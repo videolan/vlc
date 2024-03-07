@@ -48,6 +48,7 @@ class QWindow;
 class QQuickItem;
 class QQuickView;
 class QQuickWindow;
+struct WindowEffectsModule;
 
 namespace vlc {
 
@@ -126,6 +127,8 @@ protected:
     void commonWindowEnable();
     void commonWindowDisable();
 
+    bool setBlurBehind(QWindow* window, bool enable = true);
+
 protected:
     bool commonGUICreate(QWindow* window, QmlUISurface* , CompositorVideo::Flags flags);
     bool commonGUICreate(QWindow* window, QQuickView* , CompositorVideo::Flags flags);
@@ -154,6 +157,10 @@ protected:
 #ifdef _WIN32
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 #endif
+
+    bool m_blurBehind = false;
+    WindowEffectsModule* m_windowEffectsModule = nullptr;
+    bool m_failedToLoadWindowEffectsModule = false;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(CompositorVideo::Flags)

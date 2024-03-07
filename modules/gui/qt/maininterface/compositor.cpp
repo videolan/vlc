@@ -40,7 +40,11 @@
 #  include "compositor_x11.hpp"
 #endif
 
+#include "maininterface/windoweffects_module.hpp"
+
 #include <vlc_window.h>
+#include <vlc_modules.h>
+
 
 using namespace vlc;
 
@@ -184,7 +188,12 @@ CompositorVideo::CompositorVideo(qt_intf_t *p_intf, QObject* parent)
 
 CompositorVideo::~CompositorVideo()
 {
-
+    if (m_windowEffectsModule)
+    {
+        if (m_windowEffectsModule->p_module)
+            module_unneed(m_windowEffectsModule, m_windowEffectsModule->p_module);
+        vlc_object_delete(m_windowEffectsModule);
+    }
 }
 
 void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)
@@ -250,6 +259,7 @@ void CompositorVideo::commonWindowDisable()
 bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags)
 {
     assert(m_mainCtx);
+    assert(window);
 
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
     m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
@@ -261,6 +271,10 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
         connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
                 this, &CompositorVideo::onSurfaceSizeChanged);
     }
+    if (flags & CompositorVideo::HAS_ACRYLIC)
+    {
+        setBlurBehind(window, true);
+    }
     m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
     m_videoWindowHandler->setWindow( window );
 
@@ -269,7 +283,7 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 #else
     m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
 #endif
-    m_mainCtx->setHasAcrylicSurface(flags & CompositorVideo::HAS_ACRYLIC);
+    m_mainCtx->setHasAcrylicSurface(m_blurBehind);
     m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
 
 #ifdef _WIN32
@@ -319,4 +333,40 @@ void CompositorVideo::commonIntfDestroy()
     m_videoWindowHandler.reset();
     m_videoSurfaceProvider.reset();
     unloadGUI();
+}
+
+bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
+{
+    assert(window);
+    assert(m_intf);
+
+    if (m_failedToLoadWindowEffectsModule)
+        return false;
+
+    if (!m_windowEffectsModule)
+    {
+        m_windowEffectsModule = vlc_object_create<WindowEffectsModule>(m_intf);
+        if (!m_windowEffectsModule) // do not set m_failedToLoadWindowEffectsModule here
+            return false;
+    }
+
+    if (!m_windowEffectsModule->p_module)
+    {
+        m_windowEffectsModule->p_module = module_need(m_windowEffectsModule, "qtwindoweffects", nullptr, false);
+        if (!m_windowEffectsModule->p_module)
+        {
+            msg_Info(m_intf, "A module providing window effects capability could not be instantiated. Background blur effect will not be available.");
+            m_failedToLoadWindowEffectsModule = true;
+            vlc_object_delete(m_windowEffectsModule);
+            m_windowEffectsModule = nullptr;
+            return false;
+        }
+    }
+
+    if (!m_windowEffectsModule->isEffectAvailable(WindowEffectsModule::BlurBehind))
+        return false;
+
+    m_windowEffectsModule->setBlurBehind(window, enable);
+    m_blurBehind = enable;
+    return true;
 }
