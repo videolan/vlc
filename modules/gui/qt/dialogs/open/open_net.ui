@@ -44,7 +44,7 @@
 rtp://@:1234
 mms://mms.examples.com/stream.asx
 rtsp://server.example.org:8080/test.sdp
-http://www.yourtube.com/watch?v=gg64x</string>
+http://www.youtube.com/watch?v=gg64x</string>
         </property>
         <property name="margin">
          <number>5</number>
