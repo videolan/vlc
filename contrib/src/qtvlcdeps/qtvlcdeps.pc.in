@@ -1,0 +1,9 @@
+prefix=/
+exec_prefix=${prefix}
+libdir=/
+
+Name: qtvlcdeps
+Description: Qt dependencies for VLC media player
+Version: 0.1
+
+Libs: %1
