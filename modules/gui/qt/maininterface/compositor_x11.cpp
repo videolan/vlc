@@ -207,13 +207,14 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     m_qmlView->winId();
     m_qmlView->show();
 
-    CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP;
-    if (m_renderWindow->hasAcrylic())
-        flags |= CompositorVideo::HAS_ACRYLIC;
+    CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | HAS_ACRYLIC;
     if (m_renderWindow->supportExtendedFrame())
         flags |= CompositorVideo::HAS_EXTENDED_FRAME;
     if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
         return false;
+
+    if (m_blurBehind)
+        m_renderWindow->m_hasAcrylic = true;
 
     m_renderWindow->setInterfaceWindow(m_qmlView.get());
     m_renderWindow->setVideoWindow(m_videoWidget->windowHandle());

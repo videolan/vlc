@@ -151,6 +151,8 @@ public:
 
 class CompositorX11RenderWindow : public DummyRenderWindow, public AccessibleRenderWindow
 {
+    friend class CompositorX11;
+
     Q_OBJECT
 public:
     explicit CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWindow* parent = nullptr);

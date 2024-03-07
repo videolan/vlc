@@ -42,8 +42,6 @@
 #include "qt.hpp"
 #include "mainctx.hpp"
 
-//blur behind for KDE
-#define _KDE_NET_WM_BLUR_BEHIND_REGION_NAME "_KDE_NET_WM_BLUR_BEHIND_REGION"
 #define _GTK_FRAME_EXTENTS "_GTK_FRAME_EXTENTS"
 
 using namespace vlc;
@@ -395,16 +393,6 @@ bool CompositorX11RenderWindow::init()
     {
         if (!wmScreenHasCompositor(qtConn, screen))
             return true;
-    }
-
-    //check if KDE "acrylic" effect is available
-    xcb_atom_t blurBehindAtom = getInternAtom(qtConn, _KDE_NET_WM_BLUR_BEHIND_REGION_NAME);
-    if (blurBehindAtom != XCB_ATOM_NONE)
-    {
-        uint32_t val = 0;
-        xcb_change_property(qtConn, XCB_PROP_MODE_REPLACE, m_wid,
-                            blurBehindAtom, XCB_ATOM_CARDINAL, 32, 1, &val);
-        m_hasAcrylic = true;
     }
 
     //_GTK_FRAME_EXTENTS should be available at least on Gnome/KDE/FXCE/Enlightement
