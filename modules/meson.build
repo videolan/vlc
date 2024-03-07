@@ -296,7 +296,7 @@ foreach module : vlc_modules
     kwargs = {}
 
     if module.has_key('link_language')
-      kwargs += { link_language: module.get('link_language') }
+        kwargs += { link_language: module.get('link_language') }
     endif
 
     vlc_plugin = library(
