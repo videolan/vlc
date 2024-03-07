@@ -26,7 +26,9 @@
 #include "test.h"
 #include "media_utils.h"
 
-static void test_meta (const char ** argv, int argc)
+#include <vlc_modules.h>
+
+static int test_meta (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
     libvlc_media_t *media;
@@ -36,6 +38,9 @@ static void test_meta (const char ** argv, int argc)
 
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
+
+    if (!module_exists("taglib"))
+        return 77;
 
     media = libvlc_media_new_path(SRCDIR "/samples/meta.mp3");
     assert( media );
@@ -55,6 +60,8 @@ static void test_meta (const char ** argv, int argc)
     free (artist);
     libvlc_media_release (media);
     libvlc_release (vlc);
+
+    return 0;
 }
 
 
@@ -62,7 +69,5 @@ int main (void)
 {
     test_init();
 
-    test_meta (test_defaults_args, test_defaults_nargs);
-
-    return 0;
+    return test_meta (test_defaults_args, test_defaults_nargs);
 }
