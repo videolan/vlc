@@ -518,7 +518,7 @@ chain_CVPX_Flush(filter_t *filter)
 }
 
 static vlc_fourcc_t
-GetIntermediateChroma(input_chroma, output_chroma)
+GetIntermediateChroma(vlc_fourcc_t input_chroma, vlc_fourcc_t output_chroma)
 {
     vlc_fourcc_t chromas[2] = { input_chroma, output_chroma };
 
