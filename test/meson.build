@@ -37,6 +37,7 @@ foreach vlc_test: vlc_tests
         '-DTOP_SRCDIR="@0@"'.format(vlc_src_root),
     ]
 
+    disabled_dependencies = []
     test_modules_deps = []
     foreach module_name : vlc_test.get('module_depends', [])
         if module_name not in vlc_plugins_targets.keys()
@@ -44,7 +45,15 @@ foreach vlc_test: vlc_tests
                   .format(vlc_test['name'], module_name))
         endif
         test_modules_deps += vlc_plugins_targets[module_name]
+        if vlc_plugins_manifest[module_name].get('enabled', true)
+            disabled_dependencies += module_name
+        endif
     endforeach
+
+    if disabled_dependencies != []
+        # TODO: mark as skipped
+        continue
+    endif
 
     moc_sources = []
     if vlc_test.has_key('moc_headers') and qt5_dep.found()
