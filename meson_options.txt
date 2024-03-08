@@ -265,6 +265,11 @@ option('vorbis',
     value : 'auto',
     description : 'Enable/disable vorbis support')
 
+option('vsxu',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable VSXU visualization support')
+
 option('x265',
     type : 'feature',
     value : 'auto',
