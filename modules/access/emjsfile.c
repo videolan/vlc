@@ -247,17 +247,16 @@ static int EmFileOpen( vlc_object_t *p_this ) {
         w.addEventListener('message', handleFileRequest);
     }, pthread_self());
 
-    access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
-    if (unlikely(p_sys == NULL)) {
-        return VLC_ENOMEM;
-    }
-
     char *endPtr;
     long id = strtol(p_access->psz_location, &endPtr, 10);
     if ((endPtr == p_access->psz_location) || (*endPtr != '\0')) {
         msg_Err(p_access, "error: failed init uri has invalid id!");
         return VLC_EGENERIC;
     }
+
+    access_sys_t *p_sys = vlc_obj_malloc(p_this, sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
 
     /*
       Request the file from the main thread.
