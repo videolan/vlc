@@ -805,24 +805,30 @@ create_mock_media(const char *name, const struct media_params *params)
     return item;
 }
 
+static input_item_t *
+player_create_mock_media(struct ctx *ctx, const char *name,
+                         const struct media_params *params)
+{
+    assert(params);
+
+    input_item_t *media = create_mock_media(name, params);
+    assert(media != NULL);
+
+    ctx->params = *params;
+    if (ctx->params.chapter_count > 0 && ctx->params.title_count == 0)
+        ctx->params.title_count = 1;
+    if (ctx->params.program_count == 0)
+        ctx->params.program_count = 1;
+    return media;
+}
+
 static void
 player_set_current_mock_media(struct ctx *ctx, const char *name,
                               const struct media_params *params, bool ignored)
 {
     input_item_t *media;
     if (name)
-    {
-        assert(params);
-
-        media = create_mock_media(name, params);
-        assert(media);
-
-        ctx->params = *params;
-        if (ctx->params.chapter_count > 0 && ctx->params.title_count == 0)
-            ctx->params.title_count = 1;
-        if (ctx->params.program_count == 0)
-            ctx->params.program_count = 1;
-    }
+        media = player_create_mock_media(ctx, name, params);
     else
         media = NULL;
     int ret = vlc_player_SetCurrentMedia(ctx->player, media);
