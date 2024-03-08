@@ -1972,6 +1972,17 @@ test_next_media(struct ctx *ctx)
 
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(100));
 
+    /* This media should be overiden by the first call of
+     * player_set_next_mock_media() and no events should be sent regarding this
+     * media. */
+    input_item_t *media = create_mock_media("ignored", &params);
+    assert(media);
+    vlc_player_SetNextMedia(ctx->player, media);
+
+    /* Check vlc_player_GetNextMedia() */
+    assert(vlc_player_GetNextMedia(ctx->player) == media);
+    input_item_Release(media);
+
     for (size_t i = 0; i < media_count; ++i)
         player_set_next_mock_media(ctx, media_names[i], &params);
     player_set_rate(ctx, 4.f);
