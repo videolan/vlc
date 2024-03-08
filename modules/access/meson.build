@@ -169,6 +169,18 @@ if (get_option('linsys')
     endif
 endif
 
+live555_dep = dependency('live555', version: '>= 2011.12.23', required: get_option('live555'))
+# TODO support without pkg-config
+vlc_modules += {
+    'name' : 'live555',
+    'sources' : files('live555.cpp', 'live555_dtsgen.h',
+                      'mms/asf.c', 'mms/asf.h',
+                      'mms/buffer.c', 'mms/buffer.h',
+                      '../codec/opus_header.c', '../codec/opus_header.h'),
+    'dependencies' : [live555_dep, socket_libs],
+    'enabled' : live555_dep.found(),
+}
+
 # Shared memory frame buffer capture
 vlc_modules += {
     'name' : 'shm',

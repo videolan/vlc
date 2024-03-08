@@ -630,6 +630,11 @@ option('dsm',
     value: 'auto',
     description: 'SMB/CIFS access/sd support')
 
+option('live555',
+    type: 'feature',
+    value: 'auto',
+    description: 'RTSP input through live555')
+
 option('rist',
     type: 'feature',
     value: 'auto',
@@ -735,7 +740,6 @@ option('nvdec',
     value: 'auto',
     description: 'NVDEC decoder support')
 
-# TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing decklink
 # TODO: Missing rpi-omxil
