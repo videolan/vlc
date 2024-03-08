@@ -27,23 +27,6 @@ vlc_tests += {
     'module_depends': ['imem'],
 }
 
-test_libvlc_media_thumbnail_modules = ['demux_mock']
-if avcodec_dep.found()
-    test_libvlc_media_thumbnail_modules += ['avcodec']
-endif
-if swscale_dep.found()
-    test_libvlc_media_thumbnail_modules += ['swscale']
-endif
-if jpeg_dep.found()
-    test_libvlc_media_thumbnail_modules += ['jpeg']
-endif
-if png_dep.found()
-    test_libvlc_media_thumbnail_modules += ['png']
-endif
-if vpx_dep.found()
-    test_libvlc_media_thumbnail_modules += ['vpx']
-endif
-
 vlc_tests += {
     'name' : 'test_libvlc_media_thumbnail_argb',
     'sources' : files('media_thumbnail.c'),
@@ -53,7 +36,7 @@ vlc_tests += {
         '-DTEST_THUMB_TYPE=libvlc_picture_Argb',
         '-DTEST_REQUIRED_MODULES="avcodec"',
     ],
-    'module_depends': test_libvlc_media_thumbnail_modules,
+    'module_depends': ['demux_mock', 'swscale', 'avcodec'],
 }
 
 vlc_tests += {
@@ -65,7 +48,7 @@ vlc_tests += {
         '-DTEST_THUMB_TYPE=libvlc_picture_Jpg',
         '-DTEST_REQUIRED_MODULES="jpeg"',
     ],
-    'module_depends': test_libvlc_media_thumbnail_modules,
+    'module_depends': ['demux_mock', 'swscale', 'jpeg'],
 }
 
 vlc_tests += {
@@ -77,7 +60,7 @@ vlc_tests += {
         '-DTEST_THUMB_TYPE=libvlc_picture_Png',
         '-DTEST_REQUIRED_MODULES="png"',
     ],
-    'module_depends': test_libvlc_media_thumbnail_modules,
+    'module_depends': ['demux_mock', 'swscale', 'png'],
 }
 
 vlc_tests += {
@@ -89,7 +72,7 @@ vlc_tests += {
         '-DTEST_THUMB_TYPE=libvlc_picture_WebP',
         '-DTEST_REQUIRED_MODULES="vpx"',
     ],
-    'module_depends': test_libvlc_media_thumbnail_modules,
+    'module_depends': ['demux_mock', 'swscale', 'vpx'],
 }
 
 # vlc_tests += {
