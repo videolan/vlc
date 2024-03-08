@@ -102,6 +102,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (NSIndexSet *)outlineView:(NSOutlineView *)outlineView selectionIndexesForProposedSelection:(nonnull NSIndexSet *)proposedSelectionIndexes
 {
+    NSAssert(outlineView == _outlineView, @"VLCLibraryWindowNavigationSidebarController should only be a delegate for the libraryWindow nav sidebar outline view!");
+
     if (proposedSelectionIndexes.count == 0 || proposedSelectionIndexes.firstIndex != VLCLibraryMusicSegment) {
         return proposedSelectionIndexes;
     } else {
