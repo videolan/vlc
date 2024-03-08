@@ -113,23 +113,22 @@ vlc_modules += {
 }
 
 # CVPX chroma converter
-if host_system == 'darwin'
-    # TODO: Set minimum versions for tvOS and iOS
-    vlc_modules += {
-        'name' : 'cvpx',
-        'sources' : files(
-            '../codec/vt_utils.c',
-            'cvpx.c',
-        ),
-        'link_with' : [chroma_copy_lib],
-        'dependencies' : [
-            frameworks['VideoToolbox'],
-            frameworks['Foundation'],
-            frameworks['CoreMedia'],
-            frameworks['CoreVideo'],
-        ],
-    }
-endif
+# TODO: Set minimum versions for tvOS and iOS
+vlc_modules += {
+    'name' : 'cvpx',
+    'sources' : files(
+        '../codec/vt_utils.c',
+        'cvpx.c',
+    ),
+    'link_with' : [chroma_copy_lib],
+    'dependencies' : [
+        frameworks['VideoToolbox'],
+        frameworks['Foundation'],
+        frameworks['CoreMedia'],
+        frameworks['CoreVideo'],
+    ],
+    'enabled' : host_system == 'darwin',
+}
 
 ## Tests
 

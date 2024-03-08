@@ -245,20 +245,19 @@ vlc_modules += {
 }
 
 # macOS/iOS accelerated video filters (CoreImage)
-if host_system == 'darwin'
-    vlc_modules += {
-        'name' : 'ci_filters',
-        'sources' : files('ci_filters.m', '../codec/vt_utils.c'),
-        'dependencies' : [
-            frameworks['Foundation'],
-            frameworks['CoreGraphics'],
-            frameworks['CoreImage'],
-            frameworks['CoreVideo'],
-            (have_osx) ? dependency('gl', required: true) : frameworks['OpenGLES'],
-        ],
-        'include_directories' : [include_directories('../codec')]
-    }
-endif
+vlc_modules += {
+    'name' : 'ci_filters',
+    'sources' : files('ci_filters.m', '../codec/vt_utils.c'),
+    'dependencies' : [
+        frameworks['Foundation'],
+        frameworks['CoreGraphics'],
+        frameworks['CoreImage'],
+        frameworks['CoreVideo'],
+        (have_osx) ? dependency('gl', required: true) : frameworks['OpenGLES'],
+    ],
+    'include_directories' : [include_directories('../codec')],
+    'enabled' : host_system == 'darwin',
+}
 
 # deinterlace common helper lib
 deinterlacecommon_lib = static_library(
