@@ -207,7 +207,7 @@ static int EmFileOpen( vlc_object_t *p_this ) {
     */
     MAIN_THREAD_EM_ASM({
         const thread_id = $0;
-        let w = Module.PThread.pthreads[thread_id].worker;
+        let w = Module.PThread.pthreads[thread_id];
         function handleFileRequest(e) {
             const msg = e.data;
             if (msg.type === "requestFile") {
