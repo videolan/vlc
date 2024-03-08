@@ -1193,7 +1193,18 @@ vlc_player_Start(vlc_player_t *player)
     }
 
     if (!player->media)
-        return VLC_EGENERIC;
+    {
+        if (player->next_media != NULL)
+        {
+            /* The user called only SetNextMedia() and not SetCurrentMedia(),
+             * so open the next media directly from here. */
+            int ret = vlc_player_OpenNextMedia(player);
+            if (ret != VLC_SUCCESS)
+                return ret;
+        }
+        else
+            return VLC_EGENERIC;
+    }
 
     if (!player->input)
     {
