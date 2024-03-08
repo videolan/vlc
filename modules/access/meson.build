@@ -70,49 +70,44 @@ if get_option('oss').disable_auto_if(
 endif
 
 # JACK input module
-if jack_dep.found()
-    vlc_modules += {
-        'name' : 'access_jack',
-        'sources' : files('jack.c'),
-        'dependencies' : [jack_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'access_jack',
+    'sources' : files('jack.c'),
+    'dependencies' : [jack_dep],
+    'enabled' : jack_dep.found(),
+}
 
 # Pulseaudio module
-if pulse_dep.found()
-    vlc_modules += {
-        'name' : 'pulsesrc',
-        'sources' : files('pulse.c'),
-        'dependencies' : [pulse_dep],
-        'link_with' : [libvlc_pulse],
-    }
-endif
+vlc_modules += {
+    'name' : 'pulsesrc',
+    'sources' : files('pulse.c'),
+    'dependencies' : [pulse_dep],
+    'link_with' : [libvlc_pulse],
+    'enabled' : pulse_dep.found(),
+}
 
 # AVFoundation audio capture access
-if have_osx
-    vlc_modules += {
-        'name' : 'avaudiocapture',
-        'sources' : files('avaudiocapture.m'),
-        'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [
-            frameworks['Foundation'],
-            frameworks['AVFoundation'],
-            frameworks['CoreMedia'],
-        ],
-    }
-endif
+vlc_modules += {
+    'name' : 'avaudiocapture',
+    'sources' : files('avaudiocapture.m'),
+    'objc_args' : ['-fobjc-arc'],
+    'dependencies' : [
+        frameworks['Foundation'],
+        frameworks['AVFoundation'],
+        frameworks['CoreMedia'],
+    ],
+    'enabled' : have_osx,
+}
 
 # WASAPI access
-if (get_option('wasapi')
-    .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
-    .allowed() and ksuser_lib.found())
-    vlc_modules += {
-        'name' : 'access_wasapi',
-        'sources' : files('wasapi.c'),
-        'dependencies' : [ksuser_lib]
-    }
-endif
-
+vlc_modules += {
+    'name' : 'access_wasapi',
+    'sources' : files('wasapi.c'),
+    'dependencies' : [ksuser_lib],
+    'enabled' : get_option('wasapi')
+      .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
+      .allowed() and ksuser_lib.found()
+}
 
 ## Video capture
 
