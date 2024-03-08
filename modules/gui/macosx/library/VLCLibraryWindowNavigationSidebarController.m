@@ -100,6 +100,15 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     return cellView;
 }
 
+- (NSIndexSet *)outlineView:(NSOutlineView *)outlineView selectionIndexesForProposedSelection:(nonnull NSIndexSet *)proposedSelectionIndexes
+{
+    if (proposedSelectionIndexes.count == 0 || proposedSelectionIndexes.firstIndex != VLCLibraryMusicSegment) {
+        return proposedSelectionIndexes;
+    } else {
+        return [NSIndexSet indexSetWithIndex:VLCLibraryArtistsMusicSubSegment];
+    }
+}
+
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
     NSTreeNode * const node = (NSTreeNode *)[_outlineView itemAtRow:_outlineView.selectedRow];
