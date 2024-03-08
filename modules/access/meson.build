@@ -8,6 +8,30 @@ vlc_modules += {
     'sources' : files('data.c')
 }
 
+decklink_dep = disabler()
+if get_option('decklink').allowed()
+decklink_cpp_args = []
+if host_system == 'windows'
+    decklink_cpp_args += libcom_cppflags
+endif
+# TODO allow providing a custom location for the DeckLink SDK
+if contrib_dir != ''
+    decklink_dep = declare_dependency(
+        link_args: '-L' + contrib_libdir,
+        compile_args: [f'-I@contrib_incdir@/decklink'])
+    if not cpp.check_header('DeckLinkAPI.h', dependencies: [ decklink_dep ])
+        decklink_dep = disabler()
+    endif
+endif
+vlc_modules += {
+    'name' : 'decklink',
+    'sources' : files('decklink.cpp', 'sdi.c', 'sdi.h', 'vlc_decklink.h'),
+    'dependencies' : [dl_lib, decklink_dep],
+    'cpp_args' : decklink_cpp_args,
+    'enabled' : decklink_dep.found(),
+}
+endif
+
 # Filesystem access module
 vlc_modules += {
     'name' : 'filesystem',

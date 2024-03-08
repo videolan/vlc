@@ -740,8 +740,12 @@ option('nvdec',
     value: 'auto',
     description: 'NVDEC decoder support')
 
+option('decklink',
+    type: 'feature',
+    value: 'auto',
+    description: 'DeckLink support')
+
 # TODO: Missing v4l2
-# TODO: Missing decklink
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
 # TODO: Missing merge-ffmpeg
