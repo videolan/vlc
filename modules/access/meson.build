@@ -353,8 +353,26 @@ if host_system == 'windows' and have_win_desktop
     }
 endif
 
+# vlc_access_cache helper lib
+vlc_access_cache_lib = static_library(
+    'vlc_access_cache',
+    files('cache.c',),
+    include_directories: [vlc_include_dirs],
+    pic: true,
+    install: false
+)
 
 ## Network stream access modules
+
+# Smb v1
+libdsm_dep = dependency('libdsm', version: '>= 0.2.0', required: get_option('dsm'))
+vlc_modules += {
+    'name' : 'dsm',
+    'sources' : files('dsm/access.c', 'dsm/sd.c', 'smb_common.h'),
+    'dependencies' : [libdsm_dep],
+    'link_with' : [vlc_access_cache_lib],
+    'enabled' : libdsm_dep.found(),
+}
 
 # FTP
 vlc_modules += {

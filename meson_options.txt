@@ -625,6 +625,11 @@ option('udev',
     value: 'auto',
     description: 'Linux udev services discovery')
 
+option('dsm',
+    type: 'feature',
+    value: 'auto',
+    description: 'SMB/CIFS access/sd support')
+
 option('rist',
     type: 'feature',
     value: 'auto',
@@ -755,6 +760,5 @@ option('nvdec',
 # TODO: Missing vsxu
 # TODO: Missing kwallet
 # TODO: Missing osx_notifications
-# TODO: Missing dsm
 # TODO: Missing asdcplib
 # TODO: Missing chromecast
