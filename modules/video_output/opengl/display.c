@@ -136,16 +136,6 @@ static const struct vlc_display_operations ops = {
     .update_format = UpdateFormat,
 };
 
-static void
-FlipVerticalAlign(struct vout_display_placement *dp)
-{
-    /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (dp->align.vertical == VLC_VIDEO_ALIGN_TOP)
-        dp->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (dp->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        dp->align.vertical = VLC_VIDEO_ALIGN_TOP;
-}
-
 static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
                          struct vout_display_placement dp)
 {
@@ -166,9 +156,8 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
         dp.height = width;
     }
 
-    FlipVerticalAlign(&dp);
-
     vout_display_PlacePicture(place, &source, &dp);
+    place->y = dp.height - (place->y + place->height);
 
     if (ORIENT_IS_SWAP(transform))
     {
