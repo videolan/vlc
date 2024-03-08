@@ -157,6 +157,9 @@ libgcrypt_dep = dependency('libgcrypt',
 # Array that holds all enabled VLC module dicts
 vlc_modules = []
 
+# video chroma modules
+subdir('video_chroma')
+
 # codec modules
 subdir('codec')
 
@@ -213,9 +216,6 @@ subdir('spu')
 
 # text renderer modules
 subdir('text_renderer')
-
-# video chroma modules
-subdir('video_chroma')
 
 # video filter modules
 subdir('video_filter')
