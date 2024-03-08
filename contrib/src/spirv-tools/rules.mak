@@ -27,7 +27,7 @@ spirv-tools/external/spirv-headers: SPIRV-Headers-sdk-$(SPIRVHEADERS_VERSION).ta
 	$(UNPACK)
 	$(MOVE)
 
-SPIRVTOOLS_CONFIG := -DSPIRV_SKIP_TESTS=ON
+SPIRVTOOLS_CONFIG := -DSPIRV_SKIP_TESTS=ON -DSPIRV_WERROR=OFF -DSPIRV_CHECK_CONTEXT=OFF
 
 .spirv-tools: BUILD_DIR=$</vlc_native
 .spirv-tools: spirv-tools spirv-tools/external/spirv-headers
@@ -35,5 +35,4 @@ SPIRVTOOLS_CONFIG := -DSPIRV_SKIP_TESTS=ON
 	$(BUILDVARS) $(CMAKE_NATIVE) $(SPIRVTOOLS_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
 	touch $@
