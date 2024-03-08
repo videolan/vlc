@@ -153,13 +153,11 @@ opengles_dep = frameworks['OpenGLES']
 
 
 # Windows-specific dependencies
-if host_system == 'windows'
 
-    # WASAPI-related dependency
-    ksuser_lib = cc.find_library('ksuser',
-                                 has_headers: ['audioclient.h'],
-                                 required: get_option('wasapi'))
-endif
+# WASAPI-related dependency
+ksuser_lib = cc.find_library('ksuser',
+                             has_headers: ['audioclient.h'],
+                             required: host_system == 'windows' and get_option('wasapi'))
 
 # Helper libraries for modules
 # These are helper libraries used by some modules
