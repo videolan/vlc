@@ -1,4 +1,8 @@
 bin
+include
+lib
+libexec
+share
 python-venv
 vlc-contrib-*.tar.xz
 vlc-contrib-*.tar.bz2
