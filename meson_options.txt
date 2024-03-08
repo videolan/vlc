@@ -745,6 +745,11 @@ option('decklink',
     value: 'auto',
     description: 'DeckLink support')
 
+option('nfs',
+    type: 'feature',
+    value: 'auto',
+    description: 'support nfs protocol via libnfs')
+
 # TODO: Missing v4l2
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode

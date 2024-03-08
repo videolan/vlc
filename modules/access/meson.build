@@ -443,6 +443,15 @@ vlc_modules += {
 # New HTTP(S)
 subdir('http')
 
+# Network file sharing
+nfs_dep = dependency('libnfs', version: '>= 1.10.0', required: get_option('nfs'))
+vlc_modules += {
+    'name' : 'nfs',
+    'sources' : files('nfs.c'),
+    'dependencies' : [nfs_dep, socket_libs],
+    'enabled' : nfs_dep.found(),
+}
+
 # TCP
 vlc_modules += {
     'name' : 'tcp',
