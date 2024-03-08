@@ -1,7 +1,8 @@
 # TagLib
 
 TAGLIB_VERSION := 2.0
-TAGLIB_URL := https://taglib.org/releases/taglib-$(TAGLIB_VERSION).tar.gz
+TAGLIB_URL := $(GITHUB)/taglib/taglib/releases/download/v$(TAGLIB_VERSION)/taglib-$(TAGLIB_VERSION).tar.gz
+
 UTFCPP_GITURL := $(GITHUB)/nemtrif/utfcpp.git
 UTFCPP_GITVERSION := df857efc5bbc2aa84012d865f7d7e9cccdc08562
 
