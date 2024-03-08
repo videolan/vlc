@@ -105,6 +105,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     if (proposedSelectionIndexes.count == 0 || proposedSelectionIndexes.firstIndex != VLCLibraryMusicSegment) {
         return proposedSelectionIndexes;
     } else {
+        NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:VLCLibraryMusicSegment];
+        [self.outlineView expandItem:itemNode];
         return [NSIndexSet indexSetWithIndex:VLCLibraryArtistsMusicSubSegment];
     }
 }
