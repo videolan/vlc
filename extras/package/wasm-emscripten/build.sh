@@ -251,6 +251,6 @@ if echo "${VLC_USE_SANITIZER}" | grep address > /dev/null; then
 SANITIZERS="$SANITIZERS -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer"
 fi
 
-emcc $SANITIZERS -pthread -c "$BUILD_PATH"/vlc-modules.c -I"$VLC_SRCPATH"/include -I"$BUILD_PATH"  -o "$BUILD_PATH"/vlc-modules.bc
+emcc $SANITIZERS -pthread -c -emit-llvm "$BUILD_PATH"/vlc-modules.c -I"$VLC_SRCPATH"/include -I"$BUILD_PATH"  -o "$BUILD_PATH"/vlc-modules.bc
 
 echo "VLC for wasm32-unknown-emscripten built!"
