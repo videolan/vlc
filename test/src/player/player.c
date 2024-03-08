@@ -848,10 +848,15 @@ static void
 player_set_next_mock_media(struct ctx *ctx, const char *name,
                            const struct media_params *params)
 {
-    if (vlc_player_GetCurrentMedia(ctx->player) == NULL)
+    assert(name != NULL);
+    if (ctx->added_medias.size == 0)
     {
-        assert(ctx->added_medias.size == 0);
-        player_set_current_mock_media(ctx, name, params, false);
+        input_item_t *media = player_create_mock_media(ctx, name, params);
+        vlc_player_SetNextMedia(ctx->player, media);
+        bool success = vlc_vector_push(&ctx->added_medias, media);
+        assert(success);
+        success = vlc_vector_push(&ctx->played_medias, media);
+        assert(success);
     }
     else
     {
@@ -1475,7 +1480,7 @@ test_tracks_ids(struct ctx *ctx)
     const size_t track_count = params.track_count[VIDEO_ES] +
                                params.track_count[AUDIO_ES] +
                                params.track_count[SPU_ES];
-    player_set_next_mock_media(ctx, "media1", &params);
+    player_set_current_mock_media(ctx, "media1", &params, false);
 
     /*
      * Test that tracks can be set before the player is started
@@ -1910,7 +1915,7 @@ test_seeks(struct ctx *ctx)
     vlc_player_t *player = ctx->player;
 
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(10));
-    player_set_next_mock_media(ctx, "media1", &params);
+    player_set_current_mock_media(ctx, "media1", &params, false);
 
     /* only the last one will be taken into account before start */
     vlc_player_SetTimeFast(player, 0);
