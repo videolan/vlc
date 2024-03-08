@@ -132,6 +132,7 @@ static void Convert( filter_t *p_filter, picture_t *p_source,
         vlc_assert_unreachable();
 
     /* Create a RGBA palette */
+    assert(p_yuvp->i_entries <= VIDEO_PALETTE_COLORS_MAX);
     rgbp.i_entries = p_yuvp->i_entries;
     for( int i = 0; i < p_yuvp->i_entries; i++ )
     {
