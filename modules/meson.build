@@ -76,35 +76,81 @@ if not jack_dep.found()
         required: false)
 endif
 
+frameworks = {}
+framework_conditions = [
+    {
+        'frameworks': [
+            'Foundation',
+            'CoreFoundation',
+            'Security',
+            'CoreMedia',
+            'AVFoundation',
+            'CoreVideo',
+            'VideoToolbox',
+            'AudioToolbox',
+            'IOKit',
+            'QuartzCore',
+            'QuartzText',
+            'CoreText',
+            'CoreAudio',
+            'CoreImage',
+            'CoreGraphics',
+            'AVKit',
+        ],
+        'condition': host_system == 'darwin'
+    },
+    {
+        'frameworks': [
+            'Cocoa',
+            'OpenGL',
+            'AudioUnit',
+        ],
+        'condition': have_osx
+    },
+    {
+        'frameworks': [
+            'UIKit',
+            'OpenGLES',
+        ],
+        'condition': have_ios or have_tvos
+    },
+]
+
+foreach framework_spec : framework_conditions
+    foreach framework_name : framework_spec['frameworks']
+        if framework_spec['condition']
+            # Not-found dependency
+            frameworks += { framework_name: disabler() }
+        else
+            frameworks += { framework_name: dependency(framework_name, required: framework_spec['condition']) }
+        endif
+    endforeach
+endforeach
+
 # Darwin-specific dependencies
-if host_system == 'darwin'
-    security_dep = dependency('Security', required: true)
-    coremedia_dep = dependency('CoreMedia', required: true)
-    avfoundation_dep = dependency('AVFoundation', required: true)
-    corevideo_dep = dependency('CoreVideo', required: true)
-    videotoolbox_dep = dependency('VideoToolbox', required: true)
-    audiotoolbox_dep = dependency('AudioToolbox', required: true)
-    iokit_dep = dependency('IOKit', required: true)
-    quartz_dep = dependency('QuartzCore', required: true)
-    coretext_dep = dependency('CoreText', required: true)
-    coreaudio_dep = dependency('CoreAudio', required: true)
-    coreimage_dep = dependency('CoreImage', required: true)
-    coregraphics_dep = dependency('CoreGraphics', required: true)
-    avkit_dep = dependency('AVKit', required: true)
-endif
+security_dep = frameworks['Security']
+coremedia_dep = frameworks['CoreMedia']
+avfoundation_dep = frameworks['AVFoundation']
+corevideo_dep = frameworks['CoreVideo']
+videotoolbox_dep = frameworks['VideoToolbox']
+audiotoolbox_dep = frameworks['AudioToolbox']
+iokit_dep = frameworks['IOKit']
+quartz_dep = frameworks['QuartzCore']
+coretext_dep = frameworks['CoreText']
+coreaudio_dep = frameworks['CoreAudio']
+coreimage_dep = frameworks['CoreImage']
+coregraphics_dep = frameworks['CoreGraphics']
+avkit_dep = frameworks['AVKit']
 
 # macOS specific dependencies
-if have_osx
-    cocoa_dep = dependency('Cocoa', required: true)
-    opengl_dep = dependency('OpenGL', required: true)
-    audiounit_dep = dependency('AudioUnit', required: true)
-endif
+cocoa_dep = frameworks['Cocoa']
+opengl_dep = frameworks['OpenGL']
+audiounit_dep = frameworks['AudioUnit']
 
 # iOS/tvOS specific dependencies
-if have_ios or have_tvos
-    uikit_dep = dependency('UIKit', required: true)
-    opengles_dep = dependency('OpenGLES', required: true)
-endif
+uikit_dep = frameworks['UIKit']
+opengles_dep = frameworks['OpenGLES']
+
 
 # Windows-specific dependencies
 if host_system == 'windows'
