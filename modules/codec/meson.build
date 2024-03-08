@@ -24,23 +24,21 @@ vlc_modules += {
 
 # a52 codec
 a52_lib = cc.find_library('a52', required: get_option('a52'))
-if a52_lib.found()
-    vlc_modules += {
-        'name' : 'a52',
-        'sources' : files('a52.c'),
-        'dependencies' : [a52_lib]
-    }
-endif
+vlc_modules += {
+    'name' : 'a52',
+    'sources' : files('a52.c'),
+    'dependencies' : [a52_lib],
+    'enabled' : a52_lib.found(),
+}
 
 # DTS Coherent Acoustics decoder
 dca_dep = dependency('libdca', version: '>= 0.0.5', required: get_option('dca'))
-if dca_dep.found()
-    vlc_modules += {
-        'name' : 'dca',
-        'sources' : files('dca.c'),
-        'dependencies' : [dca_dep, m_lib]
-    }
-endif
+vlc_modules += {
+    'name' : 'dca',
+    'sources' : files('dca.c'),
+    'dependencies' : [dca_dep, m_lib],
+    'enabled' : dca_dep.found(),
+}
 
 # adpcm codec
 vlc_modules += {
@@ -62,13 +60,12 @@ vlc_modules += {
 
 # faad decoder plugin
 faad_lib = cc.find_library('faad', required: get_option('faad'))
-if faad_lib.found()
-    vlc_modules += {
-        'name' : 'faad',
-        'sources' : files('faad.c'),
-        'dependencies' : [faad_lib, m_lib]
-    }
-endif
+vlc_modules += {
+    'name' : 'faad',
+    'sources' : files('faad.c'),
+    'dependencies' : [faad_lib, m_lib],
+    'enabled' : faad_lib.found(),
+}
 
 # g711 codec
 vlc_modules += {
@@ -96,27 +93,25 @@ else
     fluidsynth_dep = dependency('', required: false)
 endif
 
-if fluidsynth_dep.found()
-    vlc_modules += {
-        'name' : 'fluidsynth',
-        'sources' : files('fluidsynth.c'),
-        'dependencies' : [fluidsynth_dep, m_lib],
-        'c_args' : fluidsynth_module_flags
-    }
-endif
+vlc_modules += {
+    'name' : 'fluidsynth',
+    'sources' : files('fluidsynth.c'),
+    'dependencies' : [fluidsynth_dep, m_lib],
+    'c_args' : fluidsynth_module_flags,
+    'enabled' : fluidsynth_dep.found(),
+}
 
 # Audiotoolbox MIDI plugin (Darwin only)
-if have_osx
-    vlc_modules += {
-        'name' : 'audiotoolboxmidi',
-        'sources' : files('audiotoolbox_midi.c'),
-        'dependencies' : [
-            frameworks['CoreFoundation'],
-            frameworks['AudioUnit'],
-            frameworks['AudioToolbox'],
-        ],
-    }
-endif
+vlc_modules += {
+    'name' : 'audiotoolboxmidi',
+    'sources' : files('audiotoolbox_midi.c'),
+    'dependencies' : [
+        frameworks['CoreFoundation'],
+        frameworks['AudioUnit'],
+        frameworks['AudioToolbox'],
+    ],
+    'enabled' : have_osx,
+}
 
 # LPCM codec
 vlc_modules += {
@@ -126,23 +121,21 @@ vlc_modules += {
 
 # libmad codec
 mad_dep = dependency('mad', required: get_option('mad'))
-if mad_dep.found()
-  vlc_modules += {
-      'name' : 'mad',
-      'sources' : files('mad.c'),
-      'dependencies' : [mad_dep]
-  }
-endif
+vlc_modules += {
+    'name' : 'mad',
+    'sources' : files('mad.c'),
+    'dependencies' : [mad_dep],
+    'enabled' : mad_dep.found(),
+}
 
 # libmpg123 decoder
 mpg123_dep = dependency('libmpg123', required: get_option('mpg123'))
-if mpg123_dep.found()
-    vlc_modules += {
-        'name' : 'mpg123',
-        'sources' : files('mpg123.c'),
-        'dependencies' : [mpg123_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'mpg123',
+    'sources' : files('mpg123.c'),
+    'dependencies' : [mpg123_dep],
+    'enabled' : mpg123_dep.found(),
+}
 
 # Ulead DV Audio codec
 vlc_modules += {
@@ -161,13 +154,12 @@ vlc_modules += {
 
 # libmpeg2 decoder
 mpeg2_dep = dependency('libmpeg2', version: '> 0.3.2', required: get_option('mpeg2'))
-if mpeg2_dep.found()
-    vlc_modules += {
-        'name' : 'libmpeg2',
-        'sources' : files('libmpeg2.c', 'synchro.c'),
-        'dependencies' : [mpeg2_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'libmpeg2',
+    'sources' : files('libmpeg2.c', 'synchro.c'),
+    'dependencies' : [mpeg2_dep],
+    'enabled' : mpeg2_dep.found(),
+}
 
 # Raw video codec
 vlc_modules += {
@@ -185,13 +177,12 @@ vlc_modules += {
 schroedinger_dep = dependency('schroedinger-1.0',
                               version: '>= 1.0.10',
                               required: get_option('schroedinger'))
-if schroedinger_dep.found()
-    vlc_modules += {
-        'name' : 'schroedinger',
-        'sources' : files('schroedinger.c'),
-        'dependencies' : [schroedinger_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'schroedinger',
+    'sources' : files('schroedinger.c'),
+    'dependencies' : [schroedinger_dep],
+    'enabled' : schroedinger_dep.found(),
+}
 
 # RTP Raw video codec
 vlc_modules += {
@@ -203,57 +194,49 @@ vlc_modules += {
 
 # PNG codec
 png_dep = dependency('libpng', required: get_option('png'))
-if png_dep.found()
-  vlc_modules += {
-      'name' : 'png',
-      'sources' : files('png.c'),
-      'dependencies' : [png_dep, m_lib]
-  }
-endif
+vlc_modules += {
+    'name' : 'png',
+    'sources' : files('png.c'),
+    'dependencies' : [png_dep, m_lib],
+    'enabled' : png_dep.found(),
+}
 
 # JPEG codec
 jpeg_dep = dependency('libjpeg', required: get_option('jpeg'))
-if jpeg_dep.found()
-  vlc_modules += {
-      'name' : 'jpeg',
-      'sources' : files('jpeg.c'),
-      'dependencies' : [jpeg_dep]
-  }
-endif
+vlc_modules += {
+    'name' : 'jpeg',
+    'sources' : files('jpeg.c'),
+    'dependencies' : [jpeg_dep],
+    'enabled' : jpeg_dep.found(),
+}
 
 # BPG codec
 bpg_lib = cc.find_library('bpg', required: get_option('bpg'))
-if bpg_lib.found()
-  vlc_modules += {
-      'name' : 'bpg',
-      'sources' : files('bpg.c'),
-      'dependencies' : [bpg_lib]
-  }
-endif
+vlc_modules += {
+    'name' : 'bpg',
+    'sources' : files('bpg.c'),
+    'dependencies' : [bpg_lib],
+    'enabled' : bpg_lib.found(),
+}
 
 # SVG image decoder
 cairo_dep = dependency('cairo', version: '>= 1.13.1', required: get_option('cairo'))
-if rsvg_dep.found() and cairo_dep.found()
-    vlc_modules += {
-        'name' : 'svgdec',
-        'sources' : files('svg.c'),
-        'dependencies' : [rsvg_dep, cairo_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'svgdec',
+    'sources' : files('svg.c'),
+    'dependencies' : [rsvg_dep, cairo_dep],
+    'enabled' : rsvg_dep.found() and cairo_dep.found(),
+}
 
 # xwd
-if (get_option('xcb')
-    .disable_auto_if(host_system in ['darwin', 'windows'])
-    .allowed())
-  xproto_dep = dependency('xproto', required: get_option('xcb'))
-  if xproto_dep.found()
-    vlc_modules += {
-        'name' : 'xwd',
-        'sources' : files('xwd.c'),
-        'dependencies' : [xproto_dep]
-    }
-  endif
-endif
+xproto_dep = dependency('xproto', required: get_option('xcb')
+    .disable_auto_if(host_system in ['darwin', 'windows']))
+vlc_modules += {
+    'name' : 'xwd',
+    'sources' : files('xwd.c'),
+    'dependencies' : [xproto_dep],
+    'enabled' : xproto_dep.found(),
+}
 
 
 ## SPU codecs
@@ -277,13 +260,13 @@ if libass_dep.found()
     if freetype_dep.found()
         libass_deps += freetype_dep
     endif
-
-    vlc_modules += {
-        'name' : 'libass',
-        'sources' : files('libass.c'),
-        'dependencies' : libass_deps
-    }
 endif
+vlc_modules += {
+    'name' : 'libass',
+    'sources' : files('libass.c'),
+    'dependencies' : libass_deps,
+    'enabled' : libass_dep.found(),
+}
 
 # Closed captioning decoder
 vlc_modules += {
@@ -305,14 +288,13 @@ vlc_modules += {
 
 # aribsub
 aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribsub'))
-if aribb24_dep.found()
-  vlc_modules += {
-      'name' : 'aribsub',
-      'sources' : files('arib/aribsub.c'),
-      'dependencies' : [aribb24_dep],
-      'cpp_args' : ['-DHAVE_ARIBB24']
-  }
-endif
+vlc_modules += {
+    'name' : 'aribsub',
+    'sources' : files('arib/aribsub.c'),
+    'dependencies' : [aribb24_dep],
+    'cpp_args' : ['-DHAVE_ARIBB24'],
+    'enabled' : aribb24_dep.found()
+}
 
 # scte18 decoder
 vlc_modules += {
@@ -377,22 +359,19 @@ vlc_modules += {
 
 # zvbi
 use_zvbi = zvbi_dep.found() and get_option('zvbi').enabled()
-
-if use_zvbi
-  vlc_modules += {
-      'name' : 'zvbi',
-      'sources' : files('zvbi.c'),
-      'dependencies' : [zvbi_dep, socket_libs]
-  }
-endif
+vlc_modules += {
+    'name' : 'zvbi',
+    'sources' : files('zvbi.c'),
+    'dependencies' : [zvbi_dep, socket_libs],
+    'enabled' : use_zvbi,
+}
 
 # telx
-if not use_zvbi and get_option('telx').enabled()
-  vlc_modules += {
-      'name' : 'telx',
-      'sources' : files('telx.c')
-  }
-endif
+vlc_modules += {
+    'name' : 'telx',
+    'sources' : files('telx.c'),
+    'enabled' : not use_zvbi and get_option('telx').enabled(),
+}
 
 # textst
 vlc_modules += {
@@ -467,9 +446,8 @@ endif
 vlc_modules += {
     'name' : 'webvtt',
     'sources' : webvtt_sources,
-    'include_directories' : include_directories('webvtt')
+    'include_directories' : include_directories('webvtt'),
 }
-
 
 ## Xiph.org codecs
 
@@ -477,87 +455,79 @@ ogg_dep = dependency('ogg', required: get_option('ogg'))
 
 # FLAC codec
 flac_dep = dependency('flac', required: get_option('flac'))
-if flac_dep.found()
-    vlc_modules += {
-        'name' : 'flac',
-        'sources' : files('flac.c'),
-        'dependencies' : [flac_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'flac',
+    'sources' : files('flac.c'),
+    'dependencies' : [flac_dep],
+    'enabled' : flac_dep.found(),
+}
 
 # Kate codec
 kate_dep = dependency('kate', version: '>= 0.3.0', required: get_option('kate'))
+kate_deps = [kate_dep, m_lib]
+kate_cpp_args = []
 if kate_dep.found()
-  kate_deps = [kate_dep, m_lib]
-  kate_cpp_args = []
-
   tiger_dep = dependency('tiger', version: '>= 0.3.1', required: get_option('tiger'))
 
   if tiger_dep.found()
     kate_cpp_args += ['-DHAVE_TIGER=1']
     kate_deps += tiger_dep
   endif
-
-  vlc_modules += {
-      'name' : 'kate',
-      'sources' : files('kate.c'),
-      'dependencies' : kate_deps,
-      'cpp_args' : kate_cpp_args
-  }
 endif
+vlc_modules += {
+    'name' : 'kate',
+    'sources' : files('kate.c'),
+    'dependencies' : kate_deps,
+    'cpp_args' : kate_cpp_args,
+    'enabled' : kate_dep.found(),
+}
 
 # Opus codec
 opus_dep = dependency('opus', version: '>= 1.0.3', required: get_option('opus'))
-if opus_dep.found() and ogg_dep.found()
-    vlc_modules += {
-        'name' : 'opus',
-        'sources' : files('opus.c', 'opus_header.c'),
-        'dependencies' : [opus_dep, ogg_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'opus',
+    'sources' : files('opus.c', 'opus_header.c'),
+    'dependencies' : [opus_dep, ogg_dep],
+    'enabled' : opus_dep.found() and ogg_dep.found(),
+}
 
 # Theora codec
 theoraenc_dep = dependency('theoraenc', required: get_option('theoraenc'))
 theoradec_dep = dependency('theoradec', version: '>= 1.0', required: get_option('theoradec'))
-if theoraenc_dep.found() and theoradec_dep.found() and ogg_dep.found()
-    vlc_modules += {
-        'name' : 'theora',
-        'sources' : files('theora.c'),
-        'dependencies' : [theoraenc_dep, theoradec_dep, ogg_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'theora',
+    'sources' : files('theora.c'),
+    'dependencies' : [theoraenc_dep, theoradec_dep, ogg_dep],
+    'enabled' : theoraenc_dep.found() and theoradec_dep.found() and ogg_dep.found(),
+}
 
 # Daala codec plugin
 daaladec_dep = dependency('daaladec', required: get_option('daaladec'))
 daalaenc_dep = dependency('daalaenc', required: get_option('daalaenc'))
-if daaladec_dep.found() and daalaenc_dep.found()
-    vlc_modules += {
-        'name' : 'daala',
-        'sources' : files('daala.c'),
-        'dependencies' : [daaladec_dep, daalaenc_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'daala',
+    'sources' : files('daala.c'),
+    'dependencies' : [daaladec_dep, daalaenc_dep],
+    'enabled' : daaladec_dep.found() and daalaenc_dep.found(),
+}
 
 # Vorbis codec
 vorbis_dep    = dependency('vorbis', version: '>= 1.1', required: get_option('vorbis'))
 vorbisenc_dep = dependency('vorbisenc', version: '>= 1.1', required: get_option('vorbis'))
-
-if vorbis_dep.found() and vorbisenc_dep.found() and ogg_dep.found()
-    vlc_modules += {
-        'name' : 'vorbis',
-        'sources' : files('vorbis.c'),
-        'dependencies' : [vorbis_dep, vorbisenc_dep, ogg_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'vorbis',
+    'sources' : files('vorbis.c'),
+    'dependencies' : [vorbis_dep, vorbisenc_dep, ogg_dep],
+    'enabled' : vorbis_dep.found() and vorbisenc_dep.found() and ogg_dep.found()
+}
 
 # OggSpots decoder
-if ogg_dep.found()
-    vlc_modules += {
-        'name' : 'oggspots',
-        'sources' : files('oggspots.c'),
-        'dependencies' : [ogg_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'oggspots',
+    'sources' : files('oggspots.c'),
+    'dependencies' : [ogg_dep],
+    'enabled' : ogg_dep.found(),
+}
 
 # VideoToolbox (Apples hardware-accelerated video decoder/encoder)
 # TODO: Set proper flags for minimum iOS/tvOS versions
@@ -628,53 +598,51 @@ if avcodec_dep.found()
 endif
 
 # FFmpeg codec module
-if avcodec_dep.found()
-    avcodec_extra_sources = []
-    if get_option('stream_outputs')
-        avcodec_extra_sources += 'avcodec/encoder.c'
-    endif
-
-    # TODO: Implement the merge-ffmpeg option
-
-    vlc_modules += {
-        'name' : 'avcodec',
-        'sources' : files(
-                'avcodec/video.c',
-                'avcodec/subtitle.c',
-                'avcodec/audio.c',
-                'avcodec/va.c',
-                'avcodec/avcodec.c',
-                '../packetizer/av1_obu.c',
-                '../packetizer/av1_obu.h',
-                '../packetizer/av1.h',
-                avcodec_extra_sources
-        ),
-        'dependencies' : [avutil_dep, avcodec_dep],
-        'link_with' : [libavcodec_common],
-        'link_args' : symbolic_linkargs
-    }
+avcodec_extra_sources = []
+if get_option('stream_outputs')
+    avcodec_extra_sources += 'avcodec/encoder.c'
 endif
+
+# TODO: Implement the merge-ffmpeg option
+
+vlc_modules += {
+    'name' : 'avcodec',
+    'sources' : files(
+            'avcodec/video.c',
+            'avcodec/subtitle.c',
+            'avcodec/audio.c',
+            'avcodec/va.c',
+            'avcodec/avcodec.c',
+            '../packetizer/av1_obu.c',
+            '../packetizer/av1_obu.h',
+            '../packetizer/av1.h',
+            avcodec_extra_sources
+    ),
+    'dependencies' : [avutil_dep, avcodec_dep],
+    'link_with' : [libavcodec_common],
+    'link_args' : symbolic_linkargs,
+    'enabled' : avcodec_dep.found(),
+}
 
 if get_option('libva').enabled() and get_option('avcodec').disabled()
     error('-Dlibva=enabled and -Davcodec=disabled options are mutually exclusive. Use -Davcodec=disabled')
 endif
 
 libva_dep = dependency('libva', version: '>= 1.0', required: get_option('libva'))
-if get_option('libva').require(
-    avcodec_dep.found() and avutil_dep.found(),
-    error_message: 'VAAPI requires avcodec').allowed() and libva_dep.found()
+vlc_modules += {
+    'name' : 'vaapi',
+    'sources' : files(
+            'avcodec/vaapi.c',
+            '../hw/vaapi/vlc_vaapi.c',
+            'avcodec/va_surface.c',
+        ),
+    'dependencies' : [avcodec_dep, libva_dep, avutil_dep],
+    'enabled' : get_option('libva').require(
+        avcodec_dep.found() and avutil_dep.found(),
+        error_message: 'VAAPI requires avcodec').allowed() and
+        libva_dep.found()
+}
 
-    vlc_modules += {
-        'name' : 'vaapi',
-        'sources' : files(
-                'avcodec/vaapi.c',
-                '../hw/vaapi/vlc_vaapi.c',
-                'avcodec/va_surface.c',
-            ),
-        'dependencies' : [avcodec_dep, libva_dep, avutil_dep]
-    }
-
-endif
 
 if host_system == 'windows'
     d3d11_common_lib = static_library('d3d11_common',
@@ -725,117 +693,111 @@ if host_system == 'windows'
 endif
 
 # OpenMAX IL codec
-if get_option('omxil')
-    vlc_modules += {
-        'name' : 'omxil',
-        'sources' : files(
-                'omxil/utils.c',
-                'omxil/qcom.c',
-                'omxil/omxil.c',
-                'omxil/omxil_core.c',
-                '../packetizer/h264_nal.c',
-                '../packetizer/hevc_nal.c',
-            ),
-        'link_with' : [chroma_copy_lib, dl_lib]
-    }
-endif
+vlc_modules += {
+    'name' : 'omxil',
+    'sources' : files(
+            'omxil/utils.c',
+            'omxil/qcom.c',
+            'omxil/omxil.c',
+            'omxil/omxil_core.c',
+            '../packetizer/h264_nal.c',
+            '../packetizer/hevc_nal.c',
+        ),
+    'dependencies' : [dl_lib],
+    'link_with' : [chroma_copy_lib],
+    'enabled' : get_option('omxil'),
+}
 
 ## x26X encoders
 
 # x265 encoder
 x265_dep = dependency('x265', required: get_option('x265'))
-if x265_dep.found()
-    vlc_modules += {
-        'name' : 'x265',
-        'sources' : files('x265.c'),
-        'dependencies' : [x265_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'x265',
+    'sources' : files('x265.c'),
+    'dependencies' : [x265_dep],
+    'enabled' : x265_dep.found(),
+}
 
 # x262 encoder
 x262_dep = dependency('x262', required: get_option('x262'))
-if x262_dep.found()
-    vlc_modules += {
-        'name' : 'x262',
-        'sources' : files('x264.c'),
-        'dependencies' : [x262_dep],
-        'c_args' : ['-DPLUGIN_X262'],
-        'link_args' : symbolic_linkargs
-    }
-endif
+vlc_modules += {
+    'name' : 'x262',
+    'sources' : files('x264.c'),
+    'dependencies' : [x262_dep],
+    'c_args' : ['-DPLUGIN_X262'],
+    'link_args' : symbolic_linkargs,
+    'enabled' : x262_dep.found(),
+}
 
 # x264 10-bit encoder (requires x264 >= 0.153)
 x26410b_dep = dependency('x264', version: '>= 0.153', required: get_option('x264'))
-if x26410b_dep.found()
-    vlc_modules += {
-        'name' : 'x26410b',
-        'sources' : files('x264.c'),
-        'dependencies' : [x26410b_dep],
-        'c_args' : ['-DPLUGIN_X264_10B'],
-        'link_args' : symbolic_linkargs
-    }
-endif
+vlc_modules += {
+    'name' : 'x26410b',
+    'sources' : files('x264.c'),
+    'dependencies' : [x26410b_dep],
+    'c_args' : ['-DPLUGIN_X264_10B'],
+    'link_args' : symbolic_linkargs,
+    'enabled' : x26410b_dep.found(),
+}
 
 # x264 encoder
 x264_dep = dependency('x264', version: '>= 0.148', required: get_option('x264'))
-if x264_dep.found()
-    vlc_modules += {
-        'name' : 'x264',
-        'sources' : files('x264.c'),
-        'dependencies' : [x264_dep],
-        'c_args' : ['-DPLUGIN_X264'],
-        'link_args' : symbolic_linkargs
-    }
-endif
+vlc_modules += {
+    'name' : 'x264',
+    'sources' : files('x264.c'),
+    'dependencies' : [x264_dep],
+    'c_args' : ['-DPLUGIN_X264'],
+    'link_args' : symbolic_linkargs,
+    'enabled' : x264_dep.found(),
+}
 
 
 ## Misc codecs
 
 # fdkaac encoder
 fdkaac_dep = dependency('fdk-aac', required: get_option('fdk-aac'))
-if fdkaac_dep.found()
-    vlc_modules += {
-        'name' : 'fdkaac',
-        'sources' : files('fdkaac.c'),
-        'dependencies' : [fdkaac_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'fdkaac',
+    'sources' : files('fdkaac.c'),
+    'dependencies' : [fdkaac_dep],
+    'enabled' : fdkaac_dep.found(),
+}
 
 # Shine MPEG Audio Layer 3 encoder
 shine_dep = dependency('shine', version: '>= 3.0.0', required: get_option('shine'))
-if shine_dep.found()
-    vlc_modules += {
-        'name' : 'shine',
-        'sources' : files('shine.c'),
-        'dependencies' : [shine_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'shine',
+    'sources' : files('shine.c'),
+    'dependencies' : [shine_dep],
+    'enabled' : shine_dep.found(),
+}
 
 # VP8/VP9 encoder/decoder (libvpx)
+vpx_c_args = []
 vpx_dep = dependency('vpx', version: '>= 1.5.0', required: get_option('vpx'))
 if vpx_dep.found()
-  vpx_c_args = []
-
-  if cc.has_function('vpx_codec_vp8_dx', dependencies: [vpx_dep])
-    vpx_c_args += '-DENABLE_VP8_DECODER'
-  endif
-  if cc.has_function('vpx_codec_vp9_dx', dependencies: [vpx_dep])
-    vpx_c_args += '-DENABLE_VP9_DECODER'
-  endif
-  if cc.has_function('vpx_codec_vp8_cx', dependencies: [vpx_dep])
-    vpx_c_args += '-DENABLE_VP8_ENCODER'
-  endif
-  if cc.has_function('vpx_codec_vp9_cx', dependencies: [vpx_dep])
-    vpx_c_args += '-DENABLE_VP9_ENCODER'
-  endif
-
-  vlc_modules += {
-      'name' : 'vpx',
-      'sources' : files('vpx.c'),
-      'c_args' : vpx_c_args,
-      'dependencies' : [vpx_dep]
-  }
+    if cc.has_function('vpx_codec_vp8_dx', dependencies: [vpx_dep])
+        vpx_c_args += '-DENABLE_VP8_DECODER'
+    endif
+    if cc.has_function('vpx_codec_vp9_dx', dependencies: [vpx_dep])
+        vpx_c_args += '-DENABLE_VP9_DECODER'
+    endif
+    if cc.has_function('vpx_codec_vp8_cx', dependencies: [vpx_dep])
+        vpx_c_args += '-DENABLE_VP8_ENCODER'
+    endif
+    if cc.has_function('vpx_codec_vp9_cx', dependencies: [vpx_dep])
+        vpx_c_args += '-DENABLE_VP9_ENCODER'
+    endif
 endif
+
+vlc_modules += {
+    'name' : 'vpx',
+    'sources' : files('vpx.c'),
+    'c_args' : vpx_c_args,
+    'dependencies' : [vpx_dep],
+    'enabled' : vpx_dep.found(),
+}
 
 # VP8/VP9 with alpha pseudo-decoder
 vpx_alpha_sources = files('vpx_alpha.c')
@@ -850,61 +812,55 @@ vlc_modules += {
     'link_with' : vpx_alpha_with
 }
 
-
 # libaom AV1 codec
 aom_dep = dependency('aom', required: get_option('aom'))
-if aom_dep.found()
-    vlc_modules += {
-        'name' : 'aom',
-        'sources' : files('aom.c'),
-        'dependencies' : [aom_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'aom',
+    'sources' : files('aom.c'),
+    'dependencies' : [aom_dep],
+    'enabled' : aom_dep.found(),
+}
 
 rav1e_dep = dependency('rav1e', required: get_option('rav1e'))
-if rav1e_dep.found()
-    vlc_modules += {
-        'name' : 'rav1e',
-        'sources' : files('rav1e.c'),
-        'dependencies' : [rav1e_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'rav1e',
+    'sources' : files('rav1e.c'),
+    'dependencies' : [rav1e_dep],
+    'enabled' : rav1e_dep.found(),
+}
 
 # Twolame MPEG Audio Layer 2 encoder
 twolame_dep = dependency('twolame', required: get_option('twolame'))
-if twolame_dep.found()
-    vlc_modules += {
-        'name' : 'twolame',
-        'sources' : files('twolame.c'),
-        'dependencies' : [twolame_dep],
-        'c_args' : ['-DLIBTWOLAME_STATIC']
-    }
-endif
+vlc_modules += {
+    'name' : 'twolame',
+    'sources' : files('twolame.c'),
+    'dependencies' : [twolame_dep],
+    'c_args' : ['-DLIBTWOLAME_STATIC'],
+    'enabled' : twolame_dep.found(),
+}
 
 # dav1d AV1 decoder
 dav1d_dep = dependency('dav1d', version: '>= 0.5.0', required: get_option('dav1d'))
-if dav1d_dep.found()
-    vlc_modules += {
-        'name' : 'dav1d',
-        'sources' : files(
-                'dav1d.c',
-                '../packetizer/av1_obu.c'
-            ),
-        'dependencies' : [dav1d_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'dav1d',
+    'sources' : files(
+            'dav1d.c',
+            '../packetizer/av1_obu.c'
+        ),
+    'dependencies' : [dav1d_dep],
+    'enabled' : dav1d_dep.found(),
+}
 
 
 ## Hardware encoders
 
 # QSV encoder
 qsv_dep = dependency('libmfx', required: get_option('mfx'))
-if qsv_dep.found()
-    vlc_modules += {
-        'name' : 'qsv',
-        'sources' : files('qsv.c'),
-        'dependencies' : [qsv_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'qsv',
+    'sources' : files('qsv.c'),
+    'dependencies' : [qsv_dep],
+    'enabled' : qsv_dep.found(),
+}
 
 ## External frameworks
