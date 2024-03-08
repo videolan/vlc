@@ -52,11 +52,11 @@ if have_osx
         'name' : 'auhal',
         'sources' : files('auhal.c', 'coreaudio_common.c'),
         'dependencies' : [
-            corefoundation_dep,
-            audiounit_dep,
-            audiotoolbox_dep,
-            coreaudio_dep,
-        ]
+            frameworks['CoreFoundation'],
+            frameworks['AudioUnit'],
+            frameworks['AudioToolbox'],
+            frameworks['CoreAudio'],
+        ],
     }
 endif
 
@@ -66,10 +66,10 @@ if have_ios or have_tvos
         'name' : 'audiounit_ios',
         'sources' : files('audiounit_ios.m', 'coreaudio_common.c'),
         'dependencies' : [
-            foundation_dep,
-            avfoundation_dep,
-            audiotoolbox_dep,
-            coreaudio_dep,
-        ]
+            frameworks['Foundation'],
+            frameworks['AVFoundation'],
+            frameworks['AudioToolbox'],
+            frameworks['CoreAudio'],
+        ],
     }
 endif

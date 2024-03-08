@@ -110,7 +110,11 @@ if have_osx
     vlc_modules += {
         'name' : 'audiotoolboxmidi',
         'sources' : files('audiotoolbox_midi.c'),
-        'dependencies' : [corefoundation_dep, audiounit_dep, audiotoolbox_dep]
+        'dependencies' : [
+            frameworks['CoreFoundation'],
+            frameworks['AudioUnit'],
+            frameworks['AudioToolbox'],
+        ],
     }
 endif
 
@@ -262,7 +266,11 @@ libass_dep = dependency('libass',
 libass_deps = [libass_dep]
 
 if host_system == 'darwin'
-    libass_deps += [corefoundation_dep, coregraphics_dep, coretext_dep]
+    libass_deps += [
+        frameworks['CoreFoundation'],
+        frameworks['CoreGraphics'],
+        frameworks['CoreText'],
+    ]
 endif
 
 if libass_dep.found()
@@ -575,8 +583,12 @@ if host_system == 'darwin'
             '../packetizer/h264_nal.c',
             '../packetizer/hevc_nal.c'
         ),
-        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep,
-                          corevideo_dep],
+        'dependencies' : [
+            frameworks['VideoToolbox'],
+            frameworks['Foundation'],
+            frameworks['CoreMedia'],
+            frameworks['CoreVideo'],
+        ],
         'link_with' : [libvlc_vtutils],
     }
 
@@ -591,8 +603,12 @@ if host_system == 'darwin'
             '../packetizer/h264_nal.c',
             '../packetizer/hevc_nal.c'
         ),
-        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep,
-                          corevideo_dep],
+        'dependencies' : [
+            frameworks['VideoToolbox'],
+            frameworks['Foundation'],
+            frameworks['CoreMedia'],
+            frameworks['CoreVideo'],
+        ],
         'link_with' : [libvlc_vtutils],
     }
 

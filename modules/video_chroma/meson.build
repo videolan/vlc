@@ -122,10 +122,14 @@ if host_system == 'darwin'
             'cvpx.c',
         ),
         'link_with' : [chroma_copy_lib],
-        'dependencies' : [videotoolbox_dep, foundation_dep, coremedia_dep, corevideo_dep]
+        'dependencies' : [
+            frameworks['VideoToolbox'],
+            frameworks['Foundation'],
+            frameworks['CoreMedia'],
+            frameworks['CoreVideo'],
+        ],
     }
 endif
-
 
 ## Tests
 

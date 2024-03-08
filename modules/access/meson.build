@@ -94,7 +94,11 @@ if have_osx
         'name' : 'avaudiocapture',
         'sources' : files('avaudiocapture.m'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [avfoundation_dep, coremedia_dep, foundation_dep]
+        'dependencies' : [
+            frameworks['Foundation'],
+            frameworks['AVFoundation'],
+            frameworks['CoreMedia'],
+        ],
     }
 endif
 
@@ -120,7 +124,12 @@ if (get_option('macosx_avfoundation')
         'name' : 'avcapture',
         'sources' : files('avcapture.m'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [avfoundation_dep, coremedia_dep, foundation_dep, corevideo_dep],
+        'dependencies' : [
+            frameworks['Foundation'],
+            frameworks['AVFoundation'],
+            frameworks['CoreMedia'],
+            frameworks['CoreVideo'],
+        ],
     }
 endif
 

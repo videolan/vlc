@@ -250,16 +250,15 @@ if host_system == 'darwin'
         'name' : 'ci_filters',
         'sources' : files('ci_filters.m', '../codec/vt_utils.c'),
         'dependencies' : [
-            foundation_dep,
-            coregraphics_dep,
-            coreimage_dep,
-            corevideo_dep,
-            (have_osx) ? dependency('gl', required: true) : opengles_dep
+            frameworks['Foundation'],
+            frameworks['CoreGraphics'],
+            frameworks['CoreImage'],
+            frameworks['CoreVideo'],
+            (have_osx) ? dependency('gl', required: true) : frameworks['OpenGLES'],
         ],
         'include_directories' : [include_directories('../codec')]
     }
 endif
-
 
 # deinterlace common helper lib
 deinterlacecommon_lib = static_library(

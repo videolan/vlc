@@ -17,13 +17,18 @@ vlc_modules += {
         '../../codec/vt_utils.c'
     ),
     'objc_args' : ['-fobjc-arc'],
-    'dependencies' : [foundation_dep, corefoundation_dep, corevideo_dep, darwingl_dep],
+    'dependencies' : [
+        frameworks['Foundation'],
+        frameworks['CoreFoundation'],
+        frameworks['CoreVideo'],
+        darwingl_dep,
+    ],
 }
 
 if have_osx
-    uifwk_dep = cocoa_dep
+    uifwk_dep = frameworks['Cocoa']
 else
-    uifwk_dep = uikit_dep
+    uifwk_dep = frameworks['UIKit']
 endif
 
 vlc_modules += {
@@ -42,13 +47,21 @@ if have_ios or have_tvos
         'name' : 'caeagl',
         'sources' : files('VLCOpenGLES2VideoView.m'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [foundation_dep, uikit_dep, quartz_dep, opengles_dep],
+        'dependencies' : [
+            frameworks['Foundation'],
+            frameworks['UIKit'],
+            frameworks['QuartzCore'],
+            frameworks['OpenGLES']
+        ],
     }
 
     vlc_modules += {
         'name' : 'uiview',
         'sources' : files('VLCVideoUIView.m'),
         'objc_args' : ['-fobjc-arc'],
-        'dependencies' : [foundation_dep, uikit_dep],
+        'dependencies' : [
+            frameworks['Foundation'],
+            frameworks['UIKit'],
+        ],
     }
 endif
