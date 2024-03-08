@@ -23,7 +23,7 @@ spirv-tools: SPIRV-Tools-$(SPIRVTOOLS_VERSION).tar.gz .sum-spirv-tools
 	$(UNPACK)
 	$(MOVE)
 
-spirv-tools/external/spirv-headers: SPIRV-Headers-sdk-$(SPIRVHEADERS_VERSION).tar.gz .sum-spirv-tools
+spirv-tools/external/spirv-headers: SPIRV-Headers-sdk-$(SPIRVHEADERS_VERSION).tar.gz .sum-spirv-tools spirv-tools
 	$(UNPACK)
 	$(MOVE)
 
