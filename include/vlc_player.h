@@ -365,6 +365,9 @@ enum vlc_player_restore_playback_pos
  * blocking. If a media is currently being played, this media will be stopped
  * and the requested media will be set after.
  *
+ * @note The function will open the media, without starting it, allowing the
+ * user to send controls (like seek requests) before Starting the player.
+ *
  * @warning This function is either synchronous (if the player state is
  * STOPPED) or asynchronous. In the later case, vlc_player_GetCurrentMedia()
  * will return the old media, even after this call, and until the
@@ -384,6 +387,11 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media);
  * The user should set the next media from the
  * vlc_player_media_provider.get_next callback or anytime before the current
  * media is stopped.
+ *
+ * @note The media won't be opened directly by this function. If there is no
+ * current media, the next media will be opened from vlc_player_Start(). If
+ * there is a current playing media, the next media will be opened and played
+ * automatically.
  *
  * @param player locked player instance
  * @param media next media to play (will be held by the player)
