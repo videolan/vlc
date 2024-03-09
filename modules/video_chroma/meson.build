@@ -14,17 +14,16 @@ vlc_modules += {
 }
 
 swscale_dep = dependency('libswscale', version: '>= 0.5.0', required: get_option('swscale'))
-if swscale_dep.found()
-  vlc_modules += {
-      'name' : 'swscale',
-      'sources' : files(
-        'swscale.c',
-        '../codec/avcodec/chroma.c'
-      ),
-      'dependencies' : [swscale_dep, m_lib],
-      'link_args' : symbolic_linkargs
-  }
-endif
+vlc_modules += {
+    'name' : 'swscale',
+    'sources' : files(
+      'swscale.c',
+      '../codec/avcodec/chroma.c'
+    ),
+    'dependencies' : [swscale_dep, m_lib],
+    'link_args' : symbolic_linkargs,
+    'enabled' : swscale_dep.found(),
+}
 
 vlc_modules += {
     'name' : 'grey_yuv',
@@ -81,28 +80,29 @@ vlc_modules += {
     'sources' : files('yuvp.c')
 }
 
-if have_sse2
-    vlc_modules += {
-        'name' : 'i420_rgb_sse2',
-        'sources' : files(
-            'i420_rgb.c',
-            'i420_rgb16_x86.c'
-        ),
-        'c_args' : ['-DPLUGIN_SSE2']
-    }
+vlc_modules += {
+    'name' : 'i420_rgb_sse2',
+    'sources' : files(
+        'i420_rgb.c',
+        'i420_rgb16_x86.c'
+    ),
+    'c_args' : ['-DPLUGIN_SSE2'],
+    'enabled' : have_sse2,
+}
 
-  vlc_modules += {
-      'name' : 'i420_yuy2_sse2',
-      'sources' : files('i420_yuy2.c'),
-      'c_args' : ['-DPLUGIN_SSE2']
-  }
+vlc_modules += {
+    'name' : 'i420_yuy2_sse2',
+    'sources' : files('i420_yuy2.c'),
+    'c_args' : ['-DPLUGIN_SSE2'],
+    'enabled' : have_sse2,
+}
 
-  vlc_modules += {
-      'name' : 'i422_yuy2_sse2',
-      'sources' : files('i422_yuy2.c'),
-      'c_args' : ['-DPLUGIN_SSE2']
-  }
-endif
+vlc_modules += {
+    'name' : 'i422_yuy2_sse2',
+    'sources' : files('i422_yuy2.c'),
+    'c_args' : ['-DPLUGIN_SSE2'],
+    'enabled' : have_sse2,
+}
 
 vlc_modules += {
     'name' : 'orient',
