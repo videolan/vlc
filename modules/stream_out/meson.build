@@ -147,3 +147,6 @@ vlc_modules += {
     'dependencies' : [libchromaprint_dep],
     'enabled' : libchromaprint_dep.found(),
 }
+
+# Chromecast module
+subdir('chromecast')

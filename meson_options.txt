@@ -115,6 +115,10 @@ option('css_engine',
     description : 'CSS selector engine for WebVTT')
 
 # Dependency options
+option('chromecast',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable chromecast support')
 
 option('qt',
     type : 'feature',
