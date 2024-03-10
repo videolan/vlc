@@ -869,6 +869,7 @@
                 <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="098-yp-97f"/>
                 <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
                 <outlet property="splitViewBottomConstraintToSuperView" destination="DQQ-ji-YSy" id="b0t-C0-5uP"/>
+                <outlet property="splitViewController" destination="Kkr-kI-gpb" id="9aZ-xw-zrl"/>
                 <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="To1-7k-AJF"/>
                 <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="gtf-cd-765"/>
                 <outlet property="upNextLabel" destination="TET-5r-zHx" id="3oI-LK-NDP"/>
