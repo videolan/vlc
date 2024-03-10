@@ -28,6 +28,10 @@ endif
 ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
 OPUS_CONF += -D rtcd=disabled
 endif
+# disable rtcd on armv7-windows
+ifeq ($(ARCH)-$(HAVE_WIN32),arm-1)
+OPUS_CONF += -D rtcd=disabled
+endif
 
 .opus: opus crossfile.meson
 	$(MESONCLEAN)
