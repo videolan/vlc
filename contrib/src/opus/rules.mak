@@ -24,11 +24,9 @@ ifndef HAVE_FPU
 OPUS_CONF += -D fixed-point=true
 endif
 
-# disable rtcd on win64-arm-llvm
+# disable rtcd on aarch64-windows
 ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
-ifdef HAVE_CLANG
 OPUS_CONF += -D rtcd=disabled
-endif
 endif
 
 .opus: opus crossfile.meson
