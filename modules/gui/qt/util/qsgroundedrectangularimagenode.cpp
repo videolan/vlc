@@ -205,8 +205,8 @@ QSGGeometry* QSGRoundedRectangularImageNode::rebuildGeometry(const Shape& shape,
                        || painterPath.elementAt(i).type == QPainterPath::ElementType::LineToElement);
 
                 // Symmetry based triangulation based on ordered painter path.
-                (*path)[i] = (painterPath.elementAt((i % 2) ? (i)
-                                                            : (elementCount - i - 1))) / extrapolationFactor;
+                (*path)[i] = static_cast<QPointF>(painterPath.elementAt((i % 2) ? (i)
+                                                                                : (elementCount - i - 1))) / extrapolationFactor;
             }
 
             paths.insert(key, new QVector<QPointF>(*path));
