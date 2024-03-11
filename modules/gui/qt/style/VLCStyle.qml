@@ -17,6 +17,7 @@
  *****************************************************************************/
 pragma Singleton
 import QtQuick
+import QtQuick.Controls
 import org.videolan.vlc 0.1
 
 QtObject {
@@ -54,6 +55,9 @@ QtObject {
     readonly property double margin_large: MainCtx.dp(24, scale);
     readonly property double margin_xlarge: MainCtx.dp(32, scale);
     readonly property double margin_xxlarge: MainCtx.dp(36, scale);
+
+    property Component _scrollBarComponent: ScrollBar { }
+    property real resizeHandleWidth
 
     // Borders
     readonly property int border: MainCtx.dp(1, scale)
@@ -326,4 +330,16 @@ QtObject {
         return Math.floor((width + column_spacing) / (column_width + column_spacing))
     }
 
+    Component.onCompleted: {
+        {
+            // Resize handle width setting:
+            const scrollBarObject = _scrollBarComponent.createObject()
+            console.assert(scrollBarObject)
+            const scrollBarWidth = scrollBarObject.width
+            scrollBarObject.destroy()
+
+            _scrollBarComponent = null
+            resizeHandleWidth = (scrollBarWidth / 2)
+        }
+    }
 }
