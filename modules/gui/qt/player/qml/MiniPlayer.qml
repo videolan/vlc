@@ -51,8 +51,10 @@ ControlBar {
 
     identifier: PlayerControlbarModel.Miniplayer
 
-    Component.onCompleted: {
-        // Enable the behavior only when everything is resolved:
+    onImplicitHeightChanged: {
+        // Animation should not be based on the implicit height change
+        // but rather the visibility state:
+        behavior.enabled = false
         Qt.callLater(() => { behavior.enabled = true })
     }
 
