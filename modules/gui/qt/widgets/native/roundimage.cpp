@@ -283,7 +283,11 @@ namespace
             auto textureFactory = std::unique_ptr<QQuickTextureFactory>(response->textureFactory());
             auto img = !textureFactory ? QImage {} : textureFactory->image();
             if (!textureFactory || img.isNull())
+            {
+                // source response failed, signal to parent
+                emit finished();
                 return;
+            }
 
             response->disconnect(this);
             response->deleteLater();
