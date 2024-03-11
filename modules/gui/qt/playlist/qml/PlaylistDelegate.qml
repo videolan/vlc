@@ -254,7 +254,7 @@ T.ItemDelegate {
             }
 
             if (contextMenu && mouse.button === Qt.RightButton)
-                contextMenu.popup(index, this.mapToGlobal(mouse.x, mouse.y))
+                contextMenu.popup(index, mapToGlobal(mouse.x, mouse.y))
         }
 
         onDoubleClicked: (mouse) => {
