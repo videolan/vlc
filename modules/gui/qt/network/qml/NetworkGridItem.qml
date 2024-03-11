@@ -50,6 +50,8 @@ Widgets.GridItem {
         return ""
     }
 
+    cacheImage: true // we may have network thumbnail
+
     fallbackImage: {
         const f = function(type) {
             switch (type) {

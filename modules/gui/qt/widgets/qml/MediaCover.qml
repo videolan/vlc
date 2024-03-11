@@ -75,6 +75,8 @@ Rectangle {
         anchors.fill: parent
 
         radius: root.radius
+
+        cache: false
     }
 
     RoundImage {
@@ -89,6 +91,8 @@ Rectangle {
         // we only keep this image till there is no main image
         // try to release the resources otherwise
         source: !root.isImageReady ? root.fallbackImageSource : ""
+
+        cache: true
     }
 
     Loader {

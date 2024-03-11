@@ -136,7 +136,10 @@ MainInterface.MainViewLoader {
                 height: width / 2
                 pictureWidth: width
                 pictureHeight: height
+
                 image: model.cover || ""
+                cacheImage: true // for this view, we generate custom covers, cache it
+
                 fallbackImage: VLCStyle.noArtAlbumCover
 
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
