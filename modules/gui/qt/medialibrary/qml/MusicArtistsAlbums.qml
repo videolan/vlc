@@ -144,7 +144,6 @@ FocusScope {
         Widgets.KeyNavigableListView {
             id: artistList
 
-            spacing: 4
             model: artistModel
             selectionModel: root.selectionModel
             currentIndex: -1
