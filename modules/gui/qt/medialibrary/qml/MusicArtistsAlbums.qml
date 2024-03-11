@@ -39,7 +39,8 @@ FocusScope {
     property int rightPadding: 0
 
     property var sortModel: [
-        { text: I18n.qtr("Alphabetic"),  criteria: "title" }
+        { text: I18n.qtr("Alphabetic"),  criteria: "title" },
+        { text: I18n.qtr("Release Year"),  criteria: "release_year" }
     ]
 
     property int initialIndex: 0
