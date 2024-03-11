@@ -42,7 +42,11 @@ Rectangle {
     // Aliases
 
     property alias source: image.source
+
+    property alias cacheImage: image.cache
+
     property bool isImageReady: image.status == RoundImage.Ready
+
 
     property string fallbackImageSource
 
