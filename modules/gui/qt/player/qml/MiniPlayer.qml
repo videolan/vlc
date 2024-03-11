@@ -25,17 +25,9 @@ import "qrc:///style/"
 ControlBar {
     id: root
 
-    // Binding evaluation order:
-    // state -> implicitHeight OR visible -> anchors.bottomMargin
-    // Care must be taken to not cause binding loops.
-    visible: {
-        if (state === "inViewport")
-            return true
-        else if ((anchors.bottomMargin + implicitHeight) > Number.EPSILON)
-            return true
-        else
-            return false
-    }
+    visible: animation.running || (state === "inViewport")
+
+    anchors.bottomMargin: (state === "outViewport") ? -_delayedImplicitHeight : 0
 
     state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? "outViewport"
                                                                   : "inViewport"
@@ -51,29 +43,34 @@ ControlBar {
 
     identifier: PlayerControlbarModel.Miniplayer
 
+    property real _delayedImplicitHeight
+
     onImplicitHeightChanged: {
-        // Animation should not be based on the implicit height change
-        // but rather the visibility state:
-        behavior.enabled = false
-        Qt.callLater(() => { behavior.enabled = true })
+        if (!animation.running) {
+            // Animation should not be based on the implicit height change
+            // but rather the visibility state:
+            behavior.enabled = false
+            Qt.callLater(() => { behavior.enabled = true })
+        }
     }
 
-    BindingCompat on anchors.bottomMargin {
-        id: binding
-
+    BindingCompat on _delayedImplicitHeight {
         // eliminate intermediate adjustments until implicit height is calculated fully
         // we can not delay on component load because we do not want twitching
         // NOTE: The delay here can be removed, as long as a direct height is set
         //       for the whole control instead of implicit height.
         delayed: behavior.enabled
-
-        value: (root.state === "outViewport") ? -root.implicitHeight : 0
+        value: root.implicitHeight
     }
 
     Behavior on anchors.bottomMargin {
         id: behavior
         enabled: false
-        NumberAnimation { easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
+        NumberAnimation {
+            id: animation
+            easing.type: Easing.InOutSine
+            duration: VLCStyle.duration_long
+        }
     }
 }
 
