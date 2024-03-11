@@ -14,9 +14,6 @@
             <subviews>
                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="qdP-As-qZ0" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="357" id="y7Y-rw-LCu"/>
-                    </constraints>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GoN-QI-mru">
                     <rect key="frame" x="18" y="309" width="155" height="28"/>
