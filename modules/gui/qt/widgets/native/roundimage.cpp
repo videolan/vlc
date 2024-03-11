@@ -104,7 +104,15 @@ namespace
     class ImageReader : public AsyncTask<QImage>
     {
     public:
-        // requestedSize is only taken as hint, the Image is resized with PreserveAspectCrop
+        /**
+         * @brief ImageReader
+         * @param device i/o source to read from, ImageReader doesn't take owner ship of the device
+         *               parent must make sure availability of device through out the lifetime of this instance
+         *
+         * @param requestedSize only taken as hint, the Image is resized with PreserveAspectCrop
+         *
+         * @param radius
+         */
         ImageReader(QIODevice *device, QSize requestedSize, const qreal radius)
             : device {device}
             , requestedSize {requestedSize}
@@ -182,11 +190,19 @@ namespace
     class NetworkImageResponse : public QQuickImageResponse
     {
     public:
+        /**
+         * @brief NetworkImageResponse
+         * @param reply - Network reply to read from, NetworkImageResponse takes ownership of this object
+         * @param requestedSize - passed to ImageReader class
+         * @param radius - passed to ImageReader class
+         */
         NetworkImageResponse(QNetworkReply *reply, QSize requestedSize, const qreal radius)
             : reply {reply}
             , requestedSize {requestedSize}
             , radius {radius}
         {
+            reply->setParent(this);
+
             QObject::connect(reply, &QNetworkReply::finished
                              , this, &NetworkImageResponse::handleNetworkReplyFinished);
         }
@@ -216,6 +232,8 @@ namespace
             {
                 error = reply->errorString();
                 emit finished();
+
+                releaseNetworkReply();
                 return;
             }
 
@@ -226,10 +244,18 @@ namespace
                 error = reader->errorString();
                 reader.reset();
 
+                releaseNetworkReply();
+
                 emit finished();
             });
 
             reader->start(*QThreadPool::globalInstance());
+        }
+
+        void releaseNetworkReply()
+        {
+            reply->deleteLater();
+            reply = nullptr;
         }
 
         QNetworkReply *reply;
