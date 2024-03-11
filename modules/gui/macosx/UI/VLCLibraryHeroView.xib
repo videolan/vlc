@@ -9,10 +9,10 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LPV-K6-7AE" customClass="VLCLibraryHeroView">
+        <customView wantsLayer="YES" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="LPV-K6-7AE" customClass="VLCLibraryHeroView">
             <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
             <subviews>
-                <customView translatesAutoresizingMaskIntoConstraints="NO" id="qdP-As-qZ0" customClass="VLCImageView">
+                <customView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qdP-As-qZ0" customClass="VLCImageView">
                     <rect key="frame" x="0.0" y="0.0" width="833" height="357"/>
                 </customView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GoN-QI-mru">
