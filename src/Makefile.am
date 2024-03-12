@@ -385,6 +385,7 @@ libvlccore_la_SOURCES = \
 	misc/mtime.c \
 	misc/frame.c \
 	misc/fifo.c \
+	misc/filesystem.c \
 	misc/fourcc.c \
 	misc/fourcc_list.h \
 	misc/es_format.c \

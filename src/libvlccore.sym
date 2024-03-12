@@ -459,6 +459,7 @@ utf8_fprintf
 vlc_loaddir
 vlc_lstat
 vlc_mkdir
+vlc_mkdir_parent
 vlc_mkstemp
 vlc_open
 vlc_openat

@@ -276,6 +276,16 @@ VLC_API void vlc_rewinddir( vlc_DIR *dir );
 VLC_API int vlc_mkdir(const char *dirname, mode_t mode);
 
 /**
+ * Creates a directory and parent directories as needed.
+ *
+ * @param dirname a UTF-8 string containing the name of the directory to
+ *        be created.
+ * @param mode directory permissions
+ * @return 0 on success, -1 on error (see errno).
+ */
+VLC_API int vlc_mkdir_parent(const char *dirname, mode_t mode);
+
+/**
  * Determines the current working directory.
  *
  * @return the current working directory (must be free()'d)
