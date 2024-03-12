@@ -47,6 +47,7 @@
 - (void)awakeFromNib
 {
     self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
+    [self connectItemUpdaters];
 }
 
 - (void)updateRepresentedItem
@@ -153,6 +154,31 @@
 {
     [self setOptimalRepresentedItem];
     [self disconnectForNewVideo];
+}
+
+- (void)connectItemUpdaters
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(itemUpdated:)
+                               name:VLCLibraryModelVideoMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(itemUpdated:)
+                               name:VLCLibraryModelAudioMediaItemUpdated
+                             object:nil];
+}
+
+- (void)itemUpdated:(NSNotification *)notification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+    NSAssert(mediaItem != nil, @"Notification should contain a media item!");
+    if (mediaItem.libraryID != self.representedItem.item.libraryID) {
+        return;
+    }
+
+    VLCLibraryRepresentedItem * const item = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:item.parentType];
+    self.representedItem = item;
 }
 
 @end
