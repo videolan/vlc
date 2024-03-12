@@ -142,9 +142,17 @@
                              object:nil];
 }
 
+- (void)disconnectForNewVideo
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter removeObserver:self name:VLCLibraryModelVideoMediaListReset object:nil];
+    [notificationCenter removeObserver:self name:VLCLibraryModelRecentsMediaListReset object:nil];
+}
+
 - (void)newVideosAvailable:(NSNotification *)notification
 {
     [self setOptimalRepresentedItem];
+    [self disconnectForNewVideo];
 }
 
 @end
