@@ -70,6 +70,8 @@ struct vlc_clock_event_cbs
     void (*on_discontinuity)(void *data);
 };
 
+typedef struct vlc_clock_listener_id vlc_clock_listener_id;
+
 /**
  * This function creates the vlc_clock_main_t of the program
  */
@@ -231,16 +233,26 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
 void vlc_clock_Wake(vlc_clock_t *clock);
 
 /**
- * Register for events
+ * Add a listener for events
  *
  * @param clock the clock used by the source
- * @param cbs valid pointer to register events or NULL to unregister
+ * @param cbs valid pointer to register events
  * @param data opaque data used by cbs
- * @return 0 in case of success
+ * @return a valid listener id, or NULL in case of allocation error
  */
-int vlc_clock_RegisterEvents(vlc_clock_t *clock,
-                             const struct vlc_clock_event_cbs *cbs,
-                             void *data);
+vlc_clock_listener_id *
+vlc_clock_AddListener(vlc_clock_t *clock,
+                      const struct vlc_clock_event_cbs *cbs,
+                      void *data);
+
+/**
+ * Remove a event listener callback
+ *
+ * @param clock the clock used by the source
+ * @param listener_id listener id returned by vlc_clock_AddListener()
+ */
+void
+vlc_clock_RemoveListener(vlc_clock_t *clock, vlc_clock_listener_id *listener_id);
 
 /**
  * This function converts a timestamp from stream to system

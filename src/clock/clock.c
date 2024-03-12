@@ -32,7 +32,7 @@
 
 #define COEFF_THRESHOLD 0.2 /* between 0.8 and 1.2 */
 
-struct vlc_clock_event
+struct vlc_clock_listener_id
 {
     vlc_clock_t *clock;
     const struct vlc_clock_event_cbs *cbs;
@@ -70,7 +70,7 @@ struct vlc_clock_main_t
     vlc_tick_t output_dejitter; /* Delay used to absorb the output clock jitter */
     vlc_tick_t input_dejitter; /* Delay used to absorb the input jitter */
 
-    struct VLC_VECTOR(struct vlc_clock_event) events;
+    struct VLC_VECTOR(vlc_clock_listener_id *) listeners;
 };
 
 struct vlc_clock_ops
@@ -96,53 +96,69 @@ struct vlc_clock_t
     void *cbs_data;
 };
 
-int vlc_clock_RegisterEvents(vlc_clock_t *clock,
-                             const struct vlc_clock_event_cbs *cbs,
-                             void *data)
+vlc_clock_listener_id *
+vlc_clock_AddListener(vlc_clock_t *clock,
+                      const struct vlc_clock_event_cbs *cbs,
+                      void *data)
 {
     vlc_clock_main_t *main_clock = clock->owner;
+    assert(cbs != NULL);
 
     vlc_mutex_lock(&main_clock->lock);
     if (clock == main_clock->master || clock == main_clock->input_master)
     {
         /* Events are only from master to slaves */
         vlc_mutex_unlock(&main_clock->lock);
-        return -EINVAL;
+        return NULL;
     }
 
-    int ret;
-    if (cbs != NULL)
+    vlc_clock_listener_id *listener_id = malloc(sizeof(*listener_id));
+    if (listener_id == NULL)
     {
-        const struct vlc_clock_event event = {
-            .clock = clock,
-            .cbs = cbs,
-            .data = data,
-        };
-        ret = vlc_vector_push(&main_clock->events, event) ? 0 : -ENOMEM;
-    }
-    else
-    {
-        ret = -EINVAL;
-        const struct vlc_clock_event *event;
-        vlc_vector_foreach_ref(event, &main_clock->events)
-            if (event->clock == clock)
-            {
-                vlc_vector_remove(&main_clock->events, vlc_vector_idx_event);
-                ret = 0;
-                break;
-            }
-        assert(ret == 0);
+        vlc_mutex_unlock(&main_clock->lock);
+        return NULL;
     }
 
+    listener_id->clock = clock;
+    listener_id->cbs = cbs;
+    listener_id->data = data;
+
+    bool success = vlc_vector_push(&main_clock->listeners, listener_id);
     vlc_mutex_unlock(&main_clock->lock);
-    return ret;
+    if (!success)
+    {
+        free(listener_id);
+        return NULL;
+    }
+    return listener_id;
+}
+
+void
+vlc_clock_RemoveListener(vlc_clock_t *clock, vlc_clock_listener_id *listener_id)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+
+    vlc_mutex_lock(&main_clock->lock);
+
+    const vlc_clock_listener_id *it;
+    vlc_vector_foreach(it, &main_clock->listeners)
+        if (it == listener_id)
+        {
+            vlc_vector_remove(&main_clock->listeners, vlc_vector_idx_it);
+            free(listener_id);
+
+            vlc_mutex_unlock(&main_clock->lock);
+            return;
+        }
+
+    vlc_assert_unreachable();
 }
 
 #define vlc_clock_SendEvent(main_clock, event) { \
-    const struct vlc_clock_event *event; \
-    vlc_vector_foreach_ref(event, &main_clock->events) \
-        if (event->cbs->on_##event != NULL) \
-            event->cbs->on_##event(event->data); \
+    const struct vlc_clock_listener_id *listener_id; \
+    vlc_vector_foreach(listener_id, &main_clock->listeners) \
+        if (listener_id->cbs->on_##event != NULL) \
+            listener_id->cbs->on_##event(listener_id->data); \
 }
 
 static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
@@ -575,7 +591,7 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
     AvgInit(&main_clock->coeff_avg, 10);
     AvgResetAndFill(&main_clock->coeff_avg, main_clock->coeff);
 
-    vlc_vector_init(&main_clock->events);
+    vlc_vector_init(&main_clock->listeners);
 
     return main_clock;
 }
@@ -655,8 +671,8 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
     if (main_clock->logger != NULL)
         vlc_LogDestroy(main_clock->logger);
 
-    assert(main_clock->events.size == 0);
-    vlc_vector_destroy(&main_clock->events);
+    assert(main_clock->listeners.size == 0);
+    vlc_vector_destroy(&main_clock->listeners);
 
     free(main_clock);
 }

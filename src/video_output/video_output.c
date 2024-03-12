@@ -84,6 +84,7 @@ typedef struct vout_thread_sys_t
     bool wait_interrupted;
 
     vlc_clock_t     *clock;
+    vlc_clock_listener_id *clock_listener_id;
     float           rate;
     vlc_tick_t      delay;
 
@@ -1898,7 +1899,11 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     if (sys->spu)
         spu_Detach(sys->spu);
 
-    vlc_clock_RegisterEvents(sys->clock, NULL, NULL);
+    if (sys->clock_listener_id != NULL)
+    {
+        vlc_clock_RemoveListener(sys->clock, sys->clock_listener_id);
+        sys->clock_listener_id = NULL;
+    }
 
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;
@@ -2249,7 +2254,8 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     static const struct vlc_clock_event_cbs clock_event_cbs = {
         .on_discontinuity = clock_event_OnDiscontinuity,
     };
-    vlc_clock_RegisterEvents(sys->clock, &clock_event_cbs, vout);
+    sys->clock_listener_id =
+        vlc_clock_AddListener(sys->clock, &clock_event_cbs, vout);
 
     sys->delay = 0;
 
@@ -2271,7 +2277,9 @@ error_thread:
     vout_ReleaseDisplay(vout);
 error_display:
     vout_DisableWindow(vout);
-    vlc_clock_RegisterEvents(sys->clock, NULL, NULL);
+    if (sys->clock_listener_id != NULL)
+        vlc_clock_RemoveListener(sys->clock, sys->clock_listener_id);
+    sys->clock_listener_id = NULL;
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;
     vlc_mutex_unlock(&sys->clock_lock);
