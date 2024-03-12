@@ -104,27 +104,18 @@ vlc_clock_AddListener(vlc_clock_t *clock,
     vlc_clock_main_t *main_clock = clock->owner;
     assert(cbs != NULL);
 
-    vlc_mutex_lock(&main_clock->lock);
-    if (clock == main_clock->master || clock == main_clock->input_master)
-    {
-        /* Events are only from master to slaves */
-        vlc_mutex_unlock(&main_clock->lock);
-        return NULL;
-    }
-
     vlc_clock_listener_id *listener_id = malloc(sizeof(*listener_id));
     if (listener_id == NULL)
-    {
-        vlc_mutex_unlock(&main_clock->lock);
         return NULL;
-    }
 
     listener_id->clock = clock;
     listener_id->cbs = cbs;
     listener_id->data = data;
 
+    vlc_mutex_lock(&main_clock->lock);
     bool success = vlc_vector_push(&main_clock->listeners, listener_id);
     vlc_mutex_unlock(&main_clock->lock);
+
     if (!success)
     {
         free(listener_id);
