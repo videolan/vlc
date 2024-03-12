@@ -167,6 +167,14 @@
                            selector:@selector(itemUpdated:)
                                name:VLCLibraryModelAudioMediaItemUpdated
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(itemDeleted:)
+                               name:VLCLibraryModelVideoMediaItemDeleted
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(itemDeleted:)
+                               name:VLCLibraryModelAudioMediaItemDeleted
+                             object:nil];
 }
 
 - (void)itemUpdated:(NSNotification *)notification
@@ -179,6 +187,17 @@
 
     VLCLibraryRepresentedItem * const item = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:item.parentType];
     self.representedItem = item;
+}
+
+- (void)itemDeleted:(NSNotification *)notification
+{
+    VLCMediaLibraryMediaItem * const mediaItem = notification.object;
+    NSAssert(mediaItem != nil, @"Notification should contain a media item!");
+    if (mediaItem.libraryID != self.representedItem.item.libraryID) {
+        return;
+    }
+
+    [self setOptimalRepresentedItem];
 }
 
 @end
