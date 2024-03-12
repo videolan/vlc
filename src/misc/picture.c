@@ -211,10 +211,13 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     memset( p_picture, 0, sizeof( *p_picture ) );
     p_picture->date = VLC_TICK_INVALID;
 
-    p_picture->format = *p_fmt;
+    video_format_Copy(&p_picture->format, p_fmt);
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_picture, p_fmt ) )
+    {
+        video_format_Clean(&p_picture->format);
         return false;
+    }
 
     vlc_atomic_rc_init(&p_picture->refs);
     priv->gc.opaque = NULL;
@@ -324,6 +327,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 
     return pic;
 error:
+    video_format_Clean(&priv->picture.format);
     free(privbuf);
     return NULL;
 }
@@ -353,6 +357,7 @@ void picture_Destroy(picture_t *picture)
     assert(priv->gc.destroy != NULL);
     priv->gc.destroy(picture);
     vlc_ancillary_array_Clear(&priv->ancillaries);
+    video_format_Clean(&picture->format);
     free(priv);
 }
 
