@@ -120,12 +120,31 @@
         return;
     }
 
-    NSLog(@"Could not find a food media item for hero view!");
+    NSLog(@"Could not find a good media item for hero view!");
+    [self connectForNewVideo];
 }
 
 - (IBAction)playRepresentedItem:(id)sender
 {
     [self.representedItem play];
+}
+
+- (void)connectForNewVideo
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(newVideosAvailable:)
+                               name:VLCLibraryModelVideoMediaListReset
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(newVideosAvailable:)
+                               name:VLCLibraryModelRecentsMediaListReset
+                             object:nil];
+}
+
+- (void)newVideosAvailable:(NSNotification *)notification
+{
+    [self setOptimalRepresentedItem];
 }
 
 @end
