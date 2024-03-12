@@ -69,45 +69,11 @@ static inline std::string sFromLocale( const std::string &rLocale )
  */
 static int makedir( const char *newdir )
 {
-    char *p, *buffer = strdup( newdir );
-    int  len = strlen( buffer );
-
-    if( len <= 0 )
-    {
-        free( buffer );
-        return 0;
-    }
-
-    if( buffer[len-1] == '/' )
-    {
-        buffer[len-1] = '\0';
-    }
-
-    if( vlc_mkdir( buffer, 0775 ) == 0 )
-    {
-        free( buffer );
+    int ret = vlc_mkdir_parent(newdir, 0775);
+    if (ret == 0)
         return 1;
-    }
-
-    p = buffer + 1;
-    while( 1 )
-    {
-        char hold;
-
-        while( *p && *p != '\\' && *p != '/' ) p++;
-        hold = *p;
-        *p = 0;
-        if( ( vlc_mkdir( buffer, 0775 ) == -1 ) && ( errno == ENOENT ) )
-        {
-            fprintf( stderr, "couldn't create directory %s\n", buffer );
-            free( buffer );
-            return 0;
-        }
-        if( hold == 0 ) break;
-        *p++ = hold;
-    }
-    free( buffer );
-    return 1;
+    fprintf(stderr, "couldn't create directory %s\n", newdir);
+    return 0;
 }
 
 bool ThemeLoader::load( const std::string &fileName )
