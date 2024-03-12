@@ -906,108 +906,119 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     return VLC_SUCCESS;
 }
 
-static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx)
+static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx,
+                                              const d3d_format_t * & decoder_format)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+
+    const d3d_format_t *res = nullptr;
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
     if (vtcx_sys != NULL &&
         D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
     {
-        sys->picQuad.generic.textureFormat = D3D11_RenderFormat(vtcx_sys->format, vtcx_sys->secondary ,true);
+        res = D3D11_RenderFormat(vtcx_sys->format, vtcx_sys->secondary ,true);
+        if (res != nullptr)
+            return res;
     }
 
     // look for the requested pixel format first
-    if ( !sys->picQuad.generic.textureFormat )
-        sys->picQuad.generic.textureFormat = GetDirectRenderingFormat(vd, fmt->i_chroma);
+    res = GetDirectRenderingFormat(vd, fmt->i_chroma);
+    if (res != nullptr)
+        return res;
 
     // look for any pixel format that we can handle with enough pixels per channel
-    const d3d_format_t *decoder_format = nullptr;
-    if ( !sys->picQuad.generic.textureFormat )
+    uint8_t bits_per_channel;
+    uint8_t widthDenominator, heightDenominator;
+    uint8_t alpha_bits = 0;
+    vlc_fourcc_t cpu_chroma;
+    if (is_d3d11_opaque(fmt->i_chroma))
+        cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
+    else if (is_nvdec_opaque(fmt->i_chroma))
+        cpu_chroma = NVDECToVlcChroma(fmt->i_chroma);
+    else
+        cpu_chroma = fmt->i_chroma;
+
+    const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
+    if (unlikely(p_format == NULL || p_format->plane_count == 0))
     {
-        uint8_t bits_per_channel;
-        uint8_t widthDenominator, heightDenominator;
-        uint8_t alpha_bits = 0;
-        vlc_fourcc_t cpu_chroma;
-        if (is_d3d11_opaque(fmt->i_chroma))
-            cpu_chroma = DxgiFormatFourcc(vtcx_sys->format);
-        else if (is_nvdec_opaque(fmt->i_chroma))
-            cpu_chroma = NVDECToVlcChroma(fmt->i_chroma);
-        else
-            cpu_chroma = fmt->i_chroma;
-
-        const auto *p_format = vlc_fourcc_GetChromaDescription(cpu_chroma);
-        if (unlikely(p_format == NULL || p_format->plane_count == 0))
+        bits_per_channel = 8;
+        widthDenominator = heightDenominator = 2;
+    }
+    else
+    {
+        bits_per_channel = p_format->pixel_bits /
+                            (p_format->plane_count==1 ? p_format->pixel_size : 1);
+        widthDenominator = heightDenominator = 1;
+        for (size_t i=0; i<p_format->plane_count; i++)
         {
-            bits_per_channel = 8;
-            widthDenominator = heightDenominator = 2;
-        }
-        else
-        {
-            bits_per_channel = p_format->pixel_bits /
-                               (p_format->plane_count==1 ? p_format->pixel_size : 1);
-            widthDenominator = heightDenominator = 1;
-            for (size_t i=0; i<p_format->plane_count; i++)
-            {
-                if (widthDenominator < p_format->p[i].w.den)
-                    widthDenominator = p_format->p[i].w.den;
-                if (heightDenominator < p_format->p[i].h.den)
-                    heightDenominator = p_format->p[1].h.den;
-            }
-
-            switch (cpu_chroma) // FIXME get this info from the core
-            {
-            case VLC_CODEC_YUVA:
-            case VLC_CODEC_YUV422A:
-            case VLC_CODEC_YUV420A:
-            case VLC_CODEC_VUYA:
-            case VLC_CODEC_RGBA:
-            case VLC_CODEC_ARGB:
-            case VLC_CODEC_BGRA:
-            case VLC_CODEC_ABGR:
-            case VLC_CODEC_D3D11_OPAQUE_RGBA:
-            case VLC_CODEC_D3D11_OPAQUE_BGRA:
-            case VLC_CODEC_D3D11_OPAQUE_ALPHA:
-                alpha_bits = 8;
-                break;
-            case VLC_CODEC_YUVA_444_10L:
-            case VLC_CODEC_YUVA_444_10B:
-                alpha_bits = 10;
-                break;
-            case VLC_CODEC_RGBA10LE:
-                bits_per_channel = 10;
-                alpha_bits = 2;
-                break;
-            case VLC_CODEC_YUVA_444_12L:
-            case VLC_CODEC_YUVA_444_12B:
-                alpha_bits = 12;
-                break;
-            case VLC_CODEC_RGBA64:
-                alpha_bits = 16;
-                break;
-            }
+            if (widthDenominator < p_format->p[i].w.den)
+                widthDenominator = p_format->p[i].w.den;
+            if (heightDenominator < p_format->p[i].h.den)
+                heightDenominator = p_format->p[1].h.den;
         }
 
-        /* look for a decoder format that can be decoded but not used in shaders */
-        if ( is_d3d11_opaque(fmt->i_chroma) )
-            decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
-
-        bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
-        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
-                                                             widthDenominator, heightDenominator, alpha_bits,
-                                                             decoder_format!=nullptr,
-                                                             is_rgb ? DXGI_RGB_FORMAT : DXGI_YUV_FORMAT);
-        if (!sys->picQuad.generic.textureFormat)
-            sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, bits_per_channel,
-                                                                 widthDenominator, heightDenominator, alpha_bits,
-                                                                 decoder_format!=nullptr,
-                                                                 is_rgb ? DXGI_YUV_FORMAT : DXGI_RGB_FORMAT);
+        switch (cpu_chroma) // FIXME get this info from the core
+        {
+        case VLC_CODEC_YUVA:
+        case VLC_CODEC_YUV422A:
+        case VLC_CODEC_YUV420A:
+        case VLC_CODEC_VUYA:
+        case VLC_CODEC_RGBA:
+        case VLC_CODEC_ARGB:
+        case VLC_CODEC_BGRA:
+        case VLC_CODEC_ABGR:
+        case VLC_CODEC_D3D11_OPAQUE_RGBA:
+        case VLC_CODEC_D3D11_OPAQUE_BGRA:
+        case VLC_CODEC_D3D11_OPAQUE_ALPHA:
+            alpha_bits = 8;
+            break;
+        case VLC_CODEC_YUVA_444_10L:
+        case VLC_CODEC_YUVA_444_10B:
+            alpha_bits = 10;
+            break;
+        case VLC_CODEC_RGBA10LE:
+            bits_per_channel = 10;
+            alpha_bits = 2;
+            break;
+        case VLC_CODEC_YUVA_444_12L:
+        case VLC_CODEC_YUVA_444_12B:
+            alpha_bits = 12;
+            break;
+        case VLC_CODEC_RGBA64:
+            alpha_bits = 16;
+            break;
+        }
     }
 
-    // look for any pixel format that we can handle
-    if ( !sys->picQuad.generic.textureFormat )
-        sys->picQuad.generic.textureFormat = GetDisplayFormatByDepth(vd, 0, 0, 0, 0, true, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
+    /* look for a decoder format that can be decoded but not used in shaders */
+    if ( is_d3d11_opaque(fmt->i_chroma) )
+        decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
 
+    bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
+    res = GetDisplayFormatByDepth(vd, bits_per_channel,
+                                  widthDenominator, heightDenominator, alpha_bits,
+                                  decoder_format!=nullptr,
+                                  is_rgb ? DXGI_RGB_FORMAT : DXGI_YUV_FORMAT);
+    if (res != nullptr)
+        return res;
+    res = GetDisplayFormatByDepth(vd, bits_per_channel,
+                                  widthDenominator, heightDenominator, alpha_bits,
+                                  decoder_format!=nullptr,
+                                  is_rgb ? DXGI_YUV_FORMAT : DXGI_RGB_FORMAT);
+    if (res != nullptr)
+        return res;
+
+    // look for any pixel format that we can handle
+    return GetDisplayFormatByDepth(vd, 0, 0, 0, 0, true, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
+}
+
+static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    const d3d_format_t *decoder_format = nullptr;
+
+    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, fmt, vctx, decoder_format);
     if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
@@ -1019,7 +1030,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
 
     fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.generic.textureFormat->fourcc;
 
-    /* check the region pixel format */
+    /* select the subpicture region pixel format */
     sys->regionQuad.generic.textureFormat = GetBlendableFormat(vd, VLC_CODEC_RGBA);
     if (!sys->regionQuad.generic.textureFormat)
         sys->regionQuad.generic.textureFormat = GetBlendableFormat(vd, VLC_CODEC_BGRA);
