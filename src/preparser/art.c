@@ -40,19 +40,7 @@
 
 static void ArtCacheCreateDir( char *psz_dir )
 {
-    char * psz = psz_dir;
-
-    while( *psz )
-    {
-        while( *psz && *psz != DIR_SEP_CHAR) psz++;
-        if( !*psz ) break;
-        *psz = 0;
-        if( !EMPTY_STR( psz_dir ) )
-            vlc_mkdir( psz_dir, 0700 );
-        *psz = DIR_SEP_CHAR;
-        psz++;
-    }
-    vlc_mkdir( psz_dir, 0700 );
+    vlc_mkdir_parent(psz_dir, 0700);
 }
 
 static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
