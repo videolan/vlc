@@ -3,7 +3,9 @@
 #
 
 # Direct3D11 video output
-d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_scaler.cpp', 'd3d11_shaders.cpp', 'd3d_shaders.c', 'd3d_dynamic_shader.c', 'common.c')
+d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_scaler.cpp',
+                      'd3d11_shaders.cpp', 'd3d11_tonemap.cpp',
+                      'd3d_shaders.c', 'd3d_dynamic_shader.c', 'common.c')
 d3d11_link_with = [ d3d11_common_lib ]
 d3d11_cargs = []
 d3d11_cxxargs = [ libcom_cppflags ]
