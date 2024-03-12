@@ -100,6 +100,7 @@ enum d3d11_hdr
     hdr_Auto,
     hdr_Never,
     hdr_Always,
+    hdr_Fake,
 };
 
 static inline enum d3d11_hdr HdrModeFromString(vlc_logger *logger, const char *psz_hdr)
@@ -110,6 +111,8 @@ static inline enum d3d11_hdr HdrModeFromString(vlc_logger *logger, const char *p
         return hdr_Never;
     if (strcmp("always", psz_hdr) == 0)
         return hdr_Always;
+    if (strcmp("generate", psz_hdr) == 0)
+        return hdr_Fake;
 
     vlc_warning(logger, "unknown HDR mode %s, using auto mode", psz_hdr);
     return hdr_Auto;
