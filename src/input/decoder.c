@@ -1569,9 +1569,7 @@ static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_
     }
 
     /* */
-    vlc_fifo_Lock(p_owner->p_fifo);
     int ret = DecoderWaitUnblock(p_owner);
-    vlc_fifo_Unlock(p_owner->p_fifo);
 
     if (ret != VLC_SUCCESS || p_subpic->i_start == VLC_TICK_INVALID)
     {
@@ -1602,15 +1600,10 @@ static void ModuleThread_QueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     if( p_spu->i_start != VLC_TICK_INVALID &&
         p_spu->i_start < p_owner->i_preroll_end &&
         ( p_spu->i_stop == VLC_TICK_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
-    {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         subpicture_Delete( p_spu );
-    }
     else
-    {
-        vlc_fifo_Unlock(p_owner->p_fifo);
         ModuleThread_PlaySpu( p_owner, p_spu );
-    }
+    vlc_fifo_Unlock(p_owner->p_fifo);
 }
 
 static void DecoderThread_ProcessInput( vlc_input_decoder_t *p_owner, vlc_frame_t *frame );
