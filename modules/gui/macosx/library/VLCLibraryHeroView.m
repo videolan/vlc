@@ -35,13 +35,6 @@
 
 #import "views/VLCImageView.h"
 
-@interface VLCLibraryHeroView ()
-
-@property (readonly) VLCMediaLibraryMediaItem *randomItem;
-@property (readonly) VLCMediaLibraryMediaItem *latestPartiallyPlayedItem;
-
-@end
-
 @implementation VLCLibraryHeroView
 
 + (instancetype)fromNibWithOwner:(id)owner
