@@ -429,7 +429,8 @@ void picture_Copy( picture_t *p_dst, const picture_t *p_src )
 
 static void picture_DestroyClone(picture_t *clone)
 {
-    picture_t *picture = ((picture_priv_t *)clone)->gc.opaque;
+    picture_priv_t *clone_priv = container_of(clone, picture_priv_t, picture);
+    picture_t *picture = clone_priv->gc.opaque;
 
     picture_Release(picture);
 }
@@ -450,7 +451,8 @@ picture_t *picture_InternalClone(picture_t *picture,
 
     picture_t *clone = picture_NewFromResource(&picture->format, &res);
     if (likely(clone != NULL)) {
-        ((picture_priv_t *)clone)->gc.opaque = opaque;
+        picture_priv_t *clone_priv = container_of(clone, picture_priv_t, picture);
+        clone_priv->gc.opaque = opaque;
 
         /* The picture context is responsible for potentially holding the
          * video context attached to the picture if needed. */
