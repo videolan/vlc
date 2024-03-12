@@ -90,7 +90,7 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
         // try with alpha
         newPixelFormat = FindD3D11Format( display->obj, display->d3d_dev, 0, DXGI_RGB_FORMAT,
                                         cfg->bitdepth > 8 ? 10 : 8,
-                                        0, 0, 8,
+                                        0, 0, 1,
                                         DXGI_CHROMA_CPU, D3D11_FORMAT_SUPPORT_DISPLAY );
     if (unlikely(newPixelFormat == NULL))
         // try YUV without alpha
