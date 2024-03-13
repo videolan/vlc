@@ -932,7 +932,7 @@
                             </view>
                         </subviews>
                         <constraints>
-                            <constraint firstAttribute="trailing" secondItem="OxL-Q0-VBh" secondAttribute="trailing" constant="16" id="0DO-Qi-CxU"/>
+                            <constraint firstAttribute="trailing" secondItem="OxL-Q0-VBh" secondAttribute="trailing" constant="18" id="0DO-Qi-CxU"/>
                             <constraint firstItem="OxL-Q0-VBh" firstAttribute="leading" secondItem="EeU-rT-tSP" secondAttribute="leading" id="fDQ-Jn-PXr"/>
                             <constraint firstItem="OxL-Q0-VBh" firstAttribute="top" secondItem="EeU-rT-tSP" secondAttribute="top" id="tBs-XJ-NLF"/>
                         </constraints>
