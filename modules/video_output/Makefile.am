@@ -284,7 +284,8 @@ libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.c \
  video_output/win32/d3d11_quad.c video_output/win32/d3d11_quad.h \
  video_output/win32/d3d11_shaders.c video_output/win32/d3d11_shaders.h \
  video_output/win32/common.c video_output/win32/common.h \
- video_output/win32/d3d11_scaler.cpp video_output/win32/d3d11_scaler.h
+ video_output/win32/d3d11_scaler.cpp video_output/win32/d3d11_scaler.h \
+ video_output/win32/d3d11_tonemap.cpp video_output/win32/d3d11_tonemap.h
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
  -DMODULE_NAME_IS_direct3d11
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid
