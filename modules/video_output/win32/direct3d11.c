@@ -1597,22 +1597,15 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     return VLC_SUCCESS;
 }
 
-static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt,
-                                              const d3d_format_t ** decoder_format)
+static const d3d_format_t *SelectClosestOutput(vout_display_t *vd, vlc_fourcc_t i_chroma,
+                                               bool from_processor)
 {
-    vout_display_sys_t *sys = vd->sys;
-    *decoder_format = NULL;
-
     const d3d_format_t *res = NULL;
-    // look for the requested pixel format first
-    res = GetDirectRenderingFormat(vd, fmt->i_chroma);
-    if (res != NULL)
-        return res;
 
     // look for any pixel format that we can handle with enough pixels per channel
     uint8_t bits_per_channel;
     uint8_t widthDenominator, heightDenominator;
-    switch (fmt->i_chroma)
+    switch (i_chroma)
     {
     case VLC_CODEC_D3D11_OPAQUE:
         bits_per_channel = 8;
@@ -1624,7 +1617,7 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
         break;
     default:
         {
-            const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(fmt->i_chroma);
+            const vlc_chroma_description_t *p_format = vlc_fourcc_GetChromaDescription(i_chroma);
             if (p_format == NULL)
             {
                 bits_per_channel = 8;
@@ -1647,29 +1640,40 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
         break;
     }
 
-    /* look for a decoder format that can be decoded but not used in shaders */
-    if ( is_d3d11_opaque(fmt->i_chroma) )
-        *decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
-    else
-        *decoder_format = res;
-
-    bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
+    bool is_rgb = !vlc_fourcc_IsYUV(i_chroma);
     res = GetDisplayFormatByDepth(vd, bits_per_channel,
                                   widthDenominator,
                                   heightDenominator,
-                                  *decoder_format!=NULL, is_rgb);
+                                  from_processor, is_rgb);
     if (res != NULL)
         return res;
     if (is_rgb)
         res = GetDisplayFormatByDepth(vd, bits_per_channel,
                                       widthDenominator,
                                       heightDenominator,
-                                      *decoder_format!=NULL, false);
+                                      from_processor, false);
     if (res != NULL)
         return res;
 
     // look for any pixel format that we can handle
     res = GetDisplayFormatByDepth(vd, 0, 0, 0, false, false);
+    return res;
+}
+
+static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt,
+                                              const d3d_format_t ** decoder_format)
+{
+    const d3d_format_t *res = NULL;
+    // look for the requested pixel format first
+    res = GetDirectRenderingFormat(vd, fmt->i_chroma);
+    if (res != NULL)
+        return res;
+
+    /* look for a decoder format that can be decoded but not used in shaders */
+    if ( is_d3d11_opaque(fmt->i_chroma) )
+        *decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
+
+    res = SelectClosestOutput(vd, fmt->i_chroma, *decoder_format!=NULL);
 
     return res;
 }
