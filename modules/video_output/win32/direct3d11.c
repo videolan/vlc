@@ -56,6 +56,7 @@
 #include "d3d11_quad.h"
 #include "d3d11_shaders.h"
 #include "d3d11_scaler.h"
+#include "d3d11_tonemap.h"
 
 #include "common.h"
 
@@ -82,9 +83,9 @@ static const char *const ppsz_upscale_mode_text[] = {
 #define HDR_MODE_LONGTEXT N_("Use HDR output even if the source is SDR.")
 
 static const char *const ppsz_hdr_mode[] = {
-    "auto", "never", "always" };
+    "auto", "never", "always", "generate" };
 static const char *const ppsz_hdr_mode_text[] = {
-    N_("Auto"), N_("Never out HDR"), N_("Always output HDR") };
+    N_("Auto"), N_("Never out HDR"), N_("Always output HDR"), N_("Generate HDR from SDR") };
 
 vlc_module_begin ()
     set_shortname("Direct3D11")
@@ -124,6 +125,7 @@ enum d3d11_hdr
     hdr_Auto,
     hdr_Never,
     hdr_Always,
+    hdr_Fake,
 };
 
 struct vout_display_sys_t
@@ -178,6 +180,7 @@ struct vout_display_sys_t
 
     // HDR mode
     enum d3d11_hdr           hdrMode;
+    struct d3d11_tonemapper  *tonemapProc;
 };
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
@@ -543,7 +546,7 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
     out->Width = vd->source.i_visible_width;
     out->Height = vd->source.i_visible_height;
     out->Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
-    if (sys->hdrMode == hdr_Always)
+    if (sys->hdrMode == hdr_Always || sys->hdrMode == hdr_Fake)
         out->Format = DXGI_FORMAT_R10G10B10A2_UNORM;
     else if (sys->hdrMode == hdr_Auto)
     {
@@ -1049,7 +1052,13 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (is_d3d11_opaque(picture->format.i_chroma))
             d3d11_device_lock( &sys->d3d_dev );
 
-        if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        if (sys->tonemapProc)
+        {
+            if (FAILED(D3D11_TonemapperProcess(VLC_OBJECT(vd), sys->tonemapProc, p_sys)))
+                return;
+            p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
+        }
+        else if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
         {
             if (D3D11_UpscalerScale(VLC_OBJECT(vd), sys->scaleProc, p_sys) != VLC_SUCCESS)
                 return;
@@ -1155,7 +1164,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
     else
     {
-        picture_sys_t *p_sys = ActivePictureSys(picture);
+        picture_sys_t *p_sys;
+        if (sys->tonemapProc)
+            p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
+        else
+            p_sys = ActivePictureSys(picture);
         D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, p_sys->resourceView, sys->d3drenderTargetView);
     }
 
@@ -1302,11 +1315,13 @@ static void D3D11SetColorSpace(vout_display_t *vd)
         match_source.transfer  = TRANSFER_FUNC_BT709;
         match_source.space     = COLOR_SPACE_BT709;
     }
-    else if (sys->hdrMode == hdr_Always)
+    else if (sys->hdrMode == hdr_Always || sys->hdrMode == hdr_Fake)
     {
         match_source.primaries = COLOR_PRIMARIES_BT2020;
         match_source.transfer  = TRANSFER_FUNC_SMPTE_ST2084;
         match_source.space     = COLOR_SPACE_BT2020;
+        if (sys->hdrMode == hdr_Fake) // the video processor keeps the source range
+            match_source.i_chroma  = VLC_CODEC_RGBA10;
     }
 
     bool src_full_range = match_source.b_color_range_full ||
@@ -1503,9 +1518,28 @@ static enum d3d11_hdr HdrModeFromString(vlc_object_t *logger, const char *psz_hd
         return hdr_Never;
     if (strcmp("always", psz_hdr) == 0)
         return hdr_Always;
+    if (strcmp("generate", psz_hdr) == 0)
+        return hdr_Fake;
 
     msg_Warn(logger, "unknown HDR mode %s, using auto mode", psz_hdr);
     return hdr_Auto;
+}
+
+static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_in)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (sys->hdrMode != hdr_Fake)
+        return;
+
+    sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), &sys->d3d_dev, fmt_in);
+    if (sys->tonemapProc == NULL)
+    {
+        sys->hdrMode = hdr_Auto;
+        msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
+        return;
+    }
+
+    msg_Dbg(vd, "Using tonemapper");
 }
 
 static void InitScaleProcessor(vout_display_t *vd)
@@ -1538,7 +1572,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         HRESULT hr = S_OK;
 
         DXGI_SWAP_CHAIN_DESC1 scd;
-        FillSwapChainDesc(vd, &scd);
 
         hr = D3D11_CreateDevice(vd, &sys->hd3d,
                                 is_d3d11_opaque(vd->source.i_chroma),
@@ -1554,12 +1587,16 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         return VLC_EGENERIC;
         }
 
+        InitTonemapProcessor(vd, &vd->source);
+
         hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
         IDXGIAdapter_Release(dxgiadapter);
         if (FAILED(hr)) {
         msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
         }
+
+        FillSwapChainDesc(vd, &scd);
 
         hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
                                                 sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
@@ -1735,6 +1772,21 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, video_form
 
     // look for the requested pixel format first
     const d3d_format_t *decoder_format = NULL;
+    if (sys->hdrMode == hdr_Fake)
+    {
+        quad_fmt->i_chroma           = VLC_CODEC_RGBA10;
+        quad_fmt->primaries          = sys->display.colorspace->primaries;
+        quad_fmt->transfer           = sys->display.colorspace->transfer;
+        quad_fmt->space              = sys->display.colorspace->color;
+        quad_fmt->b_color_range_full = sys->display.colorspace->b_full_range;
+
+        // request an input format that can be input of a VideoProcessor
+        UINT supportFlags = D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
+        if (is_d3d11_opaque(fmt->i_chroma))
+            supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
+        decoder_format = FindD3D11Format( vd, &sys->d3d_dev, fmt->i_chroma, false, 0, 0, 0,
+                                          is_d3d11_opaque(fmt->i_chroma), supportFlags );
+    }
     sys->picQuad.formatInfo = SelectOutputFormat(vd, quad_fmt, &decoder_format);
 
     if ( !sys->picQuad.formatInfo )
@@ -2053,6 +2105,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     ReleasePictureSys(&sys->stagingSys);
 
+    if (sys->tonemapProc != NULL)
+    {
+        D3D11_TonemapperDestroy(sys->tonemapProc);
+        sys->tonemapProc = NULL;
+    }
     if (sys->scaleProc != NULL)
     {
         D3D11_UpscalerDestroy(sys->scaleProc);
