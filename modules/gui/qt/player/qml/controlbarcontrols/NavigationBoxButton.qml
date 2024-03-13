@@ -19,7 +19,6 @@
 import QtQuick 2.12
 
 import "qrc:///widgets/" as Widgets
-import "qrc:///player/" as Player
 import "qrc:///style/"
 
 import org.videolan.vlc 0.1
