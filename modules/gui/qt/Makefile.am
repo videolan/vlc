@@ -297,7 +297,6 @@ libqt_plugin_la_SOURCES = \
 	util/imageluminanceextractor.cpp util/imageluminanceextractor.hpp \
 	util/csdbuttonmodel.cpp util/csdbuttonmodel.hpp \
 	util/imagehelper.cpp util/imagehelper.hpp \
-	util/i18n.cpp util/i18n.hpp \
 	util/keyhelper.cpp util/keyhelper.hpp \
 	util/listcache.hxx util/listcache.hpp \
 	util/listcacheloader.hpp \
@@ -461,7 +460,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/color_svg_image_provider.moc.cpp \
 	util/imageluminanceextractor.moc.cpp \
 	util/csdbuttonmodel.moc.cpp \
-	util/i18n.moc.cpp \
 	util/keyhelper.moc.cpp \
 	util/listcache.moc.cpp \
 	util/locallistcacheloader.moc.cpp \
