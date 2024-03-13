@@ -174,11 +174,11 @@ VideoAll {
             }
 
             property var gridLabels: function (model) {
-                return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
+                return root.getLabelGroup(model, qsTr("%1 Videos"))
             }
 
             property var listLabels: function (model) {
-                return root.getLabelGroup(model, I18n.qtr("%1"))
+                return root.getLabelGroup(model, qsTr("%1"))
             }
 
             function onAction(indexes) {
@@ -235,11 +235,11 @@ VideoAll {
             }
 
             property var gridLabels: function (model) {
-                return root.getLabelGroup(model, I18n.qtr("%1 Videos"))
+                return root.getLabelGroup(model, qsTr("%1 Videos"))
             }
 
             property var listLabels: function (model) {
-                return root.getLabelGroup(model, I18n.qtr("%1"))
+                return root.getLabelGroup(model, qsTr("%1"))
             }
 
             function onAction(indexes) {
@@ -266,7 +266,7 @@ VideoAll {
 
         nbItemPerRow: Helpers.get(root.currentItem, "nbItemPerRow", 0)
 
-        subtitleText: (root.model && root.model.count > 0) ? I18n.qtr("Videos") : ""
+        subtitleText: (root.model && root.model.count > 0) ? qsTr("Videos") : ""
 
         Navigation.parentItem: root
 

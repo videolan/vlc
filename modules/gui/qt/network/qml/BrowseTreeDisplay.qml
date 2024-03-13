@@ -51,10 +51,10 @@ MainInterface.MainViewLoader {
     isSearchable: true
 
     sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name"},
-        { text: I18n.qtr("Url"), criteria: "mrl" },
-        { text: I18n.qtr("File size"), criteria: "fileSizeRaw64" },
-        { text: I18n.qtr("File modified"), criteria: "fileModified" }
+        { text: qsTr("Alphabetic"), criteria: "name"},
+        { text: qsTr("Url"), criteria: "mrl" },
+        { text: qsTr("File size"), criteria: "fileSizeRaw64" },
+        { text: qsTr("File modified"), criteria: "fileModified" }
     ]
 
     grid: gridComponent
@@ -95,7 +95,7 @@ MainInterface.MainViewLoader {
 
         indexes: selectionModel.selectedIndexes
 
-        defaultText:  I18n.qtr("Unknown Share")
+        defaultText:  qsTr("Unknown Share")
 
         coverProvider: function(index, data) {
             // this is used to provide context to NetworkCustomCover
@@ -227,7 +227,7 @@ MainInterface.MainViewLoader {
 
                     subCriterias: [ "mrl" ],
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: thumbnailHeader,
                     colDelegate: thumbnailColumn
@@ -240,7 +240,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "thumbnail",
 
-                    text: I18n.qtr("Cover"),
+                    text: qsTr("Cover"),
 
                     headerDelegate: thumbnailHeader,
                     colDelegate: thumbnailColumn
@@ -251,7 +251,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "name",
 
-                    text: I18n.qtr("Name")
+                    text: qsTr("Name")
                 }
             }, {
                 size: Math.max(_nbCols - _nameColSpan - 1, 1),
@@ -259,7 +259,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "mrl",
 
-                    text: I18n.qtr("Url"),
+                    text: qsTr("Url"),
 
                     showContextButton: true
                 }
@@ -358,10 +358,10 @@ MainInterface.MainViewLoader {
                     coverWidth : VLCStyle.dp(182, VLCStyle.scale)
                     coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 
-                    text: I18n.qtr("Nothing to see here, go back.")
+                    text: qsTr("Nothing to see here, go back.")
 
                     button.iconTxt: VLCIcons.back
-                    button.text: I18n.qtr("Back")
+                    button.text: qsTr("Back")
                     button.enabled: !History.previousEmpty
                     button.width: button.implicitWidth
 

@@ -56,7 +56,7 @@ Widgets.KeyNavigableTableView {
         model: {
             criteria: "url",
 
-            text: I18n.qtr("Url"),
+            text: qsTr("Url"),
 
             showSection: "url",
 
@@ -68,7 +68,7 @@ Widgets.KeyNavigableTableView {
         model: {
             criteria: "last_played_date",
 
-            text: I18n.qtr("Last played date"),
+            text: qsTr("Last played date"),
 
             showSection: "",
             showContextButton: true,

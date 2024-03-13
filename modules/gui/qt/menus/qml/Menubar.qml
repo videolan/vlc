@@ -38,14 +38,14 @@ Item {
         colorSet: ColorContext.MenuBar
     }
 
-    Action{ id: mediaMenu;    text: I18n.qtr("&Media")    ; onTriggered: (source) => menubar.popupMediaMenu(source);   }
-    Action{ id: playbackMenu; text: I18n.qtr("&Playback") ; onTriggered: (source) => menubar.popupPlaybackMenu(source);}
-    Action{ id: videoMenu;    text: I18n.qtr("&Video")    ; onTriggered: (source) => menubar.popupVideoMenu(source);   }
-    Action{ id: audioMenu;    text: I18n.qtr("&Audio")    ; onTriggered: (source) => menubar.popupAudioMenu(source);   }
-    Action{ id: subtitleMenu; text: I18n.qtr("&Subtitle") ; onTriggered: (source) => menubar.popupSubtitleMenu(source);}
-    Action{ id: toolMenu;     text: I18n.qtr("&Tools")    ; onTriggered: (source) => menubar.popupToolsMenu(source);   }
-    Action{ id: viewMenu;     text: I18n.qtr("V&iew")     ; onTriggered: (source) => menubar.popupViewMenu(source);    }
-    Action{ id: helpMenu;     text: I18n.qtr("&Help")     ; onTriggered: (source) => menubar.popupHelpMenu(source);    }
+    Action{ id: mediaMenu;    text: qsTr("&Media")    ; onTriggered: (source) => menubar.popupMediaMenu(source);   }
+    Action{ id: playbackMenu; text: qsTr("&Playback") ; onTriggered: (source) => menubar.popupPlaybackMenu(source);}
+    Action{ id: videoMenu;    text: qsTr("&Video")    ; onTriggered: (source) => menubar.popupVideoMenu(source);   }
+    Action{ id: audioMenu;    text: qsTr("&Audio")    ; onTriggered: (source) => menubar.popupAudioMenu(source);   }
+    Action{ id: subtitleMenu; text: qsTr("&Subtitle") ; onTriggered: (source) => menubar.popupSubtitleMenu(source);}
+    Action{ id: toolMenu;     text: qsTr("&Tools")    ; onTriggered: (source) => menubar.popupToolsMenu(source);   }
+    Action{ id: viewMenu;     text: qsTr("V&iew")     ; onTriggered: (source) => menubar.popupViewMenu(source);    }
+    Action{ id: helpMenu;     text: qsTr("&Help")     ; onTriggered: (source) => menubar.popupHelpMenu(source);    }
 
     property var toolbarModel: [
         mediaMenu,

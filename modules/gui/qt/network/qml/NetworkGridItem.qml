@@ -74,7 +74,7 @@ Widgets.GridItem {
                             .uri()
     }
 
-    title: model.name || I18n.qtr("Unknown share")
+    title: model.name || qsTr("Unknown share")
     subtitle: {
        if (!model.mrl) {
          return ""

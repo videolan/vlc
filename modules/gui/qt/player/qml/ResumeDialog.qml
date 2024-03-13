@@ -39,7 +39,7 @@ FocusScope {
     enabled: visible
 
     Accessible.role: Accessible.Dialog
-    Accessible.name: I18n.qtr("Resume dialog")
+    Accessible.name: qsTr("Resume dialog")
 
     signal hidden()
 
@@ -113,7 +113,7 @@ FocusScope {
         font.bold: true
         wrapMode: Text.Wrap
 
-        text: I18n.qtr("Do you want to restart the playback where you left off?")
+        text: qsTr("Do you want to restart the playback where you left off?")
     }
 
     Widgets.ButtonExt {
@@ -123,7 +123,7 @@ FocusScope {
         anchors.left: label.right
         anchors.leftMargin: VLCStyle.margin_xsmall
 
-        text: I18n.qtr("Continue")
+        text: qsTr("Continue")
         font.bold: true
         color: theme.fg.primary
         focus: true
@@ -144,7 +144,7 @@ FocusScope {
         anchors.verticalCenter: label.verticalCenter
         anchors.left: continueBtn.right
 
-        text: I18n.qtr("Dismiss")
+        text: qsTr("Dismiss")
         font.bold: true
         color: theme.fg.primary
         onClicked: hideResumePanel()

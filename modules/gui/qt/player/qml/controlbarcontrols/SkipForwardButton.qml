@@ -30,5 +30,5 @@ Widgets.IconToolButton {
 
     text: VLCIcons.skip_for
     onClicked: Player.jumpFwd()
-    description: I18n.qtr("Step forward")
+    description: qsTr("Step forward")
 }

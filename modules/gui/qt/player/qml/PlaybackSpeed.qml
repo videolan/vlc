@@ -36,7 +36,7 @@ ColumnLayout {
     property var _model: [{ "value": 0.25 },
                           { "value": 0.5 },
                           { "value": 0.75 },
-                          { "value": 1, "title": I18n.qtr("Normal") },
+                          { "value": 1, "title": qsTr("Normal") },
                           { "value": 1.25 },
                           { "value": 1.5 },
                           { "value": 1.75 },
@@ -168,7 +168,7 @@ ColumnLayout {
 
         Layout.alignment: Qt.AlignTop
 
-        text: I18n.qtr("Playback Speed")
+        text: qsTr("Playback Speed")
 
         color: theme.fg.primary
     }
@@ -187,7 +187,7 @@ ColumnLayout {
         Widgets.CaptionLabel {
             anchors.verticalCenter: parent.verticalCenter
 
-            text: I18n.qtr("0.25")
+            text: qsTr("0.25")
 
             color: theme.fg.primary
 
@@ -199,7 +199,7 @@ ColumnLayout {
 
             anchors.verticalCenter: parent.verticalCenter
 
-            text: I18n.qtr("4.00")
+            text: qsTr("4.00")
 
             color: theme.fg.primary
 
@@ -273,7 +273,7 @@ ColumnLayout {
         Navigation.upItem: slider
 
         Widgets.ListLabel {
-            text: I18n.qtr("Presets")
+            text: qsTr("Presets")
             color: colorContext.fg.primary
             Layout.fillWidth: true
         }

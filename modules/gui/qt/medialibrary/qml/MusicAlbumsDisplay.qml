@@ -29,7 +29,7 @@ MusicAlbums {
     header: Widgets.ViewHeader {
         view: root
 
-        text: I18n.qtr("Albums")
+        text: qsTr("Albums")
     }
 
     searchPattern: MainCtx.search.pattern

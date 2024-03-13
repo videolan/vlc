@@ -49,7 +49,7 @@ AbstractButton {
 
     // Settings
 
-    text: I18n.qtr("Open player")
+    text: qsTr("Open player")
 
     padding: VLCStyle.focus_border
 
@@ -112,12 +112,12 @@ AbstractButton {
             asynchronous: true
 
             Accessible.role: Accessible.Graphic
-            Accessible.name: I18n.qtr("Cover")
+            Accessible.name: qsTr("Cover")
 
             ToolTip.visible: infoColumn.width < infoColumn.implicitWidth
                              && (root.hovered || root.visualFocus)
             ToolTip.delay: VLCStyle.delayToolTipAppear
-            ToolTip.text: I18n.qtr("%1\n%2\n%3").arg(titleLabel.text)
+            ToolTip.text: qsTr("%1\n%2\n%3").arg(titleLabel.text)
                                                 .arg(artistLabel.text)
                                                 .arg(progressIndicator.text)
 
@@ -148,7 +148,7 @@ AbstractButton {
 
                 text: {
                     if (paintOnly)
-                        I18n.qtr("Title")
+                        qsTr("Title")
                     else
                         Player.title
                 }
@@ -168,7 +168,7 @@ AbstractButton {
 
                 text: {
                     if (paintOnly)
-                        I18n.qtr("Artist")
+                        qsTr("Artist")
                     else
                         Player.artist
                 }

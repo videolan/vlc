@@ -40,7 +40,7 @@ Item {
 
     Accessible.role: Accessible.Graphic
     Accessible.focusable: false
-    Accessible.name: I18n.qtr("video content")
+    Accessible.name: qsTr("video content")
 
     Connections {
         target: mouseArea.drag
@@ -97,7 +97,7 @@ Item {
 
                 font.pixelSize: VLCStyle.icon_large
 
-                description: I18n.qtr("play/pause")
+                description: qsTr("play/pause")
                 text: (Player.playingState !== Player.PLAYING_STATE_PAUSED
                        && Player.playingState !== Player.PLAYING_STATE_STOPPED)
                       ? VLCIcons.pause_filled
@@ -115,7 +115,7 @@ Item {
                 }
 
                 font.pixelSize: VLCStyle.icon_PIP
-                description: I18n.qtr("close video")
+                description: qsTr("close video")
                 text: VLCIcons.close
 
                 onClicked: MainPlaylistController.stop()
@@ -132,7 +132,7 @@ Item {
 
                 font.pixelSize: VLCStyle.icon_PIP
 
-                description: I18n.qtr("maximize player")
+                description: qsTr("maximize player")
                 text: VLCIcons.fullscreen
 
                 onClicked: History.push(["player"])

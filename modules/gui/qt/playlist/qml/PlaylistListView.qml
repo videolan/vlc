@@ -56,7 +56,7 @@ T.Pane {
 
     verticalPadding: VLCStyle.margin_normal
 
-    Accessible.name: I18n.qtr("Playqueue")
+    Accessible.name: qsTr("Playqueue")
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -160,7 +160,7 @@ T.Pane {
             spacing: VLCStyle.margin_xxxsmall
 
             Widgets.SubtitleLabel {
-                text: I18n.qtr("Playqueue")
+                text: qsTr("Playqueue")
                 color: theme.fg.primary
                 font.weight: Font.Bold
                 font.pixelSize: VLCStyle.dp(24, VLCStyle.scale)
@@ -169,7 +169,7 @@ T.Pane {
             Widgets.CaptionLabel {
                 color: theme.fg.secondary
                 visible: model.count !== 0
-                text: I18n.qtr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
+                text: qsTr("%1 elements, %2").arg(model.count).arg(model.duration.formatLong())
             }
         }
 
@@ -200,7 +200,7 @@ T.Pane {
                 color: theme.fg.secondary
 
                 Accessible.role: Accessible.ColumnHeader
-                Accessible.name: I18n.qtr("Cover")
+                Accessible.name: qsTr("Cover")
                 Accessible.ignored: false
             }
 
@@ -213,7 +213,7 @@ T.Pane {
                 textFormat: Text.PlainText
 
                 verticalAlignment: Text.AlignVCenter
-                text: I18n.qtr("Title")
+                text: qsTr("Title")
                 color: theme.fg.secondary
 
                 Accessible.role: Accessible.ColumnHeader
@@ -230,7 +230,7 @@ T.Pane {
                 font.pixelSize: VLCStyle.icon_playlistHeader
 
                 Accessible.role: Accessible.ColumnHeader
-                Accessible.name: I18n.qtr("Duration")
+                Accessible.name: qsTr("Duration")
                 Accessible.ignored: false
 
                 TextMetrics {
@@ -499,7 +499,7 @@ T.Pane {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    text: I18n.qtr("No content yet")
+                    text: qsTr("No content yet")
 
                     color: label.color
 
@@ -512,7 +512,7 @@ T.Pane {
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
 
-                    text: I18n.qtr("Drag & Drop some content here!")
+                    text: qsTr("Drag & Drop some content here!")
 
                     color: label.color
 

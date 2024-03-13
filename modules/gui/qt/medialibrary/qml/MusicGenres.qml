@@ -53,7 +53,7 @@ MainInterface.MainViewLoader {
     model: genreModel
 
     sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name" }
+        { text: qsTr("Alphabetic"), criteria: "name" }
     ]
 
     list: tableComponent
@@ -177,14 +177,14 @@ MainInterface.MainViewLoader {
                              elide: Text.ElideRight
                              font.pixelSize: VLCStyle.fontSize_large
                              font.weight: Font.DemiBold
-                             text: model.name || I18n.qtr("Unknown genre")
+                             text: model.name || qsTr("Unknown genre")
                              color: "white"
                              horizontalAlignment: Text.AlignHCenter
                         }
 
                         Widgets.CaptionLabel {
                             width: item.width
-                            text: model.nb_tracks > 1 ? I18n.qtr("%1 Tracks").arg(model.nb_tracks) : I18n.qtr("%1 Track").arg(model.nb_tracks)
+                            text: model.nb_tracks > 1 ? qsTr("%1 Tracks").arg(model.nb_tracks) : qsTr("%1 Track").arg(model.nb_tracks)
                             opacity: .7
                             color: "white"
                             horizontalAlignment: Text.AlignHCenter
@@ -220,7 +220,7 @@ MainInterface.MainViewLoader {
 
                     subCriterias: [ "nb_tracks" ],
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
@@ -233,7 +233,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "cover",
 
-                    text: I18n.qtr("Cover"),
+                    text: qsTr("Cover"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
@@ -244,7 +244,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "name",
 
-                    text: I18n.qtr("Name")
+                    text: qsTr("Name")
                 }
             }, {
                 size: 1,
@@ -252,7 +252,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "nb_tracks",
 
-                    text: I18n.qtr("Tracks")
+                    text: qsTr("Tracks")
                 }
             }]
 
@@ -300,7 +300,7 @@ MainInterface.MainViewLoader {
         id: emptyLabelComponent
 
         Widgets.EmptyLabelButton {
-            text: I18n.qtr("No genres found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No genres found\nPlease try adding sources, by going to the Browse tab")
             Navigation.parentItem: root
             cover: VLCStyle.noArtAlbumCover
         }

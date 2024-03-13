@@ -29,7 +29,7 @@ Widgets.IconToolButton {
     enabled: Player.rewindable
 
     text: VLCIcons.play_reverse
-    description: I18n.qtr("Reverse")
+    description: qsTr("Reverse")
 
     onClicked: Player.reverse()
 }

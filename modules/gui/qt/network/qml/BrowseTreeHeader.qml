@@ -78,8 +78,8 @@ T.Control {
             iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
 
             text: providerModel.indexed
-                  ? I18n.qtr("Remove from medialibrary")
-                  : I18n.qtr("Add to medialibrary")
+                  ? qsTr("Remove from medialibrary")
+                  : qsTr("Add to medialibrary")
 
             visible: !providerModel.is_on_provider_list
                      && !!providerModel.canBeIndexed

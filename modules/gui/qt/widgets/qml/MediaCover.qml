@@ -61,7 +61,7 @@ Rectangle {
     width: VLCStyle.listAlbumCover_width
 
     Accessible.role: Accessible.Graphic
-    Accessible.name: I18n.qtr("Media cover")
+    Accessible.name: qsTr("Media cover")
 
     // Children
 

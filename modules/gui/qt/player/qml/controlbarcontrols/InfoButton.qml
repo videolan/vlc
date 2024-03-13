@@ -28,5 +28,5 @@ Widgets.IconToolButton {
     enabled: Player.isPlaying
     text: VLCIcons.info
     onClicked: DialogsProvider.mediaInfoDialog()
-    description: I18n.qtr("Information")
+    description: qsTr("Information")
 }

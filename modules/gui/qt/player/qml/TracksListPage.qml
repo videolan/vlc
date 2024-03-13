@@ -49,14 +49,14 @@ RowLayout {
     Widgets.ButtonExt {
         id: playbackBtn
 
-        text: I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
+        text: qsTr("%1x").arg(+Player.rate.toFixed(2))
 
         onPressed: {
             trackMenuController.requestPlaybackSpeedPage()
         }
 
         T.ToolTip.visible: (hovered || visualFocus)
-        T.ToolTip.text: I18n.qtr("Playback Speed")
+        T.ToolTip.text: qsTr("Playback Speed")
         T.ToolTip.delay: VLCStyle.delayToolTipAppear
 
         Navigation.parentItem: root
@@ -76,27 +76,27 @@ RowLayout {
 
         //we store the model in a different property as functions can't be passed in modelData
         property var modelDefinition: [{
-                "title": I18n.qtr("Subtitle"),
+                "title": qsTr("Subtitle"),
                 "tracksModel": Player.subtitleTracks,
                 "menuIcon": VLCIcons.expand,
-                "menuText": I18n.qtr("Menu"),
+                "menuText": qsTr("Menu"),
                 "menuAction": function(menuPos) {
                     menuSubtitle.popup(menuPos)
                 },
 
             }, {
-                "title": I18n.qtr("Audio"),
+                "title": qsTr("Audio"),
                 "tracksModel": Player.audioTracks,
                 "menuIcon": VLCIcons.expand,
-                "menuText": I18n.qtr("Menu"),
+                "menuText": qsTr("Menu"),
                 "menuAction": function(menuPos) {
                     menuAudio.popup(menuPos)
                 }
             }, {
-                "title": I18n.qtr("Video Tracks"),
+                "title": qsTr("Video Tracks"),
                 "tracksModel": Player.videoTracks,
                 "menuIcon": VLCIcons.add,
-                "menuText": I18n.qtr("Add"),
+                "menuText": qsTr("Add"),
                 "menuAction": function(menuPos) {
                     DialogsProvider.loadVideoFile()
                 },
@@ -204,7 +204,7 @@ RowLayout {
                     fadingEdge.backgroundColor: "transparent"
 
                     Accessible.role: Accessible.List
-                    Accessible.name: I18n.qtr("Track list")
+                    Accessible.name: qsTr("Track list")
 
                     Navigation.parentItem: tracksListContainer
                     Navigation.upItem: button

@@ -44,7 +44,7 @@ T.Control {
     enabled: visible
 
     Accessible.role: Accessible.Pane
-    Accessible.name: I18n.qtr("Empty view")
+    Accessible.name: qsTr("Empty view")
 
     // Children
 

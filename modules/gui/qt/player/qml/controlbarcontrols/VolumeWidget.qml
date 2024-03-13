@@ -74,7 +74,7 @@ T.Pane {
                     VLCIcons.volume_medium
                 else
                     VLCIcons.volume_high
-            description: I18n.qtr("Mute")
+            description: qsTr("Mute")
             onClicked: Player.muted = !Player.muted
 
             Accessible.onIncreaseAction: {
@@ -126,7 +126,7 @@ T.Pane {
                 return Math.round(Player.volume * 100) + "%"
             }
 
-            Accessible.name: I18n.qtr("Volume")
+            Accessible.name: qsTr("Volume")
 
             Keys.onPressed: (event) => {
                 if (KeyHelper.matchOk(event)) {

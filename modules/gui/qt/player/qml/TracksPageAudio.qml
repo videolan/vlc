@@ -32,7 +32,7 @@ TracksPage {
     // Functions
 
     function textFromValue(value, locale) {
-        return I18n.qtr("%1 ms").arg(Number(value).toLocaleString(locale, 'f', 0))
+        return qsTr("%1 ms").arg(Number(value).toLocaleString(locale, 'f', 0))
     }
 
     function valueFromText(text, locale) {
@@ -50,7 +50,7 @@ TracksPage {
         Widgets.SubtitleLabel {
             Layout.fillWidth: true
 
-            text: I18n.qtr("Audio track synchronization")
+            text: qsTr("Audio track synchronization")
 
             color: root.colorContext.fg.primary
         }
@@ -62,7 +62,7 @@ TracksPage {
             spacing: VLCStyle.margin_xsmall
 
             Accessible.role: Accessible.Grouping
-            Accessible.name: I18n.qtr("Audio track delay")
+            Accessible.name: qsTr("Audio track delay")
 
             DelayEstimator {
                 id: delayEstimator
@@ -73,7 +73,7 @@ TracksPage {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
 
-                text: I18n.qtr("Audio track delay")
+                text: qsTr("Audio track delay")
 
                 color: root.colorContext.fg.primary
             }
@@ -124,7 +124,7 @@ TracksPage {
             Widgets.ActionButtonOverlay {
                 id: reset
 
-                text: I18n.qtr("Reset")
+                text: qsTr("Reset")
 
                 onClicked: {
                     Player.audioDelayMS = 0
@@ -145,7 +145,7 @@ TracksPage {
             Widgets.TrackDelayButton {
                 id: soundHeard
 
-                text: I18n.qtr("Sound Heard")
+                text: qsTr("Sound Heard")
                 iconTxt: VLCIcons.check
                 selected: delayEstimator.isSpottedTimeMarked
 
@@ -159,7 +159,7 @@ TracksPage {
             Widgets.TrackDelayButton {
                 id: soundSpotted
 
-                text: I18n.qtr("Sound Spotted")
+                text: qsTr("Sound Spotted")
                 iconTxt: VLCIcons.check
                 selected: delayEstimator.isHeardTimeMarked
 

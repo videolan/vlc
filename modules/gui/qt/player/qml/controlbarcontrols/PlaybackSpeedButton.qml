@@ -30,7 +30,7 @@ PopupIconToolButton {
 
     popup.width: VLCStyle.dp(256, VLCStyle.scale)
 
-    text: I18n.qtr("Playback Speed")
+    text: qsTr("Playback Speed")
 
     popup.contentItem: P.PlaybackSpeed {
         colorContext.palette: root.colorContext.palette
@@ -47,8 +47,8 @@ PopupIconToolButton {
 
         font.pixelSize: VLCStyle.fontSize_normal
 
-        text: !root.paintOnly ? I18n.qtr("%1x").arg(+Player.rate.toFixed(2))
-                              : I18n.qtr("1x")
+        text: !root.paintOnly ? qsTr("%1x").arg(+Player.rate.toFixed(2))
+                              : qsTr("1x")
 
         color: root.color
     }

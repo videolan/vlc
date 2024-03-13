@@ -141,7 +141,7 @@ T.ToolBar {
                                  id: history_back
                                  font.pixelSize: VLCStyle.icon_banner
                                  text: VLCIcons.back
-                                 description: I18n.qtr("Previous")
+                                 description: qsTr("Previous")
                                  height: VLCStyle.bannerButton_height
                                  width: VLCStyle.bannerButton_width
                                  onClicked: History.previous()
@@ -263,7 +263,7 @@ T.ToolBar {
                                 height: VLCStyle.bannerButton_height
                                 font.pixelSize: VLCStyle.icon_banner
                                 text: MainCtx.gridView ? VLCIcons.list : VLCIcons.grid
-                                description: I18n.qtr("List/Grid")
+                                description: qsTr("List/Grid")
                                 onClicked: MainCtx.gridView = !MainCtx.gridView
                                 enabled: true
                             }
@@ -407,7 +407,7 @@ T.ToolBar {
 
                                 font.pixelSize: VLCStyle.icon_banner
                                 text: VLCIcons.playlist
-                                description: I18n.qtr("Playlist")
+                                description: qsTr("Playlist")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 highlighted: MainCtx.playlistVisible
@@ -461,7 +461,7 @@ T.ToolBar {
                                 visible: !MainCtx.hasToolbarMenu
                                 font.pixelSize: VLCStyle.icon_banner
                                 text: VLCIcons.more
-                                description: I18n.qtr("Menu")
+                                description: qsTr("Menu")
                                 width: VLCStyle.bannerButton_width
                                 height: VLCStyle.bannerButton_height
                                 checked: contextMenu.shown

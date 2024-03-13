@@ -100,7 +100,7 @@ Widgets.KeyNavigableListView {
                         Widgets.CaptionLabel {
                             color: servicesView.colorContext.fg.primary
                             textFormat: Text.StyledText
-                            text: model.author ? I18n.qtr("by <b>%1</b>").arg(model.author) : I18n.qtr("by <b>Unknown</b>")
+                            text: model.author ? qsTr("by <b>%1</b>").arg(model.author) : qsTr("by <b>Unknown</b>")
                             topPadding: VLCStyle.margin_xxxsmall
                             width: parent.width
                         }
@@ -115,13 +115,13 @@ Widgets.KeyNavigableListView {
                         text: {
                             switch(model.state) {
                             case ServicesDiscoveryModel.INSTALLED:
-                                return I18n.qtr("Remove")
+                                return qsTr("Remove")
                             case ServicesDiscoveryModel.NOTINSTALLED:
-                                return I18n.qtr("Install")
+                                return qsTr("Install")
                             case ServicesDiscoveryModel.INSTALLING:
-                                return I18n.qtr("Installing")
+                                return qsTr("Installing")
                             case ServicesDiscoveryModel.UNINSTALLING:
-                                return I18n.qtr("Uninstalling")
+                                return qsTr("Uninstalling")
                             }
                         }
 
@@ -136,7 +136,7 @@ Widgets.KeyNavigableListView {
 
                 Widgets.CaptionLabel {
                     elide: Text.ElideRight
-                    text:  model.description || model.summary || I18n.qtr("No information available")
+                    text:  model.description || model.summary || qsTr("No information available")
                     color: servicesView.colorContext.fg.secondary
                     topPadding: VLCStyle.margin_xsmall
                     wrapMode: Text.WordWrap
@@ -145,7 +145,7 @@ Widgets.KeyNavigableListView {
                 }
 
                 Widgets.CaptionLabel {
-                    text: I18n.qtr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
+                    text: qsTr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
                     topPadding: VLCStyle.margin_xsmall
                     color: servicesView.colorContext.fg.secondary
                     Layout.fillWidth: true

@@ -138,9 +138,9 @@ T.ProgressBar {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            text: (MediaLib.discoveryPending) ? I18n.qtr("Scanning %1")
+            text: (MediaLib.discoveryPending) ? qsTr("Scanning %1")
                                                 .arg(MediaLib.discoveryEntryPoint)
-                                              : I18n.qtr("Indexing Medias (%1%)")
+                                              : qsTr("Indexing Medias (%1%)")
                                                 .arg(MediaLib.parsingProgress)
 
             elide: Text.ElideMiddle

@@ -50,6 +50,6 @@ VideoAll {
     header: Widgets.ViewHeader {
         view: root
 
-        text: I18n.qtr("Continue Watching")
+        text: qsTr("Continue Watching")
     }
 }

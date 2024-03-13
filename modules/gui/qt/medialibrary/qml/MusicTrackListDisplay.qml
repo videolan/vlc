@@ -50,7 +50,7 @@ Widgets.KeyNavigableTableView {
     property var _lineTitle: ({
         criteria: "title",
 
-        text: I18n.qtr("Title"),
+        text: qsTr("Title"),
 
         showSection: "title",
 
@@ -63,7 +63,7 @@ Widgets.KeyNavigableTableView {
     property var _lineAlbum: ({
         criteria: "album_title",
 
-        text: I18n.qtr("Album"),
+        text: qsTr("Album"),
 
         showSection: "album_title"
     })
@@ -71,7 +71,7 @@ Widgets.KeyNavigableTableView {
     property var _lineArtist: ({
         criteria: "main_artist",
 
-        text: I18n.qtr("Artist"),
+        text: qsTr("Artist"),
 
         showSection: "main_artist"
     })
@@ -79,7 +79,7 @@ Widgets.KeyNavigableTableView {
     property var _lineDuration: ({
         criteria: "duration",
 
-        text: I18n.qtr("Duration"),
+        text: qsTr("Duration"),
 
         showSection: "",
 
@@ -90,7 +90,7 @@ Widgets.KeyNavigableTableView {
     property var _lineTrack: ({
         criteria: "track_number",
 
-        text: I18n.qtr("Track"),
+        text: qsTr("Track"),
 
         showSection: ""
     })
@@ -98,7 +98,7 @@ Widgets.KeyNavigableTableView {
     property var _lineDisc: ({
         criteria: "disc_number",
 
-        text: I18n.qtr("Disc"),
+        text: qsTr("Disc"),
 
         showSection: ""
     })
@@ -155,7 +155,7 @@ Widgets.KeyNavigableTableView {
 
             subCriterias: [ "duration", "album_title" ],
 
-            text: I18n.qtr("Title"),
+            text: qsTr("Title"),
 
             showSection: "title",
 

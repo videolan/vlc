@@ -28,7 +28,7 @@ Widgets.IconToolButton {
 
     text: VLCIcons.effect_filter
 
-    description: I18n.qtr("Extended settings")
+    description: qsTr("Extended settings")
 
     onClicked: DialogsProvider.extendedDialog()
 }

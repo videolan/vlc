@@ -30,5 +30,5 @@ Widgets.IconToolButton {
 
     text: VLCIcons.faster
     onClicked: Player.faster()
-    description: I18n.qtr("Faster")
+    description: qsTr("Faster")
 }

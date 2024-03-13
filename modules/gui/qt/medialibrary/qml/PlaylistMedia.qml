@@ -54,7 +54,7 @@ MainInterface.MainTableView {
 
             subCriterias: [ "duration" ],
 
-            text: I18n.qtr("Title"),
+            text: qsTr("Title"),
 
             headerDelegate: table.titleHeaderDelegate,
             colDelegate   : table.titleDelegate,
@@ -69,7 +69,7 @@ MainInterface.MainTableView {
         model: {
             criteria: "thumbnail",
 
-            text: I18n.qtr("Cover"),
+            text: qsTr("Cover"),
 
             type: "image",
 
@@ -84,7 +84,7 @@ MainInterface.MainTableView {
         model: {
             criteria: "title",
 
-            text: I18n.qtr("Title")
+            text: qsTr("Title")
         }
     }, {
         size: 1,
@@ -92,7 +92,7 @@ MainInterface.MainTableView {
         model: {
             criteria: "duration",
 
-            text: I18n.qtr("Duration"),
+            text: qsTr("Duration"),
 
             headerDelegate: table.timeHeaderDelegate,
             colDelegate   : table.timeColDelegate

@@ -30,5 +30,5 @@ Widgets.IconToolButton {
           ? VLCIcons.repeat_one
           : VLCIcons.repeat_all
     onClicked: MainPlaylistController.toggleRepeatMode()
-    description: I18n.qtr("Repeat")
+    description: qsTr("Repeat")
 }

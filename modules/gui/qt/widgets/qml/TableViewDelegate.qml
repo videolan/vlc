@@ -223,7 +223,7 @@ T.Control {
 
                 font.pixelSize: VLCStyle.icon_normal
 
-                description: I18n.qtr("Menu")
+                description: qsTr("Menu")
 
                 visible: delegate.hovered
 

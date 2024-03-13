@@ -97,7 +97,7 @@ FocusScope {
             rightPadding: Helpers.get(view.currentItem, "contentRightMargin", 0)
             topPadding: 0
 
-            text: I18n.qtr("Continue Watching")
+            text: qsTr("Continue Watching")
 
             onSeeAllButtonClicked: History.push(["mc", "video", "all", "recentVideos"]);
 

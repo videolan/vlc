@@ -31,8 +31,8 @@ Widgets.GridItem {
     image: model.cover || ""
     fallbackImage: VLCStyle.noArtAlbumCover
 
-    title: model.title || I18n.qtr("Unknown title")
-    subtitle: model.main_artist || I18n.qtr("Unknown artist")
+    title: model.title || qsTr("Unknown title")
+    subtitle: model.main_artist || qsTr("Unknown artist")
     pictureWidth: VLCStyle.gridCover_music_width
     pictureHeight: VLCStyle.gridCover_music_height
     playCoverBorderWidth: VLCStyle.gridCover_music_border

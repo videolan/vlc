@@ -46,8 +46,8 @@ FocusScope {
     }
 
     property var sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name"},
-        { text: I18n.qtr("Url"),        criteria: "mrl" }
+        { text: qsTr("Alphabetic"), criteria: "name"},
+        { text: qsTr("Url"),        criteria: "mrl" }
     ]
 
     readonly property bool hasGridListMode: true
@@ -124,7 +124,7 @@ FocusScope {
 
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? theme.accent : theme.fg.primary
-        text: I18n.qtr("No network shares found")
+        text: qsTr("No network shares found")
     }
 
     ScrollView {
@@ -161,7 +161,7 @@ FocusScope {
                     searchPattern: MainCtx.search.pattern
                 }
 
-                title: I18n.qtr("My Folders")
+                title: qsTr("My Folders")
 
                 Navigation.parentItem: root
 
@@ -206,7 +206,7 @@ FocusScope {
                 }
 
 
-                title: I18n.qtr("My Machine")
+                title: qsTr("My Machine")
 
                 Navigation.parentItem: root
 
@@ -255,7 +255,7 @@ FocusScope {
                     searchPattern: MainCtx.search.pattern
                 }
 
-                title: I18n.qtr("My LAN")
+                title: qsTr("My LAN")
 
                 Navigation.parentItem: root
 

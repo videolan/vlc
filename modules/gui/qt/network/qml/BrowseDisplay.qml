@@ -50,7 +50,7 @@ Widgets.PageLoader {
     localMenuDelegate: (pageName !== "home") ? componentBar : null
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Browse view")
+    Accessible.name: qsTr("Browse view")
 
     //functions
 
@@ -96,8 +96,8 @@ Widgets.PageLoader {
 
         BrowseDeviceView {
             property var sortModel: [
-                { text: I18n.qtr("Alphabetic"), criteria: "name" },
-                { text: I18n.qtr("Url"),        criteria: "mrl"  }
+                { text: qsTr("Alphabetic"), criteria: "name" },
+                { text: qsTr("Url"),        criteria: "mrl"  }
             ]
 
             displayMarginEnd: g_mainDisplay.displayMargin
@@ -123,8 +123,8 @@ Widgets.PageLoader {
             /*required*/ property var sd_source
 
             property var sortModel: [
-                { text: I18n.qtr("Alphabetic"), criteria: "name" },
-                { text: I18n.qtr("Url"),        criteria: "mrl"  }
+                { text: qsTr("Alphabetic"), criteria: "name" },
+                { text: qsTr("Url"),        criteria: "mrl"  }
             ]
 
             displayMarginEnd: g_mainDisplay.displayMargin

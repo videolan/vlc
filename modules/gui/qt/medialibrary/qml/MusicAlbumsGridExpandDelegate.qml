@@ -66,9 +66,9 @@ FocusScope {
         const count = Helpers.get(model, "nb_tracks", 0);
 
         if (count < 2)
-            return I18n.qtr("%1 track").arg(count);
+            return qsTr("%1 track").arg(count);
         else
-            return I18n.qtr("%1 tracks").arg(count);
+            return qsTr("%1 tracks").arg(count);
     }
 
     readonly property ColorContext colorContext: ColorContext {
@@ -158,7 +158,7 @@ FocusScope {
                         id: _playActionBtn
 
                         iconTxt: VLCIcons.play
-                        text: I18n.qtr("Play")
+                        text: qsTr("Play")
                         onClicked: MediaLib.addAndPlay( root.model.id )
 
                         onActiveFocusChanged: {
@@ -176,7 +176,7 @@ FocusScope {
                         id: _enqueueActionBtn
 
                         iconTxt: VLCIcons.enqueue
-                        text: I18n.qtr("Enqueue")
+                        text: qsTr("Enqueue")
                         onClicked: MediaLib.addToPlaylist( root.model.id )
                     }
                 }
@@ -240,7 +240,7 @@ FocusScope {
                         Widgets.SubtitleLabel {
                             id: expand_infos_title_id
 
-                            text: Helpers.get(root.model, "title", I18n.qtr("Unknown title"))
+                            text: Helpers.get(root.model, "title", qsTr("Unknown title"))
 
                             color: theme.fg.primary
 
@@ -264,8 +264,8 @@ FocusScope {
                         color: theme.fg.secondary
 
                         width: parent.width
-                        text: I18n.qtr("%1 - %2 - %3 - %4")
-                            .arg(Helpers.get(root.model, "main_artist", I18n.qtr("Unknown artist")))
+                        text: qsTr("%1 - %2 - %3 - %4")
+                            .arg(Helpers.get(root.model, "main_artist", qsTr("Unknown artist")))
                             .arg(Helpers.get(root.model, "release_year", ""))
                             .arg(_getStringTrack())
                             .arg((root.model && root.model.duration) ? root.model.duration.formatHMS() : 0)
@@ -398,7 +398,7 @@ FocusScope {
                 }
 
                 Widgets.CaptionLabel {
-                    text: I18n.qtr("Title")
+                    text: qsTr("Title")
                     color: theme.fg.secondary
                 }
             }
@@ -434,7 +434,7 @@ FocusScope {
 
                     visible: true,
 
-                    text: I18n.qtr("Title"),
+                    text: qsTr("Title"),
 
                     showSection: "",
 
@@ -449,7 +449,7 @@ FocusScope {
 
                     visible: true,
 
-                    text: I18n.qtr("Duration"),
+                    text: qsTr("Duration"),
 
                     showSection: "",
 

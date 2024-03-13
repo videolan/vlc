@@ -29,7 +29,7 @@ Widgets.IconToolButton {
     signal requestLockUnlockAutoHide(bool lock)
 
     text: VLCIcons.ellipsis
-    description: I18n.qtr("Menu")
+    description: qsTr("Menu")
     checked: contextMenu.shown
 
     onClicked: contextMenu.popup(this.mapToGlobal(0, 0))

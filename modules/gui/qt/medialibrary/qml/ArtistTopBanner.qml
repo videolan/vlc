@@ -39,7 +39,7 @@ FocusScope {
     implicitHeight: VLCStyle.artistBanner_height
 
     Accessible.role: Accessible.Pane
-    Accessible.name: I18n.qtr("Artist banner")
+    Accessible.name: qsTr("Artist banner")
 
     function setCurrentItemFocus(reason) {
         playActionBtn.forceActiveFocus(reason);
@@ -137,7 +137,7 @@ FocusScope {
             Widgets.SubtitleLabel {
                 Layout.fillWidth: true
 
-                text: artist.name || I18n.qtr("No artist")
+                text: artist.name || qsTr("No artist")
                 color: theme.fg.primary
 
                 Layout.maximumWidth: parent.width
@@ -148,7 +148,7 @@ FocusScope {
 
                 Layout.topMargin: VLCStyle.margin_xxxsmall
 
-                text: I18n.qtr("%1 Songs").arg(artist.nb_tracks)
+                text: qsTr("%1 Songs").arg(artist.nb_tracks)
                 color: theme.fg.secondary
             }
 
@@ -166,7 +166,7 @@ FocusScope {
                     Widgets.ActionButtonPrimary {
                         id: playActionBtn
                         iconTxt: VLCIcons.play
-                        text: I18n.qtr("Play all")
+                        text: qsTr("Play all")
                         focus: true
 
                         //we probably want to keep this button like the other action buttons
@@ -178,7 +178,7 @@ FocusScope {
                     Widgets.ActionButtonOverlay {
                         id: enqueueActionBtn
                         iconTxt: VLCIcons.enqueue
-                        text: I18n.qtr("Enqueue all")
+                        text: qsTr("Enqueue all")
                         onClicked: MediaLib.addToPlaylist( artist.id )
                     }
                 }

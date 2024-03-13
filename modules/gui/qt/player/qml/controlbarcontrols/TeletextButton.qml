@@ -35,7 +35,7 @@ PopupIconToolButton {
 
     text: VLCIcons.tvtelx
 
-    description: I18n.qtr("Teletext")
+    description: qsTr("Teletext")
 
     popup.contentItem: TeletextWidget {
         colorContext.palette: root.colorContext.palette

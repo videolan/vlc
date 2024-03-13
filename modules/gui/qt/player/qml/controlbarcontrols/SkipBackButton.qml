@@ -30,5 +30,5 @@ Widgets.IconToolButton {
 
     text: VLCIcons.skip_back
     onClicked: Player.jumpBwd()
-    description: I18n.qtr("Step back")
+    description: qsTr("Step back")
 }

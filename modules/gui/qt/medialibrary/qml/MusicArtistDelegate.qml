@@ -185,7 +185,7 @@ T.ItemDelegate {
                 }
 
                 text: (model.name) ? model.name
-                                   : I18n.qtr("Unknown artist")
+                                   : qsTr("Unknown artist")
 
                 color: theme.fg.primary
             }

@@ -74,7 +74,7 @@ EmptyLabel {
 
         focus: true
 
-        text: I18n.qtr("Browse")
+        text: qsTr("Browse")
         iconTxt: VLCIcons.topbar_network
 
         Navigation.parentItem: root

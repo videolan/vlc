@@ -66,17 +66,17 @@ Widgets.PageLoader {
     pageModel: [{
             name: "all",
             default: true,
-            displayText: I18n.qtr("All"),
+            displayText: qsTr("All"),
             url: "qrc:///medialibrary/VideoAllDisplay.qml"
         },{
             name: "playlists",
-            displayText: I18n.qtr("Playlists"),
+            displayText: qsTr("Playlists"),
             url: "qrc:///medialibrary/VideoPlaylistsDisplay.qml"
         }
     ]
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Video view")
+    Accessible.name: qsTr("Video view")
 
     onCurrentItemChanged: {
         // NOTE: We need bindings because the VideoAll model can change over time.

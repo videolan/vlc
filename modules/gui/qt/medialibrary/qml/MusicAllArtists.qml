@@ -54,8 +54,8 @@ MainInterface.MainViewLoader {
     }
 
     sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "name" },
-        { text: I18n.qtr("Tracks Count"),   criteria: "nb_tracks" }
+        { text: qsTr("Alphabetic"), criteria: "name" },
+        { text: qsTr("Tracks Count"),   criteria: "nb_tracks" }
     ]
 
     grid: gridComponent
@@ -108,8 +108,8 @@ MainInterface.MainViewLoader {
                 image: model.cover || ""
                 fallbackImage: VLCStyle.noArtArtistSmall
 
-                title: model.name || I18n.qtr("Unknown artist")
-                subtitle: model.nb_tracks > 1 ? I18n.qtr("%1 songs").arg(model.nb_tracks) : I18n.qtr("%1 song").arg(model.nb_tracks)
+                title: model.name || qsTr("Unknown artist")
+                subtitle: model.nb_tracks > 1 ? qsTr("%1 songs").arg(model.nb_tracks) : qsTr("%1 song").arg(model.nb_tracks)
                 pictureRadius: VLCStyle.artistGridCover_radius
                 pictureHeight: VLCStyle.artistGridCover_radius
                 pictureWidth: VLCStyle.artistGridCover_radius
@@ -152,7 +152,7 @@ MainInterface.MainViewLoader {
 
                     subCriterias: [ "nb_tracks" ],
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate,
@@ -167,7 +167,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "name",
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate,
@@ -180,7 +180,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "nb_tracks",
 
-                    text: I18n.qtr("Tracks")
+                    text: qsTr("Tracks")
                 }
             }]
 
@@ -223,7 +223,7 @@ MainInterface.MainViewLoader {
         id: emptyLabelComponent
 
         Widgets.EmptyLabelButton {
-            text: I18n.qtr("No artists found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No artists found\nPlease try adding sources, by going to the Browse tab")
             Navigation.parentItem: root
             cover: VLCStyle.noArtArtistCover
         }

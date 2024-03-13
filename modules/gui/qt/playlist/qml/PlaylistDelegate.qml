@@ -147,15 +147,15 @@ T.ItemDelegate {
             Layout.alignment: Qt.AlignVCenter
 
             Accessible.role: Accessible.Graphic
-            Accessible.name: I18n.qtr("Cover")
+            Accessible.name: qsTr("Cover")
             Accessible.description: {
                 if (model.isCurrent) {
                     if (Player.playingState === Player.PLAYING_STATE_PLAYING)
-                        return I18n.qtr("Playing")
+                        return qsTr("Playing")
                     else if (Player.playingState === Player.PLAYING_STATE_PAUSED)
-                        return I18n.qtr("Paused")
+                        return qsTr("Paused")
                 }
-                return I18n.qtr("Media cover")
+                return qsTr("Media cover")
             }
 
             Widgets.ScaledImage {
@@ -219,7 +219,7 @@ T.ItemDelegate {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                text: (model.artist ? model.artist : I18n.qtr("Unknown Artist"))
+                text: (model.artist ? model.artist : qsTr("Unknown Artist"))
                 color: theme.fg.primary
                 verticalAlignment: Text.AlignBottom
             }

@@ -33,7 +33,7 @@ Window {
     width: 350
     minimumWidth: playlistView.minimumWidth
 
-    title: I18n.qtr("Playlist")
+    title: qsTr("Playlist")
     color: theme.bg.primary
 
     Component.onCompleted: {

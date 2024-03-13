@@ -41,7 +41,7 @@ Widgets.GridItem {
     image: model.thumbnail || ""
     fallbackImage: VLCStyle.noArtVideoCover
 
-    title: model.title || I18n.qtr("Unknown title")
+    title: model.title || qsTr("Unknown title")
     subtitle: !!model && (typeof model.duration !== "undefined") ? model.duration.formatHMS() : ""
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height

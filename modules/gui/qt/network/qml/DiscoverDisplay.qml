@@ -30,12 +30,12 @@ Widgets.PageLoader {
     id: root
 
     pageModel: [{
-            displayText: I18n.qtr("Services"),
+            displayText: qsTr("Services"),
             default: true,
             name: "services",
             url: "qrc:///network/ServicesHomeDisplay.qml"
         }, {
-            displayText: I18n.qtr("URL"),
+            displayText: qsTr("URL"),
             name: "url",
             url: "qrc:///network/DiscoverUrlDisplay.qml"
         }
@@ -44,7 +44,7 @@ Widgets.PageLoader {
     localMenuDelegate: menuDelegate
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Discover view")
+    Accessible.name: qsTr("Discover view")
 
     function loadIndex(index) {
         const pageName = root.pageModel[index].name

@@ -25,7 +25,7 @@ import "qrc:///style/"
 Widgets.ImageToolButton {
     id: control
 
-    text: I18n.qtr("A to B")
+    text: qsTr("A to B")
 
     sourceSize.width: VLCStyle.icon_toolbar
     sourceSize.height: VLCStyle.icon_toolbar

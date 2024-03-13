@@ -27,5 +27,5 @@ Widgets.IconToolButton {
     text: VLCIcons.previous
     enabled: MainPlaylistController.hasPrev
     onClicked: MainPlaylistController.prev()
-    description: I18n.qtr("Previous")
+    description: qsTr("Previous")
 }

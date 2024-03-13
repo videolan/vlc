@@ -95,7 +95,7 @@ T.Pane {
 
             focus: true
 
-            text: I18n.qtr("See All")
+            text: qsTr("See All")
 
             font.pixelSize: VLCStyle.fontSize_large
 

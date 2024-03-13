@@ -34,5 +34,5 @@ Widgets.IconToolButton {
     }
     checked: MainCtx.playlistVisible
 
-    description: I18n.qtr("Playlist")
+    description: qsTr("Playlist")
 }

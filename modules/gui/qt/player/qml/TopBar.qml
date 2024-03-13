@@ -71,7 +71,7 @@ FocusScope{
 
     // Settings
 
-    Accessible.name: I18n.qtr("Player topbar")
+    Accessible.name: qsTr("Player topbar")
     Accessible.role: Accessible.ToolBar
 
     // Events
@@ -253,7 +253,7 @@ FocusScope{
                 objectName: "IconToolButton"
                 font.pixelSize: VLCStyle.icon_banner
                 text: VLCIcons.back
-                description: I18n.qtr("Back")
+                description: qsTr("Back")
                 focus: true
 
                 Navigation.parentItem: root
@@ -424,7 +424,7 @@ FocusScope{
             height: VLCStyle.bannerButton_height
 
             text: VLCIcons.more
-            description: I18n.qtr("Menu")
+            description: qsTr("Menu")
             checked: contextMenu.shown
 
             Navigation.parentItem: root
@@ -452,7 +452,7 @@ FocusScope{
             objectName: ControlListModel.PLAYLIST_BUTTON
             font.pixelSize: VLCStyle.icon_banner
             text: VLCIcons.playlist
-            description: I18n.qtr("Playlist")
+            description: qsTr("Playlist")
             focus: root.showToolbar
 
             checked: MainCtx.playlistVisible

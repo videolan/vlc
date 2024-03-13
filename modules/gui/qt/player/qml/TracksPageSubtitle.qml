@@ -32,7 +32,7 @@ TracksPage {
     // Functions
 
     function textFromValueA(value, locale) {
-        return I18n.qtr("%1 ms").arg(Number(value).toLocaleString(locale, 'f', 0))
+        return qsTr("%1 ms").arg(Number(value).toLocaleString(locale, 'f', 0))
     }
 
     function valueFromTextA(text, locale) {
@@ -40,7 +40,7 @@ TracksPage {
     }
 
     function textFromValueB(value, locale) {
-        return I18n.qtr("%1 fps").arg(Number(value / 10).toLocaleString(locale, 'f', 3))
+        return qsTr("%1 fps").arg(Number(value / 10).toLocaleString(locale, 'f', 3))
     }
 
     function valueFromTextB(text, locale) {
@@ -58,7 +58,7 @@ TracksPage {
         Widgets.SubtitleLabel {
             Layout.fillWidth: true
 
-            text: I18n.qtr("Subtitle synchronization")
+            text: qsTr("Subtitle synchronization")
 
             color: root.colorContext.fg.primary
         }
@@ -70,7 +70,7 @@ TracksPage {
             spacing: VLCStyle.margin_xxxsmall
 
             Accessible.role: Accessible.Grouping
-            Accessible.name: I18n.qtr("Primary subtitle delay")
+            Accessible.name: qsTr("Primary subtitle delay")
 
             DelayEstimator {
                 id: delayEstimatorPrimary
@@ -89,7 +89,7 @@ TracksPage {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
 
-                    text: I18n.qtr("Primary subtitle delay")
+                    text: qsTr("Primary subtitle delay")
 
                     color: root.colorContext.fg.primary
                 }
@@ -141,7 +141,7 @@ TracksPage {
                 Widgets.TextToolButton {
                     id: resetA
 
-                    text: I18n.qtr("Reset")
+                    text: qsTr("Reset")
 
                     focus: true
 
@@ -167,7 +167,7 @@ TracksPage {
                     id: voiceHeardA
 
                     iconTxt: VLCIcons.check
-                    text: I18n.qtr("Voice Heard")
+                    text: qsTr("Voice Heard")
                     selected: delayEstimatorPrimary.isHeardTimeMarked
 
                     onClicked: {
@@ -181,7 +181,7 @@ TracksPage {
                     id: textSeenA
 
                     iconTxt: VLCIcons.check
-                    text: I18n.qtr("Text Seen")
+                    text: qsTr("Text Seen")
                     selected: delayEstimatorPrimary.isSpottedTimeMarked
 
                     onClicked: {
@@ -199,7 +199,7 @@ TracksPage {
             spacing: VLCStyle.margin_xxxsmall
 
             Accessible.role: Accessible.Grouping
-            Accessible.name: I18n.qtr("Secondary subtitle delay")
+            Accessible.name: qsTr("Secondary subtitle delay")
 
             DelayEstimator {
                 id: delayEstimatorSecondary
@@ -218,7 +218,7 @@ TracksPage {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
 
-                    text: I18n.qtr("Secondary subtitle delay")
+                    text: qsTr("Secondary subtitle delay")
 
                     color: root.colorContext.fg.primary
                 }
@@ -269,7 +269,7 @@ TracksPage {
                 Widgets.TextToolButton {
                     id: resetB
 
-                    text: I18n.qtr("Reset")
+                    text: qsTr("Reset")
 
                     Navigation.parentItem: root
                     Navigation.leftItem: spinBoxB
@@ -293,7 +293,7 @@ TracksPage {
                 Widgets.TrackDelayButton {
                     id: voiceHeardB
 
-                    text: I18n.qtr("Voice Heard")
+                    text: qsTr("Voice Heard")
                     iconTxt: VLCIcons.check
                     selected: delayEstimatorSecondary.isHeardTimeMarked
 
@@ -307,7 +307,7 @@ TracksPage {
                 Widgets.TrackDelayButton {
                     id: textSeenB
 
-                    text: I18n.qtr("Text Seen")
+                    text: qsTr("Text Seen")
                     iconTxt: VLCIcons.check
                     selected: delayEstimatorSecondary.isSpottedTimeMarked
 
@@ -326,13 +326,13 @@ TracksPage {
             spacing: VLCStyle.margin_xsmall
 
             Accessible.role: Accessible.Grouping
-            Accessible.name: I18n.qtr("Subtitle Speed")
+            Accessible.name: qsTr("Subtitle Speed")
 
             Widgets.MenuCaption {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
 
-                text: I18n.qtr("Subtitle Speed")
+                text: qsTr("Subtitle Speed")
 
                 color: root.colorContext.fg.primary
             }
@@ -383,7 +383,7 @@ TracksPage {
             Widgets.TextToolButton {
                 id: resetC
 
-                text: I18n.qtr("Reset")
+                text: qsTr("Reset")
 
                 onClicked: spinBoxC.value = 10
 

@@ -30,7 +30,7 @@ Widgets.IconToolButton {
     enabled: Player.hasMenu
 
     text: VLCIcons.dvd_menu
-    description: I18n.qtr("Menu")
+    description: qsTr("Menu")
 
     onClicked: Player.sectionMenu()
 }

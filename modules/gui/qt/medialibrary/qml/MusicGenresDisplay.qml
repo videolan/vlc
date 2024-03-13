@@ -46,7 +46,7 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: genresView
 
-                text: I18n.qtr("Genres")
+                text: qsTr("Genres")
             }
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
@@ -72,7 +72,7 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: albumsView
 
-                text: I18n.qtr("Genres - %1").arg(genreName)
+                text: qsTr("Genres - %1").arg(genreName)
             }
 
             searchPattern: MainCtx.search.pattern

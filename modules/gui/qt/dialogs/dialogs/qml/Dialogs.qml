@@ -183,7 +183,7 @@ Item {
             property real layoutWidth: layout.width
 
             Accessible.role: Accessible.AlertMessage
-            Accessible.name: I18n.qtr("error popup")
+            Accessible.name: qsTr("error popup")
 
             RowLayout {
                 id: layout
@@ -217,7 +217,7 @@ Item {
                 Widgets.TextToolButton {
                     id: detailsBtn
 
-                    text: I18n.qtr("Show Details")
+                    text: qsTr("Show Details")
 
                     colorContext.colorSet: ColorContext.ButtonAccent
 
@@ -233,7 +233,7 @@ Item {
                     id: closeBtn
                     font.pixelSize: VLCStyle.icon_normal
                     text: VLCIcons.clear
-                    description: I18n.qtr("Dismiss")
+                    description: qsTr("Dismiss")
                     Layout.rightMargin: VLCStyle.margin_xxsmall
 
                     color: closeBtn.colorContext.fg.negative
@@ -281,7 +281,7 @@ Item {
             }
 
             Text {
-                text: I18n.qtr("User")
+                text: qsTr("User")
                 color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -300,7 +300,7 @@ Item {
             }
 
             Text {
-                text: I18n.qtr("Password")
+                text: qsTr("Password")
                 color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -319,7 +319,7 @@ Item {
             }
 
             Text {
-                text: I18n.qtr("Save password")
+                text: qsTr("Save password")
                 color: loginContentTheme.fg.primary
                 font.pixelSize: VLCStyle.fontSize_normal
             }
@@ -355,7 +355,7 @@ Item {
                     Widgets.TextToolButton {
                         id: loginCancel
                         Layout.fillWidth: true
-                        text: I18n.qtr("cancel")
+                        text: qsTr("cancel")
 
                         Navigation.upItem: savePassword
                         Navigation.rightItem: loginOk
@@ -371,7 +371,7 @@ Item {
                     Widgets.TextToolButton {
                         id: loginOk
                         Layout.fillWidth: true
-                        text: I18n.qtr("Ok")
+                        text: qsTr("Ok")
                         focus: true
 
                         Navigation.upItem: savePassword

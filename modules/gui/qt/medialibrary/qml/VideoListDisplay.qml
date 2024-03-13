@@ -54,7 +54,7 @@ MainInterface.MainTableView {
 
             showSection: "title",
 
-            text: I18n.qtr("Title"),
+            text: qsTr("Title"),
 
             placeHolder: VLCStyle.noArtVideoCover,
 
@@ -71,7 +71,7 @@ MainInterface.MainTableView {
 
             criteria: "thumbnail",
 
-            text: I18n.qtr("Cover"),
+            text: qsTr("Cover"),
 
             showSection: "",
 
@@ -88,7 +88,7 @@ MainInterface.MainTableView {
 
             showSection: "title",
 
-            text: I18n.qtr("Title")
+            text: qsTr("Title")
         })
     }, {
         size: 1,
@@ -96,7 +96,7 @@ MainInterface.MainTableView {
         model: ({
             criteria: "duration",
 
-            text: I18n.qtr("Duration"),
+            text: qsTr("Duration"),
 
             showSection: "",
             showContextButton: true,

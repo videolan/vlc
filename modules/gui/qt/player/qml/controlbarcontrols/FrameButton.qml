@@ -30,5 +30,5 @@ Widgets.IconToolButton {
 
     text: VLCIcons.frame_by_frame
     onClicked: Player.frameNext()
-    description: I18n.qtr("Next frame")
+    description: qsTr("Next frame")
 }

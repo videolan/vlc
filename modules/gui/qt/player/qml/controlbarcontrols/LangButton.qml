@@ -48,7 +48,7 @@ Widgets.IconToolButton {
 
     enabled: menuLoader.status === Loader.Ready
 
-    description: I18n.qtr("Languages and tracks")
+    description: qsTr("Languages and tracks")
 
     // Events
 

@@ -26,7 +26,7 @@ FocusScope {
     id: root
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Home view")
+    Accessible.name: qsTr("Home view")
 
     //behave like a Page
     property var pagePrefix: []
@@ -50,13 +50,13 @@ FocusScope {
 
         Widgets.MenuLabel {
             anchors .horizontalCenter: parent.horizontalCenter
-            text: I18n.qtr("Drop some content here")
+            text: qsTr("Drop some content here")
             color: theme.fg.secondary
         }
 
         Widgets.ActionButtonPrimary {
             id: openFileButton
-            text: I18n.qtr("Open File")
+            text: qsTr("Open File")
             focus: true
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: DialogsProvider.simpleOpenDialog()

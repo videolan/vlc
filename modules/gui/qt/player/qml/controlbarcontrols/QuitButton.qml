@@ -27,5 +27,5 @@ Widgets.IconToolButton {
     id: quitBtn
     text: VLCIcons.clear
     onClicked: MainCtx.close()
-    description: I18n.qtr("Quit")
+    description: qsTr("Quit")
 }

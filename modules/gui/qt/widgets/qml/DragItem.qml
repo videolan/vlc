@@ -51,7 +51,7 @@ Item {
 
     property string defaultCover: VLCStyle.noArtAlbumCover
 
-    property string defaultText: I18n.qtr("Unknown")
+    property string defaultText: qsTr("Unknown")
 
     // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), cover: <component>}
     property var coverProvider: null
@@ -215,7 +215,7 @@ Item {
     //NoRole because I'm not sure we need this to be accessible
     //can drag items be considered Tooltip ? or is another class better suited
     Accessible.role: Accessible.NoRole
-    Accessible.name: I18n.qtr("drag item")
+    Accessible.name: qsTr("drag item")
 
     Drag.onActiveChanged: {
         if (Drag.active) {
@@ -503,7 +503,7 @@ Item {
         x: dragItem.coversXPos(_displayedCoversCount - 1) + dragItem.coverSize + VLCStyle.margin_small
 
         visible: text && text !== ""
-        text: I18n.qtr("%1 selected").arg(dragItem._indexesSize)
+        text: qsTr("%1 selected").arg(dragItem._indexesSize)
         color: theme.fg.secondary
     }
 

@@ -28,5 +28,5 @@ Widgets.IconToolButton {
     enabled: Player.isPlaying
     text: VLCIcons.snapshot
     onClicked: Player.snapshot()
-    description: I18n.qtr("Snapshot")
+    description: qsTr("Snapshot")
 }

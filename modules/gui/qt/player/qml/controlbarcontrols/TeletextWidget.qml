@@ -69,7 +69,7 @@ T.Pane {
             Widgets.SubtitleLabel {
                 id: itemText
 
-                text: I18n.qtr("Teletext")
+                text: qsTr("Teletext")
 
                 color: theme.fg.primary
             }
@@ -106,7 +106,7 @@ T.Pane {
                 checked: Player.teletextTransparency
 
                 text: VLCIcons.transparency
-                description: I18n.qtr("Teletext transparency")
+                description: qsTr("Teletext transparency")
 
                 Navigation.parentItem: root
                 Navigation.leftItem: teleActivateBtn
@@ -180,7 +180,7 @@ T.Pane {
                 enabled: teleActivateBtn.checked
 
                 text: VLCIcons.home
-                description: I18n.qtr("Index key")
+                description: qsTr("Index key")
 
                 Navigation.parentItem: root
                 Navigation.leftItem: telePageNumber
@@ -197,7 +197,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: I18n.qtr("Red key")
+                text: qsTr("Red key")
 
                 color: root._teletextButtonColor(this, "red")
 
@@ -216,7 +216,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: I18n.qtr("Green key")
+                text: qsTr("Green key")
 
                 color: root._teletextButtonColor(this, "green")
 
@@ -235,7 +235,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: I18n.qtr("Yellow key")
+                text: qsTr("Yellow key")
 
                 color: root._teletextButtonColor(this, "yellow")
 
@@ -254,7 +254,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: I18n.qtr("Blue key")
+                text: qsTr("Blue key")
 
                 color: root._teletextButtonColor(this, "blue")
 

@@ -30,5 +30,5 @@ Widgets.IconToolButton {
 
     text: VLCIcons.slower
     onClicked: Player.slower()
-    description: I18n.qtr("Slower")
+    description: qsTr("Slower")
 }

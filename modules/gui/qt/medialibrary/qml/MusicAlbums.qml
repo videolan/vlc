@@ -50,10 +50,10 @@ MainInterface.MainViewLoader {
     model: albumModelId
 
     sortModel: [
-        { text: I18n.qtr("Alphabetic"),  criteria: "title"},
-        { text: I18n.qtr("Duration"),    criteria: "duration" },
-        { text: I18n.qtr("Date"),        criteria: "release_year" },
-        { text: I18n.qtr("Artist"),      criteria: "main_artist" },
+        { text: qsTr("Alphabetic"),  criteria: "title"},
+        { text: qsTr("Duration"),    criteria: "duration" },
+        { text: qsTr("Date"),        criteria: "release_year" },
+        { text: qsTr("Artist"),      criteria: "main_artist" },
     ]
 
     grid: gridComponent
@@ -186,7 +186,7 @@ MainInterface.MainViewLoader {
 
                     subCriterias: [ "main_artist", "duration" ],
 
-                    text: I18n.qtr("Title"),
+                    text: qsTr("Title"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate,
@@ -201,7 +201,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "title",
 
-                    text: I18n.qtr("Title"),
+                    text: qsTr("Title"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate,
@@ -214,7 +214,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "main_artist",
 
-                    text: I18n.qtr("Artist")
+                    text: qsTr("Artist")
                 }
             }, {
                 size: 1,
@@ -222,7 +222,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "duration",
 
-                    text: I18n.qtr("Duration"),
+                    text: qsTr("Duration"),
 
                     showSection: "",
 
@@ -277,7 +277,7 @@ MainInterface.MainViewLoader {
         id: emptyLabelComponent
 
         Widgets.EmptyLabelButton {
-            text: I18n.qtr("No albums found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No albums found\nPlease try adding sources, by going to the Browse tab")
             Navigation.parentItem: root
             cover: VLCStyle.noArtAlbumCover
         }

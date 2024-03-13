@@ -39,8 +39,8 @@ FocusScope {
     property int rightPadding: 0
 
     property var sortModel: [
-        { text: I18n.qtr("Alphabetic"),  criteria: "title" },
-        { text: I18n.qtr("Release Year"),  criteria: "release_year" }
+        { text: qsTr("Alphabetic"),  criteria: "title" },
+        { text: qsTr("Release Year"),  criteria: "release_year" }
     ]
 
     property int initialIndex: 0
@@ -189,7 +189,7 @@ FocusScope {
                 topPadding: VLCStyle.margin_xlarge
                 bottomPadding: VLCStyle.margin_small
 
-                text: I18n.qtr("Artists")
+                text: qsTr("Artists")
             }
 
             Widgets.MLDragItem {
@@ -255,7 +255,7 @@ FocusScope {
         anchors.fill: parent
         visible: !artistModel.loading && (artistModel.count <= 0)
         focus: visible
-        text: I18n.qtr("No artists found\nPlease try adding sources, by going to the Browse tab")
+        text: qsTr("No artists found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
     }
 }

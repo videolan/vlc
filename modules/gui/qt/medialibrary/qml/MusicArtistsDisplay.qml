@@ -51,7 +51,7 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: artistsView
 
-                text: I18n.qtr("Artists")
+                text: qsTr("Artists")
             }
 
             searchPattern: MainCtx.search.pattern

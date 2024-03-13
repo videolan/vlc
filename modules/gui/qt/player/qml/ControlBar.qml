@@ -64,7 +64,7 @@ T.Pane {
     Keys.onPressed: (event) => root.Navigation.defaultKeyAction(event)
     Navigation.cancelAction: function() { History.previous(Qt.BacktabFocusReason) }
 
-    Accessible.name: I18n.qtr("Player controls")
+    Accessible.name: qsTr("Player controls")
 
     function showChapterMarks() {
         if (contentItem.trackPositionSlider)

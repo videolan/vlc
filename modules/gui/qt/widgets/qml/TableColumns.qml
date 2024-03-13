@@ -71,7 +71,7 @@ Item {
                 string += value.formatShort()
             } else if (criteria === "nb_tracks") {
 
-                string += I18n.qtr("%1 tracks").arg(value)
+                string += qsTr("%1 tracks").arg(value)
             } else {
                 string += value
             }
@@ -175,7 +175,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter
                     text: (titleDel.rowModel && root.showTitleText)
-                          ? (titleDel.rowModel[titleDel.model.criteria] || I18n.qtr("Unknown Title"))
+                          ? (titleDel.rowModel[titleDel.model.criteria] || qsTr("Unknown Title"))
                           : ""
 
                     color: titleDel.selected

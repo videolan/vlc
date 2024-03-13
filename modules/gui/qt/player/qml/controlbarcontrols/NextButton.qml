@@ -28,5 +28,5 @@ Widgets.IconToolButton {
     text: VLCIcons.next
     enabled: MainPlaylistController.hasNext
     onClicked: MainPlaylistController.next()
-    description: I18n.qtr("Next")
+    description: qsTr("Next")
 }

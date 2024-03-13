@@ -50,7 +50,7 @@ MainInterface.MainGridView {
     headerDelegate: Widgets.ViewHeader {
         view: root
 
-        text: I18n.qtr("Services")
+        text: qsTr("Services")
     }
 
     delegate: Widgets.GridItem {
@@ -59,7 +59,7 @@ MainInterface.MainGridView {
         property int index: -1
         readonly property bool is_dummy: model.type === NetworkSourcesModel.TYPE_DUMMY
 
-        title: is_dummy ? I18n.qtr("Add a service") : model.long_name
+        title: is_dummy ? qsTr("Add a service") : model.long_name
         subtitle: ""
         pictureWidth: VLCStyle.colWidth(1)
         pictureHeight: VLCStyle.gridCover_network_height

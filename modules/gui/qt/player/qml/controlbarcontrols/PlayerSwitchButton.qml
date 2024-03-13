@@ -32,5 +32,5 @@ Widgets.IconToolButton {
             History.push(["player"])
     }
 
-    description: I18n.qtr("Switch Player")
+    description: qsTr("Switch Player")
 }

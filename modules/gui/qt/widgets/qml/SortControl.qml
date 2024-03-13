@@ -60,7 +60,7 @@ Widgets.IconToolButton {
 
     focus: true
 
-    description: I18n.qtr("Sort")
+    description: qsTr("Sort")
 
     text: VLCIcons.topbar_sort
 

@@ -210,7 +210,7 @@ FocusScope {
 
         focus: visible
 
-        text: I18n.qtr("No media found")
+        text: qsTr("No media found")
 
         cover: root._placeHolder
 

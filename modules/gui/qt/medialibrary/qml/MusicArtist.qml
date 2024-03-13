@@ -121,7 +121,7 @@ FocusScope {
                 bottomPadding: VLCStyle.layoutTitle_bottom_padding -
                                (MainCtx.gridView ? 0 : VLCStyle.gridItemSelectedBorder)
 
-                text: I18n.qtr("Albums")
+                text: qsTr("Albums")
             }
 
             Loader {
@@ -176,7 +176,7 @@ FocusScope {
                             image: model.cover || ""
                             fallbackImage: VLCStyle.noArtAlbumCover
 
-                            title: model.title || I18n.qtr("Unknown title")
+                            title: model.title || qsTr("Unknown title")
                             subtitle: model.release_year || ""
                             textAlignHCenter: true
                             x: selectedBorderWidth
@@ -217,7 +217,7 @@ FocusScope {
                         leftPadding: VLCStyle.margin_xlarge
                         topPadding: 0
 
-                        text: I18n.qtr("Tracks")
+                        text: qsTr("Tracks")
                     }
                 }
             }
@@ -443,7 +443,7 @@ FocusScope {
 
                     subCriterias: [ "duration", "album_title" ],
 
-                    text: I18n.qtr("Title"),
+                    text: qsTr("Title"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
@@ -456,7 +456,7 @@ FocusScope {
                 model: {
                     criteria: "title",
 
-                    text: I18n.qtr("Title"),
+                    text: qsTr("Title"),
 
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
@@ -467,7 +467,7 @@ FocusScope {
                 model: {
                     criteria: "album_title",
 
-                    text: I18n.qtr("Album")
+                    text: qsTr("Album")
                 }
             }, {
                 size: 1,
@@ -475,7 +475,7 @@ FocusScope {
                 model: {
                     criteria: "duration",
 
-                    text: I18n.qtr("Duration"),
+                    text: qsTr("Duration"),
 
                     showSection: "",
 

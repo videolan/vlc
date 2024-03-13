@@ -32,7 +32,7 @@ Widgets.IconToolButton {
 
     text: VLCIcons.tv
 
-    description: I18n.qtr("Programs")
+    description: qsTr("Programs")
 
     // NOTE: We want to pop the menu above the button.
     onClicked: menu.popup(this.mapToGlobal(0, 0), true)

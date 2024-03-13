@@ -30,27 +30,27 @@ Widgets.PageLoader {
     id: root
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Music view")
+    Accessible.name: qsTr("Music view")
 
     pageModel: [{
-            displayText: I18n.qtr("Artists"),
+            displayText: qsTr("Artists"),
             name: "artists",
             default: true,
             url: "qrc:///medialibrary/MusicArtistsDisplay.qml"
         }, {
-            displayText: I18n.qtr("Albums"),
+            displayText: qsTr("Albums"),
             name: "albums",
             url: "qrc:///medialibrary/MusicAlbumsDisplay.qml"
         }, {
-            displayText: I18n.qtr("Tracks"),
+            displayText: qsTr("Tracks"),
             name: "tracks" ,
             url: "qrc:///medialibrary/MusicTracksDisplay.qml"
         }, {
-            displayText: I18n.qtr("Genres"),
+            displayText: qsTr("Genres"),
             name: "genres" ,
             url: "qrc:///medialibrary/MusicGenresDisplay.qml"
         }, {
-            displayText: I18n.qtr("Playlists"),
+            displayText: qsTr("Playlists"),
             name: "playlists" ,
             url: "qrc:///medialibrary/MusicPlaylistsDisplay.qml"
         }

@@ -41,48 +41,48 @@ NativeMenu {
     // Settings
 
     actions: [{
-            "text": I18n.qtr("Play"),
+            "text": qsTr("Play"),
             "action": addAndPlay
         }, {
-            "text": I18n.qtr("Play as audio"),
+            "text": qsTr("Play as audio"),
             "action": playAsAudio,
             "visible": root.showPlayAsAudioAction
         }, {
-            "text": I18n.qtr("Enqueue"),
+            "text": qsTr("Enqueue"),
             "action": enqueue
         }, {
-            "text": I18n.qtr("Add to favorites"),
+            "text": qsTr("Add to favorites"),
             "action": addFavorite,
             "visible": _showAddFavorite
         }, {
-            "text": I18n.qtr("Remove from favorites"),
+            "text": qsTr("Remove from favorites"),
             "action": removeFavorite,
             "visible": _showRemoveFavorite
         }, {
-            "text": I18n.qtr("Add to a playlist"),
+            "text": qsTr("Add to a playlist"),
             "action": addToAPlaylist
         }, {
-            "text": I18n.qtr("Mark as seen"),
+            "text": qsTr("Mark as seen"),
             "action": markSeen,
             "visible": _showSeen
         }, {
-            "text": I18n.qtr("Mark as unseen"),
+            "text": qsTr("Mark as unseen"),
             "action": markUnseen,
             "visible": _showUnseen
         }, {
-            "text": I18n.qtr("Open Containing Folder"),
+            "text": qsTr("Open Containing Folder"),
             "action": openContainingFolder,
             "visible": _openContainingFolder
         }, {
-            "text": I18n.qtr("Delete"),
+            "text": qsTr("Delete"),
             "action": deleteStream,
             "visible": _deleteStream
         }, {
-            "text": I18n.qtr("Information"),
+            "text": qsTr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
         }, {
-            "text": I18n.qtr("Media Information"),
+            "text": qsTr("Media Information"),
             "action": function(dataList, options, indexes) {
                 DialogsProvider.mediaInfoDialog(dataList[0][idDataRole])
             },

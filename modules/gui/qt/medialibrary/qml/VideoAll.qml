@@ -72,8 +72,8 @@ MainInterface.MainViewLoader {
     emptyLabel: emptylabel
 
     sortModel: [
-        { text: I18n.qtr("Alphabetic"), criteria: "title"    },
-        { text: I18n.qtr("Duration"),   criteria: "duration" }
+        { text: qsTr("Alphabetic"), criteria: "title"    },
+        { text: qsTr("Duration"),   criteria: "duration" }
     ]
 
     // Functions
@@ -233,7 +233,7 @@ MainInterface.MainViewLoader {
 
             focus: true
 
-            text: I18n.qtr("No video found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No video found\nPlease try adding sources, by going to the Browse tab")
 
             cover: VLCStyle.noArtVideoCover
 

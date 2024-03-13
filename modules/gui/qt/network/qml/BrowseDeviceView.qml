@@ -242,7 +242,7 @@ FocusScope {
 
                     subCriterias: [ "mrl" ],
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: artworkHeader,
                     colDelegate: artworkColumn
@@ -255,7 +255,7 @@ FocusScope {
                 model: {
                     criteria: "artwork",
 
-                    text: I18n.qtr("Cover"),
+                    text: qsTr("Cover"),
 
                     headerDelegate: artworkHeader,
                     colDelegate: artworkColumn
@@ -266,7 +266,7 @@ FocusScope {
                 model: {
                     criteria: "name",
 
-                    text: I18n.qtr("Name")
+                    text: qsTr("Name")
                 }
             }, {
                 size: Math.max(_nbCols - _size - 1, 1),
@@ -274,7 +274,7 @@ FocusScope {
                 model: {
                     criteria: "mrl",
 
-                    text: I18n.qtr("Url"),
+                    text: qsTr("Url"),
 
                     colDelegate: mrlColumn
                 }

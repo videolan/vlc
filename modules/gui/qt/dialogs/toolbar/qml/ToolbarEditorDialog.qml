@@ -35,7 +35,7 @@ WindowDialog {
     minimumHeight: 400
 
     modal: true
-    title: I18n.qtr("Toolbar Editor")
+    title: qsTr("Toolbar Editor")
 
     signal unload()
 
@@ -81,7 +81,7 @@ WindowDialog {
                     Layout.minimumWidth: implicitWidth
 
                     color: root.colorContext.fg.primary
-                    text: I18n.qtr("Select profile:")
+                    text: qsTr("Select profile:")
                 }
 
                 Widgets.ComboBoxExt {
@@ -136,18 +136,18 @@ WindowDialog {
                         MainCtx.controlbarProfileModel.selectedProfile = currentIndex
                     }
 
-                    Accessible.name: I18n.qtr("Profiles")
+                    Accessible.name: qsTr("Profiles")
                 }
 
                 Widgets.IconToolButton {
-                    description: I18n.qtr("New Profile")
+                    description: qsTr("New Profile")
                     text: VLCIcons.profile_new
 
                     onClicked: {
                         const npDialog = DialogsProvider.getTextDialog(null,
-                                                                     I18n.qtr("Profile Name"),
-                                                                     I18n.qtr("Please enter the new profile name:"),
-                                                                     I18n.qtr("Profile %1").arg(comboBox.count + 1))
+                                                                     qsTr("Profile Name"),
+                                                                     qsTr("Please enter the new profile name:"),
+                                                                     qsTr("Profile %1").arg(comboBox.count + 1))
                         if (!npDialog.ok)
                             return
 
@@ -159,7 +159,7 @@ WindowDialog {
                 Widgets.IconToolButton {
                     id: useDefaultButton
 
-                    description: I18n.qtr("Use Default")
+                    description: qsTr("Use Default")
                     text: VLCIcons.history
 
                     onClicked: {
@@ -168,7 +168,7 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    description: I18n.qtr("Delete the current profile")
+                    description: qsTr("Delete the current profile")
                     text: VLCIcons.del
 
                     onClicked: {

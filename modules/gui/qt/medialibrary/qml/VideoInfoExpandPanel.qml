@@ -138,7 +138,7 @@ FocusScope {
                                 id: playActionBtn
 
                                 iconTxt: VLCIcons.play
-                                text: I18n.qtr("Play")
+                                text: qsTr("Play")
                                 onClicked: MediaLib.addAndPlay( model.id )
                             }
 
@@ -146,7 +146,7 @@ FocusScope {
                                 id: enqueueActionBtn
 
                                 iconTxt: VLCIcons.enqueue
-                                text: I18n.qtr("Enqueue")
+                                text: qsTr("Enqueue")
                                 onClicked: MediaLib.addToPlaylist( model.id )
                             }
                         }
@@ -169,7 +169,7 @@ FocusScope {
                     width: parent.width
 
                     Widgets.SubtitleLabel {
-                        text: model.title || I18n.qtr("Unknown title")
+                        text: model.title || qsTr("Unknown title")
                         color: theme.fg.primary
 
                         Layout.fillWidth: true
@@ -180,7 +180,7 @@ FocusScope {
 
                         text: VLCIcons.close
 
-                        description: I18n.qtr("Close")
+                        description: qsTr("Close")
 
                         onClicked: root.retract()
 
@@ -197,14 +197,14 @@ FocusScope {
 
                 Widgets.MenuCaption {
                     topPadding: VLCStyle.margin_normal
-                    text: "<b>" + I18n.qtr("File Name:") + "</b> " + root.model.fileName
+                    text: "<b>" + qsTr("File Name:") + "</b> " + root.model.fileName
                     width: parent.width
                     color: theme.fg.secondary
                     textFormat: Text.StyledText
                 }
 
                 Widgets.MenuCaption {
-                    text: "<b>" + I18n.qtr("Path:") + "</b> " + root.model.display_mrl
+                    text: "<b>" + qsTr("Path:") + "</b> " + root.model.display_mrl
                     color: theme.fg.secondary
                     topPadding: VLCStyle.margin_xsmall
                     bottomPadding: VLCStyle.margin_large
@@ -215,7 +215,7 @@ FocusScope {
                 Widgets.ButtonExt {
                     id: showMoreButton
 
-                    text: root._showMoreInfo ? I18n.qtr("View Less") : I18n.qtr("View More")
+                    text: root._showMoreInfo ? qsTr("View Less") : qsTr("View More")
                     iconTxt: VLCIcons.expand
                     iconRotation: root._showMoreInfo ? -180 : 0
 
@@ -252,11 +252,11 @@ FocusScope {
                     Repeater {
                         model: [
                             {
-                                "title": I18n.qtr("Video track"),
+                                "title": qsTr("Video track"),
                                 "model": videoDescModel
                             },
                             {
-                                "title": I18n.qtr("Audio track"),
+                                "title": qsTr("Audio track"),
                                 "model": audioDescModel
                             }
                         ]
@@ -296,9 +296,9 @@ FocusScope {
                 readonly property bool isFirst: (index === 0)
 
                 model: [
-                    {text: I18n.qtr("Codec:"), data: modelData.codec },
-                    {text: I18n.qtr("Language:"), data: modelData.language },
-                    {text: I18n.qtr("FPS:"), data: modelData.fps }
+                    {text: qsTr("Codec:"), data: modelData.codec },
+                    {text: qsTr("Language:"), data: modelData.language },
+                    {text: qsTr("FPS:"), data: modelData.fps }
                 ]
 
                 delegate: Widgets.MenuCaption {
@@ -324,9 +324,9 @@ FocusScope {
                 readonly property bool isFirst: (index === 0)
 
                 model: [
-                    {text: I18n.qtr("Codec:"), data: modelData.codec },
-                    {text: I18n.qtr("Language:"), data: modelData.language },
-                    {text: I18n.qtr("Channel:"), data: modelData.nbchannels }
+                    {text: qsTr("Codec:"), data: modelData.codec },
+                    {text: qsTr("Language:"), data: modelData.language },
+                    {text: qsTr("Channel:"), data: modelData.nbchannels }
                 ]
 
                 delegate: Widgets.MenuCaption {

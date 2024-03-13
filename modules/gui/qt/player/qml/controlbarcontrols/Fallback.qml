@@ -47,7 +47,7 @@ Control {
     }
 
     contentItem: Widgets.MenuLabel {
-        text: I18n.qtr("WIDGET\nNOT\nFOUND")
+        text: qsTr("WIDGET\nNOT\nFOUND")
         horizontalAlignment: Text.AlignHCenter
         color: theme.fg.primary
     }

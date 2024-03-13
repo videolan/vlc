@@ -74,7 +74,7 @@ FocusScope {
     layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
 
     Accessible.role: Accessible.Client
-    Accessible.name: I18n.qtr("Player")
+    Accessible.name: qsTr("Player")
 
     // Events
 
@@ -416,7 +416,7 @@ FocusScope {
                     sourceSize: Qt.size(maximumSize, maximumSize)
 
                     Accessible.role: Accessible.Graphic
-                    Accessible.name: I18n.qtr("Cover")
+                    Accessible.name: qsTr("Cover")
 
                     onStatusChanged: {
                         if (status === Image.Ready)
@@ -452,7 +452,7 @@ FocusScope {
                 font.pixelSize: VLCStyle.fontSize_xxlarge
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary
-                Accessible.description: I18n.qtr("album")
+                Accessible.description: qsTr("album")
 
                 property bool componentCompleted: false
 
@@ -477,7 +477,7 @@ FocusScope {
                 font.weight: Font.Light
                 horizontalAlignment: Text.AlignHCenter
                 color: centerTheme.fg.primary
-                Accessible.description: I18n.qtr("artist")
+                Accessible.description: qsTr("artist")
 
                 property bool componentCompleted: false
 
@@ -515,21 +515,21 @@ FocusScope {
                         text: VLCIcons.skip_back
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpBwd()
-                        description: I18n.qtr("Step back")
+                        description: qsTr("Step back")
                     }
 
                     Widgets.IconToolButton {
                         text: VLCIcons.visualization
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.toggleVisualization()
-                        description: I18n.qtr("Visualization")
+                        description: qsTr("Visualization")
                     }
 
                     Widgets.IconToolButton{
                         text: VLCIcons.skip_for
                         font.pixelSize: VLCStyle.icon_audioPlayerButton
                         onClicked: Player.jumpFwd()
-                        description: I18n.qtr("Step forward")
+                        description: qsTr("Step forward")
                     }
                 }
             }
@@ -546,7 +546,7 @@ FocusScope {
 
             visible: false
 
-            text: I18n.qtr("Volume %1%").arg(Math.round(Player.volume * 100))
+            text: qsTr("Volume %1%").arg(Math.round(Player.volume * 100))
 
             color: centerTheme.fg.primary
 

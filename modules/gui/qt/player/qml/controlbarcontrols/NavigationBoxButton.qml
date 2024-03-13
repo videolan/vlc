@@ -26,7 +26,7 @@ import org.videolan.vlc 0.1
 Widgets.IconToolButton {
     visible: Player.isInteractive
     text: VLCIcons.ic_fluent_arrow_move
-    description: I18n.qtr("Navigation Buttons")
+    description: qsTr("Navigation Buttons")
 
     onClicked: MainCtx.navBoxToggled()
 }

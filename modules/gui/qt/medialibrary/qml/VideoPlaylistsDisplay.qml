@@ -56,7 +56,7 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: playlistView
 
-                text: I18n.qtr("Playlists")
+                text: qsTr("Playlists")
             }
 
             isMusic: false

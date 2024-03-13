@@ -65,7 +65,7 @@ RowLayout {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            description: I18n.qtr("Back")
+            description: qsTr("Back")
             text: VLCIcons.back
 
             Navigation.parentItem: root

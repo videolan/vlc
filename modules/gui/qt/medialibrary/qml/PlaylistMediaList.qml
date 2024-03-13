@@ -102,7 +102,7 @@ MainInterface.MainViewLoader {
     emptyLabel: emptyLabel
 
     isSearchable: true
-    sortModel: [{ text: I18n.qtr("Alphabetic"), criteria: "title" }]
+    sortModel: [{ text: qsTr("Alphabetic"), criteria: "title" }]
 
 
     model: MLPlaylistListModel {
@@ -135,7 +135,7 @@ MainInterface.MainViewLoader {
         if (count < 100)
             return count;
         else
-            return I18n.qtr("99+");
+            return qsTr("99+");
     }
 
     //---------------------------------------------------------------------------------------------
@@ -199,10 +199,10 @@ MainInterface.MainViewLoader {
                 pictureHeight: _heightCover
 
                 title: (model.name) ? model.name
-                                    : I18n.qtr("Unknown title")
+                                    : qsTr("Unknown title")
 
-                labels: (model.count > 1) ? [ I18n.qtr("%1 Tracks").arg(_getCount(model)) ]
-                                          : [ I18n.qtr("%1 Track") .arg(_getCount(model)) ]
+                labels: (model.count > 1) ? [ qsTr("%1 Tracks").arg(_getCount(model)) ]
+                                          : [ qsTr("%1 Track") .arg(_getCount(model)) ]
 
                 dragItem: dragItemPlaylist
 
@@ -268,7 +268,7 @@ MainInterface.MainViewLoader {
 
                     subCriterias: [ "count" ],
 
-                    text: I18n.qtr("Name"),
+                    text: qsTr("Name"),
 
                     headerDelegate: columns.titleHeaderDelegate,
                     colDelegate   : columns.titleDelegate
@@ -281,7 +281,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "thumbnail",
 
-                    text: I18n.qtr("Cover"),
+                    text: qsTr("Cover"),
 
                     headerDelegate: columns.titleHeaderDelegate,
                     colDelegate   : columns.titleDelegate
@@ -292,7 +292,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "name",
 
-                    text: I18n.qtr("Name")
+                    text: qsTr("Name")
                 }
             }, {
                 size: 1,
@@ -300,7 +300,7 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "count",
 
-                    text: I18n.qtr("Tracks")
+                    text: qsTr("Tracks")
                 }
             }]
 
@@ -378,8 +378,8 @@ MainInterface.MainViewLoader {
 
             focus: true
 
-            text: I18n.qtr("No playlists found")
-            hint: I18n.qtr("Right click on a media to add it to a playlist")
+            text: qsTr("No playlists found")
+            hint: qsTr("Right click on a media to add it to a playlist")
 
             cover: VLCStyle.noArtAlbumCover
         }

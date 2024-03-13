@@ -34,12 +34,12 @@ FocusScope {
     property var pagePrefix: []
 
     property var sortModel: [
-        { text: I18n.qtr("Title"),    criteria: "title"},
-        { text: I18n.qtr("Album"),    criteria: "album_title" },
-        { text: I18n.qtr("Artist"),   criteria: "main_artist" },
-        { text: I18n.qtr("Duration"), criteria: "duration" },
-        { text: I18n.qtr("Track"),    criteria: "track_number" },
-        { text: I18n.qtr("Disc"),     criteria: "disc_number" }
+        { text: qsTr("Title"),    criteria: "title"},
+        { text: qsTr("Album"),    criteria: "album_title" },
+        { text: qsTr("Artist"),   criteria: "main_artist" },
+        { text: qsTr("Duration"), criteria: "duration" },
+        { text: qsTr("Track"),    criteria: "track_number" },
+        { text: qsTr("Disc"),     criteria: "disc_number" }
     ]
 
     // Aliases
@@ -66,7 +66,7 @@ FocusScope {
         header: Widgets.ViewHeader {
             view: tracklistdisplay_id
 
-            text: I18n.qtr("Tracks")
+            text: qsTr("Tracks")
         }
 
         searchPattern: MainCtx.search.pattern
@@ -89,7 +89,7 @@ FocusScope {
         anchors.fill: parent
         visible: !tracklistdisplay_id.model.loading && (tracklistdisplay_id.model.count <= 0)
         focus: visible
-        text: I18n.qtr("No tracks found\nPlease try adding sources, by going to the Browse tab")
+        text: qsTr("No tracks found\nPlease try adding sources, by going to the Browse tab")
         Navigation.parentItem: root
         cover: VLCStyle.noArtAlbumCover
     }
