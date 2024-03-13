@@ -714,7 +714,7 @@ FocusScope {
                     || navBox.hovered || !rootPlayer.hasEmbededVideo)
 
         x: rootPlayer.x + VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
-        y: controlBarView.y - navBox.height - VLCStyle.margin_normal
+        y: controlBar.y - navBox.height - VLCStyle.margin_normal
 
         dragXMin: 0
         dragXMax: rootPlayer.width - navBox.width
