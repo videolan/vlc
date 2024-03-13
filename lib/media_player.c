@@ -784,7 +784,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create(mp, "record-file", VLC_VAR_STRING);
 
     mp->timer.id = NULL;
-    mp->p_md = NULL;
+    mp->p_md = mp->p_next_md = NULL;
     mp->p_libvlc_instance = instance;
     /* use a reentrant lock to allow calling libvlc functions from callbacks */
     mp->player = vlc_player_New(VLC_OBJECT(mp), VLC_PLAYER_LOCK_REENTRANT);
@@ -885,6 +885,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_next_md );
 
     free(p_mi->vout.default_dec_dev);
     free(p_mi->vout.default_vout);
@@ -954,10 +955,12 @@ void libvlc_media_player_set_media(
     vlc_player_Lock(p_mi->player);
 
     libvlc_media_release( p_mi->p_md );
+    libvlc_media_release( p_mi->p_next_md );
 
     if( p_md )
         libvlc_media_retain( p_md );
     p_mi->p_md = p_md;
+    p_mi->p_next_md = NULL;
 
     vlc_player_SetCurrentMedia(p_mi->player, p_md ? p_md->p_input_item : NULL);
 
@@ -974,6 +977,36 @@ libvlc_media_player_get_media( libvlc_media_player_t *p_mi )
 
     vlc_player_Lock(p_mi->player);
     p_m = p_mi->p_md;
+    if( p_m )
+        libvlc_media_retain( p_m );
+    vlc_player_Unlock(p_mi->player);
+
+    return p_m;
+}
+
+void libvlc_media_player_set_next_media( libvlc_media_player_t *p_mi,
+                                         libvlc_media_t *p_md )
+{
+    vlc_player_Lock(p_mi->player);
+
+    libvlc_media_release( p_mi->p_next_md );
+
+    if( p_md )
+        libvlc_media_retain( p_md );
+    p_mi->p_next_md = p_md;
+
+    vlc_player_SetNextMedia(p_mi->player, p_md ? p_md->p_input_item : NULL);
+
+    vlc_player_Unlock(p_mi->player);
+}
+
+libvlc_media_t *
+libvlc_media_player_get_next_media( libvlc_media_player_t *p_mi )
+{
+    libvlc_media_t *p_m;
+
+    vlc_player_Lock(p_mi->player);
+    p_m = p_mi->p_next_md;
     if( p_m )
         libvlc_media_retain( p_m );
     vlc_player_Unlock(p_mi->player);

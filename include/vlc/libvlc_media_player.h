@@ -230,8 +230,12 @@ LIBVLC_API void libvlc_media_player_release( libvlc_media_player_t *p_mi );
 LIBVLC_API libvlc_media_player_t *libvlc_media_player_retain( libvlc_media_player_t *p_mi );
 
 /**
- * Set the media that will be used by the media_player. If any,
- * previous md will be released.
+ * Set the media that will be used by the media_player.
+ *
+ * This function replaces the current and next medias.
+ *
+ * \note The function will open the media, without starting it, allowing the
+ * user to send controls (like seek requests) before Starting the player.
  *
  * \note The user should listen to the libvlc_MediaPlayerMediaChanged event, to
  * know when the new media is actually used by the player (or to known that the
@@ -259,6 +263,30 @@ LIBVLC_API void libvlc_media_player_set_media( libvlc_media_player_t *p_mi,
  *       with libvlc_media_release().
  */
 LIBVLC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_player_t *p_mi );
+
+/**
+ * Set the next media
+ *
+ * This function replaces the next media to be played.
+ * \note The media won't be opened directly by this function. If there is no
+ * current media, the next media will be opened from
+ * libvlc_media_player_play(). If there is a current playing media, the next
+ * media will be opened and played automatically.
+ *
+ * \param p_mi the Media Player
+ * \param p_md the next Media. Afterwards the p_md can be safely destroyed.
+ */
+LIBVLC_API void libvlc_media_player_set_next_media( libvlc_media_player_t *p_mi,
+                                                    libvlc_media_t *p_md );
+
+/**
+ * Get the next media to be played
+ *
+ * This function return the media set by libvlc_media_player_set_next_media()
+ *
+ * \return the next media, or NULL if there is no next media
+ */
+LIBVLC_API libvlc_media_t * libvlc_media_player_get_next_media( libvlc_media_player_t *p_mi );
 
 /**
  * Get the Event Manager from which the media player send event.
