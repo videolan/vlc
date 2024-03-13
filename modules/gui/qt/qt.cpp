@@ -53,6 +53,7 @@ extern "C" char **environ;
 #include <QLoggingCategory>
 #include <QQmlError>
 #include <QList>
+#include <QTranslator>
 
 #include "qt.hpp"
 
@@ -473,6 +474,27 @@ static inline void triggerQuit()
         }, Qt::QueuedConnection);
 }
 
+class Translator : public QTranslator
+{
+public:
+    explicit Translator(QObject* parent) : QTranslator(parent) { }
+
+    bool isEmpty() const override { return false; };
+
+    QString translate(const char *context,
+                      const char *sourceText,
+                      const char *disambiguation = nullptr,
+                      int n = -1) const override
+    {
+        Q_UNUSED(context);
+        Q_UNUSED(disambiguation);
+        Q_UNUSED(n);
+        const char* const text = vlc_gettext(sourceText);
+        assert(text);
+        return QString::fromUtf8(text);
+    }
+};
+
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
@@ -769,6 +791,13 @@ static void *Thread( void *obj )
     /* Start the QApplication here */
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
+
+    {
+        // Install custom translator:
+        const auto translator = new Translator(&app);
+        const auto ret = QCoreApplication::installTranslator(translator);
+        assert(ret);
+    }
 
     registerMetaTypes();
 
