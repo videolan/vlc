@@ -848,7 +848,7 @@ PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
     : QObject(parent)
 {}
 
-void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
+void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
 {
     if (!m_controler || !m_model || !m_selectionModel)
         return;
@@ -860,15 +860,15 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
     for (const int modelIndex : m_selectionModel->selectedIndexesFlat())
         selectedUrlList.push_back(m_model->itemAt(modelIndex).getUrl());
 
-    PlaylistItem currentItem;
-    if (currentIndex >= 0)
-        currentItem = m_model->itemAt(currentIndex);
+    PlaylistItem selectedItem;
+    if (selectedIndex >= 0)
+        selectedItem = m_model->itemAt(selectedIndex);
 
-    if (currentItem)
+    if (selectedItem)
     {
         action = m_menu->addAction( qtr("Play") );
-        connect(action, &QAction::triggered, [this, currentIndex]( ) {
-            m_controler->goTo(currentIndex, true);
+        connect(action, &QAction::triggered, [this, selectedIndex]( ) {
+            m_controler->goTo(selectedIndex, true);
         });
 
         m_menu->addSeparator();
@@ -888,19 +888,19 @@ void PlaylistContextMenu::popup(int currentIndex, QPoint pos )
         m_menu->addSeparator();
     }
 
-    if (currentItem) {
+    if (selectedItem) {
         action = m_menu->addAction( qtr("Information") );
         action->setIcon(QIcon(":/menu/info.svg"));
-        connect(action, &QAction::triggered, [currentItem]( ) {
-            DialogsProvider::getInstance()->mediaInfoDialog(currentItem);
+        connect(action, &QAction::triggered, [selectedItem]( ) {
+            DialogsProvider::getInstance()->mediaInfoDialog(selectedItem);
         });
 
         m_menu->addSeparator();
 
         action = m_menu->addAction( qtr("Show Containing Directory...") );
         action->setIcon(QIcon(":/menu/folder.svg"));
-        connect(action, &QAction::triggered, [this, currentItem]( ) {
-            m_controler->explore(currentItem);
+        connect(action, &QAction::triggered, [this, selectedItem]( ) {
+            m_controler->explore(selectedItem);
         });
 
         m_menu->addSeparator();
