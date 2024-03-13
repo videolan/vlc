@@ -78,6 +78,14 @@ static const char *const ppsz_upscale_mode[] = {
 static const char *const ppsz_upscale_mode_text[] = {
     N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor"), N_("Super Resolution") };
 
+#define HDR_MODE_TEXT N_("HDR Output Mode")
+#define HDR_MODE_LONGTEXT N_("Use HDR output even if the source is SDR.")
+
+static const char *const ppsz_hdr_mode[] = {
+    "auto", "never", "always" };
+static const char *const ppsz_hdr_mode_text[] = {
+    N_("Auto"), N_("Never out HDR"), N_("Always output HDR") };
+
 vlc_module_begin ()
     set_shortname("Direct3D11")
     set_description(N_("Direct3D11 video output"))
@@ -95,6 +103,9 @@ vlc_module_begin ()
     add_string("d3d11-upscale-mode", "linear", UPSCALE_MODE_TEXT, UPSCALE_MODE_LONGTEXT, false)
         change_string_list(ppsz_upscale_mode, ppsz_upscale_mode_text)
 
+    add_string("d3d11-hdr-mode", "auto", HDR_MODE_TEXT, HDR_MODE_LONGTEXT, false)
+        change_string_list(ppsz_hdr_mode, ppsz_hdr_mode_text)
+
     set_capability("vout display", 300)
     add_shortcut("direct3d11")
     set_callbacks(Open, Close)
@@ -106,6 +117,13 @@ enum d3d11_upscale
     upscale_PointSampler,
     upscale_VideoProcessor,
     upscale_SuperResolution,
+};
+
+enum d3d11_hdr
+{
+    hdr_Auto,
+    hdr_Never,
+    hdr_Always,
 };
 
 struct vout_display_sys_t
@@ -157,6 +175,9 @@ struct vout_display_sys_t
     // upscaling
     enum d3d11_upscale       upscaleMode;
     struct d3d11_scaler      *scaleProc;
+
+    // HDR mode
+    enum d3d11_hdr           hdrMode;
 };
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
@@ -513,6 +534,7 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
 #if !VLC_WINSTORE_APP
 static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
 {
+    vout_display_sys_t *sys = vd->sys;
     ZeroMemory(out, sizeof(*out));
     out->BufferCount = 3;
     out->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -520,14 +542,15 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
     out->SampleDesc.Quality = 0;
     out->Width = vd->source.i_visible_width;
     out->Height = vd->source.i_visible_height;
-    switch(vd->source.i_chroma)
-    {
-    case VLC_CODEC_D3D11_OPAQUE_10B:
+    out->Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
+    if (sys->hdrMode == hdr_Always)
         out->Format = DXGI_FORMAT_R10G10B10A2_UNORM;
-        break;
-    default:
-        out->Format = DXGI_FORMAT_R8G8B8A8_UNORM; /* TODO: use DXGI_FORMAT_NV12 */
-        break;
+    else if (sys->hdrMode == hdr_Auto)
+    {
+        if ( vd->source.i_chroma == VLC_CODEC_D3D11_OPAQUE_10B ||
+             vd->source.transfer == TRANSFER_FUNC_SMPTE_ST2084 ||
+             vd->source.transfer == TRANSFER_FUNC_HLG)
+            out->Format = DXGI_FORMAT_R10G10B10A2_UNORM;
     }
     //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
 
@@ -1272,10 +1295,24 @@ static void D3D11SetColorSpace(vout_display_t *vd)
         goto done;
     }
 
-    bool src_full_range = vd->source.b_color_range_full ||
+    video_format_t match_source = vd->source;
+    if (sys->hdrMode == hdr_Never)
+    {
+        match_source.primaries = COLOR_PRIMARIES_BT709;
+        match_source.transfer  = TRANSFER_FUNC_BT709;
+        match_source.space     = COLOR_SPACE_BT709;
+    }
+    else if (sys->hdrMode == hdr_Always)
+    {
+        match_source.primaries = COLOR_PRIMARIES_BT2020;
+        match_source.transfer  = TRANSFER_FUNC_SMPTE_ST2084;
+        match_source.space     = COLOR_SPACE_BT2020;
+    }
+
+    bool src_full_range = match_source.b_color_range_full ||
                           /* the YUV->RGB conversion already output full range */
-                          is_d3d11_opaque(vd->source.i_chroma) ||
-                          vlc_fourcc_IsYUV(vd->source.i_chroma);
+                          is_d3d11_opaque(match_source.i_chroma) ||
+                          vlc_fourcc_IsYUV(match_source.i_chroma);
 
     /* pick the best output based on color support and transfer */
     /* TODO support YUV output later */
@@ -1285,13 +1322,13 @@ static void D3D11SetColorSpace(vout_display_t *vd)
         if (SUCCEEDED(hr) && support) {
             msg_Dbg(vd, "supports colorspace %s", color_spaces[i].name);
             score = 0;
-            if (color_spaces[i].primaries == vd->source.primaries)
+            if (color_spaces[i].primaries == match_source.primaries)
                 score++;
-            if (color_spaces[i].color == vd->source.space)
+            if (color_spaces[i].color == match_source.space)
                 score += 2; /* we don't want to translate color spaces */
-            if (color_spaces[i].transfer == vd->source.transfer ||
+            if (color_spaces[i].transfer == match_source.transfer ||
                 /* favor 2084 output for HLG source */
-                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && vd->source.transfer == TRANSFER_FUNC_HLG))
+                (color_spaces[i].transfer == TRANSFER_FUNC_SMPTE_ST2084 && match_source.transfer == TRANSFER_FUNC_HLG))
                 score++;
             if (color_spaces[i].b_full_range == src_full_range)
                 score++;
@@ -1309,6 +1346,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     }
 
 #ifdef HAVE_DXGI1_6_H
+    if (sys->hdrMode == hdr_Auto) // match the screen
     if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->dxgiswapChain, &dxgiOutput )))
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
@@ -1457,6 +1495,19 @@ static bool BogusZeroCopy(const vout_display_t *vd)
     }
 }
 
+static enum d3d11_hdr HdrModeFromString(vlc_object_t *logger, const char *psz_hdr)
+{
+    if (strcmp("auto", psz_hdr) == 0)
+        return hdr_Auto;
+    if (strcmp("never", psz_hdr) == 0)
+        return hdr_Never;
+    if (strcmp("always", psz_hdr) == 0)
+        return hdr_Always;
+
+    msg_Warn(logger, "unknown HDR mode %s, using auto mode", psz_hdr);
+    return hdr_Auto;
+}
+
 static void InitScaleProcessor(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1476,6 +1527,10 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
+
+    char *psz_hdr = var_InheritString(vd, "d3d11-hdr-mode");
+    sys->hdrMode = HdrModeFromString(VLC_OBJECT(vd), psz_hdr);
+    free(psz_hdr);
 
     if (!external_device)
     {
