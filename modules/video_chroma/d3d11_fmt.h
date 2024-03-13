@@ -144,6 +144,20 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
 #define FindD3D11Format(a,b,c,d,e,f,g,h,i)  \
     FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
+static inline const d3d_format_t *D3D11_RenderFormat(DXGI_FORMAT opaque, bool gpu_based)
+{
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+            output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == opaque &&
+            is_d3d11_opaque(output_format->fourcc) == gpu_based)
+        {
+            return output_format;
+        }
+    }
+    return NULL;
+}
+
 int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
                      const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[]);
 #define AllocateTextures(a,b,c,d,e,f)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f)
