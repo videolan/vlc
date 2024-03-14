@@ -160,7 +160,7 @@ static void Display(vout_display_t *, picture_t *);
 static int  Direct3D11Open (vout_display_t *, video_format_t *, vlc_video_context *);
 static void Direct3D11Close(vout_display_t *);
 
-static int SetupOutputFormat(vout_display_t *, video_format_t *, vlc_video_context *);
+static int SetupOutputFormat(vout_display_t *, video_format_t *, vlc_video_context *, video_format_t *quad);
 static int  Direct3D11CreateFormatResources (vout_display_t *, const video_format_t *);
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
@@ -229,13 +229,13 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
         }
         break;
     }
-    cfg.full_range = fmt->color_range == COLOR_RANGE_FULL ||
+    cfg.full_range = sys->picQuad.quad_fmt.color_range == COLOR_RANGE_FULL ||
                      /* the YUV->RGB conversion already output full range */
-                     is_d3d11_opaque(fmt->i_chroma) ||
-                     vlc_fourcc_IsYUV(fmt->i_chroma);
-    cfg.primaries  = (libvlc_video_color_primaries_t) fmt->primaries;
-    cfg.colorspace = (libvlc_video_color_space_t)     fmt->space;
-    cfg.transfer   = (libvlc_video_transfer_func_t)   fmt->transfer;
+                     is_d3d11_opaque(sys->picQuad.quad_fmt.i_chroma) ||
+                     vlc_fourcc_IsYUV(sys->picQuad.quad_fmt.i_chroma);
+    cfg.primaries  = (libvlc_video_color_primaries_t) sys->picQuad.quad_fmt.primaries;
+    cfg.colorspace = (libvlc_video_color_space_t)     sys->picQuad.quad_fmt.space;
+    cfg.transfer   = (libvlc_video_transfer_func_t)   sys->picQuad.quad_fmt.transfer;
     }
 
     libvlc_video_output_cfg_t out;
@@ -859,7 +859,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     free(psz_hdr);
 
     video_format_Copy(&fmt, vd->source);
-    int err = SetupOutputFormat(vd, &fmt, vctx);
+    video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
+    int err = SetupOutputFormat(vd, &fmt, vctx, &sys->picQuad.quad_fmt);
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source->i_chroma)
@@ -873,7 +874,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
                 if (list[i] == vd->source->i_chroma)
                     continue;
                 fmt.i_chroma = list[i];
-                err = SetupOutputFormat(vd, &fmt, NULL);
+                err = SetupOutputFormat(vd, &fmt, nullptr, &sys->picQuad.quad_fmt);
                 if (err == VLC_SUCCESS)
                     break;
             }
@@ -888,7 +889,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         }
     }
 
-    video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
     if (!is_d3d11_opaque(fmt.i_chroma))
     {
         sys->picQuad.quad_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
@@ -924,7 +924,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     CommonPlacePicture(vd, &sys->area);
 
-    err = UpdateDisplayFormat(vd, &fmt);
+    err = UpdateDisplayFormat(vd, &sys->picQuad.quad_fmt);
     if (err != VLC_SUCCESS) {
         msg_Err(vd, "Could not update the backbuffer");
         return err;
@@ -1054,12 +1054,12 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     return GetDisplayFormatByDepth(vd, 0, 0, 0, 0, true, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
 }
 
-static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx)
+static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx, video_format_t *quad_fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     const d3d_format_t *decoder_format = nullptr;
 
-    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, fmt, vctx, decoder_format);
+    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, decoder_format);
     if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
