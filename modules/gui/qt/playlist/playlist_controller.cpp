@@ -554,6 +554,12 @@ void PlaylistController::explore(const PlaylistItem& pItem)
     }
 }
 
+int PlaylistController::currentIndex() const
+{
+    Q_D(const PlaylistController);
+    return d->m_currentIndex;
+}
+
 void PlaylistController::play()
 {
     Q_D(PlaylistController);

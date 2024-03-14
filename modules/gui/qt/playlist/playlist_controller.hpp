@@ -105,6 +105,7 @@ public:
     Q_PROPERTY(SortKey sortKey READ getSortKey WRITE setSortKey NOTIFY sortKeyChanged FINAL)
     Q_PROPERTY(SortOrder sortOrder READ getSortOrder WRITE setSortOrder NOTIFY sortOrderChanged FINAL)
     Q_PROPERTY(MediaStopAction mediaStopAction READ getMediaStopAction WRITE setMediaStopAction NOTIFY mediaStopActionChanged FINAL)
+    Q_PROPERTY(int currentIndex READ currentIndex NOTIFY currentIndexChanged FINAL)
 
 
 public:
@@ -162,6 +163,7 @@ public slots:
 
     bool isEmpty() const;
     int count() const;
+    int currentIndex() const;
 
     SortKey getSortKey() const;
     void setSortKey(SortKey sortKey);
