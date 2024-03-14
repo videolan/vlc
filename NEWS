@@ -6,7 +6,10 @@ Decoders:
  - Fix some ASS subtitle rendering issues
 
 Video Output:
- * Super Resolution scaling with AMD GPUs
+ - Super Resolution scaling with AMD GPUs
+ - Add D3D11 option to use NVIDIA TrueHDR to generate HDR from SDR sources
+ - The D3D11 HDR option can also turn on/off HDR for all sources regardless of
+   the display
 
 Audio Output:
  - Fix regression on macOS causing crashes when using audio devices
