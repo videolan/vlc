@@ -1240,8 +1240,9 @@ static void EsOutSendEsEvent(es_out_sys_t *p_sys, es_out_id_t *es, int action,
 
 static vlc_tick_t
 ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
-                    vlc_tick_t ck_stream, double rate)
+                    vlc_tick_t ck_stream, double rate, bool discontinuity)
 {
+    (void) discontinuity;
     es_out_pgrm_t *pgrm = opaque;
     vlc_clock_Lock(pgrm->clocks.input);
     vlc_tick_t drift =

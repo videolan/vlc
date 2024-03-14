@@ -49,12 +49,13 @@ struct vlc_input_clock_cbs {
      * \param ck_system     time reference for the buffering progress
      * \param ck_stream     progress of the buffering in tick
      * \param rate          current playback rate for the buffering
+     * \param discontinuity PCR discontinuity with the previous update
      *
      * \return              how much time the playback has drifted from
      *                      the main clock
      */
     vlc_tick_t (*update)(void *opaque, vlc_tick_t ck_system,
-                         vlc_tick_t ck_stream, double rate);
+                         vlc_tick_t ck_stream, double rate, bool discontinuity);
 
     /**
      * Notify the listener that the buffering needed a reset.
@@ -109,6 +110,7 @@ void input_clock_Delete(input_clock_t *);
 vlc_tick_t input_clock_Update( input_clock_t *clock, vlc_object_t *p_log,
                             bool b_can_pace_control, bool b_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );
+
 /**
  * This function will reset the drift of a input_clock_t.
  *
