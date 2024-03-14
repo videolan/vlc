@@ -1598,9 +1598,8 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     }
     free(psz_upscale);
 
-    video_format_t fmt;
-    video_format_Copy(&fmt, &vd->source);
-    int err = SetupOutputFormat(vd, &fmt);
+    video_format_Copy(&sys->pool_fmt, &vd->source);
+    int err = SetupOutputFormat(vd, &sys->pool_fmt);
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source.i_chroma)
@@ -1613,10 +1612,10 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
                         vlc_fourcc_GetYUVFallback(vd->source.i_chroma) :
                         vlc_fourcc_GetRGBFallback(vd->source.i_chroma);
             for (unsigned i = 0; list[i] != 0; i++) {
-                fmt.i_chroma = list[i];
-                if (fmt.i_chroma == vd->source.i_chroma)
+                sys->pool_fmt.i_chroma = list[i];
+                if (sys->pool_fmt.i_chroma == vd->source.i_chroma)
                     continue;
-                err = SetupOutputFormat(vd, &fmt);
+                err = SetupOutputFormat(vd, &sys->pool_fmt);
                 if (err == VLC_SUCCESS)
                     break;
             }
@@ -1629,8 +1628,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     video_format_Copy(&sys->quad_fmt, &vd->source);
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
         sys->sys.src_fmt = &sys->quad_fmt;
-
-    video_format_Copy(&sys->pool_fmt, &fmt);
 
     if ( sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_R8G8B8A8_UNORM &&
          sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_B5G6R5_UNORM )
@@ -1645,7 +1642,7 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     }
 
     video_format_Clean(&vd->fmt);
-    vd->fmt = fmt;
+    vd->fmt = sys->pool_fmt;
 
     sys->log_level = var_InheritInteger(vd, "verbose");
 
@@ -1740,16 +1737,17 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
     // look for the requested pixel format first
     const d3d_format_t *decoder_format = NULL;
     sys->picQuad.formatInfo = SelectOutputFormat(vd, fmt, &decoder_format);
+
     if ( !sys->picQuad.formatInfo )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
     }
-    sys->pool_d3dfmt = sys->picQuad.formatInfo;
+    sys->pool_d3dfmt = decoder_format ? decoder_format : sys->picQuad.formatInfo;
 
-    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.formatInfo->name,
+    msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->pool_d3dfmt->name,
                  (char *)&fmt->i_chroma );
-    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.formatInfo->fourcc;
+    fmt->i_chroma = sys->pool_d3dfmt->fourcc;
     DxgiFormatMask( sys->picQuad.formatInfo->formatTexture, fmt );
 
     /* check the region pixel format */
