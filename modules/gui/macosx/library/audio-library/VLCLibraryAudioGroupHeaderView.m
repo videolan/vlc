@@ -45,8 +45,6 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
     if (@available(macOS 10.14, *)) {
         _playButton.bezelColor = NSColor.VLCAccentColor;
     }
-
-    _backgroundBox.borderColor = NSColor.VLCSubtleBorderColor;
 }
 
 - (void)updateRepresentation

@@ -39,7 +39,7 @@ extern NSString * const VLCLibraryAudioGroupHeaderViewIdentifier;
 @property (readwrite, weak) IBOutlet NSTextField *detailTextField;
 @property (readwrite, weak) IBOutlet NSButton *playButton;
 @property (readwrite, weak) IBOutlet NSButton *queueButton;
-@property (readwrite, weak) IBOutlet NSBox *backgroundBox;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *backgroundEffectView;
 
 - (IBAction)play:(id)sender;
 - (IBAction)enqueue:(id)sender;
