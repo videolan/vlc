@@ -221,6 +221,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
      && state != VLC_PLAYER_STATE_STOPPED)
         return;
 
+    enum vlc_player_state last_state = input->state;
     input->state = state;
 
     /* Override the global state if the player is still playing and has a next
@@ -250,7 +251,8 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                     player->eos_burst_count = 0;
             }
 
-            vlc_player_WaitRetryDelay(player);
+            if (player->started)
+                vlc_player_WaitRetryDelay(player);
 
             /* Assign the current date after the wait */
             player->last_eos = vlc_tick_now();
@@ -258,13 +260,14 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             if (!player->deleting)
             {
                 vlc_player_OpenNextMedia(player);
-                if (player->input)
+                /* It is possible to open several medias in a stopped state */
+                if (player->input && player->started)
                     vlc_player_input_Start(player->input);
             }
             if (!player->input)
                 player->started = false;
 
-            send_event = !player->started;
+            send_event = !player->started && last_state != VLC_PLAYER_STATE_STOPPED;
             break;
         case VLC_PLAYER_STATE_STOPPING:
             input->started = false;
@@ -307,6 +310,7 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
 
     if (send_event)
     {
+        assert(player->global_state != input->state);
         player->global_state = input->state;
         vlc_player_SendEvent(player, on_state_changed, player->global_state);
     }

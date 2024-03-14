@@ -2026,6 +2026,34 @@ test_same_media(struct ctx *ctx)
 }
 
 static void
+test_media_stopped(struct ctx *ctx)
+{
+    test_log("media_stopped\n");
+
+    vlc_player_t *player = ctx->player;
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(10));
+
+    /* This test checks for player_start() success, and doesn't care about the
+     * stopped state. */
+    //params.error = true;
+
+    player_set_current_mock_media(ctx, "media1", &params, true);
+    player_set_current_mock_media(ctx, "media2", &params, false);
+
+    {
+        vec_on_current_media_changed *vec = &ctx->report.on_current_media_changed;
+        while (vec->size != 2)
+            vlc_player_CondWait(player, &ctx->wait);
+    }
+    player_start(ctx);
+
+    wait_state(ctx, VLC_PLAYER_STATE_STARTED);
+    wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
+
+    test_end(ctx);
+}
+
+static void
 test_set_current_media(struct ctx *ctx)
 {
     test_log("current_media\n");
@@ -3063,6 +3091,7 @@ main(void)
     test_outputs(&ctx); /* Must be the first test */
 
     test_same_media(&ctx);
+    test_media_stopped(&ctx);
     test_set_current_media(&ctx);
     test_next_media(&ctx);
     test_seeks(&ctx);
