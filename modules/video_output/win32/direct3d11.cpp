@@ -175,6 +175,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     case VLC_CODEC_D3D11_OPAQUE_BGRA:
         cfg.bitdepth = 8;
         break;
+    case VLC_CODEC_RGBA10LE:
     case VLC_CODEC_D3D11_OPAQUE_10B:
         cfg.bitdepth = 10;
         break;
@@ -974,6 +975,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
                 alpha_bits = 10;
                 break;
             case VLC_CODEC_RGBA10LE:
+                bits_per_channel = 10;
                 alpha_bits = 2;
                 break;
             case VLC_CODEC_YUVA_444_12L:
