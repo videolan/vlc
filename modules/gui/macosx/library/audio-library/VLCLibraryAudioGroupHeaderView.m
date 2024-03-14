@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibraryUIUnits.h"
 
 NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGroupHeaderViewIdentifier";
 
@@ -45,6 +46,9 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
     if (@available(macOS 10.14, *)) {
         _playButton.bezelColor = NSColor.VLCAccentColor;
     }
+
+    self.backgroundEffectView.wantsLayer = YES;
+    self.backgroundEffectView.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
 }
 
 - (void)updateRepresentation
