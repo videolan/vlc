@@ -193,7 +193,7 @@ static void Direct3D11Destroy(vout_display_t *);
 static int  Direct3D11Open (vout_display_t *, bool external_device);
 static void Direct3D11Close(vout_display_t *);
 
-static int SetupOutputFormat(vout_display_t *, video_format_t *);
+static int SetupOutputFormat(vout_display_t *, video_format_t *decoder, video_format_t *quad);
 static int  Direct3D11CreateFormatResources (vout_display_t *, const video_format_t *);
 static int  Direct3D11CreateGenericResources(vout_display_t *);
 static void Direct3D11DestroyResources(vout_display_t *);
@@ -1599,7 +1599,8 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     free(psz_upscale);
 
     video_format_Copy(&sys->pool_fmt, &vd->source);
-    int err = SetupOutputFormat(vd, &sys->pool_fmt);
+    video_format_Copy(&sys->quad_fmt, &vd->source);
+    int err = SetupOutputFormat(vd, &sys->pool_fmt, &sys->quad_fmt);
     if (err != VLC_SUCCESS)
     {
         if (!is_d3d11_opaque(vd->source.i_chroma)
@@ -1615,7 +1616,7 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
                 sys->pool_fmt.i_chroma = list[i];
                 if (sys->pool_fmt.i_chroma == vd->source.i_chroma)
                     continue;
-                err = SetupOutputFormat(vd, &sys->pool_fmt);
+                err = SetupOutputFormat(vd, &sys->pool_fmt, &sys->quad_fmt);
                 if (err == VLC_SUCCESS)
                     break;
             }
@@ -1624,8 +1625,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
             return err;
     }
 
-    video_format_Init(&sys->quad_fmt, vd->source.i_chroma);
-    video_format_Copy(&sys->quad_fmt, &vd->source);
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
         sys->sys.src_fmt = &sys->quad_fmt;
 
@@ -1730,13 +1729,13 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     return res;
 }
 
-static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
+static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, video_format_t *quad_fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
     // look for the requested pixel format first
     const d3d_format_t *decoder_format = NULL;
-    sys->picQuad.formatInfo = SelectOutputFormat(vd, fmt, &decoder_format);
+    sys->picQuad.formatInfo = SelectOutputFormat(vd, quad_fmt, &decoder_format);
 
     if ( !sys->picQuad.formatInfo )
     {
@@ -1761,10 +1760,11 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
             (sys->scaleProc == NULL && !CanUseTextureArray(vd)) ||
             BogusZeroCopy(vd);
 
-    if (Direct3D11CreateFormatResources(vd, fmt)) {
+    if (Direct3D11CreateFormatResources(vd, quad_fmt)) {
         msg_Err(vd, "Failed to allocate format resources");
         return VLC_EGENERIC;
     }
+    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_UNKNOWN;
 
     return VLC_SUCCESS;
 }
@@ -1859,7 +1859,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     }
 #endif
 
-    vd->info.is_slow = !is_d3d11_opaque(fmt->i_chroma) && sys->picQuad.formatInfo->formatTexture != DXGI_FORMAT_UNKNOWN;
     return VLC_SUCCESS;
 }
 
