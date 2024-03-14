@@ -96,48 +96,48 @@ enum d3d11_upscale
 
 typedef struct vout_display_sys_t
 {
-    display_win32_area_t     area;
+    display_win32_area_t     area = {};
 
-    int                      log_level;
+    int                      log_level = 1;
 
     display_info_t           display = {};
 
     d3d11_device_t           *d3d_dev = NULL;
     d3d11_decoder_device_t   *local_d3d_dev = NULL; // when opened without a video context
     d3d_shader_compiler_t    *shaders = nullptr;
-    d3d11_quad_t             picQuad;
+    d3d11_quad_t             picQuad = {};
 
 #ifdef HAVE_D3D11_4_H
-    d3d11_gpu_fence          fence;
+    d3d11_gpu_fence          fence = {};
 #endif
 
-    picture_sys_d3d11_t      stagingSys;
+    picture_sys_d3d11_t      stagingSys = {};
     plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
 
-    d3d11_vertex_shader_t    projectionVShader;
-    d3d11_vertex_shader_t    flatVShader;
+    d3d11_vertex_shader_t    projectionVShader = {};
+    d3d11_vertex_shader_t    flatVShader = {};
 
     /* copy from the decoder pool into picSquad before display
      * Uses a Texture2D with slices rather than a Texture2DArray for the decoder */
     bool                     legacy_shader = false;
 
     // SPU
-    vlc_fourcc_t             pSubpictureChromas[2];
-    d3d11_quad_t             regionQuad;
+    vlc_fourcc_t             pSubpictureChromas[2] = {};
+    d3d11_quad_t             regionQuad = {};
     int                      d3dregion_count = 0;
-    picture_t                **d3dregions = NULL;
+    picture_t                **d3dregions = nullptr;
 
     /* outside rendering */
-    void *outside_opaque = NULL;
-    libvlc_video_update_output_cb            updateOutputCb;
-    libvlc_video_swap_cb                     swapCb;
-    libvlc_video_makeCurrent_cb              startEndRenderingCb;
-    libvlc_video_frameMetadata_cb            sendMetadataCb;
-    libvlc_video_output_select_plane_cb      selectPlaneCb;
+    void *outside_opaque = nullptr;
+    libvlc_video_update_output_cb            updateOutputCb = nullptr;
+    libvlc_video_swap_cb                     swapCb = nullptr;
+    libvlc_video_makeCurrent_cb              startEndRenderingCb = nullptr;
+    libvlc_video_frameMetadata_cb            sendMetadataCb = nullptr;
+    libvlc_video_output_select_plane_cb      selectPlaneCb = nullptr;
 
     // upscaling
-    enum d3d11_upscale       upscaleMode;
-    d3d11_scaler             *scaleProc;
+    enum d3d11_upscale       upscaleMode = upscale_LinearSampler;
+    d3d11_scaler             *scaleProc = nullptr;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
