@@ -262,18 +262,40 @@ UploadSurface(filter_t *filter, picture_t *src)
     vlc_vaapi_PicAttachContext(dest_pic);
     picture_CopyProperties(dest_pic, src);
 
-    if (vlc_vaapi_DeriveImage(VLC_OBJECT(filter), va_dpy,
-                              vlc_vaapi_PicGetSurface(dest_pic), &dest_img)
-        || vlc_vaapi_MapBuffer(VLC_OBJECT(filter), va_dpy,
-                               dest_img.buf, &dest_buf))
+    if (p_sys->derive_failed ||
+        vlc_vaapi_DeriveImage(VLC_OBJECT(filter), va_dpy,
+                              vlc_vaapi_PicGetSurface(dest_pic), &dest_img))
+    {
+        if (p_sys->image_fallback_failed)
+            goto error;
+
+        p_sys->derive_failed = true;
+
+        if (CreateFallbackImage(filter, dest_pic, va_dpy, &dest_img))
+        {
+            p_sys->image_fallback_failed = true;
+            goto error;
+        }
+    }
+
+    if (vlc_vaapi_MapBuffer(VLC_OBJECT(filter), va_dpy,
+                            dest_img.buf, &dest_buf))
         goto error;
 
     FillVAImageFromPicture(&dest_img, dest_buf, dest_pic,
                            src, &p_sys->cache);
 
-    if (vlc_vaapi_UnmapBuffer(VLC_OBJECT(filter), va_dpy, dest_img.buf)
-        || vlc_vaapi_DestroyImage(VLC_OBJECT(filter),
-                                  va_dpy, dest_img.image_id))
+    if (vlc_vaapi_UnmapBuffer(VLC_OBJECT(filter), va_dpy, dest_img.buf))
+        goto error;
+
+    if (p_sys->derive_failed &&
+        vaPutImage(va_dpy, vlc_vaapi_PicGetSurface(dest_pic), dest_img.image_id,
+                   0, 0, dest_pic->format.i_width, dest_pic->format.i_height,
+                   0, 0, dest_pic->format.i_width, dest_pic->format.i_height))
+        goto error;
+
+    if (vlc_vaapi_DestroyImage(VLC_OBJECT(filter),
+                               va_dpy, dest_img.image_id))
         goto error;
 
 ret:
