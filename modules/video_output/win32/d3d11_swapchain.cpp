@@ -114,7 +114,12 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
         return false;
     }
 
-    if (!DXGI_UpdateSwapChain( display->sys, dxgiadapter.Get(), display->d3d_dev->d3ddevice, newPixelFormat, cfg ))
+    char *psz_hdr = var_InheritString(display->obj, "d3d11-hdr-mode");
+    auto hdrMode = HdrModeFromString(vlc_object_logger(display->obj), psz_hdr);
+    free(psz_hdr);
+
+    if (!DXGI_UpdateSwapChain( display->sys, dxgiadapter.Get(), display->d3d_dev->d3ddevice,
+                               newPixelFormat, cfg, hdrMode == hdr_Auto ))
         return false;
 
     ComPtr<ID3D11Resource> pBackBuffer;

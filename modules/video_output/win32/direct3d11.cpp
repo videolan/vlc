@@ -71,6 +71,14 @@ static const char *const ppsz_upscale_mode[] = {
 static const char *const ppsz_upscale_mode_text[] = {
     N_("Linear Sampler"), N_("Point Sampler"), N_("Video Processor"), N_("Super Resolution") };
 
+#define HDR_MODE_TEXT N_("HDR Output Mode")
+#define HDR_MODE_LONGTEXT N_("Use HDR output even if the source is SDR.")
+
+static const char *const ppsz_hdr_mode[] = {
+    "auto", "never", "always" };
+static const char *const ppsz_hdr_mode_text[] = {
+    N_("Auto"), N_("Never out HDR"), N_("Always output HDR") };
+
 vlc_module_begin ()
     set_shortname("Direct3D11")
     set_description(N_("Direct3D11 video output"))
@@ -81,6 +89,9 @@ vlc_module_begin ()
 
     add_string("d3d11-upscale-mode", "linear", UPSCALE_MODE_TEXT, UPSCALE_MODE_LONGTEXT)
         change_string_list(ppsz_upscale_mode, ppsz_upscale_mode_text)
+
+    add_string("d3d11-hdr-mode", "auto", HDR_MODE_TEXT, HDR_MODE_LONGTEXT)
+        change_string_list(ppsz_hdr_mode, ppsz_hdr_mode_text)
 
     add_shortcut("direct3d11")
     set_callback_display(Open, 300)
@@ -138,6 +149,9 @@ typedef struct vout_display_sys_t
     // upscaling
     enum d3d11_upscale       upscaleMode = upscale_LinearSampler;
     d3d11_scaler             *scaleProc = nullptr;
+
+    // HDR mode
+    enum d3d11_hdr           hdrMode = hdr_Auto;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
@@ -165,6 +179,27 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     cfg.width  = vd->cfg->display.width;
     cfg.height = vd->cfg->display.height;
 
+    if (sys->hdrMode == hdr_Always)
+    {
+        // force a fake HDR source
+        // corresponds to DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020
+        cfg.bitdepth = 10;
+        cfg.full_range = true;
+        cfg.primaries  = libvlc_video_primaries_BT2020;
+        cfg.colorspace = libvlc_video_colorspace_BT2020;
+        cfg.transfer   = libvlc_video_transfer_func_PQ;
+    }
+    else if (sys->hdrMode == hdr_Never)
+    {
+        // corresponds to DXGI_COLOR_SPACE_RGB_FULL_G22_NONE_P709
+        cfg.bitdepth = 8;
+        cfg.full_range = true;
+        cfg.primaries  = libvlc_video_primaries_BT709;
+        cfg.colorspace = libvlc_video_colorspace_BT709;
+        cfg.transfer   = libvlc_video_transfer_func_BT709;
+    }
+    else
+    {
     switch (fmt->i_chroma)
     {
     case VLC_CODEC_D3D11_OPAQUE:
@@ -201,6 +236,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     cfg.primaries  = (libvlc_video_color_primaries_t) fmt->primaries;
     cfg.colorspace = (libvlc_video_color_space_t)     fmt->space;
     cfg.transfer   = (libvlc_video_transfer_func_t)   fmt->transfer;
+    }
 
     libvlc_video_output_cfg_t out;
     if (!sys->updateOutputCb( sys->outside_opaque, &cfg, &out ))
@@ -817,6 +853,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     video_format_t fmt;
+
+    char *psz_hdr = var_InheritString(vd, "d3d11-hdr-mode");
+    sys->hdrMode = HdrModeFromString(vlc_object_logger(vd), psz_hdr);
+    free(psz_hdr);
+
     video_format_Copy(&fmt, vd->source);
     int err = SetupOutputFormat(vd, &fmt, vctx);
     if (err != VLC_SUCCESS)

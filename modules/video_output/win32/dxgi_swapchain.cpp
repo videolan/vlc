@@ -147,7 +147,7 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
-void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_render_cfg_t *cfg)
+void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_render_cfg_t *cfg, bool match_display)
 {
     HRESULT hr;
     int best = 0;
@@ -199,6 +199,7 @@ void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_
     display->dxgiswapChain.As(&display->dxgiswapChain4);
 
 #ifdef HAVE_DXGI1_6_H
+    if (match_display)
     if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(&dxgiOutput)))
     {
         ComPtr<IDXGIOutput6> dxgiOutput6;
@@ -443,7 +444,8 @@ void DXGI_SwapchainUpdateOutput( dxgi_swapchain *display, libvlc_video_output_cf
 
 bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
                            IUnknown *pFactoryDevice,
-                           const d3d_format_t *newPixelFormat, const libvlc_video_render_cfg_t *cfg )
+                           const d3d_format_t *newPixelFormat, const libvlc_video_render_cfg_t *cfg,
+                           bool match_display )
 {
     // 0 dimensions are not allowed, a value of 8 is used otherwise
     UINT width = cfg->width ? cfg->width : 8;
@@ -482,7 +484,7 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
         return false;
     }
 
-    DXGI_SelectSwapchainColorspace(display, cfg);
+    DXGI_SelectSwapchainColorspace(display, cfg, match_display);
     return true;
 }
 

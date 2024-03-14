@@ -58,12 +58,13 @@ Microsoft::WRL::ComPtr<IDXGISwapChain1> & DXGI_GetSwapChain1( struct dxgi_swapch
 Microsoft::WRL::ComPtr<IDXGISwapChain4> & DXGI_GetSwapChain4( struct dxgi_swapchain * );
 const d3d_format_t  *DXGI_GetPixelFormat( struct dxgi_swapchain * );
 
-void DXGI_SelectSwapchainColorspace( struct dxgi_swapchain *, const libvlc_video_render_cfg_t * );
+void DXGI_SelectSwapchainColorspace( struct dxgi_swapchain *, const libvlc_video_render_cfg_t *, bool match_display );
 void DXGI_LocalSwapchainCleanupDevice( struct dxgi_swapchain * );
 void DXGI_SwapchainUpdateOutput( struct dxgi_swapchain *, libvlc_video_output_cfg_t * );
 bool DXGI_UpdateSwapChain( struct dxgi_swapchain *, IDXGIAdapter *,
                            IUnknown *pFactoryDevice,
-                           const d3d_format_t *, const libvlc_video_render_cfg_t * );
+                           const d3d_format_t *, const libvlc_video_render_cfg_t *,
+                           bool match_display );
 
 void DXGI_LocalSwapchainSwap( struct dxgi_swapchain * );
 void DXGI_LocalSwapchainSetMetadata( struct dxgi_swapchain *, libvlc_video_metadata_type_t, const void * );
