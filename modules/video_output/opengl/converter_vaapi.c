@@ -72,9 +72,10 @@ struct priv
          * (GPU tiling, compression, etc...) */
         VADRMPRIMESurfaceDescriptor va_surface_descriptor;
 #else
+        VAImage                     va_image;
         VABufferInfo                va_buffer_info;
 #endif
-        VAImage                     va_image;
+        unsigned                    num_planes;
         void *                      egl_images[3];
     } last;
 };
@@ -111,7 +112,7 @@ vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
 {
     vlc_object_t *o = VLC_OBJECT(tc->gl);
 
-    for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
+    for (unsigned i = 0; i < priv->last.num_planes; ++i)
         vaegl_image_destroy(tc, priv->last.egl_images[i]);
 
 #if VA_CHECK_VERSION(1, 1, 0)
@@ -119,9 +120,9 @@ vaegl_release_last_pic(const opengl_tex_converter_t *tc, struct priv *priv)
         close(priv->last.va_surface_descriptor.objects[i].fd);
 #else
     vlc_vaapi_ReleaseBufferHandle(o, priv->vadpy, priv->last.va_image.buf);
-#endif
 
     vlc_vaapi_DestroyImage(o, priv->vadpy, priv->last.va_image.image_id);
+#endif
 
     picture_Release(priv->last.pic);
 }
@@ -182,26 +183,35 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     (void) plane_offset;
     struct priv *priv = tc->priv;
     vlc_object_t *o = VLC_OBJECT(tc->gl);
-    VAImage va_image;
 #if VA_CHECK_VERSION(1, 1, 0)
     VADRMPRIMESurfaceDescriptor va_surface_descriptor;
 #else
+    VAImage va_image;
     VABufferInfo va_buffer_info;
 #endif
     EGLImageKHR egl_images[3] = { };
     bool release_image = false, release_buffer_info = false;
+    unsigned num_planes = 0;
 
     if (pic == priv->last.pic)
     {
-        va_image = priv->last.va_image;
 #if VA_CHECK_VERSION(1, 1, 0)
         va_surface_descriptor = priv->last.va_surface_descriptor;
+#else
+        va_image = priv->last.va_image;
 #endif
-        for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
+        for (unsigned i = 0; i < priv->last.num_planes; ++i)
             egl_images[i] = priv->last.egl_images[i];
     }
     else
     {
+#if VA_CHECK_VERSION(1, 1, 0)
+        if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
+                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
+                                          &va_surface_descriptor))
+            goto error;
+        release_image = true;
+#else
         if (vlc_vaapi_DeriveImage(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
                                   &va_image))
             goto error;
@@ -209,12 +219,6 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
 
         assert(va_image.format.fourcc == priv->fourcc);
 
-#if VA_CHECK_VERSION(1, 1, 0)
-        if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
-                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
-                                          &va_surface_descriptor))
-            goto error;
-#else
         va_buffer_info = (VABufferInfo) {
             .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
         };
@@ -226,7 +230,8 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     }
 
 #if VA_CHECK_VERSION(1, 1, 0)
-    for (unsigned i = 0; i < va_surface_descriptor.num_layers; ++i)
+    num_planes = va_surface_descriptor.num_layers;
+    for (unsigned i = 0; i < num_planes; ++i)
     {
         unsigned obj_idx = va_surface_descriptor.layers[i].object_index[0];
 
@@ -251,7 +256,8 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
         priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
     }
 #else
-    for (unsigned i = 0; i < va_image.num_planes; ++i)
+    num_planes = va_image.num_planes;
+    for (unsigned i = 0; i < num_planes; ++i)
     {
         egl_images[i] =
             vaegl_image_create(tc, tex_width[i], tex_height[i],
@@ -272,14 +278,15 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
         if (priv->last.pic != NULL)
             vaegl_release_last_pic(tc, priv);
         priv->last.pic = picture_Hold(pic);
-        priv->last.va_image = va_image;
 #if VA_CHECK_VERSION(1, 1, 0)
         priv->last.va_surface_descriptor = va_surface_descriptor;
 #else
+        priv->last.va_image = va_image;
         priv->last.va_buffer_info = va_buffer_info;
 #endif
+        priv->last.num_planes = num_planes;
 
-        for (unsigned i = 0; i < va_image.num_planes; ++i)
+        for (unsigned i = 0; i < num_planes; ++i)
             priv->last.egl_images[i] = egl_images[i];
     }
 
@@ -301,7 +308,9 @@ error:
         for (unsigned i = 0; i < 3 && egl_images[i] != NULL; ++i)
             vaegl_image_destroy(tc, egl_images[i]);
 
+#if !VA_CHECK_VERSION(1, 1, 0)
         vlc_vaapi_DestroyImage(o, priv->vadpy, va_image.image_id);
+#endif
     }
     return VLC_EGENERIC;
 }
