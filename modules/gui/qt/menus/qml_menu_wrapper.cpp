@@ -874,6 +874,12 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
         m_menu->addSeparator();
     }
 
+    if (m_controler->currentIndex() != -1)
+    {
+        action = m_menu->addAction( qtr("Jump to current playing"));
+        connect(action, &QAction::triggered, this, &PlaylistContextMenu::jumpToCurrentPlaying);
+    }
+
     if (m_selectionModel->hasSelection()) {
         action = m_menu->addAction( qtr("Stream") );
         connect(action, &QAction::triggered, [selectedUrlList]( ) {

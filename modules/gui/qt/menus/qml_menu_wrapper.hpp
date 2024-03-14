@@ -378,6 +378,9 @@ class PlaylistContextMenu : public QObject {
 public:
     PlaylistContextMenu(QObject* parent = nullptr);
 
+signals:
+    void jumpToCurrentPlaying();
+
 public slots:
     void popup(int currentIndex, QPoint pos );
 private:

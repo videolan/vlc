@@ -137,6 +137,8 @@ T.Pane {
         model: root.model
         selectionModel: root.selectionModel
         controler: MainPlaylistController
+
+        onJumpToCurrentPlaying: listView.positionViewAtIndex( MainPlaylistController.currentIndex, ItemView.Center)
     }
 
     background: Widgets.AcrylicBackground {
