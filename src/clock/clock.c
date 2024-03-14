@@ -609,13 +609,13 @@ void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
     vlc_mutex_assert(&main_clock->lock);
     struct vlc_clock_context *ctx = &main_clock->context;
 
-    if (main_clock->first_pcr.system == VLC_TICK_INVALID)
-    {
-        main_clock->first_pcr = clock_point_Create(system_now, ts);
-        main_clock->wait_sync_ref_priority = UINT_MAX;
-        ctx->wait_sync_ref =
-            clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
-    }
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+        return;
+
+    main_clock->first_pcr = clock_point_Create(system_now, ts);
+    main_clock->wait_sync_ref_priority = UINT_MAX;
+    ctx->wait_sync_ref =
+        clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 }
 
 void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
