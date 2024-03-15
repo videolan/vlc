@@ -1261,14 +1261,20 @@ ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
                     vlc_tick_t ck_stream, double rate)
 {
     es_out_pgrm_t *pgrm = opaque;
-    return vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
+    vlc_clock_Lock(pgrm->clocks.input);
+    vlc_tick_t drift =
+        vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
+    vlc_clock_Unlock(pgrm->clocks.input);
+    return drift;
 }
 
 static void
 ClockListenerReset(void *opaque)
 {
     es_out_pgrm_t *pgrm = opaque;
+    vlc_clock_Lock(pgrm->clocks.input);
     vlc_clock_Reset(pgrm->clocks.input);
+    vlc_clock_Unlock(pgrm->clocks.input);
 }
 
 

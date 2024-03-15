@@ -315,6 +315,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     vlc_clock_main_t *mainclk = vlc_clock_main_New(logger, tracer);
     assert(mainclk != NULL);
 
+    vlc_clock_main_Lock(mainclk);
     vlc_clock_t *master = vlc_clock_main_CreateMaster(mainclk, scenario->name,
                                                       NULL, NULL);
     assert(master != NULL);
@@ -325,6 +326,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     vlc_clock_t *slave = vlc_clock_main_CreateSlave(mainclk, slave_name, VIDEO_ES,
                                                     NULL, NULL);
     assert(slave != NULL);
+    vlc_clock_main_Unlock(mainclk);
 
     const struct clock_ctx ctx = {
         .mainclk = mainclk,
@@ -365,10 +367,12 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         {
             while (video_system < expected_system + scenario->stream_increment)
             {
+                vlc_clock_Lock(ctx.slave);
                 vlc_tick_t play_date =
                     vlc_clock_ConvertToSystem(ctx.slave, video_system, video_ts,
                                               1.0f);
                 vlc_clock_Update(ctx.slave, play_date, video_ts, 1.0f);
+                vlc_clock_Unlock(ctx.slave);
                 video_system += video_increment;
                 video_ts += video_increment;
             }
@@ -454,8 +458,10 @@ static void normal_update(const struct clock_ctx *ctx, size_t index,
     (void) index;
     const struct clock_scenario *scenario = ctx->scenario;
 
+    vlc_clock_Lock(ctx->master);
     vlc_tick_t drift =
         vlc_clock_Update(ctx->master, *system, stream, 1.0f);
+    vlc_clock_Unlock(ctx->master);
     /* The master can't drift */
     assert(drift == VLC_TICK_INVALID);
 
@@ -524,9 +530,11 @@ static void normal_check(const struct clock_ctx *ctx, size_t update_count,
         }
     }
 
+    vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted =
         vlc_clock_ConvertToSystem(ctx->slave, expected_system_end,
                                   stream_end, 1.0f);
+    vlc_clock_Unlock(ctx->slave);
     assert(converted == expected_system_end);
 }
 
@@ -543,8 +551,10 @@ static void lowprecision_update(const struct clock_ctx *ctx, size_t index,
     vlc_tick_t imprecision = rand() % VLC_TICK_FROM_MS(5);
     *system = base_system + imprecision;
 
+    vlc_clock_Lock(ctx->master);
     vlc_tick_t drift =
         vlc_clock_Update(ctx->master, *system, stream, 1.0f);
+    vlc_clock_Unlock(ctx->master);
     /* The master can't drift */
     assert(drift == VLC_TICK_INVALID);
 }
@@ -578,8 +588,10 @@ static void drift_update(const struct clock_ctx *ctx, size_t index,
     (void) index;
     const struct clock_scenario *scenario = ctx->scenario;
 
+    vlc_clock_Lock(ctx->master);
     vlc_tick_t drift =
         vlc_clock_Update(ctx->master, *system, stream, 1.0f);
+    vlc_clock_Unlock(ctx->master);
     /* The master can't drift */
     assert(drift == VLC_TICK_INVALID);
 
@@ -600,9 +612,11 @@ static void drift_check(const struct clock_ctx *ctx, size_t update_count,
 
     check_no_event_error(update_count);
 
+    vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted =
         vlc_clock_ConvertToSystem(ctx->slave, expected_system_end,
                                   stream_end, 1.0f);
+    vlc_clock_Unlock(ctx->slave);
 
     assert(converted - expected_system_end == scenario->total_drift_duration);
 }
@@ -613,8 +627,10 @@ static void drift_sudden_update(const struct clock_ctx *ctx, size_t index,
     (void) index;
     const struct clock_scenario *scenario = ctx->scenario;
 
+    vlc_clock_Lock(ctx->slave);
     vlc_tick_t drift =
         vlc_clock_Update(ctx->master, *system, stream, 1.0f);
+    vlc_clock_Unlock(ctx->slave);
     /* The master can't drift */
     assert(drift == VLC_TICK_INVALID);
 
@@ -633,16 +649,26 @@ static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
     const vlc_tick_t pause_duration = VLC_TICK_FROM_MS(20);
     vlc_tick_t system = system_start;
 
+    vlc_clock_Lock(updater);
     vlc_clock_Update(updater, system, 1, 1.0f);
+    vlc_clock_Unlock(updater);
 
     system += VLC_TICK_FROM_MS(10);
 
+    vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_ChangePause(ctx->mainclk, system, true);
+    vlc_clock_main_Unlock(ctx->mainclk);
+
     system += pause_duration;
+
+    vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_ChangePause(ctx->mainclk, system, false);
+    vlc_clock_main_Unlock(ctx->mainclk);
     system += 1;
 
+    vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    vlc_clock_Unlock(ctx->slave);
     assert(converted == system_start + pause_duration);
 }
 
@@ -654,8 +680,10 @@ static void master_pause_run(const struct clock_ctx *ctx)
 static void monotonic_pause_run(const struct clock_ctx *ctx)
 {
     /* Don't add any delay for the first monotonic ref point  */
+    vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
     vlc_clock_main_SetDejitter(ctx->mainclk, 0);
+    vlc_clock_main_Unlock(ctx->mainclk);
 
     pause_common(ctx, ctx->slave);
 }
@@ -665,14 +693,20 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     const vlc_tick_t system_start = vlc_tick_now();
     vlc_tick_t system = system_start;
 
+    vlc_clock_Lock(updater);
     vlc_clock_Update(updater, system_start, 1, 1.0f);
+    vlc_clock_Unlock(updater);
 
     system += VLC_TICK_FROM_MS(10);
 
+    vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_ChangePause(ctx->mainclk, system, true);
+    vlc_clock_main_Unlock(ctx->mainclk);
     system += 1;
 
+    vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    vlc_clock_Unlock(ctx->slave);
     assert(converted == system_start);
 }
 
@@ -684,8 +718,10 @@ static void master_convert_paused_run(const struct clock_ctx *ctx)
 static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
 {
     /* Don't add any delay for the first monotonic ref point  */
+    vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
     vlc_clock_main_SetDejitter(ctx->mainclk, 0);
+    vlc_clock_main_Unlock(ctx->mainclk);
 
     convert_paused_common(ctx, ctx->slave);
 }

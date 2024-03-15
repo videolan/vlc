@@ -195,13 +195,15 @@ vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock,
 
 /**
  * This function free the resources allocated by vlc_clock*Create*()
+ *
+ * @param clock the unlocked clock used by the source
  */
 void vlc_clock_Delete(vlc_clock_t *clock);
 
 /**
  * This function will update the clock drift and returns the drift
  *
- * @param clock the clock setter to update
+ * @param clock the locked clock used by the source
  * @param system_now valid system time or VLC_TICK_MAX is the updated point is
  *        forced (when paused for example)
  * @param ts the timestamp in media time for the updated point
@@ -225,6 +227,8 @@ vlc_tick_t vlc_clock_UpdateVideo(vlc_clock_t *clock, vlc_tick_t system_now,
 
 /**
  * This function resets the clock drift
+ *
+ * @param clock the locked clock used by the source
  */
 void vlc_clock_Reset(vlc_clock_t *clock);
 
@@ -233,16 +237,22 @@ void vlc_clock_Reset(vlc_clock_t *clock);
  *
  * It returns the amount of time the clock owner need to wait in order to reach
  * the time introduced by the new positive delay.
+ *
+ * @param clock the locked clock used by the source
  */
 vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t ts_delay);
 
 /**
  * Lock the clock mutex
+ *
+ * @param clock the unlocked clock used by the source
  */
 void vlc_clock_Lock(vlc_clock_t *clock);
 
 /**
  * Unlock the clock mutex
+ *
+ * @param clock the locked clock used by the source
  */
 void vlc_clock_Unlock(vlc_clock_t *clock);
 
@@ -251,6 +261,7 @@ void vlc_clock_Unlock(vlc_clock_t *clock);
  *
  * The clock mutex must be locked.
  *
+ * @param clock the locked clock used by the source
  * @retval true if the clock is paused
  * @retval false if the clock is not paused
  */
@@ -263,8 +274,7 @@ bool vlc_clock_IsPaused(vlc_clock_t *clock);
  * invalidate the computed deadline. In that case, the caller must recompute
  * the new deadline and call it again.
  *
- * The clock mutex must be locked.
- *
+ * @param clock the locked clock used by the source
  * @return 0 if the condition was signaled, an error code in case of timeout
  */
 int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
@@ -272,14 +282,14 @@ int vlc_clock_Wait(vlc_clock_t *clock, vlc_tick_t system_deadline);
 /**
  * Wake up any vlc_clock_Wait()
  *
- * The clock mutex must be locked.
+ * @param clock the locked clock used by the source
  */
 void vlc_clock_Wake(vlc_clock_t *clock);
 
 /**
  * Add a listener for events
  *
- * @param clock the clock used by the source
+ * @param clock the locked clock used by the source
  * @param cbs valid pointer to register events
  * @param data opaque data used by cbs
  * @return a valid listener id, or NULL in case of allocation error
@@ -292,7 +302,7 @@ vlc_clock_AddListener(vlc_clock_t *clock,
 /**
  * Remove a event listener callback
  *
- * @param clock the clock used by the source
+ * @param clock the locked clock used by the source
  * @param listener_id listener id returned by vlc_clock_AddListener()
  */
 void
@@ -301,23 +311,11 @@ vlc_clock_RemoveListener(vlc_clock_t *clock, vlc_clock_listener_id *listener_id)
 /**
  * This function converts a timestamp from stream to system
  *
- * The clock mutex must be locked.
- *
+ * @param clock the locked clock used by the source
  * @return the valid system time
  */
-vlc_tick_t vlc_clock_ConvertToSystemLocked(vlc_clock_t *clock,
-                                           vlc_tick_t system_now, vlc_tick_t ts,
-                                           double rate);
-
-static inline vlc_tick_t
-vlc_clock_ConvertToSystem(vlc_clock_t *clock, vlc_tick_t system_now,
-                          vlc_tick_t ts, double rate)
-{
-    vlc_clock_Lock(clock);
-    vlc_tick_t system =
-        vlc_clock_ConvertToSystemLocked(clock, system_now, ts, rate);
-    vlc_clock_Unlock(clock);
-    return system;
-}
+vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock,
+                                     vlc_tick_t system_now, vlc_tick_t ts,
+                                     double rate);
 
 #endif /*CLOCK_H*/

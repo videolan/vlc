@@ -418,7 +418,9 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     assert(owner_sys->clock == NULL);
     assert(owner_sys->vout == NULL);
 
+    vlc_clock_Lock(owner_sys->clock_source);
     vlc_clock_t *clock = vlc_clock_CreateSlave(owner_sys->clock_source, AUDIO_ES);
+    vlc_clock_Unlock(owner_sys->clock_source);
     if (clock == NULL)
         return NULL;
 
@@ -700,7 +702,11 @@ static void aout_FiltersPipelineResetClock(const struct aout_filter *tab,
     {
         vlc_clock_t *clock = tab[i].clock;
         if (clock != NULL)
+        {
+            vlc_clock_Lock(clock);
             vlc_clock_Reset(clock);
+            vlc_clock_Unlock(clock);
+        }
     }
 }
 
@@ -717,7 +723,11 @@ static void aout_FiltersPipelineSetClockDelay(const struct aout_filter *tab,
     {
         vlc_clock_t *clock = tab[i].clock;
         if (clock != NULL)
+        {
+            vlc_clock_Lock(clock);
             vlc_clock_SetDelay(clock, delay);
+            vlc_clock_Unlock(clock);
+        }
     }
 }
 

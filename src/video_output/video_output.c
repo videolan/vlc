@@ -984,9 +984,11 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                 if (is_late_dropped && !decoded->b_force)
                 {
                     const vlc_tick_t system_now = vlc_tick_now();
+                    vlc_clock_Lock(sys->clock);
                     const vlc_tick_t system_pts =
                         vlc_clock_ConvertToSystem(sys->clock, system_now,
                                                   decoded->date, sys->rate);
+                    vlc_clock_Unlock(sys->clock);
 
                     if (IsPictureLate(vout, decoded, system_now, system_pts))
                     {
@@ -1145,9 +1147,11 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
         render_subtitle_date = sys->pause.date;
     else
     {
+        vlc_clock_Lock(sys->clock);
         render_subtitle_date = filtered->date <= VLC_TICK_0 ? system_now :
             vlc_clock_ConvertToSystem(sys->clock, system_now, filtered->date,
                                       sys->rate);
+        vlc_clock_Unlock(sys->clock);
     }
 
     /*
@@ -1313,8 +1317,10 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
     vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
+    vlc_clock_Lock(sys->clock);
     vlc_tick_t system_pts = render_now ? system_now :
         vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate);
+    vlc_clock_Unlock(sys->clock);
 
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
@@ -1357,8 +1363,9 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
                     deadline = max_deadline;
                 else
                 {
-                    deadline = vlc_clock_ConvertToSystemLocked(sys->clock,
-                                                vlc_tick_now(), pts, sys->rate);
+                    deadline = vlc_clock_ConvertToSystem(sys->clock,
+                                                         vlc_tick_now(), pts,
+                                                         sys->rate);
                     if (deadline > max_deadline)
                         deadline = max_deadline;
                 }
@@ -1385,10 +1392,12 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
     /* Display the direct buffer returned by vout_RenderPicture */
     vout_display_Display(vd, todisplay);
+    vlc_clock_Lock(sys->clock);
     vlc_tick_t drift = vlc_clock_UpdateVideo(sys->clock,
                                              vlc_tick_now(),
                                              pts, sys->rate,
                                              frame_rate, frame_rate_base);
+    vlc_clock_Unlock(sys->clock);
 
     vlc_queuedmutex_unlock(&sys->display_lock);
 
@@ -1461,9 +1470,11 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
         return false;
 
     const vlc_tick_t system_now = vlc_tick_now();
+    vlc_clock_Lock(sys->clock);
     const vlc_tick_t system_swap_current =
         vlc_clock_ConvertToSystem(sys->clock, system_now,
                                   sys->displayed.current->date, sys->rate);
+    vlc_clock_Unlock(sys->clock);
 
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
     vlc_tick_t system_prepare_current = system_swap_current - render_delay;
@@ -1598,8 +1609,10 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
 
     if (sys->clock != NULL)
     {
+        vlc_clock_Lock(sys->clock);
         vlc_clock_Reset(sys->clock);
         vlc_clock_SetDelay(sys->clock, sys->delay);
+        vlc_clock_Unlock(sys->clock);
     }
 }
 
@@ -1636,7 +1649,9 @@ void vout_ChangeDelay(vout_thread_t *vout, vlc_tick_t delay)
     assert(sys->display);
 
     vout_control_Hold(&sys->control);
+    vlc_clock_Lock(sys->clock);
     vlc_clock_SetDelay(sys->clock, delay);
+    vlc_clock_Unlock(sys->clock);
     sys->delay = delay;
     vout_control_Release(&sys->control);
 }
@@ -1901,7 +1916,9 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
 
     if (sys->clock_listener_id != NULL)
     {
+        vlc_clock_Lock(sys->clock);
         vlc_clock_RemoveListener(sys->clock, sys->clock_listener_id);
+        vlc_clock_Unlock(sys->clock);
         sys->clock_listener_id = NULL;
     }
 
@@ -2254,8 +2271,10 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     static const struct vlc_clock_event_cbs clock_event_cbs = {
         .on_discontinuity = clock_event_OnDiscontinuity,
     };
+    vlc_clock_Lock(sys->clock);
     sys->clock_listener_id =
         vlc_clock_AddListener(sys->clock, &clock_event_cbs, vout);
+    vlc_clock_Unlock(sys->clock);
 
     sys->delay = 0;
 
@@ -2278,7 +2297,11 @@ error_thread:
 error_display:
     vout_DisableWindow(vout);
     if (sys->clock_listener_id != NULL)
+    {
+        vlc_clock_Lock(sys->clock);
         vlc_clock_RemoveListener(sys->clock, sys->clock_listener_id);
+        vlc_clock_Unlock(sys->clock);
+    }
     sys->clock_listener_id = NULL;
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = NULL;

@@ -696,12 +696,12 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
     {
         assert(entry);
 
-        entry->start = vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                                       entry->orgstart, channel->rate);
+        entry->start = vlc_clock_ConvertToSystem(channel->clock, system_now,
+                                                 entry->orgstart, channel->rate);
 
         entry->stop =
-            vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                            entry->orgstop, channel->rate);
+            vlc_clock_ConvertToSystem(channel->clock, system_now,
+                                      entry->orgstop, channel->rate);
     }
     vlc_clock_Unlock(channel->clock);
 
@@ -1857,7 +1857,9 @@ void spu_SetClockDelay(spu_t *spu, size_t channel_id, vlc_tick_t delay)
     vlc_mutex_lock(&sys->lock);
     struct spu_channel *channel = spu_GetChannel(spu, channel_id, NULL);
     assert(channel->clock);
+    vlc_clock_Lock(channel->clock);
     vlc_clock_SetDelay(channel->clock, delay);
+    vlc_clock_Unlock(channel->clock);
     channel->delay = delay;
     vlc_mutex_unlock(&sys->lock);
 }
@@ -1979,11 +1981,11 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
         vlc_clock_Lock(channel->clock);
         subpic->i_start =
-            vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                            orgstart, channel->rate);
+            vlc_clock_ConvertToSystem(channel->clock, system_now,
+                                      orgstart, channel->rate);
         subpic->i_stop =
-            vlc_clock_ConvertToSystemLocked(channel->clock, system_now,
-                                            orgstop, channel->rate);
+            vlc_clock_ConvertToSystem(channel->clock, system_now,
+                                      orgstop, channel->rate);
         vlc_clock_Unlock(channel->clock);
 
         spu_channel_EarlyRemoveLate(sys, channel, system_now);
@@ -2187,8 +2189,10 @@ void spu_ClearChannel(spu_t *spu, size_t channel_id)
     spu_channel_Clean(sys, channel);
     if (channel->clock)
     {
+        vlc_clock_Lock(channel->clock);
         vlc_clock_Reset(channel->clock);
         vlc_clock_SetDelay(channel->clock, channel->delay);
+        vlc_clock_Unlock(channel->clock);
     }
     vlc_mutex_unlock(&sys->lock);
 }
