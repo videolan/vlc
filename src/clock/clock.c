@@ -589,17 +589,18 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
 
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock)
 {
-    vlc_mutex_lock(&main_clock->lock);
+    vlc_mutex_assert(&main_clock->lock);
+
     vlc_clock_main_reset(main_clock);
     main_clock->first_pcr =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
                                 vlc_tick_t system_now, vlc_tick_t ts)
 {
-    vlc_mutex_lock(&main_clock->lock);
+    vlc_mutex_assert(&main_clock->lock);
+
     if (main_clock->first_pcr.system == VLC_TICK_INVALID)
     {
         main_clock->first_pcr = clock_point_Create(system_now, ts);
@@ -607,29 +608,29 @@ void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
         main_clock->wait_sync_ref =
             clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     }
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
                                      vlc_tick_t delay)
 {
-    vlc_mutex_lock(&main_clock->lock);
+    vlc_mutex_assert(&main_clock->lock);
+
     main_clock->input_dejitter = delay;
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_SetDejitter(vlc_clock_main_t *main_clock,
                                 vlc_tick_t dejitter)
 {
-    vlc_mutex_lock(&main_clock->lock);
+    vlc_mutex_assert(&main_clock->lock);
+
     main_clock->output_dejitter = dejitter;
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
                                 bool paused)
 {
-    vlc_mutex_lock(&main_clock->lock);
+    vlc_mutex_assert(&main_clock->lock);
+
     assert(paused == (main_clock->pause_date == VLC_TICK_INVALID));
 
     if (paused)
@@ -653,7 +654,6 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
         main_clock->pause_date = VLC_TICK_INVALID;
         vlc_cond_broadcast(&main_clock->cond);
     }
-    vlc_mutex_unlock(&main_clock->lock);
 }
 
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
@@ -666,6 +666,17 @@ void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
     vlc_vector_destroy(&main_clock->listeners);
 
     free(main_clock);
+}
+
+void vlc_clock_main_Lock(vlc_clock_main_t *main_clock)
+{
+    vlc_mutex_lock(&main_clock->lock);
+}
+
+void vlc_clock_main_Unlock(vlc_clock_main_t *main_clock)
+{
+    vlc_mutex_assert(&main_clock->lock);
+    vlc_mutex_unlock(&main_clock->lock);
 }
 
 vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
@@ -738,12 +749,13 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
                                          const struct vlc_clock_cbs *cbs,
                                          void *cbs_data)
 {
+    vlc_mutex_assert(&main_clock->lock);
+
     /* The master has always the 0 priority */
     vlc_clock_t *clock = vlc_clock_main_Create(main_clock, track_str_id, 0, cbs, cbs_data);
     if (!clock)
         return NULL;
 
-    vlc_mutex_lock(&main_clock->lock);
     assert(main_clock->master == NULL);
 
     if (main_clock->input_master == NULL)
@@ -753,19 +765,19 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
 
     main_clock->master = clock;
     main_clock->rc++;
-    vlc_mutex_unlock(&main_clock->lock);
 
     return clock;
 }
 
 vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 {
+    vlc_mutex_assert(&main_clock->lock);
+
     /* The master has always the 0 priority */
     vlc_clock_t *clock = vlc_clock_main_Create(main_clock, "input", 0, NULL, NULL);
     if (!clock)
         return NULL;
 
-    vlc_mutex_lock(&main_clock->lock);
     assert(main_clock->input_master == NULL);
 
     /* Even if the master ES clock has already been created, it should not
@@ -779,7 +791,6 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
     clock->ops = &master_ops;
     main_clock->input_master = clock;
     main_clock->rc++;
-    vlc_mutex_unlock(&main_clock->lock);
 
     return clock;
 }
@@ -790,6 +801,8 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
                                         const struct vlc_clock_cbs *cbs,
                                         void *cbs_data)
 {
+    vlc_mutex_assert(&main_clock->lock);
+
     /* SPU outputs should have lower priority than VIDEO outputs since they
      * necessarily depend on a VIDEO output. This mean that a SPU reference
      * point will always be overridden by AUDIO or VIDEO outputs. Cf.
@@ -812,10 +825,8 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
     if (!clock)
         return NULL;
 
-    vlc_mutex_lock(&main_clock->lock);
     clock->ops = &slave_ops;
     main_clock->rc++;
-    vlc_mutex_unlock(&main_clock->lock);
 
     return clock;
 }

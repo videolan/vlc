@@ -79,16 +79,48 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
 
 /**
  * Destroy the clock main
+ *
+ * @param main_clock the unlocked main_clock
  */
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock);
 
 /**
+ * Lock the main_clock mutex
+ *
+ * All vlc_clock_main_t functions must be called with the lock held, except
+ * vlc_clock_main_Delete()
+ *
+ * @param main_clock the unlocked main_clock
+ */
+void vlc_clock_main_Lock(vlc_clock_main_t *main_clock);
+
+/**
+ * Unlock the main_clock mutex
+ *
+ * @param main_clock the locked main_clock
+ */
+void vlc_clock_main_Unlock(vlc_clock_main_t *main_clock);
+
+/**
  * Reset the vlc_clock_main_t
+ *
+ * @param main_clock the locked main_clock
  */
 void vlc_clock_main_Reset(vlc_clock_main_t *main_clock);
 
+/**
+ * Set the first PCR point
+ *
+ * @param main_clock the locked main_clock
+ */
 void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
                                 vlc_tick_t system_now, vlc_tick_t ts);
+
+/**
+ * Set the input dejitter
+ *
+ * @param main_clock the locked main_clock
+ */
 void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
                                      vlc_tick_t delay);
 
@@ -96,12 +128,16 @@ void vlc_clock_main_SetInputDejitter(vlc_clock_main_t *main_clock,
  * This function sets the dejitter delay to absorb the clock jitter
  *
  * Also used as the maximum delay before the synchro is considered to kick in.
+ *
+ * @param main_clock the locked main_clock
  */
 void vlc_clock_main_SetDejitter(vlc_clock_main_t *main_clock, vlc_tick_t dejitter);
 
 
 /**
  * This function allows changing the pause status.
+ *
+ * @param main_clock the locked main_clock
  */
 void vlc_clock_main_ChangePause(vlc_clock_main_t *clock, vlc_tick_t system_now,
                                 bool paused);
@@ -112,6 +148,8 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *clock, vlc_tick_t system_now,
  * @warning There can be only one master at a given time.
  *
  * You must use vlc_clock_Delete to free it.
+ *
+ * @param main_clock the locked main_clock
  */
 vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
                                          const char *track_str_id,
@@ -127,6 +165,8 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
  * @warning There can be only one input master at a given time.
  *
  * You must use vlc_clock_Delete to free it.
+ *
+ * @param main_clock the locked main_clock
  */
 vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock);
 
@@ -134,6 +174,8 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock);
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.
+ *
+ * @param main_clock the locked main_clock
  */
 vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
                                         const char *track_str_id,
@@ -145,6 +187,8 @@ vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.
+ *
+ * @param main_clock the locked main_clock
  */
 vlc_clock_t *vlc_clock_CreateSlave(const vlc_clock_t *clock,
                                    enum es_format_category_e cat);

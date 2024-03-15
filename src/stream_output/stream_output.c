@@ -792,15 +792,21 @@ void sout_ClockMainDelete( vlc_clock_main_t *main_clock )
 
 void sout_ClockMainSetFirstPcr( vlc_clock_main_t *main_clock, vlc_tick_t pcr )
 {
+    vlc_clock_main_Lock( main_clock );
     vlc_clock_main_Reset( main_clock );
     vlc_clock_main_SetFirstPcr( main_clock, vlc_tick_now(), pcr );
+    vlc_clock_main_Unlock( main_clock );
 }
 
 vlc_clock_t *sout_ClockCreate( vlc_clock_main_t *main_clock,
                                const es_format_t *fmt )
 {
-    return vlc_clock_main_CreateSlave( main_clock, NULL, fmt->i_cat,
-                                       NULL, NULL );
+    vlc_clock_main_Lock( main_clock );
+    vlc_clock_t *clock =
+        vlc_clock_main_CreateSlave( main_clock, NULL, fmt->i_cat,
+                                    NULL, NULL );
+    vlc_clock_main_Unlock( main_clock );
+    return clock;
 }
 
 void sout_ClockDelete( vlc_clock_t *clock )
