@@ -56,7 +56,6 @@ int vlc_placebo_PlaneComponents(const video_format_t *, struct pl_plane[4]);
 // Fill a pl_plane_data array with various data. Returns the number of planes,
 // or 0 if the format is unsupported by the libplacebo API. If `buf` is set,
 // then all addresses of the picture_t must lie within `buf`'s mapped memory.
-int vlc_placebo_PlaneFormat(const video_format_t *, struct pl_plane_data[4]);
 int vlc_placebo_PlaneData(const picture_t *, struct pl_plane_data[4], pl_buf buf);
 
 // See if a given FourCC is physically supported by a given GPU

@@ -128,7 +128,7 @@ struct fmt_desc {
 
 // NOTE: This list contains some special formats that don't follow the normal
 // rules, but which are included regardless. The corrections for these
-// exceptions happen below, in the function vlc_placebo_PlaneFormat!
+// exceptions happen below, in the function vlc_placebo_PlaneData!
 static const struct { vlc_fourcc_t fcc; struct fmt_desc desc; } formats[] = {
     { VLC_CODEC_I410,           {PLANAR(3,  8, _410)} },
     { VLC_CODEC_I411,           {PLANAR(3,  8, _411)} },
@@ -317,44 +317,38 @@ static void FillDesc(vlc_fourcc_t fcc, const struct fmt_desc *desc,
     }
 }
 
-int vlc_placebo_PlaneFormat(const video_format_t *fmt, struct pl_plane_data data[4])
-{
-    const struct fmt_desc *desc = FindDesc(fmt->i_chroma);
-    if (!desc)
-        return 0;
-
-    FillDesc(fmt->i_chroma, desc, data);
-    for (int i = 0; i < desc->num_planes; i++) {
-        const struct plane_desc *p = &desc->planes[i];
-        data[i].width  = (fmt->i_visible_width  + p->w_denom - 1) / p->w_denom;
-        data[i].height = (fmt->i_visible_height + p->h_denom - 1) / p->h_denom;
-    }
-
-    return desc->num_planes;
-}
-
 int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4],
                           pl_buf buf)
 {
-    int planes = vlc_placebo_PlaneFormat(&pic->format, data);
-    if (!planes)
+    const struct fmt_desc *desc = FindDesc(pic->format.i_chroma);
+    if (!desc || desc->num_planes == 0)
         return 0;
+    assert(desc->num_planes == pic->i_planes);
 
-    assert(planes == pic->i_planes);
-    for (int i = 0; i < planes; i++) {
-        assert(data[i].height == pic->p[i].i_visible_lines);
+    FillDesc(pic->format.i_chroma, desc, data);
+    for (int i = 0; i < desc->num_planes; i++) {
+        const struct plane_desc *p = &desc->planes[i];
+        data[i].width  = (pic->format.i_visible_width  + p->w_denom - 1) / p->w_denom;
+        data[i].height = (pic->format.i_visible_height + p->h_denom - 1) / p->h_denom;
+
+        // assert(data[i].height == pic->p[i].i_visible_lines);
         data[i].row_stride = pic->p[i].i_pitch;
+
+        const size_t pixels_offset =
+                ((pic->format.i_y_offset + p->w_denom - 1) / p->w_denom) * pic->p[i].i_pitch +
+                ((pic->format.i_x_offset + p->h_denom - 1) / p->h_denom) * pic->p[i].i_pixel_pitch;
+
         if (buf) {
             assert(buf->data);
             assert(pic->p[i].p_pixels <= buf->data + buf->params.size);
             data[i].buf = buf;
-            data[i].buf_offset = (uintptr_t) pic->p[i].p_pixels - (ptrdiff_t) buf->data;
+            data[i].buf_offset = (uintptr_t) pic->p[i].p_pixels + pixels_offset - (ptrdiff_t) buf->data;
         } else {
-            data[i].pixels = pic->p[i].p_pixels;
+            data[i].pixels = pic->p[i].p_pixels + pixels_offset;
         }
     }
 
-    return planes;
+    return desc->num_planes;
 }
 
 bool vlc_placebo_FormatSupported(pl_gpu gpu, vlc_fourcc_t fcc)
