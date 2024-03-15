@@ -317,8 +317,7 @@ static void FillDesc(vlc_fourcc_t fcc, const struct fmt_desc *desc,
     }
 }
 
-int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4],
-                          pl_buf buf)
+int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4])
 {
     const struct fmt_desc *desc = FindDesc(pic->format.i_chroma);
     if (!desc || desc->num_planes == 0)
@@ -338,14 +337,7 @@ int vlc_placebo_PlaneData(const picture_t *pic, struct pl_plane_data data[4],
                 ((pic->format.i_y_offset + p->w_denom - 1) / p->w_denom) * pic->p[i].i_pitch +
                 ((pic->format.i_x_offset + p->h_denom - 1) / p->h_denom) * pic->p[i].i_pixel_pitch;
 
-        if (buf) {
-            assert(buf->data);
-            assert(pic->p[i].p_pixels <= buf->data + buf->params.size);
-            data[i].buf = buf;
-            data[i].buf_offset = (uintptr_t) pic->p[i].p_pixels + pixels_offset - (ptrdiff_t) buf->data;
-        } else {
-            data[i].pixels = pic->p[i].p_pixels + pixels_offset;
-        }
+        data[i].pixels = pic->p[i].p_pixels + pixels_offset;
     }
 
     return desc->num_planes;

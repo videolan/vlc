@@ -265,7 +265,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     // Upload the image data for each plane
     struct pl_plane_data data[4];
-    if (!vlc_placebo_PlaneData(pic, data, NULL)) {
+    if (!vlc_placebo_PlaneData(pic, data)) {
         // This should never happen, in theory
         assert(!"Failed processing the picture_t into pl_plane_data!?");
     }
@@ -390,7 +390,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         vlc_vector_foreach(r, &subpicture->regions) {
             assert(r->p_picture->i_planes == 1);
             struct pl_plane_data subdata[4];
-            if (!vlc_placebo_PlaneData(r->p_picture, subdata, NULL))
+            if (!vlc_placebo_PlaneData(r->p_picture, subdata))
                 assert(!"Failed processing the subpicture_t into pl_plane_data!?");
 
             if (!pl_upload_plane(gpu, NULL, &sys->overlay_tex[i], subdata)) {
