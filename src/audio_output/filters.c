@@ -370,7 +370,7 @@ struct aout_filters
         (either the scaletempo filter or a resampler) */
     struct aout_filter resampler; /**< The resampler */
     int resampling; /**< Current resampling (Hz) */
-    const vlc_clock_t *clock_source;
+    vlc_clock_t *clock_source;
 
     unsigned count; /**< Number of filters */
     struct aout_filter tab[AOUT_MAX_FILTERS]; /**< Configured user filters
@@ -406,7 +406,7 @@ static int VisualizationCallback (vlc_object_t *obj, const char *var,
 
 struct filter_owner_sys
 {
-    const vlc_clock_t *clock_source;
+    vlc_clock_t *clock_source;
     vlc_clock_t *clock;
     vout_thread_t *vout;
 };
@@ -542,7 +542,7 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
     return ret;
 }
 
-aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, const vlc_clock_t *clock,
+aout_filters_t *aout_FiltersNewWithClock(vlc_object_t *obj, vlc_clock_t *clock,
                                          const audio_sample_format_t *restrict infmt,
                                          const audio_sample_format_t *restrict outfmt,
                                          const aout_filters_cfg_t *cfg)
