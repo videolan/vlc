@@ -29,4 +29,57 @@
 
 @implementation VLCBottomBarView
 
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+
+    if (self) {
+        [self commonInit];
+    }
+
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+
+    if (self) {
+        [self commonInit];
+    }
+
+    return self;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+
+    if (self ) {
+        [self commonInit];
+    }
+
+    return self;
+}
+
+- (void)commonInit
+{
+    self.wantsLayer = YES;
+    self.needsDisplay = YES;
+}
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+    [super drawRect:dirtyRect];
+
+    const NSRect barFrame = self.frame;
+    NSBezierPath * const separatorPath = NSBezierPath.bezierPath;
+    [separatorPath moveToPoint:NSMakePoint(NSMinX(barFrame), NSMaxY(barFrame) - 0.5)];
+    [separatorPath lineToPoint:NSMakePoint(NSMaxX(barFrame), NSMaxY(barFrame) - 0.5)];
+    separatorPath.lineWidth = 1.0;
+
+    [NSColor.VLCSubtleBorderColor setStroke];
+    [separatorPath stroke];
+}
+
 @end
