@@ -355,9 +355,12 @@
                             <real value="250"/>
                         </holdingPriorities>
                     </splitView>
-                    <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="vUy-jt-gjY" customClass="VLCBottomBarView">
                         <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
                         <subviews>
+                            <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="D5i-Pe-TAl">
+                                <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
+                            </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="MQH-bI-Zdh" customClass="VLCDragDropView">
                                 <rect key="frame" x="0.0" y="0.0" width="896" height="48"/>
                                 <subviews>
@@ -648,13 +651,17 @@
                             </customView>
                         </subviews>
                         <constraints>
+                            <constraint firstAttribute="bottom" secondItem="D5i-Pe-TAl" secondAttribute="bottom" id="1LS-Zu-gsR"/>
                             <constraint firstAttribute="height" constant="48" id="Fps-hR-AFq"/>
                             <constraint firstAttribute="bottom" secondItem="MQH-bI-Zdh" secondAttribute="bottom" id="Uo1-sD-OXk"/>
+                            <constraint firstItem="D5i-Pe-TAl" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="WKP-Ke-OrH"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="leading" secondItem="vUy-jt-gjY" secondAttribute="leading" id="YVB-nY-sHE"/>
+                            <constraint firstItem="D5i-Pe-TAl" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="ZD9-R0-yq0"/>
                             <constraint firstAttribute="trailing" secondItem="MQH-bI-Zdh" secondAttribute="trailing" id="aBH-H2-ykp"/>
                             <constraint firstItem="MQH-bI-Zdh" firstAttribute="top" secondItem="vUy-jt-gjY" secondAttribute="top" id="kba-GQ-94a"/>
+                            <constraint firstAttribute="trailing" secondItem="D5i-Pe-TAl" secondAttribute="trailing" id="lo1-R4-xx4"/>
                         </constraints>
-                    </visualEffectView>
+                    </customView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="bottom" secondItem="u8g-jy-S4e" secondAttribute="bottom" priority="250" id="DQQ-ji-YSy"/>

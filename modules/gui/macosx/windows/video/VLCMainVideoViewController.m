@@ -115,7 +115,6 @@
 - (void)viewDidLoad
 {
     _autohideControls = YES;
-    _controlsBar.bottomBarView.blendingMode = NSVisualEffectBlendingModeWithinWindow;
 
     [self setDisplayLibraryControls:NO];
     [self updatePlaylistToggleState];

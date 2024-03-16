@@ -22,8 +22,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCBottomBarView : NSVisualEffectView
-
-@property (readwrite) BOOL isDark;
+@interface VLCBottomBarView : NSView
 
 @end

@@ -23,77 +23,10 @@
 
 #import "VLCBottomBarView.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSGradient+VLCAdditions.h"
 
-@interface VLCBottomBarView () {
-    NSBezierPath *_rectanglePath;
-    NSBezierPath *_separatorPath;
-    NSRect _oldBounds;
-}
-
-@end
-
 @implementation VLCBottomBarView
-
-- (instancetype)initWithCoder:(NSCoder *)coder
-{
-    self = [super initWithCoder:coder];
-
-    if (self) {
-        [self commonInit];
-    }
-
-    return self;
-}
-
-- (instancetype)initWithFrame:(NSRect)frameRect
-{
-    self = [super initWithFrame:frameRect];
-
-    if (self) {
-        [self commonInit];
-    }
-
-    return self;
-}
-
-- (instancetype)init
-{
-    self = [super init];
-
-    if (self ) {
-        [self commonInit];
-    }
-
-    return self;
-}
-
-- (void)commonInit
-{
-    self.blendingMode = NSVisualEffectBlendingModeBehindWindow;
-    self.material = NSVisualEffectMaterialTitlebar;
-}
-
-- (BOOL)isFlipped
-{
-    return NO;
-}
-
-- (void)viewDidChangeEffectiveAppearance
-{
-    [super viewDidChangeEffectiveAppearance];
-
-    BOOL setDark = NO;
-
-    if (@available(macOS 10.14, *)) {
-        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameVibrantDark]) {
-            setDark = YES;
-        }
-    }
-    
-    _isDark = setDark;
-    [self setNeedsDisplay:YES];
-}
 
 @end
