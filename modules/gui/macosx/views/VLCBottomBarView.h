@@ -24,12 +24,6 @@
 
 @interface VLCBottomBarView : NSVisualEffectView
 
-@property NSGradient *lightGradient;
-@property NSGradient *darkGradient;
-
-@property NSColor *lightStroke;
-@property NSColor *darkStroke;
-
 @property (readwrite) BOOL isDark;
 
 @end
