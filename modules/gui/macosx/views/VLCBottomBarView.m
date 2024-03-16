@@ -72,6 +72,7 @@
 - (void)commonInit
 {
     self.blendingMode = NSVisualEffectBlendingModeBehindWindow;
+    self.material = NSVisualEffectMaterialTitlebar;
 }
 
 - (BOOL)isFlipped
