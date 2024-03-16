@@ -95,12 +95,12 @@
 
 + (NSColor *)VLCLightSubtleBorderColor
 {
-    return [NSColor colorWithCalibratedWhite:0 alpha:0.2];
+    return [NSColor colorWithCalibratedWhite:0 alpha:0.1];
 }
 
 + (NSColor *)VLCDarkSubtleBorderColor
 {
-    return [NSColor colorWithCalibratedWhite:1 alpha:0.2];
+    return [NSColor colorWithCalibratedWhite:1 alpha:0.3];
 }
 
 + (NSColor *)VLCSubtleBorderColor
