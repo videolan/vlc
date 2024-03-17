@@ -86,6 +86,7 @@ MainInterface.MainViewLoader {
 
             basePictureWidth: VLCStyle.gridCover_music_width
             basePictureHeight: VLCStyle.gridCover_music_height
+            titleTopMargin: VLCStyle.gridItemTitle_topMargin + VLCStyle.margin_xxsmall
             
             selectionModel: root.selectionModel
             model: artistModel
@@ -117,7 +118,7 @@ MainInterface.MainViewLoader {
                 pictureRadius: VLCStyle.artistGridCover_radius
                 pictureHeight: VLCStyle.artistGridCover_radius
                 pictureWidth: VLCStyle.artistGridCover_radius
-                titleMargin: VLCStyle.margin_xlarge
+                titleTopMargin: artistGrid.titleTopMargin
                 playIconSize: VLCStyle.play_cover_small
                 textAlignHCenter: true
                 dragItem: artistsDragItem

@@ -39,7 +39,10 @@ Widgets.ExpandGridView {
 
     // Aliases
 
+    property alias titleTopMargin: gridHelper.titleTopMargin
     property alias titleHeight: gridHelper.titleHeight
+
+    property alias subtitleTopMargin: gridHelper.subtitleTopMargin
     property alias subtitleHeight: gridHelper.subtitleHeight
 
     // Settings

@@ -45,7 +45,6 @@ Widgets.GridItem {
     subtitle: model?.duration?.formatHMS() ?? ""
     pictureWidth: VLCStyle.gridCover_video_width
     pictureHeight: VLCStyle.gridCover_video_height
-    titleMargin: VLCStyle.margin_xxsmall
 
     pictureOverlay: Item {
         width: root.pictureWidth

@@ -29,8 +29,16 @@ QtObject{
 
     required property int availableWidth
 
+    property int titleTopMargin: VLCStyle.gridItemTitle_topMargin
     property int titleHeight: VLCStyle.gridItemTitle_height
+
+    property int subtitleTopMargin: VLCStyle.gridItemSubtitle_topMargin
     property int subtitleHeight: VLCStyle.gridItemSubtitle_height
+
+    // NOTE: The total text height of title and subtitle
+    //       1dp is added to each, to correctly represent the actual height
+    readonly property int textHeight: (titleHeight ? titleHeight + titleTopMargin + VLCStyle.dp(1): 0) +
+                                      (subtitleHeight ? subtitleHeight + subtitleTopMargin + VLCStyle.dp(1) : 0)
 
     property int horizontalSpacing: VLCStyle.column_spacing
 
@@ -39,7 +47,7 @@ QtObject{
 
     // NOTE: Responsive cell sizing based on available width
     readonly property int cellWidth: (availableWidth + horizontalSpacing) / nbItemPerRow - horizontalSpacing
-    readonly property int cellHeight: (basePictureHeight / basePictureWidth) * cellWidth + titleHeight + subtitleHeight
+    readonly property int cellHeight: (basePictureHeight / basePictureWidth) * cellWidth + textHeight
 
     // NOTE: Find the maximum picture size for nbItemPerRow == 1, so that we always downscale
     //       formula for maxPictureWidth depended on nbItemPerRow would be:

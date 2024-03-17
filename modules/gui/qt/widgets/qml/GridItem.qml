@@ -34,7 +34,8 @@ T.ItemDelegate {
 
     property real pictureWidth: VLCStyle.colWidth(1)
     property real pictureHeight: pictureWidth
-    property int titleMargin: VLCStyle.margin_xsmall
+    property int titleTopMargin: VLCStyle.gridItemTitle_topMargin
+    property int subtitleTopMargin: VLCStyle.gridItemSubtitle_topMargin
     property Item dragItem: null
 
     readonly property int selectedBorderWidth: VLCStyle.gridItemSelectedBorder
@@ -325,7 +326,7 @@ T.ItemDelegate {
 
             Layout.preferredWidth: Math.min(titleLabel.implicitWidth, root.width)
             Layout.preferredHeight: titleLabel.height
-            Layout.topMargin: root.titleMargin
+            Layout.topMargin: root.titleTopMargin
             Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
 
             Widgets.ListLabel {
@@ -352,7 +353,7 @@ T.ItemDelegate {
 
             Layout.preferredWidth: Math.min(root.width, implicitWidth)
             Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
-            Layout.topMargin: VLCStyle.margin_xsmall
+            Layout.topMargin: root.subtitleTopMargin
 
             ToolTip.delay: VLCStyle.delayToolTipAppear
             ToolTip.text: subtitleTxt.text

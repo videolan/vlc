@@ -201,7 +201,10 @@ QtObject {
     readonly property int artistGridCover_radius: MainCtx.dp(90, scale)
 
     //GridItem
+    readonly property int gridItemTitle_topMargin: margin_xsmall + margin_xxxsmall
     readonly property int gridItemTitle_height: fontHeight_normal
+
+    readonly property int gridItemSubtitle_topMargin: margin_xsmall - margin_xxxsmall
     readonly property int gridItemSubtitle_height: fontHeight_normal
 
     readonly property int gridItem_network_width: VLCStyle.gridCover_network_width
