@@ -253,6 +253,7 @@ ifdef USE_FFMPEG
 	sed -i.orig 's,< 0x0600,< 0x0501,g' $(UNPACK_DIR)/configure
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
+	$(APPLY) $(SRC)/ffmpeg/avcodec-fix-compilation-visionos.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
