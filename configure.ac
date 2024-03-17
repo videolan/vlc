@@ -116,6 +116,7 @@ HAVE_WIN64="0"
 HAVE_IOS="0"
 HAVE_OSX="0"
 HAVE_TVOS="0"
+HAVE_XROS="0"
 
 dnl  Set x86 asm flags and defines
 X86ASMFLAGS=""
@@ -228,6 +229,19 @@ int foo() { return my_array[0]; }
              [HAVE_TVOS="1"
              HAVE_IOS="0"
              HAVE_OSX="0"
+             HAVE_XROS="0"
+             ac_cv_func_fork=no
+             ],)
+
+    AC_EGREP_CPP(yes,
+            [#import <TargetConditionals.h>
+             #if TARGET_OS_VISION
+             yes
+             #endif],
+             [HAVE_XROS="1"
+             HAVE_IOS="0"
+             HAVE_OSX="0"
+             HAVE_TVOS="0"
              ac_cv_func_fork=no
              ],)
 
@@ -472,6 +486,7 @@ AM_CONDITIONAL([HAVE_DARWIN],  [test "${SYS}" = "darwin"])
 AM_CONDITIONAL([HAVE_IOS],     [test "${HAVE_IOS}" = "1"])
 AM_CONDITIONAL([HAVE_OSX],     [test "${HAVE_OSX}" = "1"])
 AM_CONDITIONAL([HAVE_TVOS],    [test "${HAVE_TVOS}" = "1"])
+AM_CONDITIONAL([HAVE_XROS],    [test "${HAVE_XROS}" = "1"])
 
 AM_CONDITIONAL([HAVE_LIBANL],  [test "${HAVE_LIBANL}" = "1"])
 

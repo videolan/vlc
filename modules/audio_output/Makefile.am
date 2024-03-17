@@ -134,3 +134,6 @@ endif
 if HAVE_TVOS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la
 endif
+if HAVE_XROS
+aout_LTLIBRARIES += libaudiounit_ios_plugin.la
+endif

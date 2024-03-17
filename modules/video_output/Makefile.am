@@ -39,16 +39,20 @@ libglinterop_cvpx_plugin_la_LIBADD = libvlc_vtutils.la
 libglinterop_cvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,Foundation,-framework,CoreVideo,-framework,IOSurface,-framework,Metal
 libglinterop_cvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-if HAVE_DARWIN
 if HAVE_OSX
+vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
-else
+endif
+if HAVE_IOS
+vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 endif
+if HAVE_TVOS
 vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
+libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 endif
-
 
 if HAVE_OSX
 libwindow_macosx_plugin_la_SOURCES = video_output/window_macosx.m
@@ -108,16 +112,22 @@ libcvpx_gl_plugin_la_LDFLAGS = $(AM_LDFLAGS) \
     -Wl,-framework,Foundation,-framework,CoreFoundation,-framework,CoreVideo,-framework,Metal
 libcvpx_gl_plugin_la_LIBADD = libvlc_vtutils.la
 
-if HAVE_DARWIN
 if HAVE_OSX
+vout_LTLIBRARIES += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengl.la
-else
+endif
+if HAVE_IOS
+vout_LTLIBRARIES += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
 endif
+if HAVE_TVOS
 vout_LTLIBRARIES += libcvpx_gl_plugin.la
+libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
+libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
+libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
 endif
 
 if HAVE_IOS
@@ -130,6 +140,10 @@ vout_LTLIBRARIES += \
 	libvout_ios_plugin.la \
 	libuiview_window_plugin.la \
 	libcaeagl_ios_plugin.la
+endif
+if HAVE_XROS
+vout_LTLIBRARIES += \
+	libuiview_window_plugin.la
 endif
 
 libglinterop_gst_mem_plugin_la_SOURCES = video_output/opengl/interop_gst_mem.c \

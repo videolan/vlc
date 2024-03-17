@@ -67,14 +67,20 @@ libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 endif
 endif
 
-if HAVE_DARWIN
-vout_LTLIBRARIES += libglinterop_sw_plugin.la
+
 if HAVE_OSX
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
 libglinterop_sw_plugin_la_LIBADD = libvlc_opengl.la
-else
+endif
+if HAVE_IOS
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
 libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
 libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 endif
+if HAVE_TVOS
+vout_LTLIBRARIES += libglinterop_sw_plugin.la
+libglinterop_sw_plugin_la_LIBADD = libvlc_opengles.la
+libglinterop_sw_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 endif
 
 if HAVE_ANDROID
@@ -112,14 +118,19 @@ libglfilter_draw_plugin_la_LIBADD = libvlc_opengl.la $(GL_LIBS)
 vout_LTLIBRARIES += libglfilter_draw_plugin.la
 endif
 
-if HAVE_DARWIN
-vout_LTLIBRARIES += libglfilter_draw_plugin.la
 if HAVE_OSX
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengl.la
-else
+endif
+if HAVE_IOS
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
 libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
 libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 endif
+if HAVE_TVOS
+vout_LTLIBRARIES += libglfilter_draw_plugin.la
+libglfilter_draw_plugin_la_LIBADD = libvlc_opengles.la $(GLES2_LIBS)
+libglfilter_draw_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 endif
 
 if !HAVE_GL
@@ -174,14 +185,19 @@ libpl_scale_plugin_la_LIBADD += libvlc_opengl.la
 video_filter_LTLIBRARIES += libpl_scale_plugin.la
 endif
 
-if HAVE_DARWIN
-video_filter_LTLIBRARIES += libpl_scale_plugin.la
 if HAVE_OSX
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
 libpl_scale_plugin_la_LIBADD += libvlc_opengl.la
-else
+endif
+if HAVE_IOS
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
 libpl_scale_plugin_la_LIBADD += libvlc_opengles.la
 libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 endif
+if HAVE_TVOS
+video_filter_LTLIBRARIES += libpl_scale_plugin.la
+libpl_scale_plugin_la_LIBADD += libvlc_opengles.la
+libpl_scale_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2=1
 endif
 
 if !HAVE_GL
