@@ -1,0 +1,13 @@
+diff -ru ffmpeg/libavcodec/videotoolbox.c ffmpeg/libavcodec/videotoolbox.c
+--- ffmpeg/libavcodec/videotoolbox.c	2023-11-11 01:25:17
++++ ffmpeg/libavcodec/videotoolbox.c	2024-03-17 11:32:05
+@@ -784,7 +784,9 @@
+     CFDictionarySetValue(buffer_attributes, kCVPixelBufferWidthKey, w);
+     CFDictionarySetValue(buffer_attributes, kCVPixelBufferHeightKey, h);
+ #if TARGET_OS_IPHONE
++#ifndef TARGET_OS_VISION
+     CFDictionarySetValue(buffer_attributes, kCVPixelBufferOpenGLESCompatibilityKey, kCFBooleanTrue);
++#endif
+ #else
+     CFDictionarySetValue(buffer_attributes, kCVPixelBufferIOSurfaceOpenGLTextureCompatibilityKey, kCFBooleanTrue);
+ #endif

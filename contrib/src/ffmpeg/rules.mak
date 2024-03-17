@@ -227,6 +227,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
 	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
+	$(APPLY) $(SRC)/ffmpeg/avcodec-fix-compilation-visionos.patch
 	$(MOVE)
 
 .ffmpeg: ffmpeg
