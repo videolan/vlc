@@ -64,6 +64,13 @@ public:
         return d ? d->item.get() : nullptr;
     }
 
+    input_item_t *inputItem() const {
+        if (const auto item = raw())
+            return vlc_playlist_item_GetMedia(item);
+        else
+            return nullptr;
+    }
+
     bool isSelected() const;
     void setSelected(bool selected);
 
