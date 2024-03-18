@@ -84,12 +84,41 @@ AbstractButton {
 
     onClicked: History.push(["player"])
 
+    // Children
+
+    Widgets.DragItem {
+        id: dragItem
+
+        onRequestData: (_, resolve, reject) => {
+            resolve([{
+                "title": Player.title,
+                "cover": (!!Player.artwork && Player.artwork.toString() !== "") ? Player.artwork
+                                                                                : VLCStyle.noArtAlbumCover
+            }])
+        }
+
+        onRequestInputItems: (indexes, data, resolve, reject) => {
+            resolve([MainPlaylistController.currentItem])
+        }
+
+        indexes: [0]
+    }
+
+    DragHandler {
+        target: null
+        onActiveChanged: {
+            if (active) {
+                dragItem.Drag.active = true
+            } else {
+                dragItem.Drag.drop()
+            }
+        }
+    }
+
     background: Widgets.AnimatedBackground {
         enabled: theme.initialized
         border.color: visualFocus ? theme.visualFocus : "transparent"
     }
-
-    // Children
 
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
