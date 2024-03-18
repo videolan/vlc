@@ -172,17 +172,15 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                                sys->picture.subpic_crop, alpha_color,
                                ARRAY_SIZE(rects), rects);
 
+    const float scale_w = (float)(place->width ) / (subpic->i_original_picture_width );
+    const float scale_h = (float)(place->height) / (subpic->i_original_picture_height);
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
-    int_fast16_t dx = place->x + reg->place.x * place->width
-                               / subpic->i_original_picture_width;
-    int_fast16_t dy = place->y + reg->place.y * place->height
-                               / subpic->i_original_picture_height;
-    uint_fast16_t dw = (reg->place.width) * place->width
-                       / subpic->i_original_picture_width;
-    uint_fast16_t dh = (reg->place.height) * place->height
-                       / subpic->i_original_picture_height;
+    int_fast16_t dx = place->x + reg->place.x * scale_w;
+    int_fast16_t dy = place->y + reg->place.y * scale_h;
+    uint_fast16_t dw = (reg->place.width)  * scale_w;
+    uint_fast16_t dh = (reg->place.height) * scale_h;
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
                          sys->picture.subpic_crop, sys->picture.alpha,
