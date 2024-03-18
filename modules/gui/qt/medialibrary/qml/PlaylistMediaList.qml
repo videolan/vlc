@@ -138,6 +138,34 @@ MainInterface.MainViewLoader {
             return qsTr("99+");
     }
 
+    function _adjustDragAccepted(drag) {
+        if (drag.source !== dragItemPlaylist && Helpers.isValidInstanceOf(drag.source, Widgets.DragItem))
+            drag.accepted = true
+        else if (drag.hasUrls)
+            drag.accepted = true
+        else {
+            drag.accepted = false
+        }
+    }
+
+    function _dropAction(drop, index) {
+        const item = drop.source
+        if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
+            item.getSelectedInputItem().then(inputItems => {
+                root.model.append(root.model.getItemId(index), inputItems)
+            })
+            drop.accepted = true
+        } else if (drop.hasUrls) {
+            const urlList = []
+            for (let url in drop.urls)
+                urlList.push(drop.urls[url])
+            root.model.append(root.model.getItemId(index), urlList)
+            drop.accepted = true
+        } else {
+            drop.accepted = false
+        }
+    }
+
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
@@ -145,6 +173,8 @@ MainInterface.MainViewLoader {
 
     Widgets.MLDragItem {
         id: dragItemPlaylist
+
+        objectName: "PlaylistMediaListDragItem"
 
         mlModel: model
 
@@ -226,6 +256,18 @@ MainInterface.MainViewLoader {
                 // Animations
 
                 Behavior on opacity { NumberAnimation { duration: VLCStyle.duration_short } }
+
+                DropArea {
+                    anchors.fill: parent
+
+                    onEntered: function(drag) {
+                        root._adjustDragAccepted(drag)
+                    }
+
+                    onDropped: function(drop) {
+                        root._dropAction(drop, index)
+                    }
+                }
             }
 
             //-------------------------------------------------------------------------------------
@@ -324,6 +366,8 @@ MainInterface.MainViewLoader {
 
             header: root.header
 
+            acceptDrop: true
+
             Navigation.parentItem: root
 
             //-------------------------------------------------------------------------------------
@@ -339,6 +383,14 @@ MainInterface.MainViewLoader {
 
             onRightClick: (_, _, globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            }
+
+            onDropEntered: (_, _, drag, _) => {
+                root._adjustDragAccepted(drag)
+            }
+
+            onDropEvent: (_, index, _, drop, _) => {
+                root._dropAction(drop, index)
             }
 
             //-------------------------------------------------------------------------------------
