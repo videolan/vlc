@@ -612,6 +612,7 @@ void vlc_clock_main_SetFirstPcr(vlc_clock_main_t *main_clock,
     if (main_clock->first_pcr.system != VLC_TICK_INVALID)
         return;
 
+    vlc_clock_main_reset(main_clock);
     main_clock->first_pcr = clock_point_Create(system_now, ts);
     main_clock->wait_sync_ref_priority = UINT_MAX;
     ctx->wait_sync_ref =
