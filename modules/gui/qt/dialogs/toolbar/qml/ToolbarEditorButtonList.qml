@@ -196,6 +196,7 @@ GridView {
 
                     color: theme.fg.secondary
                     elide: Text.ElideNone
+                    fontSizeMode: Text.Fit
                     text: PlayerControlbarControls.controlList[model.index].text
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
