@@ -152,14 +152,20 @@ MainInterface.MainViewLoader {
         const item = drop.source
         if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             item.getSelectedInputItem().then(inputItems => {
-                root.model.append(root.model.getItemId(index), inputItems)
+                if (index === undefined)
+                    DialogsProvider.playlistsDialog(inputItems)
+                else
+                    root.model.append(root.model.getItemId(index), inputItems)
             })
             drop.accepted = true
         } else if (drop.hasUrls) {
             const urlList = []
             for (let url in drop.urls)
                 urlList.push(drop.urls[url])
-            root.model.append(root.model.getItemId(index), urlList)
+            if (index === undefined)
+                DialogsProvider.playlistsDialog(inputItems)
+            else
+                root.model.append(root.model.getItemId(index), urlList)
             drop.accepted = true
         } else {
             drop.accepted = false
@@ -170,6 +176,17 @@ MainInterface.MainViewLoader {
     // Childs
     //---------------------------------------------------------------------------------------------
 
+    DropArea {
+        anchors.fill: parent
+
+        onEntered: function(drag) {
+            root._adjustDragAccepted(drag)
+        }
+
+        onDropped: function(drop) {
+            root._dropAction(drop)
+        }
+    }
 
     Widgets.MLDragItem {
         id: dragItemPlaylist
