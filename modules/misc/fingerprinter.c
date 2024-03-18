@@ -52,8 +52,13 @@ struct fingerprinter_sys_t
     struct
     {
         vlc_array_t         queue;
+    } incoming;
+
+    struct
+    {
+        vlc_array_t         queue;
         vlc_mutex_t         lock;
-    } incoming, results;
+    } results;
 
     vlc_cond_t              incoming_cond;
 
@@ -88,10 +93,10 @@ vlc_module_end ()
 static int EnqueueRequest( fingerprinter_thread_t *f, fingerprint_request_t *r )
 {
     fingerprinter_sys_t *p_sys = f->p_sys;
-    vlc_mutex_lock( &p_sys->incoming.lock );
+    vlc_player_Lock( p_sys->player );
     int i_ret = vlc_array_append( &p_sys->incoming.queue, r );
     vlc_cond_signal( &p_sys->incoming_cond );
-    vlc_mutex_unlock( &p_sys->incoming.lock );
+    vlc_player_Unlock( p_sys->player );
     return i_ret;
 }
 
@@ -199,7 +204,7 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
 
     if (ret == VLC_SUCCESS)
     {
-        while( p_fingerprinter->p_sys->processing.b_working )
+        while( !p_fingerprinter->p_sys->abort && p_fingerprinter->p_sys->processing.b_working )
             vlc_player_CondWait(player,
                                 &p_fingerprinter->p_sys->processing.cond);
 
@@ -251,9 +256,8 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
-    atomic_init( &p_sys->abort, false );
+    p_sys->abort = false;
     vlc_array_init( &p_sys->incoming.queue );
-    vlc_mutex_init( &p_sys->incoming.lock );
     vlc_cond_init( &p_sys->incoming_cond );
 
     vlc_array_init( &p_sys->processing.queue );
@@ -289,10 +293,11 @@ static void Close(vlc_object_t *p_this)
     fingerprinter_thread_t   *p_fingerprinter = (fingerprinter_thread_t*) p_this;
     fingerprinter_sys_t *p_sys = p_fingerprinter->p_sys;
 
-    vlc_mutex_lock( &p_sys->incoming.lock );
-    atomic_store_explicit( &p_sys->abort, true, memory_order_relaxed );
+    vlc_player_Lock( p_sys->player );
+    p_sys->abort = true;
+    vlc_cond_signal( &p_sys->processing.cond );
     vlc_cond_signal( &p_sys->incoming_cond );
-    vlc_mutex_unlock( &p_sys->incoming.lock );
+    vlc_player_Unlock( p_sys->player );
     vlc_join( p_sys->thread, NULL );
 
     CleanSys( p_sys );
@@ -353,21 +358,21 @@ static void *Run( void *opaque )
     /* main loop */
     for (;;)
     {
-        vlc_mutex_lock( &p_sys->incoming.lock );
+        vlc_player_Lock( p_sys->player );
 
         while( vlc_array_count( &p_sys->incoming.queue ) == 0 )
         {
-            if( atomic_load_explicit( &p_sys->abort, memory_order_relaxed ) )
+            if( p_sys->abort )
             {
-                vlc_mutex_unlock( &p_sys->incoming.lock );
+                vlc_player_Unlock( p_sys->player );
                 return NULL;
             }
-            vlc_cond_wait( &p_sys->incoming_cond, &p_sys->incoming.lock );
+            vlc_player_CondWait( p_sys->player, &p_sys->incoming_cond );
         }
 
         QueueIncomingRequests( p_sys );
 
-        vlc_mutex_unlock( &p_sys->incoming.lock );
+        vlc_player_Unlock( p_sys->player );
 
         bool results_available = false;
         while( vlc_array_count( &p_sys->processing.queue ) )
@@ -411,7 +416,7 @@ static void *Run( void *opaque )
             // cancellation, so remove it immediately
             vlc_array_remove( &p_sys->processing.queue, 0 );
 
-            if( atomic_load_explicit( &p_sys->abort, memory_order_relaxed ) )
+            if( p_sys->abort )
                 return NULL;
         }
 
