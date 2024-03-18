@@ -172,8 +172,8 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                                sys->picture.subpic_crop, alpha_color,
                                ARRAY_SIZE(rects), rects);
 
-    const float scale_w = (float)(place->width ) / (subpic->i_original_picture_width );
-    const float scale_h = (float)(place->height) / (subpic->i_original_picture_height);
+    const float scale_w = (float)(place->width  * reg->zoom_h.num) / (subpic->i_original_picture_width  * reg->zoom_h.den);
+    const float scale_h = (float)(place->height * reg->zoom_v.num) / (subpic->i_original_picture_height * reg->zoom_v.den);
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
@@ -181,6 +181,28 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     int_fast16_t dy = place->y + reg->place.y * scale_h;
     uint_fast16_t dw = (reg->place.width)  * scale_w;
     uint_fast16_t dh = (reg->place.height) * scale_h;
+
+    xcb_render_transform_t transform = {
+        0, 0, 0,
+        0, 0, 0,
+        /* Multiply z by width and height to compensate for x and y above */
+        0, 0, 10000,
+    };
+    transform.matrix11 = 10000 / scale_h;
+    transform.matrix22 = 10000 / scale_w;
+
+    xcb_render_set_picture_transform(conn, sys->picture.subpic_crop, transform);
+    xcb_render_set_picture_transform(conn, sys->picture.alpha,       transform);
+
+    if (likely(sys->filter != NULL))
+    {
+        xcb_render_set_picture_filter(conn, sys->picture.subpic_crop,
+                                      strlen(sys->filter), sys->filter,
+                                      0, NULL);
+        xcb_render_set_picture_filter(conn, sys->picture.alpha,
+                                      strlen(sys->filter), sys->filter,
+                                      0, NULL);
+    } 
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
                          sys->picture.subpic_crop, sys->picture.alpha,
@@ -713,6 +735,7 @@ static int Open(vout_display_t *vd,
     sys->spu_chromas[1] = 0;
 
     vd->info.subpicture_chromas = sys->spu_chromas;
+    vd->info.can_scale_spu = true;
     vd->ops = &ops;
 
     (void) ctx;
