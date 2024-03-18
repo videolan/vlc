@@ -33,7 +33,7 @@ FlickableScrollHandler::FlickableScrollHandler(QObject *parent)
         emit effectiveScaleFactorChanged();
     });
 
-    setScaleFactor(1.0);
+    emit scaleFactorChanged();
 }
 
 FlickableScrollHandler::~FlickableScrollHandler()

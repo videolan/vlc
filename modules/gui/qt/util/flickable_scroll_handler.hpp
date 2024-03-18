@@ -74,7 +74,7 @@ private:
 
 private:
     QPointer<QQuickItem> m_target = nullptr;
-    qreal m_scaleFactor;
+    qreal m_scaleFactor = 1.;
     qreal m_effectiveScaleFactor;
     bool m_enabled = true;
     bool m_fallbackScroll = false;
