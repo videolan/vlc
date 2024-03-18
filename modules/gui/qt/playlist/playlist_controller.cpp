@@ -80,9 +80,14 @@ QVector<Media> toMediaList(const QVariantList &sources)
                 mrl = resolveWinSymlinks(mrl);
 
             return Media(mrl.toString(QUrl::FullyEncoded), mrl.fileName());
-        } else if (value.canConvert<SharedInputItem>())
+        }
+        else if (value.canConvert<SharedInputItem>())
         {
             return Media(value.value<SharedInputItem>().get());
+        }
+        else if (value.canConvert<PlaylistItem>())
+        {
+            return Media(value.value<PlaylistItem>().inputItem());
         }
         return Media{};
     });
