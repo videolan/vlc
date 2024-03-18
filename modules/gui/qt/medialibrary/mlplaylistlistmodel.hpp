@@ -64,7 +64,7 @@ public:
 public: // Interface
     Q_INVOKABLE void create(const QString & name, const QVariantList& initialItems);
 
-    Q_INVOKABLE bool append(const MLItemId & playlistId, const QVariantList & ids);
+    Q_INVOKABLE void append(const MLItemId & playlistId, const QVariantList & ids);
 
     Q_INVOKABLE bool deletePlaylists(const QVariantList & ids);
 

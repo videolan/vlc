@@ -116,13 +116,13 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     });
 }
 
-/* Q_INVOKABLE */ bool MLPlaylistListModel::append(const MLItemId     & playlistId,
+/* Q_INVOKABLE */ void MLPlaylistListModel::append(const MLItemId     & playlistId,
                                                    const QVariantList & ids)
 {
     assert(m_mediaLib);
 
     if (unlikely(m_transactionPending))
-        return false;
+        return;
 
     m_transactionPending = true;
 
@@ -156,8 +156,6 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     [this]() {
         endTransaction();
     });
-
-    return result;
 }
 
 /* Q_INVOKABLE */ bool MLPlaylistListModel::deletePlaylists(const QVariantList & ids)
