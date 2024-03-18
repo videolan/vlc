@@ -198,7 +198,13 @@ set_deployment_target()
         VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-simulator"
     fi
     VLC_DEPLOYMENT_TARGET_LDFLAG="-Wl,-platform_version,${VLC_DEPLOYMENT_TARGET_LDFLAG},${VLC_DEPLOYMENT_TARGET},${VLC_APPLE_SDK_VERSION}"
-    VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-version-min=${VLC_DEPLOYMENT_TARGET}"
+
+    # xrOS does not support the minimal version flag in clang 15.x (yet ?)
+    if [ "$VLC_HOST_OS" != "xros" ]; then
+        VLC_DEPLOYMENT_TARGET_CFLAG="${VLC_DEPLOYMENT_TARGET_CFLAG}-version-min=${VLC_DEPLOYMENT_TARGET}"
+    else
+	    VLC_DEPLOYMENT_TARGET_CFLAG=""
+    fi
 }
 
 # Validates the architecture and sets VLC_HOST_ARCH
@@ -306,6 +312,17 @@ validate_sdk_name()
             VLC_HOST_PLATFORM="macOS"
             VLC_HOST_OS="macosx"
             set_deployment_target "$VLC_DEPLOYMENT_TARGET_MACOSX"
+            ;;
+        xros*)
+            VLC_HOST_PLATFORM="xrOS"
+            VLC_HOST_OS="xros"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_XROS"
+            ;;
+        xrsimulator*)
+            VLC_HOST_PLATFORM="xr-Simulator"
+            VLC_HOST_PLATFORM_SIMULATOR="yes"
+            VLC_HOST_OS="xros"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_XROS"
             ;;
         watch*)
             abort_err "Building for watchOS is not supported by this script"
@@ -612,6 +629,8 @@ if [ "$VLC_HOST_OS" = "ios" ]; then
 elif [ "$VLC_HOST_OS" = "tvos" ]; then
     export BUILDFORIOS="yes"
     export BUILDFORTVOS="yes"
+elif [ "$VLC_HOST_OS" = "xros" ]; then
+    export BUILDFORIOS="yes"
 fi
 
 # Default to "make" if there is no MAKE env variable
@@ -646,6 +665,8 @@ elif [ "$VLC_HOST_OS" = "ios" ]; then
     VLC_CONTRIB_OPTIONS+=( "${VLC_CONTRIB_OPTIONS_IOS[@]}" )
 elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_CONTRIB_OPTIONS+=( "${VLC_CONTRIB_OPTIONS_TVOS[@]}" )
+elif [ "$VLC_HOST_OS" = "xros" ]; then
+    VLC_CONTRIB_OPTIONS+=( "${VLC_CONTRIB_OPTIONS_XROS[@]}" )
 fi
 
 # Create dir to build contribs in
@@ -726,6 +747,8 @@ elif [ "$VLC_HOST_OS" = "ios" ]; then
     VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_IOS[@]}" )
 elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_TVOS[@]}" )
+elif [ "$VLC_HOST_OS" = "xros" ]; then
+    VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_XROS[@]}" )
 fi
 
 if [ "$VLC_DISABLE_DEBUG" -gt "0" ]; then
@@ -791,6 +814,8 @@ elif [ "$VLC_HOST_OS" = "ios" ]; then
     VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_IOS[@]}" )
 elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_TVOS[@]}" )
+elif [ "$VLC_HOST_OS" = "xros" ]; then
+    VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_XROS[@]}" )
 fi
 
 for module in "${VLC_MODULE_REMOVAL_LIST[@]}"; do
