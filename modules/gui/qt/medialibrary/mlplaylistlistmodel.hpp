@@ -70,7 +70,7 @@ public: // Interface
 
     Q_INVOKABLE bool showDialogRename(const QModelIndex & index);
 
-    MLItemId getItemId(int index) const;
+    Q_INVOKABLE MLItemId getItemId(int index) const;
 
 public: // QAbstractItemModel implementation
     QHash<int, QByteArray> roleNames() const override;
