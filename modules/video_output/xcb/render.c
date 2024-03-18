@@ -52,6 +52,7 @@ typedef struct vout_display_sys_t {
         xcb_pixmap_t crop;
         xcb_pixmap_t scale;
         xcb_pixmap_t subpic;
+        xcb_pixmap_t subpic_crop;
         xcb_pixmap_t alpha;
         xcb_window_t dest;
     } drawable;
@@ -60,6 +61,7 @@ typedef struct vout_display_sys_t {
         xcb_render_picture_t crop;
         xcb_render_picture_t scale;
         xcb_render_picture_t subpic;
+        xcb_render_picture_t subpic_crop;
         xcb_render_picture_t alpha;
         xcb_render_picture_t dest;
     } picture;
@@ -118,13 +120,17 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     xcb_connection_t *conn = sys->conn;
     const vout_display_place_t *place = &sys->place;
     picture_t *pic = reg->p_picture;
-    unsigned sw = pic->format.i_width;
-    unsigned sh = pic->format.i_height;
+    unsigned sw = reg->place.width;
+    unsigned sh = reg->place.height;
     xcb_rectangle_t rects[] = { { 0, 0, sw, sh }, };
 
-    xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root, sw, sh);
+    xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root, 
+        pic->format.i_width, pic->format.i_height);
+    xcb_create_pixmap(conn, 32, sys->drawable.subpic_crop, sys->root, sw, sh);
     xcb_create_pixmap(conn, 8, sys->drawable.alpha, sys->root, sw, sh);
     xcb_render_create_picture(conn, sys->picture.subpic, sys->drawable.subpic,
+                              sys->format.argb, 0, NULL);
+    xcb_render_create_picture(conn, sys->picture.subpic_crop, sys->drawable.subpic_crop,
                               sys->format.argb, 0, NULL);
     xcb_render_create_picture(conn, sys->picture.alpha, sys->drawable.alpha,
                               sys->format.alpha, 0, NULL);
@@ -135,9 +141,16 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
                   pic->p->i_lines, 0, 0, 0, 32,
                   pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
 
-    /* Copy alpha channel */
+    /* Crop the picture with pixel accuracy */
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
                          sys->picture.subpic, XCB_RENDER_PICTURE_NONE,
+                         sys->picture.subpic_crop,
+                         reg->source_offset_x, reg->source_offset_y, 0, 0,
+                         0, 0, reg->place.width, reg->place.height);
+
+    /* Copy alpha channel */
+    xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
+                         sys->picture.subpic_crop, XCB_RENDER_PICTURE_NONE,
                          sys->picture.alpha, 0, 0, 0, 0, 0, 0, sw, sh);
 
     /* Force alpha channel to maximum (add 100% and clip).
@@ -147,7 +160,7 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
     static const xcb_render_color_t alpha_one_color = { 0, 0, 0, 0xffff };
 
     xcb_render_fill_rectangles(conn, XCB_RENDER_PICT_OP_ADD,
-                               sys->picture.subpic, alpha_one_color,
+                               sys->picture.subpic_crop, alpha_one_color,
                                ARRAY_SIZE(rects), rects);
 
     /* Multiply by region and subpicture alpha factors */
@@ -156,31 +169,32 @@ static void RenderRegion(vout_display_t *vd, const vlc_render_subpicture *subpic
         0, 0, 0, lroundf(reg->i_alpha * alpha_fixed) };
 
     xcb_render_fill_rectangles(conn, XCB_RENDER_PICT_OP_IN_REVERSE,
-                               sys->picture.subpic, alpha_color,
+                               sys->picture.subpic_crop, alpha_color,
                                ARRAY_SIZE(rects), rects);
 
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
     int_fast16_t dx = place->x + reg->place.x * place->width
-                      / subpic->i_original_picture_width;
+                               / subpic->i_original_picture_width;
     int_fast16_t dy = place->y + reg->place.y * place->height
-                      / subpic->i_original_picture_height;
+                               / subpic->i_original_picture_height;
     uint_fast16_t dw = (reg->place.width) * place->width
                        / subpic->i_original_picture_width;
     uint_fast16_t dh = (reg->place.height) * place->height
                        / subpic->i_original_picture_height;
 
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
-                         sys->picture.subpic, sys->picture.alpha,
+                         sys->picture.subpic_crop, sys->picture.alpha,
                          sys->picture.scale,
-                         reg->source_offset_x, reg->source_offset_y,
-                         reg->source_offset_x, reg->source_offset_y,
+                         0, 0, 0, 0,
                          dx, dy, dw, dh);
 
     xcb_render_free_picture(conn, sys->picture.alpha);
+    xcb_render_free_picture(conn, sys->picture.subpic_crop);
     xcb_render_free_picture(conn, sys->picture.subpic);
     xcb_free_pixmap(conn, sys->drawable.alpha);
+    xcb_free_pixmap(conn, sys->drawable.subpic_crop);
     xcb_free_pixmap(conn, sys->drawable.subpic);
 }
 
@@ -651,12 +665,14 @@ static int Open(vout_display_t *vd,
     sys->drawable.crop = xcb_generate_id(conn);
     sys->drawable.scale = xcb_generate_id(conn);
     sys->drawable.subpic = xcb_generate_id(conn);
+    sys->drawable.subpic_crop = xcb_generate_id(conn);
     sys->drawable.alpha = xcb_generate_id(conn);
     sys->drawable.dest = xcb_generate_id(conn);
     sys->picture.source = xcb_generate_id(conn);
     sys->picture.crop = xcb_generate_id(conn);
     sys->picture.scale = xcb_generate_id(conn);
     sys->picture.subpic = xcb_generate_id(conn);
+    sys->picture.subpic_crop = xcb_generate_id(conn);
     sys->picture.alpha = xcb_generate_id(conn);
     sys->picture.dest = xcb_generate_id(conn);
     sys->gc = xcb_generate_id(conn);
