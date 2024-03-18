@@ -54,11 +54,10 @@ endif
 libuikit_inhibit_plugin_la_SOURCES = misc/inhibit/uikit-inhibit.m
 libuikit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,UIKit,-framework,Foundation
 libuikit_inhibit_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
-if HAVE_IOS
+if HAVE_IOS_OR_TVOS
 misc_LTLIBRARIES += libuikit_inhibit_plugin.la
 endif
-
-if HAVE_TVOS
+if HAVE_XROS
 misc_LTLIBRARIES += libuikit_inhibit_plugin.la
 endif
 

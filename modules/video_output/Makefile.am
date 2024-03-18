@@ -43,12 +43,7 @@ if HAVE_OSX
 vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 endif
-if HAVE_IOS
-vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
-libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
-endif
-if HAVE_TVOS
+if HAVE_IOS_OR_TVOS
 vout_LTLIBRARIES += libglinterop_cvpx_plugin.la
 libglinterop_cvpx_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libglinterop_cvpx_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
@@ -117,25 +112,14 @@ vout_LTLIBRARIES += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengl.la
 endif
-if HAVE_IOS
-vout_LTLIBRARIES += libcvpx_gl_plugin.la
-libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
-libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
-libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
-endif
-if HAVE_TVOS
+if HAVE_IOS_OR_TVOS
 vout_LTLIBRARIES += libcvpx_gl_plugin.la
 libcvpx_gl_plugin_la_CPPFLAGS += -DUSE_OPENGL_ES2
 libcvpx_gl_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 libcvpx_gl_plugin_la_LIBADD += libvlc_opengles.la
 endif
 
-if HAVE_IOS
-vout_LTLIBRARIES += libvout_ios_plugin.la \
-	libuiview_window_plugin.la \
-	libcaeagl_ios_plugin.la
-endif
-if HAVE_TVOS
+if HAVE_IOS_OR_TVOS
 vout_LTLIBRARIES += \
 	libvout_ios_plugin.la \
 	libuiview_window_plugin.la \

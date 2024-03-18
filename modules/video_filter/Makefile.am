@@ -121,7 +121,7 @@ libci_filters_plugin_la_LDFLAGS += -Wl,-framework,OpenGL
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
 
-if HAVE_IOS
+if HAVE_IOS_OR_TVOS
 libci_filters_plugin_la_LDFLAGS += -Wl,-framework,OpenGLES
 video_filter_LTLIBRARIES += libci_filters_plugin.la
 endif
@@ -141,13 +141,7 @@ endif
 endif
 endif
 
-if HAVE_IOS
-libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
-libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
-video_filter_LTLIBRARIES += libopengl_filter_plugin.la
-endif
-
-if HAVE_TVOS
+if HAVE_IOS_OR_TVOS
 libopengl_filter_plugin_la_LIBADD = libvlc_opengles.la
 libopengl_filter_plugin_la_CFLAGS = -DUSE_OPENGL_ES2=1
 video_filter_LTLIBRARIES += libopengl_filter_plugin.la
@@ -196,12 +190,7 @@ if HAVE_OSX
 video_filter_LTLIBRARIES += libglblend_plugin.la
 libglblend_plugin_la_LIBADD = libvlc_opengl.la
 endif
-if HAVE_IOS
-video_filter_LTLIBRARIES += libglblend_plugin.la
-libglblend_plugin_la_LIBADD = libvlc_opengles.la
-libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
-endif
-if HAVE_TVOS
+if HAVE_IOS_OR_TVOS
 video_filter_LTLIBRARIES += libglblend_plugin.la
 libglblend_plugin_la_LIBADD = libvlc_opengles.la
 libglblend_plugin_la_CFLAGS += -DUSE_OPENGL_ES2=1
