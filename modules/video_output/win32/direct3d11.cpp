@@ -53,6 +53,10 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
+#ifdef HAVE_DXGI1_6_H
+# include <dxgi1_6.h>
+#endif
+
 using Microsoft::WRL::ComPtr;
 
 static int  Open(vout_display_t *,
@@ -433,15 +437,51 @@ static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_i
     if (sys->hdrMode != hdr_Fake)
         return;
 
-    sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), sys->d3d_dev, fmt_in);
-    if (sys->tonemapProc == NULL)
+#ifdef HAVE_DXGI1_6_H
+    { // check the main display is in HDR mode
+    HRESULT hr;
+
+    ComPtr<IDXGIAdapter> adapter;
+    ComPtr<IDXGIFactory2> factory;
+    ComPtr<IDXGIOutput> dxgiOutput;
+    ComPtr<IDXGIOutput6> dxgiOutput6;
+    DXGI_OUTPUT_DESC1 desc1;
+
+    hr = CreateDXGIFactory1(IID_GRAPHICS_PPV_ARGS(factory.GetAddressOf()));
+    if (FAILED(hr))
+        goto error;
+    UINT adapter_index = 0;
+    hr = factory->EnumAdapters(adapter_index, adapter.GetAddressOf());
+    if (FAILED(hr))
+        goto error;
+    UINT output_index = 0;
+    hr = adapter->EnumOutputs(output_index, dxgiOutput.GetAddressOf());
+    if (FAILED(hr))
+        goto error;
+    hr = dxgiOutput.As(&dxgiOutput6);
+    if (FAILED(hr))
+        goto error;
+    hr = dxgiOutput6->GetDesc1(&desc1);
+    if (FAILED(hr))
+        goto error;
+    if (desc1.ColorSpace != DXGI_COLOR_SPACE_RGB_FULL_G2084_NONE_P2020)
     {
-        sys->hdrMode = hdr_Auto;
-        msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
+        msg_Warn(vd, "not an HDR display");
+        goto error;
+    }
+    }
+#endif
+
+    sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), sys->d3d_dev, fmt_in);
+    if (sys->tonemapProc != NULL)
+    {
+        msg_Dbg(vd, "Using tonemapper");
         return;
     }
 
-    msg_Dbg(vd, "Using tonemapper");
+error:
+    sys->hdrMode = hdr_Auto;
+    msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
 }
 
 static const auto ops = []{
