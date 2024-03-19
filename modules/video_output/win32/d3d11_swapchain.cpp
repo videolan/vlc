@@ -49,6 +49,7 @@ struct d3d11_local_swapchain
 
     vlc_object_t           *obj = nullptr;
     d3d11_device_t         *d3d_dev = nullptr;
+    bool                   match_display = true;
 
     ComPtr<ID3D11RenderTargetView> swapchainTargetView[DXGI_MAX_RENDER_TARGET];
 };
@@ -114,12 +115,8 @@ static bool UpdateSwapchain( d3d11_local_swapchain *display, const libvlc_video_
         return false;
     }
 
-    char *psz_hdr = var_InheritString(display->obj, "d3d11-hdr-mode");
-    auto hdrMode = HdrModeFromString(vlc_object_logger(display->obj), psz_hdr);
-    free(psz_hdr);
-
     if (!DXGI_UpdateSwapChain( display->sys, dxgiadapter.Get(), display->d3d_dev->d3ddevice,
-                               newPixelFormat, cfg, hdrMode == hdr_Auto ))
+                               newPixelFormat, cfg, display->match_display ))
         return false;
 
     ComPtr<ID3D11Resource> pBackBuffer;
@@ -189,7 +186,7 @@ bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *out )
     return true;
 }
 
-void *D3D11_CreateLocalSwapchain(vlc_object_t *o, d3d11_device_t *d3d_dev, dxgi_swapchain *sys)
+void *D3D11_CreateLocalSwapchain(vlc_object_t *o, d3d11_device_t *d3d_dev, dxgi_swapchain *sys, bool match_display)
 {
     d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
     if (unlikely(display == NULL))
@@ -198,6 +195,7 @@ void *D3D11_CreateLocalSwapchain(vlc_object_t *o, d3d11_device_t *d3d_dev, dxgi_
     display->sys = sys;
     display->obj = o;
     display->d3d_dev = d3d_dev;
+    display->match_display = match_display;
 
     return display;
 }

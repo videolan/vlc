@@ -95,27 +95,4 @@ void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
 
 void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *);
 
-enum d3d11_hdr
-{
-    hdr_Auto,
-    hdr_Never,
-    hdr_Always,
-    hdr_Fake,
-};
-
-static inline enum d3d11_hdr HdrModeFromString(vlc_logger *logger, const char *psz_hdr)
-{
-    if (strcmp("auto", psz_hdr) == 0)
-        return hdr_Auto;
-    if (strcmp("never", psz_hdr) == 0)
-        return hdr_Never;
-    if (strcmp("always", psz_hdr) == 0)
-        return hdr_Always;
-    if (strcmp("generate", psz_hdr) == 0)
-        return hdr_Fake;
-
-    vlc_warning(logger, "unknown HDR mode %s, using auto mode", psz_hdr);
-    return hdr_Auto;
-}
-
 #endif /* VLC_D3D11_SHADERS_H */

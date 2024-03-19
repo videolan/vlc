@@ -106,6 +106,14 @@ enum d3d11_upscale
     upscale_SuperResolution,
 };
 
+enum d3d11_hdr
+{
+    hdr_Auto,
+    hdr_Never,
+    hdr_Always,
+    hdr_Fake,
+};
+
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area = {};
@@ -404,6 +412,21 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
+static enum d3d11_hdr HdrModeFromString(vlc_logger *logger, const char *psz_hdr)
+{
+    if (strcmp("auto", psz_hdr) == 0)
+        return hdr_Auto;
+    if (strcmp("never", psz_hdr) == 0)
+        return hdr_Never;
+    if (strcmp("always", psz_hdr) == 0)
+        return hdr_Always;
+    if (strcmp("generate", psz_hdr) == 0)
+        return hdr_Fake;
+
+    vlc_warning(logger, "unknown HDR mode %s, using auto mode", psz_hdr);
+    return hdr_Auto;
+}
+
 static const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
@@ -476,7 +499,8 @@ static int Open(vout_display_t *vd,
         if (unlikely(swap == NULL))
             goto error;
 
-        sys->outside_opaque = D3D11_CreateLocalSwapchain(VLC_OBJECT(vd), sys->d3d_dev, swap);
+        sys->outside_opaque = D3D11_CreateLocalSwapchain(VLC_OBJECT(vd), sys->d3d_dev, swap,
+                                                         sys->hdrMode != hdr_Never && sys->hdrMode != hdr_Always);
         if (unlikely(sys->outside_opaque == NULL))
         {
             DXGI_LocalSwapchainCleanupDevice(swap);
