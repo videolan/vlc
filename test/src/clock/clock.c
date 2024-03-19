@@ -357,6 +357,11 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         system_start = scenario->system_start;
         stream_start = scenario->stream_start;
     }
+
+    vlc_clock_Start(input, system_start, stream_start);
+
+    if (scenario->type == CLOCK_SCENARIO_UPDATE)
+        vlc_clock_Start(master, system_start, stream_start);
     vlc_clock_main_Unlock(mainclk);
 
     const struct clock_ctx ctx = {
@@ -552,8 +557,7 @@ static void normal_check(const struct clock_ctx *ctx, size_t update_count,
         {
             case TRACER_EVENT_TYPE_UPDATE:
                 assert(event.update.coeff == 1.0f);
-                assert(event.update.offset ==
-                       scenario->system_start - scenario->stream_start);
+                assert(event.update.offset == 0);
                 break;
             case TRACER_EVENT_TYPE_RENDER_VIDEO:
                 if (last_video_date != VLC_TICK_INVALID)
@@ -687,6 +691,7 @@ static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
     vlc_tick_t system = system_start;
 
     vlc_clock_Lock(updater);
+    vlc_clock_Start(updater, ctx->system_start, ctx->stream_start);
     vlc_clock_Update(updater, system, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
 
@@ -736,6 +741,7 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     vlc_clock_main_Unlock(ctx->mainclk);
 
     vlc_clock_Lock(updater);
+    vlc_clock_Start(updater, ctx->system_start, ctx->stream_start);
     vlc_clock_Update(updater, ctx->system_start, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
 
