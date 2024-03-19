@@ -1,6 +1,6 @@
 lua_dep = dependency(
   [
-    'lua',
+    'lua', 'Lua',
     'lua-5.4', 'lua54',
     'lua-5.3', 'lua53',
     'lua-5.2', 'lua52',
