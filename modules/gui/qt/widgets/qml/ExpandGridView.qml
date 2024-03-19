@@ -63,7 +63,6 @@ FocusScope {
     // default is true
     property bool reuseItems: true
 
-    property int rowX: 0
     property int horizontalSpacing: VLCStyle.column_spacing
     property int verticalSpacing: VLCStyle.column_spacing
 
@@ -910,8 +909,6 @@ FocusScope {
                 return
             else if (!root._isInitialised)
                 return
-
-            root.rowX = getItemPos(0)[0]
 
             const expandItemGridId = getExpandItemGridId()
 

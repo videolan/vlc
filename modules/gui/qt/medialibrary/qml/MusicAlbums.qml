@@ -31,8 +31,6 @@ MainInterface.MainViewLoader {
 
     // Properties
 
-    property var gridViewRowX: currentItem?.rowX ?? 0
-
     readonly property var currentIndex: currentItem?.currentIndex ?? - 1
 
     property Component header: null
