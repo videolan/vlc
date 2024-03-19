@@ -1361,7 +1361,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
     }
 
 #ifdef HAVE_DXGI1_6_H
-    if (sys->hdrMode == hdr_Auto) // match the screen
+    if (sys->hdrMode == hdr_Auto || sys->hdrMode == hdr_Fake) // match the screen
     if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->dxgiswapChain, &dxgiOutput )))
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
