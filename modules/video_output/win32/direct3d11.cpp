@@ -427,6 +427,23 @@ static enum d3d11_hdr HdrModeFromString(vlc_logger *logger, const char *psz_hdr)
     return hdr_Auto;
 }
 
+static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_in)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    if (sys->hdrMode != hdr_Fake)
+        return;
+
+    sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), sys->d3d_dev, fmt_in);
+    if (sys->tonemapProc == NULL)
+    {
+        sys->hdrMode = hdr_Auto;
+        msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
+        return;
+    }
+
+    msg_Dbg(vd, "Using tonemapper");
+}
+
 static const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
@@ -444,6 +461,10 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
     vd->sys = sys;
+
+    char *psz_hdr = var_InheritString(vd, "d3d11-hdr-mode");
+    sys->hdrMode = HdrModeFromString(vlc_object_logger(vd), psz_hdr);
+    free(psz_hdr);
 
     d3d11_decoder_device_t *dev_sys = NULL;
 
@@ -472,6 +493,8 @@ static int Open(vout_display_t *vd,
         dev_sys = sys->local_d3d_dev;
     }
     sys->d3d_dev = &dev_sys->d3d_dev;
+
+    InitTonemapProcessor(vd, vd->source);
 
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
@@ -871,23 +894,6 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 8, DXGI_CHROMA_CPU, supportFlags );
 }
 
-static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_in)
-{
-    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    if (sys->hdrMode != hdr_Fake)
-        return;
-
-    sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), sys->d3d_dev, fmt_in);
-    if (sys->tonemapProc == NULL)
-    {
-        sys->hdrMode = hdr_Auto;
-        msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
-        return;
-    }
-
-    msg_Dbg(vd, "Using tonemapper");
-}
-
 static void InitScaleProcessor(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
@@ -909,12 +915,6 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     video_format_t fmt;
-
-    char *psz_hdr = var_InheritString(vd, "d3d11-hdr-mode");
-    sys->hdrMode = HdrModeFromString(vlc_object_logger(vd), psz_hdr);
-    free(psz_hdr);
-
-    InitTonemapProcessor(vd, vd->source);
 
     video_format_Copy(&fmt, vd->source);
     video_format_Copy(&sys->picQuad.quad_fmt, &fmt);
