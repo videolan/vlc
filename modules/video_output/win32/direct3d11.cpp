@@ -464,17 +464,25 @@ static int Open(vout_display_t *vd,
         }
 
         /* use our internal swapchain callbacks */
+        dxgi_swapchain *swap = nullptr;
 #if defined(HAVE_DCOMP_H)
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_DCOMP)
-            sys->outside_opaque =
-                D3D11_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
-                                                      vd->cfg->window->display.dcomp_device,
-                                                      vd->cfg->window->handle.dcomp_visual, sys->d3d_dev);
+            swap = DXGI_CreateLocalSwapchainHandleDComp(VLC_OBJECT(vd),
+                                                        vd->cfg->window->display.dcomp_device,
+                                                        vd->cfg->window->handle.dcomp_visual);
         else
 #endif //HAVE_DCOMP_H
-            sys->outside_opaque      = D3D11_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->area), sys->d3d_dev);
-        if (unlikely(sys->outside_opaque == NULL))
+            swap = DXGI_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->area));
+        if (unlikely(swap == NULL))
             goto error;
+
+        sys->outside_opaque = D3D11_CreateLocalSwapchain(VLC_OBJECT(vd), sys->d3d_dev, swap);
+        if (unlikely(sys->outside_opaque == NULL))
+        {
+            DXGI_LocalSwapchainCleanupDevice(swap);
+            goto error;
+        }
+
         sys->updateOutputCb      = D3D11_LocalSwapchainUpdateOutput;
         sys->swapCb              = D3D11_LocalSwapchainSwap;
         sys->startEndRenderingCb = D3D11_LocalSwapchainStartEndRendering;

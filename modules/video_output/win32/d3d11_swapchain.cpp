@@ -189,36 +189,15 @@ bool D3D11_LocalSwapchainSelectPlane( void *opaque, size_t plane, void *out )
     return true;
 }
 
-void *D3D11_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd, d3d11_device_t *d3d_dev)
+void *D3D11_CreateLocalSwapchain(vlc_object_t *o, d3d11_device_t *d3d_dev, dxgi_swapchain *sys)
 {
     d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
     if (unlikely(display == NULL))
         return NULL;
 
-    display->sys = DXGI_CreateLocalSwapchainHandleHwnd(o, hwnd);
-    if (unlikely(display->sys == NULL))
-        return NULL;
-
+    display->sys = sys;
     display->obj = o;
     display->d3d_dev = d3d_dev;
 
     return display;
 }
-
-#if defined(HAVE_DCOMP_H)
-void *D3D11_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual, d3d11_device_t *d3d_dev)
-{
-    d3d11_local_swapchain *display = new (std::nothrow) d3d11_local_swapchain();
-    if (unlikely(display == NULL))
-        return NULL;
-
-    display->sys = DXGI_CreateLocalSwapchainHandleDComp(o, dcompDevice, dcompVisual);
-    if (unlikely(display->sys == NULL))
-        return NULL;
-
-    display->obj = o;
-    display->d3d_dev = d3d_dev;
-
-    return display;
-}
-#endif // HAVE_DCOMP_H
