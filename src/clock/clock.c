@@ -624,26 +624,27 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
     assert(paused == (main_clock->pause_date == VLC_TICK_INVALID));
 
     if (paused)
-        main_clock->pause_date = now;
-    else
     {
-        /**
-         * Only apply a delay if the clock has a reference point to avoid
-         * messing up the timings if the stream was paused then seeked
-         */
-        const vlc_tick_t delay = now - main_clock->pause_date;
-        if (main_clock->offset != VLC_TICK_INVALID)
-        {
-            main_clock->last.system += delay;
-            main_clock->offset += delay;
-        }
-        if (main_clock->first_pcr.system != VLC_TICK_INVALID)
-            main_clock->first_pcr.system += delay;
-        if (main_clock->wait_sync_ref.system != VLC_TICK_INVALID)
-            main_clock->wait_sync_ref.system += delay;
-        main_clock->pause_date = VLC_TICK_INVALID;
-        vlc_cond_broadcast(&main_clock->cond);
+        main_clock->pause_date = now;
+        return;
     }
+
+    /**
+     * Only apply a delay if the clock has a reference point to avoid
+     * messing up the timings if the stream was paused then seeked
+     */
+    const vlc_tick_t delay = now - main_clock->pause_date;
+    if (main_clock->offset != VLC_TICK_INVALID)
+    {
+        main_clock->last.system += delay;
+        main_clock->offset += delay;
+    }
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+        main_clock->first_pcr.system += delay;
+    if (main_clock->wait_sync_ref.system != VLC_TICK_INVALID)
+        main_clock->wait_sync_ref.system += delay;
+    main_clock->pause_date = VLC_TICK_INVALID;
+    vlc_cond_broadcast(&main_clock->cond);
 }
 
 void vlc_clock_main_Delete(vlc_clock_main_t *main_clock)
