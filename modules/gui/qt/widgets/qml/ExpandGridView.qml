@@ -559,9 +559,6 @@ FocusScope {
         item.x = x
         item.y = y
         item.z = _indexToZ(id)
-
-        // update required property (do we need this??)
-        item.selected = selectionModel.isSelected(id)
     }
 
     function _repositionItem(id, x, y) {
