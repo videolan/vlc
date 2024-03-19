@@ -85,6 +85,9 @@ struct clock_ctx
     vlc_clock_t *master;
     vlc_clock_t *slave;
 
+    vlc_tick_t system_start;
+    vlc_tick_t stream_start;
+
     const struct clock_scenario *scenario;
 };
 
@@ -339,6 +342,14 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         vlc_clock_main_SetInputDejitter(mainclk, 0);
         vlc_clock_main_SetDejitter(mainclk, 0);
     }
+
+    vlc_tick_t system_start = VLC_TICK_0 + VLC_TICK_FROM_MS(15000);
+    vlc_tick_t stream_start = VLC_TICK_0 + VLC_TICK_FROM_MS(15000);
+    if (scenario->type == CLOCK_SCENARIO_UPDATE)
+    {
+        system_start = scenario->system_start;
+        stream_start = scenario->stream_start;
+    }
     vlc_clock_main_Unlock(mainclk);
 
     const struct clock_ctx ctx = {
@@ -346,6 +357,8 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
         .master = master,
         .slave = slave,
         .scenario = scenario,
+        .system_start = system_start,
+        .stream_start = stream_start,
     };
 
     if (scenario->type == CLOCK_SCENARIO_RUN)
@@ -658,12 +671,12 @@ static void drift_sudden_update(const struct clock_ctx *ctx, size_t index,
 
 static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
 {
-    const vlc_tick_t system_start = vlc_tick_now();
+    const vlc_tick_t system_start = ctx->system_start;
     const vlc_tick_t pause_duration = VLC_TICK_FROM_MS(20);
     vlc_tick_t system = system_start;
 
     vlc_clock_Lock(updater);
-    vlc_clock_Update(updater, system, 1, 1.0f);
+    vlc_clock_Update(updater, system, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
 
     system += VLC_TICK_FROM_MS(10);
@@ -680,7 +693,7 @@ static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
     system += 1;
 
     vlc_clock_Lock(ctx->slave);
-    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(ctx->slave);
     assert(converted == system_start + pause_duration);
 }
@@ -697,11 +710,11 @@ static void monotonic_pause_run(const struct clock_ctx *ctx)
 
 static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
 {
-    const vlc_tick_t system_start = vlc_tick_now();
+    const vlc_tick_t system_start = ctx->system_start;
     vlc_tick_t system = system_start;
 
     vlc_clock_Lock(updater);
-    vlc_clock_Update(updater, system_start, 1, 1.0f);
+    vlc_clock_Update(updater, ctx->system_start, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
 
     system += VLC_TICK_FROM_MS(10);
@@ -712,7 +725,7 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     system += 1;
 
     vlc_clock_Lock(ctx->slave);
-    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, 1, 1.0f);
+    vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(ctx->slave);
     assert(converted == system_start);
 }
@@ -733,7 +746,7 @@ static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
 
 #define INIT_SYSTEM_STREAM_TIMING(duration_, increment_, video_fps_) \
     .stream_start = VLC_TICK_0 + VLC_TICK_FROM_MS(31000000), \
-    .system_start = VLC_TICK_INVALID, \
+    .system_start = VLC_TICK_0, \
     .duration = duration_, \
     .stream_increment = increment_, \
     .video_fps = video_fps_
