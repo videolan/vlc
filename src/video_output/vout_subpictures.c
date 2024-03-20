@@ -203,9 +203,10 @@ static void spu_channel_EarlyRemoveLate(spu_private_t *sys,
     for (size_t i = 0; i < channel->entries.size - 1; i++)
     {
         const spu_render_entry_t *entry = &channel->entries.data[i];
-        if(spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
+        if(!entry->subpic->b_ephemer &&
+           spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
             continue;
-        if(minactivespu <= entry->start)
+        if(minactivespu >= entry->start)
         {
             minactivespu = entry->start;
             if(minactivespuorder > entry->subpic->i_order)
