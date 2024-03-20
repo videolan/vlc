@@ -553,8 +553,8 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
 
             ext.function = kIntelVpeFnScaling;
             param = upscale ? kIntelVpeScalingSuperResolution : kIntelVpeScalingDefault;
-            hr = scaleProc->d3dvidctx->VideoProcessorSetOutputExtension(
-                scaleProc->processor.Get(),
+            hr = scaleProc->d3dvidctx->VideoProcessorSetStreamExtension(
+                scaleProc->processor.Get(), 0,
                 &GUID_INTEL_VPE_INTERFACE, sizeof(ext), &ext);
             if (FAILED(hr)) {
                 msg_Err(vd, "Failed to set the Intel VPE scaling type. (hr=0x%lX)", hr);
