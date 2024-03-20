@@ -3141,6 +3141,7 @@ const char vlc_module_name[] = MODULE_STRING;
 
 struct aout_sys
 {
+    vlc_tick_t first_pts;
     vlc_tick_t first_play_date;
     vlc_tick_t pos;
 };
@@ -3150,9 +3151,14 @@ static void aout_Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     struct aout_sys *sys = aout->sys;
 
     if (sys->first_play_date == VLC_TICK_INVALID)
+    {
+        assert(sys->first_pts == VLC_TICK_INVALID);
         sys->first_play_date = date;
+        sys->first_pts = block->i_pts;
+    }
 
-    aout_TimingReport(aout, sys->first_play_date + sys->pos - VLC_TICK_0, sys->pos);
+    aout_TimingReport(aout, sys->first_play_date + sys->pos - VLC_TICK_0,
+                      sys->first_pts + sys->pos);
     sys->pos += block->i_length;
     block_Release(block);
 }
@@ -3161,7 +3167,7 @@ static void aout_Flush(audio_output_t *aout)
 {
     struct aout_sys *sys = aout->sys;
     sys->pos = 0;
-    sys->first_play_date = VLC_TICK_INVALID;
+    sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
 }
 
 static int aout_Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)

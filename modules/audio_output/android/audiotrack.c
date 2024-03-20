@@ -119,6 +119,7 @@ typedef struct
     size_t timing_report_last_written_bytes;
     /* Number of bytes to write before sending a timing report */
     size_t timing_report_delay_bytes;
+    vlc_tick_t first_pts;
 } aout_sys_t;
 
 
@@ -574,6 +575,7 @@ AudioTrack_Reset( JNIEnv *env, aout_stream_t *stream )
     p_sys->i_samples_written = 0;
     p_sys->timing_report_last_written_bytes = 0;
     p_sys->timing_report_delay_bytes = 0;
+    p_sys->first_pts = VLC_TICK_INVALID;
 }
 
 static vlc_tick_t
@@ -1216,7 +1218,8 @@ AudioTrack_ReportTiming( JNIEnv *env, aout_stream_t *stream )
                            + (p_sys->timestamp.i_frame_wrap_count << 32);
 
         aout_stream_TimingReport( stream, frame_date_us,
-                                  FRAMES_TO_US( frame_pos ) );
+                                  FRAMES_TO_US( frame_pos ) +
+                                  p_sys->first_pts );
         return VLC_SUCCESS;
     }
 
@@ -1411,6 +1414,9 @@ Play( aout_stream_t *stream, block_t *p_buffer, vlc_tick_t i_date )
        aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
                             p_sys->i_chans_to_reorder, p_sys->p_chan_table,
                             p_sys->fmt.i_format );
+
+    if( p_sys->first_pts == VLC_TICK_INVALID )
+        p_sys->first_pts = p_buffer->i_pts;
 
     vlc_frame_ChainLastAppend(&p_sys->frame_last, p_buffer);
     vlc_cond_signal(&p_sys->thread_cond);

@@ -317,15 +317,13 @@ struct audio_output
  * \param aout the audio output instance
  * \param system_ts system timestamp when audio_ts is played, based on
  * vlc_tick_now(), can be now, in the past or in the future.
- * \param audio_ts audio timestamp played at system_ts, starts at 0 for the
- * first sample played (must not take block->i_pts, passed in play(), into
- * account).
- *
+ * \param audio_pts audio timestamp played at system_ts, starts at block->i_pts
+ * for the first sample played.
  */
 static inline void aout_TimingReport(audio_output_t *aout, vlc_tick_t system_ts,
-                                     vlc_tick_t audio_ts)
+                                     vlc_tick_t audio_pts)
 {
-    aout->events->timing_report(aout, system_ts, audio_ts);
+    aout->events->timing_report(aout, system_ts, audio_pts);
 }
 
 /**

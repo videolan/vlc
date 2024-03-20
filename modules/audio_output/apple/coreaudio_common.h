@@ -65,6 +65,7 @@ struct aout_sys_common
     size_t              i_out_size;
     /* Size written via the render callback */
     uint64_t            i_total_bytes;
+    vlc_tick_t first_pts;
     /* Date when the data callback should start to process audio */
     vlc_tick_t first_play_date;
     /* Bytes written since the last timing report */

@@ -80,6 +80,7 @@ typedef struct
     } fifo;
 
     pa_usec_t flush_rt;
+    vlc_tick_t first_pts;
 
     pa_volume_t volume_force; /**< Forced volume (stream must be NULL) */
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
@@ -286,7 +287,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (sys->start_date_reached
      && likely(rt >= sys->flush_rt + silence_us))
     {
-        vlc_tick_t audio_ts = VLC_TICK_0 +
+        vlc_tick_t audio_ts = sys->first_pts +
             VLC_TICK_FROM_US(rt - sys->flush_rt - silence_us);
 
         aout_TimingReport(aout, sys->timing_system_ts, audio_ts);
@@ -650,6 +651,9 @@ static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 
     if (!sys->start_date_reached)
     {
+        if (sys->first_pts == VLC_TICK_INVALID)
+            sys->first_pts = block->i_pts;
+
         vlc_tick_t now = vlc_tick_now();
         sys->start_date = date
                         - pa_bytes_to_usec(sys->fifo.size, ss);
@@ -737,6 +741,7 @@ static void Flush(audio_output_t *aout)
     const pa_timing_info *ti = pa_stream_get_timing_info(s);
     if (ti != NULL && !ti->read_index_corrupt)
         sys->flush_rt = pa_bytes_to_usec(ti->read_index, ss);
+    sys->first_pts = VLC_TICK_INVALID;
 
     pa_threaded_mainloop_unlock(sys->mainloop);
 }
@@ -981,6 +986,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     sys->draining = false;
     pa_cvolume_init(&sys->cvolume);
     sys->flush_rt = 0;
+    sys->first_pts = VLC_TICK_INVALID;
 
     sys->start_date_reached = false;
     sys->start_date = VLC_TICK_INVALID;

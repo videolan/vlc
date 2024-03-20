@@ -268,7 +268,8 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
         p_sys->timing_report_delay_bytes =
             TicksToBytes(p_sys, TIMING_REPORT_DELAY_TICKS);
 
-        vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes);
+        vlc_tick_t pos_ticks = BytesToTicks(p_sys, p_sys->i_total_bytes)
+                             + p_sys->first_pts;
         aout_TimingReport(p_aout, end_ticks + GetLatency(p_aout), pos_ticks);
     }
 
@@ -287,6 +288,7 @@ ca_Flush(audio_output_t *p_aout)
     p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
     p_sys->first_play_date = VLC_TICK_INVALID;
+    p_sys->first_pts = VLC_TICK_INVALID;
     p_sys->timing_report_delay_bytes =
     p_sys->timing_report_last_written_bytes = 0;
 
@@ -334,6 +336,8 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
     if (!p_sys->started)
     {
         vlc_tick_t now = vlc_tick_now();
+        if (p_sys->first_pts == VLC_TICK_INVALID)
+            p_sys->first_pts = p_block->i_pts;
         p_sys->first_play_date = date - BytesToTicks(p_sys, p_sys->i_out_size);
 
         if (p_sys->first_play_date > now)
@@ -374,6 +378,7 @@ ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
     p_sys->i_out_size = 0;
     p_sys->i_total_bytes = 0;
     p_sys->first_play_date = VLC_TICK_INVALID;
+    p_sys->first_pts = VLC_TICK_INVALID;
 
     p_sys->i_rate = fmt->i_rate;
     p_sys->i_bytes_per_frame = fmt->i_bytes_per_frame;

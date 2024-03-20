@@ -62,6 +62,7 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS))
     block_t **_outChainLast;
 
     int64_t _ptsSamples;
+    vlc_tick_t _firstPts;
     unsigned _sampleRate;
     BOOL _stopped;
 }
@@ -204,6 +205,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
         [self stopSyncRenderer];
 
     _ptsSamples = -1;
+    _firstPts = VLC_TICK_INVALID;
 }
 
 - (void)pause:(BOOL)pause date:(vlc_tick_t)date
@@ -216,10 +218,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
 - (void)whenTimeObserved:(CMTime) time
 {
+    assert(_firstPts != VLC_TICK_INVALID);
+
     if (time.value == 0)
         return;
     vlc_tick_t system_now = vlc_tick_now();
-    vlc_tick_t pos_ticks = [VLCAVSample CMTimeTotick:time];
+    vlc_tick_t pos_ticks = [VLCAVSample CMTimeTotick:time] + _firstPts;
 
     aout_TimingReport(_aout, system_now, pos_ticks);
 }
@@ -266,6 +270,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
             [weakSelf whenDataReady];
         }];
 
+        _firstPts = block->i_pts;
         const CMTime interval = CMTimeMake(CLOCK_FREQ, CLOCK_FREQ);
         _observer = [_sync addPeriodicTimeObserverForInterval:interval
                                                         queue:_timeQueue
@@ -415,6 +420,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     _stopped = NO;
 
     _ptsSamples = -1;
+    _firstPts = VLC_TICK_INVALID;
     _sampleRate = fmt->i_rate;
     _bytesPerFrame = desc.mBytesPerFrame;
 

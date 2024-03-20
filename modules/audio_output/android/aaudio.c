@@ -80,6 +80,7 @@ struct sys
     size_t timing_report_last_written_bytes;
     /* Number of bytes to write before sending a timing report */
     size_t timing_report_delay_bytes;
+    vlc_tick_t first_pts;
 };
 
 /* dlopen/dlsym symbols */
@@ -454,7 +455,8 @@ DataCallback(AAudioStream *as, void *user, void *data_, int32_t num_frames)
             /* Add the start silence to the system time and don't subtract
              * it from pos_ticks to avoid (unlikely) negatives ts */
             system_ts += BytesToTicks(sys, sys->start_silence_bytes);
-            aout_stream_TimingReport(stream, system_ts, pos_ticks);
+            aout_stream_TimingReport(stream, system_ts,
+                                     pos_ticks + sys->first_pts);
         }
 
         memcpy(data, f->p_buffer, tocopy);
@@ -620,6 +622,8 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
     {
         vlc_tick_t now = vlc_tick_now();
         sys->first_play_date = date - BytesToTicks(sys, sys->frames_total_bytes);
+        if (sys->first_pts == VLC_TICK_INVALID)
+            sys->first_pts = frame->i_pts;
 
         if (sys->first_play_date > now)
             msg_Dbg(stream, "deferring start (%"PRId64" us)",
@@ -713,7 +717,7 @@ Flush(aout_stream_t *stream)
 
     sys->started = false;
     sys->draining = false;
-    sys->first_play_date = VLC_TICK_INVALID;
+    sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
     sys->start_silence_bytes = 0;
     sys->timing_report_last_written_bytes = 0;
     sys->timing_report_delay_bytes = 0;
@@ -836,7 +840,7 @@ Start(aout_stream_t *stream, audio_sample_format_t *fmt,
     sys->underrun_bytes = 0;
     sys->started = false;
     sys->draining = false;
-    sys->first_play_date = VLC_TICK_INVALID;
+    sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
     sys->timing_report_last_written_bytes = 0;
     sys->timing_report_delay_bytes = 0;
 
