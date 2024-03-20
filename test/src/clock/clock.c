@@ -2,6 +2,10 @@
  * clock/clock.c: test for the vlc clock
  *****************************************************************************
  * Copyright (C) 2023 VLC authors, VideoLAN and Videolabs SAS
+ * Copyright (C) 2024 Videolabs
+ *
+ * Authors: Thomas Guillem <thomas@gllm.fr>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -68,7 +72,10 @@ struct clock_scenario
             void (*check)(const struct clock_ctx *ctx, size_t update_count,
                           vlc_tick_t expected_system_end, vlc_tick_t stream_end);
         };
-        void (*run)(const struct clock_ctx *ctx);
+        struct {
+            void (*run)(const struct clock_ctx *ctx);
+            bool disable_jitter;
+        };
     };
 };
 
@@ -326,6 +333,12 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     vlc_clock_t *slave = vlc_clock_main_CreateSlave(mainclk, slave_name, VIDEO_ES,
                                                     NULL, NULL);
     assert(slave != NULL);
+    if (scenario->type == CLOCK_SCENARIO_RUN && scenario->disable_jitter)
+    {
+        /* Don't add any delay for the first monotonic ref point  */
+        vlc_clock_main_SetInputDejitter(mainclk, 0);
+        vlc_clock_main_SetDejitter(mainclk, 0);
+    }
     vlc_clock_main_Unlock(mainclk);
 
     const struct clock_ctx ctx = {
@@ -679,12 +692,6 @@ static void master_pause_run(const struct clock_ctx *ctx)
 
 static void monotonic_pause_run(const struct clock_ctx *ctx)
 {
-    /* Don't add any delay for the first monotonic ref point  */
-    vlc_clock_main_Lock(ctx->mainclk);
-    vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
-    vlc_clock_main_SetDejitter(ctx->mainclk, 0);
-    vlc_clock_main_Unlock(ctx->mainclk);
-
     pause_common(ctx, ctx->slave);
 }
 
@@ -717,12 +724,6 @@ static void master_convert_paused_run(const struct clock_ctx *ctx)
 
 static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
 {
-    /* Don't add any delay for the first monotonic ref point  */
-    vlc_clock_main_Lock(ctx->mainclk);
-    vlc_clock_main_SetInputDejitter(ctx->mainclk, 0);
-    vlc_clock_main_SetDejitter(ctx->mainclk, 0);
-    vlc_clock_main_Unlock(ctx->mainclk);
-
     convert_paused_common(ctx, ctx->slave);
 }
 
@@ -811,6 +812,7 @@ static struct clock_scenario clock_scenarios[] = {
     .desc = "pause + resume is delaying the next conversion",
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_pause_run,
+    .disable_jitter = true,
 },
 {
     .name = "master_convert_paused",
@@ -823,6 +825,7 @@ static struct clock_scenario clock_scenarios[] = {
     .desc = "it is possible de convert ts while paused",
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_convert_paused_run,
+    .disable_jitter = true,
 },
 };
 
