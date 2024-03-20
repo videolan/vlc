@@ -1024,7 +1024,7 @@ static void RequestReload( vlc_input_decoder_t *p_owner )
     atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
 }
 
-static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
+static int DecoderWaitUnblock(vlc_input_decoder_t *p_owner, vlc_tick_t date)
 {
     struct vlc_tracer *tracer = vlc_object_get_tracer(VLC_OBJECT(&p_owner->dec));
     vlc_fifo_Assert(p_owner->p_fifo);
@@ -1045,6 +1045,10 @@ static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
         p_owner->out_started = true;
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "DEC", p_owner->psz_id, "stop wait");
+
+        vlc_clock_Lock(p_owner->p_clock);
+        vlc_clock_Start(p_owner->p_clock, vlc_tick_now(), date);
+        vlc_clock_Unlock(p_owner->p_clock);
     }
 
     if (p_owner->flushing)
@@ -1364,12 +1368,13 @@ static int ModuleThread_PlayVideo( vlc_input_decoder_t *p_owner, picture_t *p_pi
     }
     else
     {
-        int ret = DecoderWaitUnblock(p_owner);
+        int ret = DecoderWaitUnblock(p_owner, p_picture->date);
         if (ret != VLC_SUCCESS)
         {
             picture_Release(p_picture);
             return ret;
         }
+
     }
 
     if( unlikely(p_owner->paused) && likely(p_owner->frames_countdown > 0) )
@@ -1506,7 +1511,7 @@ static int ModuleThread_PlayAudio( vlc_input_decoder_t *p_owner, vlc_frame_t *p_
         vlc_aout_stream_Flush( p_astream );
     }
 
-    int ret = DecoderWaitUnblock(p_owner);
+    int ret = DecoderWaitUnblock(p_owner, p_audio->i_pts);
     if (ret != VLC_SUCCESS)
     {
         block_Release(p_audio);
@@ -1573,7 +1578,7 @@ static void ModuleThread_PlaySpu( vlc_input_decoder_t *p_owner, subpicture_t *p_
     }
 
     /* */
-    int ret = DecoderWaitUnblock(p_owner);
+    int ret = DecoderWaitUnblock(p_owner, p_subpic->i_start);
 
     if (ret != VLC_SUCCESS || p_subpic->i_start == VLC_TICK_INVALID)
     {
