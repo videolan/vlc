@@ -124,8 +124,8 @@ d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev, vl
 
         hr = d3dvidctx->VideoProcessorGetStreamExtension(processor.Get(),
                     0, &kNvidiaPPEInterfaceGUID, sizeof(available), &available);
-        d3d11_device_unlock(d3d_dev);
 checked:
+        d3d11_device_unlock(d3d_dev);
         canProcess = available != 0;
     }
     else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL)
