@@ -130,8 +130,7 @@ checked:
     }
     else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL)
     {
-        // TODO refine which GPU and drivers can do it
-        canProcess = true;
+        canProcess = true; // detection doesn't work
     }
 #ifdef HAVE_AMF_SCALER
     else if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_AMD)
