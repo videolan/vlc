@@ -150,6 +150,7 @@
         <file alias="MainViewLoader.qml">maininterface/qml/MainViewLoader.qml</file>
     </qresource>
     <qresource prefix="/widgets">
+        <file alias="LabelExt.qml">widgets/qml/LabelExt.qml</file>
         <file alias="EmptyLabel.qml">widgets/qml/EmptyLabel.qml</file>
         <file alias="EmptyLabelButton.qml">widgets/qml/EmptyLabelButton.qml</file>
         <file alias="EmptyLabelHint.qml">widgets/qml/EmptyLabelHint.qml</file>

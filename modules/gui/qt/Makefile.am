@@ -1030,6 +1030,7 @@ libqt_plugin_la_QML = \
 	util/qml/NativeMenu.qml \
 	util/qml/MLContextMenu.qml \
 	util/qml/FadeControllerStateGroup.qml \
+	widgets/qml/LabelExt.qml \
 	widgets/qml/ActionButtonOverlay.qml \
 	widgets/qml/ActionButtonPrimary.qml \
 	widgets/qml/BannerTabButton.qml \
