@@ -296,7 +296,6 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 @interface VLCSampleBufferDisplay: NSObject {
     @public
-    vout_display_place_t place;
     filter_t *converter;
 }
     @property (nonatomic) id<VLCOpenGLVideoViewEmbedding> container;
@@ -569,8 +568,6 @@ static void PrepareDisplay (vout_display_t *vd) {
             spuView = nil;
         }
 
-        vout_display_PlacePicture(&sys->place, vd->source, &vd->cfg->display);
-
         sys.displayView = displayView;
         sys.spuView = spuView;
         @synchronized(sys.displayLayer) {
@@ -606,11 +603,7 @@ static int Control (vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_ZOOM:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        {
-            vout_display_PlacePicture(
-                &sys->place, vd->source, &vd->cfg->display);
             break;
-        }
         default:
             msg_Err (vd, "Unhandled request %d", query);
             return VLC_EGENERIC;
