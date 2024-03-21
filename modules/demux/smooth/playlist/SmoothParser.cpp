@@ -58,7 +58,7 @@ static SegmentTimeline *createTimeline(Node *streamIndexNode)
     SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(nullptr);
     if(timeline)
     {
-        std::vector<Node *> chunks = DOMHelper::getElementByTagName(streamIndexNode, "c", true);
+        std::vector<Node *> chunks = DOMHelper::getElementByTagName(streamIndexNode, "c", NS_SMOOTH, true);
         std::vector<Node *>::const_iterator it;
 
         struct
@@ -253,7 +253,7 @@ static void ParseStreamIndex(BasePeriod *period, Node *streamIndexNode, unsigned
 
             unsigned nextid = 1;
             const std::string &type = streamIndexNode->getAttributeValue("Type");
-            std::vector<Node *> qualLevels = DOMHelper::getElementByTagName(streamIndexNode, "QualityLevel", true);
+            std::vector<Node *> qualLevels = DOMHelper::getElementByTagName(streamIndexNode, "QualityLevel", NS_SMOOTH, true);
             std::vector<Node *>::const_iterator it;
             for(it = qualLevels.begin(); it != qualLevels.end(); ++it)
                 ParseQualityLevel(adaptSet, *it, type, nextid++, id, timescale);
@@ -302,7 +302,7 @@ Manifest * ManifestParser::parse()
     {
         period->duration.Set(manifest->duration.Get());
         unsigned nextid = 1;
-        std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", true);
+        std::vector<Node *> streamIndexes = DOMHelper::getElementByTagName(root, "StreamIndex", NS_SMOOTH, true);
         std::vector<Node *>::const_iterator it;
         for(it = streamIndexes.begin(); it != streamIndexes.end(); ++it)
             ParseStreamIndex(period, *it, nextid++);

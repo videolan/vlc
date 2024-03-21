@@ -36,16 +36,16 @@ using namespace adaptive::xml;
 
 const std::string   Node::EmptyString = "";
 
-bool Node::Attribute::matches(const std::string &name) const
+bool Node::Attribute::matches(const std::string &name, const std::string &ns) const
 {
-    return this->name == name;
+    return *this->ns == ns && this->name == name;
 }
 
-Node::Node(std::unique_ptr<std::string> name)
+Node::Node(std::unique_ptr<std::string> name, Namespaces::Ptr ns)
 {
     this->name = std::move(name);
+    this->ns = ns;
 }
-
 
 Node::~Node ()
 {
@@ -63,31 +63,49 @@ void                                Node::addSubNode            (Node *node)
 }
 const std::string&                  Node::getName               () const
 {
-    return *this->name;
+    return *name;
+}
+
+const std::string & Node::getNamespace() const
+{
+    if(ns != nullptr)
+        return *ns;
+    return EmptyString;
 }
 
 bool Node::hasAttribute(const std::string& name) const
 {
+    return hasAttribute(name, EmptyString);
+}
+
+bool Node::hasAttribute(const std::string& name, const std::string &ns) const
+{
     auto it = std::find_if(attributes.cbegin(),attributes.cend(),
-                           [name](const struct Attribute &a)
-                                {return a.name == name;});
+                           [name, ns](const struct Attribute &a)
+                                {return a.name == name && ns == *a.ns;});
     return it != attributes.cend();
 }
 
 const std::string& Node::getAttributeValue(const std::string& key) const
 {
+    return getAttributeValue(key, EmptyString);
+}
+
+const std::string& Node::getAttributeValue(const std::string& key, const std::string &ns) const
+{
     auto it = std::find_if(attributes.cbegin(),attributes.cend(),
-                           [key](const struct Attribute &a)
-                                {return a.name == key;});
+                           [key, ns](const struct Attribute &a)
+                                {return a.name == key && ns == *a.ns;});
     if (it != attributes.cend())
         return (*it).value;
     return EmptyString;
 }
 
-void Node::addAttribute(const std::string& key, const std::string& value)
+void Node::addAttribute(const std::string& key, Namespaces::Ptr ns, const std::string& value)
 {
     struct Attribute attr;
     attr.name = key;
+    attr.ns = ns;
     attr.value = value;
     attributes.push_back(std::move(attr));
 }
@@ -107,7 +125,7 @@ const Node::Attributes& Node::getAttributes() const
     return this->attributes;
 }
 
-bool Node::matches(const std::string &name) const
+bool Node::matches(const std::string &name, const std::string &ns) const
 {
-    return *this->name == name;
+    return *this->ns == ns && *this->name == name;
 }

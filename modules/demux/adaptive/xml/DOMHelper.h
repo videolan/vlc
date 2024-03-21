@@ -37,12 +37,16 @@ namespace adaptive
         class DOMHelper
         {
             public:
-                static std::vector<Node *> getElementByTagName      (Node *root, const std::string& name, bool selfContain);
-                static std::vector<Node *> getChildElementByTagName (Node *root, const std::string& name);
-                static Node*               getFirstChildElementByName( Node *root, const std::string& name );
+                static std::vector<Node *> getElementByTagName      (Node *root, const std::string& name,
+                                                                     const std::string& ns, bool selfContain);
+                static std::vector<Node *> getChildElementByTagName (Node *root, const std::string& name,
+                                                                     const std::string& ns);
+                static Node*               getFirstChildElementByName(Node *root, const std::string& name,
+                                                                      const std::string& ns);
 
             private:
-                static void getElementsByTagName(Node *root, const std::string& name, std::vector<Node *> *elements, bool selfContain);
+                static void getElementsByTagName(Node *root, const std::string& name, const std::string &ns,
+                                                 std::vector<Node *> *elements, bool selfContain);
         };
     }
 }

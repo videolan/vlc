@@ -61,6 +61,8 @@ namespace dash
         using namespace adaptive::playlist;
         using namespace adaptive;
 
+        static const std::string NS_DASH("urn:mpeg:dash:schema:mpd:2011");
+
         class IsoffMainParser
         {
             public:
@@ -71,6 +73,7 @@ namespace dash
 
             private:
                 mpd::Profile getProfile     () const;
+                const std::string & getDASHNamespace() const;
                 void    parseMPDBaseUrl     (MPD *, xml::Node *);
                 void    parseMPDAttributes  (MPD *, xml::Node *);
                 void    parseAdaptationSets (MPD *, xml::Node *periodNode, BasePeriod *period);

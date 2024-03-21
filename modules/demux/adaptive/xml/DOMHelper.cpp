@@ -29,53 +29,56 @@
 
 using namespace adaptive::xml;
 
-std::vector<Node *> DOMHelper::getElementByTagName      (Node *root, const std::string& name, bool selfContain)
+std::vector<Node *> DOMHelper::getElementByTagName(Node *root, const std::string& name,
+                                                   const std::string& ns, bool selfContain)
 {
     std::vector<Node *> elements;
 
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        getElementsByTagName(root->getSubNodes().at(i), name, &elements, selfContain);
+        getElementsByTagName(root->getSubNodes().at(i), name, ns, &elements, selfContain);
     }
 
     return elements;
 }
 
-std::vector<Node *> DOMHelper::getChildElementByTagName (Node *root, const std::string& name)
+std::vector<Node *> DOMHelper::getChildElementByTagName(Node *root, const std::string& name,
+                                                        const std::string& ns)
 {
     std::vector<Node *> elements;
 
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        if( root->getSubNodes().at(i)->getName() == name )
+        if(root->getSubNodes().at(i)->matches(name, ns))
             elements.push_back(root->getSubNodes().at(i));
     }
 
     return elements;
 }
 
-void                DOMHelper::getElementsByTagName     (Node *root, const std::string& name, std::vector<Node*> *elements, bool selfContain)
+void DOMHelper::getElementsByTagName(Node *root, const std::string& name, const std::string &ns,
+                                     std::vector<Node*> *elements, bool selfContain)
 {
-    if(!selfContain && !root->getName().compare(name))
+    if(!selfContain && root->matches(name, ns))
     {
         elements->push_back(root);
         return;
     }
 
-    if(!root->getName().compare(name))
+    if(root->matches(name, ns))
         elements->push_back(root);
 
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        getElementsByTagName(root->getSubNodes().at(i), name, elements, selfContain);
+        getElementsByTagName(root->getSubNodes().at(i), name, ns, elements, selfContain);
     }
 }
 
-Node*           DOMHelper::getFirstChildElementByName( Node *root, const std::string &name )
+Node* DOMHelper::getFirstChildElementByName(Node *root, const std::string &name, const std::string& ns)
 {
     for(size_t i = 0; i < root->getSubNodes().size(); i++)
     {
-        if( root->getSubNodes().at( i )->getName() == name )
+        if(root->getSubNodes().at(i)->matches(name, ns))
             return root->getSubNodes().at( i );
     }
     return nullptr;

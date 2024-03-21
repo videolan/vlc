@@ -83,7 +83,7 @@ static void parseAvailability(MPD *mpd, Node *node, T *s)
 
 void IsoffMainParser::parseMPDBaseUrl(MPD *mpd, Node *root)
 {
-    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL");
+    std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(root, "BaseURL", getDASHNamespace());
 
     for(size_t i = 0; i < baseUrls.size(); i++)
         mpd->addBaseUrl(baseUrls.at(i)->getText());
@@ -97,7 +97,7 @@ MPD * IsoffMainParser::parse()
     if(mpd)
     {
         parseMPDAttributes(mpd, root);
-        parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation"), mpd);
+        parseProgramInformation(DOMHelper::getFirstChildElementByName(root, "ProgramInformation", getDASHNamespace()), mpd);
         parseMPDBaseUrl(mpd, root);
         parsePeriods(mpd, root);
         mpd->addAttribute(new StartnumberAttr(1));
@@ -114,6 +114,9 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     for(auto attr: attributes)
     {
+        if(*attr.ns != NS_DASH)
+            continue;
+
         if(attr.name == "mediaPresentationDuration")
         {
             mpd->duration.Set(IsoTime(attr.value));
@@ -158,7 +161,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
 void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
 {
-    std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", false);
+    std::vector<Node *> periods = DOMHelper::getElementByTagName(root, "Period", getDASHNamespace(), false);
     std::vector<Node *>::const_iterator it;
     uint64_t nextid = 0;
 
@@ -172,7 +175,7 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
             period->startTime.Set(IsoTime((*it)->getAttributeValue("start")));
         if((*it)->hasAttribute("duration"))
             period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
-        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
+        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL", getDASHNamespace());
         if(!baseUrls.empty())
         {
             period->baseUrl.Set( new Url( baseUrls.front()->getText() ) );
@@ -188,7 +191,7 @@ void IsoffMainParser::parseSegmentBaseType(MPD *, Node *node,
                                            AbstractSegmentBaseType *base,
                                            SegmentInformation *parent)
 {
-    parseInitSegment(DOMHelper::getFirstChildElementByName(node, "Initialization"), base, parent);
+    parseInitSegment(DOMHelper::getFirstChildElementByName(node, "Initialization", getDASHNamespace()), base, parent);
 
     if(node->hasAttribute("indexRange"))
     {
@@ -226,7 +229,7 @@ void IsoffMainParser::parseMultipleSegmentBaseType(MPD *mpd, Node *node,
     if(node->hasAttribute("startNumber"))
         base->addAttribute(new StartnumberAttr(Integer<uint64_t>(node->getAttributeValue("startNumber"))));
 
-    parseTimeline(DOMHelper::getFirstChildElementByName(node, "SegmentTimeline"), base);
+    parseTimeline(DOMHelper::getFirstChildElementByName(node, "SegmentTimeline", getDASHNamespace()), base);
 }
 
 size_t IsoffMainParser::parseSegmentTemplate(MPD *mpd, Node *templateNode, SegmentInformation *info)
@@ -269,9 +272,9 @@ size_t IsoffMainParser::parseSegmentInformation(MPD *mpd, Node *node,
                                                 SegmentInformation *info, uint64_t *nextid)
 {
     size_t total = 0;
-    total += parseSegmentBase(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentBase"), info);
-    total += parseSegmentList(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentList"), info);
-    total += parseSegmentTemplate(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentTemplate" ), info);
+    total += parseSegmentBase(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentBase", getDASHNamespace()), info);
+    total += parseSegmentList(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentList", getDASHNamespace()), info);
+    total += parseSegmentTemplate(mpd, DOMHelper::getFirstChildElementByName(node, "SegmentTemplate", getDASHNamespace()), info);
     if(node->hasAttribute("timescale"))
         info->addAttribute(new TimescaleAttr(Timescale(Integer<uint64_t>(node->getAttributeValue("timescale")))));
 
@@ -287,7 +290,7 @@ size_t IsoffMainParser::parseSegmentInformation(MPD *mpd, Node *node,
 
 void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BasePeriod *period)
 {
-    std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", false);
+    std::vector<Node *> adaptationSets = DOMHelper::getElementByTagName(periodNode, "AdaptationSet", getDASHNamespace(), false);
     std::vector<Node *>::const_iterator it;
     uint64_t nextid = 0;
 
@@ -308,14 +311,14 @@ void    IsoffMainParser::parseAdaptationSets  (MPD *mpd, Node *periodNode, BaseP
         if((*it)->hasAttribute("segmentAlignment"))
             adaptationSet->setSegmentAligned((*it)->getAttributeValue("segmentAlignment") == "true");
 
-        Node *baseUrl = DOMHelper::getFirstChildElementByName((*it), "BaseURL");
+        Node *baseUrl = DOMHelper::getFirstChildElementByName((*it), "BaseURL", getDASHNamespace());
         if(baseUrl)
         {
             parseAvailability<AdaptationSet>(mpd, baseUrl, adaptationSet);
             adaptationSet->baseUrl.Set(new Url(baseUrl->getText()));
         }
 
-        Node *role = DOMHelper::getFirstChildElementByName((*it), "Role");
+        Node *role = DOMHelper::getFirstChildElementByName((*it), "Role", getDASHNamespace());
         if(role && role->hasAttribute("schemeIdUri") && role->hasAttribute("value"))
         {
             const std::string &uri = role->getAttributeValue("schemeIdUri");
@@ -371,7 +374,7 @@ void IsoffMainParser::parseCommonAttributesElements(Node *node,
 
 void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode, AdaptationSet *adaptationSet)
 {
-    std::vector<Node *> representations = DOMHelper::getElementByTagName(adaptationSetNode, "Representation", false);
+    std::vector<Node *> representations = DOMHelper::getElementByTagName(adaptationSetNode, "Representation", getDASHNamespace(), false);
     uint64_t nextid = 0;
 
     for(size_t i = 0; i < representations.size(); i++)
@@ -379,7 +382,7 @@ void    IsoffMainParser::parseRepresentations (MPD *mpd, Node *adaptationSetNode
         Representation *currentRepresentation = new Representation(adaptationSet);
         Node *repNode = representations.at(i);
 
-        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL");
+        std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(repNode, "BaseURL", getDASHNamespace());
         if(!baseUrls.empty())
         {
             currentRepresentation->baseUrl.Set(new Url(baseUrls.front()->getText()));
@@ -440,7 +443,7 @@ size_t IsoffMainParser::parseSegmentList(MPD *mpd, Node * segListNode, SegmentIn
     size_t total = 0;
     if(segListNode)
     {
-        std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", false);
+        std::vector<Node *> segments = DOMHelper::getElementByTagName(segListNode, "SegmentURL", getDASHNamespace(), false);
         SegmentList *list;
         if((list = new (std::nothrow) SegmentList(info)))
         {
@@ -524,7 +527,7 @@ void IsoffMainParser::parseTimeline(Node *node, AbstractMultipleSegmentBaseType 
     SegmentTimeline *timeline = new (std::nothrow) SegmentTimeline(base);
     if(timeline)
     {
-        std::vector<Node *> elements = DOMHelper::getElementByTagName(node, "S", false);
+        std::vector<Node *> elements = DOMHelper::getElementByTagName(node, "S", getDASHNamespace(), false);
         std::vector<Node *>::const_iterator it;
         for(it = elements.begin(); it != elements.end(); ++it)
         {
@@ -562,15 +565,15 @@ void IsoffMainParser::parseProgramInformation(Node * node, MPD *mpd)
     ProgramInformation *info = new (std::nothrow) ProgramInformation();
     if (info)
     {
-        Node *child = DOMHelper::getFirstChildElementByName(node, "Title");
+        Node *child = DOMHelper::getFirstChildElementByName(node, "Title", getDASHNamespace());
         if(child)
             info->setTitle(child->getText());
 
-        child = DOMHelper::getFirstChildElementByName(node, "Source");
+        child = DOMHelper::getFirstChildElementByName(node, "Source", getDASHNamespace());
         if(child)
             info->setSource(child->getText());
 
-        child = DOMHelper::getFirstChildElementByName(node, "Copyright");
+        child = DOMHelper::getFirstChildElementByName(node, "Copyright", getDASHNamespace());
         if(child)
             info->setCopyright(child->getText());
 
@@ -602,4 +605,9 @@ Profile IsoffMainParser::getProfile() const
     while (nextpos != std::string::npos && res == Profile::Name::Unknown);
 
     return res;
+}
+
+const std::string & IsoffMainParser::getDASHNamespace() const
+{
+    return root->getNamespace();
 }

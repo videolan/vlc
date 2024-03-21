@@ -28,6 +28,8 @@ namespace smooth
     {
         using namespace adaptive::playlist;
 
+        static std::string NS_SMOOTH = "";
+
         class Manifest : public BasePlaylist
         {
             friend class ManifestParser;

@@ -47,6 +47,7 @@ namespace adaptive
                 void                print       ();
 
             private:
+                Namespaces          nss;
                 Node                *root;
                 stream_t            *stream;
 

@@ -25,9 +25,10 @@
 #ifndef NODE_H_
 #define NODE_H_
 
+#include "Namespaces.hpp"
+
 #include <vector>
 #include <string>
-#include <memory>
 
 namespace adaptive
 {
@@ -41,33 +42,37 @@ namespace adaptive
                     public:
                         std::string name;
                         std::string value;
-                        bool matches(const std::string &name) const;
+                        Namespaces::Ptr ns;
+                        bool matches(const std::string &name, const std::string &ns) const;
                 };
 
                 using Attributes = std::vector<struct Attribute>;
 
                 Node            () = delete;
-                Node(std::unique_ptr<std::string>);
+                Node(std::unique_ptr<std::string>, Namespaces::Ptr);
                 ~Node   ();
 
                 const std::vector<Node *>&          getSubNodes         () const;
                 void                                addSubNode          (Node *node);
                 const std::string&                  getName             () const;
+                const std::string&                  getNamespace        () const;
                 bool                                hasAttribute        (const std::string& key) const;
-                void                                addAttribute        (const std::string& key, const std::string& value);
+                bool                                hasAttribute        (const std::string& key, const std::string &ns) const;
+                void                                addAttribute        (const std::string& key, Namespaces::Ptr, const std::string& value);
                 const std::string&                  getAttributeValue   (const std::string& key) const;
+                const std::string&                  getAttributeValue   (const std::string& key, const std::string &ns) const;
                 const std::string&                  getText             () const;
                 void                                setText( const std::string &text );
                 const Attributes&                   getAttributes () const;
-                bool                                matches(const std::string &name) const;
+                bool                                matches(const std::string &name, const std::string &ns) const;
 
             private:
                 static const std::string            EmptyString;
                 std::vector<Node *>                 subNodes;
                 Attributes                          attributes;
                 std::unique_ptr<std::string>        name;
+                Namespaces::Ptr                     ns;
                 std::string                         text;
-
         };
     }
 }

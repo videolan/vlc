@@ -29,6 +29,7 @@
 
 #include <vector>
 #include <stack>
+#include <cstring>
 #include <vlc_xml.h>
 
 using namespace adaptive::xml;
@@ -92,18 +93,22 @@ bool DOMParser::reset(stream_t *s)
 
 Node* DOMParser::processNode(bool b_strict)
 {
-    const char *data;
+    const char *data, *ns;
     int type;
     std::stack<Node *> lifo;
 
-    while( (type = xml_ReaderNextNode(vlc_reader, &data)) > 0 )
+    while( (type = xml_ReaderNextNodeNS(vlc_reader, &data, &ns)) > 0 )
     {
         switch(type)
         {
             case XML_READER_STARTELEM:
             {
+                Namespaces::Ptr ptr = nss.registerNamespace(ns);
                 bool empty = xml_ReaderIsEmptyElement(vlc_reader);
-                Node *node = new (std::nothrow) Node(std::make_unique<std::string>(data));
+                const char *unprefixed = std::strchr(data, ':');
+                data = unprefixed ? unprefixed + 1 : data;
+                auto name = std::make_unique<std::string>(data);
+                Node *node = new (std::nothrow) Node(std::move(name), ptr);
                 if(node)
                 {
                     if(!lifo.empty())
@@ -159,12 +164,14 @@ void    DOMParser::addAttributesToNode      (Node *node)
 {
     const char *attrValue;
     const char *attrName;
+    const char *ns;
 
-    while((attrName = xml_ReaderNextAttr(this->vlc_reader, &attrValue)) != nullptr)
+    while((attrName = xml_ReaderNextAttrNS(this->vlc_reader, &attrValue, &ns)) != nullptr)
     {
+        Namespaces::Ptr ptr = nss.registerNamespace(ns ? ns : "");
         std::string key     = attrName;
         std::string value   = attrValue;
-        node->addAttribute(key, value);
+        node->addAttribute(key, ptr, value);
     }
 }
 void    DOMParser::print                    (Node *node, int offset)

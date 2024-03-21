@@ -168,23 +168,16 @@ int DASHManager::doControl(int i_query, va_list args)
 bool DASHManager::isDASH(xml::Node *root)
 {
     static const std::string namespaces[] = {
-        "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011",
-        "urn:mpeg:schema:dash:mpd:2011",
+        "urn:mpeg:dash:schema:mpd:2011",
         "urn:mpeg:DASH:schema:MPD:2011",
-        "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011",
         "urn:mpeg:schema:dash:mpd:2011",
-        "urn:mpeg:DASH:schema:MPD:2011",
+        "urn:mpeg:mpegB:schema:DASH:MPD:DIS2011",
     };
 
-    if(root->getName() != "MPD")
-        return false;
-
-    const std::string &ns = root->getAttributeValue("xmlns");
     for( size_t i=0; i<ARRAY_SIZE(namespaces); i++ )
-    {
-        if ( adaptive::Helper::ifind(ns, namespaces[i]) )
+        if(root->matches("MPD", namespaces[i]))
             return true;
-    }
+
     return false;
 }
 
