@@ -76,7 +76,7 @@ Widgets.IconToolButton {
 
         // This popup should not exceed the boundaries of the scene.
         // Setting margins to >=0 makes it sure that this is satisfied.
-        margins: 0
+        margins: MainCtx.windowExtendedMargin
 
         modal: true
 
