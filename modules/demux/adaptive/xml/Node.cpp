@@ -35,10 +35,6 @@ using namespace adaptive::xml;
 
 const std::string   Node::EmptyString = "";
 
-Node::Node() :
-    type( -1 )
-{
-}
 Node::~Node ()
 {
     for(size_t i = 0; i < this->subNodes.size(); i++)
@@ -107,29 +103,4 @@ void Node::setText(const std::string &text)
 const std::map<std::string,std::string>&   Node::getAttributes         () const
 {
     return this->attributes;
-}
-
-int Node::getType() const
-{
-    return this->type;
-}
-
-void Node::setType(int type)
-{
-    this->type = type;
-}
-
-std::vector<std::string> Node::toString(int indent) const
-{
-    std::vector<std::string> ret;
-    std::string text(indent, ' ');
-    text.append(getName());
-    ret.push_back(text);
-    std::vector<Node *>::const_iterator l;
-    for(l = subNodes.begin(); l < subNodes.end(); ++l)
-    {
-        std::vector<std::string> sub = (*l)->toString(indent + 1);
-        ret.insert(ret.end(), sub.begin(), sub.end());
-    }
-    return ret;
 }

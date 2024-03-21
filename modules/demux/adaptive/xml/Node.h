@@ -36,7 +36,7 @@ namespace adaptive
         class Node
         {
             public:
-                Node            ();
+                Node            () = default;
                 virtual ~Node   ();
 
                 const std::vector<Node *>&          getSubNodes         () const;
@@ -50,9 +50,6 @@ namespace adaptive
                 const std::string&                  getText             () const;
                 void                                setText( const std::string &text );
                 const std::map<std::string, std::string>& getAttributes () const;
-                int                                 getType() const;
-                void                                setType( int type );
-                std::vector<std::string>            toString(int) const;
 
             private:
                 static const std::string            EmptyString;
@@ -60,7 +57,6 @@ namespace adaptive
                 std::map<std::string, std::string>  attributes;
                 std::string                         name;
                 std::string                         text;
-                int                                 type;
 
         };
     }
