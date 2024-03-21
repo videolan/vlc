@@ -44,8 +44,6 @@ Widgets.IconToolButton {
 
     color: (popup.visible) ? control.colorContext.accent : control.colorContext.fg.primary
 
-    size: VLCStyle.icon_toolbar
-
     // FIXME: We can't use upItem because a Popup is not an Item.
     Navigation.upAction: function() {
         if (popup.visible) {
