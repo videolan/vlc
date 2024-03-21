@@ -47,7 +47,6 @@ struct subpicture
     struct vlc_gl_api api;
     struct vlc_gl_interop *interop;
     struct vlc_gl_sub_renderer *renderer;
-    vout_display_place_t place;
     bool place_changed;
     bool is_dirty;
     bool clear;
@@ -90,10 +89,6 @@ static int subpicture_Control(vout_display_t *vd, int query)
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     {
-        struct vout_display_placement dp = vd->cfg->display;
-
-        FlipVerticalAlign(&dp);
-        vout_display_PlacePicture(&sub->place, vd->source, &dp);
         sub->place_changed = true;
         return VLC_SUCCESS;
     }
@@ -318,9 +313,6 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
         goto disable_win;
 
     /* Initialize and configure subpicture renderer/interop */
-    struct vout_display_placement dp = vd->cfg->display;
-    FlipVerticalAlign(&dp);
-    vout_display_PlacePicture(&sub->place, vd->source, &dp);
     sub->place_changed = true;
     vlc_gl_Resize(sub->gl, vd->cfg->display.width, vd->cfg->display.height);
 
