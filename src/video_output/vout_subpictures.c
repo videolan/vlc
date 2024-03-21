@@ -1361,7 +1361,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             vlc_vector_push(&output->regions, output_last_ptr);
 
             if (subpic->b_subtitle) {
-                area = spu_area_unscaled(area, scale);
+                if (!external_scale)
+                    area = spu_area_unscaled(area, scale);
                 if (!subpic->b_absolute && area.width > 0 && area.height > 0) {
                     // keep the non-absolute region position that doesn't overlap
                     // with other regions, the output subpicture will become
