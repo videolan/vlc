@@ -37,7 +37,7 @@ namespace adaptive
         {
             public:
                 Node            () = default;
-                virtual ~Node   ();
+                ~Node   ();
 
                 const std::vector<Node *>&          getSubNodes         () const;
                 void                                addSubNode          (Node *node);
