@@ -77,6 +77,14 @@ typedef struct VLC_VECTOR(struct spu_channel) spu_channel_vector;
 typedef struct VLC_VECTOR(subpicture_t *) spu_prerender_vector;
 #define SPU_CHROMALIST_COUNT 10
 
+struct subtitle_position_cache
+{
+    const subpicture_region_t *region;
+    int x, y;
+    bool is_active;
+};
+typedef struct VLC_VECTOR(struct subtitle_position_cache) subtitles_positions_vector;
+
 struct spu_private_t {
     vlc_mutex_t  lock;            /* lock to protect all following fields */
     input_thread_t *input;
@@ -98,12 +106,14 @@ struct spu_private_t {
 
     int margin;                        /**< force position of a subpicture */
     /**
-     * Move the secondary subtites vertically.
+     * Move the secondary subtitles vertically.
      * Note: Primary sub margin is applied to all sub tracks and is absolute.
      * Secondary sub margin is not absolute to enable overlap detection.
      */
     int secondary_margin;
     int secondary_alignment;       /**< Force alignment for secondary subs */
+    subtitles_positions_vector subs_pos;
+
     video_palette_t palette;              /**< force palette of subpicture */
 
     /* Subpiture filters */
@@ -600,6 +610,77 @@ static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
 
     if (modified)
         *area = spu_area_unscaled(a, area->scale);
+}
+
+static void subtitles_positions_StartUpdate(subtitles_positions_vector *subs)
+{
+    struct subtitle_position_cache *pos;
+    vlc_vector_foreach_ref(pos, subs)
+    {
+        pos->is_active = false;
+    }
+}
+
+static void subtitles_positions_FinishUpdate(subtitles_positions_vector *subs)
+{
+    struct subtitle_position_cache *pos;
+    for (size_t i = subs->size; i != 0; i--)
+    {
+        pos = &subs->data[i - 1];
+        if (!pos->is_active)
+            vlc_vector_remove(subs, i - 1);
+    }
+}
+
+static struct subtitle_position_cache *subtitles_positions_FindRegion(
+    subtitles_positions_vector *subs,
+    const subpicture_t *subpic,
+    const subpicture_region_t *region)
+{
+    if (!subpic->b_subtitle)
+        return NULL;
+    if (subpic->b_absolute)
+        return NULL;
+
+    struct subtitle_position_cache *pos;
+    vlc_vector_foreach_ref(pos, subs)
+    {
+        if (pos->region == region)
+        {
+            return pos;
+        }
+    }
+    return NULL;
+}
+
+static void subtitles_positions_AddRegion(subtitles_positions_vector *subs,
+                                          const subpicture_t *subpic,
+                                          const subpicture_region_t *region,
+                                          const spu_area_t *area)
+{
+    assert(subpic->b_subtitle);
+    if (subpic->b_absolute)
+        return;
+    if (area->width <= 0 && area->height <= 0)
+        return;
+
+    // find existing
+    struct subtitle_position_cache *write =
+        subtitles_positions_FindRegion(subs, subpic, region);
+    if (write == NULL)
+    {
+        if (unlikely(!vlc_vector_insert_hole(subs, subs->size, 1)))
+            return;
+        write = &subs->data[subs->size - 1];
+    }
+
+    // keep the non-absolute region position that doesn't overlap
+    // with other regions, the output subpicture will become
+    // absolute and this won't change later
+    write->region    = region;
+    write->is_active = true;
+    write->x         = area->x;
+    write->y         = area->y;
 }
 
 /**
@@ -1280,6 +1361,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
     spu_area_t *subtitle_area;
     size_t subtitle_area_count = 0;
 
+    subtitles_positions_StartUpdate(&spu->p->subs_pos);
+
     subtitle_area = subtitle_area_buffer;
     if (subtitle_region_count > ARRAY_SIZE(subtitle_area_buffer))
         subtitle_area = calloc(subtitle_region_count, sizeof(*subtitle_area));
@@ -1351,9 +1434,19 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             /* Check scale validity */
             assert(scale.w != 0 && scale.h != 0);
 
+            subpicture_t forced_subpic = *subpic;
+            struct subtitle_position_cache *cache_pos =
+                subtitles_positions_FindRegion(&spu->p->subs_pos, subpic, rendered_region);
+            if (cache_pos != NULL)
+            {
+                rendered_region->i_x = cache_pos->x;
+                rendered_region->i_y = cache_pos->y;
+                forced_subpic.b_absolute = true;
+            }
+
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
-                            subpic, entry->channel_order,
+                            &forced_subpic, entry->channel_order,
                             rendered_region, scale, !external_scale,
                             chroma_list, fmt_dst,
                             subtitle_area, subtitle_area_count,
@@ -1374,22 +1467,16 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
                     subtitle_area[subtitle_area_count++] = area;
-                if (!subpic->b_absolute && area.width > 0 && area.height > 0) {
-                    // keep the non-absolute region position that doesn't overlap
-                    // with other regions, the output subpicture will become
-                    // absolute and this won't change later
-                    region->i_x = area.x;
-                    region->i_y = area.y;
-                }
+                subtitles_positions_AddRegion(&spu->p->subs_pos, subpic, region, &area);
             }
         }
-        if (subpic->b_subtitle && !vlc_spu_regions_is_empty(&subpic->regions))
-            subpic->b_absolute = true;
     }
 
     /* */
     if (subtitle_area != subtitle_area_buffer)
         free(subtitle_area);
+
+    subtitles_positions_FinishUpdate(&spu->p->subs_pos);
 
     return output;
 }
@@ -1709,6 +1796,8 @@ static void spu_Cleanup(spu_t *spu)
     for (size_t i = 0; i < sys->channels.size; ++i)
         spu_channel_Clean(sys, &sys->channels.data[i]);
 
+    vlc_vector_destroy(&sys->subs_pos);
+
     vlc_vector_destroy(&sys->channels);
 
     vlc_vector_clear(&sys->prerender.vector);
@@ -1774,6 +1863,7 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
 
     sys->secondary_alignment = var_InheritInteger(spu,
                                                   "secondary-sub-alignment");
+    vlc_vector_init(&sys->subs_pos);
 
     sys->source_chain_update = NULL;
     sys->filter_chain_update = NULL;
