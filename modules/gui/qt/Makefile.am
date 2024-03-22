@@ -808,7 +808,6 @@ libqt_plugin_la_RES = \
 	pixmaps/menu/volume-muted.svg \
 	pixmaps/misc/cone.svg \
 	pixmaps/misc/new_indicator.svg \
-	pixmaps/misc/play_button.svg \
 	pixmaps/misc/play_shadow.png \
 	pixmaps/misc/theme_dark.svg \
 	pixmaps/misc/theme_daynight.svg \
