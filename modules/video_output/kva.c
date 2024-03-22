@@ -882,24 +882,12 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
         {
             SHORT i_mouse_x = SHORT1FROMMP( mp1 );
             SHORT i_mouse_y = SHORT2FROMMP( mp1 );
-            RECTL movie_rect;
-            int   i_movie_width, i_movie_height;
 
-            /* Get a current movie area */
-            kvaAdjustDstRect( &sys->kvas.rclSrcRect, &movie_rect );
-            i_movie_width = movie_rect.xRight - movie_rect.xLeft;
-            i_movie_height = movie_rect.yTop - movie_rect.yBottom;
+            int x = i_mouse_x;
+            int y = i_mouse_y;
 
-            vout_display_place_t place;
-            vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
-
-            int x = ( i_mouse_x - movie_rect.xLeft ) *
-                    place.width / i_movie_width + place.x;
-            int y = ( i_mouse_y - movie_rect.yBottom ) *
-                    place.height / i_movie_height;
-
-            /* Invert Y coordinate and add y offset */
-            y = ( place.height - y ) + place.y;
+            /* Invert Y coordinate */
+            y = vd->cfg.display.height - y;
 
             vlc_window_ReportMouseMoved( vd->cfg->window, x, y );
 
