@@ -571,6 +571,8 @@ vlc_modules += {
         'adaptive/xml/DOMHelper.h',
         'adaptive/xml/DOMParser.cpp',
         'adaptive/xml/DOMParser.h',
+        'adaptive/xml/Namespaces.cpp',
+        'adaptive/xml/Namespaces.hpp',
         'adaptive/xml/Node.cpp',
         'adaptive/xml/Node.h',
 

@@ -414,6 +414,8 @@ libvlc_adaptive_la_SOURCES = \
     demux/adaptive/xml/DOMHelper.h \
     demux/adaptive/xml/DOMParser.cpp \
     demux/adaptive/xml/DOMParser.h \
+    demux/adaptive/xml/Namespaces.cpp \
+    demux/adaptive/xml/Namespaces.hpp \
     demux/adaptive/xml/Node.cpp \
     demux/adaptive/xml/Node.h
 libvlc_adaptive_la_SOURCES += \
