@@ -115,6 +115,7 @@ T.Control {
             if (!event.isAutoRepeat) {
                 _keyOkPressed = true
                 keyHoldTimer.restart()
+                innerRectangle.state = "diminished"
             }
             event.accepted = true
         }
@@ -126,6 +127,7 @@ T.Control {
             if (!event.isAutoRepeat) {
                 _keyOkPressed = false
                 keyHoldTimer.stop()
+                innerRectangle.state = ""
                 if (Player.playingState !== Player.PLAYING_STATE_STOPPED)
                     MainPlaylistController.togglePlayPause()
             }
@@ -136,6 +138,7 @@ T.Control {
     // Functions
 
     function _pressAndHoldAction() {
+        innerRectangle.state = ""
         _keyOkPressed = false
         MainPlaylistController.stop()
     }
@@ -180,6 +183,11 @@ T.Control {
             }
 
             root.forceActiveFocus(Qt.MouseFocusReason)
+            innerRectangle.state = "diminished"
+        }
+
+        onReleased: {
+            innerRectangle.state = ""
         }
 
         onClicked: (mouse) => {
@@ -274,18 +282,58 @@ T.Control {
             anchors.fill: parent
 
             radius: width
+
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "#e25b01" }
                 GradientStop { position: 1.0; color: "#f89a06" }
             }
 
             Rectangle {
+                id: innerRectangle
+
                 color: "white"
 
                 anchors.fill: parent
                 anchors.margins: VLCStyle.dp(2)
 
                 radius: width
+
+                Binding on anchors.margins {
+                    id: marginBinding
+                    when: false
+                    value: (innerRectangle.parent.width / 2)
+                }
+
+                onStateChanged: {
+                    if (state === "diminished") {
+                        marginBehavior.enabled = true
+                        bindingTimer.start()
+                    } else {
+                        bindingTimer.stop()
+                        marginBehavior.enabled = false
+                        marginBinding.when = false
+                    }
+                }
+
+                Timer {
+                    // Do not immediately start the animation.
+                    // Give some time if the intention is not
+                    // to hold the button.
+                    id: bindingTimer
+                    interval: mouseArea.pressAndHoldInterval / 3
+                    onTriggered: marginBinding.when = true
+                }
+
+                Behavior on anchors.margins {
+                    id: marginBehavior
+                    NumberAnimation {
+                        // Press and hold action must be triggered
+                        // as soon as the inner rectangle diminishes.
+                        // Subtract the interval here so that we satisfy
+                        // that condition.
+                        duration: mouseArea.pressAndHoldInterval - bindingTimer.interval
+                    }
+                }
             }
         }
     }
