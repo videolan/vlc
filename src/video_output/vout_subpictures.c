@@ -1370,6 +1370,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (subpic->b_subtitle) {
                 if (!external_scale)
                     area = spu_area_unscaled(area, scale);
+                if (subtitle_area)
+                    subtitle_area[subtitle_area_count++] = area;
                 if (!subpic->b_absolute && area.width > 0 && area.height > 0) {
                     // keep the non-absolute region position that doesn't overlap
                     // with other regions, the output subpicture will become
@@ -1377,8 +1379,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                     region->i_x = area.x;
                     region->i_y = area.y;
                 }
-                if (subtitle_area)
-                    subtitle_area[subtitle_area_count++] = area;
             }
         }
         if (subpic->b_subtitle && !vlc_spu_regions_is_empty(&subpic->regions))
