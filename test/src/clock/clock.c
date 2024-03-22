@@ -816,13 +816,13 @@ static struct clock_scenario clock_scenarios[] = {
 },
 {
     .name = "master_convert_paused",
-    .desc = "it is possible de convert ts while paused",
+    .desc = "it is possible to convert ts while paused",
     .type = CLOCK_SCENARIO_RUN,
     .run = master_convert_paused_run,
 },
 {
     .name = "monotonic_convert_paused",
-    .desc = "it is possible de convert ts while paused",
+    .desc = "it is possible to convert ts while paused",
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_convert_paused_run,
     .disable_jitter = true,
