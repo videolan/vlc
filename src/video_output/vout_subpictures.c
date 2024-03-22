@@ -866,7 +866,9 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
  */
 static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             spu_area_t *dst_area,
-                            const spu_render_entry_t *entry, subpicture_region_t *region,
+                            subpicture_t *subpic,
+                            enum vlc_vout_order channel_order,
+                            subpicture_region_t *region,
                             const spu_scale_t scale_size, bool apply_scale,
                             const vlc_fourcc_t *chroma_list,
                             const video_format_t *fmt,
@@ -874,7 +876,6 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             vlc_tick_t render_date)
 {
     assert(!subpicture_region_IsText( region ));
-    subpicture_t *subpic = entry->subpic;
     spu_private_t *sys = spu->p;
 
     if (scale_size.h == SCALE_UNIT && scale_size.w == SCALE_UNIT)
@@ -909,13 +910,13 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
      * We compute the position in the rendered size */
 
     int i_align = region->i_align;
-    if (entry->channel_order == VLC_VOUT_ORDER_SECONDARY)
+    if (channel_order == VLC_VOUT_ORDER_SECONDARY)
         i_align = sys->secondary_alignment >= 0 ? sys->secondary_alignment : i_align;
 
     SpuRegionPlace(&x_offset, &y_offset,
                    subpic, region, i_align);
 
-    if (entry->channel_order == VLC_VOUT_ORDER_SECONDARY)
+    if (channel_order == VLC_VOUT_ORDER_SECONDARY)
     {
         int secondary_margin =
             apply_scale ? spu_invscale_h(sys->secondary_margin, scale_size) : sys->secondary_margin;
@@ -1352,7 +1353,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             /* */
             output_last_ptr = SpuRenderRegion(spu, &area,
-                            entry, rendered_region, scale, !external_scale,
+                            subpic, entry->channel_order,
+                            rendered_region, scale, !external_scale,
                             chroma_list, fmt_dst,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
