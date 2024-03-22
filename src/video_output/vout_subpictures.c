@@ -135,6 +135,7 @@ struct spu_private_t {
         subpicture_t   *p_processed;
         video_format_t  fmtsrc;
         video_format_t  fmtdst;
+        vout_display_place_t video_position;
         vlc_fourcc_t    chroma_list[SPU_CHROMALIST_COUNT+1];
         bool            live;
     } prerender;
@@ -1412,9 +1413,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             };
             if (region_sar.num <= 0 || region_sar.den <= 0) {
 
-                const uint64_t i_sar_num = (uint64_t)fmt_dst->i_visible_width  *
+                const uint64_t i_sar_num = (uint64_t)output_width  *
                                            fmt_dst->i_sar_num * i_original_height;
-                const uint64_t i_sar_den = (uint64_t)fmt_dst->i_visible_height *
+                const uint64_t i_sar_den = (uint64_t)output_height *
                                            fmt_dst->i_sar_den * i_original_width;
 
                 vlc_ureduce(&region_sar.num, &region_sar.den,
@@ -1428,9 +1429,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             // position the rendered video, rather than the whole output format
             // expand the width using the SAR
             spu_scale_t scale;
-            scale = spu_scale_createq((uint64_t)video_position->height * fmt_dst->i_sar_den * region_sar.num,
+            scale = spu_scale_createq((uint64_t)output_height          * fmt_dst->i_sar_den * region_sar.num,
                                       (uint64_t)i_original_height      * fmt_dst->i_sar_num * region_sar.den,
-                                      video_position->height,
+                                      output_height,
                                       i_original_height);
 
             /* Check scale validity */
@@ -1612,6 +1613,7 @@ static int SubSourceDelProxyCallbacks(filter_t *filter, void *opaque)
 static void spu_PrerenderWake(spu_private_t *sys,
                               const video_format_t *fmt_dst,
                               const video_format_t *fmt_src,
+                              const vout_display_place_t *video_position,
                               const vlc_fourcc_t *chroma_list)
 {
     vlc_mutex_lock(&sys->prerender.lock);
@@ -1625,6 +1627,7 @@ static void spu_PrerenderWake(spu_private_t *sys,
         video_format_Clean(&sys->prerender.fmtsrc);
         video_format_Copy(&sys->prerender.fmtsrc, fmt_src);
     }
+    sys->prerender.video_position = *video_position;
 
     for(size_t i=0; i<SPU_CHROMALIST_COUNT; i++)
     {
@@ -1745,6 +1748,10 @@ static void * spu_PrerenderThread(void *priv)
         memcpy(chroma_list, sys->prerender.chroma_list, SPU_CHROMALIST_COUNT);
         video_format_Copy(&fmtdst, &sys->prerender.fmtdst);
         video_format_Copy(&fmtsrc, &sys->prerender.fmtsrc);
+
+        fmtdst.i_width  = fmtdst.i_visible_width  = sys->prerender.video_position.width;
+        fmtdst.i_height = fmtdst.i_visible_height = sys->prerender.video_position.height;
+        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
 
         vlc_mutex_unlock(&sys->prerender.lock);
 
@@ -2211,7 +2218,7 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
     }
 
     /* wake up prerenderer, we have some video size and chroma */
-    spu_PrerenderWake(sys, fmt_dst, fmt_src, chroma_list);
+    spu_PrerenderWake(sys, fmt_dst, fmt_src, video_position, chroma_list);
 
     vlc_mutex_lock(&sys->lock);
 
@@ -2238,8 +2245,13 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         subpic->i_start = entry->start;
         subpic->i_stop = entry->stop;
 
+        video_format_t fmtdst = *fmt_dst;
+        fmtdst.i_width  = fmtdst.i_visible_width  = video_position->width;
+        fmtdst.i_height = fmtdst.i_visible_height = video_position->height;
+        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+
         subpicture_Update(subpic,
-                          fmt_src, fmt_dst,
+                          fmt_src, &fmtdst,
                           subpic->b_subtitle ? render_subtitle_date : system_now);
     }
 
