@@ -579,12 +579,13 @@ static void SpuAreaFixOverlap(spu_area_t *dst,
 }
 
 
-static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
+static void SpuAreaFitInside(spu_area_t *area, const unsigned boundary_width,
+                                               const unsigned boundary_height)
 {
     spu_area_t a = spu_area_scaled(*area);
     bool modified = false;
 
-    const int i_error_x = (a.x + a.width) - boundary->width;
+    const int i_error_x = (a.x + a.width) - boundary_width;
     if (i_error_x > 0)
     {
         a.x -= i_error_x;
@@ -596,7 +597,7 @@ static void SpuAreaFitInside(spu_area_t *area, const spu_area_t *boundary)
         modified = true;
     }
 
-    const int i_error_y = (a.y + a.height) - boundary->height;
+    const int i_error_y = (a.y + a.height) - boundary_height;
     if (i_error_y > 0)
     {
         a.y -= i_error_y;
@@ -952,7 +953,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             subpicture_region_t *region,
                             const spu_scale_t scale_size, bool apply_scale,
                             const vlc_fourcc_t *chroma_list,
-                            const video_format_t *fmt,
+                            const unsigned output_width, const unsigned output_height,
                             const spu_area_t *subtitle_area, size_t subtitle_area_count,
                             vlc_tick_t render_date)
 {
@@ -1036,10 +1037,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if (subpic->b_subtitle)
         restrained.y -= y_margin;
 
-    spu_area_t display = spu_area_create(0, 0, fmt->i_visible_width,
-                                         fmt->i_visible_height,
-                                         spu_scale_unit());
-    SpuAreaFitInside(&restrained, &display);
+    SpuAreaFitInside(&restrained, output_width, output_height);
 
     /* Fix the position for the current scale_size */
     x_offset = spu_scale_w(restrained.x, restrained.scale);
@@ -1381,6 +1379,10 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
 
+        unsigned output_width, output_height;
+        output_width  = video_position->width;
+        output_height = video_position->height;
+
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
          * first rendering to allow good subtitle overlap support.
@@ -1448,7 +1450,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             output_last_ptr = SpuRenderRegion(spu, &area,
                             &forced_subpic, entry->channel_order,
                             rendered_region, scale, !external_scale,
-                            chroma_list, fmt_dst,
+                            chroma_list, output_width, output_height,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
             if (rendered_region != region)
