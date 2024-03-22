@@ -270,9 +270,23 @@ T.Control {
             yRadius: xRadius
         }
 
-        Widgets.ScaledImage {
+        Rectangle {
             anchors.fill: parent
-            source: "qrc:/misc/play_button.svg"
+
+            radius: width
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "#e25b01" }
+                GradientStop { position: 1.0; color: "#f89a06" }
+            }
+
+            Rectangle {
+                color: "white"
+
+                anchors.fill: parent
+                anchors.margins: VLCStyle.dp(2)
+
+                radius: width
+            }
         }
     }
 }
