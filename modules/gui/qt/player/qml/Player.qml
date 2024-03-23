@@ -284,8 +284,9 @@ FocusScope {
         topMargin: VLCStyle.applicationVerticalMargin
         sideMargin: VLCStyle.applicationHorizontalMargin
 
-        textWidth: (MainCtx.playlistVisible) ? rootPlayer.width - playlistpopup.width
-                                             : rootPlayer.width
+        textWidth: playlistVisibility.isPlaylistVisible
+                 ? rootPlayer.width - playlistpopup.width
+                 : rootPlayer.width
 
         // NOTE: With pinned controls, the top controls are hidden when switching to
         //       fullScreen. Except when resume is visible

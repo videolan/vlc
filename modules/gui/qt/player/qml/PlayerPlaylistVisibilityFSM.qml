@@ -69,9 +69,7 @@ Util.FSM {
 
         transitions: ({
             togglePlaylistVisibility: {
-                action: () => {
-                    MainCtx.playlistVisible = !MainCtx.playlistVisible
-                }
+                action: () => { MainCtx.playlistVisible = !MainCtx.playlistVisible }
             },
             updatePlaylistDocked: {
                 guard: () => MainCtx.playlistDocked,
@@ -106,7 +104,7 @@ Util.FSM {
 
                 transitions: ({
                     updatePlaylistVisible: {
-                        guard: ()=> !MainCtx.playlistVisible,
+                        guard: () => !MainCtx.playlistVisible,
                         target: fsmHidden
                     },
                     togglePlaylistVisibility: {
@@ -130,7 +128,6 @@ Util.FSM {
                     }
                 })
             }
-
         }
 
         Util.FSMState {
@@ -141,10 +138,12 @@ Util.FSM {
                     guard: () => !MainCtx.hasEmbededVideo,
                     target: fsmFollowVisible
                 },
+                updatePlaylistVisible: {
+                    guard: () => MainCtx.playlistVisible,
+                    target: fsmFollowVisible
+                },
                 togglePlaylistVisibility: {
-                    action: () => {
-                        MainCtx.playlistVisible = true
-                    },
+                    action: () => { MainCtx.playlistVisible = true },
                     target: fsmFollowVisible
                 }
             })
