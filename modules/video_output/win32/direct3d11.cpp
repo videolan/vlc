@@ -346,14 +346,9 @@ static void UpdateSize(vout_display_t *vd)
 
     sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
 
-    RECT source_rect;
-    source_rect.left   = sys->picQuad.quad_fmt.i_x_offset;
-    source_rect.right  = sys->picQuad.quad_fmt.i_x_offset + sys->picQuad.quad_fmt.i_visible_width;
-    source_rect.top    = sys->picQuad.quad_fmt.i_y_offset;
-    source_rect.bottom = sys->picQuad.quad_fmt.i_y_offset + sys->picQuad.quad_fmt.i_visible_height;
     d3d11_device_lock( sys->d3d_dev );
 
-    D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
+    D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad,
                              video_format_GetTransform(vd->source->orientation, sys->display.orientation));
 
     D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
@@ -1309,12 +1304,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    RECT source_rect;
-    source_rect.left   = sys->picQuad.quad_fmt.i_x_offset;
-    source_rect.right  = sys->picQuad.quad_fmt.i_x_offset + sys->picQuad.quad_fmt.i_visible_width;
-    source_rect.top    = sys->picQuad.quad_fmt.i_y_offset;
-    source_rect.bottom = sys->picQuad.quad_fmt.i_y_offset + sys->picQuad.quad_fmt.i_visible_height;
-    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad, &source_rect,
+    if (!D3D11_UpdateQuadPosition(vd, sys->d3d_dev, &sys->picQuad,
                                   video_format_GetTransform(sys->picQuad.quad_fmt.orientation, sys->display.orientation)))
     {
         msg_Err(vd, "Could not set quad picture position.");
@@ -1637,13 +1627,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             continue;
         }
 
-        RECT output;
-        output.left   = r->p_picture->format.i_x_offset;
-        output.right  = r->p_picture->format.i_x_offset + r->p_picture->format.i_visible_width;
-        output.top    = r->p_picture->format.i_y_offset;
-        output.bottom = r->p_picture->format.i_y_offset + r->p_picture->format.i_visible_height;
-
-        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad, &output,
+        D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad,
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
 
         RECT spuViewport;

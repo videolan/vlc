@@ -140,7 +140,7 @@ void d3d11_quad_t::Reset()
 
 #undef D3D11_UpdateQuadPosition
 bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_quad_t *quad,
-                                const RECT *output, video_transform_t orientation )
+                               video_transform_t orientation )
 {
     bool result = true;
     HRESULT hr;
@@ -166,7 +166,13 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d11_q
         return false;
     }
 
-    result = D3D_SetupQuadData(o, &quad->generic, output, dst_data, mappedResource.pData, orientation);
+    RECT output;
+    output.left   = quad->quad_fmt.i_x_offset;
+    output.right  = quad->quad_fmt.i_x_offset + quad->quad_fmt.i_visible_width;
+    output.top    = quad->quad_fmt.i_y_offset;
+    output.bottom = quad->quad_fmt.i_y_offset + quad->quad_fmt.i_visible_height;
+
+    result = D3D_SetupQuadData(o, &quad->generic, &output, dst_data, mappedResource.pData, orientation);
 
     d3d_dev->d3dcontext->Unmap(quad->indexBuffer.Get(), 0);
     d3d_dev->d3dcontext->Unmap(quad->vertexBuffer.Get(), 0);
