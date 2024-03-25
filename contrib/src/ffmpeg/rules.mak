@@ -40,6 +40,10 @@ FFMPEGCONF += \
 	--disable-securetransport
 endif
 
+ifdef ENABLE_PDB
+FFMPEGCONF += --ln_s=false
+endif
+
 DEPS_ffmpeg = zlib $(DEPS_zlib) gsm $(DEPS_gsm) openjpeg $(DEPS_openjpeg)
 
 # Optional dependencies
