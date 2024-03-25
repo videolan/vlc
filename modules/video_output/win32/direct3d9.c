@@ -267,16 +267,23 @@ static void orientationVertexOrder(video_orientation_t orientation, int vertex_o
 
 static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
                                   const RECT *full_texture, const RECT *visible_texture,
-                                  const RECT *rect_in_display,
+                                  const vout_display_place_t *place_in_display,
                                   int alpha,
                                   video_orientation_t orientation)
 {
+    RECT rect_in_display = {
+        .left   = place_in_display->x,
+        .right  = place_in_display->x + place_in_display->width,
+        .top    = place_in_display->y,
+        .bottom = place_in_display->y + place_in_display->height,
+    };
+
     /* Vertices of the dst rectangle in the unrotated (clockwise) order. */
     const int vertices_coords[4][2] = {
-        { rect_in_display->left,  rect_in_display->top    },
-        { rect_in_display->right, rect_in_display->top    },
-        { rect_in_display->right, rect_in_display->bottom },
-        { rect_in_display->left,  rect_in_display->bottom },
+        { rect_in_display.left,  rect_in_display.top    },
+        { rect_in_display.right, rect_in_display.top    },
+        { rect_in_display.right, rect_in_display.bottom },
+        { rect_in_display.left,  rect_in_display.bottom },
     };
 
     /* Compute index remapping necessary to implement the rotation. */
@@ -398,14 +405,8 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* */
     region->texture = sys->sceneTexture;
-    RECT rect_in_display = {
-        .left   = sys->area.place.x,
-        .right  = sys->area.place.x + sys->area.place.width,
-        .top    = sys->area.place.y,
-        .bottom = sys->area.place.y + sys->area.place.height,
-    };
     Direct3D9SetupVertices(region->vertex, &texture_visible_rect, &source_visible_rect,
-                           &rect_in_display, 255, vd->source->orientation);
+                           &sys->area.place, 255, vd->source->orientation);
     return VLC_SUCCESS;
 }
 
@@ -955,12 +956,6 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         }
 
         /* Map the subpicture to sys->sys.sys.place */
-        RECT rect_in_display;
-        rect_in_display.left   = r->place.x;
-        rect_in_display.right  = r->place.x + r->place.width;
-        rect_in_display.top    = r->place.y;
-        rect_in_display.bottom = r->place.y + r->place.height;
-
         RECT texture_rect;
         texture_rect.left   = 0;
         texture_rect.right  = r->p_picture->format.i_width;
@@ -974,7 +969,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         texture_visible_rect.bottom = r->p_picture->format.i_y_offset + r->p_picture->format.i_visible_height;
 
         Direct3D9SetupVertices(d3dr->vertex, &texture_rect, &texture_visible_rect,
-                              &rect_in_display, r->i_alpha, ORIENT_NORMAL);
+                              &r->place, r->i_alpha, ORIENT_NORMAL);
         i++;
     }
 }
