@@ -1,0 +1,41 @@
+From adcb67039236cb7a67e91c897372332f25a7cfa4 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 25 Mar 2024 10:29:19 +0100
+Subject: [PATCH] Allocate an extra real number
+
+In newer libavutil the FFT buffer needs room for an extra value.
+
+The algorithm writes at len2 index which corresponds to our dft_length length:
+https://github.com/FFmpeg/FFmpeg/commit/af94ab7c7c004786084903bcf82b7617e88e3aa9
+---
+ src/cr.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/cr.c b/src/cr.c
+index 4122db3..e765829 100644
+--- a/src/cr.c
++++ b/src/cr.c
+@@ -201,7 +201,7 @@ static void dft_stage_init(
+     else f->post_peak = num_taps / 2;
+ 
+     dft_length = set_dft_length(num_taps, (int)min_dft_size, (int)large_dft_size);
+-    f->coefs = rdft_calloc((size_t)dft_length, sizeof_real);
++    f->coefs = rdft_calloc((size_t)dft_length+1, sizeof_real);
+     offset = dft_length - num_taps + 1;
+     m = (1. / dft_length) * rdft_multiplier() * L * *multiplier;
+     if (IS_FLOAT32) for (i = 0; i < num_taps; ++i)
+@@ -212,9 +212,9 @@ static void dft_stage_init(
+   }
+ 
+   if (rdft_flags() & RDFT_IS_SIMD)
+-    p->dft_out = rdft_malloc(sizeof_real * (size_t)dft_length);
++    p->dft_out = rdft_malloc(sizeof_real * (size_t)(dft_length+1));
+   if (rdft_flags() & RDFT_NEEDS_SCRATCH)
+-    p->dft_scratch = rdft_malloc(2 * sizeof_real * (size_t)dft_length);
++    p->dft_scratch = rdft_malloc(2 * sizeof_real * (size_t)(dft_length+1));
+ 
+   if (!f->dft_length) {
+     void * coef_setup = rdft_forward_setup(dft_length);
+-- 
+2.37.3.windows.1
+

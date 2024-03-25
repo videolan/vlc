@@ -23,6 +23,7 @@ soxr: soxr-$(SOXR_VERSION)-Source.tar.xz .sum-soxr
 	$(APPLY) $(SRC)/soxr/find_ff_pkgconfig.patch
 	$(APPLY) $(SRC)/soxr/soxr-check-function.patch
 	$(APPLY) $(SRC)/soxr/aarch64.patch
+	$(APPLY) $(SRC)/soxr/0001-Allocate-an-extra-real-number.patch
 	$(call pkg_static,"src/soxr.pc.in")
 	$(MOVE)
 
