@@ -108,51 +108,52 @@ MPD * IsoffMainParser::parse()
 
 void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 {
-    const std::map<std::string, std::string> & attr = node->getAttributes();
+    const Node::Attributes& attributes = node->getAttributes();
 
-    std::map<std::string, std::string>::const_iterator it;
+    mpd->b_needsUpdates = false;
 
-    it = attr.find("mediaPresentationDuration");
-    if(it != attr.end())
-        mpd->duration.Set(IsoTime(it->second));
-
-    it = attr.find("minBufferTime");
-    if(it != attr.end())
-        mpd->setMinBuffering(IsoTime(it->second));
-
-    it = attr.find("minimumUpdatePeriod");
-    if(it != attr.end())
+    for(auto attr: attributes)
     {
-        mpd->b_needsUpdates = true;
-        vlc_tick_t minupdate = IsoTime(it->second);
-        if(minupdate > 0)
-            mpd->minUpdatePeriod.Set(minupdate);
+        if(attr.name == "mediaPresentationDuration")
+        {
+            mpd->duration.Set(IsoTime(attr.value));
+        }
+        else if(attr.name == "minBufferTime")
+        {
+            mpd->setMinBuffering(IsoTime(attr.value));
+        }
+        else if(attr.name == "minimumUpdatePeriod")
+        {
+            mpd->b_needsUpdates = true;
+            vlc_tick_t minupdate = IsoTime(attr.value);
+            if(minupdate > 0)
+                mpd->minUpdatePeriod.Set(minupdate);
+        }
+        else if(attr.name == "maxSegmentDuration")
+        {
+            mpd->maxSegmentDuration.Set(IsoTime(attr.value));
+        }
+        else if(attr.name == "type")
+        {
+            mpd->setType(attr.value);
+        }
+        else if(attr.name == "availabilityStartTime")
+        {
+            mpd->availabilityStartTime.Set(UTCTime(attr.value).mtime());
+        }
+        else if(attr.name == "availabilityEndTime")
+        {
+            mpd->availabilityEndTime.Set(UTCTime(attr.value).mtime());
+        }
+        else if(attr.name == "timeShiftBufferDepth")
+        {
+            mpd->timeShiftBufferDepth.Set(IsoTime(attr.value));
+        }
+        else if(attr.name == "suggestedPresentationDelay")
+        {
+            mpd->suggestedPresentationDelay.Set(IsoTime(attr.value));
+        }
     }
-    else mpd->b_needsUpdates = false;
-
-    it = attr.find("maxSegmentDuration");
-    if(it != attr.end())
-        mpd->maxSegmentDuration.Set(IsoTime(it->second));
-
-    it = attr.find("type");
-    if(it != attr.end())
-        mpd->setType(it->second);
-
-    it = attr.find("availabilityStartTime");
-    if(it != attr.end())
-        mpd->availabilityStartTime.Set(UTCTime(it->second).mtime());
-
-    it = attr.find("availabilityEndTime");
-    if(it != attr.end())
-        mpd->availabilityEndTime.Set(UTCTime(it->second).mtime());
-
-    it = attr.find("timeShiftBufferDepth");
-        if(it != attr.end())
-            mpd->timeShiftBufferDepth.Set(IsoTime(it->second));
-
-    it = attr.find("suggestedPresentationDelay");
-    if(it != attr.end())
-        mpd->suggestedPresentationDelay.Set(IsoTime(it->second));
 }
 
 void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)

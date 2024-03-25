@@ -27,7 +27,7 @@
 
 #include <vector>
 #include <string>
-#include <map>
+#include <memory>
 
 namespace adaptive
 {
@@ -36,26 +36,36 @@ namespace adaptive
         class Node
         {
             public:
-                Node            () = default;
+                class Attribute
+                {
+                    public:
+                        std::string name;
+                        std::string value;
+                        bool matches(const std::string &name) const;
+                };
+
+                using Attributes = std::vector<struct Attribute>;
+
+                Node            () = delete;
+                Node(std::unique_ptr<std::string>);
                 ~Node   ();
 
                 const std::vector<Node *>&          getSubNodes         () const;
                 void                                addSubNode          (Node *node);
                 const std::string&                  getName             () const;
-                void                                setName             (const std::string& name);
-                bool                                hasAttribute        (const std::string& name) const;
+                bool                                hasAttribute        (const std::string& key) const;
                 void                                addAttribute        (const std::string& key, const std::string& value);
                 const std::string&                  getAttributeValue   (const std::string& key) const;
-                std::vector<std::string>            getAttributeKeys    () const;
                 const std::string&                  getText             () const;
                 void                                setText( const std::string &text );
-                const std::map<std::string, std::string>& getAttributes () const;
+                const Attributes&                   getAttributes () const;
+                bool                                matches(const std::string &name) const;
 
             private:
                 static const std::string            EmptyString;
                 std::vector<Node *>                 subNodes;
-                std::map<std::string, std::string>  attributes;
-                std::string                         name;
+                Attributes                          attributes;
+                std::unique_ptr<std::string>        name;
                 std::string                         text;
 
         };

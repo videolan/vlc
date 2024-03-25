@@ -28,12 +28,24 @@
 #include "Node.h"
 
 #include <cassert>
+#include <algorithm>
 #include <vlc_common.h>
 #include <vlc_xml.h>
 
 using namespace adaptive::xml;
 
 const std::string   Node::EmptyString = "";
+
+bool Node::Attribute::matches(const std::string &name) const
+{
+    return this->name == name;
+}
+
+Node::Node(std::unique_ptr<std::string> name)
+{
+    this->name = std::move(name);
+}
+
 
 Node::~Node ()
 {
@@ -51,43 +63,33 @@ void                                Node::addSubNode            (Node *node)
 }
 const std::string&                  Node::getName               () const
 {
-    return this->name;
-}
-void                                Node::setName               (const std::string& name)
-{
-    this->name = name;
+    return *this->name;
 }
 
-bool                                Node::hasAttribute        (const std::string& name) const
+bool Node::hasAttribute(const std::string& name) const
 {
-    if(this->attributes.find(name) != this->attributes.end())
-        return true;
-
-    return false;
+    auto it = std::find_if(attributes.cbegin(),attributes.cend(),
+                           [name](const struct Attribute &a)
+                                {return a.name == name;});
+    return it != attributes.cend();
 }
-const std::string&                  Node::getAttributeValue     (const std::string& key) const
-{
-    std::map<std::string, std::string>::const_iterator  it = this->attributes.find( key );
 
-    if ( it != this->attributes.end() )
-        return it->second;
+const std::string& Node::getAttributeValue(const std::string& key) const
+{
+    auto it = std::find_if(attributes.cbegin(),attributes.cend(),
+                           [key](const struct Attribute &a)
+                                {return a.name == key;});
+    if (it != attributes.cend())
+        return (*it).value;
     return EmptyString;
 }
 
-void                                Node::addAttribute          ( const std::string& key, const std::string& value)
+void Node::addAttribute(const std::string& key, const std::string& value)
 {
-    this->attributes[key] = value;
-}
-std::vector<std::string>            Node::getAttributeKeys      () const
-{
-    std::vector<std::string> keys;
-    std::map<std::string, std::string>::const_iterator it;
-
-    for(it = this->attributes.begin(); it != this->attributes.end(); ++it)
-    {
-        keys.push_back(it->first);
-    }
-    return keys;
+    struct Attribute attr;
+    attr.name = key;
+    attr.value = value;
+    attributes.push_back(std::move(attr));
 }
 
 const std::string&                         Node::getText               () const
@@ -100,7 +102,12 @@ void Node::setText(const std::string &text)
     this->text = text;
 }
 
-const std::map<std::string,std::string>&   Node::getAttributes         () const
+const Node::Attributes& Node::getAttributes() const
 {
     return this->attributes;
+}
+
+bool Node::matches(const std::string &name) const
+{
+    return *this->name == name;
 }

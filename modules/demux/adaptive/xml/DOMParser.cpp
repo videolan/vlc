@@ -103,14 +103,13 @@ Node* DOMParser::processNode(bool b_strict)
             case XML_READER_STARTELEM:
             {
                 bool empty = xml_ReaderIsEmptyElement(vlc_reader);
-                Node *node = new (std::nothrow) Node();
+                Node *node = new (std::nothrow) Node(std::make_unique<std::string>(data));
                 if(node)
                 {
                     if(!lifo.empty())
                         lifo.top()->addSubNode(node);
                     lifo.push(node);
 
-                    node->setName(std::string(data));
                     addAttributesToNode(node);
                 }
 
@@ -175,10 +174,10 @@ void    DOMParser::print                    (Node *node, int offset)
 
     msg_Dbg(this->stream, "%s", node->getName().c_str());
 
-    std::vector<std::string> keys = node->getAttributeKeys();
+    const Node::Attributes &attributes = node->getAttributes();
 
-    for(size_t i = 0; i < keys.size(); i++)
-        msg_Dbg(this->stream, " %s=%s", keys.at(i).c_str(), node->getAttributeValue(keys.at(i)).c_str());
+    for(auto attr : attributes)
+        msg_Dbg(this->stream, " %s=%s", attr.name.c_str(), attr.value.c_str());
 
     msg_Dbg(this->stream, "\n");
 
