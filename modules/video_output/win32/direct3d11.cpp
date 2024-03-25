@@ -338,13 +338,7 @@ static void UpdateSize(vout_display_t *vd)
 
     UpdateDisplayFormat(vd, vd->fmt);
 
-    RECT rect_dst;
-    rect_dst.left   = sys->area.place.x;
-    rect_dst.right  = sys->area.place.x + sys->area.place.width;
-    rect_dst.top    = sys->area.place.y;
-    rect_dst.bottom = sys->area.place.y + sys->area.place.height;
-
-    sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
+    sys->picQuad.UpdateViewport( &sys->area.place, sys->display.pixelFormat );
 
     d3d11_device_lock( sys->d3d_dev );
 
@@ -1414,13 +1408,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       return VLC_EGENERIC;
     }
 
-    RECT rect_dst;
-    rect_dst.left   = sys->area.place.x;
-    rect_dst.right  = sys->area.place.x + sys->area.place.width;
-    rect_dst.top    = sys->area.place.y;
-    rect_dst.bottom = sys->area.place.y + sys->area.place.height;
-
-    sys->picQuad.UpdateViewport( &rect_dst, sys->display.pixelFormat );
+    sys->picQuad.UpdateViewport( &sys->area.place, sys->display.pixelFormat );
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
@@ -1630,13 +1618,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         D3D11_UpdateQuadPosition(vd, sys->d3d_dev, quad,
             video_format_GetTransform(ORIENT_NORMAL, sys->display.orientation));
 
-        RECT spuViewport;
-        spuViewport.left   = r->place.x;
-        spuViewport.top    = r->place.y;
-        spuViewport.right  = r->place.x + r->place.width;
-        spuViewport.bottom = r->place.y + r->place.height;
-
-        quad->UpdateViewport( &spuViewport, sys->display.pixelFormat );
+        quad->UpdateViewport( &r->place, sys->display.pixelFormat );
 
         D3D11_UpdateQuadOpacity(vd, sys->d3d_dev, quad, r->i_alpha / 255.0f );
         i++;

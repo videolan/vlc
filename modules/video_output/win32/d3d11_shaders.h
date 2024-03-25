@@ -51,7 +51,7 @@ struct d3d11_quad_t
     }
 
     void Reset();
-    void UpdateViewport(const RECT *, const d3d_format_t *display);
+    void UpdateViewport(const vout_display_place_t *, const d3d_format_t *display);
 
     picture_sys_d3d11_t       picSys = {};
     d3d_quad_t                generic = {};
