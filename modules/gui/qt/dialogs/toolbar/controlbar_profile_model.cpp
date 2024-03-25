@@ -18,6 +18,7 @@
 #include "controlbar_profile_model.hpp"
 
 #include <QSettings>
+#include <QChar>
 
 #include "qt.hpp"
 #include "controlbar_profile.hpp"
@@ -30,9 +31,9 @@
 #define SETTINGS_KEY_MODEL "Model"
 #define SETTINGS_KEY_ID "Id"
 
-#define SETTINGS_CONTROL_SEPARATOR ","
-#define SETTINGS_CONFIGURATION_SEPARATOR "|"
-#define SETTINGS_PROFILE_SEPARATOR "$"
+#define SETTINGS_CONTROL_SEPARATOR QChar(',')
+#define SETTINGS_CONFIGURATION_SEPARATOR QChar('|')
+#define SETTINGS_PROFILE_SEPARATOR QChar('$')
 
 decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
@@ -615,17 +616,16 @@ void ControlbarProfileModel::save(bool clearDirty) const
                 return ret;
             };
 
-            val += QString(SETTINGS_PROFILE_SEPARATOR
-                           "%1"
-                           SETTINGS_CONFIGURATION_SEPARATOR
-                           "%2"
-                           SETTINGS_CONFIGURATION_SEPARATOR
-                           "%3"
-                           SETTINGS_CONFIGURATION_SEPARATOR
-                           "%4").arg(QString::number(identifier),
-                                     join(serializedModels[0]),
-                                     join(serializedModels[1]),
-                                     join(serializedModels[2]));
+            {
+                val += SETTINGS_PROFILE_SEPARATOR;
+                val += QString::number(identifier);
+                val += SETTINGS_CONFIGURATION_SEPARATOR;
+                val += join(serializedModels[0]);
+                val += SETTINGS_CONFIGURATION_SEPARATOR;
+                val += join(serializedModels[1]);
+                val += SETTINGS_CONFIGURATION_SEPARATOR;
+                val += join(serializedModels[2]);
+            }
         }
 
         if (clearDirty)
