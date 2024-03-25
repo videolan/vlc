@@ -1569,6 +1569,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 i++;
                 continue;
             }
+            video_format_Copy(&d3dquad->quad_fmt, &r->p_picture->format);
             d3dquad->generic.i_width  = r->p_picture->format.i_width;
             d3dquad->generic.i_height = r->p_picture->format.i_height;
 
