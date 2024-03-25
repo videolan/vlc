@@ -564,6 +564,10 @@ if host_system == 'darwin'
         'name' : 'videotoolbox',
         'sources' : files(
             'videotoolbox/decoder.c',
+            'videotoolbox/dpb.c',
+            'videotoolbox/dpb.h',
+            'videotoolbox/pacer.c',
+            'videotoolbox/pacer.h',
             'hxxx_helper.c',
             '../packetizer/hxxx_nal.c',
             '../packetizer/hxxx_sei.c',
