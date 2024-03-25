@@ -295,7 +295,7 @@ T.ItemDelegate {
                 }
             }
 
-            Widgets.ScrollingText {
+            Widgets.TextAutoScroller {
                 id: titleTextRect
 
                 label: titleLabel

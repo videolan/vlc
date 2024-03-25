@@ -149,7 +149,7 @@ Row {
 
         width: Math.max(0, parent.width - x)
 
-        Widgets.ScrollingText {
+        Widgets.TextAutoScroller {
             id: itemText
 
             anchors.left: parent.left

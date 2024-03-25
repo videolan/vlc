@@ -328,7 +328,7 @@ FocusScope {
             Component {
                 id: mrlColumn
 
-                Widgets.ScrollingText {
+                Widgets.TextAutoScroller {
                     id: itemText
 
                     property var rowModel: parent.rowModel

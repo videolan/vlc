@@ -1080,7 +1080,7 @@ libqt_plugin_la_QML = \
 	widgets/qml/RoundButton.qml \
 	widgets/qml/ScaledImage.qml \
 	widgets/qml/ScanProgressBar.qml \
-	widgets/qml/ScrollingText.qml \
+        widgets/qml/TextAutoScroller.qml \
 	widgets/qml/SearchBox.qml \
 	widgets/qml/SliderExt.qml \
 	widgets/qml/SortControl.qml \

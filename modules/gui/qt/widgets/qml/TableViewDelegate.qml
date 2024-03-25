@@ -56,7 +56,7 @@ T.Control {
     signal dropExited(var drag, bool before)
     signal dropEvent(var drag, var drop, bool before)
 
-    property Component defaultDelegate: Widgets.ScrollingText {
+    property Component defaultDelegate: Widgets.TextAutoScroller {
         id: defaultDelId
         property var rowModel: parent.rowModel
         property var colModel: parent.colModel

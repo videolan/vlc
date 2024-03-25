@@ -152,7 +152,7 @@ Item {
             Layout.topMargin: VLCStyle.margin_xxsmall
             Layout.bottomMargin: VLCStyle.margin_xxsmall
 
-            Widgets.ScrollingText {
+            Widgets.TextAutoScroller {
                 id: textRect
 
                 anchors.left: parent.left

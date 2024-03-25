@@ -165,7 +165,7 @@ T.ItemDelegate {
             }
         }
 
-        Widgets.ScrollingText {
+        Widgets.TextAutoScroller {
             label: artistName
 
             forceScroll: root.isCurrent || root._isHover
