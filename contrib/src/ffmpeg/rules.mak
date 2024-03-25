@@ -55,6 +55,10 @@ FFMPEGCONF += \
 endif
 endif
 
+ifdef ENABLE_PDB
+FFMPEGCONF += --ln_s=false
+endif
+
 DEPS_ffmpeg = zlib $(DEPS_zlib) gsm $(DEPS_gsm)
 
 ifndef USE_LIBAV
