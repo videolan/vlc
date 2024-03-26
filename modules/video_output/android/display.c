@@ -40,14 +40,6 @@
 #include "../opengl/gl_api.h"
 #include "../opengl/sub_renderer.h"
 
-struct sub_region
-{
-    int x;
-    int y;
-    unsigned int width;
-    unsigned int height;
-};
-
 struct subpicture
 {
     vlc_window_t *window;
@@ -61,7 +53,7 @@ struct subpicture
     bool clear;
 
     int64_t last_order;
-    struct VLC_VECTOR(struct sub_region) regions;
+    struct VLC_VECTOR(vout_display_place_t) regions;
 
     struct {
         PFNGLFLUSHPROC Flush;
@@ -149,11 +141,8 @@ static bool subpicture_NeedDraw(vout_display_t *vd,
         size_t i = 0;
         vlc_vector_foreach(r, &subpicture->regions)
         {
-            struct sub_region *cmp = &sub->regions.data[i++];
-            if (cmp->x != r->place.x
-             || cmp->y != r->place.y
-             || cmp->width != r->place.width
-             || cmp->height != r->place.height)
+            vout_display_place_t *cmp = &sub->regions.data[i++];
+            if (!vout_display_PlaceEquals(cmp, &r->place))
             {
                 /* Subpicture regions are different */
                 draw = true;
@@ -180,13 +169,7 @@ end:
 
     vlc_vector_foreach(r, &subpicture->regions)
     {
-        struct sub_region reg = {
-            .x = r->place.x,
-            .y = r->place.y,
-            .width = r->place.width,
-            .height = r->place.height,
-        };
-        bool res = vlc_vector_push(&sub->regions, reg);
+        bool res = vlc_vector_push(&sub->regions, r->place);
         /* Already checked with vlc_vector_reserve */
         assert(res); (void) res;
     }
