@@ -1162,6 +1162,8 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     if (p_bitmap_region)
     {
         p_bitmap_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
+        p_bitmap_region->i_x = 0;
+        p_bitmap_region->i_y = 0;
     }
     p_region->i_x = 0;
     p_region->i_y = 10;
