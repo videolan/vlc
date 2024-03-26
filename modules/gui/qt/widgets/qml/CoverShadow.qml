@@ -31,13 +31,11 @@ Item {
     property alias primaryVerticalOffset: primaryShadow.verticalOffset
     property alias primaryHorizontalOffset: primaryShadow.horizontalOffset
     property alias primaryBlurRadius: primaryShadow.radius
-    property alias primarySamples: primaryShadow.samples
 
     property alias secondaryColor: secondaryShadow.color
     property alias secondaryVerticalOffset: secondaryShadow.verticalOffset
     property alias secondaryHorizontalOffset: secondaryShadow.horizontalOffset
     property alias secondaryBlurRadius: secondaryShadow.radius
-    property alias secondarySamples: secondaryShadow.samples
 
     DropShadow {
         id: primaryShadow
@@ -46,7 +44,6 @@ Item {
         horizontalOffset: 0
         spread: 0
         color: Qt.rgba(0, 0, 0, .22)
-        samples: 1 + radius * 2
     }
 
     DropShadow {
@@ -57,7 +54,6 @@ Item {
         horizontalOffset: 0
         spread: 0
         color: Qt.rgba(0, 0, 0, .18)
-        samples: 1 + radius * 2
         cached: root.cached
     }
 }
