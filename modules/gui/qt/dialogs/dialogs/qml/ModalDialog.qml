@@ -66,7 +66,6 @@ Dialog {
                 live: true
             }
             radius: 12
-            samples: 16
         }
     }
 
