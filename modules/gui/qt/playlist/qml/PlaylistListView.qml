@@ -84,19 +84,16 @@ T.Pane {
         // NOTE: Move implementation.
         if (dragItem === item) {
             model.moveItemsPre(root.selectionModel.sortedSelectedIndexesFlat, index);
-
+            listView.forceActiveFocus();
         // NOTE: Dropping medialibrary content into the queue.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-
-            item.getSelectedInputItem()
-                .then((inputItems) => {
+            return item.getSelectedInputItem().then((inputItems) => {
                     if (!Array.isArray(inputItems) || inputItems.length === 0) {
                         console.warn("can't convert items to input items");
                         return
                     }
                     MainPlaylistController.insert(index, inputItems, false)
-                })
-
+                }).then(() => { listView.forceActiveFocus(); })
         // NOTE: Dropping an external item (i.e. filesystem) into the queue.
         } else if (drop.hasUrls) {
             const urlList = [];
@@ -108,9 +105,10 @@ T.Pane {
 
             // NOTE This is required otherwise backend may handle the drop as well yielding double addition.
             drop.accept(Qt.IgnoreAction);
+            listView.forceActiveFocus();
         }
 
-        listView.forceActiveFocus();
+        return Promise.resolve()
     }
 
     Widgets.DragItem {
@@ -338,7 +336,7 @@ T.Pane {
 
                     color: "transparent"
 
-                    visible: (root.model.count === 0 && dropArea.containsDrag)
+                    visible: (root.model.count === 0 && (dropArea.containsDrag || dropArea.dropOperationOngoing))
 
                     opacity: 0.8
 
@@ -358,6 +356,8 @@ T.Pane {
 
                     anchors.fill: parent
 
+                    property bool dropOperationOngoing: false
+
                     onEntered: (drag) => {
                         if(!root.isDropAcceptable(drag, root.model.count)) {
                             drag.accepted = false
@@ -366,7 +366,9 @@ T.Pane {
                     }
 
                     onDropped: (drop) => {
+                        dropOperationOngoing = true
                         root.acceptDrop(root.model.count, drop)
+                            .then(() => { dropOperationOngoing = false })
                     }
                 }
             }
