@@ -1092,6 +1092,8 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
         msg_Err( p_dec, "cannot allocate SPU region" );
         return NULL;
     }
+    p_region->i_x = 0;
+    p_region->i_y = 0;
     assert( p_pic->format.i_chroma == VLC_CODEC_YUVA );
     /* FIXME the copy is probably not needed anymore */
     picture_CopyPixels( p_region->p_picture, p_pic );
