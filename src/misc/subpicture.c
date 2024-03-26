@@ -164,6 +164,9 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     p_region->fmt.i_sar_num =
     p_region->fmt.i_sar_den = 0;
 
+    // margin to the center or to the top/left if the subpicture is absolute
+    p_region->i_x = 0;
+    p_region->i_y = 0;
 
     vlc_spu_regions_push( &p_subpic->regions, p_region );
     return p_subpic;
