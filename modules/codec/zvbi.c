@@ -585,6 +585,9 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         p_spu->i_stop = 0;
         p_region->b_absolute = true;
         p_region->i_align = i_align;
+        // bottom center based on "vbi-position"
+        p_region->i_x = 0;
+        p_region->i_y = 0;
     }
 
     p_spu->b_ephemer = true;
