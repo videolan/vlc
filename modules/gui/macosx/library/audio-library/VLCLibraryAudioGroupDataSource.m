@@ -252,13 +252,14 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
 {
     if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
-        if (self.representedListOfAlbums == nil || self.representedListOfAlbums.count == 0) {
+        NSArray<VLCMediaLibraryAlbum *> * const albums = self.representedListOfAlbums;
+        if (albums == nil || albums.count == 0 || indexPath.item >= albums.count) {
             return nil;
         }
 
         VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
 
-        VLCMediaLibraryAlbum * const album = self.representedListOfAlbums[indexPath.item];
+        VLCMediaLibraryAlbum * const album = albums[indexPath.item];
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:_currentParentType];
 
         albumSupplementaryDetailView.representedItem = representedItem;
