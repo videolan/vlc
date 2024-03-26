@@ -2044,6 +2044,8 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
             return;
         }
         p_reg->b_absolute = true;
+        p_reg->i_x = 0;
+        p_reg->i_y = 0;
         vlc_spu_regions_push(&ov->regions, p_reg);
     }
 
