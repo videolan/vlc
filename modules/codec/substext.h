@@ -193,11 +193,15 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                 r->i_x = margin_h + fmt_dst->i_x_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_RIGHT)
                 r->i_x = margin_h + outerright_h;
+            else
+                r->i_x = 0;
 
             if (r->i_align & SUBPICTURE_ALIGN_TOP )
                 r->i_y = margin_v + fmt_dst->i_y_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
                 r->i_y = margin_v + outerbottom_v;
+            else
+                r->i_y = 0;
 
             if( update_region->flags & UPDT_REGION_ORIGIN_X_IS_RATIO )
                 r->i_x += update_region->origin.x * inner_w;
