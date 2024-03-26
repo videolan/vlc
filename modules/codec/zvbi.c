@@ -573,21 +573,21 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         return NULL;
     }
     vlc_spu_regions_push(&p_spu->regions, p_region);
+
+    p_spu->i_start = i_pts;
     if ( b_text )
     {
+        p_spu->i_stop = i_pts + VLC_TICK_FROM_SEC(10);
         p_region->b_absolute = false;
     }
     else
     {
+        p_spu->i_stop = 0;
         p_region->b_absolute = true;
+        p_region->i_align = i_align;
     }
 
-    p_spu->i_start = i_pts;
-    p_spu->i_stop = b_text ? i_pts + VLC_TICK_FROM_SEC(10): 0;
     p_spu->b_ephemer = true;
-
-    if( !b_text )
-        p_region->i_align = i_align;
 
     return p_spu;
 }
