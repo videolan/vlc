@@ -54,7 +54,7 @@ Dialog {
     }
 
     Overlay.modal: Item {
-        GaussianBlur {
+        FastBlur {
             anchors.fill: parent
             anchors.topMargin: MainCtx.windowExtendedMargin
             anchors.leftMargin: MainCtx.windowExtendedMargin
