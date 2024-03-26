@@ -29,6 +29,7 @@
 
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowController.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
 
@@ -1465,7 +1466,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)showPlaylist:(id)sender
 {
-    [[[VLCMain.sharedInstance libraryWindowController] window] makeKeyAndOrderFront:sender];
+    [VLCMain.sharedInstance.libraryWindowController.window makeKeyAndOrderFront:sender];
+    [VLCMain.sharedInstance.libraryWindow.splitViewController togglePlaylistSidebar:self];
 }
 
 #pragma mark - Help and Docs
