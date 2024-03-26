@@ -428,6 +428,7 @@ static subpicture_region_t *SpuRenderText(spu_t *spu,
 
     text->fmt_out.video.i_height =
     text->fmt_out.video.i_visible_height = output_height;
+    assert(region->i_x != INT_MAX && region->i_y != INT_MAX);
 
     subpicture_region_t *rendered_region = text->ops->render(text, region, chroma_list);
     assert(rendered_region == NULL || !subpicture_region_IsText(rendered_region));
