@@ -72,17 +72,19 @@ static void OSDTextUpdate(subpicture_t *subpic,
     r->text_flags |= sys->position;
     r->b_absolute = false;
     r->i_align = sys->position;
-    r->i_x = 0;
     if (r->i_align & SUBPICTURE_ALIGN_LEFT)
-        r->i_x += margin_h + fmt_dst->i_x_offset;
+        r->i_x = margin_h + fmt_dst->i_x_offset;
     else if (r->i_align & SUBPICTURE_ALIGN_RIGHT)
-        r->i_x += margin_h - fmt_dst->i_x_offset;
+        r->i_x = margin_h - fmt_dst->i_x_offset;
+    else
+        r->i_x = 0;
 
-    r->i_y = 0;
     if (r->i_align & SUBPICTURE_ALIGN_TOP )
-        r->i_y += margin_v + fmt_dst->i_y_offset;
+        r->i_y = margin_v + fmt_dst->i_y_offset;
     else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
-        r->i_y += margin_v - fmt_dst->i_y_offset;
+        r->i_y = margin_v - fmt_dst->i_y_offset;
+    else
+        r->i_y = 0;
 }
 
 static void OSDTextDestroy(subpicture_t *subpic)
