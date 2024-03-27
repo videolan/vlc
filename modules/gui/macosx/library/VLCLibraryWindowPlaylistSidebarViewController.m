@@ -34,6 +34,7 @@
 #import "playlist/VLCPlaylistDataSource.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
+#import "windows/VLCOpenWindowController.h"
 
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
@@ -138,6 +139,13 @@
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.dragDropImageBackgroundBox.hidden = YES;
     }
+}
+
+#pragma mark - open media handling
+
+- (IBAction)openMedia:(id)sender
+{
+    [VLCMain.sharedInstance.open openFileGeneric];
 }
 
 #pragma mark - playmode state display and interaction

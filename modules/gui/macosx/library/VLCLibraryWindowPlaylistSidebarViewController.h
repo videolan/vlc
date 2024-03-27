@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (IBAction)openMedia:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
