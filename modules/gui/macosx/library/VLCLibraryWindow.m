@@ -274,13 +274,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self hideToolbarItem:_renderersToolbarItem];
     [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
 
-    // HACK: The size of the segmented title buttons is not always correctly calculated
-    // especially when the text we are setting differs from what is set in the storyboard.
-    // Hiding and showing the toolbar again must trigger something that causes the width
-    // of the buttons to be correctly recalculated, working around this issue
-    [self toggleToolbarShown:self];
-    [self toggleToolbarShown:self];
-
     [self updatePlayqueueToggleState];
 }
 
