@@ -34,9 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
+@property (readwrite, weak) IBOutlet NSTextField *titleLabel;
+@property (readwrite, weak) IBOutlet NSBox *titleSeparator;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *counterTextField;
 @property (readwrite, weak) IBOutlet NSTableView *tableView;
 @property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
+@property (readwrite, weak) IBOutlet NSBox *dragDropImageBackgroundBox;
+@property (readwrite, weak) IBOutlet NSButton *openMediaButton;
+@property (readwrite, weak) IBOutlet NSBox *bottomButtonsSeparator;
 
 @property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistController *playlistController;

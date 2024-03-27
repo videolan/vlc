@@ -23,6 +23,8 @@
 #import "VLCLibraryWindowPlaylistSidebarViewController.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -70,6 +72,58 @@
     self.tableView.delegate = self.dataSource;
     self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     [self.tableView reloadData];
+
+    self.titleLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.titleLabel.stringValue = _NS("Playlist");
+    self.openMediaButton.title = _NS("Open media...");
+    self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
+
+    [self updateColorsBasedOnAppearance:self.view.effectiveAppearance];
+
+    if (@available(macOS 10.14, *)) {
+        [NSApplication.sharedApplication addObserver:self
+                                          forKeyPath:@"effectiveAppearance"
+                                             options:NSKeyValueObservingOptionNew
+                                             context:nil];
+    }
+}
+
+#pragma mark - appearance setters
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        NSAppearance * const effectiveAppearance = change[NSKeyValueChangeNewKey];
+        [self updateColorsBasedOnAppearance:effectiveAppearance];
+    }
+}
+
+- (void)updateColorsBasedOnAppearance:(NSAppearance *)appearance
+{
+    NSParameterAssert(appearance);
+    BOOL isDark = NO;
+    if (@available(macOS 10.14, *)) {
+        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
+                 [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+    }
+
+    // If we try to pull the view's effectiveAppearance we are going to get the previous 
+    // appearance's name despite responding to the effectiveAppearance change (???) so it is a
+    // better idea to pull from the general system theme preference, which is always up-to-date
+    if (isDark) {
+        self.titleLabel.textColor = NSColor.VLClibraryDarkTitleColor;
+        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
+        self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
+        self.dragDropImageBackgroundBox.hidden = NO;
+    } else {
+        self.titleLabel.textColor = NSColor.VLClibraryLightTitleColor;
+        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
+        self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
+        self.dragDropImageBackgroundBox.hidden = YES;
+    }
 }
 
 @end

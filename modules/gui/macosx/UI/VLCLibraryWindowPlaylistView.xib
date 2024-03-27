@@ -8,6 +8,14 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlaylistSidebarViewController">
             <connections>
+                <outlet property="bottomButtonsSeparator" destination="ew3-Pn-diG" id="N5L-cw-953"/>
+                <outlet property="counterTextField" destination="jFQ-fK-HXk" id="3wU-kI-MJU"/>
+                <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
+                <outlet property="dragDropView" destination="grx-kk-1X1" id="b1W-Zw-a7Z"/>
+                <outlet property="openMediaButton" destination="ghp-DI-YmZ" id="30J-m7-gLb"/>
+                <outlet property="tableView" destination="Ubg-RS-LWE" id="ZiJ-ca-sOj"/>
+                <outlet property="titleLabel" destination="Dkf-kU-x6H" id="Ahd-Md-7ii"/>
+                <outlet property="titleSeparator" destination="ik5-L4-VLw" id="qht-tq-0rB"/>
                 <outlet property="topInternalConstraint" destination="9cu-Nw-dau" id="QIS-MS-lEM"/>
                 <outlet property="view" destination="NJR-gf-yTs" id="P3C-tn-4va"/>
             </connections>
