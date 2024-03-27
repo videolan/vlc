@@ -103,14 +103,14 @@ MLRecentsModel::createMLLoader() const
 
 size_t MLRecentsModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
-    return vlc_ml_count_history( ml, queryParams );
+    return vlc_ml_count_history( ml, queryParams, VLC_ML_HISTORY_TYPE_GLOBAL );
 }
 
 std::vector<std::unique_ptr<MLItem>>
 MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
-                ml, queryParams ) };
+                ml, queryParams, VLC_ML_HISTORY_TYPE_GLOBAL ) };
     if ( media_list == nullptr )
         return {};
 

@@ -1057,8 +1057,6 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_LIST_HISTORY:
         case VLC_ML_COUNT_HISTORY_BY_TYPE:
         case VLC_ML_LIST_HISTORY_BY_TYPE:
-        case VLC_ML_COUNT_STREAM_HISTORY:
-        case VLC_ML_LIST_STREAM_HISTORY:
         {
             medialibrary::Query<medialibrary::IMedia> query;
 
@@ -1066,8 +1064,11 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             {
             case VLC_ML_COUNT_HISTORY:
             case VLC_ML_LIST_HISTORY:
-                query = m_ml->history( medialibrary::HistoryType::Local );
+            {
+                const auto type = static_cast<medialibrary::HistoryType>( va_arg(args, int) );
+                query = m_ml->history( type );
                 break;
+            }
             case VLC_ML_COUNT_HISTORY_BY_TYPE:
             case VLC_ML_LIST_HISTORY_BY_TYPE:
             {
@@ -1078,10 +1079,6 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
                     query = m_ml->videoHistory();
                 break;
             }
-            case VLC_ML_COUNT_STREAM_HISTORY:
-            case VLC_ML_LIST_STREAM_HISTORY:
-                query = m_ml->history(medialibrary::HistoryType::Network);
-                break;
             default:
                 vlc_assert_unreachable();
             }
@@ -1093,14 +1090,12 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             {
             case VLC_ML_LIST_HISTORY:
             case VLC_ML_LIST_HISTORY_BY_TYPE:
-            case VLC_ML_LIST_STREAM_HISTORY:
                 *va_arg( args, vlc_ml_media_list_t**) =
                         ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
                             query->items( nbItems, offset ) );
                 return VLC_SUCCESS;
             case VLC_ML_COUNT_HISTORY:
             case VLC_ML_COUNT_HISTORY_BY_TYPE:
-            case VLC_ML_COUNT_STREAM_HISTORY:
                 *va_arg( args, size_t* ) = query->count();
                 return VLC_SUCCESS;
             default:
