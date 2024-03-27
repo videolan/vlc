@@ -473,6 +473,7 @@ static void DeletePipController( pip_controller_t * pipcontroller );
 @property (nonatomic, weak) VLCSampleBufferSubpicture *subpicture;
 @property (nonatomic) CGRect backingFrame;
 @property (nonatomic) CGImageRef image;
+@property (nonatomic) CGFloat    alpha;
 @end
 
 @implementation VLCSampleBufferSubpictureRegion
@@ -551,6 +552,7 @@ static void DeletePipController( pip_controller_t * pipcontroller );
 #else
         CGRect regionFrame = region.backingFrame;
 #endif
+        CGContextSetAlpha(cgCtx, region.alpha);
         CGContextDrawImage(cgCtx, regionFrame, region.image);
     }
 #if TARGET_OS_IPHONE
@@ -934,6 +936,7 @@ static void UpdateSubpictureRegions(vout_display_t *vd,
         region = [VLCSampleBufferSubpictureRegion new];
         region.subpicture = sys.subpicture;
         region.image = image;
+        region.alpha = r->i_alpha / 255.f;
 
         region.backingFrame = RegionBackingFrame(vd->cfg->display.height, r);
         [regions addObject:region];
