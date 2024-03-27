@@ -52,14 +52,14 @@ void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
 
 size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
-    return vlc_ml_count_history_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO);
+    return vlc_ml_count_video_history(ml, queryParams);
 }
 
 std::vector<std::unique_ptr<MLItem>>
 MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list {
-        vlc_ml_list_history_by_type(ml, queryParams, VLC_ML_MEDIA_TYPE_VIDEO)
+        vlc_ml_list_video_history(ml, queryParams)
     };
 
     if (media_list == nullptr)

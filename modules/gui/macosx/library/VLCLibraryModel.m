@@ -221,8 +221,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
 
             queryParameters.i_nbResults = self->_recentMediaLimit;
-            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_VIDEO);
-            self->_initialRecentAudioCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_AUDIO);
+            self->_initialRecentsCount = vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
+            self->_initialRecentAudioCount = vlc_ml_count_audio_history(self->_p_mediaLibrary, &queryParameters);
         });
     }
     return self;
@@ -470,7 +470,12 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         const vlc_ml_query_params_t queryParameters = { .i_nbResults = countLimit };
         // we don't set the sorting criteria here as they are not applicable to history
-        vlc_ml_media_list_t *p_media_list = vlc_ml_list_history_by_type(self->_p_mediaLibrary, &queryParameters, type);
+        vlc_ml_media_list_t *p_media_list = NULL;
+        if (type == VLC_ML_MEDIA_TYPE_VIDEO)
+            p_media_list = vlc_ml_list_video_history(self->_p_mediaLibrary, &queryParameters);
+        else if (type == VLC_ML_MEDIA_TYPE_AUDIO)
+            p_media_list = vlc_ml_list_audio_history(self->_p_mediaLibrary, &queryParameters);
+
         NSArray * const mediaArray = [NSArray arrayFromVlcMediaList:p_media_list];
         if (mediaArray == nil) {
             return;

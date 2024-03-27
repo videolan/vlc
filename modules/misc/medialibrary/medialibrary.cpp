@@ -1055,8 +1055,10 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             return listPlaylist( listQuery, paramsPtr, psz_pattern, nbItems, offset, args );
         case VLC_ML_COUNT_HISTORY:
         case VLC_ML_LIST_HISTORY:
-        case VLC_ML_COUNT_HISTORY_BY_TYPE:
-        case VLC_ML_LIST_HISTORY_BY_TYPE:
+        case VLC_ML_COUNT_VIDEO_HISTORY:
+        case VLC_ML_LIST_VIDEO_HISTORY:
+        case VLC_ML_COUNT_AUDIO_HISTORY:
+        case VLC_ML_LIST_AUDIO_HISTORY:
         {
             medialibrary::Query<medialibrary::IMedia> query;
 
@@ -1069,16 +1071,14 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
                 query = m_ml->history( type );
                 break;
             }
-            case VLC_ML_COUNT_HISTORY_BY_TYPE:
-            case VLC_ML_LIST_HISTORY_BY_TYPE:
-            {
-                auto type = static_cast<medialibrary::IMedia::Type>(va_arg(args, int));
-                if ( type == medialibrary::IMedia::Type::Audio )
-                    query = m_ml->audioHistory();
-                else if ( type == medialibrary::IMedia::Type::Video )
-                    query = m_ml->videoHistory();
+            case VLC_ML_COUNT_VIDEO_HISTORY:
+            case VLC_ML_LIST_VIDEO_HISTORY:
+                query = m_ml->videoHistory();
                 break;
-            }
+            case VLC_ML_COUNT_AUDIO_HISTORY:
+            case VLC_ML_LIST_AUDIO_HISTORY:
+                query = m_ml->audioHistory();
+                break;
             default:
                 vlc_assert_unreachable();
             }
@@ -1089,13 +1089,15 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             switch ( listQuery )
             {
             case VLC_ML_LIST_HISTORY:
-            case VLC_ML_LIST_HISTORY_BY_TYPE:
+            case VLC_ML_LIST_VIDEO_HISTORY:
+            case VLC_ML_LIST_AUDIO_HISTORY:
                 *va_arg( args, vlc_ml_media_list_t**) =
                         ml_convert_list<vlc_ml_media_list_t, vlc_ml_media_t>(
                             query->items( nbItems, offset ) );
                 return VLC_SUCCESS;
             case VLC_ML_COUNT_HISTORY:
-            case VLC_ML_COUNT_HISTORY_BY_TYPE:
+            case VLC_ML_COUNT_VIDEO_HISTORY:
+            case VLC_ML_COUNT_AUDIO_HISTORY:
                 *va_arg( args, size_t* ) = query->count();
                 return VLC_SUCCESS;
             default:
