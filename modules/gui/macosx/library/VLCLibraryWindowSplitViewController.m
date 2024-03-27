@@ -25,6 +25,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
+#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 
 #import "main/VLCMain.h"
 
@@ -48,6 +49,7 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     self.splitView.wantsLayer = YES;
     _navSidebarViewController = [[VLCLibraryWindowNavigationSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     _libraryTargetViewController = [[NSViewController alloc] init];
+    _playlistSidebarViewController = [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
 
     self.libraryTargetViewController.view = self.libraryWindow.libraryTargetView;
 
@@ -66,7 +68,7 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     _playlistSidebarItem.canCollapse = YES;
     _playlistSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
 
-    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem];
+    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
