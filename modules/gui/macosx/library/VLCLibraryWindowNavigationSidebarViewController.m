@@ -32,7 +32,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithNibName:@"VLCLibraryWindowNavigationSidebarView" bundle:nil];
     if (self) {
         _libraryWindow = libraryWindow;
         _segments = VLCLibrarySegment.librarySegments;
