@@ -37,8 +37,8 @@ typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
 @property (readwrite, weak) IBOutlet VLCLibraryWindow *libraryWindow;
 
 @property (readwrite, strong) IBOutlet NSViewController *navSidebarViewController;
-@property (readwrite, strong) IBOutlet NSViewController *libraryTargetViewController;
 @property (readwrite, strong) IBOutlet NSViewController *playlistSidebarViewController;
+@property (readonly) NSViewController *libraryTargetViewController;
 
 @property (readonly) NSSplitViewItem *navSidebarItem;
 @property (readonly) NSSplitViewItem *libraryTargetViewItem;

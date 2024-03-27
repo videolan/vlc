@@ -56,6 +56,8 @@ extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;
 extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
+@property (readonly) NSView *libraryTargetView;
+
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
@@ -98,7 +100,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;
-@property (readwrite, weak) IBOutlet NSView *libraryTargetView;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *playlistViewTitleTopConstraint;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
 @property (readwrite, weak) IBOutlet NSView *mediaOptionBar;

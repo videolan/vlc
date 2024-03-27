@@ -175,6 +175,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowFullscreenController, (__bridge void *)self);
     var_AddCallback(libvlc, "intf-show", ShowController, (__bridge void *)self);
 
+    _libraryTargetView = [[NSView alloc] init];
+
     self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
     self.navigationStack.delegate = self;
 
