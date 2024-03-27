@@ -1,8 +1,8 @@
-MEDIALIBRARY_VERSION := 0.12.4
+MEDIALIBRARY_VERSION := 0.13.0
 MEDIALIBRARY_URL := https://code.videolan.org/videolan/medialibrary/-/archive/$(MEDIALIBRARY_VERSION)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2
 
 PKGS += medialibrary
-ifeq ($(call need_pkg,"medialibrary >= 0.12.0"),)
+ifeq ($(call need_pkg,"medialibrary >= 0.13.0"),)
 PKGS_FOUND += medialibrary
 endif
 
@@ -15,6 +15,7 @@ $(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2:
 
 medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(UNPACK)
+	$(APPLY) $(SRC)/medialibrary/Fix-CacheWorker.patch
 	$(MOVE)
 
 .medialibrary: medialibrary crossfile.meson

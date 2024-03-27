@@ -1,0 +1,87 @@
+From ab1de729b73138b1a7b6dfa5e17a6a63063dd2ab Mon Sep 17 00:00:00 2001
+From: Alaric Senat <alaric@videolabs.io>
+Date: Wed, 27 Mar 2024 11:42:57 +0100
+Subject: [PATCH] CacheWorker: Fail when the cache implementation isn't
+ provided
+
+Allow the library users not to provide an implementation for the cacher.
+---
+ src/CacheWorker.cpp | 20 ++++++++++++++------
+ src/CacheWorker.h   |  2 +-
+ 2 files changed, 15 insertions(+), 7 deletions(-)
+
+diff --git a/src/CacheWorker.cpp b/src/CacheWorker.cpp
+index 0b08267a..06b1dfa7 100644
+--- a/src/CacheWorker.cpp
++++ b/src/CacheWorker.cpp
+@@ -58,14 +58,22 @@ void CacheWorker::setCacher( std::shared_ptr<ICacher> cacher )
+     m_cacher = std::move( cacher );
+ }
+ 
+-void CacheWorker::queueTask( std::shared_ptr<Media> m, bool cache )
++bool CacheWorker::queueTask( std::shared_ptr<Media> m, bool cache )
+ {
+     std::lock_guard<compat::Mutex> lock{ m_mutex };
++
++    if ( m_cacher == nullptr )
++    {
++        LOG_WARN( "Cache implementation not provided" );
++        return false;
++    }
++
+     m_tasks.emplace( std::move( m ), cache );
+     if ( m_thread.joinable() == false )
+         m_thread = compat::Thread{ &CacheWorker::run, this };
+     else
+         m_cond.notify_all();
++    return true;
+ }
+ 
+ bool CacheWorker::cacheMedia( std::shared_ptr<Media> m )
+@@ -78,8 +86,7 @@ bool CacheWorker::cacheMedia( std::shared_ptr<Media> m )
+         LOG_DEBUG( "Media ", m->id(), " is already cached" );
+         return true;
+     }
+-    queueTask( std::move( m ), true );
+-    return true;
++    return queueTask( std::move( m ), true );
+ }
+ 
+ bool CacheWorker::removeCached( std::shared_ptr<Media> m )
+@@ -92,8 +99,7 @@ bool CacheWorker::removeCached( std::shared_ptr<Media> m )
+         LOG_DEBUG( "Media ", m->id(), " is not cached" );
+         return false;
+     }
+-    queueTask( std::move( m ), false );
+-    return true;
++    return queueTask( std::move( m ), false );
+ }
+ 
+ void CacheWorker::cacheSubscriptions()
+@@ -117,7 +123,9 @@ void CacheWorker::resume()
+ 
+ void CacheWorker::stop()
+ {
+-    m_cacher->interrupt();
++    if ( m_cacher != nullptr )
++        m_cacher->interrupt();
++
+     {
+         std::lock_guard<compat::Mutex> lock{ m_mutex };
+         if ( m_thread.joinable() == false )
+diff --git a/src/CacheWorker.h b/src/CacheWorker.h
+index 57088c92..01e33c0c 100644
+--- a/src/CacheWorker.h
++++ b/src/CacheWorker.h
+@@ -73,7 +73,7 @@ private:
+     void checkCache();
+     bool removeFromCache( const std::string& mrl );
+     bool evictIfNeeded( const File& file, Subscription* s, IFile::CacheType cacheType );
+-    void queueTask( std::shared_ptr<Media> m, bool cache );
++    bool queueTask( std::shared_ptr<Media> m, bool cache );
+     uint64_t availableSubscriptionCacheSize() const;
+     uint64_t availableCacheSize() const;
+ 
+-- 
+2.43.0
+
