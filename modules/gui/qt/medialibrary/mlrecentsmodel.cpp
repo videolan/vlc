@@ -76,7 +76,7 @@ void MLRecentsModel::clearHistory()
     m_mediaLib->runOnMLThread(this,
     //ML thread
     [](vlc_medialibrary_t* ml){
-        vlc_ml_clear_history(ml);
+        vlc_ml_clear_history(ml, VLC_ML_HISTORY_TYPE_GLOBAL);
     });
 }
 

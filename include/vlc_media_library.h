@@ -577,7 +577,7 @@ enum vlc_ml_control
     VLC_ML_RESUME_BACKGROUND,       /**< no args; can't fail */
 
     /* Misc operations */
-    VLC_ML_CLEAR_HISTORY,           /**< no args; can't fail */
+    VLC_ML_CLEAR_HISTORY,           /**< arg1: vlc_ml_history_type_t; can't fail */
 
     /* Create media */
     VLC_ML_NEW_EXTERNAL_MEDIA,      /**< arg1: const char*; arg2(out): vlc_ml_media_t** */
@@ -776,7 +776,7 @@ enum vlc_ml_event_type
     /**
      * Sent after the history gets changed. It can be either cleaned, or simply
      * modified because a media was recently played/removed from the history.
-     * The history type (media/network) is stored in
+     * The history type (global/local/network) is stored in
      * vlc_ml_event_t::history_changed::history_type
      */
     VLC_ML_EVENT_HISTORY_CHANGED,
@@ -1016,9 +1016,9 @@ static inline int vlc_ml_resume_background( vlc_medialibrary_t* p_ml )
     return vlc_ml_control( p_ml, VLC_ML_RESUME_BACKGROUND );
 }
 
-static inline int vlc_ml_clear_history( vlc_medialibrary_t* p_ml )
+static inline int vlc_ml_clear_history( vlc_medialibrary_t* p_ml, vlc_ml_history_type_t type )
 {
-    return vlc_ml_control( p_ml, VLC_ML_CLEAR_HISTORY );
+    return vlc_ml_control( p_ml, VLC_ML_CLEAR_HISTORY, type );
 }
 
 static inline vlc_ml_media_t* vlc_ml_new_external_media( vlc_medialibrary_t* p_ml, const char* psz_mrl )

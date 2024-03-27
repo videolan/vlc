@@ -170,7 +170,7 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
     if (!_p_libraryInstance) {
         return VLC_EACCES;
     }
-    return vlc_ml_clear_history(_p_libraryInstance);
+    return vlc_ml_clear_history(_p_libraryInstance, VLC_ML_HISTORY_TYPE_GLOBAL);
 }
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria andDescending:(bool)descending

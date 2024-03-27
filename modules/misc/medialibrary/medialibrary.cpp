@@ -588,8 +588,11 @@ int MediaLibrary::Control( int query, va_list args )
             m_ml->resumeBackgroundOperations();
             break;
         case VLC_ML_CLEAR_HISTORY:
-            m_ml->clearHistory( medialibrary::HistoryType::Global );
+        {
+            const auto type = static_cast<medialibrary::HistoryType>( va_arg(args, int) );
+            m_ml->clearHistory( type );
             break;
+        }
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         {
             auto priorityAccess = m_ml->acquirePriorityAccess();
