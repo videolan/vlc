@@ -24,12 +24,22 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCDragDropView;
 @class VLCLibraryWindow;
+@class VLCPlaylistDataSource;
+@class VLCPlaylistController;
+@class VLCRoundedCornerTextField;
 
 @interface VLCLibraryWindowPlaylistSidebarViewController : NSViewController
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
+@property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *counterTextField;
+@property (readwrite, weak) IBOutlet NSTableView *tableView;
+@property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
+
+@property (readonly) VLCPlaylistDataSource *dataSource;
+@property (readonly) VLCPlaylistController *playlistController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

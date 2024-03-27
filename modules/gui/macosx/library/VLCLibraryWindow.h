@@ -22,6 +22,8 @@
 
 #import "windows/video/VLCFullVideoViewWindow.h"
 
+#import "views/VLCDragDropView.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCControlsBarCommon;
@@ -50,7 +52,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
     VLCLibraryLargestSentinelViewModeSegment
 };
 
-@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification>
+@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification, VLCDragDropTarget>
 
 extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;

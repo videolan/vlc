@@ -89,7 +89,7 @@ const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
 const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-@interface VLCLibraryWindow () <VLCDragDropTarget>
+@interface VLCLibraryWindow ()
 {
     CGFloat _lastPlaylistWidthBeforeCollaps;
 
