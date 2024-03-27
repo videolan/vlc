@@ -6,7 +6,11 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlaylistSidebarViewController">
+            <connections>
+                <outlet property="view" destination="NJR-gf-yTs" id="P3C-tn-4va"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customView identifier="VLCLibraryWindowPlaylistSidebarIdentifier" misplaced="YES" id="NJR-gf-yTs">
@@ -140,7 +144,7 @@
                     <rect key="frame" x="20" y="16" width="470" height="22"/>
                     <subviews>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bdZ-N9-Noa">
-                            <rect key="frame" x="0.0" y="-2" width="24" height="24"/>
+                            <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="shuffleOn" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="fpN-XQ-XkJ">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -151,7 +155,7 @@
                             </constraints>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9xU-Ba-Hys">
-                            <rect key="frame" x="149" y="-2" width="24" height="24"/>
+                            <rect key="frame" x="149" y="0.0" width="24" height="24"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="repeatOff" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="CWu-CE-2fG">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -162,7 +166,7 @@
                             </constraints>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C02-6a-1Uw">
-                            <rect key="frame" x="297" y="13" width="24" height="10"/>
+                            <rect key="frame" x="297" y="0.0" width="24" height="25"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="line.horizontal.3.decrease" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="Qsi-6S-0bG">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
@@ -173,7 +177,7 @@
                             </constraints>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-lw-hfk">
-                            <rect key="frame" x="446" y="-5" width="24.5" height="32"/>
+                            <rect key="frame" x="446" y="-3" width="24.5" height="32"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="trash" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="DEr-Gg-n7Z">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>
