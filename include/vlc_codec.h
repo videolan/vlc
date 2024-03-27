@@ -516,6 +516,8 @@ static inline subpicture_t *decoder_NewSubpicture( decoder_t *dec,
     subpicture_t *p_subpicture = dec->cbs->spu.buffer_new( dec, p_dyn );
     if( !p_subpicture )
         msg_Warn( dec, "can't get output subpicture" );
+    else
+        p_subpicture->b_subtitle = true;
     return p_subpicture;
 }
 

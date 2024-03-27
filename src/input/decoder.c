@@ -953,7 +953,6 @@ static subpicture_t *ModuleThread_NewSpuBuffer( decoder_t *p_dec,
     {
         p_subpic->i_channel = p_owner->i_spu_channel;
         p_subpic->i_order = p_owner->i_spu_order++;
-        p_subpic->b_subtitle = true;
     }
 
     return p_subpic;
