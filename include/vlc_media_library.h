@@ -442,6 +442,7 @@ typedef struct vlc_ml_query_params_t
     uint32_t i_offset;
     vlc_ml_sorting_criteria_t i_sort;
     bool b_desc;
+    bool b_favorite_only;
 } vlc_ml_query_params_t;
 
 enum vlc_ml_get_queries
