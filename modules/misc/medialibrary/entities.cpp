@@ -485,6 +485,8 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
     output.i_nb_audio = input->nbAudio();
     output.i_nb_video = input->nbVideo();
 
+    output.i_duration = input->duration();
+
     output.b_banned = input->isBanned();
 
     if ( strdup_helper( input->name(), output.psz_name ) == false )

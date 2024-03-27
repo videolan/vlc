@@ -375,6 +375,7 @@ typedef struct vlc_ml_folder_t
     unsigned int i_nb_media; /**< The media count */
     unsigned int i_nb_video; /**< The number of video for this folder */
     unsigned int i_nb_audio; /**< The number of audio for this volder */
+    int64_t i_duration; /**< The sum of all the member durations of the folder in ms. */
     bool b_present; /**< The folder's presence state */
     bool b_banned; /**< Will be true if the user required this folder to be excluded */
 } vlc_ml_folder_t;
