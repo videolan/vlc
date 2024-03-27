@@ -72,6 +72,7 @@ struct subpicture_region_t
     video_format_t  fmt;                          /**< format of the picture */
     picture_t       *p_picture;          /**< picture comprising this region */
 
+    bool            b_absolute;       /**< position is absolute in the movie */
     int             i_x;      /**< position of region, relative to alignment */
     int             i_y;      /**< position of region, relative to alignment */
     int             i_align;                  /**< alignment flags of region */
