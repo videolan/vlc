@@ -222,4 +222,9 @@
     }
 }
 
+- (IBAction)clearPlaylist:(id)sender
+{
+    [self.playlistController clearPlaylist];
+}
+
 @end
