@@ -71,6 +71,7 @@ static void OSDTextUpdate(subpicture_t *subpic,
     const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
 
     r->text_flags |= sys->position;
+    r->b_absolute = false;
     r->i_align = sys->position;
     r->i_x = 0;
     if (r->i_align & SUBPICTURE_ALIGN_LEFT)

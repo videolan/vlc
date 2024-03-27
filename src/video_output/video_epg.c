@@ -109,6 +109,7 @@ static subpicture_region_t * vout_OSDBackground(int x, int y,
     if (!region)
         return NULL;
 
+    region->b_absolute = false;
     region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
     region->i_x = x;
     region->i_y = y;
@@ -145,6 +146,7 @@ static subpicture_region_t * vout_OSDEpgSlider(int x, int y,
     if (!region)
         return NULL;
 
+    region->b_absolute = false;
     region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
     region->i_x = x;
     region->i_y = y;
@@ -234,6 +236,7 @@ static subpicture_region_t * vout_OSDImage( vlc_object_t *p_obj,
             spuregion_CreateFromPicture( p_obj, &fmt_out, psz_uri );
     if( image )
     {
+        image->b_absolute = false;
         image->i_x = x;
         image->i_y = y;
         image->i_align = SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_TOP;
@@ -260,6 +263,7 @@ static subpicture_region_t * vout_OSDTextRegion(text_segment_t *p_segment,
     if (!region)
         return NULL;
 
+    region->b_absolute = false;
     region->fmt.i_sar_num = 1;
     region->fmt.i_sar_den = 1;
     region->p_text   = p_segment;

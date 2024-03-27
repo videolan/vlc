@@ -161,6 +161,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
         return NULL;
     }
 
+    p_region->b_absolute = true;
     p_region->fmt.i_sar_num =
     p_region->fmt.i_sar_den = 0;
 
