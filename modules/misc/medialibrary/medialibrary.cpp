@@ -2022,10 +2022,10 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
             case VLC_ML_PLAYLIST_TYPE_ALL:
                 mlPlaylistType = medialibrary::PlaylistType::All;
                 break;
-            case VLC_ML_PLAYLIST_TYPE_VIDEO:
+            case VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY:
                 mlPlaylistType = medialibrary::PlaylistType::VideoOnly;
                 break;
-            case VLC_ML_PLAYLIST_TYPE_AUDIO:
+            case VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY:
                 mlPlaylistType = medialibrary::PlaylistType::AudioOnly;
                 break;
             default:
