@@ -744,7 +744,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
                                     uint8_t bits_per_channel,
                                     uint8_t widthDenominator,
                                     uint8_t heightDenominator,
-                                    uint8_t alpha_bits,
+                                    int alpha_bits,
                                     int cpu_gpu,
                                     UINT supportFlags)
 {
@@ -766,7 +766,7 @@ const d3d_format_t *(FindD3D11Format)(vlc_object_t *o,
             continue;
         if (heightDenominator && heightDenominator < output_format->heightDenominator)
             continue;
-        if (alpha_bits && output_format->bitsForAlpha < alpha_bits)
+        if (alpha_bits > 0 && output_format->bitsForAlpha < alpha_bits)
             continue;
         if (alpha_bits == 0 && output_format->bitsForAlpha != 0)
             continue;

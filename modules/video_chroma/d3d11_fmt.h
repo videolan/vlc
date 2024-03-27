@@ -197,7 +197,7 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     uint8_t bits_per_channel,
                                     uint8_t widthDenominator,
                                     uint8_t heightDenominator,
-                                    uint8_t alpha_bits,
+                                    int alpha_bits,
                                     int cpu_gpu,
                                     UINT supportFlags);
 #define FindD3D11Format(a,b,c,d,e,f,g,h,i,j)  \
