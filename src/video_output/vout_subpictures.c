@@ -642,7 +642,7 @@ static struct subtitle_position_cache *subtitles_positions_FindRegion(
 {
     if (!subpic->b_subtitle)
         return NULL;
-    if (subpic->b_absolute)
+    if (region->b_absolute)
         return NULL;
 
     struct subtitle_position_cache *pos;
@@ -662,7 +662,7 @@ static void subtitles_positions_AddRegion(subtitles_positions_vector *subs,
                                           const spu_area_t *area)
 {
     assert(subpic->b_subtitle);
-    if (subpic->b_absolute)
+    if (region->b_absolute)
         return;
     if (area->width <= 0 && area->height <= 0)
         return;
@@ -695,7 +695,8 @@ static void SpuRegionPlace(int *x, int *y,
                            int i_align)
 {
     assert(region->i_x != INT_MAX && region->i_y != INT_MAX);
-    if (subpic->b_absolute) {
+    assert(subpic->b_absolute == region->b_absolute);
+    if (region->b_absolute) {
         *x = region->i_x;
         *y = region->i_y;
     } else {
@@ -1003,7 +1004,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     {
         int secondary_margin =
             apply_scale ? spu_invscale_h(sys->secondary_margin, scale_size) : sys->secondary_margin;
-        if (!subpic->b_absolute)
+        if (!region->b_absolute)
         {
             /* Move the secondary subtitles by the secondary margin before
              * overlap detection. This way, overlaps will be resolved if they
@@ -1026,7 +1027,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                                 apply_scale ? scale_size : spu_scale_unit());
 
     /* Handle overlapping subtitles when possible */
-    if (subpic->b_subtitle && !subpic->b_absolute)
+    if (subpic->b_subtitle && !region->b_absolute)
         SpuAreaFixOverlap(dst_area, subtitle_area, subtitle_area_count,
                           i_align);
 
@@ -1322,13 +1323,17 @@ static bool IsSubpicInVideo(const subpicture_t *subpic, bool spu_in_full_window)
     if (!spu_in_full_window)
         return true;
 
-    // absolute spu in video coordinates
-    if (subpic->b_absolute)
-        return true;
-
     // only subtitle SPUs allowed outside video
     if (!subpic->b_subtitle)
         return true;
+
+    // absolute spu in video coordinates
+    const subpicture_region_t *p_region;
+    vlc_spu_regions_foreach_const(p_region, &subpic->regions)
+    {
+        if (p_region->b_absolute)
+            return true;
+    }
 
     return false;
 }
@@ -1470,6 +1475,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             {
                 region->i_x = cache_pos->x;
                 region->i_y = cache_pos->y;
+                region->b_absolute = true;
                 forced_subpic.b_absolute = true;
             }
 
@@ -1483,7 +1489,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (unlikely(output_last_ptr == NULL))
                 continue;
 
-            if (subpic_in_video) {
+            if (subpic_in_video || !region->b_absolute) {
                 // place the region inside the video area
                 output_last_ptr->place.x += video_position->x;
                 output_last_ptr->place.y += video_position->y;
@@ -1491,13 +1497,14 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             if (cache_pos != NULL)
             {
+                region->b_absolute = false; // back to the original state
                 assert(output_last_ptr->place.x == cache_pos->x);
                 assert(output_last_ptr->place.y == cache_pos->y);
             }
 
             vlc_vector_push(&output->regions, output_last_ptr);
 
-            if (subpic->b_subtitle && !subpic->b_absolute) {
+            if (subpic->b_subtitle && !region->b_absolute) {
                 if (!external_scale)
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
