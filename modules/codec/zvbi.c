@@ -479,6 +479,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             }
         }
 
+        p_spu_sys->region.b_absolute = false;
         p_spu_sys->region.inner_align = i_align;
         p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND;
 
