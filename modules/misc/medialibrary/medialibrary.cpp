@@ -1068,16 +1068,16 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             case VLC_ML_LIST_HISTORY:
             {
                 const auto type = static_cast<medialibrary::HistoryType>( va_arg(args, int) );
-                query = m_ml->history( type );
+                query = m_ml->history( type, paramsPtr );
                 break;
             }
             case VLC_ML_COUNT_VIDEO_HISTORY:
             case VLC_ML_LIST_VIDEO_HISTORY:
-                query = m_ml->videoHistory();
+                query = m_ml->videoHistory( paramsPtr );
                 break;
             case VLC_ML_COUNT_AUDIO_HISTORY:
             case VLC_ML_LIST_AUDIO_HISTORY:
-                query = m_ml->audioHistory();
+                query = m_ml->audioHistory( paramsPtr );
                 break;
             default:
                 vlc_assert_unreachable();
