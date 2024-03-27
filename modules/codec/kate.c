@@ -1044,7 +1044,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + vlc_tick_from_samples(ev->duration * p_sys->ki.gps_denominator, p_sys->ki.gps_numerator);
     p_spu->b_ephemer = false;
-    p_spu->b_absolute = false;
 
 #ifdef HAVE_TIGER
     if( p_sys->b_use_tiger)
@@ -1055,7 +1054,6 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
 
         p_spu->i_stop = __MAX( p_sys->i_max_stop, p_spu->i_stop );
         p_spu->b_ephemer = true;
-        p_spu->b_absolute = true;
 
         /* add the event to tiger */
         vlc_mutex_lock( &p_sys->lock );
@@ -1181,7 +1179,6 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
                 p_bitmap_region->i_x = kin.region_x;
                 p_bitmap_region->i_y = kin.region_y;
             }
-            p_spu->b_absolute = true;
         }
 
         kate_tracker_clear(&kin);

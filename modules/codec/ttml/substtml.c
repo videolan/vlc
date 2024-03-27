@@ -1396,7 +1396,6 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
             p_spu->i_stop     = p_sys->pes.i_offset +
                                 VLC_TICK_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
-            p_spu->b_absolute = true;
 
             if( !b_bitmap_regions ) /* TEXT regions */
                 TTMLRegionsToSpuTextRegions( p_dec, p_spu, p_regions );

@@ -461,7 +461,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;
     p_spu->i_alpha = p_sys->i_alpha;
-    p_spu->b_absolute = false;
 
     p_spu->i_original_picture_width = p_sys->i_width;
     p_spu->i_original_picture_height = p_sys->i_height;

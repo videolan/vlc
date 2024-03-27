@@ -250,7 +250,6 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
                            &p_spusys->region);
         p_spusys->region.b_absolute = false;
 
-        p_sub->b_absolute = false;
         decoder_QueueSub(p_dec, p_sub);
     }
 
@@ -276,4 +275,3 @@ static int Open(vlc_object_t *object)
 
     return VLC_SUCCESS;
 }
-

@@ -194,7 +194,6 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                 p_spu->i_stop = VLC_TICK_INVALID;
 
             p_spu->b_ephemer  = true;
-            p_spu->b_absolute = false;
 
             p_spu_sys->region.b_absolute = false;
             p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_TOP;
@@ -250,4 +249,3 @@ static void Close( vlc_object_t *p_object )
     atsc_a65_handle_Release( p_sys->p_handle );
     free( p_sys );
 }
-

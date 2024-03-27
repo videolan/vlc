@@ -261,7 +261,6 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     }
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts;
-    p_spu->b_absolute = true;
     p_spu->b_fade = p_sys->b_cfg_fadeout;
 
     if (caption.wait_duration == ARIBCC_DURATION_INDEFINITE) {

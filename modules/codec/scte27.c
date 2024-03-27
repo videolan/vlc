@@ -389,7 +389,6 @@ static subpicture_t *DecodeSubtitleMessage(decoder_t *dec,
         frame_duration = VLC_TICK_FROM_MS(40);
         break;
     }
-    sub->b_absolute = true;
     region->b_absolute = true;
     if (!pre_clear_display)
         msg_Warn(dec, "SCTE-27 subtitles without pre_clear_display flag are not well supported");
@@ -516,4 +515,3 @@ static void Close(vlc_object_t *object)
     free(sys->segment_buffer);
     free(sys);
 }
-

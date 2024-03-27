@@ -1490,7 +1490,6 @@ static subpicture_t *render( decoder_t *p_dec )
     if( !p_spu )
         return NULL;
 
-    p_spu->b_absolute = p_sys->b_absolute;
     /* Set the pf_render callback */
     p_spu->i_start = p_sys->i_pts;
     //p_spu->i_stop = (vlc_tick_t) 0;

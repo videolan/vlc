@@ -1117,7 +1117,6 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
     p_spu->i_stop     = p_cea708->i_clock + VLC_TICK_FROM_SEC(10);   /* 10s max */
 
     p_spu->b_ephemer  = true;
-    p_spu->b_absolute = false;
     p_spu->b_subtitle = true;
 
     return p_spu;

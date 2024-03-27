@@ -49,7 +49,6 @@ subpicture_t *subpicture_New( const subpicture_updater_t *p_upd )
         return NULL;
 
     p_subpic->i_order    = 0;
-    p_subpic->b_absolute = true;
     p_subpic->b_fade     = false;
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;

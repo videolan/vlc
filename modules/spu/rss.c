@@ -485,13 +485,11 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     {   /*  set to an absolute xy */
         region->i_align = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
         region->b_absolute = true;
-        p_spu->b_absolute = true;
     }
     else
     {   /* set to one of the 9 relative locations */
         region->i_align = p_sys->i_pos;
         region->b_absolute = false;
-        p_spu->b_absolute = false;
     }
     region->i_x = p_sys->i_xoff;
     region->i_y = p_sys->i_yoff;

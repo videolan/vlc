@@ -636,7 +636,6 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input)
     subpic->i_start    = now;
     subpic->i_stop     = now + VLC_TICK_FROM_SEC(3);
     subpic->b_ephemer  = true;
-    subpic->b_absolute = false;
     subpic->b_fade     = true;
     subpic->b_subtitle = false;
 

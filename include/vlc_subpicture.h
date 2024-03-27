@@ -263,7 +263,6 @@ struct subpicture_t
      * subtitle type. */
     /**@{*/
     bool         b_subtitle;            /**< the picture is a movie subtitle */
-    bool         b_absolute;                       /**< position is absolute */
     unsigned     i_original_picture_width;  /**< original width of the movie */
     unsigned     i_original_picture_height;/**< original height of the movie */
     int          i_alpha;                                  /**< transparency */

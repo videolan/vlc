@@ -346,7 +346,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     if( !p_spu )
         return NULL;
 
-    p_spu->b_absolute = true;
     p_spu->i_start = date;
     p_spu->i_stop = 0;
     p_spu->b_ephemer = true;

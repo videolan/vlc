@@ -326,7 +326,6 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     subpic->i_start    = vlc_tick_now();
     subpic->i_stop     = subpic->i_start + VLC_TICK_FROM_MS(1200);
     subpic->b_ephemer  = true;
-    subpic->b_absolute = true;
     subpic->b_fade     = true;
 
     vout_PutSubpicture(vout, subpic);
@@ -341,4 +340,3 @@ void vout_OSDIcon(vout_thread_t *vout, int channel, short type )
 {
     OSDWidget(vout, channel, type, 0);
 }
-

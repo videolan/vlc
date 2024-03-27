@@ -53,7 +53,6 @@ static void OSDTextUpdate(subpicture_t *subpic,
 
     assert(fmt_dst->i_sar_den && fmt_dst->i_sar_num);
 
-    subpic->b_absolute = false;
     subpic->i_original_picture_width  = fmt_dst->i_visible_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
     subpic->i_original_picture_height = fmt_dst->i_visible_height;
 
@@ -128,7 +127,6 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     subpic->i_start    = vlc_tick_now();
     subpic->i_stop     = subpic->i_start + duration;
     subpic->b_ephemer  = true;
-    subpic->b_absolute = false;
     subpic->b_fade     = true;
 
     vout_PutSubpicture(vout, subpic);

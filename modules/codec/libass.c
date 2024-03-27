@@ -388,7 +388,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         p_spu->i_start = p_block->i_pts;
         p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
         p_spu->b_ephemer = true;
-        p_spu->b_absolute = true;
 
         p_sys->i_max_stop = p_spu->i_stop;
 

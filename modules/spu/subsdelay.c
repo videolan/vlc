@@ -1049,8 +1049,6 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
     if( p_entry->b_update_position )
     {
-        p_subpic->b_absolute = false;
-
         if( p_region )
         {
             p_region->b_absolute = false;
@@ -1064,8 +1062,6 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
     }
     else if( p_entry->b_last_region_saved )
     {
-        p_subpic->b_absolute = true;
-
         if( p_region )
         {
             p_region->b_absolute = true;

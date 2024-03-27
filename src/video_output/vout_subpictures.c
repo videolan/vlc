@@ -695,7 +695,6 @@ static void SpuRegionPlace(int *x, int *y,
                            int i_align)
 {
     assert(region->i_x != INT_MAX && region->i_y != INT_MAX);
-    assert(subpic->b_absolute == region->b_absolute);
     if (region->b_absolute) {
         *x = region->i_x;
         *y = region->i_y;
@@ -740,9 +739,8 @@ static int SSizeCmp(ssize_t i0, ssize_t i1)
 /**
  * This function compares 2 subpictures using the following properties
  * (ordered by priority)
- * 1. absolute positioning
- * 2. start time (display time)
- * 3. creation order (per channel)
+ * 1. start time (display time)
+ * 2. creation order (per channel)
  *
  * It can be used by qsort.
  *
@@ -756,9 +754,7 @@ static int SpuRenderCmp(const void *s0, const void *s1)
     subpicture_t *subpic1 = render_entry1->subpic;
     int r;
 
-    r = IntegerCmp(!subpic0->b_absolute, !subpic1->b_absolute);
-    if (!r)
-        r = IntegerCmp(subpic0->i_start, subpic1->i_start);
+    r = IntegerCmp(subpic0->i_start, subpic1->i_start);
     if (!r)
         r = SSizeCmp(subpic0->i_channel, subpic1->i_channel);
     if (!r)
@@ -1476,7 +1472,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 region->i_x = cache_pos->x;
                 region->i_y = cache_pos->y;
                 region->b_absolute = true;
-                forced_subpic.b_absolute = true;
             }
 
             /* */

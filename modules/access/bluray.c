@@ -1722,7 +1722,6 @@ static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
 
     p_pic->i_original_picture_width = p_ov->width;
     p_pic->i_original_picture_height = p_ov->height;
-    p_pic->b_absolute = true;
 
     vlc_mutex_init(&p_upd_sys->lock);
     p_upd_sys->ref_cnt = 2;

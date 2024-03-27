@@ -585,7 +585,6 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
     p_spu->i_start = i_pts;
     p_spu->i_stop = b_text ? i_pts + VLC_TICK_FROM_SEC(10): 0;
     p_spu->b_ephemer = true;
-    p_spu->b_absolute = b_text ? false : true;
 
     if( !b_text )
         p_region->i_align = i_align;

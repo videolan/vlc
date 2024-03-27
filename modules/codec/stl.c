@@ -410,8 +410,6 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
             {
                 FillSubpictureUpdater(p_group, p_sub->updater.sys );
 
-                p_sub->b_absolute = false;
-
                 if(p_group->i_end != VLC_TICK_INVALID && p_group->i_start >= p_block->i_dts)
                 {
                     p_sub->i_start = VLC_TICK_0 + p_group->i_start;

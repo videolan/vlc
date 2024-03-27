@@ -1873,7 +1873,6 @@ static void RenderRegions( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_
         p_spu->i_start = VLC_TICK_0 + i_nzstart;
         p_spu->i_stop = VLC_TICK_0 + i_nzstop;
         p_spu->b_ephemer  = true; /* !important */
-        p_spu->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
 
         subtext_updater_sys_t *p_spu_sys = p_spu->updater.sys;
         p_spu_sys->p_default_style->f_font_relsize = WEBVTT_DEFAULT_LINE_HEIGHT_VH /
