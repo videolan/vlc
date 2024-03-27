@@ -2,10 +2,9 @@
 
 vlc_ml_query_params_t MLQueryParams::toCQueryParams() const
 {
-    vlc_ml_query_params_t params;
-    params.psz_pattern = searchPatternUtf8.isNull()
-                       ? nullptr
-                       : searchPatternUtf8.constData();
+    vlc_ml_query_params_t params = vlc_ml_query_params_create();
+    if (!searchPatternUtf8.isNull())
+        params.psz_pattern = searchPatternUtf8.constData();
     params.i_nbResults = nbResults;
     params.i_offset = offset;
     params.i_sort = sort;

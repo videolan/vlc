@@ -256,9 +256,7 @@ MLVideoGroupsModel::Loader::load(vlc_medialibrary_t* ml,
         // NOTE: When it's a group of one we convert it to a MLVideo.
         if (group.i_nb_total_media == 1)
         {
-            vlc_ml_query_params_t query;
-
-            memset(&query, 0, sizeof(vlc_ml_query_params_t));
+            vlc_ml_query_params_t query = vlc_ml_query_params_create();
 
             ml_unique_ptr<vlc_ml_media_list_t> list(vlc_ml_list_group_media(ml,
                                                                             &query, group.i_id));

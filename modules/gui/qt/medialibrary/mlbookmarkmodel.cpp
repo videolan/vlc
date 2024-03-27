@@ -404,7 +404,7 @@ void MLBookmarkModel::updateMediaId(uint64_t revision, const QString mediaUri)
             ctx.newMLid = mlMedia->i_id;
             vlc_ml_release( mlMedia );
         }
-        vlc_ml_query_params_t params{};
+        vlc_ml_query_params_t params = vlc_ml_query_params_create();
         params.i_sort = sort;
         params.b_desc = desc;
         ctx.newBookmarks.reset( vlc_ml_list_media_bookmarks( ml, &params, ctx.newMLid ) );
@@ -447,7 +447,7 @@ void MLBookmarkModel::refresh(MLBookmarkModel::RefreshOperation forceClear )
         //ML thread
         [mediaId, sort = m_sort, desc = m_desc]
         (vlc_medialibrary_t* ml, Ctx& ctx) {
-            vlc_ml_query_params_t params{};
+            vlc_ml_query_params_t params = vlc_ml_query_params_create();
             params.i_sort = sort;
             params.b_desc = desc;
             ctx.newBookmarks.reset( vlc_ml_list_media_bookmarks( ml, &params, mediaId ) );

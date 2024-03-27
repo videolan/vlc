@@ -606,10 +606,9 @@ MLListCacheLoader::MLOp::MLOp(MLItemId parentId, QString searchPattern, vlc_ml_s
 
 vlc_ml_query_params_t MLListCacheLoader::MLOp::getQueryParams(size_t offset, size_t limit) const
 {
-    vlc_ml_query_params_t params;
-    params.psz_pattern = m_searchPattern.isNull()
-                             ? nullptr
-                             : m_searchPattern.constData();
+    vlc_ml_query_params_t params = vlc_ml_query_params_create();
+    if (!m_searchPattern.isNull())
+        params.psz_pattern = m_searchPattern.constData();
     params.i_nbResults = limit;
     params.i_offset = offset;
     params.i_sort = m_sort;

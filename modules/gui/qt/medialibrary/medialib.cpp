@@ -84,8 +84,7 @@ static void convertMLItemToPlaylistMedias(vlc_medialibrary_t* ml, const MLItemId
     }
     else
     {
-        vlc_ml_query_params_t query;
-        memset(&query, 0, sizeof(vlc_ml_query_params_t));
+        vlc_ml_query_params_t query = vlc_ml_query_params_create();
         ml_unique_ptr<vlc_ml_media_list_t> media_list(vlc_ml_list_media_of( ml, &query, itemId.type, itemId.id));
         if (media_list == nullptr || media_list->i_nb_items == 0)
             return;
@@ -345,8 +344,7 @@ void MediaLib::mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callb
             {
                 ml_unique_ptr<vlc_ml_media_list_t> list;
 
-                vlc_ml_query_params_t query;
-                memset(&query, 0, sizeof(vlc_ml_query_params_t));
+                vlc_ml_query_params_t query = vlc_ml_query_params_create();
 
                 list.reset(vlc_ml_list_media_of(ml, &query, mlId.type, mlId.id));
 

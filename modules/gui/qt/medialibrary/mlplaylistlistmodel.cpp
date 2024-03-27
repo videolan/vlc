@@ -48,8 +48,7 @@ const int PLAYLIST_COVERY = 2;
 
 void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const std::vector<MLItemId>& itemList)
 {
-    vlc_ml_query_params_t query;
-    memset(&query, 0, sizeof(vlc_ml_query_params_t));
+    vlc_ml_query_params_t query = vlc_ml_query_params_create();
 
     for (auto itemId : itemList)
     {
