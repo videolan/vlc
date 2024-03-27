@@ -497,6 +497,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     }
 
     vlc_spu_regions_push(&p_spu->regions, p_region);
+    p_region->b_absolute = true;
     p_region->i_x = p_sys->i_x_start;
     p_region->i_y = p_sys->i_y_start;
 

@@ -392,6 +392,7 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 
     i_mask = ParsePositionAttributeList( psz_subtitle, &i_align, &i_x, &i_y );
 
+    p_region->b_absolute = false;
     if( i_mask & ATTRIBUTE_ALIGNMENT )
         p_region->i_align = i_align;
 

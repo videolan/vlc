@@ -499,6 +499,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
         r = subpicture_region_New( &fmt_region );
         if( !r )
             break;
+        r->b_absolute = true;
         r->i_x = region[i].x0;
         r->i_y = region[i].y0;
         r->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;

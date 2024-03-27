@@ -572,6 +572,14 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
         return NULL;
     }
     vlc_spu_regions_push(&p_spu->regions, p_region);
+    if ( b_text )
+    {
+        p_region->b_absolute = false;
+    }
+    else
+    {
+        p_region->b_absolute = true;
+    }
 
     p_spu->i_start = i_pts;
     p_spu->i_stop = b_text ? i_pts + VLC_TICK_FROM_SEC(10): 0;

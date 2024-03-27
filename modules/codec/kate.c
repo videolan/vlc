@@ -1155,6 +1155,11 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     SetupText( p_dec, p_region, ev );
 
     /* default positioning */
+    p_region->b_absolute = false;
+#ifdef HAVE_TIGER
+    if( p_sys->b_use_tiger)
+        p_region->b_absolute = true;
+#endif
     p_region->i_align = SUBPICTURE_ALIGN_BOTTOM;
     if (p_bitmap_region)
     {
@@ -1168,6 +1173,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     {
         if (kin.has.region)
         {
+            p_region->b_absolute = true;
             p_region->i_x = kin.region_x;
             p_region->i_y = kin.region_y;
             if (p_bitmap_region)
@@ -1184,6 +1190,7 @@ static subpicture_t *SetupSimpleKateSPU( decoder_t *p_dec, subpicture_t *p_spu,
     /* if we have a bitmap, chain it before the text */
     if (p_bitmap_region)
     {
+        p_bitmap_region->b_absolute = p_region->b_absolute;
         vlc_spu_regions_push(&p_spu->regions, p_bitmap_region);
     }
     vlc_spu_regions_push(&p_spu->regions, p_region);
