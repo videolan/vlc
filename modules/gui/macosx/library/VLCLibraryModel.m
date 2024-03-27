@@ -211,7 +211,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                          object:nil];
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-            const vlc_ml_query_params_t queryParameters = {};
+            vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
 
             // Preload video and audio count for gui
             self->_initialVideoCount = vlc_ml_count_video_media(self->_p_mediaLibrary, &queryParameters);
@@ -219,8 +219,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialAlbumCount = vlc_ml_count_albums(self->_p_mediaLibrary, &queryParameters);
             self->_initialArtistCount = vlc_ml_count_artists(self->_p_mediaLibrary, &queryParameters, true);
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
-            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = self->_recentMediaLimit }), VLC_ML_MEDIA_TYPE_VIDEO);
-            self->_initialRecentAudioCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &((vlc_ml_query_params_t){ .i_nbResults = self->_recentMediaLimit }), VLC_ML_MEDIA_TYPE_AUDIO);
+
+            queryParameters.i_nbResults = self->_recentMediaLimit;
+            self->_initialRecentsCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_VIDEO);
+            self->_initialRecentAudioCount = vlc_ml_count_history_by_type(self->_p_mediaLibrary, &queryParameters, VLC_ML_MEDIA_TYPE_AUDIO);
         });
     }
     return self;
