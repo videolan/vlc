@@ -26,8 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
 @class VLCLibraryWindow;
-@class VLCPlaylistDataSource;
 @class VLCPlaylistController;
+@class VLCPlaylistDataSource;
+@class VLCPlaylistSortingMenuController;
 @class VLCRoundedCornerTextField;
 
 @interface VLCLibraryWindowPlaylistSidebarViewController : NSViewController
@@ -45,14 +46,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *repeatButton;
 @property (readwrite, weak) IBOutlet NSButton *shuffleButton;
 
-@property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistController *playlistController;
+@property (readonly) VLCPlaylistDataSource *dataSource;
+@property (readonly) VLCPlaylistSortingMenuController *sortingMenuController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 - (IBAction)openMedia:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;
+- (IBAction)sortPlaylist:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
 
 @end

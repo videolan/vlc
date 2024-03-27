@@ -196,6 +196,9 @@
                                 <constraint firstAttribute="height" constant="24" id="3rz-oE-rhS"/>
                                 <constraint firstAttribute="width" constant="24" id="uLL-RT-XeW"/>
                             </constraints>
+                            <connections>
+                                <action selector="sortPlaylist:" target="-2" id="BAl-CA-um5"/>
+                            </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-lw-hfk">
                             <rect key="frame" x="446" y="-5" width="24.5" height="32"/>

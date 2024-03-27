@@ -32,6 +32,7 @@
 #import "main/VLCMain.h"
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlaylistDataSource.h"
+#import "playlist/VLCPlaylistSortingMenuController.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
 #import "windows/VLCOpenWindowController.h"
@@ -228,6 +229,16 @@
                 break;
         }
     }
+}
+
+- (IBAction)sortPlaylist:(id)sender
+{
+    if (!self.sortingMenuController) {
+        _sortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
+    }
+    [NSMenu popUpContextMenu:self.sortingMenuController.playlistSortingMenu
+                   withEvent:NSApp.currentEvent
+                     forView:sender];
 }
 
 - (IBAction)clearPlaylist:(id)sender
