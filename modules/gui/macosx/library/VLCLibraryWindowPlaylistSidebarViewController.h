@@ -52,6 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (IBAction)tableDoubleClickAction:(id)sender;
 - (IBAction)openMedia:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;

@@ -142,6 +142,17 @@
     }
 }
 
+#pragma mark - table view interaction
+
+- (IBAction)tableDoubleClickAction:(id)sender
+{
+    const NSInteger selectedRow = self.tableView.selectedRow;
+    if (selectedRow == -1) {
+        return;
+    }
+    [VLCMain.sharedInstance.playlistController playItemAtIndex:selectedRow];
+}
+
 #pragma mark - open media handling
 
 - (IBAction)openMedia:(id)sender
