@@ -248,11 +248,9 @@ static int vlclua_ml_list_show( lua_State* L, vlc_ml_show_list_t* list )
 
 static void vlclua_ml_assign_params( lua_State *L, vlc_ml_query_params_t *params, uint8_t paramIndex )
 {
+    *params = vlc_ml_query_params_create();
     if (!lua_istable(L, paramIndex))
-    {
-        memset(params, 0, sizeof(*params));
         return;
-    }
     lua_getfield(L, 1, "limit" );
     lua_getfield(L, 1, "offset" );
     lua_getfield(L, 1, "desc" );
