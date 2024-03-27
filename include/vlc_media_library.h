@@ -87,7 +87,8 @@ typedef enum vlc_ml_thumbnail_status_t
 
 typedef enum vlc_ml_history_type_t
 {
-    VLC_ML_HISTORY_TYPE_MEDIA,
+    VLC_ML_HISTORY_TYPE_GLOBAL,
+    VLC_ML_HISTORY_TYPE_LOCAL,
     VLC_ML_HISTORY_TYPE_NETWORK,
 } vlc_ml_history_type_t;
 

@@ -229,10 +229,10 @@ public:
     void onDiscoveryProgress(const std::string& entryPoint) override;
     void onDiscoveryCompleted() override;
     void onDiscoveryFailed( const std::string& entryPoint ) override;
-    void onEntryPointAdded(const std::string& entryPoint, bool success) override;
-    void onEntryPointRemoved(const std::string& entryPoint, bool success) override;
-    void onEntryPointBanned(const std::string& entryPoint, bool success) override;
-    void onEntryPointUnbanned(const std::string& entryPoint, bool success) override;
+    void onRootAdded(const std::string& entryPoint, bool success) override;
+    void onRootRemoved(const std::string& entryPoint, bool success) override;
+    void onRootBanned(const std::string& entryPoint, bool success) override;
+    void onRootUnbanned(const std::string& entryPoint, bool success) override;
     void onParsingStatsUpdated(uint32_t done, uint32_t scheduled) override;
     void onBackgroundTasksIdleChanged(bool isIdle) override;
     void onMediaThumbnailReady(medialibrary::MediaPtr media,
@@ -240,6 +240,14 @@ public:
                                bool success) override;
     void onHistoryChanged( medialibrary::HistoryType historyType ) override;
     void onRescanStarted() override;
+
+    // TODO Will be exposed once subscriptions are integrated.
+    void onSubscriptionsAdded( std::vector<medialibrary::SubscriptionPtr> ) override {}
+    void onSubscriptionsModified( std::set<int64_t> ) override {}
+    void onSubscriptionsDeleted( std::set<int64_t> ) override {}
+    void onSubscriptionNewMedia( std::set<int64_t> ) override {}
+    void onSubscriptionCacheUpdated( int64_t ) override {}
+    void onCacheIdleChanged( bool ) override {}
 };
 
 bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output );

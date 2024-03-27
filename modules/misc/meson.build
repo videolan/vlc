@@ -44,7 +44,7 @@ if libxml2_dep.found()
 endif
 
 # medialibrary module
-medialibrary_dep = dependency('medialibrary', version: '>= 0.12', required: get_option('medialibrary'), method: 'pkg-config')
+medialibrary_dep = dependency('medialibrary', version: '>= 0.13', required: get_option('medialibrary'), method: 'pkg-config')
 if medialibrary_dep.found()
     vlc_modules += {
         'name' : 'medialibrary',

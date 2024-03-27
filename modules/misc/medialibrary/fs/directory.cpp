@@ -238,7 +238,7 @@ void
 SDDirectory::addFile(std::string mrl, IFile::LinkedFileType fType, std::string linkedFile) const
 {
     time_t lastModificationDate = 0;
-    int64_t fileSize = 0;
+    uint64_t fileSize = 0;
 
     if ( m_fs.isNetworkFileSystem() == false )
     {

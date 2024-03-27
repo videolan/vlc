@@ -298,7 +298,7 @@ void MediaLibrary::onDiscoveryFailed( const std::string& entryPoint )
 }
 
 
-void MediaLibrary::onEntryPointAdded( const std::string& entryPoint, bool success )
+void MediaLibrary::onRootAdded( const std::string& entryPoint, bool success )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_ENTRY_POINT_ADDED;
@@ -307,7 +307,7 @@ void MediaLibrary::onEntryPointAdded( const std::string& entryPoint, bool succes
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onEntryPointRemoved( const std::string& entryPoint, bool success )
+void MediaLibrary::onRootRemoved( const std::string& entryPoint, bool success )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_ENTRY_POINT_REMOVED;
@@ -316,7 +316,7 @@ void MediaLibrary::onEntryPointRemoved( const std::string& entryPoint, bool succ
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onEntryPointBanned( const std::string& entryPoint, bool success )
+void MediaLibrary::onRootBanned( const std::string& entryPoint, bool success )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_ENTRY_POINT_BANNED;
@@ -325,7 +325,7 @@ void MediaLibrary::onEntryPointBanned( const std::string& entryPoint, bool succe
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onEntryPointUnbanned( const std::string& entryPoint, bool success )
+void MediaLibrary::onRootUnbanned( const std::string& entryPoint, bool success )
 {
     vlc_ml_event_t ev;
     ev.i_type = VLC_ML_EVENT_ENTRY_POINT_UNBANNED;
@@ -375,8 +375,11 @@ void MediaLibrary::onHistoryChanged( medialibrary::HistoryType historyType )
     ev.i_type = VLC_ML_EVENT_HISTORY_CHANGED;
     switch ( historyType )
     {
-        case medialibrary::HistoryType::Media:
-            ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_MEDIA;
+        case medialibrary::HistoryType::Global:
+            ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_GLOBAL;
+            break;
+        case medialibrary::HistoryType::Local:
+            ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_LOCAL;
             break;
         case medialibrary::HistoryType::Network:
             ev.history_changed.history_type = VLC_ML_HISTORY_TYPE_NETWORK;
@@ -549,7 +552,7 @@ int MediaLibrary::Control( int query, va_list args )
                     m_ml->discover( mrl );
                     break;
                 case VLC_ML_REMOVE_FOLDER:
-                    m_ml->removeEntryPoint( mrl );
+                    m_ml->removeRoot( mrl );
                     break;
                 case VLC_ML_BAN_FOLDER:
                     m_ml->banFolder( mrl );
@@ -585,7 +588,7 @@ int MediaLibrary::Control( int query, va_list args )
             m_ml->resumeBackgroundOperations();
             break;
         case VLC_ML_CLEAR_HISTORY:
-            m_ml->clearHistory();
+            m_ml->clearHistory( medialibrary::HistoryType::Global );
             break;
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         {
@@ -1060,18 +1063,21 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
             {
             case VLC_ML_COUNT_HISTORY:
             case VLC_ML_LIST_HISTORY:
-                query = m_ml->history();
+                query = m_ml->history( medialibrary::HistoryType::Local );
                 break;
             case VLC_ML_COUNT_HISTORY_BY_TYPE:
             case VLC_ML_LIST_HISTORY_BY_TYPE:
             {
-                auto  type = va_arg(args, int);
-                query = m_ml->history(static_cast<medialibrary::IMedia::Type>( type ));
+                auto type = static_cast<medialibrary::IMedia::Type>(va_arg(args, int));
+                if ( type == medialibrary::IMedia::Type::Audio )
+                    query = m_ml->audioHistory();
+                else if ( type == medialibrary::IMedia::Type::Video )
+                    query = m_ml->videoHistory();
                 break;
             }
             case VLC_ML_COUNT_STREAM_HISTORY:
             case VLC_ML_LIST_STREAM_HISTORY:
-                query = m_ml->streamHistory();
+                query = m_ml->history(medialibrary::HistoryType::Network);
                 break;
             default:
                 vlc_assert_unreachable();
@@ -1101,7 +1107,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_LIST_ENTRY_POINTS:
         {
             const bool banned = va_arg( args, int ) != 0;
-            const auto query = banned ? m_ml->bannedEntryPoints() : m_ml->entryPoints();
+            const auto query = banned ? m_ml->bannedRoots() : m_ml->roots( paramsPtr );
             if ( query == nullptr )
                 return VLC_EGENERIC;
             auto* res =
@@ -1112,7 +1118,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
         case VLC_ML_COUNT_ENTRY_POINTS:
         {
             const bool banned = va_arg( args, int ) != 0;
-            const auto query = banned ? m_ml->bannedEntryPoints() : m_ml->entryPoints();
+            const auto query = banned ? m_ml->bannedRoots() : m_ml->roots( paramsPtr );
             *( va_arg( args, size_t* ) ) = query ? query->count() : 0;
             break;
         }
@@ -2034,7 +2040,7 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
 
             medialibrary::Query<medialibrary::IPlaylist> query;
             if ( pattern != nullptr )
-                query = m_ml->searchPlaylists( pattern, paramsPtr );
+                query = m_ml->searchPlaylists( pattern, mlPlaylistType, paramsPtr );
             else
                 query = m_ml->playlists( mlPlaylistType, paramsPtr );
             if ( query == nullptr )
