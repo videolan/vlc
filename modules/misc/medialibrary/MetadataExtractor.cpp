@@ -136,7 +136,7 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
 
     item.setDuration( MS_FROM_VLC_TICK(inputItem->i_duration) );
 
-    for ( auto i = 0; i < inputItem->es_vec.size; ++i )
+    for ( auto i = 0u; i < inputItem->es_vec.size; ++i )
     {
         medialibrary::parser::IItem::Track t;
         const es_format_t *p_es = &inputItem->es_vec.data[i].es;
