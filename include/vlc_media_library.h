@@ -426,15 +426,19 @@ typedef enum vlc_ml_sorting_criteria_t
     VLC_ML_SORTING_TRACKNUMBER,
 } vlc_ml_sorting_criteria_t;
 
-typedef struct vlc_ml_query_params_t vlc_ml_query_params_t;
-struct vlc_ml_query_params_t
+/**
+ * Generic parameter set for medialibrary queries.
+ *
+ * \warning Should only be default instanciated with ::vlc_ml_query_params_create().
+ */
+typedef struct vlc_ml_query_params_t
 {
     const char* psz_pattern;
     uint32_t i_nbResults;
     uint32_t i_offset;
     vlc_ml_sorting_criteria_t i_sort;
     bool b_desc;
-};
+} vlc_ml_query_params_t;
 
 enum vlc_ml_get_queries
 {
