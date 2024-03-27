@@ -255,6 +255,8 @@ struct subpicture_t
                                    will be displayed until the next one appears
                                    or if i_stop is reached when it is valid */
     bool            b_fade;                               /**< enable fading */
+    bool            b_subtitle;      /**< subtitle with timestamps relative to
+                                                                  the video */
     /**@}*/
 
     /** \name Display properties
@@ -262,7 +264,6 @@ struct subpicture_t
      * changed by the video output thread, or simply ignored depending of the
      * subtitle type. */
     /**@{*/
-    bool         b_subtitle;            /**< the picture is a movie subtitle */
     unsigned     i_original_picture_width;  /**< original width of the movie */
     unsigned     i_original_picture_height;/**< original height of the movie */
     int          i_alpha;                                  /**< transparency */
