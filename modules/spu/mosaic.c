@@ -458,7 +458,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     /* Initialize subpicture */
     p_spu->i_channel = 0;
     p_spu->i_start  = date;
-    p_spu->i_stop = 0;
+    p_spu->i_stop = VLC_TICK_INVALID;
     p_spu->b_ephemer = true;
     p_spu->i_alpha = p_sys->i_alpha;
 

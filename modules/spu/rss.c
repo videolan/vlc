@@ -477,7 +477,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     if( p_sys->p_style->i_font_size > 0 )
         region->fmt.i_visible_height = p_sys->p_style->i_font_size;
     p_spu->i_start = date;
-    p_spu->i_stop  = 0;
+    p_spu->i_stop  = VLC_TICK_INVALID;
     p_spu->b_ephemer = true;
 
     /*  where to locate the string: */

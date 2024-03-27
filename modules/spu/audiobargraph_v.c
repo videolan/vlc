@@ -363,7 +363,7 @@ static subpicture_t *FilterSub(filter_t *p_filter, vlc_tick_t date)
         goto exit;
 
     p_spu->i_start = date;
-    p_spu->i_stop = 0;
+    p_spu->i_stop = VLC_TICK_INVALID;
     p_spu->b_ephemer = true;
 
     /* Send an empty subpicture to clear the display when needed */

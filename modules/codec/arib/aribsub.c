@@ -263,7 +263,7 @@ static subpicture_t *render( decoder_t *p_dec, arib_parser_t *p_parser,
 
     vlc_tick_t i_duration = VLC_TICK_FROM_US(arib_decoder_get_time( p_arib_decoder ));
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = i_duration ? p_block->i_pts + i_duration : 0;
+    p_spu->i_stop = i_duration ? p_block->i_pts + i_duration : VLC_TICK_INVALID;
     p_spu->b_ephemer  = i_duration == 0;
 
     arib_spu_updater_sys_t *p_spu_sys = p_spu->updater.sys;

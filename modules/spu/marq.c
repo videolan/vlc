@@ -298,7 +298,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
     p_region->p_text = text_segment_New( msg );
     p_spu->i_start = date;
-    p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout;
+    p_spu->i_stop  = p_sys->i_timeout == 0 ? VLC_TICK_INVALID : date + p_sys->i_timeout;
     p_spu->b_ephemer = true;
 
     /*  where to locate the string: */

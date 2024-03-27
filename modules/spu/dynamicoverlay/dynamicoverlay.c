@@ -347,7 +347,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
 
     p_spu->i_start = date;
-    p_spu->i_stop = 0;
+    p_spu->i_stop = VLC_TICK_INVALID;
     p_spu->b_ephemer = true;
 
     vlc_vector_foreach(p_overlay, &p_sys->overlays)

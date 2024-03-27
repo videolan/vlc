@@ -582,7 +582,7 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
     }
     else
     {
-        p_spu->i_stop = 0;
+        p_spu->i_stop = VLC_TICK_INVALID;
         p_region->b_absolute = true;
         p_region->i_align = i_align;
         // bottom center based on "vbi-position"
