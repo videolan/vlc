@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryWindowPlaylistSidebarViewController : NSViewController
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

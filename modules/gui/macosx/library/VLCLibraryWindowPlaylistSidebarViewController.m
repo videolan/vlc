@@ -22,6 +22,10 @@
 
 #import "VLCLibraryWindowPlaylistSidebarViewController.h"
 
+#import "extensions/NSWindow+VLCAdditions.h"
+#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -31,6 +35,15 @@
         _libraryWindow = libraryWindow;
     }
     return self;
+}
+
+- (void)viewDidLoad
+{
+    if (self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
+        // Compensate for full content view window's titlebar height, prevent top being cut off
+        self.topInternalConstraint.constant =
+            self.libraryWindow.titlebarHeight + VLCLibraryUIUnits.mediumSpacing;
+    }
 }
 
 @end

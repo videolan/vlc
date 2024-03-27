@@ -8,6 +8,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlaylistSidebarViewController">
             <connections>
+                <outlet property="topInternalConstraint" destination="9cu-Nw-dau" id="QIS-MS-lEM"/>
                 <outlet property="view" destination="NJR-gf-yTs" id="P3C-tn-4va"/>
             </connections>
         </customObject>
