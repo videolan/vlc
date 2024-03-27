@@ -36,12 +36,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     if (self) {
         _libraryWindow = libraryWindow;
         _segments = VLCLibrarySegment.librarySegments;
-        [self setupOutlineView];
     }
     return self;
 }
 
-- (void)setupOutlineView
+- (void)viewDidLoad
 {
     _treeController = [[NSTreeController alloc] init];
     _treeController.objectClass = VLCLibrarySegment.class;
@@ -49,9 +48,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     _treeController.childrenKeyPath = @"childNodes";
     _treeController.leafKeyPath = @"leaf";
     [_treeController bind:@"contentArray" toObject:self withKeyPath:@"segments" options:nil];
-
-    _outlineView = _libraryWindow.navSidebarOutlineView;
-    _outlineView.delegate = self;
 
     _outlineView.rowSizeStyle = NSTableViewRowSizeStyleMedium;
     _outlineView.allowsMultipleSelection = NO;

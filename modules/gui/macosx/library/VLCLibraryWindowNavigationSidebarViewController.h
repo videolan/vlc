@@ -32,7 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSArray<VLCLibrarySegment *> *segments;
 @property (readonly) NSTreeController *treeController;
-@property (readonly) NSOutlineView *outlineView;
+
+@property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)selectSegment:(NSInteger)segmentType;

@@ -5,9 +5,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowNavigationSidebarController">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowNavigationSidebarViewController">
             <connections>
-                <outlet property="view" destination="gLW-4d-ery" id="npw-3d-WUw"/>
+                <outlet property="outlineView" destination="7u8-Zm-gnd" id="sWc-AU-MVa"/>
+                <outlet property="view" destination="gLW-4d-ery" id="lAX-ki-W5E"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -83,6 +84,9 @@
                                 </prototypeCellViews>
                             </tableColumn>
                         </tableColumns>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="3zv-hj-C4v"/>
+                        </connections>
                     </outlineView>
                 </subviews>
                 <nil key="backgroundColor"/>
