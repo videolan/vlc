@@ -1053,6 +1053,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
         if( p_region )
         {
+            p_region->b_absolute = false;
             p_region->i_x = 0;
             p_region->i_y = 10;
             p_region->i_align = ( p_region->i_align & ( ~SUBPICTURE_ALIGN_MASK ) )
@@ -1067,6 +1068,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
 
         if( p_region )
         {
+            p_region->b_absolute = true;
             p_region->i_x = p_entry->i_last_region_x;
             p_region->i_y = p_entry->i_last_region_y;
             p_region->i_align = p_entry->i_last_region_align;
