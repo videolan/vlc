@@ -24,7 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryWindow;
+
 @interface VLCLibraryWindowPlaylistSidebarViewController : NSViewController
+
+@property (readonly) VLCLibraryWindow *libraryWindow;
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 @end
 

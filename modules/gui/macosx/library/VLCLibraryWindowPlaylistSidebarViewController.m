@@ -24,4 +24,13 @@
 
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super initWithNibName:@"VLCLibraryWindowPlaylistView" bundle:nil];
+    if (self) {
+        _libraryWindow = libraryWindow;
+    }
+    return self;
+}
+
 @end
