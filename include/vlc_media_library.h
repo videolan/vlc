@@ -95,6 +95,8 @@ typedef enum vlc_ml_history_type_t
 typedef enum vlc_ml_playlist_type_t
 {
     VLC_ML_PLAYLIST_TYPE_ALL,        /**< Playlist containing any kind of tracks */
+    VLC_ML_PLAYLIST_TYPE_AUDIO,      /**< Playlist containing at least one audio track */
+    VLC_ML_PLAYLIST_TYPE_VIDEO,      /**< Playlist containing at least one video track */
     VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY, /**< Playlist containing audio tracks only */
     VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY, /**< Playlist containing video tracks only */
 } vlc_ml_playlist_type_t;
