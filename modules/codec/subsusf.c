@@ -262,7 +262,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
-    p_spu->b_ephemer = (p_block->i_length == VLC_TICK_INVALID);
+    p_spu->b_ephemer = (p_block->i_length == 0);
     if (p_sys->i_original_width > 0 && p_sys->i_original_height > 0)
     {
         p_spu->i_original_picture_width = p_sys->i_original_width;
