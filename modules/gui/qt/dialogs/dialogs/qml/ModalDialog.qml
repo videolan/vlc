@@ -64,6 +64,7 @@ Dialog {
             source: ShaderEffectSource {
                 sourceItem: control.rootWindow
                 live: true
+                hideSource: true
             }
             radius: 12
         }
