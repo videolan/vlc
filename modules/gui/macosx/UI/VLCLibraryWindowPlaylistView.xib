@@ -13,6 +13,8 @@
                 <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
                 <outlet property="dragDropView" destination="grx-kk-1X1" id="b1W-Zw-a7Z"/>
                 <outlet property="openMediaButton" destination="ghp-DI-YmZ" id="30J-m7-gLb"/>
+                <outlet property="repeatButton" destination="9xU-Ba-Hys" id="myS-5X-rgK"/>
+                <outlet property="shuffleButton" destination="bdZ-N9-Noa" id="bJz-sR-lGW"/>
                 <outlet property="tableView" destination="Ubg-RS-LWE" id="ZiJ-ca-sOj"/>
                 <outlet property="titleLabel" destination="Dkf-kU-x6H" id="Ahd-Md-7ii"/>
                 <outlet property="titleSeparator" destination="ik5-L4-VLw" id="qht-tq-0rB"/>
@@ -162,6 +164,9 @@
                                 <constraint firstAttribute="width" constant="24" id="Dt6-9r-UXZ"/>
                                 <constraint firstAttribute="height" constant="24" id="MPF-8Q-Oge"/>
                             </constraints>
+                            <connections>
+                                <action selector="shuffleAction:" target="-2" id="yht-Rc-8kq"/>
+                            </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9xU-Ba-Hys">
                             <rect key="frame" x="149" y="0.0" width="24" height="24"/>
@@ -173,6 +178,9 @@
                                 <constraint firstAttribute="width" constant="24" id="LwI-Gs-9Ll"/>
                                 <constraint firstAttribute="height" constant="24" id="oy4-Ke-bx1"/>
                             </constraints>
+                            <connections>
+                                <action selector="repeatAction:" target="-2" id="SNk-vw-LSL"/>
+                            </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C02-6a-1Uw">
                             <rect key="frame" x="297" y="0.0" width="24" height="25"/>

@@ -24,6 +24,7 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -86,6 +87,19 @@
                                              options:NSKeyValueObservingOptionNew
                                              context:nil];
     }
+
+    [self repeatStateUpdated:nil];
+    [self shuffleStateUpdated:nil];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(shuffleStateUpdated:)
+                               name:VLCPlaybackOrderChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(repeatStateUpdated:)
+                               name:VLCPlaybackRepeatChanged
+                             object:nil];
 }
 
 #pragma mark - appearance setters
@@ -123,6 +137,88 @@
         self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.dragDropImageBackgroundBox.hidden = YES;
+    }
+}
+
+#pragma mark - playmode state display and interaction
+
+- (IBAction)shuffleAction:(id)sender
+{
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    } else {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
+}
+
+- (void)shuffleStateUpdated:(NSNotification *)aNotification
+{
+    if (@available(macOS 11.0, *)) {
+        self.shuffleButton.image = [NSImage imageWithSystemSymbolName:@"shuffle"
+                                             accessibilityDescription:@"Shuffle"];
+        self.shuffleButton.contentTintColor =
+            self.playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+                nil : NSColor.VLCAccentColor;
+    } else {
+        self.shuffleButton.image =
+            self.playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+                [NSImage imageNamed:@"shuffleOff"] :
+                [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
+    }
+}
+
+- (IBAction)repeatAction:(id)sender
+{
+    const enum vlc_playlist_playback_repeat repeatState = self.playlistController.playbackRepeat;
+    switch (repeatState) {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+            break;
+        default:
+            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+            break;
+    }
+}
+
+- (void)repeatStateUpdated:(NSNotification *)aNotification
+{
+    const enum vlc_playlist_playback_repeat repeatState = self.playlistController.playbackRepeat;
+
+    if (@available(macOS 11.0, *)) {
+        switch (repeatState) {
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+                self.repeatButton.image = [NSImage imageWithSystemSymbolName:@"repeat.1"
+                                                    accessibilityDescription:@"Repeat current"];
+                self.repeatButton.contentTintColor = NSColor.VLCAccentColor;
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+                self.repeatButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
+                                                    accessibilityDescription:@"Repeat"];
+                self.repeatButton.contentTintColor = NSColor.VLCAccentColor;
+                break;
+            default:
+                self.repeatButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
+                                                    accessibilityDescription:@"Repeat"];
+                self.repeatButton.contentTintColor = nil;
+                break;
+        }
+    } else {
+        switch (repeatState) {
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+                self.repeatButton.image =
+                    [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+                self.repeatButton.image =
+                    [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
+                break;
+            default:
+                self.repeatButton.image = [NSImage imageNamed:@"repeatOff"];
+                break;
+        }
     }
 }
 

@@ -42,11 +42,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSBox *dragDropImageBackgroundBox;
 @property (readwrite, weak) IBOutlet NSButton *openMediaButton;
 @property (readwrite, weak) IBOutlet NSBox *bottomButtonsSeparator;
+@property (readwrite, weak) IBOutlet NSButton *repeatButton;
+@property (readwrite, weak) IBOutlet NSButton *shuffleButton;
 
 @property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistController *playlistController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+
+- (IBAction)shuffleAction:(id)sender;
+- (IBAction)repeatAction:(id)sender;
 
 @end
 
