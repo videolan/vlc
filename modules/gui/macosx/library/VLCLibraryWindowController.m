@@ -25,7 +25,6 @@
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowNavigationSidebarController.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -64,8 +63,6 @@
 
     NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
     NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
-
-    [libraryWindow.navSidebarController selectSegment:rememberedSelectedLibrarySegment];
 
     completionHandler(libraryWindow, nil);
 }

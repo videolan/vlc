@@ -47,7 +47,6 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
-#import "library/VLCLibraryWindowNavigationSidebarController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
@@ -228,8 +227,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                                options:NSKeyValueObservingOptionNew
                                                context:nil];
     }
-
-    _navSidebarController = [[VLCLibraryWindowNavigationSidebarController alloc] initWithLibraryWindow:self];
 
     _playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
     _playlistDragDropView.dropTarget = self;
@@ -816,11 +813,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     return NO;
-}
-
-- (IBAction)goToBrowseSection:(id)sender
-{
-    [_navSidebarController selectSegment:VLCLibraryBrowseSegment];
 }
 
 - (IBAction)backwardsNavigationAction:(id)sender

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowNavigationSidebarController.h: MacOS X interface module
+ * VLCLibraryWindowNavigationSidebarViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryWindowNavigationSidebarController.h"
+#import "VLCLibraryWindowNavigationSidebarViewController.h"
 
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibrarySegment.h"
@@ -28,7 +28,7 @@
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
 
-@implementation VLCLibraryWindowNavigationSidebarController
+@implementation VLCLibraryWindowNavigationSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {

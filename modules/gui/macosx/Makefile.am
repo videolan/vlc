@@ -152,8 +152,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
-	gui/macosx/library/VLCLibraryWindowNavigationSidebarController.h \
-	gui/macosx/library/VLCLibraryWindowNavigationSidebarController.m \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.h \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.h \
@@ -441,7 +441,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryAlbumTableCellView.xib \
 	gui/macosx/UI/VLCLibraryAudioGroupHeaderView.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
-	gui/macosx/UI/VLCLibraryWindowNavSidebarView.xib \
+	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
 	gui/macosx/UI/VLCLibraryWindowPlaylistView.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \

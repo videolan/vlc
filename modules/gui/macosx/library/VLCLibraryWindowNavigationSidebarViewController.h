@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowNavigationSidebarController.h: MacOS X interface module
+ * VLCLibraryWindowNavigationSidebarViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCLibrarySegment;
 
-@interface VLCLibraryWindowNavigationSidebarController : NSObject<NSOutlineViewDelegate>
+@interface VLCLibraryWindowNavigationSidebarViewController : NSViewController<NSOutlineViewDelegate>
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSArray<VLCLibrarySegment *> *segments;
