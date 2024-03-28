@@ -47,6 +47,7 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
@@ -810,6 +811,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     return NO;
+}
+
+- (IBAction)goToBrowseSection:(id)sender
+{
+    [self.splitViewController.navSidebarViewController selectSegment:VLCLibraryBrowseSegment];
 }
 
 - (IBAction)backwardsNavigationAction:(id)sender

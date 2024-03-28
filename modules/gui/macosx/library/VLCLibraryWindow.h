@@ -168,6 +168,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)repeatAction:(id)sender;
 - (IBAction)clearPlaylist:(id)sender;
 - (IBAction)sortPlaylist:(id)sender;
+- (IBAction)goToBrowseSection:(id)sender;
 - (IBAction)sortLibrary:(id)sender;
 - (IBAction)filterLibrary:(id)sender;
 - (IBAction)openMedia:(id)sender;
