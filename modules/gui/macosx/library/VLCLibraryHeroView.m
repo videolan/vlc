@@ -75,6 +75,9 @@
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     NSArray * const videos = libraryModel.listOfVideoMedia;
     const NSInteger videoCount = videos.count;
+    if (videoCount == 0) {
+        return nil;
+    }
     const uint32_t randIdx = arc4random_uniform((uint32_t)(videoCount - 1));
     return [videos objectAtIndex:randIdx];
 }
