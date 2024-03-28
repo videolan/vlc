@@ -48,6 +48,7 @@
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
@@ -967,12 +968,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self hideControlsBarImmediately];
     [self.videoViewController showControls];
 
-    self.playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing;
+    self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = YES;
 }
 
 - (void)disableVideoPlaybackAppearance
 {
-    [self makeFirstResponder: _playlistTableView];
+    [self makeFirstResponder:self.splitViewController.playlistSidebarViewController.view];
     [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
@@ -991,7 +992,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
-    self.playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
+    self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
