@@ -37,6 +37,12 @@
 #import "views/VLCRoundedCornerTextField.h"
 #import "windows/VLCOpenWindowController.h"
 
+@interface VLCLibraryWindowPlaylistSidebarViewController()
+
+@property (readwrite) BOOL internalMainVideoModeEnabled;
+
+@end
+
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -44,17 +50,14 @@
     self = [super initWithNibName:@"VLCLibraryWindowPlaylistView" bundle:nil];
     if (self) {
         _libraryWindow = libraryWindow;
+        _internalMainVideoModeEnabled = NO;
     }
     return self;
 }
 
 - (void)viewDidLoad
 {
-    if (self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
-        // Compensate for full content view window's titlebar height, prevent top being cut off
-        self.topInternalConstraint.constant =
-            self.libraryWindow.titlebarHeight + VLCLibraryUIUnits.mediumSpacing;
-    }
+    self.mainVideoModeEnabled = NO;
 
     self.dragDropView.dropTarget = self.libraryWindow;
     self.counterTextField.useStrongRounding = YES;
@@ -140,6 +143,22 @@
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.dragDropImageBackgroundBox.hidden = YES;
     }
+}
+
+- (BOOL)mainVideoModeEnabled
+{
+    return self.internalMainVideoModeEnabled;
+}
+
+- (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
+{
+    self.internalMainVideoModeEnabled = mainVideoModeEnabled;
+    CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.mediumSpacing;
+    if (!mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
+        // Compensate for full content view window's titlebar height, prevent top being cut off
+        internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
+    }
+    self.topInternalConstraint.constant = internalTopConstraintConstant;
 }
 
 #pragma mark - table view interaction

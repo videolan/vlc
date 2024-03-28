@@ -50,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistSortingMenuController *sortingMenuController;
 
+@property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 - (IBAction)tableDoubleClickAction:(id)sender;
