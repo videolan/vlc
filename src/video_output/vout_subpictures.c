@@ -898,10 +898,10 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
             bool is_late = render_entry->is_late;
+            const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
-                                             current->b_subtitle ? render_subtitle_date : system_now,
-                                             ignore_osd))
+                                             render_date, ignore_osd))
             {
                 index++;
                 continue;
