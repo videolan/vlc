@@ -27,6 +27,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
@@ -272,9 +273,11 @@
 
 - (void)updatePlaylistToggleState
 {
-    VLCLibraryWindow *libraryWindow = (VLCLibraryWindow*)self.view.window;
+    VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
-        _playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:libraryWindow.playlistView] ?
+        NSView * const playlistView =
+            libraryWindow.splitViewController.playlistSidebarViewController.view;
+        self.playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:playlistView] ?
             NSControlStateValueOff : NSControlStateValueOn;
     }
 }

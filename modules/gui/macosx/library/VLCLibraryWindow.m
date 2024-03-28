@@ -632,7 +632,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)updatePlayqueueToggleState
 {
-    _playQueueToggle.state = [_mainSplitView isSubviewCollapsed:_playlistView] ?
+    NSView * const playlistView = self.splitViewController.playlistSidebarViewController.view;
+    _playQueueToggle.state = [self.mainSplitView isSubviewCollapsed:playlistView] ?
         NSControlStateValueOff : NSControlStateValueOn;
 }
 
