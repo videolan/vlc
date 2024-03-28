@@ -202,7 +202,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
             if( p_block )
             {
                 p_block->i_dts = p_block->i_pts = VLC_TICK_0 + p_spu->i_start;
-                if( p_spu->i_stop > p_spu->i_start )
+                if( p_spu->i_stop != VLC_TICK_INVALID && p_spu->i_stop > p_spu->i_start )
                     p_block->i_length = p_spu->i_stop - p_spu->i_start;
             }
         }
