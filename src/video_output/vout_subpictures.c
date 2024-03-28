@@ -897,7 +897,6 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
         for (size_t index = 0; index < channel->entries.size; ) {
             render_entry = &channel->entries.data[index];
             subpicture_t *current = render_entry->subpic;
-            bool is_late = render_entry->is_late;
             const vlc_tick_t render_date = current->b_subtitle ? render_subtitle_date : system_now;
 
             if (!spu_render_entry_IsSelected(render_entry, channel->id,
@@ -910,7 +909,7 @@ spu_SelectSubpictures(spu_t *spu, vlc_tick_t system_now,
             const vlc_tick_t stop_date = current->b_subtitle ? __MAX(start_date, sys->last_sort_date) : system_now;
 
             /* Destroy late and obsolete ephemer subpictures */
-            bool is_rejected = is_late && render_entry->stop <= stop_date;
+            bool is_rejected = render_entry->is_late && render_entry->stop <= stop_date;
             if (current->b_ephemer) {
                 const vlc_tick_t ephemer_date = current->b_subtitle ? ephemer_subtitle_date : ephemer_osd_date;
                 if (render_entry->start < ephemer_date)
