@@ -210,7 +210,8 @@ static void OutputPicture( decoder_t *p_dec,
     p_spu->b_ephemer = p_spu_properties->b_ephemer;
     p_spu->b_subtitle = p_spu_properties->b_subtitle;
 
-    if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
+    if( (p_spu->i_stop == VLC_TICK_INVALID || p_spu->i_stop <= p_spu->i_start) &&
+        !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
         p_spu->i_stop = p_spu->i_start + VLC_TICK_FROM_MS(500 * 11);
