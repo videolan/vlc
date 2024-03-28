@@ -808,9 +808,9 @@ spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
     if (ignore_osd && !subpic->b_subtitle)
         return false;
 
-    if (render_date && render_date < render_entry->start)
-        return false; /* Too early, come back next monday */
-    return true;
+    assert(render_date != VLC_TICK_INVALID);
+    // is it too early for this entry ?
+    return render_date >= render_entry->start;
 }
 
 /*****************************************************************************
