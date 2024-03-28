@@ -42,6 +42,8 @@ class RoundImage : public QQuickItem
 
     Q_PROPERTY(Status status READ status NOTIFY statusChanged FINAL)
 
+    Q_PROPERTY(bool cache READ cache WRITE setCache NOTIFY cacheChanged FINAL)
+
 public:
     enum Status
     {
@@ -61,15 +63,18 @@ public:
     QUrl source() const;
     qreal radius() const;
     Status status() const;
+    bool cache() const;
 
 public slots:
     void setSource(const QUrl& source);
     void setRadius(qreal radius);
+    void setCache(bool cache);
 
 signals:
     void sourceChanged(const QUrl&);
     void radiusChanged(qreal);
     void statusChanged();
+    void cacheChanged();;
 
 protected:
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
@@ -96,6 +101,7 @@ private:
     QUrl m_source;
     qreal m_radius = 0.0;
     qreal m_dpr = 1.0; // device pixel ratio
+    bool m_cache = true;
 
     QImage m_roundImage;
     std::shared_ptr<RoundImageRequest> m_activeImageResponse;

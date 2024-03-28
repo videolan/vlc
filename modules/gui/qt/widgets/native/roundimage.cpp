@@ -231,6 +231,11 @@ RoundImageRequest::~RoundImageRequest()
     g_imageCache.removeRequest(m_key);
 }
 
+void RoundImageRequest::saveInCache()
+{
+    m_saveInCache = true;
+}
+
 void RoundImageRequest::handleImageResponseFinished()
 {
     m_cancelOnDelete = false;
@@ -255,7 +260,8 @@ void RoundImageRequest::handleImageResponseFinished()
 
     image.setDevicePixelRatio(m_dpr);
 
-    g_imageCache.insert(m_key, new QImage(image), image.sizeInBytes());
+    if (m_saveInCache)
+        g_imageCache.insert(m_key, new QImage(image), image.sizeInBytes());
     emit requestCompleted(RoundImage::Status::Ready, image);
 }
 
@@ -416,6 +422,11 @@ RoundImage::Status RoundImage::status() const
     return m_status;
 }
 
+bool RoundImage::cache() const
+{
+    return m_cache;
+}
+
 void RoundImage::setSource(const QUrl& source)
 {
     if (m_source == source)
@@ -433,6 +444,14 @@ void RoundImage::setRadius(qreal radius)
 
     m_radius = radius;
     emit radiusChanged(m_radius);
+}
+
+void RoundImage::setCache(bool cache)
+{
+    if (m_cache == cache)
+        return;
+    m_cache = cache;
+    emit cacheChanged();
 }
 
 void RoundImage::itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value)
@@ -478,6 +497,9 @@ void RoundImage::load()
         onRequestCompleted(RoundImage::Error, {});
         return;
     }
+
+    if (m_cache)
+        m_activeImageResponse->saveInCache();
 
     connect(m_activeImageResponse.get(), &RoundImageRequest::requestCompleted, this, &RoundImage::onRequestCompleted);
     //at this point m_activeImageResponse is either in Loading or Error status

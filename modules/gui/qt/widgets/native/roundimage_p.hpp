@@ -78,6 +78,8 @@ public:
 
     void handleImageResponseFinished();
 
+    void saveInCache();
+
 signals:
     void requestCompleted(RoundImage::Status status, QImage image);
 
@@ -89,6 +91,7 @@ private:
     qreal m_dpr;
     QQuickImageResponse* m_imageResponse = nullptr;
     RoundImage::Status m_status = RoundImage::Status::Loading;
+    bool m_saveInCache = false;
 };
 
 /**
