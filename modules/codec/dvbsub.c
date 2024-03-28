@@ -2011,7 +2011,8 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     bs_write( s, 8, 0xff );/* End marker */
     p_block->i_buffer = bs_pos( s ) / 8;
     p_block->i_pts = p_block->i_dts = p_subpic->i_start;
-    if( !p_subpic->b_ephemer && ( p_subpic->i_stop > p_subpic->i_start ) )
+    if( !p_subpic->b_ephemer &&
+        ( p_subpic->i_stop != VLC_TICK_INVALID && p_subpic->i_stop > p_subpic->i_start ) )
     {
         block_t *p_block_stop;
 
@@ -2108,7 +2109,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
 
     i_timeout = 0;
     if( p_subpic && !p_subpic->b_ephemer &&
-        ( p_subpic->i_stop > p_subpic->i_start ) )
+        ( p_subpic->i_stop != VLC_TICK_INVALID && p_subpic->i_stop > p_subpic->i_start ) )
     {
         i_timeout = SEC_FROM_VLC_TICK(p_subpic->i_stop - p_subpic->i_start);
     }
@@ -2650,4 +2651,3 @@ static void default_dds_init( decoder_t * p_dec )
     p_sys->display.i_height_minus1 = 576-1;
     p_sys->display.b_windowed = false;
 }
-
