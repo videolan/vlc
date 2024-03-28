@@ -636,7 +636,7 @@ static void subtitles_positions_FinishUpdate(subtitles_positions_vector *subs)
 }
 
 static struct subtitle_position_cache *subtitles_positions_FindRegion(
-    subtitles_positions_vector *subs,
+    const subtitles_positions_vector *subs,
     const subpicture_t *subpic,
     const subpicture_region_t *region)
 {
