@@ -872,7 +872,7 @@ static int Demux( demux_t *p_demux )
             {
                 p_block->i_dts =
                 p_block->i_pts = VLC_TICK_0 + p_subtitle->i_start * p_sys->f_rate;
-                if( p_subtitle->i_stop >= 0 && p_subtitle->i_stop >= p_subtitle->i_start )
+                if( p_subtitle->i_stop != VLC_TICK_INVALID && p_subtitle->i_stop >= p_subtitle->i_start )
                     p_block->i_length = (p_subtitle->i_stop - p_subtitle->i_start) * p_sys->f_rate;
 
                 es_out_Send( p_demux->out, p_sys->es, p_block );
@@ -1032,7 +1032,7 @@ static int ParseMicroDvd( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     /* */
     p_subtitle->i_start  =  VLC_TICK_0 + i_start * p_props->i_microsecperframe;
-    p_subtitle->i_stop   = i_stop >= 0 ? (VLC_TICK_0 + i_stop  * p_props->i_microsecperframe) : -1;
+    p_subtitle->i_stop   = i_stop >= 0 ? (VLC_TICK_0 + i_stop  * p_props->i_microsecperframe) : VLC_TICK_INVALID;
     p_subtitle->psz_text = psz_text;
     return VLC_SUCCESS;
 }
@@ -1578,7 +1578,7 @@ static int ParseMPL2(vlc_object_t *p_obj, subs_properties_t *p_props,
             sscanf( s, "[%d][%d] %[^\r\n]", &i_start, &i_stop, psz_text ) == 3)
         {
             p_subtitle->i_start = VLC_TICK_0 + VLC_TICK_FROM_MS(i_start * 100);
-            p_subtitle->i_stop  = i_stop >= 0 ? VLC_TICK_0 + VLC_TICK_FROM_MS(i_stop  * 100) : -1;
+            p_subtitle->i_stop  = i_stop >= 0 ? VLC_TICK_0 + VLC_TICK_FROM_MS(i_stop  * 100) : VLC_TICK_INVALID;
             break;
         }
         free( psz_text );
