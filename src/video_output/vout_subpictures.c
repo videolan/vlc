@@ -2149,7 +2149,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
 
     /* An ephemer with stop time can be ephemer,
        but a pic without stop time must be ephemer */
-    if(subpic->i_stop < subpic->i_start)
+    if(subpic->i_stop != VLC_TICK_INVALID && subpic->i_stop < subpic->i_start)
         subpic->b_ephemer = true;
 
     if (spu_channel_Push(channel, subpic, orgstart, orgstop))
