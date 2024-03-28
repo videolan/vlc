@@ -805,7 +805,7 @@ spu_render_entry_IsSelected(spu_render_entry_t *render_entry, size_t channel_id,
     assert(subpic->i_channel >= 0 && (size_t) subpic->i_channel == channel_id);
     (void) channel_id;
 
-    if (ignore_osd && !subpic->b_subtitle)
+    if (ignore_osd && subpic->i_channel < VOUT_SPU_CHANNEL_OSD_COUNT)
         return false;
 
     assert(render_date != VLC_TICK_INVALID);
