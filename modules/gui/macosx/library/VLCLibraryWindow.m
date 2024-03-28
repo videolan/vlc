@@ -36,8 +36,6 @@
 
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistDataSource.h"
-#import "playlist/VLCPlaylistSortingMenuController.h"
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -87,21 +85,15 @@
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
-const CGFloat VLCLibraryWindowDefaultPlaylistWidth = 340.;
-const CGFloat VLCLibraryWindowMinimalPlaylistWidth = 170.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
 @interface VLCLibraryWindow ()
 {
-    CGFloat _lastPlaylistWidthBeforeCollaps;
-
     NSInteger _librarySegmentType;
     NSInteger _currentSelectedViewModeSegment;
 }
 
 @property NSTimer *searchInputTimer;
-
-- (IBAction)goToBrowseSection:(id)sender;
 
 @end
 
@@ -201,14 +193,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCWindowShouldShowController
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(shuffleStateUpdated:)
-                               name:VLCPlaybackOrderChanged
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(repeatStateUpdated:)
-                               name:VLCPlaybackRepeatChanged
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
@@ -225,51 +209,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCRendererRemovedNotification
                              object:nil];
 
-    if (@available(macOS 10.14, *)) {
-        [NSApplication.sharedApplication addObserver:self
-                                            forKeyPath:@"effectiveAppearance"
-                                               options:NSKeyValueObservingOptionNew
-                                               context:nil];
-    }
-
-    _playlistViewTitleTopConstraint.constant = VLCLibraryUIUnits.mediumSpacing + self.titlebarHeight;
-    _playlistDragDropView.dropTarget = self;
-    _playlistCounterTextField.useStrongRounding = YES;
-    _playlistCounterTextField.font = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];
-    _playlistCounterTextField.textColor = NSColor.VLClibraryAnnotationColor;
-    _playlistCounterTextField.hidden = YES;
-
-    _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
-    _playlistDataSource.playlistController = _playlistController;
-    _playlistDataSource.tableView = _playlistTableView;
-    _playlistDataSource.dragDropView = _playlistDragDropView;
-    _playlistDataSource.counterTextField = _playlistCounterTextField;
-    [_playlistDataSource prepareForUse];
-    _playlistController.playlistDataSource = _playlistDataSource;
-
-    _playlistTableView.dataSource = _playlistDataSource;
-    _playlistTableView.delegate = _playlistDataSource;
-    _playlistTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
-    [_playlistTableView reloadData];
-
     _libraryHomeViewController = [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
-    self.upNextLabel.font = NSFont.VLClibrarySectionHeaderFont;
-    self.upNextLabel.stringValue = _NS("Playlist");
-    self.openMediaButton.title = _NS("Open media...");
-    self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
-
-    [self updateColorsBasedOnAppearance:self.effectiveAppearance];
-
-    //_mainSplitView.delegate = self;
-    _lastPlaylistWidthBeforeCollaps = VLCLibraryWindowDefaultPlaylistWidth;
-
     [self setViewForSelectedSegment];
-    [self repeatStateUpdated:nil];
-    [self shuffleStateUpdated:nil];
 
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
@@ -295,121 +240,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super encodeRestorableStateWithCoder:coder];
     [coder encodeInteger:_librarySegmentType forKey:@"macosx-library-selected-segment"];
-}
-
-#pragma mark - appearance setters
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
-                       context:(void *)context
-{
-    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
-        NSAppearance *effectiveAppearance = change[NSKeyValueChangeNewKey];
-        [self updateColorsBasedOnAppearance:effectiveAppearance];
-    }
-}
-
-- (void)updateColorsBasedOnAppearance:(NSAppearance*)appearance
-{
-    NSParameterAssert(appearance);
-    BOOL isDark = NO;
-    if (@available(macOS 10.14, *)) {
-        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
-    }
-
-    // If we try to pull the view's effectiveAppearance we are going to get the previous appearance's name despite
-    // responding to the effectiveAppearance change (???) so it is a better idea to pull from the general system
-    // theme preference, which is always up-to-date
-    if (isDark) {
-        self.upNextLabel.textColor = NSColor.VLClibraryDarkTitleColor;
-        self.upNextSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
-        self.clearPlaylistSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
-        self.dragDropImageBackgroundBox.hidden = NO;
-    } else {
-        self.upNextLabel.textColor = NSColor.VLClibraryLightTitleColor;
-        self.upNextSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
-        self.clearPlaylistSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
-        self.dragDropImageBackgroundBox.hidden = YES;
-    }
-}
-
-#pragma mark - playmode state display and interaction
-
-- (IBAction)shuffleAction:(id)sender
-{
-    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
-    } else {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
-    }
-}
-
-- (void)shuffleStateUpdated:(NSNotification *)aNotification
-{
-    if (@available(macOS 11.0, *)) {
-        self.shufflePlaylistButton.image = [NSImage imageWithSystemSymbolName:@"shuffle"
-                                                     accessibilityDescription:@"Shuffle"];
-        self.shufflePlaylistButton.contentTintColor = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
-            nil : [NSColor VLCAccentColor];
-    } else {
-        self.shufflePlaylistButton.image = _playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
-            [NSImage imageNamed:@"shuffleOff"] : [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
-    }
-}
-
-- (IBAction)repeatAction:(id)sender
-{
-    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
-    switch (currentRepeatState) {
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
-            break;
-        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
-            break;
-
-        default:
-            _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
-            break;
-    }
-}
-
-- (void)repeatStateUpdated:(NSNotification *)aNotification
-{
-    enum vlc_playlist_playback_repeat currentRepeatState = _playlistController.playbackRepeat;
-
-    if (@available(macOS 11.0, *)) {
-        switch (currentRepeatState) {
-            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat.1"
-                                                            accessibilityDescription:@"Repeat current"];
-                self.repeatPlaylistButton.contentTintColor = [NSColor VLCAccentColor];
-                break;
-            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
-                                                            accessibilityDescription:@"Repeat"];
-                self.repeatPlaylistButton.contentTintColor = [NSColor VLCAccentColor];
-                break;
-            default:
-                self.repeatPlaylistButton.image = [NSImage imageWithSystemSymbolName:@"repeat"
-                                                            accessibilityDescription:@"Repeat"];
-                self.repeatPlaylistButton.contentTintColor = nil;
-                break;
-        }
-    } else {
-        switch (currentRepeatState) {
-            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-                self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatAll"] imageTintedWithColor:NSColor.VLCAccentColor];
-                break;
-            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-                self.repeatPlaylistButton.image = [[NSImage imageNamed:@"repeatOne"] imageTintedWithColor:NSColor.VLCAccentColor];
-                break;
-            default:
-                self.repeatPlaylistButton.image = [NSImage imageNamed:@"repeatOff"];
-                break;
-        }
-    }
 }
 
 #pragma mark - misc. user interactions
@@ -721,28 +551,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     NSLog(@"Unknown kind of library item provided, cannot present library view for it: %@", libraryItem.displayString);
 }
 
-- (IBAction)playlistDoubleClickAction:(id)sender
-{
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
-    if (selectedRow == -1)
-        return;
-
-    [VLCMain.sharedInstance.playlistController playItemAtIndex:selectedRow];
-}
-
-- (IBAction)clearPlaylist:(id)sender
-{
-    [_playlistController clearPlaylist];
-}
-
-- (IBAction)sortPlaylist:(id)sender
-{
-    if (!_playlistSortingMenuController) {
-        _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
-    }
-    [NSMenu popUpContextMenu:_playlistSortingMenuController.playlistSortingMenu withEvent:[NSApp currentEvent] forView:sender];
-}
-
 - (IBAction)sortLibrary:(id)sender
 {
     if (!_librarySortingMenuController) {
@@ -777,11 +585,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self stopSearchTimer];
     _librarySearchField.stringValue = @"";
     [self updateFilterString];
-}
-
-- (IBAction)openMedia:(id)sender
-{
-    [[VLCMain.sharedInstance open] openFileGeneric];
 }
 
 - (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
