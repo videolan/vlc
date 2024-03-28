@@ -679,6 +679,13 @@ static void pause_common(const struct clock_ctx *ctx, vlc_clock_t *updater)
     vlc_clock_Update(updater, system, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
 
+    {
+        vlc_clock_Lock(ctx->slave);
+        vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, ctx->stream_start, 1.0f);
+        assert(converted == system);
+        vlc_clock_Unlock(ctx->slave);
+    }
+
     system += VLC_TICK_FROM_MS(10);
 
     vlc_clock_main_Lock(ctx->mainclk);
