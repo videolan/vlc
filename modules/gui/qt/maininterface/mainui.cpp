@@ -41,6 +41,7 @@
 #include "util/flickable_scroll_handler.hpp"
 #include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
+#include "util/vlcaccess_image_provider.hpp"
 #include "util/csdbuttonmodel.hpp"
 #include "util/vlctick.hpp"
 #include "util/list_selection_model.hpp"
@@ -144,6 +145,7 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
     SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
     SingletonRegisterHelper<SVGColorImage>::setInstance( new SVGColorImage(this) );
+    SingletonRegisterHelper<VLCAccessImage>::setInstance( new VLCAccessImage(this) );
 
     if (m_mainCtx->hasMediaLibrary())
     {
@@ -174,6 +176,7 @@ bool MainUI::setup(QQmlEngine* engine)
 
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
+    engine->addImageProvider(QStringLiteral("vlcaccess"), new VLCAccessImageProvider());
 
     m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/main/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
@@ -239,6 +242,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
         qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
+        qmlRegisterSingletonType<VLCAccessImage>(uri, versionMajor, versionMinor, "VLCAccessImage", SingletonRegisterHelper<VLCAccessImage>::callback);
         qmlRegisterSingletonType<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", SingletonRegisterHelper<PlaylistController>::callback);
 
         qmlRegisterType<DelayEstimator>( uri, versionMajor, versionMinor, "DelayEstimator" );

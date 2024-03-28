@@ -298,6 +298,7 @@ libqt_plugin_la_SOURCES = \
 	util/base_model.hpp util/base_model_p.hpp util/base_model.cpp \
 	util/color_scheme_model.cpp util/color_scheme_model.hpp \
 	util/color_svg_image_provider.cpp util/color_svg_image_provider.hpp \
+	util/vlcaccess_image_provider.cpp util/vlcaccess_image_provider.hpp \
 	util/covergenerator.cpp \
 	util/covergenerator.hpp \
 	util/imageluminanceextractor.cpp util/imageluminanceextractor.hpp \
@@ -464,6 +465,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/base_model.moc.cpp \
 	util/color_scheme_model.moc.cpp \
 	util/color_svg_image_provider.moc.cpp \
+	util/vlcaccess_image_provider.moc.cpp \
 	util/imageluminanceextractor.moc.cpp \
 	util/csdbuttonmodel.moc.cpp \
 	util/keyhelper.moc.cpp \
