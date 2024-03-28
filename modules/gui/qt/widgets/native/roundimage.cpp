@@ -24,12 +24,16 @@
 # include "config.h"
 #endif
 
+#include <vlc_access.h>
+#include <vlc_stream.h>
+
 #include "qt.hpp"
 
 #include "roundimage.hpp"
 #include "roundimage_p.hpp"
 #include "util/asynctask.hpp"
 #include "util/qsgroundedrectangularimagenode.hpp"
+#include "util/vlcaccess_image_provider.hpp"
 
 #include <qhashfunctions.h>
 
@@ -42,14 +46,9 @@
 #include <QQuickWindow>
 #include <QGuiApplication>
 #include <QSGImageNode>
+#include <QIODevice>
 #include <QtQml>
 #include <QQmlFile>
-
-#ifdef QT_NETWORK_LIB
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
-#endif
 
 
 bool operator ==(const ImageCacheKey &lhs, const ImageCacheKey &rhs)
@@ -100,172 +99,6 @@ namespace
 
         return target;
     }
-
-    class ImageReader : public AsyncTask<QImage>
-    {
-    public:
-        /**
-         * @brief ImageReader
-         * @param device i/o source to read from, ImageReader doesn't take owner ship of the device
-         *               parent must make sure availability of device through out the lifetime of this instance
-         *
-         * @param requestedSize only taken as hint, the Image is resized with PreserveAspectCrop
-         *
-         * @param radius
-         */
-        ImageReader(QIODevice *device, QSize requestedSize, const qreal radius)
-            : device {device}
-            , requestedSize {requestedSize}
-            , radius {radius}
-        {
-        }
-
-        QString errorString() const { return errorStr; }
-
-        QImage execute() override
-        {
-            QImageReader reader;
-            reader.setDevice(device);
-            const QSize sourceSize = reader.size();
-
-            if (requestedSize.isValid())
-                reader.setScaledSize(sourceSize.scaled(requestedSize, Qt::KeepAspectRatioByExpanding));
-
-            auto img = reader.read();
-            errorStr = reader.errorString();
-
-            if (!errorStr.isEmpty())
-                img = prepareImage(requestedSize.isValid() ? requestedSize : img.size(), radius, img);
-
-            return img;
-        }
-
-    private:
-        QIODevice *device;
-        QSize requestedSize;
-        qreal radius;
-        QString errorStr;
-    };
-
-    class LocalImageResponse : public QQuickImageResponse
-    {
-    public:
-        LocalImageResponse(const QString &fileName, const QSize &requestedSize, const qreal radius)
-        {
-            auto file = new QFile(fileName);
-            reader.reset(new ImageReader(file, requestedSize, radius));
-            file->setParent(reader.get());
-
-            connect(reader.get(), &ImageReader::result, this, &LocalImageResponse::handleImageRead);
-
-            reader->start(*QThreadPool::globalInstance());
-        }
-
-        QQuickTextureFactory *textureFactory() const override
-        {
-            return result.isNull() ? nullptr : QQuickTextureFactory::textureFactoryForImage(result);
-        }
-
-        QString errorString() const override
-        {
-            return errorStr;
-        }
-
-    private:
-        void handleImageRead()
-        {
-            result = reader->takeResult();
-            errorStr = reader->errorString();
-            reader.reset();
-
-            emit finished();
-        }
-
-        QImage result;
-        TaskHandle<ImageReader> reader;
-        QString errorStr;
-    };
-
-#ifdef QT_NETWORK_LIB
-    class NetworkImageResponse : public QQuickImageResponse
-    {
-    public:
-        /**
-         * @brief NetworkImageResponse
-         * @param reply - Network reply to read from, NetworkImageResponse takes ownership of this object
-         * @param requestedSize - passed to ImageReader class
-         * @param radius - passed to ImageReader class
-         */
-        NetworkImageResponse(QNetworkReply *reply, QSize requestedSize, const qreal radius)
-            : reply {reply}
-            , requestedSize {requestedSize}
-            , radius {radius}
-        {
-            reply->setParent(this);
-
-            QObject::connect(reply, &QNetworkReply::finished
-                             , this, &NetworkImageResponse::handleNetworkReplyFinished);
-        }
-
-        QQuickTextureFactory *textureFactory() const override
-        {
-            return result.isNull() ? nullptr : QQuickTextureFactory::textureFactoryForImage(result);
-        }
-
-        QString errorString() const override
-        {
-            return error;
-        }
-
-        void cancel() override
-        {
-            if (reply->isRunning())
-                reply->abort();
-
-            reader.reset();
-        }
-
-    private:
-        void handleNetworkReplyFinished()
-        {
-            if (reply->error() != QNetworkReply::NoError)
-            {
-                error = reply->errorString();
-                emit finished();
-
-                releaseNetworkReply();
-                return;
-            }
-
-            reader.reset(new ImageReader(reply, requestedSize, radius));
-            QObject::connect(reader.get(), &ImageReader::result, this, [this]()
-            {
-                result = reader->takeResult();
-                error = reader->errorString();
-                reader.reset();
-
-                releaseNetworkReply();
-
-                emit finished();
-            });
-
-            reader->start(*QThreadPool::globalInstance());
-        }
-
-        void releaseNetworkReply()
-        {
-            reply->deleteLater();
-            reply = nullptr;
-        }
-
-        QNetworkReply *reply;
-        QSize requestedSize;
-        qreal radius;
-        TaskHandle<ImageReader> reader;
-        QImage result;
-        QString error;
-    };
-#endif
 
     // adapts a given QQuickImageResponse to produce a image with radius
     class ImageResponseRadiusAdaptor : public QQuickImageResponse
@@ -429,7 +262,7 @@ void RoundImageRequest::handleImageResponseFinished()
 
 QQuickImageResponse* RoundImageRequest::getAsyncImageResponse(const QUrl &url, const QSize &requestedSize, const qreal radius, QQmlEngine *engine)
 {
-    if (url.scheme() == QStringLiteral("image"))
+    if (url.scheme() == QStringLiteral("image") && url.host() != "vlcaccess")
     {
         auto provider = engine->imageProvider(url.host());
         if (!provider)
@@ -447,21 +280,13 @@ QQuickImageResponse* RoundImageRequest::getAsyncImageResponse(const QUrl &url, c
 
         return nullptr;
     }
-    else if (QQmlFile::isLocalFile(url))
-    {
-        return new LocalImageResponse(QQmlFile::urlToLocalFileOrQrc(url), requestedSize, radius);
-    }
-#ifdef QT_NETWORK_LIB
-    else
-    {
-        QNetworkRequest request(url);
-        request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-        auto reply = engine->networkAccessManager()->get(request);
-        return new NetworkImageResponse(reply, requestedSize, radius);
-    }
-#else
-    return nullptr;
-#endif
+
+    VLCAccessImageProvider vlcAccessImageProvider([radius](QImage& img, const QSize &requestedSize) -> QImage {
+        return prepareImage(requestedSize, radius, img);
+    });
+    QString wrappedUri = VLCAccessImageProvider::wrapUri(url.toString(QUrl::FullyEncoded));
+
+    return vlcAccessImageProvider.requestImageResponse(wrappedUri, requestedSize);
 }
 
 // RoundImage
