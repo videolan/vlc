@@ -1489,6 +1489,12 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 output_last_ptr->place.y += video_position->y;
             }
 
+            if (cache_pos != NULL)
+            {
+                assert(output_last_ptr->place.x == cache_pos->x);
+                assert(output_last_ptr->place.y == cache_pos->y);
+            }
+
             vlc_vector_push(&output->regions, output_last_ptr);
 
             if (subpic->b_subtitle && !subpic->b_absolute) {
