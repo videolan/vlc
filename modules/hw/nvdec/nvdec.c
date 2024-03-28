@@ -784,6 +784,7 @@ static int OpenDecoder(vlc_object_t *p_this)
             result = hxxx_helper_set_extra(&p_sys->hh, p_dec->fmt_in->p_extra,
                                            p_dec->fmt_in->i_extra);
             if (result != VLC_SUCCESS) {
+                msg_Dbg(p_this, "missing/invalid HEVC/H264 extradata");
                 hxxx_helper_clean(&p_sys->hh);
                 goto early_exit;
             }
@@ -808,6 +809,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                     break;
                 }
             }
+            msg_Dbg(p_this, "missing/invalid VC1/WMV3 extradata");
             goto early_exit;
         case VLC_CODEC_MP1V:
         case VLC_CODEC_MP2V:
@@ -828,6 +830,7 @@ static int OpenDecoder(vlc_object_t *p_this)
                 goto early_exit;
             break;
         default:
+            msg_Dbg(p_this, "Unsupported codec %4.4s", (char*)&p_dec->fmt_in->i_codec);
             goto early_exit;
     }
 
@@ -835,6 +838,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (dec_device == NULL) {
         if (p_sys->b_is_hxxx)
             hxxx_helper_clean(&p_sys->hh);
+        msg_Dbg(p_this, "Missing decoder device");
         goto early_exit;
     }
     p_sys->devsys = GetNVDECOpaqueDevice(dec_device);
