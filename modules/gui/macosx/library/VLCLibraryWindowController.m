@@ -25,6 +25,8 @@
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowNavigationSidebarViewController.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -59,10 +61,10 @@
         VLCMain.sharedInstance.libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
     }
 
-    VLCLibraryWindow *libraryWindow = VLCMain.sharedInstance.libraryWindow;
+    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
 
-    NSInteger rememberedSelectedLibrarySegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
-    NSInteger rememberedSelectedLibraryViewAudioSegment = [state decodeIntegerForKey:@"macosx-library-audio-view-selected-segment"];
+    const NSInteger selectedSegment = [state decodeIntegerForKey:@"macosx-library-selected-segment"];
+    [libraryWindow.splitViewController.navSidebarViewController selectSegment:selectedSegment];
 
     completionHandler(libraryWindow, nil);
 }
