@@ -1491,7 +1491,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
             vlc_vector_push(&output->regions, output_last_ptr);
 
-            if (subpic->b_subtitle) {
+            if (subpic->b_subtitle && !subpic->b_absolute) {
                 if (!external_scale)
                     area = spu_area_unscaled(area, scale);
                 if (subtitle_area)
