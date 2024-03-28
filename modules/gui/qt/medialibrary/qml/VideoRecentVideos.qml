@@ -41,6 +41,9 @@ FocusScope {
     property int rightPadding: VLCStyle.margin_xsmall
 
     property int nbItemPerRow
+
+    property int allVideosContentLeftMargin
+    property int allVideosContentRightMargin
     
     property alias model: recentModel
 
@@ -149,9 +152,11 @@ FocusScope {
 
             view: root
 
-            leftPadding: view.currentItem?.contentLeftMargin ?? 0
-            topPadding: MainCtx.gridView ? VLCStyle.gridView_spacing + VLCStyle.margin_xsmall + VLCStyle.margin_xxxsmall
-                                         : VLCStyle.tableView_spacing
+            leftPadding: allVideosContentLeftMargin
+            rightPadding: allVideosContentRightMargin
+            topPadding: recentModel.count > 0 ? (MainCtx.gridView ? VLCStyle.gridView_spacing :
+                                                                    VLCStyle.tableView_spacing)
+                                              : 0
 
             text: view.title
         }

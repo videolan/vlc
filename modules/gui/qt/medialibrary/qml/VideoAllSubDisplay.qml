@@ -268,6 +268,9 @@ VideoAll {
 
         nbItemPerRow: root.currentItem?.nbItemPerRow ?? 0
 
+        allVideosContentLeftMargin: root.currentItem?.contentLeftMargin ?? 0
+        allVideosContentRightMargin: root.currentItem?.contentRightMargin ?? 0
+
         subtitleText: (root.model && root.model.count > 0) ? qsTr("Videos") : ""
 
         Navigation.parentItem: root
