@@ -1278,6 +1278,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     dst->place.height = region_fmt.i_visible_height;
     int fade_alpha = 255;
     if (subpic->b_fade) {
+        assert(subpic->i_stop != VLC_TICK_INVALID);
         vlc_tick_t fade_start = subpic->i_start + 3 * (subpic->i_stop - subpic->i_start) / 4;
 
         if (fade_start <= render_date && fade_start < subpic->i_stop)
