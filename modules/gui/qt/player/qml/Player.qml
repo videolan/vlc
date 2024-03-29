@@ -407,7 +407,7 @@ FocusScope {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: rootPlayer.coverSource
+                    source: VLCAccessImage.uri(rootPlayer.coverSource)
                     fillMode: Image.PreserveAspectFit
                     mipmap: true
                     cache: false

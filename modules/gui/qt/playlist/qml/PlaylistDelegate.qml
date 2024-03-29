@@ -163,7 +163,7 @@ T.ItemDelegate {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: (model.artwork && model.artwork.toString()) ? model.artwork : VLCStyle.noArtAlbumCover
+                source: (model.artwork && model.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
                 visible: !statusIcon.visible
                 asynchronous: true
 

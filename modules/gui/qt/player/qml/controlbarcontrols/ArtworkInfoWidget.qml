@@ -102,7 +102,7 @@ AbstractButton {
 
             source: {
                 if (!paintOnly && Player.artwork && Player.artwork.toString())
-                    return Player.artwork
+                    return VLCAccessImage.uri(Player.artwork)
                 else
                     return VLCStyle.noArtAlbumCover
             }

@@ -108,7 +108,7 @@ Item {
 
         source: {
             if (!!networkModel && !!networkModel.artwork && networkModel.artwork.length > 0)
-                return networkModel.artwork
+                return VLCAccessImage.uri(networkModel.artwork)
 
             return ""
         }
