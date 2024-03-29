@@ -38,7 +38,6 @@ using namespace hls;
 HLSStream::HLSStream(demux_t *demux)
     : AbstractStream(demux)
 {
-    b_id3_timestamps_offset_set = false;
     p_meta = vlc_meta_New();
     b_meta_updated = false;
 }
@@ -52,29 +51,14 @@ HLSStream::~HLSStream()
 void HLSStream::setMetadataTimeOffset(vlc_tick_t i_offset)
 {
     if(i_offset >= 0)
-    {
-        if(!b_id3_timestamps_offset_set)
-            fakeEsOut()->setAssociatedTimestamp(i_offset);
-        b_id3_timestamps_offset_set = true;
-    }
+        fakeEsOut()->setAssociatedTimestamp(i_offset);
     else
-    {
         fakeEsOut()->setAssociatedTimestamp(-1);
-        b_id3_timestamps_offset_set = false;
-    }
 }
 
 void HLSStream::setMetadataTimeMapping(vlc_tick_t mpegts, vlc_tick_t muxed)
 {
     fakeEsOut()->setAssociatedTimestamp(mpegts, muxed);
-}
-
-bool HLSStream::setPosition(const StreamPosition &pos, bool b)
-{
-    bool ok = AbstractStream::setPosition(pos, b);
-    if(b && ok)
-        b_id3_timestamps_offset_set = false;
-    return ok;
 }
 
 void HLSStream::trackerEvent(const TrackerEvent &e)
