@@ -463,13 +463,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)updatePresentedView
 {
+    _audioDataSource.audioLibrarySegment = [self currentLibrarySegmentToAudioLibrarySegment];
     if (_audioDataSource.libraryModel.numberOfAudioMedia == 0) {
         [self presentPlaceholderAudioView];
     } else {
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
-        _audioDataSource.audioLibrarySegment = [self currentLibrarySegmentToAudioLibrarySegment];
         const VLCLibraryViewModeSegment viewModeSegment = [self viewModeSegmentForCurrentLibrarySegment];
 
         if (viewModeSegment == VLCLibraryListViewModeSegment) {
