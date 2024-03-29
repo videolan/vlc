@@ -174,16 +174,27 @@
                                                             <action selector="openBookmarks:" target="3" id="o6m-9M-L4U"/>
                                                         </connections>
                                                     </button>
-                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
+                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jZ-hd-YVq" customClass="VLCImageButton">
                                                         <rect key="frame" x="111" y="-1" width="32" height="33"/>
+                                                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="arrow.down.right.topleft.rectangle" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="fyV-F5-ogO">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" secondItem="dYZ-ri-Kra" secondAttribute="height" multiplier="1:1" id="cHQ-Fu-L8k"/>
-                                                            <constraint firstAttribute="width" constant="32" id="quS-fD-Od7"/>
+                                                            <constraint firstAttribute="width" constant="32" id="QNF-zS-6Sz"/>
+                                                            <constraint firstAttribute="width" secondItem="8jZ-hd-YVq" secondAttribute="height" multiplier="1:1" id="iNf-6g-2uS"/>
                                                         </constraints>
+                                                    </button>
+                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
+                                                        <rect key="frame" x="148" y="-1" width="32" height="33"/>
                                                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="arrow.up.left.and.arrow.down.right" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="Z8g-js-0W6">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="dYZ-ri-Kra" secondAttribute="height" multiplier="1:1" id="cHQ-Fu-L8k"/>
+                                                            <constraint firstAttribute="width" constant="32" id="quS-fD-Od7"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="fullscreen:" target="3" id="0Kk-UV-WtF"/>
                                                         </connections>
@@ -198,8 +209,10 @@
                                                     <integer value="1000"/>
                                                     <integer value="1000"/>
                                                     <integer value="1000"/>
+                                                    <integer value="1000"/>
                                                 </visibilityPriorities>
                                                 <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
@@ -427,6 +440,7 @@
         <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
         <image name="NSListViewTemplate" width="21" height="15"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
+        <image name="arrow.down.right.topleft.rectangle" catalog="system" width="18" height="14"/>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="16" height="15"/>
         <image name="backward.fill" catalog="system" width="19" height="12"/>
         <image name="bookmark.circle" catalog="system" width="15" height="15"/>
