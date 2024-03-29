@@ -36,7 +36,6 @@ namespace hls
             block_t *checkBlock(block_t *, bool) override;
             AbstractDemuxer * newDemux(vlc_object_t *, const StreamFormat &,
                                        es_out_t *, AbstractSourceStream *) const override;
-            bool setPosition(const StreamPosition &, bool) override;
             void trackerEvent(const TrackerEvent &)  override;
 
         private:
@@ -45,7 +44,6 @@ namespace hls
             int ParseID3PrivTag(const uint8_t *, size_t);
             void setMetadataTimeOffset(vlc_tick_t);
             void setMetadataTimeMapping(vlc_tick_t, vlc_tick_t);
-            bool b_id3_timestamps_offset_set;
             vlc_meta_t *p_meta;
             bool b_meta_updated;
     };
