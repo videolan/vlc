@@ -12,8 +12,12 @@ endif
 ifdef HAVE_WIN32
 PKGS += qt
 endif
+ifneq ($(findstring qt,$(PKGS)),)
+PKGS_TOOLS += qt-tools
+endif
+PKGS_ALL += qt-tools
 
-DEPS_qt += freetype2 $(DEPS_freetype2) harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)
+DEPS_qt = qt-tools freetype2 $(DEPS_freetype2) harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)
 ifdef HAVE_WIN32
 DEPS_qt += d3d12 $(DEPS_d3d12) dcomp $(DEPS_dcomp)
 endif
@@ -21,11 +25,20 @@ endif
 ifeq ($(call need_pkg,"Qt6Core >= 6.6 Qt6Gui >= 6.6 Qt6Widgets >= 6.6 Qt6Network >= 6.6"),)
 PKGS_FOUND += qt
 endif
+ifndef HAVE_CROSS_COMPILE
+PKGS_FOUND += qt-tools
+endif
+ifeq ($(shell qt-cmake --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),3.22)
+PKGS_FOUND += qt-tools
+endif
 
 $(TARBALLS)/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz:
 	$(call download_pkg,$(QTBASE_URL), qt)
 
 .sum-qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz
+
+.sum-qt-tools: .sum-qt
+	touch $@
 
 qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
@@ -71,16 +84,15 @@ QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATU
 	-DFEATURE_texthtmlparser=OFF -DFEATURE_cssparser=OFF -DFEATURE_textodfwriter=OFF -DFEATURE_textmarkdownreader=OFF \
 	-DFEATURE_textmarkdownwriter=OFF -DINPUT_libb2=no -DFEATURE_harfbuzz=OFF -DFEATURE_freetype=OFF
 
-.qt: qt toolchain.cmake
-ifdef HAVE_CROSS_COMPILE
-	# Native
+.qt-tools: BUILD_DIR=$</vlc_native
+.qt-tools: qt
 	$(CMAKECLEAN)
 	$(BUILDVARS) $(CMAKE_NATIVE) $(QTBASE_NATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 
 	# Note that libexec is treated as bin on Windows by Qt
-	
+
 	# MOC
 	ln -sf $(BUILDPREFIX)/libexec/moc $(PREFIX)/bin/moc
 
@@ -89,7 +101,9 @@ ifdef HAVE_CROSS_COMPILE
 
 	# UIC
 	ln -sf $(BUILDPREFIX)/libexec/uic $(PREFIX)/bin/uic
-endif
+	touch $@
+
+.qt: qt toolchain.cmake
 	$(CMAKECLEAN)
 	mkdir -p $(BUILD_DIR)
 
