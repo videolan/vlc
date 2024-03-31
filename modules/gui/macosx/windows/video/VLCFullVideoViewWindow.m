@@ -59,6 +59,22 @@
     self.acceptsMouseMovedEvents = YES;
 }
 
+- (void)setPipModeEnabled:(BOOL)pipModeEnabled
+{
+    _pipModeEnabled = pipModeEnabled;
+    if (self.pipModeEnabled) {
+        self.level = NSMainMenuWindowLevel;
+        self.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
+                                  NSWindowCollectionBehaviorIgnoresCycle |
+                                  NSWindowCollectionBehaviorTransient |
+                                  NSWindowCollectionBehaviorFullScreenAuxiliary;
+        [self hideTitleBar:self];
+    } else {
+        self.level = NSNormalWindowLevel;
+        self.collectionBehavior = NSWindowCollectionBehaviorDefault;
+    }
+}
+
 - (void)stopTitlebarAutohideTimer
 {
     [_hideTitlebarTimer invalidate];
