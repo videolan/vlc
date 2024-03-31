@@ -45,6 +45,7 @@
 {
     [super setup];
     _autohideTitlebar = NO;
+    _pipModeEnabled = NO;
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
