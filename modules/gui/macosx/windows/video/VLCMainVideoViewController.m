@@ -382,4 +382,13 @@
     }
 }
 
+- (IBAction)togglePictureInPicture:(id)sender
+{
+    VLCFullVideoViewWindow * const videoWindow = (VLCFullVideoViewWindow *)self.view.window;
+    if (videoWindow != nil) {
+        videoWindow.pipModeEnabled = !videoWindow.pipModeEnabled;
+    }
+    self.pipModeEnabled = !self.pipModeEnabled;
+}
+
 @end

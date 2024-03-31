@@ -184,6 +184,9 @@
                                                             <constraint firstAttribute="width" constant="32" id="QNF-zS-6Sz"/>
                                                             <constraint firstAttribute="width" secondItem="8jZ-hd-YVq" secondAttribute="height" multiplier="1:1" id="iNf-6g-2uS"/>
                                                         </constraints>
+                                                        <connections>
+                                                            <action selector="togglePictureInPicture:" target="-2" id="l48-tv-GNg"/>
+                                                        </connections>
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
                                                         <rect key="frame" x="148" y="-1" width="32" height="33"/>

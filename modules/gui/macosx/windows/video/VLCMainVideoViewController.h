@@ -50,6 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL autohideControls;
 @property (readwrite, nonatomic) BOOL displayLibraryControls;
+@property (readwrite, nonatomic) BOOL pipModeEnabled;
 @property (readonly) BOOL mouseOnControls;
 
 - (void)showControls;
@@ -57,6 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (IBAction)togglePlaylist:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;
+- (IBAction)togglePictureInPicture:(id)sender;
 
 @end
 
