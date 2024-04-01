@@ -38,9 +38,6 @@ MainInterface.MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
-     // 'loading' property is not available with NetworkDevicesModel
-    readonly property bool loading: model?.loading ?? false
-
     // fixme remove this
     property Item _currentView: currentItem
 
@@ -358,7 +355,7 @@ MainInterface.MainViewLoader {
                 Widgets.EmptyLabelButton {
                     id: emptyLabel
 
-                    visible: !root.loading
+                    visible: !root.isLoading
 
                     // FIXME: find better cover
                     cover: VLCStyle.noArtVideoCover
@@ -393,7 +390,7 @@ MainInterface.MainViewLoader {
                 }
 
                 Item {
-                    visible: root.loading
+                    visible: root.isLoading
 
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -401,7 +398,7 @@ MainInterface.MainViewLoader {
                     Widgets.BusyIndicatorExt {
                         id: busyIndicator
 
-                        runningDelayed: root.loading
+                        runningDelayed: root.isLoading
                         anchors.centerIn: parent
                         z: 1
                     }
