@@ -16,7 +16,7 @@ qt6_dep = dependency('qt6',
     version: '>=6.2',
     modules: [
         'Core', 'Gui', 'Widgets', 'Svg', 'Qml', 'QmlModels',
-        'QuickLayouts', 'QuickTemplates2',
+        'QuickLayouts', 'QuickTemplates2', 'QmlWorkerScript',
         'Quick', 'QuickControls2', 'ShaderTools'
         ],
     private_headers: true,
