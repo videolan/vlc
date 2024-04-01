@@ -164,7 +164,6 @@ public:
     inline ItemType getType() const { return m_type; }
     inline bool isIndexed() const { return m_indexed; }
     inline bool canBeIndexed() const { return m_canBeIndexed; }
-    int getCount() const;
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist( int index );
