@@ -45,17 +45,20 @@
 
 double vlc_strtod_c(const char *restrict str, char **restrict end)
 {
-    locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
-    locale_t oldloc = uselocale (loc);
-    double res = strtod (str, end);
-
-    if (loc != (locale_t)0)
-    {
-        uselocale (oldloc);
-        freelocale (loc);
+    locale_t loc = newlocale(LC_NUMERIC_MASK, "C", NULL);
+    if (loc == NULL) {
+        // Handle error, maybe by using the default locale or returning an error code
+        return -1.0; // Example error return value
     }
+    locale_t oldloc = uselocale(loc);
+    double res = strtod(str, end);
+    uselocale(oldloc);
+    freelocale(loc);
     return res;
 }
+
+// Similarly, add error handling to other functions where newlocale() is called
+
 
 float vlc_strtof_c(const char *restrict str, char **restrict end)
 {
