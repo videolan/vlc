@@ -78,12 +78,12 @@ Widgets.GridItem {
 
     title: model.name || qsTr("Unknown share")
     subtitle: {
-       if (!model.mrl) {
-         return ""
-       } else if ((model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY) && model.mrl.toString() === "vlc://nop") {
-         return ""
-      } else {
-         return model.mrl
-      }
+        if (!model.mrl) {
+            return ""
+        } else if ((model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY) && model.mrl.toString() === "vlc://nop") {
+            return ""
+        } else {
+            return model.mrl
+        }
     }
 }
