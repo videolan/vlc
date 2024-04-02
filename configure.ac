@@ -4000,7 +4000,11 @@ have_qt_core_private="no"
 AS_IF([test "${enable_qt}" != "no"], [
   dnl Note that Qt < 6.2.5 does not provide pc files!
   QT_MINIMUM_VERSION=6.2
-  PKG_CHECK_MODULES([QT], m4_foreach([pkg], [Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2 Qt6ShaderTools Qt6Svg Qt6Network], [pkg >= ${QT_MINIMUM_VERSION}]), [
+  PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
+      Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
+      Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2 Qt6ShaderTools
+      Qt6Svg Qt6Network
+    ], [pkg >= ${QT_MINIMUM_VERSION}]), [
 
       QT_PREFIX_PATH="$(eval $PKG_CONFIG --variable=prefix Qt6Core)"
       QT_PLUGINS_PATH="${QT_PREFIX_PATH}/plugins"
@@ -4080,6 +4084,7 @@ AS_IF([test "${enable_qt}" != "no"], [
             --qmake "${QMAKE}" \
             --modules \
             QtQml.Models="" \
+            QtQml.WorkerScript="" \
             QtQuick.Layouts="" \
             QtQuick.Window="" \
             QtQuick.Controls="" \
