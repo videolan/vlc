@@ -1,6 +1,8 @@
-prefix=/
+prefix=@@CONTRIB_PREFIX@@
 exec_prefix=${prefix}
-libdir=/
+libdir=${prefix}/lib
+pluginsdir=${prefix}/plugins
+qmldir=${prefix}/qml
 
 Name: qtvlcdeps
 Description: Qt dependencies for VLC media player

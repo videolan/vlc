@@ -14,18 +14,29 @@ ifeq ($(call need_pkg,"qtvlcdeps >= 0.1"),)
 PKGS_FOUND += qtvlcdeps
 endif
 
-$(TARBALLS)/.dummy-qtvlcdeps:
-	rm -f $(TARBALLS)/.dummy-qtvlcdeps
-	cp -f $(SRC)/qtvlcdeps/dummy $(TARBALLS)/.dummy-qtvlcdeps
+QT_VLC_DEP_SOURCES := Imports.qml Imports.qrc qtvlcdeps.pc.in vlcdeps.pro
 
-.sum-qtvlcdeps: .dummy-qtvlcdeps
+.sum-qtvlcdeps:
+	touch $@
 
-QMAKE := $(PREFIX)/bin/qmake
+qtvlcdeps: UNPACK_DIR=qtvlcdeps-unpack
+qtvlcdeps:
+	$(RM) -R $@ && mkdir -p $(UNPACK_DIR)
+	for f in $(QT_VLC_DEP_SOURCES) ; do \
+	  cp -f $(SRC)/qtvlcdeps/$$f $(UNPACK_DIR) ; \
+	done
+	$(MOVE)
 
-.qtvlcdeps:
-	rm -rf /tmp/vlc-qt-deps
-	$(QMAKE) $(SRC)/qtvlcdeps -o /tmp/vlc-qt-deps/deps
-	rm -f $(PREFIX)/lib/pkgconfig/qtvlcdeps.pc
-	cp -f $(SRC)/qtvlcdeps/qtvlcdeps.pc.in $(PREFIX)/lib/pkgconfig/qtvlcdeps.pc
-	QT_LIBS=$$(awk -F '=' '/LIBS/ {print $$2; exit}' /tmp/vlc-qt-deps/deps.Release); \
-	sed -i "s|%1|$$QT_LIBS|g" $(PREFIX)/lib/pkgconfig/qtvlcdeps.pc
+.qtvlcdeps: qtvlcdeps
+	rm -rf $</Makefile.Release
+	$(BUILDPREFIX)/bin/qmake6 -qtconf $(PREFIX)/bin/target_qt.conf $(SRC)/qtvlcdeps -o $<
+	QT_LIBS=$$(awk -F '=' '/LIBS/ {print $$2; exit}' $</Makefile.Release); \
+	  cat $</qtvlcdeps.pc.in                         | \
+	  sed "s|%1|$$QT_LIBS|"                          | \
+	  sed "s|$(PREFIX)/lib/|$$\{libdir\}/|g"         | \
+	  sed "s|$(PREFIX)/plugins/|$$\{pluginsdir\}/|g" | \
+	  sed "s|$(PREFIX)/qml/|$$\{qmldir\}/|g"         | \
+	  sed "s|$(PREFIX)/|$$\{prefix\}/|g"             | \
+	  sed "s|@@CONTRIB_PREFIX@@|$(PREFIX)|" > $</qtvlcdeps.pc
+	install -d $(PREFIX)/lib/pkgconfig && install $</qtvlcdeps.pc $(PREFIX)/lib/pkgconfig
+	touch $@
