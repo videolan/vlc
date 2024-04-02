@@ -61,14 +61,15 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_CONFIG) \
 	--no-feature-quick-particles \
 	--no-feature-quick-shadereffect \
 	--no-feature-quick-path \
-	--no-feature-qml-network \
-	-- -DFEATURE_qml_debug=OFF -DFEATURE_qml_profiler=OFF
+	--no-feature-qml-network
+
+QT_DECLARATIVE_FEATURES := -DFEATURE_qml_debug=OFF -DFEATURE_qml_profiler=OFF
 
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
 .qtdeclarative-tools: qtdeclarative
 	$(CMAKECLEAN)
 	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_NATIVE_CONFIG)
+	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_NATIVE_CONFIG) -- $(QT_DECLARATIVE_FEATURES)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
@@ -77,7 +78,7 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_CONFIG) \
 	mkdir -p $(PREFIX)/libexec
 	$(CMAKECLEAN)
 	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_CONFIG) -- -DFEATURE_qml_debug=OFF -DFEATURE_qml_profiler=OFF
+	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_CONFIG) -- $(QT_DECLARATIVE_FEATURES)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 
