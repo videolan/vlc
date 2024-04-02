@@ -1,0 +1,40 @@
+From d4f3ba3b1e5fdcbdca7ffe7f3903e5f47e312855 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4_qt@ycbcr.xyz>
+Date: Tue, 2 Apr 2024 13:16:23 +0200
+Subject: [PATCH] disable precompiled headers when forcing WINVER internally
+
+Change-Id: I663194224b5b69540183d92ffe45425575b0752c
+---
+ src/plugins/platforms/direct2d/CMakeLists.txt | 2 ++
+ src/plugins/platforms/windows/CMakeLists.txt  | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/src/plugins/platforms/direct2d/CMakeLists.txt b/src/plugins/platforms/direct2d/CMakeLists.txt
+index e21b230cd7..fc764e9c74 100644
+--- a/src/plugins/platforms/direct2d/CMakeLists.txt
++++ b/src/plugins/platforms/direct2d/CMakeLists.txt
+@@ -136,6 +136,8 @@ qt_internal_extend_target(QWindowsDirect2DIntegrationPlugin CONDITION QT_FEATURE
+ qt_internal_extend_target(QWindowsDirect2DIntegrationPlugin CONDITION QT_FEATURE_clipboard AND QT_FEATURE_draganddrop
+     SOURCES
+         ../windows/qwindowsdrag.cpp ../windows/qwindowsdrag.h
++    NO_PCH_SOURCES
++        ../windows/qwindowsdrag.cpp
+ )
+ 
+ qt_internal_extend_target(QWindowsDirect2DIntegrationPlugin CONDITION QT_FEATURE_tabletevent
+diff --git a/src/plugins/platforms/windows/CMakeLists.txt b/src/plugins/platforms/windows/CMakeLists.txt
+index ca1bbcb758..213fdcbff5 100644
+--- a/src/plugins/platforms/windows/CMakeLists.txt
++++ b/src/plugins/platforms/windows/CMakeLists.txt
+@@ -125,6 +125,8 @@ qt_internal_extend_target(QWindowsIntegrationPlugin CONDITION QT_FEATURE_clipboa
+ qt_internal_extend_target(QWindowsIntegrationPlugin CONDITION QT_FEATURE_clipboard AND QT_FEATURE_draganddrop
+     SOURCES
+         qwindowsdrag.cpp qwindowsdrag.h
++    NO_PCH_SOURCES
++        qwindowsdrag.cpp
+ )
+ 
+ qt_internal_extend_target(QWindowsIntegrationPlugin CONDITION QT_FEATURE_tabletevent
+-- 
+2.37.3.windows.1
+
