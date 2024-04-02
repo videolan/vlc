@@ -1116,6 +1116,11 @@ libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/RectFilter.frag \
                           shaders/SubTexture.vert \
                           shaders/PlayerBlurredBackground.frag
+if ENABLE_QT
+BUILT_SOURCES += \
+    $(libqt_plugin_la_SHADER:.frag=.frag.qsb) \
+    $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
+endif
 
 QSB_PARAMS = --glsl="100 es,120,150" --batchable -O
 if HAVE_WIN32
@@ -1136,6 +1141,7 @@ shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.fra
 	$(AM_V_GEN) $(RCC) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
 
 libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
+BUILT_SOURCES += shaders/shaders.qrc
 
 lib_qt_plugin_la_QRC = vlc.qrc
 
