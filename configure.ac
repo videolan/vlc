@@ -4021,13 +4021,56 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
       QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
 
+      dnl check native in contribs and keep the full path if found there
+      AC_MSG_CHECKING([if contribs provide qmake])
+      AS_IF([test -x "${CONTRIB_DIR}/qmake${BUILDEXEEXT}"], [
+        QMAKE="${CONTRIB_DIR}/qmake${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
       AC_PATH_PROGS(QMAKE, [qmake], qmake, ["${QT_BIN_DIRECTORY}"])
+      AC_MSG_CHECKING([if contribs provide moc])
+      AS_IF([test -x "${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"], [
+        MOC="${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
+      AC_MSG_CHECKING([if contribs provide rcc])
+      AS_IF([test -x "${CONTRIB_DIR}/../libexec/rcc${BUILDEXEEXT}"], [
+        RCC="${CONTRIB_DIR}/../libexec/rcc${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
+      AC_MSG_CHECKING([if contribs provide uic])
+      AS_IF([test -x "${CONTRIB_DIR}/../libexec/uic${BUILDEXEEXT}"], [
+        UIC="${CONTRIB_DIR}/../libexec/uic${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
+      AC_MSG_CHECKING([if contribs provide qsb])
+      AS_IF([test -x "${CONTRIB_DIR}/../bin/qsb${BUILDEXEEXT}"], [
+        QSB="${CONTRIB_DIR}/../bin/qsb${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
       AC_PATH_PROGS(QSB, [qsb], qsb, ["${QT_SHADERTOOLS_BIN_DIRECTORY}"])
 
-      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], no, ["${QT_QML_LIBEXEC_DIRECTORY}"])
+      AC_MSG_CHECKING([if contribs provide qmlcachegen])
+      AS_IF([test -x "${CONTRIB_DIR}/../libexec/qmlcachegen${BUILDEXEEXT}"], [
+        QMLCACHEGEN="${CONTRIB_DIR}/../libexec/qmlcachegen${BUILDEXEEXT}"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
+      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], qmlcachegen, ["${QT_QML_LIBEXEC_DIRECTORY}"])
       AS_IF([test "${QMLCACHEGEN}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
@@ -4045,7 +4088,7 @@ AS_IF([test "${enable_qt}" != "no"], [
           AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
           enable_qt="no"
       ])
-    
+
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
           AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py --qmake "${QMAKE}" --modules QtTest=""], [
               have_qt_quick_test="yes"
