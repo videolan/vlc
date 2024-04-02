@@ -6,7 +6,7 @@ SPIRVTOOLS_URL := $(GITHUB)/KhronosGroup/SPIRV-Tools/archive/refs/tags/v$(SPIRVT
 SPIRVHEADERS_VERSION := 1.3.246.1
 SPIRVHEADERS_URL := $(GITHUB)/KhronosGroup/SPIRV-Headers/archive/refs/tags/sdk-$(SPIRVHEADERS_VERSION).tar.gz
 
-ifdef HAVE_WIN32
+ifneq ($(findstring qt,$(PKGS)),)
 # match with Qt targets
 PKGS_TOOLS += spirv-tools
 endif
