@@ -42,45 +42,49 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	$(APPLY) $(SRC)/qtdeclarative/0001-Fix-incorrect-library-inclusion.patch
 	$(MOVE)
 
-QT_DECLARATIVE_CONFIG := \
-	--no-feature-quick-designer \
-	--no-feature-quick-particles \
-	--no-feature-qml-preview \
-	--no-feature-quickcontrols2-imagine \
-	--no-feature-quickcontrols2-material \
-	--no-feature-quickcontrols2-universal \
-	--no-feature-quickcontrols2-macos \
-	--no-feature-quickcontrols2-ios \
-	--no-feature-qml-network
+QT_DECLARATIVE_COMMON_CONFIG := \
+	-DFEATURE_qml_debug=OFF \
+	-DFEATURE_qml_profiler=OFF \
+	-DFEATURE_quick_designer=OFF \
+	-DFEATURE_quick_particles=OFF \
+	-DFEATURE_qml_preview=OFF \
+	-DFEATURE_quickcontrols2_imagine=OFF \
+	-DFEATURE_quickcontrols2_material=OFF \
+	-DFEATURE_quickcontrols2_universal=OFF \
+	-DFEATURE_quickcontrols2_macos=OFF \
+	-DFEATURE_quickcontrols2_ios=OFF \
+	-DFEATURE_qml_network=OFF
 
-QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_CONFIG) \
-	--no-feature-qml-animation \
-	--no-feature-qml-delegate-model \
-	--no-feature-qml-itemmodel \
-	--no-feature-qml-object-model \
-	--no-feature-qml-table-model \
-	--no-feature-quick-particles \
-	--no-feature-quick-shadereffect \
-	--no-feature-quick-path \
-	--no-feature-qml-network
+QT_DECLARATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
+	-DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake \
+	-DQT_HOST_PATH=$(BUILDPREFIX)
+ifdef ENABLE_PDB
+QT_DECLARATIVE_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QT_DECLARATIVE_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
 
-QT_DECLARATIVE_FEATURES := -DFEATURE_qml_debug=OFF -DFEATURE_qml_profiler=OFF
+QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
+	-DFEATURE_qml_animation=OFF \
+	-DFEATURE_qml_delegate_model=OFF \
+	-DFEATURE_qml_itemmodel=OFF \
+	-DFEATURE_qml_object-model=OFF \
+	-DFEATURE_qml_table-model=OFF \
+	-DFEATURE_quick_shadereffect=OFF \
+	-DFEATURE_quick_path=OFF \
+	-DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake \
 
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
 .qtdeclarative-tools: qtdeclarative
 	$(CMAKECLEAN)
-	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_NATIVE_CONFIG) -- $(QT_DECLARATIVE_FEATURES)
+	$(BUILDVARS) $(CMAKE_NATIVE) $(QT_DECLARATIVE_NATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
 
 .qtdeclarative: qtdeclarative toolchain.cmake
-	mkdir -p $(PREFIX)/libexec
 	$(CMAKECLEAN)
-	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_CONFIG) -- $(QT_DECLARATIVE_FEATURES)
+	$(HOSTVARS) $(CMAKE) $(QT_DECLARATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
 	touch $@

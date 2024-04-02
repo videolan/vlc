@@ -19,13 +19,20 @@ $(TARBALLS)/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz:
 
 .sum-qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
+QTSVG_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+ifdef ENABLE_PDB
+QTSVG_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QTSVG_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
+
 qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
 	$(MOVE)
 
 .qtsvg: qtsvg toolchain.cmake
-	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC)
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) $(QTSVG_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

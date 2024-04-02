@@ -19,13 +19,20 @@ $(TARBALLS)/qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz:
 
 .sum-qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz
 
+QT5_COMPAT_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+ifdef ENABLE_PDB
+QT5_COMPAT_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QT5_COMPAT_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
+
 qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz .sum-qt5compat
 	$(UNPACK)
 	$(MOVE)
 
 .qt5compat: qt5compat toolchain.cmake
-	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC)
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) $(QT5_COMPAT_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

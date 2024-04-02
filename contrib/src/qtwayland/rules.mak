@@ -11,13 +11,20 @@ $(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
 
 .sum-qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
+QTWAYLAND_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+ifdef ENABLE_PDB
+QTWAYLAND_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QTWAYLAND_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
+
 qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 	$(UNPACK)
 	$(MOVE)
 
 .qtwayland: qtwayland toolchain.cmake
-	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC)
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) $(QTWAYLAND_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

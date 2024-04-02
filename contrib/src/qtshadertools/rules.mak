@@ -41,6 +41,15 @@ $(TARBALLS)/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz:
 .sum-qtshadertools-tools: .sum-qtshadertools
 	touch $@
 
+QT_SHADETOOLS_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake -DQT_HOST_PATH=$(BUILDPREFIX)
+ifdef ENABLE_PDB
+QT_SHADETOOLS_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QT_SHADETOOLS_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
+
+QT_SHADETOOLS_NATIVE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+
 qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum-qtshadertools
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtshadertools/0001-Use-fxc2-through-wine-instead-of-fxc.patch
@@ -50,17 +59,14 @@ qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum
 .qtshadertools-tools: BUILD_DIR=$</vlc_native
 .qtshadertools-tools: qtshadertools
 	$(CMAKECLEAN)
-	mkdir -p $(BUILD_DIR)
-	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC)
+	$(BUILDVARS) $(CMAKE_NATIVE) $(QT_SHADETOOLS_NATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
 
 .qtshadertools: qtshadertools toolchain.cmake
 	$(CMAKECLEAN)
-	mkdir -p $(BUILD_DIR)
-	+cd $(BUILD_DIR) && $(PREFIX)/bin/qt-configure-module $(BUILD_SRC)
+	$(HOSTVARS) $(CMAKE) $(QT_SHADETOOLS_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
 	touch $@
