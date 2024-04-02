@@ -71,14 +71,6 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_CONFIG) \
 	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC) $(QT_DECLARATIVE_NATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
-	# Note that libexec is treated as bin on Windows by Qt
-
-	# qmlcachegen
-	ln -sf $(BUILDPREFIX)/libexec/qmlcachegen $(PREFIX)/bin/qmlcachegen
-
-	# qmlimportscanner
-	ln -sf $(BUILDPREFIX)/libexec/qmlimportscanner $(PREFIX)/bin/qmlimportscanner
 	touch $@
 
 .qtdeclarative: qtdeclarative toolchain.cmake

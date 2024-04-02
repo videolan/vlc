@@ -90,17 +90,6 @@ QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATU
 	$(BUILDVARS) $(CMAKE_NATIVE) $(QTBASE_NATIVE_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
-	# Note that libexec is treated as bin on Windows by Qt
-
-	# MOC
-	ln -sf $(BUILDPREFIX)/libexec/moc $(PREFIX)/bin/moc
-
-	# RCC
-	ln -sf $(BUILDPREFIX)/libexec/rcc $(PREFIX)/bin/rcc
-
-	# UIC
-	ln -sf $(BUILDPREFIX)/libexec/uic $(PREFIX)/bin/uic
 	touch $@
 
 .qt: qt toolchain.cmake

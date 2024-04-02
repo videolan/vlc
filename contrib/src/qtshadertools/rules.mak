@@ -53,9 +53,6 @@ qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum
 	cd $(BUILD_DIR) && $(BUILDVARS) $(BUILDPREFIX)/bin/qt-configure-module $(BUILD_SRC)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
-
-	# qsb
-	ln -sf $(BUILDPREFIX)/bin/qsb $(PREFIX)/bin/qsb
 	touch $@
 
 .qtshadertools: qtshadertools toolchain.cmake
