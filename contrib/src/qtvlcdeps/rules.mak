@@ -6,7 +6,7 @@ ifdef HAVE_LINUX
 DEPS_qtvlcdeps += qtwayland $(DEPS_qtwayland)
 endif
 
-ifdef HAVE_WIN32
+ifneq ($(findstring qt,$(PKGS)),)
 PKGS += qtvlcdeps
 endif
 
