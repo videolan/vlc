@@ -204,6 +204,7 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlthreadpool.cpp \
 	medialibrary/mlthreadpool.hpp \
 	medialibrary/mlqmltypes.hpp \
+	medialibrary/mlmedia.hpp \
 	medialibrary/mlqueryparams.cpp \
 	medialibrary/mlqueryparams.hpp \
 	medialibrary/mlrecentsmodel.cpp \
@@ -415,6 +416,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/mlgenremodel.moc.cpp \
 	medialibrary/mlthreadpool.moc.cpp \
 	medialibrary/mlqmltypes.moc.cpp \
+	medialibrary/mlmedia.moc.cpp \
 	medialibrary/mlrecentsmodel.moc.cpp \
 	medialibrary/mlrecentsvideomodel.moc.cpp \
 	medialibrary/mlurlmodel.moc.cpp \
