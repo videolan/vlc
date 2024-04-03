@@ -342,7 +342,6 @@ export CXXFLAGS
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
-make list
 if [ "$PREBUILT" = "yes" ]; then
     if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
         make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
@@ -353,6 +352,7 @@ if [ "$PREBUILT" = "yes" ]; then
 else
     PREBUILT_FAILED=yes
 fi
+make list
 if [ -n "$PREBUILT_FAILED" ]; then
     make -j$JOBS fetch
     make -j$JOBS -k || make -j1
