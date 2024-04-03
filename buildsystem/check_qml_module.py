@@ -77,13 +77,13 @@ class QmlModuleChecker:
         return ret
 
 
-    def getInstallInfo(self, qmake):
+    def getInstallInfo(self, qmake, qtconf):
         if not os.path.isfile(qmake):
             print("qmake not found")
             return False
 
         ret = subprocess.run(
-            [ qmake, "-query"],
+            [ qmake, "-qtconf", qtconf, "-query"],
             capture_output=True,
             encoding="utf8"
         )
@@ -140,7 +140,11 @@ def main():
     parser = argparse.ArgumentParser("check for qml runtime dependencies")
     parser.add_argument(
         "--qmake", type=str, required=True,
-        help="qmake path")
+        help="native qmake path")
+
+    parser.add_argument(
+        "--qtconf", type=str, required=True,
+        help="qmake qtconf path")
 
     parser.add_argument(
         "--modules", nargs="+", action=KeyValue, required=True,
@@ -149,7 +153,7 @@ def main():
     args = parser.parse_args()
 
     moduleChecker = QmlModuleChecker()
-    if not moduleChecker.getInstallInfo(args.qmake):
+    if not moduleChecker.getInstallInfo(args.qmake, args.qtconf):
         exit(-1)
 
     with NamedTemporaryFile(mode="w+", suffix=".qml") as f:

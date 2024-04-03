@@ -4013,7 +4013,6 @@ AS_IF([test "${enable_qt}" != "no"], [
           have_qt_wayland="yes"
       ],[:])
 
-      QT_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6Core)"
       QT_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Core)"
       QT_INCLUDE_DIRECTORY="$(eval $PKG_CONFIG --variable=includedir Qt6Core)"
       QT_LIB_DIRECTORY="$(eval $PKG_CONFIG --variable=libdir Qt6Core)"
@@ -4027,13 +4026,13 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       dnl check native in contribs and keep the full path if found there
       AC_MSG_CHECKING([if contribs provide qmake])
-      AS_IF([test -x "${CONTRIB_DIR}/qmake${BUILDEXEEXT}"], [
-        QMAKE="${CONTRIB_DIR}/qmake${BUILDEXEEXT}"
+      AS_IF([test -x "${CONTRIB_DIR}/../bin/qmake${BUILDEXEEXT}"], [
+        QMAKE="${CONTRIB_DIR}/../bin/qmake${BUILDEXEEXT}"
         AC_MSG_RESULT([yes])
       ],[
         AC_MSG_RESULT([no])
       ])
-      AC_PATH_PROGS(QMAKE, [qmake], qmake, ["${QT_BIN_DIRECTORY}"])
+      AC_CHECK_TOOL(QMAKE, [qmake], [false])
       AC_MSG_CHECKING([if contribs provide moc])
       AS_IF([test -x "${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"], [
         MOC="${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"
@@ -4080,22 +4079,29 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE}" \
+            --qtconf "${CONTRIB_DIR}/bin/target_qt.conf" \
             --modules \
             QtQml.Models="" \
             QtQml.WorkerScript="" \
             QtQuick.Layouts="" \
             QtQuick.Window="" \
             QtQuick.Controls="" \
-            Qt5Compat.GraphicalEffects=""],
-      [],[
-          AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
-          enable_qt="no"
+            Qt5Compat.GraphicalEffects=""], [
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+        AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
+        enable_qt="no"
       ])
 
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
-          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py --qmake "${QMAKE}" --modules QtTest=""], [
+          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
+            --qmake "${QMAKE}" \
+            --qtconf "${CONTRIB_DIR}/bin/target_qt.conf" \
+            --modules QtTest=""], [
               have_qt_quick_test="yes"
           ], [])
       ],[
