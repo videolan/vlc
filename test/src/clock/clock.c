@@ -191,7 +191,7 @@ static void TracerTrace(void *opaque, vlc_tick_t ts,
 {
     struct vlc_tracer *libvlc_tracer = opaque;
 
-    const struct vlc_tracer_entry *entry = trace->entries;
+    const struct vlc_tracer_entry *cursor = trace->entries;
 
     bool is_render = false, is_render_video = false, is_status = false;
     unsigned nb_update = 0;
@@ -200,8 +200,11 @@ static void TracerTrace(void *opaque, vlc_tick_t ts,
     vlc_tick_t render_video_pts = VLC_TICK_INVALID;
     enum tracer_event_status status = 0;
 
-    while (entry->key != NULL)
+    while (cursor->key != NULL)
     {
+        const struct vlc_tracer_entry *entry = cursor;
+        cursor++;
+
         switch (entry->type)
         {
             case VLC_TRACER_INT:
@@ -257,7 +260,6 @@ static void TracerTrace(void *opaque, vlc_tick_t ts,
                 break;
             default: vlc_assert_unreachable();
         }
-        entry++;
     }
 
     if (libvlc_tracer != NULL)
