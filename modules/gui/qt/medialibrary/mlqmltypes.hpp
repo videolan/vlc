@@ -27,11 +27,13 @@
 #include <vlc_common.h>
 #include <vlc_media_library.h>
 
+static constexpr int64_t INVALID_MLITEMID_ID = 0;
+
 class MLItemId
 {
     Q_GADGET
 public:
-    MLItemId() : id(0), type( VLC_ML_PARENT_UNKNOWN ) {}
+    MLItemId() : id(INVALID_MLITEMID_ID), type( VLC_ML_PARENT_UNKNOWN ) {}
     MLItemId( int64_t i, vlc_ml_parent_type t ) : id( i ), type( t ) {}
     bool operator==( const MLItemId& other ) const
     {
