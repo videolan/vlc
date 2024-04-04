@@ -49,7 +49,7 @@
             weakViewToHide.animator.alphaValue = hideVTH ? 0.0 : 1.0;
             weakViewToShow.animator.alphaValue = hideVTS ? 0.0 : 1.0;
         } completionHandler:^{
-            if (startMouseIn != _mouseIn) {
+            if (startMouseIn != self->_mouseIn) {
                 return;
             }
             weakViewToHide.hidden = hideVTH;

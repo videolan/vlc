@@ -110,9 +110,10 @@
     // dispatch the event async to prevent potential deadlock 
     // with video output's RenderPicture's display lock
     dispatch_async(_eventQueue, ^{
-        if (_wnd == NULL)
+        if (self->_wnd == NULL) {
             return;
-        vlc_window_ReportSize(_wnd, bounds.size.width, bounds.size.height);
+        }
+        vlc_window_ReportSize(self->_wnd, bounds.size.width, bounds.size.height);
     });
     [super layout];
 }
