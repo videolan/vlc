@@ -22,7 +22,7 @@ ifdef HAVE_WIN32
 DEPS_qt += d3d12 $(DEPS_d3d12) dcomp $(DEPS_dcomp)
 endif
 
-ifeq ($(call need_pkg,"Qt6Core >= 6.6 Qt6Gui >= 6.6 Qt6Widgets >= 6.6 Qt6Network >= 6.6"),)
+ifeq ($(call need_pkg,"Qt6Core >= $(QTBASE_VERSION_MAJOR) Qt6Gui >= $(QTBASE_VERSION_MAJOR) Qt6Widgets >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qt
 endif
 ifndef HAVE_CROSS_COMPILE
