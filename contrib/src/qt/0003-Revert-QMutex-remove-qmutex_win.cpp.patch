@@ -1,7 +1,7 @@
-From 13ced07c50bc04b7f67001aa6521aee09f3cbfb8 Mon Sep 17 00:00:00 2001
+From a566b1d5192a99b41ae13706668b7c8bf786e204 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Sun, 14 Jan 2024 23:34:29 +0200
-Subject: [PATCH 4/8] Revert "QMutex: remove qmutex_win.cpp"
+Subject: [PATCH 3/7] Revert "QMutex: remove qmutex_win.cpp"
 
 This reverts commit b6e30e9fee98f9cdfec4c54c980864f65632519c.
 ---
@@ -15,18 +15,18 @@ This reverts commit b6e30e9fee98f9cdfec4c54c980864f65632519c.
  create mode 100644 src/corelib/thread/qmutex_win.cpp
 
 diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
-index dff023581c..d43ece2b9f 100644
+index bf24eec2cf..4809e32766 100644
 --- a/src/corelib/CMakeLists.txt
 +++ b/src/corelib/CMakeLists.txt
-@@ -499,6 +499,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
- # from the wrong DLL at runtime and crash!
+@@ -524,6 +524,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
  qt_internal_extend_target(Core CONDITION QT_FEATURE_thread AND WIN32
      SOURCES
+         thread/qfutex_win_p.h
 +        thread/qmutex_win.cpp
          thread/qwaitcondition_win.cpp
      LIBRARIES
          synchronization
-@@ -1313,6 +1314,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_ctf AND QT_FEATURE_library
+@@ -1362,6 +1363,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_ctf
  set_source_files_properties(
      thread/qmutex_mac.cpp
      thread/qmutex_unix.cpp
@@ -53,10 +53,10 @@ index 9fa7e70da9..0c205fff66 100644
  // We mean it.
  //
 diff --git a/src/corelib/thread/qmutex.cpp b/src/corelib/thread/qmutex.cpp
-index b794d79e23..1a30b25ad5 100644
+index ec6c711a4f..97ccbdf3a4 100644
 --- a/src/corelib/thread/qmutex.cpp
 +++ b/src/corelib/thread/qmutex.cpp
-@@ -913,10 +913,12 @@ void QMutexPrivate::derefWaiters(int value) noexcept
+@@ -908,10 +908,12 @@ void QMutexPrivate::derefWaiters(int value) noexcept
  
  QT_END_NAMESPACE
  
@@ -134,7 +134,7 @@ index 0000000000..8c7741c113
 +
 +QT_END_NAMESPACE
 diff --git a/src/corelib/thread/qwaitcondition_p.h b/src/corelib/thread/qwaitcondition_p.h
-index cfb36ca30b..01bb000366 100644
+index 14833d56ef..7b1becb3db 100644
 --- a/src/corelib/thread/qwaitcondition_p.h
 +++ b/src/corelib/thread/qwaitcondition_p.h
 @@ -7,9 +7,10 @@
@@ -152,5 +152,5 @@ index cfb36ca30b..01bb000366 100644
  // We mean it.
  //
 -- 
-2.43.1
+2.44.0
 

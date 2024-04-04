@@ -1,17 +1,17 @@
-From d05eac31981d69c4b29aaf38f9f0addb2b549fae Mon Sep 17 00:00:00 2001
+From 846a13b3703dc4bac6f7a9f3bbb6aa31fa5660f7 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Tue, 9 Jan 2024 20:59:45 +0200
-Subject: [PATCH 2/8] Windows Tray Icon Set NOSOUND
+Subject: [PATCH 1/7] Windows Tray Icon Set NOSOUND
 
 ---
  src/plugins/platforms/windows/qwindowssystemtrayicon.cpp | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
-index acad849a3d..fae00c2081 100644
+index ed88e250a2..835487a818 100644
 --- a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
 +++ b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
-@@ -214,6 +214,9 @@ void QWindowsSystemTrayIcon::showMessage(const QString &title, const QString &me
+@@ -216,6 +216,9 @@ void QWindowsSystemTrayIcon::showMessage(const QString &title, const QString &me
      qStringToLimitedWCharArray(message, tnd.szInfo, 256);
      qStringToLimitedWCharArray(title, tnd.szInfoTitle, 64);
  
@@ -22,5 +22,5 @@ index acad849a3d..fae00c2081 100644
  
      const auto size = icon.actualSize(QSize(256, 256));
 -- 
-2.43.1
+2.44.0
 

@@ -1,17 +1,17 @@
-From 944575ba8b8e7817fd11cddbae2c2fc20eabd556 Mon Sep 17 00:00:00 2001
+From 2e74ca54c146bda95482900faba547e96ece24a1 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Wed, 24 Jan 2024 16:31:06 +0200
-Subject: [PATCH 7/8] Try DCompositionCreateDevice3() first if available
+Subject: [PATCH 6/7] Try DCompositionCreateDevice3() first if available
 
 ---
- src/gui/rhi/qrhid3dhelpers_p.h | 13 ++++++++++++-
+ src/gui/rhi/qrhid3dhelpers.cpp | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/src/gui/rhi/qrhid3dhelpers_p.h b/src/gui/rhi/qrhid3dhelpers_p.h
-index f20c042860..d78c5a2bb2 100644
---- a/src/gui/rhi/qrhid3dhelpers_p.h
-+++ b/src/gui/rhi/qrhid3dhelpers_p.h
-@@ -45,7 +45,18 @@ inline IDCompositionDevice *createDirectCompositionDevice()
+diff --git a/src/gui/rhi/qrhid3dhelpers.cpp b/src/gui/rhi/qrhid3dhelpers.cpp
+index 216c358cbe..79efb386eb 100644
+--- a/src/gui/rhi/qrhid3dhelpers.cpp
++++ b/src/gui/rhi/qrhid3dhelpers.cpp
+@@ -110,7 +110,18 @@ IDCompositionDevice *createDirectCompositionDevice()
          _In_ REFIID iid,
          _Outptr_ void **dcompositionDevice);
      DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
@@ -32,5 +32,5 @@ index f20c042860..d78c5a2bb2 100644
          qWarning("Unable to resolve DCompositionCreateDevice, perhaps dcomp.dll is missing?");
          return nullptr;
 -- 
-2.43.1
+2.44.0
 

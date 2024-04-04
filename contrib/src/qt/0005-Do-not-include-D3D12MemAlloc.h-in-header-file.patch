@@ -1,7 +1,7 @@
-From 354c2ed8c581d9b0fc0bf776f653c270f307f075 Mon Sep 17 00:00:00 2001
+From 94a120d3668a29b3f08b3dcba68656038888a60d Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 22 Jan 2024 21:19:55 +0200
-Subject: [PATCH 6/8] Do not include D3D12MemAlloc.h in header file
+Subject: [PATCH 5/7] Do not include D3D12MemAlloc.h in header file
 
 ---
  src/gui/rhi/qrhid3d12.cpp | 11 +++++++++++
@@ -9,7 +9,7 @@ Subject: [PATCH 6/8] Do not include D3D12MemAlloc.h in header file
  2 files changed, 18 insertions(+), 10 deletions(-)
 
 diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
-index 4a5e52bfc6..0787b9a0c8 100644
+index ce9c5dcbdb..ae6e4ac376 100644
 --- a/src/gui/rhi/qrhid3d12.cpp
 +++ b/src/gui/rhi/qrhid3d12.cpp
 @@ -2,6 +2,7 @@
@@ -17,10 +17,10 @@ index 4a5e52bfc6..0787b9a0c8 100644
  
  #include "qrhid3d12_p.h"
 +#include "D3D12MemAlloc.h"
- #include "qshader.h"
- #include <QWindow>
  #include <qmath.h>
-@@ -124,6 +125,16 @@ QT_BEGIN_NAMESPACE
+ #include <QtCore/private/qsystemerror_p.h>
+ #include <comdef.h>
+@@ -123,6 +124,16 @@ QT_BEGIN_NAMESPACE
  // https://learn.microsoft.com/en-us/windows/win32/direct3d12/hardware-feature-levels
  static const D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL = D3D_FEATURE_LEVEL_11_0;
  
@@ -38,10 +38,10 @@ index 4a5e52bfc6..0787b9a0c8 100644
  {
      debugLayer = params->enableDebugLayer;
 diff --git a/src/gui/rhi/qrhid3d12_p.h b/src/gui/rhi/qrhid3d12_p.h
-index a6954d279c..ef13cc214a 100644
+index c6d4123c09..08d11e9e47 100644
 --- a/src/gui/rhi/qrhid3d12_p.h
 +++ b/src/gui/rhi/qrhid3d12_p.h
-@@ -28,7 +28,12 @@
+@@ -27,7 +27,12 @@
  #include <dxgi1_6.h>
  #include <dcomp.h>
  
@@ -53,9 +53,9 @@ index a6954d279c..ef13cc214a 100644
 +    class Allocator;
 +}
  
- QT_BEGIN_NAMESPACE
- 
-@@ -291,15 +296,7 @@ struct QD3D12Resource
+ // ID3D12Device2 and ID3D12GraphicsCommandList1 and types and enums introduced
+ // with those are hard requirements now. These should be declared in any
+@@ -311,15 +316,7 @@ struct QD3D12Resource
          return pool->add({ resource, state, resource->GetDesc(), nullptr, nullptr, 0, false });
      }
  
@@ -73,5 +73,5 @@ index a6954d279c..ef13cc214a 100644
  
  struct QD3D12Pipeline
 -- 
-2.43.1
+2.44.0
 

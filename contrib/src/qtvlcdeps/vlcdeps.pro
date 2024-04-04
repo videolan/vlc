@@ -6,7 +6,7 @@ QTPLUGIN = qsvgicon qsvg qjpeg qico
 CONFIG -= entrypoint
 
 win32 {
-QTPLUGIN += qwindows qwindowsvistastyle
+QTPLUGIN += qwindows qmodernwindowsstyle
 }
 
 linux {

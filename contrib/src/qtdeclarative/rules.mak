@@ -1,7 +1,7 @@
 # QtDeclarative
 
-QTDECLARATIVE_VERSION_MAJOR := 6.6
-QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).2
+QTDECLARATIVE_VERSION_MAJOR := 6.7
+QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).0
 QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
 DEPS_qtdeclarative-tools := qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
@@ -39,6 +39,7 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtdeclarative/0001-Fix-incorrect-library-inclusion.patch
+	$(APPLY) $(SRC)/qtdeclarative/0002-Fix-build-with-no-feature-network.patch
 	# disable unused CLI tools: qml, qmleasing, qmldom, qmlformat, qmltc
 	sed -i.orig -e 's,add_subdirectory(qml),#add_subdirectory(qml),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmleasing),#add_subdirectory(qmleasing),' $(UNPACK_DIR)/tools/CMakeLists.txt
@@ -47,6 +48,8 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	sed -i.orig -e 's,add_subdirectory(qmltc),#add_subdirectory(qmltc),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	# disable QT labs feature we don't use
 	sed -i.orig -e 's,add_subdirectory(labs),#add_subdirectory(labs),' $(UNPACK_DIR)/src/CMakeLists.txt
+	# disable unused svgtoqml tool:
+	sed -i.orig -e 's,add_subdirectory(svgtoqml),#add_subdirectory(svgtoqml),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \

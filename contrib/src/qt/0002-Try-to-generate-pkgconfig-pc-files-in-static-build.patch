@@ -1,7 +1,7 @@
-From d9d290432bfc482ba970bf215f1dcec59fa7da01 Mon Sep 17 00:00:00 2001
+From 25f81e4e301efa03c4b72eda8ea10249f2779b55 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 8 Jan 2024 21:52:41 +0200
-Subject: [PATCH 3/8] Try to generate pkgconfig pc files in static build
+Subject: [PATCH 2/7] Try to generate pkgconfig pc files in static build
 
 ---
  cmake/QtPkgConfigHelpers.cmake | 7 ++++---
@@ -26,5 +26,5 @@ index dbe736c438..caacd4e8ed 100644
      set(pkgconfig_file "${QT_CMAKE_EXPORT_NAMESPACE}${module}")
      set(pkgconfig_name "${QT_CMAKE_EXPORT_NAMESPACE} ${module}")
 -- 
-2.43.1
+2.44.0
 

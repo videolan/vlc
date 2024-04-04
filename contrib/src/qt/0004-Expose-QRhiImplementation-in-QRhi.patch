@@ -1,17 +1,17 @@
-From 94a5a61135c85489426896d2b164974128edf542 Mon Sep 17 00:00:00 2001
+From 5e7f3336f7a924a0401934d66512c4073aa785fc Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Thu, 18 Jan 2024 17:30:26 +0200
-Subject: [PATCH 5/8] Expose QRhiImplementation in QRhi
+Subject: [PATCH 4/7] Expose QRhiImplementation in QRhi
 
 ---
  src/gui/rhi/qrhi.h | 3 +++
  1 file changed, 3 insertions(+)
 
 diff --git a/src/gui/rhi/qrhi.h b/src/gui/rhi/qrhi.h
-index c96ab7b19c..1aa9d77c76 100644
+index f7a49dc292..a4c74dd837 100644
 --- a/src/gui/rhi/qrhi.h
 +++ b/src/gui/rhi/qrhi.h
-@@ -1964,6 +1964,9 @@ protected:
+@@ -1987,6 +1987,9 @@ protected:
  private:
      Q_DISABLE_COPY(QRhi)
      QRhiImplementation *d = nullptr;
@@ -22,5 +22,5 @@ index c96ab7b19c..1aa9d77c76 100644
  
  Q_DECLARE_OPERATORS_FOR_FLAGS(QRhi::Flags)
 -- 
-2.43.1
+2.44.0
 
