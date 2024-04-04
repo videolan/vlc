@@ -1,0 +1,33 @@
+From 0813ef63bb445437d364d16aeca42f7425608a0e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 4 Apr 2024 14:26:47 +0300
+Subject: [PATCH] Backport a change to SPIRV-Cross to add a missing include
+
+This backports this change from later upstream SPIRV-Cross:
+https://github.com/KhronosGroup/SPIRV-Cross/commit/a25d0acaad9406e5e5d5a712ebb7e798965aacf6
+
+Further upstream in qtshadertools, this issue goes away entirely
+by updating to a newer version of SPIRV-Cross, with this fix
+included.
+
+This fixes building with libc++ with
+_LIBCPP_REMOVE_TRANSITIVE_INCLUDES set.
+---
+ src/3rdparty/SPIRV-Cross/spirv_cross_containers.hpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/3rdparty/SPIRV-Cross/spirv_cross_containers.hpp b/src/3rdparty/SPIRV-Cross/spirv_cross_containers.hpp
+index 506b069..9fc2a80 100644
+--- a/src/3rdparty/SPIRV-Cross/spirv_cross_containers.hpp
++++ b/src/3rdparty/SPIRV-Cross/spirv_cross_containers.hpp
+@@ -26,6 +26,7 @@
+ 
+ #include "spirv_cross_error_handling.hpp"
+ #include <algorithm>
++#include <exception>
+ #include <functional>
+ #include <iterator>
+ #include <limits>
+-- 
+2.25.1
+
