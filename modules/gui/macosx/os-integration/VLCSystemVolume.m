@@ -31,7 +31,7 @@
 static const AudioObjectPropertyAddress virtualMasterPropertyAddress = {
     .mElement   = kAudioObjectPropertyElementMaster,
     .mScope     = kAudioObjectPropertyScopeOutput,
-    .mSelector  = kAudioHardwareServiceDeviceProperty_VirtualMasterVolume,
+    .mSelector  = kAudioHardwareServiceDeviceProperty_VirtualMainVolume,
 };
 
 @implementation VLCSystemVolume
