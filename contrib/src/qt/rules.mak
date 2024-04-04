@@ -64,7 +64,7 @@ ifdef HAVE_WIN32
 QTBASE_CONFIG += -no-feature-style-fusion
 endif
 
-QTBASE_CONFIG += -static -opensource -confirm-license -opengl desktop -no-pkg-config -no-openssl \
+QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl \
     -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
 	-no-feature-sql -no-feature-testlib -system-freetype -system-harfbuzz -system-libjpeg \
 	-no-feature-xml -no-feature-printsupport -system-libpng -system-zlib -no-feature-network \
