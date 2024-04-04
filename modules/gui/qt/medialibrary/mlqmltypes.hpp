@@ -71,6 +71,12 @@ public:
     }
 };
 
+
+inline size_t qHash(const MLItemId& item, size_t seed = 0)
+{
+    return qHashMulti(seed, item.id, item.type);
+}
+
 class MLItem
 {
 public:
