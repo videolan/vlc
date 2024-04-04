@@ -23,7 +23,8 @@ WIX_LZX_FULL_VERSION=3.5.2519.0
 # WIX_LZX_VERSION=314
 # WIX_LZX_FULL_VERSION=3.14.0.6526
 # 9ff09b4e6c612ca742c763740fb89d99211bf1d0eace84e3693cb503deb6a85bd28c3754c34772a3220bb0c1e92a3013e7d99bcf106ff1b835c0fdc6aba8bbc6  wix3.14.0.6526.zip
-WIX_LZX_URL := https://wixtoolset.org/downloads/v$(WIX_LZX_FULL_VERSION)/wix$(WIX_LZX_VERSION)-binaries.zip
+# WIX_LZX_URL := https://wixtoolset.org/downloads/v$(WIX_LZX_FULL_VERSION)/wix$(WIX_LZX_VERSION)-binaries.zip
+WIX_LZX_URL := $(CONTRIB_VIDEOLAN)/wixlzx/wix3.5.2519.0.zip
 
 ifdef HAVE_WIN32
 # this requires dotnet 4.0 to be installed when running wix
