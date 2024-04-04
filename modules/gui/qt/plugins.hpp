@@ -67,6 +67,7 @@
     Q_IMPORT_QML_PLUGIN(QtQuickControls2NativeStylePlugin)
     // Q_IMPORT_PLUGIN(QWindowsDirect2DIntegrationPlugin)
 #elif defined(Q_OS_MACOS)
+    Q_IMPORT_PLUGIN(QMacStylePlugin)
     Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin)
 #elif defined(__linux__)
     Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
