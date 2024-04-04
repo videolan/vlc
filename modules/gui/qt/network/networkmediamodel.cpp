@@ -131,6 +131,10 @@ public:
 
             m_items.erase( it );
         }
+
+        // notify updates
+        ++m_revision;
+        invalidateCache();
     }
 
     void refreshMediaList(
