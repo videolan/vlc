@@ -3,6 +3,8 @@ TEMPLATE = app
 QT = core gui qml svg quick widgets quickcontrols2
 QTPLUGIN = qsvgicon qsvg qjpeg qico
 
+CONFIG -= entrypoint
+
 win32 {
 QTPLUGIN += qwindows qwindowsvistastyle
 }
