@@ -67,7 +67,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 
         if (m_mainCtx->isHideAfterCreation())
             m_window->hide();
-    }, Qt::QueuedConnection, nullptr);
+    }, Qt::QueuedConnection);
 
     m_window->setTitle("");
 

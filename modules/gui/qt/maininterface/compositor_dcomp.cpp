@@ -47,8 +47,10 @@
 #endif
 
 #if __has_include(<d3d12.h>) && __has_include(<d3d12sdklayers.h>)
-#define QRhiD3D12_ACTIVE
 #include <QtGui/private/qrhid3d12_p.h>
+#if (QT_VERSION < QT_VERSION_CHECK(6, 7, 0)) || defined(QRHI_D3D12_AVAILABLE)
+#define QRhiD3D12_ACTIVE
+#endif
 #endif
 
 #endif

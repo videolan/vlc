@@ -28,7 +28,7 @@ static void on_player_aout_device_changed(audio_output_t *,const char *device, v
     AudioDeviceModel* that = static_cast<AudioDeviceModel*>(data);
     QMetaObject::invokeMethod(that, [that, device=QString::fromUtf8(device)](){
         that->updateCurrent(device);
-    }, Qt::QueuedConnection, nullptr);
+    }, Qt::QueuedConnection);
 }
 
 }

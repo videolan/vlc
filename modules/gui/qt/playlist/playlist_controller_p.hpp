@@ -42,7 +42,11 @@ public:
     inline void callAsync(Fun&& fun)
     {
         Q_Q(PlaylistController);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+        QMetaObject::invokeMethod(q, [fun = std::forward<Fun>(fun)]() -> void* { fun(); return nullptr; }, Qt::QueuedConnection);
+#else
         QMetaObject::invokeMethod(q, std::forward<Fun>(fun), Qt::QueuedConnection, nullptr);
+#endif
     }
 
     //playlist

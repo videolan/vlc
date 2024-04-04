@@ -61,7 +61,11 @@
     Q_IMPORT_QML_PLUGIN(QtQmlMetaPlugin)
 
 #ifdef _WIN32
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    Q_IMPORT_PLUGIN(QModernWindowsStylePlugin)
+#else
     Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
+#endif
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2WindowsStylePlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2NativeStylePlugin)
