@@ -41,7 +41,6 @@
 @property (readwrite, weak) IBOutlet NSSlider *adjustContrastSlider;
 @property (readwrite, weak) IBOutlet NSTextField *adjustBrightnessLabel;
 @property (readwrite, weak) IBOutlet NSSlider *adjustBrightnessSlider;
-@property (readwrite, weak) IBOutlet NSButton *adjustBrightnessCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *adjustSaturationLabel;
 @property (readwrite, weak) IBOutlet NSSlider *adjustSaturationSlider;
 @property (readwrite, weak) IBOutlet NSTextField *adjustGammaLabel;
@@ -171,7 +170,6 @@
 /* basic */
 - (IBAction)enableAdjust:(id)sender;
 - (IBAction)adjustSliderChanged:(id)sender;
-- (IBAction)enableAdjustBrightnessThreshold:(id)sender;
 - (IBAction)enableSharpen:(id)sender;
 - (IBAction)sharpenSliderChanged:(id)sender;
 - (IBAction)enableBanding:(id)sender;

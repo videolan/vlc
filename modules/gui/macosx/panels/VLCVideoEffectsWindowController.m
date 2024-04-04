@@ -219,7 +219,6 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
     [_adjustHueLabel setStringValue:_NS("Hue")];
     [_adjustContrastLabel setStringValue:_NS("Contrast")];
     [_adjustBrightnessLabel setStringValue:_NS("Brightness")];
-    [_adjustBrightnessCheckbox setTitle:_NS("Brightness Threshold")];
     [_adjustSaturationLabel setStringValue:_NS("Saturation")];
     [_adjustGammaLabel setStringValue:_NS("Gamma")];
     [_adjustResetButton setTitle: _NS("Reset")];
@@ -928,7 +927,6 @@ NSString *VLCVideoEffectsProfileNamesKey = @"VideoEffectProfileNames";
 
         [VLCVideoFilterHelper setVideoFilter: "adjust" on: b_state];
         [_adjustBrightnessSlider setEnabled: b_state];
-        [_adjustBrightnessCheckbox setEnabled: NO];
         [_adjustBrightnessLabel setEnabled: b_state];
         [_adjustContrastSlider setEnabled: b_state];
         [_adjustContrastLabel setEnabled: b_state];

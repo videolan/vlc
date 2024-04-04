@@ -20,7 +20,6 @@
                 <outlet property="addTextPositionPopup" destination="325" id="tW5-Zo-l3v"/>
                 <outlet property="addTextTextLabel" destination="307" id="EjM-rT-nbl"/>
                 <outlet property="addTextTextTextField" destination="331" id="Buq-de-YSq"/>
-                <outlet property="adjustBrightnessCheckbox" destination="46" id="5Ee-QH-Xki"/>
                 <outlet property="adjustBrightnessLabel" destination="23" id="uwi-0T-4yO"/>
                 <outlet property="adjustBrightnessSlider" destination="29" id="m62-xB-gV4"/>
                 <outlet property="adjustCheckbox" destination="49" id="3cR-q5-IQh"/>
@@ -265,7 +264,6 @@
                                                 <constraints>
                                                     <constraint firstItem="30" firstAttribute="trailing" secondItem="31" secondAttribute="trailing" id="0t4-yg-7G9"/>
                                                     <constraint firstItem="28" firstAttribute="leading" secondItem="27" secondAttribute="leading" id="1ti-kw-eTx"/>
-                                                    <constraint firstItem="46" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="5" id="2yB-xm-KVx"/>
                                                     <constraint firstItem="21" firstAttribute="leading" secondItem="22" secondAttribute="leading" id="5dg-ua-Wds"/>
                                                     <constraint firstItem="29" firstAttribute="leading" secondItem="23" secondAttribute="trailing" constant="10" id="8HZ-pE-vGD"/>
                                                     <constraint firstItem="24" firstAttribute="leading" secondItem="25" secondAttribute="leading" id="8hK-LP-6OX"/>
@@ -280,7 +278,6 @@
                                                     <constraint firstItem="30" firstAttribute="top" secondItem="31" secondAttribute="bottom" constant="9" id="ICT-ay-DIU"/>
                                                     <constraint firstItem="23" firstAttribute="centerY" secondItem="29" secondAttribute="centerY" constant="-1.5" id="JVF-Sh-s7B"/>
                                                     <constraint firstItem="30" firstAttribute="width" secondItem="31" secondAttribute="width" id="KzM-fh-ytL"/>
-                                                    <constraint firstItem="46" firstAttribute="leading" secondItem="29" secondAttribute="leading" id="ME1-fu-8tY"/>
                                                     <constraint firstItem="29" firstAttribute="leading" secondItem="30" secondAttribute="leading" id="Msg-qq-uKg"/>
                                                     <constraint firstItem="22" firstAttribute="centerY" secondItem="28" secondAttribute="centerY" constant="-1.5" id="O8e-Hv-caT"/>
                                                     <constraint firstItem="704" firstAttribute="top" secondItem="27" secondAttribute="bottom" constant="7" id="Og1-XU-Yzi"/>
@@ -288,8 +285,7 @@
                                                     <constraint firstItem="23" firstAttribute="leading" secondItem="24" secondAttribute="leading" id="VIx-Sp-uhx"/>
                                                     <constraint firstItem="25" firstAttribute="centerY" secondItem="31" secondAttribute="centerY" constant="-1.5" id="WfY-UB-PFt"/>
                                                     <constraint firstItem="25" firstAttribute="leading" secondItem="wwn-Le-8VF" secondAttribute="leading" constant="17" id="dfY-CP-f9m"/>
-                                                    <constraint firstItem="28" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="25" id="i3W-0P-Dh7"/>
-                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="46" secondAttribute="trailing" constant="18" id="iuf-gs-VGb"/>
+                                                    <constraint firstItem="28" firstAttribute="top" secondItem="29" secondAttribute="bottom" constant="9" id="i3W-0P-Dh7"/>
                                                     <constraint firstItem="704" firstAttribute="trailing" secondItem="27" secondAttribute="trailing" id="m4o-gm-JZO"/>
                                                     <constraint firstItem="21" firstAttribute="centerY" secondItem="27" secondAttribute="centerY" constant="-1.5" id="mUN-p9-OSr"/>
                                                     <constraint firstItem="22" firstAttribute="leading" secondItem="23" secondAttribute="leading" id="uac-H8-N26"/>
