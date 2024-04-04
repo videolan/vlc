@@ -12,7 +12,7 @@ QTPLUGIN += qxcb-glx-integration qxcb-egl-integration qxcb qwayland-generic qway
 }
 
 macx {
-QTPLUGIN += qcocoa
+QTPLUGIN += qcocoa qmacstyle
 }
 
 # qmake will run qmlimportscanner,
