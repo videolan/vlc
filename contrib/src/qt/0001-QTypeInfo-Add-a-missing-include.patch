@@ -1,0 +1,40 @@
+From 52965e15b8f87e192c4cfbeb772648d018b77016 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Thu, 4 Apr 2024 13:32:31 +0300
+Subject: [PATCH] QTypeInfo: Add a missing include
+
+This header uses std::is_trivial_v, which requires including
+the <type_traits> header.
+
+When building with PCH enabled (which is the default), this
+dependency does get satisfied via the PCH, so no issue is
+visible.
+
+This fixes building with recent version of libc++ when configured
+with _LIBCPP_REMOVE_TRANSITIVE_INCLUDES (which removes unnecessary
+transitive dependencies between the libc++ headers, a configuration
+which may become the default in the future), with PCH disabled.
+
+Pick-to: 6.7 6.5 6.2
+Change-Id: I5e3ae20e366ed3028b1156cee05bcf2908d6e845
+Reviewed-by: Giuseppe D'Angelo <giuseppe.dangelo@kdab.com>
+(cherry picked from commit adb49d65e0774fa6be0b0d9d490c6f1fc5066a1b)
+---
+ src/corelib/global/qtypeinfo.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/corelib/global/qtypeinfo.h b/src/corelib/global/qtypeinfo.h
+index f89bf72635..3b8c40e974 100644
+--- a/src/corelib/global/qtypeinfo.h
++++ b/src/corelib/global/qtypeinfo.h
+@@ -11,6 +11,7 @@
+ #include <variant>
+ #include <optional>
+ #include <tuple>
++#include <type_traits>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-- 
+2.34.1
+
