@@ -4,7 +4,7 @@ QTDECLARATIVE_VERSION_MAJOR := 6.6
 QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).2
 QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
-DEPS_qtdeclarative-tools := qt-tools $(DEPS_qt-tools)
+DEPS_qtdeclarative-tools := qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
 
 DEPS_qtdeclarative = qt $(DEPS_qt) qtshadertools $(DEPS_qtshadertools)
 ifdef HAVE_CROSS_COMPILE
