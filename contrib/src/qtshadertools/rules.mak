@@ -23,7 +23,7 @@ PKGS_TOOLS += qtshadertools-tools
 endif
 PKGS_ALL += qtshadertools-tools
 
-ifeq ($(call need_pkg,"Qt6ShaderTools >= 6.6"),)
+ifeq ($(call need_pkg,"Qt6ShaderTools >= $(QTSHADERTOOLS_VERSION_MAJOR)"),)
 PKGS_FOUND += qtshadertools
 endif
 ifndef HAVE_CROSS_COMPILE
