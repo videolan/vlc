@@ -826,27 +826,13 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qmake_QtQuick_Controls_impl );
     Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic );
     Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic_impl );
-    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Fusion );
-    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Fusion_impl );
-#ifdef _WIN32
-    Q_INIT_RESOURCE( qmake_QtQuick_Controls_Windows );
-    Q_INIT_RESOURCE( qmake_QtQuick_NativeStyle );
-    Q_INIT_RESOURCE( qtquickcontrols2windowsstyleplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtquickcontrols2nativestyleplugin_raw_qml_0 );
-#endif
     Q_INIT_RESOURCE( qmake_QtQuick_Layouts );
     Q_INIT_RESOURCE( qmake_QtQuick_Templates );
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-    Q_INIT_RESOURCE( QuickControls2FusionStyleImpl_raw_qml_0 );
-    Q_INIT_RESOURCE( QuickControls2Fusion_raw_qml_0 );
-    Q_INIT_RESOURCE( qtquickcontrols2fusionstyle );
     Q_INIT_RESOURCE( QuickControls2Basic_raw_qml_0 );
     Q_INIT_RESOURCE( qtquickcontrols2basicstyle );
 #else
-    Q_INIT_RESOURCE( qtquickcontrols2fusionstyleimplplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtquickcontrols2fusionstyleplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtquickcontrols2fusionstyle );
     Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin_raw_qml_0 );
     Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin );
 #endif
@@ -866,12 +852,7 @@ static void *Thread( void *obj )
     QQuickWindow::setDefaultAlphaBuffer(true);
 
 #ifdef QT_STATIC
-#ifdef _WIN32
-    QQuickStyle::setStyle(QLatin1String("Windows"));
-#else
-    QQuickStyle::setStyle(QLatin1String("Fusion"));
-#endif
-    QQuickStyle::setFallbackStyle(QLatin1String("Fusion"));
+    QQuickStyle::setStyle(QLatin1String("Basic"));
 #endif
 
     /* Start the QApplication here */

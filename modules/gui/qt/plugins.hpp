@@ -47,8 +47,6 @@
     Q_IMPORT_QML_PLUGIN(QtQuickControls2Plugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2BasicStylePlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2BasicStyleImplPlugin)
-    Q_IMPORT_QML_PLUGIN(QtQuickControls2FusionStylePlugin)
-    Q_IMPORT_QML_PLUGIN(QtQuickControls2FusionStyleImplPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickControls2ImplPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuickLayoutsPlugin)
     Q_IMPORT_QML_PLUGIN(QtQuick_WindowPlugin)
@@ -67,8 +65,6 @@
     Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
 #endif
     Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
-    Q_IMPORT_QML_PLUGIN(QtQuickControls2WindowsStylePlugin)
-    Q_IMPORT_QML_PLUGIN(QtQuickControls2NativeStylePlugin)
     // Q_IMPORT_PLUGIN(QWindowsDirect2DIntegrationPlugin)
 #elif defined(Q_OS_MACOS)
     Q_IMPORT_PLUGIN(QMacStylePlugin)
