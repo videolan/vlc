@@ -4003,7 +4003,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
       Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
       Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2 Qt6ShaderTools
-      Qt6Svg Qt6Network
+      Qt6Svg
     ], [pkg >= ${QT_MINIMUM_VERSION}]), [
 
       QT_PREFIX_PATH="$(eval $PKG_CONFIG --variable=prefix Qt6Core)"
