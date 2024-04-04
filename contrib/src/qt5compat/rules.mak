@@ -10,7 +10,7 @@ ifdef HAVE_WIN32
 PKGS += qt5compat
 endif
 
-ifeq ($(call need_pkg,"Qt6Core5Compat >= 6.6"),)
+ifeq ($(call need_pkg,"Qt6Core5Compat >= $(QT5COMPAT_VERSION_MAJOR)"),)
 PKGS_FOUND += qt5compat
 endif
 
