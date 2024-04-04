@@ -469,12 +469,13 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
         return false;
 
     // NOTE: mrl() must only be called when isReadOnly() is true.
-    if( output.b_is_read_only && !strdup_helper( input->mrl(), output.psz_mrl ) )
-        return false;
-    else
+    if (!output.b_is_read_only)
+    {
         output.psz_mrl = nullptr;
+        return true;
+    }
 
-    return true;
+    return strdup_helper(input->mrl(), output.psz_mrl) == true;
 }
 
 bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
