@@ -50,7 +50,8 @@ QT_DECLARATIVE_CONFIG := \
 	--no-feature-quickcontrols2-material \
 	--no-feature-quickcontrols2-universal \
 	--no-feature-quickcontrols2-macos \
-	--no-feature-quickcontrols2-ios
+	--no-feature-quickcontrols2-ios \
+	--no-feature-qml-network
 
 QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_CONFIG) \
 	--no-feature-qml-animation \
