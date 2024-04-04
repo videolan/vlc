@@ -10,7 +10,7 @@ ifdef HAVE_WIN32
 PKGS += qtsvg
 endif
 
-ifeq ($(call need_pkg,"Qt6Svg >= 6.6"),)
+ifeq ($(call need_pkg,"Qt6Svg >= $(QTSVG_VERSION_MAJOR)"),)
 PKGS_FOUND += qtsvg
 endif
 
