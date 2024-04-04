@@ -593,9 +593,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
 {
-    NSParameterAssert(aNotification);
-    VLCLibraryModel *model = (VLCLibraryModel *)aNotification.object;
-    NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger audioCount = model.numberOfAudioMedia;
 
     if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegment ||
