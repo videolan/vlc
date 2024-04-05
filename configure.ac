@@ -4089,7 +4089,8 @@ AS_IF([test "${enable_qt}" != "no"], [
             QtQuick.Layouts="" \
             QtQuick.Window="" \
             QtQuick.Controls="" \
-            Qt5Compat.GraphicalEffects=""], [
+            Qt5Compat.GraphicalEffects="" \
+            >&AS_MESSAGE_FD ], [
         AC_MSG_RESULT([yes])
       ],[
         AC_MSG_RESULT([no])
@@ -4101,7 +4102,8 @@ AS_IF([test "${enable_qt}" != "no"], [
           AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE}" \
             --qtconf "${CONTRIB_DIR}/bin/target_qt.conf" \
-            --modules QtTest=""], [
+            --modules QtTest="" \
+            >&AS_MESSAGE_FD ], [
               have_qt_quick_test="yes"
           ], [])
       ],[

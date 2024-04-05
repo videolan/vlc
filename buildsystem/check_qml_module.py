@@ -54,6 +54,7 @@ class QmlModuleChecker:
             )
 
         if ret.returncode != 0:
+            print(ret.stderr.strip())
             return None
 
         return json.loads(ret.stdout)
@@ -89,7 +90,8 @@ class QmlModuleChecker:
         )
 
         if ret.returncode != 0:
-            return None
+            print(ret.stderr.strip())
+            return False
 
         binpath = None
         libexec = None
@@ -111,7 +113,7 @@ class QmlModuleChecker:
             self.qt5 = False
 
         if not checkQmakePath(self.qmlpath):
-            print("Qml path not found")
+            print("Qml path {} not found".format(self.qmlpath))
             return False
 
         self.qmlimportscanner = findProgram(binpath, "qmlimportscanner")
