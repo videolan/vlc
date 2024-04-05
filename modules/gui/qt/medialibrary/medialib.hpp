@@ -74,9 +74,6 @@ public:
     Q_INVOKABLE void reload();
 
     Q_INVOKABLE void mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callback);
-    // TODO: This is added back due to type conversion does not occur with Qt 5.12.
-    //       Remove when possible:
-    Q_INVOKABLE void mlInputItem(const QVariantList& variantList, QJSValue callback);
 
     inline bool idle() const { return m_idle; }
     inline int discoveryPending() const { return m_discoveryPending; }
