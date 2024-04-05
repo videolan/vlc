@@ -27,8 +27,7 @@ import "qrc:///style/"
 Window {
     visible: MainCtx.playlistVisible
 
-    // TODO: Qt >5.13 use transientParent
-    property QtWindow parentWindow
+    transientParent: MainCtx.intfMainWindow
 
     property alias playlistView: playlistView
 
@@ -40,17 +39,11 @@ Window {
 
     onVisibleChanged: {
         if (visible) {
-            const window = parentWindow ? parentWindow : MainCtx.intfMainWindow
-            if (window) {
-                height = window.height
-                minimumHeight = window.minimumHeight
-
-                x = window.x + window.width + 10
-                y = window.y
-            } else {
-                height = 400
-                minimumHeight = 200
-            }
+            console.assert(transientParent)
+            height = transientParent.height
+            minimumHeight = transientParent.minimumHeight
+            x = transientParent.x + transientParent.width + 10
+            y = transientParent.y
         }
     }
 
