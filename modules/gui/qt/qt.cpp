@@ -792,7 +792,6 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qtquickshapes_shaders );
 #endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #ifdef _WIN32
     // QSysInfo::productVersion() returns "unknown" on Windows 7
     // RHI Fallback does not seem to work.
@@ -809,7 +808,6 @@ static void *Thread( void *obj )
     if (dwMajorVersion <= 6 && dwMinorVersion <= 1)
         QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
 
-#endif
 #endif
 
     auto compositor = var_InheritString(p_intf, "qt-compositor");
