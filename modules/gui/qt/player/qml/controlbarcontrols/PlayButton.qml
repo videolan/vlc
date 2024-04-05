@@ -238,19 +238,11 @@ T.Control {
         implicitWidth: height
         implicitHeight: VLCStyle.icon_medium
 
-        // TODO: Qt >= 5.15 use inline component for the drop shadows
-        Widgets.DropShadowImage {
-            id: hoverShadow
-
+        component DropShadowImage : Widgets.DropShadowImage {
             anchors.centerIn: parent
 
             visible: opacity > 0
             opacity: 0
-
-            blurRadius: VLCStyle.dp(9)
-            yOffset: VLCStyle.dp(4)
-
-            color: VLCStyle.setColorAlpha(theme.accent, 0.29)
 
             rectWidth: parent.width
             rectHeight: parent.height
@@ -258,24 +250,22 @@ T.Control {
             yRadius: xRadius
         }
 
-        Widgets.DropShadowImage {
+        DropShadowImage {
+            id: hoverShadow
+
+            blurRadius: VLCStyle.dp(9)
+            yOffset: VLCStyle.dp(4)
+
+            color: VLCStyle.setColorAlpha(theme.accent, 0.29)
+        }
+
+        DropShadowImage {
             id: focusShadow
-
-            anchors.centerIn: parent
-
-            visible: opacity > 0
-            opacity: 0
 
             blurRadius: VLCStyle.dp(14)
             yOffset: VLCStyle.dp(1)
 
             color: VLCStyle.setColorAlpha(theme.accent, 1.0)
-
-            rectWidth: parent.width
-            rectHeight: parent.height
-
-            xRadius: parent.width
-            yRadius: xRadius
         }
 
         Rectangle {
