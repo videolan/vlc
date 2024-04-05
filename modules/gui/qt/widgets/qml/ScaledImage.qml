@@ -29,11 +29,6 @@ Image {
 
     property bool disableSmoothWhenIntegerUpscaling: false
 
-    // TODO: Remove this Qt >= 5.14 (Binding.restoreMode == Binding.RestoreBindingOrValue)
-    // Only required for the Binding to restore the value back
-    readonly property bool _smooth: true
-    smooth: _smooth
-
     Binding on smooth {
         when: root.disableSmoothWhenIntegerUpscaling &&
               !((root.paintedWidth % root.implicitWidth) || (root.paintedHeight % root.implicitHeight))
