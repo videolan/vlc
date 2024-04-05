@@ -628,6 +628,10 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
             stream->timing.rate_audio_ts = dec_pts;
             stream->timing.rate = stream->sync.rate;
         }
+
+        if (stream->timing.first_pts == VLC_TICK_INVALID)
+            stream->timing.first_pts = dec_pts;
+
         bool is_drifting = stream->timing.last_drift != VLC_TICK_INVALID;
         vlc_mutex_unlock(&stream->timing.lock);
 
@@ -783,13 +787,6 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     stream_Synchronize(stream, system_now, play_date, block->i_pts);
 
     vlc_audio_meter_Process(&owner->meter, block, play_date);
-
-    if (stream->timing.first_pts == VLC_TICK_INVALID)
-    {
-        vlc_mutex_lock(&stream->timing.lock);
-        stream->timing.first_pts = block->i_pts;
-        vlc_mutex_unlock(&stream->timing.lock);
-    }
 
     /* Output */
     stream->sync.discontinuity = false;
