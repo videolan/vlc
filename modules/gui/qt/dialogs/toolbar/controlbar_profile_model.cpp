@@ -674,12 +674,8 @@ bool ControlbarProfileModel::reload()
         if (modelValue.isEmpty())
             continue;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        const auto val = modelValue.splitRef(SETTINGS_PROFILE_SEPARATOR);
-#else
         QStringView modelValueStringView(modelValue);
         const auto val = modelValueStringView.split(SETTINGS_PROFILE_SEPARATOR);
-#endif
         if (val.isEmpty())
             continue;
 
