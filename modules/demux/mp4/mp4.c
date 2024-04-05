@@ -1771,8 +1771,7 @@ static int DemuxMoov( demux_t *p_demux )
         mp4_track_t *tk = &p_sys->track[i_track];
         bool b = true;
 
-        if( !tk->b_ok || MP4_isMetadata( tk ) ||
-            ( tk->b_selected && tk->i_sample >= tk->i_sample_count ) )
+        if( !tk->b_ok || MP4_isMetadata( tk ) )
         {
             continue;
         }
