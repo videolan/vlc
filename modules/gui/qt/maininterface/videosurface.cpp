@@ -312,17 +312,9 @@ void VideoSurface::keyPressEvent(QKeyEvent* event)
     event->ignore();
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-void VideoSurface::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
-#else
 void VideoSurface::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
-#endif
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
-#else
     QQuickItem::geometryChange(newGeometry, oldGeometry);
-#endif
     onSurfaceSizeChanged();
 }
 
