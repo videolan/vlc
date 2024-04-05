@@ -34,11 +34,7 @@ class Win7NativeEventFilter : public QObject, public QAbstractNativeEventFilter 
 public:
     Win7NativeEventFilter( QObject* parent = nullptr );
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool nativeEventFilter(const QByteArray &, void *message, qintptr* /* result */);
-#else
-    bool nativeEventFilter(const QByteArray &, void *message, long* /* result */);
-#endif
 signals:
     void windowStyleChanged();
 };

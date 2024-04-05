@@ -25,11 +25,6 @@
 
 #include <vlc_window.h>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#define D3D11_NO_HELPERS  // avoid tons of warnings
-#include <d3d11.h>
-#endif
-
 #include <dwmapi.h>
 
 using namespace vlc;
@@ -57,48 +52,6 @@ CompositorWin7::~CompositorWin7()
 
 bool CompositorWin7::preInit(qt_intf_t *p_intf)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    //check whether D3DCompiler is available. whitout it Angle won't work
-    QLibrary d3dCompilerDll;
-    for (int i = 47; i > 41; --i)
-    {
-        d3dCompilerDll.setFileName(QString("D3DCOMPILER_%1.dll").arg(i));
-        if (d3dCompilerDll.load())
-            break;
-    }
-
-    D3D_FEATURE_LEVEL requestedFeatureLevels[] = {
-        D3D_FEATURE_LEVEL_9_1,
-        D3D_FEATURE_LEVEL_9_2,
-        D3D_FEATURE_LEVEL_9_3,
-        D3D_FEATURE_LEVEL_10_0,
-        D3D_FEATURE_LEVEL_10_1,
-        D3D_FEATURE_LEVEL_11_1,
-        D3D_FEATURE_LEVEL_11_0,
-    };
-
-    HRESULT hr = D3D11CreateDevice(
-        nullptr,    // Adapter
-        D3D_DRIVER_TYPE_HARDWARE,
-        nullptr,    // Module
-        D3D11_CREATE_DEVICE_BGRA_SUPPORT,
-        requestedFeatureLevels,
-        ARRAY_SIZE(requestedFeatureLevels),
-        D3D11_SDK_VERSION,
-        nullptr, //D3D device
-        nullptr,    // Actual feature level
-        nullptr //D3D context
-        );
-
-    //no hw acceleration, manually select the software backend
-    //otherwise Qt will load angle and fail.
-    if (!d3dCompilerDll.isLoaded() || FAILED(hr))
-    {
-        msg_Info(p_intf, "no D3D support, use software backend");
-        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-    }
-#endif
-
     return true;
 }
 
@@ -287,11 +240,7 @@ Win7NativeEventFilter::Win7NativeEventFilter(QObject* parent)
 }
 
 //parse native events that are not reported by Qt
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool Win7NativeEventFilter::nativeEventFilter(const QByteArray&, void* message, qintptr*)
-#else
-bool Win7NativeEventFilter::nativeEventFilter(const QByteArray&, void* message, long*)
-#endif
 {
     MSG * msg = static_cast<MSG*>( message );
 
