@@ -483,8 +483,7 @@ static filter_t *ResamplerCreate(filter_t *p_filter)
     p_resampler->fmt_out = p_filter->fmt_in;
     p_resampler->fmt_out.audio.i_rate = atomic_load( &p_sys->rate_shift );
     aout_FormatPrepare( &p_resampler->fmt_out.audio );
-    p_resampler->p_module = module_need( p_resampler, "audio resampler", NULL,
-                                         false );
+    p_resampler->p_module = module_need_var(p_resampler, "audio resampler", "audio-resampler");
 
     if( p_resampler->p_module == NULL )
     {
