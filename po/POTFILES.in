@@ -235,7 +235,6 @@ modules/audio_filter/gain.c
 modules/audio_filter/karaoke.c
 modules/audio_filter/normvol.c
 modules/audio_filter/param_eq.c
-modules/audio_filter/resampler/bandlimited.c
 modules/audio_filter/resampler/soxr.c
 modules/audio_filter/resampler/speex.c
 modules/audio_filter/resampler/src.c

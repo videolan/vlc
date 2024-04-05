@@ -185,12 +185,6 @@ vlc_modules += {
 
 ## Resampler
 
-# TODO: Band-limited resampler module
-#vlc_modules += {
-#    'name' : 'bandlimited_resampler',
-#    'sources' : files('resampler/bandlimited.c')
-#}
-
 # Ugly resampler module
 vlc_modules += {
     'name' : 'ugly_resampler',

@@ -114,9 +114,6 @@ audio_filter_LTLIBRARIES += \
 	libaudio_format_plugin.la
 
 # Resamplers
-libbandlimited_resampler_plugin_la_SOURCES = \
-	audio_filter/resampler/bandlimited.c \
-	audio_filter/resampler/bandlimited.h
 libugly_resampler_plugin_la_SOURCES = audio_filter/resampler/ugly.c
 libsamplerate_plugin_la_SOURCES = audio_filter/resampler/src.c
 libsamplerate_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SAMPLERATE_CFLAGS)
@@ -139,7 +136,6 @@ audio_filter_LTLIBRARIES += \
 	$(LTLIBebur128) \
 	libugly_resampler_plugin.la
 EXTRA_LTLIBRARIES += \
-	libbandlimited_resampler_plugin.la \
 	libsamplerate_plugin.la \
 	libsoxr_plugin.la \
 	libebur128_plugin.la
