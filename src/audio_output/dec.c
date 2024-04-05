@@ -785,14 +785,6 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         stream->timing.rate_system_ts = play_date;
         stream->timing.rate_audio_ts = block->i_pts;
         stream->timing.rate = stream->sync.rate;
-
-        /* Update the clock immediately with the new rate, instead of waiting
-         * for a timing update that could come too late (after 1second). */
-        vlc_clock_Lock(stream->sync.clock);
-        stream->timing.last_drift =
-            vlc_clock_Update(stream->sync.clock, play_date, block->i_pts,
-                             stream->sync.rate);
-        vlc_clock_Unlock(stream->sync.clock);
         vlc_mutex_unlock(&stream->timing.lock);
     }
 
