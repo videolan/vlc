@@ -774,6 +774,7 @@ int MediaLibrary::List( int listQuery, const vlc_ml_query_params_t* params, va_l
     {
         p.desc = params->b_desc;
         p.sort = sortingCriteria( params->i_sort );
+        p.favoriteOnly = params->b_favorite_only;
         nbItems = params->i_nbResults;
         offset = params->i_offset;
         psz_pattern = params->psz_pattern;
