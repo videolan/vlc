@@ -135,29 +135,23 @@ Item {
                 shaderEffectSource.shaderEffect = null
             }
 
-            // TODO: Qt >= 5.15 use inline component
-            Behavior on beginningFadeSize {
-                id: beginningFadeBehavior
-
+            component FadeBehavior : Behavior {
                 enabled: false
 
                 // Qt Bug: UniformAnimator does not work...
+                // FIXME: Is it fixed with Qt 6?
                 NumberAnimation {
                     duration: VLCStyle.duration_veryShort
                     easing.type: Easing.InOutSine
                 }
             }
 
-            Behavior on endFadeSize {
+            FadeBehavior on beginningFadeSize {
+                id: beginningFadeBehavior
+            }
+
+            FadeBehavior on endFadeSize {
                 id: endFadeBehavior
-
-                enabled: false
-
-                // Qt Bug: UniformAnimator does not work...
-                NumberAnimation {
-                    duration: VLCStyle.duration_veryShort
-                    easing.type: Easing.InOutSine
-                }
             }
 
             // Atlas textures can be supported
