@@ -251,12 +251,14 @@ static void vlclua_ml_assign_params( lua_State *L, vlc_ml_query_params_t *params
     *params = vlc_ml_query_params_create();
     if (!lua_istable(L, paramIndex))
         return;
+    lua_getfield(L, 1, "public_only" );
     lua_getfield(L, 1, "favorite_only" );
     lua_getfield(L, 1, "limit" );
     lua_getfield(L, 1, "offset" );
     lua_getfield(L, 1, "desc" );
     lua_getfield(L, 1, "sort" );
     lua_getfield(L, 1, "pattern" );
+    params->b_public_only = lua_toboolean( L, -7 );
     params->b_favorite_only = lua_toboolean( L, -6 );
     params->i_nbResults = lua_tointeger( L, -5 );
     params->i_offset = lua_tointeger( L, -4 );

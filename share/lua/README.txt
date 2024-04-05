@@ -432,6 +432,7 @@ query_params = {
   "sort": integer,
   "pattern": string,
   "favorite_only": boolean,
+  "public_only": boolean,
 }
 
 vlc.ml.video(query_params): Get video media list
