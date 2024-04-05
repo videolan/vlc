@@ -27,15 +27,11 @@
 
 #include <windows.h>
 #include <bcrypt.h>
+#include <assert.h>
 
 void vlc_rand_bytes (void *buf, size_t len)
 {
-    BCRYPT_ALG_HANDLE algo_handle;
-    NTSTATUS ret = BCryptOpenAlgorithmProvider(&algo_handle, BCRYPT_RNG_ALGORITHM,
-                                               MS_PRIMITIVE_PROVIDER, 0);
-    if (BCRYPT_SUCCESS(ret))
-    {
-        BCryptGenRandom(algo_handle, buf, len, 0);
-        BCryptCloseAlgorithmProvider(algo_handle, 0);
-    }
+    NTSTATUS ret;
+    ret = BCryptGenRandom(0, buf, len, BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    assert(BCRYPT_SUCCESS(ret));
 }
