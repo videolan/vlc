@@ -372,7 +372,7 @@ void MediaLib::mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callb
             i++;
         }
 
-        for (auto cb : qAsConst(it.value())) // TODO: Qt 6 use const reference
+        for (const auto& cb : qAsConst(it.value()))
         {
             cb.call({jsArray});
         }
