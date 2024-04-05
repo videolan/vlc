@@ -24,11 +24,9 @@
 // Qt includes
 #include <QSortFilterProxyModel>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 Q_MOC_INCLUDE("maininterface/mainctx.hpp")
 Q_MOC_INCLUDE("player/player_controller.hpp")
 Q_MOC_INCLUDE("player/control_list_model.hpp")
-#endif
 
 // Forward declarations
 class PlayerController;

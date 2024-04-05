@@ -35,10 +35,8 @@
 #include "mlhelper.hpp"
 #include "mlevent.hpp"
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 Q_MOC_INCLUDE( "medialibrary/medialib.hpp" )
 Q_MOC_INCLUDE( "player/player_controller.hpp" )
-#endif
 
 class PlayerController;
 class MediaLib;

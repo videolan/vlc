@@ -27,14 +27,12 @@
 #include "maininterface/mainctx.hpp"
 #include "util/list_selection_model.hpp"
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 Q_MOC_INCLUDE("playlist/playlist_controller.hpp")
 Q_MOC_INCLUDE("playlist/playlist_model.hpp")
 Q_MOC_INCLUDE("network/networkdevicemodel.hpp")
 Q_MOC_INCLUDE("network/networkmediamodel.hpp")
 Q_MOC_INCLUDE("medialibrary/mlplaylistlistmodel.hpp")
 Q_MOC_INCLUDE("medialibrary/mlplaylistmodel.hpp")
-#endif
 
 class MediaLib;
 class MLPlaylistListModel;
