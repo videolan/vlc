@@ -44,11 +44,8 @@ FadingEdge {
                                                 listView.remove?.running ||
                                                 listView.removeDisplaced?.running)
 
-    // TODO: Use itemAtIndex(0) Qt >= 5.13
     // FIXME: Delegate with variable size
-    readonly property Item delegateItem: listView.contentItem.children.length > 0
-                                         ? listView.contentItem.children[listView.contentItem.children.length - 1]
-                                         : null
+    readonly property Item delegateItem: listView.itemAtIndex(0)
 
     readonly property Item firstVisibleItem: {
         if (transitionsRunning || !delegateItem)
