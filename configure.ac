@@ -4024,6 +4024,14 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
       QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
 
+      AC_MSG_CHECKING([if contribs provide target_qt.conf])
+      AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
+        QT_CONF=${CONTRIB_DIR}/bin/target_qt.conf
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
+
       dnl check native in contribs and keep the full path if found there
       AC_MSG_CHECKING([if contribs provide qmake])
       AS_IF([test -x "${CONTRIB_DIR}/../bin/qmake${BUILDEXEEXT}"], [
@@ -4079,10 +4087,10 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
-      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE}])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE} and conf ${QT_CONF}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE}" \
-            --qtconf "${CONTRIB_DIR}/bin/target_qt.conf" \
+            --qtconf "${QT_CONF}" \
             --modules \
             QtQml.Models="" \
             QtQml.WorkerScript="" \
@@ -4101,7 +4109,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
           AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE}" \
-            --qtconf "${CONTRIB_DIR}/bin/target_qt.conf" \
+            --qtconf "${QT_CONF}" \
             --modules QtTest="" \
             >&AS_MESSAGE_FD ], [
               have_qt_quick_test="yes"

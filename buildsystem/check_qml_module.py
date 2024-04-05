@@ -83,11 +83,18 @@ class QmlModuleChecker:
             print("qmake not found")
             return False
 
-        ret = subprocess.run(
-            [ qmake, "-qtconf", qtconf, "-query"],
-            capture_output=True,
-            encoding="utf8"
-        )
+        if qtconf:
+            ret = subprocess.run(
+                [ qmake, "-qtconf", qtconf, "-query"],
+                capture_output=True,
+                encoding="utf8"
+            )
+        else:
+            ret = subprocess.run(
+                [ qmake, "-query"],
+                capture_output=True,
+                encoding="utf8"
+            )
 
         if ret.returncode != 0:
             print(ret.stderr.strip())
@@ -145,7 +152,7 @@ def main():
         help="native qmake path")
 
     parser.add_argument(
-        "--qtconf", type=str, required=True,
+        "--qtconf", type=str, required=False,
         help="qmake qtconf path")
 
     parser.add_argument(
