@@ -74,7 +74,7 @@ RowLayout {
 
             checked: MainPlaylistController.random
             font.pixelSize: VLCStyle.icon_playlist
-            Accessible.name: qsTr("Shuffle")
+            description: qsTr("Shuffle")
             text: VLCIcons.shuffle
             onClicked: MainPlaylistController.toggleRandom()
             focusPolicy: Qt.NoFocus
