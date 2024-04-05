@@ -142,11 +142,7 @@ CompositorDCompositionAcrylicSurface::~CompositorDCompositionAcrylicSurface()
         DestroyWindow(m_dummyWindow);
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &, void *message, qintptr *)
-#else
-bool CompositorDCompositionAcrylicSurface::nativeEventFilter(const QByteArray &, void *message, long *)
-#endif
 {
     MSG* msg = static_cast<MSG*>( message );
 
