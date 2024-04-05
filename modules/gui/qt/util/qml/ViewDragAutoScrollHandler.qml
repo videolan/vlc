@@ -116,9 +116,6 @@ QtObject {
         function directionChangedHandler() {
             if (direction === ViewDragAutoScrollHandler.Direction.None) {
                 running = false
-
-                if (_scrollBar)
-                    _scrollBar.active = false // TODO: Use Binding Qt >=5.14
             } else if (!running) {
                 let _to
 
@@ -142,10 +139,14 @@ QtObject {
 
                 to = _to
                 running = true
-
-                if (_scrollBar)
-                    _scrollBar.active = true // TODO: Use Binding Qt >= 5.14
             }
+        }
+
+        readonly property Binding _scrollBarActiveBinding: Binding {
+            when: !!animation._scrollBar && animation.running
+            target: animation._scrollBar
+            property: "active"
+            value: true
         }
     }
 }
