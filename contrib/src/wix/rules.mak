@@ -1,6 +1,7 @@
 WIX_VERSION=314
-WIX_FULL_VERSION=3.14.0.6526
-WIX_URL := $(GITHUB)/wixtoolset/wix3/releases/download/wix$(WIX_VERSION)rtm/wix$(WIX_VERSION)-binaries.zip
+WIX_SUB_VERSION=1
+WIX_FULL_VERSION=3.14.1.8722
+WIX_URL := $(GITHUB)/wixtoolset/wix3/releases/download/wix$(WIX_VERSION)$(WIX_SUB_VERSION)rtm/wix$(WIX_VERSION)-binaries.zip
 
 ifdef HAVE_WIN32
 # this requires dotnet 4.0 to be installed when running wix
