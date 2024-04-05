@@ -246,11 +246,7 @@ public:
             return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
     }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool nativeEventFilter(const QByteArray &, void *message, qintptr *result) override
-#else
-    bool nativeEventFilter(const QByteArray &, void *message, long *result) override
-#endif
     {
         MSG* msg = static_cast<MSG*>( message );
 
@@ -669,11 +665,7 @@ void WinTaskbarWidget::createTaskBarButtons()
         changeThumbbarButtons( THEMIM->getPlayingState() );
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, qintptr* /* result */)
-#else
-bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, long* /* result */)
-#endif
 {
     MSG * msg = static_cast<MSG*>( message );
     if (msg->hwnd != WinId(m_window))
@@ -913,11 +905,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
     return ret;
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &, void *message, qintptr *result)
-#else
-    bool InterfaceWindowHandlerWin32::nativeEventFilter(const QByteArray &, void *message, long *result)
-#endif
 {
     MSG* msg = static_cast<MSG*>( message );
 
