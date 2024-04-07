@@ -110,16 +110,17 @@ static void WindowSetState(vlc_window_t *p_wnd, unsigned i_state)
         msg_Dbg(p_wnd, "Ignore change to VLC_WINDOW_STATE_BELOW");
 
     @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = VLCMain.sharedInstance.voutProvider;
+        VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
 
-        NSInteger i_cocoa_level = NSNormalWindowLevel;
-
-        if (i_state & VLC_WINDOW_STATE_ABOVE)
-            i_cocoa_level = NSStatusWindowLevel;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [voutProvider setWindowLevel:i_cocoa_level forWindow:p_wnd];
-        });
+        if (i_state & VLC_WINDOW_STATE_ABOVE) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [voutProvider floatOnTopForWindow:p_wnd];
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [voutProvider setWindowLevel:NSNormalWindowLevel forWindow:p_wnd];
+            });
+        }
     }
 }
 
@@ -533,6 +534,11 @@ int WindowOpen(vlc_window_t *p_wnd)
     }
 
     [o_window setWindowLevel:i_level];
+}
+
+- (void)floatOnTopForWindow:(vlc_window_t *)p_wnd
+{
+    [self setWindowLevel:NSStatusWindowLevel forWindow:p_wnd];
 }
 
 - (void)setFullscreen:(int)i_full forWindow:(vlc_window_t *)p_wnd withAnimation:(BOOL)b_animation
