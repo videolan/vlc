@@ -533,12 +533,25 @@ int WindowOpen(vlc_window_t *p_wnd)
         }
     }
 
-    [o_window setWindowLevel:i_level];
+    o_window.level = i_level;
+    o_window.collectionBehavior = NSWindowCollectionBehaviorDefault;
 }
 
 - (void)floatOnTopForWindow:(vlc_window_t *)p_wnd
 {
+    NSValue * const voutWindowsKey = [NSValue valueWithPointer:p_wnd];
+    VLCVideoWindowCommon * const window = [self.voutWindows objectForKey:voutWindowsKey];
+    if (!window) {
+        msg_Err(getIntf(), "Cannot set float on top for nonexisting window");
+        return;
+    }
+
     [self setWindowLevel:NSStatusWindowLevel forWindow:p_wnd];
+    window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
+                                NSWindowCollectionBehaviorIgnoresCycle |
+                                NSWindowCollectionBehaviorTransient |
+                                NSWindowCollectionBehaviorFullScreenAuxiliary;
+
 }
 
 - (void)setFullscreen:(int)i_full forWindow:(vlc_window_t *)p_wnd withAnimation:(BOOL)b_animation
