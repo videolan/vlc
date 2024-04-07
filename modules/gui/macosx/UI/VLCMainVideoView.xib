@@ -176,7 +176,7 @@
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8jZ-hd-YVq" customClass="VLCImageButton">
                                                         <rect key="frame" x="111" y="-1" width="32" height="33"/>
-                                                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="arrow.down.right.topleft.rectangle" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="fyV-F5-ogO">
+                                                        <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="play.rectangle.on.rectangle.fill" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="fyV-F5-ogO">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
@@ -443,13 +443,13 @@
         <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
         <image name="NSListViewTemplate" width="21" height="15"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
-        <image name="arrow.down.right.topleft.rectangle" catalog="system" width="18" height="14"/>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="16" height="15"/>
         <image name="backward.fill" catalog="system" width="19" height="12"/>
         <image name="bookmark.circle" catalog="system" width="15" height="15"/>
         <image name="forward.fill" catalog="system" width="19" height="12"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
         <image name="text.bubble" catalog="system" width="17" height="16"/>
+        <image name="play.rectangle.on.rectangle.fill" catalog="system" width="20" height="16"/>
         <image name="volume.3.fill" catalog="system" width="22" height="15"/>
         <image name="waveform.circle" catalog="system" width="15" height="15"/>
     </resources>
