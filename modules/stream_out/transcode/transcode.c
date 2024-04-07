@@ -142,6 +142,11 @@ static const char *const ppsz_deinterlace_type[] =
 {
     "deinterlace", "ffmpeg-deinterlace"
 };
+static const int channel_layout_values[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, };
+
+static const char *const channel_layout_texts[] = {
+  "default", "mono", "stereo", "2.1", "4.0", "5.0", "5.1", "7.0", "7.1", "8.1",
+};
 
 static int  Open ( vlc_object_t * );
 static void Close( sout_stream_t * );
@@ -193,7 +198,7 @@ vlc_module_begin ()
                 ALANG_LONGTEXT )
     add_integer( SOUT_CFG_PREFIX "channels", 0, ACHANS_TEXT,
                  ACHANS_LONGTEXT )
-        change_integer_range( 0, 9 )
+        change_integer_list( channel_layout_values, channel_layout_texts)
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, ARATE_TEXT,
                  ARATE_LONGTEXT )
         change_integer_range( 0, 48000 )
