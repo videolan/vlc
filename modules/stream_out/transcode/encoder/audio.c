@@ -36,25 +36,20 @@
 #include "encoder.h"
 #include "encoder_priv.h"
 
-static const int pi_channels_maps[9] =
+static const int pi_channels_maps[] =
 {
     0,
     AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LFE  | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
-     | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-     | AOUT_CHAN_LFE,
+    AOUT_CHANS_2_0,
+    AOUT_CHANS_2_1,
+    AOUT_CHANS_4_0,
+    AOUT_CHANS_5_0,
+    AOUT_CHANS_5_1,
+    AOUT_CHANS_7_0,
+    AOUT_CHANS_7_1,
+    AOUT_CHANS_8_1,
 };
+
 
 int transcode_encoder_audio_open( transcode_encoder_t *p_enc,
                                   const transcode_encoder_config_t *p_cfg )
