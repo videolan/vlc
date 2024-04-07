@@ -37,6 +37,9 @@
 
 #import "views/VLCWrappableTextField.h"
 
+#import "windows/video/VLCMainVideoViewController.h"
+#import "windows/video/VLCVideoWindowCommon.h"
+
 @interface VLCMainVideoViewControlsBar ()
 {
     VLCPlaylistController *_playlistController;
@@ -101,6 +104,20 @@
     [menu popUpMenuPositioningItem:nil
                         atLocation:_audioButton.frame.origin
                             inView:((NSView *)sender).superview];
+}
+
+- (IBAction)toggleFloatOnTop:(id)sender
+{
+    VLCVideoWindowCommon * const window = (VLCVideoWindowCommon *)self.floatOnTopButton.window;
+    if (window == nil) {
+        return;
+    }
+    vout_thread_t * const p_vout = window.videoViewController.voutView.voutThread;
+    if (!p_vout) {
+        return;
+    }
+    var_ToggleBool(p_vout, "video-on-top");
+    vout_Release(p_vout);
 }
 
 @end

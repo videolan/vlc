@@ -57,7 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (IBAction)togglePlaylist:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;
-- (IBAction)togglePictureInPicture:(id)sender;
 
 @end
 

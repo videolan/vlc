@@ -34,6 +34,7 @@
                 <outlet property="backwardButton" destination="V9d-hX-iyg" id="ZFn-jn-7OB"/>
                 <outlet property="bookmarksButton" destination="4tZ-52-1q9" id="dAN-YB-YZ5"/>
                 <outlet property="detailLabel" destination="5ii-yU-6Zp" id="ves-8e-T8E"/>
+                <outlet property="floatOnTopButton" destination="8jZ-hd-YVq" id="x53-4o-LsM"/>
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
@@ -185,7 +186,7 @@
                                                             <constraint firstAttribute="width" secondItem="8jZ-hd-YVq" secondAttribute="height" multiplier="1:1" id="iNf-6g-2uS"/>
                                                         </constraints>
                                                         <connections>
-                                                            <action selector="togglePictureInPicture:" target="-2" id="l48-tv-GNg"/>
+                                                            <action selector="toggleFloatOnTop:" target="3" id="BvH-qi-jx1"/>
                                                         </connections>
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dYZ-ri-Kra" customClass="VLCImageButton">
