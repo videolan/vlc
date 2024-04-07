@@ -112,15 +112,14 @@ static void WindowSetState(vlc_window_t *p_wnd, unsigned i_state)
     @autoreleasepool {
         VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
 
-        if (i_state & VLC_WINDOW_STATE_ABOVE) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [voutProvider floatOnTopForWindow:p_wnd];
-            });
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [voutProvider setWindowLevel:NSNormalWindowLevel forWindow:p_wnd];
-            });
-        }
+        NSInteger i_cocoa_level = NSNormalWindowLevel;
+        if (i_state & VLC_WINDOW_STATE_ABOVE)
+            i_cocoa_level = NSStatusWindowLevel;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutProvider setWindowLevel:i_cocoa_level forWindow:p_wnd];
+        });
+
     }
 }
 
@@ -512,7 +511,8 @@ int WindowOpen(vlc_window_t *p_wnd)
 
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vlc_window_t *)p_wnd
 {
-    VLCVideoWindowCommon *o_window = [_voutWindows objectForKey:[NSValue valueWithPointer:p_wnd]];
+    NSValue * const windowKey = [NSValue valueWithPointer:p_wnd];
+    VLCVideoWindowCommon * const o_window = [_voutWindows objectForKey:windowKey];
     if (!o_window) {
         msg_Err(getIntf(), "Cannot set level for nonexisting window");
         return;
@@ -523,7 +523,13 @@ int WindowOpen(vlc_window_t *p_wnd)
         _statusLevelWindowCounter++;
         // window level need to stay on normal in fullscreen mode
         if (![o_window fullscreen] && ![o_window inFullscreenTransition]) {
+            // make sure float on top can join all spaces, including full-screen ones
+            NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
             [self updateWindowLevelForHelperWindows:i_level];
+            o_window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
+                                          NSWindowCollectionBehaviorIgnoresCycle |
+                                          NSWindowCollectionBehaviorTransient |
+                                          NSWindowCollectionBehaviorFullScreenAuxiliary;
         }
     } else {
         if (_statusLevelWindowCounter > 0) {
@@ -532,28 +538,10 @@ int WindowOpen(vlc_window_t *p_wnd)
             NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
             [self updateWindowLevelForHelperWindows:i_level];
         }
+        o_window.collectionBehavior = NSWindowCollectionBehaviorDefault;
     }
 
     o_window.level = i_level;
-    o_window.collectionBehavior = NSWindowCollectionBehaviorDefault;
-}
-
-- (void)floatOnTopForWindow:(vlc_window_t *)p_wnd
-{
-    NSValue * const voutWindowsKey = [NSValue valueWithPointer:p_wnd];
-    VLCVideoWindowCommon * const window = [self.voutWindows objectForKey:voutWindowsKey];
-    if (!window) {
-        msg_Err(getIntf(), "Cannot set float on top for nonexisting window");
-        return;
-    }
-
-    NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
-    [self setWindowLevel:NSStatusWindowLevel forWindow:p_wnd];
-    window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
-                                NSWindowCollectionBehaviorIgnoresCycle |
-                                NSWindowCollectionBehaviorTransient |
-                                NSWindowCollectionBehaviorFullScreenAuxiliary;
-
 }
 
 - (void)setFullscreen:(int)i_full forWindow:(vlc_window_t *)p_wnd withAnimation:(BOOL)b_animation
