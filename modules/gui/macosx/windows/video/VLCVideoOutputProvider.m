@@ -534,7 +534,8 @@ int WindowOpen(vlc_window_t *p_wnd)
     } else {
         if (_statusLevelWindowCounter > 0) {
             _statusLevelWindowCounter--;
-        } else if (_statusLevelWindowCounter == 0) {
+        } 
+        if (_statusLevelWindowCounter == 0) {
             NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
             [self updateWindowLevelForHelperWindows:i_level];
         }
