@@ -22,11 +22,11 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import <windows/mainwindow/VLCControlsBarCommon.h>
 #import <windows/video/VLCVoutView.h>
 
 @class VLCMainVideoViewOverlayView;
 @class VLCMainVideoViewAudioMediaDecorativeView;
+@class VLCMainVideoViewControlsBar;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, strong) IBOutlet NSView *bottomBarView;
 @property (readwrite, strong) IBOutlet NSStackView *centralControlsStackView;
-@property (readwrite, strong) IBOutlet VLCControlsBarCommon *controlsBar;
+@property (readwrite, strong) IBOutlet VLCMainVideoViewControlsBar *controlsBar;
 @property (readwrite, strong) IBOutlet NSButton *returnButton;
 @property (readwrite, strong) IBOutlet NSButton *playlistButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonTopConstraint;
