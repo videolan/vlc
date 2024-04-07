@@ -522,13 +522,14 @@ int WindowOpen(vlc_window_t *p_wnd)
     if(i_level == NSStatusWindowLevel) {
         _statusLevelWindowCounter++;
         // window level need to stay on normal in fullscreen mode
-        if (![o_window fullscreen] && ![o_window inFullscreenTransition])
+        if (![o_window fullscreen] && ![o_window inFullscreenTransition]) {
             [self updateWindowLevelForHelperWindows:i_level];
+        }
     } else {
-        if (_statusLevelWindowCounter > 0)
+        if (_statusLevelWindowCounter > 0) {
             _statusLevelWindowCounter--;
-
-        if (_statusLevelWindowCounter == 0) {
+        } else if (_statusLevelWindowCounter == 0) {
+            NSApp.activationPolicy = NSApplicationActivationPolicyRegular;
             [self updateWindowLevelForHelperWindows:i_level];
         }
     }
@@ -546,6 +547,7 @@ int WindowOpen(vlc_window_t *p_wnd)
         return;
     }
 
+    NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
     [self setWindowLevel:NSStatusWindowLevel forWindow:p_wnd];
     window.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
                                 NSWindowCollectionBehaviorIgnoresCycle |
