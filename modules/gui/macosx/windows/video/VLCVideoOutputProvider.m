@@ -522,7 +522,7 @@ int WindowOpen(vlc_window_t *p_wnd)
     if(i_level == NSStatusWindowLevel) {
         _statusLevelWindowCounter++;
         // window level need to stay on normal in fullscreen mode
-        if (![o_window fullscreen] && ![o_window inFullscreenTransition]) {
+        if (!o_window.fullscreen && !o_window.inFullscreenTransition) {
             // make sure float on top can join all spaces, including full-screen ones
             NSApp.activationPolicy = NSApplicationActivationPolicyAccessory;
             [self updateWindowLevelForHelperWindows:i_level];

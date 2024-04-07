@@ -45,7 +45,6 @@
 {
     [super setup];
     _autohideTitlebar = NO;
-    _pipModeEnabled = NO;
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -57,22 +56,6 @@
     self.styleMask |= NSWindowStyleMaskFullSizeContentView;
     self.ignoresMouseEvents = NO;
     self.acceptsMouseMovedEvents = YES;
-}
-
-- (void)setPipModeEnabled:(BOOL)pipModeEnabled
-{
-    _pipModeEnabled = pipModeEnabled;
-    if (self.pipModeEnabled) {
-        self.level = NSMainMenuWindowLevel;
-        self.collectionBehavior = NSWindowCollectionBehaviorCanJoinAllSpaces |
-                                  NSWindowCollectionBehaviorIgnoresCycle |
-                                  NSWindowCollectionBehaviorTransient |
-                                  NSWindowCollectionBehaviorFullScreenAuxiliary;
-        [self hideTitleBar:self];
-    } else {
-        self.level = NSNormalWindowLevel;
-        self.collectionBehavior = NSWindowCollectionBehaviorDefault;
-    }
 }
 
 - (void)stopTitlebarAutohideTimer

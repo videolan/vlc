@@ -26,8 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCFullVideoViewWindow : VLCVideoWindowCommon
 
-@property (readwrite, nonatomic) BOOL pipModeEnabled;
-
 - (void)stopTitlebarAutohideTimer;
 - (void)startTitlebarAutohideTimer;
 - (void)showTitleBar;

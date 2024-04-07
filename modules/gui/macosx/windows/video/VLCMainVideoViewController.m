@@ -384,11 +384,11 @@
 
 - (IBAction)togglePictureInPicture:(id)sender
 {
-    VLCFullVideoViewWindow * const videoWindow = (VLCFullVideoViewWindow *)self.view.window;
-    if (videoWindow != nil) {
-        videoWindow.pipModeEnabled = !videoWindow.pipModeEnabled;
+    vout_thread_t * const p_vout = self.voutView.voutThread;
+    if (p_vout) {
+        var_ToggleBool(p_vout, "video-on-top");
+        vout_Release(p_vout);
     }
-    self.pipModeEnabled = !self.pipModeEnabled;
 }
 
 @end
