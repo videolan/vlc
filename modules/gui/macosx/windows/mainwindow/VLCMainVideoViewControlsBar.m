@@ -116,7 +116,8 @@
     if (!p_vout) {
         return;
     }
-    var_ToggleBool(p_vout, "video-on-top");
+    const bool enabled = !var_ToggleBool(p_vout, "video-on-top");
+    self.floatOnTopButton.state = enabled ? NSControlStateValueOn : NSControlStateValueOff;
     vout_Release(p_vout);
 }
 
