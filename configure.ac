@@ -4013,7 +4013,6 @@ AS_IF([test "${enable_qt}" != "no"], [
           have_qt_wayland="yes"
       ],[:])
 
-      QT_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Core)"
       QT_INCLUDE_DIRECTORY="$(eval $PKG_CONFIG --variable=includedir Qt6Core)"
       QT_LIB_DIRECTORY="$(eval $PKG_CONFIG --variable=libdir Qt6Core)"
       QT_VERSION_CORE="$(eval $PKG_CONFIG --modversion Qt6Core)"
@@ -4021,8 +4020,21 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_VERSION_QML="$(eval $PKG_CONFIG --modversion Qt6Qml)"
       QT_VERSION_QUICK="$(eval $PKG_CONFIG --modversion Qt6Quick)"
 
-      QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
-      QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
+      AS_IF([test "${host}" = "${build}"],[
+        dnl native build, we can use the exectuables of the Qt6 target
+        QT_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6Core)"
+        QT_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Core)"
+        QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
+        QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
+      ],[
+        dnl cross compilation, use Qt6 native tools from contribs
+        AS_IF([test -n "${CONTRIB_DIR}"], [
+          QT_BIN_DIRECTORY=${CONTRIB_DIR}/../bin
+          QT_LIBEXEC_DIRECTORY=${CONTRIB_DIR}/../libexec
+          QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
+          QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
+        ])
+      ])
 
       AC_MSG_CHECKING([if contribs provide target_qt.conf])
       AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
@@ -4033,55 +4045,12 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       dnl check native in contribs and keep the full path if found there
-      AC_MSG_CHECKING([if contribs provide qmake6])
-      AS_IF([test -x "${CONTRIB_DIR}/../bin/qmake6${BUILDEXEEXT}"], [
-        QMAKE6="${CONTRIB_DIR}/../bin/qmake6${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
-      AC_CHECK_TOOL(QMAKE6, [qmake6], [false])
-      AC_MSG_CHECKING([if contribs provide moc])
-      AS_IF([test -x "${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"], [
-        MOC="${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
+      AC_PATH_PROGS(QMAKE6, [qmake6], qmake6, ["${QT_BIN_DIRECTORY}"])
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
-      AC_MSG_CHECKING([if contribs provide rcc])
-      AS_IF([test -x "${CONTRIB_DIR}/../libexec/rcc${BUILDEXEEXT}"], [
-        RCC="${CONTRIB_DIR}/../libexec/rcc${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
-      AC_MSG_CHECKING([if contribs provide uic])
-      AS_IF([test -x "${CONTRIB_DIR}/../libexec/uic${BUILDEXEEXT}"], [
-        UIC="${CONTRIB_DIR}/../libexec/uic${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
-      AC_MSG_CHECKING([if contribs provide qsb])
-      AS_IF([test -x "${CONTRIB_DIR}/../bin/qsb${BUILDEXEEXT}"], [
-        QSB="${CONTRIB_DIR}/../bin/qsb${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
       AC_PATH_PROGS(QSB, [qsb], qsb, ["${QT_SHADERTOOLS_BIN_DIRECTORY}"])
-
-      AC_MSG_CHECKING([if contribs provide qmlcachegen])
-      AS_IF([test -x "${CONTRIB_DIR}/../libexec/qmlcachegen${BUILDEXEEXT}"], [
-        QMLCACHEGEN="${CONTRIB_DIR}/../libexec/qmlcachegen${BUILDEXEEXT}"
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
-      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], qmlcachegen, ["${QT_QML_LIBEXEC_DIRECTORY}"])
+      AC_PATH_PROGS(QMLCACHEGEN, [qmlcachegen], no, ["${QT_QML_LIBEXEC_DIRECTORY}"])
       AS_IF([test "${QMLCACHEGEN}" = "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
