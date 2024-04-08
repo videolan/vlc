@@ -108,8 +108,4 @@ QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATU
 	# Install
 	$(CMAKEINSTALL)
 
-	# qt-configure-module wants to have qt-cmake-private in libexec:
-	mkdir -p $(PREFIX)/libexec
-	ln -sf $(PREFIX)/bin/qt-cmake-private $(PREFIX)/libexec/qt-cmake-private
-
 	touch $@
