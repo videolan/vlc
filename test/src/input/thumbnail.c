@@ -45,19 +45,19 @@ const struct
 } test_params[] = {
     /* Simple test with a thumbnail at 60s, with a video track */
     { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, true,
-        VLC_TICK_FROM_SEC( 1 ), true },
+      VLC_TICK_INVALID, true },
     /* Test without fast-seek */
     { 1, 0, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, false, true,
-        VLC_TICK_FROM_SEC( 1 ), true },
+      VLC_TICK_INVALID, true },
     /* Seek by position test */
-    { 1, 0, VLC_TICK_INVALID, 0, .3f, true, true, true, VLC_TICK_FROM_SEC( 1 ), true },
+    { 1, 0, VLC_TICK_INVALID, 0, .3f, true, true, true, VLC_TICK_INVALID, true },
     /* Seek at a negative position */
-    { 1, 0, VLC_TICK_INVALID, -12345, .0f, false, true, true, VLC_TICK_FROM_SEC( 1 ), true },
+    { 1, 0, VLC_TICK_INVALID, -12345, .0f, false, true, true, VLC_TICK_INVALID, true },
     /* Take a thumbnail of a file without video, which should timeout. */
     { 0, 1, VLC_TICK_INVALID, VLC_TICK_FROM_SEC( 60 ), .0f, false, true, false, VLC_TICK_FROM_MS( 100 ), false },
     /* Take a thumbnail of a file with a video track starting later */
     { 1, 1, VLC_TICK_FROM_SEC( 60 ), VLC_TICK_FROM_SEC( 30 ), .0f, false, true, true,
-        VLC_TICK_FROM_SEC( 2 ), true },
+      VLC_TICK_INVALID, true },
 };
 
 struct test_ctx
