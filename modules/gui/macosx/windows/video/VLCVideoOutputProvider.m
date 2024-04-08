@@ -49,6 +49,8 @@
 
 NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
 NSString *VLCWindowLevelKey = @"VLCWindowLevelKey";
+NSString * const VLCWindowFloatOnTopChangedNotificationName = @"VLCWindowFloatOnTopChanged";
+NSString * const VLCWindowFloatOnTopEnabledNotificationKey = @"VLCWindowFloatOnTopEnabled";
 
 static int WindowEnable(vlc_window_t *p_wnd, const vlc_window_cfg_t *cfg)
 {
@@ -173,6 +175,28 @@ int WindowOpen(vlc_window_t *p_wnd)
     p_wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
     p_wnd->ops = &ops;
     return VLC_SUCCESS;
+}
+
+static int WindowFloatOnTop(vlc_object_t *obj,
+                     char const *psz_var,
+                     vlc_value_t oldval,
+                     vlc_value_t newval,
+                     void *p_data)
+{
+    VLC_UNUSED(obj); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
+    @autoreleasepool {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            VLCVideoWindowCommon * const videoWindow = (__bridge VLCVideoWindowCommon *)p_data;
+            NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+            NSDictionary<NSString *, NSNumber *> * const userInfo = @{
+                VLCWindowFloatOnTopEnabledNotificationKey: @(newval.b_bool)
+            };
+            [notificationCenter postNotificationName:VLCWindowFloatOnTopChangedNotificationName
+                                              object:videoWindow
+                                            userInfo:userInfo];
+        });
+        return VLC_SUCCESS;
+    }
 }
 
 @interface VLCVideoOutputProvider ()
@@ -390,12 +414,14 @@ int WindowOpen(vlc_window_t *p_wnd)
 - (void)setupVideoOutputForVideoWindow:(VLCVideoWindowCommon *)videoWindow
                          withVlcWindow:(vlc_window_t *)p_wnd
 {
-    VLCVoutView *voutView = videoWindow.videoViewController.voutView;
+    VLCVoutView * const voutView = videoWindow.videoViewController.voutView;
 
-    [videoWindow setAlphaValue:config_GetFloat("macosx-opaqueness")];
+    videoWindow.alphaValue = config_GetFloat("macosx-opaqueness");
     [_voutWindows setObject:videoWindow forKey:[NSValue valueWithPointer:p_wnd]];
-    [voutView setVoutThread:(vout_thread_t *)vlc_object_parent(p_wnd)];
-    [voutView setVoutWindow:p_wnd];
+    vout_thread_t * const p_vout = (vout_thread_t *)vlc_object_parent(p_wnd);
+    var_AddCallback(p_vout, "video-on-top", WindowFloatOnTop, (__bridge void *)videoWindow);
+    voutView.voutThread = p_vout;
+    voutView.voutWindow = p_wnd;
     videoWindow.hasActiveVideo = YES;
     _playerController.activeVideoPlayback = YES;
     VLCMain.sharedInstance.libraryWindow.nonembedded = !b_mainWindowHasVideo;
