@@ -240,6 +240,7 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
     output.i_playcount = input->playCount();
     output.f_progress = input->lastPosition();
     output.i_last_played_date = input->lastPlayedDate();
+    output.b_is_public = input->isPublic();
 
     output.psz_title = strdup( input->title().c_str() );
     if ( unlikely( output.psz_title == nullptr ) )

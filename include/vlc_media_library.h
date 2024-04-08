@@ -222,6 +222,7 @@ typedef struct vlc_ml_media_t
     vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
 
     bool b_is_favorite;
+    bool b_is_public;
 
     union
     {
