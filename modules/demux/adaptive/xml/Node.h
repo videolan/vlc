@@ -46,7 +46,7 @@ namespace adaptive
                         bool matches(const std::string &name, const std::string &ns) const;
                 };
 
-                using Attributes = std::vector<struct Attribute>;
+                using Attributes = std::vector<class Attribute>;
 
                 Node            () = delete;
                 Node(std::unique_ptr<std::string>, Namespaces::Ptr);

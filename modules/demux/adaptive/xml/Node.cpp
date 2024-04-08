@@ -81,7 +81,7 @@ bool Node::hasAttribute(const std::string& name) const
 bool Node::hasAttribute(const std::string& name, const std::string &ns) const
 {
     auto it = std::find_if(attributes.cbegin(),attributes.cend(),
-                           [name, ns](const struct Attribute &a)
+                           [name, ns](const class Attribute &a)
                                 {return a.name == name && ns == *a.ns;});
     return it != attributes.cend();
 }
@@ -94,7 +94,7 @@ const std::string& Node::getAttributeValue(const std::string& key) const
 const std::string& Node::getAttributeValue(const std::string& key, const std::string &ns) const
 {
     auto it = std::find_if(attributes.cbegin(),attributes.cend(),
-                           [key, ns](const struct Attribute &a)
+                           [key, ns](const class Attribute &a)
                                 {return a.name == key && ns == *a.ns;});
     if (it != attributes.cend())
         return (*it).value;
@@ -103,7 +103,7 @@ const std::string& Node::getAttributeValue(const std::string& key, const std::st
 
 void Node::addAttribute(const std::string& key, Namespaces::Ptr ns, const std::string& value)
 {
-    struct Attribute attr;
+    class Attribute attr;
     attr.name = key;
     attr.ns = ns;
     attr.value = value;
