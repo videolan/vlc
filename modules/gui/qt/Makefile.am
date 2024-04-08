@@ -1121,7 +1121,6 @@ if ENABLE_QT
 BUILT_SOURCES += \
     $(libqt_plugin_la_SHADER:.frag=.frag.qsb) \
     $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
-endif
 
 QSB_PARAMS = --glsl="100 es,120,150" --batchable -O
 if HAVE_WIN32
@@ -1153,6 +1152,7 @@ endif
 EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_SHADER)
 
 nodist_libqt_plugin_la_SOURCES += resources.cpp shaders/shaders.cpp
+endif
 
 if ENABLE_VLM
 nodist_libqt_plugin_la_SOURCES += dialogs/vlm/vlm.moc.cpp
