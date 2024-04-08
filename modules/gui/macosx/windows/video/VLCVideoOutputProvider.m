@@ -47,8 +47,8 @@
 #include <vlc_configuration.h>
 #include <vlc_vout_display.h>
 
-NSString *VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
-NSString *VLCWindowLevelKey = @"VLCWindowLevelKey";
+NSString * const VLCWindowShouldUpdateLevel = @"VLCWindowShouldUpdateLevel";
+NSString * const VLCWindowLevelKey = @"VLCWindowLevelKey";
 NSString * const VLCWindowFloatOnTopChangedNotificationName = @"VLCWindowFloatOnTopChanged";
 NSString * const VLCWindowFloatOnTopEnabledNotificationKey = @"VLCWindowFloatOnTopEnabled";
 
