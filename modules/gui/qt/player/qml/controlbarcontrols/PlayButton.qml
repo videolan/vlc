@@ -284,15 +284,12 @@ T.Control {
                 color: "white"
 
                 anchors.fill: parent
-                anchors.margins: VLCStyle.dp(2)
+                anchors.margins: _diminished ? (parent.width / 2)
+                                             : VLCStyle.dp(2)
 
                 radius: width
 
-                Binding on anchors.margins {
-                    id: marginBinding
-                    when: false
-                    value: (innerRectangle.parent.width / 2)
-                }
+                property bool _diminished: false
 
                 onStateChanged: {
                     if (state === "diminished") {
@@ -301,7 +298,7 @@ T.Control {
                     } else {
                         bindingTimer.stop()
                         marginBehavior.enabled = false
-                        marginBinding.when = false
+                        _diminished = false
                     }
                 }
 
@@ -311,7 +308,7 @@ T.Control {
                     // to hold the button.
                     id: bindingTimer
                     interval: mouseArea.pressAndHoldInterval / 3
-                    onTriggered: marginBinding.when = true
+                    onTriggered: innerRectangle._diminished = true
                 }
 
                 Behavior on anchors.margins {
