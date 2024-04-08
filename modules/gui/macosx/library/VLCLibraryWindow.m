@@ -70,7 +70,7 @@
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
 
-#import "windows/mainwindow/VLCControlsBarCommon.h"
+#import "windows/controlsbar/VLCControlsBarCommon.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"

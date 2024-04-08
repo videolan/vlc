@@ -23,7 +23,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "windows/mainwindow/VLCControlsBarCommon.h"
+#import "windows/controlsbar/VLCControlsBarCommon.h"
 
 @class VLCVolumeSlider;
 @class VLCTrackingView;

@@ -1102,10 +1102,10 @@
 			isa = PBXGroup;
 			children = (
 				1C1ED5162205AA8200811EC0 /* addons */,
+				1C1ED5092204ACC600811EC0 /* controlsbar */,
 				1C1ED51C2205AC0700811EC0 /* convertandsave */,
 				1C1ED5182205AABF00811EC0 /* extensions */,
 				1C1ED51F2205AC8000811EC0 /* logging */,
-				1C1ED5092204ACC600811EC0 /* mainwindow */,
 				1C1ED5052204AA5800811EC0 /* video */,
 				1C67C8A61D58C0A40079E1C1 /* VLCAboutWindowController.h */,
 				1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */,
@@ -1123,7 +1123,7 @@
 			path = windows;
 			sourceTree = "<group>";
 		};
-		1C1ED5092204ACC600811EC0 /* mainwindow */ = {
+		1C1ED5092204ACC600811EC0 /* controlsbar */ = {
 			isa = PBXGroup;
 			children = (
 				1C1ED51D2205AC6B00811EC0 /* VLCControlsBarCommon.h */,
@@ -1133,7 +1133,7 @@
 				7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */,
 				7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */,
 			);
-			path = mainwindow;
+			path = controlsbar;
 			sourceTree = "<group>";
 		};
 		1C1ED50A2204AFA900811EC0 /* coreinteraction */ = {

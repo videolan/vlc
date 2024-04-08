@@ -32,7 +32,7 @@
 
 #import "views/VLCBottomBarView.h"
 
-#import "windows/mainwindow/VLCControlsBarCommon.h"
+#import "windows/controlsbar/VLCControlsBarCommon.h"
 
 @implementation VLCLibraryUIUnits
 

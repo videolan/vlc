@@ -399,12 +399,12 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/windows/logging/VLCLogMessage.m \
 	gui/macosx/windows/logging/VLCLogWindowController.h \
 	gui/macosx/windows/logging/VLCLogWindowController.m \
-	gui/macosx/windows/mainwindow/VLCControlsBarCommon.h \
-	gui/macosx/windows/mainwindow/VLCControlsBarCommon.m \
-	gui/macosx/windows/mainwindow/VLCMainVideoViewControlsBar.h \
-	gui/macosx/windows/mainwindow/VLCMainVideoViewControlsBar.m \
-	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.h \
-	gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.m \
+	gui/macosx/windows/controlsbar/VLCControlsBarCommon.h \
+	gui/macosx/windows/controlsbar/VLCControlsBarCommon.m \
+	gui/macosx/windows/controlsbar/VLCMainVideoViewControlsBar.h \
+	gui/macosx/windows/controlsbar/VLCMainVideoViewControlsBar.m \
+	gui/macosx/windows/controlsbar/VLCMainWindowControlsBar.h \
+	gui/macosx/windows/controlsbar/VLCMainWindowControlsBar.m \
 	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.h \
 	gui/macosx/windows/video/VLCAspectRatioRetainingVideoWindow.m \
 	gui/macosx/windows/video/VLCFullVideoViewWindow.h \

@@ -54,7 +54,7 @@
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCErrorWindowController.h"
 #import "windows/VLCHelpWindowController.h"
-#import "windows/mainwindow/VLCMainWindowControlsBar.h"
+#import "windows/controlsbar/VLCMainWindowControlsBar.h"
 #import "windows/extensions/VLCExtensionsManager.h"
 #import "windows/convertandsave/VLCConvertAndSaveWindowController.h"
 #import "windows/logging/VLCLogWindowController.h"

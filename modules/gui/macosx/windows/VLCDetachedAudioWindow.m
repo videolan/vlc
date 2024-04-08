@@ -36,7 +36,7 @@
 #import "views/VLCTrackingView.h"
 #import "views/VLCBottomBarView.h"
 
-#import "windows/mainwindow/VLCControlsBarCommon.h"
+#import "windows/controlsbar/VLCControlsBarCommon.h"
 
 @interface VLCDetachedAudioWindow()
 {

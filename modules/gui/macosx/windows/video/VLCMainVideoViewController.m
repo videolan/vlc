@@ -37,7 +37,7 @@
 
 #import "views/VLCBottomBarView.h"
 
-#import "windows/mainwindow/VLCMainVideoViewControlsBar.h"
+#import "windows/controlsbar/VLCMainVideoViewControlsBar.h"
 
 #import "windows/video/VLCMainVideoViewAudioMediaDecorativeView.h"
 #import "windows/video/VLCMainVideoViewOverlayView.h"
