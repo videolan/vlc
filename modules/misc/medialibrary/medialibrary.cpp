@@ -522,6 +522,8 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_BAN_FOLDER:
         case VLC_ML_UNBAN_FOLDER:
         case VLC_ML_RELOAD_FOLDER:
+        case VLC_ML_SET_FOLDER_PUBLIC:
+        case VLC_ML_SET_FOLDER_PRIVATE:
         case VLC_ML_RESUME_BACKGROUND:
         case VLC_ML_NEW_EXTERNAL_MEDIA:
         case VLC_ML_NEW_STREAM:
@@ -544,6 +546,8 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_REMOVE_FOLDER:
         case VLC_ML_BAN_FOLDER:
         case VLC_ML_UNBAN_FOLDER:
+        case VLC_ML_SET_FOLDER_PUBLIC:
+        case VLC_ML_SET_FOLDER_PRIVATE:
         {
             const char* mrl = va_arg( args, const char* );
             switch( query )
@@ -560,6 +564,17 @@ int MediaLibrary::Control( int query, va_list args )
                 case VLC_ML_UNBAN_FOLDER:
                     m_ml->unbanFolder( mrl );
                     break;
+                case VLC_ML_SET_FOLDER_PUBLIC:
+                case VLC_ML_SET_FOLDER_PRIVATE:
+                {
+                    auto folder = m_ml->folder(mrl);
+                    const bool is_public = query == VLC_ML_SET_FOLDER_PUBLIC;
+
+                    if (folder)
+                        folder->setPublic(is_public);
+                    break;
+                }
+                    
             }
             break;
         }
