@@ -140,6 +140,8 @@ libvlccore_sources_base = files(
     'input/info.h',
     'input/meta.c',
     'input/attachment.c',
+    'input/source.c',
+    'input/source.h',
     'player/player.c',
     'player/player.h',
     'player/input.c',

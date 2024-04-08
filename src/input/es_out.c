@@ -46,6 +46,7 @@
 #include <vlc_tracer.h>
 
 #include "input_internal.h"
+#include "./source.h"
 #include "../clock/input_clock.h"
 #include "../clock/clock.h"
 #include "decoder.h"

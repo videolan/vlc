@@ -316,6 +316,8 @@ libvlccore_la_SOURCES = \
 	input/resource.h \
 	input/resource.c \
 	input/services_discovery.c \
+	input/source.c \
+	input/source.h \
 	input/stats.c \
 	input/stream.c \
 	input/stream_fifo.c \

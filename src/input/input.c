@@ -2790,36 +2790,6 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     return VLC_SUCCESS;
 }
 
-input_source_t *input_source_Hold( input_source_t *in )
-{
-    vlc_atomic_rc_inc( &in->rc );
-    return in;
-}
-
-void input_source_Release( input_source_t *in )
-{
-    if( vlc_atomic_rc_dec( &in->rc ) )
-    {
-        free( in->str_id );
-        free( in );
-    }
-}
-
-const char *input_source_GetStrId( input_source_t *in )
-{
-    return in->str_id;
-}
-
-int input_source_GetNewAutoId( input_source_t *in )
-{
-    return in->auto_id++;
-}
-
-bool input_source_IsAutoSelected( input_source_t *in )
-{
-    return in->autoselected;
-}
-
 /*****************************************************************************
  * InputSourceDestroy:
  *****************************************************************************/
