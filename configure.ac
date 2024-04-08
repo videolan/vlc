@@ -4033,14 +4033,14 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       dnl check native in contribs and keep the full path if found there
-      AC_MSG_CHECKING([if contribs provide qmake])
-      AS_IF([test -x "${CONTRIB_DIR}/../bin/qmake${BUILDEXEEXT}"], [
-        QMAKE="${CONTRIB_DIR}/../bin/qmake${BUILDEXEEXT}"
+      AC_MSG_CHECKING([if contribs provide qmake6])
+      AS_IF([test -x "${CONTRIB_DIR}/../bin/qmake6${BUILDEXEEXT}"], [
+        QMAKE6="${CONTRIB_DIR}/../bin/qmake6${BUILDEXEEXT}"
         AC_MSG_RESULT([yes])
       ],[
         AC_MSG_RESULT([no])
       ])
-      AC_CHECK_TOOL(QMAKE, [qmake], [false])
+      AC_CHECK_TOOL(QMAKE6, [qmake6], [false])
       AC_MSG_CHECKING([if contribs provide moc])
       AS_IF([test -x "${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"], [
         MOC="${CONTRIB_DIR}/../libexec/moc${BUILDEXEEXT}"
@@ -4087,9 +4087,9 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
-      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE} and conf ${QT_CONF}])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${QT_CONF}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qmake "${QMAKE}" \
+            --qmake "${QMAKE6}" \
             --qtconf "${QT_CONF}" \
             --modules \
             QtQml.Models="" \
@@ -4108,7 +4108,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
           AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qmake "${QMAKE}" \
+            --qmake "${QMAKE6}" \
             --qtconf "${QT_CONF}" \
             --modules QtTest="" \
             >&AS_MESSAGE_FD ], [
