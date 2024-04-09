@@ -245,16 +245,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         return;
     if (sys->area.place_changed)
     {
-        struct vout_display_placement place_cfg = vd->cfg->display;
         vout_display_place_t place;
 
+        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
         /* Reverse vertical alignment as the GL tex are Y inverted */
-        if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_TOP)
-            place_cfg.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-        else if (place_cfg.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-            place_cfg.align.vertical = VLC_VIDEO_ALIGN_TOP;
-
-        vout_display_PlacePicture(&place, vd->source, &place_cfg);
+        place.y = vd->cfg->display.height - (place.y + place.height);
 
         vlc_gl_Resize (sys->gl, place.width, place.height);
         vout_display_opengl_SetOutputSize(sys->vgl, vd->cfg->display.width, vd->cfg->display.height);
