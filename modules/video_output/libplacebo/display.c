@@ -297,23 +297,12 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     // Set the target crop dynamically based on the swapchain flip state
     vout_display_place_t place;
-    struct vout_display_placement dp = vd->cfg->display;
     if (!need_vflip)
         vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
     else
     {
-        switch (dp.align.vertical) {
-        case VLC_VIDEO_ALIGN_TOP:
-            dp.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-            break;
-        case VLC_VIDEO_ALIGN_BOTTOM:
-            dp.align.vertical = VLC_VIDEO_ALIGN_TOP;
-            break;
-        default:
-            break;
-        }
-        vout_display_PlacePicture(&place, vd->fmt, &dp);
-        place.y = vd->cfg->display.height - place.y;
+        vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
+        place.y = place.height + place.y;
         place.height = -place.height;
     }
 
