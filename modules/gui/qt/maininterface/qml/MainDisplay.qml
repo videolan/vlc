@@ -184,7 +184,9 @@ FocusScope {
 
             model: g_mainDisplay.tabModel
 
-            plListView: playlistLoader.item
+            plListView: playlistLoader.active ? playlistLoader.item
+                                              : (playlistWindowLoader.status === Loader.Ready ? playlistWindowLoader.item.playlistView
+                                                                                              : null)
 
             onItemClicked: (index) => {
                 const name = g_mainDisplay.tabModel.get(index).name

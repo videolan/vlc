@@ -30,6 +30,8 @@ Window {
     // TODO: Qt >5.13 use transientParent
     property QtWindow parentWindow
 
+    property alias playlistView: playlistView
+
     width: 350
     minimumWidth: playlistView.minimumWidth
 
