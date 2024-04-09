@@ -25,6 +25,11 @@
 #define LIBVLC_INPUT_ES_OUT_H 1
 
 #include <vlc_common.h>
+#include <vlc_es_out.h>
+
+#include "input_internal.h"
+
+typedef struct input_thread_t input_thread_t;
 
 enum es_out_mode_e
 {
