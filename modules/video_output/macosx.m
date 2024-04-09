@@ -333,6 +333,8 @@ static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg)
     vout_display_place_t place;
     /* We never receive resize from the core, so provide the size ourselves */
     vout_display_PlacePicture(&place, vd->source, &cfg->display);
+    /* Reverse vertical alignment as the GL tex are Y inverted */
+    place.y = cfg->display.height - (place.y + place.height);
     sys->place = place;
 }
 
@@ -358,11 +360,6 @@ static int Control (vout_display_t *vd, int query)
                 @synchronized(sys->glView) {
                     vout_display_cfg_t cfg;
                     cfg = *vd->cfg;
-                    /* Reverse vertical alignment as the GL tex are Y inverted */
-                    if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_TOP)
-                        cfg.display.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-                    else if (cfg.display.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-                        cfg.display.align.vertical = VLC_VIDEO_ALIGN_TOP;
                     cfg.display.width = sys->cfg.display.width;
                     cfg.display.height = sys->cfg.display.height;
                     sys->cfg = cfg;
@@ -583,7 +580,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
     NSRect bounds = [self convertRectToBacking:[self bounds]];
-    vout_display_place_t place;
 
     @synchronized(self) {
         if (vd == NULL) return;
