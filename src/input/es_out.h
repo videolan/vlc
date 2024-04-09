@@ -104,6 +104,21 @@ enum es_out_query_private_e
     ES_OUT_PRIV_SET_VBI_TRANSPARENCY                /* arg1=bool res=can fail */
 };
 
+struct vlc_input_es_out;
+struct vlc_input_es_out_ops {
+    int (*priv_control)(
+        struct vlc_input_es_out *out,
+        input_source_t *source,
+        int query,
+        va_list args);
+};
+
+struct vlc_input_es_out {
+    es_out_t out;
+
+    const struct vlc_input_es_out_ops *ops;
+};
+
 static inline int es_out_vaPrivControl( es_out_t *out, int query, va_list args )
 {
     vlc_assert( out->cbs->priv_control );
@@ -254,5 +269,11 @@ es_out_t  *input_EsOutSourceNew(es_out_t *master_out, input_source_t *in);
 
 es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id);
 const input_source_t *vlc_es_id_GetSource(vlc_es_id_t *id);
+
+static inline void
+vlc_input_es_out_Delete(struct vlc_input_es_out *out)
+{
+    es_out_Delete(&out->out);
+}
 
 #endif
