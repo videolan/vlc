@@ -139,10 +139,6 @@ Item {
             active: !MainCtx.playlistDocked
             source: "qrc:///playlist/PlaylistDetachedWindow.qml"
         }
-        Connections {
-            target: playlistWindowLoader.item
-            function onClosing() { MainCtx.playlistVisible = false }
-        }
 
         Connections {
             target: MainPlaylistController

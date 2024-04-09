@@ -52,6 +52,10 @@ Window {
         }
     }
 
+    onClosing: {
+        MainCtx.playlistVisible = false
+    }
+
     PlaylistListView {
         id: playlistView
 
