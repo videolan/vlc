@@ -38,7 +38,7 @@
 
 struct es_out_source
 {
-    es_out_t out;
+    struct vlc_input_es_out out;
     input_source_t *in;
     es_out_t *parent_out;
 } ;
@@ -46,7 +46,8 @@ struct es_out_source
 static struct es_out_source *
 PRIV(es_out_t *out)
 {
-    struct es_out_source *source = container_of(out, struct es_out_source, out);
+    struct vlc_input_es_out *parent = container_of(out, struct vlc_input_es_out, out);
+    struct es_out_source *source = container_of(parent, struct es_out_source, out);
     return source;
 }
 
@@ -111,8 +112,9 @@ es_out_t *input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
         return NULL;
 
     sys->in = in;
-    sys->out.cbs = &es_out_cbs;
+    sys->out.ops = NULL;
+    sys->out.out.cbs = &es_out_cbs;
     sys->parent_out = parent_out;
 
-    return &sys->out;
+    return &sys->out.out;
 }
