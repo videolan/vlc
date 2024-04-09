@@ -25,10 +25,10 @@ import "qrc:///style/"
 
 
 Window {
-    visible: true
+    visible: MainCtx.playlistVisible
 
     // TODO: Qt >5.13 use transientParent
-    property QtWindow parentWindow: MainCtx.intfMainWindow
+    property QtWindow parentWindow
 
     width: 350
     minimumWidth: playlistView.minimumWidth
@@ -36,16 +36,19 @@ Window {
     title: qsTr("Playlist")
     color: theme.bg.primary
 
-    Component.onCompleted: {
-        if (!!parentWindow) {
-            height = parentWindow.height
-            minimumHeight = parentWindow.minimumHeight
+    onVisibleChanged: {
+        if (visible) {
+            const window = parentWindow ? parentWindow : MainCtx.intfMainWindow
+            if (window) {
+                height = window.height
+                minimumHeight = window.minimumHeight
 
-            x = parentWindow.x + parentWindow.width + 10
-            y = parentWindow.y
-        } else {
-            height = 400
-            minimumHeight = 200
+                x = window.x + window.width + 10
+                y = window.y
+            } else {
+                height = 400
+                minimumHeight = 200
+            }
         }
     }
 
