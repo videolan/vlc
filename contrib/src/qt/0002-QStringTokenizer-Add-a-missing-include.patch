@@ -1,0 +1,38 @@
+From 55a7e34d7b4eeafb3465d9869920dc88dbc3a6e9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 9 Apr 2024 14:03:29 +0300
+Subject: [PATCH 2/3] QStringTokenizer: Add a missing include
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This header uses std::forward_iterator_tag, which requires including
+the <iterator> header.
+
+This fixes building with libc++ with
+_LIBCPP_REMOVE_TRANSITIVE_INCLUDES enabled.
+
+Pick-to: 6.7 6.5 6.2
+Change-Id: Id2ce97e158c87dab1efe30e54a93f0bc9351de5a
+Reviewed-by: Thiago Macieira <thiago.macieira@intel.com>
+Reviewed-by: Mårten Nordheim <marten.nordheim@qt.io>
+(cherry picked from commit aa896ca9f51252b6d01766e19a03e41bd49857f3)
+---
+ src/corelib/text/qstringtokenizer.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/corelib/text/qstringtokenizer.h b/src/corelib/text/qstringtokenizer.h
+index 2b679608f9..7a627b4508 100644
+--- a/src/corelib/text/qstringtokenizer.h
++++ b/src/corelib/text/qstringtokenizer.h
+@@ -5,6 +5,7 @@
+ 
+ #include <QtCore/qnamespace.h>
+ #include <QtCore/qcontainerfwd.h>
++#include <iterator>
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-- 
+2.25.1
+

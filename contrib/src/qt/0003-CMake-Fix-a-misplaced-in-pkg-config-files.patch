@@ -1,0 +1,57 @@
+From ba1059325eedba710d933fa0be4af1e6a4056aac Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 9 Apr 2024 15:38:02 +0300
+Subject: [PATCH 3/3] CMake: Fix a misplaced > in pkg-config files
+
+The Qt CMake routines for generating pkg-config files don't
+handle all sorts of generator expressions, see
+qt_internal_set_pkg_config_cpp_flags in QtPkgConfigHelpers.cmake
+which hardcodes handling of some specific expressions. In this
+case, they don't handle the semicolon within the generator
+expression expansion.
+
+For the UNICODE and _UNICODE defines, this means that the pkg-config
+file ends up containing "-D_UNICODE>" with the trailing ">". (The
+pkg-config generator tries to parse out the generator expressions,
+but the semicolon gets handled as a higher level separator, leaving
+the closing bracket ">" behind.)
+
+This issue only shows up for mingw targets, because pkg-config files
+aren't generated in MSVC style builds.
+
+Escape the semicolon as $<SEMICOLON> to make it not break the
+surrounding generator expression, as parsed by the pkg-config file
+generator.
+
+The generator expressions aren't fully correctly evaluated for the
+pkg-config files though; the UNICODE and _UNICODE defines don't
+end up in the resulting pkg-config file even though they're used
+during compilation (both before and after this change).
+
+Fixes: QTBUG-103019
+Co-authored-by: Martin Reboredo <yakoyoku@gmail.com>
+Pick-to: 6.7 6.5 6.2
+Change-Id: Icdb380e3b42be2a47372a8ee2b61378a33c685f7
+Reviewed-by:  Alexey Edelev <alexey.edelev@qt.io>
+Reviewed-by: Li Xinwei <1326710505@qq.com>
+(cherry picked from commit f35b9530b9acf954f8741d0ee2b4b68fc90a4afc)
+---
+ cmake/QtFlagHandlingHelpers.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/QtFlagHandlingHelpers.cmake b/cmake/QtFlagHandlingHelpers.cmake
+index 91e1de8644..cdbaaacad4 100644
+--- a/cmake/QtFlagHandlingHelpers.cmake
++++ b/cmake/QtFlagHandlingHelpers.cmake
+@@ -365,7 +365,7 @@ function(qt_internal_enable_unicode_defines)
+         set(no_unicode_condition
+             "$<NOT:$<BOOL:$<TARGET_PROPERTY:QT_NO_UNICODE_DEFINES>>>")
+         target_compile_definitions(Platform
+-            INTERFACE "$<${no_unicode_condition}:UNICODE;_UNICODE>")
++            INTERFACE "$<${no_unicode_condition}:UNICODE$<SEMICOLON>_UNICODE>")
+     endif()
+ endfunction()
+ 
+-- 
+2.25.1
+

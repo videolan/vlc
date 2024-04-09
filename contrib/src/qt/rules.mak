@@ -52,6 +52,8 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0008-Try-to-satisfy-Windows-7-compatibility.patch
 	$(APPLY) $(SRC)/qt/0001-disable-precompiled-headers-when-forcing-WINVER-inte.patch
 	$(APPLY) $(SRC)/qt/0001-QTypeInfo-Add-a-missing-include.patch
+	$(APPLY) $(SRC)/qt/0002-QStringTokenizer-Add-a-missing-include.patch
+	$(APPLY) $(SRC)/qt/0003-CMake-Fix-a-misplaced-in-pkg-config-files.patch
 	$(MOVE)
 
 QTBASE_CONFIG := -release
