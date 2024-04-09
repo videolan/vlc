@@ -36,30 +36,37 @@
 #include "input_internal.h"
 #include "es_out.h"
 
-typedef struct
+struct es_out_source
 {
     es_out_t out;
     input_source_t *in;
     es_out_t *parent_out;
-} es_out_sys_t;
+} ;
+
+static struct es_out_source *
+PRIV(es_out_t *out)
+{
+    struct es_out_source *source = container_of(out, struct es_out_source, out);
+    return source;
+}
 
 static es_out_id_t *EsOutSourceAdd(es_out_t *out, input_source_t *in,
                                     const es_format_t *fmt)
 {
     assert(in == NULL);
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     return sys->parent_out->cbs->add(sys->parent_out, sys->in, fmt);
 }
 
 static int EsOutSourceSend(es_out_t *out, es_out_id_t *es, block_t *block)
 {
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     return es_out_Send(sys->parent_out, es, block);
 }
 
 static void EsOutSourceDel(es_out_t *out, es_out_id_t *es)
 {
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     es_out_Del(sys->parent_out, es);
 }
 
@@ -67,7 +74,7 @@ static int EsOutSourceControl(es_out_t *out, input_source_t *in, int query,
                                va_list args)
 {
     assert(in == NULL);
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     return sys->parent_out->cbs->control(sys->parent_out, sys->in, query, args);
 }
 
@@ -75,13 +82,13 @@ static int EsOutSourcePrivControl(es_out_t *out, input_source_t *in, int query,
                                   va_list args)
 {
     assert(in == NULL);
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     return sys->parent_out->cbs->priv_control(sys->parent_out, sys->in, query, args);
 }
 
 static void EsOutSourceDestroy(es_out_t *out)
 {
-    es_out_sys_t *sys = container_of(out, es_out_sys_t, out);
+    struct es_out_source *sys = PRIV(out);
     free(sys);
 }
 
@@ -99,7 +106,7 @@ es_out_t *input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
         .priv_control = EsOutSourcePrivControl,
     };
 
-    es_out_sys_t *sys = malloc(sizeof(*sys));
+    struct es_out_source *sys = malloc(sizeof(*sys));
     if (!sys)
         return NULL;
 
