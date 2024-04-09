@@ -297,11 +297,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
 
     // Set the target crop dynamically based on the swapchain flip state
     vout_display_place_t place;
-    if (!need_vflip)
-        vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
-    else
+    vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
+    if (need_vflip)
     {
-        vout_display_PlacePicture(&place, vd->fmt, &vd->cfg->display);
         place.y = place.height + place.y;
         place.height = -place.height;
     }
