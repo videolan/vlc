@@ -67,15 +67,6 @@ struct sys
     struct subpicture sub;
 };
 
-static void FlipVerticalAlign(struct vout_display_placement *dp)
-{
-    /* Reverse vertical alignment as the GL tex are Y inverted */
-    if (dp->align.vertical == VLC_VIDEO_ALIGN_TOP)
-        dp->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
-    else if (dp->align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
-        dp->align.vertical = VLC_VIDEO_ALIGN_TOP;
-}
-
 static int subpicture_Control(vout_display_t *vd, int query)
 {
     struct sys *sys = vd->sys;
