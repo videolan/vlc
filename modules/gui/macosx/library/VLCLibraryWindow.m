@@ -454,11 +454,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)setViewModeToolbarItemVisible:(BOOL)visible
 {
     if (!visible) {
-        [self hideToolbarItem:_libraryViewModeToolbarItem];
+        [self hideToolbarItem:self.libraryViewModeToolbarItem];
         return;
     }
 
-    [self insertToolbarItem:_libraryViewModeToolbarItem inFrontOf:@[_forwardsToolbarItem, _backwardsToolbarItem]];
+    [self insertToolbarItem:self.libraryViewModeToolbarItem inFrontOf:@[
+        self.toggleNavSidebarToolbarItem,
+        self.trackingSeparatorToolbarItem,
+        self.forwardsToolbarItem,
+        self.backwardsToolbarItem
+    ]];
 }
 
 - (void)updatePlayqueueToggleState
