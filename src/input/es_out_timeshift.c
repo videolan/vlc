@@ -836,7 +836,10 @@ static const struct es_out_callbacks es_out_timeshift_cbs =
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
  *****************************************************************************/
-es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out, float rate )
+struct vlc_input_es_out *
+input_EsOutTimeshiftNew(input_thread_t *p_input,
+                        es_out_t *p_next_out,
+                        float rate)
 {
     struct es_out_timeshift *p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
@@ -924,7 +927,7 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
 #undef S
 #endif
 
-    return &p_sys->out.out;
+    return &p_sys->out;
 }
 
 /*****************************************************************************

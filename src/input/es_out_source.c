@@ -93,7 +93,8 @@ static void EsOutSourceDestroy(es_out_t *out)
     free(sys);
 }
 
-es_out_t *input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
+struct vlc_input_es_out *
+input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
 {
     assert(parent_out && in);
 
@@ -116,5 +117,5 @@ es_out_t *input_EsOutSourceNew(es_out_t *parent_out, input_source_t *in)
     sys->out.out.cbs = &es_out_cbs;
     sys->parent_out = parent_out;
 
-    return &sys->out.out;
+    return &sys->out;
 }

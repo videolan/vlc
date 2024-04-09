@@ -4001,8 +4001,9 @@ static const struct es_out_callbacks es_out_cbs =
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, float rate,
-                          enum input_type input_type )
+struct vlc_input_es_out *
+input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
+               enum input_type input_type)
 {
     es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
@@ -4049,7 +4050,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
 
-    return &p_sys->out.out;
+    return &p_sys->out;
 }
 
 /****************************************************************************
