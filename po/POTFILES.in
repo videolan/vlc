@@ -644,10 +644,10 @@ modules/gui/macosx/windows/logging/VLCLogMessage.h
 modules/gui/macosx/windows/logging/VLCLogMessage.m
 modules/gui/macosx/windows/logging/VLCLogWindowController.h
 modules/gui/macosx/windows/logging/VLCLogWindowController.m
-modules/gui/macosx/windows/mainwindow/VLCControlsBarCommon.h
-modules/gui/macosx/windows/mainwindow/VLCControlsBarCommon.m
-modules/gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.h
-modules/gui/macosx/windows/mainwindow/VLCMainWindowControlsBar.m
+modules/gui/macosx/windows/controlsbar/VLCControlsBarCommon.h
+modules/gui/macosx/windows/controlsbar/VLCControlsBarCommon.m
+modules/gui/macosx/windows/controlsbar/VLCMainWindowControlsBar.h
+modules/gui/macosx/windows/controlsbar/VLCMainWindowControlsBar.m
 modules/gui/macosx/windows/video/VLCVideoOutputProvider.h
 modules/gui/macosx/windows/video/VLCVideoOutputProvider.m
 modules/gui/macosx/windows/video/VLCVideoWindowCommon.h
