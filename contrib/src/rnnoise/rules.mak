@@ -1,7 +1,7 @@
 # rnnoise
 
-RNNOISE_GITURL := $(GITHUB)/xiph/rnnoise.git
-RNNOISE_GITHASH := 90ec41ef659fd82cfec2103e9bb7fc235e9ea66c
+RNNOISE_VERSION := 0.1.1
+RNNOISE_URL := $(GITHUB)/xiph/rnnoise/archive/refs/tags/v${RNNOISE_VERSION}.tar.gz
 
 ifndef HAVE_ANDROID
 PKGS += rnnoise
@@ -11,14 +11,12 @@ ifeq ($(call need_pkg,"rnnoise"),)
 PKGS_FOUND += rnnoise
 endif
 
-$(TARBALLS)/rnnoise-$(RNNOISE_GITHASH).tar.xz:
-	$(call download_git,$(RNNOISE_GITURL),,$(RNNOISE_GITHASH))
+$(TARBALLS)/rnnoise-$(RNNOISE_VERSION).tar.gz:
+	$(call download_pkg,$(RNNOISE_URL),rnnoise)
 
-.sum-rnnoise: rnnoise-$(RNNOISE_GITHASH).tar.xz
-	$(call check_githash,$(RNNOISE_GITHASH))
-	touch $@
+.sum-rnnoise: rnnoise-$(RNNOISE_VERSION).tar.gz
 
-rnnoise: rnnoise-$(RNNOISE_GITHASH).tar.xz .sum-rnnoise
+rnnoise: rnnoise-$(RNNOISE_VERSION).tar.gz .sum-rnnoise
 	$(UNPACK)
 	$(MOVE)
 
