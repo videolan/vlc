@@ -335,7 +335,7 @@ struct vlc_input_es_out *
 input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, float i_rate );
 
 struct vlc_input_es_out *
-input_EsOutSourceNew(es_out_t *master_out, input_source_t *in);
+input_EsOutSourceNew(struct vlc_input_es_out *master_out, input_source_t *in);
 
 es_out_id_t *vlc_es_id_get_out(vlc_es_id_t *id);
 const input_source_t *vlc_es_id_GetSource(vlc_es_id_t *id);

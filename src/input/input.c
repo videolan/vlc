@@ -2669,7 +2669,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
         {
             in->p_slave_es_out
                 = es_out
-                = input_EsOutSourceNew(&priv->p_es_out->out, in);
+                = input_EsOutSourceNew(priv->p_es_out, in);
         }
         else
             es_out = priv->p_es_out;
