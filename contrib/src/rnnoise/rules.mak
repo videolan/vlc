@@ -3,9 +3,7 @@
 RNNOISE_VERSION := 0.1.1
 RNNOISE_URL := $(GITHUB)/xiph/rnnoise/archive/refs/tags/v${RNNOISE_VERSION}.tar.gz
 
-ifndef HAVE_ANDROID
 PKGS += rnnoise
-endif
 
 ifeq ($(call need_pkg,"rnnoise"),)
 PKGS_FOUND += rnnoise
