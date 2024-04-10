@@ -48,7 +48,6 @@ typedef struct vout_display_sys_t
     bool attached;
     uint8_t depth; /* useful bits per pixel */
     video_format_t fmt;
-    vout_display_place_t place;
 } vout_display_sys_t;
 
 static void Prepare(vout_display_t *vd, picture_t *pic,
@@ -99,32 +98,32 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_rectangle_t rectv[4], *rect;
     unsigned int rectc = 0;
 
-    if (sys->place.x > 0) {
+    if (vd->place->x > 0) {
         rect = &rectv[rectc++];
         rect->x = 0;
         rect->y = 0;
-        rect->width = sys->place.x;
+        rect->width = vd->place->x;
         rect->height = vd->cfg->display.height;
     }
-    if (sys->place.x + sys->place.width < vd->cfg->display.width) {
+    if (vd->place->x + vd->place->width < vd->cfg->display.width) {
         rect = &rectv[rectc++];
-        rect->x = sys->place.x + sys->place.width;
+        rect->x = vd->place->x + vd->place->width;
         rect->y = 0;
         rect->width = vd->cfg->display.width - rect->x;
         rect->height = vd->cfg->display.height;
     }
-    if (sys->place.y > 0) {
+    if (vd->place->y > 0) {
         rect = &rectv[rectc++];
-        rect->x = sys->place.x;
+        rect->x = vd->place->x;
         rect->y = 0;
-        rect->width = sys->place.width;
-        rect->height = sys->place.y;
+        rect->width = vd->place->width;
+        rect->height = vd->place->y;
     }
-    if (sys->place.y + sys->place.height < vd->cfg->display.height) {
+    if (vd->place->y + vd->place->height < vd->cfg->display.height) {
         rect = &rectv[rectc++];
-        rect->x = sys->place.x;
-        rect->y = sys->place.y + sys->place.height;
-        rect->width = sys->place.width;
+        rect->x = vd->place->x;
+        rect->y = vd->place->y + vd->place->height;
+        rect->width = vd->place->width;
         rect->height = vd->cfg->display.height - rect->y;
     }
 
@@ -139,7 +138,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                        /* y */ sys->fmt.i_y_offset,
                    /* width */ sys->fmt.i_visible_width,
                   /* height */ sys->fmt.i_visible_height,
-                               sys->place.x, sys->place.y, sys->depth,
+                               vd->place->x, vd->place->y, sys->depth,
                                XCB_IMAGE_FORMAT_Z_PIXMAP, 0,
                                segment, buf->offset);
     else {
@@ -155,7 +154,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
             lines--;
             xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->window,
                           sys->gc, pic->p->i_visible_pitch, 1,
-                          sys->place.x, sys->place.y + sys->place.height - 1,
+                          vd->place->x, vd->place->y + vd->place->height - 1,
                           0, sys->depth, pic->p->i_visible_pitch,
                           pic->p->p_pixels + offset + lines * pic->p->i_pitch);
         }
@@ -163,7 +162,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
         ck = xcb_put_image_checked(conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                                    sys->window, sys->gc,
                                    pic->p->i_pitch / pic->p->i_pixel_pitch,
-                                   lines, sys->place.x, sys->place.y,
+                                   lines, vd->place->x, vd->place->y,
                                    0, sys->depth, pic->p->i_pitch * lines,
                                    pic->p->p_pixels + offset);
 
@@ -193,16 +192,14 @@ static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
     vout_display_sys_t *sys = vd->sys;
     video_format_t src;
 
-    vout_display_PlacePicture(&sys->place, vd->source, &vd->cfg->display);
-
     video_format_ApplyRotation(&src, vd->source);
-    sys->fmt.i_width  = src.i_width  * sys->place.width / src.i_visible_width;
-    sys->fmt.i_height = src.i_height * sys->place.height / src.i_visible_height;
+    sys->fmt.i_width  = src.i_width  * vd->place->width / src.i_visible_width;
+    sys->fmt.i_height = src.i_height * vd->place->height / src.i_visible_height;
 
-    sys->fmt.i_visible_width  = sys->place.width;
-    sys->fmt.i_visible_height = sys->place.height;
-    sys->fmt.i_x_offset = src.i_x_offset * sys->place.width / src.i_visible_width;
-    sys->fmt.i_y_offset = src.i_y_offset * sys->place.height / src.i_visible_height;
+    sys->fmt.i_visible_width  = vd->place->width;
+    sys->fmt.i_visible_height = vd->place->height;
+    sys->fmt.i_x_offset = src.i_x_offset * vd->place->width / src.i_visible_width;
+    sys->fmt.i_y_offset = src.i_y_offset * vd->place->height / src.i_visible_height;
 
     *fmt = sys->fmt;
     return VLC_SUCCESS;
@@ -226,12 +223,8 @@ static int Control(vout_display_t *vd, int query)
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {
-        vout_display_place_t place;
-
-        vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
-
-        if (place.width  != sys->fmt.i_visible_width
-         || place.height != sys->fmt.i_visible_height)
+        if (vd->place->width  != sys->fmt.i_visible_width
+         || vd->place->height != sys->fmt.i_visible_height)
             return VLC_EGENERIC;
 
         return VLC_SUCCESS;
@@ -376,9 +369,7 @@ static int Open (vout_display_t *vd,
         /* XCB_CW_COLORMAP */
         cmap,
     };
-    vout_display_place_t *place = &sys->place;
 
-    vout_display_PlacePicture(place, vd->source, &vd->cfg->display);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
     xcb_create_window(conn, sys->depth, sys->window,
