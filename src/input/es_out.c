@@ -1621,7 +1621,7 @@ static int EsOutProgramDel( es_out_t *out, input_source_t *source, int i_group )
     return VLC_SUCCESS;
 }
 
-/* EsOutProgramMeta:
+/* EsOutProgramGetMetaName:
  */
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
 {
