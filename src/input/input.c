@@ -1444,7 +1444,10 @@ static void End( input_thread_t * p_input )
 
     /* Unload all modules */
     if( priv->p_es_out )
+    {
         vlc_input_es_out_Delete(priv->p_es_out);
+        priv->p_es_out = NULL;
+    }
     es_out_SetMode( priv->p_es_out_display, ES_OUT_MODE_END );
 
     if( priv->stats != NULL )
@@ -2691,7 +2694,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
                                       " Check the log for details."), psz_mrl );
         if( in->p_slave_es_out )
         {
-            es_out_Delete( in->p_slave_es_out );
+            vlc_input_es_out_Delete(in->p_slave_es_out);
             in->p_slave_es_out = NULL;
         }
         return VLC_EGENERIC;
@@ -2717,7 +2720,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
             msg_Err(p_input, "Failed to create demux filter");
             if( in->p_slave_es_out )
             {
-                es_out_Delete( in->p_slave_es_out );
+                vlc_input_es_out_Delete(in->p_slave_es_out);
                 in->p_slave_es_out = NULL;
             }
             return VLC_EGENERIC;
@@ -2803,7 +2806,7 @@ static void InputSourceDestroy( input_source_t *in )
     if( in->p_demux )
         demux_Delete( in->p_demux );
     if( in->p_slave_es_out )
-        es_out_Delete( in->p_slave_es_out );
+        vlc_input_es_out_Delete(in->p_slave_es_out);
 
     if( in->i_title > 0 )
     {
