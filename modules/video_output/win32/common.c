@@ -121,7 +121,6 @@ void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
         }
 #endif /* WINAPI_PARTITION_DESKTOP */
         // fallthrough
-    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
