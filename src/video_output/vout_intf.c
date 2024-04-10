@@ -58,6 +58,8 @@ static int AspectCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static int AutoScaleCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
+static int FitCallback( vlc_object_t *, char const *,
+                        vlc_value_t, vlc_value_t, void * );
 static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 static int AboveCallback( vlc_object_t *, char const *,
@@ -307,6 +309,7 @@ void vout_CreateVars( vout_thread_t *p_vout )
 void vout_IntfInit( vout_thread_t *p_vout )
 {
     var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
+    var_AddCallback( p_vout, "fit", FitCallback, NULL );
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
     var_AddCallback( p_vout, "crop-left", CropBorderCallback, NULL );
     var_AddCallback( p_vout, "crop-top", CropBorderCallback, NULL );
@@ -358,6 +361,7 @@ void vout_IntfDeinit(vlc_object_t *obj)
     var_DelCallback(obj, "crop-top", CropBorderCallback, NULL);
     var_DelCallback(obj, "crop-left", CropBorderCallback, NULL);
     var_DelCallback(obj, "zoom", ZoomCallback, NULL);
+    var_DelCallback(obj, "fit", FitCallback, NULL);
     var_DelCallback(obj, "autoscale", AutoScaleCallback, NULL);
 }
 
@@ -568,6 +572,17 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
     vout_thread_t *p_vout = (vout_thread_t *)obj;
     enum vlc_video_fitting fit = cur.b_bool ? var_InheritFit(obj)
                                             : VLC_VIDEO_FIT_NONE;
+
+    (void) name; (void) prev; (void) data;
+    vout_ChangeDisplayFitting(p_vout, fit);
+    return VLC_SUCCESS;
+}
+
+static int FitCallback( vlc_object_t *obj, char const *name,
+                        vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)obj;
+    enum vlc_video_fitting fit = cur.i_int;
 
     (void) name; (void) prev; (void) data;
     vout_ChangeDisplayFitting(p_vout, fit);
