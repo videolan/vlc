@@ -7,28 +7,16 @@ QTSHADERTOOLS_URL := $(QT)/$(QTSHADERTOOLS_VERSION_MAJOR)/$(QTSHADERTOOLS_VERSIO
 
 DEPS_qtshadertools-tools := qt-tools $(DEPS_qt-tools)
 
-DEPS_qtshadertools += qt $(DEPS_qt)
-ifdef HAVE_CROSS_COMPILE
-DEPS_qtshadertools += qtshadertools-tools $(DEPS_qtshadertools-tools)
-endif
 ifdef HAVE_WIN32
 DEPS_qtshadertools-tools += fxc2 $(DEPS_fxc2)
 endif
 
-ifdef HAVE_WIN32
-PKGS += qtshadertools
-endif
 ifneq ($(findstring qt,$(PKGS)),)
 PKGS_TOOLS += qtshadertools-tools
 endif
 PKGS_ALL += qtshadertools-tools
 
-ifeq ($(call need_pkg,"Qt6ShaderTools >= $(QTSHADERTOOLS_VERSION_MAJOR)"),)
-PKGS_FOUND += qtshadertools
-endif
-ifndef HAVE_CROSS_COMPILE
-PKGS_FOUND += qtshadertools-tools
-else ifeq ($(call system_tool_majmin, qsb --version),$(QTSHADERTOOLS_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, qsb --version),$(QTSHADERTOOLS_VERSION_MAJOR))
 PKGS_FOUND += qtshadertools-tools
 endif
 
@@ -57,13 +45,6 @@ qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum
 .qtshadertools-tools: qtshadertools
 	$(CMAKECLEAN)
 	$(BUILDVARS) $(CMAKE_NATIVE) $(QT_SHADETOOLS_NATIVE_CONFIG)
-	+$(CMAKEBUILD)
-	$(CMAKEINSTALL)
-	touch $@
-
-.qtshadertools: qtshadertools toolchain.cmake
-	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(QT_SHADETOOLS_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

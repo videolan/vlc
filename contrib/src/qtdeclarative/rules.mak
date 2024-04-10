@@ -6,10 +6,7 @@ QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSIO
 
 DEPS_qtdeclarative-tools := qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
 
-DEPS_qtdeclarative = qt $(DEPS_qt) qtshadertools $(DEPS_qtshadertools)
-ifdef HAVE_CROSS_COMPILE
-DEPS_qtdeclarative += qtdeclarative-tools $(DEPS_qtdeclarative-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
-endif
+DEPS_qtdeclarative = qt $(DEPS_qt) qtshadertools-tools $(DEPS_qtshadertools-tools)
 
 ifdef HAVE_WIN32
 PKGS += qtdeclarative
