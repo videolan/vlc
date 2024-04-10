@@ -156,15 +156,6 @@ enum vout_display_query {
     VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
 
     /**
-     * Notifies a change of the user zoom factor.
-     *
-     * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
-     *         request is necessary
-     */
-    VOUT_DISPLAY_CHANGE_ZOOM,
-
-    /**
      * Notifies a change of the sample aspect ratio.
      *
      * \retval VLC_SUCCESS if the display handled the change
@@ -304,7 +295,6 @@ struct vlc_display_operations
      * This occurs after a
      * \ref VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
      * \ref VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
-     * \ref VOUT_DISPLAY_CHANGE_ZOOM,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP or
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_PLACE

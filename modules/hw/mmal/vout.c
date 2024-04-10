@@ -696,11 +696,6 @@ static int vd_control(vout_display_t *vd, int query)
             break;
         }
 
-        case VOUT_DISPLAY_CHANGE_ZOOM:
-            msg_Warn(vd, "Unsupported control query %d", query);
-            ret = VLC_SUCCESS;
-            break;
-
         default:
             msg_Warn(vd, "Unknown control query %d", query);
             break;

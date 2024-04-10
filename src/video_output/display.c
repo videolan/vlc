@@ -652,19 +652,12 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         return; /* zoom has not changed */
 
     bool place_changed = PlaceVideoInDisplay(osys);
-
-    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM);
-        vout_display_Reset(vd);
-
     if (place_changed)
     {
         int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
         if (res2 != VLC_SUCCESS)
-            res1 = res2;
+            vout_display_Reset(vd);
     }
-
-    if (res1 != VLC_SUCCESS)
-        vout_display_Reset(vd);
 }
 
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
