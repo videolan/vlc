@@ -1711,7 +1711,7 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)toggleMute
 {
-    vlc_player_aout_Mute(_p_player, !_mute);
+    vlc_player_aout_ToggleMute(_p_player);
 }
 
 - (audio_output_t *)mainAudioOutput
