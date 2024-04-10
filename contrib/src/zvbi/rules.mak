@@ -27,6 +27,8 @@ endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/zvbi/zvbi-android.patch
 endif
+	# check for pthread_create in pthreads as well
+	sed -i.orig "s/AC_CHECK_LIB(pthread, pthread_create,,/AC_SEARCH_LIBS([pthread_create], [pthread pthreads],,/" $(UNPACK_DIR)/configure.in
 	$(MOVE)
 
 DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)
@@ -35,6 +37,11 @@ ZVBICONF := \
 	--disable-dvb --disable-bktr \
 	--disable-nls --disable-proxy \
 	--without-doxygen
+
+ifdef HAVE_ANDROID
+# discard bogus pthread_cancel calls
+ZVBICONF += CFLAGS="$(CFLAGS) -Wno-implicit-function-declaration"
+endif
 
 ifdef HAVE_WIN32
 DEPS_zvbi += winpthreads $(DEPS_winpthreads)
