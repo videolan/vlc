@@ -19,6 +19,8 @@ zlib: zlib-$(ZLIB_VERSION).tar.xz .sum-zlib
 	sed -e 's,install(TARGETS zlib zlibstatic,install(TARGETS zlibstatic,' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	# only use the proper libz name for the static library
 	sed -e 's,set_target_properties(zlib zlibstatic ,set_target_properties(zlibstatic ,' -i.orig $(UNPACK_DIR)/CMakeLists.txt
+	# don't use --version-script on static libraries
+	sed -e 's,if(NOT APPLE AND NOT(CMAKE_SYSTEM_NAME STREQUAL AIX)),if(BUILD_SHARED_LIBS AND (NOT APPLE AND NOT(CMAKE_SYSTEM_NAME STREQUAL AIX))),' -i.orig $(UNPACK_DIR)/CMakeLists.txt
 	$(MOVE)
 
 ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig -DZLIB_BUILD_EXAMPLES=OFF
