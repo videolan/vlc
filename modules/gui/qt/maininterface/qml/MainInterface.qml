@@ -141,13 +141,13 @@ Item {
         }
         Connections {
             target: playlistWindowLoader.item
-            onClosing: MainCtx.playlistVisible = false
+            function onClosing() { MainCtx.playlistVisible = false }
         }
 
         Connections {
             target: MainPlaylistController
 
-            onPlaylistInitialized: {
+            function onPlaylistInitialized() {
                 _playlistReady = true
                 if (_interfaceReady)
                     setInitialView()
@@ -156,7 +156,7 @@ Item {
 
         Connections {
             target: History
-            onNavigate: (focusReason) => {
+            function onNavigate(focusReason) {
                 loadCurrentHistoryView(focusReason)
                 MainCtx.mediaLibraryVisible = !History.match(History.viewPath, ["player"])
             }
@@ -165,7 +165,7 @@ Item {
         Connections {
             target: MainCtx
 
-            onMediaLibraryVisibleChanged: {
+            function onMediaLibraryVisibleChanged() {
                 if (MainCtx.mediaLibraryVisible) {
                     if (History.match(History.viewPath, ["mc"]))
                         return
@@ -246,7 +246,7 @@ Item {
 
                 Connections {
                     target: Player
-                    onPlayingStateChanged: {
+                    function onPlayingStateChanged() {
                         if (Player.playingState === Player.PLAYING_STATE_STOPPED
                                 && History.match(History.viewPath, ["player"]) ) {
                             if (History.previousEmpty)

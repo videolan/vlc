@@ -278,12 +278,12 @@ T.Pane {
             Connections {
                 target: listView.model
 
-                onRowsInserted: {
+                function onRowsInserted() {
                     if (listView.currentIndex === -1)
                         listView.currentIndex = 0
                 }
 
-                onModelReset: {
+                function onModelReset() {
                     if (listView.currentIndex === -1 && root.model.count > 0)
                         listView.currentIndex = 0
                 }

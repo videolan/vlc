@@ -413,7 +413,7 @@ FocusScope {
             Connections {
                 target: selectionModel
 
-                onSelectionChanged: {
+                function onSelectionChanged() {
                     tableDelegate.selected = Qt.binding(function() {
                       return root.selectionModel.selectedIndexesFlat.includes(index)
                     })

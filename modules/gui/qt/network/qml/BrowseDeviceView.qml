@@ -100,7 +100,7 @@ FocusScope {
     Connections {
         target: MainCtx
 
-        onGridViewChanged: {
+        function onGridViewChanged() {
             if (MainCtx.gridView) view.replace(grid)
             else                  view.replace(list)
         }

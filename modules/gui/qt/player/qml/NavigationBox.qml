@@ -50,7 +50,9 @@ Control {
 
     Connections {
         target: MainCtx
-        onNavBoxToggled: navigationBox.toggleVisibility()
+        function onNavBoxToggled() {
+            navigationBox.toggleVisibility()
+        }
     }
 
     contentItem: GridLayout {

@@ -127,7 +127,7 @@ TracksPage {
                     Connections {
                         target: Player
 
-                        onSubtitleDelayChanged: {
+                        function onSubtitleDelayChanged() {
                             spinBoxA.update = false
 
                             spinBoxA.value = Player.subtitleDelayMS
@@ -256,7 +256,7 @@ TracksPage {
                     Connections {
                         target: Player
 
-                        onSecondarySubtitleDelayChanged: {
+                        function onSecondarySubtitleDelayChanged() {
                             spinBoxB.update = false
 
                             spinBoxB.value = Player.secondarySubtitleDelayMS
@@ -370,7 +370,7 @@ TracksPage {
                 Connections {
                     target: Player
 
-                    onSecondarySubtitleDelayChanged: {
+                    function onSecondarySubtitleDelayChanged() {
                         spinBoxC.update = false
 
                         value = Player.subtitleFPS / 10

@@ -296,7 +296,7 @@ ListView {
     // FIXME: This is probably not useful anymore.
     Connections {
         target: root.headerItem
-        onFocusChanged: {
+        function onFocusChanged() {
             if (!headerItem.focus) {
                 currentItem.focus = true
             }

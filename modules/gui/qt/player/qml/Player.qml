@@ -123,7 +123,9 @@ FocusScope {
     Connections {
         target: Player
 
-        onVolumeChanged: animationVolume.restart()
+        function onVolumeChanged() {
+            animationVolume.restart()
+        }
     }
 
     // Functions
@@ -174,9 +176,15 @@ FocusScope {
         target: MainCtx
 
         //playlist
-        onPlaylistDockedChanged: playlistVisibility.updatePlaylistDocked()
-        onPlaylistVisibleChanged: playlistVisibility.updatePlaylistVisible()
-        onHasEmbededVideoChanged: playlistVisibility.updateVideoEmbed()
+        function onPlaylistDockedChanged() {
+            playlistVisibility.updatePlaylistDocked()
+        }
+        function onPlaylistVisibleChanged() {
+            playlistVisibility.updatePlaylistVisible()
+        }
+        function onHasEmbededVideoChanged() {
+            playlistVisibility.updateVideoEmbed()
+        }
     }
 
     VideoSurface {
@@ -665,7 +673,7 @@ FocusScope {
                     Connections {
                         target: MainCtx
 
-                        onPlaylistWidthFactorChanged: {
+                        function onPlaylistWidthFactorChanged() {
                             resizeHandle._updateFromMainCtx()
                         }
                     }
@@ -729,19 +737,19 @@ FocusScope {
     // NavigationBox's visibility depends on this timer
     Connections {
         target: MainCtx
-        onNavBoxToggled: toggleControlBarButtonAutoHide.restart()
+        function onNavBoxToggled() { toggleControlBarButtonAutoHide.restart() }
     }
 
     Connections {
-           target: rootPlayer
-           onWidthChanged: {
-               if (navBox.x > navBox.dragXMax)
-                   navBox.x = navBox.dragXMax
-           }
-           onHeightChanged: {
-               if (navBox.y > navBox.dragYMax)
-                   navBox.y = navBox.dragYMax
-           }
+        target: rootPlayer
+        function onWidthChanged() {
+            if (navBox.x > navBox.dragXMax)
+                navBox.x = navBox.dragXMax
+        }
+        function onHeightChanged() {
+            if (navBox.y > navBox.dragYMax)
+                navBox.y = navBox.dragYMax
+        }
     }
 
    Widgets.ButtonExt {
@@ -886,7 +894,7 @@ FocusScope {
 
     Connections {
         target: MainCtx
-        onAskShow: {
+        function onAskShow() {
             toolbarAutoHide.toggleForceVisible()
         }
     }

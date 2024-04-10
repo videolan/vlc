@@ -106,7 +106,9 @@ VideoAll {
 
     Connections {
         target: MainCtx
-        onGroupingChanged: root._updateMetaModel(MainCtx.grouping)
+        function onGroupingChanged() {
+            root._updateMetaModel(MainCtx.grouping)
+        }
     }
 
     Component.onCompleted: root._updateMetaModel(MainCtx.grouping)

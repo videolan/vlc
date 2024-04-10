@@ -109,8 +109,8 @@ Repeater {
 
             enabled: loader.status === Loader.Ready
 
-            onVisibleChanged: {
-                if (activeFocus && !item.visible)
+            function onVisibleChanged() {
+                if (loader.activeFocus && !item.visible)
                     recoverFocus()
             }
         }

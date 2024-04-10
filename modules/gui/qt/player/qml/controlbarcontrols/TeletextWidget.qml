@@ -156,7 +156,7 @@ T.Pane {
 
                 Connections {
                     target: Player
-                    onTeletextPageChanged: {
+                    function onTeletextPageChanged() {
                         telePageNumber.inhibitPageUpdate = true
                         telePageNumber.value = Player.teletextPage
                         telePageNumber.inhibitPageUpdate = false

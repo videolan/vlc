@@ -182,7 +182,7 @@ T.Pane {
                 target: Player
                 enabled: !paintOnly
 
-                onVolumeChanged: volControl._syncVolumeWithPlayer()
+                function onVolumeChanged() { volControl._syncVolumeWithPlayer() }
             }
 
             Binding on toolTip.visible {

@@ -76,14 +76,14 @@ Item {
     {
         target: dialogModel
 
-        onLogin: (dialogId, title, text, defaultUsername, askStore) => {
+        function onLogin(dialogId, title, text, defaultUsername, askStore) {
             loginDialog.dialogId = dialogId
             loginDialog.title = title
             loginDialog.defaultUsername = defaultUsername
             loginDialog.open()
         }
 
-        onQuestion: (dialogId, title, text, type, cancel, action1, action2) => {
+        function onQuestion(dialogId, title, text, type, cancel, action1, action2) {
             questionDialog.dialogId = dialogId
             questionDialog.title = title
             questionDialog.text = text
@@ -93,7 +93,7 @@ Item {
             questionDialog.open()
         }
 
-        onProgress: (dialogId, title, text, indeterminate, position, cancel) => {
+        function onProgress(dialogId, title, text, indeterminate, position, cancel) {
             progressDialog.dialogId = dialogId
             progressDialog.title = title
             progressDialog.text = text
@@ -103,7 +103,7 @@ Item {
             progressDialog.open()
         }
 
-        onProgressUpdated: (dialogId, position, text) => {
+        function onProgressUpdated(dialogId, position, text) {
             if (progressDialog.dialogId !== dialogId) {
                 console.warn("progress event on an inexisting dialog")
                 return
@@ -112,7 +112,7 @@ Item {
             progressDialog.position = position
         }
 
-        onCancelled: (dialogId) => {
+        function onCancelled(dialogId) {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
                 questionDialog.dialogId = null
@@ -135,7 +135,7 @@ Item {
     {
         target: DialogErrorModel
 
-        onCountChanged: {
+        function onCountChanged() {
             hideErrorPopupTimer.restart()
             errorPopup.state = "visible"
         }
@@ -588,7 +588,7 @@ Item {
         Connections {
             target: toolbarEditorDialogLoader.item
 
-            onUnload: {
+            function onUnload() {
                 toolbarEditorDialogLoader.active = false
             }
         }
@@ -596,7 +596,7 @@ Item {
         Connections {
             target: DialogsProvider
 
-            onShowToolbarEditorDialog: {
+            function onShowToolbarEditorDialog() {
                 toolbarEditorDialogLoader.active = true
                 toolbarEditorDialogLoader.item.open()
             }

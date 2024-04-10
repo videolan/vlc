@@ -111,7 +111,7 @@ TracksPage {
                 Connections {
                     target: Player
 
-                    onAudioDelayChanged: {
+                    function onAudioDelayChanged() {
                         spinBox.update = false
 
                         spinBox.value = Player.audioDelayMS

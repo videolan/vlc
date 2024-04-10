@@ -131,7 +131,7 @@ Widgets.StackViewExt {
     Connections {
         target: model
 
-        onCountChanged: {
+        function onCountChanged() {
             if (selectionModel.hasSelection)
                 return
 

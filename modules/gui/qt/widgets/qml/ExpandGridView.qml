@@ -285,7 +285,7 @@ FocusScope {
 
     Connections {
         target: model
-        onDataChanged: (topLeft, bottomRight, roles) => {
+        function onDataChanged(topLeft, bottomRight, roles) {
             const iMin = topLeft.row
             const iMax = bottomRight.row + 1 // [] => [)
             const f_l = _currentRange
@@ -296,18 +296,18 @@ FocusScope {
                 _refreshData(iMin, iMax)
             }
         }
-        onRowsInserted: _onModelCountChanged()
-        onRowsRemoved: _onModelCountChanged()
-        onModelReset: _onModelCountChanged()
+        function onRowsInserted() { _onModelCountChanged() }
+        function onRowsRemoved() { _onModelCountChanged() }
+        function onModelReset() { _onModelCountChanged() }
 
         // NOTE: This is useful for SortFilterProxyModel(s).
-        onLayoutChanged: _onModelCountChanged()
+        function onLayoutChanged() { _onModelCountChanged() }
     }
 
     Connections {
         target: selectionModel
 
-        onSelectionChanged: (selected, deselected) => {
+        function onSelectionChanged(selected, deselected) {
             for (let i = 0; i < selected.length; ++i) {
                 _updateSelectedRange(selected[i].topLeft, selected[i].bottomRight, true)
             }
@@ -340,7 +340,7 @@ FocusScope {
 
     Connections {
         target: MainCtx
-        onIntfScaleFactorChanged: flickable.layout(true)
+        function onIntfScaleFactorChanged() { flickable.layout(true) }
     }
 
     // Animations
@@ -785,11 +785,11 @@ FocusScope {
                 animateFlickableContentY(0)
             }
 
-            onHeightChanged: {
+            function onHeightChanged() {
                 flickable.layout(true)
             }
 
-            onActiveFocusChanged: {
+            function onActiveFocusChanged() {
                 // when header loads because of setting headerItem.focus == true, it will suddenly attain the active focus
                 // but then a queued flickable.layout() may take away it's focus and assign it to current item,
                 // using Qt.callLater we save unnecessary scrolling
@@ -799,7 +799,7 @@ FocusScope {
 
         Connections {
             target: footerItem
-            onHeightChanged: {
+            function onHeightChanged() {
                 if (flickable.contentY + flickable.height > footerItemLoader.y + footerItemLoader.height)
                     flickable.contentY = footerItemLoader.y + footerItemLoader.height - flickable.height
                 flickable.layout(false)
@@ -957,7 +957,7 @@ FocusScope {
 
         Connections {
             target: expandItem
-            onImplicitHeightChanged: {
+            function onImplicitHeightChanged() {
                 /* This is the only event we have after the expandItem height content was resized.
                    We can trigger here the expand animation with the right final height. */
                 if (root.expandIndex !== -1)

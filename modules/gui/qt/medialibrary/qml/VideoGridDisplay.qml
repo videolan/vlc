@@ -73,7 +73,7 @@ MainInterface.MainGridView {
     Connections {
         target: gridView.contextMenu
 
-        onShowMediaInformation: (index) => {
+        function onShowMediaInformation(index) {
             gridView.switchExpandItem(index)
 
             if (gridView.focus)

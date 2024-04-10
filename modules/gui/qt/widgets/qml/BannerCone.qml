@@ -53,18 +53,18 @@ Image {
                 target: root
 
                 // handles VLCStyle.scale changes
-                onXChanged: Qt.callLater(root.updateRect)
-                onYChanged: Qt.callLater(root.updateRect)
-                onWidthChanged: Qt.callLater(root.updateRect)
-                onHeightChanged: Qt.callLater(root.updateRect)
+                function onXChanged() { Qt.callLater(root.updateRect) }
+                function onYChanged() { Qt.callLater(root.updateRect) }
+                function onWidthChanged() { Qt.callLater(root.updateRect) }
+                function onHeightChanged() { Qt.callLater(root.updateRect) }
             }
 
             Connections {
                 target: VLCStyle
 
                 // handle window resize
-                onAppWidthChanged: Qt.callLater(root.updateRect)
-                onAppHeightChanged: Qt.callLater(root.updateRect)
+                function onAppWidthChanged() { Qt.callLater(root.updateRect) }
+                function onAppHeightChanged() { Qt.callLater(root.updateRect) }
             }
         }
     }

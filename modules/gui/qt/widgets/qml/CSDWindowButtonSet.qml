@@ -112,8 +112,8 @@ Row {
                 target: VLCStyle
 
                 // handle window resize
-                onAppWidthChanged: Qt.callLater(updateRect)
-                onAppHeightChanged: Qt.callLater(updateRect)
+                function onAppWidthChanged() { Qt.callLater(updateRect) }
+                function onAppHeightChanged() { Qt.callLater(updateRect) }
             }
 
             function updateRect() {

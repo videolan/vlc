@@ -44,7 +44,7 @@ Item {
 
     Connections {
         target: mouseArea.drag
-        onActiveChanged: {
+        function onActiveChanged() {
             root.anchors.left = undefined;
             root.anchors.right = undefined
             root.anchors.top = undefined

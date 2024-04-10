@@ -76,7 +76,9 @@ T.ToolBar {
 
     Connections {
         target: MainCtx.search
-        onAskShow: searchBox.expandAndFocus()
+        function onAskShow() {
+            searchBox.expandAndFocus()
+        }
     }
 
     background: Widgets.AcrylicBackground {

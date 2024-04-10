@@ -39,7 +39,11 @@ Widgets.ComboBoxExt {
 
     Connections {
         target: combo.popup
-        onOpened: combo.requestLockUnlockAutoHide(true)
-        onClosed: combo.requestLockUnlockAutoHide(false)
+        function onOpened() {
+            combo.requestLockUnlockAutoHide(true)
+        }
+        function onClosed() {
+            combo.requestLockUnlockAutoHide(false)
+        }
     }
 }

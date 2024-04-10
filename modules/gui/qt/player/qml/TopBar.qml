@@ -275,7 +275,7 @@ FocusScope{
                 Connections {
                     target: logo.button
 
-                    onSystemMenuVisibilityChanged: {
+                    function onSystemMenuVisibilityChanged() {
                         root.requestLockUnlockAutoHide(visible)
                     }
                 }
@@ -393,7 +393,7 @@ FocusScope{
         Connections {
             target: csdDecorations.item
             enabled: csdDecorations.status === Loader.Ready
-            onButtonHoveredChanged: root.requestLockUnlockAutoHide(csdDecorations.item.buttonHovered)
+            function onButtonHoveredChanged() { root.requestLockUnlockAutoHide(csdDecorations.item.buttonHovered) }
         }
     }
 

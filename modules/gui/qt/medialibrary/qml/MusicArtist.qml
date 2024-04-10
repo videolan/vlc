@@ -198,7 +198,9 @@ FocusScope {
                             Connections {
                                 target: albumsList.selectionModel
 
-                                onSelectionChanged: gridItem.selected = albumsList.selectionModel.isSelected(index)
+                                function onSelectionChanged() {
+                                    gridItem.selected = albumsList.selectionModel.isSelected(index)
+                                }
                             }
 
                             function play() {
@@ -342,7 +344,9 @@ FocusScope {
             Connections {
                 target: albumModel
                 // selectionModel updates but doesn't trigger any signal, this forces selection update in view
-                onParentIdChanged: currentIndex = -1
+                function onParentIdChanged() {
+                    currentIndex = -1
+                }
             }
 
             delegate: AudioGridItem {
@@ -410,7 +414,9 @@ FocusScope {
 
             Connections {
                 target: contextMenu
-                onShowMediaInformation: (index) => gridView_id.switchExpandItem( index )
+                function onShowMediaInformation(index) {
+                    gridView_id.switchExpandItem( index )
+                }
             }
         }
 
@@ -533,7 +539,7 @@ FocusScope {
 
         Connections {
             target: MainCtx
-            onGridViewChanged: {
+            function onGridViewChanged() {
                 if (MainCtx.gridView)
                     view.replace(gridComponent)
                 else

@@ -192,8 +192,8 @@ Slider {
 
     Connections {
         target: Player
-        onPositionChanged: fsm.playerUpdatePosition(Player.position)
-        onInputChanged: fsm.inputChanged()
+        function onPositionChanged() {  fsm.playerUpdatePosition(Player.position) }
+        function onInputChanged() {  fsm.inputChanged() }
     }
 
     Component.onCompleted: value = Player.position

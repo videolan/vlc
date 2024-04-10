@@ -142,7 +142,9 @@ MainInterface.MainTableView {
         target: root
 
         // NOTE: We want to hide the drop line when scrolling so its position stays relevant.
-        onContentYChanged: hideLine(_item)
+        function onContentYChanged() {
+            hideLine(_item)
+        }
     }
 
     //---------------------------------------------------------------------------------------------

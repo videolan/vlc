@@ -423,7 +423,7 @@ FocusScope {
                         Connections {
                             target: MainCtx
 
-                            onPlaylistWidthFactorChanged: {
+                            function onPlaylistWidthFactorChanged() {
                                 resizeHandle._updateFromMainInterface()
                             }
                         }
@@ -479,11 +479,11 @@ FocusScope {
         //keep the player visible on resize
         Connections {
             target: g_mainDisplay
-            onWidthChanged: {
+            function onWidthChanged() {
                 if (playerPip.x > playerPip.dragXMax)
                     playerPip.x = playerPip.dragXMax
             }
-            onHeightChanged: {
+            function onHeightChanged() {
                 if (playerPip.y > playerPip.dragYMax)
                     playerPip.y = playerPip.dragYMax
             }
@@ -526,7 +526,7 @@ FocusScope {
 
     Connections {
         target: Player
-        onHasVideoOutputChanged: {
+        function onHasVideoOutputChanged() {
             if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
                 if (!History.match(History.viewPath, ["player"]))
                     History.push(["player"])

@@ -68,7 +68,7 @@ FocusScope {
 
     Connections {
         target: Player
-        onCanRestorePlaybackChanged: {
+        function onCanRestorePlaybackChanged() {
             if (Player.canRestorePlayback) {
                 showResumePanel()
             } else {

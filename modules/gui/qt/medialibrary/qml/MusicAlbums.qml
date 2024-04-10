@@ -165,7 +165,9 @@ MainInterface.MainViewLoader {
 
             Connections {
                 target: contextMenu
-                onShowMediaInformation: (index) => gridView_id.switchExpandItem( index )
+                function onShowMediaInformation(index) {
+                    gridView_id.switchExpandItem( index )
+                }
             }
         }
     }
@@ -259,7 +261,7 @@ MainInterface.MainViewLoader {
 
             Connections {
                 target: albumModelId
-                onSortCriteriaChanged: {
+                function onSortCriteriaChanged() {
                     switch (albumModelId.sortCriteria) {
                     case "title":
                     case "main_artist":

@@ -151,7 +151,9 @@ ColumnLayout {
     Connections {
         target: Player
 
-        onRateChanged: _updateValue(Player.rate)
+        function onRateChanged() {
+            _updateValue(Player.rate)
+        }
     }
 
     // Children
