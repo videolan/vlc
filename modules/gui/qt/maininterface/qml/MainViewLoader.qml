@@ -56,7 +56,7 @@ Widgets.StackViewExt {
     property Component loadingComponent: null
 
     // NOTE: Sometimes the model has no 'loading' property.
-    readonly property bool isLoading: (model.loading) ? model.loading : false
+    readonly property bool isLoading: model.loading ?? false
 
     readonly property int count: model.count
 

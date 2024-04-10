@@ -32,10 +32,10 @@ ScaledImage {
     property real viewportWidth: rectWidth + (Math.max(Math.abs(primaryHorizontalOffset) + primaryBlurRadius, Math.abs(secondaryHorizontalOffset) + secondaryBlurRadius)) * 2
     property real viewportHeight: rectHeight + (Math.max(Math.abs(primaryVerticalOffset) + primaryBlurRadius, Math.abs(secondaryVerticalOffset) + secondaryBlurRadius)) * 2
 
-    property real rectWidth: sourceItem ? sourceItem.width : 0
-    property real rectHeight: sourceItem ? sourceItem.height : 0
-    property real xRadius: (sourceItem && sourceItem.radius !== undefined ) ? sourceItem.radius : 0
-    property real yRadius: (sourceItem && sourceItem.radius !== undefined ) ? sourceItem.radius : 0
+    property real rectWidth: sourceItem?.width ?? 0
+    property real rectHeight: sourceItem?.height ?? 0
+    property real xRadius: sourceItem?.radius ?? 0
+    property real yRadius: sourceItem?.radius ?? 0
 
     property color primaryColor: Qt.rgba(0, 0, 0, .18)
     property real primaryVerticalOffset: 0

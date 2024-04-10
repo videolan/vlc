@@ -91,8 +91,8 @@ FocusScope{
 
     function _layoutLine(c1, c2, offset)
     {
-        let c1Height = c1 !== undefined ? c1.implicitHeight : 0
-        let c2Height = c2 !== undefined ? c2.implicitHeight : 0
+        let c1Height = c1?.implicitHeight ?? 0
+        let c2Height = c2?.implicitHeight ?? 0
 
         if (c2 === csdDecorations) {
             //csdDecorations.implicitHeight gets overwritten when the height is set,

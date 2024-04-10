@@ -30,13 +30,13 @@ ScaledImage {
     property real blurRadius: 0
     property color color
 
-    property real rectWidth: sourceItem ? sourceItem.width : 0
-    property real rectHeight: sourceItem ? sourceItem.height : 0
+    property real rectWidth: sourceItem?.width ?? 0
+    property real rectHeight: sourceItem?.height ?? 0
 
     property real xOffset: 0
     property real yOffset: 0
-    property real xRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
-    property real yRadius: (sourceItem && sourceItem.radius !== undefined) ? sourceItem.radius : 0
+    property real xRadius: sourceItem?.radius ?? 0
+    property real yRadius: sourceItem?.radius ?? 0
 
     sourceSize: Qt.size(viewportWidth, viewportHeight)
 

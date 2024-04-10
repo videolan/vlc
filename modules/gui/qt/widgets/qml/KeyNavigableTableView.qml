@@ -70,7 +70,7 @@ FocusScope {
     }
 
     property Component header: null
-    property Item headerItem: view.headerItem ? view.headerItem.loadedHeader : null
+    property Item headerItem: view.headerItem?.loadedHeader ?? null
     property color headerColor: colorContext.bg.primary
     property int headerTopPadding: 0
 

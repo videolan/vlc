@@ -71,7 +71,7 @@ Repeater {
         // Events
 
         onActiveFocusChanged: {
-            if (activeFocus && (!!item && !item.focus)) {
+            if (activeFocus && !item?.focus) {
                 recoverFocus()
             }
         }
@@ -209,7 +209,7 @@ Repeater {
         // Private
 
         function _focusIfFocusable(_loader) {
-            if (!!_loader && !!_loader.item && _loader.item.focus) {
+            if (_loader?.item?.focus) {
                 if (item.focusReason !== undefined)
                     _loader.item.forceActiveFocus(item.focusReason)
                 else {

@@ -38,11 +38,11 @@ FadingEdge {
                                                           : delegateItem.width) / 2
                            : (VLCStyle.margin_large * 2)
 
-    readonly property bool transitionsRunning: ((listView.add ? listView.add.running : false) ||
-                                                (listView.addDisplaced ? listView.addDisplaced.running : false) ||
-                                                (listView.populate ? listView.populate.running : false) ||
-                                                (listView.remove ? listView.remove.running : false) ||
-                                                (listView.removeDisplaced ? listView.removeDisplaced.running : false))
+    readonly property bool transitionsRunning: (listView.add?.running ||
+                                                listView.addDisplaced?.running ||
+                                                listView.populate?.running ||
+                                                listView.remove?.running ||
+                                                listView.removeDisplaced?.running)
 
     // TODO: Use itemAtIndex(0) Qt >= 5.13
     // FIXME: Delegate with variable size

@@ -107,7 +107,7 @@ Item {
         verticalAlignment: root.verticalAlignment
 
         source: {
-            if (!!networkModel && !!networkModel.artwork && networkModel.artwork.length > 0)
+            if (networkModel?.artwork && networkModel.artwork.length > 0)
                 return VLCAccessImage.uri(networkModel.artwork)
 
             return ""

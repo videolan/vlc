@@ -29,8 +29,8 @@ Item {
     property bool anchorInside: true
 
     //private
-    readonly property int _targetHeight: target ? target.height : 0
-    readonly property int _targetWidth: target ? target.width : 0
+    readonly property int _targetHeight: target?.height ?? 0
+    readonly property int _targetWidth: target?.width ?? 0
 
     readonly property int _edgeVtHeight: target ? (target.height - root.csdSize * 2) : 0
     readonly property int _edgeHzWidth:  target ? (target.width  - root.csdSize * 2) : 0

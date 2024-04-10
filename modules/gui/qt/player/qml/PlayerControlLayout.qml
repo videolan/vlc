@@ -176,7 +176,7 @@ FocusScope {
             rightMargin: layoutSpacing - spacing
         }
 
-        active: !!playerControlLayout.model && !!playerControlLayout.model.left && (playerControlLayout.model.left.count > 0) &&
+        active: !!playerControlLayout.model?.left && (playerControlLayout.model.left.count > 0) &&
                 !loaderLeftRight.active
 
         focus: active

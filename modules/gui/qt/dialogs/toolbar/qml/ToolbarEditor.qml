@@ -70,8 +70,7 @@ Item {
                     text: {
                         const text = modelData.name
 
-                        if (!!MainCtx.controlbarProfileModel.currentModel &&
-                                MainCtx.controlbarProfileModel.currentModel.getModel(identifier).dirty)
+                        if (MainCtx.controlbarProfileModel.currentModel?.getModel(identifier).dirty)
                             return _markDirty(text)
                         else
                             return text
@@ -188,7 +187,7 @@ Item {
                                                                                                       rightMetric.width) * 1.25
                                                                                              : 0
 
-                            readonly property int count: !!item ? item.count : 0
+                            readonly property int count: item?.count ?? 0
 
                             sourceComponent: Rectangle {
                                 color: theme.bg.primary
@@ -304,6 +303,6 @@ Item {
     Util.ViewDragAutoScrollHandler {
         id: dragAutoScrollHandler
 
-        view: _viewThatContainsDrag ? _viewThatContainsDrag : null
+        view: _viewThatContainsDrag ?? null
     }
 }

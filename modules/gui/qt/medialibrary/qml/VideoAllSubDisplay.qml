@@ -50,15 +50,15 @@ VideoAll {
 
     // Settings
 
-    model: !!_meta ? _meta.model : null
+    model: _meta?.model ?? null
 
     contextMenu: Util.MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
 
-    gridLabels: !!_meta ? _meta.gridLabels : root.getLabel
+    gridLabels: _meta?.gridLabels ?? root.getLabel
 
-    listLabels: !!_meta ? _meta.listLabels : root.getLabel
+    listLabels: _meta?.listLabels ?? root.getLabel
 
-    sectionProperty: !!_meta && !!_meta.sectionProperty ? _meta.sectionProperty : ""
+    sectionProperty: _meta?.sectionProperty ?? ""
 
     headerPositioning: headerItem.model.count > 0 ? ListView.InlineHeader : ListView.OverlayHeader
 

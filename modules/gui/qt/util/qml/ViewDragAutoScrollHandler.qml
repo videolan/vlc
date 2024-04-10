@@ -28,7 +28,7 @@ QtObject {
     // if 'dragItem' is null, user must override property 'dragging' and 'dragPosProvider'
     property Item dragItem: null
 
-    property bool dragging: !!dragItem && dragItem.visible
+    property bool dragging: dragItem?.visible
 
     property var dragPosProvider: function () {
         return root.view.mapFromItem(root.dragItem.parent,

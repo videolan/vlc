@@ -34,22 +34,22 @@ FocusScope {
 
     /* required */ property var model
 
-    readonly property int rowHeight: (_currentView) ? _currentView.rowHeight : 0
+    readonly property int rowHeight: _currentView?.rowHeight ?? 0
 
-    readonly property int contentHeight: (_currentView) ? _currentView.contentHeight : 0
+    readonly property int contentHeight: _currentView?.contentHeight ?? 0
 
-    readonly property int contentLeftMargin: (_currentView) ? _currentView.contentLeftMargin : 0
-    readonly property int contentRightMargin: (_currentView) ? _currentView.contentRightMargin : 0
+    readonly property int contentLeftMargin: _currentView?.contentLeftMargin ?? 0
+    readonly property int contentRightMargin: _currentView?.contentRightMargin ?? 0
 
     property int displayMarginEnd: 0
 
-    readonly property int currentIndex: (_currentView) ? _currentView.currentIndex : -1
+    readonly property int currentIndex: _currentView?.currentIndex ?? -1
 
     property int maximumRows: -1
 
-    readonly property int maximumCount: (_currentView) ? _currentView.maximumCount : -1
+    readonly property int maximumCount: _currentView?.maximumCount ?? -1
 
-    readonly property int nbItemPerRow: (_currentView) ? _currentView.nbItemPerRow : 1
+    readonly property int nbItemPerRow: _currentView?.nbItemPerRow ?? 1
 
     property bool isSearchable: true
 

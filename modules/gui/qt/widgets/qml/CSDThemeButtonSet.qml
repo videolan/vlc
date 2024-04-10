@@ -34,9 +34,9 @@ Rectangle {
         return false
     }
 
-    readonly property int _frameMarginLeft: VLCStyle.palette.csdMetrics ? VLCStyle.palette.csdMetrics.csdFrameMarginLeft : 0
-    readonly property int _frameMarginRight: VLCStyle.palette.csdMetrics ? VLCStyle.palette.csdMetrics.csdFrameMarginRight : 0
-    readonly property int _interNavButtonSpacing: VLCStyle.palette.csdMetrics ? VLCStyle.palette.csdMetrics.interNavButtonSpacing : 0
+    readonly property int _frameMarginLeft: VLCStyle.palette.csdMetrics?.csdFrameMarginLeft ?? 0
+    readonly property int _frameMarginRight: VLCStyle.palette.csdMetrics?.csdFrameMarginRight ?? 0
+    readonly property int _interNavButtonSpacing: VLCStyle.palette.csdMetrics?.interNavButtonSpacing ?? 0
 
     implicitWidth: layout.implicitWidth + _frameMarginLeft + _frameMarginRight
     implicitHeight: layout.implicitHeight

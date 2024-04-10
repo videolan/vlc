@@ -102,13 +102,7 @@ Item {
             Layout.preferredHeight: root.titleCover_height
             Layout.preferredWidth: root.titleCover_width
 
-            source: {
-                let cover = null
-                if (!!titleDel.rowModel) {
-                    cover = titleDel.rowModel[root.criteriaCover]
-                }
-                return cover || ""
-            }
+            source: titleDel.rowModel?.[root.criteriaCover] ?? ""
 
             fallbackImageSource: titleDel.model.placeHolder || VLCStyle.noArtAlbumCover
 

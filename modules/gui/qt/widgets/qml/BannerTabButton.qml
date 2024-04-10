@@ -96,7 +96,7 @@ T.TabButton {
                 horizontalCenter: parent.horizontalCenter
             }
 
-            width: control.contentItem ? control.contentItem.implicitWidth : 0
+            width: control.contentItem?.implicitWidth ?? 0
 
             visible: (width > 0 && control.showCurrentIndicator && control.selected)
         }

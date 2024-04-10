@@ -696,7 +696,7 @@ FocusScope {
     }
 
     function _onModelCountChanged() {
-        _count = model ? model.rowCount() : 0
+        _count = model?.rowCount() ?? 0
         if (!_isInitialised)
             return
 

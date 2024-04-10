@@ -64,7 +64,7 @@ FocusScope {
             focus: true
 
             Navigation.parentItem:  root
-            Navigation.downItem: (!!urlListDisplay.item) ? urlListDisplay.item : null
+            Navigation.downItem: urlListDisplay.item ?? null
 
             Widgets.TextFieldExt {
                 id: searchField

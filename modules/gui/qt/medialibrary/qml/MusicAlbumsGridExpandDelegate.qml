@@ -371,7 +371,7 @@ FocusScope {
                 anchors.fill: parent
 
                 Widgets.ListLabel {
-                    text: !!rowModel && !!rowModel.track_number ? rowModel.track_number : ""
+                    text: rowModel?.track_number ?? ""
                     color: theme.fg.primary
                     font.weight: Font.Normal
 
@@ -381,7 +381,7 @@ FocusScope {
                 }
 
                 Widgets.ListLabel {
-                    text: !!rowModel && !!rowModel.title ? rowModel.title : ""
+                    text: rowModel?.title ?? ""
                     color: theme.fg.primary
 
                     Layout.fillHeight: true

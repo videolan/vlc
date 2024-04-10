@@ -34,7 +34,7 @@ T.Pane {
     property var model: PlaylistListModel {
         playlist: MainPlaylistController.playlist
     }
-    readonly property ListSelectionModel selectionModel: listView ? listView.selectionModel : null
+    readonly property ListSelectionModel selectionModel: listView?.selectionModel ?? null
 
     property bool useAcrylic: true
 

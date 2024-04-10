@@ -67,16 +67,13 @@ FocusScope {
         const item = stackView.currentItem
 
         sourcesBanner.localMenuDelegate = Qt.binding(function () {
-            return !!item.localMenuDelegate ? item.localMenuDelegate : null
+            return item.localMenuDelegate ?? null
         })
 
         // NOTE: sortMenu is declared with the SortMenu type, so when it's undefined we have to
         //       return null to avoid a QML warning.
         sourcesBanner.sortMenu = Qt.binding(function () {
-            if (item.sortMenu)
-                return item.sortMenu
-            else
-                return null
+            return item.sortMenu ?? null
         })
 
         MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)

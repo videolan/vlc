@@ -287,8 +287,8 @@ T.ProgressBar {
             Item {
                 Rectangle {
                     id: seekpointsRect
-                    readonly property real startPosition: model.startPosition === undefined ? 0.0 : model.startPosition
-                    readonly property real endPosition: model.endPosition === undefined ? 1.0 : model.endPosition
+                    readonly property real startPosition: model.startPosition ??  0.0
+                    readonly property real endPosition: model.endPosition ?? 1.0
 
                     readonly property int _currentChapter: {
                         if (control.visualPosition < seekpointsRect.startPosition)

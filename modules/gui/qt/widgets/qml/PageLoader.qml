@@ -35,20 +35,14 @@ StackViewExt {
     property var pageModel: []
 
     //indicates whether the subview support grid/list mode
-    readonly property bool hasGridListMode: (currentItem
-                                            && currentItem.hasGridListMode !== undefined
-                                            && currentItem.hasGridListMode)
+    readonly property bool hasGridListMode: currentItem?.hasGridListMode ?? false
 
-    readonly property bool isSearchable: (currentItem
-                                    && currentItem.isSearchable !== undefined
-                                    && currentItem.isSearchable)
+    readonly property bool isSearchable: currentItem?.isSearchable ?? false
 
-    readonly property var sortModel: (currentItem
-                                    && currentItem.sortModel !== undefined) ? currentItem.sortModel : null
+    readonly property var sortModel: currentItem?.sortModel ?? null
 
     //property is *not* readOnly, a PageLoader may define a localMenuDelegate common for its subviews (music, video)
-    property Component localMenuDelegate: (currentItem
-                                    && currentItem.localMenuDelegate
+    property Component localMenuDelegate: (currentItem?.localMenuDelegate
                                     && (currentItem.localMenuDelegate instanceof Component)) ? currentItem.localMenuDelegate : null
 
 

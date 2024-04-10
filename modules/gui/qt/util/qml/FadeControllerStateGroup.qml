@@ -25,7 +25,7 @@ import "qrc:///style/"
 StateGroup {
     id: root
 
-    state: target ? target.state : ""
+    state: target?.state ?? ""
 
     property Item target
 

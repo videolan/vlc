@@ -163,7 +163,7 @@ T.ItemDelegate {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: (model.artwork && model.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
+                source: (model?.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
                 visible: !statusIcon.visible
                 asynchronous: true
 
@@ -219,7 +219,7 @@ T.ItemDelegate {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                text: (model.artist ? model.artist : qsTr("Unknown Artist"))
+                text: model?.artist ?? qsTr("Unknown Artist")
                 color: theme.fg.primary
                 verticalAlignment: Text.AlignBottom
             }
