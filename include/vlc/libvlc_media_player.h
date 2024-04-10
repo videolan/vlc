@@ -148,6 +148,17 @@ typedef enum libvlc_position_t {
 } libvlc_position_t;
 
 /**
+ * Enumeration of values used to set the video fitting inside the display area.
+ */
+typedef enum libvlc_video_fit_mode_t {
+    libvlc_video_fit_none,    /**< Explicit zoom set by \ref libvlc_video_set_scale */
+    libvlc_video_fit_smaller, /**< Fit inside / to smallest display dimension */
+    libvlc_video_fit_larger,  /**< Fit outside / to largest display dimension */
+    libvlc_video_fit_width,   /**< Fit to display width */
+    libvlc_video_fit_height,  /**< Fit to display height */
+} libvlc_video_fit_mode_t;
+
+/**
  * Enumeration of teletext keys than can be passed via
  * libvlc_video_set_teletext()
  */
@@ -1880,6 +1891,23 @@ LIBVLC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi );
  * \note Invalid aspect ratios are ignored.
  */
 LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, const char *psz_aspect );
+
+/**
+ * Get current video display fit mode.
+ *
+ * \param p_mi the media player
+ * \return the video display fit mode.
+ */
+LIBVLC_API libvlc_video_fit_mode_t libvlc_video_get_display_fit( libvlc_media_player_t *p_mi );
+
+/**
+ * Set new video display fit.
+ *
+ * \param p_mi the media player
+ * \param fit new display fit mode
+ * \note Invalid fit mode are ignored.
+ */
+LIBVLC_API void libvlc_video_set_display_fit( libvlc_media_player_t *p_mi, libvlc_video_fit_mode_t fit );
 
 /**
  * Create a video viewpoint structure.

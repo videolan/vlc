@@ -252,6 +252,28 @@ void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
     free (pp_vouts);
 }
 
+libvlc_video_fit_mode_t libvlc_video_get_display_fit( libvlc_media_player_t *p_mi )
+{
+    return var_GetInteger (p_mi, "fit");
+}
+
+void libvlc_video_set_display_fit( libvlc_media_player_t *p_mi, libvlc_video_fit_mode_t fit )
+{
+    var_SetInteger (p_mi, "fit", fit);
+
+    size_t n;
+    vout_thread_t **pp_vouts = GetVouts (p_mi, &n);
+    for (size_t i = 0; i < n; i++)
+    {
+        vout_thread_t *p_vout = pp_vouts[i];
+
+        var_SetInteger (p_vout, "fit", fit);
+        vout_Release(p_vout);
+    }
+    free (pp_vouts);
+}
+
+
 libvlc_video_viewpoint_t *libvlc_video_new_viewpoint(void)
 {
     libvlc_video_viewpoint_t *p_vp = malloc(sizeof *p_vp);

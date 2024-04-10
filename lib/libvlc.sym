@@ -251,6 +251,8 @@ libvlc_video_set_callbacks
 libvlc_video_set_crop_ratio
 libvlc_video_set_crop_window
 libvlc_video_set_crop_border
+libvlc_video_get_display_fit
+libvlc_video_set_display_fit
 libvlc_video_set_deinterlace
 libvlc_video_set_format
 libvlc_video_set_format_callbacks
