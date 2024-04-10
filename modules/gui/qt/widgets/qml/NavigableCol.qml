@@ -128,16 +128,6 @@ T.Control {
 
     // Childs
 
-    Component {
-        id: enabledConnection
-
-        Connections {
-            onEnabledChanged: root._countEnabled += (target.enabled ? 1 : -1)
-        }
-    }
-
-    // Childs
-
     contentItem: Column {
         spacing: root.spacing
 
@@ -147,7 +137,7 @@ T.Control {
             onItemAdded: (index, item) => {
                 if (item.enabled) root._countEnabled += 1;
 
-                enabledConnection.createObject(item, { target: item });
+                item.onEnabledChanged.connect(() => { root._countEnabled += (target.enabled ? 1 : -1) });
 
                 item.Navigation.upAction = function() {
                     let i = index;
