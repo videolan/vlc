@@ -276,6 +276,10 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
                                         VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
                                         VLC_TICK_INVALID);
 
+            vlc_player_UpdateTimerState(player, NULL,
+                                        VLC_PLAYER_TIMER_STATE_STOPPING,
+                                        VLC_TICK_INVALID);
+
             if (input == player->input)
                 player->input = NULL;
 

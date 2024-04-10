@@ -240,11 +240,15 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
         case VLC_PLAYER_TIMER_STATE_PLAYING:
             break;
 
+        case VLC_PLAYER_TIMER_STATE_STOPPING:
+            break;
+
         default:
             vlc_assert_unreachable();
     }
 
-    player->timer.state = state;
+    if (player->timer.state != VLC_PLAYER_TIMER_STATE_STOPPING)
+        player->timer.state = state;
 
     if (!notify)
     {
@@ -475,9 +479,10 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
     if (player->timer.state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
         player->timer.state = VLC_PLAYER_TIMER_STATE_PLAYING;
 
-    vlc_player_UpdateTimerBestSource(player, es_source,
-                                     es_source_is_master, point, system_date,
-                                     force_update);
+    if (player->timer.state != VLC_PLAYER_TIMER_STATE_STOPPING)
+        vlc_player_UpdateTimerBestSource(player, es_source,
+                                         es_source_is_master, point, system_date,
+                                         force_update);
 
     vlc_player_UpdateTimerSmpteSource(player, es_source, point, system_date,
                                       frame_rate, frame_rate_base);
