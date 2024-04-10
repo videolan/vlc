@@ -844,12 +844,6 @@ static void *Thread( void *obj )
 
     registerMetaTypes();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,1)
-    //suppress deprecation warnings about QML 'Connections' syntax
-    //legacy connection syntax is required to keep compatibility with Qt <= 5.14
-    QLoggingCategory::setFilterRules("qt.qml.connections.warning=false");
-#endif
-
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
 
     /* Set application direction to locale direction,
