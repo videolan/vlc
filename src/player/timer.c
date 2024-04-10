@@ -237,9 +237,11 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
             assert(system_date != VLC_TICK_INVALID);
             break;
 
-        default:
         case VLC_PLAYER_TIMER_STATE_PLAYING:
             break;
+
+        default:
+            vlc_assert_unreachable();
     }
 
     player->timer.state = state;
