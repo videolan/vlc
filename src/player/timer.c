@@ -330,6 +330,99 @@ vlc_player_UpdateTimerSource(vlc_player_t *player,
         source->point.position = player->timer.input_position;
 }
 
+static void
+vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
+                                 bool es_source_is_master,
+                                 const struct vlc_player_timer_point *point,
+                                 vlc_tick_t system_date,
+                                 bool force_update)
+{
+    /* Best source priority:
+     * 1/ es_source != NULL when paused (any ES tracks when paused. Indeed,
+     * there is likely no audio update (master) when paused but only video
+     * ones, via vlc_player_NextVideoFrame() for example)
+     * 2/ es_source != NULL + master (from the master ES track)
+     * 3/ es_source != NULL (from the first ES track updated)
+     * 4/ es_source == NULL (from the input)
+     */
+    struct vlc_player_timer_source *source = &player->timer.best_source;
+    if (!source->es || es_source_is_master
+     || (es_source && player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED))
+        source->es = es_source;
+
+    /* Notify the best source */
+    if (source->es == es_source)
+    {
+        if (source->point.rate != point->rate)
+        {
+            player->timer.last_ts = VLC_TICK_INVALID;
+            force_update = true;
+        }
+
+        /* When paused (VLC_TICK_MAX), the same ts can be send more than one
+         * time from the video source, only send it if different in that case.
+         */
+        if (point->ts != player->timer.last_ts
+          || source->point.system_date != system_date
+          || system_date != VLC_TICK_MAX)
+        {
+            vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
+                                         system_date);
+
+            /* It is possible to receive valid points while seeking. These
+             * points could be updated when the input thread didn't yet process
+             * the seek request. */
+            if (!player->timer.seeking)
+            {
+                /* Reset seek time/position now that we receive a valid point
+                 * and seek was processed */
+                player->timer.seek_ts = VLC_TICK_INVALID;
+                player->timer.seek_position = -1;
+            }
+
+            if (!vlc_list_is_empty(&source->listeners))
+                vlc_player_SendTimerSourceUpdates(player, source, force_update,
+                                                  &source->point);
+        }
+    }
+}
+
+static void
+vlc_player_UpdateTimerSmpteSource(vlc_player_t *player, vlc_es_id_t *es_source,
+                                  const struct vlc_player_timer_point *point,
+                                  vlc_tick_t system_date,
+                                  unsigned frame_rate, unsigned frame_rate_base)
+{
+    struct vlc_player_timer_source *source = &player->timer.smpte_source;
+    /* SMPTE source: only the video source */
+    if (!source->es && es_source && vlc_es_id_GetCat(es_source) == VIDEO_ES)
+        source->es = es_source;
+
+    /* Notify the SMPTE source, also notify when the video output was rendered
+     * while the clock was paused */
+    if (source->es == es_source && source->es)
+    {
+        if (frame_rate != 0 && (frame_rate != source->smpte.frame_rate
+         || frame_rate_base != source->smpte.frame_rate_base))
+        {
+            assert(frame_rate_base != 0);
+            player->timer.last_ts = VLC_TICK_INVALID;
+            vlc_player_UpdateSmpteTimerFPS(player, source, frame_rate,
+                                           frame_rate_base);
+        }
+
+        if (point->ts != player->timer.last_ts && source->smpte.frame_rate != 0)
+        {
+            vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
+                                         system_date);
+
+            if (!vlc_list_is_empty(&source->listeners))
+                vlc_player_SendSmpteTimerSourceUpdates(player, source,
+                                                       &source->point);
+        }
+    }
+}
+
 void
 vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
                        bool es_source_is_master,
@@ -337,7 +430,6 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
                        vlc_tick_t normal_time,
                        unsigned frame_rate, unsigned frame_rate_base)
 {
-    struct vlc_player_timer_source *source;
     assert(point);
     /* A null source can't be the master */
     assert(es_source == NULL ? !es_source_is_master : true);
@@ -383,83 +475,12 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
     if (player->timer.state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
         player->timer.state = VLC_PLAYER_TIMER_STATE_PLAYING;
 
-    /* Best source priority:
-     * 1/ es_source != NULL when paused (any ES tracks when paused. Indeed,
-     * there is likely no audio update (master) when paused but only video
-     * ones, via vlc_player_NextVideoFrame() for example)
-     * 2/ es_source != NULL + master (from the master ES track)
-     * 3/ es_source != NULL (from the first ES track updated)
-     * 4/ es_source == NULL (from the input)
-     */
-    source = &player->timer.best_source;
-    if (!source->es || es_source_is_master
-     || (es_source && player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED))
-        source->es = es_source;
+    vlc_player_UpdateTimerBestSource(player, es_source,
+                                     es_source_is_master, point, system_date,
+                                     force_update);
 
-    /* Notify the best source */
-    if (source->es == es_source)
-    {
-        if (source->point.rate != point->rate)
-        {
-            player->timer.last_ts = VLC_TICK_INVALID;
-            force_update = true;
-        }
-
-        /* When paused (VLC_TICK_MAX), the same ts can be send more than one
-         * time from the video source, only send it if different in that case.
-         */
-        if (point->ts != player->timer.last_ts
-          || source->point.system_date != system_date
-          || system_date != VLC_TICK_MAX)
-        {
-            vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
-                                         system_date);
-
-            /* It is possible to receive valid points while seeking. These
-             * points could be updated when the input thread didn't yet process
-             * the seek request. */
-            if (!player->timer.seeking)
-            {
-                /* Reset seek time/position now that we receive a valid point
-                 * and seek was processed */
-                player->timer.seek_ts = VLC_TICK_INVALID;
-                player->timer.seek_position = -1;
-            }
-
-            if (!vlc_list_is_empty(&source->listeners))
-                vlc_player_SendTimerSourceUpdates(player, source, force_update,
-                                                  &source->point);
-        }
-    }
-
-    source = &player->timer.smpte_source;
-    /* SMPTE source: only the video source */
-    if (!source->es && es_source && vlc_es_id_GetCat(es_source) == VIDEO_ES)
-        source->es = es_source;
-
-    /* Notify the SMPTE source, also notify when the video output was rendered
-     * while the clock was paused */
-    if (source->es == es_source && source->es)
-    {
-        if (frame_rate != 0 && (frame_rate != source->smpte.frame_rate
-         || frame_rate_base != source->smpte.frame_rate_base))
-        {
-            assert(frame_rate_base != 0);
-            player->timer.last_ts = VLC_TICK_INVALID;
-            vlc_player_UpdateSmpteTimerFPS(player, source, frame_rate,
-                                           frame_rate_base);
-        }
-
-        if (point->ts != player->timer.last_ts && source->smpte.frame_rate != 0)
-        {
-            vlc_player_UpdateTimerSource(player, source, point->rate, point->ts,
-                                         system_date);
-
-            if (!vlc_list_is_empty(&source->listeners))
-                vlc_player_SendSmpteTimerSourceUpdates(player, source,
-                                                       &source->point);
-        }
-    }
+    vlc_player_UpdateTimerSmpteSource(player, es_source, point, system_date,
+                                      frame_rate, frame_rate_base);
 
     player->timer.last_ts = point->ts;
 
