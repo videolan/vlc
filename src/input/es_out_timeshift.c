@@ -279,12 +279,12 @@ struct es_out_timeshift
     int            i_es;
     es_out_id_t    **pp_es;
 
-    es_out_t       out;
+    struct vlc_input_es_out out;
 };
 
 static void         Del    ( es_out_t *, es_out_id_t * );
 
-static int          TsStart( es_out_t * );
+static int          TsStart(struct es_out_timeshift *);
 static void         TsAutoStop( es_out_t * );
 
 static void         TsStop( ts_thread_t * );
@@ -359,7 +359,8 @@ static int GetTmpFile( char **filename, const char *dirname )
  *****************************************************************************/
 static struct es_out_timeshift * PRIV(es_out_t *out)
 {
-    struct es_out_timeshift *sys = container_of(out, struct es_out_timeshift, out);
+    struct vlc_input_es_out *parent = container_of(out, struct vlc_input_es_out, out);
+    struct es_out_timeshift *sys = container_of(parent, struct es_out_timeshift, out);
     return sys;
 }
 
@@ -555,7 +556,7 @@ ControlLockedSetPauseState(struct es_out_timeshift *p_sys,
         if( !input_CanPaceControl( p_sys->p_input ) )
         {
             if( !p_sys->b_delayed )
-                TsStart(&p_sys->out);
+                TsStart(p_sys);
             if( p_sys->b_delayed )
                 i_ret = TsChangePause( p_sys->p_ts, b_source_paused, b_paused, i_date );
         }
@@ -595,7 +596,7 @@ ControlLockedSetRate(struct es_out_timeshift *p_sys,
         if( !input_CanPaceControl( p_sys->p_input ) )
         {
             if( !p_sys->b_delayed )
-                TsStart(&p_sys->out);
+                TsStart(p_sys);
             if( p_sys->b_delayed )
                 i_ret = TsChangeRate( p_sys->p_ts, src_rate, rate );
         }
@@ -841,7 +842,8 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     if( !p_sys )
         return NULL;
 
-    p_sys->out.cbs = &es_out_timeshift_cbs;
+    p_sys->out.ops = NULL;
+    p_sys->out.out.cbs = &es_out_timeshift_cbs;
 
     /* */
     p_sys->b_input_paused = false;
@@ -922,7 +924,7 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
 #undef S
 #endif
 
-    return &p_sys->out;
+    return &p_sys->out.out;
 }
 
 /*****************************************************************************
@@ -932,10 +934,11 @@ static void TsDestroy( ts_thread_t *p_ts )
 {
     free( p_ts );
 }
-static int TsStart( es_out_t *p_out )
+static int TsStart(struct es_out_timeshift *p_sys)
 {
-    struct es_out_timeshift *p_sys = PRIV(p_out);
     ts_thread_t *p_ts;
+
+    es_out_t *p_out = &p_sys->out.out;
 
     assert( !p_sys->b_delayed );
 
