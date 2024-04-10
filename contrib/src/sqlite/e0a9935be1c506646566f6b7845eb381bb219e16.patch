@@ -1,0 +1,32 @@
+From e0a9935be1c506646566f6b7845eb381bb219e16 Mon Sep 17 00:00:00 2001
+From: stephan <stephan@noemail.net>
+Date: Mon, 19 Feb 2024 12:20:46 +0000
+Subject: [PATCH] Extend the strerror_r() result type discrepancy check in
+ os_unix.c to include the Android NDK, as reported in [forum post
+ 3f13857fa4062301|forum:3f13857fa4062301]. The NDK's strerror_r() signature is
+ version-dependent, whereas this change assumes int return (POSIX semantic)
+ across all versions.
+
+FossilOrigin-Name: f18b2524da6bbbcf372b292df52fbe6efa49fd6e1f1f13ef2447279d559f7a08
+---
+ sqlite3.c |  6 +++++-
+ 3 files changed, 13 insertions(+), 9 deletions(-)
+
+diff --git a/sqlite3.c b/sqlite3.c
+index 4b3d63c2c1..4663c22d94 100644
+--- a/sqlite3.c
++++ b/sqlite3.c
+@@ -1295,8 +1295,12 @@ static int unixLogErrorAtLine(
+   ** available, the error message will often be an empty string. Not a
+   ** huge problem. Incorrectly concluding that the GNU version is available
+   ** could lead to a segfault though.
++  **
++  ** Forum post 3f13857fa4062301 reports that the Android SDK may use
++  ** int-type return, depending on its version.
+   */
+-#if defined(STRERROR_R_CHAR_P) || defined(__USE_GNU)
++#if (defined(STRERROR_R_CHAR_P) || defined(__USE_GNU)) \
++  && !defined(ANDROID) && !defined(__ANDROID__)
+   zErr =
+ # endif
+   strerror_r(iErrno, aErr, sizeof(aErr)-1);
