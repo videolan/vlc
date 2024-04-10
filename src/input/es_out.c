@@ -237,7 +237,7 @@ typedef struct
 
     unsigned    cc_decoder;
 
-    es_out_t out;
+    struct vlc_input_es_out out;
 } es_out_sys_t;
 
 static void         EsOutDelLocked(es_out_sys_t *, es_out_id_t *);
@@ -2081,7 +2081,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     if( !es )
         return NULL;
 
-    es->out = &p_sys->out;
+    es->out = &p_sys->out.out;
     es->id.source = input_source_Hold( source );
 
     if( es_format_Copy( &es->fmt, fmt ) != VLC_SUCCESS )
@@ -4008,7 +4008,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     if( !p_sys )
         return NULL;
 
-    p_sys->out.cbs = &es_out_cbs;
+    p_sys->out.ops = NULL;
+    p_sys->out.out.cbs = &es_out_cbs;
 
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_input = p_input;
@@ -4048,7 +4049,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, input_source_t *main_source, 
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
 
-    return &p_sys->out;
+    return &p_sys->out.out;
 }
 
 /****************************************************************************
