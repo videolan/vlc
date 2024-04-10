@@ -252,7 +252,7 @@ struct es_out_id_t
     es_out_id_t *p_es;
 };
 
-typedef struct
+struct es_out_timeshift
 {
     input_thread_t *p_input;
     es_out_t       *p_out;
@@ -279,7 +279,7 @@ typedef struct
     es_out_id_t    **pp_es;
 
     es_out_t       out;
-} es_out_sys_t;
+};
 
 static void         Del    ( es_out_t *, es_out_id_t * );
 
@@ -356,9 +356,15 @@ static int GetTmpFile( char **filename, const char *dirname )
 /*****************************************************************************
  * Internal functions
  *****************************************************************************/
+static struct es_out_timeshift * PRIV(es_out_t *out)
+{
+    struct es_out_timeshift *sys = container_of(out, struct es_out_timeshift, out);
+    return sys;
+}
+
 static void Destroy( es_out_t *p_out )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     if( p_sys->b_delayed )
     {
@@ -376,7 +382,7 @@ static void Destroy( es_out_t *p_out )
 
 static es_out_id_t *Add( es_out_t *p_out, input_source_t *in, const es_format_t *p_fmt )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     ts_cmd_add_t cmd;
 
     es_out_id_t *p_es = malloc( sizeof( *p_es ) );
@@ -405,7 +411,7 @@ static es_out_id_t *Add( es_out_t *p_out, input_source_t *in, const es_format_t 
 }
 static int Send( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     ts_cmd_send_t cmd;
     int i_ret = VLC_SUCCESS;
 
@@ -425,7 +431,7 @@ static int Send( es_out_t *p_out, es_out_id_t *p_es, block_t *p_block )
 }
 static void Del( es_out_t *p_out, es_out_id_t *p_es )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     ts_cmd_del_t cmd;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -480,7 +486,7 @@ static inline int es_out_in_PrivControl( es_out_t *p_out, input_source_t *in,
 static int ControlLockedGetEmpty( es_out_t *p_out, input_source_t *in,
                                   bool *pb_empty )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     if( p_sys->b_delayed && TsHasCmd( p_sys->p_ts ) )
         *pb_empty = false;
@@ -494,7 +500,7 @@ static int ControlLockedGetEmpty( es_out_t *p_out, input_source_t *in,
 }
 static int ControlLockedGetWakeup( es_out_t *p_out, input_source_t *in, vlc_tick_t *pi_wakeup )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     if( p_sys->b_delayed )
     {
@@ -512,7 +518,7 @@ static int ControlLockedGetWakeup( es_out_t *p_out, input_source_t *in, vlc_tick
 }
 static int ControlLockedGetBuffering( es_out_t *p_out, input_source_t *in, bool *pb_buffering )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     if( p_sys->b_delayed )
         *pb_buffering = true;
@@ -527,7 +533,7 @@ static int ControlLockedGetBuffering( es_out_t *p_out, input_source_t *in, bool 
 }
 static int ControlLockedSetPauseState( es_out_t *p_out, input_source_t *in, bool b_source_paused, bool b_paused, vlc_tick_t i_date )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     int i_ret;
 
     if( !p_sys->b_delayed && !b_source_paused == !b_paused )
@@ -563,7 +569,7 @@ static int ControlLockedSetPauseState( es_out_t *p_out, input_source_t *in, bool
 }
 static int ControlLockedSetRate( es_out_t *p_out, input_source_t *in, float src_rate, float rate )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     int i_ret;
 
     if( !p_sys->b_delayed && src_rate == rate )
@@ -600,7 +606,7 @@ static int ControlLockedSetRate( es_out_t *p_out, input_source_t *in, float src_
 }
 static int ControlLockedSetFrameNext( es_out_t *p_out, input_source_t *in )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     return es_out_in_PrivControl( p_sys->p_out, in, ES_OUT_PRIV_SET_FRAME_NEXT );
 }
@@ -608,7 +614,7 @@ static int ControlLockedSetFrameNext( es_out_t *p_out, input_source_t *in )
 static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
                           va_list args )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     switch( i_query )
     {
@@ -706,7 +712,7 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
 
 static int Control( es_out_t *p_tsout, input_source_t *in, int i_query, va_list args )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -722,7 +728,7 @@ static int Control( es_out_t *p_tsout, input_source_t *in, int i_query, va_list 
 
 static int PrivControlLocked( es_out_t *p_tsout, input_source_t *in, int i_query, va_list args )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
 
     switch( i_query )
     {
@@ -792,7 +798,7 @@ static int PrivControlLocked( es_out_t *p_tsout, input_source_t *in, int i_query
 
 static int PrivControl( es_out_t *p_tsout, input_source_t *in, int i_query, va_list args )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
@@ -821,7 +827,7 @@ static const struct es_out_callbacks es_out_timeshift_cbs =
  *****************************************************************************/
 es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out, float rate )
 {
-    es_out_sys_t *p_sys = malloc( sizeof(*p_sys) );
+    struct es_out_timeshift *p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
         return NULL;
 
@@ -918,7 +924,7 @@ static void TsDestroy( ts_thread_t *p_ts )
 }
 static int TsStart( es_out_t *p_out )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
     ts_thread_t *p_ts;
 
     assert( !p_sys->b_delayed );
@@ -961,7 +967,7 @@ static int TsStart( es_out_t *p_out )
 }
 static void TsAutoStop( es_out_t *p_out )
 {
-    es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_out);
 
     if( !p_sys->b_delayed || !TsIsUnused( p_sys->p_ts ) )
         return;
@@ -1490,7 +1496,7 @@ static int CmdInitAdd( ts_cmd_add_t *p_cmd, input_source_t *in,  es_out_id_t *p_
 }
 static void CmdExecuteAdd( es_out_t *p_tsout, ts_cmd_add_t *p_cmd )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     p_cmd->p_es->p_es = p_sys->p_out->cbs->add( p_sys->p_out, p_cmd->in,
                                                 p_cmd->p_fmt );
     TAB_APPEND( p_sys->i_es, p_sys->pp_es, p_cmd->p_es );
@@ -1512,7 +1518,7 @@ static void CmdInitSend( ts_cmd_send_t *p_cmd, es_out_id_t *p_es, block_t *p_blo
 }
 static int CmdExecuteSend( es_out_t *p_tsout, ts_cmd_send_t *p_cmd )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     block_t *p_block = p_cmd->p_block;
 
     p_cmd->p_block = NULL;
@@ -1540,7 +1546,7 @@ static int CmdInitDel( ts_cmd_del_t *p_cmd, es_out_id_t *p_es )
 }
 static void CmdExecuteDel( es_out_t *p_tsout, ts_cmd_del_t *p_cmd )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     if( p_cmd->p_es->p_es )
         es_out_Del( p_sys->p_out, p_cmd->p_es->p_es );
     TAB_REMOVE( p_sys->i_es, p_sys->pp_es, p_cmd->p_es );
@@ -1692,7 +1698,7 @@ static int CmdInitControl( ts_cmd_control_t *p_cmd, input_source_t *in,
 }
 static int CmdExecuteControl( es_out_t *p_tsout, ts_cmd_control_t *p_cmd )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     const int i_query = p_cmd->i_query;
     input_source_t *in = p_cmd->in;
 
@@ -1842,7 +1848,7 @@ static int CmdInitPrivControl( ts_cmd_privcontrol_t *p_cmd, input_source_t *in, 
 
 static int CmdExecutePrivControl( es_out_t *p_tsout, ts_cmd_privcontrol_t *p_cmd )
 {
-    es_out_sys_t *p_sys = container_of(p_tsout, es_out_sys_t, out);
+    struct es_out_timeshift *p_sys = PRIV(p_tsout);
     const int i_query = p_cmd->i_query;
     input_source_t *in = p_cmd->in;
 
