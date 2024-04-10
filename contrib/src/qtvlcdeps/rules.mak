@@ -1,6 +1,6 @@
 # qtvlcdeps
 
-DEPS_qtvlcdeps += qt $(DEPS_qt) qtsvg $(DEPS_qtsvg) qtshadertools $(DEPS_qtshadertools) qtdeclarative $(DEPS_qtdeclarative) qt5compat $(DEPS_qt5compat)
+DEPS_qtvlcdeps += qt $(DEPS_qt) qtsvg $(DEPS_qtsvg) qtdeclarative $(DEPS_qtdeclarative) qt5compat $(DEPS_qt5compat)
 
 ifdef HAVE_LINUX
 DEPS_qtvlcdeps += qtwayland $(DEPS_qtwayland)
