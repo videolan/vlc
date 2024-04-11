@@ -26,6 +26,7 @@ int main(int argc, char **argv)
     QTEST_SET_MAIN_SOURCE_PATH
     //run tests offscreen as the CI doesn't have a desktop environment
     qputenv("QT_QPA_PLATFORM", "offscreen");
-    Q_INIT_RESOURCE(vlc);
+    Q_INIT_RESOURCE(qml);
+    Q_INIT_RESOURCE(assets);
     return quick_test_main(argc, argv, "qml_test", QUICK_TEST_SOURCE_DIR);
 }

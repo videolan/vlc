@@ -754,7 +754,11 @@ static void *Thread( void *obj )
     argv[argc] = NULL;
 
 #ifdef QT_STATIC
-    Q_INIT_RESOURCE( vlc );
+    Q_INIT_RESOURCE( assets );
+    Q_INIT_RESOURCE( qml );
+#ifdef _WIN32
+    Q_INIT_RESOURCE( windows );
+#endif
     Q_INIT_RESOURCE( shaders );
 
     Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );

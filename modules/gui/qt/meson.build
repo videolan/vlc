@@ -538,7 +538,7 @@ ui_sources = files(
     'dialogs/vlm/vlm.ui',
 )
 
-qrc_files = files('vlc.qrc')
+qrc_files = files('assets.qrc', 'qml.qrc')
 if host_system == 'windows'
   qrc_files += files('windows.qrc')
 endif

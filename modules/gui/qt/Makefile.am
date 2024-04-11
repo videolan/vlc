@@ -1150,15 +1150,21 @@ shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.fra
 libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
 BUILT_SOURCES += shaders/shaders.qrc
 
-lib_qt_plugin_la_QRC = vlc.qrc
+lib_qt_plugin_la_QRC = assets.qrc qml.qrc
 
 if HAVE_WIN32
 lib_qt_plugin_la_QRC += windows.qrc
+
+windows.cpp: $(libqt_plugin_la_RES)
+windows.cpp: windows.qrc
+	$(AM_V_GEN)$(RCC) --name windows -o $@ $<
+
+nodist_libqt_plugin_la_SOURCES += windows.cpp
 endif
 
 EXTRA_DIST += $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_SHADER)
 
-nodist_libqt_plugin_la_SOURCES += resources.cpp shaders/shaders.cpp
+nodist_libqt_plugin_la_SOURCES += assets.cpp qml.cpp shaders/shaders.cpp
 endif
 
 if ENABLE_VLM
@@ -1171,35 +1177,33 @@ nodist_libqt_plugin_la_SOURCES += qmlcache_loader.cpp
 libqt_plugin_la_SOURCES += $(libqt_plugin_la_QML)
 
 .qml.cpp:
-	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/qml.qrc -o $@ $<
 
 .js.cpp:
-	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/qml.qrc -o $@ $<
 
 .mjs.cpp:
-	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/vlc.qrc -o $@ $<
-
-qml_cache.qrc: vlc.qrc
-	$(AM_V_GEN)$(QMLCACHEGEN) --filter-resource-file -o $@ $<
-
-QRCS_EXCEPT_VLC_QRC = $(filter-out vlc.qrc, $(lib_qt_plugin_la_QRC))
-QRCS_EXCEPT_VLC_QRC += qml_cache.qrc
-
-resources.cpp: $(QRCS_EXCEPT_VLC_QRC) $(libqt_plugin_la_RES)
-	$(AM_V_GEN)$(RCC) --name qml_cache -o $@ $(filter %.qrc, $^)
+	$(AM_V_GEN)$(QMLCACHEGEN) --resource=$(srcdir)/qml.qrc -o $@ $<
 
 #output name matters here
-qmlcache_loader.cpp: vlc.qrc qml_cache.qrc $(libqt_plugin_la_QML)
-	$(AM_V_GEN)$(QMLCACHEGEN) --resource-file-mapping=$<=qml_cache.qrc $< -o $@
+qmlcache_loader.cpp: $(libqt_plugin_la_QML)
+qmlcache_loader.cpp: qml.qrc
+	$(AM_V_GEN)$(QMLCACHEGEN) $< -o $@
 
 else
 
 EXTRA_DIST += $(libqt_plugin_la_QML)
 
-resources.cpp: $(lib_qt_plugin_la_QRC) $(libqt_plugin_la_RES) $(libqt_plugin_la_QML)
-	$(AM_V_GEN)$(RCC) --name vlc -o $@ $(filter %.qrc, $^)
-
 endif
+
+assets.cpp: $(libqt_plugin_la_RES)
+assets.cpp: assets.qrc
+	$(AM_V_GEN)$(RCC) --name assets -o $@ $<
+
+qml.cpp: $(libqt_plugin_la_QML)
+qml.cpp: qml.qrc
+	$(AM_V_GEN)$(RCC) --name qml -o $@ $<
+
 
 if HAVE_QT_GTK
 libqt_gtktheme_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(GTK3_CFLAGS)
@@ -1250,7 +1254,7 @@ QML_LOG_COMPILER = $(builddir)/qml_test -input
 
 if HAVE_QT_QUICK_TEST
 qml_test_SOURCES = tests/qml_test.cpp
-nodist_qml_test_SOURCES = resources.cpp
+nodist_qml_test_SOURCES = qml.cpp assets.cpp
 if HAVE_QMLCACHEGEN
 nodist_qml_test_SOURCES += qmlcache_loader.cpp $(libqt_plugin_la_QML)
 endif
