@@ -83,12 +83,10 @@ endif
 	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
 	# FormatMessageA is available on all Windows versions, even WinRT
 	$(APPLY) $(SRC)/live555/live555-formatmessage.patch
-ifdef HAVE_ANDROID
 	# ifaddrs.h is supported since API level 24
 	$(APPLY) $(SRC)/live555/android-no-ifaddrs.patch
 	# Don't use unavailable off64_t functions
 	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
-endif
 	cd $(UNPACK_DIR) && sed -i.orig "s,LIBRARY_LINK =.*,LIBRARY_LINK = $(AR) cr ,g" config.macosx*
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
