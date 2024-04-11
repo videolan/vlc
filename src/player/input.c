@@ -949,7 +949,7 @@ input_thread_Events(input_thread_t *input_thread,
                 const struct vlc_player_timer_point point = {
                     .position = input->position,
                     .rate = input->rate,
-                    .ts = input->time + input->normal_time,
+                    .ts = input->time,
                     .length = input->length,
                     .system_date = system_date,
                 };
