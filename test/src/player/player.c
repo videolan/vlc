@@ -2636,6 +2636,7 @@ test_timers(struct ctx *ctx)
         for (size_t j = 0; j < ARRAY_SIZE(df_min_test_list); ++j)
         {
             unsigned minute = df_min_test_list[j];
+            vlc_tick_t check_duration = VLC_TICK_FROM_SEC(2);
 
             struct media_params params =
                 DEFAULT_MEDIA_PARAMS(minute * VLC_TICK_FROM_SEC(60)
@@ -2646,10 +2647,14 @@ test_timers(struct ctx *ctx)
             params.video_frame_rate = fps * 1000;
             params.video_frame_rate_base = 1001;
 
+            /* This will prevent a RESET_PCR and ensure we receive all outputs
+             * points. */
+            params.pts_delay = check_duration;
+
             player_set_current_mock_media(ctx, "media1", &params, false);
             player_set_rate(ctx, 24);
 
-            vlc_player_SetTime(player, params.length - VLC_TICK_FROM_SEC(2));
+            vlc_player_SetTime(player, params.length - check_duration);
 
             player_start(ctx);
 
