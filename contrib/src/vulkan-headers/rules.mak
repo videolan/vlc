@@ -13,8 +13,9 @@ VULKAN_HEADERS_MIN_VERSION_NAME := $(subst $() ,_,$(wordlist 1,2,$(VULKAN_HEADER
 # VK_VERSION_X_Y header guard defines instead to detect major/minor, and
 # then use VK_HEADER_VERSION which is not defined as a cast for the patch
 # version.
-define VULKAN_HEADERS_CHECK := # include <vulkan/vulkan_core.h> \n
-# if defined(VK_VERSION_$(VULKAN_HEADERS_MIN_VERSION_NAME))) \\n
+define VULKAN_HEADERS_CHECK :=
+# include <vulkan/vulkan_core.h> \n
+# if defined(VK_VERSION_$(VULKAN_HEADERS_MIN_VERSION_NAME)) \n
 #    && VK_HEADER_VERSION >= $(lastword $(VULKAN_HEADERS_MIN_VERSION_LIST)) \n
 #  define VULKAN_HEADERS_OK \n
 # endif \n
