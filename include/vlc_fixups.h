@@ -333,7 +333,9 @@ time_t timegm(struct tm *);
 #endif
 
 #ifndef HAVE_TIMESPEC_GET
+#ifndef TIME_UTC
 #define TIME_UTC 1
+#endif
 struct timespec;
 int timespec_get(struct timespec *, int);
 #endif
