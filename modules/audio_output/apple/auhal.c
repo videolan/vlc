@@ -1105,6 +1105,7 @@ StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
 
     /* Set volume for output unit */
     VolumeSet(p_aout, p_sys->f_volume);
+    MuteSet(p_aout, var_InheritBool(p_aout, "mute"));
 
     free(layout);
 
