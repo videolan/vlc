@@ -35,17 +35,27 @@ EXTRA_LTLIBRARIES += libmtp_plugin.la
 sd_PLUGINS += $(LTLIBmtp)
 
 libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.hpp \
-			    services_discovery/upnp-wrapper.hpp \
-			    services_discovery/upnp-wrapper.cpp \
-			    stream_out/renderer_common.hpp \
-			    stream_out/renderer_common.cpp \
-			    stream_out/dlna/profile_names.hpp \
-			    stream_out/dlna/dlna_common.hpp \
-			    stream_out/dlna/dlna.hpp \
-			    stream_out/dlna/dlna.cpp
+	services_discovery/upnp-wrapper.hpp \
+	services_discovery/upnp-wrapper.cpp \
+	stream_out/renderer_common.hpp \
+	stream_out/renderer_common.cpp \
+	stream_out/dlna/profile_names.hpp \
+	stream_out/dlna/dlna_common.hpp \
+	stream_out/dlna/dlna.hpp \
+	stream_out/dlna/dlna.cpp \
+	control/upnp_server/ml.hpp \
+	control/upnp_server/xml_wrapper.hpp \
+	control/upnp_server/upnp_server.hpp \
+	control/upnp_server/utils.cpp \
+	control/upnp_server/utils.hpp \
+	control/upnp_server/upnp_server.cpp
 libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
 libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)
+libupnp_plugin_la_RES = ../share/upnp_server/ContentDirectory.xml \
+	../share/upnp_server/ConnectionManager.xml
+dist_libupnp_plugin_la_DATA = $(libupnp_plugin_la_RES)
+libupnp_plugin_ladir = $(prefix)/share/vlc/upnp_server
 EXTRA_LTLIBRARIES += libupnp_plugin.la
 sd_PLUGINS += $(LTLIBupnp)
 if HAVE_OSX

@@ -55,6 +55,12 @@ if upnp_dep.found()
             'upnp-wrapper.cpp',
             '../stream_out/renderer_common.cpp',
             '../stream_out/dlna/dlna.cpp',
+	        '../control/upnp_server/ml.hpp',
+	        '../control/upnp_server/xml_wrapper.hpp',
+	        '../control/upnp_server/upnp_server.hpp',
+	        '../control/upnp_server/utils.cpp',
+	        '../control/upnp_server/utils.hpp',
+	        '../control/upnp_server/upnp_server.cpp',
             ),
         'dependencies' : [contrib_dep, upnp_dep, upnp_darwin_deps]
     }
