@@ -167,6 +167,15 @@ const dlna_profile_t default_video_profile = {
     VLC_CODEC_MP4A,
 };
 
+const dlna_profile_t default_image_profile = {
+    "JPEG_MED",
+    "jpg",
+    "image/jpeg",
+    DLNA_CLASS_IMAGE,
+    VLC_CODEC_JPEG,
+    VLC_CODEC_NONE,
+};
+
 static const std::vector<dlna_profile_t> dlna_profile_list = {
 
     default_audio_profile,
