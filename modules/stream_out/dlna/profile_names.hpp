@@ -167,7 +167,7 @@ const dlna_profile_t default_video_profile = {
     VLC_CODEC_MP4A,
 };
 
-std::vector<dlna_profile_t> dlna_profile_list = {
+static const std::vector<dlna_profile_t> dlna_profile_list = {
 
     default_audio_profile,
     default_video_profile,
