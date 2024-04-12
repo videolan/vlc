@@ -180,6 +180,8 @@ vlc_module_begin()
         set_callbacks(Server::open, Server::close);
 
         add_string(SERVER_PREFIX "name", SERVER_DEFAULT_NAME, SERVER_NAME_DESC, SERVER_NAME_LONGTEXT)
+        add_bool(SERVER_PREFIX "share-private-media", false, SERVER_SHARE_PRIVATE_MEDIA_TEXT, SERVER_SHARE_PRIVATE_MEDIA_LONGTEXT);
+            change_volatile();
 
 vlc_module_end()
 

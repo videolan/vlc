@@ -33,6 +33,7 @@ namespace ml
 
 struct MediaLibraryContext {
     vlc_medialibrary_t *handle;
+    bool share_private_media;
 };
 
 static const vlc_ml_query_params_t PUBLIC_ONLY_QP = [] {
@@ -103,7 +104,7 @@ template <typename MLObject, vlc_ml_get_queries GetQuery> struct Object
             throw errors::UnknownObject();
 
         Ptr ptr{obj, static_cast<void (*)(MLObject *)>(&vlc_ml_release)};
-        if (is_ml_object_private(ml, ptr.get()))
+        if (!ml.share_private_media && is_ml_object_private(ml, ptr.get()))
             throw errors::ForbiddenAccess();
         return ptr;
     }
@@ -128,7 +129,7 @@ struct List : Object
         int status;
 
         vlc_ml_query_params_t params = vlc_ml_query_params_create();
-        params.b_public_only = true;
+        params.b_public_only = !ml.share_private_media;
 
         if (id.has_value())
             status = vlc_ml_list(ml.handle, CountQuery, &params, *id, &res);
@@ -153,7 +154,7 @@ struct List : Object
         int status;
 
         vlc_ml_query_params_t extra_params = *params;
-        extra_params.b_public_only = true;
+        extra_params.b_public_only = !ml.share_private_media;
 
         if (id.has_value())
             status = vlc_ml_list(ml.handle, ListQuery, &extra_params, *id, &res);

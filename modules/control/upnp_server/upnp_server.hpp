@@ -28,6 +28,11 @@
 #define SERVER_DEFAULT_NAME N_("VLC Media Server")
 #define SERVER_NAME_DESC N_("Upnp server name")
 #define SERVER_NAME_LONGTEXT N_("The client exposed upnp server name")
+#define SERVER_SHARE_PRIVATE_MEDIA_TEXT N_("Share private media")
+#define SERVER_SHARE_PRIVATE_MEDIA_LONGTEXT                                                        \
+    N_("Every media indexed by the media library will be exposed by the UPNP server regardless "   \
+       "of their public/private status. This option needs to be explicitely set at each startup "  \
+       "of VLC to avoid unnoticed private media leaks on the network.")
 
 struct vlc_object_t;
 

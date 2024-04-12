@@ -561,7 +561,8 @@ int open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     intf->p_sys = sys;
 
-    sys->p_ml = ml::MediaLibraryContext{vlc_ml_instance_get(p_this)};
+    const bool share_private_media = var_InheritBool(p_this, SERVER_PREFIX "share-private-media");
+    sys->p_ml = ml::MediaLibraryContext{vlc_ml_instance_get(p_this), share_private_media};
     if (!sys->p_ml.handle)
     {
         msg_Err(intf, "Medialibrary not initialized");
