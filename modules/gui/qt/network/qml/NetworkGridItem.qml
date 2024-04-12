@@ -23,6 +23,7 @@ import Qt5Compat.GraphicalEffects
 import org.videolan.vlc 0.1
 
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///style/"
 
 Widgets.GridItem {
@@ -84,6 +85,28 @@ Widgets.GridItem {
             return ""
         } else {
             return model.mrl
+        }
+    }
+
+    pictureOverlay: Item {
+        width: root.pictureWidth
+        height: root.pictureHeight
+
+        Widgets.VideoProgressBar {
+            id: progressBar
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+
+            visible: (model.progress ?? - 1) > 0
+
+            radius: root.pictureRadius
+            value:  visible
+                    ? Helpers.clamp(model.progress, 0, 1)
+                    : 0
         }
     }
 }
