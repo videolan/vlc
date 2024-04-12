@@ -142,6 +142,13 @@ LN_S = cp -R
 endif
 endif
 
+ifdef HAVE_ANDROID
+# Android NDK has vulkan headers but vulkan.h from the sysroot but it is not
+# the actual vulkan version from the Android NDK, the proper one is located
+# in this third_party folder
+EXTRA_CFLAGS += -isystem$(ANDROID_NDK)/sources/third_party/vulkan/src/include
+endif
+
 ifdef HAVE_SOLARIS
 ifeq ($(ARCH),x86_64)
 EXTRA_CFLAGS += -m64
