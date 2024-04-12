@@ -117,6 +117,20 @@ dump_resources(xml::Element &dest, const vlc_ml_media_t &media, const std::strin
 
         dest.add_child(std::move(elem));
     }
+
+    // Subtitles, for now we only share the first available subtitle file.
+    const auto subtitles = utils::get_media_files(media, VLC_ML_FILE_TYPE_SUBTITLE);
+    if (!subtitles.empty())
+    {
+        const vlc_ml_file_t &sub = subtitles.front();
+        const auto file_extension = utils::file_extension(sub.psz_mrl);
+        const std::string url = utils::get_server_url() + "subtitle/" + std::to_string(media.i_id) +
+                                "." + file_extension;
+
+        auto res = doc.create_element("res", doc.create_text_node(url.c_str()));
+        res.set_attribute("protocolInfo", ("http-get:*:text/" + file_extension + ":*").c_str());
+        dest.add_child(std::move(res));
+    }
 }
 
 void Item::dump_mlobject_metadata(xml::Element &dest,
