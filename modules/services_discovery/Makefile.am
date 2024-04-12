@@ -65,7 +65,8 @@ libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
 libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)
 libupnp_plugin_la_RES = ../share/upnp_server/ContentDirectory.xml \
-	../share/upnp_server/ConnectionManager.xml
+	../share/upnp_server/ConnectionManager.xml \
+	../share/upnp_server/X_MS_MediaReceiverRegistrar.xml
 dist_libupnp_plugin_la_DATA = $(libupnp_plugin_la_RES)
 libupnp_plugin_ladir = $(prefix)/share/vlc/upnp_server
 EXTRA_LTLIBRARIES += libupnp_plugin.la

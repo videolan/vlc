@@ -249,6 +249,20 @@ static void handle_action_request(UpnpActionRequest *p_request, intf_thread_t *p
             UpnpActionRequest_set_ActionResult(p_request, action_result);
         }
     }
+    else if (strcmp(service_id, "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar") == 0)
+    {
+        // We need a mockup of this service to support Microsoft devices and clients.
+        if (strcmp(action_name, "IsAuthorized") == 0)
+        {
+            UpnpAddToActionResponse(&action_result, action_name, CDS_ID, "Result", "1");
+            UpnpActionRequest_set_ActionResult(p_request, action_result);
+        }
+        else if (strcmp(action_name, "IsValidated") == 0)
+        {
+            UpnpAddToActionResponse(&action_result, action_name, CDS_ID, "Result", "1");
+            UpnpActionRequest_set_ActionResult(p_request, action_result);
+        }
+    }
 }
 
 static int Callback(Upnp_EventType event_type, const void *event, void *cookie)
@@ -414,9 +428,28 @@ static xml::Document make_server_identity(const char *uuid, const char *server_n
             ret.create_element("modelURL", ret.create_text_node("https://videolan.org/vlc/")),
             ret.create_element("serialNumber", ret.create_text_node("1")),
             ret.create_element("UDN", ret.create_text_node(uuid_attr.c_str())),
-            ret.create_element("serviceList",
-                               service_elem("ConnectionManager"),
-                               service_elem("ContentDirectory"))));
+            ret.create_element(
+                "serviceList",
+                service_elem("ConnectionManager"),
+                service_elem("ContentDirectory"),
+
+                ret.create_element(
+                    "service",
+                    ret.create_element(
+                        "serviceType",
+                        ret.create_text_node(
+                            "urn:microsoft.com:service:X_MS_MediaReceiverRegistrar:1")),
+                    ret.create_element(
+                        "serviceId",
+                        ret.create_text_node(
+                            "urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar")),
+                    ret.create_element("SCPDURL",
+                                       ret.create_text_node("/X_MS_MediaReceiverRegistrar.xml")),
+                    ret.create_element(
+                        "controlURL", ret.create_text_node("/X_MS_MediaReceiverRegistrar/Control")),
+                    ret.create_element(
+                        "eventSubURL",
+                        ret.create_text_node("/X_MS_MediaReceiverRegistrar/Event"))))));
     root.set_attribute("xmlns", "urn:schemas-upnp-org:device-1-0");
 
     ret.set_entry(std::move(root));
