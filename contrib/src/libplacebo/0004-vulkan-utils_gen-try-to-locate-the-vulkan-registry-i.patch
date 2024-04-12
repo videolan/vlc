@@ -1,0 +1,25 @@
+From 5acce05c63c7b0f4a952d1258153da283b95bf8a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 12 Apr 2024 08:12:45 +0200
+Subject: [PATCH 4/4] vulkan/utils_gen: try to locate the vulkan registry in
+ the Android NDK
+
+---
+ src/vulkan/utils_gen.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/vulkan/utils_gen.py b/src/vulkan/utils_gen.py
+index 4bbe185b..4fe4a2d6 100644
+--- a/src/vulkan/utils_gen.py
++++ b/src/vulkan/utils_gen.py
+@@ -215,6 +215,7 @@ def find_registry_xml(datadir):
+         '$MINGW_PREFIX/share/vulkan/registry/vk.xml',
+         '%VULKAN_SDK%/share/vulkan/registry/vk.xml',
+         '$VULKAN_SDK/share/vulkan/registry/vk.xml',
++        '$ANDROID_NDK/sources/third_party/vulkan/src/registry/vk.xml',
+         '/usr/share/vulkan/registry/vk.xml',
+     ]
+ 
+-- 
+2.37.3.windows.1
+
