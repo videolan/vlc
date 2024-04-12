@@ -57,6 +57,7 @@ using MediaFileRef = ConstRef<vlc_ml_file_t>;
 std::vector<MediaFileRef> get_media_files(const vlc_ml_media_t &media, vlc_ml_file_type_t);
 
 std::string album_thumbnail_url(const vlc_ml_album_t &);
+std::string thumbnail_url(const vlc_ml_media_t &media, vlc_ml_thumbnail_size_t size);
 
 namespace http
 {

@@ -477,6 +477,7 @@ static bool init_upnp(intf_thread_t *intf)
     UpnpVirtualDir_set_CloseCallback(reinterpret_cast<VDCallback_Close>(close_cb));
 
     UpnpAddVirtualDir("/media", intf, nullptr);
+    UpnpAddVirtualDir("/thumbnail", intf, nullptr);
 
     res = UpnpSendAdvertisement(sys->p_device_handle, 1800);
     if (res != UPNP_E_SUCCESS)

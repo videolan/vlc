@@ -100,6 +100,23 @@ dump_resources(xml::Element &dest, const vlc_ml_media_t &media, const std::strin
     const auto main_files = utils::get_media_files(media, VLC_ML_FILE_TYPE_MAIN);
 
     dest.add_child(make_resource(doc, media, v_tracks, main_files, file_extension));
+
+    // Thumbnails
+    for (int i = 0; i < VLC_ML_THUMBNAIL_SIZE_COUNT; ++i)
+    {
+        const auto &thumbnail = media.thumbnails[i];
+        if (thumbnail.i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
+            continue;
+        const auto thumbnail_extension = utils::file_extension(std::string(thumbnail.psz_mrl));
+        const auto url = utils::thumbnail_url(media, static_cast<vlc_ml_thumbnail_size_t>(i));
+        auto elem = doc.create_element("res", doc.create_text_node(url.c_str()));
+
+        const utils::MimeType mime{"image", "jpeg"};
+        const auto protocol_info = utils::http::get_dlna_extra_protocol_info(mime);
+        elem.set_attribute("protocolInfo", protocol_info.c_str());
+
+        dest.add_child(std::move(elem));
+    }
 }
 
 void Item::dump_mlobject_metadata(xml::Element &dest,

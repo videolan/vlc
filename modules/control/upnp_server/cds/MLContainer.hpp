@@ -29,6 +29,7 @@
 #include "../ml.hpp"
 #include "Container.hpp"
 #include "Item.hpp"
+#include "../utils.hpp"
 
 namespace cds
 {
@@ -114,12 +115,15 @@ template <typename MLHelper> class MLContainer : public Container
 
         dest.set_attribute("childCount", std::to_string(album.i_nb_tracks).c_str());
 
+        const auto album_thumbnail_url = utils::album_thumbnail_url(album);
         dest.add_children(
             doc.create_element("upnp:artist", doc.create_text_node(album.psz_artist)),
             doc.create_element("upnp:class",
                                doc.create_text_node("object.container.album.musicAlbum")),
             doc.create_element("dc:title", doc.create_text_node(album.psz_title)),
-            doc.create_element("dc:description", doc.create_text_node(album.psz_summary)));
+            doc.create_element("dc:description", doc.create_text_node(album.psz_summary)),
+            doc.create_element("upnp:albumArtURI",
+                               doc.create_text_node(album_thumbnail_url.c_str())));
     }
 
     void dump_mlobject_metadata(xml::Element &dest, const vlc_ml_artist_t &artist) const

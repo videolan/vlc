@@ -155,6 +155,19 @@ std::string album_thumbnail_url(const vlc_ml_album_t &album)
            thumbnail_extension;
 }
 
+std::string thumbnail_url(const vlc_ml_media_t &media, vlc_ml_thumbnail_size_t size)
+{
+    std::stringstream ss;
+    const std::string s_size = size == VLC_ML_THUMBNAIL_SMALL ? "small" : "banner";
+    const auto &thumbnail = media.thumbnails[size];
+
+    const auto thumbnail_extension = file_extension(std::string(thumbnail.psz_mrl));
+    ss << get_server_url() << "thumbnail/" << s_size << "/media/" << media.i_id << '.'
+       << thumbnail_extension;
+
+    return ss.str();
+}
+
 namespace http
 {
 
@@ -192,8 +205,13 @@ std::string get_dlna_extra_protocol_info(const MimeType &mime)
 {
     // TODO We should change that to a better profile selection using profiles in dlna.hpp
     // as soon as more info on media tracks are available in the medialibrary
-    dlna_profile_t profile =
-        mime.media_type == "audio" ? default_audio_profile : default_video_profile;
+    dlna_profile_t profile;
+    if (mime.media_type == "audio")
+        profile = default_audio_profile;
+    else if (mime.media_type == "image")
+        profile = default_image_profile;
+    else
+        profile = default_video_profile;
     profile.mime = mime.combine();
 
     const protocol_info_t info{
