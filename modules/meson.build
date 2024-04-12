@@ -381,7 +381,7 @@ foreach module : vlc_modules
 endforeach
 
 # Rust/cargo common handling code
-if get_option('rust')
+if get_option('rust').enabled()
     rust_optimization_args = {
         'plain': [],
         '0': [],
