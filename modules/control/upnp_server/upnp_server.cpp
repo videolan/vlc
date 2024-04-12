@@ -385,6 +385,16 @@ static xml::Document make_server_identity(const char *uuid, const char *server_n
 {
     xml::Document ret;
 
+    const auto icon_elem =
+        [&ret](const char *url, const char *width, const char *height) -> xml::Element {
+        return ret.create_element("icon",
+                                  ret.create_element("mimetype", ret.create_text_node("image/png")),
+                                  ret.create_element("width", ret.create_text_node(width)),
+                                  ret.create_element("height", ret.create_text_node(height)),
+                                  ret.create_element("depth", ret.create_text_node("8")),
+                                  ret.create_element("url", ret.create_text_node(url)));
+    };
+
     const auto service_elem = [&ret](const char *service) -> xml::Element {
         const auto type = std::string("urn:schemas-upnp-org:service:") + service + ":1";
         const auto id = std::string("urn:upnp-org:serviceId:") + service;
@@ -428,6 +438,9 @@ static xml::Document make_server_identity(const char *uuid, const char *server_n
             ret.create_element("modelURL", ret.create_text_node("https://videolan.org/vlc/")),
             ret.create_element("serialNumber", ret.create_text_node("1")),
             ret.create_element("UDN", ret.create_text_node(uuid_attr.c_str())),
+            ret.create_element("iconList",
+                               icon_elem("/vlc.png", "32", "32"),
+                               icon_elem("/vlc512x512.png", "512", "512")),
             ret.create_element(
                 "serviceList",
                 service_elem("ConnectionManager"),
