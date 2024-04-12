@@ -1,6 +1,6 @@
 # TagLib
 
-TAGLIB_VERSION := 2.0
+TAGLIB_VERSION := 2.0.1
 TAGLIB_URL := $(GITHUB)/taglib/taglib/releases/download/v$(TAGLIB_VERSION)/taglib-$(TAGLIB_VERSION).tar.gz
 
 UTFCPP_VERSION := 3.2.5
