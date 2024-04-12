@@ -5,7 +5,6 @@ PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
 PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
 PLACEBOCONF := -Dpython-path=$(PYTHON_VENV)/bin/python3 \
-	-Dvulkan-registry=${PREFIX}/share/vulkan/registry/vk.xml \
 	-Dglslang=enabled \
 	-Dshaderc=disabled \
 	-Ddemos=false \
