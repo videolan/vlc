@@ -34,6 +34,7 @@
 #include <vlc_interface.h>
 #include <vlc_rand.h>
 
+#include "FileHandler.hpp"
 #include "ml.hpp"
 #include "upnp_server.hpp"
 #include "utils.hpp"
@@ -182,6 +183,89 @@ static int Callback(Upnp_EventType event_type, const void *event, void *cookie)
     return UPNP_E_SUCCESS;
 }
 
+// UPNP Callbacks
+
+static int
+getinfo_cb(const char *url, UpnpFileInfo *info, intf_thread_t *intf, FileHandler **fhandler)
+{
+    const char *user_agent = UpnpFileInfo_get_Os_cstr(info);
+    if (user_agent == nullptr)
+        return UPNP_E_BAD_REQUEST;
+
+    msg_Dbg(intf, "GetInfo callback on: \"%s\" from: \"%s\"", url, user_agent);
+
+    UpnpFileInfo_set_IsReadable(info, true);
+    UpnpFileInfo_set_IsDirectory(info, false);
+
+    auto file_handler = parse_url(url, intf->p_sys->p_ml);
+
+    if (file_handler == nullptr)
+        return UPNP_E_FILE_NOT_FOUND;
+
+    file_handler->get_info(*info);
+
+    // Pass the filehandler ownership to the open callback to avoid reparsing the url
+    *fhandler = file_handler.release();
+
+    return UPNP_E_SUCCESS;
+}
+
+static UpnpWebFileHandle
+open_cb(const char *url, enum UpnpOpenFileMode, intf_thread_t *intf, FileHandler *file_handler)
+{
+    msg_Dbg(intf, "Opening: %s", url);
+
+    FileHandler *ret = file_handler;
+    if (!ret)
+        ret = parse_url(url, intf->p_sys->p_ml).release();
+
+    if (ret == nullptr)
+        return nullptr;
+
+    if (!ret->open(VLC_OBJECT(intf)))
+    {
+        msg_Err(intf, "Failed to open %s", url);
+        delete ret;
+        return nullptr;
+    }
+    return ret;
+}
+
+static int
+read_cb(UpnpWebFileHandle fileHnd, uint8_t buf[], size_t buflen, intf_thread_t *intf, const void *)
+{
+    assert(fileHnd);
+
+    auto *impl = static_cast<FileHandler *>(fileHnd);
+    const size_t bytes_read = impl->read(buf, buflen);
+
+    msg_Dbg(intf, "http read callback, %zub requested %zub returned", buflen, bytes_read);
+
+    return bytes_read;
+}
+
+static int
+seek_cb(UpnpWebFileHandle fileHnd, off_t offset, int origin, intf_thread_t *intf, const void *)
+{
+    assert(fileHnd);
+    msg_Dbg(
+        intf, "http seek callback offset: %jd origin: %d", static_cast<intmax_t>(offset), origin);
+
+    auto *impl = static_cast<FileHandler *>(fileHnd);
+    const auto seek_type = static_cast<FileHandler::SeekType>(origin);
+    const bool success = impl->seek(seek_type, offset);
+
+    return success == true ? 0 : -1;
+}
+
+static int close_cb(UpnpWebFileHandle fileHnd, intf_thread_t *intf, const void *)
+{
+    assert(fileHnd);
+    msg_Dbg(intf, "http close callback");
+    delete static_cast<FileHandler *>(fileHnd);
+    return 0;
+}
+
 static xml::Document make_server_identity(const char *uuid, const char *server_name)
 {
     xml::Document ret;
@@ -246,7 +330,26 @@ static bool init_upnp(intf_thread_t *intf)
     vlc_rand_bytes(uuid, sizeof(uuid));
     sys->uuid = vlc::wrap_cptr(addons_uuid_to_psz(&uuid), &free);
 
-    int res;
+    int res = UpnpEnableWebserver(true);
+    if (res != UPNP_E_SUCCESS)
+    {
+        msg_Err(intf, "Enabling libupnp webserver failed: %s", UpnpGetErrorMessage(res));
+        return false;
+    }
+
+    msg_Info(intf, "Upnp server enabled on %s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
+
+    const auto str_rootdir = utils::get_root_dir();
+
+    res = UpnpSetWebServerRootDir(str_rootdir.c_str());
+    msg_Dbg(intf, "Webserver root dir set to: \"%s\"", str_rootdir.c_str());
+    if (res != UPNP_E_SUCCESS)
+    {
+        msg_Err(intf, "Setting webserver root dir failed: %s", UpnpGetErrorMessage(res));
+        UpnpEnableWebserver(false);
+        return false;
+    }
+
     const auto server_name = vlc::wrap_cptr(var_InheritString(intf, SERVER_PREFIX "name"), &free);
     assert(server_name);
     const auto presentation_doc = make_server_identity(sys->uuid.get(), server_name.get());
@@ -261,15 +364,25 @@ static bool init_upnp(intf_thread_t *intf)
                                   &sys->p_device_handle);
     if (res != UPNP_E_SUCCESS)
     {
-        msg_Err(intf, "server: registration failed: %s", UpnpGetErrorMessage(res));
+        msg_Err(intf, "Registration failed: %s", UpnpGetErrorMessage(res));
+        UpnpEnableWebserver(false);
         return false;
     }
+
+    UpnpVirtualDir_set_GetInfoCallback(reinterpret_cast<VDCallback_GetInfo>(getinfo_cb));
+    UpnpVirtualDir_set_OpenCallback(reinterpret_cast<VDCallback_Open>(open_cb));
+    UpnpVirtualDir_set_ReadCallback(reinterpret_cast<VDCallback_Read>(read_cb));
+    UpnpVirtualDir_set_SeekCallback(reinterpret_cast<VDCallback_Seek>(seek_cb));
+    UpnpVirtualDir_set_CloseCallback(reinterpret_cast<VDCallback_Close>(close_cb));
+
+    UpnpAddVirtualDir("/media", intf, nullptr);
 
     res = UpnpSendAdvertisement(sys->p_device_handle, 1800);
     if (res != UPNP_E_SUCCESS)
     {
         msg_Dbg(intf, "Advertisement failed: %s", UpnpGetErrorMessage(res));
         UpnpUnRegisterRootDevice(sys->p_device_handle);
+        UpnpEnableWebserver(false);
         return false;
     }
 
@@ -321,6 +434,7 @@ void close(vlc_object_t *p_this)
     intf_thread_t *intf = container_of(p_this, intf_thread_t, obj);
     intf_sys_t *sys = intf->p_sys;
     UpnpUnRegisterRootDevice(sys->p_device_handle);
+    UpnpEnableWebserver(false);
     delete sys;
 }
 } // namespace Server

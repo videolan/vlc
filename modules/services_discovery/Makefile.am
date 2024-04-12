@@ -48,6 +48,8 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 	control/upnp_server/upnp_server.hpp \
 	control/upnp_server/utils.cpp \
 	control/upnp_server/utils.hpp \
+	control/upnp_server/FileHandler.cpp \
+	control/upnp_server/FileHandler.hpp \
 	control/upnp_server/upnp_server.cpp
 libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
 libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(sd_RPATH)

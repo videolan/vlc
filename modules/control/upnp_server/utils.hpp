@@ -23,14 +23,39 @@
 #define UTILS_HPP
 
 #include <string>
+#include <upnp/list.h>
+#include <vector>
+
+#include <vlc_media_library.h>
 
 struct sockaddr_storage;
 
 namespace utils
 {
+struct MimeType
+{
+    std::string media_type;
+    std::string file_type;
+
+    std::string combine() const { return media_type + '/' + file_type; }
+};
+
+MimeType get_mimetype(vlc_ml_media_type_t type, const std::string &file_extension) noexcept;
+
 std::string get_server_url();
+std::string get_root_dir();
 
 std::string addr_to_string(const sockaddr_storage *addr);
+
+template <typename T> using ConstRef = std::reference_wrapper<const T>;
+
+using MediaFileRef = ConstRef<vlc_ml_file_t>;
+std::vector<MediaFileRef> get_media_files(const vlc_ml_media_t &media, vlc_ml_file_type_t);
+
+namespace http
+{
+void add_response_hdr(UpnpListHead *list, const std::pair<std::string, std::string> resp);
+} // namespace http
 } // namespace utils
 
 #endif /* UTILS_HPP */
