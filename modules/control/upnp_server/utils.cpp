@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <cassert>
 #include <sstream>
+#include <stream_out/dlna/dlna.hpp>
 #include <string>
 #include <upnp/upnp.h>
 #if UPNP_VERSION >= 11400
@@ -48,7 +49,6 @@
 
 namespace utils
 {
-
 MimeType get_mimetype(vlc_ml_media_type_t type, const std::string &file_extension) noexcept
 {
     const char *mime_end = file_extension.c_str();
@@ -67,6 +67,14 @@ MimeType get_mimetype(vlc_ml_media_type_t type, const std::string &file_extensio
         default:
             vlc_assert_unreachable();
     }
+}
+
+std::string file_extension(const std::string &file)
+{
+    auto pos = file.find_last_of('.');
+    if (pos == std::string::npos)
+        return {};
+    return file.substr(pos + 1);
 }
 
 std::string get_server_url()
@@ -107,6 +115,21 @@ std::string addr_to_string(const sockaddr_storage *addr)
     return buff;
 }
 
+std::vector<MediaTrackRef> get_media_tracks(const vlc_ml_media_t &media, vlc_ml_track_type_t type)
+{
+    std::vector<MediaTrackRef> ret;
+
+    if (media.p_tracks == nullptr)
+        return ret;
+    for (unsigned i = 0; i < media.p_tracks->i_nb_items; ++i)
+    {
+        const auto &track = media.p_tracks->p_items[i];
+        if (track.i_type == type)
+            ret.emplace_back(track);
+    }
+    return ret;
+}
+
 std::vector<MediaFileRef> get_media_files(const vlc_ml_media_t &media, vlc_ml_file_type_t type)
 {
     std::vector<MediaFileRef> ret;
@@ -120,6 +143,16 @@ std::vector<MediaFileRef> get_media_files(const vlc_ml_media_t &media, vlc_ml_fi
             ret.emplace_back(file);
     }
     return ret;
+}
+
+std::string album_thumbnail_url(const vlc_ml_album_t &album)
+{
+    const auto &thumbnail = album.thumbnails[VLC_ML_THUMBNAIL_SMALL];
+    if (thumbnail.i_status != VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
+        return "";
+    const auto thumbnail_extension = file_extension(std::string(thumbnail.psz_mrl));
+    return get_server_url() + "thumbnail/small/album/" + std::to_string(album.i_id) + "." +
+           thumbnail_extension;
 }
 
 namespace http
@@ -153,6 +186,28 @@ void add_response_hdr(UpnpListHead *list, const std::pair<std::string, std::stri
     UpnpExtraHeaders_set_resp(hdr, resp_str.c_str());
     UpnpListInsert(
         list, UpnpListEnd(list), const_cast<UpnpListHead *>(UpnpExtraHeaders_get_node(hdr)));
+}
+
+std::string get_dlna_extra_protocol_info(const MimeType &mime)
+{
+    // TODO We should change that to a better profile selection using profiles in dlna.hpp
+    // as soon as more info on media tracks are available in the medialibrary
+    dlna_profile_t profile =
+        mime.media_type == "audio" ? default_audio_profile : default_video_profile;
+    profile.mime = mime.combine();
+
+    const protocol_info_t info{
+        DLNA_TRANSPORT_PROTOCOL_HTTP,
+        DLNA_ORG_CONVERSION_NONE,
+        profile,
+    };
+
+    const dlna_org_flags_t flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
+                                   DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
+                                   DLNA_ORG_FLAG_CONNECTION_STALL | DLNA_ORG_FLAG_DLNA_V15;
+    const dlna_org_operation_t op = DLNA_ORG_OPERATION_RANGE;
+
+    return dlna_write_protocol_info(info, flags, op);
 }
 
 } // namespace http

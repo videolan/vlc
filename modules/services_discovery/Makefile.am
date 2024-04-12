@@ -43,6 +43,16 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 	stream_out/dlna/dlna_common.hpp \
 	stream_out/dlna/dlna.hpp \
 	stream_out/dlna/dlna.cpp \
+	control/upnp_server/cds/Object.hpp \
+	control/upnp_server/cds/Container.hpp \
+	control/upnp_server/cds/FixedContainer.cpp \
+	control/upnp_server/cds/FixedContainer.hpp \
+	control/upnp_server/cds/Item.cpp \
+	control/upnp_server/cds/Item.hpp \
+	control/upnp_server/cds/MLContainer.hpp \
+	control/upnp_server/cds/MLFolderContainer.hpp \
+	control/upnp_server/cds/cds.cpp \
+	control/upnp_server/cds/cds.hpp \
 	control/upnp_server/ml.hpp \
 	control/upnp_server/xml_wrapper.hpp \
 	control/upnp_server/upnp_server.hpp \
