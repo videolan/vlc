@@ -30,7 +30,6 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <iomanip>
 
 #include <vlc_configuration.h>
 #include <vlc_cxx_helpers.hpp>
@@ -108,34 +107,11 @@ static char *getServerIPAddress() {
 
 std::string dlna_write_protocol_info (const protocol_info_t info)
 {
-    std::ostringstream protocol;
-
-    if (info.transport == DLNA_TRANSPORT_PROTOCOL_HTTP)
-        protocol << "http-get:*:";
-
-    protocol << info.profile.mime;
-    protocol << ":";
-
-    if (info.profile.name != "*")
-        protocol << "DLNA.ORG_PN=" << info.profile.name.c_str() << ";";
-
-    dlna_org_flags_t flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
-                             DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
-                             DLNA_ORG_FLAG_CONNECTION_STALL |
-                             DLNA_ORG_FLAG_DLNA_V15;
-
-    protocol << std::setfill('0')
-        << "DLNA.ORG_OP="
-        << std::hex << std::setw(2)
-        << DLNA_ORG_OPERATION_RANGE
-        << ";DLNA.ORG_CI="
-        << std::dec << info.ci
-        << ";DLNA.ORG_FLAGS="
-        << std::hex
-        << std::setw(8) << flags
-        << std::setw(24) << 0;
-
-    return protocol.str();
+    const dlna_org_flags_t flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
+                                   DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
+                                   DLNA_ORG_FLAG_CONNECTION_STALL |
+                                   DLNA_ORG_FLAG_DLNA_V15;
+  return dlna_write_protocol_info(info, flags, DLNA_ORG_OPERATION_RANGE);
 }
 
 std::vector<std::string> split(const std::string &s, char delim) {

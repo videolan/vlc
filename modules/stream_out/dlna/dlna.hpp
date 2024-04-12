@@ -28,6 +28,9 @@
 #include "dlna_common.hpp"
 #include "profile_names.hpp"
 
+#include <sstream>
+#include <iomanip>
+
 struct protocol_info_t {
     protocol_info_t() = default;
     protocol_info_t(const protocol_info_t&) = default;
@@ -46,6 +49,34 @@ struct protocol_info_t {
     dlna_org_conversion_t ci = DLNA_ORG_CONVERSION_NONE;
     dlna_profile_t profile;
 };
+
+static inline std::string dlna_write_protocol_info(const protocol_info_t info,
+                                                   const dlna_org_flags_t flags,
+                                                   const dlna_org_operation_t op)
+{
+    std::ostringstream protocol;
+
+    if (info.transport == DLNA_TRANSPORT_PROTOCOL_HTTP)
+        protocol << "http-get:*:";
+
+    protocol << info.profile.mime;
+    protocol << ":";
+
+    if (info.profile.name != "*")
+        protocol << "DLNA.ORG_PN=" << info.profile.name.c_str() << ";";
+
+    protocol << std::setfill('0')
+             << "DLNA.ORG_OP="
+             << std::hex << std::setw(2) << op
+             << ";DLNA.ORG_CI="
+             << std::dec << info.ci
+             << ";DLNA.ORG_FLAGS="
+             << std::hex
+             << std::setw(8) << flags
+             << std::setw(24) << 0;
+
+    return protocol.str();
+}
 
 using ProtocolPtr = std::unique_ptr<protocol_info_t>;
 static inline ProtocolPtr make_protocol(protocol_info_t a)
