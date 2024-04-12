@@ -35,6 +35,8 @@
 #include <vlc_rand.h>
 
 #include "FileHandler.hpp"
+#include "cds/Container.hpp"
+#include "cds/cds.hpp"
 #include "ml.hpp"
 #include "upnp_server.hpp"
 #include "utils.hpp"
@@ -61,6 +63,8 @@ struct intf_sys_t
     // request, he knows that the server state has changed and hence can refetch the exposed
     // hierarchy.
     std::atomic<unsigned int> upnp_update_id;
+
+    std::vector<std::unique_ptr<cds::Object>> obj_hierarchy;
 };
 
 static void medialibrary_event_callback(void *p_data, const struct vlc_ml_event_t *p_event)
@@ -88,6 +92,102 @@ static void medialibrary_event_callback(void *p_data, const struct vlc_ml_event_
             p_sys->upnp_update_id++;
             break;
     }
+}
+
+static bool cds_browse(UpnpActionRequest *request, intf_thread_t *intf)
+{
+    intf_sys_t *sys = intf->p_sys;
+
+    auto *action_rq =
+        reinterpret_cast<IXML_Element *>(UpnpActionRequest_get_ActionRequest(request));
+
+    const char *object_id = xml_getChildElementValue(action_rq, "ObjectID");
+    if (object_id == nullptr)
+        return false;
+
+    const char *browse_flag = xml_getChildElementValue(action_rq, "BrowseFlag");
+    const char *starting_index = xml_getChildElementValue(action_rq, "StartingIndex");
+    const char *requested_count = xml_getChildElementValue(action_rq, "RequestedCount");
+
+    if (browse_flag == nullptr || starting_index == nullptr || requested_count == nullptr)
+        return false;
+
+    cds::Container::BrowseParams browse_params{
+        static_cast<uint32_t>(strtoul(starting_index, nullptr, 10)),
+        static_cast<uint32_t>(strtoul(requested_count, nullptr, 10)),
+    };
+
+    xml::Document result;
+    xml::Element didl_lite = result.create_element("DIDL-Lite");
+
+    // Standard upnp attributes
+    didl_lite.set_attribute("xmlns", "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/");
+    didl_lite.set_attribute("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+    didl_lite.set_attribute("xmlns:upnp", "urn:schemas-upnp-org:metadata-1-0/upnp/");
+
+    const std::string id = object_id;
+    unsigned obj_idx;
+    cds::Object::ExtraId extra_id;
+
+    try
+    {
+        std::tie(obj_idx, extra_id) = cds::parse_id(id);
+    }
+    catch (const std::invalid_argument &e)
+    {
+        UpnpActionRequest_set_ErrCode(request, 500);
+        return false;
+    }
+
+    std::string str_nb_returned;
+    std::string str_total_matches;
+    const cds::Object &obj = *sys->obj_hierarchy[obj_idx];
+    try
+    {
+        if (strcmp(browse_flag, "BrowseDirectChildren") == 0 &&
+            obj.type == cds::Object::Type::Container)
+        {
+            const auto browse_stats =
+                static_cast<const cds::Container &>(obj).browse_direct_children(
+                    didl_lite, browse_params, extra_id);
+            str_nb_returned = std::to_string(browse_stats.result_count);
+            str_total_matches = std::to_string(browse_stats.total_matches);
+        }
+        else if (strcmp(browse_flag, "BrowseMetadata") == 0)
+        {
+            didl_lite.add_child(obj.browse_metadata(result, extra_id));
+            str_nb_returned = "1";
+            str_total_matches = "1";
+        }
+    }
+    catch (const ml::errors::UnknownObject &)
+    {
+        UpnpActionRequest_set_ErrCode(request, 404);
+        return false;
+    }
+
+    result.set_entry(std::move(didl_lite));
+
+    const char *action_name = UpnpActionRequest_get_ActionName_cstr(request);
+
+    const auto up_reponse_str = result.to_wrapped_cstr();
+    const auto str_update_id = std::to_string(sys->upnp_update_id.load());
+
+    auto *p_answer = UpnpActionRequest_get_ActionResult(request);
+
+    static constexpr char service_type[] = UPNP_SERVICE_TYPE("ContentDirectory");
+    UpnpAddToActionResponse(&p_answer, action_name, service_type, "Result", up_reponse_str.get());
+    UpnpAddToActionResponse(
+        &p_answer, action_name, service_type, "NumberReturned", str_nb_returned.c_str());
+    UpnpAddToActionResponse(
+        &p_answer, action_name, service_type, "TotalMatches", str_total_matches.c_str());
+    UpnpAddToActionResponse(
+        &p_answer, action_name, service_type, "UpdateID", str_update_id.c_str());
+
+    UpnpActionRequest_set_ActionResult(request, p_answer);
+    msg_Dbg(intf, "Sending response to client: \n%s", up_reponse_str.get());
+
+    return true;
 }
 
 static void handle_action_request(UpnpActionRequest *p_request, intf_thread_t *p_intf)
@@ -126,7 +226,8 @@ static void handle_action_request(UpnpActionRequest *p_request, intf_thread_t *p
 
         if (strcmp(action_name, "Browse") == 0)
         {
-            msg_Err(p_intf, "server: failed to respond to browse action request");
+            if (!cds_browse(p_request, p_intf))
+                msg_Err(p_intf, "Failed to respond to browse action request");
         }
         else if (strcmp(action_name, "GetSearchCapabilities") == 0)
         {
@@ -419,6 +520,8 @@ int open(vlc_object_t *p_this)
 
     sys->upnp = vlc::wrap_cptr(UpnpInstanceWrapper::get(p_this),
                                [](UpnpInstanceWrapper *p_upnp) { p_upnp->release(); });
+
+    sys->obj_hierarchy = cds::init_hierarchy(sys->p_ml);
 
     if (!init_upnp(intf))
     {
