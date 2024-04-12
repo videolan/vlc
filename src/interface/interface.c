@@ -94,6 +94,8 @@ int intf_Create( libvlc_int_t *libvlc, const char *chain )
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Telnet") );
     val.psz_string = (char *)"http,none";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Web") );
+    val.psz_string = (char *)"upnp,none";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Upnp") );
     val.psz_string = (char *)"gestures,none";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val,
                 _("Mouse Gestures") );
