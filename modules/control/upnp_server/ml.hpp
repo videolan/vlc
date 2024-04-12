@@ -35,7 +35,55 @@ struct MediaLibraryContext {
     vlc_medialibrary_t *handle;
 };
 
+static const vlc_ml_query_params_t PUBLIC_ONLY_QP = [] {
+    vlc_ml_query_params_t params = vlc_ml_query_params_create();
+    params.b_public_only = true;
+    return params;
+}();
+
+static inline bool is_ml_object_private(const MediaLibraryContext &, vlc_ml_media_t *media)
+{
+    return !media->b_is_public;
+}
+
+static inline bool is_ml_object_private(const MediaLibraryContext &ml, vlc_ml_album_t *album)
+{
+    const size_t count = vlc_ml_count_album_tracks(ml.handle, &PUBLIC_ONLY_QP, album->i_id);
+    return count == 0;
+}
+
+static inline bool is_ml_object_private(const MediaLibraryContext &ml, vlc_ml_playlist_t *playlist)
+{
+    const size_t count = vlc_ml_count_playlist_media(ml.handle, &PUBLIC_ONLY_QP, playlist->i_id);
+    return count == 0;
+}
+
+static inline bool is_ml_object_private(const MediaLibraryContext &ml, vlc_ml_artist_t *artist)
+{
+    const size_t count = vlc_ml_count_artist_tracks(ml.handle, &PUBLIC_ONLY_QP, artist->i_id);
+    return count == 0;
+}
+
+static inline bool is_ml_object_private(const MediaLibraryContext &ml, vlc_ml_genre_t *genre)
+{
+    const size_t count = vlc_ml_count_genre_tracks(ml.handle, &PUBLIC_ONLY_QP, genre->i_id);
+    return count == 0;
+}
+
+static inline bool is_ml_object_private(const MediaLibraryContext &ml, vlc_ml_folder_t *folder)
+{
+    const size_t count = vlc_ml_count_folder_media(ml.handle, &PUBLIC_ONLY_QP, folder->i_id);
+    return count == 0;
+}
+
 namespace errors {
+struct ForbiddenAccess : public std::exception {
+    virtual ~ForbiddenAccess() = default;
+    virtual const char *what() const noexcept override {
+        return "Private element";
+    }
+};
+
 struct UnknownObject : public std::exception {
     virtual ~UnknownObject() = default;
     virtual const char *what() const noexcept override {
@@ -54,7 +102,10 @@ template <typename MLObject, vlc_ml_get_queries GetQuery> struct Object
         if (obj == nullptr)
             throw errors::UnknownObject();
 
-        return Ptr{obj, static_cast<void (*)(MLObject *)>(&vlc_ml_release)};
+        Ptr ptr{obj, static_cast<void (*)(MLObject *)>(&vlc_ml_release)};
+        if (is_ml_object_private(ml, ptr.get()))
+            throw errors::ForbiddenAccess();
+        return ptr;
     }
 };
 
@@ -76,7 +127,8 @@ struct List : Object
         size_t res;
         int status;
 
-        const vlc_ml_query_params_t params = vlc_ml_query_params_create();
+        vlc_ml_query_params_t params = vlc_ml_query_params_create();
+        params.b_public_only = true;
 
         if (id.has_value())
             status = vlc_ml_list(ml.handle, CountQuery, &params, *id, &res);
@@ -100,16 +152,19 @@ struct List : Object
         ListType *res;
         int status;
 
+        vlc_ml_query_params_t extra_params = *params;
+        extra_params.b_public_only = true;
+
         if (id.has_value())
-            status = vlc_ml_list(ml.handle, ListQuery, params, *id, &res);
+            status = vlc_ml_list(ml.handle, ListQuery, &extra_params, *id, &res);
         else if (ListQuery == VLC_ML_LIST_ARTISTS)
-            status = vlc_ml_list(ml.handle, ListQuery, params, (int)false, &res);
+            status = vlc_ml_list(ml.handle, ListQuery, &extra_params, (int)false, &res);
         else if (ListQuery == VLC_ML_LIST_ENTRY_POINTS)
-            status = vlc_ml_list(ml.handle, ListQuery, params, (int)false, &res);
+            status = vlc_ml_list(ml.handle, ListQuery, &extra_params, (int)false, &res);
         else if (ListQuery == VLC_ML_LIST_PLAYLISTS)
-            status = vlc_ml_list(ml.handle, ListQuery, params, VLC_ML_PLAYLIST_TYPE_ALL, &res);
+            status = vlc_ml_list(ml.handle, ListQuery, &extra_params, VLC_ML_PLAYLIST_TYPE_ALL, &res);
         else
-            status = vlc_ml_list(ml.handle, ListQuery, params, &res);
+            status = vlc_ml_list(ml.handle, ListQuery, &extra_params, &res);
         return {status == VLC_SUCCESS ? res : nullptr,
                 static_cast<void (*)(ListType *)>(&vlc_ml_release)};
     }

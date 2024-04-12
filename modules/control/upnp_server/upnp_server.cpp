@@ -161,8 +161,12 @@ static bool cds_browse(UpnpActionRequest *request, intf_thread_t *intf)
             str_nb_returned = "1";
             str_total_matches = "1";
         }
-    }
-    catch (const ml::errors::UnknownObject &)
+    } catch (const ml::errors::ForbiddenAccess&)
+    {
+        msg_Warn(intf, "Client tried to browse a private medialibrary element.");
+        UpnpActionRequest_set_ErrCode(request, 404);
+        return false;
+    } catch (const ml::errors::UnknownObject&)
     {
         UpnpActionRequest_set_ErrCode(request, 404);
         return false;
