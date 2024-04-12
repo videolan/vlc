@@ -117,6 +117,7 @@ public:
         NETWORK_ARTWORK,
         NETWORK_FILE_SIZE,
         NETWORK_FILE_MODIFIED,
+        NETWORK_MEDIA,
     };
 
     enum ItemType{
