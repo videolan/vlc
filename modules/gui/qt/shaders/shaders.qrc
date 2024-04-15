@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <RCC>
     <qresource prefix="/shaders">
         <file alias="FadingEdge.frag.qsb">FadingEdge.frag.qsb</file>
