@@ -16,9 +16,13 @@ endif
 meson-machinefile:
 	mkdir -p $@
 
+meson-machinefile/contrib.ini: $(foreach tool,$(filter-out $(PKGS_FOUND),$(PKGS.tools)),.dep-$(tool))
 meson-machinefile/contrib.ini: $(SRC)/gen-meson-machinefile.py meson-machinefile
 	PREFIX="$(PREFIX)" \
-	$(SRC)/gen-meson-machinefile.py --type external-$(CROSS_OR_NATIVE) $@
+	$(SRC)/gen-meson-machinefile.py \
+		--type external-$(CROSS_OR_NATIVE) \
+		$(foreach tool,$(filter-out $(PKGS_FOUND),$(PKGS.tools)),--binary $(tool):$(PKGS.tools.$(tool).path)) \
+		$@
 
 # Dummy target, there is nothing to check
 # as we download nothing.
