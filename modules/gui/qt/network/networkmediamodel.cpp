@@ -515,6 +515,13 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
             return item->media.valid()
                     ? QVariant::fromValue(item->media)
                     : QVariant {};
+        case NETWORK_MEDIA_PROGRESS:
+        {
+            if (item->media.valid())
+                return item->media.progress();
+
+            return {};
+        }
         default:
             return {};
     }
@@ -533,7 +540,8 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
         { NETWORK_ARTWORK, "artwork" },
         { NETWORK_FILE_SIZE, "fileSizeRaw64" },
         { NETWORK_FILE_MODIFIED, "fileModified" },
-        { NETWORK_MEDIA, "media" }
+        { NETWORK_MEDIA, "media" },
+        { NETWORK_MEDIA_PROGRESS, "progress" }
     };
 }
 
