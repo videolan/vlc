@@ -404,6 +404,11 @@ CMAKE = cmake -S $< -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX:STRING=$(PREFIX) \
 		-DBUILD_SHARED_LIBS:BOOL=OFF \
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib
+ifndef WITH_OPTIMIZATION
+CMAKE += -DCMAKE_BUILD_TYPE=Debug
+else
+CMAKE += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+endif
 ifdef HAVE_WIN32
 CMAKE += -DCMAKE_DEBUG_POSTFIX:STRING=
 endif
@@ -570,11 +575,6 @@ endif
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@
-ifndef WITH_OPTIMIZATION
-	echo "set(CMAKE_BUILD_TYPE Debug)" >> $@
-else
-	echo "set(CMAKE_BUILD_TYPE RelWithDebInfo)" >> $@
-endif
 	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
 	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
 		echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" >> $@; \
