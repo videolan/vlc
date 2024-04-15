@@ -267,6 +267,18 @@ MainInterface.MainViewLoader {
 
                     showContextButton: true
                 }
+            }, {
+                size: 1,
+
+                model: {
+                    criteria: "duration",
+
+                    text: qsTr("Duration"),
+
+                    showContextButton: true,
+                    headerDelegate: tableColumns.timeHeaderDelegate,
+                    colDelegate: tableColumns.timeColDelegate
+                }
             }]
 
             dragItem: networkDragItem
@@ -306,6 +318,10 @@ MainInterface.MainViewLoader {
             }
             onRightClick: (_,_,globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
+            }
+
+            Widgets.TableColumns {
+                id: tableColumns
             }
         }
     }
