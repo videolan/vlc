@@ -119,6 +119,7 @@ public:
         NETWORK_FILE_MODIFIED,
         NETWORK_MEDIA,
         NETWORK_MEDIA_PROGRESS,
+        NETWORK_MEDIA_DURATION,
     };
 
     enum ItemType{

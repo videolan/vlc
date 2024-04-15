@@ -64,6 +64,20 @@ inline bool isADir(const NetworkMediaItemPtr& x)
     return (x->type == NetworkMediaModel::ItemType::TYPE_DIRECTORY);
 }
 
+int compareMediaDuration(const NetworkMediaItemPtr &l
+                         , const NetworkMediaItemPtr &r)
+{
+    const bool lHasMedia = l->media.valid();
+    const bool rHasMedia = r->media.valid();
+    if (lHasMedia != rHasMedia) return lHasMedia ? 1 : - 1;
+    if (!lHasMedia && !rHasMedia) return 0;
+
+    const auto &lmedia = l->media.duration();
+    const auto &rmedia = r->media.duration();
+    if (lmedia == rmedia) return 0;
+    return lmedia > rmedia ? 1 : -1;
+}
+
 }
 
 // ListCache specialisation
@@ -300,6 +314,21 @@ public:
                     return a->fileModified > b->fileModified;
                 };
         }
+        else if (m_sortCriteria == "duration")
+        {
+            if (m_sortOrder == Qt::SortOrder::DescendingOrder)
+                return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool
+                {
+                    if(isADir(a) != isADir(b)) return isADir(a);
+                    return compareMediaDuration(a, b) > 0;
+                };
+            else
+                return [](const NetworkMediaItemPtr& a, const NetworkMediaItemPtr& b) -> bool
+                {
+                    if(isADir(a) != isADir(b)) return isADir(a);
+                    return compareMediaDuration(a, b) < 0;
+                };
+        }
         else // m_sortCriteria == "name"
         {
             if (m_sortOrder == Qt::SortOrder::DescendingOrder)
@@ -522,6 +551,16 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
 
             return {};
         }
+        case NETWORK_MEDIA_DURATION:
+        {
+            if (item->media.valid())
+            {
+                const VLCTick duration = item->media.duration();
+                return duration <= 0 ? QVariant {} : QVariant::fromValue(duration);
+            }
+
+            return {};
+        }
         default:
             return {};
     }
@@ -541,7 +580,8 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
         { NETWORK_FILE_SIZE, "fileSizeRaw64" },
         { NETWORK_FILE_MODIFIED, "fileModified" },
         { NETWORK_MEDIA, "media" },
-        { NETWORK_MEDIA_PROGRESS, "progress" }
+        { NETWORK_MEDIA_PROGRESS, "progress" },
+        { NETWORK_MEDIA_DURATION, "duration" }
     };
 }
 
