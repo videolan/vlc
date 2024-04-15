@@ -16,8 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+// NOTE: All imports used throughout the interface
+//       must be imported here as well:
+import QtQml
+import QtQml.Models
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Templates
 import QtQuick.Controls
 import QtQuick.Window
 import Qt5Compat.GraphicalEffects
