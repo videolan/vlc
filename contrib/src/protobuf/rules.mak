@@ -9,6 +9,7 @@ PROTOBUF_URL := $(GITHUB)/google/protobuf/releases/download/v$(PROTOBUF_VERSION)
 ifndef HAVE_TVOS
 PKGS += protobuf protoc
 PKGS_TOOLS += protoc
+PKGS.tools += protoc
 endif # !HAVE_TVOS
 PKGS_ALL += protoc
 ifeq ($(call need_pkg, "protobuf-lite = $(PROTOBUF_VERSION)"),)
@@ -17,6 +18,7 @@ ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += protoc
 endif
 endif
+PKGS.tools.protoc.path = $(BUILDBINDIR)/$(HOST)-protoc
 
 ifeq ($(shell $(HOST)-protoc --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(PROTOBUF_MAJVERSION))
 PKGS_FOUND += protoc
