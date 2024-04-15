@@ -493,7 +493,20 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
         case NETWORK_TREE:
             return QVariant::fromValue( item->tree );
         case NETWORK_ARTWORK:
-            return item->artwork;
+        {
+            if (!item->artwork.isEmpty())
+                return item->artwork;
+
+            /// XXX: request medialibrary for thumbnail if not available??
+            const MLMedia &media = item->media;
+            if (media.valid())
+            {
+                const QString bannerCover = media.bannerCover();
+                return !bannerCover.isEmpty() ? bannerCover : media.smallCover();
+            }
+
+            return {};
+        }
         case NETWORK_FILE_SIZE:
             return item->fileSize;
         case NETWORK_FILE_MODIFIED:
