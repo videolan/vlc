@@ -216,6 +216,27 @@ endif
 it would not do what you might expect, as `disable_auto_if` returns a new option and does not mutate the
 existing one. The returned option object is never assigned to any variable, so it is lost.
 
+#### Compiling with contribs
+
+The meson build system also supports using dependencies and binaries provided
+by the contrib system. 
+
+Once the contrib has been prepared, a meson machine file will be generated
+in the installation prefix. For native linux x86_64, it will typically be
+found at the following location:
+
+    vlc/contrib/x86_64-pc-linux-gnu/share/meson/native/contrib.ini
+
+Then you can setup meson with this file using the following command:
+
+    meson setup build-meson \
+        --native-file contrib/x86_64-pc-linux-gnu/share/meson/native/contrib.ini 
+
+When cross-compiling, both the crossfile and the contrib machine file
+can be supplied at the same time:
+
+    meson setup build-meson --cross-file win32.crossfile \
+        --cross-file contrib/x86_64-w64-mingw32/share/meson/cross/contrib.ini 
 
 [mref_files]: https://mesonbuild.com/Reference-manual_functions.html#files
 [mref_include_directories]: https://mesonbuild.com/Reference-manual_functions.html#include_directories
