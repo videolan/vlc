@@ -56,14 +56,6 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0003-CMake-Fix-a-misplaced-in-pkg-config-files.patch
 	$(MOVE)
 
-QTBASE_CONFIG := -release
-
-# Qt static debug build is practically unusable.
-# So add debug symbols in release mode instead:
-ifndef WITH_OPTIMIZATION
-QTBASE_CONFIG += -force-debug-info
-endif
-
 ifeq ($(V),1)
 QTBASE_CONFIG += -verbose
 endif
@@ -77,7 +69,14 @@ QTBASE_CONFIG += -static -opensource -confirm-license -opengl desktop -no-pkg-co
     -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
 	-no-feature-sql -no-feature-testlib -system-freetype -system-harfbuzz -system-libjpeg \
 	-no-feature-xml -no-feature-printsupport -system-libpng -system-zlib -no-feature-network \
-	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX)
+	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
+	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
+
+ifdef ENABLE_PDB
+QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
+else
+QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=Release
+endif
 
 QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATURE_pkg_config=OFF \
 	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_printsupport=OFF -DFEATURE_androiddeployqt=OFF \
@@ -101,8 +100,7 @@ QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATU
 	mkdir -p $(BUILD_DIR)
 
 	# Configure qt, build and run cmake
-	+cd $(BUILD_DIR) && ../configure $(QTBASE_PLATFORM) $(QTBASE_CONFIG) \
-	    -- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
+	+cd $(BUILD_DIR) && ../configure $(QTBASE_PLATFORM) $(QTBASE_CONFIG)
 
 	# Build
 	+$(CMAKEBUILD)
