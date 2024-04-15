@@ -3,6 +3,19 @@ import os
 import argparse
 import shlex
 
+class BinaryAction(argparse.Action):
+    def __init__(self, option_strings, dest, nargs=None, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        split = value.split(':')
+        if (len(split) < 2 or split[0] == '' or split[1] == ''):
+            raise ValueError("Syntax: --binary foo:/usr/bin/foo")
+        name = split[0]
+        if (getattr(namespace, 'binary') is None):
+            setattr(namespace, 'binary', {})
+        namespace.binary[name] = ':'.join(split[1:])
+
 # Argument parsing
 parser = argparse.ArgumentParser(
     description="Generate a meson crossfile based on environment variables")
@@ -16,6 +29,7 @@ external-*: External machine file (either cross or native).
             This is meant to be used by VLCs meson build system to easily
             use the given contribs, similar to --with-contrib=DIR for ./configure
 """)
+parser.add_argument('--binary', action=BinaryAction, nargs='*')
 parser.add_argument('file', type=argparse.FileType('w', encoding='UTF-8'),
     help="output file")
 args = parser.parse_args()
@@ -84,6 +98,10 @@ if args.type == 'internal':
 
 elif args.type.startswith('external'):
     # Constants section
+    if args.binary is not None:
+        args.file.write("\n[binaries]\n")
+        for program_name, program_path in args.binary.items():
+            args.file.write(f"{program_name} = '{program_path}'\n")
     args.file.write("\n[constants]\n")
     args.file.write("contrib_dir = '{}'\n".format(os.environ['PREFIX']))
     args.file.write("contrib_libdir = contrib_dir / 'lib'\n")
