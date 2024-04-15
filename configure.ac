@@ -600,16 +600,6 @@ AS_IF([test -n "${CONTRIB_DIR}"], [
     ])
   ])
 
-  AS_IF([test -z "$PROTOC"], [
-    AC_MSG_CHECKING([if contribs provide protoc])
-    AS_IF([test -x "${CONTRIB_DIR}/../bin/${host_alias}-protoc${BUILDEXEEXT}"], [
-      PROTOC="${CONTRIB_DIR}/../bin/${host_alias}-protoc${BUILDEXEEXT}"
-      AC_MSG_RESULT([yes])
-    ],[
-      AC_MSG_RESULT([no])
-    ])
-  ])
-
   AS_IF([test "${SYS}" = "darwin"], [
     export LD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH"
     export DYLD_LIBRARY_PATH="${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH"
@@ -3925,52 +3915,24 @@ PKG_WITH_MODULES([CHROMECAST],[protobuf-lite], [],[
 ], [(Chromecast streaming support)], [auto])
 
 AC_ARG_VAR(PROTOC, [protobuf compiler])
-dnl Intentionally using prefixed binaries for native tool in contribs
 AS_IF([test -n "$PKG_CONFIG"],[
-    AC_CHECK_TOOL(PROTOC, protoc, no)
+    AC_PATH_PROGS(PROTOC, [protoc], no, ["${CONTRIB_DIR}/../bin:$PATH"])
     AS_IF([test "${PROTOC}" != "no"], [
         dnl silently checks the protoc version matches the protobuf library
         PROTOBUF_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
         protoc_ver_next="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
         AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
-        AS_IF([test -n "$PKG_CONFIG"],[
-            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&5
-            ac_status=$?
-            AS_IF([test $ac_status = 0],[
-                protoc_matching=yes
-                AC_MSG_RESULT([yes])
-            ],[
-                protoc_matching=no
-                AC_MSG_RESULT([no])
-            ])
+        ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&AS_MESSAGE_FD
+        ac_status=$?
+        AS_IF([test $ac_status = 0],[
+            protoc_matching=yes
+            AC_MSG_RESULT([yes])
+        ],[
+            protoc_matching=no
+            AC_MSG_RESULT([no])
         ])
     ],[
         protoc_matching=no
-    ])
-    AS_IF([test "${protoc_matching}" != "yes"], [
-        dnl Reset cache from the previous test
-        unset PROTOC
-        unset ac_cv_prog_PROTOC
-        dnl checking plain 'protoc' (possibly a second time)
-        AC_CHECK_PROG(PROTOC, protoc, no)
-
-        AS_IF([test "${PROTOC}" != "no"], [
-            dnl silently checks the protoc version matches the protobuf library
-            PROTOBUF_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
-            protoc_ver_next="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
-            AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
-            ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&5
-            ac_status=$?
-            AS_IF([test $ac_status = 0],[
-                protoc_matching=yes
-                AC_MSG_RESULT([yes])
-            ],[
-                AC_MSG_RESULT([no])
-                AS_IF([test "${enable_chromecast}" != "no"], [
-                    AC_MSG_ERROR(protoc compiler needed for [chromecast] was not found)
-                ])
-            ])
-        ])
     ])
 ])
 AC_SUBST([PROTOBUF_VERSION])
