@@ -98,6 +98,9 @@ Currently the modules dict accepts the following keys:
 @param 	sources
 		The source files for the module, use [`files()`][mref_files] to specify them. **Required**
 
+@param  enabled
+        A boolean indicating whether the module should be built or not.
+
 @param  dependencies
 		The dependencies needed by the module. Only list external dependencies
 		here, not libraries that are built as part of the VLC build, for these
@@ -173,13 +176,12 @@ Now we can just look up the option and use that for the `required` argument of t
 ```meson
 # dav1d AV1 decoder
 dav1d_dep = dependency('dav1d', version: '>= 0.5.0', required: get_option('dav1d'))
-if dav1d_dep.found()
-    vlc_modules += {
-        'name' : 'dav1d',
-        'sources' : files('dav1d.c'),
-        'dependencies' : [dav1d_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'dav1d',
+    'sources' : files('dav1d.c'),
+    'dependencies' : [dav1d_dep],
+    'enabled' : dav1d_dep.found(),
+}
 ```
 
 As the option defaults to `auto`, meson will look it up, and if its is found, add the module.
@@ -191,11 +193,13 @@ cases of conditional dependencies. For example suppose we want an option to be d
 cases when it is set to `auto`:
 
 ```meson
-if (get_option('x11')
-    .disable_auto_if(host_system in ['darwin', 'windows'])
-    .allowed())
-    # Do something here if the X11 option is enabled
-endif
+vlc_modules += {
+    'name' : 'xcb',
+    'sources' : files('xcb.c'),
+    'enabled' : get_option('x11') \
+        .disable_auto_if(host_system in ['darwin', 'windows']) \
+        .allowed(),
+}
 ```
 
 This will disable the `x11` option if it is set to auto, when on `darwin` or `windows`.
