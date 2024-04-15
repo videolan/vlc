@@ -29,6 +29,8 @@ endif
 PKGS += lua luac
 PKGS_TOOLS += luac
 PKGS_ALL += luac
+PKGS.tools += luac
+PKGS.tools.luac.path = $(BUILDBINDIR)/$(HOST)-luac
 
 LUAC_IF_NOT_CROSS =
 ifndef HAVE_CROSS_COMPILE
