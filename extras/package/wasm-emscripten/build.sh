@@ -155,6 +155,7 @@ if [ "$VLC_USE_PREBUILT_CONTRIBS" -ne "0" ]; then
 else
     PREBUILT_FAILED=yes
 fi
+emmake make list
 if [ -n "$PREBUILT_FAILED" ]; then
     emmake make
     if [ "$GENERATE_ARCHIVE" -eq "1" ]; then
