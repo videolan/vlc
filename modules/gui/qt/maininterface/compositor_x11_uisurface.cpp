@@ -288,8 +288,8 @@ bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
     case QEvent::Enter:
     {
         QEnterEvent *enterEvent = static_cast<QEnterEvent *>(event);
-        QEnterEvent mappedEvent(enterEvent->localPos(), enterEvent->windowPos(),
-                                enterEvent->screenPos());
+        QEnterEvent mappedEvent(enterEvent->position(), enterEvent->scenePosition(),
+                                enterEvent->globalPosition());
         bool ret = QCoreApplication::sendEvent(m_uiWindow, &mappedEvent);
         event->setAccepted(mappedEvent.isAccepted());
         return ret;
@@ -326,8 +326,8 @@ bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
     case QEvent::MouseMove:
     {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
-        QMouseEvent mappedEvent(mouseEvent->type(), mouseEvent->localPos(),
-                                mouseEvent->localPos(), mouseEvent->screenPos(),
+        QMouseEvent mappedEvent(mouseEvent->type(), mouseEvent->position(),
+                                mouseEvent->position(), mouseEvent->globalPosition(),
                                 mouseEvent->button(), mouseEvent->buttons(),
                                 mouseEvent->modifiers(), mouseEvent->source());
         QCoreApplication::sendEvent(m_uiWindow, &mappedEvent);
