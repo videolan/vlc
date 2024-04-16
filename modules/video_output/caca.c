@@ -54,6 +54,9 @@ typedef struct vout_display_sys_t {
     caca_canvas_t *cv;
     caca_display_t *dp;
     caca_dither_t *dither;
+    unsigned      dither_width, dither_height;
+    int           dither_pitch;
+    bool          update_dither;
 
     bool dead;
     vlc_queue_t q;
@@ -133,7 +136,14 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->dither) {
+    if (!sys->dither || (sys->update_dither && (
+          sys->dither_width  != vd->source->i_visible_width ||
+          sys->dither_height != vd->source->i_visible_height ||
+          sys->dither_pitch  != picture->p[0].i_pitch
+        ) ) ) {
+        if (sys->dither)
+            caca_free_dither(sys->dither);
+
         /* Create the libcaca dither object */
         sys->dither = caca_create_dither(32,
                                             vd->source->i_visible_width,
@@ -148,6 +158,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             msg_Err(vd, "could not create libcaca dither object");
             return;
         }
+        sys->dither_width  = vd->source->i_visible_width;
+        sys->dither_height = vd->source->i_visible_height;
+        sys->dither_pitch  = picture->p[0].i_pitch;
+        sys->update_dither = false;
     }
 
     caca_set_color_ansi(sys->cv, CACA_DEFAULT, CACA_BLACK);
@@ -182,10 +196,8 @@ static int Control(vout_display_t *vd, int query)
 
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        if (sys->dither)
-            caca_free_dither(sys->dither);
-        sys->dither = NULL;
-        /* fall through */
+        sys->update_dither = true;
+        return VLC_SUCCESS;
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
