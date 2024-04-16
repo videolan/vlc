@@ -20,7 +20,8 @@
 
 #include <QString>
 
-#include "mlhelper.hpp"
+#include <vlc_media_library.h>
+
 #include "mlqmltypes.hpp"
 
 class VLCTick;
@@ -48,6 +49,4 @@ private:
     unsigned int m_discNumber;
     int64_t m_duration;
     QString m_mrl;
-
-   ml_unique_ptr<vlc_ml_media_t> m_data;
 };
