@@ -212,7 +212,8 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
         flags |= CompositorVideo::HAS_ACRYLIC;
     if (m_renderWindow->supportExtendedFrame())
         flags |= CompositorVideo::HAS_EXTENDED_FRAME;
-    commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags);
+    if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
+        return false;
 
     m_renderWindow->setInterfaceWindow(m_qmlView.get());
     m_renderWindow->setVideoWindow(m_videoWidget->windowHandle());
