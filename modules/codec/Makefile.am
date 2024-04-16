@@ -566,13 +566,17 @@ libfdkaac_plugin_la_CFLAGS = $(AM_CFLAGS) $(FDKAAC_CFLAGS)
 libfdkaac_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libfdkaac_plugin_la_LIBADD = $(FDKAAC_LIBS)
 EXTRA_LTLIBRARIES += libfdkaac_plugin.la
+if ENABLE_SOUT
 codec_LTLIBRARIES += $(LTLIBfdkaac)
+endif
 
 libshine_plugin_la_SOURCES = codec/shine.c
 libshine_plugin_la_CFLAGS = $(AM_CFLAGS) $(SHINE_CFLAGS)
 libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' $(SHINE_LIBS)
 EXTRA_LTLIBRARIES += libshine_plugin.la
+if ENABLE_SOUT
 codec_LTLIBRARIES += $(LTLIBshine)
+endif
 
 libvpx_plugin_la_SOURCES = codec/vpx.c
 libvpx_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -617,7 +621,9 @@ libtwolame_plugin_la_CFLAGS = $(AM_CFLAGS) $(TWOLAME_CFLAGS)
 libtwolame_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
 libtwolame_plugin_la_LIBADD = $(TWOLAME_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libtwolame_plugin.la
+if ENABLE_SOUT
 codec_LTLIBRARIES += $(LTLIBtwolame)
+endif
 
 libdav1d_plugin_la_SOURCES = codec/dav1d.c \
 	packetizer/av1_obu.c packetizer/av1_obu.h
