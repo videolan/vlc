@@ -211,7 +211,7 @@ void ExtendedDialog::saveConfig()
          i != hashConfig->end(); ++i )
     {
         QVariant &value = i.value();
-        switch( static_cast<QMetaType::Type>(value.type()) )
+        switch( static_cast<QMetaType::Type>(value.typeId()) )
         {
             case QMetaType::QString:
                 config_PutPsz( qtu(i.key()), qtu(value.toString()) );
