@@ -35,10 +35,6 @@ public:
     unsigned int getNbAlbums() const;
     unsigned int getNbTracks() const;
 
-    Q_INVOKABLE QString getPresName() const;
-    Q_INVOKABLE QString getPresImage() const;
-    Q_INVOKABLE QString getPresInfo() const;
-
 private:
     QString m_name;
     QString m_shortBio;

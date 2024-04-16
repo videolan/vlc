@@ -55,19 +55,3 @@ unsigned int MLArtist::getNbTracks() const
 {
     return m_nbTracks;
 }
-
-QString MLArtist::getPresName() const
-{
-    return m_name;
-}
-
-QString MLArtist::getPresImage() const
-{
-    return m_cover;
-}
-
-QString MLArtist::getPresInfo() const
-{
-    return m_shortBio;
-}
-
