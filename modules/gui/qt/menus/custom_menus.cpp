@@ -446,7 +446,7 @@ BooleanPropertyAction::BooleanPropertyAction(QString title, QObject *model, QStr
     int propertyId = meta->indexOfProperty(qtu(propertyName));
     assert(propertyId != -1);
     QMetaProperty property = meta->property(propertyId);
-    assert(property.type() ==  QVariant::Bool);
+    assert(property.typeId() ==  QMetaType::Bool);
     const QMetaObject* selfMeta = this->metaObject();
 
     assert(property.hasNotifySignal());
