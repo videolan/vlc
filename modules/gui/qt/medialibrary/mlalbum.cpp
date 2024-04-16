@@ -68,20 +68,3 @@ VLCTick MLAlbum::getDuration() const
 {
     return VLCTick::fromMS(m_duration);
 }
-
-QString MLAlbum::getPresName() const
-{
-    return m_title;
-}
-
-QString MLAlbum::getPresImage() const
-{
-    return m_cover;
-}
-
-QString MLAlbum::getPresInfo() const
-{
-    return m_shortSummary;
-}
-
-

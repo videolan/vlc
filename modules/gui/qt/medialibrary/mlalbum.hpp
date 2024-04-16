@@ -39,10 +39,6 @@ public:
     unsigned int getNbTracks() const;
     VLCTick getDuration() const;
 
-    QString getPresName() const;
-    QString getPresImage() const;
-    QString getPresInfo() const;
-
 private:
     QString m_title;
     unsigned int m_releaseYear;
