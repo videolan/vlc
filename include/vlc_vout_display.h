@@ -143,15 +143,6 @@ typedef struct {
  */
 enum vout_display_query {
     /**
-     * Notifies a change in display size.
-     *
-     * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if a \ref vlc_display_operations::reset_pictures
-     *         request is necessary
-     */
-    VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
-
-    /**
      * Notifies a change of the sample aspect ratio.
      *
      * \retval VLC_SUCCESS if the display handled the change
@@ -278,6 +269,17 @@ struct vlc_display_operations
     void       (*display)(vout_display_t *, picture_t *pic);
 
     /**
+     * Let the display module know the display size has changed.
+     *
+     * \return VLC_SUCCESS if the size is accepted.
+     * \return an error if the size is not accepted and
+     * \ref vlc_display_operations::reset_pictures "reset_pictures" needs to be called.
+     *
+     * When the callback is NULL, it is considered as returning VLC_SUCCESS.
+     */
+    int (*set_display_size)(vout_display_t *, unsigned width, unsigned height);
+
+    /**
      * Performs a control request (mandatory).
      *
      * \param query request type
@@ -288,8 +290,7 @@ struct vlc_display_operations
 
     /**
      * Reset the picture format handled by the module.
-     * This occurs after a
-     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
+     * This occurs after an error in \ref vlc_display_operations::set_display_size,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP or
      * \ref VOUT_DISPLAY_CHANGE_SOURCE_PLACE

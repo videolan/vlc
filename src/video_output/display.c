@@ -612,7 +612,8 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE);
+    err2 = vd->ops->set_display_size == NULL ? VLC_SUCCESS :
+        vd->ops->set_display_size(vd, vd->cfg->display.width, vd->cfg->display.height);
     if (err2 != VLC_SUCCESS)
         err1 = err2;
 

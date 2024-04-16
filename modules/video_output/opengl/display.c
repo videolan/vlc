@@ -163,6 +163,15 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
     assert(sys->gl->orientation != ORIENT_NORMAL || place->y == (int)(vd->cfg->display.height - (vd->place->y + vd->place->height)));
 }
 
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    PlacePicture(vd, &sys->place, vd->cfg->display);
+    vlc_gl_Resize (sys->gl, width, height);
+    return VLC_SUCCESS;
+}
+
 static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -184,6 +193,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
     .display = PictureDisplay,
+    .set_display_size = SetDisplaySize,
     .control = Control,
     .set_viewpoint = SetViewpoint,
     .update_format = UpdateFormat,
@@ -356,11 +366,6 @@ static int Control (vout_display_t *vd, int query)
 
     switch (query)
     {
-
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-            PlacePicture(vd, &sys->place, vd->cfg->display);
-            vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
-            return VLC_SUCCESS;
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:

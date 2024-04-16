@@ -1647,13 +1647,18 @@ static void Direct3D9Close(vout_display_t *vd)
     Direct3D9DestroyResources(vd);
 }
 
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    VLC_UNUSED(width); VLC_UNUSED(height);
+    vout_display_sys_t *sys = vd->sys;
+    CommonDisplaySizeChanged(sys->video_wnd);
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        CommonDisplaySizeChanged(sys->video_wnd);
-        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
         break;
@@ -1734,6 +1739,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
+    .set_display_size = SetDisplaySize,
     .control = Control,
 };
 

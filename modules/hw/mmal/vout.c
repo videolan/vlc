@@ -536,6 +536,12 @@ static int configure_display(vout_display_t *vd)
     return VLC_SUCCESS;
 }
 
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    VLC_UNUSED(width); VLC_UNUSED(height);
+    return configure_display(vd);
+}
+
 static void vd_display(vout_display_t *vd, picture_t *p_pic)
 {
     vout_display_sys_t * const sys = vd->sys;
@@ -642,7 +648,6 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
 static int vd_control(vout_display_t *vd, int query)
 {
     switch (query) {
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
@@ -980,6 +985,7 @@ static const struct vlc_display_operations ops = {
     .close = CloseMmalVout,
     .prepare = vd_prepare,
     .display = vd_display,
+    .set_display_size = SetDisplaySize,
     .control = vd_control,
     .reset_pictures = vd_reset_pictures,
 };

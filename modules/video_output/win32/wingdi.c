@@ -154,14 +154,18 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     plane_CopyPixels(&sys->pic_buf, picture->p);
 }
 
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    VLC_UNUSED(width); VLC_UNUSED(height);
+    vout_display_sys_t *sys = vd->sys;
+    CommonDisplaySizeChanged(sys->video_wnd);
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        CommonDisplaySizeChanged(sys->video_wnd);
-        sys->size_changed = true;
-        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
         break;
@@ -176,6 +180,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
+    .set_display_size = SetDisplaySize,
     .control = Control,
 };
 

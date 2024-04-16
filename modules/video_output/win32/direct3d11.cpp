@@ -197,7 +197,7 @@ static void Direct3D11DeleteRegions(int, picture_t **);
 static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, const vlc_render_subpicture *);
 
 static int Control(vout_display_t *, int);
-
+static int SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 
 static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 {
@@ -525,11 +525,12 @@ static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t pr
     return Direct3D11CreateFormatResources(vd, vd->source);
 }
 
-static const auto ops = []{
+static constexpr const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
     ops.prepare = Prepare;
     ops.display = Display;
+    ops.set_display_size = SetDisplaySize;
     ops.control = Control;
     ops.set_viewpoint = SetViewpoint;
     ops.change_source_projection = ChangeSourceProjection;
@@ -672,6 +673,56 @@ static void Close(vout_display_t *vd)
     Direct3D11Close(vd);
     delete sys;
 }
+
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+
+    bool use_scaler = false;
+    if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
+    {
+        D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
+                             vd->source, &sys->picQuad.quad_fmt,
+                             width, height,
+                             vd->place);
+
+        if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        {
+            D3D11_UpscalerGetSize(sys->scaleProc, &sys->picQuad.quad_fmt.i_width, &sys->picQuad.quad_fmt.i_height);
+
+            sys->picQuad.quad_fmt.i_x_offset       = 0;
+            sys->picQuad.quad_fmt.i_y_offset       = 0;
+            sys->picQuad.quad_fmt.i_visible_width  = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.quad_fmt.i_visible_height = sys->picQuad.quad_fmt.i_height;
+
+            sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
+            sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
+
+            use_scaler = true;
+        }
+    }
+
+    if (!use_scaler)
+    {
+        sys->picQuad.quad_fmt.i_sar_num        = vd->source->i_sar_num;
+        sys->picQuad.quad_fmt.i_sar_den        = vd->source->i_sar_den;
+        sys->picQuad.quad_fmt.i_x_offset       = vd->source->i_x_offset;
+        sys->picQuad.quad_fmt.i_y_offset       = vd->source->i_y_offset;
+        sys->picQuad.quad_fmt.i_visible_width  = vd->source->i_visible_width;
+        sys->picQuad.quad_fmt.i_visible_height = vd->source->i_visible_height;
+    }
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    CommonDisplaySizeChanged(sys->video_wnd);
+#endif /* WINAPI_PARTITION_DESKTOP */
+
+    if ( sys->place_changed )
+    {
+        UpdateSize(vd);
+    }
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
@@ -711,11 +762,6 @@ static int Control(vout_display_t *vd, int query)
     }
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        CommonDisplaySizeChanged(sys->video_wnd);
-#endif /* WINAPI_PARTITION_DESKTOP */
-        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
         // fallthrough

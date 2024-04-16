@@ -109,6 +109,7 @@ typedef struct vout_display_sys_t
  *****************************************************************************/
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int);
+static int             SetDisplaySize( vout_display_t *, unsigned width, unsigned height )
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
 static void CloseDisplay( vout_display_t * );
@@ -158,6 +159,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
+    .set_display_size = SetDisplaySize,
     .control = Control,
 };
 
@@ -389,6 +391,15 @@ static void Display( vout_display_t *vd, picture_t *picture )
     WinPostMsg( sys->client, WM_VLC_MANAGE, 0, 0 );
 }
 
+static int SetDisplaySize( vout_display_t *vd, unsigned width, unsigned height )
+{
+    vout_display_sys_t *sys = vd->sys;
+    WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
+                MPFROMLONG( width ),
+                MPFROMLONG( height ));
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Control: control facility for the vout
  *****************************************************************************/
@@ -398,14 +409,6 @@ static int Control( vout_display_t *vd, int query )
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-    {
-        WinPostMsg( sys->client, WM_VLC_SIZE_CHANGE,
-                    MPFROMLONG( vd->cfg->display.width ),
-                    MPFROMLONG( vd->cfg->display.height ));
-        return VLC_SUCCESS;
-    }
-
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {

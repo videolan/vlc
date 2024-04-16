@@ -82,6 +82,7 @@ typedef struct vout_display_sys_t
 static void PictureRender(vout_display_t *, picture_t *, const vlc_render_subpicture *, vlc_tick_t);
 static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t *, int);
+static int SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 static void Close(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 static void UpdateColorspaceHint(vout_display_t *, const video_format_t *);
@@ -91,6 +92,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
     .display = PictureDisplay,
+    .set_display_size = SetDisplaySize,
     .control = Control,
     .set_icc_profile = UpdateIccProfile,
 };
@@ -517,13 +519,10 @@ static void UpdateIccProfile(vout_display_t *vd, const vlc_icc_profile_t *prof)
     (void) prof; /* we get the current value from vout_display_cfg_t */
 }
 
-static int Control(vout_display_t *vd, int query)
+static int SetDisplaySize(vout_display_t *vd, unsigned width_, unsigned height_)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    switch (query)
-    {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         /* The following resize should be automatic on most platforms but can
          * trigger bugs on some platform with some drivers, that have been seen
          * on Windows in particular. Doing it right now enforces the correct
@@ -532,8 +531,8 @@ static int Control(vout_display_t *vd, int query)
          * window is defined by the size of the content, and not the opposite.
          * The swapchain creation won't be done twice with this call. */
         {
-            int width = (int) vd->cfg->display.width;
-            int height = (int) vd->cfg->display.height;
+            int width = (int) width_;
+            int height = (int) height_;
             if (vlc_placebo_MakeCurrent(sys->pl) != VLC_SUCCESS)
                 return VLC_SUCCESS; // ignore errors
 
@@ -543,12 +542,17 @@ static int Control(vout_display_t *vd, int query)
             /* NOTE: We currently ignore resizing failures that are transient
              * on X11. Maybe improving resizing might fix that, but we don't
              * implement reset_pictures anyway.
-            if (width != (int) vd->cfg->display.width
-             || height != (int) vd->cfg->display.height)
+            if (width != (int) width_ || height != (int) height_)
                 return VLC_EGENERIC;
             */
         }
         return VLC_SUCCESS;
+}
+
+static int Control(vout_display_t *vd, int query)
+{
+    switch (query)
+    {
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:

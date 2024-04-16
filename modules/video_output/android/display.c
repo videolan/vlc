@@ -67,6 +67,14 @@ struct sys
     struct subpicture sub;
 };
 
+static void subpicture_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    struct sys *sys = vd->sys;
+    struct subpicture *sub = &sys->sub;
+    vlc_gl_Resize(sub->gl, width, height);
+    sub->place_changed = true;
+}
+
 static int subpicture_Control(vout_display_t *vd, int query)
 {
     struct sys *sys = vd->sys;
@@ -74,9 +82,6 @@ static int subpicture_Control(vout_display_t *vd, int query)
 
     switch (query)
     {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        vlc_gl_Resize(sub->gl, vd->cfg->display.width, vd->cfg->display.height);
-        // fallthrough
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {
         sub->place_changed = true;
@@ -392,6 +397,16 @@ static void SetVideoLayout(vout_display_t *vd)
                                   rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 }
 
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    struct sys *sys = vd->sys;
+    if (sys->sub.window != NULL)
+        subpicture_SetDisplaySize(vd, width, height);
+
+    msg_Dbg(vd, "change display size: %dx%d", width, height);
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     struct sys *sys = vd->sys;
@@ -411,12 +426,6 @@ static int Control(vout_display_t *vd, int query)
                 vd->source->i_sar_den);
 
         SetVideoLayout(vd);
-        return VLC_SUCCESS;
-    }
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-    {
-        msg_Dbg(vd, "change display size: %dx%d", vd->cfg->display.width,
-                                                  vd->cfg->display.height);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
@@ -502,6 +511,7 @@ static int Open(vout_display_t *vd,
         .close = Close,
         .prepare = Prepare,
         .display = Display,
+        .set_display_size = SetDisplaySize,
         .control = Control,
         .set_viewpoint = NULL,
     };

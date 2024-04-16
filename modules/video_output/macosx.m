@@ -135,7 +135,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 }
 
 static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint, NULL,
+    Close, PictureRender, PictureDisplay, NULL, Control, NULL, SetViewpoint, NULL,
 };
 
 static int Open (vout_display_t *vd,
@@ -348,10 +348,6 @@ static int Control (vout_display_t *vd, int query)
     @autoreleasepool {
         switch (query)
         {
-            /* We handle the resizing ourselves, nothing to report either. */
-            case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-                return VLC_SUCCESS;
-
             case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:

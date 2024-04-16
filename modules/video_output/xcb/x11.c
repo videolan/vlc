@@ -210,15 +210,6 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
-        uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
-        const uint32_t values[] = {
-            vd->cfg->display.width, vd->cfg->display.height,
-        };
-
-        xcb_configure_window(sys->conn, sys->window, mask, values);
-    }
-        /* fall through */
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
@@ -234,6 +225,24 @@ static int Control(vout_display_t *vd, int query)
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
     }
+}
+
+static int SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+    const uint32_t values[] = {
+        width, height,
+    };
+
+    xcb_configure_window(sys->conn, sys->window, mask, values);
+
+    if (vd->place->width  != sys->fmt.i_visible_width ||
+        vd->place->height != sys->fmt.i_visible_height)
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }
 
 /**
@@ -299,6 +308,7 @@ static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = Prepare,
     .display = Display,
+    .set_display_size = SetDisplaySize,
     .control = Control,
     .reset_pictures = ResetPictures,
 };
