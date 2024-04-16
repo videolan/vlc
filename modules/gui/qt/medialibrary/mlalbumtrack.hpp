@@ -19,17 +19,11 @@
 #pragma once
 
 #include <QString>
-#include <memory>
 
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
 
 class VLCTick;
-
-extern "C" {
-    struct vlc_medialibrary_t;
-    typedef struct vlc_ml_media_t vlc_ml_media_t;
-};
 
 class MLAlbumTrack : public MLItem
 {
