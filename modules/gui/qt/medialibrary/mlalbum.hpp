@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <QObject>
 #include <QString>
 #include <QList>
 #include <memory>
@@ -27,12 +26,10 @@
 
 class VLCTick;
 
-class MLAlbum : public QObject, public MLItem
+class MLAlbum : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLAlbum(const vlc_ml_album_t *_data, QObject *_parent = nullptr);
+    MLAlbum(const vlc_ml_album_t *_data);
 
     QString getTitle() const;
     unsigned int getReleaseYear() const;
@@ -42,9 +39,9 @@ public:
     unsigned int getNbTracks() const;
     VLCTick getDuration() const;
 
-    Q_INVOKABLE QString getPresName() const;
-    Q_INVOKABLE QString getPresImage() const;
-    Q_INVOKABLE QString getPresInfo() const;
+    QString getPresName() const;
+    QString getPresImage() const;
+    QString getPresInfo() const;
 
 private:
     QString m_title;
