@@ -53,7 +53,7 @@ bool ControlListModel::setData(const QModelIndex &index, const QVariant &value, 
 
     switch (role) {
     case ID_ROLE:
-        if (value.canConvert(QVariant::Int))
+        if (value.canConvert<int>())
             control = static_cast<ControlType>(value.toInt());
         else
             return false;
