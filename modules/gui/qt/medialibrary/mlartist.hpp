@@ -19,7 +19,6 @@
 #ifndef MLARTIST_HPP
 #define MLARTIST_HPP
 
-#include <QObject>
 #include <QString>
 #include <memory>
 
@@ -31,12 +30,10 @@ extern "C" {
     typedef struct vlc_ml_artist_t vlc_ml_artist_t;
 };
 
-class MLArtist : public QObject, public MLItem
+class MLArtist : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLArtist(const vlc_ml_artist_t *_data, QObject *_parent = nullptr);
+    MLArtist(const vlc_ml_artist_t *_data);
 
     QString getName() const;
     QString getShortBio() const;

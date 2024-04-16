@@ -19,9 +19,8 @@
 #include <cassert>
 #include "mlartist.hpp"
 
-MLArtist::MLArtist(const vlc_ml_artist_t* _data, QObject *_parent)
-    : QObject(_parent)
-    , MLItem    ( MLItemId( _data->i_id, VLC_ML_PARENT_ARTIST ) )
+MLArtist::MLArtist(const vlc_ml_artist_t* _data)
+    : MLItem    ( MLItemId( _data->i_id, VLC_ML_PARENT_ARTIST ) )
     , m_name    ( QString::fromUtf8( _data->psz_name ) )
     , m_shortBio( QString::fromUtf8( _data->psz_shortbio ) )
     , m_cover   ( QString::fromUtf8( _data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl ) )
