@@ -20,15 +20,9 @@
 #define MLARTIST_HPP
 
 #include <QString>
-#include <memory>
 
-#include "mlalbum.hpp"
 #include "mlhelper.hpp"
 #include "mlqmltypes.hpp"
-
-extern "C" {
-    typedef struct vlc_ml_artist_t vlc_ml_artist_t;
-};
 
 class MLArtist : public MLItem
 {
