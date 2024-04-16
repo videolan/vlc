@@ -91,6 +91,7 @@ vlc_module_begin ()
     set_callback( OpenDecoder )
     add_shortcut( "png" )
 
+#ifdef ENABLE_SOUT
     /* video encoder submodule */
     add_submodule()
     add_shortcut("png")
@@ -98,6 +99,7 @@ vlc_module_begin ()
     set_description(N_("PNG video encoder"))
     set_capability("video encoder", 1000)
     set_callback(OpenEncoder)
+#endif
 
     /* image encoder submodule */
     add_submodule()
