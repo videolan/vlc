@@ -364,9 +364,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
         qmlRegisterType<MLRecentsModel>( uri, versionMajor, versionMinor, "MLRecentModel" );
 
-        //expose base object, they aren't instanciable from QML side
-        registerAnonymousType<MLAlbumTrack>(uri, versionMajor);
-
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );
 
