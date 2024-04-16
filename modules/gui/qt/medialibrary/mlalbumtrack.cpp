@@ -21,9 +21,8 @@
 #include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 
-MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data, QObject *_parent )
-    : QObject( _parent )
-    , MLItem       ( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
+MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
+    : MLItem       ( MLItemId( _data->i_id, VLC_ML_PARENT_UNKNOWN ) )
     , m_title      ( QString::fromUtf8( _data->psz_title ) )
     , m_trackNumber( _data->album_track.i_track_nb )
     , m_discNumber ( _data->album_track.i_disc_nb )

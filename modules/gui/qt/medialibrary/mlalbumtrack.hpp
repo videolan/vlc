@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <QObject>
 #include <QString>
 #include <memory>
 
@@ -32,12 +31,10 @@ extern "C" {
     typedef struct vlc_ml_media_t vlc_ml_media_t;
 };
 
-class MLAlbumTrack : public QObject, public MLItem
+class MLAlbumTrack : public MLItem
 {
-    Q_OBJECT
-
 public:
-    MLAlbumTrack(vlc_medialibrary_t *_ml, const vlc_ml_media_t *_data, QObject *_parent = nullptr);
+    MLAlbumTrack(vlc_medialibrary_t *_ml, const vlc_ml_media_t *_data);
 
     QString getTitle() const;
     QString getAlbumTitle() const;
