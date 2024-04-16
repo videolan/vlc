@@ -115,6 +115,7 @@ vlc_module_begin()
     set_callbacks(OpenDecoder, CloseDecoder)
     add_shortcut("jpeg")
 
+#ifdef ENABLE_SOUT
     /* video encoder submodule */
     add_submodule()
     add_shortcut("jpeg")
@@ -124,6 +125,7 @@ vlc_module_begin()
     set_callback(OpenEncoder)
     add_integer_with_range(ENC_CFG_PREFIX "quality", 95, 0, 100,
                            ENC_QUALITY_TEXT, ENC_QUALITY_LONGTEXT)
+#endif
     /* image encoder submodule */
     add_submodule()
     add_shortcut("jpeg")
