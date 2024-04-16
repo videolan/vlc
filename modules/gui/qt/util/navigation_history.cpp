@@ -44,17 +44,16 @@ void NavigationHistory::push(QStringList path, Qt::FocusReason focusReason)
 
 static bool isNodeValid(const QVariant& value)
 {
-    if (value.canConvert(QVariant::StringList)
-        || value.canConvert(QVariant::StringList)
-        || value.canConvert(QVariant::String)
-        || value.canConvert(QVariant::UInt)
-        || value.canConvert(QVariant::Int)
-        || value.canConvert(QVariant::Bool)
+    if (value.canConvert<QStringList>()
+        || value.canConvert<QString>()
+        || value.canConvert<unsigned int>()
+        || value.canConvert<int>()
+        || value.canConvert<bool>()
         || value.canConvert<MLItemId>())
     {
         return true;
     }
-    else if ( value.canConvert(QVariant::List) )
+    else if ( value.canConvert<QVariantList>() )
     {
         QVariantList valueList = value.toList();
         for (QVariant& v : valueList)
@@ -72,7 +71,7 @@ static bool isNodeValid(const QVariant& value)
 
         return true;
     }
-    else if ( value.canConvert(QVariant::Map) )
+    else if ( value.canConvert<QVariantMap>() )
     {
         QVariantMap valueList = value.toMap();
         for (QVariant& v : valueList.values())
