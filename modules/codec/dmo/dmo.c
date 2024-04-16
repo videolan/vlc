@@ -57,10 +57,12 @@ static int  DecoderOpen  ( vlc_object_t * );
 static void DecoderClose ( vlc_object_t * );
 static int DecodeBlock ( decoder_t *, block_t * );
 static void *DecoderThread( void * );
+#ifdef ENABLE_SOUT
 static void EncoderClose ( encoder_t * );
 static block_t *EncodeBlock( encoder_t *, void * );
 
 static int  EncOpen  ( vlc_object_t * );
+#endif // !ENABLE_SOUT
 
 static int LoadDMO( vlc_object_t *, HINSTANCE *, IMediaObject **,
                     const es_format_t *, bool );
@@ -1000,6 +1002,7 @@ static void *DecoderThread( void *data )
 }
 
 
+#ifdef ENABLE_SOUT
 /****************************************************************************
  * Encoder descriptor declaration
  ****************************************************************************/
@@ -1623,6 +1626,7 @@ void EncoderClose( encoder_t *p_enc )
 
     free( p_sys );
 }
+#endif // !ENABLE_SOUT
 
 vlc_module_begin ()
     set_description( N_("DirectMedia Object decoder") )
@@ -1636,6 +1640,7 @@ vlc_module_begin ()
     set_capability( "audio decoder", 1 )
     set_callbacks(DecoderOpen, DecoderClose)
 
+#ifdef ENABLE_SOUT
     add_submodule ()
     set_description( N_("DirectMedia Object encoder") )
     add_shortcut( "dmo" )
@@ -1647,4 +1652,5 @@ vlc_module_begin ()
     add_shortcut( "dmo" )
     set_capability( "audio encoder", 10 )
     set_callback( EncoderOpenAudio )
+#endif
 vlc_module_end ()
