@@ -270,7 +270,7 @@ void VideoSurface::mouseReleaseEvent(QMouseEvent* event)
 
 void VideoSurface::mouseMoveEvent(QMouseEvent* event)
 {
-    QPointF current_pos = event->localPos();
+    QPointF current_pos = event->position();
     QQuickWindow* window = this->window();
     if (!window)
         return;
@@ -281,7 +281,7 @@ void VideoSurface::mouseMoveEvent(QMouseEvent* event)
 
 void VideoSurface::hoverMoveEvent(QHoverEvent* event)
 {
-    QPointF current_pos = event->posF();
+    QPointF current_pos = event->position();
     if (current_pos != m_oldHoverPos)
     {
         QQuickWindow* window = this->window();
