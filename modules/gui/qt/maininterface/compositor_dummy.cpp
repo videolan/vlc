@@ -60,6 +60,9 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
     ui->setup(m_qmlWidget->engine());
     m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
 
+    if (m_qmlWidget->status() != QQuickView::Ready)
+        return false;
+
     m_qmlWidget->show();
 
     return true;
