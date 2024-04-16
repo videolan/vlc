@@ -94,6 +94,7 @@ vlc_module_begin()
     set_capability("audio decoder", 1)
     set_callbacks(Open, Close)
 
+#ifdef ENABLE_SOUT
     add_submodule()
     add_shortcut("mft")
     set_capability("audio encoder", 10) // less than DMO for now
@@ -103,6 +104,7 @@ vlc_module_begin()
     add_shortcut("mft")
     set_capability("video encoder", 10) // less than DMO for now
     set_callback(OpenMFTVideoEncoder)
+#endif
 vlc_module_end()
 
 class mft_sys_t : public vlc_mft_ref
@@ -1933,6 +1935,7 @@ HRESULT mft_enc_video::ProcessOutput(vlc_logger *logger, block_t * & output)
     return S_OK;
 }
 
+#ifdef ENABLE_SOUT
 static block_t *EncodeVideoAsync(encoder_t *p_enc, picture_t *p_pic)
 {
     mft_enc_video *p_sys = static_cast<mft_enc_video*>(p_enc->p_sys);
@@ -2582,6 +2585,7 @@ error:
     EncoderClose(p_enc);
     return VLC_ENOTSUP;
 }
+#endif // !ENABLE_SOUT
 
 static int Open(vlc_object_t *p_this)
 {
