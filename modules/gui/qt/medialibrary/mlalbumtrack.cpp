@@ -50,14 +50,14 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
     {
         ml_unique_ptr<vlc_ml_album_t> album(vlc_ml_get_album(_ml, _data->album_track.i_album_id));
         if (album)
-             m_albumTitle =  album->psz_title;
+            m_albumTitle =  album->psz_title;
     }
 
     if ( _data->album_track.i_artist_id != 0 )
     {
         ml_unique_ptr<vlc_ml_artist_t> artist(vlc_ml_get_artist(_ml, _data->album_track.i_artist_id));
         if (artist)
-             m_artist =  artist->psz_name;
+            m_artist =  artist->psz_name;
     }
 }
 
