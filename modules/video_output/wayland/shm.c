@@ -173,6 +173,30 @@ static int ResetPictures(vout_display_t *vd, video_format_t *fmt)
     return VLC_SUCCESS;
 }
 
+static int UpdateViewport(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->viewport == NULL)
+        return VLC_EGENERIC;
+
+    video_format_t fmt;
+    vout_display_place_t place;
+
+    video_format_ApplyRotation(&fmt, vd->source);
+    vout_display_PlacePicture(&place, vd->source,
+                              &vd->cfg->display);
+
+    wp_viewport_set_source(sys->viewport,
+                    wl_fixed_from_int(fmt.i_x_offset),
+                    wl_fixed_from_int(fmt.i_y_offset),
+                    wl_fixed_from_int(fmt.i_visible_width),
+                    wl_fixed_from_int(fmt.i_visible_height));
+    wp_viewport_set_destination(sys->viewport,
+                                place.width, place.height);
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -183,28 +207,7 @@ static int Control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            if (sys->viewport != NULL)
-            {
-                video_format_t fmt;
-                vout_display_place_t place;
-
-                video_format_ApplyRotation(&fmt, vd->source);
-                vout_display_PlacePicture(&place, vd->source,
-                                          &vd->cfg->display);
-
-                wp_viewport_set_source(sys->viewport,
-                                wl_fixed_from_int(fmt.i_x_offset),
-                                wl_fixed_from_int(fmt.i_y_offset),
-                                wl_fixed_from_int(fmt.i_visible_width),
-                                wl_fixed_from_int(fmt.i_visible_height));
-                wp_viewport_set_destination(sys->viewport,
-                                            place.width, place.height);
-            }
-            else
-                return VLC_EGENERIC;
-            break;
-        }
+            return UpdateViewport(vd);
         default:
              msg_Err(vd, "unknown request %d", query);
              return VLC_EGENERIC;
