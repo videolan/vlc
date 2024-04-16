@@ -388,6 +388,23 @@ static void DeleteBuffers(vout_display_t *vd)
     xcb_free_pixmap(conn, sys->drawable.crop);
 }
 
+static int UpdateOutput(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* Update the window size */
+    uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+    const uint32_t values[] = {
+        vd->cfg->display.width, vd->cfg->display.height
+    };
+
+    xcb_configure_window(sys->conn, sys->drawable.dest, mask, values);
+    DeleteBuffers(vd);
+    CreateBuffers(vd);
+    xcb_flush(sys->conn);
+    return VLC_SUCCESS;
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -397,19 +414,7 @@ static int Control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            /* Update the window size */
-            uint32_t mask = XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
-            const uint32_t values[] = {
-                vd->cfg->display.width, vd->cfg->display.height
-            };
-
-            xcb_configure_window(sys->conn, sys->drawable.dest, mask, values);
-            DeleteBuffers(vd);
-            CreateBuffers(vd);
-            xcb_flush(sys->conn);
-            return VLC_SUCCESS;
-        }
+            return UpdateOutput(vd);
 
         default:
             msg_Err(vd, "Unknown request in XCB RENDER display");
