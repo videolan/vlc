@@ -45,15 +45,18 @@ public:
     {
         vlc_assert(obj);
         updatePalette();
-        connect(qApp, &QGuiApplication::paletteChanged, this, &SystemePaletteObserver::paletteChanged);
     }
 
-public slots:
-    void paletteChanged()
+    bool event(QEvent *event) override
     {
-        updatePalette();
-        if (m_obj->paletteUpdated)
-            m_obj->paletteUpdated(m_obj, m_obj->paletteUpdatedData);
+        if (event->type() == QEvent::ApplicationPaletteChange)
+        {
+            updatePalette();
+            if (m_obj->paletteUpdated)
+                m_obj->paletteUpdated(m_obj, m_obj->paletteUpdatedData);
+        }
+
+        return QObject::event(event);
     }
 
 public:
