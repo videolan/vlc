@@ -110,9 +110,7 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
 
     m_qmlWindowHWND = (HWND)m_qmlView->winId();
 
-    commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
-
-    return true;
+    return commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
 }
 
 void CompositorWin7::destroyMainInterface()
