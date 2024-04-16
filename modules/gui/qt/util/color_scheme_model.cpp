@@ -60,7 +60,7 @@ bool ColorSchemeModel::setData(const QModelIndex &index,
     if (role == Qt::CheckStateRole
             && checkIndex(index, CheckIndexOption::IndexIsValid)
             && index.row() != m_currentIndex
-            && value.type() == QVariant::Bool
+            && value.typeId() == QMetaType::Bool
             && value.toBool())
     {
         setCurrentIndex(index.row());
