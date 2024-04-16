@@ -146,7 +146,7 @@ diagnostic "vlc contribs: bootstrap"
             --disable-speexdsp --disable-taglib --disable-zvbi \
             --disable-rnnoise --disable-libaribcaption \
             --disable-ogg --disable-vorbis --disable-kate --disable-flac \
-            --host=wasm32-unknown-emscripten --enable-rav1e
+            --host=wasm32-unknown-emscripten
 
 diagnostic "vlc contribs: make"
 if [ "$VLC_USE_PREBUILT_CONTRIBS" -ne "0" ]; then
