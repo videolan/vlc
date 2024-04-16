@@ -126,22 +126,24 @@ public:
         invalidateCache();
     }
 
-    void setIntexedState(const NetworkMediaItemPtr& item, bool indexed)
+    void setIntexedState(const QString &uri, bool indexed)
     {
-        if (item->indexed == indexed)
+        auto itr = m_items.find(uri);
+        if (itr == m_items.end())
             return;
-        auto it = std::find(m_items.begin(), m_items.end(), item);
-        if (it != m_items.end())
-        {
-            //contruct by copy, don't mutate items in m_items,
-            //we want the change to be notified
-            auto newItem = std::make_shared<NetworkMediaItem>(*item);
-            newItem->indexed = indexed;
 
-            *it = newItem;
-            ++m_revision;
-            invalidateCache();
-        }
+        auto &itemPtr = *itr;
+        if (itemPtr->indexed == indexed)
+            return;
+
+        //contruct by copy, don't mutate items in m_items,
+        //we want the change to be notified
+        auto newItem = std::make_shared<NetworkMediaItem>(*itemPtr);
+        newItem->indexed = indexed;
+
+        itemPtr = newItem;
+        ++m_revision;
+        invalidateCache();
     }
 
     void removeItem(const SharedInputItem& node, const std::vector<SharedInputItem>& itemsList)
@@ -239,17 +241,23 @@ public:
                     bool succeed;
                     bool isIndexed;
                 };
+
+                const QString uri = item->uri;
                 m_mediaLib->runOnMLThread<Ctx>(q,
                     //ML thread
-                    [item](vlc_medialibrary_t* ml, Ctx& ctx){
-                        auto ret = vlc_ml_is_indexed( ml, qtu(item->mainMrl.toString( QUrl::FullyEncoded )), &ctx.isIndexed );
+                    [uri](vlc_medialibrary_t* ml, Ctx& ctx){
+                        // Medialibrary requires folders uri to be terminated with '/'
+                        const QString mlURI = uri + "/";
+
+                        auto ret = vlc_ml_is_indexed( ml, qtu( mlURI ), &ctx.isIndexed );
                         ctx.succeed = (ret == VLC_SUCCESS);
                     },
                     //UI thread
-                    [this, item](quint64, Ctx& ctx){
+                    [this, uri](quint64, Ctx& ctx){
                         if (!ctx.succeed)
                             return;
-                        setIntexedState(item, ctx.isIndexed);
+
+                        setIntexedState(uri, ctx.isIndexed);
                     });
             }
 
@@ -611,27 +619,36 @@ bool NetworkMediaModel::setData( const QModelIndex& idx, const QVariant& value, 
     if ( item->indexed == enabled )
         return  true;
 
-    QUrl mainMrl = item->mainMrl;
-    struct Ctx {
+    struct Ctx
+    {
         bool succeed;
     };
+
+    const QString uri = item->uri;
+
     d->m_mediaLib->runOnMLThread<Ctx>(this,
     //ML thread
-    [enabled, mainMrl]
+    [enabled, uri]
     (vlc_medialibrary_t* ml, Ctx& ctx){
         int res;
+
+        // Medialibrary requires folders uri to be terminated with '/'
+        const QString mlURI = uri + "/";
+
         if ( enabled )
-            res = vlc_ml_add_folder( ml, qtu( mainMrl.toString( QUrl::FullyEncoded ) ) );
+            res = vlc_ml_add_folder( ml, qtu( mlURI ) );
         else
-            res = vlc_ml_remove_folder( ml, qtu( mainMrl.toString( QUrl::FullyEncoded ) ) );
+            res = vlc_ml_remove_folder( ml, qtu( mlURI ) );
+
         ctx.succeed = res == VLC_SUCCESS;
     },
     //UI thread
-    [this, item, enabled](qint64, Ctx& ctx){
+    [this, uri, enabled](qint64, Ctx& ctx){
         Q_D(NetworkMediaModel);
         if (!ctx.succeed)
             return;
-        d->setIntexedState(item, enabled);
+
+        d->setIntexedState(uri, enabled);
     },
     ML_FOLDER_ADD_QUEUE);
 
