@@ -521,7 +521,7 @@ bool ControlbarProfileModel::setData(const QModelIndex &index, const QVariant &v
         switch (role)
         {
         case Qt::DisplayRole:
-            if (value.canConvert(QVariant::String))
+            if (value.canConvert<QString>())
                 ptrProfile->setName(value.toString());
             else
                 return false;
