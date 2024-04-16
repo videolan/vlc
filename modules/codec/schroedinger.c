@@ -47,6 +47,7 @@
  *****************************************************************************/
 static int        OpenDecoder  ( vlc_object_t * );
 static void       CloseDecoder ( vlc_object_t * );
+#ifdef ENABLE_SOUT
 static int        OpenEncoder  ( vlc_object_t * );
 static void       CloseEncoder ( encoder_t * );
 
@@ -354,6 +355,7 @@ static const char *const ppsz_enc_options[] = {
     ENC_ME_GLOBAL_MOTION, ENC_ME_PHASECORR, ENC_SCD, ENC_FORCE_PROFILE,
     NULL
 };
+#endif // !ENABLE_SOUT
 
 
 /* Module declaration */
@@ -366,6 +368,7 @@ vlc_module_begin ()
     set_callbacks( OpenDecoder, CloseDecoder )
     add_shortcut( "schroedinger" )
 
+#ifdef ENABLE_SOUT
     /* encoder */
     add_submodule()
     set_section( N_("Encoding") , NULL )
@@ -518,6 +521,7 @@ vlc_module_begin ()
     add_string( ENC_CFG_PREFIX ENC_FORCE_PROFILE, NULL,
                 ENC_FORCE_PROFILE_TEXT, NULL )
     change_string_list( enc_profile_list, enc_profile_list_text )
+#endif // !ENABLE_SOUT
 
 vlc_module_end ()
 
@@ -871,6 +875,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 }
 
+#ifdef ENABLE_SOUT
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1604,3 +1609,4 @@ static void CloseEncoder( encoder_t *p_enc )
     /* We need to reset p_sys since CloseEncoder is also called during error. */
     p_enc->p_sys = NULL;
 }
+#endif // !ENABLE_SOUT
