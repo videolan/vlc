@@ -22,6 +22,7 @@ foreach vlc_test: vlc_tests
         'c_args',
         'cpp_args',
         'objc_args',
+        'include_directories',
     ]
 
     foreach key : vlc_test.keys()
