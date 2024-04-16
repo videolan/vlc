@@ -94,11 +94,13 @@ vlc_module_begin ()
     set_callbacks(OpenDecoder, CloseGeneric)
 #endif
 
+#ifdef ENABLE_SOUT
     add_submodule ()
     set_section( N_("Encoding") , NULL )
     set_description( N_("Video encoder (using OpenMAX IL)") )
     set_capability( "video encoder", 0 )
     set_callback( OpenEncoder )
+#endif
 vlc_module_end ()
 
 /*****************************************************************************
@@ -895,6 +897,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+#ifdef ENABLE_SOUT
 static void CloseEncoder( encoder_t *p_enc )
 {
     CloseGeneric( VLC_OBJECT(p_enc) );
@@ -923,6 +926,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 }
+#endif
 
 /*****************************************************************************
  * OpenGeneric: Create the generic decoder/encoder instance
@@ -1627,6 +1631,7 @@ error:
     return VLCDEC_SUCCESS;
 }
 
+#ifdef ENABLE_SOUT
 /*****************************************************************************
  * EncodeVideo: Called to encode one frame
  *****************************************************************************/
@@ -1724,6 +1729,7 @@ error:
     p_sys->b_error = true;
     return NULL;
 }
+#endif // !ENABLE_SOUT
 
 /*****************************************************************************
  * CloseGeneric: omxil decoder destruction
