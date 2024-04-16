@@ -737,7 +737,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
         ml->addAndPlay(ids, {":no-video"});
     });
 
-    if (options.contains("information") && options["information"].type() == QVariant::Int) {
+    if (options.contains("information") && options["information"].typeId() == QMetaType::Int) {
         action = m_menu->addAction(qtr("Information"));
 
         QSignalMapper * mapper = new QSignalMapper(m_menu.get());
