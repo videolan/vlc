@@ -1535,7 +1535,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         _infoWindowController = [[VLCInformationWindowController alloc] init];
         _infoWindowController.mainMenuInstance = YES;
     }
-    _infoWindowController.representedInputItem = _playlistController.currentlyPlayingInputItem;
+
+    VLCInputItem * const currentInputItem = _playlistController.currentlyPlayingInputItem;
+    if (currentInputItem == nil) {
+        return;
+    }
+    _infoWindowController.representedInputItem = currentInputItem;
     [_infoWindowController toggleWindow:sender];
 }
 
