@@ -1728,8 +1728,11 @@ static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
     return p_grab;
 }
 
-void rtp_get_video_geometry( sout_stream_id_sys_t *id, int *width, int *height )
+int rtp_get_video_geometry( sout_stream_id_sys_t *id, int *width, int *height )
 {
     int ret = sscanf( id->rtp_fmt.fmtp, "%*s width=%d; height=%d; ", width, height );
-    assert( ret == 2 );
+    if( ret != 2 )
+        return VLC_EGENERIC;
+
+    return VLC_SUCCESS;
 }

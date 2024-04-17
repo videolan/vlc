@@ -87,5 +87,5 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
                  rtp_format_t *p_rtp_fmt );
 
 /* Only used by rtp_packetize_rawvideo */
-void rtp_get_video_geometry( sout_stream_id_sys_t *id, int *width, int *height );
+int rtp_get_video_geometry( sout_stream_id_sys_t *id, int *width, int *height );
 uint16_t rtp_get_extended_sequence( sout_stream_id_sys_t *id );

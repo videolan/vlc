@@ -1744,7 +1744,12 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
 static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fourcc_t i_format  )
 {
     int i_width, i_height;
-    rtp_get_video_geometry( id, &i_width, &i_height );
+    if( rtp_get_video_geometry( id, &i_width, &i_height ) != VLC_SUCCESS )
+    {
+        block_Release( in );
+        return VLC_EGENERIC;
+    }
+
     int i_pgroup; /* Size of a group of pixels */
     int i_xdec, i_ydec; /* sub-sampling factor in x and y */
     switch( i_format )
