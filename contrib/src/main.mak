@@ -274,13 +274,6 @@ endif
 endif
 GIT ?= $(error git not found)
 
-ifndef SVN
-ifeq ($(shell svn --version >/dev/null 2>&1 || echo FAIL),)
-SVN = svn
-endif
-endif
-SVN ?= $(error subversion client (svn) not found)
-
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
 download = curl -f -L -- "$(1)" > "$@"
 else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
