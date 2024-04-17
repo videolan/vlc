@@ -12,9 +12,6 @@ VLC_TOOLS ?= $(TOPSRC)/../extras/tools/build
 
 CMAKE_GENERATOR ?= Ninja
 
-PATH :=$(abspath $(VLC_TOOLS)/bin):$(PATH)
-export PATH
-
 PKGS_ALL := $(patsubst $(SRC)/%/rules.mak,%,$(wildcard $(SRC)/*/rules.mak))
 DATE := $(shell date +%Y%m%d)
 VPATH := $(TARBALLS)
@@ -41,6 +38,11 @@ PREFIX := $(abspath $(PREFIX))
 BUILDPREFIX ?= $(PREFIX)/..
 BUILDPREFIX := $(abspath $(BUILDPREFIX))
 BUILDBINDIR ?= $(BUILDPREFIX)/bin
+
+SYSTEM_PATH := $(abspath $(VLC_TOOLS)/bin):$(PATH)
+PATH :=$(abspath $(BUILDBINDIR)):$(SYSTEM_PATH)
+export PATH
+
 ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif

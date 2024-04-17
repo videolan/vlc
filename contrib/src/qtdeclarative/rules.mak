@@ -25,7 +25,7 @@ endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtdeclarative-tools
 endif
-ifeq ($(shell qml --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(QTDECLARATIVE_VERSION_MAJOR))
+ifeq ($(shell PATH="${SYSTEM_PATH}" qml --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(QTDECLARATIVE_VERSION_MAJOR))
 PKGS_FOUND += qtshadertools-tools
 endif
 
