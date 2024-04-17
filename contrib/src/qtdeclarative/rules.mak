@@ -25,7 +25,7 @@ endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtdeclarative-tools
 endif
-ifeq ($(call system_tool_majmin, qml --version),$(QTDECLARATIVE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, qmlcachegen --version),$(QTDECLARATIVE_VERSION_MAJOR))
 PKGS_FOUND += qtshadertools-tools
 endif
 

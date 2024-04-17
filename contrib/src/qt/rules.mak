@@ -28,7 +28,7 @@ endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qt-tools
 endif
-ifeq ($(call system_tool_version, qt-cmake --version),3.22)
+ifeq ($(call system_tool_version, moc --version),$(QTBASE_VERSION_MAJOR))
 PKGS_FOUND += qt-tools
 endif
 
