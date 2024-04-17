@@ -80,9 +80,7 @@ Widgets.StackViewExt {
     property int initialIndex: -1
 
     // used in custom focus management for explicit "focusReason" transfer
-    property var setCurrentItemFocus: {
-        return Helpers.get(currentItem, "setCurrentItemFocus", setCurrentItemFocusDefault)
-    }
+    property var setCurrentItemFocus: currentItem?.setCurrentItemFocus ?? setCurrentItemFocusDefault
 
     // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
     //       gets called multiple times even when the currentComponent stays the same.

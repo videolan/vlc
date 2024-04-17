@@ -621,7 +621,7 @@ FocusScope {
     }
 
     function _shouldDelayRemove(item) {
-        return Helpers.get(item, "delayRemove", false)
+        return item?.delayRemove ??false
     }
 
     function _delayRemove(id, item) {

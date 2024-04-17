@@ -35,11 +35,11 @@ MainInterface.MainViewLoader {
 
     readonly property var currentIndex: _currentView.currentIndex
 
-    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
-    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
+    readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
+    readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
      // 'loading' property is not available with NetworkDevicesModel
-    readonly property bool loading: Helpers.get(model, "loading", false)
+    readonly property bool loading: model?.loading ?? false
 
     // fixme remove this
     property Item _currentView: currentItem

@@ -35,19 +35,19 @@ MainInterface.MainViewLoader {
 
     // Properties
 
-    readonly property int contentLeftMargin: Helpers.get(currentItem, "contentLeftMargin", 0)
-    readonly property int contentRightMargin: Helpers.get(currentItem, "contentRightMargin", 0)
+    readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
+    readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
     property bool fadingEdgeList: true
 
     // NOTE: Specify an optional header for the view.
     property Component header: null
 
-    property Item headerItem: Helpers.get(currentItem, "headerItem", null)
+    property Item headerItem: currentItem?.headerItem ?? null
 
     property int headerPositioning: ListView.OverlayHeader
 
-    readonly property int currentIndex: Helpers.get(currentItem, "currentIndex", -1)
+    readonly property int currentIndex: currentItem?.currentIndex ?? -1
 
     // 'role' used for tableview's section text
     /* required */ property string sectionProperty

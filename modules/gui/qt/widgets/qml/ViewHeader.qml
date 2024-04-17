@@ -34,8 +34,8 @@ T.Pane {
 
     /* required */ property var view
 
-    leftPadding: Helpers.get(view, "contentLeftMargin", 0)
-    rightPadding: Helpers.get(view, "contentRightMargin", 0)
+    leftPadding: view?.contentLeftMargin ?? 0
+    rightPadding: view?.contentRightMargin ?? 0
 
     bottomPadding: VLCStyle.layoutTitle_bottom_padding
     topPadding: VLCStyle.layoutTitle_top_padding

@@ -95,14 +95,14 @@ FadingEdge {
                                                       : !listView.atXBeginning) &&
                          (!firstVisibleItem ||
                          (!firstVisibleItem.activeFocus &&
-                          !Helpers.get(firstVisibleItem, "hovered", true)))
+                          !(firstVisibleItem?.hovered ?? true)))
 
     enableEndFade: _fadeRectEnoughSize &&
                    (orientation === Qt.Vertical ? !listView.atYEnd
                                                 : !listView.atXEnd) &&
                    (!lastVisibleItem ||
                    (!lastVisibleItem.activeFocus &&
-                    !Helpers.get(lastVisibleItem, "hovered", true)))
+                    !(lastVisibleItem?.hovered ?? true)))
 
     Binding on enableBeginningFade {
         when: !!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)

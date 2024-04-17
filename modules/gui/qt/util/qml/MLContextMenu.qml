@@ -147,7 +147,7 @@ NativeMenu {
 
     function showInformationAvailable(dataList, options, indexes) {
         return indexes.length === 1
-                && Helpers.isInteger(Helpers.get(options, "information", null))
+                && Helpers.isInteger(options?.["information"] ?? null)
     }
 
     // Private
@@ -187,13 +187,13 @@ NativeMenu {
     }
 
     function _signalShowInformation(dataList, options) {
-        const index = Helpers.get(options, "information", null)
+        const index = options?.["information"] ?? null
         console.assert(Helpers.isInteger(index))
         showMediaInformation(index)
     }
 
     function _playerOptions(options, extraOptions) {
-        const playerOpts = Helpers.get(options, "player-options", [])
+        const playerOpts = options?.["player-options"] ?? []
         return playerOpts.concat(extraOptions)
     }
 

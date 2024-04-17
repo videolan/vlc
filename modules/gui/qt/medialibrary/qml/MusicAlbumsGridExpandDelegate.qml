@@ -63,7 +63,7 @@ FocusScope {
     }
 
     function _getStringTrack() {
-        const count = Helpers.get(model, "nb_tracks", 0);
+        const count = model?.nb_tracks ?? 0;
 
         if (count < 2)
             return qsTr("%1 track").arg(count);
@@ -240,7 +240,7 @@ FocusScope {
                         Widgets.SubtitleLabel {
                             id: expand_infos_title_id
 
-                            text: Helpers.get(root.model, "title", qsTr("Unknown title"))
+                            text: root.model?.title ?? qsTr("Unknown title")
 
                             color: theme.fg.primary
 
@@ -265,10 +265,10 @@ FocusScope {
 
                         width: parent.width
                         text: qsTr("%1 - %2 - %3 - %4")
-                            .arg(Helpers.get(root.model, "main_artist", qsTr("Unknown artist")))
-                            .arg(Helpers.get(root.model, "release_year", ""))
+                            .arg(root.model?.main_artist ?? qsTr("Unknown artist"))
+                            .arg(root.model?.release_year ?? "")
                             .arg(_getStringTrack())
-                            .arg((root.model && root.model.duration) ? root.model.duration.formatHMS() : 0)
+                            .arg(root.model?.duration?.formatHMS() ?? 0)
                     }
                 }
             }
