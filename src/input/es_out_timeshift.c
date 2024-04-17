@@ -745,9 +745,12 @@ static int Control( es_out_t *p_tsout, input_source_t *in, int i_query, va_list 
     return i_ret;
 }
 
-static int PrivControlLocked( es_out_t *p_tsout, input_source_t *in, int i_query, va_list args )
+static int PrivControlLocked(struct vlc_input_es_out *p_tsout,
+                             input_source_t *in,
+                             int i_query,
+                             va_list args )
 {
-    struct es_out_timeshift *p_sys = PRIV(p_tsout);
+    struct es_out_timeshift *p_sys = PRIV(&p_tsout->out);
 
     switch( i_query )
     {
@@ -815,16 +818,16 @@ static int PrivControlLocked( es_out_t *p_tsout, input_source_t *in, int i_query
     }
 }
 
-static int PrivControl( es_out_t *p_tsout, input_source_t *in, int i_query, va_list args )
+static int PrivControl(struct vlc_input_es_out *p_tsout, input_source_t *in, int i_query, va_list args )
 {
-    struct es_out_timeshift *p_sys = PRIV(p_tsout);
+    struct es_out_timeshift *p_sys = PRIV(&p_tsout->out);
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
 
-    TsAutoStop( p_tsout );
+    TsAutoStop(&p_tsout->out);
 
-    i_ret = PrivControlLocked( p_tsout, in, i_query, args );
+    i_ret = PrivControlLocked(p_tsout, in, i_query, args);
 
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -838,7 +841,6 @@ static const struct es_out_callbacks es_out_timeshift_cbs =
     .del = Del,
     .control = Control,
     .destroy = Destroy,
-    .priv_control = PrivControl,
 };
 
 /*****************************************************************************
@@ -853,7 +855,11 @@ input_EsOutTimeshiftNew(input_thread_t *p_input,
     if( !p_sys )
         return NULL;
 
-    p_sys->out.ops = NULL;
+    static const struct vlc_input_es_out_ops timeshift_ops =
+    {
+        .priv_control = PrivControl,
+    };
+    p_sys->out.ops = &timeshift_ops;
     p_sys->out.out.cbs = &es_out_timeshift_cbs;
 
     /* */
