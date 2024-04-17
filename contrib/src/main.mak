@@ -40,7 +40,7 @@ BUILDPREFIX := $(abspath $(BUILDPREFIX))
 BUILDBINDIR ?= $(BUILDPREFIX)/bin
 
 SYSTEM_PATH := $(abspath $(VLC_TOOLS)/bin):$(PATH)
-PATH :=$(abspath $(BUILDBINDIR)):$(SYSTEM_PATH)
+PATH :=$(abspath $(BUILDBINDIR)):$(abspath $(BUILDBINDIR)/../libexec):$(SYSTEM_PATH)
 export PATH
 
 ifneq ($(HOST),$(BUILD))
