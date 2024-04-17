@@ -28,8 +28,7 @@ PKGS_FOUND += qtshadertools
 endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtshadertools-tools
-endif
-ifeq ($(call system_tool_majmin, qsb --version),$(QTSHADERTOOLS_VERSION_MAJOR))
+else ifeq ($(call system_tool_majmin, qsb --version),$(QTSHADERTOOLS_VERSION_MAJOR))
 PKGS_FOUND += qtshadertools-tools
 endif
 
