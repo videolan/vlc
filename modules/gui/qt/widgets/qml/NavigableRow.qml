@@ -143,7 +143,7 @@ T.Control {
             onItemAdded: (index, item) => {
                 if (item.enabled) root._countEnabled += 1;
 
-                item.onEnabledChanged.connect(() => { root._countEnabled += (target.enabled ? 1 : -1) })
+                item.onEnabledChanged.connect(() => { root._countEnabled += (item.enabled ? 1 : -1) })
 
                 item.Navigation.parentItem = root;
 
