@@ -26,14 +26,6 @@ function isValidInstanceOf(object, type) {
     return (!!object && (object instanceof type))
 }
 
-// Returns the value associated with the key.
-// If the hash contains no item with the key,
-// or the value is invalid, returns defaultValue
-function get(dict, key, defaultValue) {
-    var v = typeof dict !== "undefined" && !!dict ? dict[key] : undefined
-    return typeof v === "undefined" ? defaultValue : v
-}
-
 // NOTE: This allows us to force another 'reason' even when the item has activeFocus.
 function enforceFocus(item, reason) {
     if (item.activeFocus && item.focusReason === reason)
