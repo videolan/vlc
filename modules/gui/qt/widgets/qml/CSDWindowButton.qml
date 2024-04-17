@@ -35,8 +35,6 @@ T.Button {
     property bool showHovered: false
     property bool isThemeDark: false
 
-    readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
-
     readonly property bool _paintHovered: control.hovered || showHovered
 
     padding: 0
@@ -71,9 +69,15 @@ T.Button {
             text: control.iconTxt
 
             font.family:{
-                if (useWinIcons)
-                 return "Segoe Fluent Icons, Segoe MDL2 Assets"
+                if (MainCtx.osName === MainCtx.Windows)
+                {
+                    if(MainCtx.osVersion === 10)
+                        return "Segoe MDL2 Assets"
 
+                    else if(MainCtx.osVersion >= 11)
+                        return "Segoe Fluent Icons"
+                }
+     
                 return VLCIcons.fontFamily
             }
 
