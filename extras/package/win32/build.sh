@@ -249,8 +249,6 @@ case $LICENSE in
     ;;
 esac
 
-export PATH="$PWD/contrib/$CONTRIB_PREFIX/bin":"$PATH"
-
 if [ "$INTERACTIVE" = "yes" ]; then
 if [ "x$SHELL" != "x" ]; then
     exec $SHELL
