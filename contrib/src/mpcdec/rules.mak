@@ -15,14 +15,7 @@ $(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
 #MUSE_REV := 481
 #MUSE_SVN := http://svn.musepack.net/libmpc/trunk/
 
-#$(TARBALLS)/musepack_src_r$(MUSE_REV).tar.gz:
-#	rm -Rf musepack_src_r$(MUSE_REV)
-#	$(SVN) export $(MUSE_SVN) -r $(MUSE_REV) musepack_src_r$(MUSE_REV)
-#	tar czv musepack_src_r$(MUSE_REV) > $@
-
 .sum-mpcdec: musepack_src_r$(MUSE_REV).tar.gz
-#	$(warning $@ not implemented)
-#	touch $@
 
 musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 	$(UNPACK)
