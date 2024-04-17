@@ -28,7 +28,7 @@ endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qt-tools
 endif
-ifeq ($(shell PATH="${SYSTEM_PATH}" qt-cmake --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),3.22)
+ifeq ($(call system_tool_version, qt-cmake --version),3.22)
 PKGS_FOUND += qt-tools
 endif
 

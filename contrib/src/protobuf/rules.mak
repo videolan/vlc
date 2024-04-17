@@ -20,7 +20,7 @@ endif
 endif
 PKGS.tools.protoc.path = $(BUILDBINDIR)/protoc
 
-ifeq ($(shell PATH="${SYSTEM_PATH}" protoc --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2),$(PROTOBUF_MAJVERSION))
+ifeq ($(call system_tool_majmin, protoc --version),$(PROTOBUF_MAJVERSION))
 PKGS_FOUND += protoc
 endif
 
