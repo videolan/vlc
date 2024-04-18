@@ -141,7 +141,6 @@ check libtool 2.4
 check pkg-config
 check cmake 3.21.0
 check_tar
-check ragel
 check_sed
 check ant
 check xz

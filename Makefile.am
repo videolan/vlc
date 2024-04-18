@@ -68,8 +68,7 @@ EXTRA_DIST += \
 	extras/tools/libtool-2.4.7-clang-libs.patch \
 	extras/tools/libtool-2.4.7-response-files.patch \
 	extras/tools/libtool-2.4.7-lpthread.patch \
-	extras/tools/libtool-2.4.7-embed-bitcode.patch \
-	extras/tools/ragel-6.8-javacodegen.patch
+	extras/tools/libtool-2.4.7-embed-bitcode.patch
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )

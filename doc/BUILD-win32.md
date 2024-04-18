@@ -21,7 +21,7 @@ needs to build itself and its contribs.
 sudo apt-get update -qq
 sudo apt-get install -qqy \
     git wget bzip2 file libwine-dev unzip libtool libtool-bin libltdl-dev pkg-config ant \
-    build-essential automake texinfo ragel yasm p7zip-full autopoint \
+    build-essential automake texinfo yasm p7zip-full autopoint \
     gettext cmake zip wine nsis g++-mingw-w64-i686 curl gperf flex bison \
     libcurl4-gnutls-dev python3 python3-setuptools python3-mako python3-requests \
     gcc make procps ca-certificates \
@@ -37,7 +37,7 @@ pacman -S --needed git wget bzip2 file unzip libtool pkg-config \
     gettext cmake zip curl gperf flex bison \
     python3 python3-setuptools python3-mako \
     gcc make ca-certificates nasm gnupg patch help2man \
-    ragel python3 meson
+    python3 meson
 ```
 <!-- pacman -S ant autopoint nsis python3-requests jq openjdk-11-jdk-headless -->
 
@@ -71,8 +71,8 @@ should go with the `msvcrt` version. The official VLC builds use `msvcrt` for de
 wget https://github.com/mstorsjo/llvm-mingw/releases/download/20220906/llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64.tar.xz
 tar xvf llvm-mingw-20220906-msvcrt-ubuntu-18.04-x86_64.tar.xz -C /opt
 ```
-Every time you build VLC, you will need to have the toolchain in your PATH.  
-We recommend creating a script file to do this, so that you can call 
+Every time you build VLC, you will need to have the toolchain in your PATH.
+We recommend creating a script file to do this, so that you can call
 it when you start your build sesson:
 
 ```sh
@@ -91,8 +91,8 @@ wget https://github.com/mstorsjo/llvm-mingw/releases/download/20220906/llvm-ming
 unzip llvm-mingw-20220906-msvcrt-x86_64.zip -d /opt
 ```
 
-Every time you build VLC, you will need to have the toolchain in your PATH.  
-We recommend creating a script file to do this, so that you can call 
+Every time you build VLC, you will need to have the toolchain in your PATH.
+We recommend creating a script file to do this, so that you can call
 it when you start your build sesson:
 
 ```sh

@@ -30,9 +30,6 @@ TAR_URL=$(GNU)/tar/tar-$(TAR_VERSION).tar.bz2
 XZ_VERSION=5.4.1
 XZ_URL=http://tukaani.org/xz/xz-$(XZ_VERSION).tar.bz2
 
-RAGEL_VERSION=6.10
-RAGEL_URL=http://www.colm.net/files/ragel/ragel-$(RAGEL_VERSION).tar.gz
-
 SED_VERSION=4.2.2
 SED_URL=$(GNU)/sed/sed-$(SED_VERSION).tar.bz2
 
