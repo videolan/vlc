@@ -2551,7 +2551,7 @@
 				PRODUCT_NAME = VLC;
 				PROJECT_TEMP_DIR = "build-xcode";
 				SYMROOT = "${BUILD_PATH}";
-				VLC_BUILD_TRIPLET = "x86_64-apple-darwin18";
+				VLC_BUILD_TRIPLET = "aarch64-apple-darwin23";
 				VLC_PATH = "${VLC_SRC_DIR}/contrib/${VLC_BUILD_TRIPLET}/bin:${VLC_SRC_DIR}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin";
 				VLC_SRC_DIR = "$(PROJECT_DIR)/../../..";
 			};
@@ -2604,7 +2604,7 @@
 				PRODUCT_NAME = VLC;
 				PROJECT_TEMP_DIR = "build-xcode";
 				SYMROOT = "${BUILD_PATH}";
-				VLC_BUILD_TRIPLET = "x86_64-apple-darwin18";
+				VLC_BUILD_TRIPLET = "aarch64-apple-darwin23";
 				VLC_PATH = "${VLC_SRC_DIR}/contrib/${VLC_BUILD_TRIPLET}/bin:${VLC_SRC_DIR}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin";
 				VLC_SRC_DIR = "$(PROJECT_DIR)/../../..";
 			};
@@ -2657,7 +2657,7 @@
 				PRODUCT_NAME = VLC;
 				PROJECT_TEMP_DIR = "build-xcode";
 				SYMROOT = "${BUILD_PATH}";
-				VLC_BUILD_TRIPLET = "x86_64-apple-darwin18";
+				VLC_BUILD_TRIPLET = "aarch64-apple-darwin23";
 				VLC_PATH = "${VLC_SRC_DIR}/contrib/${VLC_BUILD_TRIPLET}/bin:${VLC_SRC_DIR}/extras/tools/build/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin";
 				VLC_SRC_DIR = "$(PROJECT_DIR)/../../..";
 			};
