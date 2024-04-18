@@ -25,7 +25,8 @@ HARFBUZZ_CONF := -Dfreetype=enabled \
 	-Dglib=disabled \
 	-Dgobject=disabled \
 	-Ddocs=disabled \
-	-Dtests=disabled
+	-Dtests=disabled \
+	-Dragel_subproject=true
 
 ifdef HAVE_DARWIN_OS
 HARFBUZZ_CONF += -Dcoretext=enabled
