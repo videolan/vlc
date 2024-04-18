@@ -630,21 +630,25 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [self updateTrackHandlingMenus:aNotification];
 
-    VLCInputItem *inputItem = _playerController.currentMedia;
+    VLCInputItem * const inputItem = _playerController.currentMedia;
 
-    if (inputItem != NULL) {
+    if (inputItem != nil) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
-        inputItem = nil;
-
         [self setRateControlsEnabled:_playerController.rateChangable];
         [self setSubtitleSizeControlsEnabled:YES];
+        self.info.enabled = YES;
     } else {
         [_postprocessing setEnabled:NO];
         [self setAudioSubMenusEnabled:NO];
         [self setVideoMenuActiveVideo:NO];
         [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
+        
+        if (self.windowMenu.autoenablesItems) {
+            self.windowMenu.autoenablesItems = NO;
+        }
+        self.info.enabled = NO;
     }
 }
 
