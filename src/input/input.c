@@ -355,9 +355,8 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     else
         priv->stats = NULL;
 
-    struct vlc_input_es_out *out = 
-        input_EsOutNew(p_input, priv->master, priv->rate, priv->type);
-    priv->p_es_out_display = out == NULL ? NULL : &out->out;
+    priv->p_es_out_display = input_EsOutNew(p_input, priv->master, priv->rate,
+                                            priv->type);
     if( !priv->p_es_out_display )
     {
         Destroy( p_input );
@@ -381,7 +380,7 @@ static void Destroy(input_thread_t *input)
     if (priv->p_renderer != NULL)
         vlc_renderer_item_release(priv->p_renderer);
     if (priv->p_es_out_display != NULL)
-        es_out_Delete(priv->p_es_out_display);
+        vlc_input_es_out_Delete(priv->p_es_out_display);
 
     if (priv->p_resource != NULL)
         input_resource_Release(priv->p_resource);
@@ -575,8 +574,8 @@ static vlc_tick_t InputSourceGetLength( input_source_t *source, input_item_t *it
     return length;
 }
 
-static void InputSourceStatistics( input_source_t *source, input_item_t *item,
-                                   es_out_t *out )
+static void InputSourceStatistics(input_source_t *source, input_item_t *item,
+                                  struct vlc_input_es_out *out )
 {
     double f_position = 0.0;
     vlc_tick_t i_time;
@@ -1306,10 +1305,8 @@ static int Init( input_thread_t * p_input )
         goto error;
 
     /* Create es out */
-    struct vlc_input_es_out *out = 
-        input_EsOutTimeshiftNew(p_input, priv->p_es_out_display, priv->rate);
-    priv->p_es_out = out == NULL ? NULL : &out->out;
-    if( priv->p_es_out == NULL )
+    priv->p_es_out = input_EsOutTimeshiftNew(p_input, &priv->p_es_out_display->out, priv->rate);
+    if (priv->p_es_out == NULL)
         goto error;
 
     /* Handle all early controls */
@@ -1380,7 +1377,7 @@ static int Init( input_thread_t * p_input )
             for (size_t i = 0; i < priv->i_slave; i++)
                 InputSourceMeta( p_input, priv->slave[i], p_meta );
 
-            es_out_ControlSetMeta( priv->p_es_out, p_meta );
+            es_out_ControlSetMeta(&priv->p_es_out->out, p_meta);
             vlc_meta_Delete( p_meta );
         }
     }
@@ -1397,8 +1394,8 @@ error:
     input_ChangeState( p_input, ERROR_S, VLC_TICK_INVALID );
 
     if( input_priv(p_input)->p_es_out )
-        es_out_Delete( input_priv(p_input)->p_es_out );
-    es_out_SetMode( input_priv(p_input)->p_es_out_display, ES_OUT_MODE_END );
+        vlc_input_es_out_Delete(input_priv(p_input)->p_es_out);
+    es_out_SetMode(input_priv(p_input)->p_es_out_display, ES_OUT_MODE_END );
     if( input_priv(p_input)->p_resource )
     {
         if( input_priv(p_input)->p_sout )
@@ -1447,7 +1444,7 @@ static void End( input_thread_t * p_input )
 
     /* Unload all modules */
     if( priv->p_es_out )
-        es_out_Delete( priv->p_es_out );
+        vlc_input_es_out_Delete(priv->p_es_out);
     es_out_SetMode( priv->p_es_out_display, ES_OUT_MODE_END );
 
     if( priv->stats != NULL )
@@ -1936,7 +1933,7 @@ static bool Control( input_thread_t *p_input,
             }
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+            es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             if( demux_SetPosition( priv->master->p_demux, param.pos.f_val,
                                    !param.pos.b_fast_seek ) )
             {
@@ -1965,7 +1962,7 @@ static bool Control( input_thread_t *p_input,
             }
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+            es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
 
             i_ret = demux_SetTime( priv->master->p_demux, param.time.i_val,
                                    !param.time.b_fast_seek );
@@ -2062,7 +2059,7 @@ static bool Control( input_thread_t *p_input,
                 !priv->master->b_can_pace_control && priv->master->b_can_rate_control )
             {
                 if( !priv->master->b_rescale_ts )
-                    es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+                    es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
 
                 if( demux_Control( priv->master->p_demux, DEMUX_SET_RATE,
                                    &rate ) )
@@ -2092,8 +2089,8 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_PROGRAM:
             /* No need to force update, es_out does it if needed */
-            es_out_Control( priv->p_es_out,
-                            ES_OUT_SET_GROUP, (int)param.val.i_int );
+            es_out_Control(&priv->p_es_out->out,
+                           ES_OUT_SET_GROUP, (int)param.val.i_int);
 
             if( priv->master->p_demux == NULL )
                 break; /* Possible when called early, the group will be set on
@@ -2195,9 +2192,9 @@ static bool Control( input_thread_t *p_input,
             if( i_title < 0 || i_title >= priv->master->i_title )
                 break;
 
-            es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
-            demux_Control( priv->master->p_demux,
-                           DEMUX_SET_TITLE, i_title );
+            es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
+            demux_Control(priv->master->p_demux,
+                          DEMUX_SET_TITLE, i_title);
             break;
         }
         case INPUT_CONTROL_SET_SEEKPOINT:
@@ -2237,7 +2234,7 @@ static bool Control( input_thread_t *p_input,
              || i_seekpoint >= priv->master->title[i_title]->i_seekpoint )
                 break;
 
-            es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+            es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
@@ -2664,18 +2661,18 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
     char *url;
     if( likely(asprintf( &url, "%s://%s", psz_access, psz_path ) >= 0) )
     {
-        es_out_t *es_out;
-        if (!master )
+        struct vlc_input_es_out *es_out;
+        if (!master)
         {
-            struct vlc_input_es_out *out = input_EsOutSourceNew(priv->p_es_out, in);
-            es_out = in->p_slave_es_out =
-                out == NULL ? NULL : &out->out;
+            in->p_slave_es_out
+                = es_out
+                = input_EsOutSourceNew(&priv->p_es_out->out, in);
         }
         else
             es_out = priv->p_es_out;
 
         if( es_out )
-            in->p_demux = InputDemuxNew( p_input, es_out, in, url,
+            in->p_demux = InputDemuxNew( p_input, &es_out->out, in, url,
                                          psz_demux, psz_newanchor ? psz_newanchor : psz_anchor );
         free( url );
     }
@@ -2894,7 +2891,7 @@ static void SlaveDemux( input_thread_t *p_input )
             if( in->b_slave_sub && in->b_can_rate_control )
             {
                 if( in->sub_rate != 0 ) /* Don't reset when it's the first time */
-                    es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+                    es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
                 float new_rate = priv->slave_subs_rate;
                 demux_Control( in->p_demux, DEMUX_SET_RATE, &new_rate );
             }
@@ -3077,7 +3074,7 @@ static void InputUpdateMeta( input_thread_t *p_input, demux_t *p_demux )
         vlc_mutex_unlock( &priv->p_item->lock );
     }
 
-    es_out_ControlSetMeta( input_priv(p_input)->p_es_out, p_meta );
+    es_out_ControlSetMeta(&input_priv(p_input)->p_es_out->out, p_meta);
     vlc_meta_Delete( p_meta );
 }
 

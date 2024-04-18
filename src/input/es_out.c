@@ -116,7 +116,7 @@ struct es_out_id_t
     vlc_es_id_t id;
 
     /* weak reference, used by input_decoder_callbacks and vlc_clock_cbs */
-    es_out_t *out;
+    struct vlc_input_es_out *out;
 
     /* ES ID */
     es_out_pgrm_t *p_pgrm;
@@ -332,8 +332,8 @@ decoder_on_vout_started(vlc_input_decoder_t *decoder, vout_thread_t *vout,
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return;
@@ -354,8 +354,8 @@ decoder_on_vout_stopped(vlc_input_decoder_t *decoder, vout_thread_t *vout, void 
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return;
@@ -376,8 +376,8 @@ decoder_on_thumbnail_ready(vlc_input_decoder_t *decoder, picture_t *pic, void *u
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return;
@@ -397,8 +397,8 @@ decoder_on_new_video_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return;
@@ -424,8 +424,8 @@ decoder_on_new_audio_stats(vlc_input_decoder_t *decoder, unsigned decoded, unsig
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return;
@@ -450,8 +450,8 @@ decoder_get_attachments(vlc_input_decoder_t *decoder,
     (void) decoder;
 
     es_out_id_t *id = userdata;
-    es_out_t *out = id->out;
-    es_out_sys_t *p_sys = PRIV(out);
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     if (!p_sys->p_input)
         return -1;
@@ -2081,7 +2081,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     if( !es )
         return NULL;
 
-    es->out = &p_sys->out.out;
+    es->out = &p_sys->out;
     es->id.source = input_source_Hold( source );
 
     if( es_format_Copy( &es->fmt, fmt ) != VLC_SUCCESS )
@@ -2226,7 +2226,7 @@ static void ClockUpdate(vlc_tick_t system_ts, vlc_tick_t ts, double rate,
                         void *data)
 {
     es_out_id_t *es = data;
-    es_out_sys_t *p_sys = PRIV(es->out);
+    es_out_sys_t *p_sys = PRIV(&es->out->out);
 
     input_SendEventOutputClock(p_sys->p_input, &es->id, es->master, system_ts,
                                ts, rate, frame_rate, frame_rate_base);
