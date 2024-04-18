@@ -3976,10 +3976,12 @@ static int EsOutPrivControlLocked(es_out_sys_t *sys, input_source_t *source, int
     return ret;
 }
 
-static int EsOutPrivControl( es_out_t *out, input_source_t *source,
-                             int query, va_list args )
+static int EsOutPrivControl(struct vlc_input_es_out *out,
+                            input_source_t *source,
+                            int query,
+                            va_list args)
 {
-    es_out_sys_t *p_sys = PRIV(out);
+    es_out_sys_t *p_sys = PRIV(&out->out);
 
     vlc_mutex_lock( &p_sys->lock );
     int ret = EsOutVaPrivControlLocked(p_sys, source, query, args);
@@ -3995,9 +3997,7 @@ static const struct es_out_callbacks es_out_cbs =
     .del = EsOutDel,
     .control = EsOutControl,
     .destroy = EsOutDelete,
-    .priv_control = EsOutPrivControl,
 };
-
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
@@ -4009,7 +4009,11 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
     if( !p_sys )
         return NULL;
 
-    p_sys->out.ops = NULL;
+    static const struct vlc_input_es_out_ops input_es_out_ops =
+    {
+        .priv_control = EsOutPrivControl,
+    };
+    p_sys->out.ops = &input_es_out_ops;
     p_sys->out.out.cbs = &es_out_cbs;
 
     vlc_mutex_init( &p_sys->lock );
