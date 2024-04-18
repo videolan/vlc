@@ -58,6 +58,8 @@ Widgets.KeyNavigableTableView {
 
             text: qsTr("Url"),
 
+            isSortable: false,
+
             showSection: "url",
 
             headerDelegate: urlHeaderDelegate
@@ -69,6 +71,8 @@ Widgets.KeyNavigableTableView {
             criteria: "last_played_date",
 
             text: qsTr("Last played date"),
+
+            isSortable: false,
 
             showSection: "",
             showContextButton: true,

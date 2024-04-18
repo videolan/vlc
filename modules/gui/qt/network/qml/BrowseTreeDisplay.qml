@@ -242,6 +242,8 @@ MainInterface.MainViewLoader {
 
                     text: qsTr("Cover"),
 
+                    isSortable: false,
+
                     headerDelegate: thumbnailHeader,
                     colDelegate: thumbnailColumn
                 }

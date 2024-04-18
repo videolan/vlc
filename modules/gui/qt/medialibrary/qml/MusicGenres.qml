@@ -238,6 +238,8 @@ MainInterface.MainViewLoader {
 
                     text: qsTr("Cover"),
 
+                    isSortable: false,
+
                     headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: tableColumns.titleDelegate
                 }
@@ -255,7 +257,9 @@ MainInterface.MainViewLoader {
                 model: {
                     criteria: "nb_tracks",
 
-                    text: qsTr("Tracks")
+                    text: qsTr("Tracks"),
+
+                    isSortable: false
                 }
             }]
 

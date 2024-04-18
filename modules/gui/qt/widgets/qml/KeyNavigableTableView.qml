@@ -331,7 +331,9 @@ FocusScope {
                                 }
                             }
                             onClicked: {
-                                if (root.model.sortCriteria !== modelData.model.criteria)
+                                if (!(modelData.model.isSortable ?? true))
+                                    return
+                                else if (root.model.sortCriteria !== modelData.model.criteria)
                                     root.model.sortCriteria = modelData.model.criteria
                                 else
                                     root.model.sortOrder = (root.model.sortOrder === Qt.AscendingOrder) ? Qt.DescendingOrder : Qt.AscendingOrder

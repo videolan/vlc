@@ -56,6 +56,8 @@ MainInterface.MainTableView {
 
             text: qsTr("Title"),
 
+            isSortable: false,
+
             headerDelegate: table.titleHeaderDelegate,
             colDelegate   : table.titleDelegate,
 
@@ -71,6 +73,8 @@ MainInterface.MainTableView {
 
             text: qsTr("Cover"),
 
+            isSortable: false,
+
             type: "image",
 
             headerDelegate: table.titleHeaderDelegate,
@@ -84,7 +88,9 @@ MainInterface.MainTableView {
         model: {
             criteria: "title",
 
-            text: qsTr("Title")
+            text: qsTr("Title"),
+
+            isSortable: false
         }
     }, {
         size: 1,
@@ -93,6 +99,8 @@ MainInterface.MainTableView {
             criteria: "duration",
 
             text: qsTr("Duration"),
+
+            isSortable: false,
 
             headerDelegate: table.timeHeaderDelegate,
             colDelegate   : table.timeColDelegate

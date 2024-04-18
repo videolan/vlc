@@ -257,6 +257,8 @@ FocusScope {
 
                     text: qsTr("Cover"),
 
+                    isSortable: false,
+
                     headerDelegate: artworkHeader,
                     colDelegate: artworkColumn
                 }

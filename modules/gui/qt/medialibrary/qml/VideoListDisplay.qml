@@ -73,6 +73,8 @@ MainInterface.MainTableView {
 
             text: qsTr("Cover"),
 
+            isSortable: false,
+
             showSection: "",
 
             placeHolder: VLCStyle.noArtVideoCover,
