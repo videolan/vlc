@@ -111,6 +111,8 @@
 		536BFD1929B181E100BD0776 /* VLCMainVideoViewOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 536BFD1829B181E100BD0776 /* VLCMainVideoViewOverlayView.m */; };
 		536EFBF5295BCB8300F4CB13 /* VLCLibraryUIUnits.m in Sources */ = {isa = PBXBuildFile; fileRef = 536EFBF4295BCB8300F4CB13 /* VLCLibraryUIUnits.m */; };
 		536EFC39295E521600F4CB13 /* VLCLibraryVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */; };
+		5377B15C2BD12EEE00D660B8 /* QuickLookThumbnailing.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5377B15B2BD12EEE00D660B8 /* QuickLookThumbnailing.framework */; };
+		5377B15E2BD12F2900D660B8 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5377B15D2BD12F2900D660B8 /* QuickLook.framework */; };
 		537976BA2A4319330036827E /* VLCSettingTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 537976B82A4319330036827E /* VLCSettingTextField.m */; };
 		5387FFF52A15127100A3A70A /* NSWindow+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5387FFF42A15127100A3A70A /* NSWindow+VLCAdditions.m */; };
 		538A7EDA29A63EE40068AD4F /* VLCFullVideoViewWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 538A7ED929A63EE40068AD4F /* VLCFullVideoViewWindow.m */; };
@@ -354,6 +356,8 @@
 		536EFC37295E521600F4CB13 /* VLCLibraryVideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryVideoViewController.h; sourceTree = "<group>"; };
 		536EFC38295E521600F4CB13 /* VLCLibraryVideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryVideoViewController.m; sourceTree = "<group>"; };
 		536EFC3A295F828000F4CB13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5377B15B2BD12EEE00D660B8 /* QuickLookThumbnailing.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookThumbnailing.framework; path = System/Library/PrivateFrameworks/QuickLookThumbnailing.framework; sourceTree = SDKROOT; };
+		5377B15D2BD12F2900D660B8 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		537976B82A4319330036827E /* VLCSettingTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSettingTextField.m; sourceTree = "<group>"; };
 		537976B92A4319330036827E /* VLCSettingTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCSettingTextField.h; sourceTree = "<group>"; };
 		5387FFF32A15127100A3A70A /* NSWindow+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSWindow+VLCAdditions.h"; sourceTree = "<group>"; };
@@ -878,6 +882,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5377B15E2BD12F2900D660B8 /* QuickLook.framework in Frameworks */,
+				5377B15C2BD12EEE00D660B8 /* QuickLookThumbnailing.framework in Frameworks */,
 				7DB7F20B20CC082800C2CAED /* QuartzCore.framework in Frameworks */,
 				7DB7F20920CC07FD00C2CAED /* WebKit.framework in Frameworks */,
 				7DB7F20720CC07E600C2CAED /* SystemConfiguration.framework in Frameworks */,
@@ -1780,7 +1786,9 @@
 		7DB7F1EA20CC036C00C2CAED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5377B15D2BD12F2900D660B8 /* QuickLook.framework */,
 				7D903EAC2243928800917358 /* libvlc.dylib */,
+				5377B15B2BD12EEE00D660B8 /* QuickLookThumbnailing.framework */,
 				7DB7F20A20CC082800C2CAED /* QuartzCore.framework */,
 				7DB7F20820CC07FD00C2CAED /* WebKit.framework */,
 				7DB7F20620CC07E600C2CAED /* SystemConfiguration.framework */,
@@ -2307,6 +2315,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.videolan.vlc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 			};
 			name = Development;
 		};
@@ -2346,6 +2355,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.videolan.vlc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 			};
 			name = Deployment;
 		};
@@ -2385,6 +2395,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.videolan.vlc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(inherited) $(SDKROOT)$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks";
 			};
 			name = Default;
 		};
