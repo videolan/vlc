@@ -264,7 +264,7 @@ _##field##TextField.delegate = self
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
-    _representedInputItems = @[representedInputItem];
+    _representedInputItems = representedInputItem == nil ? @[] : @[representedInputItem];
     _artwork = [VLCLibraryImageCache thumbnailForInputItem:representedInputItem];
     [self updateRepresentation];
 }
