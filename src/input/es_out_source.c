@@ -40,7 +40,7 @@ struct es_out_source
 {
     struct vlc_input_es_out out;
     input_source_t *in;
-    es_out_t *parent_out;
+    struct vlc_input_es_out *parent_out;
 } ;
 
 static struct es_out_source *
@@ -56,19 +56,19 @@ static es_out_id_t *EsOutSourceAdd(es_out_t *out, input_source_t *in,
 {
     assert(in == NULL);
     struct es_out_source *sys = PRIV(out);
-    return sys->parent_out->cbs->add(sys->parent_out, sys->in, fmt);
+    return sys->parent_out->out.cbs->add(&sys->parent_out->out, sys->in, fmt);
 }
 
 static int EsOutSourceSend(es_out_t *out, es_out_id_t *es, block_t *block)
 {
     struct es_out_source *sys = PRIV(out);
-    return es_out_Send(sys->parent_out, es, block);
+    return es_out_Send(&sys->parent_out->out, es, block);
 }
 
 static void EsOutSourceDel(es_out_t *out, es_out_id_t *es)
 {
     struct es_out_source *sys = PRIV(out);
-    es_out_Del(sys->parent_out, es);
+    es_out_Del(&sys->parent_out->out, es);
 }
 
 static int EsOutSourceControl(es_out_t *out, input_source_t *in, int query,
@@ -76,7 +76,7 @@ static int EsOutSourceControl(es_out_t *out, input_source_t *in, int query,
 {
     assert(in == NULL);
     struct es_out_source *sys = PRIV(out);
-    return sys->parent_out->cbs->control(sys->parent_out, sys->in, query, args);
+    return sys->parent_out->out.cbs->control(&sys->parent_out->out, sys->in, query, args);
 }
 
 static int EsOutSourcePrivControl(es_out_t *out, input_source_t *in, int query,
@@ -84,7 +84,7 @@ static int EsOutSourcePrivControl(es_out_t *out, input_source_t *in, int query,
 {
     assert(in == NULL);
     struct es_out_source *sys = PRIV(out);
-    return sys->parent_out->cbs->priv_control(sys->parent_out, sys->in, query, args);
+    return sys->parent_out->out.cbs->priv_control(&sys->parent_out->out, sys->in, query, args);
 }
 
 static void EsOutSourceDestroy(es_out_t *out)
@@ -115,7 +115,7 @@ input_EsOutSourceNew(struct vlc_input_es_out *parent_out, input_source_t *in)
     sys->in = in;
     sys->out.ops = NULL;
     sys->out.out.cbs = &es_out_cbs;
-    sys->parent_out = &parent_out->out;
+    sys->parent_out = parent_out;
 
     return &sys->out;
 }
