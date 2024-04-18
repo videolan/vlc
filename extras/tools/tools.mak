@@ -266,24 +266,6 @@ CLEAN_FILE += .buildgas
 CLEAN_PKG += gas
 DISTCLEAN_PKG += gas-preprocessor-$(GAS_VERSION).tar.gz
 
-# Ragel State Machine Compiler
-ragel-$(RAGEL_VERSION).tar.gz:
-	$(call download_pkg,$(RAGEL_URL),ragel)
-
-ragel: ragel-$(RAGEL_VERSION).tar.gz
-	$(UNPACK)
-	$(APPLY) $(TOOLS)/ragel-6.8-javacodegen.patch
-	$(MOVE)
-
-
-.buildragel: ragel
-	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
-	touch $@
-
-CLEAN_FILE += .buildragel
-CLEAN_PKG += ragel
-DISTCLEAN_PKG += ragel-$(RAGEL_VERSION).tar.gz
-
 # GNU sed
 
 sed-$(SED_VERSION).tar.bz2:

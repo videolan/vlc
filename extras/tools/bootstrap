@@ -136,7 +136,6 @@ check pkg-config
 check cmake 3.17.0
 check yasm
 check_tar
-check ragel
 check_sed
 check protoc 2.6.0
 check ant

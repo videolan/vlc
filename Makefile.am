@@ -64,8 +64,7 @@ EXTRA_DIST += \
 	extras/tools/cmake-enable-ALPN-support-on-macOS-10.14.patch \
 	extras/tools/libtool-2.4.7-bitcode.patch \
 	extras/tools/libtool-2.4.7-clang-libs.patch \
-	extras/tools/libtool-2.4.7-response-files.patch \
-	extras/tools/ragel-6.8-javacodegen.patch
+	extras/tools/libtool-2.4.7-response-files.patch
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
