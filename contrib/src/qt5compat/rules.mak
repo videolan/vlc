@@ -29,6 +29,7 @@ endif
 qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz .sum-qt5compat
 	$(UNPACK)
 	$(APPLY) $(SRC)/qt5compat/0001-Revert-Auxiliary-commit-to-revert-individual-files-f.patch
+	$(APPLY) $(SRC)/qt5compat/0002-Do-not-build-core5.patch
 	$(MOVE)
 
 .qt5compat: qt5compat toolchain.cmake

@@ -1,0 +1,25 @@
+From f9bd98639bd464157fbea517d679cf8447996765 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Fri, 19 Apr 2024 17:35:29 +0300
+Subject: [PATCH 2/2] Do not build core5
+
+---
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 75b2627..e880f86 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -3,7 +3,7 @@
+ 
+ # Generated from src.pro.
+ 
+-add_subdirectory(core5)
++# add_subdirectory(core5)
+ if(TARGET Qt::Gui AND TARGET Qt::Quick)
+     add_subdirectory(imports)
+ endif()
+-- 
+2.44.0
+
