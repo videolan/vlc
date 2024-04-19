@@ -3959,6 +3959,7 @@ have_qt_quick_test="no"
 have_qt_declarative_private="no"
 have_qt_gui_private="no"
 have_qt_core_private="no"
+have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   dnl Note that Qt < 6.2.5 does not provide pc files!
   QT_MINIMUM_VERSION=6.2
@@ -4048,6 +4049,13 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[
       ])
 
+      AC_PATH_PROGS(FXC, [fxc], [no], [${CONTRIB_DIR}/bin])
+      AS_IF([test "$FXC" != "no"],[
+        have_fxc="yes"
+        FXC_PATH=$(echo $FXC | head -c-5)
+        AC_SUBST([FXC_PATH])
+      ])
+
       dnl Check private headers availability
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
@@ -4127,6 +4135,7 @@ AM_CONDITIONAL([HAVE_QT_QUICK_TEST], [test "${have_qt_quick_test}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_DECLARATIVE_PRIVATE], [test "${have_qt_declarative_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_CORE_PRIVATE], [test "${have_qt_core_private}" = "yes"])
+AM_CONDITIONAL([HAVE_FXC], [test "${have_fxc}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
