@@ -63,8 +63,6 @@
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
 
-#import "menus/renderers/VLCRendererMenuController.h"
-
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
@@ -185,15 +183,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(renderersChanged:)
-                               name:VLCRendererAddedNotification
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(renderersChanged:)
-                               name:VLCRendererRemovedNotification
-                             object:nil];
-
+    
     _libraryHomeViewController = [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
@@ -722,27 +712,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [super windowDidEnterFullScreen:notification];
     if (!self.videoViewController.view.hidden) {
         [self showControlsBar];
-    }
-}
-
-#pragma mark -
-#pragma mark respond to renderers
-
-- (void)renderersChanged:(NSNotification *)notification
-{
-    const NSUInteger rendererCount = 
-        VLCMain.sharedInstance.mainMenu.rendererMenuController.rendererItems.count;
-    const BOOL rendererToolbarItemVisible = 
-        [self.toolbar.items containsObject:self.toolbarDelegate.renderersToolbarItem];
-
-    if (rendererCount > 0 && !rendererToolbarItemVisible) {
-        [self.toolbarDelegate insertToolbarItem:self.toolbarDelegate.renderersToolbarItem
-                                      inFrontOf:@[self.toolbarDelegate.sortOrderToolbarItem,
-                                                  self.toolbarDelegate.libraryViewModeToolbarItem,
-                                                  self.toolbarDelegate.forwardsToolbarItem,
-                                                  self.toolbarDelegate.backwardsToolbarItem]];
-    } else if (rendererCount == 0 && rendererToolbarItemVisible) {
-        [self.toolbarDelegate hideToolbarItem:self.toolbarDelegate.renderersToolbarItem];
     }
 }
 

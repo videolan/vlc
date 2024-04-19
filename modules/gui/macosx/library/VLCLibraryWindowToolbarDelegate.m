@@ -54,6 +54,16 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
             [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
     }
 
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(renderersChanged:)
+                               name:VLCRendererAddedNotification
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(renderersChanged:)
+                               name:VLCRendererRemovedNotification
+                             object:nil];
+
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
     [self hideToolbarItem:self.renderersToolbarItem];
@@ -80,6 +90,24 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
     }
 
     return nil;
+}
+
+- (void)renderersChanged:(NSNotification *)notification
+{
+    const NSUInteger rendererCount =
+        VLCMain.sharedInstance.mainMenu.rendererMenuController.rendererItems.count;
+    const BOOL rendererToolbarItemVisible =
+        [self.toolbar.items containsObject:self.renderersToolbarItem];
+
+    if (rendererCount > 0 && !rendererToolbarItemVisible) {
+        [self insertToolbarItem:self.renderersToolbarItem
+                      inFrontOf:@[self.sortOrderToolbarItem,
+                                  self.libraryViewModeToolbarItem,
+                                  self.forwardsToolbarItem,
+                                  self.backwardsToolbarItem]];
+    } else if (rendererCount == 0 && rendererToolbarItemVisible) {
+        [self hideToolbarItem:self.renderersToolbarItem];
+    }
 }
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
