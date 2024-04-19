@@ -34,6 +34,15 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items;
+- (void)hideToolbarItem:(NSToolbarItem *)toolbarItem;
+- (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible;
+- (void)setSortOrderToolbarItemVisible:(BOOL)visible;
+- (void)setSortOrderToolbarItemVisible:(BOOL)visible;
+- (void)setLibrarySearchToolbarItemVisible:(BOOL)visible;
+- (void)setViewModeToolbarItemVisible:(BOOL)visible;
+- (void)updatePlayqueueToggleState;
+
 @end
 
 NS_ASSUME_NONNULL_END
