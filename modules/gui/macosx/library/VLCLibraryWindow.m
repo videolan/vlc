@@ -183,7 +183,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
-    
+
     _libraryHomeViewController = [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
@@ -623,20 +623,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [self presentVideoView];
-
-    [self.forwardsNavigationButton setHidden:YES];
-    [self.gridVsListSegmentedControl setHidden:YES];
-    [self.librarySortButton setHidden:YES];
-    [self.librarySearchField setEnabled:NO];
-    [self clearFilterString];
-
-    // Make sure the back button is visible...
-    [self.toolbarDelegate insertToolbarItem:self.toolbarDelegate.backwardsToolbarItem
-                                  inFrontOf:@[self.toolbarDelegate.trackingSeparatorToolbarItem,
-                                              self.toolbarDelegate.toggleNavSidebarToolbarItem]];
-    // And repurpose it to hide the video view
-    [self.backwardsNavigationButton setEnabled:YES];
-
     [self enableVideoTitleBarMode];
     [self hideControlsBarImmediately];
     [self.videoViewController showControls];
@@ -650,19 +636,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows: NSNormalWindowLevel];
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
-    [self setAlphaValue:1.0];
+    self.alphaValue = 1.0;
     self.videoViewController.view.hidden = YES;
-
-    [self.forwardsNavigationButton setHidden:NO];
-    [self.gridVsListSegmentedControl setHidden:NO];
-    [self.librarySortButton setHidden:NO];
-    [self.librarySearchField setEnabled:YES];
-
-    // Reset the back button to navigation state
-    [self.backwardsNavigationButton setEnabled:_navigationStack.backwardsAvailable];
-
     [self setViewForSelectedSegment];
-
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
