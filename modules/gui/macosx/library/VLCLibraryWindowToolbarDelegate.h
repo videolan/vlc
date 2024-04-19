@@ -44,6 +44,8 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 @property (readwrite, weak) IBOutlet NSToolbarItem *togglePlaylistToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *renderersToolbarItem;
 
+- (IBAction)rendererControlAction:(id)sender;
+
 - (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items;
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem;
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible;

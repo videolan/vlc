@@ -143,7 +143,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (IBAction)backwardsNavigationAction:(id)sender;
 - (IBAction)forwardsNavigationAction:(id)sender;
 - (IBAction)gridVsListSegmentedControlAction:(id)sender;
-- (IBAction)rendererControlAction:(id)sender;
 
 @end
 

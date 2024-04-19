@@ -26,6 +26,10 @@
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
+#import "main/VLCMain.h"
+
+#import "menus/VLCMainMenu.h"
+
 NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
 
 @implementation VLCLibraryWindowToolbarDelegate
@@ -48,6 +52,13 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
         self.trackingSeparatorToolbarItem =
             [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
     }
+}
+
+- (IBAction)rendererControlAction:(id)sender
+{
+    [NSMenu popUpContextMenu:VLCMain.sharedInstance.mainMenu.rendererMenu
+                   withEvent:NSApp.currentEvent
+                     forView:sender];
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar

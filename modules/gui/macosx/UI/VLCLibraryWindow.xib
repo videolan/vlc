@@ -391,6 +391,9 @@
                                 <action selector="rendererControlAction:" target="QvC-M9-y7g" id="M1O-u2-5FO"/>
                             </connections>
                         </button>
+                        <connections>
+                            <action selector="rendererControlAction:" target="xXj-E8-b8X" id="k28-mg-4Hy"/>
+                        </connections>
                     </toolbarItem>
                     <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="89f-AL-zuU"/>
                     <toolbarItem implicitItemIdentifier="85037E27-D263-490C-B4B2-0EFE5B5837AA" label="Library View Type" paletteLabel="Library View Type" sizingBehavior="auto" id="kBa-MC-Mdq">
