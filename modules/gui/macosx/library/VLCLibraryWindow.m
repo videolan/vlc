@@ -162,9 +162,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoViewController.displayLibraryControls = YES;
     [self hideControlsBarImmediately];
 
-    [self.gridVsListSegmentedControl setToolTip: _NS("Grid View or List View")];
-    [self.librarySortButton setToolTip: _NS("Select Sorting Mode")];
-    [self.playQueueToggle setToolTip: _NS("Toggle Playqueue")];
 
     [self.gridVsListSegmentedControl setHidden:NO];
     [self.librarySortButton setHidden:NO];

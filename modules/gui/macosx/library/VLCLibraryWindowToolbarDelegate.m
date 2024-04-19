@@ -22,6 +22,8 @@
 
 #import "VLCLibraryWindowToolbarDelegate.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
@@ -65,6 +67,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
                            selector:@selector(renderersChanged:)
                                name:VLCRendererRemovedNotification
                              object:nil];
+
+    self.libraryViewModeToolbarItem.toolTip = _NS("Grid View or List View");
+    self.sortOrderToolbarItem.toolTip = _NS("Select Sorting Mode");
+    self.togglePlaylistToolbarItem.toolTip = _NS("Toggle Playqueue");
 
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
