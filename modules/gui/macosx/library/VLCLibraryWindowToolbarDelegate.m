@@ -29,6 +29,7 @@
 #import "main/VLCMain.h"
 
 #import "menus/VLCMainMenu.h"
+#import "menus/renderers/VLCRendererMenuController.h"
 
 NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
 
@@ -52,6 +53,13 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
         self.trackingSeparatorToolbarItem =
             [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
     }
+
+    // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
+    // renderers being added or removed to keep hidden or show depending on outcome
+    [self hideToolbarItem:self.renderersToolbarItem];
+    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
+
+    [self updatePlayqueueToggleState];
 }
 
 - (IBAction)rendererControlAction:(id)sender

@@ -200,13 +200,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
     [self setViewForSelectedSegment];
-
-    // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
-    // renderers being added or removed to keep hidden or show depending on outcome
-    [self.toolbarDelegate hideToolbarItem:self.toolbarDelegate.renderersToolbarItem];
-    [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
-
-    [self.toolbarDelegate updatePlayqueueToggleState];
 }
 
 - (void)dealloc
