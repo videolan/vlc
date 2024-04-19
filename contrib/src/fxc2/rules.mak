@@ -18,6 +18,9 @@ fxc2: fxc2-$(FXC2_VERSION).tar.xz .sum-fxc2
 	$(APPLY) $(SRC)/fxc2/0001-make-Vn-argument-as-optional-and-provide-default-var.patch
 	$(APPLY) $(SRC)/fxc2/0002-accept-windows-style-flags-and-splitted-argument-val.patch
 	$(APPLY) $(SRC)/fxc2/0004-Revert-Fix-narrowing-conversion-from-int-to-BYTE.patch
+	$(APPLY) $(SRC)/fxc2/0001-handle-O-option-to-write-to-a-binary-file-rather-tha.patch
+	$(APPLY) $(SRC)/fxc2/0002-fix-redefinition-warning.patch
+	$(APPLY) $(SRC)/fxc2/0003-improve-error-messages-after-compilation.patch
 	$(MOVE)
 
 ifeq ($(shell uname -m),aarch64)

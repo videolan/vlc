@@ -1,0 +1,26 @@
+From 39629169b7c8c2cc7c2fe7fdd057132352482fec Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 19 Apr 2024 11:43:08 +0200
+Subject: [PATCH 2/3] fix redefinition warning
+
+---
+ fxc2.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/fxc2.cpp b/fxc2.cpp
+index 2b3f587..17b0ccb 100755
+--- a/fxc2.cpp
++++ b/fxc2.cpp
+@@ -11,7 +11,9 @@
+ #include <wchar.h>
+ 
+ 
++#ifndef D3D_COMPILE_STANDARD_FILE_INCLUDE
+ #define D3D_COMPILE_STANDARD_FILE_INCLUDE ((ID3DInclude*)(UINT_PTR)1)
++#endif
+ typedef HRESULT(__stdcall *pCompileFromFileg)(LPCWSTR,
+ 					      const D3D_SHADER_MACRO[],
+ 					      ID3DInclude*,
+-- 
+2.37.3.windows.1
+
