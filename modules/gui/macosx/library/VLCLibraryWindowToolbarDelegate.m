@@ -54,7 +54,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
         [self.toolbar 
             insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier
                                  atIndex:trackingSeparatorItemIndex];
-        self.trackingSeparatorToolbarItem =
+        _trackingSeparatorToolbarItem =
             [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
     }
 
