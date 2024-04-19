@@ -284,10 +284,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
     }
 
     [self insertToolbarItem:self.libraryViewModeToolbarItem
-                  inFrontOf:@[self.toggleNavSidebarToolbarItem,
+                  inFrontOf:@[self.forwardsToolbarItem,
+                              self.backwardsToolbarItem,
                               self.trackingSeparatorToolbarItem,
-                              self.forwardsToolbarItem,
-                              self.backwardsToolbarItem]];
+                              self.toggleNavSidebarToolbarItem]];
 }
 
 @end
