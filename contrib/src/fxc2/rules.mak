@@ -2,13 +2,6 @@ FXC2_HASH := 654c29d62a02714ea0bacfb118c3e05127f846e0
 FXC2_VERSION := git-$(FXC2_HASH)
 FXC2_GITURL := $(GITHUB)/mozilla/fxc2.git
 
-ifeq ($(findstring qt,$(PKGS)),)
-# match with Qt targets
-ifdef HAVE_WIN32
-PKGS_TOOLS += fxc2
-endif
-endif
-
 ifeq ($(call need_pkg,"fxc2"),)
 PKGS_FOUND += fxc2
 endif
