@@ -147,17 +147,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         self.tabbingMode = NSWindowTabbingModeDisallowed;
     }
 
-    if (@available(macOS 11.0, *)) {
-        const NSInteger navSidebarToggleToolbarItemIndex = [self.toolbar.items indexOfObject:self.toggleNavSidebarToolbarItem];
-        NSAssert(navSidebarToggleToolbarItemIndex != NSNotFound, @"Could not find navigation sidebar toggle toolbar item!");
-
-        const NSInteger trackingSeparatorItemIndex = navSidebarToggleToolbarItemIndex + 1;
-        [self.toolbar insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier
-                                           atIndex:trackingSeparatorItemIndex];
-        self.trackingSeparatorToolbarItem = [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
-    }
-
-
     VLCMain *mainInstance = VLCMain.sharedInstance;
     _playlistController = [mainInstance playlistController];
 
@@ -214,7 +203,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
-    [self.toolbarDelegate hideToolbarItem:self.renderersToolbarItem];
+    [self.toolbarDelegate hideToolbarItem:self.toolbarDelegate.renderersToolbarItem];
     [VLCMain.sharedInstance.mainMenu.rendererMenuController startRendererDiscoveries];
 
     [self.toolbarDelegate updatePlayqueueToggleState];
@@ -659,9 +648,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self clearFilterString];
 
     // Make sure the back button is visible...
-    [self.toolbarDelegate insertToolbarItem:self.backwardsToolbarItem
-                                  inFrontOf:@[self.trackingSeparatorToolbarItem,
-                                              self.toggleNavSidebarToolbarItem]];
+    [self.toolbarDelegate insertToolbarItem:self.toolbarDelegate.backwardsToolbarItem
+                                  inFrontOf:@[self.toolbarDelegate.trackingSeparatorToolbarItem,
+                                              self.toolbarDelegate.toggleNavSidebarToolbarItem]];
     // And repurpose it to hide the video view
     [self.backwardsNavigationButton setEnabled:YES];
 
@@ -751,16 +740,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const NSUInteger rendererCount = 
         VLCMain.sharedInstance.mainMenu.rendererMenuController.rendererItems.count;
     const BOOL rendererToolbarItemVisible = 
-        [self.toolbar.items containsObject:self.renderersToolbarItem];
+        [self.toolbar.items containsObject:self.toolbarDelegate.renderersToolbarItem];
 
     if (rendererCount > 0 && !rendererToolbarItemVisible) {
-        [self.toolbarDelegate insertToolbarItem:self.renderersToolbarItem
-                                      inFrontOf:@[self.sortOrderToolbarItem,
-                                                  self.libraryViewModeToolbarItem,
-                                                  self.forwardsToolbarItem,
-                                                  self.backwardsToolbarItem]];
+        [self.toolbarDelegate insertToolbarItem:self.toolbarDelegate.renderersToolbarItem
+                                      inFrontOf:@[self.toolbarDelegate.sortOrderToolbarItem,
+                                                  self.toolbarDelegate.libraryViewModeToolbarItem,
+                                                  self.toolbarDelegate.forwardsToolbarItem,
+                                                  self.toolbarDelegate.backwardsToolbarItem]];
     } else if (rendererCount == 0 && rendererToolbarItemVisible) {
-        [self.toolbarDelegate hideToolbarItem:self.renderersToolbarItem];
+        [self.toolbarDelegate hideToolbarItem:self.toolbarDelegate.renderersToolbarItem];
     }
 }
 

@@ -33,6 +33,21 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 - (void)awakeFromNib
 {
     self.toolbar.allowsUserCustomization = NO;
+    
+    if (@available(macOS 11.0, *)) {
+        const NSInteger navSidebarToggleToolbarItemIndex = 
+            [self.toolbar.items indexOfObject:self.toggleNavSidebarToolbarItem];
+
+        NSAssert(navSidebarToggleToolbarItemIndex != NSNotFound,
+                 @"Could not find navigation sidebar toggle toolbar item!");
+
+        const NSInteger trackingSeparatorItemIndex = navSidebarToggleToolbarItemIndex + 1;
+        [self.toolbar 
+            insertItemWithItemIdentifier:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier
+                                 atIndex:trackingSeparatorItemIndex];
+        self.trackingSeparatorToolbarItem =
+            [self.toolbar.items objectAtIndex:trackingSeparatorItemIndex];
+    }
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
@@ -92,41 +107,40 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible
 {
     if (!visible) {
-        [self hideToolbarItem:self.libraryWindow.forwardsToolbarItem];
-        [self hideToolbarItem:self.libraryWindow.backwardsToolbarItem];
+        [self hideToolbarItem:self.forwardsToolbarItem];
+        [self hideToolbarItem:self.backwardsToolbarItem];
         return;
     }
 
-    [self insertToolbarItem:self.libraryWindow.backwardsToolbarItem 
-                  inFrontOf:@[
-                    self.libraryWindow.trackingSeparatorToolbarItem,
-                    self.libraryWindow.toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:self.backwardsToolbarItem 
+                  inFrontOf:@[self.trackingSeparatorToolbarItem,
+                              self.toggleNavSidebarToolbarItem]];
 
-    [self insertToolbarItem:self.libraryWindow.forwardsToolbarItem
-                  inFrontOf:@[self.libraryWindow.backwardsToolbarItem,
-                              self.libraryWindow.trackingSeparatorToolbarItem,
-                              self.libraryWindow.toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:self.forwardsToolbarItem
+                  inFrontOf:@[self.backwardsToolbarItem,
+                              self.trackingSeparatorToolbarItem,
+                              self.toggleNavSidebarToolbarItem]];
 }
 
 - (void)setSortOrderToolbarItemVisible:(BOOL)visible
 {
     if (!visible) {
-        [self hideToolbarItem:self.libraryWindow.sortOrderToolbarItem];
+        [self hideToolbarItem:self.sortOrderToolbarItem];
         return;
     }
 
-    [self insertToolbarItem:self.libraryWindow.sortOrderToolbarItem
-                  inFrontOf:@[self.libraryWindow.libraryViewModeToolbarItem,
-                              self.libraryWindow.forwardsToolbarItem,
-                              self.libraryWindow.backwardsToolbarItem,
-                              self.libraryWindow.trackingSeparatorToolbarItem,
-                              self.libraryWindow.toggleNavSidebarToolbarItem]];
+    [self insertToolbarItem:self.sortOrderToolbarItem
+                  inFrontOf:@[self.libraryViewModeToolbarItem,
+                              self.forwardsToolbarItem,
+                              self.backwardsToolbarItem,
+                              self.trackingSeparatorToolbarItem,
+                              self.toggleNavSidebarToolbarItem]];
 }
 
 - (void)setLibrarySearchToolbarItemVisible:(BOOL)visible
 {
     if (!visible) {
-        [self hideToolbarItem:self.libraryWindow.librarySearchToolbarItem];
+        [self hideToolbarItem:self.librarySearchToolbarItem];
         [self.libraryWindow clearFilterString];
         return;
     }
@@ -134,28 +148,28 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
     // Display as far to the right as possible, but not in front of the playlist toggle button
     NSMutableArray<NSToolbarItem *> * const currentToolbarItems =
         [NSMutableArray arrayWithArray:self.toolbar.items];
-    if (currentToolbarItems.lastObject == self.libraryWindow.togglePlaylistToolbarItem) {
+    if (currentToolbarItems.lastObject == self.togglePlaylistToolbarItem) {
         [currentToolbarItems removeLastObject];
     }
 
     NSArray * const reversedCurrentToolbarItems =
         currentToolbarItems.reverseObjectEnumerator.allObjects;
-    [self insertToolbarItem:self.libraryWindow.librarySearchToolbarItem
+    [self insertToolbarItem:self.librarySearchToolbarItem
                   inFrontOf:reversedCurrentToolbarItems];
 }
 
 - (void)setViewModeToolbarItemVisible:(BOOL)visible
 {
     if (!visible) {
-        [self hideToolbarItem:self.libraryWindow.libraryViewModeToolbarItem];
+        [self hideToolbarItem:self.libraryViewModeToolbarItem];
         return;
     }
 
-    [self insertToolbarItem:self.libraryWindow.libraryViewModeToolbarItem
-                  inFrontOf:@[self.libraryWindow.toggleNavSidebarToolbarItem,
-                              self.libraryWindow.trackingSeparatorToolbarItem,
-                              self.libraryWindow.forwardsToolbarItem,
-                              self.libraryWindow.backwardsToolbarItem]];
+    [self insertToolbarItem:self.libraryViewModeToolbarItem
+                  inFrontOf:@[self.toggleNavSidebarToolbarItem,
+                              self.trackingSeparatorToolbarItem,
+                              self.forwardsToolbarItem,
+                              self.backwardsToolbarItem]];
 }
 
 - (void)updatePlayqueueToggleState

@@ -501,21 +501,16 @@
                 <outlet property="audioLibrarySplitView" destination="llh-BF-BEJ" id="gvt-K1-cGw"/>
                 <outlet property="audioLibraryView" destination="lpg-UW-pTq" id="FYD-PV-Ce2"/>
                 <outlet property="backwardsNavigationButton" destination="Bzq-ZV-i8j" id="Bac-Kb-ut"/>
-                <outlet property="backwardsToolbarItem" destination="6Ie-eu-GDn" id="q3s-rt-8gy"/>
                 <outlet property="controlsBar" destination="Uzf-Tf-H8x" id="n0G-92-F2Q"/>
                 <outlet property="controlsBarHeightConstraint" destination="Fps-hR-AFq" id="E4g-JQ-fgx"/>
                 <outlet property="emptyLibraryView" destination="YJf-1r-vaC" id="AJB-eN-4u6"/>
-                <outlet property="flexibleSpaceToolbarItem" destination="89f-AL-zuU" id="3p9-t8-79g"/>
                 <outlet property="forwardsNavigationButton" destination="jzy-je-h2k" id="for-Wa-rd"/>
-                <outlet property="forwardsToolbarItem" destination="g2e-7o-Qet" id="3qp-rg-t2P"/>
                 <outlet property="gridVsListSegmentedControl" destination="lIg-5J-C5F" id="u6B-Zx-4mX"/>
                 <outlet property="homeLibraryStackView" destination="p8n-RC-fWF" id="jcF-ny-9D7"/>
                 <outlet property="homeLibraryStackViewScrollView" destination="HXH-MZ-tkf" id="fzR-fb-nyS"/>
                 <outlet property="homeLibraryView" destination="mMj-Qb-bS1" id="WeM-ZY-knV"/>
                 <outlet property="librarySearchField" destination="ab6-kR-8Io" id="Qf7-UM-lol"/>
-                <outlet property="librarySearchToolbarItem" destination="dv4-Il-y8X" id="Um3-s4-Ax4"/>
                 <outlet property="librarySortButton" destination="Rja-6g-wNZ" id="FQ7-MU-hsk"/>
-                <outlet property="libraryViewModeToolbarItem" destination="kBa-MC-Mdq" id="q39-28-tyf"/>
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
                 <outlet property="mediaSourceCollectionView" destination="r7v-GI-W1U" id="3JJ-GU-o5o"/>
                 <outlet property="mediaSourceCollectionViewScrollView" destination="cFG-c9-cI9" id="QQq-Ql-uQ7"/>
@@ -533,13 +528,9 @@
                 <outlet property="placeholderLabel" destination="adK-Pc-tnU" id="6Zw-IF-czx"/>
                 <outlet property="playQueueToggle" destination="IaO-se-D0g" id="tqY-YM-KQC"/>
                 <outlet property="renderersButton" destination="ffS-QP-Om3" id="rOM-No-rd0"/>
-                <outlet property="renderersToolbarItem" destination="YEO-08-Qzi" id="mwx-8t-5o7"/>
-                <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="098-yp-97f"/>
                 <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
                 <outlet property="splitViewBottomConstraintToSuperView" destination="DQQ-ji-YSy" id="b0t-C0-5uP"/>
                 <outlet property="splitViewController" destination="Kkr-kI-gpb" id="9aZ-xw-zrl"/>
-                <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="To1-7k-AJF"/>
-                <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="gtf-cd-765"/>
                 <outlet property="toolbarDelegate" destination="xXj-E8-b8X" id="VsJ-ky-NJg"/>
                 <outlet property="videoLibraryCollectionView" destination="neh-e5-MUa" id="bmc-HF-k9s"/>
                 <outlet property="videoLibraryCollectionViewScrollView" destination="9bN-bM-RVu" id="iLf-ff-boW"/>
@@ -1525,7 +1516,16 @@
         </customView>
         <customObject id="xXj-E8-b8X" customClass="VLCLibraryWindowToolbarDelegate">
             <connections>
+                <outlet property="backwardsToolbarItem" destination="6Ie-eu-GDn" id="nqO-Tg-a1S"/>
+                <outlet property="flexibleSpaceToolbarItem" destination="89f-AL-zuU" id="rza-T3-EQq"/>
+                <outlet property="forwardsToolbarItem" destination="g2e-7o-Qet" id="4ex-8c-aSO"/>
+                <outlet property="librarySearchToolbarItem" destination="dv4-Il-y8X" id="iip-l7-TuF"/>
+                <outlet property="libraryViewModeToolbarItem" destination="kBa-MC-Mdq" id="e5b-Hd-Qha"/>
                 <outlet property="libraryWindow" destination="QvC-M9-y7g" id="YT5-2G-VJ2"/>
+                <outlet property="renderersToolbarItem" destination="YEO-08-Qzi" id="pXm-Aj-4Qg"/>
+                <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="MFb-EI-Dsa"/>
+                <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="xoK-Zo-nwh"/>
+                <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="PX9-gs-T5Z"/>
                 <outlet property="toolbar" destination="pr3-TD-J2z" id="0bl-3Z-WiA"/>
             </connections>
         </customObject>

@@ -33,6 +33,17 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 @property (readwrite, weak) IBOutlet VLCLibraryWindow *libraryWindow;
 @property (readwrite, weak) IBOutlet NSToolbar *toolbar;
 
+@property (readwrite, weak) IBOutlet NSToolbarItem *toggleNavSidebarToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *trackingSeparatorToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *backwardsToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *forwardsToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *libraryViewModeToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *sortOrderToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *flexibleSpaceToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *librarySearchToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *togglePlaylistToolbarItem;
+@property (readwrite, weak) IBOutlet NSToolbarItem *renderersToolbarItem;
+
 - (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items;
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem;
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible;
