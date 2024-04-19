@@ -17,9 +17,11 @@ PKGS_TOOLS += qt-tools
 endif
 PKGS_ALL += qt-tools
 
-DEPS_qt = qt-tools freetype2 $(DEPS_freetype2) harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)
+DEPS_qt = qt-tools harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)
 ifdef HAVE_WIN32
 DEPS_qt += d3d12 $(DEPS_d3d12) dcomp $(DEPS_dcomp)
+else
+DEPS_qt += freetype2 $(DEPS_freetype2)
 endif
 
 ifeq ($(call need_pkg,"Qt6Core >= $(QTBASE_VERSION_MAJOR) Qt6Gui >= $(QTBASE_VERSION_MAJOR) Qt6Widgets >= $(QTBASE_VERSION_MAJOR)"),)
@@ -55,6 +57,12 @@ ifeq ($(V),1)
 QTBASE_CONFIG += -verbose
 endif
 
+ifdef HAVE_WIN32
+QTBASE_CONFIG += -no-freetype -directwrite
+else
+QTBASE_CONFIG += -system-freetype
+endif
+
 ifdef HAVE_CROSS_COMPILE
 # This is necessary to make use of qmake
 QTBASE_PLATFORM := -device-option CROSS_COMPILE=$(HOST)-
@@ -66,7 +74,7 @@ endif
 
 QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl \
     -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
-	-no-feature-sql -no-feature-testlib -system-freetype -system-harfbuzz -system-libjpeg \
+	-no-feature-sql -no-feature-testlib -system-harfbuzz -system-libjpeg \
 	-no-feature-xml -no-feature-printsupport -system-libpng -system-zlib -no-feature-network \
 	-no-feature-movie -no-feature-pdf -no-feature-whatsthis -no-feature-lcdnumber \
 	-no-feature-syntaxhighlighter -no-feature-undoview -no-feature-splashscreen \
