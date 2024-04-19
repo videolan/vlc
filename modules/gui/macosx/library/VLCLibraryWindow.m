@@ -324,43 +324,28 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showHomeLibrary
 {
     // Only collection view mode
-    [self.toolbarDelegate setForwardsBackwardsToolbarItemsVisible:NO];
-    [self.toolbarDelegate setSortOrderToolbarItemVisible:YES];
-    [self.toolbarDelegate setLibrarySearchToolbarItemVisible:YES];
-    [self.toolbarDelegate setViewModeToolbarItemVisible:NO];
-
+    [self.toolbarDelegate layoutForSegment:VLCLibraryHomeSegment];
     [_libraryHomeViewController presentHomeView];
 }
 
 - (void)showVideoLibrary
 {
-    [self.toolbarDelegate setForwardsBackwardsToolbarItemsVisible:NO];
-    [self.toolbarDelegate setSortOrderToolbarItemVisible:YES];
-    [self.toolbarDelegate setLibrarySearchToolbarItemVisible:YES];
-    [self.toolbarDelegate setViewModeToolbarItemVisible:YES];
-
+    [self.toolbarDelegate layoutForSegment:VLCLibraryVideoSegment];
     [_libraryVideoViewController presentVideoView];
 }
 
 - (void)showAudioLibrary
 {
-    [self.toolbarDelegate setForwardsBackwardsToolbarItemsVisible:NO];
-    [self.toolbarDelegate setSortOrderToolbarItemVisible:YES];
-    [self.toolbarDelegate setLibrarySearchToolbarItemVisible:YES];
-    [self.toolbarDelegate setViewModeToolbarItemVisible:YES];
-
+    [self.toolbarDelegate layoutForSegment:VLCLibraryMusicSegment];
     self.libraryAudioViewController.currentSegmentType = self.librarySegmentType;
 }
 
 - (void)showMediaSourceLibrary
 {
     [self.navigationStack clear];
-    [self.toolbarDelegate setForwardsBackwardsToolbarItemsVisible:YES];
-    [self.toolbarDelegate setSortOrderToolbarItemVisible:NO];
-    [self.toolbarDelegate setLibrarySearchToolbarItemVisible:NO];
-    [self.toolbarDelegate setViewModeToolbarItemVisible:YES];
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
+    [self.toolbarDelegate layoutForSegment:segmentType];
     if (segmentType == VLCLibraryBrowseSegment) {
         [_libraryMediaSourceViewController presentBrowseView];
     } else if (segmentType == VLCLibraryStreamsSegment) {

@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibrarySegment.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
@@ -46,12 +48,7 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 
 - (IBAction)rendererControlAction:(id)sender;
 
-- (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible;
-- (void)setSortOrderToolbarItemVisible:(BOOL)visible;
-- (void)setSortOrderToolbarItemVisible:(BOOL)visible;
-- (void)setLibrarySearchToolbarItemVisible:(BOOL)visible;
-- (void)setViewModeToolbarItemVisible:(BOOL)visible;
-- (void)updatePlayqueueToggleState;
+- (void)layoutForSegment:(VLCLibrarySegmentType)segment;
 
 @end
 

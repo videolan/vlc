@@ -136,6 +136,47 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
             NSControlStateValueOff : NSControlStateValueOn;
 }
 
+#pragma mark - convenience method for configuration of toolbar items layout
+
+- (void)layoutForSegment:(VLCLibrarySegmentType)segment
+{
+    switch(segment) {
+        case VLCLibraryLowSentinelSegment:
+            vlc_assert_unreachable();
+        case VLCLibraryHomeSegment:
+            [self setForwardsBackwardsToolbarItemsVisible:NO];
+            [self setSortOrderToolbarItemVisible:NO];
+            [self setLibrarySearchToolbarItemVisible:NO];
+            [self setViewModeToolbarItemVisible:NO];
+            break;
+        case VLCLibraryVideoSegment:
+            [self setForwardsBackwardsToolbarItemsVisible:NO];
+            [self setSortOrderToolbarItemVisible:YES];
+            [self setLibrarySearchToolbarItemVisible:YES];
+            [self setViewModeToolbarItemVisible:YES];
+            break;
+        case VLCLibraryMusicSegment:
+        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryAlbumsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegment:
+            [self setForwardsBackwardsToolbarItemsVisible:NO];
+            [self setSortOrderToolbarItemVisible:YES];
+            [self setLibrarySearchToolbarItemVisible:YES];
+            [self setViewModeToolbarItemVisible:YES];
+            break;
+        case VLCLibraryBrowseSegment:
+        case VLCLibraryStreamsSegment:
+            [self setForwardsBackwardsToolbarItemsVisible:YES];
+            [self setSortOrderToolbarItemVisible:NO];
+            [self setLibrarySearchToolbarItemVisible:NO];
+            [self setViewModeToolbarItemVisible:YES];
+            break;
+        case VLCLibraryHighSentinelSegment:
+            vlc_assert_unreachable();
+    }
+}
+
 #pragma mark - item visibility handling
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
