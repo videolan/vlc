@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
-- (IBAction)segmentedControlAction:(id)sender;
+
 - (void)presentAudioView;
 - (void)reloadData;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
