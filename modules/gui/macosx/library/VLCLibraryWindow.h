@@ -107,6 +107,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSButton *backwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
+@property (readwrite, weak) IBOutlet VLCLibraryWindowToolbarDelegate *toolbarDelegate;
 @property (readwrite, weak) IBOutlet NSToolbarItem *toggleNavSidebarToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *trackingSeparatorToolbarItem;
 @property (readwrite, weak) IBOutlet NSButton *renderersButton;
@@ -129,7 +130,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite) BOOL nonembedded;
 
 @property (readwrite, weak) IBOutlet VLCLibraryWindowSplitViewController *splitViewController;
-@property (readonly) VLCLibraryWindowToolbarDelegate *toolbarDelegate;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryAudioViewController *libraryAudioViewController;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;

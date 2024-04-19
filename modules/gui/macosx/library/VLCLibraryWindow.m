@@ -147,10 +147,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         self.tabbingMode = NSWindowTabbingModeDisallowed;
     }
 
-    _toolbarDelegate = [[VLCLibraryWindowToolbarDelegate alloc] initWithLibraryWindow:self];
-    self.toolbar.delegate = _toolbarDelegate;
-    self.toolbar.allowsUserCustomization = NO;
-
     if (@available(macOS 11.0, *)) {
         const NSInteger navSidebarToggleToolbarItemIndex = [self.toolbar.items indexOfObject:self.toggleNavSidebarToolbarItem];
         NSAssert(navSidebarToggleToolbarItemIndex != NSNotFound, @"Could not find navigation sidebar toggle toolbar item!");

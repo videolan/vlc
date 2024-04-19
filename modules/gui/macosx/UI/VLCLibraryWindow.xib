@@ -480,6 +480,9 @@
                     <searchToolbarItem reference="dv4-Il-y8X"/>
                     <toolbarItem reference="Lf2-ec-tHh"/>
                 </defaultToolbarItems>
+                <connections>
+                    <outlet property="delegate" destination="xXj-E8-b8X" id="I0j-5P-oSw"/>
+                </connections>
             </toolbar>
             <connections>
                 <outlet property="audioCollectionSelectionTableView" destination="LNt-ot-2wU" id="aim-ER-CpD"/>
@@ -537,6 +540,7 @@
                 <outlet property="splitViewController" destination="Kkr-kI-gpb" id="9aZ-xw-zrl"/>
                 <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="To1-7k-AJF"/>
                 <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="gtf-cd-765"/>
+                <outlet property="toolbarDelegate" destination="xXj-E8-b8X" id="VsJ-ky-NJg"/>
                 <outlet property="videoLibraryCollectionView" destination="neh-e5-MUa" id="bmc-HF-k9s"/>
                 <outlet property="videoLibraryCollectionViewScrollView" destination="9bN-bM-RVu" id="iLf-ff-boW"/>
                 <outlet property="videoLibraryGroupSelectionTableView" destination="8M4-Y1-r6Z" id="5e1-v1-eW3"/>
@@ -1519,6 +1523,12 @@
             </constraints>
             <point key="canvasLocation" x="58" y="-261"/>
         </customView>
+        <customObject id="xXj-E8-b8X" customClass="VLCLibraryWindowToolbarDelegate">
+            <connections>
+                <outlet property="libraryWindow" destination="QvC-M9-y7g" id="YT5-2G-VJ2"/>
+                <outlet property="toolbar" destination="pr3-TD-J2z" id="0bl-3Z-WiA"/>
+            </connections>
+        </customObject>
         <viewController id="Kkr-kI-gpb" customClass="VLCLibraryWindowSplitViewController">
             <connections>
                 <outlet property="libraryWindow" destination="QvC-M9-y7g" id="wFD-Rc-i8w"/>

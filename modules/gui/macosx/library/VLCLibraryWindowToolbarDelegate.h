@@ -30,9 +30,8 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 
 @interface VLCLibraryWindowToolbarDelegate : NSObject<NSToolbarDelegate>
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-
-- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+@property (readwrite, weak) IBOutlet VLCLibraryWindow *libraryWindow;
+@property (readwrite, weak) IBOutlet NSToolbar *toolbar;
 
 - (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items;
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem;

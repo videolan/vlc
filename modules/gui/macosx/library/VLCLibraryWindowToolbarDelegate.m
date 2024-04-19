@@ -30,13 +30,9 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 
 @implementation VLCLibraryWindowToolbarDelegate
 
-- (nonnull instancetype)initWithLibraryWindow:(nonnull VLCLibraryWindow *)libraryWindow
+- (void)awakeFromNib
 {
-    self = [super init];
-    if (self) {
-        _libraryWindow = libraryWindow;
-    }
-    return self;
+    self.toolbar.allowsUserCustomization = NO;
 }
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
