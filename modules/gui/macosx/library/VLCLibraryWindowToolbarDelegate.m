@@ -33,7 +33,8 @@
 #import "menus/VLCMainMenu.h"
 #import "menus/renderers/VLCRendererMenuController.h"
 
-NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
+NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = 
+    @"VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier";
 
 @implementation VLCLibraryWindowToolbarDelegate
 
