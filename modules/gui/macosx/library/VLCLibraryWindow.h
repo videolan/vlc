@@ -144,7 +144,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)showControlsBar;
 - (void)updateGridVsListViewModeSegmentedControl;
 - (void)updateFilterString;
-- (void)stopSearchTimer;
+- (void)clearFilterString;
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 

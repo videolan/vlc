@@ -473,7 +473,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [VLCMain.sharedInstance.libraryController filterByString:_librarySearchField.stringValue];
 }
 
-- (void)clearLibraryFilterString
+- (void)clearFilterString
 {
     [self stopSearchTimer];
     _librarySearchField.stringValue = @"";
@@ -660,7 +660,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.gridVsListSegmentedControl setHidden:YES];
     [self.librarySortButton setHidden:YES];
     [self.librarySearchField setEnabled:NO];
-    [self clearLibraryFilterString];
+    [self clearFilterString];
 
     // Make sure the back button is visible...
     [self.toolbarDelegate insertToolbarItem:self.backwardsToolbarItem

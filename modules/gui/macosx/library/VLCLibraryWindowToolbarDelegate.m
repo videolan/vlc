@@ -131,9 +131,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 {
     if (!visible) {
         [self hideToolbarItem:self.libraryWindow.librarySearchToolbarItem];
-        [self.libraryWindow stopSearchTimer];
-        self.libraryWindow.librarySearchField.stringValue = @"";
-        [self.libraryWindow updateFilterString];
+        [self.libraryWindow clearFilterString];
         return;
     }
 
