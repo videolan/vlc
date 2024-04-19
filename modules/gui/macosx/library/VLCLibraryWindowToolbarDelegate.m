@@ -35,6 +35,8 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 
 @implementation VLCLibraryWindowToolbarDelegate
 
+#pragma mark - XIB handling
+
 - (void)awakeFromNib
 {
     self.toolbar.allowsUserCustomization = NO;
@@ -72,12 +74,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
     [self updatePlayqueueToggleState];
 }
 
-- (IBAction)rendererControlAction:(id)sender
-{
-    [NSMenu popUpContextMenu:VLCMain.sharedInstance.mainMenu.rendererMenu
-                   withEvent:NSApp.currentEvent
-                     forView:sender];
-}
+#pragma mark - toolbar delegate methods
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar
      itemForItemIdentifier:(NSToolbarItemIdentifier)itemIdentifier
@@ -85,11 +82,23 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 {
     if ([itemIdentifier isEqualToString:VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier]) {
         if (@available(macOS 11.0, *)) {
-            return [NSTrackingSeparatorToolbarItem trackingSeparatorToolbarItemWithIdentifier:itemIdentifier splitView:self.libraryWindow.mainSplitView dividerIndex:VLCLibraryWindowNavigationSidebarSplitViewDividerIndex];
+            return [NSTrackingSeparatorToolbarItem
+                    trackingSeparatorToolbarItemWithIdentifier:itemIdentifier
+                    splitView:self.libraryWindow.mainSplitView
+                    dividerIndex:VLCLibraryWindowNavigationSidebarSplitViewDividerIndex];
         }
     }
 
     return nil;
+}
+
+#pragma mark - renderers toolbar item handling
+
+- (IBAction)rendererControlAction:(id)sender
+{
+    [NSMenu popUpContextMenu:VLCMain.sharedInstance.mainMenu.rendererMenu
+                   withEvent:NSApp.currentEvent
+                     forView:sender];
 }
 
 - (void)renderersChanged:(NSNotification *)notification
@@ -109,6 +118,19 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
         [self hideToolbarItem:self.renderersToolbarItem];
     }
 }
+
+#pragma mark - play queue toggle toolbar item handling
+
+- (void)updatePlayqueueToggleState
+{
+    NSView * const playlistView =
+        self.libraryWindow.splitViewController.playlistSidebarViewController.view;
+    self.libraryWindow.playQueueToggle.state =
+        [self.libraryWindow.mainSplitView isSubviewCollapsed:playlistView] ?
+            NSControlStateValueOff : NSControlStateValueOn;
+}
+
+#pragma mark - item visibility handling
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
 {
@@ -150,6 +172,8 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 
     [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier atIndex:0];
 }
+
+#pragma mark - convenience methods for hiding/showing and positioning certain toolbar items
 
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible
 {
@@ -217,15 +241,6 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
                               self.trackingSeparatorToolbarItem,
                               self.forwardsToolbarItem,
                               self.backwardsToolbarItem]];
-}
-
-- (void)updatePlayqueueToggleState
-{
-    NSView * const playlistView =
-        self.libraryWindow.splitViewController.playlistSidebarViewController.view;
-    self.libraryWindow.playQueueToggle.state =
-        [self.libraryWindow.mainSplitView isSubviewCollapsed:playlistView] ?
-            NSControlStateValueOff : NSControlStateValueOn;
 }
 
 @end
