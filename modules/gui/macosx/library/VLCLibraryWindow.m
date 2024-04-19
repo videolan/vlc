@@ -162,11 +162,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.videoViewController.displayLibraryControls = YES;
     [self hideControlsBarImmediately];
 
-
-    [self.gridVsListSegmentedControl setHidden:NO];
-    [self.librarySortButton setHidden:NO];
-    [self.librarySearchField setEnabled:YES];
-
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(shouldShowController:)
