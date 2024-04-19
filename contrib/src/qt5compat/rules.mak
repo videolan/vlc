@@ -4,7 +4,7 @@ QT5COMPAT_VERSION_MAJOR := 6.6
 QT5COMPAT_VERSION := $(QT5COMPAT_VERSION_MAJOR).2
 QT5COMPAT_URL := $(QT)/$(QT5COMPAT_VERSION_MAJOR)/$(QT5COMPAT_VERSION)/submodules/qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz
 
-DEPS_qt5compat += qtdeclarative $(DEPS_qtdeclarative) qtshadertools $(DEPS_qtshadertools)
+DEPS_qt5compat += qtdeclarative $(DEPS_qtdeclarative)
 
 ifdef HAVE_WIN32
 PKGS += qt5compat
@@ -28,6 +28,7 @@ endif
 
 qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz .sum-qt5compat
 	$(UNPACK)
+	$(APPLY) $(SRC)/qt5compat/0001-Revert-Auxiliary-commit-to-revert-individual-files-f.patch
 	$(MOVE)
 
 .qt5compat: qt5compat toolchain.cmake

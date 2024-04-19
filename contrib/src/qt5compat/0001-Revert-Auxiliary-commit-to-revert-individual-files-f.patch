@@ -1,0 +1,806 @@
+From d17c8890da94ec44e8b80fa22a061765c799a293 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Fri, 19 Apr 2024 15:59:48 +0300
+Subject: [PATCH] Revert "Auxiliary commit to revert individual files from
+ 0ba059c6dc8b7c0f6ac4a277c96b6b16e43053a2"
+
+---
+ CMakeLists.txt                                |   5 -
+ src/imports/graphicaleffects5/CMakeLists.txt  |  14 --
+ src/imports/graphicaleffects5/DropShadow.qml  | 175 +++++-------------
+ src/imports/graphicaleffects5/Glow.qml        | 126 ++++---------
+ .../graphicaleffects5/private/CMakeLists.txt  |   9 -
+ .../graphicaleffects5/shaders_ng/compile.bat  |   6 -
+ tests/manual/graphicaleffects5/CMakeLists.txt |   9 -
+ tests/manual/graphicaleffects5/main.qml       |  47 +----
+ tests/manual/graphicaleffects5/qml.qrc        |   9 -
+ 9 files changed, 91 insertions(+), 309 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ac84544..ae465c1 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -18,9 +18,4 @@ find_package(Qt6 ${PROJECT_VERSION} QUIET CONFIG OPTIONAL_COMPONENTS Network Xml
+ 
+ qt_internal_project_setup()
+ 
+-# Look for the target ShaderTools package to have access to the ShaderTools Qt module library.
+-# This is optional. When not present, runtime shader processing will not be available, and
+-# only a certain set of effects will be available
+-find_package(Qt6 ${PROJECT_VERSION} QUIET CONFIG OPTIONAL_COMPONENTS ShaderTools)
+-
+ qt_build_repo()
+diff --git a/src/imports/graphicaleffects5/CMakeLists.txt b/src/imports/graphicaleffects5/CMakeLists.txt
+index 00209ed..2889f33 100644
+--- a/src/imports/graphicaleffects5/CMakeLists.txt
++++ b/src/imports/graphicaleffects5/CMakeLists.txt
+@@ -6,31 +6,23 @@
+ #####################################################################
+ 
+ set(qml_files
+-    "Blend.qml"
+     "BrightnessContrast.qml"
+     "ColorOverlay.qml"
+     "Colorize.qml"
+     "ConicalGradient.qml"
+     "Desaturate.qml"
+-    "DirectionalBlur.qml"
+     "Displace.qml"
+     "DropShadow.qml"
+     "FastBlur.qml"
+     "GammaAdjust.qml"
+-    "GaussianBlur.qml"
+     "Glow.qml"
+     "HueSaturation.qml"
+-    "InnerShadow.qml"
+     "LevelAdjust.qml"
+     "LinearGradient.qml"
+-    "MaskedBlur.qml"
+     "OpacityMask.qml"
+-    "RadialBlur.qml"
+     "RadialGradient.qml"
+     "RectangularGlow.qml"
+-    "RecursiveBlur.qml"
+     "ThresholdMask.qml"
+-    "ZoomBlur.qml"
+ )
+ 
+ qt_internal_add_qml_module(qtgraphicaleffectsplugin
+@@ -68,12 +60,8 @@ set(qtgraphicaleffectsshaders_resource_files
+     "shaders_ng/fastblur.frag.qsb"
+     "shaders_ng/fastblur_internal.frag.qsb"
+     "shaders_ng/fastblur_internal.vert.qsb"
+-    "shaders_ng/fastinnershadow.frag.qsb"
+-    "shaders_ng/fastinnershadow_level0.frag.qsb"
+     "shaders_ng/fastglow.frag.qsb"
+     "shaders_ng/gammaadjust.frag.qsb"
+-    "shaders_ng/gaussianinnershadow.frag.qsb"
+-    "shaders_ng/gaussianinnershadow_shadow.frag.qsb"
+     "shaders_ng/huesaturation.frag.qsb"
+     "shaders_ng/leveladjust.frag.qsb"
+     "shaders_ng/lineargradient.vert.qsb"
+@@ -84,8 +72,6 @@ set(qtgraphicaleffectsshaders_resource_files
+     "shaders_ng/radialgradient.vert.qsb"
+     "shaders_ng/radialgradient_mask.frag.qsb"
+     "shaders_ng/radialgradient_nomask.frag.qsb"
+-    "shaders_ng/recursiveblur.vert.qsb"
+-    "shaders_ng/recursiveblur.frag.qsb"
+     "shaders_ng/rectangularglow.frag.qsb"
+     "shaders_ng/thresholdmask.frag.qsb"
+ )
+diff --git a/src/imports/graphicaleffects5/DropShadow.qml b/src/imports/graphicaleffects5/DropShadow.qml
+index cdf3fd4..e31fb6b 100644
+--- a/src/imports/graphicaleffects5/DropShadow.qml
++++ b/src/imports/graphicaleffects5/DropShadow.qml
+@@ -11,14 +11,9 @@ import Qt5Compat.GraphicalEffects.private
+     \since QtGraphicalEffects 1.0
+     \inherits QtQuick2::Item
+     \ingroup qtgraphicaleffects-drop-shadow
+-
+-    \brief Generates a soft shadow behind the source item.
+-
+-    The DropShadow effect blurs the alpha channel of the input, colorizes the
+-    result and places it behind the source object to create a soft shadow. The
+-    shadow's color can be changed using the \l {DropShadow::color}{color}
+-    property. The location of the shadow can be changed with the \l
+-    horizontalOffset and \l verticalOffset properties.
++    \brief Generates a colorized and blurred shadow image of the
++    source and places it behind the original, giving the impression that
++    source item is raised from the background.
+ 
+     \table
+     \header
+@@ -29,16 +24,6 @@ import Qt5Compat.GraphicalEffects.private
+         \li \image DropShadow_butterfly.png
+     \endtable
+ 
+-    The soft shadow is created by blurring the image live using a gaussian
+-    blur. Performing blur live is a costly operation. Fullscreen gaussian blur
+-    with even a moderate number of samples will only run at 60 fps on highend
+-    graphics hardware.
+-
+-    When the source is static, the \l cached property can be set to allocate
+-    another buffer to avoid performing the blur every time it is drawn.
+-
+-    \note This effect is available when running with OpenGL.
+-
+     \section1 Example
+ 
+     The following example shows how to apply the effect.
+@@ -46,12 +31,7 @@ import Qt5Compat.GraphicalEffects.private
+ 
+ */
+ Item {
+-    id: root
+-
+-    DropShadowBase {
+-        id: dbs
+-        anchors.fill: parent
+-    }
++    id: rootItem
+ 
+     /*!
+         This property defines the source item that is going to be used as the
+@@ -60,26 +40,14 @@ Item {
+         \note It is not supported to let the effect include itself, for
+         instance by setting source to the effect's parent.
+     */
+-    property alias source: dbs.source
++    property variant source
+ 
+     /*!
+-        \qmlproperty int DropShadow::radius
+-
+         Radius defines the softness of the shadow. A larger radius causes the
+         edges of the shadow to appear more blurry.
+ 
+-        The ideal blur is achieved by selecting \c samples and \c radius such
+-        that \c {samples = 1 + radius * 2}, such as:
+-
+-        \table
+-        \header \li Radius             \li Samples
+-        \row    \li 0 \e{(no blur)}    \li 1
+-        \row    \li 1                  \li 3
+-        \row    \li 2                  \li 5
+-        \row    \li 3                  \li 7
+-        \endtable
+-
+-        By default, the property is set to \c {floor(samples/2)}.
++        The value ranges from 0.0 (no blur) to inf. By default, the property is
++        set to \c 0.0 (no blur).
+ 
+         \table
+         \header
+@@ -94,10 +62,6 @@ Item {
+             \li \b { radius: 0 }
+             \li \b { radius: 6 }
+             \li \b { radius: 12 }
+-        \row
+-            \li \l samples: 25
+-            \li \l samples: 25
+-            \li \l samples: 25
+         \row
+             \li \l color: #000000
+             \li \l color: #000000
+@@ -115,31 +79,9 @@ Item {
+             \li \l spread: 0
+             \li \l spread: 0
+         \endtable
+-    */
+-    property alias radius: dbs.radius;
+-
+-    /*!
+-        This property defines how many samples are taken per pixel when edge
+-        softening blur calculation is done. Larger value produces better
+-        quality, but is slower to render.
+-
+-        Ideally, this value should be twice as large as the highest required
+-        radius value plus one, such as:
+-
+-        \table
+-        \header \li Radius             \li Samples
+-        \row    \li 0 \e{(no blur)}    \li 1
+-        \row    \li 1                  \li 3
+-        \row    \li 2                  \li 5
+-        \row    \li 3                  \li 7
+-        \endtable
+-
+-        By default, the property is set to \c 9.
+ 
+-        This property is not intended to be animated. Changing this property will
+-        cause the underlying OpenGL shaders to be recompiled.
+     */
+-    property alias samples: dbs.samples
++    property real radius: 0.0
+ 
+     /*!
+         This property defines the RGBA color value which is used for the shadow.
+@@ -163,10 +105,6 @@ Item {
+             \li \l radius: 8
+             \li \l radius: 8
+             \li \l radius: 8
+-        \row
+-            \li \l samples: 17
+-            \li \l samples: 17
+-            \li \l samples: 17
+         \row
+             \li \l horizontalOffset: 0
+             \li \l horizontalOffset: 0
+@@ -180,8 +118,9 @@ Item {
+             \li \l spread: 0
+             \li \l spread: 0
+         \endtable
++
+     */
+-    property alias color: dbs.color
++    property color color: "black"
+ 
+     /*!
+         \qmlproperty real QtGraphicalEffects::DropShadow::horizontalOffset
+@@ -215,10 +154,6 @@ Item {
+             \li \l radius: 4
+             \li \l radius: 4
+             \li \l radius: 4
+-        \row
+-            \li \l samples: 9
+-            \li \l samples: 9
+-            \li \l samples: 9
+         \row
+             \li \l color: #000000
+             \li \l color: #000000
+@@ -233,43 +168,16 @@ Item {
+             \li \l spread: 0
+         \endtable
+ 
+-        \table
+-        \header
+-        \li Output examples with different verticalOffset values
+-        \li
+-        \li
+-        \row
+-            \li \image DropShadow_horizontalOffset2.png
+-            \li \image DropShadow_spread1.png
+-        \row
+-            \li \b { horizontalOffset: 0 }
+-            \li \b { horizontalOffset: 0 }
+-        \row
+-            \li \l radius: 4
+-            \li \l radius: 8
+-        \row
+-            \li \l samples: 9
+-            \li \l samples: 17
+-        \row
+-            \li \l color: #000000
+-            \li \l color: #000000
+-        \row
+-            \li \l verticalOffset: 0
+-            \li \l verticalOffset: 20
+-        \row
+-            \li \l spread: 0
+-            \li \l spread: 0
+-        \endtable
+     */
+-    property alias horizontalOffset: dbs.horizontalOffset
+-    property alias verticalOffset: dbs.verticalOffset
++    property real horizontalOffset: 0.0
++    property real verticalOffset: 0.0
+ 
+     /*!
+-        This property defines how large part of the shadow color is strengthened
++        This property defines how large part of the shadow color is strenghtened
+         near the source edges.
+ 
+         The value ranges from 0.0 to 1.0. By default, the property is set to \c
+-        0.0.
++        0.5.
+ 
+         \table
+         \header
+@@ -288,10 +196,6 @@ Item {
+             \li \l radius: 8
+             \li \l radius: 8
+             \li \l radius: 8
+-        \row
+-            \li \l samples: 17
+-            \li \l samples: 17
+-            \li \l samples: 17
+         \row
+             \li \l color: #000000
+             \li \l color: #000000
+@@ -305,18 +209,9 @@ Item {
+             \li \l verticalOffset: 20
+             \li \l verticalOffset: 20
+         \endtable
+-    */
+-    property alias spread: dbs.spread
+-
+-    /*!
+-        \internal
+-
+-        Starting Qt 5.6, this property has no effect. It is left here
+-        for source compatibility only.
+ 
+-        ### Qt 6: remove
+     */
+-    property bool fast: false
++    property real spread: 0.0
+ 
+     /*!
+         This property allows the effect output pixels to be cached in order to
+@@ -329,8 +224,9 @@ Item {
+         properties are animated.
+ 
+         By default, the property is set to \c false.
++
+     */
+-    property alias cached: dbs.cached
++    property bool cached: false
+ 
+     /*!
+         This property determines whether or not the effect has a transparent
+@@ -339,16 +235,45 @@ Item {
+         When set to \c true, the exterior of the item is padded with a 1 pixel
+         wide transparent edge, making sampling outside the source texture use
+         transparency instead of the edge pixels. Without this property, an
+-        image which has opaque edges will not get a blurred shadow.
++        image which has opaque edges will not get a blurred edge.
+ 
+         In the image below, the Rectangle on the left has transparent borders
+         and has blurred edges, whereas the Rectangle on the right does not:
+ 
+-        By default, this property is set to \c true.
+-
+         \snippet DropShadow-transparentBorder-example.qml example
+ 
+         \image DropShadow-transparentBorder.png
+     */
+-    property alias transparentBorder: dbs.transparentBorder
++    property bool transparentBorder: false
++
++    Loader {
++        x: rootItem.horizontalOffset
++        y: rootItem.verticalOffset
++        width: parent.width
++        height: parent.height
++        sourceComponent: fastGlow
++    }
++
++    Component {
++        id: fastGlow
++        FastGlow {
++            anchors.fill: parent
++            source: sourceProxy.output
++            blur: Math.pow(rootItem.radius / 64.0, 0.4)
++            color: rootItem.color
++            cached: rootItem.cached
++            spread: rootItem.spread
++            transparentBorder: rootItem.transparentBorder
++        }
++    }
++
++    SourceProxy {
++        id: sourceProxy
++        input: rootItem.source
++        sourceRect: rootItem.transparentBorder ? Qt.rect(-1, -1, parent.width + 2.0, parent.height + 2.0) : Qt.rect(0, 0, 0, 0)
++    }
++    ShaderEffect {
++        anchors.fill: parent
++        property variant source: sourceProxy.output
++    }
+ }
+diff --git a/src/imports/graphicaleffects5/Glow.qml b/src/imports/graphicaleffects5/Glow.qml
+index 67335ac..e4aad96 100644
+--- a/src/imports/graphicaleffects5/Glow.qml
++++ b/src/imports/graphicaleffects5/Glow.qml
+@@ -30,16 +30,7 @@ import Qt5Compat.GraphicalEffects.private
+ 
+ */
+ Item {
+-    id: root
+-
+-    DropShadowBase {
+-        id: dps
+-        anchors.fill: parent
+-        color: "white"
+-        spread: 0.5
+-        horizontalOffset: 0
+-        verticalOffset: 0
+-    }
++    id: rootItem
+ 
+     /*!
+         This property defines the source item that is going to be used as source
+@@ -48,27 +39,14 @@ Item {
+         \note It is not supported to let the effect include itself, for
+         instance by setting source to the effect's parent.
+     */
+-    property alias source: dps.source
++    property variant source
+ 
+     /*!
+         Radius defines the softness of the glow. A larger radius causes the
+         edges of the glow to appear more blurry.
+ 
+-        Depending on the radius value, value of the \l{Glow::samples}{samples}
+-        should be set to sufficiently large to ensure the visual quality.
+-
+-        The ideal blur is achieved by selecting \c samples and \c radius such
+-        that \c {samples = 1 + radius * 2}, such as:
+-
+-        \table
+-        \header \li Radius             \li Samples
+-        \row    \li 0 \e{(no blur)}    \li 1
+-        \row    \li 1                  \li 3
+-        \row    \li 2                  \li 5
+-        \row    \li 3                  \li 7
+-        \endtable
+-
+-        By default, the property is set to \c {floor(samples/2)}.
++        The value ranges from 0.0 (no blur) to inf. By default, the property is
++        set to \c 0.0 (no blur).
+ 
+         \table
+         \header
+@@ -83,10 +61,6 @@ Item {
+             \li \b { radius: 0 }
+             \li \b { radius: 6 }
+             \li \b { radius: 12 }
+-        \row
+-            \li \l samples: 25
+-            \li \l samples: 25
+-            \li \l samples: 25
+         \row
+             \li \l color: #ffffff
+             \li \l color: #ffffff
+@@ -97,42 +71,15 @@ Item {
+             \li \l spread: 0
+         \endtable
+     */
+-    property alias radius: dps.radius
+-
+-    /*!
+-        This property defines how many samples are taken per pixel when edge
+-        softening blur calculation is done. Larger value produces better
+-        quality, but is slower to render.
+-
+-        Ideally, this value should be twice as large as the highest required
+-        radius value plus one, such as:
+-
+-        \table
+-        \header \li Radius             \li Samples
+-        \row    \li 0 \e{(no blur)}    \li 1
+-        \row    \li 1                  \li 3
+-        \row    \li 2                  \li 5
+-        \row    \li 3                  \li 7
+-        \endtable
+-
+-        By default, the property is set to \c 9.
+-
+-        This property is not intended to be animated. Changing this property will
+-        cause the underlying OpenGL shaders to be recompiled.
+-    */
+-    property alias samples: dps.samples
++    property real radius: 0.0
+ 
+     /*!
+-        This property defines how large part of the glow color is strengthened
++        This property defines how large part of the glow color is strenghtened
+         near the source edges.
+ 
+         The values range from 0.0 to 1.0. By default, the property is set to \c
+         0.5.
+ 
+-        \note The implementation is optimized for medium and low spread values.
+-        Depending on the source, spread values closer to 1.0 may yield visually
+-        asymmetrical results.
+-
+         \table
+         \header
+         \li Output examples with different spread values
+@@ -150,17 +97,13 @@ Item {
+             \li \l radius: 8
+             \li \l radius: 8
+             \li \l radius: 8
+-        \row
+-            \li \l samples: 17
+-            \li \l samples: 17
+-            \li \l samples: 17
+         \row
+             \li \l color: #ffffff
+             \li \l color: #ffffff
+             \li \l color: #ffffff
+         \endtable
+     */
+-    property alias spread: dps.spread
++    property real spread: 0.0
+ 
+     /*!
+         This property defines the RGBA color value which is used for the glow.
+@@ -184,10 +127,6 @@ Item {
+             \li \l radius: 8
+             \li \l radius: 8
+             \li \l radius: 8
+-        \row
+-            \li \l samples: 17
+-            \li \l samples: 17
+-            \li \l samples: 17
+         \row
+             \li \l spread: 0.5
+             \li \l spread: 0.5
+@@ -195,17 +134,7 @@ Item {
+         \endtable
+ 
+     */
+-    property alias color: dps.color
+-
+-    /*!
+-        \internal
+-
+-        Starting Qt 5.6, this property has no effect. It is left here
+-        for source compatibility only.
+-
+-        ### Qt 6: remove
+-    */
+-    property bool fast: false
++    property color color: "white"
+ 
+     /*!
+         This property allows the effect output pixels to be cached in order to
+@@ -221,20 +150,17 @@ Item {
+         By default, the property is set to \c false.
+ 
+     */
+-    property alias cached: dps.cached
++    property bool cached: false
+ 
+     /*!
+         This property determines whether or not the effect has a transparent
+         border.
+ 
+-        When set to \c true, the exterior of the item is padded with a
+-        transparent edge, making sampling outside the source texture use
++        When set to \c true, the exterior of the item is padded with a 1 pixel
++        wide transparent edge, making sampling outside the source texture use
+         transparency instead of the edge pixels. Without this property, an
+         image which has opaque edges will not get a blurred edge.
+ 
+-        By default, the property is set to \c true. Set it to false if the source
+-        already has a transparent edge to make the blurring a tiny bit faster.
+-
+         In the snippet below, the Rectangle on the left has transparent borders
+         and has blurred edges, whereas the Rectangle on the right does not.
+ 
+@@ -242,5 +168,33 @@ Item {
+ 
+         \image Glow-transparentBorder.png
+     */
+-    property alias transparentBorder: dps.transparentBorder
++    property bool transparentBorder: false
++
++    Loader {
++        anchors.fill: parent
++        sourceComponent: fastGlow
++    }
++
++    Component {
++        id: fastGlow
++        FastGlow {
++            anchors.fill: parent
++            source: sourceProxy.output
++            blur: Math.pow(rootItem.radius / 64.0, 0.4)
++            color: rootItem.color
++            cached: rootItem.cached
++            spread: rootItem.spread
++            transparentBorder: rootItem.transparentBorder
++        }
++    }
++
++    SourceProxy {
++        id: sourceProxy
++        input: rootItem.source
++        sourceRect: rootItem.transparentBorder ? Qt.rect(-1, -1, parent.width + 2.0, parent.height + 2.0) : Qt.rect(0, 0, 0, 0)
++    }
++    ShaderEffect {
++        anchors.fill: parent
++        property variant source: sourceProxy.output
++    }
+ }
+diff --git a/src/imports/graphicaleffects5/private/CMakeLists.txt b/src/imports/graphicaleffects5/private/CMakeLists.txt
+index 47ccf59..7bcd661 100644
+--- a/src/imports/graphicaleffects5/private/CMakeLists.txt
++++ b/src/imports/graphicaleffects5/private/CMakeLists.txt
+@@ -6,13 +6,7 @@
+ #####################################################################
+ 
+ set(qml_files
+-    "DropShadowBase.qml"
+     "FastGlow.qml"
+-    "FastInnerShadow.qml"
+-    "GaussianDirectionalBlur.qml"
+-    "GaussianGlow.qml"
+-    "GaussianInnerShadow.qml"
+-    "GaussianMaskedBlur.qml"
+ )
+ 
+ qt_internal_add_qml_module(qtgraphicaleffectsprivate
+@@ -23,7 +17,6 @@ qt_internal_add_qml_module(qtgraphicaleffectsprivate
+     PAST_MAJOR_VERSIONS 1
+     SOURCES
+         qgfxsourceproxy.cpp qgfxsourceproxy_p.h
+-        qgfxshaderbuilder.cpp qgfxshaderbuilder_p.h
+     QML_FILES
+         ${qml_files}
+     LIBRARIES
+@@ -31,6 +24,4 @@ qt_internal_add_qml_module(qtgraphicaleffectsprivate
+         Qt::GuiPrivate
+         Qt::QmlPrivate
+         Qt::QuickPrivate
+-        Qt::ShaderTools
+-        Qt::ShaderToolsPrivate
+ )
+diff --git a/src/imports/graphicaleffects5/shaders_ng/compile.bat b/src/imports/graphicaleffects5/shaders_ng/compile.bat
+index 1e38742..398433e 100644
+--- a/src/imports/graphicaleffects5/shaders_ng/compile.bat
++++ b/src/imports/graphicaleffects5/shaders_ng/compile.bat
+@@ -9,8 +9,6 @@ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o opacitymask_invert.frag.qsb
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastblur.frag.qsb fastblur.frag
+ qsb -b --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastblur_internal.vert.qsb fastblur_internal.vert
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastblur_internal.frag.qsb fastblur_internal.frag
+-qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastinnershadow.frag.qsb fastinnershadow.frag
+-qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastinnershadow_level0.frag.qsb fastinnershadow_level0.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o fastglow.frag.qsb fastglow.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o colorize.frag.qsb colorize.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o brightnesscontrast.frag.qsb brightnesscontrast.frag
+@@ -18,8 +16,6 @@ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o coloroverlay.frag.qsb color
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o desaturate.frag.qsb desaturate.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o displace.frag.qsb displace.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o gammaadjust.frag.qsb gammaadjust.frag
+-qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o gaussianinnershadow.frag.qsb gaussianinnershadow.frag
+-qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o gaussianinnershadow_shadow.frag.qsb gaussianinnershadow_shadow.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o huesaturation.frag.qsb huesaturation.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o rectangularglow.frag.qsb rectangularglow.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o thresholdmask.frag.qsb thresholdmask.frag
+@@ -29,8 +25,6 @@ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o lineargradient_mask.frag.qs
+ qsb -b --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o radialgradient.vert.qsb radialgradient.vert
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o radialgradient_nomask.frag.qsb radialgradient_nomask.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o radialgradient_mask.frag.qsb radialgradient_mask.frag
+-qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o recursiveblur.frag.qsb recursiveblur.frag
+-qsb -b --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o recursiveblur.vert.qsb recursiveblur.vert
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o conicalgradient_nomask.frag.qsb conicalgradient_nomask.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o conicalgradient_mask.frag.qsb conicalgradient_mask.frag
+ qsb --glsl "150,120,100 es" --hlsl 50 -c --msl 12 -o leveladjust.frag.qsb leveladjust.frag
+diff --git a/tests/manual/graphicaleffects5/CMakeLists.txt b/tests/manual/graphicaleffects5/CMakeLists.txt
+index 0d48ee2..31874ac 100644
+--- a/tests/manual/graphicaleffects5/CMakeLists.txt
++++ b/tests/manual/graphicaleffects5/CMakeLists.txt
+@@ -34,32 +34,23 @@ set(qml_resource_files
+     "../../../src/imports/graphicaleffects5/doc/images/butterfly.png"
+     "../../../src/imports/graphicaleffects5/doc/images/fog.png"
+     "../../../src/imports/graphicaleffects5/doc/images/glass_normal.png"
+-    "BlendEffect.qml"
+     "BrightnessContrastEffect.qml"
+     "ColorOverlayEffect.qml"
+     "ColorizeEffect.qml"
+     "ConicalGradientEffect.qml"
+     "DesaturateEffect.qml"
+-    "DirectionalBlurEffect.qml"
+     "DisplaceEffect.qml"
+     "DropShadowEffect.qml"
+     "FastBlurEffect.qml"
+     "GammaAdjustEffect.qml"
+-    "GaussianBlurEffect.qml"
+     "GlowEffect.qml"
+     "HueSaturationEffect.qml"
+-    "InnerShadowEffect.qml"
+-    "InnerShadowFastEffect.qml"
+     "LevelAdjustEffect.qml"
+     "LinearGradientEffect.qml"
+-    "MaskedBlurEffect.qml"
+     "OpacityMaskEffect.qml"
+-    "RadialBlurEffect.qml"
+     "RadialGradientEffect.qml"
+     "RectangularGlowEffect.qml"
+-    "RecursiveBlurEffect.qml"
+     "ThresholdMaskEffect.qml"
+-    "ZoomBlurEffect.qml"
+     "main.qml"
+ )
+ 
+diff --git a/tests/manual/graphicaleffects5/main.qml b/tests/manual/graphicaleffects5/main.qml
+index 5ca69d4..7344467 100644
+--- a/tests/manual/graphicaleffects5/main.qml
++++ b/tests/manual/graphicaleffects5/main.qml
+@@ -28,7 +28,7 @@ Window {
+     Grid {
+         id: grid
+         anchors.fill: parent
+-        columns: 6
++        columns: 5
+ 
+         BrightnessContrastEffect {
+             width: parent.width / parent.columns
+@@ -90,51 +90,11 @@ Window {
+             height: width
+         }
+ 
+-        InnerShadowEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        InnerShadowFastEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+         FastBlurEffect {
+             width: parent.width / parent.columns
+             height: width
+         }
+ 
+-        GaussianBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        MaskedBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        RadialBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        RecursiveBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        ZoomBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+-        DirectionalBlurEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+-
+         GlowEffect {
+             width: parent.width / parent.columns
+             height: width
+@@ -154,10 +114,5 @@ Window {
+             width: parent.width / parent.columns
+             height: width
+         }
+-
+-        BlendEffect {
+-            width: parent.width / parent.columns
+-            height: width
+-        }
+     }
+ }
+diff --git a/tests/manual/graphicaleffects5/qml.qrc b/tests/manual/graphicaleffects5/qml.qrc
+index 34207fe..f0a9401 100644
+--- a/tests/manual/graphicaleffects5/qml.qrc
++++ b/tests/manual/graphicaleffects5/qml.qrc
+@@ -22,14 +22,5 @@
+         <file>OpacityMaskEffect.qml</file>
+         <file alias="images/fog.png">../../../src/imports/graphicaleffects5/doc/images/fog.png</file>
+         <file>ThresholdMaskEffect.qml</file>
+-        <file>GaussianBlurEffect.qml</file>
+-        <file>MaskedBlurEffect.qml</file>
+-        <file>BlendEffect.qml</file>
+-        <file>DirectionalBlurEffect.qml</file>
+-        <file>InnerShadowEffect.qml</file>
+-        <file>InnerShadowFastEffect.qml</file>
+-        <file>RadialBlurEffect.qml</file>
+-        <file>RecursiveBlurEffect.qml</file>
+-        <file>ZoomBlurEffect.qml</file>
+     </qresource>
+ </RCC>
+-- 
+2.44.0
+
