@@ -51,7 +51,6 @@ QT_SHADETOOLS_NATIVE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Q
 
 qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum-qtshadertools
 	$(UNPACK)
-	$(APPLY) $(SRC)/qtshadertools/0001-Use-fxc2-through-wine-instead-of-fxc.patch
 	$(APPLY) $(SRC)/qtshadertools/0001-Backport-a-change-to-SPIRV-Cross-to-add-a-missing-in.patch
 	$(MOVE)
 
