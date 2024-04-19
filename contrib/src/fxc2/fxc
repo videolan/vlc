@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import sys
+import os
+import platform
+import subprocess
+import shutil
+
+def log_error(msg: str):
+    sys.stderr.write(msg + os.linesep)
+
+def toSystemPath(path: str):
+    absPath = os.path.abspath(path)
+    if platform.system() == 'Windows':
+        return absPath
+
+    if platform.system() == 'Linux':
+        pathCmd = None
+        if shutil.which('cygpath'):
+            pathCmd = 'cygpath'
+        elif shutil.which('wslpath'):
+            pathCmd = 'wslpath'
+        else:
+            pathCmd = 'wine winepath'
+        # convert to hybrid mode to avoid forward slashes in shell
+        sub = subprocess.Popen([pathCmd, '-m', absPath], shell=False, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        errcode = sub.wait()
+        if errcode != 0:
+            log_error('failed to find Windows path using {} for "{}"'.format(pathCmd, absPath))
+            exit(1)
+        p, err = sub.communicate()
+        return p.decode('utf-8').strip()
+
+def main():
+    this_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+    if (os.path.exists( os.path.join( this_path, 'fxc2.exe'))):
+        fxc2 = os.path.join( this_path, 'fxc2.exe')
+    elif (os.path.exists( os.path.join( this_path, 'fxc2'))):
+        fxc2 = os.path.join( this_path, 'fxc2')
+    else:
+        log_error('fxc2 not found in {}'.format(this_path))
+        exit(1)
+
+    nologo = False
+    optimized = True
+    entry_point = None
+    model = None
+    output_file = None
+    input_files = []
+    argi = 0
+    while argi < len(sys.argv)-1:
+        argi = argi+1
+        option = sys.argv[argi]
+
+        # --version
+        if option == '--version':
+            print('fxc wrapper 0.0.1')
+            exit(0)
+
+        # /nologo
+        if option == '/nologo' or option == '-nologo':
+            nologo = True
+
+        # /E
+        elif option == '/E' or option == '-E':
+            if argi+1 >= len(sys.argv):
+                log_error('missing /E parameter')
+                exit(1)
+            argi = argi+1
+            entry_point = sys.argv[argi]
+
+        # /T
+        elif option == '/T' or option == '-T':
+            if argi+1 >= len(sys.argv):
+                log_error('missing /T parameter')
+                exit(1)
+            argi = argi+1
+            model = sys.argv[argi]
+
+        # /Fo
+        elif option == '/Fo' or option == '-Fo':
+            if argi+1 >= len(sys.argv):
+                log_error('missing /Fo parameter')
+                exit(1)
+            argi = argi+1
+            output_file = sys.argv[argi]
+            output_mode = '-O'
+
+        # /Fh
+        elif option == '/Fh' or option == '-Fh':
+            if argi+1 >= len(sys.argv):
+                log_error('missing /Fo parameter')
+                exit(1)
+            argi = argi+1
+            output_file = sys.argv[argi]
+            output_mode = '-Fh'
+
+        # /Od
+        elif option == '/Od' or option == '-Od':
+            optimized = False
+
+        elif option.startswith('-'):
+            log_error('unknown option {}'.format(option))
+            exit(1)
+
+        elif option.startswith('/') and not os.path.exists(option):
+            log_error('unknown option {}'.format(option))
+            exit(1)
+
+        else:
+            input_files.append(option)
+
+    if len(input_files) == 0:
+        log_error('missing input file(s)')
+        exit(1)
+
+    fxc2_call = [ fxc2 ]
+    if nologo:
+        fxc2_call.append( '-nologo' )
+    if entry_point:
+        fxc2_call.append( '-E' )
+        fxc2_call.append( entry_point )
+    if model:
+        fxc2_call.append( '-T' )
+        fxc2_call.append( model )
+    if output_file:
+        fxc2_call.append( output_mode )
+        fxc2_call.append( toSystemPath(output_file) )
+    for input in input_files:
+        fxc2_call.append( toSystemPath(input) )
+
+    # disabling optimizations not supported by fxc2
+    # qsb used this to disable debugging(!)
+    # if not optimized:
+    #     fxc2_call.append( '-Od' )
+
+    if platform.system() == 'Windows':
+        call = subprocess.Popen(fxc2_call, shell=False, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+    else:
+        if not nologo:
+            print('calling fxc2 through wine')
+        call = subprocess.Popen(['bash', '-c', 'wine ' +' '.join(fxc2_call)], shell=False, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+    errcode = call.wait()
+    p, err = call.communicate()
+    if not nologo:
+        print('fxc calling ' + ' '.join(fxc2_call))
+
+    if not nologo or errcode != 0:
+        lines = p.decode('utf-8')
+        print(lines)
+
+    exit(errcode)
+
+if __name__ == "__main__":
+    main()
