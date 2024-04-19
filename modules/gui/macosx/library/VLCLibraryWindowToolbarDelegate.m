@@ -50,9 +50,9 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem
 {
-    const NSInteger toolbarItemIndex = [self.libraryWindow.toolbar.items indexOfObject:toolbarItem];
+    const NSInteger toolbarItemIndex = [self.toolbar.items indexOfObject:toolbarItem];
     if (toolbarItemIndex != NSNotFound) {
-        [self.libraryWindow.toolbar removeItemAtIndex:toolbarItemIndex];
+        [self.toolbar removeItemAtIndex:toolbarItemIndex];
     }
 }
 
@@ -71,22 +71,22 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 {
     NSParameterAssert(toolbarItem != nil && items != nil && toolbarItem.itemIdentifier.length > 0);
 
-    const NSInteger toolbarItemIndex = [self.libraryWindow.toolbar.items indexOfObject:toolbarItem];
+    const NSInteger toolbarItemIndex = [self.toolbar.items indexOfObject:toolbarItem];
     if (toolbarItemIndex != NSNotFound) {
         return;
     }
 
     for (NSToolbarItem * const item in items) {
-        const NSInteger itemIndex = [self.libraryWindow.toolbar.items indexOfObject:item];
+        const NSInteger itemIndex = [self.toolbar.items indexOfObject:item];
 
         if (itemIndex != NSNotFound) {
-            [self.libraryWindow.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier
-                                                             atIndex:itemIndex + 1];
+            [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier
+                                               atIndex:itemIndex + 1];
             return;
         }
     }
 
-    [self.libraryWindow.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier atIndex:0];
+    [self.toolbar insertItemWithItemIdentifier:toolbarItem.itemIdentifier atIndex:0];
 }
 
 - (void)setForwardsBackwardsToolbarItemsVisible:(BOOL)visible
@@ -133,7 +133,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier = @"VLCL
 
     // Display as far to the right as possible, but not in front of the playlist toggle button
     NSMutableArray<NSToolbarItem *> * const currentToolbarItems =
-        [NSMutableArray arrayWithArray:self.libraryWindow.toolbar.items];
+        [NSMutableArray arrayWithArray:self.toolbar.items];
     if (currentToolbarItems.lastObject == self.libraryWindow.togglePlaylistToolbarItem) {
         [currentToolbarItems removeLastObject];
     }
