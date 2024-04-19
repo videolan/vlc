@@ -1305,7 +1305,7 @@ static int Init( input_thread_t * p_input )
         goto error;
 
     /* Create es out */
-    priv->p_es_out = input_EsOutTimeshiftNew(p_input, &priv->p_es_out_display->out, priv->rate);
+    priv->p_es_out = input_EsOutTimeshiftNew(p_input, priv->p_es_out_display, priv->rate);
     if (priv->p_es_out == NULL)
         goto error;
 

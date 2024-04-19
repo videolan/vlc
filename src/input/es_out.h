@@ -371,7 +371,7 @@ input_EsOutNew(input_thread_t *, input_source_t *main_source, float rate,
                enum input_type input_type);
 
 struct vlc_input_es_out *
-input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, float i_rate );
+input_EsOutTimeshiftNew(input_thread_t *, struct vlc_input_es_out *, float i_rate);
 
 struct vlc_input_es_out *
 input_EsOutSourceNew(struct vlc_input_es_out *master_out, input_source_t *in);
