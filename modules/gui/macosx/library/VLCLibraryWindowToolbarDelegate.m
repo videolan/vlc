@@ -201,7 +201,9 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 
 - (void)insertToolbarItem:(NSToolbarItem *)toolbarItem inFrontOf:(NSArray<NSToolbarItem *> *)items
 {
-    NSParameterAssert(toolbarItem != nil && items != nil && toolbarItem.itemIdentifier.length > 0);
+    NSParameterAssert(toolbarItem != nil);
+    NSParameterAssert(items != nil);
+    NSParameterAssert(toolbarItem.itemIdentifier.length > 0);
 
     const NSInteger toolbarItemIndex = [self.toolbar.items indexOfObject:toolbarItem];
     if (toolbarItemIndex != NSNotFound) {
