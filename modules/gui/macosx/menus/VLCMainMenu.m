@@ -644,10 +644,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self setVideoMenuActiveVideo:NO];
         [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
-        
-        if (self.windowMenu.autoenablesItems) {
-            self.windowMenu.autoenablesItems = NO;
-        }
+
+        self.windowMenu.autoenablesItems = NO;
         self.info.enabled = NO;
     }
 }
