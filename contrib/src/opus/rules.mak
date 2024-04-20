@@ -1,6 +1,6 @@
 # opus
 
-OPUS_VERSION := 1.5.1
+OPUS_VERSION := 1.5.2
 
 OPUS_URL := $(XIPH)/opus/opus-$(OPUS_VERSION).tar.gz
 
@@ -16,7 +16,6 @@ $(TARBALLS)/opus-$(OPUS_VERSION).tar.gz:
 
 opus: opus-$(OPUS_VERSION).tar.gz .sum-opus
 	$(UNPACK)
-	$(APPLY) $(SRC)/opus/0001-dnn-vec_neon-avoid-redefinition-of-vcvtnq_s32_f32.patch
 	$(MOVE)
 
 OPUS_CONF=  -D extra-programs=disabled -D tests=disabled -D docs=disabled
