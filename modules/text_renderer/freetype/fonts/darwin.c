@@ -41,7 +41,7 @@
 #include "../platform_fonts.h"
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor);
-void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family);
+void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family, int index);
 
 
 char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
@@ -60,7 +60,66 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
+static int getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
+    CFStringRef cfFilePath = CFStringCreateWithCString(kCFAllocatorDefault, psz_filePath, kCFStringEncodingUTF8);
+    if (cfFilePath == NULL) {
+        return -1;
+    }
+    CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, cfFilePath, kCFURLPOSIXPathStyle, false);
+    if (url == NULL) {
+        CFRelease(cfFilePath);
+        return -1;
+    }
+    CFArrayRef fontDescriptors = CTFontManagerCreateFontDescriptorsFromURL(url);
+    if (fontDescriptors == NULL) {
+        CFRelease(cfFilePath);
+        CFRelease(url);
+        return -1;
+    }
+    CFIndex numberOfFontDescriptors = CFArrayGetCount(fontDescriptors);
+
+    int index = 0;
+
+    for (CFIndex i = 0; i < numberOfFontDescriptors; i++) {
+        CTFontDescriptorRef descriptor = (CTFontDescriptorRef)CFArrayGetValueAtIndex(fontDescriptors, i);
+        CFStringRef familyName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute);
+        CFStringRef fontName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute);
+        CFStringRef displayName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontDisplayNameAttribute);
+        char* familyNameStr = FromCFString(familyName, kCFStringEncodingUTF8);
+        char* fontNameStr = FromCFString(fontName, kCFStringEncodingUTF8);
+        char* displayNameStr = FromCFString(displayName, kCFStringEncodingUTF8);
+
+        if (!strcmp(familyNameStr, psz_family) || !strcmp(fontNameStr, psz_family) || !strcmp(displayNameStr, psz_family)) {
+            index = i;
+            FREENULL(familyNameStr);
+            FREENULL(fontNameStr);
+            FREENULL(displayNameStr);
+            CFRelease(familyName);
+            CFRelease(fontName);
+            CFRelease(displayName);
+            break;
+        }
+
+        FREENULL(familyNameStr);
+        FREENULL(fontNameStr);
+        FREENULL(displayNameStr);
+        CFRelease(familyName);
+        CFRelease(fontName);
+        CFRelease(displayName);
+    }
+    if (fontDescriptors != NULL) {
+        CFRelease(fontDescriptors);
+    }
+    if (url != NULL) {
+        CFRelease(url);
+    }
+    if (cfFilePath != NULL) {
+        CFRelease(cfFilePath);
+    }
+    return index;
+}
+
+void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path, vlc_family_t *family, int index)
 {
     bool b_bold = false;
     bool b_italic = false;
@@ -79,7 +138,7 @@ void addNewFontToFamily(filter_t *p_filter, CTFontDescriptorRef iter, char *path
 #else
     VLC_UNUSED(p_filter);
 #endif
-    NewFont(path, 0, b_bold, b_italic, p_family);
+    NewFont(path, index, b_bold, b_italic, family);
 
     CFRelease(fontTraits);
 }
@@ -166,7 +225,14 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
             continue;
         }
 
-        addNewFontToFamily(p_filter, iter, path, p_family);
+        /* get the index of the font family in the font file */
+        int fontIndex = getFontIndexInFontFile(path, psz_lc);
+        if (fontIndex < 0) {
+            FREENULL(path);
+            continue;
+        }
+
+        addNewFontToFamily(p_filter, iter, path, p_family, fontIndex);
     }
 
 end:
@@ -246,7 +312,13 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
         goto done;
     }
 
-    addNewFontToFamily(p_filter, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+    /* get the index of the font family in the font file */
+    int fontIndex = getFontIndexInFontFile(psz_fontPath, psz_fallbackFamilyName);
+    if (fontIndex < 0) {
+        goto done;
+    }
+
+    addNewFontToFamily(p_filter, fallbackFontDescriptor, strdup(psz_fontPath), p_family, fontIndex);
 
 done:
     CFRelease(familyName);
