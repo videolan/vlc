@@ -56,7 +56,66 @@ static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family)
+int getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
+    CFStringRef cfFilePath = CFStringCreateWithCString(kCFAllocatorDefault, psz_filePath, kCFStringEncodingUTF8);
+    if (cfFilePath == NULL) {
+        return -1;
+    }
+    CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, cfFilePath, kCFURLPOSIXPathStyle, false);
+    if (url == NULL) {
+        CFRelease(cfFilePath);
+        return -1;
+    }
+    CFArrayRef fontDescriptors = CTFontManagerCreateFontDescriptorsFromURL(url);
+    if (fontDescriptors == NULL) {
+        CFRelease(cfFilePath);
+        CFRelease(url);
+        return -1;
+    }
+    CFIndex numberOfFontDescriptors = CFArrayGetCount(fontDescriptors);
+
+    int index = 0;
+
+    for (CFIndex i = 0; i < numberOfFontDescriptors; i++) {
+        CTFontDescriptorRef descriptor = (CTFontDescriptorRef)CFArrayGetValueAtIndex(fontDescriptors, i);
+        CFStringRef familyName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute);
+        CFStringRef fontName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute);
+        CFStringRef displayName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontDisplayNameAttribute);
+        char* familyNameStr = FromCFString(familyName, kCFStringEncodingUTF8);
+        char* fontNameStr = FromCFString(fontName, kCFStringEncodingUTF8);
+        char* displayNameStr = FromCFString(displayName, kCFStringEncodingUTF8);
+
+        if (!strcmp(familyNameStr, psz_family) || !strcmp(fontNameStr, psz_family) || !strcmp(displayNameStr, psz_family)) {
+            index = i;
+            FREENULL(familyNameStr);
+            FREENULL(fontNameStr);
+            FREENULL(displayNameStr);
+            CFRelease(familyName);
+            CFRelease(fontName);
+            CFRelease(displayName);
+            break;
+        }
+
+        FREENULL(familyNameStr);
+        FREENULL(fontNameStr);
+        FREENULL(displayNameStr);
+        CFRelease(familyName);
+        CFRelease(fontName);
+        CFRelease(displayName);
+    }
+    if (fontDescriptors != NULL) {
+        CFRelease(fontDescriptors);
+    }
+    if (url != NULL) {
+        CFRelease(url);
+    }
+    if (cfFilePath != NULL) {
+        CFRelease(cfFilePath);
+    }
+    return index;
+}
+
+static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, char *path, vlc_family_t *p_family, int index)
 {
     int i_flags = 0;
     CFDictionaryRef fontTraits = CTFontDescriptorCopyAttribute(iter, kCTFontTraitsAttribute);
@@ -81,7 +140,7 @@ static void addNewFontToFamily(vlc_font_select_t *fs, CTFontDescriptorRef iter, 
 #else
     VLC_UNUSED(fs);
 #endif
-    NewFont(path, 0, i_flags, p_family);
+    NewFont(path, index, i_flags, p_family);
 
     CFRelease(fontTraits);
 }
@@ -241,7 +300,14 @@ int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
             continue;
         }
 
-        addNewFontToFamily(fs, iter, path, p_family);
+        /* get the index of the font family in the font file */
+        int fontIndex = getFontIndexInFontFile(path, psz_lcname);
+        if (fontIndex < 0) {
+            FREENULL(path);
+            continue;
+        }
+
+        addNewFontToFamily(fs, iter, path, p_family, fontIndex);
     }
 
     i_ret = VLC_SUCCESS;
@@ -328,7 +394,13 @@ int CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcname,
         goto done;
     }
 
-    addNewFontToFamily(fs, fallbackFontDescriptor, strdup(psz_fontPath), p_family);
+    /* get the index of the font family in the font file */
+    int fontIndex = getFontIndexInFontFile(psz_fontPath, psz_fallbackFamilyName);
+    if (fontIndex < 0) {
+        goto done;
+    }
+
+    addNewFontToFamily(fs, fallbackFontDescriptor, strdup(psz_fontPath), p_family, fontIndex);
 
     i_ret = VLC_SUCCESS;
 
