@@ -89,7 +89,7 @@ static int getFontIndexInFontFile(const char* psz_filePath, const char* psz_fami
         char* fontNameStr = FromCFString(fontName, kCFStringEncodingUTF8);
         char* displayNameStr = FromCFString(displayName, kCFStringEncodingUTF8);
 
-        if (!strcmp(familyNameStr, psz_family) || !strcmp(fontNameStr, psz_family) || !strcmp(displayNameStr, psz_family)) {
+        if (!strcasecmp(familyNameStr, psz_family) || !strcasecmp(fontNameStr, psz_family) || !strcasecmp(displayNameStr, psz_family)) {
             index = i;
             FREENULL(familyNameStr);
             FREENULL(fontNameStr);
