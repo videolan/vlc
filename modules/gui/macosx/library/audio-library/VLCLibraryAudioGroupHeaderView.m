@@ -45,13 +45,42 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 {
     if (@available(macOS 10.14, *)) {
         _playButton.bezelColor = NSColor.VLCAccentColor;
+        [NSApplication.sharedApplication addObserver:self
+                                          forKeyPath:@"effectiveAppearance"
+                                             options:NSKeyValueObservingOptionNew
+                                             context:nil];
     }
 
     self.backgroundEffectView.wantsLayer = YES;
     self.backgroundEffectView.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
     self.backgroundEffectView.layer.borderWidth = 1;
-    self.backgroundEffectView.layer.borderColor = NSColor.VLCSubtleBorderColor.CGColor;
+    [self updateColoredAppearance:self.effectiveAppearance];
 }
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        NSAppearance * const effectiveAppearance = change[NSKeyValueChangeNewKey];
+        [self updateColoredAppearance:effectiveAppearance];
+    }
+}
+
+- (void)updateColoredAppearance:(NSAppearance *)appearance
+{
+    NSParameterAssert(appearance);
+    BOOL isDark = NO;
+    if (@available(macOS 10.14, *)) {
+        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
+                 [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+    }
+
+    self.backgroundEffectView.layer.borderColor = isDark ?
+        NSColor.VLCDarkSubtleBorderColor.CGColor : NSColor.VLCLightSubtleBorderColor.CGColor;
+}
+
 
 - (void)updateRepresentation
 {
