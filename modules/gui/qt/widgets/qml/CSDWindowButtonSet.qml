@@ -33,6 +33,8 @@ Row {
     property color color: theme.fg.primary
     property color hoverColor: VLCStyle.setColorAlpha(theme.bg.primary, 0.5)
 
+    readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
+
     readonly property bool buttonHovered: {
         let h = false
         for (let i = 0; i < repeater.count; ++i) {
