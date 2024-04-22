@@ -713,7 +713,7 @@ endif
 ifdef HAVE_ANDROID
 	CMAKE_TOOLCHAIN_ENV += ANDROID_NDK=$(ANDROID_NDK)
 	CMAKE_TOOLCHAIN_ENV += ANDROID_ABI=$(ANDROID_ABI)
-	CMAKE_TOOLCHAIN_ENV += ANDROID_ABI=$(ANDROID_API)
+	CMAKE_TOOLCHAIN_ENV += ANDROID_API=$(ANDROID_API)
 # cmake will overwrite our --sysroot with a native (host) one on Darwin
 # Set it to "" right away to short-circuit this behaviour
 	CMAKE_TOOLCHAIN_ENV += CXX_SYSROOT_FLAG=
