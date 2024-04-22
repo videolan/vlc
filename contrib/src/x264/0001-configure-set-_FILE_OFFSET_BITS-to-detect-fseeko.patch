@@ -1,0 +1,26 @@
+From dc69fefa49726021d75e6a764357779a4b4d0800 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 22 Apr 2024 14:03:02 +0200
+Subject: [PATCH] configure: set _FILE_OFFSET_BITS to detect fseeko
+
+On Android fseeko is not detected properly if if _FILE_OFFSET_BITS is not set.
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index c1fb599f..60ad229b 100755
+--- a/configure
++++ b/configure
+@@ -1369,7 +1369,7 @@ if [ $SYS = WINDOWS -a $ARCH = X86 -a $compiler = GNU ] ; then
+     cc_check '' -fno-zero-initialized-in-bss && CFLAGS="$CFLAGS -fno-zero-initialized-in-bss"
+ fi
+ 
+-if cc_check "stdio.h" "" "fseeko(stdin,0,0);" ; then
++if cc_check "stdio.h" "#define _FILE_OFFSET_BITS 64" "fseeko(stdin,0,0);" ; then
+     define fseek fseeko
+     define ftell ftello
+ elif cc_check "stdio.h" "" "fseeko64(stdin,0,0);" ; then
+-- 
+2.37.3.windows.1
+
