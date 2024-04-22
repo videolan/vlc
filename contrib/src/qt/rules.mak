@@ -64,6 +64,7 @@ QTBASE_CONFIG += -static -opensource -confirm-license -opengl desktop -no-pkg-co
     -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
 	-no-feature-sql -no-feature-testlib -system-freetype -system-harfbuzz -system-libjpeg \
 	-no-feature-xml -no-feature-printsupport -system-libpng -system-zlib -no-feature-network \
+	-no-feature-movie \
 	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
 	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
 
