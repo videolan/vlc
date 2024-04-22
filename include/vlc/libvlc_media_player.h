@@ -151,7 +151,7 @@ typedef enum libvlc_position_t {
  * Enumeration of values used to set the video fitting inside the display area.
  */
 typedef enum libvlc_video_fit_mode_t {
-    libvlc_video_fit_none,    /**< Explicit zoom set by \ref libvlc_video_set_scale */
+    libvlc_video_fit_none = 0,    /**< Explicit zoom set by \ref libvlc_video_set_scale */
     libvlc_video_fit_smaller, /**< Fit inside / to smallest display dimension */
     libvlc_video_fit_larger,  /**< Fit outside / to largest display dimension */
     libvlc_video_fit_width,   /**< Fit to display width */
