@@ -66,7 +66,8 @@ QT_DECLARATIVE_COMMON_CONFIG := \
 	-DFEATURE_qml_network=OFF \
 	-DFEATURE_quick_animatedimage=OFF \
 	-DFEATURE_quick_flipable=OFF \
-	-DFEATURE_quick_sprite=OFF
+	-DFEATURE_quick_sprite=OFF \
+	-DFEATURE_quick_canvas=OFF
 
 QT_DECLARATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	-DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake \
