@@ -131,6 +131,18 @@ static const struct
     { "5:4", "5:4" },
 };
 
+static const struct
+{
+    enum vlc_video_fitting fit;
+    char psz_label[15];
+} p_fit_values[] = {
+    { VLC_VIDEO_FIT_NONE,    N_("None") },
+    { VLC_VIDEO_FIT_SMALLER, N_("Inside Window") },
+    { VLC_VIDEO_FIT_LARGER,  N_("Outside Window") },
+    { VLC_VIDEO_FIT_WIDTH,   N_("Window Width") },
+    { VLC_VIDEO_FIT_HEIGHT,  N_("Window Height") },
+};
+
 static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
                              char *psz_list )
 {
@@ -246,6 +258,18 @@ void vout_CreateVars( vout_thread_t *p_vout )
     {
         AddCustomRatios( p_vout, "aspect-ratio", psz_buf );
         free( psz_buf );
+    }
+
+    /* display fit */
+    var_Create( p_vout, "fit", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND |
+                VLC_VAR_DOINHERIT );
+    var_Change( p_vout, "fit", VLC_VAR_SETTEXT, _("Fit Mode") );
+
+    for( size_t i = 0; i < ARRAY_SIZE(p_fit_values); i++ )
+    {
+        val.i_int = p_fit_values[i].fit;
+        var_Change( p_vout, "fit", VLC_VAR_ADDCHOICE, val,
+                    p_fit_values[i].psz_label );
     }
 
     /* Add a variable to indicate if the window should be on top of others */
