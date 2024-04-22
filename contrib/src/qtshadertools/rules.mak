@@ -7,7 +7,7 @@ QTSHADERTOOLS_URL := $(QT)/$(QTSHADERTOOLS_VERSION_MAJOR)/$(QTSHADERTOOLS_VERSIO
 
 DEPS_qtshadertools-tools := qt-tools $(DEPS_qt-tools)
 
-DEPS_qtshadertools += qt $(DEPS_qt) spirv-tools
+DEPS_qtshadertools += qt $(DEPS_qt)
 ifdef HAVE_CROSS_COMPILE
 DEPS_qtshadertools += qtshadertools-tools $(DEPS_qtshadertools-tools)
 endif

@@ -8,7 +8,7 @@ DEPS_qtdeclarative-tools := qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS
 
 DEPS_qtdeclarative = qt $(DEPS_qt) qtshadertools $(DEPS_qtshadertools)
 ifdef HAVE_CROSS_COMPILE
-DEPS_qtdeclarative += qtdeclarative-tools $(DEPS_qtdeclarative-tools) qtshadertools-tools $(DEPS_qtshadertools-tools) spirv-tools $(DEPS_spirv-tools)
+DEPS_qtdeclarative += qtdeclarative-tools $(DEPS_qtdeclarative-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
 endif
 
 ifdef HAVE_WIN32
