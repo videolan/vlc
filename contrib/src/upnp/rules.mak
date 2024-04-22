@@ -42,6 +42,7 @@ endif
 ifdef HAVE_IOS
 	$(APPLY) $(SRC)/upnp/fix-reuseaddr-option.patch
 endif
+	$(APPLY) $(SRC)/upnp/0001-disable-fseeko-usage-on-32-bit-Android-older-than-AP.patch
 	$(MOVE)
 
 .upnp: upnp toolchain.cmake
