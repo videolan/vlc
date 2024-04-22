@@ -584,6 +584,13 @@ help:
 
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt
 
+CMAKE_HOST_ARCH=$(ARCH)
+ifeq ($(ARCH),i386)
+CMAKE_HOST_ARCH=i686
+else ifeq ($(ARCH),arm)
+CMAKE_HOST_ARCH=armv7-a
+endif
+
 CMAKE_SYSTEM_NAME =
 ifdef HAVE_CROSS_COMPILE
 CMAKE_SYSTEM_NAME = $(error CMAKE_SYSTEM_NAME required for cross-compilation)
@@ -611,7 +618,7 @@ endif
 # CMake toolchain
 toolchain.cmake:
 	$(RM) $@
-	echo "set(CMAKE_SYSTEM_PROCESSOR $(ARCH))" >> $@
+	echo "set(CMAKE_SYSTEM_PROCESSOR $(CMAKE_HOST_ARCH))" >> $@
 	if test -n "$(CMAKE_SYSTEM_NAME)"; then \
 		echo "set(CMAKE_SYSTEM_NAME $(CMAKE_SYSTEM_NAME))" >> $@; \
 	fi;
