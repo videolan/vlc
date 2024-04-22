@@ -653,6 +653,13 @@ help:
 
 .PHONY: all fetch fetch-all install mostlyclean clean distclean package list help prebuilt tools
 
+CMAKE_HOST_ARCH=$(ARCH)
+ifeq ($(ARCH),i386)
+CMAKE_HOST_ARCH=i686
+else ifeq ($(ARCH),arm)
+CMAKE_HOST_ARCH=armv7-a
+endif
+
 CMAKE_SYSTEM_NAME =
 ifdef HAVE_CROSS_COMPILE
 CMAKE_SYSTEM_NAME = $(error CMAKE_SYSTEM_NAME required for cross-compilation)
@@ -684,7 +691,7 @@ CFLAGS += -DANDROID_NATIVE_API_LEVEL=$(ANDROID_API)
 endif
 
 # CMake toolchain
-CMAKE_TOOLCHAIN_ENV := $(HOSTTOOLS) HOST_ARCH="$(ARCH)" SYSTEM_NAME="$(CMAKE_SYSTEM_NAME)"
+CMAKE_TOOLCHAIN_ENV := $(HOSTTOOLS) HOST_ARCH="$(CMAKE_HOST_ARCH)" SYSTEM_NAME="$(CMAKE_SYSTEM_NAME)"
 ifdef HAVE_WIN32
 ifdef HAVE_CROSS_COMPILE
 	CMAKE_TOOLCHAIN_ENV += RC_COMPILER="$(WINDRES)"
