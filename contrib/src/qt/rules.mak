@@ -71,6 +71,7 @@ QTBASE_CONFIG += -static -opensource -confirm-license -opengl desktop -no-pkg-co
 	-no-feature-movie -no-feature-pdf -no-feature-whatsthis -no-feature-lcdnumber \
 	-no-feature-syntaxhighlighter -no-feature-undoview -no-feature-splashscreen \
 	-no-feature-dockwidget -no-feature-mdiarea -no-feature-statusbar -no-feature-statustip \
+	-no-feature-keysequenceedit \
 	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
 	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
 
