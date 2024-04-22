@@ -588,7 +588,9 @@ CMAKE_SYSTEM_NAME =
 ifdef HAVE_CROSS_COMPILE
 CMAKE_SYSTEM_NAME = $(error CMAKE_SYSTEM_NAME required for cross-compilation)
 endif
-ifdef HAVE_LINUX
+ifdef HAVE_ANDROID
+CMAKE_SYSTEM_NAME = Android
+else
 CMAKE_SYSTEM_NAME = Linux
 endif
 ifdef HAVE_WIN32
