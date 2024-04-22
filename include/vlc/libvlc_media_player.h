@@ -1895,6 +1895,8 @@ LIBVLC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi, cons
 /**
  * Get current video display fit mode.
  *
+ * \version LibVLC 4.0.0 or later
+ *
  * \param p_mi the media player
  * \return the video display fit mode.
  */
@@ -1902,6 +1904,8 @@ LIBVLC_API libvlc_video_fit_mode_t libvlc_video_get_display_fit( libvlc_media_pl
 
 /**
  * Set new video display fit.
+ *
+ * \version LibVLC 4.0.0 or later
  *
  * \param p_mi the media player
  * \param fit new display fit mode
