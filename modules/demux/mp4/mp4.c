@@ -3277,6 +3277,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                 case VLC_CODEC_MP2:
                 case VLC_CODEC_MPGA:
                 {
+                    const unsigned i_rate = p_fmt->audio.i_rate ? p_fmt->audio.i_rate : p_track->i_timescale;
                     const MP4_Box_t *p_elst = p_track->p_elst;
                     if( p_elst && BOXDATA(p_elst)->i_entry_count &&
                         BOXDATA(p_elst)->entries[0].i_media_time < 0 )
@@ -3288,14 +3289,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     else if( p_sys->qt.i_delay_samples > 0 )
                     {
                         p_track->i_decoder_delay =  MP4_rescale_qtime(
-                                    vlc_tick_from_samples( p_sys->qt.i_delay_samples, p_fmt->audio.i_rate ),
+                                    vlc_tick_from_samples( p_sys->qt.i_delay_samples, i_rate ),
                                     p_track->i_timescale );
                     }
                     /* AAC historical Apple decoder delay 2112 > 2048 */
                     else if( p_fmt->i_codec == VLC_CODEC_MP4A )
                     {
                         p_track->i_decoder_delay =  MP4_rescale_qtime(
-                                    vlc_tick_from_samples( 2112, p_fmt->audio.i_rate ),
+                                    vlc_tick_from_samples( 2112, i_rate ),
                                     p_track->i_timescale );
                     }
                     /* Opus has an expected 80ms discard on seek */
@@ -3312,14 +3313,14 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                          * https://www.compuphase.com/mp3/mp3loops.htm
                            https://www.iis.fraunhofer.de/content/dam/iis/de/doc/ame/conference/AES-116-Convention_guideline-to-audio-codec-delay_AES116.pdf */
                         p_track->i_decoder_delay =  MP4_rescale_qtime(
-                                    vlc_tick_from_samples( 576, p_fmt->audio.i_rate ),
+                                    vlc_tick_from_samples( 576, i_rate ),
                                     p_track->i_timescale );
                     }
                     else if( p_fmt->i_codec == VLC_CODEC_MPGA ||
                              p_fmt->i_codec == VLC_CODEC_MP2 )
                     {
                         p_track->i_decoder_delay =  MP4_rescale_qtime(
-                                    vlc_tick_from_samples( 240, p_fmt->audio.i_rate ),
+                                    vlc_tick_from_samples( 240, i_rate ),
                                     p_track->i_timescale );
                     }
                 }
