@@ -1,5 +1,15 @@
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -6397,6 +6397,7 @@ func_mode_link ()
+		case $host in
+		  *-*-sco3.2v5.0.[024]*) add_dir=-L$dir ;;
+		  *-*-sysv4*uw2*) add_dir=-L$dir ;;
++		  *-*-emscripten*) add_dir=-L$dir ;;
+		  *-*-sysv5OpenUNIX* | *-*-sysv5UnixWare7.[01].[10]* | \
+		    *-*-unixware7*) add_dir=-L$dir ;;
+		  *-*-darwin* )
 diff --git a/m4/libtool.m4 b/m4/libtool.m4
-index 009155ee..797604af 100644
 --- a/m4/libtool.m4
 +++ b/m4/libtool.m4
 @@ -3081,6 +3081,21 @@ uts4*)
