@@ -1,0 +1,39 @@
+From 49708201f82d029d948d31e204213978e955eef0 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 22 Apr 2024 12:03:33 +0200
+Subject: [PATCH 2/2] [CMake] disable fseeko on 32-bit Android before API 24
+
+It can be linked in the NDK so check_function_exists detects it. But it's only supporting _FILE_OFFSET_BITS=64
+since Android API 24 [1].
+
+With NDK 26 it's no longer possible to build assuming the API is always available.
+
+[1] https://android.googlesource.com/platform/bionic/+/main/docs/32-bit-abi.md
+---
+ CMakeLists.txt | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 316a8210..15490478 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -119,7 +119,15 @@ else()
+     check_include_file("x86intrin.h" FLAC__HAS_X86INTRIN)
+ endif()
+ 
+-check_function_exists(fseeko HAVE_FSEEKO)
++
++if(ANDROID AND CMAKE_SYSTEM_VERSION VERSION_LESS 24 AND (CMAKE_SYSTEM_PROCESSOR MATCHES "i686" OR CMAKE_SYSTEM_PROCESSOR MATCHES "armv7-a"))
++    # fseeko/ftello may link, but it's not usable before Android API 24 on 32-bit Android
++    # https://android.googlesource.com/platform/bionic/+/main/docs/32-bit-abi.md
++    message(STATUS "Disabling fseeko/ftello for 32-bit Android before API 24")
++    set(HAVE_FSEEKO 0 CACHE INTERNAL "")
++else()
++    check_function_exists(fseeko HAVE_FSEEKO)
++endif()
+ 
+ check_c_source_compiles("int main() { return __builtin_bswap16 (0) ; }" HAVE_BSWAP16)
+ check_c_source_compiles("int main() { return __builtin_bswap32 (0) ; }" HAVE_BSWAP32)
+-- 
+2.37.3.windows.1
+

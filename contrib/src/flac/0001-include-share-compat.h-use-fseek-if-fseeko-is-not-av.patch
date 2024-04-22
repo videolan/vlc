@@ -1,0 +1,33 @@
+From 15c68771d6001f09b68dd1aa14b84058584f7987 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 22 Apr 2024 12:01:02 +0200
+Subject: [PATCH 1/2] include/share/compat.h : use fseek if fseeko is not
+ available
+
+---
+ include/share/compat.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/share/compat.h b/include/share/compat.h
+index 7a865153..6e73b16d 100644
+--- a/include/share/compat.h
++++ b/include/share/compat.h
+@@ -62,8 +62,15 @@
+ #endif
+ #endif
+ #else
++#ifndef HAVE_FSEEKO
++#define fseeko fseek
++#define ftello ftell
++#define FLAC__off_t long
++#define FLAC__OFF_T_MAX LONG_MAX
++#else
+ #define FLAC__off_t off_t
+ #endif
++#endif
+ 
+ #ifdef HAVE_INTTYPES_H
+ #define __STDC_FORMAT_MACROS
+-- 
+2.37.3.windows.1
+
