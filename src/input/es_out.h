@@ -119,26 +119,6 @@ struct vlc_input_es_out {
     const struct vlc_input_es_out_ops *ops;
 };
 
-static inline struct vlc_input_es_out *
-GetInputEsOut(es_out_t *out)
-{
-    return container_of(out, struct vlc_input_es_out, out);
-}
-
-static inline struct vlc_input_es_out *
-GetEsOutIdentity(struct vlc_input_es_out *out)
-{
-    return out;
-}
-
-#define ES_OUT(out) \
-    _Generic((out), \
-        struct vlc_input_es_out*: GetEsOutIdentity, \
-        es_out_t*: GetInputEsOut)((out))
-
-#define temp_as_es_out_or_input(out, apply_to, ...) \
-    (apply_to)(ES_OUT(out), ## __VA_ARGS__)
-
 static inline int
 es_out_vaPrivControl(struct vlc_input_es_out *out, int query, va_list args )
 {
@@ -146,7 +126,6 @@ es_out_vaPrivControl(struct vlc_input_es_out *out, int query, va_list args )
         return out->ops->priv_control(out, NULL, query, args);
     return out->out.cbs->priv_control(&out->out, NULL, query, args);
 }
-#define es_out_vaPrivControl(out, query, args) temp_as_es_out_or_input(out, es_out_vaPrivControl, query, args)
 
 static inline int
 es_out_PrivControl(struct vlc_input_es_out *out, int query, ...)
@@ -157,7 +136,6 @@ es_out_PrivControl(struct vlc_input_es_out *out, int query, ...)
     va_end( args );
     return result;
 }
-#define es_out_privControl(out, query, ...) temp_as_es_out_or_input(out, es_out_privControl, query, __VA_ARGS__)
 
 static inline void
 es_out_SetMode(struct vlc_input_es_out *out, int i_mode)
@@ -165,28 +143,24 @@ es_out_SetMode(struct vlc_input_es_out *out, int i_mode)
     int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_MODE, i_mode);
     assert( !i_ret );
 }
-#define es_out_SetMode(out, mode) temp_as_es_out_or_input(out, es_out_SetMode, mode)
 
 static inline int
 es_out_SetEs(struct vlc_input_es_out *out, vlc_es_id_t *id)
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_ES, id);
 }
-#define es_out_SetEs(out, id) temp_as_es_out_or_input(out, es_out_SetEs, id)
 
 static inline int
 es_out_UnsetEs(struct vlc_input_es_out *out, vlc_es_id_t *id)
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_UNSET_ES, id);
 }
-#define es_out_UnsetEs(out, id) temp_as_es_out_or_input(out, es_out_UnsetEs, id)
 
 static inline int
 es_out_RestartEs(struct vlc_input_es_out *out, vlc_es_id_t *id)
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_RESTART_ES, id);
 }
-#define es_out_RestartEs(out, id) temp_as_es_out_or_input(out, es_out_RestartEs, id)
 
 static inline vlc_tick_t
 es_out_GetWakeup(struct vlc_input_es_out *out)
@@ -197,7 +171,6 @@ es_out_GetWakeup(struct vlc_input_es_out *out)
     assert( !i_ret );
     return i_wu;
 }
-#define es_out_GetWakeup(out) temp_as_es_out_or_input(out, es_out_GetWakeup)
 
 static inline int
 es_out_SetEsList(struct vlc_input_es_out *out,
@@ -206,7 +179,6 @@ es_out_SetEsList(struct vlc_input_es_out *out,
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_ES_LIST, cat, ids);
 }
-#define es_out_SetEsList(out, cat, ids) temp_as_es_out_or_input(out, es_out_SetEsList, cat, ids)
 
 static inline void
 es_out_SetEsCatIds(struct vlc_input_es_out *out,
@@ -217,7 +189,6 @@ es_out_SetEsCatIds(struct vlc_input_es_out *out,
                                  cat, str_ids);
     assert( ret == VLC_SUCCESS );
 }
-#define es_out_SetEsCatIds(out, cat, ids) temp_as_es_out_or_input(out, es_out_SetEsCatIds, cat, ids)
 
 static inline int
 es_out_StopAllEs(struct vlc_input_es_out *out,
@@ -225,14 +196,12 @@ es_out_StopAllEs(struct vlc_input_es_out *out,
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_STOP_ALL_ES, context);
 }
-#define es_out_StopAllEs(out, context) temp_as_es_out_or_input(out, es_out_StopAllEs, context)
 
 static inline int
 es_out_StartAllEs(struct vlc_input_es_out *out, vlc_es_id_t **context )
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_START_ALL_ES, context);
 }
-#define es_out_StartAllEs(out, context) temp_as_es_out_or_input(out, es_out_StartAllEs, context)
 
 static inline bool
 es_out_GetBuffering(struct vlc_input_es_out *out)
@@ -243,7 +212,6 @@ es_out_GetBuffering(struct vlc_input_es_out *out)
     assert( !i_ret );
     return b;
 }
-#define es_out_GetBuffering(out) temp_as_es_out_or_input(out, es_out_GetBuffering)
 
 static inline bool
 es_out_GetEmpty(struct vlc_input_es_out *out)
@@ -254,7 +222,6 @@ es_out_GetEmpty(struct vlc_input_es_out *out)
     assert( !i_ret );
     return b;
 }
-#define es_out_GetEmpty(out) temp_as_es_out_or_input(out, es_out_GetEmpty)
 
 static inline void
 es_out_SetEsDelay(struct vlc_input_es_out *out,
@@ -264,7 +231,6 @@ es_out_SetEsDelay(struct vlc_input_es_out *out,
     int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_ES_DELAY, es, i_delay);
     assert( !i_ret );
 }
-#define es_out_SetEsDelay(out, es, delay) temp_as_es_out_or_input(out, es_out_SetEsDelay, es, delay)
 
 static inline void
 es_out_SetDelay(struct vlc_input_es_out *out,
@@ -274,7 +240,6 @@ es_out_SetDelay(struct vlc_input_es_out *out,
     int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_DELAY, i_cat, i_delay);
     assert( !i_ret );
 }
-#define es_out_SetDelay(out, cat, delay) temp_as_es_out_or_input(out, es_out_SetDelay, cat, delay)
 
 static inline int
 es_out_SetRecordState(struct vlc_input_es_out *out,
@@ -283,7 +248,6 @@ es_out_SetRecordState(struct vlc_input_es_out *out,
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_RECORD_STATE, b_record, dir_path);
 }
-#define es_out_SetRecordState(out, record, dir_path) temp_as_es_out_or_input(out, es_out_SetRecordState, record, dir_path)
 
 static inline int
 es_out_SetPauseState(struct vlc_input_es_out *out,
@@ -293,21 +257,18 @@ es_out_SetPauseState(struct vlc_input_es_out *out,
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_PAUSE_STATE, b_source_paused, b_paused, i_date);
 }
-#define es_out_SetPauseState(out, source_paused, paused, date) temp_as_es_out_or_input(out, es_out_SetPauseState, source_paused, paused, date)
 
 static inline int
 es_out_SetRate(struct vlc_input_es_out *out, float source_rate, float rate)
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_RATE, source_rate, rate);
 }
-#define es_out_SetRate(out, source_rate, rate) temp_as_es_out_or_input(out, es_out_SetRate, source_rate, rate)
 
 static inline int
 es_out_SetFrameNext(struct vlc_input_es_out *out )
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_FRAME_NEXT);
 }
-#define es_out_SetFrameNext(out) temp_as_es_out_or_input(out, es_out_SetFrameNext)
 
 static inline void
 es_out_SetTimes(struct vlc_input_es_out *out, double f_position,
@@ -318,7 +279,6 @@ es_out_SetTimes(struct vlc_input_es_out *out, double f_position,
                                    i_normal_time, i_length);
     assert( !i_ret );
 }
-#define es_out_SetTimes(out, pos, time, normal_time, length) temp_as_es_out_or_input(out, es_out_SetTimes, pos, time, normal_time, length)
 
 static inline void
 es_out_SetJitter(struct vlc_input_es_out *out,
@@ -329,7 +289,6 @@ es_out_SetJitter(struct vlc_input_es_out *out,
                                    i_pts_delay, i_pts_jitter, i_cr_average);
     assert( !i_ret );
 }
-#define es_out_SetJitter(out, pts_delay, pts_jitter, cr_average) temp_as_es_out_or_input(out, es_out_SetJitter, pts_delay, pts_jitter, cr_average)
 
 static inline int
 es_out_GetGroupForced(struct vlc_input_es_out *out)
@@ -339,7 +298,6 @@ es_out_GetGroupForced(struct vlc_input_es_out *out)
     assert( !i_ret );
     return i_group;
 }
-#define es_out_GetGroupForced(out) temp_as_es_out_or_input(out, es_out_GetGroupForced)
 
 static inline void
 es_out_Eos(struct vlc_input_es_out *out)
@@ -347,7 +305,6 @@ es_out_Eos(struct vlc_input_es_out *out)
     int i_ret = es_out_PrivControl(out, ES_OUT_PRIV_SET_EOS);
     assert( !i_ret );
 }
-#define es_out_Eos(out) temp_as_es_out_or_input(out, es_out_Eos)
 
 static inline int
 es_out_SetVbiPage(struct vlc_input_es_out *out, vlc_es_id_t *id,
@@ -355,7 +312,6 @@ es_out_SetVbiPage(struct vlc_input_es_out *out, vlc_es_id_t *id,
 {
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_VBI_PAGE, id, page);
 }
-#define es_out_SetVbiPage(out, id, page) temp_as_es_out_or_input(out, es_out_SetVbiPage, id, page)
 
 static inline int
 es_out_SetVbiTransparency(struct vlc_input_es_out *out, vlc_es_id_t *id,
@@ -364,7 +320,6 @@ es_out_SetVbiTransparency(struct vlc_input_es_out *out, vlc_es_id_t *id,
     return es_out_PrivControl(out, ES_OUT_PRIV_SET_VBI_TRANSPARENCY, id,
                               enabled);
 }
-#define es_out_SetVbiTransparency(out, id, enabled) temp_as_es_out_or_input(out, es_out_SetVbiTransparency, id, enabled)
 
 struct vlc_input_es_out *
 input_EsOutNew(input_thread_t *, input_source_t *main_source, float rate,
