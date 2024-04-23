@@ -39,6 +39,12 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtdeclarative/0001-Fix-incorrect-library-inclusion.patch
+	# disable unused CLI tools: qml, qmleasing, qmldom, qmlformat, qmltc
+	sed -i.orig -e 's,add_subdirectory(qml),#add_subdirectory(qml),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(qmleasing),#add_subdirectory(qmleasing),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(qmlformat),#add_subdirectory(qmlformat),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(qmltc),#add_subdirectory(qmltc),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \
