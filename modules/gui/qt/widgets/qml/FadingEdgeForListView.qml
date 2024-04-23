@@ -42,7 +42,7 @@ FadingEdge {
                                                 listView.addDisplaced?.running ||
                                                 listView.populate?.running ||
                                                 listView.remove?.running ||
-                                                listView.removeDisplaced?.running)
+                                                listView.removeDisplaced?.running) ?? false
 
     // FIXME: Delegate with variable size
     readonly property Item delegateItem: listView.itemAtIndex(0)
