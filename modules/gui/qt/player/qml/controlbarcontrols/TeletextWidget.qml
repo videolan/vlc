@@ -173,10 +173,6 @@ T.Pane {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: redKeyBtn.width
-
-                size: VLCStyle.dp(32, VLCStyle.scale)
-
                 enabled: teleActivateBtn.checked
 
                 text: VLCIcons.home
