@@ -206,7 +206,11 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     /* AV_CODEC_ID_V210X */
     { VLC_CODEC_TMV, AV_CODEC_ID_TMV },
     { VLC_CODEC_V210, AV_CODEC_ID_V210 },
+#if LIBAVCODEC_VERSION_CHECK( 59, 42, 102 )
+    { VLC_CODEC_VUYA, AV_CODEC_ID_RAWVIDEO },
+#else
     { VLC_CODEC_VUYA, AV_CODEC_ID_AYUV },
+#endif
     /* AV_CODEC_ID_DPX */
     { VLC_CODEC_MAD, AV_CODEC_ID_MAD },
     { VLC_CODEC_FRWU, AV_CODEC_ID_FRWU },
