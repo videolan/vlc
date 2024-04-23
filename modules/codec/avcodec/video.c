@@ -150,6 +150,34 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
+static void FrameInfoInit( decoder_sys_t *p_sys )
+{
+    AVCodecContext *p_context = p_sys->p_context;
+    p_context->reordered_opaque = 0;
+}
+
+static struct frame_info_s * FrameInfoGet( decoder_sys_t *p_sys, AVFrame *frame )
+{
+    return &p_sys->frame_info[frame->reordered_opaque % FRAME_INFO_DEPTH];
+}
+
+static struct frame_info_s * FrameInfoAdd( decoder_sys_t *p_sys, AVPacket *pkt )
+{
+    AVCodecContext *p_context = p_sys->p_context;
+    return &p_sys->frame_info[p_context->reordered_opaque++ % FRAME_INFO_DEPTH];
+}
+
+static int64_t NextPktSequenceNumber( decoder_sys_t *p_sys )
+{
+    AVCodecContext *p_context = p_sys->p_context;
+    return p_context->reordered_opaque;
+}
+
+static int64_t FrameSequenceNumber( const AVFrame *frame, const struct frame_info_s *info )
+{
+    VLC_UNUSED(info);
+    return frame->reordered_opaque;
+}
 
 static void lavc_Frame8PaletteCopy( video_palette_t *dst, const uint8_t *src )
 {
@@ -534,7 +562,8 @@ static int InitVideoDecCommon( decoder_t *p_dec )
      * PTS correctly */
     p_context->get_buffer2 = lavc_GetFrame;
     p_context->opaque = p_dec;
-    p_context->reordered_opaque = 0;
+
+    FrameInfoInit( p_sys );
 
     int max_thread_count;
     int i_thread_count = p_sys->b_hardware_only ? 1 : var_InheritInteger( p_dec, "avcodec-threads" );
@@ -875,7 +904,7 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
         return block;
 
     if( p_sys->i_last_output_frame >= 0 &&
-        p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame > 24 )
+        NextPktSequenceNumber( p_sys ) - p_sys->i_last_output_frame > 24 )
     {
         p_sys->framedrop = FRAMEDROP_AGGRESSIVE_RECOVER;
     }
@@ -887,7 +916,7 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
         {
             msg_Err( p_dec, "more than %"PRId64" frames of late video -> "
                             "dropping frame (computer too slow ?)",
-                     p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame );
+                     NextPktSequenceNumber( p_sys ) - p_sys->i_last_output_frame );
 
             vlc_mutex_lock(&p_sys->lock);
             date_Set( &p_sys->pts, VLC_TICK_INVALID ); /* To make sure we recover properly */
@@ -1334,6 +1363,16 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_block->i_dts = VLC_TICK_INVALID;
             }
 
+            struct frame_info_s *p_frame_info = FrameInfoAdd(p_sys, pkt);
+            if( !p_frame_info )
+            {
+                av_packet_free( &pkt );
+                b_error = true;
+                break;
+            }
+            p_frame_info->b_eos = p_block && (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+            p_frame_info->b_display = b_need_output_picture;
+
             int ret = avcodec_send_packet(p_context, pkt);
             if( ret != 0 && ret != AVERROR(EAGAIN) )
             {
@@ -1346,11 +1385,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            struct frame_info_s *p_frame_info = &p_sys->frame_info[p_context->reordered_opaque % FRAME_INFO_DEPTH];
-            p_frame_info->b_eos = p_block && (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
-            p_frame_info->b_display = b_need_output_picture;
-
-            p_context->reordered_opaque++;
             i_used = ret != AVERROR(EAGAIN) ? pkt->size : 0;
             av_packet_free( &pkt );
 
@@ -1397,7 +1431,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        struct frame_info_s *p_frame_info = &p_sys->frame_info[frame->reordered_opaque % FRAME_INFO_DEPTH];
+        struct frame_info_s *p_frame_info = FrameInfoGet( p_sys, frame );
         if( p_frame_info->b_eos )
             p_sys->b_first_frame = true;
 
@@ -1427,7 +1461,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( b_first_output_sequence )
         {
             update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
-                                     i_next_pts, frame->reordered_opaque);
+                                    i_next_pts, FrameSequenceNumber( frame, p_frame_info ) );
             b_first_output_sequence = false;
         }
 
