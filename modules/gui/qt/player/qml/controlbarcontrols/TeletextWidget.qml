@@ -197,7 +197,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: qsTr("Red key")
+                description: qsTr("Red key")
 
                 color: root._teletextButtonColor(this, "red")
 
@@ -216,7 +216,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: qsTr("Green key")
+                description: qsTr("Green key")
 
                 color: root._teletextButtonColor(this, "green")
 
@@ -235,7 +235,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: qsTr("Yellow key")
+                description: qsTr("Yellow key")
 
                 color: root._teletextButtonColor(this, "yellow")
 
@@ -254,7 +254,7 @@ T.Pane {
 
                 enabled: teleActivateBtn.checked
 
-                text: qsTr("Blue key")
+                description: qsTr("Blue key")
 
                 color: root._teletextButtonColor(this, "blue")
 
