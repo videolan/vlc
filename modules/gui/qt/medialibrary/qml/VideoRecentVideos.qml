@@ -116,7 +116,7 @@ FocusScope {
             visible: recentModel.count > 0
 
             width: root.width
-            height: currentItem.contentHeight
+            height: currentItem?.contentHeight ?? 0
 
             leftPadding: root.leftPadding
             rightPadding: root.rightPadding
