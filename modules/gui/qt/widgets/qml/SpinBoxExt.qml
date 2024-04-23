@@ -23,6 +23,7 @@ import QtQuick.Templates as T
 import org.videolan.vlc 0.1
 
 import "qrc:///style/"
+import "qrc:///widgets/" as Widgets
 
 T.SpinBox {
     id: control
@@ -126,7 +127,7 @@ T.SpinBox {
             focused: false
         }
 
-        IconLabel {
+        Widgets.IconLabel {
             text: VLCIcons.chevron_up
             font.pixelSize: control.font.pixelSize * 2
             color: upTheme.fg.primary
@@ -159,7 +160,7 @@ T.SpinBox {
             focused: false
         }
 
-        IconLabel {
+        Widgets.IconLabel {
             text: VLCIcons.chevron_down
             font.pixelSize: control.font.pixelSize * 2
             color: downTheme.fg.primary
