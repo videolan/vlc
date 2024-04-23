@@ -271,7 +271,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
     case AUDIO_ES:
         codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
+#if LIBAVUTIL_VERSION_CHECK(56, 31, 100)
+        av_channel_layout_default( &codecpar->ch_layout, fmt->audio.i_channels );
+#else
         codecpar->channels = fmt->audio.i_channels;
+#endif
         codecpar->sample_rate = fmt->audio.i_rate;
         stream->time_base = (AVRational){1, codecpar->sample_rate};
         if (fmt->i_bitrate == 0) {

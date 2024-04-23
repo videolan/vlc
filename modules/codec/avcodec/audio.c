@@ -138,7 +138,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
     }
 
     ctx->sample_rate = p_dec->fmt_in->audio.i_rate;
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+#if LIBAVUTIL_VERSION_CHECK(56, 31, 100)
     av_channel_layout_default( &ctx->ch_layout, p_dec->fmt_in->audio.i_channels );
 #else
     ctx->channels = p_dec->fmt_in->audio.i_channels;
