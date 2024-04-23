@@ -401,7 +401,11 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             es_format_Init( &es_fmt, AUDIO_ES, fcc );
             es_fmt.i_original_fourcc = CodecTagToFourcc( cp->codec_tag );
             es_fmt.i_bitrate = cp->bit_rate;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 59, 24, 100 ) && LIBAVCODEC_VERSION_MICRO >= 100
+            es_fmt.audio.i_channels = cp->ch_layout.nb_channels;
+#else
             es_fmt.audio.i_channels = cp->channels;
+#endif
             es_fmt.audio.i_rate = cp->sample_rate;
             es_fmt.audio.i_bitspersample = cp->bits_per_coded_sample;
             es_fmt.audio.i_blockalign = cp->block_align;
