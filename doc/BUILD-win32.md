@@ -107,8 +107,8 @@ source toolchain.sh
 
 * On Docker, you can use these 2 images:
 
-  * msvcrt: `registry.videolan.org/vlc-debian-llvm-msvcrt:20221011232542`
-  * ucrt:   `registry.videolan.org/vlc-debian-llvm-ucrt:20221012005047`
+  * msvcrt: `registry.videolan.org/vlc-debian-llvm-msvcrt:20240212151604`
+  * ucrt:   `registry.videolan.org/vlc-debian-llvm-ucrt:20240212151604`
 
 You can find the latest Docker images we use in [extras/ci/gitlab-ci.yml](/extras/ci/gitlab-ci.yml)
 
@@ -138,7 +138,7 @@ Type enter to select "all"
 ```
 
 
-* On Docker, you can use the `registry.videolan.org/vlc-debian-win64:20221011230137` image.
+* On Docker, you can use the `registry.videolan.org/vlc-debian-win64-posix:20240212151604` image.
 
 You can find the latest Docker images we use in [extras/ci/gitlab-ci.yml](/extras/ci/gitlab-ci.yml)
 
