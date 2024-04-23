@@ -88,7 +88,7 @@ vlc_modules += {
 ```
 
 @warning 	Make sure to not accidentally overwrite the `vlc_modules` variable by using
-		 	and `=` instead of `+=` when appending the dictionary.
+		 	an `=` instead of `+=` when appending the dictionary.
 
 Currently the modules dict accepts the following keys:
 
