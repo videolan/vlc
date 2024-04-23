@@ -421,7 +421,7 @@ FocusScope {
 
             rowHeight: VLCStyle.tableRow_height
 
-            parentId: Helpers.get(root.model, "id")
+            parentId: root.model?.id
             onParentIdChanged: {
                 currentIndex = 0
             }

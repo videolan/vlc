@@ -93,8 +93,8 @@ FocusScope {
 
             Layout.fillWidth: true
 
-            leftPadding: Helpers.get(view.currentItem, "contentLeftMargin", 0)
-            rightPadding: Helpers.get(view.currentItem, "contentRightMargin", 0)
+            leftPadding: view.currentItem?.contentLeftMargin ?? 0
+            rightPadding: view.currentItem?.contentRightMargin ?? 0
             topPadding: 0
 
             text: qsTr("Continue Watching")
@@ -149,7 +149,7 @@ FocusScope {
 
             view: root
 
-            leftPadding: Helpers.get(view.currentItem, "contentLeftMargin", 0)
+            leftPadding: view.currentItem?.contentLeftMargin ?? 0
             topPadding: MainCtx.gridView ? VLCStyle.gridView_spacing + VLCStyle.margin_xsmall + VLCStyle.margin_xxxsmall
                                          : VLCStyle.tableView_spacing
 
