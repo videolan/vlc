@@ -71,6 +71,11 @@ if HAVE_WIN32_DESKTOP
 sd_LTLIBRARIES += libwindrive_plugin.la
 endif
 
+libwinvolumes_plugin_la_SOURCES = services_discovery/winvolumes.c
+if HAVE_WIN32_DESKTOP
+sd_LTLIBRARIES += libwinvolumes_plugin.la
+endif
+
 libos2drive_plugin_la_SOURCES = services_discovery/os2drive.c
 if HAVE_OS2
 sd_LTLIBRARIES += libos2drive_plugin.la

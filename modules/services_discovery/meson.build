@@ -89,6 +89,11 @@ if host_system == 'windows'
         'name' : 'windrive',
         'sources' : files('windrive.c')
     }
+
+    vlc_modules += {
+        'name' : 'winvolumes',
+        'sources' : files('winvolumes.c')
+    }
 endif
 
 # mDNS using libmicrodns
