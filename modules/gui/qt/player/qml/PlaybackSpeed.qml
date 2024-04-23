@@ -283,8 +283,8 @@ ColumnLayout {
         Widgets.ComboBoxExt {
             id: comboBox
 
-            width: VLCStyle.combobox_width_normal
-            height: VLCStyle.combobox_height_normal
+            Layout.preferredWidth: VLCStyle.combobox_width_normal
+            Layout.preferredHeight: VLCStyle.combobox_height_normal
 
             model: ListModel {}
 
