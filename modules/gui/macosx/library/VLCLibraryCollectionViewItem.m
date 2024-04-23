@@ -227,7 +227,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     if([actualItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)actualItem;
 
-        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO) {
+        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO || mediaItem.mediaType == VLC_ML_MEDIA_TYPE_UNKNOWN) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
                                       andHeight:videoTrack.videoHeight];
