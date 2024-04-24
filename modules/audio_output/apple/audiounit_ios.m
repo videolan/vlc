@@ -226,7 +226,8 @@ GetLatency(audio_output_t *p_aout)
 @end
 
 static void
-avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt)
+avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt,
+                   bool spatial_audio)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -257,7 +258,17 @@ avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt)
         channel_count = 2;
     }
 
-    if (channel_count == 2 && aout_FormatNbChannels(fmt) > 2)
+    if (spatial_audio)
+    {
+        if (@available(iOS 15.0, tvOS 15.0, *))
+        {
+            /* Not mandatory, SpatialAudio can work without it. It just signals to
+             * the user that he is playing spatial content */
+            [instance setSupportsMultichannelContent:aout_FormatNbChannels(fmt) > 2
+                                               error:nil];
+        }
+    }
+    else if (channel_count == 2 && aout_FormatNbChannels(fmt) > 2)
     {
         /* Ask the core to downmix to stereo if the preferred number of
          * channels can't be set. */
@@ -544,7 +555,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     }
 
-    avas_PrepareFormat(p_aout, fmt);
+    avas_PrepareFormat(p_aout, fmt, false);
 
     enum port_type port_type;
     int ret = avas_GetPortType(p_aout, &port_type);
