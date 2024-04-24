@@ -75,11 +75,11 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	-DFEATURE_qml_animation=OFF \
 	-DFEATURE_qml_delegate_model=OFF \
 	-DFEATURE_qml_itemmodel=OFF \
-	-DFEATURE_qml_object-model=OFF \
-	-DFEATURE_qml_table-model=OFF \
+	-DFEATURE_qml_object_model=OFF \
+	-DFEATURE_qml_table_model=OFF \
 	-DFEATURE_quick_shadereffect=OFF \
 	-DFEATURE_quick_path=OFF \
-	-DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake \
+	-DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
 
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
 .qtdeclarative-tools: qtdeclarative
