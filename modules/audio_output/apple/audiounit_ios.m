@@ -258,8 +258,7 @@ GetLatency(audio_output_t *p_aout)
 @end
 
 static void
-avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
-                                  audio_sample_format_t *fmt)
+avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -579,9 +578,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     }
 
-    /* Set the preferred number of channels, then fetch the channel layout that
-     * should correspond to this number */
-    avas_setPreferredNumberOfChannels(p_aout, fmt);
+    avas_PrepareFormat(p_aout, fmt);
 
     BOOL success = [p_sys->avInstance setPreferredSampleRate:fmt->i_rate error:nil];
     if (!success)
