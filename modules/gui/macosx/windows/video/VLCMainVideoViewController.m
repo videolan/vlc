@@ -24,6 +24,7 @@
 
 #import "extensions/NSWindow+VLCAdditions.h"
 
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -159,7 +160,13 @@
 
     VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
 
-    const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+    BOOL decorativeViewVisible = NO;
+    if (mediaItem != nil) {
+        decorativeViewVisible = mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+    } else {
+        VLCInputItem * const inputItem = controller.currentMedia;
+        decorativeViewVisible = inputItem != nil && controller.videoTracks.count == 0;
+    }
     _audioDecorativeView.hidden = !decorativeViewVisible;
 
     if (decorativeViewVisible) {
