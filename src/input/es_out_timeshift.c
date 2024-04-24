@@ -218,7 +218,7 @@ typedef struct
     struct es_out_timeshift *ts;
     input_thread_t *p_input;
     es_out_t       *p_tsout;
-    es_out_t       *p_out;
+    struct vlc_input_es_out *p_out;
     int64_t        i_tmp_size_max;
     const char     *psz_tmp_path;
 
@@ -256,7 +256,7 @@ struct es_out_id_t
 struct es_out_timeshift
 {
     input_thread_t *p_input;
-    es_out_t       *p_out;
+    struct vlc_input_es_out *p_out;
 
     /* Configuration */
     int64_t        i_tmp_size_max;    /* Maximal temporary file size in byte */
@@ -449,14 +449,17 @@ static void Del( es_out_t *p_out, es_out_id_t *p_es )
     vlc_mutex_unlock( &p_sys->lock );
 }
 
-static inline int es_out_in_vaControl( es_out_t *p_out, input_source_t *in,
-                                       int i_query, va_list args)
+static inline int es_out_in_vaControl(struct vlc_input_es_out *p_out,
+                                      input_source_t *in,
+                                      int i_query,
+                                      va_list args)
 {
-    return p_out->cbs->control( p_out, in, i_query, args );
+    return p_out->out.cbs->control(&p_out->out, in, i_query, args);
 }
 
-static inline int es_out_in_Control( es_out_t *p_out, input_source_t *in,
-                                     int i_query, ... )
+static inline int es_out_in_Control(struct vlc_input_es_out *p_out,
+                                    input_source_t *in,
+                                    int i_query, ...)
 {
     va_list args;
     int     i_result;
@@ -467,17 +470,19 @@ static inline int es_out_in_Control( es_out_t *p_out, input_source_t *in,
     return i_result;
 }
 
-static inline int es_out_in_vaPrivControl(es_out_t *super_out, input_source_t *in,
-                                          int i_query, va_list args)
+static inline int es_out_in_vaPrivControl(struct vlc_input_es_out *out,
+                                          input_source_t *in,
+                                          int i_query,
+                                          va_list args)
 {
-    struct vlc_input_es_out *out = container_of(super_out, struct vlc_input_es_out, out);
     if (out->ops != NULL && out->ops->priv_control != NULL)
         return out->ops->priv_control(out, in, i_query, args);
     return out->out.cbs->priv_control(&out->out, in, i_query, args);
 }
 
-static inline int es_out_in_PrivControl( es_out_t *p_out, input_source_t *in,
-                                         int i_query, ... )
+static inline int es_out_in_PrivControl(struct vlc_input_es_out *p_out,
+                                        input_source_t *in,
+                                        int i_query, ... )
 {
     va_list args;
     int     i_result;
@@ -858,7 +863,7 @@ input_EsOutTimeshiftNew(input_thread_t *p_input,
     p_sys->input_rate = rate;
     p_sys->input_rate_source = rate;
 
-    p_sys->p_out = &p_next_out->out;
+    p_sys->p_out = p_next_out;
     vlc_mutex_init_recursive( &p_sys->lock );
 
     p_sys->b_delayed = false;
@@ -1516,7 +1521,7 @@ static int CmdInitAdd( ts_cmd_add_t *p_cmd, input_source_t *in,  es_out_id_t *p_
 }
 static void CmdExecuteAdd(struct es_out_timeshift *p_sys, ts_cmd_add_t *p_cmd)
 {
-    es_out_t *out = p_sys->p_out;
+    es_out_t *out = &p_sys->p_out->out;
     p_cmd->p_es->p_es = out->cbs->add(out, p_cmd->in, p_cmd->p_fmt);
     TAB_APPEND( p_sys->i_es, p_sys->pp_es, p_cmd->p_es );
 }
@@ -1538,6 +1543,7 @@ static void CmdInitSend( ts_cmd_send_t *p_cmd, es_out_id_t *p_es, block_t *p_blo
 
 static int CmdExecuteSend(struct es_out_timeshift *p_sys, ts_cmd_send_t *p_cmd)
 {
+    es_out_t *out = &p_sys->p_out->out;
     block_t *p_block = p_cmd->p_block;
 
     p_cmd->p_block = NULL;
@@ -1545,7 +1551,7 @@ static int CmdExecuteSend(struct es_out_timeshift *p_sys, ts_cmd_send_t *p_cmd)
     if( p_block )
     {
         if( p_cmd->p_es->p_es )
-            return es_out_Send( p_sys->p_out, p_cmd->p_es->p_es, p_block );
+            return es_out_Send(out, p_cmd->p_es->p_es, p_block);
         block_Release( p_block );
     }
     return VLC_EGENERIC;
@@ -1566,7 +1572,7 @@ static int CmdInitDel( ts_cmd_del_t *p_cmd, es_out_id_t *p_es )
 static void CmdExecuteDel(struct es_out_timeshift *p_sys, ts_cmd_del_t *p_cmd)
 {
     if( p_cmd->p_es->p_es )
-        es_out_Del( p_sys->p_out, p_cmd->p_es->p_es );
+        es_out_Del(&p_sys->p_out->out, p_cmd->p_es->p_es );
     TAB_REMOVE( p_sys->i_es, p_sys->pp_es, p_cmd->p_es );
     free( p_cmd->p_es );
 }
