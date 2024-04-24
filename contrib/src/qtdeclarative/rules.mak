@@ -45,6 +45,8 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	sed -i.orig -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmlformat),#add_subdirectory(qmlformat),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmltc),#add_subdirectory(qmltc),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	# disable QT labs feature we don't use
+	sed -i.orig -e 's,add_subdirectory(labs),#add_subdirectory(labs),' $(UNPACK_DIR)/src/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \
