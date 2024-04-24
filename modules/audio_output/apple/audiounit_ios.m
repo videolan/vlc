@@ -240,10 +240,10 @@ avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt,
 }
 
 static int
-avas_GetPortType(audio_output_t *p_aout, enum port_type *pport_type)
+avas_GetPortType(audio_output_t *p_aout, AVAudioSession *instance,
+                 enum port_type *pport_type)
 {
-    aout_sys_t * p_sys = p_aout->sys;
-    AVAudioSession *instance = p_sys->avInstance;
+    (void) p_aout;
     *pport_type = PORT_TYPE_DEFAULT;
 
     long last_channel_count = 0;
@@ -511,7 +511,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     avas_PrepareFormat(p_aout, fmt, false);
 
     enum port_type port_type;
-    int ret = avas_GetPortType(p_aout, &port_type);
+    int ret = avas_GetPortType(p_aout, p_sys->avInstance, &port_type);
     if (ret != VLC_SUCCESS)
         goto error;
 
