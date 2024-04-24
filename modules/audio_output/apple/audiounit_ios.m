@@ -134,7 +134,6 @@ typedef struct
     AudioUnit au_unit;
     bool      b_muted;
     bool      b_stopped;
-    bool      b_preferred_channels_set;
     bool      b_spatial_audio_supported;
     enum au_dev au_dev;
 
@@ -260,7 +259,7 @@ GetLatency(audio_output_t *p_aout)
 
 static void
 avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
-                                  const audio_sample_format_t *fmt)
+                                  audio_sample_format_t *fmt)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -272,31 +271,28 @@ avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
     unsigned channel_count = aout_FormatNbChannels(fmt);
 
     /* Increase the preferred number of output channels if possible */
-    if (channel_count > 2 && max_channel_count > 2)
+    if (channel_count > max_channel_count)
     {
-        channel_count = __MIN(channel_count, max_channel_count);
-        bool success = [instance setPreferredOutputNumberOfChannels:channel_count
-                        error:nil];
-        if (success && [instance outputNumberOfChannels] == channel_count)
-            p_sys->b_preferred_channels_set = true;
-        else
-        {
-            /* Not critical, output channels layout will be Stereo */
-            msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed");
-        }
+        msg_Warn(p_aout, "Requested channel count %u not fully supported, "
+                 "downmixing to %ld\n", channel_count, (long)max_channel_count);
+        channel_count = max_channel_count;
     }
-}
 
-static void
-avas_resetPreferredNumberOfChannels(audio_output_t *p_aout)
-{
-    aout_sys_t *p_sys = p_aout->sys;
-    AVAudioSession *instance = p_sys->avInstance;
-
-    if (p_sys->b_preferred_channels_set)
+    BOOL success = [instance setPreferredOutputNumberOfChannels:channel_count
+                                                          error:nil];
+    if (!success || [instance outputNumberOfChannels] != channel_count)
     {
-        [instance setPreferredOutputNumberOfChannels:2 error:nil];
-        p_sys->b_preferred_channels_set = false;
+        /* Not critical, output channels layout will be Stereo */
+        msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed");
+        channel_count = 2;
+    }
+
+    if (channel_count == 2 && aout_FormatNbChannels(fmt) > 2)
+    {
+        /* Ask the core to downmix to stereo if the preferred number of
+         * channels can't be set. */
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        aout_FormatPrepare(fmt);
     }
 }
 
@@ -536,8 +532,6 @@ Stop(audio_output_t *p_aout)
     if (err != noErr)
         ca_LogWarn("AudioComponentInstanceDispose failed");
 
-    avas_resetPreferredNumberOfChannels(p_aout);
-
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
 }
@@ -608,14 +602,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
             (long) [p_sys->avInstance outputNumberOfChannels],
             p_sys->b_spatial_audio_supported);
 
-    if (!p_sys->b_preferred_channels_set && fmt->i_channels > 2)
-    {
-        /* Ask the core to downmix to stereo if the preferred number of
-         * channels can't be set. */
-        fmt->i_physical_channels = AOUT_CHANS_STEREO;
-        aout_FormatPrepare(fmt);
-    }
-
     p_aout->current_sink_info.headphones = port_type == PORT_TYPE_HEADPHONES;
 
     p_sys->au_unit = au_NewOutputInstance(p_aout, kAudioUnitSubType_RemoteIO);
@@ -658,7 +644,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 error:
     if (p_sys->au_unit != NULL)
         AudioComponentInstanceDispose(p_sys->au_unit);
-    avas_resetPreferredNumberOfChannels(p_aout);
     avas_SetActive(p_aout, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
@@ -730,7 +715,6 @@ Open(vlc_object_t *obj)
     }
 
     sys->b_muted = false;
-    sys->b_preferred_channels_set = false;
     sys->b_spatial_audio_supported = false;
     sys->au_dev = var_InheritBool(aout, "spdif") ? AU_DEV_ENCODED : AU_DEV_PCM;
     aout->start = Start;
