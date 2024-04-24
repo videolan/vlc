@@ -390,9 +390,10 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Change(aout, "mix-mode", VLC_VAR_SETTEXT, _("Audio mix mode"));
 
     /* Equalizer */
-    var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
-    var_Create (aout, "equalizer-bands", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
-    var_Create (aout, "equalizer-preset", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    int doinherit = module_exists("equalizer") ? VLC_VAR_DOINHERIT : 0;
+    var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | doinherit);
+    var_Create (aout, "equalizer-bands", VLC_VAR_STRING | doinherit);
+    var_Create (aout, "equalizer-preset", VLC_VAR_STRING | doinherit);
 
     owner->bitexact = var_InheritBool (aout, "audio-bitexact");
 
