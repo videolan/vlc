@@ -332,12 +332,11 @@ GetRouteSharingPolicy(audio_output_t *p_aout)
 
 
 static int
-avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
+avas_SetActive(audio_output_t *p_aout, AVAudioSession *instance, bool active,
+               NSUInteger options)
 {
     static vlc_atomic_rc_t active_rc = VLC_STATIC_RC;
 
-    aout_sys_t * p_sys = p_aout->sys;
-    AVAudioSession *instance = p_sys->avInstance;
     BOOL ret = false;
     NSError *error = nil;
 
@@ -404,17 +403,17 @@ Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
         err = AudioOutputUnitStop(p_sys->au_unit);
         if (err != noErr)
             ca_LogErr("AudioOutputUnitStop failed");
-        avas_SetActive(p_aout, false, 0);
+        avas_SetActive(p_aout, p_sys->avInstance, false, 0);
     }
     else
     {
-        if (avas_SetActive(p_aout, true, 0) == VLC_SUCCESS)
+        if (avas_SetActive(p_aout, p_sys->avInstance, true, 0) == VLC_SUCCESS)
         {
             err = AudioOutputUnitStart(p_sys->au_unit);
             if (err != noErr)
             {
                 ca_LogErr("AudioOutputUnitStart failed");
-                avas_SetActive(p_aout, false, 0);
+                avas_SetActive(p_aout, p_sys->avInstance, false, 0);
                 /* Do not un-pause, the Render Callback won't run, and next call
                  * of ca_Play will deadlock */
                 return;
@@ -468,7 +467,7 @@ Stop(audio_output_t *p_aout)
     if (err != noErr)
         ca_LogWarn("AudioComponentInstanceDispose failed");
 
-    avas_SetActive(p_aout, false,
+    avas_SetActive(p_aout, p_sys->avInstance, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
 }
 
@@ -503,7 +502,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
                              object:nil];
 
     /* Activate the AVAudioSession */
-    if (avas_SetActive(p_aout, true, 0) != VLC_SUCCESS)
+    if (avas_SetActive(p_aout, p_sys->avInstance, true, 0) != VLC_SUCCESS)
     {
         [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
         return VLC_EGENERIC;
@@ -564,7 +563,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 error:
     if (p_sys->au_unit != NULL)
         AudioComponentInstanceDispose(p_sys->au_unit);
-    avas_SetActive(p_aout, false,
+    avas_SetActive(p_aout, p_sys->avInstance, false,
                    AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation);
     [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
     msg_Err(p_aout, "opening AudioUnit output failed");
