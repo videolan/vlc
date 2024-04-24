@@ -84,6 +84,8 @@ static int EsOutSourcePrivControl(es_out_t *out, input_source_t *in, int query,
 {
     assert(in == NULL);
     struct es_out_source *sys = PRIV(out);
+    if (sys->parent_out->ops != NULL && sys->parent_out->ops->priv_control != NULL)
+        return sys->parent_out->ops->priv_control(sys->parent_out, sys->in, query, args);
     return sys->parent_out->out.cbs->priv_control(&sys->parent_out->out, sys->in, query, args);
 }
 
