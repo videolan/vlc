@@ -66,7 +66,7 @@ if have_ios or have_tvos
     vlc_modules += {
         'name' : 'audiounit_ios',
         'sources' : files('apple/audiounit_ios.m', 'apple/coreaudio_common.c',
-                          'apple/channel_layout.c'),
+                          'apple/channel_layout.c', 'apple/avaudiosession_common.m'),
         'dependencies' : [
             frameworks['Foundation'],
             frameworks['AVFoundation'],

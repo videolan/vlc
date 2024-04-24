@@ -25,12 +25,12 @@
 #import "coreaudio_common.h"
 
 #import <vlc_plugin.h>
-#import <vlc_atomic.h>
 
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <mach/mach_time.h>
+#import "avaudiosession_common.h"
 
 #pragma mark -
 #pragma mark private declarations
@@ -86,14 +86,6 @@ typedef struct
 
 /* Soft volume helper */
 #include "audio_output/volume.h"
-
-enum port_type
-{
-    PORT_TYPE_DEFAULT,
-    PORT_TYPE_USB,
-    PORT_TYPE_HDMI,
-    PORT_TYPE_HEADPHONES
-};
 
 static vlc_tick_t
 GetLatency(audio_output_t *p_aout)
@@ -178,204 +170,6 @@ GetLatency(audio_output_t *p_aout)
 }
 
 @end
-
-static void
-avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
-                   audio_sample_format_t *fmt, bool spatial_audio)
-{
-    if (aout_BitsPerSample(fmt->i_format) == 0)
-        return; /* Don't touch the number of channels for passthrough */
-
-    NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
-    unsigned channel_count = aout_FormatNbChannels(fmt);
-
-    /* Increase the preferred number of output channels if possible */
-    if (channel_count > max_channel_count)
-    {
-        msg_Warn(p_aout, "Requested channel count %u not fully supported, "
-                 "downmixing to %ld\n", channel_count, (long)max_channel_count);
-        channel_count = max_channel_count;
-    }
-
-    NSError *error = nil;
-    BOOL success = [instance setPreferredOutputNumberOfChannels:channel_count
-                                                          error:&error];
-    if (!success || [instance outputNumberOfChannels] != channel_count)
-    {
-        /* Not critical, output channels layout will be Stereo */
-        msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed %s(%d)",
-                 !success ? error.domain.UTF8String : "",
-                 !success ? (int)error.code : 0);
-        channel_count = 2;
-    }
-
-    if (spatial_audio)
-    {
-        if (@available(iOS 15.0, tvOS 15.0, *))
-        {
-            /* Not mandatory, SpatialAudio can work without it. It just signals to
-             * the user that he is playing spatial content */
-            [instance setSupportsMultichannelContent:aout_FormatNbChannels(fmt) > 2
-                                               error:nil];
-        }
-    }
-    else if (channel_count == 2 && aout_FormatNbChannels(fmt) > 2)
-    {
-        /* Ask the core to downmix to stereo if the preferred number of
-         * channels can't be set. */
-        fmt->i_physical_channels = AOUT_CHANS_STEREO;
-        aout_FormatPrepare(fmt);
-    }
-
-    success = [instance setPreferredSampleRate:fmt->i_rate error:&error];
-    if (!success)
-    {
-        /* Not critical, we can use any sample rates */
-        msg_Dbg(p_aout, "setPreferredSampleRate failed %s(%d)",
-                error.domain.UTF8String, (int)error.code);
-    }
-}
-
-static int
-avas_GetPortType(audio_output_t *p_aout, AVAudioSession *instance,
-                 enum port_type *pport_type)
-{
-    (void) p_aout;
-    *pport_type = PORT_TYPE_DEFAULT;
-
-    long last_channel_count = 0;
-    for (AVAudioSessionPortDescription *out in [[instance currentRoute] outputs])
-    {
-        /* Choose the layout with the biggest number of channels or the HDMI
-         * one */
-
-        enum port_type port_type;
-        if ([out.portType isEqualToString: AVAudioSessionPortUSBAudio])
-            port_type = PORT_TYPE_USB;
-        else if ([out.portType isEqualToString: AVAudioSessionPortHDMI])
-            port_type = PORT_TYPE_HDMI;
-        else if ([out.portType isEqualToString: AVAudioSessionPortHeadphones])
-            port_type = PORT_TYPE_HEADPHONES;
-        else
-            port_type = PORT_TYPE_DEFAULT;
-
-        *pport_type = port_type;
-        if (port_type == PORT_TYPE_HDMI) /* Prefer HDMI */
-            break;
-    }
-
-    return VLC_SUCCESS;
-}
-
-struct API_AVAILABLE(ios(11.0))
-role2policy
-{
-    char role[sizeof("accessibility")];
-    AVAudioSessionRouteSharingPolicy policy;
-};
-
-static int API_AVAILABLE(ios(11.0))
-role2policy_cmp(const void *key, const void *val)
-{
-    const struct role2policy *entry = val;
-    return strcmp(key, entry->role);
-}
-
-static AVAudioSessionRouteSharingPolicy API_AVAILABLE(ios(11.0))
-GetRouteSharingPolicy(audio_output_t *p_aout)
-{
-#if __IPHONEOS_VERSION_MAX_ALLOWED < 130000
-    AVAudioSessionRouteSharingPolicy AVAudioSessionRouteSharingPolicyLongFormAudio =
-        AVAudioSessionRouteSharingPolicyLongForm;
-    AVAudioSessionRouteSharingPolicy AVAudioSessionRouteSharingPolicyLongFormVideo =
-        AVAudioSessionRouteSharingPolicyLongForm;
-#endif
-    /* LongFormAudio by default */
-    AVAudioSessionRouteSharingPolicy policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
-    AVAudioSessionRouteSharingPolicy video_policy;
-#if !TARGET_OS_TV
-    if (@available(iOS 13.0, *))
-        video_policy = AVAudioSessionRouteSharingPolicyLongFormVideo;
-    else
-#endif
-        video_policy = AVAudioSessionRouteSharingPolicyLongFormAudio;
-
-    char *str = var_InheritString(p_aout, "role");
-    if (str != NULL)
-    {
-        const struct role2policy role_list[] =
-        {
-            { "accessibility", AVAudioSessionRouteSharingPolicyDefault },
-            { "animation",     AVAudioSessionRouteSharingPolicyDefault },
-            { "communication", AVAudioSessionRouteSharingPolicyDefault },
-            { "game",          AVAudioSessionRouteSharingPolicyLongFormAudio },
-            { "music",         AVAudioSessionRouteSharingPolicyLongFormAudio },
-            { "notification",  AVAudioSessionRouteSharingPolicyDefault },
-            { "production",    AVAudioSessionRouteSharingPolicyDefault },
-            { "test",          AVAudioSessionRouteSharingPolicyDefault },
-            { "video",         video_policy},
-        };
-
-        const struct role2policy *entry =
-            bsearch(str, role_list, ARRAY_SIZE(role_list),
-                    sizeof (*role_list), role2policy_cmp);
-        free(str);
-        if (entry != NULL)
-            policy = entry->policy;
-    }
-
-    return policy;
-}
-
-
-static int
-avas_SetActive(audio_output_t *p_aout, AVAudioSession *instance, bool active,
-               NSUInteger options)
-{
-    static vlc_atomic_rc_t active_rc = VLC_STATIC_RC;
-
-    BOOL ret = false;
-    NSError *error = nil;
-
-    if (active)
-    {
-        if (@available(iOS 11.0, tvOS 11.0, *))
-        {
-            AVAudioSessionRouteSharingPolicy policy = GetRouteSharingPolicy(p_aout);
-
-            ret = [instance setCategory:AVAudioSessionCategoryPlayback
-                                   mode:AVAudioSessionModeMoviePlayback
-                     routeSharingPolicy:policy
-                                options:0
-                                  error:&error];
-        }
-        else
-        {
-            ret = [instance setCategory:AVAudioSessionCategoryPlayback
-                                  error:&error];
-            ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback
-                                     error:&error];
-            /* Not AVAudioSessionRouteSharingPolicy on older devices */
-        }
-        ret = ret && [instance setActive:YES withOptions:options error:&error];
-        if (ret)
-            vlc_atomic_rc_inc(&active_rc);
-    } else {
-        if (vlc_atomic_rc_dec(&active_rc))
-            ret = [instance setActive:NO withOptions:options error:&error];
-        else
-            ret = true;
-    }
-
-    if (!ret)
-    {
-        msg_Err(p_aout, "AVAudioSession playback change failed: %s(%d)",
-                error.domain.UTF8String, (int)error.code);
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
 
 #pragma mark -
 #pragma mark actual playback

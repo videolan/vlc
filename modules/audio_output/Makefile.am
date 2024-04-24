@@ -127,7 +127,7 @@ aout_LTLIBRARIES += libauhal_plugin.la
 endif
 libaudiounit_ios_plugin_la_SOURCES = audio_output/apple/audiounit_ios.m \
 	audio_output/apple/coreaudio_common.c audio_output/apple/coreaudio_common.h \
-	audio_output/apple/channel_layout.c
+	audio_output/apple/channel_layout.c audio_output/apple/avaudiosession_common.m
 libaudiounit_ios_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
 	-Wl,-framework,Foundation,-framework,CoreAudio,-framework,AudioToolbox,-framework,UIKit,-framework,AVFoundation
 if HAVE_IOS_OR_TVOS
