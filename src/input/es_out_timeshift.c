@@ -467,10 +467,13 @@ static inline int es_out_in_Control( es_out_t *p_out, input_source_t *in,
     return i_result;
 }
 
-static inline int es_out_in_vaPrivControl( es_out_t *p_out, input_source_t *in,
-                                           int i_query, va_list args)
+static inline int es_out_in_vaPrivControl(es_out_t *super_out, input_source_t *in,
+                                          int i_query, va_list args)
 {
-    return p_out->cbs->priv_control( p_out, in, i_query, args );
+    struct vlc_input_es_out *out = container_of(super_out, struct vlc_input_es_out, out);
+    if (out->ops != NULL && out->ops->priv_control != NULL)
+        return out->ops->priv_control(out, in, i_query, args);
+    return out->out.cbs->priv_control(&out->out, in, i_query, args);
 }
 
 static inline int es_out_in_PrivControl( es_out_t *p_out, input_source_t *in,
