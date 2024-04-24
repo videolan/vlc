@@ -25,6 +25,7 @@
 #import "coreaudio_common.h"
 
 #import <vlc_plugin.h>
+#import <vlc_atomic.h>
 
 #import <CoreAudio/CoreAudioTypes.h>
 #import <Foundation/Foundation.h>
@@ -55,53 +56,6 @@ static const struct {
     { "encoded", "Encoded output if available (via HDMI/SPDIF) or PCM output",
       AU_DEV_ENCODED }, /* This can also be forced with the --spdif option */
 };
-
-@interface SessionManager : NSObject
-{
-    NSMutableSet *_registeredInstances;
-}
-+ (SessionManager *)sharedInstance;
-- (void)addAoutInstance:(AoutWrapper *)wrapperInstance;
-- (NSInteger)removeAoutInstance:(AoutWrapper *)wrapperInstance;
-@end
-
-@implementation SessionManager
-+ (SessionManager *)sharedInstance
-{
-    static SessionManager *sharedInstance = nil;
-    static dispatch_once_t pred;
-
-    dispatch_once(&pred, ^{
-        sharedInstance = [SessionManager new];
-    });
-
-    return sharedInstance;
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _registeredInstances = [[NSMutableSet alloc] init];
-    }
-    return self;
-}
-
-- (void)addAoutInstance:(AoutWrapper *)wrapperInstance
-{
-    @synchronized(_registeredInstances) {
-        [_registeredInstances addObject:wrapperInstance];
-    }
-}
-
-- (NSInteger)removeAoutInstance:(AoutWrapper *)wrapperInstance
-{
-    @synchronized(_registeredInstances) {
-        [_registeredInstances removeObject:wrapperInstance];
-        return _registeredInstances.count;
-    }
-}
-@end
 
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
@@ -380,6 +334,8 @@ GetRouteSharingPolicy(audio_output_t *p_aout)
 static int
 avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 {
+    static vlc_atomic_rc_t active_rc = VLC_STATIC_RC;
+
     aout_sys_t * p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
     BOOL ret = false;
@@ -407,14 +363,12 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
         }
         ret = ret && [instance setActive:YES withOptions:options error:&error];
         if (ret)
-            [[SessionManager sharedInstance] addAoutInstance: p_sys->aoutWrapper];
+            vlc_atomic_rc_inc(&active_rc);
     } else {
-        NSInteger numberOfRegisteredInstances = [[SessionManager sharedInstance] removeAoutInstance: p_sys->aoutWrapper];
-        if (numberOfRegisteredInstances == 0) {
+        if (vlc_atomic_rc_dec(&active_rc))
             ret = [instance setActive:NO withOptions:options error:&error];
-        } else {
+        else
             ret = true;
-        }
     }
 
     if (!ret)
