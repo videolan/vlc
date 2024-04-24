@@ -277,12 +277,15 @@ avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt)
         channel_count = max_channel_count;
     }
 
+    NSError *error = nil;
     BOOL success = [instance setPreferredOutputNumberOfChannels:channel_count
-                                                          error:nil];
+                                                          error:&error];
     if (!success || [instance outputNumberOfChannels] != channel_count)
     {
         /* Not critical, output channels layout will be Stereo */
-        msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed");
+        msg_Warn(p_aout, "setPreferredOutputNumberOfChannels failed %s(%d)",
+                 !success ? error.domain.UTF8String : "",
+                 !success ? (int)error.code : 0);
         channel_count = 2;
     }
 
@@ -294,11 +297,12 @@ avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt)
         aout_FormatPrepare(fmt);
     }
 
-    success = [instance setPreferredSampleRate:fmt->i_rate error:nil];
+    success = [instance setPreferredSampleRate:fmt->i_rate error:&error];
     if (!success)
     {
         /* Not critical, we can use any sample rates */
-        msg_Dbg(p_aout, "failed to set preferred sample rate");
+        msg_Dbg(p_aout, "setPreferredSampleRate failed %s(%d)",
+                error.domain.UTF8String, (int)error.code);
     }
 }
 
