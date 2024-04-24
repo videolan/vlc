@@ -180,15 +180,12 @@ GetLatency(audio_output_t *p_aout)
 @end
 
 static void
-avas_PrepareFormat(audio_output_t *p_aout, audio_sample_format_t *fmt,
-                   bool spatial_audio)
+avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
+                   audio_sample_format_t *fmt, bool spatial_audio)
 {
-    aout_sys_t *p_sys = p_aout->sys;
-
     if (aout_BitsPerSample(fmt->i_format) == 0)
         return; /* Don't touch the number of channels for passthrough */
 
-    AVAudioSession *instance = p_sys->avInstance;
     NSInteger max_channel_count = [instance maximumOutputNumberOfChannels];
     unsigned channel_count = aout_FormatNbChannels(fmt);
 
@@ -508,7 +505,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         return VLC_EGENERIC;
     }
 
-    avas_PrepareFormat(p_aout, fmt, false);
+    avas_PrepareFormat(p_aout, p_sys->avInstance, fmt, false);
 
     enum port_type port_type;
     int ret = avas_GetPortType(p_aout, p_sys->avInstance, &port_type);
