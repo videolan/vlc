@@ -219,7 +219,7 @@ MainInterface.MainViewLoader {
             }
 
             property Component thumbnailColumn: NetworkThumbnailItem {
-                onPlayClicked: playAt(index)
+                onPlayClicked: index => playAt(index)
             }
 
             property var _modelSmall: [{

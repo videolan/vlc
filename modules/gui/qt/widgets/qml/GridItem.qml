@@ -219,7 +219,7 @@ T.ItemDelegate {
         TapHandler {
             acceptedDevices: PointerDevice.TouchScreen
 
-            onTapped: {
+            onTapped: (eventPoint, button) => {
                 root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
                 root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
             }

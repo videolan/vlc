@@ -293,7 +293,7 @@ T.ItemDelegate {
                 MainPlaylistController.goTo(index, true)
             }
 
-            onLongPressed: {
+            onLongPressed: (eventPoint, button) => {
                 if (contextMenu)
                     contextMenu.popup(index, point.scenePosition)
             }

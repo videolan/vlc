@@ -270,7 +270,7 @@ MainInterface.MainViewLoader {
 
             selectionModel: root.selectionModel
             focus: true
-            onActionForSelection: _actionAtIndex(selection)
+            onActionForSelection: (selection) => _actionAtIndex(selection)
             Navigation.parentItem: root
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height

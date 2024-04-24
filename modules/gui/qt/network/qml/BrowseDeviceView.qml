@@ -66,7 +66,7 @@ FocusScope {
             view.setCurrentItemFocus(Qt.TabFocusReason)
         }
 
-        onSeeAllButtonClicked: root.seeAll(reason)
+        onSeeAllButtonClicked: reason => root.seeAll(reason)
     }
 
     property string title
@@ -301,9 +301,9 @@ FocusScope {
 
             Navigation.upItem: headerItem
 
-            onActionForSelection: root.onAction(selection[0].row)
+            onActionForSelection: selection => root.onAction(selection[0].row)
 
-            onItemDoubleClicked: root.onDoubleClicked(model, index)
+            onItemDoubleClicked: (index, model) => root.onDoubleClicked(model, index)
 
             Component {
                 id: artworkHeader
@@ -329,7 +329,7 @@ FocusScope {
             Component {
                 id: artworkColumn
 
-                NetworkThumbnailItem { onPlayClicked: root.playAt(index) }
+                NetworkThumbnailItem { onPlayClicked: index => root.playAt(index) }
             }
 
             Component {

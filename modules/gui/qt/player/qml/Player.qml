@@ -729,7 +729,7 @@ FocusScope {
         dragYMin: 0
         dragYMax: rootPlayer.height - navBox.height
 
-        Drag.onDragStarted: {
+        Drag.onDragStarted: (controlId) => {
             navBox.x = drag.x
             navBox.y = drag.y
         }

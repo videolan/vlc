@@ -49,7 +49,10 @@ Window {
     signal reset()
 
     onAccepted: hide()
-    onRejected: if (byButton) hide()
+    onRejected: (byButton) => {
+        if (byButton)
+            hide()
+    }
     onApplied: hide()
     onDiscarded: hide()
     onReset: hide()

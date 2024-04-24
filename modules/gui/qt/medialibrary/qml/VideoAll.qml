@@ -170,7 +170,7 @@ MainInterface.MainViewLoader {
 
             onActionAtIndex: root.onAction(selectionModel.selectedIndexes)
 
-            onItemDoubleClicked: root.onDoubleClick(model)
+            onItemDoubleClicked: model => root.onDoubleClick(model)
         }
     }
 

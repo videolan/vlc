@@ -188,7 +188,7 @@ Widgets.PageLoader {
         NetworkAddressbar {
             path: root.pageName === "browse" ? root.currentItem.model.path : []
 
-            onHomeButtonClicked: root._showHome(reason)
+            onHomeButtonClicked: reason => root._showHome(reason)
 
             onBrowse:  (tree, reason) => { root._showBrowseNode(tree, reason) }
         }

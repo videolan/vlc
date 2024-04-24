@@ -105,11 +105,11 @@ RowLayout {
 
             model: MainPlaylistController.sortKeyTitleList
 
-            onSortSelected: {
+            onSortSelected: key => {
                 MainPlaylistController.sortKey = key
             }
 
-            onSortOrderSelected: {
+            onSortOrderSelected: type => {
                 if (type === Qt.AscendingOrder)
                     MainPlaylistController.sortOrder = PlaylistController.SORT_ORDER_ASC
                 else if (type === Qt.DescendingOrder)

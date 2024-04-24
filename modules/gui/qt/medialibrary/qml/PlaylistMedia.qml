@@ -122,8 +122,8 @@ MainInterface.MainTableView {
     // Events
     //---------------------------------------------------------------------------------------------
 
-    onActionForSelection: model.addAndPlay( selection )
-    onItemDoubleClicked: MediaLib.addAndPlay(model.id)
+    onActionForSelection: (selection) => model.addAndPlay( selection )
+    onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
 
 
     onDropEntered: (delegate, index, drag, before) => {

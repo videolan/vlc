@@ -433,7 +433,7 @@ FocusScope {
             clip: true // content may overflow if not enough space is provided
             model: trackModel
 
-            onActionForSelection: {
+            onActionForSelection: (selection) => {
                 model.addAndPlay(selection)
             }
 

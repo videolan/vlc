@@ -26,8 +26,8 @@ Item {
     TapHandler {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
-        onSingleTapped: {
-            if (eventPoint.event.button & Qt.RightButton) {
+        onSingleTapped: (eventPoint, button) => {
+            if (button & Qt.RightButton) {
                 const systemButton = MainCtx.csdButtonModel.systemMenuButton
                 if (systemButton) {
                     systemButton.showSystemMenu(eventPoint.position)
@@ -35,8 +35,8 @@ Item {
             }
         }
 
-        onDoubleTapped: {
-            if (!(eventPoint.event.button & Qt.LeftButton))
+        onDoubleTapped: (eventpoint, button) => {
+            if (!(button & Qt.LeftButton))
                 return
 
             // handle left button click

@@ -49,7 +49,7 @@ WindowDialog {
         unload()
     }
 
-    onRejected: {
+    onRejected: (byButton) => {
         // Load saved to discard the changes
         MainCtx.controlbarProfileModel.reload()
         unload()

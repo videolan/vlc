@@ -81,7 +81,7 @@ Widgets.IconToolButton {
     Connections {
         target: (_menu) ? _menu : null
 
-        function onSelected() {
+        function onSelected(index: int) {
             const selectedSortKey = root.model[index].criteria
 
             if (root.sortKey !== selectedSortKey) {

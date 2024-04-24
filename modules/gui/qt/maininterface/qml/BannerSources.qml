@@ -287,10 +287,12 @@ T.ToolBar {
                                 sortKey:  MainCtx.sort.criteria
                                 sortOrder: MainCtx.sort.order
 
-                                onSortSelected: {
+                                onSortSelected: (key) => {
                                     MainCtx.sort.criteria = key
                                 }
-                                onSortOrderSelected: MainCtx.sort.order = type
+                                onSortOrderSelected: (type) => {
+                                    MainCtx.sort.order = type
+                                }
                             }
                         }
 
