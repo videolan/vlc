@@ -281,12 +281,12 @@ Item {
                         && (windowVisibility !== Window.FullScreen)
 
             }
-
-            source: "qrc:///widgets/CSDMouseStealer.qml"
-
-            onLoaded: {
-                item.target = g_mainInterface
-                item.anchorInside = Qt.binding(() => !_extendedFrameVisible)
+            Component.onCompleted: {
+                setSource(
+                    "qrc:///widgets/CSDMouseStealer.qml", {
+                        target: g_mainInterface,
+                        anchorInside: Qt.binding(() => !_extendedFrameVisible)
+                    })
             }
         }
     }
