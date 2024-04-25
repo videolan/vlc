@@ -608,7 +608,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 
 - (void)thumbnailWithSize:(NSSize)size completionHandler:(void(^)(NSImage * image))completionHandler
 {
-    if (!self.isStream || _vlcInputItem == NULL) {
+    if (self.isStream || _vlcInputItem == NULL) {
         completionHandler(nil);
         return;
     }
