@@ -365,6 +365,8 @@ FocusScope {
         delegate: TableViewDelegate {
             id: tableDelegate
 
+            required property var model
+
             width: view.width
             height: root.rowHeight
 

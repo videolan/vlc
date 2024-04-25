@@ -23,7 +23,7 @@ import "qrc:///util/Helpers.js" as Helpers
 FadingEdge {
     id: root
 
-    /* required */ property ListView listView
+    required property ListView listView
 
     sourceItem: listView.contentItem
 

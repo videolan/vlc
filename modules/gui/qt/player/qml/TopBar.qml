@@ -33,7 +33,7 @@ FocusScope{
 
     // Properties
 
-    /* required */ property int textWidth
+    required property int textWidth
 
     property int reservedHeight: 0
 

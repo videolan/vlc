@@ -37,12 +37,14 @@ T.ItemDelegate {
 
     property ItemView view: ListView.view
 
+    required property var model
+    required property int index
 
     property bool isCurrent: false
 
     property bool selected: false
 
-    /* required */ property Item dragTarget
+    required  property Widgets.MLDragItem dragTarget
 
     // Aliases
     // Private

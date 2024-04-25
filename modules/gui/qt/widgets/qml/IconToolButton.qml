@@ -32,7 +32,7 @@ T.ToolButton {
 
     property bool paintOnly: false
 
-    property string description
+    required property string description
 
     property color color: (control.checked) ? theme.accent : theme.fg.primary
 

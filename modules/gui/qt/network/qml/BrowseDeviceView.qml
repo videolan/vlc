@@ -32,7 +32,7 @@ FocusScope {
 
     // Properties
 
-    /* required */ property var model
+    required property BaseModel model
 
     readonly property int rowHeight: _currentView?.rowHeight ?? 0
 

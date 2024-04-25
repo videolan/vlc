@@ -38,7 +38,8 @@ RowLayout {
         colorSet: ColorContext.Window // copied from TracksPage, maybe use Pane?
     }
 
-    /* required */ property var trackMenuController: null
+    //FIXME make TrackMenuController a proper type (see TrackMenu)
+    required property QtObject trackMenuController
 
     spacing: 0
 

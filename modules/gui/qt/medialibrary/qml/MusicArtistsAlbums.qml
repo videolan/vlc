@@ -209,8 +209,6 @@ FocusScope {
 
                 isCurrent: ListView.isCurrentItem
 
-                mlModel: artistModel
-
                 dragTarget: musicArtistDragItem
 
                 selected: selectionModel.selectedIndexesFlat.includes(index)

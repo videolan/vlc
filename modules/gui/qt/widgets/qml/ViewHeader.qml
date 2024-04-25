@@ -31,8 +31,7 @@ T.Pane {
     id: root
 
     // Properties
-
-    /* required */ property var view
+    required property Item view
 
     leftPadding: view?.contentLeftMargin ?? 0
     rightPadding: view?.contentRightMargin ?? 0

@@ -50,10 +50,10 @@ MainInterface.MainViewLoader {
     readonly property int currentIndex: currentItem?.currentIndex ?? -1
 
     // 'role' used for tableview's section text
-    /* required */ property string sectionProperty
+    required  property string sectionProperty
 
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
-    /* required */ property var contextMenu
+    required property Util.MLContextMenu contextMenu
 
     // function(model) -> [strings....]
     // used to get grid labels per model item

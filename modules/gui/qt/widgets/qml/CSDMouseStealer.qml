@@ -25,7 +25,7 @@ Item {
     id: root
 
     property int csdSize: MainCtx.csdBorderSize
-    /* required */ property Item target: null
+    required property Item target
     property bool anchorInside: true
 
     //private

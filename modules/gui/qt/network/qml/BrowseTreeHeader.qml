@@ -32,7 +32,7 @@ T.Control {
     id: root
 
     // Network* model
-    /* required */ property var providerModel
+    required property BaseModel providerModel
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -73,18 +73,19 @@ T.Control {
         Widgets.ButtonExt {
             id: medialibraryBtn
 
+            readonly property NetworkMediaModel networkModel: providerModel as NetworkMediaModel
+
             focus: true
 
-            iconTxt: providerModel.indexed ? VLCIcons.remove : VLCIcons.add
+            iconTxt: networkModel?.indexed ? VLCIcons.remove : VLCIcons.add
 
-            text: providerModel.indexed
+            text: networkModel?.indexed
                   ? qsTr("Remove from medialibrary")
                   : qsTr("Add to medialibrary")
 
-            visible: !providerModel.is_on_provider_list
-                     && !!providerModel.canBeIndexed
+            visible: providerModel?.canBeIndexed ?? false
 
-            onClicked: providerModel.indexed = !providerModel.indexed
+            onClicked: networkModel.indexed = !networkModel.indexed
 
             Layout.preferredWidth: implicitWidth
 

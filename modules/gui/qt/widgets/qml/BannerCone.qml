@@ -27,7 +27,7 @@ Image {
     id: root
 
     property var button: MainCtx.csdButtonModel.systemMenuButton
-    /* required */ property color color
+    required property color color
 
     sourceSize.width: VLCStyle.icon_normal
     sourceSize.height: VLCStyle.icon_normal

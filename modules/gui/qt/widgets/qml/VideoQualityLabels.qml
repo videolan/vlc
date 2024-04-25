@@ -24,7 +24,7 @@ import "qrc:///style/"
 Row {
     id: root
 
-    property var labels
+    required property var labels
 
     onLabelsChanged: {
         // try to reuse items, texts are assigned with Binding

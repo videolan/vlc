@@ -81,8 +81,9 @@ FocusScope {
 
     property alias alignment: repeater.alignment
 
-    //function
-    /* required */ property var altFocusAction
+
+    ///@type {function}
+    required property var altFocusAction
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme

@@ -19,6 +19,8 @@
 import QtQml
 
 import org.videolan.vlc 0.1
+import org.videolan.medialib 0.1
+
 
 import "qrc:///util/Helpers.js" as Helpers
 
@@ -28,7 +30,7 @@ NativeMenu {
 
     // Properties
 
-    /* required */ property var model: null
+    required property MLBaseModel model
 
     property string idDataRole: "id"
 

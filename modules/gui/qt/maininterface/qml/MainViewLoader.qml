@@ -40,14 +40,14 @@ Widgets.StackViewExt {
     */
 
     // components to load depending on MainCtx.gridView
-    /* required */ property Component grid
-    /* required */ property Component list
+    required property Component grid
+    required property Component list
 
     // component to load when provided model is empty
-    /* required */ property Component emptyLabel
+    required property Component emptyLabel
 
     // view's model
-    /* required */ property var model
+    required property BaseModel model
 
     // behave like a Page
     property var pagePrefix: []

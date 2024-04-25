@@ -120,7 +120,8 @@ Widgets.PageLoader {
         BrowseDeviceView {
             id: viewDevice
 
-            /*required*/ property var sd_source
+            //@type {NetworkDeviceModel.SDCatType}
+            required property int sd_source
 
             property var sortModel: [
                 { text: qsTr("Alphabetic"), criteria: "name" },

@@ -35,7 +35,8 @@ RowLayout {
 
     property int preferredWidth: VLCStyle.dp(512, VLCStyle.scale)
 
-    /* required */ property var trackMenuController: null
+    //FIXME make TrackMenuController a proper type (see TrackMenu)
+    required property QtObject trackMenuController
 
     // Settings
 

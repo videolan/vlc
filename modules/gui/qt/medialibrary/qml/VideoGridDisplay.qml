@@ -88,8 +88,8 @@ MainInterface.MainGridView {
 
         // Properties
 
-        /* required */ property var model: ({})
-        /* required */ property int index: -1
+        required property var model
+        required property int index
 
         // Settings
 
