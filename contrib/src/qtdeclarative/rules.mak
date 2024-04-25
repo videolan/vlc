@@ -50,6 +50,7 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	sed -i.orig -e 's,add_subdirectory(quickdialogs),#add_subdirectory(quickdialogs),' $(UNPACK_DIR)/src/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' $(UNPACK_DIR)/src/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(effects),#add_subdirectory(effects),' $(UNPACK_DIR)/src/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(quickwidgets),#add_subdirectory(quickwidgets),' $(UNPACK_DIR)/src/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \
