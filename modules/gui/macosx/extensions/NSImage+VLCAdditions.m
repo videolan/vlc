@@ -23,8 +23,40 @@
 #import "NSImage+VLCAdditions.h"
 
 #import <QuickLook/QuickLook.h>
+#import <QuickLookThumbnailing/QuickLookThumbnailing.h>
 
 @implementation NSImage(VLCAdditions)
+
++ (void)quickLookPreviewForLocalPath:(NSString *)path 
+                            withSize:(NSSize)size 
+                   completionHandler:(void (^)(NSImage * _Nullable))completionHandler
+{
+    NSURL * const pathUrl = [NSURL fileURLWithPath:path];
+    [self quickLookPreviewForLocalURL:pathUrl withSize:size completionHandler:completionHandler];
+}
+
++ (void)quickLookPreviewForLocalURL:(NSURL *)url 
+                           withSize:(NSSize)size 
+                  completionHandler:(void (^)(NSImage * _Nullable))completionHandler
+{
+    if (@available(macOS 10.15, *)) {
+        const QLThumbnailGenerationRequestRepresentationTypes type = 
+            QLThumbnailGenerationRequestRepresentationTypeThumbnail;
+        QLThumbnailGenerator * const generator = QLThumbnailGenerator.sharedGenerator;
+        QLThumbnailGenerationRequest * const request = 
+            [[QLThumbnailGenerationRequest alloc] initWithFileAtURL:url 
+                                                               size:size 
+                                                              scale:1. 
+                                                representationTypes:type];
+    } else {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            NSImage * const image = [self quickLookPreviewForLocalURL:url withSize:size];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(image);
+            });
+        });
+    }
+}
 
 + (instancetype)quickLookPreviewForLocalPath:(NSString *)path withSize:(NSSize)size
 {
