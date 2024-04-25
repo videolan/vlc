@@ -19,12 +19,11 @@ import QtQuick
 import org.videolan.vlc 0.1
 
 Item {
-    //NOTE: property pointing to the parent value is a temporary measure
-    /* required */ property int index: parent.index
-    /* required */ property var colModel: parent.colModel
-    /* required */ property var rowModel: parent.rowModel
-    /* required */ property ColorContext colorContext: parent.colorContext
-    /* required */ property bool selected: parent.selected
-    /* required */ property bool containsMouse: parent.containsMouse
-    /* required */ property bool currentlyFocused: parent.currentlyFocused
+    required property int index
+    required property var colModel
+    required property var rowModel
+    required property ColorContext colorContext
+    required property bool selected
+    required property bool containsMouse
+    required property bool currentlyFocused
 }

@@ -19,7 +19,6 @@ import QtQuick
 import org.videolan.vlc 0.1
 
 Item {
-    //NOTE: property pointing to the parent value is a temporary measure
-    /* required */ property var colModel: parent.colModel
-    /* required */ property ColorContext colorContext: parent.colorContext
+    required property var colModel
+    required property ColorContext colorContext
 }
