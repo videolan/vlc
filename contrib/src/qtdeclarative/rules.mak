@@ -25,7 +25,7 @@ endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtdeclarative-tools
 else ifeq ($(call system_tool_majmin, qmlcachegen --version),$(QTDECLARATIVE_VERSION_MAJOR))
-PKGS_FOUND += qtshadertools-tools
+PKGS_FOUND += qtdeclarative-tools
 endif
 
 $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
