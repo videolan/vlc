@@ -149,13 +149,15 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         completionHandler(image);
     } else {
         [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage * const image) {
-            if (image) {
-                [_imageCache setObject:image forKey:inputItem.MRL];
-                completionHandler(image);
-            } else {
-                NSLog(@"Failed to generate thumbnail for input item %@", inputItem.MRL);
-                completionHandler([NSImage imageNamed:@"noart.png"]);
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (image) {
+                    [_imageCache setObject:image forKey:inputItem.MRL];
+                    completionHandler(image);
+                } else {
+                    NSLog(@"Failed to generate thumbnail for input item %@", inputItem.MRL);
+                    completionHandler([NSImage imageNamed:@"noart.png"]);
+                }
+            });
         }];
     }
 }
