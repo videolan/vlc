@@ -12,7 +12,7 @@ ifdef HAVE_CROSS_COMPILE
 DEPS_qtshadertools += qtshadertools-tools $(DEPS_qtshadertools-tools)
 endif
 ifdef HAVE_WIN32
-DEPS_qtshadertools += fxc2 $(DEPS_fxc2)
+DEPS_qtshadertools-tools += fxc2 $(DEPS_fxc2)
 endif
 
 ifdef HAVE_WIN32
