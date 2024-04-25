@@ -103,8 +103,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemPrimaryDetailButton.enabled = primaryActionableDetail;
     self.mediaItemSecondaryDetailButton.enabled = secondaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.mediaItemPrimaryDetailButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
-        self.mediaItemSecondaryDetailButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
+        NSColor * const primaryDetailButtonColor = 
+            primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.labelColor;
+        NSColor * const secondaryDetailButtonColor = 
+            secondaryActionableDetail ? NSColor.VLCAccentColor : NSColor.labelColor;
+        self.mediaItemPrimaryDetailButton.contentTintColor = primaryDetailButtonColor;
+        self.mediaItemSecondaryDetailButton.contentTintColor = secondaryDetailButtonColor;
     }
     self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
