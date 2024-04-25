@@ -29,35 +29,44 @@ Widgets.IconToolButton {
 
     enabled: !paintOnly && Player.isPlaying
 
-    color: "red" //red means recording
+    color: "#FFFF0000" //red means recording
     text: VLCIcons.record
     description: qsTr("record")
 
     onClicked: Player.toggleRecord()
 
-    contentItem: T.Label {
-        anchors.centerIn: parent
+    //IconToolButton already contains a color animation that would conflict
+    contentItem: Widgets.IconLabel {
+        text: control.text
 
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
-
-        text: VLCIcons.record
         color: control.color
 
-        ColorAnimation on color {
-            from:  "transparent"
-            to: control.color
-            //this is an animation and not a transisition, we explicitly want a long duration
-            duration: 1000
+        SequentialAnimation on color {
             loops: Animation.Infinite
-            easing.type: Easing.InOutSine
             running: control.enabled && Player.recording
 
+            ColorAnimation  {
+                from:  "#FFFF0000"
+                to: "#00FF0000"//use "red" transparent
+                //this is an animation and not a transisition, we explicitly want a long duration
+                duration: 1000
+                easing.type: Easing.InSine
+            }
+
+            ColorAnimation  {
+                from:"#00FF0000"
+                to: "#FFFF0000"
+                //this is an animation and not a transisition, we explicitly want a long duration
+                duration: 1000
+                easing.type: Easing.OutSine
+            }
+
             onStopped: {
-                control.contentItem.color = control.color
+                color = "#FFFF0000"
             }
         }
-
-        Accessible.ignored: true
+        font: control.font
     }
+
+
 }
