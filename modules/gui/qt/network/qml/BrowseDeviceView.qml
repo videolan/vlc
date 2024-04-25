@@ -308,16 +308,21 @@ FocusScope {
             Component {
                 id: artworkHeader
 
-                Widgets.IconLabel {
-                    text: VLCIcons.album_cover
+                Widgets.TableHeaderDelegate {
+                    Widgets.IconLabel {
 
-                    height: VLCStyle.listAlbumCover_height
-                    width: VLCStyle.listAlbumCover_width
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: VLCStyle.icon_tableHeader
+                        height: VLCStyle.listAlbumCover_height
+                        width: VLCStyle.listAlbumCover_width
+                        anchors.centerIn: parent
 
-                    color: parent.colorContext.fg.secondary
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pixelSize: VLCStyle.icon_tableHeader
+
+                        text: VLCIcons.album_cover
+
+                        color: parent.colorContext.fg.secondary
+                    }
                 }
             }
 
@@ -330,43 +335,40 @@ FocusScope {
             Component {
                 id: mrlColumn
 
-                Widgets.TextAutoScroller {
+                Widgets.TableRowDelegate {
                     id: itemText
 
-                    property var rowModel: parent.rowModel
-                    property var colModel: parent.colModel
+                    Widgets.TextAutoScroller {
 
-                    readonly property ColorContext colorContext: parent.colorContext
-                    readonly property bool selected: parent.selected
+                        anchors.fill: parent
 
-                    width: parent.width
+                        clip: scrolling
 
-                    clip: scrolling
+                        label: itemLabel
 
-                    label: itemLabel
+                        forceScroll: itemText.currentlyFocused
 
-                    forceScroll: parent.currentlyFocused
+                        Widgets.ListLabel {
+                            id: itemLabel
 
-                    Widgets.ListLabel {
-                        id: itemLabel
+                            anchors.verticalCenter: parent.verticalCenter
 
-                        anchors.verticalCenter: parent.verticalCenter
+                            text: {
+                                if (itemText.rowModel === null)
+                                    return ""
 
-                        text: {
-                            if (itemText.rowModel === null)
-                                return ""
+                                const text = itemText.rowModel[itemText.colModel.criteria]
 
-                            const text = itemText.rowModel[itemText.colModel.criteria]
+                                if (text.toString() === "vlc://nop")
+                                    return ""
+                                else
+                                    return text
+                            }
 
-                            if (text.toString() === "vlc://nop")
-                                return ""
-                            else
-                                return text
+                            color: itemText.selected
+                                ? itemText.colorContext.fg.highlight
+                                : itemText.colorContext.fg.primary
                         }
-
-                        color: itemText.selected
-                            ? itemText.colorContext.fg.highlight
-                            : itemText.colorContext.fg.primary
                     }
                 }
             }

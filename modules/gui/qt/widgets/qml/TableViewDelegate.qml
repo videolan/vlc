@@ -29,13 +29,12 @@ T.Control {
     id: delegate
 
     // Properties
+    required property int index
 
     property var rowModel
     property var sortModel
 
     property bool selected: false
-
-    readonly property int _index: index
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -56,29 +55,26 @@ T.Control {
     signal dropExited(var drag, bool before)
     signal dropEvent(var drag, var drop, bool before)
 
-    property Component defaultDelegate: Widgets.TextAutoScroller {
+    property Component defaultDelegate: TableRowDelegate {
         id: defaultDelId
-        property var rowModel: parent.rowModel
-        property var colModel: parent.colModel
-        readonly property ColorContext colorContext: parent.colorContext
-        readonly property bool selected: parent.selected
+        Widgets.TextAutoScroller {
 
-        label: text
-        forceScroll: parent.currentlyFocused
-        width: parent.width
-        clip: scrolling
+            anchors.fill: parent
 
-        Widgets.ListLabel {
-            id: text
+            label: text
+            forceScroll: defaultDelId.currentlyFocused
+            clip: scrolling
 
-            anchors.verticalCenter: parent.verticalCenter
-            text: defaultDelId.rowModel
-                    ? (defaultDelId.rowModel[defaultDelId.colModel.criteria] || "")
-                    : ""
+            Widgets.ListLabel {
+                id: text
 
-            color: defaultDelId.selected
-                ? defaultDelId.colorContext.fg.highlight
-                : defaultDelId.colorContext.fg.primary
+                anchors.verticalCenter: parent.verticalCenter
+                text: defaultDelId.rowModel[defaultDelId.colModel.criteria] ?? ""
+
+                color: defaultDelId.selected
+                    ? defaultDelId.colorContext.fg.highlight
+                    : defaultDelId.colorContext.fg.primary
+            }
         }
     }
     // Settings
@@ -141,7 +137,7 @@ T.Control {
 
             onDoubleClicked: (mouse) => {
                 if (mouse.button === Qt.LeftButton)
-                    delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
+                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
             }
 
             drag.onActiveChanged: {
@@ -161,7 +157,7 @@ T.Control {
 
                 onTapped: {
                     delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
-                    delegate.itemDoubleClicked(delegate._index, delegate.rowModel)
+                    delegate.itemDoubleClicked(delegate.index, delegate.rowModel)
                 }
 
                 onLongPressed: {
@@ -187,7 +183,7 @@ T.Control {
 
                 property var colModel: modelData.model
 
-                readonly property int index: delegate._index
+                readonly property int index: delegate.index
 
                 readonly property bool currentlyFocused: delegate.activeFocus
 

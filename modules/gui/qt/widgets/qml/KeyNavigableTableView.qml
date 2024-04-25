@@ -35,14 +35,18 @@ FocusScope {
 
     property var sortModel: []
 
-    property Component tableHeaderDelegate: Widgets.CaptionLabel {
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+    property Component tableHeaderDelegate:  TableHeaderDelegate {
+        Widgets.CaptionLabel {
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
 
-        Accessible.ignored: true
+            anchors.fill: parent
 
-        text: colModel.text || ""
-        color: parent.colorContext.fg.secondary
+            Accessible.ignored: true
+
+            text: parent.colModel.text ?? ""
+            color: parent.colorContext.fg.secondary
+        }
     }
 
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own

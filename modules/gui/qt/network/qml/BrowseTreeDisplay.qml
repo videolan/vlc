@@ -203,14 +203,19 @@ MainInterface.MainViewLoader {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView.availableRowWidth)
             readonly property int _nameColSpan: Math.max((_nbCols - 1) / 2, 1)
-            property Component thumbnailHeader: Widgets.IconLabel {
-                height: VLCStyle.listAlbumCover_height
-                width: VLCStyle.listAlbumCover_width
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: VLCStyle.icon_tableHeader
-                text: VLCIcons.album_cover
-                color: tableView.colorContext.fg.secondary
+            property Component thumbnailHeader: Widgets.TableHeaderDelegate {
+                Widgets.IconLabel {
+                    height: VLCStyle.listAlbumCover_height
+                    width: VLCStyle.listAlbumCover_width
+
+                    anchors.centerIn: parent
+
+                    horizontalAlignment: Text.AlignHCenter
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: VLCStyle.icon_tableHeader
+                    text: VLCIcons.album_cover
+                    color: parent.colorContext.fg.secondary
+                }
             }
 
             property Component thumbnailColumn: NetworkThumbnailItem {

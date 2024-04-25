@@ -389,17 +389,20 @@ FocusScope {
                 }
             }
 
-            property Component titleHeaderDelegate: Row {
+            property Component titleHeaderDelegate: Widgets.TableHeaderDelegate {
+                id: headerDelegate
+                Row {
+                    anchors.fill: parent
+                    Widgets.CaptionLabel {
+                        text: "#"
+                        width: VLCStyle.margin_large
+                        color: headerDelegate.colorContext.fg.secondary
+                    }
 
-                Widgets.CaptionLabel {
-                    text: "#"
-                    width: VLCStyle.margin_large
-                    color: theme.fg.secondary
-                }
-
-                Widgets.CaptionLabel {
-                    text: qsTr("Title")
-                    color: theme.fg.secondary
+                    Widgets.CaptionLabel {
+                        text: qsTr("Title")
+                        color: headerDelegate.colorContext.fg.secondary
+                    }
                 }
             }
 

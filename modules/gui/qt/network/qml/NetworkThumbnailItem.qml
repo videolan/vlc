@@ -26,26 +26,10 @@ import org.videolan.vlc 0.1
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Row {
+Widgets.TableRowDelegate {
     id: root
 
-    // Properties
-
-    readonly property bool containsMouse: parent.containsMouse
-    readonly property bool currentlyFocused: parent.currentlyFocused
-
-    property var rowModel: parent.rowModel
-    property var model: parent.colModel
-
-    readonly property int index: parent.index
-
-    readonly property string artworkSource: !!rowModel ? rowModel.artwork : ""
-
-    readonly property ColorContext colorContext: parent.colorContext
-
-    readonly property bool selected: parent.selected
-
-    // Private
+    readonly property string artworkSource: rowModel?.artwork ?? ""
 
     readonly property bool _showPlayCover: (currentlyFocused || containsMouse)
                                            && !!rowModel
@@ -54,13 +38,7 @@ Row {
 
     readonly property bool _showCustomCover: (!artworkSource) || (artwork.status !== Image.Ready)
 
-    // Signals
-
     signal playClicked(int index)
-
-    // Settings
-
-    spacing: VLCStyle.margin_normal
 
     // Functions
 
@@ -91,109 +69,112 @@ Row {
         return string
     }
 
-    // Children
+    Row {
+        anchors.fill: parent
+        spacing: VLCStyle.margin_normal
 
-    Item {
-        id: itemCover
+        Item {
+            id: itemCover
 
-        anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: parent.verticalCenter
 
-        width: artwork.width
-        height: artwork.height
+            width: artwork.width
+            height: artwork.height
 
-        Widgets.DefaultShadow {
-            anchors.centerIn: artwork
+            Widgets.DefaultShadow {
+                anchors.centerIn: artwork
 
-            // clip shadows to only the painted area of cover
-            rectWidth: artwork.paintedWidth
-            rectHeight: artwork.paintedHeight
-        }
+                // clip shadows to only the painted area of cover
+                rectWidth: artwork.paintedWidth
+                rectHeight: artwork.paintedHeight
+            }
 
-        NetworkCustomCover {
-            id: artwork
+            NetworkCustomCover {
+                id: artwork
 
-            width: VLCStyle.listAlbumCover_width
-            height: VLCStyle.listAlbumCover_height
+                width: VLCStyle.listAlbumCover_width
+                height: VLCStyle.listAlbumCover_height
 
-            // artworks can have anysize, we try to fit it using PreserveAspectFit
-            // in the provided size and place it in the center of itemCover
-            fillMode: Image.PreserveAspectFit
-            horizontalAlignment: Image.AlignHCenter
-            verticalAlignment: Image.AlignVCenter
+                // artworks can have anysize, we try to fit it using PreserveAspectFit
+                // in the provided size and place it in the center of itemCover
+                fillMode: Image.PreserveAspectFit
+                horizontalAlignment: Image.AlignHCenter
+                verticalAlignment: Image.AlignVCenter
 
-            networkModel: rowModel
+                networkModel: root.rowModel
 
-            bgColor: root.colorContext.bg.secondary
-            color1: root.colorContext.fg.primary
-            accent: root.colorContext.accent
+                bgColor: root.colorContext.bg.secondary
+                color1: root.colorContext.fg.primary
+                accent: root.colorContext.accent
 
-            Widgets.PlayCover {
-                x: Math.round((artwork.width - width) / 2)
-                y: Math.round((artwork.height - height) / 2)
+                Widgets.PlayCover {
+                    x: Math.round((artwork.width - width) / 2)
+                    y: Math.round((artwork.height - height) / 2)
 
-                width: VLCStyle.play_cover_small
+                    width: VLCStyle.play_cover_small
 
-                visible: root._showPlayCover
+                    visible: root._showPlayCover
 
-                onClicked: playClicked(root.index)
+                    onClicked: playClicked(root.index)
+                }
             }
         }
-    }
 
-    Column {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        Column {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
 
-        anchors.topMargin: VLCStyle.margin_xxsmall
-        anchors.bottomMargin: VLCStyle.margin_xxsmall
+            anchors.topMargin: VLCStyle.margin_xxsmall
+            anchors.bottomMargin: VLCStyle.margin_xxsmall
 
-        width: Math.max(0, parent.width - x)
+            width: Math.max(0, parent.width - x)
 
-        Widgets.TextAutoScroller {
-            id: itemText
+            Widgets.TextAutoScroller {
+                id: itemText
 
-            anchors.left: parent.left
-            anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.right: parent.right
 
-            height: (itemCriterias.visible) ? Math.round(parent.height / 2)
-                                            : parent.height
+                height: (itemCriterias.visible) ? Math.round(parent.height / 2)
+                                                : parent.height
 
-            visible: (listLabel.text)
+                visible: (listLabel.text)
 
-            clip: scrolling
+                clip: scrolling
 
-            label: listLabel
+                label: listLabel
 
-            forceScroll: root.currentlyFocused
+                forceScroll: root.currentlyFocused
 
-            Widgets.ListLabel {
-                id: listLabel
+                Widgets.ListLabel {
+                    id: listLabel
 
-                anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenter: parent.verticalCenter
 
-                text: (root.rowModel && model.title) ? root.rowModel[model.title] : ""
+                    text: root.rowModel?.[root.colModel.title] ?? ""
+
+                    color: root.selected
+                        ? root.colorContext.fg.highlight
+                        : root.colorContext.fg.primary
+                }
+            }
+
+            Widgets.MenuCaption {
+                id: itemCriterias
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+
+                height: itemText.height
+
+                visible: (text)
 
                 color: root.selected
                     ? root.colorContext.fg.highlight
-                    : root.colorContext.fg.primary
+                    : root.colorContext.fg.secondary
+
+                text: root.getCriterias(root.colModel, root.rowModel)
             }
-        }
-
-        Widgets.MenuCaption {
-            id: itemCriterias
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            height: itemText.height
-
-            visible: (text)
-
-            color: root.selected
-                ? root.colorContext.fg.highlight
-                : root.colorContext.fg.secondary
-
-            text: root.getCriterias(root.model, root.rowModel)
         }
     }
 }

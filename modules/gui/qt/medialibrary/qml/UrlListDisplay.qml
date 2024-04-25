@@ -39,12 +39,15 @@ Widgets.KeyNavigableTableView {
 
     readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
                                        listView_id.availableRowWidth)
-    property Component urlHeaderDelegate: Widgets.IconLabel {
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        font.pixelSize: VLCStyle.icon_tableHeader
-        text: VLCIcons.history
-        color: listView_id.colorContext.fg.secondary
+    property Component urlHeaderDelegate: Widgets.TableHeaderDelegate {
+        Widgets.IconLabel {
+            anchors.fill: parent
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            font.pixelSize: VLCStyle.icon_tableHeader
+            text: VLCIcons.history
+            color: parent.colorContext.fg.secondary
+        }
     }
 
     visible: urlModel.count > 0
