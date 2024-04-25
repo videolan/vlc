@@ -119,21 +119,25 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
                                     kVLCDefaultThumbnailPosition);
 }
 
-+ (NSImage *)thumbnailForInputItem:(VLCInputItem *)inputItem
++ (void)thumbnailForInputItem:(VLCInputItem *)inputItem 
+               withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:inputItem];
+    [VLCLibraryImageCache.sharedImageCache imageForInputItem:inputItem withCompletion:completionHandler];
 }
 
-- (NSImage *)imageForInputItem:(VLCInputItem *)inputItem
+- (void)imageForInputItem:(VLCInputItem *)inputItem 
+           withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    NSImage *cachedImage = [_imageCache objectForKey:inputItem.MRL];
+    NSImage * const cachedImage = [_imageCache objectForKey:inputItem.MRL];
     if (cachedImage) {
-        return cachedImage;
+        completionHandler(cachedImage);
+        return;
     }
-    return [self generateImageForInputItem:inputItem];
+    [self generateImageForInputItem:inputItem withCompletion:completionHandler];
 }
 
-- (NSImage *)generateImageForInputItem:(VLCInputItem *)inputItem
+- (void)generateImageForInputItem:(VLCInputItem *)inputItem 
+                   withCompletion:(void(^)(const NSImage *))completionHandler
 {
     NSURL * const artworkURL = inputItem.artworkURL;
     NSImage * const image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
@@ -142,24 +146,21 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     if (image) {
         image.size = imageSize;
         [_imageCache setObject:image forKey:inputItem.MRL];
-        return image;
+        completionHandler(image);
     } else {
-        [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage *thumbnail) {
-            if (thumbnail) {
-                [_imageCache setObject:thumbnail forKey:inputItem.MRL];
-            }
-        }];
-        return [NSImage imageNamed:@"noart.png"];
+        [inputItem thumbnailWithSize:imageSize completionHandler:completionHandler];
     }
 }
 
-+ (NSImage *)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem
++ (void)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem 
+                  withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem];
+    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem 
+                                                     withCompletion:completionHandler];
 }
 
 + (void)thumbnailForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
-               withCompletion:(void(^)(const NSImage *))completionHandler
+                 withCompletion:(void(^)(const NSImage *))completionHandler
 {
     if ([libraryItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class] && ![libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
 
@@ -195,23 +196,6 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
             });
         });
     }
-}
-
-+ (void)thumbnailForInputItem:(VLCInputItem *)inputItem
-               withCompletion:(void(^)(const NSImage *))completionHandler
-{
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        NSImage * const image = [VLCLibraryImageCache thumbnailForInputItem:inputItem];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completionHandler(image);
-        });
-    });
-}
-
-+ (void)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem
-               withCompletion:(void(^)(const NSImage *))completionHandler
-{
-    [self thumbnailForInputItem:playlistItem.inputItem withCompletion:completionHandler];
 }
 
 @end

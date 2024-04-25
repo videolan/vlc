@@ -265,7 +265,10 @@ _##field##TextField.delegate = self
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
     _representedInputItems = (representedInputItem == nil) ? @[] : @[representedInputItem];
-    _artwork = [VLCLibraryImageCache thumbnailForInputItem:representedInputItem];
+    [VLCLibraryImageCache thumbnailForInputItem:representedInputItem 
+                                 withCompletion:^(NSImage * const image) {
+        self->_artwork = image;
+    }];
     [self updateRepresentation];
 }
 
@@ -278,9 +281,12 @@ _##field##TextField.delegate = self
 
     _representedInputItems = [inputItems copy];
 
-    // HACK: Input items retrieved via an audio group do not acquire an artwork URL.
-    // To show something in the information window, set the small artwork from the audio group.
-    _artwork = [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup];
+    [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup 
+                                   withCompletion:^(NSImage * const image) {
+        // HACK: Input items retrieved via an audio group do not acquire an artwork URL.
+        // To show something in the information window, set the small artwork from the audio group.
+        self->_artwork = image;
+    }];
 
     [self updateRepresentation];
 }

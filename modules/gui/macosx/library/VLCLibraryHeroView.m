@@ -54,9 +54,11 @@
 {
     NSAssert(self.representedItem != nil, @"Should not update nil represented item!");
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
-    self.largeImageView.image = [VLCLibraryImageCache thumbnailForLibraryItem:actualItem];
     self.titleTextField.stringValue = actualItem.displayString;
     self.detailTextField.stringValue = actualItem.primaryDetailString;
+    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const image) {
+        self.largeImageView.image = image;
+    }];
 }
 
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
