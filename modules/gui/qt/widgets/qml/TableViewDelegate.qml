@@ -30,19 +30,15 @@ T.Control {
 
     // Properties
     required property int index
-
-    property var rowModel
-    property var sortModel
-
-    property bool selected: false
-
-    property int _modifiersOnLastPress: Qt.NoModifier
+    required property var rowModel
+    required property var sortModel
+    required property bool selected
+    required property Widgets.DragItem dragItem
+    required property bool acceptDrop
 
     readonly property bool dragActive: hoverArea.drag.active
 
-    property var dragItem
-
-    property bool acceptDrop: false
+    property int _modifiersOnLastPress: Qt.NoModifier
 
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)

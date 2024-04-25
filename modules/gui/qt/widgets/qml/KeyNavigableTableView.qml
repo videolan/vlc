@@ -83,7 +83,7 @@ FocusScope {
 
     property real availableRowWidth: 0
 
-    property Item dragItem
+    property Widgets.DragItem dragItem: null
     property bool acceptDrop: false
 
     // Private
