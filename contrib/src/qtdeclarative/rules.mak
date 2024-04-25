@@ -47,6 +47,7 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	sed -i.orig -e 's,add_subdirectory(labs),#add_subdirectory(labs),' $(UNPACK_DIR)/src/CMakeLists.txt
 	# disable unused svgtoqml tool:
 	sed -i.orig -e 's,add_subdirectory(svgtoqml),#add_subdirectory(svgtoqml),' $(UNPACK_DIR)/tools/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(quickdialogs),#add_subdirectory(quickdialogs),' $(UNPACK_DIR)/src/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \
