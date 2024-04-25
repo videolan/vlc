@@ -41,7 +41,7 @@
 {
     if (@available(macOS 10.15, *)) {
         const QLThumbnailGenerationRequestRepresentationTypes type = 
-            QLThumbnailGenerationRequestRepresentationTypeThumbnail;
+            QLThumbnailGenerationRequestRepresentationTypeAll;
         QLThumbnailGenerator * const generator = QLThumbnailGenerator.sharedGenerator;
         QLThumbnailGenerationRequest * const request = 
             [[QLThumbnailGenerationRequest alloc] initWithFileAtURL:url 
