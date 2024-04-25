@@ -36,16 +36,13 @@
         VLCInputItem * const inputItem = inputNode.inputItem;
         self.title = inputItem.name;
 
-        [VLCLibraryImageCache thumbnailForInputItem:inputItem 
-                                     withCompletion:^(NSImage * const image) {
-            self.image = image;
-            // HACK: We have no way when we get the clicked item from the path control
-            // of knowing specifically which input node this path item corresponds to,
-            // as the path control returns a copy for clickedPathItem that is not of
-            // this class. As a very awkward workaround, lets set the name of the image
-            // used here as the MRL of the node's input item
-            self.image.name = inputItem.MRL;
-        }];
+        self.image = [NSImage imageNamed:NSImageNameFolder];
+        // HACK: We have no way when we get the clicked item from the path control
+        // of knowing specifically which input node this path item corresponds to,
+        // as the path control returns a copy for clickedPathItem that is not of
+        // this class. As a very awkward workaround, lets set the name of the image
+        // used here as the MRL of the node's input item
+        self.image.name = inputItem.MRL;
 
     } else if (inputNode == nil) {
         NSLog(@"WARNING: Received nil input node, cannot create VLCInputNodePathControlItem");
