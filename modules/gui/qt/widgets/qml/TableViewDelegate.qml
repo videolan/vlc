@@ -181,6 +181,8 @@ T.Control {
             model: delegate.sortModel
 
             Loader{
+                required property var modelData
+
                 property var rowModel: delegate.rowModel
 
                 property var colModel: modelData.model

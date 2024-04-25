@@ -199,6 +199,8 @@ FocusScope {
             delegate: T.AbstractButton {
                 id: button
 
+                required property var modelData
+
                 implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                                         implicitContentWidth + leftPadding + rightPadding)
                 implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,

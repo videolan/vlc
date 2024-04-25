@@ -299,6 +299,8 @@ FocusScope {
                         model: sortModel
                         MouseArea {
 
+                            required property var modelData
+
                             height: VLCStyle.tableHeaderText_height
                             width: VLCStyle.colWidth(modelData.size) || 1
 

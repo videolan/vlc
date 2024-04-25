@@ -393,6 +393,9 @@ Item {
         model: dragItem._covers
 
         Item {
+            required property var modelData
+            required property int index
+
             x: dragItem.coversXPos(index)
             anchors.verticalCenter: parent.verticalCenter
             width: dragItem.coverSize

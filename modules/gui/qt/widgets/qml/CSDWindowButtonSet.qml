@@ -56,6 +56,8 @@ Row {
         model: MainCtx.csdButtonModel.windowCSDButtons
 
         CSDWindowButton {
+            required property var modelData
+
             height: windowButtonGroup.height
 
             showHovered: modelData.showHovered

@@ -113,6 +113,9 @@ RowLayout {
 
             id: tracksListContainer
 
+            required property var modelData
+            required property int index
+
             property var tracksModel: modelData.tracksModel
 
             focus: true

@@ -186,6 +186,9 @@ Item {
         }
 
         delegate: MouseArea {
+
+            required property var modelData
+
             x: modelData.x
             y: modelData.y
 

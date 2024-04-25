@@ -59,6 +59,8 @@ Rectangle {
 
             CSDThemeButton {
 
+                required property var modelData
+
                 anchors.verticalCenter: parent.verticalCenter
 
                 bannerHeight: root.height
