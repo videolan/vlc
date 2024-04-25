@@ -29,7 +29,7 @@
 
 + (void)quickLookPreviewForLocalPath:(NSString *)path 
                             withSize:(NSSize)size 
-                   completionHandler:(void (^)(NSImage * _Nullable))completionHandler
+                   completionHandler:(void (^)(NSImage *))completionHandler
 {
     NSURL * const pathUrl = [NSURL fileURLWithPath:path];
     [self quickLookPreviewForLocalURL:pathUrl withSize:size completionHandler:completionHandler];
@@ -37,7 +37,7 @@
 
 + (void)quickLookPreviewForLocalURL:(NSURL *)url 
                            withSize:(NSSize)size 
-                  completionHandler:(void (^)(NSImage * _Nullable))completionHandler
+                  completionHandler:(void (^)(NSImage *))completionHandler
 {
     if (@available(macOS 10.15, *)) {
         const QLThumbnailGenerationRequestRepresentationTypes type = 
@@ -48,6 +48,16 @@
                                                                size:size 
                                                               scale:1. 
                                                 representationTypes:type];
+        [generator generateBestRepresentationForRequest:request 
+                                      completionHandler:^(QLThumbnailRepresentation * const thumbnail, 
+                                                          NSError * const error) {
+            if (error != nil) {
+                NSLog(@"Error generating thumbnail: %@", error);
+                completionHandler(nil);
+                return;
+            }
+            completionHandler(thumbnail.NSImage);
+        }];
     } else {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             NSImage * const image = [self quickLookPreviewForLocalURL:url withSize:size];
