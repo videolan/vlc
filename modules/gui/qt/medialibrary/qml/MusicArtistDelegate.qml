@@ -37,7 +37,7 @@ T.ItemDelegate {
 
     property ItemView view: ListView.view
 
-    /* required */ property MLModel mlModel
+    /* required */ property MLBaseModel mlModel
 
     property bool isCurrent: false
 
