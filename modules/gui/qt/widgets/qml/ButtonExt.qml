@@ -58,8 +58,6 @@ T.Button {
 
     padding: 0
 
-    text: model.displayText
-
     font.pixelSize: VLCStyle.fontSize_normal
 
     // Keys
