@@ -808,7 +808,7 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qtgraphicaleffectsplugin_raw_qml_0 );
     Q_INIT_RESOURCE( qtgraphicaleffectsprivate_raw_qml_0 );
     Q_INIT_RESOURCE( qtgraphicaleffectsshaders );
-    Q_INIT_RESOURCE( qtquickshapes_shaders );
+    // Q_INIT_RESOURCE( qtquickshapes_shaders );
 #endif
 
 #ifdef _WIN32
