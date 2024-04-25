@@ -65,6 +65,7 @@ QT_DECLARATIVE_COMMON_CONFIG := \
 	-DFEATURE_quick_flipable=OFF \
 	-DFEATURE_quick_sprite=OFF \
 	-DFEATURE_quick_canvas=OFF \
+	-DFEATURE_quick_path=OFF \
 	-DFEATURE_quicktemplates2_calendar=OFF
 
 QT_DECLARATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
@@ -83,7 +84,6 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	-DFEATURE_qml_object_model=OFF \
 	-DFEATURE_qml_table_model=OFF \
 	-DFEATURE_quick_shadereffect=OFF \
-	-DFEATURE_quick_path=OFF \
 	-DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
 
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
