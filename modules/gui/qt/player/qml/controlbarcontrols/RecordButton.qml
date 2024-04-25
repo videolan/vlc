@@ -30,7 +30,8 @@ Widgets.IconToolButton {
     enabled: !paintOnly && Player.isPlaying
 
     color: "red" //red means recording
-    text: qsTr("record")
+    text: VLCIcons.record
+    description: qsTr("record")
 
     onClicked: Player.toggleRecord()
 
