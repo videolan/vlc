@@ -176,28 +176,32 @@ T.Control {
         Repeater {
             model: delegate.sortModel
 
-            Loader{
+            //manually load the component as Loader is unable to pass initial/required properties
+            Item {
+                id: loader
                 required property var modelData
-
-                property var rowModel: delegate.rowModel
-
-                property var colModel: modelData.model
-
-                readonly property int index: delegate.index
-
-                readonly property bool currentlyFocused: delegate.activeFocus
-
-                readonly property bool selected: delegate.selected
-
-                readonly property bool containsMouse: hoverArea.containsMouse
-
-                readonly property ColorContext colorContext: theme
-
+                property TableRowDelegate item: null
                 width: (modelData.size) ? VLCStyle.colWidth(modelData.size) : 0
-
                 height: parent.height
 
-                sourceComponent: colModel.colDelegate || delegate.defaultDelegate
+                Component.onCompleted: {
+                    const del = modelData.model.colDelegate || delegate.defaultDelegate
+                    item = del.createObject(loader, {
+                            width: Qt.binding(() => loader.width),
+                            height: Qt.binding(() => loader.height),
+                            rowModel: Qt.binding(() => delegate.rowModel),
+                            colModel: Qt.binding(() => loader.modelData.model),
+                            index: Qt.binding(() => delegate.index),
+                            currentlyFocused: Qt.binding(() => delegate.activeFocus),
+                            selected: Qt.binding(() => delegate.selected),
+                            containsMouse: Qt.binding(() => hoverArea.containsMouse),
+                            colorContext: Qt.binding(() => theme),
+                        }
+                    )
+                }
+                Component.onDestruction: {
+                    item?.destroy()
+                }
             }
         }
 

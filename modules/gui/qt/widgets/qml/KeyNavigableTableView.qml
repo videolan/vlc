@@ -302,8 +302,10 @@ FocusScope {
                     Repeater {
                         model: sortModel
                         MouseArea {
+                            id: headerCell
 
                             required property var modelData
+                            property TableHeaderDelegate _item: null
 
                             height: VLCStyle.tableHeaderText_height
                             width: VLCStyle.colWidth(modelData.size) || 1
@@ -311,15 +313,15 @@ FocusScope {
                             Accessible.role: Accessible.ColumnHeader
                             Accessible.name: modelData.model.text
 
-                            Loader {
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-
-                                property var colModel: modelData.model
-
-                                readonly property ColorContext colorContext: view.colorContext
-
-                                sourceComponent: colModel.headerDelegate || root.tableHeaderDelegate
+                            //Using a Loader is unable to pass the initial/required properties
+                            Component.onCompleted: {
+                                const comp = modelData.model.headerDelegate || root.tableHeaderDelegate
+                                headerCell._item = comp.createObject(headerCell, {
+                                    width:  Qt.binding(() => headerCell.width),
+                                    height:  Qt.binding(() => headerCell.height),
+                                    colorContext:  Qt.binding(() => view.colorContext),
+                                    colModel: Qt.binding(() => modelData.model)
+                                })
                             }
 
                             Text {
