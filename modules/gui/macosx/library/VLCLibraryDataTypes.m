@@ -1049,9 +1049,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     case VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE:
     {
         VLCInputItem * const inputItem = self.inputItem;
+        VLCMediaLibraryShowEpisode * const episodeInfo = self.showEpisode;
         return [NSString stringWithFormat:_NS("Season %u, Episode %u"),
-                         inputItem.season,
-                         inputItem.episode];
+                episodeInfo.seasonNumber, episodeInfo.episodeNumber];
     }
     case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
     {
