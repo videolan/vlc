@@ -135,25 +135,22 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
 
 - (NSImage *)generateImageForInputItem:(VLCInputItem *)inputItem
 {
-    NSImage *image;
     NSURL * const artworkURL = inputItem.artworkURL;
+    NSImage * const image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
     const NSSize imageSize = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
 
-    if (artworkURL) {
-        image = [[NSImage alloc] initWithContentsOfURL:artworkURL];
-    }
-
-    if (image == nil) {
-        image = [inputItem thumbnailWithSize:imageSize];
-    }
-
     if (image) {
+        image.size = imageSize;
         [_imageCache setObject:image forKey:inputItem.MRL];
-    } else { // If nothing so far worked, then fall back on default image
-        image = [NSImage imageNamed:@"noart.png"];
+        return image;
+    } else {
+        [inputItem thumbnailWithSize:imageSize completionHandler:^(NSImage *thumbnail) {
+            if (thumbnail) {
+                [_imageCache setObject:thumbnail forKey:inputItem.MRL];
+            }
+        }];
+        return [NSImage imageNamed:@"noart.png"];
     }
-
-    return image;
 }
 
 + (NSImage *)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem

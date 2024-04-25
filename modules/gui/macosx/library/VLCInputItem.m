@@ -606,32 +606,46 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     return input_item_WriteMeta(VLC_OBJECT(getIntf()), _vlcInputItem);
 }
 
-- (NSImage*)thumbnailWithSize:(NSSize)size
+- (void)thumbnailWithSize:(NSSize)size completionHandler:(void(^)(NSImage * image))completionHandler
 {
-    NSImage *image;
-    if (!self.isStream && _vlcInputItem != NULL) {
-        char *psz_url = input_item_GetURI(_vlcInputItem);
-        if (psz_url) {
-            char *psz_path = vlc_uri2path(psz_url);
-            if (psz_path) {
-                NSString *path = toNSStr(psz_path);
-                free(psz_path);
-                image = [NSImage quickLookPreviewForLocalPath:path
-                                                     withSize:size];
+    if (!self.isStream || _vlcInputItem == NULL) {
+        completionHandler(nil);
+        return;
+    }
 
-                if (!image) {
-                    image = [NSWorkspace.sharedWorkspace iconForFile:path];
-                    image.size = size;
-                }
-            }
-            free(psz_url);
+    char * const psz_url = input_item_GetURI(_vlcInputItem);
+    if (psz_url == NULL) {
+        completionHandler(nil);
+        return;
+    }
+
+    char * const psz_path = vlc_uri2path(psz_url);
+    free(psz_url);
+    if (psz_path == NULL) {
+        completionHandler(nil);
+        return;
+    }
+
+    NSString * const path = toNSStr(psz_path);
+    free(psz_path);
+
+    [NSImage quickLookPreviewForLocalPath:path 
+                                 withSize:size
+                        completionHandler:^(NSImage * image) {
+        if (image) {
+            completionHandler(image);
+            return;
         }
-    }
 
-    if (!image) {
-        image = [NSImage imageNamed: @"noart.png"];
-    }
-    return image;
+        NSImage * const workspaceImage = [NSWorkspace.sharedWorkspace iconForFile:path];
+        if (workspaceImage) {
+            image.size = size;
+            completionHandler(image);
+            return;
+        }
+
+        completionHandler(nil);
+    }];
 }
 
 - (void)moveToTrash

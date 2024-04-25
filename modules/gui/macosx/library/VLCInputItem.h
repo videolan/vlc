@@ -81,7 +81,8 @@ extern NSString *VLCInputItemPreparsingSucceeded;
 - (int)preparseInputItem;
 - (int)writeMetadataToFile;
 
-- (NSImage*)thumbnailWithSize:(NSSize)size;
+- (void)thumbnailWithSize:(NSSize)size 
+        completionHandler:(void (^)(NSImage * _Nullable))completionHandler;
 
 @end
 
