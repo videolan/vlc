@@ -303,8 +303,6 @@ public:
         bool dataChanged = false;
         for (const SharedInputItem& p_item : inputList)
         {
-            auto items = m_items;
-
             auto oldItem = std::make_shared<NetworkDeviceItem>(p_item, mediaSource);
             NetworkDeviceItemSet::iterator it = m_items.find(oldItem);
             if (it != m_items.end())
@@ -330,7 +328,7 @@ public:
 
                 if (!found)
                 {
-                    items.erase(it);
+                    m_items.erase(it);
                     dataChanged = true;
                 }
             }
