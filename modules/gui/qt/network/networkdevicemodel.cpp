@@ -220,8 +220,10 @@ public:
             q->m_name += q->m_name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
             emit q->nameChanged();
 
-            auto mediaSource = vlc_media_source_provider_GetMediaSource( provider,
-                                                                        meta->name );
+            MediaSourcePtr mediaSource(
+                        vlc_media_source_provider_GetMediaSource(provider, meta->name)
+                        , false );
+
             if ( mediaSource == nullptr )
                 continue;
             std::unique_ptr<MediaTreeListener> l{ new MediaTreeListener(
