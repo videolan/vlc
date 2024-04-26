@@ -158,7 +158,7 @@ QQuickImageResponse* VLCAccessImageProvider::requestImageResponse(const QString&
     if (!query.hasQueryItem(PATH_KEY))
         return nullptr;
 
-    QString vlcurl = query.queryItemValue(PATH_KEY, QUrl::FullyEncoded);
+    QString vlcurl = query.queryItemValue(PATH_KEY, QUrl::FullyDecoded);
     return new VLCAccessImageResponse(QUrl::fromEncoded(vlcurl.toUtf8()), requestedSize, postProcessCb);
 }
 
