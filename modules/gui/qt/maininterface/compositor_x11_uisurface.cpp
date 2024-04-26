@@ -373,11 +373,7 @@ void CompositorX11UISurface::resizeFbo()
     {
         const bool current = m_context->makeCurrent(this);
         assert(current);
-
-        m_context->functions()->glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-        m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
-        m_fboId = 0;
+        destroyFbo();
         createFbo();
         m_context->doneCurrent();
         updateSizes();
