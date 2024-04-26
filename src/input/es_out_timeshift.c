@@ -475,9 +475,7 @@ static inline int es_out_in_vaPrivControl(struct vlc_input_es_out *out,
                                           int i_query,
                                           va_list args)
 {
-    if (out->ops != NULL && out->ops->priv_control != NULL)
-        return out->ops->priv_control(out, in, i_query, args);
-    return out->out.cbs->priv_control(&out->out, in, i_query, args);
+    return out->ops->priv_control(out, in, i_query, args);
 }
 
 static inline int es_out_in_PrivControl(struct vlc_input_es_out *p_out,

@@ -84,9 +84,7 @@ static int EsOutSourcePrivControl(struct vlc_input_es_out *out, input_source_t *
 {
     assert(in == NULL);
     struct es_out_source *sys = PRIV(&out->out);
-    if (sys->parent_out->ops != NULL && sys->parent_out->ops->priv_control != NULL)
-        return sys->parent_out->ops->priv_control(sys->parent_out, sys->in, query, args);
-    return sys->parent_out->out.cbs->priv_control(&sys->parent_out->out, sys->in, query, args);
+    return sys->parent_out->ops->priv_control(sys->parent_out, sys->in, query, args);
 }
 
 static void EsOutSourceDestroy(es_out_t *out)
