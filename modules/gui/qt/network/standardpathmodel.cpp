@@ -23,8 +23,7 @@
 #include "networkdevicemodel.hpp"
 #include "networkmediamodel.hpp"
 
-#include "util/base_model_p.hpp"
-#include "util/locallistcacheloader.hpp"
+#include "util/locallistbasemodel.hpp"
 #include "util/shared_input_item.hpp"
 
 // VLC includes
@@ -99,14 +98,13 @@ bool descendingMrl(const StandardPathItemPtr& a,
 
 
 class StandardPathModelPrivate
-    : public BaseModelPrivateT<StandardPathItemPtr>
-    , public LocalListCacheLoader<StandardPathItemPtr>::ModelSource
+    : public LocalListBaseModelPrivate<StandardPathItemPtr>
 {
     Q_DECLARE_PUBLIC(StandardPathModel)
 public:
 
     StandardPathModelPrivate(StandardPathModel* pub)
-        : BaseModelPrivateT<StandardPathItemPtr>(pub)
+        : LocalListBaseModelPrivate<StandardPathItemPtr>(pub)
     {}
 
     StandardPathLoader::ItemCompare getSortFunction() const
@@ -127,15 +125,9 @@ public:
         }
     }
 
-    std::unique_ptr<ListCacheLoader<StandardPathItemPtr>> createLoader() const override
-    {
-        return std::make_unique<StandardPathLoader>(
-            this, m_searchPattern,
-            getSortFunction());
-    }
-
     bool initializeModel() override
     {
+        Q_Q(StandardPathModel);
         assert(m_qmlInitializing == false);
 #ifdef Q_OS_UNIX
         addItem(QVLCUserDir(VLC_HOME_DIR), qtr("Home"), QUrl());
@@ -145,6 +137,10 @@ public:
         addItem(QVLCUserDir(VLC_MUSIC_DIR), qtr("Music"), QUrl());
         addItem(QVLCUserDir(VLC_VIDEOS_DIR), qtr("Videos"), QUrl());
         addItem(QVLCUserDir(VLC_DOWNLOAD_DIR), qtr("Download"), QUrl());
+        //model is never updated, but this is still needed to fit the LocalListBaseModelPrivate requirements
+        ++m_revision;
+        m_loading = false;
+        emit q->loadingChanged();
         return true;
     }
 
@@ -182,13 +178,6 @@ public:
     }
 
 public: //LocalListCacheLoader::ModelSource implementation
-
-    size_t getModelRevision() const override
-    {
-        //model never changes
-        return 1;
-    }
-
     std::vector<StandardPathItemPtr> getModelData(const QString& pattern) const override
     {
         if (pattern.isEmpty())

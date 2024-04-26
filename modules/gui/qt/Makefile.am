@@ -308,6 +308,7 @@ libqt_plugin_la_SOURCES = \
 	util/listcache.hxx util/listcache.hpp \
 	util/listcacheloader.hpp \
 	util/locallistcacheloader.hpp \
+	util/locallistbasemodel.hpp \
 	util/navigation_history.cpp util/navigation_history.hpp \
 	util/item_key_event_filter.cpp \
 	util/item_key_event_filter.hpp \

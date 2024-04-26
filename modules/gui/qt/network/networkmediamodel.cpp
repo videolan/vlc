@@ -21,8 +21,7 @@
 
 #include "maininterface/mainctx.hpp"
 
-#include "util/base_model_p.hpp"
-#include "util/locallistcacheloader.hpp"
+#include "util/locallistbasemodel.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -75,14 +74,13 @@ bool ListCache<NetworkMediaItemPtr>::compareItems(const NetworkMediaItemPtr& a, 
 // NetworkMediaModelPrivate
 
 class NetworkMediaModelPrivate
-    : public BaseModelPrivateT<NetworkMediaItemPtr>
-    , public LocalListCacheLoader<NetworkMediaItemPtr>::ModelSource
+    : public LocalListBaseModelPrivate<NetworkMediaItemPtr>
 {
     Q_DECLARE_PUBLIC(NetworkMediaModel)
 
 public:
     NetworkMediaModelPrivate(NetworkMediaModel* pub)
-        : BaseModelPrivateT<NetworkMediaItemPtr>(pub)
+        : LocalListBaseModelPrivate<NetworkMediaItemPtr>(pub)
         , m_preparseSem(1)
     {}
 
@@ -227,12 +225,7 @@ public:
 
     //BaseModelPrivateT interface implementation
 public:
-    bool loading() const override
-    {
-        return m_parsing || BaseModelPrivateT<NetworkMediaItemPtr>::loading();
-    }
-
-    LocalListCacheLoader<NetworkMediaItemPtr>::ItemCompare getSortFunction() const
+    LocalListCacheLoader<NetworkMediaItemPtr>::ItemCompare getSortFunction() const override
     {
         if (m_sortCriteria == "mrl" )
         {
@@ -286,12 +279,6 @@ public:
                     return QString::compare(a->name, b->name, Qt::CaseInsensitive) < 0;
                 };
         }
-    }
-
-    std::unique_ptr<ListCacheLoader<NetworkMediaItemPtr>> createLoader() const override
-    {
-        return std::make_unique<LocalListCacheLoader<NetworkMediaItemPtr>>(
-            this, m_searchPattern, getSortFunction());
     }
 
     bool initializeModel() override
@@ -384,9 +371,6 @@ public:
         m_preparseSem.acquire();
         vlc_media_tree_Preparse( tree, libvlc, q->m_treeItem.media.get(), this );
 
-        m_parsing = true;
-        emit q->loadingChanged();
-
         m_listener = std::move( l );
 
         return true;
@@ -394,12 +378,6 @@ public:
 
     // LocalListCacheLoader::ModelSource interface implementation
 protected:
-
-    size_t getModelRevision() const override
-    {
-        return m_revision;
-    }
-
     std::vector<NetworkMediaItemPtr> getModelData(const QString& pattern) const override
     {
         if (pattern.isEmpty())
@@ -415,12 +393,10 @@ protected:
     }
 
 public:
-    bool m_parsing = true;
     MediaLib* m_mediaLib;
     bool m_hasTree = false;
     QSemaphore m_preparseSem;
     std::unique_ptr<MediaTreeListener> m_listener;
-    size_t m_revision = 0;
     std::vector<NetworkMediaItemPtr> m_items;
 };
 
@@ -832,7 +808,7 @@ void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item
         if (p_node != model->m_treeItem.media)
             return;
 
-        model->d_func()->m_parsing = false;
+        model->d_func()->m_loading = false;
         emit model->loadingChanged();
     });
 }

@@ -129,6 +129,7 @@ moc_headers = files(
     'util/keyhelper.hpp',
     'util/listcache.hpp',
     'util/locallistcacheloader.hpp',
+    'util/locallistbasemodel.hpp',
     'util/navigation_history.hpp',
     'util/item_key_event_filter.hpp',
     'util/effects_image_provider.hpp',
@@ -692,4 +693,3 @@ if qt6_dep.found()
         'dependencies': [qt6_dep, qt_extra_deps],
     }
 endif
-

@@ -18,8 +18,7 @@
 
 #include "servicesdiscoverymodel.hpp"
 
-#include "util/base_model_p.hpp"
-#include "util/locallistcacheloader.hpp"
+#include "util/locallistbasemodel.hpp"
 
 #include "medialibrary/mlhelper.hpp"
 
@@ -109,15 +108,15 @@ bool ListCache<SDItemPtr>::compareItems(const SDItemPtr& a, const SDItemPtr& b)
 // ServicesDiscoveryModelPrivate
 
 class ServicesDiscoveryModelPrivate
-    : public BaseModelPrivateT<SDItemPtr>
-    , public LocalListCacheLoader<SDItemPtr>::ModelSource
+    : public LocalListBaseModelPrivate<SDItemPtr>
 {
+
 public:
     Q_DECLARE_PUBLIC(ServicesDiscoveryModel)
 
 public: //ctor/dtor
     ServicesDiscoveryModelPrivate(ServicesDiscoveryModel* pub)
-        : BaseModelPrivateT<SDItemPtr>(pub)
+        : LocalListBaseModelPrivate<SDItemPtr>(pub)
     {
     }
 
@@ -139,19 +138,6 @@ public:
 public: //BaseModelPrivateT implementation
     bool initializeModel() override;
 
-    bool loading() const override
-    {
-        return m_loading || BaseModelPrivateT<SDItemPtr>::loading();
-    }
-
-    std::unique_ptr<ListCacheLoader<SDItemPtr>> createLoader() const override
-    {
-        return std::make_unique<LocalListCacheLoader<SDItemPtr>>(
-            this, m_searchPattern,
-            getSortFunction()
-            );
-    }
-
     LocalListCacheLoader<SDItemPtr>::ItemCompare getSortFunction() const
     {
         if (m_sortOrder == Qt::SortOrder::DescendingOrder)
@@ -172,12 +158,6 @@ public: //discovery callbacks
     void discoveryEnded();
 
 public: //LocalListCacheLoader implementation
-
-    size_t getModelRevision() const override
-    {
-        return m_revision;
-    }
-
     //return the data matching the pattern
     SDItemList getModelData(const QString& pattern) const override
     {
@@ -195,10 +175,7 @@ public: //LocalListCacheLoader implementation
     }
 
 public: // data
-    bool m_loading = true;
     addons_manager_t* m_manager = nullptr;
-
-    size_t m_revision = 0;
     SDItemList m_items;
 };
 
@@ -345,7 +322,6 @@ bool ServicesDiscoveryModelPrivate::initializeModel()
     m_manager = addons_manager_New( VLC_OBJECT( q->m_ctx->getIntf() ), &owner );
     assert( m_manager );
 
-    m_loading = true;
     emit q->loadingChanged();
     addons_manager_LoadCatalog( m_manager );
     addons_manager_Gather( m_manager, "repo://" );

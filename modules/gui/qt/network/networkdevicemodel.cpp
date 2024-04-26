@@ -28,8 +28,7 @@
 #include "playlist/playlist_controller.hpp"
 
 #include "util/shared_input_item.hpp"
-#include "util/base_model_p.hpp"
-#include "util/locallistcacheloader.hpp"
+#include "util/locallistbasemodel.hpp"
 
 namespace
 {
@@ -158,17 +157,16 @@ bool ListCache<NetworkDeviceItemPtr>::compareItems(const NetworkDeviceItemPtr& a
 // NetworkDeviceModelPrivate
 
 class NetworkDeviceModelPrivate
-    : public BaseModelPrivateT<NetworkDeviceItemPtr>
-    , public LocalListCacheLoader<NetworkDeviceItemPtr>::ModelSource
+    : public LocalListBaseModelPrivate<NetworkDeviceItemPtr>
 {
     Q_DECLARE_PUBLIC(NetworkDeviceModel)
 public:
     NetworkDeviceModelPrivate(NetworkDeviceModel * pub)
-        : BaseModelPrivateT<NetworkDeviceItemPtr>(pub)
+        : LocalListBaseModelPrivate<NetworkDeviceItemPtr>(pub)
         , m_items(0, NetworkDeviceItemHash{}, NetworkDeviceItemEqual{})
     {}
 
-    NetworkDeviceModelLoader::ItemCompare getSortFunction() const
+    NetworkDeviceModelLoader::ItemCompare getSortFunction() const override
     {
         if (m_sortCriteria == "mrl")
         {
@@ -184,13 +182,6 @@ public:
             else
                 return descendingName;
         }
-    }
-
-    std::unique_ptr<ListCacheLoader<NetworkDeviceItemPtr>> createLoader() const override
-    {
-        return std::make_unique<NetworkDeviceModelLoader>(
-            this, m_searchPattern,
-            getSortFunction());
     }
 
     bool initializeModel() override
@@ -240,6 +231,11 @@ public:
                 return false;
             m_listeners.push_back( std::move( l ) );
         }
+
+        //service discovery don't notify preparse end
+        m_loading = false;
+        emit q->loadingChanged();
+
         return m_listeners.empty() == false;
     }
 
@@ -293,7 +289,7 @@ public:
 
         if (dataChanged)
         {
-            m_modelRevision += 1;
+            m_revision += 1;
             invalidateCache();
         }
     }
@@ -336,17 +332,12 @@ public:
         }
         if (dataChanged)
         {
-            m_modelRevision += 1;
+            m_revision += 1;
             invalidateCache();
         }
     }
 
 public: //LocalListCacheLoader::ModelSource
-    size_t getModelRevision() const override
-    {
-        return m_modelRevision;
-    }
-
     std::vector<NetworkDeviceItemPtr> getModelData(const QString& pattern) const override
     {
         std::vector<NetworkDeviceItemPtr> items;
@@ -369,7 +360,6 @@ public: //LocalListCacheLoader::ModelSource
     }
 
 public:
-    size_t m_modelRevision = 0;
     NetworkDeviceItemSet m_items;
     std::vector<std::unique_ptr<MediaTreeListener>> m_listeners;
 };

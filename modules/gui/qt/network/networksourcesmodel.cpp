@@ -20,8 +20,7 @@
 #include "networksourcesmodel.hpp"
 #include "networkmediamodel.hpp"
 
-#include "util/base_model_p.hpp"
-#include "util/locallistcacheloader.hpp"
+#include "util/locallistbasemodel.hpp"
 
 #include "playlist/media.hpp"
 #include "playlist/playlist_controller.hpp"
@@ -73,14 +72,13 @@ using SourceItemLists = std::vector<SourceItemPtr>;
 }
 
 class NetworkSourcesModelPrivate
-    : public BaseModelPrivateT<SourceItemPtr>
-    , public LocalListCacheLoader<SourceItemPtr>::ModelSource
+    : public LocalListBaseModelPrivate<SourceItemPtr>
 {
     Q_DECLARE_PUBLIC(NetworkSourcesModel);
 
 public: //Ctor/Dtor
     NetworkSourcesModelPrivate(NetworkSourcesModel* pub)
-        : BaseModelPrivateT<SourceItemPtr>(pub)
+        : LocalListBaseModelPrivate<SourceItemPtr>(pub)
     {}
 
 public:
@@ -94,7 +92,7 @@ public:
 
 public: // BaseModelPrivate implementation
 
-    LocalListCacheLoader<SourceItemPtr>::ItemCompare getSortFunction() const
+    LocalListCacheLoader<SourceItemPtr>::ItemCompare getSortFunction() const override
     {
         if (m_sortOrder == Qt::DescendingOrder)
             return [](const SourceItemPtr& a, const SourceItemPtr& b) {
@@ -114,12 +112,6 @@ public: // BaseModelPrivate implementation
                     return false;
                 return QString::compare(a->name, b->name, Qt::CaseInsensitive) < 0;
             };
-    }
-
-    std::unique_ptr<ListCacheLoader<SourceItemPtr>> createLoader() const override
-    {
-        return std::make_unique<LocalListCacheLoader<SourceItemPtr>>(
-            this, m_searchPattern, getSortFunction());
     }
 
     bool initializeModel() override
@@ -153,15 +145,14 @@ public: // BaseModelPrivate implementation
             SourceItemPtr item = std::make_shared<SourceItem>(meta);
             m_items.push_back( item );
         }
-
+        //model is never udpdated but this is required to fit the LocalListBaseModelPrivate model
+        ++m_revision;
+        m_loading = false;
+        emit q->loadingChanged();
         return true;
     }
 
 public: // LocalListCacheLoader::ModelSource implementation
-    size_t getModelRevision() const override
-    {
-        return 1;
-    }
 
     std::vector<SourceItemPtr> getModelData(const QString& pattern) const override
     {
