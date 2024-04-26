@@ -131,10 +131,6 @@ struct es_out_callbacks
     void         (*del)(es_out_t *, es_out_id_t *);
     int          (*control)(es_out_t *, input_source_t *in, int query, va_list);
     void         (*destroy)(es_out_t *);
-    /**
-     * Private control callback, must be NULL for es_out created from modules.
-     */
-    int          (*priv_control)(es_out_t *, input_source_t *in, int query, va_list);
 };
 
 struct es_out_t
