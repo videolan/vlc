@@ -51,15 +51,16 @@ namespace adaptive
     };
 }
 
-const struct es_out_callbacks EsOutCallbacks::cbs =
+const struct es_out_callbacks EsOutCallbacks::cbs = []() constexpr
 {
-    EsOutCallbacks::es_out_Add,
-    EsOutCallbacks::es_out_Send,
-    EsOutCallbacks::es_out_Del,
-    EsOutCallbacks::es_out_Control,
-    EsOutCallbacks::es_out_Destroy,
-    nullptr,
-};
+    struct es_out_callbacks cbs {};
+    cbs.add = EsOutCallbacks::es_out_Add;
+    cbs.send = EsOutCallbacks::es_out_Send;
+    cbs.del = EsOutCallbacks::es_out_Del;
+    cbs.control = EsOutCallbacks::es_out_Control;
+    cbs.destroy = EsOutCallbacks::es_out_Destroy;
+    return cbs;
+}();
 
 es_out_id_t * EsOutCallbacks::es_out_Add(es_out_t *fakees, input_source_t *, const es_format_t *p_fmt)
 {
