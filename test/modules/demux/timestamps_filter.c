@@ -73,12 +73,11 @@ static void trash_es_out_Del(es_out_t *out, es_out_id_t *id)
 
 static const struct es_out_callbacks trash_es_out_cbs =
 {
-    trash_es_out_Add,
-    trash_es_out_Send,
-    trash_es_out_Del,
-    trash_es_out_Control,
-    trash_es_out_Delete,
-    NULL,
+    .add = trash_es_out_Add,
+    .send = trash_es_out_Send,
+    .del = trash_es_out_Del,
+    .control = trash_es_out_Control,
+    .destroy = trash_es_out_Delete,
 };
 
 #define TIMELINE_0 (CLOCK_FREQ)
