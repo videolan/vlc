@@ -105,9 +105,8 @@ private:
 
     uint m_textureId = 0;
     qreal m_dpr = 0;
-    QOffscreenSurface *m_offscreenSurface = nullptr;
 
-    bool initialized=  false;
+    bool initialized = false;
 
     unsigned int m_fboId = 0;
 };
