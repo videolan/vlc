@@ -83,6 +83,8 @@ ListView {
 
     boundsBehavior: Flickable.StopAtBounds
 
+    reuseItems: true
+
     section.property: ""
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
@@ -90,13 +92,6 @@ ListView {
     Accessible.role: Accessible.List
 
     // Events
-
-    Component.onCompleted: {
-        if (typeof root.reuseItems === "boolean") {
-            // Qt 5.15 feature, on by default here:
-            root.reuseItems = true
-        }
-    }
 
     // NOTE: We always want a valid 'currentIndex' by default.
     onCountChanged: if (count && currentIndex === -1) currentIndex = 0
