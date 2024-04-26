@@ -62,10 +62,14 @@
 #include "../../packetizer/av1_obu.h"
 #include "../../packetizer/av1.h"
 #include "../cc.h"
-#define FRAME_INFO_DEPTH 64
+
+#define OPAQUE_REF_ONLY LIBAVCODEC_VERSION_CHECK( 59, 63, 100 )
 
 struct frame_info_s
 {
+#if OPAQUE_REF_ONLY
+    uint64_t i_sequence_number;
+#endif
     bool b_eos;
     bool b_display;
 };
@@ -91,7 +95,12 @@ typedef struct
     bool b_hardware_only;
     enum AVDiscard i_skip_frame;
 
+#if OPAQUE_REF_ONLY
+    uint64_t i_next_sequence_number;
+#else
+# define FRAME_INFO_DEPTH 64
     struct frame_info_s frame_info[FRAME_INFO_DEPTH];
+#endif
 
     enum
     {
@@ -150,33 +159,83 @@ static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
+
 static void FrameInfoInit( decoder_sys_t *p_sys )
 {
+#if OPAQUE_REF_ONLY
+    p_sys->i_next_sequence_number = 0;
+#else
     AVCodecContext *p_context = p_sys->p_context;
     p_context->reordered_opaque = 0;
+#endif
 }
 
 static struct frame_info_s * FrameInfoGet( decoder_sys_t *p_sys, AVFrame *frame )
 {
+#if OPAQUE_REF_ONLY
+    /* There's no pkt to frame opaque mapping guarantee */
+    return (struct frame_info_s *) frame->opaque_ref->data;
+#else
     return &p_sys->frame_info[frame->reordered_opaque % FRAME_INFO_DEPTH];
+#endif
 }
 
 static struct frame_info_s * FrameInfoAdd( decoder_sys_t *p_sys, AVPacket *pkt )
 {
+#if OPAQUE_REF_ONLY
+    AVBufferRef *bufref = av_buffer_allocz(sizeof(struct frame_info_s));
+    if( !bufref )
+        return NULL;
+    pkt->opaque_ref = bufref;
+
+    struct frame_info_s *p_frame_info = (struct frame_info_s *) bufref->data;
+    p_frame_info->i_sequence_number = p_sys->i_next_sequence_number++;
+    return p_frame_info;
+#else
+    VLC_UNUSED(pkt);
     AVCodecContext *p_context = p_sys->p_context;
     return &p_sys->frame_info[p_context->reordered_opaque++ % FRAME_INFO_DEPTH];
+#endif
+}
+
+static bool FrameCanStoreInfo( const AVFrame *frame )
+{
+#if OPAQUE_REF_ONLY
+    return !!frame->opaque_ref;
+#else
+    return true;
+#endif
+}
+
+static void FrameSetPicture( AVFrame *frame, picture_t *pic )
+{
+    frame->opaque = pic;
+}
+
+static picture_t * FrameGetPicture( AVFrame *frame )
+{
+    return frame->opaque;
 }
 
 static int64_t NextPktSequenceNumber( decoder_sys_t *p_sys )
 {
+#if OPAQUE_REF_ONLY
+    return p_sys->i_next_sequence_number;
+#else
     AVCodecContext *p_context = p_sys->p_context;
     return p_context->reordered_opaque;
+#endif
 }
 
 static int64_t FrameSequenceNumber( const AVFrame *frame, const struct frame_info_s *info )
 {
+#if OPAQUE_REF_ONLY
+    VLC_UNUSED(frame);
+    return info->i_sequence_number;
+#else
     VLC_UNUSED(info);
     return frame->reordered_opaque;
+#endif
 }
 
 static void lavc_Frame8PaletteCopy( video_palette_t *dst, const uint8_t *src )
@@ -508,6 +567,10 @@ static int InitVideoDecCommon( decoder_t *p_dec )
 
     /* ***** Output always the frames ***** */
     p_context->flags |= AV_CODEC_FLAG_OUTPUT_CORRUPT;
+
+#if OPAQUE_REF_ONLY
+    p_context->flags |= AV_CODEC_FLAG_COPY_OPAQUE;
+#endif
 
 #if LIBAVCODEC_VERSION_CHECK( 61, 03, 100 )
     if( p_dec->fmt_in->i_codec == VLC_CODEC_VVC )
@@ -1363,14 +1426,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_block->i_dts = VLC_TICK_INVALID;
             }
 
-            struct frame_info_s *p_frame_info = FrameInfoAdd(p_sys, pkt);
+            struct frame_info_s *p_frame_info = FrameInfoAdd( p_sys, pkt );
             if( !p_frame_info )
             {
                 av_packet_free( &pkt );
                 b_error = true;
                 break;
             }
-            p_frame_info->b_eos = p_block && (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+            const bool b_eos = p_block && (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
+            p_frame_info->b_eos = b_eos;
             p_frame_info->b_display = b_need_output_picture;
 
             int ret = avcodec_send_packet(p_context, pkt);
@@ -1388,7 +1452,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_used = ret != AVERROR(EAGAIN) ? pkt->size : 0;
             av_packet_free( &pkt );
 
-            if( p_frame_info->b_eos && !b_drained )
+            if( b_eos && !b_drained )
             {
                  avcodec_send_packet( p_context, NULL );
                  b_drained = true;
@@ -1432,7 +1496,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         struct frame_info_s *p_frame_info = FrameInfoGet( p_sys, frame );
-        if( p_frame_info->b_eos )
+        if( p_frame_info && p_frame_info->b_eos )
             p_sys->b_first_frame = true;
 
         vlc_mutex_lock(&p_sys->lock);
@@ -1460,12 +1524,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         if( b_first_output_sequence )
         {
-            update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
-                                    i_next_pts, FrameSequenceNumber( frame, p_frame_info ) );
+            if( p_frame_info )
+                update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
+                                        i_next_pts, FrameSequenceNumber( frame, p_frame_info ) );
             b_first_output_sequence = false;
         }
 
-        if( !p_frame_info->b_display ||
+        if( (p_frame_info && !p_frame_info->b_display) ||
            ( !p_sys->p_va && !frame->linesize[0] ) ||
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&
              !p_sys->b_show_corrupted ) )
@@ -1506,7 +1571,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
-        picture_t *p_pic = frame->opaque;
+        picture_t *p_pic = FrameGetPicture( frame );
         if( p_pic == NULL )
         {   /* When direct rendering is not used, get_format() and get_buffer()
              * might not be called. The output video format must be set here
@@ -1570,6 +1635,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_pic->i_nb_fields = 2 + frame->repeat_pict;
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
+        p_pic->b_still = p_frame_info && p_frame_info->b_eos;
 
         if (DecodeSidedata(p_dec, frame, p_pic))
             i_pts = VLC_TICK_INVALID;
@@ -1579,8 +1645,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Send decoded frame to vout */
         if (i_pts != VLC_TICK_INVALID)
         {
-            if(p_frame_info->b_eos)
-                p_pic->b_still = true;
             p_sys->b_first_frame = false;
             vlc_mutex_unlock(&p_sys->lock);
             decoder_QueueVideo( p_dec, p_pic );
@@ -1734,6 +1798,9 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     decoder_sys_t *p_sys = dec->p_sys;
     vlc_va_t *va = p_sys->p_va;
 
+    if(!FrameCanStoreInfo(frame))
+        return -1;
+
     picture_t *pic;
     pic = decoder_NewPicture(dec);
     if (pic == NULL)
@@ -1771,7 +1838,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         frame->extended_buf[frame->nb_extended_buf++] = buf;
     }
 
-    frame->opaque = pic;
+    FrameSetPicture( frame, pic );
     return 0;
 }
 
@@ -1839,7 +1906,7 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         picture_Hold(pic);
     }
 
-    frame->opaque = pic;
+    FrameSetPicture( frame, pic );
     /* The loop above held one reference to the picture for each plane. */
     assert(pic->i_planes > 0);
     picture_Release(pic);
@@ -1866,7 +1933,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         frame->linesize[i] = 0;
         frame->buf[i] = NULL;
     }
-    frame->opaque = NULL;
+    FrameSetPicture( frame, NULL );
 
     vlc_mutex_lock(&sys->lock);
     if (sys->p_va == NULL)

@@ -132,6 +132,8 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
 #if LIBAVCODEC_VERSION_CHECK(61, 03, 100)
     av_frame_side_data_free(&vaapi_pic_ctx->avframe->side_data, &vaapi_pic_ctx->avframe->nb_side_data);
 #endif
+    av_buffer_unref(&vaapi_pic_ctx->avframe->opaque_ref);
+    vaapi_pic_ctx->avframe->opaque = NULL;
     vaapi_pic_ctx->cloned = false;
     vlc_vaapi_PicSetContext(pic, &vaapi_pic_ctx->ctx);
 
