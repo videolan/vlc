@@ -185,15 +185,16 @@ void DummyEsOut::callback_destroy(es_out_t *)
 
 }
 
-const struct es_out_callbacks dummycbs =
+static const struct es_out_callbacks dummycbs = []() constexpr
 {
-    .add = DummyEsOut::callback_add,
-    .send = DummyEsOut::callback_send,
-    .del = DummyEsOut::callback_del,
-    .control = DummyEsOut::callback_control,
-    .destroy = DummyEsOut::callback_destroy,
-    .priv_control = nullptr,
-};
+    es_out_callbacks cbs = {};
+    cbs.add = DummyEsOut::callback_add;
+    cbs.send = DummyEsOut::callback_send;
+    cbs.del = DummyEsOut::callback_del;
+    cbs.control = DummyEsOut::callback_control;
+    cbs.destroy = DummyEsOut::callback_destroy;
+    return cbs;
+}();
 
 DummyEsOut::ES::ES(const es_format_t *src)
 {
