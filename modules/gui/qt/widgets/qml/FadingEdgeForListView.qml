@@ -45,7 +45,7 @@ FadingEdge {
                                                 listView.removeDisplaced?.running) ?? false
 
     // FIXME: Delegate with variable size
-    readonly property Item delegateItem: listView.itemAtIndex(0)
+    readonly property Item delegateItem: (listView.count > 0) ? listView.itemAtIndex(0) : null
 
     readonly property Item firstVisibleItem: {
         if (transitionsRunning || !delegateItem)
