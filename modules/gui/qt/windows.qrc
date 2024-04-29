@@ -1,8 +1,5 @@
 <?xml version="1.0"?>
 <RCC>
-    <qresource prefix="/">
-        <file alias="qtquickcontrols2.conf">pixmaps/windows-theme.conf</file>
-    </qresource>
     <qresource prefix="/win7">
         <file alias="pause.svg">pixmaps/win7/pause.svg</file>
         <file alias="prev.svg">pixmaps/win7/prev.svg</file>

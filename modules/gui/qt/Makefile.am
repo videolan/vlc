@@ -870,7 +870,7 @@ libqt_plugin_la_RES = \
 	pixmaps/sd/unknown.svg
 
 if HAVE_WIN32
-libqt_plugin_la_RES += pixmaps/windows-theme.conf \
+libqt_plugin_la_RES += \
 	pixmaps/win7/pause.svg \
 	pixmaps/win7/prev.svg \
 	pixmaps/win7/next.svg \
