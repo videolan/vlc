@@ -137,7 +137,7 @@ StackViewExt {
      * @return {boolean}
      */
     function isDefaulLoadedForPath(path) {
-        console.assert(Array.isArray(path))
+        console.assert(Helpers.isArray(path))
 
         let subPageName
         if (path.length === 0) {

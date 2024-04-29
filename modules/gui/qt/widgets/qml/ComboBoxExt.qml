@@ -23,6 +23,7 @@ import org.videolan.vlc 0.1
 
 import "qrc:///style/"
 import "qrc:///widgets/" as Widgets
+import "qrc:///util/Helpers.js" as Helpers
 
 T.ComboBox {
     id: control
@@ -59,7 +60,7 @@ T.ComboBox {
         padding: VLCStyle.margin_xsmall
         leftPadding: control.leftPadding
         contentItem: Widgets.ListLabel {
-            text: control.textRole ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
+            text: control.textRole ? (Helpers.isArray(control.model) ? modelData[control.textRole] : model[control.textRole]) : modelData
             color: control.color
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter

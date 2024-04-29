@@ -17,6 +17,8 @@
  *****************************************************************************/
 import QtQuick
 
+import "qrc:///util/Helpers.js" as Helpers
+
 /**
  * @brief a pure QML hierarchical Finite State Machine implementation
  *
@@ -136,7 +138,7 @@ FSMState {
         } else if (transitions === null || transitions.toString().startsWith("FSMState")) {
             _changeState(transitions)
             return true
-        } else if (Array.isArray(transitions)) {
+        } else if (Helpers.isArray(transitions)) {
             for (const t of transitions) {
                 //stop at the first accepted transition
                 if (_evaluateTransition(state, event, t, ...args))

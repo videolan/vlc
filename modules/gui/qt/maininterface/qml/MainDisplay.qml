@@ -79,7 +79,7 @@ FocusScope {
         MainCtx.hasGridListMode = Qt.binding(() => item.hasGridListMode !== undefined && item.hasGridListMode)
         MainCtx.search.available = Qt.binding(() => item.isSearchable !== undefined && item.isSearchable)
         MainCtx.sort.model = Qt.binding(function () { return item.sortModel })
-        MainCtx.sort.available = Qt.binding(function () { return Array.isArray(item.sortModel) && item.sortModel.length > 0 })
+        MainCtx.sort.available = Qt.binding(function () { return Helpers.isArray(item.sortModel) && item.sortModel.length > 0 })
 
         if (Player.hasVideoOutput && MainCtx.hasEmbededVideo)
             _showMiniPlayer = true

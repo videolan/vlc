@@ -164,7 +164,7 @@ Item {
     }
 
     function _setInputItems(inputItems) {
-        if (!Array.isArray(inputItems) || inputItems.length === 0) {
+        if (!Helpers.isArray(inputItems) || inputItems.length === 0) {
             console.warn("can't convert items to input items");
             dragItem._inputItems = null
             return
