@@ -721,10 +721,10 @@ bool NetworkMediaModel::addAndPlay(const QModelIndexList& itemIdList)
 }
 
 /* Q_INVOKABLE */
-QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes) const
+QVector<SharedInputItem> NetworkMediaModel::getItemsForIndexes(const QModelIndexList & indexes) const
 {
     Q_D(const NetworkMediaModel);
-    QVariantList items;
+    QVector<SharedInputItem> items;
 
     for (const QModelIndex & modelIndex : indexes)
     {
@@ -736,7 +736,7 @@ QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & index
 
         const NetworkTreeItem & tree = item->tree;
 
-        items.append(QVariant::fromValue(SharedInputItem(tree.media.get(), true)));
+        items.append(SharedInputItem(tree.media.get(), true));
     }
 
     return items;
