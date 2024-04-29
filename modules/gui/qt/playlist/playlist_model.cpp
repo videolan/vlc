@@ -24,7 +24,6 @@
 #include "playlist_model_p.hpp"
 #include <algorithm>
 #include <cassert>
-#include "util/shared_input_item.hpp"
 #include "playlist_controller.hpp"
 
 namespace vlc {
@@ -402,11 +401,11 @@ int PlaylistListModel::getCurrentIndex() const
 }
 
 /* Q_INVOKABLE */
-QVariantList PlaylistListModel::getItemsForIndexes(const QVector<int> & indexes) const
+QVector<SharedInputItem> PlaylistListModel::getItemsForIndexes(const QVector<int> & indexes) const
 {
     Q_D(const PlaylistListModel);
 
-    QVariantList items;
+    QVector<SharedInputItem> items;
 
     for (int index : indexes)
     {
@@ -423,7 +422,7 @@ QVariantList PlaylistListModel::getItemsForIndexes(const QVector<int> & indexes)
         if (media == nullptr)
             continue;
 
-        items.append(QVariant::fromValue(SharedInputItem(media, true)));
+        items.append(SharedInputItem(media, true));
     }
 
     return items;
