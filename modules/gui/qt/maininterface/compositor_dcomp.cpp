@@ -324,6 +324,8 @@ void CompositorDirectComposition::destroyMainInterface()
 
 void CompositorDirectComposition::unloadGUI()
 {
+    m_interfaceWindowHandler.reset();
+    m_quickView.reset();
     commonGUIDestroy();
 }
 
