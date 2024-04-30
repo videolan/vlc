@@ -66,6 +66,8 @@ static void FlushPacketizer( decoder_t *p_dec )
 {
     avparser_ClosePacketizer( VLC_OBJECT( p_dec ) );
     p_dec->p_sys = NULL;
+    es_format_Clean( &p_dec->fmt_out );
+    es_format_Init( &p_dec->fmt_out, p_dec->fmt_in->i_cat, 0 );
     int res = avparser_OpenPacketizer( VLC_OBJECT( p_dec ) );
     if ( res != VLC_SUCCESS )
     {
