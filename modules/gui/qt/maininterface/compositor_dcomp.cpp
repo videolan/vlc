@@ -257,6 +257,14 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                 eventLoop.quit();
         }, Qt::SingleShotConnection);
 
+    connect(quickViewPtr,
+            &QQuickWindow::sceneGraphError,
+            &eventLoop,
+            [&eventLoop, &appropriateGraphicsApi](QQuickWindow::SceneGraphError error, const QString &message) {
+                qWarning() << "CompositorDComp: Scene Graph Error: " << error << ", Message: " << message;
+                appropriateGraphicsApi = false;
+                eventLoop.quit();
+        }, Qt::SingleShotConnection);
 
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP;
 
