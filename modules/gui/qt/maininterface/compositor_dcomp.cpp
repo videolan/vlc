@@ -231,17 +231,9 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
             &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
             this,
             &CompositorDirectComposition::setup,
-            static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
+            Qt::SingleShotConnection);
 
-    connect(quickViewPtr,
-            &QQuickWindow::sceneGraphInvalidated,
-            this,
-            [this]() {
-                m_videoVisual.Reset();
-                delete m_acrylicSurface.data();
-                m_rootVisual.Reset();
-            },
-            Qt::DirectConnection);
+    m_quickView->installEventFilter(this);
 
     bool appropriateGraphicsApi = true;
 
@@ -389,6 +381,30 @@ void CompositorDirectComposition::removeVisual(IDCompositionVisual *visual)
 QQuickItem * CompositorDirectComposition::activeFocusItem() const /* override */
 {
     return m_quickView->activeFocusItem();
+}
+
+bool CompositorDirectComposition::eventFilter(QObject *watched, QEvent *event)
+{
+    switch (event->type())
+    {
+    case QEvent::PlatformSurface:
+        if (watched == m_quickView.get() &&
+            static_cast<QPlatformSurfaceEvent *>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
+        {
+            m_videoVisual.Reset();
+            delete m_acrylicSurface.data();
+            // Just in case root visual deletes its children
+            // when it is deleted: (Qt's UI visual should be
+            // deleted by Qt itself)
+            m_rootVisual->RemoveVisual(m_uiVisual);
+            m_rootVisual.Reset();
+        }
+        break;
+    default:
+        break;
+    }
+
+    return QObject::eventFilter(watched, event);
 }
 
 }

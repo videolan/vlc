@@ -65,6 +65,8 @@ public:
 
     QQuickItem * activeFocusItem() const override;
 
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
     void onSurfaceSizeChanged(const QSizeF& size) override;
