@@ -129,7 +129,7 @@ T.ItemDelegate {
 
                 // based on design, ColorContext can't handle this case
                 if (!delegate.hovered)
-                    return VLCStyle.setColorAlpha(theme.indicator, 0)
+                    return theme.indicator.alpha(0)
 
                 return theme.indicator
             }

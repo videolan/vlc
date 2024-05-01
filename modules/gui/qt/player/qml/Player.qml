@@ -233,8 +233,8 @@ FocusScope {
 
             source: cover
 
-            screenColor: VLCStyle.setColorAlpha(bgtheme.bg.primary, .55)
-            overlayColor: VLCStyle.setColorAlpha(Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary), 0.4)
+            screenColor: bgtheme.bg.primary.alpha(.55)
+            overlayColor: Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary).alpha(0.4)
         }
     }
 
@@ -602,7 +602,7 @@ FocusScope {
 
             height: playlistpopup.height
 
-            color: VLCStyle.setColorAlpha(windowTheme.bg.primary, 0.8)
+            color: windowTheme.bg.primary.alpha(0.8)
 
 
             PL.PlaylistListView {

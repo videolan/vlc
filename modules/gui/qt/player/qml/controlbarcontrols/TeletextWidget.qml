@@ -42,7 +42,7 @@ T.Pane {
     function _teletextButtonColor(item, base)
     {
         if (!item.enabled)
-            return VLCStyle.setColorAlpha(base, 0.2)
+            return base.alpha(0.2)
         else if (item.hovered && !item.down)
             return Qt.lighter(base)
         else

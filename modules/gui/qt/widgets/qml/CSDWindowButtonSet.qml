@@ -31,7 +31,7 @@ Row {
     width: implicitWidth
 
     property color color: theme.fg.primary
-    property color hoverColor: VLCStyle.setColorAlpha(theme.bg.primary, 0.5)
+    property color hoverColor: theme.bg.primary.alpha(0.5)
 
     readonly property bool useWinIcons: ((MainCtx.osName === MainCtx.Windows)&&(MainCtx.osVersion >= 10))
 

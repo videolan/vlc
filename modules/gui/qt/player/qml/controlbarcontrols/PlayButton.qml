@@ -256,7 +256,7 @@ T.Control {
             blurRadius: VLCStyle.dp(9)
             yOffset: VLCStyle.dp(4)
 
-            color: VLCStyle.setColorAlpha(theme.accent, 0.29)
+            color: theme.accent.alpha(0.29)
         }
 
         DropShadowImage {
@@ -265,7 +265,7 @@ T.Control {
             blurRadius: VLCStyle.dp(14)
             yOffset: VLCStyle.dp(1)
 
-            color: VLCStyle.setColorAlpha(theme.accent, 1.0)
+            color: theme.accent.alpha(1.0)
         }
 
         Rectangle {
