@@ -291,8 +291,12 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: viewportWidth
-                height: viewportHeight
+                width: parent.width + viewportHorizontalOffset
+                height: parent.height + viewportVerticalOffset
+
+                rectWidth: sourceSize.width
+                rectHeight: sourceSize.height
+
                 sourceSize: Qt.size(128, 128)
             }
 
@@ -306,8 +310,11 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: viewportWidth
-                height: viewportHeight
+                width: parent.width + viewportHorizontalOffset
+                height: parent.height + viewportVerticalOffset
+
+                rectWidth: sourceSize.width
+                rectHeight: sourceSize.height
 
                 sourceSize: Qt.size(128, 128)
 
