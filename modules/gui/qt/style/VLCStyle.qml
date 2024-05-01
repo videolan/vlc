@@ -313,7 +313,6 @@ QtObject {
 
     //"alias" ColorHelper functions
     readonly property var blendColors: vlc_style.palette.blendColors
-    readonly property var setColorAlpha: vlc_style.palette.setColorAlpha
 
     function dp(size, scale) {
         if (scale === undefined)
