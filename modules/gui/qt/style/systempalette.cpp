@@ -25,14 +25,6 @@
 
 namespace {
 
-QColor blendColors(QColor c1, QColor c2, float blend = 0.5)
-{
-    return QColor::fromRgbF(c2.redF()   + (c1.redF()   - c2.redF())   * blend,
-                  c2.greenF() + (c1.greenF() - c2.greenF()) * blend,
-                  c2.blueF()  + (c1.blueF()  - c2.blueF())  * blend,
-                  c2.alphaF() + (c1.alphaF() - c2.alphaF()) * blend);
-}
-
 QColor setColorAlpha(const QColor& c1, float alpha)
 {
     QColor c(c1);
