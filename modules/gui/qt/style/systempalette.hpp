@@ -145,7 +145,6 @@ public:
 
     //function helper exposed to QML
     Q_INVOKABLE QColor blendColors(const QColor& c1, const QColor& c2, float blend = 0.5);
-    Q_INVOKABLE QColor setColorAlpha(const QColor& c1, float alpha);
 
     void setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
                   ColorContext::ColorName name, ColorContext::ColorState state, QColor color);

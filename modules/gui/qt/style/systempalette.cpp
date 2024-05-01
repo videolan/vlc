@@ -341,10 +341,6 @@ QColor SystemPalette::blendColors(const QColor& c1, const QColor& c2, float blen
 {
     return ::blendColors(c1, c2, blend);
 }
-QColor SystemPalette::setColorAlpha(const QColor& c1, float alpha)
-{
-    return ::setColorAlpha(c1, alpha);
-}
 
 void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
 {
