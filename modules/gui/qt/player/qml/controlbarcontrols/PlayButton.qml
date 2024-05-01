@@ -69,31 +69,12 @@ T.Control {
 
     states: [
         State {
-            name: "focused"
-            when: visualFocus
-
-            PropertyChanges {
-                target: hoverShadow
-                opacity: 0.0
-            }
-
-            PropertyChanges {
-                target: focusShadow
-                opacity: 1.0
-            }
-        },
-        State {
-            name: "hover"
+            name: "hovered"
             when: cursorInside
 
             PropertyChanges {
                 target: hoverShadow
                 opacity: 1.0
-            }
-
-            PropertyChanges {
-                target: focusShadow
-                opacity: 0.0
             }
         }
     ]
@@ -238,7 +219,9 @@ T.Control {
         implicitWidth: height
         implicitHeight: VLCStyle.icon_medium
 
-        component DropShadowImage : Widgets.DropShadowImage {
+        Widgets.DropShadowImage {
+            id: hoverShadow
+
             anchors.centerIn: parent
 
             visible: opacity > 0
@@ -248,24 +231,11 @@ T.Control {
             rectHeight: parent.height
             xRadius: parent.width
             yRadius: xRadius
-        }
-
-        DropShadowImage {
-            id: hoverShadow
 
             blurRadius: VLCStyle.dp(9)
             yOffset: VLCStyle.dp(4)
 
             color: theme.accent.alpha(0.29)
-        }
-
-        DropShadowImage {
-            id: focusShadow
-
-            blurRadius: VLCStyle.dp(14)
-            yOffset: VLCStyle.dp(1)
-
-            color: theme.accent.alpha(1.0)
         }
 
         Rectangle {
