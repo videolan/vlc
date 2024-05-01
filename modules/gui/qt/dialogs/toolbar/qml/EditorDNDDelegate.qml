@@ -17,7 +17,7 @@
  *****************************************************************************/
 
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
 
@@ -27,10 +27,15 @@ import "qrc:///player/"
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-Control {
+T.Control {
     id: control
 
     padding: background.border.width
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
     readonly property int controlId: model.id
     property ListView dndView: null
