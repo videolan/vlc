@@ -113,9 +113,7 @@ ListView {
     }
 
     footer: Item {
-        anchors.verticalCenter: parent.verticalCenter
-
-        implicitHeight: VLCStyle.icon_medium
+        implicitHeight: playerBtnDND.height
 
         Binding on implicitWidth {
             delayed: true
@@ -125,13 +123,13 @@ ListView {
         property alias dropVisible: footerDropArea.containsDrag
 
         Rectangle {
+            anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
 
             z: 2
 
             implicitWidth: VLCStyle.dp(2, VLCStyle.scale)
+            implicitHeight: VLCStyle.icon_medium
 
             visible: dropVisible
             color: theme.accent
