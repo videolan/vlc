@@ -243,6 +243,11 @@ T.ProgressBar {
             target: null
             dragThreshold: 0
 
+            function moveControl() {
+                fsm.moveControl(dragHandler.centroid.position.x / control.width,
+                                dragHandler.centroid.modifiers === Qt.ShiftModifier)
+            }
+
             onActiveChanged: {
                 if (active) {
                     fsm.pressControl(centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
@@ -250,14 +255,10 @@ T.ProgressBar {
                     fsm.releaseControl( centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
                 }
             }
-        }
 
-        Connections {
-            //FIXME Qt6.5 use xAxis.onActiveValueChanged in the DragHandler
-            target: dragHandler
-
-            function onCentroidChanged() {
-                fsm.moveControl(dragHandler.centroid.position.x / control.width, dragHandler.centroid.modifiers === Qt.ShiftModifier)
+            onCentroidChanged: {
+                // FIXME: Qt 6.5 use xAxis.onActiveValueChanged in the DragHandler
+                Qt.callLater(dragHandler.moveControl)
             }
         }
     }
