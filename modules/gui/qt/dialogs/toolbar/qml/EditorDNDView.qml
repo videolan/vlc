@@ -123,6 +123,7 @@ ListView {
         property alias dropVisible: footerDropArea.containsDrag
 
         Rectangle {
+            id: footerDropIndicator
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
 
@@ -138,7 +139,12 @@ ListView {
         DropArea {
             id: footerDropArea
 
-            anchors.fill: parent
+            anchors {
+                left: parent.left
+                right: parent.right
+                top: footerDropIndicator.top
+                bottom: footerDropIndicator.bottom
+            }
 
             onEntered: (drag) => {
                 if (drag.source.dndView === playerBtnDND &&
