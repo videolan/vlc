@@ -238,6 +238,15 @@ T.Control {
             color: theme.accent.alpha(0.29)
         }
 
+        Widgets.AnimatedBackground {
+            anchors.fill: parent
+            anchors.margins: -border.width
+
+            enabled: theme.initialized
+
+            border.color: root.visualFocus ? theme.visualFocus : "transparent"
+        }
+
         Rectangle {
             anchors.fill: parent
 
