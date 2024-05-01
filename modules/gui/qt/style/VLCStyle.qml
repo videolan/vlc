@@ -311,9 +311,6 @@ QtObject {
     readonly property int controlLayoutHeight: MainCtx.dp(64, scale)
     readonly property int controlLayoutHeightPinned: MainCtx.dp(32, scale)
 
-    //"alias" ColorHelper functions
-    readonly property var blendColors: vlc_style.palette.blendColors
-
     function dp(size, scale) {
         if (scale === undefined)
             return MainCtx.dp(size, MainCtx.intfScaleFactor)
