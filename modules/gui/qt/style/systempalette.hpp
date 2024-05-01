@@ -143,9 +143,6 @@ public:
     inline MainCtx* getCtx() const { return m_ctx; }
     bool hasCSDImage() const;
 
-    //function helper exposed to QML
-    Q_INVOKABLE QColor blendColors(const QColor& c1, const QColor& c2, float blend = 0.5);
-
     void setColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,
                   ColorContext::ColorName name, ColorContext::ColorState state, QColor color);
     QColor getColor(ColorContext::ColorSet colorSet,  ColorContext::ColorSection section,

@@ -337,11 +337,6 @@ bool SystemPalette::hasCSDImage() const
     return m_palettePriv->hasCSDImages();
 }
 
-QColor SystemPalette::blendColors(const QColor& c1, const QColor& c2, float blend)
-{
-    return ::blendColors(c1, c2, blend);
-}
-
 void SystemPalette::setSource(ColorSchemeModel::ColorScheme source)
 {
     if (m_source == source)
