@@ -1772,7 +1772,7 @@ static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
     picture_Release(picture);
 }
 
-static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
+static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *p_sys = dec->p_sys;
@@ -1794,7 +1794,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         return -1;
     }
 
-    AVBufferRef *buf = av_buffer_create(NULL, 0, lavc_ReleaseFrame, pic, 0);
+    AVBufferRef *buf = av_buffer_create(NULL, 0, lavc_ReleaseFrame, pic, flags);
     if (unlikely(buf == NULL))
     {
         lavc_ReleaseFrame(pic, NULL);
@@ -1822,7 +1822,7 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     return 0;
 }
 
-static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
+static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
@@ -1876,7 +1876,7 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
         frame->data[i] = data;
         frame->linesize[i] = pic->p[i].i_pitch;
         frame->buf[i] = av_buffer_create(data, size, lavc_ReleaseFrame,
-                                         pic, 0);
+                                         pic, flags);
         if (unlikely(frame->buf[i] == NULL))
         {
             while (i > 0)
@@ -1937,14 +1937,14 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 
     if (sys->p_va != NULL)
     {
-        int ret = lavc_va_GetFrame(ctx, frame);
+        int ret = lavc_va_GetFrame(ctx, frame, flags);
         vlc_mutex_unlock(&sys->lock);
         return ret;
     }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
-    int ret = lavc_dr_GetFrame(ctx, frame);
+    int ret = lavc_dr_GetFrame(ctx, frame, flags);
     vlc_mutex_unlock(&sys->lock);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
