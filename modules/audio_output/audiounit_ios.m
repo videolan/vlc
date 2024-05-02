@@ -217,7 +217,7 @@ GetLatency(audio_output_t *p_aout)
 
     if (routeChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable
      || routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
-        aout_RestartRequest(p_aout, true);
+        aout_RestartRequest(p_aout, false);
     else
         ca_ResetDeviceLatency(p_aout);
 }
@@ -252,7 +252,7 @@ GetLatency(audio_output_t *p_aout)
         msg_Dbg(p_aout, "Spatial Audio availability changed: %i", spatialAudioEnabled);
 
         if (spatialAudioEnabled) {
-            aout_RestartRequest(p_aout, true);
+            aout_RestartRequest(p_aout, false);
         }
     }
 }
