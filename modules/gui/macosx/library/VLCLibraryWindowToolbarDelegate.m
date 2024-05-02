@@ -132,9 +132,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 {
     NSView * const playlistView =
         self.libraryWindow.splitViewController.playlistSidebarViewController.view;
+    NSSplitView * const sv = self.libraryWindow.mainSplitView;
     self.libraryWindow.playQueueToggle.state =
-        [self.libraryWindow.mainSplitView isSubviewCollapsed:playlistView] ?
-            NSControlStateValueOff : NSControlStateValueOn;
+        ![sv.arrangedSubviews containsObject:playlistView] || [sv isSubviewCollapsed:playlistView] ?
+                NSControlStateValueOff : NSControlStateValueOn;
 }
 
 #pragma mark - convenience method for configuration of toolbar items layout
