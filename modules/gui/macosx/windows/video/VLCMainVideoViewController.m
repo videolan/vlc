@@ -152,12 +152,8 @@
     [self.controlsBar update];
 }
 
-- (void)playerCurrentMediaItemChanged:(NSNotification *)notification
+- (void)updateDecorativeViewVisibilityOnControllerChange:(VLCPlayerController *)controller
 {
-    NSParameterAssert(notification);
-    VLCPlayerController * const controller = notification.object;
-    NSAssert(controller != nil, @"Player current media item changed notification should carry a valid player controller");
-
     VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
 
     BOOL decorativeViewVisible = NO;
@@ -174,6 +170,15 @@
     } else {
         [self setAutohideControls:YES];
     }
+}
+
+- (void)playerCurrentMediaItemChanged:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCPlayerController * const controller = notification.object;
+    NSAssert(controller != nil, 
+             @"Player current media item changed notification should have valid player controller");
+    [self updateDecorativeViewVisibilityOnControllerChange:controller];
 }
 
 - (BOOL)mouseOnControls
