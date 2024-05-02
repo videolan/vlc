@@ -343,7 +343,7 @@ static void stream_event_cb(pa_stream *s, const char *name, pa_proplist *pl,
     /* FIXME: expose aout_Restart() directly */
     if (!strcmp(name, PA_STREAM_EVENT_FORMAT_LOST)) {
         msg_Dbg (aout, "format lost");
-        aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest (aout, true);
     } else
         msg_Warn (aout, "unhandled stream event \"%s\"", name);
     (void) s;

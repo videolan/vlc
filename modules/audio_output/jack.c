@@ -449,7 +449,7 @@ static int Buffer_ch( jack_nframes_t nframes, void *p_arg )
         jack_deactivate( p_sys->p_jack_client );
         p_sys->read_buffer = orig_buffer;
         status = ENOMEM;
-        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(p_aout, true);
     }
     return status;
 }

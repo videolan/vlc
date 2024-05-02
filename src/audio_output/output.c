@@ -165,11 +165,14 @@ out:
     vlc_mutex_unlock (&owner->dev.lock);
 }
 
-static void aout_RestartNotify (audio_output_t *aout, unsigned mode)
+static void aout_RestartNotify (audio_output_t *aout, bool restart_dec)
 {
     aout_owner_t *owner = aout_owner (aout);
     if (owner->main_stream)
+    {
+        unsigned mode = restart_dec ? AOUT_RESTART_OUTPUT : AOUT_RESTART_STEREOMODE;
         vlc_aout_stream_RequestRestart(owner->main_stream, mode);
+    }
 }
 
 void aout_InputRequestRestart(audio_output_t *aout)

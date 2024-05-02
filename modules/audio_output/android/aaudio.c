@@ -486,7 +486,7 @@ ErrorCallback(AAudioStream *as, void *user, aaudio_result_t error)
     (void) as;
 
     LogAAudioError(stream, "AAudio stream error or disconnected:", error);
-    aout_stream_RestartRequest(stream, AOUT_RESTART_OUTPUT);
+    aout_stream_RestartRequest(stream, true);
 }
 
 static void
@@ -732,7 +732,7 @@ Flush(aout_stream_t *stream)
     {
         msg_Err(stream, "rate changed after flush, from %u to %d",
                 sys->fmt.i_rate, new_rate);
-        aout_stream_RestartRequest(stream, AOUT_RESTART_OUTPUT);
+        aout_stream_RestartRequest(stream, true);
     }
 }
 

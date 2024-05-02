@@ -363,7 +363,7 @@ static void * InjectionThread(void * data)
     if (sys->started && !sys->unrecoverable_error)
     {
         msg_Err(aout, "Unhandled error in injection thread, requesting aout restart");
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(aout, true);
     }
     vlc_mutex_unlock(&sys->lock);
     return NULL;
@@ -1080,7 +1080,7 @@ static int DeviceSelect (audio_output_t *aout, const char *id)
     free (sys->device);
     sys->device = device;
     aout_DeviceReport (aout, device);
-    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest (aout, true);
     return 0;
 }
 

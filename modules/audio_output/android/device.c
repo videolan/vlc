@@ -236,7 +236,7 @@ static int DeviceSelect(audio_output_t *aout, const char *id)
     {
         sys->adev = adev;
         sys->encoding_flags = encoding_flags;
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(aout, true);
         msg_Dbg(aout, "selected device: %s", id);
 
         if (adev == ANDROID_AUDIO_DEVICE_ENCODED)

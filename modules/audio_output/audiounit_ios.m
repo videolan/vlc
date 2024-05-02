@@ -217,7 +217,7 @@ GetLatency(audio_output_t *p_aout)
 
     if (routeChangeReason == AVAudioSessionRouteChangeReasonNewDeviceAvailable
      || routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable)
-        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(p_aout, true);
     else
         ca_ResetDeviceLatency(p_aout);
 }
@@ -252,7 +252,7 @@ GetLatency(audio_output_t *p_aout)
         msg_Dbg(p_aout, "Spatial Audio availability changed: %i", spatialAudioEnabled);
 
         if (spatialAudioEnabled) {
-            aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+            aout_RestartRequest(p_aout, true);
         }
     }
 }
@@ -686,7 +686,7 @@ static int DeviceSelect(audio_output_t *p_aout, const char *psz_id)
     if (au_dev != p_sys->au_dev)
     {
         p_sys->au_dev = au_dev;
-        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(p_aout, true);
         msg_Dbg(p_aout, "selected audiounit device: %s", psz_id);
     }
     aout_DeviceReport(p_aout, psz_id);

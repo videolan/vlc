@@ -133,7 +133,7 @@ struct vlc_audio_output_events {
     void (*policy_report)(audio_output_t *, bool);
     void (*device_report)(audio_output_t *, const char *);
     void (*hotplug_report)(audio_output_t *, const char *, const char *);
-    void (*restart_request)(audio_output_t *, unsigned);
+    void (*restart_request)(audio_output_t *, bool);
     int (*gain_request)(audio_output_t *, float);
 };
 
@@ -393,9 +393,9 @@ static inline int aout_GainRequest(audio_output_t *aout, float gain)
     return aout->events->gain_request(aout, gain);
 }
 
-static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
+static inline void aout_RestartRequest(audio_output_t *aout, bool restart_dec)
 {
-    aout->events->restart_request(aout, mode);
+    aout->events->restart_request(aout, restart_dec);
 }
 
 #define AOUT_RESTART_FILTERS        0x1

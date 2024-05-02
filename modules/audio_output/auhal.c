@@ -610,7 +610,7 @@ DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses,
         return -1;
 
     msg_Warn(p_aout, "audio device died, resetting aout");
-    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest(p_aout, true);
 
     return noErr;
 }
@@ -659,7 +659,7 @@ DefaultDeviceChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
     if (defaultDeviceID != p_sys->i_selected_dev)
     {
         msg_Dbg(p_aout, "default device actually changed, resetting aout");
-        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(p_aout, true);
     }
     vlc_mutex_unlock(&p_sys->selected_device_lock);
 
@@ -717,7 +717,7 @@ StreamsChangedListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
         if (p_streams[i] == inObjectID)
         {
             msg_Dbg(p_aout, "Restart aout as this affects current device");
-            aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+            aout_RestartRequest(p_aout, true);
             break;
         }
     }
@@ -753,7 +753,7 @@ DevicesListener(AudioObjectID inObjectID, UInt32 inNumberAddresses,
                        &p_sys->i_selected_dev);
     CFRange range = CFRangeMake(0, CFArrayGetCount(p_sys->device_list));
     if (!CFArrayContainsValue(p_sys->device_list, range, selectedDevice))
-        aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(p_aout, true);
     CFRelease(selectedDevice);
     vlc_mutex_unlock(&p_sys->device_list_lock);
     vlc_mutex_unlock(&p_sys->selected_device_lock);
@@ -891,7 +891,7 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
     p_sys->i_new_selected_dev = (name) ? atoi(name) : 0;
 
     aout_DeviceReport(p_aout, name);
-    aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest(p_aout, true);
 
     return 0;
 }

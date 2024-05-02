@@ -583,7 +583,7 @@ vlc_MMNotificationClient_OnDefaultDeviceChange(IMMNotificationClient *this,
     {
         msg_Dbg(aout, "default device changed: %ls", wid);
         sys->request_device_restart = true;
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(aout, true);
     }
     vlc_mutex_unlock(&sys->lock);
 
@@ -738,7 +738,7 @@ static int DeviceRequestLocked(audio_output_t *aout)
 
     if (sys->stream != NULL && sys->dev != NULL)
         /* Request restart of stream with the new device */
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(aout, true);
     return (sys->dev != NULL) ? 0 : -1;
 }
 

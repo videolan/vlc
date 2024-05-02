@@ -380,7 +380,7 @@ static int DeviceSelect (audio_output_t *aout, const char *id)
     free (sys->device);
     sys->device = path;
     aout_DeviceReport (aout, path);
-    aout_RestartRequest (aout, AOUT_RESTART_OUTPUT);
+    aout_RestartRequest (aout, true);
     return 0;
 }
 

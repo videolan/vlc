@@ -56,9 +56,9 @@ aout_stream_GainRequest(aout_stream_t *s, float gain)
 }
 
 static inline void
-aout_stream_RestartRequest(aout_stream_t *s, unsigned mode)
+aout_stream_RestartRequest(aout_stream_t *s, bool restart_dec)
 {
-    aout_RestartRequest(s->aout, mode);
+    aout_RestartRequest(s->aout, restart_dec);
 }
 
 static inline

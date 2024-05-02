@@ -217,7 +217,7 @@ static int DeviceRequestLocked(audio_output_t *aout)
 
     if (sys->stream != NULL && sys->client != NULL)
         /* Request restart of stream with the new device */
-        aout_RestartRequest(aout, AOUT_RESTART_OUTPUT);
+        aout_RestartRequest(aout, true);
     return (sys->client != NULL) ? 0 : -1;
 }
 
