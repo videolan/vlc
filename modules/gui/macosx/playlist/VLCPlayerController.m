@@ -1390,7 +1390,7 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (void)trackListChanged
 {
-    [_defaultNotificationCenter postNotificationName:VLCPlayerTrackListChanged object:nil];
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTrackListChanged object:self];
 }
 
 - (void)selectTrack:(VLCTrackMetaData *)track exclusively:(BOOL)exclusiveSelection
