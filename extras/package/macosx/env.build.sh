@@ -20,6 +20,8 @@ get_buildsystem_arch() {
     fi
 }
 
+ACTUAL_HOST_ARCH="$(get_actual_arch "${HOST_ARCH}")"
+
 vlcGetOSXKernelVersion() {
     local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)
     if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
