@@ -57,22 +57,22 @@ static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
 }
 
 CFIndex getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
-    CFIndex index = -1;
+    CFIndex index = kCFNotFound;
     CFURLRef url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)psz_filePath, strlen(psz_filePath), false);
     if (url == NULL) {
-        return -1;
+        return kCFNotFound;
     }
     CFArrayRef fontDescriptors = CTFontManagerCreateFontDescriptorsFromURL(url);
     if (fontDescriptors == NULL) {
         CFRelease(url);
-        return -1;
+        return kCFNotFound;
     }
     CFIndex numberOfFontDescriptors = CFArrayGetCount(fontDescriptors);
     CFStringRef targetFontName = CFStringCreateWithCString(kCFAllocatorDefault, psz_family, kCFStringEncodingUTF8);
     if (targetFontName == NULL) {
         CFRelease(fontDescriptors);
         CFRelease(url);
-        return -1;
+        return kCFNotFound;
     }
 
     for (CFIndex i = 0; i < numberOfFontDescriptors; i++) {
@@ -91,7 +91,7 @@ CFIndex getFontIndexInFontFile(const char* psz_filePath, const char* psz_family)
         CFRelease(fontName);
         CFRelease(displayName);
 
-        if (index != -1) {
+        if (index != kCFNotFound) {
             break;
         }
     }
@@ -288,7 +288,7 @@ int CoreText_GetFamily(vlc_font_select_t *fs, const char *psz_lcname,
 
         /* get the index of the font family in the font file */
         CFIndex fontIndex = getFontIndexInFontFile(path, psz_lcname);
-        if (fontIndex < 0) {
+        if (fontIndex == kCFNotFound) {
             FREENULL(path);
             continue;
         }
@@ -382,7 +382,7 @@ int CoreText_GetFallbacks(vlc_font_select_t *fs, const char *psz_lcname,
 
     /* get the index of the font family in the font file */
     CFIndex fontIndex = getFontIndexInFontFile(psz_fontPath, psz_fallbackFamilyName);
-    if (fontIndex < 0) {
+    if (fontIndex == kCFNotFound) {
         goto done;
     }
 
