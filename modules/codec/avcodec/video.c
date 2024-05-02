@@ -1724,7 +1724,18 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
     if (frame->buf[0] == NULL)
         frame->buf[0] = buf;
     else
-        frame->opaque_ref = buf;
+    {
+        AVBufferRef **extended_buf = av_realloc_array(frame->extended_buf,
+                                                      sizeof(*extended_buf),
+                                                      frame->nb_extended_buf + 1);
+        if(!extended_buf)
+        {
+            av_buffer_unref(&buf);
+            return -1;
+        }
+        frame->extended_buf = extended_buf;
+        frame->extended_buf[frame->nb_extended_buf++] = buf;
+    }
 
     frame->opaque = pic;
     return 0;
