@@ -34,6 +34,10 @@
 /* Max input rate factor (1/4 -> 4) */
 # define AOUT_MAX_INPUT_RATE (4)
 
+#define AOUT_RESTART_FILTERS        0x1
+#define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
+#define AOUT_RESTART_STEREOMODE     (AOUT_RESTART_OUTPUT|0x4)
+
 enum {
     AOUT_RESAMPLING_NONE=0,
     AOUT_RESAMPLING_UP,

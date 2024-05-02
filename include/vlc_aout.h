@@ -398,10 +398,6 @@ static inline void aout_RestartRequest(audio_output_t *aout, bool restart_dec)
     aout->events->restart_request(aout, restart_dec);
 }
 
-#define AOUT_RESTART_FILTERS        0x1
-#define AOUT_RESTART_OUTPUT         (AOUT_RESTART_FILTERS|0x2)
-#define AOUT_RESTART_STEREOMODE     (AOUT_RESTART_OUTPUT|0x4)
-
 /** @} */
 
 /**
