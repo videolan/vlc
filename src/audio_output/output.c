@@ -170,7 +170,7 @@ static void aout_RestartNotify (audio_output_t *aout, bool restart_dec)
     aout_owner_t *owner = aout_owner (aout);
     if (owner->main_stream)
     {
-        unsigned mode = restart_dec ? AOUT_RESTART_OUTPUT : AOUT_RESTART_STEREOMODE;
+        unsigned mode = restart_dec ? AOUT_RESTART_OUTPUT_DEC : AOUT_RESTART_OUTPUT;
         vlc_aout_stream_RequestRestart(owner->main_stream, mode);
     }
 }
@@ -226,7 +226,7 @@ static int StereoModeCallback (vlc_object_t *obj, const char *varname,
     vlc_mutex_unlock (&owner->lock);
 
     if (owner->main_stream)
-        vlc_aout_stream_RequestRestart(owner->main_stream, AOUT_RESTART_STEREOMODE);
+        vlc_aout_stream_RequestRestart(owner->main_stream, AOUT_RESTART_OUTPUT);
     return 0;
 }
 
@@ -242,7 +242,7 @@ static int MixModeCallback (vlc_object_t *obj, const char *varname,
     vlc_mutex_unlock (&owner->lock);
 
     if (owner->main_stream)
-        vlc_aout_stream_RequestRestart(owner->main_stream, AOUT_RESTART_STEREOMODE);
+        vlc_aout_stream_RequestRestart(owner->main_stream, AOUT_RESTART_OUTPUT);
     return 0;
 }
 

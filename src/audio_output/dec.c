@@ -351,7 +351,7 @@ static int stream_CheckReady (vlc_aout_stream *stream)
 
     int restart = atomic_exchange_explicit(&stream->restart, 0,
                                            memory_order_acquire);
-    if (unlikely(restart))
+    if (unlikely(restart != 0))
     {
         if (stream->filters)
         {
@@ -382,7 +382,7 @@ static int stream_CheckReady (vlc_aout_stream *stream)
              * suitable codec (like an HDMI audio format). However, keep the
              * same codec if the aout was restarted because of a stereo-mode
              * change from the user. */
-            if (restart == AOUT_RESTART_OUTPUT)
+            if ((restart & AOUT_RESTART_OUTPUT_DEC) == AOUT_RESTART_OUTPUT_DEC)
                 status = AOUT_DEC_CHANGED;
         }
         else if (tracer != NULL)
