@@ -610,7 +610,7 @@ DeviceAliveListener(AudioObjectID inObjectID,  UInt32 inNumberAddresses,
         return -1;
 
     msg_Warn(p_aout, "audio device died, resetting aout");
-    aout_RestartRequest(p_aout, true);
+    aout_RestartRequest(p_aout, false);
 
     return noErr;
 }
