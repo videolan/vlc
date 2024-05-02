@@ -135,7 +135,7 @@ vlc_module_begin()
     cannot_unload_broken_library()
 
     set_section(N_("Appearance"), 0)
-        add_bool("macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT)
+        add_bool("macosx-nativefullscreenmode", true, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT)
         add_bool("macosx-statusicon", true, DISPLAY_STATUS_ICONMENU_TEXT, DISPLAY_STATUS_ICONMENU_LONGTEXT)
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT)
         add_integer_with_range("macosx-max-volume", 125, 60, 200, VOLUME_MAX_TEXT, NULL)
