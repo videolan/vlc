@@ -363,7 +363,7 @@ static void * InjectionThread(void * data)
     if (sys->started && !sys->unrecoverable_error)
     {
         msg_Err(aout, "Unhandled error in injection thread, requesting aout restart");
-        aout_RestartRequest(aout, true);
+        aout_RestartRequest(aout, false);
     }
     vlc_mutex_unlock(&sys->lock);
     return NULL;
