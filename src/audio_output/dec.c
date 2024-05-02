@@ -384,6 +384,8 @@ static int stream_CheckReady (vlc_aout_stream *stream)
              * change from the user. */
             if ((restart & AOUT_RESTART_OUTPUT_DEC) == AOUT_RESTART_OUTPUT_DEC)
                 status = AOUT_DEC_CHANGED;
+
+            stream_Reset(stream);
         }
         else if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "filters_restart");
