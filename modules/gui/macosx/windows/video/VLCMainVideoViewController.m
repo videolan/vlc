@@ -69,6 +69,10 @@
                                selector:@selector(playerCurrentMediaItemChanged:)
                                    name:VLCPlayerCurrentMediaItemChanged
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(playerCurrentItemTrackListChanged:)
+                                   name:VLCPlayerTrackListChanged
+                                 object:nil];
     }
     return self;
 }
@@ -178,6 +182,15 @@
     VLCPlayerController * const controller = notification.object;
     NSAssert(controller != nil, 
              @"Player current media item changed notification should have valid player controller");
+    [self updateDecorativeViewVisibilityOnControllerChange:controller];
+}
+
+- (void)playerCurrentItemTrackListChanged:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCPlayerController * const controller = notification.object;
+    NSAssert(controller != nil, 
+             @"Player current item track list changed notification should have valid player controller");
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
 }
 
