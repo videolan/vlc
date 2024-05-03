@@ -73,6 +73,10 @@
                                selector:@selector(playerCurrentItemTrackListChanged:)
                                    name:VLCPlayerTrackListChanged
                                  object:nil];
+        [notificationCenter addObserver:self
+                                   selector:@selector(playerBufferChanged:)
+                                   name:VLCPlayerBufferChanged
+                                 object:nil];
     }
     return self;
 }
@@ -192,6 +196,18 @@
     NSAssert(controller != nil, 
              @"Player current item track list changed notification should have valid player controller");
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
+}
+
+- (void)playerBufferChanged:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    NSParameterAssert(notification.userInfo != nil);
+
+    NSNumber * const bufferFillNumber = notification.userInfo[VLCPlayerBufferFill];
+    NSAssert(bufferFillNumber != nil, @"Buffer fill number should not be nil");
+
+    const float bufferFill = bufferFillNumber.floatValue;
+    self.loadingIndicator.hidden = bufferFill == 1.0;
 }
 
 - (BOOL)mouseOnControls
