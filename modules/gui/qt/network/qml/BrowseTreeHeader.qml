@@ -28,7 +28,7 @@ import "qrc:///util/Helpers.js" as Helpers
 import "qrc:///widgets/" as Widgets
 import "qrc:///style/"
 
-T.Control {
+T.Pane {
     id: root
 
     // Network* model
@@ -47,7 +47,6 @@ T.Control {
     bottomPadding: VLCStyle.layoutTitle_bottom_padding
 
     focus: medialibraryBtn.visible
-
     Navigation.navigable: medialibraryBtn.visible
 
     RowLayout {
