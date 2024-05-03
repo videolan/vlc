@@ -208,6 +208,11 @@
 
     const float bufferFill = bufferFillNumber.floatValue;
     self.loadingIndicator.hidden = bufferFill == 1.0;
+    if (self.loadingIndicator.hidden) {
+        [self.loadingIndicator stopAnimation:self];
+    } else {
+        [self.loadingIndicator startAnimation:self];
+    }
 }
 
 - (BOOL)mouseOnControls
