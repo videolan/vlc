@@ -14,6 +14,7 @@
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
                 <outlet property="fakeTitleBarHeightConstraint" destination="wY4-If-nIp" id="wPt-X4-mgu"/>
+                <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
                 <outlet property="overlayView" destination="FGS-tq-54S" id="RSC-7m-N0y"/>
                 <outlet property="playlistButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
@@ -69,6 +70,11 @@
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="FGS-tq-54S" customClass="VLCMainVideoViewOverlayView">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                                <subviews>
+                                    <progressIndicator maxValue="100" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="xOQ-YR-iAc">
+                                        <rect key="frame" x="328" y="232" width="64" height="16"/>
+                                    </progressIndicator>
+                                </subviews>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="132"/>
@@ -409,13 +415,18 @@
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="0l2-eC-67c"/>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="20" id="BkP-RA-uxn"/>
                             <constraint firstItem="FGS-tq-54S" firstAttribute="top" secondItem="jnw-gL-nrF" secondAttribute="bottom" id="Doc-Mq-oOI"/>
+                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="leading" secondItem="PCC-8a-sVF" secondAttribute="leading" id="G78-CB-Iv7"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
+                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="centerX" secondItem="PCC-8a-sVF" secondAttribute="centerX" id="P4y-Fp-ihz"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
                             <constraint firstAttribute="trailing" secondItem="jnw-gL-nrF" secondAttribute="trailing" id="SDl-7h-q9o"/>
                             <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="VyM-t4-y6F"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="1tI-8K-e3c" secondAttribute="centerX" id="YMh-Zl-NSA"/>
+                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="trailing" secondItem="PCC-8a-sVF" secondAttribute="trailing" id="YYE-P1-KM8"/>
                             <constraint firstItem="jnw-gL-nrF" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Z37-TJ-B2D"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
+                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="height" secondItem="PCC-8a-sVF" secondAttribute="height" multiplier="0.25" id="exy-Lo-f6o"/>
+                            <constraint firstItem="PCC-8a-sVF" firstAttribute="centerY" secondItem="xOQ-YR-iAc" secondAttribute="centerY" id="gIq-Vl-JX1"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
                             <constraint firstAttribute="bottom" secondItem="FGS-tq-54S" secondAttribute="bottom" id="ps4-nL-1Xc"/>
                             <constraint firstItem="FGS-tq-54S" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="qfd-OD-CHv"/>
