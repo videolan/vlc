@@ -70,11 +70,6 @@
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="FGS-tq-54S" customClass="VLCMainVideoViewOverlayView">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
-                                <subviews>
-                                    <progressIndicator maxValue="100" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="xOQ-YR-iAc">
-                                        <rect key="frame" x="328" y="232" width="64" height="16"/>
-                                    </progressIndicator>
-                                </subviews>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="132"/>
@@ -415,18 +410,13 @@
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="0l2-eC-67c"/>
                             <constraint firstItem="UoQ-34-Pox" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" constant="20" id="BkP-RA-uxn"/>
                             <constraint firstItem="FGS-tq-54S" firstAttribute="top" secondItem="jnw-gL-nrF" secondAttribute="bottom" id="Doc-Mq-oOI"/>
-                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="leading" secondItem="PCC-8a-sVF" secondAttribute="leading" id="G78-CB-Iv7"/>
                             <constraint firstAttribute="bottom" secondItem="1GA-GG-Sdx" secondAttribute="bottom" id="KQN-vk-oha"/>
-                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="centerX" secondItem="PCC-8a-sVF" secondAttribute="centerX" id="P4y-Fp-ihz"/>
                             <constraint firstItem="1GA-GG-Sdx" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Qn0-ts-S0d"/>
                             <constraint firstAttribute="trailing" secondItem="jnw-gL-nrF" secondAttribute="trailing" id="SDl-7h-q9o"/>
                             <constraint firstItem="Drq-if-dw4" firstAttribute="top" secondItem="1tI-8K-e3c" secondAttribute="top" constant="20" id="VyM-t4-y6F"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerX" secondItem="1tI-8K-e3c" secondAttribute="centerX" id="YMh-Zl-NSA"/>
-                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="trailing" secondItem="PCC-8a-sVF" secondAttribute="trailing" id="YYE-P1-KM8"/>
                             <constraint firstItem="jnw-gL-nrF" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Z37-TJ-B2D"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
-                            <constraint firstItem="xOQ-YR-iAc" firstAttribute="height" secondItem="PCC-8a-sVF" secondAttribute="height" multiplier="0.25" id="exy-Lo-f6o"/>
-                            <constraint firstItem="PCC-8a-sVF" firstAttribute="centerY" secondItem="xOQ-YR-iAc" secondAttribute="centerY" id="gIq-Vl-JX1"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
                             <constraint firstAttribute="bottom" secondItem="FGS-tq-54S" secondAttribute="bottom" id="ps4-nL-1Xc"/>
                             <constraint firstItem="FGS-tq-54S" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="qfd-OD-CHv"/>
@@ -437,13 +427,19 @@
                     </view>
                     <color key="fillColor" red="0.0" green="0.0" blue="0.0" alpha="0.35060533940397354" colorSpace="custom" customColorSpace="sRGB"/>
                 </box>
+                <progressIndicator maxValue="100" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="xOQ-YR-iAc">
+                    <rect key="frame" x="344" y="156" width="32" height="32"/>
+                </progressIndicator>
             </subviews>
             <constraints>
                 <constraint firstItem="D4V-Zd-qvB" firstAttribute="bottom" secondItem="mAS-4a-RS8" secondAttribute="bottom" id="AaN-hq-IgD"/>
                 <constraint firstItem="mAS-4a-RS8" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="F3X-8V-3Hg"/>
                 <constraint firstAttribute="bottom" secondItem="mAS-4a-RS8" secondAttribute="bottom" id="RPX-tv-ZTb"/>
                 <constraint firstItem="D4V-Zd-qvB" firstAttribute="top" secondItem="mAS-4a-RS8" secondAttribute="top" id="RUD-Fr-n5w"/>
+                <constraint firstItem="xOQ-YR-iAc" firstAttribute="top" secondItem="CvV-yX-Nbh" secondAttribute="bottom" constant="20" id="S0Y-3b-Ibd"/>
                 <constraint firstItem="mAS-4a-RS8" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="Ygq-Dt-Lbg"/>
+                <constraint firstItem="xOQ-YR-iAc" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="enR-Xo-ume"/>
+                <constraint firstItem="1GA-GG-Sdx" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xOQ-YR-iAc" secondAttribute="bottom" constant="20" id="jM9-dz-8jm"/>
                 <constraint firstAttribute="trailing" secondItem="mAS-4a-RS8" secondAttribute="trailing" id="jOZ-5U-ips"/>
                 <constraint firstItem="D4V-Zd-qvB" firstAttribute="leading" secondItem="mAS-4a-RS8" secondAttribute="leading" id="rIC-FU-Uxl"/>
                 <constraint firstItem="D4V-Zd-qvB" firstAttribute="trailing" secondItem="mAS-4a-RS8" secondAttribute="trailing" id="z4h-I8-bGU"/>
