@@ -126,6 +126,7 @@
 
 - (void)viewDidLoad
 {
+    self.loadingIndicator.hidden = YES;
     _autohideControls = YES;
 
     [self setDisplayLibraryControls:NO];
