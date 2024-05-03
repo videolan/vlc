@@ -35,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet VLCVoutView *voutView;
 @property (readwrite, strong) IBOutlet NSBox *mainControlsView;
 @property (readwrite, strong) IBOutlet VLCMainVideoViewOverlayView *overlayView;
-@property (readwrite, strong) IBOutlet VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, strong) IBOutlet NSView *bottomBarView;
 @property (readwrite, strong) IBOutlet NSStackView *centralControlsStackView;
 @property (readwrite, strong) IBOutlet VLCMainVideoViewControlsBar *controlsBar;
@@ -49,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
 
+@property (readonly, strong) VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, nonatomic) BOOL autohideControls;
 @property (readwrite, nonatomic) BOOL displayLibraryControls;
 @property (readonly) BOOL mouseOnControls;
