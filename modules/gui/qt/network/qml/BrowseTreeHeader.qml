@@ -40,11 +40,12 @@ T.Pane {
         colorSet: ColorContext.View
     }
 
-    height: implicitHeight
-    implicitHeight: layout.implicitHeight + topPadding + bottomPadding
-
     topPadding: VLCStyle.layoutTitle_top_padding
     bottomPadding: VLCStyle.layoutTitle_bottom_padding
+
+    height: implicitHeight
+    implicitHeight: layout.implicitHeight + topPadding + bottomPadding
+    implicitWidth: layout.implicitWidth + leftPadding + rightPadding
 
     focus: medialibraryBtn.visible
     Navigation.navigable: medialibraryBtn.visible
@@ -52,15 +53,7 @@ T.Pane {
     RowLayout {
         id: layout
 
-        anchors {
-            fill: parent
-
-            leftMargin: root.leftPadding
-            rightMargin: root.rightPadding
-
-            topMargin: root.topPadding
-            bottomMargin: root.bottomPadding
-        }
+        anchors.fill: parent
 
         Widgets.SubtitleLabel {
             text: providerModel.name
