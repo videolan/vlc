@@ -120,3 +120,7 @@ function flickablePositionContaining(flickable, y, height, topMargin, bottomMarg
 
     return newContentY
 }
+
+function isArray(obj) {
+    return (obj?.length !== undefined) ?? false
+}
