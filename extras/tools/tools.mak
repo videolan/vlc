@@ -111,7 +111,7 @@ DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 help2man-$(HELP2MAN_VERSION).tar.xz:
 	$(call download_pkg,$(HELP2MAN_URL),help2man)
 
-help2man: help2man-$(HELP2MAN_VERSION).tar.xz
+help2man: help2man-$(HELP2MAN_VERSION).tar.xz .xz .tar
 	$(UNPACK)
 	$(MOVE)
 
@@ -335,7 +335,7 @@ CLEAN_FILE += .buildprotoc
 bison-$(BISON_VERSION).tar.xz:
 	$(call download_pkg,$(BISON_URL),bison)
 
-bison: bison-$(BISON_VERSION).tar.xz
+bison: bison-$(BISON_VERSION).tar.xz .xz .tar
 	$(UNPACK)
 	$(MOVE)
 
