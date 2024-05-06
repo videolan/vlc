@@ -15,6 +15,8 @@ $(TARBALLS)/libaom-$(AOM_VERSION).tar.gz:
 aom: libaom-$(AOM_VERSION).tar.gz .sum-aom
 	$(UNPACK)
 	$(APPLY) $(SRC)/aom/0002-cmake-win-fix-asm-flag-appending.patch
+	$(APPLY) $(SRC)/aom/0001-cpu.cmake-Do-more-elaborate-test-of-whether-SVE-can-.patch
+	$(APPLY) $(SRC)/aom/0002-cpu.cmake-Address-issues-in-SVE-feature-tests.patch
 	$(MOVE)
 
 DEPS_aom =
