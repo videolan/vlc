@@ -386,12 +386,14 @@ FocusScope {
         // NOTE: Saving the focus reason for later.
         _currentFocusReason = reason;
 
-        if (!model || model.count === 0 || currentIndex === -1) {
+        if (!model || model.count === 0) {
             // NOTE: By default we want the focus on the flickable.
             flickable.forceActiveFocus(reason);
-
             return;
         }
+
+        if (currentIndex === -1)
+            currentIndex = 0
 
         if (_containsItem(currentIndex))
             Helpers.enforceFocus(_getItem(currentIndex), reason);
