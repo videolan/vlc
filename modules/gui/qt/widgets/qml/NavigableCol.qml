@@ -36,6 +36,12 @@ T.Control {
     property alias model: repeater.model
     property alias delegate: repeater.delegate
 
+    property alias count: repeater.count
+
+    function itemAt(index) {
+        return repeater.itemAt(index)
+    }
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
 
