@@ -161,13 +161,10 @@ FocusScope {
             Navigation.parentItem: root
 
             model: ObjectModel {
-                BrowseDeviceView {
+                HomeDeviceView {
                     id: foldersSection
 
-                    width: root.width
-                    height: contentHeight
-
-                    visible: (model.count !== 0)
+                    title: qsTr("My Folders")
 
                     model: StandardPathModel {
                         //we only have a handfull of standard path (5 or 6)
@@ -177,26 +174,12 @@ FocusScope {
                         sortOrder: MainCtx.sort.order
                         searchPattern: MainCtx.search.pattern
                     }
-
-                    title: qsTr("My Folders")
-
-                    onBrowse: (tree, reason) => root.browse(tree, reason)
-
-                    onSeeAll: (reason) => root.seeAllFolders(title, reason)
-
-                    onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
-                    onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
                 }
 
-                BrowseDeviceView {
+                HomeDeviceView {
                     id: deviceSection
 
-                    width: root.width
-                    height: contentHeight
-
-                    maximumRows: root.maximumRows
-
-                    visible: (model.count !== 0)
+                    title: qsTr("My Machine")
 
                     model: NetworkDeviceModel {
                         ctx: MainCtx
@@ -210,27 +193,12 @@ FocusScope {
                         sd_source: NetworkDeviceModel.CAT_DEVICES
                         source_name: "*"
                     }
-
-
-                    title: qsTr("My Machine")
-
-                    onBrowse: (tree, reason) => root.browse(tree, reason)
-
-                    onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
-
-                    onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
-                    onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
                 }
 
-                BrowseDeviceView {
+                HomeDeviceView {
                     id: lanSection
 
-                    width: root.width
-                    height: contentHeight
-
-                    maximumRows: root.maximumRows
-
-                    visible: (model.count !== 0)
+                    title: qsTr("My LAN")
 
                     model: NetworkDeviceModel {
                         ctx: MainCtx
@@ -244,15 +212,6 @@ FocusScope {
                         sortCriteria: MainCtx.sort.criteria
                         searchPattern: MainCtx.search.pattern
                     }
-
-                    title: qsTr("My LAN")
-
-                    onBrowse: (tree, reason) => root.browse(tree, reason)
-
-                    onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
-
-                    onActiveFocusChanged: _centerFlickableOnItem(lanSection)
-                    onCurrentIndexChanged: _centerFlickableOnItem(lanSection)
                 }
             }
         }
@@ -274,5 +233,20 @@ FocusScope {
                 widgetlist[i].focus = false
             }
         }
+    }
+
+    component HomeDeviceView: BrowseDeviceView {
+        width: root.width
+        height: contentHeight
+
+        maximumRows: root.maximumRows
+
+        visible: (model.count !== 0)
+
+        onBrowse: (tree, reason) => root.browse(tree, reason)
+        onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
+
+        onActiveFocusChanged: _centerFlickableOnItem(this)
+        onCurrentIndexChanged: _centerFlickableOnItem(this)
     }
 }
