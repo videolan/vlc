@@ -16,9 +16,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import org.videolan.vlc 0.1
 
 Item {
     required property var colModel
-    required property ColorContext colorContext
+
+    // using QObject/QGadget types in Qt.binding fails
+    // so don't mark 'ColorContext' type here
+    // see https://bugreports.qt.io/browse/QTBUG-125095
+    required property var colorContext
 }

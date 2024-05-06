@@ -16,14 +16,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import org.videolan.vlc 0.1
 
 Item {
     required property int index
     required property var colModel
     required property var rowModel
-    required property ColorContext colorContext
     required property bool selected
     required property bool containsMouse
     required property bool currentlyFocused
+
+    // using QObject/QGadget types in Qt.binding fails
+    // so don't mark 'ColorContext' type here
+    // see https://bugreports.qt.io/browse/QTBUG-125095
+    required property var colorContext
 }
