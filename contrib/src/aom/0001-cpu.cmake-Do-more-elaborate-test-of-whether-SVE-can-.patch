@@ -1,0 +1,51 @@
+From 17cb0f6be6807c73027cce0d941868b3e5ede54f Mon Sep 17 00:00:00 2001
+From: Martin Storsjo <martin@martin.st>
+Date: Wed, 1 May 2024 00:45:41 +0300
+Subject: [PATCH 1/2] cpu.cmake: Do more elaborate test of whether SVE can be
+ compiled
+
+For Windows targets, Clang will successfully compile simpler
+SVE functions, but if the function requires backing up and restoring
+SVE registers (as part of the AAPCS calling convention), Clang
+will fail to generate unwind data for this function, resulting
+in an error.
+
+This issue is tracked upstream in Clang in
+https://github.com/llvm/llvm-project/issues/80009.
+
+Check whether the compiler can compile such a function, and
+disable SVE if it is unable to handle that case.
+
+Change-Id: I307d7398cedd1942c39ef034431a51696264ff47
+(cherry picked from commit 5ccdc66ab6eb8eb300eda854fab4ff250b2c2f92)
+---
+ build/cmake/cpu.cmake | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/build/cmake/cpu.cmake b/build/cmake/cpu.cmake
+index 489dbcbf44..e16e9ec6a5 100644
+--- a/build/cmake/cpu.cmake
++++ b/build/cmake/cpu.cmake
+@@ -56,8 +56,18 @@ if("${AOM_TARGET_CPU}" STREQUAL "arm64")
+ #endif
+ #include <arm_sve.h>
+ #include <arm_neon_sve_bridge.h>" HAVE_SVE_HEADERS)
++    # Check whether the compiler can compile SVE functions that require
++    # backup/restore of SVE registers according to AAPCS. Clang for Windows used
++    # to fail this, see https://github.com/llvm/llvm-project/issues/80009.
++    aom_check_source_compiles("arm_sve_preserve" "
++#include <arm_sve.h>
++void other(void);
++svfloat32_t func(svfloat32_t a) {
++  other();
++  return a;
++}" CAN_COMPILE_SVE)
+     set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQURED_FLAGS})
+-    if(HAVE_SVE_HEADERS EQUAL 0)
++    if(HAVE_SVE_HEADERS EQUAL 0 OR CAN_COMPILE_SVE EQUAL 0)
+       set(ENABLE_SVE 0)
+       set(ENABLE_SVE2 0)
+     endif()
+-- 
+2.34.1
+
