@@ -3965,7 +3965,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   QT_MINIMUM_VERSION=6.2
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
       Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
-      Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2 Qt6ShaderTools
+      Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2
       Qt6Svg
     ], [pkg >= ${QT_MINIMUM_VERSION}]), [
 
