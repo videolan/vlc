@@ -60,62 +60,48 @@ char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-static int getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
-    CFStringRef cfFilePath = CFStringCreateWithCString(kCFAllocatorDefault, psz_filePath, kCFStringEncodingUTF8);
-    if (cfFilePath == NULL) {
-        return -1;
-    }
-    CFURLRef url = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, cfFilePath, kCFURLPOSIXPathStyle, false);
+static CFIndex getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
+    CFIndex index = -1;
+    CFURLRef url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)psz_filePath, strlen(psz_filePath), false);
     if (url == NULL) {
-        CFRelease(cfFilePath);
         return -1;
     }
     CFArrayRef fontDescriptors = CTFontManagerCreateFontDescriptorsFromURL(url);
     if (fontDescriptors == NULL) {
-        CFRelease(cfFilePath);
         CFRelease(url);
         return -1;
     }
     CFIndex numberOfFontDescriptors = CFArrayGetCount(fontDescriptors);
-
-    int index = 0;
+    CFStringRef targetFontName = CFStringCreateWithCString(kCFAllocatorDefault, psz_family, kCFStringEncodingUTF8);
+    if (targetFontName == NULL) {
+        CFRelease(fontDescriptors);
+        CFRelease(url);
+        return -1;
+    }
 
     for (CFIndex i = 0; i < numberOfFontDescriptors; i++) {
         CTFontDescriptorRef descriptor = (CTFontDescriptorRef)CFArrayGetValueAtIndex(fontDescriptors, i);
         CFStringRef familyName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontFamilyNameAttribute);
         CFStringRef fontName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontNameAttribute);
         CFStringRef displayName = (CFStringRef)CTFontDescriptorCopyAttribute(descriptor, kCTFontDisplayNameAttribute);
-        char* familyNameStr = FromCFString(familyName, kCFStringEncodingUTF8);
-        char* fontNameStr = FromCFString(fontName, kCFStringEncodingUTF8);
-        char* displayNameStr = FromCFString(displayName, kCFStringEncodingUTF8);
 
-        if (!strcasecmp(familyNameStr, psz_family) || !strcasecmp(fontNameStr, psz_family) || !strcasecmp(displayNameStr, psz_family)) {
+        if (CFStringCompare(targetFontName, familyName, kCFCompareCaseInsensitive) == kCFCompareEqualTo ||
+            CFStringCompare(targetFontName, fontName, kCFCompareCaseInsensitive) == kCFCompareEqualTo ||
+            CFStringCompare(targetFontName, displayName, kCFCompareCaseInsensitive) == kCFCompareEqualTo) {
             index = i;
-            FREENULL(familyNameStr);
-            FREENULL(fontNameStr);
-            FREENULL(displayNameStr);
-            CFRelease(familyName);
-            CFRelease(fontName);
-            CFRelease(displayName);
-            break;
         }
 
-        FREENULL(familyNameStr);
-        FREENULL(fontNameStr);
-        FREENULL(displayNameStr);
         CFRelease(familyName);
         CFRelease(fontName);
         CFRelease(displayName);
+
+        if (index != -1) {
+            break;
+        }
     }
-    if (fontDescriptors != NULL) {
-        CFRelease(fontDescriptors);
-    }
-    if (url != NULL) {
-        CFRelease(url);
-    }
-    if (cfFilePath != NULL) {
-        CFRelease(cfFilePath);
-    }
+    CFRelease(targetFontName);
+    CFRelease(fontDescriptors);
+    CFRelease(url);
     return index;
 }
 
@@ -226,7 +212,7 @@ const vlc_family_t *CoreText_GetFamily(filter_t *p_filter, const char *psz_famil
         }
 
         /* get the index of the font family in the font file */
-        int fontIndex = getFontIndexInFontFile(path, psz_lc);
+        CFIndex fontIndex = getFontIndexInFontFile(path, psz_lc);
         if (fontIndex < 0) {
             FREENULL(path);
             continue;
@@ -313,7 +299,7 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
     }
 
     /* get the index of the font family in the font file */
-    int fontIndex = getFontIndexInFontFile(psz_fontPath, psz_fallbackFamilyName);
+    CFIndex fontIndex = getFontIndexInFontFile(psz_fontPath, psz_fallbackFamilyName);
     if (fontIndex < 0) {
         goto done;
     }
