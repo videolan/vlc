@@ -30,6 +30,7 @@ asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(APPLY) $(SRC)/asdcplib/adding-pkg-config-file.patch
 	$(APPLY) $(SRC)/asdcplib/win32-cross-compilation.patch
 	$(APPLY) $(SRC)/asdcplib/win32-dirent.patch
+	$(APPLY) $(SRC)/asdcplib/0001-Remove-a-broken-unused-template-class.patch
 	$(MOVE)
 
 DEPS_asdcplib = nettle $(DEPS_nettle)
