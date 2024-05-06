@@ -147,7 +147,9 @@ FocusScope {
 
         Util.FlickableScrollHandler { }
 
-        Column {
+        Navigation.parentItem: root
+
+        Widgets.NavigableCol {
             id: column
 
             width: foldersSection.width
@@ -156,136 +158,102 @@ FocusScope {
             spacing: (MainCtx.gridView ? VLCStyle.gridView_spacing : VLCStyle.tableView_spacing) -
                      VLCStyle.layoutTitle_top_padding
 
-            BrowseDeviceView {
-                id: foldersSection
+            Navigation.parentItem: root
 
-                width: root.width
-                height: contentHeight
+            model: ObjectModel {
+                BrowseDeviceView {
+                    id: foldersSection
 
-                visible: (model.count !== 0)
+                    width: root.width
+                    height: contentHeight
 
-                model: StandardPathModel {
-                    //we only have a handfull of standard path (5 or 6)
-                    //so we don't limit them
+                    visible: (model.count !== 0)
 
-                    sortCriteria: MainCtx.sort.criteria
-                    sortOrder: MainCtx.sort.order
-                    searchPattern: MainCtx.search.pattern
+                    model: StandardPathModel {
+                        //we only have a handfull of standard path (5 or 6)
+                        //so we don't limit them
+
+                        sortCriteria: MainCtx.sort.criteria
+                        sortOrder: MainCtx.sort.order
+                        searchPattern: MainCtx.search.pattern
+                    }
+
+                    title: qsTr("My Folders")
+
+                    onBrowse: (tree, reason) => root.browse(tree, reason)
+
+                    onSeeAll: (reason) => root.seeAllFolders(title, reason)
+
+                    onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
+                    onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
                 }
 
-                title: qsTr("My Folders")
+                BrowseDeviceView {
+                    id: deviceSection
 
-                Navigation.parentItem: root
+                    width: root.width
+                    height: contentHeight
 
-                Navigation.downAction: function() {
-                    if (deviceSection.visible)
-                        deviceSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else if (lanSection.visible)
-                        lanSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else
-                        root.Navigation.defaultNavigationDown()
+                    maximumRows: root.maximumRows
+
+                    visible: (model.count !== 0)
+
+                    model: NetworkDeviceModel {
+                        ctx: MainCtx
+
+                        limit: deviceSection.maximumCount
+
+                        sortOrder: MainCtx.sort.order
+                        sortCriteria: MainCtx.sort.criteria
+                        searchPattern: MainCtx.search.pattern
+
+                        sd_source: NetworkDeviceModel.CAT_DEVICES
+                        source_name: "*"
+                    }
+
+
+                    title: qsTr("My Machine")
+
+                    onBrowse: (tree, reason) => root.browse(tree, reason)
+
+                    onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
+
+                    onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
+                    onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
                 }
 
-                onBrowse: (tree, reason) => root.browse(tree, reason)
+                BrowseDeviceView {
+                    id: lanSection
 
-                onSeeAll: (reason) => root.seeAllFolders(title, reason)
+                    width: root.width
+                    height: contentHeight
 
-                onActiveFocusChanged: _centerFlickableOnItem(foldersSection)
-                onCurrentIndexChanged: _centerFlickableOnItem(foldersSection)
-            }
+                    maximumRows: root.maximumRows
 
-            BrowseDeviceView {
-                id: deviceSection
+                    visible: (model.count !== 0)
 
-                width: root.width
-                height: contentHeight
+                    model: NetworkDeviceModel {
+                        ctx: MainCtx
 
-                maximumRows: root.maximumRows
+                        sd_source: NetworkDeviceModel.CAT_LAN
+                        source_name: "*"
 
-                visible: (model.count !== 0)
+                        limit: lanSection.maximumCount
 
-                model: NetworkDeviceModel {
-                    ctx: MainCtx
+                        sortOrder: MainCtx.sort.order
+                        sortCriteria: MainCtx.sort.criteria
+                        searchPattern: MainCtx.search.pattern
+                    }
 
-                    limit: deviceSection.maximumCount
+                    title: qsTr("My LAN")
 
-                    sortOrder: MainCtx.sort.order
-                    sortCriteria: MainCtx.sort.criteria
-                    searchPattern: MainCtx.search.pattern
+                    onBrowse: (tree, reason) => root.browse(tree, reason)
 
-                    sd_source: NetworkDeviceModel.CAT_DEVICES
-                    source_name: "*"
+                    onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
+
+                    onActiveFocusChanged: _centerFlickableOnItem(lanSection)
+                    onCurrentIndexChanged: _centerFlickableOnItem(lanSection)
                 }
-
-
-                title: qsTr("My Machine")
-
-                Navigation.parentItem: root
-
-                Navigation.upAction: function() {
-                    if (foldersSection.visible)
-                        foldersSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else
-                        root.Navigation.defaultNavigationUp()
-                }
-
-                Navigation.downAction: function() {
-                    if (lanSection.visible)
-                        lanSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else
-                        root.Navigation.defaultNavigationDown()
-                }
-
-                onBrowse: (tree, reason) => root.browse(tree, reason)
-
-                onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
-
-                onActiveFocusChanged: _centerFlickableOnItem(deviceSection)
-                onCurrentIndexChanged: _centerFlickableOnItem(deviceSection)
-            }
-
-            BrowseDeviceView {
-                id: lanSection
-
-                width: root.width
-                height: contentHeight
-
-                maximumRows: root.maximumRows
-
-                visible: (model.count !== 0)
-
-                model: NetworkDeviceModel {
-                    ctx: MainCtx
-
-                    sd_source: NetworkDeviceModel.CAT_LAN
-                    source_name: "*"
-
-                    limit: lanSection.maximumCount
-
-                    sortOrder: MainCtx.sort.order
-                    sortCriteria: MainCtx.sort.criteria
-                    searchPattern: MainCtx.search.pattern
-                }
-
-                title: qsTr("My LAN")
-
-                Navigation.parentItem: root
-
-                Navigation.upAction: function() {
-                    if (deviceSection.visible)
-                        deviceSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else if (foldersSection.visible)
-                        foldersSection.setCurrentItemFocus(Qt.TabFocusReason)
-                    else
-                        root.Navigation.defaultNavigationUp()
-                }
-
-                onBrowse: (tree, reason) => root.browse(tree, reason)
-
-                onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
-
-                onActiveFocusChanged: _centerFlickableOnItem(lanSection)
-                onCurrentIndexChanged: _centerFlickableOnItem(lanSection)
             }
         }
     }
