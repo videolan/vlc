@@ -33,7 +33,7 @@ PKGS += wixlzx
 PKGS_TOOLS += wixlzx
 endif
 
-DEPS_wixlzx := wix $(DEPS_wix)
+DEPS_wixlzx = wix $(DEPS_wix)
 
 .sum-wixlzx: wix$(WIX_LZX_FULL_VERSION).zip
 

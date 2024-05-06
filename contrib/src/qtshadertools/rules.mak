@@ -5,7 +5,7 @@ QTSHADERTOOLS_VERSION_MAJOR := 6.7
 QTSHADERTOOLS_VERSION := $(QTSHADERTOOLS_VERSION_MAJOR).0
 QTSHADERTOOLS_URL := $(QT)/$(QTSHADERTOOLS_VERSION_MAJOR)/$(QTSHADERTOOLS_VERSION)/submodules/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz
 
-DEPS_qtshadertools-tools := qt-tools $(DEPS_qt-tools)
+DEPS_qtshadertools-tools = qt-tools $(DEPS_qt-tools)
 
 ifdef HAVE_WIN32
 DEPS_qtshadertools-tools += fxc2 $(DEPS_fxc2)

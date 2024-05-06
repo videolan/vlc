@@ -12,7 +12,7 @@ PKGS += mfx
 endif
 endif
 
-DEPS_mfx :=
+DEPS_mfx =
 ifdef HAVE_WINSTORE
 DEPS_mfx += alloweduwp $(DEPS_alloweduwp)
 endif

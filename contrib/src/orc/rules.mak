@@ -7,7 +7,7 @@ ifeq ($(call need_pkg,"orc-0.4"),)
 PKGS_FOUND += orc
 endif
 
-DEPS_orc :=
+DEPS_orc =
 ifdef HAVE_WINSTORE
 # orc uses VirtualAlloc
 DEPS_orc += alloweduwp $(DEPS_alloweduwp)

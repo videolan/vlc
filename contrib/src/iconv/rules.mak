@@ -15,7 +15,7 @@ endif
 endif
 endif
 
-DEPS_iconv :=
+DEPS_iconv =
 ifdef HAVE_WINSTORE
 # gnulib uses GetFileInformationByHandle
 DEPS_iconv += alloweduwp $(DEPS_alloweduwp)
