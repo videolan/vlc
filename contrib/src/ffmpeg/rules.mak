@@ -12,7 +12,8 @@ FFMPEG_LAVC_MIN := 57.37.100
 FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
 
 # bsf=vp9_superframe is needed to mux VP9 inside webm/mkv
-FFMPEGCONF = \
+FFMPEGCONF = --prefix="$(PREFIX)" --enable-static --disable-shared \
+	--extra-ldflags="$(LDFLAGS)" \
 	--cc="$(CC)" \
 	--pkg-config="$(PKG_CONFIG)" \
 	--disable-doc \
@@ -241,9 +242,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 
 .ffmpeg: ffmpeg
 	$(MAKEBUILDDIR)
-	$(MAKECONFDIR)/configure \
-		--extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) \
-		--prefix="$(PREFIX)" --enable-static --disable-shared
+	$(MAKECONFDIR)/configure $(FFMPEGCONF)
 	+$(MAKEBUILD)
 	+$(MAKEBUILD) install-libs install-headers
 	touch $@
