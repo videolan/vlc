@@ -177,6 +177,25 @@ FocusScope {
                 }
 
                 HomeDeviceView {
+                    id: computerSection
+
+                    title: qsTr("Computer")
+
+                    model: NetworkDeviceModel {
+                        ctx: MainCtx
+
+                        sd_source: NetworkDeviceModel.CAT_MYCOMPUTER
+                        source_name: "*"
+
+                        limit: computerSection.maximumCount
+
+                        sortOrder: MainCtx.sort.order
+                        sortCriteria: MainCtx.sort.criteria
+                        searchPattern: MainCtx.search.pattern
+                    }
+                }
+
+                HomeDeviceView {
                     id: deviceSection
 
                     title: qsTr("My Machine")
