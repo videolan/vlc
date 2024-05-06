@@ -215,8 +215,6 @@ struct vlc_player_timer
 {
     vlc_mutex_t lock;
 
-    enum vlc_player_timer_state state;
-
     vlc_tick_t input_length;
     vlc_tick_t input_normal_time;
     vlc_tick_t last_ts;
@@ -224,6 +222,8 @@ struct vlc_player_timer
 
     vlc_tick_t seek_ts;
     double seek_position;
+    bool paused;
+    bool stopping;
     bool seeking;
 
     struct vlc_player_timer_source sources[VLC_PLAYER_TIMER_TYPE_COUNT];

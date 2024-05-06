@@ -31,7 +31,6 @@ vlc_player_ResetTimer(vlc_player_t *player)
 {
     vlc_mutex_lock(&player->timer.lock);
 
-    player->timer.state = VLC_PLAYER_TIMER_STATE_DISCONTINUITY;
     player->timer.input_length = VLC_TICK_INVALID;
     player->timer.input_normal_time = VLC_TICK_0;
     player->timer.last_ts = VLC_TICK_INVALID;
@@ -39,7 +38,9 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.smpte_source.smpte.last_framenum = ULONG_MAX;
     player->timer.seek_ts = VLC_TICK_INVALID;
     player->timer.seek_position = -1;
+    player->timer.paused = false;
     player->timer.seeking = false;
+    player->timer.stopping = false;
 
     vlc_mutex_unlock(&player->timer.lock);
 }
@@ -235,20 +236,21 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
         case VLC_PLAYER_TIMER_STATE_PAUSED:
             notify = true;
             assert(system_date != VLC_TICK_INVALID);
+            player->timer.paused = true;
             break;
 
         case VLC_PLAYER_TIMER_STATE_PLAYING:
+            assert(!player->timer.stopping);
+            player->timer.paused = false;
             break;
 
         case VLC_PLAYER_TIMER_STATE_STOPPING:
+            player->timer.stopping = true;
             break;
 
         default:
             vlc_assert_unreachable();
     }
-
-    if (player->timer.state != VLC_PLAYER_TIMER_STATE_STOPPING)
-        player->timer.state = state;
 
     if (!notify)
     {
@@ -351,7 +353,7 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
      */
     struct vlc_player_timer_source *source = &player->timer.best_source;
     if (!source->es || es_source_is_master
-     || (es_source && player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED))
+     || (es_source && player->timer.paused))
         source->es = es_source;
 
     /* Notify the best source */
@@ -472,14 +474,10 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
     assert(point->ts != VLC_TICK_INVALID);
 
     vlc_tick_t system_date = point->system_date;
-    if (player->timer.state == VLC_PLAYER_TIMER_STATE_PAUSED)
+    if (player->timer.paused)
         system_date = VLC_TICK_MAX;
 
-    /* An update after a discontinuity means that the playback is resumed */
-    if (player->timer.state == VLC_PLAYER_TIMER_STATE_DISCONTINUITY)
-        player->timer.state = VLC_PLAYER_TIMER_STATE_PLAYING;
-
-    if (player->timer.state != VLC_PLAYER_TIMER_STATE_STOPPING)
+    if (!player->timer.stopping)
         vlc_player_UpdateTimerBestSource(player, es_source,
                                          es_source_is_master, point, system_date,
                                          force_update);
