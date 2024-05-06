@@ -218,19 +218,20 @@ FocusScope {
     }
 
     function resetFocus() {
-        const widgetlist = [foldersSection, deviceSection, lanSection]
-        for (let i in widgetlist) {
-            if (widgetlist[i].activeFocus && widgetlist[i].visible)
+        for (let i = 0; i < column.count; ++i) {
+            const widget = column.itemAt(i)
+            if (widget.activeFocus && widget.visible)
                 return
         }
 
         let found  = false;
-        for (let i in widgetlist) {
-            if (widgetlist[i].visible && !found) {
-                widgetlist[i].focus = true
+        for (let i = 0; i < column.count; ++i){
+            const widget = column.itemAt(i)
+            if (widget.visible && !found) {
+                widget.focus = true
                 found = true
             } else {
-                widgetlist[i].focus = false
+                widget.focus = false
             }
         }
     }
