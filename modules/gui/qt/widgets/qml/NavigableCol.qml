@@ -36,6 +36,13 @@ T.Control {
     property alias model: repeater.model
     property alias delegate: repeater.delegate
 
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
+
     // Settings
 
     Navigation.navigable: (_countEnabled > 0)
