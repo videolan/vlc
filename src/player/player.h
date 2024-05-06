@@ -203,12 +203,12 @@ struct vlc_player_timer_source
     };
 };
 
-enum vlc_player_timer_state
+enum vlc_player_timer_event
 {
-    VLC_PLAYER_TIMER_STATE_PLAYING,
-    VLC_PLAYER_TIMER_STATE_PAUSED,
-    VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
-    VLC_PLAYER_TIMER_STATE_STOPPING,
+    VLC_PLAYER_TIMER_EVENT_PLAYING,
+    VLC_PLAYER_TIMER_EVENT_PAUSED,
+    VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
+    VLC_PLAYER_TIMER_EVENT_STOPPING,
 };
 
 struct vlc_player_timer
@@ -476,8 +476,8 @@ void
 vlc_player_ResetTimer(vlc_player_t *player);
 
 void
-vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
-                            enum vlc_player_timer_state state,
+vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
+                            enum vlc_player_timer_event event,
                             vlc_tick_t system_date);
 
 void

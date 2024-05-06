@@ -272,12 +272,12 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
         case VLC_PLAYER_STATE_STOPPING:
             input->started = false;
 
-            vlc_player_UpdateTimerState(player, NULL,
-                                        VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
+            vlc_player_UpdateTimerEvent(player, NULL,
+                                        VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
                                         VLC_TICK_INVALID);
 
-            vlc_player_UpdateTimerState(player, NULL,
-                                        VLC_PLAYER_TIMER_STATE_STOPPING,
+            vlc_player_UpdateTimerEvent(player, NULL,
+                                        VLC_PLAYER_TIMER_EVENT_STOPPING,
                                         VLC_TICK_INVALID);
 
             if (input == player->input)
@@ -289,8 +289,8 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             break;
         case VLC_PLAYER_STATE_PLAYING:
             input->pause_date = VLC_TICK_INVALID;
-            vlc_player_UpdateTimerState(player, NULL,
-                                        VLC_PLAYER_TIMER_STATE_PLAYING,
+            vlc_player_UpdateTimerEvent(player, NULL,
+                                        VLC_PLAYER_TIMER_EVENT_PLAYING,
                                         input->pause_date);
             /* fall through */
         case VLC_PLAYER_STATE_STARTED:
@@ -304,8 +304,8 @@ vlc_player_input_HandleState(struct vlc_player_input *input,
             assert(state_date != VLC_TICK_INVALID);
             input->pause_date = state_date;
 
-            vlc_player_UpdateTimerState(player, NULL,
-                                        VLC_PLAYER_TIMER_STATE_PAUSED,
+            vlc_player_UpdateTimerEvent(player, NULL,
+                                        VLC_PLAYER_TIMER_EVENT_PAUSED,
                                         input->pause_date);
             break;
         default:
@@ -884,8 +884,8 @@ input_thread_Events(input_thread_t *input_thread,
         }
         else
         {
-            vlc_player_UpdateTimerState(player, event->output_clock.id,
-                                        VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
+            vlc_player_UpdateTimerEvent(player, event->output_clock.id,
+                                        VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
                                         VLC_TICK_INVALID);
         }
         return;
@@ -986,8 +986,8 @@ input_thread_Events(input_thread_t *input_thread,
             break;
         case INPUT_EVENT_CACHE:
             if (event->cache == 0.0f)
-                vlc_player_UpdateTimerState(player, NULL,
-                                            VLC_PLAYER_TIMER_STATE_DISCONTINUITY,
+                vlc_player_UpdateTimerEvent(player, NULL,
+                                            VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
                                             VLC_TICK_INVALID);
             input->cache = event->cache;
             vlc_player_SendEvent(player, on_buffering_changed, event->cache);

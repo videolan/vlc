@@ -191,8 +191,8 @@ vlc_player_UpdateSmpteTimerFPS(vlc_player_t *player,
 }
 
 void
-vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
-                            enum vlc_player_timer_state state,
+vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
+                            enum vlc_player_timer_event event,
                             vlc_tick_t system_date)
 {
     vlc_mutex_lock(&player->timer.lock);
@@ -203,9 +203,9 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
     bool notify = false;
     struct vlc_player_timer_source *bestsource = &player->timer.best_source;
 
-    switch(state)
+    switch (event)
     {
-        case VLC_PLAYER_TIMER_STATE_DISCONTINUITY:
+        case VLC_PLAYER_TIMER_EVENT_DISCONTINUITY:
             assert(system_date == VLC_TICK_INVALID);
             for (size_t i = 0; i < VLC_PLAYER_TIMER_TYPE_COUNT; ++i)
             {
@@ -233,18 +233,18 @@ vlc_player_UpdateTimerState(vlc_player_t *player, vlc_es_id_t *es_source,
             }
             break;
 
-        case VLC_PLAYER_TIMER_STATE_PAUSED:
+        case VLC_PLAYER_TIMER_EVENT_PAUSED:
             notify = true;
             assert(system_date != VLC_TICK_INVALID);
             player->timer.paused = true;
             break;
 
-        case VLC_PLAYER_TIMER_STATE_PLAYING:
+        case VLC_PLAYER_TIMER_EVENT_PLAYING:
             assert(!player->timer.stopping);
             player->timer.paused = false;
             break;
 
-        case VLC_PLAYER_TIMER_STATE_STOPPING:
+        case VLC_PLAYER_TIMER_EVENT_STOPPING:
             player->timer.stopping = true;
             break;
 
