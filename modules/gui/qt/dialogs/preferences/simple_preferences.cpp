@@ -599,13 +599,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             connect( ui.volNormBox, &QCheckBox::toggled, ui.volNormSpin, &QDoubleSpinBox::setEnabled );
 
             char* psz = config_GetPsz( "audio-filter" );
-            qs_filter = qfu( psz ).split( ':',
-                                          #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                              Qt::SkipEmptyParts
-                                          #else
-                                              QString::SkipEmptyParts
-                                          #endif
-                                        );
+            qs_filter = qfu( psz ).split( ':', Qt::SkipEmptyParts );
 
             free( psz );
 
@@ -807,13 +801,8 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             connect( layoutImages, qOverload<QAbstractButton*>( &QButtonGroup::buttonClicked ), this, &SPrefsPanel::imageLayoutClick );
 
             /* Set checkboxes depending on the layout selected*/
-#if QT_VERSION >= QT_VERSION_CHECK(5,15,0)
             connect(radioGroup, &QButtonGroup::idClicked, this, &SPrefsPanel::handleLayoutChange);
             connect(layoutImages, &QButtonGroup::idClicked, this, &SPrefsPanel::handleLayoutChange);
-#else
-            connect(radioGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &SPrefsPanel::handleLayoutChange);
-            connect(layoutImages, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &SPrefsPanel::handleLayoutChange);
-#endif
 
             configBool( "embedded-video", ui.embedVideo );
             configBool( "qt-video-autoresize", ui.resizingBox );
