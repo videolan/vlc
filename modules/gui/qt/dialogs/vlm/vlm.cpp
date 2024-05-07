@@ -637,13 +637,7 @@ void VLMWrapper::EditBroadcast( const QString& name, const QString& input,
         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
         vlm_MessageDelete( message );
 
-        QStringList options = inputOptions.split( " :",
-                                                  #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                                      Qt::SkipEmptyParts
-                                                  #else
-                                                      QString::SkipEmptyParts
-                                                  #endif
-                                                );
+        QStringList options = inputOptions.split( " :", Qt::SkipEmptyParts );
 
         for( int i = 0; i < options.count(); i++ )
         {
@@ -735,13 +729,7 @@ void VLMWrapper::EditSchedule( const QString& name, const QString& input,
         vlm_ExecuteCommand( p_vlm, qtu( command ), &message );
         vlm_MessageDelete( message );
 
-        QStringList options = inputOptions.split( " :",
-                                                  #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                                      Qt::SkipEmptyParts
-                                                  #else
-                                                      QString::SkipEmptyParts
-                                                  #endif
-                                                );
+        QStringList options = inputOptions.split( " :", Qt::SkipEmptyParts );
         for( int i = 0; i < options.count(); i++ )
         {
             command = "setup \"" + name + "\" option \"" + options[i].trimmed() + "\"";
