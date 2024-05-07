@@ -797,11 +797,7 @@ void MainCtxWin32::reloadPrefs()
 
 InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
     : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
-
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx, window, window))
-#endif
-
 {
     auto systemMenuButton = std::make_shared<WinSystemMenuButton>(mainCtx->intfMainWindow(), nullptr);
     mainCtx->csdButtonModel()->setSystemMenuButton(systemMenuButton);
@@ -984,9 +980,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
 
 
 
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 void InterfaceWindowHandlerWin32::updateCSDWindowSettings()
 {
     static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainCtx->useClientSideDecoration());
 }
-#endif

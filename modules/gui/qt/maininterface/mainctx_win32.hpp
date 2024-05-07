@@ -80,10 +80,8 @@ protected:
     bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
 
 private:
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     void updateCSDWindowSettings() override;
     QObject *m_CSDWindowEventHandler {};
-#endif
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP

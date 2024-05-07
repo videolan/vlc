@@ -137,9 +137,7 @@ void FirstRunWizard::finish()
 
     /* Layout Page settings */
     config_PutInt( "qt-menubar", ui.layoutGroup->checkedId() );
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     config_PutInt( "qt-titlebar", ui.layoutGroup->checkedId() );
-#endif
 
     config_PutInt( "qt-pin-controls", ui.layoutGroup->checkedId() );
 
@@ -311,9 +309,7 @@ void FirstRunWizard::reject()
 
     /* Layout Page settings */
     config_PutInt( "qt-menubar", 0 );
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     config_PutInt( "qt-titlebar", 0 );
-#endif
     p_intf->p_mi->setPinVideoControls( 0 );
     p_intf->p_mi->controlbarProfileModel()->setSelectedProfileFromId(ControlbarProfileModel::DEFAULT_STYLE);
 

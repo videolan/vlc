@@ -161,6 +161,4 @@ static inline QString QVLCUserDir( vlc_userdir_t type )
  */
 #define QT_XMAS_JOKE_DAY 354
 
-#define QT_CLIENT_SIDE_DECORATION_AVAILABLE (QT_VERSION >= QT_VERSION_CHECK(5,15,0))
-
 #endif

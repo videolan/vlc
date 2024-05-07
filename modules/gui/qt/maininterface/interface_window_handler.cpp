@@ -118,10 +118,8 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     connect(this, &InterfaceWindowHandler::incrementIntfUserScaleFactor,
             m_mainCtx, &MainCtx::incrementIntfUserScaleFactor);
 
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     connect( m_mainCtx, &MainCtx::useClientSideDecorationChanged,
              this, &InterfaceWindowHandler::updateCSDWindowSettings );
-#endif
 
     connect(m_mainCtx, &MainCtx::requestInterfaceMaximized,
             this, &InterfaceWindowHandler::setInterfaceMaximized);
@@ -144,14 +142,12 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
     QVLCTools::saveWindowPosition(getSettings(), m_window);
 }
 
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
 void InterfaceWindowHandler::updateCSDWindowSettings()
 {
     m_window->hide(); // some window managers don't like to change frame window hint on visible window
     m_window->setFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
     m_window->show();
 }
-#endif
 
 bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
 {

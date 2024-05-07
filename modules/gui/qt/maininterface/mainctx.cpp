@@ -341,9 +341,7 @@ void MainCtx::loadPrefs(const bool callSignals)
 
     loadFromVLCOption(m_hasToolbarMenu, "qt-menubar", &MainCtx::hasToolbarMenuChanged);
 
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
     loadFromVLCOption(m_windowTitlebar, "qt-titlebar" , &MainCtx::useClientSideDecorationChanged);
-#endif
 
     loadFromVLCOption(m_smoothScroll, "qt-smooth-scrolling", &MainCtx::smoothScrollChanged);
 

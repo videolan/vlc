@@ -788,9 +788,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             /*Update layout radio buttons based on the checkState of the following checkboxes*/
             connect(ui.menuBarCheck, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
             connect(ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
             connect(ui.titleBarCheckBox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
-#endif
 
             /*Clicking on image will check the corresponding layout radio button*/
             layoutImages = new QButtonGroup( this );
@@ -873,11 +871,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             QObject::connect( ui.toolbarEditor, &QAbstractButton::clicked, provider, &DialogsProvider::showToolbarEditorDialog);
 
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
             configBool( "qt-titlebar", ui.titleBarCheckBox );
-#else
-            ui.titleBarCheckBox->hide();
-#endif
 
             /* UPDATE options */
 #ifdef UPDATE_CHECK
@@ -1145,18 +1139,14 @@ void SPrefsPanel::handleLayoutChange( int id )
         // Modern layout selected
         ui.styleStackedWidget->setCurrentIndex(0);
         ui.menuBarCheck->setChecked(false);
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
         ui.titleBarCheckBox->setChecked(false);
-#endif
         ui.pinVideoControlsCheckbox->setChecked(false);
     }
     else if (id == 1) {
         // Classic layout selected
         ui.styleStackedWidget->setCurrentIndex(0);
         ui.menuBarCheck->setChecked(true);
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
         ui.titleBarCheckBox->setChecked(true);
-#endif
         ui.pinVideoControlsCheckbox->setChecked(true);
     }
     else if (id == 2) {
@@ -1168,17 +1158,13 @@ void SPrefsPanel::updateLayoutSelection()
 {
     auto ui = m_interfaceUI;
     bool isModern = !ui.menuBarCheck->isChecked()
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
                     && !ui.titleBarCheckBox->isChecked()
-#endif
                     && !ui.pinVideoControlsCheckbox->isChecked();
 
     ui.modernButton->setChecked(isModern);
 
     bool isClassic = ui.menuBarCheck->isChecked()
-#if QT_CLIENT_SIDE_DECORATION_AVAILABLE
                      && ui.titleBarCheckBox->isChecked()
-#endif
                      && ui.pinVideoControlsCheckbox->isChecked();
 
     ui.classicButton->setChecked(isClassic);
