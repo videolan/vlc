@@ -63,13 +63,7 @@
 
 static bool filterIsPresent( const QString &filters, const QString &filter )
 {
-    QStringList list = filters.split( ':',
-                                      #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                        Qt::SkipEmptyParts
-                                      #else
-                                        QString::SkipEmptyParts
-                                      #endif
-                                    );
+    QStringList list = filters.split( ':', Qt::SkipEmptyParts );
 
     foreach( const QString &filterCmp, list )
     {
@@ -306,13 +300,7 @@ static QString ChangeFiltersString( qt_intf_t *p_intf, const char *psz_filter_ty
     char* psz_chain = var_GetString( p_intf, psz_filter_type );
 
     QString const chain = QString( psz_chain ? psz_chain : "" );
-    QStringList list = chain.split( ':',
-                                    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                        Qt::SkipEmptyParts
-                                    #else
-                                        QString::SkipEmptyParts
-                                    #endif
-                                  );
+    QStringList list = chain.split( ':', Qt::SkipEmptyParts );
 
     if( b_add && std::find(list.begin(), list.end(), psz_name) == list.end() )
         list << psz_name;
@@ -1004,13 +992,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
             char *psz_bands = var_GetString( p_aout.get(), qtu(p_data->name) );
             if ( psz_bands )
             {
-                bands = QString( psz_bands ).split( " ",
-                                                    #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                                        Qt::SkipEmptyParts
-                                                    #else
-                                                        QString::SkipEmptyParts
-                                                    #endif
-                                                  );
+                bands = QString( psz_bands ).split( " ", Qt::SkipEmptyParts );
                 free( psz_bands );
             }
         }
@@ -1025,13 +1007,7 @@ QStringList EqualizerSliderData::getBandsFromAout() const
     char *psz_bands = config_GetPsz( qtu(p_data->name) );
     if ( psz_bands )
     {
-        bands = QString( psz_bands ).split( " ",
-                                            #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-                                                Qt::SkipEmptyParts
-                                            #else
-                                                QString::SkipEmptyParts
-                                            #endif
-                                          );
+        bands = QString( psz_bands ).split( " ", Qt::SkipEmptyParts );
         free( psz_bands );
     }
 
