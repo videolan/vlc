@@ -102,18 +102,6 @@ public:
 template<class T>
 QPointer<T> SingletonRegisterHelper<T>::m_instance = nullptr;
 
-template<class T>
-void registerAnonymousType( const char *uri, int versionMajor )
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    qmlRegisterAnonymousType<T>( uri, versionMajor );
-#else
-    qmlRegisterType<T>();
-    VLC_UNUSED( uri );
-    VLC_UNUSED( versionMajor );
-#endif
-}
-
 } // anonymous namespace
 
 
