@@ -641,7 +641,6 @@ void RoundImage::adjustQSGCustomGeometry(const QQuickWindow* const window)
     }
     else
     {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         // QSG(Opaque)TextureMaterial supports Qt RHI,
         // so there is no obstacle using custom geometry
         // if Qt RHI is in use.
@@ -649,11 +648,5 @@ void RoundImage::adjustQSGCustomGeometry(const QQuickWindow* const window)
             enableCustomGeometry();
         else
             disableCustomGeometry();
-#else
-        // Qt RHI is introduced in Qt 5.14.
-        // QSG(Opaque)TextureMaterial does not support any graphics API other than OpenGL
-        // without the Qt RHI abstraction layer.
-        disableCustomGeometry();
-#endif
     }
 }
