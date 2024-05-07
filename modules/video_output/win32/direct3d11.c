@@ -650,6 +650,10 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         cfg.display.height = window_height;
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, &sys->d3d_dev,
                              &sys->pool_fmt, &sys->quad_fmt, &cfg);
+
+        if (sys->tonemapProc)
+            D3D11_TonemapperUpdate(VLC_OBJECT(vd), sys->tonemapProc, &sys->d3d_dev,
+                                   &sys->quad_fmt);
     }
 
     D3D11_TEXTURE2D_DESC dsc = { 0 };
@@ -934,6 +938,10 @@ static int Control(vout_display_t *vd, int query, va_list args)
                 cfg.display.height = window_height;
                 D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, &sys->d3d_dev, &vd->source,
                                      &sys->quad_fmt, &cfg);
+
+                if (sys->tonemapProc)
+                    D3D11_TonemapperUpdate(VLC_OBJECT(vd), sys->tonemapProc, &sys->d3d_dev,
+                                           &sys->quad_fmt);
             }
             break;
         }
@@ -1049,17 +1057,17 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         if (is_d3d11_opaque(picture->format.i_chroma))
             d3d11_device_lock( &sys->d3d_dev );
 
-        if (sys->tonemapProc)
-        {
-            if (FAILED(D3D11_TonemapperProcess(VLC_OBJECT(vd), sys->tonemapProc, p_sys)))
-                return;
-            p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
-        }
         if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
         {
             if (D3D11_UpscalerScale(VLC_OBJECT(vd), sys->scaleProc, p_sys) != VLC_SUCCESS)
                 return;
             p_sys = D3D11_UpscalerGetOutput(sys->scaleProc);
+        }
+        if (sys->tonemapProc)
+        {
+            if (FAILED(D3D11_TonemapperProcess(VLC_OBJECT(vd), sys->tonemapProc, p_sys)))
+                return;
+            p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
         }
 
         D3D11_TEXTURE2D_DESC srcDesc;
@@ -1156,6 +1164,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     {
         memcpy(SRV, sys->stagingSys.resourceView, sizeof(SRV));
     }
+    else if (sys->tonemapProc)
+    {
+        picture_sys_t *p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
+        memcpy(SRV, p_sys->resourceView, sizeof(SRV));
+    }
     else if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
     {
         D3D11_UpscalerGetSRV(sys->scaleProc, SRV);
@@ -1163,10 +1176,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     else
     {
         picture_sys_t *p_sys;
-        if (sys->tonemapProc)
-            p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
-        else
-            p_sys = ActivePictureSys(picture);
+        p_sys = ActivePictureSys(picture);
         memcpy(SRV, p_sys->resourceView, sizeof(SRV));
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, SRV, sys->d3drenderTargetView);
@@ -1587,8 +1597,6 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
         return VLC_EGENERIC;
         }
 
-        InitTonemapProcessor(vd, &vd->source);
-
         hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
         IDXGIAdapter_Release(dxgiadapter);
         if (FAILED(hr)) {
@@ -1772,21 +1780,6 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, video_form
 
     // look for the requested pixel format first
     const d3d_format_t *decoder_format = NULL;
-    if (sys->hdrMode == hdr_Fake)
-    {
-        quad_fmt->i_chroma           = VLC_CODEC_RGBA10;
-        quad_fmt->primaries          = sys->display.colorspace->primaries;
-        quad_fmt->transfer           = sys->display.colorspace->transfer;
-        quad_fmt->space              = sys->display.colorspace->color;
-        quad_fmt->b_color_range_full = sys->display.colorspace->b_full_range;
-
-        // request an input format that can be input of a VideoProcessor
-        UINT supportFlags = D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
-        if (is_d3d11_opaque(fmt->i_chroma))
-            supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-        decoder_format = FindD3D11Format( vd, &sys->d3d_dev, fmt->i_chroma, false, 0, 0, 0,
-                                          is_d3d11_opaque(fmt->i_chroma), supportFlags );
-    }
     sys->picQuad.formatInfo = SelectOutputFormat(vd, quad_fmt, &decoder_format);
 
     if ( !sys->picQuad.formatInfo )
@@ -1796,17 +1789,29 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, video_form
     }
     sys->pool_d3dfmt = decoder_format ? decoder_format : sys->picQuad.formatInfo;
 
+    InitScaleProcessor(vd);
+
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->pool_d3dfmt->name,
                  (char *)&fmt->i_chroma );
     fmt->i_chroma = sys->pool_d3dfmt->fourcc;
     DxgiFormatMask( sys->picQuad.formatInfo->formatTexture, fmt );
 
+    InitTonemapProcessor(vd, quad_fmt);
+
+    if (sys->hdrMode == hdr_Fake)
+    {
+        quad_fmt->i_chroma           = VLC_CODEC_RGBA10;
+        quad_fmt->primaries          = sys->display.colorspace->primaries;
+        quad_fmt->transfer           = sys->display.colorspace->transfer;
+        quad_fmt->space              = sys->display.colorspace->color;
+        quad_fmt->b_color_range_full = sys->display.colorspace->b_full_range;
+        sys->picQuad.formatInfo = SelectOutputFormat(vd, quad_fmt, &decoder_format);
+    }
+
     /* check the region pixel format */
     sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_RGBA);
     if (!sys->d3dregion_format)
         sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
-
-    InitScaleProcessor(vd);
 
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 ||
             (sys->scaleProc == NULL && !CanUseTextureArray(vd)) ||
