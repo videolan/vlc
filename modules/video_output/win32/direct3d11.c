@@ -1046,9 +1046,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     {
         picture_sys_t *p_sys = ActivePictureSys(picture);
 
-        D3D11_TEXTURE2D_DESC srcDesc;
-        ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
-
         if (is_d3d11_opaque(picture->format.i_chroma))
             d3d11_device_lock( &sys->d3d_dev );
 
@@ -1062,11 +1059,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         {
             if (D3D11_UpscalerScale(VLC_OBJECT(vd), sys->scaleProc, p_sys) != VLC_SUCCESS)
                 return;
-            uint32_t witdh, height;
-            D3D11_UpscalerGetSize(sys->scaleProc, &witdh, &height);
-            srcDesc.Width  = witdh;
-            srcDesc.Height = height;
+            p_sys = D3D11_UpscalerGetOutput(sys->scaleProc);
         }
+
+        D3D11_TEXTURE2D_DESC srcDesc;
+        ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
 
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC texDesc;
