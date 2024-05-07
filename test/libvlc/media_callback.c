@@ -43,13 +43,20 @@
 
 const char vlc_module_name[] = MODULE_STRING;
 
+#define ACCESS_COUNT 2
+struct imem_root_access
+{
+    vlc_sem_t opened;
+    vlc_sem_t read_blocking;
+};
+
 struct imem_root
 {
     /* root controlled semaphores */
     vlc_sem_t available;
     vlc_sem_t done;
-    vlc_sem_t opened;
-    vlc_sem_t read_blocking;
+    size_t access_idx;
+    struct imem_root_access accesses[ACCESS_COUNT];
 
     vlc_sem_t wait;
 };
@@ -66,6 +73,7 @@ static void AccessClose(void *opaque)
     fprintf(stderr, "test: Access: Close\n");
     vlc_sem_post(&sys->root->done);
     vlc_sem_post(&sys->root->available);
+    sys->root->access_idx++;
     free(sys);
 }
 
@@ -73,6 +81,7 @@ static int AccessOpen(void *opaque, void **datap, uint64_t *sizep)
 {
     (void)sizep;
     struct imem_root *root = opaque;
+    assert(root->access_idx < ACCESS_COUNT);
     vlc_sem_wait(&root->available);
     fprintf(stderr, "test: Access: Opening new instance\n");
 
@@ -82,7 +91,7 @@ static int AccessOpen(void *opaque, void **datap, uint64_t *sizep)
 
     sys->root = root;
     vlc_sem_init(&sys->wait, 0);
-    vlc_sem_post(&sys->root->opened);
+    vlc_sem_post(&root->accesses[root->access_idx].opened);
     return VLC_SUCCESS;
 }
 
@@ -104,9 +113,10 @@ static ssize_t AccessReadBlocking(void *opaque, unsigned char *buf, size_t len)
 {
     (void)opaque; (void)buf;
     struct imem_access *sys = opaque;
+    struct imem_root *root = sys->root;
     assert(len < SSIZE_MAX);
 
-    vlc_sem_post(&sys->root->read_blocking);
+    vlc_sem_post(&root->accesses[root->access_idx].read_blocking);
     /* The interruption is used to detect when the input has been closed. */
     bool was_interrupted = false;
     vlc_interrupt_register(SetFlag, &was_interrupted);
@@ -137,8 +147,12 @@ static struct imem_root *imem_root_New(void)
     vlc_sem_init(&imem->available, 1);
     vlc_sem_init(&imem->done, 0);
     vlc_sem_init(&imem->wait, 0);
-    vlc_sem_init(&imem->opened, 0);
-    vlc_sem_init(&imem->read_blocking, 0);
+    imem->access_idx = 0;
+    for (size_t i = 0; i < ACCESS_COUNT; i++)
+    {
+        vlc_sem_init(&imem->accesses[i].opened, 0);
+        vlc_sem_init(&imem->accesses[i].read_blocking, 0);
+    }
 
     return imem;
 }
@@ -216,8 +230,8 @@ static void test_media_callback_interrupt(libvlc_instance_t *vlc)
     libvlc_media_player_play(player);
 
     /* We want to be sure that the media has been opened. */
-    vlc_sem_wait(&imem->opened);
-    vlc_sem_wait(&imem->read_blocking);
+    vlc_sem_wait(&imem->accesses[0].opened);
+    vlc_sem_wait(&imem->accesses[0].read_blocking);
 
     libvlc_media_release(media);
     media = libvlc_media_new_callbacks(
@@ -233,10 +247,10 @@ static void test_media_callback_interrupt(libvlc_instance_t *vlc)
 
     /* Semaphore notifying that the first access has been closed. */
     vlc_sem_wait(&imem->done);
-    assert(vlc_sem_trywait(&imem->read_blocking) == EAGAIN);
+    assert(vlc_sem_trywait(&imem->accesses[0].read_blocking) == EAGAIN);
 
-    vlc_sem_wait(&imem->opened);
-    vlc_sem_wait(&imem->read_blocking);
+    vlc_sem_wait(&imem->accesses[1].opened);
+    vlc_sem_wait(&imem->accesses[1].read_blocking);
 
     fprintf(stderr, "test: checking that we get the media stopping event\n");
     libvlc_media_player_stop_async(player);
