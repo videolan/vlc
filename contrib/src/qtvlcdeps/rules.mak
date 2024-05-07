@@ -14,7 +14,7 @@ ifeq ($(call need_pkg,"qtvlcdeps >= 0.1"),)
 PKGS_FOUND += qtvlcdeps
 endif
 
-QT_VLC_DEP_SOURCES := Imports.qml Imports.qrc qtvlcdeps.pc.in vlcdeps.pro
+QT_VLC_DEP_SOURCES := Imports.qml qtvlcdeps.pc.in CMakeLists.txt
 
 .sum-qtvlcdeps:
 	touch $@
@@ -28,9 +28,9 @@ qtvlcdeps:
 	$(MOVE)
 
 .qtvlcdeps: qtvlcdeps
-	rm -rf $</Makefile.Release
-	$(BUILDPREFIX)/bin/qmake6 -qtconf $(PREFIX)/bin/target_qt.conf $(SRC)/qtvlcdeps -o $<
-	QT_LIBS=$$(awk -F '=' '/LIBS/ {print $$2; exit}' $</Makefile.Release); \
+	$(CMAKECLEAN)
+	$(HOSTVARS) $(CMAKE) -G Ninja -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+	QT_LIBS=$$(awk -F '=' '/LINK_LIBRARIES/ {print $$2; exit}' $(BUILD_DIR)/build.ninja); \
 	  cat $</qtvlcdeps.pc.in                         | \
 	  sed "s|%1|$$QT_LIBS|"                          | \
 	  sed "s|$(PREFIX)/lib/|$$\{libdir\}/|g"         | \
