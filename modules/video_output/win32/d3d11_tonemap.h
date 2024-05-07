@@ -23,6 +23,8 @@ struct d3d11_tonemapper;
 struct d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *, d3d11_device_t *,
                                                 const video_format_t * in);
 void D3D11_TonemapperDestroy(struct d3d11_tonemapper *);
+int D3D11_TonemapperUpdate(vlc_object_t *, struct d3d11_tonemapper *, d3d11_device_t*,
+                         video_format_t *);
 HRESULT D3D11_TonemapperProcess(vlc_object_t *, struct d3d11_tonemapper *, picture_sys_t *);
 struct picture_sys_t *D3D11_TonemapperGetOutput(struct d3d11_tonemapper *);
 
