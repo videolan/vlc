@@ -32,6 +32,8 @@ struct d3d11_tonemapper
     const d3d_format_t              *d3d_fmt = nullptr;
     UINT                            Width  = 0;
     UINT                            Height = 0;
+
+    HRESULT UpdateTexture(vlc_object_t *, d3d11_device_t *, UINT width, UINT height);
 };
 
 d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_dev,
@@ -49,10 +51,6 @@ d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_d
         return nullptr; // the source is already in HDR
     }
 
-    ComPtr<ID3D11Texture2D> texture;
-    ID3D11Texture2D *_texture[D3D11_MAX_SHADER_VIEW] = {};
-    D3D11_TEXTURE2D_DESC texDesc { };
-    D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc{ };
     d3d11_tonemapper *tonemapProc = new d3d11_tonemapper();
     tonemapProc->d3d_fmt = D3D11_RenderFormat(DXGI_FORMAT_R10G10B10A2_UNORM, false);
     assert(tonemapProc->d3d_fmt != nullptr);
@@ -145,6 +143,24 @@ d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_d
         d3d11_device_unlock(d3d_dev);
     }
 
+    hr = tonemapProc->UpdateTexture(vd, d3d_dev, in->i_width, in->i_height);
+    if (FAILED(hr))
+        goto error;
+
+    return tonemapProc;
+error:
+    delete tonemapProc;
+    return nullptr;
+}
+
+HRESULT d3d11_tonemapper::UpdateTexture(vlc_object_t *vd, d3d11_device_t *d3d_dev, UINT width, UINT height)
+{
+    ComPtr<ID3D11Texture2D> texture;
+    D3D11_TEXTURE2D_DESC texDesc { };
+    D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc{ };
+    ID3D11Texture2D *_texture[D3D11_MAX_SHADER_VIEW] = {};
+    HRESULT hr;
+
     // we need a texture that will receive the upscale version
     texDesc.MipLevels = 1;
     texDesc.SampleDesc.Count = 1;
@@ -152,38 +168,47 @@ d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_d
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     texDesc.CPUAccessFlags = 0;
     texDesc.ArraySize = 1;
-    texDesc.Format = tonemapProc->d3d_fmt->formatTexture;
-    texDesc.Width = in->i_width;
-    texDesc.Height = in->i_height;
+    texDesc.Format = d3d_fmt->formatTexture;
+    texDesc.Width = width;
+    texDesc.Height = height;
     texDesc.MiscFlags = 0;
     hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, texture.GetAddressOf());
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the tonemap texture. (hr=0x%lX)", hr);
-        goto error;
+        return hr;
     }
 
     outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
     outDesc.Texture2D.MipSlice = 0;
 
-    hr = tonemapProc->d3dviddev->CreateVideoProcessorOutputView(
-                                                            texture.Get(),
-                                                            tonemapProc->enumerator.Get(),
-                                                            &outDesc,
-                                                            tonemapProc->outputView.ReleaseAndGetAddressOf());
+    hr = d3dviddev->CreateVideoProcessorOutputView(texture.Get(),
+                                                   enumerator.Get(),
+                                                   &outDesc,
+                                                   outputView.ReleaseAndGetAddressOf());
     if (FAILED(hr))
     {
         msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
-        goto error;
+        return hr;
     }
 
+    if (picsys.processorInput)
+    {
+        picsys.processorInput->Release();
+        picsys.processorInput = NULL;
+    }
+    if (picsys.processorOutput)
+    {
+        picsys.processorOutput->Release();
+        picsys.processorOutput = NULL;
+    }
     _texture[0] = texture.Get();
     _texture[1] = texture.Get();
     _texture[2] = texture.Get();
     _texture[3] = texture.Get();
-    if ((D3D11_AllocateShaderView)(vd, d3d_dev->d3ddevice, tonemapProc->d3d_fmt,
-                                   _texture, 0, tonemapProc->SRV.GetAddressOf()) != VLC_SUCCESS)
-        goto error;
+    if ((D3D11_AllocateShaderView)(vd, d3d_dev->d3ddevice, d3d_fmt,
+                                   _texture, 0, SRV.ReleaseAndGetAddressOf()) != VLC_SUCCESS)
+        return hr;
 
     {
         RECT srcRect;
@@ -193,31 +218,24 @@ d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_d
         srcRect.bottom = texDesc.Height;
 
         d3d11_device_lock(d3d_dev);
-        tonemapProc->d3dvidctx->VideoProcessorSetStreamSourceRect(tonemapProc->processor.Get(),
+        d3dvidctx->VideoProcessorSetStreamSourceRect(processor.Get(),
                                                                   0, TRUE, &srcRect);
 
-        tonemapProc->d3dvidctx->VideoProcessorSetStreamDestRect(tonemapProc->processor.Get(),
+        d3dvidctx->VideoProcessorSetStreamDestRect(processor.Get(),
                                                                 0, TRUE, &srcRect);
 
         d3d11_device_unlock(d3d_dev);
     }
 
-    tonemapProc->picsys.texture[0] = texture.Get();
-    tonemapProc->picsys.resourceView[0] = tonemapProc->SRV.Get();
-    tonemapProc->picsys.formatTexture = texDesc.Format;
+    picsys.texture[0] = texture.Get();
+    picsys.resourceView[0] = SRV.Get();
+    picsys.formatTexture = texDesc.Format;
 
-    tonemapProc->Width  = texDesc.Width;
-    tonemapProc->Height = texDesc.Height;
+    Width  = texDesc.Width;
+    Height = texDesc.Height;
+    msg_Dbg(vd, "tonemap resolution %ux%u", Width, Height);
 
-    return tonemapProc;
-error:
-    delete tonemapProc;
-    return nullptr;
-}
-
-void ReleaseSRVs(d3d11_tonemapper *tonemapProc)
-{
-    tonemapProc->SRV.Reset();
+    return S_OK;
 }
 
 void D3D11_TonemapperDestroy(d3d11_tonemapper *tonemapProc)
@@ -298,68 +316,9 @@ int D3D11_TonemapperUpdate(vlc_object_t *vd, d3d11_tonemapper *tonemapProc, d3d1
         // do nothing
         return VLC_SUCCESS;
 
-    {
-        tonemapProc->Width  = out_width;
-        tonemapProc->Height = out_height;
-
-        // we need a texture that will receive the upscale version
-        D3D11_TEXTURE2D_DESC texDesc;
-        ZeroMemory(&texDesc, sizeof(texDesc));
-        texDesc.MipLevels = 1;
-        texDesc.SampleDesc.Count = 1;
-        texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-        texDesc.Usage = D3D11_USAGE_DEFAULT;
-        texDesc.CPUAccessFlags = 0;
-        texDesc.ArraySize = 1;
-        texDesc.Format = tonemapProc->d3d_fmt->formatTexture;
-        texDesc.Width = tonemapProc->Width;
-        texDesc.Height = tonemapProc->Height;
-        texDesc.MiscFlags = 0;
-        hr = d3d_dev->d3ddevice->CreateTexture2D(&texDesc, nullptr, texture.GetAddressOf());
-        if (FAILED(hr))
-        {
-            msg_Err(vd, "Failed to create the tonemap texture. (hr=0x%lX)", hr);
-            goto done_super;
-        }
-        msg_Dbg(vd, "tonemap resolution %ux%u", texDesc.Width, texDesc.Height);
-
-        outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
-        outDesc.Texture2D.MipSlice = 0;
-
-        hr = tonemapProc->d3dviddev->CreateVideoProcessorOutputView(
-                                                                texture.Get(),
-                                                                tonemapProc->enumerator.Get(),
-                                                                &outDesc,
-                                                                tonemapProc->outputView.ReleaseAndGetAddressOf());
-        if (FAILED(hr))
-        {
-            msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
-            goto done_super;
-        }
-
-        ReleaseSRVs(tonemapProc);
-        _texture[0] = texture.Get();
-        _texture[1] = texture.Get();
-        _texture[2] = texture.Get();
-        _texture[3] = texture.Get();
-        if ((D3D11_AllocateShaderView)(vd, d3d_dev->d3ddevice, tonemapProc->d3d_fmt,
-                                    _texture, 0, tonemapProc->SRV.GetAddressOf()) != VLC_SUCCESS)
-            goto done_super;
-
-        if (tonemapProc->picsys.processorInput)
-        {
-            tonemapProc->picsys.processorInput->Release();
-            tonemapProc->picsys.processorInput = NULL;
-        }
-        if (tonemapProc->picsys.processorOutput)
-        {
-            tonemapProc->picsys.processorOutput->Release();
-            tonemapProc->picsys.processorOutput = NULL;
-        }
-        tonemapProc->picsys.texture[0] = texture.Get();
-        tonemapProc->picsys.resourceView[0] = tonemapProc->SRV.Get();
-        tonemapProc->picsys.formatTexture = texDesc.Format;
-    }
+    hr = tonemapProc->UpdateTexture(vd, d3d_dev, out_width, out_height);
+    if (FAILED(hr))
+        goto done_super;
 
     RECT srcRect;
     srcRect.left   = 0;
@@ -377,7 +336,7 @@ int D3D11_TonemapperUpdate(vlc_object_t *vd, d3d11_tonemapper *tonemapProc, d3d1
 
     return VLC_SUCCESS;
 done_super:
-    ReleaseSRVs(tonemapProc);
+    tonemapProc->SRV.Reset();
     tonemapProc->processor.Reset();
     tonemapProc->enumerator.Reset();
     return VLC_EGENERIC;
