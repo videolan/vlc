@@ -42,15 +42,9 @@
 static_assert (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0),
                "Update your Qt version to at least 6.2.0");
 
-#if ( QT_VERSION < QT_VERSION_CHECK(5, 15, 0) )
-# define QSIGNALMAPPER_MAPPEDINT_SIGNAL QOverload<int>::of(&QSignalMapper::mapped)
-# define QSIGNALMAPPER_MAPPEDSTR_SIGNAL QOverload<const QString &>::of(&QSignalMapper::mapped)
-# define QSIGNALMAPPER_MAPPEDOBJ_SIGNAL QOverload<QObject *>::of(&QSignalMapper::mapped)
-#else
 # define QSIGNALMAPPER_MAPPEDINT_SIGNAL &QSignalMapper::mappedInt
 # define QSIGNALMAPPER_MAPPEDSTR_SIGNAL &QSignalMapper::mappedString
 # define QSIGNALMAPPER_MAPPEDOBJ_SIGNAL &QSignalMapper::mappedObject
-#endif
 
 
 enum {
