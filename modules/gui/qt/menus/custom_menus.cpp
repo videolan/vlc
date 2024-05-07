@@ -221,11 +221,7 @@ CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , 
         m_actionGroup = new QActionGroup(this);
         if (m_grouping == GROUPED_OPTIONAL)
         {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
             m_actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
-#else
-            m_actionGroup->setExclusive(false);
-#endif
         }
     }
 
