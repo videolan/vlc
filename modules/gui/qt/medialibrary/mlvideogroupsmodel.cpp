@@ -73,12 +73,7 @@ QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
         {GROUP_COUNT, "count"},
     };
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-    for (auto i = groupRoles.begin(); i != groupRoles.end(); ++i)
-        hash.insert(i.key(), i.value());
-#else
     hash.insert(groupRoles);
-#endif
 
     return hash;
 }
