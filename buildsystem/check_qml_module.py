@@ -50,7 +50,7 @@ class QmlModuleChecker:
                 "-qmlFiles", f.name,
                 "-importPath", self.qmlpath
             ],
-            capture_output=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             )
 
         if ret.returncode != 0:
@@ -86,13 +86,13 @@ class QmlModuleChecker:
         if qtconf:
             ret = subprocess.run(
                 [ qmake, "-qtconf", qtconf, "-query"],
-                capture_output=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 encoding="utf8"
             )
         else:
             ret = subprocess.run(
                 [ qmake, "-query"],
-                capture_output=True,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 encoding="utf8"
             )
 
