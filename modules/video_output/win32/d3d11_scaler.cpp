@@ -54,6 +54,8 @@ struct d3d11_scaler
     ComPtr<ID3D11VideoProcessor>            processor;
     ComPtr<ID3D11VideoProcessorOutputView>  outputView;
     ID3D11ShaderResourceView                *SRVs[D3D11_MAX_SHADER_VIEW] = {};
+    picture_sys_t                           picsys{};
+
 #ifdef HAVE_AMF_SCALER
     vlc_amf_context                 amf = {};
     amf::AMFComponent               *amf_scaler = nullptr;
@@ -240,6 +242,11 @@ static void ReleaseSRVs(d3d11_scaler *scaleProc)
             scaleProc->SRVs[i] = nullptr;
         }
     }
+}
+
+picture_sys_t *D3D11_UpscalerGetOutput(d3d11_scaler *scaleProc)
+{
+    return &scaleProc->picsys;
 }
 
 int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device_t*d3d_dev,
@@ -440,6 +447,21 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             scaleProc->amf_initialized = true;
         }
 #endif
+
+        if (scaleProc->picsys.processorInput)
+        {
+            scaleProc->picsys.processorInput->Release();
+            scaleProc->picsys.processorInput = NULL;
+        }
+        if (scaleProc->picsys.processorOutput)
+        {
+            scaleProc->picsys.processorOutput->Release();
+            scaleProc->picsys.processorOutput = NULL;
+        }
+        scaleProc->picsys.texture[0] = upscaled.Get();
+        for (size_t i=0; i<ARRAY_SIZE(scaleProc->picsys.resourceView); i++)
+            scaleProc->picsys.resourceView[i] = scaleProc->SRVs[i];
+        scaleProc->picsys.formatTexture = texDesc.Format;
     }
 
 #ifdef HAVE_AMF_SCALER
