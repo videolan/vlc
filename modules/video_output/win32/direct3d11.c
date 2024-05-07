@@ -1153,14 +1153,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     ID3D11DeviceContext_ClearDepthStencilView(sys->d3d_dev.d3dcontext, sys->d3ddepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-    /* Render the quad */
+    ID3D11ShaderResourceView *SRV[D3D11_MAX_SHADER_VIEW];
+    /* Render the quad using the last stage of processing */
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
-        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, sys->stagingSys.resourceView, sys->d3drenderTargetView);
+    {
+        memcpy(SRV, sys->stagingSys.resourceView, sizeof(SRV));
+    }
     else if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
     {
-        ID3D11ShaderResourceView *SRV[D3D11_MAX_SHADER_VIEW];
         D3D11_UpscalerGetSRV(sys->scaleProc, SRV);
-        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, SRV, sys->d3drenderTargetView);
     }
     else
     {
@@ -1169,8 +1170,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
             p_sys = D3D11_TonemapperGetOutput(sys->tonemapProc);
         else
             p_sys = ActivePictureSys(picture);
-        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, p_sys->resourceView, sys->d3drenderTargetView);
+        memcpy(SRV, p_sys->resourceView, sizeof(SRV));
     }
+    D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, SRV, sys->d3drenderTargetView);
 
     if (subpicture) {
         // draw the additional vertices
