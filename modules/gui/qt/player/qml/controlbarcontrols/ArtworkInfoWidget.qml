@@ -164,7 +164,6 @@ AbstractButton {
                 Layout.fillHeight: true
 
                 Binding on visible {
-                    delayed: (MainCtx.qtVersion() < MainCtx.qtVersionCheck(5, 15, 8))
                     value: (infoColumn.height > infoColumn.implicitHeight) && (artistLabel.text.length > 0)
                 }
 
