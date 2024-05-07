@@ -285,25 +285,19 @@ bool X11DamageObserver::init()
     return true;
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
 //can't use QOverload with private signals
 template<class T>
 static auto privateOverload(void (QSocketNotifier::* s)( QSocketDescriptor,QSocketNotifier::Type, T) )
 {
     return s;
 }
-#endif
 
 void X11DamageObserver::start()
 {
     //listen to the x11 socket instead of blocking
     m_socketNotifier = new QSocketNotifier(m_connFd, QSocketNotifier::Read, this);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(m_socketNotifier, privateOverload(&QSocketNotifier::activated),
             this, &X11DamageObserver::onEvent);
-#else
-    connect(m_socketNotifier, &QSocketNotifier::activated, this, &X11DamageObserver::onEvent);
-#endif
 }
 
 bool X11DamageObserver::onRegisterSurfaceDamage(unsigned int wid)
