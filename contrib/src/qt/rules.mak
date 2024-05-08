@@ -32,7 +32,7 @@ PKGS_FOUND += qt-tools
 endif
 
 $(TARBALLS)/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz:
-	$(call download_pkg,$(QTBASE_URL), qt)
+	$(call download_pkg,$(QTBASE_URL),qt)
 
 .sum-qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz
 
