@@ -59,7 +59,8 @@ FocusScope {
     implicitWidth: loaderLeftRight.active ? loaderLeftRight.implicitWidth
                                           : (loaderLeft.implicitWidth + loaderCenter.implicitWidth + loaderRight.implicitWidth)
 
-    implicitHeight: Math.max(loaderLeft.implicitHeight, loaderCenter.implicitHeight, loaderRight.implicitHeight)
+    implicitHeight: loaderLeftRight.active ? loaderLeftRight.implicitHeight
+                                           : Math.max(loaderLeft.implicitHeight, loaderCenter.implicitHeight, loaderRight.implicitHeight)
 
     // Events
 
