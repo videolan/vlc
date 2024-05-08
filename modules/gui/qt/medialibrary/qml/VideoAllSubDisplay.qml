@@ -37,7 +37,7 @@ VideoAll {
     property SortMenuVideo sortMenu: SortMenuVideo {
         ctx: MainCtx
 
-        onGrouping: (groupping) => { MainCtx.grouping = grouping }
+        onGrouping: (grouping) => { MainCtx.grouping = grouping }
     }
 
     // Private
