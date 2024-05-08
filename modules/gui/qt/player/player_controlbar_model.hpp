@@ -34,6 +34,7 @@ class PlayerControlbarModel : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool dirty READ dirty WRITE setDirty NOTIFY dirtyChanged FINAL)
+    Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
 
     Q_PROPERTY(ControlListModel* left READ left CONSTANT FINAL)
     Q_PROPERTY(ControlListModel* center READ center CONSTANT FINAL)
@@ -70,6 +71,7 @@ public:
     ~PlayerControlbarModel();
 
     bool dirty() const;
+    bool empty() const;
 
     std::array<QVector<int>, 3> serializeModels() const;
     void loadModels(const std::array<QVector<int>, 3>& array);
@@ -83,10 +85,12 @@ public slots:
 
 signals:
     void dirtyChanged(bool dirty);
+    void emptyChanged(bool);
     void controlListChanged();
 
 private:
     bool m_dirty = false;
+    bool m_empty = true;
 
     ControlListModel* m_left = nullptr;
     ControlListModel* m_center = nullptr;
