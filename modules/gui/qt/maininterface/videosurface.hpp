@@ -128,6 +128,8 @@ protected:
 
     QSGNode* updatePaintNode(QSGNode *, QQuickItem::UpdatePaintNodeData *) override;
 
+    void componentComplete() override;
+
 signals:
     void ctxChanged(MainCtx*);
     void surfaceSizeChanged(QSizeF);

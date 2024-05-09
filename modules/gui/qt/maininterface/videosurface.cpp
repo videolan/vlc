@@ -210,12 +210,6 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
     setFlag(ItemHasContents, true);
-
-    connect(this, &QQuickItem::xChanged, this, &VideoSurface::onSurfacePositionChanged);
-    connect(this, &QQuickItem::yChanged, this, &VideoSurface::onSurfacePositionChanged);
-    connect(this, &QQuickItem::widthChanged, this, &VideoSurface::onSurfaceSizeChanged);
-    connect(this, &QQuickItem::heightChanged, this, &VideoSurface::onSurfaceSizeChanged);
-    connect(this, &VideoSurface::enabledChanged, this, &VideoSurface::updatePositionAndSize);
 }
 
 MainCtx* VideoSurface::getCtx()
@@ -363,6 +357,19 @@ QSGNode*VideoSurface::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintN
     }
     updatePositionAndSize();
     return node;
+}
+
+void VideoSurface::componentComplete()
+{
+    ViewBlockingRectangle::componentComplete();
+
+    connect(this, &QQuickItem::xChanged, this, &VideoSurface::onSurfacePositionChanged);
+    connect(this, &QQuickItem::yChanged, this, &VideoSurface::onSurfacePositionChanged);
+    connect(this, &QQuickItem::widthChanged, this, &VideoSurface::onSurfaceSizeChanged);
+    connect(this, &QQuickItem::heightChanged, this, &VideoSurface::onSurfaceSizeChanged);
+    connect(this, &VideoSurface::enabledChanged, this, &VideoSurface::updatePositionAndSize);
+
+    updatePositionAndSize();
 }
 
 void VideoSurface::onProviderVideoChanged(bool hasVideo)
