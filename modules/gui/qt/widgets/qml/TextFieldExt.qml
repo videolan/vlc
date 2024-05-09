@@ -38,6 +38,8 @@ TextField {
     selectedTextColor : theme.fg.highlight
     selectionColor : theme.bg.highlight
     color : theme.fg.primary
+    placeholderTextColor: theme.fg.secondary
+
     font.pixelSize: VLCStyle.fontSize_normal
 
     background: Rectangle {
