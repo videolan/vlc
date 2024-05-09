@@ -42,6 +42,8 @@ TextField {
 
     font.pixelSize: VLCStyle.fontSize_normal
 
+    verticalAlignment: Text.AlignVCenter
+
     background: Rectangle {
         implicitWidth: 200
         implicitHeight: 40
