@@ -23,7 +23,7 @@
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VGp-RV-Jl4">
                                     <rect key="frame" x="-2" y="6" width="144" height="28"/>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Audio Group" id="96R-yZ-Dap">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Audio Group" id="96R-yZ-Dap">
                                         <font key="font" metaFont="systemBold" size="24"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
