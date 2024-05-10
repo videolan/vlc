@@ -127,6 +127,12 @@ MainInterface.MainTableView {
 
 
     onDropEntered: (delegate, index, drag, before) => {
+        if (!root.model || root.model.transactionPending)
+        {
+            drag.accepted = false
+            return
+        }
+
         root._dropUpdatePosition(drag, index, delegate, before)
     }
 
