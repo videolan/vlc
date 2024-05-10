@@ -106,11 +106,14 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
     connect(m_nativeEventFilter.get(), &Win7NativeEventFilter::windowStyleChanged,
             this, &CompositorWin7::resetVideoZOrder);
 
-    m_qmlView->show();
-
     m_qmlWindowHWND = (HWND)m_qmlView->winId();
 
-    return commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
+    const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
+
+    if (ret)
+        m_qmlView->show();
+
+    return ret;
 }
 
 void CompositorWin7::destroyMainInterface()
