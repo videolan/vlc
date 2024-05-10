@@ -139,6 +139,12 @@ MainInterface.MainViewLoader {
     }
 
     function _adjustDragAccepted(drag) {
+        if (!root.model || root.model.transactionPending)
+        {
+            drag.accepted = false
+            return
+        }
+
         if (drag.source !== dragItemPlaylist && Helpers.isValidInstanceOf(drag.source, Widgets.DragItem))
             drag.accepted = true
         else if (drag.hasUrls)
