@@ -219,7 +219,7 @@ T.ItemDelegate {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
-                text: model?.artist ?? qsTr("Unknown Artist")
+                text: model.artist || qsTr("Unknown Artist")
                 color: theme.fg.primary
                 verticalAlignment: Text.AlignBottom
             }
