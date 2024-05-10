@@ -109,7 +109,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_qmlView->setColor(QColor(Qt::transparent));
 
-    m_qmlView->show();
+    m_qmlView->create();
 
     QPlatformNativeInterface *nativeInterface = QGuiApplication::platformNativeInterface();
     void* interfaceSurface = nativeInterface->nativeResourceForWindow("surface", m_qmlView.get());
@@ -118,8 +118,13 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
 
     m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, dprForWindow(m_qmlView.get()));
 
-    return commonGUICreate(m_qmlView.get(), m_qmlView.get(),
-                    CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC);
+    const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(),
+                                     CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC);
+
+    if (ret)
+        m_qmlView->show();
+
+    return ret;
 }
 
 QWindow* CompositorWayland::interfaceMainWindow() const
