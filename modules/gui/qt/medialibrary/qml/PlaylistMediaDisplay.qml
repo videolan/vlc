@@ -129,6 +129,38 @@ FocusScope {
 
             resetFocus();
         }
+
+        onTransactionPendingChanged: {
+            if (transactionPending)
+                visibilityTimer.start()
+            else {
+                visibilityTimer.stop()
+                progressIndicator.visible = false
+            }
+        }
+    }
+
+    Widgets.ProgressIndicator {
+        id: progressIndicator
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.margins: VLCStyle.margin_small
+
+        visible: false
+
+        z: 99
+
+        text: qsTr("Processing...")
+
+        Timer {
+            id: visibilityTimer
+
+            interval: VLCStyle.duration_humanMoment
+
+            onTriggered: {
+                progressIndicator.visible = true
+            }
+        }
     }
 
     Widgets.MLDragItem {
