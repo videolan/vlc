@@ -26,7 +26,6 @@
 #include "playlist_common.hpp"
 #include "playlist_item.hpp"
 #include "util/vlctick.hpp"
-#include "util/shared_input_item.hpp"
 
 #include <QAbstractListModel>
 
@@ -72,7 +71,7 @@ public:
 
     int getCurrentIndex() const;
 
-    Q_INVOKABLE QVector<SharedInputItem> getItemsForIndexes(const QVector<int> & indexes) const;
+    Q_INVOKABLE QVariantList getItemsForIndexes(const QVector<int> & indexes) const;
 
 public slots:
     Playlist getPlaylist() const;
