@@ -1128,7 +1128,8 @@ libqt_plugin_la_QML = \
 	widgets/qml/FadingEdgeForListView.qml \
 	widgets/qml/PopupIconToolButton.qml \
         widgets/qml/PartialEffect.qml \
-        widgets/qml/ViewHeader.qml
+        widgets/qml/ViewHeader.qml \
+        widgets/qml/ProgressIndicator.qml
 
 
 # Shaders:
