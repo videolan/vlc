@@ -88,31 +88,25 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
 {
     assert(m_mediaLib);
 
+    struct Ctx {
+        MLItemId createdPlaylistId;
+    };
 
-    std::vector<MLItemId> itemList;
-    for (const QVariant & id : initialItems)
-    {
-        if (id.canConvert<MLItemId>() == false)
-            continue;
-
-        const MLItemId & itemId = id.value<MLItemId>();
-
-        if (itemId.id == 0)
-            continue;
-        itemList.push_back(itemId);
-    }
-
-    m_mediaLib->runOnMLThread(this,
+    m_mediaLib->runOnMLThread<Ctx>(this,
     //ML thread
-    [name, itemList](vlc_medialibrary_t* ml)
+    [name](vlc_medialibrary_t* ml, Ctx& ctx)
     {
         vlc_ml_playlist_t * playlist = vlc_ml_playlist_create(ml, qtu(name));
         if (playlist)
         {
-            auto playlistId = playlist->i_id;
+            ctx.createdPlaylistId = MLItemId(playlist->i_id, VLC_ML_PARENT_UNKNOWN);
             vlc_ml_playlist_release(playlist);
-
-            appendMediaIntoPlaylist(ml, playlistId, itemList);
+        }
+    },
+    [this, initialItems](quint64, const Ctx& ctx) {
+        if (ctx.createdPlaylistId.id)
+        {
+            append(ctx.createdPlaylistId, initialItems);
         }
     });
 }
