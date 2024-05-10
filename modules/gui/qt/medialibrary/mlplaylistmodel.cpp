@@ -68,7 +68,7 @@ static const QHash<QByteArray, vlc_ml_sorting_criteria_t> criterias =
 
     QVector<vlc::playlist::Media> medias = vlc::playlist::toMediaList(items);
 
-    m_transactionPending = true;
+    setTransactionPending(true);
 
     m_mediaLib->runOnMLThread(this,
     //ML thread
@@ -227,7 +227,7 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
     highLowRanges.lowRangeIt = highLowRanges.lowRanges.size();
     highLowRanges.highRangeIt = 0;
 
-    m_transactionPending = true;
+    setTransactionPending(true);
 
     moveImpl(id, std::move(highLowRanges));
 }
@@ -275,19 +275,32 @@ void MLPlaylistModel::removeImpl(int64_t playlistId, const std::vector<std::pair
     auto rangeList = getSortedRowsRanges(indexes, false);
     assert(rangeList.size() > 0);
 
-    m_transactionPending = true;
+    setTransactionPending(true);
     removeImpl(id, std::move(rangeList), 0);
 }
 
 void MLPlaylistModel::endTransaction()
 {
-    m_transactionPending = false;
-    if (m_resetAfterTransaction)
+    setTransactionPending(false);
+}
+
+void MLPlaylistModel::setTransactionPending(bool value)
+{
+    if (m_transactionPending == value)
+        return;
+
+    m_transactionPending = value;
+
+    if (!value)
     {
-        m_resetAfterTransaction = false;
-        emit resetRequested();
+        if (m_resetAfterTransaction)
+        {
+            m_resetAfterTransaction = false;
+            emit resetRequested();
+        }
     }
 
+    emit transactionPendingChanged();
 }
 
 //-------------------------------------------------------------------------------------------------
