@@ -204,14 +204,14 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 
     m_qmlView->setFlag(Qt::WindowType::WindowTransparentForInput);
     m_qmlView->setParent(m_renderWindow.get());
-    m_qmlView->winId();
-    m_qmlView->show();
-
+    m_qmlView->create();
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | HAS_ACRYLIC;
     if (m_renderWindow->supportExtendedFrame())
         flags |= CompositorVideo::HAS_EXTENDED_FRAME;
     if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
         return false;
+
+    m_qmlView->show();
 
     if (m_blurBehind)
         m_renderWindow->m_hasAcrylic = true;
