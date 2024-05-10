@@ -118,6 +118,15 @@ MainInterface.MainViewLoader {
         coverDefault: root._placeHolder
 
         coverPrefix: (isMusic) ? "playlist-music" : "playlist-video"
+
+        onTransactionPendingChanged: {
+            if (transactionPending)
+                visibilityTimer.start()
+            else {
+                visibilityTimer.stop()
+                progressIndicator.visible = false
+            }
+        }
     }
 
     function _actionAtIndex() {
@@ -191,6 +200,29 @@ MainInterface.MainViewLoader {
 
         onDropped: function(drop) {
             root._dropAction(drop)
+        }
+    }
+
+    Widgets.ProgressIndicator {
+        id: progressIndicator
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.margins: VLCStyle.margin_small
+
+        visible: false
+
+        z: 99
+
+        text: qsTr("Processing...")
+
+        Timer {
+            id: visibilityTimer
+
+            interval: VLCStyle.duration_humanMoment
+
+            onTriggered: {
+                progressIndicator.visible = true
+            }
         }
     }
 
