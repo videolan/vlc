@@ -237,10 +237,14 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
     connect(quickViewPtr,
             &QQuickWindow::sceneGraphInitialized,
             &eventLoop,
-            [&eventLoop, &appropriateGraphicsApi]() {
+            [&eventLoop, &appropriateGraphicsApi, quickViewPtr]() {
                 if (!(QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D11 ||
                       QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D12)) {
                     appropriateGraphicsApi = false;
+                }
+                else
+                {
+                    quickViewPtr->show();
                 }
                 eventLoop.quit();
         }, Qt::SingleShotConnection);
@@ -259,8 +263,6 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
     m_quickView->create();
 
     const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, flags);
-
-    m_quickView->show();
 
     if (!m_quickView->isSceneGraphInitialized())
         eventLoop.exec();
