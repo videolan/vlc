@@ -109,6 +109,8 @@ T.Pane {
 
             property bool _keyPressed: false
 
+            property bool filterEvents: false
+
             color: root.sliderColor
 
             from: 0
@@ -209,7 +211,12 @@ T.Pane {
                     return
 
                 if (!volControl._inhibitPlayerVolumeUpdate) {
-                    Qt.callLater(volControl._adjustPlayerVolume)
+                    if (filterEvents) {
+                        Qt.callLater(volControl._adjustPlayerVolume)
+                    } else {
+                        volControl._adjustPlayerVolume()
+                        filterEvents = true
+                    }
                 }
             }
 
@@ -269,6 +276,7 @@ T.Pane {
                         return
                     }
 
+                    volControl.filterEvents = false
                     adjustVolume(mouse)
                 }
 
