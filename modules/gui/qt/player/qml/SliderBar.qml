@@ -249,6 +249,8 @@ T.ProgressBar {
             dragThreshold: 0
             grabPermissions: PointerHandler.CanTakeOverFromAnything
 
+            property bool filterEvents: false
+
             function moveControl() {
                 fsm.moveControl(dragHandler.centroid.position.x / control.width,
                                 dragHandler.centroid.modifiers === Qt.ShiftModifier)
@@ -256,6 +258,7 @@ T.ProgressBar {
 
             onActiveChanged: {
                 if (active) {
+                    filterEvents = false
                     fsm.pressControl(centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
                 } else {
                     fsm.releaseControl( centroid.position.x / control.width, centroid.modifiers === Qt.ShiftModifier)
@@ -264,7 +267,12 @@ T.ProgressBar {
 
             onCentroidChanged: {
                 // FIXME: Qt 6.5 use xAxis.onActiveValueChanged in the DragHandler
-                Qt.callLater(dragHandler.moveControl)
+                if (filterEvents) {
+                    Qt.callLater(dragHandler.moveControl)
+                } else {
+                    dragHandler.moveControl()
+                    filterEvents = true
+                }
             }
         }
     }
