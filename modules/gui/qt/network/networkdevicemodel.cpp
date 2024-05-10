@@ -559,10 +559,10 @@ bool NetworkDeviceModel::addAndPlay(const QModelIndexList& itemIdList)
 }
 
 /* Q_INVOKABLE */
-QVector<SharedInputItem> NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & indexes) const
+QVariantList NetworkDeviceModel::getItemsForIndexes(const QModelIndexList & indexes) const
 {
     Q_D(const NetworkDeviceModel);
-    QVector<SharedInputItem> items;
+    QVariantList items;
 
     for (const QModelIndex & modelIndex : indexes)
     {
@@ -570,7 +570,7 @@ QVector<SharedInputItem> NetworkDeviceModel::getItemsForIndexes(const QModelInde
         if (!item)
             continue;
 
-        items.append(SharedInputItem(item->inputItem.get(), true));
+        items.append(QVariant::fromValue(SharedInputItem(item->inputItem.get(), true)));
     }
 
     return items;
