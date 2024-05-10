@@ -58,6 +58,8 @@ public:
 
     Q_PROPERTY(PlaylistType playlistType READ playlistType WRITE setPlaylistType NOTIFY playlistTypeChanged FINAL)
 
+    Q_PROPERTY(bool transactionPending READ transactionPending NOTIFY transactionPendingChanged FINAL)
+
 public:
     explicit MLPlaylistListModel(QObject * parent = nullptr);
 
@@ -71,6 +73,8 @@ public: // Interface
     Q_INVOKABLE bool showDialogRename(const QModelIndex & index);
 
     Q_INVOKABLE MLItemId getItemId(int index) const;
+
+    bool transactionPending() const { return m_transactionPending; };
 
 public: // QAbstractItemModel implementation
     QHash<int, QByteArray> roleNames() const override;
@@ -91,6 +95,8 @@ private: // Functions
 
     void endTransaction();
 
+    void setTransactionPending(bool);
+
 private: // MLBaseModel implementation
     void onVlcMlEvent(const MLEvent & event) override;
 
@@ -99,6 +105,7 @@ signals:
     void coverDefaultChanged();
     void coverPrefixChanged ();
     void playlistTypeChanged();
+    void transactionPendingChanged(bool);
 
 public: // Properties
     QSize coverSize() const;

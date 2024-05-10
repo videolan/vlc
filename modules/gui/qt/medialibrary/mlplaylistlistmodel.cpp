@@ -120,7 +120,7 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     if (unlikely(m_transactionPending))
         return;
 
-    m_transactionPending = true;
+    setTransactionPending(true);
 
     m_mediaLib->runOnMLThread(this,
     //ML thread
@@ -178,7 +178,7 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
     if (unlikely(m_transactionPending))
         return false;
 
-    m_transactionPending = true;
+    setTransactionPending(true);
 
     std::vector<MLItemId> itemList;
     for (const QVariant & id : ids)
@@ -342,12 +342,26 @@ std::unique_ptr<MLListCacheLoader> MLPlaylistListModel::createMLLoader() const /
 
 void MLPlaylistListModel::endTransaction()
 {
-    m_transactionPending = false;
-    if (m_resetAfterTransaction)
+    setTransactionPending(false);
+}
+
+void MLPlaylistListModel::setTransactionPending(const bool value)
+{
+    if (m_transactionPending == value)
+        return;
+
+    m_transactionPending = value;
+
+    if (!value)
     {
-        m_resetAfterTransaction = false;
-        emit resetRequested();
+        if (m_resetAfterTransaction)
+        {
+            m_resetAfterTransaction = false;
+            emit resetRequested();
+        }
     }
+
+    emit transactionPendingChanged(value);
 }
 
 QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
