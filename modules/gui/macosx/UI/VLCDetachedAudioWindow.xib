@@ -43,40 +43,49 @@
                                 </constraints>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
-                                <rect key="frame" x="0.0" y="0.0" width="239" height="65"/>
+                                <rect key="frame" x="0.0" y="0.0" width="239" height="77"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="65" customClass="VLCDragDropView">
-                                        <rect key="frame" x="0.0" y="0.0" width="239" height="65"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="239" height="77"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Vae-cT-EEI" userLabel="Play controls group">
-                                                <rect key="frame" x="77" y="10" width="85" height="23"/>
+                                                <rect key="frame" x="72" y="10" width="96" height="32"/>
                                                 <subviews>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                                        <rect key="frame" x="0.0" y="0.0" width="29" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="backward-3btns" imagePosition="only" alignment="center" alternateImage="backward-3btns-pressed" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="14">
+                                                        <rect key="frame" x="0.0" y="-1.5" width="32" height="35"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="backward.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="backward.fill" controlSize="large" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="14">
                                                             <behavior key="behavior" lightByContents="YES"/>
-                                                            <font key="font" metaFont="label"/>
+                                                            <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="11" secondAttribute="height" multiplier="1:1" id="09v-B2-ddE"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="bwd:" target="3" id="56"/>
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                                                        <rect key="frame" x="29" y="0.0" width="27" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="play" imagePosition="only" alignment="center" alternateImage="play-pressed" imageScaling="proportionallyUpOrDown" id="15">
+                                                        <rect key="frame" x="32" y="-3" width="32" height="38"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="play.circle.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="play.circle.fill" controlSize="large" imageScaling="proportionallyUpOrDown" id="15">
                                                             <behavior key="behavior" lightByContents="YES"/>
-                                                            <font key="font" metaFont="titleBar" size="12" textStyle="headline"/>
+                                                            <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="10" secondAttribute="height" multiplier="1:1" id="aTD-32-d4n"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="play:" target="3" id="39"/>
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="12">
-                                                        <rect key="frame" x="56" y="0.0" width="29" height="23"/>
-                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="forward-3btns" imagePosition="only" alignment="center" alternateImage="forward-3btns-pressed" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="13">
+                                                        <rect key="frame" x="64" y="-1.5" width="32" height="35"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="forward.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="forward.fill" controlSize="large" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="13">
                                                             <behavior key="behavior" lightByContents="YES"/>
-                                                            <font key="font" metaFont="label"/>
+                                                            <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="12" secondAttribute="height" multiplier="1:1" id="Naf-xP-Ez9"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="fwd:" target="3" id="51"/>
                                                         </connections>
@@ -87,7 +96,7 @@
                                                     <constraint firstItem="10" firstAttribute="left" secondItem="11" secondAttribute="right" id="496-Ip-nTd"/>
                                                     <constraint firstItem="10" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="9Kr-xx-Ssf"/>
                                                     <constraint firstAttribute="right" secondItem="12" secondAttribute="right" id="KOc-oW-4iH"/>
-                                                    <constraint firstAttribute="height" constant="23" id="bN7-k9-7Iy"/>
+                                                    <constraint firstAttribute="height" constant="32" id="bN7-k9-7Iy"/>
                                                     <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" id="fFe-7J-ver"/>
                                                     <constraint firstItem="12" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="gwB-yN-SK0"/>
                                                     <constraint firstAttribute="bottom" secondItem="12" secondAttribute="bottom" id="l2h-EI-MAG"/>
@@ -97,7 +106,7 @@
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCSlider">
-                                                <rect key="frame" x="8" y="41" width="176" height="18"/>
+                                                <rect key="frame" x="8" y="50" width="176" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
                                                 </constraints>
@@ -108,8 +117,8 @@
                                                     <action selector="timeSliderAction:" target="3" id="46"/>
                                                 </connections>
                                             </slider>
-                                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
-                                                <rect key="frame" x="185" y="44" width="46" height="13"/>
+                                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9" customClass="VLCTimeField">
+                                                <rect key="frame" x="185" y="53" width="46" height="13"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="42" id="EvZ-Sy-m25"/>
                                                     <constraint firstAttribute="height" constant="13" id="LYT-Sd-Gf6"/>
@@ -137,7 +146,7 @@
                                     <constraint firstItem="65" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="84j-is-ZZ4"/>
                                     <constraint firstAttribute="bottom" secondItem="65" secondAttribute="bottom" id="WrS-PS-vpi"/>
                                     <constraint firstItem="65" firstAttribute="top" secondItem="5" secondAttribute="top" id="ecn-UJ-dvK"/>
-                                    <constraint firstAttribute="height" constant="65" id="z2X-5w-wme"/>
+                                    <constraint firstAttribute="height" constant="77" id="z2X-5w-wme"/>
                                 </constraints>
                             </customView>
                         </subviews>
@@ -190,12 +199,9 @@
         </customObject>
     </objects>
     <resources>
-        <image name="backward-3btns" width="29" height="23"/>
-        <image name="backward-3btns-pressed" width="29" height="23"/>
-        <image name="forward-3btns" width="29" height="23"/>
-        <image name="forward-3btns-pressed" width="29" height="23"/>
-        <image name="play" width="27" height="23"/>
-        <image name="play-pressed" width="27" height="23"/>
+        <image name="backward.fill" catalog="system" width="19" height="12"/>
+        <image name="forward.fill" catalog="system" width="19" height="12"/>
+        <image name="play.circle.fill" catalog="system" width="15" height="15"/>
         <image name="window-close" width="14" height="16"/>
     </resources>
 </document>
