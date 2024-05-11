@@ -297,6 +297,10 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
                [self.collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
         NSObject<VLCLibraryCollectionViewDataSource> * const dataSource = (NSObject<VLCLibraryCollectionViewDataSource> *)self.collectionView.dataSource;
         NSIndexPath * const indexPath = [dataSource indexPathForLibraryItem:self.representedItem.item];
+        if (indexPath == nil) {
+            return;
+        }
+
         NSSet<NSIndexPath *> * const indexPathSet = [NSSet setWithObject:indexPath];
         [self.collectionView deselectItemsAtIndexPaths:indexPathSet];
         
