@@ -298,6 +298,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         NSObject<VLCLibraryCollectionViewDataSource> * const dataSource = (NSObject<VLCLibraryCollectionViewDataSource> *)self.collectionView.dataSource;
         NSIndexPath * const indexPath = [dataSource indexPathForLibraryItem:self.representedItem.item];
         if (indexPath == nil) {
+            NSLog(@"Received nil indexPath for item %@!", self.representedItem.item.displayString);
             return;
         }
 
