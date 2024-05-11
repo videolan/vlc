@@ -45,7 +45,7 @@
                             <shadow key="shadow" blurRadius="20">
                                 <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </shadow>
-                            <textFieldCell key="cell" controlSize="large" title="Item detail string" id="P7c-bg-dPX">
+                            <textFieldCell key="cell" controlSize="large" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" title="Item detail string" usesSingleLineMode="YES" id="P7c-bg-dPX">
                                 <font key="font" metaFont="systemSemibold" size="17"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
