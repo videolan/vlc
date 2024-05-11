@@ -446,6 +446,28 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
     vlc_player_Unlock(player);
 }
 
+void libvlc_video_set_teletext_transparency( libvlc_media_player_t *p_mi, bool transparent )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_player_SetTeletextTransparency(player, transparent);
+
+    vlc_player_Unlock(player);
+}
+
+bool libvlc_video_get_teletext_transparency( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    bool transparent = vlc_player_IsTeletextTransparent(player);
+
+    vlc_player_Unlock(player);
+
+    return transparent;
+}
+
 /******************************************************************************
  * libvlc_video_set_deinterlace : enable/disable/auto deinterlace and filter
  *****************************************************************************/

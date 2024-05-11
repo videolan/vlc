@@ -244,6 +244,7 @@ libvlc_video_get_scale
 libvlc_video_get_spu_delay
 libvlc_video_get_spu_text_scale
 libvlc_video_get_teletext
+libvlc_video_get_teletext_transparency
 libvlc_video_set_adjust_float
 libvlc_video_set_adjust_int
 libvlc_video_set_aspect_ratio
@@ -267,6 +268,7 @@ libvlc_video_set_scale
 libvlc_video_set_spu_delay
 libvlc_video_set_spu_text_scale
 libvlc_video_set_teletext
+libvlc_video_set_teletext_transparency
 libvlc_video_take_snapshot
 libvlc_video_new_viewpoint
 libvlc_video_update_viewpoint

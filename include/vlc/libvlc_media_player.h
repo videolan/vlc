@@ -2154,6 +2154,25 @@ LIBVLC_API int libvlc_video_get_teletext( libvlc_media_player_t *p_mi );
 LIBVLC_API void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page );
 
 /**
+ * Set teletext background transparency.
+ *
+ * \param p_mi the media player
+ * \param transparent whether background should be transparent.
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API void libvlc_video_set_teletext_transparency( libvlc_media_player_t *p_mi, bool transparent );
+
+/**
+ * Get teletext background transparency.
+ *
+ * \param p_mi the media player
+ * \retval true teletext has transparent background
+ * \retval false teletext has opaque background
+ * \version LibVLC 4.0.0 or later
+ */
+LIBVLC_API bool libvlc_video_get_teletext_transparency( libvlc_media_player_t *p_mi );
+
+/**
  * Take a snapshot of the current video window.
  *
  * If i_width AND i_height is 0, original size is used.
