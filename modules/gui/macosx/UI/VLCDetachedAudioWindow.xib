@@ -137,6 +137,9 @@
                                     <constraint firstItem="65" firstAttribute="top" secondItem="5" secondAttribute="top" id="ecn-UJ-dvK"/>
                                     <constraint firstAttribute="height" constant="77" id="z2X-5w-wme"/>
                                 </constraints>
+                                <shadow key="shadow" blurRadius="10">
+                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </shadow>
                             </customView>
                         </subviews>
                         <constraints>
