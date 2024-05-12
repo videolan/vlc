@@ -12,8 +12,8 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="detachedaudiowindow" animationBehavior="default" titleVisibility="hidden" id="2" userLabel="Detached Audio Window" customClass="VLCDetachedAudioWindow">
-            <windowStyleMask key="styleMask" resizable="YES" fullSizeContentView="YES"/>
+        <window title="VLC media player" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="detachedaudiowindow" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="2" userLabel="Detached Audio Window" customClass="VLCDetachedAudioWindow">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="91" y="467" width="239" height="239"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
@@ -31,17 +31,6 @@
                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB">
                         <rect key="frame" x="0.0" y="0.0" width="239" height="233"/>
                         <subviews>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="F6N-G1-ay4" customClass="VLCCustomWindowCloseButton">
-                                <rect key="frame" x="8" y="217" width="14" height="16"/>
-                                <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="window-close" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="WwK-DC-6gz" customClass="VLCWindowButtonCell">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="16" id="h5F-zc-xQI"/>
-                                    <constraint firstAttribute="width" constant="14" id="u5l-1z-YIF"/>
-                                </constraints>
-                            </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="239" height="77"/>
                                 <subviews>
@@ -151,8 +140,6 @@
                             </customView>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="F6N-G1-ay4" firstAttribute="top" secondItem="s7h-2z-AKB" secondAttribute="top" id="3fm-nY-Pva"/>
-                            <constraint firstItem="F6N-G1-ay4" firstAttribute="leading" secondItem="s7h-2z-AKB" secondAttribute="leading" constant="8" id="DxB-T0-68G"/>
                             <constraint firstAttribute="trailing" secondItem="5" secondAttribute="trailing" id="Vh6-w4-RpJ"/>
                             <constraint firstItem="5" firstAttribute="leading" secondItem="s7h-2z-AKB" secondAttribute="leading" id="aOM-Yt-uR4"/>
                             <constraint firstAttribute="bottom" secondItem="5" secondAttribute="bottom" id="sVp-W4-nlt"/>
@@ -202,6 +189,5 @@
         <image name="backward.fill" catalog="system" width="19" height="12"/>
         <image name="forward.fill" catalog="system" width="19" height="12"/>
         <image name="play.circle.fill" catalog="system" width="15" height="15"/>
-        <image name="window-close" width="14" height="16"/>
     </resources>
 </document>
