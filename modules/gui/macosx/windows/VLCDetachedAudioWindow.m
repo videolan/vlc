@@ -38,6 +38,8 @@
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
+#import "windows/video/VLCMainVideoViewOverlayView.h"
+
 @interface VLCDetachedAudioWindow()
 {
     VLCPlayerController *_playerController;
@@ -51,12 +53,19 @@
     self.title = @"";
 
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
+
     VLCTrackingView * const trackingView = self.contentView;
-    trackingView.viewToHide = self.wrapperView;
+    trackingView.viewToHide = self.overlayView;
     trackingView.animatesTransition = YES;
 
+    self.overlayView.drawGradientForTopControls = YES;
+    self.overlayView.darkestGradientColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.8];
+
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(inputItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
 
     [self inputItemChanged:nil];
 }

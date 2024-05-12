@@ -173,7 +173,7 @@
                 <outlet property="bottomBarView" destination="5" id="xZs-ha-Bmg"/>
                 <outlet property="controlsBar" destination="3" id="69"/>
                 <outlet property="imageView" destination="63" id="xYd-xT-wUa"/>
-                <outlet property="wrapperView" destination="s7h-2z-AKB" id="Vze-9X-Oxo"/>
+                <outlet property="overlayView" destination="s7h-2z-AKB" id="VGk-aw-I4j"/>
             </connections>
             <point key="canvasLocation" x="138.5" y="146.5"/>
         </window>
