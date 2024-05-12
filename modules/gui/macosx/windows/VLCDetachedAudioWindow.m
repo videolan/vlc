@@ -49,7 +49,6 @@
 - (void)awakeFromNib
 {
     self.title = @"";
-    self.imageView.cropsImagesToRoundedCorners = NO;
 
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
     VLCTrackingView *trackingView = self.contentView;
