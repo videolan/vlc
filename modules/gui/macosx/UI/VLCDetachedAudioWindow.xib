@@ -28,8 +28,8 @@
                             <constraint firstAttribute="width" secondItem="63" secondAttribute="height" multiplier="1:1" id="RxG-T1-BEQ"/>
                         </constraints>
                     </customView>
-                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB">
-                        <rect key="frame" x="0.0" y="0.0" width="239" height="233"/>
+                    <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB" customClass="VLCMainVideoViewOverlayView">
+                        <rect key="frame" x="0.0" y="0.0" width="239" height="239"/>
                         <subviews>
                             <customView appearanceType="darkAqua" translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="239" height="77"/>
@@ -166,7 +166,7 @@
                     <constraint firstAttribute="trailing" secondItem="63" secondAttribute="trailing" id="b8X-Kc-BfD"/>
                     <constraint firstAttribute="bottom" secondItem="s7h-2z-AKB" secondAttribute="bottom" id="d58-lr-6o8"/>
                     <constraint firstAttribute="trailing" secondItem="s7h-2z-AKB" secondAttribute="trailing" id="dB2-xi-SzA"/>
-                    <constraint firstItem="s7h-2z-AKB" firstAttribute="top" secondItem="4" secondAttribute="top" constant="6" id="plq-T3-bmm"/>
+                    <constraint firstItem="s7h-2z-AKB" firstAttribute="top" secondItem="4" secondAttribute="top" id="plq-T3-bmm"/>
                 </constraints>
             </view>
             <connections>
