@@ -31,7 +31,7 @@
                     <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB">
                         <rect key="frame" x="0.0" y="0.0" width="239" height="233"/>
                         <subviews>
-                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
+                            <customView appearanceType="darkAqua" translatesAutoresizingMaskIntoConstraints="NO" id="5" customClass="VLCBottomBarView">
                                 <rect key="frame" x="0.0" y="0.0" width="239" height="77"/>
                                 <subviews>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="65" customClass="VLCDragDropView">
