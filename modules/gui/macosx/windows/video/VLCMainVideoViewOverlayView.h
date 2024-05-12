@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCMainVideoViewOverlayView : NSView
 
 @property (readwrite, assign) BOOL drawGradientForTopControls;
+@property (readwrite, strong) NSColor *darkestGradientColor;
 
 @end
 
