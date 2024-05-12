@@ -51,11 +51,11 @@
     self.title = @"";
 
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
-    VLCTrackingView *trackingView = self.contentView;
+    VLCTrackingView * const trackingView = self.contentView;
     trackingView.viewToHide = self.wrapperView;
     trackingView.animatesTransition = YES;
 
-    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self selector:@selector(inputItemChanged:) name:VLCPlayerCurrentMediaItemChanged object:nil];
 
     [self inputItemChanged:nil];
@@ -68,7 +68,7 @@
 
 - (void)inputItemChanged:(NSNotification *)aNotification
 {
-    VLCInputItem *currentInput = _playerController.currentMedia;
+    VLCInputItem * const currentInput = _playerController.currentMedia;
     if (currentInput) {
         [self.imageView setImageURL:currentInput.artworkURL placeholderImage:[NSImage imageNamed:@"noart.png"]];
     } else {
