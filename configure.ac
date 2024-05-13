@@ -4018,7 +4018,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       dnl check native in contribs and keep the full path if found there
-      AC_PATH_PROGS(QMAKE6, [qmake6], qmake6, ["${QT_BIN_DIRECTORY}"])
+      AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["${QT_BIN_DIRECTORY}"])
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
@@ -4029,9 +4029,9 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
-      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${QT_CONF}])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QTPATHS6} and conf ${QT_CONF}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qmake "${QMAKE6}" \
+            --qtpaths "${QTPATHS6}" \
             --qtconf "${QT_CONF}" \
             --modules \
             QtQml.Models="" \
@@ -4050,7 +4050,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
           AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qmake "${QMAKE6}" \
+            --qtpaths "${QTPATHS6}" \
             --qtconf "${QT_CONF}" \
             --modules QtTest="" \
             >&AS_MESSAGE_FD ], [
