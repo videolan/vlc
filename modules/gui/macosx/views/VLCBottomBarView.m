@@ -66,11 +66,16 @@
 {
     self.wantsLayer = YES;
     self.needsDisplay = YES;
+    self.drawBorder = YES;
 }
 
 - (void)drawRect:(NSRect)dirtyRect
 {
     [super drawRect:dirtyRect];
+
+    if (!self.drawBorder) {
+        return;
+    }
 
     const NSRect barFrame = self.frame;
     NSBezierPath * const separatorPath = NSBezierPath.bezierPath;

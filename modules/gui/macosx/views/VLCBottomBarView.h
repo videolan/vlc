@@ -24,4 +24,6 @@
 
 @interface VLCBottomBarView : NSView
 
+@property (readwrite, assign) BOOL drawBorder;
+
 @end
