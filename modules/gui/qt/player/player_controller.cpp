@@ -1251,6 +1251,9 @@ void PlayerController::setTime(VLCTick new_time)
 void PlayerController::setPosition(double position)
 {
     Q_D(PlayerController);
+    if (qFuzzyCompare(d->m_position, position))
+        return;
+
     vlc_player_locker lock{ d->m_player };
     if( !isCurrentItemSynced() )
         return;
