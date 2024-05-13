@@ -112,8 +112,11 @@
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="42" id="EvZ-Sy-m25"/>
                                                     <constraint firstAttribute="height" constant="13" id="LYT-Sd-Gf6"/>
                                                 </constraints>
+                                                <shadow key="shadow" blurRadius="1">
+                                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </shadow>
                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" alignment="center" title="00:00" id="16">
-                                                    <font key="font" metaFont="label"/>
+                                                    <font key="font" metaFont="systemBold" size="10"/>
                                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
