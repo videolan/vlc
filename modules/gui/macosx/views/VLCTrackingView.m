@@ -65,12 +65,14 @@
 {
     _mouseIn = YES;
     [self performTransition];
+    self.mouseEnteredBlock();
 }
 
 - (void)handleMouseExit
 {
     _mouseIn = NO;
     [self performTransition];
+    self.mouseExitedBlock();
 }
 
 - (void)mouseEntered:(NSEvent *)event

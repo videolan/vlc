@@ -24,11 +24,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^EnterExitBlock)(void);
+
 @interface VLCTrackingView : NSView
 
 @property (readwrite) BOOL animatesTransition;
 @property (readwrite, assign, nullable) NSView *viewToHide; // Hide when mouse out
 @property (readwrite, assign, nullable) NSView *viewToShow; // Show when mouse out
+@property (readwrite, assign, nullable) EnterExitBlock mouseEnteredBlock;
+@property (readwrite, assign, nullable) EnterExitBlock mouseExitedBlock;
 
 @end
 
