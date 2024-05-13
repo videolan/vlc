@@ -725,7 +725,7 @@ FocusScope {
     Flickable {
         id: flickable
 
-        flickableDirection: Flickable.VerticalFlick
+        flickableDirection: Flickable.AutoFlickIfNeeded
 
         boundsBehavior: Flickable.StopAtBounds
 
