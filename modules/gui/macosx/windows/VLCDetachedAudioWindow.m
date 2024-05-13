@@ -57,6 +57,12 @@
     VLCTrackingView * const trackingView = self.contentView;
     trackingView.viewToHide = self.overlayView;
     trackingView.animatesTransition = YES;
+    trackingView.mouseEnteredBlock = ^{
+        self.styleMask |= NSWindowStyleMaskTitled;
+    };
+    trackingView.mouseExitedBlock = ^{
+        self.styleMask &= ~NSWindowStyleMaskTitled;
+    };
 
     self.overlayView.drawGradientForTopControls = YES;
     self.overlayView.darkestGradientColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.8];
