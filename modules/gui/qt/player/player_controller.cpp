@@ -1248,7 +1248,7 @@ void PlayerController::setTime(VLCTick new_time)
     vlc_player_SetTime( d->m_player, new_time );
 }
 
-void PlayerController::setPosition(float position)
+void PlayerController::setPosition(double position)
 {
     Q_D(PlayerController);
     vlc_player_locker lock{ d->m_player };
@@ -1289,7 +1289,7 @@ void PlayerController::jumpToTime(VLCTick i_time)
     vlc_player_JumpTime( d->m_player, i_time );
 }
 
-void PlayerController::jumpToPos( float new_pos )
+void PlayerController::jumpToPos( double new_pos )
 {
     Q_D(PlayerController);
     {
@@ -2061,7 +2061,7 @@ PRIMITIVETYPE_GETTER(PlayerController::PlayingState, getPlayingState, m_playing_
 PRIMITIVETYPE_GETTER(QString, getName, m_name)
 PRIMITIVETYPE_GETTER(VLCTick, getTime, m_time)
 PRIMITIVETYPE_GETTER(VLCTick, getRemainingTime, m_remainingTime)
-PRIMITIVETYPE_GETTER(float, getPosition, m_position)
+PRIMITIVETYPE_GETTER(double, getPosition, m_position)
 PRIMITIVETYPE_GETTER(VLCTick, getLength, m_length)
 PRIMITIVETYPE_GETTER(VLCTick, getAudioDelay, m_audioDelay)
 PRIMITIVETYPE_GETTER(VLCTick, getSubtitleDelay, m_subtitleDelay)

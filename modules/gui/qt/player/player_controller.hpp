@@ -113,7 +113,7 @@ public:
 
     Q_PROPERTY(VLCTick time READ getTime WRITE setTime NOTIFY timeChanged FINAL)
     Q_PROPERTY(VLCTick remainingTime READ getRemainingTime NOTIFY remainingTimeChanged FINAL)
-    Q_PROPERTY(float position READ getPosition WRITE setPosition NOTIFY positionChanged FINAL)
+    Q_PROPERTY(double position READ getPosition WRITE setPosition NOTIFY positionChanged FINAL)
     Q_PROPERTY(VLCTick length READ getLength NOTIFY lengthChanged FINAL)
 
     Q_PROPERTY(bool seekable READ isSeekable NOTIFY seekableChanged FINAL)
@@ -205,7 +205,7 @@ public slots:
     void jumpFwd();
     void jumpBwd();
     void jumpToTime( VLCTick i_time );
-    void jumpToPos( float );
+    void jumpToPos( double );
     void frameNext();
 
     //title/chapters/menu
@@ -282,8 +282,8 @@ public slots:
     VLCTick getTime() const;
     void setTime(VLCTick);
     VLCTick getRemainingTime() const;
-    float getPosition() const;
-    void setPosition(float);
+    double getPosition() const;
+    void setPosition(double);
     VLCTick getLength() const;
     bool isSeekable() const;
     bool isRewindable() const;
@@ -399,10 +399,10 @@ signals:
 
     void timeChanged( VLCTick );
     void remainingTimeChanged( VLCTick );
-    void positionChanged( float );
+    void positionChanged( double );
     void lengthChanged( VLCTick );
-    void positionUpdated( float , VLCTick, int );
-    void seekRequested( float pos ); //not exposed through Q_PROPERTY
+    void positionUpdated( double , VLCTick, int );
+    void seekRequested( double pos ); //not exposed through Q_PROPERTY
 
     void seekableChanged( bool );
     void rewindableChanged( bool );
