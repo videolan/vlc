@@ -17,6 +17,8 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.xz .sum-harfbuzz
 	$(APPLY) $(SRC)/harfbuzz/0001-meson-Enable-big-objects-support-when-building-for-w.patch
 	$(APPLY) $(SRC)/harfbuzz/0001-freetype-Fix-function-signatures-to-match-without-ca.patch
 	$(APPLY) $(SRC)/harfbuzz/0002-Disable-Wcast-function-type-strict.patch
+	# build ragel as a native tool (which can't be installed)
+	sed -i.orig -e 's,install : true,native : true,' $(UNPACK_DIR)/subprojects/packagefiles/ragel/meson.build
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
