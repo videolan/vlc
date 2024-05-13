@@ -3055,17 +3055,17 @@ dnl H262 encoder plugin (lib262)
 dnl
 AC_ARG_ENABLE([x262],
   AS_HELP_STRING([--enable-x262], [H262 encoding support with static libx262 (default disabled)]))
-if test "${enable_x262}" != "no"; then
+AS_IF([test "${enable_x262}" != "no"], [
     PKG_CHECK_MODULES(X262, x262, [
         VLC_ADD_PLUGIN([x262])
         VLC_ADD_LIBS([x262],[${X262_LIBS}])
         VLC_ADD_CFLAGS([x262],[${X262_CFLAGS}])
-    ], [
-       if test "${enable_x262}" = "yes"; then
-        AC_MSG_ERROR([x262 module doesn't work without staticly compiled libx262.a])
-       fi
+    ],[
+       AS_IF([test "${enable_x262}" = "yes"], [
+        AC_MSG_ERROR([x262 module does not work without statically compiled libx262.a])
+       ])
     ])
-fi
+])
 
 dnl x265 encoder
 PKG_ENABLE_MODULES_VLC([X265],, [x265], [HEVC/H.265 encoder], [auto])
