@@ -61,6 +61,8 @@
     self.overlayView.drawGradientForTopControls = YES;
     self.overlayView.darkestGradientColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.8];
 
+    self.bottomBarView.drawBorder = NO;
+
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(inputItemChanged:)
