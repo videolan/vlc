@@ -214,6 +214,12 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
     }
 
     size_t bytes_copied = 0;
+
+    /* Store the previous started state, in order to skip the timing report
+     * from the first render call, in order to avoid small timing
+     * discontinuities when starting.  */
+    bool was_started = p_sys->started;
+
     while (bytes > 0)
     {
         vlc_frame_t *f = p_sys->p_out_chain;
@@ -252,7 +258,8 @@ ca_Render(audio_output_t *p_aout, uint64_t host_time,
 
     p_sys->timing_report_last_written_bytes += bytes_copied;
 
-    if (p_sys->timing_report_last_written_bytes >=
+    if (was_started &&
+        p_sys->timing_report_last_written_bytes >=
         p_sys->timing_report_delay_bytes)
     {
         p_sys->timing_report_last_written_bytes = 0;
