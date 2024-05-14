@@ -78,10 +78,6 @@ class QmlModuleChecker:
 
 
     def getInstallInfo(self, qtpaths, qtconf):
-        if not os.path.isfile(qtpaths):
-            print("qtpaths not found")
-            return False
-
         qtpaths_cmd = [ qtpaths, "--query", "--query-format", "json" ]
         if qtconf:
             qtpaths_cmd += [ "--qtconf", qtconf ]
