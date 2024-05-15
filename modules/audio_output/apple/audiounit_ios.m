@@ -227,12 +227,7 @@ MuteSet(audio_output_t *p_aout, bool mute)
 static void
 Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 {
-    aout_sys_t * p_sys = p_aout->sys;
-
-    if (p_sys->b_muted)
-        block_Release(p_block);
-    else
-        ca_Play(p_aout, p_block, date);
+    ca_Play(p_aout, p_block, date);
 }
 
 #pragma mark initialization
@@ -338,9 +333,6 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
         au_Uninitialize(p_aout, p_sys->au_unit);
         goto error;
     }
-
-    if (p_sys->b_muted)
-        Pause(p_aout, true, 0);
 
     fmt->channel_type = AUDIO_CHANNEL_TYPE_BITMAP;
     p_aout->pause = Pause;
