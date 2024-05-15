@@ -383,8 +383,6 @@ bool CompositorX11RenderWindow::init()
     const auto nativeInterface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
     assert(nativeInterface);
     xcb_connection_t* qtConn = nativeInterface->connection();
-    xcb_window_t rootWindow = winId();
-
     QPlatformNativeInterface *native = qApp->platformNativeInterface();
     if (!native)
         return true;
@@ -396,6 +394,7 @@ bool CompositorX11RenderWindow::init()
     }
 
     //_GTK_FRAME_EXTENTS should be available at least on Gnome/KDE/FXCE/Enlightement
+    const xcb_window_t rootWindow = reinterpret_cast<intptr_t>(native->nativeResourceForIntegration(QByteArrayLiteral("rootwindow")));
     xcb_atom_t gtkExtendFrame = getInternAtom(qtConn, _GTK_FRAME_EXTENTS);
     if (gtkExtendFrame != XCB_ATOM_NONE && wmNetSupport(qtConn, rootWindow, gtkExtendFrame))
     {
