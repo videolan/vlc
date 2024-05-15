@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "h26x.h"
+#include "fmtp.h"
 
 #define FLAG_DONL 1
 
@@ -296,25 +297,23 @@ static int rtp_h265_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 
     opaque->obj = obj;
 
-    if(desc->parameters)
-    {
-        const char *psz = strstr(desc->parameters, "sprop-max-don-diff=");
-        if(psz)
-            opaque->b_donl = (atoi(psz + 19) > 0);
-        block_t **append = &opaque->sdpxps;
-        const char *props[] = { "sprop-vps=", "sprop-sps=", "sprop-pps=" };
-        for(int i=0; i<ARRAY_SIZE(props); i++)
-        {
-            psz = strstr(desc->parameters, props[i]);
-            if(!psz)
-                continue;
-            block_t *xps = h26x_fillextradata(psz + 10);
-            if(xps)
-                block_ChainLastAppend(&append, xps);
-        }
-        if(opaque->sdpxps)
-            opaque->sdpxps = block_ChainGather(opaque->sdpxps);
+    uint16_t don_diff;
+    if(!vlc_sdp_fmtp_get(desc, "sprop-max-don-diff", &don_diff))
+        opaque->b_donl = (don_diff > 0);
+
+    block_t **append = &opaque->sdpxps;
+    const char *props[] = { "sprop-vps", "sprop-sps", "sprop-pps" };
+    for(size_t i=0; i<ARRAY_SIZE(props); i++) {
+        size_t len;
+        const char *value = vlc_sdp_fmtp_get_str(desc, props[i], &len);
+        if(!value || len == 0)
+            continue;
+        block_t *xps = h26x_fillextradata(value);
+        if(xps)
+            block_ChainLastAppend(&append, xps);
     }
+    if(opaque->sdpxps)
+        opaque->sdpxps = block_ChainGather(opaque->sdpxps);
 
     return VLC_SUCCESS;
 }
