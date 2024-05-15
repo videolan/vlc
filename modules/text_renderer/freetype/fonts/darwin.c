@@ -56,7 +56,7 @@ static char* getPathForFontDescription(CTFontDescriptorRef fontDescriptor)
     return retPath;
 }
 
-CFIndex getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
+static CFIndex getFontIndexInFontFile(const char* psz_filePath, const char* psz_family) {
     CFIndex index = kCFNotFound;
     CFURLRef url = CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, (const UInt8 *)psz_filePath, strlen(psz_filePath), false);
     if (url == NULL) {
