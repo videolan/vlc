@@ -24,7 +24,7 @@ variables:
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20240212151604
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20240212151604
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20240402131352
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20231013040434
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20240514145422
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20231013031754
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20231013032350
     VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20240313095757
@@ -579,7 +579,7 @@ tvos-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout aa63288b6bb5c52dfacbdec95104cd4c86c7e9c2)
+        (cd libvlcjni && git checkout b4416c1acbd4714fbd2e648c13723b20f3b2d834)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           CONTRIB_FLAGS="--with-prebuilt-contribs"
         else
