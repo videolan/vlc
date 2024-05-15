@@ -25,6 +25,7 @@
 #include <assert.h>
 
 #include "h26x.h"
+#include "fmtp.h"
 
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -271,8 +272,8 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     if(!desc->parameters)
         return VLC_ENOTSUP;
 
-    const char *psz = strstr(desc->parameters, "packetization-mode=");
-    if(!psz || psz[19] == '\0' || atoi(&psz[19]) > 1)
+    uint8_t mode;
+    if (vlc_sdp_fmtp_get(desc, "packetization-mode", &mode) || mode > 1)
         return VLC_ENOTSUP;
 
     if (vlc_ascii_strcasecmp(desc->name, "H264") == 0)
@@ -287,12 +288,10 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
 
     opaque->obj = obj;
 
-    if(desc->parameters)
-    {
-        psz = strstr(desc->parameters, "sprop-parameter-sets=");
-        if(psz)
-            opaque->sdpxps = h26x_fillextradata(psz + 21);
-    }
+    size_t sprop_len;
+    const char *sprop = vlc_sdp_fmtp_get_str(desc, "sprop-parameter-sets", &sprop_len);
+    if (sprop && sprop_len)
+        opaque->sdpxps = h26x_fillextradata(sprop);
 
     return VLC_SUCCESS;
 }
