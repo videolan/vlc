@@ -1748,10 +1748,12 @@ static int HandleVTStatus(decoder_t *p_dec, OSStatus status,
             case -8960 /* codecErr */:
             case kVTVideoDecoderMalfunctionErr:
             case kVTInvalidSessionErr:
-            case kVTVideoDecoderReferenceMissingErr:
             case kVTVideoDecoderBadDataErr:
             case -8969 /* codecBadDataErr */:
                 *p_vtsession_status = VTSESSION_STATUS_RESTART;
+                break;
+            case kVTVideoDecoderReferenceMissingErr:
+                *p_vtsession_status = VTSESSION_STATUS_OK;
                 break;
             default:
                 *p_vtsession_status = VTSESSION_STATUS_ABORT;
