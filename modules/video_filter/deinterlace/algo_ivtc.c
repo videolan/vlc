@@ -1092,13 +1092,12 @@ static void IVTCCadenceAnalyze( filter_t *p_filter )
         if( p_ivtc->b_sequence_valid )
         {
             /* Determine TFF/BFF. */
-            int i_vote_invalid = 0;
             int i_vote_tff     = 0;
             int i_vote_bff     = 0;
             for( int i = 0; i < IVTC_DETECTION_HISTORY_SIZE; ++i )
             {
                 if( pi_tfd[i] == TFD_INVALID )
-                    i_vote_invalid++;
+                    continue;
                 else if( pi_tfd[i] == TFD_TFF )
                     i_vote_tff++;
                 else if( pi_tfd[i] == TFD_BFF )
