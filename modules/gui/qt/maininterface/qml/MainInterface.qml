@@ -203,6 +203,20 @@ Item {
 
         DropArea {
             anchors.fill: parent
+
+            onEntered: (drag) => {
+                // Do not handle internal drag here:
+                if (!drag.source) {
+                    // Foreign drag, check if valid:
+                    if (drop.hasUrls || drop.hasText) {
+                        drag.accepted = true
+                        return
+                    }
+                }
+
+                drag.accepted = false
+            }
+
             onDropped: (drop) => {
                 let urls = []
                 if (drop.hasUrls) {
