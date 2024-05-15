@@ -91,6 +91,16 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	-DFEATURE_quick_shadereffect=OFF \
 	-DCMAKE_TOOLCHAIN_FILE=$(QT_HOST_LIBS)/cmake/Qt6/qt.toolchain.cmake
 
+QT_DECLARATIVE_HOSTVARS = $(HOSTVARS_CMAKE)
+ifdef HAVE_WIN32
+ifndef HAVE_CLANG
+# gcc doesn't support PDBs and therefore keep a huge amount of debug information
+# this can result in libqt_plugin.dll being bigger than 2GB (#28643).
+QT_DECLARATIVE_CONFIG += -DCMAKE_CXX_FLAGS_DEBUG:STRING= -DCMAKE_C_FLAGS_DEBUG:STRING= -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING= -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=
+QT_DECLARATIVE_HOSTVARS += CXXFLAGS="$(patsubst -g,,${CXXFLAGS})" CFLAGS="$(patsubst -g,,${CFLAGS})"
+endif
+endif
+
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
 .qtdeclarative-tools: qtdeclarative
 	$(CMAKECLEAN)
@@ -101,7 +111,7 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 
 .qtdeclarative: qtdeclarative toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) $(QT_DECLARATIVE_CONFIG)
+	$(QT_DECLARATIVE_HOSTVARS) $(CMAKE) $(QT_DECLARATIVE_CONFIG)
 	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

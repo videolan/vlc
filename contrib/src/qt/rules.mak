@@ -83,6 +83,16 @@ else
 QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=Release
 endif
 
+QTBASE_HOSTVARS = $(HOSTVARS_CMAKE)
+ifdef HAVE_WIN32
+ifndef HAVE_CLANG
+# gcc doesn't support PDBs and therefore keep a huge amount of debug information
+# this can result in libqt_plugin.dll being bigger than 2GB (#28643).
+QTBASE_CONFIG += -DCMAKE_CXX_FLAGS_DEBUG:STRING= -DCMAKE_C_FLAGS_DEBUG:STRING= -DCMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING= -DCMAKE_C_FLAGS_RELWITHDEBINFO:STRING=
+QTBASE_HOSTVARS += CXXFLAGS="$(patsubst -g,,${CXXFLAGS})" CFLAGS="$(patsubst -g,,${CFLAGS})"
+endif
+endif
+
 QTBASE_COMMON_CONFIG := -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
 	-DFEATURE_dbus=OFF -DFEATURE_zstd=OFF -DFEATURE_concurrent=OFF -DFEATURE_androiddeployqt=OFF \
 	-DFEATURE_sql=OFF \
@@ -133,7 +143,7 @@ endif
 
 .qt: qt toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE) $(QTBASE_CONFIG)
+	$(QTBASE_HOSTVARS) $(CMAKE) $(QTBASE_CONFIG)
 	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
