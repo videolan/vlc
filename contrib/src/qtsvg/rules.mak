@@ -19,11 +19,6 @@ $(TARBALLS)/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz:
 .sum-qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
 QTSVG_CONFIG := $(QT_CMAKE_CONFIG)
-ifdef ENABLE_PDB
-QTSVG_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
-else
-QTSVG_CONFIG += -DCMAKE_BUILD_TYPE=Release
-endif
 
 qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)

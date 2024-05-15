@@ -17,11 +17,6 @@ $(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
 .sum-qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
 QTWAYLAND_CONFIG := $(QT_CMAKE_CONFIG)
-ifdef ENABLE_PDB
-QTWAYLAND_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
-else
-QTWAYLAND_CONFIG += -DCMAKE_BUILD_TYPE=Release
-endif
 
 qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 	$(UNPACK)
