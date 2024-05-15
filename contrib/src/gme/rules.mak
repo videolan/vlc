@@ -19,6 +19,7 @@ game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gme/mac-use-c-stdlib.patch
 endif
+	$(APPLY) $(SRC)/gme/0004-Blip_Buffer-replace-assert-with-a-check.patch
 	$(call pkg_static,"gme/libgme.pc.in")
 	$(MOVE)
 
