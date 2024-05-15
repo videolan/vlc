@@ -272,8 +272,9 @@ static int rtp_h264_open(vlc_object_t *obj, struct vlc_rtp_pt *pt,
     if(!desc->parameters)
         return VLC_ENOTSUP;
 
-    uint8_t mode;
-    if (vlc_sdp_fmtp_get(desc, "packetization-mode", &mode) || mode > 1)
+    uint8_t mode = 0;
+    int ret = vlc_sdp_fmtp_get(desc, "packetization-mode", &mode);
+    if ((ret && ret != -ENOENT) || mode > 1)
         return VLC_ENOTSUP;
 
     if (vlc_ascii_strcasecmp(desc->name, "H264") == 0)
