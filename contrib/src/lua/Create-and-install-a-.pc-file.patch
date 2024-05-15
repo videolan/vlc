@@ -33,7 +33,7 @@ index f3bf10c..3e327ee 100644
  
 -install: dummy
 +lua.pc:
-+	$(MAKE) pc > lua.pc
++	$(MAKE) --no-print-directory pc > lua.pc
 +
 +
 +install: dummy $(TO_PKGCONFIG)
