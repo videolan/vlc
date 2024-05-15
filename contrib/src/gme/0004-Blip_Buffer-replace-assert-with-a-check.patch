@@ -1,0 +1,45 @@
+From 74449b553fef6528e1fd9d2dccc6413ded1d5e39 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Wed, 15 May 2024 14:34:59 +0200
+Subject: [PATCH] Blip_Buffer: replace assert with a check
+
+assert() may be disabled and you don't want to abort a whole process in
+case of a parsing issue. So check the offset from samples_avail(), that
+will return 0 (EOF) in case of a out of bounds read.
+---
+ gme/Blip_Buffer.cpp | 1 -
+ gme/Blip_Buffer.h   | 6 +++++-
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/gme/Blip_Buffer.cpp b/gme/Blip_Buffer.cpp
+index 71e48b2..7d2faf3 100644
+--- a/gme/Blip_Buffer.cpp
++++ b/gme/Blip_Buffer.cpp
+@@ -144,7 +144,6 @@ void Blip_Buffer::bass_freq( int freq )
+ void Blip_Buffer::end_frame( blip_time_t t )
+ {
+ 	offset_ += t * factor_;
+-	assert( samples_avail() <= (long) buffer_size_ ); // time outside buffer length
+ }
+ 
+ void Blip_Buffer::remove_silence( long count )
+diff --git a/gme/Blip_Buffer.h b/gme/Blip_Buffer.h
+index 9af53f7..ea109d7 100644
+--- a/gme/Blip_Buffer.h
++++ b/gme/Blip_Buffer.h
+@@ -475,7 +475,11 @@ inline blip_eq_t::blip_eq_t( double t, long rf, long sr, long cf ) :
+ 		treble( t ), rolloff_freq( rf ), sample_rate( sr ), cutoff_freq( cf ) { }
+ 
+ inline int  Blip_Buffer::length() const         { return length_; }
+-inline long Blip_Buffer::samples_avail() const  { return (long) (offset_ >> BLIP_BUFFER_ACCURACY); }
++inline long Blip_Buffer::samples_avail() const
++{
++    long samples = (long) (offset_ >> BLIP_BUFFER_ACCURACY);
++    return samples <= (long) buffer_size_ ? samples : 0;
++}
+ inline long Blip_Buffer::sample_rate() const    { return sample_rate_; }
+ inline int  Blip_Buffer::output_latency() const { return blip_widest_impulse_ / 2; }
+ inline long Blip_Buffer::clock_rate() const     { return clock_rate_; }
+-- 
+2.39.2
+
