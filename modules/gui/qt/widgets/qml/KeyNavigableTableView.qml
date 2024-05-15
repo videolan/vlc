@@ -449,6 +449,8 @@ FocusScope {
                 tableDelegate.forceActiveFocus(focusReason)
             }
 
+            onContainsDragChanged: view.updateItemContainsDrag(this, containsDrag)
+
             Connections {
                 target: selectionModel
 

@@ -37,6 +37,8 @@ T.Control {
     required property bool acceptDrop
 
     readonly property bool dragActive: dragHandler.active
+    property alias containsDrag: dropArea.containsDrag
+    property alias drag: dropArea.drag
 
     required property real fixedColumnWidth
     required property real weightedColumnWidth
@@ -281,6 +283,8 @@ T.Control {
     }
 
     DropArea {
+        id: dropArea
+
         enabled: delegate.acceptDrop
 
         anchors.fill: parent
