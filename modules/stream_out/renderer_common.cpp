@@ -263,7 +263,7 @@ std::string GetVencX264Option( sout_stream_t * /* p_stream */,
 
 #ifdef __APPLE__
 std::string GetVencAvcodecVTOption( sout_stream_t * /* p_stream */,
-                                           const video_format_t * p_vid,
+                                           const video_format_t * /* p_vid */,
                                            int i_quality )
 {
     std::stringstream ssout;
