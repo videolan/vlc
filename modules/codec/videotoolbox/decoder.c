@@ -2125,10 +2125,16 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_sys->vtsession_status = vtsession_status;
         goto end;
     }
-    if (unlikely(!imageBuffer))
+
+    if (!imageBuffer)
     {
-        msg_Err(p_dec, "critical: null imageBuffer with a valid status");
-        p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        if (unlikely((infoFlags & kVTDecodeInfo_FrameDropped) != kVTDecodeInfo_FrameDropped))
+        {
+            msg_Err(p_dec, "critical: null imageBuffer for a non-dropped frame with valid status");
+            p_sys->vtsession_status = VTSESSION_STATUS_ABORT;
+        } else {
+            msg_Dbg(p_dec, "decoder dropped frame");
+        }
         goto end;
     }
 
