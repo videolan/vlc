@@ -30,8 +30,8 @@ layout(binding = 1) uniform sampler2D source;
 
 
 void main() {
-    if (((qt_TexCoord0.x >= discardRect.x && qt_TexCoord0.x <= discardRect.w) &&
-        (qt_TexCoord0.y >= discardRect.y && qt_TexCoord0.y <= discardRect.z)))
+    if (((qt_TexCoord0.x >= discardRect.x && qt_TexCoord0.x <= discardRect.z) &&
+        (qt_TexCoord0.y >= discardRect.y && qt_TexCoord0.y <= discardRect.w)))
         discard;
 
     highp vec4 texel = texture(source, qt_TexCoord0);
