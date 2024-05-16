@@ -4101,9 +4101,27 @@ AS_IF([test "${enable_qt}" != "no"], [
       VLC_RESTORE_FLAGS
 
       AS_IF([test "${have_qt_static}" = "yes"],[
-        PKG_CHECK_MODULES([VLCQTDEPS], [qtvlcdeps], [], [
+        QT_PATHS=${QTPATHS6}
+        AS_IF([test -n ${QT_CONF}],[
+            QT_PATHS="${QT_PATHS} --qtconf ${QT_CONF}"
+        ])
+        QMAKE="$(${QT_PATHS} --query QT_INSTALL_BINS 2>/dev/null)/qmake"
+        AS_IF([test -n ${QT_CONF}],[
+            QMAKE="${QMAKE} -qtconf ${QT_CONF}"
+        ])
+        AC_MSG_CHECKING([for qt static libraries with ${QMAKE}])
+        mkdir -p ${ac_pwd}/modules/gui/qmake-qt
+        (${QMAKE} ${srcdir}/modules/gui/qt/vlcdeps.pro -o ${ac_pwd}/modules/gui/qmake-qt) 2>/dev/null
+        ac_status=$?
+        AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release],[
+            AC_MSG_RESULT([found])
+            VLCQTDEPS_LIBS=$(awk -F '=' '/LIBS/ {print $2; exit}' ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release)
+            AC_SUBST([VLCQTDEPS_LIBS])
+        ],[
+            AC_MSG_RESULT([not found])
             have_qt="no"
         ])
+        rm -rf ${ac_pwd}/modules/gui/qmake-qt
       ])
 
       dnl gtk theme provider

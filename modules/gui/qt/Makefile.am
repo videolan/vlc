@@ -16,7 +16,7 @@ guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 TEST_EXTENSIONS = .qml
-EXTRA_DIST =
+EXTRA_DIST = vlcdeps.pro Imports.qml imports.qrc
 
 vlc_qt_libs = $(QT_LIBS) $(VLCQTDEPS_LIBS)
 
