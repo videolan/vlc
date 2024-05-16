@@ -44,7 +44,6 @@ $(TARBALLS)/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz:
 qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
 	$(APPLY) $(SRC)/qt/0001-Windows-Tray-Icon-Set-NOSOUND.patch
-	$(APPLY) $(SRC)/qt/0002-Try-to-generate-pkgconfig-pc-files-in-static-build.patch
 	$(APPLY) $(SRC)/qt/0003-Revert-QMutex-remove-qmutex_win.cpp.patch
 	$(APPLY) $(SRC)/qt/0004-Expose-QRhiImplementation-in-QRhi.patch
 	$(APPLY) $(SRC)/qt/0005-Do-not-include-D3D12MemAlloc.h-in-header-file.patch
@@ -79,7 +78,7 @@ QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl
 	-no-feature-movie -no-feature-pdf -no-feature-whatsthis -no-feature-lcdnumber \
 	-no-feature-syntaxhighlighter -no-feature-undoview -no-feature-splashscreen \
 	-no-feature-dockwidget -no-feature-mdiarea -no-feature-statusbar -no-feature-statustip \
-	-no-feature-keysequenceedit \
+	-no-feature-keysequenceedit -no-feature-pkg-config \
 	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
 	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
 
