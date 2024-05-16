@@ -3972,7 +3972,18 @@ have_qt_core_private="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
-  dnl Note that Qt < 6.2.5 does not provide pc files!
+  AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["${CONTRIB_DIR}/../bin:$PATH"])
+
+  QT_PATHS=${QTPATHS6}
+  AC_MSG_CHECKING([if contribs provide target_qt.conf])
+  AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
+      QT_CONF=${CONTRIB_DIR}/bin/target_qt.conf
+      QT_PATHS="${QT_PATHS} --qtconf ${QT_CONF}"
+      AC_MSG_RESULT([yes])
+  ],[
+      AC_MSG_RESULT([no])
+  ])
+
   QT_MINIMUM_VERSION=6.2
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
       Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
@@ -3980,46 +3991,23 @@ AS_IF([test "${enable_qt}" != "no"], [
       Qt6Svg
     ], [pkg >= ${QT_MINIMUM_VERSION}]), [
 
-      QT_PREFIX_PATH="$(eval $PKG_CONFIG --variable=prefix Qt6Core)"
-      QT_PLUGINS_PATH="${QT_PREFIX_PATH}/plugins"
-
       PKG_CHECK_MODULES([QT_WAYLAND], [Qt6WaylandClient >= ${QT_MINIMUM_VERSION}], [
           have_qt_wayland="yes"
       ],[:])
 
-      QT_INCLUDE_DIRECTORY="$(eval $PKG_CONFIG --variable=includedir Qt6Core)"
-      QT_LIB_DIRECTORY="$(eval $PKG_CONFIG --variable=libdir Qt6Core)"
-      QT_VERSION_CORE="$(eval $PKG_CONFIG --modversion Qt6Core)"
-      QT_VERSION_GUI="$(eval $PKG_CONFIG --modversion Qt6Gui)"
-      QT_VERSION_QML="$(eval $PKG_CONFIG --modversion Qt6Qml)"
-      QT_VERSION_QUICK="$(eval $PKG_CONFIG --modversion Qt6Quick)"
+      QT_INCLUDE_DIRECTORY="$(${QT_PATHS}     --query QT_INSTALL_HEADERS 2>/dev/null)"
+      QT_VERSION_CORE="$(${QT_PATHS}          --query QT_VERSION 2>/dev/null)"
+      dnl assume Qt installation is coherent and uses the same version number
+      QT_VERSION_GUI=${QT_VERSION_CORE}
+      QT_VERSION_QML=${QT_VERSION_CORE}
+      QT_VERSION_QUICK=${QT_VERSION_CORE}
 
-      AS_IF([test "${host}" = "${build}"],[
-        dnl native build, we can use the exectuables of the Qt6 target
-        QT_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6Core)"
-        QT_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Core)"
-        QT_QML_LIBEXEC_DIRECTORY="$(eval $PKG_CONFIG --variable=libexecdir Qt6Qml)"
-        QT_SHADERTOOLS_BIN_DIRECTORY="$(eval $PKG_CONFIG --variable=bindir Qt6ShaderTools)"
-      ],[
-        dnl cross compilation, use Qt6 native tools from contribs
-        AS_IF([test -n "${CONTRIB_DIR}"], [
-          QT_BIN_DIRECTORY=${CONTRIB_DIR}/../bin
-          QT_LIBEXEC_DIRECTORY=${CONTRIB_DIR}/../libexec
-          QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
-          QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
-        ])
-      ])
-
-      AC_MSG_CHECKING([if contribs provide target_qt.conf])
-      AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
-        QT_CONF=${CONTRIB_DIR}/bin/target_qt.conf
-        AC_MSG_RESULT([yes])
-      ],[
-        AC_MSG_RESULT([no])
-      ])
+      QT_BIN_DIRECTORY="$(${QT_PATHS}         --query QT_HOST_BINS 2>/dev/null)"
+      QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     --query QT_HOST_LIBEXECS 2>/dev/null)"
+      QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
+      QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
 
       dnl check native in contribs and keep the full path if found there
-      AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["${QT_BIN_DIRECTORY}"])
       AC_PATH_PROGS(MOC, [moc], moc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(RCC, [rcc], rcc, ["${QT_LIBEXEC_DIRECTORY}"])
       AC_PATH_PROGS(UIC, [uic], uic, ["${QT_LIBEXEC_DIRECTORY}"])
@@ -4101,10 +4089,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       VLC_RESTORE_FLAGS
 
       AS_IF([test "${have_qt_static}" = "yes"],[
-        QT_PATHS=${QTPATHS6}
-        AS_IF([test -n ${QT_CONF}],[
-            QT_PATHS="${QT_PATHS} --qtconf ${QT_CONF}"
-        ])
         QMAKE="$(${QT_PATHS} --query QT_INSTALL_BINS 2>/dev/null)/qmake"
         AS_IF([test -n ${QT_CONF}],[
             QMAKE="${QMAKE} -qtconf ${QT_CONF}"
