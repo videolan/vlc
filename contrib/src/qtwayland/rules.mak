@@ -4,6 +4,12 @@ QTWAYLAND_VERSION_MAJOR := 6.7
 QTWAYLAND_VERSION := $(QTWAYLAND_VERSION_MAJOR).0
 QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
+ifdef HAVE_LINUX
+ifneq ($(findstring qt,$(PKGS)),)
+PKGS += qtwayland
+endif
+endif
+
 DEPS_qtwayland = qtdeclarative $(DEPS_qtdeclarative)
 
 $(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
