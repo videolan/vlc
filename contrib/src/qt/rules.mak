@@ -27,7 +27,7 @@ PKGS_FOUND += qt
 endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qt-tools
-else ifeq ($(call system_tool_version, moc --version),$(QTBASE_VERSION_MAJOR))
+else ifeq ($(call system_tool_majmin, moc --version),$(QTBASE_VERSION_MAJOR))
 PKGS_FOUND += qt-tools
 endif
 
