@@ -3985,6 +3985,17 @@ AS_IF([test "${enable_qt}" != "no"], [
   ])
 
   QT_MINIMUM_VERSION=6.2
+  AC_MSG_CHECKING([Qt is at least ${QT_MINIMUM_VERSION}])
+  QT_VERSION_CORE="$(${QT_PATHS}          --query QT_VERSION 2>/dev/null)"
+  QT_MINIMUM_MAJ=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f -1)
+  QT_MINIMUM_MIN=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f 2-2)
+  QT_VERSION_MAJ=$(echo ${QT_VERSION_CORE} | cut -d "." -f -1)
+  QT_VERSION_MIN=$(echo ${QT_VERSION_CORE} | cut -d "." -f 2-2)
+  AS_IF([ test "${QT_VERSION_MAJ}" -lt "${QT_MINIMUM_MAJ}" || (test "${QT_VERSION_MAJ}" = "${QT_MINIMUM_MAJ}" && test "${QT_VERSION_MIN}" -lt "${QT_MINIMUM_MIN}") ], [
+    AC_MSG_RESULT([(${QT_VERSION_CORE}) no])
+    have_qt="no"
+  ],[
+    AC_MSG_RESULT([(${QT_VERSION_CORE}) yes])
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
       Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
       Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2
@@ -3996,7 +4007,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[:])
 
       QT_INCLUDE_DIRECTORY="$(${QT_PATHS}     --query QT_INSTALL_HEADERS 2>/dev/null)"
-      QT_VERSION_CORE="$(${QT_PATHS}          --query QT_VERSION 2>/dev/null)"
       dnl assume Qt installation is coherent and uses the same version number
       QT_VERSION_GUI=${QT_VERSION_CORE}
       QT_VERSION_QML=${QT_VERSION_CORE}
@@ -4115,6 +4125,7 @@ AS_IF([test "${enable_qt}" != "no"], [
     ], [
       have_qt="no"
     ])
+  ])
     AS_IF([test "${have_qt}" = "no"],[
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
