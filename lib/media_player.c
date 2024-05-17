@@ -1400,6 +1400,42 @@ double libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
     return f_position;
 }
 
+int
+libvlc_media_player_set_abloop( libvlc_media_player_t *p_mi,
+                                libvlc_abloop_t abloop )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    int ret = vlc_player_SetAtoBLoop(player, (int) abloop);
+
+    vlc_player_Unlock(player);
+    return ret;
+}
+
+libvlc_abloop_t
+libvlc_media_player_get_abloop( libvlc_media_player_t *p_mi,
+                                libvlc_time_t *a_time, double *a_pos,
+                                libvlc_time_t *b_time, double *b_pos )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_tick_t a_ticks, b_ticks;
+    int ret = vlc_player_GetAtoBLoop(player, &a_ticks, a_pos, &b_ticks, b_pos);
+
+    vlc_player_Unlock(player);
+
+    if (a_time != NULL)
+        *a_time = a_ticks == VLC_TICK_INVALID ? -1 :
+                  libvlc_time_from_vlc_tick(a_ticks);
+    if (b_time != NULL)
+        *b_time = b_ticks == VLC_TICK_INVALID ? -1 :
+                  libvlc_time_from_vlc_tick(b_ticks);
+
+    return ret;
+}
+
 void libvlc_media_player_set_chapter( libvlc_media_player_t *p_mi,
                                       int chapter )
 {
@@ -2420,4 +2456,11 @@ static_assert(libvlc_video_primaries_BT601_525 == (cast_)COLOR_PRIMARIES_BT601_5
               libvlc_video_primaries_DCI_P3    == (cast_)COLOR_PRIMARIES_DCI_P3 &&
               libvlc_video_primaries_BT470_M   == (cast_)COLOR_PRIMARIES_BT470_M
               , "libvlc video color primaries mismatch");
+#undef cast_
+
+#define cast_ libvlc_abloop_t
+static_assert(libvlc_abloop_none == (cast_) VLC_PLAYER_ABLOOP_NONE &&
+              libvlc_abloop_a    == (cast_) VLC_PLAYER_ABLOOP_A &&
+              libvlc_abloop_b    == (cast_) VLC_PLAYER_ABLOOP_B
+              , "libvlc abloop mismatch");
 #undef cast_
