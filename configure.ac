@@ -4052,16 +4052,32 @@ AS_IF([test "${enable_qt}" != "no"], [
         have_qt="no"
       ])
 
-      PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
-          AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qtpaths "${QTPATHS6}" \
-            --qtconf "${QT_CONF}" \
-            --modules QtTest="" \
-            >&AS_MESSAGE_FD ], [
-              have_qt_quick_test="yes"
-          ], [])
+      AC_MSG_CHECKING([for qt QuickTest using ${QMAKE}])
+      (${QMAKE} ${srcdir}/modules/gui/qt/quicktest.pro -o ${ac_pwd}/modules/gui/qt/qmake-quicktest) 2>/dev/null
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
+        AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
+        --qtpaths "${QTPATHS6}" \
+        --qtconf "${QT_CONF}" \
+        --modules QtTest="" \
+        >&AS_MESSAGE_FD ], [
+            echo 'get_cflags:'                     >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
+            echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
+            echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
+            echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
+            AC_MSG_RESULT([found])
+            QT_QUICK_TEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_libs)
+            QT_QUICK_TEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_cflags)
+            AC_SUBST([QT_QUICK_TEST_LIBS])
+            AC_SUBST([QT_QUICK_TEST_CFLAGS])
+            have_qt_quick_test="yes"
+        ], [
+            AC_MSG_RESULT([not found])
+        ])
       ],[
+        AC_MSG_RESULT([not found])
       ])
+      rm -f ${ac_pwd}/modules/gui/qt/qmake-quicktest
 
       AC_PATH_PROGS(FXC, [fxc], [no], [${CONTRIB_DIR}/bin])
       AS_IF([test "$FXC" != "no"],[
