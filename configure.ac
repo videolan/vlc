@@ -4169,13 +4169,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-quick
 
-      VLC_SAVE_FLAGS
-      CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
-      AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([[#include <qconfig.h>]],[[QT_STATIC]])],
-        [have_qt_static=yes],[have_qt_static=no])
-      VLC_RESTORE_FLAGS
-
       dnl gtk theme provider
       PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.20], [
         have_qt_gtk="yes"
@@ -4216,7 +4209,6 @@ AC_SUBST([QT_VERSION_QUICK])
 AC_SUBST([QT_INCLUDE_DIRECTORY])
 AC_SUBST([QT_INDIRECT_LIBS])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
-AM_CONDITIONAL([QT_STATIC], [test "${have_qt_static}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_WAYLAND], [test "${have_qt_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_GTK], [test "${have_qt_gtk}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_QUICK_TEST], [test "${have_qt_quick_test}" = "yes"])
