@@ -3971,6 +3971,7 @@ have_qt_gui_private="no"
 have_qt_core_private="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
+  have_qt="yes"
   dnl Note that Qt < 6.2.5 does not provide pc files!
   QT_MINIMUM_VERSION=6.2
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
@@ -4045,7 +4046,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[
         AC_MSG_RESULT([no])
         AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
-        enable_qt="no"
+        have_qt="no"
       ])
 
       PKG_CHECK_MODULES([QT_QUICK_TEST], [Qt6QuickTest >= ${QT_MINIMUM_VERSION}], [
@@ -4101,7 +4102,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       AS_IF([test "${have_qt_static}" = "yes"],[
         PKG_CHECK_MODULES([VLCQTDEPS], [qtvlcdeps], [], [
-            enable_qt="no"
+            have_qt="no"
         ])
       ])
 
@@ -4110,6 +4111,9 @@ AS_IF([test "${enable_qt}" != "no"], [
         have_qt_gtk="yes"
       ], [:])
     ], [
+      have_qt="no"
+    ])
+    AS_IF([test "${have_qt}" = "no"],[
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
       ],[
