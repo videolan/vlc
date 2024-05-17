@@ -1514,8 +1514,8 @@ vlc_player_SetAtoBLoop(vlc_player_t *player, enum vlc_player_abloop abloop)
 }
 
 enum vlc_player_abloop
-vlc_player_GetAtoBLoop(vlc_player_t *player, vlc_tick_t *a_time, float *a_pos,
-                       vlc_tick_t *b_time, float *b_pos)
+vlc_player_GetAtoBLoop(vlc_player_t *player, vlc_tick_t *a_time, double *a_pos,
+                       vlc_tick_t *b_time, double *b_pos)
 {
     struct vlc_player_input *input = vlc_player_get_input_locked(player);
 
