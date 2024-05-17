@@ -17,10 +17,5 @@ macx {
 QTPLUGIN += qcocoa qmacstyle
 }
 
-# qmake will run qmlimportscanner,
-# which will make it generate correct qml plugin
-# dependencies
-RESOURCES = imports.qrc
-
 # These are not needed now, but may be required in the future:
 # CONFIG += import_plugins staticlib create_pc create_prl no_install_prl link_prl
