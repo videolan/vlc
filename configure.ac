@@ -4038,8 +4038,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
 
-      QT_INCLUDE_DIRECTORY="$(${QT_PATHS}     --query QT_INSTALL_HEADERS 2>/dev/null)"
-
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     --query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
       QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
@@ -4198,7 +4196,6 @@ AM_CONDITIONAL(QT_QML_DEBUG, [test "${enable_qt_qml_debug}" = "yes"])
 AS_IF([test "${enable_qt}" != "no"], [
   ALIASES="${ALIASES} qvlc"
 ])
-AC_SUBST([QT_INCLUDE_DIRECTORY])
 AC_SUBST([QT_INDIRECT_LIBS])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT_WAYLAND], [test "${have_qt_wayland}" = "yes"])
