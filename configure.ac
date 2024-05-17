@@ -4108,9 +4108,15 @@ AS_IF([test "${enable_qt}" != "no"], [
         (${QMAKE} ${srcdir}/modules/gui/qt/vlcdeps.pro -o ${ac_pwd}/modules/gui/qmake-qt) 2>/dev/null
         ac_status=$?
         AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release],[
+            echo "get_cflags:"                  >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
+            echo '	echo $(DEFINES) $(INCPATH)' >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
+            echo "get_libs:"                    >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
+            echo '	echo $(LIBS)'               >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
             AC_MSG_RESULT([found])
-            VLCQTDEPS_LIBS=$(awk -F '=' '/LIBS/ {print $2; exit}' ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release)
+            VLCQTDEPS_LIBS="$(cd ${ac_pwd}/modules/gui/qmake-qt && make -s -f Makefile.Release get_libs)"
+            VLCQTDEPS_CFLAGS="$(cd ${ac_pwd}/modules/gui/qmake-qt && make -s -f Makefile.Release get_cflags)"
             AC_SUBST([VLCQTDEPS_LIBS])
+            AC_SUBST([VLCQTDEPS_CFLAGS])
         ],[
             AC_MSG_RESULT([not found])
             have_qt="no"
