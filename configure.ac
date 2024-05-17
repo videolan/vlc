@@ -4008,9 +4008,24 @@ AS_IF([test "${enable_qt}" != "no"], [
       Qt6Svg
     ], [pkg >= ${QT_MINIMUM_VERSION}]), [
 
-      PKG_CHECK_MODULES([QT_WAYLAND], [Qt6WaylandClient >= ${QT_MINIMUM_VERSION}], [
-          have_qt_wayland="yes"
-      ],[:])
+      AC_MSG_CHECKING([for qt Qt6WaylandClient using ${QMAKE}])
+      (${QMAKE} ${srcdir}/modules/gui/qt/wayland.pro -o ${ac_pwd}/modules/gui/qt/qmake-wayland) 2>/dev/null
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-wayland],[
+        echo 'get_cflags:'                     >> ${ac_pwd}/modules/gui/qt/qmake-wayland
+        echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-wayland
+        echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-wayland
+        echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-wayland
+        AC_MSG_RESULT([found])
+        QT_WAYLAND_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_libs)
+        QT_WAYLAND_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_cflags)
+        AC_SUBST([QT_WAYLAND_LIBS])
+        AC_SUBST([QT_WAYLAND_CFLAGS])
+        have_qt_wayland="yes"
+      ],[
+        AC_MSG_RESULT([not found])
+      ])
+      rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
 
       QT_INCLUDE_DIRECTORY="$(${QT_PATHS}     --query QT_INSTALL_HEADERS 2>/dev/null)"
       dnl assume Qt installation is coherent and uses the same version number
