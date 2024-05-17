@@ -100,6 +100,9 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="VLCAccentColor"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="16" id="rj4-sx-pmn"/>
+                                            </constraints>
                                             <connections>
                                                 <action selector="primaryDetailAction:" target="HAc-or-XD8" id="bFl-ro-arq"/>
                                             </connections>
@@ -111,6 +114,9 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="16" id="eff-TH-kPm"/>
+                                            </constraints>
                                             <connections>
                                                 <action selector="secondaryDetailAction:" target="HAc-or-XD8" id="IAX-VG-Kpd"/>
                                             </connections>
