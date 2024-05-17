@@ -4039,10 +4039,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
 
       QT_INCLUDE_DIRECTORY="$(${QT_PATHS}     --query QT_INSTALL_HEADERS 2>/dev/null)"
-      dnl assume Qt installation is coherent and uses the same version number
-      QT_VERSION_GUI=${QT_VERSION_CORE}
-      QT_VERSION_QML=${QT_VERSION_CORE}
-      QT_VERSION_QUICK=${QT_VERSION_CORE}
 
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     --query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
@@ -4202,10 +4198,6 @@ AM_CONDITIONAL(QT_QML_DEBUG, [test "${enable_qt_qml_debug}" = "yes"])
 AS_IF([test "${enable_qt}" != "no"], [
   ALIASES="${ALIASES} qvlc"
 ])
-AC_SUBST([QT_VERSION_CORE])
-AC_SUBST([QT_VERSION_GUI])
-AC_SUBST([QT_VERSION_QML])
-AC_SUBST([QT_VERSION_QUICK])
 AC_SUBST([QT_INCLUDE_DIRECTORY])
 AC_SUBST([QT_INDIRECT_LIBS])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
