@@ -127,8 +127,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
     VLCMediaLibraryGenre * const secondGenre = [genres objectAtIndex:1];
     return [NSString stringWithFormat:_NS("%@, %@, and %lli other genres"),
-                     firstGenre.name,
-                     secondGenre.name,
+                     firstGenre.displayString,
+                     secondGenre.displayString,
                      genreCount - 2];
 }
 
@@ -456,10 +456,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.secondaryActionableDetail = YES;
 
         _name = toNSStr(p_artist->psz_name);
-        if ([_name isEqualToString:@""]) {
-            _name = _NS("Unknown Artist");
-        }
-
         _shortBiography = toNSStr(p_artist->psz_shortbio);
         _musicBrainzID = toNSStr(p_artist->psz_mb_id);
         _numberOfAlbums = p_artist->i_nb_album;
@@ -470,7 +466,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)displayString
 {
-    return _name;
+    return self.name.length == 0 ? _NS("Unknown Artist") : self.name;
 }
 
 - (NSString *)primaryDetailString
@@ -579,10 +575,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.secondaryActionableDetail = YES;
 
         _title = toNSStr(p_album->psz_title);
-        if ([_title isEqualToString:@""]) {
-            _title = _NS("Unknown Album");
-        }
-
         _summary = toNSStr(p_album->psz_summary);
         _artistName = toNSStr(p_album->psz_artist);
         _artistID = p_album->i_artist_id;
@@ -595,7 +587,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)displayString
 {
-    return _title;
+    return self.title.length == 0 ? _NS("Unknown Album") : self.title;
 }
 
 - (NSString *)primaryDetailString
@@ -680,10 +672,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.secondaryActionableDetail = NO;
 
         _name = toNSStr(p_genre->psz_name);
-        if ([_name isEqualToString:@""]) {
-            _name = _NS("Unknown Genre");
-        }
-
         _numberOfTracks = p_genre->i_nb_tracks;
     }
     return self;
@@ -705,7 +693,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)displayString
 {
-    return _name;
+    return self.name.length == 0 ? _NS("Unknown Genre") : self.name;
 }
 
 - (NSString *)primaryDetailString
@@ -886,11 +874,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _lastPlayedDate = p_mediaItem->i_last_played_date;
         _progress = p_mediaItem->f_progress;
         _favorited = p_mediaItem->b_is_favorite;
-
         _title = toNSStr(p_mediaItem->psz_title);
-        if ([_title isEqualToString:@""]) {
-            _title = _NS("Unknown Media Item");
-        }
 
         switch (p_mediaItem->i_subtype) {
             case VLC_ML_MEDIA_SUBTYPE_MOVIE:
@@ -1028,7 +1012,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (NSString *)displayString
 {
-    return _title;
+    return self.title.length == 0 ? _NS("Unknown item") : self.title;
 }
 
 - (nullable NSString *)contextualPrimaryDetailString
