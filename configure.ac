@@ -4127,26 +4127,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-quick
 
-      dnl Check private headers availability
-      VLC_SAVE_FLAGS
-      CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtCore/${QT_VERSION_CORE}"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtCore/${QT_VERSION_CORE}/QtCore"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtGui/${QT_VERSION_GUI}"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtGui/${QT_VERSION_GUI}/QtGui"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtQml/${QT_VERSION_QML}"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtQml/${QT_VERSION_QML}/QtQml"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtQuick/${QT_VERSION_QUICK}"
-      CPPFLAGS="${CPPFLAGS} -I${QT_INCLUDE_DIRECTORY}/QtQuick/${QT_VERSION_QUICK}/QtQuick"
-
-      AS_IF([test "${SYS}" != "mingw32"], [
-          CPPFLAGS="${CPPFLAGS} -fPIC"
-      ])
-
-      AC_LANG_PUSH([C++])
-      AC_LANG_POP([C++])
-      VLC_RESTORE_FLAGS
-
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
       AC_COMPILE_IFELSE(
