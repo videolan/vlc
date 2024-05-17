@@ -4,6 +4,8 @@ QT = core gui qml svg quick widgets quickcontrols2
 QTPLUGIN = qsvgicon qsvg qjpeg qico
 
 CONFIG -= entrypoint
+CONFIG -= debug_and_release
+CONFIG += no_include_pwd
 
 win32 {
 QTPLUGIN += qwindows qmodernwindowsstyle

@@ -4002,11 +4002,22 @@ AS_IF([test "${enable_qt}" != "no"], [
   AS_IF([test -n "${QT_CONF}"],[
       QMAKE="${QMAKE} -qtconf ${QT_CONF}"
   ])
-  PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
-      Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
-      Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2
-      Qt6Svg
-    ], [pkg >= ${QT_MINIMUM_VERSION}]), [
+
+  AC_MSG_CHECKING([for qt libraries with ${QMAKE}])
+  mkdir -p ${ac_pwd}/modules/gui/qt
+  touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
+  QT_PKG_ERRORS=$(${QMAKE} ${srcdir}/modules/gui/qt/qt6.pro -o ${ac_pwd}/modules/gui/qt/qmake-qt 2>&1)
+  ac_status=$?
+  AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-qt],[
+      echo "get_cflags:"                    >> ${ac_pwd}/modules/gui/qt/qmake-qt
+      echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-qt
+      echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-qt
+      echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-qt
+      AC_MSG_RESULT([found])
+      QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
+      QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
+      AC_SUBST([QT_LIBS])
+      AC_SUBST([QT_CFLAGS])
 
       AC_MSG_CHECKING([for qt Qt6WaylandClient using ${QMAKE}])
       (${QMAKE} ${srcdir}/modules/gui/qt/wayland.pro -o ${ac_pwd}/modules/gui/qt/qmake-wayland) 2>/dev/null
@@ -4165,36 +4176,17 @@ AS_IF([test "${enable_qt}" != "no"], [
         [have_qt_static=yes],[have_qt_static=no])
       VLC_RESTORE_FLAGS
 
-      AS_IF([test "${have_qt_static}" = "yes"],[
-        AC_MSG_CHECKING([for qt static libraries with ${QMAKE}])
-        mkdir -p ${ac_pwd}/modules/gui/qmake-qt
-        (${QMAKE} ${srcdir}/modules/gui/qt/vlcdeps.pro -o ${ac_pwd}/modules/gui/qmake-qt) 2>/dev/null
-        ac_status=$?
-        AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release],[
-            echo "get_cflags:"                  >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
-            echo '	echo $(DEFINES) $(INCPATH)' >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
-            echo "get_libs:"                    >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
-            echo '	echo $(LIBS)'               >> ${ac_pwd}/modules/gui/qmake-qt/Makefile.Release
-            AC_MSG_RESULT([found])
-            VLCQTDEPS_LIBS="$(cd ${ac_pwd}/modules/gui/qmake-qt && make -s -f Makefile.Release get_libs)"
-            VLCQTDEPS_CFLAGS="$(cd ${ac_pwd}/modules/gui/qmake-qt && make -s -f Makefile.Release get_cflags)"
-            AC_SUBST([VLCQTDEPS_LIBS])
-            AC_SUBST([VLCQTDEPS_CFLAGS])
-        ],[
-            AC_MSG_RESULT([not found])
-            have_qt="no"
-        ])
-        rm -rf ${ac_pwd}/modules/gui/qmake-qt
-      ])
-
       dnl gtk theme provider
       PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.20], [
         have_qt_gtk="yes"
       ], [:])
     ], [
+      AC_MSG_RESULT([no])
       have_qt="no"
     ])
   ])
+  rm -f ${ac_pwd}/modules/gui/qt/qmake-qt
+  rm -f ${ac_pwd}/modules/gui/qt/.qmake.stash
     AS_IF([test "${have_qt}" = "no"],[
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
