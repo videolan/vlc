@@ -16,7 +16,7 @@ guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 TEST_EXTENSIONS = .qml
-EXTRA_DIST = vlcdeps.pro private-core.pro private-gui.pro
+EXTRA_DIST = vlcdeps.pro private-core.pro private-gui.pro private-quick.pro
 
 vlc_qt_libs = $(QT_LIBS) $(VLCQTDEPS_LIBS)
 
@@ -85,16 +85,7 @@ libqt_plugin_la_CPPFLAGS += -DQT_GUI_PRIVATE $(QT_GUI_PRIVATE_CFLAGS)
 endif
 
 if HAVE_QT_DECLARATIVE_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT_DECLARATIVE_PRIVATE \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtCore/$(QT_VERSION_CORE)/QtCore \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtGui/$(QT_VERSION_GUI)/QtGui \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION_QML) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQml/$(QT_VERSION_QML)/QtQml \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION_QUICK) \
-	-I$(QT_INCLUDE_DIRECTORY)/QtQuick/$(QT_VERSION_QUICK)/QtQuick
-
+libqt_plugin_la_CPPFLAGS += -DQT_DECLARATIVE_PRIVATE $(QT_QUICK_PRIVATE_CFLAGS)
 endif
 
 libqt_plugin_la_SOURCES = \

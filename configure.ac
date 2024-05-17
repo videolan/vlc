@@ -4108,6 +4108,25 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
 
+      AC_MSG_CHECKING([for qt quick private using ${QMAKE}])
+      (${QMAKE} ${srcdir}/modules/gui/qt/private-quick.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-quick) 2>/dev/null
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-quick],[
+        echo 'get_cflags:'                     >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
+        echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
+        echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
+        echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
+        AC_MSG_RESULT([found])
+        QT_QUICK_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_libs)
+        QT_QUICK_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_cflags)
+        AC_SUBST([QT_QUICK_PRIVATE_LIBS])
+        AC_SUBST([QT_QUICK_PRIVATE_CFLAGS])
+        have_qt_declarative_private="yes"
+      ],[
+        AC_MSG_RESULT([not found])
+      ])
+      rm -f ${ac_pwd}/modules/gui/qt/qmake-private-quick
+
       dnl Check private headers availability
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
@@ -4125,8 +4144,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_LANG_PUSH([C++])
-      AC_CHECK_HEADERS([private/qquickitem_p.h private/qquickwindow_p.h],
-         [have_qt_declarative_private="yes"], [])
       AC_LANG_POP([C++])
       VLC_RESTORE_FLAGS
 
