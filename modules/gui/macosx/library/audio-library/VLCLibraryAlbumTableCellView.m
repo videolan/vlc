@@ -301,7 +301,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
     NSAssert(album != nil, @"Represented item should be a medialibraryalbum!");
 
-    self.albumNameTextField.stringValue = album.title;
+    self.albumNameTextField.stringValue = album.displayString;
     self.artistNameTextButton.title = album.artistName;
     self.genreNameTextButton.title = album.genreString;
 
