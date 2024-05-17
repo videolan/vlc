@@ -3996,6 +3996,12 @@ AS_IF([test "${enable_qt}" != "no"], [
     have_qt="no"
   ],[
     AC_MSG_RESULT([(${QT_VERSION_CORE}) yes])
+
+  QT_BIN_DIRECTORY="$(${QT_PATHS}         --query QT_HOST_BINS 2>/dev/null)"
+  QMAKE="${QT_BIN_DIRECTORY}/qmake"
+  AS_IF([test -n "${QT_CONF}"],[
+      QMAKE="${QMAKE} -qtconf ${QT_CONF}"
+  ])
   PKG_CHECK_MODULES([QT], m4_foreach([pkg], [
       Qt6Core Qt6Widgets Qt6Gui Qt6Qml Qt6QmlModels Qt6QmlWorkerScript
       Qt6Quick Qt6QuickControls2 Qt6QuickLayouts Qt6QuickTemplates2
@@ -4012,7 +4018,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       QT_VERSION_QML=${QT_VERSION_CORE}
       QT_VERSION_QUICK=${QT_VERSION_CORE}
 
-      QT_BIN_DIRECTORY="$(${QT_PATHS}         --query QT_HOST_BINS 2>/dev/null)"
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     --query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
       QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
@@ -4065,6 +4070,25 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_SUBST([FXC_PATH])
       ])
 
+      AC_MSG_CHECKING([for qt core private using ${QMAKE}])
+      (${QMAKE} ${srcdir}/modules/gui/qt/private-core.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-core) 2>/dev/null
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-core],[
+        echo 'get_cflags:'                     >> ${ac_pwd}/modules/gui/qt/qmake-private-core
+        echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-private-core
+        echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-private-core
+        echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-private-core
+        AC_MSG_RESULT([found])
+        QT_CORE_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_libs)
+        QT_CORE_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
+        AC_SUBST([QT_CORE_PRIVATE_LIBS])
+        AC_SUBST([QT_CORE_PRIVATE_CFLAGS])
+        have_qt_core_private="yes"
+      ],[
+        AC_MSG_RESULT([not found])
+      ])
+      rm -f ${ac_pwd}/modules/gui/qt/qmake-private-core
+
       dnl Check private headers availability
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
@@ -4082,8 +4106,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_LANG_PUSH([C++])
-      AC_CHECK_HEADERS([private/qobject_p.h],
-         [have_qt_core_private="yes"], [])
       AC_CHECK_HEADERS([private/qquickitem_p.h private/qquickwindow_p.h],
          [have_qt_declarative_private="yes"], [])
       AC_CHECK_HEADERS([QtGui/qpa/qplatformnativeinterface.h],
@@ -4099,10 +4121,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       VLC_RESTORE_FLAGS
 
       AS_IF([test "${have_qt_static}" = "yes"],[
-        QMAKE="$(${QT_PATHS} --query QT_INSTALL_BINS 2>/dev/null)/qmake"
-        AS_IF([test -n ${QT_CONF}],[
-            QMAKE="${QMAKE} -qtconf ${QT_CONF}"
-        ])
         AC_MSG_CHECKING([for qt static libraries with ${QMAKE}])
         mkdir -p ${ac_pwd}/modules/gui/qmake-qt
         (${QMAKE} ${srcdir}/modules/gui/qt/vlcdeps.pro -o ${ac_pwd}/modules/gui/qmake-qt) 2>/dev/null

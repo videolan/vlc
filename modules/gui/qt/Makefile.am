@@ -16,7 +16,7 @@ guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 SUFFIXES += .ui .h .hpp .moc.cpp .qml
 TEST_EXTENSIONS = .qml
-EXTRA_DIST = vlcdeps.pro
+EXTRA_DIST = vlcdeps.pro private-core.pro
 
 vlc_qt_libs = $(QT_LIBS) $(VLCQTDEPS_LIBS)
 
@@ -77,7 +77,7 @@ libqt_plugin_la_CPPFLAGS += -DQT_HAS_GTK
 endif
 
 if HAVE_QT_CORE_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT_CORE_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT_CORE_PRIVATE $(QT_CORE_PRIVATE_CFLAGS)
 endif
 
 if HAVE_QT_GUI_PRIVATE
