@@ -37,8 +37,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-I$(builddir)/dialogs/podcast \
 	-I$(builddir)/dialogs/preferences \
 	-I$(builddir)/dialogs/sout \
-	-I$(builddir)/dialogs/vlm \
-	-DQPNI_HEADER=\<$(QT_VERSION_GUI)/QtGui/qpa/qplatformnativeinterface.h\>
+	-I$(builddir)/dialogs/vlm
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(vlc_qt_libs)

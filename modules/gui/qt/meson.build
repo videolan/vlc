@@ -619,7 +619,6 @@ if qt6_dep.found()
 
     if host_system == 'windows'
         qt_cppargs += libcom_cppflags
-        qt_extra_flags += '-DQPNI_HEADER=<' + qt6_dep.version() + '/QtGui/qpa/qplatformnativeinterface.h>'
     endif
 
     if not (host_system in ['windows', 'darwin'])
