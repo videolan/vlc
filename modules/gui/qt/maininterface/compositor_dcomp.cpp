@@ -260,7 +260,10 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
 
     const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, flags);
 
-    m_quickView->show();
+    if (ret)
+        m_quickView->show();
+    else
+        return false;
 
     if (!m_quickView->isSceneGraphInitialized())
         eventLoop.exec();
