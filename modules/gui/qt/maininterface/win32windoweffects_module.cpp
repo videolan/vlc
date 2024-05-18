@@ -59,7 +59,7 @@ int QtWin32WindowEffectsOpen(vlc_object_t* p_this)
     assert(p_this);
 
     if (QOperatingSystemVersion::current()
-        < QOperatingSystemVersion(QOperatingSystemVersion::Windows, 11, 0, 22621))
+        < QOperatingSystemVersion(QOperatingSystemVersion::Windows, 10, 0, 22621))
         return VLC_EGENERIC;
 
     const auto obj = reinterpret_cast<WindowEffectsModule*>(p_this);
