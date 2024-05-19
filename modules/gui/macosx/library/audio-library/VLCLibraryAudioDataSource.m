@@ -119,6 +119,30 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     }
 }
 
+- (size_t)collectionToDisplayCount
+{
+    switch(_currentParentType) {
+    case VLCMediaLibraryParentGroupTypeAudioLibrary:
+        return self.libraryModel.numberOfAudioMedia;
+    case VLCMediaLibraryParentGroupTypeRecentAudios:
+        return self.libraryModel.numberOfRecentAudioMedia;
+    case VLCMediaLibraryParentGroupTypeAlbum:
+        return self.libraryModel.numberOfAlbums;
+    case VLCMediaLibraryParentGroupTypeArtist:
+        return self.libraryModel.numberOfArtists;
+    case VLCMediaLibraryParentGroupTypeGenre:
+        return self.libraryModel.numberOfGenres;
+    default:
+        NSAssert(1, @"current parent type should not be unknown, no collection to display");
+        return 0;
+    }
+}
+
+- (NSInteger)displayedCollectionCount
+{
+    return self.displayedCollection.count;
+}
+
 - (NSArray *)collectionToDisplay
 {
     switch(_currentParentType) {
