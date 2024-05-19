@@ -546,6 +546,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentLibraryItemWaitForDataSourceFinished:(NSNotification *)aNotification
 {
+    if (self.audioDataSource.displayedCollectionCount < self.audioDataSource.collectionToDisplayCount) {
+        return;
+    }
+    
     [NSNotificationCenter.defaultCenter removeObserver:self
                                                   name:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                                                 object:self.audioDataSource];
@@ -586,9 +590,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                              object:self.audioDataSource];
 
     [self updatePresentedView];
-    if (!self.audioDataSource.displayedCollectionUpdating) {
-        [self presentLibraryItemWaitForDataSourceFinished:nil];
-    }
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
