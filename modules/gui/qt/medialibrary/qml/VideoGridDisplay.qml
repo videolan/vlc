@@ -108,7 +108,7 @@ MainInterface.MainGridView {
 
         onItemClicked: (modifier) => { gridView.leftClickOnItem(modifier, index) }
 
-        onItemDoubleClicked: model => gridView.itemDoubleClicked(model)
+        onItemDoubleClicked: gridView.itemDoubleClicked(model)
 
         onContextMenuButtonClicked: (_, globalMousePos) => {
             gridView.rightClickOnItem(index);
