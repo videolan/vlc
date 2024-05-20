@@ -583,6 +583,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else {
         self.currentSegmentType = VLCLibrarySongsMusicSubSegment;
     }
+    self.libraryWindow.librarySegmentType = self.currentSegmentType;
 
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForDataSourceFinished:)
