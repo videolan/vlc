@@ -159,6 +159,8 @@ MainInterface.MainViewLoader {
                 }
 
                 pictureOverlay: Item {
+                    id: overlay
+
                     Rectangle {
                         anchors.fill: parent
 
@@ -175,7 +177,7 @@ MainInterface.MainViewLoader {
 
                         //FIXME use the right xxxLabel class
                         T.Label {
-                            width: item.width
+                            width: overlay.width
                             elide: Text.ElideRight
                             font.pixelSize: VLCStyle.fontSize_large
                             font.weight: Font.DemiBold
@@ -185,7 +187,7 @@ MainInterface.MainViewLoader {
                         }
 
                         Widgets.CaptionLabel {
-                            width: item.width
+                            width: overlay.width
                             text: model.nb_tracks > 1 ? qsTr("%1 Tracks").arg(model.nb_tracks) : qsTr("%1 Track").arg(model.nb_tracks)
                             opacity: .7
                             color: "white"
