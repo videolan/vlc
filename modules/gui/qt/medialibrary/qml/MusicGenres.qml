@@ -127,7 +127,7 @@ MainInterface.MainViewLoader {
             headerDelegate: root.header
 
             delegate: Widgets.GridItem {
-                id: item
+                id: genreGridDelegate
 
                 property var model: ({})
                 property int index: -1
@@ -146,7 +146,7 @@ MainInterface.MainViewLoader {
                 dragItem: genreDragItem
 
                 onItemDoubleClicked: (_,_,modifier) => { root.showAlbumView(model.id, model.name, Qt.MouseFocusReason) }
-                onItemClicked: (_,_,modifier) => { gridView_id.leftClickOnItem(modifier, item.index) }
+                onItemClicked: (_,_,modifier) => { gridView_id.leftClickOnItem(modifier, genreGridDelegate.index) }
 
                 onPlayClicked: {
                     if (model.id)
