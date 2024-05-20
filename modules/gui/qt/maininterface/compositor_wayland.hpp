@@ -25,6 +25,10 @@
 #include <memory>
 #include "compositor.hpp"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)) && defined(QT_GUI_PRIVATE)
+#define QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
+#endif
+
 class MainCtx;
 class QQuickView;
 class InterfaceWindowHandler;
@@ -77,7 +81,9 @@ public:
 protected slots:
     void onSurfacePositionChanged(const QPointF&) override;
     void onSurfaceSizeChanged(const QSizeF&) override;
-
+#ifdef QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
+    void adjustQuickWindowMask();
+#endif
 
 protected:
     std::unique_ptr<QQuickView> m_qmlView;
