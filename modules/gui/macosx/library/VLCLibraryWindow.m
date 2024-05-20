@@ -337,7 +337,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showAudioLibrary
 {
     [self.toolbarDelegate layoutForSegment:VLCLibraryMusicSegment];
-    self.libraryAudioViewController.currentSegmentType = self.librarySegmentType;
+    [self.libraryAudioViewController presentAudioView];
 }
 
 - (void)showMediaSourceLibrary
