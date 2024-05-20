@@ -36,7 +36,7 @@ MainInterface.MainViewLoader {
     readonly property var currentIndex: currentItem?.currentIndex ?? - 1
 
     property Component header: null
-    
+
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
@@ -146,7 +146,7 @@ MainInterface.MainViewLoader {
                 dragItem: genreDragItem
 
                 onItemDoubleClicked: (_,_,modifier) => { root.showAlbumView(model.id, model.name, Qt.MouseFocusReason) }
-                onItemClicked: (_,_,modifier) => { gridView_id.leftClickOnItem(modifier, genreGridDelegate.index) }
+                onItemClicked: (modifier) => { gridView_id.leftClickOnItem(modifier, item.index) }
 
                 onPlayClicked: {
                     if (model.id)

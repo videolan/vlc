@@ -120,7 +120,7 @@ MainInterface.MainViewLoader {
                 width: VLCStyle.colWidth(1)
                 dragItem: artistsDragItem
 
-                onItemClicked: (_,_, modifier) => { artistGrid.leftClickOnItem(modifier, index) }
+                onItemClicked: (modifier) => { artistGrid.leftClickOnItem(modifier, index) }
 
                 onItemDoubleClicked: (_,_, modifier) => { root.requestArtistAlbumView(Qt.MouseFocusReason) }
 

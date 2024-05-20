@@ -69,7 +69,7 @@ T.ItemDelegate {
 
     signal playClicked
     signal addToPlaylistClicked
-    signal itemClicked(Item menuParent, int key, int modifier)
+    signal itemClicked(int modifier)
     signal itemDoubleClicked(Item menuParent, int keys, int modifier)
     signal contextMenuButtonClicked(Item menuParent, point globalMousePos)
 
@@ -192,7 +192,7 @@ T.ItemDelegate {
             if (mouse.button === Qt.RightButton)
                 contextMenuButtonClicked(picture, root.mapToGlobal(mouse.x,mouse.y));
             else if (mouse.button === Qt.LeftButton) {
-                root.itemClicked(picture, mouse.button, mouse.modifiers);
+                root.itemClicked(mouse.modifiers);
             }
         }
 
@@ -209,7 +209,7 @@ T.ItemDelegate {
             // perform the "click" action because the click action is only executed on mouse release (we are in the pressed state)
             // but we will need the updated list on drop
             if (drag.active && !selected) {
-                root.itemClicked(picture, Qt.LeftButton, root._modifiersOnLastPress)
+                root.itemClicked(root._modifiersOnLastPress)
             } else if (root.dragItem) {
                 root.dragItem.Drag.drop()
             }
@@ -220,7 +220,7 @@ T.ItemDelegate {
             acceptedDevices: PointerDevice.TouchScreen
 
             onTapped: (eventPoint, button) => {
-                root.itemClicked(picture, Qt.LeftButton, Qt.NoModifier)
+                root.itemClicked(Qt.NoModifier)
                 root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
             }
 
@@ -255,7 +255,7 @@ T.ItemDelegate {
                 onPlayIconClicked: (mouse) => {
                     // emulate a mouse click before delivering the play signal as to select the item
                     // this helps in updating the selection and restore of initial index in the parent views
-                    root.itemClicked(picture, mouse.button, mouse.modifiers)
+                    root.itemClicked(mouse.modifiers)
                     root.playClicked()
                 }
 

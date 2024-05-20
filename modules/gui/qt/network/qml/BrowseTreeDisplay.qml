@@ -168,7 +168,7 @@ MainInterface.MainViewLoader {
                 dragItem: networkDragItem
 
                 onPlayClicked: playAt(index)
-                onItemClicked : (_, _, modifier) => {
+                onItemClicked : (modifier) => {
                     gridView.leftClickOnItem(modifier, index)
                 }
 

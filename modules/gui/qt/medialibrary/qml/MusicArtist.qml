@@ -189,7 +189,7 @@ FocusScope {
                             onPlayClicked: play()
                             onItemDoubleClicked: play()
 
-                            onItemClicked: (_,_, modifier) => {
+                            onItemClicked: (modifier) => {
                                 albumsList.selectionModel.updateSelection( modifier , albumsList.currentIndex, index )
                                 albumsList.currentIndex = index
                                 albumsList.forceActiveFocus()
@@ -355,7 +355,7 @@ FocusScope {
                 opacity: gridView_id.expandIndex !== -1 && gridView_id.expandIndex !== audioGridItem.index ? .7 : 1
                 dragItem: albumDragItem
 
-                onItemClicked : (_,_,modifier) => {
+                onItemClicked : (modifier) => {
                     gridView_id.leftClickOnItem(modifier, index)
                 }
 

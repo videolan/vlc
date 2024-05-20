@@ -106,7 +106,7 @@ MainInterface.MainGridView {
 
         // Events
 
-        onItemClicked: (_,_, modifier) => { gridView.leftClickOnItem(modifier, index) }
+        onItemClicked: (modifier) => { gridView.leftClickOnItem(modifier, index) }
 
         onItemDoubleClicked: model => gridView.itemDoubleClicked(model)
 

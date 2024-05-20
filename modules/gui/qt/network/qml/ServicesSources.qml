@@ -102,7 +102,7 @@ MainInterface.MainGridView {
                 root.browseSourceRoot(model.name, Qt.TabFocusReason)
         }
 
-        onItemClicked : (_, _, modifier) => {
+        onItemClicked : (modifier) => {
             root.selectionModel.updateSelection(modifier, root.currentIndex, index)
             root.currentIndex = index
             root.forceActiveFocus()
