@@ -159,8 +159,7 @@ MainInterface.MainViewLoader {
                 }
 
                 pictureOverlay: Item {
-                    Rectangle
-                    {
+                    Rectangle {
                         anchors.fill: parent
 
                         radius: VLCStyle.gridCover_radius
@@ -176,13 +175,13 @@ MainInterface.MainViewLoader {
 
                         //FIXME use the right xxxLabel class
                         T.Label {
-                             width: item.width
-                             elide: Text.ElideRight
-                             font.pixelSize: VLCStyle.fontSize_large
-                             font.weight: Font.DemiBold
-                             text: model.name || qsTr("Unknown genre")
-                             color: "white"
-                             horizontalAlignment: Text.AlignHCenter
+                            width: item.width
+                            elide: Text.ElideRight
+                            font.pixelSize: VLCStyle.fontSize_large
+                            font.weight: Font.DemiBold
+                            text: model.name || qsTr("Unknown genre")
+                            color: "white"
+                            horizontalAlignment: Text.AlignHCenter
                         }
 
                         Widgets.CaptionLabel {
