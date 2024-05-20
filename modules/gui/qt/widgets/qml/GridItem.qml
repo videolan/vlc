@@ -191,7 +191,7 @@ T.ItemDelegate {
         onClicked: (mouse) => {
             if (mouse.button === Qt.RightButton)
                 contextMenuButtonClicked(picture, root.mapToGlobal(mouse.x,mouse.y));
-            else {
+            else if (mouse.button === Qt.LeftButton) {
                 root.itemClicked(picture, mouse.button, mouse.modifiers);
             }
         }
