@@ -70,7 +70,7 @@ T.ItemDelegate {
     signal playClicked
     signal addToPlaylistClicked
     signal itemClicked(int modifier)
-    signal itemDoubleClicked(Item menuParent, int keys, int modifier)
+    signal itemDoubleClicked(int modifier)
     signal contextMenuButtonClicked(Item menuParent, point globalMousePos)
 
     // Settings
@@ -198,7 +198,7 @@ T.ItemDelegate {
 
         onDoubleClicked: (mouse) => {
             if (mouse.button === Qt.LeftButton)
-                root.itemDoubleClicked(picture,mouse.buttons, mouse.modifiers)
+                root.itemDoubleClicked(mouse.modifiers)
         }
 
         onPressed: (mouse) => {
@@ -221,7 +221,7 @@ T.ItemDelegate {
 
             onTapped: (eventPoint, button) => {
                 root.itemClicked(Qt.NoModifier)
-                root.itemDoubleClicked(picture, Qt.LeftButton, Qt.NoModifier)
+                root.itemDoubleClicked(Qt.NoModifier)
             }
 
             onLongPressed: {

@@ -209,7 +209,7 @@ FocusScope {
             delegate: NetworkGridItem {
                 onItemClicked: (modifier) => { root.onClicked(model, index, modifier) }
 
-                onItemDoubleClicked: (_, _, modifier) => { root.onDoubleClicked(model, index) }
+                onItemDoubleClicked: root.onDoubleClicked(model, index)
 
                 onPlayClicked: root.playAt(index)
             }

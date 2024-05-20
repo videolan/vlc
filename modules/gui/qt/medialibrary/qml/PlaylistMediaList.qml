@@ -297,7 +297,7 @@ MainInterface.MainViewLoader {
 
                 onItemClicked: (modifier) => { gridView.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: (modifier) => { showList(model, Qt.MouseFocusReason) }
+                onItemDoubleClicked: showList(model, Qt.MouseFocusReason)
 
                 onPlayClicked: if (model.id) MediaLib.addAndPlay(model.id)
 

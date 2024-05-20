@@ -172,7 +172,7 @@ MainInterface.MainViewLoader {
                     gridView.leftClickOnItem(modifier, index)
                 }
 
-                onItemDoubleClicked: (_, _, modifier) => {
+                onItemDoubleClicked: {
                     if (model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY)
                         browse(model.tree, Qt.MouseFocusReason)
                     else

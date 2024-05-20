@@ -145,7 +145,7 @@ MainInterface.MainViewLoader {
                 playCoverBorderWidth: VLCStyle.dp(3, VLCStyle.scale)
                 dragItem: genreDragItem
 
-                onItemDoubleClicked: (_,_,modifier) => { root.showAlbumView(model.id, model.name, Qt.MouseFocusReason) }
+                onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
                 onItemClicked: (modifier) => { gridView_id.leftClickOnItem(modifier, item.index) }
 
                 onPlayClicked: {

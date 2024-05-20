@@ -112,7 +112,7 @@ MainInterface.MainViewLoader {
                 dragItem: albumDragItem
                 onItemClicked : (modifier) => { gridView_id.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: (_,_,modifier) => {
+                onItemDoubleClicked: {
                     gridView_id.switchExpandItem(index)
                 }
 

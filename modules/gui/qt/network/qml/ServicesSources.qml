@@ -95,7 +95,7 @@ MainInterface.MainGridView {
                 .uri()
         }
 
-        onItemDoubleClicked: (_, _, modifier) => {
+        onItemDoubleClicked: {
             if (is_dummy)
                 root.browseServiceManage(Qt.MouseFocusReason)
             else

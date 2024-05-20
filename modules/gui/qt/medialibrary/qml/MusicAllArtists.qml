@@ -122,7 +122,7 @@ MainInterface.MainViewLoader {
 
                 onItemClicked: (modifier) => { artistGrid.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: (_,_, modifier) => { root.requestArtistAlbumView(Qt.MouseFocusReason) }
+                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
 
                 onContextMenuButtonClicked: (_, globalMousePos) => {
                     artistGrid.rightClickOnItem(index)
