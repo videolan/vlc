@@ -489,6 +489,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setCurrentSegmentType:(VLCLibrarySegmentType)currentSegmentType
 {
     _currentSegmentType = currentSegmentType;
+    VLCLibraryWindow * const libraryWindow = self.libraryWindow;
+    libraryWindow.librarySegmentType = currentSegmentType;
+    [libraryWindow.splitViewController.navSidebarViewController selectSegment:currentSegmentType];
     [self updatePresentedView];
 }
 
@@ -585,10 +588,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else {
         self.currentSegmentType = VLCLibrarySongsMusicSubSegment;
     }
-
-    VLCLibraryWindow * const libraryWindow = self.libraryWindow;
-    libraryWindow.librarySegmentType = self.currentSegmentType;
-    [libraryWindow.splitViewController.navSidebarViewController selectSegment:self.currentSegmentType];
 
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForDataSourceFinished:)
