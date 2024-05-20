@@ -32,6 +32,8 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryWindowNavigationSidebarViewController.h"
+#import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryTwoPaneSplitViewDelegate.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
@@ -583,7 +585,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else {
         self.currentSegmentType = VLCLibrarySongsMusicSubSegment;
     }
-    self.libraryWindow.librarySegmentType = self.currentSegmentType;
+
+    VLCLibraryWindow * const libraryWindow = self.libraryWindow;
+    libraryWindow.librarySegmentType = self.currentSegmentType;
+    [libraryWindow.splitViewController.navSidebarViewController selectSegment:self.currentSegmentType];
 
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForDataSourceFinished:)
