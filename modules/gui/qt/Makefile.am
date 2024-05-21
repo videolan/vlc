@@ -1252,7 +1252,7 @@ nodist_base_model_test_SOURCES = util/base_model.moc.cpp \
         util/locallistcacheloader.moc.cpp
 
 base_model_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
-base_model_test_LDADD = $(QT5_PLUGINS_LIBS) $(QT_LIBS) $(LIBS_qt)
+base_model_test_LDADD = $(QT_LIBS) $(LIBS_qt)
 check_PROGRAMS = base_model_test
 TESTS = base_model_test
 
