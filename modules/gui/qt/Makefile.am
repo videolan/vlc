@@ -1300,7 +1300,8 @@ libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/FrostedGlass.frag \
                           shaders/RectFilter.frag \
                           shaders/SubTexture.vert \
-                          shaders/PlayerBlurredBackground.frag
+                          shaders/PlayerBlurredBackground.frag \
+                          shaders/HollowRectangularGlow.frag
 if ENABLE_QT
 
 libqt_plugin_la_LIBADD += libqml_module_dialogs.a \

@@ -8,5 +8,6 @@
         <file alias="RectFilter.frag.qsb">RectFilter.frag.qsb</file>
         <file alias="SubTexture.vert.qsb">SubTexture.vert.qsb</file>
         <file alias="PlayerBlurredBackground.frag.qsb">PlayerBlurredBackground.frag.qsb</file>
+        <file alias="HollowRectangularGlow.frag.qsb">HollowRectangularGlow.frag.qsb</file>
     </qresource>
 </RCC>

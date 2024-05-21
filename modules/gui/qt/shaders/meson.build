@@ -13,7 +13,8 @@ shader_sources = [
     'FrostedGlass.frag',
     'RectFilter.frag',
     'SubTexture.vert',
-    'PlayerBlurredBackground.frag'
+    'PlayerBlurredBackground.frag',
+    'HollowRectangularGlow.frag'
 ]
 
 shader_files = files(shader_sources)
