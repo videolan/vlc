@@ -368,6 +368,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (NSInteger)numberOfItemsInCarousel:(iCarousel *)carousel
 {
+    if (self.collectionArray == nil) {
+        return 0;
+    }
+    
     return self.collectionArray.count;
 }
 
