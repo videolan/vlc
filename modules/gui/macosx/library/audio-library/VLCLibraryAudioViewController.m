@@ -548,11 +548,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                                   name:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                                                 object:self.audioDataSource];
 
-    const VLCLibraryViewModeSegment viewModeSegment = self.libraryWindow.librarySegmentType;
+    const VLCLibraryViewModeSegment viewModeSegment = [self viewModeSegmentForCurrentLibrarySegment];
     if (viewModeSegment == VLCLibraryListViewModeSegment) {
         [self presentLibraryItemInTableView:_awaitingPresentingLibraryItem];
     } else if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         [self presentLibraryItemInCollectionView:_awaitingPresentingLibraryItem];
+    } else {
+        NSAssert(false, @"No valid view mode segment acquired, cannot present item!");
     }
 
     _awaitingPresentingLibraryItem = nil;
