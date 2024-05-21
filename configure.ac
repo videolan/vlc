@@ -4002,8 +4002,9 @@ AS_IF([test "${enable_qt}" != "no"], [
   AS_IF([test -n "${QT_CONF}"],[
       QMAKE="${QMAKE} -qtconf ${QT_CONF}"
   ])
+  AC_MSG_NOTICE([using ${QMAKE}])
 
-  AC_MSG_CHECKING([for qt libraries with ${QMAKE}])
+  AC_MSG_CHECKING([for Qt libraries])
   mkdir -p ${ac_pwd}/modules/gui/qt
   touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
   QT_PKG_ERRORS=$(${QMAKE} ${srcdir}/modules/gui/qt/qt6.pro -o ${ac_pwd}/modules/gui/qt/qmake-qt 2>&1)
@@ -4013,13 +4014,13 @@ AS_IF([test "${enable_qt}" != "no"], [
       echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-qt
       echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-qt
       echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-qt
-      AC_MSG_RESULT([found])
+      AC_MSG_RESULT([yes])
       QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
       QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
       AC_SUBST([QT_LIBS])
       AC_SUBST([QT_CFLAGS])
 
-      AC_MSG_CHECKING([for qt Qt6WaylandClient using ${QMAKE}])
+      AC_MSG_CHECKING([for Qt6WaylandClient])
       (${QMAKE} ${srcdir}/modules/gui/qt/wayland.pro -o ${ac_pwd}/modules/gui/qt/qmake-wayland) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-wayland],[
@@ -4027,14 +4028,14 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-wayland
         echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-wayland
         echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-wayland
-        AC_MSG_RESULT([found])
+        AC_MSG_RESULT([yes])
         QT_WAYLAND_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_libs)
         QT_WAYLAND_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_cflags)
         AC_SUBST([QT_WAYLAND_LIBS])
         AC_SUBST([QT_WAYLAND_CFLAGS])
         have_qt_wayland="yes"
       ],[
-        AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([no])
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
 
@@ -4072,7 +4073,7 @@ AS_IF([test "${enable_qt}" != "no"], [
         have_qt="no"
       ])
 
-      AC_MSG_CHECKING([for qt QuickTest using ${QMAKE}])
+      AC_MSG_CHECKING([for QuickTest])
       (${QMAKE} ${srcdir}/modules/gui/qt/quicktest.pro -o ${ac_pwd}/modules/gui/qt/qmake-quicktest) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
@@ -4085,17 +4086,17 @@ AS_IF([test "${enable_qt}" != "no"], [
             echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
             echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
             echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
-            AC_MSG_RESULT([found])
+            AC_MSG_RESULT([yes])
             QT_QUICK_TEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_libs)
             QT_QUICK_TEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_cflags)
             AC_SUBST([QT_QUICK_TEST_LIBS])
             AC_SUBST([QT_QUICK_TEST_CFLAGS])
             have_qt_quick_test="yes"
         ], [
-            AC_MSG_RESULT([not found])
+            AC_MSG_RESULT([no])
         ])
       ],[
-        AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([no])
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-quicktest
 
@@ -4106,7 +4107,7 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_SUBST([FXC_PATH])
       ])
 
-      AC_MSG_CHECKING([for qt core private using ${QMAKE}])
+      AC_MSG_CHECKING([for Qt Core private])
       (${QMAKE} ${srcdir}/modules/gui/qt/private-core.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-core) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-core],[
@@ -4114,18 +4115,18 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-private-core
         echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-private-core
         echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-private-core
-        AC_MSG_RESULT([found])
+        AC_MSG_RESULT([yes])
         QT_CORE_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_libs)
         QT_CORE_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
         AC_SUBST([QT_CORE_PRIVATE_LIBS])
         AC_SUBST([QT_CORE_PRIVATE_CFLAGS])
         have_qt_core_private="yes"
       ],[
-        AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([no])
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-core
 
-      AC_MSG_CHECKING([for qt gui private using ${QMAKE}])
+      AC_MSG_CHECKING([for Qt GUI private])
       (${QMAKE} ${srcdir}/modules/gui/qt/private-gui.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-gui) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-gui],[
@@ -4133,18 +4134,18 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
         echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
         echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
-        AC_MSG_RESULT([found])
+        AC_MSG_RESULT([yes])
         QT_GUI_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_libs)
         QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
         AC_SUBST([QT_GUI_PRIVATE_LIBS])
         AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
         have_qt_gui_private="yes"
       ],[
-        AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([no])
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
 
-      AC_MSG_CHECKING([for qt quick private using ${QMAKE}])
+      AC_MSG_CHECKING([for Qt Quick private])
       (${QMAKE} ${srcdir}/modules/gui/qt/private-quick.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-quick) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-quick],[
@@ -4152,14 +4153,14 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
         echo 'get_libs:'                       >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
         echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
-        AC_MSG_RESULT([found])
+        AC_MSG_RESULT([yes])
         QT_QUICK_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_libs)
         QT_QUICK_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_cflags)
         AC_SUBST([QT_QUICK_PRIVATE_LIBS])
         AC_SUBST([QT_QUICK_PRIVATE_CFLAGS])
         have_qt_declarative_private="yes"
       ],[
-        AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([no])
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-private-quick
 
