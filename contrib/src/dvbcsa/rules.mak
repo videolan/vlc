@@ -22,6 +22,6 @@ libdvbcsa: libdvbcsa-$(DVBCSA_VERSION).tar.gz .sum-dvbcsa
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
-	+$(MAKEBUILD)
-	+$(MAKEBUILD) install
+	+$(MAKEBUILD) -C src
+	+$(MAKEBUILD) -C src install
 	touch $@
