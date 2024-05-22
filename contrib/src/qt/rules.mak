@@ -105,6 +105,10 @@ QTBASE_COMMON_CONFIG += -DFEATURE_stack_clash_protection=OFF
 endif
 endif
 
+ifdef ENABLE_LTO
+QTBASE_CONFIG += -DFEATURE_ltcg=ON
+endif
+
 QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
     -DFEATURE_gif=OFF \
 	-DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
