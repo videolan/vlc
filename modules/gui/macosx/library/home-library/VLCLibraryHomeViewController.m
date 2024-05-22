@@ -69,64 +69,33 @@
         [self setupHomeLibraryViews];
 
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelVideoMediaListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelVideoMediaItemDeleted
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelAudioMediaListReset
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelAudioMediaItemDeleted
-                                 object:nil];
+        NSString *notificationNames[] =
+        {
+            VLCLibraryModelVideoMediaListReset,
+            VLCLibraryModelAudioMediaListReset,
+            VLCLibraryModelVideoMediaItemDeleted,
+            VLCLibraryModelAudioMediaItemDeleted,
+        };
 
-        NSString * const videoMediaResetLongLoadStartNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const videoMediaResetLongLoadFinishNotification = [VLCLibraryModelVideoMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
-        NSString * const audioMediaResetLongLoadStartNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const audioMediaResetLongLoadFinishNotification = [VLCLibraryModelAudioMediaListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
-        NSString * const videoMediaDeletedLongLoadStartNotification = [VLCLibraryModelVideoMediaItemDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const videoMediaDeletedLongLoadFinishNotification = [VLCLibraryModelVideoMediaItemDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
-        NSString * const audioMediaDeletedLongLoadStartNotification = [VLCLibraryModelAudioMediaItemDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const audioMediaDeletedLongLoadFinishNotification = [VLCLibraryModelAudioMediaItemDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        for (size_t i = 0; i < ARRAY_SIZE(notificationNames); ++i) @autoreleasepool
+        {
+            [notificationCenter addObserver:self
+                                   selector:@selector(libraryModelUpdated:)
+                                       name:notificationNames[i]
+                                     object:nil];
 
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadStarted:)
-                                   name:videoMediaResetLongLoadStartNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadFinished:)
-                                   name:videoMediaResetLongLoadFinishNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadStarted:)
-                                   name:audioMediaResetLongLoadStartNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadFinished:)
-                                   name:audioMediaResetLongLoadFinishNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadStarted:)
-                                   name:videoMediaDeletedLongLoadStartNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadFinished:)
-                                   name:videoMediaDeletedLongLoadFinishNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadStarted:)
-                                   name:audioMediaDeletedLongLoadStartNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryModelLongLoadFinished:)
-                                   name:audioMediaDeletedLongLoadFinishNotification
-                                 object:nil];
+            NSString *startedNotification = [notificationNames[i] stringByAppendingString:VLCLongNotificationNameStartSuffix];
+            [notificationCenter addObserver:self
+                                   selector:@selector(libraryModelLongLoadStarted:)
+                                       name:startedNotification
+                                     object:nil];
+
+            NSString *finishedNotification = [notificationNames[i] stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+            [notificationCenter addObserver:self
+                                   selector:@selector(libraryModelLongLoadFinished:)
+                                       name:finishedNotification
+                                     object:nil];
+        }
     }
 
     return self;
