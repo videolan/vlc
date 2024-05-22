@@ -1018,7 +1018,7 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="4597" secondAttribute="trailing" constant="18" id="0mI-WU-Hft"/>
-                <constraint firstItem="4597" firstAttribute="leading" secondItem="4596" secondAttribute="leading" constant="28" id="3eU-xF-bKw"/>
+                <constraint firstItem="4597" firstAttribute="leading" secondItem="4615" secondAttribute="leading" id="3eU-xF-bKw"/>
                 <constraint firstItem="4600" firstAttribute="centerY" secondItem="4598" secondAttribute="centerY" id="5aF-Lp-phm"/>
                 <constraint firstItem="4597" firstAttribute="top" secondItem="4601" secondAttribute="bottom" constant="-8" id="5k1-Co-uGX"/>
                 <constraint firstItem="4615" firstAttribute="top" secondItem="4596" secondAttribute="top" id="7KB-Mh-tpE"/>
@@ -1077,7 +1077,7 @@
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="5548" secondAttribute="trailing" constant="17" id="QDr-TS-Anv"/>
                 <constraint firstAttribute="trailing" secondItem="5555" secondAttribute="trailing" constant="20" id="WG2-ZC-N9x"/>
                 <constraint firstItem="5548" firstAttribute="centerX" secondItem="5550" secondAttribute="centerX" id="ZTn-Vv-gdG"/>
-                <constraint firstItem="5555" firstAttribute="leading" secondItem="5547" secondAttribute="leading" constant="28" id="abd-YT-hbw"/>
+                <constraint firstItem="5555" firstAttribute="leading" secondItem="5548" secondAttribute="leading" id="abd-YT-hbw"/>
                 <constraint firstAttribute="bottom" secondItem="5555" secondAttribute="bottom" constant="2" id="fI1-6z-VzI"/>
                 <constraint firstItem="5548" firstAttribute="centerY" secondItem="5550" secondAttribute="centerY" id="jed-zg-Ueg"/>
             </constraints>
@@ -1149,7 +1149,7 @@
                 <constraint firstItem="uVr-yv-xcp" firstAttribute="trailing" secondItem="bMX-Y8-2vL" secondAttribute="trailing" id="eoR-UG-pdH"/>
                 <constraint firstItem="uVr-yv-xcp" firstAttribute="centerY" secondItem="Jqh-Tt-S94" secondAttribute="centerY" id="s3X-tb-Ora"/>
                 <constraint firstItem="bMX-Y8-2vL" firstAttribute="top" secondItem="Jqh-Tt-S94" secondAttribute="bottom" constant="16" id="ybL-Ac-zUJ"/>
-                <constraint firstItem="bMX-Y8-2vL" firstAttribute="leading" secondItem="GSo-om-Xt7" secondAttribute="leading" constant="28" id="yyk-px-6zZ"/>
+                <constraint firstItem="bMX-Y8-2vL" firstAttribute="leading" secondItem="Jqh-Tt-S94" secondAttribute="leading" id="yyk-px-6zZ"/>
             </constraints>
             <point key="canvasLocation" x="423" y="362"/>
         </customView>
