@@ -70,6 +70,7 @@ if args.type == 'internal':
         _add_environ_val('objc', 'OBJC')
         _add_environ_val('objcpp', 'OBJCXX')
     _add_environ_val('ar', 'AR')
+    _add_environ_val('ranlib', 'RANLIB')
     _add_environ_val('strip', 'STRIP')
     _add_environ_val('pkgconfig', 'PKG_CONFIG')
     _add_environ_val('windres', 'WINDRES')
