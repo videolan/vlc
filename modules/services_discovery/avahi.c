@@ -278,7 +278,7 @@ static void resolve_callback(
 
         const char *psz_protocol = NULL;
         bool is_renderer = false;
-        for( unsigned int i = 0; i < ARRAY_SIZE(protocols); i++ )
+        for (size_t i = 0; i < ARRAY_SIZE(protocols); i++)
         {
             if( !strcmp(type, protocols[i].psz_service_name) )
             {
@@ -454,7 +454,7 @@ static int OpenCommon( discovery_sys_t *p_sys )
         goto error;
     }
 
-    for( unsigned i = 0; i < ARRAY_SIZE(protocols); i++ )
+    for (size_t i = 0; i < ARRAY_SIZE(protocols); i++)
     {
         if( protocols[i].b_renderer != p_sys->renderer )
             continue;
