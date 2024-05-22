@@ -313,7 +313,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
     {
         if( p_entry->type == RR_SRV )
         {
-            for( unsigned i = 0; i < ARRAY_SIZE(protocols); ++i )
+            for (size_t i = 0; i < ARRAY_SIZE(protocols); ++i)
             {
                 if( !strrcmp( p_entry->name, protocols[i].psz_service_name ) &&
                     protocols[i].b_renderer == b_renderer )
@@ -588,7 +588,7 @@ OpenCommon( vlc_object_t *p_obj, struct discovery_sys *p_sys, bool b_renderer )
     vlc_array_init( &p_sys->items );
 
     /* Listen to protocols that are handled by VLC */
-    for( unsigned int i = 0; i < ARRAY_SIZE(protocols); ++i )
+    for (size_t i = 0; i < ARRAY_SIZE(protocols); ++i)
     {
         if( protocols[i].b_renderer == b_renderer )
             p_sys->ppsz_service_names[p_sys->i_nb_service_names++] =
