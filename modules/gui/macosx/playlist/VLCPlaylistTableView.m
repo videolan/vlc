@@ -30,18 +30,18 @@
 #import "playlist/VLCPlaylistMenuController.h"
 
 @interface VLCPlaylistTableView ()
-{
-    VLCPlaylistMenuController *_menuController;
-}
+
+@property (readonly, atomic) VLCPlaylistMenuController *menuController;
+
 @end
 
 @implementation VLCPlaylistTableView
 
 - (NSMenu *)menuForEvent:(NSEvent *)event
 {
-    if (!_menuController) {
+    if (self.menuController == nil) {
         _menuController = [[VLCPlaylistMenuController alloc] init];
-        _menuController.playlistTableView = self;
+        self.menuController.playlistTableView = self;
     }
 
     NSPoint pt = [self convertPoint: [event locationInWindow] fromView: nil];
@@ -49,7 +49,7 @@
     if (row != -1 && ![[self selectedRowIndexes] containsIndex: row])
         [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-    return _menuController.playlistMenu;
+    return self.menuController.playlistMenu;
 }
 
 - (void)keyDown:(NSEvent *)event
