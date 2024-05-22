@@ -39,7 +39,7 @@ SOXR_CONF := \
 
 .soxr: soxr toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(SOXR_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(SOXR_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

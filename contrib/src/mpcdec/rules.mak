@@ -30,7 +30,7 @@ musepack: musepack_src_r$(MUSE_REV).tar.gz .sum-mpcdec
 
 .mpcdec: musepack toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

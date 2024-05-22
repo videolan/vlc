@@ -46,7 +46,7 @@ endif
 
 .upnp: upnp toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(UPNP_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(UPNP_CONF)
 	+$(CMAKEBUILD)
 	+$(CMAKEINSTALL)
 	touch $@

@@ -26,7 +26,7 @@ endif
 
 .taglib: taglib toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(TAGLIB_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(TAGLIB_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

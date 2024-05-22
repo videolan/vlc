@@ -52,7 +52,7 @@ endif
 
 .libxml2: libxml2 toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(LIBXML2_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(LIBXML2_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

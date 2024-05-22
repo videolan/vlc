@@ -23,7 +23,7 @@ matroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 
 .matroska: matroska toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

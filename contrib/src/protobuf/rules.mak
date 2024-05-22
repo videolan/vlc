@@ -32,7 +32,7 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 
 .protobuf: protobuf toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) -S $</cmake $(PROTOBUF_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) -S $</cmake $(PROTOBUF_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

@@ -43,7 +43,7 @@ FLUIDCONF := \
 
 .fluid: fluidsynth toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(FLUIDCONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(FLUIDCONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

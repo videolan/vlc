@@ -319,6 +319,19 @@ HOSTTOOLS := \
 	PATH="$(PREFIX)/bin:$(PATH)" \
 	PKG_CONFIG="$(PKG_CONFIG)"
 
+ifdef HAVE_BITCODE_ENABLED
+CFLAGS := $(CFLAGS) -fembed-bitcode
+CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
+endif
+
+# Add these flags after CMake consumed the CFLAGS/CXXFLAGS
+# CMake handles the optimization level with CMAKE_BUILD_TYPE
+HOSTVARS_CMAKE := $(HOSTTOOLS) \
+	CPPFLAGS="$(CPPFLAGS)" \
+	CFLAGS="$(CFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS)" \
+	LDFLAGS="$(LDFLAGS)"
+
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
 # as when setting those for Meson, it would apply to tests
 # and cause the check if symbols have underscore prefix to
@@ -329,11 +342,6 @@ CXXFLAGS := $(CXXFLAGS) -g -O0
 else
 CFLAGS := $(CFLAGS) -g -O2
 CXXFLAGS := $(CXXFLAGS) -g -O2
-endif
-
-ifdef HAVE_BITCODE_ENABLED
-CFLAGS := $(CFLAGS) -fembed-bitcode
-CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
 endif
 
 ifdef ENABLE_PDB

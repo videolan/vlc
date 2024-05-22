@@ -22,7 +22,7 @@ OGG_CONF := -DINSTALL_DOCS:BOOL=OFF
 
 .ogg: libogg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(OGG_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(OGG_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
