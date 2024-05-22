@@ -103,9 +103,6 @@
 
 - (void)remove:(id)sender
 {
-    if (self.playlistTableView.selectedRow == -1)
-        return;
-
     [_playlistController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
 }
 
