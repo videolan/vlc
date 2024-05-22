@@ -35,7 +35,7 @@ OPTIONS:
                      n: nightly
                      u: unsigned stripped release archive
                      z: zip
-   -k <sdk>      Use the specified sdk (default: $SDKROOT)
+   -k <sdk>      Use the specified SDK (default: $SDKROOT)
    -a <arch>     Use the specified arch (default: $HOST_ARCH)
    -C            Use the specified VLC build dir
    -b <url>      Enable breakpad support and send crash reports to this URL
