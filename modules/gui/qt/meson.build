@@ -530,6 +530,11 @@ if (x11_dep.found() and
     )
 endif
 
+qrc_files = files('assets.qrc')
+if host_system == 'windows'
+  qrc_files += files('windows.qrc')
+endif
+
 ui_sources = files(
     'dialogs/extended/equalizer.ui',
     'dialogs/extended/video_effects.ui',
@@ -555,16 +560,382 @@ ui_sources = files(
     'dialogs/vlm/vlm.ui',
 )
 
-qrc_files = files('assets.qrc', 'qml.qrc')
-if host_system == 'windows'
-  qrc_files += files('windows.qrc')
-endif
+qml_modules = []
+
+qml_modules += {
+    'name' : 'VLC.Dialogs',
+    'target' : 'dialogs',
+    'outdir' : 'VLC/Dialogs',
+    'sources': files(
+        'dialogs/dialogs/qml/CustomDialog.qml',
+        'dialogs/dialogs/qml/Dialogs.qml',
+        'dialogs/dialogs/qml/ModalDialog.qml',
+        'dialogs/dialogs/qml/WindowDialog.qml',
+        'dialogs/toolbar/qml/EditorDNDDelegate.qml',
+        'dialogs/toolbar/qml/EditorDNDView.qml',
+        'dialogs/toolbar/qml/EditorDummyButton.qml',
+        'dialogs/toolbar/qml/EditorTabButton.qml',
+        'dialogs/toolbar/qml/ToolbarEditor.qml',
+        'dialogs/toolbar/qml/ToolbarEditorDialog.qml',
+        'dialogs/toolbar/qml/ToolbarEditorButtonList.qml'
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.MainInterface',
+    'target' : 'maininterface',
+    'outdir' : 'VLC/MainInterface',
+    'sources': files(
+        'maininterface/qml/BannerSources.qml',
+        'maininterface/qml/MainInterface.qml',
+        'maininterface/qml/MainViewLoader.qml',
+        'maininterface/qml/MainDisplay.qml',
+        'maininterface/qml/MainGridView.qml',
+        'maininterface/qml/MainTableView.qml',
+        'maininterface/qml/NoMedialibHome.qml'
+    ),
+}
+qml_modules += {
+    'name' : 'VLC.MediaLibrary',
+    'target' : 'medialibrary',
+    'outdir' : 'VLC/MediaLibrary',
+    'sources': files(
+        'medialibrary/qml/ArtistTopBanner.qml',
+        'medialibrary/qml/AudioGridItem.qml',
+        'medialibrary/qml/MediaGroupDisplay.qml',
+        'medialibrary/qml/MusicAlbums.qml',
+        'medialibrary/qml/MusicAlbumsDisplay.qml',
+        'medialibrary/qml/MusicAlbumsGridExpandDelegate.qml',
+        'medialibrary/qml/MusicArtist.qml',
+        'medialibrary/qml/MusicArtistDelegate.qml',
+        'medialibrary/qml/MusicArtistsAlbums.qml',
+        'medialibrary/qml/MusicAllArtists.qml',
+        'medialibrary/qml/MusicArtistsDisplay.qml',
+        'medialibrary/qml/MusicDisplay.qml',
+        'medialibrary/qml/MusicGenres.qml',
+        'medialibrary/qml/MusicGenresDisplay.qml',
+        'medialibrary/qml/MusicPlaylistsDisplay.qml',
+        'medialibrary/qml/MusicTrackListDisplay.qml',
+        'medialibrary/qml/MusicTracksDisplay.qml',
+        'medialibrary/qml/UrlListDisplay.qml',
+        'medialibrary/qml/VideoDisplay.qml',
+        'medialibrary/qml/VideoAll.qml',
+        'medialibrary/qml/VideoAllDisplay.qml',
+        'medialibrary/qml/VideoAllSubDisplay.qml',
+        'medialibrary/qml/PlaylistMediaList.qml',
+        'medialibrary/qml/PlaylistMedia.qml',
+        'medialibrary/qml/PlaylistMediaDisplay.qml',
+        'medialibrary/qml/VideoPlaylistsDisplay.qml',
+        'medialibrary/qml/VideoRecentVideos.qml',
+        'medialibrary/qml/VideoRecentVideosDisplay.qml',
+        'medialibrary/qml/VideoGridItem.qml',
+        'medialibrary/qml/VideoInfoExpandPanel.qml',
+        'medialibrary/qml/VideoListDisplay.qml',
+        'medialibrary/qml/VideoGridDisplay.qml'
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Menus',
+    'target' : 'menus',
+    'outdir' : 'VLC/Menus',
+    'sources': files(
+        'menus/qml/GlobalShortcuts.qml',
+        'menus/qml/GlobalShortcutsMedialib.qml',
+        'menus/qml/Menubar.qml',
+        'menus/qml/ShortcutExt.qml'
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Network',
+    'target' : 'network',
+    'outdir' : 'VLC/Network',
+    'sources': files(
+        'network/qml/AddressbarButton.qml',
+        'network/qml/BrowseDeviceView.qml',
+        'network/qml/BrowseDisplay.qml',
+        'network/qml/BrowseHomeDisplay.qml',
+        'network/qml/BrowseTreeDisplay.qml',
+        'network/qml/BrowseTreeHeader.qml',
+        'network/qml/DiscoverDisplay.qml',
+        'network/qml/DiscoverUrlDisplay.qml',
+        'network/qml/NetworkAddressbar.qml',
+        'network/qml/NetworkCustomCover.qml',
+        'network/qml/NetworkGridItem.qml',
+        'network/qml/NetworkThumbnailItem.qml',
+        'network/qml/ServicesHomeDisplay.qml',
+        'network/qml/ServicesManage.qml',
+        'network/qml/ServicesSources.qml'
+    ),
+}
+
+qml_modules += {
+   'name' : 'VLC.Player',
+   'target' : 'player',
+   'outdir' : 'VLC/Player',
+   'sources': files(
+       'player/qml/Bookmarks.qml',
+       'player/qml/ControlBar.qml',
+       'player/qml/PlaybackSpeed.qml',
+       'player/qml/MiniPlayer.qml',
+       'player/qml/PIPPlayer.qml',
+       'player/qml/Player.qml',
+       'player/qml/PlayerBlurredBackground.qml',
+       'player/qml/PlayerControlLayout.qml',
+       'player/qml/PlayerPlaylistVisibilityFSM.qml',
+       'player/qml/ResumeDialog.qml',
+       'player/qml/SliderBar.qml',
+       'player/qml/TopBar.qml',
+       'player/qml/TracksMenu.qml',
+       'player/qml/TracksPage.qml',
+       'player/qml/TracksPageAudio.qml',
+       'player/qml/TracksPageSpeed.qml',
+       'player/qml/TracksPageSubtitle.qml',
+       'player/qml/TracksListPage.qml',
+       'player/qml/ControlLayout.qml',
+       'player/qml/ControlRepeater.qml',
+       'player/qml/NavigationBox.qml',
+   ),
+   'singletons' : files(
+       'player/qml/PlayerControlbarControls.qml',
+   )
+}
+
+qml_modules += {
+   'name' : 'VLC.PlayerControls',
+   'target' : 'playercontrols',
+   'outdir' : 'VLC/PlayerControls',
+   'sources': files(
+       'player/qml/controlbarcontrols/HighResolutionTimeWidget.qml',
+       'player/qml/controlbarcontrols/ArtworkInfoWidget.qml',
+       'player/qml/controlbarcontrols/AspectRatioWidget.qml',
+       'player/qml/controlbarcontrols/AtoBButton.qml',
+       'player/qml/controlbarcontrols/BackButton.qml',
+       'player/qml/controlbarcontrols/BookmarkButton.qml',
+       'player/qml/controlbarcontrols/ChapterNextButton.qml',
+       'player/qml/controlbarcontrols/ChapterPreviousButton.qml',
+       'player/qml/controlbarcontrols/DvdMenuButton.qml',
+       'player/qml/controlbarcontrols/ExpandingSpacerWidget.qml',
+       'player/qml/controlbarcontrols/ExtendedSettingsButton.qml',
+       'player/qml/controlbarcontrols/FasterButton.qml',
+       'player/qml/controlbarcontrols/FrameButton.qml',
+       'player/qml/controlbarcontrols/FullscreenButton.qml',
+       'player/qml/controlbarcontrols/InfoButton.qml',
+       'player/qml/controlbarcontrols/LangButton.qml',
+       'player/qml/controlbarcontrols/LoopButton.qml',
+       'player/qml/controlbarcontrols/MenuButton.qml',
+       'player/qml/controlbarcontrols/NavigationBoxButton.qml',
+       'player/qml/controlbarcontrols/NavigationWidget.qml',
+       'player/qml/controlbarcontrols/NextButton.qml',
+       'player/qml/controlbarcontrols/OpenButton.qml',
+       'player/qml/controlbarcontrols/PlaybackSpeedButton.qml',
+       'player/qml/controlbarcontrols/PlayButton.qml',
+       'player/qml/controlbarcontrols/PlayerSwitchButton.qml',
+       'player/qml/controlbarcontrols/PlaylistButton.qml',
+       'player/qml/controlbarcontrols/PreviousButton.qml',
+       'player/qml/controlbarcontrols/ProgramButton.qml',
+       'player/qml/controlbarcontrols/QuitButton.qml',
+       'player/qml/controlbarcontrols/RandomButton.qml',
+       'player/qml/controlbarcontrols/RendererButton.qml',
+       'player/qml/controlbarcontrols/RecordButton.qml',
+       'player/qml/controlbarcontrols/ReverseButton.qml',
+       'player/qml/controlbarcontrols/SkipBackButton.qml',
+       'player/qml/controlbarcontrols/SkipForwardButton.qml',
+       'player/qml/controlbarcontrols/SlowerButton.qml',
+       'player/qml/controlbarcontrols/SnapshotButton.qml',
+       'player/qml/controlbarcontrols/SpacerWidget.qml',
+       'player/qml/controlbarcontrols/StopButton.qml',
+       'player/qml/controlbarcontrols/TeletextButton.qml',
+       'player/qml/controlbarcontrols/TeletextColorButton.qml',
+       'player/qml/controlbarcontrols/TeletextWidget.qml',
+       'player/qml/controlbarcontrols/VolumeWidget.qml',
+       'player/qml/controlbarcontrols/Fallback.qml',
+   ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Playlist',
+    'target' : 'playlist',
+    'outdir' : 'VLC/Playlist',
+    'sources': files(
+        'playlist/qml/PlaylistDelegate.qml',
+        'playlist/qml/PlaylistListView.qml',
+        'playlist/qml/PlaylistToolbar.qml',
+        'playlist/qml/PlaylistDetachedWindow.qml',
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Style',
+    'target' : 'style',
+    'outdir' : 'VLC/Style',
+    'singletons': files(
+        'style/AcrylicController.qml',
+        'style/VLCIcons.qml',
+        'style/VLCStyle.qml',
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Util',
+    'target' : 'util',
+    'outdir' : 'VLC/Util',
+    'sources': files(
+        'util/qml/Helpers.js',
+        'util/qml/ModelSortSettingHandler.qml',
+        'util/qml/FlickableScrollHandler.qml',
+        'util/qml/ViewDragAutoScrollHandler.qml',
+        'util/qml/FSM.qml',
+        'util/qml/FSMState.qml',
+        'util/qml/GridSizeHelper.qml',
+        'util/qml/NativeMenu.qml',
+        'util/qml/MLContextMenu.qml',
+        'util/qml/FadeControllerStateGroup.qml'
+    ),
+}
+
+qml_modules += {
+    'name' : 'VLC.Widgets',
+    'target' : 'widgets',
+    'outdir' : 'VLC/Widgets',
+    'sources': files(
+        'widgets/qml/LabelExt.qml',
+        'widgets/qml/ActionButtonOverlay.qml',
+        'widgets/qml/ActionButtonPrimary.qml',
+        'widgets/qml/BannerTabButton.qml',
+        'widgets/qml/BannerCone.qml',
+        'widgets/qml/BusyIndicatorExt.qml',
+        'widgets/qml/CaptionLabel.qml',
+        'widgets/qml/CheckButton.qml',
+        'widgets/qml/CheckedDelegate.qml',
+        'widgets/qml/ComboBoxExt.qml',
+        'widgets/qml/AcrylicBackground.qml',
+        'widgets/qml/AnimatedBackground.qml',
+        'widgets/qml/CSDThemeButton.qml',
+        'widgets/qml/CSDThemeButtonSet.qml',
+        'widgets/qml/CSDWindowButton.qml',
+        'widgets/qml/CSDWindowButtonSet.qml',
+        'widgets/qml/CSDTitlebarTapNDrapHandler.qml',
+        'widgets/qml/CSDMouseStealer.qml',
+        'widgets/qml/CurrentIndicator.qml',
+        'widgets/qml/DragItem.qml',
+        'widgets/qml/DrawerExt.qml',
+        'widgets/qml/ExpandGridView.qml',
+        'widgets/qml/ExpandGridItemView.qml',
+        'widgets/qml/EmptyLabel.qml',
+        'widgets/qml/EmptyLabelButton.qml',
+        'widgets/qml/EmptyLabelHint.qml',
+        'widgets/qml/GridItem.qml',
+        'widgets/qml/HorizontalResizeHandle.qml',
+        'widgets/qml/IconLabel.qml',
+        'widgets/qml/IconButton.qml',
+        'widgets/qml/IconToolButton.qml',
+        'widgets/qml/IconTrackButton.qml',
+        'widgets/qml/ImageToolButton.qml',
+        'widgets/qml/KeyNavigableListView.qml',
+        'widgets/qml/KeyNavigableTableView.qml',
+        'widgets/qml/TableViewDelegate.qml',
+        'widgets/qml/TableRowDelegate.qml',
+        'widgets/qml/TableHeaderDelegate.qml',
+        'widgets/qml/DefaultShadow.qml',
+        'widgets/qml/ListLabel.qml',
+        'widgets/qml/LocalTabBar.qml',
+        'widgets/qml/MediaCover.qml',
+        'widgets/qml/SubtitleLabel.qml',
+        'widgets/qml/MenuCaption.qml',
+        'widgets/qml/MenuLabel.qml',
+        'widgets/qml/MLDragItem.qml',
+        'widgets/qml/NavigableCol.qml',
+        'widgets/qml/NavigableRow.qml',
+        'widgets/qml/PlayCover.qml',
+        'widgets/qml/RoundButton.qml',
+        'widgets/qml/ScaledImage.qml',
+        'widgets/qml/ScanProgressBar.qml',
+        'widgets/qml/TextAutoScroller.qml',
+        'widgets/qml/SearchBox.qml',
+        'widgets/qml/SliderExt.qml',
+        'widgets/qml/SortControl.qml',
+        'widgets/qml/SpinBoxExt.qml',
+        'widgets/qml/StackViewExt.qml',
+        'widgets/qml/PageLoader.qml',
+        'widgets/qml/ButtonExt.qml',
+        'widgets/qml/TableColumns.qml',
+        'widgets/qml/TextFieldExt.qml',
+        'widgets/qml/TextToolButton.qml',
+        'widgets/qml/TrackDelayButton.qml',
+        'widgets/qml/VideoProgressBar.qml',
+        'widgets/qml/VideoQualityLabels.qml',
+        'widgets/qml/ListSubtitleLabel.qml',
+        'widgets/qml/PointingTooltip.qml',
+        'widgets/qml/FrostedGlassEffect.qml',
+        'widgets/qml/OverlayMenu.qml',
+        'widgets/qml/ToolTipExt.qml',
+        'widgets/qml/DropShadowImage.qml',
+        'widgets/qml/DoubleShadow.qml',
+        'widgets/qml/FadingEdge.qml',
+        'widgets/qml/FadingEdgeForListView.qml',
+        'widgets/qml/PopupIconToolButton.qml',
+        'widgets/qml/PartialEffect.qml',
+        'widgets/qml/ViewHeader.qml',
+        'widgets/qml/ProgressIndicator.qml'
+    ),
+}
 
 qml_tests = {
     'tst_FSM': files('tests/tst_FSM.qml'),
 }
 
+qmllibs = []
+
 if qt6_dep.found()
+    prog_python = find_program('python3')
+    modules_qrc = []
+    foreach module : qml_modules
+        #generates 'res.qrc', 'qmldir.qrc', 'qmldir',
+        run_command(
+            prog_python,
+            meson.current_source_dir() / 'scripts/genqrc.py',
+            '-o', meson.current_build_dir() / module['outdir'] / 'res.qrc',
+            '--prefix', module['outdir'],
+            '--sources', module.get('sources', []) + module.get('singletons', []),
+            check: true,
+        )
+        run_command(
+            prog_python,
+            meson.current_source_dir() / 'scripts/genqmldir.py',
+            '-o', meson.current_build_dir() / module['outdir'] / 'qmldir',
+            '--module', module['name'],
+            '--sources', module.get('sources', []),
+            '--singletons', module.get('singletons', []),
+            check: true,
+        )
+        run_command(
+            prog_python,
+            meson.current_source_dir() / 'scripts/genqrc.py',
+            '-o', meson.current_build_dir() / module['outdir'] / 'qmldir.qrc',
+            '--prefix', module['outdir'],
+            '--sources', [meson.current_build_dir() / module['outdir'] / 'qmldir'],
+            check: true,
+        )
+        module_qrc = qt6.preprocess(
+            module['target'] + '_assets',
+            qresources: files(
+                meson.current_build_dir() / module['outdir'] / 'res.qrc',
+                meson.current_build_dir() / module['outdir'] / 'qmldir.qrc',
+            ),
+            include_directories: qt_include_dir,
+            dependencies: qt6_dep
+        )
+
+        #FIXME copy every files to the outdir module so they can be used by qt tooling
+
+        qmllibs += static_library(
+            'qml_module' + module['target'],
+            module_qrc,
+            dependencies: qt6_dep)
+    endforeach
+
     qt6pre_qrc = qt6.preprocess(
         qresources: qrc_files,
         include_directories: qt_include_dir,
@@ -574,8 +945,6 @@ if qt6_dep.found()
         moc_headers: moc_headers,
         include_directories: qt_include_dir,
         dependencies: qt6_dep)
-
-    qt_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir')
 
     qt_sources = files('qt.cpp')
 
@@ -683,10 +1052,11 @@ if qt6_dep.found()
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
         'cpp_args' : [qt_extra_flags, qt_cppargs],
-        'link_args' : qt_link_args
+        'link_args' : qt_link_args,
+        'link_with' : qmllibs,
     }
 
-    test_qt6_dep = dependency('qt6', modules: ['QuickTest'], required: false)
+    test_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
     if test_qt6_dep.found()
         qml_test = executable(
           'qml_test',
@@ -694,6 +1064,7 @@ if qt6_dep.found()
           qt6pre_qrc,
           build_by_default: false,
           dependencies: [test_qt6_dep],
+          link_with: qmllibs,
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
         foreach test_name, test_file : qml_tests

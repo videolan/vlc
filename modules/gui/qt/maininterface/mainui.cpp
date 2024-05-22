@@ -169,6 +169,31 @@ bool MainUI::setup(QQmlEngine* engine)
         engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
     }
 
+    engine->addImportPath(":/");
+
+    qmlRegisterModule("VLC.Dialogs", 1, 0);
+    qmlProtectModule("VLC.Dialogs", 1);
+    qmlRegisterModule("VLC.MainInterface", 1, 0);
+    qmlProtectModule("VLC.MainInterface", 1);
+    qmlRegisterModule("VLC.MediaLibrary", 1, 0);
+    qmlProtectModule("VLC.MediaLibrary", 1);
+    qmlRegisterModule("VLC.Menus", 1, 0);
+    qmlProtectModule("VLC.Menus", 1);
+    qmlRegisterModule("VLC.Network", 1, 0);
+    qmlProtectModule("VLC.Network", 1);
+    qmlRegisterModule("VLC.Playlist", 1, 0);
+    qmlProtectModule("VLC.Playlist", 1);
+    qmlRegisterModule("VLC.Player", 1, 0);
+    qmlProtectModule("VLC.Player", 1);
+    qmlRegisterModule("VLC.PlayerControls", 1, 0);
+    qmlProtectModule("VLC.PlayerControls", 1);
+    qmlRegisterModule("VLC.Style", 1, 0);
+    qmlProtectModule("VLC.Style", 1);
+    qmlRegisterModule("VLC.Util", 1, 0);
+    qmlProtectModule("VLC.Util", 1);
+    qmlRegisterModule("VLC.Widgets", 1, 0);
+    qmlProtectModule("VLC.Widgets", 1);
+
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
     engine->addImageProvider(QStringLiteral("vlcaccess"), new VLCAccessImageProvider());

@@ -808,9 +808,37 @@ static void *Thread( void *obj )
 #endif
     argv[argc] = NULL;
 
+    //qml modules are always statically linked
+    Q_INIT_RESOURCE( dialogs_assets );
+    Q_INIT_RESOURCE( maininterface_assets );
+    Q_INIT_RESOURCE( menus_assets );
+    Q_INIT_RESOURCE( maininterface_assets );
+    Q_INIT_RESOURCE( medialibrary_assets );
+    Q_INIT_RESOURCE( network_assets );
+    Q_INIT_RESOURCE( player_assets );
+    Q_INIT_RESOURCE( playercontrols_assets );
+    Q_INIT_RESOURCE( playlist_assets );
+    Q_INIT_RESOURCE( style_assets );
+    Q_INIT_RESOURCE( util_assets );
+    Q_INIT_RESOURCE( widgets_assets );
+
+#ifdef QT_USE_QMLCACHEGEN
+    Q_INIT_RESOURCE( dialogs_cachegen );
+    Q_INIT_RESOURCE( maininterface_cachegen );
+    Q_INIT_RESOURCE( menus_cachegen );
+    Q_INIT_RESOURCE( maininterface_cachegen );
+    Q_INIT_RESOURCE( medialibrary_cachegen );
+    Q_INIT_RESOURCE( network_cachegen );
+    Q_INIT_RESOURCE( player_cachegen );
+    Q_INIT_RESOURCE( playercontrols_cachegen );
+    Q_INIT_RESOURCE( playlist_cachegen );
+    Q_INIT_RESOURCE( style_cachegen );
+    Q_INIT_RESOURCE( util_cachegen );
+    Q_INIT_RESOURCE( widgets_cachegen );
+#endif
+
 #ifdef QT_STATIC
     Q_INIT_RESOURCE( assets );
-    Q_INIT_RESOURCE( qml );
 #ifdef _WIN32
     Q_INIT_RESOURCE( windows );
 #endif
