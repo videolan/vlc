@@ -310,6 +310,15 @@ if [ ! -z "$WINSTORE" ]; then
     export HAVE_WINSTORE=1
 fi
 
+if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
+    # avoid using gcc-ar with the clang toolchain, if both are installed
+    AR="$TRIPLET-ar"
+    export AR
+    # avoid using gcc-ranlib with the clang toolchain, if both are installed
+    RANLIB="$TRIPLET-ranlib"
+    export RANLIB
+fi
+
 export CFLAGS
 export CXXFLAGS
 
