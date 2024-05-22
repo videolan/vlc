@@ -85,14 +85,13 @@ static const struct
     { "rtsp", "_rtsp._tcp.local", false, 0 },
     { "chromecast", "_googlecast._tcp.local", true, VLC_RENDERER_CAN_AUDIO },
 };
-#define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
 
 struct discovery_sys
 {
     vlc_thread_t        thread;
     atomic_bool         stop;
     struct mdns_ctx *   p_microdns;
-    const char *        ppsz_service_names[NB_PROTOCOLS];
+    const char *        ppsz_service_names[ARRAY_SIZE(protocols)];
     unsigned int        i_nb_service_names;
     vlc_array_t         items;
 };
@@ -314,7 +313,7 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
     {
         if( p_entry->type == RR_SRV )
         {
-            for( unsigned i = 0; i < NB_PROTOCOLS; ++i )
+            for( unsigned i = 0; i < ARRAY_SIZE(protocols); ++i )
             {
                 if( !strrcmp( p_entry->name, protocols[i].psz_service_name ) &&
                     protocols[i].b_renderer == b_renderer )
@@ -589,7 +588,7 @@ OpenCommon( vlc_object_t *p_obj, struct discovery_sys *p_sys, bool b_renderer )
     vlc_array_init( &p_sys->items );
 
     /* Listen to protocols that are handled by VLC */
-    for( unsigned int i = 0; i < NB_PROTOCOLS; ++i )
+    for( unsigned int i = 0; i < ARRAY_SIZE(protocols); ++i )
     {
         if( protocols[i].b_renderer == b_renderer )
             p_sys->ppsz_service_names[p_sys->i_nb_service_names++] =
