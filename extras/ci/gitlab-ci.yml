@@ -220,7 +220,7 @@ nightly-win32-llvm:
         name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables:
         <<: *variables-win32
-        LIBVLC_EXTRA_BUILD_FLAGS: -D /
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -t
 
 nightly-win64:
     extends: .nightly-win-common
@@ -234,7 +234,7 @@ nightly-win64-llvm:
         name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables:
         <<: *variables-win64
-        LIBVLC_EXTRA_BUILD_FLAGS: -D /
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -t
 
 nightly-win64-llvm-meson:
     extends: .nightly-win-common
@@ -242,7 +242,7 @@ nightly-win64-llvm-meson:
         name: $VLC_WIN_LLVM_MSVCRT_IMAGE
     variables:
         <<: *variables-win64
-        LIBVLC_EXTRA_BUILD_FLAGS: -D / -m
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -m -t
 
 nightly-win64-ucrt-llvm:
     extends: .nightly-win-common
@@ -252,7 +252,7 @@ nightly-win64-ucrt-llvm:
         <<: *variables-win64
         VLCARCH: win64-ucrt
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
-        LIBVLC_EXTRA_BUILD_FLAGS: -D /
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -t
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 nightly-win64-arm-llvm:
@@ -263,7 +263,7 @@ nightly-win64-arm-llvm:
         <<: *variables-win64-arm
         VLCARCH: winarm64-ucrt
         TRIPLET: $HOST_ARCH-ucrt-w64-mingw32
-        LIBVLC_EXTRA_BUILD_FLAGS: -D /
+        LIBVLC_EXTRA_BUILD_FLAGS: -D / -t
         UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
 
 #
