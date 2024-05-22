@@ -46,6 +46,9 @@ endif
 ifdef ENABLE_PDB
 FFMPEGCONF += --ln_s=false
 endif
+ifdef ENABLE_LTO
+FFMPEGCONF += --enable-lto
+endif
 
 DEPS_ffmpeg = zlib $(DEPS_zlib) gsm $(DEPS_gsm) openjpeg $(DEPS_openjpeg)
 
