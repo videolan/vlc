@@ -919,7 +919,7 @@ static inline dtv_delivery_t GetSingleDelivery( dtv_delivery_t d )
     if( d == 0 )
         return DTV_DELIVERY_NONE;
     else
-        return 1 << stdc_trailing_zeros(d);
+        return 1 << stdc_trailing_zeros((unsigned)d);
 }
 
 /** Determines which delivery system to use. */
