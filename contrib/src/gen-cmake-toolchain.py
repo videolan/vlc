@@ -32,7 +32,11 @@ _add_environ_val('CMAKE_SYSTEM_PROCESSOR', 'HOST_ARCH')
 _add_environ_val_not_empty('CMAKE_SYSTEM_NAME', 'SYSTEM_NAME')
 _add_environ_val('CMAKE_RC_COMPILER', 'RC_COMPILER')
 _add_environ_val('CMAKE_RANLIB', 'RANLIB')
+_add_environ_val('CMAKE_C_COMPILER_RANLIB', 'RANLIB')
+_add_environ_val('CMAKE_CXX_COMPILER_RANLIB', 'RANLIB')
 _add_environ_val('CMAKE_AR', 'AR')
+_add_environ_val('CMAKE_C_COMPILER_AR', 'AR')
+_add_environ_val('CMAKE_CXX_COMPILER_AR', 'AR')
 
 _add_environ_val('CMAKE_OSX_SYSROOT', 'OSX_SYSROOT')
 
