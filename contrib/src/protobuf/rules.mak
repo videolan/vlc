@@ -89,7 +89,7 @@ protobuf: protobuf-$(PROTOBUF_PACKAGE).tar.gz .sum-protobuf
 
 .protobuf: protobuf toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(PROTOBUF_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(PROTOBUF_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

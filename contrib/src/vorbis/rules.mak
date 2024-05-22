@@ -37,7 +37,7 @@ DEPS_vorbis = ogg $(DEPS_ogg)
 
 .vorbis: libvorbis toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

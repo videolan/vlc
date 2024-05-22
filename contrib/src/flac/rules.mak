@@ -41,7 +41,7 @@ DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(FLAC_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(FLAC_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

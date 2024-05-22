@@ -30,7 +30,7 @@ qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz .sum-qtwayland
 
 .qtwayland: qtwayland toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(QTWAYLAND_CONFIG)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(QTWAYLAND_CONFIG)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

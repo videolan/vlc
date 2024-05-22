@@ -23,7 +23,7 @@ DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)
 
 .chromaprint: chromaprint toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

@@ -41,7 +41,7 @@ libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 
 .libarchive: libarchive toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(LIBARCHIVE_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(LIBARCHIVE_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

@@ -27,7 +27,7 @@ ZLIB_CONF = -DINSTALL_PKGCONFIG_DIR:STRING=$(PREFIX)/lib/pkgconfig -DZLIB_BUILD_
 
 .zlib: zlib toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(ZLIB_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(ZLIB_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

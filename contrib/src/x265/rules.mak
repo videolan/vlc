@@ -43,7 +43,7 @@ X265_CONF := -DENABLE_SHARED=OFF -DENABLE_CLI=OFF
 .x265: x265 toolchain.cmake
 	$(REQUIRE_GPL)
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) -S $</source $(X265_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) -S $</source $(X265_CONF)
 	+$(CMAKEBUILD)
 	sed -e s/'[^ ]*clang_rt[^ ]*'//g -i.orig "$(BUILD_DIR)/x265.pc"
 	$(CMAKEINSTALL)

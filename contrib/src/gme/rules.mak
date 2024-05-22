@@ -26,7 +26,7 @@ GME_CONF := -DENABLE_UBSAN=OFF
 
 .gme: game-music-emu toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(GME_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(GME_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

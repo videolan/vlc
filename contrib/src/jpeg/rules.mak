@@ -16,7 +16,7 @@ JPEG_CONF:= -DENABLE_SHARED=OFF -DWITH_TURBOJPEG=OFF
 
 .jpeg: jpeg toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS) $(CMAKE) $(JPEG_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(JPEG_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL) --component lib
 	$(CMAKEINSTALL) --component include
