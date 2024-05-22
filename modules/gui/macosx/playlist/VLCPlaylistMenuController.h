@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCPlaylistMenuController : NSObject
+@interface VLCPlaylistMenuController : NSObject<NSTableViewDelegate>
 
 @property (readwrite, weak) NSTableView *playlistTableView;
 @property (readonly) NSMenu *playlistMenu;

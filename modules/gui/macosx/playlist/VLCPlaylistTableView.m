@@ -42,6 +42,7 @@
     if (self.menuController == nil) {
         _menuController = [[VLCPlaylistMenuController alloc] init];
         self.menuController.playlistTableView = self;
+        self.delegate = self.menuController;
     }
 
     NSPoint pt = [self convertPoint: [event locationInWindow] fromView: nil];

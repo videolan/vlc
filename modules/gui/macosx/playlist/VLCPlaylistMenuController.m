@@ -48,6 +48,9 @@
     NSMenuItem *_clearPlaylistMenuItem;
     NSMenuItem *_sortMenuItem;
 }
+
+@property (readwrite, atomic) NSArray<NSMenuItem *> *items;
+
 @end
 
 @implementation VLCPlaylistMenuController
@@ -86,8 +89,19 @@
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
 
+    self.items = @[
+        _playMenuItem,
+        _removeMenuItem,
+        _revealInFinderMenuItem,
+        _informationMenuItem,
+        NSMenuItem.separatorItem,
+        _addFilesToPlaylistMenuItem,
+        _clearPlaylistMenuItem,
+        _sortMenuItem
+    ];
+
     _playlistMenu = [[NSMenu alloc] init];
-    [_playlistMenu addMenuItemsFromArray:@[_playMenuItem, _removeMenuItem, _revealInFinderMenuItem, _informationMenuItem, [NSMenuItem separatorItem], _addFilesToPlaylistMenuItem, _clearPlaylistMenuItem, _sortMenuItem]];
+    _playlistMenu.itemArray = self.items;
 }
 
 - (void)play:(id)sender
@@ -175,6 +189,23 @@
     }
 
     return NO;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSTableView * const tableView = notification.object;
+    if (tableView != self.playlistTableView) {
+        return;
+    }
+
+    const BOOL multipleSelection = tableView.selectedRowIndexes.count > 1;
+    if (multipleSelection) {
+        [self.playlistMenu removeItem:_playMenuItem];
+        [self.playlistMenu removeItem:_revealInFinderMenuItem];
+        [self.playlistMenu removeItem:_informationMenuItem]; // TODO: Support multiple
+    } else {
+        self.playlistMenu.itemArray = self.items;
+    }
 }
 
 @end
