@@ -35,6 +35,7 @@ usage()
 	echo "  --enable-ad-clauses configure to build packages with advertising clauses"
 	echo "                   (USE AT YOUR OWN LEGAL RISKS)"
 	echo "  --disable-optim  disable optimization in libraries"
+	echo "  --enable-lto     use Link Time Optimization"
 	echo "  --enable-pdb     generate debug information in PDB format"
 	echo "  --enable-bitcode generate bitcode information"
 }
@@ -81,6 +82,9 @@ do
 			;;
 		--disable-optim)
 			WITH_OPTIMIZATION=
+			;;
+		--enable-lto)
+			ENABLE_LTO=1
 			;;
 		--enable-pdb)
 			ENABLE_PDB=1
@@ -258,6 +262,7 @@ test -z "$GPL" || add_make_enabled "GPL"
 test -z "$GNUV3" || add_make_enabled "GNUV3"
 test -z "$AD_CLAUSES" || add_make_enabled "AD_CLAUSES"
 test -z "$WITH_OPTIMIZATION" || add_make_enabled "WITH_OPTIMIZATION"
+test -z "$ENABLE_LTO" || add_make_enabled "ENABLE_LTO"
 test -z "$ENABLE_PDB" || add_make_enabled "ENABLE_PDB"
 
 LN_S="ln -s"
