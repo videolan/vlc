@@ -71,6 +71,12 @@ ifdef HAVE_WIN32
 QTBASE_CONFIG += -no-feature-style-fusion
 endif
 
+ifdef ENABLE_PDB
+QTBASE_CONFIG += -release -force-debug-info
+else
+QTBASE_CONFIG += -release
+endif
+
 QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl \
     -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
 	-no-feature-sql -no-feature-testlib -system-harfbuzz -system-libjpeg \
@@ -81,12 +87,6 @@ QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl
 	-no-feature-keysequenceedit -no-feature-pkg-config \
 	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
 	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
-
-ifdef ENABLE_PDB
-QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
-else
-QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=Release
-endif
 
 QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATURE_pkg_config=OFF \
 	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_printsupport=OFF -DFEATURE_androiddeployqt=OFF \
