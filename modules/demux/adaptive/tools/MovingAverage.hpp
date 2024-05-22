@@ -29,7 +29,7 @@ namespace adaptive
     class MovingAverageSum
     {
         public:
-            MovingAverageSum<T>(T i): sum(0), prev(i) { }
+            MovingAverageSum(T i): sum(0), prev(i) { }
             void operator()(T n) {
                 sum += (n > prev) ? n - prev : prev - n;
                 prev = n;
