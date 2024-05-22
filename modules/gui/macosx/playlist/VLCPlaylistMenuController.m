@@ -50,6 +50,7 @@
 }
 
 @property (readwrite, atomic) NSArray<NSMenuItem *> *items;
+@property (readwrite, atomic) NSArray<NSMenuItem *> *multipleSelectionItems;
 
 @end
 
@@ -94,6 +95,14 @@
         _removeMenuItem,
         _revealInFinderMenuItem,
         _informationMenuItem,
+        NSMenuItem.separatorItem,
+        _addFilesToPlaylistMenuItem,
+        _clearPlaylistMenuItem,
+        _sortMenuItem
+    ];
+
+    self.multipleSelectionItems = @[
+        _removeMenuItem,
         NSMenuItem.separatorItem,
         _addFilesToPlaylistMenuItem,
         _clearPlaylistMenuItem,
@@ -200,9 +209,7 @@
 
     const BOOL multipleSelection = tableView.selectedRowIndexes.count > 1;
     if (multipleSelection) {
-        [self.playlistMenu removeItem:_playMenuItem];
-        [self.playlistMenu removeItem:_revealInFinderMenuItem];
-        [self.playlistMenu removeItem:_informationMenuItem]; // TODO: Support multiple
+        self.playlistMenu.itemArray = self.multipleSelectionItems;
     } else {
         self.playlistMenu.itemArray = self.items;
     }
