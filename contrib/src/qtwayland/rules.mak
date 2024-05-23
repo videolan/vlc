@@ -16,7 +16,7 @@ $(TARBALLS)/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz:
 
 .sum-qtwayland: qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
-QTWAYLAND_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
+QTWAYLAND_CONFIG := $(QT_CMAKE_CONFIG)
 ifdef ENABLE_PDB
 QTWAYLAND_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
 else
