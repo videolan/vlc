@@ -567,16 +567,6 @@ if qt6_dep.found()
     subdir('shaders')
 
     # Qt plugins
-    qt_static_check = '''
-    #include <qconfig.h>
-    #ifndef QT_STATIC
-    #error Qt using shared libraries
-    #endif
-    '''
-    if cpp.compiles(qt_static_check, dependencies: qt6_dep, name: 'Qt6 compiled with static libraries')
-        qt_extra_deps += dependency('qtvlcdeps', required: true)
-    endif
-
     if host_system == 'windows'
         qt_extra_deps += [
             cc.find_library('dwmapi'),
