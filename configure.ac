@@ -4048,25 +4048,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_SUBST([QT_CFLAGS])
       AC_SUBST([QT_LDFLAGS])
 
-      AC_MSG_CHECKING([for Qt6WaylandClient])
-      (${QMAKE} ${srcdir}/modules/gui/qt/wayland.pro -o ${ac_pwd}/modules/gui/qt/qmake-wayland) 2>/dev/null
-      ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-wayland],[
-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-wayland
-
-        AC_MSG_RESULT([yes])
-        QT_WAYLAND_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_libs)
-        QT_WAYLAND_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_cflags)
-        QT_WAYLAND_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_ldflags)
-        AC_SUBST([QT_WAYLAND_LIBS])
-        AC_SUBST([QT_WAYLAND_CFLAGS])
-        AC_SUBST([QT_WAYLAND_LDFLAGS])
-        have_qt_wayland="yes"
-      ],[
-        AC_MSG_RESULT([no])
-      ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
-
       QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     -query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
       QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
@@ -4225,7 +4206,6 @@ AS_IF([test "${enable_qt}" != "no"], [
 ])
 AC_SUBST([QT_INDIRECT_LIBS])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
-AM_CONDITIONAL([HAVE_QT_WAYLAND], [test "${have_qt_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_GTK], [test "${have_qt_gtk}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_QUICK_TEST], [test "${have_qt_quick_test}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_DECLARATIVE_PRIVATE], [test "${have_qt_declarative_private}" = "yes"])
