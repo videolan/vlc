@@ -261,7 +261,8 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
-    if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY) {
+    if (inputNode.inputItem.inputType == ITEM_TYPE_DIRECTORY &&
+        [inputNode.inputItem.MRL hasPrefix:@"file://"]) {
         input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
 
