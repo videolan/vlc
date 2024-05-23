@@ -167,6 +167,7 @@ case "${host_os}" in
     ;;
   darwin*)
     SYS=darwin
+    ac_cv_func_aligned_alloc=no
 
     dnl Work around an Xcode 11 bug, fixed in Xcode 11.3.1
     AX_APPEND_FLAG([-fno-stack-check], [CFLAGS])
