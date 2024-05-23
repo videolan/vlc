@@ -3975,14 +3975,22 @@ AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
   AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["$PATH:${CONTRIB_DIR}/../bin"])
 
-  QT_PATHS=${QTPATHS6}
-  AC_MSG_CHECKING([if contribs provide target_qt.conf])
-  AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
-      QT_CONF=${CONTRIB_DIR}/bin/target_qt.conf
-      QT_PATHS="${QT_PATHS} --qtconf ${QT_CONF}"
+  AC_ARG_WITH([qtconf],
+    AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
+  )
+  AS_IF([test -z "${with_qtconf}"], [
+    AC_MSG_CHECKING([if contribs provide target_qt.conf])
+    AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
+      with_qtconf=${CONTRIB_DIR}/bin/target_qt.conf
       AC_MSG_RESULT([yes])
-  ],[
+    ],[
       AC_MSG_RESULT([no])
+    ])
+  ])
+
+  QT_PATHS=${QTPATHS6}
+  AS_IF([test -n "${with_qtconf}"], [
+    QT_PATHS="${QT_PATHS} --qtconf ${with_qtconf}"
   ])
 
   QT_MINIMUM_VERSION=6.2
@@ -4000,8 +4008,8 @@ AS_IF([test "${enable_qt}" != "no"], [
 
   QT_BIN_DIRECTORY="$(${QT_PATHS}         --query QT_HOST_BINS 2>/dev/null)"
   QMAKE="${QT_BIN_DIRECTORY}/qmake"
-  AS_IF([test -n "${QT_CONF}"],[
-      QMAKE="${QMAKE} -qtconf ${QT_CONF}"
+  AS_IF([test -n "${with_qtconf}"],[
+      QMAKE="${QMAKE} -qtconf ${with_qtconf}"
   ])
   AC_MSG_NOTICE([using ${QMAKE}])
 
@@ -4055,10 +4063,10 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
-      AC_MSG_CHECKING([if required Qt plugins are installed with ${QTPATHS6} and conf ${QT_CONF}])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QTPATHS6} and conf ${with_qtconf}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qtpaths "${QTPATHS6}" \
-            --qtconf "${QT_CONF}" \
+            --qtconf "${with_qtconf}" \
             --modules \
             QtQml.Models="" \
             QtQml.WorkerScript="" \
@@ -4080,7 +4088,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
         AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
         --qtpaths "${QTPATHS6}" \
-        --qtconf "${QT_CONF}" \
+        --qtconf "${with_qtconf}" \
         --modules QtTest="" \
         >&AS_MESSAGE_FD ], [
             echo 'get_cflags:'                     >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
