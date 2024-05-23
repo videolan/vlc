@@ -128,11 +128,8 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
         {
             QRect screenres = screenList[numscreen]->geometry();
             m_lastWinScreen = m_window->screen();
-#ifdef QT_HAS_WAYLAND
             if( !m_hasWayland )
                 m_window->setScreen(screenList[numscreen]);
-#endif
-            m_window->setScreen(screenList[numscreen]);
 
             /* To be sure window is on proper-screen in xinerama */
             if( !screenres.contains( m_window->position() ) )
@@ -146,13 +143,8 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     {
         bool hold = WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, false);
 
-#ifdef QT_HAS_WAYLAND
         if( m_lastWinScreen != NULL && !m_hasWayland )
             m_window->setScreen(m_lastWinScreen);
-#else
-        if( m_lastWinScreen != NULL )
-            m_window->setScreen(m_lastWinScreen);
-#endif
         if( !hold && m_lastWinGeometry.isNull() == false )
         {
             m_window->setGeometry( m_lastWinGeometry );

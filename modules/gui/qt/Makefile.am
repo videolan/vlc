@@ -55,15 +55,6 @@ vlc_qt_check_CXXFLAGS += $(XCB_CFLAGS) -DQT_HAS_X11
 endif
 endif
 
-if HAVE_QT_WAYLAND
-libqt_plugin_la_CPPFLAGS += $(QT_WAYLAND_CFLAGS)
-libqt_plugin_la_LIBADD += $(QT_WAYLAND_LIBS)
-libqt_plugin_la_LDFLAGS += $(QT_WAYLAND_LDFLAGS)
-vlc_qt_check_CPPFLAGS += $(QT_WAYLAND_CFLAGS) -DQT_HAS_WAYLAND
-vlc_qt_check_LDADD += $(QT_WAYLAND_LIBS)
-vlc_qt_check_LDFLAGS += $(QT_WAYLAND_LDFLAGS)
-endif
-
 if HAVE_WIN32
 libqt_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ldwmapi
@@ -576,7 +567,6 @@ endif
 # wayland compositor
 
 if HAVE_WAYLAND
-if HAVE_QT_WAYLAND
 if HAVE_QT_GUI_PRIVATE
 
 libqt_plugin_la_CPPFLAGS += -DQT_HAS_WAYLAND_COMPOSITOR
@@ -599,7 +589,6 @@ if ENABLE_QT
 gui_LTLIBRARIES += libqt_wayland_plugin.la
 endif
 
-endif
 endif
 endif
 
