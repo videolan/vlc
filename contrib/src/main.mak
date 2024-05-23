@@ -16,6 +16,9 @@ PKGS_ALL := $(patsubst $(SRC)/%/rules.mak,%,$(wildcard $(SRC)/*/rules.mak))
 DATE := $(shell date +%Y%m%d)
 VPATH := $(TARBALLS)
 
+# Default Qt version
+QTBASE_VERSION_MAJOR := 6.7
+
 # Common download locations
 GNU ?= http://ftp.gnu.org/gnu
 SF := https://downloads.sourceforge.net/project
@@ -25,7 +28,7 @@ VIDEOLAN_GIT := https://git.videolan.org/git
 GITHUB := https://github.com
 GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com
 GNUGPG := https://www.gnupg.org/ftp/gcrypt
-QT := https://download.qt.io/official_releases/qt
+QT := https://download.qt.io/official_releases/qt/$(QTBASE_VERSION_MAJOR)
 XIPH := https://ftp.osuosl.org/pub/xiph/releases
 XORG := https://www.x.org/releases/individual
 

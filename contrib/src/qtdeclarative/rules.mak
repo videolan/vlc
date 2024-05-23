@@ -1,8 +1,7 @@
 # QtDeclarative
 
-QTDECLARATIVE_VERSION_MAJOR := 6.7
-QTDECLARATIVE_VERSION := $(QTDECLARATIVE_VERSION_MAJOR).1
-QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION_MAJOR)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
+QTDECLARATIVE_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
 DEPS_qtdeclarative-tools = qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)
 
@@ -16,12 +15,12 @@ PKGS_TOOLS += qtdeclarative-tools
 endif
 PKGS_ALL += qtdeclarative-tools
 
-ifeq ($(call need_pkg,"Qt6Qml >= $(QTDECLARATIVE_VERSION_MAJOR) Qt6Quick >= $(QTDECLARATIVE_VERSION_MAJOR) Qt6QuickControls2 >= $(QTDECLARATIVE_VERSION_MAJOR) Qt6QuickLayouts >= $(QTDECLARATIVE_VERSION_MAJOR) Qt6QmlWorkerScript >= $(QTDECLARATIVE_VERSION_MAJOR)"),)
+ifeq ($(call need_pkg,"Qt6Qml >= $(QTBASE_VERSION_MAJOR) Qt6Quick >= $(QTBASE_VERSION_MAJOR) Qt6QuickControls2 >= $(QTBASE_VERSION_MAJOR) Qt6QuickLayouts >= $(QTBASE_VERSION_MAJOR) Qt6QmlWorkerScript >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qtdeclarative
 endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtdeclarative-tools
-else ifeq ($(call system_tool_majmin, qmlcachegen --version),$(QTDECLARATIVE_VERSION_MAJOR))
+else ifeq ($(call system_tool_majmin, qmlcachegen --version),$(QTBASE_VERSION_MAJOR))
 PKGS_FOUND += qtdeclarative-tools
 endif
 

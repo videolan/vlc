@@ -1,8 +1,7 @@
 # qtsvg
 
-QTSVG_VERSION_MAJOR := 6.7
-QTSVG_VERSION := $(QTSVG_VERSION_MAJOR).1
-QTSVG_URL := $(QT)/$(QTSVG_VERSION_MAJOR)/$(QTSVG_VERSION)/submodules/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
+QTSVG_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTSVG_URL := $(QT)/$(QTSVG_VERSION)/submodules/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
 DEPS_qtsvg += qt $(DEPS_qt)
 
@@ -10,7 +9,7 @@ ifdef HAVE_WIN32
 PKGS += qtsvg
 endif
 
-ifeq ($(call need_pkg,"Qt6Svg >= $(QTSVG_VERSION_MAJOR)"),)
+ifeq ($(call need_pkg,"Qt6Svg >= $(QTBASE_VERSION_MAJOR)"),)
 PKGS_FOUND += qtsvg
 endif
 

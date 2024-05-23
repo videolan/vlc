@@ -1,8 +1,7 @@
 # qtwayland
 
-QTWAYLAND_VERSION_MAJOR := 6.7
-QTWAYLAND_VERSION := $(QTWAYLAND_VERSION_MAJOR).1
-QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION_MAJOR)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
+QTWAYLAND_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
 ifdef HAVE_LINUX
 ifneq ($(findstring qt,$(PKGS)),)
