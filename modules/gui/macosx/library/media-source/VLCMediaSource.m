@@ -249,7 +249,7 @@ static const char *const myFoldersDescription = "My Folders";
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode
 {
     if(!inputNode) {
-        NSLog(@"Could not preparese input node, is null.");
+        NSLog(@"Could not preparse input node, is null.");
         return;
     }
 
