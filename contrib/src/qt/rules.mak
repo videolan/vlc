@@ -84,8 +84,8 @@ QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl
 	-no-feature-syntaxhighlighter -no-feature-undoview -no-feature-splashscreen \
 	-no-feature-dockwidget -no-feature-statusbar -no-feature-statustip \
 	-no-feature-keysequenceedit -no-feature-pkg-config \
-	-nomake examples -prefix $(PREFIX) -qt-host-path $(BUILDPREFIX) \
-	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake)
+	-nomake examples -prefix $(PREFIX) \
+	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
 QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATURE_pkg_config=OFF \
 	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_printsupport=OFF -DFEATURE_androiddeployqt=OFF \

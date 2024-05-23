@@ -72,8 +72,7 @@ QT_DECLARATIVE_COMMON_CONFIG := \
 	-DFEATURE_quicktemplates2_calendar=OFF
 
 QT_DECLARATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
-	-DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake \
-	-DQT_HOST_PATH=$(BUILDPREFIX)
+	-DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
 ifdef ENABLE_PDB
 QT_DECLARATIVE_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
 else
@@ -87,7 +86,7 @@ QT_DECLARATIVE_NATIVE_CONFIG := $(QT_DECLARATIVE_COMMON_CONFIG) \
 	-DFEATURE_qml_object_model=OFF \
 	-DFEATURE_qml_table_model=OFF \
 	-DFEATURE_quick_shadereffect=OFF \
-	-DCMAKE_TOOLCHAIN_FILE=$(BUILDPREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+	-DCMAKE_TOOLCHAIN_FILE=$(QT_HOST_LIBS)/cmake/Qt6/qt.toolchain.cmake
 
 .qtdeclarative-tools: BUILD_DIR=$</vlc_native
 .qtdeclarative-tools: qtdeclarative

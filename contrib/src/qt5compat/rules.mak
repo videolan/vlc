@@ -18,7 +18,7 @@ $(TARBALLS)/qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz:
 
 .sum-qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz
 
-QT5_COMPAT_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+QT5_COMPAT_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
 ifdef ENABLE_PDB
 QT5_COMPAT_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
 else

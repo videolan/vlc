@@ -18,7 +18,7 @@ $(TARBALLS)/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz:
 
 .sum-qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
-QTSVG_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake
+QTSVG_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
 ifdef ENABLE_PDB
 QTSVG_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
 else
