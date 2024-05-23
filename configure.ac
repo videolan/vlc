@@ -3973,7 +3973,7 @@ have_qt_core_private="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
-  AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["${CONTRIB_DIR}/../bin:$PATH"])
+  AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["$PATH:${CONTRIB_DIR}/../bin"])
 
   QT_PATHS=${QTPATHS6}
   AC_MSG_CHECKING([if contribs provide target_qt.conf])
