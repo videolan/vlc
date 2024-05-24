@@ -488,6 +488,9 @@ if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
      MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
 else
+    if [ -z "$WITH_LTO" ]; then
+        info "Warning: Link Time Optimization not used in Release mode (missing --enable-lto)"
+    fi
      CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
      MCONFIGFLAGS="$MCONFIGFLAGS --buildtype release"
 fi
