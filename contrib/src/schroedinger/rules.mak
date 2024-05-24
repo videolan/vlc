@@ -16,6 +16,8 @@ $(TARBALLS)/schroedinger-$(SCHROEDINGER_VERSION).tar.gz:
 schroedinger: schroedinger-$(SCHROEDINGER_VERSION).tar.gz .sum-schroedinger
 	$(UNPACK)
 	$(APPLY) $(SRC)/schroedinger/schroedinger-notests.patch
+	# disable orc compilation, the old compiler matches what was used to precompile
+	$(APPLY) $(SRC)/schroedinger/schroedinger-disable-orcc.patch
 	$(call pkg_static,"schroedinger.pc.in")
 	$(MOVE)
 
