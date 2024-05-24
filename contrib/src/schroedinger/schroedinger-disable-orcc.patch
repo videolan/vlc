@@ -1,0 +1,11 @@
+--- schroedinger/configure.ac.orig	2024-05-24 11:11:32.059775800 +0200
++++ schroedinger/configure.ac	2024-05-24 11:11:46.999404400 +0200
+@@ -56,7 +56,7 @@ fi
+ SCHRO_PKG_DEPS="$SCHRO_PKG_DEPS orc-0.4 >= $ORC_VER"
+ ORCC=`$PKG_CONFIG --variable=orcc orc-0.4`
+ AC_SUBST(ORCC)
+-AM_CONDITIONAL(HAVE_ORCC, test "x$cross_compiling" != xyes)
++AM_CONDITIONAL(HAVE_ORCC, test "x$cross_compiling" = none)
+ 
+ AC_ARG_WITH([thread],
+     AS_HELP_STRING([--with-thread=IMPL],[use threading library {auto,pthread,gthread,win32,none} [[default=auto]]]),
