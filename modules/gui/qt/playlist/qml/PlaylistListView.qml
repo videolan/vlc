@@ -264,7 +264,7 @@ T.Pane {
             }
 
             fadingEdge.backgroundColor: root.background.usingAcrylic ? "transparent"
-                                                                     : listView.colorContext.bg.primary
+                                                                     : (root.background?.color ?? "transparent")
 
             contentWidth: width
 
