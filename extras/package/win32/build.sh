@@ -345,7 +345,7 @@ if [ "$RELEASE" != "yes" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
 fi
 if [ ! -z "$DISABLEGUI" ]; then
-    CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qt5compat --disable-qtshadertools --disable-qtwayland --disable-qtvlcdeps"
+    CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qt5compat --disable-qtshadertools --disable-qtwayland"
 fi
 if [ ! -z "$WINSTORE" ]; then
     # we don't use a special toolchain to trigger the detection in contribs so force it manually
