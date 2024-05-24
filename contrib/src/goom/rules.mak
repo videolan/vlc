@@ -20,6 +20,7 @@ goom: goom-$(GOOM_VERSION)-src.tar.gz .sum-goom
 	$(APPLY) $(SRC)/goom/goom2k4-0-memleaks.patch
 	$(APPLY) $(SRC)/goom/goom2k4-autotools.patch
 	$(APPLY) $(SRC)/goom/goom2k4-noxmmx.patch
+	$(APPLY) $(SRC)/goom/goom2k4-mmx-only.patch
 	$(APPLY) $(SRC)/goom/goom2k4-xmmslibdir.patch
 ifdef HAVE_WIN32
 ifdef MSYS_BUILD

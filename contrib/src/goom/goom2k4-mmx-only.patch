@@ -1,0 +1,29 @@
+--- goom/src/mmx.h.orig	2024-05-24 10:28:08.890273700 +0200
++++ goom/src/mmx.h	2024-05-24 10:28:33.482644400 +0200
+@@ -27,6 +27,8 @@
+ #ifndef _MMX_H
+ #define _MMX_H
+ 
++#define HAVE_FORCE_MMX 1
++
+ #include "goom_graphic.h"
+ 
+ /*	Warning:  at this writing, the version of GAS packaged
+@@ -63,6 +65,9 @@ typedef	union {
+ static int
+ mm_support(void)
+ {
++#ifdef HAVE_FORCE_MMX
++	return 0x1; // MMX only
++#else /* HAVE_FORCE_MMX */
+ 	/* Returns 1 if MMX instructions are supported,
+ 	   3 if Cyrix MMX and Extended MMX instructions are supported
+ 	   5 if AMD MMX and 3DNow! instructions are supported
+@@ -223,6 +228,7 @@ mm_support(void)
+ 
+ 	/* Return */
+ 	return(rval);
++#endif /* HAVE_FORCE_MMX */
+ }
+ 
+ /*	Function to test if mmx instructions are supported...
