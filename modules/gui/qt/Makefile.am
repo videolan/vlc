@@ -407,13 +407,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	maininterface/videosurface.moc.cpp \
 	maininterface/video_window_handler.moc.cpp \
 	medialibrary/medialib.moc.cpp \
-	medialibrary/mlalbum.moc.cpp \
 	medialibrary/mlalbummodel.moc.cpp \
-	medialibrary/mlalbumtrack.moc.cpp \
 	medialibrary/mlalbumtrackmodel.moc.cpp \
-	medialibrary/mlartist.moc.cpp \
 	medialibrary/mlartistmodel.moc.cpp \
-        medialibrary/mlbookmarkmodel.moc.cpp \
+	medialibrary/mlbookmarkmodel.moc.cpp \
 	medialibrary/mlbasemodel.moc.cpp \
 	medialibrary/mlfoldersmodel.moc.cpp \
 	medialibrary/mlgenremodel.moc.cpp \
