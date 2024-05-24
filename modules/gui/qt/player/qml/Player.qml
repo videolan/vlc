@@ -595,88 +595,85 @@ FocusScope {
             value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         }
 
-        component: Rectangle {
+        component: PL.PlaylistListView {
+            id: playlistView
+
             width: Helpers.clamp(rootPlayer.width / resizeHandle.widthFactor
                                  , playlistView.minimumWidth
                                  , (rootPlayer.width + playlistView.rightPadding) / 2)
-
             height: playlistpopup.height
 
-            color: windowTheme.bg.primary.alpha(0.8)
+            useAcrylic: false
+            focus: true
+
+            wheelEnabled: true
+
+            rightPadding: VLCStyle.applicationHorizontalMargin
+            topPadding:  {
+                if (rootPlayer._controlsUnderVideo)
+                    return VLCStyle.margin_normal
+                else
+                    // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
+                    return topBar.reservedHeight
+            }
+
+            background: Rectangle {
+                color: windowTheme.bg.primary.alpha(0.8)
+            }
+
+            Navigation.parentItem: rootPlayer
+            Navigation.upItem: topBar
+            Navigation.downItem: Player.isInteractive ? toggleControlBarButton : controlBar
+            Navigation.leftAction: closePlaylist
+            Navigation.cancelAction: closePlaylist
+
+            function closePlaylist() {
+                playlistVisibility.togglePlaylistVisibility()
+                if (audioControls.visible)
+                    audioControls.forceActiveFocus()
+                else
+                    controlBar.forceActiveFocus()
+            }
 
 
-            PL.PlaylistListView {
-                id: playlistView
+            Widgets.HorizontalResizeHandle {
+                id: resizeHandle
 
-                useAcrylic: false
-                focus: true
+                property bool _inhibitMainCtxUpdate: false
 
-                wheelEnabled: true
+                parent: playlistView
 
-                anchors.fill: parent
-                rightPadding: VLCStyle.applicationHorizontalMargin
-                topPadding:  {
-                    if (rootPlayer._controlsUnderVideo)
-                        return VLCStyle.margin_normal
-                    else
-                        // NOTE: We increase the padding accordingly to avoid overlapping the TopBar.
-                        return topBar.reservedHeight
+                anchors {
+                    top: parent.top
+                    bottom: parent.bottom
+                    left: parent.left
                 }
 
-                Navigation.parentItem: rootPlayer
-                Navigation.upItem: topBar
-                Navigation.downItem: Player.isInteractive ? toggleControlBarButton : controlBar
-                Navigation.leftAction: closePlaylist
-                Navigation.cancelAction: closePlaylist
+                atRight: false
+                targetWidth: playlistpopup.width
+                sourceWidth: rootPlayer.width
 
-                function closePlaylist() {
-                    playlistVisibility.togglePlaylistVisibility()
-                    if (audioControls.visible)
-                        audioControls.forceActiveFocus()
-                    else
-                        controlBar.forceActiveFocus()
+                onWidthFactorChanged: {
+                    if (!_inhibitMainCtxUpdate)
+                        MainCtx.playerPlaylistWidthFactor = widthFactor
                 }
 
+                Component.onCompleted:  _updateFromMainCtx()
 
-                Widgets.HorizontalResizeHandle {
-                    id: resizeHandle
+                function _updateFromMainCtx() {
+                    if (widthFactor == MainCtx.playerPlaylistWidthFactor)
+                        return
 
-                    property bool _inhibitMainCtxUpdate: false
+                    _inhibitMainCtxUpdate = true
+                    widthFactor = MainCtx.playerPlaylistWidthFactor
+                    _inhibitMainCtxUpdate = false
+                }
 
-                    parent: playlistView
+                Connections {
+                    target: MainCtx
 
-                    anchors {
-                        top: parent.top
-                        bottom: parent.bottom
-                        left: parent.left
-                    }
-
-                    atRight: false
-                    targetWidth: playlistpopup.width
-                    sourceWidth: rootPlayer.width
-
-                    onWidthFactorChanged: {
-                        if (!_inhibitMainCtxUpdate)
-                            MainCtx.playerPlaylistWidthFactor = widthFactor
-                    }
-
-                    Component.onCompleted:  _updateFromMainCtx()
-
-                    function _updateFromMainCtx() {
-                        if (widthFactor == MainCtx.playerPlaylistWidthFactor)
-                            return
-
-                        _inhibitMainCtxUpdate = true
-                        widthFactor = MainCtx.playerPlaylistWidthFactor
-                        _inhibitMainCtxUpdate = false
-                    }
-
-                    Connections {
-                        target: MainCtx
-
-                        function onPlaylistWidthFactorChanged() {
-                            resizeHandle._updateFromMainCtx()
-                        }
+                    function onPlaylistWidthFactorChanged() {
+                        resizeHandle._updateFromMainCtx()
                     }
                 }
             }
