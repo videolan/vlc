@@ -4022,7 +4022,12 @@ AS_IF([test "${enable_qt}" != "no"], [
       echo "get_cflags:"                    > ${ac_pwd}/modules/gui/qt/qmake-common.mk
       echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
       echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      echo '	echo $(LIBS) | sed -e "s@/[[^ ]]*/lib\([[^ ]]*\)\.so@-l\1@g"' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+      dnl transform /foo/bar/libbaz.so arguments to -L/foo/bar -lbaz
+      dnl RS: each arguments (space separated) are treated as a new line
+      dnl FS: split fields using /[^/]* to extract the file basepath ($1)
+      dnl  /lib.*\.so/ lines (arguments) will add -Lxxx if this is not the current path (p), then transform into a -lxxx argument
+      dnl other arguments are kept as-is
+      echo '	echo $(LIBS) | awk '\''BEGIN{FS="/[[^/]]*$$";RS=" ";ORS=" "}{if($$0 ~ /\/lib.*\.so/){ if(p != $$1){ print "-L" $$1; p=$$1}; sub(/.*\/lib/, "-l"); sub(/\.so.*/, "")}; print $$0}'\' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
 
       echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
 
