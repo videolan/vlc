@@ -22,6 +22,10 @@ gcrypt: libgcrypt-$(GCRYPT_VERSION).tar.bz2 .sum-gcrypt
 
 	# don't use getpid in UWP as it's not actually available
 	$(APPLY) $(SRC)/gcrypt/gcrypt-uwp-getpid.patch
+ifdef HAVE_CROSS_COMPILE
+	# disable cross-compiled command line tools that can't be run
+	sed -i.orig -e 's,^bin_PROGRAMS ,bin_PROGRAMS_disabled ,g' $(UNPACK_DIR)/src/Makefile.am
+endif
 
 	$(MOVE)
 
