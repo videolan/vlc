@@ -990,8 +990,14 @@ namespace
             if ( objectID == NULL || title == NULL )
                 return NULL;
 
+            char *encoded_id = vlc_uri_encode( objectID );
+            if ( unlikely(encoded_id == NULL) )
+                return NULL;
+
             char* psz_url;
-            if( asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root, objectID ) < 0 )
+            const int ret = asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root, encoded_id );
+            free( encoded_id );
+            if( ret < 0 )
                 return NULL;
 
             input_item_t* p_item = input_item_NewDirectory( psz_url, title, ITEM_NET );
@@ -1060,7 +1066,7 @@ MediaServer::MediaServer( stream_t *p_access, input_item_node_t *node )
         // Remove this parameter from the URL, since it might cause some servers to fail
         // Keep in mind that we added a '&' or a '?' to the URL, so remove it as well
         *( psz_objectid - 1) = 0;
-        m_psz_objectId = &psz_objectid[strlen( "ObjectID=" )];
+        m_psz_objectId = vlc_uri_decode( &psz_objectid[strlen("ObjectID=")] );
     }
 }
 
