@@ -133,7 +133,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     case VLCMediaLibraryParentGroupTypeGenre:
         return self.libraryModel.numberOfGenres;
     default:
-        NSAssert(1, @"current parent type should not be unknown, no collection to display");
+        NSAssert(NO, @"current parent type should not be unknown, no collection to display");
         return 0;
     }
 }

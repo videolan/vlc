@@ -554,7 +554,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         [self presentLibraryItemInCollectionView:_awaitingPresentingLibraryItem];
     } else {
-        NSAssert(false, @"No valid view mode segment acquired, cannot present item!");
+        NSAssert(NO, @"No valid view mode segment acquired, cannot present item!");
     }
 
     _awaitingPresentingLibraryItem = nil;
