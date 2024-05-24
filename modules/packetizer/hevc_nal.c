@@ -24,9 +24,9 @@
 #include <stdbit.h>
 
 #include "hevc_nal.h"
+#include "h26x_nal_common.h"
 #include "hxxx_nal.h"
 #include "hxxx_ep3b.h"
-#include "iso_color_tables.h"
 
 #include <vlc_common.h>
 #include <vlc_bits.h>
@@ -34,17 +34,6 @@
 #include <limits.h>
 
 //#define HEVC_POC_DEBUG
-
-typedef uint8_t  nal_u1_t;
-typedef uint8_t  nal_u2_t;
-typedef uint8_t  nal_u3_t;
-typedef uint8_t  nal_u4_t;
-typedef uint8_t  nal_u5_t;
-typedef uint8_t  nal_u6_t;
-typedef uint8_t  nal_u7_t;
-typedef uint8_t  nal_u8_t;
-typedef int32_t  nal_se_t;
-typedef uint32_t nal_ue_t;
 
 typedef struct
 {
@@ -97,12 +86,7 @@ typedef struct
 typedef struct
 {
     nal_u1_t aspect_ratio_info_present_flag;
-    struct
-    {
-        nal_u8_t aspect_ratio_idc;
-        uint16_t sar_width;
-        uint16_t sar_height;
-    } ar;
+    h26x_aspect_ratio_t ar;
     nal_u1_t overscan_info_present_flag;
     nal_u1_t overscan_appropriate_flag;
 
@@ -110,14 +94,8 @@ typedef struct
     struct
     {
         nal_u3_t video_format;
-        nal_u1_t video_full_range_flag;
         nal_u1_t colour_description_present_flag;
-        struct
-        {
-            nal_u8_t colour_primaries;
-            nal_u8_t transfer_characteristics;
-            nal_u8_t matrix_coeffs;
-        } colour;
+        h26x_colour_description_t colour;
     } vs;
 
     nal_u1_t chroma_loc_info_present_flag;
@@ -197,13 +175,7 @@ struct hevc_sequence_parameter_set_t
     nal_ue_t pic_height_in_luma_samples;
 
     nal_u1_t conformance_window_flag;
-    struct
-    {
-    nal_ue_t left_offset;
-    nal_ue_t right_offset;
-    nal_ue_t top_offset;
-    nal_ue_t bottom_offset;
-    } conf_win;
+    h26x_conf_window_t conf_win;
 
     nal_ue_t bit_depth_luma_minus8;
     nal_ue_t bit_depth_chroma_minus8;
@@ -461,7 +433,7 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
     if( p_vui->video_signal_type_present_flag )
     {
         p_vui->vs.video_format = bs_read( p_bs, 3 );
-        p_vui->vs.video_full_range_flag = bs_read1( p_bs );
+        p_vui->vs.colour.full_range_flag = bs_read1( p_bs );
         p_vui->vs.colour_description_present_flag = bs_read1( p_bs );
         if( p_vui->vs.colour_description_present_flag )
         {
@@ -1065,38 +1037,11 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
                             unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh )
 {
-    *p_w = *p_vw = p_sps->pic_width_in_luma_samples;
-    *p_h = *p_vh = p_sps->pic_height_in_luma_samples;
-    if( p_sps->conformance_window_flag )
-    {
-        unsigned sub_width_c, sub_height_c;
-
-        if( p_sps->chroma_format_idc == 1 )
-        {
-            sub_width_c = 2;
-            sub_height_c = 2;
-        }
-        else if( p_sps->chroma_format_idc == 2 )
-        {
-            sub_width_c = 2;
-            sub_height_c = 1;
-        }
-        else
-        {
-            sub_width_c = 1;
-            sub_height_c = 1;
-        }
-
-        *p_oy = p_sps->conf_win.top_offset * sub_height_c;
-        *p_ox = p_sps->conf_win.left_offset * sub_width_c;
-        *p_vh -= (p_sps->conf_win.bottom_offset + p_sps->conf_win.top_offset) * sub_height_c;
-        *p_vw -= (p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset) * sub_width_c;
-    }
-    else
-    {
-        *p_oy = *p_ox = 0;
-    }
-    return true;
+    return h26x_get_picture_size( p_sps->chroma_format_idc,
+                                  p_sps->pic_width_in_luma_samples,
+                                  p_sps->pic_height_in_luma_samples,
+                                  &p_sps->conf_win,
+                                  p_ox, p_oy, p_w, p_h, p_vw, p_vh );
 }
 
 void hevc_get_dpb_values( const hevc_sequence_parameter_set_t *p_sps, uint8_t *max_num_reorder_pics,
@@ -1152,45 +1097,9 @@ bool hevc_get_frame_rate( const hevc_sequence_parameter_set_t *p_sps,
 bool hevc_get_aspect_ratio( const hevc_sequence_parameter_set_t *p_sps,
                             unsigned *num, unsigned *den )
 {
-    if( p_sps->vui_parameters_present_flag )
-    {
-        if( p_sps->vui.ar.aspect_ratio_idc != 255 )
-        {
-            static const uint8_t ar_table[16][2] =
-            {
-                {    1,      1 },
-                {   12,     11 },
-                {   10,     11 },
-                {   16,     11 },
-                {   40,     33 },
-                {   24,     11 },
-                {   20,     11 },
-                {   32,     11 },
-                {   80,     33 },
-                {   18,     11 },
-                {   15,     11 },
-                {   64,     33 },
-                {  160,     99 },
-                {    4,      3 },
-                {    3,      2 },
-                {    2,      1 },
-            };
-            if( p_sps->vui.ar.aspect_ratio_idc > 0 &&
-                p_sps->vui.ar.aspect_ratio_idc < 17 )
-            {
-                *num = ar_table[p_sps->vui.ar.aspect_ratio_idc - 1][0];
-                *den = ar_table[p_sps->vui.ar.aspect_ratio_idc - 1][1];
-                return true;
-            }
-        }
-        else
-        {
-            *num = p_sps->vui.ar.sar_width;
-            *den = p_sps->vui.ar.sar_height;
-            return true;
-        }
-    }
-    return false;
+    if( !p_sps->vui_parameters_present_flag )
+        return false;
+    return h26x_get_aspect_ratio( &p_sps->vui.ar, num, den );
 }
 
 bool hevc_get_chroma_luma( const hevc_sequence_parameter_set_t *p_sps, uint8_t *pi_chroma_format,
@@ -1210,14 +1119,8 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
 {
     if( !p_sps->vui_parameters_present_flag )
         return false;
-    *p_primaries =
-        iso_23001_8_cp_to_vlc_primaries( p_sps->vui.vs.colour.colour_primaries );
-    *p_transfer =
-        iso_23001_8_tc_to_vlc_xfer( p_sps->vui.vs.colour.transfer_characteristics );
-    *p_colorspace =
-        iso_23001_8_mc_to_vlc_coeffs( p_sps->vui.vs.colour.matrix_coeffs );
-    *p_full_range = p_sps->vui.vs.video_full_range_flag ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
-    return true;
+    return h26x_get_colorimetry( &p_sps->vui.vs.colour,
+                                p_primaries, p_transfer, p_colorspace, p_full_range );
 }
 
 static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,

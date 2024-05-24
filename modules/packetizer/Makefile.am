@@ -32,6 +32,7 @@ libpacketizer_flac_plugin_la_SOURCES = packetizer/flac.c \
         packetizer/flac.h
 libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
 	packetizer/hevc_nal.h packetizer/hevc_nal.c \
+	packetizer/h26x_nal_common.h \
 	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
 	packetizer/hxxx_nal.h \
 	packetizer/hxxx_common.c packetizer/hxxx_common.h \
