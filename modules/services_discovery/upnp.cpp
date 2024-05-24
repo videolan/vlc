@@ -957,8 +957,11 @@ namespace
             if ( unlikely(encoded_id == NULL) )
                 return NULL;
 
+            const char opt_delim = strrchr( psz_root, '?' ) == NULL ? '?' : '&';
+
             char* psz_url;
-            const int ret = asprintf( &psz_url, "upnp://%s?ObjectID=%s", psz_root, encoded_id );
+            const int ret = asprintf( &psz_url, "upnp://%s%cObjectID=%s", psz_root,
+                                      opt_delim, encoded_id );
             free( encoded_id );
             if( ret < 0 )
                 return NULL;
