@@ -113,6 +113,23 @@
     _playlistMenu.itemArray = self.items;
 }
 
+- (void)setPlaylistTableView:(NSTableView *)playlistTableView
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    if (self.playlistTableView != nil) {
+        [notificationCenter removeObserver:self
+                                      name:NSTableViewSelectionDidChangeNotification
+                                    object:self.playlistTableView];
+    }
+
+    _playlistTableView = playlistTableView;
+    [notificationCenter addObserver:self
+                           selector:@selector(tableViewSelectionDidChange:)
+                               name:NSTableViewSelectionDidChangeNotification
+                             object:self.playlistTableView];
+
+}
+
 - (void)play:(id)sender
 {
     NSInteger selectedRow = self.playlistTableView.selectedRow;
