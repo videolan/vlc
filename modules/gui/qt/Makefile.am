@@ -24,6 +24,7 @@ vlc_qt_check_SOURCES = vlc-qt-check.cpp plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
 vlc_qt_check_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt)
 vlc_qt_check_LDADD = $(vlc_qt_libs)
+vlc_qt_check_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-DQT_STRICT_ITERATORS \
@@ -41,7 +42,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(vlc_qt_libs)
-libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS)
+libqt_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
 if HAVE_DARWIN
 libqt_plugin_la_LDFLAGS += -Wl,-framework,Cocoa
 endif
@@ -57,8 +58,10 @@ endif
 if HAVE_QT_WAYLAND
 libqt_plugin_la_CPPFLAGS += $(QT_WAYLAND_CFLAGS)
 libqt_plugin_la_LIBADD += $(QT_WAYLAND_LIBS)
+libqt_plugin_la_LDFLAGS += $(QT_WAYLAND_LDFLAGS)
 vlc_qt_check_CPPFLAGS += $(QT_WAYLAND_CFLAGS) -DQT_HAS_WAYLAND
 vlc_qt_check_LDADD += $(QT_WAYLAND_LIBS)
+vlc_qt_check_LDFLAGS += $(QT_WAYLAND_LDFLAGS)
 endif
 
 if HAVE_WIN32
@@ -1250,6 +1253,7 @@ nodist_base_model_test_SOURCES = util/base_model.moc.cpp \
 
 base_model_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
 base_model_test_LDADD = $(QT_LIBS) $(LIBS_qt)
+base_model_test_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
 check_PROGRAMS = base_model_test
 TESTS = base_model_test
 
@@ -1264,6 +1268,7 @@ nodist_qml_test_SOURCES += qmlcache_loader.cpp $(libqt_plugin_la_QML)
 endif
 qml_test_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt) ${QT_QUICK_TEST_CFLAGS} -DQUICK_TEST_SOURCE_DIR="\"${srcdir}/tests\""
 qml_test_LDADD = $(QT_INDIRECT_LIBS) ${QT_QUICK_TEST_LIBS} $(QT_LIBS) $(LIBS_qt)
+qml_test_LDFLAGS = $(AM_LDFLAGS) $(QT_QUICK_TEST_LDFLAGS)
 check_PROGRAMS += qml_test
 EXTRA_DIST += tests/tst_FSM.qml
 TESTS += tests/tst_FSM.qml

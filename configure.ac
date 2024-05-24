@@ -4028,14 +4028,18 @@ AS_IF([test "${enable_qt}" != "no"], [
       dnl  /lib.*\.so/ lines (arguments) will add -Lxxx if this is not the current path (p), then transform into a -lxxx argument
       dnl other arguments are kept as-is
       echo '	echo $(LIBS) | awk '\''BEGIN{FS="/[[^/]]*$$";RS=" ";ORS=" "}{if($$0 ~ /\/lib.*\.so/){ if(p != $$1){ print "-L" $$1; p=$$1}; sub(/.*\/lib/, "-l"); sub(/\.so.*/, "")}; print $$0}'\' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+      echo 'get_ldflags:'                   >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+      echo '	echo $(LFLAGS)'             >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
 
       echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
 
       AC_MSG_RESULT([yes])
       QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
       QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
+      QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_ldflags)
       AC_SUBST([QT_LIBS])
       AC_SUBST([QT_CFLAGS])
+      AC_SUBST([QT_LDFLAGS])
 
       AC_MSG_CHECKING([for Qt6WaylandClient])
       (${QMAKE} ${srcdir}/modules/gui/qt/wayland.pro -o ${ac_pwd}/modules/gui/qt/qmake-wayland) 2>/dev/null
@@ -4046,8 +4050,10 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_RESULT([yes])
         QT_WAYLAND_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_libs)
         QT_WAYLAND_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_cflags)
+        QT_WAYLAND_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-wayland get_ldflags)
         AC_SUBST([QT_WAYLAND_LIBS])
         AC_SUBST([QT_WAYLAND_CFLAGS])
+        AC_SUBST([QT_WAYLAND_LDFLAGS])
         have_qt_wayland="yes"
       ],[
         AC_MSG_RESULT([no])
@@ -4101,8 +4107,10 @@ AS_IF([test "${enable_qt}" != "no"], [
             AC_MSG_RESULT([yes])
             QT_QUICK_TEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_libs)
             QT_QUICK_TEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_cflags)
+            QT_QUICK_TEST_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_ldflags)
             AC_SUBST([QT_QUICK_TEST_LIBS])
             AC_SUBST([QT_QUICK_TEST_CFLAGS])
+            AC_SUBST([QT_QUICK_TEST_LDFLAGS])
             have_qt_quick_test="yes"
         ], [
             AC_MSG_RESULT([no])
@@ -4127,8 +4135,10 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_RESULT([yes])
         QT_CORE_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_libs)
         QT_CORE_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
+        QT_CORE_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
         AC_SUBST([QT_CORE_PRIVATE_LIBS])
         AC_SUBST([QT_CORE_PRIVATE_CFLAGS])
+        AC_SUBST([QT_CORE_PRIVATE_LDFLAGS])
         have_qt_core_private="yes"
       ],[
         AC_MSG_RESULT([no])
@@ -4144,8 +4154,10 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_RESULT([yes])
         QT_GUI_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_libs)
         QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
+        QT_GUI_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_ldflags)
         AC_SUBST([QT_GUI_PRIVATE_LIBS])
         AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
+        AC_SUBST([QT_GUI_PRIVATE_LDFLAGS])
         have_qt_gui_private="yes"
       ],[
         AC_MSG_RESULT([no])
@@ -4160,8 +4172,10 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_RESULT([yes])
         QT_QUICK_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_libs)
         QT_QUICK_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_cflags)
+        QT_QUICK_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_ldflags)
         AC_SUBST([QT_QUICK_PRIVATE_LIBS])
         AC_SUBST([QT_QUICK_PRIVATE_CFLAGS])
+        AC_SUBST([QT_QUICK_PRIVATE_LDFLAGS])
         have_qt_declarative_private="yes"
       ],[
         AC_MSG_RESULT([no])
