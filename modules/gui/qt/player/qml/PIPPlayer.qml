@@ -74,6 +74,7 @@ Item {
 
         hoverEnabled: true
         onClicked: MainPlaylistController.togglePlayPause()
+        onDoubleClicked: History.push(["player"])
 
         enabled: root.enabled
         visible: root.visible
