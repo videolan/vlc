@@ -27,14 +27,11 @@ $(TARBALLS)/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz:
 .sum-qtshadertools-tools: .sum-qtshadertools
 	touch $@
 
-QT_SHADETOOLS_CONFIG := $(QT_CMAKE_CONFIG)
-ifdef ENABLE_PDB
-QT_SHADETOOLS_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
-else
-QT_SHADETOOLS_CONFIG += -DCMAKE_BUILD_TYPE=Release
-endif
-
+ifdef HAVE_CROSS_COMPILE
 QT_SHADETOOLS_NATIVE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(QT_HOST_LIBS)/cmake/Qt6/qt.toolchain.cmake
+else
+QT_SHADETOOLS_NATIVE_CONFIG := $(QT_CMAKE_CONFIG)
+endif
 
 qtshadertools: qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz .sum-qtshadertools
 	$(UNPACK)
