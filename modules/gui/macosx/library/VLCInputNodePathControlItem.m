@@ -48,10 +48,11 @@
         // HACK: We have no way when we get the clicked item from the path control
         // of knowing specifically which input node this path item corresponds to,
         // as the path control returns a copy for clickedPathItem that is not of
-        // this class. As a very awkward workaround, lets set the name of the image
-        // used here as the MRL of the node's input item
-        self.image.name = inputItem.MRL;
-
+        // this class. As a very awkward workaround, lets set the accessibility
+        // description of the image and we will use this as an identifier.
+        self.image.accessibilityDescription = [NSString stringWithFormat:@"%@: %@", 
+                                               VLCInputNodePathControlItem.accessibilityDescriptionPrefix, 
+                                               inputItem.path];
     } else if (inputNode == nil) {
         NSLog(@"WARNING: Received nil input node, cannot create VLCInputNodePathControlItem");
     } else if (inputNode.inputItem == nil) {
