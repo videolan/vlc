@@ -111,7 +111,10 @@ static bool ts_pes_Push( ts_pes_parse_callback *cb,
         {
             /* too early unit start resulting from packet loss */
             /* or ending on a pkt not belonging to PES (%15 packets loss) */
-            i_flags |= BLOCK_FLAG_CORRUPTED;
+            /* But some encoders can't compute PES size right #28649 :/ */
+            if( p_pes->gather.i_gathered < p_pes->gather.i_data_size  ||
+                p_pes->gather.i_gathered > p_pes->gather.i_data_size + 16 )
+                i_flags |= BLOCK_FLAG_CORRUPTED;
         }
         /* Flush the pes from pid */
         p_pes->gather.p_data = NULL;
