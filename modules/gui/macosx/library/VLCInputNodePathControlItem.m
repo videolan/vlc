@@ -25,7 +25,14 @@
 #import "VLCInputItem.h"
 #import "VLCLibraryImageCache.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCInputNodePathControlItem
+
++ (NSString *)accessibilityDescriptionPrefix
+{
+    return _NS("Thumbnail for media location");
+}
 
 - (instancetype)initWithInputNode:(VLCInputNode *)inputNode
 {

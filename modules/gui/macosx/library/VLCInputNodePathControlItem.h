@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCInputNodePathControlItem : NSPathControlItem
 
+@property (class, readonly) NSString *accessibilityDescriptionPrefix;
+
 @property (readonly) VLCInputNode *inputNode;
 
 - (instancetype)initWithInputNode:(VLCInputNode *)inputNode;
