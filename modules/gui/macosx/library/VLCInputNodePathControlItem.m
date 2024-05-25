@@ -36,7 +36,8 @@
         VLCInputItem * const inputItem = inputNode.inputItem;
         self.title = inputItem.name;
 
-        self.image = [NSImage imageNamed:NSImageNameFolder];
+        NSImage * const folderImage = [NSImage imageNamed:NSImageNameFolder];
+        self.image = folderImage.copy;
         // HACK: We have no way when we get the clicked item from the path control
         // of knowing specifically which input node this path item corresponds to,
         // as the path control returns a copy for clickedPathItem that is not of
