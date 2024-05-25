@@ -30,16 +30,16 @@
 {
     NSParameterAssert(inputNodePathControlItem != nil);
     NSParameterAssert(inputNodePathControlItem.image != nil);
-    NSParameterAssert(inputNodePathControlItem.image.name != nil);
-    NSParameterAssert(![inputNodePathControlItem.image.name isEqualToString:@""]);
+    NSParameterAssert(inputNodePathControlItem.image.accessibilityDescription != nil);
+    NSParameterAssert(![inputNodePathControlItem.image.accessibilityDescription isEqualToString:@""]);
 
-    if (_inputNodePathControlItems == nil) {
+    if (self.inputNodePathControlItems == nil) {
         _inputNodePathControlItems = [NSMutableDictionary dictionary];
     }
 
-    [_inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.name];
+    [self.inputNodePathControlItems setObject:inputNodePathControlItem forKey:inputNodePathControlItem.image.accessibilityDescription];
 
-    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSMutableArray * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
     [pathItems addObject:inputNodePathControlItem];
     self.pathItems = pathItems;
 }
@@ -47,49 +47,49 @@
 - (void)removeLastInputNodePathControlItem
 {
     if (self.pathItems.count == 0) {
-        _inputNodePathControlItems = [NSMutableDictionary dictionary];
+        _inputNodePathControlItems = NSMutableDictionary.dictionary;
         return;
     }
 
-    NSMutableArray *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
-    NSPathControlItem *lastItem = pathItems.lastObject;
+    NSMutableArray * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSPathControlItem * const lastItem = pathItems.lastObject;
 
     [pathItems removeLastObject];
     self.pathItems = pathItems;
-    [_inputNodePathControlItems removeObjectForKey:lastItem.image.name];
+    [self.inputNodePathControlItems removeObjectForKey:lastItem.image.accessibilityDescription];
 }
 
 - (void)clearInputNodePathControlItems
 {
-    _inputNodePathControlItems = [NSMutableDictionary dictionary];
+    _inputNodePathControlItems = NSMutableDictionary.dictionary;
     self.pathItems = @[];
 }
 
 - (void)clearPathControlItemsAheadOf:(NSPathControlItem *)item
 {
-    if ([item.image.name isEqualToString:@""]) {
+    if ([item.image.accessibilityDescription isEqualToString:@""]) {
         return;
     }
 
-    NSUInteger indexOfItem = [self.pathItems indexOfObjectPassingTest:^BOOL(NSPathControlItem *searchItem, NSUInteger idx, BOOL *stop) {
-        return [searchItem.image.name isEqualToString:item.image.name];
+    const NSUInteger indexOfItem = [self.pathItems indexOfObjectPassingTest:^BOOL(NSPathControlItem * const searchItem, const NSUInteger idx, BOOL * const stop) {
+        return [searchItem.image.accessibilityDescription isEqualToString:item.image.accessibilityDescription];
     }];
 
     if (indexOfItem == NSNotFound) {
         return;
     }
 
-    NSMutableArray<NSPathControlItem *> *pathItems = [NSMutableArray arrayWithArray:self.pathItems];
-    NSArray<NSPathControlItem *> *itemsToRemove = [pathItems subarrayWithRange:NSMakeRange(indexOfItem + 1, pathItems.count - indexOfItem - 1)];
-    NSMutableArray<NSString *> *itemMrlsToRemove = [NSMutableArray arrayWithCapacity:itemsToRemove.count];
+    NSMutableArray<NSPathControlItem *> * const pathItems = [NSMutableArray arrayWithArray:self.pathItems];
+    NSArray<NSPathControlItem *> * const itemsToRemove = [pathItems subarrayWithRange:NSMakeRange(indexOfItem + 1, pathItems.count - indexOfItem - 1)];
+    NSMutableArray<NSString *> * const itemIdsToRemove = [NSMutableArray arrayWithCapacity:itemsToRemove.count];
 
-    for (NSPathControlItem *searchItem in itemsToRemove) {
-        NSString *searchItemMrl = searchItem.image.name;
-        [itemMrlsToRemove addObject:searchItemMrl];
+    for (NSPathControlItem * const searchItem in itemsToRemove) {
+        NSString * const searchItemId = searchItem.image.accessibilityDescription;
+        [itemIdsToRemove addObject:searchItemId];
     };
 
     self.pathItems = [pathItems subarrayWithRange:NSMakeRange(0, indexOfItem + 1)];
-    [_inputNodePathControlItems removeObjectsForKeys:itemMrlsToRemove];
+    [self.inputNodePathControlItems removeObjectsForKeys:itemIdsToRemove];
 }
 
 @end
