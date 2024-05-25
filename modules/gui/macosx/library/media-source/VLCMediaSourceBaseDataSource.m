@@ -503,17 +503,19 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)pathControlAction:(id)sender
 {
-    if (_pathControl.clickedPathItem == nil || _childDataSource == nil) {
+    if (self.pathControl.clickedPathItem == nil || self.childDataSource == nil) {
         return;
     }
 
-    NSPathControlItem * const selectedItem = _pathControl.clickedPathItem;
-    NSString * const itemNodeMrl = selectedItem.image.name;
+    NSPathControlItem * const selectedItem = self.pathControl.clickedPathItem;
+    NSString * const itemNodeMrl = selectedItem.image.accessibilityDescription;
 
-    VLCInputNodePathControlItem * const matchingItem = [_pathControl.inputNodePathControlItems objectForKey:itemNodeMrl];
+    VLCInputNodePathControlItem * const matchingItem = [self.pathControl.inputNodePathControlItems objectForKey:itemNodeMrl];
     if (matchingItem != nil) {
-        _childDataSource.nodeToDisplay = matchingItem.inputNode;
-        [_pathControl clearPathControlItemsAheadOf:selectedItem];
+        self.childDataSource.nodeToDisplay = matchingItem.inputNode;
+        [self.pathControl clearPathControlItemsAheadOf:selectedItem];
+    } else {
+        NSLog(@"Could not find matching item for clicked path item: %@", selectedItem);
     }
 }
 
