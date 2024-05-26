@@ -162,6 +162,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 {
     _tracksTableView = [[VLCLibraryTableView alloc] initWithFrame:NSZeroRect];
     _tracksTableView.identifier = VLCLibraryAlbumTableCellTableViewIdentifier;
+    _tracksTableView.allowsMultipleSelection = YES;
     _column = [[NSTableColumn alloc] initWithIdentifier:VLCLibraryAlbumTableCellTableViewColumnIdentifier];
     _column.width = [self expectedTableViewWidth];
     _column.maxWidth = MAXFLOAT;
