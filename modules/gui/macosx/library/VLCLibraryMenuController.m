@@ -116,9 +116,15 @@
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
 
-        [self menuItems:_localInputItemRequiringMenuItems 
-              setHidden:self.representedInputItems.firstObject.isStream];
-    }
+        BOOL anyStream = NO;
+        for (VLCInputItem * const inputItem in self.representedInputItems) {
+            if (inputItem.isStream) {
+                anyStream = YES;
+                break;
+            }
+        }
+        [self menuItems:_localInputItemRequiringMenuItems setHidden:anyStream];
+   }
 }
 
 - (void)popupMenuWithEvent:(NSEvent *)theEvent forView:(NSView *)theView
