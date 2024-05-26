@@ -118,7 +118,7 @@
 
     /* Initialize main window */
     window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    window.rootViewController = [UIViewController alloc];
+    window.rootViewController = [[UIViewController alloc] init];
     window.backgroundColor = [UIColor whiteColor];
 
     subview = [[UIView alloc] initWithFrame:window.bounds];
