@@ -163,11 +163,14 @@
 
 - (void)appendToPlaylist:(id)sender
 {
-    if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
-        [self.representedItems.firstObject queue];
+    if (self.representedItems != nil && self.representedItems.count > 0) {
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            [item queue];
+        }
     } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
-        [self addInputItemToPlaylist:self.representedInputItems.firstObject
-                     playImmediately:NO];
+        for (VLCInputItem * const inputItem in self.representedInputItems) {
+            [self addInputItemToPlaylist:inputItem playImmediately:NO];
+        }
     }
 }
 
