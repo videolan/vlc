@@ -141,9 +141,23 @@
 {
     if (self.representedItems != nil && self.representedItems.count > 0) {
         [self.representedItems.firstObject play];
+
+        if (self.representedItems.count > 1) {
+            for (NSUInteger i = 1; i < self.representedItems.count; i++) {
+                [self.representedItems[i] queue];
+            }
+        }
+
     } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
         [self addInputItemToPlaylist:self.representedInputItems.firstObject
                      playImmediately:YES];
+
+        if (self.representedInputItems.count > 1) {
+            for (NSUInteger i = 1; i < self.representedInputItems.count; i++) {
+                [self addInputItemToPlaylist:self.representedInputItems[i]
+                             playImmediately:NO];
+            }
+        }
     }
 }
 
