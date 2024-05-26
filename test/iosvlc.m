@@ -137,7 +137,7 @@
     libvlc_InternalAddIntf(_libvlc->p_libvlc_int, "ios_interface,none");
 
     /* Start parsing arguments and eventual playback */
-    libvlc_InternalPlay(_libvlc);
+    libvlc_InternalPlay(_libvlc->p_libvlc_int);
 
     return YES;
 }
