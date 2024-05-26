@@ -79,7 +79,7 @@ extern NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotif
 + (void)setupCollectionView:(NSCollectionView *)collectionView;
 - (void)setup;
 - (void)reloadData;
-- (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row;
+- (void)tableView:(NSTableView * const)tableView selectRowIndices:(NSIndexSet * const)indices;
 
 @end
 

@@ -696,7 +696,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     return self.displayedCollection[row];
 }
 
-- (void)tableView:(NSTableView * const)tableView selectRow:(NSInteger)row
+- (void)tableView:(NSTableView * const)tableView selectRowIndices:(NSIndexSet * const)indices
 {
     NSParameterAssert(tableView);
 
@@ -704,11 +704,11 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
-    if (tableView.selectedRow != row) {
-        [tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+    if (tableView.selectedRowIndexes != indices) {
+        [tableView selectRowIndexes:indices byExtendingSelection:NO];
     }
 
-    const NSInteger selectedRow = tableView.selectedRow;
+    const NSInteger selectedRow = indices.firstIndex;
     if (selectedRow >= self.displayedCollection.count) {
         return;
     }

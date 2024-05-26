@@ -130,7 +130,7 @@
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
         [(VLCLibraryAudioDataSource*)vlcDataSource tableView:tableView 
-                                                   selectRow:selectedIndices.firstIndex];
+                                            selectRowIndices:selectedIndices];
     }
 }
 
