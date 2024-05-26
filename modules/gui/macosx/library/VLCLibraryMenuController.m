@@ -203,9 +203,13 @@
 - (void)moveToTrash:(id)sender
 {
     if (self.representedItems != nil && self.representedItems.count > 0) {
-        [self.representedItems.firstObject moveToTrash];
+        for (VLCLibraryRepresentedItem * const item in self.representedItems) {
+            [item moveToTrash];
+        }
     } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
-        [self.representedInputItems.firstObject moveToTrash];
+        for (VLCInputItem * const inputItem in self.representedInputItems) {
+            [inputItem moveToTrash];
+        }
     }
 }
 
