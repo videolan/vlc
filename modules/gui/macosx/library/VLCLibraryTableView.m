@@ -89,7 +89,7 @@
                 [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:parentType];
             [representedItems addObject:representedItem];
         }];
-        [_menuController setRepresentedItem:representedItems.firstObject];
+        _menuController.representedItems = representedItems;
 
     } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
         NSMutableArray<VLCInputItem *> * const mediaSourceInputItems = NSMutableArray.array;
@@ -102,7 +102,7 @@
                 [mediaSourceDataSource mediaSourceInputItemAtRow:index];
             [mediaSourceInputItems addObject:mediaSourceInputItem];
         }];
-        [_menuController setRepresentedInputItem:mediaSourceInputItems.firstObject];
+        _menuController.representedInputItems = mediaSourceInputItems;
     }
 }
 

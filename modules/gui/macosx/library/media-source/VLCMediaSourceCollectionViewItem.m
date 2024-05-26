@@ -171,7 +171,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
             _menuController = [[VLCLibraryMenuController alloc] init];
         }
 
-        [_menuController setRepresentedInputItem:_representedInputItem];
+        [_menuController setRepresentedInputItems:@[_representedInputItem]];
         [_menuController popupMenuWithEvent:theEvent forView:self.view];
     }
 
@@ -184,7 +184,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    [_menuController setRepresentedInputItem:_representedInputItem];
+    [_menuController setRepresentedInputItems:@[_representedInputItem]];
     [_menuController popupMenuWithEvent:theEvent forView:self.view];
 
     [super rightMouseDown:theEvent];

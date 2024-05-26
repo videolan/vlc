@@ -290,7 +290,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
             _menuController = [[VLCLibraryMenuController alloc] init];
         }
 
-        [_menuController setRepresentedItem:self.representedItem];
+        [_menuController setRepresentedItems:@[self.representedItem]];
         [_menuController popupMenuWithEvent:theEvent forView:self.view];
     } else if (self.deselectWhenClickedIfSelected && 
                self.selected &&
@@ -320,7 +320,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    [_menuController setRepresentedItem:self.representedItem];
+    [_menuController setRepresentedItems:@[self.representedItem]];
     [_menuController popupMenuWithEvent:theEvent forView:self.view];
 
     [super rightMouseDown:theEvent];

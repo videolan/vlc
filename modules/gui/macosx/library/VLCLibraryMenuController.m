@@ -108,15 +108,16 @@
 
 - (void)updateMenuItems
 {
-    if (_representedItem != nil) {
+    if (self.representedItems != nil && self.representedItems.count > 0) {
         [self menuItems:_inputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_localInputItemRequiringMenuItems setHidden:YES];
         [self menuItems:_mediaItemRequiringMenuItems setHidden:NO];
-    } else if (_representedInputItem != nil) {
+    } else if (_representedInputItems != nil && self.representedInputItems.count > 0) {
         [self menuItems:_mediaItemRequiringMenuItems setHidden:YES];
         [self menuItems:_inputItemRequiringMenuItems setHidden:NO];
 
-        [self menuItems:_localInputItemRequiringMenuItems setHidden:_representedInputItem.isStream];
+        [self menuItems:_localInputItemRequiringMenuItems 
+              setHidden:self.representedInputItems.firstObject.isStream];
     }
 }
 
@@ -131,27 +132,27 @@
                playImmediately:(BOOL)playImmediately
 {
     NSParameterAssert(inputItem);
-    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItem.vlcInputItem
+    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItems.firstObject.vlcInputItem
                                                  atPosition:-1
                                               startPlayback:playImmediately];
 }
 
 - (void)play:(id)sender
 {
-    if (self.representedItem != nil) {
-        [self.representedItem play];
-    } else if (self.representedInputItem != nil) {
-        [self addInputItemToPlaylist:self.representedInputItem
+    if (self.representedItems != nil && self.representedItems.count > 0) {
+        [self.representedItems.firstObject play];
+    } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        [self addInputItemToPlaylist:self.representedInputItems.firstObject
                      playImmediately:YES];
     }
 }
 
 - (void)appendToPlaylist:(id)sender
 {
-    if (self.representedInputItem != nil) {
-        [self.representedItem queue];
-    } else if (self.representedInputItem != nil) {
-        [self addInputItemToPlaylist:self.representedInputItem
+    if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        [self.representedItems.firstObject queue];
+    } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        [self addInputItemToPlaylist:self.representedInputItems.firstObject
                      playImmediately:NO];
     }
 }
@@ -175,19 +176,19 @@
 
 - (void)revealInFinder:(id)sender
 {
-    if (self.representedItem != nil) {
-        [self.representedItem revealInFinder];
-    } else if (_representedInputItem != nil) {
-        [_representedInputItem revealInFinder];
+    if (self.representedItems != nil && self.representedItems.count > 0) {
+        [self.representedItems.firstObject revealInFinder];
+    } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        [self.representedInputItems.firstObject revealInFinder];
     }
 }
 
 - (void)moveToTrash:(id)sender
 {
-    if (self.representedItem != nil) {
-        [self.representedItem moveToTrash];
-    } else if (_representedInputItem != nil) {
-        [_representedInputItem moveToTrash];
+    if (self.representedItems != nil && self.representedItems.count > 0) {
+        [self.representedItems.firstObject moveToTrash];
+    } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        [self.representedInputItems.firstObject moveToTrash];
     }
 }
 
@@ -197,31 +198,31 @@
         _informationWindowController = [[VLCInformationWindowController alloc] init];
     }
 
-    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
+    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItems.firstObject.item;
     if (actualItem != nil) {
         if ([actualItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
             [_informationWindowController setRepresentedMediaLibraryAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)actualItem];
         } else {
             [_informationWindowController setRepresentedInputItem:actualItem.firstMediaItem.inputItem];
         }
-    } else if (_representedInputItem != nil) {
-        _informationWindowController.representedInputItem = _representedInputItem;
+    } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
+        _informationWindowController.representedInputItem = self.representedInputItems.firstObject;
     }
 
     [_informationWindowController toggleWindow:sender];
 }
 
-- (void)setRepresentedItem:(VLCLibraryRepresentedItem *)item
+- (void)setRepresentedItems:(NSArray<VLCLibraryRepresentedItem *> *)items
 {
-    _representedItem = item;
-    _representedInputItem = nil;
+    _representedItems = items;
+    _representedInputItems = nil;
     [self updateMenuItems];
 }
 
-- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
+- (void)setRepresentedInputItem:(NSArray<VLCInputItem *> *)representedInputItems
 {
-    _representedInputItem = representedInputItem;
-    _representedItem = nil;
+    _representedInputItems = representedInputItems;
+    _representedItems = nil;
     [self updateMenuItems];
 }
 
