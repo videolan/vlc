@@ -117,9 +117,9 @@
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    NSTableView *tableView = (NSTableView *)notification.object;
+    NSTableView * const tableView = (NSTableView *)notification.object;
     NSAssert(tableView, @"Must be a valid table view");
-    NSInteger selectedRow = tableView.selectedRow;
+    NSIndexSet * const selectedIndices = tableView.selectedRowIndexes;
 
     if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
         return;
@@ -129,7 +129,8 @@
     NSAssert(vlcDataSource != nil, @"Should be a valid data source");
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryAudioDataSource class]]) {
-        [(VLCLibraryAudioDataSource*)vlcDataSource tableView:tableView selectRow:selectedRow];
+        [(VLCLibraryAudioDataSource*)vlcDataSource tableView:tableView 
+                                                   selectRow:selectedIndices.firstIndex];
     }
 }
 
