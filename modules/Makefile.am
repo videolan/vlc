@@ -82,3 +82,22 @@ SUFFIXES += -client-protocol.h -protocol.c .xml
 .xml-protocol.c:
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code < "$^" > "$@.tmp"
 	$(AM_V_at)mv -f -- "$@.tmp" "$@"
+
+# Remove the non-plugins, it needs intermediate steps because
+# we can only replace and not match inverse. Instead we;
+#  1/ replace plugins .la targets by plugins names
+#  2/ remove every word which is a .la target (ie. non-plugins)
+#  3/ rename every plugin name back into the target name
+ALL_TARGETS_PLUGIN_RENAMED := $(LTLIBRARIES:lib%_plugin.la=%_plugin)
+PLUGINS_NAMES := $(ALL_TARGETS_PLUGIN_RENAMED:%.la=)
+
+# Generate a list containing the name of every plugin being built
+# Note that it cannot include plugins from recursive makefiles,
+# like the Qt plugin.
+vlc_modules_list: Makefile
+	$(AM_V_GEN)rm -f $@.tmp; for plugin in $(PLUGINS_NAMES); do \
+		printf "$${plugin}\n" >> $@.tmp; done && \
+		mv $@.tmp $@
+
+BUILT_SOURCES += vlc_modules_list
+CLEANFILES += vlc_modules_list
