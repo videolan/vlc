@@ -350,6 +350,17 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
             free( psz_playlist_option );
         }
     } else {
+        const auto loc_starts_with = [desc](const char *s) {
+            return desc->location.compare(0, strlen(s), s) == 0;
+        };
+
+        if ( !loc_starts_with("http://") && !loc_starts_with("https://") )
+        {
+            msg_Warn( m_sd, "Unexpected underlying protocol, the UPNP module "
+                      "fully supports HTTP and has partial support for HTTPS" );
+            return false;
+        } 
+
         std::string mrl = std::string("upnp://") + desc->location;
 
         // Forge a root object ID in the MRL, this is used in the dir access.
