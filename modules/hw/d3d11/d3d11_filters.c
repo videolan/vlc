@@ -665,6 +665,13 @@ vlc_module_begin()
     set_callbacks( D3D11OpenDeinterlace, D3D11CloseDeinterlace )
     add_shortcut ("deinterlace")
 
+#ifdef HAVE_AMF_ENHANCER
+    add_submodule()
+    set_description(N_("AMD VQ Enhancer"))
+    add_shortcut(N_("amf_vqenhancer"))
+    set_callbacks( D3D11CreateAMFVQE, D3D11CloseAMFVQE )
+#endif
+
     add_submodule()
     set_capability( "video converter", 10 )
     set_callbacks( D3D11OpenConverter, D3D11CloseConverter )
