@@ -218,6 +218,18 @@ libpostproc_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(video_filterdir)'
 video_filter_LTLIBRARIES += $(LTLIBpostproc)
 EXTRA_LTLIBRARIES += libpostproc_plugin.la
 
+if HAVE_AMF_ENHANCER
+libamf_vqenhancer_plugin_la_SOURCES = video_filter/amf_vqenhancer.c \
+    hw/amf/amf_helper.c hw/amf/amf_helper.h
+if HAVE_WIN32
+libamf_vqenhancer_plugin_la_LIBADD = $(LIBCOM) libd3d11_common.la
+if HAVE_WINSTORE
+libamf_vqenhancer_plugin_la_LIBADD += -ld3d11
+endif
+video_filter_LTLIBRARIES += libamf_vqenhancer_plugin.la
+endif
+endif
+
 # misc
 libblend_plugin_la_SOURCES = video_filter/blend.cpp
 video_filter_LTLIBRARIES += libblend_plugin.la
