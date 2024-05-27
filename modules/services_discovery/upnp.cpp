@@ -350,17 +350,17 @@ bool MediaServerList::addServer( MediaServerDesc* desc )
             free( psz_playlist_option );
         }
     } else {
-        char* psz_mrl;
-        // We might already have some options specified in the location.
-        char opt_delim = desc->location.find( '?' ) == std::string::npos ? '?' : '&';
-        if( asprintf( &psz_mrl, "upnp://%s%cObjectID=0", desc->location.c_str(), opt_delim ) < 0 )
-            return false;
+        std::string mrl = std::string("upnp://") + desc->location;
 
-        p_input_item = input_item_NewDirectory( psz_mrl,
+        // Forge a root object ID in the MRL, this is used in the dir access.
+        if ( desc->location.find( '?' ) == std::string::npos )
+            mrl += "?ObjectID=0";
+        else 
+            mrl += "&ObjectID=0";
+
+        p_input_item = input_item_NewDirectory( mrl.c_str(),
                                                 desc->friendlyName.c_str(),
                                                 ITEM_NET );
-        free( psz_mrl );
-
         if ( !p_input_item )
             return false;
 
