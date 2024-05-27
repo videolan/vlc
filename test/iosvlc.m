@@ -95,10 +95,6 @@
 /* Called after application launch */
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    /* Set VLC_PLUGIN_PATH for dynamic loading */
-    NSString *pluginsDirectory = [[NSBundle mainBundle] privateFrameworksPath];
-    setenv("VLC_PLUGIN_PATH", [pluginsDirectory UTF8String], 1);
-
     /* Store startup arguments to forward them to libvlc */
     NSArray *arguments = [[NSProcessInfo processInfo] arguments];
     unsigned vlc_argc = [arguments count] - 1;
