@@ -2188,7 +2188,7 @@ dnl
 dnl  AMD Advanced Media Framework API
 dnl
 AC_ARG_ENABLE([amf-scaler], AS_HELP_STRING([--disable-amf-scaler],
-  [disable AMD AMF API (default auto)]))
+  [disable AMD Scaler API (default auto)]))
 have_amf_scaler="no"
 AS_IF([test "$enable_amf_scaler" != "no"], [
   AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/HQScaler.h], [
@@ -2197,6 +2197,16 @@ AS_IF([test "$enable_amf_scaler" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_AMF_SCALER], [test "${have_amf_scaler}" != "no"])
+
+AC_ARG_ENABLE([amf-enhancer], AS_HELP_STRING([--disable-amf-enhancer],
+  [disable AMD Enhancer API (default auto)]))
+have_amf_enhancer="no"
+AS_IF([test "$enable_amf_enhancer" != "no"], [
+  AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/VQEnhancer.h], [
+    have_amf_enhancer="yes"
+  ])
+])
+AM_CONDITIONAL([HAVE_AMF_ENHANCER], [test "${have_amf_enhancer}" != "no"])
 
 dnl
 dnl special access module for Blackmagic SDI cards
