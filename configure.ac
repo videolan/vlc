@@ -1824,7 +1824,7 @@ You can get an updated one from http://www.live555.com/liveMedia .])
         other_libs="$other_libs -lws2_32"
       ])
 
-      dnl We need to check for pic because live555 don't provide shared libs
+      dnl We need to check for pic because live555 do not provide shared libs
       dnl and we want to build a plugins so we need -fPIC on some arch.
       VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
       VLC_ADD_LDFLAGS([live555], [${LDFLAGS_live555}])
@@ -1945,7 +1945,7 @@ dnl
 dnl  AMD Advanced Media Framework API
 dnl
 AC_ARG_ENABLE([amf-scaler], AS_HELP_STRING([--disable-amf-scaler],
-  [disable AMD AMF API (default auto)]))
+  [disable AMD Scaler API (default auto)]))
 have_amf_scaler="no"
 AS_IF([test "$enable_amf_scaler" != "no"], [
   AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/HQScaler.h], [
@@ -1954,6 +1954,17 @@ AS_IF([test "$enable_amf_scaler" != "no"], [
   ])
 ])
 AM_CONDITIONAL([HAVE_AMF_SCALER], [test "${have_amf_scaler}" != "no"])
+
+AC_ARG_ENABLE([amf-enhancer], AS_HELP_STRING([--disable-amf-enhancer],
+  [disable AMD Enhancer API (default auto)]))
+have_amf_enhancer="no"
+AS_IF([test "$enable_amf_enhancer" != "no"], [
+  AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/VQEnhancer.h], [
+    have_amf_enhancer="yes"
+    AC_DEFINE(HAVE_AMF_ENHANCER, 1, AMD VQ Enhancer supported)
+  ])
+])
+AM_CONDITIONAL([HAVE_AMF_ENHANCER], [test "${have_amf_enhancer}" != "no"])
 
 dnl
 dnl special access module for Blackmagic SDI cards
