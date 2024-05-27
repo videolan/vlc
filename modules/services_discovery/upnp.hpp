@@ -119,6 +119,7 @@ private:
 private:
     char* m_psz_root;
     char* m_psz_objectId;
+    std::string m_original_url;
     stream_t* m_access;
     input_item_node_t* m_node;
 };
