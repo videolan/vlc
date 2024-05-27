@@ -15,15 +15,16 @@
 extern "C" {
 #endif
 
+#ifdef __cplusplus
+#define AMT_TYPE(t)  amf::t
+#else
+#define AMT_TYPE(t)  t
+#endif
+
 struct vlc_amf_context
 {
-#ifdef __cplusplus
-    amf::AMFFactory *pFactory;
-    amf::AMFContext *Context;
-#else
-    AMFFactory      *pFactory;
-    AMFContext      *Context;
-#endif
+    AMT_TYPE(AMFFactory) *pFactory;
+    AMT_TYPE(AMFContext) *Context;
     void            *Private;
 };
 
