@@ -235,12 +235,12 @@ MainCtx::~MainCtx()
     settings->beginGroup("MainWindow");
     settings->setValue( "pl-dock-status", b_playlistDocked );
     settings->setValue( "ShowRemainingTime", m_showRemainingTime );
-    settings->setValue( "interface-scale", m_intfUserScaleFactor );
+    settings->setValue( "interface-scale", QString::number( m_intfUserScaleFactor ) );
 
     /* Save playlist state */
     settings->setValue( "playlist-visible", m_playlistVisible );
-    settings->setValue( "playlist-width-factor", m_playlistWidthFactor);
-    settings->setValue( "player-playlist-width-factor", m_playerPlaylistWidthFactor);
+    settings->setValue( "playlist-width-factor", QString::number( m_playlistWidthFactor ) );
+    settings->setValue( "player-playlist-width-factor", QString::number( m_playerPlaylistWidthFactor ) );
 
     settings->setValue( "grid-view", m_gridView );
     settings->setValue( "grouping", m_grouping );
