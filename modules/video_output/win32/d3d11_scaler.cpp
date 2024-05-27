@@ -18,20 +18,6 @@
 #ifdef HAVE_AMF_SCALER
 #include "../../hw/amf/amf_helper.h"
 #include <AMF/components/HQScaler.h>
-
-amf::AMF_SURFACE_FORMAT DXGIToAMF(DXGI_FORMAT fmt)
-{
-    switch (fmt)
-    {
-        case DXGI_FORMAT_NV12: return amf::AMF_SURFACE_NV12;
-        case DXGI_FORMAT_P010: return amf::AMF_SURFACE_P010;
-        case DXGI_FORMAT_P016: return amf::AMF_SURFACE_P016;
-        case DXGI_FORMAT_B8G8R8A8_UNORM: return amf::AMF_SURFACE_BGRA;
-        case DXGI_FORMAT_R8G8B8A8_UNORM: return amf::AMF_SURFACE_RGBA;
-        case DXGI_FORMAT_R10G10B10A2_UNORM: return amf::AMF_SURFACE_R10G10B10A2;
-        default: return amf::AMF_SURFACE_UNKNOWN;
-    }
-}
 #endif
 
 #include <new>
