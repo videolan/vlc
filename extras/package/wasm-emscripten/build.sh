@@ -98,6 +98,9 @@ cd "$OLD_PWD"
 diagnostic "vlc sources path: "
 echo "$VLC_SRCPATH";
 
+# update PATH to include vlc tools
+export PATH=$VLC_SRCPATH/extras/tools/build/bin:$PATH
+
 diagnostic "vlc tools: bootstrap"
 cd "$VLC_SRCPATH"/extras/tools
 
@@ -110,9 +113,6 @@ fi
 
 diagnostic "vlc tools: make"
 make
-
-# update the PATH
-export PATH=$VLC_SRCPATH/extras/tools/bin:$PATH
 
 diagnostic "sdk tests: checking if autoconf supports emscripten"
 # https://code.videolan.org/-/snippets/1283
