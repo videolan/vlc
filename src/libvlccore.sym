@@ -113,6 +113,7 @@ es_format_Init
 es_format_InitFromVideo
 es_format_IsSimilar
 es_format_LogDifferences
+vlc_extension_VaControl
 filter_AddProxyCallbacks
 filter_DelProxyCallbacks
 filter_Blend

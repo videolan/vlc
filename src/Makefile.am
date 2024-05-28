@@ -392,6 +392,7 @@ libvlccore_la_SOURCES = \
 	misc/fourcc.c \
 	misc/fourcc_list.h \
 	misc/es_format.c \
+	misc/extensions.c \
 	misc/picture.c \
 	misc/picture.h \
 	misc/picture_fifo.c \

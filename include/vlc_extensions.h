@@ -55,6 +55,20 @@ typedef struct extension_t {
     int   i_icondata_size;    /**< Size of that data */
 } extension_t;
 
+struct vlc_extensions_manager_operations {
+    int (*activate)(extensions_manager_t*, extension_t *);
+    int (*deactivate)(extensions_manager_t *, extension_t *);
+    bool (*is_activated)(extensions_manager_t *, extension_t *);
+    bool (*has_menu)(extensions_manager_t *, extension_t *);
+    int (*get_menu)(extensions_manager_t *, extension_t *, char ***, uint16_t **);
+    bool (*trigger_only)(extensions_manager_t *, extension_t *);
+    int (*trigger)(extensions_manager_t *, extension_t *);
+    int (*trigger_menu)(extensions_manager_t *, extension_t *, int);
+    int (*set_input)(extensions_manager_t *, extension_t *, input_item_t *);
+    int (*playing_changed)(extensions_manager_t *, extension_t *, int);
+    int (*meta_changed)(extensions_manager_t *, extension_t *);
+};
+
 /** Extensions manager object */
 struct extensions_manager_t
 {
@@ -67,8 +81,19 @@ struct extensions_manager_t
     DECL_ARRAY(extension_t*) extensions; /**< Array of extension descriptors */
     vlc_mutex_t lock;                  /**< A lock for the extensions array */
 
-    /** Control, see extension_Control */
+    /** Control, see extension_Control
+     *
+     *  Legacy way of implementing callbacks.
+     *  \ref vlc_extensions_manager_operations should be preferred.
+     */
     int (*pf_control)(extensions_manager_t*, int, extension_t *, va_list);
+
+    /**
+     * Implementation of the extension manager operations.
+     *
+     * If NULL all operations will be redirected to \ref extensions_manager_t.pf_control 
+     */
+    const struct vlc_extensions_manager_operations *ops;
 };
 
 /* Control commands */
@@ -88,6 +113,11 @@ enum
     EXTENSION_META_CHANGED,   /**< arg1: extension_t*, arg2 (input_item_t*) */
 };
 
+VLC_API int vlc_extension_VaControl( extensions_manager_t *p_mgr,
+                                       int i_control,
+                                       extension_t *ext,
+                                       va_list args );
+
 /**
  * Control function for extensions.
  * Every GUI -> extension command will go through this function.
@@ -98,7 +128,7 @@ static inline int extension_Control( extensions_manager_t *p_mgr,
 {
     va_list args;
     va_start(args, ext);
-    int i_ret = p_mgr->pf_control(p_mgr, i_control, ext, args);
+    int i_ret = vlc_extension_VaControl(p_mgr, i_control, ext, args);
     va_end( args );
     return i_ret;
 }
