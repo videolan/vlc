@@ -20,7 +20,7 @@ PKGS_FOUND += qtdeclarative
 endif
 ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qtdeclarative-tools
-else ifeq ($(call system_tool_majmin, qmlcachegen --version),$(QTBASE_VERSION_MAJOR))
+else ifdef QT_USES_SYSTEM_TOOLS
 PKGS_FOUND += qtdeclarative-tools
 endif
 

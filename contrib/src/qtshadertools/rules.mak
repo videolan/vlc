@@ -15,7 +15,7 @@ PKGS_TOOLS += qtshadertools-tools
 endif
 PKGS_ALL += qtshadertools-tools
 
-ifeq ($(call system_tool_majmin, qsb --version),$(QTBASE_VERSION_MAJOR))
+ifdef QT_USES_SYSTEM_TOOLS
 PKGS_FOUND += qtshadertools-tools
 endif
 

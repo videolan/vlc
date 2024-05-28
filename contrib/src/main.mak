@@ -543,7 +543,25 @@ MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(
 
 # shared Qt config
 ifdef HAVE_CROSS_COMPILE
+QT_LIBEXECS := $(shell qmake6 -query QT_HOST_LIBEXECS)
+QT_BINS := $(shell qmake6 -query QT_HOST_BINS)
+else
+QT_LIBEXECS := $(shell qmake6 -query QT_INSTALL_LIBEXECS):$(shell qmake6 -query QT_HOST_LIBEXECS)
+QT_BINS := $(shell qmake6 -query QT_INSTALL_BINS):$(shell qmake6 -query QT_HOST_BINS)
+endif
+
 ifeq ($(call system_tool_majmin, qmake6 -query QT_VERSION),$(QTBASE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, PATH="${QT_LIBEXECS}" moc --version),$(QTBASE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, PATH="${QT_BINS}" qsb --version),$(QTBASE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, PATH="${QT_LIBEXECS}" qmlcachegen --version),$(QTBASE_VERSION_MAJOR))
+QT_USES_SYSTEM_TOOLS = 1
+endif
+endif
+endif
+endif
+
+ifdef HAVE_CROSS_COMPILE
+ifdef QT_USES_SYSTEM_TOOLS
  # using system Qt native tools
  QT_HOST_PREFIX := $(shell PATH="${SYSTEM_PATH}" qmake6 -query QT_HOST_PREFIX)
  QT_HOST_LIBS := $(shell PATH="${SYSTEM_PATH}" qmake6 -query QT_HOST_LIBS)
