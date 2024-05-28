@@ -1027,7 +1027,12 @@ void matroska_segment_c::EnsureDuration()
     if ( b_cues && _seeker._cluster_positions.size() )
         i_last_cluster_pos = *_seeker._cluster_positions.rbegin();
     else if( !cluster->IsFiniteSize() )
+    {
+        if ( i_last_cluster_pos == cluster->GetElementPosition() )
+            // make sure our first Cluster has a timestamp
+            ParseCluster( cluster, false, SCOPE_PARTIAL_DATA );
         return;
+    }
 
     es.I_O().setFilePointer( i_last_cluster_pos, seek_beginning );
 
