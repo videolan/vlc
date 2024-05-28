@@ -266,7 +266,8 @@ PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PREFIX)/share/pkgconfig:$(PKG_CONFI
 export PKG_CONFIG_PATH
 
 # Get the version of a system tool $1 and pass it through the $2 command(s)
-system_tool_version = $(shell PATH="${SYSTEM_PATH}" $(1) 2>/dev/null | head -1 | sed -ne 's/[^0-9]*\([0-9]\([0-9a-zA-Z\.\-]*\)\)\(.*\)/\1/p' | $(2))
+FULL_VERSION_REGEX := 's/[^0-9]*\([0-9]\([0-9a-zA-Z\.\-]*\)\)\(.*\)/\1/p'
+system_tool_version = $(shell PATH="${SYSTEM_PATH}" $(1) 2>/dev/null | head -1 | sed -ne ${FULL_VERSION_REGEX} | $(2))
 # Get the major.minor version of a system tool
 system_tool_majmin = $(call system_tool_version, $(1), cut -d '.' -f -2)
 
