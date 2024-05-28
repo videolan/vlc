@@ -542,20 +542,17 @@ MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
 MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
 
 # shared Qt config
-ifeq ($(call system_tool_majmin, qmake6 -query QT_VERSION),$(QTBASE_VERSION_MAJOR))
-# using system Qt native tools
 ifdef HAVE_CROSS_COMPILE
+ifeq ($(call system_tool_majmin, qmake6 -query QT_VERSION),$(QTBASE_VERSION_MAJOR))
+ # using system Qt native tools
  QT_HOST_PREFIX := $(shell PATH="${SYSTEM_PATH}" qmake6 -query QT_HOST_PREFIX)
  QT_HOST_LIBS := $(shell PATH="${SYSTEM_PATH}" qmake6 -query QT_HOST_LIBS)
- QT_HOST_PATH := -DQT_HOST_PATH=$(QT_HOST_PREFIX) -DQT_HOST_PATH_CMAKE_DIR=$(QT_HOST_LIBS)/cmake
-endif
 else
-# using locally compiled Qt native tools
-ifdef HAVE_CROSS_COMPILE
+ # using locally compiled Qt native tools
  QT_HOST_PREFIX := $(BUILDPREFIX)
  QT_HOST_LIBS := $(QT_HOST_PREFIX)/lib
- QT_HOST_PATH := -DQT_HOST_PATH=$(QT_HOST_PREFIX) -DQT_HOST_PATH_CMAKE_DIR=$(QT_HOST_LIBS)/cmake
 endif
+QT_HOST_PATH := -DQT_HOST_PATH=$(QT_HOST_PREFIX) -DQT_HOST_PATH_CMAKE_DIR=$(QT_HOST_LIBS)/cmake
 endif
 QT_CMAKE_CONFIG := -DCMAKE_TOOLCHAIN_FILE=$(PREFIX)/lib/cmake/Qt6/qt.toolchain.cmake $(QT_HOST_PATH)
 
