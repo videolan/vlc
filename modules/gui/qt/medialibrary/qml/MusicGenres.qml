@@ -290,7 +290,7 @@ MainInterface.MainViewLoader {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }
 
-            Widgets.TableColumns {
+            Widgets.MLTableColumns {
                 id: tableColumns
 
                 showTitleText: (tableView_id.sortModel === tableView_id._modelSmall)
