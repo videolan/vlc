@@ -192,8 +192,6 @@ FocusScope {
 
         anchors.fill: parent
 
-        clip: true
-
         focus: (model.count !== 0)
 
         model: root.model
