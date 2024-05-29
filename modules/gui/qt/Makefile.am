@@ -1042,7 +1042,6 @@ libqt_plugin_la_QML = \
 	widgets/qml/ComboBoxExt.qml \
 	widgets/qml/AcrylicBackground.qml \
 	widgets/qml/AnimatedBackground.qml \
-	widgets/qml/CoverShadow.qml \
 	widgets/qml/CSDThemeButton.qml \
 	widgets/qml/CSDThemeButtonSet.qml \
 	widgets/qml/CSDWindowButton.qml \
