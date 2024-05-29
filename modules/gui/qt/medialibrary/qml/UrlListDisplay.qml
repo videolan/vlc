@@ -107,7 +107,7 @@ Widgets.KeyNavigableTableView {
     }
 
 
-    Widgets.TableColumns {
+    Widgets.MLTableColumns {
         id: tableColumns
     }
 }
