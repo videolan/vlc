@@ -169,10 +169,16 @@ void CompositorX11UISurface::createFbo()
 
 void CompositorX11UISurface::destroyFbo()
 {
-    m_context->functions()->glDeleteTextures(1, &m_textureId);
-    m_textureId = 0;
-    m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
-    m_fboId = 0;
+    if (m_textureId)
+    {
+        m_context->functions()->glDeleteTextures(1, &m_textureId);
+        m_textureId = 0;
+    }
+    if (m_fboId)
+    {
+        m_context->functions()->glDeleteFramebuffers(1, &m_fboId);
+        m_fboId = 0;
+    }
 }
 
 void CompositorX11UISurface::render()
