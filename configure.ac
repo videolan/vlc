@@ -3983,7 +3983,7 @@ have_qt_core_private="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
-  AC_PATH_PROGS(QTPATHS6, [qtpaths6], qtpaths6, ["$PATH:${CONTRIB_DIR}/../bin"])
+  AC_PATH_PROGS(QMAKE6, [qmake6], qmake6, ["$PATH:${CONTRIB_DIR}/../bin"])
 
   AC_ARG_WITH([qtconf],
     AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
@@ -3998,14 +3998,14 @@ AS_IF([test "${enable_qt}" != "no"], [
     ])
   ])
 
-  QT_PATHS=${QTPATHS6}
+  QT_PATHS=${QMAKE6}
   AS_IF([test -n "${with_qtconf}"], [
-    QT_PATHS="${QT_PATHS} --qtconf ${with_qtconf}"
+    QT_PATHS="${QMAKE6} -qtconf ${with_qtconf}"
   ])
 
   QT_MINIMUM_VERSION=6.2
   AC_MSG_CHECKING([Qt is at least ${QT_MINIMUM_VERSION}])
-  QT_VERSION_CORE="$(${QT_PATHS}          --query QT_VERSION 2>/dev/null)"
+  QT_VERSION_CORE="$(${QT_PATHS}          -query QT_VERSION 2>/dev/null)"
   QT_MINIMUM_MAJ=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f -1)
   QT_MINIMUM_MIN=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f 2-2)
   QT_VERSION_MAJ=$(echo ${QT_VERSION_CORE} | cut -d "." -f -1)
@@ -4016,11 +4016,8 @@ AS_IF([test "${enable_qt}" != "no"], [
   ],[
     AC_MSG_RESULT([(${QT_VERSION_CORE}) yes])
 
-  QT_BIN_DIRECTORY="$(${QT_PATHS}         --query QT_HOST_BINS 2>/dev/null)"
-  QMAKE="${QT_BIN_DIRECTORY}/qmake"
-  AS_IF([test -n "${with_qtconf}"],[
-      QMAKE="${QMAKE} -qtconf ${with_qtconf}"
-  ])
+  QT_BIN_DIRECTORY="$(${QT_PATHS}         -query QT_HOST_BINS 2>/dev/null)"
+  QMAKE="${QT_PATHS}"
   AC_MSG_NOTICE([using ${QMAKE}])
 
   AC_MSG_CHECKING([for Qt libraries])
@@ -4070,7 +4067,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
       rm -f ${ac_pwd}/modules/gui/qt/qmake-wayland
 
-      QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     --query QT_HOST_LIBEXECS 2>/dev/null)"
+      QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}     -query QT_HOST_LIBEXECS 2>/dev/null)"
       QT_QML_LIBEXEC_DIRECTORY=${QT_LIBEXEC_DIRECTORY}
       QT_SHADERTOOLS_BIN_DIRECTORY=${QT_BIN_DIRECTORY}
 
@@ -4085,9 +4082,9 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
-      AC_MSG_CHECKING([if required Qt plugins are installed with ${QTPATHS6} and conf ${with_qtconf}])
+      AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${with_qtconf}])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-            --qtpaths "${QTPATHS6}" \
+            --qmake "${QMAKE6}" \
             --qtconf "${with_qtconf}" \
             --modules \
             QtQml.Models="" \
@@ -4109,7 +4106,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
         AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
-        --qtpaths "${QTPATHS6}" \
+        --qmake "${QMAKE6}" \
         --qtconf "${with_qtconf}" \
         --modules QtTest="" \
         >&AS_MESSAGE_FD ], [
