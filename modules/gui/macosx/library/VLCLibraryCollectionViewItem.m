@@ -295,7 +295,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 
 -(void)mouseDown:(NSEvent *)event
 {
-    if (event.modifierFlags & NSControlKeyMask) {
+    if (event.modifierFlags & NSEventModifierFlagControl) {
         [self openContextMenu:event];
     } else if (self.deselectWhenClickedIfSelected && 
                self.selected &&
