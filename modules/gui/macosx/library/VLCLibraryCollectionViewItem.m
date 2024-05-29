@@ -289,7 +289,20 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    [_menuController setRepresentedItems:@[self.representedItem]];
+    NSCollectionView * const collectionView = self.collectionView;
+    Protocol * const vlcDataSourceProtocol = @protocol(VLCLibraryCollectionViewDataSource);
+
+    if([collectionView.dataSource conformsToProtocol:vlcDataSourceProtocol]) {
+        NSObject<VLCLibraryCollectionViewDataSource> * const dataSource = 
+            (NSObject<VLCLibraryCollectionViewDataSource> *)collectionView.dataSource;
+        NSSet<NSIndexPath *> * const indexPaths = collectionView.selectionIndexPaths;
+        NSArray<VLCLibraryRepresentedItem *> * const items = 
+            [dataSource representedItemsAtIndexPaths:indexPaths forCollectionView:collectionView];
+        _menuController.representedItems = items;
+    } else {
+        _menuController.representedItems = @[self.representedItem];
+    }
+
     [_menuController popupMenuWithEvent:event forView:self.view];
 }
 
