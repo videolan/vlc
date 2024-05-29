@@ -211,11 +211,9 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
                                       &p_dec->fmt_out.video.i_visible_width,
                                       &p_dec->fmt_out.video.i_visible_height );
 
-        if( p_sps->vui.i_sar_num != 0 && p_sps->vui.i_sar_den != 0 )
-        {
-            p_dec->fmt_out.video.i_sar_num = p_sps->vui.i_sar_num;
-            p_dec->fmt_out.video.i_sar_den = p_sps->vui.i_sar_den;
-        }
+        h264_get_aspect_ratio( p_sps,
+                              &p_dec->fmt_out.video.i_sar_num,
+                              &p_dec->fmt_out.video.i_sar_den );
 
         if( !p_dec->fmt_out.video.i_frame_rate ||
             !p_dec->fmt_out.video.i_frame_rate_base )

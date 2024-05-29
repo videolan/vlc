@@ -832,20 +832,20 @@ hxxx_helper_get_current_picture_size(const struct hxxx_helper *hh,
 int
 hxxx_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den)
 {
+    unsigned num, den;
     if(hh->i_codec == VLC_CODEC_H264)
     {
         const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-        if (hsps)
+        if (hsps && hsps->h264_sps && h264_get_aspect_ratio(hsps->h264_sps, &num, &den))
         {
-            *p_num = hsps->h264_sps->vui.i_sar_num;
-            *p_den = hsps->h264_sps->vui.i_sar_den;
+            *p_num = num;
+            *p_den = den;
             return VLC_SUCCESS;
         }
     }
     else if(hh->i_codec == VLC_CODEC_HEVC)
     {
         const struct hxxx_helper_nal *hsps = &hh->hevc.sps_list[hh->hevc.i_current_sps];
-        unsigned num, den;
         if(hsps && hsps->hevc_sps && hevc_get_aspect_ratio(hsps->hevc_sps, &num, &den))
         {
             *p_num = num;
