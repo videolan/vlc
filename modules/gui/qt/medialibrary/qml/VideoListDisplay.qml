@@ -121,7 +121,7 @@ MainInterface.MainTableView {
     // Childs
     //---------------------------------------------------------------------------------------------
 
-    Widgets.TableColumns {
+    Widgets.MLTableColumns {
         id: tableColumns
 
         showTitleText: (listView_id.sortModel === listView_id._modelSmall)
