@@ -205,7 +205,7 @@ Widgets.KeyNavigableTableView {
         mlModel: model
     }
 
-    Widgets.TableColumns {
+    Widgets.MLTableColumns {
         id: tableColumns
 
         showCriterias: (root.sortModel === root._modelSmall)
