@@ -32,8 +32,8 @@ ScaledImage {
     property real viewportWidth: rectWidth + (Math.max(Math.abs(primaryHorizontalOffset) + primaryBlurRadius, Math.abs(secondaryHorizontalOffset) + secondaryBlurRadius)) * 2
     property real viewportHeight: rectHeight + (Math.max(Math.abs(primaryVerticalOffset) + primaryBlurRadius, Math.abs(secondaryVerticalOffset) + secondaryBlurRadius)) * 2
 
-    property real rectWidth: sourceItem?.width ?? 0
-    property real rectHeight: sourceItem?.height ?? 0
+    property real rectWidth: sourceItem ? Math.min(sourceItem.paintedWidth ?? Number.MAX_VALUE, sourceItem.width) : 0
+    property real rectHeight: sourceItem ? Math.min(sourceItem.paintedHeight ?? Number.MAX_VALUE, sourceItem.height) : 0
     property real xRadius: sourceItem?.radius ?? 0
     property real yRadius: sourceItem?.radius ?? 0
 
