@@ -1091,6 +1091,7 @@ libqt_plugin_la_QML = \
 	widgets/qml/PageLoader.qml \
 	widgets/qml/ButtonExt.qml \
 	widgets/qml/TableColumns.qml \
+	widgets/qml/MLTableColumns.qml \
 	widgets/qml/TextFieldExt.qml \
 	widgets/qml/TextToolButton.qml \
 	widgets/qml/TrackDelayButton.qml \
