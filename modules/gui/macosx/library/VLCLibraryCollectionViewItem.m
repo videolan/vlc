@@ -283,15 +283,20 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     [self.representedItem queue];
 }
 
--(void)mouseDown:(NSEvent *)theEvent
+- (void)openContextMenu:(NSEvent *)event
 {
-    if (theEvent.modifierFlags & NSControlKeyMask) {
-        if (!_menuController) {
-            _menuController = [[VLCLibraryMenuController alloc] init];
-        }
+    if (!_menuController) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
 
-        [_menuController setRepresentedItems:@[self.representedItem]];
-        [_menuController popupMenuWithEvent:theEvent forView:self.view];
+    [_menuController setRepresentedItems:@[self.representedItem]];
+    [_menuController popupMenuWithEvent:event forView:self.view];
+}
+
+-(void)mouseDown:(NSEvent *)event
+{
+    if (event.modifierFlags & NSControlKeyMask) {
+        [self openContextMenu:event];
     } else if (self.deselectWhenClickedIfSelected && 
                self.selected &&
                [self.collectionView.dataSource conformsToProtocol:@protocol(VLCLibraryCollectionViewDataSource)]) {
@@ -311,19 +316,13 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         }
     }
 
-    [super mouseDown:theEvent];
+    [super mouseDown:event];
 }
 
-- (void)rightMouseDown:(NSEvent *)theEvent
+- (void)rightMouseDown:(NSEvent *)event
 {
-    if (!_menuController) {
-        _menuController = [[VLCLibraryMenuController alloc] init];
-    }
-
-    [_menuController setRepresentedItems:@[self.representedItem]];
-    [_menuController popupMenuWithEvent:theEvent forView:self.view];
-
-    [super rightMouseDown:theEvent];
+    [self openContextMenu:event];
+[super rightMouseDown:event];
 }
 
 @end
