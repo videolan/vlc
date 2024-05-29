@@ -483,7 +483,8 @@ static inline void triggerQuit()
 {
     QMetaObject::invokeMethod(qApp, []() {
             qApp->closeAllWindows();
-            qApp->quit();
+            //at this point both UI and Vout have ended, stop Qt mainloop
+            qApp->exit();
         }, Qt::QueuedConnection);
 }
 
