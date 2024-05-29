@@ -309,4 +309,22 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return [NSIndexPath indexPathForItem:arrayIdx inSection:0];
 }
 
+- (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
+                                                     forCollectionView:(NSCollectionView *)collectionView
+{
+    NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems = 
+        [NSMutableArray arrayWithCapacity:indexPaths.count];
+    
+    for (NSIndexPath * const indexPath in indexPaths) {
+        const id<VLCMediaLibraryItemProtocol> libraryItem = 
+            [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        VLCLibraryRepresentedItem * const representedItem = 
+            [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem 
+                                                 parentType:self.currentParentType];
+        [representedItems addObject:representedItem];
+    }
+
+    return representedItems;
+}
+
 @end

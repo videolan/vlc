@@ -24,6 +24,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryItemProtocol;
 
 @protocol VLCLibraryCollectionViewDataSource <NSCollectionViewDataSource>
@@ -31,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView;
 - (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
+- (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
+                                                     forCollectionView:(NSCollectionView *)collectionView;
+
 - (void)reloadData;
 
 @optional
