@@ -16,5 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+
+import org.videolan.medialib 0.1
+
+
 TableColumns {
+
+    onPlayClicked: function (model) {
+        MediaLib.addAndPlay(model.id)
+        History.push(["player"])
+    }
 }

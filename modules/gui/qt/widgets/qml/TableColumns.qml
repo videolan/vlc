@@ -20,7 +20,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 import org.videolan.vlc 0.1
-import org.videolan.medialib 0.1
 
 import "qrc:///widgets/" as Widgets
 import "qrc:///util/Helpers.js" as Helpers
@@ -46,6 +45,10 @@ Item {
     property var titlecoverLabels: function(model) {
         return []
     }
+
+    // this is called in reponse to user request to play
+    // model is associated row data of delegate
+    signal playClicked(var model)
 
     function getCriterias(colModel, rowModel) {
         if (colModel === null || rowModel === null)
@@ -99,10 +102,6 @@ Item {
 
                 playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
-                onPlayIconClicked: {
-                    MediaLib.addAndPlay(titleDel.rowModel.id)
-                    History.push(["player"])
-                }
                 radius: root.titleCover_radius
                 color: titleDel.colorContext.bg.secondary
 
@@ -128,6 +127,8 @@ Item {
 
                     sourceItem: parent
                 }
+
+                onPlayIconClicked: root.playClicked(titleDel.rowModel)
             }
 
             Column {
