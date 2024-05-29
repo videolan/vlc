@@ -124,7 +124,7 @@
     _collectionView.collectionViewLayout = _collectionViewLayout;
     _collectionView.selectable = YES;
     _collectionView.allowsEmptySelection = YES;
-    _collectionView.allowsMultipleSelection = NO;
+    _collectionView.allowsMultipleSelection = YES;
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
