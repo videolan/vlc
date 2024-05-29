@@ -1277,7 +1277,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
         break
       fi
     done
-    AS_IF([test "x${win32_path_cmd}" != "xno"],[
+    AS_IF([test "${win32_path_cmd}" != "no"],[
       WIN32_PATH_CMD=${win32_path_cmd}
       AC_MSG_RESULT([using '${win32_path_cmd}'])
     ],[
