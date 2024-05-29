@@ -531,7 +531,9 @@ void CompositorX11RenderWindow::setVideoWindow( QWindow* window)
 {
     //ensure Qt x11 pending operation have been forwarded to the server
     xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
-    m_videoClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
+    m_videoClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window->winId());
+    connect(window, &QWindow::widthChanged, m_videoClient.get(), &CompositorX11RenderClient::resetPixmap);
+    connect(window, &QWindow::heightChanged, m_videoClient.get(), &CompositorX11RenderClient::resetPixmap);
     m_videoPosition = QRect(0,0,0,0);
     m_videoWindow = window;
     emit videoSurfaceChanged(m_videoClient.get());
@@ -558,7 +560,8 @@ void CompositorX11RenderWindow::setInterfaceWindow(CompositorX11UISurface* windo
 {
     //ensure Qt x11 pending operation have been forwarded to the server
     xcb_flush(qGuiApp->nativeInterface<QNativeInterface::QX11Application>()->connection());
-    m_interfaceClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window);
+    m_interfaceClient = std::make_unique<CompositorX11RenderClient>(m_intf, m_conn, window->winId());
+    connect(window, &CompositorX11UISurface::requestPixmapReset, m_interfaceClient.get(), &CompositorX11RenderClient::resetPixmap);
     m_interfaceWindow = window;
 }
 

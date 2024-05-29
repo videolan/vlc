@@ -422,14 +422,15 @@ void CompositorX11UISurface::exposeEvent(QExposeEvent *)
         {
             m_uiRenderControl->initialize();
         }
+        emit requestPixmapReset();
         requestUpdate();
     }
 }
 
 void CompositorX11UISurface::handleScreenChange()
 {
-   m_uiWindow->setGeometry(0, 0, width(), height());
-   requestUpdate();
+    emit requestPixmapReset();
+    requestUpdate();
 }
 
 void CompositorX11UISurface::forwardFocusObjectChanged(QObject* object)

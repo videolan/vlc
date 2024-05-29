@@ -43,7 +43,7 @@ class CompositorX11RenderClient : public QObject
 public:
     CompositorX11RenderClient(
             qt_intf_t* p_intf, xcb_connection_t* conn,
-            QWindow* window,
+            xcb_window_t wid,
             QObject* parent = nullptr);
 
     ~CompositorX11RenderClient();
@@ -58,7 +58,6 @@ public slots:
 
 private:
     qt_intf_t* m_intf;
-    QWindow* m_window = nullptr;
 
     xcb_connection_t* m_conn = 0;
     xcb_window_t m_wid = 0;

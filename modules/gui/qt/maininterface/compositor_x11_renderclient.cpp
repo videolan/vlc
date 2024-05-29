@@ -22,12 +22,11 @@
 
 using namespace vlc;
 
-CompositorX11RenderClient::CompositorX11RenderClient(qt_intf_t* p_intf, xcb_connection_t* conn,  QWindow* window, QObject *parent)
+CompositorX11RenderClient::CompositorX11RenderClient(qt_intf_t* p_intf, xcb_connection_t* conn,  xcb_window_t wid, QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
-    , m_window(window)
     , m_conn(conn)
-    , m_wid(window->winId())
+    , m_wid(wid)
     , m_pixmap(m_conn)
     , m_picture(m_conn)
 {
@@ -65,9 +64,6 @@ CompositorX11RenderClient::CompositorX11RenderClient(qt_intf_t* p_intf, xcb_conn
         xcb_change_property(m_conn, XCB_PROP_MODE_REPLACE, m_wid,
                             _NET_WM_BYPASS_COMPOSITOR, XCB_ATOM_CARDINAL, 32, 1, &val);
     }
-
-    connect(window, &QWindow::widthChanged, this, &CompositorX11RenderClient::resetPixmap);
-    connect(window, &QWindow::heightChanged, this, &CompositorX11RenderClient::resetPixmap);
 }
 
 CompositorX11RenderClient::~CompositorX11RenderClient()
@@ -78,7 +74,7 @@ CompositorX11RenderClient::~CompositorX11RenderClient()
 
 xcb_drawable_t CompositorX11RenderClient::getWindowXid() const
 {
-    return m_window->winId();
+    return m_wid;
 }
 
 void CompositorX11RenderClient::createPicture()

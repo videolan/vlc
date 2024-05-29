@@ -75,6 +75,8 @@ signals:
     void sizeChanged(const QSize& size);
     void updated();
 
+    void requestPixmapReset();
+
 protected:
     bool eventFilter(QObject* object, QEvent *event) override;
 
