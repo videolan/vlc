@@ -251,7 +251,7 @@ MainInterface.MainViewLoader {
             }
             onItemDoubleClicked: (index, model) => MediaLib.addAndPlay( model.id )
 
-            Widgets.TableColumns {
+            Widgets.MLTableColumns {
                 id: tableColumns
 
                 showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
