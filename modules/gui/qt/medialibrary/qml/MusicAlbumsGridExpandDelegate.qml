@@ -465,7 +465,7 @@ FocusScope {
             Navigation.leftItem: VLCStyle.isScreenSmall ? null : root.enqueueActionBtn
             Navigation.upItem: headerItem
 
-            Widgets.TableColumns {
+            Widgets.MLTableColumns {
                 id: tableColumns
             }
         }
