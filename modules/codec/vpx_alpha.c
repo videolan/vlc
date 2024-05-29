@@ -457,7 +457,6 @@ static int Decode( decoder_t *dec, vlc_frame_t *frame )
 static void Flush( decoder_t *dec )
 {
     vpx_alpha *p_sys = dec->p_sys;
-    vlc_mutex_lock(&p_sys->lock);
 
     if ( p_sys->opaque->dec.pf_flush != NULL )
         p_sys->opaque->dec.pf_flush( &p_sys->opaque->dec );
@@ -465,6 +464,7 @@ static void Flush( decoder_t *dec )
     if ( p_sys->alpha->dec.pf_flush != NULL )
         p_sys->alpha->dec.pf_flush( &p_sys->alpha->dec );
 
+    vlc_mutex_lock(&p_sys->lock);
     picture_t *picture;
     while ((picture = vlc_picture_chain_PopFront(&p_sys->opaque->decoded)) != NULL)
         picture_Release(picture);
