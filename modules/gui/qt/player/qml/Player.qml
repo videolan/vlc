@@ -431,17 +431,19 @@ FocusScope {
                         if (status === Image.Ready)
                             backgroundImage.scheduleUpdate()
                     }
-                }
 
-                //don't use a DoubleShadow here as cover size will change
-                //dynamically with the window size
-                Widgets.CoverShadow {
-                    anchors.fill: parent
-                    source: cover
-                    primaryVerticalOffset: VLCStyle.dp(24)
-                    primaryBlurRadius: VLCStyle.dp(54)
-                    secondaryVerticalOffset: VLCStyle.dp(5)
-                    secondaryBlurRadius: VLCStyle.dp(14)
+                    // TODO: Qt >= 6.4 Investigate using MultiEffect.
+                    Widgets.DoubleShadow {
+                        anchors.centerIn: parent
+                        sourceItem: parent
+
+                        cache: false
+
+                        primaryVerticalOffset: VLCStyle.dp(24)
+                        primaryBlurRadius: VLCStyle.dp(54)
+                        secondaryVerticalOffset: VLCStyle.dp(5)
+                        secondaryBlurRadius: VLCStyle.dp(14)
+                    }
                 }
             }
 
