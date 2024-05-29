@@ -188,12 +188,18 @@ static xcb_window_t getWindowProperty(xcb_connection_t* conn, xcb_window_t windo
     if (!reply)
        return 0;
 
-    return ((xcb_window_t *)xcb_get_property_value(reply.get()))[0];
+    if (xcb_get_property_value_length(reply.get()) == 0)
+        return 0;
+
+    return *((xcb_window_t *)xcb_get_property_value(reply.get()));
 }
 
 //see https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html#idm45894598113264
 static bool supportWMCheck(xcb_connection_t* conn, xcb_window_t rootWindow)
 {
+    if (rootWindow == 0)
+        return false;
+
     xcb_atom_t atom = getInternAtom(conn, "_NET_SUPPORTING_WM_CHECK");
     xcb_window_t wmWindow = getWindowProperty(conn, rootWindow, atom);
     if (wmWindow == 0)
