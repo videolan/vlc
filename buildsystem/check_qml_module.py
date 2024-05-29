@@ -91,15 +91,21 @@ class QmlModuleChecker:
             print(ret.stderr.strip())
             return False
 
-        binpath = None
-        libexec = None
+        binpath_host = None
+        libexec_host = None
+        binpath_install = None
+        libexec_install = None
         qtmajor = ""
         for l in ret.stdout.splitlines():
             l.strip()
             if l.startswith("QT_HOST_BINS:"):
-                binpath = l.split(":", 1)[1]
+                binpath_host = l.split(":", 1)[1]
             elif l.startswith("QT_HOST_LIBEXECS:"):
-                libexec = l.split(":", 1)[1]
+                libexec_host = l.split(":", 1)[1]
+            elif l.startswith("QT_INSTALL_BINS:"):
+                binpath_install = l.split(":", 1)[1]
+            elif l.startswith("QT_INSTALL_LIBEXECS:"):
+                libexec_install = l.split(":", 1)[1]
             elif l.startswith("QT_INSTALL_QML:"):
                 self.qmlpath = l.split(":", 1)[1]
             elif l.startswith("QT_VERSION:"):
@@ -113,12 +119,21 @@ class QmlModuleChecker:
             print("Qml path {} not found".format(self.qmlpath))
             return False
 
-        self.qmlimportscanner = findProgram(binpath, "qmlimportscanner")
+        self.qmlimportscanner = findProgram(binpath_install, "qmlimportscanner")
         if self.qmlimportscanner is not None:
             return True
 
-        #Qt6 may place qmlimportscanner in libexec
-        self.qmlimportscanner = findProgram(libexec, "qmlimportscanner")
+        #Qt6 may place qmlimportscanner in libexec_host
+        self.qmlimportscanner = findProgram(libexec_install, "qmlimportscanner")
+        if self.qmlimportscanner is not None:
+            return True
+
+        self.qmlimportscanner = findProgram(binpath_host, "qmlimportscanner")
+        if self.qmlimportscanner is not None:
+            return True
+
+        #Qt6 may place qmlimportscanner in libexec_host
+        self.qmlimportscanner = findProgram(libexec_host, "qmlimportscanner")
         if self.qmlimportscanner is not None:
             return True
 
