@@ -2072,7 +2072,7 @@ You can get an updated one from http://www.live555.com/liveMedia .])
         other_libs="$other_libs -lws2_32"
       ])
 
-      dnl We need to check for pic because live555 don't provide shared libs
+      dnl We need to check for pic because live555 does not provide shared libs
       dnl and we want to build a plugins so we need -fPIC on some arch.
       VLC_ADD_CXXFLAGS([live555], [${CPPFLAGS_live555}])
       VLC_ADD_LDFLAGS([live555], [${LDFLAGS_live555}])
