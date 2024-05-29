@@ -541,11 +541,19 @@ void CompositorX11RenderWindow::setVideoWindow( QWindow* window)
 
 void CompositorX11RenderWindow::enableVideoWindow()
 {
+    //if we stop the rendering, m_videoWindow may be null
+    if (!m_videoWindow)
+        return;
+
     emit registerVideoWindow(m_videoWindow->winId());
 }
 
 void CompositorX11RenderWindow::disableVideoWindow()
 {
+    //if we stop the rendering, m_videoWindow may be null
+    if (!m_videoWindow)
+        return;
+
     emit registerVideoWindow(0);
 }
 
