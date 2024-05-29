@@ -295,7 +295,7 @@ validate_sdk_name()
             VLC_HOST_PLATFORM="iOS-Simulator"
             VLC_HOST_PLATFORM_SIMULATOR="yes"
             VLC_HOST_OS="ios"
-            set_deployment_target "$VLC_DEPLOYMENT_TARGET_IOS"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_IOS_SIMULATOR"
             ;;
         appletvos*)
             VLC_HOST_PLATFORM="tvOS"
@@ -306,7 +306,7 @@ validate_sdk_name()
             VLC_HOST_PLATFORM="tvOS-Simulator"
             VLC_HOST_PLATFORM_SIMULATOR="yes"
             VLC_HOST_OS="tvos"
-            set_deployment_target "$VLC_DEPLOYMENT_TARGET_TVOS"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_TVOS_SIMULATOR"
             ;;
         macosx*)
             VLC_HOST_PLATFORM="macOS"
