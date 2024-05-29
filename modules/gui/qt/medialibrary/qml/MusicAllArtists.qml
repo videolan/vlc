@@ -211,7 +211,7 @@ MainInterface.MainViewLoader {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }
 
-            Widgets.TableColumns {
+            Widgets.MLTableColumns {
                 id: tableColumns
 
                 showCriterias: (artistTable.sortModel === artistTable._modelSmall)
