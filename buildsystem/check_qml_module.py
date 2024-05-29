@@ -78,7 +78,7 @@ class QmlModuleChecker:
 
 
     def getInstallInfo(self, qtpaths, qtconf):
-        qtpaths_cmd = [ qtpaths, "--query", "--query-format", "json" ]
+        qtpaths_cmd = [ qtpaths, "--query" ]
         if qtconf:
             qtpaths_cmd += [ "--qtconf", qtconf ]
         ret = subprocess.run(
@@ -91,22 +91,20 @@ class QmlModuleChecker:
             print(ret.stderr.strip())
             return False
 
-        # Qt 6.6 outputs invalid json, try to fix it
-        qpaths_json = str(ret.stdout)
-        if ',\n}' in qpaths_json:
-            qpaths_json = qpaths_json.replace(',\n}', '\n}')
-        elif ',\r\n}' in qpaths_json:
-            qpaths_json = qpaths_json.replace(',\r\n}', '\r\n}')
-
-        qtjson = json.loads(qpaths_json)
-        binpath = qtjson["QT_HOST_BINS"]
-        libexec = qtjson["QT_HOST_LIBEXECS"]
-        self.qmlpath = qtjson["QT_INSTALL_QML"]
-        qmlversion = qtjson["QT_VERSION"]
-        if qmlversion:
-            qtmajor = qmlversion.split(".")[0]
-        else:
-            qtmajor = ""
+        binpath = None
+        libexec = None
+        qtmajor = ""
+        for l in ret.stdout.splitlines():
+            l.strip()
+            if l.startswith("QT_HOST_BINS:"):
+                binpath = l.split(":", 1)[1]
+            elif l.startswith("QT_HOST_LIBEXECS:"):
+                libexec = l.split(":", 1)[1]
+            elif l.startswith("QT_INSTALL_QML:"):
+                self.qmlpath = l.split(":", 1)[1]
+            elif l.startswith("QT_VERSION:"):
+                qmlversion = l.split(":", 1)[1]
+                qtmajor = qmlversion.split(".")[0]
 
         if qtmajor == "6":
             self.qt5 = False
