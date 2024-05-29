@@ -45,6 +45,8 @@ typedef struct
     vlc_video_context *vctx;
     picture_t *(*pf_combine)(decoder_t *, picture_t *opaque, picture_t *alpha, vlc_video_context *);
 
+    struct VLC_VECTOR(vlc_tick_t) missing_alpha;
+
     picture_pool_t    *pool;
 } vpx_alpha;
 
@@ -63,14 +65,15 @@ struct cpu_alpha_context
 {
     picture_context_t  ctx;
     picture_t          *opaque;
-    picture_t          *alpha;
+    picture_t          *alpha; // may be NULL if the alpha layer was missing
 };
 
 static void cpu_alpha_destroy(picture_context_t *ctx)
 {
     struct cpu_alpha_context *pctx = container_of(ctx, struct cpu_alpha_context, ctx);
     picture_Release(pctx->opaque);
-    picture_Release(pctx->alpha);
+    if (pctx->alpha)
+        picture_Release(pctx->alpha);
     free(pctx);
 }
 
@@ -82,8 +85,19 @@ static picture_context_t *cpu_alpha_copy(picture_context_t *src)
         return NULL;
     alpha_ctx->ctx = *src;
     alpha_ctx->opaque = picture_Hold(pctx->opaque);
-    alpha_ctx->alpha  = picture_Hold(pctx->alpha);
+    alpha_ctx->alpha  = alpha_ctx->alpha ? picture_Hold(pctx->alpha) : NULL;
     return &alpha_ctx->ctx;
+}
+
+struct pic_alpha_plane
+{
+    plane_t p;
+    uint8_t buffer[];
+};
+
+static void DestroyPoolPic(picture_t *pic)
+{
+    free(pic->p_sys);
 }
 
 static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture_t *alpha, vlc_video_context *vctx)
@@ -104,12 +118,42 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
         cpu_alpha_destroy, cpu_alpha_copy, NULL
     };
     alpha_ctx->opaque = picture_Hold(opaque);
-    alpha_ctx->alpha  = picture_Hold(alpha);
+    alpha_ctx->alpha  = alpha ? picture_Hold(alpha) : NULL;
     out->context = &alpha_ctx->ctx;
 
     for (int i=0; i<opaque->i_planes; i++)
         out->p[i] = opaque->p[i];
-    out->p[opaque->i_planes] = alpha->p[0];
+    if (alpha)
+        out->p[opaque->i_planes] = alpha->p[0];
+    else
+    {
+        // use the dummy opaque plane attached in the picture p_sys
+        struct pic_alpha_plane *p = out->p_sys;
+        if (out->p_sys == NULL)
+        {
+            int plane_size = bdec->fmt_out.video.i_width * bdec->fmt_out.video.i_height;
+            p = malloc(sizeof(*p) + plane_size);
+            if (likely(p != NULL))
+            {
+                p->p.i_lines = bdec->fmt_out.video.i_height;
+                p->p.i_visible_lines = bdec->fmt_out.video.i_y_offset + bdec->fmt_out.video.i_visible_height;
+
+                p->p.i_pitch = bdec->fmt_out.video.i_width;
+                p->p.i_visible_pitch = bdec->fmt_out.video.i_x_offset + bdec->fmt_out.video.i_visible_width;
+                p->p.i_pixel_pitch = 1;
+                p->p.p_pixels = p->buffer;
+                memset(p->p.p_pixels, 0xFF, plane_size);
+
+                out->p_sys = p;
+            }
+        }
+        if (unlikely(p == NULL))
+        {
+            picture_Release(out);
+            return NULL;
+        }
+        out->p[opaque->i_planes] = p->p;
+    }
     return out;
 }
 
@@ -127,7 +171,8 @@ static int SetupCPU(decoder_t *bdec)
 
     for (; i<ARRAY_SIZE(pics); i++)
     {
-        pics[i] = picture_NewFromResource(&bdec->fmt_out.video, &(picture_resource_t){0});
+        picture_resource_t res = { .pf_destroy = DestroyPoolPic };
+        pics[i] = picture_NewFromResource(&bdec->fmt_out.video, &res);
         if (pics[i] == NULL)
             goto error;
     }
@@ -187,7 +232,9 @@ static int FormatUpdate( decoder_t *dec, vlc_video_context *vctx )
             // not ready
             bdec->fmt_out.video.i_chroma = bdec->fmt_out.i_codec = dec->fmt_out.video.i_chroma;
             p_sys->pf_combine = CombineKeepOpaque;
-            goto done;
+            if (p_sys->missing_alpha.size == 0)
+                goto done;
+            // we need to send pictures without waiting for the alpha
         }
     }
     es_format_Clean(&bdec->fmt_out);
@@ -255,15 +302,44 @@ done:
     return res;
 }
 
+static bool CheckMissingAlpha(decoder_t *bdec, vlc_tick_t pts)
+{
+    vpx_alpha *p_sys = bdec->p_sys;
+    vlc_tick_t missing_pts;
+    vlc_vector_foreach(missing_pts, &p_sys->missing_alpha)
+    {
+        if (missing_pts == pts)
+            return true;
+        if (missing_pts < pts)
+            break;
+    }
+    return false;
+}
+
+static void PurgeMissingAlpha(decoder_t *bdec, vlc_tick_t pts)
+{
+    vpx_alpha *p_sys = bdec->p_sys;
+    size_t count = 0;
+    vlc_tick_t missing_pts;
+    vlc_vector_foreach(missing_pts, &p_sys->missing_alpha)
+    {
+        if (missing_pts > pts)
+            break; // in VPx there are not frames out of order
+        count++;
+    }
+    if (count > 0)
+        vlc_vector_remove_slice(&p_sys->missing_alpha, 0, count);
+}
+
 static bool SendMergedLocked(decoder_t *bdec)
 {
     vpx_alpha *p_sys = bdec->p_sys;
 
     picture_t *opaque = vlc_picture_chain_PeekFront(&p_sys->opaque->decoded);
     picture_t *alpha  = vlc_picture_chain_PeekFront(&p_sys->alpha->decoded);
-    while (opaque != NULL && alpha != NULL)
+    while (opaque != NULL && (alpha != NULL || CheckMissingAlpha(bdec, opaque->date)))
     {
-        if (opaque->date == alpha->date)
+        if (alpha == NULL || opaque->date == alpha->date)
         {
             // dequeue if both first of the queue match DTS/PTS
             // merge alpha and opaque pictures with same DTS/PTS and send them
@@ -277,11 +353,15 @@ static bool SendMergedLocked(decoder_t *bdec)
             vlc_picture_chain_PopFront(&p_sys->opaque->decoded);
             picture_Release(opaque);
 
-            vlc_picture_chain_PopFront(&p_sys->alpha->decoded);
-            picture_Release(alpha);
+            if (alpha != NULL)
+            {
+                vlc_picture_chain_PopFront(&p_sys->alpha->decoded);
+                picture_Release(alpha);
+            }
 
+            PurgeMissingAlpha(bdec, opaque->date);
             if (out == NULL)
-                return false;
+                break;
 
             decoder_QueueVideo(bdec, out);
             return true;
@@ -384,17 +464,12 @@ static int Decode( decoder_t *dec, vlc_frame_t *frame )
     {
         struct vlc_ancillary *p_alpha;
         p_alpha = vlc_frame_GetAncillary(frame, VLC_ANCILLARY_ID_VPX_ALPHA);
-        if (p_alpha == NULL)
-        {
-            msg_Err(dec, "missing alpha data");
-            return VLCDEC_ECRITICAL;
-        }
 
         struct alpha_frame *alpha_frame = malloc(sizeof(*alpha_frame));
         if (unlikely(alpha_frame == NULL))
             return VLCDEC_ECRITICAL;
 
-        vlc_vpx_alpha_t *alpha = vlc_ancillary_GetData(p_alpha);
+        vlc_vpx_alpha_t *alpha = p_alpha ? vlc_ancillary_GetData(p_alpha) : NULL;
 
         static const struct vlc_frame_callbacks cbs_alpha = {
             ReleaseAlphaFrame,
@@ -407,12 +482,16 @@ static int Decode( decoder_t *dec, vlc_frame_t *frame )
         alpha_frame->frame = frame;
         vlc_atomic_rc_init(&alpha_frame->rc);
 
-        vlc_frame_Init(&alpha_frame->alpha, &cbs_alpha, alpha->data, alpha->size);
-        vlc_atomic_rc_inc(&alpha_frame->rc);
-        alpha_frame->alpha.i_dts = frame->i_dts;
-        alpha_frame->alpha.i_pts = frame->i_pts;
-        alpha_frame->alpha.i_length = frame->i_length;
-        alpha_frame->alpha.i_flags = frame->i_flags;
+        bool b_has_alpha = alpha != NULL;
+        if (b_has_alpha)
+        {
+            vlc_frame_Init(&alpha_frame->alpha, &cbs_alpha, alpha->data, alpha->size);
+            vlc_atomic_rc_inc(&alpha_frame->rc);
+            alpha_frame->alpha.i_dts = frame->i_dts;
+            alpha_frame->alpha.i_pts = frame->i_pts;
+            alpha_frame->alpha.i_length = frame->i_length;
+            alpha_frame->alpha.i_flags = frame->i_flags;
+        }
 
         vlc_frame_Init(&alpha_frame->opaque, &cbs_opaque, frame->p_buffer, frame->i_buffer);
         alpha_frame->opaque.i_dts = frame->i_dts;
@@ -420,17 +499,25 @@ static int Decode( decoder_t *dec, vlc_frame_t *frame )
         alpha_frame->opaque.i_length = frame->i_length;
         alpha_frame->opaque.i_flags = frame->i_flags;
 
+        if (b_has_alpha)
+        {
+            res = p_sys->alpha->dec.pf_decode(&p_sys->alpha->dec, &alpha_frame->alpha);
+            if (res != VLCDEC_SUCCESS)
+            {
+                ReleaseAlphaFrame(&alpha_frame->alpha);
+                return VLCDEC_ECRITICAL;
+            }
+        }
+        else
+        {
+            assert(frame->i_pts != VLC_TICK_INVALID);
+            vlc_vector_push(&p_sys->missing_alpha, frame->i_pts);
+        }
+
         res = p_sys->opaque->dec.pf_decode(&p_sys->opaque->dec, &alpha_frame->opaque);
         if (res != VLCDEC_SUCCESS)
         {
             ReleaseOpaqueFrame(&alpha_frame->opaque);
-            return VLCDEC_ECRITICAL;
-        }
-
-        res = p_sys->alpha->dec.pf_decode(&p_sys->alpha->dec, &alpha_frame->alpha);
-        if (res != VLCDEC_SUCCESS)
-        {
-            ReleaseAlphaFrame(&alpha_frame->alpha);
             return VLCDEC_ECRITICAL;
         }
     }
@@ -515,6 +602,7 @@ int OpenDecoder(vlc_object_t *o)
     es_format_Init(&p_sys->alpha->fmt_out, VIDEO_ES, 0);
 
     vlc_mutex_init(&p_sys->lock);
+    vlc_vector_init(&p_sys->missing_alpha);
     dec->p_sys = p_sys;
 
     static const struct decoder_owner_callbacks dec_cbs =
@@ -569,4 +657,5 @@ void CloseDecoder(vlc_object_t *o)
 
     if (p_sys->vctx)
         vlc_video_context_Release(p_sys->vctx);
+    vlc_vector_destroy(&p_sys->missing_alpha);
 }
