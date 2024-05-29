@@ -250,7 +250,7 @@ MainInterface.MainTableView {
     // Childs
     //---------------------------------------------------------------------------------------------
 
-    Widgets.TableColumns {
+    Widgets.MLTableColumns {
         id: table
 
         titleCover_width: isMusic ? VLCStyle.trackListAlbumCover_width
