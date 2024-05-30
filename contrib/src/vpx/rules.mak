@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.13.1
+VPX_VERSION := 1.14.1
 VPX_URL := $(GITHUB)/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
@@ -27,6 +27,9 @@ ifeq ($(ARCH),aarch64)
 	$(APPLY) $(SRC)/vpx/libvpx-darwin-aarch64.patch
 endif
 endif
+	# Disable automatic addition of -fembed-bitcode for iOS
+	# as it is enabled through --extra-cflags if necessary.
+	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
 	$(MOVE)
 
 DEPS_vpx =
@@ -125,11 +128,19 @@ ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 else
 VPX_CONF += --extra-cflags="-mstackrealign"
+ifeq ($(ARCH),arm)
+# As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for Windows armv7
+VPX_CONF += --disable-runtime-cpu-detect
+endif
 endif
 ifdef HAVE_DARWIN_OS
 VPX_CONF += --enable-vp8-decoder --disable-tools
 VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 ifdef HAVE_IOS
+ifeq ($(ARCH),arm)
+# As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for iOS arm7
+VPX_CONF += --disable-runtime-cpu-detect
+endif
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 endif
 ifdef HAVE_MACOSX

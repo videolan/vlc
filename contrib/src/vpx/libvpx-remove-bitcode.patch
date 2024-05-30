@@ -1,0 +1,15 @@
+--- libvpx-1.14.0/build/make/configure.sh	2024-01-24 15:55:34.070346026 -0500
++++ libvpx-1.14.0-new/build/make/configure.sh	2024-01-24 15:57:57.821681598 -0500
+@@ -1090,12 +1090,6 @@
+                 fi
+                 ;;
+             esac
+-
+-            if [ "$(show_darwin_sdk_major_version iphoneos)" -gt 8 ]; then
+-              check_add_cflags -fembed-bitcode
+-              check_add_asflags -fembed-bitcode
+-              check_add_ldflags -fembed-bitcode
+-            fi
+           fi
+ 
+           asm_conversion_cmd="${source_path_mk}/build/make/ads2gas_apple.pl"

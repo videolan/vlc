@@ -1,6 +1,6 @@
---- libvpx-1.13.0/build/make/configure.sh	2023-02-07 20:33:51.000000000 -0500
-+++ libvpx-1.13.0-new/build/make/configure.sh	2023-03-24 11:41:25.477967730 -0400
-@@ -1119,7 +1119,7 @@
+--- libvpx-1.14.0/build/make/configure.sh	2024-01-24 14:51:54.835698759 -0500
++++ libvpx-1.14.0-new/build/make/configure.sh	2024-01-24 14:54:28.595456073 -0500
+@@ -1146,7 +1146,7 @@
  
          darwin)
            if ! enabled external_build; then
@@ -9,7 +9,7 @@
              CXX="$(${XCRUN_FIND} clang++)"
              CC="$(${XCRUN_FIND} clang)"
              AR="$(${XCRUN_FIND} ar)"
-@@ -1138,7 +1138,7 @@
+@@ -1165,7 +1165,7 @@
              add_cflags -arch ${tgt_isa}
              add_ldflags -arch ${tgt_isa}
  
