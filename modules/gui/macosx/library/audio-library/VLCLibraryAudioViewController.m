@@ -181,10 +181,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryCollectionView.dataSource = _audioDataSource;
     _audioLibraryCollectionView.delegate = _audioLibraryCollectionViewDelegate;
 
-    _audioLibraryCollectionView.selectable = YES;
-    _audioLibraryCollectionView.allowsMultipleSelection = YES;
-    _audioLibraryCollectionView.allowsEmptySelection = YES;
-
     const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
 
@@ -222,10 +218,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     _audioLibraryGridModeSplitViewListSelectionCollectionView.dataSource = _audioGroupDataSource;
     _audioLibraryGridModeSplitViewListSelectionCollectionView.delegate = _audioLibraryCollectionViewDelegate;
-
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.selectable = YES;
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsMultipleSelection = NO;
-    _audioLibraryGridModeSplitViewListSelectionCollectionView.allowsEmptySelection = YES;
 
     const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = [VLCLibraryUIUnits collectionViewSectionInsets];
