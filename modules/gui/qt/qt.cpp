@@ -96,6 +96,7 @@ extern "C" char **environ;
 #include <vlc_window.h>
 #include <vlc_player.h>
 #include <vlc_threads.h>
+#include <vlc_messages.h>
 
 #include <QQuickWindow>
 
@@ -744,11 +745,21 @@ static void *Thread( void *obj )
         QString filterRules;
 
         const int verbosity = var_InheritInteger(p_intf, "verbose");
-        if (verbosity < 2)
+        if (verbosity < VLC_MSG_DBG)
         {
             filterRules += QStringLiteral("*.debug=false\n");
-            if (verbosity < 1)
+            if (verbosity < VLC_MSG_WARN)
+            {
                 filterRules += QStringLiteral("*.warning=false\n");
+                if (verbosity < VLC_MSG_ERR)
+                {
+                    filterRules += QStringLiteral("*.critical=false\n");
+                    if (verbosity < VLC_MSG_INFO)
+                    {
+                        filterRules += QStringLiteral("*.info=false\n");
+                    }
+                }
+            }
         }
 
         if (var_InheritBool(p_intf, "qt-verbose"))
