@@ -188,7 +188,7 @@ T.Control {
                             rowModel: Qt.binding(() => delegate.rowModel),
                             colModel: Qt.binding(() => loader.modelData.model),
                             index: Qt.binding(() => delegate.index),
-                            currentlyFocused: Qt.binding(() => delegate.activeFocus),
+                            currentlyFocused: Qt.binding(() => delegate.visualFocus),
                             selected: Qt.binding(() => delegate.selected),
                             containsMouse: Qt.binding(() => hoverArea.containsMouse),
                             colorContext: Qt.binding(() => theme),
