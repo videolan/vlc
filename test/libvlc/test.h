@@ -63,6 +63,12 @@ static const char test_default_sample[] = "mock://";
 
 #define test_log( ... ) printf( "testapi: " __VA_ARGS__ );
 
+static inline void test_setup(void)
+{
+    setenv("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
+    setenv("VLC_LIB_PATH", TOP_BUILDDIR, 1);
+}
+
 static inline void test_init (void)
 {
     (void)test_default_sample; /* This one may not be used */
@@ -84,8 +90,7 @@ static inline void test_init (void)
     if (alarm_timeout != 0)
         alarm (alarm_timeout);
 
-    setenv( "VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1 );
-    setenv( "VLC_LIB_PATH", TOP_BUILDDIR, 1 );
+    test_setup();
 }
 
 #endif /* TEST_H */
