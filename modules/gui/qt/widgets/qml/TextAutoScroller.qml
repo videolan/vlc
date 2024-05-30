@@ -34,10 +34,6 @@ Item {
     readonly property real requiredTextWidth: label.implicitWidth
     readonly property bool _needsToScroll: (label.width < requiredTextWidth)
 
-    ToolTip.delay: VLCStyle.delayToolTipAppear
-    ToolTip.visible: scrolling && hoverArea.containsMouse
-    ToolTip.text: label.text
-
     //Accessible
     Accessible.role: Accessible.StaticText
     Accessible.name: label.text
