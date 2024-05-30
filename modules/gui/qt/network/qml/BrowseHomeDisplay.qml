@@ -127,7 +127,7 @@ FocusScope {
         text: qsTr("No network shares found")
     }
 
-    ScrollView {
+    Flickable {
         id: flickable
 
         anchors.fill: parent
@@ -135,9 +135,19 @@ FocusScope {
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
 
+        ScrollBar.vertical: ScrollBar { }
+
+        flickableDirection: Flickable.AutoFlickIfNeeded
+        boundsBehavior: Flickable.StopAtBounds
+
         focus: true
 
+        contentWidth: column.width
+        contentHeight: column.height
+
         Column {
+            id: column
+
             width: foldersSection.width
             height: implicitHeight
 
