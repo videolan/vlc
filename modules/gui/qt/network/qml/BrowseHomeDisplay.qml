@@ -145,6 +145,8 @@ FocusScope {
         contentWidth: column.width
         contentHeight: column.height
 
+        Util.FlickableScrollHandler { }
+
         Column {
             id: column
 
