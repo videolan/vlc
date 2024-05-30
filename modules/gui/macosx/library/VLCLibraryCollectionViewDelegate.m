@@ -55,14 +55,13 @@
 
 - (void)collectionView:(NSCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
-    NSIndexPath *indexPath = indexPaths.anyObject;
-    if (!indexPath) {
-        return;
-    }
+    VLCLibraryCollectionViewFlowLayout * const collectionViewFlowLayout = 
+        (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
 
-    VLCLibraryCollectionViewFlowLayout *collectionViewFlowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
     if (collectionViewFlowLayout) {
-        [collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
+        for (NSIndexPath * const indexPath in indexPaths) {
+            [collectionViewFlowLayout collapseDetailSectionAtIndex:indexPath];
+        }
     }
 }
 
