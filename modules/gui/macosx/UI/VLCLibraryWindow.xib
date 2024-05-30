@@ -626,8 +626,8 @@
                         <rect key="frame" x="1" y="1" width="867" height="806"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView allowsMultipleSelection="YES" id="neh-e5-MUa">
-                                <rect key="frame" x="0.0" y="0.0" width="869" height="158"/>
+                            <collectionView selectable="YES" allowsMultipleSelection="YES" id="neh-e5-MUa">
+                                <rect key="frame" x="0.0" y="0.0" width="871" height="158"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="0sw-3B-cXl">
                                     <size key="itemSize" width="50" height="50"/>
@@ -993,7 +993,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <collectionView allowsMultipleSelection="YES" id="ZGR-PZ-7h5">
+                                    <collectionView selectable="YES" allowsMultipleSelection="YES" id="ZGR-PZ-7h5">
                                         <rect key="frame" x="0.0" y="0.0" width="415" height="390"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                         <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="od3-Iu-ch8">
@@ -1150,7 +1150,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <collectionView allowsMultipleSelection="YES" id="QAt-jP-zE7">
+                            <collectionView selectable="YES" allowsMultipleSelection="YES" id="QAt-jP-zE7">
                                 <rect key="frame" x="0.0" y="0.0" width="714" height="390"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="oKT-Ic-UdV">
