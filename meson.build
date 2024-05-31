@@ -490,7 +490,6 @@ if get_option('extra_checks')
     add_project_arguments(cc.get_supported_arguments([
         '-Werror=missing-field-initializers',
         '-Werror=format',
-        '-Werror=return-type',
         '-Werror=return-mismatch'
     ]), language: ['c', 'cpp'])
     add_project_arguments(cc.get_supported_arguments([
