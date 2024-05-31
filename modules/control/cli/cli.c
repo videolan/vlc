@@ -543,7 +543,7 @@ static void cli_client_delete(struct cli_client *cl)
     free(cl);
 }
 
-static void *Run(void *data)
+_Noreturn static void *Run(void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
