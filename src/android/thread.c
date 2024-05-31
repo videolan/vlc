@@ -35,7 +35,6 @@
 #include <signal.h>
 #include <errno.h>
 #include <stdatomic.h>
-#include <stdnoreturn.h>
 #include <time.h>
 #include <assert.h>
 
