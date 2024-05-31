@@ -235,8 +235,7 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;
         }
 
-        if( p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF &&
-            p_sps->vui.b_valid )
+        if( p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF )
         {
             h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
                                   &p_dec->fmt_out.video.transfer,
