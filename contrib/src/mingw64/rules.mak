@@ -16,12 +16,9 @@ PKGS += dcomp
 endif # !HAVE_WINSTORE
 PKGS += dxva dxvahd mingw11-fixes mft10 d3d12
 
-ifeq ($(call mingw_at_least, 9), true)
-PKGS_FOUND += d3d12
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
 endif # HAVE_WINSTORE
-endif # MINGW 9
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva mft10
 endif # MINGW 10
@@ -32,7 +29,7 @@ ifeq ($(call mingw_at_least, 11), true)
 PKGS_FOUND += dxvahd
 endif # MINGW 11
 ifeq ($(call mingw_at_least, 12), true)
-PKGS_FOUND += mingw11-fixes
+PKGS_FOUND += mingw11-fixes d3d12
 endif # MINGW 12
 endif # !HAVE_VISUALSTUDIO
 
