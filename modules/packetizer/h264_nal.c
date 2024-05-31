@@ -400,10 +400,9 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     }
 
     /* vui */
-    i_tmp = bs_read( p_bs, 1 );
-    if( i_tmp )
+    p_sps->vui_parameters_present_flag = bs_read( p_bs, 1 );
+    if( p_sps->vui_parameters_present_flag )
     {
-        p_sps->vui.b_valid = true;
         /* read the aspect ratio part if any */
         i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
@@ -895,7 +894,7 @@ bool h264_get_colorimetry( const h264_sequence_parameter_set_t *p_sps,
                            video_color_space_t *p_colorspace,
                            video_color_range_t *p_full_range )
 {
-    if( !p_sps->vui.b_valid )
+    if( !p_sps->vui_parameters_present_flag )
         return false;
     *p_primaries =
         iso_23001_8_cp_to_vlc_primaries( p_sps->vui.colour.i_colour_primaries );

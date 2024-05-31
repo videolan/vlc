@@ -223,7 +223,7 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
         {
             /* on first run == if fmt_in does not provide frame rate info */
             /* If we have frame rate info in the stream */
-            if(p_sps->vui.b_valid &&
+            if(p_sps->vui_parameters_present_flag &&
                p_sps->vui.i_num_units_in_tick > 0 &&
                p_sps->vui.i_time_scale > 1 )
             {
@@ -777,7 +777,7 @@ static bool CanSwapPTSwithDTS( const h264_slice_t *p_slice,
 {
     if( p_slice->i_nal_ref_idc == 0 && p_slice->type == H264_SLICE_TYPE_B )
         return true;
-    else if( p_sps->vui.b_valid )
+    else if( p_sps->vui_parameters_present_flag )
         return p_sps->vui.i_max_num_reorder_frames == 0;
     else
         return p_sps->i_profile == PROFILE_H264_CAVLC_INTRA;
@@ -1224,7 +1224,7 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
                 break;
             }
 
-            if( p_sps->vui.b_valid )
+            if( p_sps->vui_parameters_present_flag )
             {
                 if( p_sps->vui.b_hrd_parameters_present_flag )
                 {

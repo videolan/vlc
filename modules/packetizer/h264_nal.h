@@ -130,8 +130,8 @@ struct h264_sequence_parameter_set_t
     int32_t offset_for_ref_frame[255];
     int i_log2_max_pic_order_cnt_lsb;
 
+    bool vui_parameters_present_flag;
     struct {
-        bool b_valid;
         int i_sar_num, i_sar_den;
         struct {
             bool b_full_range;
