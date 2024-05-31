@@ -209,8 +209,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/audio-library/VLCLibraryAudioViewController.m \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h \
 	gui/macosx/library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.m \
-	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h \
-	gui/macosx/library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibrarySongTableCellView.m \
 	gui/macosx/library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h \
@@ -451,7 +449,6 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryCarouselViewItemView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewAlbumSupplementaryDetailView.xib \
-	gui/macosx/UI/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.xib \
 	gui/macosx/UI/VLCLibraryHeroView.xib \
 	gui/macosx/UI/VLCLibrarySongTableCellView.xib \
