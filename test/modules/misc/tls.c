@@ -115,7 +115,7 @@ static vlc_tls_t *securepair(vlc_thread_t *th,
     return client;
 }
 
-#define CERTDIR SRCDIR "/samples/certs"
+#define CERTDIR TOP_SRCDIR "/test/samples/certs"
 #define CERTFILE CERTDIR "/certkey.pem"
 
 static const char *const test_cert_argv[] = {
