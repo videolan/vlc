@@ -801,9 +801,9 @@ Add(sout_stream_t *stream, const es_format_t *fmt, const char *es_id)
     hls_playlist_t *playlist;
     if (map != NULL)
     {
-        if (map->playlist_ref == NULL)
-            map->playlist_ref = AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->variant_playlists);
         playlist = map->playlist_ref;
+        if (playlist == NULL)
+            playlist = AddPlaylist(stream, HLS_PLAYLIST_TYPE_TS, &sys->variant_playlists);
     }
     else if (fmt->i_cat == SPU_ES)
         playlist = AddPlaylist(
