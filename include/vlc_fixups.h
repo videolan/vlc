@@ -768,11 +768,6 @@ void sincosf(float, float *, float *);
 char *realpath(const char * restrict pathname, char * restrict resolved_path);
 #endif
 
-/* mingw-w64 has a broken IN6_IS_ADDR_MULTICAST macro */
-#if defined(_WIN32) && defined(__MINGW64_VERSION_MAJOR)
-# define IN6_IS_ADDR_MULTICAST IN6_IS_ADDR_MULTICAST
-#endif
-
 #ifdef __APPLE__
 # define fdatasync fsync
 
