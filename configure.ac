@@ -1028,13 +1028,13 @@ AX_APPEND_COMPILE_FLAGS([-pipe], [CFLAGS])
 dnl Checks for socket stuff
 VLC_SAVE_FLAGS
 SOCKET_LIBS=""
-AC_SEARCH_LIBS(connect, [socket], [
-  AS_IF([test "$ac_cv_search_connect" != "none required"], [
-    SOCKET_LIBS="$ac_cv_search_connect"
-  ])
-], [
-  AS_IF([test "${SYS}" = "mingw32"], [
-    SOCKET_LIBS="-lws2_32 -liphlpapi"
+AS_IF([test "${SYS}" = "mingw32"], [
+  SOCKET_LIBS="-lws2_32 -liphlpapi"
+],[
+  AC_SEARCH_LIBS(connect, [socket], [
+    AS_IF([test "$ac_cv_search_connect" != "none required"], [
+      SOCKET_LIBS="$ac_cv_search_connect"
+    ])
   ])
 ])
 
