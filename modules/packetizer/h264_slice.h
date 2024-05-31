@@ -49,7 +49,6 @@ unsigned h264_get_frame_num( const h264_slice_t *p_slice );
 unsigned h264_get_nal_ref_idc( const h264_slice_t *p_slice );
 bool h264_has_mmco5( const h264_slice_t *p_slice );
 void h264_slice_release( h264_slice_t *p_slice );
-void h264_slice_init( h264_slice_t *p_slice );
 void h264_slice_copy_idr_id( const h264_slice_t *src, h264_slice_t *dst );
 
 

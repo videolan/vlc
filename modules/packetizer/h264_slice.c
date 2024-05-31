@@ -89,27 +89,9 @@ void h264_slice_release( h264_slice_t *p_slice )
     free( p_slice );
 }
 
-void h264_slice_init( h264_slice_t *p_slice )
-{
-    p_slice->i_nal_type = -1;
-    p_slice->i_nal_ref_idc = -1;
-    p_slice->i_idr_pic_id = -1;
-    p_slice->i_frame_num = 0;
-    p_slice->type = H264_SLICE_TYPE_UNKNOWN;
-    p_slice->i_pic_parameter_set_id = -1;
-    p_slice->i_field_pic_flag = 0;
-    p_slice->i_bottom_field_flag = -1;
-    p_slice->i_pic_order_cnt_type = -1;
-    p_slice->i_pic_order_cnt_lsb = -1;
-    p_slice->i_delta_pic_order_cnt_bottom = -1;
-    p_slice->i_delta_pic_order_cnt0 = 0;
-    p_slice->i_delta_pic_order_cnt1 = 0;
-    p_slice->has_mmco5 = false;
-}
-
 void h264_slice_copy_idr_id( const h264_slice_t *src, h264_slice_t *dst )
 {
-    if( !src || dst->i_idr_pic_id != -1 )
+    if( !src || src->i_nal_type != H264_NAL_SLICE_IDR ) /* value only set on IDR */
         return;
     dst->i_idr_pic_id = src->i_idr_pic_id;
 }
@@ -123,7 +105,6 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     h264_slice_t *p_slice = calloc( 1, sizeof(*p_slice) );
     if( !p_slice )
         return NULL;
-    h264_slice_init( p_slice );
 
     int i_slice_type;
     bs_t s;
@@ -495,22 +476,23 @@ bool h264_IsFirstVCLNALUnit( const h264_slice_t *p_prev, const h264_slice_t *p_c
         p_cur->i_field_pic_flag != p_prev->i_field_pic_flag ||
         !p_cur->i_nal_ref_idc != !p_prev->i_nal_ref_idc )
         return true;
-    if( (p_cur->i_bottom_field_flag != -1) &&
-        (p_prev->i_bottom_field_flag != -1) &&
-        (p_cur->i_bottom_field_flag != p_prev->i_bottom_field_flag) )
+    if( p_cur->i_field_pic_flag && /* present in both and differs in value */
+        p_cur->i_bottom_field_flag != p_prev->i_bottom_field_flag )
         return true;
-    if( p_cur->i_pic_order_cnt_type == 0 &&
-        ( p_cur->i_pic_order_cnt_lsb != p_prev->i_pic_order_cnt_lsb ||
-         p_cur->i_delta_pic_order_cnt_bottom != p_prev->i_delta_pic_order_cnt_bottom ) )
-        return true;
-    else if( p_cur->i_pic_order_cnt_type == 1 &&
-             ( p_cur->i_delta_pic_order_cnt0 != p_prev->i_delta_pic_order_cnt0 ||
-              p_cur->i_delta_pic_order_cnt1 != p_prev->i_delta_pic_order_cnt1 ) )
-        return true;
+    if( p_cur->i_pic_order_cnt_type == p_prev->i_pic_order_cnt_type )
+    {
+        if( p_cur->i_pic_order_cnt_type == 0 &&
+            ( p_cur->i_pic_order_cnt_lsb != p_prev->i_pic_order_cnt_lsb ||
+             p_cur->i_delta_pic_order_cnt_bottom != p_prev->i_delta_pic_order_cnt_bottom ) )
+            return true;
+        else if( p_cur->i_pic_order_cnt_type == 1 &&
+                 ( p_cur->i_delta_pic_order_cnt0 != p_prev->i_delta_pic_order_cnt0 ||
+                  p_cur->i_delta_pic_order_cnt1 != p_prev->i_delta_pic_order_cnt1 ) )
+            return true;
+    }
     if( ( p_cur->i_nal_type == H264_NAL_SLICE_IDR || p_prev->i_nal_type == H264_NAL_SLICE_IDR ) &&
         ( p_cur->i_nal_type != p_prev->i_nal_type || p_cur->i_idr_pic_id != p_prev->i_idr_pic_id ) )
         return true;
-
     return false;
 }
 

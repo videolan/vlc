@@ -99,6 +99,9 @@ void h264_release_sps( h264_sequence_parameter_set_t * );
 void h264_release_pps( h264_picture_parameter_set_t * );
 void h264_release_sps_extension( h264_sequence_parameter_set_extension_t * );
 
+uint8_t h264_get_sps_id( const h264_sequence_parameter_set_t * );
+uint8_t h264_get_pps_sps_id( const h264_picture_parameter_set_t * );
+
 struct h264_sequence_parameter_set_t
 {
     uint8_t i_id;
@@ -207,6 +210,14 @@ uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
 bool h264_get_dpb_values( const h264_sequence_parameter_set_t *,
                           uint8_t *pi_depth, unsigned *pi_delay );
 
+unsigned h264_get_max_frame_num( const h264_sequence_parameter_set_t * );
+bool h264_is_frames_only( const h264_sequence_parameter_set_t * );
+bool h264_using_adaptive_frames( const h264_sequence_parameter_set_t * );
+
+bool h264_get_sps_profile_tier_level( const h264_sequence_parameter_set_t *,
+                                     uint8_t *pi_profile, uint8_t *pi_level );
+bool h264_get_constraints_set( const h264_sequence_parameter_set_t *p_sps,
+                               uint8_t *pi_constraints );
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *,
                             unsigned *p_ox, unsigned *p_oy,
                             unsigned *p_w, unsigned *p_h,

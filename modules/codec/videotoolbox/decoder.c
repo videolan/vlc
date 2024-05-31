@@ -201,7 +201,7 @@ static void GetxPSH264(uint8_t i_pps_id, void *priv,
     if (*pp_pps == NULL)
         *pp_sps = NULL;
     else
-        *pp_sps = h264ctx->hh.h264.sps_list[(*pp_pps)->i_sps_id].h264_sps;
+        *pp_sps = h264ctx->hh.h264.sps_list[h264_get_pps_sps_id(*pp_pps)].h264_sps;
 }
 
 struct sei_callback_h264_s
@@ -271,7 +271,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                 p_info->b_keyframe = slicetype == H264_SLICE_TYPE_I;
                 p_info->b_flush = p_info->b_keyframe || h264_has_mmco5(slice);
                 p_info->b_field = h264_is_field_pic(slice);
-                p_info->b_progressive = !p_sps->mb_adaptive_frame_field_flag &&
+                p_info->b_progressive = !h264_using_adaptive_frames(p_sps) &&
                                         !p_info->b_field;
 
                 struct sei_callback_h264_s sei;

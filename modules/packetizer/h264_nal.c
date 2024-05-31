@@ -774,6 +774,16 @@ bool h264_get_xps_id( const uint8_t *p_buf, size_t i_buf, uint8_t *pi_id )
     return !bs_error( &bs ) && *pi_id <= i_max;
 }
 
+uint8_t h264_get_sps_id( const h264_sequence_parameter_set_t *p_sps )
+{
+    return p_sps->i_id;
+}
+
+uint8_t h264_get_pps_sps_id( const h264_picture_parameter_set_t *p_pps )
+{
+    return p_pps->i_sps_id;
+}
+
 static const h264_level_limits_t * h264_get_level_limits( const h264_sequence_parameter_set_t *p_sps )
 {
     uint16_t i_level_number = p_sps->i_level;
@@ -841,6 +851,37 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
     *pi_depth = i_max_num_reorder_frames;
     *pi_delay = 0;
 
+    return true;
+}
+
+unsigned h264_get_max_frame_num( const h264_sequence_parameter_set_t *p_sps )
+{
+    return 1 << (p_sps->i_log2_max_frame_num + 4);
+}
+
+bool h264_is_frames_only( const h264_sequence_parameter_set_t *p_sps )
+{
+    return p_sps->frame_mbs_only_flag;
+}
+
+bool h264_using_adaptive_frames( const h264_sequence_parameter_set_t *p_sps )
+{
+    return p_sps->mb_adaptive_frame_field_flag;
+}
+
+
+bool h264_get_sps_profile_tier_level( const h264_sequence_parameter_set_t *p_sps,
+                                      uint8_t *pi_profile, uint8_t *pi_level)
+{
+    *pi_profile = p_sps->i_profile;
+    *pi_level = p_sps->i_level;
+    return true;
+}
+
+bool h264_get_constraints_set( const h264_sequence_parameter_set_t *p_sps,
+                               uint8_t *pi_constraints )
+{
+    *pi_constraints = p_sps->i_constraint_set_flags;
     return true;
 }
 

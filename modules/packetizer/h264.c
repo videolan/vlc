@@ -200,8 +200,12 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
 
     if( p_sps )
     {
-        p_dec->fmt_out.i_profile = p_sps->i_profile;
-        p_dec->fmt_out.i_level = p_sps->i_level;
+        uint8_t pl[2];
+        if( h264_get_sps_profile_tier_level( p_sps, pl, &pl[1] ) )
+        {
+            p_dec->fmt_out.i_profile = pl[0];
+            p_dec->fmt_out.i_level = pl[1];
+        }
 
         (void) h264_get_picture_size( p_sps,
                                       &p_dec->fmt_out.video.i_x_offset,
@@ -789,7 +793,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( p_sys->i_recoveryfnum != UINT_MAX )
     {
         assert(p_sys->b_recovered == false);
-        const unsigned maxFrameNum = 1 << (p_sps->i_log2_max_frame_num + 4);
+        const unsigned maxFrameNum = h264_get_max_frame_num( p_sps );
 
         if( ( p_sys->i_recoveryfnum > maxFrameNum &&
               i_frame_num < p_sys->i_recoverystartfnum &&
@@ -851,7 +855,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     unsigned i_num_clock_ts = h264_get_num_ts( p_sps, p_sys->p_slice, p_sys->i_pic_struct, tFOC, bFOC );
 
-    if( p_sps->frame_mbs_only_flag == 0 && p_sps->vui.b_pic_struct_present_flag )
+    if( !h264_is_frames_only( p_sps ) && p_sys->i_pic_struct != UINT8_MAX )
     {
         switch( p_sys->i_pic_struct )
         {
@@ -1138,7 +1142,7 @@ static void GetSPSPPS( uint8_t i_pps_id, void *priv,
     if( *pp_pps == NULL )
         *pp_sps = NULL;
     else
-        *pp_sps = p_sys->sps[(*pp_pps)->i_sps_id].p_sps;
+        *pp_sps = p_sys->sps[h264_get_pps_sps_id(*pp_pps)].p_sps;
 }
 
 static h264_slice_t * ParseSliceHeader( decoder_t *p_dec, const block_t *p_frag )
