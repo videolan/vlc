@@ -55,6 +55,9 @@ extern "C" char **environ;
 #include <QQmlError>
 #include <QList>
 #include <QTranslator>
+#ifdef _WIN32
+#include <QOperatingSystemVersion>
+#endif
 
 #include "qt.hpp"
 
@@ -63,8 +66,6 @@ extern "C" char **environ;
 #include "dialogs/dialogs_provider.hpp" /* THEDP creation */
 #include "dialogs/dialogs/dialogmodel.hpp"
 #ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 # include "maininterface/mainctx_win32.hpp"
 #include "maininterface/win32windoweffects_module.hpp"
 #else
@@ -838,21 +839,13 @@ static void *Thread( void *obj )
 #endif
 
 #ifdef _WIN32
-    // QSysInfo::productVersion() returns "unknown" on Windows 7
-    // RHI Fallback does not seem to work.
+    // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
+    //       We have to manually pick a graphics api here for
+    //       Windows 7, since it may not support the default
+    //       graphics api (D3D11).
 
-    DWORD dwVersion = 0;
-    DWORD dwMajorVersion = 0;
-    DWORD dwMinorVersion = 0;
-
-    dwVersion = GetVersion();
-
-    dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-    dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-
-    if (dwMajorVersion <= 6 && dwMinorVersion <= 1)
+    if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8)
         QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
-
 #endif
 
     auto compositor = var_InheritString(p_intf, "qt-compositor");
