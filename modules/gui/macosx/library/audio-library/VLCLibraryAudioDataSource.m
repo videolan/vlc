@@ -41,7 +41,6 @@
 #import "library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
-#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 #import "library/audio-library/VLCLibrarySongsTableViewSongPlayingTableCellView.h"
 
 #import "library/home-library/VLCLibraryHomeViewBaseCarouselContainerView.h"
@@ -412,11 +411,6 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     [collectionView registerNib:albumSupplementaryDetailView
       forSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind
                   withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier];
-
-    NSNib * const audioGroupSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewAudioGroupSupplementaryDetailView" bundle:nil];
-    [collectionView registerNib:audioGroupSupplementaryDetailView
-      forSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind
-                  withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewIdentifier];
 
     NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:@"VLCLibraryCollectionViewMediaItemSupplementaryDetailView" bundle:nil];
     [collectionView registerNib:mediaItemSupplementaryDetailView
@@ -840,25 +834,6 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         }
 
         return albumSupplementaryDetailView;
-
-    } else if ([kind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
-
-        VLCLibraryCollectionViewAudioGroupSupplementaryDetailView* audioGroupSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind forIndexPath:indexPath];
-
-        const id<VLCMediaLibraryAudioGroupProtocol> audioGroup = self.displayedCollection[indexPath.item];
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:audioGroup parentType:_currentParentType];
-
-        audioGroupSupplementaryDetailView.representedItem = representedItem;
-        audioGroupSupplementaryDetailView.selectedItem = [collectionView itemAtIndex:indexPath.item];
-        audioGroupSupplementaryDetailView.parentScrollView = VLCMain.sharedInstance.libraryWindow.audioCollectionViewScrollView;
-        audioGroupSupplementaryDetailView.internalScrollView.scrollParentY = YES;
-
-        VLCLibraryCollectionViewFlowLayout *flowLayout = (VLCLibraryCollectionViewFlowLayout*)collectionView.collectionViewLayout;
-        if (flowLayout != nil) {
-            audioGroupSupplementaryDetailView.layoutScrollDirection = flowLayout.scrollDirection;
-        }
-
-        return audioGroupSupplementaryDetailView;
 
     } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
