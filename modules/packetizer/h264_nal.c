@@ -961,3 +961,24 @@ bool h264_decode_sei_recovery_point( bs_t *p_bs, h264_sei_recovery_point_t *p_re
     //int i_changing_slice_group = bs_read( p_bs, 2 );
     return true;
 }
+
+bool h264_decode_sei_pic_timing(  bs_t *p_bs,
+                                  const h264_sequence_parameter_set_t *p_sps,
+                                  uint8_t *pic_struct, uint8_t *output_delay  )
+{
+    if( !p_sps->vui_parameters_present_flag )
+        return false;
+
+    if( p_sps->vui.b_hrd_parameters_present_flag )
+    {
+        bs_read( p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
+        *output_delay =
+            bs_read( p_bs, p_sps->vui.i_dpb_output_delay_length_minus1 + 1 );
+    }
+
+    if( p_sps->vui.b_pic_struct_present_flag )
+        *pic_struct = bs_read( p_bs, 4 );
+
+    /* + unparsed remains */
+    return true;
+}

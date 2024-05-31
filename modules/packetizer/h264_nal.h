@@ -231,6 +231,9 @@ typedef struct
 } h264_sei_recovery_point_t;
 
 bool h264_decode_sei_recovery_point( bs_t *, h264_sei_recovery_point_t * );
+bool h264_decode_sei_pic_timing(  bs_t *, const h264_sequence_parameter_set_t *,
+                                  uint8_t *, uint8_t *  );
+
 
 #ifdef __cplusplus
 }

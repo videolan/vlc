@@ -215,16 +215,13 @@ static bool ParseH264SEI(const hxxx_sei_data_t *p_sei_data, void *priv)
     if (p_sei_data->i_type == HXXX_SEI_PIC_TIMING)
     {
         struct sei_callback_h264_s *s = priv;
-        if (s->p_sps && s->p_sps->vui.b_valid)
+        if (s->p_sps)
         {
-            if (s->p_sps->vui.b_hrd_parameters_present_flag)
-            {
-                bs_read(p_sei_data->p_bs, s->p_sps->vui.i_cpb_removal_delay_length_minus1 + 1);
-                bs_read(p_sei_data->p_bs, s->p_sps->vui.i_dpb_output_delay_length_minus1 + 1);
-            }
-
-            if (s->p_sps->vui.b_pic_struct_present_flag)
-                s->i_pic_struct = bs_read( p_sei_data->p_bs, 4);
+            uint8_t i_dpb_output_delay;
+            h264_decode_sei_pic_timing( p_sei_data->p_bs, s->p_sps,
+                                       &s->i_pic_struct,
+                                       &i_dpb_output_delay );
+            VLC_UNUSED(i_dpb_output_delay);
         }
         return false;
     }

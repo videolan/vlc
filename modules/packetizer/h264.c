@@ -1190,19 +1190,9 @@ static bool ParseSeiCallback( const hxxx_sei_data_t *p_sei_data, void *cbdata )
                 break;
             }
 
-            if( p_sps->vui_parameters_present_flag )
-            {
-                if( p_sps->vui.b_hrd_parameters_present_flag )
-                {
-                    bs_read( p_sei_data->p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
-                    p_sys->i_dpb_output_delay =
-                            bs_read( p_sei_data->p_bs, p_sps->vui.i_dpb_output_delay_length_minus1 + 1 );
-                }
-
-                if( p_sps->vui.b_pic_struct_present_flag )
-                    p_sys->i_pic_struct = bs_read( p_sei_data->p_bs, 4 );
-                /* + unparsed remains */
-            }
+            h264_decode_sei_pic_timing( p_sei_data->p_bs, p_sps,
+                                       &p_sys->i_pic_struct,
+                                       &p_sys->i_dpb_output_delay );
         } break;
 
             /* Look for user_data_registered_itu_t_t35 */
