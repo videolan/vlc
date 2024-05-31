@@ -122,6 +122,7 @@ endif
 	install $</mingw-w64-headers/include/winbase.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/libloaderapi.h "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/winreg.h "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/heapapi.h      "$(PREFIX)/include"
 
 	# Trick mingw-w64 into just building libwindowsapp.a
 	$(MAKEBUILDDIR)
