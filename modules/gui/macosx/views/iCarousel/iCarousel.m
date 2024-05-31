@@ -1372,6 +1372,11 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     {
         [self scrollToItemAtIndex:0 animated:(_numberOfPlaceholders > 0)];
     }
+
+    [self loadUnloadViews];
+    [self pushAnimationState:NO];
+    [self layOutItemViews];
+    [self popAnimationState];
 }
 
 
