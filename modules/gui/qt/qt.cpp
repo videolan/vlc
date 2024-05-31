@@ -57,6 +57,9 @@ extern "C" char **environ;
 #include <QTranslator>
 #ifdef _WIN32
 #include <QOperatingSystemVersion>
+#if __has_include(<rhi/qrhi.h>)
+#include <rhi/qrhi.h>
+#endif
 #endif
 
 #include "qt.hpp"
@@ -838,16 +841,6 @@ static void *Thread( void *obj )
     // Q_INIT_RESOURCE( qtquickshapes_shaders );
 #endif
 
-#ifdef _WIN32
-    // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
-    //       We have to manually pick a graphics api here for
-    //       Windows 7, since it may not support the default
-    //       graphics api (D3D11).
-
-    if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8)
-        QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
-#endif
-
     auto compositor = var_InheritString(p_intf, "qt-compositor");
     vlc::CompositorFactory compositorFactory(p_intf, compositor);
     free(compositor);
@@ -868,6 +861,30 @@ static void *Thread( void *obj )
     /* Start the QApplication here */
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
+
+#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+    // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
+    //       We have to manually pick a graphics api here for
+    //       Windows 7, since it may not support the default
+    //       graphics api (D3D11).
+
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
+    {
+        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8)
+        {
+            // TODO: Probe D3D12 when it becomes the default.
+            {
+#if __has_include(<rhi/qrhi.h>)
+                QRhiD3D11InitParams params;
+                if (QRhi::probe(QRhi::D3D11, &params))
+                    QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D11);
+                else
+#endif
+                    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+            }
+        }
+    }
+#endif
 
     {
         // Install custom translator:
