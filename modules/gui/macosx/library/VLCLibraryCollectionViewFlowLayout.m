@@ -28,7 +28,6 @@
 #import "library/audio-library/VLCLibraryAudioDataSource.h"
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
-#import "library/audio-library/VLCLibraryCollectionViewAudioGroupSupplementaryDetailView.h"
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
@@ -270,7 +269,6 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         switch(audioDataSource.audioLibrarySegment) {
             case VLCAudioLibraryArtistsSegment:
             case VLCAudioLibraryGenresSegment:
-                [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
                 break;
             case VLCAudioLibraryAlbumsSegment:
                 [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
@@ -295,12 +293,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 {
     BOOL isLibrarySupplementaryView = NO;
 
-    if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind]) {
-
-        isLibrarySupplementaryView = YES;
-        _animationType = self.scrollDirection == NSCollectionViewScrollDirectionVertical ? VLCExpandAnimationTypeVerticalLarge : VLCExpandAnimationTypeHorizontalLarge;
-
-    } else if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
+    if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
                [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         isLibrarySupplementaryView = YES;
@@ -345,8 +338,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 - (NSSet<NSIndexPath *> *)indexPathsToDeleteForSupplementaryViewOfKind:(NSString *)elementKind
 {
-    if ([elementKind isEqualToString:VLCLibraryCollectionViewAudioGroupSupplementaryDetailViewKind] ||
-        [elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
+    if ([elementKind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind] ||
         [elementKind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
 
         return [self.collectionView indexPathsForVisibleSupplementaryElementsOfKind:elementKind];
