@@ -1,9 +1,9 @@
 # winpthreads, dxvahd
 
-MINGW64_VERSION := 11.0.0
+MINGW64_VERSION := 12.0.0
 MINGW64_URL := $(SF)/mingw-w64/mingw-w64/mingw-w64-release/mingw-w64-v$(MINGW64_VERSION).tar.bz2
-MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
-MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
+# MINGW64_HASH=2c35e8ff0d33916bd490e8932cba2049cd1af3d0
+# MINGW64_GITURL := https://git.code.sf.net/p/mingw-w64/mingw-w64
 
 ifdef HAVE_WIN32
 PKGS += winpthreads
@@ -33,8 +33,8 @@ endif # HAVE_WIN32
 
 PKGS_ALL += winpthreads dxva dxvahd mingw11-fixes alloweduwp mft10
 
-$(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
-	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
+# $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
+# 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
 
 $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 	$(call download_pkg,$(MINGW64_URL),winpthreads)
@@ -47,15 +47,6 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetFileInformationByHandle-in-Win10-U.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-VirtualAlloc-Ex-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-CreateHardLinkW-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GetVolumePathNameW-in-Win10-UWP-build.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-more-module-API-in-Win10-UWP-builds.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-GET_MODULE_HANDLE_EX_xxx-defines-in-U.patch
-	$(APPLY) $(SRC)/mingw64/0001-headers-enable-some-Registry-API-calls-in-UWP-8.1-bu.patch
-	$(APPLY) $(SRC)/mingw64/0001-add-api-ms-core-registry-def-files.patch
-	$(APPLY) $(SRC)/mingw64/0001-include-process-fix-bare-DllMain-_CRT_INIT-signature.patch
 	$(MOVE)
 
 .mingw64: mingw64
