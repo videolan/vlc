@@ -19,6 +19,3 @@ QTPLUGIN += qxcb-glx-integration qxcb-egl-integration qxcb qwayland-generic qway
 macx {
 QTPLUGIN += qcocoa qmacstyle
 }
-
-# These are not needed now, but may be required in the future:
-# CONFIG += import_plugins staticlib create_pc create_prl no_install_prl link_prl
