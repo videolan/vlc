@@ -30,54 +30,34 @@ enum h264_slice_type_e
     H264_SLICE_TYPE_UNKNOWN,
 };
 
-typedef struct
+typedef struct h264_slice_s h264_slice_t;
+
+enum h264_slice_type_e h264_get_slice_type( const h264_slice_t *p_slice );
+
+enum h264_slice_struct_e
 {
-    int i_nal_type;
-    int i_nal_ref_idc;
+    H264_SLICE_FRAME,
+    H264_SLICE_FIELD,
+    H264_SLICE_MBAFF,
+};
 
-    enum h264_slice_type_e type;
-    int i_pic_parameter_set_id;
-    unsigned i_frame_num;
+enum h264_slice_struct_e h264_get_slice_struct( const h264_slice_t *p_slice );
+bool h264_is_field_pic( const h264_slice_t *p_slice );
 
-    int i_field_pic_flag;
-    int i_bottom_field_flag;
+int h264_get_slice_pps_id( const h264_slice_t *p_slice );
+unsigned h264_get_frame_num( const h264_slice_t *p_slice );
+unsigned h264_get_nal_ref_idc( const h264_slice_t *p_slice );
+bool h264_has_mmco5( const h264_slice_t *p_slice );
+void h264_slice_release( h264_slice_t *p_slice );
+void h264_slice_init( h264_slice_t *p_slice );
+void h264_slice_copy_idr_id( const h264_slice_t *src, h264_slice_t *dst );
 
-    int i_idr_pic_id;
 
-    int i_pic_order_cnt_type;
-    int i_pic_order_cnt_lsb;
-    int i_delta_pic_order_cnt_bottom;
-
-    int i_delta_pic_order_cnt0;
-    int i_delta_pic_order_cnt1;
-
-    bool no_output_of_prior_pics_flag;
-    bool has_mmco5;
-} h264_slice_t;
-
-static inline void h264_slice_init( h264_slice_t *p_slice )
-{
-    p_slice->i_nal_type = -1;
-    p_slice->i_nal_ref_idc = -1;
-    p_slice->i_idr_pic_id = -1;
-    p_slice->i_frame_num = 0;
-    p_slice->type = H264_SLICE_TYPE_UNKNOWN;
-    p_slice->i_pic_parameter_set_id = -1;
-    p_slice->i_field_pic_flag = 0;
-    p_slice->i_bottom_field_flag = -1;
-    p_slice->i_pic_order_cnt_type = -1;
-    p_slice->i_pic_order_cnt_lsb = -1;
-    p_slice->i_delta_pic_order_cnt_bottom = -1;
-    p_slice->i_delta_pic_order_cnt0 = 0;
-    p_slice->i_delta_pic_order_cnt1 = 0;
-    p_slice->has_mmco5 = false;
-}
-
-bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
+h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
                         void (* get_sps_pps)(uint8_t pps_id, void *,
                                              const h264_sequence_parameter_set_t **,
                                              const h264_picture_parameter_set_t ** ),
-                        void *, h264_slice_t *p_slice );
+                        void * );
 
 typedef struct
 {
@@ -109,5 +89,11 @@ void h264_compute_poc( const h264_sequence_parameter_set_t *p_sps,
 
 uint8_t h264_get_num_ts( const h264_sequence_parameter_set_t *p_sps,
                          const h264_slice_t *p_slice, uint8_t pic_struct, int tFOC, int bFOC );
+
+bool h264_slice_top_field( const h264_slice_t *p_slice );
+
+bool h264_IsFirstVCLNALUnit( const h264_slice_t *p_prev, const h264_slice_t *p_cur );
+
+bool h264_CanSwapPTSWithDTS( const h264_slice_t *p_slice, const h264_sequence_parameter_set_t * );
 
 #endif

@@ -257,24 +257,25 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
 
         if (i_nal_type <= H264_NAL_SLICE_IDR && i_nal_type != H264_NAL_UNKNOWN)
         {
-            h264_slice_t slice;
-            if (!h264_decode_slice(p_nal, i_nal, GetxPSH264, h264ctx, &slice))
+            h264_slice_t *slice = h264_decode_slice(p_nal, i_nal, GetxPSH264, h264ctx);
+            if (!slice)
                 return false;
 
             const h264_sequence_parameter_set_t *p_sps;
             const h264_picture_parameter_set_t *p_pps;
-            GetxPSH264(slice.i_pic_parameter_set_id, h264ctx, &p_sps, &p_pps);
+            GetxPSH264(h264_get_slice_pps_id(slice), h264ctx, &p_sps, &p_pps);
             if (p_sps)
             {
                 int bFOC;
-                h264_compute_poc(p_sps, &slice, &h264ctx->poc,
+                h264_compute_poc(p_sps, slice, &h264ctx->poc,
                                  &p_info->i_poc, &p_info->i_foc, &bFOC);
 
-                p_info->b_keyframe = slice.type == H264_SLICE_TYPE_I;
-                p_info->b_flush = (slice.type == H264_SLICE_TYPE_I) || slice.has_mmco5;
-                p_info->b_field = slice.i_field_pic_flag;
+                enum h264_slice_type_e slicetype = h264_get_slice_type(slice);
+                p_info->b_keyframe = slicetype == H264_SLICE_TYPE_I;
+                p_info->b_flush = p_info->b_keyframe || h264_has_mmco5(slice);
+                p_info->b_field = h264_is_field_pic(slice);
                 p_info->b_progressive = !p_sps->mb_adaptive_frame_field_flag &&
-                                        !slice.i_field_pic_flag;
+                                        !p_info->b_field;
 
                 struct sei_callback_h264_s sei;
                 sei.p_sps = p_sps;
@@ -284,7 +285,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     HxxxParseSEI(sei_array[i].p_nal, sei_array[i].i_nal, 1,
                                  ParseH264SEI, &sei);
 
-                p_info->i_num_ts = h264_get_num_ts(p_sps, &slice, sei.i_pic_struct,
+                p_info->i_num_ts = h264_get_num_ts(p_sps, slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
                 unsigned dummy;
                 h264_get_dpb_values(p_sps, &p_info->i_max_pics_buffering, &dummy);
@@ -299,6 +300,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     p_info->field_rate_den = p_sps->vui.i_num_units_in_tick;
                 }
             }
+            h264_slice_release(slice);
 
             return true; /* No need to parse further NAL */
         }
