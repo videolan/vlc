@@ -211,6 +211,8 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *,
                             unsigned *p_ox, unsigned *p_oy,
                             unsigned *p_w, unsigned *p_h,
                             unsigned *p_vw, unsigned *p_vh );
+bool h264_get_frame_rate( const h264_sequence_parameter_set_t *,
+                          unsigned *pi_num, unsigned *pi_den );
 bool h264_get_aspect_ratio( const h264_sequence_parameter_set_t *,
                            unsigned *pi_num, unsigned *pi_den );
 bool h264_get_chroma_luma( const h264_sequence_parameter_set_t *, uint8_t *pi_chroma_format,

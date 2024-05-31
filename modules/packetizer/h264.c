@@ -220,13 +220,9 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
         {
             /* on first run == if fmt_in does not provide frame rate info */
             /* If we have frame rate info in the stream */
-            if(p_sps->vui_parameters_present_flag &&
-               p_sps->vui.i_num_units_in_tick > 0 &&
-               p_sps->vui.i_time_scale > 1 )
-            {
-                date_Change( &p_sys->dts, p_sps->vui.i_time_scale,
-                                          p_sps->vui.i_num_units_in_tick );
-            }
+            unsigned nd[2];
+            if( h264_get_frame_rate( p_sps, nd, &nd[1] ) )
+                date_Change( &p_sys->dts, nd[0], nd[1] );
             /* else use the default num/den */
             p_dec->fmt_out.video.i_frame_rate = p_sys->dts.i_divider_num >> 1; /* num_clock_ts == 2 */
             p_dec->fmt_out.video.i_frame_rate_base = p_sys->dts.i_divider_den;

@@ -291,10 +291,11 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
                     p_info->b_top_field_first = (sei.i_pic_struct % 2 == 1);
 
                 /* Set frame rate for timings in case of missing rate */
-                if (p_sps->vui.i_time_scale && p_sps->vui.i_num_units_in_tick)
+                unsigned fr[2];
+                if(h264_get_frame_rate(p_sps, fr, &fr[1]))
                 {
-                    p_info->field_rate_num = p_sps->vui.i_time_scale;
-                    p_info->field_rate_den = p_sps->vui.i_num_units_in_tick;
+                    p_info->field_rate_num = fr[0];
+                    p_info->field_rate_den = fr[1];
                 }
             }
             h264_slice_release(slice);

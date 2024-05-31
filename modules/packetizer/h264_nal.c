@@ -880,6 +880,17 @@ bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps,
     return true;
 }
 
+bool h264_get_frame_rate( const h264_sequence_parameter_set_t *p_sps,
+                         unsigned *pi_num, unsigned *pi_den )
+{
+    if(!p_sps->vui_parameters_present_flag || !p_sps->vui.i_num_units_in_tick ||
+        p_sps->vui.i_time_scale <= 1)
+        return false;
+    *pi_num = p_sps->vui.i_time_scale;
+    *pi_den = p_sps->vui.i_num_units_in_tick;
+    return true;
+}
+
 bool h264_get_aspect_ratio( const h264_sequence_parameter_set_t *p_sps,
                            unsigned *pi_num, unsigned *pi_den )
 {
