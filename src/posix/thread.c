@@ -34,7 +34,6 @@
 #include "libvlc.h"
 #include <stdarg.h>
 #include <stdatomic.h>
-#include <stdnoreturn.h>
 #include <signal.h>
 #include <errno.h>
 #include <limits.h>
