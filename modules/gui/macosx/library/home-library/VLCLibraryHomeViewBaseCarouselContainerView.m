@@ -109,6 +109,31 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
+
+    NSImage * const leftImage = [NSImage imageNamed:(@"NSGoLeftTemplate")];
+    NSButton * const leftButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 24, 24)];
+    leftButton.translatesAutoresizingMaskIntoConstraints = NO;
+    leftButton.image = leftImage;
+    leftButton.bezelStyle = NSBezelStyleCircular;
+    leftButton.target = self;
+    [self addSubview:leftButton];
+    [NSLayoutConstraint activateConstraints:@[
+        [leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+    ]];
+
+    NSImage * const rightImage = [NSImage imageNamed:(@"NSGoRightTemplate")];
+    NSButton * const rightButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 24, 24)];
+    rightButton.translatesAutoresizingMaskIntoConstraints = NO;
+    rightButton.image = rightImage;
+    rightButton.bezelStyle = NSBezelStyleCircular;
+    rightButton.target = self;
+    [self addSubview:rightButton];
+    [NSLayoutConstraint activateConstraints:@[
+        [rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
+        [rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+    ]];
+
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
 
     [self updateCarouselViewHeight];
