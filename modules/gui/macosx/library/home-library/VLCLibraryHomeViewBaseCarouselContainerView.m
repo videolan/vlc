@@ -113,9 +113,6 @@
 
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];
-
-    self.carouselView.autoscroll = -.05;
-    self.carouselView.reenablePostInteractAutoscrollTimeout = 3.;
 }
 
 - (void)connect
@@ -209,8 +206,6 @@
         const CGFloat desiredMultiple = desiredWidthWithSpacing / itemWidth;
         return desiredMultiple;
     }
-    case iCarouselOptionWrap:
-        return YES;
     default:
         return value;
     }
