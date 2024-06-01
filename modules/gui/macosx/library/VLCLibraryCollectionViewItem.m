@@ -335,7 +335,7 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
 - (void)rightMouseDown:(NSEvent *)event
 {
     [self openContextMenu:event];
-[super rightMouseDown:event];
+    [super rightMouseDown:event];
 }
 
 @end
