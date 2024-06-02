@@ -109,6 +109,9 @@
         [self.bottomAnchor constraintEqualToAnchor:self.carouselView.bottomAnchor]
     ]];
 
+    const CGFloat buttonWidth = VLCLibraryUIUnits.largeSpacing;
+    const CGFloat buttonHeight = 
+        VLCLibraryUIUnits.carouselViewItemViewHeight - VLCLibraryUIUnits.largeSpacing;
 
     NSImage * const leftImage = [NSImage imageNamed:@"NSGoLeftTemplate"];
     _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
@@ -121,8 +124,8 @@
     [NSLayoutConstraint activateConstraints:@[
         [self.leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
         [self.leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
-        [self.leftButton.heightAnchor constraintEqualToConstant:self.itemHeight],
-        [self.leftButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.largeSpacing]
+        [self.leftButton.heightAnchor constraintEqualToConstant:buttonHeight],
+        [self.leftButton.widthAnchor constraintEqualToConstant:buttonWidth]
     ]];
 
     NSImage * const rightImage = [NSImage imageNamed:@"NSGoRightTemplate"];
@@ -136,8 +139,8 @@
     [NSLayoutConstraint activateConstraints:@[
         [self.rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
         [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
-        [self.rightButton.heightAnchor constraintEqualToConstant:self.itemHeight],
-        [self.rightButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.largeSpacing]
+        [self.rightButton.heightAnchor constraintEqualToConstant:buttonHeight],
+        [self.rightButton.widthAnchor constraintEqualToConstant:buttonWidth]
     ]];
 
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
