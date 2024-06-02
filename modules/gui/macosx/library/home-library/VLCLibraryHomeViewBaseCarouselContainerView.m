@@ -143,6 +143,7 @@
 
     [self updateCarouselViewHeight];
     [self updateCarouselOffset];
+    [self updateCarouselButtonVisibility];
 }
 
 - (void)connect
@@ -176,6 +177,14 @@
     const CGFloat itemWidth = self.carouselView.itemWidth;
     const CGFloat horizontalOffset = (-(widthToFirstItemCenter - itemWidth / 2)) + leadingPadding;
     self.carouselView.contentOffset = NSMakeSize(horizontalOffset, 0);
+}
+
+- (void)updateCarouselButtonVisibility
+{
+    const NSInteger currentItemIndex = self.carouselView.currentItemIndex;
+    const NSInteger numberOfItems = self.carouselView.numberOfItems;
+    self.leftButton.hidden = currentItemIndex == 0;
+    self.rightButton.hidden = currentItemIndex == numberOfItems - 1;
 }
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldSize
@@ -263,6 +272,8 @@
     self.selectedItemView.selected = NO;
     carouselItemView.selected = YES;
     self.selectedItemView = carouselItemView;
+
+    [self updateCarouselButtonVisibility];
 }
 
 - (void)carousel:(iCarousel *)carousel didSelectItemAtIndex:(NSInteger)index
