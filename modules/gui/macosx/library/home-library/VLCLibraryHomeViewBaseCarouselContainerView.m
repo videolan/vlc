@@ -116,6 +116,7 @@
     leftButton.image = leftImage;
     leftButton.bezelStyle = NSBezelStyleCircular;
     leftButton.target = self;
+    leftButton.action = @selector(scrollLeft:);
     [self addSubview:leftButton];
     [NSLayoutConstraint activateConstraints:@[
         [leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
@@ -128,6 +129,7 @@
     rightButton.image = rightImage;
     rightButton.bezelStyle = NSBezelStyleCircular;
     rightButton.target = self;
+    rightButton.action = @selector(scrollRight:);
     [self addSubview:rightButton];
     [NSLayoutConstraint activateConstraints:@[
         [rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
@@ -207,6 +209,16 @@
 
     _itemHeight = itemHeight;
     [self updateCarouselViewHeight];
+}
+
+- (void)scrollLeft:(id)sender
+{
+    [self.carouselView scrollToItemAtIndex:self.carouselView.currentItemIndex - 1 animated:YES];
+}
+
+- (void)scrollRight:(id)sender
+{
+    [self.carouselView scrollToItemAtIndex:self.carouselView.currentItemIndex + 1 animated:YES];
 }
 
 // pragma mark - iCarousel delegate methods
