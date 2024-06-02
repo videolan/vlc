@@ -111,29 +111,29 @@
 
 
     NSImage * const leftImage = [NSImage imageNamed:@"NSGoLeftTemplate"];
-    NSButton * const leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
-    leftButton.translatesAutoresizingMaskIntoConstraints = NO;
-    leftButton.image = leftImage;
-    leftButton.bezelStyle = NSBezelStyleCircular;
-    leftButton.target = self;
-    leftButton.action = @selector(scrollLeft:);
-    [self addSubview:leftButton];
+    _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
+    self.leftButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.leftButton.image = leftImage;
+    self.leftButton.bezelStyle = NSBezelStylePush;
+    self.leftButton.target = self;
+    self.leftButton.action = @selector(scrollLeft:);
+    [self addSubview:self.leftButton];
     [NSLayoutConstraint activateConstraints:@[
-        [leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+        [self.leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
+        [self.leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
     ]];
 
     NSImage * const rightImage = [NSImage imageNamed:@"NSGoRightTemplate"];
-    NSButton * const rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
-    rightButton.translatesAutoresizingMaskIntoConstraints = NO;
-    rightButton.image = rightImage;
-    rightButton.bezelStyle = NSBezelStyleCircular;
-    rightButton.target = self;
-    rightButton.action = @selector(scrollRight:);
-    [self addSubview:rightButton];
+    _rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
+    self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.rightButton.image = rightImage;
+    self.rightButton.bezelStyle = NSBezelStylePush;
+    self.rightButton.target = self;
+    self.rightButton.action = @selector(scrollRight:);
+    [self addSubview:self.rightButton];
     [NSLayoutConstraint activateConstraints:@[
-        [rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
-        [rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+        [self.rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
+        [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
     ]];
 
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;

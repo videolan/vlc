@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSTextField *titleView;
 @property (readonly) iCarousel *carouselView;
+@property (readonly) NSButton *leftButton;
+@property (readonly) NSButton *rightButton;
 @property (readonly) NSObject<iCarouselDelegate> *delegate;
 @property (readonly) NSObject<VLCLibraryCollectionViewDataSource, iCarouselDataSource> *dataSource;
 // We want the carousel view to be packed tight around the actual items and not have excess space.
