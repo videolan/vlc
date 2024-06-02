@@ -46,7 +46,7 @@
     UIWindow *window;
     UIView *subview;
 
-#if TARGET_OS_IOS
+#if !TARGET_OS_TV
     UIPinchGestureRecognizer *_pinchRecognizer;
 #endif
 
@@ -58,7 +58,7 @@
 
 
 @implementation AppDelegate
-#if TARGET_OS_IOS
+#if !TARGET_OS_TV
 - (void)pinchRecognized:(UIPinchGestureRecognizer *)pinchRecognizer
 {
     UIGestureRecognizerState state = [pinchRecognizer state];
@@ -113,7 +113,12 @@
         return NO;
 
     /* Initialize main window */
+#if TARGET_OS_VISION
+    /* UIScreen is unavailable so we need create a size on our own */
+    window = [[UIWindow alloc] initWithFrame:CGRectMake(0., 0., 1200., 800.)];
+#else
     window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+#endif
     window.rootViewController = [[UIViewController alloc] init];
     window.backgroundColor = [UIColor whiteColor];
 
@@ -122,7 +127,7 @@
     [window addSubview:subview];
     [window makeKeyAndVisible];
 
-#if TARGET_OS_IOS
+#if !TARGET_OS_TV
     _pinchRecognizer = [[UIPinchGestureRecognizer alloc]
         initWithTarget:self action:@selector(pinchRecognized:)];
     [window addGestureRecognizer:_pinchRecognizer];

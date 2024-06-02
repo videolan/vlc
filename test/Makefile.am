@@ -449,6 +449,10 @@ if HAVE_TVOS
 noinst_PROGRAMS += vlccoreios
 endif
 
+if HAVE_XROS
+noinst_PROGRAMS += vlccoreios
+endif
+
 vlc_window_SOURCES = vlc-window.c
 vlc_window_CPPFLAGS = $(AM_CPPFLAGS) -I../include/
 vlc_window_LDADD = ../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
