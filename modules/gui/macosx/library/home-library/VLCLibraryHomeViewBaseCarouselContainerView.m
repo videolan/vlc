@@ -180,6 +180,12 @@
 
 - (void)updateCarouselButtonVisibility
 {
+    if (self.carouselView.numberOfItems <= 1) {
+        self.leftButton.hidden = YES;
+        self.rightButton.hidden = YES;
+        return;
+    }
+
     const NSInteger currentItemIndex = self.carouselView.currentItemIndex;
     const NSInteger numberOfItems = self.carouselView.numberOfItems;
     self.leftButton.hidden = currentItemIndex == 0;
