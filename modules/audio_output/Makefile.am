@@ -125,6 +125,9 @@ endif
 if HAVE_TVOS
 libavsamplebuffer_plugin_la_SOURCES += audio_output/apple/avaudiosession_common.m
 endif
+if HAVE_XROS
+libavsamplebuffer_plugin_la_SOURCES += audio_output/apple/avaudiosession_common.m
+endif
 libavsamplebuffer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
 	-Wl,-framework,CoreMedia,-framework,Foundation,-framework,AVFoundation
 libavsamplebuffer_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
