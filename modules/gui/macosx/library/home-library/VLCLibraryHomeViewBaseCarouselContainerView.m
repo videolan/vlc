@@ -173,9 +173,8 @@
 - (void)updateCarouselOffset
 {
     const CGFloat widthToFirstItemCenter = self.frame.size.width / 2;
-    const CGFloat leadingPadding = VLCLibraryUIUnits.largeSpacing + VLCLibraryUIUnits.mediumSpacing;
     const CGFloat itemWidth = self.carouselView.itemWidth;
-    const CGFloat horizontalOffset = (-(widthToFirstItemCenter - itemWidth / 2)) + leadingPadding;
+    const CGFloat horizontalOffset = (-(widthToFirstItemCenter - itemWidth / 2));
     self.carouselView.contentOffset = NSMakeSize(horizontalOffset, 0);
 }
 
