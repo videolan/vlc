@@ -110,8 +110,8 @@
     ]];
 
 
-    NSImage * const leftImage = [NSImage imageNamed:(@"NSGoLeftTemplate")];
-    NSButton * const leftButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 24, 24)];
+    NSImage * const leftImage = [NSImage imageNamed:@"NSGoLeftTemplate"];
+    NSButton * const leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     leftButton.translatesAutoresizingMaskIntoConstraints = NO;
     leftButton.image = leftImage;
     leftButton.bezelStyle = NSBezelStyleCircular;
@@ -123,8 +123,8 @@
         [leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
     ]];
 
-    NSImage * const rightImage = [NSImage imageNamed:(@"NSGoRightTemplate")];
-    NSButton * const rightButton = [[NSButton alloc] initWithFrame:NSMakeRect(0, 0, 24, 24)];
+    NSImage * const rightImage = [NSImage imageNamed:@"NSGoRightTemplate"];
+    NSButton * const rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     rightButton.translatesAutoresizingMaskIntoConstraints = NO;
     rightButton.image = rightImage;
     rightButton.bezelStyle = NSBezelStyleCircular;
