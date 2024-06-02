@@ -114,26 +114,30 @@
     _leftButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.leftButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.leftButton.image = leftImage;
-    self.leftButton.bezelStyle = NSBezelStylePush;
+    self.leftButton.bezelStyle = NSBezelStyleFlexiblePush;
     self.leftButton.target = self;
     self.leftButton.action = @selector(scrollLeft:);
     [self addSubview:self.leftButton];
     [NSLayoutConstraint activateConstraints:@[
         [self.leftButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor],
-        [self.leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+        [self.leftButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
+        [self.leftButton.heightAnchor constraintEqualToConstant:self.itemHeight],
+        [self.leftButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.largeSpacing]
     ]];
 
     NSImage * const rightImage = [NSImage imageNamed:@"NSGoRightTemplate"];
     _rightButton = [[NSButton alloc] initWithFrame:NSZeroRect];
     self.rightButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.rightButton.image = rightImage;
-    self.rightButton.bezelStyle = NSBezelStylePush;
+    self.rightButton.bezelStyle = NSBezelStyleFlexiblePush;
     self.rightButton.target = self;
     self.rightButton.action = @selector(scrollRight:);
     [self addSubview:self.rightButton];
     [NSLayoutConstraint activateConstraints:@[
         [self.rightButton.trailingAnchor constraintEqualToAnchor:self.carouselView.trailingAnchor],
-        [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor]
+        [self.rightButton.centerYAnchor constraintEqualToAnchor:self.carouselView.centerYAnchor],
+        [self.rightButton.heightAnchor constraintEqualToConstant:self.itemHeight],
+        [self.rightButton.widthAnchor constraintEqualToConstant:VLCLibraryUIUnits.largeSpacing]
     ]];
 
     _itemHeight = VLCLibraryUIUnits.carouselViewItemViewHeight;
