@@ -1,43 +1,56 @@
 Changes between 3.0.20 and 3.0.21:
-------------------------------------
+----------------------------------
 
 Decoders:
- - Improve Opus ambisonic support
- - Fix some ASS subtitle rendering issues
+ * Improve Opus ambisonic support
+ * Fix some ASS subtitle rendering issues
 
 Video Output:
- - Super Resolution scaling with AMD GPUs
- - Add D3D11 option to use NVIDIA TrueHDR to generate HDR from SDR sources
- - The D3D11 HDR option can also turn on/off HDR for all sources regardless of
+ * Super Resolution scaling with AMD GPUs
+ * Add D3D11 option to use NVIDIA TrueHDR to generate HDR from SDR sources
+ * The D3D11 HDR option can also turn on/off HDR for all sources regardless of
    the display
+ * Improve subtitles rendering on Apple platforms of notably Asian languages
+   by correcting font fallback lookups
+
+Video Filter:
+ * New AMD VQ Enhancer filter
 
 Audio Output:
- - Fix regression on macOS causing crashes when using audio devices
+ * Fix regression on macOS causing crashes when using audio devices
    with more than 9 channels
 
+Services Discovery:
+ * Fix exposed UPnP directory URL schemes to be compliant with RFC 3986
+
+Input:
+ * Add support for HTTP content range handling according to RFC 9110
+
 Contrib:
- - Update FFmpeg to 4.4.4
+ * Update FFmpeg to 4.4.4
+ * Update dav1d to 1.4.2
+ * Update libvpx to 1.14.1
 
 libVLC:
- - the HWND passed to libvlc_media_player_set_hwnd must have the WS_CLIPCHILDREN
+ * the HWND passed to libvlc_media_player_set_hwnd must have the WS_CLIPCHILDREN
    style set.
 
 Changes between 3.0.19 and 3.0.20:
 ----------------------------------
 
 Video Output:
- - Fix green line in fullscreen in D3D11 video output
- - Fix crash with some AMD drivers old versions
- - Fix events propagation issue when double-clicking with mouse wheel
+ * Fix green line in fullscreen in D3D11 video output
+ * Fix crash with some AMD drivers old versions
+ * Fix events propagation issue when double-clicking with mouse wheel
 
 Decoders:
- - Fix crash when AV1 hardware decoder fails
+ * Fix crash when AV1 hardware decoder fails
 
 Interface:
- - Fix annoying disappearance of the Windows fullscreen controller
+ * Fix annoying disappearance of the Windows fullscreen controller
 
 Demuxers:
- - Fix potential security issue (OOB Write) on MMS:// by checking user size bounds
+ * Fix potential security issue (OOB Write) on MMS:// by checking user size bounds
 
 
 Changes between 3.0.18 and 3.0.19:
