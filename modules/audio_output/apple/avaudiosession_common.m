@@ -217,6 +217,11 @@ avas_SetActive(audio_output_t *p_aout, AVAudioSession *instance, bool active,
             /* Not AVAudioSessionRouteSharingPolicy on older devices */
         }
         ret = ret && [instance setActive:YES withOptions:options error:&error];
+#if TARGET_OS_VISION
+        ret = ret && [instance setIntendedSpatialExperience:AVAudioSessionSpatialExperienceFixed
+                                                    options:nil
+                                                      error:&error];
+#endif
         if (ret)
             vlc_atomic_rc_inc(&active_rc);
     } else {
