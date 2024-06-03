@@ -1,6 +1,6 @@
 # QtDeclarative
 
-QTDECLARATIVE_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTDECLARATIVE_VERSION := $(QTBASE_VERSION)
 QTDECLARATIVE_URL := $(QT)/$(QTDECLARATIVE_VERSION)/submodules/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz
 
 DEPS_qtdeclarative-tools = qt-tools $(DEPS_qt-tools) qtshadertools-tools $(DEPS_qtshadertools-tools)

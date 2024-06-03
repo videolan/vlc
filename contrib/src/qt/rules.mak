@@ -1,6 +1,5 @@
 # qtbase
 
-QTBASE_VERSION := $(QTBASE_VERSION_MAJOR).1
 # Insert potential -betaX suffix here:
 QTBASE_VERSION_FULL := $(QTBASE_VERSION)
 QTBASE_URL := $(QT)/$(QTBASE_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz

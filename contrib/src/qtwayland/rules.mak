@@ -1,6 +1,6 @@
 # qtwayland
 
-QTWAYLAND_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTWAYLAND_VERSION := $(QTBASE_VERSION)
 QTWAYLAND_URL := $(QT)/$(QTWAYLAND_VERSION)/submodules/qtwayland-everywhere-src-$(QTWAYLAND_VERSION).tar.xz
 
 ifdef HAVE_LINUX

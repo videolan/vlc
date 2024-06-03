@@ -1,7 +1,7 @@
 # qtshadertools
 # required for Qt5Compat, and for qtdeclarative.
 
-QTSHADERTOOLS_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTSHADERTOOLS_VERSION := $(QTBASE_VERSION)
 QTSHADERTOOLS_URL := $(QT)/$(QTSHADERTOOLS_VERSION)/submodules/qtshadertools-everywhere-src-$(QTSHADERTOOLS_VERSION).tar.xz
 
 DEPS_qtshadertools-tools = qt-tools $(DEPS_qt-tools)

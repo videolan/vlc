@@ -1,6 +1,6 @@
 # qtsvg
 
-QTSVG_VERSION := $(QTBASE_VERSION_MAJOR).1
+QTSVG_VERSION := $(QTBASE_VERSION)
 QTSVG_URL := $(QT)/$(QTSVG_VERSION)/submodules/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
 DEPS_qtsvg += qt $(DEPS_qt)
