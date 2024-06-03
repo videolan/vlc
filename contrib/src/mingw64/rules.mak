@@ -14,7 +14,7 @@ PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += dcomp
 endif # !HAVE_WINSTORE
-PKGS += dxva dxvahd mingw11-fixes mft10 d3d12
+PKGS += dxva dxvahd mingw11-fixes mingw12-fixes mft10 d3d12
 
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
@@ -31,6 +31,9 @@ endif # MINGW 11
 ifeq ($(call mingw_at_least, 12), true)
 PKGS_FOUND += mingw11-fixes d3d12
 endif # MINGW 12
+ifeq ($(call mingw_at_least, 13), true)
+PKGS_FOUND += mingw12-fixes
+endif # MINGW 13
 endif # !HAVE_VISUALSTUDIO
 
 HAVE_WINPTHREAD := $(shell $(CC) $(CFLAGS) -E -dM -include pthread.h - < /dev/null >/dev/null 2>&1 || echo FAIL)
@@ -40,7 +43,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers dxva dxvahd dcomp mingw11-fixes alloweduwp mft10 d3d12
+PKGS_ALL += winpthreads winrt_headers dxva dxvahd dcomp mingw11-fixes mingw12-fixes alloweduwp mft10 d3d12
 
 # $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 # 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -54,6 +57,7 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
+	$(APPLY) $(SRC)/mingw64/0001-headers-disable-more-strmif-interfaces-in-UWP.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -101,6 +105,14 @@ MINGW_HEADERS_WINRT := \
 .mingw11-fixes: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/crt/process.h "$(PREFIX)/include"
+	touch $@
+
+.sum-mingw12-fixes: .sum-mingw64
+	touch $@
+
+.mingw12-fixes: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/strmif.h "$(PREFIX)/include"
 	touch $@
 
 .sum-dcomp: .sum-mingw64
