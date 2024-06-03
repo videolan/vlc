@@ -237,6 +237,8 @@ libqt_plugin_la_SOURCES = \
 	menus/menus.cpp menus/menus.hpp \
 	network/mediatreelistener.cpp \
 	network/mediatreelistener.hpp \
+	network/devicesourceprovider.cpp \
+	network/devicesourceprovider.hpp \
 	network/networkdevicemodel.cpp \
 	network/networkdevicemodel.hpp \
 	network/networksourcesmodel.cpp \
@@ -422,6 +424,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	menus/custom_menus.moc.cpp \
 	menus/qml_menu_wrapper.moc.cpp \
 	menus/menus.moc.cpp \
+	network/devicesourceprovider.moc.cpp \
 	network/networkdevicemodel.moc.cpp \
 	network/networksourcesmodel.moc.cpp \
 	network/networkmediamodel.moc.cpp \
