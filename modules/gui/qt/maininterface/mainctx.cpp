@@ -34,6 +34,7 @@
 #include "compositor.hpp"
 #include "util/renderer_manager.hpp"
 #include "util/csdbuttonmodel.hpp"
+#include "util/workerthreadset.hpp"
 
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -520,6 +521,16 @@ inline void MainCtx::initSystray()
 
     if( b_systrayAvailable && b_systrayWanted )
         createSystray();
+}
+
+WorkerThreadSet* MainCtx::workersThreads() const
+{
+    if (!m_workersThreads)
+    {
+        m_workersThreads.reset( new WorkerThreadSet );
+    }
+
+    return m_workersThreads.get();
 }
 
 void MainCtx::setMediaLibraryVisible( bool visible )

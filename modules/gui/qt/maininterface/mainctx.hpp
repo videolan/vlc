@@ -67,6 +67,7 @@ class VideoSurfaceProvider;
 class ControlbarProfileModel;
 class SearchCtx;
 class SortCtx;
+class WorkerThreadSet;
 
 namespace vlc {
 namespace playlist {
@@ -277,6 +278,8 @@ public:
 
     Q_INVOKABLE bool useXmasCone() const;
 
+    WorkerThreadSet *workersThreads() const;
+
 protected:
     /* Systray */
     void createSystray();
@@ -353,6 +356,8 @@ protected:
 
     SearchCtx* m_search = nullptr;
     SortCtx* m_sort = nullptr;
+
+    mutable std::unique_ptr<WorkerThreadSet> m_workersThreads;
 
 public slots:
     void toggleUpdateSystrayMenu();
