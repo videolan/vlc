@@ -193,7 +193,7 @@ FFMPEGCONF += --disable-mediafoundation --disable-amf --disable-schannel
 ifndef HAVE_WINSTORE
 FFMPEGCONF += --enable-dxva2
 else
-FFMPEGCONF += --disable-dxva2
+FFMPEGCONF += --disable-dxva2 --disable-mediafoundation
 endif
 
 ifeq ($(ARCH),x86_64)
