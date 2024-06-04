@@ -952,7 +952,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
 #if 0
-    msg_Err(p_dec, "F/BOC %d/%d POC %d %d rec %d flags %x ref%d fn %d fp %d %d pts %ld len %ld",
+    msg_Err(p_dec, "F/BOC %d/%d POC %d %d rec %d flags %x ref%d fn %d fp %d %ld pts %ld len %ld",
                     tFOC, bFOC, PictureOrderCount,
                     h264_get_slice_type(p_sys->p_slice), p_sys->b_recovered, p_pic->i_flags,
                     h264_get_nal_ref_idc(p_sys->p_slice), h264_get_frame_num(p_sys->p_slice),
