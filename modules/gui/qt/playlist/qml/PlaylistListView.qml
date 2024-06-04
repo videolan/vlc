@@ -263,8 +263,8 @@ T.Pane {
                 value: false
             }
 
-            fadingEdge.backgroundColor: root.background.usingAcrylic ? "transparent"
-                                                                     : (root.background?.color ?? "transparent")
+            fadingEdge.backgroundColor: (root.background && (root.background.color.a >= 1.0)) ? root.background.color
+                                                                                             : "transparent"
 
             contentWidth: width
 

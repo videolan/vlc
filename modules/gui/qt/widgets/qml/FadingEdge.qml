@@ -26,9 +26,9 @@ Item {
     // backgroundColor is only needed for sub-pixel
     // font rendering. Or, if the background color
     // needs to be known during rendering in general.
-    // Ideally it should be fully opaque, but it is
-    // still better than not providing any color
-    // information.
+    // Ideally it should be fully opaque, otherwise
+    // the background here may blend with the actual
+    // background.
     property alias backgroundColor: backgroundRect.color
 
     property alias sourceItem: shaderEffectSource.sourceItem
