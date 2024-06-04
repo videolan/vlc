@@ -1893,7 +1893,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
-        video_format_t surface_fmt = *fmt;
+        video_format_t surface_fmt = sys->pool_fmt;
         surface_fmt.i_width  = sys->picQuad.i_width;
         surface_fmt.i_height = sys->picQuad.i_height;
 
