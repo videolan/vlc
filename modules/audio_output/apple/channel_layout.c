@@ -66,8 +66,27 @@ channel_layout_MapFromVLC(audio_output_t *p_aout, const audio_sample_format_t *f
                           AudioChannelLayout **inlayoutp, size_t *inlayout_size)
 {
     unsigned channels = aout_FormatNbChannels(fmt);
-
     size_t size;
+
+    /* Stereo on xros via avsb doesn't work with the UseChannelDescriptions
+     * tag, so use Mono and Stereo tags. */
+    if (channels <= 2)
+    {
+        size = sizeof(AudioChannelLayout);
+        AudioChannelLayout *inlayout = malloc(size);
+        if (inlayout == NULL)
+            return VLC_ENOMEM;
+        *inlayoutp = inlayout;
+        *inlayout_size = size;
+
+        if (channels == 1)
+            inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
+        else
+            inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+
+        return VLC_SUCCESS;
+    }
+
     if (ckd_mul(&size, channels, sizeof(AudioChannelDescription)) ||
         ckd_add(&size, size, sizeof(AudioChannelLayout)))
         return VLC_ENOMEM;
