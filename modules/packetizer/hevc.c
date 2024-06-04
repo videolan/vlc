@@ -120,7 +120,6 @@ static block_t *GetXPSCopy(decoder_sys_t *);
 
 #define BLOCK_FLAG_DROP (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
-static const uint8_t p_hevc_startcode[3] = {0x00, 0x00, 0x01};
 /****************************************************************************
  * Helpers
  ****************************************************************************/
@@ -220,8 +219,8 @@ static int Open(vlc_object_t *p_this)
     INITQ(post);
 
     packetizer_Init(&p_sys->packetizer,
-                    p_hevc_startcode, sizeof(p_hevc_startcode), startcode_FindAnnexB,
-                    p_hevc_startcode, 1, 5,
+                    annexb_startcode3, 3, startcode_FindAnnexB,
+                    annexb_startcode3, 1, 5,
                     PacketizeReset, PacketizeParse, PacketizeValidate, PacketizeDrain,
                     p_dec);
 
