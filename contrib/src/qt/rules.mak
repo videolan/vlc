@@ -51,41 +51,37 @@ qt: qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0001-disable-precompiled-headers-when-forcing-WINVER-inte.patch
 	$(MOVE)
 
-ifeq ($(V),1)
-QTBASE_CONFIG += -verbose
-endif
-
 ifdef HAVE_WIN32
-QTBASE_CONFIG += -no-freetype -directwrite
+QTBASE_CONFIG += -DFEATURE_freetype=OFF -DFEATURE_directwrite=ON -DFEATURE_directwrite3=ON
 else
-QTBASE_CONFIG += -system-freetype
+QTBASE_CONFIG += -DFEATURE_freetype=ON -DFEATURE_system_freetype=ON
 endif
 
 ifdef HAVE_CROSS_COMPILE
 # This is necessary to make use of qmake
-QTBASE_PLATFORM := -device-option CROSS_COMPILE=$(HOST)-
+QTBASE_CONFIG += -DQT_QMAKE_DEVICE_OPTIONS:STRING=CROSS_COMPILE=$(HOST)-
 endif
 
 ifdef HAVE_WIN32
-QTBASE_CONFIG += -no-feature-style-fusion
+QTBASE_CONFIG += -DFEATURE_style_fusion=OFF
 endif
 
 ifdef ENABLE_PDB
-QTBASE_CONFIG += -release -force-debug-info
+QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=RelWithDebInfo
 else
-QTBASE_CONFIG += -release
+QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=Release
 endif
 
-QTBASE_CONFIG += -static -opensource -confirm-license -no-pkg-config -no-openssl \
-    -no-gif -no-dbus -no-feature-zstd -no-feature-concurrent -no-feature-androiddeployqt \
-	-no-feature-sql -no-feature-testlib -system-harfbuzz -system-libjpeg \
-	-no-feature-xml -no-feature-printsupport -system-libpng -system-zlib -no-feature-network \
-	-no-feature-movie -no-feature-pdf -no-feature-whatsthis -no-feature-lcdnumber \
-	-no-feature-syntaxhighlighter -no-feature-undoview -no-feature-splashscreen \
-	-no-feature-dockwidget -no-feature-statusbar -no-feature-statustip \
-	-no-feature-keysequenceedit -no-feature-pkg-config \
-	-nomake examples -prefix $(PREFIX) \
-	-- -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
+QTBASE_CONFIG += -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
+    -DFEATURE_gif=OFF -DFEATURE_dbus=OFF -DFEATURE_zstd=OFF -DFEATURE_concurrent=OFF -DFEATURE_androiddeployqt=OFF \
+	-DFEATURE_sql=OFF -DFEATURE_testlib=OFF -DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
+	-DFEATURE_xml=OFF -DFEATURE_printsupport=OFF -DFEATURE_png=ON -DFEATURE_system_png=ON -DFEATURE_zlib=ON -DFEATURE_system_zlib=ON -DFEATURE_network=OFF \
+	-DFEATURE_movie=OFF -DFEATURE_pdf=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF \
+	-DFEATURE_syntaxhighlighter=OFF -DFEATURE_undoview=OFF -DFEATURE_splashscreen=OFF \
+	-DFEATURE_dockwidget=OFF -DFEATURE_statusbar=OFF -DFEATURE_statustip=OFF \
+	-DFEATURE_keysequenceedit=OFF \
+	-DQT_BUILD_EXAMPLES=OFF \
+	-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
 QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATURE_pkg_config=OFF \
 	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_printsupport=OFF -DFEATURE_androiddeployqt=OFF \
@@ -111,15 +107,7 @@ endif
 
 .qt: qt toolchain.cmake
 	$(CMAKECLEAN)
-	mkdir -p $(BUILD_DIR)
-
-	# Configure qt, build and run cmake
-	+cd $(BUILD_DIR) && ../configure $(QTBASE_PLATFORM) $(QTBASE_CONFIG)
-
-	# Build
+	$(HOSTVARS_CMAKE) $(CMAKE) $(QTBASE_CONFIG)
 	+$(CMAKEBUILD)
-
-	# Install
 	$(CMAKEINSTALL)
-
 	touch $@
