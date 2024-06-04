@@ -180,7 +180,7 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
                 continue;
             }
 
-            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
+            if ([inputItem.decodedMRL hasPrefix:entryPoint.decodedMRL]) {
                 [reloadMRLs addObject:entryPoint.MRL];
                 [checkedInputItems addObject:inputItem];
                 break;
