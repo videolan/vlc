@@ -27,6 +27,8 @@
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryController.h"
+
 #import <vlc_url.h>
 
 NSString *VLCInputItemParsingSucceeded = @"VLCInputItemParsingSucceeded";
@@ -654,7 +656,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
         return;
     }
 
-    NSURL *pathUrl = [NSURL URLWithString:self.path];
+    NSURL * const pathUrl = [NSURL URLWithString:self.path];
     if (pathUrl == nil) {
         return;
     }
@@ -662,6 +664,9 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     [NSFileManager.defaultManager trashItemAtURL:pathUrl
                                 resultingItemURL:nil
                                            error:nil];
+    
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    [libraryController reloadMediaLibraryFoldersForInputItems:@[self]];
 }
 
 - (void)revealInFinder
