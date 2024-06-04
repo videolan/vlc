@@ -25,6 +25,7 @@
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryController.h"
 
 #import <vlc_media_library.h>
 #import <vlc_url.h>
@@ -1354,12 +1355,15 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (void)moveToTrash
 {
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    for (VLCMediaLibraryFile *fileToTrash in _files) {
+    NSFileManager * const fileManager = NSFileManager.defaultManager;
+    for (VLCMediaLibraryFile * const fileToTrash in self.files) {
         [fileManager trashItemAtURL:fileToTrash.fileURL
                    resultingItemURL:nil
                               error:nil];
     }
+
+    VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
+    [libraryController reloadMediaLibraryFoldersForInputItems:@[self.inputItem]];
 }
 
 @end
