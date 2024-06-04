@@ -116,6 +116,12 @@ bool CompositorDirectComposition::init()
     return false;
 #endif
 
+    {
+        const QString& platformName = qApp->platformName();
+        if (!(platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d")))
+            return false;
+    }
+
     QSystemLibrary dcomplib(QLatin1String("dcomp"));
 
     typedef HRESULT (__stdcall *DCompositionCreateDeviceFuncPtr)(
@@ -130,12 +136,6 @@ bool CompositorDirectComposition::init()
     {
         msg_Warn(m_intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
         return false;
-    }
-
-    {
-        const QString& platformName = qApp->platformName();
-        if (!(platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d")))
-            return false;
     }
 
     return true;
