@@ -54,7 +54,7 @@
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
-#include "iso_color_tables.h"
+#include "h26x_nal_common.h"
 
 #include <limits.h>
 
@@ -947,17 +947,20 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             /* Sequence display extension */
             bool contains_color_description = (p_frag->p_buffer[4] & 0x01);
             //uint8_t video_format = (p_frag->p_buffer[4] & 0x0f) >> 1;
-
             if( contains_color_description && p_frag->i_buffer > 11 )
             {
-                p_dec->fmt_out.video.primaries =
-                        iso_23001_8_cp_to_vlc_primaries( p_frag->p_buffer[5] );
-                p_dec->fmt_out.video.transfer =
-                        iso_23001_8_tc_to_vlc_xfer( p_frag->p_buffer[6] );
-                p_dec->fmt_out.video.space =
-                        iso_23001_8_mc_to_vlc_coeffs( p_frag->p_buffer[7] );
+                h26x_colour_description_t colour;
+                colour.colour_primaries = p_frag->p_buffer[5];
+                colour.transfer_characteristics = p_frag->p_buffer[6];
+                colour.matrix_coeffs = p_frag->p_buffer[7];
+                colour.full_range_flag = 0;
+                video_color_range_t range;
+                h26x_get_colorimetry( &colour,
+                                      &p_dec->fmt_out.video.primaries,
+                                      &p_dec->fmt_out.video.transfer,
+                                      &p_dec->fmt_out.video.space,
+                                      &range );
             }
-
         }
     }
     else if( startcode == USER_DATA_STARTCODE && p_frag->i_buffer > 8 )
