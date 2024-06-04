@@ -40,7 +40,7 @@
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
-#include "iso_color_tables.h"
+#include "h26x_nal_common.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -460,28 +460,32 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
     if( visual_object_type == 1 /* video ID */ ||
         visual_object_type == 2 /* still texture ID */ )
     {
-        uint8_t colour_primaries = 1;
-        uint8_t colour_xfer = 1;
-        uint8_t colour_matrix_coeff = 1;
-        uint8_t full_range = 0;
+        h26x_colour_description_t colour =
+        {
+            .colour_primaries = 1,
+            .transfer_characteristics = 1,
+            .matrix_coeffs = 1,
+            .full_range_flag = 0,
+        };
         if( bs_read1( &s ) ) /* video_signal_type */
         {
             bs_read( &s, 3 );
-            full_range = bs_read( &s, 1 );
+            colour.full_range_flag = bs_read( &s, 1 );
             if( bs_read( &s, 1 ) ) /* colour description */
             {
-                colour_primaries = bs_read( &s, 8 );
-                colour_xfer = bs_read( &s, 8 );
-                colour_matrix_coeff = bs_read( &s, 8 );
+                colour.colour_primaries = bs_read( &s, 8 );
+                colour.transfer_characteristics = bs_read( &s, 8 );
+                colour.matrix_coeffs = bs_read( &s, 8 );
             }
         }
 
         if( p_dec->fmt_in->video.primaries == COLOR_PRIMARIES_UNDEF )
         {
-            p_dec->fmt_out.video.primaries = iso_23001_8_cp_to_vlc_primaries( colour_primaries );
-            p_dec->fmt_out.video.transfer = iso_23001_8_tc_to_vlc_xfer( colour_xfer );
-            p_dec->fmt_out.video.space = iso_23001_8_mc_to_vlc_coeffs( colour_matrix_coeff );
-            p_dec->fmt_out.video.color_range = full_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+            h26x_get_colorimetry( &colour,
+                                  &p_dec->fmt_out.video.primaries,
+                                  &p_dec->fmt_out.video.transfer,
+                                  &p_dec->fmt_out.video.space,
+                                  &p_dec->fmt_out.video.color_range );
         }
     }
 
