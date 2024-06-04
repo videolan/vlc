@@ -82,7 +82,10 @@ channel_layout_MapFromVLC(audio_output_t *p_aout, const audio_sample_format_t *f
         if (channels == 1)
             inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_Mono;
         else
-            inlayout->mChannelLayoutTag = kAudioChannelLayoutTag_Stereo;
+            inlayout->mChannelLayoutTag =
+                p_aout->current_sink_info.headphones ?
+                    kAudioChannelLayoutTag_StereoHeadphones :
+                    kAudioChannelLayoutTag_Stereo;
 
         return VLC_SUCCESS;
     }
