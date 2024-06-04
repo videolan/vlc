@@ -52,8 +52,9 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
     /* Increase the preferred number of output channels if possible */
     if (channel_count > max_channel_count)
     {
-        msg_Warn(p_aout, "Requested channel count %u not fully supported, "
-                 "downmixing to %ld\n", channel_count, (long)max_channel_count);
+        if (!spatial_audio)
+            msg_Warn(p_aout, "Requested channel count %u not fully supported, "
+                     "downmixing to %ld\n", channel_count, (long)max_channel_count);
         channel_count = max_channel_count;
     }
 
