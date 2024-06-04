@@ -238,7 +238,7 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                     appropriateGraphicsApi = false;
                 }
                 eventLoop.quit();
-        }, Qt::SingleShotConnection);
+        }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
 
     connect(quickViewPtr,
             &QQuickWindow::sceneGraphError,
@@ -247,7 +247,7 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                 qWarning() << "CompositorDComp: Scene Graph Error: " << error << ", Message: " << message;
                 appropriateGraphicsApi = false;
                 eventLoop.quit();
-        }, Qt::SingleShotConnection);
+        }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
 
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC;
 
