@@ -59,6 +59,25 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_modules_packetizer_h266',
+    'sources' : files('packetizer/h266.c'),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
+    'name' : 'test_modules_packetizer_h266_nal',
+    'sources' : files(
+        'packetizer/h266_nal.c',
+        '../../modules/packetizer/h266_nal.c'
+      ),
+    'suite' : ['modules', 'test_modules'],
+    'link_with' : [libvlc, libvlccore],
+    'module_depends' : vlc_plugins_targets.keys()
+}
+
+vlc_tests += {
     'name' : 'test_modules_packetizer_mpegvideo',
     'sources' : files('packetizer/mpegvideo.c'),
     'suite' : ['modules', 'test_modules'],

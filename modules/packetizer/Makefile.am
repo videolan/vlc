@@ -50,6 +50,14 @@ libpacketizer_hevc_plugin_la_SOURCES = packetizer/hevc.c \
 	packetizer/hxxx_common.c packetizer/hxxx_common.h \
         packetizer/hxxx_ep3b.h \
         packetizer/iso_color_tables.h
+libpacketizer_h266_plugin_la_SOURCES = packetizer/h266.c \
+	packetizer/h266_nal.h packetizer/h266_nal.c \
+	packetizer/h26x_nal_common.h \
+	packetizer/hxxx_sei.c packetizer/hxxx_sei.h \
+	packetizer/hxxx_nal.h \
+	packetizer/hxxx_common.c packetizer/hxxx_common.h \
+        packetizer/hxxx_ep3b.h \
+        packetizer/iso_color_tables.h
 libpacketizer_a52_plugin_la_SOURCES = packetizer/a52.c packetizer/a52.h
 libpacketizer_dts_plugin_la_SOURCES = packetizer/dts.c \
 	packetizer/dts_header.c packetizer/dts_header.h
@@ -70,10 +78,11 @@ packetizer_PLUGINS += \
 	libpacketizer_mpeg4audio_plugin.la \
 	libpacketizer_mpegaudio_plugin.la \
 	libpacketizer_h264_plugin.la \
+	libpacketizer_h266_plugin.la \
+	libpacketizer_hevc_plugin.la \
 	libpacketizer_vc1_plugin.la \
 	libpacketizer_mlp_plugin.la \
 	libpacketizer_flac_plugin.la \
-	libpacketizer_hevc_plugin.la \
 	libpacketizer_copy_plugin.la \
 	libpacketizer_a52_plugin.la \
 	libpacketizer_dts_plugin.la \

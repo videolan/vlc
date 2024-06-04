@@ -99,6 +99,17 @@ vlc_modules += {
     'shortname' : 'p_hevc',
 }
 
+# VVC packetizer
+vlc_modules += {
+    'name' : 'packetizer_h266',
+    'sources' : files(
+        'h266.c',
+        'h266_nal.c',
+        'hxxx_sei.c',
+        'hxxx_common.c'
+        )
+}
+
 # A/52 audio packetizer
 vlc_modules += {
     'name' : 'packetizer_a52',
