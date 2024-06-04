@@ -23,8 +23,11 @@
 #import "VLCLibraryController.h"
 
 #import "main/VLCMain.h"
+
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
+
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
 
@@ -163,6 +166,32 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
         return VLC_EINVAL;
     }
     return vlc_ml_reload_folder(_p_libraryInstance, fileURL.absoluteString.UTF8String);
+}
+
+- (void)reloadMediaLibraryFoldersForInputItems:(NSArray<VLCInputItem *> *)inputItems
+{
+    NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = self.libraryModel.listOfMonitoredFolders;
+    NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
+    NSMutableSet<VLCInputItem *> * const checkedInputItems = NSMutableSet.set;
+
+    for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
+        for (VLCInputItem * const inputItem in inputItems) {
+            if ([checkedInputItems containsObject:inputItem]) {
+                continue;
+            }
+
+            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
+                [reloadMRLs addObject:entryPoint.MRL];
+                [checkedInputItems addObject:inputItem];
+                break;
+            }
+        }
+    }
+
+    for (NSString * const entryPointMRL in reloadMRLs) {
+        NSURL * const entryPointURL = [NSURL URLWithString:entryPointMRL];
+        [self reloadFolderWithFileURL:entryPointURL];
+    }
 }
 
 - (int)clearHistory

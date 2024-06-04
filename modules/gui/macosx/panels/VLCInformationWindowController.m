@@ -489,28 +489,7 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 - (void)reloadMediaLibraryFoldersForInputItems:(NSArray<VLCInputItem *> *)inputItems
 {
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
-    NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = libraryController.libraryModel.listOfMonitoredFolders;
-    NSMutableSet<NSString *> * const reloadMRLs = NSMutableSet.set;
-    NSMutableSet<VLCInputItem *> * const checkedInputItems = NSMutableSet.set;
-
-    for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
-        for (VLCInputItem * const inputItem in inputItems) {
-            if ([checkedInputItems containsObject:inputItem]) {
-                continue;
-            }
-
-            if ([inputItem.MRL hasPrefix:entryPoint.MRL]) {
-                [reloadMRLs addObject:entryPoint.MRL];
-                [checkedInputItems addObject:inputItem];
-                break;
-            }
-        }
-    }
-
-    for (NSString * const entryPointMRL in reloadMRLs) {
-        NSURL * const entryPointURL = [NSURL URLWithString:entryPointMRL];
-        [libraryController reloadFolderWithFileURL:entryPointURL];
-    }
+    [libraryController reloadMediaLibraryFoldersForInputItems:inputItems];
 }
 
 - (void)saveInputItemsMetadata:(NSArray<VLCInputItem *> *)inputItems
