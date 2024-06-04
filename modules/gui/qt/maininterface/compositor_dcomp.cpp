@@ -215,12 +215,6 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
     m_quickView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_quickView->setColor(Qt::transparent);
 
-    connect(quickViewPtr,
-            &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
-            this,
-            &CompositorDirectComposition::setup,
-            Qt::SingleShotConnection);
-
     m_quickView->installEventFilter(this);
 
     bool appropriateGraphicsApi = true;
@@ -229,9 +223,18 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
     connect(quickViewPtr,
             &QQuickWindow::sceneGraphInitialized,
             &eventLoop,
-            [&eventLoop, &appropriateGraphicsApi]() {
-                if (!(QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D11 ||
-                      QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D12)) {
+            [&eventLoop, &appropriateGraphicsApi, quickViewPtr, this]() {
+                if (QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D11 ||
+                    QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D12)
+                {
+                    connect(quickViewPtr,
+                            &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
+                            this,
+                            &CompositorDirectComposition::setup,
+                            Qt::SingleShotConnection);
+                }
+                else
+                {
                     appropriateGraphicsApi = false;
                 }
                 eventLoop.quit();
