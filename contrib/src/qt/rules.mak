@@ -72,23 +72,29 @@ else
 QTBASE_CONFIG += -DCMAKE_BUILD_TYPE=Release
 endif
 
-QTBASE_CONFIG += -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
-    -DFEATURE_gif=OFF -DFEATURE_dbus=OFF -DFEATURE_zstd=OFF -DFEATURE_concurrent=OFF -DFEATURE_androiddeployqt=OFF \
-	-DFEATURE_sql=OFF -DFEATURE_testlib=OFF -DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
-	-DFEATURE_xml=OFF -DFEATURE_printsupport=OFF -DFEATURE_png=ON -DFEATURE_system_png=ON -DFEATURE_zlib=ON -DFEATURE_system_zlib=ON -DFEATURE_network=OFF \
-	-DFEATURE_movie=OFF -DFEATURE_pdf=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF \
+QTBASE_COMMON_CONFIG := -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
+	-DFEATURE_dbus=OFF -DFEATURE_zstd=OFF -DFEATURE_concurrent=OFF -DFEATURE_androiddeployqt=OFF \
+	-DFEATURE_sql=OFF -DFEATURE_testlib=OFF \
+	-DFEATURE_xml=OFF -DFEATURE_printsupport=OFF -DFEATURE_network=OFF \
+	-DFEATURE_pdf=OFF \
+	-DQT_BUILD_EXAMPLES=OFF
+
+QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
+    -DFEATURE_gif=OFF \
+	-DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
+	-DFEATURE_png=ON -DFEATURE_system_png=ON -DFEATURE_zlib=ON -DFEATURE_system_zlib=ON \
+	-DFEATURE_movie=OFF -DFEATURE_whatsthis=OFF -DFEATURE_lcdnumber=OFF \
 	-DFEATURE_syntaxhighlighter=OFF -DFEATURE_undoview=OFF -DFEATURE_splashscreen=OFF \
 	-DFEATURE_dockwidget=OFF -DFEATURE_statusbar=OFF -DFEATURE_statustip=OFF \
 	-DFEATURE_keysequenceedit=OFF \
-	-DQT_BUILD_EXAMPLES=OFF \
 	-DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) $(QT_HOST_PATH)
 
-QTBASE_NATIVE_CONFIG := -DQT_BUILD_EXAMPLES=FALSE -DQT_BUILD_TESTS=FALSE -DFEATURE_pkg_config=OFF \
-	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF -DFEATURE_printsupport=OFF -DFEATURE_androiddeployqt=OFF \
-	-DFEATURE_xml=OFF -DFEATURE_network=OFF -DFEATURE_vnc=OFF -DFEATURE_linuxfb=OFF -DFEATURE_xlib=OFF \
-	-DFEATURE_sql=OFF -DFEATURE_testlib=OFF -DFEATURE_pdf=OFF -DFEATURE_vulkan=OFF -DFEATURE_imageformatplugin=OFF \
-	-DFEATURE_zstd=OFF -DFEATURE_xkbcommon=OFF -DFEATURE_evdev=OFF -DFEATURE_sessionmanager=OFF -DFEATURE_png=OFF \
-	-DFEATURE_dbus=OFF -DINPUT_openssl=no -DFEATURE_concurrent=OFF -DFEATURE_glib=OFF -DFEATURE_icu=OFF \
+QTBASE_NATIVE_CONFIG := $(QTBASE_COMMON_CONFIG) -DQT_BUILD_TESTS=FALSE \
+	-DFEATURE_accessibility=OFF -DFEATURE_widgets=OFF \
+	-DFEATURE_vnc=OFF -DFEATURE_linuxfb=OFF -DFEATURE_xlib=OFF \
+	-DFEATURE_vulkan=OFF -DFEATURE_imageformatplugin=OFF \
+	-DFEATURE_xkbcommon=OFF -DFEATURE_evdev=OFF -DFEATURE_sessionmanager=OFF -DFEATURE_png=OFF \
+	-DFEATURE_glib=OFF -DFEATURE_icu=OFF \
 	-DFEATURE_texthtmlparser=OFF -DFEATURE_cssparser=OFF -DFEATURE_textodfwriter=OFF -DFEATURE_textmarkdownreader=OFF \
 	-DFEATURE_textmarkdownwriter=OFF -DINPUT_libb2=no -DFEATURE_harfbuzz=OFF -DFEATURE_freetype=OFF -DINPUT_opengl=no
 
