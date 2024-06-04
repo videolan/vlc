@@ -355,15 +355,13 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     return p_pic;
 }
 
-/* ParseVOL:
- *  TODO:
- *      - support aspect ratio
- */
+/* ParseVOL: */
 static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
                      uint8_t *p_vol, int i_vol )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_vo_ver_id, i_ar, i_shape;
+    int i_vo_ver_id, i_shape;
+    h26x_aspect_ratio_t ar;
     bs_t s;
 
     for( ;; )
@@ -392,12 +390,21 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     {
         i_vo_ver_id = 1;
     }
-    i_ar = bs_read( &s, 4 );
-    if( i_ar == 0xf )
+    ar.aspect_ratio_idc = bs_read( &s, 4 );
+    if( ar.aspect_ratio_idc == 0xf )
     {
-        bs_skip( &s, 8 );  /* ar_width */
-        bs_skip( &s, 8 );  /* ar_height */
+        ar.aspect_ratio_idc = 0xff; // was only coded on 4 bits in MPEG4
+        ar.sar_width = bs_read( &s, 8 );
+        ar.sar_height = bs_read( &s, 8 );
     }
+    if(!p_dec->fmt_in->video.i_sar_num ||
+       !p_dec->fmt_in->video.i_sar_den)
+    {
+        h26x_get_aspect_ratio(&ar,
+                              &fmt->video.i_sar_num,
+                              &fmt->video.i_sar_den);
+    }
+
     if( bs_read1( &s ) )
     {
         /* vol control parameter */
