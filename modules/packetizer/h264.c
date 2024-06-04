@@ -158,7 +158,6 @@ static bool ParseSliceHeader( decoder_t *p_dec, const block_t *p_frag, h264_slic
 static bool ParseSeiCallback( const hxxx_sei_data_t *, void * );
 
 
-static const uint8_t p_h264_startcode[3] = { 0x00, 0x00, 0x01 };
 
 /*****************************************************************************
  * Helpers
@@ -334,8 +333,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     packetizer_Init( &p_sys->packetizer,
-                     p_h264_startcode, sizeof(p_h264_startcode), startcode_FindAnnexB,
-                     p_h264_startcode, 1, 5,
+                     annexb_startcode3, 3, startcode_FindAnnexB,
+                     annexb_startcode3, 1, 5,
                      PacketizeReset, PacketizeParse, PacketizeValidate, PacketizeDrain,
                      p_dec );
 
