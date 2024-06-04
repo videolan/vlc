@@ -958,7 +958,7 @@ libqt_plugin_la_QML = \
 	player/qml/qmldir \
         player/qml/Bookmarks.qml \
 	player/qml/ControlBar.qml \
-	player/qml/ControlbarControls.qml \
+	player/qml/PlayerControlbarControls.qml \
 	player/qml/PlaybackSpeed.qml \
 	player/qml/MiniPlayer.qml \
 	player/qml/PIPPlayer.qml \

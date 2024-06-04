@@ -835,7 +835,7 @@ modules/gui/qt/player/control_list_filter.cpp
 modules/gui/qt/player/control_list_filter.hpp
 modules/gui/qt/player/player_controlbar_model.cpp
 modules/gui/qt/player/player_controlbar_model.hpp
-modules/gui/qt/player/qml/ControlbarControls.qml
+modules/gui/qt/player/qml/PlayerControlbarControls.qml
 modules/gui/qt/player/qml/NavigationBox.qml
 modules/gui/qt/player/qml/PlaybackSpeed.qml
 modules/gui/qt/player/qml/Player.qml

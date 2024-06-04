@@ -1,1 +1,1 @@
-singleton PlayerControlbarControls ControlbarControls.qml
+singleton PlayerControlbarControls PlayerControlbarControls.qml
