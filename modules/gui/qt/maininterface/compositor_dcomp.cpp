@@ -111,8 +111,13 @@ CompositorDirectComposition::~CompositorDirectComposition()
 
 bool CompositorDirectComposition::preInit(qt_intf_t *intf)
 {
+    return true;
+}
+
+bool CompositorDirectComposition::init()
+{
 #if !defined(QRhiD3D11_ACTIVE) && !defined(QRhiD3D12_ACTIVE)
-    msg_Warn(intf, "compositor_dcomp was not built with D3D11 or D3D12 headers. It will not work.");
+    msg_Warn(m_intf, "compositor_dcomp was not built with D3D11 or D3D12 headers. It will not work.");
     return false;
 #endif
 
@@ -128,15 +133,10 @@ bool CompositorDirectComposition::preInit(qt_intf_t *intf)
     Microsoft::WRL::ComPtr<IDCompositionDevice> device;
     if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
     {
-        msg_Warn(intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
+        msg_Warn(m_intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
         return false;
     }
 
-    return true;
-}
-
-bool CompositorDirectComposition::init()
-{
     {
         const QString& platformName = qApp->platformName();
         if (!(platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d")))
