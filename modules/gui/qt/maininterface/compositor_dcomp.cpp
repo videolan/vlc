@@ -125,15 +125,12 @@ bool CompositorDirectComposition::preInit(qt_intf_t *intf)
     DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
         dcomplib.resolve("DCompositionCreateDevice"));
 
-    IDCompositionDevice *device = nullptr;
+    Microsoft::WRL::ComPtr<IDCompositionDevice> device;
     if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
     {
         msg_Warn(intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
         return false;
     }
-
-    if (device)
-        device->Release();
 
     return true;
 }
