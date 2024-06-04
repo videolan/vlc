@@ -859,8 +859,6 @@ static void *Thread( void *obj )
     vlc::CompositorFactory compositorFactory(p_intf, compositor);
     free(compositor);
 
-    compositorFactory.preInit();
-
     // at the moment, the vout is created in another thread than the rendering thread
     QApplication::setAttribute( Qt::AA_DontCheckOpenGLContextThreadAffinity );
     QQuickWindow::setDefaultAlphaBuffer(true);

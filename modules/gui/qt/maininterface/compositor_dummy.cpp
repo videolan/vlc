@@ -33,11 +33,6 @@ CompositorDummy::~CompositorDummy()
 {
 }
 
-bool CompositorDummy::preInit(qt_intf_t *)
-{
-    return true;
-}
-
 bool CompositorDummy::init()
 {
     return true;

@@ -62,11 +62,6 @@ CompositorX11::~CompositorX11()
         xcb_disconnect(m_conn);
 }
 
-bool CompositorX11::preInit(qt_intf_t*)
-{
-    return true;
-}
-
 static bool checkExtensionPresent(qt_intf_t* intf, xcb_connection_t *conn, const char* extension)
 {
     bool ret = queryExtension(conn, extension, nullptr, nullptr);

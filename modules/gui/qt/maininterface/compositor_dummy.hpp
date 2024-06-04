@@ -38,7 +38,6 @@ public:
     CompositorDummy(qt_intf_t *p_intf, QObject* parent = nullptr);
     virtual ~CompositorDummy();
 
-    static bool preInit(qt_intf_t*);
     bool init() override;
 
     bool makeMainInterface(MainCtx*) override;

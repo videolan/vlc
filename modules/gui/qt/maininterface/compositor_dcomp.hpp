@@ -48,7 +48,6 @@ public:
     CompositorDirectComposition(qt_intf_t *p_intf, QObject* parent = nullptr);
     ~CompositorDirectComposition();
 
-    static bool preInit(qt_intf_t *);
     bool init() override;
 
     bool makeMainInterface(MainCtx*) override;

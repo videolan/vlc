@@ -50,11 +50,6 @@ CompositorWin7::~CompositorWin7()
 {
 }
 
-bool CompositorWin7::preInit(qt_intf_t *p_intf)
-{
-    return true;
-}
-
 bool CompositorWin7::init()
 {
     {

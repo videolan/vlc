@@ -47,7 +47,6 @@ public:
 
     virtual ~CompositorWin7();
 
-    static bool preInit(qt_intf_t *p_intf);
     bool init() override;
 
     bool makeMainInterface(MainCtx*) override;

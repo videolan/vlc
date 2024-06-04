@@ -53,48 +53,29 @@ static Compositor* instanciateCompositor(qt_intf_t *p_intf) {
     return new T(p_intf);
 }
 
-template<typename T>
-static bool preInit(qt_intf_t *p_intf) {
-    return T::preInit(p_intf);
-}
-
 struct {
     const char* name;
     Compositor* (*instantiate)(qt_intf_t *p_intf);
-    bool (*preInit)(qt_intf_t *p_intf);
 } static compositorList[] = {
 #ifdef _WIN32
 #ifdef HAVE_DCOMP_H
-    {"dcomp", &instanciateCompositor<CompositorDirectComposition>, &preInit<CompositorDirectComposition> },
+    {"dcomp", &instanciateCompositor<CompositorDirectComposition> },
 #endif
-    {"win7", &instanciateCompositor<CompositorWin7>, &preInit<CompositorWin7> },
+    {"win7", &instanciateCompositor<CompositorWin7> },
 #endif
 #ifdef QT_HAS_WAYLAND_COMPOSITOR
-    {"wayland", &instanciateCompositor<CompositorWayland>, &preInit<CompositorWayland> },
+    {"wayland", &instanciateCompositor<CompositorWayland> },
 #endif
 #ifdef QT_HAS_X11_COMPOSITOR
-    {"x11", &instanciateCompositor<CompositorX11>, &preInit<CompositorX11> },
+    {"x11", &instanciateCompositor<CompositorX11> },
 #endif
-    {"dummy", &instanciateCompositor<CompositorDummy>, &preInit<CompositorDummy> }
+    {"dummy", &instanciateCompositor<CompositorDummy> }
 };
 
 CompositorFactory::CompositorFactory(qt_intf_t *p_intf, const char* compositor)
     : m_intf(p_intf)
     , m_compositorName(compositor)
 {
-}
-
-bool CompositorFactory::preInit()
-{
-    for (; m_compositorIndex < ARRAY_SIZE(compositorList); m_compositorIndex++)
-    {
-        if (m_compositorName == "auto" || m_compositorName == compositorList[m_compositorIndex].name)
-        {
-            if (compositorList[m_compositorIndex].preInit(m_intf))
-                return true;
-        }
-    }
-    return false;
 }
 
 Compositor* CompositorFactory::createCompositor()

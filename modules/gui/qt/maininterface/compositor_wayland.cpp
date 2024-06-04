@@ -61,11 +61,6 @@ CompositorWayland::~CompositorWayland()
     }
 }
 
-bool CompositorWayland::preInit(qt_intf_t *)
-{
-    return true;
-}
-
 bool CompositorWayland::init()
 {
     QPlatformNativeInterface* native = QGuiApplication::platformNativeInterface();

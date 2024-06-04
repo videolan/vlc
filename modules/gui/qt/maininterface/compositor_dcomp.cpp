@@ -109,11 +109,6 @@ CompositorDirectComposition::~CompositorDirectComposition()
     destroyMainInterface();
 }
 
-bool CompositorDirectComposition::preInit(qt_intf_t *intf)
-{
-    return true;
-}
-
 bool CompositorDirectComposition::init()
 {
 #if !defined(QRhiD3D11_ACTIVE) && !defined(QRhiD3D12_ACTIVE)

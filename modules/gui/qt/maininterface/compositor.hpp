@@ -173,9 +173,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(CompositorVideo::Flags)
  *
  * the usual scenario is:
  *
- *   - call to preInit that will try to preInit compositors from list until we find
- *     a matching candidate
- *
  *   - start Qt main loop
  *
  *   - call to createCompositor to instantiate the compositor, if it fails it will
@@ -185,18 +182,6 @@ class CompositorFactory {
 public:
 
     CompositorFactory(qt_intf_t *p_intf, const char* compositor = "auto");
-
-    /**
-     * @brief preInit will check whether a compositor can be used, before starting Qt,
-     * each candidate may perform some basic checks and can setup Qt environment variable if required
-     *
-     * @note if a compositor return true on preinit but fails to initialize afterwards, next
-     * compositor in chain will be initialized without the preinit phaze (as Qt will be already started)
-     * this might lead to an unstable configuration if incompatible operations are done in the preInit phase
-     *
-     * @return true if a compositor can be instantiated
-     */
-    bool preInit();
 
     /**
      * @brief createCompositor will instantiate a compositor
