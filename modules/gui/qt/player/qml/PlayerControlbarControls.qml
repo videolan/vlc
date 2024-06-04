@@ -22,12 +22,12 @@ import QtQml
 
 import org.videolan.vlc 0.1
 
-import "qrc:///player/controlbarcontrols/" as Controls
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/PlayerControls/" as Controls
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 QtObject {
-    readonly property string controlPath : "qrc:///player/controlbarcontrols/"
+    readonly property string controlPath : "qrc:///VLC/PlayerControls/"
 
     readonly property var controlList: [
         { id: ControlListModel.PLAY_BUTTON, file: "PlayButton.qml", label: VLCIcons.play_filled, text: qsTr("Play") },

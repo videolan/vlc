@@ -49,6 +49,6 @@ Item {
 
     Loader {
         active: MainCtx.mediaLibraryAvailable
-        source: "qrc:///menus/GlobalShortcutsMedialib.qml"
+        source: "qrc:///VLC/Menus/GlobalShortcutsMedialib.qml"
     }
 }

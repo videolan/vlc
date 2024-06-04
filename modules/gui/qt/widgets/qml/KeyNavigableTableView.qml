@@ -23,9 +23,9 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///util/" as Util
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 // FIXME: Maybe we could inherit from KeyNavigableListView directly.
 FocusScope {

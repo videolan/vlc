@@ -23,9 +23,9 @@ import QtQuick.Controls
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 Widgets.IconToolButton {
     id: control

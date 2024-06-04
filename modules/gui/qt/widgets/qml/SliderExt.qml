@@ -23,8 +23,8 @@ import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 T.Slider {
     id: control

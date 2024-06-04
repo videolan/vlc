@@ -24,9 +24,9 @@ import QtQuick.Window
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///menus/" as Menus
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Menus/" as Menus
 
 FocusScope{
     id: root
@@ -193,7 +193,7 @@ FocusScope{
 
         anchors.fill: parent
         active: root.showCSD
-        source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
+        source: "qrc:///VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
     }
 
     // Components -
@@ -387,8 +387,8 @@ FocusScope{
         enabled: root.showCSD
         visible: root.showCSD
         source:  VLCStyle.palette.hasCSDImage
-            ? "qrc:///widgets/CSDThemeButtonSet.qml"
-            : "qrc:///widgets/CSDWindowButtonSet.qml"
+            ? "qrc:///VLC/Widgets/CSDThemeButtonSet.qml"
+            : "qrc:///VLC/Widgets/CSDWindowButtonSet.qml"
 
         Connections {
             target: csdDecorations.item

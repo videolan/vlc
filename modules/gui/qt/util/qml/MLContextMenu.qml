@@ -22,7 +22,7 @@ import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
 
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 // @brief - a generic ML context menu
 NativeMenu {

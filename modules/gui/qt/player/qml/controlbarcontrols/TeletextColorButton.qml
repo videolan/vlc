@@ -21,8 +21,8 @@
 import QtQuick
 import QtQuick.Templates as T
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 Widgets.IconToolButton {
     // Settings

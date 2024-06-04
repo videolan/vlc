@@ -18,7 +18,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 Item {
     id: root

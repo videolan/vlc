@@ -21,8 +21,8 @@
 import QtQuick
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
 
 EmptyLabel {
     id: root

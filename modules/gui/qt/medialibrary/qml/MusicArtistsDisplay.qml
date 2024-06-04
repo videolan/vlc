@@ -23,10 +23,10 @@ import QtQuick.Layouts
 import org.videolan.medialib 0.1
 import org.videolan.vlc 0.1
 
-import "qrc:///util/" as Util
-import "qrc:///widgets/" as Widgets
-import "qrc:///main/" as MainInterface
-import "qrc:///style/"
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/MainInterface/" as MainInterface
+import "qrc:///VLC/Style/"
 
 
 Widgets.PageLoader {

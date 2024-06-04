@@ -23,9 +23,9 @@ import QtQml.Models
 
 import org.videolan.vlc 0.1
 
-import "qrc:///player/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Player/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 T.Control {
     id: control

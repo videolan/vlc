@@ -19,8 +19,8 @@ import QtQuick
 import QtQuick.Controls
 
 import org.videolan.vlc 0.1
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
 
 Item {
     id: root

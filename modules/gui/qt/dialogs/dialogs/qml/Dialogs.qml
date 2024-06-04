@@ -23,8 +23,8 @@ import QtQuick.Templates as T
 import org.videolan.vlc 0.1
 
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 Item {
     id: root
@@ -583,7 +583,7 @@ Item {
     Loader {
         id: toolbarEditorDialogLoader
         active: false
-        source: "qrc:///dialogs/ToolbarEditorDialog.qml"
+        source: "qrc:///VLC/Dialogs/ToolbarEditorDialog.qml"
 
         Connections {
             target: toolbarEditorDialogLoader.item

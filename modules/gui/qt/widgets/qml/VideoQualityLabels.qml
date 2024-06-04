@@ -19,7 +19,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 Row {
     id: root

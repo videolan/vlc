@@ -22,7 +22,7 @@ import QtQuick
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 
 ViewBlockingRectangle {

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <RCC>
-    <qresource prefix="/util">
+    <qresource prefix="VLC/Util">
         <file alias="Helpers.js">util/qml/Helpers.js</file>
         <file alias="ModelSortSettingHandler.qml">util/qml/ModelSortSettingHandler.qml</file>
         <file alias="FlickableScrollHandler.qml">util/qml/FlickableScrollHandler.qml</file>
@@ -12,7 +12,7 @@
         <file alias="FadeControllerStateGroup.qml">util/qml/FadeControllerStateGroup.qml</file>
         <file alias="GridSizeHelper.qml">util/qml/GridSizeHelper.qml</file>
     </qresource>
-    <qresource prefix="/main">
+    <qresource prefix="VLC/MainInterface">
         <file alias="BannerSources.qml">maininterface/qml/BannerSources.qml</file>
         <file alias="MainInterface.qml">maininterface/qml/MainInterface.qml</file>
         <file alias="MainDisplay.qml">maininterface/qml/MainDisplay.qml</file>
@@ -21,7 +21,7 @@
         <file alias="MainGridView.qml">maininterface/qml/MainGridView.qml</file>
         <file alias="MainViewLoader.qml">maininterface/qml/MainViewLoader.qml</file>
     </qresource>
-    <qresource prefix="/widgets">
+    <qresource prefix="VLC/Widgets">
         <file alias="LabelExt.qml">widgets/qml/LabelExt.qml</file>
         <file alias="EmptyLabel.qml">widgets/qml/EmptyLabel.qml</file>
         <file alias="EmptyLabelButton.qml">widgets/qml/EmptyLabelButton.qml</file>
@@ -103,7 +103,7 @@
         <file alias="ProgressIndicator.qml">widgets/qml/ProgressIndicator.qml</file>
         <file alias="ExpandGridItemView.qml">widgets/qml/ExpandGridItemView.qml</file>
     </qresource>
-    <qresource prefix="/network">
+    <qresource prefix="VLC/Network">
         <file alias="AddressbarButton.qml">network/qml/AddressbarButton.qml</file>
         <file alias="BrowseDeviceView.qml">network/qml/BrowseDeviceView.qml</file>
         <file alias="BrowseDisplay.qml">network/qml/BrowseDisplay.qml</file>
@@ -120,7 +120,7 @@
         <file alias="ServicesManage.qml">network/qml/ServicesManage.qml</file>
         <file alias="ServicesSources.qml">network/qml/ServicesSources.qml</file>
     </qresource>
-    <qresource prefix="/medialibrary">
+    <qresource prefix="VLC/MediaLibrary">
         <file alias="MediaGroupDisplay.qml">medialibrary/qml/MediaGroupDisplay.qml</file>
         <file alias="MusicAlbums.qml">medialibrary/qml/MusicAlbums.qml</file>
         <file alias="MusicDisplay.qml">medialibrary/qml/MusicDisplay.qml</file>
@@ -154,25 +154,25 @@
         <file alias="VideoGridDisplay.qml">medialibrary/qml/VideoGridDisplay.qml</file>
         <file alias="VideoRecentVideosDisplay.qml">medialibrary/qml/VideoRecentVideosDisplay.qml</file>
     </qresource>
-    <qresource prefix="/style">
+    <qresource prefix="VLC/Style">
         <file alias="AcrylicController.qml">style/AcrylicController.qml</file>
         <file alias="qmldir">style/qmldir</file>
         <file alias="VLCStyle.qml">style/VLCStyle.qml</file>
         <file alias="VLCIcons.qml">style/VLCIcons.qml</file>
     </qresource>
-    <qresource prefix="/playlist">
+    <qresource prefix="VLC/Playlist">
         <file alias="PlaylistDelegate.qml">playlist/qml/PlaylistDelegate.qml</file>
         <file alias="PlaylistListView.qml">playlist/qml/PlaylistListView.qml</file>
         <file alias="PlaylistToolbar.qml">playlist/qml/PlaylistToolbar.qml</file>
         <file alias="PlaylistDetachedWindow.qml">playlist/qml/PlaylistDetachedWindow.qml</file>
     </qresource>
-    <qresource prefix="/menus">
+    <qresource prefix="VLC/Menus">
         <file alias="Menubar.qml">menus/qml/Menubar.qml</file>
         <file alias="GlobalShortcuts.qml">menus/qml/GlobalShortcuts.qml</file>
         <file alias="GlobalShortcutsMedialib.qml">menus/qml/GlobalShortcutsMedialib.qml</file>
         <file alias="ShortcutExt.qml">menus/qml/ShortcutExt.qml</file>
     </qresource>
-    <qresource prefix="/player">
+    <qresource prefix="VLC/Player">
         <file alias="qmldir">player/qml/qmldir</file>
         <file alias="Player.qml">player/qml/Player.qml</file>
         <file alias="ControlBar.qml">player/qml/ControlBar.qml</file>
@@ -197,7 +197,7 @@
         <file alias="Bookmarks.qml">player/qml/Bookmarks.qml</file>
         <file alias="NavigationBox.qml">player/qml/NavigationBox.qml</file>
     </qresource>
-    <qresource prefix="/player/controlbarcontrols">
+    <qresource prefix="VLC/PlayerControls">
         <file alias="HighResolutionTimeWidget.qml">player/qml/controlbarcontrols/HighResolutionTimeWidget.qml</file>
         <file alias="ArtworkInfoWidget.qml">player/qml/controlbarcontrols/ArtworkInfoWidget.qml</file>
         <file alias="AspectRatioWidget.qml">player/qml/controlbarcontrols/AspectRatioWidget.qml</file>
@@ -243,7 +243,7 @@
         <file alias="VolumeWidget.qml">player/qml/controlbarcontrols/VolumeWidget.qml</file>
         <file alias="Fallback.qml">player/qml/controlbarcontrols/Fallback.qml</file>
     </qresource>
-    <qresource prefix="/dialogs">
+    <qresource prefix="VLC/Dialogs">
         <file alias="CustomDialog.qml">dialogs/dialogs/qml/CustomDialog.qml</file>
         <file alias="Dialogs.qml">dialogs/dialogs/qml/Dialogs.qml</file>
         <file alias="ModalDialog.qml">dialogs/dialogs/qml/ModalDialog.qml</file>

@@ -20,8 +20,8 @@ import QtQuick.Layouts
 
 import org.videolan.vlc 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 Widgets.KeyNavigableListView {
     id: servicesView

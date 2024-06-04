@@ -21,9 +21,9 @@ import QtQuick.Layouts
 
 import org.videolan.vlc 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///util/" as Util
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Style/"
 
 Widgets.ExpandGridItemView {
     id: root

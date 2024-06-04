@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 /**
  * @brief a pure QML hierarchical Finite State Machine implementation

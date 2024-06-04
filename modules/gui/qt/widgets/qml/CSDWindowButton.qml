@@ -23,7 +23,7 @@ import QtQuick.Layouts
 import org.videolan.vlc 0.1
 
 import "."
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 
 T.Button {

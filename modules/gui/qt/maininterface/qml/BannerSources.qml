@@ -26,11 +26,11 @@ import QtQuick.Window
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///playlist/" as PL
-import "qrc:///widgets/" as Widgets
-import "qrc:///menus/" as Menus
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Playlist/" as PL
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Menus/" as Menus
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 T.ToolBar {
     id: root
@@ -110,7 +110,7 @@ T.ToolBar {
                 Loader {
                     anchors.fill: parent
                     active: root._showCSD
-                    source: "qrc:///widgets/CSDTitlebarTapNDrapHandler.qml"
+                    source: "qrc:///VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
                 }
 
                 Column {
@@ -205,8 +205,8 @@ T.ToolBar {
                     height: VLCStyle.globalToolbar_height
                     active: root._showCSD
                     source: VLCStyle.palette.hasCSDImage
-                              ? "qrc:///widgets/CSDThemeButtonSet.qml"
-                              : "qrc:///widgets/CSDWindowButtonSet.qml"
+                              ? "qrc:///VLC/Widgets/CSDThemeButtonSet.qml"
+                              : "qrc:///VLC/Widgets/CSDWindowButtonSet.qml"
                 }
             }
 

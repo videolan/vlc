@@ -17,8 +17,8 @@
  *****************************************************************************/
 import QtQuick
 
-import "qrc:///style/"
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 FadingEdge {
     id: root

@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick 2.12
 import QtQuick.Templates 2.12 as T
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 T.Label {
     T.ToolTip.visible: (elide !== Text.ElideNone) && (width < implicitWidth) && hoverHandler.hovered

@@ -24,9 +24,9 @@ import QtQml.Models
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///playlist/" as PL
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Playlist/" as PL
 
 
 T.Pane {
@@ -165,7 +165,7 @@ T.Pane {
 
                 parent: root
                 active: MainCtx.mediaLibraryAvailable
-                source: "qrc:/player/Bookmarks.qml"
+                source: "qrc:///VLC/Player/Bookmarks.qml"
 
                 x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
                 y: row2.y + row2.height + VLCStyle.margin_xxsmall

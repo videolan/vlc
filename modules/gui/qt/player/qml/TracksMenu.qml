@@ -24,9 +24,9 @@ import QtQml.Models
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///util/" as Util
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Util/" as Util
 
 // FIXME: Keyboard navigation needs to be fixed for this Popup.
 T.Popup {
@@ -142,15 +142,15 @@ T.Popup {
       }
 
       onRequestAudioPage: {
-          stackView.push("qrc:///player/TracksPageAudio.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///VLC/Player/TracksPageAudio.qml", {"trackMenuController": trackMenuController})
       }
 
       onRequestSubtitlePage: {
-          stackView.push("qrc:///player/TracksPageSubtitle.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///VLC/Player/TracksPageSubtitle.qml", {"trackMenuController": trackMenuController})
       }
 
       onRequestPlaybackSpeedPage: {
-          stackView.push("qrc:///player/TracksPageSpeed.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///VLC/Player/TracksPageSpeed.qml", {"trackMenuController": trackMenuController})
       }
     }
 }

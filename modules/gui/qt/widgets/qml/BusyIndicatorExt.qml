@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 BusyIndicator {
     id: control

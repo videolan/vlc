@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtTest
-import "qrc:///util/" as Util
+import "qrc:///VLC/Util/" as Util
 
 TestCase {
     id: root

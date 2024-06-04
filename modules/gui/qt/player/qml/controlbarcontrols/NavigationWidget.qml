@@ -23,8 +23,8 @@ import QtQuick.Templates as Templates
 
 import org.videolan.vlc 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 Templates.Pane {
     id: root
@@ -37,7 +37,7 @@ Templates.Pane {
 
     // Private
 
-    readonly property string _controlPath : "qrc:///player/controlbarcontrols/"
+    readonly property string _controlPath : "qrc:///VLC/PlayerControls/"
 
     // Signals
 

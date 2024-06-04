@@ -22,10 +22,10 @@ import QtQuick.Layouts
 
 import org.videolan.vlc 0.1
 
-import "qrc:///player/"
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///util/" as Util
+import "qrc:///VLC/Player/"
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Util/" as Util
 
 GridView {
     id: root

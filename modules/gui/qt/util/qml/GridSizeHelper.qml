@@ -20,7 +20,7 @@
 
 import QtQuick
 
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 QtObject{
     // NOTE: Base picture sizing

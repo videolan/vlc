@@ -29,10 +29,10 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
-import "qrc:///util/" as Util
-import "qrc:///playlist/" as PL
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Playlist/" as PL
 
 Item {
     id: root
@@ -44,8 +44,8 @@ Item {
                                       && (MainCtx.intfMainWindow.visibility === Window.Windowed)
 
     readonly property var _pageModel: [
-        { name: "mc", url: "qrc:///main/MainDisplay.qml" },
-        { name: "player", url:"qrc:///player/Player.qml" },
+        { name: "mc", url: "qrc:///VLC/MainInterface/MainDisplay.qml" },
+        { name: "player", url:"qrc:///VLC/Player/Player.qml" },
     ]
 
     property var _oldHistoryPath: ([])
@@ -142,7 +142,7 @@ Item {
             id: playlistWindowLoader
             asynchronous: true
             active: !MainCtx.playlistDocked
-            source: "qrc:///playlist/PlaylistDetachedWindow.qml"
+            source: "qrc:///VLC/Playlist/PlaylistDetachedWindow.qml"
         }
 
         Connections {
@@ -276,7 +276,7 @@ Item {
 
         Loader {
             asynchronous: true
-            source: "qrc:///menus/GlobalShortcuts.qml"
+            source: "qrc:///VLC/Menus/GlobalShortcuts.qml"
         }
 
         MouseArea {
@@ -297,7 +297,7 @@ Item {
             }
             Component.onCompleted: {
                 setSource(
-                    "qrc:///widgets/CSDMouseStealer.qml", {
+                    "qrc:///VLC/Widgets/CSDMouseStealer.qml", {
                         target: g_mainInterface,
                         anchorInside: Qt.binding(() => !_extendedFrameVisible)
                     })

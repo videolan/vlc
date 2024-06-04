@@ -22,9 +22,9 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///util/" as Util
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 ListView {
     id: root

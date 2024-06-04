@@ -23,9 +23,9 @@ import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///widgets/" as Widgets
-import "qrc:///menus/" as Menus
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Menus/" as Menus
 
 FocusScope {
     id: resumePanel

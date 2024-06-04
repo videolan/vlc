@@ -20,9 +20,9 @@ import QtQuick
 
 import org.videolan.vlc 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
-import "qrc:///player/" as Player
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Player/" as Player
 
 Widgets.IconToolButton {
     id: root

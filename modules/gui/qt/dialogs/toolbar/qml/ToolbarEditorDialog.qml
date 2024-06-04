@@ -20,8 +20,8 @@ import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
 
 import org.videolan.vlc 0.1
 

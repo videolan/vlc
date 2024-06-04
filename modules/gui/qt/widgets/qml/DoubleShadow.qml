@@ -20,7 +20,7 @@ import QtQuick
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 // A convenience file to encapsulate two drop shadow images stacked on top
 // of each other

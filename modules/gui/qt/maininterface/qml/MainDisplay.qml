@@ -22,15 +22,15 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///style/"
-import "qrc:///main/" as Main
-import "qrc:///widgets/" as Widgets
-import "qrc:///playlist/" as PL
-import "qrc:///player/" as P
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/MainInterface/" as Main
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Playlist/" as PL
+import "qrc:///VLC/Player/" as P
 
-import "qrc:///util/" as Util
-import "qrc:///util/Helpers.js" as Helpers
-import "qrc:///dialogs/" as DG
+import "qrc:///VLC/Util/" as Util
+import "qrc:///VLC/Util/Helpers.js" as Helpers
+import "qrc:///VLC/Dialogs/" as DG
 
 FocusScope {
     id: g_mainDisplay
@@ -107,35 +107,35 @@ FocusScope {
             displayText: qsTr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
-            url: "qrc:///medialibrary/VideoDisplay.qml"
+            url: "qrc:///VLC/MediaLibrary/VideoDisplay.qml"
         }, {
             listed: MainCtx.mediaLibraryAvailable,
             displayText: qsTr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
-            url: "qrc:///medialibrary/MusicDisplay.qml"
+            url: "qrc:///VLC/MediaLibrary/MusicDisplay.qml"
         }, {
             listed: !MainCtx.mediaLibraryAvailable,
             displayText: qsTr("Home"),
             icon: VLCIcons.home,
             name: "home",
-            url: "qrc:///main/NoMedialibHome.qml"
+            url: "qrc:///VLC/MainInterface/NoMedialibHome.qml"
         }, {
             listed: true,
             displayText: qsTr("Browse"),
             icon: VLCIcons.topbar_network,
             name: "network",
-            url: "qrc:///network/BrowseDisplay.qml"
+            url: "qrc:///VLC/Network/BrowseDisplay.qml"
         }, {
             listed: true,
             displayText: qsTr("Discover"),
             icon: VLCIcons.topbar_discover,
             name: "discover",
-            url: "qrc:///network/DiscoverDisplay.qml"
+            url: "qrc:///VLC/Network/DiscoverDisplay.qml"
         }, {
             listed: false,
             name: "mlsettings",
-            url: "qrc:///medialibrary/MLFoldersSettings.qml"
+            url: "qrc:///VLC/MediaLibrary/MLFoldersSettings.qml"
         }
     ]
 
@@ -456,7 +456,7 @@ FocusScope {
 
         height: active ? implicitHeight : 0
 
-        source: "qrc:///widgets/ScanProgressBar.qml"
+        source: "qrc:///VLC/Widgets/ScanProgressBar.qml"
 
         onLoaded: {
             item.background.visible = Qt.binding(function() { return !stackViewParent.layer.enabled })

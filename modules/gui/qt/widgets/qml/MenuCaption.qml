@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Templates as T
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 
 T.Label {
     elide: Text.ElideRight

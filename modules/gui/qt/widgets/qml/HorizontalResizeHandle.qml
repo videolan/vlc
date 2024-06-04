@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
-import "qrc:///style/"
+import "qrc:///VLC/Style/"
 import org.videolan.vlc 0.1
 
 // targetWidth: concerned widget's current width

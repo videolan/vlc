@@ -20,9 +20,9 @@ import QtQuick
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///widgets/" as Widgets
-import "qrc:///style/"
-import "qrc:///util/Helpers.js" as Helpers
+import "qrc:///VLC/Widgets/" as Widgets
+import "qrc:///VLC/Style/"
+import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 Widgets.GridItem {
     property var model: ({})
