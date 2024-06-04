@@ -126,7 +126,7 @@ bool CompositorDirectComposition::preInit(qt_intf_t *intf)
         dcomplib.resolve("DCompositionCreateDevice"));
 
     IDCompositionDevice *device = nullptr;
-    if (!func || FAILED(func(nullptr, __uuidof(IDCompositionDevice), reinterpret_cast<void **>(&device))))
+    if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
     {
         msg_Warn(intf, "Can not create DCompositionDevice. CompositorDirectComposition will not work.");
         return false;
