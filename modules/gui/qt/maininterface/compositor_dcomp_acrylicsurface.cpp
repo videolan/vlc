@@ -107,7 +107,7 @@ CompositorDCompositionAcrylicSurface::CompositorDCompositionAcrylicSurface(qt_in
     , m_mainCtx {mainCtx}
 {
     assert(device);
-    device->QueryInterface(__uuidof(IDCompositionDevice3), (void**)&m_dcompDevice);
+    device->QueryInterface(IID_PPV_ARGS(&m_dcompDevice));
 
     if (!m_dcompDevice)
         throw std::runtime_error("DCompositionDevice is not DCompositionDevice3.");
@@ -301,7 +301,7 @@ try
     thumbnail.rcSource = RECT{ 0, 0, desktopWidth, desktopHeight };
 
     HTHUMBNAIL desktopThumbnail;
-    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice, &m_desktopVisual, &desktopThumbnail), "create desktop visual");
+    HR(lDwmpCreateSharedThumbnailVisual(hwnd(), desktopWindow, 2, &thumbnail, m_dcompDevice.Get(), &m_desktopVisual, &desktopThumbnail), "create desktop visual");
     HR(m_rootVisual->AddVisual(m_desktopVisual.Get(), FALSE, nullptr), "Add desktop visual");
 
     return true;
@@ -333,7 +333,7 @@ try
     lSetWindowCompositionAttribute(m_dummyWindow, &CompositionAttribute);
 
     vlc_assert(!m_backHostVisual);
-    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice, &m_backHostVisual, &m_backHostThumbnail)
+    HR(lDwmpCreateSharedMultiWindowVisual(m_dummyWindow, m_dcompDevice.Get(), &m_backHostVisual, &m_backHostThumbnail)
        , "failed to create shared multi visual");
 
     updateVisual();

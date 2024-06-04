@@ -32,6 +32,7 @@
 #include "compositor_dcomp_error.hpp"
 
 class IDCompositionVisual2;
+class IDCompositionDevice3;
 
 // Windows Private APIs, taken from https://blog.adeltax.com/dwm-thumbnails-but-with-idcompositionvisual/
 
@@ -203,7 +204,7 @@ private:
     HTHUMBNAIL m_backHostThumbnail = NULL;
     HWND m_dummyWindow {};
 
-    class IDCompositionDevice3 *m_dcompDevice;
+    Microsoft::WRL::ComPtr<IDCompositionDevice3> m_dcompDevice;
     Microsoft::WRL::ComPtr<IDCompositionVisual2> m_rootVisual;
     Microsoft::WRL::ComPtr<IDCompositionVisual2> m_backHostVisual;
     Microsoft::WRL::ComPtr<IDCompositionVisual2> m_desktopVisual;
