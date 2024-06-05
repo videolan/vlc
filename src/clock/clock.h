@@ -265,7 +265,7 @@ void vlc_clock_Unlock(vlc_clock_t *clock);
  * @retval true if the clock is paused
  * @retval false if the clock is not paused
  */
-bool vlc_clock_IsPaused(vlc_clock_t *clock);
+bool vlc_clock_IsPaused(const vlc_clock_t *clock);
 
 /**
  * Wait for a timestamp expressed in system time

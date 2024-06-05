@@ -509,13 +509,13 @@ void vlc_clock_Unlock(vlc_clock_t *clock)
     vlc_mutex_unlock(&main_clock->lock);
 }
 
-static inline void AssertLocked(vlc_clock_t *clock)
+static inline void AssertLocked(const vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_assert(&main_clock->lock);
 }
 
-bool vlc_clock_IsPaused(vlc_clock_t *clock)
+bool vlc_clock_IsPaused(const vlc_clock_t *clock)
 {
     AssertLocked(clock);
 
