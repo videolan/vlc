@@ -124,8 +124,8 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="509" customClass="VLCSettingTextField">
-                                            <rect key="frame" x="37" y="18" width="468" height="19"/>
+                                        <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="509" customClass="VLCSettingTextField">
+                                            <rect key="frame" x="37" y="18" width="381" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="19" id="POw-kc-CJg"/>
                                             </constraints>
