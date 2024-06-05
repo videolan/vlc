@@ -64,7 +64,9 @@ endif
 libaudiotoolboxmidi_plugin_la_SOURCES = codec/audiotoolbox_midi.c
 libaudiotoolboxmidi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation,-framework,AudioToolbox
 if HAVE_DARWIN
+if !HAVE_WATCHOS
 codec_LTLIBRARIES += libaudiotoolboxmidi_plugin.la
+endif
 endif
 
 liblpcm_plugin_la_SOURCES = codec/lpcm.c
@@ -364,7 +366,9 @@ libvideotoolbox_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) # Trigger MODULE_NAME declar
 libvideotoolbox_plugin_la_LIBADD = libchroma_copy.la libvlc_hxxxhelper.la libvlc_vtutils.la
 libvideotoolbox_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo -Wl,-framework,Metal
 if HAVE_DARWIN
+if !HAVE_WATCHOS
 codec_LTLIBRARIES += libvideotoolbox_plugin.la
+endif
 endif
 
 videotoolbox_dpb_test_SOURCES = codec/videotoolbox/dpb_test.c \

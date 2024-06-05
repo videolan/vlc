@@ -92,7 +92,9 @@ libbonjour_plugin_la_SOURCES = services_discovery/bonjour.m
 libbonjour_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libbonjour_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)' -Wl,-framework,Foundation
 if HAVE_DARWIN
+if !HAVE_WATCHOS
 sd_LTLIBRARIES += libbonjour_plugin.la
+endif
 endif
 
 libudisks_plugin_la_SOURCES = services_discovery/udisks.c

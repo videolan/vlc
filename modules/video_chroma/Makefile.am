@@ -84,7 +84,9 @@ libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.
 libcvpx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(chromadir)' -Wl,-framework,Foundation -Wl,-framework,VideoToolbox -Wl,-framework,CoreMedia -Wl,-framework,CoreVideo
 libcvpx_plugin_la_LIBADD = libchroma_copy.la
 if HAVE_DARWIN
+if !HAVE_WATCHOS
 chroma_LTLIBRARIES += libcvpx_plugin.la
+endif
 endif
 
 libgst_mem_plugin_la_SOURCES = video_chroma/gst_mem.c \

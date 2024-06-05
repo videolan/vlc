@@ -74,6 +74,7 @@ vout_LTLIBRARIES += libvout_macosx_plugin.la libcaopengllayer_plugin.la libwindo
 endif
 
 if HAVE_DARWIN
+if !HAVE_WATCHOS
 libsamplebufferdisplay_plugin_la_SOURCES = video_output/apple/VLCSampleBufferDisplay.m codec/vt_utils.c codec/vt_utils.h
 libsamplebufferdisplay_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 if HAVE_OSX
@@ -84,6 +85,7 @@ libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
 	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo
 endif
 vout_LTLIBRARIES += libsamplebufferdisplay_plugin.la
+endif
 endif
 
 libvout_ios_plugin_la_SOURCES = video_output/opengl/display.c $(OPENGL_VOUT_COMMONSOURCES)
