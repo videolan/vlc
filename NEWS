@@ -4,10 +4,15 @@ Changes between 3.0.20 and 3.0.21:
 Decoders:
  * Improve Opus ambisonic support
  * Fix some ASS subtitle rendering issues
+ * Fix Opus in MP4 behaviour
+ * Fix VAAPI hw decoding with some drivers
+
+Input:
+ * Add support for HTTP content range handling according to RFC 9110
+ * Fix some HLS Adaptive Streaming not working in audio-only mode
 
 Video Output:
  * Super Resolution scaling with AMD GPUs
- * Add D3D11 option to use NVIDIA TrueHDR to generate HDR from SDR sources
  * The D3D11 HDR option can also turn on/off HDR for all sources regardless of
    the display
  * Improve subtitles rendering on Apple platforms of notably Asian languages
@@ -15,6 +20,7 @@ Video Output:
 
 Video Filter:
  * New AMD VQ Enhancer filter
+ * Add D3D11 option to use NVIDIA TrueHDR to generate HDR from SDR sources
 
 Audio Output:
  * Fix regression on macOS causing crashes when using audio devices
@@ -22,9 +28,6 @@ Audio Output:
 
 Services Discovery:
  * Fix exposed UPnP directory URL schemes to be compliant with RFC 3986
-
-Input:
- * Add support for HTTP content range handling according to RFC 9110
 
 Contrib:
  * Update FFmpeg to 4.4.4
@@ -34,6 +37,12 @@ Contrib:
 libVLC:
  * the HWND passed to libvlc_media_player_set_hwnd must have the WS_CLIPCHILDREN
    style set.
+ * Fix crashes when using caopengllayer
+
+Misc:
+ * Fix various warnings, leaks and potential crashes
+ * Fix security integer overflow in MMS module
+
 
 Changes between 3.0.19 and 3.0.20:
 ----------------------------------
