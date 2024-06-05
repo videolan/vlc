@@ -2,7 +2,7 @@
 # Copyright (C) Marvin Scholz
 #
 # Script to help build VLC or libVLC for Apple OSes
-# Supported OSes: iOS, tvOS, macOS
+# Supported OSes: iOS, tvOS, macOS, xrOS, watchOS
 #
 # Currently this script builds a full static library,
 # with all modules and contribs combined into one .a
@@ -211,7 +211,7 @@ set_deployment_target()
 validate_architecture()
 {
     case "$1" in
-    i386|x86_64|armv7|arm64)
+    i386|x86_64|armv7|arm64|armv7k|arm64_32)
         VLC_HOST_ARCH="$1"
         ;;
     aarch64)
@@ -318,8 +318,16 @@ validate_sdk_name()
             VLC_HOST_OS="xros"
             set_deployment_target "$VLC_DEPLOYMENT_TARGET_XROS"
             ;;
-        watch*)
-            abort_err "Building for watchOS is not supported by this script"
+        watchos*)
+            VLC_HOST_PLATFORM="watchOS"
+            VLC_HOST_OS="watchos"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_WATCHOS"
+            ;;
+        watchsimulator*)
+            VLC_HOST_PLATFORM="watchSimulator"
+            VLC_HOST_PLATFORM_SIMULATOR="yes"
+            VLC_HOST_OS="watchos"
+            set_deployment_target "$VLC_DEPLOYMENT_TARGET_WATCHOS"
             ;;
         *)
             abort_err "Unhandled SDK name '$1'"
@@ -625,6 +633,9 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     export BUILDFORTVOS="yes"
 elif [ "$VLC_HOST_OS" = "xros" ]; then
     export BUILDFORIOS="yes"
+elif [ "$VLC_HOST_OS" = "watchos" ]; then
+    export BUILDFORIOS="yes"
+    export BUILDFORWATCHOS="yes"
 fi
 
 # Default to "make" if there is no MAKE env variable
@@ -661,6 +672,8 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_CONTRIB_OPTIONS+=( "${VLC_CONTRIB_OPTIONS_TVOS[@]}" )
 elif [ "$VLC_HOST_OS" = "xros" ]; then
     VLC_CONTRIB_OPTIONS+=( "${VLC_CONTRIB_OPTIONS_XROS[@]}" )
+elif [ "$VLC_HOST_OS" = "watchos" ]; then
+    VLC_CONTRIB_OPTIONS=( "${VLC_CONTRIB_OPTIONS_WATCHOS[@]}" )
 fi
 
 # Create dir to build contribs in
@@ -743,6 +756,8 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_TVOS[@]}" )
 elif [ "$VLC_HOST_OS" = "xros" ]; then
     VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_XROS[@]}" )
+elif [ "$VLC_HOST_OS" = "watchos" ]; then
+    VLC_CONFIG_OPTIONS+=( "${VLC_CONFIG_OPTIONS_WATCHOS[@]}" )
 fi
 
 if [ "$VLC_DISABLE_DEBUG" -gt "0" ]; then
@@ -814,6 +829,8 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_TVOS[@]}" )
 elif [ "$VLC_HOST_OS" = "xros" ]; then
     VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_XROS[@]}" )
+elif [ "$VLC_HOST_OS" = "watchos" ]; then
+    VLC_MODULE_REMOVAL_LIST+=( "${VLC_MODULE_REMOVAL_LIST_WATCHOS[@]}" )
 fi
 
 for module in "${VLC_MODULE_REMOVAL_LIST[@]}"; do
