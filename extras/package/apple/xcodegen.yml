@@ -1,10 +1,12 @@
 name: VLC
 options:
   bundleIdPrefix: org.videolan.vlc
-  supportedDestinations: [iOS, tvOS, visionOS]
+  supportedDestinations: [iOS, tvOS, visionOS, watchOS]
   deploymentTarget:
     iOS: 9.0
     tvOS: 12.0
+    visionOS: 1.0
+    watchOS: 7.4
 configs:
   Debug: debug
   Release: release
@@ -24,7 +26,7 @@ fileGroups:
 targets:
   VLCAutomake:
     type: ""
-    supportedDestinations: [iOS, tvOS, visionOS]
+    supportedDestinations: [iOS, tvOS, visionOS, watchOS]
     legacy:
       toolPath: ${VLC_SRC_DIR}/extras/package/apple/xcode.sh
       passSettings: true
@@ -60,9 +62,48 @@ targets:
             install_name_tool -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore" \
                 "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
             codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
+
+  vlccorewatchos:
+    type: "application"
+    platform: [watchOS]
+    dependencies:
+      - target: VLCAutomake
+      - target: vlc
+      - target: vlccore
+    info:
+      path: "vlccorewatchos/Info.plist"
+      properties:
+        CFBundleIdentifier: org.videolan.vlc.vlccoreios.watchapp
+        WKCompanionAppBundleIdentifier: org.videolan.vlc.vlccoreios
+        WKRunsIndependentlyOfCompanionApp: true
+        WKApplication: true
+        UIBackgroundModes:
+          - audio
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: org.videolan.vlc.vlccoreios.watchapp
+    postBuildScripts:
+      - script: ${VLC_SRC_DIR}/extras/package/apple/copy_plugins.sh
+        name: "Copy VLC plugins"
+
+      - name: Copy vlccorewatchos binary
+        shell: /bin/bash
+        script: |
+            INPUT_FILES=()
+            for arch in ${ARCHS}; do
+                INPUT_FILES+=("${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/test/.libs/vlccoreios")
+            done
+            lipo -create \
+                -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" \
+                "${INPUT_FILES[@]}"
+            install_name_tool -change "@rpath/libvlc.dylib" "@rpath/vlc.framework/vlc" \
+                "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
+            install_name_tool -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore" \
+                "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
+            codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}"
+
   vlc:
     type: "framework"
-    supportedDestinations: [iOS, tvOS, visionOS]
+    supportedDestinations: [iOS, tvOS, visionOS, watchOS]
     dependencies:
       - target: VLCAutomake
     info:
@@ -87,7 +128,7 @@ targets:
 
   vlccore:
     type: "framework"
-    supportedDestinations: [iOS, tvOS, visionOS]
+    supportedDestinations: [iOS, tvOS, visionOS, watchOS]
     dependencies:
       - target: VLCAutomake
     info:
