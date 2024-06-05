@@ -443,16 +443,23 @@
                                         </textField>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="9jw-Fr-d1M">
                                             <rect key="frame" x="345" y="129" width="160" height="128"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="128" id="sbu-BX-HX7"/>
-                                            </constraints>
                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="noart" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="T6o-O9-fdd">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="128" id="sbu-BX-HX7"/>
+                                            </constraints>
                                             <connections>
                                                 <action selector="chooseArtwork:" target="-2" id="aoX-w0-3xf"/>
                                             </connections>
+                                        </button>
+                                        <button horizontalHuggingPriority="252" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mC1-pf-fRU">
+                                            <rect key="frame" x="424" y="19" width="81" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Decoded" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="VR0-15-bEV">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
                                         </button>
                                     </subviews>
                                     <constraints>
@@ -465,6 +472,7 @@
                                         <constraint firstItem="435" firstAttribute="top" secondItem="436" secondAttribute="bottom" constant="3" id="5A4-pd-kbP"/>
                                         <constraint firstItem="463" firstAttribute="leading" secondItem="461" secondAttribute="trailing" constant="8" id="5fW-BF-CQQ"/>
                                         <constraint firstAttribute="trailing" secondItem="435" secondAttribute="trailing" constant="37" id="5sT-kX-Mgh"/>
+                                        <constraint firstItem="509" firstAttribute="trailing" secondItem="mC1-pf-fRU" secondAttribute="leading" constant="-8" id="64p-sq-S98"/>
                                         <constraint firstItem="435" firstAttribute="leading" secondItem="431" secondAttribute="trailing" constant="8" id="69n-nP-QoU"/>
                                         <constraint firstItem="439" firstAttribute="top" secondItem="440" secondAttribute="bottom" constant="3" id="71b-yF-M2B"/>
                                         <constraint firstItem="9jw-Fr-d1M" firstAttribute="bottom" secondItem="486" secondAttribute="bottom" id="77b-m1-E2f"/>
@@ -525,7 +533,6 @@
                                         <constraint firstItem="cXh-Kb-cBh" firstAttribute="baseline" secondItem="8ES-YK-OvS" secondAttribute="baseline" id="bXf-GW-PkM"/>
                                         <constraint firstItem="8ES-YK-OvS" firstAttribute="leading" secondItem="tWC-Zr-8E5" secondAttribute="leading" id="bg2-9d-Pz1"/>
                                         <constraint firstItem="504" firstAttribute="top" secondItem="505" secondAttribute="bottom" constant="3" id="cNI-ci-of3"/>
-                                        <constraint firstItem="509" firstAttribute="trailing" secondItem="427" secondAttribute="trailing" id="cSo-Kc-YyT"/>
                                         <constraint firstItem="481" firstAttribute="leading" secondItem="422" secondAttribute="leading" constant="37" id="cT2-6b-0aP"/>
                                         <constraint firstItem="Cro-Nn-BBH" firstAttribute="centerY" secondItem="Vvu-VZ-aui" secondAttribute="centerY" id="dwC-lc-i68"/>
                                         <constraint firstItem="504" firstAttribute="trailing" secondItem="412" secondAttribute="trailing" id="e5v-Xe-fX8"/>
@@ -536,6 +543,7 @@
                                         <constraint firstItem="477" firstAttribute="top" secondItem="461" secondAttribute="bottom" constant="8" symbolic="YES" id="g6g-Ns-JmP"/>
                                         <constraint firstItem="487" firstAttribute="trailing" secondItem="498" secondAttribute="trailing" id="gE5-M8-JCo"/>
                                         <constraint firstItem="D3W-el-Mmk" firstAttribute="trailing" secondItem="Ken-fu-rsj" secondAttribute="trailing" id="gJK-xx-0fy"/>
+                                        <constraint firstAttribute="trailing" secondItem="mC1-pf-fRU" secondAttribute="trailing" constant="37" id="gcK-U6-TdJ"/>
                                         <constraint firstItem="9jw-Fr-d1M" firstAttribute="width" secondItem="463" secondAttribute="width" id="gsO-On-Rim"/>
                                         <constraint firstAttribute="trailing" secondItem="510" secondAttribute="trailing" constant="34" id="hlm-Bz-jEa"/>
                                         <constraint firstItem="441" firstAttribute="leading" secondItem="463" secondAttribute="leading" id="ikh-TH-cNg"/>
@@ -547,6 +555,7 @@
                                         <constraint firstItem="462" firstAttribute="top" secondItem="tWC-Zr-8E5" secondAttribute="bottom" constant="8" id="nzo-th-CDt"/>
                                         <constraint firstItem="431" firstAttribute="width" secondItem="439" secondAttribute="width" id="oAX-uN-IMI"/>
                                         <constraint firstItem="D3W-el-Mmk" firstAttribute="leading" secondItem="32r-kK-YIK" secondAttribute="leading" id="oPJ-zE-OzO"/>
+                                        <constraint firstItem="mC1-pf-fRU" firstAttribute="centerY" secondItem="509" secondAttribute="centerY" id="odQ-Gk-fU2"/>
                                         <constraint firstItem="476" firstAttribute="top" secondItem="477" secondAttribute="bottom" constant="3" id="p8W-42-Rnu"/>
                                         <constraint firstItem="487" firstAttribute="top" secondItem="497" secondAttribute="bottom" constant="8" id="pMt-4R-J9m"/>
                                         <constraint firstItem="462" firstAttribute="leading" secondItem="461" secondAttribute="leading" id="pU7-gV-qZe"/>
