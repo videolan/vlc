@@ -47,6 +47,8 @@
 - (void)awakeFromNib
 {
     self.largeImageView.contentGravity = VLCImageViewContentGravityResizeAspectFill;
+    self.titleTextField.maximumNumberOfLines = 3;
+    self.detailTextField.maximumNumberOfLines = 1;
     [self connectItemUpdaters];
 }
 
