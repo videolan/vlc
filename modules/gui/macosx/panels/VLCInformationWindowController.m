@@ -231,6 +231,25 @@ _##field##TextField.delegate = self
     }
 }
 
+- (IBAction)toggleDecodedMRL:(id)sender 
+{
+    [self updateMrlField];
+}
+
+- (void)updateMrlField
+{
+    VLCInputItem * const inputItem = _representedInputItems.firstObject;
+    if (!inputItem) {
+        return;
+    }
+
+    if (self.decodedMRLCheckbox.state == NSControlStateValueOn) {
+        self.decodedMRLTextField.stringValue = inputItem.decodedMRL;
+    } else {
+        self.decodedMRLTextField.stringValue = inputItem.MRL;
+    }
+}
+
 - (void)initMediaPanelStats
 {
     //Initializing Input Variables
@@ -358,6 +377,8 @@ _##field##TextField.delegate = self
 #undef FILL_FIELD_FROM_INPUTITEM
 
     _artworkImageButton.image = _artwork;
+
+    [self updateMrlField];
 
     if (!_mainMenuInstance) {
         [self.window setTitle:inputItem.title];

@@ -33,6 +33,7 @@
 @property (readwrite, weak) IBOutlet NSOutlineView *outlineView;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedView;
 
+@property (readwrite, weak) IBOutlet NSButton *decodedMRLCheckbox;
 @property (readwrite, weak) IBOutlet NSTextField *decodedMRLLabel;
 @property (readwrite, weak) IBOutlet NSTextField *titleLabel;
 @property (readwrite, weak) IBOutlet VLCSettingTextField *decodedMRLTextField;
@@ -112,6 +113,7 @@
 @property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;
+- (IBAction)toggleDecodedMRL:(id)sender;
 - (IBAction)saveMetaData:(id)sender;
 - (IBAction)chooseArtwork:(id)sender;
 
