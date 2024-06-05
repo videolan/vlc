@@ -23,7 +23,6 @@
                 <outlet property="copyrightTextField" destination="486" id="659"/>
                 <outlet property="dateLabel" destination="436" id="656"/>
                 <outlet property="dateTextField" destination="435" id="655"/>
-                <outlet property="decodedMRLCheckbox" destination="mC1-pf-fRU" id="Ihh-gs-dwU"/>
                 <outlet property="decodedMRLTextField" destination="509" id="cRO-43-SO3"/>
                 <outlet property="demuxBitrateLabel" destination="545" id="693"/>
                 <outlet property="demuxBitrateTextField" destination="hUq-0S-i6D" id="Jgq-FQ-1CE"/>
@@ -60,6 +59,7 @@
                 <outlet property="lostAudioBuffersTextField" destination="578" id="695"/>
                 <outlet property="lostFramesLabel" destination="559" id="696"/>
                 <outlet property="lostFramesTextField" destination="560" id="697"/>
+                <outlet property="mrlCopyButton" destination="mC1-pf-fRU" id="aal-CO-3Tz"/>
                 <outlet property="nowPlayingLabel" destination="477" id="667"/>
                 <outlet property="nowPlayingTextField" destination="476" id="668"/>
                 <outlet property="outlineView" destination="519" id="683"/>
@@ -126,7 +126,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="509" customClass="VLCSettingTextField">
-                                            <rect key="frame" x="37" y="18" width="381" height="19"/>
+                                            <rect key="frame" x="37" y="18" width="416" height="19"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="19" id="POw-kc-CJg"/>
                                             </constraints>
@@ -456,13 +456,14 @@
                                             </connections>
                                         </button>
                                         <button horizontalHuggingPriority="252" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="mC1-pf-fRU">
-                                            <rect key="frame" x="424" y="19" width="81" height="18"/>
-                                            <buttonCell key="cell" type="check" title="Decoded" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="VR0-15-bEV">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
+                                            <rect key="frame" x="441" y="18" width="64" height="19"/>
+                                            <buttonCell key="cell" type="roundRect" title="Copy" bezelStyle="roundedRect" imagePosition="trailing" alignment="center" state="on" borderStyle="border" inset="2" id="VR0-15-bEV">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="cellTitle"/>
+                                                <imageReference key="image" image="arrow.right.doc.on.clipboard" catalog="system" symbolScale="small"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="toggleDecodedMRL:" target="-2" id="xBf-vc-bZ9"/>
+                                                <action selector="copyMrl:" target="-2" id="WOa-yv-wo3"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1123,6 +1124,7 @@
         </window>
     </objects>
     <resources>
+        <image name="arrow.right.doc.on.clipboard" catalog="system" width="14" height="15"/>
         <image name="noart" width="128" height="128"/>
     </resources>
 </document>
