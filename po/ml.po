@@ -15,7 +15,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2023-10-30 09:17+0100\n"
+"POT-Creation-Date: 2024-06-05 17:42+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Dilip Re, 2021\n"
 "Language-Team: Malayalam (https://app.transifex.com/yaron/teams/16553/ml/)\n"
@@ -25,7 +25,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/vlc_common.h:1048
+#: include/vlc_common.h:1053
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -734,10 +734,10 @@ msgstr "റിവേഴ്സ് സ്റ്റീരിയോ"
 msgid "Headphones"
 msgstr "ഹെഡ്ഫോണുകള്‍"
 
-#: src/config/core.c:370 modules/access/dtv/access.c:93
-#: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
-#: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
-#: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
+#: src/config/core.c:370 modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:113 modules/access/dtv/access.c:122
+#: modules/access/dtv/access.c:130 modules/access/dtv/access.c:139
+#: modules/access/dtv/access.c:147 modules/access/dtv/access.c:169
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:991
 #: modules/gui/qt/components/simple_preferences.cpp:394
 msgid "Automatic"
@@ -908,7 +908,7 @@ msgid "decoder"
 msgstr "ഡികോഡര്‍"
 
 #: src/input/decoder.c:1922 src/input/decoder.c:2205
-#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:912
+#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:918
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "സ്ട്രീമിംഗ് /ട്രാന്‍സ്കോഡിംഗ് പരാജയപ്പെട്ടു"
@@ -1101,7 +1101,7 @@ msgstr "ചായ്‌വ് "
 
 #: src/input/es_out.c:3250 src/input/es_out.c:3268 src/input/es_out.c:3286
 #: src/input/es_out.c:3300 src/playlist/tree.c:67
-#: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
+#: modules/access/dtv/access.c:82 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "നിര്‍വചിക്കാത്തത്"
 
@@ -1744,17 +1744,18 @@ msgstr ""
 #: modules/services_discovery/upnp.cpp:82
 #: modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
+#: modules/video_output/win32/direct3d11.c:88
 #: modules/video_output/xcb/xvideo.c:824 modules/gui/qt/ui/profiles.h:742
 #: modules/gui/qt/ui/profiles.h:745
 msgid "Auto"
 msgstr "ഓട്ടോ"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:201 modules/control/hotkeys.c:405
 msgid "On"
 msgstr "ഓണ്‍"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:137 modules/access/v4l2/v4l2.c:201
 #: modules/control/hotkeys.c:383 modules/control/hotkeys.c:405
 #: modules/video_filter/deinterlace/algo_phosphor.h:55
@@ -1829,8 +1830,8 @@ msgstr ""
 "അനുവദിക്കുന്നു"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
-#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
-#: modules/access/dtv/access.c:143 modules/access/v4l2/v4l2.c:163
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:114
+#: modules/access/dtv/access.c:148 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:429 modules/codec/x264.c:434
 #: modules/demux/mp4/meta.c:430
@@ -2854,8 +2855,8 @@ msgid ""
 msgstr ""
 "എന്താണ് പ്ലേ ചെയ്യുന്നത് എന്നനുസരിച്ച് തലകെട്ട് സജ്ജീകരിക്കാന്‍ ഈ ഐഛികം നിങ്ങളെ അനുവദിക്കും "
 "<br>$a: കലാകാരന്‍<br>$b: ആല്‍ബം<br>$g: ഇനം<br>$n: ട്രാക്ക് സംഖ്യ<br>$p: ഇപ്പോള്‍ "
-"പ്ലേചെയ്യുന്നത്<br>$A: തീയതി<br>$D: സമയദൈര്‍ഖ്യം<br>$Z: \"ഇപ്പോള്‍ "
-"പ്ലേചെയ്യുന്നത്\" (ടൈറ്റിലിലേക്ക് തിരികെ വരുക - കലാകാരന്‍)"
+"പ്ലേചെയ്യുന്നത്<br>$A: തീയതി<br>$D: സമയദൈര്‍ഖ്യം<br>$Z: \"ഇപ്പോള്‍ പ്ലേചെയ്യുന്നത്\" "
+"(ടൈറ്റിലിലേക്ക് തിരികെ വരുക - കലാകാരന്‍)"
 
 #: src/libvlc-module.c:695
 msgid "Disable all lua plugins"
@@ -6791,11 +6792,11 @@ msgstr "libdsm SMB ഇൻപുട്ട്"
 msgid "libdsm NETBIOS discovery module"
 msgstr "libdsm നെറ്റ്ബിയോസ് കണ്ടെത്തൽ മൊഡ്യൂൾ"
 
-#: modules/access/dtv/access.c:38
+#: modules/access/dtv/access.c:43
 msgid "DVB adapter"
 msgstr "ഡിവിബി അഡാപ്റ്റര്‍"
 
-#: modules/access/dtv/access.c:40
+#: modules/access/dtv/access.c:45
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
@@ -6803,11 +6804,11 @@ msgstr ""
 "ഒന്നില്‍ കൂടുതല്‍ ഡിജിറ്റൽ പ്രക്ഷേപണ അഡാപ്റ്ററുകള്‍ ഉണ്ടെങ്കില്‍, അഡാപ്റ്റര്‍ സംഖ്യ തിരഞ്ഞെടുക്കണം. "
 "സംഖ്യകള്‍ 0 മുതല്‍ തുടങ്ങണം."
 
-#: modules/access/dtv/access.c:43
+#: modules/access/dtv/access.c:48
 msgid "DVB device"
 msgstr "ഡിവിബി ഡിവൈസ്"
 
-#: modules/access/dtv/access.c:45
+#: modules/access/dtv/access.c:50
 msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
@@ -6815,11 +6816,11 @@ msgstr ""
 "അഡാപ്റ്റര്‍ ബഹുവിധ സ്വതന്ത്ര ട്യൂണര്‍ ഉപകരണങ്ങള്‍ സൌകര്യപ്പെടുത്തുന്നുണ്ടെങ്കില്‍, ഉപകരണ സംഖ്യ "
 "തിരഞ്ഞെടുത്തിരിക്കണം. സംഖ്യാവല്‍കരണം പൂജ്യം മുതല്‍ ആരംഭിക്കണം."
 
-#: modules/access/dtv/access.c:47
+#: modules/access/dtv/access.c:52
 msgid "Do not demultiplex"
 msgstr "ഡീമള്‍ട്ടിപ്ലെക്സ് ചെയ്യരുത്"
 
-#: modules/access/dtv/access.c:49
+#: modules/access/dtv/access.c:54
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
@@ -6828,27 +6829,27 @@ msgstr ""
 "ചെയ്യാറുള്ളത്.  ഈ ഐഛികം ഡിമള്‍ട്ടിപ്ലെക്സിങ് പ്രവര്‍ത്തനരഹിതമാക്കുകയും കൂടാതെ എല്ലാ "
 "പ്രോഗ്രാമുകളെയും സ്വീകരിക്കും"
 
-#: modules/access/dtv/access.c:52
+#: modules/access/dtv/access.c:57
 msgid "Network name"
 msgstr "നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:53
+#: modules/access/dtv/access.c:58
 msgid "Unique network name in the System Tuning Spaces"
 msgstr "സിസ്റ്റം ട്യൂണിംഗ് സ്പേസുകളില്‍ അനുപമമായ നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:55
+#: modules/access/dtv/access.c:60
 msgid "Network name to create"
 msgstr "നിര്‍മ്മിക്കേണ്ട നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:56
+#: modules/access/dtv/access.c:61
 msgid "Create unique name in the System Tuning Spaces"
 msgstr "സിസ്റ്റം ട്യൂണിംഗ് സ്പേസുകളില്‍ ഒരു അനുപമമായ നാമം സൃഷ്ടിക്കുക"
 
-#: modules/access/dtv/access.c:58
+#: modules/access/dtv/access.c:63
 msgid "Frequency (Hz)"
 msgstr "ഫ്രീക്വന്‍സി (Hz)"
 
-#: modules/access/dtv/access.c:60
+#: modules/access/dtv/access.c:65
 msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
@@ -6856,23 +6857,23 @@ msgstr ""
 "ഒരു തന്നിരിക്കുന്ന ഫ്രീക്വെന്‍സിയില്‍ ടി‌വി ചാനലുകളെ ട്രാന്‍സ്പോണ്ടറുകള്‍ (മള്‍ട്ടിപ്ലെക്സ് എന്നും "
 "അറിയപ്പെടും) വര്‍ഗ്ഗീകരിക്കും. റിസീവര്‍ ട്യൂണ്‍ ചെയ്യാന്‍ ഇത് ആവശ്യമാണ്."
 
-#: modules/access/dtv/access.c:63 modules/gui/qt/components/open_panels.cpp:987
+#: modules/access/dtv/access.c:68 modules/gui/qt/components/open_panels.cpp:987
 msgid "Modulation / Constellation"
 msgstr "മോഡ്യുലേഷന്‍ /കോണ്‍സ്റ്റലേഷന്‍"
 
-#: modules/access/dtv/access.c:64
+#: modules/access/dtv/access.c:69
 msgid "Layer A modulation"
 msgstr "ലെയര്‍ എ മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:65
+#: modules/access/dtv/access.c:70
 msgid "Layer B modulation"
 msgstr "ലെയര്‍ ബി മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:66
+#: modules/access/dtv/access.c:71
 msgid "Layer C modulation"
 msgstr "ലെയര്‍ സി മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:68
+#: modules/access/dtv/access.c:73
 msgid ""
 "The digital signal can be modulated according with different constellations "
 "(depending on the delivery system). If the demodulator cannot detect the "
@@ -6882,11 +6883,11 @@ msgstr ""
 "ആശ്രയിച്ച്). ഡിമോഡുലേറ്ററിന് സ്വയം കൂട്ടത്തെ തിരിച്ചറിയാന്‍ കഴിഞ്ഞില്ലെങ്കില്‍, അതിനെ സ്വമേധയാ "
 "കോൺഫിഗർ ചെയ്യേണ്ടതുണ്ട്."
 
-#: modules/access/dtv/access.c:83
+#: modules/access/dtv/access.c:88
 msgid "Symbol rate (bauds)"
 msgstr "സിമ്പല്‍ റേറ്റ്(ബൗഡ്സ്)"
 
-#: modules/access/dtv/access.c:85
+#: modules/access/dtv/access.c:90
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
@@ -6894,11 +6895,11 @@ msgstr ""
 "ചിഹ്നനിരക്ക് ചില സിസ്റ്റങ്ങളിൽ സ്വമേധ നിര്‍ദ്ദേശിക്കപ്പെടണം, വിശേഷിച്ച് ഡി‌വി‌ബി-സി, ഡി‌വി‌ബി-"
 "എസ് കൂടാതെ ഡി‌വി‌ബി-എസ്2."
 
-#: modules/access/dtv/access.c:88
+#: modules/access/dtv/access.c:93
 msgid "Spectrum inversion"
 msgstr "സ്പെക്ട്രം ഇന്‍വേര്‍ഷന്‍"
 
-#: modules/access/dtv/access.c:90
+#: modules/access/dtv/access.c:95
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
@@ -6906,135 +6907,135 @@ msgstr ""
 "ഡിമോഡുലേറ്ററിന് പ്രതസംബന്ധ വൈപരീത്യം ശരിയായി തിരിച്ചറിയാന്‍ കഴിഞ്ഞില്ലെങ്കില്‍, അതിനെ "
 "സ്വമേധയാ കോൺഫിഗർ ചെയ്യേണ്ടതുണ്ട്."
 
-#: modules/access/dtv/access.c:96
+#: modules/access/dtv/access.c:101
 msgid "FEC code rate"
 msgstr "എഫ്ഇസി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:97
+#: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
 msgstr "ഹൈ-പ്രയോരിറ്റി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
 msgstr "ലോ-പ്രയോരിറ്റി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:99
+#: modules/access/dtv/access.c:104
 msgid "Layer A code rate"
 msgstr "ലെയര്‍ എ കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:100
+#: modules/access/dtv/access.c:105
 msgid "Layer B code rate"
 msgstr "ലെയര്‍ ബി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:101
+#: modules/access/dtv/access.c:106
 msgid "Layer C code rate"
 msgstr "ലെയര്‍ സി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:103
+#: modules/access/dtv/access.c:108
 msgid "The code rate for Forward Error Correction can be specified."
 msgstr "മുന്നോട്ടുള്ള തെറ്റുകള്‍ ശരിയാക്കാനാവശ്യമായ കോഡ് നിരക്ക് നിര്‍ദ്ദേശിക്കാം."
 
-#: modules/access/dtv/access.c:113
+#: modules/access/dtv/access.c:118
 msgid "Transmission mode"
 msgstr "ട്രാന്‍സ്മിഷന്‍ മോഡ്"
 
-#: modules/access/dtv/access.c:121
+#: modules/access/dtv/access.c:126
 msgid "Bandwidth (MHz)"
 msgstr "ബാന്‍ഡ്വിഡ്ത്ത് (MHz)"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "10 MHz"
 msgstr "10 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "8 MHz"
 msgstr "8 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "7 MHz"
 msgstr "7 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "6 MHz"
 msgstr "6 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "5 MHz"
 msgstr "5 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "1.712 MHz"
 msgstr "1.712 MHz"
 
-#: modules/access/dtv/access.c:130
+#: modules/access/dtv/access.c:135
 msgid "Guard interval"
 msgstr "ഗാര്‍ഡ് ഇടവേള"
 
-#: modules/access/dtv/access.c:138
+#: modules/access/dtv/access.c:143
 msgid "Hierarchy mode"
 msgstr "ഹൈറാര്‍ക്കി മോഡ്"
 
-#: modules/access/dtv/access.c:146
+#: modules/access/dtv/access.c:151
 msgid "DVB-T2 Physical Layer Pipe"
 msgstr "ഡിവിബി-ടി2 ഫിസിക്കല്‍ ലെയര്‍ പൈപ്പ്"
 
-#: modules/access/dtv/access.c:148
+#: modules/access/dtv/access.c:153
 msgid "Layer A segments count"
 msgstr "ലെയര്‍ എ സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:149
+#: modules/access/dtv/access.c:154
 msgid "Layer B segments count"
 msgstr "ലെയര്‍ ബി സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:150
+#: modules/access/dtv/access.c:155
 msgid "Layer C segments count"
 msgstr "ലെയര്‍ സി സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:152
+#: modules/access/dtv/access.c:157
 msgid "Layer A time interleaving"
 msgstr "ലെയര്‍ എ ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:153
+#: modules/access/dtv/access.c:158
 msgid "Layer B time interleaving"
 msgstr "ലെയര്‍ ബി ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:154
+#: modules/access/dtv/access.c:159
 msgid "Layer C time interleaving"
 msgstr "ലെയര്‍ സി ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:156
+#: modules/access/dtv/access.c:161
 msgid "Stream identifier"
 msgstr "സ്ട്രീം ഐഡന്റിഫയര്‍"
 
-#: modules/access/dtv/access.c:158
+#: modules/access/dtv/access.c:163
 msgid "Pilot"
 msgstr "പൈലറ്റ്"
 
-#: modules/access/dtv/access.c:160
+#: modules/access/dtv/access.c:165
 msgid "Roll-off factor"
 msgstr "റോള്‍-ഓഫ് ഫാക്ടര്‍"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.35 (same as DVB-S)"
 msgstr "0.35 (ഡിവിബി-എസിനു തുല്യമായ)"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.20"
 msgstr "0.20"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.25"
 msgstr "0.25"
 
-#: modules/access/dtv/access.c:168
+#: modules/access/dtv/access.c:173
 msgid "Transport stream ID"
 msgstr "ട്രാന്‍സ്പോര്‍ട്ട് സ്ട്രീം ഐഡി"
 
-#: modules/access/dtv/access.c:170
+#: modules/access/dtv/access.c:175
 msgid "Polarization (Voltage)"
 msgstr "പോളറൈസേഷന്‍(വോള്‍ട്ടേജ്)"
 
-#: modules/access/dtv/access.c:172
+#: modules/access/dtv/access.c:177
 msgid ""
 "To select the polarization of the transponder, a different voltage is "
 "normally applied to the low noise block-downconverter (LNB)."
@@ -7042,31 +7043,31 @@ msgstr ""
 "ട്രാന്‍സ്പോണ്ടറുകളുടെ ധ്രുവീകരണം തിരഞ്ഞെടുക്കാന്‍, സാധാരണഗതിയില്‍ ഒരു വ്യത്യസ്ഥമായ വോള്‍ട്ടേജ് കുറഞ്ഞ "
 "നോയിസ് ബ്ലോക്-ഡൌണ്‍കൌണ്ടറിലേക്ക് (എല്‍‌എന്‍‌ബി)  പ്രയോഗിക്കും."
 
-#: modules/access/dtv/access.c:175
+#: modules/access/dtv/access.c:180
 msgid "Unspecified (0V)"
 msgstr "സൂചിപ്പിക്കാത്തത് (0V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Vertical (13V)"
 msgstr "ലംബമായ (13V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Horizontal (18V)"
 msgstr "തിരശ്ചീനമായ (18V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Right Hand (13V)"
 msgstr "സര്‍ക്കുലര്‍ വലത് കൈ (13V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Left Hand (18V)"
 msgstr "സര്‍ക്കുലര്‍ വലത് കൈ(18V)"
 
-#: modules/access/dtv/access.c:179
+#: modules/access/dtv/access.c:184
 msgid "High LNB voltage"
 msgstr "ഉയര്‍ന്ന എല്‍എന്‍ബി വോള്‍ട്ടേജ്"
 
-#: modules/access/dtv/access.c:181
+#: modules/access/dtv/access.c:186
 msgid ""
 "If the cables between the satellilte low noise block-downconverter and the "
 "receiver are long, higher voltage may be required.\n"
@@ -7076,15 +7077,15 @@ msgstr ""
 "കൂടുതലാണെങ്കില്‍, കൂടിയ വോള്‍ട്ടേജ് അനിവാര്യമായേക്കാം.\n"
 "എല്ലാ റിസീവറുകളും ഇത് പിന്തുണക്കില്ല. "
 
-#: modules/access/dtv/access.c:185
+#: modules/access/dtv/access.c:190
 msgid "Local oscillator low frequency (kHz)"
 msgstr "ലോക്കല്‍ ഓസിലേറ്റര്‍ ലോ ഫ്രീക്വന്‍സി (kHz)"
 
-#: modules/access/dtv/access.c:186
+#: modules/access/dtv/access.c:191
 msgid "Local oscillator high frequency (kHz)"
 msgstr "ലോക്കല്‍ ഓസിലേറ്റര്‍ ഹൈ ഫ്രീക്വന്‍സി (kHz)"
 
-#: modules/access/dtv/access.c:188
+#: modules/access/dtv/access.c:193
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
@@ -7093,11 +7094,11 @@ msgstr ""
 "ഡൗൺകൺ‌വർ‌ട്ടർ‌ (എൽ‌എൻ‌ബി) സാറ്റലൈറ്റ് ട്രാൻസ്മിഷൻ ഫ്രീക്വൻസിയിൽ നിന്ന് ലോക്കൽ ഓസിലേറ്റർ "
 "ഫ്രീക്വൻസി കുറയ്ക്കും. RF കേബിളിലെ ഇന്റർമീഡിയറ്റ് ഫ്രീക്വൻസി (IF) ആണ് ഫലം."
 
-#: modules/access/dtv/access.c:191
+#: modules/access/dtv/access.c:196
 msgid "Universal LNB switch frequency (kHz)"
 msgstr "യൂണിവേഴ്സല്‍ എല്‍എന്‍ബി സ്വിച്ച് ഫ്രീക്വന്‍സി  (kHz)"
 
-#: modules/access/dtv/access.c:193
+#: modules/access/dtv/access.c:198
 msgid ""
 "If the satellite transmission frequency exceeds the switch frequency, the "
 "oscillator high frequency will be used as reference. Furthermore the "
@@ -7107,11 +7108,11 @@ msgstr ""
 "ഫ്രീക്വെന്‍സിയെ പ്രമനകോശമായി ഉപയോഗിക്കും. അതിനുപുറമേ 22 കിലോഹെര്‍ട്സ് സ്വയംപ്രേരിത തുടര്‍ ടോണ്‍ "
 "അയക്കപ്പെടും."
 
-#: modules/access/dtv/access.c:196
+#: modules/access/dtv/access.c:201
 msgid "Continuous 22kHz tone"
 msgstr "തുടര്‍ച്ചയായ 22kHz ടോണ്‍"
 
-#: modules/access/dtv/access.c:198
+#: modules/access/dtv/access.c:203
 msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
@@ -7119,11 +7120,11 @@ msgstr ""
 "22 കിലോഹെര്‍ട്സ് തുടര്‍ ടോണ്‍ കേബിളില്‍ അയക്കാം. എല്ലാറ്റിനും പറ്റിയ എല്‍‌എന്‍‌ബിയില്‍ നിന്നും കൂടിയ "
 "ഫ്രീക്വെന്‍സി ബാന്‍ഡ് ഇത് പൊതുവേ തിരഞ്ഞെടുക്കും."
 
-#: modules/access/dtv/access.c:201
+#: modules/access/dtv/access.c:206
 msgid "DiSEqC LNB number"
 msgstr "ഡിസെക്സി എല്‍എന്‍ബി നമ്പര്‍"
 
-#: modules/access/dtv/access.c:203
+#: modules/access/dtv/access.c:208
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a DiSEqC 1.0 switch, the correct LNB can be "
@@ -7133,16 +7134,16 @@ msgstr ""
 "സ്വിച്ചിലൂടെ ഘടിപ്പിച്ചിട്ടുണ്ടെങ്കില്‍, ശരിയായ എല്‍‌എന്‍‌ബി തിരഞ്ഞെടുക്കാം (1 മുതല്‍ 4 വരെ). സ്വിച്ച് "
 "ഒന്നുമില്ലെങ്കില്‍ ഈ ഘടകം 0 ആയിരിക്കണം."
 
-#: modules/access/dtv/access.c:209 modules/access/v4l2/v4l2.c:136
+#: modules/access/dtv/access.c:214 modules/access/v4l2/v4l2.c:136
 #: modules/access/v4l2/v4l2.c:163 modules/access/v4l2/v4l2.c:201
 msgid "Unspecified"
 msgstr "വിവരിയ്ക്കപ്പെടാത്ത"
 
-#: modules/access/dtv/access.c:213
+#: modules/access/dtv/access.c:218
 msgid "Uncommitted DiSEqC LNB number"
 msgstr "കമ്മിറ്റ് ചെയ്യാത്ത ഡിസെക്സി എന്‍എന്‍ബി നമ്പര്‍"
 
-#: modules/access/dtv/access.c:215
+#: modules/access/dtv/access.c:220
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a cascade formed from DiSEqC 1.1 uncommitted "
@@ -7155,100 +7156,100 @@ msgstr ""
 "സ്വിച്ചിനോടും ഘടിപ്പിച്ചിട്ടുണ്ടെങ്കില്‍, ശരിയായ പരിത്യജികാത്ത എല്‍‌എന്‍‌ബി തിരഞ്ഞെടുക്കാം (1 മുതല്‍ "
 "4 വരെ). പരിത്യജികാത്ത സ്വിച്ച് ഒന്നുമില്ലെങ്കില്‍ ഈ ഘടകം 0 ആയിരിക്കണം."
 
-#: modules/access/dtv/access.c:222
+#: modules/access/dtv/access.c:227
 msgid "Network identifier"
 msgstr "നെറ്റ്വര്‍ക്ക് ഐഡന്റിഫയര്‍"
 
-#: modules/access/dtv/access.c:223
+#: modules/access/dtv/access.c:228
 msgid "Satellite azimuth"
 msgstr "സാറ്റലൈറ്റ് അസിമുത്ത്"
 
-#: modules/access/dtv/access.c:224
+#: modules/access/dtv/access.c:229
 msgid "Satellite azimuth in tenths of degree"
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് അഗ്രകോടി"
 
-#: modules/access/dtv/access.c:225
+#: modules/access/dtv/access.c:230
 msgid "Satellite elevation"
 msgstr "സാറ്റലൈറ്റ് എലിവേഷന്‍"
 
-#: modules/access/dtv/access.c:226
+#: modules/access/dtv/access.c:231
 msgid "Satellite elevation in tenths of degree"
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് ഉയരം"
 
-#: modules/access/dtv/access.c:227
+#: modules/access/dtv/access.c:232
 msgid "Satellite longitude"
 msgstr "സാറ്റ്ലൈറ്റ് ലോംഗിറ്റ്യൂഡ്"
 
-#: modules/access/dtv/access.c:229
+#: modules/access/dtv/access.c:234
 msgid "Satellite longitude in tenths of degree. West is negative."
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് ധ്രുവരേഖാശം. പടിഞ്ഞാറു നെഗറ്റിവ് ആണ്"
 
-#: modules/access/dtv/access.c:231
+#: modules/access/dtv/access.c:236
 msgid "Satellite range code"
 msgstr "സാറ്റലൈറ്റ് റേഞ്ച് കോഡ്"
 
-#: modules/access/dtv/access.c:232
+#: modules/access/dtv/access.c:237
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr ""
 "നിര്‍മ്മാതാവിനാല്‍ നിര്‍വചിക്കപ്പെട്ട സാറ്റലൈറ്റ് പരിധി കോഡ് ഉദാ. ഡി‌ഐ‌എസ്‌ഇ‌ക്യൂ‌സി സ്വിച്ച് കോഡ്"
 
-#: modules/access/dtv/access.c:236
+#: modules/access/dtv/access.c:241
 msgid "Major channel"
 msgstr "പ്രധാന ചാനല്‍"
 
-#: modules/access/dtv/access.c:237
+#: modules/access/dtv/access.c:242
 msgid "ATSC minor channel"
 msgstr "എടിഎസ്സി മൈനര്‍ ചാനല്‍"
 
-#: modules/access/dtv/access.c:238
+#: modules/access/dtv/access.c:243
 msgid "Physical channel"
 msgstr "ഫിസിക്കല്‍ ചാനല്‍"
 
-#: modules/access/dtv/access.c:244
+#: modules/access/dtv/access.c:249
 msgid "DTV"
 msgstr "ഡിടിവി"
 
-#: modules/access/dtv/access.c:245
+#: modules/access/dtv/access.c:250
 msgid "Digital Television and Radio"
 msgstr "ഡിജിറ്റല്‍ ടെലിവിഷനും റോഡിയോയും"
 
-#: modules/access/dtv/access.c:283
+#: modules/access/dtv/access.c:288
 msgid "Terrestrial reception parameters"
 msgstr "ടെറസ്ട്രിയല്‍ റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:295
+#: modules/access/dtv/access.c:300
 msgid "DVB-T reception parameters"
 msgstr "ഡിവിബി-ടി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:311
+#: modules/access/dtv/access.c:316
 msgid "ISDB-T reception parameters"
 msgstr "ഐസ്ഡിബി-ടി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:352
+#: modules/access/dtv/access.c:357
 msgid "Cable and satellite reception parameters"
 msgstr "കേബിളും സാറ്റലൈറ്റ് റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:364
+#: modules/access/dtv/access.c:369
 msgid "DVB-S2 parameters"
 msgstr "ഡിവിബി-എസ്2 പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:375
+#: modules/access/dtv/access.c:380
 msgid "ISDB-S parameters"
 msgstr "ഐഎസ്ഡിബി-എസ് പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:380
+#: modules/access/dtv/access.c:385
 msgid "Satellite equipment control"
 msgstr "സാറ്റ്ലൈറ്റ് ഉപകരണ നിയന്ത്രണം"
 
-#: modules/access/dtv/access.c:422
+#: modules/access/dtv/access.c:427
 msgid "ATSC reception parameters"
 msgstr "എടിഎസ്സി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:476
+#: modules/access/dtv/access.c:481
 msgid "Digital broadcasting"
 msgstr "ഡിജിറ്റല്‍ ബ്രോഡ്കാസ്റ്റിംഗ്"
 
-#: modules/access/dtv/access.c:477
+#: modules/access/dtv/access.c:482
 msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
@@ -7724,11 +7725,11 @@ msgstr "സ്ട്രീമുകളുടെ വലുപ്പം ബൈറ�
 msgid "Memory input"
 msgstr "മെമ്മറി ഇന്‍പുട്ട്"
 
-#: modules/access/imem-access.c:159
+#: modules/access/imem-access.c:165
 msgid "Memory stream"
 msgstr "മെമ്മറി സ്ട്രീം"
 
-#: modules/access/imem-access.c:160
+#: modules/access/imem-access.c:166
 msgid "In-memory stream input"
 msgstr "മെമ്മറിയിലെ സ്ട്രീം ഇൻപുട്ട്"
 
@@ -10906,8 +10907,8 @@ msgstr "ഉപശീർഷകത്തിൽ കോർ ടെക്സ്റ്�
 msgid "ARIB subtitles decoder"
 msgstr "എആർഐബി സബ്ടൈറ്റിലുകൾ ഡീകോഡർ"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
-#: modules/demux/mpeg/ts_psi.c:1092
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1089
+#: modules/demux/mpeg/ts_psi.c:1096
 msgid "ARIB subtitles"
 msgstr "എആർഐബി സബ്ടൈറ്റിലുകൾ"
 
@@ -11404,23 +11405,23 @@ msgstr ""
 "വി‌എല്‍‌സി മീഡിയ പ്ലെയറിന് അകത്തുള്ള ഒരു തെറ്റല്ല ഇത്.\n"
 "ഈ പ്രശ്നത്തിന് വേണ്ടി വീഡിയോലാന്‍ പ്രോജക്റ്റുമായി ബന്ധപ്പെടണ്ട.\n"
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "unknown"
 msgstr "അറിയാത്ത"
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "video"
 msgstr "വീഡിയോ"
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "audio"
 msgstr "ഓഡിയോ"
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "subpicture"
 msgstr "സബ്പിക്ച്ചര്‍"
 
-#: modules/codec/avcodec/encoder.c:913
+#: modules/codec/avcodec/encoder.c:919
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "%4.4s %s എന്‍കോഡര്‍ വി‌എല്‍‌സിക്കു തുറക്കാന്‍ കഴിഞ്ഞില്ല."
@@ -12160,15 +12161,15 @@ msgstr "വീഡിയോ എന്‍കോഡര്‍ (ഒപെന്‍മ
 msgid "OpenMAX IL video output"
 msgstr "ഓപ്പണ്‍മാക്സ് ഐഎല്‍ വീഡിയോ ഔട്ട്പുട്ട്"
 
-#: modules/codec/opus.c:62
+#: modules/codec/opus.c:65
 msgid "Opus audio decoder"
 msgstr "ഒപസ് ഓഡിയോ ഡീക്കോഡര്‍"
 
-#: modules/codec/opus.c:64 modules/codec/opus.c:71
+#: modules/codec/opus.c:67 modules/codec/opus.c:74
 msgid "Opus"
 msgstr "ഒപസ്"
 
-#: modules/codec/opus.c:69
+#: modules/codec/opus.c:72
 msgid "Opus audio encoder"
 msgstr "ഒപസ് ഓഡിയോ എന്‍കോഡര്‍"
 
@@ -14888,315 +14889,315 @@ msgstr "ആര്‍സി"
 msgid "Remote control interface"
 msgstr "റിമോട്ട് കണ്‍ട്രോള്‍ ഇന്റര്‍ഫേസ്"
 
-#: modules/control/oldrc.c:368
+#: modules/control/oldrc.c:370
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr ""
 "റിമോട്ട് കണ്‍ട്രോള്‍ ഇന്റര്‍ഫേസ് ഇനീഷ്യലൈസ് ചെയ്തിരിക്കുന്നു. സഹായത്തിനായി 'സഹായം' ടൈപ്പ് ചെയ്യുക."
 
-#: modules/control/oldrc.c:767
+#: modules/control/oldrc.c:769
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "അറിയപ്പെടാത്ത കമാന്‍ഡ് '%s'. സഹായത്തിന് വേണ്ടി 'ഹെല്പ്' ടൈപ്പ് ചെയ്യുക."
 
-#: modules/control/oldrc.c:785
+#: modules/control/oldrc.c:787
 msgid "+----[ Remote control commands ]"
 msgstr "+----[റിമോട്ട് നിയന്ത്രണ ആജ്ഞ]"
 
-#: modules/control/oldrc.c:787
+#: modules/control/oldrc.c:789
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr "| എക്സ്‌വൈ‌സെഡ് ചേര്‍ക്കുക ............ എക്സ്‌വൈ‌സെഡ് പ്ലേലിസ്റ്റില്‍ ചേര്‍ക്കുക"
 
-#: modules/control/oldrc.c:788
+#: modules/control/oldrc.c:790
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr "| എക്സ്‌വൈ‌സെഡ് വരിയാക്കുക ............ പ്ലേലിസ്റ്റില്‍ എക്സ്‌വൈ‌സെഡ് വരിയാക്കുക."
 
-#: modules/control/oldrc.c:789
+#: modules/control/oldrc.c:791
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr "|പ്ലേലിസ്റ്റ് .... പ്ലേലിസ്റ്റില്‍ ഇപ്പോളുള്ള ഇനങ്ങള്‍ പ്രദര്‍ശിപ്പികുക."
 
-#: modules/control/oldrc.c:790
+#: modules/control/oldrc.c:792
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr "| പ്ലേ . . . . . . . . . . ..  . .  സ്ട്രീം പ്ലേചെയ്യുക "
 
-#: modules/control/oldrc.c:791
+#: modules/control/oldrc.c:793
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr "|നിര്‍ത്തുക . . . . . . ..  . സ്ട്രീം നിര്‍ത്തുക"
 
-#: modules/control/oldrc.c:792
+#: modules/control/oldrc.c:794
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr "|അടുത്ത . . . . . . . . . . . . . . . . .  അടുത്ത പ്ലേലിസ്റ്റ് ഇനം"
 
-#: modules/control/oldrc.c:793
+#: modules/control/oldrc.c:795
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr "|മുമ്പിലത്തെ . . . . . . . . . . . . . . . . .  മുമ്പിലത്തെ പ്ലേലിസ്റ്റ് ഇനം"
 
-#: modules/control/oldrc.c:794
+#: modules/control/oldrc.c:796
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr ""
 "|പോകുക. . . . . . . . . . . . . . . . . സൂചികയിലെ പ്ലേലിസ്റ്റ് ഇനത്തിലേക്ക് പോകുക "
 
-#: modules/control/oldrc.c:795
+#: modules/control/oldrc.c:797
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr "|അവര്‍ത്തനം [തുടങ്ങുക|നിര്‍ത്തുക} . . . . പ്ലേലിസ്റ്റ് ഇനങ്ങളുടെ ആവര്‍ത്തനം മാറ്റുക"
 
-#: modules/control/oldrc.c:796
+#: modules/control/oldrc.c:798
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
 msgstr "|പരിഭ്രമണം [തുടങ്ങുക|നിര്‍ത്തുക] . . . . . .  . . . പ്ലേലിസ്റ്റ് പരിഭ്രമണം മാറ്റുക"
 
-#: modules/control/oldrc.c:797
+#: modules/control/oldrc.c:799
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
 msgstr "|ക്രമമല്ലാത്ത [തുടങ്ങുക|നിര്‍ത്തുക] . . . . . .  . . . ക്രമമല്ലാത്ത ചാട്ടം മാറ്റുക"
 
-#: modules/control/oldrc.c:798
+#: modules/control/oldrc.c:800
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
 msgstr "| കാലിയാക്കുക . . . . . . . . . . . . . . പ്ലേ ലിസ്റ്റ് കാലിയാക്കുക"
 
-#: modules/control/oldrc.c:799
+#: modules/control/oldrc.c:801
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr "|സ്ഥിതി . . . . . . . . . . .  . ഇപ്പോളത്തെ പ്ലേലിസ്റ്റ് സ്ഥിതി"
 
-#: modules/control/oldrc.c:800
+#: modules/control/oldrc.c:802
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr "|ശീര്‍ഷകം [എക്സ്]... ഇപ്പോളത്തെ ഇനത്തിലെ ശീര്‍ഷകം സജ്ജീകരിക്കുക/എടുക്കുക"
 
-#: modules/control/oldrc.c:801
+#: modules/control/oldrc.c:803
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr "|ശീര്‍ഷകം_ന . . . . . . . . . ഇപ്പോളത്തെ ഇനത്തിലെ അടുത്ത ശീര്‍ഷകം"
 
-#: modules/control/oldrc.c:802
+#: modules/control/oldrc.c:804
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr "|ശീര്‍ഷകം_പി . . . . . . .  ഇപ്പോളത്തെ ഇനത്തിലെ മുന്‍പിലത്തെ ശീര്‍ഷകം"
 
-#: modules/control/oldrc.c:803
+#: modules/control/oldrc.c:805
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr "|അധ്യായം [എക്സ്] . . . . ഇപ്പോളത്തെ ഇനത്തിലെ അധ്യായം സജ്ജീകരിക്കുക / എടുക്കുക"
 
-#: modules/control/oldrc.c:804
+#: modules/control/oldrc.c:806
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr "|അധ്യായം_എന്‍ . . . . . . . . . ഇപ്പോളത്തെ ഇനത്തിലെ അടുത്ത അധ്യായം"
 
-#: modules/control/oldrc.c:805
+#: modules/control/oldrc.c:807
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr "|അധ്യായം_പി. . . . . . . . . ഇപ്പോളത്തെ ഇനത്തിലെ മുന്‍പിലത്തെ അധ്യായം"
 
-#: modules/control/oldrc.c:807
+#: modules/control/oldrc.c:809
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr "| തേടുക എക്സ് . . . . സെക്കന്‍ഡില്‍ തേടുക, ഉദാഹരണത്തിന് 'സീക്12'"
 
-#: modules/control/oldrc.c:808
+#: modules/control/oldrc.c:810
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr "| തല്‍കളികവിരാമം . . . . . . . . . . . . . .  . .താല്‍കാലികവിരാമം മാറ്റുക"
 
-#: modules/control/oldrc.c:809
+#: modules/control/oldrc.c:811
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr "| മുന്‍പിലോട്ട് പെട്ടെന്നു . . . . . .  .  കൂടിയ മൂല്യം സജ്ജീകരിക്കുക"
 
-#: modules/control/oldrc.c:810
+#: modules/control/oldrc.c:812
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr "| പിന്നിലോട്ട് പോവുക . . . . . .  .  കൂടിയ മൂല്യം സജ്ജീകരിക്കുക"
 
-#: modules/control/oldrc.c:811
+#: modules/control/oldrc.c:813
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr "| വേഗത്തില്‍  . . . . . .  .  സ്ട്രീമുകളുടെ വേഗത്തിലുള്ള പ്ലെയിങ്"
 
-#: modules/control/oldrc.c:812
+#: modules/control/oldrc.c:814
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr "| മെല്ലെ . . . . . .  .  സ്ട്രീമുകളുടെ മെല്ലെയുള്ള പ്ലെയിങ്"
 
-#: modules/control/oldrc.c:813
+#: modules/control/oldrc.c:815
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr "| സാധാരണ . . . . . .  .  സ്ട്രീമുകളുടെ സാധാരണത്തിലുള്ള പ്ലെയിങ്"
 
-#: modules/control/oldrc.c:814
+#: modules/control/oldrc.c:816
 msgid "| frame. . . . . . . . . .  play frame by frame"
 msgstr "| ഫ്രെയിം- ഫ്രെയിം ഫ്രെയിം ആയി പ്ലേ ചെയ്യുക"
 
-#: modules/control/oldrc.c:815
+#: modules/control/oldrc.c:817
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr "|എഫ് [തുടങ്ങുക|നിര്‍ത്തുക] . . . . . . . . . . . . . മുഴുവന്‍സ്ക്രീന്‍ മാറ്റാന്‍"
 
-#: modules/control/oldrc.c:816
+#: modules/control/oldrc.c:818
 msgid "| info . . . . .  information about the current stream"
 msgstr "|ഇന്‍ഫോ . . . . ഇപ്പോളത്തെ സ്ട്രീമിനെ പറ്റിയുള്ള അറിവ്"
 
-#: modules/control/oldrc.c:817
+#: modules/control/oldrc.c:819
 msgid "| stats  . . . . . . . .  show statistical information"
 msgstr "| സ്റ്റാറ്റ്സ് . . . . . . . സാംഖ്യിക വിവരങള്‍ കാണിക്കുക"
 
-#: modules/control/oldrc.c:818
+#: modules/control/oldrc.c:820
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| സമയം_കിട്ടുക . . സ്ട്രീമിന്റെ തുടക്കം മുതലുള്ള സെകണ്ടുകള്‍ കഴിഞ്ഞത്"
 
-#: modules/control/oldrc.c:819
+#: modules/control/oldrc.c:821
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr "| പ്ലേ_ചെയ്യുന്നു . . . ഒരു സ്ട്രീം പ്ലേ ചെയ്യുകയാണെങ്കില്‍ 1, അല്ലെങ്കില്‍ 0"
 
-#: modules/control/oldrc.c:820
+#: modules/control/oldrc.c:822
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr "| ശീര്‍ഷകം_എടുക്കുക . . . . . ഇപ്പോളത്തെ സ്ട്രീമിന്‍റെ ശീര്‍ഷകം"
 
-#: modules/control/oldrc.c:821
+#: modules/control/oldrc.c:823
 msgid "| get_length . . . .  the length of the current stream"
 msgstr "| നീളം_എടുക്കുക . . . . ഇപ്പോളത്തെ സ്ട്രീമിന്‍റെ നീളം"
 
-#: modules/control/oldrc.c:823
+#: modules/control/oldrc.c:825
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr ""
 "| വോളിയം [എക്സ്] . . . . . . .  . . .  . ഔഡിയോയുടെ വോളിയം സജ്ജീകരിക്കുക/ എടുക്കുക"
 
-#: modules/control/oldrc.c:824
+#: modules/control/oldrc.c:826
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr "|വോളിയം കൂട്ടുക [എക്സ്] . . . . . . .  ഓഡിയോ വോളിയം എക്സ് ചുവടുകള്‍ കൂട്ടുക"
 
-#: modules/control/oldrc.c:825
+#: modules/control/oldrc.c:827
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr "|വോളിയം കുറക്കുക [എക്സ്] . . . . . . .  ഓഡിയോ വോളിയം എക്സ് ചുവടുകള്‍ കുറക്കുക"
 
-#: modules/control/oldrc.c:826
+#: modules/control/oldrc.c:828
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
 msgstr "| അഡേവ് [ഡിവൈസ്] . . . . . . . . .  ഓഡിയോ ഡിവൈസ് സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:827
+#: modules/control/oldrc.c:829
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr "| അചാന്‍ [എക്സ്] . . . . . . . . .  ഓഡിയോ ചാനലുകള്‍ സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:828
+#: modules/control/oldrc.c:830
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr "| അട്രാക് [എക്സ്] . . . . . . . . .  ഓഡിയോ ട്രാക്ക് സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:829
+#: modules/control/oldrc.c:831
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr "| വിട്രാക്ക് [എക്സ്] . . . . . . . . .  വീഡിയോ ട്രാക്ക് സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:830
+#: modules/control/oldrc.c:832
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr ""
 "| വിറേഷിയോ [എക്സ്] . . . . . . . . .  വീഡിയോ ആസ്പെക്ട് അനുപാതം സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:831
+#: modules/control/oldrc.c:833
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr "| വിക്രോപ് [എക്സ്] . . . . . . . . .  വീഡിയോ ക്രോപ് സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:832
+#: modules/control/oldrc.c:834
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr "| വിസൂം [എക്സ്] . . . . . . . . .  വീഡിയോ സൂം സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:833
+#: modules/control/oldrc.c:835
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
 msgstr "| സ്നാപ്ഷോട്ട് . . . . . . . . . . . . വീഡിയോ സ്നാപ്ഷോട്ട് എടുക്കുക"
 
-#: modules/control/oldrc.c:834
+#: modules/control/oldrc.c:836
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
 msgstr "| എസ്ട്രാക് [എക്സ്] . . . . . . . . .  ഉപശീര്‍ഷക ട്രാക്ക് സജ്ജീകരിക്കുക/ നേടുക"
 
-#: modules/control/oldrc.c:835
+#: modules/control/oldrc.c:837
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr "| കീ [ഹോട്ട്കീ പേര്] . . . . . . . . .  ഹോട്ട്കീ ഞെക്കല്‍ അനുകരിക്കുക"
 
-#: modules/control/oldrc.c:837
+#: modules/control/oldrc.c:839
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr "| സഹായം . . . . . ..  . . . .. . . . .  ഈ സഹായ സന്ദേശം"
 
-#: modules/control/oldrc.c:838
+#: modules/control/oldrc.c:840
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr "| ലോഗൌട് . . . . . . . .  പുറത്തുപോവുക (സോക്കറ്റ് ബന്ധത്തില്‍ ആണെങ്കില്‍)"
 
-#: modules/control/oldrc.c:839
+#: modules/control/oldrc.c:841
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| ക്വിറ്റ് . . . . . . . . . . . . . . . . . . .  ക്വിറ്റ് വിഎല്‍സി"
 
-#: modules/control/oldrc.c:841
+#: modules/control/oldrc.c:843
 msgid "+----[ end of help ]"
 msgstr "+----[സഹായത്തിന്റെ അവസാനം]"
 
-#: modules/control/oldrc.c:968
+#: modules/control/oldrc.c:970
 msgid "Press pause to continue."
 msgstr "തുടരാന്‍ പോസ് അമര്‍ത്തുക"
 
-#: modules/control/oldrc.c:1192 modules/control/oldrc.c:1441
-#: modules/control/oldrc.c:1485
+#: modules/control/oldrc.c:1194 modules/control/oldrc.c:1443
+#: modules/control/oldrc.c:1487
 msgid "Type 'pause' to continue."
 msgstr "തുടരാന്‍ പോസ് ടൈപ്പ് ചെയ്യുക"
 
-#: modules/control/oldrc.c:1281
+#: modules/control/oldrc.c:1283
 msgid "Error: `goto' needs an argument greater than zero."
 msgstr "തെറ്റ്: 'പോവുക' ക്കു പൂജ്യത്തെക്കാള്‍ വലിയ അര്‍ഗുമെന്‍റ് ആവശ്യമുണ്ട്"
 
-#: modules/control/oldrc.c:1291
+#: modules/control/oldrc.c:1293
 #, c-format
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] "പ്ലേലിസ്റ്റില്‍ %u ഘടകം മാത്രം ഉള്ളൂ"
 msgstr[1] "പ്ലേലിസ്റ്റില്‍ %u ഘടകങ്ങള്‍ മാത്രമേ ഉള്ളൂ"
 
-#: modules/control/oldrc.c:1737 modules/gui/ncurses.c:808
+#: modules/control/oldrc.c:1739 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
 msgstr "+-[അകത്തോട്ടു]"
 
-#: modules/control/oldrc.c:1738 modules/gui/ncurses.c:810
+#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:810
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
 msgstr "| ഇന്‍പുട്ട് ബയിറ്റ്സ് വായിച്ചു: %8.0f KiB"
 
-#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:812
+#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
 msgstr "| ഇന്‍പുട്ട് ബിറ്റ്നിരക്ക് : %6.0f kb/s"
 
-#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:814
+#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:814
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
 msgstr "| ഡിമക്സ് ബയിറ്റ്സ് വായിച്ചു: %8.0f KiB"
 
-#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:816
+#: modules/control/oldrc.c:1746 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
 msgstr "| ഡിമക്സ് ബിറ്റ്നിരക്ക് : %6.0f kb/s"
 
-#: modules/control/oldrc.c:1746
+#: modules/control/oldrc.c:1748
 #, c-format
 msgid "| demux corrupted  :    %5<PRIi64>"
 msgstr "| ഡിമക്സ് തെറ്റായി : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1748
+#: modules/control/oldrc.c:1750
 #, c-format
 msgid "| discontinuities  :    %5<PRIi64>"
 msgstr "| അവസാനിപ്പികല്‍ :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1752 modules/gui/ncurses.c:822
+#: modules/control/oldrc.c:1754 modules/gui/ncurses.c:822
 msgid "+-[Video Decoding]"
 msgstr "+-[വീഡിയോ ഡീക്കോഡിംഗ്]"
 
-#: modules/control/oldrc.c:1753 modules/gui/ncurses.c:824
+#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:824
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
 msgstr "| വീഡിയോ ഡീകോഡഡ്    :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
+#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
 msgstr "| കാണിക്കുന്ന ഫ്രെയിമുകള്‍:    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
+#: modules/control/oldrc.c:1759 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
 msgstr "| നഷ്ട്ടപ്പെട്ട ഫ്രെയിമുകള്‍ :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1761 modules/gui/ncurses.c:834
+#: modules/control/oldrc.c:1763 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
 msgstr "+-[ഓഡിയോ ഡീക്കോഡിംഗ്]"
 
-#: modules/control/oldrc.c:1762 modules/gui/ncurses.c:836
+#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:836
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
 msgstr "| ഡികോഡ് ചെയ്യപ്പെട്ട ഓഡിയോ :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
+#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:838
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
 msgstr "| പ്ലേ ചെയ്ത ബഫറുകള്‍ :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
+#: modules/control/oldrc.c:1768 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
 msgstr "| നഷ്ട്ടപ്പെട്ട ബഫറുകള്‍ :   %5<PRIi64>"
@@ -15386,7 +15387,7 @@ msgstr "ആവശ്യമുള്ളപ്പോള്‍ ഫിക്സ് �
 msgid "AVI demuxer"
 msgstr "എവിഐ ഡീമക്സര്‍"
 
-#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4307
+#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4375
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15413,7 +15414,7 @@ msgstr "സൂചിക നിര്‍മ്മിച്ചതിന്‍ശ�
 msgid "Play as is"
 msgstr "ഉള്ളതുപോലേ പ്ലേ ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4318
+#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4386
 msgid "Broken or missing Index"
 msgstr "സൂചിക കേടാണ് അല്ലെങ്കിൽ കാണുന്നില്ല"
 
@@ -15857,11 +15858,11 @@ msgstr "എം‌പി4 സ്ട്രീം ടിമക്സര്‍"
 msgid "MP4"
 msgstr "എം‌പി4"
 
-#: modules/demux/mp4/mp4.c:4315
+#: modules/demux/mp4/mp4.c:4383
 msgid "Do not seek"
 msgstr "തേടരുത് "
 
-#: modules/demux/mp4/mp4.c:4316
+#: modules/demux/mp4/mp4.c:4384
 msgid "Build index"
 msgstr "സൂചിക നിർമ്മിക്കുക"
 
@@ -16069,15 +16070,15 @@ msgstr "ടെലിടെക്സ്റ്റ് ഉപശീര്‍ഷക�
 msgid "DVB subtitles: hearing impaired"
 msgstr "ഡി‌വി‌ബി ഉപശീര്‍ഷകങ്ങള്‍: കേള്‍വിക്കു കോട്ടം വന്നത്"
 
-#: modules/demux/mpeg/ts_psi.c:1333
+#: modules/demux/mpeg/ts_psi.c:1337
 msgid "clean effects"
 msgstr "ശുദ്ധ പ്രതീതി"
 
-#: modules/demux/mpeg/ts_psi.c:1334
+#: modules/demux/mpeg/ts_psi.c:1338
 msgid "hearing impaired"
 msgstr "കേള്‍വിക്കു കോട്ടം വന്നത്"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1339
 msgid "visual impaired commentary"
 msgstr "കാഴ്ചക്കു കോട്ടം വന്നവര്‍ക്കുള്ള വ്യാഖ്യാനം"
 
@@ -22043,6 +22044,15 @@ msgstr "ഇമേജ് ഗാമ (0-10)"
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "ചിത്ര ഗാമ 0.01 നും 10 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
 
+#: modules/hw/d3d11/d3d11_filters.c:670
+#, fuzzy
+msgid "AMD VQ Enhancer"
+msgstr "സ്റ്റീരിയോ എന്‍ഹാന്‍സര്‍"
+
+#: modules/hw/d3d11/d3d11_filters.c:671
+msgid "amf_vqenhancer"
+msgstr ""
+
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
 msgstr "ഡയറക്റ്റ് 3 ഡി 9 ഫിൽട്ടർ ക്രമീകരിക്കുക"
@@ -24199,7 +24209,7 @@ msgstr "ഇഷ്‌ടാനുസൃത പട്ടിക "
 
 #: modules/services_discovery/upnp.cpp:118
 #: modules/services_discovery/upnp.cpp:125
-#: modules/services_discovery/upnp.cpp:261
+#: modules/services_discovery/upnp.cpp:262
 msgid "Universal Plug'n'Play"
 msgstr "ആഗോള പ്ലഗ്ഗിന്‍ പ്ലേ"
 
@@ -27888,12 +27898,12 @@ msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "ഡെസ്ക്ടോപ് രീതി  ഡെസ്ക്ടോപില്‍ തന്നെ വീഡിയോ കാണിക്കാന്‍ നിങ്ങളെ സഹായിക്കുന്നു"
 
 #: modules/video_output/win32/direct3d9.c:76
-#: modules/video_output/win32/direct3d11.c:69
+#: modules/video_output/win32/direct3d11.c:70
 msgid "Use hardware blending support"
 msgstr "ഹാര്‍ഡ്വെയര്‍ ബ്ലെന്‍ഡിംഗ് പിന്തുണ ഉപയോഗിക്കുക"
 
 #: modules/video_output/win32/direct3d9.c:78
-#: modules/video_output/win32/direct3d11.c:71
+#: modules/video_output/win32/direct3d11.c:72
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr "സബ്ടൈറ്റില്‍/OSD ബ്ലെന്‍ഡിംങ്ങിനായി ഹാര്‍ഡ് വയര്‍ ആക്സിലറേഷന്‍ ഉപയോഗിക്കാന്‍ ശ്രമിക്കുക"
 
@@ -27925,41 +27935,63 @@ msgstr "വിന്‍ഡോസ് വിസ്റ്റയ്ക്കും �
 msgid "Direct3D9 video output"
 msgstr "ഡയറക്റ്റ് 3 ഡി 9 വീഡിയോ ഔട്ട്പുട്ട് "
 
-#: modules/video_output/win32/direct3d11.c:68
+#: modules/video_output/win32/direct3d11.c:69
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr "വിൻഡോസ് 8 നും അതിനുശേഷമുള്ള പതിപ്പുകൾക്കുമായി ശുപാർശ ചെയ്യുന്ന വീഡിയോ ഔട്ട്പുട്ട് "
 
-#: modules/video_output/win32/direct3d11.c:73
+#: modules/video_output/win32/direct3d11.c:74
 #, fuzzy
 msgid "Video Upscaling Mode"
 msgstr "വീഡിയോ സ്കെയിലിംഗ്"
 
-#: modules/video_output/win32/direct3d11.c:74
+#: modules/video_output/win32/direct3d11.c:75
 #, fuzzy
 msgid "Select the upscaling mode for video."
 msgstr "വീഡിയോയിലെ ഒരു നിറം തിരഞ്ഞടുക്കുക"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Linear Sampler"
 msgstr "പ്രതി സാമ്പിള്‍ ബിറ്റുകള്‍"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Point Sampler"
 msgstr "SoX റീസാംപ്ലർ "
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Video Processor"
 msgstr "വീഡിയോ കോഡെക്കുകള്‍"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Super Resolution"
 msgstr "റസല്യൂഷന്‍"
 
+#: modules/video_output/win32/direct3d11.c:82
+#, fuzzy
+msgid "HDR Output Mode"
+msgstr "ഔട്ട്പുട്ട് മോഡ്യൂളുകള്‍"
+
 #: modules/video_output/win32/direct3d11.c:83
+msgid "Use HDR output even if the source is SDR."
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Never out HDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+#, fuzzy
+msgid "Always output HDR"
+msgstr "എപ്പോഴും മുകളില്‍"
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Generate HDR from SDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
 msgstr "ഡയറക്റ്റ് 3 ഡി 11 വീഡിയോ ഔട്ട്പുട്ട് "
 

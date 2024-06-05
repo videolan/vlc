@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2023-10-30 09:17+0100\n"
+"POT-Creation-Date: 2024-06-05 17:42+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: abuyop <abuyop@gmail.com>, 2023\n"
 "Language-Team: Malay (https://app.transifex.com/yaron/teams/16553/ms/)\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: include/vlc_common.h:1048
+#: include/vlc_common.h:1053
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -735,10 +735,10 @@ msgstr "Stereo songsang"
 msgid "Headphones"
 msgstr "Fon kepala"
 
-#: src/config/core.c:370 modules/access/dtv/access.c:93
-#: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
-#: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
-#: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
+#: src/config/core.c:370 modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:113 modules/access/dtv/access.c:122
+#: modules/access/dtv/access.c:130 modules/access/dtv/access.c:139
+#: modules/access/dtv/access.c:147 modules/access/dtv/access.c:169
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:991
 #: modules/gui/qt/components/simple_preferences.cpp:394
 msgid "Automatic"
@@ -937,7 +937,7 @@ msgid "decoder"
 msgstr "penyahkod"
 
 #: src/input/decoder.c:1922 src/input/decoder.c:2205
-#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:912
+#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:918
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "Penstriman/Pentranskodan gagal"
@@ -1130,7 +1130,7 @@ msgstr "Orientasi"
 
 #: src/input/es_out.c:3250 src/input/es_out.c:3268 src/input/es_out.c:3286
 #: src/input/es_out.c:3300 src/playlist/tree.c:67
-#: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
+#: modules/access/dtv/access.c:82 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "Tidak ditakrif"
 
@@ -1773,17 +1773,18 @@ msgstr ""
 #: modules/services_discovery/upnp.cpp:82
 #: modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
+#: modules/video_output/win32/direct3d11.c:88
 #: modules/video_output/xcb/xvideo.c:824 modules/gui/qt/ui/profiles.h:742
 #: modules/gui/qt/ui/profiles.h:745
 msgid "Auto"
 msgstr "Auto"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:201 modules/control/hotkeys.c:405
 msgid "On"
 msgstr "Hidup"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:137 modules/access/v4l2/v4l2.c:201
 #: modules/control/hotkeys.c:383 modules/control/hotkeys.c:405
 #: modules/video_filter/deinterlace/algo_phosphor.h:55
@@ -1862,8 +1863,8 @@ msgstr ""
 "tinggi tanpa mempengaruhi pic audio"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
-#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
-#: modules/access/dtv/access.c:143 modules/access/v4l2/v4l2.c:163
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:114
+#: modules/access/dtv/access.c:148 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:429 modules/codec/x264.c:434
 #: modules/demux/mp4/meta.c:430
@@ -6840,11 +6841,11 @@ msgstr "Input SMB libdsm"
 msgid "libdsm NETBIOS discovery module"
 msgstr "Modul penemuan NETBIOS libdsm"
 
-#: modules/access/dtv/access.c:38
+#: modules/access/dtv/access.c:43
 msgid "DVB adapter"
 msgstr "Penyesuai DVB"
 
-#: modules/access/dtv/access.c:40
+#: modules/access/dtv/access.c:45
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
@@ -6852,11 +6853,11 @@ msgstr ""
 "Jika terdapat lebih dari satu penyesuai siaran digital, bilangan penyesuai "
 "mesti dipilih. Pernomboran bermula dari sifar."
 
-#: modules/access/dtv/access.c:43
+#: modules/access/dtv/access.c:48
 msgid "DVB device"
 msgstr "Peranti DVB"
 
-#: modules/access/dtv/access.c:45
+#: modules/access/dtv/access.c:50
 msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
@@ -6864,11 +6865,11 @@ msgstr ""
 "Jika penyesuai menyediakan peranti penala bebas berbilang, bilangan peranti "
 "mesti dipilih. Pernomboran bermula dari sifar."
 
-#: modules/access/dtv/access.c:47
+#: modules/access/dtv/access.c:52
 msgid "Do not demultiplex"
 msgstr "Jangan nyahmultiplex"
 
-#: modules/access/dtv/access.c:49
+#: modules/access/dtv/access.c:54
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
@@ -6876,27 +6877,27 @@ msgstr ""
 "Hanya program berguna biasanya dinyahmultipleks daripada transponder. "
 "Pilihan ini akan lumpuhkan penyahmultipleks dan menerima semua program."
 
-#: modules/access/dtv/access.c:52
+#: modules/access/dtv/access.c:57
 msgid "Network name"
 msgstr "Nama rangkaian"
 
-#: modules/access/dtv/access.c:53
+#: modules/access/dtv/access.c:58
 msgid "Unique network name in the System Tuning Spaces"
 msgstr "Nama rangkaian unik dalam Ruang Penalaan Sistem"
 
-#: modules/access/dtv/access.c:55
+#: modules/access/dtv/access.c:60
 msgid "Network name to create"
 msgstr "Nama rangkaian untuk dicipta"
 
-#: modules/access/dtv/access.c:56
+#: modules/access/dtv/access.c:61
 msgid "Create unique name in the System Tuning Spaces"
 msgstr "Cipta nama unik dalam Ruang Penalaan Sistem"
 
-#: modules/access/dtv/access.c:58
+#: modules/access/dtv/access.c:63
 msgid "Frequency (Hz)"
 msgstr "Frekuensi (Hz)"
 
-#: modules/access/dtv/access.c:60
+#: modules/access/dtv/access.c:65
 msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
@@ -6904,23 +6905,23 @@ msgstr ""
 "Saluran TV dikumpul oleh transponder (ataupun multipleks) pada frekuensi "
 "yang diberi. Ia diperlukan untuk menala penerima."
 
-#: modules/access/dtv/access.c:63 modules/gui/qt/components/open_panels.cpp:987
+#: modules/access/dtv/access.c:68 modules/gui/qt/components/open_panels.cpp:987
 msgid "Modulation / Constellation"
 msgstr "Modulasi / Konstelasi"
 
-#: modules/access/dtv/access.c:64
+#: modules/access/dtv/access.c:69
 msgid "Layer A modulation"
 msgstr "Modulasi Lapisan A"
 
-#: modules/access/dtv/access.c:65
+#: modules/access/dtv/access.c:70
 msgid "Layer B modulation"
 msgstr "Modulasi Lapisan B"
 
-#: modules/access/dtv/access.c:66
+#: modules/access/dtv/access.c:71
 msgid "Layer C modulation"
 msgstr "Modulasi Lapisan C"
 
-#: modules/access/dtv/access.c:68
+#: modules/access/dtv/access.c:73
 msgid ""
 "The digital signal can be modulated according with different constellations "
 "(depending on the delivery system). If the demodulator cannot detect the "
@@ -6930,11 +6931,11 @@ msgstr ""
 "(bergantung pada sistem penghantaran). Jika demodulator tidak dapat kesan "
 "konstelasi secara automatik, ia perlu dikonfigur secara manual."
 
-#: modules/access/dtv/access.c:83
+#: modules/access/dtv/access.c:88
 msgid "Symbol rate (bauds)"
 msgstr "Kadar simbol (baud)"
 
-#: modules/access/dtv/access.c:85
+#: modules/access/dtv/access.c:90
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
@@ -6942,11 +6943,11 @@ msgstr ""
 "Kadar simbol mesti dinyatakan secara manual untuk sesetengah sistem, seperti "
 "DVB-C, DVB-S dan DVB-S2."
 
-#: modules/access/dtv/access.c:88
+#: modules/access/dtv/access.c:93
 msgid "Spectrum inversion"
 msgstr "Pembalikan spektrum"
 
-#: modules/access/dtv/access.c:90
+#: modules/access/dtv/access.c:95
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
@@ -6954,135 +6955,135 @@ msgstr ""
 "Jika demodulator tidak dapat kesan songsangan spektral  dengan betul, ia "
 "perlu dikonfigur secara manual."
 
-#: modules/access/dtv/access.c:96
+#: modules/access/dtv/access.c:101
 msgid "FEC code rate"
 msgstr "Kadar kod FEC"
 
-#: modules/access/dtv/access.c:97
+#: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
 msgstr "Kadar kod keutamaan-tinggi"
 
-#: modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
 msgstr "Kadar kod keutamaan-rendah"
 
-#: modules/access/dtv/access.c:99
+#: modules/access/dtv/access.c:104
 msgid "Layer A code rate"
 msgstr "Kadar kod lapisan A"
 
-#: modules/access/dtv/access.c:100
+#: modules/access/dtv/access.c:105
 msgid "Layer B code rate"
 msgstr "Kadar kod lapisan B"
 
-#: modules/access/dtv/access.c:101
+#: modules/access/dtv/access.c:106
 msgid "Layer C code rate"
 msgstr "Kadar kod lapisan C"
 
-#: modules/access/dtv/access.c:103
+#: modules/access/dtv/access.c:108
 msgid "The code rate for Forward Error Correction can be specified."
 msgstr "Kadar kod untuk Pembetulan Ralat Ke Depan yang boleh ditentukan."
 
-#: modules/access/dtv/access.c:113
+#: modules/access/dtv/access.c:118
 msgid "Transmission mode"
 msgstr "Mod transmisi"
 
-#: modules/access/dtv/access.c:121
+#: modules/access/dtv/access.c:126
 msgid "Bandwidth (MHz)"
 msgstr "Jalurlebar (MHz)"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "10 MHz"
 msgstr "10 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "8 MHz"
 msgstr "8 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "7 MHz"
 msgstr "7 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "6 MHz"
 msgstr "6 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "5 MHz"
 msgstr "5 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "1.712 MHz"
 msgstr "1.712 MHz"
 
-#: modules/access/dtv/access.c:130
+#: modules/access/dtv/access.c:135
 msgid "Guard interval"
 msgstr "Pengawal selang"
 
-#: modules/access/dtv/access.c:138
+#: modules/access/dtv/access.c:143
 msgid "Hierarchy mode"
 msgstr "Mod hirarki"
 
-#: modules/access/dtv/access.c:146
+#: modules/access/dtv/access.c:151
 msgid "DVB-T2 Physical Layer Pipe"
 msgstr "Paip Lapisan Fizikal DVB-T2"
 
-#: modules/access/dtv/access.c:148
+#: modules/access/dtv/access.c:153
 msgid "Layer A segments count"
 msgstr "Hitung sengmen lapisan A"
 
-#: modules/access/dtv/access.c:149
+#: modules/access/dtv/access.c:154
 msgid "Layer B segments count"
 msgstr "Hitung sengmen lapisan B"
 
-#: modules/access/dtv/access.c:150
+#: modules/access/dtv/access.c:155
 msgid "Layer C segments count"
 msgstr "Hitung sengmen lapisan C"
 
-#: modules/access/dtv/access.c:152
+#: modules/access/dtv/access.c:157
 msgid "Layer A time interleaving"
 msgstr "Pengantaralembaran masa lapisan A"
 
-#: modules/access/dtv/access.c:153
+#: modules/access/dtv/access.c:158
 msgid "Layer B time interleaving"
 msgstr "Pengantaralembaran masa lapisan B"
 
-#: modules/access/dtv/access.c:154
+#: modules/access/dtv/access.c:159
 msgid "Layer C time interleaving"
 msgstr "Pengantaralembaran masa lapisan C"
 
-#: modules/access/dtv/access.c:156
+#: modules/access/dtv/access.c:161
 msgid "Stream identifier"
 msgstr "Pengecam strim"
 
-#: modules/access/dtv/access.c:158
+#: modules/access/dtv/access.c:163
 msgid "Pilot"
 msgstr "Rintis"
 
-#: modules/access/dtv/access.c:160
+#: modules/access/dtv/access.c:165
 msgid "Roll-off factor"
 msgstr "Faktor lurutan"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.35 (same as DVB-S)"
 msgstr "0.35 (sama seperti DVB-S)"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.20"
 msgstr "0.20"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.25"
 msgstr "0.25"
 
-#: modules/access/dtv/access.c:168
+#: modules/access/dtv/access.c:173
 msgid "Transport stream ID"
 msgstr "ID Strim Pengangkutan"
 
-#: modules/access/dtv/access.c:170
+#: modules/access/dtv/access.c:175
 msgid "Polarization (Voltage)"
 msgstr "Pengutuban (Voltan)"
 
-#: modules/access/dtv/access.c:172
+#: modules/access/dtv/access.c:177
 msgid ""
 "To select the polarization of the transponder, a different voltage is "
 "normally applied to the low noise block-downconverter (LNB)."
@@ -7090,31 +7091,31 @@ msgstr ""
 "Untuk memilih kekutuban transponder, voltan yang berbeza biasanya dilaksana "
 "ke block-downconverter hingar rendah (LNB)."
 
-#: modules/access/dtv/access.c:175
+#: modules/access/dtv/access.c:180
 msgid "Unspecified (0V)"
 msgstr "Tak ditentukan (0V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Vertical (13V)"
 msgstr "Menegak (13V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Horizontal (18V)"
 msgstr "Mendatar (18V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Right Hand (13V)"
 msgstr "Tangan Kanan Pekeliling (13V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Left Hand (18V)"
 msgstr "Tangan Kiri Pekeliling (18V)"
 
-#: modules/access/dtv/access.c:179
+#: modules/access/dtv/access.c:184
 msgid "High LNB voltage"
 msgstr "Voltan LNB tinggi"
 
-#: modules/access/dtv/access.c:181
+#: modules/access/dtv/access.c:186
 msgid ""
 "If the cables between the satellilte low noise block-downconverter and the "
 "receiver are long, higher voltage may be required.\n"
@@ -7124,15 +7125,15 @@ msgstr ""
 "adalah panjang, maka voltan lebih tinggi diperlukan.\n"
 "Bukan semua penerima menyokongnya."
 
-#: modules/access/dtv/access.c:185
+#: modules/access/dtv/access.c:190
 msgid "Local oscillator low frequency (kHz)"
 msgstr "Pengayun berfrekuensi rendah setempat (kHz)"
 
-#: modules/access/dtv/access.c:186
+#: modules/access/dtv/access.c:191
 msgid "Local oscillator high frequency (kHz)"
 msgstr "Frekuensi tinggi pengayun setempat (kHz)"
 
-#: modules/access/dtv/access.c:188
+#: modules/access/dtv/access.c:193
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
@@ -7141,11 +7142,11 @@ msgstr ""
 "Downconverter (LNB) akan asingkan frekuensi pengayun setempat dari frekuensi "
 "penghantaran satelit. Frekuensi perantara (IF) pada kabel RF adalah hasilnya."
 
-#: modules/access/dtv/access.c:191
+#: modules/access/dtv/access.c:196
 msgid "Universal LNB switch frequency (kHz)"
 msgstr "Frekuensi suis LNB universal (kHz)"
 
-#: modules/access/dtv/access.c:193
+#: modules/access/dtv/access.c:198
 msgid ""
 "If the satellite transmission frequency exceeds the switch frequency, the "
 "oscillator high frequency will be used as reference. Furthermore the "
@@ -7155,11 +7156,11 @@ msgstr ""
 "tinggi pengayun akan digunakan sebagai rujukan. Tambahan pula, nada 22kHz "
 "berterusan automatik akan dihantar."
 
-#: modules/access/dtv/access.c:196
+#: modules/access/dtv/access.c:201
 msgid "Continuous 22kHz tone"
 msgstr "Nada 22kHz berterusan"
 
-#: modules/access/dtv/access.c:198
+#: modules/access/dtv/access.c:203
 msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
@@ -7167,11 +7168,11 @@ msgstr ""
 "Nada berterusan pada 22kHz akan dihantar melalui kabel. Ia biasanya memilih "
 "jalur frekuensi lebih tinggi dari LNB universal."
 
-#: modules/access/dtv/access.c:201
+#: modules/access/dtv/access.c:206
 msgid "DiSEqC LNB number"
 msgstr "Nombor DiSEqC LNB"
 
-#: modules/access/dtv/access.c:203
+#: modules/access/dtv/access.c:208
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a DiSEqC 1.0 switch, the correct LNB can be "
@@ -7181,16 +7182,16 @@ msgstr ""
 "melalui suai DiSEqC 1.0, LNB yang betul boleh dipilih (1 hingga 4). Jika "
 "tiada suis, parameter ini sepatutnya adalah 0."
 
-#: modules/access/dtv/access.c:209 modules/access/v4l2/v4l2.c:136
+#: modules/access/dtv/access.c:214 modules/access/v4l2/v4l2.c:136
 #: modules/access/v4l2/v4l2.c:163 modules/access/v4l2/v4l2.c:201
 msgid "Unspecified"
 msgstr "Tidak ditentukan"
 
-#: modules/access/dtv/access.c:213
+#: modules/access/dtv/access.c:218
 msgid "Uncommitted DiSEqC LNB number"
 msgstr "Bilangan nombor DiSEqC LNB tidak dilakukan"
 
-#: modules/access/dtv/access.c:215
+#: modules/access/dtv/access.c:220
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a cascade formed from DiSEqC 1.1 uncommitted "
@@ -7204,99 +7205,99 @@ msgstr ""
 "hingga 4). Jika tiada lagi suai tidak dilaku, parameter ini seharusnya "
 "menjadi 0."
 
-#: modules/access/dtv/access.c:222
+#: modules/access/dtv/access.c:227
 msgid "Network identifier"
 msgstr "Pengenal rangkaian"
 
-#: modules/access/dtv/access.c:223
+#: modules/access/dtv/access.c:228
 msgid "Satellite azimuth"
 msgstr "Azimut satelit"
 
-#: modules/access/dtv/access.c:224
+#: modules/access/dtv/access.c:229
 msgid "Satellite azimuth in tenths of degree"
 msgstr "Azimut satelit dalam persepuluh darjah"
 
-#: modules/access/dtv/access.c:225
+#: modules/access/dtv/access.c:230
 msgid "Satellite elevation"
 msgstr "Ketinggia satelit"
 
-#: modules/access/dtv/access.c:226
+#: modules/access/dtv/access.c:231
 msgid "Satellite elevation in tenths of degree"
 msgstr "Ketinggian satelit dalam persepuluh darjah"
 
-#: modules/access/dtv/access.c:227
+#: modules/access/dtv/access.c:232
 msgid "Satellite longitude"
 msgstr "Logitud satelit"
 
-#: modules/access/dtv/access.c:229
+#: modules/access/dtv/access.c:234
 msgid "Satellite longitude in tenths of degree. West is negative."
 msgstr "Longitud satelit dalam persepuluh darjah. Barat adalah negatif."
 
-#: modules/access/dtv/access.c:231
+#: modules/access/dtv/access.c:236
 msgid "Satellite range code"
 msgstr "Kod julat satelit"
 
-#: modules/access/dtv/access.c:232
+#: modules/access/dtv/access.c:237
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr "Kod julat satelit ditakrif oleh pengilang iaitu. kod suis DISEqC"
 
-#: modules/access/dtv/access.c:236
+#: modules/access/dtv/access.c:241
 msgid "Major channel"
 msgstr "Saluran major"
 
-#: modules/access/dtv/access.c:237
+#: modules/access/dtv/access.c:242
 msgid "ATSC minor channel"
 msgstr "Saluran minor ATSC"
 
-#: modules/access/dtv/access.c:238
+#: modules/access/dtv/access.c:243
 msgid "Physical channel"
 msgstr "Saluran fizikal"
 
-#: modules/access/dtv/access.c:244
+#: modules/access/dtv/access.c:249
 msgid "DTV"
 msgstr "DTV"
 
-#: modules/access/dtv/access.c:245
+#: modules/access/dtv/access.c:250
 msgid "Digital Television and Radio"
 msgstr "Radio dan Televisyen Digital"
 
-#: modules/access/dtv/access.c:283
+#: modules/access/dtv/access.c:288
 msgid "Terrestrial reception parameters"
 msgstr "Parameter penerimaan bumi"
 
-#: modules/access/dtv/access.c:295
+#: modules/access/dtv/access.c:300
 msgid "DVB-T reception parameters"
 msgstr "Parameter penerimaan DVB-T"
 
-#: modules/access/dtv/access.c:311
+#: modules/access/dtv/access.c:316
 msgid "ISDB-T reception parameters"
 msgstr "Parameter penerimaan ISDB-T"
 
-#: modules/access/dtv/access.c:352
+#: modules/access/dtv/access.c:357
 msgid "Cable and satellite reception parameters"
 msgstr "Parameter penerimaan kabel dan satelit"
 
-#: modules/access/dtv/access.c:364
+#: modules/access/dtv/access.c:369
 msgid "DVB-S2 parameters"
 msgstr "Parameter DVB-S2"
 
-#: modules/access/dtv/access.c:375
+#: modules/access/dtv/access.c:380
 msgid "ISDB-S parameters"
 msgstr "Parameter ISDB-S"
 
-#: modules/access/dtv/access.c:380
+#: modules/access/dtv/access.c:385
 msgid "Satellite equipment control"
 msgstr "Kawalan peralatan satelit"
 
-#: modules/access/dtv/access.c:422
+#: modules/access/dtv/access.c:427
 msgid "ATSC reception parameters"
 msgstr "Parameter penerimaan ATSC"
 
-#: modules/access/dtv/access.c:476
+#: modules/access/dtv/access.c:481
 msgid "Digital broadcasting"
 msgstr "Penyiaran digital"
 
-#: modules/access/dtv/access.c:477
+#: modules/access/dtv/access.c:482
 msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
@@ -7775,11 +7776,11 @@ msgstr "Saiz strim dalam bait"
 msgid "Memory input"
 msgstr "Input Memori"
 
-#: modules/access/imem-access.c:159
+#: modules/access/imem-access.c:165
 msgid "Memory stream"
 msgstr "Strim ingatan"
 
-#: modules/access/imem-access.c:160
+#: modules/access/imem-access.c:166
 msgid "In-memory stream input"
 msgstr "Input strim dalam-ingatan"
 
@@ -10972,8 +10973,8 @@ msgstr "Guna pengemas gabung Core Text dalam sari kata."
 msgid "ARIB subtitles decoder"
 msgstr "Penyahkod sarikata ARIB"
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
-#: modules/demux/mpeg/ts_psi.c:1092
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1089
+#: modules/demux/mpeg/ts_psi.c:1096
 msgid "ARIB subtitles"
 msgstr "Sarikata ARIB"
 
@@ -11467,23 +11468,23 @@ msgstr ""
 "Ia bukanlah ralat di dalam pemain media VLC.\n"
 "Jangan hubungi projek VideoLAN mengenai masalah ini.\n"
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "unknown"
 msgstr "tidak diketahui"
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "video"
 msgstr "video"
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "audio"
 msgstr "audio"
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "subpicture"
 msgstr "subgambar"
 
-#: modules/codec/avcodec/encoder.c:913
+#: modules/codec/avcodec/encoder.c:919
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "VLC tidak dapat buka %4.4s pengekod %s."
@@ -12226,15 +12227,15 @@ msgstr "Pengekod video (menggunakan OpenMAX IL)"
 msgid "OpenMAX IL video output"
 msgstr "Output video OpenMAX IL"
 
-#: modules/codec/opus.c:62
+#: modules/codec/opus.c:65
 msgid "Opus audio decoder"
 msgstr "Pengekod audio Opus"
 
-#: modules/codec/opus.c:64 modules/codec/opus.c:71
+#: modules/codec/opus.c:67 modules/codec/opus.c:74
 msgid "Opus"
 msgstr "Opus"
 
-#: modules/codec/opus.c:69
+#: modules/codec/opus.c:72
 msgid "Opus audio encoder"
 msgstr "Pengekod audio Opus"
 
@@ -14971,310 +14972,310 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Antara muka kawalan jauh"
 
-#: modules/control/oldrc.c:368
+#: modules/control/oldrc.c:370
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Antara muka kawalan jauh dimulakan. Taip `help' untuk bantuan."
 
-#: modules/control/oldrc.c:767
+#: modules/control/oldrc.c:769
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "Arahan tidak diketahui `%s'. Taip `help' untuk bantuan."
 
-#: modules/control/oldrc.c:785
+#: modules/control/oldrc.c:787
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ Arahan kawalan jauh ]"
 
-#: modules/control/oldrc.c:787
+#: modules/control/oldrc.c:789
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ  . . . . . . . . . . tambah XYZ kepada senarai main"
 
-#: modules/control/oldrc.c:788
+#: modules/control/oldrc.c:790
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr "| enqueue XYZ  . . . . . . . . . berbaris XYZ kepada senarai main"
 
-#: modules/control/oldrc.c:789
+#: modules/control/oldrc.c:791
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr "| playlist . . .  tunjuk item kini dalam senarai main"
 
-#: modules/control/oldrc.c:790
+#: modules/control/oldrc.c:792
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . . . tayang strim"
 
-#: modules/control/oldrc.c:791
+#: modules/control/oldrc.c:793
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . henti strim"
 
-#: modules/control/oldrc.c:792
+#: modules/control/oldrc.c:794
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr "| next . . . . . . . . . . . .  item senarai main berikut"
 
-#: modules/control/oldrc.c:793
+#: modules/control/oldrc.c:795
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr "| prev . . . . . . . . . .  item senarai main terdahulu"
 
-#: modules/control/oldrc.c:794
+#: modules/control/oldrc.c:796
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr "| goto  . . . . . . . . . . . . pergi item pada indeks"
 
-#: modules/control/oldrc.c:795
+#: modules/control/oldrc.c:797
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr "| repeat [on|off] . . . . . . . . . . tuil skrin penuh"
 
-#: modules/control/oldrc.c:796
+#: modules/control/oldrc.c:798
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
 msgstr "| loop [on|off] . . . . . . . . . tuil skrin penuh"
 
-#: modules/control/oldrc.c:797
+#: modules/control/oldrc.c:799
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
 msgstr "| random [on|off] . . . . . . .  toggle random jumping"
 
-#: modules/control/oldrc.c:798
+#: modules/control/oldrc.c:800
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
 msgstr "| clear . . . . . . . . . . . . . . bersihkan senarai main"
 
-#: modules/control/oldrc.c:799
+#: modules/control/oldrc.c:801
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr "| status . . . . . . . . . status senarai main semasa "
 
-#: modules/control/oldrc.c:800
+#: modules/control/oldrc.c:802
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr "| title [X]  . . . . . .  tetap/ambil judul dalam item semasa"
 
-#: modules/control/oldrc.c:801
+#: modules/control/oldrc.c:803
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr "| title_n  . . . . . . . .  judul berikut dalam item semasa"
 
-#: modules/control/oldrc.c:802
+#: modules/control/oldrc.c:804
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr "| title_p  . . . . . .  judul terdahulu dalam item semasa"
 
-#: modules/control/oldrc.c:803
+#: modules/control/oldrc.c:805
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr "| chapter [X]  . . . .  tetap/ambil bab dalam item semasa"
 
-#: modules/control/oldrc.c:804
+#: modules/control/oldrc.c:806
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr "| chapter_n  . . . . . .  bab berikut dalam item semasa"
 
-#: modules/control/oldrc.c:805
+#: modules/control/oldrc.c:807
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr "| chapter_p . . . . . .  bab terdahulu dalam item semasa"
 
-#: modules/control/oldrc.c:807
+#: modules/control/oldrc.c:809
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . cari dalam saat, sebagai contoh `seek 12'"
 
-#: modules/control/oldrc.c:808
+#: modules/control/oldrc.c:810
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause  . . . . . . . . . . . . . .  umpil henti"
 
-#: modules/control/oldrc.c:809
+#: modules/control/oldrc.c:811
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr "| fastforward  . . . . . .  .  tetapkan kepada kadar maksima"
 
-#: modules/control/oldrc.c:810
+#: modules/control/oldrc.c:812
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind  . . . . . . . . . .  tetapkan kepada kadar minima"
 
-#: modules/control/oldrc.c:811
+#: modules/control/oldrc.c:813
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . .  cepatkan tayangan strim"
 
-#: modules/control/oldrc.c:812
+#: modules/control/oldrc.c:814
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . .  lambatkan tayangan strim"
 
-#: modules/control/oldrc.c:813
+#: modules/control/oldrc.c:815
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . .  tayangan stim normal "
 
-#: modules/control/oldrc.c:814
+#: modules/control/oldrc.c:816
 msgid "| frame. . . . . . . . . .  play frame by frame"
 msgstr "| frame. . . . . . . . . .  putar setiap bingkai"
 
-#: modules/control/oldrc.c:815
+#: modules/control/oldrc.c:817
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . . . . . . tuil skrin penuh"
 
-#: modules/control/oldrc.c:816
+#: modules/control/oldrc.c:818
 msgid "| info . . . . .  information about the current stream"
 msgstr "| info . . . . maklumat tentang strim semasa"
 
-#: modules/control/oldrc.c:817
+#: modules/control/oldrc.c:819
 msgid "| stats  . . . . . . . .  show statistical information"
 msgstr "| stats . . . . . . . . . status senarai main semasa"
 
-#: modules/control/oldrc.c:818
+#: modules/control/oldrc.c:820
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| get_time . . saat yang berlalu sejak memulakan strim"
 
-#: modules/control/oldrc.c:819
+#: modules/control/oldrc.c:821
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr "| is_playing . .  1 jika strim ditayangkan, 0 jika tidak"
 
-#: modules/control/oldrc.c:820
+#: modules/control/oldrc.c:822
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr "| get_title . . . . .  judul strim semasa"
 
-#: modules/control/oldrc.c:821
+#: modules/control/oldrc.c:823
 msgid "| get_length . . . .  the length of the current stream"
 msgstr "| get_length . . . . panjang strim semasa"
 
-#: modules/control/oldrc.c:823
+#: modules/control/oldrc.c:825
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . .  tetap/ambil volum audio"
 
-#: modules/control/oldrc.c:824
+#: modules/control/oldrc.c:826
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr "| volup [X]  . . . .  tingkatkan volum audio X langkah"
 
-#: modules/control/oldrc.c:825
+#: modules/control/oldrc.c:827
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr "| voldown [X]  . . . . .  turunkan volum audio X langkah"
 
-#: modules/control/oldrc.c:826
+#: modules/control/oldrc.c:828
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
 msgstr "| adev [device]  . . . . . . . .  set/dapatkan peranti audio"
 
-#: modules/control/oldrc.c:827
+#: modules/control/oldrc.c:829
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr "| achan [X]  . . . . . .  tetapkan/ambil saluran audio"
 
-#: modules/control/oldrc.c:828
+#: modules/control/oldrc.c:830
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr "| atrack [X]  . . . . . .  tetapkan/ambil trek audio"
 
-#: modules/control/oldrc.c:829
+#: modules/control/oldrc.c:831
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr "| vtrack [X]  . . . . .  . tetapkan/ambil trek video"
 
-#: modules/control/oldrc.c:830
+#: modules/control/oldrc.c:832
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr "| vratio [X]  . . . . . .  tetapkan/ambil nisbah aspek"
 
-#: modules/control/oldrc.c:831
+#: modules/control/oldrc.c:833
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr "| vcrop [X]  . . . . . .  tetapkan/ambil cantasan video"
 
-#: modules/control/oldrc.c:832
+#: modules/control/oldrc.c:834
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr "| vzoom [X] . . . . . . . .  tetap/ambil zum video"
 
-#: modules/control/oldrc.c:833
+#: modules/control/oldrc.c:835
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
 msgstr "| snapshot . . . . . . . . . . . . ambil snapshot video"
 
-#: modules/control/oldrc.c:834
+#: modules/control/oldrc.c:836
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
 msgstr "| strack [X] . . . . . . . . .  set/dapatkan trek sari kata"
 
-#: modules/control/oldrc.c:835
+#: modules/control/oldrc.c:837
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr "| kekunci [nama hotkey] . . . . . .  tekan hotkey simulasi"
 
-#: modules/control/oldrc.c:837
+#: modules/control/oldrc.c:839
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr "| help . . . . . . . . . . . . . . . mesej bantuan ini"
 
-#: modules/control/oldrc.c:838
+#: modules/control/oldrc.c:840
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr "| logout . . . . . . keluar (jika dalam sambungan soket)"
 
-#: modules/control/oldrc.c:839
+#: modules/control/oldrc.c:841
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit . . . . . . . . . . . . . . . . .  keluar vlc"
 
-#: modules/control/oldrc.c:841
+#: modules/control/oldrc.c:843
 msgid "+----[ end of help ]"
 msgstr "+----[ bantuan tamat ]"
 
-#: modules/control/oldrc.c:968
+#: modules/control/oldrc.c:970
 msgid "Press pause to continue."
 msgstr "Tekan jeda untuk teruskan."
 
-#: modules/control/oldrc.c:1192 modules/control/oldrc.c:1441
-#: modules/control/oldrc.c:1485
+#: modules/control/oldrc.c:1194 modules/control/oldrc.c:1443
+#: modules/control/oldrc.c:1487
 msgid "Type 'pause' to continue."
 msgstr "Taip 'pause' untuk teruskan."
 
-#: modules/control/oldrc.c:1281
+#: modules/control/oldrc.c:1283
 msgid "Error: `goto' needs an argument greater than zero."
 msgstr "Ralat: 'goto' perlu argumen lebih besar dari sifar."
 
-#: modules/control/oldrc.c:1291
+#: modules/control/oldrc.c:1293
 #, c-format
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] "Senarai main hanya mempunyai %u unsur"
 
-#: modules/control/oldrc.c:1737 modules/gui/ncurses.c:808
+#: modules/control/oldrc.c:1739 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
 msgstr "+-[Incoming]"
 
-#: modules/control/oldrc.c:1738 modules/gui/ncurses.c:810
+#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:810
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
 msgstr "| input bytes read : %8.0f KiB"
 
-#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:812
+#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
 msgstr "| kadar bit input  :   %6.0f kb/s"
 
-#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:814
+#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:814
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
 msgstr "| demux bytes read : %8.0f KiB"
 
-#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:816
+#: modules/control/oldrc.c:1746 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
 msgstr "| kadar bit demux    :   %6.0f kb/s"
 
-#: modules/control/oldrc.c:1746
+#: modules/control/oldrc.c:1748
 #, c-format
 msgid "| demux corrupted  :    %5<PRIi64>"
 msgstr "| demux corrupted  :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1748
+#: modules/control/oldrc.c:1750
 #, c-format
 msgid "| discontinuities  :    %5<PRIi64>"
 msgstr "| discontinuities  :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1752 modules/gui/ncurses.c:822
+#: modules/control/oldrc.c:1754 modules/gui/ncurses.c:822
 msgid "+-[Video Decoding]"
 msgstr "+-[Video Decoding]"
 
-#: modules/control/oldrc.c:1753 modules/gui/ncurses.c:824
+#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:824
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
 msgstr "| video decoded    :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
+#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
 msgstr "| frames displayed :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
+#: modules/control/oldrc.c:1759 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
 msgstr "| frames lost      :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1761 modules/gui/ncurses.c:834
+#: modules/control/oldrc.c:1763 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
 msgstr "+-[Audio Decoding]"
 
-#: modules/control/oldrc.c:1762 modules/gui/ncurses.c:836
+#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:836
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
 msgstr "| audio decoded    :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
+#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:838
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
 msgstr "| buffers played   :    %5<PRIi64>"
 
-#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
+#: modules/control/oldrc.c:1768 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
 msgstr "| buffers lost     :    %5<PRIi64>"
@@ -15464,7 +15465,7 @@ msgstr "Pulihkan jika perlu"
 msgid "AVI demuxer"
 msgstr "Demuxer AVI"
 
-#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4307
+#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4375
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15493,7 +15494,7 @@ msgstr "Bina indeks kemudian main"
 msgid "Play as is"
 msgstr "Putar seadanya"
 
-#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4318
+#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4386
 msgid "Broken or missing Index"
 msgstr "Indeks rosak atau hilang"
 
@@ -15941,11 +15942,11 @@ msgstr "Demuxer strim MP4"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4315
+#: modules/demux/mp4/mp4.c:4383
 msgid "Do not seek"
 msgstr "Jangan jangkau"
 
-#: modules/demux/mp4/mp4.c:4316
+#: modules/demux/mp4/mp4.c:4384
 msgid "Build index"
 msgstr "Bina indeks"
 
@@ -16153,15 +16154,15 @@ msgstr "Sari kata teleteks: cacat pendengaran"
 msgid "DVB subtitles: hearing impaired"
 msgstr "Sarikata DVB: cacat pendengaran"
 
-#: modules/demux/mpeg/ts_psi.c:1333
+#: modules/demux/mpeg/ts_psi.c:1337
 msgid "clean effects"
 msgstr "kesan bersih"
 
-#: modules/demux/mpeg/ts_psi.c:1334
+#: modules/demux/mpeg/ts_psi.c:1338
 msgid "hearing impaired"
 msgstr "pendengaran terganggu"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1339
 msgid "visual impaired commentary"
 msgstr "visual dirosakkan komentar"
 
@@ -22143,6 +22144,15 @@ msgstr "Imej gamma (0-10)"
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Tetapkan gamma imej, antara 0.01 dan 10. Lalai ialah 1."
 
+#: modules/hw/d3d11/d3d11_filters.c:670
+#, fuzzy
+msgid "AMD VQ Enhancer"
+msgstr "Pembaik Stereo"
+
+#: modules/hw/d3d11/d3d11_filters.c:671
+msgid "amf_vqenhancer"
+msgstr ""
+
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
 msgstr "Penapis laras Direct3D9"
@@ -24300,7 +24310,7 @@ msgstr "Senarai Suai"
 
 #: modules/services_discovery/upnp.cpp:118
 #: modules/services_discovery/upnp.cpp:125
-#: modules/services_discovery/upnp.cpp:261
+#: modules/services_discovery/upnp.cpp:262
 msgid "Universal Plug'n'Play"
 msgstr "Plug'n'Play Universal"
 
@@ -28019,12 +28029,12 @@ msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "Mod atas meja membolehkan anda paparkan video di atas meja."
 
 #: modules/video_output/win32/direct3d9.c:76
-#: modules/video_output/win32/direct3d11.c:69
+#: modules/video_output/win32/direct3d11.c:70
 msgid "Use hardware blending support"
 msgstr "Guna sokongan pengadunan perkakasan"
 
 #: modules/video_output/win32/direct3d9.c:78
-#: modules/video_output/win32/direct3d11.c:71
+#: modules/video_output/win32/direct3d11.c:72
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr "Cuba guna pemecutan perkakasan untuk pengadunan sarikata/OSD/"
 
@@ -28056,41 +28066,63 @@ msgstr "Output video disarankan untuk Windows Vista dan versi terkini"
 msgid "Direct3D9 video output"
 msgstr "Output video Direct3D9"
 
-#: modules/video_output/win32/direct3d11.c:68
+#: modules/video_output/win32/direct3d11.c:69
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr "Output video disarankan untuk Windows 8 dan versi terkemudian"
 
-#: modules/video_output/win32/direct3d11.c:73
+#: modules/video_output/win32/direct3d11.c:74
 #, fuzzy
 msgid "Video Upscaling Mode"
 msgstr "Penskalaan video"
 
-#: modules/video_output/win32/direct3d11.c:74
+#: modules/video_output/win32/direct3d11.c:75
 #, fuzzy
 msgid "Select the upscaling mode for video."
 msgstr "Plih satu warna dalam video"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Linear Sampler"
 msgstr "Bit per sampel"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Point Sampler"
 msgstr "Pensampel Semula SoX"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Video Processor"
 msgstr "Kodeks video"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Super Resolution"
 msgstr "Resolusi"
 
+#: modules/video_output/win32/direct3d11.c:82
+#, fuzzy
+msgid "HDR Output Mode"
+msgstr "Modul output"
+
 #: modules/video_output/win32/direct3d11.c:83
+msgid "Use HDR output even if the source is SDR."
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Never out HDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+#, fuzzy
+msgid "Always output HDR"
+msgstr "Sentiasa di atas"
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Generate HDR from SDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
 msgstr "Output video Direct3D11"
 

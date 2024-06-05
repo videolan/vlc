@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.13\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2023-10-30 09:17+0100\n"
+"POT-Creation-Date: 2024-06-05 17:42+0200\n"
 "PO-Revision-Date: 2017-12-10 22:48+0000\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Aragonese (https://app.transifex.com/yaron/teams/16553/an/)\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: include/vlc_common.h:1048
+#: include/vlc_common.h:1053
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -737,10 +737,10 @@ msgstr "Estereo inverso"
 msgid "Headphones"
 msgstr "Auriculars"
 
-#: src/config/core.c:370 modules/access/dtv/access.c:93
-#: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
-#: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
-#: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
+#: src/config/core.c:370 modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:113 modules/access/dtv/access.c:122
+#: modules/access/dtv/access.c:130 modules/access/dtv/access.c:139
+#: modules/access/dtv/access.c:147 modules/access/dtv/access.c:169
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:991
 #: modules/gui/qt/components/simple_preferences.cpp:394
 msgid "Automatic"
@@ -943,7 +943,7 @@ msgid "decoder"
 msgstr "descodificador"
 
 #: src/input/decoder.c:1922 src/input/decoder.c:2205
-#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:912
+#: modules/codec/avcodec/encoder.c:378 modules/codec/avcodec/encoder.c:918
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "Ha fallau a transmisión u a transcodificación"
@@ -1136,7 +1136,7 @@ msgstr ""
 
 #: src/input/es_out.c:3250 src/input/es_out.c:3268 src/input/es_out.c:3286
 #: src/input/es_out.c:3300 src/playlist/tree.c:67
-#: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
+#: modules/access/dtv/access.c:82 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "Sin definir"
 
@@ -1775,17 +1775,18 @@ msgstr ""
 #: modules/services_discovery/upnp.cpp:82
 #: modules/text_renderer/freetype/freetype.c:124
 #: modules/text_renderer/freetype/freetype.c:151 modules/video_output/kva.c:62
+#: modules/video_output/win32/direct3d11.c:88
 #: modules/video_output/xcb/xvideo.c:824 modules/gui/qt/ui/profiles.h:742
 #: modules/gui/qt/ui/profiles.h:745
 msgid "Auto"
 msgstr "Auto"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:201 modules/control/hotkeys.c:405
 msgid "On"
 msgstr "Activau"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:99
 #: modules/access/v4l2/v4l2.c:137 modules/access/v4l2/v4l2.c:201
 #: modules/control/hotkeys.c:383 modules/control/hotkeys.c:405
 #: modules/video_filter/deinterlace/algo_phosphor.h:55
@@ -1863,8 +1864,8 @@ msgstr ""
 "malmeter o ton de l'audio"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
-#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
-#: modules/access/dtv/access.c:143 modules/access/v4l2/v4l2.c:163
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:114
+#: modules/access/dtv/access.c:148 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 #: modules/codec/kate.c:199 modules/codec/x264.c:429 modules/codec/x264.c:434
 #: modules/demux/mp4/meta.c:430
@@ -6825,327 +6826,327 @@ msgstr ""
 msgid "libdsm NETBIOS discovery module"
 msgstr ""
 
-#: modules/access/dtv/access.c:38
+#: modules/access/dtv/access.c:43
 msgid "DVB adapter"
 msgstr "Adaptador DVB"
 
-#: modules/access/dtv/access.c:40
+#: modules/access/dtv/access.c:45
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
 msgstr ""
 
-#: modules/access/dtv/access.c:43
+#: modules/access/dtv/access.c:48
 msgid "DVB device"
 msgstr "Dispositivo DVB "
 
-#: modules/access/dtv/access.c:45
+#: modules/access/dtv/access.c:50
 msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
 msgstr ""
 
-#: modules/access/dtv/access.c:47
+#: modules/access/dtv/access.c:52
 msgid "Do not demultiplex"
 msgstr "No demultiplexar"
 
-#: modules/access/dtv/access.c:49
+#: modules/access/dtv/access.c:54
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
 msgstr ""
 
-#: modules/access/dtv/access.c:52
+#: modules/access/dtv/access.c:57
 msgid "Network name"
 msgstr "Nombre de ret"
 
-#: modules/access/dtv/access.c:53
+#: modules/access/dtv/access.c:58
 msgid "Unique network name in the System Tuning Spaces"
 msgstr "Nombre solo de ret en o «System Tuning Spaces»"
 
-#: modules/access/dtv/access.c:55
+#: modules/access/dtv/access.c:60
 msgid "Network name to create"
 msgstr "Nombre de ret a creyar"
 
-#: modules/access/dtv/access.c:56
+#: modules/access/dtv/access.c:61
 msgid "Create unique name in the System Tuning Spaces"
 msgstr "Creyar nombre solo en o «System Tuning Spaces»"
 
-#: modules/access/dtv/access.c:58
+#: modules/access/dtv/access.c:63
 msgid "Frequency (Hz)"
 msgstr "Freqüencia (Hz)"
 
-#: modules/access/dtv/access.c:60
+#: modules/access/dtv/access.c:65
 msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
 msgstr ""
 
-#: modules/access/dtv/access.c:63 modules/gui/qt/components/open_panels.cpp:987
+#: modules/access/dtv/access.c:68 modules/gui/qt/components/open_panels.cpp:987
 msgid "Modulation / Constellation"
 msgstr "Modulación / Contelación"
 
-#: modules/access/dtv/access.c:64
+#: modules/access/dtv/access.c:69
 msgid "Layer A modulation"
 msgstr "Modulacion capa A2"
 
-#: modules/access/dtv/access.c:65
+#: modules/access/dtv/access.c:70
 msgid "Layer B modulation"
 msgstr "Modulacion capa B"
 
-#: modules/access/dtv/access.c:66
+#: modules/access/dtv/access.c:71
 msgid "Layer C modulation"
 msgstr "Modulacion capa B"
 
-#: modules/access/dtv/access.c:68
+#: modules/access/dtv/access.c:73
 msgid ""
 "The digital signal can be modulated according with different constellations "
 "(depending on the delivery system). If the demodulator cannot detect the "
 "constellation automatically, it needs to be configured manually."
 msgstr ""
 
-#: modules/access/dtv/access.c:83
+#: modules/access/dtv/access.c:88
 msgid "Symbol rate (bauds)"
 msgstr "Taxa de simbolo (baudios)"
 
-#: modules/access/dtv/access.c:85
+#: modules/access/dtv/access.c:90
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
 msgstr ""
 
-#: modules/access/dtv/access.c:88
+#: modules/access/dtv/access.c:93
 msgid "Spectrum inversion"
 msgstr "Inversión d'espectrómetro"
 
-#: modules/access/dtv/access.c:90
+#: modules/access/dtv/access.c:95
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
 msgstr ""
 
-#: modules/access/dtv/access.c:96
+#: modules/access/dtv/access.c:101
 msgid "FEC code rate"
 msgstr "Taxa de codigo FEC"
 
-#: modules/access/dtv/access.c:97
+#: modules/access/dtv/access.c:102
 msgid "High-priority code rate"
 msgstr "Taxa de codigo d'alta prioridat"
 
-#: modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:103
 msgid "Low-priority code rate"
 msgstr ""
 
-#: modules/access/dtv/access.c:99
+#: modules/access/dtv/access.c:104
 msgid "Layer A code rate"
 msgstr "Taxa de codigo capa A2"
 
-#: modules/access/dtv/access.c:100
+#: modules/access/dtv/access.c:105
 msgid "Layer B code rate"
 msgstr "Taxa de codigo capa B"
 
-#: modules/access/dtv/access.c:101
+#: modules/access/dtv/access.c:106
 msgid "Layer C code rate"
 msgstr "Taxa de codigo capa C"
 
-#: modules/access/dtv/access.c:103
+#: modules/access/dtv/access.c:108
 msgid "The code rate for Forward Error Correction can be specified."
 msgstr ""
 
-#: modules/access/dtv/access.c:113
+#: modules/access/dtv/access.c:118
 msgid "Transmission mode"
 msgstr "Modo transmisión"
 
-#: modules/access/dtv/access.c:121
+#: modules/access/dtv/access.c:126
 msgid "Bandwidth (MHz)"
 msgstr "Amplo de banda (MHz)"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "10 MHz"
 msgstr "10 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "8 MHz"
 msgstr "8 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "7 MHz"
 msgstr "7 MHz"
 
-#: modules/access/dtv/access.c:126
+#: modules/access/dtv/access.c:131
 msgid "6 MHz"
 msgstr "6 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "5 MHz"
 msgstr "5 MHz"
 
-#: modules/access/dtv/access.c:127
+#: modules/access/dtv/access.c:132
 msgid "1.712 MHz"
 msgstr "1.712 MHz"
 
-#: modules/access/dtv/access.c:130
+#: modules/access/dtv/access.c:135
 msgid "Guard interval"
 msgstr "Intervalo d'alza"
 
-#: modules/access/dtv/access.c:138
+#: modules/access/dtv/access.c:143
 msgid "Hierarchy mode"
 msgstr "Modo jeráquico"
 
-#: modules/access/dtv/access.c:146
+#: modules/access/dtv/access.c:151
 msgid "DVB-T2 Physical Layer Pipe"
 msgstr ""
 
-#: modules/access/dtv/access.c:148
+#: modules/access/dtv/access.c:153
 msgid "Layer A segments count"
 msgstr "Cuenta de segmentos capa A2"
 
-#: modules/access/dtv/access.c:149
+#: modules/access/dtv/access.c:154
 msgid "Layer B segments count"
 msgstr "Cuenta de segmentos capa B"
 
-#: modules/access/dtv/access.c:150
+#: modules/access/dtv/access.c:155
 msgid "Layer C segments count"
 msgstr "Cuenta de segmentos capa C"
 
-#: modules/access/dtv/access.c:152
+#: modules/access/dtv/access.c:157
 msgid "Layer A time interleaving"
 msgstr ""
 
-#: modules/access/dtv/access.c:153
+#: modules/access/dtv/access.c:158
 msgid "Layer B time interleaving"
 msgstr ""
 
-#: modules/access/dtv/access.c:154
+#: modules/access/dtv/access.c:159
 msgid "Layer C time interleaving"
 msgstr ""
 
-#: modules/access/dtv/access.c:156
+#: modules/access/dtv/access.c:161
 msgid "Stream identifier"
 msgstr ""
 
-#: modules/access/dtv/access.c:158
+#: modules/access/dtv/access.c:163
 msgid "Pilot"
 msgstr ""
 
-#: modules/access/dtv/access.c:160
+#: modules/access/dtv/access.c:165
 msgid "Roll-off factor"
 msgstr ""
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.35 (same as DVB-S)"
 msgstr "0.35 (igual que DVB-S)"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.20"
 msgstr "0.20"
 
-#: modules/access/dtv/access.c:165
+#: modules/access/dtv/access.c:170
 msgid "0.25"
 msgstr "0.25"
 
-#: modules/access/dtv/access.c:168
+#: modules/access/dtv/access.c:173
 msgid "Transport stream ID"
 msgstr "IT d'emisión de transporte"
 
-#: modules/access/dtv/access.c:170
+#: modules/access/dtv/access.c:175
 msgid "Polarization (Voltage)"
 msgstr "Polarización (Voltaje)"
 
-#: modules/access/dtv/access.c:172
+#: modules/access/dtv/access.c:177
 msgid ""
 "To select the polarization of the transponder, a different voltage is "
 "normally applied to the low noise block-downconverter (LNB)."
 msgstr ""
 
-#: modules/access/dtv/access.c:175
+#: modules/access/dtv/access.c:180
 msgid "Unspecified (0V)"
 msgstr "No especificau (0V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Vertical (13V)"
 msgstr "Vertical (13V)"
 
-#: modules/access/dtv/access.c:176
+#: modules/access/dtv/access.c:181
 msgid "Horizontal (18V)"
 msgstr "Horizontal (18V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Right Hand (13V)"
 msgstr "Man dreita circular (13V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:182
 msgid "Circular Left Hand (18V)"
 msgstr "Man cucha circular (18V)"
 
-#: modules/access/dtv/access.c:179
+#: modules/access/dtv/access.c:184
 msgid "High LNB voltage"
 msgstr "Alto voltaje LNB"
 
-#: modules/access/dtv/access.c:181
+#: modules/access/dtv/access.c:186
 msgid ""
 "If the cables between the satellilte low noise block-downconverter and the "
 "receiver are long, higher voltage may be required.\n"
 "Not all receivers support this."
 msgstr ""
 
-#: modules/access/dtv/access.c:185
+#: modules/access/dtv/access.c:190
 msgid "Local oscillator low frequency (kHz)"
 msgstr "Oscilador local baixa freqüencia (kHz)"
 
-#: modules/access/dtv/access.c:186
+#: modules/access/dtv/access.c:191
 msgid "Local oscillator high frequency (kHz)"
 msgstr ""
 
-#: modules/access/dtv/access.c:188
+#: modules/access/dtv/access.c:193
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
 
-#: modules/access/dtv/access.c:191
+#: modules/access/dtv/access.c:196
 msgid "Universal LNB switch frequency (kHz)"
 msgstr ""
 
-#: modules/access/dtv/access.c:193
+#: modules/access/dtv/access.c:198
 msgid ""
 "If the satellite transmission frequency exceeds the switch frequency, the "
 "oscillator high frequency will be used as reference. Furthermore the "
 "automatic continuous 22kHz tone will be sent."
 msgstr ""
 
-#: modules/access/dtv/access.c:196
+#: modules/access/dtv/access.c:201
 msgid "Continuous 22kHz tone"
 msgstr "Ton contino 22kHz"
 
-#: modules/access/dtv/access.c:198
+#: modules/access/dtv/access.c:203
 msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
 msgstr ""
 
-#: modules/access/dtv/access.c:201
+#: modules/access/dtv/access.c:206
 msgid "DiSEqC LNB number"
 msgstr ""
 
-#: modules/access/dtv/access.c:203
+#: modules/access/dtv/access.c:208
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a DiSEqC 1.0 switch, the correct LNB can be "
 "selected (1 to 4). If there is no switch, this parameter should be 0."
 msgstr ""
 
-#: modules/access/dtv/access.c:209 modules/access/v4l2/v4l2.c:136
+#: modules/access/dtv/access.c:214 modules/access/v4l2/v4l2.c:136
 #: modules/access/v4l2/v4l2.c:163 modules/access/v4l2/v4l2.c:201
 msgid "Unspecified"
 msgstr "No especificau"
 
-#: modules/access/dtv/access.c:213
+#: modules/access/dtv/access.c:218
 msgid "Uncommitted DiSEqC LNB number"
 msgstr ""
 
-#: modules/access/dtv/access.c:215
+#: modules/access/dtv/access.c:220
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a cascade formed from DiSEqC 1.1 uncommitted "
@@ -7154,99 +7155,99 @@ msgid ""
 "be 0."
 msgstr ""
 
-#: modules/access/dtv/access.c:222
+#: modules/access/dtv/access.c:227
 msgid "Network identifier"
 msgstr "Identificador de ret"
 
-#: modules/access/dtv/access.c:223
+#: modules/access/dtv/access.c:228
 msgid "Satellite azimuth"
 msgstr "Azimut de satélite"
 
-#: modules/access/dtv/access.c:224
+#: modules/access/dtv/access.c:229
 msgid "Satellite azimuth in tenths of degree"
 msgstr "Azimut de satélite en decenas de grau"
 
-#: modules/access/dtv/access.c:225
+#: modules/access/dtv/access.c:230
 msgid "Satellite elevation"
 msgstr "Elevación de satélite"
 
-#: modules/access/dtv/access.c:226
+#: modules/access/dtv/access.c:231
 msgid "Satellite elevation in tenths of degree"
 msgstr "Elevación de satélite en decenas de grau"
 
-#: modules/access/dtv/access.c:227
+#: modules/access/dtv/access.c:232
 msgid "Satellite longitude"
 msgstr "Longaria de satélite"
 
-#: modules/access/dtv/access.c:229
+#: modules/access/dtv/access.c:234
 msgid "Satellite longitude in tenths of degree. West is negative."
 msgstr "Longaria de satélite en decenas de grau. Ueste ye negativo."
 
-#: modules/access/dtv/access.c:231
+#: modules/access/dtv/access.c:236
 msgid "Satellite range code"
 msgstr "Codigo d'aconsiga de satélite"
 
-#: modules/access/dtv/access.c:232
+#: modules/access/dtv/access.c:237
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr ""
 
-#: modules/access/dtv/access.c:236
+#: modules/access/dtv/access.c:241
 msgid "Major channel"
 msgstr "Canal prencipal"
 
-#: modules/access/dtv/access.c:237
+#: modules/access/dtv/access.c:242
 msgid "ATSC minor channel"
 msgstr "Canal secundaria ATSC"
 
-#: modules/access/dtv/access.c:238
+#: modules/access/dtv/access.c:243
 msgid "Physical channel"
 msgstr "Canal fisica"
 
-#: modules/access/dtv/access.c:244
+#: modules/access/dtv/access.c:249
 msgid "DTV"
 msgstr "DTV"
 
-#: modules/access/dtv/access.c:245
+#: modules/access/dtv/access.c:250
 msgid "Digital Television and Radio"
 msgstr "Televisión digtal y radio"
 
-#: modules/access/dtv/access.c:283
+#: modules/access/dtv/access.c:288
 msgid "Terrestrial reception parameters"
 msgstr "Modo de recepción terrestre"
 
-#: modules/access/dtv/access.c:295
+#: modules/access/dtv/access.c:300
 msgid "DVB-T reception parameters"
 msgstr "Parametros de recepción DVB-T"
 
-#: modules/access/dtv/access.c:311
+#: modules/access/dtv/access.c:316
 msgid "ISDB-T reception parameters"
 msgstr "Parametros de recepción ISDB-T"
 
-#: modules/access/dtv/access.c:352
+#: modules/access/dtv/access.c:357
 msgid "Cable and satellite reception parameters"
 msgstr "Parametros de receptor cable y satélite"
 
-#: modules/access/dtv/access.c:364
+#: modules/access/dtv/access.c:369
 msgid "DVB-S2 parameters"
 msgstr "Parametros DVB-S2"
 
-#: modules/access/dtv/access.c:375
+#: modules/access/dtv/access.c:380
 msgid "ISDB-S parameters"
 msgstr "Parametros ISDB-S"
 
-#: modules/access/dtv/access.c:380
+#: modules/access/dtv/access.c:385
 msgid "Satellite equipment control"
 msgstr " Control de quipamiento de satélite"
 
-#: modules/access/dtv/access.c:422
+#: modules/access/dtv/access.c:427
 msgid "ATSC reception parameters"
 msgstr "Parametros de recepción ATSC"
 
-#: modules/access/dtv/access.c:476
+#: modules/access/dtv/access.c:481
 msgid "Digital broadcasting"
 msgstr "Emisión dichital"
 
-#: modules/access/dtv/access.c:477
+#: modules/access/dtv/access.c:482
 msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
@@ -7710,11 +7711,11 @@ msgstr "Grandaria d'o fluxo en bytes"
 msgid "Memory input"
 msgstr "Dentrada de memoria"
 
-#: modules/access/imem-access.c:159
+#: modules/access/imem-access.c:165
 msgid "Memory stream"
 msgstr ""
 
-#: modules/access/imem-access.c:160
+#: modules/access/imem-access.c:166
 msgid "In-memory stream input"
 msgstr ""
 
@@ -10805,8 +10806,8 @@ msgstr ""
 msgid "ARIB subtitles decoder"
 msgstr ""
 
-#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
-#: modules/demux/mpeg/ts_psi.c:1092
+#: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1089
+#: modules/demux/mpeg/ts_psi.c:1096
 msgid "ARIB subtitles"
 msgstr ""
 
@@ -11285,23 +11286,23 @@ msgid ""
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "unknown"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:899
+#: modules/codec/avcodec/encoder.c:905
 msgid "video"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "audio"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:900
+#: modules/codec/avcodec/encoder.c:906
 msgid "subpicture"
 msgstr ""
 
-#: modules/codec/avcodec/encoder.c:913
+#: modules/codec/avcodec/encoder.c:919
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr ""
@@ -12023,15 +12024,15 @@ msgstr "Codificador de video (usando OpenMAX IL)"
 msgid "OpenMAX IL video output"
 msgstr ""
 
-#: modules/codec/opus.c:62
+#: modules/codec/opus.c:65
 msgid "Opus audio decoder"
 msgstr ""
 
-#: modules/codec/opus.c:64 modules/codec/opus.c:71
+#: modules/codec/opus.c:67 modules/codec/opus.c:74
 msgid "Opus"
 msgstr ""
 
-#: modules/codec/opus.c:69
+#: modules/codec/opus.c:72
 msgid "Opus audio encoder"
 msgstr ""
 
@@ -14647,312 +14648,312 @@ msgstr "RC"
 msgid "Remote control interface"
 msgstr "Interficie de control remoto"
 
-#: modules/control/oldrc.c:368
+#: modules/control/oldrc.c:370
 msgid "Remote control interface initialized. Type `help' for help."
 msgstr "Interficie de control remoto inicializada. Escriba «help» para aduya."
 
-#: modules/control/oldrc.c:767
+#: modules/control/oldrc.c:769
 #, c-format
 msgid "Unknown command `%s'. Type `help' for help."
 msgstr "Comando desconoixiu «%s». Escriba «help» para aduya."
 
-#: modules/control/oldrc.c:785
+#: modules/control/oldrc.c:787
 msgid "+----[ Remote control commands ]"
 msgstr "+----[ Comandos de control remoto ]"
 
-#: modules/control/oldrc.c:787
+#: modules/control/oldrc.c:789
 msgid "| add XYZ  . . . . . . . . . . . . add XYZ to playlist"
 msgstr "| add XYZ . . . . . .  adhibe XYZ a lista de reproducción"
 
-#: modules/control/oldrc.c:788
+#: modules/control/oldrc.c:790
 msgid "| enqueue XYZ  . . . . . . . . . queue XYZ to playlist"
 msgstr "| enqueue XYZ . . .  encolar XYZ a lista de reproducción"
 
-#: modules/control/oldrc.c:789
+#: modules/control/oldrc.c:791
 msgid "| playlist . . . . .  show items currently in playlist"
 msgstr "| playlist  . . muestrar obchectos en lista de reproducción"
 
-#: modules/control/oldrc.c:790
+#: modules/control/oldrc.c:792
 msgid "| play . . . . . . . . . . . . . . . . . . play stream"
 msgstr "| play . . . . . . . . . . . . . . .  reproducir emisión"
 
-#: modules/control/oldrc.c:791
+#: modules/control/oldrc.c:793
 msgid "| stop . . . . . . . . . . . . . . . . . . stop stream"
 msgstr "| stop . . . . . . . . . . . . . . . . . . detener emisión"
 
-#: modules/control/oldrc.c:792
+#: modules/control/oldrc.c:794
 msgid "| next . . . . . . . . . . . . . .  next playlist item"
 msgstr "| next . . . . obchecto siguient de lista de reproducción"
 
-#: modules/control/oldrc.c:793
+#: modules/control/oldrc.c:795
 msgid "| prev . . . . . . . . . . . .  previous playlist item"
 msgstr "| prev . . . . . . . . . obchecto previo de lista de reproducción"
 
-#: modules/control/oldrc.c:794
+#: modules/control/oldrc.c:796
 msgid "| goto . . . . . . . . . . . . . .  goto item at index"
 msgstr "| goto . . . . . . . . . . . . . . ir a obchecto en indiz"
 
-#: modules/control/oldrc.c:795
+#: modules/control/oldrc.c:797
 msgid "| repeat [on|off] . . . .  toggle playlist item repeat"
 msgstr "| repeat [on|off] . . .  cambiar repetir obchecto de lista"
 
-#: modules/control/oldrc.c:796
+#: modules/control/oldrc.c:798
 msgid "| loop [on|off] . . . . . . . . . toggle playlist loop"
 msgstr "| loop [on|off] . . . .  cambiar bucle de lista de reproducción"
 
-#: modules/control/oldrc.c:797
+#: modules/control/oldrc.c:799
 msgid "| random [on|off] . . . . . . .  toggle random jumping"
 msgstr "| random [on|off] . . . . . . .  cambiar blinco aleatorio"
 
-#: modules/control/oldrc.c:798
+#: modules/control/oldrc.c:800
 msgid "| clear . . . . . . . . . . . . . . clear the playlist"
 msgstr "| clear . . . . . . . . .  limpiar lista de reproducción"
 
-#: modules/control/oldrc.c:799
+#: modules/control/oldrc.c:801
 msgid "| status . . . . . . . . . . . current playlist status"
 msgstr "| status . . . .  estau actual de lista de reproducción"
 
-#: modules/control/oldrc.c:800
+#: modules/control/oldrc.c:802
 msgid "| title [X]  . . . . . . set/get title in current item"
 msgstr "| title [X]  . . . . . establir/obtener titol en obchecto actual"
 
-#: modules/control/oldrc.c:801
+#: modules/control/oldrc.c:803
 msgid "| title_n  . . . . . . . .  next title in current item"
 msgstr "| title_n  . . . . . . siguient titol en obchecto actual"
 
-#: modules/control/oldrc.c:802
+#: modules/control/oldrc.c:804
 msgid "| title_p  . . . . . .  previous title in current item"
 msgstr "| title_p  . . . . . . .  titol previo en obchecto actual"
 
-#: modules/control/oldrc.c:803
+#: modules/control/oldrc.c:805
 msgid "| chapter [X]  . . . . set/get chapter in current item"
 msgstr "| chapter [X]  . . . establir/obtener capitol en obchecto actual"
 
-#: modules/control/oldrc.c:804
+#: modules/control/oldrc.c:806
 msgid "| chapter_n  . . . . . .  next chapter in current item"
 msgstr "| chapter_n  . . . . capitol siguient en obchecto actual"
 
-#: modules/control/oldrc.c:805
+#: modules/control/oldrc.c:807
 msgid "| chapter_p  . . . .  previous chapter in current item"
 msgstr "| chapter_p  . . . . .  capitol previo en obchecto actual"
 
-#: modules/control/oldrc.c:807
+#: modules/control/oldrc.c:809
 msgid "| seek X . . . seek in seconds, for instance `seek 12'"
 msgstr "| seek X . . . . . . buscar en segundos, p. eix. «seek 12»"
 
-#: modules/control/oldrc.c:808
+#: modules/control/oldrc.c:810
 msgid "| pause  . . . . . . . . . . . . . . . .  toggle pause"
 msgstr "| pause  . . . . . . . . . . . . . . . . . cambiar pausa"
 
-#: modules/control/oldrc.c:809
+#: modules/control/oldrc.c:811
 msgid "| fastforward  . . . . . . . .  .  set to maximum rate"
 msgstr "| fastforward  . . . . . . . .  meter a maxima velocidat"
 
-#: modules/control/oldrc.c:810
+#: modules/control/oldrc.c:812
 msgid "| rewind  . . . . . . . . . . . .  set to minimum rate"
 msgstr "| rewind . . . . . . . . . . .  meter a minima velocidat"
 
-#: modules/control/oldrc.c:811
+#: modules/control/oldrc.c:813
 msgid "| faster . . . . . . . . . .  faster playing of stream"
 msgstr "| faster . . . . . . . . . reproducir emisión mas rapida"
 
-#: modules/control/oldrc.c:812
+#: modules/control/oldrc.c:814
 msgid "| slower . . . . . . . . . .  slower playing of stream"
 msgstr "| slower . . . . . . . . .  reproducir emisión mas lenta"
 
-#: modules/control/oldrc.c:813
+#: modules/control/oldrc.c:815
 msgid "| normal . . . . . . . . . .  normal playing of stream"
 msgstr "| normal . . . . . . . . . . . reproducir emisión normal"
 
-#: modules/control/oldrc.c:814
+#: modules/control/oldrc.c:816
 msgid "| frame. . . . . . . . . .  play frame by frame"
 msgstr "| frame. . . . . . . . . .  reproducir fotograma a fotograma"
 
-#: modules/control/oldrc.c:815
+#: modules/control/oldrc.c:817
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
 msgstr "| f [on|off] . . . . . .  intercambiar pantalla completa"
 
-#: modules/control/oldrc.c:816
+#: modules/control/oldrc.c:818
 msgid "| info . . . . .  information about the current stream"
 msgstr "| info . . . . . . . información sobre a emisión actual"
 
-#: modules/control/oldrc.c:817
+#: modules/control/oldrc.c:819
 msgid "| stats  . . . . . . . .  show statistical information"
 msgstr "| stats  . . . . . . . . amostrar información estatistica"
 
-#: modules/control/oldrc.c:818
+#: modules/control/oldrc.c:820
 msgid "| get_time . . seconds elapsed since stream's beginning"
 msgstr "| get_time . .  segundos pasaus dimpués d'encetar a emisión"
 
-#: modules/control/oldrc.c:819
+#: modules/control/oldrc.c:821
 msgid "| is_playing . . . .  1 if a stream plays, 0 otherwise"
 msgstr "| is_playing . . . .  1 si se reproduz emisión, 0 si no"
 
-#: modules/control/oldrc.c:820
+#: modules/control/oldrc.c:822
 msgid "| get_title . . . . .  the title of the current stream"
 msgstr "| get_title  . . . . . . . . titol d'a emisión actual"
 
-#: modules/control/oldrc.c:821
+#: modules/control/oldrc.c:823
 msgid "| get_length . . . .  the length of the current stream"
 msgstr "| get_length . . . . . . . longaria d'a emisión actual"
 
-#: modules/control/oldrc.c:823
+#: modules/control/oldrc.c:825
 msgid "| volume [X] . . . . . . . . . .  set/get audio volume"
 msgstr "| volume [X] . . . . . . . .  establir/obtener volumen d'audio"
 
-#: modules/control/oldrc.c:824
+#: modules/control/oldrc.c:826
 msgid "| volup [X]  . . . . . . .  raise audio volume X steps"
 msgstr "| volup [X]  . . . . . . puyar volumen d'audio X puntos"
 
-#: modules/control/oldrc.c:825
+#: modules/control/oldrc.c:827
 msgid "| voldown [X]  . . . . . .  lower audio volume X steps"
 msgstr "| voldown [X]  . . . . . baixar volumen d'audio X puntos"
 
-#: modules/control/oldrc.c:826
+#: modules/control/oldrc.c:828
 msgid "| adev [device]  . . . . . . . .  set/get audio device"
 msgstr ""
 
-#: modules/control/oldrc.c:827
+#: modules/control/oldrc.c:829
 msgid "| achan [X]. . . . . . . . . .  set/get audio channels"
 msgstr "| achan [X]  . . . . . . . .  establir/obtener canals d'audio"
 
-#: modules/control/oldrc.c:828
+#: modules/control/oldrc.c:830
 msgid "| atrack [X] . . . . . . . . . . . set/get audio track"
 msgstr "| atrack [X] . . . . . . . . .  establir/obtener pista d'audio"
 
-#: modules/control/oldrc.c:829
+#: modules/control/oldrc.c:831
 msgid "| vtrack [X] . . . . . . . . . . . set/get video track"
 msgstr "| vtrack [X] . . . . . . . . .  establir/obtener pista de video"
 
-#: modules/control/oldrc.c:830
+#: modules/control/oldrc.c:832
 msgid "| vratio [X]  . . . . . . . set/get video aspect ratio"
 msgstr "| vratio [X] . . . .  establir/obtener proporción de video"
 
-#: modules/control/oldrc.c:831
+#: modules/control/oldrc.c:833
 msgid "| vcrop [X]  . . . . . . . . . . .  set/get video crop"
 msgstr "| vcrop [X]  . . . . . . . .  establir/obtener retalle de video"
 
-#: modules/control/oldrc.c:832
+#: modules/control/oldrc.c:834
 msgid "| vzoom [X]  . . . . . . . . . . .  set/get video zoom"
 msgstr "| vzoom [X]  . . . . . . . . . . establir/obtener zoom de video"
 
-#: modules/control/oldrc.c:833
+#: modules/control/oldrc.c:835
 msgid "| snapshot . . . . . . . . . . . . take video snapshot"
 msgstr "| snapshot . . . . .  prener captura de pantalla de video"
 
-#: modules/control/oldrc.c:834
+#: modules/control/oldrc.c:836
 msgid "| strack [X] . . . . . . . . .  set/get subtitle track"
 msgstr ""
 
-#: modules/control/oldrc.c:835
+#: modules/control/oldrc.c:837
 msgid "| key [hotkey name] . . . . . .  simulate hotkey press"
 msgstr ""
 "| key [nombre alcorce de teclau] . simular pulsación d'alcorce de teclau"
 
-#: modules/control/oldrc.c:837
+#: modules/control/oldrc.c:839
 msgid "| help . . . . . . . . . . . . . . . this help message"
 msgstr "| help  . . . . . . . . . . . . .  iste mensache d'aduya"
 
-#: modules/control/oldrc.c:838
+#: modules/control/oldrc.c:840
 msgid "| logout . . . . . . .  exit (if in socket connection)"
 msgstr "| logout  . . . . . . salir (estando en connexión socket)"
 
-#: modules/control/oldrc.c:839
+#: modules/control/oldrc.c:841
 msgid "| quit . . . . . . . . . . . . . . . . . . .  quit vlc"
 msgstr "| quit  . . . . . . . . . . . . . . . . . . salir de vlc"
 
-#: modules/control/oldrc.c:841
+#: modules/control/oldrc.c:843
 msgid "+----[ end of help ]"
 msgstr "+----[ fin d'aduya ]"
 
-#: modules/control/oldrc.c:968
+#: modules/control/oldrc.c:970
 msgid "Press pause to continue."
 msgstr ""
 
-#: modules/control/oldrc.c:1192 modules/control/oldrc.c:1441
-#: modules/control/oldrc.c:1485
+#: modules/control/oldrc.c:1194 modules/control/oldrc.c:1443
+#: modules/control/oldrc.c:1487
 msgid "Type 'pause' to continue."
 msgstr ""
 
-#: modules/control/oldrc.c:1281
+#: modules/control/oldrc.c:1283
 msgid "Error: `goto' needs an argument greater than zero."
 msgstr "Error: «goto» ameneste un argumento mayor que zero."
 
-#: modules/control/oldrc.c:1291
+#: modules/control/oldrc.c:1293
 #, c-format
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] ""
 msgstr[1] ""
 
-#: modules/control/oldrc.c:1737 modules/gui/ncurses.c:808
+#: modules/control/oldrc.c:1739 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
 msgstr "+-[Emisión dentrant]"
 
-#: modules/control/oldrc.c:1738 modules/gui/ncurses.c:810
+#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:810
 #, c-format
 msgid "| input bytes read : %8.0f KiB"
 msgstr "| bytes de dentrada leitos : %8.0f KiB"
 
-#: modules/control/oldrc.c:1740 modules/gui/ncurses.c:812
+#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:812
 #, c-format
 msgid "| input bitrate    :   %6.0f kb/s"
 msgstr "| taxa de bits de dentrada    :   %6.0f kb/s"
 
-#: modules/control/oldrc.c:1742 modules/gui/ncurses.c:814
+#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:814
 #, c-format
 msgid "| demux bytes read : %8.0f KiB"
 msgstr " | bytes de demux leitos : %8.0f KiB"
 
-#: modules/control/oldrc.c:1744 modules/gui/ncurses.c:816
+#: modules/control/oldrc.c:1746 modules/gui/ncurses.c:816
 #, c-format
 msgid "| demux bitrate    :   %6.0f kb/s"
 msgstr "| taxa de bits de demux      :   %6.0f kb/s"
 
-#: modules/control/oldrc.c:1746
+#: modules/control/oldrc.c:1748
 #, c-format
 msgid "| demux corrupted  :    %5<PRIi64>"
 msgstr " | demux corrompiu : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1748
+#: modules/control/oldrc.c:1750
 #, c-format
 msgid "| discontinuities  :    %5<PRIi64>"
 msgstr "| discontinidatz : %5<PRIi64>"
 
-#: modules/control/oldrc.c:1752 modules/gui/ncurses.c:822
+#: modules/control/oldrc.c:1754 modules/gui/ncurses.c:822
 msgid "+-[Video Decoding]"
 msgstr "+-[Descodificación de cideo]"
 
-#: modules/control/oldrc.c:1753 modules/gui/ncurses.c:824
+#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:824
 #, c-format
 msgid "| video decoded    :    %5<PRIi64>"
 msgstr "| video decodificado         :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1755 modules/gui/ncurses.c:826
+#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:826
 #, c-format
 msgid "| frames displayed :    %5<PRIi64>"
 msgstr "| fotogramas amostraus       :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1757 modules/gui/ncurses.c:828
+#: modules/control/oldrc.c:1759 modules/gui/ncurses.c:828
 #, c-format
 msgid "| frames lost      :    %5<PRIi64>"
 msgstr "| fotogramas perdius        :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1761 modules/gui/ncurses.c:834
+#: modules/control/oldrc.c:1763 modules/gui/ncurses.c:834
 msgid "+-[Audio Decoding]"
 msgstr "+-[Descodificación d'audio]"
 
-#: modules/control/oldrc.c:1762 modules/gui/ncurses.c:836
+#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:836
 #, c-format
 msgid "| audio decoded    :    %5<PRIi64>"
 msgstr "| audio decodificado         :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1764 modules/gui/ncurses.c:838
+#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:838
 #, c-format
 msgid "| buffers played   :    %5<PRIi64>"
 msgstr "| buffers reproducius        :   %5<PRIi64>"
 
-#: modules/control/oldrc.c:1766 modules/gui/ncurses.c:840
+#: modules/control/oldrc.c:1768 modules/gui/ncurses.c:840
 #, c-format
 msgid "| buffers lost     :    %5<PRIi64>"
 msgstr "| buffers perdius            :   %5<PRIi64>"
@@ -15142,7 +15143,7 @@ msgstr ""
 msgid "AVI demuxer"
 msgstr "Demuxor AVI"
 
-#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4307
+#: modules/demux/avi/avi.c:902 modules/demux/mp4/mp4.c:4375
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15164,7 +15165,7 @@ msgstr "Construir indiz dimpués reproducir"
 msgid "Play as is"
 msgstr "Reproducir como"
 
-#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4318
+#: modules/demux/avi/avi.c:913 modules/demux/mp4/mp4.c:4386
 msgid "Broken or missing Index"
 msgstr ""
 
@@ -15603,11 +15604,11 @@ msgstr "Demuxor MP4 d'emisión"
 msgid "MP4"
 msgstr "MP4"
 
-#: modules/demux/mp4/mp4.c:4315
+#: modules/demux/mp4/mp4.c:4383
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:4316
+#: modules/demux/mp4/mp4.c:4384
 msgid "Build index"
 msgstr ""
 
@@ -15811,15 +15812,15 @@ msgstr "Subtítulos teletexto: personas con problemas auditivos"
 msgid "DVB subtitles: hearing impaired"
 msgstr "Subtítulos DVB: personas con problemas auditivos"
 
-#: modules/demux/mpeg/ts_psi.c:1333
+#: modules/demux/mpeg/ts_psi.c:1337
 msgid "clean effects"
 msgstr "limpiar efectos"
 
-#: modules/demux/mpeg/ts_psi.c:1334
+#: modules/demux/mpeg/ts_psi.c:1338
 msgid "hearing impaired"
 msgstr "incapacidat auditiva"
 
-#: modules/demux/mpeg/ts_psi.c:1335
+#: modules/demux/mpeg/ts_psi.c:1339
 msgid "visual impaired commentary"
 msgstr "comentario incapacidat visual"
 
@@ -21678,6 +21679,14 @@ msgstr "Gamma d'imachen (0-10)"
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "Establir a gamma d'imachen, entre 0.01 y 10. Predeterminau a 1."
 
+#: modules/hw/d3d11/d3d11_filters.c:670
+msgid "AMD VQ Enhancer"
+msgstr ""
+
+#: modules/hw/d3d11/d3d11_filters.c:671
+msgid "amf_vqenhancer"
+msgstr ""
+
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
 msgstr ""
@@ -23782,7 +23791,7 @@ msgstr ""
 
 #: modules/services_discovery/upnp.cpp:118
 #: modules/services_discovery/upnp.cpp:125
-#: modules/services_discovery/upnp.cpp:261
+#: modules/services_discovery/upnp.cpp:262
 msgid "Universal Plug'n'Play"
 msgstr "Plug'n'Play Universal"
 
@@ -27378,12 +27387,12 @@ msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "O modo escritorio le permite amostrar o video en o escritorio."
 
 #: modules/video_output/win32/direct3d9.c:76
-#: modules/video_output/win32/direct3d11.c:69
+#: modules/video_output/win32/direct3d11.c:70
 msgid "Use hardware blending support"
 msgstr "Usar suporte d'hardware de difuminación."
 
 #: modules/video_output/win32/direct3d9.c:78
-#: modules/video_output/win32/direct3d11.c:71
+#: modules/video_output/win32/direct3d11.c:72
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr ""
 
@@ -27415,41 +27424,63 @@ msgstr "Salida de video recomendada ta Windows Vista y versions posteriors"
 msgid "Direct3D9 video output"
 msgstr ""
 
-#: modules/video_output/win32/direct3d11.c:68
+#: modules/video_output/win32/direct3d11.c:69
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
-#: modules/video_output/win32/direct3d11.c:73
+#: modules/video_output/win32/direct3d11.c:74
 #, fuzzy
 msgid "Video Upscaling Mode"
 msgstr "Escalau de video"
 
-#: modules/video_output/win32/direct3d11.c:74
+#: modules/video_output/win32/direct3d11.c:75
 #, fuzzy
 msgid "Select the upscaling mode for video."
 msgstr "Seleccionar una color en o video"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Linear Sampler"
 msgstr "Bits por muestra"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Point Sampler"
 msgstr "Taxa de muestreyo"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Video Processor"
 msgstr "Codecs de video"
 
-#: modules/video_output/win32/direct3d11.c:79
+#: modules/video_output/win32/direct3d11.c:80
 #, fuzzy
 msgid "Super Resolution"
 msgstr "Resolución"
 
+#: modules/video_output/win32/direct3d11.c:82
+#, fuzzy
+msgid "HDR Output Mode"
+msgstr "Modulos de salida"
+
 #: modules/video_output/win32/direct3d11.c:83
+msgid "Use HDR output even if the source is SDR."
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Never out HDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:88
+#, fuzzy
+msgid "Always output HDR"
+msgstr "Siempre dencima"
+
+#: modules/video_output/win32/direct3d11.c:88
+msgid "Generate HDR from SDR"
+msgstr ""
+
+#: modules/video_output/win32/direct3d11.c:92
 msgid "Direct3D11 video output"
 msgstr ""
 
