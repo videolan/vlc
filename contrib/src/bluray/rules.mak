@@ -47,7 +47,6 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
-	$(APPLY) $(SRC)/bluray/0001-install-bdjo_data-header.patch
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 
