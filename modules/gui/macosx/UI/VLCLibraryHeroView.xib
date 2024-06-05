@@ -27,14 +27,14 @@
                     </textFieldCell>
                 </textField>
                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U3j-Zx-fFf">
-                    <rect key="frame" x="20" y="20" width="250" height="86"/>
+                    <rect key="frame" x="20" y="20" width="793" height="86"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" textCompletion="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kFW-i6-3hg">
                             <rect key="frame" x="-2" y="58" width="103" height="28"/>
                             <shadow key="shadow" blurRadius="20">
                                 <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </shadow>
-                            <textFieldCell key="cell" controlSize="large" alignment="left" title="Item title" id="0Cs-Ex-sMn">
+                            <textFieldCell key="cell" controlSize="large" truncatesLastVisibleLine="YES" alignment="left" title="Item title" id="0Cs-Ex-sMn">
                                 <font key="font" metaFont="systemBold" size="24"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -52,7 +52,7 @@
                             </textFieldCell>
                         </textField>
                         <button verticalHuggingPriority="1000" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="5zZ-VM-Lb9">
-                            <rect key="frame" x="-3" y="-4" width="179" height="35"/>
+                            <rect key="frame" x="-3" y="-4" width="799" height="35"/>
                             <buttonCell key="cell" type="bevel" title=" Resume playing" bezelStyle="regularSquare" image="play.circle.fill" catalog="system" imagePosition="leading" alignment="left" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="639-6i-zsD">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="systemSemibold" size="17"/>
@@ -86,7 +86,7 @@
                 <constraint firstItem="qdP-As-qZ0" firstAttribute="top" secondItem="LPV-K6-7AE" secondAttribute="top" id="9aA-Ma-Vvy"/>
                 <constraint firstItem="U3j-Zx-fFf" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="20" symbolic="YES" id="A9P-6v-TYB"/>
                 <constraint firstAttribute="bottom" secondItem="U3j-Zx-fFf" secondAttribute="bottom" constant="20" id="GKS-hS-EhI"/>
-                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="20" id="Nzn-Md-2Xx"/>
+                <constraint firstAttribute="trailing" secondItem="U3j-Zx-fFf" secondAttribute="trailing" constant="20" id="Nzn-Md-2Xx"/>
                 <constraint firstItem="GoN-QI-mru" firstAttribute="leading" secondItem="LPV-K6-7AE" secondAttribute="leading" constant="20" id="UTF-IS-5xp"/>
                 <constraint firstItem="U3j-Zx-fFf" firstAttribute="top" relation="greaterThanOrEqual" secondItem="GoN-QI-mru" secondAttribute="bottom" constant="20" id="ZCB-XT-8xc"/>
                 <constraint firstAttribute="bottom" secondItem="qdP-As-qZ0" secondAttribute="bottom" id="lyx-Ea-nZ1"/>
