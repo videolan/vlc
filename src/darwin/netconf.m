@@ -31,7 +31,9 @@
 
 #import <TargetConditionals.h>
 #if TARGET_OS_IPHONE
+#if !TARGET_OS_WATCH
 #include <CFNetwork/CFProxySupport.h>
+#endif
 #else
 #include <CoreServices/CoreServices.h>
 #endif
