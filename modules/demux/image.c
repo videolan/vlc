@@ -409,7 +409,7 @@ static uint8_t FindJpegMarker(size_t *position, const uint8_t *data, size_t size
 static bool IsJfif(stream_t *s)
 {
     const uint8_t *header;
-    ssize_t peek = vlc_stream_Peek(s, &header, 256);
+    ssize_t peek = vlc_stream_Peek(s, &header, 4096);
     if(peek < 256)
         return false;
     size_t size = (size_t) peek;
@@ -417,6 +417,16 @@ static bool IsJfif(stream_t *s)
 
     if (FindJpegMarker(&position, header, size) != 0xd8)
         return false;
+    if (FindJpegMarker(&position, header, size) == 0xe2) // ICC Profile
+    {
+        size_t icc_size = GetWBE(&header[position]);
+        position += 2;
+        if (position + 12 > size)
+            return false;
+        if (memcmp(&header[position], "ICC_PROFILE\0", 12))
+            return false;
+        position += icc_size - 2;
+    }
     if (FindJpegMarker(&position, header, size) != 0xe0)
         return false;
     position += 2;  /* Skip size */
