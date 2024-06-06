@@ -122,6 +122,8 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
 
     /* slice_type */
     i_slice_type = bs_read_ue( &s );
+    if( i_slice_type > 9 )
+        goto error;
     p_slice->type = i_slice_type % 5;
 
     /* */
@@ -151,7 +153,11 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     }
 
     if( p_slice->i_nal_type == H264_NAL_SLICE_IDR )
+    {
         p_slice->i_idr_pic_id = bs_read_ue( &s );
+        if( p_slice->i_idr_pic_id > 65535 )
+            goto error;
+    }
 
     p_slice->i_pic_order_cnt_type = p_sps->i_pic_order_cnt_type;
     if( p_sps->i_pic_order_cnt_type == 0 )
@@ -268,6 +274,8 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
             do
             {
                 mmco = bs_read_ue( &s );
+                if( mmco > 6 )
+                    goto error;
                 if( mmco == 1 || mmco == 3 )
                     bs_read_ue( &s ); /* diff_pics_minus1 */
                 if( mmco == 2 )
