@@ -39,6 +39,7 @@
 #define MIN_MACOS 11.3
 #define MIN_IOS 14.5
 #define MIN_TVOS 14.5
+#define MIN_WATCHOS 7.4
 
 // work-around to fix compilation on older Xcode releases
 #if defined(TARGET_OS_VISION) && TARGET_OS_VISION
@@ -438,7 +439,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     selector:@selector(flushedAutomatically:)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
-    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0 VISIONOS_AVAILABLE, *))
+    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0 VISIONOS_AVAILABLE, *))
     {
         [notifCenter addObserver:self
                         selector:@selector(outputConfigurationChanged:)
@@ -459,7 +460,7 @@ error_avas:
 
 @end
 
-static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 DeviceSelect(audio_output_t *aout, const char *name)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -469,7 +470,7 @@ DeviceSelect(audio_output_t *aout, const char *name)
     return VLC_SUCCESS;
 }
 
-static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 MuteSet(audio_output_t *aout, bool mute)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -479,7 +480,7 @@ MuteSet(audio_output_t *aout, bool mute)
     return VLC_SUCCESS;
 }
 
-static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 VolumeSet(audio_output_t *aout, float volume)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -489,7 +490,7 @@ VolumeSet(audio_output_t *aout, float volume)
     return VLC_SUCCESS;
 }
 
-static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 Flush(audio_output_t *aout)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -497,7 +498,7 @@ Flush(audio_output_t *aout)
     [sys flush];
 }
 
-static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -505,7 +506,7 @@ Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
     [sys pause:pause date:date];
 }
 
-static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -513,7 +514,7 @@ Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
     [sys play:block date:date];
 }
 
-static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static void API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 Stop(audio_output_t *aout)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -521,7 +522,7 @@ Stop(audio_output_t *aout)
     [sys stop];
 }
 
-static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILABLE)
+static int API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS), watchos(MIN_WATCHOS) VISIONOS_API_AVAILABLE)
 Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     VLCAVSample *sys = (__bridge VLCAVSample*)aout->sys;
@@ -532,7 +533,7 @@ Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 static void
 Close(vlc_object_t *obj)
 {
-    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS VISIONOS_AVAILABLE, *))
+    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS VISIONOS_AVAILABLE, *))
     {
         audio_output_t *aout = (audio_output_t *)obj;
         /* Transfer ownership back from VLC to ARC so that it can be released. */
@@ -546,7 +547,7 @@ Open(vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
 
-    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS VISIONOS_AVAILABLE, *))
+    if (@available(macOS MIN_MACOS, iOS MIN_IOS, tvOS MIN_TVOS, watchOS MIN_WATCHOS VISIONOS_AVAILABLE, *))
     {
         aout->sys = (__bridge_retained void*) [[VLCAVSample alloc] init:aout];
         if (aout->sys == nil)
