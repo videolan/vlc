@@ -218,6 +218,8 @@ FocusScope {
                     text: root._showMoreInfo ? qsTr("View Less") : qsTr("View More")
                     iconTxt: VLCIcons.expand
                     iconRotation: root._showMoreInfo ? -180 : 0
+                    visible: (root.model.audioDesc?.length > 0)
+                             || (root.model.videoDesc?.length > 0)
 
                     Behavior on iconRotation {
                         NumberAnimation {
