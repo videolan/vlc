@@ -58,6 +58,7 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
         channel_count = max_channel_count;
     }
 
+#if !TARGET_OS_WATCH
     NSError *error = nil;
     BOOL success = [instance setPreferredOutputNumberOfChannels:channel_count
                                                           error:&error];
@@ -69,6 +70,9 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
                  !success ? (int)error.code : 0);
         channel_count = 2;
     }
+#else
+    channel_count = 2;
+#endif
 
     if (spatial_audio)
     {
@@ -88,6 +92,7 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
         aout_FormatPrepare(fmt);
     }
 
+#if !TARGET_OS_WATCH
     success = [instance setPreferredSampleRate:fmt->i_rate error:&error];
     if (!success)
     {
@@ -95,6 +100,7 @@ avas_PrepareFormat(audio_output_t *p_aout, AVAudioSession *instance,
         msg_Dbg(p_aout, "setPreferredSampleRate failed %s(%d)",
                 error.domain.UTF8String, (int)error.code);
     }
+#endif
 }
 
 int

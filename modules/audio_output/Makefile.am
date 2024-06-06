@@ -128,6 +128,9 @@ endif
 if HAVE_XROS
 libavsamplebuffer_plugin_la_SOURCES += audio_output/apple/avaudiosession_common.m
 endif
+if HAVE_WATCHOS
+libavsamplebuffer_plugin_la_SOURCES += audio_output/apple/avaudiosession_common.m
+endif
 libavsamplebuffer_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(aoutdir)' \
 	-Wl,-framework,CoreMedia,-framework,Foundation,-framework,AVFoundation
 libavsamplebuffer_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
@@ -151,4 +154,7 @@ aout_LTLIBRARIES += libaudiounit_ios_plugin.la libavsamplebuffer_plugin.la
 endif
 if HAVE_XROS
 aout_LTLIBRARIES += libaudiounit_ios_plugin.la libavsamplebuffer_plugin.la
+endif
+if HAVE_WATCHOS
+aout_LTLIBRARIES += libavsamplebuffer_plugin.la
 endif
