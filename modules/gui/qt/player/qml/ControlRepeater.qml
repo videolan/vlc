@@ -65,6 +65,7 @@ Repeater {
 
         Binding on visible {
             delayed: true // this is important
+            when: (loader.status === Loader.Ready)
             value: (loader.x + loader.Layout.minimumWidth <= repeater.availableWidth)
         }
 
