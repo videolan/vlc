@@ -436,8 +436,13 @@ if HAVE_LIBFUZZER
 noinst_PROGRAMS += vlc-demux-libfuzzer vlc-demux-dec-libfuzzer vlc-demux-run vlc-demux-dec-run
 endif
 
+if HAVE_WATCHOS
+vlccoreios_SOURCES = watchosvlc.m
+vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,WatchKit
+else
 vlccoreios_SOURCES = iosvlc.m
 vlccoreios_LDFLAGS = $(LDFLAGS_vlc) -Wl,-framework,Foundation,-framework,UIKit
+endif
 vlccoreios_LDFLAGS += -Xlinker -rpath -Xlinker "@executable_path/Frameworks/"
 vlccoreios_OBJCFLAGS = -fobjc-arc
 vlccoreios_LDADD = ../lib/libvlc.la ../src/libvlccore.la
@@ -450,6 +455,10 @@ noinst_PROGRAMS += vlccoreios
 endif
 
 if HAVE_XROS
+noinst_PROGRAMS += vlccoreios
+endif
+
+if HAVE_WATCHOS
 noinst_PROGRAMS += vlccoreios
 endif
 
