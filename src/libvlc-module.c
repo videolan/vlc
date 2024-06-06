@@ -678,7 +678,7 @@ static const char *const ppsz_prefres[] = {
 
 #define INPUT_LOWDELAY_TEXT N_("Low delay mode")
 #define INPUT_LOWDELAY_LONGTEXT N_(\
-    "Try to minimize delay along decoding chain."\
+    "Try to minimize delay along decoding chain. "\
     "Might break with non compliant streams.")
 
 #define INPUT_REPEAT_TEXT N_("Input repetitions")
