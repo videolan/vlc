@@ -27,6 +27,7 @@ sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 	$(APPLY) $(SRC)/sidplay2/sidplay2-resid-dependency.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-char-cast.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-fix-overflow.patch
+	$(APPLY) $(SRC)/sidplay2/sidplay2-cxxtest.patch
 	$(MOVE)
 
 .sidplay2: sidplay-libs

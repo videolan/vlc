@@ -1,0 +1,11 @@
+--- sidplay-libs/resid/configure.in.old	2024-06-06 09:31:47.000000000 +0200
++++ sidplay-libs/resid/configure.in	2024-06-06 09:32:10.000000000 +0200
+@@ -28,7 +28,7 @@
+ 
+ dnl Set CXXFLAGS for g++. Use -fno-exceptions if supported.
+ if test "$GXX" = yes; then
+-  if test "$ac_test_CXXFLAGS" != set; then
++  if test "$ac_test_CXXFLAGS" != set -a "$ac_test_CXXFLAGS" != y; then
+     CXXFLAGS="-g -Wall -O2 -funroll-loops -fomit-frame-pointer -fno-exceptions"
+     AC_MSG_CHECKING([whether the C++ compiler ($CXX $CXXFLAGS $LDFLAGS) works])
+     AC_TRY_COMPILE([],
