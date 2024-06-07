@@ -229,6 +229,10 @@ T.ProgressBar {
         TapHandler {
             acceptedButtons: Qt.LeftButton
 
+            grabPermissions: TapHandler.CanTakeOverFromAnything
+
+            gesturePolicy: TapHandler.WithinBounds
+
             //clicked but not dragged
             onTapped: (point, button) => {
                 fsm.pressControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
@@ -242,6 +246,7 @@ T.ProgressBar {
 
             target: null
             dragThreshold: 0
+            grabPermissions: PointerHandler.CanTakeOverFromAnything
 
             function moveControl() {
                 fsm.moveControl(dragHandler.centroid.position.x / control.width,
