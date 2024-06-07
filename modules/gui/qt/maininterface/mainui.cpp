@@ -62,6 +62,13 @@
 #include "widgets/native/roundimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
 #include "widgets/native/viewblockingrectangle.hpp"
+#if QT_VERSION < QT_VERSION_CHECK(6, 4, 0)
+#include "widgets/native/doubleclickignoringitem.hpp"
+#else
+// QQuickItem already ignores double click, starting
+// with Qt 6.4.0:
+#define DoubleClickIgnoringItem QQuickItem
+#endif
 
 #include "videosurface.hpp"
 #include "mainctx.hpp"
@@ -306,6 +313,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
 
         qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
+
+        qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
 
         qmlProtectModule(uri, versionMajor);
     }
