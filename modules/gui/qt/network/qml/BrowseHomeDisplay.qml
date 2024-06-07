@@ -164,7 +164,7 @@ FocusScope {
                 HomeDeviceView {
                     id: foldersSection
 
-                    title: qsTr("My Folders")
+                    title: qsTr("Folders")
 
                     model: StandardPathModel {
                         //we only have a handfull of standard path (5 or 6)
@@ -198,7 +198,7 @@ FocusScope {
                 HomeDeviceView {
                     id: deviceSection
 
-                    title: qsTr("My Machine")
+                    title: qsTr("Devices")
 
                     model: NetworkDeviceModel {
                         ctx: MainCtx
@@ -217,7 +217,7 @@ FocusScope {
                 HomeDeviceView {
                     id: lanSection
 
-                    title: qsTr("My LAN")
+                    title: qsTr("Network")
 
                     model: NetworkDeviceModel {
                         ctx: MainCtx
