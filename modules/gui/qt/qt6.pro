@@ -19,3 +19,7 @@ QTPLUGIN += qxcb-glx-integration qxcb-egl-integration qxcb qwayland-generic qway
 macx {
 QTPLUGIN += qcocoa qmacstyle
 }
+
+emscripten {
+QTPLUGIN += qwasm
+}

@@ -78,5 +78,7 @@
     Q_IMPORT_PLUGIN(QWaylandXdgShellIntegrationPlugin)
     Q_IMPORT_PLUGIN(QGtk3ThemePlugin)
     Q_IMPORT_PLUGIN(QXdgDesktopPortalThemePlugin)
+#elif defined(__EMSCRIPTEN__)
+    Q_IMPORT_PLUGIN(QWasmIntegrationPlugin)
 #endif
 #endif
