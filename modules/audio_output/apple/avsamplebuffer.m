@@ -438,7 +438,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     selector:@selector(flushedAutomatically:)
                         name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification
                       object:nil];
-    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0, *))
+    if (@available(macOS 12.0, iOS 15.0, tvOS 15.0 VISIONOS_AVAILABLE, *))
     {
         [notifCenter addObserver:self
                         selector:@selector(outputConfigurationChanged:)
