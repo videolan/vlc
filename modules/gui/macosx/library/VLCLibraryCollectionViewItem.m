@@ -298,18 +298,20 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         NSSet<NSIndexPath *> * const indexPaths = collectionView.selectionIndexPaths;
         NSArray<VLCLibraryRepresentedItem *> * const selectedItems =
             [dataSource representedItemsAtIndexPaths:indexPaths forCollectionView:collectionView];
-        NSMutableArray<VLCLibraryRepresentedItem *> * const items = selectedItems.mutableCopy;
         const NSInteger representedItemIndex = [selectedItems indexOfObjectPassingTest:^BOOL(
             VLCLibraryRepresentedItem * const repItem, const NSUInteger idx, BOOL * const stop
         ) {
             return repItem.item.libraryID == self.representedItem.item.libraryID;
         }];
+        NSArray<VLCLibraryRepresentedItem *> *items = nil;
 
         if (representedItemIndex == NSNotFound) {
-            [items addObject:self.representedItem];
+            items = @[self.representedItem];
+        } else {
+            items = selectedItems;
         }
 
-        _menuController.representedItems = items.copy;
+        _menuController.representedItems = items;
     } else {
         _menuController.representedItems = @[self.representedItem];
     }
