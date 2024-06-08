@@ -80,15 +80,28 @@
         const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = 
             (id<VLCLibraryTableViewDataSource>)self.dataSource;
 
-        [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
+        if ([indices containsIndex:self.clickedRow]) {
+            [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
+                const id<VLCMediaLibraryItemProtocol> mediaItem =
+                    [vlcLibraryDataSource libraryItemAtRow:index forTableView:self];
+                const VLCMediaLibraryParentGroupType parentType =
+                    vlcLibraryDataSource.currentParentType;
+                VLCLibraryRepresentedItem * const representedItem =
+                    [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem
+                                                         parentType:parentType];
+                [representedItems addObject:representedItem];
+            }];
+        } else {
             const id<VLCMediaLibraryItemProtocol> mediaItem = 
-                [vlcLibraryDataSource libraryItemAtRow:index forTableView:self];
+                [vlcLibraryDataSource libraryItemAtRow:self.clickedRow forTableView:self];
             const VLCMediaLibraryParentGroupType parentType = 
                 vlcLibraryDataSource.currentParentType;
             VLCLibraryRepresentedItem * const representedItem = 
-                [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:parentType];
+                [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem
+                                                     parentType:parentType];
             [representedItems addObject:representedItem];
-        }];
+        }
+
         _menuController.representedItems = representedItems;
 
     } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
