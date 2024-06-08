@@ -724,6 +724,19 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_t
             return (-ENOTSUP);
         }
 
+        if (scaleProc->picsys.processorInput)
+        {
+            scaleProc->picsys.processorInput->Release();
+            scaleProc->picsys.processorInput = NULL;
+        }
+        if (scaleProc->picsys.processorOutput)
+        {
+            scaleProc->picsys.processorOutput->Release();
+            scaleProc->picsys.processorOutput = NULL;
+        }
+        scaleProc->picsys.texture[0] = out;
+        scaleProc->picsys.formatTexture = inputDesc.Format;
+
         amfOutput->Release();
 
         return VLC_SUCCESS;
