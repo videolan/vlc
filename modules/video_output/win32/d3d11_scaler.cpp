@@ -634,10 +634,15 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_d
         D3D11_TEXTURE2D_DESC stagingDesc, inputDesc;
         amfStaging->GetDesc(&stagingDesc);
         p_sys->texture[KNOWN_DXGI_INDEX]->GetDesc(&inputDesc);
-        assert(stagingDesc.Width == inputDesc.Width);
-        assert(stagingDesc.Height == inputDesc.Height);
+        assert(stagingDesc.Width <= inputDesc.Width);
+        assert(stagingDesc.Height <= inputDesc.Height);
         assert(stagingDesc.Format == inputDesc.Format);
 #endif
+
+        D3D11_BOX box = {};
+        box.bottom = stagingDesc.Height,
+        box.right = stagingDesc.Width,
+        box.back = 1,
 
         // copy source into staging as it may not be shared
         d3d11_device_lock( scaleProc->d3d_dev );
@@ -646,7 +651,7 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_d
                                                 0, 0, 0,
                                                 p_sys->texture[KNOWN_DXGI_INDEX],
                                                 p_sys->slice_index,
-                                                NULL);
+                                                &box);
         d3d11_device_unlock( scaleProc->d3d_dev );
         submitSurface = scaleProc->amfInput;
 
