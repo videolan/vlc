@@ -630,14 +630,12 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_d
         auto packedStaging = scaleProc->amfInput->GetPlane(amf::AMF_PLANE_PACKED);
         ID3D11Texture2D *amfStaging = reinterpret_cast<ID3D11Texture2D *>(packedStaging->GetNative());
 
-#ifndef NDEBUG
         D3D11_TEXTURE2D_DESC stagingDesc, inputDesc;
         amfStaging->GetDesc(&stagingDesc);
         p_sys->texture[KNOWN_DXGI_INDEX]->GetDesc(&inputDesc);
         assert(stagingDesc.Width <= inputDesc.Width);
         assert(stagingDesc.Height <= inputDesc.Height);
         assert(stagingDesc.Format == inputDesc.Format);
-#endif
 
         D3D11_BOX box = {};
         box.bottom = stagingDesc.Height,
