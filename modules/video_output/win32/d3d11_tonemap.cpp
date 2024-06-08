@@ -115,6 +115,7 @@ d3d11_tonemapper *D3D11_TonemapperCreate(vlc_object_t *vd, d3d11_device_t *d3d_d
 
         if (!available)
         {
+            msg_Warn(vd, "True HDR not supported");
             d3d11_device_unlock(d3d_dev);
             goto error;
         }
