@@ -147,7 +147,6 @@ int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hDisplayKey, hKey;
-    CHAR key[128];
     CHAR szData[256], lookup[256];
     DWORD len = 256;
     LSTATUS ret;
