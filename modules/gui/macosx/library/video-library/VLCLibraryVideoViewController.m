@@ -140,6 +140,8 @@
 - (void)setupDataSource
 {
     _videoLibrarySplitView.delegate = _splitViewDelegate;
+    [_splitViewDelegate resetDefaultSplitForSplitView:self.videoLibrarySplitView];
+
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
     _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;

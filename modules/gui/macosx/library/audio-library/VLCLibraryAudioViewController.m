@@ -194,6 +194,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupAudioTableViews
 {
     _audioLibrarySplitView.delegate = _splitViewDelegate;
+    [_splitViewDelegate resetDefaultSplitForSplitView:self.audioLibrarySplitView];
 
     _audioCollectionSelectionTableView.dataSource = _audioDataSource;
     _audioCollectionSelectionTableView.delegate = _audioLibraryTableViewDelegate;
@@ -212,6 +213,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)setupGridModeSplitView
 {
     _audioLibraryGridModeSplitView.delegate = _splitViewDelegate;
+    [_splitViewDelegate resetDefaultSplitForSplitView:self.audioLibraryGridModeSplitView];
 
     _audioLibraryGridModeSplitViewListTableView.dataSource = _audioDataSource;
     _audioLibraryGridModeSplitViewListTableView.delegate = _audioLibraryTableViewDelegate;
