@@ -22,7 +22,6 @@
 
 #import "VLCLibraryAudioViewController.h"
 
-#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -51,6 +50,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCLoadingOverlayView.h"
+#import "views/VLCNoResultsLabel.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
@@ -71,7 +71,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 
-    NSTextField *_noResultsTextView;
+    VLCNoResultsLabel *_noResultsLabel;
 }
 @end
 
@@ -379,26 +379,20 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentNoResultsView
 {
-    if (_noResultsTextView == nil) {
-        _noResultsTextView = [[NSTextField alloc] init];
-        _noResultsTextView.editable = NO;
-        _noResultsTextView.selectable = NO;
-        _noResultsTextView.bezeled = NO;
-        _noResultsTextView.drawsBackground = NO;
-        _noResultsTextView.stringValue = _NS("No results");
-        _noResultsTextView.font = NSFont.VLClibrarySectionHeaderFont;
-        _noResultsTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    if (_noResultsLabel == nil) {
+        _noResultsLabel = [[VLCNoResultsLabel alloc] init];
+        _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
     }
 
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[_noResultsTextView, self.loadingOverlayView];
+        self.libraryTargetView.subviews = @[_noResultsLabel, self.loadingOverlayView];
     } else {
-        self.libraryTargetView.subviews = @[_noResultsTextView];
+        self.libraryTargetView.subviews = @[_noResultsLabel];
     }
 
     [NSLayoutConstraint activateConstraints:@[
-        [_noResultsTextView.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
-        [_noResultsTextView.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
+        [_noResultsLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+        [_noResultsLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
     ]];
 }
 
