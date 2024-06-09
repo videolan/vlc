@@ -346,6 +346,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCLinearProgressIndicator.m \
 	gui/macosx/views/VLCLoadingOverlayView.h \
 	gui/macosx/views/VLCLoadingOverlayView.m \
+	gui/macosx/views/VLCNoResultsLabel.h \
+	gui/macosx/views/VLCNoResultsLabel.m \
 	gui/macosx/views/VLCRoundedCornerTextField.h \
 	gui/macosx/views/VLCRoundedCornerTextField.m \
 	gui/macosx/views/VLCScrollingClipView.h \
