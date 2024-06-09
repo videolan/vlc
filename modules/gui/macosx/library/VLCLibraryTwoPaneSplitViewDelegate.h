@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryTwoPaneSplitViewDelegate : NSObject<NSSplitViewDelegate>
 
+- (void)resetDefaultSplitForSplitView:(NSSplitView *)splitView;
+
 @end
 
 NS_ASSUME_NONNULL_END
