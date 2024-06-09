@@ -47,6 +47,7 @@
 #import "main/VLCMain.h"
 
 #import "views/VLCLoadingOverlayView.h"
+#import "views/VLCNoResultsLabel.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
@@ -61,6 +62,8 @@
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
+
+    VLCNoResultsLabel *_noResultsLabel;
 }
 @end
 
@@ -265,10 +268,13 @@
 
 - (void)updatePresentedView
 {
-    if (_libraryVideoDataSource.libraryModel.numberOfVideoMedia == 0) { // empty library
-        [self presentPlaceholderVideoLibraryView];
-    } else {
+    const BOOL anyVideoMedia = self.libraryVideoDataSource.libraryModel.numberOfVideoMedia > 0;
+    if (anyVideoMedia) {
         [self presentVideoLibraryView];
+    } else if (self.libraryVideoDataSource.libraryModel.filterString.length > 0) {
+        [self presentNoResultsView];
+    } else {
+        [self presentPlaceholderVideoLibraryView];
     }
 }
 
@@ -299,6 +305,25 @@
 
     _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
     _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
+}
+
+- (void)presentNoResultsView
+{
+    if (_noResultsLabel == nil) {
+        _noResultsLabel = [[VLCNoResultsLabel alloc] init];
+        _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[_noResultsLabel, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[_noResultsLabel];
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        [_noResultsLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+        [_noResultsLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
+    ]];
 }
 
 - (void)presentVideoLibraryView
