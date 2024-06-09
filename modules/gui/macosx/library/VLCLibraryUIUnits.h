@@ -66,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, readonly) const CGFloat libraryWindowControlsBarHeight;
 
+@property (class, readonly) const CGFloat librarySplitViewSelectionViewDefaultWidth;
 @property (class, readonly) const CGFloat librarySplitViewMainViewMinimumWidth;
 @property (class, readonly) const CGFloat libraryWindowNavSidebarMaxWidth;
 @property (class, readonly) const CGFloat libraryWindowPlaylistSidebarMaxWidth;

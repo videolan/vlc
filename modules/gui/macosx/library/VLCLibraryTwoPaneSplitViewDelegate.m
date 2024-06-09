@@ -33,7 +33,8 @@
 {
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const CGFloat libraryWindowWidth = libraryWindow.frame.size.width;
-    [splitView setPosition:250 ofDividerAtIndex:0];
+    [splitView setPosition:VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth
+          ofDividerAtIndex:0];
 }
 
 - (CGFloat)splitView:(NSSplitView *)splitView

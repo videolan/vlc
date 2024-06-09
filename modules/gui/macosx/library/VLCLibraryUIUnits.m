@@ -206,6 +206,11 @@
     return 0.4f;
 }
 
++ (const CGFloat)librarySplitViewSelectionViewDefaultWidth
+{
+    return 180.;
+}
+
 + (const CGFloat)librarySplitViewMainViewMinimumWidth
 {
     return 400.;
