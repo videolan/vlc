@@ -212,7 +212,7 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
 
 - (void)filterByString:(NSString*)filterString
 {
-    [_libraryModel filterByString:filterString];
+    self.libraryModel.filterString = filterString;
 }
 
 @end

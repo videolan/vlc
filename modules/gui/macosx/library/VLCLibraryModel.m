@@ -63,7 +63,6 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 
     enum vlc_ml_sorting_criteria_t _sortCriteria;
     bool _sortDescending;
-    NSString *_filterString;
 
     size_t _initialVideoCount;
     size_t _initialAudioCount;
@@ -646,7 +645,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self dropCaches];
 }
 
-- (void)filterByString:(NSString*)filterString
+- (void)setFilterString:(NSString *)filterString
 {
     if([filterString isEqualToString:_filterString]) {
         return;

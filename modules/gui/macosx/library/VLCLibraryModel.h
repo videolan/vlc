@@ -98,13 +98,14 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 @property (readonly) NSDictionary<NSNumber *, NSString *> *artistDict;
 @property (readonly) NSDictionary<NSNumber *, NSString *> *genreDict;
 
+@property (readwrite, nonatomic) NSString *filterString;
+
 - (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType;
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(const VLCMediaLibraryParentGroupType)parentType;
 
 - (void)sortByCriteria:(enum vlc_ml_sorting_criteria_t)sortCriteria
          andDescending:(bool)descending;
-- (void)filterByString:(NSString*)filterString;
 
 @end
 
