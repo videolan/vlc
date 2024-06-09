@@ -22,12 +22,46 @@
 
 #import "VLCNoResultsLabel.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCNoResultsLabel
 
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setup];
+    }
+    return self;
+}
+
+- (void)setup
+{
+    self.editable = NO;
+    self.selectable = NO;
+    self.bezeled = NO;
+    self.drawsBackground = NO;
+    self.stringValue = _NS("No results");
+    self.font = NSFont.VLClibrarySectionHeaderFont;
 }
 
 @end
