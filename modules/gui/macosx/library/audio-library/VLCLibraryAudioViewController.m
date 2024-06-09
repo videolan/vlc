@@ -22,6 +22,7 @@
 
 #import "VLCLibraryAudioViewController.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -69,6 +70,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
 
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
+
+    NSTextField *_noResultsTextView;
 }
 @end
 
@@ -374,6 +377,31 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _emptyLibraryView.identifier = VLCLibraryPlaceholderAudioViewIdentifier;
 }
 
+- (void)presentNoResultsView
+{
+    if (_noResultsTextView == nil) {
+        _noResultsTextView = [[NSTextField alloc] init];
+        _noResultsTextView.editable = NO;
+        _noResultsTextView.selectable = NO;
+        _noResultsTextView.bezeled = NO;
+        _noResultsTextView.drawsBackground = NO;
+        _noResultsTextView.stringValue = _NS("No results");
+        _noResultsTextView.font = NSFont.VLClibrarySectionHeaderFont;
+        _noResultsTextView.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[_noResultsTextView, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[_noResultsTextView];
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        [_noResultsTextView.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+        [_noResultsTextView.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
+    ]];
+}
+
 - (void)prepareAudioLibraryView
 {
     self.audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -458,9 +486,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)updatePresentedView
 {
     self.audioDataSource.audioLibrarySegment = [self currentLibrarySegmentToAudioLibrarySegment];
-    if (_audioDataSource.libraryModel.numberOfAudioMedia == 0) {
-        [self presentPlaceholderAudioView];
-    } else {
+    const BOOL anyAudioMedia = self.audioDataSource.libraryModel.numberOfAudioMedia > 0;
+
+    if (anyAudioMedia) {
         [self prepareAudioLibraryView];
         [self hideAllViews];
 
@@ -475,6 +503,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         }
 
         [VLCMain.sharedInstance.libraryWindow updateGridVsListViewModeSegmentedControl];
+    } else if (self.audioDataSource.libraryModel.filterString.length > 0) {
+        [self presentNoResultsView];
+    } else {
+        [self presentPlaceholderAudioView];
     }
 }
 
