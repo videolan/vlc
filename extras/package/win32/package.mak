@@ -103,6 +103,13 @@ package-win-activex: build-npapi
 
 package-win-strip: package-win-common package-win-activex
 	mkdir -p "$(win32_debugdir)"/
+if ENABLE_PDB
+	find $(win32_destdir) -type f -name '*.pdb' | while read i; \
+	do if test -n "$$i" ; then \
+	    mv "$$i" "$(win32_debugdir)/`basename $$i`"; \
+	  fi ; \
+	done
+endif
 	find $(win32_destdir) -type f \( -name '*$(LIBEXT)' -or -name '*$(EXEEXT)' \) | while read i; \
 	do if test -n "$$i" ; then \
 	    $(OBJCOPY) --only-keep-debug "$$i" "$(win32_debugdir)/`basename $$i.dbg`"; \
