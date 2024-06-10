@@ -102,10 +102,10 @@ FocusScope {
         }
 
         // TODO: We could implement a scrolling animation like in ExpandGridView.
-        if (maxY > flickable.contentItem.contentY + flickable.height) {
-            flickable.contentItem.contentY = maxY - flickable.height
-        } else if (minY < flickable.contentItem.contentY) {
-            flickable.contentItem.contentY = minY
+        if (maxY > flickable.contentY + flickable.height) {
+            flickable.contentY = maxY - flickable.height
+        } else if (minY < flickable.contentY) {
+            flickable.contentY = minY
         }
     }
 
