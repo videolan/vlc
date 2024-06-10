@@ -251,6 +251,8 @@ FocusScope {
                             text: VLCIcons.close
                             focus: true
 
+                            description: qsTr("Close Panel")
+
                             Navigation.parentItem: headerFocusScope
                             Layout.rightMargin: VLCStyle.margin_small
 
