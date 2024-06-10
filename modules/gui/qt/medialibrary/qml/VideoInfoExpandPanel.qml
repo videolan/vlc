@@ -300,7 +300,7 @@ FocusScope {
         Repeater {
             id: sourceRepeater
 
-            delegate: Repeater {
+            Repeater {
                 id: delegateRepeater
 
                 model: column.delegateModel
@@ -309,7 +309,7 @@ FocusScope {
                 required property int index
                 readonly property bool isFirst: (index === 0)
 
-                delegate: Widgets.MenuCaption {
+                Widgets.MenuCaption {
                     required property var modelData
                     required property int index
 
