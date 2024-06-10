@@ -273,7 +273,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     {
     case AUDIO_ES:
         codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
-#if LIBAVCODEC_VERSION_CHECK( 59, 24, 100 )
+#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
         av_channel_layout_default( &codecpar->ch_layout, fmt->audio.i_channels );
 #else
         codecpar->channels = fmt->audio.i_channels;
