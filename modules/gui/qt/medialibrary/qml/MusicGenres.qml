@@ -146,7 +146,7 @@ MainInterface.MainViewLoader {
                 dragItem: genreDragItem
 
                 onItemDoubleClicked: root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
-                onItemClicked: (modifier) => { gridView_id.leftClickOnItem(modifier, item.index) }
+                onItemClicked: (modifier) => { gridView_id.leftClickOnItem(modifier, index) }
 
                 onPlayClicked: {
                     if (model.id)
