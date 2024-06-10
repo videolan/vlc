@@ -365,27 +365,29 @@ FocusScope {
 
             readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
 
-            property Component titleDelegate: RowLayout {
-                property var rowModel: parent.rowModel
+            property Component titleDelegate: Widgets.TableRowDelegate {
+                id: title
 
-                anchors.fill: parent
+                RowLayout {
+                    anchors.fill: parent
 
-                Widgets.ListLabel {
-                    text: rowModel?.track_number ?? ""
-                    color: theme.fg.primary
-                    font.weight: Font.Normal
+                    Widgets.ListLabel {
+                        text: title.rowModel?.track_number ?? ""
+                        color: theme.fg.primary
+                        font.weight: Font.Normal
 
-                    Layout.fillHeight: true
-                    Layout.leftMargin: VLCStyle.margin_xxsmall
-                    Layout.preferredWidth: VLCStyle.margin_large
-                }
+                        Layout.fillHeight: true
+                        Layout.leftMargin: VLCStyle.margin_xxsmall
+                        Layout.preferredWidth: VLCStyle.margin_large
+                    }
 
-                Widgets.ListLabel {
-                    text: rowModel?.title ?? ""
-                    color: theme.fg.primary
+                    Widgets.ListLabel {
+                        text: title.rowModel?.title ?? ""
+                        color: theme.fg.primary
 
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        Layout.fillWidth: true
+                    }
                 }
             }
 
