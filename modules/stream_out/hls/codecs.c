@@ -25,7 +25,7 @@
 
 #include <vlc_memstream.h>
 
-#include "../codec/hxxx_helper.h"
+#include "../../codec/hxxx_helper.h"
 #include "codecs.h"
 
 static int FormatAVC1(struct vlc_memstream *ms, const es_format_t *fmt)
