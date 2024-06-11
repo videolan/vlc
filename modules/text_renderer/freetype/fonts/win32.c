@@ -169,8 +169,9 @@ static char* GetWindowsFontPath()
     wchar_t wdir[MAX_PATH];
     if( S_OK != SHGetFolderPathW( NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, wdir ) )
     {
-        GetWindowsDirectoryW( wdir, MAX_PATH );
-        wcscat_s( wdir, MAX_PATH, L"\\fonts" );
+        UINT wdirlen = GetWindowsDirectoryW( wdir, MAX_PATH );
+        if ( wdirlen + 1 + wcslen(L"\\fonts") <= MAX_PATH )
+            wcscpy( &wdir[wdirlen], L"\\fonts" );
     }
     return FromWide( wdir );
 }
