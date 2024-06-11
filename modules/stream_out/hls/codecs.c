@@ -28,7 +28,7 @@
 #include "../../codec/hxxx_helper.h"
 #include "codecs.h"
 
-static int FormatAVC1(struct vlc_memstream *ms, const es_format_t *fmt)
+static int FormatAVC(struct vlc_memstream *ms, const es_format_t *fmt)
 {
     /* Parse the h264 constraint flag. */
     uint8_t constraints = 0;
@@ -66,7 +66,7 @@ int hls_codec_Format(struct vlc_memstream *ms, const es_format_t *fmt)
     switch (fmt->i_codec)
     {
         case VLC_CODEC_H264:
-            return FormatAVC1(ms, fmt);
+            return FormatAVC(ms, fmt);
         case VLC_CODEC_MP4A:
             return FormatMP4A(ms, fmt);
         case VLC_CODEC_TEXT:
