@@ -43,16 +43,16 @@ static int FormatAVC(struct vlc_memstream *ms, const es_format_t *fmt)
     }
     hxxx_helper_clean(&hh);
 
-    const int wrote = vlc_memstream_printf(
+    const int written = vlc_memstream_printf(
         ms, "avc1.%02X%02X%02X", profile, constraints, level);
-    return (wrote == -1) ? VLC_ENOMEM : VLC_SUCCESS;
+    return (written < 0) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
 static int FormatMP4A(struct vlc_memstream *ms, const es_format_t *fmt)
 {
-    const int wrote = vlc_memstream_printf(
+    const int written = vlc_memstream_printf(
         ms, "mp4a.40.%02x", (fmt->i_profile == -1) ? 2u : fmt->i_profile + 1u);
-    return (wrote == -1) ? VLC_ENOMEM : VLC_SUCCESS;
+    return (written < 0) ? VLC_ENOMEM : VLC_SUCCESS;
 }
 
 static int FormatWebVTT(struct vlc_memstream *ms)
