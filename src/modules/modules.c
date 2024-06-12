@@ -221,13 +221,14 @@ module_t *(vlc_module_load)(struct vlc_logger *log, const char *capability,
         int ret = VLC_EGENERIC;
         void *cb = vlc_module_map(log, cand);
 
-        if (cb != NULL) {
-            va_list ap;
+        if (cb == NULL)
+            continue;
 
-            va_copy(ap, args);
-            ret = probe(cb, i < strict_total, ap);
-            va_end(ap);
-        }
+        va_list ap;
+
+        va_copy(ap, args);
+        ret = probe(cb, i < strict_total, ap);
+        va_end(ap);
 
         switch (ret) {
             case VLC_SUCCESS:
