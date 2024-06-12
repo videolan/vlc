@@ -157,6 +157,9 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
                 t.u.v.sarNum = p_es->video.i_sar_num;
                 t.u.v.sarDen = p_es->video.i_sar_den;
                 break;
+            case SPU_ES:
+                t.type = medialibrary::parser::IItem::Track::Type::Subtitle;
+                break;
             default:
                 continue;
         }
