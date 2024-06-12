@@ -22,8 +22,8 @@ import QtQuick.Controls
 import org.videolan.vlc 0.1
 import org.videolan.controls 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.Style
 
 
 // NOTE: This rectangle is useful to discern the item against a similar background.

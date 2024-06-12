@@ -24,12 +24,12 @@ import QtQuick.Window
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Playlist/" as PL
+import VLC.Style
+import VLC.Widgets as Widgets
+import VLC.Playlist as PL
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import "qrc:///VLC/Dialogs/" as DG
-import "qrc:///VLC/Util/" as Util
+import VLC.Dialogs as DG
+import VLC.Util as Util
 
 FocusScope {
     id: rootPlayer

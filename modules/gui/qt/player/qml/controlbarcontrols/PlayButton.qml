@@ -21,8 +21,8 @@ import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.Style
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 T.Control {

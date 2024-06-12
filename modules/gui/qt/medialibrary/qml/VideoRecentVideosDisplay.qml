@@ -23,10 +23,10 @@ import QtQuick
 import org.videolan.vlc 0.1
 import org.videolan.medialib 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Util/"    as Util
-import "qrc:///VLC/MainInterface/" as MainInterface
+import VLC.Widgets as Widgets
+import VLC.Style
+import VLC.Util    as Util
+import VLC.MainInterface as MainInterface
 
 VideoAll {
     id: root

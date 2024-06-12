@@ -22,9 +22,9 @@ import QtQml
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/PlayerControls/" as Controls
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.PlayerControls as Controls
+import VLC.Widgets as Widgets
+import VLC.Style
 
 QtObject {
     readonly property string controlPath : "qrc:///VLC/PlayerControls/"

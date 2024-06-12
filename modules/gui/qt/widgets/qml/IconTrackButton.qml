@@ -20,7 +20,7 @@
 
 import QtQuick
 
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 IconToolButton {
     // Style

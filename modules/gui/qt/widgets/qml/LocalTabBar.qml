@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 NavigableRow {
     id: row

@@ -23,10 +23,10 @@ import QtQml
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/MainInterface/" as MainInterface
-import "qrc:///VLC/Util/" as Util
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.MainInterface as MainInterface
+import VLC.Util as Util
+import VLC.Style
 
 FocusScope {
     id: root

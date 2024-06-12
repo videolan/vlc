@@ -23,10 +23,10 @@ import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Util/" as Util
+import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.Style
 
 T.Pane {
     id: root

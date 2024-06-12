@@ -18,8 +18,8 @@
 
 import QtQuick
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.Style
 
 Widgets.KeyNavigableTableView {
     id: root

@@ -22,9 +22,9 @@ import QtQml
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Util/" as Util
-import "qrc:///VLC/Style/"
+import VLC.Widgets as Widgets
+import VLC.Util as Util
+import VLC.Style
 
 Widgets.PageLoader {
     id: root

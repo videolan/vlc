@@ -23,8 +23,8 @@ import QtQml.Models
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Util/" as Util
+import VLC.Widgets as Widgets
+import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 

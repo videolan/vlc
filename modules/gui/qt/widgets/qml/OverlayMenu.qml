@@ -22,7 +22,7 @@ import QtQuick.Layouts
 import org.videolan.vlc 0.1
 
 import "."
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 FocusScope {
     id: root

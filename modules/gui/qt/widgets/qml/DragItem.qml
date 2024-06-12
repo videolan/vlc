@@ -26,10 +26,10 @@ import Qt5Compat.GraphicalEffects
 import org.videolan.vlc 0.1
 import org.videolan.controls 0.1
 
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Playlist/" as Playlist
+import VLC.Style
+import VLC.Playlist as Playlist
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import "qrc:///VLC/Util/" as Util
+import VLC.Util as Util
 
 Item {
     id: dragItem

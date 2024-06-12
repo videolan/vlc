@@ -18,7 +18,7 @@
 import QtQuick
 import QtQuick.Controls
 
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 /*
  * Custom StackView with brief transitions and helper to load view from the history

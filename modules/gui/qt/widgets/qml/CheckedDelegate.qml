@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 import org.videolan.vlc 0.1
 
 import "."
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 T.ItemDelegate {
     id: control

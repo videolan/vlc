@@ -22,9 +22,9 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/widgets/" as Widgets
+import VLC.Widgets as Widgets
 import "qrc:///VLC/util/Helpers.js" as Helpers
-import "qrc:///VLC/style/"
+import VLC.Style
 
 Widgets.GridItem {
     id: root

@@ -26,10 +26,10 @@ import QtQuick.Window
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Playlist/" as PL
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Menus/" as Menus
+import VLC.Style
+import VLC.Playlist as PL
+import VLC.Widgets as Widgets
+import VLC.Menus as Menus
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 T.ToolBar {

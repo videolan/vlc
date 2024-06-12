@@ -21,7 +21,7 @@ import QtQuick.Layouts
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 Rectangle {
     id: root

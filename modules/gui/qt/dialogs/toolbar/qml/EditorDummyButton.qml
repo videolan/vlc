@@ -20,7 +20,7 @@ import QtQuick.Controls
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 Label {
     font.pixelSize: VLCStyle.icon_medium

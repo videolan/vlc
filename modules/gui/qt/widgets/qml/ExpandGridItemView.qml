@@ -20,9 +20,9 @@
 
 import QtQuick
 
-import "qrc:///VLC/Util/" as Util
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Style/"
+import VLC.Util as Util
+import VLC.Widgets as Widgets
+import VLC.Style
 
 Widgets.ExpandGridView {
     id: root

@@ -22,15 +22,15 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/MainInterface/" as Main
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Playlist/" as PL
-import "qrc:///VLC/Player/" as P
+import VLC.Style
+import VLC.MainInterface as Main
+import VLC.Widgets as Widgets
+import VLC.Playlist as PL
+import VLC.Player as P
 
-import "qrc:///VLC/Util/" as Util
+import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import "qrc:///VLC/Dialogs/" as DG
+import VLC.Dialogs as DG
 
 FocusScope {
     id: g_mainDisplay

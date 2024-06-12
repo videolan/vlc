@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import org.videolan.vlc 0.1
-import "qrc:///VLC/Style/"
+import VLC.Style
 
 //we want the progress bar to match the radius of the of the video thumbnail
 //so we generarte two rectangles with the right radius and we clip the part we

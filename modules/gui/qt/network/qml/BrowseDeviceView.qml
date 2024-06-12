@@ -22,10 +22,9 @@ import QtQuick
 
 import org.videolan.vlc 0.1
 
-
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Widgets/" as Widgets
-import "qrc:///VLC/Util/"    as Util
+import VLC.Style
+import VLC.Widgets as Widgets
+import VLC.Util as Util
 
 FocusScope {
     id: root

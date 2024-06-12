@@ -22,8 +22,8 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
-import "qrc:///VLC/Style/"
-import "qrc:///VLC/Util/" as Util
+import VLC.Style
+import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 ListView {
