@@ -243,7 +243,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     char *name_chained = NULL;
     const char *module_name = name;
     assert( capability != NULL );
-    if( name != NULL && chain->b_allow_fmt_out_change )
+    if (name != NULL && name[0] != '\0' && chain->b_allow_fmt_out_change )
     {
         /* Append the "chain" video filter to the current list.
          * This filter will be used if the requested filter fails to load.
@@ -252,11 +252,52 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
             goto error;
         module_name = name_chained;
     }
-    filter->p_module = module_need(filter, capability, module_name, name != NULL);
+    else if (name == NULL || name[0] != '\0')
+        module_name = "any";
+
+    struct vlc_logger *logger = vlc_object_logger(chain->obj);
+    module_t **modules;
+    size_t strict_total;
+    ssize_t count = vlc_module_match(capability, module_name, name != NULL,
+                                     &modules, &strict_total);
+
+    if (count < 0)
+    {
+        free(name_chained);
+        goto error;
+    }
+
+    vlc_debug(logger, "looking for %s module matching \"%s\": %zd candidates",
+              capability, module_name, count);
     free(name_chained);
 
-    if( filter->p_module == NULL )
-        goto error;
+    int ret = VLC_ENOTSUP;
+    for (size_t i = 0; i < (size_t)count; ++i)
+    {
+        module_t *mod = modules[i];
+        int (*activate)(vlc_object_t *) = vlc_module_map(logger, mod);
+        if (activate == NULL)
+            continue;
+
+        filter->p_module = mod;
+        filter->obj.force = i < strict_total;
+        ret = (*activate)(&filter->obj);
+        switch (ret)
+        {
+            case VLC_SUCCESS:
+                goto done;
+            case VLC_ENOMEM:
+                goto error;
+            default:
+                vlc_objres_clear(&filter->obj);
+                continue;
+        }
+    }
+
+   if (ret != VLC_SUCCESS)
+      goto error;
+
+done:
     assert( filter->ops != NULL );
 
     vlc_list_append( &chained->node, &chain->filter_list );
@@ -274,6 +315,7 @@ error:
         msg_Err( chain->obj, "Failed to create %s '%s'", capability, name );
     else
         msg_Err( chain->obj, "Failed to create %s", capability );
+    vlc_objres_clear(&filter->obj);
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
     vlc_object_delete(filter);
