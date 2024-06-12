@@ -502,6 +502,7 @@
 #define VLC_CODEC_BPG             VLC_FOURCC('B','P','G',0xFB)
 #define VLC_CODEC_JPEGLS          VLC_FOURCC('M','J','L','S')
 #define VLC_CODEC_BMP             VLC_FOURCC('b','m','p',' ')
+#define VLC_CODEC_FARBFELD        VLC_FOURCC('f','a','r','b')
 #define VLC_CODEC_TIFF            VLC_FOURCC('t','i','f','f')
 #define VLC_CODEC_GIF             VLC_FOURCC('g','i','f',' ')
 #define VLC_CODEC_TARGA           VLC_FOURCC('t','g','a',' ')

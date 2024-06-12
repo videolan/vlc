@@ -1051,6 +1051,9 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_BMP, "BMP Image"),
         A("bmp "),
 
+    B(VLC_CODEC_FARBFELD, "Farbfeld Image"),
+        A("farb"),
+
     B(VLC_CODEC_TIFF, "TIFF Image"),
         A("tiff"),
 
