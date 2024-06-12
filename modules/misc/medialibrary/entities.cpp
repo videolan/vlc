@@ -37,6 +37,7 @@
 #include <medialibrary/IPlaylist.h>
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
+#include <medialibrary/ISubtitleTrack.h>
 #include <medialibrary/IFolder.h>
 #include <medialibrary/filesystem/IDevice.h>
 #include <medialibrary/filesystem/Errors.h>
@@ -132,7 +133,9 @@ static bool convertTracks( const medialibrary::IMedia* inputMedia, vlc_ml_media_
 {
     auto videoTracks = inputMedia->videoTracks()->all();
     auto audioTracks = inputMedia->audioTracks()->all();
-    auto nbItems = videoTracks.size() + audioTracks.size();
+    auto subtitleTracks = inputMedia->subtitleTracks()->all();
+
+    auto nbItems = videoTracks.size() + audioTracks.size() + subtitleTracks.size();
     outputMedia.p_tracks = static_cast<vlc_ml_media_track_list_t*>(
                 calloc( 1, sizeof( *outputMedia.p_tracks ) +
                         nbItems * sizeof( *outputMedia.p_tracks->p_items ) ) );
@@ -167,6 +170,19 @@ static bool convertTracks( const medialibrary::IMedia* inputMedia, vlc_ml_media_
         output->a.i_nbChannels = t->nbChannels();
         output->a.i_sampleRate = t->sampleRate();
     }
+
+    for ( const auto& t : subtitleTracks )
+    {
+        vlc_ml_media_track_t* output = &items[outputMedia.p_tracks->i_nb_items++];
+
+        if ( convertTracksCommon( output, t->codec(), t->language(), t->description() ) == false )
+            return false;
+
+        output->i_type = VLC_ML_TRACK_TYPE_SUBTITLE;
+        if ( !strdup_helper( t->encoding(), output->s.psz_encoding ) )
+            return false;
+    }
+
     return true;
 }
 

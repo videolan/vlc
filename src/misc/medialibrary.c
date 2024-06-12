@@ -164,6 +164,9 @@ static void vlc_ml_media_release_tracks_inner( vlc_ml_media_track_list_t* p_trac
         free( p_track->psz_codec );
         free( p_track->psz_language );
         free( p_track->psz_description );
+
+        if ( p_track->i_type == VLC_ML_TRACK_TYPE_SUBTITLE )
+            free( p_track->s.psz_encoding );
     }
     free( p_tracks );
 }

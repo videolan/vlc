@@ -66,6 +66,7 @@ typedef enum vlc_ml_track_type_t
     VLC_ML_TRACK_TYPE_UNKNOWN,
     VLC_ML_TRACK_TYPE_VIDEO,
     VLC_ML_TRACK_TYPE_AUDIO,
+    VLC_ML_TRACK_TYPE_SUBTITLE,
 } vlc_ml_track_type_t;
 
 typedef enum vlc_ml_thumbnail_size_t
@@ -191,6 +192,11 @@ typedef struct vlc_ml_media_track_t
             uint32_t i_fpsNum;
             uint32_t i_fpsDen;
         } v;
+        struct
+        {
+            // Subtitle
+            char* psz_encoding;
+        } s;
     };
 } vlc_ml_media_track_t;
 
