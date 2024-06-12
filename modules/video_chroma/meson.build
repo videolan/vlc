@@ -43,14 +43,12 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'i420_yuy2',
     'sources' : files('i420_yuy2.c'),
-    'c_args' : ['-DPLUGIN_PLAIN']
 }
 
 vlc_modules += {
     'name' : 'i420_nv12',
     'sources' : files('i420_nv12.c'),
     'link_with' : [chroma_copy_lib],
-    'c_args' : ['-DPLUGIN_PLAIN'],
 }
 
 vlc_modules += {
@@ -61,7 +59,6 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'i422_yuy2',
     'sources' : files('i422_yuy2.c'),
-    'c_args' : ['-DPLUGIN_PLAIN']
 }
 
 vlc_modules += {

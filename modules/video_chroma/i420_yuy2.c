@@ -43,15 +43,16 @@
 
 #define SRC_FOURCC  "I420,IYUV,YV12"
 
-#if defined (PLUGIN_PLAIN)
-#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,Y211"
-#    define VLC_TARGET
-#elif defined (PLUGIN_SSE2)
+#if defined (PLUGIN_SSE2)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #    define VLC_TARGET VLC_SSE
 #elif defined (PLUGIN_ALTIVEC)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #    define VLC_TARGET VLC_ALTIVEC
+#else
+#    define PLUGIN_PLAIN
+#    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,Y211"
+#    define VLC_TARGET
 #endif
 
 /*****************************************************************************
