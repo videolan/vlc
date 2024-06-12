@@ -240,20 +240,20 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     else
         filter->owner.sub = NULL;
 
+    char *name_chained = NULL;
+    const char *module_name = name;
     assert( capability != NULL );
     if( name != NULL && chain->b_allow_fmt_out_change )
     {
         /* Append the "chain" video filter to the current list.
          * This filter will be used if the requested filter fails to load.
          * It will then try to add a video converter before. */
-        char *name_chained;
         if (asprintf(&name_chained, "%s,chain", name) == -1)
             goto error;
-        filter->p_module = module_need( filter, capability, name_chained, true );
-        free(named_chained);
+        module_name = name_chained;
     }
-    else
-        filter->p_module = module_need( filter, capability, name, name != NULL );
+    filter->p_module = module_need(filter, capability, module_name, name != NULL);
+    free(name_chained);
 
     if( filter->p_module == NULL )
         goto error;
