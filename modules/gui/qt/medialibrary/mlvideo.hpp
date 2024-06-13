@@ -83,6 +83,32 @@ private:
     unsigned int m_sampleRate;
 };
 
+class SubtitleDescription
+{
+    Q_GADGET
+
+    Q_PROPERTY(QString codec READ getCodec CONSTANT FINAL)
+    Q_PROPERTY(QString language READ getLanguage CONSTANT FINAL)
+    Q_PROPERTY(QString description READ getDescription CONSTANT FINAL)
+    Q_PROPERTY(QString encoding READ getEncoding CONSTANT FINAL)
+
+public:
+    SubtitleDescription() = default;
+    SubtitleDescription(const QString& codec, const QString& language
+                     , const QString &description, const QString &encoding);
+
+    QString getCodec() const;
+    QString getLanguage() const;
+    QString getDescription() const;
+    QString getEncoding() const;
+
+private:
+    QString m_codec;
+    QString m_language;
+    QString m_description;
+    QString m_encoding;
+};
+
 class MLVideo : public MLItem
 {
 public:
@@ -106,6 +132,7 @@ public:
     VLCTick getProgressTime() const;
     QList<AudioDescription> getAudioDesc() const;
     QList<VideoDescription> getVideoDesc() const;
+    QList<SubtitleDescription> getSubtitleDesc() const;
 
 private:
     bool m_isNew;
@@ -123,6 +150,7 @@ private:
     vlc_ml_thumbnail_status_t m_thumbnailStatus;
     QList<AudioDescription> m_audioDesc;
     QList<VideoDescription> m_videoDesc;
+    QList<SubtitleDescription> m_subtitleDesc;
 };
 
 #endif // MLVIDEO_H

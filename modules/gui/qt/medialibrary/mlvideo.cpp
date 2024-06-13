@@ -119,6 +119,13 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
                                      QString::fromUtf8( track.psz_language ) ,
                                      track.v.i_fpsNum }
                                  );
+        } else if ( track.i_type == VLC_ML_TRACK_TYPE_SUBTITLE )
+        {
+            m_subtitleDesc.emplaceBack( qfu(track.psz_codec)
+                                        , qfu(track.psz_language)
+                                        , qfu(track.psz_description)
+                                        , qfu(track.s.psz_encoding)
+                                    );
         }
     }
 
@@ -226,7 +233,41 @@ QList<VideoDescription> MLVideo::getVideoDesc() const
     return m_videoDesc;
 }
 
+QList<SubtitleDescription> MLVideo::getSubtitleDesc() const
+{
+    return m_subtitleDesc;
+}
+
 QList<AudioDescription> MLVideo::getAudioDesc() const
 {
     return m_audioDesc;
+}
+
+SubtitleDescription::SubtitleDescription(const QString &codec, const QString &language
+                                         , const QString &description, const QString &encoding)
+    : m_codec {codec}
+    , m_language {language}
+    , m_description {description}
+    , m_encoding {encoding}
+{
+}
+
+QString SubtitleDescription::getCodec() const
+{
+    return m_codec;
+}
+
+QString SubtitleDescription::getLanguage() const
+{
+    return m_language;
+}
+
+QString SubtitleDescription::getDescription() const
+{
+    return m_description;
+}
+
+QString SubtitleDescription::getEncoding() const
+{
+    return m_encoding;
 }
