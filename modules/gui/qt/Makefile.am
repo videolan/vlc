@@ -1391,14 +1391,18 @@ cachegen_verbose_ = $(cachegen_verbose__$(AM_DEFAULT_VERBOSITY))
 cachegen_verbose_0 = @echo "CACHEGEN" $@;
 cachegen_verbose__0 = $(cachegen_verbose_0)
 
+if HAVE_QT67
+QML_CACHEGEN_EXTRA_ARGS=--validate-basic-blocks
+endif
+
 .qml.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
 
 .js.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
 
 .mjs.cpp:
-	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_ARGS) -o $@ $<
+	$(cachegen_verbose)$(QMLCACHEGEN) $(QML_CACHEGEN_EXTRA_ARGS) $(QML_CACHEGEN_ARGS) -o $@ $<
 
 #we need to pass the resource path and as it appears in the qrc, this is easier to generate it externally
 %_qmlcachegen.rsp: $(builddir)/%/res.qrc

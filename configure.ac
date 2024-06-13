@@ -4212,6 +4212,7 @@ AM_CONDITIONAL([HAVE_QT_DECLARATIVE_PRIVATE], [test "${have_qt_declarative_priva
 AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_CORE_PRIVATE], [test "${have_qt_core_private}" = "yes"])
 AM_CONDITIONAL([HAVE_FXC], [test "${have_fxc}" = "yes"])
+AM_CONDITIONAL([HAVE_QT67], [test "${QT_VERSION_MAJ}" -gt "6" || (test "${QT_VERSION_MAJ}" = "6" && test "${QT_VERSION_MIN}" -ge "7")])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
