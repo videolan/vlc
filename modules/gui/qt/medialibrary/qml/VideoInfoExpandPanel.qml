@@ -274,6 +274,17 @@ FocusScope {
                             {text: qsTr("Channel:"), role: "nbchannels" }
                         ]
                     }
+
+                    DescriptionList {
+                        title: qsTr("Subtitle track")
+
+                        sourceModel: [{"text": root.model.subtitleDesc?.map(desc => desc.language)
+                                                    .filter(l => !!l).join(", ")}]
+
+                        delegateModel:  [
+                            {text: qsTr("Language:"), role: "text" }
+                        ]
+                    }
                 }
             }
         }
