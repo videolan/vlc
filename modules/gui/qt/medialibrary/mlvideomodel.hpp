@@ -53,6 +53,7 @@ public:
         VIDEO_DISPLAY_MRL,
         VIDEO_VIDEO_TRACK,
         VIDEO_AUDIO_TRACK,
+        VIDEO_SUBTITLE_TRACK,
 
         VIDEO_TITLE_FIRST_SYMBOL,
     };

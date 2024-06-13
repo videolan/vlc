@@ -143,6 +143,8 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
             return getVariantList( video->getVideoDesc() );
         case VIDEO_AUDIO_TRACK:
             return getVariantList( video->getAudioDesc() );
+        case VIDEO_SUBTITLE_TRACK:
+            return getVariantList( video->getSubtitleDesc() );
         case VIDEO_TITLE_FIRST_SYMBOL:
             return QVariant::fromValue( getFirstSymbol( video->getTitle() ) );
 
@@ -170,6 +172,7 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
         { VIDEO_DISPLAY_MRL, "display_mrl" },
         { VIDEO_AUDIO_TRACK, "audioDesc" },
         { VIDEO_VIDEO_TRACK, "videoDesc" },
+        { VIDEO_SUBTITLE_TRACK, "subtitleDesc" },
         { VIDEO_TITLE_FIRST_SYMBOL, "title_first_symbol"},
     };
 }
