@@ -28,7 +28,7 @@
 #import <vlc_plugin.h>
 #import <vlc_aout.h>
 
-#if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_VISION
+#if TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_VISION
 #define HAS_AVAUDIOSESSION
 #import "avaudiosession_common.h"
 #endif
