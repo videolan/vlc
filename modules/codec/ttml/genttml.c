@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "../codec/ttml/ttml.h"
+#include "ttml.h"
 
 char *tt_genTiming( tt_time_t t )
 {

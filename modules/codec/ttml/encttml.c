@@ -27,7 +27,7 @@
 #include <vlc_codec.h>
 #include <vlc_subpicture.h>
 
-#include "../codec/ttml/ttml.h"
+#include "ttml.h"
 
 #define HEX_COLOR_MAX 10
 static void FillHexColor( uint32_t argb, bool withalpha, char text[HEX_COLOR_MAX] )
