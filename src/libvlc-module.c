@@ -48,6 +48,15 @@
 
 #include "clock/clock.h"
 
+#ifdef HAVE_DYNAMIC_PLUGINS
+#define VLC_META_EXPORT_DECL( name, value ) \
+    VLC_API const char * CDECL_SYMBOL \
+    VLC_SYMBOL(vlc_entry_ ## name)(void); \
+
+VLC_META_EXPORT_DECL(copyright, VLC_MODULE_COPYRIGHT)
+VLC_META_EXPORT_DECL(license, VLC_MODULE_LICENSE)
+#endif
+
 static const char *const ppsz_snap_formats[] =
 { "png", "jpg", "tiff", "webp" };
 
