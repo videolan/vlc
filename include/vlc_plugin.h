@@ -427,11 +427,6 @@ VLC_METADATA_EXPORTS
 #define set_section( text, longtext ) \
     add_typedesc_inner( CONFIG_SECTION, text, longtext )
 
-#ifndef VLC_DYNAMIC_PLUGIN
-#define add_category_hint(text, longtext) \
-    add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
-#endif
-
 #define add_string( name, value, text, longtext ) \
     add_string_inner(CONFIG_ITEM_STRING, name, text, longtext, value)
 
@@ -457,17 +452,6 @@ VLC_METADATA_EXPORTS
 #define add_module_list(name, cap, value, text, longtext) \
     add_string_inner(CONFIG_ITEM_MODULE_LIST, name, text, longtext, value) \
     vlc_config_set (VLC_CONFIG_CAPABILITY, VLC_CHECKED_TYPE(const char *, cap));
-
-#ifndef VLC_DYNAMIC_PLUGIN
-#define add_module_cat(name, subcategory, value, text, longtext) \
-    add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
-    change_integer_range (subcategory /* gruik */, 0)
-
-#define add_module_list_cat(name, subcategory, value, text, longtext) \
-    add_string_inner(CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
-                     value) \
-    change_integer_range (subcategory /* gruik */, 0)
-#endif
 
 #define add_integer( name, value, text, longtext ) \
     add_int_inner(CONFIG_ITEM_INTEGER, name, text, longtext, value)

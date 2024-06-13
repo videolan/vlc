@@ -1568,6 +1568,18 @@ static const char *const mouse_wheel_texts[] = {
  * add_bool( option_name, b_value, N_(text), N_(longtext) )
  */
 
+#define add_category_hint(text, longtext) \
+    add_typedesc_inner( CONFIG_HINT_CATEGORY, text, longtext )
+
+#define add_module_cat(name, subcategory, value, text, longtext) \
+    add_string_inner(CONFIG_ITEM_MODULE_CAT, name, text, longtext, value) \
+    change_integer_range (subcategory /* gruik */, 0)
+
+#define add_module_list_cat(name, subcategory, value, text, longtext) \
+    add_string_inner(CONFIG_ITEM_MODULE_LIST_CAT, name, text, longtext, \
+                     value) \
+    change_integer_range (subcategory /* gruik */, 0)
+
 vlc_module_begin ()
     set_description( N_("core program") )
 
