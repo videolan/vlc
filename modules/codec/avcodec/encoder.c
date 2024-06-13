@@ -43,12 +43,13 @@
 #include <vlc_cpu.h>
 
 #include <libavcodec/avcodec.h>
-#include <libavutil/channel_layout.h>
 
 #include "avcodec.h"
 #include "avcommon.h"
 
-#if LIBAVUTIL_VERSION_CHECK( 52,2,6,0,0 )
+#define API_CHANNEL_LAYOUT (LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 100))
+
+#if API_CHANNEL_LAYOUT
 # include <libavutil/channel_layout.h>
 #endif
 
@@ -157,6 +158,7 @@ struct encoder_sys_t
 
 
 /* Taken from audio.c*/
+#if API_CHANNEL_LAYOUT
 static const uint64_t pi_channels_map[][2] =
 {
     { AV_CH_FRONT_LEFT,        AOUT_CHAN_LEFT },
@@ -193,6 +195,7 @@ static const uint32_t channel_mask[][2] = {
     {AOUT_CHANS_7_1, AV_CH_LAYOUT_7POINT1},
     {AOUT_CHANS_8_1, AV_CH_LAYOUT_OCTAGONAL},
 };
+#endif
 
 static const char *const ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "codec", "hq",
@@ -746,7 +749,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels      = p_enc->fmt_out.audio.i_channels;
-#if LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 0)
+#if API_CHANNEL_LAYOUT
         p_context->channel_layout = channel_mask[p_context->channels][1];
 
         /* Setup Channel ordering for multichannel audio
@@ -925,7 +928,9 @@ errmsg:
         if( p_enc->fmt_out.audio.i_channels > 2 )
         {
             p_context->channels = 2;
+#if API_CHANNEL_LAYOUT
             p_context->channel_layout = channel_mask[p_context->channels][1];
+#endif
 
             /* Change fmt_in in order to ask for a channels conversion */
             p_enc->fmt_in.audio.i_channels =
