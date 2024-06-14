@@ -275,13 +275,13 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     for (size_t i = 0; i < (size_t)count; ++i)
     {
         module_t *mod = modules[i];
-        int (*activate)(vlc_object_t *) = vlc_module_map(logger, mod);
+        int (*activate)(filter_t *) = vlc_module_map(logger, mod);
         if (activate == NULL)
             continue;
 
         filter->p_module = mod;
         filter->obj.force = i < strict_total;
-        ret = (*activate)(&filter->obj);
+        ret = (*activate)(filter);
         switch (ret)
         {
             case VLC_SUCCESS:
