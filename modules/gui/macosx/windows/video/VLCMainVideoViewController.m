@@ -82,6 +82,10 @@
                                selector:@selector(floatOnTopChanged:)
                                    name:VLCWindowFloatOnTopChangedNotificationName
                                  object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(shouldShowControls:)
+                                   name:VLCVideoWindowShouldShowFullscreenController
+                                 object:nil];
     }
     return self;
 }
@@ -132,18 +136,21 @@
 - (void)viewDidLoad
 {
     self.loadingIndicator.hidden = YES;
-    self.floatOnTopIndicatorImageView.hidden = YES;
+
+    BOOL floatOnTopActive = NO;
+    VLCVideoWindowCommon * const window = (VLCVideoWindowCommon *)self.view.window;
+    vout_thread_t * const p_vout = window.videoViewController.voutView.voutThread;
+    if (p_vout) {
+        floatOnTopActive = var_GetBool(p_vout, "video-on-top");
+        vout_Release(p_vout);
+    }
+    self.floatOnTopIndicatorImageView.hidden = !floatOnTopActive;
+
     _autohideControls = YES;
 
     [self setDisplayLibraryControls:NO];
     [self updatePlaylistToggleState];
     [self updateLibraryControls];
-
-    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter addObserver:self
-                           selector:@selector(shouldShowControls:)
-                               name:VLCVideoWindowShouldShowFullscreenController
-                             object:nil];
 
     _returnButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_returnButton
                                                                  attribute:NSLayoutAttributeBottom
