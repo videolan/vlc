@@ -70,6 +70,21 @@
                             </visualEffectView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="FGS-tq-54S" customClass="VLCMainVideoViewOverlayView">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                                <subviews>
+                                    <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="CrW-mq-gge">
+                                        <rect key="frame" x="344" y="285.5" width="32.5" height="45"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="wyi-7y-I1n"/>
+                                            <constraint firstAttribute="height" constant="32" id="yeS-Wi-3sX"/>
+                                        </constraints>
+                                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="OcH-tO-P80">
+                                            <imageReference key="image" image="pin.fill" catalog="system" symbolScale="large"/>
+                                        </imageCell>
+                                    </imageView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="CrW-mq-gge" firstAttribute="centerX" secondItem="FGS-tq-54S" secondAttribute="centerX" id="rPJ-ci-c4T"/>
+                                </constraints>
                             </customView>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="1GA-GG-Sdx">
                                 <rect key="frame" x="0.0" y="0.0" width="720" height="132"/>
@@ -150,28 +165,30 @@
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YTl-LZ-WDe" customClass="VLCImageButton">
                                                         <rect key="frame" x="37" y="-1" width="32" height="33"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="width" constant="32" id="lX6-ad-1gX"/>
-                                                            <constraint firstAttribute="width" secondItem="YTl-LZ-WDe" secondAttribute="height" multiplier="1:1" id="vzf-FG-VLf"/>
-                                                        </constraints>
                                                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="text.bubble" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="1qF-LY-LkO">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="YTl-LZ-WDe" secondAttribute="height" multiplier="1:1" id="2QI-lH-hlk"/>
+                                                            <constraint firstAttribute="width" constant="32" id="lX6-ad-1gX"/>
+                                                            <constraint firstAttribute="width" secondItem="YTl-LZ-WDe" secondAttribute="height" multiplier="1:1" id="vzf-FG-VLf"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="openSubtitlesMenu:" target="3" id="X6e-aG-mVF"/>
                                                         </connections>
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4tZ-52-1q9" customClass="VLCImageButton">
                                                         <rect key="frame" x="74" y="-1" width="32" height="33"/>
-                                                        <constraints>
-                                                            <constraint firstAttribute="width" constant="32" id="oY2-hp-RHB"/>
-                                                            <constraint firstAttribute="width" secondItem="4tZ-52-1q9" secondAttribute="height" multiplier="1:1" id="pSW-vN-Ly5"/>
-                                                        </constraints>
                                                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="bookmark.circle" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="bGc-fn-jgQ">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="4tZ-52-1q9" secondAttribute="height" multiplier="1:1" id="UdU-aK-B0s"/>
+                                                            <constraint firstAttribute="width" constant="32" id="oY2-hp-RHB"/>
+                                                            <constraint firstAttribute="width" secondItem="4tZ-52-1q9" secondAttribute="height" multiplier="1:1" id="pSW-vN-Ly5"/>
+                                                        </constraints>
                                                         <connections>
                                                             <action selector="openBookmarks:" target="3" id="o6m-9M-L4U"/>
                                                         </connections>
@@ -418,6 +435,7 @@
                             <constraint firstItem="jnw-gL-nrF" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="Z37-TJ-B2D"/>
                             <constraint firstAttribute="trailing" secondItem="1GA-GG-Sdx" secondAttribute="trailing" id="dWk-NI-ekN"/>
                             <constraint firstItem="CvV-yX-Nbh" firstAttribute="centerY" secondItem="1tI-8K-e3c" secondAttribute="centerY" id="l2Y-IR-aus"/>
+                            <constraint firstItem="CrW-mq-gge" firstAttribute="bottom" secondItem="CvV-yX-Nbh" secondAttribute="top" constant="-20" id="mik-2t-Inh"/>
                             <constraint firstAttribute="bottom" secondItem="FGS-tq-54S" secondAttribute="bottom" id="ps4-nL-1Xc"/>
                             <constraint firstItem="FGS-tq-54S" firstAttribute="leading" secondItem="1tI-8K-e3c" secondAttribute="leading" id="qfd-OD-CHv"/>
                             <constraint firstAttribute="trailing" secondItem="Drq-if-dw4" secondAttribute="trailing" constant="20" id="rWa-NJ-Aju"/>
@@ -455,9 +473,10 @@
         <image name="backward.fill" catalog="system" width="19" height="12"/>
         <image name="bookmark.circle" catalog="system" width="15" height="15"/>
         <image name="forward.fill" catalog="system" width="19" height="12"/>
+        <image name="pin.fill" catalog="system" width="19" height="22"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
+        <image name="play.rectangle.on.rectangle.fill" catalog="system" width="19" height="16"/>
         <image name="text.bubble" catalog="system" width="17" height="16"/>
-        <image name="play.rectangle.on.rectangle.fill" catalog="system" width="20" height="16"/>
         <image name="volume.3.fill" catalog="system" width="22" height="15"/>
         <image name="waveform.circle" catalog="system" width="15" height="15"/>
     </resources>
