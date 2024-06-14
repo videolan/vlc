@@ -47,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSVisualEffectView *fakeTitleBar;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
+@property (readwrite, strong) IBOutlet NSImageView *floatOnTopIndicatorImageView;
 
 @property (readonly, strong) VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, nonatomic) BOOL autohideControls;

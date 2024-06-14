@@ -42,6 +42,7 @@
 
 #import "windows/video/VLCMainVideoViewAudioMediaDecorativeView.h"
 #import "windows/video/VLCMainVideoViewOverlayView.h"
+#import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
 #import <vlc_common.h>
@@ -76,6 +77,10 @@
         [notificationCenter addObserver:self
                                    selector:@selector(playerBufferChanged:)
                                    name:VLCPlayerBufferChanged
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(floatOnTopChanged:)
+                                   name:VLCWindowFloatOnTopChangedNotificationName
                                  object:nil];
     }
     return self;
@@ -127,6 +132,7 @@
 - (void)viewDidLoad
 {
     self.loadingIndicator.hidden = YES;
+    self.floatOnTopIndicatorImageView.hidden = YES;
     _autohideControls = YES;
 
     [self setDisplayLibraryControls:NO];
@@ -214,6 +220,17 @@
     } else {
         [self.loadingIndicator startAnimation:self];
     }
+}
+
+- (void)floatOnTopChanged:(NSNotification *)notification
+{
+    VLCVideoWindowCommon * const videoWindow = (VLCVideoWindowCommon *)notification.object;
+    NSAssert(videoWindow != nil, @"Received video window should not be nil!");
+    NSDictionary<NSString *, NSNumber *> * const userInfo = notification.userInfo;
+    NSAssert(userInfo != nil, @"Received user info should not be nil!");
+    NSNumber * const enabledNumberWrapper = userInfo[VLCWindowFloatOnTopEnabledNotificationKey];
+    NSAssert(enabledNumberWrapper != nil, @"Received user info enabled wrapper should not be nil!");
+    self.floatOnTopIndicatorImageView.hidden = !enabledNumberWrapper.boolValue;
 }
 
 - (BOOL)mouseOnControls

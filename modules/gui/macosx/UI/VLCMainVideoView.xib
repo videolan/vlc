@@ -14,6 +14,7 @@
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
                 <outlet property="fakeTitleBarHeightConstraint" destination="wY4-If-nIp" id="wPt-X4-mgu"/>
+                <outlet property="floatOnTopIndicatorImageView" destination="CrW-mq-gge" id="hqR-4Z-a18"/>
                 <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
                 <outlet property="overlayView" destination="FGS-tq-54S" id="RSC-7m-N0y"/>
