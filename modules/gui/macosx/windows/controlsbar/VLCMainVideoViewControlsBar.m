@@ -76,6 +76,14 @@
                                name:VLCWindowFloatOnTopChangedNotificationName
                              object:nil];
 
+    [self update];
+}
+
+- (void)update
+{
+    [super update];
+    [self updateDetailLabel];
+    [self updateFloatOnTopButton];
 }
 
 - (void)currentMediaItemChanged:(NSNotification *)notification
