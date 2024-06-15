@@ -80,8 +80,11 @@
 - (void)updateDetailLabel:(NSNotification *)notification
 {
 
-    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
+    VLCMediaLibraryMediaItem * const mediaItem =
+        [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
+
     if (!mediaItem) {
+        self.detailLabel.hidden = YES;
         return;
     }
 
