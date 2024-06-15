@@ -68,18 +68,23 @@
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
-                           selector:@selector(updateDetailLabel:)
+                           selector:@selector(currentMediaItemChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(updateFloatOnTopButton:)
                                name:VLCWindowFloatOnTopChangedNotificationName
                              object:nil];
+
 }
 
-- (void)updateDetailLabel:(NSNotification *)notification
+- (void)currentMediaItemChanged:(NSNotification *)notification
 {
+    [self updateDetailLabel];
+}
 
+- (void)updateDetailLabel
+{
     VLCMediaLibraryMediaItem * const mediaItem =
         [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
 
