@@ -251,7 +251,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
         const NSInteger section = [self videoGroupToRow:group];
         NSSet<NSIndexPath *> * const indexPathSet = [rowIndexSet indexPathSetWithSection:section];
-        [self.collectionView insertItemsAtIndexPaths:indexPathSet];
+        [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
 
         const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
         if (selectedTableViewVideoGroup == group) {
