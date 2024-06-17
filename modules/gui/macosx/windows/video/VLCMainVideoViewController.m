@@ -233,11 +233,24 @@
 {
     VLCVideoWindowCommon * const videoWindow = (VLCVideoWindowCommon *)notification.object;
     NSAssert(videoWindow != nil, @"Received video window should not be nil!");
-    NSDictionary<NSString *, NSNumber *> * const userInfo = notification.userInfo;
-    NSAssert(userInfo != nil, @"Received user info should not be nil!");
-    NSNumber * const enabledNumberWrapper = userInfo[VLCWindowFloatOnTopEnabledNotificationKey];
-    NSAssert(enabledNumberWrapper != nil, @"Received user info enabled wrapper should not be nil!");
-    self.floatOnTopIndicatorImageView.hidden = !enabledNumberWrapper.boolValue;
+    VLCVideoWindowCommon * const selfVideoWindow = (VLCVideoWindowCommon *)self.view.window;
+
+    if (videoWindow != selfVideoWindow) {
+        return;
+    }
+
+    [self updateFloatOnTopIndicator];
+}
+
+- (void)updateFloatOnTopIndicator
+{
+    vout_thread_t * const voutThread = self.voutView.voutThread;
+    if (voutThread == NULL) {
+        return;
+    }
+
+    const bool floatOnTopEnabled = var_GetBool(voutThread, "video-on-top");
+    self.floatOnTopIndicatorImageView.hidden = !floatOnTopEnabled;
 }
 
 - (BOOL)mouseOnControls
