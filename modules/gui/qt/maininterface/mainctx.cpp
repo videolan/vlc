@@ -695,9 +695,8 @@ void MainCtx::handleSystrayClick(
 #endif
             break;
         case QSystemTrayIcon::MiddleClick:
-            sysTray->showMessage( qtr( "VLC media player" ),
-                    qtr( "Control menu for the player" ),
-                    QSystemTrayIcon::Information, 3000 );
+            if (PlaylistController* const playlistController = p_intf->p_mainPlaylistController)
+                playlistController->togglePlayPause();
             break;
         default:
             break;
