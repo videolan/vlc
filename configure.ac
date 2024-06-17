@@ -4869,18 +4869,18 @@ if test -n $SHELL; then
 fi
 rm -f compile
 compile_top_srcdir=`sed -ne "s/^top_srcdir *= *//p" < Makefile`
-echo "#! $SHELL
-rm -f .error\$\$
+[printf '%s\n' '#! '"${SHELL}"'
+rm -f .error$$
 ERROR=0
-export PATH=\"$PATH\" LANG=C
-if [ "$NO_COLOR" = 1 ]; then
-($MAKE V=1 \$@ 2>&1 || touch .error\$\$)
+export PATH="$PATH" LANG=C
+if test "$NO_COLOR" = 1 ; then
+('"${MAKE}"' V=1 "$@" 2>&1 || touch .error$$)
 else
-($MAKE V=1 \$@ 2>&1 || touch .error\$\$)| $compile_top_srcdir/extras/buildsystem/make.pl
+('"${MAKE}"' V=1 "$@" 2>&1 || touch .error$$)| '"$compile_top_srcdir"'/extras/buildsystem/make.pl
 fi
-test -f .error\$\$ && ERROR=1
-rm -f .error\$\$
-exit \$ERROR" >compile
+test -f .error$$ && ERROR=1
+rm -f .error$$
+exit $ERROR'] >compile
 chmod a+x compile
 
 echo "
