@@ -172,6 +172,7 @@
 
     [self setupAudioDecorativeView];
     [self.controlsBar update];
+    [self updateFloatOnTopIndicator];
 }
 
 - (void)updateDecorativeViewVisibilityOnControllerChange:(VLCPlayerController *)controller
