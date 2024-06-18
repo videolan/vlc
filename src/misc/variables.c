@@ -1050,7 +1050,6 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
     {
         case VLC_VAR_STRING:
             p_val->psz_string = config_GetPsz( psz_name );
-            if( !p_val->psz_string ) p_val->psz_string = strdup("");
             break;
         case VLC_VAR_FLOAT:
             p_val->f_float = config_GetFloat( psz_name );
