@@ -52,7 +52,9 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
     m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get(), nullptr);
 
     MainUI* ui = new MainUI(m_intf, m_mainCtx, m_qmlWidget.get(), m_qmlWidget.get());
-    ui->setup(m_qmlWidget->engine());
+    if (!ui->setup(m_qmlWidget->engine()))
+        return false;
+
     m_qmlWidget->setContent(QUrl(), ui->getComponent(), ui->createRootItem());
 
     if (m_qmlWidget->status() != QQuickView::Ready)
