@@ -204,12 +204,29 @@ FocusScope {
                 }
 
                 Widgets.MenuCaption {
-                    text: "<b>" + qsTr("Path:") + "</b> " + root.model.display_mrl
+
+                    readonly property string folderMRL: MainCtx.folderMRL(root.model?.mrl ?? "")
+
+                    text: {
+                        if (!!folderMRL)
+                            return "<b>%1</b> <a href='%2'>%3</a>"
+                                        .arg(qsTr("Folder:"))
+                                        .arg(folderMRL)
+                                        .arg(MainCtx.displayMRL(folderMRL))
+
+                        return "<b>" + qsTr("Path:") + "</b> " + root.model.display_mrl
+                    }
+
+                    linkColor: theme.fg.link
                     color: theme.fg.secondary
                     topPadding: VLCStyle.margin_xsmall
                     bottomPadding: VLCStyle.margin_large
                     width: parent.width
                     textFormat: Text.StyledText
+
+                    onLinkActivated: function (link) {
+                        Qt.openUrlExternally(link)
+                    }
                 }
 
                 Widgets.ButtonExt {
