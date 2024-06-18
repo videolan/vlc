@@ -1,0 +1,29 @@
+From f06054ea7a576d031a5bbfea1dbd6a9a6432761e Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 18 Jun 2024 07:26:22 +0200
+Subject: [PATCH] Fix usage of GetVolumePathNameW in UWP before 20H1
+
+It started being allowed in UWP in 20H1.
+---
+ libarchive/archive_windows.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libarchive/archive_windows.h b/libarchive/archive_windows.h
+index 47b7cb8e..8187dd66 100644
+--- a/libarchive/archive_windows.h
++++ b/libarchive/archive_windows.h
+@@ -294,7 +294,10 @@ typedef int mbstate_t;
+ size_t wcrtomb(char *, wchar_t, mbstate_t *);
+ #endif
+ 
+-#if defined(_MSC_VER) && _MSC_VER < 1300
++#if !WINAPI_FAMILY_PARTITION (WINAPI_PARTITION_DESKTOP) && NTDDI_VERSION < NTDDI_WIN10_VB
++// not supported in UWP SDK before 20H1
++#define GetVolumePathNameW(f, v, c)   (0)
++#elif defined(_MSC_VER) && _MSC_VER < 1300
+ WINBASEAPI BOOL WINAPI GetVolumePathNameW(
+        LPCWSTR lpszFileName,
+        LPWSTR lpszVolumePathName,
+-- 
+2.45.0.windows.1
+
