@@ -21,7 +21,7 @@
 
 import QtQuick
 
-import org.videolan.medialib 0.1
+import VLC.MediaLibrary
 
 DragItem {
     id: root

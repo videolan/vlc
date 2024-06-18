@@ -175,8 +175,6 @@ bool MainUI::setup(QQmlEngine* engine)
     qmlProtectModule("VLC.Dialogs", 1);
     qmlRegisterModule("VLC.MainInterface", 1, 0);
     qmlProtectModule("VLC.MainInterface", 1);
-    qmlRegisterModule("VLC.MediaLibrary", 1, 0);
-    qmlProtectModule("VLC.MediaLibrary", 1);
     qmlRegisterModule("VLC.Menus", 1, 0);
     qmlProtectModule("VLC.Menus", 1);
     qmlRegisterModule("VLC.Network", 1, 0);
@@ -354,9 +352,9 @@ void MainUI::registerQMLTypes()
 
     if (m_mainCtx->hasMediaLibrary())
     {
-        const char* uri = "org.videolan.medialib";
-        const int versionMajor = 0;
-        const int versionMinor = 1;
+        const char* uri = "VLC.MediaLibrary";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
 
         qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
 
@@ -385,7 +383,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );
 
-
+        qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
 }

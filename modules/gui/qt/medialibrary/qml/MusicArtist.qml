@@ -20,7 +20,7 @@ import QtQuick
 import QtQml.Models
 import QtQuick.Layouts
 
-import org.videolan.medialib 0.1
+import VLC.MediaLibrary
 import org.videolan.vlc 0.1
 
 import VLC.Util as Util
