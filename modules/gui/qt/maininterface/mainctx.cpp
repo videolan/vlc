@@ -30,6 +30,7 @@
 
 #include "mainctx.hpp"
 #include "mainctx_submodels.hpp"
+#include "medialibrary/mlhelper.hpp"
 
 #include "compositor.hpp"
 #include "util/renderer_manager.hpp"
@@ -50,7 +51,6 @@
 #include "menus/menus.hpp"                            // Menu creation
 
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
-
 
 #include <QKeyEvent>
 
@@ -531,6 +531,27 @@ WorkerThreadSet* MainCtx::workersThreads() const
     }
 
     return m_workersThreads.get();
+}
+
+QUrl MainCtx::folderMRL(const QString &fileMRL) const
+{
+    return folderMRL(QUrl::fromUserInput(fileMRL));
+}
+
+QUrl MainCtx::folderMRL(const QUrl &fileMRL) const
+{
+    if (fileMRL.isLocalFile())
+    {
+        const QString f = fileMRL.toLocalFile();
+        return QUrl::fromLocalFile(QFileInfo(f).absoluteDir().absolutePath());
+    }
+
+    return {};
+}
+
+QString MainCtx::displayMRL(const QUrl &mrl) const
+{
+    return urlToDisplayString(mrl);
 }
 
 void MainCtx::setMediaLibraryVisible( bool visible )

@@ -280,6 +280,11 @@ public:
 
     WorkerThreadSet *workersThreads() const;
 
+    Q_INVOKABLE QUrl folderMRL(const QString &fileMRL) const;
+    Q_INVOKABLE QUrl folderMRL(const QUrl &fileMRL) const;
+
+    Q_INVOKABLE QString displayMRL(const QUrl &mrl) const;
+
 protected:
     /* Systray */
     void createSystray();
