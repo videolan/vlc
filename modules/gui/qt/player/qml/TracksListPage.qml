@@ -28,7 +28,7 @@ import VLC.Style
 import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Util as Util
-
+import VLC.Dialogs
 
 RowLayout {
     id: root

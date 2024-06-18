@@ -171,8 +171,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     engine->addImportPath(":/");
 
-    qmlRegisterModule("VLC.Dialogs", 1, 0);
-    qmlProtectModule("VLC.Dialogs", 1);
     qmlRegisterModule("VLC.MainInterface", 1, 0);
     qmlProtectModule("VLC.MainInterface", 1);
     qmlRegisterModule("VLC.Menus", 1, 0);
@@ -246,8 +244,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<SortCtx>(uri, versionMajor, versionMinor, "SortCtx", "");
 
         qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::callback);
-        qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
-        qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
         qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
@@ -276,12 +272,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<CSDButton>(uri, versionMajor, versionMinor, "CSDButton", "");
         qmlRegisterUncreatableType<CSDButtonModel>(uri, versionMajor, versionMinor, "CSDButtonModel", "has CSD buttons and provides for communicating CSD events between UI and backend");
 
-        qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
-
-        qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
-
-        qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
-
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
         qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
 
@@ -304,6 +294,21 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
 
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.Dialogs";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
+        qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
+        qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
+        qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
+        qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
+        qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
 

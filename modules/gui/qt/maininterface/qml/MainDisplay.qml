@@ -30,7 +30,7 @@ import VLC.Player
 
 import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import VLC.Dialogs as DG
+import VLC.Dialogs
 
 FocusScope {
     id: g_mainDisplay
@@ -501,7 +501,7 @@ FocusScope {
         }
     }
 
-    DG.Dialogs {
+    Dialogs {
         z: 10
         bgContent: g_mainDisplay
 

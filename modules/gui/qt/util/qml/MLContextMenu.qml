@@ -20,7 +20,7 @@ import QtQml
 
 import org.videolan.vlc 0.1
 import VLC.MediaLibrary
-
+import VLC.Dialogs
 
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 

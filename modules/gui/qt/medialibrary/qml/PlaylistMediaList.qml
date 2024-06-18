@@ -31,6 +31,7 @@ import VLC.MainInterface    as MainInterface
 import VLC.Util    as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
+import VLC.Dialogs
 
 MainInterface.MainViewLoader {
     id: root

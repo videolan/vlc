@@ -29,7 +29,7 @@ import VLC.Widgets as Widgets
 import VLC.Playlist
 import VLC.Player
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import VLC.Dialogs as DG
+import VLC.Dialogs
 import VLC.Util as Util
 
 FocusScope {
@@ -687,7 +687,7 @@ FocusScope {
         }
     }
 
-    DG.Dialogs {
+    Dialogs {
         z: 10
         bgContent: rootPlayer
 
