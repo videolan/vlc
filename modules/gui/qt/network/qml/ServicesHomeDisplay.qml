@@ -26,6 +26,7 @@ import VLC.Widgets as Widgets
 import VLC.Util as Util
 import VLC.MainInterface as MainInterface
 import VLC.Style
+import VLC.Network
 
 Widgets.PageLoader {
     id: root

@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 import VLC.Util as Util
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Network
 
 FocusScope {
     id: root

@@ -25,6 +25,7 @@ import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Widgets as Widgets
 import VLC.MainInterface as MainInterface
 import VLC.Style
+import VLC.Network
 
 MainInterface.MainViewLoader {
     id: root

@@ -27,6 +27,7 @@ import VLC.Widgets as Widgets
 import VLC.MainInterface as MainInterface
 import VLC.Util as Util
 import VLC.Style
+import VLC.Network
 
 FocusScope {
     id: root
