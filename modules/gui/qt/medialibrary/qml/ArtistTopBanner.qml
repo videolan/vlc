@@ -22,7 +22,6 @@ import QtQml.Models
 import Qt5Compat.GraphicalEffects
 
 import org.videolan.medialib 0.1
-import org.videolan.controls 0.1
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
@@ -102,7 +101,7 @@ FocusScope {
             implicitHeight: VLCStyle.cover_normal
             implicitWidth: VLCStyle.cover_normal
 
-            RoundImage {
+            Widgets.RoundImage {
                 source: artist.cover || VLCStyle.noArtArtist
                 sourceSize.width: width
                 sourceSize.height: height

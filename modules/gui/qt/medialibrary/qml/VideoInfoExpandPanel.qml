@@ -21,8 +21,6 @@ import QtQml.Models
 import QtQuick.Layouts
 
 import org.videolan.medialib 0.1
-import org.videolan.controls 0.1
-
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
@@ -110,7 +108,7 @@ FocusScope {
                         width: VLCStyle.gridCover_video_width
 
                         /* A bigger cover for the album */
-                        RoundImage {
+                        Widgets.RoundImage {
                             id: expand_cover_id
 
                             anchors.fill: parent
@@ -124,7 +122,7 @@ FocusScope {
 
                                 sourceItem: parent
 
-                                visible: (parent.status === RoundImage.Ready)
+                                visible: (parent.status === Widgets.RoundImage.Ready)
                             }
                         }
                     }

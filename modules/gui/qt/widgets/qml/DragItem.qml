@@ -24,9 +24,9 @@ import QtQml.Models
 import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
-import org.videolan.controls 0.1
 
 import VLC.Style
+import VLC.Widgets as Widgets
 import VLC.Playlist as Playlist
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Util as Util
@@ -415,7 +415,7 @@ Item {
                 }
             }
 
-            RoundImage {
+            Widgets.RoundImage {
                 id: fallbackCover
 
                 anchors.centerIn: parent

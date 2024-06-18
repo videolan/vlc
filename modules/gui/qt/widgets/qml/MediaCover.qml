@@ -20,7 +20,6 @@ import QtQuick
 import QtQuick.Controls
 
 import org.videolan.vlc 0.1
-import org.videolan.controls 0.1
 
 import VLC.Widgets as Widgets
 import VLC.Style
@@ -43,7 +42,7 @@ Rectangle {
 
     property alias cacheImage: image.cache
 
-    property bool isImageReady: image.status == RoundImage.Ready
+    property bool isImageReady: image.status == Widgets.RoundImage.Ready
 
 
     property string fallbackImageSource
@@ -70,7 +69,7 @@ Rectangle {
 
     // Children
 
-    RoundImage {
+    Widgets.RoundImage {
         id: image
 
         anchors.fill: parent
@@ -83,7 +82,7 @@ Rectangle {
         cache: false
     }
 
-    RoundImage {
+    Widgets.RoundImage {
         id: fallbackImage
 
         anchors.fill: parent

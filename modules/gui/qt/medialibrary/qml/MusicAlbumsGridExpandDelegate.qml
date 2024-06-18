@@ -21,7 +21,6 @@ import QtQuick.Layouts
 import QtQml.Models
 
 import org.videolan.medialib 0.1
-import org.videolan.controls 0.1
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
@@ -114,7 +113,7 @@ FocusScope {
         Component {
             id: cover
 
-            RoundImage {
+            Widgets.RoundImage {
                 id: expand_cover_id
 
                 property int cover_height: parent.cover_height
@@ -134,7 +133,7 @@ FocusScope {
 
                     sourceItem: parent
 
-                    visible: (parent.status === RoundImage.Ready)
+                    visible: (parent.status === Widgets.RoundImage.Ready)
                 }
             }
         }

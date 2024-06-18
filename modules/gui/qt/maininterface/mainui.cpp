@@ -191,8 +191,6 @@ bool MainUI::setup(QQmlEngine* engine)
     qmlProtectModule("VLC.Style", 1);
     qmlRegisterModule("VLC.Util", 1, 0);
     qmlProtectModule("VLC.Util", 1);
-    qmlRegisterModule("VLC.Widgets", 1, 0);
-    qmlProtectModule("VLC.Widgets", 1);
 
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
@@ -277,7 +275,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
         qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "ColorProperty", "");
         qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
-        qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
 
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
 
@@ -335,8 +332,6 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
-        qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
-
         qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
 
         qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
@@ -345,15 +340,15 @@ void MainUI::registerQMLTypes()
     }
 
     {
-        // Custom controls
-
-        const char* uri = "org.videolan.controls";
-        const int versionMajor = 0;
-        const int versionMinor = 1;
+        const char* uri = "VLC.Widgets";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
 
         qmlRegisterType<RoundImage>( uri, versionMajor, versionMinor, "RoundImage" );
+        qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
+        qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
 
-
+        qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
 

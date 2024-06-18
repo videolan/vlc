@@ -24,7 +24,6 @@ import QtQuick.Layouts
 import QtQml.Models
 
 import org.videolan.medialib 0.1
-import org.videolan.controls 0.1
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
@@ -156,7 +155,7 @@ T.ItemDelegate {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
 
-        RoundImage {
+        Widgets.RoundImage {
             implicitWidth: VLCStyle.play_cover_small
             implicitHeight: VLCStyle.play_cover_small
             Layout.fillHeight: true
