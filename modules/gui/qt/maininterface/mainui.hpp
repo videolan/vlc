@@ -22,7 +22,7 @@ public:
     explicit MainUI(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* interfaceWindow, QObject *parent = nullptr);
     ~MainUI();
 
-    bool setup(QQmlEngine* engine);
+    [[nodiscard]] bool setup(QQmlEngine* engine);
 
     inline QQmlComponent* getComponent() const {return m_component;}
     VLC_USED
