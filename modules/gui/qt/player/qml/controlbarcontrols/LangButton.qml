@@ -22,7 +22,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
 import VLC.Style
-import VLC.Player as Player
+import VLC.Player
 
 Widgets.IconToolButton {
     id: root
@@ -59,7 +59,7 @@ Widgets.IconToolButton {
     Loader {
         id: menuLoader
 
-        sourceComponent: Player.TracksMenu {
+        sourceComponent: TracksMenu {
             id: menu
 
             parent: root._parentItem

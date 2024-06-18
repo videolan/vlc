@@ -26,7 +26,7 @@ import VLC.Style
 import VLC.MainInterface as Main
 import VLC.Widgets as Widgets
 import VLC.Playlist
-import VLC.Player as P
+import VLC.Player
 
 import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
@@ -467,7 +467,7 @@ FocusScope {
         }
     }
 
-    P.PIPPlayer {
+    PIPPlayer {
         id: playerPip
         anchors {
             bottom: miniPlayer.top
@@ -512,7 +512,7 @@ FocusScope {
         }
     }
 
-    P.MiniPlayer {
+    MiniPlayer {
         id: miniPlayer
 
         anchors.left: parent.left

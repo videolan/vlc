@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 import org.videolan.vlc 0.1
 
 import VLC.Style
-import VLC.Player as P
+import VLC.Player
 import VLC.Widgets
 
 PopupIconToolButton {
@@ -34,7 +34,7 @@ PopupIconToolButton {
 
     description: qsTr("change playback speed")
 
-    popup.contentItem: P.PlaybackSpeed {
+    popup.contentItem: PlaybackSpeed {
         colorContext.palette: root.colorContext.palette
 
         Navigation.parentItem: root

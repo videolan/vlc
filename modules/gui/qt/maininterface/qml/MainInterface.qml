@@ -33,6 +33,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util as Util
 import VLC.Playlist
+import VLC.Player
 
 Item {
     id: root

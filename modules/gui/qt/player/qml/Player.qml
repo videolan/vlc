@@ -27,6 +27,7 @@ import org.videolan.vlc 0.1
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Playlist
+import VLC.Player
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Dialogs as DG
 import VLC.Util as Util

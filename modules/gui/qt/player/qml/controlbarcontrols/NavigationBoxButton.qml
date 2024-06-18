@@ -19,6 +19,7 @@
 import QtQuick
 
 import VLC.Widgets as Widgets
+import VLC.Player
 import VLC.Style
 
 import org.videolan.vlc 0.1

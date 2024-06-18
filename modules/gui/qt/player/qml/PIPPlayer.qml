@@ -22,6 +22,7 @@ import org.videolan.vlc 0.1
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Playlist
+import VLC.Player
 
 Item {
     id: root

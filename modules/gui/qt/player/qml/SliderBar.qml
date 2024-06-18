@@ -23,6 +23,7 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
+import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
 import "qrc:///VLC/Util/Helpers.js" as Helpers
