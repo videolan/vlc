@@ -68,7 +68,7 @@ public:
 public:
     virtual ~Compositor() = default;
 
-    virtual bool init() = 0;
+    [[nodiscard]] virtual bool init() = 0;
 
     virtual bool makeMainInterface(MainCtx* intf) = 0;
     virtual void destroyMainInterface() = 0;
