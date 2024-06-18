@@ -75,7 +75,7 @@ public:
 
     virtual void unloadGUI() = 0;
 
-    virtual bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
+    [[nodiscard]] virtual bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
 
     virtual Type type() const = 0;
 
