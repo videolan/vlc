@@ -26,6 +26,7 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/0003-win32-use-ANSI-calls-explicitly.patch
 	$(APPLY) $(SRC)/caca/0004-win32-use-CreateFile2-when-compiling-for-Win8.patch
 	$(APPLY) $(SRC)/caca/0005-canvas-use-GetCurrentProcessId-on-Windows.patch
+	$(APPLY) $(SRC)/caca/0006-stubs-include-winsock2.h-to-get-htons-htonl-declarat.patch
 	$(call pkg_static,"caca/caca.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
