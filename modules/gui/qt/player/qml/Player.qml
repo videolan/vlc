@@ -26,7 +26,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Style
 import VLC.Widgets as Widgets
-import VLC.Playlist as PL
+import VLC.Playlist
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Dialogs as DG
 import VLC.Util as Util
@@ -597,7 +597,7 @@ FocusScope {
             value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         }
 
-        component: PL.PlaylistListView {
+        component: PlaylistListView {
             id: playlistView
 
             width: Helpers.clamp(rootPlayer.width / resizeHandle.widthFactor

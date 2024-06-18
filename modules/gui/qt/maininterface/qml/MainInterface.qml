@@ -32,7 +32,7 @@ import org.videolan.vlc 0.1
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util as Util
-import VLC.Playlist as PL
+import VLC.Playlist
 
 Item {
     id: root

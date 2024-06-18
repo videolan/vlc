@@ -177,8 +177,6 @@ bool MainUI::setup(QQmlEngine* engine)
     qmlProtectModule("VLC.MainInterface", 1);
     qmlRegisterModule("VLC.Menus", 1, 0);
     qmlProtectModule("VLC.Menus", 1);
-    qmlRegisterModule("VLC.Playlist", 1, 0);
-    qmlProtectModule("VLC.Playlist", 1);
     qmlRegisterModule("VLC.Player", 1, 0);
     qmlProtectModule("VLC.Player", 1);
     qmlRegisterModule("VLC.PlayerControls", 1, 0);
@@ -257,7 +255,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
         qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
         qmlRegisterSingletonType<VLCAccessImage>(uri, versionMajor, versionMinor, "VLCAccessImage", SingletonRegisterHelper<VLCAccessImage>::callback);
-        qmlRegisterSingletonType<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", SingletonRegisterHelper<PlaylistController>::callback);
 
         qmlRegisterType<DelayEstimator>( uri, versionMajor, versionMinor, "DelayEstimator" );
 
@@ -286,9 +283,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<CSDButton>(uri, versionMajor, versionMinor, "CSDButton", "");
         qmlRegisterUncreatableType<CSDButtonModel>(uri, versionMajor, versionMinor, "CSDButtonModel", "has CSD buttons and provides for communicating CSD events between UI and backend");
 
-        qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "PlaylistItem", "");
-        qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
-        qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
 
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
 
@@ -316,7 +310,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<QmlRendererMenu>( uri, versionMajor, versionMinor, "QmlRendererMenu" );
         qmlRegisterType<QmlSubtitleMenu>( uri, versionMajor, versionMinor, "QmlSubtitleMenu" );
         qmlRegisterType<QmlAudioMenu>( uri, versionMajor, versionMinor, "QmlAudioMenu" );
-        qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
 
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
@@ -324,6 +317,21 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
 
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.Playlist";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
+        qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "PlaylistItem", "");
+        qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
+        qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
+        qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
+        qmlRegisterSingletonType<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", SingletonRegisterHelper<PlaylistController>::callback);
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
 

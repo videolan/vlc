@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 import VLC.Style
 import VLC.MainInterface as Main
 import VLC.Widgets as Widgets
-import VLC.Playlist as PL
+import VLC.Playlist
 import VLC.Player as P
 
 import VLC.Util as Util
@@ -352,7 +352,7 @@ FocusScope {
                     }
                 }
 
-                sourceComponent: PL.PlaylistListView {
+                sourceComponent: PlaylistListView {
                     id: playlist
 
                     implicitWidth: VLCStyle.isScreenSmall

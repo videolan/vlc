@@ -27,7 +27,7 @@ import QtQuick.Window
 import org.videolan.vlc 0.1
 
 import VLC.Style
-import VLC.Playlist as PL
+import VLC.Playlist
 import VLC.Widgets as Widgets
 import VLC.Menus as Menus
 import "qrc:///VLC/Util/Helpers.js" as Helpers
@@ -43,7 +43,7 @@ T.ToolBar {
 
     // For now, used for d&d functionality
     // Not strictly necessary to set
-    property PL.PlaylistListView plListView: null
+    property PlaylistListView plListView: null
 
     property bool _showCSD: MainCtx.clientSideDecoration && !(MainCtx.intfMainWindow.visibility === Window.FullScreen)
 
