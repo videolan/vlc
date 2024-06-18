@@ -79,7 +79,7 @@ T.ProgressBar {
         //tooltip is a Popup, palette should be passed explicitly
         colorContext.palette: theme.palette
 
-        visible: hoverHandler.hovered || control.visualFocus
+        visible: hoverHandler.hovered || control.visualFocus || dragHandler.active
 
         text: {
             let _text
