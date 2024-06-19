@@ -23,6 +23,7 @@ import QtQuick.Layouts
 
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 T.Control {
     id: delegate

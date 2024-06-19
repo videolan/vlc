@@ -1121,7 +1121,6 @@ libqml_module_util_a_ModulePath = VLC/Util
 libqml_module_util_a_CXXFLAGS = $(libqt_plugin_la_CXXFLAGS)
 libqml_module_util_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_util_a_QML = \
-	util/qml/Helpers.js \
 	util/qml/ModelSortSettingHandler.qml \
 	util/qml/FlickableScrollHandler.qml \
 	util/qml/ViewDragAutoScrollHandler.qml \
@@ -1131,9 +1130,11 @@ libqml_module_util_a_QML = \
 	util/qml/MLContextMenu.qml \
 	util/qml/FadeControllerStateGroup.qml \
 	util/qml/GridSizeHelper.qml
+libqml_module_util_a_Singleton_QML = \
+	util/qml/Helpers.qml
 nodist_libqml_module_util_a_SOURCES = util_qmlassets.cpp
-$(libqml_module_util_a_QML:.qml=.cpp) util/qml/Helpers.cpp : $(builddir)/util/res.qrc
-$(libqml_module_util_a_QML:.qml=.cpp) util/qml/Helpers.cpp : QML_CACHEGEN_ARGS=--resource=$(builddir)/util/res.qrc
+$(libqml_module_util_a_QML:.qml=.cpp) $(libqml_module_util_a_Singleton_QML:.qml=.cpp) : $(builddir)/util/res.qrc
+$(libqml_module_util_a_QML:.qml=.cpp) $(libqml_module_util_a_Singleton_QML:.qml=.cpp) : QML_CACHEGEN_ARGS=--resource=$(builddir)/util/res.qrc
 
 libqml_module_widgets_a_Module = VLC.Widgets
 libqml_module_widgets_a_ModulePath = VLC/Widgets
@@ -1383,7 +1384,7 @@ libqml_module_player_a_SOURCES = $(libqml_module_player_a_QML) $(libqml_module_p
 libqml_module_playercontrols_a_SOURCES = $(libqml_module_playercontrols_a_QML)
 libqml_module_playlist_a_SOURCES = $(libqml_module_playlist_a_QML)
 libqml_module_style_a_SOURCES = $(libqml_module_style_a_QML) $(libqml_module_style_a_Singleton_QML)
-libqml_module_util_a_SOURCES = $(libqml_module_util_a_QML)
+libqml_module_util_a_SOURCES = $(libqml_module_util_a_QML) $(libqml_module_util_a_Singleton_QML)
 libqml_module_widgets_a_SOURCES = $(libqml_module_widgets_a_QML)
 
 cachegen_verbose = $(cachegen_verbose_$(V))

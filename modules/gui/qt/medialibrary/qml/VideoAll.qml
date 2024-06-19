@@ -26,7 +26,6 @@ import VLC.MediaLibrary
 import VLC.Widgets as Widgets
 import VLC.MainInterface
 import VLC.Util
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 
 MainViewLoader {

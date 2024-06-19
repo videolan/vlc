@@ -23,7 +23,7 @@ import QtQuick.Controls
 import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 T.ComboBox {
     id: control

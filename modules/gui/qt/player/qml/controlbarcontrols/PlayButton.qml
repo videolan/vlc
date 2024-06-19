@@ -25,7 +25,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
 import VLC.Playlist
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 T.Control {
     id: root

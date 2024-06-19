@@ -24,7 +24,6 @@ import Qt5Compat.GraphicalEffects
 import VLC.MainInterface
 import VLC.Style
 import VLC.Util
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 ListView {
     id: root

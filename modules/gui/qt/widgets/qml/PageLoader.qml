@@ -18,7 +18,7 @@
 import QtQuick
 
 import VLC.MainInterface
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 StackViewExt {
     id: root

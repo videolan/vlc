@@ -24,7 +24,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.MainInterface
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 import VLC.Style
 
 MainTableView {

@@ -21,7 +21,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 Widgets.GridItem {
     property var model: ({})

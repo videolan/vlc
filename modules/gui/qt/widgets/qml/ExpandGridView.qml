@@ -25,7 +25,6 @@ import QtQml.Models
 
 import VLC.MainInterface
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Util
 
 FocusScope {

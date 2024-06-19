@@ -25,7 +25,7 @@ import VLC.MainInterface
 import VLC.Player
 import VLC.Style
 import VLC.Widgets as Widgets
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 ColumnLayout {
     id: root

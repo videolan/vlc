@@ -24,6 +24,7 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Player
 import VLC.Widgets
+import VLC.Util
 
 PopupIconToolButton {
     id: root

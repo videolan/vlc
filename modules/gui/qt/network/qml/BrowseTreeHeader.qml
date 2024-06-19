@@ -23,7 +23,6 @@ import QtQuick.Templates as T
 
 
 import VLC.Util
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Network

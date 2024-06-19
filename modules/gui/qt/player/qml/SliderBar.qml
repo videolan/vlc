@@ -25,7 +25,6 @@ import Qt5Compat.GraphicalEffects
 import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Util
 
 T.ProgressBar {

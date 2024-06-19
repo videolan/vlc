@@ -23,7 +23,7 @@ import QtQuick.Templates as T
 
 
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 T.Slider {
     id: control

@@ -27,6 +27,7 @@ import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
 import VLC.Style
+import VLC.Util
 
 T.ItemDelegate {
     id: root

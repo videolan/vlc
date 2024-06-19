@@ -26,8 +26,6 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
-
 
 Control {
     padding: VLCStyle.focus_border

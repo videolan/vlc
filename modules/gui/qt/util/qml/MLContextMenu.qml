@@ -22,7 +22,7 @@ import VLC.MainInterface
 import VLC.MediaLibrary
 import VLC.Dialogs
 
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 // @brief - a generic ML context menu
 NativeMenu {

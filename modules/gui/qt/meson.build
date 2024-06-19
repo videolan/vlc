@@ -782,7 +782,6 @@ qml_modules += {
     'target' : 'util',
     'outdir' : 'VLC/Util',
     'sources': files(
-        'util/qml/Helpers.js',
         'util/qml/ModelSortSettingHandler.qml',
         'util/qml/FlickableScrollHandler.qml',
         'util/qml/ViewDragAutoScrollHandler.qml',
@@ -792,6 +791,9 @@ qml_modules += {
         'util/qml/NativeMenu.qml',
         'util/qml/MLContextMenu.qml',
         'util/qml/FadeControllerStateGroup.qml'
+    ),
+    'singletons': files(
+        'util/qml/Helpers.qml',
     ),
 }
 

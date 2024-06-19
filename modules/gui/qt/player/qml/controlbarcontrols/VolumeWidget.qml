@@ -23,10 +23,9 @@ import Qt5Compat.GraphicalEffects
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 import VLC.Style
 import VLC.Player
-import VLC.Util
 
 T.Pane {
     id: root

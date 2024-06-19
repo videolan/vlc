@@ -25,7 +25,7 @@ import QtQuick.Templates as T
 
 import VLC.MainInterface
 import VLC.Style
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 
 T.Pane {
     id: root

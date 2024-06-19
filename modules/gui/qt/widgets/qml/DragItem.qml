@@ -28,7 +28,6 @@ import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Playlist as Playlist
-import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Util
 
 Item {

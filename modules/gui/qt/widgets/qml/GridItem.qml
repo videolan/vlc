@@ -23,7 +23,7 @@ import QtQml.Models
 
 
 import VLC.Widgets as Widgets
-import "qrc:///VLC/Util/Helpers.js" as Helpers
+import VLC.Util
 import VLC.Style
 
 T.ItemDelegate {
