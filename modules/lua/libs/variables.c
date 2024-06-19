@@ -67,7 +67,10 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
                 lua_pushinteger( L, val.i_int );
             break;
         case VLC_VAR_STRING:
-            lua_pushstring( L, val.psz_string );
+            if (val.psz_string)
+                lua_pushstring( L, val.psz_string );
+            else
+                lua_pushstring( L, "" );
             break;
         case VLC_VAR_FLOAT:
             lua_pushnumber( L, val.f_float );
