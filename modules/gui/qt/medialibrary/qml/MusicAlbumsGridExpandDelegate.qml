@@ -240,7 +240,7 @@ FocusScope {
                         Widgets.SubtitleLabel {
                             id: expand_infos_title_id
 
-                            text: root.model?.title ?? qsTr("Unknown title")
+                            text: root.model?.title || qsTr("Unknown title")
 
                             color: theme.fg.primary
 
@@ -266,9 +266,10 @@ FocusScope {
                         color: theme.fg.secondary
 
                         width: parent.width
+
                         text: qsTr("%1 - %2 - %3 - %4")
-                            .arg(root.model?.main_artist ?? qsTr("Unknown artist"))
-                            .arg(root.model?.release_year ?? "")
+                            .arg(root.model?.main_artist || qsTr("Unknown artist"))
+                            .arg(root.model?.release_year || "")
                             .arg(_getStringTrack())
                             .arg(root.model?.duration?.formatHMS() ?? 0)
                     }
