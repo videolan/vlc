@@ -315,8 +315,6 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
         CMTime hostTime = CMTimeAdd(CMClockGetTime(CMClockGetHostTimeClock()),
                                     CMTimeMake(delta, CLOCK_FREQ));
         CMTime time = CMTimeMake(_ptsSamples, _sampleRate);
-
-        _sync.delaysRateChangeUntilHasSufficientMediaData = NO;
         [_sync setRate:1.0f time:time atHostTime:hostTime];
     }
 
@@ -465,6 +463,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
         goto error;
     }
 
+    _sync.delaysRateChangeUntilHasSufficientMediaData = NO;
     [_sync addRenderer:_renderer];
 
     _ptsSamples = -1;
