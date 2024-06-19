@@ -39,7 +39,8 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 #include <libavutil/pixdesc.h>
-#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#include "avcommon_compat.h"
+#if LIBAVUTIL_VERSION_CHECK( 55, 16, 101 )
 #include <libavutil/mastering_display_metadata.h>
 #endif
 
@@ -995,7 +996,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     decoder_sys_t *p_sys = p_dec->p_sys;
     bool format_changed = false;
 
-#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#if LIBAVUTIL_VERSION_CHECK( 55, 16, 101 )
 #define FROM_AVRAT(default_factor, avrat) \
 (uint64_t)(default_factor) * (avrat).num / (avrat).den
     const AVFrameSideData *metadata =
@@ -1050,7 +1051,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
 #undef FROM_AVRAT
     }
 #endif
-#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 60, 100 ) )
+#if LIBAVUTIL_VERSION_CHECK( 55, 60, 100 )
     const AVFrameSideData *metadata_lt =
             av_frame_get_side_data( frame,
                                     AV_FRAME_DATA_CONTENT_LIGHT_LEVEL );
