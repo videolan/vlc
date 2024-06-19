@@ -98,6 +98,26 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
     _outChain = NULL;
     _outChainLast = &_outChain;
 
+    /* The first call to CMAudioFormatDescriptionCreate() might take some time
+     * (between 200 and 600ms) as it is initializing some static context/libs.
+     * Therefore, call it from the Open() callback with dummy params. Indeed,
+     * the playback is not yet started and a longer Open() call won't mess with
+     * playback timings. */
+    static const AudioStreamBasicDescription dummyDesc = {
+        .mSampleRate = 48000,
+        .mFormatID = kAudioFormatLinearPCM,
+        .mFormatFlags = kAudioFormatFlagsNativeFloatPacked,
+        .mChannelsPerFrame = 2,
+        .mFramesPerPacket = 1,
+        .mBitsPerChannel = 32,
+    };
+    CMAudioFormatDescriptionRef dummyFmtDesc;
+    OSStatus status =
+        CMAudioFormatDescriptionCreate(kCFAllocatorDefault, &dummyDesc, 0, nil,
+                                       0, nil, nil, &dummyFmtDesc);
+    if (status == noErr)
+        CFRelease(dummyFmtDesc);
+
     self = [super init];
     if (self == nil)
         return nil;
