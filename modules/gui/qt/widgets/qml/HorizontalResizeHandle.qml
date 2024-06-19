@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
+import VLC.MainInterface
 import VLC.Style
 import org.videolan.vlc 0.1
 

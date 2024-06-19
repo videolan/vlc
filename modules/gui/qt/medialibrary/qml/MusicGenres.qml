@@ -25,11 +25,11 @@ import VLC.MediaLibrary
 
 import VLC.Util
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 
-MainInterface.MainViewLoader {
+MainViewLoader {
     id: root
 
     // Properties
@@ -120,7 +120,7 @@ MainInterface.MainViewLoader {
         id: gridComponent
         Widgets.ExpandGridItemView {
             id: gridView_id
-            
+
             basePictureWidth: VLCStyle.gridCover_video_width
             basePictureHeight: VLCStyle.gridCover_video_width / 2
             titleHeight: 0
@@ -213,7 +213,7 @@ MainInterface.MainViewLoader {
     Component {
         id: tableComponent
         /* Table View */
-        MainInterface.MainTableView {
+        MainTableView {
             id: tableView_id
 
             property var _modelSmall: [{

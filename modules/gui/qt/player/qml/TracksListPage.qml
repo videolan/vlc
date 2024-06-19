@@ -24,6 +24,7 @@ import QtQml.Models
 
 import org.videolan.vlc 0.1
 
+import VLC.MainInterface
 import VLC.Style
 import VLC.Player
 import VLC.Widgets as Widgets

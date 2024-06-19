@@ -29,6 +29,7 @@ import Qt5Compat.GraphicalEffects
 
 import org.videolan.vlc 0.1
 
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util

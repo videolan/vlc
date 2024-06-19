@@ -21,6 +21,7 @@
 import QtQuick
 
 import org.videolan.vlc 0.1
+import VLC.MainInterface
 import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets

@@ -26,7 +26,7 @@ import VLC.MediaLibrary
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 
 VideoAll {
     id: root

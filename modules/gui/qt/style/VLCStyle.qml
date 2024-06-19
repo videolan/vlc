@@ -19,6 +19,7 @@ pragma Singleton
 import QtQuick
 import QtQuick.Controls
 import org.videolan.vlc 0.1
+import VLC.MainInterface
 import VLC.Style
 
 QtObject {

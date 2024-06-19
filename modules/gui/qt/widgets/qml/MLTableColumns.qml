@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 
+import VLC.MainInterface
 import VLC.MediaLibrary
 
 

@@ -22,11 +22,11 @@ import org.videolan.vlc 0.1
 
 import VLC.Util
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 
-MainInterface.MainViewLoader {
+MainViewLoader {
     id: root
 
     // Properties
@@ -180,7 +180,7 @@ MainInterface.MainViewLoader {
     Component {
         id: tableComponent
 
-        MainInterface.MainTableView {
+        MainTableView {
             id: tableView_id
 
             property var _modelSmall: [{

@@ -21,6 +21,7 @@
 
 import QtQuick
 
+import VLC.MainInterface
 import VLC.MediaLibrary
 
 DragItem {

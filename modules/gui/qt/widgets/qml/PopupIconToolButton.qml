@@ -23,6 +23,7 @@ import QtQuick.Controls
 
 import org.videolan.vlc 0.1
 
+import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 import "qrc:///VLC/Util/Helpers.js" as Helpers

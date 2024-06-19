@@ -26,7 +26,7 @@ import org.videolan.vlc 0.1
 import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import VLC.Style
 
 FocusScope {
@@ -450,7 +450,7 @@ FocusScope {
     Component {
         id: tableComponent
 
-        MainInterface.MainTableView {
+        MainTableView {
             id: tableView_id
 
             model: trackModel

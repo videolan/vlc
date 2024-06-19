@@ -24,10 +24,10 @@ import VLC.MediaLibrary
 
 import VLC.Util
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import VLC.Style
 
-MainInterface.MainTableView {
+MainTableView {
     id: listView_id
 
     //---------------------------------------------------------------------------------------------

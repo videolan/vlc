@@ -23,6 +23,7 @@ import QtQuick.Templates as T
 
 import org.videolan.vlc 0.1
 
+import VLC.MainInterface
 import VLC.Style
 
 T.Switch {

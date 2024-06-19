@@ -171,9 +171,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     engine->addImportPath(":/");
 
-    qmlRegisterModule("VLC.MainInterface", 1, 0);
-    qmlProtectModule("VLC.MainInterface", 1);
-
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
     engine->addImageProvider(QStringLiteral("vlcaccess"), new VLCAccessImageProvider());
@@ -231,29 +228,31 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 0;
         const int versionMinor = 1;
 
+        qmlRegisterModule(uri, versionMajor, versionMinor);
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.MainInterface";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
         qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
         qmlRegisterUncreatableType<SearchCtx>(uri, versionMajor, versionMinor, "SearchCtx", "");
         qmlRegisterUncreatableType<SortCtx>(uri, versionMajor, versionMinor, "SortCtx", "");
-
         qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::callback);
-
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
-
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
-
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
-
         qmlRegisterUncreatableType<BaseModel>( uri, versionMajor, versionMinor, "BaseModel", "Base Model is uncreatable." );
-
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );
-
         qmlRegisterUncreatableType<CSDButton>(uri, versionMajor, versionMinor, "CSDButton", "");
         qmlRegisterUncreatableType<CSDButtonModel>(uri, versionMajor, versionMinor, "CSDButtonModel", "has CSD buttons and provides for communicating CSD events between UI and backend");
-
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
+        qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
 

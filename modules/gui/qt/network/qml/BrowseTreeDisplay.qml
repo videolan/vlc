@@ -23,11 +23,11 @@ import org.videolan.vlc 0.1
 import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import VLC.Style
 import VLC.Network
 
-MainInterface.MainViewLoader {
+MainViewLoader {
     id: root
 
     // Properties
@@ -145,7 +145,7 @@ MainInterface.MainViewLoader {
             subtitleHeight: 0
 
             maxNbItemPerRow: 12
-            
+
             selectionModel: root.selectionModel
             model: root.model
 
@@ -204,7 +204,7 @@ MainInterface.MainViewLoader {
     Component{
         id: tableComponent
 
-        MainInterface.MainTableView {
+        MainTableView {
             id: tableView
 
             property Component thumbnailHeader: Widgets.TableHeaderDelegate {

@@ -23,11 +23,11 @@ import org.videolan.vlc 0.1
 
 import VLC.Util
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 
-MainInterface.MainViewLoader {
+MainViewLoader {
     id: root
 
     // Properties
@@ -35,7 +35,7 @@ MainInterface.MainViewLoader {
     readonly property int currentIndex: currentItem?.currentIndex ?? - 1
 
     property Component header: null
-    
+
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
@@ -87,7 +87,7 @@ MainInterface.MainViewLoader {
             basePictureWidth: VLCStyle.gridCover_music_width
             basePictureHeight: VLCStyle.gridCover_music_height
             titleTopMargin: VLCStyle.gridItemTitle_topMargin + VLCStyle.margin_xxsmall
-            
+
             selectionModel: root.selectionModel
             model: artistModel
             focus: true
@@ -143,7 +143,7 @@ MainInterface.MainViewLoader {
     Component {
         id: tableComponent
 
-        MainInterface.MainTableView {
+        MainTableView {
             id: artistTable
 
             property var _modelSmall: [{

@@ -23,7 +23,7 @@ import Qt5Compat.GraphicalEffects
 import org.videolan.vlc 0.1
 
 import VLC.Style
-import VLC.MainInterface as Main
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Playlist
 import VLC.Player
@@ -171,7 +171,7 @@ FocusScope {
         Navigation.parentItem: g_mainDisplay
 
         /* Source selection*/
-        Main.BannerSources {
+        BannerSources {
             id: sourcesBanner
             z: 2
             Layout.preferredHeight: height

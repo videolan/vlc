@@ -18,6 +18,7 @@
 
 import QtQuick
 
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Style

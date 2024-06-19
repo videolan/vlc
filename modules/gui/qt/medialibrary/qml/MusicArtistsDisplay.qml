@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Util
 import VLC.Widgets as Widgets
-import VLC.MainInterface as MainInterface
+import VLC.MainInterface
 import VLC.Style
 
 

@@ -20,6 +20,7 @@ import QtQuick.Controls
 import QtQml.Models
 import QtQuick.Layouts
 
+import VLC.MainInterface
 import VLC.MediaLibrary
 import org.videolan.vlc 0.1
 

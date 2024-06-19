@@ -19,6 +19,7 @@ import QtQuick
 
 import org.videolan.vlc 0.1
 
+import VLC.MainInterface
 import VLC.Player
 import VLC.PlayerControls
 import VLC.Style

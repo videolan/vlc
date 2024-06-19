@@ -27,13 +27,13 @@ import VLC.MediaLibrary
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
-import VLC.MainInterface    as MainInterface
+import VLC.MainInterface
 import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 import VLC.Dialogs
 
-MainInterface.MainViewLoader {
+MainViewLoader {
     id: root
 
     //---------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ MainInterface.MainViewLoader {
     readonly property int currentIndex: currentItem?.currentIndex ?? -1
 
     property Component header: null
-    
+
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
@@ -341,7 +341,7 @@ MainInterface.MainViewLoader {
     Component {
         id: table
 
-        MainInterface.MainTableView {
+        MainTableView {
             id: tableView
 
             //-------------------------------------------------------------------------------------
