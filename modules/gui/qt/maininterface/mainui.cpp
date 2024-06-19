@@ -177,8 +177,6 @@ bool MainUI::setup(QQmlEngine* engine)
     qmlProtectModule("VLC.Menus", 1);
     qmlRegisterModule("VLC.PlayerControls", 1, 0);
     qmlProtectModule("VLC.PlayerControls", 1);
-    qmlRegisterModule("VLC.Style", 1, 0);
-    qmlProtectModule("VLC.Style", 1);
     qmlRegisterModule("VLC.Util", 1, 0);
     qmlProtectModule("VLC.Util", 1);
 
@@ -257,10 +255,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<SVGColorImageBuilder>(uri, versionMajor, versionMinor, "SVGColorImageBuilder", "");
 
         qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
-        qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
-        qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
-        qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "ColorProperty", "");
-        qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
+
 
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
 
@@ -362,6 +357,20 @@ void MainUI::registerQMLTypes()
 
         qmlRegisterType<NetworkMediaContextMenu>( uri, versionMajor, versionMinor, "NetworkMediaContextMenu" );
         qmlRegisterType<NetworkDeviceContextMenu>( uri, versionMajor, versionMinor, "NetworkDeviceContextMenu" );
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.Style";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
+        qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
+        qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
+        qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "ColorProperty", "");
+        qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
