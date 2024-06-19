@@ -407,7 +407,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         ret = avcodec_receive_frame( ctx, frame );
         if( ret == 0 )
         {
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+#if LIBAVUTIL_VERSION_CHECK(57, 24, 100)
             int channels = frame->ch_layout.nb_channels;
 #else
             int channels = ctx->channels;
