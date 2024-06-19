@@ -95,8 +95,7 @@ int IOWriteTyped(void *opaque, const uint8_t *buf, int buf_size,
  *****************************************************************************/
 int avformat_OpenMux( vlc_object_t *p_this )
 {
-#if LIBAVFORMAT_VERSION_MICRO >= 100 && \
-    LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(59, 0, 100)
+#if LIBAVFORMAT_VERSION_CHECK(59, 0, 100)
     const AVOutputFormat *file_oformat;
 #else
     AVOutputFormat *file_oformat;
@@ -104,8 +103,7 @@ int avformat_OpenMux( vlc_object_t *p_this )
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     bool dummy = !strcmp( p_mux->p_access->psz_access, "dummy");
 
-#if ( (LIBAVFORMAT_VERSION_MICRO >= 100) \
-      && (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(58, 7, 100)) )
+#if LIBAVFORMAT_VERSION_MICRO >= 100 && !(LIBAVFORMAT_VERSION_CHECK(58, 7, 100))
     if( dummy && strlen(p_mux->p_access->psz_path)
                               >= sizeof (((AVFormatContext *)NULL)->filename) )
         return VLC_EGENERIC;
@@ -144,8 +142,7 @@ int avformat_OpenMux( vlc_object_t *p_this )
     p_sys->oc->oformat = file_oformat;
     /* If we use dummy access, let avformat write output */
     if( dummy )
-#if ( (LIBAVFORMAT_VERSION_MICRO >= 100) \
-      && (LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 7, 100)) )
+#if LIBAVFORMAT_VERSION_CHECK(58, 7, 100)
         p_sys->oc->url = av_strdup(p_mux->p_access->psz_path);
 #else
         strcpy( p_sys->oc->filename, p_mux->p_access->psz_path );
@@ -397,7 +394,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         pkt->dts = p_data->i_dts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num;
 
-#if LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(59, 2, 103)
+#if LIBAVFORMAT_VERSION_MICRO >= 100 && !(LIBAVFORMAT_VERSION_CHECK(59, 2, 103))
     /* this is another hack to prevent libavformat from triggering the "non monotone timestamps" check in avformat/utils.c */
     p_stream->cur_dts = ( p_data->i_dts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num ) - 1;

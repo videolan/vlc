@@ -126,6 +126,14 @@
 #ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
 # include <libavformat/avformat.h>
 
+/* check the FFmpeg libavformat version */
+#define LIBAVFORMAT_VERSION_CHECK( a, d, e ) \
+    (LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, d, e ) )
+
+/* LIBAV_FORMAT_VERSION_CHECK checks for the right libavformat version of libav and FFmpeg
+ * a is the major version
+ * b and c the minor and micro versions of libav
+ * d and e the minor and micro versions of FFmpeg */
 #define LIBAV_FORMAT_VERSION_CHECK( a, b, c, d, e ) \
     ( (LIBAVFORMAT_VERSION_MICRO <  100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, b, c ) ) || \
       (LIBAVFORMAT_VERSION_MICRO >= 100 && LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT( a, d, e ) ) )
