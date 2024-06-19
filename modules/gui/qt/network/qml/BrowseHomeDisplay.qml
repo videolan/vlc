@@ -25,7 +25,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
 import VLC.MainInterface as MainInterface
-import VLC.Util as Util
+import VLC.Util
 import VLC.Style
 import VLC.Network
 
@@ -146,7 +146,7 @@ FocusScope {
         contentWidth: column.width
         contentHeight: column.height
 
-        Util.FlickableScrollHandler { }
+        FlickableScrollHandler { }
 
         Navigation.parentItem: root
 

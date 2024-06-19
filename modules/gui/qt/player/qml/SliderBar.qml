@@ -27,7 +27,7 @@ import VLC.Player
 import VLC.Widgets as Widgets
 import VLC.Style
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import VLC.Util as Util
+import VLC.Util
 
 T.ProgressBar {
     id: control
@@ -100,7 +100,7 @@ T.ProgressBar {
                                                         : (control.visualPosition * control.width), 0)
     }
 
-    Util.FSM {
+    FSM {
         id: fsm
         signal playerUpdatePosition(real position)
         signal pressControl(real position, bool forcePrecise)
@@ -137,7 +137,7 @@ T.ProgressBar {
             Player.position = position
         }
 
-        Util.FSMState {
+        FSMState {
             id: fsmReleased
 
             transitions: ({
@@ -156,7 +156,7 @@ T.ProgressBar {
             })
         }
 
-        Util.FSMState  {
+        FSMState  {
             id: fsmHeld
 
             transitions: ({
@@ -174,7 +174,7 @@ T.ProgressBar {
             })
         }
 
-        Util.FSMState  {
+        FSMState  {
             id: fsmHeldWrongInput
 
             function enter() {

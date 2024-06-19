@@ -23,7 +23,7 @@ import Qt5Compat.GraphicalEffects
 import org.videolan.vlc 0.1
 
 import VLC.Style
-import VLC.Util as Util
+import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 ListView {
@@ -286,7 +286,7 @@ ListView {
         }
     }
 
-    Util.FlickableScrollHandler { }
+    FlickableScrollHandler { }
 
     // FIXME: This is probably not useful anymore.
     Connections {

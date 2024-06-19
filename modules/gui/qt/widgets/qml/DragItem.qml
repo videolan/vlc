@@ -29,7 +29,7 @@ import VLC.Style
 import VLC.Widgets as Widgets
 import VLC.Playlist as Playlist
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import VLC.Util as Util
+import VLC.Util
 
 Item {
     id: dragItem
@@ -239,7 +239,7 @@ Item {
         }
     }
 
-    Util.FSM {
+    FSM {
         id: fsm
 
         signal startDrag()
@@ -260,7 +260,7 @@ Item {
 
         initialState: fsmDragInactive
 
-        Util.FSMState {
+        FSMState {
             id: fsmDragInactive
 
             function enter() {
@@ -275,7 +275,7 @@ Item {
             })
         }
 
-        Util.FSMState {
+        FSMState {
             id: fsmDragActive
 
             initialState: fsmRequestData
@@ -301,7 +301,7 @@ Item {
                 stopDrag: fsmDragInactive
             })
 
-            Util.FSMState {
+            FSMState {
                 id: fsmRequestData
 
                 function enter() {
@@ -324,7 +324,7 @@ Item {
                 })
             }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmRequestInputItem
 
                 function enter() {
@@ -347,7 +347,7 @@ Item {
                 })
             }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmLoadingDone
 
                 function enter() {
@@ -362,7 +362,7 @@ Item {
                 }
             }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmLoadingFailed
                 function enter() {
                     _pendingNativeDragStart = false

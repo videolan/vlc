@@ -26,7 +26,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Style
 import "qrc:///VLC/Util/Helpers.js" as Helpers
-import VLC.Util as Util
+import VLC.Util
 
 FocusScope {
     id: root
@@ -763,7 +763,7 @@ FocusScope {
             }
         }
 
-        Util.FlickableScrollHandler { }
+        FlickableScrollHandler { }
 
         Loader {
             id: headerItemLoader

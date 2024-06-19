@@ -25,6 +25,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Style
 import VLC.Player
+import VLC.Util
 import VLC.Widgets as Widgets
 
 TracksPage {

@@ -20,6 +20,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 
 import VLC.Style
+import VLC.Util
 
 DoubleShadow {
     id: root

@@ -20,6 +20,7 @@ import QtQuick
 import Qt5Compat.GraphicalEffects
 
 import VLC.Style
+import VLC.Util
 
 // This item can be used as a layer effect.
 // Make sure that the sampler name is set to "source" (default).

@@ -26,7 +26,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
 import VLC.MainInterface    as MainInterface
-import VLC.Util    as Util
+import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 
@@ -53,7 +53,7 @@ MainInterface.MainViewLoader {
     required  property string sectionProperty
 
     // NOTE: The ContextMenu depends on the model so we have to provide it too.
-    required property Util.MLContextMenu contextMenu
+    required property MLContextMenu contextMenu
 
     // function(model) -> [strings....]
     // used to get grid labels per model item

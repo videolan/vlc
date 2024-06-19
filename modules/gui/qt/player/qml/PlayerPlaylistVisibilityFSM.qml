@@ -18,7 +18,7 @@
 import QtQuick
 import org.videolan.vlc 0.1
 
-import VLC.Util as Util
+import VLC.Util
 
 /**
  * playlist visibility state machine
@@ -39,7 +39,7 @@ import VLC.Util as Util
  * @enduml
  *
  */
-Util.FSM {
+FSM {
     id: fsm
 
     //incoming signals
@@ -64,7 +64,7 @@ Util.FSM {
         updateVideoEmbed: fsm.updateVideoEmbed
     })
 
-    Util.FSMState {
+    FSMState {
         id: fsmFloating
 
         transitions: ({
@@ -78,12 +78,12 @@ Util.FSM {
         })
     }
 
-    Util.FSMState {
+    FSMState {
         id: fsmDocked
 
         initialState: MainCtx.hasEmbededVideo ? fsmForceHidden : fsmFollowVisible
 
-        Util.FSMState {
+        FSMState {
             id: fsmFollowVisible
 
             initialState: MainCtx.playlistVisible ? fsmVisible : fsmHidden
@@ -99,7 +99,7 @@ Util.FSM {
                 }
             })
 
-            Util.FSMState {
+            FSMState {
                 id: fsmVisible
 
                 transitions: ({
@@ -114,7 +114,7 @@ Util.FSM {
                 })
             }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmHidden
 
                 transitions: ({
@@ -130,7 +130,7 @@ Util.FSM {
             }
         }
 
-        Util.FSMState {
+        FSMState {
             id: fsmForceHidden
 
             transitions: ({

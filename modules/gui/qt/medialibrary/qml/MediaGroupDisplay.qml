@@ -24,7 +24,7 @@ import org.videolan.vlc 0.1
 import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
-import VLC.Util as Util
+import VLC.Util
 import VLC.Style
 
 VideoAll {
@@ -52,7 +52,7 @@ VideoAll {
         ml: MediaLib
     }
 
-    contextMenu: Util.MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
+    contextMenu: MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
 
     header: Widgets.ViewHeader {
         view: root

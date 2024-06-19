@@ -24,6 +24,7 @@ import org.videolan.vlc 0.1
 
 import VLC.Dialogs
 import VLC.Widgets as Widgets
+import VLC.Util
 import VLC.Style
 
 Item {

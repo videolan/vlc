@@ -20,6 +20,7 @@
 import QtQuick
 
 import Qt5Compat.GraphicalEffects
+import VLC.Util
 
 Item {
     id: rootItem

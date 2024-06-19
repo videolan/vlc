@@ -26,6 +26,7 @@ import VLC.Widgets as Widgets
 import "qrc:///VLC/util/Helpers.js" as Helpers
 import VLC.Network
 import VLC.Style
+import VLC.Util
 
 Widgets.GridItem {
     id: root

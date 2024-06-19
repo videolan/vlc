@@ -26,6 +26,7 @@ import org.videolan.vlc 0.1
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Network
+import VLC.Util
 
 Widgets.TableRowDelegate {
     id: root

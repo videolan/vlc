@@ -19,8 +19,9 @@
 import QtQml
 
 import org.videolan.vlc 0.1 as VLC
+import VLC.Util
 
-VLC.FlickableScrollHandler {
+FlickableScrollHandler {
     id: handler
 
     scaleFactor: VLC.MainCtx.intfScaleFactor

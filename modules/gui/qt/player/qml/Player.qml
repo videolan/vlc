@@ -31,7 +31,7 @@ import VLC.Player
 import VLC.PlayerControls
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Dialogs
-import VLC.Util as Util
+import VLC.Util
 
 FocusScope {
     id: rootPlayer
@@ -330,7 +330,7 @@ FocusScope {
             History.previous()
         }
 
-        Util.FadeControllerStateGroup {
+        FadeControllerStateGroup {
             target: topBar
         }
 
@@ -836,7 +836,7 @@ FocusScope {
             color: windowTheme.bg.primary
         }
 
-        Util.FadeControllerStateGroup {
+        FadeControllerStateGroup {
             target: controlBar
         }
     }

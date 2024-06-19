@@ -26,6 +26,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
 import VLC.Player
+import VLC.Util
 
 AbstractButton {
     id: root

@@ -30,6 +30,7 @@ import VLC.Style
 import VLC.Playlist
 import VLC.Widgets as Widgets
 import VLC.Menus as Menus
+import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 
 T.ToolBar {

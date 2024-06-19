@@ -21,6 +21,7 @@ import QtQuick
 import org.videolan.vlc 0.1
 
 import VLC.Style
+import VLC.Util
 
 // A convenience file to encapsulate two drop shadow images stacked on top
 // of each other

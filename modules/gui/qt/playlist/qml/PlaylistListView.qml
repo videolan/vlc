@@ -24,7 +24,7 @@ import QtQml.Models
 import org.videolan.vlc 0.1
 
 import VLC.Widgets as Widgets
-import VLC.Util as Util
+import VLC.Util
 import VLC.Playlist
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
@@ -255,12 +255,12 @@ T.Pane {
             model: root.model
 
             Binding on fadingEdge.enableBeginningFade {
-                when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Backward)
+                when: (autoScroller.scrollingDirection === ViewDragAutoScrollHandler.Direction.Backward)
                 value: false
             }
 
             Binding on fadingEdge.enableEndFade {
-                when: (autoScroller.scrollingDirection === Util.ViewDragAutoScrollHandler.Direction.Forward)
+                when: (autoScroller.scrollingDirection === ViewDragAutoScrollHandler.Direction.Forward)
                 value: false
             }
 
@@ -290,7 +290,7 @@ T.Pane {
                 }
             }
 
-            Util.ViewDragAutoScrollHandler {
+            ViewDragAutoScrollHandler {
                 id: autoScroller
 
                 view: listView

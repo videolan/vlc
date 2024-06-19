@@ -23,7 +23,7 @@ import QtQuick.Layouts
 import VLC.MediaLibrary
 import org.videolan.vlc 0.1
 
-import VLC.Util as Util
+import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.MainInterface as MainInterface
 import VLC.Style

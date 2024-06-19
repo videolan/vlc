@@ -27,7 +27,7 @@ import org.videolan.vlc 0.1
 import VLC.Style
 import VLC.Player
 import VLC.Widgets as Widgets
-import VLC.Util as Util
+import VLC.Util
 import VLC.Dialogs
 
 RowLayout {

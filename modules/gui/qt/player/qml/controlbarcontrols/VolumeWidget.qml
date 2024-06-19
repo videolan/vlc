@@ -26,6 +26,7 @@ import VLC.Widgets as Widgets
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 import VLC.Player
+import VLC.Util
 
 T.Pane {
     id: root

@@ -24,7 +24,7 @@ import org.videolan.vlc 0.1
 import VLC.MediaLibrary
 
 import VLC.Widgets as Widgets
-import VLC.Util as Util
+import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
 import VLC.Menus
@@ -53,7 +53,7 @@ VideoAll {
 
     model: _meta?.model ?? null
 
-    contextMenu: Util.MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
+    contextMenu: MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
 
     gridLabels: _meta?.gridLabels ?? root.getLabel
 

@@ -17,7 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtTest
-import VLC.Util as Util
+import VLC.Util
 
 TestCase {
     id: root
@@ -29,7 +29,7 @@ TestCase {
         events.push(e)
     }
 
-    Util.FSM {
+    FSM {
         id: fsm
         initialState: fsmA
 
@@ -53,7 +53,7 @@ TestCase {
 
         property bool selfTransitionDone: false
 
-        Util.FSMState {
+        FSMState {
             id: fsmA
             objectName: "fsmA"
 
@@ -67,7 +67,7 @@ TestCase {
                 recEvent("-A")
             }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmAA
                 objectName: "fsmAA"
 
@@ -85,7 +85,7 @@ TestCase {
                     signalInParent: fsmC,
                 })
 
-                Util.FSMState {
+                FSMState {
                     id: fsmAAA
                     objectName: "fsmAAA"
 
@@ -115,7 +115,7 @@ TestCase {
                     })
                 }
 
-                Util.FSMState {
+                FSMState {
                     id: fsmAAB
                     objectName: "fsmAAB"
 
@@ -137,7 +137,7 @@ TestCase {
                 }
             }
         }
-        Util.FSMState {
+        FSMState {
             id: fsmB
             objectName: "fsmB"
 
@@ -145,7 +145,7 @@ TestCase {
             function enter() { recEvent("+B") }
             function exit() {  recEvent("-B") }
 
-            Util.FSMState {
+            FSMState {
                 id: fsmBA
                 objectName: "fsmBA"
 
@@ -153,7 +153,7 @@ TestCase {
                 function exit() {  recEvent("-BA") }
             }
         }
-        Util.FSMState {
+        FSMState {
             id: fsmC
             objectName: "fsmC"
 
@@ -257,7 +257,7 @@ TestCase {
         check_active_inactive([fsmA, fsmAA, fsmAAA], [fsmAAB])
     }
 
-    Util.FSM {
+    FSM {
         id: fsmSeq
 
         signal atob()
@@ -271,7 +271,7 @@ TestCase {
         })
 
         initialState: seqA
-        Util.FSMState {
+        FSMState {
             id: seqA
             objectName: "seqA"
             function enter() { recEvent("+A")  }
@@ -282,7 +282,7 @@ TestCase {
 
             })
         }
-        Util.FSMState {
+        FSMState {
             id: seqB
             objectName: "seqB"
             function enter() { recEvent("+B") }
@@ -291,7 +291,7 @@ TestCase {
                 atob: seqA,
             })
         }
-        Util.FSMState {
+        FSMState {
             id: seqC
             objectName: "seqC"
             function enter() {
@@ -303,7 +303,7 @@ TestCase {
                 ctod: seqD,
             })
         }
-        Util.FSMState {
+        FSMState {
             id: seqD
             objectName: "seqD"
             function enter() { recEvent("+D") }
@@ -328,7 +328,7 @@ TestCase {
         check_active_inactive(data.active, data.inactive)
     }
 
-    Util.FSM {
+    FSM {
         id: fsmGuard
 
         signal success()
@@ -350,7 +350,7 @@ TestCase {
         })
 
         initialState: guardInit
-        Util.FSMState {
+        FSMState {
             id: guardInit
             objectName: "guardInit"
             transitions: ({
@@ -399,11 +399,11 @@ TestCase {
 
             })
         }
-        Util.FSMState {
+        FSMState {
             id: guardOK
             objectName: "guardOK"
         }
-        Util.FSMState {
+        FSMState {
             id: guardFail
             objectName: "guardFail"
         }
@@ -439,7 +439,7 @@ TestCase {
     }
 
 
-    Util.FSM {
+    FSM {
         id: fsmAction
 
         signal simple()
@@ -464,7 +464,7 @@ TestCase {
 
         initialState: actionA
 
-        Util.FSMState {
+        FSMState {
             id: actionA
             objectName: "actionA"
             initialState: actionAA
@@ -480,7 +480,7 @@ TestCase {
                 }
             })
 
-            Util.FSMState {
+            FSMState {
                 id: actionAA
                 objectName: "actionAA"
                 function enter() { recEvent("+AA") }
@@ -538,20 +538,20 @@ TestCase {
                 })
             }
         }
-        Util.FSMState {
+        FSMState {
             id: actionOK
             objectName: "actionOK"
              function enter() { recEvent("+OK") }
             function exit() { recEvent("-OK") }
 
         }
-        Util.FSMState {
+        FSMState {
             id: actionKO
             objectName: "actionKO"
             function enter() { recEvent("+KO") }
             function exit() { recEvent("-KO") }
         }
-        Util.FSMState {
+        FSMState {
             id: actionTransient
             objectName: "actionTransient"
             function enter() { recEvent("+T") }
@@ -590,7 +590,7 @@ TestCase {
 
 
     //check that the FSM hierarchy may contain other object than FSMState nodes
-    Util.FSM {
+    FSM {
         id: fsmMixed
         initialState: mixedA
 
@@ -602,7 +602,7 @@ TestCase {
             btoc: btoc,
         })
 
-        Util.FSMState {
+        FSMState {
             id: mixedA
             objectName: "mixedA"
 
@@ -614,7 +614,7 @@ TestCase {
             })
         }
 
-        Util.FSMState {
+        FSMState {
             id: mixedB
             objectName: "mixedB"
 
@@ -629,7 +629,7 @@ TestCase {
             })
         }
 
-        Util.FSMState {
+        FSMState {
             id: mixedC
             objectName: "mixedC"
         }

@@ -24,7 +24,7 @@ import QtQml.Models
 import org.videolan.vlc 0.1
 import VLC.MediaLibrary
 
-import VLC.Util as Util
+import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.Style
 
@@ -34,7 +34,7 @@ Widgets.ExpandGridItemView {
     // Properties
 
     property Widgets.MLDragItem dragItem
-    property Util.MLContextMenu contextMenu
+    property MLContextMenu contextMenu
     property var labels
 
     // Signals

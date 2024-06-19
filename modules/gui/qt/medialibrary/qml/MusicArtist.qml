@@ -23,7 +23,7 @@ import QtQuick.Layouts
 import VLC.MediaLibrary
 import org.videolan.vlc 0.1
 
-import VLC.Util as Util
+import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Widgets as Widgets
 import VLC.MainInterface as MainInterface
@@ -177,7 +177,7 @@ FocusScope {
                             root.setCurrentItemFocus(Qt.TabFocusReason);
                         }
 
-                        Util.GridSizeHelper {
+                        GridSizeHelper {
                             id: gridHelper
 
                             availableWidth: albumsList.width
@@ -333,13 +333,13 @@ FocusScope {
         parentId: albumModel.parentId
     }
 
-    Util.MLContextMenu {
+    MLContextMenu {
         id: contextMenu
 
         model: albumModel
     }
 
-    Util.MLContextMenu {
+    MLContextMenu {
         id: trackContextMenu
 
         model: trackModel
