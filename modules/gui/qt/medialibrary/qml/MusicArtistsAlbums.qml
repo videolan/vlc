@@ -125,7 +125,7 @@ FocusScope {
     Widgets.AcrylicBackground {
       id: artistListBackground
 
-      visible: artistModel.count > 0
+      visible: artistList.visible
       width: artistList.width
       height: artistList.height + artistList.displayMarginEnd
 
