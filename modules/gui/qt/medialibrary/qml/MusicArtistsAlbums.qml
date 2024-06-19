@@ -232,6 +232,7 @@ FocusScope {
 
             implicitWidth: VLCStyle.border
             color: artistList.colorContext.separator
+            visible: artistList.visible
         }
 
         MusicArtist {
