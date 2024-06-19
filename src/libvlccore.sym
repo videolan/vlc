@@ -235,10 +235,6 @@ vlc_readdir_helper_finish
 vlc_readdir_helper_additem
 intf_Create
 libvlc_InternalAddIntf
-libvlc_InternalDialogInit
-libvlc_InternalDialogClean
-libvlc_InternalKeystoreInit
-libvlc_InternalKeystoreClean
 libvlc_InternalPlay
 libvlc_InternalCleanup
 libvlc_InternalCreate
