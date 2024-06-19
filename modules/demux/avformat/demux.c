@@ -60,12 +60,6 @@
 # define AVF_MAYBE_CONST
 #endif
 
-#if (LIBAVFORMAT_VERSION_INT < AV_VERSION_INT(57, 80, 100))
-static void avio_context_free(AVIOContext **io)
-{
-    av_freep(io);
-}
-#endif
 
 struct avformat_track_s
 {

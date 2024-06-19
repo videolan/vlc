@@ -2602,9 +2602,9 @@ AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default dis
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 
-dnl We need >=57.37.100 from ffmpeg
-dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
-PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 57.37.100 libavutil >= 55.22.101],
+dnl We require ffmpeg >= 4.2
+dnl Ubuntu Focal (20.04 LTS) has 4.2, debian stable (bookworm) has 5.1
+PKG_HAVE_WITH_MODULES([AVCODEC], [libavcodec >= 58.54.100 libavutil >= 56.31.100],
                        [libavcodec codec (default enabled)], [yes])
 
 dnl
@@ -2764,7 +2764,7 @@ AS_HELP_STRING([--enable-avformat], [libavformat containers (default enabled)]),
 ])
 have_avformat="no"
 AS_IF([test "${enable_avformat}" != "no"], [
-  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 53.21.0 libavcodec libavutil], [
+  PKG_CHECK_MODULES(AVFORMAT,[libavformat >= 58.29.100 libavcodec libavutil], [
       have_avformat="yes"
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${AVFORMAT_CFLAGS}"
