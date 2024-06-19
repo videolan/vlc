@@ -790,6 +790,8 @@ check-local:
 	done
 	$(SHELL) $(srcdir)/check_headers $(pluginsinclude_HEADERS)
 
+include rust/Makefile.am
+
 FORCE:
 	@echo "Generated source cannot be phony. Go away." >&2
 	@exit 1
