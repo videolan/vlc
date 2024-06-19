@@ -25,6 +25,7 @@ import QtQuick.Window
 import org.videolan.vlc 0.1
 
 import VLC.Style
+import VLC.PlayerControls
 import VLC.Widgets as Widgets
 import VLC.Menus as Menus
 

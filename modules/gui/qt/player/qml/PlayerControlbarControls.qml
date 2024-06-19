@@ -22,7 +22,7 @@ import QtQml
 
 import org.videolan.vlc 0.1
 
-import VLC.PlayerControls as Controls
+import VLC.PlayerControls
 import VLC.Widgets as Widgets
 import VLC.Style
 

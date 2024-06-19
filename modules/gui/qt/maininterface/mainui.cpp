@@ -175,8 +175,6 @@ bool MainUI::setup(QQmlEngine* engine)
     qmlProtectModule("VLC.MainInterface", 1);
     qmlRegisterModule("VLC.Menus", 1, 0);
     qmlProtectModule("VLC.Menus", 1);
-    qmlRegisterModule("VLC.PlayerControls", 1, 0);
-    qmlProtectModule("VLC.PlayerControls", 1);
     qmlRegisterModule("VLC.Util", 1, 0);
     qmlProtectModule("VLC.Util", 1);
 
@@ -270,13 +268,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
         qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
 
-        qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");
-        qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
-        qmlRegisterUncreatableType<PlayerControlbarModel>(uri, versionMajor, versionMinor, "PlayerControlbarModel", "");
-        qmlRegisterUncreatableType<ControlListModel>( uri, versionMajor, versionMinor, "ControlListModel", "" );
-        qmlRegisterType<ControlListFilter>(uri, versionMajor, versionMinor, "ControlListFilter");
-        qmlRegisterSingletonType(uri, versionMajor, versionMinor, "PlayerListModel", PlayerControlbarModel::getPlaylistIdentifierListModel);
-
         qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );
         qmlRegisterType<SortMenu>( uri, versionMajor, versionMinor, "SortMenu" );
         qmlRegisterType<SortMenuVideo>( uri, versionMajor, versionMinor, "SortMenuVideo" );
@@ -323,6 +314,23 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<QmlRendererMenu>( uri, versionMajor, versionMinor, "QmlRendererMenu" );
         qmlRegisterType<QmlSubtitleMenu>( uri, versionMajor, versionMinor, "QmlSubtitleMenu" );
         qmlRegisterType<QmlAudioMenu>( uri, versionMajor, versionMinor, "QmlAudioMenu" );
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.PlayerControls";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
+        qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");
+        qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
+        qmlRegisterUncreatableType<PlayerControlbarModel>(uri, versionMajor, versionMinor, "PlayerControlbarModel", "");
+        qmlRegisterUncreatableType<ControlListModel>( uri, versionMajor, versionMinor, "ControlListModel", "" );
+        qmlRegisterType<ControlListFilter>(uri, versionMajor, versionMinor, "ControlListFilter");
+        qmlRegisterSingletonType(uri, versionMajor, versionMinor, "PlayerListModel", PlayerControlbarModel::getPlaylistIdentifierListModel);
+
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
