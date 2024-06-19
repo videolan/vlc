@@ -26,7 +26,6 @@ import org.videolan.vlc 0.1
 import VLC.Player
 import VLC.Style
 import VLC.Widgets as Widgets
-import VLC.Menus as Menus
 
 FocusScope {
     id: resumePanel

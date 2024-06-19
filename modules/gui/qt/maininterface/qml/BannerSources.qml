@@ -472,7 +472,7 @@ T.ToolBar {
 
                                 onClicked: contextMenu.popup(this.mapToGlobal(0, height))
 
-                                QmlGlobalMenu {
+                                Menus.QmlGlobalMenu {
                                     id: contextMenu
                                     ctx: MainCtx
                                 }

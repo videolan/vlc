@@ -27,6 +27,7 @@ import VLC.Widgets as Widgets
 import VLC.Util as Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers
 import VLC.Style
+import VLC.Menus
 
 VideoAll {
     id: root

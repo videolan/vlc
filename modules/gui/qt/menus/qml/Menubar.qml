@@ -23,7 +23,7 @@ import org.videolan.vlc 0.1
 import QtQuick.Layouts
 
 import VLC.Style
-
+import VLC.Menus
 
 Item {
     id: root

@@ -436,7 +436,7 @@ FocusScope{
 
             onHoveredChanged: root.requestLockUnlockAutoHide(hovered)
 
-            QmlGlobalMenu {
+            Menus.QmlGlobalMenu {
                 id: contextMenu
 
                 ctx: MainCtx

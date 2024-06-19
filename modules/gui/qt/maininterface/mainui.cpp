@@ -173,8 +173,6 @@ bool MainUI::setup(QQmlEngine* engine)
 
     qmlRegisterModule("VLC.MainInterface", 1, 0);
     qmlProtectModule("VLC.MainInterface", 1);
-    qmlRegisterModule("VLC.Menus", 1, 0);
-    qmlProtectModule("VLC.Menus", 1);
     qmlRegisterModule("VLC.Util", 1, 0);
     qmlProtectModule("VLC.Util", 1);
 
@@ -268,12 +266,6 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
         qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
 
-        qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );
-        qmlRegisterType<SortMenu>( uri, versionMajor, versionMinor, "SortMenu" );
-        qmlRegisterType<SortMenuVideo>( uri, versionMajor, versionMinor, "SortMenuVideo" );
-        qmlRegisterType<QmlGlobalMenu>( uri, versionMajor, versionMinor, "QmlGlobalMenu" );
-        qmlRegisterType<QmlMenuBar>( uri, versionMajor, versionMinor, "QmlMenuBar" );
-
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
 
         qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
@@ -293,6 +285,21 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
+
+        qmlRegisterModule(uri, versionMajor, versionMinor);
+        qmlProtectModule(uri, versionMajor);
+    }
+
+    {
+        const char* uri = "VLC.Menus";
+        const int versionMajor = 1;
+        const int versionMinor = 0;
+
+        qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );
+        qmlRegisterType<SortMenu>( uri, versionMajor, versionMinor, "SortMenu" );
+        qmlRegisterType<SortMenuVideo>( uri, versionMajor, versionMinor, "SortMenuVideo" );
+        qmlRegisterType<QmlGlobalMenu>( uri, versionMajor, versionMinor, "QmlGlobalMenu" );
+        qmlRegisterType<QmlMenuBar>( uri, versionMajor, versionMinor, "QmlMenuBar" );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);

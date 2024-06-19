@@ -19,7 +19,7 @@
 import QtQml
 
 import org.videolan.vlc 0.1
-
+import VLC.Menus
 
 // @brief - a class that can be used to create native menus with support
 // to asyncronously retreive data from MLBaseModel like model
