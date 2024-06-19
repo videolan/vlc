@@ -237,6 +237,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.MainInterface
         qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
         qmlRegisterUncreatableType<SearchCtx>(uri, versionMajor, versionMinor, "SearchCtx", "");
         qmlRegisterUncreatableType<SortCtx>(uri, versionMajor, versionMinor, "SortCtx", "");
@@ -261,6 +262,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Dialogs
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
         qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
@@ -276,6 +278,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Menus
         qmlRegisterType<StringListMenu>( uri, versionMajor, versionMinor, "StringListMenu" );
         qmlRegisterType<SortMenu>( uri, versionMajor, versionMinor, "SortMenu" );
         qmlRegisterType<SortMenuVideo>( uri, versionMajor, versionMinor, "SortMenuVideo" );
@@ -291,6 +294,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Player
         qmlRegisterUncreatableType<TrackListModel>(uri, versionMajor, versionMinor, "TrackListModel", "available tracks of a media (audio/video/sub)" );
         qmlRegisterUncreatableType<TitleListModel>(uri, versionMajor, versionMinor, "TitleListModel", "available titles of a media" );
         qmlRegisterUncreatableType<ChapterListModel>(uri, versionMajor, versionMinor, "ChapterListModel", "available chapters of a media" );
@@ -312,6 +316,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.PlayerControls
         qmlRegisterUncreatableType<ControlbarProfileModel>(uri, versionMajor, versionMinor, "ControlbarProfileModel", "");
         qmlRegisterUncreatableType<ControlbarProfile>(uri, versionMajor, versionMinor, "ControlbarProfile", "");
         qmlRegisterUncreatableType<PlayerControlbarModel>(uri, versionMajor, versionMinor, "PlayerControlbarModel", "");
@@ -329,6 +334,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Playlist
         qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "PlaylistItem", "");
         qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
         qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
@@ -344,6 +350,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Network
         qmlRegisterType<NetworkMediaModel>( uri, versionMajor, versionMinor, "NetworkMediaModel");
         qmlRegisterType<NetworkDeviceModel>( uri, versionMajor, versionMinor, "NetworkDeviceModel");
         qmlRegisterType<NetworkSourcesModel>( uri, versionMajor, versionMinor, "NetworkSourcesModel");
@@ -363,6 +370,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Style
         qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
         qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
         qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "ColorProperty", "");
@@ -377,6 +385,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Util
         qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
         qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
         qmlRegisterUncreatableType<SVGColorImageBuilder>(uri, versionMajor, versionMinor, "SVGColorImageBuilder", "");
@@ -400,6 +409,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.Widgets
         qmlRegisterType<RoundImage>( uri, versionMajor, versionMinor, "RoundImage" );
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
@@ -414,6 +424,7 @@ void MainUI::registerQMLTypes()
         const int versionMajor = 1;
         const int versionMinor = 0;
 
+        // @uri VLC.MediaLibrary
         qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
 
         qmlRegisterUncreatableType<MLItemId>( uri, versionMajor, versionMinor, "MLItemId", "");
