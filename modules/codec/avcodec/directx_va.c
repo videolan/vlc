@@ -284,7 +284,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
 
     /* VPx */
     { "VP8",                                                                          &DXVA_ModeVP8_VLD,                      8, 0, NULL },
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 57, 17, 100 ) && LIBAVCODEC_VERSION_MICRO >= 100
+#if LIBAVCODEC_VERSION_CHECK( 57, 17, 100 )
     { "VP9 profile 0",                                                                &DXVA_ModeVP9_VLD_Profile0,             8, AV_CODEC_ID_VP9, PROF_VP9_MAIN },
     { "VP9 profile 2",                                                                &DXVA_ModeVP9_VLD_10bit_Profile2,       10, AV_CODEC_ID_VP9, PROF_VP9_10 },
 #else
@@ -294,7 +294,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                8, 0, NULL },
 
     /* AV1 */
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 58, 112, 103 ) && LIBAVCODEC_VERSION_MICRO >= 100
+#if LIBAVCODEC_VERSION_CHECK( 58, 112, 103 )
     { "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, AV_CODEC_ID_AV1, PROF_AV1_MAIN },
     { "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,             10, AV_CODEC_ID_AV1, PROF_AV1_MAIN },
     { "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, AV_CODEC_ID_AV1, PROF_AV1_HIGH },
