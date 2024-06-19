@@ -13,6 +13,7 @@ BUILT_SOURCES = $(nodist_pluginsinclude_HEADERS)
 CLEANFILES = $(BUILT_SOURCES)
 
 SUFFIXES = .pc.in .pc .rc.in .rc
+TEST_EXTENSIONS =
 
 ###############################################################################
 # Headers
