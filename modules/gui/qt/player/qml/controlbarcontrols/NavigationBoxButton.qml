@@ -23,7 +23,6 @@ import VLC.Widgets as Widgets
 import VLC.Player
 import VLC.Style
 
-import org.videolan.vlc 0.1
 
 Widgets.IconToolButton {
     visible: Player.isInteractive

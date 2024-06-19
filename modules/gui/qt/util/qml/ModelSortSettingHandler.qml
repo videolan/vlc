@@ -18,7 +18,6 @@
  *****************************************************************************/
 import QtQml
 
-import org.videolan.vlc 0.1
 import VLC.MainInterface
 
 /**

@@ -20,7 +20,6 @@ import QtQuick.Layouts
 import QtQuick.Templates as T
 import Qt5Compat.GraphicalEffects
 
-import org.videolan.vlc 0.1
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets

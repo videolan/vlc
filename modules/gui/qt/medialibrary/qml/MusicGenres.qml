@@ -20,7 +20,6 @@ import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQml.Models
 
-import org.videolan.vlc 0.1
 import VLC.MediaLibrary
 
 import VLC.Util

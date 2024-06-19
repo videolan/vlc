@@ -19,7 +19,6 @@ import QtQuick
 import QtQuick.Controls
 import VLC.MainInterface
 import VLC.Style
-import org.videolan.vlc 0.1
 
 // targetWidth: concerned widget's current width
 // sourceWidth: target's width is bounded by this value (parent's width?)

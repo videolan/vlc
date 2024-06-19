@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import org.videolan.vlc 0.1
 
 import VLC.MainInterface
 import "qrc:///VLC/Util/Helpers.js" as Helpers

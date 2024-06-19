@@ -24,7 +24,6 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Player
 
-import org.videolan.vlc 0.1
 
 Widgets.IconToolButton {
 

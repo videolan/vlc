@@ -224,15 +224,6 @@ QQuickItem* MainUI::createRootItem()
 void MainUI::registerQMLTypes()
 {
     {
-        const char* uri = "org.videolan.vlc";
-        const int versionMajor = 0;
-        const int versionMinor = 1;
-
-        qmlRegisterModule(uri, versionMajor, versionMinor);
-        qmlProtectModule(uri, versionMajor);
-    }
-
-    {
         const char* uri = "VLC.MainInterface";
         const int versionMajor = 1;
         const int versionMinor = 0;

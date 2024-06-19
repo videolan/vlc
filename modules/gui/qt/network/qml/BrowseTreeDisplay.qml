@@ -18,7 +18,6 @@
 import QtQuick
 import QtQuick.Layouts
 
-import org.videolan.vlc 0.1
 
 import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers

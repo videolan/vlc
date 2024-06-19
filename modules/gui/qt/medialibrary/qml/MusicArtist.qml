@@ -21,7 +21,6 @@ import QtQml.Models
 import QtQuick.Layouts
 
 import VLC.MediaLibrary
-import org.videolan.vlc 0.1
 
 import VLC.Util
 import "qrc:///VLC/Util/Helpers.js" as Helpers

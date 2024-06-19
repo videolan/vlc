@@ -20,7 +20,6 @@ import QtQuick.Controls
 import QtQml.Models
 import QtQml
 
-import org.videolan.vlc 0.1
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets

@@ -20,7 +20,6 @@
 import QtQuick
 import QtQuick.Window
 
-import org.videolan.vlc 0.1
 import VLC.MainInterface
 
 Item {

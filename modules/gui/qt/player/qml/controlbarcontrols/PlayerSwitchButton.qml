@@ -21,7 +21,6 @@ import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 
-import org.videolan.vlc 0.1
 
 Widgets.IconToolButton {
     text: VLCIcons.fullscreen

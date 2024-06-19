@@ -18,7 +18,6 @@
 
 import QtQml
 
-import org.videolan.vlc 0.1 as VLC
 import VLC.MainInterface
 import VLC.Util
 
