@@ -3,3 +3,4 @@ members = [
     "vlcrs-messages",
     "vlcrs-sys-generator"
 ]
+resolver = "2"
