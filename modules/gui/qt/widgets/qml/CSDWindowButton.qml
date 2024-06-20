@@ -20,8 +20,7 @@ import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
-
-import "."
+import VLC.Widgets as Widgets
 import VLC.MainInterface
 import VLC.Style
 
@@ -63,7 +62,7 @@ T.Button {
     }
 
     contentItem: Item {
-        IconLabel {
+        Widgets.IconLabel {
             id: icon
             anchors.centerIn: parent
             text: control.iconTxt

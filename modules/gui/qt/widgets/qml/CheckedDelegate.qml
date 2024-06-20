@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Templates as T
 
-import "."
+import VLC.Widgets as Widgets
 import VLC.Style
 
 T.ItemDelegate {
@@ -47,14 +47,14 @@ T.ItemDelegate {
         enabled: control.enabled
     }
 
-    background: AnimatedBackground {
+    background: Widgets.AnimatedBackground {
         enabled: theme.initialized
         color: control.checked ? theme.bg.highlight : theme.bg.primary
         border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
     contentItem: Item { // don't use a row, it will move text when control is unchecked
-        IconLabel {
+        Widgets.IconLabel {
             id: checkIcon
 
             height: parent.height
@@ -70,7 +70,7 @@ T.ItemDelegate {
             font.pixelSize: VLCStyle.icon_track
         }
 
-        MenuLabel {
+        Widgets.MenuLabel {
             id: text
 
             anchors.left: checkIcon.right

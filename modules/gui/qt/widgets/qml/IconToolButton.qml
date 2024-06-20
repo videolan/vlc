@@ -23,7 +23,6 @@ import QtQuick.Templates as T
 import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
-import "."
 
 T.ToolButton {
     id: control
@@ -90,7 +89,7 @@ T.ToolButton {
         pressed: control.down
     }
 
-    background: AnimatedBackground {
+    background: Widgets.AnimatedBackground {
         implicitWidth: control.font.pixelSize
         implicitHeight: control.font.pixelSize
 
@@ -101,7 +100,7 @@ T.ToolButton {
         border.color: visualFocus ? theme.visualFocus : "transparent"
     }
 
-    contentItem: IconLabel {
+    contentItem: Widgets.IconLabel {
         text: control.text
 
         color: control.color

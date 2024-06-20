@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 
 import VLC.MainInterface
 import VLC.Style
-import "."
+import VLC.Widgets as Widgets
 
 T.Button {
     id: control
@@ -49,7 +49,7 @@ T.Button {
     T.ToolTip.delay: VLCStyle.delayToolTipAppear
     T.ToolTip.text: description
 
-    contentItem: IconLabel {
+    contentItem: Widgets.IconLabel {
         font: control.font
         color: control.color
         text: control.text

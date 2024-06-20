@@ -20,7 +20,7 @@ import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
-import "."
+import VLC.Widgets
 import VLC.MainInterface
 import VLC.Style
 import VLC.Util
@@ -186,7 +186,7 @@ FocusScope {
                 }
             }
 
-            header: MenuLabel {
+            header: Widgets.MenuLabel {
                 font.pixelSize: VLCStyle.fontSize_xlarge
                 text: listView.currentModel.title
 
@@ -273,7 +273,7 @@ FocusScope {
 
                         Component {
                             id: fontIcon
-                            IconLabel {
+                            Widgets.IconLabel {
                                 horizontalAlignment: Text.AlignHCenter
                                 text: modelData.fontIcon
                                 color: theme.fg.primary
@@ -282,7 +282,7 @@ FocusScope {
 
                         Component {
                             id: tickMark
-                            ListLabel {
+                            Widgets.ListLabel {
                                 horizontalAlignment: Text.AlignHCenter
                                 text: "✓"
                                 color: theme.fg.primary
@@ -300,7 +300,7 @@ FocusScope {
                         }
                     }
 
-                    ListLabel {
+                    Widgets.ListLabel {
                         id: textLabel
 
                         Layout.fillWidth: true
@@ -314,7 +314,7 @@ FocusScope {
                         Accessible.ignored: true
                     }
 
-                    ListLabel {
+                    Widgets.ListLabel {
                         Layout.alignment: Qt.AlignHCenter
 
                         horizontalAlignment: Text.AlignHCenter

@@ -480,7 +480,7 @@ Item {
         border.width: VLCStyle.dp(1, VLCStyle.scale)
         border.color: theme.border
 
-        MenuLabel {
+        Widgets.MenuLabel {
             anchors.fill: parent
 
             verticalAlignment: Text.AlignVCenter
