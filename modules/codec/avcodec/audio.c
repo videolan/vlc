@@ -41,6 +41,8 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 
+#define API_CHANNEL_LAYOUT_STRUCT (LIBAVCODEC_VERSION_CHECK(59, 24, 100)) // AVCodecContext.ch_layout
+
 #define API_CHANNEL_LAYOUT (LIBAV_UTIL_VERSION_CHECK( 52, 2, 6, 0, 100))
 
 #if API_CHANNEL_LAYOUT
@@ -142,7 +144,7 @@ static int OpenAudioCodec( decoder_t *p_dec )
     }
 
     ctx->sample_rate = p_dec->fmt_in.audio.i_rate;
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100) && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
     av_channel_layout_default( &ctx->ch_layout, p_dec->fmt_in.audio.i_channels );
 #else
     ctx->channels = p_dec->fmt_in.audio.i_channels;
@@ -598,7 +600,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     p_dec->fmt_out.audio.i_rate = p_sys->p_context->sample_rate;
 
     /* */
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT
     if( p_sys->i_previous_channels == p_sys->p_context->ch_layout.nb_channels &&
         p_sys->i_previous_layout == p_sys->p_context->ch_layout.u.mask )
         return;
@@ -622,7 +624,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
 
     int i_channels_src = 0, channel_count;
     uint64_t channel_layout_mask;
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT
     channel_layout_mask = p_sys->p_context->ch_layout.u.mask;
     channel_count = p_sys->p_context->ch_layout.nb_channels;
 #elif API_CHANNEL_LAYOUT
