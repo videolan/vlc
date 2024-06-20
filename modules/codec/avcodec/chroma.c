@@ -33,6 +33,7 @@
  * Only libavutil can be depended on here.
  */
 #include "chroma.h"
+#include "avcommon_compat.h"
 
 /*****************************************************************************
  * Chroma fourcc -> libavutil pixfmt mapping
@@ -121,7 +122,7 @@ static const struct
     {VLC_CODEC_UYVY, AV_PIX_FMT_UYVY422,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_YVYU, AV_PIX_FMT_YVYU422,  COLOR_RANGE_UNDEF },
 
-#if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 34, 100)
+#if LIBAVUTIL_VERSION_CHECK(57, 34, 100)
     {VLC_CODEC_VUYA, AV_PIX_FMT_VUYX,     COLOR_RANGE_UNDEF },
 #endif
 
