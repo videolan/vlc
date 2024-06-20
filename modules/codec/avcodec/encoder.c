@@ -48,6 +48,8 @@
 #include "avcodec.h"
 #include "avcommon.h"
 
+#define API_CHANNEL_LAYOUT_STRUCT (LIBAVCODEC_VERSION_CHECK(59, 24, 100)) // AVCodecContext.ch_layout
+
 #define HURRY_UP_GUARD1 VLC_TICK_FROM_MS(450)
 #define HURRY_UP_GUARD2 VLC_TICK_FROM_MS(300)
 #define HURRY_UP_GUARD3 VLC_TICK_FROM_MS(100)
@@ -172,7 +174,7 @@ static const uint64_t pi_channels_map[][2] =
     { AV_CH_STEREO_RIGHT,      0 },
 };
 
-#if !LIBAVCODEC_VERSION_CHECK(59, 24, 100)
+#if !API_CHANNEL_LAYOUT_STRUCT
 static const uint32_t channel_mask[][2] = {
     {0,0},
     {AOUT_CHAN_CENTER, AV_CH_LAYOUT_MONO},
@@ -778,7 +780,7 @@ int InitVideoEnc( vlc_object_t *p_this )
         int i_channels_src = 0;
 
         msg_Dbg( p_enc, "Creating channel order for reordering");
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100) && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
         av_channel_layout_default( &p_context->ch_layout, p_enc->fmt_out.audio.i_channels );
         uint64_t channel_mask = p_context->ch_layout.u.mask;
 #else
@@ -933,7 +935,7 @@ errmsg:
 
         if( p_enc->fmt_out.audio.i_channels > 2 )
         {
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100) && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
             av_channel_layout_default( &p_context->ch_layout, 2 );
 #else
             p_context->channels = 2;
@@ -1298,7 +1300,7 @@ static block_t *handle_delay_buffer( encoder_t *p_enc, encoder_sys_t *p_sys, uns
     av_frame_unref( p_sys->frame );
     p_sys->frame->format     = p_sys->p_context->sample_fmt;
     p_sys->frame->nb_samples = leftover_samples + p_sys->i_samples_delay;
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100) && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
     av_channel_layout_copy(&p_sys->frame->ch_layout, &p_sys->p_context->ch_layout);
 #else
     p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
@@ -1432,7 +1434,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
         else
             p_sys->frame->nb_samples = p_sys->i_frame_size;
         p_sys->frame->format = p_sys->p_context->sample_fmt;
-#if LIBAVCODEC_VERSION_CHECK(59, 24, 100) && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
+#if API_CHANNEL_LAYOUT_STRUCT && LIBAVUTIL_VERSION_CHECK(57, 24, 100)
         av_channel_layout_copy(&p_sys->frame->ch_layout, &p_sys->p_context->ch_layout);
 #else
         p_sys->frame->channel_layout = p_sys->p_context->channel_layout;
