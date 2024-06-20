@@ -305,7 +305,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                8, {1, 1}, 0, NULL, 0 },
 
     /* AV1 */
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 58, 112, 103 )
+#if LIBAVCODEC_VERSION_CHECK( 58, 112, 103 )
     { "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 },
     { "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 },
     { "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, {1, 1}, AV_CODEC_ID_AV1, PROF_AV1_HIGH, 0 },
