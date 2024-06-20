@@ -139,7 +139,7 @@
 
     if (@available(macOS 10.14, *)) {
         self.floatOnTopButton.contentTintColor =
-            floatOnTopEnabled ? NSColor.controlAccentColor : NSColor.controlTextColor;
+            floatOnTopEnabled ? NSColor.controlAccentColor : nil;
     }
 }
 
