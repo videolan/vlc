@@ -217,8 +217,3 @@ int ffmpeg_OpenCodec( decoder_t *p_dec, AVCodecContext *, const AVCodec * );
    "for encoding the audio bitstream. It takes the following options: " \
    "main, low, ssr (not supported),ltp, hev1, hev2 (default: low). " \
    "hev1 and hev2 are currently supported only with libfdk-aac enabled libavcodec" )
-
-#ifndef AV_VERSION_INT
-#   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
-#endif
-
