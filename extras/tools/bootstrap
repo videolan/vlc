@@ -134,6 +134,23 @@ else
 fi
 }
 
+check_config() {
+    # always install it for now as we need the arm64_32 patch
+    NEEDED="$NEEDED configguess"
+# # TODO find the relevant config.guess
+# AUTOMAKE_DATA_DIRS=$(foreach n,$(foreach n,$(subst :, ,$(shell echo $$PATH)),$(abspath $(n)/../share)),$(wildcard $(n)/automake*))
+# for dir in $AUTOMAKE_DATA_DIRS; do
+#     if test -f "$dir/config.sub" -a -f "$dir/config.guess"; then
+#         # check if it's recent enough
+#         DIR_VERSION=$("$dir/config.guess" --time-stamp | sed -e 's/-/./g')
+#         check_version "$dir/config.guess" $2 $DIR_VERSION
+#         # cp "$dir/config.sub" "$dir/config.guess" $(UNPACK_DIR);
+#         break
+#     fi
+# done
+}
+
+check_config 2024.01.01
 check autoconf 2.69
 check automake 1.15
 check m4 1.4.16

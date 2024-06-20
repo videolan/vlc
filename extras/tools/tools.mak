@@ -165,6 +165,25 @@ CLEAN_PKG += xz
 DISTCLEAN_PKG += xz-$(XZ_VERSION).tar.bz2
 CLEAN_FILE += .buildxz
 
+# config.guess
+
+config.guess:UNPACK_DIR=.
+config.guess:
+	$(call download_pkg,$(CONFIGGUESS_URL),config.guess)
+	$(APPLY) $(TOOLS)/config.guess-config-add-support-for-arm64_32.patch
+
+config.sub:UNPACK_DIR=.
+config.sub:
+	$(call download_pkg,$(CONFIGSUB_URL),config.sub)
+	$(APPLY) $(TOOLS)/config.sub-config-add-support-for-arm64_32.patch
+
+.buildconfigguess: config.guess config.sub
+	# install in a dummy automake so that VLC contribs pick it
+	install -d "$(PREFIX)/share/automake000"
+	install config.guess "$(PREFIX)/share/automake000"
+	install config.sub "$(PREFIX)/share/automake000"
+	touch $@
+
 # autoconf
 
 autoconf-$(AUTOCONF_VERSION).tar.gz:

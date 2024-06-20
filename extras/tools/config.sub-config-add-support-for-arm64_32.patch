@@ -1,0 +1,25 @@
+From 1d28edfb0574c77591403f133d42e0edf7d037e1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Felix=20Paul=20K=C3=BChne?= <felix@feepk.net>
+Date: Wed, 19 Jun 2024 13:59:41 +0200
+Subject: [PATCH] config: add support for arm64_32
+
+---
+ config.sub   | 2 +-
+ 1 files changed, 1 insertions(+), 1 deletion(-)
+
+diff --git a/config.sub b/config.sub
+index 2c6a07ab..b7f358cb 100755
+--- a/config.sub
++++ b/config.sub
+@@ -1181,7 +1181,7 @@ case $cpu-$vendor in
+ 		case $cpu in
+ 			1750a | 580 \
+ 			| a29k \
+-			| aarch64 | aarch64_be | aarch64c | arm64ec \
++			| aarch64 | aarch64_be | aarch64c | arm64ec | aarch64_32 | arm64_32 \
+ 			| abacus \
+ 			| alpha | alphaev[4-8] | alphaev56 | alphaev6[78] \
+ 			| alpha64 | alpha64ev[4-8] | alpha64ev56 | alpha64ev6[78] \
+-- 
+2.32.1 (Apple Git-133)
+
