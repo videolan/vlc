@@ -189,8 +189,10 @@ config.sub:
 autoconf-$(AUTOCONF_VERSION).tar.gz:
 	$(call download_pkg,$(AUTOCONF_URL),autoconf)
 
-autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
+autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz .configguess
 	$(UNPACK)
+	@-cp config.guess $(UNPACK_DIR)/build-aux
+	@-cp config.sub $(UNPACK_DIR)/build-aux
 	$(MOVE)
 
 .buildautoconf: autoconf .pkg-config .m4
@@ -206,10 +208,12 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 automake-$(AUTOMAKE_VERSION).tar.gz:
 	$(call download_pkg,$(AUTOMAKE_URL),automake)
 
-automake: automake-$(AUTOMAKE_VERSION).tar.gz
+automake: automake-$(AUTOMAKE_VERSION).tar.gz .configguess
 	$(UNPACK)
 	$(APPLY) $(TOOLS)/automake-disable-documentation.patch
 	$(APPLY) $(TOOLS)/automake-clang.patch
+	@-cp config.guess $(UNPACK_DIR)/lib
+	@-cp config.sub $(UNPACK_DIR)/lib
 	$(MOVE)
 
 .buildautomake: automake .autoconf
