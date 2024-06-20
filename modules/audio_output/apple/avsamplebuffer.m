@@ -74,8 +74,10 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
 
     int64_t _ptsSamples;
     vlc_tick_t _firstPts;
+    vlc_tick_t _lastDate;
     unsigned _sampleRate;
     BOOL _stopped;
+    BOOL _dateReached;
 }
 @end
 
@@ -229,7 +231,9 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
         [self stopSyncRenderer];
 
     _ptsSamples = -1;
+    _dateReached = NO;
     _firstPts = VLC_TICK_INVALID;
+    _lastDate = VLC_TICK_INVALID;
 }
 
 - (void)pause:(BOOL)pause date:(vlc_tick_t)date
@@ -252,12 +256,65 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     aout_TimingReport(_aout, system_now, pos_ticks);
 }
 
+- (void)startNow:(vlc_tick_t)delta
+{
+    assert(!_dateReached);
+
+    _dateReached = YES;
+    CMTime time = CMTimeMake(0, _sampleRate);
+    [_sync setRate:1.0f time:time];
+
+    const CMTime interval = CMTimeMake(CLOCK_FREQ, CLOCK_FREQ);
+    __weak typeof(self) weakSelf = self;
+    _observer = [_sync addPeriodicTimeObserverForInterval:interval
+                                                    queue:_timeQueue
+                                               usingBlock:^ (CMTime time){
+        [weakSelf whenTimeObserved:time];
+    }];
+}
+
 - (void)whenDataReady
 {
     vlc_mutex_lock(&_bufferLock);
 
-    while (_renderer.readyForMoreMediaData)
+    while (_renderer.readyForMoreMediaData || !_dateReached)
     {
+        if (!_dateReached)
+        {
+            /* Start playback at the requested date */
+
+            CMTime writtenTime = CMTimeMake(_ptsSamples, _sampleRate);
+            vlc_tick_t writtenTicks = [VLCAVSample CMTimeTotick:writtenTime];
+            vlc_tick_t now = vlc_tick_now();
+            vlc_tick_t deadline = _lastDate - writtenTicks;
+            vlc_tick_t delta = deadline - now;
+
+            if (delta <= 0)
+            {
+                msg_Dbg(_aout, "starting late (%"PRId64" us)", delta);
+                [self startNow:delta];
+            }
+            else
+            {
+                msg_Dbg(_aout, "deferring start (%"PRId64" us)", delta);
+
+                int timeout = 0;
+                /* Wait for the start date if there are no buffers to enqueue */
+                while (!_stopped && _outChain == NULL && timeout == 0)
+                {
+                    timeout = vlc_cond_timedwait(&_bufferWait, &_bufferLock,
+                                                 deadline);
+                    deadline = _lastDate - writtenTicks;
+                }
+
+                if (timeout != 0)
+                {
+                    msg_Dbg(_aout, "started");
+                    [self startNow:0];
+                }
+            }
+        }
+
         while (!_stopped && _outChain == NULL)
             vlc_cond_wait(&_bufferWait, &_bufferLock);
 
@@ -296,27 +353,15 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     if (_ptsSamples == -1)
     {
         _stopped = NO;
+        _firstPts = block->i_pts;
+        _ptsSamples = 0;
 
         __weak typeof(self) weakSelf = self;
         [_renderer requestMediaDataWhenReadyOnQueue:_dataQueue usingBlock:^{
             [weakSelf whenDataReady];
         }];
-
-        _firstPts = block->i_pts;
-        const CMTime interval = CMTimeMake(CLOCK_FREQ, CLOCK_FREQ);
-        _observer = [_sync addPeriodicTimeObserverForInterval:interval
-                                                        queue:_timeQueue
-                                                   usingBlock:^ (CMTime time){
-            [weakSelf whenTimeObserved:time];
-        }];
-
-        _ptsSamples = 0;
-        vlc_tick_t delta = date - vlc_tick_now();
-        CMTime hostTime = CMTimeAdd(CMClockGetTime(CMClockGetHostTimeClock()),
-                                    CMTimeMake(delta, CLOCK_FREQ));
-        CMTime time = CMTimeMake(_ptsSamples, _sampleRate);
-        [_sync setRate:1.0f time:time atHostTime:hostTime];
     }
+    _lastDate = date;
 
     block_ChainLastAppend(&_outChainLast, block);
 
@@ -334,12 +379,13 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 {
     _sync.rate = 0.0f;
 
-    [_sync removeTimeObserver:_observer];
-
     [_renderer stopRequestingMediaData];
     [_renderer flush];
 
     vlc_mutex_lock(&_bufferLock);
+    if (_dateReached)
+        [_sync removeTimeObserver:_observer];
+
     _stopped = YES;
 
     block_ChainRelease(_outChain);
@@ -466,8 +512,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     _sync.delaysRateChangeUntilHasSufficientMediaData = NO;
     [_sync addRenderer:_renderer];
 
+    _stopped = NO;
+    _dateReached = NO;
+
     _ptsSamples = -1;
     _firstPts = VLC_TICK_INVALID;
+    _lastDate = VLC_TICK_INVALID;
     _sampleRate = fmt->i_rate;
     _bytesPerFrame = desc.mBytesPerFrame;
 
