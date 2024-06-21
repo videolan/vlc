@@ -55,7 +55,7 @@ struct vlc_aout_stream
         float rate; /**< Play-out speed rate */
         vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
-        bool discontinuity;
+        bool played;
         vlc_tick_t request_delay;
         vlc_tick_t delay;
     } sync;
@@ -157,7 +157,7 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
 
 static void stream_Discontinuity(vlc_aout_stream *stream)
 {
-    stream->sync.discontinuity = true;
+    stream->sync.played = false;
 
     vlc_mutex_lock(&stream->timing.lock);
     stream->timing.first_pts = VLC_TICK_INVALID;
@@ -502,13 +502,13 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
      * is not portable, not supported by some hardware and often unsafe/buggy
      * where supported. The other alternative is to flush the buffers
      * completely. */
-    if (drift > (stream->sync.discontinuity ? 0
-                : lroundf(+3 * AOUT_MAX_PTS_DELAY / rate)))
+    if (drift > (stream->sync.played ?
+                 lroundf(+3 * AOUT_MAX_PTS_DELAY / rate) : 0))
     {
         if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "late_flush");
 
-        if (!stream->sync.discontinuity)
+        if (stream->sync.played)
             msg_Warn (aout, "playback way too late (%"PRId64"): "
                       "flushing buffers", drift);
         else
@@ -522,10 +522,10 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
 
     /* Early audio output.
      * This is rare except at startup when the buffers are still empty. */
-    if (drift < (stream->sync.discontinuity ? 0
-                : lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate)))
+    if (drift < (stream->sync.played ?
+                 lroundf(-3 * AOUT_MAX_PTS_ADVANCE / rate) : 0))
     {
-        if (!stream->sync.discontinuity)
+        if (stream->sync.played)
         {
             if (tracer != NULL)
                 vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "early_silence");
@@ -655,7 +655,7 @@ static void stream_Synchronize(vlc_aout_stream *stream, vlc_tick_t system_now,
         if (stream_GetDelay(stream, &delay) != 0)
             return; /* nothing can be done if timing is unknown */
 
-        if (stream->sync.discontinuity)
+        if (!stream->sync.played)
         {
             /* Chicken-egg situation for some aout modules that can't be
              * started deferred (like alsa). These modules will start to play
@@ -782,7 +782,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     vlc_audio_meter_Process(&owner->meter, block, play_date);
 
     /* Output */
-    stream->sync.discontinuity = false;
+    stream->sync.played = true;
     stream->timing.played_samples += block->i_nb_samples;
     aout->play(aout, block, play_date);
 
