@@ -29,6 +29,9 @@ if test -d ${VLC_TOOLS}/share/aclocal; then
   # https://www.gnu.org/software/automake/manual/html_node/Macro-Search-Path.html
   ACLOCAL_ARGS="${ACLOCAL_ARGS} -I ${VLC_TOOLS}/share/aclocal/"
 fi
+if test -f ${VLC_TOOLS}/share/autoconf-vlc/build-aux/config.guess -a -f ${VLC_TOOLS}/share/autoconf-vlc/build-aux/config.sub; then
+  export autom4te_buildauxdir="$( cd "${VLC_TOOLS}/share/autoconf-vlc/build-aux" ; pwd -P )"
+fi
 
 ###
 ###  Get a sane environment, just in case
