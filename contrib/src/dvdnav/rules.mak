@@ -29,7 +29,6 @@ DEPS_dvdnav = dvdread $(DEPS_dvdread)
 
 .dvdnav: dvdnav
 	$(REQUIRE_GPL)
-	$(RECONF) -I m4
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)

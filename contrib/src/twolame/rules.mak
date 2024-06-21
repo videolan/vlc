@@ -23,7 +23,6 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz .sum-twolame
 TWOLAME_CONF := CFLAGS="${CFLAGS} -DLIBTWOLAME_STATIC"
 
 .twolame: twolame
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(TWOLAME_CONF)
 	+$(MAKEBUILD)

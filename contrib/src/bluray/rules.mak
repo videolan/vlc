@@ -54,7 +54,6 @@ bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 
 .bluray: bluray
 	rm -rf $(PREFIX)/share/java/libbluray*.jar
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(BLURAY_CONF)
 	+$(MAKEBUILD)

@@ -17,7 +17,6 @@ ffi: libffi-$(FFI_VERSION).tar.gz .sum-ffi
 	$(MOVE)
 
 .ffi: ffi
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)
