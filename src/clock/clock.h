@@ -323,10 +323,11 @@ vlc_clock_RemoveListener(vlc_clock_t *clock, vlc_clock_listener_id *listener_id)
  * This function converts a timestamp from stream to system
  *
  * @param clock the locked clock used by the source
+ * @param clock_id pointer to the clock id used for conversion. Can be NULL.
  * @return the valid system time
  */
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock,
                                      vlc_tick_t system_now, vlc_tick_t ts,
-                                     double rate);
+                                     double rate, uint32_t *clock_id);
 
 #endif /*CLOCK_H*/

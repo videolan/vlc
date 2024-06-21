@@ -776,11 +776,13 @@ static size_t spu_channel_UpdateDates(struct spu_channel *channel,
         assert(entry);
 
         entry->start = vlc_clock_ConvertToSystem(channel->clock, system_now,
-                                                 entry->orgstart, channel->rate);
+                                                 entry->orgstart, channel->rate,
+                                                 NULL);
 
         entry->stop =
             vlc_clock_ConvertToSystem(channel->clock, system_now,
-                                      entry->orgstop, channel->rate);
+                                      entry->orgstop, channel->rate,
+                                      NULL);
     }
     vlc_clock_Unlock(channel->clock);
 
@@ -2125,10 +2127,10 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         vlc_clock_Lock(channel->clock);
         subpic->i_start =
             vlc_clock_ConvertToSystem(channel->clock, system_now,
-                                      orgstart, channel->rate);
+                                      orgstart, channel->rate, NULL);
         subpic->i_stop =
             vlc_clock_ConvertToSystem(channel->clock, system_now,
-                                      orgstop, channel->rate);
+                                      orgstop, channel->rate, NULL);
         vlc_clock_Unlock(channel->clock);
 
         spu_channel_EarlyRemoveLate(sys, channel, system_now);

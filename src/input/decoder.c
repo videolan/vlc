@@ -991,7 +991,7 @@ static vlc_tick_t ModuleThread_GetDisplayDate( decoder_t *p_dec,
 
     vlc_clock_Lock( p_owner->p_clock );
     vlc_tick_t conv_ts =
-        vlc_clock_ConvertToSystem( p_owner->p_clock, system_now, i_ts, rate );
+        vlc_clock_ConvertToSystem( p_owner->p_clock, system_now, i_ts, rate, NULL );
     vlc_clock_Unlock( p_owner->p_clock );
     return conv_ts;
 }

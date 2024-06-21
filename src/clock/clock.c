@@ -902,11 +902,13 @@ vlc_tick_t vlc_clock_SetDelay(vlc_clock_t *clock, vlc_tick_t delay)
 
 vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock,
                                      vlc_tick_t system_now, vlc_tick_t ts,
-                                     double rate)
+                                     double rate, uint32_t *clock_id)
 {
     AssertLocked(clock);
     struct vlc_clock_context *ctx =
         vlc_clock_get_context(clock, system_now, ts, false);
+    if (clock_id != NULL)
+        *clock_id = ctx->clock_id;
 
     clock->last_conversion =
         clock->ops->to_system(clock, ctx, system_now, ts, rate);
