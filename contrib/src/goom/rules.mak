@@ -16,6 +16,7 @@ $(TARBALLS)/goom-$(GOOM_VERSION)-src.tar.gz:
 goom: goom-$(GOOM_VERSION)-src.tar.gz .sum-goom
 	$(UNPACK)
 	mv goom2k4-0 goom-2k4-0-src
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/goom/goom2k4-0-memleaks.patch
 	$(APPLY) $(SRC)/goom/goom2k4-autotools.patch
 	$(APPLY) $(SRC)/goom/goom2k4-noxmmx.patch

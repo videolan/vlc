@@ -13,6 +13,7 @@ $(TARBALLS)/libsmb2-$(SMB2_VERSION).tar.gz:
 
 smb2: libsmb2-$(SMB2_VERSION).tar.gz .sum-smb2
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 SMB2_CONF := --disable-examples --disable-werror --without-libkrb5

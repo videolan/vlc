@@ -14,6 +14,7 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.bz2:
 
 orc: orc-$(ORC_VERSION).tar.bz2 .sum-orc
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/orc/0001-Fix-usage-of-pthread_jit_write_protect_np-on-macOS-a.patch
 
 	# replace FORMAT_MESSAGE_ALLOCATE_BUFFER which may not be available in older mingw-w64 UWP

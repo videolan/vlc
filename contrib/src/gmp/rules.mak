@@ -27,6 +27,7 @@ $(TARBALLS)/gmp-$(GMP_VERSION).tar.bz2:
 
 gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/gmp/ppc64.patch
 	$(APPLY) $(SRC)/gmp/win-arm64.patch
 	$(APPLY) $(SRC)/gmp/arm64-Add-GSYM_PREFIX-to-function-calls-in-assembly.patch

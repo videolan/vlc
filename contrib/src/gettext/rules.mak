@@ -15,6 +15,7 @@ $(TARBALLS)/gettext-$(GETTEXT_VERSION).tar.gz:
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/gettext/0001-libasprintf-On-mingw-really-use-our-vasprintf-functi.patch
 	$(APPLY) $(SRC)/gettext/0002-libasprintf-Avoid-compilation-error-on-mingw-with-D_.patch
 	$(MOVE)

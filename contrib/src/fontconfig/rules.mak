@@ -15,6 +15,7 @@ $(TARBALLS)/fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz .sum-fontconfig
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/fontconfig/fontconfig-win32.patch
 	$(APPLY) $(SRC)/fontconfig/fontconfig-noxml2.patch

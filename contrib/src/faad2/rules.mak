@@ -18,6 +18,7 @@ $(TARBALLS)/faad2-$(FAAD2_VERSION_FIXED).tar.gz:
 
 faad2: faad2-$(FAAD2_VERSION_FIXED).tar.gz .sum-faad2
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 ifndef HAVE_FPU
 	$(APPLY) $(SRC)/faad2/faad2-fixed.patch
 endif
