@@ -178,10 +178,10 @@ config.sub:
 	$(APPLY) $(TOOLS)/config.sub-config-add-support-for-arm64_32.patch
 
 .buildconfigguess: config.guess config.sub
-	# install in a dummy automake so that VLC contribs pick it
-	install -d "$(PREFIX)/share/automake000"
-	install config.guess "$(PREFIX)/share/automake000"
-	install config.sub "$(PREFIX)/share/automake000"
+	# install in a dummy autoconf so that VLC contribs pick it
+	install -d           "$(PREFIX)/share/autoconf-vlc/build-aux"
+	install config.guess "$(PREFIX)/share/autoconf-vlc/build-aux"
+	install config.sub   "$(PREFIX)/share/autoconf-vlc/build-aux"
 	touch $@
 
 # autoconf
