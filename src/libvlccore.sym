@@ -855,6 +855,7 @@ vlc_player_CondWait
 vlc_player_DisplayPosition
 vlc_player_DecrementRate
 vlc_player_Delete
+vlc_player_GetAtoBLoop
 vlc_player_GetCapabilities
 vlc_player_GetCategoryDelay
 vlc_player_GetCategoryLanguage
