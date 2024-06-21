@@ -155,7 +155,7 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
     return 0;
 }
 
-static void stream_Discontinuity(vlc_aout_stream *stream)
+static void stream_ResetTimings(vlc_aout_stream *stream)
 {
     stream->sync.played = false;
 
@@ -212,7 +212,7 @@ static void stream_Reset(vlc_aout_stream *stream)
     atomic_store_explicit(&stream->drain_deadline, VLC_TICK_INVALID,
                           memory_order_relaxed);
 
-    stream_Discontinuity(stream);
+    stream_ResetTimings(stream);
 }
 
 /**
@@ -278,7 +278,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->sync.rate = 1.f;
     stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
     stream->sync.delay = stream->sync.request_delay = 0;
-    stream_Discontinuity(stream);
+    stream_ResetTimings(stream);
 
     atomic_init (&stream->buffers_lost, 0);
     atomic_init (&stream->buffers_played, 0);
@@ -735,7 +735,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
-        stream_Discontinuity(stream);
+        stream_ResetTimings(stream);
 
     if (stream->filters)
     {
@@ -789,7 +789,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     atomic_fetch_add_explicit(&stream->buffers_played, 1, memory_order_relaxed);
     return ret;
 drop:
-    stream_Discontinuity(stream);
+    stream_ResetTimings(stream);
     block_Release (block);
     atomic_fetch_add_explicit(&stream->buffers_lost, 1, memory_order_relaxed);
     return ret;
