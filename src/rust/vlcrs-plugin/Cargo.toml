@@ -1,0 +1,7 @@
+[package]
+name = "vlcrs-plugin"
+edition = "2021"
+version.workspace = true
+license.workspace = true
+
+[dependencies]
