@@ -85,6 +85,7 @@ typedef struct vout_thread_sys_t
 
     vlc_clock_t     *clock;
     vlc_clock_listener_id *clock_listener_id;
+    uint32_t clock_id;
     float           rate;
     vlc_tick_t      delay;
 
@@ -983,11 +984,25 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
 
             if (decoded) {
                 const vlc_tick_t system_now = vlc_tick_now();
+                uint32_t clock_id;
                 vlc_clock_Lock(sys->clock);
                 const vlc_tick_t system_pts =
                     vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                              decoded->date, sys->rate, NULL);
+                                              decoded->date, sys->rate, &clock_id);
                 vlc_clock_Unlock(sys->clock);
+                if (clock_id != sys->clock_id)
+                {
+                    sys->clock_id = clock_id;
+                    msg_Dbg(&vout->obj, "Using a new clock context (%u), "
+                            "flusing static filters", clock_id);
+
+                    /* Most deinterlace modules can't handle a PTS
+                     * discontinuity, so flush them.
+                     *
+                     * FIXME: Pass a discontinuity flag and handle it in
+                     * deinterlace modules. */
+                    filter_chain_VideoFlush(sys->filter.chain_static);
+                }
 
                 if (is_late_dropped && !decoded->b_force
                  && IsPictureLate(vout, decoded, system_now, system_pts))
@@ -1930,6 +1945,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     sys->clock = NULL;
     vlc_mutex_unlock(&sys->clock_lock);
     sys->str_id = NULL;
+    sys->clock_id = 0;
 }
 
 void vout_StopDisplay(vout_thread_t *vout)
@@ -2267,6 +2283,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     sys->delay = 0;
     sys->rate = 1.f;
     sys->str_id = cfg->str_id;
+    sys->clock_id = 0;
 
     vlc_mutex_lock(&sys->clock_lock);
     sys->clock = cfg->clock;
