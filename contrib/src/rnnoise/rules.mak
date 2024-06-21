@@ -16,6 +16,7 @@ $(TARBALLS)/rnnoise-$(RNNOISE_VERSION).tar.gz:
 
 rnnoise: rnnoise-$(RNNOISE_VERSION).tar.gz .sum-rnnoise
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 RNNOISE_CONF := --disable-examples --disable-doc

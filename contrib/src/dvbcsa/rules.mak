@@ -15,6 +15,7 @@ $(TARBALLS)/libdvbcsa-$(DVBCSA_VERSION).tar.gz:
 
 libdvbcsa: libdvbcsa-$(DVBCSA_VERSION).tar.gz .sum-dvbcsa
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/dvbcsa/0001-generate-pkgconfig.patch
 	$(MOVE)
 
