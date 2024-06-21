@@ -982,15 +982,15 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
             decoded = picture_fifo_Pop(sys->decoder_fifo);
 
             if (decoded) {
+                const vlc_tick_t system_now = vlc_tick_now();
+                vlc_clock_Lock(sys->clock);
+                const vlc_tick_t system_pts =
+                    vlc_clock_ConvertToSystem(sys->clock, system_now,
+                                              decoded->date, sys->rate, NULL);
+                vlc_clock_Unlock(sys->clock);
+
                 if (is_late_dropped && !decoded->b_force)
                 {
-                    const vlc_tick_t system_now = vlc_tick_now();
-                    vlc_clock_Lock(sys->clock);
-                    const vlc_tick_t system_pts =
-                        vlc_clock_ConvertToSystem(sys->clock, system_now,
-                                                  decoded->date, sys->rate, NULL);
-                    vlc_clock_Unlock(sys->clock);
-
                     if (IsPictureLate(vout, decoded, system_now, system_pts))
                     {
                         picture_Release(decoded);
