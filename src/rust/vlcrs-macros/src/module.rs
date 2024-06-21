@@ -616,7 +616,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
 
     let vlc_entry_config_params = params.as_ref().map(|params| {
         let params = params.params.iter().map(|param| {
-            let name = vlc_param_name(&module_info, &param);
+            let name = vlc_param_name(module_info, param);
             let name_with_nul = tt_c_str!(param.name.span() => name);
             let text_with_nul = tt_c_str!(param.text.span() => param.text.value());
             let long_text_with_nul = tt_c_str!(param.long_text.span() => param.long_text.value());
