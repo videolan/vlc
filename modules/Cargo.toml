@@ -1,0 +1,6 @@
+[workspace]
+resolver = "2"
+members = []
+
+[workspace.dependencies]
+vlcrs-messages = { path = "../src/rust/vlcrs-messages" }
