@@ -140,7 +140,7 @@ impl Parse for ModuleInfo {
                             _ => {
                                 return Err(Error::new_spanned(
                                     attr,
-                                    format!("unexcepted, try `#[prefix = \"...\"]`"),
+                                    "unexcepted, try `#[prefix = \"...\"]`",
                                 ));
                             }
                         }
