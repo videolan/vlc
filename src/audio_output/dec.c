@@ -331,11 +331,14 @@ void vlc_aout_stream_Delete (vlc_aout_stream *stream)
 
     if (stream->mixer_format.i_format)
     {
-        stream_Reset(stream);
         vlc_audio_meter_Reset(&owner->meter, NULL);
         if (stream->filters)
             aout_FiltersDelete (aout, stream->filters);
         aout_OutputDelete (aout);
+
+        vlc_clock_Lock(stream->sync.clock);
+        vlc_clock_Reset(stream->sync.clock);
+        vlc_clock_Unlock(stream->sync.clock);
     }
     if (stream->volume != NULL)
         aout_volume_Delete(stream->volume);

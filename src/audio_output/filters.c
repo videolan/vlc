@@ -144,7 +144,12 @@ static void aout_FiltersPipelineDestroy(struct aout_filter *tab, unsigned n)
         if (tab[i].vout != NULL)
             vout_Close(tab[i].vout);
         if (tab[i].clock != NULL)
+        {
+            vlc_clock_Lock(tab[i].clock);
+            vlc_clock_Reset(tab[i].clock);
+            vlc_clock_Unlock(tab[i].clock);
             vlc_clock_Delete(tab[i].clock);
+        }
     }
 }
 
