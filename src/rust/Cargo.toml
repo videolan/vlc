@@ -4,3 +4,7 @@ members = [
     "vlcrs-sys-generator"
 ]
 resolver = "2"
+
+[workspace.package]
+version = "4.0.0"
+license = "LGPL-2.1-or-later"
