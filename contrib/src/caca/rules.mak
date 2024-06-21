@@ -19,6 +19,7 @@ $(TARBALLS)/libcaca-$(CACA_VERSION).tar.gz:
 
 caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(APPLY) $(SRC)/caca/0001-win32-don-t-for-_WIN32_WINNT-to-Win2K.patch
@@ -28,7 +29,6 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/0005-canvas-use-GetCurrentProcessId-on-Windows.patch
 	$(APPLY) $(SRC)/caca/0006-stubs-include-winsock2.h-to-get-htons-htonl-declarat.patch
 	$(call pkg_static,"caca/caca.pc.in")
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 	mv caca/config.sub caca/config.guess caca/.auto
 

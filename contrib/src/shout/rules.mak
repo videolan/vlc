@@ -20,6 +20,7 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 # TODO: fix socket stuff on POSIX and Linux
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/shout/fix-xiph_openssl.patch
 	$(APPLY) $(SRC)/shout/shout-strings.patch
 	$(APPLY) $(SRC)/shout/shout-timeval.patch
@@ -33,7 +34,6 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/0001-Favor-GetCurrentProcessId-on-Windows.patch
 
 	$(call pkg_static,"shout.pc.in")
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_shout = ogg $(DEPS_ogg) theora $(DEPS_theora) speex $(DEPS_speex)

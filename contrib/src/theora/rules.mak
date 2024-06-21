@@ -15,12 +15,12 @@ $(TARBALLS)/libtheora-$(THEORA_VERSION).tar.xz:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.xz .sum-theora
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/theora/libtheora-compiler-differentiation.patch
 	$(APPLY) $(SRC)/theora/libtheora-no-forceaddr.patch
 	# Disable the generation of documentation. In 1.2.x it can be replaced by
 	# a --disable-doc parameter.
 	sed -i.orig "/^SUBDIRS =/s/doc//g" "$(UNPACK_DIR)/Makefile.am" "$(UNPACK_DIR)/Makefile.in"
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 THEORACONF := \

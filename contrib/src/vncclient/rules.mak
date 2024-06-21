@@ -19,6 +19,7 @@ $(TARBALLS)/LibVNCServer-$(VNCCLIENT_VERSION).tar.gz:
 
 vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	mv libvncserver-LibVNCServer-$(VNCCLIENT_VERSION)  LibVNCServer-$(VNCCLIENT_VERSION)
 	$(APPLY) $(SRC)/vncclient/libvncclient-libjpeg-win32.patch
 	$(APPLY) $(SRC)/vncclient/rfbproto.patch
@@ -28,7 +29,6 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(APPLY) $(SRC)/vncclient/vnc-gnutls-anon.patch
 	$(APPLY) $(SRC)/vncclient/cross-ar.patch
 	$(call pkg_static,"libvncclient.pc.in")
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 DEPS_vncclient = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls $(DEPS_gnutls)

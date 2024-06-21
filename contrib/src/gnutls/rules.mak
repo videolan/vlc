@@ -31,13 +31,13 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g $(UNPACK_DIR)/lib/includes/gnutls/gnutls.h.in
 
 	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/gnutls/0001-Use-CreateFile2-in-UWP-builds.patch
 
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 GNUTLS_CONF := \
