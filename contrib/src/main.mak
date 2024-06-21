@@ -446,7 +446,8 @@ AUTOMAKE_DATA_DIRS:=$(foreach n,$(foreach n,$(subst :, ,$(shell echo $$PATH)),$(
 update_autoconfig = \
 	for dir in $(AUTOMAKE_DATA_DIRS); do \
 		if test -f "$${dir}/config.sub" -a -f "$${dir}/config.guess"; then \
-			cp "$${dir}/config.sub" "$${dir}/config.guess" $(UNPACK_DIR)/$(1)/; \
+			install -p "$${dir}/config.guess" "$(UNPACK_DIR)/$(1)/"; \
+			install -p "$${dir}/config.sub"   "$(UNPACK_DIR)/$(1)/"; \
 			break; \
 		fi; \
 	done
