@@ -283,6 +283,10 @@ extern const CGFloat VLCVolumeDefault;
  * @note listen to VLCPlayerABLoopStateChanged for changes to this property
  */
 @property (readonly) enum vlc_player_abloop abLoopState;
+@property (readonly) vlc_tick_t aLoopTime;
+@property (readonly) vlc_tick_t bLoopTime;
+@property (readonly) float aLoopPosition;
+@property (readonly) float bLoopPosition;
 
 /**
  * set the A→B loop
