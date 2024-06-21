@@ -1,8 +1,8 @@
 [package]
 name = "vlcrs-messages"
-version = "0.0.0"
 edition = "2021"
-license = "LGPL-2.1-or-later"
+version.workspace = true
+license.workspace = true
 
 [dependencies]
 vlcrs-utils = { path = "../vlcrs-utils" }
