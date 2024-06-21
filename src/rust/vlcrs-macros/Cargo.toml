@@ -1,5 +1,5 @@
 [package]
-name = "vlcrs-core-macros"
+name = "vlcrs-macros"
 edition = "2021"
 version.workspace = true
 license.workspace = true

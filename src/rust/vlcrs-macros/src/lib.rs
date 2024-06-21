@@ -7,7 +7,7 @@ mod module;
 /// Module macro
 ///
 /// ```no_run
-/// # use vlcrs_core_macros::module;
+/// # use vlcrs_macros::module;
 /// module! {
 ///     type: MyModule,
 ///     shortname: "infrs",
@@ -45,7 +45,7 @@ mod module;
 /// ## Complete example
 ///
 /// ```no_run
-/// # use vlcrs_core_macros::module;
+/// # use vlcrs_macros::module;
 /// module! {
 ///     type: Inflate,
 ///     shortcuts: ["mp4", "MP4A"],
