@@ -73,7 +73,7 @@ impl Parse for ModuleInfo {
             let global_attrs: Vec<Attribute> = input.call(Attribute::parse_inner)?;
             let local_attrs: Vec<Attribute> = input.call(Attribute::parse_outer)?;
 
-            for global_attr in &global_attrs {
+            if let Some(global_attr) = global_attrs.first() {
                 return Err(Error::new_spanned(
                     global_attr,
                     "no global arguments are expected here",
@@ -178,7 +178,7 @@ impl Parse for ModuleInfo {
             }
 
             if !use_local_args {
-                for local_attr in &local_attrs {
+                if let Some(local_attr) = local_attrs.first() {
                     return Err(Error::new_spanned(
                         local_attr,
                         "no local arguments are expected here",
