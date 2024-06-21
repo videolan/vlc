@@ -450,9 +450,13 @@ UPDATE_AUTOCONFIG = for dir in $(AUTOMAKE_DATA_DIRS); do \
 		fi; \
 	done
 
+ifneq ($(wildcard $(abspath $(VLC_TOOLS))/share/autoconf-vlc/build-aux),)
+VLC_CONFIG_GUESS := autom4te_buildauxdir=$(abspath $(VLC_TOOLS))/share/autoconf-vlc/build-aux
+endif
+
 AUTORECONF = GTKDOCIZE=true autoreconf
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
-	cd $< && $(AUTORECONF) -fiv
+	cd $< && $(VLC_CONFIG_GUESS) $(AUTORECONF) -fiv
 
 BUILD_DIR = $</vlc_build
 BUILD_SRC := ..
