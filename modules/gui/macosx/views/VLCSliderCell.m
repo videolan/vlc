@@ -26,9 +26,11 @@
 
 #import "extensions/NSGradient+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
+
 #import "main/CompatibilityFixes.h"
 
-@interface VLCSliderCell () {
+@interface VLCSliderCell ()
+{
     NSInteger _animationPosition;
     double _lastTime;
     double _deltaToLastFrame;
@@ -36,7 +38,25 @@
 
     NSColor *_emptySliderBackgroundColor;
 }
+
+- (void)displayLink:(CVDisplayLinkRef)displayLink tickWithTime:(const CVTimeStamp *)inNow;
+
 @end
+
+static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
+                                    const CVTimeStamp *inNow,
+                                    const CVTimeStamp *inOutputTime,
+                                    CVOptionFlags flagsIn,
+                                    CVOptionFlags *flagsOut,
+                                    void *displayLinkContext)
+{
+    const CVTimeStamp inNowCopy = *inNow;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCSliderCell * const sliderCell = (__bridge VLCSliderCell*)displayLinkContext;
+        [sliderCell displayLink:displayLink tickWithTime:&inNowCopy];
+    });
+    return kCVReturnSuccess;
+}
 
 @implementation VLCSliderCell
 
@@ -52,46 +72,9 @@
     return self;
 }
 
-- (void)setSliderStyleLight
-{
-    _emptySliderBackgroundColor = NSColor.VLCSliderLightBackgroundColor;
-}
-
-- (void)setSliderStyleDark
-{
-    _emptySliderBackgroundColor = NSColor.VLCSliderDarkBackgroundColor;
-}
-
 - (void)dealloc
 {
     CVDisplayLinkRelease(_displayLink);
-}
-
-static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, 
-                                    const CVTimeStamp *inNow,
-                                    const CVTimeStamp *inOutputTime,
-                                    CVOptionFlags flagsIn,
-                                    CVOptionFlags *flagsOut,
-                                    void *displayLinkContext)
-{
-    const CVTimeStamp inNowCopy = *inNow;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCSliderCell * const sliderCell = (__bridge VLCSliderCell*)displayLinkContext;
-        [sliderCell displayLink:displayLink tickWithTime:&inNowCopy];
-    });
-    return kCVReturnSuccess;
-}
-
-- (void)displayLink:(CVDisplayLinkRef)displayLink tickWithTime:(const CVTimeStamp*)inNow
-{
-    if (_lastTime == 0) {
-        _deltaToLastFrame = 0;
-    } else {
-        _deltaToLastFrame = (double)(inNow->videoTime - _lastTime) / inNow->videoTimeScale;
-    }
-    _lastTime = inNow->videoTime;
-
-    self.controlView.needsDisplay = YES;
 }
 
 - (void)initDisplayLink
@@ -102,6 +85,28 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
         return;
     }
     CVDisplayLinkSetOutputCallback(_displayLink, DisplayLinkCallback, (__bridge void*) self);
+}
+
+- (void)setSliderStyleLight
+{
+    _emptySliderBackgroundColor = NSColor.VLCSliderLightBackgroundColor;
+}
+
+- (void)setSliderStyleDark
+{
+    _emptySliderBackgroundColor = NSColor.VLCSliderDarkBackgroundColor;
+}
+
+- (void)displayLink:(CVDisplayLinkRef)displayLink tickWithTime:(const CVTimeStamp *)inNow
+{
+    if (_lastTime == 0) {
+        _deltaToLastFrame = 0;
+    } else {
+        _deltaToLastFrame = (double)(inNow->videoTime - _lastTime) / inNow->videoTimeScale;
+    }
+    _lastTime = inNow->videoTime;
+
+    self.controlView.needsDisplay = YES;
 }
 
 #pragma mark -
@@ -201,7 +206,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
     }
 
     [super drawWithFrame:cellFrame inView:controlView];
-
 }
 
 #pragma mark -
