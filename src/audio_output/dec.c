@@ -51,6 +51,13 @@ struct vlc_aout_stream
 
     struct
     {
+        bool draining;
+        block_t **fifo_last;
+        block_t *fifo_first;
+    } discontinuity;
+
+    struct
+    {
         struct vlc_clock_t *clock;
         float rate; /**< Play-out speed rate */
         vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
@@ -170,6 +177,80 @@ static bool stream_IsDrained(vlc_aout_stream *stream)
         return atomic_load_explicit(&stream->drained, memory_order_relaxed);
 }
 
+static int stream_StartDiscontinuity(vlc_aout_stream *stream, block_t *block)
+{
+    audio_output_t *aout = aout_stream_aout(stream);
+    assert(!stream->discontinuity.draining);
+
+    /* Changing timings of the stream module while playing is an intricate
+     * task, therefore modules don't handle any PTS discontinuity.
+     *
+     * The PTS discontinuity is handled in the core:
+     *
+     *  - Drain the current stream in case of discontinuity
+     *  - Check from future Play() calls if the stream is drained
+     *  - Keep blocks in a list while waiting for the drain
+     *  - Flush when the stream is finally drained
+     *  - Play back all blocks that were saved
+     */
+
+    msg_Dbg(aout, "discontinuity: at %"PRId64" us, draining output",
+            block->i_pts);
+    vlc_aout_stream_Drain(stream);
+    stream->discontinuity.draining = true;
+
+    stream->discontinuity.fifo_first = NULL;
+    stream->discontinuity.fifo_last = &stream->discontinuity.fifo_first;
+
+    block->i_flags &= ~ BLOCK_FLAG_DISCONTINUITY;
+    block_ChainLastAppend(&stream->discontinuity.fifo_last, block);
+
+    return AOUT_DEC_SUCCESS;
+}
+
+static void stream_ResetDiscontinuity(vlc_aout_stream *stream)
+{
+    block_ChainRelease(stream->discontinuity.fifo_first);
+    stream->discontinuity.draining = false;
+}
+
+static int stream_HandleDiscontinuity(vlc_aout_stream *stream, block_t *block)
+{
+    audio_output_t *aout = aout_stream_aout(stream);
+
+    block_ChainLastAppend(&stream->discontinuity.fifo_last, block);
+
+    /* Will play back all blocks once the draining is finished */
+    if (!stream_IsDrained(stream))
+        return AOUT_DEC_SUCCESS;
+
+    /* Keep block list and stats before flushing */
+    int count;
+    vlc_tick_t length;
+    block_ChainProperties(stream->discontinuity.fifo_first, &count, NULL,
+                          &length);
+    block = stream->discontinuity.fifo_first;
+
+    msg_Dbg(aout, "discontinuity: flushing output");
+
+    /* Reset the discontinuity state, and flush */
+    stream->discontinuity.draining = false;
+    vlc_aout_stream_Flush(stream);
+
+    msg_Dbg(aout, "discontinuity: playing back %d blocks for a total length of "
+            "%"PRId64" us", count, length);
+
+    /* Play back all blocks past the discontinuity */
+    for (block_t *next; block != NULL; block = next)
+    {
+        next = block->p_next;
+        block->p_next = NULL;
+
+        vlc_aout_stream_Play(stream, block);
+    }
+    return AOUT_DEC_SUCCESS;
+}
+
 static void stream_ResetTimings(vlc_aout_stream *stream)
 {
     stream->sync.played = false;
@@ -218,6 +299,9 @@ static void stream_Reset(vlc_aout_stream *stream)
             stream->sync.request_delay = stream->sync.delay;
             stream->sync.delay = 0;
         }
+
+        if (stream->discontinuity.draining)
+            stream_ResetDiscontinuity(stream);
     }
 
     stream->timing.rate_audio_ts = VLC_TICK_INVALID;
@@ -293,6 +377,8 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->sync.rate = 1.f;
     stream->sync.resamp_type = AOUT_RESAMPLING_NONE;
     stream->sync.delay = stream->sync.request_delay = 0;
+
+    stream->discontinuity.draining = false;
     stream_ResetTimings(stream);
 
     atomic_init (&stream->buffers_lost, 0);
@@ -357,6 +443,9 @@ void vlc_aout_stream_Delete (vlc_aout_stream *stream)
     }
     if (stream->volume != NULL)
         aout_volume_Delete(stream->volume);
+
+    if (stream->discontinuity.draining)
+        stream_ResetDiscontinuity(stream);
 
     free(stream);
 }
@@ -745,12 +834,15 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     block->i_length = vlc_tick_from_samples( block->i_nb_samples,
                                    stream->input_format.i_rate );
 
+    if (stream->discontinuity.draining)
+        return stream_HandleDiscontinuity(stream, block);
+
+    if (block->i_flags & BLOCK_FLAG_DISCONTINUITY && stream->sync.played)
+        return stream_StartDiscontinuity(stream, block);
+
     int ret = stream_CheckReady (stream);
     if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
-
-    if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
-        stream_ResetTimings(stream);
 
     if (stream->filters)
     {
@@ -903,6 +995,10 @@ void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream)
 
 bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream)
 {
+    /* The internal draining state should not mess with the public one */
+    if (stream->discontinuity.draining)
+        return false;
+
     return stream_IsDrained(stream);
 }
 
@@ -912,6 +1008,21 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
 
     if (!stream->mixer_format.i_format)
         return;
+
+    if (unlikely(stream->discontinuity.draining))
+    {
+        if (stream->discontinuity.fifo_first != NULL)
+        {
+            vlc_tick_t length;
+            block_ChainProperties(stream->discontinuity.fifo_first, NULL, NULL,
+                                  &length);
+
+            msg_Err(aout, "draining while handling a discontinuity not handled"
+                    ", losing %"PRId64 " us of audio", length); /* FIXME */
+        }
+        stream_ResetDiscontinuity(stream);
+        return;
+    }
 
     struct vlc_tracer *tracer = aout_stream_tracer(stream);
 
