@@ -74,9 +74,9 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
                                     CVOptionFlags *flagsOut,
                                     void *displayLinkContext)
 {
-    CVTimeStamp inNowCopy = *inNow;
+    const CVTimeStamp inNowCopy = *inNow;
     dispatch_async(dispatch_get_main_queue(), ^{
-        VLCSliderCell *sliderCell = (__bridge VLCSliderCell*)displayLinkContext;
+        VLCSliderCell * const sliderCell = (__bridge VLCSliderCell*)displayLinkContext;
         [sliderCell displayLink:displayLink tickWithTime:&inNowCopy];
     });
     return kCVReturnSuccess;
@@ -91,12 +91,12 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
     }
     _lastTime = inNow->videoTime;
 
-    [self.controlView setNeedsDisplay:YES];
+    self.controlView.needsDisplay = YES;
 }
 
 - (void)initDisplayLink
 {
-    CVReturn ret = CVDisplayLinkCreateWithActiveCGDisplays(&_displayLink);
+    const CVReturn ret = CVDisplayLinkCreateWithActiveCGDisplays(&_displayLink);
     if (ret != kCVReturnSuccess) {
         // TODO: Handle error
         return;
@@ -118,12 +118,13 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
 {
-    const CGFloat trackBorderRadius = 1;
+    static const CGFloat trackBorderRadius = 1;
 
     // Empty Track Drawing
-    NSBezierPath* emptyTrackPath = [NSBezierPath bezierPathWithRoundedRect:rect
-                                                                   xRadius:trackBorderRadius
-                                                                   yRadius:trackBorderRadius];
+    NSBezierPath * const emptyTrackPath =
+        [NSBezierPath bezierPathWithRoundedRect:rect
+                                        xRadius:trackBorderRadius
+                                        yRadius:trackBorderRadius];
     [_emptySliderBackgroundColor setFill];
     [emptyTrackPath fill];
 
@@ -133,13 +134,14 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
     // Calculate filled track
     NSRect filledTrackRect = rect;
-    NSRect knobRect = [self knobRectFlipped:NO];
+    const NSRect knobRect = [self knobRectFlipped:NO];
     filledTrackRect.size.width = knobRect.origin.x + (knobRect.size.width / 2);
 
     // Filled Track Drawing
-    NSBezierPath* filledTrackPath = [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
-                                                                    xRadius:trackBorderRadius
-                                                                    yRadius:trackBorderRadius];
+    NSBezierPath * const filledTrackPath = 
+        [NSBezierPath bezierPathWithRoundedRect:filledTrackRect
+                                        xRadius:trackBorderRadius
+                                        yRadius:trackBorderRadius];
 
     [NSColor.VLCAccentColor setFill];
     [filledTrackPath fill];
@@ -151,15 +153,16 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)drawHighlightInRect:(NSRect)rect
 {
-    [_highlightGradient drawInRect:rect angle:0];
+    [self.highlightGradient drawInRect:rect angle:0];
 }
 
 
 - (void)drawHighlightBackgroundInRect:(NSRect)rect
 {
     rect = NSInsetRect(rect, 1.0, 1.0);
-    NSBezierPath *fullPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2.0 yRadius:2.0];
-    [_highlightBackground setFill];
+    NSBezierPath * const fullPath =
+        [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2.0 yRadius:2.0];
+    [self.highlightBackground setFill];
     [fullPath fill];
 }
 
@@ -169,7 +172,8 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
     [NSGraphicsContext saveGraphicsState];
     rect = NSInsetRect(rect, 1.0, 1.0);
-    NSBezierPath *fullPath = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2.0 yRadius:2.0];
+    NSBezierPath * const fullPath =
+        [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2.0 yRadius:2.0];
     [fullPath setClip];
 
     // Use previously calculated position
@@ -184,7 +188,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
     rect.size.width = _animationWidth;
 
-
     [self drawHighlightInRect:rect];
     [NSGraphicsContext restoreGraphicsState];
     _deltaToLastFrame = 0;
@@ -193,8 +196,9 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-    if (_indefinite)
+    if (self.indefinite) {
         return [self drawAnimationInRect:cellFrame];
+    }
 
     [super drawWithFrame:cellFrame inView:controlView];
 
@@ -205,39 +209,40 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
 - (void)beginAnimating
 {
-    CVReturn err = CVDisplayLinkStart(_displayLink);
+    const CVReturn err = CVDisplayLinkStart(_displayLink);
     if (err != kCVReturnSuccess) {
         // TODO: Handle error
     }
     _animationPosition = -(_animationWidth);
-    [self setEnabled:NO];
+    self.enabled = NO;
 }
 
 - (void)endAnimating
 {
     CVDisplayLinkStop(_displayLink);
-    [self setEnabled:YES];
+    self.enabled = YES;
 
 }
 
 - (void)setIndefinite:(BOOL)indefinite
 {
-    if (_indefinite == indefinite)
+    if (self.indefinite == indefinite) {
         return;
+    }
+
+    _indefinite = indefinite;
 
     if (indefinite) {
         [self beginAnimating];
     } else {
         [self endAnimating];
     }
-
-    _indefinite = indefinite;
 }
 
 - (void)setKnobHidden:(BOOL)knobHidden
 {
     _knobHidden = knobHidden;
-    [self.controlView setNeedsDisplay:YES];
+    self.controlView.needsDisplay = YES;
 }
 
 
