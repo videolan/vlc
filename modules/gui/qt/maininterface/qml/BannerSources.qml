@@ -110,7 +110,7 @@ T.ToolBar {
                 Loader {
                     anchors.fill: parent
                     active: root._showCSD
-                    source: "qrc:///VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
+                    source: "qrc:///qt/qml/VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
                 }
 
                 Column {
@@ -205,8 +205,8 @@ T.ToolBar {
                     height: VLCStyle.globalToolbar_height
                     active: root._showCSD
                     source: VLCStyle.palette.hasCSDImage
-                              ? "qrc:///VLC/Widgets/CSDThemeButtonSet.qml"
-                              : "qrc:///VLC/Widgets/CSDWindowButtonSet.qml"
+                              ? "qrc:///qt/qml/VLC/Widgets/CSDThemeButtonSet.qml"
+                              : "qrc:///qt/qml/VLC/Widgets/CSDWindowButtonSet.qml"
                 }
             }
 

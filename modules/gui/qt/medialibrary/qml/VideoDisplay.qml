@@ -67,11 +67,11 @@ Widgets.PageLoader {
             name: "all",
             default: true,
             displayText: qsTr("All"),
-            url: "qrc:///VLC/MediaLibrary/VideoAllDisplay.qml"
+            url: "qrc:///qt/qml/VLC/MediaLibrary/VideoAllDisplay.qml"
         },{
             name: "playlists",
             displayText: qsTr("Playlists"),
-            url: "qrc:///VLC/MediaLibrary/VideoPlaylistsDisplay.qml"
+            url: "qrc:///qt/qml/VLC/MediaLibrary/VideoPlaylistsDisplay.qml"
         }
     ]
 

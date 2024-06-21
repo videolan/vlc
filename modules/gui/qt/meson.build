@@ -899,7 +899,7 @@ if qt6_dep.found()
             prog_python,
             meson.current_source_dir() / 'scripts/genqrc.py',
             '-o', meson.current_build_dir() / module['outdir'] / 'res.qrc',
-            '--prefix', module['outdir'],
+            '--prefix', 'qt/qml' / module['outdir'],
             '--sources', module.get('sources', []) + module.get('singletons', []),
             check: true,
         )
@@ -908,6 +908,7 @@ if qt6_dep.found()
             meson.current_source_dir() / 'scripts/genqmldir.py',
             '-o', meson.current_build_dir() / module['outdir'] / 'qmldir',
             '--module', module['name'],
+            '--prefix', 'qt/qml',
             '--sources', module.get('sources', []),
             '--singletons', module.get('singletons', []),
             check: true,
@@ -916,7 +917,7 @@ if qt6_dep.found()
             prog_python,
             meson.current_source_dir() / 'scripts/genqrc.py',
             '-o', meson.current_build_dir() / module['outdir'] / 'qmldir.qrc',
-            '--prefix', module['outdir'],
+            '--prefix', 'qt/qml' / module['outdir'],
             '--sources', [meson.current_build_dir() / module['outdir'] / 'qmldir'],
             check: true,
         )

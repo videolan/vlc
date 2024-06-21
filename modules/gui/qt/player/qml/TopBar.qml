@@ -194,7 +194,7 @@ FocusScope{
 
         anchors.fill: parent
         active: root.showCSD
-        source: "qrc:///VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
+        source: "qrc:///qt/qml/VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
     }
 
     // Components -
@@ -388,8 +388,8 @@ FocusScope{
         enabled: root.showCSD
         visible: root.showCSD
         source:  VLCStyle.palette.hasCSDImage
-            ? "qrc:///VLC/Widgets/CSDThemeButtonSet.qml"
-            : "qrc:///VLC/Widgets/CSDWindowButtonSet.qml"
+            ? "qrc:///qt/qml/VLC/Widgets/CSDThemeButtonSet.qml"
+            : "qrc:///qt/qml/VLC/Widgets/CSDWindowButtonSet.qml"
 
         Connections {
             target: csdDecorations.item

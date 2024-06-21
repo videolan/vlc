@@ -141,15 +141,15 @@ T.Popup {
       }
 
       onRequestAudioPage: {
-          stackView.push("qrc:///VLC/Player/TracksPageAudio.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///qt/qml/VLC/Player/TracksPageAudio.qml", {"trackMenuController": trackMenuController})
       }
 
       onRequestSubtitlePage: {
-          stackView.push("qrc:///VLC/Player/TracksPageSubtitle.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///qt/qml/VLC/Player/TracksPageSubtitle.qml", {"trackMenuController": trackMenuController})
       }
 
       onRequestPlaybackSpeedPage: {
-          stackView.push("qrc:///VLC/Player/TracksPageSpeed.qml", {"trackMenuController": trackMenuController})
+          stackView.push("qrc:///qt/qml/VLC/Player/TracksPageSpeed.qml", {"trackMenuController": trackMenuController})
       }
     }
 }

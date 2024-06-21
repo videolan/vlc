@@ -169,13 +169,15 @@ bool MainUI::setup(QQmlEngine* engine)
         engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
     }
 
-    engine->addImportPath(":/");
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+    engine->addImportPath(":/qt/qml");
+#endif
 
     SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
     engine->addImageProvider(QStringLiteral("vlcaccess"), new VLCAccessImageProvider());
 
-    m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/VLC/MainInterface/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
+    m_component  = new QQmlComponent(engine, QStringLiteral("qrc:/qt/qml/VLC/MainInterface/MainInterface.qml"), QQmlComponent::PreferSynchronous, engine);
     if (m_component->isLoading())
     {
         msg_Warn(m_intf, "component is still loading");

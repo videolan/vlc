@@ -106,7 +106,7 @@ FocusScope {
             height: parent.height - searchFieldContainer.height
 
             active: MainCtx.mediaLibraryAvailable
-            source: "qrc:///VLC/MediaLibrary/UrlListDisplay.qml"
+            source: "qrc:///qt/qml/VLC/MediaLibrary/UrlListDisplay.qml"
 
             onLoaded: {
                 item.leftPadding = Qt.binding(function() {

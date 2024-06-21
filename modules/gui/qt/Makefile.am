@@ -1344,18 +1344,19 @@ endif
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py \
 	-o $@ \
 	-s $(srcdir) \
-	--prefix $(libqml_module_$*_a_ModulePath) \
+	--prefix qt/qml/$(libqml_module_$*_a_ModulePath) \
 	--sources $(libqml_module_$*_a_QML) $(libqml_module_$*_a_Singleton_QML)
 
 %/qmldir: Makefile
 	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqmldir.py \
 	-o $@ \
+	--prefix qt/qml \
 	--module $(libqml_module_$*_a_Module)  \
 	--sources $(libqml_module_$*_a_QML) \
 	--singletons $(libqml_module_$*_a_Singleton_QML)
 
 %/qmldir.qrc: %/qmldir
-	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py -o $@ --prefix $(libqml_module_$*_a_ModulePath) --sources $<
+	$(AM_V_GEN)$(PYTHON3) $(srcdir)/scripts/genqrc.py -o $@ --prefix qt/qml/$(libqml_module_$*_a_ModulePath) --sources $<
 
 CLEANFILES += $(libqt_plugin_la_QML_MODULES:%=%/res.qrc) $(libqt_plugin_la_QML_MODULES:%=%/qmldir) $(libqt_plugin_la_QML_MODULES:%=%/qmldir.qrc) $(libqml_module_util_a_QML:%.qml=%.cpp)
 

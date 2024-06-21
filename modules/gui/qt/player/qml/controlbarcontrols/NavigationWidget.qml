@@ -38,7 +38,7 @@ Templates.Pane {
 
     // Private
 
-    readonly property string _controlPath : "qrc:///VLC/PlayerControls/"
+    readonly property string _controlPath : "qrc:///qt/qml/VLC/PlayerControls/"
 
     // Signals
 

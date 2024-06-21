@@ -164,7 +164,7 @@ T.Pane {
 
                 parent: root
                 active: MainCtx.mediaLibraryAvailable
-                source: "qrc:///VLC/Player/Bookmarks.qml"
+                source: "qrc:///qt/qml/VLC/Player/Bookmarks.qml"
 
                 x: root.leftPadding + trackPositionSlider.x + row2.Layout.leftMargin
                 y: row2.y + row2.height + VLCStyle.margin_xxsmall

@@ -32,7 +32,9 @@ public:
 public slots:
     void qmlEngineAvailable(QQmlEngine *engine)
     {
-        engine->addImportPath(":/");
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+        engine->addImportPath(":/qt/qml");
+#endif
     }
 };
 

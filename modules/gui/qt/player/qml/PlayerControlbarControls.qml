@@ -27,7 +27,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 
 QtObject {
-    readonly property string controlPath : "qrc:///VLC/PlayerControls/"
+    readonly property string controlPath : "qrc:///qt/qml/VLC/PlayerControls/"
 
     readonly property var controlList: [
         { id: ControlListModel.PLAY_BUTTON, file: "PlayButton.qml", label: VLCIcons.play_filled, text: qsTr("Play") },

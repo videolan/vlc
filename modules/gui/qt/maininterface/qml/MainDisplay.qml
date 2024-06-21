@@ -105,35 +105,35 @@ FocusScope {
             displayText: qsTr("Video"),
             icon: VLCIcons.topbar_video,
             name: "video",
-            url: "qrc:///VLC/MediaLibrary/VideoDisplay.qml"
+            url: "qrc:///qt/qml/VLC/MediaLibrary/VideoDisplay.qml"
         }, {
             listed: MainCtx.mediaLibraryAvailable,
             displayText: qsTr("Music"),
             icon: VLCIcons.topbar_music,
             name: "music",
-            url: "qrc:///VLC/MediaLibrary/MusicDisplay.qml"
+            url: "qrc:///qt/qml/VLC/MediaLibrary/MusicDisplay.qml"
         }, {
             listed: !MainCtx.mediaLibraryAvailable,
             displayText: qsTr("Home"),
             icon: VLCIcons.home,
             name: "home",
-            url: "qrc:///VLC/MainInterface/NoMedialibHome.qml"
+            url: "qrc:///qt/qml/VLC/MainInterface/NoMedialibHome.qml"
         }, {
             listed: true,
             displayText: qsTr("Browse"),
             icon: VLCIcons.topbar_network,
             name: "network",
-            url: "qrc:///VLC/Network/BrowseDisplay.qml"
+            url: "qrc:///qt/qml/VLC/Network/BrowseDisplay.qml"
         }, {
             listed: true,
             displayText: qsTr("Discover"),
             icon: VLCIcons.topbar_discover,
             name: "discover",
-            url: "qrc:///VLC/Network/DiscoverDisplay.qml"
+            url: "qrc:///qt/qml/VLC/Network/DiscoverDisplay.qml"
         }, {
             listed: false,
             name: "mlsettings",
-            url: "qrc:///VLC/MediaLibrary/MLFoldersSettings.qml"
+            url: "qrc:///qt/qml/VLC/MediaLibrary/MLFoldersSettings.qml"
         }
     ]
 
@@ -454,7 +454,7 @@ FocusScope {
 
         height: active ? implicitHeight : 0
 
-        source: "qrc:///VLC/Widgets/ScanProgressBar.qml"
+        source: "qrc:///qt/qml/VLC/Widgets/ScanProgressBar.qml"
 
         onLoaded: {
             item.background.visible = Qt.binding(function() { return !stackViewParent.layer.enabled })
