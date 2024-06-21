@@ -39,6 +39,8 @@
 #include "clock/clock.h"
 #include "libvlc.h"
 
+#define BLOCK_FLAG_CORE_PRIVATE_FILTERED (1 << BLOCK_FLAG_CORE_PRIVATE_SHIFT)
+
 struct vlc_aout_stream
 {
     aout_instance_t *instance;
@@ -59,6 +61,7 @@ struct vlc_aout_stream
     struct
     {
         struct vlc_clock_t *clock;
+        uint32_t clock_id;
         float rate; /**< Play-out speed rate */
         vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
@@ -367,6 +370,7 @@ vlc_aout_stream * vlc_aout_stream_New(audio_output_t *p_aout,
     stream->filter_format = stream->mixer_format = stream->input_format = *p_format;
 
     stream->sync.clock = cfg->clock;
+    stream->sync.clock_id = 0;
     stream->str_id = cfg->str_id;
 
     stream->timing.rate_audio_ts = VLC_TICK_INVALID;
@@ -844,7 +848,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
-    if (stream->filters)
+    if (stream->filters && (block->i_flags & BLOCK_FLAG_CORE_PRIVATE_FILTERED) == 0)
     {
         if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
         {
@@ -879,11 +883,20 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     /* Drift correction */
     vlc_tick_t system_now = vlc_tick_now();
 
+    uint32_t clock_id;
     vlc_clock_Lock(stream->sync.clock);
     vlc_tick_t play_date =
         vlc_clock_ConvertToSystem(stream->sync.clock, system_now, block->i_pts,
-                                  stream->sync.rate, NULL);
+                                  stream->sync.rate, &clock_id);
     vlc_clock_Unlock(stream->sync.clock);
+
+    if (clock_id != stream->sync.clock_id)
+    {
+        stream->sync.clock_id = clock_id;
+        block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_FILTERED;
+        return stream_StartDiscontinuity(stream, block);
+    }
+
     stream_Synchronize(stream, system_now, play_date, block->i_pts);
 
     vlc_audio_meter_Process(&owner->meter, block, play_date);
