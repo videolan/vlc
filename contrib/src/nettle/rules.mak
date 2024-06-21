@@ -30,7 +30,6 @@ DEPS_nettle = gmp $(DEPS_gmp)
 ifndef GPL
 	$(REQUIRE_GNUV3)
 endif
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(NETTLE_CONF)
 	+$(MAKEBUILD) SUBDIRS=

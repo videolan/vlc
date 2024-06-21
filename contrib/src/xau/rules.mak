@@ -20,7 +20,6 @@ DEPS_xau = xorg-macros $(DEPS_xorg-macros) xproto $(DEPS_xproto)
 XAU_CONF := --enable-xthreads
 
 .xau: libxau
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XAU_CONF)
 	+$(MAKEBUILD)

@@ -34,7 +34,6 @@ endif
 endif
 
 .speexdsp: speexdsp
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(SPEEXDSP_CONF)
 	+$(MAKEBUILD)

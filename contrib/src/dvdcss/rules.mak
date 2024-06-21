@@ -20,7 +20,6 @@ DVDCSS_CONF := --disable-doc
 
 .dvdcss: dvdcss
 	$(REQUIRE_GPL)
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(DVDCSS_CONF)
 	+$(MAKEBUILD)

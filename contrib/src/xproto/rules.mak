@@ -20,7 +20,6 @@ DEPS_xproto = xorg-macros $(DEPS_xorg-macros)
 XPROTO_CONF := --enable-xthreads
 
 .xproto: xproto
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(XPROTO_CONF)
 	+$(MAKEBUILD)

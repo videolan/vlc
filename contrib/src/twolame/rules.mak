@@ -25,7 +25,6 @@ twolame: twolame-$(TWOLAME_VERSION).tar.gz .sum-twolame
 TWOLAME_CONF := --enable-static
 
 .twolame: twolame
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(TWOLAME_CONF)
 	+$(MAKEBUILD)

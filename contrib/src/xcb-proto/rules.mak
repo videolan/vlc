@@ -17,7 +17,6 @@ xcb-proto: xcb-proto-$(XCB_PROTO_VERSION).tar.bz2 .sum-xcb-proto
 	$(MOVE)
 
 .xcb-proto: xcb-proto
-	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
 	+$(MAKEBUILD)
