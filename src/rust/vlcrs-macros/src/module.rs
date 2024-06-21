@@ -917,6 +917,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
             } != 0 {
                 return -1;
             }
+
             if unsafe {
                 vlc_set(
                     opaque,
@@ -935,32 +936,43 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_OPEN as _,
+                    ::vlcrs_plugin::ModuleProperties::MODULE_CB_OPEN as _,
                     #module_open_with_nul,
-                    ::vlcrs_core::module::#module::module_open::<#type_> as
-                        unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
+                    unsafe {
+                        std::mem::transmute::<
+                            <#type_ as #trait_>::Activate,
+                            *mut std::ffi::c_void
+                        >(<#type_ as #trait_>::Loader::activate_function())
+                    }
                 )
             } != 0
             {
                 return -1;
             }
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_CLOSE as _,
-                    #module_close_with_nul,
-                    ::vlcrs_core::module::#module::module_close as
-                        unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
-                )
-            } != 0
-            {
-                return -1;
+
+            if <#type_ as #trait_>::Loader::deactivate_function() != None {
+                if unsafe {
+                    vlc_set(
+                        opaque,
+                        module as _,
+                        ::vlcrs_plugin::ModuleProperties::MODULE_CB_CLOSE as _,
+                        #module_close_with_nul,
+                        unsafe {
+                            std::mem::transmute::<
+                                <#type_ as #trait_>::Deactivate,
+                                *mut std::ffi::c_void
+                            >(<#type_ as #trait_>::Loader::deactivate_function().unwrap())
+                        }
+                    )
+                } != 0
+                {
+                    return -1;
+                }
             }
+
             #vlc_entry_config_subcategory
             #vlc_entry_config_params
         }
-
 }
 
 pub fn module(input: TokenStream) -> TokenStream {
