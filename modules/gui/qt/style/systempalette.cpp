@@ -476,6 +476,7 @@ void SystemPalette::makeLightPalette()
         setColor(CS, C::Decoration, C::Shadow, C::Normal, setColorAlpha(Qt::black, 0.22));
 
         setColor(CS, C::Decoration, C::Accent, C::Normal, orange800);
+        setColor(CS, C::Fg, C::Link, C::Normal, orange800 /* accent */);
     }
 
     //window banner & miniplayer
@@ -673,6 +674,7 @@ void SystemPalette::makeDarkPalette()
         setColor(CS, C::Decoration, C::Separator, C::Normal, darkGrey800);
 
         setColor(CS, C::Decoration, C::Accent, C::Normal, orange500);
+        setColor(CS, C::Fg, C::Link, C::Normal, orange500);
     }
 
     //window banner & miniplayer
