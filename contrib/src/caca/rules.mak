@@ -23,7 +23,6 @@ caca: libcaca-$(CACA_VERSION).tar.gz .sum-caca
 	$(APPLY) $(SRC)/caca/caca-fix-compilation-llvmgcc.patch
 	$(APPLY) $(SRC)/caca/caca-fix-pkgconfig.patch
 	$(call pkg_static,"caca/caca.pc.in")
-	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 	mv caca/config.sub caca/config.guess caca/.auto
 

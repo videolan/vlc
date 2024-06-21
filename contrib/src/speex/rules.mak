@@ -15,8 +15,8 @@ $(TARBALLS)/speex-$(SPEEX_VERSION).tar.gz:
 
 speex: speex-$(SPEEX_VERSION).tar.gz .sum-speex
 	$(UNPACK)
-	$(call pkg_static,"speex.pc.in")
 	$(UPDATE_AUTOCONFIG)
+	$(call pkg_static,"speex.pc.in")
 	$(MOVE)
 
 SPEEX_CONF := --disable-binaries
