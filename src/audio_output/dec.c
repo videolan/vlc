@@ -536,7 +536,6 @@ static void stream_HandleDrift(vlc_aout_stream *stream, vlc_tick_t drift,
         stream_Silence(stream, -drift, audio_ts);
 
         stream_StopResampling(stream);
-        stream->sync.discontinuity = true;
         drift = 0;
     }
 
