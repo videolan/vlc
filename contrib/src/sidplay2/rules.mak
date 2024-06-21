@@ -18,6 +18,7 @@ $(TARBALLS)/sidplay-libs-$(SID_VERSION).tar.gz:
 
 sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/sidplay2/sidplay2-openmode.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-endian.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-smartprt.patch

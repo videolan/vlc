@@ -17,6 +17,7 @@ $(TARBALLS)/libssh2-$(LIBSSH2_VERSION).tar.gz:
 
 ssh2: libssh2-$(LIBSSH2_VERSION).tar.gz .sum-ssh2
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(call pkg_static,"libssh2.pc.in")
 	$(MOVE)
 

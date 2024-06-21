@@ -36,6 +36,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(call pkg_static,"libass.pc.in")
 	$(MOVE)
 

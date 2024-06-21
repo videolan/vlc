@@ -20,6 +20,7 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.gz:
 
 orc: orc-$(ORC_VERSION).tar.gz .sum-orc
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .orc: orc

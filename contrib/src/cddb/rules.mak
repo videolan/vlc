@@ -18,6 +18,7 @@ $(TARBALLS)/libcddb-$(CDDB_VERSION).tar.bz2:
 
 cddb: libcddb-$(CDDB_VERSION).tar.bz2 .sum-cddb
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/cddb/cross.patch
 	$(APPLY) $(SRC)/cddb/getenv-crash.patch
 	$(APPLY) $(SRC)/cddb/cddb-no-alarm.patch

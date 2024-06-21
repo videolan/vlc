@@ -28,6 +28,7 @@ endif
 
 libmad: libmad-$(MAD_VERSION).tar.gz .sum-mad
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 ifdef HAVE_DARWIN_OS
 	sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' \
 		-e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' \

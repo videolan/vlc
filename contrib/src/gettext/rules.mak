@@ -19,6 +19,7 @@ GETTEXT_TOOLS_DIRS := gettext-runtime/src gettext-tools/src
 
 gettext: gettext-$(GETTEXT_VERSION).tar.gz .sum-gettext
 	$(UNPACK)
+	$(UPDATE_AUTOCONFIG)
 	# disable libtextstyle
 	sed -i.orig -e 's,gettext-runtime libtextstyle gettext-tools,gettext-runtime gettext-tools,g' $(UNPACK_DIR)/configure
 	sed -i.orig -e 's,gettext-runtime libtextstyle gettext-tools,gettext-runtime gettext-tools,g' $(UNPACK_DIR)/Makefile.in
