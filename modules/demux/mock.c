@@ -203,7 +203,8 @@ var_Read_float(const char *psz)
     Y(video, frame_rate, unsigned, add_integer, Unsigned, 25) \
     Y(video, frame_rate_base, unsigned, add_integer, Unsigned, 1) \
     Y(video, colorbar, bool, add_bool, Bool, false) \
-    Y(video, orientation, unsigned, add_integer, Unsigned, ORIENT_NORMAL)
+    Y(video, orientation, unsigned, add_integer, Unsigned, ORIENT_NORMAL) \
+    Y(video, image_count, unsigned, add_integer, Unsigned, 0)
 
 #define OPTIONS_SUB(Y) \
     Y(sub, packetized, bool, add_bool, Bool, true)\
@@ -313,6 +314,8 @@ struct demux_sys
     struct mock_sub_options sub;
 
     char *art_url;
+
+    bool eof_requested;
 };
 #undef X
 
@@ -1149,6 +1152,13 @@ DemuxVideo(demux_t *demux, vlc_tick_t step_length, vlc_tick_t end_pts)
             switch (track->fmt.i_cat)
             {
                 case VIDEO_ES:
+
+                    if (track->video.image_count >= 1)
+                    {
+                        track->video.image_count--;
+                        if (track->video.image_count == 0)
+                            sys->eof_requested = true;
+                    }
                     block = CreateVideoBlock(demux, track);
                     break;
                 case SPU_ES:
@@ -1257,6 +1267,9 @@ Demux(demux_t *demux)
 
     if (ret != VLC_SUCCESS)
         return VLC_DEMUXER_EGENERIC;
+
+    if (sys->eof_requested)
+        return VLC_DEMUXER_EOF;
 
     return eof ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
@@ -1442,6 +1455,7 @@ Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     demux->p_sys = sys;
+    sys->eof_requested = false;
     vlc_vector_init(&sys->tracks);
 
     if (var_LocationParse(obj, demux->psz_location, "mock-") != VLC_SUCCESS)
