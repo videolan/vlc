@@ -24,10 +24,10 @@
 
 @interface VLCSlider : NSSlider
 
-@property (nonatomic, getter=getIndefinite,setter=setIndefinite:) BOOL indefinite;
-@property (nonatomic, getter=getKnobHidden,setter=setKnobHidden:) BOOL isKnobHidden;
+@property (readwrite, nonatomic) BOOL indefinite;
+@property (readwrite, nonatomic) BOOL knobHidden;
 
 /* Indicates if the slider is scrollable with the mouse or trackpad scrollwheel. */
-@property (readwrite) BOOL isScrollable;
+@property (readwrite) BOOL scrollable;
 
 @end

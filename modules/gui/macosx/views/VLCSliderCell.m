@@ -45,7 +45,7 @@
     self = [super initWithCoder:coder];
     if (self) {
         [self setSliderStyleLight];
-        _animationWidth = [[self controlView] bounds].size.width;
+        self.animationWidth = self.controlView.bounds.size.width;
 
         [self initDisplayLink];
     }
@@ -67,7 +67,12 @@
     CVDisplayLinkRelease(_displayLink);
 }
 
-static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *inNow, const CVTimeStamp *inOutputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext)
+static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, 
+                                    const CVTimeStamp *inNow,
+                                    const CVTimeStamp *inOutputTime,
+                                    CVOptionFlags flagsIn,
+                                    CVOptionFlags *flagsOut,
+                                    void *displayLinkContext)
 {
     CVTimeStamp inNowCopy = *inNow;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -104,7 +109,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
 - (void)drawKnob:(NSRect)knobRect
 {
-    if (_isKnobHidden) {
+    if (self.knobHidden) {
         return;
     }
 
@@ -122,7 +127,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     [_emptySliderBackgroundColor setFill];
     [emptyTrackPath fill];
 
-    if (_isKnobHidden) {
+    if (self.knobHidden) {
         return;
     }
 
@@ -220,16 +225,18 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     if (_indefinite == indefinite)
         return;
 
-    if (indefinite)
+    if (indefinite) {
         [self beginAnimating];
-    else
+    } else {
         [self endAnimating];
+    }
+
     _indefinite = indefinite;
 }
 
-- (void)setKnobHidden:(BOOL)isKnobHidden
+- (void)setKnobHidden:(BOOL)knobHidden
 {
-    _isKnobHidden = isKnobHidden;
+    _knobHidden = knobHidden;
     [self.controlView setNeedsDisplay:YES];
 }
 

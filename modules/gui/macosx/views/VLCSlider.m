@@ -27,14 +27,19 @@
 
 @implementation VLCSlider
 
++ (Class)cellClass
+{
+    return VLCSliderCell.class;
+}
+
 - (instancetype)initWithCoder:(NSCoder *)coder
 {
     self = [super initWithCoder:coder];
 
     if (self) {
-        NSAssert([self.cell isKindOfClass:[VLCSliderCell class]],
+        NSAssert([self.cell isKindOfClass:[VLCSlider cellClass]], 
                  @"VLCSlider cell is not VLCSliderCell");
-        _isScrollable = YES;
+        self.scrollable = YES;
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
         } else {
@@ -45,15 +50,12 @@
     return self;
 }
 
-+ (Class)cellClass
-{
-    return [VLCSliderCell class];
-}
-
 - (void)scrollWheel:(NSEvent *)event
 {
-    if (!_isScrollable)
+    if (!self.scrollable) {
         return [super scrollWheel:event];
+    }
+
     double increment;
     CGFloat deltaY = [event scrollingDeltaY];
     double range = [self maxValue] - [self minValue];
@@ -62,43 +64,46 @@
     if (event.hasPreciseScrollingDeltas) {
         increment = (range * 0.002) * deltaY;
     } else {
-        if (deltaY == 0.0)
+        if (deltaY == 0.0) {
             return;
+        }
         increment = (range * 0.01 * deltaY);
     }
 
     // If scrolling is inversed, increment in other direction
-    if (!event.isDirectionInvertedFromDevice)
+    if (!event.isDirectionInvertedFromDevice) {
         increment = -increment;
+    }
 
-    [self setDoubleValue:self.doubleValue - increment];
+    self.doubleValue = self.doubleValue - increment;
     [self sendAction:self.action to:self.target];
 }
 
 // Workaround for 10.7
 // http://stackoverflow.com/questions/3985816/custom-nsslidercell
-- (void)setNeedsDisplayInRect:(NSRect)invalidRect {
-    [super setNeedsDisplayInRect:[self bounds]];
+- (void)setNeedsDisplayInRect:(NSRect)invalidRect
+{
+    [super setNeedsDisplayInRect:self.bounds];
 }
 
-- (BOOL)getIndefinite
+- (BOOL)indefinite
 {
-    return [(VLCSliderCell*)[self cell] indefinite];
+    return [(VLCSliderCell*)self.cell indefinite];
 }
 
 - (void)setIndefinite:(BOOL)indefinite
 {
-    [(VLCSliderCell*)[self cell] setIndefinite:indefinite];
+    [(VLCSliderCell*)self.cell setIndefinite:indefinite];
 }
 
-- (BOOL)getKnobHidden
+- (BOOL)knobHidden
 {
-    return [(VLCSliderCell*)[self cell] isKnobHidden];
+    return [(VLCSliderCell*)self.cell knobHidden];
 }
 
-- (void)setKnobHidden:(BOOL)isKnobHidden
+- (void)setKnobHidden:(BOOL)knobHidden
 {
-    [(VLCSliderCell*)[self cell] setKnobHidden:isKnobHidden];
+    [(VLCSliderCell*)self.cell setKnobHidden:knobHidden];
 }
 
 - (BOOL)isFlipped
