@@ -989,18 +989,16 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                                               decoded->date, sys->rate, NULL);
                 vlc_clock_Unlock(sys->clock);
 
-                if (is_late_dropped && !decoded->b_force)
+                if (is_late_dropped && !decoded->b_force
+                 && IsPictureLate(vout, decoded, system_now, system_pts))
                 {
-                    if (IsPictureLate(vout, decoded, system_now, system_pts))
-                    {
-                        picture_Release(decoded);
-                        vout_statistic_AddLost(&sys->statistic, 1);
+                    picture_Release(decoded);
+                    vout_statistic_AddLost(&sys->statistic, 1);
 
-                        /* A picture dropped means discontinuity for the
-                         * filters and we need to notify eg. deinterlacer. */
-                        filter_chain_VideoFlush(sys->filter.chain_static);
-                        continue;
-                    }
+                    /* A picture dropped means discontinuity for the
+                     * filters and we need to notify eg. deinterlacer. */
+                    filter_chain_VideoFlush(sys->filter.chain_static);
+                    continue;
                 }
 
                 if (!VideoFormatIsCropArEqual(&decoded->format, &sys->filter.src_fmt))
