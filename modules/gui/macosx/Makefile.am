@@ -348,16 +348,16 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCLoadingOverlayView.m \
 	gui/macosx/views/VLCNoResultsLabel.h \
 	gui/macosx/views/VLCNoResultsLabel.m \
+	gui/macosx/views/VLCPlaybackProgressSlider.h \
+	gui/macosx/views/VLCPlaybackProgressSlider.m \
+	gui/macosx/views/VLCPlaybackProgressSliderCell.h \
+	gui/macosx/views/VLCPlaybackProgressSliderCell.m \
 	gui/macosx/views/VLCRoundedCornerTextField.h \
 	gui/macosx/views/VLCRoundedCornerTextField.m \
 	gui/macosx/views/VLCScrollingClipView.h \
 	gui/macosx/views/VLCScrollingClipView.m \
 	gui/macosx/views/VLCSettingTextField.h \
 	gui/macosx/views/VLCSettingTextField.m \
-	gui/macosx/views/VLCSlider.h \
-	gui/macosx/views/VLCSlider.m \
-	gui/macosx/views/VLCSliderCell.h \
-	gui/macosx/views/VLCSliderCell.m \
 	gui/macosx/views/VLCSubScrollView.h \
 	gui/macosx/views/VLCSubScrollView.m \
 	gui/macosx/views/VLCTimeField.h \

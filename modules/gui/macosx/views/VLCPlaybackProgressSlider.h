@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCSlider.h
+ * VLCPlaybackProgressSlider.h
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  *
@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCSlider : NSSlider
+@interface VLCPlaybackProgressSlider : NSSlider
 
 @property (readwrite, nonatomic) BOOL indefinite;
 @property (readwrite, nonatomic) BOOL knobHidden;

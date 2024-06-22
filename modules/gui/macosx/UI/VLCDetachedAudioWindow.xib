@@ -94,12 +94,12 @@
                                                     <constraint firstAttribute="bottom" secondItem="10" secondAttribute="bottom" id="yGM-Jx-9fD"/>
                                                 </constraints>
                                             </customView>
-                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCSlider">
+                                            <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCPlaybackProgressSlider">
                                                 <rect key="frame" x="8" y="50" width="176" height="18"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="14" id="MYp-CS-yPe"/>
                                                 </constraints>
-                                                <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCSliderCell">
+                                                <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" doubleValue="0.32600000000000001" tickMarkPosition="above" sliderType="linear" id="23" customClass="VLCPlaybackProgressSliderCell">
                                                     <font key="font" size="12" name="Helvetica"/>
                                                 </sliderCell>
                                                 <connections>

@@ -34,8 +34,8 @@
 #import "views/VLCBottomBarView.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCImageView.h"
+#import "views/VLCPlaybackProgressSlider.h"
 #import "views/VLCTimeField.h"
-#import "views/VLCSlider.h"
 #import "views/VLCVolumeSlider.h"
 #import "views/VLCWrappableTextField.h"
 

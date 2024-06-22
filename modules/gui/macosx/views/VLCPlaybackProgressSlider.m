@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCSlider.m
+ * VLCPlaybackProgressSlider.m
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  *
@@ -20,16 +20,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCSlider.h"
+#import "VLCPlaybackProgressSlider.h"
 
 #import "extensions/NSView+VLCAdditions.h"
-#import "views/VLCSliderCell.h"
+#import "views/VLCPlaybackProgressSliderCell.h"
 
-@implementation VLCSlider
+@implementation VLCPlaybackProgressSlider
 
 + (Class)cellClass
 {
-    return VLCSliderCell.class;
+    return VLCPlaybackProgressSliderCell.class;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder
@@ -37,13 +37,13 @@
     self = [super initWithCoder:coder];
 
     if (self) {
-        NSAssert([self.cell isKindOfClass:[VLCSlider cellClass]], 
-                 @"VLCSlider cell is not VLCSliderCell");
+        NSAssert([self.cell isKindOfClass:[VLCPlaybackProgressSlider cellClass]], 
+                 @"VLCPlaybackProgressSlider cell is not a VLCPlaybackProgressSliderCell");
         self.scrollable = YES;
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
         } else {
-            [(VLCSliderCell*)self.cell setSliderStyleLight];
+            [(VLCPlaybackProgressSliderCell*)self.cell setSliderStyleLight];
         }
 
     }
@@ -88,22 +88,22 @@
 
 - (BOOL)indefinite
 {
-    return [(VLCSliderCell*)self.cell indefinite];
+    return [(VLCPlaybackProgressSliderCell*)self.cell indefinite];
 }
 
 - (void)setIndefinite:(BOOL)indefinite
 {
-    [(VLCSliderCell*)self.cell setIndefinite:indefinite];
+    [(VLCPlaybackProgressSliderCell*)self.cell setIndefinite:indefinite];
 }
 
 - (BOOL)knobHidden
 {
-    return [(VLCSliderCell*)self.cell knobHidden];
+    return [(VLCPlaybackProgressSliderCell*)self.cell knobHidden];
 }
 
 - (void)setKnobHidden:(BOOL)knobHidden
 {
-    [(VLCSliderCell*)self.cell setKnobHidden:knobHidden];
+    [(VLCPlaybackProgressSliderCell*)self.cell setKnobHidden:knobHidden];
 }
 
 - (BOOL)isFlipped
@@ -114,9 +114,9 @@
 - (void)viewDidChangeEffectiveAppearance
 {
     if (self.shouldShowDarkAppearance) {
-        [(VLCSliderCell*)self.cell setSliderStyleDark];
+        [(VLCPlaybackProgressSliderCell*)self.cell setSliderStyleDark];
     } else {
-        [(VLCSliderCell*)self.cell setSliderStyleLight];
+        [(VLCPlaybackProgressSliderCell*)self.cell setSliderStyleLight];
     }
 }
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCSliderCell.m
+ * VLCPlaybackProgressSliderCell.m
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCSliderCell.h"
+#import "VLCPlaybackProgressSliderCell.h"
 
 #import <CoreVideo/CoreVideo.h>
 
@@ -33,7 +33,7 @@
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
-@interface VLCSliderCell ()
+@interface VLCPlaybackProgressSliderCell ()
 {
     NSInteger _animationPosition;
     double _lastTime;
@@ -56,13 +56,13 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
     const CVTimeStamp inNowCopy = *inNow;
     dispatch_async(dispatch_get_main_queue(), ^{
-        VLCSliderCell * const sliderCell = (__bridge VLCSliderCell*)displayLinkContext;
+        VLCPlaybackProgressSliderCell * const sliderCell = (__bridge VLCPlaybackProgressSliderCell*)displayLinkContext;
         [sliderCell displayLink:displayLink tickWithTime:&inNowCopy];
     });
     return kCVReturnSuccess;
 }
 
-@implementation VLCSliderCell
+@implementation VLCPlaybackProgressSliderCell
 
 - (instancetype)initWithCoder:(NSCoder *)coder
 {

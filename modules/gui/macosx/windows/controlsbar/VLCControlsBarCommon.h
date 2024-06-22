@@ -24,7 +24,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCDragDropView;
-@class VLCSlider;
+@class VLCPlaybackProgressSlider;
 @class VLCVolumeSlider;
 @class VLCTimeField;
 @class VLCImageView;
@@ -46,7 +46,7 @@
 @property (readwrite, strong) IBOutlet NSButton *backwardButton;
 @property (readwrite, strong) IBOutlet NSButton *forwardButton;
 
-@property (readwrite, strong) IBOutlet VLCSlider *timeSlider;
+@property (readwrite, strong) IBOutlet VLCPlaybackProgressSlider *timeSlider;
 @property (readwrite, strong) IBOutlet VLCVolumeSlider *volumeSlider;
 @property (readwrite, strong) IBOutlet NSButton *muteVolumeButton;
 

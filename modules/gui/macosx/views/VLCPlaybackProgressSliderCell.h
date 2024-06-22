@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCSliderCell.h
+ * VLCPlaybackProgressSliderCell.h
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
  *
@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface VLCSliderCell : NSSliderCell
+@interface VLCPlaybackProgressSliderCell : NSSliderCell
 
 // Colors
 @property NSColor *gradientColor;

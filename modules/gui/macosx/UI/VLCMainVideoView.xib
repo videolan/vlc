@@ -134,12 +134,12 @@
                                             <real value="3.4028234663852886e+38"/>
                                         </customSpacing>
                                     </stackView>
-                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qNZ-Fh-W8i" customClass="VLCSlider">
+                                    <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qNZ-Fh-W8i" customClass="VLCPlaybackProgressSlider">
                                         <rect key="frame" x="18" y="37" width="684" height="19"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="15" id="xm6-li-LpC"/>
                                         </constraints>
-                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="dZM-dm-qvL" customClass="VLCSliderCell"/>
+                                        <sliderCell key="cell" controlSize="small" continuous="YES" state="on" alignment="left" maxValue="1" tickMarkPosition="above" sliderType="linear" id="dZM-dm-qvL" customClass="VLCPlaybackProgressSliderCell"/>
                                         <connections>
                                             <action selector="timeSliderAction:" target="3" id="W32-wA-rN9"/>
                                         </connections>
