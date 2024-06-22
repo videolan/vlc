@@ -111,7 +111,12 @@ namespace
                     , this, &ImageResponseRadiusAdaptor::handleResponseFinished);
         }
 
-        QString errorString() const override { return errStr; }
+        QString errorString() const override
+        {
+            if (result.isNull() && errStr.isEmpty())
+                return QStringLiteral("Unspecified error.");
+            return errStr;
+        }
 
         QQuickTextureFactory *textureFactory() const override
         {
