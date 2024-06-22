@@ -73,8 +73,8 @@ targets:
     info:
       path: "vlccorewatchos/Info.plist"
       properties:
-        CFBundleIdentifier: org.videolan.vlc.vlccoreios.watchapp
-        WKCompanionAppBundleIdentifier: org.videolan.vlc.vlccoreios
+        CFBundleIdentifier: org.videolan.vlc.vlccore.watchapp
+        WKCompanionAppBundleIdentifier: org.videolan.vlc.vlccore
         WKRunsIndependentlyOfCompanionApp: true
         WKApplication: true
         UIBackgroundModes:
@@ -90,7 +90,7 @@ targets:
         script: |
             INPUT_FILES=()
             for arch in ${ARCHS}; do
-                INPUT_FILES+=("${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/test/.libs/vlccoreios")
+                INPUT_FILES+=("${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}${BUILD_SUFFIX}/build/test/.libs/vlccorewatchos")
             done
             lipo -create \
                 -output "${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}" \
