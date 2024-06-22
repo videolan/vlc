@@ -231,4 +231,9 @@
     return 400.;
 }
 
++ (const CGFloat)sliderTickThickness
+{
+    return 1.;
+}
+
 @end

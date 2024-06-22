@@ -71,6 +71,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) const CGFloat libraryWindowNavSidebarMaxWidth;
 @property (class, readonly) const CGFloat libraryWindowPlaylistSidebarMaxWidth;
 
+@property (class, readonly) const CGFloat sliderTickThickness;
+
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio;

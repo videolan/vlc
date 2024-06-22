@@ -27,6 +27,8 @@
 #import "extensions/NSGradient+VLCAdditions.h"
 #import "extensions/NSColor+VLCAdditions.h"
 
+#import "library/VLCLibraryUIUnits.h"
+
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
@@ -214,7 +216,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
                          inCellFrame:(const NSRect)cellFrame
                            withColor:(NSColor * const)color
 {
-    static const CGFloat tickThickness = 1.0;
+    const CGFloat tickThickness = VLCLibraryUIUnits.sliderTickThickness;
     const CGSize cellSize = cellFrame.size;
     NSRect tickFrame;
 
