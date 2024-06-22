@@ -122,6 +122,8 @@ public:
 
     QString errorString() const override
     {
+        if (result.isNull() && errorStr.isEmpty())
+            return QStringLiteral("Unspecified error.");
         return errorStr;
     }
 
