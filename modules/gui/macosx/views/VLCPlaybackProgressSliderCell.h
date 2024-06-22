@@ -24,22 +24,8 @@
 
 @interface VLCPlaybackProgressSliderCell : NSSliderCell
 
-// Colors
-@property NSColor *gradientColor;
-@property NSColor *gradientColor2;
-@property NSColor *trackStrokeColor;
-@property NSColor *filledTrackColor;
-@property NSColor *shadowColor;
-@property NSColor *highlightBackground;
-
-// Gradients
-@property NSGradient *trackGradient;
-@property NSGradient *highlightGradient;
-
-@property NSInteger animationWidth;
-
-@property (nonatomic) BOOL indefinite;
-@property (nonatomic) BOOL knobHidden;
+@property (readwrite, nonatomic) BOOL indefinite;
+@property (readwrite, nonatomic) BOOL knobHidden;
 
 - (void)setSliderStyleLight;
 - (void)setSliderStyleDark;

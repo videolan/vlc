@@ -35,6 +35,7 @@
 
 @interface VLCPlaybackProgressSliderCell ()
 {
+    NSInteger _animationWidth;
     NSInteger _animationPosition;
     double _lastTime;
     double _deltaToLastFrame;
@@ -68,9 +69,9 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
     self = [super initWithCoder:coder];
     if (self) {
-        [self setSliderStyleLight];
-        self.animationWidth = self.controlView.bounds.size.width;
+        _animationWidth = self.controlView.bounds.size.width;
 
+        [self setSliderStyleLight];
         [self initDisplayLink];
     }
     return self;
@@ -159,26 +160,8 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 #pragma mark -
 #pragma mark Indefinite slider drawing
 
-
-- (void)drawHighlightInRect:(NSRect)rect
-{
-    [self.highlightGradient drawInRect:rect angle:0];
-}
-
-
-- (void)drawHighlightBackgroundInRect:(NSRect)rect
-{
-    rect = NSInsetRect(rect, 1.0, 1.0);
-    NSBezierPath * const fullPath =
-        [NSBezierPath bezierPathWithRoundedRect:rect xRadius:2.0 yRadius:2.0];
-    [self.highlightBackground setFill];
-    [fullPath fill];
-}
-
 - (void)drawAnimationInRect:(NSRect)rect
 {
-    [self drawHighlightBackgroundInRect:rect];
-
     [NSGraphicsContext saveGraphicsState];
     rect = NSInsetRect(rect, 1.0, 1.0);
     NSBezierPath * const fullPath =
@@ -197,7 +180,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 
     rect.size.width = _animationWidth;
 
-    [self drawHighlightInRect:rect];
     [NSGraphicsContext restoreGraphicsState];
     _deltaToLastFrame = 0;
 }
