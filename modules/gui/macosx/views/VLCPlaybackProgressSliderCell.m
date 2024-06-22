@@ -42,6 +42,10 @@
     CVDisplayLinkRef _displayLink;
 
     NSColor *_emptySliderBackgroundColor;
+
+    enum vlc_player_abloop _abLoopState;
+    CGFloat _aToBLoopAMarkPosition; // Position of the A loop mark as a fraction of slider width
+    CGFloat _aToBLoopBMarkPosition; // Position of the B loop mark as a fraction of slider width
 }
 
 - (void)displayLink:(CVDisplayLinkRef)displayLink tickWithTime:(const CVTimeStamp *)inNow;
@@ -72,7 +76,14 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
         _animationWidth = self.controlView.bounds.size.width;
 
         [self setSliderStyleLight];
+        [self updateAtoBLoopState];
         [self initDisplayLink];
+
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+        [notificationCenter addObserver:self
+                               selector:@selector(abLoopStateChanged:)
+                                   name:VLCPlayerABLoopStateChanged
+                                 object:nil];
     }
     return self;
 }
@@ -100,6 +111,21 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)setSliderStyleDark
 {
     _emptySliderBackgroundColor = NSColor.VLCSliderDarkBackgroundColor;
+}
+
+- (void)abLoopStateChanged:(NSNotification *)notification
+{
+    [self updateAtoBLoopState];
+}
+
+- (void)updateAtoBLoopState
+{
+    VLCPlayerController * const playerController =
+        VLCMain.sharedInstance.playlistController.playerController;
+
+    _abLoopState = playerController.abLoopState;
+    _aToBLoopAMarkPosition = playerController.aLoopPosition;
+    _aToBLoopBMarkPosition = playerController.bLoopPosition;
 }
 
 - (void)displayLink:(CVDisplayLinkRef)displayLink tickWithTime:(const CVTimeStamp *)inNow
@@ -217,20 +243,17 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
         [super drawWithFrame:cellFrame inView:controlView];
     }
 
-    VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
-
-    if (playerController.abLoopState == VLC_PLAYER_ABLOOP_NONE) {
+    if (_abLoopState == VLC_PLAYER_ABLOOP_NONE) {
         return;
     }
 
-    if (playerController.aLoopPosition >= 0) {
-        [self drawCustomTickMarkAtPosition:playerController.aLoopPosition 
+    if (_aToBLoopAMarkPosition >= 0) {
+        [self drawCustomTickMarkAtPosition:_aToBLoopAMarkPosition
                                inCellFrame:cellFrame
                                  withColor:_emptySliderBackgroundColor];
     }
-    if (playerController.bLoopPosition >= 0) {
-        [self drawCustomTickMarkAtPosition:playerController.bLoopPosition 
+    if (_aToBLoopBMarkPosition >= 0) {
+        [self drawCustomTickMarkAtPosition:_aToBLoopBMarkPosition
                                inCellFrame:cellFrame
                                  withColor:_emptySliderBackgroundColor];
     }
