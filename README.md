@@ -1,6 +1,6 @@
 # VLC media player
 
-**VLC** is a libre and open source **media player** and **multimedia engine**,
+**VLC** is a libre and open source **media player** and **multimedia engine**
 focused on **playing everything**, and **running everywhere**.
 
 **VLC** can play most multimedia files, discs, streams, devices and is also able to
