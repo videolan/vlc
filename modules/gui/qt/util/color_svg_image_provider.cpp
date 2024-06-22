@@ -164,6 +164,8 @@ public:
 
     QString errorString() const override
     {
+        if (m_result.isNull() && m_error.isEmpty())
+            return QStringLiteral("Unspecified error.");
         return m_error;
     }
 
