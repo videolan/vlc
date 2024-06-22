@@ -198,6 +198,30 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
     _deltaToLastFrame = 0;
 }
 
+- (void)drawCustomTickMarkAtPosition:(const CGFloat)position 
+                         inCellFrame:(const NSRect)cellFrame
+                           withColor:(NSColor * const)color
+{
+    static const CGFloat tickThickness = 1.0;
+    const CGSize cellSize = cellFrame.size;
+    NSRect tickFrame;
+
+    if (self.isVertical) {
+        const CGFloat tickY = cellSize.height * position;
+        tickFrame = NSMakeRect(cellFrame.origin.x, tickY, cellSize.width, tickThickness);
+    } else {
+        const CGFloat tickX = cellSize.width * position;
+        tickFrame = NSMakeRect(tickX, cellFrame.origin.y, tickThickness, cellSize.height);
+    }
+
+    const NSAlignmentOptions alignOpts =
+        NSAlignMinXOutward | NSAlignMinYOutward | NSAlignWidthOutward | NSAlignMaxYOutward;
+    const NSRect finalTickRect =
+        [self.controlView backingAlignedRect:tickFrame options:alignOpts];
+
+    [color setFill];
+    NSRectFill(finalTickRect);
+}
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
