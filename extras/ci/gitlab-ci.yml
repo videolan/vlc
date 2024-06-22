@@ -503,8 +503,6 @@ raspbian-arm:
     extends:
         - .base-template
         - .ccache-common-apple
-    tags:
-        - monterey
     script: |
         if [ "${CI_JOB_NAME:0:8}" = "nightly-" ]; then
             NIGHTLY_EXTRA_BUILD_FLAGS="-i n"
@@ -527,10 +525,14 @@ raspbian-arm:
 
 macos-x86_64:
     extends: .macos-common
+    tags:
+        - monterey
     variables: *variables-macos-x86_64
 
 macos-arm64:
     extends: .macos-common
+    tags:
+        - macos-xcode15
     variables: *variables-macos-arm64
 
 .nightly-macos-common:
@@ -559,8 +561,6 @@ nightly-macos-arm64:
 #
 .apple-os-common:
     extends: .base-template
-    tags:
-        - monterey
     script: |
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
@@ -574,18 +574,26 @@ nightly-macos-arm64:
 
 ios-arm64:
     extends: .apple-os-common
+    tags:
+        - macos-xcode15
     variables: *variables-ios-arm64
 
 ios-armv7:
     extends: .apple-os-common
+    tags:
+        - monterey
     variables: *variables-ios-armv7
 
 ios-simulator-x86_64:
     extends: .apple-os-common
+    tags:
+        - macos-xcode15
     variables: *variables-ios-simulator-x86_64
 
 tvos-arm64:
     extends: .apple-os-common
+    tags:
+        - macos-xcode15
     variables: *variables-tvos-arm64
 
 watchos-arm64_32:
