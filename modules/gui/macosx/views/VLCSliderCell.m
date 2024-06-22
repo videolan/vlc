@@ -28,6 +28,10 @@
 #import "extensions/NSColor+VLCAdditions.h"
 
 #import "main/CompatibilityFixes.h"
+#import "main/VLCMain.h"
+
+#import "playlist/VLCPlayerController.h"
+#import "playlist/VLCPlaylistController.h"
 
 @interface VLCSliderCell ()
 {
@@ -227,9 +231,30 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 {
     if (self.indefinite) {
         return [self drawAnimationInRect:cellFrame];
+    } else {
+        [super drawWithFrame:cellFrame inView:controlView];
     }
 
-    [super drawWithFrame:cellFrame inView:controlView];
+    VLCPlayerController * const playerController =
+        VLCMain.sharedInstance.playlistController.playerController;
+
+    if (playerController.abLoopState == VLC_PLAYER_ABLOOP_NONE) {
+        return;
+    }
+
+    if (playerController.aLoopPosition >= 0) {
+        [self drawCustomTickMarkAtPosition:playerController.aLoopPosition 
+                               inCellFrame:cellFrame
+                                 withColor:_emptySliderBackgroundColor];
+    }
+    if (playerController.bLoopPosition >= 0) {
+        [self drawCustomTickMarkAtPosition:playerController.bLoopPosition 
+                               inCellFrame:cellFrame
+                                 withColor:_emptySliderBackgroundColor];
+    }
+
+    // Redraw knob
+    [super drawKnob];
 }
 
 #pragma mark -
