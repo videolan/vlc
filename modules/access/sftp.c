@@ -609,7 +609,7 @@ static int Seek( stream_t* p_access, uint64_t i_pos )
 {
     access_sys_t *sys = p_access->p_sys;
 
-    libssh2_sftp_seek( sys->file, i_pos );
+    libssh2_sftp_seek64( sys->file, i_pos );
     return VLC_SUCCESS;
 }
 
