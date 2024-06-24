@@ -1806,11 +1806,11 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
     subpicture_region_t *p_reg = NULL;
     subpicture_region_t *found;
     vlc_spu_regions_foreach(found, &ov->regions) {
-        if (p_reg->i_x == eventov->x &&
-            p_reg->i_y == eventov->y &&
-            p_reg->p_picture->format.i_width == eventov->w &&
-            p_reg->p_picture->format.i_height == eventov->h &&
-            p_reg->p_picture->format.i_chroma == VLC_CODEC_YUVP)
+        if (found->i_x == eventov->x &&
+            found->i_y == eventov->y &&
+            found->p_picture->format.i_width == eventov->w &&
+            found->p_picture->format.i_height == eventov->h &&
+            found->p_picture->format.i_chroma == VLC_CODEC_YUVP)
         {
             p_reg = found;
             break;
