@@ -155,6 +155,21 @@ static int stream_GetDelay(vlc_aout_stream *stream, vlc_tick_t *delay)
     return 0;
 }
 
+static bool stream_IsDrained(vlc_aout_stream *stream)
+{
+    audio_output_t *aout = aout_stream_aout(stream);
+
+    if (aout->drain == NULL)
+    {
+        vlc_tick_t drain_deadline =
+            atomic_load_explicit(&stream->drain_deadline, memory_order_relaxed);
+        return drain_deadline != VLC_TICK_INVALID
+            && vlc_tick_now() >= drain_deadline;
+    }
+    else
+        return atomic_load_explicit(&stream->drained, memory_order_relaxed);
+}
+
 static void stream_ResetTimings(vlc_aout_stream *stream)
 {
     stream->sync.played = false;
@@ -888,17 +903,7 @@ void vlc_aout_stream_NotifyDrained(vlc_aout_stream *stream)
 
 bool vlc_aout_stream_IsDrained(vlc_aout_stream *stream)
 {
-    audio_output_t *aout = aout_stream_aout(stream);
-
-    if (aout->drain == NULL)
-    {
-        vlc_tick_t drain_deadline =
-            atomic_load_explicit(&stream->drain_deadline, memory_order_relaxed);
-        return drain_deadline != VLC_TICK_INVALID
-            && vlc_tick_now() >= drain_deadline;
-    }
-    else
-        return atomic_load_explicit(&stream->drained, memory_order_relaxed);
+    return stream_IsDrained(stream);
 }
 
 void vlc_aout_stream_Drain(vlc_aout_stream *stream)
