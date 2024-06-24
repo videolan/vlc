@@ -906,7 +906,7 @@ end:
 
             vlc_join( p_stream->p_sys->thread, NULL );
             vlc_mutex_lock( &p_sys->lock_out );
-            *out = p_sys->p_buffers;
+            block_ChainAppend(out, p_sys->p_buffers);
             p_sys->p_buffers = NULL;
             vlc_mutex_unlock( &p_sys->lock_out );
 
