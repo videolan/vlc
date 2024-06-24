@@ -28,14 +28,13 @@ $(TARBALLS)/libiconv-$(LIBICONV_VERSION).tar.gz:
 
 iconv: libiconv-$(LIBICONV_VERSION).tar.gz .sum-iconv
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(call update_autoconfig,build-aux)
+	$(call update_autoconfig,libcharset/build-aux)
 	$(APPLY) $(SRC)/iconv/bins.patch
 
 	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/iconv/0001-Use-CreateFile2-in-UWP-builds.patch
 
-	cd $(UNPACK_DIR) && cp config.guess config.sub build-aux \
-	                 && mv config.guess config.sub libcharset/build-aux
 	$(MOVE)
 
 ICONV_CONF := --disable-nls

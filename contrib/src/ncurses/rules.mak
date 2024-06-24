@@ -18,7 +18,7 @@ $(TARBALLS)/ncurses-$(NCURSES_VERSION).tar.gz:
 
 ncurses: ncurses-$(NCURSES_VERSION).tar.gz .sum-ncurses
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(call update_autoconfig,.)
 	$(APPLY) $(SRC)/ncurses/ncurses-win32.patch
 	$(MOVE)
 

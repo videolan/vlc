@@ -22,7 +22,7 @@ $(TARBALLS)/x262-git.tar.xz:
 
 x262: $(TARBALLS)/x262-git.tar.xz .sum-x262
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
+	$(call update_autoconfig,.)
 	$(MOVE)
 
 .x262: x262

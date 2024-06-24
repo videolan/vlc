@@ -21,6 +21,7 @@ $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
+	$(call update_autoconfig,build-aux)
 
 	# use CreateFile2 in Win8 as CreateFileW is forbidden in UWP
 	$(APPLY) $(SRC)/libtasn1/0001-Use-CreateFile2-in-UWP-builds.patch
