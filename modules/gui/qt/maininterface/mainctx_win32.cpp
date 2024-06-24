@@ -556,7 +556,6 @@ WinTaskbarWidget::~WinTaskbarWidget()
         ImageList_Destroy( himl );
     if(p_taskbl)
         p_taskbl->Release();
-    CoUninitialize();
 }
 
 Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
@@ -580,16 +579,22 @@ void WinTaskbarWidget::createTaskBarButtons()
     if (!winId)
         return;
 
-    HRESULT hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE );
-    if( FAILED(hr) )
+    try
+    {
+        m_comHolder = ComHolder();
+    }
+    catch( const std::exception& exception )
+    {
+        msg_Err( p_intf, "%s", exception.what() );
         return;
+    }
 
     void *pv;
-    hr = CoCreateInstance( CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER,
-                           IID_ITaskbarList3, &pv);
+    HRESULT hr = CoCreateInstance( CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER,
+                                   IID_ITaskbarList3, &pv);
     if( FAILED(hr) )
     {
-        CoUninitialize();
+        m_comHolder.reset();
         return;
     }
 
@@ -604,7 +609,7 @@ void WinTaskbarWidget::createTaskBarButtons()
     {
         p_taskbl->Release();
         p_taskbl = NULL;
-        CoUninitialize();
+        m_comHolder.reset();
         return;
     }
 

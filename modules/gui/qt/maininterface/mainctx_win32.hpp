@@ -28,6 +28,8 @@
 #include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
 
+#include <objbase.h>
+
 class WinTaskbarWidget : public QObject, public QAbstractNativeEventFilter
 {
     Q_OBJECT
@@ -51,6 +53,22 @@ private:
     UINT taskbar_wmsg = 0;
     QWindow* m_window = nullptr;
 
+    class ComHolder
+    {
+    public:
+        ComHolder()
+        {
+            if (Q_UNLIKELY(FAILED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE))))
+                throw std::runtime_error("CoInitializeEx failed");
+        }
+
+        ~ComHolder()
+        {
+            CoUninitialize();
+        }
+    };
+
+    std::optional<ComHolder> m_comHolder;
 };
 
 
