@@ -1012,7 +1012,7 @@ pub fn module(input: TokenStream) -> TokenStream {
         });
         let params_assign = params.params.iter().map(|param| {
             let rust_name = &param.name;
-            let vlc_name = vlc_param_name(&module_info, &param);
+            let vlc_name = vlc_param_name(&module_info, param);
             let vlc_name_with_nul = tt_c_str!(param.name.span()=> vlc_name);
 
             let method_name = Ident::new(if param.type_ == "i64" {
