@@ -1,0 +1,89 @@
+From c3390f17d4c86a6c817f37a273c2d44d5f57ded9 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Mon, 24 Jun 2024 17:19:20 +0300
+Subject: [PATCH] Take care of `asyncResponses` when `qml_network` is disabled
+ in qquickpixmapcache.cpp
+
+---
+ src/quick/util/qquickpixmapcache.cpp | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/src/quick/util/qquickpixmapcache.cpp b/src/quick/util/qquickpixmapcache.cpp
+index 8de79f2009..5efd2ef3e2 100644
+--- a/src/quick/util/qquickpixmapcache.cpp
++++ b/src/quick/util/qquickpixmapcache.cpp
+@@ -606,20 +606,18 @@ QQuickPixmapReader::~QQuickPixmapReader()
+             delete reply;
+         }
+         jobs.clear();
+-#if QT_CONFIG(qml_network)
+         const auto cancelJob = [this](QQuickPixmapReply *reply) {
+             if (reply->loading) {
+                 cancelledJobs.append(reply);
+                 reply->data = nullptr;
+             }
+         };
+-
++#if QT_CONFIG(qml_network)
+         for (auto *reply : std::as_const(networkJobs))
+             cancelJob(reply);
+-
++#endif
+         for (auto *reply : std::as_const(asyncResponses))
+             cancelJob(reply);
+-#endif
+ #if !QT_CONFIG(quick_pixmap_cache_threaded_download)
+     // In this case we won't be waiting, but we are on the correct thread already, so we can
+     // perform housekeeping synchronously now.
+@@ -640,7 +638,6 @@ QQuickPixmapReader::~QQuickPixmapReader()
+     wait();
+ #endif
+ 
+-#if QT_CONFIG(qml_network)
+     // While we've been waiting, the other thread may have added
+     // more replies. No one will care about them anymore.
+ 
+@@ -649,16 +646,17 @@ QQuickPixmapReader::~QQuickPixmapReader()
+             reply->data->reply = nullptr;
+         delete reply;
+     };
+-
++#if QT_CONFIG(qml_network)
+     for (QQuickPixmapReply *reply : std::as_const(networkJobs))
+         deleteReply(reply);
+-
++#endif
+     for (QQuickPixmapReply *reply : std::as_const(asyncResponses))
+         deleteReply(reply);
+ 
++#if QT_CONFIG(qml_network)
+     networkJobs.clear();
+-    asyncResponses.clear();
+ #endif
++    asyncResponses.clear();
+ }
+ 
+ #if QT_CONFIG(qml_network)
+@@ -803,7 +801,10 @@ void QQuickPixmapReader::processJobs()
+                         // cancel any jobs already started
+                         reply->close();
+                     }
+-                } else {
++                }
++                else
++#endif
++                {
+                     QQuickImageResponse *asyncResponse = asyncResponses.key(job);
+                     if (asyncResponse) {
+                         asyncResponses.remove(asyncResponse);
+@@ -811,7 +812,6 @@ void QQuickPixmapReader::processJobs()
+                     }
+                 }
+                 PIXMAP_PROFILE(pixmapStateChanged<QQuickProfiler::PixmapLoadingError>(job->url));
+-#endif
+                 // deleteLater, since not owned by this thread
+                 job->deleteLater();
+             }
+-- 
+2.45.2
+
