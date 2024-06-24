@@ -20,7 +20,6 @@ $(TARBALLS)/libshout-$(SHOUT_VERSION).tar.gz:
 # TODO: fix socket stuff on POSIX and Linux
 libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/shout/fix-xiph_openssl.patch
 	$(APPLY) $(SRC)/shout/shout-strings.patch
 	$(APPLY) $(SRC)/shout/shout-timeval.patch

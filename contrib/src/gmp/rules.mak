@@ -27,7 +27,6 @@ $(TARBALLS)/gmp-$(GMP_VERSION).tar.xz:
 
 gmp: gmp-$(GMP_VERSION).tar.xz .sum-gmp
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
 	# do not try the cross compiler to detect the build compiler
 	sed -i.orig 's/"$$CC" "$$CC $$CFLAGS $$CPPFLAGS" cc gcc c89 c99/cc gcc c89 c99/' $(UNPACK_DIR)/acinclude.m4

@@ -17,11 +17,9 @@ $(TARBALLS)/libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
 
 libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz .sum-libmpeg2
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-arm-pld.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-inline.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-mc-neon.patch
-	cd $(UNPACK_DIR) && mv config.guess config.sub .auto
 	$(MOVE)
 
 LIBMPEG2_CONF := --without-x --disable-sdl
