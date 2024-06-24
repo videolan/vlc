@@ -17,13 +17,11 @@ $(TARBALLS)/libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
 
 libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz .sum-libmpeg2
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-arm-pld.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-inline.patch
 	$(APPLY) $(SRC)/libmpeg2/libmpeg2-mc-neon.patch
 	sed -i.orig -e 's,libvo src test vc++,,' $(UNPACK_DIR)/Makefile.am
 	sed -i.orig -e 's,SUBDIRS,# SUBDIRS,' $(UNPACK_DIR)/libmpeg2/Makefile.am
-	cd $(UNPACK_DIR) && mv config.guess config.sub .auto
 	$(MOVE)
 
 LIBMPEG2_CONF := --without-x --disable-sdl

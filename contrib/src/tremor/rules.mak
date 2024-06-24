@@ -17,7 +17,6 @@ $(TARBALLS)/tremor-git.tar.xz:
 tremor: tremor-git.tar.xz .sum-tremor
 	# Stuff that does not depend on libogg
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/tremor/tremor.patch
 	$(MOVE)
 

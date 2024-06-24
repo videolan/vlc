@@ -34,7 +34,6 @@ $(TARBALLS)/asdcplib-$(ASDCPLIB_VERSION).tar.gz:
 
 asdcplib: asdcplib-$(ASDCPLIB_VERSION).tar.gz .sum-asdcplib
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub build-aux
 	$(APPLY) $(SRC)/asdcplib/port-to-nettle.patch
 	$(APPLY) $(SRC)/asdcplib/static-programs.patch
 	$(APPLY) $(SRC)/asdcplib/adding-pkg-config-file.patch

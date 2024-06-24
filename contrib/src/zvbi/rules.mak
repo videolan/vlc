@@ -15,7 +15,6 @@ $(TARBALLS)/zvbi-$(ZVBI_VERSION).tar.bz2:
 
 zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/zvbi/zvbi-ssize_max.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-ioctl.patch
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-static-linking.patch
