@@ -1242,9 +1242,15 @@ static vlc_tick_t
 ClockListenerUpdate(void *opaque, vlc_tick_t ck_system,
                     vlc_tick_t ck_stream, double rate, bool discontinuity)
 {
-    (void) discontinuity;
     es_out_pgrm_t *pgrm = opaque;
     vlc_clock_Lock(pgrm->clocks.input);
+
+    if (discontinuity)
+    {
+        const vlc_tick_t current_date = vlc_tick_now();
+        vlc_clock_main_SetFirstPcr(pgrm->clocks.main, current_date, ck_stream);
+    }
+
     vlc_tick_t drift =
         vlc_clock_Update(pgrm->clocks.input, ck_system, ck_stream, rate);
     vlc_clock_Unlock(pgrm->clocks.input);
@@ -1259,7 +1265,6 @@ ClockListenerReset(void *opaque)
     vlc_clock_Reset(pgrm->clocks.input);
     vlc_clock_Unlock(pgrm->clocks.input);
 }
-
 
 static void EsOutProgramHandleClockSource(es_out_sys_t *p_sys, es_out_pgrm_t *p_pgrm)
 {
