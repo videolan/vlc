@@ -192,3 +192,64 @@ impl TryFrom<i32> for ModuleProperties {
         Ok(prop)
     }
 }
+
+use std::ffi::c_int;
+#[allow(non_camel_case_types)]
+pub type vlc_activate = unsafe extern "C" fn(*mut vlc_object_t) -> c_int;
+#[allow(non_camel_case_types)]
+pub type vlc_deactivate = unsafe extern "C" fn(*mut vlc_object_t);
+
+///
+/// Exposes the activation and deactivation functions for modules.
+///
+/// Capabilities for modules are traits implementing a Loader type
+/// implementing the ModuleProtocol trait to provide the activation
+/// and deactivation functions for the module.
+///
+/// * `T`: Type implementing the final capability trait
+/// * `Activate`: Type for the activation function
+/// * `Deactivate`: Type for the deactivation function
+///
+/// ```no_run
+/// #![feature(associated_type_defaults)]
+/// use std::marker::PhantomData;
+/// use vlcrs_plugin::ModuleProtocol;
+///
+/// /* New trait bringing support for new capabilities in modules. */
+///
+/// type ActivateFunction = unsafe extern "C" fn();
+/// type DeactivateFunction = unsafe extern "C" fn();
+/// trait NewCapabilityTrait {
+///     /* Mandatory type definition for capability traits */
+///     type Activate = ActivateFunction;
+///     type Deactivate = DeactivateFunction;
+///     type Loader = NewCapabilityLoader<Self>;
+///
+///     /* Example capability interface, can be anything and can add
+///      * as many function as required. */
+///     fn open(&self);
+/// }
+///
+/// /* Implement a function to load modules implementing NewCapabilityTrait. */
+/// unsafe extern "C" fn activate_new_capability<ModuleType: ?Sized + NewCapabilityTrait>() {
+///     /* Do anything needed to initialize the module, for instance initializing
+///      * a ModuleType object and call the open() function on it. */
+/// }
+///
+/// /* Implement a module loader for this new capability trait. */
+/// struct NewCapabilityLoader<ModuleType: ?Sized> { _phantom : PhantomData<ModuleType> }
+/// impl<ModuleType> ModuleProtocol<
+///     ModuleType,
+///     ActivateFunction,
+///     DeactivateFunction>
+/// for NewCapabilityLoader<ModuleType>
+/// where ModuleType : ?Sized + NewCapabilityTrait {
+///     fn activate_function() -> ActivateFunction { activate_new_capability::<ModuleType> }
+///     fn deactivate_function() -> Option<DeactivateFunction> { None }
+/// }
+/// ```
+pub trait ModuleProtocol<ModuleType: ?Sized, Activate, Deactivate=*mut ()>
+{
+    fn activate_function() -> Activate;
+    fn deactivate_function() -> Option<Deactivate> { None }
+}
