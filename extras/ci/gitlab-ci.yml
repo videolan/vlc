@@ -425,24 +425,24 @@ debian-meson:
     allow_failure: true
     variables: *variables-snap
 
-snap:
-    extends: .snap-common
+# snap:
+#     extends: .snap-common
 
-nightly-snap:
-    extends: .snap-common
-    rules:
-        - if: '$CI_PIPELINE_SOURCE == "schedule"'
-    after_script:
-        - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
-        - mkdir nightlies
-        - mv extras/package/snap/vlc_*.snap nightlies/
-        - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
-        - snapcraft push nightlies/vlc_*.snap --release edge
-        - snapcraft logout
-        - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
-    artifacts:
-        paths:
-           - nightlies/*
+# nightly-snap:
+#     extends: .snap-common
+#     rules:
+#         - if: '$CI_PIPELINE_SOURCE == "schedule"'
+#     after_script:
+#         - if [ "$CI_PROJECT_NAMESPACE" = "videolan" ]; then /bin/true; else exit 0; fi
+#         - mkdir nightlies
+#         - mv extras/package/snap/vlc_*.snap nightlies/
+#         - echo $SNAP_LOGIN | base64 --decode | snapcraft login --with -
+#         - snapcraft push nightlies/vlc_*.snap --release edge
+#         - snapcraft logout
+#         - cd nightlies && find . -maxdepth 1 -type f -not -name SHA512SUM | xargs shasum -a 512 | tee SHA512SUM
+#     artifacts:
+#         paths:
+#            - nightlies/*
 
 #
 # Raspbian
