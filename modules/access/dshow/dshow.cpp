@@ -639,7 +639,7 @@ static int DemuxOpen( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_demux->p_sys = (demux_sys_t *)p_sys;
 
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     if( vlc_mta_acquire( p_this ) == false )
     {
@@ -739,7 +739,7 @@ static int AccessOpen( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     if( vlc_mta_acquire( p_this ) == false )
     {
@@ -796,7 +796,7 @@ static void AccessClose( vlc_object_t *p_this )
     stream_t     *p_access = (stream_t *)p_this;
     access_sys_t *p_sys    = (access_sys_t *)p_access->p_sys;
 
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     /* Stop capturing stuff */
     p_sys->p_control->Stop();
@@ -812,7 +812,7 @@ static void DemuxClose( vlc_object_t *p_this )
     demux_t      *p_demux = (demux_t *)p_this;
     access_sys_t *p_sys   = (access_sys_t *)p_demux->p_sys;
 
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     /* Stop capturing stuff */
     p_sys->p_control->Stop();
@@ -1712,7 +1712,7 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, ComPtr<IBaseFilter> &p_filte
  *****************************************************************************/
 static block_t *ReadCompressed( stream_t *p_access, bool *eof )
 {
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     access_sys_t   *p_sys = (access_sys_t *)p_access->p_sys;
     /* There must be only 1 elementary stream to produce a valid stream
@@ -1759,7 +1759,7 @@ out:
  ****************************************************************************/
 static int Demux( demux_t *p_demux )
 {
-    ComContext ctx( COINIT_MULTITHREADED );
+    ComContext ctx( COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE );
 
     access_sys_t *p_sys = (access_sys_t *)p_demux->p_sys;
     int i_found_samples;
@@ -1993,7 +1993,7 @@ static int FindDevices( const char *psz_name, char ***vp, char ***tp )
 
         // Use STA as this most likely comes from a Qt thread, which is
         // initialized as STA.
-        ComContext ctx( COINIT_APARTMENTTHREADED );
+        ComContext ctx( COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE );
 
         FindCaptureDevice( NULL, NULL, &list_devices, b_audio );
 

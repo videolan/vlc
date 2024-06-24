@@ -2302,7 +2302,7 @@ static int OpenMFTVideoEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t*)p_this;
 
-    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE)) )
         return VLC_EINVAL;
 
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
@@ -2451,7 +2451,7 @@ static int OpenMFTAudioEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t*)p_this;
 
-    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE)) )
         return VLC_EINVAL;
 
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);
@@ -2591,7 +2591,7 @@ static int Open(vlc_object_t *p_this)
 {
     decoder_t *p_dec = (decoder_t *)p_this;
 
-    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED)) )
+    if( FAILED(CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE)) )
         return VLC_EINVAL;
 
     HRESULT hr = MFStartup(MF_VERSION, MFSTARTUP_NOSOCKET);

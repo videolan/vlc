@@ -580,7 +580,7 @@ void WinTaskbarWidget::createTaskBarButtons()
     if (!winId)
         return;
 
-    HRESULT hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    HRESULT hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE );
     if( FAILED(hr) )
         return;
 

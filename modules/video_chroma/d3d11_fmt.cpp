@@ -188,7 +188,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
                d3d_dev->adapterDesc.SubSysId, d3d_dev->adapterDesc.Revision);
     BSTR bVideoController = SysAllocString(lookup);
 
-    hr =  CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr))
     {
         msg_Dbg(obj, "Unable to initialize COM library");

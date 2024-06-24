@@ -307,7 +307,7 @@ static int DecOpen( decoder_t *p_dec )
     int i_ret = VLC_EGENERIC;
 
     /* Initialize OLE/COM */
-    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
+    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE )) )
         vlc_assert_unreachable();
 
     if( LoadDMO( VLC_OBJECT(p_dec), &hmsdmo_dll, &p_dmo, p_dec->fmt_in, false )
@@ -1371,7 +1371,7 @@ static int EncOpen( vlc_object_t *p_this )
     HINSTANCE hmsdmo_dll = NULL;
 
     /* Initialize OLE/COM */
-    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED )) )
+    if( FAILED(CoInitializeEx( NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE )) )
         vlc_assert_unreachable();
 
     if( LoadDMO( p_this, &hmsdmo_dll, &p_dmo, &p_enc->fmt_out, true )

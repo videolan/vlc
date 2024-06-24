@@ -1433,7 +1433,7 @@ void SPrefsPanel::assoDialog()
 {
     HRESULT hr;
 
-    hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+    hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE );
     if( SUCCEEDED(hr) )
     {
         void *p;

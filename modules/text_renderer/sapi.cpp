@@ -111,7 +111,7 @@ struct MTAGuard
 
     MTAGuard()
     {
-        this->result_mta = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        this->result_mta = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     }
 
     ~MTAGuard()

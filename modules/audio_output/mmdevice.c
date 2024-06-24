@@ -50,7 +50,7 @@ DEFINE_GUID (GUID_VLC_AUD_OUT, 0x4533f59d, 0x59ee, 0x00c6,
 
 static int TryEnterMTA(vlc_object_t *obj)
 {
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     if (unlikely(FAILED(hr)))
     {
         msg_Err (obj, "cannot initialize COM (error 0x%lX)", hr);
@@ -62,7 +62,7 @@ static int TryEnterMTA(vlc_object_t *obj)
 
 static void EnterMTA(void)
 {
-    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     if (unlikely(FAILED(hr)))
         abort();
 }
@@ -1462,7 +1462,7 @@ static int ReloadAudioDevices(char const *name, char ***values, char ***descs)
 
     (void) name;
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr)) {
         if (hr != RPC_E_CHANGED_MODE)
             return -1;

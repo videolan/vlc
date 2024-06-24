@@ -314,7 +314,7 @@ static unsigned __stdcall Thread(void *data)
     void *pv;
     HRESULT hr;
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     assert(SUCCEEDED(hr)); /* COM already allocated by parent thread */
     SetEvent(sys->ready);
 
@@ -430,7 +430,7 @@ static int Open(vlc_object_t *obj)
             goto error;
     }
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     if (unlikely(FAILED(hr))) {
         msg_Err(demux, "cannot initialize COM (error 0x%lX)", hr);
         goto error;
@@ -494,7 +494,7 @@ static void Close (vlc_object_t *obj)
     demux_sys_t *sys = demux->p_sys;
     HRESULT hr;
 
-    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+    hr = CoInitializeEx(NULL, COINIT_MULTITHREADED | COINIT_DISABLE_OLE1DDE);
     assert(SUCCEEDED(hr));
 
     SetEvent(sys->events[0]);
