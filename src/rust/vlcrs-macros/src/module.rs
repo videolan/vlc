@@ -4,9 +4,9 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
-    braced, bracketed, parse::Parse, parse_macro_input, punctuated::Punctuated, spanned::Spanned,
-    Attribute, Error, ExprRange, Ident, Lit, LitByteStr, LitInt, LitStr, MetaNameValue,
-    RangeLimits, Token,
+    braced, bracketed, parenthesized, parse::Parse, parse_macro_input,
+    punctuated::Punctuated, spanned::Spanned, Attribute, Error, ExprRange,
+    Ident, Lit, LitByteStr, LitInt, LitStr, MetaNameValue, RangeLimits, Token
 };
 
 struct SectionInfo {
@@ -45,6 +45,7 @@ struct SubmoduleInfo {
 
 struct ModuleInfo {
     type_: Ident,
+    trait_: Ident,
     category: Ident,
     capability: CapabilityInfo,
     description: LitStr,
@@ -59,6 +60,7 @@ struct ModuleInfo {
 impl Parse for ModuleInfo {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut type_ = None;
+        let mut trait_ = None;
         let mut category = None;
         let mut capability = None;
         let mut description = None;
@@ -85,6 +87,9 @@ impl Parse for ModuleInfo {
                 input.parse::<Token![type]>()?;
                 input.parse::<Token![:]>()?;
                 type_ = Some(input.parse()?);
+                let parenthesis_content;
+                parenthesized!(parenthesis_content in input);
+                trait_ = Some(parenthesis_content.parse()?);
                 input.parse::<Token![,]>()?;
                 continue;
             }
@@ -195,6 +200,10 @@ impl Parse for ModuleInfo {
             return Err(input.error("missing `type` key"));
         };
 
+        let Some(trait_) = trait_ else {
+            return Err(input.error("invalid `type` key, missing module trait"));
+        };
+
         let Some(capability) = capability else {
             return Err(input.error("missing `capability` key"));
         };
@@ -213,6 +222,7 @@ impl Parse for ModuleInfo {
 
         Ok(ModuleInfo {
             type_,
+            trait_,
             category,
             capability,
             description,
@@ -504,6 +514,7 @@ fn vlc_param_name(module_info: &ModuleInfo, param: &ParameterInfo) -> String {
 fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let ModuleInfo {
         type_,
+        trait_,
         category,
         description,
         help,
