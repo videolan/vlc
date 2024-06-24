@@ -108,6 +108,7 @@ pub enum ConfigSubcategory {
 }
 
 
+#[derive(Debug, PartialEq, PartialOrd)]
 #[allow(non_camel_case_types)]
 #[repr(i32)]
 pub enum ModuleProperties {
@@ -145,4 +146,49 @@ pub enum ModuleProperties {
     CONFIG_ADD_ACTION_OBSOLETE,
     CONFIG_LIST,
     CONFIG_LIST_CB_OBSOLETE,
+}
+
+impl TryFrom<i32> for ModuleProperties {
+    type Error = ();
+
+    fn try_from(opcode: i32) -> Result<Self, Self::Error> {
+        let prop = match opcode {
+            x if x == ModuleProperties::MODULE_CREATE as i32 => ModuleProperties::MODULE_CREATE,
+            x if x == ModuleProperties::CONFIG_CREATE as i32 => ModuleProperties::CONFIG_CREATE,
+
+            x if x == ModuleProperties::MODULE_CPU_REQUIREMENT as i32 => ModuleProperties::MODULE_CPU_REQUIREMENT,
+            x if x == ModuleProperties::MODULE_SHORTCUT as i32 => ModuleProperties::MODULE_SHORTCUT,
+            x if x == ModuleProperties::MODULE_CAPABILITY as i32 => ModuleProperties::MODULE_CAPABILITY,
+            x if x == ModuleProperties::MODULE_SCORE as i32 => ModuleProperties::MODULE_SCORE,
+            x if x == ModuleProperties::MODULE_CB_OPEN as i32 => ModuleProperties::MODULE_CB_OPEN,
+            x if x == ModuleProperties::MODULE_CB_CLOSE as i32 => ModuleProperties::MODULE_CB_CLOSE,
+            x if x == ModuleProperties::MODULE_NO_UNLOAD as i32 => ModuleProperties::MODULE_NO_UNLOAD,
+            x if x == ModuleProperties::MODULE_NAME as i32 => ModuleProperties::MODULE_NAME,
+            x if x == ModuleProperties::MODULE_SHORTNAME as i32 => ModuleProperties::MODULE_SHORTNAME,
+            x if x == ModuleProperties::MODULE_DESCRIPTION as i32 => ModuleProperties::MODULE_DESCRIPTION,
+            x if x == ModuleProperties::MODULE_HELP as i32 => ModuleProperties::MODULE_HELP,
+            x if x == ModuleProperties::MODULE_TEXTDOMAIN as i32 => ModuleProperties::MODULE_TEXTDOMAIN,
+            x if x == ModuleProperties::MODULE_HELP_HTML as i32 => ModuleProperties::MODULE_HELP_HTML,
+
+            x if x == ModuleProperties::CONFIG_NAME as i32 => ModuleProperties::CONFIG_NAME,
+            x if x == ModuleProperties::CONFIG_VALUE as i32 => ModuleProperties::CONFIG_VALUE,
+            x if x == ModuleProperties::CONFIG_RANGE as i32 => ModuleProperties::CONFIG_RANGE,
+            x if x == ModuleProperties::CONFIG_ADVANCED_RESERVED as i32 => ModuleProperties::CONFIG_ADVANCED_RESERVED,
+            x if x == ModuleProperties::CONFIG_VOLATILE as i32 => ModuleProperties::CONFIG_VOLATILE,
+            x if x == ModuleProperties::CONFIG_PERSISTENT_OBSOLETE as i32 => ModuleProperties::CONFIG_PERSISTENT_OBSOLETE,
+            x if x == ModuleProperties::CONFIG_PRIVATE as i32 => ModuleProperties::CONFIG_PRIVATE,
+            x if x == ModuleProperties::CONFIG_REMOVED as i32 => ModuleProperties::CONFIG_REMOVED,
+            x if x == ModuleProperties::CONFIG_CAPABILITY as i32 => ModuleProperties::CONFIG_CAPABILITY,
+            x if x == ModuleProperties::CONFIG_SHORTCUT as i32 => ModuleProperties::CONFIG_SHORTCUT,
+            x if x == ModuleProperties::CONFIG_OLDNAME_OBSOLETE as i32 => ModuleProperties::CONFIG_OLDNAME_OBSOLETE,
+            x if x == ModuleProperties::CONFIG_SAFE as i32 => ModuleProperties::CONFIG_SAFE,
+            x if x == ModuleProperties::CONFIG_DESC as i32 => ModuleProperties::CONFIG_DESC,
+            x if x == ModuleProperties::CONFIG_LIST_OBSOLETE as i32 => ModuleProperties::CONFIG_LIST_OBSOLETE,
+            x if x == ModuleProperties::CONFIG_ADD_ACTION_OBSOLETE as i32 => ModuleProperties::CONFIG_ADD_ACTION_OBSOLETE,
+            x if x == ModuleProperties::CONFIG_LIST as i32 => ModuleProperties::CONFIG_LIST,
+            x if x == ModuleProperties::CONFIG_LIST_CB_OBSOLETE as i32 => ModuleProperties::CONFIG_LIST_CB_OBSOLETE,
+            _ => return Err(())
+        };
+        Ok(prop)
+    }
 }
