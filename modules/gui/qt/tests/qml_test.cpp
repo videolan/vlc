@@ -17,9 +17,24 @@
 *****************************************************************************/
 
 #include <QtQuickTest>
+#include <QQmlEngine>
 
 // not much right now, type registration & initialisation may be required later on
 // https://doc.qt.io/qt-5/qtquicktest-index.html#executing-c-before-qml-tests
+
+class Setup : public QObject
+{
+    Q_OBJECT
+
+public:
+    Setup() {}
+
+public slots:
+    void qmlEngineAvailable(QQmlEngine *engine)
+    {
+        engine->addImportPath(":/");
+    }
+};
 
 int main(int argc, char **argv)
 {
@@ -29,7 +44,11 @@ int main(int argc, char **argv)
 #ifdef QT_USE_QMLCACHEGEN
     Q_INIT_RESOURCE( util_cachegen );
 #endif
+
     //run tests offscreen as the CI doesn't have a desktop environment
     qputenv("QT_QPA_PLATFORM", "offscreen");
-    return quick_test_main(argc, argv, "qml_test", QUICK_TEST_SOURCE_DIR);
+    Setup setup;
+    return quick_test_main_with_setup(argc, argv, "qml_test", QUICK_TEST_SOURCE_DIR, &setup);
 }
+
+#include "qml_test.moc"

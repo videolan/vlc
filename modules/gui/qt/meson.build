@@ -1058,12 +1058,16 @@ if qt6_dep.found()
 
     test_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
     if test_qt6_dep.found()
+        qml_test_moc = qt6.compile_moc(
+            sources : files('tests/qml_test.cpp'),
+            dependencies : [test_qt6_dep, qt6_dep]
+        )
         qml_test = executable(
           'qml_test',
-          files('tests/qml_test.cpp'),
+          [files('tests/qml_test.cpp'), qml_test_moc],
           qt6pre_qrc,
           build_by_default: false,
-          dependencies: [test_qt6_dep],
+          dependencies: [test_qt6_dep, qt6_dep],
           link_with: qmllibs,
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
