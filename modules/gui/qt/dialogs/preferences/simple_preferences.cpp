@@ -194,6 +194,7 @@ static int getDefaultAudioVolume(const char *aout)
 
 namespace
 {
+#if !defined( _WIN32)
     void fillStylesCombo( QComboBox *stylesCombo, const QString &initialStyle)
     {
         stylesCombo->addItem( qtr("System's default") );
@@ -203,6 +204,7 @@ namespace
         if ( stylesCombo->currentIndex() < 0 )
             stylesCombo->setCurrentIndex( 0 ); /* default */
     }
+#endif
 
     QString getQStyleKey(const QComboBox *stylesCombo, const QString &defaultStyleName)
     {
