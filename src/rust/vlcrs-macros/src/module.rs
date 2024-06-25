@@ -1010,46 +1010,11 @@ pub fn module(input: TokenStream) -> TokenStream {
                 #rust_name: #rust_type,
             }
         });
-        let params_assign = params.params.iter().map(|param| {
-            let rust_name = &param.name;
-            let vlc_name = vlc_param_name(&module_info, param);
-            let vlc_name_with_nul = tt_c_str!(param.name.span()=> vlc_name);
-
-            let method_name = Ident::new(if param.type_ == "i64" {
-                "inherit_integer"
-            } else if param.type_ == "f32" {
-                "inherit_float"
-            } else if param.type_ == "bool" {
-                "inherit_bool"
-            } else if param.type_ == "str" {
-                "inherit_string"
-            } else {
-                unreachable!("unknown type_: {}", param.type_)
-            }, param.type_.span());
-
-            quote! {
-                #rust_name: {
-                    const VAR_NAME: &::std::ffi::CStr = unsafe { ::std::ffi::CStr::from_bytes_with_nul_unchecked(#vlc_name_with_nul) };
-                    module_args.#method_name(VAR_NAME)?
-                },
-            }
-        });
 
         quote! {
             #[derive(Debug, PartialEq)]
             struct #struct_name {
                 #(#params_def)*
-            }
-            // TODO should this be a TryFrom?
-            impl ::std::convert::TryFrom<&mut ::vlcrs_plugin::ModuleArgs> for #struct_name {
-                type Error = ();
-
-                fn try_from(module_args: &mut ::vlcrs_plugin::ModuleArgs) ->
-                        ::std::result::Result<Self, Self::Error> {
-                    Ok(#struct_name {
-                        #(#params_assign)*
-                    })
-                }
             }
         }
     });
