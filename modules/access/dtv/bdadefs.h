@@ -39,12 +39,6 @@ interface ISampleGrabber;
 #endif /* __cplusplus */
 #endif
 
-class IGuideData;
-class IGuideDataEvent;
-class IEnumTuneRequests;
-class IEnumGuideDataProperties;
-class IGuideDataProperty;
-
 
 /*****************************************************************************
  * ISampleGrabberCB interface
@@ -287,72 +281,6 @@ static FORCEINLINE HRESULT ISampleGrabber_SetCallback(ISampleGrabber* This,ISamp
 
 #endif  /* __ISampleGrabber_INTERFACE_DEFINED__ */
 
-
-class IGuideData : public IUnknown
-{
-public:
-    virtual HRESULT STDMETHODCALLTYPE GetServices(
-        IEnumTuneRequests **ppEnumTuneRequestslass )=0;
-    virtual HRESULT STDMETHODCALLTYPE GetServiceProperties(
-        ITuneRequest *pTuneRequest,
-        IEnumGuideDataProperties **ppEnumProperties )=0;
-    virtual HRESULT STDMETHODCALLTYPE GetGuideProgramIDs(
-        IEnumVARIANT **pEnumPrograms )=0;
-    virtual HRESULT STDMETHODCALLTYPE GetProgramProperties(
-        VARIANT varProgramDescriptionID,
-        IEnumGuideDataProperties **ppEnumProperties )=0;
-    virtual HRESULT STDMETHODCALLTYPE GetScheduleEntryIDs(
-        IEnumVARIANT **pEnumScheduleEntries )=0;
-    virtual HRESULT STDMETHODCALLTYPE GetScheduleEntryProperties(
-        VARIANT varScheduleEntryDescriptionID,
-        IEnumGuideDataProperties **ppEnumProperties )=0;
-};
-
-class IGuideDataEvent : public IUnknown
-{
-public:
-    virtual HRESULT STDMETHODCALLTYPE GuideDataAcquired( void )=0;
-    virtual HRESULT STDMETHODCALLTYPE ProgramChanged(
-        VARIANT varProgramDescriptionID )=0;
-    virtual HRESULT STDMETHODCALLTYPE ServiceChanged(
-        VARIANT varServiceDescriptionID )=0;
-    virtual HRESULT STDMETHODCALLTYPE ScheduleEntryChanged(
-        VARIANT varScheduleEntryDescriptionID )=0;
-    virtual HRESULT STDMETHODCALLTYPE ProgramDeleted(
-        VARIANT varProgramDescriptionID )=0;
-    virtual HRESULT STDMETHODCALLTYPE ServiceDeleted(
-        VARIANT varServiceDescriptionID )=0;
-    virtual HRESULT STDMETHODCALLTYPE ScheduleDeleted(
-            VARIANT varScheduleEntryDescriptionID )=0;
-};
-
-class IGuideDataProperty : public IUnknown
-{
-public:
-    virtual  HRESULT STDMETHODCALLTYPE get_Name( BSTR *pbstrName )=0;
-    virtual  HRESULT STDMETHODCALLTYPE get_Language( long *idLang )=0;
-    virtual  HRESULT STDMETHODCALLTYPE get_Value( VARIANT *pvar )=0;
-};
-
-class IEnumGuideDataProperties : public IUnknown
-{
-public:
-    virtual HRESULT STDMETHODCALLTYPE Next( unsigned long celt,
-        IGuideDataProperty **ppprop, unsigned long *pcelt )=0;
-    virtual HRESULT STDMETHODCALLTYPE Skip( unsigned long celt )=0;
-    virtual HRESULT STDMETHODCALLTYPE Reset( void )=0;
-    virtual HRESULT STDMETHODCALLTYPE Clone( IEnumGuideDataProperties **ppenum )=0;
-};
-
-class IEnumTuneRequests : public IUnknown
-{
-public:
-    virtual HRESULT STDMETHODCALLTYPE Next( unsigned long celt, ITuneRequest **ppprop,
-        unsigned long *pcelt )=0;
-    virtual HRESULT STDMETHODCALLTYPE Skip( unsigned long celt )=0;
-    virtual HRESULT STDMETHODCALLTYPE Reset( void )=0;
-    virtual HRESULT STDMETHODCALLTYPE Clone( IEnumTuneRequests **ppenum )=0;
-};
 
 extern "C" {
 DEFINE_GUID(CLSID_DigitalCableNetworkType,
