@@ -317,11 +317,11 @@ static void CreateDirectShowGraph( access_sys_t *p_sys )
 
     /* Create directshow filter graph */
     if( SUCCEEDED( CoCreateInstance( CLSID_FilterGraph, 0, CLSCTX_INPROC,
-                       __uuidof(p_sys->p_graph.Get()), &p_sys->p_graph ) ) )
+                       IID_PPV_ARGS( &p_sys->p_graph ) ) ) )
     {
         /* Create directshow capture graph builder if available */
         if( SUCCEEDED( CoCreateInstance( CLSID_CaptureGraphBuilder2, 0,
-                         CLSCTX_INPROC, __uuidof(p_sys->p_capture_graph_builder2.Get()), &p_sys->p_capture_graph_builder2 ) ) )
+                         CLSCTX_INPROC, IID_PPV_ARGS( &p_sys->p_capture_graph_builder2 ) ) ) )
         {
             p_sys->p_capture_graph_builder2->
                 SetFiltergraph(static_cast<IGraphBuilder *>(p_sys->p_graph.Get()) );
@@ -1186,7 +1186,7 @@ FindCaptureDevice( vlc_object_t *p_this, std::string *p_devicename,
     ComPtr<ICreateDevEnum> p_dev_enum;
 
     hr = CoCreateInstance( CLSID_SystemDeviceEnum, NULL, CLSCTX_INPROC,
-                           __uuidof(p_dev_enum.Get()), &p_dev_enum );
+                           IID_PPV_ARGS( &p_dev_enum ) );
     if( FAILED(hr) )
     {
         msg_Err( p_this, "failed to create the device enumerator (0x%lX)", hr);
@@ -1944,14 +1944,14 @@ static int AppendAudioEnabledVDevs( vlc_object_t *p_this, std::list<std::string>
     ComPtr<IGraphBuilder> p_gbuilder;
     ComPtr<ICaptureGraphBuilder2> p_cgbuilder;
 
-    if( FAILED( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, __uuidof(p_graph.Get()), &p_graph ) ) )
+    if( FAILED( CoCreateInstance( CLSID_FilterGraph, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS( &p_graph ) ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( p_graph.As( &p_gbuilder ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( CoCreateInstance( CLSID_CaptureGraphBuilder2, NULL, CLSCTX_INPROC_SERVER,
-                                  __uuidof(p_cgbuilder.Get()), &p_cgbuilder ) ) )
+                                  IID_PPV_ARGS( &p_cgbuilder ) ) ) )
         return VLC_EGENERIC;
 
     if( FAILED( p_cgbuilder->SetFiltergraph( p_gbuilder.Get() ) ) )
