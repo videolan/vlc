@@ -1418,17 +1418,6 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
     return b_temp;
 }
 
-#if !defined(__IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__)
-#define __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__
-    const GUID IID_IApplicationAssociationRegistrationUI = {0x1f76a169,0xf994,0x40ac, {0x8f,0xc8,0x09,0x59,0xe8,0x87,0x47,0x10}};
-    extern const GUID CLSID_ApplicationAssociationRegistrationUI;
-    interface IApplicationAssociationRegistrationUI : public IUnknown
-    {
-        virtual HRESULT STDMETHODCALLTYPE LaunchAdvancedAssociationUI(
-                LPCWSTR pszAppRegName) = 0;
-    };
-#endif /* __IApplicationAssociationRegistrationUI_INTERFACE_DEFINED__ */
-
 void SPrefsPanel::assoDialog()
 {
     HRESULT hr;
