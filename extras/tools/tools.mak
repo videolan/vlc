@@ -167,14 +167,20 @@ CLEAN_FILE += .buildxz
 
 # config.guess
 
-config.guess:UNPACK_DIR=.
-config.guess:
+config.guess-$(CONFIGGUESS_VERSION):
 	$(call download_pkg,$(CONFIGGUESS_URL),config.guess)
+
+config.sub-$(CONFIGSUB_VERSION):
+	$(call download_pkg,$(CONFIGSUB_URL),config.sub)
+
+config.guess: UNPACK_DIR=.
+config.guess: config.guess-$(CONFIGGUESS_VERSION)
+	cp -f $< $@
 	$(APPLY) $(TOOLS)/config.guess-config-add-support-for-arm64_32.patch
 
 config.sub:UNPACK_DIR=.
-config.sub:
-	$(call download_pkg,$(CONFIGSUB_URL),config.sub)
+config.sub: config.sub-$(CONFIGSUB_VERSION)
+	cp -f $< $@
 	$(APPLY) $(TOOLS)/config.sub-config-add-support-for-arm64_32.patch
 
 .buildconfigguess: config.guess config.sub
