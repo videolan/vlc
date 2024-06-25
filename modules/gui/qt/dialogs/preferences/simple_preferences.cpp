@@ -1438,7 +1438,7 @@ void SPrefsPanel::assoDialog()
     {
         void *p;
 
-        hr = CoCreateInstance(CLSID_ApplicationAssociationRegistrationUI,
+        hr = CoCreateInstance(__uuidof(ApplicationAssociationRegistrationUI),
                               NULL, CLSCTX_INPROC_SERVER,
                               IID_IApplicationAssociationRegistrationUI, &p);
         if( SUCCEEDED(hr) )

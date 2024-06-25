@@ -587,7 +587,7 @@ void WinTaskbarWidget::createTaskBarButtons()
         return;
     }
 
-    HRESULT hr = CoCreateInstance( CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER,
+    HRESULT hr = CoCreateInstance( __uuidof(TaskbarList), NULL, CLSCTX_INPROC_SERVER,
                                    IID_PPV_ARGS(p_taskbl.ReleaseAndGetAddressOf()));
     if( FAILED(hr) )
     {
