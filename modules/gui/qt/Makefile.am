@@ -14,7 +14,7 @@
 include ../../common.am
 guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
-SUFFIXES += .ui .h .hpp .moc.cpp .qml .js .mjs
+SUFFIXES += .ui .h .hpp .moc.cpp .qml .js .mjs .moc
 TEST_EXTENSIONS = .qml
 EXTRA_DIST = qt6.pro private-core.pro private-gui.pro private-quick.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
@@ -350,6 +350,9 @@ moc_verbose_0 = @echo "  MOC   " $@;
 moc_verbose__0 = $(moc_verbose_0)
 
 .hpp.moc.cpp:
+	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
+
+.cpp.moc:
 	$(moc_verbose)$(MOC) $(MOC_CPPFLAGS) -o $@ $<
 
 # These MOC files depend on the configure settings:
