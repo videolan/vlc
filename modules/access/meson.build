@@ -285,7 +285,7 @@ if dvdread_dep.found()
 endif
 
 # Blu-ray access
-libbluray_dep = dependency('libbluray', version: '>= 0.6.2', required: get_option('bluray'))
+libbluray_dep = dependency('libbluray', version: '>= 1.1.0', required: get_option('bluray'))
 if libbluray_dep.found()
     vlc_modules += {
         'name' : 'bluray',
