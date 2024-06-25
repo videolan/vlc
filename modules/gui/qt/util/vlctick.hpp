@@ -40,6 +40,11 @@ public:
     /**
      * @brief formatHMS
      * @return time as HH:MM:SS
+     *
+     * this method should be used to present running time or
+     * time that will be compared to a running time
+     *
+     * milliseconds will be truncated towards 0
      */
     Q_INVOKABLE QString formatHMS() const;
 

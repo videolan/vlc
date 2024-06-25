@@ -58,8 +58,7 @@ QString VLCTick::formatHMS() const
     int64_t t_ms = MS_FROM_VLC_TICK(m_ticks);
     if (t_ms >= 1000)
     {
-        //round to the nearest second
-        t_ms = roundNearestMultiple(t_ms, 1000);
+        //truncate milliseconds toward 0
         int64_t t_sec = t_ms / 1000;
         int sec = t_sec % 60;
         int min = (t_sec / 60) % 60;
