@@ -65,6 +65,9 @@
 
 #include <cassert>
 #include <math.h>
+#ifdef _WIN32
+#include <wrl/client.h>
+#endif
 
 #define ICON_HEIGHT 48
 #define ICON_WIDTH 48
@@ -1425,18 +1428,14 @@ void SPrefsPanel::assoDialog()
     hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE );
     if( SUCCEEDED(hr) )
     {
-        void *p;
-
-        hr = CoCreateInstance(__uuidof(ApplicationAssociationRegistrationUI),
-                              NULL, CLSCTX_INPROC_SERVER,
-                              IID_IApplicationAssociationRegistrationUI, &p);
-        if( SUCCEEDED(hr) )
         {
-            IApplicationAssociationRegistrationUI *p_regui =
-                (IApplicationAssociationRegistrationUI *)p;
+            Microsoft::WRL::ComPtr<IApplicationAssociationRegistrationUI> p_regui;
 
-            hr = p_regui->LaunchAdvancedAssociationUI(L"VLC" );
-            p_regui->Release();
+            hr = CoCreateInstance(__uuidof(ApplicationAssociationRegistrationUI),
+                                NULL, CLSCTX_INPROC_SERVER,
+                                IID_PPV_ARGS(&p_regui));
+            if( SUCCEEDED(hr) )
+                p_regui->LaunchAdvancedAssociationUI(L"VLC" );
         }
         CoUninitialize();
     }
