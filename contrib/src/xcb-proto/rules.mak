@@ -14,6 +14,7 @@ $(TARBALLS)/xcb-proto-$(XCB_PROTO_VERSION).tar.gz:
 
 xcb-proto: xcb-proto-$(XCB_PROTO_VERSION).tar.gz .sum-xcb-proto
 	$(UNPACK)
+	$(call update_autoconfig,.)
 	$(MOVE)
 
 .xcb-proto: xcb-proto

@@ -13,6 +13,7 @@ $(TARBALLS)/libffi-$(FFI_VERSION).tar.gz:
 
 ffi: libffi-$(FFI_VERSION).tar.gz .sum-ffi
 	$(UNPACK)
+	$(call update_autoconfig,.)
 	$(MOVE)
 
 .ffi: ffi

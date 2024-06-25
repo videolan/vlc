@@ -48,6 +48,7 @@ $(TARBALLS)/libbluray-$(BLURAY_VERSION).tar.bz2:
 
 bluray: libbluray-$(BLURAY_VERSION).tar.bz2 .sum-bluray
 	$(UNPACK)
+	$(call update_autoconfig,build-aux)
 	$(call pkg_static,"src/libbluray.pc.in")
 	$(MOVE)
 

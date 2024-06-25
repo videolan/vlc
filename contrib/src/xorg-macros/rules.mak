@@ -13,6 +13,7 @@ endif
 
 xorg-macros: util-macros-$(UTILS_MACROS_VERSION).tar.bz2 .sum-xorg-macros
 	$(UNPACK)
+	$(call update_autoconfig,.)
 	$(MOVE)
 
 .xorg-macros: xorg-macros

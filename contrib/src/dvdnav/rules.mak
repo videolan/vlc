@@ -21,6 +21,7 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
+	$(call update_autoconfig,.)
 	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 

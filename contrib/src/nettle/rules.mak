@@ -22,6 +22,7 @@ $(TARBALLS)/nettle-$(NETTLE_VERSION).tar.gz:
 
 nettle: nettle-$(NETTLE_VERSION).tar.gz .sum-nettle
 	$(UNPACK)
+	$(call update_autoconfig,.)
 	$(MOVE)
 
 DEPS_nettle = gmp $(DEPS_gmp)
