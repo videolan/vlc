@@ -168,7 +168,6 @@ endif
 
 libdshow_plugin_la_SOURCES = access/dshow/dshow.cpp access/dshow/access.h \
 	access/dshow/filter.cpp access/dshow/filter.h access/dshow/crossbar.cpp ../src/win32/mta_holder.h
-libdshow_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DSTRSAFE_NO_DEPRECATE
 libdshow_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libdshow_plugin_la_LIBADD = $(LIBCOM) -luuid -lstrmiids -lksuser
 if HAVE_WIN32_DESKTOP

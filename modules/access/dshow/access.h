@@ -25,6 +25,12 @@
  * Preamble
  *****************************************************************************/
 
+#if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 12
+// before 1ec7fa221644b6d02a617a47f6e80f5069cdc893 using strcpy
+// is replaced by strcpy_instead_use_StringCbCopyA_or_StringCchCopyA
+#define STRSAFE_NO_DEPRECATE
+#endif
+
 #include <dshow.h>
 
 #include <vector>

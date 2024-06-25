@@ -29,9 +29,12 @@
 #include <ole2.h>
 #include <limits.h>
 
-/* FIXME: mingw.org doesn't define secure versions of
- * http://msdn.microsoft.com/en-us/library/f30dzcf6.aspxu */
-#define NO_DSHOW_STRSAFE
+#if defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 12
+// before 1ec7fa221644b6d02a617a47f6e80f5069cdc893 using _snwprintf
+// is replaced by _snwprintf_instead_use_StringCbPrintfW_or_StringCchPrintfW
+#define STRSAFE_NO_DEPRECATE
+#endif
+
 #include <dshow.h>
 
 #include <comcat.h>
