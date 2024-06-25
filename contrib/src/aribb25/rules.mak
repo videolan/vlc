@@ -22,6 +22,7 @@ $(TARBALLS)/aribb25-$(ARIBB25_VERSION).tar.gz:
 
 aribb25: aribb25-$(ARIBB25_VERSION).tar.gz .sum-aribb25
 	$(UNPACK)
+	# $(call update_autoconfig,.)
 	$(APPLY) $(SRC)/aribb25/0001-fix-build-script.patch
 	$(APPLY) $(SRC)/aribb25/0002-fix-libs-include.patch
 	$(MOVE)

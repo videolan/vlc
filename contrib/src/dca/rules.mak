@@ -19,6 +19,7 @@ $(TARBALLS)/libdca-$(DCA_VERSION).tar.bz2:
 
 libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(UNPACK)
+	# $(call update_autoconfig,.auto)
 	$(call pkg_static,"./libdca/libdca.pc.in")
 	$(MOVE)
 

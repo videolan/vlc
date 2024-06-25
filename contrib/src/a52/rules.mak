@@ -14,6 +14,7 @@ $(TARBALLS)/a52dec-$(A52DEC_VERSION).tar.gz:
 
 a52dec: a52dec-$(A52DEC_VERSION).tar.gz .sum-a52
 	$(UNPACK)
+	# $(call update_autoconfig,autotools)
 	$(APPLY) $(SRC)/a52/liba52-pic.patch
 	$(APPLY) $(SRC)/a52/liba52-silence.patch
 	$(APPLY) $(SRC)/a52/liba52-inline.patch

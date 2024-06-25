@@ -19,6 +19,7 @@ $(TARBALLS)/LibVNCServer-$(VNCCLIENT_VERSION).tar.gz:
 
 vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(UNPACK)
+	# $(call update_autoconfig,.)
 	mv libvncserver-LibVNCServer-$(VNCCLIENT_VERSION)  LibVNCServer-$(VNCCLIENT_VERSION)
 	$(APPLY) $(SRC)/vncclient/libvncclient-libjpeg-win32.patch
 	$(APPLY) $(SRC)/vncclient/rfbproto.patch

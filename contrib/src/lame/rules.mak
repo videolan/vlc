@@ -10,6 +10,7 @@ $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 
 lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
+	# $(call update_autoconfig,.)
 	$(APPLY) $(SRC)/lame/lame-forceinline.patch
 	$(APPLY) $(SRC)/lame/sse.patch
 ifdef HAVE_VISUALSTUDIO

@@ -16,6 +16,7 @@ $(TARBALLS)/daala-$(DAALA_VERSION).tar.xz:
 
 daala: daala-$(DAALA_VERSION).tar.xz .sum-daala
 	$(UNPACK)
+	# $(call update_autoconfig,build-aux)
 	$(call pkg_static,"daaladec.pc.in")
 	$(call pkg_static,"daalaenc.pc.in")
 	$(MOVE)

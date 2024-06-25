@@ -29,6 +29,7 @@ $(TARBALLS)/mfx_dispatch-$(MFX_VERSION).tar.gz:
 
 mfx: mfx_dispatch-$(MFX_VERSION).tar.gz .sum-mfx
 	$(UNPACK)
+	# $(call update_autoconfig,.)
 	$(APPLY) $(SRC)/mfx/0001-fix-UWP-build-in-ming-w64.patch
 	$(APPLY) $(SRC)/mfx/0002-fix-UWP-build-in-ming-w64.patch
 	$(APPLY) $(SRC)/mfx/0001-Add-missing-mfx_dispatcher_uwp.h-.cpp.patch

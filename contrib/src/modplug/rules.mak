@@ -17,6 +17,7 @@ $(TARBALLS)/libmodplug-$(MODPLUG_VERSION).tar.gz:
 
 libmodplug: libmodplug-$(MODPLUG_VERSION).tar.gz .sum-modplug
 	$(UNPACK)
+	# $(call update_autoconfig,.)
 	$(APPLY) $(SRC)/modplug/modplug-win32-static.patch
 	$(APPLY) $(SRC)/modplug/macosx-do-not-force-min-version.patch
 	$(APPLY) $(SRC)/modplug/fix-endianness-check.diff
