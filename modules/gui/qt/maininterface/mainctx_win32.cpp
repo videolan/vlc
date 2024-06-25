@@ -554,8 +554,7 @@ WinTaskbarWidget::~WinTaskbarWidget()
 {
     if( himl )
         ImageList_Destroy( himl );
-    if(p_taskbl)
-        p_taskbl->Release();
+    p_taskbl.Reset();
 }
 
 Q_GUI_EXPORT HBITMAP qt_pixmapToWinHBITMAP(const QPixmap &p, int hbitmapFormat = 0);
@@ -572,7 +571,6 @@ void WinTaskbarWidget::createTaskBarButtons()
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
     */
-    p_taskbl = NULL;
     himl = NULL;
 
     auto winId = WinId(m_window);
@@ -589,16 +587,14 @@ void WinTaskbarWidget::createTaskBarButtons()
         return;
     }
 
-    void *pv;
     HRESULT hr = CoCreateInstance( CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER,
-                                   IID_ITaskbarList3, &pv);
+                                   IID_PPV_ARGS(p_taskbl.ReleaseAndGetAddressOf()));
     if( FAILED(hr) )
     {
         m_comHolder.reset();
         return;
     }
 
-    p_taskbl = (ITaskbarList3 *)pv;
     p_taskbl->HrInit();
 
     int iconX = GetSystemMetrics(SM_CXSMICON);
@@ -607,8 +603,7 @@ void WinTaskbarWidget::createTaskBarButtons()
                              4 /*cInitial*/, 0 /*cGrow*/);
     if( himl == NULL )
     {
-        p_taskbl->Release();
-        p_taskbl = NULL;
+        p_taskbl.Reset();
         m_comHolder.reset();
         return;
     }
