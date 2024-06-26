@@ -296,7 +296,7 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
     bool b_gap = true;
     ISegment *datasegment = pos.rep->getNextMediaSegment(pos.number, &pos.number, &b_gap);
 
-    if(!datasegment)
+    if(!datasegment && (!pos.rep->needsIndex() || pos.index_sent))
         return ChunkEntry();
 
     ISegment *segment = nullptr;
@@ -322,12 +322,12 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
     if(!segmentChunk)
         return ChunkEntry();
 
-    if(segment != datasegment) /* need to set for init */
+    if(segment != datasegment && datasegment) /* need to set for init */
         segmentChunk->discontinuitySequenceNumber = datasegment->getDiscontinuitySequenceNumber();
 
     vlc_tick_t startTime = VLC_TICK_INVALID;
     vlc_tick_t duration = 0;
-    vlc_tick_t displayTime = datasegment->getDisplayTime();
+    vlc_tick_t displayTime = datasegment ? datasegment->getDisplayTime() : VLC_TICK_INVALID;
     /* timings belong to timeline and are not set on the segment or need profile timescale */
     if(pos.rep->getPlaybackTimeDurationBySegmentNumber(pos.number, &startTime, &duration))
         startTime += VLC_TICK_0;
