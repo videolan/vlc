@@ -26,9 +26,8 @@ cddb: libcddb-$(CDDB_VERSION).tar.bz2 .sum-cddb
 	# Avoid relying on iconv.m4 from gettext, when reconfiguring.
 	# This is only used by the frontend which we disable.
 	sed -i.orig 's/^AM_ICONV/#&/' $(UNPACK_DIR)/configure.ac
-ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/cddb/win32-pkg.patch
-endif
+	# add internal dependencies
+	sed -i.orig 's/-lcddb @LIBICONV@/-lcddb @LIBICONV@ @LIBS@/' $(UNPACK_DIR)/libcddb.pc.in
 	$(MOVE)
 
 DEPS_cddb = regex $(DEPS_regex)
