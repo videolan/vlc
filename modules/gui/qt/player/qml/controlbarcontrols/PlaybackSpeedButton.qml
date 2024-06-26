@@ -32,6 +32,8 @@ PopupIconToolButton {
 
     text: qsTr("Playback Speed")
 
+    description: qsTr("change playback speed")
+
     popup.contentItem: P.PlaybackSpeed {
         colorContext.palette: root.colorContext.palette
 
