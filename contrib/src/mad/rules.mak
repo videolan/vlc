@@ -42,7 +42,6 @@ endif
 	$(APPLY) $(SRC)/mad/mad-mips-h-constraint-removal.patch
 	$(APPLY) $(SRC)/mad/mad-foreign.patch
 	$(APPLY) $(SRC)/mad/check-bitstream-length.patch
-	cd $(UNPACK_DIR) && rm -rf aclocal.m4 Makefile.in
 	$(MOVE)
 
 .mad: libmad
