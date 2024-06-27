@@ -536,7 +536,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 
     return PacketizeXXC1( p_dec, VLC_OBJECT(p_dec),
                           p_sys->i_avcC_length_size, pp_block,
-                          ParseNALBlockW );
+                          ParseNALBlockW, PacketizeDrain );
 }
 
 /*****************************************************************************
