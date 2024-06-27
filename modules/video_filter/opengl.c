@@ -365,7 +365,7 @@ vlc_module_begin()
     set_shortname( N_("opengl") )
     set_description( N_("Opengl filter executor") )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 1 )
+    set_capability( "video filter", 0 )
     add_shortcut( "opengl" )
     set_callback( OpenOpenGL )
     add_module_list( "opengl-filter", "opengl filter", NULL,
