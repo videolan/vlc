@@ -223,10 +223,8 @@ end:
 #endif
 }
 
-static int OpenOpenGL(vlc_object_t *obj)
+static int OpenOpenGL(filter_t *filter)
 {
-    filter_t *filter = (filter_t *)obj;
-
     filter_sys_t *sys
         = filter->p_sys
         = malloc(sizeof *sys);
@@ -240,7 +238,7 @@ static int OpenOpenGL(vlc_object_t *obj)
 
     struct vlc_decoder_device *device = filter_HoldDecoderDevice(filter);
 
-    sys->gl = CreateGL(obj, device, width, height);
+    sys->gl = CreateGL(VLC_OBJECT(filter), device, width, height);
 
     /* The vlc_gl_t instance must have hold the device if it needs it. */
     if (device)
@@ -248,13 +246,13 @@ static int OpenOpenGL(vlc_object_t *obj)
 
     if (sys->gl == NULL)
     {
-        msg_Err(obj, "Failed to create opengl context");
+        msg_Err(filter, "Failed to create opengl context");
         goto gl_create_failure;
     }
 
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
     {
-        msg_Err(obj, "Failed to gl make current");
+        msg_Err(filter, "Failed to gl make current");
         assert(false);
         goto make_current_failure;
     }
@@ -262,7 +260,7 @@ static int OpenOpenGL(vlc_object_t *obj)
     struct vlc_gl_api *api = &sys->api;
     if (vlc_gl_api_Init(api, sys->gl) != VLC_SUCCESS)
     {
-        msg_Err(obj, "Failed to init vlc_gl_api");
+        msg_Err(filter, "Failed to init vlc_gl_api");
         goto gl_api_failure;
     }
 
@@ -270,7 +268,7 @@ static int OpenOpenGL(vlc_object_t *obj)
                                       &filter->fmt_in.video);
     if (!sys->interop)
     {
-        msg_Err(obj, "Could not create interop");
+        msg_Err(filter, "Could not create interop");
         goto gl_interop_failure;
     }
 
@@ -278,7 +276,7 @@ static int OpenOpenGL(vlc_object_t *obj)
         var_InheritString(filter, OPENGL_CFG_PREFIX "filter");
     if (!glfilters_config)
     {
-        msg_Err(obj, "No filters requested");
+        msg_Err(filter, "No filters requested");
         goto filter_config_failure;
     }
 
@@ -286,7 +284,7 @@ static int OpenOpenGL(vlc_object_t *obj)
     sys->filters = vlc_gl_filters_New(sys->gl, api, sys->interop, ORIENT_NORMAL);
     if (!sys->filters)
     {
-        msg_Err(obj, "Could not create filters");
+        msg_Err(filter, "Could not create filters");
         free(glfilters_config);
         goto filters_new_failure;
     }
@@ -296,7 +294,7 @@ static int OpenOpenGL(vlc_object_t *obj)
     ret = LoadFilters(sys, glfilters_config);
     if (ret != VLC_SUCCESS)
     {
-        msg_Err(obj, "Could not load filters: %s", glfilters_config);
+        msg_Err(filter, "Could not load filters: %s", glfilters_config);
         free(glfilters_config);
         goto filters_load_failure;
     }
@@ -314,7 +312,7 @@ static int OpenOpenGL(vlc_object_t *obj)
     ret = vlc_gl_filters_InitFramebuffers(sys->filters);
     if (ret != VLC_SUCCESS)
     {
-        msg_Err(obj, "Could not init filters framebuffers");
+        msg_Err(filter, "Could not init filters framebuffers");
         goto init_framebuffer_failure;
     }
 
@@ -365,9 +363,8 @@ vlc_module_begin()
     set_shortname( N_("opengl") )
     set_description( N_("Opengl filter executor") )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
-    set_capability( "video filter", 0 )
     add_shortcut( "opengl" )
-    set_callback( OpenOpenGL )
+    set_callback_video_filter( OpenOpenGL )
     add_module_list( "opengl-filter", "opengl filter", NULL,
                      FILTER_LIST_TEXT, FILTER_LIST_LONGTEXT )
     add_module( "opengl-gl", "opengl offscreen", "", "OpenGL provider",
