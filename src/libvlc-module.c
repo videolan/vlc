@@ -2297,6 +2297,7 @@ vlc_module_begin ()
 #   define KEY_RATE_SLOWER_FINE   NULL
 #   define KEY_NEXT               "Command+Right"
 #   define KEY_PREV               "Command+Left"
+#   define KEY_PROJECTION_TOGGLE  NULL
 #   define KEY_STOP               "Command+."
 #   define KEY_POSITION           "t"
 #   define KEY_JUMP_MEXTRASHORT   "Command+Ctrl+Left"
@@ -2430,6 +2431,7 @@ vlc_module_begin ()
 #   define KEY_PREV               "p\tMedia Prev Track"
 #   define KEY_STOP               "s\tMedia Stop"
 #endif
+#   define KEY_PROJECTION_TOGGLE  NULL
 #   define KEY_POSITION           "t"
 #   define KEY_JUMP_MEXTRASHORT   "Shift+Left"
 #   define KEY_JUMP_PEXTRASHORT   "Shift+Right"
@@ -2570,6 +2572,7 @@ vlc_module_begin ()
             RATE_SLOWER_FINE_KEY_TEXT, RATE_SLOWER_FINE_KEY_LONGTEXT)
     add_key("key-next", KEY_NEXT, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT)
     add_key("key-prev", KEY_PREV, PREV_KEY_TEXT, PREV_KEY_LONGTEXT)
+    add_key("key-projection-toggle", KEY_PROJECTION_TOGGLE, "", "")
     add_key("key-stop", KEY_STOP, STOP_KEY_TEXT, STOP_KEY_LONGTEXT)
     add_key("key-position", KEY_POSITION, POSITION_KEY_TEXT,
              POSITION_KEY_LONGTEXT)
