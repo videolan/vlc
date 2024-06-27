@@ -340,6 +340,7 @@ static const struct name2action
     { "prev", ACTIONID_PREV, },
     { "program-sid-next", ACTIONID_PROGRAM_SID_NEXT, },
     { "program-sid-prev", ACTIONID_PROGRAM_SID_PREV, },
+    { "projection-toggle", ACTIONID_PROJECTION_TOGGLE, },
     { "quit", ACTIONID_QUIT, },
     { "random", ACTIONID_RANDOM, },
     { "rate-faster-fine", ACTIONID_RATE_FASTER_FINE, },
