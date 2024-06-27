@@ -38,6 +38,9 @@ T.Control {
 
     readonly property bool dragActive: dragHandler.active
 
+    required property real fixedColumnWidth
+    required property real weightedColumnWidth
+
     property int _modifiersOnLastPress: Qt.NoModifier
 
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
@@ -186,7 +189,14 @@ T.Control {
                 id: loader
                 required property var modelData
                 property TableRowDelegate item: null
-                width: (modelData.size) ? VLCStyle.colWidth(modelData.size) : 0
+                width: {
+                    if (!!modelData.size)
+                        return modelData.size * delegate.fixedColumnWidth
+                    else if (!!modelData.weight)
+                        return modelData.weight * delegate.weightedColumnWidth
+                    else
+                        return 0
+                }
                 height: parent.height
 
                 Component.onCompleted: {

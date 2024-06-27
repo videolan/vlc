@@ -183,10 +183,8 @@ MainInterface.MainViewLoader {
         MainInterface.MainTableView {
             id: tableView_id
 
-            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tableView_id.availableRowWidth)
-
             property var _modelSmall: [{
-                size: Math.max(2, tableView_id._nbCols),
+                weight: 1,
 
                 model: ({
                     criteria: "title",
@@ -203,7 +201,7 @@ MainInterface.MainViewLoader {
             }]
 
             property var _modelMedium: [{
-                size: 2,
+                weight: 1,
 
                 model: {
                     criteria: "title",
@@ -216,7 +214,7 @@ MainInterface.MainViewLoader {
                     placeHolder: VLCStyle.noArtAlbumCover
                 }
             }, {
-                size: Math.max(1, tableView_id._nbCols - 3),
+                weight: 1,
 
                 model: {
                     criteria: "main_artist",

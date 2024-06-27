@@ -42,10 +42,8 @@ MainInterface.MainTableView {
     //---------------------------------------------------------------------------------------------
     // Private
 
-    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
-
     property var _modelSmall: [{
-        size: Math.max(2, _nbCols),
+        weight: 1,
 
         model: ({
             criteria: mainCriteria,
@@ -83,7 +81,7 @@ MainInterface.MainTableView {
             colDelegate   : tableColumns.titleDelegate
         })
     }, {
-        size: Math.max(1, _nbCols - 2),
+        weight: 1,
 
         model: ({
             criteria: mainCriteria,

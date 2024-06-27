@@ -368,8 +368,6 @@ FocusScope {
 
             fadingEdge.backgroundColor: headerColor
 
-            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(tracks.availableRowWidth)
-
             property Component titleDelegate: Widgets.TableRowDelegate {
                 id: title
 
@@ -437,7 +435,7 @@ FocusScope {
             }
 
             sortModel: [{
-                size: Math.max(tracks._nbCols - 1, 1),
+                weight: 1,
 
                 model: {
                     criteria: "title",

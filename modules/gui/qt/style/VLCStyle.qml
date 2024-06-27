@@ -324,11 +324,6 @@ QtObject {
       return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
     }
 
-    //Returns the number columns fitting in given width
-    function gridColumnsForWidth(width) {
-        return Math.floor((width + column_spacing) / (column_width + column_spacing))
-    }
-
     Component.onCompleted: {
         {
             // Resize handle width setting:

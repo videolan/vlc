@@ -52,8 +52,8 @@ FocusScope {
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
     //       margins implementation like in ExpandGridView. The default values should be the same
     //       than ExpandGridView to respect the grid parti pris.
-    property int leftMargin: VLCStyle.column_margin + leftPadding
-    property int rightMargin: VLCStyle.column_margin + rightPadding
+    property int leftMargin: VLCStyle.margin_normal + leftPadding
+    property int rightMargin: VLCStyle.margin_normal + rightPadding
 
     property int leftPadding: 0
     property int rightPadding: 0
@@ -64,14 +64,29 @@ FocusScope {
     readonly property int contentLeftMargin: extraMargin + leftMargin
     readonly property int contentRightMargin: extraMargin + rightMargin
 
-    readonly property real usedRowSpace: {
-        let size = leftMargin + rightMargin
+    property real baseColumnWidth: VLCStyle.column_width
 
-        for (let i in sortModel)
-            size += VLCStyle.colWidth(sortModel[i].size)
-
-        return size + Math.max(VLCStyle.column_spacing * (sortModel.length - 1), 0)
+    readonly property int _fixedColumnSize: {
+       let size = 0
+       for (let i in sortModel) {
+           size += sortModel[i].size ?? 0
+       }
+       return size * baseColumnWidth
     }
+
+    readonly property int _totalColumnWeights: {
+         let count = 0
+
+         for (let i in sortModel) {
+             count += sortModel[i].weight ?? 0
+         }
+         return count
+      }
+
+    readonly property int _availableSpaceForWeightedColumns: (width - (leftMargin + rightMargin + _totalSpacerSize + _fixedColumnSize))
+    readonly property int _weightedColumnsSize: _availableSpaceForWeightedColumns / _totalColumnWeights
+
+    readonly property int _totalSpacerSize: VLCStyle.column_spacing * sortModel.length
 
     property Component header: null
     property Item headerItem: view.headerItem?.loadedHeader ?? null
@@ -308,8 +323,14 @@ FocusScope {
                             property TableHeaderDelegate _item: null
 
                             height: VLCStyle.tableHeaderText_height
-                            width: VLCStyle.colWidth(modelData.size) || 1
-
+                            width: {
+                                if (!!modelData.size)
+                                    return modelData.size * root.baseColumnWidth
+                                else if (!!modelData.weight)
+                                    return modelData.weight * root._weightedColumnsSize
+                                else
+                                    return 0
+                            }
                             Accessible.role: Accessible.ColumnHeader
                             Accessible.name: modelData.model.text
 
@@ -380,6 +401,9 @@ FocusScope {
 
             width: view.width
             height: root.rowHeight
+
+            fixedColumnWidth: root.baseColumnWidth
+            weightedColumnWidth: root._weightedColumnsSize
 
             leftPadding: root.contentLeftMargin
             rightPadding: root.contentRightMargin

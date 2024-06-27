@@ -72,7 +72,7 @@ FocusScope {
                 focus: true
                 anchors.centerIn: parent
                 height: VLCStyle.dp(32, VLCStyle.scale)
-                width: VLCStyle.colWidth(Math.max(VLCStyle.gridColumnsForWidth(root.width * .6), 2))
+                width: root.width * .6
                 placeholderText: qsTr("Paste or write the URL here")
                 selectByMouse: true
 

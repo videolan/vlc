@@ -216,10 +216,8 @@ MainInterface.MainViewLoader {
         MainInterface.MainTableView {
             id: tableView_id
 
-            property int _nbCols: VLCStyle.gridColumnsForWidth(availableRowWidth)
-
             property var _modelSmall: [{
-                size: Math.max(2, tableView_id._nbCols),
+                weight: 1,
 
                 model: {
                     criteria: "name",
@@ -247,7 +245,7 @@ MainInterface.MainViewLoader {
                     colDelegate: tableColumns.titleDelegate
                 }
             }, {
-                size: Math.max(1, _nbCols - 2),
+                weight: 1,
 
                 model: {
                     criteria: "name",

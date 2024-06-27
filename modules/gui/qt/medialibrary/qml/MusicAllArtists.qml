@@ -146,10 +146,8 @@ MainInterface.MainViewLoader {
         MainInterface.MainTableView {
             id: artistTable
 
-            readonly property int _nbCols: VLCStyle.gridColumnsForWidth(artistTable.availableRowWidth)
-
             property var _modelSmall: [{
-                size: Math.max(2, artistTable._nbCols),
+                weight: 1,
 
                 model: ({
                     criteria: "name",
@@ -166,7 +164,7 @@ MainInterface.MainViewLoader {
             }]
 
             property var _modelMedium: [{
-                size: Math.max(1, artistTable._nbCols - 1),
+                weight: 1,
 
                 model: {
                     criteria: "name",

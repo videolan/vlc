@@ -37,8 +37,6 @@ Widgets.KeyNavigableTableView {
     property alias sortOrder: urlModel.sortOrder
     property alias sortCriteria: urlModel.sortCriteria
 
-    readonly property int _nbCols: VLCStyle.gridColumnsForWidth(
-                                       listView_id.availableRowWidth)
     property Component urlHeaderDelegate: Widgets.TableHeaderDelegate {
         Widgets.IconLabel {
             anchors.fill: parent
@@ -54,7 +52,7 @@ Widgets.KeyNavigableTableView {
     model: urlModel
 
     sortModel: [{
-        size: Math.max(listView_id._nbCols - 1, 1),
+        weight: 1,
 
         model: {
             criteria: "url",
