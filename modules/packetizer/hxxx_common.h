@@ -37,8 +37,10 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t * );
 
 /* */
 
-typedef block_t * (*pf_annexb_nal_parse)(decoder_t *, bool *, block_t *);
-block_t *PacketizeXXC1( decoder_t *, uint8_t, block_t **, pf_annexb_nal_parse );
+typedef block_t * (*pf_annexb_nal_parse)(void *, bool *, block_t *);
+block_t *PacketizeXXC1( void *, struct vlc_logger *,
+                       uint8_t, block_t **,
+                       pf_annexb_nal_parse );
 
 #endif // HXXX_COMMON_H
 
