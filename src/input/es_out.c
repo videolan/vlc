@@ -1327,8 +1327,8 @@ static void EsOutProgramHandleClockSource(es_out_sys_t *p_sys, es_out_pgrm_t *p_
     if (p_pgrm->active_clock_source != VLC_CLOCK_MASTER_INPUT)
     {
         vlc_clock_main_Lock(p_pgrm->clocks.main);
-        p_pgrm->clocks.input = vlc_clock_main_CreateSlave(
-            p_pgrm->clocks.main, "pcr", UNKNOWN_ES, NULL, NULL);
+        p_pgrm->clocks.input =
+            vlc_clock_main_CreateInputSlave(p_pgrm->clocks.main);
         vlc_clock_main_Unlock(p_pgrm->clocks.main);
 
         if (p_pgrm->clocks.input != NULL)
