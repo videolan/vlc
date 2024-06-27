@@ -233,11 +233,9 @@ error:
     return VLC_EGENERIC;
 }
 
-static int OpenVideoFilter(vlc_object_t *obj)
+static int OpenVideoFilter(filter_t *filter)
 {
-    filter_t *filter = (filter_t*)obj;
-
-    char *mode = var_InheritString(obj, "deinterlace-mode");
+    char *mode = var_InheritString(filter, "deinterlace-mode");
     bool is_supported = !mode
         || !strcmp(mode, "auto")
         || !strcmp(mode, "blend");
@@ -258,8 +256,7 @@ vlc_module_begin()
     set_description("OpenGL blend deinterlace filter")
     set_subcategory(SUBCAT_VIDEO_VFILTER)
 
-    set_capability("video filter", 0)
-    set_callback(OpenVideoFilter)
+    set_callback_video_filter(OpenVideoFilter)
     add_shortcut("glblend")
 
     add_submodule()
