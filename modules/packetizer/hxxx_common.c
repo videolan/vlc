@@ -111,7 +111,8 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t *p_desc
  * Will prepend a SPS and PPS before each keyframe
  ****************************************************************************/
 block_t *PacketizeXXC1( decoder_t *p_dec, uint8_t i_nal_length_size,
-                        block_t **pp_block, pf_annexb_nal_packetizer pf_nal_parser )
+                        block_t **pp_block,
+                        pf_annexb_nal_parse pf_nal_parser )
 {
     block_t       *p_block;
     block_t       *p_ret = NULL;
