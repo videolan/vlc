@@ -232,7 +232,7 @@ T.Control {
 
                 // NOTE: We want the contextButton to be contained inside the trailing
                 //       column_spacing.
-                anchors.leftMargin: -width
+                anchors.leftMargin: -width - delegate.leftPadding
 
                 anchors.verticalCenter: parent.verticalCenter
 
