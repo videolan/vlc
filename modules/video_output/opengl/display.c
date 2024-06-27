@@ -78,6 +78,7 @@ typedef struct vout_display_sys_t
     vout_display_place_t place;
     bool place_changed;
     bool is_dirty;
+    bool restart_renderer;
 
     struct {
         PFNGLFLUSHPROC Flush;
@@ -121,15 +122,6 @@ UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
     return ret;
 }
 
-static const struct vlc_display_operations ops = {
-    .close = Close,
-    .prepare = PictureRender,
-    .display = PictureDisplay,
-    .control = Control,
-    .set_viewpoint = SetViewpoint,
-    .update_format = UpdateFormat,
-};
-
 static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
                          struct vout_display_placement dp)
 {
@@ -166,6 +158,31 @@ static void PlacePicture(vout_display_t *vd, vout_display_place_t *place,
 
     video_format_Clean(&source);
 }
+
+static void UpdateConfig(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    PlacePicture(vd, &sys->place, vd->cfg->display);
+    sys->place_changed = true;
+}
+
+static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
+{
+    vout_display_sys_t *sys = vd->sys;
+    UpdateConfig(vd);
+    sys->restart_renderer = true;
+    return VLC_SUCCESS;
+}
+
+static const struct vlc_display_operations ops = {
+    .close = Close,
+    .prepare = PictureRender,
+    .display = PictureDisplay,
+    .control = Control,
+    .set_viewpoint = SetViewpoint,
+    .update_format = UpdateFormat,
+    .change_source_projection = ChangeSourceProjection,
+};
 
 /**
  * Allocates a surface and an OpenGL context for video output.
@@ -281,8 +298,12 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
 
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
-        vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
-        sys->vt.Flush();
+        if (sys->restart_renderer)
+        {
+            vout_display_opengl_ChangeProjection(sys->vgl, vd->cfg->projection);
+            sys->restart_renderer = false;
+        }
+
         if (sys->place_changed)
         {
             vout_display_opengl_SetOutputSize(sys->vgl, vd->cfg->display.width,
@@ -291,7 +312,10 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
                                          sys->place.width, sys->place.height);
             sys->place_changed = false;
         }
+
+        vout_display_opengl_Prepare (sys->vgl, pic, subpicture);
         vout_display_opengl_Display(sys->vgl);
+
         sys->vt.Flush();
         vlc_gl_ReleaseCurrent (sys->gl);
         sys->is_dirty = true;
@@ -316,6 +340,7 @@ static int Control (vout_display_t *vd, int query)
     {
 
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+            UpdateConfig(vd);
             vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
             // fallthrough
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -326,8 +351,10 @@ static int Control (vout_display_t *vd, int query)
 
             PlacePicture(vd, &sys->place, dp);
             sys->place_changed = true;
+            UpdateConfig(vd);
             return VLC_SUCCESS;
         }
+
         default:
             msg_Err (vd, "Unknown request %d", query);
     }
