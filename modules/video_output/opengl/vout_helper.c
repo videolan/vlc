@@ -10,6 +10,7 @@
  *          Adrien Maglo <magsoft at videolan dot org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -63,6 +64,7 @@ struct vout_display_opengl_t {
     struct vlc_gl_sub_renderer *sub_renderer;
 
     vlc_viewpoint_t viewpoint;
+    video_projection_mode_t projection;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -176,6 +178,41 @@ CreateFilters(vlc_gl_t *gl, const struct vlc_gl_api *api,
 error:
     vlc_gl_filters_Delete(filters);
     return NULL;
+}
+
+int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
+                                         video_projection_mode_t projection)
+{
+    const config_chain_t chain = {
+        .psz_name = strdup("projection-mode"),
+        .psz_value = strdup(projection == PROJECTION_MODE_RECTANGULAR ? "0" : "-1"),
+    };
+
+    struct vlc_gl_filter *new_renderer =
+        vlc_gl_filters_Replace(vgl->filters, vgl->renderer_filter, "renderer", &chain);
+    free(chain.psz_name);
+    free(chain.psz_value);
+    if (new_renderer == NULL)
+    {
+        msg_Err(vgl->gl, "Could not re-create renderer filter for projection mode %d",
+                (int)projection);
+        return VLC_EGENERIC;
+    }
+
+    int ret = vlc_gl_filters_InitFramebuffers(vgl->filters);
+    if (ret != VLC_SUCCESS)
+    {
+        msg_Err(vgl->gl, "Could not init filters framebuffers");
+        return VLC_EGENERIC;
+    }
+
+    vgl->renderer_filter = new_renderer;
+    vgl->renderer = new_renderer->sys;
+
+    vlc_gl_renderer_SetViewpoint(vgl->renderer, &vgl->viewpoint);
+
+    msg_Dbg(vgl->gl, "Changed to projection mode %d", projection);
+    return VLC_SUCCESS;
 }
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,

@@ -87,4 +87,7 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
                                      const video_format_t *fmt,
                                      vlc_video_context *vctx);
 
+int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
+                                         video_projection_mode_t projection);
+
 #endif
