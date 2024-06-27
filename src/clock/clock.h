@@ -171,6 +171,17 @@ vlc_clock_t *vlc_clock_main_CreateMaster(vlc_clock_main_t *main_clock,
 vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock);
 
 /**
+ * This function creates a new input slave vlc_clock_t interface
+ *
+ * @warning There can be only one input, slave or master, at a given time.
+ *
+ * You must use vlc_clock_Delete to free it.
+ *
+ * @param main_clock the locked main_clock
+ */
+vlc_clock_t *vlc_clock_main_CreateInputSlave(vlc_clock_main_t *main_clock);
+
+/**
  * This function creates a new slave vlc_clock_t interface
  *
  * You must use vlc_clock_Delete to free it.

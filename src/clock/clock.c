@@ -811,6 +811,21 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
     return clock;
 }
 
+vlc_clock_t *vlc_clock_main_CreateInputSlave(vlc_clock_main_t *main_clock)
+{
+    vlc_mutex_assert(&main_clock->lock);
+
+    /* The input has always the 0 priority */
+    vlc_clock_t *clock = vlc_clock_main_Create(main_clock, "input", 0, NULL, NULL);
+    if (!clock)
+        return NULL;
+
+    clock->ops = &slave_ops;
+    main_clock->rc++;
+
+    return clock;
+}
+
 vlc_clock_t *vlc_clock_main_CreateSlave(vlc_clock_main_t *main_clock,
                                         const char* track_str_id,
                                         enum es_format_category_e cat,
