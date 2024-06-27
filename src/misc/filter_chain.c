@@ -73,6 +73,7 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
             case VLC_SUCCESS:
                 vlc_debug(log, "using %s module \"%s\"", capability,
                           module_get_object(cand));
+                assert( p_filter->ops != NULL );
                 p_filter->p_module = cand;
                 /* fall through */
             case VLC_ETIMEOUT:
