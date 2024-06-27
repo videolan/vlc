@@ -64,24 +64,24 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
         if (cb == NULL)
             continue;
 
+        p_filter->p_module = cand;
         p_filter->obj.force = i < strict_total;
         ret = cb(p_filter);
-        if (ret != VLC_SUCCESS)
-            vlc_objres_clear(&p_filter->obj);
-
-        switch (ret) {
-            case VLC_SUCCESS:
-                vlc_debug(log, "using %s module \"%s\"", capability,
-                          module_get_object(cand));
-                assert( p_filter->ops != NULL );
-                p_filter->p_module = cand;
-                /* fall through */
-            case VLC_ETIMEOUT:
-                goto done;
+        if (ret == VLC_SUCCESS)
+        {
+            vlc_debug(log, "using %s module \"%s\"", capability,
+                        module_get_object(cand));
+            assert( p_filter->ops != NULL );
+            break;
         }
+
+        vlc_objres_clear(&p_filter->obj);
+        p_filter->p_module = NULL;
+
+        if (ret == VLC_ETIMEOUT)
+            break;
     }
 
-done:
     if (p_filter->p_module == NULL)
         vlc_debug(log, "no %s modules matched with name %s", capability, name);
 
