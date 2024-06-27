@@ -82,6 +82,8 @@
  * my dice --Meuuh */
 #define CR_MEAN_PTS_GAP VLC_TICK_FROM_MS(300)
 
+#define CR_MAX_GAP CR_MEAN_PTS_GAP
+
 /* Rate (in 1/256) at which we will read faster to try to increase our
  * internal buffer (if we control the pace of the source).
  */

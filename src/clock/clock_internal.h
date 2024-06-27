@@ -27,9 +27,6 @@
 #include <vlc_common.h>
 #include <vlc_tick.h>
 
-/* Maximum gap allowed between two CRs. */
-#define CR_MAX_GAP VLC_TICK_FROM_SEC(60)
-
 /*****************************************************************************
  * Structures
  *****************************************************************************/
