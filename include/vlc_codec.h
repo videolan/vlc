@@ -93,7 +93,7 @@ struct decoder_owner_callbacks
 };
 
 /*
- * BIG FAT WARNING : the code relies in the first 4 members of filter_t
+ * BIG FAT WARNING : the code relies in the first 3 members of filter_t
  * and decoder_t to be the same, so if you have anything to add, do it
  * at the end of the structure.
  */

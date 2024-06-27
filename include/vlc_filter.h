@@ -204,7 +204,7 @@ typedef int (*vlc_filter_open)(filter_t *);
     set_capability( "video blending", priority )
 
 /** Structure describing a filter
- * @warning BIG FAT WARNING : the code relies on the first 4 members of
+ * @warning BIG FAT WARNING : the code relies on the first 3 members of
  * filter_t and decoder_t to be the same, so if you have anything to add,
  * do it at the end of the structure.
  */
