@@ -33,6 +33,33 @@
 #include <libvlc.h>
 #include <assert.h>
 
+static int vlc_filter_Activate(void *func, bool forced, va_list ap)
+{
+    filter_t *p_filter = va_arg(ap, filter_t *);
+    vlc_filter_open activate = func;
+
+    p_filter->obj.force = forced;
+    int ret = activate(p_filter);
+    if (ret != VLC_SUCCESS)
+        vlc_objres_clear(&p_filter->obj);
+    return ret;
+}
+
+module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
+                                const char *name, bool strict)
+{
+    const bool b_force_backup = p_filter->obj.force; /* FIXME: remove this */
+    p_filter->p_module = vlc_module_load(p_filter->obj.logger, capability, name, strict,
+                                         vlc_filter_Activate, p_filter);
+    if (p_filter->p_module != NULL) {
+        var_Create(p_filter, "module-name", VLC_VAR_STRING);
+        var_SetString(p_filter, "module-name", module_get_object(p_filter->p_module));
+    }
+
+    p_filter->obj.force = b_force_backup;
+    return p_filter->p_module;
+}
+
 typedef struct chained_filter_t
 {
     /* Public part of the filter structure */

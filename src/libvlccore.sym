@@ -135,6 +135,7 @@ filter_chain_ForEach
 filter_ConfigureBlend
 filter_DeleteBlend
 filter_NewBlend
+vlc_filter_LoadModule
 FromCharset
 vlc_find_iso639
 vlc_http_auth_Init

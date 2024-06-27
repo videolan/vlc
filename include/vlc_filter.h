@@ -243,6 +243,9 @@ static inline void filter_Close( filter_t *p_filter )
         p_filter->ops->close( p_filter );
 }
 
+VLC_API module_t *vlc_filter_LoadModule(filter_t *, const char *cap,
+                                        const char *name, bool strict);
+
 /**
  * This function will return a new picture usable by p_filter as an output
  * buffer. You have to release it using picture_Release or by returning
