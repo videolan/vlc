@@ -132,8 +132,7 @@ int filter_ConfigureBlend( vlc_blender_t *p_blend,
         !video_format_IsSameChroma( &p_blend->fmt_in.video, p_src ) )
     {
         /* The chroma is not the same, we need to reload the blend module */
-        filter_Close( p_blend );
-        module_unneed( p_blend, p_blend->p_module );
+        vlc_filter_UnloadModule( p_blend );
         p_blend->p_module = NULL;
     }
 

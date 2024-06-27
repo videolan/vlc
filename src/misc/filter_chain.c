@@ -388,8 +388,7 @@ void filter_chain_DeleteFilter( filter_chain_t *chain, filter_t *filter )
     /* Remove it from the chain */
     vlc_list_remove( &chained->node );
 
-    filter_Close( filter );
-    module_unneed( filter, filter->p_module );
+    vlc_filter_UnloadModule( filter );
 
     msg_Dbg( chain->obj, "Filter %p removed from chain", (void *)filter );
     FilterDeletePictures( &chained->pending );

@@ -783,11 +783,7 @@ static filter_t *CreateConverter( vlc_object_t *p_this,
 
 static void DeleteConverter( filter_t * p_filter )
 {
-    if( p_filter->p_module )
-    {
-        filter_Close( p_filter );
-        module_unneed( p_filter, p_filter->p_module );
-    }
+    vlc_filter_UnloadModule( p_filter );
 
     es_format_Clean( &p_filter->fmt_in );
     es_format_Clean( &p_filter->fmt_out );

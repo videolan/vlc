@@ -101,11 +101,7 @@ static void DeleteCVPXConverter( filter_t * p_converter )
     if (!p_converter)
         return;
 
-    if( p_converter->p_module )
-    {
-        filter_Close( p_converter );
-        module_unneed( p_converter, p_converter->p_module );
-    }
+    vlc_filter_UnloadModule( p_converter );
 
     es_format_Clean( &p_converter->fmt_in );
     es_format_Clean( &p_converter->fmt_out );
