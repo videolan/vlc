@@ -33,24 +33,58 @@
 #include <libvlc.h>
 #include <assert.h>
 
-static int vlc_filter_Activate(void *func, bool forced, va_list ap)
-{
-    filter_t *p_filter = va_arg(ap, filter_t *);
-    vlc_filter_open activate = func;
-
-    p_filter->obj.force = forced;
-    int ret = activate(p_filter);
-    if (ret != VLC_SUCCESS)
-        vlc_objres_clear(&p_filter->obj);
-    return ret;
-}
-
 module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
                                 const char *name, bool strict)
 {
     const bool b_force_backup = p_filter->obj.force; /* FIXME: remove this */
-    p_filter->p_module = vlc_module_load(p_filter->obj.logger, capability, name, strict,
-                                         vlc_filter_Activate, p_filter);
+
+    if (name == NULL || name[0] == '\0')
+        name = "any";
+
+    /* Find matching modules */
+    module_t **mods;
+    size_t strict_total;
+    ssize_t total = vlc_module_match(capability, name, strict,
+                                     &mods, &strict_total);
+
+    if (unlikely(total < 0))
+        return NULL;
+
+    struct vlc_logger *log = p_filter->obj.logger;
+
+    vlc_debug(log, "looking for %s module matching \"%s\": %zd candidates",
+              capability, name, total);
+
+    p_filter->p_module = NULL;
+    for (size_t i = 0; i < (size_t)total; i++) {
+        module_t *cand = mods[i];
+        int ret = VLC_EGENERIC;
+        vlc_filter_open cb = vlc_module_map(log, cand);
+
+        if (cb == NULL)
+            continue;
+
+        p_filter->obj.force = i < strict_total;
+        ret = cb(p_filter);
+        if (ret != VLC_SUCCESS)
+            vlc_objres_clear(&p_filter->obj);
+
+        switch (ret) {
+            case VLC_SUCCESS:
+                vlc_debug(log, "using %s module \"%s\"", capability,
+                          module_get_object(cand));
+                p_filter->p_module = cand;
+                /* fall through */
+            case VLC_ETIMEOUT:
+                goto done;
+        }
+    }
+
+done:
+    if (p_filter->p_module == NULL)
+        vlc_debug(log, "no %s modules matched with name %s", capability, name);
+
+    free(mods);
     if (p_filter->p_module != NULL) {
         var_Create(p_filter, "module-name", VLC_VAR_STRING);
         var_SetString(p_filter, "module-name", module_get_object(p_filter->p_module));
