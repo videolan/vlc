@@ -84,7 +84,7 @@ CreateCVPXConverter(vout_display_t *vd)
     converter->fmt_out.video.i_chroma =
     converter->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
 
-    converter->p_module = module_need(converter, "video converter", NULL, false);
+    converter->p_module = vlc_filter_LoadModule(converter, "video converter", NULL, false);
     if (!converter->p_module)
     {
         vlc_object_delete(converter);

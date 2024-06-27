@@ -377,7 +377,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->fmt_out.video.i_height =
     scale->fmt_out.video.i_visible_height = require_resize ? 16 : 32;
 
-    scale->p_module = module_need(scale, "video converter", NULL, false);
+    scale->p_module = vlc_filter_LoadModule(scale, "video converter", NULL, false);
     if (!scale->p_module)
     {
         vlc_object_delete(scale);

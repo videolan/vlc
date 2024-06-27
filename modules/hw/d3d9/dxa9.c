@@ -212,7 +212,7 @@ static filter_t *CreateFilter( filter_t *p_this, const es_format_t *p_fmt_in,
     es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
     es_format_InitFromVideo( &p_filter->fmt_out, &p_fmt_in->video );
     p_filter->fmt_out.i_codec = p_filter->fmt_out.video.i_chroma = dst_chroma;
-    p_filter->p_module = module_need( p_filter, "video converter", NULL, false );
+    p_filter->p_module = vlc_filter_LoadModule (p_filter, "video converter", NULL, false );
 
     if( !p_filter->p_module )
     {

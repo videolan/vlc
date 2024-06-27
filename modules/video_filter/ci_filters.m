@@ -566,7 +566,7 @@ CVPX_to_CVPX_converter_Create(filter_t *filter, bool to_rgba)
         converter->fmt_in.i_codec = VLC_CODEC_CVPX_BGRA;
     }
 
-    converter->p_module = module_need(converter, "video converter", NULL, false);
+    converter->p_module = vlc_filter_LoadModule(converter, "video converter", NULL, false);
     if (!converter->p_module)
     {
         vlc_object_delete(converter);
