@@ -30,7 +30,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_modules.h>                 /* module_need for "video blending" */
 #include <vlc_filter.h>
 
 #include "screen.h"

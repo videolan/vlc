@@ -31,7 +31,6 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_plugin.h>
-#include <vlc_modules.h>
 #include <vlc_mouse.h>
 #include "filter_picture.h"
 #include "vt_utils.h"
