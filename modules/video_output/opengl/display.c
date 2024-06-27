@@ -315,21 +315,21 @@ static int Control (vout_display_t *vd, int query)
     switch (query)
     {
 
-      case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
-        // fallthrough
-      case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-      case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-      case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-      {
-        struct vout_display_placement dp = vd->cfg->display;
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+            vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
+            // fallthrough
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        {
+            struct vout_display_placement dp = vd->cfg->display;
 
-        PlacePicture(vd, &sys->place, dp);
-        sys->place_changed = true;
-        return VLC_SUCCESS;
-      }
-      default:
-        msg_Err (vd, "Unknown request %d", query);
+            PlacePicture(vd, &sys->place, dp);
+            sys->place_changed = true;
+            return VLC_SUCCESS;
+        }
+        default:
+            msg_Err (vd, "Unknown request %d", query);
     }
     return VLC_EGENERIC;
 }
