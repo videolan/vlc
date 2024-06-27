@@ -80,6 +80,11 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
 
         if (ret == VLC_ETIMEOUT)
             break;
+        if (ret == VLC_ENOMEM)
+        {
+            free(mods);
+            return NULL;
+        }
     }
 
     if (p_filter->p_module == NULL)
