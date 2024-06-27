@@ -113,15 +113,15 @@ Widgets.KeyNavigableTableView {
     }, {
         size: 1,
 
-        model: _lineDuration
-    }, {
-        size: 1,
-
         model: _lineTrack
     }, {
         size: 1,
 
         model: _lineDisc
+    }, {
+        size: 1,
+
+        model: _lineDuration
     }]
 
     property var _modelMedium: [{
