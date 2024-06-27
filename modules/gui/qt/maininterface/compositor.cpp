@@ -62,7 +62,7 @@ struct {
 #if defined(_WIN32) && defined(HAVE_DCOMP_H)
     {"dcomp", &instanciateCompositor<CompositorDirectComposition> },
 #endif
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(__APPLE__)
     {"platform", &instanciateCompositor<CompositorPlatform> },
 #endif
 #if defined(_WIN32)

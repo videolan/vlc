@@ -23,6 +23,9 @@
 
 #include <vlc_window.h>
 
+#ifdef __APPLE__
+#include <objc/runtime.h>
+#endif
 
 using namespace vlc;
 
@@ -36,8 +39,8 @@ CompositorPlatform::CompositorPlatform(qt_intf_t *p_intf, QObject *parent)
 bool CompositorPlatform::init()
 {
     // TODO: For now only qwindows and qdirect2d
-    //       running on Windows 8+ platforms
-    //       are supported.
+    //       running on Windows 8+, and cocoa
+    //       platforms are supported.
 
     const QString& platformName = qApp->platformName();
 
@@ -47,6 +50,11 @@ bool CompositorPlatform::init()
         if (platformName == QLatin1String("windows") || platformName == QLatin1String("direct2d"))
             return true;
     }
+#endif
+
+#ifdef __APPLE__
+    if (platformName == QLatin1String("cocoa"))
+        return true;
 #endif
 
     return false;
@@ -108,10 +116,21 @@ bool CompositorPlatform::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb dest
 {
     commonSetupVoutWindow(p_wnd, destroyCb);
 
+#ifdef __WIN32
     p_wnd->type = VLC_WINDOW_TYPE_HWND;
     p_wnd->handle.hwnd = reinterpret_cast<void*>(m_videoWindow->winId());
 
     return true;
+#endif
+
+#ifdef __APPLE__
+    p_wnd->type = VLC_WINDOW_TYPE_NSOBJECT;
+    p_wnd->handle.nsobject = reinterpret_cast<id>(m_videoWindow->winId());
+
+    return true;
+#endif
+
+    vlc_assert_unreachable();
 }
 
 QWindow *CompositorPlatform::interfaceMainWindow() const
