@@ -362,25 +362,15 @@ MainInterface.MainViewLoader {
             }]
 
             property var _modelMedium: [{
-                size: 1,
-
-                model: {
-                    criteria: "thumbnail",
-
-                    text: qsTr("Cover"),
-
-                    isSortable: false,
-
-                    headerDelegate: columns.titleHeaderDelegate,
-                    colDelegate   : columns.titleDelegate
-                }
-            }, {
                 weight: 1,
 
                 model: {
                     criteria: "name",
 
-                    text: qsTr("Name")
+                    text: qsTr("Name"),
+
+                    headerDelegate: columns.titleHeaderDelegate,
+                    colDelegate   : columns.titleDelegate
                 }
             }, {
                 size: 1,
@@ -443,8 +433,7 @@ MainInterface.MainViewLoader {
             Widgets.TableColumns {
                 id: columns
 
-                showTitleText: (tableView.sortModel === tableView._modelSmall)
-                showCriterias: showTitleText
+                showCriterias: (tableView.sortModel === tableView._modelSmall)
 
                 criteriaCover: "thumbnail"
 

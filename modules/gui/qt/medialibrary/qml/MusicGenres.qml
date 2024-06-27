@@ -232,25 +232,15 @@ MainInterface.MainViewLoader {
             }]
 
             property var _modelMedium: [{
-                size: 1,
-
-                model: {
-                    criteria: "cover",
-
-                    text: qsTr("Cover"),
-
-                    isSortable: false,
-
-                    headerDelegate: tableColumns.titleHeaderDelegate,
-                    colDelegate: tableColumns.titleDelegate
-                }
-            }, {
                 weight: 1,
 
                 model: {
                     criteria: "name",
 
-                    text: qsTr("Name")
+                    text: qsTr("Name"),
+
+                    headerDelegate: tableColumns.titleHeaderDelegate,
+                    colDelegate: tableColumns.titleDelegate
                 }
             }, {
                 size: 1,
@@ -293,8 +283,7 @@ MainInterface.MainViewLoader {
             Widgets.MLTableColumns {
                 id: tableColumns
 
-                showTitleText: (tableView_id.sortModel === tableView_id._modelSmall)
-                showCriterias: showTitleText
+                showCriterias: (tableView_id.sortModel === tableView_id._modelSmall)
 
                 titleCover_height: VLCStyle.listAlbumCover_height
                 titleCover_width: VLCStyle.listAlbumCover_width

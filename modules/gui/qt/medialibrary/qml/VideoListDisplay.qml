@@ -62,25 +62,6 @@ MainInterface.MainTableView {
     }]
 
     property var _modelMedium: [{
-        size: 1,
-
-        model: ({
-            type: "image",
-
-            criteria: "thumbnail",
-
-            text: qsTr("Cover"),
-
-            isSortable: false,
-
-            showSection: "",
-
-            placeHolder: VLCStyle.noArtVideoCover,
-
-            headerDelegate: tableColumns.titleHeaderDelegate,
-            colDelegate   : tableColumns.titleDelegate
-        })
-    }, {
         weight: 1,
 
         model: ({
@@ -88,7 +69,12 @@ MainInterface.MainTableView {
 
             showSection: "title",
 
-            text: qsTr("Title")
+            text: qsTr("Title"),
+
+            headerDelegate: tableColumns.titleHeaderDelegate,
+            colDelegate   : tableColumns.titleDelegate,
+
+            placeHolder: VLCStyle.noArtVideoCover
         })
     }, {
         size: 1,
@@ -122,8 +108,7 @@ MainInterface.MainTableView {
     Widgets.MLTableColumns {
         id: tableColumns
 
-        showTitleText: (listView_id.sortModel === listView_id._modelSmall)
-        showCriterias: showTitleText
+        showCriterias: (listView_id.sortModel === listView_id._modelSmall)
 
         criteriaCover: "thumbnail"
 
