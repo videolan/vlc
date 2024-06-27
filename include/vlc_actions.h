@@ -262,6 +262,8 @@ typedef enum vlc_action_id {
     /* Combo Actions */
     ACTIONID_COMBO_VOL_FOV_DOWN,
     ACTIONID_COMBO_VOL_FOV_UP,
+
+    ACTIONID_PROJECTION_TOGGLE,
 } vlc_action_id_t;
 
 /**
