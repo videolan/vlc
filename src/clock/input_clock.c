@@ -232,18 +232,29 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.stream != VLC_TICK_INVALID &&
-             ( (cl->last.stream - i_ck_stream) > CR_MAX_GAP ||
-               (cl->last.stream - i_ck_stream) < -CR_MAX_GAP ) )
+    else if (cl->last.stream != VLC_TICK_INVALID && cl->b_has_external_clock)
     {
-        /* Stream discontinuity, for which we haven't received a
-         * warning from the stream control facilities (dd-edited
-         * stream ?). */
-        msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
+        assert(cl->last.system != VLC_TICK_INVALID);
 
-        /* */
-        msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
-        b_reset_reference= true;
+        /* We need compare both stream and system times for discontinuity.
+         * Indeed, a big stream diff is OK if we have the same system diff. */
+        vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
+        vlc_tick_t system_diff = i_ck_system - cl->last.system;
+        vlc_tick_t diff = stream_diff - system_diff;
+        if (diff > CR_MAX_GAP || diff < -CR_MAX_GAP)
+        {
+            /* Stream discontinuity, for which we haven't received a
+             * warning from the stream control facilities (dd-edited
+             * stream ?). */
+            msg_Warn(p_log, "clock gap, unexpected stream discontinuity: "
+                     "system_diff: %"PRId64" stream_diff: %"PRId64,
+                     system_diff, stream_diff);
+
+            /* */
+            msg_Warn(p_log, "feeding synchro with a new reference point trying"
+                     " to recover from clock gap");
+            b_reset_reference= true;
+        }
     }
 
     /* */
