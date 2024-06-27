@@ -336,53 +336,12 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
             goto error;
         module_name = name_chained;
     }
-    else if (name == NULL || name[0] != '\0')
-        module_name = "any";
 
-    struct vlc_logger *logger = vlc_object_logger(chain->obj);
-    module_t **modules;
-    size_t strict_total;
-    ssize_t count = vlc_module_match(capability, module_name, name != NULL,
-                                     &modules, &strict_total);
+    filter->p_module =
+        vlc_filter_LoadModule(filter, capability, module_name, name != NULL);
 
-    if (count < 0)
-    {
-        free(name_chained);
-        goto error;
-    }
-
-    vlc_debug(logger, "looking for %s module matching \"%s\": %zd candidates",
-              capability, module_name, count);
-    free(name_chained);
-
-    int ret = VLC_ENOTSUP;
-    for (size_t i = 0; i < (size_t)count; ++i)
-    {
-        module_t *mod = modules[i];
-        vlc_filter_open activate = vlc_module_map(logger, mod);
-        if (activate == NULL)
-            continue;
-
-        filter->p_module = mod;
-        filter->obj.force = i < strict_total;
-        ret = (*activate)(filter);
-        switch (ret)
-        {
-            case VLC_SUCCESS:
-                goto done;
-            case VLC_ENOMEM:
-                goto error;
-            default:
-                vlc_objres_clear(&filter->obj);
-                continue;
-        }
-    }
-
-   if (ret != VLC_SUCCESS)
+   if (filter->p_module == NULL)
       goto error;
-
-done:
-    assert( filter->ops != NULL );
 
     vlc_list_append( &chained->node, &chain->filter_list );
 
