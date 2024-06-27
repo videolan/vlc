@@ -237,12 +237,6 @@ struct filter_t
     filter_owner_t      owner;
 };
 
-static inline void filter_Close( filter_t *p_filter )
-{
-    if ( p_filter->ops->close )
-        p_filter->ops->close( p_filter );
-}
-
 VLC_API module_t *vlc_filter_LoadModule(filter_t *, const char *cap,
                                         const char *name, bool strict);
 VLC_API void vlc_filter_UnloadModule(filter_t *);
