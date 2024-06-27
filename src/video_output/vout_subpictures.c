@@ -290,16 +290,6 @@ static ssize_t spu_GetFreeChannelId(spu_t *spu, enum vlc_vout_order *order)
     return VOUT_SPU_CHANNEL_INVALID;
 }
 
-static void FilterRelease(filter_t *filter)
-{
-    if (filter->p_module)
-    {
-        filter_Close(filter);
-        module_unneed(filter, filter->p_module);
-    }
-    vlc_object_delete(filter);
-}
-
 static int spu_get_attachments(filter_t *filter,
                                input_attachment_t ***attachment_ptr,
                                int *attachment_count)
@@ -1824,13 +1814,13 @@ static void spu_Cleanup(spu_t *spu)
     spu_private_t *sys = spu->p;
 
     if (sys->text)
-        FilterRelease(sys->text);
+        vlc_filter_Delete(sys->text);
 
     if (sys->scale_yuvp)
-        FilterRelease(sys->scale_yuvp);
+        vlc_filter_Delete(sys->scale_yuvp);
 
     if (sys->scale)
-        FilterRelease(sys->scale);
+        vlc_filter_Delete(sys->scale);
 
     filter_chain_ForEach(sys->source_chain, SubSourceClean, spu);
     if (sys->vout)
@@ -1986,7 +1976,7 @@ void spu_Attach(spu_t *spu, input_thread_t *input)
 
         vlc_mutex_lock(&spu->p->textlock);
         if (spu->p->text)
-            FilterRelease(spu->p->text);
+            vlc_filter_Delete(spu->p->text);
         spu->p->text = SpuRenderCreateAndLoadText(spu);
         vlc_mutex_unlock(&spu->p->textlock);
     }

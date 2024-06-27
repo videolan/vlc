@@ -169,13 +169,7 @@ int filter_Blend( vlc_blender_t *p_blend,
 
 void filter_DeleteBlend( vlc_blender_t *p_blend )
 {
-    if( p_blend->p_module )
-    {
-        filter_Close( p_blend );
-        module_unneed( p_blend, p_blend->p_module );
-    }
-
-    vlc_object_delete(p_blend);
+    vlc_filter_Delete( p_blend );
 }
 
 /* */

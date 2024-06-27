@@ -184,9 +184,7 @@ void screen_CloseCapture( void *opaque )
 #ifdef SCREEN_MOUSE
     if( p_data->p_blend )
     {
-        filter_Close( p_data->p_blend );
-        module_unneed( p_data->p_blend, p_data->p_blend->p_module );
-        vlc_object_delete(p_data->p_blend);
+        vlc_filter_Delete( p_data->p_blend );
     }
 #endif
 
