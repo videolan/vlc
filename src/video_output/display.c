@@ -762,6 +762,14 @@ int vout_SetDisplayFormat(vout_display_t *vd, const video_format_t *fmt,
     return VLC_SUCCESS;
 }
 
+void vout_SetDisplayProjection(vout_display_t *vd,
+                               video_projection_mode_t projection)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    osys->cfg.projection = projection;
+    vout_display_ChangeProjection(vd, projection);
+}
+
 vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const video_format_t *source,
                                  vlc_video_context *vctx,

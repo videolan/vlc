@@ -42,6 +42,7 @@ int vout_SetDisplayFormat(vout_display_t *, const video_format_t *fmt,
 /* The owner/caller is responsible for managing the lifetime of this ICC
  * profile and always updating the display state to a consistent value */
 void vout_SetDisplayIccProfile(vout_display_t *, const vlc_icc_profile_t *);
+void vout_SetDisplayProjection(vout_display_t *, video_projection_mode_t);
 
 #endif /* LIBVLC_VOUT_WRAPPER_H */
 
