@@ -112,13 +112,17 @@ block_t * cc_storage_get_current( cc_storage_t *p_ccs, decoder_cc_desc_t *p_desc
  ****************************************************************************/
 block_t *PacketizeXXC1( void *p_private, struct vlc_logger *logger,
                         uint8_t i_nal_length_size, block_t **pp_block,
-                        pf_annexb_nal_parse pf_nal_parser )
+                        pf_annexb_nal_parse pf_nal_parser,
+                        pf_annexb_nal_drain pf_nal_drain )
 {
     block_t       *p_block;
     block_t       *p_ret = NULL;
     uint8_t       *p;
 
-    if( !pp_block || !*pp_block )
+    if( !pp_block )
+        return pf_nal_drain ? pf_nal_drain( p_private ) : NULL;
+
+    if( !*pp_block )
         return NULL;
     if( (*pp_block)->i_flags&(BLOCK_FLAG_CORRUPTED) )
     {
