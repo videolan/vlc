@@ -36,6 +36,8 @@
 
 #define COEFF_THRESHOLD 0.2 /* between 0.8 and 1.2 */
 
+#define MAX_PCR_DELAY VLC_TICK_FROM_SEC(60)
+
 struct vlc_clock_listener_id
 {
     vlc_clock_t *clock;
@@ -401,7 +403,7 @@ vlc_clock_monotonic_to_system(vlc_clock_t *clock, vlc_tick_t now,
             (ts - main_clock->first_pcr.stream) / rate +
             main_clock->first_pcr.system - now;
 
-        if (pcr_delay > CR_MAX_GAP)
+        if (pcr_delay > MAX_PCR_DELAY)
         {
             if (main_clock->logger != NULL)
                 vlc_error(main_clock->logger, "Invalid PCR delay ! Ignoring it...");
