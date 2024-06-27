@@ -340,7 +340,7 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     char *list = var_InheritString(VLC_OBJECT(text), "text-renderer");
     if (unlikely(list != NULL))
     {
-        text->p_module = module_need(VLC_OBJECT(text), "text renderer", list, false);
+        text->p_module = vlc_filter_LoadModule(text, "text renderer", list, false);
         free(list);
     }
 
