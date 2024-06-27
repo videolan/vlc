@@ -119,6 +119,7 @@ typedef struct vout_thread_sys_t
         bool        is_interlaced;
         picture_t   *decoded; // decoded picture before passed through chain_static
         picture_t   *current;
+        video_projection_mode_t projection;
     } displayed;
 
     struct {
@@ -674,6 +675,50 @@ void vout_ChangeIccProfile(vout_thread_t *vout,
     sys->display_cfg.icc_profile = profile;
     if (sys->display != NULL)
         vout_SetDisplayIccProfile(sys->display, profile);
+    vlc_queuedmutex_unlock(&sys->display_lock);
+}
+
+void vout_ToggleProjection(vout_thread_t *vout, bool enabled)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    video_projection_mode_t projection;
+    if (sys->displayed.projection != PROJECTION_MODE_RECTANGULAR && !enabled)
+        projection = PROJECTION_MODE_RECTANGULAR;
+    else if (sys->original.projection_mode != PROJECTION_MODE_RECTANGULAR && enabled)
+        projection = sys->original.projection_mode;
+    else return;
+
+    vlc_queuedmutex_lock(&sys->display_lock);
+    if (sys->display != NULL)
+        vout_SetDisplayProjection(sys->display, projection);
+    vlc_queuedmutex_unlock(&sys->display_lock);
+
+}
+
+void vout_ResetProjection(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    msg_Dbg(vout, "resetting projection_mode to %d", sys->original.projection_mode);
+    vout_ChangeProjection(vout, sys->original.projection_mode);
+}
+
+void vout_ChangeProjection(vout_thread_t *vout,
+                           video_projection_mode_t projection)
+{
+    vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
+    assert(!sys->dummy);
+
+    /* Use vout_ResetProjection instead. */
+    assert((int)projection != -1);
+    msg_Dbg(vout, "setting projection_mode to %d", projection);
+
+    vlc_queuedmutex_lock(&sys->display_lock);
+    if (sys->display != NULL)
+        vout_SetDisplayProjection(sys->display, projection);
     vlc_queuedmutex_unlock(&sys->display_lock);
 }
 
@@ -1814,6 +1859,12 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
     dcfg.display.width = sys->window_width;
     dcfg.display.height = sys->window_height;
 
+    int projection = var_InheritInteger(&vout->obj, "projection-mode");
+    if (projection == -1)
+        dcfg.projection = sys->original.projection_mode;
+    else if (projection >= 0)
+        dcfg.projection = (video_projection_mode_t)projection;
+
     sys->private_pool =
         picture_pool_NewFromFormat(&sys->original, FILTER_POOL_SIZE);
     if (sys->private_pool == NULL) {
@@ -2306,6 +2357,7 @@ int vout_Request(const vout_configuration_t *cfg, vlc_video_context *vctx, input
     vlc_mutex_lock(&sys->window_lock);
     video_format_Clean(&sys->original);
     sys->original = original;
+    sys->displayed.projection = original.projection_mode;
     vout_InitSource(vout);
 
     if (EnableWindowLocked(vout, &original) != 0)
