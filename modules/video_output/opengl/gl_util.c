@@ -215,7 +215,7 @@ vlc_gl_WrapOpenGLFilter(filter_t *filter, const char *opengl_filter_name)
     var_SetString(filter, "opengl-filter", opengl_filter_name);
 
     filter->p_cfg = NULL;
-    module_t *module = module_need(filter, "video filter", "opengl", true);
+    module_t *module = vlc_filter_LoadModule(filter, "video filter", "opengl", true);
     filter->p_cfg = prev_chain;
 
     var_Destroy(filter, "opengl-filter");
