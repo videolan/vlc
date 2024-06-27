@@ -915,6 +915,12 @@ VOUT_ACTION_HANDLER(SubtitleDisplay)
     }
 }
 
+VOUT_ACTION_HANDLER(Projection)
+{
+    (void)intf; (void)action_id;
+    var_ToggleBool(vout, "override-projection");
+}
+
 /****************
  * action table *
  ****************/
@@ -993,6 +999,7 @@ static struct vlc_action const actions[] =
     VLC_ACTION_VOUT(TOGGLE_AUTOSCALE, ZOOM_DOUBLE, Zoom)
     VLC_ACTION_VOUT(DEINTERLACE, DEINTERLACE_MODE, Deinterlace)
     VLC_ACTION_VOUT(SUBPOS_DOWN, SUBTITLE_TEXT_SCALE_UP, SubtitleDisplay)
+    VLC_ACTION_VOUT(PROJECTION_TOGGLE, PROJECTION_TOGGLE, Projection)
     /* null action */
     { .type = NULL_ACTION }
 
