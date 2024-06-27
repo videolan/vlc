@@ -69,6 +69,10 @@ static void PacketizeFlush( decoder_t * );
 static void PacketizeReset(void *p_private, bool b_broken);
 static block_t *PacketizeParse(void *p_private, bool *pb_ts_used, block_t *);
 static block_t *ParseNALBlock(decoder_t *, bool *pb_ts_used, block_t *);
+static inline block_t *ParseNALBlockW( void *opaque, bool *pb_ts_used, block_t *p_frag )
+{
+    return ParseNALBlock( (decoder_t *) opaque, pb_ts_used, p_frag );
+}
 static int PacketizeValidate(void *p_private, block_t *);
 static block_t * PacketizeDrain(void *);
 static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
@@ -297,8 +301,9 @@ static block_t *PacketizeHVC1(decoder_t *p_dec, block_t **pp_block)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    return PacketizeXXC1( p_dec, p_sys->i_nal_length_size,
-                          pp_block, ParseNALBlock );
+    return PacketizeXXC1( p_dec, VLC_OBJECT(p_dec),
+                          p_sys->i_nal_length_size, pp_block,
+                          ParseNALBlockW );
 }
 
 static block_t *PacketizeAnnexB(decoder_t *p_dec, block_t **pp_block)
