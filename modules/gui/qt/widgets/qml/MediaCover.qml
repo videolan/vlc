@@ -68,6 +68,16 @@ Rectangle {
 
     // Children
 
+    //delay placeholder showing up
+    Timer {
+        id: timer
+        //changing running value will start/stop the timer,
+        //the running value will change back to false when the timer
+        //timeout regardless of the binding
+        running: image.state === Image.Loading
+        interval: VLCStyle.duration_long
+    }
+
     Widgets.RoundImage {
         id: image
 
@@ -88,7 +98,7 @@ Rectangle {
 
         radius: root.radius
 
-        visible: !root.isImageReady
+        visible: !root.isImageReady && !timer.running
 
         // we only keep this image till there is no main image
         // try to release the resources otherwise
