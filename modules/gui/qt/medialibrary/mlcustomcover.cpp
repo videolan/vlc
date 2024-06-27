@@ -198,6 +198,7 @@ public:
     {
         if (image.isNull())
             return QStringLiteral("Unspecified error.");
+        return QStringLiteral("");
     }
 
 private:
