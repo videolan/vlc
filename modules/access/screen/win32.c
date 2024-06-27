@@ -310,7 +310,7 @@ static void RenderCursor( demux_t *p_demux, int i_x, int i_y,
             p_data->p_blend->fmt_in.video = p_sys->p_mouse->format;
             p_data->p_blend->fmt_out = p_sys->fmt;
             p_data->p_blend->p_module =
-                module_need( p_data->p_blend, "video blending", NULL, false );
+                vlc_filter_LoadModule( p_data->p_blend, "video blending", NULL, false );
             if( !p_data->p_blend->p_module )
             {
                 msg_Err( p_demux, "Could not load video blending module" );

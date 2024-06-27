@@ -243,7 +243,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     p_blend->fmt_out.video = p_sys->p_base_image->format;
     p_blend->fmt_in.video = p_sys->p_blend_image->format;
-    p_blend->p_module = module_need( p_blend, "video blending", NULL, false );
+    p_blend->p_module = vlc_filter_LoadModule( p_blend, "video blending", NULL, false );
     if( !p_blend->p_module )
     {
         picture_Release( p_pic );

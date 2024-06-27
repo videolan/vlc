@@ -150,7 +150,7 @@ int filter_ConfigureBlend( vlc_blender_t *p_blend,
 
     /* */
     if( !p_blend->p_module )
-        p_blend->p_module = module_need( p_blend, "video blending", NULL, false );
+        p_blend->p_module = vlc_filter_LoadModule( p_blend, "video blending", NULL, false );
     if( !p_blend->p_module )
         return VLC_EGENERIC;
     assert( p_blend->ops != NULL );
