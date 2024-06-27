@@ -245,6 +245,13 @@ static inline void filter_Close( filter_t *p_filter )
 
 VLC_API module_t *vlc_filter_LoadModule(filter_t *, const char *cap,
                                         const char *name, bool strict);
+VLC_API void vlc_filter_UnloadModule(filter_t *);
+
+static inline void vlc_filter_Delete(filter_t *p_filter)
+{
+    vlc_filter_UnloadModule(p_filter);
+    vlc_object_delete(p_filter);
+}
 
 /**
  * This function will return a new picture usable by p_filter as an output

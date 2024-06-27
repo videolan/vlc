@@ -136,6 +136,7 @@ filter_ConfigureBlend
 filter_DeleteBlend
 filter_NewBlend
 vlc_filter_LoadModule
+vlc_filter_UnloadModule
 FromCharset
 vlc_find_iso639
 vlc_http_auth_Init

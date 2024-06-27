@@ -60,6 +60,23 @@ module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,
     return p_filter->p_module;
 }
 
+void vlc_filter_UnloadModule(filter_t *p_filter)
+{
+    if (likely(p_filter->p_module))
+    {
+        if ( p_filter->ops->close )
+            p_filter->ops->close( p_filter );
+
+        msg_Dbg(p_filter, "removing \"%s\" module \"%s\"", module_get_capability(p_filter->p_module),
+                module_get_object(p_filter->p_module));
+        var_Destroy(p_filter, "module-name");
+
+        p_filter->p_module = NULL;
+    }
+
+    vlc_objres_clear(&p_filter->obj);
+}
+
 typedef struct chained_filter_t
 {
     /* Public part of the filter structure */
