@@ -339,7 +339,8 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/qvlcframe.hpp \
 	widgets/native/roundimage.cpp widgets/native/roundimage.hpp widgets/native/roundimage_p.hpp \
 	widgets/native/searchlineedit.cpp widgets/native/searchlineedit.hpp \
-	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp
+	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp \
+	widgets/native/doubleclickignoringitem.hpp
 
 # Meta-object compilation
 
