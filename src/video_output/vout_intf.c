@@ -83,6 +83,12 @@ static int SecondarySubMarginCallback( vlc_object_t *, char const *,
 static int ViewpointCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
+static int OverrideProjectionCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+
+static int ChangeProjectionCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
+
 /*****************************************************************************
  * vout_IntfInit: called during the vout creation to initialise misc things.
  *****************************************************************************/
@@ -328,6 +334,11 @@ void vout_CreateVars( vout_thread_t *p_vout )
     /* SPU in full window */
     var_Create( p_vout, "spu-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
+
+    var_Create(p_vout, "override-projection", VLC_VAR_BOOL);
+    var_SetBool(p_vout, "override-projection", false);
+
+    var_Create(p_vout, "projection-mode", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 }
 
 void vout_IntfInit( vout_thread_t *p_vout )
@@ -350,6 +361,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "sub-filter", SubFilterCallback, NULL );
     var_AddCallback( p_vout, "sub-margin", SubMarginCallback, NULL );
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
+    var_AddCallback( p_vout, "override-projection", OverrideProjectionCallback, NULL );
+    var_AddCallback( p_vout, "projection-mode", ChangeProjectionCallback, NULL );
 }
 
 void vout_IntfReinit( vout_thread_t *p_vout )
@@ -364,6 +377,8 @@ void vout_IntfReinit( vout_thread_t *p_vout )
         cause unwanted OSD on vout start. Filter out it there. */
     var_TriggerCallback( p_vout, "sub-margin" );
     var_TriggerCallback( p_vout, "secondary-sub-margin" );
+
+    var_TriggerCallback( p_vout, "projection-mode" );
 }
 
 void vout_IntfDeinit(vlc_object_t *obj)
@@ -387,6 +402,8 @@ void vout_IntfDeinit(vlc_object_t *obj)
     var_DelCallback(obj, "zoom", ZoomCallback, NULL);
     var_DelCallback(obj, "fit", FitCallback, NULL);
     var_DelCallback(obj, "autoscale", AutoScaleCallback, NULL);
+    var_DelCallback(obj, "override-projection", OverrideProjectionCallback, NULL);
+    var_DelCallback(obj, "projection-mode", ChangeProjectionCallback, NULL);
 }
 
 /*****************************************************************************
@@ -611,6 +628,48 @@ static int FitCallback( vlc_object_t *obj, char const *name,
 
     (void) name; (void) prev; (void) data;
     vout_ChangeDisplayFitting(p_vout, fit);
+    return VLC_SUCCESS;
+}
+
+static int OverrideProjectionCallback( vlc_object_t *obj, char const *name,
+                              vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    VLC_UNUSED(name); VLC_UNUSED(prev); VLC_UNUSED(data);
+    vout_thread_t *vout = (vout_thread_t *)obj;
+
+    vout_OSDMessage(vout, VOUT_SPU_CHANNEL_OSD, "Projection: %s", cur.b_bool ? "disabled" : "enabled");
+    vout_ToggleProjection(vout, !cur.b_bool);
+    return VLC_SUCCESS;
+}
+
+static int ChangeProjectionCallback( vlc_object_t *obj, char const *name,
+                              vlc_value_t prev, vlc_value_t cur, void *data )
+{
+    VLC_UNUSED(name); VLC_UNUSED(prev); VLC_UNUSED(data);
+    vout_thread_t *vout = (vout_thread_t *)obj;
+
+    const char *projection;
+    switch(cur.i_int)
+    {
+        case -1:                                        projection = "source"; break;
+        case PROJECTION_MODE_RECTANGULAR:               projection = "rectangular"; break;
+        case PROJECTION_MODE_EQUIRECTANGULAR:           projection = "equirectangular"; break;
+        case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:   projection = "cubemap (standard)"; break;
+        default: projection = "unknown"; break;
+    }
+
+    vout_OSDMessage(vout, VOUT_SPU_CHANNEL_OSD, "Projection: %s", projection);
+    if (cur.i_int == -1)
+    {
+        vout_ResetProjection(vout);
+        return VLC_SUCCESS;
+    }
+    else if (cur.i_int < 0 || cur.i_int > (int)PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+    {
+        return VLC_EGENERIC;
+    }
+
+    vout_ChangeProjection(vout, cur.i_int);
     return VLC_SUCCESS;
 }
 
