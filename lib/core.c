@@ -65,11 +65,13 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
     if (unlikely (p_libvlc_int == NULL))
         goto error;
 
-    int ret = libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
+    const int ret = libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
     if (ret != VLC_SUCCESS)
     {
         libvlc_InternalDestroy( p_libvlc_int );
-        libvlc_printerr("%s", vlc_strerror_c(-ret));
+        const char *error = (ret == VLC_EGENERIC) ? _( "Generic VLC error" )
+                                                  : vlc_strerror_c( -ret );
+        libvlc_printerr( "%s", error );
         goto error;
     }
 
