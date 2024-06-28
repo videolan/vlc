@@ -5,6 +5,8 @@ CARGOC_VERSION=0.9.29
 RUSTUP_VERSION=1.25.1
 RUSTUP_URL=$(GITHUB)/rust-lang/rustup/archive/$(RUSTUP_VERSION).tar.gz
 
+PKGS_TOOLS += cargo
+
 RUSTUP = . $(CARGO_HOME)/env && \
 	RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 
