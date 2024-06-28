@@ -1,7 +1,7 @@
 // Copyright (C) 2003-2024 VLC authors and VideoLAN
 // SPDX-License-Identifier: LGPL-2.1-or-later
 //
-// chapter_command_script.cpp : DVD codec for Matroska Chapter Codecs
+// chapter_command_script.cpp : Matroska Script Codec for Matroska Chapter Codecs
 // Authors: Laurent Aimar <fenrir@via.ecp.fr>
 //          Steve Lhomme <steve.lhomme@free.fr>
 
@@ -11,6 +11,7 @@
 
 namespace mkv {
 
+//Matroska Script
 const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAndPlay";
 
 // see http://www.matroska.org/technical/specs/chapters/index.html#mscript
@@ -63,38 +64,6 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
     }
 
     return b_result;
-}
-
-bool matroska_script_codec_c::Enter()
-{
-    bool f_result = false;
-    ChapterProcess::iterator index = enter_cmds.begin();
-    while ( index != enter_cmds.end() )
-    {
-        if ( (*index).GetSize() )
-        {
-            vlc_debug( l, "Matroska Script enter command" );
-            f_result |= interpreter.Interpret( (*index).GetBuffer(), (*index).GetSize() );
-        }
-        ++index;
-    }
-    return f_result;
-}
-
-bool matroska_script_codec_c::Leave()
-{
-    bool f_result = false;
-    ChapterProcess::iterator index = leave_cmds.begin();
-    while ( index != leave_cmds.end() )
-    {
-        if ( (*index).GetSize() )
-        {
-            vlc_debug( l, "Matroska Script leave command" );
-            f_result |= interpreter.Interpret( (*index).GetBuffer(), (*index).GetSize() );
-        }
-        ++index;
-    }
-    return f_result;
 }
 
 } // namespace
