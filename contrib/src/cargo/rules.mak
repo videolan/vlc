@@ -2,8 +2,8 @@
 
 RUST_VERSION=1.75.0
 CARGOC_VERSION=0.9.29
-RUSTUP_VERSION=1.25.1
-RUSTUP_URL=$(GITHUB)/rust-lang/rustup/archive/$(RUSTUP_VERSION).tar.gz
+RUSTUP_VERSION := 1.27.1
+RUSTUP_URL := $(GITHUB)/rust-lang/rustup/archive/refs/tags/$(RUSTUP_VERSION).tar.gz
 
 PKGS_TOOLS += cargo
 
