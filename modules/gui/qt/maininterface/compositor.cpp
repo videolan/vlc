@@ -341,9 +341,9 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
         m_windowEffectsModule->p_module = module_need(m_windowEffectsModule, "qtwindoweffects", nullptr, false);
         if (!m_windowEffectsModule->p_module)
         {
-            msg_Info(m_intf, "A module providing window effects capability could not be instantiated. " \
-                             "Native background blur effect will not be available. " \
-                             "The application may compensate this with a simulated effect on certain platform(s).");
+            msg_Dbg(m_intf, "A module providing window effects capability could not be instantiated. " \
+                            "Native background blur effect will not be available. " \
+                            "The application may compensate this with a simulated effect on certain platform(s).");
             m_failedToLoadWindowEffectsModule = true;
             vlc_object_delete(m_windowEffectsModule);
             m_windowEffectsModule = nullptr;
