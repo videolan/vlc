@@ -245,6 +245,8 @@ struct vlc_input_event_es {
      * the user.
      */
     bool forced;
+
+    enum vlc_vout_order vout_order;
 };
 
 struct vlc_input_event_signal {

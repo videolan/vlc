@@ -640,6 +640,7 @@ vlc_player_input_HandleEsEvent(struct vlc_player_input *input,
             {
                 trackpriv->t.selected = true;
                 trackpriv->selected_by_user = ev->forced;
+                trackpriv->vout_order = ev->vout_order;
                 vlc_player_SendEvent(player, on_track_selection_changed,
                                      NULL, trackpriv->t.es_id);
                 vlc_player_input_HandleTeletextMenu(input, ev, trackpriv);

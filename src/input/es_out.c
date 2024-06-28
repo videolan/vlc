@@ -251,7 +251,7 @@ static void         EsOutUpdateInfo(es_out_sys_t *, es_out_id_t *es, const vlc_m
 static int          EsOutSetRecord(es_out_sys_t *, bool b_record, const char *dir_path);
 
 static bool EsIsSelected( es_out_id_t *es );
-static void EsOutSelectEs(es_out_sys_t *out, es_out_id_t *es, bool b_force);
+static void EsOutSelectEs(es_out_sys_t *out, es_out_id_t *es, bool b_force, enum vlc_vout_order vout_order);
 static void EsOutDeleteInfoEs(es_out_sys_t *, es_out_id_t *es);
 static void EsOutUnselectEs(es_out_sys_t *out, es_out_id_t *es, bool b_update);
 static void EsOutDecoderChangeDelay(es_out_sys_t *out, es_out_id_t *p_es);
@@ -1206,7 +1206,7 @@ static vlc_tick_t EsOutGetBuffering(es_out_sys_t *p_sys)
 }
 
 static void EsOutSendEsEvent(es_out_sys_t *p_sys, es_out_id_t *es, int action,
-                             bool forced)
+                             bool forced, enum vlc_vout_order vout_order)
 {
     input_thread_t *p_input = p_sys->p_input;
 
@@ -1234,6 +1234,7 @@ static void EsOutSendEsEvent(es_out_sys_t *p_sys, es_out_id_t *es, int action,
         .title = es->psz_title ? es->psz_title : "",
         .fmt = es->fmt_out.i_cat != UNKNOWN_ES ? &es->fmt_out : &es->fmt,
         .forced = forced,
+        .vout_order = vout_order,
     });
 }
 
@@ -1391,7 +1392,7 @@ static void EsOutProgramSelect(es_out_sys_t *p_sys, es_out_pgrm_t *p_pgrm)
                 /* ES tracks are deleted (and unselected) when their programs
                  * are unselected (they will be added back when their programs
                  * are selected back). */
-                EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_DELETED, false);
+                EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_DELETED, false, VLC_VOUT_ORDER_PRIMARY);
             }
 
         }
@@ -1426,7 +1427,7 @@ static void EsOutProgramSelect(es_out_sys_t *p_sys, es_out_pgrm_t *p_pgrm)
         }
         else if (es->p_pgrm == p_sys->p_pgrm)
         {
-            EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_ADDED, false);
+            EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_ADDED, false, VLC_VOUT_ORDER_PRIMARY);
             EsOutUpdateInfo(p_sys, es, NULL);
         }
 
@@ -2192,7 +2193,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     vlc_atomic_rc_init(&es->rc);
 
     if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_ADDED, false);
+        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_ADDED, false, VLC_VOUT_ORDER_PRIMARY);
 
     EsOutUpdateInfo(p_sys, es, NULL);
     EsOutSelect(p_sys, es, false);
@@ -2400,7 +2401,7 @@ static void EsOutDestroyDecoder(es_out_sys_t *sys,
     es_format_Clean( &p_es->fmt_out );
 }
 
-static void EsOutSelectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
+static void EsOutSelectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force, enum vlc_vout_order vout_order)
 {
     input_thread_t *p_input = p_sys->p_input;
     bool b_thumbnailing = p_sys->input_type == INPUT_TYPE_THUMBNAILING;
@@ -2456,7 +2457,7 @@ static void EsOutSelectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
         return;
 
     /* Mark it as selected */
-    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_SELECTED, b_force);
+    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_SELECTED, b_force, vout_order);
 
     /* Special case of the zvbi decoder for teletext: send the initial selected
      * page and transparency */
@@ -2505,7 +2506,7 @@ static void EsOutUnselectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_update)
         return;
 
     /* Mark it as unselected */
-    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UNSELECTED, false);
+    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UNSELECTED, false, VLC_VOUT_ORDER_PRIMARY);
 }
 
 static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
@@ -2602,7 +2603,7 @@ static void EsOutSelect(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
             if( b_auto_unselect )
                 EsOutUnselectEs(p_sys, p_esprops->p_main_es, true);
 
-            EsOutSelectEs(p_sys, es, b_force);
+            EsOutSelectEs(p_sys, es, b_force, VLC_VOUT_ORDER_PRIMARY);
         }
     }
     else if( p_sys->i_mode == ES_OUT_MODE_PARTIAL )
@@ -2619,7 +2620,7 @@ static void EsOutSelect(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
                 if( atoi( prgm ) == es->p_pgrm->i_id )
                 {
                     if( !EsIsSelected( es ) )
-                        EsOutSelectEs(p_sys, es, b_force);
+                        EsOutSelectEs(p_sys, es, b_force, VLC_VOUT_ORDER_PRIMARY);
                     break;
                 }
             }
@@ -2690,7 +2691,7 @@ static void EsOutSelect(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
             if( b_auto_unselect )
                 EsOutUnselectEs(p_sys, p_esprops->p_main_es, true);
 
-            EsOutSelectEs(p_sys, es, b_force);
+            EsOutSelectEs(p_sys, es, b_force, VLC_VOUT_ORDER_PRIMARY);
         }
     }
 
@@ -2735,7 +2736,7 @@ static void EsOutSelectListFromProps(es_out_sys_t *p_sys, enum es_format_categor
         strcpy( buffer, esprops->str_ids );
         if( EsOutIdMatchStrIds( other, buffer ) && !EsIsSelected( other ) )
         {
-            EsOutSelectEs(p_sys, other, true);
+            EsOutSelectEs(p_sys, other, true, VLC_VOUT_ORDER_PRIMARY);
 
             if( esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE )
                 break;
@@ -2784,7 +2785,11 @@ static void EsOutSelectList(es_out_sys_t *p_sys, enum es_format_category_e cat,
             continue;
         }
 
-        EsOutSelectEs(p_sys, other, true);
+        /* First ID is considered to be the PRIMARY */
+        enum vlc_vout_order vout_oder = ( es_id_list[0] == &other->id )
+            ? VLC_VOUT_ORDER_PRIMARY
+            : VLC_VOUT_ORDER_SECONDARY;
+        EsOutSelectEs(p_sys, other, true, vout_oder);
 
         if (p_esprops->e_policy == ES_OUT_ES_POLICY_EXCLUSIVE)
             break;
@@ -2967,7 +2972,7 @@ static int EsOutSend(es_out_t *out, es_out_id_t *es, block_t *p_block )
         if (ret == VLC_SUCCESS)
         {
             EsOutUpdateInfo(p_sys, es, status.format.meta);
-            EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UPDATED, false);
+            EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UPDATED, false, VLC_VOUT_ORDER_PRIMARY);
         }
 
         es_format_Clean( &status.format.fmt );
@@ -3030,7 +3035,7 @@ static void EsOutDelLocked(es_out_sys_t *p_sys, es_out_id_t *es)
     EsTerminate(es);
 
     if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_DELETED, false);
+        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_DELETED, false, VLC_VOUT_ORDER_PRIMARY);
 
     EsOutDeleteInfoEs(p_sys, es);
 
@@ -3067,7 +3072,7 @@ static void EsOutDelLocked(es_out_sys_t *p_sys, es_out_id_t *es)
             {
                 if (EsIsSelected(other))
                 {
-                    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_SELECTED, false);
+                    EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_SELECTED, false, VLC_VOUT_ORDER_PRIMARY);
                     if( p_esprops->p_main_es == NULL )
                         p_esprops->p_main_es = other;
                 }
@@ -3156,7 +3161,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         bool is_selected = EsIsSelected(es);
         if(request_select && !is_selected)
         {
-            EsOutSelectEs(p_sys, es, true);
+            EsOutSelectEs(p_sys, es, true, VLC_VOUT_ORDER_PRIMARY);
             return EsIsSelected( es ) ? VLC_SUCCESS : VLC_EGENERIC;
         }
 
@@ -3488,7 +3493,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         if(b_was_selected)
             EsOutCreateDecoder(p_sys, es);
 
-        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UPDATED, false);
+        EsOutSendEsEvent(p_sys, es, VLC_INPUT_ES_UPDATED, false, VLC_VOUT_ORDER_PRIMARY);
 
         return VLC_SUCCESS;
     }
