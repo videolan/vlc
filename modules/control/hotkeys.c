@@ -365,112 +365,17 @@ PLAYER_ACTION_HANDLER(NavigateMedia)
     }
 }
 
-static void CycleSecondarySubtitles(intf_thread_t *intf, vlc_player_t *player,
-                                    bool next)
-{
-    intf_sys_t *sys = intf->p_sys;
-    const enum es_format_category_e cat = SPU_ES;
-    size_t count = vlc_player_GetTrackCount(player, cat);
-    if (!count)
-        return;
-
-    vlc_es_id_t *cycle_id = NULL;
-    vlc_es_id_t *keep_id = NULL;
-
-    /* Check how many subtitle tracks are already selected */
-    size_t selected_count = 0;
-    for (size_t i = 0; i < count; ++i)
-    {
-        const struct vlc_player_track *track =
-            vlc_player_GetTrackAt(player, cat, i);
-        assert(track);
-
-        if (track->selected)
-        {
-            enum vlc_vout_order order;
-            if (vlc_player_GetEsIdVout(player, track->es_id, &order)
-             && order == sys->spu_channel_order)
-                cycle_id = track->es_id;
-            else
-                keep_id = track->es_id;
-            ++selected_count;
-        }
-    }
-
-    if ((sys->spu_channel_order == VLC_VOUT_ORDER_PRIMARY
-      && selected_count == 1) || selected_count == 0)
-    {
-        /* Only cycle the primary subtitle track */
-        if (next)
-            vlc_player_SelectNextTrack(player, cat);
-        else
-            vlc_player_SelectPrevTrack(player, cat);
-    }
-    else
-    {
-        /* Find out the current selected index.
-           If no track selected, select the first or the last track */
-        size_t index = next ? 0 : count - 1;
-        for (size_t i = 0; i < count; ++i)
-        {
-            const struct vlc_player_track *track =
-                vlc_player_GetTrackAt(player, cat, i);
-            assert(track);
-
-            if (track->es_id == cycle_id)
-            {
-                index = i;
-                break;
-            }
-        }
-
-        /* Look for the next free (unselected) track */
-        while (true)
-        {
-            const struct vlc_player_track *track =
-                vlc_player_GetTrackAt(player, cat, index);
-
-            if (!track->selected)
-            {
-                cycle_id = track->es_id;
-                break;
-            }
-            /* Unselect if we reach the end of the cycle */
-            else if ((next && index + 1 == count) || (!next && index == 0))
-            {
-                cycle_id = NULL;
-                break;
-            }
-            else /* Switch to the next or previous track */
-                index = index + (next ? 1 : -1);
-        }
-
-        // We want the PRIMARY in first position
-        vlc_es_id_t *esIds[] = { cycle_id, keep_id, NULL };
-        if ( sys->spu_channel_order == VLC_VOUT_ORDER_SECONDARY ) {
-            esIds[0] = keep_id;
-            esIds[1] = cycle_id;
-        }
-        /* Make sure the list never contains NULL before a valid id */
-        if ( !esIds[0] ){
-            esIds[0] = esIds[1];
-            esIds[1] = NULL;
-        }
-        vlc_player_SelectEsIdList(player, cat, esIds);
-    }
-}
-
 PLAYER_ACTION_HANDLER(Track)
 {
     switch (action_id)
     {
         case ACTIONID_AUDIO_TRACK:
-            vlc_player_SelectNextTrack(player, AUDIO_ES);
+            vlc_player_SelectNextTrack(player, AUDIO_ES, VLC_VOUT_ORDER_PRIMARY);
             break;
         case ACTIONID_SUBTITLE_REVERSE_TRACK:
         case ACTIONID_SUBTITLE_TRACK:
-            CycleSecondarySubtitles(intf, player,
-                                    action_id == ACTIONID_SUBTITLE_TRACK);
+            vlc_player_CycleTrack(player, SPU_ES, intf->p_sys->spu_channel_order,
+                                  action_id == ACTIONID_SUBTITLE_TRACK);
             break;
         default:
             vlc_assert_unreachable();

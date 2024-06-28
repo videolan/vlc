@@ -1423,14 +1423,14 @@ static int BossCallback(vlc_object_t *p_this,
 - (void)selectPreviousTrackForCategory:(enum es_format_category_e)category
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SelectPrevTrack(_p_player, category);
+    vlc_player_SelectPrevTrack(_p_player, category, VLC_VOUT_ORDER_PRIMARY);
     vlc_player_Unlock(_p_player);
 }
 
 - (void)selectNextTrackForCategory:(enum es_format_category_e)category
 {
     vlc_player_Lock(_p_player);
-    vlc_player_SelectNextTrack(_p_player, category);
+    vlc_player_SelectNextTrack(_p_player, category, VLC_VOUT_ORDER_PRIMARY);
     vlc_player_Unlock(_p_player);
 }
 

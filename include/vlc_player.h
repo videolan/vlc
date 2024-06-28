@@ -1585,39 +1585,55 @@ vlc_player_SelectEsIdList(vlc_player_t *player,
                           enum es_format_category_e cat,
                           vlc_es_id_t *const es_id_list[]);
 
+
 /**
- * Select the next track
+ * Cycle through the tracks
  *
  * If the last track is already selected, a call to this function will disable
  * this last track. And a second call will select the first track.
+ * Unless called on the PRIMARY with a SECONDARY selected, it will cycle through
  *
- * @warning This function has no effects if there are several tracks selected
- * for a same category. Therefore the default policy is
- * VLC_PLAYER_SELECT_EXCLUSIVE.
+ * @param player locked player instance
+ * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
+ * @param next the cycle order
+ */
+VLC_API void
+vlc_player_CycleTrack(vlc_player_t *player, enum es_format_category_e cat,
+                      enum vlc_vout_order vout_order, bool next);
+
+/**
+ * Helper to select the next track
+ *
+ * If the last track is already selected, a call to this function will disable
+ * this last track. And a second call will select the first track.
+ * Unless called on the PRIMARY with a SECONDARY selected, it will cycle through
  *
  * @param player locked player instance
  * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
  */
-VLC_API void
-vlc_player_SelectNextTrack(vlc_player_t *player,
-                           enum es_format_category_e cat);
+static inline void
+vlc_player_SelectNextTrack(vlc_player_t *player, enum es_format_category_e cat,
+                           enum vlc_vout_order vout_order)
+{
+    vlc_player_CycleTrack(player, cat, vout_order, true);
+}
 
 /**
- * Select the Previous track
+ * Helper to select the Previous track
  *
  * If the first track is already selected, a call to this function will disable
  * this first track. And a second call will select the last track.
- *
- * @warning This function has no effects if there are several tracks selected
- * for a same category. Therefore the default policy is
- * VLC_PLAYER_SELECT_EXCLUSIVE.
+ * Unless called on the PRIMARY with a SECONDARY selected, it will cycle through
  *
  * @param player locked player instance
  * @param cat VIDEO_ES, AUDIO_ES or SPU_ES
  */
-VLC_API void
-vlc_player_SelectPrevTrack(vlc_player_t *player,
-                           enum es_format_category_e cat);
+static inline void
+vlc_player_SelectPrevTrack(vlc_player_t *player, enum es_format_category_e cat,
+                           enum vlc_vout_order vout_order)
+{
+    vlc_player_CycleTrack(player, cat, vout_order, false);
+}
 
 /**
  * Unselect a track from an ES identifier

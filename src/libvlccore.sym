@@ -854,6 +854,7 @@ vlc_player_aout_RemoveListener
 vlc_player_aout_SetVolume
 vlc_player_ChangeRate
 vlc_player_CondWait
+vlc_player_CycleTrack
 vlc_player_DisplayPosition
 vlc_player_DecrementRate
 vlc_player_Delete
@@ -916,11 +917,9 @@ vlc_player_SelectEsId
 vlc_player_SelectEsIdList
 vlc_player_SelectNextChapter
 vlc_player_SelectNextTitle
-vlc_player_SelectNextTrack
 vlc_player_SelectNextProgram
 vlc_player_SelectPrevChapter
 vlc_player_SelectPrevTitle
-vlc_player_SelectPrevTrack
 vlc_player_SelectPrevProgram
 vlc_player_SelectProgram
 vlc_player_SelectTeletextPage

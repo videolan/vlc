@@ -274,7 +274,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             enum es_format_category_e cat =
                 p_sys->i_pattern == GESTURE(UP,RIGHT,NONE,NONE) ?
                 AUDIO_ES : SPU_ES;
-            vlc_player_SelectNextTrack(player, cat);
+            vlc_player_SelectNextTrack(player, cat, VLC_VOUT_ORDER_PRIMARY);
             break;
         }
 

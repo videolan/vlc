@@ -1503,17 +1503,17 @@ static void HandleCommonKey(intf_thread_t *intf, vlc_player_t *player, int key)
 
     case 'c':
         vlc_player_Lock(player);
-        vlc_player_SelectNextTrack(player, AUDIO_ES);
+        vlc_player_SelectNextTrack(player, AUDIO_ES, VLC_VOUT_ORDER_PRIMARY);
         vlc_player_Unlock(player);
         break;
     case 'v':
         vlc_player_Lock(player);
-        vlc_player_SelectNextTrack(player, SPU_ES);
+        vlc_player_SelectNextTrack(player, SPU_ES, VLC_VOUT_ORDER_PRIMARY);
         vlc_player_Unlock(player);
         break;
     case 'b':
         vlc_player_Lock(player);
-        vlc_player_SelectNextTrack(player, VIDEO_ES);
+        vlc_player_SelectNextTrack(player, VIDEO_ES, VLC_VOUT_ORDER_PRIMARY);
         vlc_player_Unlock(player);
         break;
 

@@ -596,69 +596,77 @@ vlc_player_SelectTracksByStringIds(vlc_player_t *player,
         vlc_player_input_SelectTracksByStringIds(input, cat, str_ids);
 }
 
-static void
+void
 vlc_player_CycleTrack(vlc_player_t *player, enum es_format_category_e cat,
-                      bool next)
+                      enum vlc_vout_order vout_order, bool next)
 {
     size_t count = vlc_player_GetTrackCount(player, cat);
     if (!count)
         return;
 
-    size_t index;
-    bool selected = false;
-    for (size_t i = 0; i < count; ++i)
+    vlc_es_id_t *keep_id = NULL;
+
+    /* Check how many tracks are already selected */
+    size_t selected_count = 0;
+
+    /* Find out the current selected index.
+     * If no track selected, select the first or the last track */
+    size_t cycle_index = next ? count-1 : count;
+
+    for (size_t i = 0; i < count && selected_count < 2; ++i)
     {
         const struct vlc_player_track *track =
             vlc_player_GetTrackAt(player, cat, i);
         assert(track);
+
         if (track->selected)
         {
-            if (selected)
-            {
-                /* Can't cycle through tracks if there are more than one
-                 * selected */
-                return;
-            }
-            index = i;
-            selected = true;
+            enum vlc_vout_order order;
+            vlc_player_GetEsIdVout(player, track->es_id, &order);
+            if (order == vout_order)
+                cycle_index = i;
+            else
+                keep_id = track->es_id;
+            ++selected_count;
         }
     }
 
-    if (!selected)
+    vlc_es_id_t * cycle_id = NULL;
+    /* Look for the next free (unselected) track */
+    for (size_t i = 0; i < count; ++i)
     {
-        /* No track selected: select the first or the last track */
-        index = next ? 0 : count - 1;
-        selected = true;
+        cycle_index = (cycle_index + (next ? 1 : -1) + count) % count;
+
+        /* Unselect if we reach the end of the cycle
+         * Unless cycling PRIMARY with a selected SECONDARY then wrap around */
+        if (((next && cycle_index == 0) || (!next && cycle_index + 1 == count))
+         && ((selected_count == 1 && vout_order == VLC_VOUT_ORDER_PRIMARY)
+          || (selected_count == 2 && vout_order == VLC_VOUT_ORDER_SECONDARY)))
+            break;
+
+        const struct vlc_player_track *track =
+            vlc_player_GetTrackAt(player, cat, cycle_index);
+        if (!track->selected)
+        {
+            cycle_id = track->es_id;
+            break;
+        }
     }
-    else
+
+    // We want the PRIMARY in first position
+    vlc_es_id_t *esIds[] = { cycle_id, keep_id, NULL };
+    if (vout_order == VLC_VOUT_ORDER_SECONDARY)
     {
-        /* Unselect if we reach the end of the cycle */
-        if ((next && index + 1 == count) || (!next && index == 0))
-            selected = false;
-        else /* Switch to the next or previous track */
-            index = index + (next ? 1 : -1);
+        esIds[0] = keep_id;
+        esIds[1] = cycle_id;
+    }
+    if (!esIds[0])
+    {
+        esIds[0] = esIds[1];
+        esIds[1] = NULL;
     }
 
-    const struct vlc_player_track *track =
-        vlc_player_GetTrackAt(player, cat, index);
-    if (selected)
-        vlc_player_SelectTrack(player, track, VLC_PLAYER_SELECT_EXCLUSIVE);
-    else
-        vlc_player_UnselectTrack(player, track);
-}
-
-void
-vlc_player_SelectNextTrack(vlc_player_t *player,
-                           enum es_format_category_e cat)
-{
-    vlc_player_CycleTrack(player, cat, true);
-}
-
-void
-vlc_player_SelectPrevTrack(vlc_player_t *player,
-                           enum es_format_category_e cat)
-{
-    vlc_player_CycleTrack(player, cat, false);
+    vlc_player_SelectEsIdList(player, cat, esIds);
 }
 
 void

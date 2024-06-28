@@ -1421,7 +1421,7 @@ test_tracks(struct ctx *ctx, bool packetized)
         /* Select all track via next calls */
         for (size_t j = 0; j < params.track_count[cat]; ++j)
         {
-            vlc_player_SelectNextTrack(player, cat);
+            vlc_player_SelectNextTrack(player, cat, VLC_VOUT_ORDER_PRIMARY);
 
             /* Wait that the next track is selected */
             const struct vlc_player_track *track =
@@ -1435,7 +1435,7 @@ test_tracks(struct ctx *ctx, bool packetized)
         /* Select all track via previous calls */
         for (size_t j = params.track_count[cat] - 1; j > 0; --j)
         {
-            vlc_player_SelectPrevTrack(player, cat);
+            vlc_player_SelectPrevTrack(player, cat, VLC_VOUT_ORDER_PRIMARY);
 
             const struct vlc_player_track *track =
                 vlc_player_GetTrackAt(player, cat, j - 1);
@@ -1448,7 +1448,7 @@ test_tracks(struct ctx *ctx, bool packetized)
 
         }
         /* Current track index is 0, a previous will unselect the track */
-        vlc_player_SelectPrevTrack(player, cat);
+        vlc_player_SelectPrevTrack(player, cat, VLC_VOUT_ORDER_PRIMARY);
         const struct vlc_player_track *track =
             vlc_player_GetTrackAt(player, cat, 0);
         /* Wait that the track is unselected */
