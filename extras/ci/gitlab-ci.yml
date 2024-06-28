@@ -381,10 +381,10 @@ debian-meson:
         - |
             # We split in two different commands to handle the case where
             # the coverage will be generated on different jobs later.
-            # Note: qt6-assets_qrc.cpp, qt6-qml_qrc.cpp, qt6-shaders_qrc.cpp, qt6-windows_qrc.cpp need to be remove from the report since their
+            # Note: qt generated files need to be remove from the report since their
             # coverage should not be checked. It leads to gcovr having trouble
             # parsing the coverage otherwise.
-            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j$NCPU --gcov-ignore-parse-errors=negative_hits.warn_once_per_file --exclude build-meson/modules/gui/qt/qt6-assets_qrc.cpp --exclude build-meson/modules/gui/qt/qt6-qml_qrc.cpp --exclude build-meson/modules/gui/qt/shaders/qt6-shaders_qrc.cpp --exclude build-meson/modules/gui/qt/qt6-windows_qrc.cpp
+            gcovr -r "${CI_PROJECT_DIR}/" --json "${CI_PROJECT_DIR}/${CI_JOB_NAME}.cov.json" -j$NCPU --gcov-ignore-parse-errors=negative_hits.warn_once_per_file --exclude "build-meson/modules/gui/qt/.*_qrc.cpp" --exclude "build-meson/modules/gui/qt/.*_assets.cpp"
 
         - mkdir html-coverage
         - >
