@@ -22,13 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "views/iCarousel/iCarousel.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCImageView;
 @class VLCLinearProgressIndicator;
 @class VLCLibraryRepresentedItem;
 
-@interface VLCLibraryCarouselViewItemView : NSView
+@interface VLCLibraryCarouselViewItemView : NSView<iCarouselItemView>
 
 @property (readwrite, weak) IBOutlet VLCImageView *imageView;
 @property (readwrite, weak) IBOutlet NSTextField *annotationTextField;
@@ -45,7 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromNibWithOwner:(id)owner;
 
 - (void)playRepresentedItem;
-- (void)openContextMenu:(NSEvent *)event;
 
 @end
 
