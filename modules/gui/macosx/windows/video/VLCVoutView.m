@@ -186,14 +186,15 @@
 - (void)mouseDown:(NSEvent *)o_event
 {
     if (([o_event type] == NSLeftMouseDown) && (! ([o_event modifierFlags] &  NSControlKeyMask))) {
-        if ([o_event clickCount] == 1)
-            dispatch_sync(_eventQueue, ^{
-                if (_wnd)
-                    vlc_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
-            });
-        if ([o_event clickCount] == 2)
+        if (o_event.clickCount == 1) {
+            vlc_mutex_lock(&_mutex);
+            if (_wnd) {
+                vlc_window_ReportMousePressed(_wnd, MOUSE_BUTTON_LEFT);
+            }
+            vlc_mutex_unlock(&_mutex);
+        } else if (o_event.clickCount == 2) {
             [_playerController toggleFullscreen];
-
+        }
     } else if (([o_event type] == NSRightMouseDown) ||
                (([o_event type] == NSLeftMouseDown) &&
                ([o_event modifierFlags] &  NSControlKeyMask)))
@@ -205,10 +206,11 @@
 - (void)mouseUp:(NSEvent *)event
 {
     if (event.type == NSLeftMouseUp) {
-        dispatch_sync(_eventQueue, ^{
-            if (_wnd)
-                vlc_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
-        });
+        vlc_mutex_lock(&_mutex);
+        if (_wnd) {
+            vlc_window_ReportMouseReleased(_wnd, MOUSE_BUTTON_LEFT);
+        }
+        vlc_mutex_unlock(&_mutex);
     }
 
     [super mouseUp:event];
@@ -233,20 +235,18 @@
 
 - (void)mouseMoved:(NSEvent *)event
 {
-    NSPoint pointInView = 
-        [self convertPoint:event.locationInWindow fromView:nil];
+    const NSPoint pointInView = [self convertPoint:event.locationInWindow fromView:nil];
     if ([self mouse:pointInView inRect:self.bounds]) {
-        [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController
-                      object:self];
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCVideoWindowShouldShowFullscreenController object:self];
         // Invert Y coordinates
-        CGPoint pointInWindow = 
-            CGPointMake(pointInView.x, self.bounds.size.height - pointInView.y);
-        NSPoint pointInBacking = [self convertPointToBacking:pointInWindow];
-        dispatch_sync(_eventQueue, ^{
-            if (_wnd == NULL)
-                return;
+        const CGPoint pointInWindow = CGPointMake(pointInView.x, self.bounds.size.height - pointInView.y);
+        const NSPoint pointInBacking = [self convertPointToBacking:pointInWindow];
+
+        vlc_mutex_lock(&_mutex);
+        if (_wnd) {
             vlc_window_ReportMouseMoved(_wnd, pointInBacking.x, pointInBacking.y);
-        });
+        }
+        vlc_mutex_unlock(&_mutex);
     }
     [super mouseMoved:event];
 }
