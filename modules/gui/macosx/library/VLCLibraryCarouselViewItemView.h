@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromNibWithOwner:(id)owner;
 
 - (void)playRepresentedItem;
+- (void)openContextMenu:(NSEvent *)event;
 
 @end
 

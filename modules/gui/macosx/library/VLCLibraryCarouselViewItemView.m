@@ -30,12 +30,19 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
 #import "views/VLCLinearProgressIndicator.h"
+
+@interface VLCLibraryCarouselViewItemView ()
+
+@property (readonly) VLCLibraryMenuController *menuController;
+
+@end
 
 @implementation VLCLibraryCarouselViewItemView
 
@@ -164,6 +171,16 @@
 - (void)playRepresentedItem
 {
     [self.representedItem play];
+}
+
+- (void)openContextMenu:(NSEvent *)event
+{
+    if (self.menuController == nil) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
+
+    self.menuController.representedItems = @[self.representedItem];
+    [self.menuController popupMenuWithEvent:event forView:self];
 }
 
 @end
