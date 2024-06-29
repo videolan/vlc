@@ -2271,14 +2271,22 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     if (!_didDrag)
     {
         //convert position to view
-        CGPoint position = [theEvent locationInWindow];
-        position = [self convertPoint:position fromView:self.window.contentView];
+        const CGPoint position = [self convertPoint:theEvent.locationInWindow
+                                           fromView:self.window.contentView];
 
         //check for tapped view
-        UIView *itemView = [self itemViewAtPoint:position];
-        NSInteger index = itemView? [self indexOfItemView: itemView]: NSNotFound;
-        if (index != NSNotFound)
-        {
+        UIView * const itemView = [self itemViewAtPoint:position];
+
+        if (theEvent.modifierFlags & NSEventModifierFlagControl && itemView != nil) {
+            const SEL openContextMenuSelector = @selector(openContextMenu:);
+            if ([itemView respondsToSelector:openContextMenuSelector]) {
+                [itemView performSelector:openContextMenuSelector withObject:theEvent];
+            }
+            return;
+        }
+
+        const NSInteger index = itemView ? [self indexOfItemView: itemView] : NSNotFound;
+        if (index != NSNotFound) {
             if (_centerItemWhenSelected && index != self.currentItemIndex)
             {
                 [self scrollToItemAtIndex:index animated:YES];
