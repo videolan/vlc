@@ -2333,6 +2333,23 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
     }
 }
 
+- (void)rightMouseDown:(NSEvent *)event
+{
+    //convert position to view
+    const CGPoint position = [self convertPoint:event.locationInWindow
+                                       fromView:self.window.contentView];
+
+    //check for tapped view
+    UIView * const itemView = [self itemViewAtPoint:position];
+    if (itemView == nil) {
+        return;
+    }
+
+    const SEL openContextMenuSelector = @selector(openContextMenu:);
+    if ([itemView respondsToSelector:openContextMenuSelector]) {
+        [itemView performSelector:openContextMenuSelector withObject:event];
+    }
+}
 
 #pragma mark -
 #pragma mark Keyboard control
