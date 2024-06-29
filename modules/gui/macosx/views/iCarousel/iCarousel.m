@@ -2277,10 +2277,11 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
         //check for tapped view
         UIView * const itemView = [self itemViewAtPoint:position];
 
-        if (theEvent.modifierFlags & NSEventModifierFlagControl && itemView != nil) {
-            const SEL openContextMenuSelector = @selector(openContextMenu:);
-            if ([itemView respondsToSelector:openContextMenuSelector]) {
-                [itemView performSelector:openContextMenuSelector withObject:theEvent];
+        if (theEvent.modifierFlags & NSEventModifierFlagControl) {
+            UIView<iCarouselItemView> * const carouselItemView =
+                (UIView<iCarouselItemView> *)itemView;
+            if ([carouselItemView respondsToSelector:@selector(openContextMenu:)]) {
+                [carouselItemView openContextMenu:theEvent];
             }
             return;
         }
@@ -2340,14 +2341,10 @@ NSComparisonResult compareViewDepth(UIView *view1, UIView *view2, iCarousel *sel
                                        fromView:self.window.contentView];
 
     //check for tapped view
-    UIView * const itemView = [self itemViewAtPoint:position];
-    if (itemView == nil) {
-        return;
-    }
-
-    const SEL openContextMenuSelector = @selector(openContextMenu:);
-    if ([itemView respondsToSelector:openContextMenuSelector]) {
-        [itemView performSelector:openContextMenuSelector withObject:event];
+    UIView<iCarouselItemView> * const itemView =
+        (UIView<iCarouselItemView> *)[self itemViewAtPoint:position];
+    if ([itemView respondsToSelector:@selector(openContextMenu:)]) {
+        [itemView openContextMenu:event];
     }
 }
 
