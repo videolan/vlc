@@ -28,12 +28,19 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
 #import "views/VLCImageView.h"
+
+@interface VLCLibraryHeroView ()
+
+@property (readonly) VLCLibraryMenuController *menuController;
+
+@end
 
 @implementation VLCLibraryHeroView
 
@@ -205,6 +212,31 @@
     }
 
     [self setOptimalRepresentedItem];
+}
+
+- (void)openContextMenu:(NSEvent *)event
+{
+    if (self.menuController == nil) {
+        _menuController = [[VLCLibraryMenuController alloc] init];
+    }
+
+    self.menuController.representedItems = @[self.representedItem];
+    [self.menuController popupMenuWithEvent:event forView:self];
+}
+
+- (void)mouseDown:(NSEvent *)event
+{
+    if (event.modifierFlags & NSEventModifierFlagControl) {
+        [self openContextMenu:event];
+    }
+
+    [super mouseDown:event];
+}
+
+- (void)rightMouseDown:(NSEvent *)event
+{
+    [self openContextMenu:event];
+    [super rightMouseDown:event];
 }
 
 @end
