@@ -199,6 +199,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol iCarouselItemView <NSObject>
+
+@optional
+- (void)openContextMenu:(NSEvent *)event;
+
+@end
+
 NS_ASSUME_NONNULL_END
 
 #pragma clang diagnostic pop
