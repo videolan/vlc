@@ -58,6 +58,7 @@
     vout_thread_t *p_vout;
     vlc_window_t *_wnd;
     dispatch_queue_t _eventQueue;
+    vlc_mutex_t _mutex;
     NSTrackingArea *_trackingArea;
     VLCPlayerController *_playerController;
     VLCHotkeysController *_hotkeysController;
@@ -102,7 +103,8 @@
 
     _playerController = VLCMain.sharedInstance.playlistController.playerController;
     _hotkeysController = [[VLCHotkeysController alloc] init];
-    _eventQueue = dispatch_queue_create("org.videolan.vlc.vout.mouseevents", DISPATCH_QUEUE_SERIAL);
+    _eventQueue = dispatch_queue_create("org.videolan.vlc.vout.events", DISPATCH_QUEUE_SERIAL);
+    vlc_mutex_init(&_mutex);
 }
 
 - (void)layout {
