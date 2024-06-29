@@ -72,11 +72,13 @@
 
 - (void)dealloc
 {
-    dispatch_sync(_eventQueue, ^{
-        _wnd = NULL;
-    });
-    if (p_vout)
+    vlc_mutex_lock(&_mutex);
+    _wnd = NULL;
+    vlc_mutex_unlock(&_mutex);
+
+    if (p_vout) {
         vout_Release(p_vout);
+    }
 
     [self unregisterDraggedTypes];
 }
@@ -327,17 +329,19 @@
 #pragma mark -
 #pragma mark Handling of vout related actions
 
-- (void)setVoutWindow:(vlc_window_t *)p_wnd {
-    dispatch_sync(_eventQueue, ^{
-        _wnd = p_wnd;
-    });
+- (void)setVoutWindow:(vlc_window_t *)p_wnd
+{
+    vlc_mutex_lock(&_mutex);
+    _wnd = p_wnd;
+    vlc_mutex_unlock(&_mutex);
 }
 
-- (vlc_window_t *)voutWindow {
-    __block vlc_window_t *p_wnd = NULL;
-    dispatch_sync(_eventQueue, ^{
-        p_wnd = _wnd;
-    });
+- (vlc_window_t *)voutWindow
+{
+    vlc_window_t *p_wnd = NULL;
+    vlc_mutex_lock(&_mutex);
+    p_wnd = _wnd;
+    vlc_mutex_unlock(&_mutex);
     return p_wnd;
 }
 
