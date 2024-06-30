@@ -109,7 +109,7 @@
 @property (readwrite, weak) IBOutlet NSTextField *demuxDiscontinuitiesLabel;
 @property (readwrite, weak) IBOutlet NSTextField *demuxDiscontinuitiesTextField;
 
-@property (readwrite, strong, atomic) NSArray<VLCInputItem *> *representedInputItems;
+@property (readwrite, strong, nonatomic) NSArray<VLCInputItem *> *representedInputItems;
 @property (readwrite) BOOL mainMenuInstance;
 
 - (IBAction)toggleWindow:(id)sender;

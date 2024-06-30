@@ -259,30 +259,46 @@ _##field##TextField.delegate = self
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
-    _representedInputItems = (representedInputItem == nil) ? @[] : @[representedInputItem];
-    [VLCLibraryImageCache thumbnailForInputItem:representedInputItem 
+    if (representedInputItem == nil) {
+        self.representedInputItems = @[];
+        return;
+    }
+
+    [VLCLibraryImageCache thumbnailForInputItem:representedInputItem
                                  withCompletion:^(NSImage * const image) {
         self->_artwork = image;
+        self.representedInputItems = @[representedInputItem];
     }];
-    [self updateRepresentation];
 }
 
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
 {
+    if (representedMediaLibraryAudioGroup == nil) {
+        self.representedInputItems = @[];
+        return;
+    }
+
     NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
     for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
         [inputItems addObject:mediaItem.inputItem];
     }
-
-    _representedInputItems = [inputItems copy];
 
     [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup 
                                    withCompletion:^(NSImage * const image) {
         // HACK: Input items retrieved via an audio group do not acquire an artwork URL.
         // To show something in the information window, set the small artwork from the audio group.
         self->_artwork = image;
+        self.representedInputItems = inputItems.copy;
     }];
+}
 
+- (void)setRepresentedInputItems:(NSArray<VLCInputItem *> *)representedInputItems
+{
+    if (representedInputItems == _representedInputItems) {
+        return;
+    }
+
+    _representedInputItems = representedInputItems;
     [self updateRepresentation];
 }
 
