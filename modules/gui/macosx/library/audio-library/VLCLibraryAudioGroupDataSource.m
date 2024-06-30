@@ -128,6 +128,10 @@
 {
     NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
     for (NSCollectionView * const collectionView in collectionViews) {
+        NSCollectionViewLayout * const collectionViewLayout = collectionView.collectionViewLayout;
+        if ([collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class]) {
+            [(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout resetLayout];
+        }
         [collectionView reloadData];
     }
 }
