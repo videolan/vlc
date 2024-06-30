@@ -293,17 +293,9 @@ _##field##TextField.delegate = self
 
 - (void)updateStatistics:(NSNotification *)aNotification
 {
-    if (!_statisticsEnabled)
-        return;
-
-    if (![self.window isVisible])
-        return;
-
-    VLCInputStats *inputStats = aNotification.userInfo[VLCPlayerInputStats];
-    if (!inputStats) {
-        [self initMediaPanelStats];
-        return;
-    }
+    NSAssert(_statisticsEnabled, @"Statistics should not be updated when they are disabled!");
+    VLCInputStats * const inputStats = aNotification.userInfo[VLCPlayerInputStats];
+    NSAssert(inputStats != nil, @"inputStats received for statistics update should not be nil!");
 
     /* input */
     [_inputReadBytesTextField setStringValue: [NSString stringWithFormat:
