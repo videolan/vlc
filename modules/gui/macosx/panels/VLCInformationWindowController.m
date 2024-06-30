@@ -383,9 +383,14 @@ _##field##TextField.delegate = self
     NSString * const dictKey = [NSString stringWithUTF8String:#field];      \
     NSString * const fieldValue = [dict objectForKey:dictKey];              \
                                                                             \
-    if (fieldValue != nil) {                                                \
+    if ([fieldValue isEqualToString:@"<differing>"]) {                      \
+        _##field##TextField.placeholderString = _NS("(Multiple values)");   \
+        _##field##TextField.originalStateString = @"";                      \
+    } else if (fieldValue != nil) {                                         \
+        _##field##TextField.placeholderString = @"";                        \
         _##field##TextField.originalStateString = fieldValue;               \
     } else {                                                                \
+        _##field##TextField.placeholderString = @"";                        \
         _##field##TextField.originalStateString = @"";                      \
     }                                                                       \
 }                                                                           \
