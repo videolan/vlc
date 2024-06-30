@@ -729,13 +729,13 @@ BOOL differing_##prop = NO;
 #define CREATE_PROP_VAR(prop)                                                               \
 NSString * const firstItem_##prop = firstInputItem.prop;
 
-#define SET_IF_DIFFERING(prop)                                                              \
+#define UPDATE_IF_DIFFERING_BOOL(prop)                                                          \
 differing_##prop = differing_##prop || ![inputItem.prop isEqualToString:firstItem_##prop];
 
-#define ADD_PROP_TO_DICT_IF_DIFFERING(prop)                                                 \
-if (!differing_##prop && firstItem_##prop != nil) {                                         \
-    [commonData setObject:firstItem_##prop forKey:[NSString stringWithUTF8String:#prop]];   \
-}
+#define ADD_PROP_TO_DICT(prop)                                                              \
+NSString * firstItemValue_##prop = firstItem_##prop == nil ? @"" : firstItem_##prop;        \
+NSString * const value_##prop = differing_##prop ? @"<differing>" : firstItemValue_##prop;  \
+[commonData setObject:value_##prop forKey:[NSString stringWithUTF8String:#prop]];           \
 
     PERFORM_ACTION_PER_INPUTITEM_PROP(CREATE_DIFFER_BOOL);
     PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(CREATE_PROP_VAR);
@@ -746,11 +746,11 @@ if (!differing_##prop && firstItem_##prop != nil) {                             
     for (uint i = 1; i < inputItems.count; ++i) {
         VLCInputItem * const inputItem = inputItems[i];
 
-        PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(SET_IF_DIFFERING);
+        PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(UPDATE_IF_DIFFERING_BOOL);
         differing_artworkURL = differing_artworkURL || ![inputItem.artworkURL.absoluteString isEqualToString:firstItem_artworkURL.absoluteString];
     }
 
-    PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT_IF_DIFFERING);
+    PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT);
 
 #undef PERFORM_ACTION_PER_INPUTITEM_PROP
 #undef CREATE_DIFFER_BOOL
