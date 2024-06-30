@@ -701,6 +701,8 @@ NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem *>
     NSMutableDictionary<NSString *, id> *const commonData = [[NSMutableDictionary alloc] init];
 
 #define PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(action)                                  \
+action(MRL);                                                                                \
+action(decodedMRL);                                                                         \
 action(title);                                                                              \
 action(artist);                                                                             \
 action(album);                                                                              \
