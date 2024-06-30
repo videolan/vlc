@@ -110,14 +110,16 @@ actionCallback(encodedBy);
 
 - (void)awakeFromNib
 {
+    _statisticsEnabled = var_InheritBool(getIntf(), "stats");
+
     [self.window setExcludedFromWindowsMenu: YES];
     [self.window setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     [self.window setInitialFirstResponder: _decodedMRLLabel];
 
-    _outlineView.dataSource = self;
+    self.outlineView.dataSource = self;
 
-    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
-    if (_mainMenuInstance) {
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    if (_mainMenuInstance && _statisticsEnabled) {
         [notificationCenter addObserver:self
                                selector:@selector(updateStatistics:)
                                    name:VLCPlayerStatisticsUpdated
@@ -136,11 +138,8 @@ actionCallback(encodedBy);
                                name:VLCInputItemPreparsingSucceeded
                              object:nil];
 
-    [notificationCenter postNotificationName:VLCPlayerStatisticsUpdated object:self];
-
     [self initStrings];
 
-    _statisticsEnabled = var_InheritBool(getIntf(), "stats");
     if (!_statisticsEnabled || !_mainMenuInstance) {
         if ([_segmentedView segmentCount] >= 3)
             [_segmentedView setSegmentCount: 2];
