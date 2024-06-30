@@ -38,6 +38,7 @@ NSString *VLCInputItemPreparsingSkipped = @"VLCInputItemPreparsingSkipped";
 NSString *VLCInputItemPreparsingFailed = @"VLCInputItemPreparsingFailed";
 NSString *VLCInputItemPreparsingTimeOut = @"VLCInputItemPreparsingTimeOut";
 NSString *VLCInputItemPreparsingSucceeded = @"VLCInputItemPreparsingSucceeded";
+NSString * const VLCInputItemCommonDataDifferingFlagString = @"<differing>";
 
 @interface VLCInputItem()
 {
@@ -736,7 +737,8 @@ differing_##prop = differing_##prop || ![inputItem.prop isEqualToString:firstIte
 
 #define ADD_PROP_TO_DICT(prop)                                                              \
 NSString * firstItemValue_##prop = firstItem_##prop == nil ? @"" : firstItem_##prop;        \
-NSString * const value_##prop = differing_##prop ? @"<differing>" : firstItemValue_##prop;  \
+NSString * const value_##prop =                                                             \
+    differing_##prop ? VLCInputItemCommonDataDifferingFlagString : firstItemValue_##prop;   \
 [commonData setObject:value_##prop forKey:[NSString stringWithUTF8String:#prop]];           \
 
     PERFORM_ACTION_PER_INPUTITEM_PROP(CREATE_DIFFER_BOOL);

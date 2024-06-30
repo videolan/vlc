@@ -37,6 +37,7 @@ extern NSString *VLCInputItemPreparsingSkipped;
 extern NSString *VLCInputItemPreparsingFailed;
 extern NSString *VLCInputItemPreparsingTimeOut;
 extern NSString *VLCInputItemPreparsingSucceeded;
+extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 
 @interface VLCInputItem : NSObject<VLCLocallyManipulableItemProtocol>
 

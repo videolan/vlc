@@ -378,22 +378,22 @@ _##field##TextField.delegate = self
 {
     NSParameterAssert(dict != nil);
 
-#define FILL_FIELD_FROM_DICT(field)                                         \
-{                                                                           \
-    NSString * const dictKey = [NSString stringWithUTF8String:#field];      \
-    NSString * const fieldValue = [dict objectForKey:dictKey];              \
-                                                                            \
-    if ([fieldValue isEqualToString:@"<differing>"]) {                      \
-        _##field##TextField.placeholderString = _NS("(Multiple values)");   \
-        _##field##TextField.originalStateString = @"";                      \
-    } else if (fieldValue != nil) {                                         \
-        _##field##TextField.placeholderString = @"";                        \
-        _##field##TextField.originalStateString = fieldValue;               \
-    } else {                                                                \
-        _##field##TextField.placeholderString = @"";                        \
-        _##field##TextField.originalStateString = @"";                      \
-    }                                                                       \
-}                                                                           \
+#define FILL_FIELD_FROM_DICT(field)                                                 \
+{                                                                                   \
+    NSString * const dictKey = [NSString stringWithUTF8String:#field];              \
+    NSString * const fieldValue = [dict objectForKey:dictKey];                      \
+                                                                                    \
+    if ([fieldValue isEqualToString:VLCInputItemCommonDataDifferingFlagString]) {   \
+        _##field##TextField.placeholderString = _NS("(Multiple values)");           \
+        _##field##TextField.originalStateString = @"";                              \
+    } else if (fieldValue != nil) {                                                 \
+        _##field##TextField.placeholderString = @"";                                \
+        _##field##TextField.originalStateString = fieldValue;                       \
+    } else {                                                                        \
+        _##field##TextField.placeholderString = @"";                                \
+        _##field##TextField.originalStateString = @"";                              \
+    }                                                                               \
+}
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_DICT);
 
