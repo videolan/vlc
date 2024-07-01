@@ -89,7 +89,6 @@ protected:
     struct vlc_logger *l;
     chapter_codec_vm & vm;
 };
-
 } // namespace
 
 #endif

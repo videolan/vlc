@@ -1442,7 +1442,16 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 if( MKV_CHECKED_PTR_DECL_CONST( p_codec_id, KaxChapterProcessCodecID, proc ) )
                 {
                     if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_NATIVE )
-                        p_ccodec = new matroska_script_codec_c( vlc_object_logger( &vars.obj->sys.demuxer ), vars.obj->sys );
+                    {
+                       auto interpreter = vars.obj->sys.GetMatroskaScriptInterpreter();
+                       if (unlikely(interpreter == nullptr))
+                            debug( vars, "failed to get the Matroska Script interpreter ");
+                       else
+                            p_ccodec = new matroska_script_codec_c(
+                            vlc_object_logger( &vars.obj->sys.demuxer ),
+                            vars.obj->sys, *interpreter
+                            );
+                    }
                     else if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_DVD )
                     {
                         auto interepreter = vars.obj->sys.GetDVDInterpretor();

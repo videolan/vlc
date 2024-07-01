@@ -34,16 +34,16 @@ protected:
 class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 public:
-    matroska_script_codec_c( struct vlc_logger *log, chapter_codec_vm & vm_ )
+    matroska_script_codec_c( struct vlc_logger *log, chapter_codec_vm & vm_, matroska_script_interpretor_c & interpreter_)
     :chapter_codec_cmds_c( log, vm_, MATROSKA_CHAPTER_CODEC_NATIVE )
-    ,interpreter( log, vm_ )
+    ,interpreter( interpreter_ )
     {}
 
     bool Enter();
     bool Leave();
 
 protected:
-    matroska_script_interpretor_c interpreter;
+    matroska_script_interpretor_c & interpreter;
 };
 
 } // namespace

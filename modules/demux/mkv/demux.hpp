@@ -28,6 +28,7 @@
 
 #include "chapter_command.hpp"
 #include "chapter_command_dvd.hpp"
+#include "chapter_command_script.hpp"
 #include "events.hpp"
 
 #include <memory>
@@ -123,6 +124,19 @@ public:
         return dvd_interpretor.get();
     }
 
+    matroska_script_interpretor_c * GetMatroskaScriptInterpreter()
+    {
+        if (!ms_interpreter)
+        {
+            try {
+                ms_interpreter = std::make_unique<matroska_script_interpretor_c> ( vlc_object_logger( &demuxer ), *this );
+            } catch ( const std::bad_alloc & ) {
+            }
+        }
+
+        return ms_interpreter.get();
+    }
+
     uint8_t        palette[4][4];
     vlc_mutex_t    lock_demuxer;
 
@@ -132,6 +146,7 @@ public:
 private:
     virtual_segment_c                *p_current_vsegment = nullptr;
     std::unique_ptr<dvd_command_interpretor_c> dvd_interpretor; // protected by lock_demuxer
+    std::unique_ptr<matroska_script_interpretor_c> ms_interpreter;
 };
 
 } // namespace
