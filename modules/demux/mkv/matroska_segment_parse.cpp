@@ -1438,9 +1438,9 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             {
                 if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, cp[j] ) )
                 {
-                    if ( static_cast<uint32_t>(*p_codec_id) == 0 )
+                    if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_NATIVE )
                         p_ccodec = new matroska_script_codec_c( vars.obj->sys );
-                    else if ( static_cast<uint32_t>(*p_codec_id) == 1 )
+                    else if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_DVD )
                         p_ccodec = new dvd_chapter_codec_c( vars.obj->sys );
                     break;
                 }
