@@ -43,12 +43,12 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                     const void *p_cookie,
                                     size_t i_cookie_size )
 {
-    VLC_UNUSED( codec_id );
     // this chapter
     auto index = codecs.cbegin();
     while ( index != codecs.cend() )
     {
-        if ( match( **index ,p_cookie, i_cookie_size ) )
+        if ( (*index)->i_codec_id == codec_id &&
+             match( **index ,p_cookie, i_cookie_size ) )
             return this;
         ++index;
     }
