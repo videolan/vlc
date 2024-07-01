@@ -120,7 +120,7 @@ public:
         if (!dvd_interpretor)
         {
             try {
-                dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this, *this );
+                dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( vlc_object_logger( &demuxer ), *this );
             } catch ( const std::bad_alloc & ) {
             }
         }

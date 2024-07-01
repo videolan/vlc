@@ -55,15 +55,13 @@ public:
                                                    virtual_segment_c * & p_vsegment_found ) = 0;
 };
 
-struct demux_sys_t;
-
 class chapter_codec_cmds_c
 {
 public:
-    chapter_codec_cmds_c( demux_sys_t & demuxer, chapter_codec_vm & vm_, enum chapter_codec_id codec_id)
+    chapter_codec_cmds_c( struct vlc_logger *log, chapter_codec_vm & vm_, enum chapter_codec_id codec_id)
     :i_codec_id( codec_id )
     ,p_private_data(NULL)
-    ,sys( demuxer )
+    ,l( log )
     ,vm( vm_ )
     {}
 
@@ -97,7 +95,7 @@ protected:
     std::vector<KaxChapterProcessData*> during_cmds;
     std::vector<KaxChapterProcessData*> leave_cmds;
 
-    demux_sys_t & sys;
+    struct vlc_logger *l;
     chapter_codec_vm & vm;
 };
 
@@ -105,8 +103,8 @@ protected:
 class dvd_command_interpretor_c
 {
 public:
-    dvd_command_interpretor_c( demux_sys_t & demuxer, chapter_codec_vm & vm_ )
-    :sys( demuxer )
+    dvd_command_interpretor_c( struct vlc_logger *log, chapter_codec_vm & vm_ )
+    :l( log )
     ,vm( vm_ )
     {
         memset( p_PRMs, 0, sizeof(p_PRMs) );
@@ -209,7 +207,7 @@ protected:
     }
 
     uint16_t       p_PRMs[256];
-    demux_sys_t  & sys;
+    struct vlc_logger *l;
     chapter_codec_vm & vm;
 
     // DVD command IDs
@@ -269,8 +267,8 @@ protected:
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
-    dvd_chapter_codec_c( demux_sys_t & sys, chapter_codec_vm & vm_, dvd_command_interpretor_c & intepretor_ )
-    :chapter_codec_cmds_c( sys, vm_, MATROSKA_CHAPTER_CODEC_DVD )
+    dvd_chapter_codec_c( struct vlc_logger *log, chapter_codec_vm & vm_, dvd_command_interpretor_c & intepretor_ )
+    :chapter_codec_cmds_c( log, vm_, MATROSKA_CHAPTER_CODEC_DVD )
     ,intepretor(intepretor_)
     {}
 
@@ -288,8 +286,8 @@ protected:
 class matroska_script_interpretor_c
 {
 public:
-    matroska_script_interpretor_c( demux_sys_t & demuxer, chapter_codec_vm & vm_ )
-    :sys( demuxer )
+    matroska_script_interpretor_c( struct vlc_logger *log, chapter_codec_vm & vm_ )
+    :l( log )
     ,vm( vm_ )
     {}
 
@@ -299,7 +297,7 @@ public:
     static const std::string CMD_MS_GOTO_AND_PLAY;
 
 protected:
-    demux_sys_t  & sys;
+    struct vlc_logger *l;
     chapter_codec_vm & vm;
 };
 
@@ -307,9 +305,9 @@ protected:
 class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 public:
-    matroska_script_codec_c( demux_sys_t & sys, chapter_codec_vm & vm_ )
-    :chapter_codec_cmds_c( sys, vm_, MATROSKA_CHAPTER_CODEC_NATIVE )
-    ,interpreter( sys, vm_ )
+    matroska_script_codec_c( struct vlc_logger *log, chapter_codec_vm & vm_ )
+    :chapter_codec_cmds_c( log, vm_, MATROSKA_CHAPTER_CODEC_NATIVE )
+    ,interpreter( log, vm_ )
     {}
 
     bool Enter();

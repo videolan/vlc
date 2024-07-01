@@ -90,7 +90,7 @@ bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, std::vector<K
             size_t i_size  = std::min<size_t>( *p_data++, ( (*it)->GetSize() - 1 ) >> 3 ); // avoid reading too much
             for( ; i_size > 0; i_size -=1, p_data += 8 )
             {
-                msg_Dbg( &sys.demuxer, "%s", str_diag);
+                vlc_debug( l, "%s", str_diag);
                 f_result |= intepretor.Interpret( p_data );
             }
         }
@@ -202,7 +202,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         {
         case CMD_DVD_IF_GPREG_EQUAL:
             // if equals
-            msg_Dbg( &sys.demuxer, "IF %s EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) == i_value ))
             {
                 b_test_positive = false;
@@ -210,7 +210,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_NOT_EQUAL:
             // if not equals
-            msg_Dbg( &sys.demuxer, "IF %s NOT EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s NOT EQUALS %s", GetRegTypeName( false, i_cr1 ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) != i_value ))
             {
                 b_test_positive = false;
@@ -218,7 +218,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_INF:
             // if inferior
-            msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) < i_value ))
             {
                 b_test_positive = false;
@@ -226,7 +226,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_INF_EQUAL:
             // if inferior or equal
-            msg_Dbg( &sys.demuxer, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s < %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) <= i_value ))
             {
                 b_test_positive = false;
@@ -234,7 +234,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_AND:
             // if logical and
-            msg_Dbg( &sys.demuxer, "IF %s & %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s & %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) & i_value ))
             {
                 b_test_positive = false;
@@ -242,7 +242,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_SUP:
             // if superior
-            msg_Dbg( &sys.demuxer, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) > i_value ))
             {
                 b_test_positive = false;
@@ -250,7 +250,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             break;
         case CMD_DVD_IF_GPREG_SUP_EQUAL:
             // if superior or equal
-            msg_Dbg( &sys.demuxer, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
+            vlc_debug( l, "IF %s >= %s", GetRegTypeName( false, p_command[3] ).c_str(), GetRegTypeName( b_test_value, i_value ).c_str() );
             if (!( GetPRM( i_cr1 ) >= i_value ))
             {
                 b_test_positive = false;
@@ -270,19 +270,19 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     case CMD_DVD_NOP:
     case CMD_DVD_NOP2:
         {
-            msg_Dbg( &sys.demuxer, "NOP" );
+            vlc_debug( l, "NOP" );
             break;
         }
     case CMD_DVD_BREAK:
         {
-            msg_Dbg( &sys.demuxer, "Break" );
+            vlc_debug( l, "Break" );
             // TODO
             break;
         }
     case CMD_DVD_JUMP_TT:
         {
             uint8_t i_title = p_command[5];
-            msg_Dbg( &sys.demuxer, "JumpTT %d", i_title );
+            vlc_debug( l, "JumpTT %d", i_title );
 
             // find in the ChapProcessPrivate matching this Title level
             p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
@@ -302,7 +302,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_CALLSS_VTSM1:
         {
-            msg_Dbg( &sys.demuxer, "CallSS" );
+            vlc_debug( l, "CallSS" );
             binary p_type;
             switch( (p_command[6] & 0xC0) >> 6 ) {
                 case 0:
@@ -310,28 +310,28 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     switch ( p_type )
                     {
                     case 0x00:
-                        msg_Dbg( &sys.demuxer, "CallSS PGC (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS PGC (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x02:
-                        msg_Dbg( &sys.demuxer, "CallSS Title Entry (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Title Entry (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x03:
-                        msg_Dbg( &sys.demuxer, "CallSS Root Menu (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Root Menu (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x04:
-                        msg_Dbg( &sys.demuxer, "CallSS Subpicture Menu (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Subpicture Menu (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x05:
-                        msg_Dbg( &sys.demuxer, "CallSS Audio Menu (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Audio Menu (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x06:
-                        msg_Dbg( &sys.demuxer, "CallSS Angle Menu (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Angle Menu (rsm_cell %x)", p_command[4]);
                         break;
                     case 0x07:
-                        msg_Dbg( &sys.demuxer, "CallSS Chapter Menu (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS Chapter Menu (rsm_cell %x)", p_command[4]);
                         break;
                     default:
-                        msg_Dbg( &sys.demuxer, "CallSS <unknown> (rsm_cell %x)", p_command[4]);
+                        vlc_debug( l, "CallSS <unknown> (rsm_cell %x)", p_command[4]);
                         break;
                     }
                     p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1, p_vsegment );
@@ -348,49 +348,49 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     }
                 break;
                 case 1:
-                    msg_Dbg( &sys.demuxer, "CallSS VMGM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
+                    vlc_debug( l, "CallSS VMGM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
                 break;
                 case 2:
-                    msg_Dbg( &sys.demuxer, "CallSS VTSM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
+                    vlc_debug( l, "CallSS VTSM (menu %d, rsm_cell %x)", p_command[5] & 0x0F, p_command[4]);
                 break;
                 case 3:
-                    msg_Dbg( &sys.demuxer, "CallSS VMGM (pgc %d, rsm_cell %x)", (p_command[2] << 8) + p_command[3], p_command[4]);
+                    vlc_debug( l, "CallSS VMGM (pgc %d, rsm_cell %x)", (p_command[2] << 8) + p_command[3], p_command[4]);
                 break;
             }
             break;
         }
     case CMD_DVD_JUMP_SS:
         {
-            msg_Dbg( &sys.demuxer, "JumpSS");
+            vlc_debug( l, "JumpSS");
             binary p_type;
             switch( (p_command[5] & 0xC0) >> 6 ) {
                 case 0:
-                    msg_Dbg( &sys.demuxer, "JumpSS FP");
+                    vlc_debug( l, "JumpSS FP");
                 break;
                 case 1:
                     p_type = p_command[5] & 0x0F;
                     switch ( p_type )
                     {
                     case 0x02:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Title Entry");
+                        vlc_debug( l, "JumpSS VMGM Title Entry");
                         break;
                     case 0x03:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Root Menu");
+                        vlc_debug( l, "JumpSS VMGM Root Menu");
                         break;
                     case 0x04:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Subpicture Menu");
+                        vlc_debug( l, "JumpSS VMGM Subpicture Menu");
                         break;
                     case 0x05:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Audio Menu");
+                        vlc_debug( l, "JumpSS VMGM Audio Menu");
                         break;
                     case 0x06:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Angle Menu");
+                        vlc_debug( l, "JumpSS VMGM Angle Menu");
                         break;
                     case 0x07:
-                        msg_Dbg( &sys.demuxer, "JumpSS VMGM Chapter Menu");
+                        vlc_debug( l, "JumpSS VMGM Chapter Menu");
                         break;
                     default:
-                        msg_Dbg( &sys.demuxer, "JumpSS <unknown>");
+                        vlc_debug( l, "JumpSS <unknown>");
                         break;
                     }
                     // find the VMG
@@ -410,25 +410,25 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                     switch ( p_type )
                     {
                     case 0x02:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Title Entry", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Title Entry", p_command[4], p_command[3]);
                         break;
                     case 0x03:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Root Menu", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Root Menu", p_command[4], p_command[3]);
                         break;
                     case 0x04:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Subpicture Menu", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Subpicture Menu", p_command[4], p_command[3]);
                         break;
                     case 0x05:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Audio Menu", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Audio Menu", p_command[4], p_command[3]);
                         break;
                     case 0x06:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Angle Menu", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Angle Menu", p_command[4], p_command[3]);
                         break;
                     case 0x07:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) Chapter Menu", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) Chapter Menu", p_command[4], p_command[3]);
                         break;
                     default:
-                        msg_Dbg( &sys.demuxer, "JumpSS VTSM (vts %d, ttn %d) <unknown>", p_command[4], p_command[3]);
+                        vlc_debug( l, "JumpSS VTSM (vts %d, ttn %d) <unknown>", p_command[4], p_command[3]);
                         break;
                     }
 
@@ -449,13 +449,13 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             }
                         }
                         else
-                            msg_Dbg( &sys.demuxer, "Title (%d) does not exist in this VTS", p_command[3] );
+                            vlc_debug( l, "Title (%d) does not exist in this VTS", p_command[3] );
                     }
                     else
-                        msg_Dbg( &sys.demuxer, "DVD Domain VTS (%d) not found", p_command[4] );
+                        vlc_debug( l, "DVD Domain VTS (%d) not found", p_command[4] );
                 break;
                 case 3:
-                    msg_Dbg( &sys.demuxer, "JumpSS VMGM (pgc %d)", (p_command[2] << 8) + p_command[3]);
+                    vlc_debug( l, "JumpSS VMGM (pgc %d)", (p_command[2] << 8) + p_command[3]);
                 break;
             }
             break;
@@ -465,7 +465,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             uint8_t i_title = p_command[5];
             uint8_t i_ptt = p_command[3];
 
-            msg_Dbg( &sys.demuxer, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
+            vlc_debug( l, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
 
             // find the current VTS content segment
             p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsDomain, NULL, 0 );
@@ -491,31 +491,31 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             }
                         }
                     else
-                        msg_Dbg( &sys.demuxer, "Title (%d) does not exist in this VTS", i_title );
+                        vlc_debug( l, "Title (%d) does not exist in this VTS", i_title );
                     }
                     else
-                        msg_Dbg( &sys.demuxer, "DVD Domain VTS (%d) not found", i_curr_title );
+                        vlc_debug( l, "DVD Domain VTS (%d) not found", i_curr_title );
                 }
                 else
-                    msg_Dbg( &sys.demuxer, "JumpVTS_PTT command found but not in a VTS(M)");
+                    vlc_debug( l, "JumpVTS_PTT command found but not in a VTS(M)");
             }
             else
-                msg_Dbg( &sys.demuxer, "JumpVTS_PTT command but the DVD domain wasn't found");
+                vlc_debug( l, "JumpVTS_PTT command but the DVD domain wasn't found");
             break;
         }
     case CMD_DVD_SET_GPRMMD:
         {
-            msg_Dbg( &sys.demuxer, "Set GPRMMD [%d]=%d", (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3]);
+            vlc_debug( l, "Set GPRMMD [%d]=%d", (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3]);
 
             if ( !SetGPRM( (p_command[4] << 8) + p_command[5], (p_command[2] << 8) + p_command[3] ) )
-                msg_Dbg( &sys.demuxer, "Set GPRMMD failed" );
+                vlc_debug( l, "Set GPRMMD failed" );
             break;
         }
     case CMD_DVD_LINKPGCN:
         {
             uint16_t i_pgcn = (p_command[6] << 8) + p_command[7];
 
-            msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
+            vlc_debug( l, "Link PGCN(%d)", i_pgcn );
             p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_vchapter != NULL )
             {
@@ -530,7 +530,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
             p_vchapter = vm.GetCurrentVSegment()->CurrentChapter();
 
-            msg_Dbg( &sys.demuxer, "LinkCN (cell %d)", i_cn );
+            vlc_debug( l, "LinkCN (cell %d)", i_cn );
             p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cn, 1 );
             if ( p_vchapter != NULL )
             {
@@ -541,19 +541,19 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         }
     case CMD_DVD_GOTO_LINE:
         {
-            msg_Dbg( &sys.demuxer, "GotoLine (%d)", (p_command[6] << 8) + p_command[7] );
+            vlc_debug( l, "GotoLine (%d)", (p_command[6] << 8) + p_command[7] );
             // TODO
             break;
         }
     case CMD_DVD_SET_HL_BTNN1:
         {
-            msg_Dbg( &sys.demuxer, "SetHL_BTN (%d)", p_command[4] );
+            vlc_debug( l, "SetHL_BTN (%d)", p_command[4] );
             SetSPRM( 0x88, p_command[4] );
             break;
         }
     default:
         {
-            msg_Dbg( &sys.demuxer, "unsupported command : %02X %02X %02X %02X %02X %02X %02X %02X"
+            vlc_debug( l, "unsupported command : %02X %02X %02X %02X %02X %02X %02X %02X"
                      ,p_command[0]
                      ,p_command[1]
                      ,p_command[2]
@@ -692,7 +692,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
 
     std::string sz_command( reinterpret_cast<const char*> (p_command), i_size );
 
-    msg_Dbg( &sys.demuxer, "command : %s", sz_command.c_str() );
+    vlc_debug( l, "command : %s", sz_command.c_str() );
 
     if ( sz_command.compare( 0, CMD_MS_GOTO_AND_PLAY.size(), CMD_MS_GOTO_AND_PLAY ) == 0 )
     {
@@ -721,13 +721,13 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         int64_t i_chapter_uid = atoll( st.c_str() );
 
         virtual_segment_c *p_vsegment;
-        virtual_chapter_c *p_vchapter = sys.FindVChapter( i_chapter_uid, p_vsegment );
+        virtual_chapter_c *p_vchapter = vm.FindVChapter( i_chapter_uid, p_vsegment );
 
         if ( p_vchapter == NULL )
-            msg_Dbg( &sys.demuxer, "Chapter %" PRId64 " not found", i_chapter_uid);
+            vlc_debug( l, "Chapter %" PRId64 " not found", i_chapter_uid);
         else
         {
-            if ( !p_vchapter->EnterAndLeave( sys.p_current_vsegment->CurrentChapter(), false ) )
+            if ( !p_vchapter->EnterAndLeave( vm.GetCurrentVSegment()->CurrentChapter(), false ) )
                 vm.JumpTo( *p_vsegment, *p_vchapter );
             b_result = true;
         }
@@ -744,7 +744,7 @@ bool matroska_script_codec_c::Enter()
     {
         if ( (*index)->GetSize() )
         {
-            msg_Dbg( &sys.demuxer, "Matroska Script enter command" );
+            vlc_debug( l, "Matroska Script enter command" );
             f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         ++index;
@@ -760,7 +760,7 @@ bool matroska_script_codec_c::Leave()
     {
         if ( (*index)->GetSize() )
         {
-            msg_Dbg( &sys.demuxer, "Matroska Script leave command" );
+            vlc_debug( l, "Matroska Script leave command" );
             f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
         }
         ++index;

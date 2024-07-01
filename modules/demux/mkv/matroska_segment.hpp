@@ -76,6 +76,8 @@ public:
     simple_tags_t   simple_tags;
 };
 
+struct demux_sys_t;
+
 class matroska_segment_c
 {
 public:
