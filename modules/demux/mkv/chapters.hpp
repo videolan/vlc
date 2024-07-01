@@ -28,6 +28,8 @@
 
 #include "mkv.hpp"
 
+#include <optional>
+
 namespace mkv {
 
 class chapter_translation_c
@@ -63,7 +65,7 @@ public:
     int16_t                     GetTitleNumber( ) const;
 
     vlc_tick_t                  i_start_time = 0;
-    vlc_tick_t                  i_end_time = -1;
+    std::optional<vlc_tick_t>   i_end_time;
     std::vector<chapter_item_c*> sub_chapters;
     KaxChapterSegmentUID        *p_segment_uid = nullptr;
     KaxChapterSegmentEditionUID *p_segment_edition_uid = nullptr;
