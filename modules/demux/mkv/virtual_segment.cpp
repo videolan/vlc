@@ -53,6 +53,14 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
         return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration, sub_chapters );
     }
 
+    if( b_ordered && !p_chap->i_end_time )
+    {
+        msg_Warn( &main_segment.sys.demuxer,
+                  "Missing end time in ordered chapter - ignoring chapter %s",
+                  p_chap->str_name.c_str() );
+        return NULL;
+    }
+
     matroska_segment_c * p_segment = &main_segment;
     if( p_chap->p_segment_uid &&
        ( !( p_segment = getSegmentbyUID( p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
