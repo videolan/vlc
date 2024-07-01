@@ -45,8 +45,8 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
 {
     VLC_UNUSED( codec_id );
     // this chapter
-    std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
-    while ( index != codecs.end() )
+    auto index = codecs.cbegin();
+    while ( index != codecs.cend() )
     {
         if ( match( **index ,p_cookie, i_cookie_size ) )
             return this;
@@ -96,8 +96,8 @@ std::string chapter_item_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
 
-    std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
-    while ( index != codecs.end() )
+    auto index = codecs.cbegin();
+    while ( index != codecs.cend() )
     {
         result = (*index)->GetCodecName( f_for_title );
         if ( !result.empty () )
@@ -112,8 +112,8 @@ int16_t chapter_item_c::GetTitleNumber( ) const
 {
     int result = -1;
 
-    std::vector<chapter_codec_cmds_c*>::const_iterator index = codecs.begin();
-    while ( index != codecs.end() )
+    auto index = codecs.cbegin();
+    while ( index != codecs.cend() )
     {
         result = (*index)->GetTitleNumber( );
         if ( result >= 0 )
