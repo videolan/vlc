@@ -120,6 +120,10 @@ FocusScope {
     property var _currentRange: [0,0]
     property var _delayedChildrenMap: ({})
 
+    property int _anchoredIdx: -1
+    property real _anchoredIdxFraction: 1
+    property real _anchoredIdxUpdate: 0
+
     // Aliases
 
     property alias contentHeight: flickable.contentHeight
@@ -174,15 +178,14 @@ FocusScope {
             flickable.layout(true)
     }
 
-    onHeightChanged: flickable.layout(false)
-
-    onContentWidthChanged: flickable.layout(true)
-    onContentHeightChanged: flickable.layout(true)
+    onHeightChanged: _anchoredLayout(false)
+    onContentWidthChanged: _anchoredLayout(true)
+    onContentHeightChanged: _anchoredLayout(true)
 
     // NOTE: Update on contentLeftMargin since we depend on this for item placements.
-    onContentLeftMarginChanged: flickable.layout(true)
+    onContentLeftMarginChanged: _anchoredLayout(true)
 
-    onDisplayMarginEndChanged: flickable.layout(false)
+    onDisplayMarginEndChanged: _anchoredLayout(false)
 
     onModelChanged: _onModelCountChanged()
 
@@ -350,6 +353,36 @@ FocusScope {
     }
 
     // Functions
+
+    // layouts such that views indexes are preserved during a resize
+    function _anchoredLayout(forceLayout) {
+        if (_currentRange[0] === _currentRange[1])
+            return
+
+        // fix anchor for some duration, so that index remains
+        // same during whole resize operation
+        const dirty = (Date.now() - _anchoredIdxUpdate) > VLCStyle.duration_veryLong
+
+        if (dirty || (_anchoredIdx < 0) || (_anchoredIdx >= _count)) {
+            _anchoredIdx = _currentRange?.[0] ?? 0
+            const item = _getItem(_anchoredIdx)
+            _anchoredIdxFraction = (item.y - flickable.contentY) / cellHeight
+        }
+
+        // reset timer for each call, this allows preserving anchor for extened duration
+        _anchoredIdxUpdate = Date.now()
+
+        let y = 0 // by default show full view including header
+        if (_anchoredIdx !== 0)
+            y = getItemPos(_anchoredIdx)[1] + (cellHeight * _anchoredIdxFraction)
+
+        const previousContentY = flickable.contentY
+        const maxY = Math.max(0, flickable.contentHeight - height)
+
+        flickable.contentY = Helpers.clamp(y, 0, maxY)
+        if (forceLayout || (previousContentY === flickable.contentY))
+            flickable.layout(forceLayout)
+    }
 
     // NOTE: This function is useful to set the currentItem without losing the visual focus.
     function setCurrentItem(index) {
