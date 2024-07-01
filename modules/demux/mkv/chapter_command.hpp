@@ -247,8 +247,9 @@ protected:
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
-    dvd_chapter_codec_c( demux_sys_t & sys )
+    dvd_chapter_codec_c( demux_sys_t & sys, dvd_command_interpretor_c & intepretor_ )
     :chapter_codec_cmds_c( sys, MATROSKA_CHAPTER_CODEC_DVD )
+    ,intepretor(intepretor_)
     {}
 
     bool Enter();
@@ -259,6 +260,7 @@ public:
 
 protected:
     bool EnterLeaveHelper( char const*, std::vector<KaxChapterProcessData*>* );
+    dvd_command_interpretor_c & intepretor;
 };
 
 class matroska_script_interpretor_c

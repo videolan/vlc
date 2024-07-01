@@ -1441,7 +1441,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                     if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_NATIVE )
                         p_ccodec = new matroska_script_codec_c( vars.obj->sys );
                     else if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_DVD )
-                        p_ccodec = new dvd_chapter_codec_c( vars.obj->sys );
+                        p_ccodec = new dvd_chapter_codec_c( vars.obj->sys, vars.obj->sys.GetDVDInterpretor() );
                     break;
                 }
             }
