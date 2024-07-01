@@ -28,8 +28,8 @@ ControlBar {
 
     anchors.bottomMargin: (state === "outViewport") ? -_delayedImplicitHeight : 0
 
-    state: (Player.playingState === Player.PLAYING_STATE_STOPPED) ? "outViewport"
-                                                                  : "inViewport"
+    state: Player.isStarted ? "inViewport"
+                            : "outViewport"
 
     textPosition: (MainCtx.pinVideoControls) ? ControlBar.TimeTextPosition.LeftRightSlider
                                              : ControlBar.TimeTextPosition.Hide
