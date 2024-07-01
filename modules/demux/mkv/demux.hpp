@@ -56,7 +56,6 @@ public:
         ,i_current_seekpoint(0)
         ,i_updates(0)
         ,p_current_vsegment(NULL)
-        ,dvd_interpretor( *this )
         ,i_duration(-1)
         ,trust_cues(trust_cues)
         ,ev(&demux)
@@ -90,8 +89,6 @@ public:
     std::vector<virtual_segment_c*>  used_vsegments;
     virtual_segment_c                *p_current_vsegment;
 
-    dvd_command_interpretor_c        dvd_interpretor;
-
     /* duration of the stream */
     vlc_tick_t              i_duration;
 
@@ -112,11 +109,24 @@ public:
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
+    dvd_command_interpretor_c & GetDVDInterpretor()
+    {
+        if (!dvd_interpretor)
+        {
+            dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this );
+            assert(dvd_interpretor);
+        }
+        return *dvd_interpretor;
+    }
+
     uint8_t        palette[4][4];
     vlc_mutex_t    lock_demuxer;
 
     /* event */
     event_thread_t ev;
+
+private:
+    std::unique_ptr<dvd_command_interpretor_c> dvd_interpretor;
 };
 
 } // namespace

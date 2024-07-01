@@ -91,7 +91,7 @@ bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, std::vector<K
             for( ; i_size > 0; i_size -=1, p_data += 8 )
             {
                 msg_Dbg( &sys.demuxer, "%s", str_diag);
-                f_result |= sys.dvd_interpretor.Interpret( p_data );
+                f_result |= sys.GetDVDInterpretor().Interpret( p_data );
             }
         }
         ++it;
