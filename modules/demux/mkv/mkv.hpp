@@ -149,6 +149,8 @@ struct matroska_stream_c
 class chapter_codec_cmds_c;
 using chapter_cmd_match = std::function<bool(const chapter_codec_cmds_c &)>;
 
+using chapter_uid = uint64_t;
+
 
 /*****************************************************************************
  * definitions of structures and functions used by this plugins

@@ -73,7 +73,7 @@ void chapter_item_c::Append( const chapter_item_c & chapter )
     }
 }
 
-chapter_item_c * chapter_item_c::FindChapter( int64_t i_find_uid )
+chapter_item_c * chapter_item_c::FindChapter( chapter_uid i_find_uid )
 {
     size_t i;
     chapter_item_c *p_result = NULL;

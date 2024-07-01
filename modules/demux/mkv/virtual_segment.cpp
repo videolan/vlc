@@ -555,7 +555,7 @@ bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
     return false;
 }
 
-virtual_chapter_c * virtual_chapter_c::FindChapter( int64_t i_find_uid )
+virtual_chapter_c * virtual_chapter_c::FindChapter( chapter_uid i_find_uid )
 {
     if( p_chapter && ( p_chapter->i_uid == i_find_uid ) )
         return this;
@@ -570,7 +570,7 @@ virtual_chapter_c * virtual_chapter_c::FindChapter( int64_t i_find_uid )
     return NULL;
 }
 
-virtual_chapter_c * virtual_segment_c::FindChapter( int64_t i_find_uid )
+virtual_chapter_c * virtual_segment_c::FindChapter( chapter_uid i_find_uid )
 {
     virtual_edition_c * p_edition = CurrentEdition();
     if (unlikely(p_edition == NULL))

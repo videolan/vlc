@@ -36,7 +36,7 @@ class chapter_codec_vm
 {
 public:
     virtual virtual_segment_c *GetCurrentVSegment() = 0;
-    virtual virtual_chapter_c *FindVChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found ) = 0;
+    virtual virtual_chapter_c *FindVChapter( chapter_uid i_find_uid, virtual_segment_c * & p_vsegment_found ) = 0;
     virtual void JumpTo( virtual_segment_c &, virtual_chapter_c & ) = 0;
 
     virtual virtual_chapter_c *BrowseCodecPrivate( enum chapter_codec_id,

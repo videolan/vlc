@@ -63,7 +63,7 @@ public:
 
     virtual ~chapter_item_c();
     void Append( const chapter_item_c & edition );
-    chapter_item_c * FindChapter( int64_t i_find_uid );
+    chapter_item_c * FindChapter( chapter_uid i_find_uid );
     virtual chapter_item_c *BrowseCodecPrivate( chapter_codec_id codec_id,
                                                 chapter_cmd_match match );
     std::string                 GetCodecName( bool f_for_title = false ) const;
@@ -74,7 +74,7 @@ public:
     std::vector<chapter_item_c*> sub_chapters;
     KaxChapterSegmentUID        *p_segment_uid;
     KaxChapterSegmentEditionUID *p_segment_edition_uid;
-    int64_t                     i_uid;
+    chapter_uid                 i_uid;
     bool                        b_display_seekpoint;
     bool                        b_user_display;
     std::string                 str_name;
