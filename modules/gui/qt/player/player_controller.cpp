@@ -1162,9 +1162,9 @@ vlc_player_t * PlayerController::getPlayer() const
     return d->m_player;
 }
 
-input_item_t *PlayerController::getInput()
+input_item_t *PlayerController::getInput() const
 {
-    Q_D(PlayerController);
+    Q_D(const PlayerController);
     vlc_player_locker locker{ d->m_player };
     return vlc_player_GetCurrentMedia( d->m_player );
 }
