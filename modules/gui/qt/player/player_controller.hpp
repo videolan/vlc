@@ -106,7 +106,7 @@ public:
 
     //playback
     Q_PROPERTY(PlayingState playingState READ getPlayingState NOTIFY playingStateChanged FINAL)
-    Q_PROPERTY(bool isPlaying READ hasInput NOTIFY inputChanged FINAL)
+    Q_PROPERTY(bool isStarted READ isStarted NOTIFY playingStateChanged FINAL)
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
     Q_PROPERTY(float buffering READ getBuffering  NOTIFY bufferingChanged FINAL)
     Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateChanged FINAL)
@@ -274,6 +274,7 @@ public:
 public slots:
     //playback
     PlayingState getPlayingState() const;
+    bool isStarted() const;
     bool hasInput() const;
     QString getName() const;
     float getBuffering() const;

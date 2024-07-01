@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 Widgets.IconToolButton {
     id: snapshotBtn
-    enabled: Player.isPlaying
+    enabled: Player.isStarted
     text: VLCIcons.snapshot
     onClicked: Player.snapshot()
     description: qsTr("Snapshot")

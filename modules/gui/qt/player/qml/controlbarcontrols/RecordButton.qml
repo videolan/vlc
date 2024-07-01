@@ -27,7 +27,7 @@ import "qrc:///style/"
 Widgets.IconToolButton {
     id: control
 
-    enabled: !paintOnly && Player.isPlaying
+    enabled: !paintOnly && Player.isStarted
 
     color: "#FFFF0000" //red means recording
     text: VLCIcons.record

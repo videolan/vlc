@@ -25,7 +25,7 @@ import "qrc:///style/"
 
 Widgets.IconToolButton {
     id: stopBtn
-    enabled: Player.isPlaying
+    enabled: Player.isStarted
     text: VLCIcons.stop
     onClicked: MainPlaylistController.stop()
     description: qsTr("Stop")

@@ -1169,11 +1169,16 @@ input_item_t *PlayerController::getInput() const
     return vlc_player_GetCurrentMedia( d->m_player );
 }
 
-bool PlayerController::hasInput() const
+bool PlayerController::isStarted() const
 {
     Q_D(const PlayerController);
     vlc_player_locker locker{ d->m_player };
     return vlc_player_IsStarted( d->m_player );
+}
+
+bool PlayerController::hasInput() const
+{
+    return getInput();
 }
 
 void PlayerController::reverse()
