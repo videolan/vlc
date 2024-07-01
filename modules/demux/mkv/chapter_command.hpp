@@ -42,9 +42,9 @@ struct demux_sys_t;
 class chapter_codec_cmds_c
 {
 public:
-    chapter_codec_cmds_c( demux_sys_t & demuxer, int codec_id = -1)
-    :p_private_data(NULL)
-    ,i_codec_id( codec_id )
+    chapter_codec_cmds_c( demux_sys_t & demuxer, enum chapter_codec_id codec_id)
+    :i_codec_id( codec_id )
+    ,p_private_data(NULL)
     ,sys( demuxer )
     {}
 
@@ -69,6 +69,8 @@ public:
     virtual std::string GetCodecName( bool ) const { return ""; }
     virtual int16_t GetTitleNumber() { return -1; }
 
+    const enum chapter_codec_id i_codec_id;
+
     KaxChapterProcessPrivate *p_private_data;
 
 protected:
@@ -76,7 +78,6 @@ protected:
     std::vector<KaxChapterProcessData*> during_cmds;
     std::vector<KaxChapterProcessData*> leave_cmds;
 
-    int i_codec_id;
     demux_sys_t & sys;
 };
 
@@ -247,7 +248,7 @@ class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
     dvd_chapter_codec_c( demux_sys_t & sys )
-    :chapter_codec_cmds_c( sys, 1 )
+    :chapter_codec_cmds_c( sys, MATROSKA_CHAPTER_CODEC_DVD )
     {}
 
     bool Enter();
@@ -281,7 +282,7 @@ class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 public:
     matroska_script_codec_c( demux_sys_t & sys )
-    :chapter_codec_cmds_c( sys, 0 )
+    :chapter_codec_cmds_c( sys, MATROSKA_CHAPTER_CODEC_NATIVE )
     ,interpreter( sys )
     {}
 
