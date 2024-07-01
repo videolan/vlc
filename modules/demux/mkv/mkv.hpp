@@ -111,6 +111,12 @@ enum
     MATROSKA_ENCODING_SCOPE_NEXT = 4 /* unsupported */
 };
 
+enum chapter_codec_id
+{
+    MATROSKA_CHAPTER_CODEC_NATIVE  = 0,
+    MATROSKA_CHAPTER_CODEC_DVD     = 1,
+};
+
 #define MKVD_TIMECODESCALE 1000000
 
 #define MKV_IS_ID( el, C ) ( el != NULL && (el->operator const EbmlId&()) == EBML_ID(C) && !el->IsDummy() )

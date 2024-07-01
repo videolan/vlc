@@ -327,7 +327,7 @@ virtual_segment_c::~virtual_segment_c()
         delete veditions[i];
 }
 
-virtual_chapter_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id,
+virtual_chapter_c *virtual_segment_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                     const void *p_cookie,
                                     size_t i_cookie_size )
@@ -340,7 +340,7 @@ virtual_chapter_c *virtual_segment_c::BrowseCodecPrivate( unsigned int codec_id,
 }
 
 
-virtual_chapter_c * virtual_edition_c::BrowseCodecPrivate( unsigned int codec_id,
+virtual_chapter_c * virtual_edition_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                     const void *p_cookie,
                                     size_t i_cookie_size )
@@ -359,7 +359,7 @@ virtual_chapter_c * virtual_edition_c::BrowseCodecPrivate( unsigned int codec_id
 
 
 
-virtual_chapter_c * virtual_chapter_c::BrowseCodecPrivate( unsigned int codec_id,
+virtual_chapter_c * virtual_chapter_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                     const void *p_cookie,
                                     size_t i_cookie_size )

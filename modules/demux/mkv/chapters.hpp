@@ -65,7 +65,7 @@ public:
     virtual ~chapter_item_c();
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( int64_t i_find_uid );
-    virtual chapter_item_c *BrowseCodecPrivate( unsigned int codec_id,
+    virtual chapter_item_c *BrowseCodecPrivate( chapter_codec_id codec_id,
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                     const void *p_cookie,
                                     size_t i_cookie_size );

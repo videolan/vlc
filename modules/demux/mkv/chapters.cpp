@@ -38,7 +38,7 @@ chapter_item_c::~chapter_item_c()
     vlc_delete_all( sub_chapters );
 }
 
-chapter_item_c *chapter_item_c::BrowseCodecPrivate( unsigned int codec_id,
+chapter_item_c *chapter_item_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                     bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                     const void *p_cookie,
                                     size_t i_cookie_size )

@@ -55,7 +55,7 @@ public:
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
     int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level, bool allow_no_name );
 
-    virtual_chapter_c * BrowseCodecPrivate( unsigned int codec_id,
+    virtual_chapter_c * BrowseCodecPrivate( chapter_codec_id codec_id,
                                             bool (*match)( const chapter_codec_cmds_c &data,
                                                            const void *p_cookie,
                                                            size_t i_cookie_size ),
@@ -92,7 +92,7 @@ public:
     virtual_chapter_c* getChapterbyTimecode( vlc_tick_t time );
     std::string GetMainName();
     int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level );
-    virtual_chapter_c * BrowseCodecPrivate( unsigned int codec_id,
+    virtual_chapter_c * BrowseCodecPrivate( chapter_codec_id codec_id,
                                             bool (*match)( const chapter_codec_cmds_c &data,
                                                            const void *p_cookie,
                                                            size_t i_cookie_size ),
@@ -151,7 +151,7 @@ public:
 
     inline std::vector<virtual_edition_c*>* Editions() { return &veditions; }
 
-    virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,
+    virtual_chapter_c *BrowseCodecPrivate( chapter_codec_id codec_id,
                                            bool (*match)( const chapter_codec_cmds_c &data,
                                                           const void *p_cookie,
                                                           size_t i_cookie_size ),

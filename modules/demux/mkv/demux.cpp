@@ -323,7 +323,7 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
     return NULL;
 }
 
-virtual_chapter_c *demux_sys_t::BrowseCodecPrivate( unsigned int codec_id,
+virtual_chapter_c *demux_sys_t::BrowseCodecPrivate( chapter_codec_id codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size,

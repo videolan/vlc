@@ -95,7 +95,7 @@ public:
     const bool              trust_cues;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
-    virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,
+    virtual_chapter_c *BrowseCodecPrivate( chapter_codec_id codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size,
