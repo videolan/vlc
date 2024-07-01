@@ -98,10 +98,8 @@ public:
 
     // chapter_codec_vm
     virtual_chapter_c *BrowseCodecPrivate( chapter_codec_id codec_id,
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                        const void *p_cookie,
-                                        size_t i_cookie_size,
-                                        virtual_segment_c * & p_vsegment_found ) override;
+                                           chapter_cmd_match match,
+                                           virtual_segment_c * & p_vsegment_found ) override;
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter ) override;
     virtual_segment_c *GetCurrentVSegment() override
     {

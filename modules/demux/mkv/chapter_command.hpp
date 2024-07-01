@@ -38,7 +38,6 @@ const binary MATROSKA_DVD_LEVEL_PTT  = 0x10;
 const binary MATROSKA_DVD_LEVEL_CN   = 0x08;
 
 class virtual_chapter_c;
-class chapter_codec_cmds_c;
 class virtual_segment_c;
 
 class chapter_codec_vm
@@ -49,9 +48,7 @@ public:
     virtual void JumpTo( virtual_segment_c &, virtual_chapter_c & ) = 0;
 
     virtual virtual_chapter_c *BrowseCodecPrivate( enum chapter_codec_id,
-                                                   bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                                   const void *p_cookie,
-                                                   size_t i_cookie_size,
+                                                   chapter_cmd_match match,
                                                    virtual_segment_c * & p_vsegment_found ) = 0;
 };
 
@@ -253,15 +250,15 @@ protected:
     static const uint16_t CMD_DVD_GPREG_AND_VALUE        = 0x7900;
 
     // callbacks when browsing inside CodecPrivate
-    static bool MatchIsDomain     ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchIsVMG        ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchVTSNumber    ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchVTSMNumber   ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchTitleNumber  ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchPgcType      ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchPgcNumber    ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchChapterNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
-    static bool MatchCellNumber   ( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size );
+    static bool MatchIsDomain     ( const chapter_codec_cmds_c & );
+    static bool MatchIsVMG        ( const chapter_codec_cmds_c & );
+    static bool MatchVTSNumber    ( const chapter_codec_cmds_c &, uint16_t i_title );
+    static bool MatchVTSMNumber   ( const chapter_codec_cmds_c &, uint8_t i_title );
+    static bool MatchTitleNumber  ( const chapter_codec_cmds_c &, uint8_t i_title );
+    static bool MatchPgcType      ( const chapter_codec_cmds_c &, uint8_t i_pgc );
+    static bool MatchPgcNumber    ( const chapter_codec_cmds_c &, uint16_t i_pgc_n );
+    static bool MatchChapterNumber( const chapter_codec_cmds_c &, uint8_t i_ptt );
+    static bool MatchCellNumber   ( const chapter_codec_cmds_c &, uint8_t i_cell_n );
 };
 
 class dvd_chapter_codec_c : public chapter_codec_cmds_c

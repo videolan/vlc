@@ -39,16 +39,14 @@ chapter_item_c::~chapter_item_c()
 }
 
 chapter_item_c *chapter_item_c::BrowseCodecPrivate( chapter_codec_id codec_id,
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                    const void *p_cookie,
-                                    size_t i_cookie_size )
+                                                    chapter_cmd_match match )
 {
     // this chapter
     auto index = codecs.cbegin();
     while ( index != codecs.cend() )
     {
         if ( (*index)->i_codec_id == codec_id &&
-             match( **index ,p_cookie, i_cookie_size ) )
+             match( **index ) )
             return this;
         ++index;
     }

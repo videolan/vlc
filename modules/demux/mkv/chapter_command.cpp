@@ -285,12 +285,18 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             vlc_debug( l, "JumpTT %d", i_title );
 
             // find in the ChapProcessPrivate matching this Title level
-            p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
+            p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                [i_title](const chapter_codec_cmds_c &data) {
+                    return MatchTitleNumber(data, i_title);
+                }, p_vsegment );
             if ( p_vsegment != NULL && p_vchapter != NULL )
             {
                 /* enter via the First Cell */
                 uint8_t i_cell = 1;
-                p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
+                p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                    [i_cell](const chapter_codec_cmds_c &data) {
+                        return MatchCellNumber( data, i_cell );
+                    });
                 if ( p_vchapter != NULL )
                 {
                     vm.JumpTo( *p_vsegment, *p_vchapter );
@@ -334,12 +340,17 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         vlc_debug( l, "CallSS <unknown> (rsm_cell %x)", p_command[4]);
                         break;
                     }
-                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1, p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                        [p_type](const chapter_codec_cmds_c &data) {
+                            return MatchPgcType( data, p_type );
+                        }, p_vsegment );
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
                         /* enter via the first Cell */
                         uint8_t i_cell = 1;
-                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
+                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                            [i_cell](const chapter_codec_cmds_c &data) {
+                                return MatchCellNumber( data, i_cell ); } );
                         if ( p_vchapter != NULL )
                         {
                             vm.JumpTo( *p_vsegment, *p_vchapter );
@@ -394,10 +405,14 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
                     // find the VMG
-                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsVMG, NULL, 0, p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                        [](const chapter_codec_cmds_c &data) {
+                            return MatchIsVMG( data); }, p_vsegment );
                     if ( p_vsegment != NULL )
                     {
-                        p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1 );
+                        p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                            [p_type](const chapter_codec_cmds_c &data) {
+                                return MatchPgcType( data, p_type ); } );
                         if ( p_vchapter != NULL )
                         {
                             vm.JumpTo( *p_vsegment, *p_vchapter );
@@ -432,16 +447,25 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
 
-                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSMNumber, &p_command[4], 1, p_vsegment );
+                    {
+                    uint8_t i_vts = p_command[4];
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                        [i_vts](const chapter_codec_cmds_c &data) {
+                            return MatchVTSMNumber( data,  i_vts ); }, p_vsegment );
 
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
                         // find the title in the VTS
-                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &p_command[3], 1 );
+                        uint8_t i_title = p_command[3];
+                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                            [i_title](const chapter_codec_cmds_c &data) {
+                                return MatchTitleNumber( data, i_title ); } );
                         if ( p_vchapter != NULL )
                         {
                             // find the specified menu in the VTSM
-                            p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1 );
+                            p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                                [p_type](const chapter_codec_cmds_c &data) {
+                                    return MatchPgcType( data, p_type ); } );
                             if ( p_vchapter != NULL )
                             {
                                 vm.JumpTo( *p_vsegment, *p_vchapter );
@@ -449,10 +473,11 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             }
                         }
                         else
-                            vlc_debug( l, "Title (%d) does not exist in this VTS", p_command[3] );
+                            vlc_debug( l, "Title (%d) does not exist in this VTS", i_title );
                     }
                     else
-                        vlc_debug( l, "DVD Domain VTS (%d) not found", p_command[4] );
+                        vlc_debug( l, "DVD Domain VTS (%d) not found", i_vts );
+                    }
                 break;
                 case 3:
                     vlc_debug( l, "JumpSS VMGM (pgc %d)", (p_command[2] << 8) + p_command[3]);
@@ -468,22 +493,30 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             vlc_debug( l, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
 
             // find the current VTS content segment
-            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsDomain, NULL, 0 );
+            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                [](const chapter_codec_cmds_c &data) {
+                    return MatchIsDomain( data); } );
             if ( p_vchapter != NULL )
             {
                 int16_t i_curr_title = ( p_vchapter->p_chapter )? p_vchapter->p_chapter->GetTitleNumber() : 0;
                 if ( i_curr_title > 0 )
                 {
-                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                        [i_curr_title](const chapter_codec_cmds_c &data) {
+                            return MatchVTSNumber( data, i_curr_title ); }, p_vsegment );
 
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
                         // find the title in the VTS
-                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &i_title, sizeof(i_title) );
+                        p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                            [i_title](const chapter_codec_cmds_c &data) {
+                                return MatchTitleNumber( data, i_title ); } );
                         if ( p_vchapter != NULL )
                         {
                             // find the chapter in the title
-                            p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
+                            p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                                [i_ptt](const chapter_codec_cmds_c &data) {
+                                    return MatchChapterNumber( data, i_ptt ); } );
                             if ( p_vchapter != NULL )
                             {
                                 vm.JumpTo( *p_vsegment, *p_vchapter );
@@ -516,7 +549,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             uint16_t i_pgcn = (p_command[6] << 8) + p_command[7];
 
             vlc_debug( l, "Link PGCN(%d)", i_pgcn );
-            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcNumber, &i_pgcn, 2 );
+            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                [i_pgcn](const chapter_codec_cmds_c &data) {
+                    return MatchPgcNumber( data, i_pgcn ); } );
             if ( p_vchapter != NULL )
             {
                 vm.JumpTo( *vm.GetCurrentVSegment(), *p_vchapter );
@@ -531,7 +566,9 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             p_vchapter = vm.GetCurrentVSegment()->CurrentChapter();
 
             vlc_debug( l, "LinkCN (cell %d)", i_cn );
-            p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cn, 1 );
+            p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD,
+                [i_cn](const chapter_codec_cmds_c &data) {
+                    return MatchCellNumber( data, i_cn ); } );
             if ( p_vchapter != NULL )
             {
                 vm.JumpTo( *vm.GetCurrentVSegment(), *p_vchapter );
@@ -571,12 +608,12 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
 
 
 
-bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data, const void *, size_t )
+bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data )
 {
     return ( data.p_private_data != NULL && data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS );
 }
 
-bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data, const void *, size_t )
+bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data )
 {
     if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;
@@ -584,102 +621,95 @@ bool dvd_command_interpretor_c::MatchIsVMG( const chapter_codec_cmds_c &data, co
     return ( data.p_private_data->GetBuffer()[0] == MATROSKA_DVD_LEVEL_SS && data.p_private_data->GetBuffer()[1] == 0xC0);
 }
 
-bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchVTSNumber( const chapter_codec_cmds_c &data, uint16_t i_title )
 {
-    if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x80 )
         return false;
 
     uint16_t i_gtitle = (data.p_private_data->GetBuffer()[2] << 8 ) + data.p_private_data->GetBuffer()[3];
-    uint16_t i_title = *static_cast<uint16_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
 
-bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchVTSMNumber( const chapter_codec_cmds_c &data, uint8_t i_title )
 {
-    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_SS || data.p_private_data->GetBuffer()[1] != 0x40 )
         return false;
 
     uint8_t i_gtitle = data.p_private_data->GetBuffer()[3];
-    uint8_t i_title = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
 
-bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchTitleNumber( const chapter_codec_cmds_c &data, uint8_t i_title )
 {
-    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 4 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_TT )
         return false;
 
     uint16_t i_gtitle = (data.p_private_data->GetBuffer()[1] << 8 ) + data.p_private_data->GetBuffer()[2];
-    uint8_t i_title = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_gtitle == i_title);
 }
 
-bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchPgcType( const chapter_codec_cmds_c &data, uint8_t i_pgc )
 {
-    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
     uint8_t i_pgc_type = data.p_private_data->GetBuffer()[3] & 0x0F;
-    uint8_t i_pgc = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_pgc_type == i_pgc);
 }
 
-bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchPgcNumber( const chapter_codec_cmds_c &data, uint16_t i_pgc_n )
 {
-    if ( i_cookie_size != 2 || data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 8 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PGC )
         return false;
 
-    uint16_t const* i_pgc_n = static_cast<uint16_t const*>( p_cookie );
     uint16_t i_pgc_num = (data.p_private_data->GetBuffer()[1] << 8) + data.p_private_data->GetBuffer()[2];
 
-    return (i_pgc_num == *i_pgc_n);
+    return (i_pgc_num == i_pgc_n);
 }
 
-bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchChapterNumber( const chapter_codec_cmds_c &data, uint8_t i_ptt )
 {
-    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 2 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_PTT )
         return false;
 
     uint8_t i_chapter = data.p_private_data->GetBuffer()[1];
-    uint8_t i_ptt = *static_cast<uint8_t const*>( p_cookie );
 
     return (i_chapter == i_ptt);
 }
 
-bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size )
+bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &data, uint8_t i_cell_n )
 {
-    if ( i_cookie_size != 1 || data.p_private_data == NULL || data.p_private_data->GetSize() < 5 )
+    if ( data.p_private_data == NULL || data.p_private_data->GetSize() < 5 )
         return false;
 
     if ( data.p_private_data->GetBuffer()[0] != MATROSKA_DVD_LEVEL_CN )
         return false;
 
-    uint8_t const* i_cell_n = static_cast<uint8_t const*>( p_cookie );
     uint8_t i_cell_num = data.p_private_data->GetBuffer()[3];
 
-    return (i_cell_num == *i_cell_n);
+    return (i_cell_num == i_cell_n);
 }
 
 const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAndPlay";

@@ -48,6 +48,7 @@
 #include <algorithm>
 #include <map>
 #include <stdexcept>
+#include <functional>
 
 /* libebml and matroska */
 #include <ebml/EbmlVersion.h>
@@ -144,6 +145,9 @@ struct matroska_stream_c
 
     std::vector<matroska_segment_c*> segments;
 };
+
+class chapter_codec_cmds_c;
+using chapter_cmd_match = std::function<bool(const chapter_codec_cmds_c &)>;
 
 
 /*****************************************************************************

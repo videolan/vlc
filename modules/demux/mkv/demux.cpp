@@ -324,15 +324,13 @@ matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
 }
 
 virtual_chapter_c *demux_sys_t::BrowseCodecPrivate( chapter_codec_id codec_id,
-                                        bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                        const void *p_cookie,
-                                        size_t i_cookie_size,
-                                        virtual_segment_c * &p_vsegment_found )
+                                                    chapter_cmd_match match,
+                                                    virtual_segment_c * &p_vsegment_found )
 {
     virtual_chapter_c *p_result = NULL;
     for (size_t i=0; i<used_vsegments.size(); i++)
     {
-        p_result = used_vsegments[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        p_result = used_vsegments[i]->BrowseCodecPrivate( codec_id, match );
         if ( p_result != NULL )
         {
             p_vsegment_found = used_vsegments[i];

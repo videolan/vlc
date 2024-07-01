@@ -47,7 +47,6 @@ public:
     std::vector<uint64_t>  editions;
 };
 
-class chapter_codec_cmds_c;
 class chapter_item_c
 {
 public:
@@ -66,9 +65,7 @@ public:
     void Append( const chapter_item_c & edition );
     chapter_item_c * FindChapter( int64_t i_find_uid );
     virtual chapter_item_c *BrowseCodecPrivate( chapter_codec_id codec_id,
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                    const void *p_cookie,
-                                    size_t i_cookie_size );
+                                                chapter_cmd_match match );
     std::string                 GetCodecName( bool f_for_title = false ) const;
     bool                        ParentOf( const chapter_item_c & item ) const;
     int16_t                     GetTitleNumber( ) const;

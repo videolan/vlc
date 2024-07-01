@@ -328,29 +328,25 @@ virtual_segment_c::~virtual_segment_c()
 }
 
 virtual_chapter_c *virtual_segment_c::BrowseCodecPrivate( chapter_codec_id codec_id,
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                    const void *p_cookie,
-                                    size_t i_cookie_size )
+                                                          chapter_cmd_match match )
 {
     virtual_edition_c * p_ved = CurrentEdition();
     if( p_ved )
-        return p_ved->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        return p_ved->BrowseCodecPrivate( codec_id, match );
 
     return NULL;
 }
 
 
 virtual_chapter_c * virtual_edition_c::BrowseCodecPrivate( chapter_codec_id codec_id,
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                    const void *p_cookie,
-                                    size_t i_cookie_size )
+                                                           chapter_cmd_match match )
 {
     if( !p_edition )
         return NULL;
 
     for( size_t i = 0; i < vchapters.size(); i++ )
     {
-        virtual_chapter_c * p_result = vchapters[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        virtual_chapter_c * p_result = vchapters[i]->BrowseCodecPrivate( codec_id, match );
         if( p_result )
             return p_result;
     }
@@ -360,19 +356,17 @@ virtual_chapter_c * virtual_edition_c::BrowseCodecPrivate( chapter_codec_id code
 
 
 virtual_chapter_c * virtual_chapter_c::BrowseCodecPrivate( chapter_codec_id codec_id,
-                                    bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
-                                    const void *p_cookie,
-                                    size_t i_cookie_size )
+                                                           chapter_cmd_match match )
 {
     if( !p_chapter )
         return NULL;
 
-    if( p_chapter->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size ) )
+    if( p_chapter->BrowseCodecPrivate( codec_id, match ) )
         return this;
 
     for( size_t i = 0; i < sub_vchapters.size(); i++ )
     {
-        virtual_chapter_c * p_result = sub_vchapters[i]->BrowseCodecPrivate( codec_id, match, p_cookie, i_cookie_size );
+        virtual_chapter_c * p_result = sub_vchapters[i]->BrowseCodecPrivate( codec_id, match );
         if( p_result )
             return p_result;
     }
