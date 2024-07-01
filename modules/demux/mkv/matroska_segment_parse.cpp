@@ -1439,14 +1439,14 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
                 if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, cp[j] ) )
                 {
                     if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_NATIVE )
-                        p_ccodec = new matroska_script_codec_c( vars.obj->sys );
+                        p_ccodec = new matroska_script_codec_c( vars.obj->sys, vars.obj->sys );
                     else if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_DVD )
                     {
                         auto interepreter = vars.obj->sys.GetDVDInterpretor();
                         if (unlikely(interepreter == nullptr))
                             debug( vars, "failed to get the DVD interpreter ");
                         else
-                            p_ccodec = new dvd_chapter_codec_c( vars.obj->sys, *interepreter );
+                            p_ccodec = new dvd_chapter_codec_c( vars.obj->sys, vars.obj->sys, *interepreter );
                     }
                     break;
                 }

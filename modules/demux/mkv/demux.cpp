@@ -342,7 +342,7 @@ virtual_chapter_c *demux_sys_t::BrowseCodecPrivate( chapter_codec_id codec_id,
     return p_result;
 }
 
-virtual_chapter_c *demux_sys_t::FindChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found )
+virtual_chapter_c *demux_sys_t::FindVChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found )
 {
     virtual_chapter_c *p_result = NULL;
     for (size_t i=0; i<used_vsegments.size(); i++)

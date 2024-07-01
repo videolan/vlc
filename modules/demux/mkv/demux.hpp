@@ -40,7 +40,7 @@ namespace mkv {
 class virtual_segment_c;
 class chapter_item_c;
 
-struct demux_sys_t
+struct demux_sys_t : public chapter_codec_vm
 {
 public:
     demux_sys_t( demux_t & demux, bool trust_cues )
@@ -63,7 +63,7 @@ public:
         vlc_mutex_init( &lock_demuxer );
     }
 
-    ~demux_sys_t();
+    virtual ~demux_sys_t();
 
     /* current data */
     demux_t                 & demuxer;
@@ -95,26 +95,32 @@ public:
     const bool              trust_cues;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
+
+    // chapter_codec_vm
     virtual_chapter_c *BrowseCodecPrivate( chapter_codec_id codec_id,
                                         bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
                                         const void *p_cookie,
                                         size_t i_cookie_size,
-                                        virtual_segment_c * & p_vsegment_found );
-    virtual_chapter_c *FindChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found );
+                                        virtual_segment_c * & p_vsegment_found ) override;
+    void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter ) override;
+    virtual_segment_c *GetCurrentVSegment() override
+    {
+        return p_current_vsegment;
+    }
+    virtual_chapter_c *FindVChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found ) override;
 
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     bool FreeUnused();
     bool PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date );
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
-    void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
     dvd_command_interpretor_c * GetDVDInterpretor()
     {
         if (!dvd_interpretor)
         {
             try {
-                dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this );
+                dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this, *this );
             } catch ( const std::bad_alloc & ) {
             }
         }

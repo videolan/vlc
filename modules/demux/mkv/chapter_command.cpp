@@ -285,7 +285,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             msg_Dbg( &sys.demuxer, "JumpTT %d", i_title );
 
             // find in the ChapProcessPrivate matching this Title level
-            p_vchapter = sys.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
+            p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchTitleNumber, &i_title, sizeof(i_title), p_vsegment );
             if ( p_vsegment != NULL && p_vchapter != NULL )
             {
                 /* enter via the First Cell */
@@ -293,7 +293,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                 p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
                 if ( p_vchapter != NULL )
                 {
-                    sys.JumpTo( *p_vsegment, *p_vchapter );
+                    vm.JumpTo( *p_vsegment, *p_vchapter );
                     f_result = true;
                 }
             }
@@ -334,7 +334,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         msg_Dbg( &sys.demuxer, "CallSS <unknown> (rsm_cell %x)", p_command[4]);
                         break;
                     }
-                    p_vchapter = sys.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1, p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1, p_vsegment );
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
                         /* enter via the first Cell */
@@ -342,7 +342,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cell, sizeof(i_cell) );
                         if ( p_vchapter != NULL )
                         {
-                            sys.JumpTo( *p_vsegment, *p_vchapter );
+                            vm.JumpTo( *p_vsegment, *p_vchapter );
                             f_result = true;
                         }
                     }
@@ -394,13 +394,13 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
                     // find the VMG
-                    p_vchapter = sys.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsVMG, NULL, 0, p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsVMG, NULL, 0, p_vsegment );
                     if ( p_vsegment != NULL )
                     {
                         p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1 );
                         if ( p_vchapter != NULL )
                         {
-                            sys.JumpTo( *p_vsegment, *p_vchapter );
+                            vm.JumpTo( *p_vsegment, *p_vchapter );
                             f_result = true;
                         }
                     }
@@ -432,7 +432,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                         break;
                     }
 
-                    p_vchapter = sys.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSMNumber, &p_command[4], 1, p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSMNumber, &p_command[4], 1, p_vsegment );
 
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
@@ -444,7 +444,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             p_vchapter = p_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcType, &p_type, 1 );
                             if ( p_vchapter != NULL )
                             {
-                                sys.JumpTo( *p_vsegment, *p_vchapter );
+                                vm.JumpTo( *p_vsegment, *p_vchapter );
                                 f_result = true;
                             }
                         }
@@ -468,13 +468,13 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             msg_Dbg( &sys.demuxer, "JumpVTS Title (%d) PTT (%d)", i_title, i_ptt);
 
             // find the current VTS content segment
-            p_vchapter = sys.p_current_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsDomain, NULL, 0 );
+            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchIsDomain, NULL, 0 );
             if ( p_vchapter != NULL )
             {
                 int16_t i_curr_title = ( p_vchapter->p_chapter )? p_vchapter->p_chapter->GetTitleNumber() : 0;
                 if ( i_curr_title > 0 )
                 {
-                    p_vchapter = sys.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_vsegment );
+                    p_vchapter = vm.BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchVTSNumber, &i_curr_title, sizeof(i_curr_title), p_vsegment );
 
                     if ( p_vsegment != NULL && p_vchapter != NULL )
                     {
@@ -486,7 +486,7 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
                             p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchChapterNumber, &i_ptt, sizeof(i_ptt) );
                             if ( p_vchapter != NULL )
                             {
-                                sys.JumpTo( *p_vsegment, *p_vchapter );
+                                vm.JumpTo( *p_vsegment, *p_vchapter );
                                 f_result = true;
                             }
                         }
@@ -516,10 +516,10 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
             uint16_t i_pgcn = (p_command[6] << 8) + p_command[7];
 
             msg_Dbg( &sys.demuxer, "Link PGCN(%d)", i_pgcn );
-            p_vchapter = sys.p_current_vsegment->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcNumber, &i_pgcn, 2 );
+            p_vchapter = vm.GetCurrentVSegment()->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchPgcNumber, &i_pgcn, 2 );
             if ( p_vchapter != NULL )
             {
-                sys.JumpTo( *sys.p_current_vsegment, *p_vchapter );
+                vm.JumpTo( *vm.GetCurrentVSegment(), *p_vchapter );
                 f_result = true;
             }
             break;
@@ -528,13 +528,13 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
         {
             uint8_t i_cn = p_command[7];
 
-            p_vchapter = sys.p_current_vsegment->CurrentChapter();
+            p_vchapter = vm.GetCurrentVSegment()->CurrentChapter();
 
             msg_Dbg( &sys.demuxer, "LinkCN (cell %d)", i_cn );
             p_vchapter = p_vchapter->BrowseCodecPrivate( MATROSKA_CHAPTER_CODEC_DVD, MatchCellNumber, &i_cn, 1 );
             if ( p_vchapter != NULL )
             {
-                sys.JumpTo( *sys.p_current_vsegment, *p_vchapter );
+                vm.JumpTo( *vm.GetCurrentVSegment(), *p_vchapter );
                 f_result = true;
             }
             break;
@@ -721,14 +721,14 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
         int64_t i_chapter_uid = atoll( st.c_str() );
 
         virtual_segment_c *p_vsegment;
-        virtual_chapter_c *p_vchapter = sys.FindChapter( i_chapter_uid, p_vsegment );
+        virtual_chapter_c *p_vchapter = sys.FindVChapter( i_chapter_uid, p_vsegment );
 
         if ( p_vchapter == NULL )
             msg_Dbg( &sys.demuxer, "Chapter %" PRId64 " not found", i_chapter_uid);
         else
         {
-            if ( !p_vchapter->EnterAndLeave( sys.p_current_vsegment->CurrentChapter() ) )
-                p_vsegment->Seek( sys.demuxer, p_vchapter->i_mk_virtual_start_time, p_vchapter );
+            if ( !p_vchapter->EnterAndLeave( sys.p_current_vsegment->CurrentChapter(), false ) )
+                vm.JumpTo( *p_vsegment, *p_vchapter );
             b_result = true;
         }
     }

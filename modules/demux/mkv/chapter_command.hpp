@@ -37,15 +37,34 @@ const binary MATROSKA_DVD_LEVEL_PG   = 0x18;
 const binary MATROSKA_DVD_LEVEL_PTT  = 0x10;
 const binary MATROSKA_DVD_LEVEL_CN   = 0x08;
 
+class virtual_chapter_c;
+class chapter_codec_cmds_c;
+class virtual_segment_c;
+
+class chapter_codec_vm
+{
+public:
+    virtual virtual_segment_c *GetCurrentVSegment() = 0;
+    virtual virtual_chapter_c *FindVChapter( int64_t i_find_uid, virtual_segment_c * & p_vsegment_found ) = 0;
+    virtual void JumpTo( virtual_segment_c &, virtual_chapter_c & ) = 0;
+
+    virtual virtual_chapter_c *BrowseCodecPrivate( enum chapter_codec_id,
+                                                   bool (*match)(const chapter_codec_cmds_c &data, const void *p_cookie, size_t i_cookie_size ),
+                                                   const void *p_cookie,
+                                                   size_t i_cookie_size,
+                                                   virtual_segment_c * & p_vsegment_found ) = 0;
+};
+
 struct demux_sys_t;
 
 class chapter_codec_cmds_c
 {
 public:
-    chapter_codec_cmds_c( demux_sys_t & demuxer, enum chapter_codec_id codec_id)
+    chapter_codec_cmds_c( demux_sys_t & demuxer, chapter_codec_vm & vm_, enum chapter_codec_id codec_id)
     :i_codec_id( codec_id )
     ,p_private_data(NULL)
     ,sys( demuxer )
+    ,vm( vm_ )
     {}
 
     virtual ~chapter_codec_cmds_c()
@@ -79,14 +98,16 @@ protected:
     std::vector<KaxChapterProcessData*> leave_cmds;
 
     demux_sys_t & sys;
+    chapter_codec_vm & vm;
 };
 
 
 class dvd_command_interpretor_c
 {
 public:
-    dvd_command_interpretor_c( demux_sys_t & demuxer )
+    dvd_command_interpretor_c( demux_sys_t & demuxer, chapter_codec_vm & vm_ )
     :sys( demuxer )
+    ,vm( vm_ )
     {
         memset( p_PRMs, 0, sizeof(p_PRMs) );
         p_PRMs[ 0x80 + 1 ] = 15;
@@ -189,6 +210,7 @@ protected:
 
     uint16_t       p_PRMs[256];
     demux_sys_t  & sys;
+    chapter_codec_vm & vm;
 
     // DVD command IDs
 
@@ -247,8 +269,8 @@ protected:
 class dvd_chapter_codec_c : public chapter_codec_cmds_c
 {
 public:
-    dvd_chapter_codec_c( demux_sys_t & sys, dvd_command_interpretor_c & intepretor_ )
-    :chapter_codec_cmds_c( sys, MATROSKA_CHAPTER_CODEC_DVD )
+    dvd_chapter_codec_c( demux_sys_t & sys, chapter_codec_vm & vm_, dvd_command_interpretor_c & intepretor_ )
+    :chapter_codec_cmds_c( sys, vm_, MATROSKA_CHAPTER_CODEC_DVD )
     ,intepretor(intepretor_)
     {}
 
@@ -266,8 +288,9 @@ protected:
 class matroska_script_interpretor_c
 {
 public:
-    matroska_script_interpretor_c( demux_sys_t & demuxer )
+    matroska_script_interpretor_c( demux_sys_t & demuxer, chapter_codec_vm & vm_ )
     :sys( demuxer )
+    ,vm( vm_ )
     {}
 
     bool Interpret( const binary * p_command, size_t i_size );
@@ -277,15 +300,16 @@ public:
 
 protected:
     demux_sys_t  & sys;
+    chapter_codec_vm & vm;
 };
 
 
 class matroska_script_codec_c : public chapter_codec_cmds_c
 {
 public:
-    matroska_script_codec_c( demux_sys_t & sys )
-    :chapter_codec_cmds_c( sys, MATROSKA_CHAPTER_CODEC_NATIVE )
-    ,interpreter( sys )
+    matroska_script_codec_c( demux_sys_t & sys, chapter_codec_vm & vm_ )
+    :chapter_codec_cmds_c( sys, vm_, MATROSKA_CHAPTER_CODEC_NATIVE )
+    ,interpreter( sys, vm_ )
     {}
 
     bool Enter();
