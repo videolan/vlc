@@ -27,6 +27,14 @@
 
 namespace mkv {
 
+constexpr binary MATROSKA_DVD_LEVEL_SS   = 0x30;
+constexpr binary MATROSKA_DVD_LEVEL_LU   = 0x2A;
+constexpr binary MATROSKA_DVD_LEVEL_TT   = 0x28;
+constexpr binary MATROSKA_DVD_LEVEL_PGC  = 0x20;
+constexpr binary MATROSKA_DVD_LEVEL_PG   = 0x18;
+constexpr binary MATROSKA_DVD_LEVEL_PTT  = 0x10;
+constexpr binary MATROSKA_DVD_LEVEL_CN   = 0x08;
+
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
     uint32_t codec_time = uint32_t(-1);
@@ -140,8 +148,6 @@ std::string dvd_chapter_codec_c::GetCodecName( bool f_for_title ) const
 
     return result;
 }
-class virtual_segment_c;
-class chapter_item_c;
 
 // see http://www.dvd-replica.com/DVD/vmcmdset.php for a description of DVD commands
 bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_size )

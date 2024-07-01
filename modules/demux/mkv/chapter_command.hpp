@@ -29,14 +29,6 @@
 
 namespace mkv {
 
-const binary MATROSKA_DVD_LEVEL_SS   = 0x30;
-const binary MATROSKA_DVD_LEVEL_LU   = 0x2A;
-const binary MATROSKA_DVD_LEVEL_TT   = 0x28;
-const binary MATROSKA_DVD_LEVEL_PGC  = 0x20;
-const binary MATROSKA_DVD_LEVEL_PG   = 0x18;
-const binary MATROSKA_DVD_LEVEL_PTT  = 0x10;
-const binary MATROSKA_DVD_LEVEL_CN   = 0x08;
-
 class virtual_chapter_c;
 class virtual_segment_c;
 
