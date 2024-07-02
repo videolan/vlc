@@ -310,6 +310,10 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     _sync.rate = 0.0f;
 
     [_sync removeTimeObserver:_observer];
+    /* From the doc: "Call dispatch_sync after removeTimeObserver: to wait for
+     * any in-flight blocks to finish executing." */
+    dispatch_sync(_timeQueue, ^{});
+
     [_renderer stopRequestingMediaData];
     [_renderer flush];
 
