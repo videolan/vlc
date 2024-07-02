@@ -101,7 +101,8 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     if( p_pps->i_redundant_pic_present_flag )
         bs_read_ue( &s ); /* redudant_pic_count */
 
-    unsigned num_ref_idx_l01_active_minus1[2] = {0 , 0};
+    uint32_t num_ref_idx_l01_active_minus1[2] = { p_pps->num_ref_idx_l01_default_active_minus1[0],
+                                                  p_pps->num_ref_idx_l01_default_active_minus1[1] };
 
     if( i_slice_type == 1 || i_slice_type == 6 ) /* B slices */
         bs_read1( &s ); /* direct_spatial_mv_pred_flag */

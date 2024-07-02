@@ -150,6 +150,7 @@ struct h264_picture_parameter_set_t
     uint8_t i_redundant_pic_present_flag;
     uint8_t weighted_pred_flag;
     uint8_t weighted_bipred_idc;
+    uint32_t num_ref_idx_l01_default_active_minus1[2];
 };
 
 struct h264_sequence_parameter_set_extension_t

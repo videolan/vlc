@@ -591,8 +591,8 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
         }
     }
 
-    bs_read_ue( p_bs ); /* num_ref_idx_l0_default_active_minus1 */
-    bs_read_ue( p_bs ); /* num_ref_idx_l1_default_active_minus1 */
+    p_pps->num_ref_idx_l01_default_active_minus1[0] = bs_read_ue( p_bs );
+    p_pps->num_ref_idx_l01_default_active_minus1[1] = bs_read_ue( p_bs );
     p_pps->weighted_pred_flag = bs_read( p_bs, 1 );
     p_pps->weighted_bipred_idc = bs_read( p_bs, 2 );
     bs_read_se( p_bs ); /* pic_init_qp_minus26 */
