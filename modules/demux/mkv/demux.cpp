@@ -281,12 +281,13 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment )
         if ( p_current_vsegment->CurrentSegment() != NULL )
             p_current_vsegment->CurrentSegment()->ESDestroy();
 
+        if( !new_vsegment.CurrentSegment() )
+            return false;
+
         p_current_vsegment = &new_vsegment;
         p_current_vsegment->CurrentSegment()->ESCreate();
         i_current_title = p_current_vsegment->i_sys_title;
     }
-    if( !p_current_vsegment->CurrentSegment() )
-        return false;
     if( !p_current_vsegment->CurrentSegment()->b_cues )
         msg_Warn( &p_current_vsegment->CurrentSegment()->sys.demuxer, "no cues/empty cues found->seek won't be precise" );
 
