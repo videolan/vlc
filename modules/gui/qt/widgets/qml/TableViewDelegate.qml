@@ -112,6 +112,10 @@ T.Control {
             onActiveChanged: {
                 if (dragItem) {
                     if (active) {
+                        if (!selected) {
+                            delegate.ListView.view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                        }
+
                         dragItem.Drag.active = true
                     } else {
                         dragItem.Drag.drop()
@@ -129,11 +133,17 @@ T.Control {
 
             grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
 
-            onSingleTapped: (point, button) => {
+            onSingleTapped: (eventPoint, button) => {
                 initialAction()
 
+                if (!(delegate.selected && button === Qt.RightButton)) {
+                    const view = delegate.ListView.view
+                    view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                    view.currentIndex = index
+                }
+
                 if (button === Qt.RightButton)
-                    delegate.rightClick(delegate, delegate.rowModel, parent.mapToGlobal(point.position.x, point.position.y))
+                    delegate.rightClick(delegate, delegate.rowModel, parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
             }
 
             onDoubleTapped: (point, button) => {
@@ -146,9 +156,7 @@ T.Control {
             }
 
             function initialAction() {
-                if ((point.pressedButtons === Qt.LeftButton) || !delegate.selected) {
-                    delegate.selectAndFocus(point.modifiers, Qt.MouseFocusReason)
-                }
+                delegate.forceActiveFocus(Qt.MouseFocusReason)
             }
         }
 
