@@ -96,7 +96,7 @@ download_vendor = \
                echo "" && \
                echo "WARNING: cargo vendor archive for $(1) not found" && \
                echo "" && \
-               touch $@);
+               rm $@);
 
 # Extract and move the vendor archive if the checksum is valid. Succeed even in
 # case of error (download or checksum failed). In that case, the cargo-vendor
