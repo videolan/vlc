@@ -553,7 +553,10 @@ bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
         /* only use for soft linking, hard linking should be continuous */
         es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
 
-        p_sys->PreparePlayback( *this, i_mk_date );
+        p_sys->PreparePlayback( *this );
+
+        /* Seek to the beginning (recursive call) */
+        Seek(demuxer, i_mk_date, p_current_vchapter );
         return true;
     }
     else

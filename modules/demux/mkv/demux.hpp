@@ -110,7 +110,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     bool FreeUnused();
-    bool PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date );
+    bool PreparePlayback( virtual_segment_c & new_vsegment );
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
 
     dvd_command_interpretor_c * GetDVDInterpretor()

@@ -256,11 +256,13 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
         msg_Warn( p_demux, "This file references other files, you may want to enable the preload of local directory");
 
     if ( !p_sys->PreloadLinked() ||
-         !p_sys->PreparePlayback( *p_sys->p_current_vsegment, 0 ) )
+         !p_sys->PreparePlayback( *p_sys->p_current_vsegment ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
     }
+    /* Seek to the beginning */
+    p_sys->p_current_vsegment->Seek( *p_demux, 0, p_sys->p_current_vsegment->CurrentChapter() );
 
     if (!p_sys->FreeUnused())
     {

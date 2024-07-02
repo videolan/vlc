@@ -274,7 +274,7 @@ bool demux_sys_t::FreeUnused()
     return !streams.empty() && !opened_segments.empty();
 }
 
-bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date )
+bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment )
 {
     if ( p_current_vsegment != &new_vsegment )
     {
@@ -295,10 +295,6 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t 
     /* add information */
     p_current_vsegment->CurrentSegment()->InformationCreate( );
     p_current_vsegment->CurrentSegment()->ESCreate( );
-
-    /* Seek to the beginning */
-    p_current_vsegment->Seek(p_current_vsegment->CurrentSegment()->sys.demuxer,
-                             i_mk_date, p_current_vsegment->CurrentChapter() );
 
     return true;
 }
