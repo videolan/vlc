@@ -271,9 +271,6 @@ virtual_segment_c::virtual_segment_c( matroska_segment_c & main_segment, std::ve
 {
     /* Main segment */
     std::vector<chapter_edition_c*>::size_type i;
-    i_sys_title = 0;
-    p_current_vchapter = NULL;
-    b_current_vchapter_entered = false;
 
     i_current_edition = main_segment.i_default_edition;
 
@@ -327,6 +324,9 @@ virtual_segment_c::virtual_segment_c( matroska_segment_c & main_segment, std::ve
             break;
         }
     }
+
+    if (CurrentEdition())
+        p_current_vchapter = CurrentEdition()->getChapterbyTimecode(0);
 }
 
 virtual_segment_c::~virtual_segment_c()

@@ -113,9 +113,9 @@ public:
     ~virtual_segment_c();
     std::vector<virtual_edition_c*> veditions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;
-    virtual_chapter_c               *p_current_vchapter;
-    bool                            b_current_vchapter_entered;
-    int                             i_sys_title;
+    virtual_chapter_c               *p_current_vchapter = nullptr;
+    bool                            b_current_vchapter_entered = false;
+    int                             i_sys_title = 0;
 
 
     inline virtual_edition_c * CurrentEdition()
