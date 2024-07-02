@@ -113,7 +113,6 @@ public:
     ~virtual_segment_c();
     std::vector<virtual_edition_c*> veditions;
     std::vector<virtual_edition_c*>::size_type i_current_edition;
-    virtual_chapter_c               *p_current_vchapter = nullptr;
     bool                            b_current_vchapter_entered = false;
     int                             i_sys_title = 0;
 
@@ -153,6 +152,8 @@ public:
     bool Seek( demux_t & demuxer, vlc_tick_t i_mk_date, virtual_chapter_c *p_vchapter, bool b_precise = true );
 private:
     void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
+
+    virtual_chapter_c               *p_current_vchapter = nullptr;
 };
 
 } // namespace

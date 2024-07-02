@@ -172,8 +172,8 @@ bool demux_sys_t::PreloadLinked()
         return false;
 
     /* Set current chapter */
-    msg_Dbg( &demuxer, "NEW START CHAPTER uid=%" PRId64, p_current_vsegment->p_current_vchapter && p_current_vsegment->p_current_vchapter->p_chapter ?
-                 p_current_vsegment->p_current_vchapter->p_chapter->i_uid : 0 );
+    msg_Dbg( &demuxer, "NEW START CHAPTER uid=%" PRId64, p_current_vsegment->CurrentChapter() && p_current_vsegment->CurrentChapter()->p_chapter ?
+                 p_current_vsegment->CurrentChapter()->p_chapter->i_uid : 0 );
 
     used_vsegments.push_back( p_current_vsegment );
 
@@ -298,7 +298,7 @@ bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t 
 
     /* Seek to the beginning */
     p_current_vsegment->Seek(p_current_vsegment->CurrentSegment()->sys.demuxer,
-                             i_mk_date, p_current_vsegment->p_current_vchapter );
+                             i_mk_date, p_current_vsegment->CurrentChapter() );
 
     return true;
 }
