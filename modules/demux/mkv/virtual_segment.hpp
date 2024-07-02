@@ -151,7 +151,7 @@ public:
     bool UpdateCurrentToChapter( demux_t & demux );
     bool Seek( demux_t & demuxer, vlc_tick_t i_mk_date, virtual_chapter_c *p_vchapter, bool b_precise = true );
 private:
-    void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
+    void KeepTrackSelection( const matroska_segment_c & old, const matroska_segment_c & next );
 
     virtual_chapter_c               *p_current_vchapter = nullptr;
 };

@@ -696,42 +696,40 @@ void virtual_chapter_c::print()
 }
 #endif
 
-void virtual_segment_c::KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next )
+void virtual_segment_c::KeepTrackSelection( const matroska_segment_c & old, const matroska_segment_c & next )
 {
-    typedef matroska_segment_c::tracks_map_t tracks_map_t;
-
     char *sub_lang = NULL, *aud_lang = NULL;
-    for( tracks_map_t::iterator it = old.tracks.begin(); it != old.tracks.end(); ++it )
+    for( const auto & it : old.tracks )
     {
-        mkv_track_t &track = *it->second;
-        if( track.p_es )
+        const auto &track = it.second;
+        if( track->p_es )
         {
             bool state = false;
-            es_out_Control( old.sys.demuxer.out, ES_OUT_GET_ES_STATE, track.p_es, &state );
+            es_out_Control( old.sys.demuxer.out, ES_OUT_GET_ES_STATE, track->p_es, &state );
             if( state )
             {
-                if( track.fmt.i_cat == AUDIO_ES )
-                    aud_lang = track.fmt.psz_language;
-                else if( track.fmt.i_cat == SPU_ES )
-                    sub_lang = track.fmt.psz_language;
+                if( track->fmt.i_cat == AUDIO_ES )
+                    aud_lang = track->fmt.psz_language;
+                else if( track->fmt.i_cat == SPU_ES )
+                    sub_lang = track->fmt.psz_language;
             }
         }
     }
-    for( tracks_map_t::iterator it = next.tracks.begin(); it != next.tracks.end(); ++it )
+    for( const auto & it : next.tracks )
     {
-        mkv_track_t & new_track = *it->second;
-        es_format_t & new_fmt   = new_track.fmt;
+        const auto & new_track = it.second;
+        es_format_t & new_fmt  = new_track->fmt;
 
         /* Let's only do that for audio and video for now */
         if( new_fmt.i_cat == AUDIO_ES || new_fmt.i_cat == VIDEO_ES )
         {
             /* check for a similar elementary stream */
-            for( tracks_map_t::iterator old_it = old.tracks.begin(); old_it != old.tracks.end(); ++old_it )
+            for( const auto & old_it : old.tracks )
             {
-                mkv_track_t& old_track = *old_it->second;
-                es_format_t& old_fmt = old_track.fmt;
+                const auto & old_track = old_it.second;
+                es_format_t& old_fmt = old_track->fmt;
 
-                if( !old_track.p_es )
+                if( !old_track->p_es )
                     continue;
 
                 if( ( new_fmt.i_cat == old_fmt.i_cat ) &&
@@ -748,21 +746,21 @@ void virtual_segment_c::KeepTrackSelection( matroska_segment_c & old, matroska_s
                         !memcmp( &new_fmt.video, &old_fmt.video, sizeof(video_format_t) ) ) ) )
                 {
                     /* FIXME handle video palettes... */
-                    msg_Warn( &old.sys.demuxer, "Reusing decoder of old track %u for track %u", old_track.i_number, new_track.i_number);
-                    new_track.p_es = old_track.p_es;
-                    old_track.p_es = NULL;
+                    msg_Warn( &old.sys.demuxer, "Reusing decoder of old track %u for track %u", old_track->i_number, new_track->i_number);
+                    new_track->p_es = old_track->p_es;
+                    old_track->p_es = NULL;
                     break;
                 }
             }
         }
-        new_track.fmt.i_priority &= ~(0x10);
+        new_track->fmt.i_priority &= ~(0x10);
         if( ( sub_lang && new_fmt.i_cat == SPU_ES && !strcasecmp(sub_lang, new_fmt.psz_language) ) ||
             ( aud_lang && new_fmt.i_cat == AUDIO_ES && !strcasecmp(aud_lang, new_fmt.psz_language) ) )
         {
             msg_Warn( &old.sys.demuxer, "Since previous segment used lang %s forcing track %u",
-                      new_fmt.psz_language, new_track.i_number );
+                      new_fmt.psz_language, new_track->i_number );
             new_fmt.i_priority |= 0x10;
-            new_track.b_forced = true;
+            new_track->b_forced = true;
         }
     }
 }
