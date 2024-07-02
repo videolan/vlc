@@ -445,14 +445,17 @@ static void CycleSecondarySubtitles(intf_thread_t *intf, vlc_player_t *player,
                 index = index + (next ? 1 : -1);
         }
 
-        /* Make sure the list never contains NULL before a valid id */
-        if ( !keep_id )
-        {
-            keep_id = cycle_id;
-            cycle_id = NULL;
+        // We want the PRIMARY in first position
+        vlc_es_id_t *esIds[] = { cycle_id, keep_id, NULL };
+        if ( sys->spu_channel_order == VLC_VOUT_ORDER_SECONDARY ) {
+            esIds[0] = keep_id;
+            esIds[1] = cycle_id;
         }
-
-        vlc_es_id_t *esIds[] = { keep_id, cycle_id, NULL };
+        /* Make sure the list never contains NULL before a valid id */
+        if ( !esIds[0] ){
+            esIds[0] = esIds[1];
+            esIds[1] = NULL;
+        }
         vlc_player_SelectEsIdList(player, cat, esIds);
     }
 }
