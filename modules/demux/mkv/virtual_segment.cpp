@@ -30,7 +30,7 @@ namespace mkv {
 
 /* FIXME move this, it's demux_sys_t::SegmentIsOpened */
 template<typename T>
-matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*> & opened_segments )
+matroska_segment_c * getSegmentbyUID( T * p_uid, const std::vector<matroska_segment_c*> & opened_segments )
 {
     for( size_t i = 0; i < opened_segments.size(); i++ )
     {
@@ -43,7 +43,7 @@ matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*
 
 virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_chap,
                                                              matroska_segment_c & main_segment,
-                                                             std::vector<matroska_segment_c*> & opened_segments,
+                                                             const std::vector<matroska_segment_c*> & opened_segments,
                                                              vlc_tick_t & usertime_offset, bool b_ordered)
 {
     std::vector<virtual_chapter_c *> sub_chapters;
@@ -116,7 +116,8 @@ virtual_chapter_c::~virtual_chapter_c()
 }
 
 
-virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segment_c & main_segment, std::vector<matroska_segment_c*> & opened_segments)
+virtual_edition_c::virtual_edition_c( chapter_edition_c * p_edit, matroska_segment_c & main_segment,
+                                      const std::vector<matroska_segment_c*> & opened_segments )
 {
     bool b_fake_ordered = false;
     p_edition = p_edit;
