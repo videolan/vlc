@@ -28,7 +28,7 @@
 
 namespace mkv {
 
-/* FIXME move this, it's demux_sys_t::FindSegment */
+/* FIXME move this, it's demux_sys_t::SegmentIsOpened */
 template<typename T>
 matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*> & segments )
 {

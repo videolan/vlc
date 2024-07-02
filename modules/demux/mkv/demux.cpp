@@ -107,7 +107,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
             p_segment1->Preload();
 
             if ( !p_segment1->p_segment_uid ||
-                 FindSegment( *p_segment1->p_segment_uid ) == NULL)
+                 !SegmentIsOpened( *p_segment1->p_segment_uid ) )
             {
                 opened_segments.push_back( p_segment1 );
                 b_keep_stream = true;
@@ -312,14 +312,14 @@ void demux_sys_t::JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vcha
     }
 }
 
-matroska_segment_c *demux_sys_t::FindSegment( const EbmlBinary & uid ) const
+bool demux_sys_t::SegmentIsOpened( const EbmlBinary & uid ) const
 {
     for (size_t i=0; i<opened_segments.size(); i++)
     {
         if ( opened_segments[i]->p_segment_uid && *opened_segments[i]->p_segment_uid == uid )
-            return opened_segments[i];
+            return true;
     }
-    return NULL;
+    return false;
 }
 
 virtual_chapter_c *demux_sys_t::BrowseCodecPrivate( chapter_codec_id codec_id,

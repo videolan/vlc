@@ -94,7 +94,7 @@ public:
 
     const bool              trust_cues;
 
-    matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
+    bool SegmentIsOpened( const EbmlBinary & uid ) const;
 
     // chapter_codec_vm
     virtual_chapter_c *BrowseCodecPrivate( chapter_codec_id codec_id,
