@@ -454,16 +454,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *pf = 0.0;
             if( p_sys->p_current_vsegment && p_sys->p_current_vsegment->CurrentSegment() )
             {
-                typedef matroska_segment_c::tracks_map_t tracks_map_t;
-
                 const matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
-                for( tracks_map_t::const_iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
+                for( const auto & it : p_segment->tracks )
                 {
-                    const mkv_track_t &track = *it->second;
+                    const auto &track = it.second;
 
-                    if( track.fmt.i_cat == VIDEO_ES && track.fmt.video.i_frame_rate_base > 0 )
+                    if( track->fmt.i_cat == VIDEO_ES && track->fmt.video.i_frame_rate_base > 0 )
                     {
-                        *pf = (double)track.fmt.video.i_frame_rate / track.fmt.video.i_frame_rate_base;
+                        *pf = (double)track->fmt.video.i_frame_rate / track->fmt.video.i_frame_rate_base;
                         break;
                     }
                 }

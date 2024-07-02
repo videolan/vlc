@@ -318,21 +318,19 @@ int UpdatePCR( demux_t * p_demux )
 
     vlc_tick_t i_pcr = VLC_TICK_INVALID;
 
-    typedef matroska_segment_c::tracks_map_t tracks_map_t;
-
-    for( tracks_map_t::const_iterator it = p_segment->tracks.begin(); it != p_segment->tracks.end(); ++it )
+    for( const auto & it : p_segment->tracks )
     {
-        mkv_track_t &track = *it->second;
+        const auto &track = it.second;
 
-        if( track.i_last_dts == VLC_TICK_INVALID )
+        if( track->i_last_dts == VLC_TICK_INVALID )
             continue;
 
-        if( track.fmt.i_cat != VIDEO_ES && track.fmt.i_cat != AUDIO_ES )
+        if( track->fmt.i_cat != VIDEO_ES && track->fmt.i_cat != AUDIO_ES )
             continue;
 
-        if( track.i_last_dts < i_pcr || i_pcr == VLC_TICK_INVALID )
+        if( track->i_last_dts < i_pcr || i_pcr == VLC_TICK_INVALID )
         {
-            i_pcr = track.i_last_dts;
+            i_pcr = track->i_last_dts;
         }
     }
 
