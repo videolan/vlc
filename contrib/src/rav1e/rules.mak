@@ -31,7 +31,6 @@ DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo $(DEPS_cargo)
 # rav1e-vendor
 
 rav1e-vendor-build: .cargo .sum-rav1e
-	-$(RM) -R $@
 	mkdir -p $@
 	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1
 	cd $@ && $(CARGO) vendor --locked rav1e-$(RAV1E_VERSION)-vendor
@@ -43,7 +42,7 @@ rav1e-vendor-build: .cargo .sum-rav1e
 
 $(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2:
 	$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e)
-	if test ! -s "$@"; then $(MAKE) rav1e-vendor-build; fi
+	if test ! -s "$@"; then $(RM) -R rav1e-vendor-build; $(MAKE) rav1e-vendor-build; fi
 
 .sum-rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
 	touch $@
