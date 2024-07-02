@@ -526,42 +526,42 @@ bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
         /* 1st, we need to know in which chapter we are */
         p_vchapter = CurrentEdition()->getChapterbyTimecode( i_mk_date );
 
-    if ( p_vchapter != NULL && CurrentEdition() )
+    if ( p_vchapter == NULL || !CurrentEdition() )
+        return false;
+
+    vlc_tick_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
+    if (CurrentEdition()->b_ordered)
+        p_sys->i_mk_chapter_time = p_vchapter->i_mk_virtual_start_time - p_vchapter->segment.i_mk_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 ) /* + VLC_TICK_0 */;
+    if ( p_vchapter->p_chapter && p_vchapter->i_seekpoint_num > 0 )
     {
-        vlc_tick_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
-        if (CurrentEdition()->b_ordered)
-            p_sys->i_mk_chapter_time = p_vchapter->i_mk_virtual_start_time - p_vchapter->segment.i_mk_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 ) /* + VLC_TICK_0 */;
-        if ( p_vchapter->p_chapter && p_vchapter->i_seekpoint_num > 0 )
-        {
-            p_sys->i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
-            p_sys->i_current_title = i_sys_title;
-            p_sys->i_current_seekpoint = p_vchapter->i_seekpoint_num - 1;
-        }
-
-        if( p_current_vchapter == NULL || &p_current_vchapter->segment != &p_vchapter->segment )
-        {
-            if ( p_current_vchapter )
-            {
-                KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
-                p_current_vchapter->segment.ESDestroy();
-            }
-            msg_Dbg( &demuxer, "SWITCH CHAPTER uid=%" PRId64, p_vchapter->p_chapter ? p_vchapter->p_chapter->i_uid : 0 );
-            p_current_vchapter = p_vchapter;
-
-            /* only use for soft linking, hard linking should be continuous */
-            es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
-
-            p_sys->PreparePlayback( *this, i_mk_date );
-            return true;
-        }
-        else
-        {
-            p_current_vchapter = p_vchapter;
-
-            return p_current_vchapter->segment.Seek( demuxer, i_mk_date, i_mk_time_offset, b_precise );
-        }
+        p_sys->i_updates |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SEEKPOINT;
+        p_sys->i_current_title = i_sys_title;
+        p_sys->i_current_seekpoint = p_vchapter->i_seekpoint_num - 1;
     }
-    return false;
+
+    if( p_current_vchapter == NULL || &p_current_vchapter->segment != &p_vchapter->segment )
+    {
+        // switch to a new Segment
+        if ( p_current_vchapter )
+        {
+            KeepTrackSelection( p_current_vchapter->segment, p_vchapter->segment );
+            p_current_vchapter->segment.ESDestroy();
+        }
+        msg_Dbg( &demuxer, "SWITCH CHAPTER uid=%" PRId64, p_vchapter->p_chapter ? p_vchapter->p_chapter->i_uid : 0 );
+        p_current_vchapter = p_vchapter;
+
+        /* only use for soft linking, hard linking should be continuous */
+        es_out_Control( demuxer.out, ES_OUT_RESET_PCR );
+
+        p_sys->PreparePlayback( *this, i_mk_date );
+        return true;
+    }
+    else
+    {
+        p_current_vchapter = p_vchapter;
+    }
+
+    return p_current_vchapter->segment.Seek( demuxer, i_mk_date, i_mk_time_offset, b_precise );
 }
 
 virtual_chapter_c * virtual_chapter_c::FindChapter( chapter_uid i_find_uid )
