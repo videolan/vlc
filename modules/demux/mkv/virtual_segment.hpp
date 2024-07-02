@@ -46,7 +46,7 @@ public:
 
     static virtual_chapter_c * CreateVirtualChapter( chapter_item_c * p_chap,
                                                      matroska_segment_c & main_segment,
-                                                     std::vector<matroska_segment_c*> & segments,
+                                                     std::vector<matroska_segment_c*> & opened_segments,
                                                      vlc_tick_t & usertime_offset, bool b_ordered );
 
     virtual_chapter_c* getSubChapterbyTimecode( vlc_tick_t time );

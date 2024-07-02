@@ -30,20 +30,20 @@ namespace mkv {
 
 /* FIXME move this, it's demux_sys_t::SegmentIsOpened */
 template<typename T>
-matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*> & segments )
+matroska_segment_c * getSegmentbyUID( T * p_uid, std::vector<matroska_segment_c*> & opened_segments )
 {
-    for( size_t i = 0; i < segments.size(); i++ )
+    for( size_t i = 0; i < opened_segments.size(); i++ )
     {
-        if( segments[i]->p_segment_uid &&
-            *p_uid == *(segments[i]->p_segment_uid) )
-            return segments[i];
+        if( opened_segments[i]->p_segment_uid &&
+            *p_uid == *(opened_segments[i]->p_segment_uid) )
+            return opened_segments[i];
     }
     return NULL;
 }
 
 virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_chap,
                                                              matroska_segment_c & main_segment,
-                                                             std::vector<matroska_segment_c*> & segments,
+                                                             std::vector<matroska_segment_c*> & opened_segments,
                                                              vlc_tick_t & usertime_offset, bool b_ordered)
 {
     std::vector<virtual_chapter_c *> sub_chapters;
@@ -63,7 +63,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
 
     matroska_segment_c * p_segment = &main_segment;
     if( p_chap->p_segment_uid &&
-       ( !( p_segment = getSegmentbyUID( p_chap->p_segment_uid,segments ) ) || !b_ordered ) )
+       ( !( p_segment = getSegmentbyUID( p_chap->p_segment_uid, opened_segments ) ) || !b_ordered ) )
     {
         msg_Warn( &main_segment.sys.demuxer,
                   "Couldn't find segment 0x%x or not ordered... - ignoring chapter %s",
@@ -78,7 +78,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
 
     for( size_t i = 0; i < p_chap->sub_chapters.size(); i++ )
     {
-        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, segments, tmp, b_ordered );
+        virtual_chapter_c * p_vsubchap = CreateVirtualChapter( p_chap->sub_chapters[i], *p_segment, opened_segments, tmp, b_ordered );
 
         if( p_vsubchap )
             sub_chapters.push_back( p_vsubchap );
