@@ -256,13 +256,13 @@ static int OpenInternal( demux_t *p_demux, bool trust_cues )
         msg_Warn( p_demux, "This file references other files, you may want to enable the preload of local directory");
 
     if ( !p_sys->PreloadLinked() ||
-         !p_sys->PreparePlayback( *p_sys->p_current_vsegment ) )
+         !p_sys->PreparePlayback( *p_sys->GetCurrentVSegment() ) )
     {
         msg_Err( p_demux, "cannot use the segment" );
         goto error;
     }
     /* Seek to the beginning */
-    p_sys->p_current_vsegment->Seek( *p_demux, 0, p_sys->p_current_vsegment->CurrentChapter() );
+    p_sys->GetCurrentVSegment()->Seek( *p_demux, 0, p_sys->GetCurrentVSegment()->CurrentChapter() );
 
     if (!p_sys->FreeUnused())
     {
@@ -296,7 +296,7 @@ static void Close( vlc_object_t *p_this )
 {
     demux_t     *p_demux = reinterpret_cast<demux_t*>( p_this );
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
-    virtual_segment_c *p_vsegment = p_sys->p_current_vsegment;
+    virtual_segment_c *p_vsegment = p_sys->GetCurrentVSegment();
     if( p_vsegment )
     {
         matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
@@ -399,9 +399,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             i_idx = va_arg( args, int );
             if(i_idx <  p_sys->titles.size() && p_sys->titles[i_idx]->i_seekpoint)
             {
-                const int i_edition = p_sys->p_current_vsegment->i_current_edition;
+                const int i_edition = p_sys->GetCurrentVSegment()->i_current_edition;
                 const int i_title = p_sys->i_current_title;
-                p_sys->p_current_vsegment->i_current_edition = i_idx;
+                p_sys->GetCurrentVSegment()->i_current_edition = i_idx;
                 p_sys->i_current_title = i_idx;
                 if( VLC_SUCCESS ==
                     Seek( p_demux, p_sys->titles[i_idx]->seekpoint[0]->i_time_offset, -1, NULL) )
@@ -413,7 +413,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
                 else
                 {
-                    p_sys->p_current_vsegment->i_current_edition = i_edition;
+                    p_sys->GetCurrentVSegment()->i_current_edition = i_edition;
                     p_sys->i_current_title = i_title;
                 }
             }
@@ -454,9 +454,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_FPS:
             pf = va_arg( args, double * );
             *pf = 0.0;
-            if( p_sys->p_current_vsegment && p_sys->p_current_vsegment->CurrentSegment() )
+            if( p_sys->GetCurrentVSegment() && p_sys->GetCurrentVSegment()->CurrentSegment() )
             {
-                const matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
+                const matroska_segment_c *p_segment = p_sys->GetCurrentVSegment()->CurrentSegment();
                 for( const auto & it : p_segment->tracks )
                 {
                     const auto &track = it.second;
@@ -500,7 +500,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
-    virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
+    virtual_segment_c  *p_vsegment = p_sys->GetCurrentVSegment();
 
     if( f_percent < 0 ) msg_Dbg( p_demux, "seek request to i_pos = %" PRId64, i_mk_date );
     else                msg_Dbg( p_demux, "seek request to %.2f%%", f_percent * 100 );
@@ -543,7 +543,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                   bool b_discardable_picture )
 {
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
-    matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
+    matroska_segment_c *p_segment = p_sys->GetCurrentVSegment()->CurrentSegment();
 
     KaxInternalBlock& internal_block = simpleblock
         ? static_cast<KaxInternalBlock&>( *simpleblock )
@@ -806,13 +806,13 @@ static int Demux( demux_t *p_demux)
 
     vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
-    virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
+    virtual_segment_c  *p_vsegment = p_sys->GetCurrentVSegment();
 
     if( p_sys->i_pts >= p_sys->i_start_pts )
     {
         if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
             return VLC_DEMUXER_SUCCESS;
-        p_vsegment = p_sys->p_current_vsegment;
+        p_vsegment = p_sys->GetCurrentVSegment();
     }
 
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();

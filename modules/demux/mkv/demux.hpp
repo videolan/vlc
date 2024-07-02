@@ -55,7 +55,6 @@ public:
         ,i_current_title(0)
         ,i_current_seekpoint(0)
         ,i_updates(0)
-        ,p_current_vsegment(NULL)
         ,i_duration(-1)
         ,trust_cues(trust_cues)
         ,ev(&demux)
@@ -87,7 +86,6 @@ public:
                     void(*)(input_attachment_t*)>> stored_attachments;
     std::vector<matroska_segment_c*> opened_segments;
     std::vector<virtual_segment_c*>  used_vsegments;
-    virtual_segment_c                *p_current_vsegment;
 
     /* duration of the stream */
     vlc_tick_t              i_duration;
@@ -132,6 +130,7 @@ public:
     event_thread_t ev;
 
 private:
+    virtual_segment_c                *p_current_vsegment = nullptr;
     std::unique_ptr<dvd_command_interpretor_c> dvd_interpretor;
 };
 
