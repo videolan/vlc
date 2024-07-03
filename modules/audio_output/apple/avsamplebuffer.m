@@ -110,13 +110,6 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
     block_ChainRelease(_outChain);
 }
 
-- (void)clearOutChain
-{
-    block_ChainRelease(_outChain);
-    _outChain = NULL;
-    _outChainLast = &_outChain;
-}
-
 static void
 customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 {
@@ -321,7 +314,11 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     vlc_mutex_lock(&_bufferLock);
     _stopped = YES;
-    [self clearOutChain];
+
+    block_ChainRelease(_outChain);
+    _outChain = NULL;
+    _outChainLast = &_outChain;
+
     vlc_cond_signal(&_bufferWait);
     vlc_mutex_unlock(&_bufferLock);
 }
