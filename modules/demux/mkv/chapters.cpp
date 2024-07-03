@@ -42,13 +42,11 @@ chapter_item_c *chapter_item_c::BrowseCodecPrivate( chapter_codec_id codec_id,
                                                     chapter_cmd_match match )
 {
     // this chapter
-    auto index = codecs.cbegin();
-    while ( index != codecs.cend() )
+    for (const mkv::chapter_codec_cmds_c *index : codecs)
     {
-        if ( (*index)->i_codec_id == codec_id &&
-             match( **index ) )
+        if ( index->i_codec_id == codec_id &&
+             match( *index ) )
             return this;
-        ++index;
     }
     return NULL;
 }
@@ -94,13 +92,11 @@ std::string chapter_item_c::GetCodecName( bool f_for_title ) const
 {
     std::string result;
 
-    auto index = codecs.cbegin();
-    while ( index != codecs.cend() )
+    for (const mkv::chapter_codec_cmds_c *index : codecs)
     {
-        result = (*index)->GetCodecName( f_for_title );
+        result = index->GetCodecName( f_for_title );
         if ( !result.empty () )
             break;
-        ++index;
     }
 
     return result;
@@ -110,13 +106,11 @@ int16_t chapter_item_c::GetTitleNumber( ) const
 {
     int result = -1;
 
-    auto index = codecs.cbegin();
-    while ( index != codecs.cend() )
+    for (const mkv::chapter_codec_cmds_c *index : codecs)
     {
-        result = (*index)->GetTitleNumber( );
+        result = index->GetTitleNumber( );
         if ( result >= 0 )
             break;
-        ++index;
     }
 
     return result;
