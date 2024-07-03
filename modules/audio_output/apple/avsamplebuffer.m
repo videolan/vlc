@@ -321,10 +321,9 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     vlc_mutex_lock(&_bufferLock);
     _stopped = YES;
+    [self clearOutChain];
     vlc_cond_signal(&_bufferWait);
     vlc_mutex_unlock(&_bufferLock);
-
-    [self clearOutChain];
 }
 
 - (void)stop
