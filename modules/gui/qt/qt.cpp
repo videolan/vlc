@@ -989,18 +989,13 @@ static void *Thread( void *obj )
         bool known_type = true;
 
         const QString& platform = app.platformName();
-        if( platform == QLatin1String("xcb") )
-            p_intf->voutWindowType = VLC_WINDOW_TYPE_XID;
+        if( platform == QLatin1String("xcb") ) { }
         else if( platform.startsWith( QLatin1String("wayland") ) ) {
-            p_intf->voutWindowType = VLC_WINDOW_TYPE_WAYLAND;
-
             // Workaround for popup widgets not closing on mouse press on wayland:
             app.installEventFilter(new DismissPopupEventFilter(&app));
         }
-        else if( platform == QLatin1String("windows") || platform == QLatin1String("direct2d") )
-            p_intf->voutWindowType = VLC_WINDOW_TYPE_HWND;
-        else if( platform == QLatin1String("cocoa") )
-            p_intf->voutWindowType = VLC_WINDOW_TYPE_NSOBJECT;
+        else if( platform == QLatin1String("windows") || platform == QLatin1String("direct2d") ) { }
+        else if( platform == QLatin1String("cocoa") ) { }
         else
         {
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
@@ -1173,13 +1168,13 @@ static int WindowOpen( vlc_window_t *p_wnd )
         if (p_intf->isShuttingDown)
             return VLC_EGENERIC;
 
-        switch( p_intf->voutWindowType )
         {
-            case VLC_WINDOW_TYPE_XID:
-            case VLC_WINDOW_TYPE_HWND:
+            const QString& platform = qApp->platformName();
+            if (platform == QLatin1String("windows") || platform == QLatin1String("direct2d"))
+            {
                 if( var_InheritBool( p_wnd, "video-wallpaper" ) )
                     return VLC_EGENERIC;
-                break;
+            }
         }
 
         bool ret = p_intf->p_compositor->setupVoutWindow( p_wnd, &WindowCloseCb );
