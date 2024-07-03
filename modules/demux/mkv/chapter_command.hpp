@@ -73,7 +73,7 @@ public:
     virtual bool Enter() { return false; }
     virtual bool Leave() { return false; }
     virtual std::string GetCodecName( bool ) const { return ""; }
-    virtual int16_t GetTitleNumber() { return -1; }
+    virtual int16_t GetTitleNumber() const { return -1; }
 
     const enum chapter_codec_id i_codec_id;
 
@@ -265,7 +265,7 @@ public:
     bool Leave() override;
 
     std::string GetCodecName( bool f_for_title = false ) const override;
-    int16_t GetTitleNumber() override;
+    int16_t GetTitleNumber() const override;
 
 protected:
     bool EnterLeaveHelper( char const*, std::vector<KaxChapterProcessData*>* );

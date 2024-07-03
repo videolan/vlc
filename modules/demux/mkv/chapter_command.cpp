@@ -63,7 +63,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
     }
 }
 
-int16_t dvd_chapter_codec_c::GetTitleNumber()
+int16_t dvd_chapter_codec_c::GetTitleNumber() const
 {
     if ( p_private_data->GetSize() >= 3)
     {
