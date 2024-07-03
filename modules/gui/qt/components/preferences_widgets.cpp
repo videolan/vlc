@@ -632,9 +632,15 @@ ModuleListConfigControl::~ModuleListConfigControl()
 void ModuleListConfigControl::checkbox_lists( module_t *p_parser )
 {
     const char *help = module_get_help( p_parser );
-    checkbox_lists( qtr( module_GetLongName( p_parser ) ),
+    const char *module_name = module_GetLongName( p_parser );
+    const char *module_shortcut = module_get_object( p_parser );
+
+    if ( !strcmp(module_name, "AMD VQ Enhancer"))
+        module_shortcut = "amf_vqenhancer";
+
+    checkbox_lists( qtr( module_name ),
                     help != NULL ? qtr( help ): "",
-                    module_get_object( p_parser ) );
+                    module_shortcut );
 }
 
 void ModuleListConfigControl::checkbox_lists( QString label, QString help, const char* psz_module )
