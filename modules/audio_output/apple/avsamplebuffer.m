@@ -276,6 +276,8 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     if (_ptsSamples == -1)
     {
+        _stopped = NO;
+
         __weak typeof(self) weakSelf = self;
         [_renderer requestMediaDataWhenReadyOnQueue:_dataQueue usingBlock:^{
             [weakSelf whenDataReady];
@@ -317,17 +319,17 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     [_renderer stopRequestingMediaData];
     [_renderer flush];
 
+    vlc_mutex_lock(&_bufferLock);
+    _stopped = YES;
+    vlc_cond_signal(&_bufferWait);
+    vlc_mutex_unlock(&_bufferLock);
+
     [self clearOutChain];
 }
 
 - (void)stop
 {
     NSNotificationCenter *notifCenter = [NSNotificationCenter defaultCenter];
-
-    vlc_mutex_lock(&_bufferLock);
-    _stopped = YES;
-    vlc_cond_signal(&_bufferWait);
-    vlc_mutex_unlock(&_bufferLock);
 
     if (_ptsSamples > 0)
         [self stopSyncRenderer];
@@ -431,8 +433,6 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     }
 
     [_sync addRenderer:_renderer];
-
-    _stopped = NO;
 
     _ptsSamples = -1;
     _firstPts = VLC_TICK_INVALID;
