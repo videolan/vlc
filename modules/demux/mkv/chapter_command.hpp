@@ -261,11 +261,11 @@ public:
     ,intepretor(intepretor_)
     {}
 
-    bool Enter();
-    bool Leave();
+    bool Enter() override;
+    bool Leave() override;
 
-    std::string GetCodecName( bool f_for_title = false ) const;
-    int16_t GetTitleNumber();
+    std::string GetCodecName( bool f_for_title = false ) const override;
+    int16_t GetTitleNumber() override;
 
 protected:
     bool EnterLeaveHelper( char const*, std::vector<KaxChapterProcessData*>* );
