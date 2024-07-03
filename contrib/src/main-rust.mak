@@ -4,15 +4,25 @@
 # This file is under the same license as the vlc package.
 
 ifdef HAVE_WIN32
-ifndef HAVE_WINSTORE
+ifdef HAVE_UCRT
+ifndef HAVE_WINSTORE # UWP is available as Tier 3
+ifeq ($(HOST),i686-w64-mingw32)
+RUST_TARGET = i686-pc-windows-gnullvm # ARCH is i386
+else ifeq ($(HOST),x86_64-w64-mingw32)
+RUST_TARGET = $(ARCH)-pc-windows-gnullvm
+else
+# Not supported on armv7/aarch64 yet
+endif # archs
+endif # WINSTORE
+else # MSVCRT
 ifeq ($(HOST),i686-w64-mingw32)
 RUST_TARGET = i686-pc-windows-gnu # ARCH is i386
 else ifeq ($(HOST),x86_64-w64-mingw32)
 RUST_TARGET = $(ARCH)-pc-windows-gnu
 else
 # Not supported on armv7/aarch64 yet
-endif
-endif
+endif # archs
+endif # MSVCRT
 else ifdef HAVE_ANDROID
 RUST_TARGET = $(HOST)
 else ifdef HAVE_IOS
