@@ -109,14 +109,16 @@ public:
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
-    dvd_command_interpretor_c & GetDVDInterpretor()
+    dvd_command_interpretor_c * GetDVDInterpretor()
     {
         if (!dvd_interpretor)
         {
-            dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this );
-            assert(dvd_interpretor);
+            try {
+                dvd_interpretor = std::make_unique<dvd_command_interpretor_c>( *this );
+            } catch ( const std::bad_alloc & ) {
+            }
         }
-        return *dvd_interpretor;
+        return dvd_interpretor.get();
     }
 
     uint8_t        palette[4][4];

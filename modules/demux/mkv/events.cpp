@@ -172,7 +172,10 @@ void event_thread_t::ProcessNavAction( uint16_t button, pci_t* pci )
     if( button <= 0 || button > pci->hli.hl_gi.btn_ns )
         return;
 
-    p_sys->GetDVDInterpretor().SetSPRM( 0x88, button );
+    if (!p_sys->GetDVDInterpretor())
+        return;
+
+    p_sys->GetDVDInterpretor()->SetSPRM( 0x88, button );
     btni_t button_ptr = pci->hli.btnit[button-1];
     if ( button_ptr.auto_action_mode )
     {
@@ -180,7 +183,7 @@ void event_thread_t::ProcessNavAction( uint16_t button, pci_t* pci )
         vlc_mutex_lock( &p_sys->lock_demuxer );
 
         // process the button action
-        p_sys->GetDVDInterpretor().Interpret( button_ptr.cmd.bytes, 8 );
+        p_sys->GetDVDInterpretor()->Interpret( button_ptr.cmd.bytes, 8 );
 
         vlc_mutex_unlock( &p_sys->lock_demuxer );
         vlc_mutex_lock( &lock );
@@ -194,7 +197,10 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
     pci_t *pci = &pci_packet;
 
-    uint16_t i_curr_button = p_sys->GetDVDInterpretor().GetSPRM( 0x88 );
+    if (!p_sys->GetDVDInterpretor())
+        return;
+
+    uint16_t i_curr_button = p_sys->GetDVDInterpretor()->GetSPRM( 0x88 );
 
     if( i_curr_button <= 0 || i_curr_button > pci->hli.hl_gi.btn_ns )
         return;
@@ -213,7 +219,7 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
             vlc_mutex_lock( &p_sys->lock_demuxer );
 
             // process the button action
-            p_sys->GetDVDInterpretor().Interpret( button_ptr.cmd.bytes, 8 );
+            p_sys->GetDVDInterpretor()->Interpret( button_ptr.cmd.bytes, 8 );
 
             vlc_mutex_unlock( &p_sys->lock_demuxer );
             vlc_mutex_lock( &lock );
@@ -231,6 +237,9 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     int y = event.mouse.state_new.i_y;
 
     pci_t *pci = &pci_packet;
+
+    if (!p_sys->GetDVDInterpretor())
+        return;
 
     if( vlc_mouse_HasPressed( &event.mouse.state_old, &event.mouse.state_new,
                               MOUSE_BUTTON_LEFT ) )
@@ -270,15 +279,15 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
         if ( best != 0)
         {
             btni_t button_ptr = pci->hli.btnit[best-1];
-            uint16_t i_curr_button = p_sys->GetDVDInterpretor().GetSPRM( 0x88 );
+            uint16_t i_curr_button = p_sys->GetDVDInterpretor()->GetSPRM( 0x88 );
 
             msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
             vlc_mutex_unlock( &lock );
             vlc_mutex_lock( &p_sys->lock_demuxer );
 
             // process the button action
-            p_sys->GetDVDInterpretor().SetSPRM( 0x88, best );
-            p_sys->GetDVDInterpretor().Interpret( button_ptr.cmd.bytes, 8 );
+            p_sys->GetDVDInterpretor()->SetSPRM( 0x88, best );
+            p_sys->GetDVDInterpretor()->Interpret( button_ptr.cmd.bytes, 8 );
 
             msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
 
