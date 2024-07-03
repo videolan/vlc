@@ -230,14 +230,17 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                     connect(quickViewPtr,
                             &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
                             this,
-                            &CompositorDirectComposition::setup,
+                            [this, &eventLoop]() {
+                                setup();
+                                eventLoop.quit();
+                            },
                             Qt::SingleShotConnection);
                 }
                 else
                 {
                     appropriateGraphicsApi = false;
+                    eventLoop.quit();
                 }
-                eventLoop.quit();
         }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
 
     connect(quickViewPtr,
