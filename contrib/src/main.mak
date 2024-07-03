@@ -218,6 +218,12 @@ BUILDLDFLAGS ?= $(BUILDCFLAGS)
 
 # Do not export variables above! Use HOSTVARS or BUILDVARS.
 
+ifdef HAVE_WIN32
+ifneq ($(call cppcheck, _UCRT),)
+HAVE_UCRT = 1
+endif
+endif
+
 # Do the FPU detection, after we have figured out our compilers and flags.
 ifneq ($(findstring $(ARCH),aarch64 i386 ppc ppc64 ppc64le sparc sparc64 x86_64),)
 # This should be consistent with include/vlc_cpu.h
