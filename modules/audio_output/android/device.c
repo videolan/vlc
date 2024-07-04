@@ -24,10 +24,16 @@
 # include "config.h"
 #endif
 
+#include <string.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_modules.h>
 #include <vlc_aout.h>
+
+#include <android/api-level.h>
+#include <sys/system_properties.h>
+
 #include "device.h"
 #include "audioformat_jni.h"
 #include "../video_output/android/env.h"
@@ -58,6 +64,46 @@ static const struct {
     { "encoded", "Up to 8 channels, passthrough if available.", ANDROID_AUDIO_DEVICE_ENCODED },
     {  NULL, NULL, ANDROID_AUDIO_DEVICE_DEFAULT },
 };
+
+/* Audio output Allow/Deny Logic Start */
+enum AudioOutput
+{
+    OPENSLES, ALL
+};
+
+static const struct
+{
+    const char *property;
+    const char *property_value;
+    enum AudioOutput audio_output;
+} audio_output_by_soc[] = {
+    /* getPlaybackHeadPosition returns an invalid position on Fire OS,
+     * thus Audiotrack is not usable */
+    { "ro.product.brand", "Amazon", OPENSLES },
+    { "ro.product.manufacturer", "Amazon", OPENSLES }
+};
+
+
+static enum AudioOutput get_audio_output_from_device(void)
+{
+    if (android_get_device_api_level() >= 28)
+        return ALL;
+
+    int len = 0;
+    char value[PROP_VALUE_MAX];
+    for (int i = 0; i < ARRAY_SIZE(audio_output_by_soc); i++)
+    {
+        /* On return, len will equal (int)strlen(model_id) */
+        len = __system_property_get(audio_output_by_soc[i].property, value);
+        if (len > 0)
+        {
+            if (strstr(value, audio_output_by_soc[i].property_value) != NULL)
+                return audio_output_by_soc[i].audio_output;
+        }
+    }
+    return ALL;
+}
+/* Audio output Allow/Deny Logic End */
 
 struct sys {
     aout_stream_t *stream;
@@ -264,6 +310,10 @@ Open(vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
 
     if (vlc_android_AudioFormat_InitJNI(obj) != VLC_SUCCESS)
+        return VLC_EGENERIC;
+
+    /* Return an error if OpenSLES should be used */
+    if (get_audio_output_from_device() == OPENSLES)
         return VLC_EGENERIC;
 
     struct sys *sys = aout->sys = vlc_obj_malloc(obj, sizeof(*sys));
