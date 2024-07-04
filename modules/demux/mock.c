@@ -238,13 +238,6 @@ var_Read_float(const char *psz)
     type var_name;
 #define DECLARE_SUBOPTION(a,b,c,d,e,f) DECLARE_OPTION(b,c,d,e,f)
 
-#define OVERRIDE_OPTION(group_name, var_name, type, module_header_type, getter, default_value) \
-    if (!strcmp(""#var_name, config_chain->psz_name)) \
-    { \
-        track->group_name.var_name = var_Read_ ## type(config_chain->psz_value); \
-        break; \
-    }
-
 #define READ(var_name, member_name, getter) \
     sys->member_name = var_Inherit##getter(obj, "mock-"#var_name);
 #define READ_OPTION(var_name, type, module_header_type, getter, default_value) \
@@ -1046,18 +1039,25 @@ static int
 OverrideTrackOptions(const config_chain_t *config_chain,
                      struct mock_track *track)
 {
+#define OVERRIDE_SUBOPTION(group_name, var_name, type, module_header_type, getter, default_value) \
+    if (!strcmp(""#var_name, config_chain->psz_name)) \
+    { \
+        track->group_name.var_name = var_Read_ ## type(config_chain->psz_value); \
+        break; \
+    }
+
     for (; config_chain ; config_chain = config_chain->p_next)
     {
         switch (track->fmt.i_cat)
         {
             case VIDEO_ES:
-                OPTIONS_VIDEO(OVERRIDE_OPTION)
+                OPTIONS_VIDEO(OVERRIDE_SUBOPTION)
                         break;
             case AUDIO_ES:
-                OPTIONS_AUDIO(OVERRIDE_OPTION)
+                OPTIONS_AUDIO(OVERRIDE_SUBOPTION)
                         break;
             case SPU_ES:
-                OPTIONS_SUB(OVERRIDE_OPTION)
+                OPTIONS_SUB(OVERRIDE_SUBOPTION)
                         break;
             default:
                 vlc_assert_unreachable();
