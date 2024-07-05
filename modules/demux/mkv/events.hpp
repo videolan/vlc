@@ -130,6 +130,9 @@ private:
 
     typedef std::list<EventInfo> pending_events_t;
     pending_events_t pending_events;
+
+private:
+    void HandleKeyEvent( NavivationKey key );
 };
 } // namespace
 

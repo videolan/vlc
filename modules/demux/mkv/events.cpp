@@ -178,6 +178,22 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 {
     msg_Dbg( p_demux, "Handle Key Event");
 
+    NavivationKey key;
+    switch( ev.nav.query )
+    {
+    case DEMUX_NAV_LEFT:     key = NavivationKey::LEFT;
+    case DEMUX_NAV_RIGHT:    key = NavivationKey::RIGHT;
+    case DEMUX_NAV_UP:       key = NavivationKey::UP;
+    case DEMUX_NAV_DOWN:     key = NavivationKey::DOWN;
+    case DEMUX_NAV_ACTIVATE: key = NavivationKey::OK;
+    default:                 return;
+    }
+
+    HandleKeyEvent( key );
+}
+
+void event_thread_t::HandleKeyEvent( NavivationKey key )
+{
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
     auto interpretor = p_sys->GetDVDInterpretor();
@@ -192,13 +208,13 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 
     const btni_t & button_ptr = pci.hli.btnit[i_curr_button-1];
 
-    switch( ev.nav.query )
+    switch( key )
     {
-    case DEMUX_NAV_LEFT: return ProcessNavAction( button_ptr.left, pci );
-    case DEMUX_NAV_RIGHT: return ProcessNavAction( button_ptr.right, pci );
-    case DEMUX_NAV_UP: return ProcessNavAction( button_ptr.up, pci );
-    case DEMUX_NAV_DOWN: return ProcessNavAction( button_ptr.down, pci );
-    case DEMUX_NAV_ACTIVATE:
+    case LEFT: return ProcessNavAction( button_ptr.left, pci );
+    case RIGHT: return ProcessNavAction( button_ptr.right, pci );
+    case UP: return ProcessNavAction( button_ptr.up, pci );
+    case DOWN: return ProcessNavAction( button_ptr.down, pci );
+    case OK:
         {
             vlc_mutex_unlock( &lock );
             vlc_mutex_lock( &p_sys->lock_demuxer );

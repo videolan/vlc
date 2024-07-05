@@ -45,6 +45,10 @@ public:
                                                    virtual_segment_c * & p_vsegment_found ) = 0;
 };
 
+enum NavivationKey {
+    LEFT, RIGHT, UP, DOWN, OK
+};
+
 class chapter_codec_cmds_c
 {
 public:
