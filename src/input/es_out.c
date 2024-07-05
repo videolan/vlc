@@ -1027,7 +1027,7 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
      *   PCR point.
      */
 
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true, update );
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, update );
 
     vlc_clock_main_Lock(p_sys->p_pgrm->clocks.main);
     /* Resetting the main_clock here will drop all points that were sent during

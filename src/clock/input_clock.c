@@ -132,10 +132,6 @@ struct input_clock_t
 
     bool          b_origin_changed;
 
-    /* External clock drift */
-    vlc_tick_t    i_external_clock;
-    bool          b_has_external_clock;
-
     /* Current modifiers */
     bool    b_paused;
     float   rate;
@@ -177,7 +173,6 @@ input_clock_t *input_clock_New( float rate )
     cl->b_has_reference = false;
     cl->b_origin_changed = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
-    cl->b_has_external_clock = false;
 
     cl->last = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
 
@@ -274,7 +269,6 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->b_has_reference = true;
         cl->ref = clock_point_Create( __MAX( CR_MEAN_PTS_GAP, i_ck_system ),
                                       i_ck_stream );
-        cl->b_has_external_clock = false;
     }
 
     /* Compute the drift between the stream clock and the system clock
@@ -333,7 +327,6 @@ void input_clock_Reset( input_clock_t *cl )
     cl->b_origin_changed = false;
     cl->ref = cl->last
         = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
-    cl->b_has_external_clock = false;
 
     if (cl->listener.cbs != NULL && cl->listener.cbs->reset != NULL)
         cl->listener.cbs->reset(cl->listener.opaque);
@@ -416,25 +409,12 @@ int input_clock_GetState( input_clock_t *cl,
     return VLC_SUCCESS;
 }
 
-void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tick_t i_system )
+void input_clock_ChangeSystemOrigin( input_clock_t *cl, vlc_tick_t i_system )
 {
     assert( cl->b_has_reference );
     cl->b_origin_changed = true;
 
-    vlc_tick_t i_offset;
-    if( b_absolute )
-    {
-        i_offset = i_system - cl->ref.system - ClockGetTsOffset( cl );
-    }
-    else
-    {
-        if( !cl->b_has_external_clock )
-        {
-            cl->b_has_external_clock = true;
-            cl->i_external_clock     = i_system;
-        }
-        i_offset = i_system - cl->i_external_clock;
-    }
+    vlc_tick_t i_offset = i_system - cl->ref.system - ClockGetTsOffset( cl );
 
     cl->ref.system += i_offset;
     cl->last.system += i_offset;

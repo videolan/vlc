@@ -134,10 +134,8 @@ void input_clock_ChangePause(input_clock_t *, bool b_paused, vlc_tick_t i_date);
 /**
  * This function allows rebasing the original system value date (a valid
  * reference point must have been set).
- * When using the absolute mode, it will create a discontinuity unless
- * called immediately after a input_clock_Update.
  */
-void input_clock_ChangeSystemOrigin(input_clock_t *, bool b_absolute, vlc_tick_t i_system);
+void input_clock_ChangeSystemOrigin(input_clock_t *, vlc_tick_t i_system);
 
 /**
  * This function returns the current rate.
