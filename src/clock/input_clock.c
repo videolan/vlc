@@ -130,6 +130,8 @@ struct input_clock_t
     clock_point_t ref;
     bool          b_has_reference;
 
+    bool          b_origin_changed;
+
     /* External clock drift */
     vlc_tick_t    i_external_clock;
     bool          b_has_external_clock;
@@ -173,6 +175,7 @@ input_clock_t *input_clock_New( float rate )
     cl->listener.opaque = NULL;
 
     cl->b_has_reference = false;
+    cl->b_origin_changed = false;
     cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
 
@@ -234,7 +237,8 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if (cl->last.stream != VLC_TICK_INVALID && cl->b_has_external_clock)
+    /* Don't check discontinuities if the origin has just been changed */
+    else if (cl->last.stream != VLC_TICK_INVALID && !cl->b_origin_changed)
     {
         assert(cl->last.system != VLC_TICK_INVALID);
 
@@ -258,6 +262,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
             b_reset_reference= true;
         }
     }
+    cl->b_origin_changed = false;
 
     /* */
     if( b_reset_reference )
@@ -325,6 +330,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 void input_clock_Reset( input_clock_t *cl )
 {
     cl->b_has_reference = false;
+    cl->b_origin_changed = false;
     cl->ref = cl->last
         = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
@@ -413,6 +419,8 @@ int input_clock_GetState( input_clock_t *cl,
 void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tick_t i_system )
 {
     assert( cl->b_has_reference );
+    cl->b_origin_changed = true;
+
     vlc_tick_t i_offset;
     if( b_absolute )
     {
