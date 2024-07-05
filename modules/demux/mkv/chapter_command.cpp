@@ -718,6 +718,32 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
     return (i_cell_num == i_cell_n);
 }
 
+void dvd_command_interpretor_c::SetPci(const pci_t *data)
+{
+    memcpy(&pci_packet, data, sizeof(pci_packet));
+
+#ifndef WORDS_BIGENDIAN
+    for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns &&
+            button < ARRAY_SIZE(pci_packet.hli.btnit); button++) {
+        btni_t & button_ptr = pci_packet.hli.btnit[button-1];
+        binary *p_data = (binary*) &button_ptr;
+
+        uint16_t i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
+        uint16_t i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
+        uint16_t i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
+        uint16_t i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
+        button_ptr.x_start = i_x_start;
+        button_ptr.x_end   = i_x_end;
+        button_ptr.y_start = i_y_start;
+        button_ptr.y_end   = i_y_end;
+
+    }
+    for ( uint8_t i = 0; i<3; i++ )
+        for ( uint8_t j = 0; j<2; j++ )
+            pci_packet.hli.btn_colit.btn_coli[i][j] = U32_AT( &pci_packet.hli.btn_colit.btn_coli[i][j] );
+#endif
+}
+
 const std::string matroska_script_interpretor_c::CMD_MS_GOTO_AND_PLAY = "GotoAndPlay";
 
 // see http://www.matroska.org/technical/specs/chapters/index.html#mscript

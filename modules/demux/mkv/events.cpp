@@ -38,7 +38,6 @@ event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
     vlc_mutex_init( &lock );
     vlc_cond_init( &wait );
     is_running = false;
-    memset(&pci_packet, 0, sizeof(pci_packet));
 }
 event_thread_t::~event_thread_t()
 {
@@ -47,33 +46,17 @@ event_thread_t::~event_thread_t()
 
 void event_thread_t::SetPci(const pci_t *data)
 {
+    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
     vlc_mutex_locker l(&lock);
 
     if(es_list.empty())
         return;
 
-    memcpy(&pci_packet, data, sizeof(pci_packet));
+    auto interpretor = p_sys->GetDVDInterpretor();
+    if (!interpretor)
+        return;
 
-#ifndef WORDS_BIGENDIAN
-    for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns &&
-            button < ARRAY_SIZE(pci_packet.hli.btnit); button++) {
-        btni_t & button_ptr = pci_packet.hli.btnit[button-1];
-        binary *p_data = (binary*) &button_ptr;
-
-        uint16_t i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
-        uint16_t i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
-        uint16_t i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
-        uint16_t i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
-        button_ptr.x_start = i_x_start;
-        button_ptr.x_end   = i_x_end;
-        button_ptr.y_start = i_y_start;
-        button_ptr.y_end   = i_y_end;
-
-    }
-    for ( uint8_t i = 0; i<3; i++ )
-        for ( uint8_t j = 0; j<2; j++ )
-            pci_packet.hli.btn_colit.btn_coli[i][j] = U32_AT( &pci_packet.hli.btn_colit.btn_coli[i][j] );
-#endif
+    interpretor->SetPci( data );
     if( !is_running )
     {
         b_abort = false;
@@ -196,12 +179,12 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     msg_Dbg( p_demux, "Handle Key Event");
 
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
-    const pci_t & pci = pci_packet;
 
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
         return;
 
+    const pci_t & pci = interpretor->GetPci();
     uint16_t i_curr_button = interpretor->GetSPRM( 0x88 );
 
     if( i_curr_button <= 0 || i_curr_button > pci.hli.hl_gi.btn_ns )
@@ -238,12 +221,11 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     int x = event.mouse.state_new.i_x;
     int y = event.mouse.state_new.i_y;
 
-    const pci_t & pci = pci_packet;
-
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
         return;
 
+    const pci_t & pci = interpretor->GetPci();
     if( vlc_mouse_HasPressed( &event.mouse.state_old, &event.mouse.state_new,
                               MOUSE_BUTTON_LEFT ) )
     {

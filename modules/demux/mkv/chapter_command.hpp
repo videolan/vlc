@@ -26,6 +26,7 @@
 
 #include <vlc_arrays.h>
 #include "mkv.hpp"
+#include "dvd_types.hpp"
 
 namespace mkv {
 
@@ -108,6 +109,12 @@ public:
     }
 
     bool Interpret( const binary * p_command, size_t i_size = 8 );
+
+    void SetPci(const pci_t *data);
+    const pci_t & GetPci() const
+    {
+        return pci_packet;
+    }
 
     uint16_t GetPRM( size_t index ) const
     {
@@ -198,6 +205,7 @@ protected:
     uint16_t       p_PRMs[256];
     struct vlc_logger *l;
     chapter_codec_vm & vm;
+    pci_t          pci_packet = {};
 
     // DVD command IDs
 

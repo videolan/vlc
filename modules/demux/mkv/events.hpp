@@ -121,7 +121,6 @@ private:
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_abort;
-    pci_t        pci_packet;
 
     typedef std::list<ESInfo> es_list_t;
     es_list_t es_list;
