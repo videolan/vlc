@@ -299,11 +299,7 @@ _##field##TextField.delegate = self
         return;
     }
 
-    [VLCLibraryImageCache thumbnailForInputItem:representedInputItem
-                                 withCompletion:^(NSImage * const image) {
-        self->_artwork = image;
-        self.representedInputItems = @[representedInputItem];
-    }];
+    self.representedInputItems = @[representedInputItem];
 }
 
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
@@ -317,14 +313,7 @@ _##field##TextField.delegate = self
     for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
         [inputItems addObject:mediaItem.inputItem];
     }
-
-    [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup 
-                                   withCompletion:^(NSImage * const image) {
-        // HACK: Input items retrieved via an audio group do not acquire an artwork URL.
-        // To show something in the information window, set the small artwork from the audio group.
-        self->_artwork = image;
-        self.representedInputItems = inputItems.copy;
-    }];
+    self.representedInputItems = inputItems.copy;
 }
 
 - (void)setRepresentedInputItems:(NSArray<VLCInputItem *> *)representedInputItems
@@ -333,8 +322,15 @@ _##field##TextField.delegate = self
         return;
     }
 
+    NSParameterAssert(representedInputItems.count > 0);
+
     _representedInputItems = representedInputItems;
-    [self updateRepresentation];
+
+    [VLCLibraryImageCache thumbnailForInputItem:self.representedInputItems.firstObject
+                                 withCompletion:^(NSImage * const image) {
+        self->_artwork = image;
+        [self updateRepresentation];
+    }];
 }
 
 - (void)mediaItemWasParsed:(NSNotification *)aNotification
