@@ -225,15 +225,10 @@
         _informationWindowController = [[VLCInformationWindowController alloc] init];
     }
 
-    const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItems.firstObject.item;
-    if (actualItem != nil) {
-        if ([actualItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class]) {
-            [_informationWindowController setRepresentedMediaLibraryAudioGroup:(VLCAbstractMediaLibraryAudioGroup *)actualItem];
-        } else {
-            [_informationWindowController setRepresentedInputItem:actualItem.firstMediaItem.inputItem];
-        }
+    if (self.representedItems != nil && self.representedItems.count > 0) {
+        [_informationWindowController setRepresentedMediaLibraryItems:self.representedItems];
     } else if (self.representedInputItems != nil && self.representedInputItems.count > 0) {
-        _informationWindowController.representedInputItem = self.representedInputItems.firstObject;
+        _informationWindowController.representedInputItems = self.representedInputItems;
     }
 
     [_informationWindowController toggleWindow:sender];
