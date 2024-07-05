@@ -33,6 +33,8 @@
 
 #include <list>
 
+struct vlc_spu_highlight_t;
+
 namespace mkv {
 
 struct demux_sys_t;
@@ -46,6 +48,7 @@ public:
     void SetPci(const pci_t *data);
     void ResetPci();
     int SendEventNav( int );
+    void SetHighlight( vlc_spu_highlight_t & spu_hl );
 
     bool AddES( es_out_id_t* es, int category );
     void DelES( es_out_id_t* es );

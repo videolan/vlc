@@ -308,14 +308,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
                     spu_hl.palette.palette[i][3] = i_alpha;
                 }
 
-                /* TODO: only control relevant SPU_ES given who fired the event */
-                for( es_list_t::iterator it = es_list.begin(); it != es_list.end(); ++it )
-                {
-                    if( it->category != SPU_ES )
-                        continue;
-
-                    es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, it->es, &spu_hl );
-                }
+                SetHighlight( spu_hl );
             }
             vlc_mutex_unlock( &p_sys->lock_demuxer );
             vlc_mutex_lock( &lock );
@@ -324,6 +317,18 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     else if( vlc_mouse_HasMoved( &event.mouse.state_old, &event.mouse.state_new ) )
     {
 //                dvdnav_mouse_select( NULL, pci, x, y );
+    }
+}
+
+void event_thread_t::SetHighlight( vlc_spu_highlight_t & spu_hl )
+{
+    /* TODO: only control relevant SPU_ES given who fired the event */
+    for( auto it : es_list )
+    {
+        if( it.category != SPU_ES )
+            continue;
+
+        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, it.es, &spu_hl );
     }
 }
 
