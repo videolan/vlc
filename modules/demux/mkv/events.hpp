@@ -133,6 +133,7 @@ private:
 
 private:
     void HandleKeyEvent( NavivationKey key );
+    void HandleMousePressed( unsigned x, unsigned y );
 };
 } // namespace
 
