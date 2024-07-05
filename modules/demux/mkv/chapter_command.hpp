@@ -121,11 +121,7 @@ public:
     void HandleMousePressed( unsigned x, unsigned y );
 
     void SetPci(const pci_t *data);
-    const pci_t & GetPci() const
-    {
-        return pci_packet;
-    }
-
+protected:
     uint16_t GetPRM( size_t index ) const
     {
         if ( index < 256 )
@@ -180,7 +176,6 @@ public:
 
     void ProcessNavAction( uint16_t button );
 
-protected:
     std::string GetRegTypeName( bool b_value, uint16_t value ) const
     {
         std::string result;
