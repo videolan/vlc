@@ -245,8 +245,12 @@ _##field##TextField.delegate = self
             menuItem.representedObject = inputItem;
             [choiceMenu addItem:menuItem];
         }
+        CGFloat senderHeight = 0;
+        if ([sender isKindOfClass:NSView.class]) {
+            senderHeight = ((NSView *)sender).frame.size.height;
+        }
         [choiceMenu popUpMenuPositioningItem:nil
-                                  atLocation:NSMakePoint(0, 0)
+                                  atLocation:NSMakePoint(0, senderHeight)
                                       inView:sender];
     }
 }
