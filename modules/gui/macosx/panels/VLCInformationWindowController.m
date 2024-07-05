@@ -228,9 +228,40 @@ _##field##TextField.delegate = self
 
 - (IBAction)copyMrl:(id)sender
 {
+    if (self.representedInputItems.count == 0) {
+        return;
+    } else if (self.representedInputItems.count == 1) {
+        NSPasteboard * const pasteboard = NSPasteboard.generalPasteboard;
+        [pasteboard clearContents];
+        [pasteboard setString:self.representedInputItems.firstObject.MRL
+                      forType:NSPasteboardTypeString];
+    } else {
+        NSMenu * const choiceMenu = [[NSMenu alloc] initWithTitle:@"Copy MRL"];
+        for (VLCInputItem * const inputItem in self.representedInputItems) {
+            NSMenuItem * const menuItem =
+                [[NSMenuItem alloc] initWithTitle:inputItem.title
+                                           action:@selector(copyMrlFromMenuItem:)
+                                    keyEquivalent:@""];
+            menuItem.representedObject = inputItem;
+            [choiceMenu addItem:menuItem];
+        }
+        [choiceMenu popUpMenuPositioningItem:nil
+                                  atLocation:NSMakePoint(0, 0)
+                                      inView:sender];
+    }
+}
+
+- (void)copyMrlFromMenuItem:(id)sender
+{
+    NSParameterAssert(sender);
+    NSParameterAssert([sender isKindOfClass:NSMenuItem.class]);
+    NSMenuItem * const menuItem = (NSMenuItem *)sender;
+    NSParameterAssert(menuItem.representedObject);
+    NSParameterAssert([menuItem.representedObject isKindOfClass:VLCInputItem.class]);
+    VLCInputItem * const inputItem = (VLCInputItem *)menuItem.representedObject;
     NSPasteboard * const pasteboard = NSPasteboard.generalPasteboard;
     [pasteboard clearContents];
-    [pasteboard setString:self.representedInputItems.firstObject.MRL forType:NSPasteboardTypeString];
+    [pasteboard setString:inputItem.MRL forType:NSPasteboardTypeString];
 }
 
 - (void)initMediaPanelStats
