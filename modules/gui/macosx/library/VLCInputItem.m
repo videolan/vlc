@@ -138,6 +138,7 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
     FREENULL(psz_title);
     return returnValue;
 }
+
 -(void)setTitle:(NSString *)title
 {
     if (_vlcInputItem) {

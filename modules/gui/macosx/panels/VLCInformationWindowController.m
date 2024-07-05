@@ -523,7 +523,9 @@ settingsChanged = settingsChanged || _##field##TextField.settingChanged;
 SET_INPUTITEM_PROP(field, field)                \
 
     for (VLCInputItem * const inputItem in inputItems) {
-        SET_INPUTITEM_PROP(title, name); // Input items do not have a title field
+        // We do not have a textfield for names; set the contents of the title field to the input
+        // item's name
+        SET_INPUTITEM_PROP(title, name);
         PERFORM_ACTION_READWRITE_TEXTFIELDS(SET_INPUTITEM_MATCHING_PROP);
 
         if (_newArtworkURL != nil) { // Artwork urls require their own handling
