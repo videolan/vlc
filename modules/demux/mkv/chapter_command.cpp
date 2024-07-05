@@ -629,6 +629,31 @@ void dvd_command_interpretor_c::ProcessNavAction( uint16_t button )
     }
 }
 
+void dvd_command_interpretor_c::HandleKeyEvent( NavivationKey key )
+{
+    const pci_t & pci = pci_packet;
+    uint16_t i_curr_button = GetSPRM( 0x88 );
+
+    if( i_curr_button <= 0 || i_curr_button > pci.hli.hl_gi.btn_ns )
+        return;
+
+    const btni_t & button_ptr = pci.hli.btnit[i_curr_button-1];
+
+    switch( key )
+    {
+    case LEFT:  return ProcessNavAction( button_ptr.left );
+    case RIGHT: return ProcessNavAction( button_ptr.right );
+    case UP:    return ProcessNavAction( button_ptr.up );
+    case DOWN:  return ProcessNavAction( button_ptr.down );
+    case OK:
+        // process the button action
+        Interpret( button_ptr.cmd.bytes, 8 );
+        break;
+    default:
+        break;
+    }
+}
+
 void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
 {
     const pci_t & pci = pci_packet;

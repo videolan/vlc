@@ -117,6 +117,7 @@ public:
 
     bool Interpret( const binary * p_command, size_t i_size = 8 );
 
+    void HandleKeyEvent( NavivationKey );
     void HandleMousePressed( unsigned x, unsigned y );
 
     void SetPci(const pci_t *data);

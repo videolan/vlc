@@ -147,24 +147,6 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
-void event_thread_t::ProcessNavAction( uint16_t button )
-{
-    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
-
-    auto interpretor = p_sys->GetDVDInterpretor();
-    if (!interpretor)
-        return;
-
-    vlc_mutex_unlock( &lock );
-    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-    // process the button action
-    interpretor->ProcessNavAction( button );
-
-    vlc_mutex_unlock( &p_sys->lock_demuxer );
-    vlc_mutex_lock( &lock );
-}
-
 void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 {
     msg_Dbg( p_demux, "Handle Key Event");
@@ -191,35 +173,14 @@ void event_thread_t::HandleKeyEvent( NavivationKey key )
     if (!interpretor)
         return;
 
-    const pci_t & pci = interpretor->GetPci();
-    uint16_t i_curr_button = interpretor->GetSPRM( 0x88 );
+    vlc_mutex_unlock( &lock );
+    vlc_mutex_lock( &p_sys->lock_demuxer );
 
-    if( i_curr_button <= 0 || i_curr_button > pci.hli.hl_gi.btn_ns )
-        return;
+    // process the button action
+    interpretor->HandleKeyEvent( key );
 
-    const btni_t & button_ptr = pci.hli.btnit[i_curr_button-1];
-
-    switch( key )
-    {
-    case LEFT: return ProcessNavAction( button_ptr.left );
-    case RIGHT: return ProcessNavAction( button_ptr.right );
-    case UP: return ProcessNavAction( button_ptr.up );
-    case DOWN: return ProcessNavAction( button_ptr.down );
-    case OK:
-        {
-            vlc_mutex_unlock( &lock );
-            vlc_mutex_lock( &p_sys->lock_demuxer );
-
-            // process the button action
-            interpretor->Interpret( button_ptr.cmd.bytes, 8 );
-
-            vlc_mutex_unlock( &p_sys->lock_demuxer );
-            vlc_mutex_lock( &lock );
-        }
-        break;
-    default:
-        break;
-    }
+    vlc_mutex_unlock( &p_sys->lock_demuxer );
+    vlc_mutex_lock( &lock );
 }
 
 void event_thread_t::HandleMouseEvent( EventInfo const& event )
