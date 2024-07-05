@@ -57,17 +57,17 @@ void event_thread_t::SetPci(const pci_t *data)
 #ifndef WORDS_BIGENDIAN
     for( uint8_t button = 1; button <= pci_packet.hli.hl_gi.btn_ns &&
             button < ARRAY_SIZE(pci_packet.hli.btnit); button++) {
-        btni_t *button_ptr = &(pci_packet.hli.btnit[button-1]);
-        binary *p_data = (binary*) button_ptr;
+        btni_t & button_ptr = pci_packet.hli.btnit[button-1];
+        binary *p_data = (binary*) &button_ptr;
 
         uint16_t i_x_start = ((p_data[0] & 0x3F) << 4 ) + ( p_data[1] >> 4 );
         uint16_t i_x_end   = ((p_data[1] & 0x03) << 8 ) + p_data[2];
         uint16_t i_y_start = ((p_data[3] & 0x3F) << 4 ) + ( p_data[4] >> 4 );
         uint16_t i_y_end   = ((p_data[4] & 0x03) << 8 ) + p_data[5];
-        button_ptr->x_start = i_x_start;
-        button_ptr->x_end   = i_x_end;
-        button_ptr->y_start = i_y_start;
-        button_ptr->y_end   = i_y_end;
+        button_ptr.x_start = i_x_start;
+        button_ptr.x_end   = i_x_end;
+        button_ptr.y_start = i_y_start;
+        button_ptr.y_end   = i_y_end;
 
     }
     for ( uint8_t i = 0; i<3; i++ )
@@ -165,11 +165,11 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
-void event_thread_t::ProcessNavAction( uint16_t button, pci_t* pci )
+void event_thread_t::ProcessNavAction( uint16_t button, const pci_t & pci )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
-    if( button <= 0 || button > pci->hli.hl_gi.btn_ns )
+    if( button <= 0 || button > pci.hli.hl_gi.btn_ns )
         return;
 
     auto interpretor = p_sys->GetDVDInterpretor();
@@ -177,7 +177,7 @@ void event_thread_t::ProcessNavAction( uint16_t button, pci_t* pci )
         return;
 
     interpretor->SetSPRM( 0x88, button );
-    btni_t button_ptr = pci->hli.btnit[button-1];
+    const btni_t & button_ptr = pci.hli.btnit[button-1];
     if ( button_ptr.auto_action_mode )
     {
         vlc_mutex_unlock( &lock );
@@ -196,7 +196,7 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     msg_Dbg( p_demux, "Handle Key Event");
 
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
-    pci_t *pci = &pci_packet;
+    const pci_t & pci = pci_packet;
 
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
@@ -204,10 +204,10 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 
     uint16_t i_curr_button = interpretor->GetSPRM( 0x88 );
 
-    if( i_curr_button <= 0 || i_curr_button > pci->hli.hl_gi.btn_ns )
+    if( i_curr_button <= 0 || i_curr_button > pci.hli.hl_gi.btn_ns )
         return;
 
-    btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+    const btni_t & button_ptr = pci.hli.btnit[i_curr_button-1];
 
     switch( ev.nav.query )
     {
@@ -238,7 +238,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     int x = event.mouse.state_new.i_x;
     int y = event.mouse.state_new.i_y;
 
-    pci_t *pci = &pci_packet;
+    const pci_t & pci = pci_packet;
 
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
@@ -256,17 +256,17 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
         // get current button
         best = 0;
         dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-        for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++)
+        for(button = 1; button <= pci.hli.hl_gi.btn_ns; button++)
         {
-            btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+            const btni_t & button_ptr = pci.hli.btnit[button-1];
 
-            if(((unsigned)x >= button_ptr->x_start)
-             && ((unsigned)x <= button_ptr->x_end)
-             && ((unsigned)y >= button_ptr->y_start)
-             && ((unsigned)y <= button_ptr->y_end))
+            if(((unsigned)x >= button_ptr.x_start)
+             && ((unsigned)x <= button_ptr.x_end)
+             && ((unsigned)y >= button_ptr.y_start)
+             && ((unsigned)y <= button_ptr.y_end))
             {
-                mx = (button_ptr->x_start + button_ptr->x_end)/2;
-                my = (button_ptr->y_start + button_ptr->y_end)/2;
+                mx = (button_ptr.x_start + button_ptr.x_end)/2;
+                my = (button_ptr.y_start + button_ptr.y_end)/2;
                 dx = mx - x;
                 dy = my - y;
                 d = (dx*dx) + (dy*dy);
@@ -281,7 +281,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
 
         if ( best != 0)
         {
-            btni_t button_ptr = pci->hli.btnit[best-1];
+            const btni_t & button_ptr = pci.hli.btnit[best-1];
             uint16_t i_curr_button = interpretor->GetSPRM( 0x88 );
 
             msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
@@ -309,7 +309,7 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
                 uint32_t i_palette;
 
                 if(button_ptr.btn_coln != 0) {
-                    i_palette = pci->hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
+                    i_palette = pci.hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
                 } else {
                     i_palette = 0;
                 }
