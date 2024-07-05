@@ -29,6 +29,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 #import "main/VLCMain.h"
 
@@ -312,6 +313,18 @@ _##field##TextField.delegate = self
     NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
     for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
         [inputItems addObject:mediaItem.inputItem];
+    }
+    self.representedInputItems = inputItems.copy;
+}
+
+- (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems
+{
+    NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
+    for (VLCLibraryRepresentedItem * const representedItem in representedMediaLibraryItems) {
+        NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = representedItem.item.mediaItems;
+        for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
+            [inputItems addObject:mediaItem.inputItem];
+        }
     }
     self.representedInputItems = inputItems.copy;
 }

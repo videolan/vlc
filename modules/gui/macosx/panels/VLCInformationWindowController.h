@@ -25,6 +25,7 @@
 
 @class VLCInputItem;
 @class VLCImageView;
+@class VLCLibraryRepresentedItem;
 @class VLCSettingTextField;
 @protocol VLCMediaLibraryAudioGroupProtocol;
 
@@ -119,5 +120,6 @@
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup;
+- (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems;
 
 @end
