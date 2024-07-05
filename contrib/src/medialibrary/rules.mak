@@ -16,6 +16,12 @@ $(TARBALLS)/medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2:
 medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 	$(UNPACK)
 	$(APPLY) $(SRC)/medialibrary/Fix-CacheWorker.patch
+	$(APPLY) $(SRC)/medialibrary/0002-win32-DeviceLister-don-t-use-wchar_t-string-if-they-.patch
+	$(APPLY) $(SRC)/medialibrary/0003-utils-Directory-don-t-use-wchar_t-string-if-they-are.patch
+	$(APPLY) $(SRC)/medialibrary/0004-test-common-don-t-use-wchar_t-string-if-they-are-NUL.patch
+	$(APPLY) $(SRC)/medialibrary/0005-LockFile-don-t-use-char-string-if-they-are-NULL.patch
+	$(APPLY) $(SRC)/medialibrary/0006-fs-Directory-don-t-use-char-string-if-they-are-NULL.patch
+	$(APPLY) $(SRC)/medialibrary/0007-utils-Directory-don-t-use-char-string-if-they-are-NU.patch
 	$(MOVE)
 
 .medialibrary: medialibrary crossfile.meson

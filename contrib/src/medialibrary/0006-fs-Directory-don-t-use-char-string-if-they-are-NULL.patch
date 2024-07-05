@@ -1,0 +1,28 @@
+From 154cccbef7e6be13f9f57d9eeef5eabfb5182a6a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 28 Jun 2024 08:17:58 +0200
+Subject: [PATCH 6/7] fs: Directory: don't use char string if they are NULL
+
+---
+ src/filesystem/libvlc/Directory.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/filesystem/libvlc/Directory.cpp b/src/filesystem/libvlc/Directory.cpp
+index 17594ab7..b08813c5 100644
+--- a/src/filesystem/libvlc/Directory.cpp
++++ b/src/filesystem/libvlc/Directory.cpp
+@@ -174,8 +174,10 @@ void Directory::addFile( std::string mrl, fs::IFile::LinkedFileType linkedType,
+ 
+ #ifdef _WIN32
+         /* We can't use _wstat here, see #323 */
++        auto wpath = charset::ToWide( path.c_str() );
+         WIN32_FILE_ATTRIBUTE_DATA attributes;
+-        if ( GetFileAttributesExW( charset::ToWide( path.c_str() ).get(),
++        if ( !wpath ||
++             GetFileAttributesExW( wpath.get(),
+                                    GetFileExInfoStandard, &attributes ) == 0 )
+         {
+             LOG_ERROR( "Failed to get ", path, " attributes" );
+-- 
+2.45.0.windows.1
+

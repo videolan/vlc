@@ -1,0 +1,25 @@
+From 19b3e069d3485f5bccc2712d9f96da1628800a22 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 28 Jun 2024 08:00:31 +0200
+Subject: [PATCH 4/7] test: common: don't use wchar_t string if they are NULL
+
+---
+ test/common/util.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/test/common/util.h b/test/common/util.h
+index d0ff02ce..79d92fe0 100644
+--- a/test/common/util.h
++++ b/test/common/util.h
+@@ -36,6 +36,8 @@ static inline std::string getTempDir()
+     WCHAR path[MAX_PATH];
+     GetTempPathW( MAX_PATH, path );
+     auto utf8 = medialibrary::charset::FromWide( path );
++    if ( !utf8 )
++        return {};
+     return utf8.get();
+ #else
+     return "/tmp/";
+-- 
+2.45.0.windows.1
+

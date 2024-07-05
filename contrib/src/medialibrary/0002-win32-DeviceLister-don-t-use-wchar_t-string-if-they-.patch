@@ -1,0 +1,57 @@
+From af536d9421c471b386c1e2f308cc515679f8e26a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 28 Jun 2024 07:59:28 +0200
+Subject: [PATCH 2/7] win32: DeviceLister: don't use wchar_t string if they are
+ NULL
+
+---
+ src/filesystem/win32/DeviceLister.cpp | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/src/filesystem/win32/DeviceLister.cpp b/src/filesystem/win32/DeviceLister.cpp
+index 1f8c2a13..f784190c 100644
+--- a/src/filesystem/win32/DeviceLister.cpp
++++ b/src/filesystem/win32/DeviceLister.cpp
+@@ -74,8 +74,13 @@ std::vector<CommonDeviceLister::Device> DeviceLister::networkDevices() const
+             ss << "WNetEnumResource error: #" << GetLastError();
+             throw fs::errors::DeviceListing{ ss.str() };
+         }
+-        std::string mountpoint = charset::FromWide( netResources->lpLocalName ).get();
+-        std::string uuid = charset::FromWide( netResources->lpRemoteName ).get();
++        auto utf8_local = charset::FromWide( netResources->lpLocalName );
++        auto utf8_remote = charset::FromWide( netResources->lpRemoteName );
++        if ( !utf8_local || !utf8_remote )
++            continue;
++
++        std::string mountpoint = utf8_local.get();
++        std::string uuid = utf8_remote.get();
+         devs.emplace_back( std::move( uuid ),
+             std::vector<std::string>{ utils::file::toMrl( mountpoint ) }, true );
+     } while ( true );
+@@ -118,7 +123,10 @@ std::vector<CommonDeviceLister::Device> DeviceLister::localDevices() const
+ 
+         if ( GetVolumePathNamesForVolumeName( volumeName, buffer, buffLength, &buffLength ) == 0 )
+             continue;
+-        std::string mountpoint = charset::FromWide( buffer ).get();
++        auto utf8_buffer = charset::FromWide( buffer );
++        if ( !utf8_buffer )
++            continue;
++        std::string mountpoint = utf8_buffer.get();
+ 
+         // Filter out anything which isn't a removable or fixed drive. We don't care about network
+         // drive here.
+@@ -126,7 +134,10 @@ std::vector<CommonDeviceLister::Device> DeviceLister::localDevices() const
+         if ( type != DRIVE_REMOVABLE && type != DRIVE_FIXED && type != DRIVE_REMOTE )
+             continue;
+ 
+-        std::string uuid =  charset::FromWide( volumeName ).get();
++        auto utf8_volume = charset::FromWide( volumeName );
++        if ( !utf8_volume )
++            continue;
++        std::string uuid =  utf8_volume.get();
+ 
+         LOG_INFO( "Discovered device ", uuid, "; mounted on ", mountpoint, "; removable: ",
+                   type == DRIVE_REMOVABLE ? "yes" : "no" );
+-- 
+2.45.0.windows.1
+

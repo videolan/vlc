@@ -1,0 +1,38 @@
+From 9245cc70cbae11d2a5d1d97c9e5f4a5a921119f3 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 28 Jun 2024 08:00:14 +0200
+Subject: [PATCH 3/7] utils: Directory: don't use wchar_t string if they are
+ NULL
+
+---
+ src/utils/Directory.cpp | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/utils/Directory.cpp b/src/utils/Directory.cpp
+index a5c3684f..463b0c26 100644
+--- a/src/utils/Directory.cpp
++++ b/src/utils/Directory.cpp
+@@ -104,6 +104,11 @@ std::string toAbsolute( const std::string& path )
+         throw errors::System{ GetLastError(), "Failed to convert to absolute path" };
+     }
+     auto upath = charset::FromWide( buff );
++    if ( !upath )
++    {
++        LOG_ERROR( "Failed to convert ", path, " to UTF8" );
++        throw errors::System{ GetLastError(), "Failed to convert to UTF8" };
++    }
+     return file::toFolderPath( upath.get() );
+ #endif
+ }
+@@ -209,6 +214,8 @@ bool rmdir( std::string path )
+     do
+     {
+         auto file = charset::FromWide( f.cFileName );
++        if ( !file )
++            continue;
+         if ( strcmp( file.get(), "." ) == 0 ||
+              strcmp( file.get(), ".." ) == 0 )
+             continue;
+-- 
+2.45.0.windows.1
+

@@ -1,0 +1,26 @@
+From fce5e4d3a7d9cc199dcc530b6f2d2dae0a544aa7 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 28 Jun 2024 08:17:23 +0200
+Subject: [PATCH 5/7] LockFile: don't use char string if they are NULL
+
+---
+ src/LockFile.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/LockFile.cpp b/src/LockFile.cpp
+index acd65502..75f224dc 100644
+--- a/src/LockFile.cpp
++++ b/src/LockFile.cpp
+@@ -50,6 +50,9 @@ std::unique_ptr<LockFile> LockFile::lock( const std::string& mlFolderPath )
+     Handle handle;
+ #ifdef _WIN32
+     auto wide = charset::ToWide( lockFile.c_str() );
++    if ( !wide )
++        handle = INVALID_HANDLE_VALUE;
++    else
+ # if _WIN32_WINNT >= 0x0602 /* _WIN32_WINNT_WIN8 */
+     handle = CreateFile2(wide.get(), GENERIC_WRITE, 0, CREATE_ALWAYS, NULL);
+ # else
+-- 
+2.45.0.windows.1
+
