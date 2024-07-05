@@ -177,6 +177,8 @@ public:
         return false;
     }
 
+    void ProcessNavAction( uint16_t button );
+
 protected:
     std::string GetRegTypeName( bool b_value, uint16_t value ) const
     {

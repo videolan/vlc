@@ -613,6 +613,22 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     return f_result;
 }
 
+void dvd_command_interpretor_c::ProcessNavAction( uint16_t button )
+{
+    const pci_t & pci = pci_packet;
+
+    if( button <= 0 || button > pci.hli.hl_gi.btn_ns )
+        return;
+
+    SetSPRM( 0x88, button );
+    const btni_t & button_ptr = pci.hli.btnit[button-1];
+    if ( button_ptr.auto_action_mode )
+    {
+        // process the button action
+        Interpret( button_ptr.cmd.bytes, 8 );
+    }
+}
+
 void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
 {
     const pci_t & pci = pci_packet;
