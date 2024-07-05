@@ -293,28 +293,27 @@ _##field##TextField.delegate = self
     [_lostAudioBuffersTextField setIntValue: 0];
 }
 
-- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
-{
-    if (representedInputItem == nil) {
-        self.representedInputItems = @[];
-        return;
-    }
-
-    self.representedInputItems = @[representedInputItem];
-}
-
 - (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
 {
     if (representedMediaLibraryAudioGroup == nil) {
         self.representedInputItems = @[];
         return;
     }
-
     NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
     for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
         [inputItems addObject:mediaItem.inputItem];
     }
-    self.representedInputItems = inputItems.copy;
+    
+    NSParameterAssert(inputItems.count > 0);
+    _representedInputItems = inputItems.copy;
+
+    // Sometimes artworks are applied at the library item level and not at the input item level.
+    // Hence we need to fetch the library item's thumbnail; we can'st just fetch the input item's.
+    [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup
+                                   withCompletion:^(NSImage * const image) {
+        self->_artwork = image;
+        [self updateRepresentation];
+    }];
 }
 
 - (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems
@@ -326,7 +325,27 @@ _##field##TextField.delegate = self
             [inputItems addObject:mediaItem.inputItem];
         }
     }
-    self.representedInputItems = inputItems.copy;
+
+    NSParameterAssert(inputItems.count > 0);
+    _representedInputItems = inputItems.copy;
+
+    // Sometimes artworks are applied at the library item level and not at the input item level.
+    // Hence we need to fetch the library item's thumbnail; we can'st just fetch the input item's.
+    [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryItems.firstObject.item
+                                   withCompletion:^(NSImage * const image) {
+        self->_artwork = image;
+        [self updateRepresentation];
+    }];
+}
+
+- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
+{
+    if (representedInputItem == nil) {
+        self.representedInputItems = @[];
+        return;
+    }
+
+    self.representedInputItems = @[representedInputItem];
 }
 
 - (void)setRepresentedInputItems:(NSArray<VLCInputItem *> *)representedInputItems
@@ -336,7 +355,6 @@ _##field##TextField.delegate = self
     }
 
     NSParameterAssert(representedInputItems.count > 0);
-
     _representedInputItems = representedInputItems;
 
     [VLCLibraryImageCache thumbnailForInputItem:self.representedInputItems.firstObject
