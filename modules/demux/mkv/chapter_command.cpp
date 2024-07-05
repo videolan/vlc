@@ -23,6 +23,7 @@
 
 #include "chapter_command.hpp"
 #include "demux.hpp"
+#include <vlc_subpicture.h> // vlc_spu_highlight_t
 #include <algorithm>
 
 namespace mkv {
@@ -612,7 +613,89 @@ bool dvd_command_interpretor_c::Interpret( const binary * p_command, size_t i_si
     return f_result;
 }
 
+void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
+{
+    const pci_t & pci = pci_packet;
 
+    int32_t button;
+    int32_t best,dist,d;
+    int32_t mx,my,dx,dy;
+
+    // get current button
+    best = 0;
+    dist = 0x08000000; /* >> than  (720*720)+(567*567); */
+    for(button = 1; button <= pci.hli.hl_gi.btn_ns; button++)
+    {
+        const btni_t & button_ptr = pci.hli.btnit[button-1];
+
+        if((x >= button_ptr.x_start)
+            && (x <= button_ptr.x_end)
+            && (y >= button_ptr.y_start)
+            && (y <= button_ptr.y_end))
+        {
+            mx = (button_ptr.x_start + button_ptr.x_end)/2;
+            my = (button_ptr.y_start + button_ptr.y_end)/2;
+            dx = mx - x;
+            dy = my - y;
+            d = (dx*dx) + (dy*dy);
+            /* If the mouse is within the button and the mouse is closer
+            * to the center of this button then it is the best choice. */
+            if(d < dist) {
+                dist = d;
+                best = button;
+            }
+        }
+    }
+
+    if ( best != 0)
+    {
+        const btni_t & button_ptr = pci.hli.btnit[best-1];
+        uint16_t i_curr_button = GetSPRM( 0x88 );
+
+        vlc_debug( l, "Clicked button %d", best );
+
+        // process the button action
+        SetSPRM( 0x88, best );
+        Interpret( button_ptr.cmd.bytes, 8 );
+
+        vlc_debug( l, "Processed button %d", best );
+
+        // select new button
+        if ( best != i_curr_button )
+        {
+            // TODO: make sure we do not overflow in the conversion
+            vlc_spu_highlight_t spu_hl = vlc_spu_highlight_t();
+
+            spu_hl.x_start = (int)button_ptr.x_start;
+            spu_hl.y_start = (int)button_ptr.y_start;
+
+            spu_hl.x_end = (int)button_ptr.x_end;
+            spu_hl.y_end = (int)button_ptr.y_end;
+
+            uint32_t i_palette;
+
+            if(button_ptr.btn_coln != 0) {
+                i_palette = pci.hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
+            } else {
+                i_palette = 0;
+            }
+
+            for( int i = 0; i < 4; i++ )
+            {
+                uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
+                uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
+                i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
+
+                spu_hl.palette.palette[i][0] = (i_yuv >> 16) & 0xff;
+                spu_hl.palette.palette[i][1] = (i_yuv >> 0) & 0xff;
+                spu_hl.palette.palette[i][2] = (i_yuv >> 8) & 0xff;
+                spu_hl.palette.palette[i][3] = i_alpha;
+            }
+
+            vm.SetHighlight( spu_hl );
+        }
+    }
+}
 
 bool dvd_command_interpretor_c::MatchIsDomain( const chapter_codec_cmds_c &data )
 {

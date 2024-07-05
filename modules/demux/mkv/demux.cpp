@@ -351,4 +351,9 @@ virtual_chapter_c *demux_sys_t::FindVChapter( chapter_uid i_find_uid, virtual_se
     return p_result;
 }
 
+void demux_sys_t::SetHighlight( vlc_spu_highlight_t & spu_hl )
+{
+    ev.SetHighlight( spu_hl );
+}
+
 } // namespace

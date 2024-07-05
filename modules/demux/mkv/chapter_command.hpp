@@ -28,6 +28,8 @@
 #include "mkv.hpp"
 #include "dvd_types.hpp"
 
+struct vlc_spu_highlight_t;
+
 namespace mkv {
 
 class virtual_chapter_c;
@@ -43,6 +45,7 @@ public:
     virtual virtual_chapter_c *BrowseCodecPrivate( enum chapter_codec_id,
                                                    chapter_cmd_match match,
                                                    virtual_segment_c * & p_vsegment_found ) = 0;
+    virtual void SetHighlight( vlc_spu_highlight_t & ) = 0;
 };
 
 enum NavivationKey {
@@ -113,6 +116,8 @@ public:
     }
 
     bool Interpret( const binary * p_command, size_t i_size = 8 );
+
+    void HandleMousePressed( unsigned x, unsigned y );
 
     void SetPci(const pci_t *data);
     const pci_t & GetPci() const
