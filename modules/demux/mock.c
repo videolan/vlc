@@ -235,6 +235,7 @@ var_Read_float(const char *psz)
     X(can_record, bool, add_bool, Bool, true, NO_FREE) \
     X(error, bool, add_bool, Bool, false, NO_FREE) \
     X(pts_delay, vlc_tick_t, add_integer, Unsigned, DEFAULT_PTS_DELAY, NO_FREE) \
+    X(discontinuities, char *, add_string, String, NULL, FREE_CB) \
     X(config, char *, add_string, String, NULL, FREE_CB)
 
 #define DECLARE_OPTION(var_name, type, module_header_type, getter, default_value, free_cb) \
@@ -288,6 +289,13 @@ static_assert(offsetof(struct mock_video_options, add_track_at) ==
 static_assert(offsetof(struct mock_video_options, add_track_at) ==
               offsetof(struct mock_sub_options, add_track_at), "inconsistent offset");
 
+struct pcr_point
+{
+    vlc_tick_t oldpcr;
+    vlc_tick_t newpcr;
+};
+typedef struct VLC_VECTOR(struct pcr_point) pcr_point_vector;
+
 struct demux_sys
 {
     mock_track_vector tracks;
@@ -310,6 +318,9 @@ struct demux_sys
     struct mock_sub_options sub;
 
     char *art_url;
+
+    pcr_point_vector pcr_points;
+    size_t next_pcr_index;
 
     bool eof_requested;
 };
@@ -1201,6 +1212,16 @@ Demux(demux_t *demux)
     if (ret != VLC_SUCCESS)
         return VLC_DEMUXER_EGENERIC;
 
+    if (sys->pcr_points.size > sys->next_pcr_index)
+    {
+        const struct pcr_point *pt = &sys->pcr_points.data[sys->next_pcr_index];
+        if (sys->pts >= pt->oldpcr)
+        {
+            sys->audio_pts = sys->video_pts = sys->pts = pt->newpcr;
+            sys->next_pcr_index++;
+        }
+    }
+
     vlc_tick_t prev_pts = sys->pts;
     if (sys->audio_track_count > 0
      && (sys->video_track_count > 0 || sys->sub_track_count > 0))
@@ -1451,8 +1472,74 @@ Close(vlc_object_t *obj)
         DeleteTrack(demux, track);
     }
     vlc_vector_clear(&sys->tracks);
+    vlc_vector_clear(&sys->pcr_points);
 
     free(sys->art_url);
+}
+
+static int
+ParseDiscontinuities(demux_t *demux)
+{
+    /* the 'discontinuities' option is in the following format:
+     * "(oldpcr_1,newpcr_1)(oldpcr_2,newpcr_2)...(oldpcr_n,newpcr_n)"
+     *
+     * Example: "(1000000,5000000)(7000000,1000000)"
+     * After 1s, there will be a discontinuity to 5s
+     * 2s after the previous discontinuity, there will be an other one to 1s
+     * */
+    struct demux_sys *sys = demux->p_sys;
+    assert(sys->discontinuities != NULL);
+
+    size_t discontinuities_len = strlen(sys->discontinuities);
+    size_t pcr_count = 0;
+
+    for (size_t i = 0; i < discontinuities_len; ++i)
+        if (sys->discontinuities[i] == ',')
+            pcr_count++;
+
+    if (pcr_count == 0)
+    {
+        msg_Err(demux, "ParseDiscontinuities: 0 points parsed");
+        return VLC_EINVAL;
+    }
+
+    if (!vlc_vector_push_hole(&sys->pcr_points, pcr_count))
+        return VLC_ENOMEM;
+
+    char *savetpr;
+    size_t index = 0;
+    for (const char *str = strtok_r(sys->discontinuities, "(", &savetpr);
+         str != NULL; str = strtok_r(NULL, "(", &savetpr))
+    {
+        char *endptr;
+        long long oldpcrval = strtoll(str, &endptr, 10);
+        if (oldpcrval == LLONG_MIN || oldpcrval == LLONG_MAX || endptr == str
+         || *endptr != ',')
+        {
+            vlc_vector_clear(&sys->pcr_points);
+            msg_Err(demux, "ParseDiscontinuities: invalid first value: '%s' "
+                    "at index %zu", str, index);
+            return VLC_EINVAL;
+        }
+
+        str = endptr + 1;
+        long long newpcrval = strtoll(str, &endptr, 10);
+        if (newpcrval == LLONG_MIN || newpcrval == LLONG_MAX || endptr == str
+         || *endptr != ')')
+        {
+            vlc_vector_clear(&sys->pcr_points);
+            msg_Err(demux, "ParseDiscontinuities: invalid second value: '%s' "
+                    "at index %zu", str, index);
+            return VLC_EINVAL;
+        }
+
+        assert(index < pcr_count);
+        struct pcr_point *point = &sys->pcr_points.data[index++];
+        point->oldpcr = oldpcrval;
+        point->newpcr = newpcrval;
+    }
+
+    return VLC_SUCCESS;
 }
 
 static int
@@ -1470,6 +1557,8 @@ Open(vlc_object_t *obj)
     demux->p_sys = sys;
     sys->eof_requested = false;
     vlc_vector_init(&sys->tracks);
+    vlc_vector_init(&sys->pcr_points);
+    sys->next_pcr_index = 0;
 
     if (var_LocationParse(obj, demux->psz_location, "mock-") != VLC_SUCCESS)
         return VLC_ENOMEM;
@@ -1563,6 +1652,13 @@ Open(vlc_object_t *obj)
         for (int i=0; sys->config[i]; i++)
             if (sys->config[i] == '+')
                 sys->config[i] = ':';
+    }
+
+    if (sys->discontinuities != NULL)
+    {
+        ret = ParseDiscontinuities(demux);
+        if (ret != VLC_SUCCESS)
+            goto error;
     }
 
     /* Read per track config chain */
