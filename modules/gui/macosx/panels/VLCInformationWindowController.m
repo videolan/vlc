@@ -23,6 +23,7 @@
 
 #import "VLCInformationWindowController.h"
 
+#import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
@@ -330,28 +331,38 @@ _##field##TextField.delegate = self
     _representedInputItems = inputItems.copy;
 
     // TODO: What if the small artwork has not been generated yet?
-    NSString * const firstArtMRL = representedMediaLibraryItems.firstObject.item.smallArtworkMRL;
-    BOOL sameAlbum = YES;
+    NSMutableSet<NSString *> * const artworkMrlSet = NSMutableSet.set;
     for (VLCLibraryRepresentedItem * const item in representedMediaLibraryItems) {
         const id<VLCMediaLibraryItemProtocol> internalItem = item.item;
-        if (!internalItem.smallArtworkGenerated) {
+        if (!internalItem.smallArtworkGenerated || internalItem.smallArtworkMRL == nil) {
             continue;
         }
-        sameAlbum = [item.item.smallArtworkMRL isEqualToString:firstArtMRL];
-        if (!sameAlbum) {
-            break;
-        }
+        [artworkMrlSet addObject:internalItem.smallArtworkMRL];
     }
 
-    if (sameAlbum) {
-        // Sometimes artworks are applied at the library item level and not at the input item level.
-        // Hence we need to fetch the library item's thumbnail; we can't just fetch the input item's
-        [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryItems.firstObject.item
-                                       withCompletion:^(NSImage * const image) {
-            self->_artwork = image;
-            [self updateRepresentation];
-        }];
+    if (artworkMrlSet.count == 0) {
+        _artwork = [NSImage imageNamed:@"noart.png"];
+        [self updateRepresentation];
+        return;
     }
+
+    NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
+    for (NSString * const artworkMrl in artworkMrlSet) {
+        NSImage * const image = [VLCLibraryImageCache thumbnailAtMrl:artworkMrl];
+        if (!image) {
+            continue;
+        }
+        [artworkImages addObject:image];
+    }
+
+    const NSSize artworkSize = self.artworkImageButton.frame.size;
+    NSArray<NSValue *> * const frames =
+        [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
+                                                        size:artworkSize
+                                               gridItemCount:artworkImages.count];
+    _artwork = [NSImage compositeImageWithImages:artworkImages frames:frames size:artworkSize];
+
+    [self updateRepresentation];
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
