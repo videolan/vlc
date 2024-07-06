@@ -127,6 +127,8 @@ processcommands = function ()
         vlc.playlist.prev()
     elseif command == "pl_delete" then
         vlc.playlist.delete(id)
+    elseif command == "pl_move" then
+        vlc.playlist.move( id, val )
     elseif command == "pl_empty" then
         vlc.playlist.clear()
     elseif command == "pl_sort" then
