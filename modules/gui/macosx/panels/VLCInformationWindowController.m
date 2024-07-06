@@ -355,7 +355,11 @@ _##field##TextField.delegate = self
         [artworkImages addObject:image];
     }
 
-    const NSSize artworkSize = self.artworkImageButton.frame.size;
+
+    // Without an image set the button's size can be {{0, 0}, {0, 0}}
+    const CGFloat buttonHeight = self.artworkImageButton.frame.size.height;
+    const NSSize artworkSize =
+        buttonHeight == 0 ? NSMakeSize(256, 256) : NSMakeSize(buttonHeight, buttonHeight);
     NSArray<NSValue *> * const frames =
         [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
                                                         size:artworkSize
