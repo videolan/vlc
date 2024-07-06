@@ -161,9 +161,8 @@
                                                                size:(const NSSize)size
                                                       gridItemCount:(const NSUInteger)gridItemCount
 {
-    const float sqrtAxisItemCount = sqrt(gridItemCount);
+    const float sqrtAxisItemCount = ceil(sqrt(gridItemCount));
     const float roundAxisItemCount = roundf(sqrtAxisItemCount);
-    NSAssert(sqrtAxisItemCount == roundAxisItemCount, @"Provided grid item count should be an integer square root");
 
     // Default to just one item if there are not enough images
     const NSUInteger actualGridItemCount = images.count >= gridItemCount ? gridItemCount : 1;
