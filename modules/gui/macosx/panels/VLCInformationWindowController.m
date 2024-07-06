@@ -333,11 +333,13 @@ _##field##TextField.delegate = self
     // TODO: What if the small artwork has not been generated yet?
     NSMutableSet<NSString *> * const artworkMrlSet = NSMutableSet.set;
     for (VLCLibraryRepresentedItem * const item in representedMediaLibraryItems) {
-        const id<VLCMediaLibraryItemProtocol> internalItem = item.item;
-        if (!internalItem.smallArtworkGenerated || internalItem.smallArtworkMRL == nil) {
-            continue;
+        NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = item.item.mediaItems;
+        for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
+            NSString * const mediaItemArtworkMrl = mediaItem.smallArtworkMRL;
+            if (mediaItemArtworkMrl != nil) {
+                [artworkMrlSet addObject:mediaItemArtworkMrl];
+            }
         }
-        [artworkMrlSet addObject:internalItem.smallArtworkMRL];
     }
 
     if (artworkMrlSet.count == 0) {
