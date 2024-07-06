@@ -238,7 +238,7 @@ _##field##TextField.delegate = self
         [pasteboard setString:self.representedInputItems.firstObject.MRL
                       forType:NSPasteboardTypeString];
     } else {
-        NSMenu * const choiceMenu = [[NSMenu alloc] initWithTitle:@"Copy MRL"];
+        NSMenu * const choiceMenu = [[NSMenu alloc] initWithTitle:_NS("Copy MRL")];
         for (VLCInputItem * const inputItem in self.representedInputItems) {
             NSMenuItem * const menuItem =
                 [[NSMenuItem alloc] initWithTitle:inputItem.title
