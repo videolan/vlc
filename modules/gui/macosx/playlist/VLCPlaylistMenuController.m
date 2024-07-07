@@ -152,17 +152,19 @@
         _informationWindowController = [[VLCInformationWindowController alloc] init];
     }
 
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    NSMutableArray * const inputItems = NSMutableArray.array;
+    NSIndexSet * const selectedIndices = self.playlistTableView.selectedRowIndexes;
 
-    if (selectedRow == -1)
-        return;
+    [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
+        VLCPlaylistItem * const item =
+            [self->_playlistController.playlistModel playlistItemAtIndex:idx];
+        if (item == nil) {
+            return;
+        }
+        [inputItems addObject:item.inputItem];
+    }];
 
-    VLCPlaylistItem *playlistItem = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
-    if (playlistItem == nil)
-        return;
-
-    _informationWindowController.representedInputItems = @[playlistItem.inputItem];
-
+    _informationWindowController.representedInputItems = inputItems.copy;
     [_informationWindowController toggleWindow:sender];
 }
 
