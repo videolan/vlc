@@ -309,7 +309,7 @@ _##field##TextField.delegate = self
 
     NSMutableSet * const artworkMrlSet = NSMutableSet.set;
 
-    const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_imageretrieval_queue", 0);
+    const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_libraryitemimg_queue", 0);
     dispatch_async(queue, ^{
         NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
         dispatch_group_t group = dispatch_group_create();
@@ -372,11 +372,46 @@ _##field##TextField.delegate = self
     NSParameterAssert(representedInputItems.count > 0);
     _representedInputItems = representedInputItems;
 
-    [VLCLibraryImageCache thumbnailForInputItem:self.representedInputItems.firstObject
-                                 withCompletion:^(NSImage * const image) {
-        self->_artwork = image;
+    const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_inputitemimg_queue", 0);
+    dispatch_async(queue, ^{
+        NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
+        dispatch_group_t group = dispatch_group_create();
+
+        for (VLCInputItem * const item in representedInputItems) {
+            @synchronized (artworkImages) {
+                dispatch_group_enter(group);
+                [VLCLibraryImageCache thumbnailForInputItem:item
+                                             withCompletion:^(NSImage * const image) {
+                    if (image) {
+                        [artworkImages addObject:image];
+                    }
+                    dispatch_group_leave(group);
+                }];
+            }
+        }
+
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+        if (artworkImages.count == 0) {
+            _artwork = [NSImage imageNamed:@"noart.png"];
+            [self updateRepresentation];
+            return;
+        }
+
+        // Without an image set the button's size can be {{0, 0}, {0, 0}}
+        const CGFloat buttonHeight = self.artworkImageButton.frame.size.height;
+        const NSSize artworkSize =
+            buttonHeight == 0 ? NSMakeSize(256, 256) : NSMakeSize(buttonHeight, buttonHeight);
+        NSArray<NSValue *> * const frames =
+            [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
+                                                            size:artworkSize
+                                                   gridItemCount:artworkImages.count];
+        _artwork = [NSImage compositeImageWithImages:artworkImages
+                                              frames:frames
+                                                size:artworkSize];
+
         [self updateRepresentation];
-    }];
+    });
 }
 
 - (void)mediaItemWasParsed:(NSNotification *)aNotification
