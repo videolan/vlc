@@ -341,20 +341,24 @@ _##field##TextField.delegate = self
             NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = item.item.mediaItems;
 
             for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
-                NSString * const itemArtworkMrl = mediaItem.smallArtworkMRL;
-                if ([artworkMrlSet containsObject:itemArtworkMrl]) {
-                    continue;
-                }
-                [artworkMrlSet addObject:itemArtworkMrl];
-
-                dispatch_group_enter(group);
-                [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
-                                               withCompletion:^(NSImage * const image) {
-                    if (image) {
-                        [artworkImages addObject:image];
+                @synchronized (artworkMrlSet) {
+                    NSString * const itemArtworkMrl = mediaItem.smallArtworkMRL;
+                    if ([artworkMrlSet containsObject:itemArtworkMrl]) {
+                        continue;
                     }
-                    dispatch_group_leave(group);
-                }];
+                    [artworkMrlSet addObject:itemArtworkMrl];
+                }
+
+                @synchronized (artworkImages) {
+                    dispatch_group_enter(group);
+                    [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
+                                                   withCompletion:^(NSImage * const image) {
+                        if (image) {
+                            [artworkImages addObject:image];
+                        }
+                        dispatch_group_leave(group);
+                    }];
+                }
             }
         }
 
