@@ -74,11 +74,20 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
+#if FF_API_AVIO_WRITE_NONCONST
 static int IOWrite( void *opaque, uint8_t *buf, int buf_size );
+#else
+static int IOWrite( void *opaque, const uint8_t *buf, int buf_size );
+#endif
 static int64_t IOSeek( void *opaque, int64_t offset, int whence );
 #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+# if FF_API_AVIO_WRITE_NONCONST
 static int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
                               enum AVIODataMarkerType type, int64_t time);
+# else
+int IOWriteTyped(void *opaque, const uint8_t *buf, int buf_size,
+                 enum AVIODataMarkerType type, int64_t time);
+# endif
 #endif
 
 /*****************************************************************************
@@ -411,8 +420,13 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 }
 
 #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+# if FF_API_AVIO_WRITE_NONCONST
 int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
                               enum AVIODataMarkerType type, int64_t time)
+# else
+int IOWriteTyped(void *opaque, const uint8_t *buf, int buf_size,
+                 enum AVIODataMarkerType type, int64_t time)
+# endif
 {
     VLC_UNUSED(time);
 
@@ -512,7 +526,11 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 /*****************************************************************************
  * I/O wrappers for libavformat
  *****************************************************************************/
+#if FF_API_AVIO_WRITE_NONCONST
 static int IOWrite( void *opaque, uint8_t *buf, int buf_size )
+#else
+static int IOWrite( void *opaque, const uint8_t *buf, int buf_size )
+#endif
 {
     sout_mux_t *p_mux = opaque;
     sout_mux_sys_t *p_sys = p_mux->p_sys;

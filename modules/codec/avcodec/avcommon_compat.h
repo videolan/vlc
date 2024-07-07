@@ -77,6 +77,9 @@
 #ifndef  FF_MAX_B_FRAMES
 # define  FF_MAX_B_FRAMES 16 // FIXME: remove this
 #endif
+#ifndef FF_API_AVIO_WRITE_NONCONST // removed in ffmpeg 7
+# define FF_API_AVIO_WRITE_NONCONST (LIBAVFORMAT_VERSION_MAJOR < 61)
+#endif
 
 #endif /* HAVE_LIBAVCODEC_AVCODEC_H */
 
