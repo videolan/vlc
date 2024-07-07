@@ -294,29 +294,6 @@ _##field##TextField.delegate = self
     [_lostAudioBuffersTextField setIntValue: 0];
 }
 
-- (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup
-{
-    if (representedMediaLibraryAudioGroup == nil) {
-        self.representedInputItems = @[];
-        return;
-    }
-    NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;
-    for (VLCMediaLibraryMediaItem * const mediaItem in representedMediaLibraryAudioGroup.mediaItems) {
-        [inputItems addObject:mediaItem.inputItem];
-    }
-    
-    NSParameterAssert(inputItems.count > 0);
-    _representedInputItems = inputItems.copy;
-
-    // Sometimes artworks are applied at the library item level and not at the input item level.
-    // Hence we need to fetch the library item's thumbnail; we can't just fetch the input item's.
-    [VLCLibraryImageCache thumbnailForLibraryItem:representedMediaLibraryAudioGroup
-                                   withCompletion:^(NSImage * const image) {
-        self->_artwork = image;
-        [self updateRepresentation];
-    }];
-}
-
 - (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems
 {
     NSMutableArray<VLCInputItem *> * const inputItems = NSMutableArray.array;

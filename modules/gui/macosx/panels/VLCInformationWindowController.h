@@ -119,7 +119,6 @@
 - (IBAction)chooseArtwork:(id)sender;
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;
-- (void)setRepresentedMediaLibraryAudioGroup:(id<VLCMediaLibraryAudioGroupProtocol>)representedMediaLibraryAudioGroup;
 - (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems;
 
 @end
