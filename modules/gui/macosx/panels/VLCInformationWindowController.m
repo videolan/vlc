@@ -482,7 +482,9 @@ _##field##TextField.delegate = self
     _artworkImageButton.image = _artwork;
 
     if (!_mainMenuInstance) {
-        [self.window setTitle:inputItem.title];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.window.title = inputItem.title;
+        });
     }
 }
 
