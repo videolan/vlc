@@ -330,45 +330,56 @@ _##field##TextField.delegate = self
     NSParameterAssert(inputItems.count > 0);
     _representedInputItems = inputItems.copy;
 
-    // TODO: What if the small artwork has not been generated yet?
-    NSMutableSet<NSString *> * const artworkMrlSet = NSMutableSet.set;
-    for (VLCLibraryRepresentedItem * const item in representedMediaLibraryItems) {
-        NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = item.item.mediaItems;
-        for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
-            NSString * const mediaItemArtworkMrl = mediaItem.smallArtworkMRL;
-            if (mediaItemArtworkMrl != nil) {
-                [artworkMrlSet addObject:mediaItemArtworkMrl];
+    NSMutableSet * const artworkMrlSet = NSMutableSet.set;
+
+    const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_imageretrieval_queue", 0);
+    dispatch_async(queue, ^{
+        NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
+        dispatch_group_t group = dispatch_group_create();
+
+        for (VLCLibraryRepresentedItem * const item in representedMediaLibraryItems) {
+            NSArray<VLCMediaLibraryMediaItem *> * const mediaItems = item.item.mediaItems;
+
+            for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
+                NSString * const itemArtworkMrl = mediaItem.smallArtworkMRL;
+                if ([artworkMrlSet containsObject:itemArtworkMrl]) {
+                    continue;
+                }
+                [artworkMrlSet addObject:itemArtworkMrl];
+
+                dispatch_group_enter(group);
+                [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
+                                               withCompletion:^(NSImage * const image) {
+                    if (image) {
+                        [artworkImages addObject:image];
+                    }
+                    dispatch_group_leave(group);
+                }];
             }
         }
-    }
 
-    if (artworkMrlSet.count == 0) {
-        _artwork = [NSImage imageNamed:@"noart.png"];
-        [self updateRepresentation];
-        return;
-    }
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
-    NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
-    for (NSString * const artworkMrl in artworkMrlSet) {
-        NSImage * const image = [VLCLibraryImageCache thumbnailAtMrl:artworkMrl];
-        if (!image) {
-            continue;
+        if (artworkImages.count == 0) {
+            _artwork = [NSImage imageNamed:@"noart.png"];
+            [self updateRepresentation];
+            return;
         }
-        [artworkImages addObject:image];
-    }
 
+        // Without an image set the button's size can be {{0, 0}, {0, 0}}
+        const CGFloat buttonHeight = self.artworkImageButton.frame.size.height;
+        const NSSize artworkSize =
+            buttonHeight == 0 ? NSMakeSize(256, 256) : NSMakeSize(buttonHeight, buttonHeight);
+        NSArray<NSValue *> * const frames =
+            [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
+                                                            size:artworkSize
+                                                   gridItemCount:artworkImages.count];
+        _artwork = [NSImage compositeImageWithImages:artworkImages
+                                              frames:frames
+                                                size:artworkSize];
 
-    // Without an image set the button's size can be {{0, 0}, {0, 0}}
-    const CGFloat buttonHeight = self.artworkImageButton.frame.size.height;
-    const NSSize artworkSize =
-        buttonHeight == 0 ? NSMakeSize(256, 256) : NSMakeSize(buttonHeight, buttonHeight);
-    NSArray<NSValue *> * const frames =
-        [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
-                                                        size:artworkSize
-                                               gridItemCount:artworkImages.count];
-    _artwork = [NSImage compositeImageWithImages:artworkImages frames:frames size:artworkSize];
-
-    [self updateRepresentation];
+        [self updateRepresentation];
+    });
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
