@@ -161,7 +161,7 @@
     if (playlistItem == nil)
         return;
 
-    _informationWindowController.representedInputItem = playlistItem.inputItem;
+    _informationWindowController.representedInputItems = @[playlistItem.inputItem];
 
     [_informationWindowController toggleWindow:sender];
 }

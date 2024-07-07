@@ -363,16 +363,6 @@ _##field##TextField.delegate = self
     });
 }
 
-- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
-{
-    if (representedInputItem == nil) {
-        self.representedInputItems = @[];
-        return;
-    }
-
-    self.representedInputItems = @[representedInputItem];
-}
-
 - (void)setRepresentedInputItems:(NSArray<VLCInputItem *> *)representedInputItems
 {
     if (representedInputItems == _representedInputItems) {
@@ -511,7 +501,7 @@ _##field##TextField.originalStateString = @"";
         NSDictionary * const commonItemsData = commonInputItemData(_representedInputItems);
 
         if ([commonItemsData objectForKey:@"inputItem"]) {
-            [self setRepresentedInputItem:[commonItemsData objectForKey:@"inputItem"]];
+            self.representedInputItems = @[[commonItemsData objectForKey:@"inputItem"]];
         } else {
             [self fillWindowWithDictionaryData:commonItemsData];
         }

@@ -118,7 +118,6 @@
 - (IBAction)saveMetaData:(id)sender;
 - (IBAction)chooseArtwork:(id)sender;
 
-- (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem;
 - (void)setRepresentedMediaLibraryItems:(NSArray<VLCLibraryRepresentedItem *> *)representedMediaLibraryItems;
 
 @end
