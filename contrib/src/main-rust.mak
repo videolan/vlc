@@ -8,10 +8,9 @@ ifdef HAVE_UCRT
 ifndef HAVE_WINSTORE # UWP is available as Tier 3
 ifeq ($(HOST),i686-w64-mingw32)
 RUST_TARGET = i686-pc-windows-gnullvm # ARCH is i386
-else ifeq ($(HOST),x86_64-w64-mingw32)
+else ifneq ($(HOST),armv7-w64-mingw32)
+# Not supported on armv7
 RUST_TARGET = $(ARCH)-pc-windows-gnullvm
-else
-# Not supported on armv7/aarch64 yet
 endif # archs
 endif # WINSTORE
 else # MSVCRT
