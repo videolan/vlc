@@ -5,15 +5,21 @@ CARGOC_VERSION=0.9.29
 RUSTUP_VERSION := 1.27.1
 RUSTUP_URL := $(GITHUB)/rust-lang/rustup/archive/refs/tags/$(RUSTUP_VERSION).tar.gz
 
+RUSTUP = . $(CARGO_HOME)/env && \
+	RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
+
 ifdef BUILD_RUST
 PKGS_TOOLS += rustup cargo
 PKGS_ALL += rustup
+
+ifneq ($(call system_tool_version, rustup --version, cat),)
+PKGS_FOUND += rustup
+RUSTUP = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
+endif
+
 endif
 
 DEPS_cargo = rustup $(DEPS_rustup)
-
-RUSTUP = . $(CARGO_HOME)/env && \
-	RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 
 $(TARBALLS)/rustup-$(RUSTUP_VERSION).tar.gz:
 	$(call download_pkg,$(RUSTUP_URL),cargo)
