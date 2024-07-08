@@ -22,6 +22,10 @@ PKGS_FOUND += rustup
 RUSTUP = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 endif
 
+ifneq ($(call system_tool_majmin, cargo-capi --version),)
+PKGS_FOUND += cargo
+endif
+
 endif
 
 DEPS_rustc = rustup $(DEPS_rustup)
