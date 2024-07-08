@@ -557,7 +557,6 @@ static int Control(extensions_manager_t *p_mgr, int i_control,
         }
         case EXTENSION_META_CHANGED:
         {
-            ext = va_arg( args, extension_t* );
             PushCommand(ext, CMD_UPDATE_META);
             break;
         }
