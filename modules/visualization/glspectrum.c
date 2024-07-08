@@ -381,7 +381,7 @@ static void *Thread( void *p_data )
         float p_output[FFT_BUFFER_SIZE];           /* Raw FFT Result  */
         int16_t p_buffer1[FFT_BUFFER_SIZE];        /* Buffer on which we perform
                                                       the FFT (first channel) */
-        int16_t p_dest[FFT_BUFFER_SIZE];           /* Adapted FFT result */
+        uint16_t p_dest[FFT_BUFFER_SIZE];          /* Adapted FFT result */
         float *p_buffl = (float*)block->p_buffer;  /* Original buffer */
 
         int16_t  *p_buffs;                         /* int16_t converted buffer */
