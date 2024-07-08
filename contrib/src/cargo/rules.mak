@@ -36,7 +36,7 @@ endif
 .cargo: cargo
 	cd $< && RUSTUP_INIT_SKIP_PATH_CHECK=yes \
 	  RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) \
-	  ./rustup-init.sh --no-modify-path -y --default-toolchain $(RUST_VERSION)
+	  ./rustup-init.sh --no-modify-path -y --default-toolchain none
 	+$(RUSTUP) set profile minimal
 	+$(RUSTUP) default $(RUST_VERSION)
 	+$(RUSTUP) target add $(RUST_TARGET)
