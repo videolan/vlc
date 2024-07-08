@@ -200,9 +200,9 @@ Item {
                 setInitialView()
         }
 
-
         DropArea {
             anchors.fill: parent
+            z: -1
 
             onEntered: (drag) => {
                 // Do not handle internal drag here:
@@ -250,25 +250,25 @@ Item {
                     drop.accept()
                 }
             }
+        }
 
-            Widgets.PageLoader {
-                id: stackView
-                anchors.fill: parent
-                focus: true
-                clip: _extendedFrameVisible
+        Widgets.PageLoader {
+            id: stackView
+            anchors.fill: parent
+            focus: true
+            clip: _extendedFrameVisible
 
-                pageModel: _pageModel
+            pageModel: _pageModel
 
-                Connections {
-                    target: Player
-                    function onPlayingStateChanged() {
-                        if (Player.playingState === Player.PLAYING_STATE_STOPPED
-                                && History.match(History.viewPath, ["player"]) ) {
-                            if (History.previousEmpty)
-                                _pushHome()
-                            else
-                                History.previous()
-                        }
+            Connections {
+                target: Player
+                function onPlayingStateChanged() {
+                    if (Player.playingState === Player.PLAYING_STATE_STOPPED
+                            && History.match(History.viewPath, ["player"]) ) {
+                        if (History.previousEmpty)
+                            _pushHome()
+                        else
+                            History.previous()
                     }
                 }
             }
