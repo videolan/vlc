@@ -55,6 +55,8 @@ static void Close(filter_t *);
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_("The height of the visualization window, in pixels.")
 
+#define LOG_OFFSET 0.1
+
 vlc_module_begin()
     set_shortname(N_("glSpectrum"))
     set_description(N_("3D OpenGL spectrum visualization"))
@@ -545,8 +547,9 @@ static void *Thread( void *p_data )
                 if (p_dest[j] > y)
                      y = p_dest[j];
             }
-            /* Calculate the height of the bar */
-            float new_height = y != 0 ? logf(y) * 0.4f : 0;
+            /* Calculate the height of the bar
+               This log_offset makes it possible to display low values */
+            float new_height = y != 0 ? logf( y + LOG_OFFSET ) * 0.4f : 0;
             height[i] = new_height > height[i]
                         ? new_height : height[i];
         }

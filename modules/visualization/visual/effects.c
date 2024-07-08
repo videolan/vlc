@@ -45,6 +45,8 @@
 #define GRAD_ANGLE_MAX 0.5
 #define GRAD_INCR 0.01
 
+#define LOG_OFFSET 0.1
+
 /*****************************************************************************
  * dummy_Run
  *****************************************************************************/
@@ -230,10 +232,11 @@ static int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
             if ( p_dest[j] > y )
                  y = p_dest[j];
         }
-        /* Calculate the height of the bar */
+        /* Calculate the height of the bar
+           This log_offset makes it possible to display low values */
         if( y != 0 )
         {
-            height[i] = log( y ) * 30;
+            height[i] = log( y + LOG_OFFSET ) * 30;
             if( height[i] > 380 )
                 height[i] = 380;
         }
