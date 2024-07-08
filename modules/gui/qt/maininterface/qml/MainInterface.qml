@@ -208,7 +208,7 @@ Item {
                 // Do not handle internal drag here:
                 if (!drag.source) {
                     // Foreign drag, check if valid:
-                    if (drop.hasUrls || drop.hasText) {
+                    if (drag.hasUrls || drag.hasText) {
                         drag.accepted = true
                         return
                     }
