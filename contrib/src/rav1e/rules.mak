@@ -25,8 +25,14 @@ $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz:
 RAV1E_FEATURES=--features=asm
 
 # we may not need cargo if the tarball is downloaded, but it will be needed by rav1e anyway
-DEPS_rav1e-vendor = cargo-c $(DEPS_cargo-c)
-DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
+ifdef HAVE_CROSS_COMPILE
+DEPS_rav1e-vendor = rustc-cross $(DEPS_rustc-cross)
+DEPS_rav1e = rustc-cross $(DEPS_rustc-cross)
+else
+DEPS_rav1e-vendor = rustc $(DEPS_rustc)
+DEPS_rav1e = rustc $(DEPS_rustc)
+endif
+DEPS_rav1e += rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
 
 # rav1e-vendor
 
