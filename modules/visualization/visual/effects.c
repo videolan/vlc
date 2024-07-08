@@ -108,7 +108,7 @@ static int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     int i , j , y , k;
     int i_line;
-    int16_t p_dest[FFT_BUFFER_SIZE];      /* Adapted FFT result */
+    uint16_t p_dest[FFT_BUFFER_SIZE];     /* Adapted FFT result */
     int16_t p_buffer1[FFT_BUFFER_SIZE];   /* Buffer on which we perform
                                              the FFT (first channel) */
 
@@ -449,7 +449,7 @@ static int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     int i , j , k;
     int i_line = 0;
-    int16_t p_dest[FFT_BUFFER_SIZE];      /* Adapted FFT result */
+    uint16_t p_dest[FFT_BUFFER_SIZE];     /* Adapted FFT result */
     int16_t p_buffer1[FFT_BUFFER_SIZE];   /* Buffer on which we perform
                                              the FFT (first channel) */
     float *p_buffl =                     /* Original buffer */
