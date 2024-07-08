@@ -63,6 +63,34 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [_outlineView reloadData];
 }
 
+- (NSArray<NSString *> *)defaultBookmarkedLocations
+{
+    NSMutableArray * const availableDefaultLocations = NSMutableArray.array;
+
+#define APPEND_DEFAULT_PATH_IF_AVAILABLE(dirType)                                               \
+NSString * const dirType##Path = [self defaultPathForDirectory:NS##dirType##Directory];         \
+if (dirType##Path != nil) {                                                                     \
+    [availableDefaultLocations addObject:dirType##Path];                                        \
+}
+
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Desktop)
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Document)
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Downloads)
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Movies)
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Music)
+    APPEND_DEFAULT_PATH_IF_AVAILABLE(Pictures)
+
+#undef APPEND_DEFAULT_PATH_IF_AVAILABLE
+
+    return availableDefaultLocations.copy;
+}
+
+- (NSString *)defaultPathForDirectory:(NSSearchPathDirectory)directory
+{
+    return [NSFileManager.defaultManager URLsForDirectory:directory
+                                                inDomains:NSUserDomainMask].firstObject.path;
+}
+
 - (void)selectSegment:(NSInteger)segmentType
 {
     NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
