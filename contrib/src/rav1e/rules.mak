@@ -25,12 +25,12 @@ $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz:
 RAV1E_FEATURES=--features=asm
 
 # we may not need cargo if the tarball is downloaded, but it will be needed by rav1e anyway
-DEPS_rav1e-vendor = cargo $(DEPS_cargo)
-DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo $(DEPS_cargo)
+DEPS_rav1e-vendor = cargo-c $(DEPS_cargo-c)
+DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
 
 # rav1e-vendor
 
-rav1e-vendor-build: .cargo
+rav1e-vendor-build: .rustc
 	$(RM) -R $@
 	mkdir -p $@
 	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1

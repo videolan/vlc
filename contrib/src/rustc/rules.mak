@@ -1,7 +1,6 @@
-# cargo/cargo-c installation via rustup
+# rustc+cargo installation via rustup
 
 RUST_VERSION=1.79.0
-CARGOC_VERSION=0.9.29
 RUSTUP_VERSION := 1.27.1
 RUSTUP_URL := $(GITHUB)/rust-lang/rustup/archive/refs/tags/$(RUSTUP_VERSION).tar.gz
 
@@ -9,8 +8,8 @@ RUSTUP = . $(CARGO_HOME)/env && \
 	RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 
 ifdef BUILD_RUST
-PKGS_TOOLS += rustup rustc cargo
-PKGS_ALL += rustup rustc
+PKGS_TOOLS += rustup rustc
+PKGS_ALL += rustup
 
 ifdef HAVE_CROSS_COMPILE
 PKGS_TOOLS += rustc-cross
@@ -30,35 +29,22 @@ else
 DEPS_rustc = rustup $(DEPS_rustup)
 endif
 
-ifneq ($(call system_tool_majmin, cargo-capi --version),)
-PKGS_FOUND += cargo
-endif
-
 endif
 
 DEPS_rustc-cross = rustc $(DEPS_rustc) rustup $(DEPS_rustup)
 
-ifdef HAVE_CROSS_COMPILE
-DEPS_cargo = rustc-cross $(DEPS_rustc-cross)
-else
-DEPS_cargo = rustc $(DEPS_rustc)
-endif
-
 $(TARBALLS)/rustup-$(RUSTUP_VERSION).tar.gz:
-	$(call download_pkg,$(RUSTUP_URL),cargo)
+	$(call download_pkg,$(RUSTUP_URL),rustup)
 
-.sum-cargo: rustup-$(RUSTUP_VERSION).tar.gz
+.sum-rustup: rustup-$(RUSTUP_VERSION).tar.gz
 
-.sum-rustup: .sum-cargo
+.sum-rustc:
 	touch $@
 
-.sum-rustc: .sum-cargo
+.sum-rustc-cross:
 	touch $@
 
-.sum-rustc-cross: .sum-cargo
-	touch $@
-
-cargo: rustup-$(RUSTUP_VERSION).tar.gz .sum-cargo
+cargo: rustup-$(RUSTUP_VERSION).tar.gz .sum-rustup
 	$(UNPACK)
 	$(MOVE)
 
@@ -87,11 +73,4 @@ endif
 	+$(RUSTUP) set profile minimal
 	+$(RUSTUP) default $(RUST_VERSION)
 	+$(RUSTUP) target add --toolchain $(RUST_VERSION) $(RUST_TARGET)
-	touch $@
-
-# When needed (when we have a Rust dependency not using cargo-c), the cargo-c
-# installation should go in a different package
-.cargo: cargo
-	+unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
-		$(CARGO) install --locked $(CARGOC_FEATURES) cargo-c --version $(CARGOC_VERSION)
 	touch $@
