@@ -65,30 +65,20 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (NSArray<NSString *> *)defaultBookmarkedLocations
 {
-    NSMutableArray * const availableDefaultLocations = NSMutableArray.array;
+    NSMutableArray<NSString *> * const locationMrls = NSMutableArray.array;
+    NSArray<VLCMediaSource *> * const localMediaSources =
+        VLCMediaSourceProvider.listOfLocalMediaSources;
 
-#define APPEND_DEFAULT_PATH_IF_AVAILABLE(dirType)                                               \
-NSString * const dirType##Path = [self defaultPathForDirectory:NS##dirType##Directory];         \
-if (dirType##Path != nil) {                                                                     \
-    [availableDefaultLocations addObject:dirType##Path];                                        \
-}
+    for (VLCMediaSource * const mediaSource in localMediaSources) {
+        VLCInputNode * const rootNode = mediaSource.rootNode;
+        [mediaSource preparseInputNodeWithinTree:rootNode];
 
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Desktop)
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Document)
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Downloads)
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Movies)
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Music)
-    APPEND_DEFAULT_PATH_IF_AVAILABLE(Pictures)
+        for (VLCInputNode * const node in rootNode.children) {
+            [locationMrls addObject:node.inputItem.MRL];
+        }
+    }
 
-#undef APPEND_DEFAULT_PATH_IF_AVAILABLE
-
-    return availableDefaultLocations.copy;
-}
-
-- (NSString *)defaultPathForDirectory:(NSSearchPathDirectory)directory
-{
-    return [NSFileManager.defaultManager URLsForDirectory:directory
-                                                inDomains:NSUserDomainMask].firstObject.path;
+    return locationMrls.copy;
 }
 
 - (void)selectSegment:(NSInteger)segmentType
