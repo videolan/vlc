@@ -194,15 +194,18 @@ void CompositorDirectComposition::setup()
 
     if (!m_blurBehind)
     {
-        try
+        if (var_InheritBool(m_intf, "qt-backdrop-blur"))
         {
-            m_acrylicSurface = new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainCtx, m_dcompDevice);
-        }
-        catch (const std::exception& exception)
-        {
-            if (const auto what = exception.what())
-                msg_Warn(m_intf, "%s", what);
-            delete m_acrylicSurface.data();
+            try
+            {
+                m_acrylicSurface = new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainCtx, m_dcompDevice);
+            }
+            catch (const std::exception& exception)
+            {
+                if (const auto what = exception.what())
+                    msg_Warn(m_intf, "%s", what);
+                delete m_acrylicSurface.data();
+            }
         }
     }
 }

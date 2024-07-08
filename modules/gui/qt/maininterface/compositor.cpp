@@ -326,6 +326,14 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
     assert(window);
     assert(m_intf);
 
+    if (enable)
+    {
+        if (!var_InheritBool(m_intf, "qt-backdrop-blur"))
+        {
+            return false;
+        }
+    }
+
     if (m_failedToLoadWindowEffectsModule)
         return false;
 
