@@ -22,13 +22,22 @@ PKGS_FOUND += rustup
 RUSTUP = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 endif
 
+ifneq ($(call system_tool_majmin, cargo --version),)
+PKGS_FOUND += rustc
+# TODO detect if the target is available
+# PKGS_FOUND += rustc-cross
+else
+DEPS_rustc = rustup $(DEPS_rustup)
+endif
+
 ifneq ($(call system_tool_majmin, cargo-capi --version),)
 PKGS_FOUND += cargo
 endif
 
 endif
 
-DEPS_rustc = rustup $(DEPS_rustup)
+DEPS_rustc-cross = rustc $(DEPS_rustc) rustup $(DEPS_rustup)
+
 ifdef HAVE_CROSS_COMPILE
 DEPS_cargo = rustc-cross $(DEPS_rustc-cross)
 else

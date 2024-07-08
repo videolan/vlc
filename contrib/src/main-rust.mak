@@ -78,8 +78,12 @@ endif
 CARGO_ENV = TARGET_CC="$(CC)" TARGET_AR="$(AR)" TARGET_RANLIB="$(RANLIB)" \
 	TARGET_CFLAGS="$(CFLAGS)" RUSTFLAGS="$(RUSTFLAGS)"
 
+ifneq ($(call system_tool_majmin, cargo --version),)
+CARGO = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) $(CARGO_ENV) cargo
+else
 CARGO = . $(CARGO_HOME)/env && \
-		RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) $(CARGO_ENV) cargo
+        RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) $(CARGO_ENV) cargo
+endif
 
 CARGO_INSTALL_ARGS = --target=$(RUST_TARGET) --prefix=$(PREFIX) \
 	--library-type staticlib --profile=$(CARGO_PROFILE)
