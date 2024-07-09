@@ -228,8 +228,6 @@ T.ProgressBar {
         TapHandler {
             acceptedButtons: Qt.LeftButton
 
-            grabPermissions: TapHandler.CanTakeOverFromAnything
-
             gesturePolicy: TapHandler.WithinBounds
 
             //clicked but not dragged
