@@ -252,6 +252,21 @@ T.Control {
 
                 visible: delegate.hovered
 
+                // NOTE: QTBUG-100543
+                // Hover handling in controls is blocking in Qt 6.2, meaning if this
+                // control handles the hover, delegate itself won't have its `hovered`
+                // set. Since this control is visible when delegate is hovered, there
+                // becomes an infinite loop of visibility when this control is hovered.
+
+                // 1) When delegate is hovered, delegate's hovered property becomes set.
+                // 2) This control becomes visible.
+                // 3) When this control is hovered, delegate's hovered property becomes unset.
+                // 4) This control becomes invisible. Delegate's hovered property becomes set.
+                // * Infinite loop *
+
+                // Disable hovering in this control to prevent twitching due to infinite loop:
+                hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
+
                 onClicked: {
                     if (!delegate.selected)
                         delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
