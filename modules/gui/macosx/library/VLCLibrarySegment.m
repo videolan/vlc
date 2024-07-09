@@ -126,6 +126,8 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
             return _NS("Videos");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
+        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+            NSAssert(true, @"displayStringForType should not be called for this segment type");
         case VLCLibraryStreamsSegment:
             return _NS("Streams");
         case VLCLibraryLowSentinelSegment:
@@ -150,6 +152,7 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
         case VLCLibraryVideoSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryBrowseSegment:
+        case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
         case VLCLibraryStreamsSegment:
             return [NSImage imageNamed:@"NSActionTemplate"];
@@ -187,6 +190,9 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];
+        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"folder"
+                             accessibilityDescription:@"Bookmarked location icon"];
         case VLCLibraryStreamsSegment:
             return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
                              accessibilityDescription:@"Streams icon"];
