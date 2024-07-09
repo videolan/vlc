@@ -389,6 +389,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     NSLog(@"Unknown kind of library item provided, cannot present library view for it: %@", libraryItem.displayString);
 }
 
+- (void)goToLocalFolderMrl:(NSString *)mrl
+{
+    [self goToBrowseSection:self];
+    [self.libraryMediaSourceViewController presentLocalFolderMrl:mrl];
+}
+
 - (IBAction)sortLibrary:(id)sender
 {
     if (!_librarySortingMenuController) {
