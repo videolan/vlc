@@ -107,13 +107,29 @@ AbstractButton {
         indexes: [0]
     }
 
-    DragHandler {
-        target: null
-        onActiveChanged: {
-            if (active) {
-                dragItem.Drag.active = true
-            } else {
-                dragItem.Drag.drop()
+    // TODO: Qt bug 6.2: QTBUG-103604
+    Item {
+        anchors.fill: parent
+
+        TapHandler {
+            gesturePolicy: TapHandler.ReleaseWithinBounds // TODO: Qt 6.2 bug: Use TapHandler.DragThreshold
+
+            grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
+
+            onTapped: History.push(["player"])
+        }
+
+        DragHandler {
+            target: null
+
+            grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
+
+            onActiveChanged: {
+                if (active) {
+                    dragItem.Drag.active = true
+                } else {
+                    dragItem.Drag.drop()
+                }
             }
         }
     }
