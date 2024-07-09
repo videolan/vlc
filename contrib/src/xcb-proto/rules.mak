@@ -1,6 +1,6 @@
 # X protocol C Proto
 
-XCB_PROTO_VERSION := 1.14
+XCB_PROTO_VERSION := 1.15.2
 XCB_PROTO_URL := $(XORG)/proto/xcb-proto-$(XCB_PROTO_VERSION).tar.gz
 
 ifeq ($(call need_pkg,"xcb-proto"),)
