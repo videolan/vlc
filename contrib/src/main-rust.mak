@@ -34,8 +34,9 @@ endif
 endif
 else ifdef HAVE_MACOSX
 RUST_TARGET = $(ARCH)-apple-darwin
-else ifdef HAVE_SOLARIS
-RUST_TARGET = x86_64-sun-solaris
+# else ifdef HAVE_SOLARIS
+# Solaris x86_64 is Tier 3
+# RUST_TARGET = x86_64-sun-solaris
 else ifdef HAVE_LINUX
 ifeq ($(HOST),arm-linux-gnueabihf)
 RUST_TARGET = arm-unknown-linux-gnueabihf #add eabihf
