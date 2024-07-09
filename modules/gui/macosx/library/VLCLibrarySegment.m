@@ -30,6 +30,35 @@
 
 static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 
+@interface VLCLibrarySegmentBookmarkedLocation : NSObject
+
+@property (readonly) VLCLibrarySegmentType segmentType;
+@property (readonly) NSString *name;
+@property (readonly) NSString *mrl;
+
+- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
+                               name:(NSString *)name
+                                mrl:(NSString *)mrl;
+
+@end
+
+@implementation VLCLibrarySegmentBookmarkedLocation
+
+- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
+                               name:(NSString *)name
+                                mrl:(NSString *)mrl
+{
+    self = [super init];
+    if (self) {
+        _segmentType = segmentType;
+        _name = name;
+        _mrl = mrl;
+    }
+    return self;
+}
+
+@end
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
