@@ -316,7 +316,7 @@ void VideoSurface::geometryChange(const QRectF& newGeometry, const QRectF& oldGe
 void VideoSurface::wheelEvent(QWheelEvent *event)
 {
     emit mouseWheeled(*event);
-    event->ignore();
+    event->accept();
 }
 #endif
 
