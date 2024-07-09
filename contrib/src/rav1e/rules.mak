@@ -5,11 +5,8 @@ RAV1E_URL := https://crates.io/api/v1/crates/rav1e/$(RAV1E_VERSION)/download
 
 ifdef BUILD_RUST
 ifdef BUILD_ENCODERS
-# Rav1e is not linking correctly on iOS arm64
-ifndef HAVE_IOS
 PKGS += rav1e
 PKGS_ALL += rav1e-vendor
-endif
 endif
 endif
 
