@@ -24,6 +24,12 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCInputItem.h"
+#import "library/media-source/VLCMediaSource.h"
+#import "library/media-source/VLCMediaSourceProvider.h"
+
+static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
@@ -76,6 +82,24 @@
         [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
     ];
+}
+
+- (NSArray<NSString *> *)defaultBookmarkedLocations
+{
+    NSMutableArray<NSString *> * const locationMrls = NSMutableArray.array;
+    NSArray<VLCMediaSource *> * const localMediaSources =
+        VLCMediaSourceProvider.listOfLocalMediaSources;
+
+    for (VLCMediaSource * const mediaSource in localMediaSources) {
+        VLCInputNode * const rootNode = mediaSource.rootNode;
+        [mediaSource preparseInputNodeWithinTree:rootNode];
+
+        for (VLCInputNode * const node in rootNode.children) {
+            [locationMrls addObject:node.inputItem.MRL];
+        }
+    }
+
+    return locationMrls.copy;
 }
 
 - (NSInteger)childCount

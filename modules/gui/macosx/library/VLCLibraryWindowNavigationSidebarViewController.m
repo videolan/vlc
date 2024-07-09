@@ -63,24 +63,6 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [_outlineView reloadData];
 }
 
-- (NSArray<NSString *> *)defaultBookmarkedLocations
-{
-    NSMutableArray<NSString *> * const locationMrls = NSMutableArray.array;
-    NSArray<VLCMediaSource *> * const localMediaSources =
-        VLCMediaSourceProvider.listOfLocalMediaSources;
-
-    for (VLCMediaSource * const mediaSource in localMediaSources) {
-        VLCInputNode * const rootNode = mediaSource.rootNode;
-        [mediaSource preparseInputNodeWithinTree:rootNode];
-
-        for (VLCInputNode * const node in rootNode.children) {
-            [locationMrls addObject:node.inputItem.MRL];
-        }
-    }
-
-    return locationMrls.copy;
-}
-
 - (void)selectSegment:(NSInteger)segmentType
 {
     NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
