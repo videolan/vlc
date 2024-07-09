@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibrarySection.h: MacOS X interface module
+ * VLCLibrarySegment.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2023 VLC authors and VideoLAN
  *
