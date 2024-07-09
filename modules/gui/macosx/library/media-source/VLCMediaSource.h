@@ -41,6 +41,8 @@ extern NSString *VLCMediaSourcePreparsingEnded;
                   andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
                         forCategory:(enum services_discovery_category_e)category;
 - (instancetype)initMyFoldersMediaSourceWithLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
+- (instancetype)initWithLocalFolderMrl:(NSString *)mrl
+                     andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
 
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
