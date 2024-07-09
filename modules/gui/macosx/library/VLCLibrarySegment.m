@@ -84,10 +84,18 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
 
 - (instancetype)initWithRepresentedObject:(id)modelObject
 {
-    NSNumber * const segmentNumber = (NSNumber *)modelObject;
-    const NSInteger segmentValue = segmentNumber.integerValue;
-    NSAssert(segmentNumber != nil &&
-             segmentValue > VLCLibraryLowSentinelSegment &&
+    NSInteger segmentValue = VLCLibraryLowSentinelSegment;
+
+    if ([modelObject isKindOfClass:NSNumber.class]) {
+        NSNumber * const segmentNumber = (NSNumber *)modelObject;
+        segmentValue = segmentNumber.integerValue;
+    } else if ([modelObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
+        VLCLibrarySegmentBookmarkedLocation * const descriptor =
+            (VLCLibrarySegmentBookmarkedLocation *)modelObject;
+        segmentValue = descriptor.segmentType;
+    }
+
+    NSAssert(segmentValue > VLCLibraryLowSentinelSegment &&
              segmentValue < VLCLibraryHighSentinelSegment,
              @"VLCLibrarySegment represented object must be a library segment type value!");
 
