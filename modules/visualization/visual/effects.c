@@ -213,7 +213,10 @@ static int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     window_scale_in_place( p_buffer1, &wind_ctx );
     fft_perform( p_buffer1, p_output, p_state);
     for( i = 0; i< FFT_BUFFER_SIZE ; i++ )
-        p_dest[i] = p_output[i] *  ( 2 ^ 16 ) / ( ( FFT_BUFFER_SIZE / 2 * 32768 ) ^ 2 );
+    {
+        /* Scale the output between 0 and UINT16MAX */
+        p_dest[i] = p_output[i] * UINT16_MAX / FFT_SCALING_VALUE;
+    }
 
     /* Compute the horizontal position of the first band */
     i_band_width = floor( p_effect->i_width / i_nb_bands);

@@ -28,6 +28,10 @@
 
 #define FFT_BUFFER_SIZE (1 << FFT_BUFFER_SIZE_LOG)
 
+#define FFT_MAX_VALUE_OUTPUT ((uint64_t)(FFT_BUFFER_SIZE/2 * INT16_MAX))
+
+#define FFT_SCALING_VALUE (FFT_MAX_VALUE_OUTPUT * FFT_MAX_VALUE_OUTPUT * 2)
+
 /* sound sample - should be an signed 16 bit value */
 typedef short int sound_sample;
 

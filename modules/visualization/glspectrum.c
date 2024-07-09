@@ -524,9 +524,11 @@ static void *Thread( void *p_data )
         window_scale_in_place (p_buffer1, &wind_ctx);
         fft_perform (p_buffer1, p_output, p_state);
 
-        for (i = 0; i< FFT_BUFFER_SIZE; ++i)
-            p_dest[i] = p_output[i] *  (2 ^ 16)
-                        / ((FFT_BUFFER_SIZE / 2 * 32768) ^ 2);
+        for( i = 0; i< FFT_BUFFER_SIZE ; i++ )
+        {
+            /* Scale the output between 0 and UINT16MAX */
+            p_dest[i] = p_output[i] * UINT16_MAX / FFT_SCALING_VALUE;
+        }
 
         for (i = 0 ; i < NB_BANDS; i++)
         {
