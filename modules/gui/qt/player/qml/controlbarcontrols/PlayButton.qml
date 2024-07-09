@@ -157,6 +157,15 @@ T.Control {
             }
         }
 
+        onCursorInsideChanged: {
+            if (pressed && !cursorInside) {
+                // Press and hold action can no longer be done,
+                // so reset the state in order to reset the
+                // animation:
+                innerRectangle.state = ""
+            }
+        }
+
         onPressed: (mouse) => {
             if (!cursorInside) {
                 mouse.accepted = false
