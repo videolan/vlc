@@ -3,8 +3,14 @@
 #
 # This file is under the same license as the vlc package.
 
+# default in Debian bookworm
+RUST_VERSION_MIN=1.63.0
+
 ifdef HAVE_WIN32
 ifdef HAVE_UCRT
+# does not work as Tier 2 before that
+RUST_VERSION_MIN=1.79.0
+
 ifndef HAVE_WINSTORE # UWP is available as Tier 3
 ifeq ($(HOST),i686-w64-mingw32)
 RUST_TARGET = i686-pc-windows-gnullvm # ARCH is i386
