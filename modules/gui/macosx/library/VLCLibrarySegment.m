@@ -257,7 +257,13 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
 
 - (void)updateSegmentTypeRepresentation
 {
-    _displayString = [self displayStringForType:_segmentType];
+    if ([self.representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
+        VLCLibrarySegmentBookmarkedLocation * const descriptor =
+            (VLCLibrarySegmentBookmarkedLocation *)self.representedObject;
+        _displayString = descriptor.name;
+    } else {
+        _displayString = [self displayStringForType:_segmentType];
+    }
     _displayImage = [self iconForType:_segmentType];
 }
 
