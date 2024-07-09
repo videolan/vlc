@@ -441,7 +441,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
         VLCInputNode * const node = childDataSource.nodeToDisplay;
-        VLCInputNodePathControlItem * const nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
+        VLCInputNodePathControlItem * const nodePathItem = 
+            [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
 
         [self.pathControl appendInputNodePathControlItem:nodePathItem];
     }
@@ -576,6 +577,19 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaSourceBaseDataSourceNodeChanged
                                                       object:self];
+}
+
+- (void)presentLocalFolderMrl:(NSString *)mrl
+{
+    libvlc_int_t * const p_libvlcInstance = vlc_object_instance(getIntf());
+    VLCMediaSource * const mediaSource =
+        [[VLCMediaSource alloc] initWithLocalFolderMrl:mrl andLibVLCInstance:p_libvlcInstance];
+    if (mediaSource == nil) {
+        NSLog(@"Could not create valid media source for mrl: %@", mrl);
+        return;
+    }
+    [self configureChildDataSourceWithNode:mediaSource.rootNode andMediaSource:mediaSource];
+    [self reloadData];
 }
 
 @end

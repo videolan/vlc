@@ -55,6 +55,8 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 - (void)homeButtonAction:(id)sender;
 - (void)pathControlAction:(id)sender;
 
+- (void)presentLocalFolderMrl:(NSString *)mrl;
+
 @end
 
 NS_ASSUME_NONNULL_END
