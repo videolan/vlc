@@ -109,16 +109,39 @@ static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarke
 
 - (NSArray<NSTreeNode *> *)childNodes
 {
-    if (self.segmentType != VLCLibraryMusicSegment) {
-        return nil;
+    if (self.segmentType == VLCLibraryMusicSegment) {
+        return @[
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
+        ];
+    } else if (self.segmentType == VLCLibraryBrowseSegment) {
+        NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+        NSArray<NSString *> *bookmarkedLocations =
+            [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
+        if (bookmarkedLocations == nil) {
+            bookmarkedLocations = self.defaultBookmarkedLocations;
+        }
+
+        const VLCLibrarySegmentType segmentType = VLCLibraryBrowseBookmarkedLocationSubSegment;
+        NSMutableArray<NSTreeNode *> * const bookmarkedLocationNodes = NSMutableArray.array;
+
+        for (NSString * const locationMrl in bookmarkedLocations) {
+            NSString * const locationName = locationMrl.lastPathComponent;
+            VLCLibrarySegmentBookmarkedLocation * const descriptor =
+                [[VLCLibrarySegmentBookmarkedLocation alloc] initWithSegmentType:segmentType
+                                                                            name:locationName
+                                                                             mrl:locationMrl];
+            VLCLibrarySegment * const node = 
+                [VLCLibrarySegment treeNodeWithRepresentedObject:descriptor];
+            [bookmarkedLocationNodes addObject:node];
+        }
+
+        return bookmarkedLocationNodes.copy;
     }
-    
-    return @[
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
-    ];
+
+    return nil;
 }
 
 - (NSArray<NSString *> *)defaultBookmarkedLocations
