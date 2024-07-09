@@ -177,6 +177,11 @@ T.Control {
         }
 
         onPressAndHold: (mouse) => {
+            if (!cursorInside) {
+                mouse.accepted = false
+                return
+            }
+
             _pressAndHoldAction()
             mouse.accepted = true
         }
