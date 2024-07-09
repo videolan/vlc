@@ -6,3 +6,7 @@ build/
 *.tar.bz2
 *.tar.xz
 *.zip
+config.guess
+config.sub
+config.guess-[a-f0-9]*
+config.sub-[a-f0-9]*
