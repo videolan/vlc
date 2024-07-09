@@ -277,6 +277,10 @@ FULL_VERSION_REGEX := 's/[^0-9]*\([0-9]\([0-9a-zA-Z\.\-]*\)\)\(.*\)/\1/p'
 system_tool_version = $(shell PATH="${SYSTEM_PATH}" $(1) 2>/dev/null | head -1 | sed -ne ${FULL_VERSION_REGEX} | $(2))
 # Get the major.minor version of a system tool
 system_tool_majmin = $(call system_tool_version, $(1), cut -d '.' -f -2)
+# Print the smallest version value of the given system tool (no spaces in the checked version)
+system_tool_min_version = $(shell printf "$(2) $(call system_tool_version, $(1), grep . && echo || echo 0.0.0)" | tr " " "\n" | sort -V | head -n1)
+# Check if native tool $1 is at least version $2
+system_tool_matches_min = $(shell test "$(call system_tool_min_version,$(1),$(2))" = "$(2)" || echo FAIL)
 
 ifndef GIT
 ifeq ($(shell git --version >/dev/null 2>&1 || echo FAIL),)
