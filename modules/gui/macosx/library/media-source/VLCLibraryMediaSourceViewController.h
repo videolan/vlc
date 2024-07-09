@@ -51,6 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)presentBrowseView;
 - (void)presentStreamsView;
+- (void)presentLocalFolderMrl:(NSString *)mrl;
 
 @end
 

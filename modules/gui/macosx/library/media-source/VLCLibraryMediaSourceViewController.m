@@ -190,4 +190,10 @@
     [_baseDataSource reloadViews];
 }
 
+- (void)presentLocalFolderMrl:(NSString *)mrl
+{
+    [self presentBrowseView];
+    [self.baseDataSource presentLocalFolderMrl:mrl];
+}
+
 @end
