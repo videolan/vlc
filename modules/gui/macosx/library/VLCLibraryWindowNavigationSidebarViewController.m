@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibrarySegmentBookmarkedLocation.h"
 
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
@@ -114,7 +115,17 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSTreeNode * const node = (NSTreeNode *)[_outlineView itemAtRow:_outlineView.selectedRow];
     NSParameterAssert(node != nil);
     VLCLibrarySegment * const segment = (VLCLibrarySegment *)node.representedObject;
-    _libraryWindow.librarySegmentType = segment.segmentType;
+    NSObject * const representedObject = segment.representedObject;
+    NSParameterAssert(representedObject != nil);
+
+    if ([representedObject isKindOfClass:NSNumber.class]) {
+        self.libraryWindow.librarySegmentType = segment.segmentType;
+    } else if ([representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
+        VLCLibrarySegmentBookmarkedLocation * const bookmarkedLocation =
+            (VLCLibrarySegmentBookmarkedLocation *)representedObject;
+        self.libraryWindow.librarySegmentType = bookmarkedLocation.segmentType;
+        [self.libraryWindow goToLocalFolderMrl:bookmarkedLocation.mrl];
+    }
 }
 
 @end
