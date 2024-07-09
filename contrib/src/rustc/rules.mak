@@ -17,7 +17,7 @@ RUSTUP = . $(CARGO_HOME)/env && \
          RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
 endif
 
-ifneq ($(call system_tool_majmin, cargo --version),)
+ifeq ($(call system_tool_matches_min, cargo --version,$(RUST_VERSION_MIN)),)
 PKGS_FOUND += rustc
 # TODO detect if the target is available
 # PKGS_FOUND += rustc-cross
