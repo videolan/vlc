@@ -230,10 +230,13 @@ T.ProgressBar {
 
             gesturePolicy: TapHandler.WithinBounds
 
-            //clicked but not dragged
-            onTapped: (point, button) => {
-                fsm.pressControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
-                fsm.releaseControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
+            onPressedChanged: {
+                if (pressed) {
+                    fsm.pressControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
+                } else {
+                    // NOTE: Point is still valid at this point.
+                    fsm.releaseControl(point.position.x / control.width, point.modifiers === Qt.ShiftModifier)
+                }
             }
         }
 
