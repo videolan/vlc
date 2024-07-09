@@ -25,39 +25,14 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibrarySegmentBookmarkedLocation.h"
+
 #import "library/media-source/VLCMediaSource.h"
 #import "library/media-source/VLCMediaSourceProvider.h"
 
 static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 
-@interface VLCLibrarySegmentBookmarkedLocation : NSObject
 
-@property (readonly) VLCLibrarySegmentType segmentType;
-@property (readonly) NSString *name;
-@property (readonly) NSString *mrl;
-
-- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
-                               name:(NSString *)name
-                                mrl:(NSString *)mrl;
-
-@end
-
-@implementation VLCLibrarySegmentBookmarkedLocation
-
-- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
-                               name:(NSString *)name
-                                mrl:(NSString *)mrl
-{
-    self = [super init];
-    if (self) {
-        _segmentType = segmentType;
-        _name = name;
-        _mrl = mrl;
-    }
-    return self;
-}
-
-@end
 
 @implementation VLCLibrarySegment
 

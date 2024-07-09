@@ -135,6 +135,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryRepresentedItem.m \
 	gui/macosx/library/VLCLibrarySegment.h \
 	gui/macosx/library/VLCLibrarySegment.m \
+	gui/macosx/library/VLCLibrarySegmentBookmarkedLocation.h \
+	gui/macosx/library/VLCLibrarySegmentBookmarkedLocation.m \
 	gui/macosx/library/VLCLibrarySortingMenuController.h \
 	gui/macosx/library/VLCLibrarySortingMenuController.m \
 	gui/macosx/library/VLCLibraryTableView.h \
