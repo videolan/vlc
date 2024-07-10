@@ -22,10 +22,35 @@
 
 #import "VLCLibraryWindowNavigationSidebarOutlineView.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
 
 @implementation VLCLibraryWindowNavigationSidebarOutlineView
+
+- (NSMenu *)menuForEvent:(NSEvent *)event
+{
+    const NSPoint location = [self convertPoint:event.locationInWindow fromView:nil];
+    const NSInteger row = [self rowAtPoint:location];
+    NSTreeNode * const node = [self itemAtRow:row];
+    VLCLibrarySegment * const segment = node.representedObject;
+    
+    if ([segment.representedObject isKindOfClass:NSNumber.class]) {
+        return nil;
+    }
+
+    if ([segment.representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
+        VLCLibrarySegmentBookmarkedLocation * const descriptor = segment.representedObject;
+        NSMenu * const bookmarkMenu = [[NSMenu alloc] initWithTitle:descriptor.name];
+        NSMenuItem * const removeBookmarkItem = 
+            [[NSMenuItem alloc] initWithTitle:_NS("Remove Bookmark")
+                                       action:@selector(removeBookmark:)
+                                keyEquivalent:@""];
+        [bookmarkMenu addItem:removeBookmarkItem];
+        return bookmarkMenu;
+    }
+}
 
 - (void)removeBookmark:(id)sender
 {
