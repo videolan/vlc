@@ -154,34 +154,37 @@ void CompositorDirectComposition::setup()
 
     assert(m_quickView->rhi()->backend() == QRhi::D3D11 || m_quickView->rhi()->backend() == QRhi::D3D12);
 
+    IDCompositionTarget* dcompTarget;
     if (rhi->backend() == QRhi::D3D11)
     {
 #ifdef QRhiD3D11_ACTIVE
         m_dcompDevice = static_cast<QRhiD3D11*>(rhiImplementation)->dcompDevice;
-        m_dcompTarget = static_cast<QD3D11SwapChain*>(rhiSwapChain)->dcompTarget;
-        m_uiVisual = static_cast<QD3D11SwapChain*>(rhiSwapChain)->dcompVisual;
+        auto qswapchain = static_cast<QD3D11SwapChain*>(rhiSwapChain);
+        dcompTarget = qswapchain->dcompTarget;
+        m_uiVisual = qswapchain->dcompVisual;
 #endif
     }
     else if (rhi->backend() == QRhi::D3D12)
     {
 #ifdef QRhiD3D12_ACTIVE
         m_dcompDevice = static_cast<QRhiD3D12*>(rhiImplementation)->dcompDevice;
-        m_dcompTarget = static_cast<QD3D12SwapChain*>(rhiSwapChain)->dcompTarget;
-        m_uiVisual = static_cast<QD3D12SwapChain*>(rhiSwapChain)->dcompVisual;
+        auto qswapchain = static_cast<QD3D12SwapChain*>(rhiSwapChain);
+        dcompTarget = qswapchain->dcompTarget;
+        m_uiVisual = qswapchain->dcompVisual;
 #endif
     }
     else
         Q_UNREACHABLE();
 
     assert(m_dcompDevice);
-    assert(m_dcompTarget);
+    assert(dcompTarget);
     assert(m_uiVisual);
 
     HRESULT res;
     res = m_dcompDevice->CreateVisual(&m_rootVisual);
     assert(res == S_OK);
 
-    res = m_dcompTarget->SetRoot(m_rootVisual.Get());
+    res = dcompTarget->SetRoot(m_rootVisual.Get());
     assert(res == S_OK);
 
     res = m_rootVisual->AddVisual(m_uiVisual, FALSE, NULL);
