@@ -155,6 +155,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarOutlineView.h \
+	gui/macosx/library/VLCLibraryWindowNavigationSidebarOutlineView.m \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarViewController.h \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.h \

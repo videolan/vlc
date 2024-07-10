@@ -84,6 +84,7 @@
 		531343EA2A8E8965007AEDFA /* VLCLibrarySegment.m in Sources */ = {isa = PBXBuildFile; fileRef = 531343E92A8E8965007AEDFA /* VLCLibrarySegment.m */; };
 		5317FE04294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5317FE03294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m */; };
 		532572032C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 532572022C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.m */; };
+		532572062C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 532572052C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.m */; };
 		5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */; };
 		533B5D2C29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */; };
 		534E73E229D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */; };
@@ -297,6 +298,8 @@
 		5317FE05294E8D1A001702F0 /* VLCLibraryCollectionViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDataSource.h; sourceTree = "<group>"; };
 		532572012C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySegmentBookmarkedLocation.h; sourceTree = "<group>"; };
 		532572022C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySegmentBookmarkedLocation.m; sourceTree = "<group>"; };
+		532572042C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowNavigationSidebarOutlineView.h; sourceTree = "<group>"; };
+		532572052C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowNavigationSidebarOutlineView.m; sourceTree = "<group>"; };
 		5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAudioViewController.m; sourceTree = "<group>"; };
 		5325C57C29302E6800B2B63A /* VLCLibraryAudioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAudioViewController.h; sourceTree = "<group>"; };
 		533B5D2A29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmarksTableViewDataSource.h; sourceTree = "<group>"; };
@@ -1333,6 +1336,8 @@
 				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
 				5362550B293FD639005D64FA /* VLCLibraryWindowController.h */,
 				5362550C293FD639005D64FA /* VLCLibraryWindowController.m */,
+				532572042C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.h */,
+				532572052C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.m */,
 				531343E52A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.h */,
 				531343E62A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m */,
 				5352B37429E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.h */,
@@ -2137,6 +2142,7 @@
 				1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */,
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
 				1C3113F31E508C7600D4DD76 /* VLCRendererMenuController.m in Sources */,
+				532572062C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.m in Sources */,
 				53ED473629CA4F3400795DB1 /* VLCLibraryTableViewDelegate.m in Sources */,
 				6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */,
 				6B397C4F216C8EB200403ED0 /* NSString+Helpers.m in Sources */,
