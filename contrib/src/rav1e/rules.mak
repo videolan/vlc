@@ -60,11 +60,6 @@ rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-rav1e-vendor
 
 rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e
 	$(UNPACK)
-ifdef HAVE_WIN32
-ifndef HAVE_WIN64
-	$(APPLY) $(SRC)/rav1e/unwind-resume-stub.patch
-endif
-endif
 	$(call cargo_vendor_setup,$(UNPACK_DIR),$@)
 	$(MOVE)
 
