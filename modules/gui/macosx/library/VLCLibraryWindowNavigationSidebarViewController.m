@@ -86,11 +86,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     self.libraryWindow.librarySegmentType = segment.segmentType;
 
     if (segmentType >= VLCLibraryMusicSegment && segmentType <= VLCLibraryGenresMusicSubSegment) {
-        NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:VLCLibraryMusicSegment];
-        [self.outlineView expandItem:itemNode];
-    } else if (segmentType >= VLCLibraryBrowseSegment && segmentType <= VLCLibraryBrowseBookmarkedLocationSubSegment) {
-        NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:VLCLibraryBrowseSegment];
-        [self.outlineView expandItem:itemNode];
+        const NSInteger musicItemIdx = [self indexForRootSegmentType:VLCLibraryMusicSegment];
+        if (musicItemIdx != NSNotFound) {
+            NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:musicItemIdx];
+            [self.outlineView expandItem:itemNode];
+        }
+    } else if (segmentType >= VLCLibraryBrowseSegment && 
+               segmentType <= VLCLibraryBrowseBookmarkedLocationSubSegment) {
+        const NSInteger browseItemIdx = [self indexForRootSegmentType:VLCLibraryBrowseSegment];
+        if (browseItemIdx != NSNotFound) {
+            NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:browseItemIdx];
+            [self.outlineView expandItem:itemNode];
+        }
     }
 
     [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentType]
@@ -119,8 +126,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     if (proposedSelectionIndexes.count == 0 || proposedSelectionIndexes.firstIndex != VLCLibraryMusicSegment) {
         return proposedSelectionIndexes;
     } else {
-        NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:VLCLibraryMusicSegment];
-        [self.outlineView expandItem:itemNode];
+        const NSInteger musicItemIdx = [self indexForRootSegmentType:VLCLibraryMusicSegment];
+        if (musicItemIdx != NSNotFound) {
+            NSTreeNode * const itemNode = (NSTreeNode *)[_outlineView itemAtRow:musicItemIdx];
+            [self.outlineView expandItem:itemNode];
+        }
         return [NSIndexSet indexSetWithIndex:VLCLibraryArtistsMusicSubSegment];
     }
 }
