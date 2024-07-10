@@ -22,6 +22,23 @@
 
 #import "VLCLibraryWindowNavigationSidebarOutlineView.h"
 
+#import "library/VLCLibrarySegment.h"
+#import "library/VLCLibrarySegmentBookmarkedLocation.h"
+
 @implementation VLCLibraryWindowNavigationSidebarOutlineView
+
+- (void)removeBookmark:(id)sender
+{
+    const NSInteger row = self.clickedRow;
+    NSTreeNode * const node = [self itemAtRow:row];
+    VLCLibrarySegment * const segment = node.representedObject;
+    VLCLibrarySegmentBookmarkedLocation * const descriptor = segment.representedObject;
+
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    NSMutableArray<NSString *> * const bookmarkedLocations =
+        [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey].mutableCopy;
+    [bookmarkedLocations removeObject:descriptor.mrl];
+    [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
+}
 
 @end
