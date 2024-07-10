@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern static NSString * const VLCLibraryBookmarkedLocationsKey;
+
 typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
     VLCLibraryLowSentinelSegment = -1,
     VLCLibraryHomeSegment,

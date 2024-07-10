@@ -32,8 +32,6 @@
 
 static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 
-
-
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
