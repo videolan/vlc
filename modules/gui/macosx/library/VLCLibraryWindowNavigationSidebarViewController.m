@@ -68,14 +68,17 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 {
     NSArray<NSTreeNode *> *nodes = self.treeController.arrangedObjects.childNodes;
     while (nodes.count != 0) {
-        NSMutableArray<NSTreeNode *> *nextLevelNodes = NSMutableArray.array;
+        NSMutableArray<NSTreeNode *> * const nextLevelNodes = NSMutableArray.array;
 
         const NSInteger nodeIdx = [nodes indexOfObjectPassingTest:^BOOL(NSTreeNode * const obj,
                                                                         NSUInteger idx,
                                                                         BOOL * const stop) {
-            [nextLevelNodes addObjectsFromArray:obj.childNodes];
             VLCLibrarySegment * const segment = obj.representedObject;
-            return segment.segmentType == segmentType;
+            const BOOL matching = segment.segmentType == segmentType;
+            if (!matching) {
+                [nextLevelNodes addObjectsFromArray:obj.childNodes];
+            }
+            return matching;
         }];
 
         if (nodeIdx != NSNotFound) {
