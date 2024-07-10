@@ -24,6 +24,7 @@
 #include "mkv.hpp"
 #include "demux.hpp"
 #include "events.hpp"
+#include "chapter_command_dvd.hpp"
 
 #include <vlc_actions.h>
 #include <vlc_threads.h>

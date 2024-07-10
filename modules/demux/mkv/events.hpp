@@ -29,8 +29,6 @@
 #include <vlc_actions.h>
 #include <vlc_mouse.h>
 
-#include "dvd_types.hpp"
-
 #include <list>
 
 struct vlc_spu_highlight_t;
@@ -38,6 +36,7 @@ struct vlc_spu_highlight_t;
 namespace mkv {
 
 struct demux_sys_t;
+struct pci_t;
 
 class event_thread_t
 {

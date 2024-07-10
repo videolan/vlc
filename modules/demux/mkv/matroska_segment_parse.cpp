@@ -28,6 +28,7 @@
 #include "Ebml_dispatcher.hpp"
 #include "string_dispatcher.hpp"
 #include "util.hpp"
+#include "chapter_command_script.hpp"
 
 extern "C" {
 #include "../vobsub.h"

@@ -24,6 +24,8 @@
 #ifndef VLC_MKV_DVD_TYPES_HPP
 #define VLC_MKV_DVD_TYPES_HPP
 
+#include <cstdint>
+
 namespace mkv {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #undef ATTRIBUTE_PACKED
@@ -273,7 +275,7 @@ typedef struct {
 /**
  * PCI packet
  */
-typedef struct {
+typedef struct pci_t {
   pci_gi_t    pci_gi;
   nsml_agli_t nsml_agli;
   hli_t       hli;
