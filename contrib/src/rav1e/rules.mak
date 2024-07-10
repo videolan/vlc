@@ -67,7 +67,7 @@ rav1e: rav1e-$(RAV1E_VERSION).tar.gz .sum-rav1e
 	$(MOVE)
 
 .rav1e: rav1e
-	+cd $< && $(CARGOC_INSTALL) --no-default-features $(RAV1E_FEATURES)
+	+cd $< && $(CARGOC_INSTALL) --target-dir vlc_build --no-default-features $(RAV1E_FEATURES)
 # No gcc in Android NDK25
 ifdef HAVE_ANDROID
 	sed -i -e 's/ -lgcc//g' $(PREFIX)/lib/pkgconfig/rav1e.pc
