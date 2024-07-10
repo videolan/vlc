@@ -23,6 +23,7 @@
 #import "VLCLibraryWindowNavigationSidebarViewController.h"
 
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
 

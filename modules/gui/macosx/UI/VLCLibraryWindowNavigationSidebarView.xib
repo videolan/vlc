@@ -7,7 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowNavigationSidebarViewController">
             <connections>
-                <outlet property="outlineView" destination="7u8-Zm-gnd" id="sWc-AU-MVa"/>
+                <outlet property="outlineView" destination="7u8-Zm-gnd" id="8i3-ld-a1v"/>
                 <outlet property="view" destination="gLW-4d-ery" id="lAX-ki-W5E"/>
             </connections>
         </customObject>
@@ -20,7 +20,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="52" height="408"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
-                    <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" floatsGroupRows="NO" indentationPerLevel="13" outlineTableColumn="0BA-rc-l73" id="7u8-Zm-gnd">
+                    <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" floatsGroupRows="NO" indentationPerLevel="13" outlineTableColumn="0BA-rc-l73" id="7u8-Zm-gnd" customClass="VLCLibraryWindowNavigationSidebarOutlineView">
                         <rect key="frame" x="0.0" y="0.0" width="52" height="408"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <size key="intercellSpacing" width="3" height="0.0"/>
