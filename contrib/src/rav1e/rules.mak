@@ -30,7 +30,8 @@ DEPS_rav1e = rav1e-vendor $(DEPS_rav1e-vendor) cargo $(DEPS_cargo)
 
 # rav1e-vendor
 
-rav1e-vendor-build: .sum-rav1e
+rav1e-vendor-build: .cargo
+	$(RM) -R $@
 	mkdir -p $@
 	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1
 	cd $@ && $(CARGO) vendor --locked rav1e-$(RAV1E_VERSION)-vendor
@@ -40,8 +41,10 @@ rav1e-vendor-build: .sum-rav1e
 	# install $@/SHA512SUMS $(SRC)/rav1e-vendor/SHA512SUMS
 	$(RM) -R $@
 
-$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2:
+$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e
 	-$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e)
+	# if the vendor tarball doesn't exist yet, we build it
+	if test ! -s "$@"; then $(RM) -R rav1e-vendor-build; $(MAKE) rav1e-vendor-build; fi
 
 .sum-rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
 	touch $@
@@ -50,13 +53,7 @@ rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-rav1e-vendor
 	$(UNPACK)
 	$(MOVE)
 
-.rav1e-vendor: $(if $(shell test -s "$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2"), rav1e-vendor)
-	# if the vendor tarball doesn't exist yet, we build it and extract it
-	if test ! -s "$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2"; then \
-		$(RM) -R rav1e-vendor-build; \
-		$(MAKE) rav1e-vendor-build; \
-		$(MAKE) rav1e-vendor; \
-	fi
+.rav1e-vendor: rav1e-vendor
 	touch $@
 
 # rav1e
