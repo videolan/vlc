@@ -64,6 +64,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [_outlineView reloadData];
 }
 
+- (NSInteger)indexForRootSegmentType:(VLCLibrarySegmentType)segmentType
+{
+    NSArray<NSTreeNode *> * const rootNodes = self.treeController.arrangedObjects.childNodes;
+    const NSInteger segmentIdx = [rootNodes indexOfObjectPassingTest:^BOOL(NSTreeNode * const obj,
+                                                                           NSUInteger idx,
+                                                                           BOOL * const stop) {
+        VLCLibrarySegment * const segment = obj.representedObject;
+        return segment.segmentType == segmentType;
+    }];
+    return segmentIdx;
+}
+
 - (void)selectSegment:(NSInteger)segmentType
 {
     NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
