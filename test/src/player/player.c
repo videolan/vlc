@@ -124,7 +124,7 @@ struct report_media_attachments
     size_t count;
 };
 
-#define REPORT_LIST \
+#define PLAYER_REPORT_LIST \
     X(input_item_t *, on_current_media_changed) \
     X(enum vlc_player_state, on_state_changed) \
     X(enum vlc_player_error, on_error_changed) \
@@ -179,13 +179,13 @@ struct timer_state
 };
 
 #define X(type, name) typedef struct VLC_VECTOR(type) vec_##name;
-REPORT_LIST
+PLAYER_REPORT_LIST
 #undef X
 
 #define X(type, name) vec_##name name;
 struct reports
 {
-REPORT_LIST
+PLAYER_REPORT_LIST
 };
 #undef X
 
@@ -193,7 +193,7 @@ static inline void
 reports_init(struct reports *report)
 {
 #define X(type, name) vlc_vector_init(&report->name);
-REPORT_LIST
+PLAYER_REPORT_LIST
 #undef X
 }
 
@@ -758,7 +758,7 @@ ctx_reset(struct ctx *ctx)
 #undef FOREACH_VEC
 
 #define X(type, name) vlc_vector_clear(&ctx->report.name);
-REPORT_LIST
+PLAYER_REPORT_LIST
 #undef X
 
     input_item_t *media;
@@ -2246,7 +2246,7 @@ static void
 ctx_destroy(struct ctx *ctx)
 {
 #define X(type, name) vlc_vector_destroy(&ctx->report.name);
-REPORT_LIST
+PLAYER_REPORT_LIST
 #undef X
     vlc_player_RemoveListener(ctx->player, ctx->listener);
     vlc_player_Unlock(ctx->player);
@@ -2281,7 +2281,7 @@ ctx_init(struct ctx *ctx, int flags)
 
 #define X(type, name) .name = player_##name,
     static const struct vlc_player_cbs cbs = {
-REPORT_LIST
+PLAYER_REPORT_LIST
     };
 #undef X
 
