@@ -80,25 +80,24 @@ private:
 
         EventInfo( const vlc_mouse_t & state_old, const vlc_mouse_t & state_new )
             : type( ESMouseEvent )
+            , mouse{ state_old, state_new }
         {
-            mouse.state_old = state_old;
-            mouse.state_new = state_new;
         }
 
         EventInfo( NavivationKey key )
             : type( ActionEvent )
+            , nav{ key }
         {
-            nav.key = key;
         }
 
         union {
             struct {
-                vlc_mouse_t state_old;
-                vlc_mouse_t state_new;
+                const vlc_mouse_t state_old;
+                const vlc_mouse_t state_new;
             } mouse;
 
             struct {
-                NavivationKey key;
+                const NavivationKey key;
             } nav;
         };
     };
