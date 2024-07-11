@@ -38,7 +38,7 @@ public:
     void HandleKeyEvent( NavivationKey );
     void HandleMousePressed( unsigned x, unsigned y );
 
-    void SetPci(const pci_t *data);
+    void SetPci(const uint8_t *, unsigned size);
 protected:
     uint16_t GetPRM( size_t index ) const
     {

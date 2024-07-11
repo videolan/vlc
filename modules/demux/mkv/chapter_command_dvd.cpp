@@ -799,8 +799,11 @@ bool dvd_command_interpretor_c::MatchCellNumber( const chapter_codec_cmds_c &dat
     return (i_cell_num == i_cell_n);
 }
 
-void dvd_command_interpretor_c::SetPci(const pci_t *data)
+void dvd_command_interpretor_c::SetPci(const uint8_t *data, unsigned size)
 {
+    if (size < sizeof(pci_packet))
+        return;
+
     memcpy(&pci_packet, data, sizeof(pci_packet));
 
 #ifndef WORDS_BIGENDIAN

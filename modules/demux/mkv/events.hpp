@@ -35,8 +35,7 @@ struct vlc_spu_highlight_t;
 
 namespace mkv {
 
-struct demux_sys_t;
-struct pci_t;
+struct p_block;
 
 class event_thread_t
 {
@@ -44,7 +43,7 @@ public:
     event_thread_t(demux_t *);
     virtual ~event_thread_t();
 
-    void SetPci(const pci_t *data);
+    void SendData( mkv_track_t &, block_t * );
     void AbortThread();
     int SendEventNav( demux_query_e );
     void SetHighlight( vlc_spu_highlight_t & spu_hl );

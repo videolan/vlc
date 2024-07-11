@@ -44,20 +44,28 @@ event_thread_t::~event_thread_t()
     AbortThread();
 }
 
-void event_thread_t::SetPci(const pci_t *data)
+void event_thread_t::SendData( mkv_track_t &track, block_t * p_block )
 {
-    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
-    vlc_mutex_locker l(&lock);
+    if ( track.codec == "B_VOBBTN")
+    {
+        if( p_block->i_size > 0)
+        {
+            demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
+            vlc_mutex_locker l(&lock);
 
-    if(es_list.empty())
-        return;
+            if(es_list.empty())
+                return;
 
-    auto interpretor = p_sys->GetDVDInterpretor();
-    if (!interpretor)
-        return;
+            auto interpretor = p_sys->GetDVDInterpretor();
+            if (!interpretor)
+                return;
 
-    interpretor->SetPci( data );
-    EnsureThreadLocked();
+            interpretor->SetPci( &p_block->p_buffer[1], p_block->i_size - 1 );
+            EnsureThreadLocked();
+        }
+    }
+
+    block_Release( p_block );
 }
 
 void event_thread_t::EnsureThreadLocked()

@@ -753,9 +753,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             if ( track.fmt.i_cat == DATA_ES )
             {
                 // TODO handle the start/stop times of this packet
-                if( p_block->i_size >= sizeof(pci_t))
-                    p_sys->ev.SetPci( (const pci_t *)&p_block->p_buffer[1]);
-                block_Release( p_block );
+                p_sys->ev.SendData( track, p_block );
                 return;
             }
             p_block->i_dts = p_block->i_pts = i_pts;
