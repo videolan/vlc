@@ -229,10 +229,10 @@ void event_thread_t::SetHighlight( vlc_spu_highlight_t & spu_hl )
     /* TODO: only control relevant SPU_ES given who fired the event */
     for( auto it : es_list )
     {
-        if( it.category != SPU_ES )
+        if( it.track.fmt.i_cat != SPU_ES )
             continue;
 
-        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, it.es, &spu_hl );
+        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, it.track.p_es, &spu_hl );
     }
 }
 
@@ -243,7 +243,7 @@ bool event_thread_t::AddTrack( mkv_track_t & track )
 
     vlc_mutex_locker lock_guard( &lock );
 
-    es_list.push_front( ESInfo( es, category, *this ) );
+    es_list.push_front( ESInfo( track, *this ) );
     es_list_t::iterator info = es_list.begin();
 
     if( category == VIDEO_ES )
@@ -261,10 +261,8 @@ bool event_thread_t::AddTrack( mkv_track_t & track )
 
 void event_thread_t::DelTrack( mkv_track_t &track )
 {
-    es_out_id_t* es = track.p_es;
-
     vlc_mutex_locker lock_guard( &lock );
-    es_list_t::iterator info = std::find( es_list.begin(), es_list.end(), es );
+    es_list_t::iterator info = std::find( es_list.begin(), es_list.end(), track );
     if( info != es_list.end() )
         es_list.erase( info );
 }

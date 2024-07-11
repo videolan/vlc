@@ -54,20 +54,18 @@ public:
 
 private:
     struct ESInfo {
-        ESInfo( es_out_id_t* es, int category, event_thread_t& owner )
-            : es( es )
-            , category( category )
+        ESInfo( mkv_track_t & track_, event_thread_t& owner )
+            : track( track_ )
             , owner( owner )
         {
             vlc_mouse_Init( &mouse_state );
         }
 
-        bool operator==( es_out_id_t* es ) const {
-            return this->es == es;
+        bool operator==( const mkv_track_t & t ) const {
+            return track.p_es == t.p_es;
         }
 
-        es_out_id_t* es;
-        int category;
+        mkv_track_t & track;
         event_thread_t& owner;
         vlc_mouse_t mouse_state;
     };
