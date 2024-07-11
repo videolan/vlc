@@ -110,16 +110,21 @@ int event_thread_t::SendEventNav( demux_query_e nav_query )
 void event_thread_t::EventMouse( vlc_mouse_t const* new_state, void* userdata )
 {
     ESInfo* info = static_cast<ESInfo*>( userdata );
-    vlc_mutex_locker lock_guard( &info->owner.lock );
 
     if( !new_state )
         return vlc_mouse_Init( &info->mouse_state );
 
-    info->owner.pending_events.push_back(
-        EventInfo( info->mouse_state, *new_state ) );
-
-    vlc_cond_signal( &info->owner.wait );
+    info->owner.SendEventMouse( info->mouse_state, *new_state );
     info->mouse_state = *new_state;
+}
+
+void event_thread_t::SendEventMouse( const vlc_mouse_t & old_state, const vlc_mouse_t & new_state )
+{
+    vlc_mutex_locker lock_guard( &lock );
+
+    pending_events.push_back( EventInfo( old_state, new_state ) );
+
+    vlc_cond_signal( &wait );
 }
 
 void event_thread_t::EventThread()

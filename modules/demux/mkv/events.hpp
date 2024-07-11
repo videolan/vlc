@@ -104,6 +104,7 @@ private:
     static void *EventThread(void *);
 
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
+    void SendEventMouse( const vlc_mouse_t & old_state, const vlc_mouse_t & new_state );
 
     void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
