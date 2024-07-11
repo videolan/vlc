@@ -81,8 +81,8 @@
     NSMenuItem *informationItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformation:) keyEquivalent:@""];
     informationItem.target = self;
 
-    NSMenuItem * const bookmarkItem = [[NSMenuItem alloc] initWithTitle:_NS("Bookmark")
-                                                                 action:@selector(bookmark:)
+    NSMenuItem * const bookmarkItem = [[NSMenuItem alloc] initWithTitle:_NS("Toggle Bookmark")
+                                                                 action:@selector(toggleBookmark:)
                                                           keyEquivalent:@""];
     bookmarkItem.target = self;
 
@@ -260,7 +260,7 @@
     [_informationWindowController toggleWindow:sender];
 }
 
-- (void)bookmark:(id)sender
+- (void)toggleBookmark:(id)sender
 {
     if (self.representedInputItems == nil || 
         self.representedInputItems.count != 1 ||
@@ -269,14 +269,19 @@
     }
 
     VLCInputItem * const inputItem = self.representedInputItems.firstObject;
+    NSString * const inputItemMRL = inputItem.MRL;
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     NSMutableArray<NSString *> * const bookmarkedLocations =
         [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey].mutableCopy;
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
 
-    [bookmarkedLocations addObject:inputItem.MRL];
+    if ([bookmarkedLocations containsObject:inputItemMRL]) {
+        [bookmarkedLocations removeObject:inputItemMRL];
+    } else {
+        [bookmarkedLocations addObject:inputItemMRL];
+    }
     [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
-    [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:inputItem.MRL];
+    [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:inputItemMRL];
 }
 
 - (void)setRepresentedItems:(NSArray<VLCLibraryRepresentedItem *> *)items
