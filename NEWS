@@ -32,6 +32,7 @@ Core:
  * Support of HTML help (via the vlc_plugin.h:set_help_html macro)
 
 Audio output:
+ * PipeWire (native) audio output support
  * ALSA: HDMI passthrough support.
    Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
  * Remove the DirectSound plugin (API obsolete after Windows 7)

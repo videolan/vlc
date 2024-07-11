@@ -61,6 +61,15 @@ if HAVE_ALSA
 aout_LTLIBRARIES += libalsa_plugin.la
 endif
 
+libaout_pipewire_plugin_la_SOURCES = \
+	audio_output/vlc_pipewire.c audio_output/vlc_pipewire.h \
+	audio_output/pipewire.c
+libaout_pipewire_plugin_la_CFLAGS = $(AM_CFLAGS) $(PIPEWIRE_CFLAGS)
+libaout_pipewire_plugin_la_LIBADD = $(PIPEWIRE_LIBS) $(LIBM)
+if HAVE_PIPEWIRE
+aout_LTLIBRARIES += libaout_pipewire_plugin.la
+endif
+
 libvlc_pulse_la_SOURCES = audio_output/vlcpulse.c audio_output/vlcpulse.h
 libvlc_pulse_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libvlc_pulse_la_LIBADD = $(PULSE_LIBS) $(LTLIBVLCCORE)

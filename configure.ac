@@ -3739,6 +3739,28 @@ dnl
 EXTEND_HELP_STRING([Audio plugins:])
 
 dnl
+dnl  Pipewire module
+dnl
+AC_ARG_ENABLE([pipewire],
+  AS_HELP_STRING([--enable-pipewire],
+    [use the PipeWire client library (default auto)]))
+have_pipewire="no"
+AS_IF([test "${enable_pipewire}" != "no"], [
+  for v in "0.3 >= 0.3.64" # list of supported package versions
+  do
+    AS_IF([test "${have_pipewire}" = "no"], [
+      PKG_CHECK_MODULES([PIPEWIRE], [libpipewire-${v}], [
+        have_pipewire="yes"
+      ], [true])
+    ])
+  done
+  AS_IF([test "${enable_pipewire}" = "yes" -a -n "${enable_pipewire}"], [
+    AC_MSG_ERROR([$PIPEWIRE_PKG_ERRORS. Pipewire required.])
+  ])
+])
+AM_CONDITIONAL([HAVE_PIPEWIRE], [test "${have_pipewire}" = "yes"])
+
+dnl
 dnl  Pulseaudio module
 dnl
 AC_ARG_ENABLE([pulse],
