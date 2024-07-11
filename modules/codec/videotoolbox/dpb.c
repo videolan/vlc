@@ -242,6 +242,9 @@ picture_t * DPBOutputAndRemoval(struct dpb_s *dpb, date_t *ptsdate,
             dpb->pf_release(output);
             output = next;
         }
+
+        /* Output remaining C.5.2.2 2. al.2 */
+        output = EmptyDPB(dpb, ptsdate);
     }
     else /* Regular bump process */
     {

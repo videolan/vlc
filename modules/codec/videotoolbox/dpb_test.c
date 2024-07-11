@@ -267,6 +267,68 @@ static void CheckDPBWithFramesTest(void)
 
     assert(dpb.i_size == 0);
 
+    /* IRAP, RASL, non-needed slots */
+    info.i_max_pics_buffering = 10; /* let's trigger on needed output only */
+
+    info.i_foc = 22;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = false;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 20;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = true;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 24;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 20, 22, 24, -1);
+
+    CheckDrain(&dpb, &pts, 0, -1);
+
+    assert(dpb.i_size == 0);
+
+    /* IRAP, RASL, non-needed slots, NoRaslOutputFlag */
+    info.i_max_pics_buffering = 10; /* let's trigger on needed output only */
+
+    info.i_foc = 22;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = false;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 20;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_output_needed = true;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 24;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), -1);
+
+    info.i_foc = 0;
+    info.i_poc = info.i_foc & ~1;
+    info.b_flush = (info.i_foc == 0);
+    info.b_no_rasl_output = true;
+    info.b_keyframe = true;
+    CheckOutput(&dpb, &pts, withpic(infocopy(&info), info.i_foc), 20, 24, -1);
+    info.b_no_rasl_output = false;
+    info.b_keyframe = false;
+
+    CheckDrain(&dpb, &pts, 0, -1);
+
+    assert(dpb.i_size == 0);
+
     /* Max latency requirements */
     info.i_max_pics_buffering = 10;
     info.i_max_num_reorder = 7;
