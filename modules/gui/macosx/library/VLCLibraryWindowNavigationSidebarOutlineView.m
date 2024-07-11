@@ -51,6 +51,8 @@
         [bookmarkMenu addItem:removeBookmarkItem];
         return bookmarkMenu;
     }
+
+    return nil;
 }
 
 - (void)removeBookmark:(id)sender
