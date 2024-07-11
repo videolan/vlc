@@ -74,13 +74,14 @@ Widgets.GridItem {
 
     title: model.name || qsTr("Unknown share")
     subtitle: {
-        if (!model.mrl) {
+        const mrl = model.mrl?.toString() || ""
+        const type = model.type
+
+        if ((type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
+            && (mrl === "vlc://nop"))
             return ""
-        } else if ((model.type === NetworkMediaModel.TYPE_NODE || model.type === NetworkMediaModel.TYPE_DIRECTORY) && model.mrl.toString() === "vlc://nop") {
-            return ""
-        } else {
-            return model.mrl
-        }
+
+        return mrl
     }
 
     pictureOverlay: Item {
