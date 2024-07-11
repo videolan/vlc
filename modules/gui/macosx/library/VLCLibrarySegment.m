@@ -30,7 +30,8 @@
 #import "library/media-source/VLCMediaSource.h"
 #import "library/media-source/VLCMediaSourceProvider.h"
 
-static NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
+NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
+NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLocationsChanged";
 
 @implementation VLCLibrarySegment
 
