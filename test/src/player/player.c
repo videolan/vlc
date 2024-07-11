@@ -2301,6 +2301,11 @@ REPORT_LIST
     int ret = var_SetString(vlc->p_libvlc_int, "window", "wdummy");
     assert(ret == VLC_SUCCESS);
 
+    ret = var_Create(vlc->p_libvlc_int, "test-ctx", VLC_VAR_ADDRESS);
+    assert(ret == VLC_SUCCESS);
+    ret = var_SetAddress(vlc->p_libvlc_int, "test-ctx", ctx);
+    assert(ret == VLC_SUCCESS);
+
     ctx->player = vlc_player_New(VLC_OBJECT(vlc->p_libvlc_int),
                                  VLC_PLAYER_LOCK_NORMAL);
     assert(ctx->player);
@@ -3148,6 +3153,8 @@ struct aout_sys
     vlc_tick_t first_pts;
     vlc_tick_t first_play_date;
     vlc_tick_t pos;
+
+    struct ctx *ctx;
 };
 
 static void aout_Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
@@ -3201,6 +3208,10 @@ static int aout_Open(vlc_object_t *obj)
 
     struct aout_sys *sys = aout->sys = malloc(sizeof(*sys));
     assert(sys != NULL);
+
+    sys->ctx = var_InheritAddress(aout, "test-ctx");
+    assert(sys->ctx != NULL);
+
     aout_Flush(aout);
 
     return VLC_SUCCESS;
