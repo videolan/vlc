@@ -30,6 +30,12 @@
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
 
+@interface VLCLibraryWindowNavigationSidebarViewController ()
+
+@property BOOL ignoreSegmentSelectionChanges;
+
+@end
+
 @implementation VLCLibraryWindowNavigationSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -38,6 +44,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     if (self) {
         _libraryWindow = libraryWindow;
         _segments = VLCLibrarySegment.librarySegments;
+        _ignoreSegmentSelectionChanges = NO;
     }
     return self;
 }
@@ -73,8 +80,10 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)bookmarkedLocationsChanged:(NSNotification *)notification
 {
+    self.ignoreSegmentSelectionChanges = YES;
     [self.treeController rearrangeObjects];
     [self.outlineView reloadData];
+    self.ignoreSegmentSelectionChanges = NO;
 }
 
 - (NSTreeNode *)nodeForSegmentType:(VLCLibrarySegmentType)segmentType
@@ -157,6 +166,10 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
+    if (self.ignoreSegmentSelectionChanges) {
+        return;
+    }
+    
     NSTreeNode * const node = (NSTreeNode *)[_outlineView itemAtRow:_outlineView.selectedRow];
     NSParameterAssert(node != nil);
     VLCLibrarySegment * const segment = (VLCLibrarySegment *)node.representedObject;
