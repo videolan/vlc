@@ -154,6 +154,14 @@ struct report_media_attachments
     X(struct report_media_subitems, on_media_subitems_changed) \
     X(struct report_media_attachments, on_media_attachments_added) \
 
+struct report_aout_first_pts
+{
+    vlc_tick_t first_pts;
+};
+
+#define REPORT_LIST \
+    X(vlc_tick_t, on_aout_first_pts) \
+
 struct report_timer
 {
     enum
@@ -180,12 +188,14 @@ struct timer_state
 
 #define X(type, name) typedef struct VLC_VECTOR(type) vec_##name;
 PLAYER_REPORT_LIST
+REPORT_LIST
 #undef X
 
 #define X(type, name) vec_##name name;
 struct reports
 {
 PLAYER_REPORT_LIST
+REPORT_LIST
 };
 #undef X
 
@@ -194,6 +204,7 @@ reports_init(struct reports *report)
 {
 #define X(type, name) vlc_vector_init(&report->name);
 PLAYER_REPORT_LIST
+REPORT_LIST
 #undef X
 }
 
@@ -759,6 +770,7 @@ ctx_reset(struct ctx *ctx)
 
 #define X(type, name) vlc_vector_clear(&ctx->report.name);
 PLAYER_REPORT_LIST
+REPORT_LIST
 #undef X
 
     input_item_t *media;
@@ -2247,6 +2259,7 @@ ctx_destroy(struct ctx *ctx)
 {
 #define X(type, name) vlc_vector_destroy(&ctx->report.name);
 PLAYER_REPORT_LIST
+REPORT_LIST
 #undef X
     vlc_player_RemoveListener(ctx->player, ctx->listener);
     vlc_player_Unlock(ctx->player);
@@ -3167,6 +3180,9 @@ static void aout_Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
         assert(sys->first_pts == VLC_TICK_INVALID);
         sys->first_play_date = date;
         sys->first_pts = block->i_pts;
+
+        struct ctx *ctx = sys->ctx;
+        VEC_PUSH(on_aout_first_pts, sys->first_pts);
     }
 
     aout_TimingReport(aout, sys->first_play_date + sys->pos - VLC_TICK_0,
