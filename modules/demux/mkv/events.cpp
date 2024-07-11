@@ -78,14 +78,29 @@ void event_thread_t::ResetPci()
     is_running = false;
 }
 
-int event_thread_t::SendEventNav( int nav_query )
+int event_thread_t::SendEventNav( demux_query_e nav_query )
 {
+    NavivationKey key;
+    switch( nav_query )
+    {
+    case DEMUX_NAV_LEFT:     key = NavivationKey::LEFT;  break;
+    case DEMUX_NAV_RIGHT:    key = NavivationKey::RIGHT; break;
+    case DEMUX_NAV_UP:       key = NavivationKey::UP;    break;
+    case DEMUX_NAV_DOWN:     key = NavivationKey::DOWN;  break;
+    case DEMUX_NAV_ACTIVATE: key = NavivationKey::OK;    break;
+    case DEMUX_NAV_MENU:     key = NavivationKey::MENU;  break;
+    case DEMUX_NAV_POPUP:    key = NavivationKey::POPUP; break;
+    default:
+        assert(false); // invalid navigation query received
+        return VLC_ENOTSUP;
+    }
+
     if( !is_running )
         return VLC_EGENERIC;
 
     vlc_mutex_locker lock_guard( &lock );
 
-    pending_events.push_back( EventInfo( nav_query ) );
+    pending_events.push_back( EventInfo( key ) );
 
     vlc_cond_signal( &wait );
 
@@ -153,20 +168,7 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 {
     msg_Dbg( p_demux, "Handle Key Event");
 
-    NavivationKey key;
-    switch( ev.nav.query )
-    {
-    case DEMUX_NAV_LEFT:     key = NavivationKey::LEFT;
-    case DEMUX_NAV_RIGHT:    key = NavivationKey::RIGHT;
-    case DEMUX_NAV_UP:       key = NavivationKey::UP;
-    case DEMUX_NAV_DOWN:     key = NavivationKey::DOWN;
-    case DEMUX_NAV_ACTIVATE: key = NavivationKey::OK;
-    case DEMUX_NAV_MENU:     key = NavivationKey::MENU;
-    case DEMUX_NAV_POPUP:    key = NavivationKey::POPUP;
-    default:                 return;
-    }
-
-    HandleKeyEvent( key );
+    HandleKeyEvent( ev.nav.key );
 }
 
 void event_thread_t::HandleKeyEvent( NavivationKey key )

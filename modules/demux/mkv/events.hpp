@@ -46,7 +46,7 @@ public:
 
     void SetPci(const pci_t *data);
     void ResetPci();
-    int SendEventNav( int );
+    int SendEventNav( demux_query_e );
     void SetHighlight( vlc_spu_highlight_t & spu_hl );
 
     bool AddES( es_out_id_t* es, int category );
@@ -86,10 +86,10 @@ private:
             mouse.state_new = state_new;
         }
 
-        EventInfo( int query )
+        EventInfo( NavivationKey key )
             : type( ActionEvent )
         {
-            nav.query = query;
+            nav.key = key;
         }
 
         union {
@@ -100,7 +100,7 @@ private:
             } mouse;
 
             struct {
-                int query;
+                NavivationKey key;
             } nav;
         };
     };
