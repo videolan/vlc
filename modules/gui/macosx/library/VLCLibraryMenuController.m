@@ -28,6 +28,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryRepresentedItem.h"
+#import "library/VLCLibrarySegment.h"
 
 #import "main/VLCMain.h"
 
@@ -232,6 +233,25 @@
     }
 
     [_informationWindowController toggleWindow:sender];
+}
+
+- (void)bookmark:(id)sender
+{
+    if (self.representedInputItems == nil || 
+        self.representedInputItems.count != 1 ||
+        self.representedInputItems.firstObject.inputType != ITEM_TYPE_DIRECTORY) {
+        return;
+    }
+
+    VLCInputItem * const inputItem = self.representedInputItems.firstObject;
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    NSMutableArray<NSString *> * const bookmarkedLocations =
+        [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey].mutableCopy;
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+
+    [bookmarkedLocations addObject:inputItem.MRL];
+    [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
+    [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:inputItem.MRL];
 }
 
 - (void)setRepresentedItems:(NSArray<VLCLibraryRepresentedItem *> *)items
