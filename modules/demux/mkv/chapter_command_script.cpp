@@ -71,10 +71,10 @@ bool matroska_script_codec_c::Enter()
     ChapterProcess::iterator index = enter_cmds.begin();
     while ( index != enter_cmds.end() )
     {
-        if ( (*index)->GetSize() )
+        if ( (*index).GetSize() )
         {
             vlc_debug( l, "Matroska Script enter command" );
-            f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
+            f_result |= interpreter.Interpret( (*index).GetBuffer(), (*index).GetSize() );
         }
         ++index;
     }
@@ -87,10 +87,10 @@ bool matroska_script_codec_c::Leave()
     ChapterProcess::iterator index = leave_cmds.begin();
     while ( index != leave_cmds.end() )
     {
-        if ( (*index)->GetSize() )
+        if ( (*index).GetSize() )
         {
             vlc_debug( l, "Matroska Script leave command" );
-            f_result |= interpreter.Interpret( (*index)->GetBuffer(), (*index)->GetSize() );
+            f_result |= interpreter.Interpret( (*index).GetBuffer(), (*index).GetSize() );
         }
         ++index;
     }

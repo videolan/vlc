@@ -80,7 +80,7 @@ public:
     KaxChapterProcessPrivate *p_private_data;
 
 protected:
-    using ChapterProcess = std::vector<KaxChapterProcessData*>;
+    using ChapterProcess = std::vector<KaxChapterProcessData>;
     ChapterProcess enter_cmds;
     ChapterProcess during_cmds;
     ChapterProcess leave_cmds;

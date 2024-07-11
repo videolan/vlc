@@ -38,9 +38,6 @@ namespace mkv {
 chapter_codec_cmds_c::~chapter_codec_cmds_c()
 {
     delete p_private_data;
-    vlc_delete_all( enter_cmds );
-    vlc_delete_all( leave_cmds );
-    vlc_delete_all( during_cmds );
 }
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
@@ -79,7 +76,7 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
     {
         if( MKV_CHECKED_PTR_DECL_CONST( p_cpd, KaxChapterProcessData, command[i] ) )
         {
-            container->push_back( new KaxChapterProcessData( *p_cpd ) );
+            container->push_back( *p_cpd );
         }
     }
 }

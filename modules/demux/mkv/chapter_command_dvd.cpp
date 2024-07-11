@@ -50,10 +50,10 @@ bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProces
     ChapterProcess::iterator it = p_container.begin ();
     while( it != p_container.end() )
     {
-        if( (*it)->GetSize() )
+        if( (*it).GetSize() )
         {
-            binary *p_data = (*it)->GetBuffer();
-            size_t i_size  = std::min<size_t>( *p_data++, ( (*it)->GetSize() - 1 ) >> 3 ); // avoid reading too much
+            binary *p_data = (*it).GetBuffer();
+            size_t i_size  = std::min<size_t>( *p_data++, ( (*it).GetSize() - 1 ) >> 3 ); // avoid reading too much
             for( ; i_size > 0; i_size -=1, p_data += 8 )
             {
                 vlc_debug( l, "%s", str_diag);
