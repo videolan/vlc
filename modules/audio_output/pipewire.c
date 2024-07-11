@@ -446,6 +446,8 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
         .channels = fmt->i_channels,
     };
 
+    enum spa_audio_iec958_codec encoding = SPA_AUDIO_IEC958_CODEC_PCM; /* PCM by default */
+
     /* Map possible audio output formats */
     switch (fmt->i_format) {
         case VLC_CODEC_FL64:
@@ -464,11 +466,29 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
             rawfmt.format = SPA_AUDIO_FORMAT_U8;
             break;
         case VLC_CODEC_A52:
+            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
+            fmt->i_channels = 2;
+            encoding = SPA_AUDIO_IEC958_CODEC_AC3;
+            break;
         case VLC_CODEC_EAC3:
+            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
+            fmt->i_channels = 2;
+            encoding = SPA_AUDIO_IEC958_CODEC_EAC3;
+            break;
         case VLC_CODEC_DTS:
-            /* TODO: pass-through */
-            errno = ENOTSUP;
-            return NULL;
+            fmt->i_format = VLC_CODEC_SPDIFL;
+            fmt->i_bytes_per_frame = 4;
+            fmt->i_frame_length = 1;
+            fmt->i_physical_channels = AOUT_CHANS_2_0;
+            fmt->i_channels = 2;
+            encoding = SPA_AUDIO_IEC958_CODEC_DTS;
+            break;
         default:
             vlc_pw_error(sys->context, "unknown format");
             errno = ENOTSUP;
@@ -476,37 +496,40 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     }
 
     /* Map audio channels */
-    size_t mapped = 0;
+    if (encoding == SPA_AUDIO_IEC958_CODEC_PCM)
+    {
+        size_t mapped = 0;
 
-    if (fmt->i_channels > SPA_AUDIO_MAX_CHANNELS) {
-        vlc_pw_error(sys->context, "too many channels");
-        errno = ENOTSUP;
-        return NULL;
-    }
+        if (fmt->i_channels > SPA_AUDIO_MAX_CHANNELS) {
+            vlc_pw_error(sys->context, "too many channels");
+            errno = ENOTSUP;
+            return NULL;
+        }
 
-    static const unsigned char map[] = {
-        SPA_AUDIO_CHANNEL_FC,
-        SPA_AUDIO_CHANNEL_FL,
-        SPA_AUDIO_CHANNEL_FR,
-        0 /* unassigned */,
-        SPA_AUDIO_CHANNEL_RC,
-        SPA_AUDIO_CHANNEL_RL,
-        SPA_AUDIO_CHANNEL_RR,
-        0 /* unassigned */,
-        SPA_AUDIO_CHANNEL_SL,
-        SPA_AUDIO_CHANNEL_SR,
-        0 /* unassigned */,
-        0 /* unassigned */,
-        SPA_AUDIO_CHANNEL_LFE,
-    };
+        static const unsigned char map[] = {
+            SPA_AUDIO_CHANNEL_FC,
+            SPA_AUDIO_CHANNEL_FL,
+            SPA_AUDIO_CHANNEL_FR,
+            0 /* unassigned */,
+            SPA_AUDIO_CHANNEL_RC,
+            SPA_AUDIO_CHANNEL_RL,
+            SPA_AUDIO_CHANNEL_RR,
+            0 /* unassigned */,
+            SPA_AUDIO_CHANNEL_SL,
+            SPA_AUDIO_CHANNEL_SR,
+            0 /* unassigned */,
+            0 /* unassigned */,
+            SPA_AUDIO_CHANNEL_LFE,
+        };
 
-    for (size_t i = 0; i < ARRAY_SIZE(map); i++)
-        if ((fmt->i_physical_channels >> i) & 1)
-            rawfmt.position[mapped++] = map[i];
+        for (size_t i = 0; i < ARRAY_SIZE(map); i++)
+            if ((fmt->i_physical_channels >> i) & 1)
+                rawfmt.position[mapped++] = map[i];
 
-    while (mapped < fmt->i_channels) {
-        rawfmt.position[mapped] = SPA_AUDIO_CHANNEL_START_Aux + mapped;
-        mapped++;
+        while (mapped < fmt->i_channels) {
+            rawfmt.position[mapped] = SPA_AUDIO_CHANNEL_START_Aux + mapped;
+            mapped++;
+        }
     }
 
     /* Assemble the stream format */
@@ -514,8 +537,20 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     unsigned char buf[1024];
     struct spa_pod_builder builder = SPA_POD_BUILDER_INIT(buf, sizeof (buf));
 
-    params[0] = spa_format_audio_raw_build(&builder, SPA_PARAM_EnumFormat,
-                                           &rawfmt);
+    if (encoding == SPA_AUDIO_IEC958_CODEC_PCM)
+    {
+        params[0] = spa_format_audio_raw_build(&builder, SPA_PARAM_EnumFormat,
+                                               &rawfmt);
+    }
+    else /* pass-through */
+    {
+        struct spa_audio_info_iec958 iecfmt = {
+            .rate = fmt->i_rate,
+            .codec = encoding
+        };
+        params[0] = spa_format_audio_iec958_build(&builder, SPA_PARAM_EnumFormat,
+                                                  &iecfmt);
+    }
 
     /* Assemble stream properties */
     struct pw_properties *props;
