@@ -23,7 +23,17 @@
 
 #include "chapter_command.hpp"
 
+#include <vlc_arrays.h>
+
 namespace mkv {
+
+chapter_codec_cmds_c::~chapter_codec_cmds_c()
+{
+    delete p_private_data;
+    vlc_delete_all( enter_cmds );
+    vlc_delete_all( leave_cmds );
+    vlc_delete_all( during_cmds );
+}
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {

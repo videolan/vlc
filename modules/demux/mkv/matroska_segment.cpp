@@ -27,6 +27,8 @@
 #include "util.hpp"
 #include "Ebml_dispatcher.hpp"
 
+#include <vlc_arrays.h>
+
 #include <new>
 #include <iterator>
 #include <limits>

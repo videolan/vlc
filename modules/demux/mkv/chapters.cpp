@@ -25,6 +25,8 @@
 
 #include "chapter_command.hpp"
 
+#include <vlc_arrays.h>
+
 #include <functional>
 #include <algorithm>
 

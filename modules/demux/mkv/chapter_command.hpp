@@ -24,7 +24,6 @@
 #ifndef VLC_MKV_CHAPTER_COMMAND_HPP_
 #define VLC_MKV_CHAPTER_COMMAND_HPP_
 
-#include <vlc_arrays.h>
 #include "mkv.hpp"
 
 struct vlc_spu_highlight_t;
@@ -61,13 +60,7 @@ public:
     ,vm( vm_ )
     {}
 
-    virtual ~chapter_codec_cmds_c()
-    {
-        delete p_private_data;
-        vlc_delete_all( enter_cmds );
-        vlc_delete_all( leave_cmds );
-        vlc_delete_all( during_cmds );
-    }
+    virtual ~chapter_codec_cmds_c();
 
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
     {
