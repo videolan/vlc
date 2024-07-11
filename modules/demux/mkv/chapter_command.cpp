@@ -42,42 +42,31 @@ chapter_codec_cmds_c::~chapter_codec_cmds_c()
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
-    std::optional<MatroskaChapterProcessTime> codec_time;
-    for( size_t i = 0; i < command.ListSize(); i++ )
+    auto data = FindChild<KaxChapterProcessData>(command);
+    if (unlikely(!data))
     {
-        if( MKV_CHECKED_PTR_DECL_CONST( p_cpt, KaxChapterProcessTime, command[i] ) )
-        {
-            codec_time = static_cast<MatroskaChapterProcessTime>( static_cast<unsigned>(*p_cpt) );
-            break;
-        }
+        vlc_debug( l, "missing ChapProcessData" );
+        return;
     }
 
-    if( !codec_time )
+    auto codec_time = FindChild<KaxChapterProcessTime>(command);
+    if( unlikely(!codec_time) )
     {
         vlc_debug( l, "missing ChapProcessTime" );
         return;
     }
-    if( *codec_time >= 3 )
+    if( static_cast<unsigned>(*codec_time) >= 3 )
     {
-        vlc_debug( l, "unknown ChapProcessTime %d", *codec_time );
+        vlc_debug( l, "unknown ChapProcessTime %d", static_cast<unsigned>(*codec_time) );
         return;
     }
 
-    ChapterProcess *container;
-    switch (*codec_time)
+    switch (static_cast<unsigned>(*codec_time))
     {
-        case MATROSKA_CHAPPROCESSTIME_DURING: container = &during_cmds; break;
-        case MATROSKA_CHAPPROCESSTIME_BEFORE: container = &enter_cmds;  break;
-        case MATROSKA_CHAPPROCESSTIME_AFTER:  container = &leave_cmds;  break;
+        case MATROSKA_CHAPPROCESSTIME_DURING: during_cmds.push_back( *data ); break;
+        case MATROSKA_CHAPPROCESSTIME_BEFORE: enter_cmds.push_back( *data );  break;
+        case MATROSKA_CHAPPROCESSTIME_AFTER:  leave_cmds.push_back( *data );  break;
         default: vlc_assert_unreachable();
-    }
-
-    for( size_t i = 0; i < command.ListSize(); i++ )
-    {
-        if( MKV_CHECKED_PTR_DECL_CONST( p_cpd, KaxChapterProcessData, command[i] ) )
-        {
-            container->push_back( *p_cpd );
-        }
     }
 }
 
