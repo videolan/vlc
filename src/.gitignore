@@ -1,4 +1,6 @@
 test_*
+!test_*.*
+test_*.exe
 checkheader_*_h.c
 fourcc_gen
 fourcc_tables.h
