@@ -749,6 +749,72 @@ static void monotonic_convert_paused_run(const struct clock_ctx *ctx)
     convert_paused_common(ctx, ctx->slave);
 }
 
+static void contexts_run(const struct clock_ctx *ctx)
+{
+    vlc_tick_t converted;
+    vlc_tick_t system = ctx->system_start;
+    vlc_tick_t stream_context0 = 1;
+    uint32_t clock_id;
+
+    vlc_clock_main_Lock(ctx->mainclk);
+
+    /* Initial SetFirstPcr, that will initialise the default and main context */
+    vlc_clock_main_SetFirstPcr(ctx->mainclk, system, stream_context0);
+
+    /* Check that the converted point is valid */
+    converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context0,
+                                          1.0f, &clock_id);
+    assert(clock_id == 0);
+    assert(converted == system);
+    vlc_clock_Update(ctx->slave, system, stream_context0, 1.0f);
+
+    /* Discontinuity from 1us to 30 sec */
+    vlc_tick_t system_context0 = system;
+    vlc_tick_t stream_context1 = VLC_TICK_FROM_SEC(30);
+    system += VLC_TICK_FROM_MS(100);
+    vlc_clock_main_SetFirstPcr(ctx->mainclk, system, stream_context1);
+
+    /* Check that we can use the new context (or new origin) */
+    converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context1,
+                                          1.0f, &clock_id);
+    assert(clock_id == 1);
+    assert(converted == system);
+
+    /* Check that we can still use the old context when converting a point
+     * closer to the original context */
+    converted = vlc_clock_ConvertToSystem(ctx->slave, system,
+                                          VLC_TICK_FROM_MS(10) + stream_context0,
+                                          1.0f, &clock_id);
+    assert(clock_id == 0);
+    assert(converted == system_context0 + VLC_TICK_FROM_MS(10));
+
+    /* Update on the newest context will cause previous contexts to be removed */
+    vlc_clock_Update(ctx->slave, system, stream_context1, 1.0f);
+
+    /* Discontinuity back to 1us */
+    system += VLC_TICK_FROM_MS(100);
+    vlc_tick_t stream_context2 = 1;
+    vlc_clock_main_SetFirstPcr(ctx->mainclk, system, stream_context2);
+
+    /* Check that we can use the new context (or new origin) */
+    converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context2,
+                                          1.0f, &clock_id);
+    assert(clock_id == 2);
+    assert(converted == system);
+    /* Update on the newest context will cause previous contexts to be removed */
+    vlc_clock_Update(ctx->slave, system, stream_context2, 1.0f);
+
+    /* Check that the same conversion will output a different result now that
+     * the old contexts are removed */
+    system += VLC_TICK_FROM_MS(100);
+    converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context1, 1.0f,
+                                          &clock_id);
+    assert(clock_id == 2);
+    assert(converted != system_context0);
+
+    vlc_clock_main_Unlock(ctx->mainclk);
+}
+
 #define VLC_TICK_12H VLC_TICK_FROM_SEC(12 * 60 * 60)
 #define VLC_TICK_2H VLC_TICK_FROM_SEC(2 * 60 * 60)
 #define DEFAULT_STREAM_INCREMENT VLC_TICK_FROM_MS(100)
@@ -847,6 +913,13 @@ static struct clock_scenario clock_scenarios[] = {
     .desc = "it is possible to convert ts while paused",
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_convert_paused_run,
+    .disable_jitter = true,
+},
+{
+    .name = "contexts",
+    .desc = "switching contexts is handled",
+    .type = CLOCK_SCENARIO_RUN,
+    .run = contexts_run,
     .disable_jitter = true,
 },
 };
