@@ -2988,6 +2988,32 @@ test_attachments(struct ctx *ctx)
 }
 
 static void
+test_clock_discontinuities(struct ctx *ctx)
+{
+    test_log("discontinuities\n");
+
+    vlc_player_t *player = ctx->player;
+
+    struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_SEC(20));
+    params.pts_delay = VLC_TICK_FROM_MS(50);
+    params.discontinuities = "(400000,2)(400000,2500000)(3000000,10000000)";
+    player_set_next_mock_media(ctx, "media1", &params);
+
+    player_start(ctx);
+
+    vec_on_aout_first_pts *vec = &ctx->report.on_aout_first_pts;
+    while (vec->size != 4)
+        vlc_player_CondWait(player, &ctx->wait);
+
+    assert(vec->data[0] == VLC_TICK_0); /* Initial PTS */
+    assert(vec->data[1] == 2); /* 1st discontinuity */
+    assert(vec->data[2] == 2500000); /* 2nd discontinuity */
+    assert(vec->data[3] == 10000000); /* 3rd discontinuity */
+
+    test_end(ctx);
+}
+
+static void
 test_audio_loudness_meter_cb(vlc_tick_t date, double momentary_loudness,
                              void *data)
 {
@@ -3145,6 +3171,12 @@ main(void)
     test_delete_while_playback(VLC_OBJECT(ctx.vlc->p_libvlc_int), false);
 
     ctx_destroy(&ctx);
+
+    /* Test with instantaneous audio drain */
+    ctx_init(&ctx, AUDIO_INSTANT_DRAIN);
+    test_clock_discontinuities(&ctx);
+    ctx_destroy(&ctx);
+
     /* Test with --no-video */
     ctx_init(&ctx, DISABLE_VIDEO);
     test_es_selection_override(&ctx);
