@@ -145,6 +145,9 @@ void event_thread_t::EventThread()
             const EventInfo ev = pending_events.front();
             pending_events.pop_front();
 
+            if(es_list.empty())
+                break;
+
             vlc_mutex_unlock( &lock );
             switch( ev.type )
             {
