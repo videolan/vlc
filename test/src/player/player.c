@@ -220,6 +220,7 @@ struct media_params
     vlc_tick_t pts_delay;
 
     const char *config;
+    const char *discontinuities;
 };
 
 #define DEFAULT_MEDIA_PARAMS(param_length) { \
@@ -243,6 +244,7 @@ struct media_params
     .null_names = false, \
     .pts_delay = DEFAULT_PTS_DELAY, \
     .config = NULL, \
+    .discontinuities = NULL, \
 }
 
 #define DISABLE_VIDEO_OUTPUT (1 << 0)
@@ -793,7 +795,7 @@ create_mock_media(const char *name, const struct media_params *params)
         "video_frame_rate=%u;video_frame_rate_base=%u;"
         "title_count=%zu;chapter_count=%zu;"
         "can_seek=%d;can_pause=%d;error=%d;null_names=%d;pts_delay=%"PRId64";"
-        "config=%s;attachment_count=%zu",
+        "config=%s;discontinuities=%s;attachment_count=%zu",
         params->track_count[VIDEO_ES], params->track_count[AUDIO_ES],
         params->track_count[SPU_ES], params->program_count,
         params->video_packetized, params->audio_packetized,
@@ -802,7 +804,9 @@ create_mock_media(const char *name, const struct media_params *params)
         params->title_count, params->chapter_count,
         params->can_seek, params->can_pause, params->error, params->null_names,
         params->pts_delay,
-        params->config ? params->config : "", params->attachment_count);
+        params->config ? params->config : "",
+        params->discontinuities ? params->discontinuities : "",
+        params->attachment_count);
     assert(ret != -1);
     input_item_t *item = input_item_New(url, name);
     assert(item);
