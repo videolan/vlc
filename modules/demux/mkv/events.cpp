@@ -68,10 +68,11 @@ void event_thread_t::ResetPci()
     if( !is_running )
         return;
 
-    vlc_mutex_lock( &lock );
-    b_abort = true;
-    vlc_cond_signal( &wait );
-    vlc_mutex_unlock( &lock );
+    {
+        vlc_mutex_locker lock_guard(&lock);
+        b_abort = true;
+        vlc_cond_signal( &wait );
+    }
 
     vlc_join( thread, NULL );
     is_running = false;
@@ -177,12 +178,12 @@ void event_thread_t::HandleKeyEvent( NavivationKey key )
         return;
 
     vlc_mutex_unlock( &lock );
-    vlc_mutex_lock( &p_sys->lock_demuxer );
+    {
+        vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
-    // process the button action
-    interpretor->HandleKeyEvent( key );
-
-    vlc_mutex_unlock( &p_sys->lock_demuxer );
+        // process the button action
+        interpretor->HandleKeyEvent( key );
+    }
     vlc_mutex_lock( &lock );
 }
 
@@ -213,9 +214,11 @@ void event_thread_t::HandleMousePressed( unsigned x, unsigned y )
     msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
     vlc_mutex_unlock( &lock );
-    vlc_mutex_lock( &p_sys->lock_demuxer );
-    interpretor->HandleMousePressed( x, y );
-    vlc_mutex_unlock( &p_sys->lock_demuxer );
+    {
+        vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+
+        interpretor->HandleMousePressed( x, y );
+    }
     vlc_mutex_lock( &lock );
 }
 
