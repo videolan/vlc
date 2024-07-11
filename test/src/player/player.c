@@ -245,6 +245,11 @@ struct media_params
     .config = NULL, \
 }
 
+#define DISABLE_VIDEO_OUTPUT (1 << 0)
+#define DISABLE_AUDIO_OUTPUT (1 << 1)
+#define DISABLE_VIDEO        (1 << 2)
+#define DISABLE_AUDIO        (1 << 3)
+
 struct ctx
 {
     libvlc_instance_t *vlc;
@@ -2243,16 +2248,8 @@ REPORT_LIST
     libvlc_release(ctx->vlc);
 }
 
-enum ctx_flags
-{
-    DISABLE_VIDEO_OUTPUT = 1 << 0,
-    DISABLE_AUDIO_OUTPUT = 1 << 1,
-    DISABLE_VIDEO        = 1 << 2,
-    DISABLE_AUDIO        = 1 << 3,
-};
-
 static void
-ctx_init(struct ctx *ctx, enum ctx_flags flags)
+ctx_init(struct ctx *ctx, int flags)
 {
     const char * argv[] = {
         "-v",
