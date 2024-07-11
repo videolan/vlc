@@ -25,6 +25,7 @@
 #include "demux.hpp"
 #include "stream_io_callback.hpp"
 #include "Ebml_parser.hpp"
+#include "virtual_segment.hpp"
 
 #include <vlc_actions.h>
 

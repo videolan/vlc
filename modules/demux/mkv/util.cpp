@@ -23,6 +23,7 @@
 #include "mkv.hpp"
 #include "util.hpp"
 #include "demux.hpp"
+#include "virtual_segment.hpp"
 #include "../../codec/webvtt/helpers.h"
 
 namespace mkv {

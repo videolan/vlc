@@ -26,7 +26,7 @@
 
 #include "matroska_segment.hpp"
 #include "demux.hpp"
-
+#include "virtual_segment.hpp"
 #include "chapters.hpp"
 #include "Ebml_parser.hpp"
 

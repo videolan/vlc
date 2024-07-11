@@ -28,7 +28,6 @@
 
 #include "chapter_command.hpp"
 #include "chapter_command_dvd.hpp"
-#include "virtual_segment.hpp"
 #include "events.hpp"
 
 #include <memory>
