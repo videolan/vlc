@@ -80,9 +80,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)bookmarkedLocationsChanged:(NSNotification *)notification
 {
+    const VLCLibrarySegmentType currentSegmentType = self.libraryWindow.librarySegmentType;
+
     self.ignoreSegmentSelectionChanges = YES;
+    
     [self.treeController rearrangeObjects];
     [self.outlineView reloadData];
+
+    NSTreeNode * const targetNode = [self nodeForSegmentType:currentSegmentType];
+    const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
+    [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
+                  byExtendingSelection:NO];
+
     self.ignoreSegmentSelectionChanges = NO;
 }
 
