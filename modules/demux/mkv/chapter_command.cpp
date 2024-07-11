@@ -35,11 +35,6 @@ typedef enum {
 
 namespace mkv {
 
-chapter_codec_cmds_c::~chapter_codec_cmds_c()
-{
-    delete p_private_data;
-}
-
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
     auto data = FindChild<KaxChapterProcessData>(command);

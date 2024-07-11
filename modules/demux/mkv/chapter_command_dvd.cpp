@@ -23,7 +23,7 @@ constexpr binary MATROSKA_DVD_LEVEL_CN   = 0x08;
 
 int16_t dvd_chapter_codec_c::GetTitleNumber() const
 {
-    if ( p_private_data->GetSize() >= 3)
+    if ( p_private_data != nullptr && p_private_data->GetSize() >= 3)
     {
         const binary* p_data = p_private_data->GetBuffer();
         if ( p_data[0] == MATROSKA_DVD_LEVEL_SS )

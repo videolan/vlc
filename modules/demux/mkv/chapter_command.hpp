@@ -26,6 +26,8 @@
 
 #include "mkv.hpp"
 
+#include <memory>
+
 struct vlc_spu_highlight_t;
 
 namespace mkv {
@@ -55,16 +57,15 @@ class chapter_codec_cmds_c
 public:
     chapter_codec_cmds_c( struct vlc_logger *log, chapter_codec_vm & vm_, enum chapter_codec_id codec_id)
     :i_codec_id( codec_id )
-    ,p_private_data(NULL)
     ,l( log )
     ,vm( vm_ )
     {}
 
-    virtual ~chapter_codec_cmds_c();
+    virtual ~chapter_codec_cmds_c() = default;
 
     void SetPrivate( const KaxChapterProcessPrivate & private_data )
     {
-        p_private_data = new KaxChapterProcessPrivate( private_data );
+        p_private_data = std::make_unique<KaxChapterProcessPrivate>(private_data);
     }
 
     void AddCommand( const KaxChapterProcessCommand & command );
@@ -77,7 +78,7 @@ public:
 
     const enum chapter_codec_id i_codec_id;
 
-    KaxChapterProcessPrivate *p_private_data;
+    std::unique_ptr<KaxChapterProcessPrivate> p_private_data;
 
 protected:
     using ChapterProcess = std::vector<KaxChapterProcessData>;
