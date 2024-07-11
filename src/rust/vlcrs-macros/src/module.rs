@@ -533,7 +533,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let description_with_nul = tt_c_str!(description.span() => description.value());
     let name_with_nul = tt_c_str!(type_.span() => name);
 
-    let module = Ident::new(&capability.value(), capability.span());
+    let module = &capability.value();
     let capability_with_nul = tt_c_str!(capability.span() =>
                                         capability.value());
 
