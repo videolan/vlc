@@ -25,6 +25,10 @@
 #include <vlc_plugin.h>
 #include <wayland-client.h>
 
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#include "viewporter-client-protocol.h"
+#endif
+
 #include <assert.h>
 
 typedef struct
@@ -33,6 +37,11 @@ typedef struct
     struct wl_event_queue* queue;
     struct wl_compositor* compositor;
     struct wl_subcompositor* subcompositor;
+
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    struct wp_viewport* viewport;
+    struct wp_viewporter* viewporter;
+#endif
 
     struct wl_surface* interface_surface;
 
@@ -54,6 +63,10 @@ static void registry_global_cb(void* data, struct wl_registry* registry,
         sys->subcompositor = (struct wl_subcompositor*)wl_registry_bind(registry, id, &wl_subcompositor_interface, version);
     if (!strcmp(iface, "wl_compositor"))
         sys->compositor = (struct wl_compositor*)wl_registry_bind(registry, id, &wl_compositor_interface, version);
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    if (!strcmp(iface, "wp_viewporter"))
+        sys->viewporter = (struct wp_viewporter*)wl_registry_bind(registry, id, &wp_viewporter_interface, version);
+#endif
 }
 
 static void registry_global_remove_cb(void* data, struct wl_registry* registry, uint32_t id)
@@ -90,7 +103,21 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
     if (!sys->video_surface)
         return VLC_EGENERIC;
 
-    wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    if (sys->viewporter)
+        sys->viewport = wp_viewporter_get_viewport(sys->viewporter, sys->video_surface);
+    else
+#endif
+    {
+        // The buffer scale must remain 1 when fractional scaling is used
+        if (sys->buffer_scale != 1)
+        {
+            msg_Dbg(obj, "Viewporter protocol is not available, and scale is not 1." \
+                         "Only integer scaling is possible.");
+        }
+
+        wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+    }
 
     struct wl_region* region = wl_compositor_create_region(sys->compositor);
     if (!region)
@@ -116,6 +143,15 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
 static void TeardownVoutWindow(struct qtwayland_t* obj)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    if (sys->viewport)
+    {
+        wp_viewport_destroy(sys->viewport);
+        sys->viewport = NULL;
+    }
+#endif
+
     vlc_assert(sys->video_surface);
     wl_surface_destroy(sys->video_surface);
     sys->video_surface = NULL;
@@ -158,15 +194,33 @@ static void Move(struct qtwayland_t* obj, int x, int y)
 
 static void Resize(struct qtwayland_t* obj, size_t width, size_t height)
 {
-    VLC_UNUSED(obj);
-    VLC_UNUSED(width);
-    VLC_UNUSED(height);
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+    if (!sys->video_surface)
+        return;
+    if (sys->viewport)
+    {
+        // width and height here represent the final size, after scaling
+        // is taken into account. The fractional scaling protocol is not
+        // necessary, because the (fractional) scale is retrieved from the
+        // Qt Quick window which uses the fractional scale protocol itself
+        // to determine the device pixel ratio.
+        wp_viewport_set_destination(sys->viewport, width, height);
+        wl_surface_commit(sys->video_surface);
+    }
+#endif
 }
 
 static void Close(qtwayland_t* obj)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)(obj->p_sys);
     wl_display_flush(sys->display);
+
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    if (sys->viewporter)
+        wp_viewporter_destroy(sys->viewporter);
+#endif
 
     wl_subcompositor_destroy(sys->subcompositor);
     wl_compositor_destroy(sys->compositor);
@@ -188,6 +242,11 @@ static bool Init(qtwayland_t* obj, void* qpni_display)
     sys->queue = wl_display_create_queue(display);
     void* wrapper = wl_proxy_create_wrapper(display);
     wl_proxy_set_queue((struct wl_proxy*)wrapper, sys->queue);
+
+#ifdef QT_HAS_WAYLAND_PROTOCOLS
+    sys->viewporter = NULL;
+    sys->viewport = NULL;
+#endif
 
     struct wl_registry* registry = wl_display_get_registry((struct wl_display*)wrapper);
     wl_proxy_wrapper_destroy(wrapper);

@@ -17,6 +17,8 @@
  *****************************************************************************/
 #include "compositor_wayland.hpp"
 
+#include <cmath>
+
 #include "maininterface/mainctx.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
@@ -115,7 +117,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     if (!interfaceSurface)
         return false;
 
-    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, dprForWindow(m_qmlView.get()));
+    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, std::ceil(dprForWindow(m_qmlView.get())));
 
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC;
 
