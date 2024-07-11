@@ -1437,9 +1437,9 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 
             chapter_codec_cmds_c *p_ccodec = NULL;
 
-            for( size_t j = 0; j < cp.ListSize(); j++ )
+            for (auto proc : cp)
             {
-                if( MKV_CHECKED_PTR_DECL( p_codec_id, KaxChapterProcessCodecID, cp[j] ) )
+                if( MKV_CHECKED_PTR_DECL_CONST( p_codec_id, KaxChapterProcessCodecID, proc ) )
                 {
                     if ( p_codec_id->GetValue() == MATROSKA_CHAPTER_CODEC_NATIVE )
                         p_ccodec = new matroska_script_codec_c( vlc_object_logger( &vars.obj->sys.demuxer ), vars.obj->sys );
@@ -1457,15 +1457,13 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
 
             if ( p_ccodec != NULL )
             {
-                for( size_t j = 0; j < cp.ListSize(); j++ )
+                for (auto k : cp)
                 {
-                    EbmlElement *k= cp[j];
-
-                    if( MKV_CHECKED_PTR_DECL( p_private, KaxChapterProcessPrivate, k ) )
+                    if( MKV_CHECKED_PTR_DECL_CONST( p_private, KaxChapterProcessPrivate, k ) )
                     {
                         p_ccodec->SetPrivate( *p_private );
                     }
-                    else if ( MKV_CHECKED_PTR_DECL( cmd, KaxChapterProcessCommand, k ) )
+                    else if ( MKV_CHECKED_PTR_DECL_CONST( cmd, KaxChapterProcessCommand, k ) )
                     {
                         p_ccodec->AddCommand( *cmd );
                     }
@@ -1663,9 +1661,9 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
 
     bool b_has_timecode = false;
 
-    for( unsigned int i = 0; i < cluster->ListSize(); ++i )
+    for (auto c : *cluster)
     {
-        if( MKV_CHECKED_PTR_DECL( p_ctc, KaxClusterTimestamp, (*cluster)[i] ) )
+        if( MKV_CHECKED_PTR_DECL_CONST( p_ctc, KaxClusterTimestamp, c ) )
         {
             cluster->InitTimestamp( static_cast<uint64_t>( *p_ctc ), i_timescale );
             _seeker.add_cluster( cluster );

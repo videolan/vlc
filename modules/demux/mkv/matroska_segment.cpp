@@ -1072,28 +1072,24 @@ void matroska_segment_c::EnsureDuration()
     {
         // use the last block + duration
         uint64_t i_last_timecode = p_last_cluster->GlobalTimestamp();
-        for( unsigned int i = 0; i < p_last_cluster->ListSize(); i++ )
+        for (auto l : *p_last_cluster)
         {
-            EbmlElement *l = (*p_last_cluster)[i];
-
             if( MKV_CHECKED_PTR_DECL ( simpleblock, KaxSimpleBlock, l ) )
             {
                 simpleblock->SetParent( *p_last_cluster );
                 i_last_timecode = std::max(i_last_timecode, simpleblock->GlobalTimestamp());
             }
-            else if( MKV_CHECKED_PTR_DECL ( group, KaxBlockGroup, l ) )
+            else if( MKV_CHECKED_PTR_DECL_CONST ( group, KaxBlockGroup, l ) )
             {
                 uint64_t i_group_timecode = 0;
-                for( unsigned int j = 0; j < group->ListSize(); j++ )
+                for (auto g : *group)
                 {
-                    EbmlElement *g = (*group)[j];
-
                     if( MKV_CHECKED_PTR_DECL ( block, KaxBlock, g ) )
                     {
                         block->SetParent( *p_last_cluster );
                         i_group_timecode += block->GlobalTimestamp();
                     }
-                    else if( MKV_CHECKED_PTR_DECL ( kbd_ptr, KaxBlockDuration, g ) )
+                    else if( MKV_CHECKED_PTR_DECL_CONST ( kbd_ptr, KaxBlockDuration, g ) )
                     {
                         i_group_timecode += static_cast<uint64_t>( *kbd_ptr );
                     }
