@@ -252,6 +252,8 @@ struct media_params
 
 struct ctx
 {
+    int flags;
+
     libvlc_instance_t *vlc;
     vlc_player_t *player;
     vlc_player_listener_id *listener;
@@ -2279,6 +2281,7 @@ REPORT_LIST
 #undef X
 
     *ctx = (struct ctx) {
+        .flags = flags,
         .vlc = vlc,
         .next_medias = VLC_VECTOR_INITIALIZER,
         .added_medias = VLC_VECTOR_INITIALIZER,
