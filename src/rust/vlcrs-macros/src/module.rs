@@ -4,9 +4,9 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
-    braced, bracketed, parenthesized, parse::Parse, parse_macro_input,
-    punctuated::Punctuated, spanned::Spanned, Attribute, Error, ExprRange,
-    Ident, Lit, LitByteStr, LitInt, LitStr, MetaNameValue, RangeLimits, Token
+    braced, bracketed, parse::Parse, parse_macro_input, punctuated::Punctuated, spanned::Spanned,
+    Attribute, Error, ExprRange, Ident, Lit, LitByteStr, LitInt, LitStr, MetaNameValue,
+    RangeLimits, Token,
 };
 
 struct SectionInfo {
@@ -45,7 +45,6 @@ struct SubmoduleInfo {
 
 struct ModuleInfo {
     type_: Ident,
-    trait_: Ident,
     category: Ident,
     capability: CapabilityInfo,
     description: LitStr,
@@ -60,7 +59,6 @@ struct ModuleInfo {
 impl Parse for ModuleInfo {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut type_ = None;
-        let mut trait_ = None;
         let mut category = None;
         let mut capability = None;
         let mut description = None;
@@ -75,7 +73,7 @@ impl Parse for ModuleInfo {
             let global_attrs: Vec<Attribute> = input.call(Attribute::parse_inner)?;
             let local_attrs: Vec<Attribute> = input.call(Attribute::parse_outer)?;
 
-            if let Some(global_attr) = global_attrs.first() {
+            for global_attr in &global_attrs {
                 return Err(Error::new_spanned(
                     global_attr,
                     "no global arguments are expected here",
@@ -87,9 +85,6 @@ impl Parse for ModuleInfo {
                 input.parse::<Token![type]>()?;
                 input.parse::<Token![:]>()?;
                 type_ = Some(input.parse()?);
-                let parenthesis_content;
-                parenthesized!(parenthesis_content in input);
-                trait_ = Some(parenthesis_content.parse()?);
                 input.parse::<Token![,]>()?;
                 continue;
             }
@@ -145,7 +140,7 @@ impl Parse for ModuleInfo {
                             _ => {
                                 return Err(Error::new_spanned(
                                     attr,
-                                    "unexcepted, try `#[prefix = \"...\"]`",
+                                    format!("unexcepted, try `#[prefix = \"...\"]`"),
                                 ));
                             }
                         }
@@ -183,7 +178,7 @@ impl Parse for ModuleInfo {
             }
 
             if !use_local_args {
-                if let Some(local_attr) = local_attrs.first() {
+                for local_attr in &local_attrs {
                     return Err(Error::new_spanned(
                         local_attr,
                         "no local arguments are expected here",
@@ -198,10 +193,6 @@ impl Parse for ModuleInfo {
 
         let Some(type_) = type_ else {
             return Err(input.error("missing `type` key"));
-        };
-
-        let Some(trait_) = trait_ else {
-            return Err(input.error("invalid `type` key, missing module trait"));
         };
 
         let Some(capability) = capability else {
@@ -222,7 +213,6 @@ impl Parse for ModuleInfo {
 
         Ok(ModuleInfo {
             type_,
-            trait_,
             category,
             capability,
             description,
@@ -514,7 +504,6 @@ fn vlc_param_name(module_info: &ModuleInfo, param: &ParameterInfo) -> String {
 fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let ModuleInfo {
         type_,
-        trait_,
         category,
         description,
         help,
@@ -544,7 +533,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_HELP as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_HELP as _,
                     #help_with_nul,
                 )
             } != 0
@@ -561,7 +550,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_SHORTNAME as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_SHORTNAME as _,
                     #shortname_with_nul,
                 )
             } != 0
@@ -585,7 +574,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     vlc_set(
                         opaque,
                         module as _,
-                        ::vlcrs_plugin::ModuleProperties::MODULE_SHORTCUT as _,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_SHORTCUT as _,
                         #shortcuts_with_nul_len,
                         SHORCUTS.as_ptr(),
                     )
@@ -603,9 +592,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     ::std::ptr::null_mut(),
-                    ::vlcrs_plugin::ModuleProperties::CONFIG_CREATE as _,
-                    ::vlcrs_plugin::ConfigModule::SUBCATEGORY as i64,
-                    &mut config as *mut *mut ::vlcrs_plugin::vlc_param,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_CREATE as _,
+                    ::vlcrs_core::module::capi::ConfigModule::CONFIG_SUBCATEGORY as i64,
+                    &mut config as *mut *mut ::vlcrs_core::module::capi::vlc_param,
                 )
             } != 0
             {
@@ -615,8 +604,8 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     config as _,
-                    ::vlcrs_plugin::ModuleProperties::CONFIG_VALUE as _,
-                    ::vlcrs_plugin::ConfigSubcategory::#category as i64,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_VALUE as _,
+                    ::vlcrs_core::module::capi::ConfigSubcat::#category as i64,
                 )
             } != 0
             {
@@ -627,7 +616,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
 
     let vlc_entry_config_params = params.as_ref().map(|params| {
         let params = params.params.iter().map(|param| {
-            let name = vlc_param_name(module_info, param);
+            let name = vlc_param_name(&module_info, &param);
             let name_with_nul = tt_c_str!(param.name.span() => name);
             let text_with_nul = tt_c_str!(param.text.span() => param.text.value());
             let long_text_with_nul = tt_c_str!(param.long_text.span() => param.long_text.value());
@@ -662,9 +651,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         vlc_set(
                             opaque,
                             ::std::ptr::null_mut(),
-                            ::vlcrs_plugin::ModuleProperties::CONFIG_CREATE as _,
-                            ::vlcrs_plugin::ConfigModule::SECTION as i64,
-                            &mut config as *mut *mut ::vlcrs_plugin::vlc_param,
+                            ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_CREATE as _,
+                            ::vlcrs_core::module::capi::ConfigModule::CONFIG_SECTION as i64,
+                            &mut config as *mut *mut ::vlcrs_core::module::capi::vlc_param,
                         )
                     } != 0
                     {
@@ -674,7 +663,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         vlc_set(
                             opaque,
                             config.cast(),
-                            ::vlcrs_plugin::ModuleProperties::CONFIG_DESC as _,
+                            ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_DESC as _,
                             #name_with_nul,
                             #description_with_nul,
                         )
@@ -696,9 +685,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 };
 
                 let item_type = if has_rgb {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_RGB }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_RGB }
                 } else {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_INTEGER }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_INTEGER }
                 };
                 let range_type = Some(quote! { i64 });
 
@@ -711,7 +700,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     }
                 };
                 let item_type =
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_FLOAT };
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_FLOAT };
                 let range_type = Some(quote! { ::std::ffi::c_double });
 
                 (value, item_type, range_type)
@@ -723,7 +712,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     }
                 };
                 let item_type =
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_BOOL };
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_BOOL };
 
                 (value, item_type, None)
             } else if param.type_ == "str" {
@@ -739,17 +728,17 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 };
 
                 let item_type = if has_font {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_FONT }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_FONT }
                 } else if has_savefile {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_SAVEFILE }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_SAVEFILE }
                 } else if has_loadfile {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_LOADFILE }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_LOADFILE }
                 } else if has_password {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_PASSWORD }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_PASSWORD }
                 } else if has_directory {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_DIRECTORY }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_DIRECTORY }
                 } else {
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_STRING }
+                    quote! { ::vlcrs_core::module::capi::ConfigModule::CONFIG_ITEM_STRING }
                 };
 
                 (value, item_type, None)
@@ -762,9 +751,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     vlc_set(
                         opaque,
                         ::std::ptr::null_mut(),
-                        ::vlcrs_plugin::ModuleProperties::CONFIG_CREATE as _,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_CREATE as _,
                         #item_type as i64,
-                        &mut config as *mut *mut ::vlcrs_plugin::vlc_param,
+                        &mut config as *mut *mut ::vlcrs_core::module::capi::vlc_param,
                     )
                 } != 0
                 {
@@ -774,7 +763,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     vlc_set(
                         opaque,
                         config.cast(),
-                        ::vlcrs_plugin::ModuleProperties::CONFIG_DESC as _,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_DESC as _,
                         #text_with_nul,
                         #long_text_with_nul,
                     )
@@ -786,7 +775,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     vlc_set(
                         opaque,
                         config.cast(),
-                        ::vlcrs_plugin::ModuleProperties::CONFIG_NAME as _,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_NAME as _,
                         #name_with_nul,
                     )
                 } != 0
@@ -797,7 +786,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     vlc_set(
                         opaque,
                         config.cast(),
-                        ::vlcrs_plugin::ModuleProperties::CONFIG_VALUE as _,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_VALUE as _,
                         #value,
                     )
                 } != 0
@@ -812,7 +801,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         vlc_set(
                             opaque,
                             config.cast(),
-                            ::vlcrs_plugin::ModuleProperties::CONFIG_REMOVED as _,
+                            ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_REMOVED as _,
                         )
                     } != 0
                     {
@@ -830,7 +819,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         vlc_set(
                             opaque,
                             config.cast(),
-                            ::vlcrs_plugin::ModuleProperties::CONFIG_RANGE as _,
+                            ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_RANGE as _,
                             0,
                             0xFFFFFF
                         )
@@ -858,7 +847,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                             vlc_set(
                                 opaque,
                                 config.cast(),
-                                ::vlcrs_plugin::ModuleProperties::CONFIG_RANGE as _,
+                                ::vlcrs_core::module::capi::ModuleProperties::VLC_CONFIG_RANGE as _,
                                 #from,
                                 #to
                             )
@@ -901,7 +890,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CAPABILITY as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CAPABILITY as _,
                     #capability_with_nul,
                 )
             } != 0 {
@@ -911,18 +900,17 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_SCORE as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_SCORE as _,
                     ::std::convert::Into::<i32>::into(#score),
                 )
             } != 0 {
                 return -1;
             }
-
             if unsafe {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_DESCRIPTION as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_DESCRIPTION as _,
                     #description_with_nul,
                 )
             } != 0
@@ -936,43 +924,32 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CB_OPEN as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_OPEN as _,
                     #module_open_with_nul,
-                    unsafe {
-                        std::mem::transmute::<
-                            <#type_ as #trait_>::Activate,
-                            *mut std::ffi::c_void
-                        >(<#type_ as #trait_>::Loader::activate_function())
-                    }
+                    ::vlcrs_core::module::#module::module_open::<#type_> as
+                        unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
                 )
             } != 0
             {
                 return -1;
             }
-
-            if <#type_ as #trait_>::Loader::deactivate_function() != None {
-                if unsafe {
-                    vlc_set(
-                        opaque,
-                        module as _,
-                        ::vlcrs_plugin::ModuleProperties::MODULE_CB_CLOSE as _,
-                        #module_close_with_nul,
-                        unsafe {
-                            std::mem::transmute::<
-                                <#type_ as #trait_>::Deactivate,
-                                *mut std::ffi::c_void
-                            >(<#type_ as #trait_>::Loader::deactivate_function().unwrap())
-                        }
-                    )
-                } != 0
-                {
-                    return -1;
-                }
+            if unsafe {
+                vlc_set(
+                    opaque,
+                    module as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_CLOSE as _,
+                    #module_close_with_nul,
+                    ::vlcrs_core::module::#module::module_close as
+                        unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
+                )
+            } != 0
+            {
+                return -1;
             }
-
             #vlc_entry_config_subcategory
             #vlc_entry_config_params
         }
+
 }
 
 pub fn module(input: TokenStream) -> TokenStream {
@@ -1005,7 +982,7 @@ pub fn module(input: TokenStream) -> TokenStream {
         #[no_mangle]
         #[doc(hidden)]
         extern "C" fn vlc_entry_copyright() -> *const u8 {
-            ::vlcrs_plugin::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
+            ::vlcrs_core::module::capi::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
         }
     };
 
@@ -1013,7 +990,7 @@ pub fn module(input: TokenStream) -> TokenStream {
         #[no_mangle]
         #[doc(hidden)]
         extern "C" fn vlc_entry_license() -> *const u8 {
-            ::vlcrs_plugin::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
+            ::vlcrs_core::module::capi::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
         }
     };
 
@@ -1033,11 +1010,45 @@ pub fn module(input: TokenStream) -> TokenStream {
                 #rust_name: #rust_type,
             }
         });
+        let params_assign = params.params.iter().map(|param| {
+            let rust_name = &param.name;
+            let vlc_name = vlc_param_name(&module_info, &param);
+            let vlc_name_with_nul = tt_c_str!(param.name.span()=> vlc_name);
+
+            let method_name = Ident::new(if param.type_ == "i64" {
+                "inherit_integer"
+            } else if param.type_ == "f32" {
+                "inherit_float"
+            } else if param.type_ == "bool" {
+                "inherit_bool"
+            } else if param.type_ == "str" {
+                "inherit_string"
+            } else {
+                unreachable!("unknown type_: {}", param.type_)
+            }, param.type_.span());
+
+            quote! {
+                #rust_name: {
+                    const VAR_NAME: &::std::ffi::CStr = unsafe { ::std::ffi::CStr::from_bytes_with_nul_unchecked(#vlc_name_with_nul) };
+                    module_args.#method_name(VAR_NAME)?
+                },
+            }
+        });
 
         quote! {
             #[derive(Debug, PartialEq)]
             struct #struct_name {
                 #(#params_def)*
+            }
+            impl ::std::convert::TryFrom<&mut ::vlcrs_core::module::ModuleArgs> for #struct_name {
+                type Error = ::vlcrs_core::error::CoreError;
+
+                fn try_from(module_args: &mut ::vlcrs_core::module::ModuleArgs) ->
+                        ::std::result::Result<Self, Self::Error> {
+                    Ok(#struct_name {
+                        #(#params_assign)*
+                    })
+                }
             }
         }
     });
@@ -1053,8 +1064,8 @@ pub fn module(input: TokenStream) -> TokenStream {
                     vlc_set(
                         opaque,
                         module as _,
-                        ::vlcrs_plugin::ModuleProperties::MODULE_CREATE as _,
-                        &mut module as *mut *mut ::vlcrs_plugin::module_t,
+                        ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CREATE as _,
+                        &mut module as *mut *mut ::vlcrs_core::module::capi::module_t,
                     )
                 } != 0
                 {
@@ -1073,18 +1084,19 @@ pub fn module(input: TokenStream) -> TokenStream {
         #[no_mangle]
         #[doc(hidden)]
         extern "C" fn vlc_entry(
-            vlc_set: ::vlcrs_plugin::sys::vlc_set_cb,
+            vlc_set: ::vlcrs_core::module::capi::vlc_set_cb,
             opaque: *mut ::std::ffi::c_void,
         ) -> i32 {
-            let mut module: *mut ::vlcrs_plugin::module_t = ::std::ptr::null_mut();
-            let mut config: *mut ::vlcrs_plugin::vlc_param = ::std::ptr::null_mut();
+            let mut module: *mut ::vlcrs_core::module::capi::module_t = ::std::ptr::null_mut();
+            let mut config: *mut ::vlcrs_core::module::capi::vlc_param = ::std::ptr::null_mut();
+            let vlc_set = vlc_set.unwrap();
 
             if unsafe {
                 vlc_set(
                     opaque,
                     ::std::ptr::null_mut(),
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CREATE as _,
-                    &mut module as *mut *mut ::vlcrs_plugin::module_t,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CREATE as _,
+                    &mut module as *mut *mut ::vlcrs_core::module::capi::module_t,
                 )
             } != 0
             {
@@ -1094,7 +1106,7 @@ pub fn module(input: TokenStream) -> TokenStream {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_NAME as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_NAME as _,
                     #name_with_nul,
                 )
             } != 0

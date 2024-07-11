@@ -38,7 +38,7 @@ mod module;
 ///     shortcuts: ["mp4", "MP4A"],
 ///     description: "This a Rust Module - inflate-rs",
 ///     help: "This is a dummy help text",
-///     category: INPUT_STREAM_FILTER,
+///     category: SUBCAT_INPUT_STREAM_FILTER,
 ///     capability: "stream_filter" @ 330,
 ///     #[prefix = "infrs"]
 ///     params: {
@@ -100,7 +100,7 @@ mod module;
 ///     shortname: "infrs",
 ///     description: "This a Rust Module - inflate-rs",
 ///     help: "This is a dummy help text",
-///     category: INPUT_STREAM_FILTER,
+///     category: SUBCAT_INPUT_STREAM_FILTER,
 ///     capability: "stream_filter" @ 330,
 ///     #[prefix = "infrs"]
 ///     params: {
