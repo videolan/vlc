@@ -3,7 +3,6 @@
 //
 
 #![feature(c_variadic)]
-#![feature(associated_type_defaults)]
 #![feature(extern_types)]
 #![feature(fn_ptr_trait)]
 
@@ -13,7 +12,6 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use std::marker::PhantomData;
 use vlcrs_plugin::ModuleProtocol;
 
 extern {
@@ -32,32 +30,33 @@ fn activate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &mut
     0
 }
 
+unsafe extern "C"
+fn activate_other_filter<T: TestOtherCapability>(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int
+{
+    T::open(_obj, valid);
+    0
+}
+
 //
 // Create an implementation loader for the TestFilterCapability
 //
-pub struct FilterModuleLoader<T> {
-    _phantom: PhantomData<T>
-}
+pub struct FilterModuleLoader;
 
 ///
 /// Signal the core that we can load modules with this loader
 ///
-impl<T> ModuleProtocol<T, vlc_filter_activate> for FilterModuleLoader<T>
+impl<T> ModuleProtocol<T> for FilterModuleLoader
     where T: TestFilterCapability
 {
-    fn activate_function() -> vlc_filter_activate
+    type Activate = vlc_filter_activate;
+    fn activate_function() -> Self::Activate
     {
         activate_filter::<T>
     }
 }
 
 /* Implement dummy module capability */
-pub trait TestFilterCapability : Sized {
-    type Activate = vlc_filter_activate;
-    type Deactivate = *mut ();
-
-    type Loader = FilterModuleLoader<Self>;
-
+pub trait TestFilterCapability {
     fn open(obj: *mut vlc_filter_t, bool: &mut bool);
 }
 
@@ -72,12 +71,18 @@ impl TestFilterCapability for TestModuleFilter {
 }
 
 /* Implement dummy module capability */
-pub trait TestOtherCapability : Sized {
-    type Activate = vlc_filter_activate;
-    type Deactivate = *mut ();
-    type Loader = FilterModuleLoader<Self>;
-
+pub trait TestOtherCapability  {
     fn open(obj: *mut vlc_filter_t, bool: &mut bool);
+}
+
+struct TestOtherCapabilityLoader;
+impl<T> ModuleProtocol<T> for TestOtherCapabilityLoader
+    where T: TestOtherCapability
+{
+    type Activate = vlc_filter_activate;
+    fn activate_function() -> Self::Activate {
+        activate_other_filter::<T>
+    }
 }
 
 ///
@@ -95,7 +100,7 @@ impl TestOtherCapability for TestModuleFilter {
 // and this module.
 //
 module! {
-    type: TestModuleFilter (TestFilterCapability),
+    type: TestModuleFilter (FilterModuleLoader),
     capability: "video_filter" @ 0,
     category: VIDEO_VFILTER,
     description: "A new module",
@@ -103,7 +108,7 @@ module! {
     shortcuts: ["mynewmodule_filter"],
     submodules: [
         {
-            type: TestModuleFilter (TestOtherCapability),
+            type: TestModuleFilter (TestOtherCapabilityLoader),
             capability: "other_capability" @ 0,
             category: VIDEO_VFILTER,
             description: "Another module",

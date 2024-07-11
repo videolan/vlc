@@ -13,27 +13,19 @@ mod module;
 /// # use std::ffi::{c_int, c_void};
 /// # type ActivateFunction = unsafe extern "C" fn() -> c_int;
 /// # type DeactivateFunction = unsafe extern "C" fn() -> c_void;
-/// # pub trait CapabilityTrait {
+/// # pub trait CapabilityTrait {}
+/// # extern "C" fn activate() -> c_int{ 0 }
+/// # pub struct CapabilityTraitLoader;
+/// # impl<T: CapabilityTrait> ModuleProtocol<T> for CapabilityTraitLoader {
 /// #     type Activate = ActivateFunction;
 /// #     type Deactivate = DeactivateFunction;
-/// #     type Loader = CapabilityTraitLoader<Self>;
-/// # }
-/// # extern "C" fn activate() -> c_int{ 0 }
-/// # pub struct CapabilityTraitLoader<T: ?Sized> {
-/// #     _phantom : std::marker::PhantomData<T>
-/// # }
-/// # impl<T: ?Sized + CapabilityTrait> ModuleProtocol<
-/// #     T,
-/// #     ActivateFunction,
-/// #     DeactivateFunction>
-/// # for CapabilityTraitLoader<T> {
 /// #     fn activate_function() -> ActivateFunction { activate }
 /// #     fn deactivate_function() -> Option<DeactivateFunction> { None }
 /// # }
 /// struct MyModule {}
 /// impl CapabilityTrait for MyModule {}
 /// module! {
-///     type: MyModule (CapabilityTrait),
+///     type: MyModule (CapabilityTraitLoader),
 ///     shortname: "infrs",
 ///     shortcuts: ["mp4", "MP4A"],
 ///     description: "This a Rust Module - inflate-rs",
@@ -75,27 +67,20 @@ mod module;
 /// # use std::ffi::{c_int, c_void};
 /// # type ActivateFunction = unsafe extern "C" fn() -> c_int;
 /// # type DeactivateFunction = unsafe extern "C" fn() -> c_void;
-/// # pub trait CapabilityTrait {
+/// # pub trait CapabilityTrait {}
+/// # extern "C" fn activate() -> c_int{ 0 }
+/// # pub struct CapabilityTraitLoader;
+/// # impl<T: CapabilityTrait> ModuleProtocol<T>
+/// # for CapabilityTraitLoader {
 /// #     type Activate = ActivateFunction;
 /// #     type Deactivate = DeactivateFunction;
-/// #     type Loader = CapabilityTraitLoader<Self>;
-/// # }
-/// # extern "C" fn activate() -> c_int{ 0 }
-/// # pub struct CapabilityTraitLoader<T: ?Sized> {
-/// #     _phantom : std::marker::PhantomData<T>
-/// # }
-/// # impl<T: ?Sized + CapabilityTrait> ModuleProtocol<
-/// #     T,
-/// #     ActivateFunction,
-/// #     DeactivateFunction>
-/// # for CapabilityTraitLoader<T> {
 /// #     fn activate_function() -> ActivateFunction { activate }
 /// #     fn deactivate_function() -> Option<DeactivateFunction> { None }
 /// # }
 /// struct Inflate {}
 /// impl CapabilityTrait for Inflate {}
 /// module! {
-///     type: Inflate (CapabilityTrait),
+///     type: Inflate (CapabilityTraitLoader),
 ///     shortcuts: ["mp4", "MP4A"],
 ///     shortname: "infrs",
 ///     description: "This a Rust Module - inflate-rs",

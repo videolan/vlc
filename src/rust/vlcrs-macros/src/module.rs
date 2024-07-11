@@ -45,7 +45,7 @@ struct SubmoduleInfo {
 
 struct ModuleInfo {
     type_: Ident,
-    trait_: Ident,
+    loader: Ident,
     category: Ident,
     capability: CapabilityInfo,
     description: LitStr,
@@ -60,7 +60,7 @@ struct ModuleInfo {
 impl Parse for ModuleInfo {
     fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
         let mut type_ = None;
-        let mut trait_ = None;
+        let mut loader = None;
         let mut category = None;
         let mut capability = None;
         let mut description = None;
@@ -89,7 +89,7 @@ impl Parse for ModuleInfo {
                 type_ = Some(input.parse()?);
                 let parenthesis_content;
                 parenthesized!(parenthesis_content in input);
-                trait_ = Some(parenthesis_content.parse()?);
+                loader = Some(parenthesis_content.parse()?);
                 input.parse::<Token![,]>()?;
                 continue;
             }
@@ -200,8 +200,8 @@ impl Parse for ModuleInfo {
             return Err(input.error("missing `type` key"));
         };
 
-        let Some(trait_) = trait_ else {
-            return Err(input.error("invalid `type` key, missing module trait"));
+        let Some(loader) = loader else {
+            return Err(input.error("invalid `type` key, missing module loader"));
         };
 
         let Some(capability) = capability else {
@@ -222,7 +222,7 @@ impl Parse for ModuleInfo {
 
         Ok(ModuleInfo {
             type_,
-            trait_,
+            loader,
             category,
             capability,
             description,
@@ -514,7 +514,7 @@ fn vlc_param_name(module_info: &ModuleInfo, param: &ParameterInfo) -> String {
 fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let ModuleInfo {
         type_,
-        trait_,
+        loader,
         category,
         description,
         help,
@@ -897,7 +897,6 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let module_close_with_nul = tt_c_str!(type_.span() => module_close);
 
     quote! {
-            use vlcrs_plugin::ModuleProtocol;
             if unsafe {
                 vlc_set(
                     opaque,
@@ -941,9 +940,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     #module_open_with_nul,
                     unsafe {
                         std::mem::transmute::<
-                            <#type_ as #trait_>::Activate,
+                            <#loader as ModuleProtocol<#type_>>::Activate,
                             *mut std::ffi::c_void
-                        >(<#type_ as #trait_>::Loader::activate_function())
+                        >(<#loader as ModuleProtocol<#type_>>::activate_function())
                     }
                 )
             } != 0
@@ -951,7 +950,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                 return -1;
             }
 
-            if <#type_ as #trait_>::Loader::deactivate_function() != None {
+            if <#loader as ModuleProtocol<#type_>>::deactivate_function() != None {
                 if unsafe {
                     vlc_set(
                         opaque,
@@ -960,9 +959,9 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         #module_close_with_nul,
                         unsafe {
                             std::mem::transmute::<
-                                <#type_ as #trait_>::Deactivate,
+                                <#loader as ModuleProtocol<#type_>>::Deactivate,
                                 *mut std::ffi::c_void
-                            >(<#type_ as #trait_>::Loader::deactivate_function().unwrap())
+                            >(<#loader as ModuleProtocol<#type_>>::deactivate_function().unwrap())
                         }
                     )
                 } != 0
@@ -1077,6 +1076,7 @@ pub fn module(input: TokenStream) -> TokenStream {
             vlc_set: ::vlcrs_plugin::sys::vlc_set_cb,
             opaque: *mut ::std::ffi::c_void,
         ) -> i32 {
+            use vlcrs_plugin::ModuleProtocol;
             let mut module: *mut ::vlcrs_plugin::module_t = ::std::ptr::null_mut();
             let mut config: *mut ::vlcrs_plugin::vlc_param = ::std::ptr::null_mut();
 

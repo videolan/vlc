@@ -3,7 +3,6 @@
 //
 
 #![feature(c_variadic)]
-#![feature(associated_type_defaults)]
 #![feature(extern_types)]
 #![feature(fn_ptr_trait)]
 
@@ -13,7 +12,6 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use std::marker::PhantomData;
 
 use vlcrs_plugin::{vlc_activate, vlc_deactivate};
 
@@ -29,28 +27,26 @@ fn deactivate_test<T: SpecificCapabilityModule>(_obj: *mut vlcrs_plugin::vlc_obj
 
 use vlcrs_plugin::ModuleProtocol;
 
-pub struct ModuleLoader<T> { _phantom: PhantomData<T> }
-impl<T> ModuleProtocol<T, vlc_activate, vlc_deactivate> for ModuleLoader<T>
+pub struct ModuleLoader;
+impl<T> ModuleProtocol<T> for ModuleLoader
     where T: SpecificCapabilityModule
 {
-    fn activate_function() -> vlc_activate
+    type Activate = vlc_activate;
+    type Deactivate = vlc_deactivate;
+
+    fn activate_function() -> Self::Activate
     {
         activate_test::<T>
     }
 
-    fn deactivate_function() -> Option<vlc_deactivate>
+    fn deactivate_function() -> Option<Self::Deactivate>
     {
         Some(deactivate_test::<T>)
     }
 }
 
 /* Implement dummy module */
-pub trait SpecificCapabilityModule : Sized {
-    type Activate = vlc_activate;
-    type Deactivate = vlc_deactivate;
-
-    type Loader = ModuleLoader<Self>;
-
+pub trait SpecificCapabilityModule {
     fn open();
 }
 pub struct TestModule;
@@ -61,7 +57,7 @@ impl SpecificCapabilityModule for TestModule {
 }
 
 module! {
-    type: TestModule (SpecificCapabilityModule),
+    type: TestModule (ModuleLoader),
     capability: "video_filter" @ 0,
     category: VIDEO_VFILTER,
     description: "A new module",

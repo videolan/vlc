@@ -3,7 +3,6 @@
 //
 
 #![feature(c_variadic)]
-#![feature(associated_type_defaults)]
 #![feature(extern_types)]
 #![feature(fn_ptr_trait)]
 
@@ -13,7 +12,6 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use std::marker::PhantomData;
 use vlcrs_plugin::ModuleProtocol;
 
 extern {
@@ -45,33 +43,29 @@ fn deactivate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &m
 //
 // Create an implementation loader for the TestFilterCapability
 //
-pub struct FilterModuleLoader<T> {
-    _phantom: PhantomData<T>
-}
+pub struct FilterModuleLoader;
 
 ///
 /// Signal the core that we can load modules with this loader
 ///
-impl<T> ModuleProtocol<T, vlc_filter_activate, vlc_filter_deactivate> for FilterModuleLoader<T>
+impl<T> ModuleProtocol<T> for FilterModuleLoader
     where T: TestFilterCapability
 {
-    fn activate_function() -> vlc_filter_activate
+    type Activate = vlc_filter_activate;
+    type Deactivate = vlc_filter_deactivate;
+
+    fn activate_function() -> Self::Activate
     {
         activate_filter::<T>
     }
 
-    fn deactivate_function() -> Option<vlc_filter_deactivate> {
+    fn deactivate_function() -> Option<Self::Deactivate> {
         Some(deactivate_filter::<T>)
     }
 }
 
 /* Implement dummy module capability */
-pub trait TestFilterCapability : Sized {
-    type Activate = vlc_filter_activate;
-    type Deactivate = vlc_filter_deactivate;
-
-    type Loader = FilterModuleLoader<Self>;
-
+pub trait TestFilterCapability {
     fn open(obj: *mut vlc_filter_t, bool: &mut bool);
     fn close(obj: *mut vlc_filter_t, valid: &mut bool);
 }
@@ -95,7 +89,7 @@ impl TestFilterCapability for TestModuleFilter {
 // and this module.
 //
 module! {
-    type: TestModuleFilter (TestFilterCapability),
+    type: TestModuleFilter (FilterModuleLoader),
     capability: "video_filter" @ 0,
     category: VIDEO_VFILTER,
     description: "A new module",

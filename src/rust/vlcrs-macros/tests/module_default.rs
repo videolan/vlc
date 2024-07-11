@@ -13,7 +13,6 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use std::marker::PhantomData;
 use vlcrs_plugin::{ModuleProtocol,vlc_activate};
 
 unsafe extern "C"
@@ -26,16 +25,16 @@ fn activate_filter(_obj: *mut vlcrs_plugin::vlc_object_t) -> c_int
 //
 // Create an implementation loader for the TestFilterCapability
 //
-pub struct FilterModuleLoader<T> {
-    _phantom: PhantomData<T>
-}
+pub struct FilterModuleLoader;
 
 ///
 /// Signal the core that we can load modules with this loader
 ///
-impl<T> ModuleProtocol<T, vlc_activate> for FilterModuleLoader<T>
+impl<T> ModuleProtocol<T> for FilterModuleLoader
     where T: TestNoDeactivateCapability
 {
+    type Activate = vlc_activate;
+    type Deactivate = *mut ();
     fn activate_function() -> vlc_activate
     {
         activate_filter
@@ -43,12 +42,7 @@ impl<T> ModuleProtocol<T, vlc_activate> for FilterModuleLoader<T>
 }
 
 /* Implement dummy module capability */
-pub trait TestNoDeactivateCapability : Sized {
-    type Activate = vlc_activate;
-    type Deactivate = *mut ();
-
-    type Loader = FilterModuleLoader<Self>;
-}
+pub trait TestNoDeactivateCapability {}
 
 ///
 /// Create a dummy module using this capability
@@ -61,7 +55,7 @@ impl TestNoDeactivateCapability for TestModule {}
 // and this module.
 //
 module! {
-    type: TestModule (TestNoDeactivateCapability),
+    type: TestModule (FilterModuleLoader),
     capability: "video_filter" @ 0,
     category: VIDEO_VFILTER,
     description: "A new module",
