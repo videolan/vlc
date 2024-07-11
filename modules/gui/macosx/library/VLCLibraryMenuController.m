@@ -286,7 +286,7 @@
     [self updateMenuItems];
 }
 
-- (void)setRepresentedInputItem:(NSArray<VLCInputItem *> *)representedInputItems
+- (void)setRepresentedInputItems:(NSArray<VLCInputItem *> *)representedInputItems
 {
     _representedInputItems = representedInputItems;
     _representedItems = nil;
