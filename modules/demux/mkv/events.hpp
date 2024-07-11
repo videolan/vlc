@@ -78,10 +78,9 @@ private:
             ActionEvent,
         } type;
 
-        EventInfo( ESInfo* info, vlc_mouse_t state_old, vlc_mouse_t state_new )
+        EventInfo( const vlc_mouse_t & state_old, const vlc_mouse_t & state_new )
             : type( ESMouseEvent )
         {
-            mouse.es_info = info;
             mouse.state_old = state_old;
             mouse.state_new = state_new;
         }
@@ -94,7 +93,6 @@ private:
 
         union {
             struct {
-                ESInfo* es_info;
                 vlc_mouse_t state_old;
                 vlc_mouse_t state_new;
             } mouse;

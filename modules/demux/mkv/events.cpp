@@ -116,7 +116,7 @@ void event_thread_t::EventMouse( vlc_mouse_t const* new_state, void* userdata )
         return vlc_mouse_Init( &info->mouse_state );
 
     info->owner.pending_events.push_back(
-        EventInfo( info, info->mouse_state, *new_state ) );
+        EventInfo( info->mouse_state, *new_state ) );
 
     vlc_cond_signal( &info->owner.wait );
     info->mouse_state = *new_state;
