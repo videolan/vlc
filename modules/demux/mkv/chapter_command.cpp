@@ -25,6 +25,14 @@
 
 #include <vlc_arrays.h>
 
+#if LIBMATROSKA_VERSION < 0x010700
+typedef enum {
+  MATROSKA_CHAPPROCESSTIME_DURING           = 0,
+  MATROSKA_CHAPPROCESSTIME_BEFORE           = 1,
+  MATROSKA_CHAPPROCESSTIME_AFTER            = 2,
+} MatroskaChapterProcessTime;
+#endif
+
 namespace mkv {
 
 chapter_codec_cmds_c::~chapter_codec_cmds_c()
@@ -37,14 +45,25 @@ chapter_codec_cmds_c::~chapter_codec_cmds_c()
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
-    uint32_t codec_time = uint32_t(-1);
+    std::optional<MatroskaChapterProcessTime> codec_time;
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
         if( MKV_CHECKED_PTR_DECL_CONST( p_cpt, KaxChapterProcessTime, command[i] ) )
         {
-            codec_time = static_cast<uint32_t>( *p_cpt );
+            codec_time = static_cast<MatroskaChapterProcessTime>( static_cast<unsigned>(*p_cpt) );
             break;
         }
+    }
+
+    if( !codec_time )
+    {
+        vlc_debug( l, "missing ChapProcessTime" );
+        return;
+    }
+    if( *codec_time >= 3 )
+    {
+        vlc_debug( l, "unknown ChapProcessTime %d", *codec_time );
+        return;
     }
 
     for( size_t i = 0; i < command.ListSize(); i++ )
@@ -52,13 +71,12 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
         if( MKV_CHECKED_PTR_DECL_CONST( p_cpd, KaxChapterProcessData, command[i] ) )
         {
             std::vector<KaxChapterProcessData*> *containers[] = {
-                &during_cmds, /* codec_time = 0 */
-                &enter_cmds,  /* codec_time = 1 */
-                &leave_cmds   /* codec_time = 2 */
+                &during_cmds, // MATROSKA_CHAPPROCESSTIME_DURING
+                &enter_cmds,  // MATROSKA_CHAPPROCESSTIME_BEFORE
+                &leave_cmds   // MATROSKA_CHAPPROCESSTIME_AFTER
             };
 
-            if( codec_time < 3 )
-                containers[codec_time]->push_back( new KaxChapterProcessData( *p_cpd ) );
+            containers[*codec_time]->push_back( new KaxChapterProcessData( *p_cpd ) );
         }
     }
 }
