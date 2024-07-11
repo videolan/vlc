@@ -124,6 +124,19 @@ enum chapter_codec_id
 #define MKV_CHECKED_PTR_DECL( name, type, src ) type * name = MKV_IS_ID(src, type) ? static_cast<type*>(src) : NULL
 #define MKV_CHECKED_PTR_DECL_CONST( name, type, src ) const type * name = MKV_IS_ID(src, type) ? static_cast<const type*>(src) : NULL
 
+#if LIBEBML_VERSION < 0x020000
+template <typename Type>
+Type * FindChild(const EbmlMaster & Master)
+{
+  return static_cast<Type *>(Master.FindFirstElt(EBML_INFO(Type)));
+}
+
+template <typename Type>
+Type * FindNextChild(const EbmlMaster & Master, const Type & PastElt)
+{
+  return static_cast<Type *>(Master.FindNextElt(PastElt));
+}
+#endif
 
 using namespace libmatroska;
 
