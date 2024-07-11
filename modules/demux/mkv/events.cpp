@@ -130,8 +130,10 @@ void event_thread_t::EventThread()
 
         while( !pending_events.empty() )
         {
-            EventInfo const& ev = pending_events.front();
+            const EventInfo ev = pending_events.front();
+            pending_events.pop_front();
 
+            vlc_mutex_unlock( &lock );
             switch( ev.type )
             {
                 case EventInfo::ESMouseEvent:
@@ -142,8 +144,7 @@ void event_thread_t::EventThread()
                     HandleKeyEvent( ev );
                     break;
             }
-
-            pending_events.pop_front();
+            vlc_mutex_lock( &lock );
         }
     }
 
@@ -171,14 +172,10 @@ void event_thread_t::HandleKeyEvent( NavivationKey key )
     if (!interpretor)
         return;
 
-    vlc_mutex_unlock( &lock );
-    {
-        vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
-        // process the button action
-        interpretor->HandleKeyEvent( key );
-    }
-    vlc_mutex_lock( &lock );
+    // process the button action
+    interpretor->HandleKeyEvent( key );
 }
 
 void event_thread_t::HandleMouseEvent( EventInfo const& event )
@@ -207,13 +204,9 @@ void event_thread_t::HandleMousePressed( unsigned x, unsigned y )
 
     msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
-    vlc_mutex_unlock( &lock );
-    {
-        vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
-        interpretor->HandleMousePressed( x, y );
-    }
-    vlc_mutex_lock( &lock );
+    interpretor->HandleMousePressed( x, y );
 }
 
 void event_thread_t::SetHighlight( vlc_spu_highlight_t & spu_hl )

@@ -118,10 +118,10 @@ private:
     bool         b_abort;
 
     typedef std::list<ESInfo> es_list_t;
-    es_list_t es_list;
+    es_list_t es_list;               //protected by "lock"
 
     typedef std::list<EventInfo> pending_events_t;
-    pending_events_t pending_events;
+    pending_events_t pending_events; // protected by "lock"
 
     void QueueEvent(const EventInfo e)
     {
