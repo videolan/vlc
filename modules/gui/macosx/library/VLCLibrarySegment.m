@@ -96,6 +96,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
         if (bookmarkedLocations == nil) {
             bookmarkedLocations = self.defaultBookmarkedLocations;
+            [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
         }
 
         const VLCLibrarySegmentType segmentType = VLCLibraryBrowseBookmarkedLocationSubSegment;
