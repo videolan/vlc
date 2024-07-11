@@ -1,7 +1,6 @@
 //! Module macros implementation
 
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
     braced, bracketed, parse::Parse, parse_macro_input, punctuated::Punctuated, spanned::Spanned,
@@ -39,10 +38,6 @@ struct ParametersInfo {
     params: Punctuated<ParameterInfo, Token![,]>,
 }
 
-struct SubmoduleInfo {
-    submodule: ModuleInfo,
-}
-
 struct ModuleInfo {
     type_: Ident,
     category: Ident,
@@ -53,7 +48,6 @@ struct ModuleInfo {
     prefix: Option<PrefixInfo>,
     params: Option<ParametersInfo>,
     shortcuts: Option<Punctuated<LitStr, Token![,]>>,
-    submodules: Option<Punctuated<SubmoduleInfo, Token![,]>>,
 }
 
 impl Parse for ModuleInfo {
@@ -67,7 +61,6 @@ impl Parse for ModuleInfo {
         let mut shortname = None;
         let mut params = None;
         let mut prefix = None;
-        let mut submodules = None;
 
         while !input.is_empty() {
             let global_attrs: Vec<Attribute> = input.call(Attribute::parse_inner)?;
@@ -154,24 +147,6 @@ impl Parse for ModuleInfo {
                     input.parse::<Token![:]>()?;
                     params = Some(input.parse()?);
                 }
-                "submodules" => {
-                    input.parse::<Token![:]>()?;
-                    
-                    let inner;
-                    bracketed!(inner in input);
-                    let parsed_submodules = inner.parse_terminated(SubmoduleInfo::parse)?;
-
-                    for submodule in &parsed_submodules {
-                        if submodule.submodule.submodules.is_some() {
-                            return Err(Error::new_spanned(
-                                key,
-                                "nested submodules are not allowed",
-                            ));
-                        }
-                    }
-
-                    submodules = Some(parsed_submodules);
-                }
                 _ => {
                     return Err(Error::new_spanned(key, format!("unknow {key_name} key")));
                 }
@@ -221,7 +196,6 @@ impl Parse for ModuleInfo {
             shortname,
             params,
             prefix,
-            submodules,
         })
     }
 }
@@ -232,16 +206,6 @@ impl Parse for ParametersInfo {
         braced!(content in input);
         Ok(ParametersInfo {
             params: content.parse_terminated(ParameterInfo::parse)?,
-        })
-    }
-}
-
-impl Parse for SubmoduleInfo {
-    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
-        let content;
-        braced!(content in input);
-        Ok(SubmoduleInfo {
-            submodule: content.parse()?,
         })
     }
 }
@@ -476,32 +440,7 @@ impl Parse for ParameterInfo {
     }
 }
 
-macro_rules! tt_c_str {
-    ($span:expr => $value:expr) => {{
-        LitByteStr::new(&format!("{}\0", $value).into_bytes(), $span).into_token_stream()
-    }};
-}
-
-fn vlc_param_name(module_info: &ModuleInfo, param: &ParameterInfo) -> String {
-    let mut name = if let Some(prefix) = &param.prefix {
-        prefix.prefix.value()
-    } else if let Some(prefix) = &module_info.prefix {
-        prefix.prefix.value()
-    } else {
-        unreachable!();
-    };
-
-    if !name.ends_with("_") && !name.ends_with("-") {
-        name.push('-');
-    }
-
-    name.push_str(&param.name.to_string().replace("_", "-"));
-
-    name
-}
-
-#[allow(unused_variables)]
-fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
+pub fn module(input: TokenStream) -> TokenStream {
     let ModuleInfo {
         type_,
         category,
@@ -512,12 +451,36 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
         prefix,
         params,
         capability: CapabilityInfo { capability, score },
-        submodules,
-    } = module_info;
+    } = parse_macro_input!(input as ModuleInfo);
 
     // TODO: Improve this with some kind environment variable passed by the build system
     // like what is done for the C side.
     let name = format!("{}-rs", type_.to_string().to_lowercase());
+    let name_len = name.len() + 1;
+
+    let vlc_param_name = |param: &ParameterInfo| -> String {
+        let mut name = if let Some(prefix) = &param.prefix {
+            prefix.prefix.value()
+        } else if let Some(prefix) = &prefix {
+            prefix.prefix.value()
+        } else {
+            unreachable!();
+        };
+
+        if !name.ends_with("_") && !name.ends_with("-") {
+            name.push('-');
+        }
+
+        name.push_str(&param.name.to_string().replace("_", "-"));
+
+        name
+    };
+
+    macro_rules! tt_c_str {
+        ($span:expr => $value:expr) => {{
+            LitByteStr::new(&format!("{}\0", $value).into_bytes(), $span).into_token_stream()
+        }};
+    }
 
     let description_with_nul = tt_c_str!(description.span() => description.value());
     let name_with_nul = tt_c_str!(type_.span() => name);
@@ -526,7 +489,39 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let capability_with_nul = tt_c_str!(capability.span() =>
                                         capability.value());
 
-    let module_entry_help = help.as_ref().map(|help| {
+    let module_name = quote! {
+        #[used]
+        #[no_mangle]
+        #[doc(hidden)]
+        pub static vlc_module_name: &[u8; #name_len] = #name_with_nul;
+    };
+
+    // Copied from #define VLC_API_VERSION_STRING in include/vlc_plugin.h
+    let entry_api_version = quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn vlc_entry_api_version() -> *const u8 {
+            b"4.0.6\0".as_ptr()
+        }
+    };
+
+    let entry_copyright = quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn vlc_entry_copyright() -> *const u8 {
+            ::vlcrs_core::module::capi::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
+        }
+    };
+
+    let entry_license = quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn vlc_entry_license() -> *const u8 {
+            ::vlcrs_core::module::capi::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
+        }
+    };
+
+    let module_entry_help = help.map(|help| {
         let help_with_nul = tt_c_str!(help.span() => help.value());
         quote! {
             if unsafe {
@@ -543,7 +538,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
         }
     });
 
-    let module_entry_shortname = shortname.as_ref().map(|shortname| {
+    let module_entry_shortname = shortname.map(|shortname| {
         let shortname_with_nul = tt_c_str!(shortname.span() => shortname.value());
         quote! {
             if unsafe {
@@ -560,7 +555,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
         }
     });
 
-    let module_entry_shortcuts = shortcuts.as_ref().map(|shortcuts| {
+    let module_entry_shortcuts = shortcuts.map(|shortcuts| {
         let shortcuts_with_nul: Vec<_> = shortcuts
             .into_iter()
             .map(|shortcut| tt_c_str!(shortcut.span() => shortcut.value()))
@@ -568,20 +563,18 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
 
         let shortcuts_with_nul_len = shortcuts_with_nul.len();
         quote! {
+            const SHORCUTS: [*const [u8]; #shortcuts_with_nul_len] = [#(#shortcuts_with_nul),*];
+            if unsafe {
+                vlc_set(
+                    opaque,
+                    module as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_SHORTCUT as _,
+                    #shortcuts_with_nul_len,
+                    SHORCUTS.as_ptr(),
+                )
+            } != 0
             {
-                const SHORCUTS: [*const [u8]; #shortcuts_with_nul_len] = [#(#shortcuts_with_nul),*];
-                if unsafe {
-                    vlc_set(
-                        opaque,
-                        module as _,
-                        ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_SHORTCUT as _,
-                        #shortcuts_with_nul_len,
-                        SHORCUTS.as_ptr(),
-                    )
-                } != 0
-                {
-                    return -1;
-                }
+                return -1;
             }
         }
     });
@@ -614,9 +607,68 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
         }
     };
 
+    let type_params = params.as_ref().map(|params| {
+        let struct_name = Ident::new(&format!("{}Args", type_), type_.span());
+
+        let params_def = params.params.iter().map(|param| {
+            let rust_name = &param.name;
+            let ident_string = Ident::new("String", param.type_.span());
+            let rust_type = if param.type_ == "str" {
+                &ident_string
+            } else {
+                &param.type_
+            };
+
+            quote! {
+                #rust_name: #rust_type,
+            }
+        });
+        let params_assign = params.params.iter().map(|param| {
+            let rust_name = &param.name;
+            let vlc_name = vlc_param_name(&param);
+            let vlc_name_with_nul = tt_c_str!(param.name.span()=> vlc_name);
+
+            let method_name = Ident::new(if param.type_ == "i64" {
+                "inherit_integer"
+            } else if param.type_ == "f32" {
+                "inherit_float"
+            } else if param.type_ == "bool" {
+                "inherit_bool"
+            } else if param.type_ == "str" {
+                "inherit_string"
+            } else {
+                unreachable!("unknown type_: {}", param.type_)
+            }, param.type_.span());
+
+            quote! {
+                #rust_name: {
+                    const VAR_NAME: &::std::ffi::CStr = unsafe { ::std::ffi::CStr::from_bytes_with_nul_unchecked(#vlc_name_with_nul) };
+                    module_args.#method_name(VAR_NAME)?
+                },
+            }
+        });
+
+        quote! {
+            #[derive(Debug, PartialEq)]
+            struct #struct_name {
+                #(#params_def)*
+            }
+            impl ::std::convert::TryFrom<&mut ::vlcrs_core::module::ModuleArgs> for #struct_name {
+                type Error = ::vlcrs_core::error::CoreError;
+
+                fn try_from(module_args: &mut ::vlcrs_core::module::ModuleArgs) ->
+                        ::std::result::Result<Self, Self::Error> {
+                    Ok(#struct_name {
+                        #(#params_assign)*
+                    })
+                }
+            }
+        }
+    });
+
     let vlc_entry_config_params = params.as_ref().map(|params| {
         let params = params.params.iter().map(|param| {
-            let name = vlc_param_name(&module_info, &param);
+            let name = vlc_param_name(&param);
             let name_with_nul = tt_c_str!(param.name.span() => name);
             let text_with_nul = tt_c_str!(param.text.span() => param.text.value());
             let long_text_with_nul = tt_c_str!(param.long_text.span() => param.long_text.value());
@@ -876,16 +928,39 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
         }
     });
 
-    // Ensure each submodule has uniquely named open/close functions
-    // to prevent any naming conflicts.
+    let module_entry = quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn vlc_entry(
+            vlc_set: ::vlcrs_core::module::capi::vlc_set_cb,
+            opaque: *mut ::std::ffi::c_void,
+        ) -> i32 {
+            let mut module: *mut ::vlcrs_core::module::capi::module_t = ::std::ptr::null_mut();
+            let mut config: *mut ::vlcrs_core::module::capi::vlc_param = ::std::ptr::null_mut();
+            let vlc_set = vlc_set.unwrap();
 
-    let module_open = format!("{}-open", type_);
-    let module_close = format!("{}-close", type_);
-
-    let module_open_with_nul = tt_c_str!(type_.span() => module_open);
-    let module_close_with_nul = tt_c_str!(type_.span() => module_close);
-
-    quote! {
+            if unsafe {
+                vlc_set(
+                    opaque,
+                    ::std::ptr::null_mut(),
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CREATE as _,
+                    &mut module as *mut *mut ::vlcrs_core::module::capi::module_t,
+                )
+            } != 0
+            {
+                return -1;
+            }
+            if unsafe {
+                vlc_set(
+                    opaque,
+                    module as _,
+                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_NAME as _,
+                    #name_with_nul,
+                )
+            } != 0
+            {
+                return -1;
+            }
             if unsafe {
                 vlc_set(
                     opaque,
@@ -925,7 +1000,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     opaque,
                     module as _,
                     ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_OPEN as _,
-                    #module_open_with_nul,
+                    b"module_open\0".as_ptr(),
                     ::vlcrs_core::module::#module::module_open::<#type_> as
                         unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
                 )
@@ -938,7 +1013,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     opaque,
                     module as _,
                     ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CB_CLOSE as _,
-                    #module_close_with_nul,
+                    b"module_close\0".as_ptr(),
                     ::vlcrs_core::module::#module::module_close as
                         unsafe extern "C" fn(*mut ::vlcrs_core::module::capi::vlc_object_t) -> i32,
                 )
@@ -948,173 +1023,6 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
             }
             #vlc_entry_config_subcategory
             #vlc_entry_config_params
-        }
-
-}
-
-pub fn module(input: TokenStream) -> TokenStream {
-    let module_info = parse_macro_input!(input as ModuleInfo);
-
-    // TODO: Improve this with some kind environment variable passed by the build system
-    // like what is done for the C side.
-    let name = format!("{}-rs", module_info.type_.to_string().to_lowercase());
-    let name_len = name.len() + 1;
-
-    let name_with_nul = tt_c_str!(module_info.type_.span() => name);
-
-    let module_name = quote! {
-        #[used]
-        #[no_mangle]
-        #[doc(hidden)]
-        pub static vlc_module_name: &[u8; #name_len] = #name_with_nul;
-    };
-
-    // Copied from #define VLC_API_VERSION_STRING in include/vlc_plugin.h
-    let entry_api_version = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_api_version() -> *const u8 {
-            b"4.0.6\0".as_ptr()
-        }
-    };
-
-    let entry_copyright = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_copyright() -> *const u8 {
-            ::vlcrs_core::module::capi::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
-        }
-    };
-
-    let entry_license = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_license() -> *const u8 {
-            ::vlcrs_core::module::capi::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
-        }
-    };
-
-    let type_params = module_info.params.as_ref().map(|params| {
-        let struct_name = Ident::new(&format!("{}Args", module_info.type_), module_info.type_.span());
-
-        let params_def = params.params.iter().map(|param| {
-            let rust_name = &param.name;
-            let ident_string = Ident::new("String", param.type_.span());
-            let rust_type = if param.type_ == "str" {
-                &ident_string
-            } else {
-                &param.type_
-            };
-
-            quote! {
-                #rust_name: #rust_type,
-            }
-        });
-        let params_assign = params.params.iter().map(|param| {
-            let rust_name = &param.name;
-            let vlc_name = vlc_param_name(&module_info, &param);
-            let vlc_name_with_nul = tt_c_str!(param.name.span()=> vlc_name);
-
-            let method_name = Ident::new(if param.type_ == "i64" {
-                "inherit_integer"
-            } else if param.type_ == "f32" {
-                "inherit_float"
-            } else if param.type_ == "bool" {
-                "inherit_bool"
-            } else if param.type_ == "str" {
-                "inherit_string"
-            } else {
-                unreachable!("unknown type_: {}", param.type_)
-            }, param.type_.span());
-
-            quote! {
-                #rust_name: {
-                    const VAR_NAME: &::std::ffi::CStr = unsafe { ::std::ffi::CStr::from_bytes_with_nul_unchecked(#vlc_name_with_nul) };
-                    module_args.#method_name(VAR_NAME)?
-                },
-            }
-        });
-
-        quote! {
-            #[derive(Debug, PartialEq)]
-            struct #struct_name {
-                #(#params_def)*
-            }
-            impl ::std::convert::TryFrom<&mut ::vlcrs_core::module::ModuleArgs> for #struct_name {
-                type Error = ::vlcrs_core::error::CoreError;
-
-                fn try_from(module_args: &mut ::vlcrs_core::module::ModuleArgs) ->
-                        ::std::result::Result<Self, Self::Error> {
-                    Ok(#struct_name {
-                        #(#params_assign)*
-                    })
-                }
-            }
-        }
-    });
-
-    let module_entry_configs = generate_module_code(&module_info);
-
-    let submodules_entry = module_info.submodules.as_ref().map(|submodule_info| {
-        let submodules = submodule_info.iter().map(|submodule_info| {
-            let submodule_entry_configs = generate_module_code(&submodule_info.submodule);
-
-            quote! {
-                if unsafe {
-                    vlc_set(
-                        opaque,
-                        module as _,
-                        ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CREATE as _,
-                        &mut module as *mut *mut ::vlcrs_core::module::capi::module_t,
-                    )
-                } != 0
-                {
-                    return -1;
-                }
-                #submodule_entry_configs
-            }
-        });
-
-        quote! {
-            #(#submodules)*
-        }
-    });
-
-    let module_entry = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry(
-            vlc_set: ::vlcrs_core::module::capi::vlc_set_cb,
-            opaque: *mut ::std::ffi::c_void,
-        ) -> i32 {
-            let mut module: *mut ::vlcrs_core::module::capi::module_t = ::std::ptr::null_mut();
-            let mut config: *mut ::vlcrs_core::module::capi::vlc_param = ::std::ptr::null_mut();
-            let vlc_set = vlc_set.unwrap();
-
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    ::std::ptr::null_mut(),
-                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_CREATE as _,
-                    &mut module as *mut *mut ::vlcrs_core::module::capi::module_t,
-                )
-            } != 0
-            {
-                return -1;
-            }
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_core::module::capi::ModuleProperties::VLC_MODULE_NAME as _,
-                    #name_with_nul,
-                )
-            } != 0
-            {
-                return -1;
-            }
-            #module_entry_configs
-            #submodules_entry
             0
         }
     };
