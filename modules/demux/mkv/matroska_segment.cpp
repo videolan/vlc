@@ -1134,7 +1134,7 @@ bool matroska_segment_c::ESCreate()
             track.p_es = es_out_Add( sys.demuxer.out, &track.fmt );
 
             if( track.p_es &&
-                !sys.ev.AddES( track.p_es, track.fmt.i_cat ) )
+                !sys.ev.AddTrack( track ) )
             {
                 msg_Warn( &sys.demuxer, "Could not register events, interactive menus will not work");
             }
@@ -1173,7 +1173,7 @@ void matroska_segment_c::ESDestroy( )
         if( track.p_es != NULL )
         {
             es_out_Del( sys.demuxer.out, track.p_es );
-            sys.ev.DelES( track.p_es );
+            sys.ev.DelTrack( track );
             track.p_es = NULL;
         }
     }

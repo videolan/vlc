@@ -236,8 +236,11 @@ void event_thread_t::SetHighlight( vlc_spu_highlight_t & spu_hl )
     }
 }
 
-bool event_thread_t::AddES( es_out_id_t* es, int category )
+bool event_thread_t::AddTrack( mkv_track_t & track )
 {
+    es_out_id_t* es = track.p_es;
+    int category = track.fmt.i_cat;
+
     vlc_mutex_locker lock_guard( &lock );
 
     es_list.push_front( ESInfo( es, category, *this ) );
@@ -256,8 +259,10 @@ bool event_thread_t::AddES( es_out_id_t* es, int category )
     return true;
 }
 
-void event_thread_t::DelES( es_out_id_t* es )
+void event_thread_t::DelTrack( mkv_track_t &track )
 {
+    es_out_id_t* es = track.p_es;
+
     vlc_mutex_locker lock_guard( &lock );
     es_list_t::iterator info = std::find( es_list.begin(), es_list.end(), es );
     if( info != es_list.end() )

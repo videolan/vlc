@@ -49,8 +49,8 @@ public:
     int SendEventNav( demux_query_e );
     void SetHighlight( vlc_spu_highlight_t & spu_hl );
 
-    bool AddES( es_out_id_t* es, int category );
-    void DelES( es_out_id_t* es );
+    bool AddTrack( mkv_track_t & );
+    void DelTrack( mkv_track_t & );
 
 private:
     struct ESInfo {
