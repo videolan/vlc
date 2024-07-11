@@ -47,6 +47,7 @@
             [[NSMenuItem alloc] initWithTitle:_NS("Remove Bookmark")
                                        action:@selector(removeBookmark:)
                                 keyEquivalent:@""];
+        removeBookmarkItem.representedObject = descriptor;
         [bookmarkMenu addItem:removeBookmarkItem];
         return bookmarkMenu;
     }
@@ -54,16 +55,23 @@
 
 - (void)removeBookmark:(id)sender
 {
-    const NSInteger row = self.clickedRow;
-    NSTreeNode * const node = [self itemAtRow:row];
-    VLCLibrarySegment * const segment = node.representedObject;
-    VLCLibrarySegmentBookmarkedLocation * const descriptor = segment.representedObject;
+    NSMenuItem * const menuItem = sender;
+    NSParameterAssert(menuItem != nil);
+
+    VLCLibrarySegmentBookmarkedLocation * const descriptor = menuItem.representedObject;
+    NSParameterAssert(descriptor != nil);
+
+    NSString * const descriptorMrl = descriptor.mrl;
+    NSParameterAssert(descriptorMrl != nil);
 
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     NSMutableArray<NSString *> * const bookmarkedLocations =
         [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey].mutableCopy;
-    [bookmarkedLocations removeObject:descriptor.mrl];
+    [bookmarkedLocations removeObject:descriptorMrl];
     [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
+
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter postNotificationName:VLCLibraryBookmarkedLocationsChanged object:descriptor];
 }
 
 @end
