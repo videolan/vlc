@@ -7,7 +7,8 @@
 #![feature(extern_types)]
 #![feature(fn_ptr_trait)]
 
-mod test_common;
+mod common;
+use common::TestContext;
 
 use vlcrs_macros::module;
 
@@ -30,8 +31,6 @@ fn activate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &mut
     T::open(_obj, valid);
     0
 }
-
-use crate::test_common::TestContext;
 
 //
 // Create an implementation loader for the TestFilterCapability
@@ -147,7 +146,7 @@ fn test_module_manifest_multiple_capabilities()
         open_cb: None,
         close_cb: None,
     };
-    let ret = test_common::load_manifest(&mut context, vlc_entry);
+    let ret = common::load_manifest(&mut context, vlc_entry);
     assert_eq!(ret, 0);
     assert_ne!(context.open_cb, None);
 
