@@ -159,6 +159,8 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     case DEMUX_NAV_UP:       key = NavivationKey::UP;
     case DEMUX_NAV_DOWN:     key = NavivationKey::DOWN;
     case DEMUX_NAV_ACTIVATE: key = NavivationKey::OK;
+    case DEMUX_NAV_MENU:     key = NavivationKey::MENU;
+    case DEMUX_NAV_POPUP:    key = NavivationKey::POPUP;
     default:                 return;
     }
 

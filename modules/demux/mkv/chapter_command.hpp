@@ -49,7 +49,7 @@ public:
 };
 
 enum NavivationKey {
-    LEFT, RIGHT, UP, DOWN, OK
+    LEFT, RIGHT, UP, DOWN, OK, MENU, POPUP
 };
 
 class chapter_codec_cmds_c
