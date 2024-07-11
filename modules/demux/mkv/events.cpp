@@ -177,11 +177,11 @@ void event_thread_t::HandleKeyEvent( NavivationKey key )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
+    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
         return;
-
-    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
 
     // process the button action
     interpretor->HandleKeyEvent( key );
@@ -212,6 +212,8 @@ void event_thread_t::HandleButtonData( block_t *p_block )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
+    vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
         return;
@@ -223,13 +225,13 @@ void event_thread_t::HandleMousePressed( unsigned x, unsigned y )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
-    auto interpretor = p_sys->GetDVDInterpretor();
-    if (!interpretor)
-        return;
-
     msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
     vlc_mutex_locker demux_lock ( &p_sys->lock_demuxer );
+
+    auto interpretor = p_sys->GetDVDInterpretor();
+    if (!interpretor)
+        return;
 
     interpretor->HandleMousePressed( x, y );
 }

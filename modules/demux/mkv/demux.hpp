@@ -131,7 +131,7 @@ public:
 
 private:
     virtual_segment_c                *p_current_vsegment = nullptr;
-    std::unique_ptr<dvd_command_interpretor_c> dvd_interpretor;
+    std::unique_ptr<dvd_command_interpretor_c> dvd_interpretor; // protected by lock_demuxer
 };
 
 } // namespace
