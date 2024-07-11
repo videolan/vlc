@@ -27,8 +27,6 @@
 #include "Ebml_parser.hpp"
 #include "virtual_segment.hpp"
 
-#include <vlc_actions.h>
-
 namespace mkv {
 
 demux_sys_t::~demux_sys_t()

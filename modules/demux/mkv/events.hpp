@@ -26,7 +26,6 @@
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
-#include <vlc_actions.h>
 #include <vlc_mouse.h>
 
 #include <list>
