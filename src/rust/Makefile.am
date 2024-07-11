@@ -3,7 +3,6 @@ CARGO_LOG_DRIVER = env top_builddir="${abs_top_builddir}" \
                    $(abs_top_srcdir)/buildsystem/cargo-test.py \
                    --working-directory="${abs_top_srcdir}/src/rust/"
 
-vlcrs-macros.cargo:
 vlcrs-messages.cargo:
 vlcrs-plugin.cargo:
 vlcrs-utils.cargo:
@@ -13,7 +12,6 @@ vlcrs-utils.cargo:
 
 if HAVE_RUST
 TESTS += \
-	vlcrs-macros.cargo \
 	vlcrs-messages.cargo \
 	vlcrs-plugin.cargo \
 	vlcrs-utils.cargo
