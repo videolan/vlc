@@ -63,6 +63,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                options:nil];
 
     [_outlineView reloadData];
+
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter addObserver:self
+                      selector:@selector(bookmarkedLocationsChanged:)
+                          name:VLCLibraryBookmarkedLocationsChanged
+                        object:nil];
+}
+
+- (void)bookmarkedLocationsChanged:(NSNotification *)notification
+{
+    [self.treeController rearrangeObjects];
+    [self.outlineView reloadData];
 }
 
 - (NSTreeNode *)nodeForSegmentType:(VLCLibrarySegmentType)segmentType
