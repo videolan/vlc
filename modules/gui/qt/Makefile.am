@@ -605,6 +605,28 @@ libqt_wayland_plugin_la_SOURCES = \
 	maininterface/compositor_wayland_module.c \
 	maininterface/compositor_wayland_module.h
 
+#if WAYLAND_PROTOCOLS
+#if WAYLAND_SCANNER
+libqt_wayland_plugin_la_CFLAGS += -DQT_HAS_WAYLAND_PROTOCOLS -I$(builddir)/maininterface
+
+nodist_libqt_wayland_plugin_la_SOURCES = \
+	maininterface/viewporter-client-protocol.h \
+	maininterface/viewporter-protocol.c
+
+BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
+
+maininterface/viewporter-client-protocol.h: \
+		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
+
+maininterface/viewporter-protocol.c: \
+		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml \
+		maininterface/viewporter-client-protocol.h
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
+
+#endif
+#endif
+
 if ENABLE_QT
 gui_LTLIBRARIES += libqt_wayland_plugin.la
 endif
