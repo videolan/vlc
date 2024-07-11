@@ -102,6 +102,7 @@ private:
 
     void EventThread();
     static void *EventThread(void *);
+    void EnsureThreadLocked();
 
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
 
@@ -115,7 +116,7 @@ private:
 
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
-    bool         b_abort;
+    bool         b_abort = false;
 
     typedef std::list<ESInfo> es_list_t;
     es_list_t es_list;               //protected by "lock"
@@ -126,6 +127,9 @@ private:
     void QueueEvent(const EventInfo e)
     {
         vlc_mutex_locker lock_guard( &lock );
+
+        EnsureThreadLocked();
+
         pending_events.push_back( e );
         vlc_cond_signal( &wait );
     }

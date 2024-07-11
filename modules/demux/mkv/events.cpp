@@ -57,12 +57,17 @@ void event_thread_t::SetPci(const pci_t *data)
         return;
 
     interpretor->SetPci( data );
-    if( !is_running )
-    {
-        b_abort = false;
-        is_running = !vlc_clone( &thread, EventThread, this );
-    }
+    EnsureThreadLocked();
 }
+
+void event_thread_t::EnsureThreadLocked()
+{
+    if (is_running || b_abort)
+        return;
+
+    is_running = !vlc_clone( &thread, EventThread, this );
+}
+
 void event_thread_t::ResetPci()
 {
     if( !is_running )
