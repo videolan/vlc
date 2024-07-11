@@ -897,6 +897,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let module_close_with_nul = tt_c_str!(type_.span() => module_close);
 
     quote! {
+            use vlcrs_plugin::ModuleProtocol;
             if unsafe {
                 vlc_set(
                     opaque,
