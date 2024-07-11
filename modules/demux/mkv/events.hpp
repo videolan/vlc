@@ -104,7 +104,6 @@ private:
     static void *EventThread(void *);
 
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
-    void SendEventMouse( const vlc_mouse_t & old_state, const vlc_mouse_t & new_state );
 
     void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
@@ -124,7 +123,13 @@ private:
     typedef std::list<EventInfo> pending_events_t;
     pending_events_t pending_events;
 
-private:
+    void QueueEvent(const EventInfo e)
+    {
+        vlc_mutex_locker lock_guard( &lock );
+        pending_events.push_back( e );
+        vlc_cond_signal( &wait );
+    }
+
     void HandleKeyEvent( NavivationKey key );
     void HandleMousePressed( unsigned x, unsigned y );
 };
