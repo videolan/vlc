@@ -41,7 +41,7 @@ event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
 }
 event_thread_t::~event_thread_t()
 {
-    ResetPci();
+    AbortThread();
 }
 
 void event_thread_t::SetPci(const pci_t *data)
@@ -68,7 +68,7 @@ void event_thread_t::EnsureThreadLocked()
     is_running = !vlc_clone( &thread, EventThread, this );
 }
 
-void event_thread_t::ResetPci()
+void event_thread_t::AbortThread()
 {
     if( !is_running )
         return;

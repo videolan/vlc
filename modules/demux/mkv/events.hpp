@@ -45,7 +45,7 @@ public:
     virtual ~event_thread_t();
 
     void SetPci(const pci_t *data);
-    void ResetPci();
+    void AbortThread();
     int SendEventNav( demux_query_e );
     void SetHighlight( vlc_spu_highlight_t & spu_hl );
 
