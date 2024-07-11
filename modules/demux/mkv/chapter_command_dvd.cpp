@@ -36,19 +36,19 @@ int16_t dvd_chapter_codec_c::GetTitleNumber() const
 
 bool dvd_chapter_codec_c::Enter()
 {
-    return EnterLeaveHelper( "Matroska DVD enter command", &enter_cmds );
+    return EnterLeaveHelper( "Matroska DVD enter command", enter_cmds );
 }
 
 bool dvd_chapter_codec_c::Leave()
 {
-    return EnterLeaveHelper( "Matroska DVD leave command", &leave_cmds );
+    return EnterLeaveHelper( "Matroska DVD leave command", leave_cmds );
 }
 
-bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, std::vector<KaxChapterProcessData*> * p_container )
+bool dvd_chapter_codec_c::EnterLeaveHelper( char const * str_diag, ChapterProcess & p_container )
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData*>::iterator it = p_container->begin ();
-    while( it != p_container->end() )
+    ChapterProcess::iterator it = p_container.begin ();
+    while( it != p_container.end() )
     {
         if( (*it)->GetSize() )
         {

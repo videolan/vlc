@@ -68,7 +68,7 @@ bool matroska_script_interpretor_c::Interpret( const binary * p_command, size_t 
 bool matroska_script_codec_c::Enter()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData*>::iterator index = enter_cmds.begin();
+    ChapterProcess::iterator index = enter_cmds.begin();
     while ( index != enter_cmds.end() )
     {
         if ( (*index)->GetSize() )
@@ -84,7 +84,7 @@ bool matroska_script_codec_c::Enter()
 bool matroska_script_codec_c::Leave()
 {
     bool f_result = false;
-    std::vector<KaxChapterProcessData*>::iterator index = leave_cmds.begin();
+    ChapterProcess::iterator index = leave_cmds.begin();
     while ( index != leave_cmds.end() )
     {
         if ( (*index)->GetSize() )

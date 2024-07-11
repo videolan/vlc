@@ -80,9 +80,10 @@ public:
     KaxChapterProcessPrivate *p_private_data;
 
 protected:
-    std::vector<KaxChapterProcessData*> enter_cmds;
-    std::vector<KaxChapterProcessData*> during_cmds;
-    std::vector<KaxChapterProcessData*> leave_cmds;
+    using ChapterProcess = std::vector<KaxChapterProcessData*>;
+    ChapterProcess enter_cmds;
+    ChapterProcess during_cmds;
+    ChapterProcess leave_cmds;
 
     struct vlc_logger *l;
     chapter_codec_vm & vm;

@@ -201,7 +201,7 @@ public:
     int16_t GetTitleNumber() const override;
 
 protected:
-    bool EnterLeaveHelper( char const*, std::vector<KaxChapterProcessData*>* );
+    bool EnterLeaveHelper( char const*, ChapterProcess & );
     dvd_command_interpretor_c & intepretor;
 };
 

@@ -66,17 +66,20 @@ void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command 
         return;
     }
 
+    ChapterProcess *container;
+    switch (*codec_time)
+    {
+        case MATROSKA_CHAPPROCESSTIME_DURING: container = &during_cmds; break;
+        case MATROSKA_CHAPPROCESSTIME_BEFORE: container = &enter_cmds;  break;
+        case MATROSKA_CHAPPROCESSTIME_AFTER:  container = &leave_cmds;  break;
+        default: vlc_assert_unreachable();
+    }
+
     for( size_t i = 0; i < command.ListSize(); i++ )
     {
         if( MKV_CHECKED_PTR_DECL_CONST( p_cpd, KaxChapterProcessData, command[i] ) )
         {
-            std::vector<KaxChapterProcessData*> *containers[] = {
-                &during_cmds, // MATROSKA_CHAPPROCESSTIME_DURING
-                &enter_cmds,  // MATROSKA_CHAPPROCESSTIME_BEFORE
-                &leave_cmds   // MATROSKA_CHAPPROCESSTIME_AFTER
-            };
-
-            containers[*codec_time]->push_back( new KaxChapterProcessData( *p_cpd ) );
+            container->push_back( new KaxChapterProcessData( *p_cpd ) );
         }
     }
 }
