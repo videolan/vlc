@@ -251,6 +251,7 @@ struct media_params
 #define DISABLE_AUDIO_OUTPUT (1 << 1)
 #define DISABLE_VIDEO        (1 << 2)
 #define DISABLE_AUDIO        (1 << 3)
+#define AUDIO_INSTANT_DRAIN  (1 << 4)
 
 struct ctx
 {
@@ -3181,6 +3182,11 @@ static void aout_Flush(audio_output_t *aout)
     sys->first_pts = sys->first_play_date = VLC_TICK_INVALID;
 }
 
+static void aout_InstantDrain(audio_output_t *aout)
+{
+    aout_DrainedReport(aout);
+}
+
 static int aout_Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
 {
     (void) aout;
@@ -3211,6 +3217,9 @@ static int aout_Open(vlc_object_t *obj)
 
     sys->ctx = var_InheritAddress(aout, "test-ctx");
     assert(sys->ctx != NULL);
+
+    if (sys->ctx->flags & AUDIO_INSTANT_DRAIN)
+        aout->drain = aout_InstantDrain;
 
     aout_Flush(aout);
 
