@@ -52,6 +52,10 @@ MouseArea {
         MainCtx.restoreCursor()
     }
 
+    onCanceled: {
+        MainCtx.restoreCursor()
+    }
+
     onPositionChanged: {
         const f = atRight ? -1 : 1
         const delta = mouseX - _previousX
