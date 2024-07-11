@@ -29,6 +29,7 @@
 #include <vlc_mouse.h>
 
 #include <list>
+#include <memory>
 
 struct vlc_spu_highlight_t;
 
@@ -72,6 +73,7 @@ private:
         enum {
             ESMouseEvent,
             ActionEvent,
+            ButtonDataEvent,
         } type;
 
         EventInfo( const vlc_mouse_t & state_old, const vlc_mouse_t & state_new )
@@ -86,6 +88,12 @@ private:
         {
         }
 
+        EventInfo( block_t * block )
+            : type( ButtonDataEvent )
+            , button_data( block, block_Release )
+        {
+        }
+
         union {
             struct {
                 const vlc_mouse_t state_old;
@@ -96,6 +104,8 @@ private:
                 const NavivationKey key;
             } nav;
         };
+
+        std::shared_ptr<block_t> button_data;
     };
 
     void EventThread();
@@ -106,6 +116,7 @@ private:
 
     void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
+    void HandleButtonData( EventInfo const& );
 
     demux_t      *p_demux;
 
@@ -134,6 +145,7 @@ private:
 
     void HandleKeyEvent( NavivationKey key );
     void HandleMousePressed( unsigned x, unsigned y );
+    void HandleButtonData( block_t * );
 };
 } // namespace
 

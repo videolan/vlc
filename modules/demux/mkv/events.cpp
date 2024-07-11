@@ -49,18 +49,8 @@ void event_thread_t::SendData( mkv_track_t &track, block_t * p_block )
     {
         if( p_block->i_size > 0)
         {
-            demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
-            vlc_mutex_locker l(&lock);
-
-            if(es_list.empty())
-                return;
-
-            auto interpretor = p_sys->GetDVDInterpretor();
-            if (!interpretor)
-                return;
-
-            interpretor->SetPci( &p_block->p_buffer[1], p_block->i_size - 1 );
-            EnsureThreadLocked();
+            QueueEvent( EventInfo{ p_block } );
+            return; // the block will be released later
         }
     }
 
@@ -158,6 +148,10 @@ void event_thread_t::EventThread()
                 case EventInfo::ActionEvent:
                     HandleKeyEvent( ev );
                     break;
+
+                case EventInfo::ButtonDataEvent:
+                    HandleButtonData( ev );
+                    break;
             }
             vlc_mutex_lock( &lock );
         }
@@ -207,6 +201,22 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
     {
 //                dvdnav_mouse_select( NULL, pci, x, y );
     }
+}
+
+void event_thread_t::HandleButtonData( EventInfo const& event )
+{
+    HandleButtonData( event.button_data.get() );
+}
+
+void event_thread_t::HandleButtonData( block_t *p_block )
+{
+    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
+
+    auto interpretor = p_sys->GetDVDInterpretor();
+    if (!interpretor)
+        return;
+
+    interpretor->SetPci( &p_block->p_buffer[1], p_block->i_size - 1 );
 }
 
 void event_thread_t::HandleMousePressed( unsigned x, unsigned y )
