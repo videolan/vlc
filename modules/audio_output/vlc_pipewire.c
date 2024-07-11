@@ -23,8 +23,14 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <locale.h>
+#include <pwd.h>
+#include <unistd.h>
 #include <pipewire/pipewire.h>
 #include <vlc_common.h>
+#include <vlc_fs.h>
 #include <vlc_tick.h>
 #include "vlc_pipewire.h"
 
@@ -158,6 +164,67 @@ void vlc_pw_disconnect(struct vlc_pw_context *ctx)
     free(ctx);
 }
 
+static int vlc_pw_properties_set_var(struct pw_properties *props,
+                                     const char *name,
+                                     vlc_object_t *obj, const char *varname)
+{
+    char *str = var_InheritString(obj, varname);
+    int ret = -1;
+
+    if (str != NULL) {
+        ret = pw_properties_set(props, name, str);
+        free(str);
+    }
+    return ret;
+}
+
+static int vlc_pw_properties_set_env(struct pw_properties *props,
+                                     const char *name, const char *varname)
+{
+    const char *str = getenv(varname);
+    int ret = -1;
+
+    if (str != NULL)
+        ret = pw_properties_set(props, name, str);
+
+    return ret;
+}
+
+static int getusername(uid_t uid, char *restrict buf, size_t buflen)
+{
+    struct passwd pwbuf, *pw;
+
+    if (getpwuid_r(uid, &pwbuf, buf, buflen, &pw))
+        return -1;
+
+    memmove(buf, pw->pw_name, strlen(pw->pw_name) + 1);
+    return 0;
+}
+
+static int getmachineid(char *restrict buf, size_t buflen)
+{
+    if (buflen <= 32) {
+        errno = ENAMETOOLONG;
+        return -1;
+    }
+
+    FILE *stream = vlc_fopen("/var/lib/dbus/machine-id", "rt");
+    if (stream == NULL)
+        return -1;
+
+    int ret;
+
+    if (fread(buf, 1, 32, stream) == 32) {
+        buf[32] = '\0';
+        ret = 0;
+    } else {
+        errno = ENXIO;
+        ret = -1;
+    }
+    fclose(stream);
+    return ret;
+}
+
 struct vlc_pw_context *vlc_pw_connect(vlc_object_t *obj, const char *name)
 {
     struct vlc_logger *logger = obj->logger;
@@ -187,8 +254,40 @@ struct vlc_pw_context *vlc_pw_connect(vlc_object_t *obj, const char *name)
     ctx->registry = NULL;
 
     if (likely(ctx->loop != NULL)) {
+        struct spa_dict empty = SPA_DICT_INIT(NULL, 0);
+        struct pw_properties *props = pw_properties_new_dict(&empty);
+
+        if (likely(props != NULL)) {
+            char buf[256];
+
+            vlc_pw_properties_set_var(props, PW_KEY_APP_NAME, obj,
+                                      "user-agent");
+            vlc_pw_properties_set_var(props, PW_KEY_APP_ID, obj, "app-id");
+            vlc_pw_properties_set_var(props, PW_KEY_APP_VERSION, obj,
+                                      "app-version");
+            vlc_pw_properties_set_var(props, PW_KEY_APP_ICON_NAME, obj,
+                                      "app-icon-name");
+            pw_properties_set(props, PW_KEY_APP_LANGUAGE,
+                              setlocale(LC_MESSAGES, NULL));
+            pw_properties_setf(props, PW_KEY_APP_PROCESS_ID, "%d",
+                               (int)getpid());
+            /*PW_KEY_APP_PROCESS_BINARY*/
+
+            if (getusername(getuid(), buf, sizeof (buf)) == 0)
+                pw_properties_set(props, PW_KEY_APP_PROCESS_USER, buf);
+            if (gethostname(buf, sizeof (buf)) == 0)
+                pw_properties_set(props, PW_KEY_APP_PROCESS_HOST, buf);
+            if (getmachineid(buf, sizeof (buf)) == 0)
+                pw_properties_set(props, PW_KEY_APP_PROCESS_MACHINE_ID, buf);
+
+            vlc_pw_properties_set_env(props, PW_KEY_APP_PROCESS_SESSION_ID,
+                                      "XDG_SESSION_ID");
+            vlc_pw_properties_set_env(props, PW_KEY_WINDOW_X11_DISPLAY,
+                                      "DISPLAY");
+        }
+
         ctx->context = pw_context_new(pw_thread_loop_get_loop(ctx->loop),
-                                      NULL, 0);
+                                      props, 0);
 
         if (likely(ctx->context != NULL)) {
             ctx->core = pw_context_connect(ctx->context, NULL, 0);
@@ -207,6 +306,7 @@ struct vlc_pw_context *vlc_pw_connect(vlc_object_t *obj, const char *name)
             pw_context_destroy(ctx->context);
         } else
             err = errno;
+
         pw_thread_loop_destroy(ctx->loop);
     } else
         err = errno;
