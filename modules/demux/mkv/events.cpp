@@ -249,7 +249,8 @@ bool event_thread_t::AddTrack( mkv_track_t & track )
     if( category == VIDEO_ES )
     {
         if( es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT,
-                            es, EventMouse, static_cast<void*>( &*info ) ) )
+                            es, static_cast<vlc_mouse_event>(EventMouse),
+                            static_cast<void*>( &*info ) ) )
         {
             msg_Warn( p_demux, "Unable to subscribe to mouse events" );
             es_list.erase( info );
