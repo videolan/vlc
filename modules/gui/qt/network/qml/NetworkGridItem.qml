@@ -74,14 +74,17 @@ Widgets.GridItem {
 
     title: model.name || qsTr("Unknown share")
     subtitle: {
+        // make sure subtitle is never empty otherwise it causes alignment issues
+        const defaultTxt = "--"
+
         const mrl = model.mrl?.toString() || ""
         const type = model.type
 
         if ((type === NetworkMediaModel.TYPE_NODE || type === NetworkMediaModel.TYPE_DIRECTORY)
             && (mrl === "vlc://nop"))
-            return ""
+            return defaultTxt
 
-        return mrl
+        return mrl || defaultTxt
     }
 
     pictureOverlay: Item {
