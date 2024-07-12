@@ -1545,7 +1545,7 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
         } catch (const MissingMandatory & err) {
             msg_Dbg( &sys.demuxer, "%s", err.what());
         }
-        attachedFile = &GetNextChild<KaxAttached>( *attachments, *attachedFile );
+        attachedFile = FindNextChild<KaxAttached>( *attachments, *attachedFile );
     }
 }
 
