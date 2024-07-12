@@ -1521,25 +1521,26 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
                                                             nullptr,
                                                             img_data.GetBuffer(),
                                                             img_data.GetSize() );
-            if (!new_attachment)
-                continue;
-            msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->psz_name,
-                    new_attachment->psz_mime );
-
-            if( !strncmp( new_attachment->psz_mime, "image/", 6 ) )
+            if (new_attachment)
             {
-                char *psz_url;
-                if( asprintf( &psz_url, "attachment://%s",
-                            new_attachment->psz_name ) >= 0 )
+                msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->psz_name,
+                        new_attachment->psz_mime );
+
+                if( !strncmp( new_attachment->psz_mime, "image/", 6 ) )
                 {
-                    if( !sys.meta )
-                        sys.meta = vlc_meta_New();
-                    vlc_meta_SetArtURL( sys.meta, psz_url );
-                    free( psz_url );
+                    char *psz_url;
+                    if( asprintf( &psz_url, "attachment://%s",
+                                new_attachment->psz_name ) >= 0 )
+                    {
+                        if( !sys.meta )
+                            sys.meta = vlc_meta_New();
+                        vlc_meta_SetArtURL( sys.meta, psz_url );
+                        free( psz_url );
+                    }
                 }
+                sys.stored_attachments.push_back( vlc::wrap_cptr( new_attachment,
+                                                                &vlc_input_attachment_Release ) );
             }
-            sys.stored_attachments.push_back( vlc::wrap_cptr( new_attachment,
-                                                            &vlc_input_attachment_Release ) );
         } catch (const MissingMandatory & err) {
             msg_Dbg( &sys.demuxer, "%s", err.what());
         }
