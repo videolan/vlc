@@ -133,7 +133,6 @@
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
-    [self.audioDecorativeView updateCoverArt];
 }
 
 - (void)viewDidLoad

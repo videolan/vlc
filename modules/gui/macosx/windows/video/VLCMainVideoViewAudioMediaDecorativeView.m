@@ -48,6 +48,7 @@
                            selector:@selector(playerCurrentMediaItemChanged:)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
+    [self updateCoverArt];
 }
 
 - (void)playerCurrentMediaItemChanged:(NSNotification *)notification
