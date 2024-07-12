@@ -130,7 +130,9 @@
     ]];
 
     [self.view addSubview:_audioDecorativeView positioned:NSWindowAbove relativeTo:_voutView];
-    _audioDecorativeView.hidden = YES;
+    VLCPlayerController * const controller =
+        VLCMain.sharedInstance.playlistController.playerController;
+    [self updateDecorativeViewVisibilityOnControllerChange:controller];
 }
 
 - (void)viewDidLoad
@@ -177,7 +179,8 @@
 
 - (void)updateDecorativeViewVisibilityOnControllerChange:(VLCPlayerController *)controller
 {
-    VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
+    VLCMediaLibraryMediaItem * const mediaItem = 
+        [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
 
     BOOL decorativeViewVisible = NO;
     if (mediaItem != nil) {
