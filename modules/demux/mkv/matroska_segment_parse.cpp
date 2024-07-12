@@ -1513,32 +1513,36 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
 
     while( attachedFile && ( attachedFile->GetSize() > 0 ) )
     {
-        KaxFileData  &img_data     = GetChild<KaxFileData>( *attachedFile );
-        std::string attached_filename( UTFstring( GetChild<KaxFileName>( *attachedFile ) ).GetUTF8() );
-        auto new_attachment = vlc_input_attachment_New( attached_filename.c_str(),
-                                                        GetChild<KaxMimeType>( *attachedFile ).GetValue().c_str(),
-                                                        nullptr,
-                                                        img_data.GetBuffer(),
-                                                        img_data.GetSize() );
-        if (!new_attachment)
-            continue;
-        msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->psz_name,
-                 new_attachment->psz_mime );
+        try {
+            KaxFileData  &img_data     = GetMandatoryChild<KaxFileData>( *attachedFile );
+            std::string attached_filename( UTFstring( GetMandatoryChild<KaxFileName>( *attachedFile ) ).GetUTF8() );
+            auto new_attachment = vlc_input_attachment_New( attached_filename.c_str(),
+                                                            GetMandatoryChild<KaxMimeType>( *attachedFile ).GetValue().c_str(),
+                                                            nullptr,
+                                                            img_data.GetBuffer(),
+                                                            img_data.GetSize() );
+            if (!new_attachment)
+                continue;
+            msg_Dbg( &sys.demuxer, "|   |   - %s (%s)", new_attachment->psz_name,
+                    new_attachment->psz_mime );
 
-        if( !strncmp( new_attachment->psz_mime, "image/", 6 ) )
-        {
-            char *psz_url;
-            if( asprintf( &psz_url, "attachment://%s",
-                          new_attachment->psz_name ) >= 0 )
+            if( !strncmp( new_attachment->psz_mime, "image/", 6 ) )
             {
-                if( !sys.meta )
-                    sys.meta = vlc_meta_New();
-                vlc_meta_SetArtURL( sys.meta, psz_url );
-                free( psz_url );
+                char *psz_url;
+                if( asprintf( &psz_url, "attachment://%s",
+                            new_attachment->psz_name ) >= 0 )
+                {
+                    if( !sys.meta )
+                        sys.meta = vlc_meta_New();
+                    vlc_meta_SetArtURL( sys.meta, psz_url );
+                    free( psz_url );
+                }
             }
+            sys.stored_attachments.push_back( vlc::wrap_cptr( new_attachment,
+                                                            &vlc_input_attachment_Release ) );
+        } catch (const MissingMandatory & err) {
+            msg_Dbg( &sys.demuxer, "%s", err.what());
         }
-        sys.stored_attachments.push_back( vlc::wrap_cptr( new_attachment,
-                                                          &vlc_input_attachment_Release ) );
         attachedFile = &GetNextChild<KaxAttached>( *attachments, *attachedFile );
     }
 }
