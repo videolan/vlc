@@ -89,6 +89,7 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 {
     NSInteger _librarySegmentType;
     NSInteger _currentSelectedViewModeSegment;
+    VLCVideoWindowCommon *_temporaryAudioDecorativeWindow;
 }
 
 @property NSTimer *searchInputTimer;
@@ -550,8 +551,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     NSArray<NSWindow *> * const voutWindows = voutProvider.voutWindows.allValues;
 
     if (voutWindows.count == 0) {
-        VLCVideoWindowCommon * const videoWindow = [voutProvider setupVideoWindow];
-        [videoWindow makeKeyAndOrderFront:self];
+        // If we have no video windows in the video provider but are being asked to present a window
+        // then we are dealing with an audio item and the user wants to see the decorative artwork
+        // window for said audio. Create a "fake" window and hold a reference to it so we can kill
+        // it once a real window is created for video playback.
+        if (_temporaryAudioDecorativeWindow == nil) {
+            _temporaryAudioDecorativeWindow = [voutProvider setupVideoWindow];
+        }
+        [_temporaryAudioDecorativeWindow makeKeyAndOrderFront:self];
         return;
     }
 
