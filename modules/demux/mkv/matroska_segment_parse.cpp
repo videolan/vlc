@@ -587,8 +587,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoAlphaMode, mode )
         {
             ONLY_FMT(VIDEO);
-            debug( vars, "Track Video Alpha Mode %u", static_cast<uint8>( mode ) ) ;
-            vars.tk->b_has_alpha = static_cast<uint8>( mode ) == 1;
+            debug( vars, "Track Video Alpha Mode %u", static_cast<uint8_t>( mode ) ) ;
+            vars.tk->b_has_alpha = static_cast<uint8_t>( mode ) == 1;
         }
 #endif
 #if LIBMATROSKA_VERSION >= 0x010406

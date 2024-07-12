@@ -711,7 +711,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 KaxBlockAddID *addId = FindChild<KaxBlockAddID>(*blockMore);
                 if(addId == nullptr)
                     break;
-                if (static_cast<uint64>(*addId) != 1)
+                if (static_cast<uint64_t>(*addId) != 1)
                     break;
 
                 KaxBlockAdditional *addition = FindChild<KaxBlockAdditional>(*blockMore);
