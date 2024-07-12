@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSImageView *backgroundCoverArtView;
 @property (readwrite, strong) IBOutlet NSVisualEffectView *backgroundVisualEffectView;
 
-- (void)setCoverArt:(NSImage *)coverArtImage;
+- (void)updateCoverArt;
 
 @end
 

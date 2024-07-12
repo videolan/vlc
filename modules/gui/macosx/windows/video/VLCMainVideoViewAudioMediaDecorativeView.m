@@ -24,6 +24,8 @@
 
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "main/VLCMain.h"
+
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
 
@@ -50,13 +52,19 @@
 
 - (void)playerCurrentMediaItemChanged:(NSNotification *)notification
 {
-    NSParameterAssert(notification);
-    VLCPlayerController * const controller = notification.object;
-    NSAssert(controller != nil, @"Player current media item changed notification should carry a valid player controller");
+    [self updateCoverArt];
+}
 
-    [VLCLibraryImageCache thumbnailForInputItem:controller.currentMedia withCompletion:^(NSImage * const thumbnail) {
-        [self setCoverArt:thumbnail];
-    }];
+- (void)updateCoverArt
+{
+    VLCPlayerController * const controller =
+        VLCMain.sharedInstance.playlistController.playerController;
+    if (controller.currentMedia) {
+        [VLCLibraryImageCache thumbnailForInputItem:controller.currentMedia 
+                                     withCompletion:^(NSImage * const thumbnail) {
+            [self setCoverArt:thumbnail];
+        }];
+    }
 }
 
 - (void)setCoverArt:(NSImage *)coverArtImage
