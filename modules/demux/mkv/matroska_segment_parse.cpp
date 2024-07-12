@@ -1511,8 +1511,9 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
 
     KaxAttached *attachedFile = FindChild<KaxAttached>( *attachments );
 
-    while( attachedFile && ( attachedFile->GetSize() > 0 ) )
+    while( attachedFile )
     {
+        if (attachedFile->GetSize() > 0 )
         try {
             KaxFileData  &img_data     = GetMandatoryChild<KaxFileData>( *attachedFile );
             std::string attached_filename( UTFstring( GetMandatoryChild<KaxFileName>( *attachedFile ) ).GetUTF8() );
