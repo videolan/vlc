@@ -1307,7 +1307,7 @@ void matroska_segment_c::ParseAttachments( KaxAttachments *attachments )
             delete new_attachment;
         }
 
-        attachedFile = &GetNextChild<KaxAttached>( *attachments, *attachedFile );
+        attachedFile = FindNextChild<KaxAttached>( *attachments, *attachedFile );
     }
 }
 
