@@ -124,6 +124,24 @@ enum chapter_codec_id
 #define MKV_CHECKED_PTR_DECL( name, type, src ) type * name = MKV_IS_ID(src, type) ? static_cast<type*>(src) : NULL
 #define MKV_CHECKED_PTR_DECL_CONST( name, type, src ) const type * name = MKV_IS_ID(src, type) ? static_cast<const type*>(src) : NULL
 
+class MissingMandatory : public std::runtime_error
+{
+public:
+    MissingMandatory(const char * type_name)
+        :std::runtime_error(std::string("missing mandatory element without a default ") + type_name)
+    {}
+};
+
+template <typename Type>
+Type & GetMandatoryChild(const EbmlMaster & Master)
+{
+  auto p = static_cast<Type *>(Master.FindFirstElt(EBML_INFO(Type)));
+  if (p == nullptr)
+  {
+    throw MissingMandatory(EBML_INFO_NAME(EBML_INFO(Type)));
+  }
+  return *p;
+}
 #if LIBEBML_VERSION < 0x020000
 template <typename Type>
 Type * FindChild(const EbmlMaster & Master)
