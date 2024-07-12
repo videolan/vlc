@@ -40,6 +40,8 @@ extern NSString * const VLCWindowFloatOnTopEnabledNotificationKey;
 @property (readonly) NSDictionary *voutWindows;
 
 - (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd withProposedVideoViewPosition:(NSRect)videoViewPosition;
+- (VLCVideoWindowCommon *)setupVideoWindow;
+
 - (void)removeVoutForDisplay:(NSValue *)o_key;
 - (void)setNativeVideoSize:(NSSize)size forWindow:(vlc_window_t *)p_wnd;
 - (void)setWindowLevel:(NSInteger)i_level forWindow:(vlc_window_t *)p_wnd;
