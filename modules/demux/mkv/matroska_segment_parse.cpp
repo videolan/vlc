@@ -206,12 +206,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
 {
     bool bSupported = true;
 
-    EbmlUInteger *pTrackType = static_cast<EbmlUInteger*>(m->FindElt(EBML_INFO(KaxTrackType)));
     uint8_t ttype;
-    if (likely(pTrackType != NULL))
-        ttype = (uint8_t) *pTrackType;
-    else
+    try {
+        KaxTrackType & pTrackType = GetMandatoryChild<KaxTrackType>(*m);
+        ttype = pTrackType;
+    } catch (const MissingMandatory & err) {
+        msg_Dbg( &sys.demuxer, "%s", err.what());
         ttype = 0;
+    }
 
     enum es_format_category_e es_cat;
     switch( ttype )
