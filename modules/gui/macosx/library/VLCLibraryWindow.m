@@ -501,6 +501,20 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)playerStateChanged:(NSNotification *)notification
 {
+    // If we have detached windows; we need to handle the case where we have created a temporary
+    // "artificial" video window to present audio artwork. If we are now playing video, we need to
+    // close the temporary window and present the real video window.
+    if (!var_InheritBool(getIntf(), "embedded-video") && _temporaryAudioDecorativeWindow != nil) {
+        VLCPlayerController * const playerController = self.playerController;
+        const BOOL isVideo = playerController.videoTracks.count > 0;
+
+        if (isVideo) {
+            [_temporaryAudioDecorativeWindow close];
+            _temporaryAudioDecorativeWindow = nil;
+            [self presentExternalWindows];
+        }
+    }
+
     if (_playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self hideControlsBar];
         return;
