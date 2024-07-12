@@ -548,6 +548,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
     NSArray<NSWindow *> * const voutWindows = voutProvider.voutWindows.allValues;
+
+    if (voutWindows.count == 0) {
+        VLCVideoWindowCommon * const videoWindow = [voutProvider setupVideoWindow];
+        [videoWindow makeKeyAndOrderFront:self];
+        return;
+    }
+
     for (NSWindow * const window in voutWindows) {
         [window makeKeyAndOrderFront:self];
     }
