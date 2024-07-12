@@ -164,8 +164,8 @@ Item {
         }
 
         edge: Widgets.DrawerExt.Edges.Bottom
-        width: contentItem.layoutWidth
-        height: contentItem.height
+        width: contentItem?.layoutWidth ?? 0
+        height: contentItem?.height ?? 0
         z: 10
 
         ColorContext {
