@@ -74,6 +74,7 @@
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "windows/video/VLCMainVideoViewController.h"
 
+#import "windows/VLCDetachedAudioWindow.h"
 #import "windows/VLCOpenWindowController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
@@ -501,20 +502,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)playerStateChanged:(NSNotification *)notification
 {
-    // If we have detached windows; we need to handle the case where we have created a temporary
-    // "artificial" video window to present audio artwork. If we are now playing video, we need to
-    // close the temporary window and present the real video window.
-    if (!var_InheritBool(getIntf(), "embedded-video") && _temporaryAudioDecorativeWindow != nil) {
-        VLCPlayerController * const playerController = self.playerController;
-        const BOOL isVideo = playerController.videoTracks.count > 0;
-
-        if (isVideo) {
-            [_temporaryAudioDecorativeWindow close];
-            _temporaryAudioDecorativeWindow = nil;
-            [self presentExternalWindows];
-        }
-    }
-
     if (_playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self hideControlsBar];
         return;
@@ -564,15 +551,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCVideoOutputProvider * const voutProvider = VLCMain.sharedInstance.voutProvider;
     NSArray<NSWindow *> * const voutWindows = voutProvider.voutWindows.allValues;
 
-    if (voutWindows.count == 0) {
+    if (voutWindows.count == 0 && self.playerController.videoTracks.count == 0) {
         // If we have no video windows in the video provider but are being asked to present a window
         // then we are dealing with an audio item and the user wants to see the decorative artwork
-        // window for said audio. Create a "fake" window and hold a reference to it so we can kill
-        // it once a real window is created for video playback.
-        if (_temporaryAudioDecorativeWindow == nil) {
-            _temporaryAudioDecorativeWindow = [voutProvider setupVideoWindow];
-        }
-        [_temporaryAudioDecorativeWindow makeKeyAndOrderFront:self];
+        // window for said audio
+        [VLCMain.sharedInstance.detachedAudioWindow makeKeyAndOrderFront:self];
         return;
     }
 
