@@ -171,7 +171,6 @@
     [self.playButton setAlternateImage: _pressedPlayImage];
 
     [self.timeSlider setHidden:NO];
-    [self updateTimeSlider:nil];
 
     NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
     [self.volumeSlider setToolTip: volumeTooltip];
@@ -179,11 +178,9 @@
 
     [self.volumeSlider setMaxValue: VLCVolumeMaximum];
     [self.volumeSlider setDefaultValue: VLCVolumeDefault];
-    [self updateVolumeSlider:nil];
 
     [self.muteVolumeButton setToolTip: _NS("Mute")];
     self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
-    [self updateMuteVolumeButtonImage];
 
     [self.timeField setNeedsDisplay:YES];
     [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
@@ -216,6 +213,9 @@
     [_artworkImageView setCropsImagesToRoundedCorners:YES];
     [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
     [_artworkImageView setContentGravity:VLCImageViewContentGravityResize];
+
+    // Update verything post-init
+    [self update];
 }
 
 - (void)dealloc
