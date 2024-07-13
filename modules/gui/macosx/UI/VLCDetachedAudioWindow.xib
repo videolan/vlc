@@ -129,6 +129,7 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="20" firstAttribute="top" secondItem="hHQ-ue-m9C" secondAttribute="bottom" constant="5" id="C7Y-fI-Dqe"/>
+                                            <constraint firstItem="hHQ-ue-m9C" firstAttribute="top" secondItem="65" secondAttribute="top" constant="5" id="JZy-V4-KFy"/>
                                             <constraint firstItem="hHQ-ue-m9C" firstAttribute="trailing" secondItem="9" secondAttribute="trailing" id="KgS-6V-onl"/>
                                             <constraint firstItem="20" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="10" id="KrJ-x3-HIr"/>
                                             <constraint firstItem="Vae-cT-EEI" firstAttribute="centerX" secondItem="65" secondAttribute="centerX" id="Rf0-0E-Wiz"/>
@@ -137,7 +138,7 @@
                                             <constraint firstItem="hHQ-ue-m9C" firstAttribute="leading" secondItem="20" secondAttribute="leading" id="VP9-OW-xmq"/>
                                             <constraint firstItem="9" firstAttribute="leading" secondItem="20" secondAttribute="trailing" constant="5" id="gyE-0N-u6t"/>
                                             <constraint firstAttribute="trailing" secondItem="9" secondAttribute="trailing" constant="10" id="p5i-nM-pBs"/>
-                                            <constraint firstItem="Vae-cT-EEI" firstAttribute="top" secondItem="20" secondAttribute="bottom" constant="10" id="pfB-W2-CWB"/>
+                                            <constraint firstItem="Vae-cT-EEI" firstAttribute="top" secondItem="20" secondAttribute="bottom" constant="5" id="pfB-W2-CWB"/>
                                         </constraints>
                                     </customView>
                                 </subviews>
@@ -146,7 +147,7 @@
                                     <constraint firstItem="65" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="84j-is-ZZ4"/>
                                     <constraint firstAttribute="bottom" secondItem="65" secondAttribute="bottom" id="WrS-PS-vpi"/>
                                     <constraint firstItem="65" firstAttribute="top" secondItem="5" secondAttribute="top" id="ecn-UJ-dvK"/>
-                                    <constraint firstAttribute="height" constant="95" id="z2X-5w-wme"/>
+                                    <constraint firstAttribute="height" constant="90" id="z2X-5w-wme"/>
                                 </constraints>
                                 <shadow key="shadow" blurRadius="10">
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
