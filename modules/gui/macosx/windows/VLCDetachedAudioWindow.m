@@ -32,12 +32,12 @@
 #import "playlist/VLCPlaylistController.h"
 #import "playlist/VLCPlayerController.h"
 
-#import "views/VLCImageView.h"
 #import "views/VLCTrackingView.h"
 #import "views/VLCBottomBarView.h"
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
+#import "windows/video/VLCMainVideoViewAudioMediaDecorativeView.h"
 #import "windows/video/VLCMainVideoViewOverlayView.h"
 
 @interface VLCDetachedAudioWindow()
@@ -47,6 +47,49 @@
 @end
 
 @implementation VLCDetachedAudioWindow
+
+- (void)setupAudioDecorativeView
+{
+    _decorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self.contentView];
+    self.decorativeView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.decorativeView 
+                      positioned:NSWindowBelow
+                      relativeTo:self.overlayView];
+    [self.contentView addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:self.decorativeView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.contentView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:self.decorativeView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.contentView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:self.decorativeView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.contentView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:self.decorativeView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.contentView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1.
+                                      constant:0.
+        ],
+    ]];
+}
 
 - (void)awakeFromNib
 {
@@ -69,28 +112,12 @@
 
     self.bottomBarView.drawBorder = NO;
 
-    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    [notificationCenter addObserver:self
-                           selector:@selector(inputItemChanged:)
-                               name:VLCPlayerCurrentMediaItemChanged
-                             object:nil];
-
-    [self inputItemChanged:nil];
+    [self setupAudioDecorativeView];
 }
 
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-}
-
-- (void)inputItemChanged:(NSNotification *)aNotification
-{
-    VLCInputItem * const currentInput = _playerController.currentMedia;
-    if (currentInput) {
-        [self.imageView setImageURL:currentInput.artworkURL placeholderImage:[NSImage imageNamed:@"noart.png"]];
-    } else {
-        [self.imageView setImage:[NSImage imageNamed:@"noart.png"]];
-    }
 }
 
 - (BOOL)canBecomeKeyWindow

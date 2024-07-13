@@ -22,12 +22,6 @@
                 <rect key="frame" x="0.0" y="0.0" width="239" height="239"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="63" customClass="VLCImageView">
-                        <rect key="frame" x="0.0" y="0.0" width="239" height="239"/>
-                        <constraints>
-                            <constraint firstAttribute="width" secondItem="63" secondAttribute="height" multiplier="1:1" id="RxG-T1-BEQ"/>
-                        </constraints>
-                    </customView>
                     <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB" customClass="VLCMainVideoViewOverlayView">
                         <rect key="frame" x="0.0" y="0.0" width="239" height="239"/>
                         <subviews>
@@ -154,19 +148,6 @@
                 </subviews>
                 <constraints>
                     <constraint firstItem="s7h-2z-AKB" firstAttribute="leading" secondItem="4" secondAttribute="leading" id="GSE-Q6-p8X"/>
-                    <constraint firstItem="63" firstAttribute="top" secondItem="4" secondAttribute="top" id="SR5-da-lz7">
-                        <attributedString key="userComments">
-                            <fragment content="Optional constraint if no titlebar">
-                                <attributes>
-                                    <font key="NSFont" metaFont="smallSystem"/>
-                                    <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
-                                </attributes>
-                            </fragment>
-                        </attributedString>
-                    </constraint>
-                    <constraint firstAttribute="bottom" secondItem="63" secondAttribute="bottom" priority="750" id="Xml-gb-MF1"/>
-                    <constraint firstItem="63" firstAttribute="leading" secondItem="4" secondAttribute="leading" id="b8K-0j-YLT"/>
-                    <constraint firstAttribute="trailing" secondItem="63" secondAttribute="trailing" id="b8X-Kc-BfD"/>
                     <constraint firstAttribute="bottom" secondItem="s7h-2z-AKB" secondAttribute="bottom" id="d58-lr-6o8"/>
                     <constraint firstAttribute="trailing" secondItem="s7h-2z-AKB" secondAttribute="trailing" id="dB2-xi-SzA"/>
                     <constraint firstItem="s7h-2z-AKB" firstAttribute="top" secondItem="4" secondAttribute="top" id="plq-T3-bmm"/>
@@ -175,7 +156,6 @@
             <connections>
                 <outlet property="bottomBarView" destination="5" id="xZs-ha-Bmg"/>
                 <outlet property="controlsBar" destination="3" id="69"/>
-                <outlet property="imageView" destination="63" id="xYd-xT-wUa"/>
                 <outlet property="overlayView" destination="s7h-2z-AKB" id="VGk-aw-I4j"/>
             </connections>
             <point key="canvasLocation" x="138.5" y="146.5"/>

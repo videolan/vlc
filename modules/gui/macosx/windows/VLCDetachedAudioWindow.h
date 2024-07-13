@@ -27,13 +27,14 @@
 @class VLCImageView;
 @class VLCBottomBarView;
 @class VLCMainVideoViewOverlayView;
+@class VLCMainVideoViewAudioMediaDecorativeView;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCDetachedAudioWindow : VLCWindow
 
+@property (readonly) VLCMainVideoViewAudioMediaDecorativeView *decorativeView;
 @property (nonatomic, weak) IBOutlet VLCMainVideoViewOverlayView *overlayView;
-@property (nonatomic, weak) IBOutlet VLCImageView *imageView;
 @property (nonatomic, weak) IBOutlet VLCControlsBarCommon *controlsBar;
 @property (nonatomic, weak) IBOutlet VLCBottomBarView *bottomBarView;
 
