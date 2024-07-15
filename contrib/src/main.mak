@@ -51,13 +51,6 @@ ifneq ($(HOST),$(BUILD))
 HAVE_CROSS_COMPILE = 1
 endif
 
-ifeq ($(ARCH)-$(HAVE_WIN32),x86_64-1)
-HAVE_WIN64 := 1
-endif
-ifeq ($(ARCH)-$(HAVE_WIN32),aarch64-1)
-HAVE_WIN64 := 1
-endif
-
 ifeq ($(findstring mingw32,$(BUILD)),mingw32)
 MSYS_BUILD := 1
 endif

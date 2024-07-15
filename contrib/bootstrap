@@ -332,6 +332,11 @@ case "${OS}" in
 				;;
 		esac
 		case "${HOST}" in
+			*x86_64*|*aarch64*)
+				add_make_enabled "HAVE_WIN64"
+				;;
+		esac
+		case "${HOST}" in
 			armv7*)
 				add_make_enabled "HAVE_ARMV7A"
 				;;
