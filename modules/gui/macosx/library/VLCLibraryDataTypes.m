@@ -1368,6 +1368,10 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
+@implementation VLCMediaLibraryShow
+
+@end
+
 @implementation VLCMediaLibraryEntryPoint
 
 - (instancetype)initWithEntryPoint:(struct vlc_ml_folder_t *)p_entryPoint

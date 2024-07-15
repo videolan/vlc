@@ -216,6 +216,17 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
+@interface VLCMediaLibraryShow : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
+
+@property (readonly) NSString *name;
+@property (readonly) NSString *summary;
+@property (readonly) NSString *tvdbId;
+@property (readonly) unsigned int releaseYear;
+@property (readonly) uint32_t episodeCount;
+@property (readonly) uint32_t seasonCount;
+
+@end
+
 @interface VLCMediaLibraryMediaItem : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
