@@ -1048,6 +1048,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
                 BUTTONACT( ui.addButton, &SPrefsPanel::MLaddNewFolder );
                 BUTTONACT( ui.banButton, &SPrefsPanel::MLBanFolder );
+
+                connect( ui.reloadButton, &QPushButton::clicked
+                        , p_intf->p_mi->getMediaLibrary(), &MediaLib::reload);
             }
             else
             {
