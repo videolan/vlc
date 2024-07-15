@@ -33,7 +33,7 @@ DEPS_rav1e += rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
 
 # rav1e-vendor
 
-rav1e-vendor-build: .rustc
+rav1e-vendor-build:
 	$(RM) -R $@
 	mkdir -p $@
 	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1
@@ -44,7 +44,7 @@ rav1e-vendor-build: .rustc
 	# install $@/SHA512SUMS $(SRC)/rav1e-vendor/SHA512SUMS
 	$(RM) -R $@
 
-$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e
+$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e .rustc
 	-$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e)
 	# if the vendor tarball doesn't exist yet, we build it
 	if test ! -s "$@"; then $(RM) -R rav1e-vendor-build; $(MAKE) rav1e-vendor-build; fi
