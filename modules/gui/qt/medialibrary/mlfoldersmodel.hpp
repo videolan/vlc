@@ -72,6 +72,8 @@ public:
 public slots:
     virtual void remove( const QUrl &mrl ) = 0;
     virtual void add( const QUrl &mrl ) = 0;
+    virtual void reload( const int row );
+
     void removeAt( int index );
 
 signals:

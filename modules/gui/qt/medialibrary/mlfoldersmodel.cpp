@@ -96,6 +96,15 @@ QHash<int, QByteArray> MLFoldersBaseModel::roleNames() const
     };
 }
 
+void MLFoldersBaseModel::reload(const int row)
+{
+    const QString mrl = m_mrls.at(row).mrl;
+    m_mediaLib->runOnMLThread(this, [mrl](vlc_medialibrary_t *ml)
+    {
+        vlc_ml_reload_folder( ml, qtu(mrl) );
+    });
+}
+
 void MLFoldersBaseModel::removeAt(int index)
 {
     assert(index < rowCount());
