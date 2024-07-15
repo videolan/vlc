@@ -330,4 +330,16 @@ vlc_tick_t vlc_clock_ConvertToSystem(vlc_clock_t *clock,
                                      vlc_tick_t system_now, vlc_tick_t ts,
                                      double rate, uint32_t *clock_id);
 
+/**
+ * Starts a new clock based on the given clock point, accounting for
+ * previous updates.
+ *
+ * @param clock       an input or output clock that is being started
+ * @param start_date  the system time at which the first update starts
+ * @param first_ts    the media time origin
+ **/
+void vlc_clock_Start(vlc_clock_t *clock,
+                     vlc_tick_t start_date,
+                     vlc_tick_t first_ts);
+
 #endif /*CLOCK_H*/

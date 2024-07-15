@@ -55,6 +55,12 @@ struct vlc_clock_context
     clock_point_t last;
     clock_point_t wait_sync_ref;
 
+    /**
+     * Start point emitted by the buffering to indicate when we supposedly
+     * started the playback. It does not account for latency of the output
+     * when one of them is driving the main_clock. */
+    clock_point_t start_time;
+
     struct vlc_list node;
     struct vlc_list using_clocks;
 };
@@ -83,6 +89,7 @@ struct vlc_clock_main_t
 
     unsigned wait_sync_ref_priority;
     clock_point_t first_pcr;
+
     vlc_tick_t output_dejitter; /* Delay used to absorb the output clock jitter */
     vlc_tick_t input_dejitter; /* Delay used to absorb the input jitter */
 
@@ -99,6 +106,21 @@ struct vlc_clock_ops
     vlc_tick_t (*set_delay)(vlc_clock_t *clock, vlc_tick_t delay);
     vlc_tick_t (*to_system)(vlc_clock_t *clock, struct vlc_clock_context *ctx,
                             vlc_tick_t system_now, vlc_tick_t ts, double rate);
+
+    /**
+     * Signal the clock bus that the given clock will start a new timeline.
+     *
+     * When starting an input clock, a whole new context is created to track
+     * the parameters for the new timeline.
+     *
+     * When starting an output clock, the given clock will track the new context
+     * to register the progress and convert the timestamps.
+     *
+     * \param clock         the clock which is ready to start
+     * \param system_now    the system time for the start point
+     * \param ts            the time for the start point
+     **/
+    void (*start)(vlc_clock_t *clock, vlc_tick_t system_now, vlc_tick_t ts);
 };
 
 struct vlc_clock_t
@@ -219,6 +241,7 @@ static void context_reset(struct vlc_clock_context *ctx)
     ctx->offset = VLC_TICK_INVALID;
     ctx->wait_sync_ref = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     ctx->last = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
+    ctx->start_time = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 }
 
 static void context_init(struct vlc_clock_context *ctx)
@@ -557,6 +580,39 @@ static vlc_tick_t vlc_clock_master_set_delay(vlc_clock_t *clock, vlc_tick_t dela
     return delta;
 }
 
+static void
+vlc_clock_input_start(vlc_clock_t *clock,
+                      vlc_tick_t start_date,
+                      vlc_tick_t first_ts)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_mutex_assert(&main_clock->lock);
+
+    struct vlc_clock_context *context = main_clock->context;
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+        return;
+
+    if (context->start_time.system != VLC_TICK_INVALID
+     && (context->last.system != VLC_TICK_INVALID ||
+         context->wait_sync_ref.stream != VLC_TICK_INVALID))
+    {
+        assert(context->start_time.stream != VLC_TICK_INVALID);
+        struct vlc_clock_context *new_context = malloc(sizeof(*new_context));
+        if (new_context != NULL)
+        {
+            *new_context = *context;
+            vlc_list_init(&new_context->using_clocks);
+            vlc_list_append(&new_context->node, &main_clock->prev_contexts);
+        }
+        context->clock_id++;
+    }
+
+    context_reset(context);
+    context->start_time = clock_point_Create(start_date, first_ts);
+    context->offset = ComputeOffset(main_clock, context, start_date, first_ts, 1.f);
+    main_clock->wait_sync_ref_priority = UINT_MAX;
+}
+
 static vlc_tick_t
 vlc_clock_monotonic_to_system(vlc_clock_t *clock, struct vlc_clock_context *ctx,
                               vlc_tick_t now, vlc_tick_t ts, double rate)
@@ -680,6 +736,29 @@ static vlc_tick_t vlc_clock_slave_set_delay(vlc_clock_t *clock, vlc_tick_t delay
     return 0;
 }
 
+static void
+vlc_clock_output_start(vlc_clock_t *clock,
+                       vlc_tick_t start_date,
+                       vlc_tick_t first_ts)
+{
+    (void)start_date; (void)first_ts;
+
+    vlc_clock_main_t *main_clock = clock->owner;
+    vlc_mutex_assert(&main_clock->lock);
+
+    struct vlc_clock_context *context = main_clock->context;
+#if 0
+    /* Disabled for now, the handling will be done later. */
+    /* vlc_clock_Start must have already been called. */
+    assert(context->start_time.system != VLC_TICK_INVALID);
+    assert(context->start_time.stream != VLC_TICK_INVALID);
+#endif
+    if (context->start_time.system == VLC_TICK_INVALID)
+        return;
+
+    /* Do nothing for now. */
+}
+
 void vlc_clock_Lock(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
@@ -749,6 +828,9 @@ vlc_clock_main_t *vlc_clock_main_New(struct vlc_logger *parent_logger, struct vl
     main_clock->first_pcr =
         clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     main_clock->wait_sync_ref_priority = UINT_MAX;
+
+    ctx->start_time =
+        clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
 
     main_clock->pause_date = VLC_TICK_INVALID;
     main_clock->input_dejitter = DEFAULT_PTS_DELAY;
@@ -845,6 +927,8 @@ void vlc_clock_main_ChangePause(vlc_clock_main_t *main_clock, vlc_tick_t now,
     }
     if (main_clock->first_pcr.system != VLC_TICK_INVALID)
         main_clock->first_pcr.system += delay;
+    if (ctx->start_time.system != VLC_TICK_INVALID)
+        ctx->start_time.system += delay;
     if (ctx->wait_sync_ref.system != VLC_TICK_INVALID)
         ctx->wait_sync_ref.system += delay;
     main_clock->pause_date = VLC_TICK_INVALID;
@@ -933,6 +1017,7 @@ static const struct vlc_clock_ops master_ops = {
     .reset = vlc_clock_master_reset,
     .set_delay = vlc_clock_master_set_delay,
     .to_system = vlc_clock_master_to_system,
+    .start = vlc_clock_output_start,
 };
 
 static const struct vlc_clock_ops slave_ops = {
@@ -940,6 +1025,23 @@ static const struct vlc_clock_ops slave_ops = {
     .reset = vlc_clock_slave_reset,
     .set_delay = vlc_clock_slave_set_delay,
     .to_system = vlc_clock_slave_to_system,
+    .start = vlc_clock_output_start,
+};
+
+static const struct vlc_clock_ops input_master_ops = {
+    .update = vlc_clock_master_update,
+    .reset = vlc_clock_master_reset,
+    .set_delay = vlc_clock_master_set_delay,
+    .to_system = vlc_clock_master_to_system,
+    .start = vlc_clock_input_start,
+};
+
+static const struct vlc_clock_ops input_slave_ops = {
+    .update = vlc_clock_slave_update,
+    .reset = vlc_clock_slave_reset,
+    .set_delay = vlc_clock_slave_set_delay,
+    .to_system = vlc_clock_slave_to_system,
+    .start = vlc_clock_input_start,
 };
 
 static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
@@ -1024,7 +1126,7 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
     if (main_clock->master != NULL)
         main_clock->master->ops = &slave_ops;
 
-    clock->ops = &master_ops;
+    clock->ops = &input_master_ops;
     main_clock->input_master = clock;
     main_clock->rc++;
 
@@ -1041,7 +1143,7 @@ vlc_clock_t *vlc_clock_main_CreateInputSlave(vlc_clock_main_t *main_clock)
     if (!clock)
         return NULL;
 
-    clock->ops = &slave_ops;
+    clock->ops = &input_slave_ops;
     main_clock->rc++;
 
     return clock;
@@ -1113,4 +1215,11 @@ void vlc_clock_Delete(vlc_clock_t *clock)
     main_clock->rc--;
     vlc_mutex_unlock(&main_clock->lock);
     free(clock);
+}
+
+void vlc_clock_Start(vlc_clock_t *clock,
+                     vlc_tick_t start_date,
+                     vlc_tick_t first_ts)
+{
+    clock->ops->start(clock, start_date, first_ts);
 }
