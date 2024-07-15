@@ -34,9 +34,9 @@
 #include <QPushButton>
 
 MLFoldersEditor::MLFoldersEditor(QWidget *parent)
-    : QTableWidget(0, 2, parent)
+    : QTableWidget(0, 3, parent)
 {
-    setHorizontalHeaderLabels({ qtr("Path"), qtr("Remove") });
+    setHorizontalHeaderLabels({ qtr("Path"), qtr("Remove"), qtr("Reload") });
     horizontalHeader()->setMinimumSectionSize( 100 );
     horizontalHeader()->setSectionResizeMode( 0 , QHeaderView::Stretch );
     horizontalHeader()->setFixedHeight( 24 );
@@ -135,7 +135,7 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
         QWidget *wid = new QWidget( this );
         QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
         QPushButton *pb = new QPushButton( text , wid );
-        pb->setFixedSize( 16 , 16 );
+        pb->setFixedSize( 18 , 18 );
 
         layout->addWidget( pb , Qt::AlignCenter );
         wid->setLayout( layout );
@@ -148,12 +148,19 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
     };
 
     buttonCol( 1, "-", &MLFoldersEditor::markRemoved );
+
+    buttonCol( 2, "⟳", &MLFoldersEditor::reloadUrl );
+}
+
+QUrl MLFoldersEditor::url(int row)
+{
+    const QTableWidgetItem *col1 = item(row, 0);
+    return col1->data( Qt::UserRole ).toUrl();
 }
 
 void MLFoldersEditor::markRemoved(int row)
 {
-    const QTableWidgetItem *col1 = item(row, 0);
-    const QUrl mrl = col1->data( Qt::UserRole ).toUrl();
+    const QUrl mrl = url( row );
     const auto index = m_newEntries.indexOf( mrl );
     if ( index == -1 )
         m_removeEntries.push_back( mrl );
@@ -161,4 +168,14 @@ void MLFoldersEditor::markRemoved(int row)
         m_newEntries.remove( index );
 
     removeRow( row );
+}
+
+void MLFoldersEditor::reloadUrl(int row)
+{
+    const QUrl mrl = url( row );
+    if ( m_newEntries.contains(mrl)
+        || m_removeEntries.contains(mrl) )
+        return;
+
+    m_foldersModel->reload( row );
 }
