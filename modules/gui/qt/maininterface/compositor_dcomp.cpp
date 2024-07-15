@@ -378,6 +378,15 @@ bool CompositorDirectComposition::eventFilter(QObject *watched, QEvent *event)
             // deleted by Qt itself)
             m_rootVisual->RemoveVisual(m_uiVisual);
             m_rootVisual.Reset();
+
+            // When the window receives the event `SurfaceAboutToBeDestroyed`,
+            // the RHI and the RHI swap chain are going to be destroyed.
+            // It should be noted that event filters receive events
+            // before the watched object receives them.
+            // Since these objects belong to Qt, we should clear them
+            // in order to prevent potential dangling pointer dereference:
+            m_dcompDevice = nullptr;
+            m_uiVisual = nullptr;
         }
         break;
     default:
