@@ -1271,8 +1271,11 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     // channel-count
     if(i_qt_version == 0 && afmt->i_channels == 1)
         bo_add_16be(soun, 1);
+    else if(b_mov)
+        bo_add_16be(soun, (i_qt_version == 2) ? 3 : 2); // only 1|2 for v0/1, 3 for v3
     else
-        bo_add_16be(soun, 2);
+        bo_add_16be(soun, afmt->i_channels);
+
     // sample size
     if(i_qt_version == 0 && i_uncompressed_bps == 8)
         bo_add_16be(soun, 8);
