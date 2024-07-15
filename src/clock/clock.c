@@ -769,7 +769,80 @@ vlc_clock_output_start(vlc_clock_t *clock,
     if (context->start_time.system == VLC_TICK_INVALID)
         return;
 
-    /* Do nothing for now. */
+    if (clock->priority >= main_clock->wait_sync_ref_priority)
+        return;
+
+    /**
+     * The clock should have already been started, so we have a valid
+     * start_time which links a PCR value to a time where the PCR is being
+     * "used". Any PTS from the output will necessarily be converted after
+     * this start_time, and will necessarily have bigger PTS than the
+     * registered PCR, so we can use the difference to find how much delta
+     * there is between the first PTS and the first PCR.
+     *
+     * When setting up the outputs, some amount of wait will already be
+     * consumed, for instance when playing live stream, we consume some time
+     * between the first decoded packet and the end of the buffering. The
+     * core currently handles this by substracting the buffering duration to
+     * the start time, and we re-inject this duration through the pts-delay,
+     * called input_dejitter in the clock.
+     *
+     *    |  Start                   End of      Decoders ready
+     *    |  buffering               buffering   (DecoderWaitUnblock)
+     *    |     v                       v           v
+     *    |     x-----------------------x-----------x---> system time
+     *    |
+     *    |                               Preroll and
+     *    |             pts delay         decoder delay
+     *    |     |----------------------->|---------->
+     *    |                 <-----------------------|
+     *    |                     Buffering duration
+     *    |                       (media time)
+     *    |
+     *    | Fig.1: System time representation of the clock startup
+     *
+     * The defined start_time from the input is set according to the PCR
+     * but the first PTS received by an output is likely later than this
+     * clock time, so the real output start_time must be shifted to keep
+     * intra-media synchronization in acceptable levels.
+     *
+     *    |    Start     First audio    First video
+     *    |    time      packet PTS     packet PTS
+     *    |      v            v            v
+     *    |      x------------x------------x----------> media time
+     *    |
+     *    |      |------------>
+     *    |      Audio PCR delay
+     *    |
+     *    |      |------------------------->
+     *    |      Video PCR delay
+     *    |
+     *    | Fig.2: Media time representation of the clock startup
+     *
+     * If the pts-delay is very low, and if the PCR delay is very small,
+     * an additional output_dejitter is used to offset the beginning of
+     * the playback in a uniform manner, to let some time for the outputs
+     * to start. It only makes sense when one of the output will drive
+     * the bus clock.
+     **/
+
+    vlc_tick_t pcr_delay = (first_ts - context->start_time.stream) / context->rate
+                         + context->start_time.system - start_date;
+
+    if (pcr_delay > MAX_PCR_DELAY)
+    {
+        if (main_clock->logger != NULL)
+            vlc_error(main_clock->logger, "Invalid PCR delay ! Ignoring it...");
+        pcr_delay = 0;
+    }
+
+    const vlc_tick_t input_delay = main_clock->input_dejitter + pcr_delay;
+
+    const vlc_tick_t delay =
+        __MAX(input_delay, main_clock->output_dejitter);
+
+    main_clock->wait_sync_ref_priority = clock->priority;
+    context->wait_sync_ref = clock_point_Create(start_date + delay, first_ts);
 }
 
 void vlc_clock_Lock(vlc_clock_t *clock)
