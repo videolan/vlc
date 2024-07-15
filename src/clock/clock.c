@@ -542,7 +542,6 @@ static void vlc_clock_master_reset(vlc_clock_t *clock)
     if (clock->context != NULL && clock->context != ctx)
         vlc_clock_switch_context(clock, ctx);
 
-    vlc_clock_main_reset(main_clock);
 
     assert(main_clock->delay <= 0);
     assert(clock->delay >= 0);
@@ -597,40 +596,70 @@ vlc_clock_input_start(vlc_clock_t *clock,
 {
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_assert(&main_clock->lock);
+    assert(main_clock->context != NULL);
 
-    struct vlc_clock_context *context = main_clock->context;
     if (main_clock->first_pcr.system != VLC_TICK_INVALID)
         return;
 
-    if (context->start_time.system != VLC_TICK_INVALID
-     && (context->last.system != VLC_TICK_INVALID ||
-         context->wait_sync_ref.stream != VLC_TICK_INVALID))
-    {
-        assert(context->start_time.stream != VLC_TICK_INVALID);
-        struct vlc_clock_context *new_context = malloc(sizeof(*new_context));
-        if (new_context != NULL)
-        {
-            *new_context = *context;
-            vlc_list_init(&new_context->using_clocks);
-            vlc_list_append(&new_context->node, &main_clock->prev_contexts);
-        }
-        context->clock_id++;
-    }
+    struct vlc_clock_context *context
+        = main_clock->context;
 
-    context_reset(context);
+    struct vlc_clock_context *last_context = 
+        vlc_list_last_entry_or_null(&main_clock->prev_contexts, struct vlc_clock_context, node);
+
+    if (last_context != NULL)
+        context->clock_id = last_context->clock_id + 1;
+
+    // Note: should not trigger when SetFirstPCR is called
     context->start_time = clock_point_Create(start_date, first_ts);
     context->offset = ComputeOffset(main_clock, context, start_date, first_ts, 1.f);
     main_clock->wait_sync_ref_priority = UINT_MAX;
+
+    vlc_clock_switch_context(clock, context);
 }
 
 static void vlc_clock_slave_reset(vlc_clock_t *clock);
 static void vlc_clock_input_reset(vlc_clock_t *clock)
 {
     vlc_clock_main_t *main_clock = clock->owner;
-    if (main_clock->master == clock)
-        vlc_clock_master_reset(clock);
-    else
-        vlc_clock_slave_reset(clock);
+
+    if (main_clock->tracer != NULL && clock->track_str_id != NULL)
+        vlc_tracer_TraceEvent(main_clock->tracer, "RENDER", clock->track_str_id,
+                              "reset_user");
+
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+    {
+        (main_clock->master == clock ? vlc_clock_master_reset : vlc_clock_slave_reset)(clock);
+        return;
+    }
+
+    if (clock->context == NULL || clock->context->start_time.system == VLC_TICK_INVALID)
+        return;
+
+    struct vlc_clock_context *context = main_clock->context;
+
+    bool has_other_clock = false;
+    vlc_clock_t *clock_iterator;
+    vlc_list_foreach(clock_iterator, &context->using_clocks, node)
+    {
+        if (clock_iterator == clock)
+            continue;
+
+        has_other_clock = true;
+    }
+
+    if (!has_other_clock)
+    {
+        context_reset(context);
+        return;
+    }
+
+    assert(context->start_time.stream != VLC_TICK_INVALID);
+    vlc_list_append(&context->node, &main_clock->prev_contexts);
+    main_clock->context = context_new();
+
+    if (main_clock->context == NULL)
+        main_clock->context = context; /* TODO: It fallbacks to previous context */
 }
 
 static vlc_tick_t
@@ -778,7 +807,11 @@ vlc_clock_output_start(vlc_clock_t *clock,
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_assert(&main_clock->lock);
 
-    struct vlc_clock_context *context = main_clock->context;
+
+    /* Attach to the correct context in case of reset */
+    struct vlc_clock_context *context
+        = vlc_clock_get_context(clock, start_date, first_ts, true);
+
 #if 0
     /* Disabled for now, the handling will be done later. */
     /* vlc_clock_Start must have already been called. */
@@ -787,6 +820,9 @@ vlc_clock_output_start(vlc_clock_t *clock,
 #endif
     if (context->start_time.system == VLC_TICK_INVALID)
         return;
+
+    /* Attach to the correct context in case of reset */
+    clock->context = context;
 
     if (clock->priority >= main_clock->wait_sync_ref_priority)
         return;
@@ -1073,8 +1109,14 @@ vlc_tick_t vlc_clock_Update(vlc_clock_t *clock, vlc_tick_t system_now,
                             vlc_tick_t ts, double rate)
 {
     AssertLocked(clock);
-    struct vlc_clock_context *ctx =
-        vlc_clock_get_context(clock, system_now, ts, true);
+
+    vlc_clock_main_t *main_clock = clock->owner;
+    struct vlc_clock_context *ctx;
+
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+        ctx = vlc_clock_get_context(clock, system_now, ts, true);
+    else
+        ctx = clock->context;
 
     return clock->ops->update(clock, ctx, system_now, ts, rate, 0, 0);
 }
@@ -1084,8 +1126,13 @@ vlc_tick_t vlc_clock_UpdateVideo(vlc_clock_t *clock, vlc_tick_t system_now,
                                  unsigned frame_rate, unsigned frame_rate_base)
 {
     AssertLocked(clock);
-    struct vlc_clock_context *ctx =
-        vlc_clock_get_context(clock, system_now, ts, true);
+    vlc_clock_main_t *main_clock = clock->owner;
+    struct vlc_clock_context *ctx;
+
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+        ctx = vlc_clock_get_context(clock, system_now, ts, true);
+    else
+        ctx = clock->context;
 
     return clock->ops->update(clock, ctx, system_now, ts, rate,
                               frame_rate, frame_rate_base);
@@ -1170,18 +1217,19 @@ static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
     clock->last_conversion = 0;
 
     if (input)
-        clock->context = NULL; /* Always use the main one */
-    else
     {
-        /* Attach the clock to the first context or the main one */
-        struct vlc_clock_context *ctx =
-            vlc_list_first_entry_or_null(&main_clock->prev_contexts,
-                                         struct vlc_clock_context, node);
-        if (likely(ctx == NULL))
-            ctx = main_clock->context;
-        vlc_clock_attach_context(clock, ctx);
+        /* Always use the main one */
+        vlc_clock_attach_context(clock, main_clock->context);
+        return clock;
     }
 
+    /* Attach the clock to the first context or the main one */
+    struct vlc_clock_context *ctx =
+        vlc_list_first_entry_or_null(&main_clock->prev_contexts,
+                                        struct vlc_clock_context, node);
+    if (likely(ctx == NULL))
+        ctx = main_clock->context;
+    vlc_clock_attach_context(clock, ctx);
     return clock;
 }
 
