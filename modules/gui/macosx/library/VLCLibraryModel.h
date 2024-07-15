@@ -27,13 +27,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryMediaItem;
-@class VLCMediaLibraryArtist;
-@class VLCMediaLibraryAlbum;
-@class VLCMediaLibraryGenre;
-@class VLCMediaLibraryEntryPoint;
-@protocol VLCMediaLibraryItemProtocol;
-
 extern NSString * const VLCLibraryModelArtistListReset;
 extern NSString * const VLCLibraryModelAlbumListReset;
 extern NSString * const VLCLibraryModelGenreListReset;
