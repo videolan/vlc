@@ -52,6 +52,8 @@ private:
     void newRow(const QUrl &mrl);
     void removeMrlEntry(const QUrl &mrl);
 
+    void markRemoved(int row);
+
     MLFoldersBaseModel *m_foldersModel = nullptr;
 
     // new entries to add/remove on 'commit' call

@@ -129,28 +129,36 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
     col1->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
     setItem( row, 0, col1 );
 
-    QWidget *wid = new QWidget( this );
-    QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
-    QPushButton *pb = new QPushButton( "-" , wid );
-    pb->setFixedSize( 16 , 16 );
-
-    layout->addWidget( pb , Qt::AlignCenter );
-    wid->setLayout( layout );
-
-    connect( pb , &QPushButton::clicked , this, [this, col1]()
+    auto buttonCol = [&, this] (const int col, const QString &text
+                                , std::function<void (MLFoldersEditor *editor, int row)> action)
     {
-        int row = col1->row();
-        vlc_assert( row >= 0 );
+        QWidget *wid = new QWidget( this );
+        QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
+        QPushButton *pb = new QPushButton( text , wid );
+        pb->setFixedSize( 16 , 16 );
 
-        const QUrl mrl = col1->data( Qt::UserRole ).toUrl();
-        const auto index = m_newEntries.indexOf( mrl );
-        if ( index == -1 )
-            m_removeEntries.push_back( mrl );
-        else
-            m_newEntries.remove( index );
+        layout->addWidget( pb , Qt::AlignCenter );
+        wid->setLayout( layout );
+        connect( pb, &QPushButton::clicked, this, [=, this]()
+        {
+            action(this, col1->row());
+        });
 
-        removeRow( row );
-    });
+        setCellWidget( row, col, wid );
+    };
 
-    setCellWidget( row, 1, wid );
+    buttonCol( 1, "-", &MLFoldersEditor::markRemoved );
+}
+
+void MLFoldersEditor::markRemoved(int row)
+{
+    const QTableWidgetItem *col1 = item(row, 0);
+    const QUrl mrl = col1->data( Qt::UserRole ).toUrl();
+    const auto index = m_newEntries.indexOf( mrl );
+    if ( index == -1 )
+        m_removeEntries.push_back( mrl );
+    else
+        m_newEntries.remove( index );
+
+    removeRow( row );
 }
