@@ -354,9 +354,9 @@ CURRENT_PATH="$( pwd -P )"
 TOPSRC=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH'))")
 # location of the contrib/src folder from a built library folder
 TOPSRC_BUILT=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH/libfoo'))")
-add_make "TOPSRC = $TOPSRC"
-add_make "TOPSRC_BUILT = $TOPSRC_BUILT"
-add_make "TOPDST = .."
+add_make "TOPSRC := $TOPSRC"
+add_make "TOPSRC_BUILT := $TOPSRC_BUILT"
+add_make "TOPDST := .."
 add_make "-include config.mak"
 add_make 'include $(TOPSRC)/src/main.mak'
 echo "Bootstrap completed."
