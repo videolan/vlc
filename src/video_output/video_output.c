@@ -961,6 +961,11 @@ static bool IsPictureLateToProcess(vout_thread_sys_t *vout, const video_format_t
     return false;
 }
 
+static inline vlc_tick_t GetRenderDelay(vout_thread_sys_t *sys)
+{
+    return vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
+}
+
 static bool IsPictureLateToStaticFilter(vout_thread_sys_t *vout, const video_format_t *fmt,
                                         vlc_tick_t time_until_display)
 {
@@ -1504,8 +1509,7 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
                                   sys->displayed.current->date, sys->rate, NULL);
     vlc_clock_Unlock(sys->clock);
 
-    const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
-    vlc_tick_t system_prepare_current = system_swap_current - render_delay;
+    vlc_tick_t system_prepare_current = system_swap_current - GetRenderDelay(sys);
     if (unlikely(system_prepare_current > system_now))
         // the current frame is not late, we still have time to display it
         // no need to get a new picture
@@ -1556,9 +1560,8 @@ static vlc_tick_t DisplayPicture(vout_thread_sys_t *vout)
     }
     else if (likely(sys->displayed.date != VLC_TICK_INVALID))
     {
-        const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
         // next date we need to display again the current picture
-        vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+        vlc_tick_t date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - GetRenderDelay(sys);
         const vlc_tick_t system_now = vlc_tick_now();
         /* FIXME/XXX we must redisplay the last decoded picture (because
         * of potential vout updated, or filters update or SPU update)
