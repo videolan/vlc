@@ -1370,6 +1370,22 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryShow
 
+- (instancetype)initWithShow:(struct vlc_ml_show_t *)p_show
+{
+    self = [super init];
+    if (self) {
+        self.libraryID = p_show->i_id;
+        _name = p_show->psz_name ? toNSStr(p_show->psz_name) : @"";
+        _summary = p_show->psz_summary ? toNSStr(p_show->psz_summary) : @"";
+        _tvdbId = p_show->psz_tvdb_id ? toNSStr(p_show->psz_tvdb_id) : @"";
+        _smallArtworkMRL = p_show->psz_artwork_mrl ? toNSStr(p_show->psz_artwork_mrl) : @"";
+        _releaseYear = p_show->i_release_year;
+        _episodeCount = p_show->i_nb_episodes;
+        _seasonCount = p_show->i_nb_seasons;
+    }
+    return self;
+}
+
 @end
 
 @implementation VLCMediaLibraryEntryPoint
