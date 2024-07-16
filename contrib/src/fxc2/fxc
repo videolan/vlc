@@ -17,19 +17,22 @@ def toSystemPath(path: str):
 
     if platform.system() == 'Linux':
         if shutil.which('cygpath'):
-            pathCmd = ['cygpath']
+            pathCmd = ['cygpath', '-m']
         elif shutil.which('wslpath'):
-            pathCmd = ['wslpath']
+            pathCmd = ['wslpath', '-m']
         else:
-            pathCmd = ['wine', 'winepath']
+            pathCmd = ['winepath', '-w']
         # convert to hybrid mode to avoid forward slashes in shell
-        sub = subprocess.Popen(pathCmd + ['-m', absPath], shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        sub = subprocess.Popen(pathCmd + [absPath], shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         p, err = sub.communicate()
         errcode = sub.wait()
         if errcode != 0:
             log_error('failed to find Windows path using {} for "{}" : {}'.format(pathCmd, absPath, err))
             exit(1)
-        return p.decode('utf-8').strip()
+        mixedPath = p.decode('utf-8').strip()
+        if pathCmd[1] == '-w':
+            mixedPath = mixedPath.replace('\\', '/')
+        return mixedPath
 
 def main():
     this_path = os.path.dirname(os.path.abspath(sys.argv[0]))
