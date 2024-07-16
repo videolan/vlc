@@ -27,6 +27,8 @@ import VLC.Style
 Window {
     id: root
 
+    transientParent: MainCtx.intfMainWindow
+
     flags: Qt.Dialog
 
     property bool modal: false
