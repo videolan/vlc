@@ -350,6 +350,10 @@ esac
 #
 BOOTSTRAP_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 CURRENT_PATH="$( pwd -P )"
+
+ARCH=$("${BOOTSTRAP_PATH}/src/get-arch.sh" "${HOST}")
+add_make "ARCH := $ARCH"
+
 # location of the contrib/src folder from the root of the contrib build folder
 TOPSRC=$(python3 -c "import os; print(os.path.relpath('$BOOTSTRAP_PATH', '$CURRENT_PATH'))")
 # location of the contrib/src folder from a built library folder
