@@ -778,6 +778,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryMediaItem
 
+@synthesize libraryID = _libraryID;
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
+@synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize primaryActionableDetail = _primaryActionableDetail;
+@synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
@@ -836,13 +841,13 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 {
     self = [super init];
     if (self && p_mediaItem != NULL && p_mediaLibrary != NULL) {
-        self.libraryID = p_mediaItem->i_id;
-        self.smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
-        self.smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
+        _libraryID = p_mediaItem->i_id;
+        _smallArtworkGenerated = p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl != NULL;
+        _smallArtworkMRL = self.smallArtworkGenerated ? toNSStr(p_mediaItem->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl) : nil;
 
         const BOOL isAlbumTrack = p_mediaItem->i_subtype == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
-        self.primaryActionableDetail = isAlbumTrack;
-        self.secondaryActionableDetail = isAlbumTrack;
+        _primaryActionableDetail = isAlbumTrack;
+        _secondaryActionableDetail = isAlbumTrack;
 
         _p_mediaLibrary = p_mediaLibrary;
         _mediaType = p_mediaItem->i_type;

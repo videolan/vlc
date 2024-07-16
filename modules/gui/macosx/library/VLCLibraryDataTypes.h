@@ -229,7 +229,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @end
 
-@interface VLCMediaLibraryMediaItem : VLCAbstractMediaLibraryItem<VLCMediaLibraryItemProtocol>
+@interface VLCMediaLibraryMediaItem : NSObject<VLCMediaLibraryItemProtocol>
 
 + (nullable instancetype)mediaItemForLibraryID:(int64_t)libraryID;
 + (nullable instancetype)mediaItemForURL:(NSURL *)url;
