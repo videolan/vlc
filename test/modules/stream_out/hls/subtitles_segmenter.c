@@ -28,7 +28,7 @@
 #include <vlc_sout.h>
 
 #include "../../../libvlc/test.h"
-#include "../../modules/stream_out/hls/hls.h"
+#include "../../../../modules/stream_out/hls/hls.h"
 #include "../lib/libvlc_internal.h"
 
 struct test_scenario
