@@ -1163,8 +1163,8 @@ static int StartVideoToolbox(decoder_t *p_dec)
     OSStatus status = CMVideoFormatDescriptionCreate(
                                             kCFAllocatorDefault,
                                             p_sys->codec,
-                                            p_dec->fmt_out.video.i_width,
-                                            p_dec->fmt_out.video.i_height,
+                                            p_dec->fmt_out.video.i_visible_width,
+                                            p_dec->fmt_out.video.i_visible_height,
                                             decoderConfiguration,
                                             &p_sys->videoFormatDescription);
     if (status)
