@@ -293,8 +293,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
-    [self doesNotRecognizeSelector:_cmd];
-    return nil;
+    return self.mediaItems.firstObject;
 }
 
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
@@ -317,12 +316,14 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 - (void)moveToTrash
 {
-    [self doesNotRecognizeSelector:_cmd];
+    [self iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const childMediaItem) {
+        [childMediaItem moveToTrash];
+    }];
 }
 
 - (void)revealInFinder
 {
-    [self doesNotRecognizeSelector:_cmd];
+    [self.firstMediaItem revealInFinder];
 }
 
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
