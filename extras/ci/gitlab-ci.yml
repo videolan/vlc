@@ -537,8 +537,6 @@ macos-arm64:
 
 .nightly-macos-common:
     extends: .macos-common
-    tags:
-        - monterey
     rules:
         - if: '$CI_PIPELINE_SOURCE == "schedule"'
     after_script:
@@ -552,10 +550,14 @@ macos-arm64:
 
 nightly-macos-x86_64:
     extends: .nightly-macos-common
+    tags:
+        - monterey
     variables: *variables-macos-x86_64
 
 nightly-macos-arm64:
     extends: .nightly-macos-common
+    tags:
+        - macos-xcode15
     variables: *variables-macos-arm64
 
 #
