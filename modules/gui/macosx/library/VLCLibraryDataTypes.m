@@ -1382,6 +1382,13 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         _releaseYear = p_show->i_release_year;
         _episodeCount = p_show->i_nb_episodes;
         _seasonCount = p_show->i_nb_seasons;
+
+        self.smallArtworkGenerated = _smallArtworkMRL.length > 0;
+        self.displayString = self.name;
+        self.primaryDetailString = 
+            [NSString stringWithFormat:_NS("%u seasons, %u episodes"), _seasonCount, _episodeCount];
+        self.secondaryDetailString = [NSString stringWithFormat:_NS("Released in %u"), _releaseYear];
+        self.durationString = self.secondaryDetailString;
     }
     return self;
 }
