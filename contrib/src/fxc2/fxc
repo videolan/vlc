@@ -23,12 +23,12 @@ def toSystemPath(path: str):
         else:
             pathCmd = ['wine', 'winepath']
         # convert to hybrid mode to avoid forward slashes in shell
-        sub = subprocess.Popen(pathCmd + ['-m', absPath], shell=False, stderr=subprocess.DEVNULL, stdout=subprocess.PIPE)
+        sub = subprocess.Popen(pathCmd + ['-m', absPath], shell=False, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        p, err = sub.communicate()
         errcode = sub.wait()
         if errcode != 0:
-            log_error('failed to find Windows path using {} for "{}"'.format(pathCmd, absPath))
+            log_error('failed to find Windows path using {} for "{}" : {}'.format(pathCmd, absPath, err))
             exit(1)
-        p, err = sub.communicate()
         return p.decode('utf-8').strip()
 
 def main():
