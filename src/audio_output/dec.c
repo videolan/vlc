@@ -861,6 +861,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         block = aout_FiltersPlay(stream->filters, block, stream->sync.rate);
         if (block == NULL)
             return ret;
+        assert (block->i_pts != VLC_TICK_INVALID);
     }
 
     /* Software volume */
@@ -1046,7 +1047,10 @@ void vlc_aout_stream_Drain(vlc_aout_stream *stream)
     {
         block_t *block = aout_FiltersDrain (stream->filters);
         if (block)
+        {
+            assert (block->i_pts != VLC_TICK_INVALID);
             aout->play(aout, block, vlc_tick_now());
+        }
     }
 
     if (aout->drain)
