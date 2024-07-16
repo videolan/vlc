@@ -1348,6 +1348,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryShow
 
+@synthesize episodes = _episodes;
+
 - (instancetype)initWithShow:(struct vlc_ml_show_t *)p_show
 {
     self = [super init];
@@ -1369,6 +1371,16 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
         self.durationString = self.secondaryDetailString;
     }
     return self;
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)episodes
+{
+    return fetchMediaItemsForLibraryItem(vlc_ml_list_show_episodes, self.libraryID);
+}
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    return self.episodes;
 }
 
 @end

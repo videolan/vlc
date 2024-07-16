@@ -226,6 +226,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) unsigned int releaseYear;
 @property (readonly) uint32_t episodeCount;
 @property (readonly) uint32_t seasonCount;
+@property (readonly) NSArray<VLCMediaLibraryMediaItem *> *episodes;
 
 @end
 
