@@ -196,6 +196,17 @@ bool QVLCTools::restoreWidgetPosition(qt_intf_t *p_intf,
     return defaultUsed;
 }
 
+QVLCFrame::QVLCFrame(qt_intf_t *_p_intf) : QWidget( NULL ), p_intf( _p_intf )
+{
+    assert(_p_intf);
+
+    if (windowFlags().testFlag(Qt::Window))
+    {
+        // If window, set the transient parent:
+        QVLCDialog::setWindowTransientParent(this, nullptr, p_intf);
+    }
+}
+
 void QVLCFrame::keyPressEvent(QKeyEvent *keyEvent)
 {
     if (keyEvent->key() == Qt::Key_Escape)

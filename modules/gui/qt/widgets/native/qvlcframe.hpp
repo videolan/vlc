@@ -72,8 +72,7 @@ class QVLCTools
 class QVLCFrame : public QWidget
 {
 public:
-    QVLCFrame( qt_intf_t *_p_intf ) : QWidget( NULL ), p_intf( _p_intf )
-    {}
+    QVLCFrame( qt_intf_t *_p_intf );
     virtual ~QVLCFrame()   {}
 
     void toggleVisible()
