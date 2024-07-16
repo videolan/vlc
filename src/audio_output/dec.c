@@ -891,7 +891,7 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
                                   stream->sync.rate, &clock_id);
     vlc_clock_Unlock(stream->sync.clock);
 
-    if (clock_id != stream->sync.clock_id)
+    if (clock_id != stream->sync.clock_id && stream->sync.played)
     {
         stream->sync.clock_id = clock_id;
         block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_FILTERED;
