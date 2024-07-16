@@ -267,7 +267,7 @@ OS="${HOST#*-}" # strip architecture
 MAKE=make
 case "${OS}" in
 	*-darwin*)
-		add_make_enabled "HAVE_DARWIN_OS" "HAVE_BSD"
+		add_make_enabled "HAVE_DARWIN_OS"
 		if test -z "$BUILDFORIOS"
 		then
 			check_macosx_sdk

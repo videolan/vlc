@@ -35,10 +35,9 @@ LIVE_EXTRA_CFLAGS += -DNO_GETIFADDRS=1
 endif
 ifdef HAVE_DARWIN_OS
 LIVE_TARGET := macosx-bigsur
-else
+endif
 ifdef HAVE_BSD
 LIVE_TARGET := freebsd
-endif
 endif
 ifdef HAVE_SOLARIS
 ifeq ($(ARCH),x86_64)

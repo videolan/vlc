@@ -13,9 +13,7 @@ endif
 endif
 
 ifdef HAVE_BSD
-ifndef HAVE_DARWIN_OS
 PKGS += basu
-endif
 endif
 
 endif # libsystemd
