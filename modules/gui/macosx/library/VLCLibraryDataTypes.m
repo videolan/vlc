@@ -1352,16 +1352,16 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 {
     self = [super init];
     if (self) {
-        self.libraryID = p_show->i_id;
         _name = p_show->psz_name ? toNSStr(p_show->psz_name) : @"";
         _summary = p_show->psz_summary ? toNSStr(p_show->psz_summary) : @"";
         _tvdbId = p_show->psz_tvdb_id ? toNSStr(p_show->psz_tvdb_id) : @"";
-        _smallArtworkMRL = p_show->psz_artwork_mrl ? toNSStr(p_show->psz_artwork_mrl) : @"";
         _releaseYear = p_show->i_release_year;
         _episodeCount = p_show->i_nb_episodes;
         _seasonCount = p_show->i_nb_seasons;
 
-        self.smallArtworkGenerated = _smallArtworkMRL.length > 0;
+        self.libraryID = p_show->i_id;
+        self.smallArtworkMRL = p_show->psz_artwork_mrl ? toNSStr(p_show->psz_artwork_mrl) : @"";
+        self.smallArtworkGenerated = self.smallArtworkMRL.length > 0;
         self.displayString = self.name;
         self.primaryDetailString = 
             [NSString stringWithFormat:_NS("%u seasons, %u episodes"), _seasonCount, _episodeCount];
