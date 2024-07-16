@@ -1890,6 +1890,47 @@ AC_ARG_ENABLE([rust],
   AS_HELP_STRING([--enable-rust],
     [enable building Rust modules (default disabled)]))
 AS_IF([test "${enable_rust}" = "yes"],[
+
+  rust_target_flags=
+  AS_IF([test "$vlc_winstore_app" = "1"],[
+    rust_target_flags="${rust_target_flags} --uwp"
+  ])
+  AS_IF([test "${win_ucrt_build}" = "yes"],[
+    rust_target_flags="${rust_target_flags} --ucrt"
+  ])
+  AS_IF([test "${HAVE_TVOS}" = "1"],[
+    rust_target_flags="${rust_target_flags} --darwin=tvos"
+  ],[
+    AS_IF([test "${HAVE_WATCHOS}" = "1"],[
+      rust_target_flags="${rust_target_flags} --darwin=watchos"
+    ],[
+      AS_IF([test "${HAVE_XROS}" = "1"],[
+        rust_target_flags="${rust_target_flags} --darwin=xros"
+      ],[
+        AS_IF([test "${HAVE_IOS}" = "1"],[
+          rust_target_flags="${rust_target_flags} --darwin=ios"
+        ],[
+          AS_IF([test "${HAVE_OSX}" = "1"],[
+            rust_target_flags="${rust_target_flags} --darwin=macos"
+          ])
+        ])
+      ])
+    ])
+  ])
+
+  AC_MSG_CHECKING([Rust target])
+  rust_target=$(${srcdir}/contrib/src/get-rust-target.sh \
+    ${rust_target_flags} \
+    ${host})
+  ac_status=$?
+  AS_IF([test $ac_status = 0],[
+    AC_MSG_RESULT([${rust_target}])
+    AC_SUBST([RUST_TARGET], ["${rust_target}"])
+  ],[
+    AC_MSG_RESULT([unsupported])
+    AC_MSG_ERROR([Unsupported Rust target for ${host}])
+  ])
+
   AC_CHECK_PROGS(RUSTC, [rustc], [no])
   AS_IF([test "$RUSTC" = "no"],[
     AC_MSG_ERROR([rustc not found but required to build Rust modules])
@@ -1897,9 +1938,8 @@ AS_IF([test "${enable_rust}" = "yes"],[
   AS_IF([test "${host}" = "${build}"],[
     AC_CACHE_CHECK([rustc host target], [ac_cv_rustc_host_target],
                      [ac_cv_rustc_host_target=$($RUSTC --verbose --version | grep "host:" | cut -d" " -f2-)])
-    AS_IF([test -n "${ac_cv_rustc_host_target}"],
-           [AC_SUBST([RUST_TARGET], ["$ac_cv_rustc_host_target"])],
-           [AC_MSG_ERROR(failed to extract rustc host target)])
+    AS_IF([test "${ac_cv_rustc_host_target}" != "${rust_target}"],
+           [AC_MSG_ERROR([Rust compiler host ${ac_cv_rustc_host_target} does not match ${rust_target}])])
   ],[
     AC_MSG_ERROR([cross compilation is not yet supported for Rust modules (${host} != ${build})])
   ])
