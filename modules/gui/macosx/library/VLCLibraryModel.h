@@ -37,6 +37,7 @@ extern NSString * const VLCLibraryModelAudioMediaListReset;
 extern NSString * const VLCLibraryModelVideoMediaListReset;
 extern NSString * const VLCLibraryModelRecentsMediaListReset;
 extern NSString * const VLCLibraryModelRecentAudioMediaListReset;
+extern NSString * const VLCLibraryModelListOfShowsReset;
 
 extern NSString * const VLCLibraryModelAudioMediaItemDeleted;
 extern NSString * const VLCLibraryModelVideoMediaItemDeleted;

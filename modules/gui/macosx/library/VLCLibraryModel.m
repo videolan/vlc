@@ -37,6 +37,7 @@ NSString * const VLCLibraryModelAudioMediaListReset = @"VLCLibraryModelAudioMedi
 NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMediaListReset";
 NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
 NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRecentAudioMediaListReset";
+NSString * const VLCLibraryModelListOfShowsReset = @"VLCLibraryModelListOfShowsReset";
 
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
@@ -83,6 +84,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 @property (readwrite, atomic) NSArray *cachedAlbums;
 @property (readwrite, atomic) NSArray *cachedGenres;
 @property (readwrite, atomic) NSArray *cachedVideoMedia;
+@property (readwrite, atomic) NSArray *cachedListOfShows;
 @property (readwrite, atomic) NSArray *cachedRecentMedia;
 @property (readwrite, atomic) NSArray *cachedRecentAudioMedia;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
@@ -540,6 +542,30 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         [self resetCachedListOfRecentAudioMedia];
     }
     return _cachedRecentAudioMedia;
+}
+
+- (void)resetCachedListOfShows
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        vlc_ml_show_list_t * const p_show_list = vlc_ml_list_shows(self->_p_mediaLibrary, NULL);
+        if (p_show_list == NULL) {
+            return;
+        }
+        const size_t itemCount = p_show_list->i_nb_items;
+        NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:itemCount];
+        for (size_t x = 0; x < p_show_list->i_nb_items; x++) {
+            vlc_ml_show_t * const p_vlc_show = &p_show_list->p_items[x];
+            VLCMediaLibraryShow * const show = [[VLCMediaLibraryShow alloc] initWithShow:p_vlc_show];
+            if (show) {
+                [mutableArray addObject:show];
+            }
+        }
+        vlc_ml_show_list_release(p_show_list);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.cachedListOfShows = mutableArray.copy;
+            [self.changeDelegate notifyChange:VLCLibraryModelListOfShowsReset withObject:self];
+        });
+    });
 }
 
 - (void)resetCachedMediaItemLists
