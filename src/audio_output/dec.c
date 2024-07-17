@@ -867,8 +867,18 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
     if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
+    vlc_tick_t play_date = VLC_TICK_INVALID;
+    vlc_tick_t system_now;
+
     if (stream->filters && (block->i_flags & BLOCK_FLAG_CORE_PRIVATE_FILTERED) == 0)
     {
+        system_now = vlc_tick_now();
+        vlc_tick_t prefilter_pts = block->i_pts;
+
+        play_date = stream_ClockConvert(stream, system_now, block->i_pts);
+        if (play_date == VLC_TICK_INVALID)
+            return stream_StartDiscontinuity(stream, block);
+
         if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
         {
             vlc_mutex_lock (&owner->vp.lock);
@@ -881,6 +891,10 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
         if (block == NULL)
             return ret;
         assert (block->i_pts != VLC_TICK_INVALID);
+
+        /* Re-trigger a clock convert if the filtered ts is different */
+        if (prefilter_pts != block->i_pts)
+            play_date = VLC_TICK_INVALID;
     }
 
     /* Software volume */
@@ -900,15 +914,19 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
             stream_Silence(stream, delta, block->i_pts);
     }
 
-    /* Drift correction */
-    vlc_tick_t system_now = vlc_tick_now();
-    vlc_tick_t play_date = stream_ClockConvert(stream, system_now, block->i_pts);
+    /* Convert the pts if not previously done by filters */
     if (play_date == VLC_TICK_INVALID)
     {
-        block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_FILTERED;
-        return stream_StartDiscontinuity(stream, block);
+        system_now = vlc_tick_now();
+        play_date = stream_ClockConvert(stream, system_now, block->i_pts);
+        if (play_date == VLC_TICK_INVALID)
+        {
+            block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_FILTERED;
+            return stream_StartDiscontinuity(stream, block);
+        }
     }
 
+    /* Drift correction */
     stream_Synchronize(stream, system_now, play_date, block->i_pts);
 
     vlc_audio_meter_Process(&owner->meter, block, play_date);
