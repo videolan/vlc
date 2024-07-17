@@ -91,6 +91,7 @@ typedef struct
 } filter_sys_t;
 
 static block_t *Resample( filter_t *, block_t * );
+static block_t *FixedResample( filter_t *, block_t * );
 static block_t *Drain( filter_t * );
 static void     Flush( filter_t * );
 
@@ -195,7 +196,15 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
         .flush = Flush,
         .close = Close,
     };
-    p_filter->ops = &filter_ops;
+    static const struct vlc_filter_operations fixed_filter_ops =
+    {
+        .filter_audio = FixedResample,
+        .drain_audio = Drain,
+        .flush = Flush,
+        .close = Close,
+    };
+
+    p_filter->ops = b_change_ratio ? &filter_ops : &fixed_filter_ops;
     p_filter->p_sys = p_sys;
     return VLC_SUCCESS;
 }
@@ -369,20 +378,25 @@ Resample( filter_t *p_filter, block_t *p_in )
         p_out->i_pts = i_pts;
         return p_out;
     }
-    else
-    {
-        /* "audio converter" with fixed ratio */
-
-        const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples,
-                                              p_sys->f_fixed_ratio );
-        block_t *p_out = SoXR_Resample( p_filter, p_sys->soxr, p_in, i_olen );
-        if( p_out )
-            p_out->i_pts = i_pts;
-        return p_out;
-    }
 error:
     block_Release( p_in );
     return NULL;
+}
+
+static block_t *
+FixedResample( filter_t *p_filter, block_t *p_in )
+{
+    /* "audio converter" with fixed ratio */
+    filter_sys_t *p_sys = p_filter->p_sys;
+    const vlc_tick_t i_pts = p_in->i_pts;
+    assert( p_sys->vr_soxr == NULL );
+
+    const size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples,
+                                          p_sys->f_fixed_ratio );
+    block_t *p_out = SoXR_Resample( p_filter, p_sys->soxr, p_in, i_olen );
+    if( p_out )
+        p_out->i_pts = i_pts;
+    return p_out;
 }
 
 static block_t *
