@@ -825,6 +825,25 @@ void vlc_aout_stream_NotifyTiming(vlc_aout_stream *stream, vlc_tick_t system_ts,
     vlc_mutex_unlock(&stream->timing.lock);
 }
 
+static vlc_tick_t stream_ClockConvert(vlc_aout_stream *stream,
+                                      vlc_tick_t system_now, vlc_tick_t pts)
+{
+    uint32_t clock_id;
+
+    vlc_clock_Lock(stream->sync.clock);
+    vlc_tick_t play_date =
+        vlc_clock_ConvertToSystem(stream->sync.clock, system_now, pts,
+                                  stream->sync.rate, &clock_id);
+    vlc_clock_Unlock(stream->sync.clock);
+
+    if (clock_id != stream->sync.clock_id && stream->sync.played)
+    {
+        stream->sync.clock_id = clock_id;
+        return VLC_TICK_INVALID;
+    }
+    return play_date;
+}
+
 /*****************************************************************************
  * vlc_aout_stream_Play : filter & mix the decoded buffer
  *****************************************************************************/
@@ -883,17 +902,9 @@ int vlc_aout_stream_Play(vlc_aout_stream *stream, block_t *block)
 
     /* Drift correction */
     vlc_tick_t system_now = vlc_tick_now();
-
-    uint32_t clock_id;
-    vlc_clock_Lock(stream->sync.clock);
-    vlc_tick_t play_date =
-        vlc_clock_ConvertToSystem(stream->sync.clock, system_now, block->i_pts,
-                                  stream->sync.rate, &clock_id);
-    vlc_clock_Unlock(stream->sync.clock);
-
-    if (clock_id != stream->sync.clock_id && stream->sync.played)
+    vlc_tick_t play_date = stream_ClockConvert(stream, system_now, block->i_pts);
+    if (play_date == VLC_TICK_INVALID)
     {
-        stream->sync.clock_id = clock_id;
         block->i_flags |= BLOCK_FLAG_CORE_PRIVATE_FILTERED;
         return stream_StartDiscontinuity(stream, block);
     }
