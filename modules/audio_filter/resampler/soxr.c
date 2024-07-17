@@ -314,70 +314,68 @@ Resample( filter_t *p_filter, block_t *p_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     const vlc_tick_t i_pts = p_in->i_pts;
+    assert( p_sys->vr_soxr != NULL );
 
-    if( p_sys->vr_soxr )
+    /* "audio resampler" with variable ratio: use the fixed resampler when
+     * the ratio is the same than the fixed one, otherwise use the variable
+     * resampler. */
+
+    soxr_t soxr;
+    block_t *p_flushed_out = NULL, *p_out = NULL;
+    const double f_ratio = p_filter->fmt_out.audio.i_rate
+                         / (double) p_filter->fmt_in.audio.i_rate;
+    size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples,
+        f_ratio > p_sys->f_fixed_ratio ? f_ratio : p_sys->f_fixed_ratio );
+
+    if( f_ratio != p_sys->f_fixed_ratio )
     {
-        /* "audio resampler" with variable ratio: use the fixed resampler when
-         * the ratio is the same than the fixed one, otherwise use the variable
-         * resampler. */
-
-        soxr_t soxr;
-        block_t *p_flushed_out = NULL, *p_out = NULL;
-        const double f_ratio = p_filter->fmt_out.audio.i_rate
-                             / (double) p_filter->fmt_in.audio.i_rate;
-        size_t i_olen = SoXR_GetOutLen( p_in->i_nb_samples,
-            f_ratio > p_sys->f_fixed_ratio ? f_ratio : p_sys->f_fixed_ratio );
-
-        if( f_ratio != p_sys->f_fixed_ratio )
-        {
-            /* using variable resampler */
-            soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, 0 /* instant change */ );
-            soxr = p_sys->vr_soxr;
-        }
-        else if( f_ratio == 1.0f )
-        {
-            /* not using any resampler */
-            soxr = NULL;
-            p_out = p_in;
-        }
-        else
-        {
-            /* using fixed resampler */
-            soxr = p_sys->soxr;
-        }
-
-        /* If the new soxr is different than the last one, flush it */
-        if( p_sys->last_soxr && soxr != p_sys->last_soxr && p_sys->i_last_olen )
-        {
-            p_flushed_out = SoXR_Resample( p_filter, p_sys->last_soxr,
-                                           NULL, p_sys->i_last_olen );
-            if( soxr )
-                msg_Dbg( p_filter, "Using '%s' engine", soxr_engine( soxr ) );
-        }
-
-        if( soxr )
-        {
-            assert( !p_out );
-            p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
-            if( !p_out )
-                goto error;
-        }
-
-        if( p_flushed_out )
-        {
-            /* Prepend the flushed output data to p_out */
-            const unsigned i_nb_samples = p_flushed_out->i_nb_samples
-                                        + p_out->i_nb_samples;
-
-            block_ChainAppend( &p_flushed_out, p_out );
-            p_out = block_ChainGather( p_flushed_out );
-            if( !p_out )
-                goto error;
-            p_out->i_nb_samples = i_nb_samples;
-        }
-        p_out->i_pts = i_pts;
-        return p_out;
+        /* using variable resampler */
+        soxr_set_io_ratio( p_sys->vr_soxr, 1 / f_ratio, 0 /* instant change */ );
+        soxr = p_sys->vr_soxr;
     }
+    else if( f_ratio == 1.0f )
+    {
+        /* not using any resampler */
+        soxr = NULL;
+        p_out = p_in;
+    }
+    else
+    {
+        /* using fixed resampler */
+        soxr = p_sys->soxr;
+    }
+
+    /* If the new soxr is different than the last one, flush it */
+    if( p_sys->last_soxr && soxr != p_sys->last_soxr && p_sys->i_last_olen )
+    {
+        p_flushed_out = SoXR_Resample( p_filter, p_sys->last_soxr,
+                                       NULL, p_sys->i_last_olen );
+        if( soxr )
+            msg_Dbg( p_filter, "Using '%s' engine", soxr_engine( soxr ) );
+    }
+
+    if( soxr )
+    {
+        assert( !p_out );
+        p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
+        if( !p_out )
+            goto error;
+    }
+
+    if( p_flushed_out )
+    {
+        /* Prepend the flushed output data to p_out */
+        const unsigned i_nb_samples = p_flushed_out->i_nb_samples
+                                    + p_out->i_nb_samples;
+
+        block_ChainAppend( &p_flushed_out, p_out );
+        p_out = block_ChainGather( p_flushed_out );
+        if( !p_out )
+            goto error;
+        p_out->i_nb_samples = i_nb_samples;
+    }
+    p_out->i_pts = i_pts;
+    return p_out;
 error:
     block_Release( p_in );
     return NULL;
