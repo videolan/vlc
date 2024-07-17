@@ -7,9 +7,8 @@ vlcrs-macros.cargo:
 vlcrs-messages.cargo:
 vlcrs-plugin.cargo:
 vlcrs-utils.cargo:
-	cd $(top_srcdir)/src/rust/$(@:.cargo=) && env \
-		top_builddir="${abs_top_builddir}" \
-		cargo build
+	env top_builddir="${abs_top_builddir}" \
+	$(CARGO) -C $(top_srcdir)/src/rust/$(@:.cargo=) build
 
 if HAVE_RUST
 TESTS += \
