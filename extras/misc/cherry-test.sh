@@ -36,25 +36,25 @@ fi
 
 CHERY_PICK_DETECT="cherry picked from commit "
 
-NOT_CHERRY_PICKED=`git log --invert-grep --grep "$CHERY_PICK_DETECT" --pretty=%h $COMMIT_RANGE`
+NOT_CHERRY_PICKED=$(git log --invert-grep --grep "$CHERY_PICK_DETECT" --pretty=%h $COMMIT_RANGE)
 if test -n "$NOT_CHERRY_PICKED"; then
     echo "ERROR: some commits are not cherry-picked:"
     git log --invert-grep --grep "$CHERY_PICK_DETECT" --pretty=oneline $COMMIT_RANGE
     exit 1
 fi
 
-CHERRY_PICKED=`git log --grep "$CHERY_PICK_DETECT" --pretty=%H $COMMIT_RANGE`
+CHERRY_PICKED=$(git log --grep "$CHERY_PICK_DETECT" --pretty=%H $COMMIT_RANGE)
 mkdir -p patches-new
 mkdir -p patches-orig
 
 EXIT_CODE=0
 for l in $CHERRY_PICKED; do
-    GIT_LOG=`git log -n 1 $l~1..$l`
+    GIT_LOG=$(git log -n 1 $l~1..$l)
 
-    h=`echo "$GIT_LOG" | grep "$CHERY_PICK_DETECT" | sed -e "s/cherry picked from commit//" -e "s/Edited and //" -e "s/(//" | cut -c6-45`
+    h=$(echo "$GIT_LOG" | grep "$CHERY_PICK_DETECT" | sed -e "s/cherry picked from commit//" -e "s/Edited and //" -e "s/(//" | cut -c6-45)
 
     # Check that the cherry picked hash exist in the original branch
-    HASH_EXISTS=`git merge-base --is-ancestor $h $ORIGINAL_BRANCH 2> /dev/null || echo FAIL`
+    HASH_EXISTS=$(git merge-base --is-ancestor $h $ORIGINAL_BRANCH 2> /dev/null || echo FAIL)
     if test -n "$HASH_EXISTS"; then
         echo "Invalid Hash for:"
         git log -n 1 $l
@@ -62,18 +62,18 @@ for l in $CHERRY_PICKED; do
     fi
 
     # Check the cherry picked commit has a Signed Off mark
-    SIGNED_OFF=`echo "$GIT_LOG" | grep "Signed-off-by: "`
+    SIGNED_OFF=$(echo "$GIT_LOG" | grep "Signed-off-by: ")
     if test -z "$SIGNED_OFF"; then
         echo "Missing signed off for:"
         git log -n 1 $l
     fi
 
-    IS_MARKED_REBASED=`echo "$GIT_LOG" | grep "(cherry picked from commit $h) (rebased)"`
-    IS_MARKED_EDITED=`echo "$GIT_LOG" | grep "(cherry picked from commit $h) (edited)"`
+    IS_MARKED_REBASED=$(echo "$GIT_LOG" | grep "(cherry picked from commit $h) (rebased)")
+    IS_MARKED_EDITED=$(echo "$GIT_LOG" | grep "(cherry picked from commit $h) (edited)")
 
     git diff --no-color --minimal --ignore-all-space $l~1..$l | sed -e "/index /d" -e "s/@@ .*/@@/" > patches-new/$h.diff
     git diff --no-color --minimal --ignore-all-space $h~1..$h | sed -e "/index /d" -e "s/@@ .*/@@/" > patches-orig/$h.diff
-    PATCH_DIFF=`diff -t -w patches-new/$h.diff patches-orig/$h.diff | sed -e '/^> --- /d' -e '/^> +++ /d' -e '/^---/d' -e '/^> @@/d' -e '/^< @@/d' -e '/^[0-9]\+/d'`
+    PATCH_DIFF=$(diff -t -w patches-new/$h.diff patches-orig/$h.diff | sed -e '/^> --- /d' -e '/^> +++ /d' -e '/^---/d' -e '/^> @@/d' -e '/^< @@/d' -e '/^[0-9]\+/d')
     if test -z "$PATCH_DIFF"; then
         if test -n "$IS_MARKED_EDITED"; then
             echo "Incorrectly marked edited: $(git log $l~1..$l --oneline)"
@@ -87,7 +87,7 @@ for l in $CHERRY_PICKED; do
         continue
     fi
 
-    PATCH_DIFF2=`echo "$PATCH_DIFF" | sed -e "/\(> -\|> +\| diff \)/!d" | sed -e "/> +$/d" -e "/> -$/d"`
+    PATCH_DIFF2=$(echo "$PATCH_DIFF" | sed -e "/\(> -\|> +\| diff \)/!d" | sed -e "/> +$/d" -e "/> -$/d")
 
     if test -n "$IS_MARKED_REBASED"; then
         if test -n "$PATCH_DIFF2"; then
@@ -96,7 +96,7 @@ for l in $CHERRY_PICKED; do
             continue
         fi
 
-        IS_EXPLAINED=`echo "$GIT_LOG" | grep "rebased:"`
+        IS_EXPLAINED=$(echo "$GIT_LOG" | grep "rebased:")
         if test -z "$IS_EXPLAINED"; then
             echo "Unexplained rebase: $(git log $l~1..$l)"
             EXIT_CODE=1
@@ -114,7 +114,7 @@ for l in $CHERRY_PICKED; do
             echo "Unmarked edit: $(git log $l~1..$l)"
             EXIT_CODE=1
         else
-            IS_EXPLAINED=`echo "$GIT_LOG" | grep "edited:"`
+            IS_EXPLAINED=$(echo "$GIT_LOG" | grep "edited:")
             if test -z "$IS_EXPLAINED"; then
                 echo "Unexplained edit: $(git log $l~1..$l)"
                 EXIT_CODE=1
