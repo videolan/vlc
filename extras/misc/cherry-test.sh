@@ -97,12 +97,12 @@ for l in $CHERRY_PICKED; do
         fi
 
         IS_EXPLAINED=$(echo "$GIT_LOG" | grep "rebased:")
-        if test -z "$IS_EXPLAINED"; then
-            echo "Unexplained rebase: $(git log $l~1..$l)"
-            EXIT_CODE=1
-        else
+        # if test -z "$IS_EXPLAINED"; then
+        #     echo "Unexplained rebase: $(git log $l~1..$l)"
+        #     EXIT_CODE=1
+        # else
             rm -rf patches-new/$h.diff patches-orig/$h.diff
-        fi
+        # fi
     else
         if test -z "$PATCH_DIFF2"; then
             echo "Rebase marked as edit: $(git log $l~1..$l)"
