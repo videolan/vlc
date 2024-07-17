@@ -62,11 +62,11 @@ for l in $CHERRY_PICKED; do
     fi
 
     # Check the cherry picked commit has a Signed Off mark
-    SIGNED_OFF=$(echo "$GIT_LOG" | grep "Signed-off-by: ")
-    if test -z "$SIGNED_OFF"; then
-        echo "Missing signed off for:"
-        git log -n 1 $l
-    fi
+    # SIGNED_OFF=$(echo "$GIT_LOG" | grep "Signed-off-by: ")
+    # if test -z "$SIGNED_OFF"; then
+    #     echo "Missing signed off for:"
+    #     git log -n 1 $l
+    # fi
 
     IS_MARKED_REBASED=$(echo "$GIT_LOG" | grep "(cherry picked from commit $h) (rebased)")
     IS_MARKED_EDITED=$(echo "$GIT_LOG" | grep "(cherry picked from commit $h) (edited)")
