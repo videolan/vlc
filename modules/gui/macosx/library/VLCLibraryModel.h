@@ -86,6 +86,9 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 @property (readonly) size_t numberOfRecentAudioMedia;
 @property (readonly) NSArray <VLCMediaLibraryMediaItem *> *listOfRecentAudioMedia;
 
+@property (readonly) size_t numberOfShows;
+@property (readonly) NSArray <VLCMediaLibraryShow *> *listOfShows;
+
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
 @property (readonly) NSDictionary<NSNumber *, NSString *> *albumDict;
