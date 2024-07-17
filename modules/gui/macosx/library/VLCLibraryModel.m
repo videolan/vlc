@@ -70,6 +70,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
     size_t _initialAlbumCount;
     size_t _initialArtistCount;
     size_t _initialGenreCount;
+    size_t _initialShowCount;
     size_t _initialRecentsCount;
     size_t _initialRecentAudioCount;
 
@@ -220,6 +221,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialAlbumCount = vlc_ml_count_albums(self->_p_mediaLibrary, &queryParameters);
             self->_initialArtistCount = vlc_ml_count_artists(self->_p_mediaLibrary, &queryParameters, true);
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
+            self->_initialShowCount = vlc_ml_count_shows(self->_p_mediaLibrary, &queryParameters);
 
             queryParameters.i_nbResults = self->_recentMediaLimit;
             self->_initialRecentsCount = vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
@@ -566,6 +568,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [self.changeDelegate notifyChange:VLCLibraryModelListOfShowsReset withObject:self];
         });
     });
+}
+
+- (size_t)numberOfShows
+{
+    if (!_cachedListOfShows) {
+        [self resetCachedListOfShows];
+        // Return initial count here, otherwise it will return 0 on the first time
+        return _initialShowCount;
+    }
+    return _cachedListOfShows.count;
 }
 
 - (void)resetCachedMediaItemLists
