@@ -87,6 +87,7 @@ typedef struct
     soxr_t  last_soxr;
     double  f_fixed_ratio;
     size_t  i_last_olen;
+    vlc_tick_t i_next_pts;
 } filter_sys_t;
 
 static block_t *Resample( filter_t *, block_t * );
@@ -134,6 +135,8 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
     filter_sys_t *p_sys = calloc( 1, sizeof( filter_sys_t ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
+
+    p_sys->i_next_pts = VLC_TICK_INVALID;
 
     /* Setup SoXR */
     int64_t i_vlc_q = var_InheritInteger( p_obj, "soxr-resampler-quality" );
@@ -283,6 +286,7 @@ SoXR_Resample( filter_t *p_filter, soxr_t soxr, block_t *p_in, size_t i_olen )
 
     if( p_in )
     {
+        p_sys->i_next_pts = p_in->i_pts + p_out->i_length;
         p_sys->i_last_olen = i_olen;
         p_sys->last_soxr = soxr;
     }
@@ -402,8 +406,16 @@ Drain( filter_t *p_filter )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     if( p_sys->last_soxr && p_sys->i_last_olen )
-        return SoXR_Resample( p_filter, p_sys->last_soxr, NULL,
-                              p_sys->i_last_olen );
+    {
+        block_t *p_out = SoXR_Resample( p_filter, p_sys->last_soxr, NULL,
+                                        p_sys->i_last_olen );
+        if( p_out != NULL )
+        {
+            assert( p_sys->i_next_pts != VLC_TICK_INVALID );
+            p_out->i_pts = p_sys->i_next_pts;
+        }
+        return p_out;
+    }
     else
         return NULL;
 }
@@ -419,4 +431,5 @@ Flush( filter_t *p_filter )
         p_sys->i_last_olen = 0;
         p_sys->last_soxr = NULL;
     }
+    p_sys->i_next_pts = VLC_TICK_INVALID;
 }
