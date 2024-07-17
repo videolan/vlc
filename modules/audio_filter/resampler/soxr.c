@@ -87,7 +87,6 @@ typedef struct
     soxr_t  last_soxr;
     double  f_fixed_ratio;
     size_t  i_last_olen;
-    vlc_tick_t i_last_pts;
 } filter_sys_t;
 
 static block_t *Resample( filter_t *, block_t * );
