@@ -241,7 +241,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* We need compare both stream and system times for discontinuity.
          * Indeed, a big stream diff is OK if we have the same system diff. */
         vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
-        vlc_tick_t system_diff = i_ck_system - cl->last.system;
+        vlc_tick_t system_diff = (i_ck_system - cl->last.system) * cl->rate;
         vlc_tick_t diff = stream_diff - system_diff;
         if (diff > CR_MAX_GAP || diff < -CR_MAX_GAP)
         {
