@@ -94,6 +94,7 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
+- (void)resetCachedListOfShows;
 - (void)resetCachedListOfMonitoredFolders;
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
@@ -118,12 +119,15 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
             [libraryModel resetCachedMediaItemLists];
+            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
             [libraryModel handleMediaItemUpdateEvent:p_event];
+            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_DELETED:
             [libraryModel handleMediaItemDeletionEvent:p_event];
+            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             if (p_event->media_thumbnail_generated.b_success) {
@@ -594,6 +598,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     [self resetCachedListOfRecentAudioMedia];
     [self resetCachedListOfAudioMedia];
     [self resetCachedListOfVideoMedia];
+    [self resetCachedListOfShows];
 }
 
 - (void)resetCachedListOfMonitoredFolders
