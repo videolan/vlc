@@ -1941,7 +1941,9 @@ AS_IF([test "${enable_rust}" = "yes"],[
     ])
   ])
 
+  RUST_ENV=
   AS_IF([test -n "${CARGO_HOME}"],[
+    RUST_ENV="${RUST_ENV} CARGO_HOME=\"${CARGO_HOME}\""
     AS_IF([test -x "${CARGO_HOME}/bin/cargo"],[
       ac_cv_prog_CARGO="${CARGO_HOME}/bin/cargo"
     ])
@@ -1963,22 +1965,30 @@ AS_IF([test "${enable_rust}" = "yes"],[
     ])
   ])
 
+  AS_IF([test -n "${RUSTUP_HOME}"],[
+    RUST_ENV="${RUST_ENV} RUSTUP_HOME=\"${RUSTUP_HOME}\""
+  ])
+
   AC_CHECK_PROGS(RUSTC, [rustc], [no])
   AS_IF([test "$RUSTC" = "no"],[
     AC_MSG_ERROR([rustc not found but required to build Rust modules])
   ])
-  AS_IF([test "${host}" = "${build}"],[
-    AC_CACHE_CHECK([rustc host target], [ac_cv_rustc_host_target],
-                     [ac_cv_rustc_host_target=$($RUSTC --verbose --version | grep "host:" | cut -d" " -f2-)])
-    AS_IF([test "${ac_cv_rustc_host_target}" != "${rust_target}"],
-           [AC_MSG_ERROR([Rust compiler host ${ac_cv_rustc_host_target} does not match ${rust_target}])])
+
+  AC_MSG_CHECKING([Rust compiler supports ${rust_target}])
+  ac_try="echo 'fn main() {}' | ${RUST_ENV} \"${RUSTC}\" --target=${rust_target} --emit=dep-info - -o -"
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  AS_IF([test $ac_status = 0],[
+    AC_MSG_RESULT([yes])
   ],[
-    AC_MSG_ERROR([cross compilation is not yet supported for Rust modules (${host} != ${build})])
+    AC_MSG_RESULT([no])
+    AC_MSG_ERROR([Required target ${rust_target} missing (using ${RUST_ENV})])
   ])
   AC_CHECK_PROGS(CARGO, [cargo], [no])
   AS_IF([test "$CARGO" = "no"],[
     AC_MSG_ERROR([cargo not found. cargo is required to build Rust modules])
   ])
+  AC_SUBST([RUST_ENV])
   AC_DEFINE(ENABLE_RUST, 1, [Define to 1 for building rust modules.])
 ])
 AM_CONDITIONAL([HAVE_RUST], [test "${enable_rust}" = "yes"])
