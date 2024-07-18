@@ -85,6 +85,7 @@ struct clock_ctx
     vlc_clock_main_t *mainclk;
     vlc_clock_t *master;
     vlc_clock_t *slave;
+    vlc_clock_t *input;
 
     vlc_tick_t system_start;
     vlc_tick_t stream_start;
@@ -329,6 +330,9 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
     assert(mainclk != NULL);
 
     vlc_clock_main_Lock(mainclk);
+    vlc_clock_t *input = vlc_clock_main_CreateInputSlave(mainclk);
+    assert(input != NULL);
+
     vlc_clock_t *master = vlc_clock_main_CreateMaster(mainclk, scenario->name,
                                                       NULL, NULL);
     assert(master != NULL);
@@ -357,6 +361,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
 
     const struct clock_ctx ctx = {
         .mainclk = mainclk,
+        .input = input,
         .master = master,
         .slave = slave,
         .scenario = scenario,
@@ -421,6 +426,7 @@ static void play_scenario(libvlc_int_t *vlc, struct vlc_tracer *tracer,
 end:
     vlc_clock_Delete(master);
     vlc_clock_Delete(slave);
+    vlc_clock_Delete(input);
     free(slave_name);
     vlc_clock_main_Delete(mainclk);
 }
