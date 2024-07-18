@@ -11,11 +11,7 @@ endif
 
 endif
 
-ifdef HAVE_CROSS_COMPILE
-DEPS_cargo-c = rustc-cross $(DEPS_rustc-cross)
-else
 DEPS_cargo-c = rustc $(DEPS_rustc)
-endif
 
 .sum-cargo-c:
 	touch $@
@@ -32,5 +28,5 @@ endif
 
 .cargo-c:
 	+unset PKG_CONFIG_LIBDIR PKG_CONFIG_PATH CFLAGS CPPFLAGS LDFLAGS; \
-		$(CARGO) install --locked $(CARGOC_FEATURES) cargo-c --version $(CARGOC_VERSION)
+		$(CARGO_NATIVE) install --target=$(RUST_HOST) --locked $(CARGOC_FEATURES) cargo-c --version $(CARGOC_VERSION)
 	touch $@
