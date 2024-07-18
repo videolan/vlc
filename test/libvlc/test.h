@@ -61,7 +61,7 @@ static const char test_default_sample[] = "mock://";
  * Some useful common functions
  */
 
-#define test_log( ... ) printf( "testapi: " __VA_ARGS__ );
+#define test_log( ... ) fprintf(stderr, "testapi: " __VA_ARGS__);
 
 static inline void test_setup(void)
 {
