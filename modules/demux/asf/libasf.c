@@ -106,6 +106,7 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, size_t i_peek, ui
  *
  ****************************************************************************/
 static int ASF_ReadObject( stream_t *, asf_object_t *,  asf_object_t * );
+static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj );
 
 /****************************************************************************
  *
@@ -1020,6 +1021,7 @@ static int ASF_ReadObject_extended_stream_properties( stream_t *s,
         {
             /* This p_sp will be inserted by ReadRoot later */
             p_esp->p_sp = (asf_object_stream_properties_t*)p_sp;
+            ASF_ParentObject( p_obj, p_sp );
         }
     }
 
@@ -1778,31 +1780,9 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                                 &asf_object_header_extension_guid, 0 );
             if( p_hdr_ext )
             {
-                int i_ext_stream;
-
                 p_root->p_metadata =
                     ASF_FindObject( p_hdr_ext,
                                     &asf_object_metadata_guid, 0 );
-                /* Special case for broken designed file format :( */
-                i_ext_stream = ASF_CountObject( p_hdr_ext,
-                                    &asf_object_extended_stream_properties_guid );
-                for( int i = 0; i < i_ext_stream; i++ )
-                {
-                    asf_object_t *p_esp =
-                        ASF_FindObject( p_hdr_ext,
-                                   &asf_object_extended_stream_properties_guid, i );
-                    if( p_esp->ext_stream.p_sp )
-                    {
-                        asf_object_t *p_sp =
-                                         (asf_object_t*)p_esp->ext_stream.p_sp;
-
-                        /* Insert this p_sp */
-                        p_root->p_hdr->p_last->common.p_next = p_sp;
-                        p_root->p_hdr->p_last = p_sp;
-
-                        p_sp->common.p_father = (asf_object_t*)p_root->p_hdr;
-                    }
-                }
             }
 
             ASF_ObjectDumpDebug( VLC_OBJECT(s),
