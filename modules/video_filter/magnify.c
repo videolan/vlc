@@ -197,6 +197,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         /* */
         fmt_out = p_filter->fmt_out.video;
         p_converted = image_Convert( p_sys->p_image, p_pic, &fmt_in, &fmt_out );
+        if (unlikely(!p_converted))
+        {
+            picture_Release( p_outpic );
+            return NULL;
+        }
         memcpy(p_pic->p, orig_planes, sizeof orig_planes);
 
         picture_CopyPixels( p_outpic, p_converted );
@@ -220,6 +225,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         fmt_out.i_height = fmt_out.i_visible_height = (fmt_out.i_visible_height/VIS_ZOOM) & ~1;
         p_converted = image_Convert( p_sys->p_image, p_pic,
                                      &p_pic->format, &fmt_out );
+        if (unlikely(!p_converted))
+        {
+            picture_Release( p_outpic );
+            return NULL;
+        }
 
         /* It will put only what can be copied at the top left */
         picture_CopyPixels( p_outpic, p_converted );
