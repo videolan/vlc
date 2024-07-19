@@ -238,7 +238,7 @@ static void context_reset(struct vlc_clock_context *ctx)
 {
     ctx->coeff = 1.0f;
     ctx->rate = 1.0f;
-    ctx->offset = VLC_TICK_INVALID;
+    ctx->offset = 0;
     ctx->wait_sync_ref = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     ctx->last = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
     ctx->start_time = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
@@ -1122,7 +1122,7 @@ vlc_clock_t *vlc_clock_main_CreateInputMaster(vlc_clock_main_t *main_clock)
 
     /* Even if the master ES clock has already been created, it should not
      * have updated any points */
-    assert(ctx->offset == VLC_TICK_INVALID); (void) ctx;
+    assert(ctx->offset == 0); (void) ctx;
 
     /* Override the master ES clock if it exists */
     if (main_clock->master != NULL)
