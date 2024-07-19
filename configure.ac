@@ -1931,6 +1931,16 @@ AS_IF([test "${enable_rust}" = "yes"],[
     AC_MSG_ERROR([Unsupported Rust target for ${host}])
   ])
 
+  AS_IF([test -z "${CARGO_HOME}" -a "${host}" != "${build}"],[
+    AC_MSG_CHECKING([CARGO_HOME from contribs])
+    AS_IF([test -d "${CONTRIB_DIR}/../bin/.cargo"],[
+      CARGO_HOME=$(cd "${CONTRIB_DIR}/../bin/.cargo" && pwd -P)
+      AC_MSG_RESULT([${CARGO_HOME}])
+    ],[
+      AC_MSG_RESULT([not found])
+    ])
+  ])
+
   AS_IF([test -n "${CARGO_HOME}"],[
     AS_IF([test -x "${CARGO_HOME}/bin/cargo"],[
       ac_cv_prog_CARGO="${CARGO_HOME}/bin/cargo"
