@@ -339,14 +339,16 @@ void input_clock_Reset( input_clock_t *cl )
  *****************************************************************************/
 void input_clock_ChangeRate( input_clock_t *cl, float rate )
 {
+    float oldrate = cl->rate;
+    cl->rate = rate;
+
     if( cl->b_has_reference )
     {
         /* Move the reference point (as if we were playing at the new rate
          * from the start */
-        cl->ref.system = cl->last.system - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * cl->rate);
+        cl->ref.system = cl->last.system
+            - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * oldrate);
     }
-    cl->rate = rate;
-
     UpdateListener( cl, false );
 }
 
