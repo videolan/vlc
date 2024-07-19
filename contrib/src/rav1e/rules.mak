@@ -23,12 +23,11 @@ RAV1E_FEATURES=--features=asm
 
 # we may not need cargo if the tarball is downloaded, but it will be needed by rav1e anyway
 ifdef HAVE_CROSS_COMPILE
-DEPS_rav1e-vendor = rustc-cross $(DEPS_rustc-cross)
 DEPS_rav1e = rustc-cross $(DEPS_rustc-cross)
 else
-DEPS_rav1e-vendor = rustc $(DEPS_rustc)
 DEPS_rav1e = rustc $(DEPS_rustc)
 endif
+DEPS_rav1e-vendor = rustc $(DEPS_rustc)
 DEPS_rav1e += rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
 
 # rav1e-vendor
@@ -37,7 +36,7 @@ rav1e-vendor-build:
 	$(RM) -R $@
 	mkdir -p $@
 	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1
-	cd $@ && $(CARGO) vendor --locked rav1e-$(RAV1E_VERSION)-vendor
+	cd $@ && $(CARGO_NATIVE) vendor --locked rav1e-$(RAV1E_VERSION)-vendor
 	cd $@ && tar -jcf rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 rav1e-$(RAV1E_VERSION)-vendor
 	install $@/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 "$(TARBALLS)"
 	# cd $@ && sha512sum rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 > SHA512SUMS
