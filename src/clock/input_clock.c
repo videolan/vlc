@@ -348,8 +348,9 @@ void input_clock_ChangeRate( input_clock_t *cl, float rate )
          * from the start */
         cl->ref.system = cl->last.system
             - (vlc_tick_t) ((cl->last.system - cl->ref.system) / rate * oldrate);
+
+        UpdateListener( cl, false );
     }
-    UpdateListener( cl, false );
 }
 
 /*****************************************************************************
