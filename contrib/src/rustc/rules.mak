@@ -19,10 +19,11 @@ endif
 
 ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_HOST) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --target=$(RUST_HOST) --version,$(RUST_VERSION_MIN)),)
 PKGS_FOUND += rustc
-# TODO detect if the target is available
-# PKGS_FOUND += rustc-cross
 else
 DEPS_rustc = rustup $(DEPS_rustup)
+endif
+ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_TARGET) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --target=$(RUST_TARGET) --version,$(RUST_VERSION_MIN)),)
+PKGS_FOUND += rustc-cross
 endif
 
 endif
