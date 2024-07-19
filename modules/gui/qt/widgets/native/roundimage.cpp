@@ -490,11 +490,25 @@ void RoundImage::setDPR(const qreal value)
 
 void RoundImage::load()
 {
+    // NOTE: at this point we still have old content displayed
+
     m_enqueuedGeneration = false;
 
-    auto engine = qmlEngine(this);
-    if (!engine || m_source.isEmpty() || !m_sourceSize.isValid() || m_sourceSize.isEmpty())
+    if (m_source.isEmpty())
+    {
+        // nothing to load, clear old content
+        setStatus(Status::Null);
+        setRoundImage({});
+
         return;
+    }
+
+    auto engine = qmlEngine(this);
+    if (!engine || !m_sourceSize.isValid() || m_sourceSize.isEmpty())
+    {
+        onRequestCompleted(Status::Error, {});
+        return;
+    }
 
     const qreal scaledWidth = m_sourceSize.width() * m_dpr;
     const qreal scaledHeight = m_sourceSize.height() * m_dpr;
@@ -519,6 +533,7 @@ void RoundImage::load()
         m_activeImageResponse->saveInCache();
 
     connect(m_activeImageResponse.get(), &RoundImageRequest::requestCompleted, this, &RoundImage::onRequestCompleted);
+
     //at this point m_activeImageResponse is either in Loading or Error status
     onRequestCompleted(RoundImage::Loading, {});
 }
@@ -580,11 +595,6 @@ void RoundImage::regenerateRoundImage()
 {
     if (!isComponentComplete() || m_enqueuedGeneration)
         return;
-
-    setStatus(source().isEmpty() ? Status::Null : Status::Loading);
-
-    // remove old contents
-    setRoundImage({});
 
     m_activeImageResponse.reset();
 
