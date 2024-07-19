@@ -637,6 +637,9 @@ elif [ "$VLC_HOST_OS" = "watchos" ]; then
     export BUILDFORIOS="yes"
     export BUILDFORWATCHOS="yes"
 fi
+if [ "$VLC_HOST_PLATFORM_SIMULATOR" = "yes" ]; then
+    export BUILDFORSIMULATOR="yes"
+fi
 
 # Default to "make" if there is no MAKE env variable
 MAKE=${MAKE:-make}
