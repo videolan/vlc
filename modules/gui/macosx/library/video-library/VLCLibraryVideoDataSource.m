@@ -63,24 +63,6 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
     return self;
 }
 
-- (void)setupCollectionView:(NSCollectionView *)collectionView
-{
-    [collectionView registerClass:VLCLibraryCollectionViewItem.class
-            forItemWithIdentifier:VLCLibraryCellIdentifier];
-
-    [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
-       forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
-                   withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
-
-    NSNib * const mediaItemSupplementaryDetailView = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryCollectionViewMediaItemSupplementaryDetailView.class) bundle:nil];
-    [collectionView registerNib:mediaItemSupplementaryDetailView
-     forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
-                 withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
-
-    collectionView.dataSource = self;
-    [collectionView reloadData];
-}
-
 - (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
 {
     return [array indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const findMediaItem, const NSUInteger idx, BOOL * const stop) {

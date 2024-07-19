@@ -27,6 +27,7 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
@@ -158,7 +159,7 @@
 
 - (void)setupCollectionView
 {
-     _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    _collectionViewLayout = [[VLCLibraryCollectionViewFlowLayout alloc] init];
 
     const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
     const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
@@ -167,14 +168,29 @@
     _collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
     _collectionViewLayout.sectionInset = collectionViewSectionInset;
 
-    self.videoLibraryCollectionView.collectionViewLayout = _collectionViewLayout;
+    NSCollectionView * const collectionView = self.videoLibraryCollectionView;
+    collectionView.collectionViewLayout = _collectionViewLayout;
 
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
     _collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
-    self.videoLibraryCollectionView.delegate = _collectionViewDelegate;
+    collectionView.delegate = _collectionViewDelegate;
 
-    [self.libraryVideoDataSource setupCollectionView:self.videoLibraryCollectionView];
+    [collectionView registerClass:VLCLibraryCollectionViewItem.class
+            forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    [collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
+       forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                   withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSString * const mediaItemSupplementaryDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewMediaItemSupplementaryDetailView.class);
+    NSNib * const mediaItemSupplementaryDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:mediaItemSupplementaryDetailViewString bundle:nil];
+    
+    [collectionView registerNib:mediaItemSupplementaryDetailViewNib
+     forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                 withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
 - (void)setupTableViews
@@ -350,6 +366,7 @@
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
+    self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
     [self.libraryVideoDataSource reloadData];
 }
 

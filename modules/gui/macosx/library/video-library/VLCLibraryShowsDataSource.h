@@ -37,7 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 
 - (void)reloadData;
-- (void)setupCollectionView:(NSCollectionView *)collectionView;
 
 @end
 

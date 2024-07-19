@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VVLCLibraryVideoDataSource.h: MacOS X interface module
+ * VLCLibraryVideoDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -39,7 +39,6 @@ extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotif
 @property (readwrite, assign) NSTableView *groupSelectionTableView;
 
 - (void)reloadData;
-- (void)setupCollectionView:(NSCollectionView *)collectionView;
 
 @end
 
