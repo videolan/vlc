@@ -7,62 +7,37 @@
 RUST_VERSION_MIN=1.63.0
 
 ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
+RUST_TARGET_FLAGS += --uwp
+endif
 ifdef HAVE_UCRT
 # does not work as Tier 2 before that
 RUST_VERSION_MIN=1.79.0
+RUST_TARGET_FLAGS += --ucrt
+endif
+endif
 
-ifndef HAVE_WINSTORE # UWP is available as Tier 3
-ifeq ($(HOST),i686-w64-mingw32)
-RUST_TARGET = i686-pc-windows-gnullvm # ARCH is i386
-else ifneq ($(HOST),armv7-w64-mingw32)
-# Not supported on armv7
-RUST_TARGET = $(ARCH)-pc-windows-gnullvm
-endif # archs
-endif # WINSTORE
-else # MSVCRT
-ifeq ($(HOST),i686-w64-mingw32)
-RUST_TARGET = i686-pc-windows-gnu # ARCH is i386
-else ifeq ($(HOST),x86_64-w64-mingw32)
-RUST_TARGET = $(ARCH)-pc-windows-gnu
-else
-# Not supported on armv7/aarch64 yet
-endif # archs
-endif # MSVCRT
-else ifdef HAVE_ANDROID
-RUST_TARGET = $(HOST)
+ifdef HAVE_DARWIN_OS
+ifdef HAVE_TVOS
+RUST_TARGET_FLAGS += --darwin=tvos
+else ifdef HAVE_WATCHOS
+RUST_TARGET_FLAGS += --darwin=watchos
 else ifdef HAVE_IOS
-ifneq ($(ARCH),arm) # iOS 32bit is Tier 3
-ifneq ($(ARCH),i386) # iOS 32bit is Tier 3
-ifndef HAVE_TVOS # tvOS is Tier 3
-RUST_TARGET = $(ARCH)-apple-ios
-endif
-endif
-endif
-else ifdef HAVE_MACOSX
-RUST_TARGET = $(ARCH)-apple-darwin
-# else ifdef HAVE_SOLARIS
-# Solaris x86_64 is Tier 3
-# RUST_TARGET = x86_64-sun-solaris
-else ifdef HAVE_LINUX
-ifeq ($(HOST),arm-linux-gnueabihf)
-RUST_TARGET = arm-unknown-linux-gnueabihf #add eabihf
+RUST_TARGET_FLAGS += --darwin=ios
 else
-ifeq ($(HOST),riscv64-linux-gnu)
-RUST_TARGET = riscv64gc-unknown-linux-gnu
-else
-RUST_TARGET = $(ARCH)-unknown-linux-gnu
+RUST_TARGET_FLAGS += --darwin=macos
+endif
+ifdef HAVE_SIMULATOR
+RUST_TARGET_FLAGS += --simulator
 endif
 endif
-else ifdef HAVE_BSD
-RUST_TARGET = $(HOST)
-else ifdef HAVE_EMSCRIPTEN
-RUST_TARGET = $(HOST)
-endif
+
+RUST_TARGET := $(shell $(SRC)/get-rust-target.sh $(RUST_TARGET_FLAGS) $(HOST) 2>/dev/null || echo FAIL)
 
 # For now, VLC don't support Tier 3 platforms (ios 32bit, tvOS).
 # Supporting a Tier 3 platform means building an untested rust toolchain.
 # TODO Let's hope tvOS move from Tier 3 to Tier 2 before the VLC 4.0 release.
-ifneq ($(RUST_TARGET),)
+ifneq ($(RUST_TARGET),FAIL)
 BUILD_RUST="1"
 endif
 
