@@ -296,6 +296,10 @@ case "${OS}" in
 		then
 			add_make_enabled "HAVE_BITCODE_ENABLED"
 		fi
+		if test "$BUILDFORSIMULATOR"
+		then
+			add_make_enabled "HAVE_SIMULATOR"
+		fi
 		;;
 	*bsd*)
 		MAKE=gmake
