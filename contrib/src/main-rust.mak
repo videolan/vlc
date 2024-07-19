@@ -32,13 +32,20 @@ RUST_TARGET_FLAGS += --simulator
 endif
 endif
 
-RUST_TARGET := $(shell $(SRC)/get-rust-target.sh $(RUST_TARGET_FLAGS) $(HOST) 2>/dev/null || echo FAIL)
+ifneq ($(findstring darwin,$(BUILD)),)
+RUST_BUILD_FLAGS += --darwin=macos
+endif
 
+RUST_TARGET := $(shell $(SRC)/get-rust-target.sh $(RUST_TARGET_FLAGS) $(HOST) 2>/dev/null || echo FAIL)
+RUST_HOST :=  $(shell $(SRC)/get-rust-target.sh $(RUST_BUILD_FLAGS) $(BUILD) 2>/dev/null || echo FAIL)
+
+ifneq ($(RUST_HOST),FAIL)
 # For now, VLC don't support Tier 3 platforms (ios 32bit, tvOS).
 # Supporting a Tier 3 platform means building an untested rust toolchain.
 # TODO Let's hope tvOS move from Tier 3 to Tier 2 before the VLC 4.0 release.
 ifneq ($(RUST_TARGET),FAIL)
 BUILD_RUST="1"
+endif
 endif
 
 RUSTUP_HOME= $(BUILDBINDIR)/.rustup
