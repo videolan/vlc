@@ -1931,6 +1931,15 @@ AS_IF([test "${enable_rust}" = "yes"],[
     AC_MSG_ERROR([Unsupported Rust target for ${host}])
   ])
 
+  AS_IF([test -n "${CARGO_HOME}"],[
+    AS_IF([test -x "${CARGO_HOME}/bin/cargo"],[
+      ac_cv_prog_CARGO="${CARGO_HOME}/bin/cargo"
+    ])
+    AS_IF([test -x "${CARGO_HOME}/bin/rustc"],[
+      ac_cv_prog_RUSTC="${CARGO_HOME}/bin/rustc"
+    ])
+  ])
+
   AC_CHECK_PROGS(RUSTC, [rustc], [no])
   AS_IF([test "$RUSTC" = "no"],[
     AC_MSG_ERROR([rustc not found but required to build Rust modules])
