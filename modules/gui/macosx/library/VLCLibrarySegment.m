@@ -83,7 +83,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 
 - (NSArray<NSTreeNode *> *)childNodes
 {
-    if (self.segmentType == VLCLibraryMusicSegment) {
+    if (self.segmentType == VLCLibraryVideoSegment) {
+        return @[[VLCLibrarySegment segmentWithSegmentType:VLCLibraryShowsVideoSubSegment]];
+    } else if (self.segmentType == VLCLibraryMusicSegment) {
         return @[
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
@@ -159,6 +161,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Genres");
         case VLCLibraryVideoSegment:
             return _NS("Videos");
+        case VLCLibraryShowsVideoSubSegment:
+            return _NS("Shows");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -185,6 +189,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryGenresMusicSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryVideoSegment:
+        case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryBrowseSegment:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -222,6 +227,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryVideoSegment:
             return [NSImage imageWithSystemSymbolName:@"film.stack"
                              accessibilityDescription:@"Video icon"];
+        case VLCLibraryShowsVideoSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"tv"
+                             accessibilityDescription:@"Shows icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];
