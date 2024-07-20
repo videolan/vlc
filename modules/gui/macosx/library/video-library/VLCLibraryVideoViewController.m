@@ -290,7 +290,7 @@
 
 #pragma mark - Show the video library view
 
-- (void)updatePresentedView
+- (void)updatePresentedVideoLibraryView
 {
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
     [self.libraryVideoDataSource reloadData];
@@ -306,10 +306,32 @@
     }
 }
 
+- (void)updatePresentedShowsLibraryView
+{
+    self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
+    [self.libraryShowsDataSource reloadData];
+
+    const BOOL anyShows = self.libraryShowsDataSource.libraryModel.listOfShows.count > 0;
+    if (anyShows) {
+        const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.showsLibraryViewMode;
+        [self presentVideoLibraryView:viewModeSegment];
+    } else if (self.libraryShowsDataSource.libraryModel.filterString.length > 0) {
+        [self presentNoResultsView];
+    } else {
+        [self presentPlaceholderVideoLibraryView];
+    }
+}
+
 - (void)presentVideoView
 {
     _libraryTargetView.subviews = @[];
-    [self updatePresentedView];
+    [self updatePresentedVideoLibraryView];
+}
+
+- (void)presentShowsView
+{
+    self.libraryTargetView.subviews = @[];
+    [self updatePresentedShowsLibraryView];
 }
 
 - (void)presentPlaceholderVideoLibraryView

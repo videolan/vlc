@@ -57,6 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;
+- (void)presentShowsView;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
