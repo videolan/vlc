@@ -22,6 +22,8 @@
 
 #import "VLCLibraryShowsDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryModel.h"
 
@@ -100,6 +102,13 @@
     }
 
     return 0;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row 
+                                                                  forTableView:tableView];
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 @end
