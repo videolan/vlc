@@ -33,8 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
 @property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign) NSTableView *groupsTableView;
-@property (readwrite, assign) NSTableView *groupSelectionTableView;
+@property (readwrite, assign) NSTableView *showsTableView;
+@property (readwrite, assign) NSTableView *selectedShowTableView;
 
 - (void)reloadData;
 
