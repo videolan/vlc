@@ -146,4 +146,11 @@
 {
     return self.showsArray.count;
 }
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    return self.showsArray[section].episodeCount;
+}
+
 @end
