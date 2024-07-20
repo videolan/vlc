@@ -142,6 +142,13 @@
 
 # pragma mark - collection view data source and delegation
 
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
+{
+    VLCMediaLibraryShow * const show = self.showsArray[indexPath.section];
+    return show.episodes[indexPath.item];
+}
+
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
 {
     return self.showsArray.count;
