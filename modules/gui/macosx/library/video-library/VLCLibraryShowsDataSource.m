@@ -33,6 +33,15 @@
 
 @implementation VLCLibraryShowsDataSource
 
+- (instancetype)init
+{
+    self = [super init];
+    if(self) {
+        [self connect];
+    }
+    return self;
+}
+
 - (void)connect
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
