@@ -31,6 +31,7 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
+#import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 
 #pragma mark - Private data
@@ -281,7 +282,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     } else if ([dataSource isKindOfClass:VLCLibraryAudioGroupDataSource.class]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     } else if ([dataSource isKindOfClass:VLCLibraryHomeViewVideoContainerViewDataSource.class] ||
-               [dataSource isKindOfClass:VLCLibraryVideoDataSource.class]) {
+               [dataSource isKindOfClass:VLCLibraryVideoDataSource.class] ||
+               [dataSource isKindOfClass:VLCLibraryShowsDataSource.class]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
 
