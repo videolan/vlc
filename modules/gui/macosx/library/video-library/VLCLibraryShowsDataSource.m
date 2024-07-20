@@ -135,4 +135,9 @@
     return [self indexOfMediaItem:libraryItem.libraryID inArray:self.showsArray];
 }
 
+- (VLCMediaLibraryParentGroupType)currentParentType
+{
+    return VLCMediaLibraryParentGroupTypeShow;
+}
+
 @end
