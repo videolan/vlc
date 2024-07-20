@@ -405,14 +405,21 @@
     NSParameterAssert(aNotification);
     VLCLibraryModel *model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger videoCount = model.numberOfVideoMedia;
+    const NSUInteger showsCount = model.numberOfShows;
 
     if (_libraryWindow.librarySegmentType == VLCLibraryVideoSegment &&
         ((videoCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
          (videoCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
         _libraryWindow.videoViewController.view.hidden) {
 
-        [self updatePresentedView];
-    }
+        [self updatePresentedVideoLibraryView];
+    } else if (_libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegment &&
+         ((showsCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
+          (showsCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+         _libraryWindow.videoViewController.view.hidden) {
+
+         [self updatePresentedShowsLibraryView];
+     }
 }
 
 - (void)presentLibraryItemWaitForCollectionViewDataSourceFinished:(NSNotification *)notification
