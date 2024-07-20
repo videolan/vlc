@@ -82,7 +82,6 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupDataSources];
         [self setupCollectionView];
-        [self setupTableViews];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
         [self setupLoadingOverlayView];
@@ -201,17 +200,6 @@
                  withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 }
 
-- (void)setupTableViews
-{
-    _videoLibraryGroupsTableView.dataSource = _libraryVideoDataSource;
-    _videoLibraryGroupsTableView.target = _libraryVideoDataSource;
-    _videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
-
-    _videoLibraryGroupSelectionTableView.dataSource = _libraryVideoDataSource;
-    _videoLibraryGroupSelectionTableView.target = _libraryVideoDataSource;
-    _videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
-}
-
 - (void)setupVideoPlaceholderView
 {
     _videoPlaceholderImageViewSizeConstraints = @[
@@ -293,6 +281,15 @@
 - (void)updatePresentedVideoLibraryView
 {
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
+
+    self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.target = self.libraryVideoDataSource;
+    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryVideoDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryVideoDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
+
     [self.libraryVideoDataSource reloadData];
 
     const BOOL anyVideoMedia = self.libraryVideoDataSource.libraryModel.numberOfVideoMedia > 0;
@@ -309,6 +306,15 @@
 - (void)updatePresentedShowsLibraryView
 {
     self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
+
+    self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.target = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
+
+    self.videoLibraryGroupSelectionTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupSelectionTableView.target = self.libraryShowsDataSource;
+    self.videoLibraryGroupSelectionTableView.delegate = _videoLibraryTableViewDelegate;
+
     [self.libraryShowsDataSource reloadData];
 
     const BOOL anyShows = self.libraryShowsDataSource.libraryModel.listOfShows.count > 0;
