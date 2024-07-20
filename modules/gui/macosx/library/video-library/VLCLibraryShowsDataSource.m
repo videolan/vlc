@@ -127,4 +127,12 @@
     return nil;
 }
 
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return NSNotFound;
+    }
+    return [self indexOfMediaItem:libraryItem.libraryID inArray:self.showsArray];
+}
+
 @end
