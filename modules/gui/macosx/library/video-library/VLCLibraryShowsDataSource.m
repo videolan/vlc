@@ -33,7 +33,27 @@
 
 @implementation VLCLibraryShowsDataSource
 
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
 
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelShowsListReset:)
+                               name:VLCLibraryModelListOfShowsReset
+                             object:nil];
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)libraryModelShowsListReset:(NSNotification *)notification
+{
+    [self reloadData];
+}
 
 - (void)reloadData
 {
