@@ -75,4 +75,14 @@
     [self.collectionView reloadData];
 }
 
+- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+{
+    return [array indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> findItem, 
+                                                 const NSUInteger idx,
+                                                 BOOL * const stop) {
+        NSAssert(findItem != nil, @"Collection should not contain nil items");
+        return findItem.libraryID == libraryId;
+    }];
+}
+
 @end
