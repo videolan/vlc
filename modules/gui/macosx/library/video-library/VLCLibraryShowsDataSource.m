@@ -149,6 +149,26 @@
     return show.episodes[indexPath.item];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    __block NSInteger showEpisodeIndex = NSNotFound;
+    const NSInteger showIndex = 
+        [self.showsArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryShow * const show,
+                                                        const NSUInteger idx,
+                                                        BOOL * const stop) {
+            showEpisodeIndex = 
+                [show.episodes indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item,
+                                                              const NSUInteger idx,
+                                                              BOOL * const stop) {
+                    return item.libraryID == libraryItem.libraryID;
+                }];
+            return showEpisodeIndex != NSNotFound;
+        }];
+    return showIndex != NSNotFound
+        ? [NSIndexPath indexPathForItem:showEpisodeIndex inSection:showIndex]
+        : nil;
+}
+
 - (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
                                                      forCollectionView:(NSCollectionView *)collectionView
 {
