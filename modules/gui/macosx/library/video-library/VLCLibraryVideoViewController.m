@@ -292,9 +292,13 @@
 
 - (void)updatePresentedView
 {
+    self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
+    [self.libraryVideoDataSource reloadData];
+
     const BOOL anyVideoMedia = self.libraryVideoDataSource.libraryModel.numberOfVideoMedia > 0;
     if (anyVideoMedia) {
-        [self presentVideoLibraryView];
+        const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
+        [self presentVideoLibraryView:viewModeSegment];
     } else if (self.libraryVideoDataSource.libraryModel.filterString.length > 0) {
         [self presentNoResultsView];
     } else {
@@ -350,7 +354,7 @@
     ]];
 }
 
-- (void)presentVideoLibraryView
+- (void)presentVideoLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
 {
     _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
@@ -363,8 +367,6 @@
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
-
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         _videoLibrarySplitView.hidden = YES;
         _videoLibraryCollectionViewScrollView.hidden = NO;
@@ -374,8 +376,6 @@
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
-    self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
-    [self.libraryVideoDataSource reloadData];
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
