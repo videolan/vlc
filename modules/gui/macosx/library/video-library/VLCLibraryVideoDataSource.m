@@ -172,8 +172,16 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     self->_recentsArray = [self.libraryModel listOfRecentMedia];
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
-    [self.groupSelectionTableView reloadData];
-    [self.collectionView reloadData];
+
+    if (self.groupsTableView.dataSource == self) {
+        [self.groupsTableView reloadData];
+    }
+    if (self.groupSelectionTableView.dataSource == self) {
+        [self.groupSelectionTableView reloadData];
+    }
+    if (self.collectionView.dataSource == self) {
+        [self.collectionView reloadData];
+    }
     [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
                                                       object:self
                                                     userInfo:nil];
@@ -231,18 +239,28 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
     } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
-        const NSInteger section = [self videoGroupToRow:group];
-        NSSet<NSIndexPath *> * const indexPathSet = [rowIndexSet indexPathSetWithSection:section];
-        [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
-
-        const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
-        if (selectedTableViewVideoGroup == group) {
-            // Don't regenerate the groups by index as these do not change according to the notification
-            // Stick to the selection table view
-            const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
-            NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndexesInRange:columnRange];
-            [self.groupSelectionTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
+        if (self.collectionView.dataSource == self) {
+            const NSInteger section = [self videoGroupToRow:group];
+            NSSet<NSIndexPath *> * const indexPathSet =
+                [rowIndexSet indexPathSetWithSection:section];
+            [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
         }
+
+        if (self.groupSelectionTableView.dataSource == self) {
+            const NSInteger selectedTableViewVideoGroup = 
+                [self rowToVideoGroup:self.groupsTableView.selectedRow];
+            if (selectedTableViewVideoGroup == group) {
+                // Don't regenerate the groups by index as these do not change according to the 
+                // notification, stick to the selection table view
+                const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
+                NSIndexSet * const columnIndexSet = 
+                    [NSIndexSet indexSetWithIndexesInRange:columnRange];
+                [self.groupSelectionTableView reloadDataForRowIndexes:rowIndexSet 
+                                                        columnIndexes:columnIndexSet];
+            }
+        }
+
+        // Don't bother with the groups table view as we always show "recents" and "videos" there
     }];
 }
 
@@ -255,17 +273,24 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 
         [mediaArray removeObjectAtIndex:mediaItemIndex];
 
-    } completionHandler:^(NSIndexSet * const rowIndexSet){
+    } completionHandler:^(NSIndexSet * const rowIndexSet) {
 
-        const NSInteger section = [self videoGroupToRow:group];
-        NSSet<NSIndexPath *> * const indexPathSet = [rowIndexSet indexPathSetWithSection:section];
-        [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
+        if (self.collectionView.dataSource == self) {
+            const NSInteger section = [self videoGroupToRow:group];
+            NSSet<NSIndexPath *> * const indexPathSet =
+                [rowIndexSet indexPathSetWithSection:section];
+            [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
+        }
 
-        const NSInteger selectedTableViewVideoGroup = [self rowToVideoGroup:self.groupsTableView.selectedRow];
-        if (selectedTableViewVideoGroup == group) {
-            // Don't regenerate the groups by index as these do not change according to the notification
-            // Stick to the selection table view
-            [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet withAnimation:NSTableViewAnimationSlideUp];
+        if (self.groupSelectionTableView.dataSource == self) {
+            const NSInteger selectedTableViewVideoGroup = 
+                [self rowToVideoGroup:self.groupsTableView.selectedRow];
+            if (selectedTableViewVideoGroup == group) {
+                // Don't regenerate the groups by index as these do not change according to the 
+                // notification, stick to the selection table view
+                [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet
+                                                    withAnimation:NSTableViewAnimationSlideUp];
+            }
         }
     }];
 }
