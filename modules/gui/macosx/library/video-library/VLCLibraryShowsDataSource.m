@@ -22,8 +22,28 @@
 
 #import "VLCLibraryShowsDataSource.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryModel.h"
+
+@interface VLCLibraryShowsDataSource ()
+
+@property (readwrite, atomic) NSArray<VLCMediaLibraryShow *> *showsArray;
+
+@end
+
 @implementation VLCLibraryShowsDataSource
 
 
+
+- (void)reloadData
+{
+    [(VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout resetLayout];
+
+    self.showsArray = self.libraryModel.listOfShows;
+
+    [self.showsTableView reloadData];
+    [self.selectedShowTableView reloadData];
+    [self.collectionView reloadData];
+}
 
 @end
