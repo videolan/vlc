@@ -42,6 +42,7 @@
 
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
+#import "library/video-library/VLCLibraryShowsDataSource.h"
 #import "library/video-library/VLCLibraryVideoDataSource.h"
 #import "library/video-library/VLCLibraryVideoTableViewDelegate.h"
 
@@ -79,7 +80,7 @@
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
-        [self setupDataSource];
+        [self setupDataSources];
         [self setupCollectionView];
         [self setupTableViews];
         [self setupVideoPlaceholderView];
@@ -141,7 +142,7 @@
     _emptyLibraryView = libraryWindow.emptyLibraryView;
 }
 
-- (void)setupDataSource
+- (void)setupDataSources
 {
     _videoLibrarySplitView.delegate = _splitViewDelegate;
     [_splitViewDelegate resetDefaultSplitForSplitView:self.videoLibrarySplitView];
@@ -151,6 +152,13 @@
     _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
     _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
     _libraryVideoDataSource.collectionView = _videoLibraryCollectionView;
+
+    _libraryShowsDataSource = [[VLCLibraryShowsDataSource alloc] init];
+    self.libraryShowsDataSource.libraryModel =
+        VLCMain.sharedInstance.libraryController.libraryModel;
+    self.libraryShowsDataSource.collectionView = self.videoLibraryCollectionView;
+    self.libraryShowsDataSource.showsTableView = self.videoLibraryGroupsTableView;
+    self.libraryShowsDataSource.selectedShowTableView = self.videoLibraryGroupSelectionTableView;
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
