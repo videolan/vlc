@@ -140,4 +140,10 @@
     return VLCMediaLibraryParentGroupTypeShow;
 }
 
+# pragma mark - collection view data source and delegation
+
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return self.showsArray.count;
+}
 @end
