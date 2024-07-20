@@ -85,4 +85,21 @@
     }];
 }
 
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == self.showsTableView) {
+        return self.showsArray.count;
+    } 
+
+    const NSInteger selectedShowRow = self.showsTableView.selectedRow;
+    if (tableView == self.selectedShowTableView && selectedShowRow > -1) {
+        VLCMediaLibraryShow * const show = self.showsArray[selectedShowRow];
+        return show.episodeCount;
+    }
+
+    return 0;
+}
+
 @end
