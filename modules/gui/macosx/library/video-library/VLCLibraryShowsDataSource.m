@@ -111,4 +111,20 @@
     return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == self.showsTableView) {
+        return self.showsArray[row];
+    }
+
+    const NSInteger selectedShowRow = self.showsTableView.selectedRow;
+    if (tableView == self.selectedShowTableView && selectedShowRow > -1) {
+        VLCMediaLibraryShow * const show = self.showsArray[selectedShowRow];
+        return show.episodes[row];
+    }
+
+    return nil;
+}
+
 @end
