@@ -251,6 +251,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryVideoSegment:
         [self showVideoLibrary];
         break;
+    case VLCLibraryShowsVideoSubSegment:
+        [self showShowLibrary];
+        break;
     case VLCLibraryMusicSegment:
     case VLCLibraryArtistsMusicSubSegment:
     case VLCLibraryAlbumsMusicSubSegment:
@@ -336,6 +339,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [self.toolbarDelegate layoutForSegment:VLCLibraryVideoSegment];
     [_libraryVideoViewController presentVideoView];
+}
+
+- (void)showShowLibrary
+{
+    [self.toolbarDelegate layoutForSegment:VLCLibraryShowsVideoSubSegment];
+    [self.libraryVideoViewController presentShowsView];
 }
 
 - (void)showAudioLibrary
