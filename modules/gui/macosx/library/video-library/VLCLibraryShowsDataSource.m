@@ -24,8 +24,10 @@
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryRepresentedItem.h"
 
 @interface VLCLibraryShowsDataSource ()
 
@@ -196,6 +198,19 @@
      numberOfItemsInSection:(NSInteger)section
 {
     return self.showsArray[section].episodeCount;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem * const viewItem = 
+        [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> item = 
+        [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+    viewItem.representedItem = representedItem;
+    return viewItem;
 }
 
 @end
