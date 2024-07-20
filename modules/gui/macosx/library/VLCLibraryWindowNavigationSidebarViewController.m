@@ -131,7 +131,9 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     self.libraryWindow.librarySegmentType = segment.segmentType;
 
-    if (segmentType >= VLCLibraryMusicSegment && segmentType <= VLCLibraryGenresMusicSubSegment) {
+    if (segmentType > VLCLibraryVideoSegment && segmentType <= VLCLibraryShowsVideoSubSegment) {
+        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryVideoSegment]];
+    } else if (segmentType >= VLCLibraryMusicSegment && segmentType <= VLCLibraryGenresMusicSubSegment) {
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
     } else if (segmentType >= VLCLibraryBrowseSegment &&
                segmentType <= VLCLibraryBrowseBookmarkedLocationSubSegment) {
