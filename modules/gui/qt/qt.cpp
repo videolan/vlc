@@ -895,15 +895,15 @@ static void *Thread( void *obj )
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
 
-#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
+#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WINBLUE)
     // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
     //       We have to manually pick a graphics api here for
-    //       Windows 7, since it may not support the default
-    //       graphics api (D3D11).
+    //       Windows 7 and Windows 8, since it may not support
+    //       the default graphics api (Direct3D 11.2).
 
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
     {
-        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8)
+        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8_1)
         {
             // TODO: Probe D3D12 when it becomes the default.
             {
