@@ -200,7 +200,7 @@ QVLCFrame::QVLCFrame(qt_intf_t *_p_intf) : QWidget( NULL ), p_intf( _p_intf )
 {
     assert(_p_intf);
 
-    if (windowFlags().testFlag(Qt::Window))
+    if (isWindow())
     {
         // If window, set the transient parent:
         QVLCDialog::setWindowTransientParent(this, nullptr, p_intf);
