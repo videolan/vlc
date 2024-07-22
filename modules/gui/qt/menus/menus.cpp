@@ -700,7 +700,7 @@ void VLCMenuBar::PopupMenuStaticEntries( QMenu *menu )
 /* Video Tracks and Subtitles tracks */
 QMenu* VLCMenuBar::VideoPopupMenu( qt_intf_t *p_intf, bool show )
 {
-    QMenu* menu = new QMenu();
+    QMenu* menu = new VLCMenu(p_intf);
     VideoMenu(p_intf, menu);
     if( show )
         menu->popup( QCursor::pos() );
@@ -710,7 +710,7 @@ QMenu* VLCMenuBar::VideoPopupMenu( qt_intf_t *p_intf, bool show )
 /* Audio Tracks */
 QMenu* VLCMenuBar::AudioPopupMenu( qt_intf_t *p_intf, bool show )
 {
-    QMenu* menu = new QMenu();
+    QMenu* menu = new VLCMenu(p_intf);
     AudioMenu(p_intf, menu);
     if( show )
         menu->popup( QCursor::pos() );
@@ -720,7 +720,7 @@ QMenu* VLCMenuBar::AudioPopupMenu( qt_intf_t *p_intf, bool show )
 /* Navigation stuff, and general menus ( open ), used only for skins */
 QMenu* VLCMenuBar::MiscPopupMenu( qt_intf_t *p_intf, bool show )
 {
-    QMenu* menu = new QMenu();
+    QMenu* menu = new VLCMenu(p_intf);
 
     menu->addSeparator();
     PopupMenuPlaylistEntries( menu, p_intf );
