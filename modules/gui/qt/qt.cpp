@@ -971,22 +971,6 @@ static void *Thread( void *obj )
     p_intf->p_mainPlayerController = new PlayerController(p_intf);
     p_intf->p_mainPlaylistController = new vlc::playlist::PlaylistController(p_intf->p_playlist);
 
-#ifdef UPDATE_CHECK
-    /* Checking for VLC updates */
-    if( var_InheritBool( p_intf, "qt-updates-notif" ) &&
-        !var_InheritBool( p_intf, "qt-privacy-ask" ) )
-    {
-        int interval = var_InheritInteger( p_intf, "qt-updates-days" );
-        if( QDate::currentDate() >
-             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
-        {
-            /* The constructor of the update Dialog will do the 1st request */
-            UpdateDialog::getInstance( p_intf );
-            getSettings()->setValue( "updatedate", QDate::currentDate() );
-        }
-    }
-#endif
-
     /* Create the normal interface in non-DP mode */
 #ifdef _WIN32
     p_intf->p_mi = new MainCtxWin32(p_intf);
@@ -1044,6 +1028,22 @@ static void *Thread( void *obj )
 
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
+
+#ifdef UPDATE_CHECK
+    /* Checking for VLC updates */
+    if( var_InheritBool( p_intf, "qt-updates-notif" ) &&
+        !var_InheritBool( p_intf, "qt-privacy-ask" ) )
+    {
+        int interval = var_InheritInteger( p_intf, "qt-updates-days" );
+        if( QDate::currentDate() >
+             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
+        {
+            /* The constructor of the update Dialog will do the 1st request */
+            UpdateDialog::getInstance( p_intf );
+            getSettings()->setValue( "updatedate", QDate::currentDate() );
+        }
+    }
+#endif
 
     /* Tell the main LibVLC thread we are ready */
     {
