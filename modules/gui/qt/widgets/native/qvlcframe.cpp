@@ -235,6 +235,9 @@ void QVLCDialog::keyPressEvent(QKeyEvent *keyEvent)
 
 void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_intf_t* p_intf)
 {
+    assert(widget);
+    assert(widget->isWindow()); // Do not call this method if widget is not a window.
+
     if (!parent && p_intf && !p_intf->b_isDialogProvider)
     {
         assert(p_intf->p_compositor);
