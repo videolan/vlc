@@ -1508,7 +1508,7 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
 #ifndef QT_NO_CONTEXTMENU
     if( obj == table && e->type() == QEvent::ContextMenu )
     {
-        tableContextMenuEvent( static_cast<QContextMenuEvent*>(e) );
+        tableContextMenuEvent( table, static_cast<QContextMenuEvent*>(e) );
         return true;
     }
 #endif
@@ -1538,7 +1538,7 @@ bool KeySelectorControl::eventFilter( QObject *obj, QEvent *e )
 }
 
 #ifndef QT_NO_CONTEXTMENU
-void KeySelectorControl::tableContextMenuEvent( QContextMenuEvent *event )
+void KeySelectorControl::tableContextMenuEvent( QWidget *widget, QContextMenuEvent *event )
 {
     KeyTableItem *item = static_cast<KeyTableItem *>( this->table->currentItem() );
     if( !item || item->isHidden() )
@@ -1570,7 +1570,8 @@ void KeySelectorControl::tableContextMenuEvent( QContextMenuEvent *event )
             unreachable();
     }
 
-    QMenu *menu = new QMenu();
+    assert(widget);
+    QMenu *menu = new QMenu(widget);
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     QAction *modify = new QAction( qtr( "&Modify" ), this->table );

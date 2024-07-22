@@ -435,7 +435,7 @@ public:
 protected:
     bool eventFilter( QObject *, QEvent * ) override;
 #ifndef QT_NO_CONTEXTMENU
-    void tableContextMenuEvent( QContextMenuEvent * );
+    void tableContextMenuEvent( QWidget *, QContextMenuEvent * );
 #endif
     void changeVisibility( bool ) override;
     void unset( KeyTableItem *, enum ColumnIndex );
