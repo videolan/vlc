@@ -252,6 +252,13 @@ public:
                                                                         unsigned char patch)
                                                                        { return QT_VERSION_CHECK(major, minor, patch); }
 
+    Q_INVOKABLE static /*constexpr*/ inline bool qtQuickControlRejectsHoverEvents() {
+        // QTBUG-100543
+        return (QT_VERSION < QT_VERSION_CHECK(6, 3, 0) && QT_VERSION >= QT_VERSION_CHECK(6, 2, 5)) ||
+               (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) && QT_VERSION >= QT_VERSION_CHECK(6, 3, 1)) ||
+               (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0));
+    }
+
     /**
      * @brief ask for the application to terminate
      * @return true if the application can be close right away, false if it will be delayed
