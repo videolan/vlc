@@ -59,6 +59,7 @@ extern "C" char **environ;
 #include <QOperatingSystemVersion>
 #if __has_include(<rhi/qrhi.h>)
 #include <rhi/qrhi.h>
+#include <QOffscreenSurface>
 #endif
 #endif
 
@@ -907,13 +908,22 @@ static void *Thread( void *obj )
         {
             // TODO: Probe D3D12 when it becomes the default.
             {
+                // If probing is not available, use OpenGL as a compromise:
+                QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
 #if __has_include(<rhi/qrhi.h>)
                 QRhiD3D11InitParams params;
                 if (QRhi::probe(QRhi::D3D11, &params))
-                    QQuickWindow::setGraphicsApi(QSGRendererInterface::Direct3D11);
+                    graphicsApi = QSGRendererInterface::Direct3D11;
                 else
+                {
+                    QRhiGles2InitParams params1;
+                    params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
+                    if (!QRhi::probe(QRhi::OpenGLES2, &params1))
+                        graphicsApi = QSGRendererInterface::Software;
+                    delete params1.fallbackSurface;
+                }
 #endif
-                    QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+                QQuickWindow::setGraphicsApi(graphicsApi);
             }
         }
     }
