@@ -57,10 +57,11 @@ struct clock_scenario
         CLOCK_SCENARIO_RUN,
     } type;
 
+    vlc_tick_t stream_start;
+    vlc_tick_t system_start; /* VLC_TICK_INVALID for vlc_tick_now() */
+
     union {
         struct {
-            vlc_tick_t stream_start;
-            vlc_tick_t system_start; /* VLC_TICK_INVALID for vlc_tick_now() */
             vlc_tick_t duration;
             vlc_tick_t stream_increment; /* VLC_TICK_INVALID for manual increment */
             unsigned video_fps;
@@ -894,6 +895,8 @@ static struct clock_scenario clock_scenarios[] = {
     .desc = "pause + resume is delaying the next conversion",
     .type = CLOCK_SCENARIO_RUN,
     .run = master_pause_run,
+    .system_start = VLC_TICK_FROM_MS(100),
+    .stream_start = VLC_TICK_FROM_MS(1000),
 },
 {
     .name = "monotonic_pause",
@@ -901,12 +904,16 @@ static struct clock_scenario clock_scenarios[] = {
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_pause_run,
     .disable_jitter = true,
+    .system_start = VLC_TICK_FROM_MS(100),
+    .stream_start = VLC_TICK_FROM_MS(1000),
 },
 {
     .name = "master_convert_paused",
     .desc = "it is possible to convert ts while paused",
     .type = CLOCK_SCENARIO_RUN,
     .run = master_convert_paused_run,
+    .system_start = VLC_TICK_FROM_MS(100),
+    .stream_start = VLC_TICK_FROM_MS(1000),
 },
 {
     .name = "monotonic_convert_paused",
@@ -914,6 +921,8 @@ static struct clock_scenario clock_scenarios[] = {
     .type = CLOCK_SCENARIO_RUN,
     .run = monotonic_convert_paused_run,
     .disable_jitter = true,
+    .system_start = VLC_TICK_FROM_MS(100),
+    .stream_start = VLC_TICK_FROM_MS(1000),
 },
 {
     .name = "contexts",
@@ -921,6 +930,8 @@ static struct clock_scenario clock_scenarios[] = {
     .type = CLOCK_SCENARIO_RUN,
     .run = contexts_run,
     .disable_jitter = true,
+    .system_start = VLC_TICK_FROM_MS(100),
+    .stream_start = VLC_TICK_FROM_MS(1000),
 },
 };
 
