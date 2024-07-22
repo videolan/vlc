@@ -3,7 +3,7 @@
 CARGOC_VERSION := 0.9.29
 
 ifdef BUILD_RUST
-PKGS_TOOLS += cargo-c
+# PKGS_TOOLS += cargo-c
 
 ifneq ($(call system_tool_majmin, cargo-capi --version),)
 PKGS_FOUND += cargo-c
