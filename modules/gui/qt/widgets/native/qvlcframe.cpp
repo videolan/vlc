@@ -235,8 +235,10 @@ void QVLCDialog::keyPressEvent(QKeyEvent *keyEvent)
 
 void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_intf_t* p_intf)
 {
-    if (!parent && p_intf)
+    if (!parent && p_intf && !p_intf->b_isDialogProvider)
+    {
         parent = p_intf->p_compositor->interfaceMainWindow();
+    }
     if (!parent)
         return;
 
