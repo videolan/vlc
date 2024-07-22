@@ -37,7 +37,18 @@
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </shadow>
                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="JyX-u7-Hkb">
-                                                    <font key="font" textStyle="title3" name=".SFNS-Regular"/>
+                                                    <font key="font" metaFont="systemMedium" size="15"/>
+                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                </textFieldCell>
+                                            </textField>
+                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-en-EAi" customClass="VLCWrappableTextField">
+                                                <rect key="frame" x="8" y="85" width="66" height="28"/>
+                                                <shadow key="shadow" blurRadius="5">
+                                                    <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </shadow>
+                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Label" id="y5L-0x-avz">
+                                                    <font key="font" metaFont="systemBold" size="24"/>
                                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
@@ -129,14 +140,16 @@
                                         </subviews>
                                         <constraints>
                                             <constraint firstItem="20" firstAttribute="top" secondItem="hHQ-ue-m9C" secondAttribute="bottom" constant="5" id="C7Y-fI-Dqe"/>
-                                            <constraint firstItem="hHQ-ue-m9C" firstAttribute="top" secondItem="65" secondAttribute="top" constant="5" id="JZy-V4-KFy"/>
                                             <constraint firstItem="hHQ-ue-m9C" firstAttribute="trailing" secondItem="9" secondAttribute="trailing" id="KgS-6V-onl"/>
                                             <constraint firstItem="20" firstAttribute="leading" secondItem="65" secondAttribute="leading" constant="10" id="KrJ-x3-HIr"/>
+                                            <constraint firstItem="zpq-en-EAi" firstAttribute="leading" secondItem="hHQ-ue-m9C" secondAttribute="leading" id="RXc-05-Wtz"/>
                                             <constraint firstItem="Vae-cT-EEI" firstAttribute="centerX" secondItem="65" secondAttribute="centerX" id="Rf0-0E-Wiz"/>
                                             <constraint firstItem="9" firstAttribute="centerY" secondItem="20" secondAttribute="centerY" id="SW9-5i-MQL"/>
                                             <constraint firstAttribute="bottom" secondItem="Vae-cT-EEI" secondAttribute="bottom" constant="10" id="T6V-Vf-TOT"/>
                                             <constraint firstItem="hHQ-ue-m9C" firstAttribute="leading" secondItem="20" secondAttribute="leading" id="VP9-OW-xmq"/>
+                                            <constraint firstItem="zpq-en-EAi" firstAttribute="top" secondItem="65" secondAttribute="top" constant="5" id="dgI-qM-hLE"/>
                                             <constraint firstItem="9" firstAttribute="leading" secondItem="20" secondAttribute="trailing" constant="5" id="gyE-0N-u6t"/>
+                                            <constraint firstItem="hHQ-ue-m9C" firstAttribute="top" secondItem="zpq-en-EAi" secondAttribute="bottom" id="hbj-oW-kLQ"/>
                                             <constraint firstAttribute="trailing" secondItem="9" secondAttribute="trailing" constant="10" id="p5i-nM-pBs"/>
                                             <constraint firstItem="Vae-cT-EEI" firstAttribute="top" secondItem="20" secondAttribute="bottom" constant="5" id="pfB-W2-CWB"/>
                                         </constraints>
@@ -147,7 +160,6 @@
                                     <constraint firstItem="65" firstAttribute="leading" secondItem="5" secondAttribute="leading" id="84j-is-ZZ4"/>
                                     <constraint firstAttribute="bottom" secondItem="65" secondAttribute="bottom" id="WrS-PS-vpi"/>
                                     <constraint firstItem="65" firstAttribute="top" secondItem="5" secondAttribute="top" id="ecn-UJ-dvK"/>
-                                    <constraint firstAttribute="height" constant="90" id="z2X-5w-wme"/>
                                 </constraints>
                                 <shadow key="shadow" blurRadius="10">
                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -178,10 +190,11 @@
         <customObject id="3" userLabel="Detached Window Controls Bar" customClass="VLCControlsBarCommon">
             <connections>
                 <outlet property="backwardButton" destination="11" id="aQU-S3-4ZI"/>
+                <outlet property="detailLabel" destination="hHQ-ue-m9C" id="YOa-QZ-nmx"/>
                 <outlet property="dropView" destination="65" id="9kL-XQ-Akn"/>
                 <outlet property="forwardButton" destination="12" id="f7L-YR-p1H"/>
                 <outlet property="playButton" destination="10" id="Gsq-tx-qf3"/>
-                <outlet property="playingItemDisplayField" destination="hHQ-ue-m9C" id="gz6-0p-XEt"/>
+                <outlet property="playingItemDisplayField" destination="zpq-en-EAi" id="9js-uK-Dgf"/>
                 <outlet property="timeField" destination="9" id="uzI-2c-bs3"/>
                 <outlet property="timeSlider" destination="20" id="AFS-sq-vuw"/>
             </connections>
