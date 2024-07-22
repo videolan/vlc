@@ -107,7 +107,7 @@ void ExpertPrefsTable::contextMenuEvent( QContextMenuEvent *event )
 
     ExpertPrefsTableItem *item = myModel()->itemAt( index );
 
-    QMenu *menu = new QMenu();
+    QMenu *menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
 
     if( CONFIG_CLASS( item->getType() ) == CONFIG_ITEM_BOOL )
