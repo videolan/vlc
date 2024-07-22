@@ -43,6 +43,7 @@ Widgets.IconToolButton {
         id: menu
 
         player: Player
+        ctx: MainCtx
 
         onAboutToShow: root.requestLockUnlockAutoHide(true)
         onAboutToHide: root.requestLockUnlockAutoHide(false)

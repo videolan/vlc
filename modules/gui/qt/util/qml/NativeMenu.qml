@@ -100,6 +100,8 @@ QtObject {
     readonly property StringListMenu _menu: StringListMenu {
         id: menu
 
+        ctx: MainCtx
+
         onSelected: (index, _) => {
             root._executeAction(index)
         }

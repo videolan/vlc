@@ -134,6 +134,7 @@ T.Pane {
         model: root.model
         selectionModel: root.selectionModel
         controler: MainPlaylistController
+        ctx: MainCtx
 
         onJumpToCurrentPlaying: listView.positionViewAtIndex( MainPlaylistController.currentIndex, ItemView.Center)
     }

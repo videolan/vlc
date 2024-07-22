@@ -740,7 +740,7 @@ QMenu* VLCMenuBar::MiscPopupMenu( qt_intf_t *p_intf, bool show )
 QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
 {
     /* */
-    QMenu* menu = new QMenu();
+    QMenu* menu = new VLCMenu(p_intf);
     input_item_t* p_input = THEMIM->getInput();
     QAction *action;
     bool b_isFullscreen = false;

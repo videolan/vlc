@@ -68,7 +68,8 @@ namespace
 
 void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
 {
-    QMenu *m = new QMenu;
+    assert(m_ctx);
+    QMenu *m = new VLCMenu(m_ctx->getIntf());
     m->setAttribute(Qt::WA_DeleteOnClose);
 
     for (int i = 0; i != stringList.size(); ++i)
@@ -87,7 +88,8 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
 
 void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVariantList &model)
 {
-    m_menu = std::make_unique<QMenu>();
+    assert(m_ctx);
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     connect( m_menu.get(), &QMenu::aboutToShow, this, [this]() {
         m_shown = true;
@@ -198,7 +200,7 @@ void QmlGlobalMenu::popup(QPoint pos)
     if (!p_intf)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
     QMenu* submenu;
 
     connect( m_menu.get(), &QMenu::aboutToShow, this, [this]() {
@@ -438,7 +440,7 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     if (m_ctx == nullptr || m_player == nullptr)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     connect(m_menu.get(), &QMenu::aboutToHide, this, &QmlBookmarkMenu::aboutToHide);
     connect(m_menu.get(), &QMenu::aboutToShow, this, &QmlBookmarkMenu::aboutToShow);
@@ -521,10 +523,11 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
 /* Q_INVOKABLE */ void QmlProgramMenu::popup(const QPoint & position, bool above)
 {
+    assert(m_ctx);
     if (m_player == nullptr)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     connect(m_menu.get(), &QMenu::aboutToHide, this, &QmlProgramMenu::aboutToHide);
     connect(m_menu.get(), &QMenu::aboutToShow, this, &QmlProgramMenu::aboutToShow);
@@ -574,7 +577,8 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
 /* Q_INVOKABLE */ void QmlTrackMenu::popup(const QPoint & position)
 {
-    m_menu = std::make_unique<QMenu>();
+    assert(m_ctx);
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     beforePopup(m_menu.get());
 
@@ -648,6 +652,8 @@ PlaylistListContextMenu::PlaylistListContextMenu(QObject * parent)
 
 void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos, QVariantMap)
 {
+    assert(m_ctx);
+
     if (!m_model)
         return;
 
@@ -656,7 +662,7 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
     for (const QModelIndex & modelIndex : selected)
         ids.push_back(m_model->data(modelIndex, MLPlaylistListModel::PLAYLIST_ID));
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     MediaLib * ml = m_model->ml();
 
@@ -701,6 +707,8 @@ PlaylistMediaContextMenu::PlaylistMediaContextMenu(QObject * parent) : QObject(p
 void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint pos,
                                      QVariantMap options)
 {
+    assert(m_ctx);
+
     if (!m_model)
         return;
 
@@ -709,7 +717,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
     for (const QModelIndex& modelIndex : selected)
         ids.push_back(m_model->data(modelIndex, MLPlaylistModel::MEDIA_ID));
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
 
     MediaLib * ml = m_model->ml();
 
@@ -770,10 +778,12 @@ NetworkMediaContextMenu::NetworkMediaContextMenu(QObject* parent)
 
 void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
+    assert(m_ctx);
+
     if (!m_model)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
     QAction* action;
 
     action = m_menu->addAction( qtr("Add and play") );
@@ -825,10 +835,12 @@ NetworkDeviceContextMenu::NetworkDeviceContextMenu(QObject* parent)
 
 void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
+    assert(m_ctx);
+
     if (!m_model)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
     QAction* action;
 
     action = m_menu->addAction( qtr("Add and play") );
@@ -850,10 +862,12 @@ PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
 
 void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
 {
+    assert(m_ctx);
+
     if (!m_controler || !m_model || !m_selectionModel)
         return;
 
-    m_menu = std::make_unique<QMenu>();
+    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
     QAction* action;
 
     QList<QUrl> selectedUrlList;

@@ -181,6 +181,7 @@ FocusScope {
         id: contextMenu
 
         model: root.model
+        ctx: MainCtx
     }
 
     PlaylistMedia

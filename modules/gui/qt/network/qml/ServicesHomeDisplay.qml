@@ -111,6 +111,7 @@ Widgets.PageLoader {
                 id: contextMenu
 
                 model: deviceModel
+                ctx: MainCtx
             }
         }
     }
@@ -150,6 +151,7 @@ Widgets.PageLoader {
 
             contextMenu: NetworkMediaContextMenu {
                 model: mediaModel
+                ctx: MainCtx
             }
         }
     }

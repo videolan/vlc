@@ -207,6 +207,8 @@ T.Control {
     StringListMenu {
         id: popup
 
+        ctx: MainCtx
+
         function show() {
             const model = control._menuModel.map(function (modelData) {
                 return modelData.display

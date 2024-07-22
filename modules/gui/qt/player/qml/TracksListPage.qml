@@ -254,6 +254,7 @@ RowLayout {
         id: menuSubtitle
 
         player: Player
+        ctx: MainCtx
 
         onTriggered: {
             if (action === QmlSubtitleMenu.Open) {
@@ -270,6 +271,8 @@ RowLayout {
 
     QmlAudioMenu {
         id: menuAudio
+
+        ctx: MainCtx
 
         onTriggered: {
             if (action === QmlSubtitleMenu.Open) {

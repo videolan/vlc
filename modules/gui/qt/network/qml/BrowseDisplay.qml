@@ -169,6 +169,7 @@ Widgets.PageLoader {
 
             contextMenu: NetworkMediaContextMenu {
                 model: mediaModel
+                ctx: MainCtx
             }
 
             Navigation.cancelAction: function() {
