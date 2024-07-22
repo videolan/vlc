@@ -53,6 +53,7 @@
 @property (readwrite, strong) IBOutlet VLCImageView *artworkImageView;
 @property (readwrite, strong) IBOutlet NSButton *artworkButton;
 @property (readwrite, strong) IBOutlet VLCWrappableTextField *playingItemDisplayField;
+@property (readwrite, strong) IBOutlet VLCWrappableTextField *detailLabel;
 @property (readwrite, strong) IBOutlet VLCTimeField *timeField;
 @property (readwrite, strong) IBOutlet VLCTimeField *trailingTimeField;
 

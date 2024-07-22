@@ -464,6 +464,17 @@
 
     _playingItemDisplayField.stringValue = inputItem.name;
 
+    VLCMediaLibraryMediaItem * const mediaItem =
+        [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
+    if (!mediaItem) {
+        self.detailLabel.hidden = YES;
+    } else {
+        _detailLabel.hidden = 
+            [mediaItem.primaryDetailString isEqualToString:@""] ||
+            [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
+        _detailLabel.stringValue = mediaItem.primaryDetailString;
+    }
+
     NSURL * const artworkURL = inputItem.artworkURL;
 
     if (artworkURL) {

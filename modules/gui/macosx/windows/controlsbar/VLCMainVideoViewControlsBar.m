@@ -68,10 +68,6 @@
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
-                           selector:@selector(currentMediaItemChanged:)
-                               name:VLCPlayerCurrentMediaItemChanged
-                             object:nil];
-    [notificationCenter addObserver:self
                            selector:@selector(floatOnTopChanged:)
                                name:VLCWindowFloatOnTopChangedNotificationName
                              object:nil];
@@ -82,13 +78,7 @@
 - (void)update
 {
     [super update];
-    [self updateDetailLabel];
     [self updateFloatOnTopButton];
-}
-
-- (void)currentMediaItemChanged:(NSNotification *)notification
-{
-    [self updateDetailLabel];
 }
 
 - (void)floatOnTopChanged:(NSNotification *)notification
@@ -103,21 +93,6 @@
     }
 
     [self updateFloatOnTopButton];
-}
-
-- (void)updateDetailLabel
-{
-    VLCMediaLibraryMediaItem * const mediaItem =
-        [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
-
-    if (!mediaItem) {
-        self.detailLabel.hidden = YES;
-        return;
-    }
-
-    _detailLabel.hidden = [mediaItem.primaryDetailString isEqualToString:@""] ||
-                          [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
-    _detailLabel.stringValue = mediaItem.primaryDetailString;
 }
 
 - (void)updateFloatOnTopButton
