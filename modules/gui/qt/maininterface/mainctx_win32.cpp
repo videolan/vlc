@@ -172,7 +172,7 @@ public:
 
         const int action = TrackPopupMenu(hmenu, (TPM_RETURNCMD | alignment)
                                           , screenPoints.x(), screenPoints.y()
-                                          , NULL, hwnd, 0);
+                                          , 0, hwnd, nullptr);
 
         // unlike native system menu which sends WM_SYSCOMMAND, TrackPopupMenu sends WM_COMMAND
         // imitate native system menu by sending the action manually as WM_SYSCOMMAND
