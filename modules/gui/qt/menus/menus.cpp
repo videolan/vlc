@@ -470,6 +470,7 @@ void VLCMenuBar::VideoMenu( qt_intf_t *p_intf, QMenu *current )
         current->addMenu( new CheckableListMenu(qtr( "&Zoom" ), THEMIM->getZoom(), CheckableListMenu::GROUPED_EXLUSIVE, current) );
         current->addMenu( new CheckableListMenu(qtr( "&Aspect Ratio" ), THEMIM->getAspectRatio(), CheckableListMenu::GROUPED_EXLUSIVE, current) );
         current->addMenu( new CheckableListMenu(qtr( "&Crop" ), THEMIM->getCrop(), CheckableListMenu::GROUPED_EXLUSIVE, current) );
+        current->addMenu( new CheckableListMenu(qtr( "&Fit" ), THEMIM->getFit(), CheckableListMenu::GROUPED_EXLUSIVE, current) );
 
         current->addSeparator();
         /* Rendering modifiers */

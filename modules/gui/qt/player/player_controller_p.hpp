@@ -138,6 +138,7 @@ public:
     VLCVarChoiceModel m_zoom;
     VLCVarChoiceModel m_aspectRatio;
     VLCVarChoiceModel m_crop;
+    VLCVarChoiceModel m_fit;
     VLCVarChoiceModel m_deinterlace;
     VLCVarChoiceModel m_deinterlaceMode;
     QVLCBool m_autoscale;

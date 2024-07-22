@@ -169,6 +169,7 @@ public:
     Q_PROPERTY(VLCVarChoiceModel* zoom READ getZoom CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* aspectRatio READ getAspectRatio CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* crop READ getCrop CONSTANT FINAL)
+    Q_PROPERTY(VLCVarChoiceModel* fit READ getFit CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* deinterlace READ getDeinterlace CONSTANT FINAL)
     Q_PROPERTY(VLCVarChoiceModel* deinterlaceMode READ getDeinterlaceMode CONSTANT FINAL)
     Q_PROPERTY(bool fullscreen READ isFullscreen WRITE setFullscreen NOTIFY fullscreenChanged FINAL)
@@ -348,6 +349,7 @@ public slots:
     VLCVarChoiceModel* getZoom();
     VLCVarChoiceModel* getAspectRatio();
     VLCVarChoiceModel* getCrop();
+    VLCVarChoiceModel* getFit();
     VLCVarChoiceModel* getDeinterlace();
     VLCVarChoiceModel* getDeinterlaceMode();
     bool isFullscreen() const;
