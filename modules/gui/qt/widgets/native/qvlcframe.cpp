@@ -237,6 +237,7 @@ void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_i
 {
     if (!parent && p_intf && !p_intf->b_isDialogProvider)
     {
+        assert(p_intf->p_compositor);
         parent = p_intf->p_compositor->interfaceMainWindow();
     }
     if (!parent)
