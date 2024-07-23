@@ -48,9 +48,6 @@ ifeq ($(ARCH),x86_64)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=yes
 endif
 endif
-ifdef HAVE_IOS
-GCRYPT_CONF += CFLAGS="$(CFLAGS) -fheinous-gnu-extensions"
-endif
 ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
 ifeq ($(ARCH),aarch64)
