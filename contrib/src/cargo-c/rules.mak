@@ -11,8 +11,6 @@ endif
 
 endif
 
-DEPS_cargo-c = rustc $(DEPS_rustc)
-
 .sum-cargo-c:
 	touch $@
 

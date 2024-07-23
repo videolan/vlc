@@ -53,11 +53,6 @@ BUILD_RUST="1"
 endif
 endif
 
-RUSTUP_HOME?= $(BUILDBINDIR)/.rustup
-CARGO_HOME ?= $(BUILDBINDIR)/.cargo
-
-RUST_ENV = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME)
-
 RUSTFLAGS := -C panic=abort
 ifndef WITH_OPTIMIZATION
 CARGO_PROFILE := "dev"
@@ -76,15 +71,8 @@ CARGO_ENV = TARGET_CC="$(CC)" TARGET_AR="$(AR)" TARGET_RANLIB="$(RANLIB)" \
 CARGO_ENV_NATIVE = TARGET_CC="$(BUILDCC)" TARGET_AR="$(BUILDAR)" TARGET_RANLIB="$(BUILDRANLIB)" \
 	TARGET_CFLAGS="$(BUILDCFLAGS)"
 
-ifneq ($(call system_tool_majmin, cargo --version),)
-CARGO = $(RUST_ENV) $(CARGO_ENV) cargo
-CARGO_NATIVE = $(RUST_ENV) $(CARGO_ENV_NATIVE) cargo
-else
-CARGO = . $(CARGO_HOME)/env && \
-        $(RUST_ENV) $(CARGO_ENV) cargo
-CARGO_NATIVE = . $(CARGO_HOME)/env && \
-        $(RUST_ENV) $(CARGO_ENV_NATIVE) cargo
-endif
+CARGO = $(CARGO_ENV) cargo
+CARGO_NATIVE = $(CARGO_ENV_NATIVE) cargo
 
 CARGO_INSTALL_ARGS = --target=$(RUST_TARGET) --prefix=$(PREFIX) \
 	--library-type staticlib --profile=$(CARGO_PROFILE)

@@ -17,13 +17,7 @@ if [ "x$1" = "x" ]; then
 fi
 
 # Setup cargo path
-CARGO=
-if [ -d "$(dirname $0)/bin/.cargo" ];then
-    CARGO_HOME=$(cd $(dirname $0)/bin/.cargo && pwd)
-    CARGO="CARGO_HOME=\"${CARGO_HOME}\" \"${CARGO_HOME}/bin/cargo\""
-else
-    CARGO=cargo
-fi
+CARGO=cargo
 
 # Extract archive into a tmp dir
 TMP_DIR=.tmp-$(basename $1)
