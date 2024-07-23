@@ -840,6 +840,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     vlc_tick_t i_duration = 0;
     int i_size, i_header_ext_size;
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
+    int i_subo_count = 0; /* header sub object count */
     block_t *out;
     bo_t bo;
 
@@ -912,11 +913,17 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         bo_init( &bo, out->p_buffer, i_size + 50 );
     }
 
+    /* calculate header sub object count */
+    i_subo_count += 1; /* file properties */
+    i_subo_count += 1; /* header extension */
+    i_subo_count += vlc_array_count( &p_sys->tracks ); /* stream info */
+    i_subo_count += 1; /* codec info */
+    i_subo_count += (i_cd_size ? 1 : 0); /* content description if any */
+
     /* header object */
     bo_add_guid ( &bo, &asf_object_header_guid );
     bo_addle_u64( &bo, i_size );
-    bo_addle_u32( &bo, 2 + vlc_array_count( &p_sys->tracks ) + 1 +
-                  (i_cd_size ? 1 : 0) + (i_cm_size ? 1 : 0) );
+    bo_addle_u32( &bo, i_subo_count );
     bo_add_u8   ( &bo, 1 );
     bo_add_u8   ( &bo, 2 );
 
