@@ -129,13 +129,15 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
     col1->setFlags( Qt::ItemIsEnabled | Qt::ItemIsSelectable );
     setItem( row, 0, col1 );
 
-    auto buttonCol = [&, this] (const int col, const QString &text
+    auto buttonCol = [&, this] (const int col, const QString &icon, const QString &accessibleName
                                 , std::function<void (MLFoldersEditor *editor, int row)> action)
     {
         QWidget *wid = new QWidget( this );
         QBoxLayout* layout = new QBoxLayout( QBoxLayout::LeftToRight , wid );
-        QPushButton *pb = new QPushButton( text , wid );
+
+        QPushButton *pb = new QPushButton( icon , wid );
         pb->setFixedSize( 18 , 18 );
+        pb->setAccessibleName(accessibleName);
 
         layout->addWidget( pb , Qt::AlignCenter );
         wid->setLayout( layout );
@@ -147,9 +149,9 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
         setCellWidget( row, col, wid );
     };
 
-    buttonCol( 1, "-", &MLFoldersEditor::markRemoved );
+    buttonCol( 1, "-", qtr("Remove"), &MLFoldersEditor::markRemoved );
 
-    buttonCol( 2, "⟳", &MLFoldersEditor::reloadUrl );
+    buttonCol( 2, "⟳", qtr("Reload"), &MLFoldersEditor::reloadUrl );
 }
 
 QUrl MLFoldersEditor::url(int row)
