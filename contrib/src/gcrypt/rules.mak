@@ -43,6 +43,11 @@ ifeq ($(ARCH),x86_64)
 GCRYPT_CONF += --disable-asm --disable-padlock-support
 endif
 endif
+ifdef HAVE_DARWIN_OS
+ifeq ($(ARCH),x86_64)
+GCRYPT_CONF += ac_cv_sys_symbol_underscore=yes
+endif
+endif
 ifdef HAVE_IOS
 GCRYPT_CONF += CFLAGS="$(CFLAGS) -fheinous-gnu-extensions"
 endif
@@ -50,9 +55,6 @@ ifdef HAVE_MACOSX
 GCRYPT_CONF += --disable-aesni-support
 ifeq ($(ARCH),aarch64)
 GCRYPT_CONF += --disable-asm --disable-arm-crypto-support
-endif
-ifeq ($(ARCH), x86_64)
-GCRYPT_CONF += ac_cv_sys_symbol_underscore=yes
 endif
 endif
 ifdef HAVE_BSD
