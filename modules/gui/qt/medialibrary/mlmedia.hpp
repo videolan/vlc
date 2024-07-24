@@ -51,8 +51,11 @@ public:
     {
         const auto getThumbnail = [](const vlc_ml_thumbnail_t & thumbnail)
         {
-            return (thumbnail.i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
+            const QString mrl =
+                    (thumbnail.i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE)
                     ? qfu(thumbnail.psz_mrl) : QString {};
+
+            return MLThumbnail{ mrl, thumbnail.i_status };
         };
 
         m_title = qfu(media->psz_title);
@@ -66,20 +69,36 @@ public:
 
     QString title() const { return m_title; }
     QString fileName() const { return m_fileName; }
-    QString smallCover() const { return m_smallCover; }
-    QString bannerCover() const { return m_bannerCover; }
     VLCTick duration() const {  return m_duration; }
     qreal progress() const { return m_progress; }
     int playCount() const { return m_playCount; }
+
+    QString smallCover(vlc_ml_thumbnail_status_t* status = nullptr) const
+    {
+        if (status) *status = m_smallCover.status;
+        return m_smallCover.mrl;
+    }
+
+    QString bannerCover(vlc_ml_thumbnail_status_t* status = nullptr) const
+    {
+        if (status) *status = m_bannerCover.status;
+        return m_bannerCover.mrl;
+    }
 
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
 
 
 private:
+    struct MLThumbnail
+    {
+        QString mrl;
+        vlc_ml_thumbnail_status_t status;
+    };
+
     QString m_title;
     QString m_fileName;
-    QString m_smallCover;
-    QString m_bannerCover;
+    MLThumbnail m_smallCover;
+    MLThumbnail m_bannerCover;
     VLCTick m_duration;
     qreal m_progress;
     int m_playCount;
