@@ -19,11 +19,17 @@ endif
 
 ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_HOST) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --target=$(RUST_HOST) --version,$(RUST_VERSION_MIN)),)
 PKGS_FOUND += rustc
+ifndef HAVE_CROSS_COMPILE
+RUST_ENV=
+endif
 else
 DEPS_rustc = rustup $(DEPS_rustup)
 endif
 ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_TARGET) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --target=$(RUST_TARGET) --version,$(RUST_VERSION_MIN)),)
 PKGS_FOUND += rustc-cross
+ifdef HAVE_CROSS_COMPILE
+RUST_ENV=
+endif
 endif
 
 endif
