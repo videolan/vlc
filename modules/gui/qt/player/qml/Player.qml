@@ -307,13 +307,18 @@ FocusScope {
 
                     onWheel: (wheel) => {
                         wheel.accepted = true
+                        wheelToVlc.qmlWheelEvent(wheel)
+                    }
 
-                        var delta = wheel.angleDelta.y
+                    WheelToVLCConverter {
+                        id: wheelToVlc
 
-                        if (delta === 0)
-                            return
-
-                        Helpers.applyVolume(Player, delta)
+                        onWheelUpDown: (steps, modifiers) => {
+                            if (steps > 0)
+                                Player.setVolumeUp(steps)
+                            else if (steps < 0)
+                                Player.setVolumeDown(-steps)
+                        }
                     }
 
                     ColumnLayout {

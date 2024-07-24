@@ -286,30 +286,20 @@ T.Pane {
                 }
 
                 onWheel: (wheel) => {
-                    let delta = 0, fineControl = false
 
                     if ((Math.abs(wheel.pixelDelta.x) % 120 > 0) || (Math.abs(wheel.pixelDelta.y) % 120 > 0)) {
+                        let delta = 0
                         if (Math.abs(wheel.pixelDelta.x) > Math.abs(wheel.pixelDelta.y))
                             delta = wheel.pixelDelta.x
                         else
                             delta = wheel.pixelDelta.y
-                        fineControl = true
-                    }
-                    else if (wheel.angleDelta.x)
-                        delta = wheel.angleDelta.x
-                    else if (wheel.angleDelta.y)
-                        delta = wheel.angleDelta.y
 
-                    if (delta === 0)
-                        return
-
-                    if (wheel.inverted)
-                        delta = -delta
-
-                    if (fineControl)
+                        if (wheel.inverted)
+                            delta = -delta
                         volControl.value += 0.001 * delta
+                    }
                     else
-                        Helpers.applyVolume(Player, delta)
+                        wheelToVLC.qmlWheelEvent(wheel)
 
                     wheel.accepted = true
                 }
@@ -327,6 +317,17 @@ T.Pane {
                         volControl.value = 1
                     else
                         volControl.value = 1.25
+                }
+
+                WheelToVLCConverter {
+                    id: wheelToVLC
+
+                    onWheelUpDown: (steps, modifiers) => {
+                        if (steps > 0)
+                            Player.setVolumeUp(steps)
+                        else
+                            Player.setVolumeDown(-steps)
+                    }
                 }
             }
         }
