@@ -11,10 +11,10 @@ PKGS_ALL += rustc-cross
 endif
 
 ifneq ($(call system_tool_version, rustup --version, cat),)
-RUSTUP = RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
+RUSTUP = $(RUST_ENV) rustup
 else
 RUSTUP = . $(CARGO_HOME)/env && \
-         RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) rustup
+         $(RUST_ENV) rustup
 endif
 
 ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_HOST) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --target=$(RUST_HOST) --version,$(RUST_VERSION_MIN)),)

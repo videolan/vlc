@@ -33,6 +33,6 @@ endif
 
 .rustup: rustup
 	cd $< && RUSTUP_INIT_SKIP_PATH_CHECK=yes \
-	  RUSTUP_HOME=$(RUSTUP_HOME) CARGO_HOME=$(CARGO_HOME) \
+	  $(RUST_ENV) \
 	  ./rustup-init.sh --no-modify-path -y --default-toolchain none
 	touch $@
