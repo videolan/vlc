@@ -85,6 +85,8 @@ public:
         return m_bannerCover.mrl;
     }
 
+    VLCTick progressTime() const { return VLCTick::fromMS(m_duration * m_progress); }
+
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
 
 
