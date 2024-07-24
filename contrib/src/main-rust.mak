@@ -49,7 +49,9 @@ ifneq ($(RUST_HOST),FAIL)
 # Supporting a Tier 3 platform means building an untested rust toolchain.
 # TODO Let's hope tvOS move from Tier 3 to Tier 2 before the VLC 4.0 release.
 ifneq ($(RUST_TARGET),FAIL)
+ifeq ($(call system_tool_matches_min, echo 'fn main() {}' | rustc --target=$(RUST_TARGET) --emit=dep-info - -o /dev/null 2>/dev/null && rustc --version,$(RUST_VERSION_MIN)),)
 BUILD_RUST="1"
+endif
 endif
 endif
 
