@@ -88,7 +88,7 @@ public:
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
 
 
-private:
+protected:
     struct MLThumbnail
     {
         QString mrl;
