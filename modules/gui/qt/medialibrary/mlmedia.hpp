@@ -41,6 +41,7 @@ class MLMedia : public MLItem
     Q_PROPERTY(QString bannerCover READ bannerCover CONSTANT FINAL)
     Q_PROPERTY(VLCTick duration READ duration CONSTANT FINAL)
     Q_PROPERTY(qreal progress READ progress CONSTANT FINAL)
+    Q_PROPERTY(int playCount READ playCount CONSTANT FINAL)
 
 public:
     MLMedia() : MLItem {MLItemId()} {}
@@ -60,6 +61,7 @@ public:
         m_bannerCover = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_BANNER]);
         m_duration = VLCTick::fromMS(media->i_duration);
         m_progress = media->f_progress;
+        m_playCount = media->i_playcount;
     }
 
     QString title() const { return m_title; }
@@ -68,8 +70,10 @@ public:
     QString bannerCover() const { return m_bannerCover; }
     VLCTick duration() const {  return m_duration; }
     qreal progress() const { return m_progress; }
+    int playCount() const { return m_playCount; }
 
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
+
 
 private:
     QString m_title;
@@ -78,5 +82,6 @@ private:
     QString m_bannerCover;
     VLCTick m_duration;
     qreal m_progress;
+    int m_playCount;
 };
 
