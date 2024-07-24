@@ -29,6 +29,7 @@
 
 #include <vlc_media_library.h>
 #include "mlqmltypes.hpp"
+#include "mlmedia.hpp"
 
 #include <functional>
 
@@ -109,7 +110,7 @@ private:
     QString m_encoding;
 };
 
-class MLVideo : public MLItem
+class MLVideo : public MLMedia
 {
 public:
     MLVideo(const vlc_ml_media_t *data);
@@ -118,18 +119,11 @@ public:
     void setIsNew(bool isNew);
     bool isFavorite() const;
     void setIsFavorite(bool isFavorite);
-    QString getFileName() const;
-    QString getTitle() const;
-    QString getThumbnail(vlc_ml_thumbnail_status_t* status);
-    void setThumbnail(vlc_ml_thumbnail_status_t status, QString mrl);
-    VLCTick getDuration() const;
+    void setSmallCover(vlc_ml_thumbnail_status_t status, QString mrl);
     QString getResolutionName() const;
     QString getChannel() const;
     QString getMRL() const;
     QString getDisplayMRL() const;
-    float getProgress() const;
-    unsigned int getPlayCount() const;
-    VLCTick getProgressTime() const;
     QList<AudioDescription> getAudioDesc() const;
     QList<VideoDescription> getVideoDesc() const;
     QList<SubtitleDescription> getSubtitleDesc() const;
@@ -137,17 +131,9 @@ public:
 private:
     bool m_isNew;
     bool m_isFavorite;
-    QString m_fileName;
-    QString m_title;
-    QString m_thumbnail;
-    int64_t m_duration;
     QUrl m_mrl;
     QString m_resolution;
     QString m_channel;
-    float m_progress;
-    QString m_progressTime;
-    unsigned int m_playCount;
-    vlc_ml_thumbnail_status_t m_thumbnailStatus;
     QList<AudioDescription> m_audioDesc;
     QList<VideoDescription> m_videoDesc;
     QList<SubtitleDescription> m_subtitleDesc;

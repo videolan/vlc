@@ -107,13 +107,13 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
         case VIDEO_IS_FAVORITE:
             return QVariant::fromValue( video->isFavorite() );
         case VIDEO_FILENAME:
-            return QVariant::fromValue( video->getFileName() );
+            return QVariant::fromValue( video->fileName() );
         case VIDEO_TITLE:
-            return QVariant::fromValue( video->getTitle() );
+            return QVariant::fromValue( video->title() );
         case VIDEO_THUMBNAIL:
         {
             vlc_ml_thumbnail_status_t status;
-            const QString thumbnail = video->getThumbnail(&status);
+            const QString thumbnail = video->smallCover(&status);
             if (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE)
             {
                 generateThumbnail(item->getId().id);
@@ -126,11 +126,11 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
             return QVariant::fromValue( videoUrl.isLocalFile() );
         }
         case VIDEO_DURATION:
-            return QVariant::fromValue( video->getDuration() );
+            return QVariant::fromValue( video->duration() );
         case VIDEO_PROGRESS:
-            return QVariant::fromValue( video->getProgress() );
+            return QVariant::fromValue( video->progress() );
         case VIDEO_PLAYCOUNT:
-            return QVariant::fromValue( video->getPlayCount() );
+            return QVariant::fromValue( video->playCount() );
         case VIDEO_RESOLUTION:
             return QVariant::fromValue( video->getResolutionName() );
         case VIDEO_CHANNEL:
@@ -146,7 +146,7 @@ QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
         case VIDEO_SUBTITLE_TRACK:
             return getVariantList( video->getSubtitleDesc() );
         case VIDEO_TITLE_FIRST_SYMBOL:
-            return QVariant::fromValue( getFirstSymbol( video->getTitle() ) );
+            return QVariant::fromValue( getFirstSymbol( video->title() ) );
 
         default:
             return {};
@@ -243,7 +243,7 @@ void MLVideoModel::onVlcMlEvent(const MLEvent &event)
 void MLVideoModel::thumbnailUpdated(const QModelIndex& idx, MLItem* mlitem, const QString& mrl, vlc_ml_thumbnail_status_t status)
 {
     auto videoItem = static_cast<MLVideo*>(mlitem);
-    videoItem->setThumbnail(status, mrl);
+    videoItem->setSmallCover(status, mrl);
     emit dataChanged(idx, idx, {VIDEO_THUMBNAIL});
 }
 

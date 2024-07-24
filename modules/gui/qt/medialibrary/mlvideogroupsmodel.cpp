@@ -126,11 +126,11 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
         switch (role)
         {
             case Qt::DisplayRole:
-                return QVariant::fromValue(video->getTitle());
+                return QVariant::fromValue(video->title());
             case GROUP_TITLE_FIRST_SYMBOL:
                 // videos and groups are shown mixed, force this item into a group
                 // for grouping the data must be sorted by title
-                return QVariant::fromValue( getFirstSymbol(video->getTitle() ));
+                return QVariant::fromValue( getFirstSymbol(video->title() ));
             case GROUP_IS_VIDEO:
                 return true;
             case GROUP_DATE:
