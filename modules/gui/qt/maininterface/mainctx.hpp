@@ -246,6 +246,9 @@ public:
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); }
 
+    Q_INVOKABLE static inline void setCursor(QQuickItem* item, Qt::CursorShape cursor) { assert(item); item->setCursor(cursor); }
+    Q_INVOKABLE static inline void unsetCursor(QQuickItem* item) { assert(item); item->unsetCursor(); };
+
     Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersion() { return QT_VERSION; }
     Q_INVOKABLE static /*constexpr*/ inline unsigned int qtVersionCheck(unsigned char major,
                                                                         unsigned char minor,
