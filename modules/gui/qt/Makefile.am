@@ -326,6 +326,7 @@ libqt_plugin_la_SOURCES = \
 	util/varcommon_p.hpp \
 	util/varchoicemodel.cpp  util/varchoicemodel.hpp \
 	util/variables.cpp util/variables.hpp \
+	util/vlchotkeyconverter.cpp util/vlchotkeyconverter.hpp \
 	util/vlctick.cpp \
 	util/vlctick.hpp \
 	util/shared_input_item.hpp \
@@ -497,6 +498,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/vlctick.moc.cpp \
 	util/dismiss_popup_event_filter.moc.cpp \
 	util/list_selection_model.moc.cpp \
+	util/vlchotkeyconverter.moc.cpp \
 	widgets/native/animators.moc.cpp \
 	widgets/native/csdthemeimage.moc.cpp \
 	widgets/native/customwidgets.moc.cpp \

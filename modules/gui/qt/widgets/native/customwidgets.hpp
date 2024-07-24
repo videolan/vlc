@@ -109,15 +109,4 @@ public:
     YesNoCheckBox( QWidget *parent );
 };
 
-/* VLC Key/Wheel hotkeys interactions */
-
-class QKeyEvent;
-class QWheelEvent;
-class QInputEvent;
-
-int qtKeyModifiersToVLC( const QInputEvent& e );
-int qtEventToVLCKey( QKeyEvent *e );
-int qtWheelEventToVLCKey( const QWheelEvent& e );
-QString VLCKeyToString( unsigned val, bool );
-
 #endif

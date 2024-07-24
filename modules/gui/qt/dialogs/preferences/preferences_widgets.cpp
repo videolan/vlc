@@ -31,8 +31,8 @@
 #endif
 
 #include "dialogs/preferences/preferences_widgets.hpp"
-#include "widgets/native/customwidgets.hpp"
 #include "widgets/native/searchlineedit.hpp"
+#include "util/vlchotkeyconverter.hpp"
 #include "util/qt_dirs.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
@@ -64,6 +64,7 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QFont>
+#include <QToolButton>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10

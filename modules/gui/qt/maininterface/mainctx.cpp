@@ -36,7 +36,7 @@
 #include "util/renderer_manager.hpp"
 #include "util/csdbuttonmodel.hpp"
 
-#include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
+#include "util/vlchotkeyconverter.hpp"
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 
 #include "util/color_scheme_model.hpp"
