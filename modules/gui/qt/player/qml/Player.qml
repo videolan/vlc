@@ -313,12 +313,7 @@ FocusScope {
                     WheelToVLCConverter {
                         id: wheelToVlc
 
-                        onWheelUpDown: (steps, modifiers) => {
-                            if (steps > 0)
-                                Player.setVolumeUp(steps)
-                            else if (steps < 0)
-                                Player.setVolumeDown(-steps)
-                        }
+                        onVlcWheelKey: (key) => MainCtx.sendVLCHotkey(key)
                     }
 
                     ColumnLayout {
