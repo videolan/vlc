@@ -510,6 +510,11 @@ void MainCtx::sendHotkey(Qt::Key key , Qt::KeyboardModifiers modifiers)
     var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlckey);
 }
 
+void MainCtx::sendVLCHotkey(int vlcHotkey)
+{
+    var_SetInteger(vlc_object_instance(p_intf), "key-pressed", vlcHotkey);
+}
+
 void MainCtx::updateIntfScaleFactor()
 {
     m_intfScaleFactor = m_intfUserScaleFactor;

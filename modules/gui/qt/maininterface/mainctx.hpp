@@ -431,6 +431,7 @@ public slots:
     void setMinimalView(bool);
 
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
+    void sendVLCHotkey(int vlcHotkey);
 
     void emitBoss();
     void emitRaise();
