@@ -223,31 +223,102 @@ int qtEventToVLCKey( QKeyEvent *e )
     return i_vlck;
 }
 
-int qtWheelEventToVLCKey( const QWheelEvent& e )
+Qt::Orientations WheelToVLCConverter::getWheelOrientation(int x, int y)
 {
     const qreal v_cos_deadzone = 0.45; // ~63 degrees
     const qreal h_cos_deadzone = 0.95; // ~15 degrees
 
-    int i_vlck = qtKeyModifiersToVLC(e);  // Handle modifiers
+    if (x == 0 && y == 0)
+        return Qt::Orientations{};
 
-    QPoint p = e.angleDelta();
-    if (!p.isNull())
+    qreal cos = qFabs(x)/qSqrt(x*x + y*y);
+    if (cos < v_cos_deadzone)
+        return Qt::Vertical;
+    else if (cos > h_cos_deadzone)
+        return Qt::Horizontal;
+    return Qt::Orientations{};
+}
+
+void WheelToVLCConverter::wheelEvent( const QWheelEvent* e )
+{
+    if (!e)
+        return;
+
+    const int deltaPerStep = QWheelEvent::DefaultDeltasPerStep;
+
+    if (e->modifiers() != m_modifiers)
     {
-        qreal cos = qFabs(p.x())/qSqrt(qPow(p.x(), 2) + qPow(p.y(), 2));
-
-        if (cos < v_cos_deadzone)
-        {
-            if (p.y() > 0) i_vlck |= KEY_MOUSEWHEELUP;
-            else           i_vlck |= KEY_MOUSEWHEELDOWN;
-        }
-        else if (cos > h_cos_deadzone)
-        {
-            if (p.x() > 0) i_vlck |= KEY_MOUSEWHEELLEFT;
-            else           i_vlck |= KEY_MOUSEWHEELRIGHT;
-        }
+        m_scrollAmount = {};
+        m_modifiers = e->modifiers();
+    }
+    if (e->buttons() != m_buttons)
+    {
+        m_scrollAmount = {};
+        m_buttons = e->buttons();
     }
 
-    return i_vlck;
+    QPoint p = e->angleDelta();
+    p += m_scrollAmount;
+
+    if (p.isNull())
+        return;
+
+    int i_vlck = qtKeyModifiersToVLC(*e);  // Handle modifiers
+    Qt::Orientations orientation = getWheelOrientation(p.x(), p.y());
+    if (orientation == Qt::Vertical && qAbs(p.y()) >= deltaPerStep)
+    {
+        if (p.y() > 0)
+            i_vlck |= KEY_MOUSEWHEELUP;
+        else
+            i_vlck |= KEY_MOUSEWHEELDOWN;
+
+        const int steps = p.y() / deltaPerStep;
+
+        emit wheelUpDown(steps, e->modifiers());
+        //in practice this will emit once
+        for (int i = 0; i < qAbs(steps); i++)
+            emit vlcWheelKey(i_vlck);
+
+        m_scrollAmount.setX(0);
+        m_scrollAmount.setY(p.y() % deltaPerStep);
+
+    }
+    else if (orientation == Qt::Horizontal && qAbs(p.x()) >= deltaPerStep)
+    {
+        if (p.x() > 0)
+            i_vlck |= KEY_MOUSEWHEELLEFT;
+        else
+            i_vlck |= KEY_MOUSEWHEELRIGHT;
+
+        const int steps = p.x() / deltaPerStep;
+
+        emit wheelLeftRight(steps, e->modifiers());
+        //in practice this will emit once
+        for (int i = 0; i < qAbs(steps); i++)
+            emit vlcWheelKey(i_vlck);
+
+        m_scrollAmount.setY(0);
+        m_scrollAmount.setX(p.x() % deltaPerStep);
+    }
+    else
+    {
+        m_scrollAmount = p;
+    }
+}
+
+void WheelToVLCConverter::qmlWheelEvent( const QObject* e )
+{
+    assert(e);
+    assert(e->inherits("QQuickWheelEvent"));
+
+    QPoint pixelDelta = e->property("pixelDelta").toPoint();
+    QPoint angleDelta = e->property("angleDelta").toPoint();
+    auto buttons = Qt::MouseButtons::fromInt(e->property("buttons").toInt());
+    auto modifiers = Qt::KeyboardModifiers::fromInt(e->property("modifiers").toInt());
+    bool inverted = e->property("inverted").toBool();
+
+    QWheelEvent event({}, {}, pixelDelta, angleDelta, buttons, modifiers, Qt::ScrollPhase::NoScrollPhase, inverted);
+    wheelEvent(&event);
 }
 
 QString VLCKeyToString( unsigned val, bool locale )

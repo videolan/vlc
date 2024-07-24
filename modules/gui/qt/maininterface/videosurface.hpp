@@ -33,6 +33,7 @@ extern "C" {
 Q_MOC_INCLUDE( "maininterface/mainctx.hpp")
 
 class MainCtx;
+class WheelToVLCConverter;
 
 class WindowResizer :
     public QRunnable
@@ -83,7 +84,7 @@ public slots:
     void onMouseReleased( int vlcButton );
     void onMouseDoubleClick( int vlcButton );
     void onMouseMoved( float x, float y );
-    void onMouseWheeled(const QWheelEvent& event);
+    void onMouseWheeled(int vlcButton);
     void onKeyPressed(int key, Qt::KeyboardModifiers modifiers);
     void onSurfaceSizeChanged(QSizeF size);
 
@@ -134,7 +135,6 @@ signals:
     void mouseDblClicked( int vlcButton );
     void mouseMoved( float x, float y );
     void keyPressed(int key, Qt::KeyboardModifiers modifier);
-    void mouseWheeled(const QWheelEvent& event);
 
     void videoSurfaceProviderChanged();
 
@@ -147,6 +147,8 @@ protected slots:
 
 private:
     QPointF m_oldHoverPos;
+
+    WheelToVLCConverter* m_wheelEventConverter = nullptr;
 
     QPointer<VideoSurfaceProvider> m_provider;
 

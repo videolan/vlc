@@ -53,6 +53,7 @@ class QPushButton;
 class QFontComboBox;
 class QSlider;
 class QAbstractButton;
+class WheelToVLCConverter;
 
 /*******************************************************
  * Simple widgets
@@ -505,6 +506,7 @@ private:
     QPushButton *ok, *unset;
     KeyTableItem *keyItem;
     enum KeySelectorControl::ColumnIndex column;
+    WheelToVLCConverter* wheelConverter;
 
     void checkForConflicts( const QString &sequence );
     void keyPressEvent( QKeyEvent *);

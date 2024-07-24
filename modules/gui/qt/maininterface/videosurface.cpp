@@ -174,12 +174,11 @@ void VideoSurfaceProvider::onMouseMoved(float x, float y)
         vlc_window_ReportMouseMoved(m_voutWindow, x, y);
 }
 
-void VideoSurfaceProvider::onMouseWheeled(const QWheelEvent& event)
+void VideoSurfaceProvider::onMouseWheeled(int vlcButton)
 {
-    int vlckey = qtWheelEventToVLCKey(event);
     QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
-        vlc_window_ReportKeyPress(m_voutWindow, vlckey);
+        vlc_window_ReportKeyPress(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers)
@@ -209,6 +208,8 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
+
+    m_wheelEventConverter = new WheelToVLCConverter(this);
 
     {
         connect(this, &QQuickItem::widthChanged, this, &VideoSurface::updateSurfaceSize);
@@ -307,7 +308,7 @@ void VideoSurface::keyPressEvent(QKeyEvent* event)
 #if QT_CONFIG(wheelevent)
 void VideoSurface::wheelEvent(QWheelEvent *event)
 {
-    emit mouseWheeled(*event);
+    m_wheelEventConverter->wheelEvent(event);
     event->accept();
 }
 #endif
@@ -377,11 +378,11 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::mousePressed, m_provider, &VideoSurfaceProvider::onMousePressed);
         connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::onMouseDoubleClick);
         connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
-        connect(this, &VideoSurface::mouseWheeled, m_provider, &VideoSurfaceProvider::onMouseWheeled);
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
 
+        connect(m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
         connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, &VideoSurface::updateSurfacePositionAndSize);
 
         setFlag(ItemHasContents, true);

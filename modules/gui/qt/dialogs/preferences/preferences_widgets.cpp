@@ -1766,6 +1766,14 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *table_,
     conflicts = false;
     existingkeys = NULL;
 
+    wheelConverter = new WheelToVLCConverter(this);
+    connect(wheelConverter, &WheelToVLCConverter::vlcWheelKey, this, [this](int i_vlck){
+        vlckey = VLCKeyToString( i_vlck, false );
+        vlckey_tr = VLCKeyToString( i_vlck, true );
+        selected->setText( qtr( "Key: <b>%1</b>" ).arg( vlckey_tr ) );
+        checkForConflicts( QString() );
+    });
+
     bool global = ( column == KeySelectorControl::GLOBAL_HOTKEY_COL );
 
     setWindowTitle( global ? qtr( "Global Hotkey change" )
@@ -1865,11 +1873,7 @@ void KeyInputDialog::keyPressEvent( QKeyEvent *e )
 
 void KeyInputDialog::wheelEvent( QWheelEvent *e )
 {
-    int i_vlck = qtWheelEventToVLCKey( *e );
-    vlckey = VLCKeyToString( i_vlck, false );
-    vlckey_tr = VLCKeyToString( i_vlck, true );
-    selected->setText( qtr( "Key: <b>%1</b>" ).arg( vlckey_tr ) );
-    checkForConflicts( QString() );
+    wheelConverter->wheelEvent(e);
 }
 
 void KeyInputDialog::unsetAction() { done( 2 ); }
