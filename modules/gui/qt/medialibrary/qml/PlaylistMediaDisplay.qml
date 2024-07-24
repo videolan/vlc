@@ -151,6 +151,13 @@ FocusScope {
 
         text: qsTr("Processing...")
 
+        onVisibleChanged: {
+            if (visible)
+                MainCtx.setCursor(root, Qt.BusyCursor)
+            else
+                MainCtx.unsetCursor(root)
+        }
+
         Timer {
             id: visibilityTimer
 
