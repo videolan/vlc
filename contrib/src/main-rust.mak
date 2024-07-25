@@ -101,6 +101,10 @@ download_vendor = \
                echo "" && \
                rm $@);
 
+.sum-vendor-%: $(SRC)/%/vendor-SHA512SUMS
+	$(call checksum,$(SHA512SUM),vendor-SHA512,.sum-vendor-)
+	touch $@
+
 # Extract and move the vendor archive if the checksum is valid. Succeed even in
 # case of error (download or checksum failed). In that case, the cargo-vendor
 # archive won't be used (crates.io will be used directly).

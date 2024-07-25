@@ -50,10 +50,6 @@ $(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e .rustc
 
 .sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
 
-.sum-vendor-rav1e: $(SRC)/rav1e/vendor-SHA512SUMS
-	$(call checksum,$(SHA512SUM),vendor-SHA512,.sum-vendor-)
-	touch $@
-
 rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-vendor-rav1e
 	$(UNPACK)
 	$(MOVE)
