@@ -95,6 +95,7 @@ CARGO_INSTALL = $(CARGO) install $(CARGO_INSTALL_ARGS)
 CARGOC_INSTALL = $(CARGO) capi install $(CARGO_INSTALL_ARGS)
 
 download_vendor = \
+	rm $@.skip-hash; \
 	$(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(1)) || (\
                rm $@; \
                $(RM) -R vendor-$(2)-build; \
@@ -102,16 +103,18 @@ download_vendor = \
                tar xzfo $(TARBALLS)/$(3) -C vendor-$(2)-build --strip-components=1 && \
                cd vendor-$(2)-build && \
                $(CARGO_NATIVE) vendor --locked $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
-               find $(patsubst %.tar,%,$(basename $(notdir $(1)))) -exec touch -r Cargo.toml {} \; && \
                tar -jcf $(1) $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
                cd .. && \
                install vendor-$(2)-build/$(1) "$(TARBALLS)" && \
                $(RM) -R vendor-$(2)-build && \
+               touch $@.skip-hash && \
                touch $@) || (\
                rm $@);
 
 .sum-vendor-%: $(SRC)/%/vendor-SHA512SUMS
-	$(call checksum,$(SHA512SUM),vendor-SHA512,.sum-vendor-)
+	$(foreach f,$(filter %.tar.bz2,$^), if test ! -f $(f).skip-hash; then \
+		$(call checksum,$(SHA512SUM),vendor-SHA512,.sum-vendor-); \
+	fi)
 	touch $@
 
 # Extract and move the vendor archive if the checksum is valid. Succeed even in
