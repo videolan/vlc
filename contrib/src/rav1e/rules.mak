@@ -32,21 +32,8 @@ DEPS_rav1e += vendor-rav1e $(DEPS_vendor-rav1e) cargo-c $(DEPS_cargo-c)
 
 # vendor-rav1e
 
-rav1e-vendor-build:
-	$(RM) -R $@
-	mkdir -p $@
-	tar xzfo $(TARBALLS)/rav1e-$(RAV1E_VERSION).tar.gz -C $@ --strip-components=1
-	cd $@ && $(CARGO_NATIVE) vendor --locked rav1e-$(RAV1E_VERSION)-vendor
-	cd $@ && tar -jcf rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 rav1e-$(RAV1E_VERSION)-vendor
-	install $@/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 "$(TARBALLS)"
-	# cd $@ && sha512sum rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 > SHA512SUMS
-	# install $@/SHA512SUMS $(SRC)/rav1e-vendor/SHA512SUMS
-	$(RM) -R $@
-
 $(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e .rustc
-	-$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e)
-	# if the vendor tarball doesn't exist yet, we build it
-	if test ! -s "$@"; then $(RM) -R rav1e-vendor-build; $(MAKE) rav1e-vendor-build; fi
+	$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e,rav1e-$(RAV1E_VERSION).tar.gz)
 
 .sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
 

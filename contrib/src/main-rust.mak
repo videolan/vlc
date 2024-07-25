@@ -96,9 +96,18 @@ CARGOC_INSTALL = $(CARGO) capi install $(CARGO_INSTALL_ARGS)
 
 download_vendor = \
 	$(call download,$(CONTRIB_VIDEOLAN)/$(2)/$(1)) || (\
-               echo "" && \
-               echo "WARNING: cargo vendor archive for $(1) not found" && \
-               echo "" && \
+               rm $@; \
+               $(RM) -R vendor-$(2)-build; \
+               mkdir -p vendor-$(2)-build && \
+               tar xzfo $(TARBALLS)/$(3) -C vendor-$(2)-build --strip-components=1 && \
+               cd vendor-$(2)-build && \
+               $(CARGO_NATIVE) vendor --locked $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
+               find $(patsubst %.tar,%,$(basename $(notdir $(1)))) -exec touch -r Cargo.toml {} \; && \
+               tar -jcf $(1) $(patsubst %.tar,%,$(basename $(notdir $(1)))) && \
+               cd .. && \
+               install vendor-$(2)-build/$(1) "$(TARBALLS)" && \
+               $(RM) -R vendor-$(2)-build && \
+               touch $@) || (\
                rm $@);
 
 .sum-vendor-%: $(SRC)/%/vendor-SHA512SUMS
