@@ -6,7 +6,7 @@ RAV1E_URL := https://crates.io/api/v1/crates/rav1e/$(RAV1E_VERSION)/download
 ifdef BUILD_RUST
 ifdef BUILD_ENCODERS
 PKGS += rav1e
-PKGS_ALL += rav1e-vendor
+PKGS_ALL += vendor-rav1e
 endif
 endif
 
@@ -27,10 +27,10 @@ DEPS_rav1e = rustc-cross $(DEPS_rustc-cross)
 else
 DEPS_rav1e = rustc $(DEPS_rustc)
 endif
-DEPS_rav1e-vendor = rustc $(DEPS_rustc)
-DEPS_rav1e += rav1e-vendor $(DEPS_rav1e-vendor) cargo-c $(DEPS_cargo-c)
+DEPS_vendor-rav1e = rustc $(DEPS_rustc)
+DEPS_rav1e += vendor-rav1e $(DEPS_vendor-rav1e) cargo-c $(DEPS_cargo-c)
 
-# rav1e-vendor
+# vendor-rav1e
 
 rav1e-vendor-build:
 	$(RM) -R $@
@@ -48,14 +48,17 @@ $(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e .rustc
 	# if the vendor tarball doesn't exist yet, we build it
 	if test ! -s "$@"; then $(RM) -R rav1e-vendor-build; $(MAKE) rav1e-vendor-build; fi
 
-.sum-rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
+.sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
+
+.sum-vendor-rav1e: $(SRC)/rav1e/vendor-SHA512SUMS
+	$(call checksum,$(SHA512SUM),vendor-SHA512,.sum-vendor-)
 	touch $@
 
-rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-rav1e-vendor
+rav1e-vendor: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2 .sum-vendor-rav1e
 	$(UNPACK)
 	$(MOVE)
 
-.rav1e-vendor: rav1e-vendor
+.vendor-rav1e: rav1e-vendor
 	touch $@
 
 # rav1e
