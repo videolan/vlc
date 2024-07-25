@@ -54,9 +54,6 @@ ifdef HAVE_DARWIN_OS
 ifeq ($(ARCH),x86_64)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=yes
 endif
-endif
-ifdef HAVE_MACOSX
-GCRYPT_CONF += --disable-aesni-support
 else
 ifdef HAVE_BSD
 GCRYPT_CONF += --disable-asm --disable-aesni-support
