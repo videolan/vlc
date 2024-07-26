@@ -47,6 +47,379 @@
 
 #include "../../codec/vt_utils.h"
 
+#import <VideoToolbox/VideoToolbox.h>
+
+#if __is_target_os(ios)
+#define IS_VT_ROTATION_API_AVAILABLE __IPHONE_OS_VERSION_MAX_ALLOWED >= 160000
+#elif __is_target_os(macos)
+#define IS_VT_ROTATION_API_AVAILABLE __MAC_OS_X_VERSION_MAX_ALLOWED >= 130000
+#elif __is_target_os(tvos)
+#define IS_VT_ROTATION_API_AVAILABLE __TV_OS_VERSION_MAX_ALLOWED >= 160000
+#elif __is_target_os(visionos)
+#define IS_VT_ROTATION_API_AVAILABLE __VISION_OS_VERSION_MAX_ALLOWED >= 10000
+#endif
+
+typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelRotation) {
+    kVLCSampleBufferPixelRotation_0 = 0,
+    kVLCSampleBufferPixelRotation_90CW,
+    kVLCSampleBufferPixelRotation_180,
+    kVLCSampleBufferPixelRotation_90CCW,
+};
+
+typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
+    kVLCSampleBufferPixelFlip_None = 0,
+    kVLCSampleBufferPixelFlip_H = 1 << 0,
+    kVLCSampleBufferPixelFlip_V = 1 << 1,
+};
+
+#pragma mark - VLCRotatedPixelBufferProvider
+
+@interface VLCRotatedPixelBufferProvider : NSObject
+- (CVPixelBufferRef)provideFromBuffer:(CVPixelBufferRef)pixelBuffer
+                             rotation:(VLCSampleBufferPixelRotation)rotation;
+@end
+
+@implementation VLCRotatedPixelBufferProvider
+{
+    CVPixelBufferPoolRef _rotationPool;
+}
+
+- (BOOL)_validateRotationPoolWithBuffer:(CVPixelBufferRef)pixelBuffer
+                               rotation:(VLCSampleBufferPixelRotation)rotation
+{
+    if (!_rotationPool)
+        return NO;
+
+    uint32_t poolWidth, poolHeigth, bufferWidth, bufferHeight;
+
+    bufferWidth = (uint32_t)CVPixelBufferGetWidth(pixelBuffer);
+    bufferHeight = (uint32_t)CVPixelBufferGetHeight(pixelBuffer);
+    if (rotation == kVLCSampleBufferPixelRotation_90CW || rotation == kVLCSampleBufferPixelRotation_90CCW)
+    {
+        uint32_t swap = bufferWidth;
+        bufferWidth = bufferHeight;
+        bufferHeight = swap;
+    }
+
+    CFDictionaryRef poolAttr = CVPixelBufferPoolGetPixelBufferAttributes(_rotationPool);
+    if (!poolAttr) {
+        return NO;
+    }
+    CFTypeRef value;
+    value = CFDictionaryGetValue(poolAttr, kCVPixelBufferWidthKey);
+    if (!value || CFGetTypeID(value) != CFNumberGetTypeID()
+        || !CFNumberGetValue(value, kCFNumberIntType, &poolWidth)
+        || poolWidth != bufferWidth) 
+    {
+        return NO;
+    }
+
+    value = CFDictionaryGetValue(poolAttr, kCVPixelBufferHeightKey);
+    if (!value || CFGetTypeID(value) != CFNumberGetTypeID() 
+        || !CFNumberGetValue(value, kCFNumberIntType, &poolHeigth)
+        || poolHeigth != bufferHeight)
+    {
+        return NO;
+    }
+
+    return YES;
+}
+
+- (CVPixelBufferRef)provideFromBuffer:(CVPixelBufferRef)pixelBuffer
+                             rotation:(VLCSampleBufferPixelRotation)rotation
+{
+    if (![self _validateRotationPoolWithBuffer:pixelBuffer rotation:rotation])
+        CVPixelBufferPoolRelease(_rotationPool);
+
+    if (!_rotationPool) {
+        bool rotated = rotation == kVLCSampleBufferPixelRotation_90CW || rotation == kVLCSampleBufferPixelRotation_90CCW;
+        uint32_t srcWidth = CVPixelBufferGetWidth(pixelBuffer);
+        uint32_t srcHeight = CVPixelBufferGetHeight(pixelBuffer);
+        uint32_t dstWidth = rotated ? srcHeight : srcWidth;
+        uint32_t dstHeight = rotated ? srcWidth : srcHeight;
+#if TARGET_OS_VISION
+        const int numValues = 5;
+#else
+        const int numValues = 6;
+#endif
+        CFTypeRef keys[numValues] = {
+            kCVPixelBufferPixelFormatTypeKey,
+            kCVPixelBufferWidthKey,
+            kCVPixelBufferHeightKey,
+            kCVPixelBufferIOSurfacePropertiesKey,
+            kCVPixelBufferMetalCompatibilityKey,
+#if TARGET_OS_OSX
+            kCVPixelBufferOpenGLCompatibilityKey,
+#elif !TARGET_OS_VISION
+            kCVPixelBufferOpenGLESCompatibilityKey,
+#endif
+        };
+
+        CFTypeRef values[numValues] = {
+            (__bridge CFNumberRef)(@(CVPixelBufferGetPixelFormatType(pixelBuffer))),
+            (__bridge CFNumberRef)(@(dstWidth)),
+            (__bridge CFNumberRef)(@(dstHeight)),
+            (__bridge CFDictionaryRef)@{},
+            kCFBooleanTrue,
+#if !TARGET_OS_VISION
+            kCFBooleanTrue
+#endif
+        };
+
+        CFDictionaryRef poolAttr = CFDictionaryCreate(NULL, keys, values, numValues, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+
+        OSStatus status = CVPixelBufferPoolCreate(NULL, NULL, poolAttr, &_rotationPool);
+        CFRelease(poolAttr);
+        if (status != noErr)
+            return NULL;
+    }
+
+    CVPixelBufferRef rotated;
+    OSStatus status = CVPixelBufferPoolCreatePixelBuffer(NULL, _rotationPool, &rotated);
+    if (status != noErr) {
+        return NULL;
+    }
+    CFDictionaryRef attachments;
+    if (@available(iOS 15.0, tvOS 15.0, macOS 12.0, *)) {
+        attachments = CVBufferCopyAttachments(pixelBuffer, kCVAttachmentMode_ShouldPropagate);
+    } else {
+        attachments = CVBufferGetAttachments(pixelBuffer, kCVAttachmentMode_ShouldPropagate);
+    }
+    CVBufferSetAttachments(rotated, attachments, kCVAttachmentMode_ShouldPropagate);
+    if (@available(iOS 15.0, tvOS 15.0, macOS 12.0, *)) {
+        CFRelease(attachments);
+    }
+    return rotated;
+}
+
+- (void)dealloc
+{
+    CVPixelBufferPoolRelease(_rotationPool);
+}
+@end
+
+#pragma mark - VLCPixelBufferRotationContext
+
+@protocol VLCPixelBufferRotationContext
+@property(nonatomic) VLCSampleBufferPixelRotation rotation;
+@property(nonatomic) VLCSampleBufferPixelFlip flip;
+- (CVPixelBufferRef)rotate:(CVPixelBufferRef)pixelBuffer;
+@end
+
+#pragma mark - VLCPixelBufferRotationContextVT
+
+#if IS_VT_ROTATION_API_AVAILABLE
+
+@interface VLCPixelBufferRotationContextVT : NSObject <VLCPixelBufferRotationContext>
+
+@end
+
+@implementation VLCPixelBufferRotationContextVT
+{
+    VLCRotatedPixelBufferProvider *_bufferProvider;
+    VTPixelRotationSessionRef _rotationSession;
+}
+
+@synthesize rotation = _rotation, flip = _flip;
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
+            OSStatus status = VTPixelRotationSessionCreate(NULL, &_rotationSession);
+            if (status != noErr)
+                return nil;
+        } else {
+            return nil;
+        }
+    }
+    return self;
+}
+
+- (void)setRotation:(VLCSampleBufferPixelRotation)rotation {
+    if (_rotation == rotation)
+        return;
+    _rotation = rotation;
+    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
+        switch (rotation) {
+            case kVLCSampleBufferPixelRotation_90CW:
+                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CW90);
+                break;
+            case kVLCSampleBufferPixelRotation_180:
+                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_180);
+                break;
+            case kVLCSampleBufferPixelRotation_90CCW:
+                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CCW90);
+                break;
+            case kVLCSampleBufferPixelRotation_0:
+            default:
+                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_0);
+                break;
+        }
+    }
+}
+
+- (void)setFlip:(VLCSampleBufferPixelFlip)flip {
+    if (_flip == flip)
+        return;
+    _flip = flip;
+    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
+        VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipHorizontalOrientation, flip & kVLCSampleBufferPixelFlip_H ? kCFBooleanTrue : kCFBooleanFalse);
+        VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipVerticalOrientation, flip & kVLCSampleBufferPixelFlip_V ? kCFBooleanTrue : kCFBooleanFalse);
+    }
+}
+
+- (CVPixelBufferRef)rotate:(CVPixelBufferRef)pixelBuffer {
+    if (!_bufferProvider)
+        _bufferProvider = [VLCRotatedPixelBufferProvider new];
+
+    CVPixelBufferRef rotated;
+    rotated = [_bufferProvider provideFromBuffer:pixelBuffer rotation:_rotation];
+    if (!rotated)
+        return NULL;
+
+    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
+        OSStatus status = VTPixelRotationSessionRotateImage(_rotationSession, pixelBuffer, rotated);
+        if (status != noErr) {
+            CFRelease(rotated);
+            return NULL;
+        }
+    } else {
+        CFRelease(rotated);
+        return NULL;
+    }
+
+    return rotated;
+}
+
+- (void)dealloc
+{
+    if (_rotationSession)
+    {
+        if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
+            VTPixelRotationSessionInvalidate(_rotationSession);
+        }
+        CFRelease(_rotationSession);
+    }
+}
+
+@end
+
+#endif // IS_VT_ROTATION_API_AVAILABLE
+
+#pragma mark - VLCPixelBufferRotationContextCI
+
+@interface VLCPixelBufferRotationContextCI : NSObject <VLCPixelBufferRotationContext>
+
+@end
+
+@implementation VLCPixelBufferRotationContextCI
+{
+    VLCRotatedPixelBufferProvider *_bufferProvider;
+    CIContext *_rotationContext;
+    CGImagePropertyOrientation _orientation;
+}
+
+@synthesize rotation = _rotation, flip = _flip;
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _rotationContext = [[CIContext alloc] initWithOptions:nil];
+        if (!_rotationContext)
+            return nil;
+    }
+    return self;
+}
+
+- (void)_updateOrientation {
+    switch (_rotation) {
+        case kVLCSampleBufferPixelRotation_90CW:
+        {
+            if (_flip == kVLCSampleBufferPixelFlip_None)
+                _orientation = kCGImagePropertyOrientationRight;
+            if (_flip == kVLCSampleBufferPixelFlip_H)
+                _orientation = kCGImagePropertyOrientationLeftMirrored;
+            if (_flip == kVLCSampleBufferPixelFlip_V)
+                _orientation = kCGImagePropertyOrientationRightMirrored;
+            if (_flip == (kVLCSampleBufferPixelFlip_H | kVLCSampleBufferPixelFlip_V))
+                _orientation = kCGImagePropertyOrientationLeft;
+            break;
+        }
+        case kVLCSampleBufferPixelRotation_180:
+        {
+            if (_flip == kVLCSampleBufferPixelFlip_None)
+                _orientation = kCGImagePropertyOrientationDown;
+            if (_flip == kVLCSampleBufferPixelFlip_H)
+                _orientation = kCGImagePropertyOrientationDownMirrored;
+            if (_flip == kVLCSampleBufferPixelFlip_V)
+                _orientation = kCGImagePropertyOrientationUpMirrored;
+            if (_flip == (kVLCSampleBufferPixelFlip_H | kVLCSampleBufferPixelFlip_V))
+                _orientation = kCGImagePropertyOrientationUp;
+            break;
+        }
+        case kVLCSampleBufferPixelRotation_90CCW:
+        {
+            if (_flip == kVLCSampleBufferPixelFlip_None)
+                _orientation = kCGImagePropertyOrientationLeft;
+            if (_flip == kVLCSampleBufferPixelFlip_H)
+                _orientation = kCGImagePropertyOrientationRightMirrored;
+            if (_flip == kVLCSampleBufferPixelFlip_V)
+                _orientation = kCGImagePropertyOrientationLeftMirrored;
+            if (_flip == (kVLCSampleBufferPixelFlip_H | kVLCSampleBufferPixelFlip_V))
+                _orientation = kCGImagePropertyOrientationRight;
+            break;
+        }
+        case kVLCSampleBufferPixelRotation_0:
+        default:
+        {
+            if (_flip == kVLCSampleBufferPixelFlip_None)
+                _orientation = kCGImagePropertyOrientationUp;
+            if (_flip == kVLCSampleBufferPixelFlip_H)
+                _orientation = kCGImagePropertyOrientationUpMirrored;
+            if (_flip == kVLCSampleBufferPixelFlip_V)
+                _orientation = kCGImagePropertyOrientationDownMirrored;
+            if (_flip == (kVLCSampleBufferPixelFlip_H | kVLCSampleBufferPixelFlip_V))
+                _orientation = kCGImagePropertyOrientationDown;
+            break;
+        }
+    }
+}
+
+- (void)setRotation:(VLCSampleBufferPixelRotation)rotation {
+    if (_rotation == rotation)
+        return;
+    _rotation = rotation;
+    [self _updateOrientation];
+}
+
+- (void)setFlip:(VLCSampleBufferPixelFlip)flip {
+    if (_flip == flip)
+        return;
+    _flip = flip;
+    [self _updateOrientation];
+}
+
+- (CVPixelBufferRef)rotate:(CVPixelBufferRef)pixelBuffer {
+    if (!_bufferProvider)
+        _bufferProvider = [VLCRotatedPixelBufferProvider new];
+
+    CVPixelBufferRef rotated;
+    rotated = [_bufferProvider provideFromBuffer:pixelBuffer rotation:_rotation];
+    if (!rotated)
+        return NULL;
+
+    CIImage *image = [[CIImage alloc] initWithCVPixelBuffer:pixelBuffer];
+    image = [image imageByApplyingOrientation:_orientation];
+    [_rotationContext render:image toCVPixelBuffer:rotated];
+    
+    return rotated;
+}
+
+@end
+
 static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
 {
     VLC_UNUSED(o);
@@ -298,9 +671,23 @@ shouldInheritContentsScale:(CGFloat)newScale
     @property (nonatomic) AVSampleBufferDisplayLayer *displayLayer;
     @property (nonatomic) VLCSampleBufferSubpictureView *spuView;
     @property (nonatomic) VLCSampleBufferSubpicture *subpicture;
+    @property (nonatomic) id<VLCPixelBufferRotationContext> rotationContext;
 @end
 
 @implementation VLCSampleBufferDisplay
+
+- (id<VLCPixelBufferRotationContext>)rotationContext
+{
+    if (_rotationContext)
+        return _rotationContext;
+#if IS_VT_ROTATION_API_AVAILABLE
+    _rotationContext = [VLCPixelBufferRotationContextVT new];
+#endif
+    if (!_rotationContext)
+        _rotationContext = [VLCPixelBufferRotationContextCI new];
+    return _rotationContext;
+}
+
 @end
 
 #pragma mark -
@@ -326,6 +713,40 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
 
+    switch (vd->fmt->orientation) {
+    case ORIENT_HFLIPPED:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_H;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_0;
+        break;
+    case ORIENT_VFLIPPED:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_V;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_0;
+        break;
+    case ORIENT_ROTATED_90:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_None;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CW;
+        break;
+    case ORIENT_ROTATED_180:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_None;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_180;
+        break;
+    case ORIENT_ROTATED_270:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_None;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CCW;
+        break;
+    case ORIENT_TRANSPOSED:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_V;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CW;
+        break;
+    case ORIENT_ANTI_TRANSPOSED:
+        sys.rotationContext.flip = kVLCSampleBufferPixelFlip_H;
+        sys.rotationContext.rotation = kVLCSampleBufferPixelRotation_90CW;
+    case ORIENT_NORMAL:
+    default:
+        sys.rotationContext = nil;
+        break;
+    }
+
     @synchronized(sys.displayLayer) {
         if (sys.displayLayer == nil)
             return;
@@ -344,10 +765,17 @@ static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
 
     if (pixelBuffer == NULL) {
         msg_Err(vd, "No pixelBuffer ref attached to pic!");
-        CVPixelBufferRelease(pixelBuffer);
         return;
     }
-
+    
+    if (vd->fmt->orientation != ORIENT_NORMAL) {
+        CVPixelBufferRef rotated = [sys.rotationContext rotate:pixelBuffer];
+        if (rotated) {
+            CVPixelBufferRelease(pixelBuffer);
+            pixelBuffer = rotated;
+        }
+    }
+    
     id aspectRatio = @{
         (__bridge NSString*)kCVImageBufferPixelAspectRatioHorizontalSpacingKey:
             @(vd->source->i_sar_num),

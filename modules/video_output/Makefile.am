@@ -79,10 +79,10 @@ libsamplebufferdisplay_plugin_la_SOURCES = video_output/apple/VLCSampleBufferDis
 libsamplebufferdisplay_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 if HAVE_OSX
 libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,AVFoundation,-framework,AVKit,-framework,Cocoa,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo
+	-Wl,-framework,AVFoundation,-framework,AVKit,-framework,Cocoa,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo,-framework,VideoToolbox
 else
 libsamplebufferdisplay_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo
+	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,CoreMedia,-framework,QuartzCore,-framework,CoreGraphics,-framework,CoreVideo,-framework,VideoToolbox
 endif
 vout_LTLIBRARIES += libsamplebufferdisplay_plugin.la
 endif
