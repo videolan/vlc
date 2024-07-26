@@ -767,37 +767,6 @@ static void *Thread( void *obj )
 
     auto vlcQtMessageHandler = VlcQtMessageHandlerRegisterer{VLC_OBJECT(p_intf)};
 
-    {
-        QString filterRules;
-
-        const int verbosity = var_InheritInteger(p_intf, "verbose");
-        if (verbosity < VLC_MSG_DBG)
-        {
-            filterRules += QStringLiteral("*.debug=false\n");
-            if (verbosity < VLC_MSG_WARN)
-            {
-                filterRules += QStringLiteral("*.warning=false\n");
-                if (verbosity < VLC_MSG_ERR)
-                {
-                    filterRules += QStringLiteral("*.critical=false\n");
-                    if (verbosity < VLC_MSG_INFO)
-                    {
-                        filterRules += QStringLiteral("*.info=false\n");
-                    }
-                }
-            }
-        }
-
-        if (var_InheritBool(p_intf, "qt-verbose"))
-        {
-            filterRules += QStringLiteral("*=true\n" /* Qt by default does not enable some info and error messages */
-                                          "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
-                                          "qt.widgets.painting=false\n" /* Not necessary */);
-        }
-
-        QLoggingCategory::setFilterRules(filterRules);
-    }
-
     char vlc_name[] = "vlc"; /* for WM_CLASS */
     char *argv[3] = { nullptr };
     int argc = 0;
