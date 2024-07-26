@@ -85,6 +85,7 @@ extern "C" char **environ;
 #include "util/vlctick.hpp"
 #include "util/shared_input_item.hpp"
 #include "util/model_recovery_agent.hpp"
+#include "util/vlcqtmessagehandler.hpp"
 #include "network/networkmediamodel.hpp"
 #include "network/devicesourceprovider.hpp"
 #include "playlist/playlist_common.hpp"
@@ -763,6 +764,8 @@ static inline void registerMetaTypes()
 static void *Thread( void *obj )
 {
     qt_intf_t *p_intf = (qt_intf_t *)obj;
+
+    auto vlcQtMessageHandler = VlcQtMessageHandlerRegisterer{VLC_OBJECT(p_intf)};
 
     {
         QString filterRules;
