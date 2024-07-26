@@ -211,7 +211,14 @@ BUILDLDFLAGS ?= $(BUILDCFLAGS)
 # Do not export variables above! Use HOSTVARS or BUILDVARS.
 
 ifdef HAVE_WIN32
-ifneq ($(call cppcheck, _UCRT),)
+define UCRT_HEADER_CHECK :=
+#include <crtdefs.h> \n
+#if defined(_UCRT) || (__MSVCRT_VERSION__ >= 0x1400) || (__MSVCRT_VERSION__ >= 0xE00 && __MSVCRT_VERSION__ < 0x1000) \n
+# undef _UCRT \n
+# define _UCRT \n
+#endif \n
+endef
+ifneq ($(call cppcheck, _UCRT, $(UCRT_HEADER_CHECK)),)
 HAVE_UCRT = 1
 endif
 endif
