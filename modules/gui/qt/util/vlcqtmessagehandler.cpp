@@ -29,6 +29,7 @@
 #include <vlc_common.h>
 
 static vlc_object_t* g_intf = nullptr;
+static bool g_logQtMessages = false;
 static QtMessageHandler g_defaultMessageHandler = nullptr;
 
 static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -38,7 +39,8 @@ static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &contex
     //"default" is for qDebug(), most of our code logs using msg_Dbg but some parts will use qDebug,
     //usually when they don't have access to the vlc_object. Qt itself uses categorised logger so it
     //should be safe to assume that the default logger is only used by us.
-    if (qstrcmp(context.category, "default") == 0
+    if (g_logQtMessages
+        || qstrcmp(context.category, "default") == 0
         || qstrcmp(context.category, "qml") == 0
         || qstrcmp(context.category, "js") == 0)
     {
@@ -72,40 +74,24 @@ static void vlcQtMessageHandler(QtMsgType type, const QMessageLogContext &contex
     }
 };
 
-
 void setupVlcQtMessageHandler(vlc_object_t* p_intf)
 {
     assert(g_intf == nullptr);
     assert(p_intf != nullptr);
 
     g_intf = p_intf;
+    g_logQtMessages = var_InheritBool(p_intf, "qt-verbose");
+
     g_defaultMessageHandler = qInstallMessageHandler(vlcQtMessageHandler);
+    qSetMessagePattern("[qt] (%{category}) %{message}");
 
     QString filterRules;
 
-    const int verbosity = var_InheritInteger(p_intf, "verbose");
-    if (verbosity < VLC_MSG_DBG)
+    if (g_logQtMessages)
     {
-        filterRules += QStringLiteral("*.debug=false\n");
-        if (verbosity < VLC_MSG_WARN)
-        {
-            filterRules += QStringLiteral("*.warning=false\n");
-            if (verbosity < VLC_MSG_ERR)
-            {
-                filterRules += QStringLiteral("*.critical=false\n");
-                if (verbosity < VLC_MSG_INFO)
-                {
-                    filterRules += QStringLiteral("*.info=false\n");
-                }
-            }
-        }
-    }
-
-    if (var_InheritBool(p_intf, "qt-verbose"))
-    {
-        filterRules += QStringLiteral("*=true\n" /* Qt by default does not enable some info and error messages */
-                                      "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
-                                      "qt.widgets.painting=false\n" /* Not necessary */);
+        filterRules = QStringLiteral("*=true\n"
+                                    "qt.*.debug=false\n" /* Qt's own debug messages are way too much verbose */
+                                    "qt.widgets.painting=false\n" /* Not necessary */);
     }
 
     QLoggingCategory::setFilterRules(filterRules);
