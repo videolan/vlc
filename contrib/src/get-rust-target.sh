@@ -105,6 +105,11 @@ case $OS in
     if test ! -z "$UWP"; then
       abort_err "UWP Windows is Tier 3"
     fi
+    case $ARCH in
+      armv7)
+        abort_err "ARMv7 Windows not supported by Rust"
+        ;;
+    esac
     if test ! -z "$UCRT"; then
       return_triplet $ARCH-pc-windows-gnullvm
     else
