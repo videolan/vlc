@@ -745,14 +745,15 @@ NSString * const value_##prop =                                                 
     PERFORM_ACTION_PER_INPUTITEM_PROP(CREATE_DIFFER_BOOL);
     PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(CREATE_PROP_VAR);
     // Since artworkURL is a URL, we have to handle it differently
-    NSURL * const firstItem_artworkURL = firstInputItem.artworkURL;
+    NSString * const firstItem_artworkURL = firstInputItem.artworkURL.absoluteString;
 
     // Skip first item
     for (uint i = 1; i < inputItems.count; ++i) {
         VLCInputItem * const inputItem = inputItems[i];
 
         PERFORM_ACTION_PER_INPUTITEM_NSSTRING_PROP(UPDATE_IF_DIFFERING_BOOL);
-        differing_artworkURL = differing_artworkURL || ![inputItem.artworkURL.absoluteString isEqualToString:firstItem_artworkURL.absoluteString];
+        NSString * const inputItem_artworkURL = inputItem.artworkURL.absoluteString;
+        differing_artworkURL |= ![inputItem_artworkURL isEqualToString:firstItem_artworkURL];
     }
 
     PERFORM_ACTION_PER_INPUTITEM_PROP(ADD_PROP_TO_DICT);
