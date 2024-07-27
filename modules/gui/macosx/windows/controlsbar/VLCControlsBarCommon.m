@@ -344,7 +344,6 @@
         [_playerController setVolume:[sender floatValue]];
     } else if (sender == self.muteVolumeButton) {
         [_playerController toggleMute];
-        [self updateMuteVolumeButtonImage];
     }
 }
 
