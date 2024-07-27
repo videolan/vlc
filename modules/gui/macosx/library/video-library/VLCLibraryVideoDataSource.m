@@ -346,7 +346,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 return _libraryArray.count;
             default:
-                NSAssert(1, @"Reached unreachable case for video library section");
+                NSAssert(NO, @"Reached unreachable case for video library section");
                 break;
         }
     }
@@ -370,7 +370,7 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
                 return _libraryArray[row];
             default:
-                NSAssert(1, @"Reached unreachable case for video library section");
+                NSAssert(NO, @"Reached unreachable case for video library section");
                 break;
         }
     }
