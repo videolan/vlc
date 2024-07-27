@@ -429,15 +429,15 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 - (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
                                                      forCollectionView:(NSCollectionView *)collectionView
 {
-    NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems = 
+    NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems =
         [NSMutableArray arrayWithCapacity:indexPaths.count];
-    
+
     for (NSIndexPath * const indexPath in indexPaths) {
-        const id<VLCMediaLibraryItemProtocol> libraryItem = 
+        const VLCMediaLibraryParentGroupType parentType = [self rowToVideoGroup:indexPath.section];
+        const id<VLCMediaLibraryItemProtocol> libraryItem =
             [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-        VLCLibraryRepresentedItem * const representedItem = 
-            [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem 
-                                                 parentType:self.currentParentType];
+        VLCLibraryRepresentedItem * const representedItem =
+            [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:parentType];
         [representedItems addObject:representedItem];
     }
 
@@ -479,9 +479,13 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
      itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
 {
-    VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const VLCMediaLibraryParentGroupType parentType = [self rowToVideoGroup:indexPath.section];
+    const id<VLCMediaLibraryItemProtocol> item =
+        [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:parentType];
     viewItem.representedItem = representedItem;
     return viewItem;
 }
