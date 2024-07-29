@@ -75,7 +75,7 @@ QtObject {
         const entry = controlList.find( function(e) { return ( e.id === id ) } )
 
         if (entry === undefined) {
-            console.log("control delegate id " + id +  " doesn't exist")
+            console.warn("control delegate id " + id +  " doesn't exist")
             return { source: controlPath + "Fallback.qml" }
         }
 
