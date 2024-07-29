@@ -43,6 +43,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment]
     ];
 }
 
