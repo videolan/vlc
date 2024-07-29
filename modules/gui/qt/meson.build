@@ -783,7 +783,7 @@ qml_modules += {
     'outdir' : 'VLC/Util',
     'sources': files(
         'util/qml/ModelSortSettingHandler.qml',
-        'util/qml/FlickableScrollHandler.qml',
+        'util/qml/DefaultFlickableScrollHandler.qml',
         'util/qml/ViewDragAutoScrollHandler.qml',
         'util/qml/FSM.qml',
         'util/qml/FSMState.qml',

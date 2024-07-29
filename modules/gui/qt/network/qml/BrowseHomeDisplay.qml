@@ -145,7 +145,7 @@ FocusScope {
         contentWidth: column.width
         contentHeight: column.height
 
-        FlickableScrollHandler { }
+        DefaultFlickableScrollHandler { }
 
         Navigation.parentItem: root
 

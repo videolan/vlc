@@ -795,7 +795,7 @@ FocusScope {
             }
         }
 
-        FlickableScrollHandler { }
+        DefaultFlickableScrollHandler { }
 
         Loader {
             id: headerItemLoader

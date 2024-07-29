@@ -96,7 +96,7 @@ ListView {
         colorSet: ColorContext.View
     }
 
-    FlickableScrollHandler {
+    DefaultFlickableScrollHandler {
         fallbackScroll: true
         enabled: true
     }

@@ -60,7 +60,7 @@ GridView {
         preventStealing: true
     }
 
-    FlickableScrollHandler { }
+    DefaultFlickableScrollHandler { }
 
     DropArea {
         id: dropArea

@@ -285,7 +285,7 @@ ListView {
         }
     }
 
-    FlickableScrollHandler { }
+    DefaultFlickableScrollHandler { }
 
     // FIXME: This is probably not useful anymore.
     Connections {

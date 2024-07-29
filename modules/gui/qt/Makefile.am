@@ -1122,7 +1122,7 @@ libqml_module_util_a_CXXFLAGS = $(libqt_plugin_la_CXXFLAGS)
 libqml_module_util_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_util_a_QML = \
 	util/qml/ModelSortSettingHandler.qml \
-	util/qml/FlickableScrollHandler.qml \
+	util/qml/DefaultFlickableScrollHandler.qml \
 	util/qml/ViewDragAutoScrollHandler.qml \
 	util/qml/FSM.qml \
 	util/qml/FSMState.qml \
