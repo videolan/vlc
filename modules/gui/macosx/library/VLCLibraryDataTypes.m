@@ -747,6 +747,23 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryGroup
 
+@synthesize libraryID = _libraryID;
+@synthesize smallArtworkGenerated = _smallArtworkGenerated;
+@synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize displayString = _displayString;
+@synthesize durationString = _durationString;
+@synthesize primaryDetailString = _primaryDetailString;
+@synthesize secondaryDetailString = _secondaryDetailString;
+@synthesize primaryActionableDetail = _primaryActionableDetail;
+@synthesize secondaryActionableDetail = _secondaryActionableDetail;
+@synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
+@synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
+
+- (VLCMediaLibraryMediaItem *)firstMediaItem
+{
+    return self.mediaItems.firstObject;
+}
+
 - (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
 {
     if (self.numberOfTotalItems == 0) {
