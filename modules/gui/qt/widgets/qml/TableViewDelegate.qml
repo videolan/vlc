@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
 
-
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
