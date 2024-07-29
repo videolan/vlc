@@ -30,6 +30,8 @@
 #import "library/media-source/VLCMediaSource.h"
 #import "library/media-source/VLCMediaSourceProvider.h"
 
+#import "main/VLCMain.h"
+
 NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLocationsChanged";
 
@@ -119,6 +121,34 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         }
 
         return bookmarkedLocationNodes.copy;
+    } else if (self.segmentType == VLCLibraryGroupsSegment) {
+        vlc_medialibrary_t * const libraryInstance = vlc_ml_instance_get(getIntf());
+        const vlc_ml_query_params_t queryParameters = vlc_ml_query_params_create();
+        const size_t groupCount = vlc_ml_count_groups(libraryInstance, &queryParameters);
+        if (groupCount == 0) {
+            return nil;
+        }
+
+        vlc_ml_group_list_t * const vlc_groups =
+            vlc_ml_list_groups(libraryInstance, &queryParameters);
+        if (vlc_groups == NULL) {
+            return nil;
+        }
+
+        NSMutableArray<VLCLibrarySegment *> * const groupNodes =
+            [NSMutableArray arrayWithCapacity:groupCount];
+
+        for (size_t i = 0; i < vlc_groups->i_nb_items; i++) {
+            VLCMediaLibraryGroup * const group =
+                [[VLCMediaLibraryGroup alloc] initWithGroup:&vlc_groups->p_items[i]];
+            VLCLibrarySegment * const node =
+                [VLCLibrarySegment treeNodeWithRepresentedObject:group];
+            [groupNodes addObject:node];
+        }
+
+        vlc_ml_release(vlc_groups);
+
+        return groupNodes.copy;
     }
 
     return nil;
