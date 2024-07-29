@@ -138,6 +138,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     } else if (segmentType >= VLCLibraryBrowseSegment &&
                segmentType <= VLCLibraryBrowseBookmarkedLocationSubSegment) {
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryBrowseSegment]];
+    } else if (segmentType == VLCLibraryGroupsGroupSubSegment) {
+        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryGroupsSegment]];
     }
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:segmentType];
