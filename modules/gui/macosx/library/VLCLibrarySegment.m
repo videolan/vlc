@@ -67,6 +67,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         VLCLibrarySegmentBookmarkedLocation * const descriptor =
             (VLCLibrarySegmentBookmarkedLocation *)modelObject;
         segmentValue = descriptor.segmentType;
+    } else if ([modelObject isKindOfClass:VLCMediaLibraryGroup.class]) {
+        segmentValue = VLCLibraryGroupsGroupSubSegment;
     }
 
     NSAssert(segmentValue > VLCLibraryLowSentinelSegment &&
@@ -280,6 +282,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         VLCLibrarySegmentBookmarkedLocation * const descriptor =
             (VLCLibrarySegmentBookmarkedLocation *)self.representedObject;
         _displayString = descriptor.name;
+    } else if ([self.representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
+        VLCMediaLibraryGroup * const group = (VLCMediaLibraryGroup *)self.representedObject;
+        _displayString = group.displayString;
     } else {
         _displayString = [self displayStringForType:_segmentType];
     }
