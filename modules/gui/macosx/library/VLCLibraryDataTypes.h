@@ -232,6 +232,8 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @interface VLCMediaLibraryGroup : NSObject<VLCMediaLibraryItemProtocol>
 
+- (instancetype)initWithGroup:(struct vlc_ml_group_t *)p_group;
+
 @property (readonly) NSString *name;
 @property (readonly) NSUInteger numberOfTotalItems;
 @property (readonly) NSUInteger numberOfVideoItems;

@@ -759,6 +759,31 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
+- (instancetype)initWithGroup:(struct vlc_ml_group_t *)p_group
+{
+    NSParameterAssert(p_group != NULL);
+    self = [super init];
+    if (self) {
+        _libraryID = p_group->i_id;
+        _name = toNSStr(p_group->psz_name);
+        _numberOfTotalItems = p_group->i_nb_total_media;
+        _numberOfVideoItems = p_group->i_nb_video;
+        _numberOfAudioItems = p_group->i_nb_audio;
+        _numberOfUnknownItems = p_group->i_nb_unknown;
+        _numberOfPresentTotalItems = p_group->i_nb_present_media;
+        _numberOfPresentVideoItems = p_group->i_nb_present_video;
+        _numberOfPresentAudioItems = p_group->i_nb_present_audio;
+        _numberOfPresentUnknownItems = p_group->i_nb_present_unknown;
+        _numberOfSeenItems = p_group->i_nb_seen;
+        _numberOfPresentSeenItems = p_group->i_nb_present_seen;
+        _duration = p_group->i_duration;
+        _creationDate = [NSDate dateWithTimeIntervalSince1970:p_group->i_creation_date];
+        _lastModificationDate =
+            [NSDate dateWithTimeIntervalSince1970:p_group->i_last_modification_date];
+    }
+    return self;
+}
+
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
     return self.mediaItems.firstObject;
