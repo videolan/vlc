@@ -784,6 +784,11 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return self;
 }
 
+- (NSString *)displayString
+{
+    return self.name.length == 0 ? _NS("Unknown Group") : self.name;
+}
+
 - (VLCMediaLibraryMediaItem *)firstMediaItem
 {
     return self.mediaItems.firstObject;
