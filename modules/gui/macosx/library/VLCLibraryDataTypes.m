@@ -739,6 +739,28 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @end
 
+@interface VLCMediaLibraryGroup ()
+
+@property (readwrite, nullable) NSArray<VLCMediaLibraryMediaItem *> *groupMediaItems;
+
+@end
+
+@implementation VLCMediaLibraryGroup
+
+- (NSArray<VLCMediaLibraryMediaItem *> *)mediaItems
+{
+    if (self.numberOfTotalItems == 0) {
+        return @[];
+    } else if (self.groupMediaItems == nil ||
+               self.groupMediaItems.count != self.numberOfTotalItems) {
+        self.groupMediaItems =
+            fetchMediaItemsForLibraryItem(vlc_ml_list_group_media, self.libraryID);
+    }
+    return self.groupMediaItems;
+}
+
+@end
+
 @interface VLCMediaLibraryMediaItem ()
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
