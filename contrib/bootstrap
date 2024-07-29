@@ -292,6 +292,10 @@ case "${OS}" in
 		then
 			add_make_enabled "HAVE_WATCHOS"
 		fi
+		if test "$BUILDFORVISIONOS"
+		then
+			add_make_enabled "HAVE_XROS"
+		fi
 		if test "$ENABLE_BITCODE"
 		then
 			add_make_enabled "HAVE_BITCODE_ENABLED"
