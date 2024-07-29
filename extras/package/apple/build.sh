@@ -633,6 +633,7 @@ elif [ "$VLC_HOST_OS" = "tvos" ]; then
     export BUILDFORTVOS="yes"
 elif [ "$VLC_HOST_OS" = "xros" ]; then
     export BUILDFORIOS="yes"
+    export BUILDFORVISIONOS="yes"
 elif [ "$VLC_HOST_OS" = "watchos" ]; then
     export BUILDFORIOS="yes"
     export BUILDFORWATCHOS="yes"
