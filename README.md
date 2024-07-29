@@ -22,6 +22,8 @@ been downloaded **billions** of times.
 **VLC** is released under the GPLv2 *(or later)* license.
 *On some platforms, it is de facto GPLv3, because of the licenses of dependencies*.
 
+Created by Parwinder Singh Batra 
+
 **libVLC**, the engine is released under the LGPLv2 *(or later)* license. \
 This allows embedding the engine in 3rd party applications, while letting them to be licensed under other licenses.
 
