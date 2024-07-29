@@ -166,9 +166,13 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
-            NSAssert(true, @"displayStringForType should not be called for this segment type");
+            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryStreamsSegment:
             return _NS("Streams");
+        case VLCLibraryGroupsSegment:
+            return _NS("Groups");
+        case VLCLibraryGroupsGroupSubSegment:
+            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
         default:
@@ -196,6 +200,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return [NSImage imageNamed:@"NSFolder"];
         case VLCLibraryStreamsSegment:
             return [NSImage imageNamed:@"NSActionTemplate"];
+        case VLCLibraryGroupsSegment:
+        case VLCLibraryGroupsGroupSubSegment:
+            return [NSImage imageNamed:@"NSTouchBarTagIcon"];
         default:
             NSAssert(true, @"Invalid segment value");
             return nil;
@@ -239,6 +246,12 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryStreamsSegment:
             return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
                              accessibilityDescription:@"Streams icon"];
+        case VLCLibraryGroupsSegment:
+            return [NSImage imageWithSystemSymbolName:@"rectangle.3.group"
+                             accessibilityDescription:@"Groups icon"];
+        case VLCLibraryGroupsGroupSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"play.rectangle"
+                             accessibilityDescription:@"Group icon"];
         default:
             NSAssert(true, @"Invalid segment value");
             return nil;
