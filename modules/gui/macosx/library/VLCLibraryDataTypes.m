@@ -740,10 +740,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @end
 
 @interface VLCMediaLibraryMediaItem ()
-{
-    NSString *_primaryDetailString;
-    NSString *_secondaryDetailString;
-}
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
 
@@ -754,6 +750,8 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize libraryID = _libraryID;
 @synthesize smallArtworkGenerated = _smallArtworkGenerated;
 @synthesize smallArtworkMRL = _smallArtworkMRL;
+@synthesize primaryDetailString = _primaryDetailString;
+@synthesize secondaryDetailString = _secondaryDetailString;
 @synthesize primaryActionableDetail = _primaryActionableDetail;
 @synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
