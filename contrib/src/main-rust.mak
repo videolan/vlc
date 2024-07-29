@@ -25,6 +25,8 @@ ifdef HAVE_TVOS
 RUST_TARGET_FLAGS += --darwin=tvos
 else ifdef HAVE_WATCHOS
 RUST_TARGET_FLAGS += --darwin=watchos
+else ifdef HAVE_XROS
+RUST_TARGET_FLAGS += --darwin=xros
 else ifdef HAVE_IOS
 RUST_TARGET_FLAGS += --darwin=ios
 else
