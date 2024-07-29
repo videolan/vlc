@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2021 VLC authors and VideoLAN
+ * Copyright (C) 2024 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ import VLC.Util
 FlickableScrollHandler {
     id: handler
 
-    scaleFactor: VLC.MainCtx.intfScaleFactor
+    scaleFactor: MainCtx.intfScaleFactor
 
-    enabled: !VLC.MainCtx.smoothScroll
+    enabled: !MainCtx.smoothScroll
 }
