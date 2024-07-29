@@ -747,15 +747,6 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 
 @implementation VLCMediaLibraryGroup
 
-@synthesize libraryID = _libraryID;
-@synthesize smallArtworkGenerated = _smallArtworkGenerated;
-@synthesize smallArtworkMRL = _smallArtworkMRL;
-@synthesize displayString = _displayString;
-@synthesize durationString = _durationString;
-@synthesize primaryDetailString = _primaryDetailString;
-@synthesize secondaryDetailString = _secondaryDetailString;
-@synthesize primaryActionableDetail = _primaryActionableDetail;
-@synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
@@ -764,7 +755,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     NSParameterAssert(p_group != NULL);
     self = [super init];
     if (self) {
-        _libraryID = p_group->i_id;
+        self.libraryID = p_group->i_id;
         _name = toNSStr(p_group->psz_name);
         _numberOfTotalItems = p_group->i_nb_total_media;
         _numberOfVideoItems = p_group->i_nb_video;
