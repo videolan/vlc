@@ -61,7 +61,7 @@ validate_triplet()
   OS=$(echo $1 | cut -f 3 -d '-')
   REST=$(echo $1 | cut -f 4 -d '-')
 
-  if test ! -z "$REST"; then
+  if test -n "$REST"; then
     OS=$REST
   fi
   if test -z "$ARCH" || test -z "$UNUSED" || test -z "$OS"; then
@@ -102,7 +102,7 @@ done
 
 case $OS in
   mingw32|mingw32ucrt|mingw32uwp)
-    if test ! -z "$UWP"; then
+    if test -n "$UWP"; then
       abort_err "UWP Windows is Tier 3"
     fi
     case $ARCH in
@@ -110,7 +110,7 @@ case $OS in
         abort_err "ARMv7 Windows not supported by Rust"
         ;;
     esac
-    if test ! -z "$UCRT"; then
+    if test -n "$UCRT"; then
       return_triplet $ARCH-pc-windows-gnullvm
     else
       return_triplet $ARCH-pc-windows-gnu
@@ -147,7 +147,7 @@ case $OS in
         ;;
 
       ios)
-        if test ! -z "$SIMULATOR"; then
+        if test -n "$SIMULATOR"; then
           case $ARCH in
             aarch64|arm64)
               return_triplet aarch64-apple-ios-sim
