@@ -59,12 +59,6 @@ public: // Interface
     QList<VideoDescription> getVideo() const;
     QList<AudioDescription> getAudio() const;
 
-
-private: // Events
-    static void onMlEvent(void * data, const vlc_ml_event_t * event);
-
-    void onMlEvent(const vlc_ml_event_t * event);
-
 private:
     // Properties
     vlc_ml_media_type_t m_type;
