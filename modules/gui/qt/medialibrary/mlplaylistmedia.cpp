@@ -28,14 +28,7 @@
 //-------------------------------------------------------------------------------------------------
 
 MLPlaylistMedia::MLPlaylistMedia(const vlc_ml_media_t * data)
-    : MLItem(MLItemId(data->i_id, VLC_ML_PARENT_UNKNOWN))
-    , m_type(data->i_type)
-    , m_title(qfu(data->psz_title))
-    , m_thumbnail(qfu(data->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl))
-    , m_thumbnailStatus(data->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status)
-    , m_duration(data->i_duration)
-    , m_progress(data->f_progress)
-    , m_playCount(data->i_playcount)
+    : MLMedia(data)
 {
     for (const vlc_ml_file_t & file : ml_range_iterate<vlc_ml_file_t>(data->p_files))
     {
@@ -112,30 +105,10 @@ vlc_ml_media_type_t MLPlaylistMedia::getType() const
     return m_type;
 }
 
-QString MLPlaylistMedia::getTitle() const
-{
-    return m_title;
-}
 
-// FIXME: We have the same code in MLVideo implementation.
-QString MLPlaylistMedia::getThumbnail(vlc_ml_thumbnail_status_t* status)
+void MLPlaylistMedia::setSmallCover(const QString& thumbnail, vlc_ml_thumbnail_status_t status)
 {
-    if (status)
-        *status = m_thumbnailStatus;
-    return m_thumbnail;
-}
-
-void MLPlaylistMedia::setThumbnail(const QString& thumbnail, vlc_ml_thumbnail_status_t status)
-{
-    m_thumbnail = thumbnail;
-    m_thumbnailStatus = status;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-VLCTick MLPlaylistMedia::getDuration() const
-{
-    return VLCTick::fromMS(m_duration);
+    m_smallCover = { thumbnail, status };
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -163,25 +136,6 @@ QString MLPlaylistMedia::getMRLDisplay() const
 {
     return m_mrl.toString(QUrl::PrettyDecoded | QUrl::RemoveUserInfo | QUrl::PreferLocalFile |
                           QUrl::NormalizePathSegments);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-double MLPlaylistMedia::getProgress() const
-{
-    return m_progress;
-}
-
-VLCTick MLPlaylistMedia::getProgressTime() const
-{
-    return VLCTick::fromMS(m_duration * m_progress);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-unsigned int MLPlaylistMedia::getPlayCount() const
-{
-    return m_playCount;
 }
 
 //-------------------------------------------------------------------------------------------------

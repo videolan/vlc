@@ -24,6 +24,8 @@
 #endif
 
 // MediaLibrary includes
+#include "mlmedia.hpp"
+
 // NOTE: We need that header for VideoDescription and AudioDescription.
 #include "mlvideo.hpp"
 
@@ -35,7 +37,7 @@ class VLCTick;
 // Forward declarations
 struct vlc_medialibrary_t;
 
-class MLPlaylistMedia : public MLItem
+class MLPlaylistMedia : public MLMedia
 {
 public:
     MLPlaylistMedia( const vlc_ml_media_t * data);
@@ -45,12 +47,7 @@ public: // Interface
 
     vlc_ml_media_type_t getType() const;
 
-    QString getTitle() const;
-
-    QString getThumbnail(vlc_ml_thumbnail_status_t* status = nullptr);
-    void setThumbnail(const QString& thumbnail, vlc_ml_thumbnail_status_t status);
-
-    VLCTick getDuration() const;
+    void setSmallCover(const QString& thumbnail, vlc_ml_thumbnail_status_t status);
 
     QString getResolutionName() const;
 
@@ -58,11 +55,6 @@ public: // Interface
 
     QString getMRL       () const;
     QString getMRLDisplay() const;
-
-    double   getProgress    () const;
-    VLCTick getProgressTime() const;
-
-    unsigned int getPlayCount() const;
 
     QList<VideoDescription> getVideo() const;
     QList<AudioDescription> getAudio() const;
@@ -73,27 +65,13 @@ private: // Events
 
     void onMlEvent(const vlc_ml_event_t * event);
 
-private: // Properties
+private:
+    // Properties
     vlc_ml_media_type_t m_type;
 
-    QString m_title;
-
-    QString                   m_thumbnail;
-    vlc_ml_thumbnail_status_t m_thumbnailStatus;
-
-    int64_t m_duration;
-
     QString m_resolution;
-
     QString m_channel;
-
     QUrl m_mrl;
-
-    double   m_progress;
-    QString m_progressTime;
-
-    unsigned int m_playCount;
-
     QList<VideoDescription> m_video;
     QList<AudioDescription> m_audio;
 };
