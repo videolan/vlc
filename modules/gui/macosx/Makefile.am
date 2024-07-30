@@ -167,6 +167,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.m \
+	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.h \
+	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsViewController.h \
 	gui/macosx/library/groups-library/VLCLibraryGroupsViewController.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h \
