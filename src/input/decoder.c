@@ -209,6 +209,7 @@ struct vlc_input_decoder_t
     bool b_waiting;
     bool b_first;
     bool b_has_data;
+    bool out_started;
 
     /* Flushing */
     bool flushing;
@@ -1036,16 +1037,15 @@ static int DecoderWaitUnblock( vlc_input_decoder_t *p_owner )
         vlc_cond_signal( &p_owner->wait_acknowledge );
     }
 
-    bool did_wait = false;
     while (p_owner->b_waiting && p_owner->b_has_data && !p_owner->flushing)
-    {
         vlc_fifo_WaitCond(p_owner->p_fifo, &p_owner->wait_request);
-        /* We should not start the clock if we ended up flushing. */
-        did_wait = !p_owner->flushing;
-    }
 
-    if (tracer != NULL && did_wait)
-        vlc_tracer_TraceEvent(tracer, "DEC", p_owner->psz_id, "stop wait");
+    if (!p_owner->out_started)
+    {
+        p_owner->out_started = true;
+        if (tracer != NULL)
+            vlc_tracer_TraceEvent(tracer, "DEC", p_owner->psz_id, "stop wait");
+    }
 
     if (p_owner->flushing)
     {
@@ -1813,6 +1813,7 @@ static void *DecoderThread( void *p_data )
              * is called again. This will avoid a second useless flush (but
              * harmless). */
             p_owner->flushing = false;
+            p_owner->out_started = false;
             p_owner->i_preroll_end = PREROLL_NONE;
             continue;
         }
@@ -1976,6 +1977,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     p_owner->b_waiting = false;
     p_owner->b_first = true;
     p_owner->b_has_data = false;
+    p_owner->out_started = false;
 
     p_owner->error = false;
 
