@@ -32,6 +32,6 @@ qtsvg: qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 .qtsvg: qtsvg toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(QTSVG_CONFIG)
-	+$(CMAKEBUILD)
+	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@

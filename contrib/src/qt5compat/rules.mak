@@ -34,6 +34,6 @@ qt5compat: qt5compat-everywhere-src-$(QT5COMPAT_VERSION).tar.xz .sum-qt5compat
 .qt5compat: qt5compat toolchain.cmake
 	$(CMAKECLEAN)
 	$(HOSTVARS_CMAKE) $(CMAKE) $(QT5_COMPAT_CONFIG)
-	+$(CMAKEBUILD)
+	+PATH="$(PATH):$(PREFIX)/bin" $(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
