@@ -11,6 +11,7 @@
 DARWIN=
 ARCH=
 OS=
+LLVM=
 UWP=
 UCRT=
 SIMULATOR=
@@ -71,7 +72,7 @@ validate_triplet()
 
 print_usage()
 {
-    echo "Usage: $0 [--ucrt] [--uwp] [--darwin {macos,ios,tvos,watchos,xros}] [--simulator] triplet"
+    echo "Usage: $0 [--ucrt] [--uwp] [--llvm] [--darwin {macos,ios,tvos,watchos,xros}] [--simulator] triplet"
 }
 
 
@@ -82,6 +83,9 @@ for ARG in "$@"; do
       ;;
     --ucrt)
       UCRT=1
+      ;;
+    --llvm)
+      LLVM=1
       ;;
     --simulator)
       SIMULATOR=1
@@ -111,9 +115,13 @@ case $OS in
         ;;
     esac
     if test -n "$UCRT"; then
-      return_triplet $ARCH-pc-windows-gnullvm
+      if test -n "$LLVM"; then
+        return_triplet $ARCH-pc-windows-gnullvm
+      fi
     else
-      return_triplet $ARCH-pc-windows-gnu
+      if test -z "$CLANG"; then
+        return_triplet $ARCH-pc-windows-gnu
+      fi
     fi
     ;;
 

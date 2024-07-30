@@ -17,6 +17,10 @@ RUST_TARGET_FLAGS += --ucrt
 endif
 endif
 
+ifdef HAVE_CLANG
+RUST_TARGET_FLAGS += --llvm
+endif
+
 ifdef HAVE_DARWIN_OS
 ifdef HAVE_TVOS
 RUST_TARGET_FLAGS += --darwin=tvos
