@@ -22,6 +22,27 @@
 
 #import "VLCLibraryGroupsViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+
 @implementation VLCLibraryGroupsViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super init];
+    if (self) {
+        [self setupPropertiesFromLibraryWindow:libraryWindow];
+    }
+    return self;
+}
+
+- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    NSParameterAssert(libraryWindow);
+    _libraryWindow = libraryWindow;
+    _libraryTargetView = libraryWindow.libraryTargetView;
+    _emptyLibraryView = libraryWindow.emptyLibraryView;
+    _placeholderImageView = libraryWindow.placeholderImageView;
+    _placeholderLabel = libraryWindow.placeholderLabel;
+}
 
 @end
