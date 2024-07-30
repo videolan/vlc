@@ -114,14 +114,10 @@ case $OS in
         abort_err "ARMv7 Windows not supported by Rust"
         ;;
     esac
-    if test -n "$UCRT"; then
-      if test -n "$LLVM"; then
-        return_triplet $ARCH-pc-windows-gnullvm
-      fi
+    if test -n "$LLVM"; then
+      return_triplet $ARCH-pc-windows-gnullvm
     else
-      if test -z "$CLANG"; then
-        return_triplet $ARCH-pc-windows-gnu
-      fi
+      return_triplet $ARCH-pc-windows-gnu
     fi
     ;;
 
