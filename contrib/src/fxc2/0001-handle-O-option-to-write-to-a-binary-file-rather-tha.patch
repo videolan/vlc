@@ -57,7 +57,7 @@ index 205fa16..a4037af 100755
  
      FILE* f;
 -    errno_t err = fopen_s(&f, outputFile, "w");
-+    const auto openMode = outputToHeader ? "wb" : "w";
++    const auto openMode = outputToHeader ? "w" : "wb";
 +    errno_t err = fopen_s(&f, outputFile, openMode);
  
 +    if (!outputToHeader) {
