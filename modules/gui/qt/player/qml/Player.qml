@@ -191,9 +191,10 @@ FocusScope {
     VideoSurface {
         id: videoSurface
 
-        ctx: MainCtx
+        videoSurfaceProvider: MainCtx.videoSurfaceProvider
+
         visible: rootPlayer.hasEmbededVideo
-        enabled: rootPlayer.hasEmbededVideo
+
         anchors.fill: parent
         anchors.topMargin: rootPlayer._controlsUnderVideo ? topBar.height : 0
         anchors.bottomMargin: rootPlayer._controlsUnderVideo ? controlBar.height : 0

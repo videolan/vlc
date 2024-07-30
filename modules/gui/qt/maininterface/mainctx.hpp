@@ -45,6 +45,7 @@ Q_MOC_INCLUDE( "dialogs/toolbar/controlbar_profile_model.hpp" )
 Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
 Q_MOC_INCLUDE( "playlist/playlist_controller.hpp" )
 Q_MOC_INCLUDE( "maininterface/mainctx_submodels.hpp" )
+Q_MOC_INCLUDE( "maininterface/videosurface.hpp" )
 
 class CSDButtonModel;
 class QSettings;
@@ -127,6 +128,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool useGlobalShortcuts READ getUseGlobalShortcuts WRITE setUseGlobalShortcuts NOTIFY useGlobalShortcutsChanged FINAL)
     Q_PROPERTY(int maxVolume READ maxVolume NOTIFY maxVolumeChanged FINAL)
     Q_PROPERTY(float safeArea READ safeArea NOTIFY safeAreaChanged FINAL)
+    Q_PROPERTY(VideoSurfaceProvider* videoSurfaceProvider READ getVideoSurfaceProvider WRITE setVideoSurfaceProvider NOTIFY hasEmbededVideoChanged FINAL)
 
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
 

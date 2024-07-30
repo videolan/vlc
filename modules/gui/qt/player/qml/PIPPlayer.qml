@@ -31,8 +31,8 @@ T.Control {
     height: VLCStyle.dp(180, VLCStyle.scale)
 
     //VideoSurface x,y won't update
-    onXChanged: videoSurface.onSurfacePositionChanged()
-    onYChanged: videoSurface.onSurfacePositionChanged()
+    onXChanged: videoSurface.updateSurfacePosition()
+    onYChanged: videoSurface.updateSurfacePosition()
 
     objectName: "pip window"
 
@@ -93,7 +93,7 @@ T.Control {
 
     background: VideoSurface {
         id: videoSurface
-        ctx: MainCtx
+        videoSurfaceProvider: MainCtx.videoSurfaceProvider
     }
 
     contentItem: Rectangle {

@@ -200,12 +200,23 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
     p_wnd->sys = this;
     p_wnd->ops = &ops;
     p_wnd->info.has_double_click = true;
+
+    // These need to be connected here, since the compositor might not be ready when
+    // these signals are emitted. VOut window might not be set, or worse, compositor's
+    // internal preparations might not be completed yet:
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
+            this, &CompositorVideo::onSurfacePositionChanged, Qt::UniqueConnection);
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
+            this, &CompositorVideo::onSurfaceSizeChanged, Qt::UniqueConnection);
 }
 
 void CompositorVideo::windowDestroy()
 {
     if (m_destroyCb)
         m_destroyCb(m_wnd);
+
+    m_videoSurfaceProvider.reset();
+    m_videoWindowHandler.reset();
 }
 
 void CompositorVideo::windowResize(unsigned width, unsigned height)
@@ -252,10 +263,6 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     if (flags & CompositorVideo::CAN_SHOW_PIP)
     {
         m_mainCtx->setCanShowVideoPIP(true);
-        connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-                this, &CompositorVideo::onSurfacePositionChanged);
-        connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
-                this, &CompositorVideo::onSurfaceSizeChanged);
     }
     if (flags & CompositorVideo::HAS_ACRYLIC)
     {
@@ -316,8 +323,6 @@ void CompositorVideo::commonGUIDestroy()
 
 void CompositorVideo::commonIntfDestroy()
 {
-    m_videoWindowHandler.reset();
-    m_videoSurfaceProvider.reset();
     unloadGUI();
 }
 
