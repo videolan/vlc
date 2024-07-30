@@ -13,7 +13,6 @@ endif
 ifdef HAVE_UCRT
 # does not work as Tier 2 before that
 RUST_VERSION_MIN=1.79.0
-RUST_TARGET_FLAGS += --ucrt
 endif
 endif
 

@@ -13,7 +13,6 @@ ARCH=
 OS=
 LLVM=
 UWP=
-UCRT=
 SIMULATOR=
 TRIPLET=
 
@@ -72,7 +71,7 @@ validate_triplet()
 
 print_usage()
 {
-    echo "Usage: $0 [--ucrt] [--uwp] [--llvm] [--darwin {macos,ios,tvos,watchos,xros}] [--simulator] triplet"
+    echo "Usage: $0 [--uwp] [--llvm] [--darwin {macos,ios,tvos,watchos,xros}] [--simulator] triplet"
 }
 
 
@@ -80,9 +79,6 @@ for ARG in "$@"; do
   case $ARG in
     --uwp)
       UWP=1
-      ;;
-    --ucrt)
-      UCRT=1
       ;;
     --llvm)
       LLVM=1

@@ -1895,9 +1895,6 @@ AS_IF([test "${enable_rust}" = "yes"],[
   AS_IF([test "$vlc_winstore_app" = "1"],[
     rust_target_flags="${rust_target_flags} --uwp"
   ])
-  AS_IF([test "${win_ucrt_build}" = "yes"],[
-    rust_target_flags="${rust_target_flags} --ucrt"
-  ])
   AS_IF([test -n "$(eval ${CC} --version 2>/dev/null | grep 'clang')"],[
     rust_target_flags="${rust_target_flags} --llvm"
   ])
