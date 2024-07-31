@@ -38,6 +38,7 @@ NSString * const VLCLibraryModelVideoMediaListReset = @"VLCLibraryModelVideoMedi
 NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecentsMediaListReset";
 NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRecentAudioMediaListReset";
 NSString * const VLCLibraryModelListOfShowsReset = @"VLCLibraryModelListOfShowsReset";
+NSString * const VLCLibraryModelListOfGroupsReset = @"VLCLibraryModelListOfGroupsReset";
 
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
@@ -632,6 +633,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         vlc_ml_group_list_release(p_group_list);
         dispatch_async(dispatch_get_main_queue(), ^{
             self.cachedListOfGroups = mutableArray.copy;
+            [self.changeDelegate notifyChange:VLCLibraryModelListOfGroupsReset withObject:self];
         });
     });
 }
