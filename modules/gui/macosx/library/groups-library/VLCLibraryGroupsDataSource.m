@@ -101,6 +101,22 @@
     return 0;
 }
 
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == self.groupsTableView) {
+        return self.groupsArray[row];
+    }
+
+    const NSInteger selectedGroupRow = self.groupsTableView.selectedRow;
+    if (tableView == self.selectedGroupTableView && selectedGroupRow > -1) {
+        VLCMediaLibraryGroup * const group = self.groupsArray[selectedGroupRow];
+        return group.mediaItems[row];
+    }
+
+    return nil;
+}
+
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     if (libraryItem == nil) {
