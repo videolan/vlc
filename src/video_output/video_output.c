@@ -993,10 +993,14 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
         picture_t *decoded;
         if (unlikely(reuse_decoded && sys->displayed.decoded)) {
             decoded = picture_Hold(sys->displayed.decoded);
+            if (decoded == NULL)
+                break;
         } else {
             decoded = picture_fifo_Pop(sys->decoder_fifo);
+            if (decoded == NULL)
+                break;
 
-            if (decoded) {
+            {
                 const vlc_tick_t system_now = vlc_tick_now();
                 uint32_t clock_id;
                 vlc_clock_Lock(sys->clock);
@@ -1046,8 +1050,6 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
             }
         }
 
-        if (!decoded)
-            break;
         reuse_decoded = false;
 
         if (sys->displayed.decoded)
