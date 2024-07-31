@@ -28,6 +28,8 @@
 #include <vlc_codec.h>
 #include <vlc_mouse.h>
 
+struct vlc_clock_t;
+
 struct vlc_input_decoder_callbacks {
     /* notifications */
     void (*on_vout_started)(vlc_input_decoder_t *decoder, vout_thread_t *vout,
@@ -54,7 +56,7 @@ struct vlc_input_decoder_cfg
 {
     const es_format_t *fmt;
     const char *str_id;
-    vlc_clock_t *clock;
+    struct vlc_clock_t *clock;
     input_resource_t *resource;
     sout_stream_t *sout;
     enum input_type input_type;
