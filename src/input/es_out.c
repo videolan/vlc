@@ -959,7 +959,7 @@ static void EsOutDecodersStopBuffering(es_out_sys_t *p_sys, bool b_forced)
                                          i_preroll_duration +
                                          p_sys->i_buffering_extra_stream - p_sys->i_buffering_extra_initial;
 
-    if( i_stream_duration <= i_buffering_duration && !b_forced )
+    if( i_stream_duration < i_buffering_duration && !b_forced )
     {
         double f_level;
         if (i_buffering_duration == 0)
