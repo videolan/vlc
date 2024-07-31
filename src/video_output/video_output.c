@@ -1033,20 +1033,20 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                     filter_chain_VideoFlush(sys->filter.chain_static);
                     continue;
                 }
+            }
 
-                if (!VideoFormatIsCropArEqual(&decoded->format, &sys->filter.src_fmt))
-                {
-                    // we received an aspect ratio change
-                    // Update the filters with the filter source format with the new aspect ratio
-                    video_format_Clean(&sys->filter.src_fmt);
-                    video_format_Copy(&sys->filter.src_fmt, &decoded->format);
-                    if (sys->filter.src_vctx)
-                        vlc_video_context_Release(sys->filter.src_vctx);
-                    vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
-                    sys->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
+            if (!VideoFormatIsCropArEqual(&decoded->format, &sys->filter.src_fmt))
+            {
+                // we received an aspect ratio change
+                // Update the filters with the filter source format with the new aspect ratio
+                video_format_Clean(&sys->filter.src_fmt);
+                video_format_Copy(&sys->filter.src_fmt, &decoded->format);
+                if (sys->filter.src_vctx)
+                    vlc_video_context_Release(sys->filter.src_vctx);
+                vlc_video_context *pic_vctx = picture_GetVideoContext(decoded);
+                sys->filter.src_vctx = pic_vctx ? vlc_video_context_Hold(pic_vctx) : NULL;
 
-                    ChangeFilters(vout);
-                }
+                ChangeFilters(vout);
             }
         }
 
