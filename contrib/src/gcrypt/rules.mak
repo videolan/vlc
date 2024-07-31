@@ -41,6 +41,10 @@ ifneq ($(call need_pkg,"gpg-error >= 1.27"),)
 GCRYPT_CONF += --with-libgpg-error-prefix=$(PREFIX)
 endif
 
+ifneq ($(call need_pkg,"gpg-error >= 1.27"),)
+GCRYPT_CONF += --with-libgpg-error-prefix=$(PREFIX)
+endif
+
 ifdef HAVE_WIN32
 ifeq ($(ARCH),x86_64)
 GCRYPT_CONF += --disable-asm --disable-padlock-support
