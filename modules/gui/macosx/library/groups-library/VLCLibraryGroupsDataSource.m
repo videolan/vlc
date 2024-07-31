@@ -75,4 +75,20 @@
     [self.collectionView reloadData];
 }
 
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == self.groupsTableView) {
+        return self.groupsArray.count;
+    }
+
+    const NSInteger selectedGroupRow = self.groupsTableView.selectedRow;
+    if (tableView == self.selectedGroupTableView && selectedGroupRow > -1) {
+        return self.groupsArray[selectedGroupRow].numberOfTotalItems;
+    }
+
+    return 0;
+}
+
 @end
