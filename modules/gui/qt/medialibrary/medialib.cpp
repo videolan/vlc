@@ -21,6 +21,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "util/shared_input_item.hpp"
 
+#include <utility>
 
 MediaLib::MediaLib(qt_intf_t *_intf, QObject *_parent)
     : QObject( _parent )
@@ -354,7 +355,7 @@ void MediaLib::mlInputItem(const QVector<MLItemId>& itemIdVector, QJSValue callb
             i++;
         }
 
-        for (const auto& cb : qAsConst(it.value()))
+        for (const auto& cb : std::as_const(it.value()))
         {
             cb.call({jsArray});
         }
