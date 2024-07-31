@@ -29,8 +29,6 @@ WIX_LZX_URL := $(CONTRIB_VIDEOLAN)/wixlzx/wix3.5.2519.0.zip
 ifdef HAVE_WIN32
 # this requires dotnet 4.0 to be installed when running wix
 PKGS += wixlzx
-# need to be installed when using prebuilt
-PKGS_TOOLS += wixlzx
 endif
 
 DEPS_wixlzx = wix $(DEPS_wix)
