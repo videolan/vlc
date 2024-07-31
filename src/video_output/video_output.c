@@ -1354,10 +1354,16 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
 
     vlc_tick_t system_now = vlc_tick_now();
     const vlc_tick_t pts = todisplay->date;
-    vlc_clock_Lock(sys->clock);
-    vlc_tick_t system_pts = render_now ? system_now :
-        vlc_clock_ConvertToSystem(sys->clock, system_now, pts, sys->rate, NULL);
-    vlc_clock_Unlock(sys->clock);
+    vlc_tick_t system_pts;
+    if (render_now)
+        system_pts = system_now;
+    else
+    {
+        vlc_clock_Lock(sys->clock);
+        system_pts = vlc_clock_ConvertToSystem(sys->clock, system_now, pts,
+                                               sys->rate, NULL);
+        vlc_clock_Unlock(sys->clock);
+    }
 
     const unsigned frame_rate = todisplay->format.i_frame_rate;
     const unsigned frame_rate_base = todisplay->format.i_frame_rate_base;
