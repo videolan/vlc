@@ -605,6 +605,37 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     return _cachedListOfGroups.count;
 }
 
+- (NSArray<VLCMediaLibraryGroup *> *)listOfGroups
+{
+    if (!_cachedListOfGroups) {
+        [self resetCachedListOfGroups];
+    }
+    return _cachedListOfGroups;
+}
+
+- (void)resetCachedListOfGroups
+{
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        vlc_ml_group_list_t * const p_group_list = vlc_ml_list_groups(self->_p_mediaLibrary, NULL);
+        if (p_group_list == NULL) {
+            return;
+        }
+        const size_t itemCount = p_group_list->i_nb_items;
+        NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:itemCount];
+        for (size_t x = 0; x < p_group_list->i_nb_items; x++) {
+            vlc_ml_group_t * const p_vlc_group = &p_group_list->p_items[x];
+            VLCMediaLibraryGroup * const group = [[VLCMediaLibraryGroup alloc] initWithGroup:p_vlc_group];
+            if (group) {
+                [mutableArray addObject:group];
+            }
+        }
+        vlc_ml_group_list_release(p_group_list);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.cachedListOfGroups = mutableArray.copy;
+        });
+    });
+}
+
 - (void)resetCachedMediaItemLists
 {
     [self resetCachedListOfRecentMedia];

@@ -90,6 +90,7 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 @property (readonly) NSArray <VLCMediaLibraryShow *> *listOfShows;
 
 @property (readonly) size_t numberOfGroups;
+@property (readonly) NSArray <VLCMediaLibraryGroup *> *listOfGroups;
 
 @property (readonly) NSArray <VLCMediaLibraryEntryPoint *> *listOfMonitoredFolders;
 
