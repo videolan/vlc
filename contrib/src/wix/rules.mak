@@ -6,8 +6,6 @@ WIX_URL := $(GITHUB)/wixtoolset/wix3/releases/download/wix$(WIX_VERSION)$(WIX_SU
 ifdef HAVE_WIN32
 # this requires dotnet 4.0 to be installed when running wix
 PKGS += wix
-# need to be installed when using prebuilt
-PKGS_TOOLS += wix
 endif
 
 .sum-wix: wix$(WIX_FULL_VERSION).zip

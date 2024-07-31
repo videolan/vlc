@@ -28,8 +28,6 @@ WIX_LZX_URL := https://wixtoolset.org/downloads/v$(WIX_LZX_FULL_VERSION)/wix$(WI
 ifdef HAVE_WIN32
 # this requires dotnet 4.0 to be installed when running wix
 PKGS += wixlzx
-# need to be installed when using prebuilt
-PKGS_TOOLS += wixlzx
 endif
 
 DEPS_wixlzx := wix $(DEPS_wix)
