@@ -1178,6 +1178,8 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     vlc_tick_t render_subtitle_date;
     if (sys->pause.is_on)
         render_subtitle_date = sys->pause.date;
+    else if (filtered->b_force)
+        render_subtitle_date = system_now;
     else
     {
         vlc_clock_Lock(sys->clock);
