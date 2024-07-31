@@ -671,11 +671,6 @@ prebuilt: vlc-contrib-$(HOST)-latest.tar.bz2
 	$(UNPACK)
 	mv $(HOST) $(PREFIX)
 	cd $(PREFIX) && $(abspath $(SRC))/change_prefix.sh
-ifdef HAVE_WIN32
-ifndef HAVE_CROSS_COMPILE
-	$(RM) `find $(PREFIX)/bin | file -f- | grep ELF | awk -F: '{print $$1}' | xargs`
-endif
-endif
 
 package: install
 	rm -Rf tmp/
