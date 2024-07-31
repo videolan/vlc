@@ -20,11 +20,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+
+#import "library/VLCLibraryCollectionViewDataSource.h"
+#import "library/VLCLibraryTableViewDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryModel;
+
 @interface VLCLibraryGroupsDataSource : NSObject
+
+@property (readwrite, assign) VLCLibraryModel *libraryModel;
+@property (readwrite, assign) NSCollectionView *collectionView;
+@property (readwrite, assign) NSTableView *groupsTableView;
+@property (readwrite, assign) NSTableView *selectedGroupTableView;
+
+- (void)reloadData;
 
 @end
 

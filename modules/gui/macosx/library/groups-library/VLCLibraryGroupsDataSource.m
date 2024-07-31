@@ -22,6 +22,57 @@
 
 #import "VLCLibraryGroupsDataSource.h"
 
+#include "library/VLCLibraryCollectionViewFlowLayout.h"
+#include "library/VLCLibraryModel.h"
+
+@interface VLCLibraryGroupsDataSource ()
+
+@property (readwrite, atomic) NSArray<VLCMediaLibraryGroup *> *groupsArray;
+
+@end
+
 @implementation VLCLibraryGroupsDataSource
+
+- (instancetype)init
+{
+    self = [super init];
+    if(self) {
+        [self connect];
+    }
+    return self;
+}
+
+- (void)connect
+{
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGroupsListReset:)
+                               name:VLCLibraryModelListOfGroupsReset
+                             object:nil];
+
+    [self reloadData];
+}
+
+- (void)disconnect
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)libraryModelShowsListReset:(NSNotification *)notification
+{
+    [self reloadData];
+}
+
+- (void)reloadData
+{
+    [(VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout resetLayout];
+
+    self.groupsArray = self.libraryModel.listOfGroups;
+
+    [self.groupsTableView reloadData];
+    [self.selectedGroupTableView reloadData];
+    [self.collectionView reloadData];
+}
 
 @end
