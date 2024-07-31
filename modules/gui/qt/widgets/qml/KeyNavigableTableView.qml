@@ -242,8 +242,6 @@ FocusScope {
 
         anchors.fill: parent
 
-        contentWidth: root.width - root.contentLeftMargin - root.contentRightMargin
-
         focus: true
 
         headerPositioning: ListView.OverlayHeader
