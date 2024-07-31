@@ -1362,6 +1362,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
     else
     {
         vlc_clock_Lock(sys->clock);
+        assert(!sys->displayed.current->b_force);
         system_pts = vlc_clock_ConvertToSystem(sys->clock, system_now, pts,
                                                sys->rate, NULL);
         vlc_clock_Unlock(sys->clock);
@@ -1408,6 +1409,7 @@ static int RenderPicture(vout_thread_sys_t *sys, bool render_now)
                     deadline = max_deadline;
                 else
                 {
+                    assert(!sys->displayed.current->b_force);
                     deadline = vlc_clock_ConvertToSystem(sys->clock,
                                                          vlc_tick_now(), pts,
                                                          sys->rate, NULL);
