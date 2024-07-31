@@ -1000,6 +1000,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
             if (decoded == NULL)
                 break;
 
+            if (!decoded->b_force)
             {
                 const vlc_tick_t system_now = vlc_tick_now();
                 uint32_t clock_id;
@@ -1022,8 +1023,9 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                     filter_chain_VideoFlush(sys->filter.chain_static);
                 }
 
-                if (is_late_dropped && !decoded->b_force
-                 && IsPictureLateToStaticFilter(vout, &decoded->format, system_pts - system_now))
+                if (is_late_dropped
+                 && IsPictureLateToStaticFilter(vout, &decoded->format,
+                                                system_pts - system_now))
                 {
                     picture_Release(decoded);
                     vout_statistic_AddLost(&sys->statistic, 1);
