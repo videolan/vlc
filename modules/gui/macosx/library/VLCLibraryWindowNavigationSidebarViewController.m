@@ -22,10 +22,11 @@
 
 #import "VLCLibraryWindowNavigationSidebarViewController.h"
 
-#import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
+#import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
@@ -73,12 +74,16 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self
-                      selector:@selector(bookmarkedLocationsChanged:)
+                      selector:@selector(internalNodesChanged:)
                           name:VLCLibraryBookmarkedLocationsChanged
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(internalNodesChanged:)
+                          name:VLCLibraryModelListOfGroupsReset
                         object:nil];
 }
 
-- (void)bookmarkedLocationsChanged:(NSNotification *)notification
+- (void)internalNodesChanged:(NSNotification *)notification
 {
     const VLCLibrarySegmentType currentSegmentType = self.libraryWindow.librarySegmentType;
 
