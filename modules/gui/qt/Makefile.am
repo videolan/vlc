@@ -1305,11 +1305,21 @@ if HAVE_FXC
 QSB_EXTRA_PATH += $(FXC_PATH):
 endif
 
+qsb_verbose = $(qsb_verbose_$(V))
+qsb_verbose_ = $(qsb_verbose__$(AM_DEFAULT_VERBOSITY))
+qsb_verbose_0 = @echo "  QSB     " $@;
+qsb_verbose__0 = $(qsb_verbose_0)
+
+QSB_PARAMS_VERBOSE = $(QSB_PARAMS_VERBOSE_$(V))
+QSB_PARAMS_VERBOSE_ = $(QSB_PARAMS_VERBOSE__$(AM_DEFAULT_VERBOSITY))
+QSB_PARAMS_VERBOSE_0 = -s
+QSB_PARAMS_VERBOSE__0 = $(QSB_PARAMS_VERBOSE_0)
+
 %.frag.qsb: %.frag
-	$(AM_V_GEN) PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) -o $@ $<
+	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
 
 %.vert.qsb: %.vert
-	$(AM_V_GEN) PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) -o $@ $<
+	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
 
 shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.frag=.frag.qsb) $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
 	$(AM_V_GEN) cp -f $(filter %.qrc, $^) $(builddir)/shaders/shaders.qrc || true
