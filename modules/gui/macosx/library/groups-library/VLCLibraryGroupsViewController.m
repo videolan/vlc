@@ -62,11 +62,20 @@
     self.groupsTableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.selectedGroupTableView.translatesAutoresizingMaskIntoConstraints = NO;
 
+    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
     self.groupsTableViewScrollView.hasHorizontalScroller = NO;
     self.groupsTableViewScrollView.borderType = NSNoBorder;
+    self.groupsTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.groupsTableViewScrollView.contentInsets = defaultInsets;
+    self.groupsTableViewScrollView.scrollerInsets = scrollerInsets;
 
     self.selectedGroupTableViewScrollView.hasHorizontalScroller = NO;
     self.selectedGroupTableViewScrollView.borderType = NSNoBorder;
+    self.selectedGroupTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.selectedGroupTableViewScrollView.contentInsets = defaultInsets;
+    self.selectedGroupTableViewScrollView.scrollerInsets = scrollerInsets;
 
     self.groupsTableViewScrollView.documentView = self.groupsTableView;
     self.selectedGroupTableViewScrollView.documentView = self.selectedGroupTableView;
