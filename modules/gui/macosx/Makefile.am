@@ -121,6 +121,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryImageCache.h \
 	gui/macosx/library/VLCLibraryImageCache.m \
+	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDataSource.h \
 	gui/macosx/library/VLCLibraryMenuController.h \
 	gui/macosx/library/VLCLibraryMenuController.m \
 	gui/macosx/library/VLCLibraryModel.h \
