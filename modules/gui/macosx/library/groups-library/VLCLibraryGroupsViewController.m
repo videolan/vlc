@@ -27,6 +27,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -150,6 +151,14 @@
 
     [self.groupsTableView addTableColumn:groupsColumn];
     [self.selectedGroupTableView addTableColumn:selectedGroupColumn];
+
+    NSNib * const tableCellViewNib = 
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                                 bundle:nil];
+    [self.groupsTableView registerNib:tableCellViewNib
+                        forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+    [self.selectedGroupTableView registerNib:tableCellViewNib
+                               forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
 
     self.groupsTableView.headerView = nil;
     self.selectedGroupTableView.headerView = nil;
