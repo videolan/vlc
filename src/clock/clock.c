@@ -706,6 +706,8 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
                                          unsigned frame_rate,
                                          unsigned frame_rate_base)
 {
+    vlc_clock_main_t *main_clock = clock->owner;
+
     if (system_now == VLC_TICK_MAX)
     {
         /* If system_now is VLC_TICK_MAX, the update is forced, don't modify
@@ -715,9 +717,19 @@ static vlc_tick_t vlc_clock_slave_update(vlc_clock_t *clock,
         return VLC_TICK_MAX;
     }
 
-    vlc_tick_t computed = clock->ops->to_system(clock, ctx, system_now, ts, rate);
+    vlc_tick_t drift;
+    vlc_tick_t computed;
+    if (main_clock->first_pcr.system != VLC_TICK_INVALID || ctx->wait_sync_ref.stream != VLC_TICK_INVALID)
+    {
+        computed = clock->ops->to_system(clock, ctx, system_now, ts, rate);
+        drift = computed - system_now;
+    }
+    else
+    {
+        computed = system_now;
+        drift = 0;
+    }
 
-    vlc_tick_t drift = computed - system_now;
     vlc_clock_on_update(clock, computed, ts, drift, rate,
                         frame_rate, frame_rate_base);
     return drift;
