@@ -21,6 +21,8 @@
 #include <QQuickView>
 #include <QOperatingSystemVersion>
 
+#include "maininterface/interface_window_handler.hpp"
+
 #include <vlc_window.h>
 
 #ifdef __APPLE__
@@ -109,6 +111,8 @@ void CompositorPlatform::destroyMainInterface()
 
 void CompositorPlatform::unloadGUI()
 {
+    m_interfaceWindowHandler.reset();
+    delete m_quickWindow;
     commonGUIDestroy();
 }
 
