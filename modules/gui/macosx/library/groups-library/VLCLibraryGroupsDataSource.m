@@ -59,7 +59,7 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)libraryModelShowsListReset:(NSNotification *)notification
+- (void)libraryModelGroupsListReset:(NSNotification *)notification
 {
     [self reloadData];
 }
