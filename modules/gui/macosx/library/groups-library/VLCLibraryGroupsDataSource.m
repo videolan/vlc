@@ -70,8 +70,8 @@
 
     self.groupsArray = self.libraryModel.listOfGroups;
 
-    [self.groupsTableView reloadData];
-    [self.selectedGroupTableView reloadData];
+    [self.masterTableView reloadData];
+    [self.detailTableView reloadData];
     [self.collectionView reloadData];
 }
 
@@ -89,12 +89,12 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView == self.groupsTableView) {
+    if (tableView == self.masterTableView) {
         return self.groupsArray.count;
     }
 
-    const NSInteger selectedGroupRow = self.groupsTableView.selectedRow;
-    if (tableView == self.selectedGroupTableView && selectedGroupRow > -1) {
+    const NSInteger selectedGroupRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedGroupRow > -1) {
         return self.groupsArray[selectedGroupRow].numberOfTotalItems;
     }
 
@@ -104,12 +104,12 @@
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (tableView == self.groupsTableView) {
+    if (tableView == self.masterTableView) {
         return self.groupsArray[row];
     }
 
-    const NSInteger selectedGroupRow = self.groupsTableView.selectedRow;
-    if (tableView == self.selectedGroupTableView && selectedGroupRow > -1) {
+    const NSInteger selectedGroupRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedGroupRow > -1) {
         VLCMediaLibraryGroup * const group = self.groupsArray[selectedGroupRow];
         return group.mediaItems[row];
     }

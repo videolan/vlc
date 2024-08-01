@@ -91,8 +91,8 @@
         }
     } else if ([vlcDataSource isKindOfClass:[VLCLibraryGroupsDataSource class]]) {
         VLCLibraryGroupsDataSource * const groupsTableViewDataSource = (VLCLibraryGroupsDataSource *)vlcDataSource;
-        if (tableView == groupsTableViewDataSource.groupsTableView) {
-            [groupsTableViewDataSource.selectedGroupTableView reloadData];
+        if (tableView == groupsTableViewDataSource.masterTableView) {
+            [groupsTableViewDataSource.detailTableView reloadData];
         }
     }
 }
