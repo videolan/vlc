@@ -153,7 +153,7 @@ variables:
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
-        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
         fi
         extras/package/win32/build.sh -a $HOST_ARCH $EXTRA_BUILD_FLAGS $LIBVLC_EXTRA_BUILD_FLAGS $UWP_EXTRA_BUILD_FLAGS
@@ -302,7 +302,7 @@ debian-contrib:
             make list
             make -j$NCPU --output-sync=recurse fetch
             make -j$NCPU --output-sync=recurse
-            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
                 make package
             fi
         else
@@ -462,7 +462,7 @@ raspbian-arm:
             echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
-        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
         fi
         extras/package/raspberry/build.sh $EXTRA_BUILD_FLAGS -x -a $HOST_ARCH
@@ -514,7 +514,7 @@ raspbian-arm:
         else
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -c"
         fi
-        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
             EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} -p"
         fi
         export PATH="${VLC_PATH}:$PATH"
@@ -662,7 +662,7 @@ wasm32-emscripten-build :
                 echo "Building using prebuilt contribs at $VLC_PREBUILT_CONTRIBS_URL"
                 EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
             fi
-            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" ]; then
+            if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
                 EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --gen-contrib-archive"
             fi
             ./extras/package/wasm-emscripten/build.sh $EXTRA_BUILD_FLAGS
