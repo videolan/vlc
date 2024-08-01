@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryCollectionViewDelegate;
+@class VLCLibraryGroupsDataSource;
 @class VLCLibraryMasterDetailViewTableViewDelegate;
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
@@ -46,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryMasterDetailViewTableViewDelegate *tableViewDelegate;
+@property (readonly) VLCLibraryGroupsDataSource *dataSource;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

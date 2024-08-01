@@ -27,11 +27,17 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryController.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
+#import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+
+#import "library/groups-library/VLCLibraryGroupsDataSource.h"
+
+#import "main/VLCMain.h"
 
 @implementation VLCLibraryGroupsViewController
 
@@ -40,6 +46,7 @@
     self = [super init];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupDataSource];
         [self setupGridViewModeViews];
         [self setupListViewModeViews];
     }
@@ -54,6 +61,12 @@
     _emptyLibraryView = libraryWindow.emptyLibraryView;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
+}
+
+- (void)setupDataSource
+{
+    _dataSource = [[VLCLibraryGroupsDataSource alloc] init];
+    self.dataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
 }
 
 - (void)setupGridViewModeViews
