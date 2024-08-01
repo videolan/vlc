@@ -33,6 +33,7 @@ NSString * const VLCLibrarySongsLibraryViewModePreferenceKey = @"SongsLibraryVie
 NSString * const VLCLibraryArtistLibraryViewModePreferenceKey = @"ArtistLibraryViewMode";
 NSString * const VLCLibraryBrowseLibraryViewModePreferenceKey = @"BrowseLibraryViewMode";
 NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryViewMode";
+NSString * const VLCLibraryGroupsLibraryViewModePreferenceKey = @"GroupsLibraryViewMode";
 
 @implementation VLCLibraryWindowPersistentPreferences
 
@@ -178,6 +179,17 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryStreamLibraryViewModePreferenceKey
                                               value:streamLibraryViewMode];
+}
+
+- (VLCLibraryViewModeSegment)groupsLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryGroupsLibraryViewModePreferenceKey];
+}
+
+- (void)setGroupsLibraryViewMode:(VLCLibraryViewModeSegment)groupsLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryGroupsLibraryViewModePreferenceKey
+                                              value:groupsLibraryViewMode];
 }
 
 @end
