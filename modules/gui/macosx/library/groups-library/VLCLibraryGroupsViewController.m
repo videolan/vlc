@@ -34,6 +34,7 @@
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/groups-library/VLCLibraryGroupsDataSource.h"
 
@@ -189,6 +190,28 @@
 
     self.groupsTableView.dataSource = self.dataSource;
     self.selectedGroupTableView.dataSource = self.dataSource;
+}
+
+- (void)presentGroupsView
+{
+    const VLCLibraryViewModeSegment viewModeSegment =
+        VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
+    NSView *viewToPresent = nil;
+
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        viewToPresent = self.collectionViewScrollView;
+    } else {
+        viewToPresent = self.listViewSplitView;
+    }
+    NSParameterAssert(viewToPresent != nil);
+
+    self.libraryTargetView.subviews = @[viewToPresent];
+    [NSLayoutConstraint activateConstraints:@[
+        [self.libraryTargetView.topAnchor constraintEqualToAnchor:viewToPresent.topAnchor],
+        [self.libraryTargetView.bottomAnchor constraintEqualToAnchor:viewToPresent.bottomAnchor],
+        [self.libraryTargetView.leadingAnchor constraintEqualToAnchor:viewToPresent.leadingAnchor],
+        [self.libraryTargetView.trailingAnchor constraintEqualToAnchor:viewToPresent.trailingAnchor]
+    ]];
 }
 
 @end

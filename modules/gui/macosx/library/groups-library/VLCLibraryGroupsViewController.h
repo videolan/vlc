@@ -51,6 +51,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (void)presentGroupsView;
+
 @end
 
 NS_ASSUME_NONNULL_END
