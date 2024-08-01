@@ -30,6 +30,16 @@
 
 @implementation VLCLibraryTableViewDelegate
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.cellViewIdentifier = @"VLCLibraryTableViewCellIdentifier";
+        self.cellViewClass = [VLCLibraryTableCellView class];
+    }
+    return self;
+}
+
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
