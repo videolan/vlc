@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryMediaSourceViewController;
 @class VLCLibraryVideoViewController;
 @class VLCLibraryHomeViewController;
+@class VLCLibraryGroupsViewController;
 @class VLCLibrarySortingMenuController;
 @class VLCPlaylistController;
 @class VLCCustomEmptyLibraryBrowseButton;
@@ -123,6 +124,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
 @property (readonly) VLCLibraryVideoViewController *libraryVideoViewController;
 @property (readonly) VLCLibraryHomeViewController *libraryHomeViewController;
+@property (readonly) VLCLibraryGroupsViewController *libraryGroupsViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
 

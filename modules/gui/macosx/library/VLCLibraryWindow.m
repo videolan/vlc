@@ -51,6 +51,8 @@
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
+#import "library/groups-library/VLCLibraryGroupsViewController.h"
+
 #import "library/home-library/VLCLibraryHomeViewController.h"
 
 #import "library/video-library/VLCLibraryVideoDataSource.h"
@@ -182,6 +184,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryVideoViewController = [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     _libraryAudioViewController = [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
+    _libraryGroupsViewController = [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:self];
 
     [self setViewForSelectedSegment];
 }
