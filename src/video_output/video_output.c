@@ -82,6 +82,7 @@ typedef struct vout_thread_sys_t
     vlc_mutex_t clock_lock;
     bool clock_nowait; /* protected by vlc_clock_Lock()/vlc_clock_Unlock() */
     bool wait_interrupted;
+    bool first_picture;
 
     vlc_clock_t     *clock;
     vlc_clock_listener_id *clock_listener_id;
@@ -1516,6 +1517,19 @@ static bool UpdateCurrentPicture(vout_thread_sys_t *sys)
     if (sys->pause.is_on || sys->wait_interrupted)
         return false;
 
+    /* Prevent to query the clock if we know that there are no next pictures.
+     * Since the clock is likely no properly setup at that stage. Indeed, the
+     * input/decoder.c send a first forced picture quickly, then a next one
+     * when the clock is configured. */
+    if (sys->first_picture)
+    {
+        bool has_next_pic = !picture_fifo_IsEmpty(sys->decoder_fifo);
+        if (!has_next_pic)
+            return false;
+
+        sys->first_picture = false;
+    }
+
     const vlc_tick_t system_now = vlc_tick_now();
     vlc_clock_Lock(sys->clock);
     const vlc_tick_t system_swap_current =
@@ -1659,6 +1673,7 @@ static void vout_FlushUnlocked(vout_thread_sys_t *vout, bool below,
         vlc_clock_SetDelay(sys->clock, sys->delay);
         vlc_clock_Unlock(sys->clock);
     }
+    sys->first_picture = true;
 }
 
 void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
@@ -1972,6 +1987,7 @@ static void vout_ReleaseDisplay(vout_thread_sys_t *vout)
     vlc_mutex_unlock(&sys->clock_lock);
     sys->str_id = NULL;
     sys->clock_id = 0;
+    sys->first_picture = true;
 }
 
 void vout_StopDisplay(vout_thread_t *vout)
@@ -2149,6 +2165,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     vlc_mutex_init(&sys->clock_lock);
     sys->clock_nowait = false;
     sys->wait_interrupted = false;
+    sys->first_picture = true;
 
     /* Display */
     sys->display = NULL;
