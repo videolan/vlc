@@ -183,6 +183,12 @@
 
     self.groupsTableView.delegate = self.tableViewDelegate;
     self.selectedGroupTableView.delegate = self.tableViewDelegate;
+
+    self.dataSource.masterTableView = self.groupsTableView;
+    self.dataSource.detailTableView = self.selectedGroupTableView;
+
+    self.groupsTableView.dataSource = self.dataSource;
+    self.selectedGroupTableView.dataSource = self.dataSource;
 }
 
 @end
