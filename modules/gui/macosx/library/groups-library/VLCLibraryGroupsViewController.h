@@ -24,13 +24,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
 @interface VLCLibraryGroupsViewController : NSObject
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
-@property (readonly) NSView *groupsLibraryView;
+@property (readonly) NSSplitView *listViewSplitView;
+@property (readonly) NSScrollView *groupsTableViewScrollView;
+@property (readonly) VLCLibraryTableView *groupsTableView;
+@property (readonly) NSScrollView *selectedGroupTableViewScrollView;
+@property (readonly) VLCLibraryTableView *selectedGroupTableView;
 @property (readonly) NSView *emptyLibraryView;
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;

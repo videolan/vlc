@@ -22,6 +22,8 @@
 
 #import "VLCLibraryGroupsViewController.h"
 
+#import "library/VLCLibraryTableView.h"
+#import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
 @implementation VLCLibraryGroupsViewController
@@ -31,6 +33,7 @@
     self = [super init];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupListViewModeViews];
     }
     return self;
 }
@@ -43,6 +46,48 @@
     _emptyLibraryView = libraryWindow.emptyLibraryView;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
+}
+
+- (void)setupListViewModeViews
+{
+    _groupsTableViewScrollView = [[NSScrollView alloc] init];
+    _selectedGroupTableViewScrollView = [[NSScrollView alloc] init];
+    _groupsTableView = [[VLCLibraryTableView alloc] init];
+    _selectedGroupTableView = [[VLCLibraryTableView alloc] init];
+    _listViewSplitView = [[NSSplitView alloc] init];
+
+    self.groupsTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.selectedGroupTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.groupsTableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.selectedGroupTableView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.groupsTableViewScrollView.hasHorizontalScroller = NO;
+    self.groupsTableViewScrollView.borderType = NSNoBorder;
+
+    self.selectedGroupTableViewScrollView.hasHorizontalScroller = NO;
+    self.selectedGroupTableViewScrollView.borderType = NSNoBorder;
+
+    self.groupsTableViewScrollView.documentView = self.groupsTableView;
+    self.selectedGroupTableViewScrollView.documentView = self.selectedGroupTableView;
+
+    self.listViewSplitView.vertical = YES;
+    self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
+    [self.listViewSplitView addArrangedSubview:self.groupsTableViewScrollView];
+    [self.listViewSplitView addArrangedSubview:self.selectedGroupTableViewScrollView];
+
+    NSTableColumn * const groupsColumn = [[NSTableColumn alloc] initWithIdentifier:@"groups"];
+    NSTableColumn * const selectedGroupColumn =
+        [[NSTableColumn alloc] initWithIdentifier:@"selectedGroup"];
+
+    [self.groupsTableView addTableColumn:groupsColumn];
+    [self.selectedGroupTableView addTableColumn:selectedGroupColumn];
+
+    self.groupsTableView.headerView = nil;
+    self.selectedGroupTableView.headerView = nil;
+
+    self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
 }
 
 @end
