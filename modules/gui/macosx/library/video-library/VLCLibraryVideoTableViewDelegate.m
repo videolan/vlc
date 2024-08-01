@@ -42,59 +42,31 @@
     return self;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView 
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
 {
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        return nil;
-    }
+    NSParameterAssert([tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]);
 
-    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
+    VLCLibraryTableCellView * const cellView =
+        (VLCLibraryTableCellView *)[super tableView:tableView
+                                 viewForTableColumn:tableColumn
+                                                row:row];
 
-    const id<VLCMediaLibraryItemProtocol> mediaItem = [vlcDataSource libraryItemAtRow:row forTableView:tableView];
-    if (mediaItem != nil) {
-        return [super tableView:tableView viewForTableColumn:tableColumn row:row];
-    }
-
-    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:self.cellViewIdentifier owner:self];
+    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource =
+        (NSObject<VLCLibraryTableViewDataSource> *)tableView.dataSource;
+    NSParameterAssert(vlcDataSource != nil);
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
+        VLCLibraryVideoDataSource * const videoTableViewDataSource = 
+            (VLCLibraryVideoDataSource *)vlcDataSource;
         NSTableView * const groupsTableView = videoTableViewDataSource.masterTableView;
-
         if (tableView == groupsTableView) {
             cellView.representedVideoLibrarySection = row;
         }
     }
 
     return cellView;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    NSParameterAssert(notification);
-    NSTableView *tableView = (NSTableView *)notification.object;
-    NSAssert(tableView, @"Must be a valid table view");
-    NSInteger selectedRow = tableView.selectedRow;
-
-    if (![tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
-        return;
-    }
-
-    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource = (NSObject<VLCLibraryTableViewDataSource>*)tableView.dataSource;
-    NSAssert(vlcDataSource != nil, @"Should be a valid data source");
-
-    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
-        if (tableView == videoTableViewDataSource.masterTableView) {
-            [videoTableViewDataSource.detailTableView reloadData];
-        }
-    } else if ([vlcDataSource isKindOfClass:[VLCLibraryGroupsDataSource class]]) {
-        VLCLibraryGroupsDataSource * const groupsTableViewDataSource = (VLCLibraryGroupsDataSource *)vlcDataSource;
-        if (tableView == groupsTableViewDataSource.masterTableView) {
-            [groupsTableViewDataSource.detailTableView reloadData];
-        }
-    }
 }
 
 @end
