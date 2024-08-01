@@ -28,6 +28,8 @@
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 
+#import "library/groups-library/VLCLibraryGroupsDataSource.h"
+
 @implementation VLCLibraryVideoTableViewDelegate
 
 - (instancetype)init
@@ -84,10 +86,13 @@
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
         VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
-        NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
-
         if (tableView == videoTableViewDataSource.groupsTableView) {
             [videoTableViewDataSource.groupSelectionTableView reloadData];
+        }
+    } else if ([vlcDataSource isKindOfClass:[VLCLibraryGroupsDataSource class]]) {
+        VLCLibraryGroupsDataSource * const groupsTableViewDataSource = (VLCLibraryGroupsDataSource *)vlcDataSource;
+        if (tableView == groupsTableViewDataSource.groupsTableView) {
+            [groupsTableViewDataSource.selectedGroupTableView reloadData];
         }
     }
 }
