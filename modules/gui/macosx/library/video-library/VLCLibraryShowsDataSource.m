@@ -76,8 +76,8 @@
 
     self.showsArray = self.libraryModel.listOfShows;
 
-    [self.showsTableView reloadData];
-    [self.selectedShowTableView reloadData];
+    [self.masterTableView reloadData];
+    [self.detailTableView reloadData];
     [self.collectionView reloadData];
 }
 
@@ -95,12 +95,12 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView == self.showsTableView) {
+    if (tableView == self.masterTableView) {
         return self.showsArray.count;
     } 
 
-    const NSInteger selectedShowRow = self.showsTableView.selectedRow;
-    if (tableView == self.selectedShowTableView && selectedShowRow > -1) {
+    const NSInteger selectedShowRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedShowRow > -1) {
         VLCMediaLibraryShow * const show = self.showsArray[selectedShowRow];
         return show.episodeCount;
     }
@@ -118,12 +118,12 @@
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (tableView == self.showsTableView) {
+    if (tableView == self.masterTableView) {
         return self.showsArray[row];
     }
 
-    const NSInteger selectedShowRow = self.showsTableView.selectedRow;
-    if (tableView == self.selectedShowTableView && selectedShowRow > -1) {
+    const NSInteger selectedShowRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedShowRow > -1) {
         VLCMediaLibraryShow * const show = self.showsArray[selectedShowRow];
         return show.episodes[row];
     }

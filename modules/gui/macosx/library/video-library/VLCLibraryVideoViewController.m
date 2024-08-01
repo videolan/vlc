@@ -156,8 +156,8 @@
     self.libraryShowsDataSource.libraryModel =
         VLCMain.sharedInstance.libraryController.libraryModel;
     self.libraryShowsDataSource.collectionView = self.videoLibraryCollectionView;
-    self.libraryShowsDataSource.showsTableView = self.videoLibraryGroupsTableView;
-    self.libraryShowsDataSource.selectedShowTableView = self.videoLibraryGroupSelectionTableView;
+    self.libraryShowsDataSource.masterTableView = self.videoLibraryGroupsTableView;
+    self.libraryShowsDataSource.detailTableView = self.videoLibraryGroupSelectionTableView;
 
     NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
     [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
