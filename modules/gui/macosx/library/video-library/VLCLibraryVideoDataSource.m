@@ -173,11 +173,11 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
     self->_recentsArray = [self.libraryModel listOfRecentMedia];
     self->_libraryArray = [self.libraryModel listOfVideoMedia];
 
-    if (self.groupsTableView.dataSource == self) {
-        [self.groupsTableView reloadData];
+    if (self.masterTableView.dataSource == self) {
+        [self.masterTableView reloadData];
     }
-    if (self.groupSelectionTableView.dataSource == self) {
-        [self.groupSelectionTableView reloadData];
+    if (self.detailTableView.dataSource == self) {
+        [self.detailTableView reloadData];
     }
     if (self.collectionView.dataSource == self) {
         [self.collectionView reloadData];
@@ -246,15 +246,14 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
             [self.collectionView reloadItemsAtIndexPaths:indexPathSet];
         }
 
-        if (self.groupSelectionTableView.dataSource == self &&
-            [self rowToVideoGroup:self.groupsTableView.selectedRow] == group) {
+        if (self.detailTableView.dataSource == self &&
+            [self rowToVideoGroup:self.masterTableView.selectedRow] == group) {
             // Don't regenerate the groups by index as these do not change according to the
             // notification, stick to the selection table view
-            const NSRange columnRange = NSMakeRange(0, self->_groupsTableView.numberOfColumns);
+            const NSRange columnRange = NSMakeRange(0, self.masterTableView.numberOfColumns);
             NSIndexSet * const columnIndexSet =
                 [NSIndexSet indexSetWithIndexesInRange:columnRange];
-            [self.groupSelectionTableView reloadDataForRowIndexes:rowIndexSet
-                                                    columnIndexes:columnIndexSet];
+            [self.detailTableView reloadDataForRowIndexes:rowIndexSet columnIndexes:columnIndexSet];
         }
 
         // Don't bother with the groups table view as we always show "recents" and "videos" there
@@ -279,12 +278,12 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
             [self.collectionView deleteItemsAtIndexPaths:indexPathSet];
         }
 
-        if (self.groupSelectionTableView.dataSource == self &&
-            [self rowToVideoGroup:self.groupsTableView.selectedRow] == group) {
+        if (self.detailTableView.dataSource == self &&
+            [self rowToVideoGroup:self.masterTableView.selectedRow] == group) {
             // Don't regenerate the groups by index as these do not change according to the
             // notification, stick to the selection table view
-            [self.groupSelectionTableView removeRowsAtIndexes:rowIndexSet
-                                                withAnimation:NSTableViewAnimationSlideUp];
+            [self.detailTableView removeRowsAtIndexes:rowIndexSet
+                                        withAnimation:NSTableViewAnimationSlideUp];
         }
     }];
 }
@@ -330,17 +329,17 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
-    [_groupsTableView reloadData];
+    [self.masterTableView reloadData];
     [self reloadData];
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (tableView == _groupsTableView) {
+    if (tableView == self.masterTableView) {
         _priorNumVideoSections = [self recentItemsPresent] ? 2 : 1;
         return _priorNumVideoSections;
-    } else if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
+    } else if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
+        switch([self rowToVideoGroup:self.masterTableView.selectedRow]) {
             case VLCMediaLibraryParentGroupTypeRecentVideos:
                 return _recentsArray.count;
             case VLCMediaLibraryParentGroupTypeVideoLibrary:
@@ -363,8 +362,8 @@ NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (tableView == _groupSelectionTableView && _groupsTableView.selectedRow > -1) {
-        switch([self rowToVideoGroup:_groupsTableView.selectedRow]) {
+    if (tableView == self.detailTableView && self.masterTableView.selectedRow > -1) {
+        switch([self rowToVideoGroup:self.masterTableView.selectedRow]) {
             case VLCMediaLibraryParentGroupTypeRecentVideos:
                 return _recentsArray[row];
             case VLCMediaLibraryParentGroupTypeVideoLibrary:

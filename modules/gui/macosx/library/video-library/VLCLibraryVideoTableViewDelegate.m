@@ -60,7 +60,7 @@
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
         VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
-        NSTableView * const groupsTableView = videoTableViewDataSource.groupsTableView;
+        NSTableView * const groupsTableView = videoTableViewDataSource.masterTableView;
 
         if (tableView == groupsTableView) {
             cellView.representedVideoLibrarySection = row;
@@ -86,8 +86,8 @@
 
     if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
         VLCLibraryVideoDataSource * const videoTableViewDataSource = (VLCLibraryVideoDataSource *)vlcDataSource;
-        if (tableView == videoTableViewDataSource.groupsTableView) {
-            [videoTableViewDataSource.groupSelectionTableView reloadData];
+        if (tableView == videoTableViewDataSource.masterTableView) {
+            [videoTableViewDataSource.detailTableView reloadData];
         }
     } else if ([vlcDataSource isKindOfClass:[VLCLibraryGroupsDataSource class]]) {
         VLCLibraryGroupsDataSource * const groupsTableViewDataSource = (VLCLibraryGroupsDataSource *)vlcDataSource;

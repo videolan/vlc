@@ -148,8 +148,8 @@
 
     _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
     _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _libraryVideoDataSource.groupsTableView = _videoLibraryGroupsTableView;
-    _libraryVideoDataSource.groupSelectionTableView = _videoLibraryGroupSelectionTableView;
+    _libraryVideoDataSource.masterTableView = _videoLibraryGroupsTableView;
+    _libraryVideoDataSource.detailTableView = _videoLibraryGroupSelectionTableView;
     _libraryVideoDataSource.collectionView = _videoLibraryCollectionView;
 
     _libraryShowsDataSource = [[VLCLibraryShowsDataSource alloc] init];
