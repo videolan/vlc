@@ -22,6 +22,11 @@
 
 #import "VLCLibraryGroupsViewController.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
+#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -33,6 +38,7 @@
     self = [super init];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+        [self setupGridViewModeViews];
         [self setupListViewModeViews];
     }
     return self;
@@ -46,6 +52,59 @@
     _emptyLibraryView = libraryWindow.emptyLibraryView;
     _placeholderImageView = libraryWindow.placeholderImageView;
     _placeholderLabel = libraryWindow.placeholderLabel;
+}
+
+- (void)setupGridViewModeViews
+{
+    _collectionViewScrollView = [[NSScrollView alloc] init];
+    _collectionView = [[NSCollectionView alloc] init];
+
+    self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.collectionView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.collectionViewScrollView.hasHorizontalScroller = NO;
+    self.collectionViewScrollView.borderType = NSNoBorder;
+    self.collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.collectionViewScrollView.contentInsets =
+        VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    self.collectionViewScrollView.scrollerInsets =
+        VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    self.collectionViewScrollView.documentView = self.collectionView;
+
+    const CGFloat collectionItemSpacing = VLCLibraryUIUnits.collectionViewItemSpacing;
+    const NSEdgeInsets collectionViewSectionInset = VLCLibraryUIUnits.collectionViewSectionInsets;
+
+    VLCLibraryCollectionViewFlowLayout * const collectionViewLayout =
+        [[VLCLibraryCollectionViewFlowLayout alloc] init];
+    collectionViewLayout.headerReferenceSize =
+        VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
+    collectionViewLayout.minimumLineSpacing = collectionItemSpacing;
+    collectionViewLayout.minimumInteritemSpacing = collectionItemSpacing;
+    collectionViewLayout.sectionInset = collectionViewSectionInset;
+    self.collectionView.collectionViewLayout = collectionViewLayout;
+
+    _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
+    self.collectionViewDelegate.itemsAspectRatio = VLCLibraryCollectionViewItemAspectRatioVideoItem;
+    self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
+    self.collectionView.delegate = self.collectionViewDelegate;
+
+    [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
+                 forItemWithIdentifier:VLCLibraryCellIdentifier];
+
+    [self.collectionView registerClass:VLCLibraryCollectionViewSupplementaryElementView.class
+            forSupplementaryViewOfKind:NSCollectionElementKindSectionHeader
+                        withIdentifier:VLCLibrarySupplementaryElementViewIdentifier];
+
+    NSString * const mediaItemSupplementaryDetailViewString =
+        NSStringFromClass(VLCLibraryCollectionViewMediaItemSupplementaryDetailView.class);
+    NSNib * const mediaItemSupplementaryDetailViewNib =
+        [[NSNib alloc] initWithNibNamed:mediaItemSupplementaryDetailViewString bundle:nil];
+
+    [self.collectionView registerNib:mediaItemSupplementaryDetailViewNib
+          forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
+                      withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
+
+    self.collectionView.delegate = self.collectionViewDelegate;
 }
 
 - (void)setupListViewModeViews
