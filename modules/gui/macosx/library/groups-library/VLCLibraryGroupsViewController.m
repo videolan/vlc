@@ -27,6 +27,7 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -112,6 +113,7 @@
 {
     _groupsTableViewScrollView = [[NSScrollView alloc] init];
     _selectedGroupTableViewScrollView = [[NSScrollView alloc] init];
+    _tableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
     _groupsTableView = [[VLCLibraryTableView alloc] init];
     _selectedGroupTableView = [[VLCLibraryTableView alloc] init];
     _listViewSplitView = [[NSSplitView alloc] init];
@@ -165,6 +167,9 @@
 
     self.groupsTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     self.selectedGroupTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+
+    self.groupsTableView.delegate = self.tableViewDelegate;
+    self.selectedGroupTableView.delegate = self.tableViewDelegate;
 }
 
 @end

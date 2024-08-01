@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryCollectionViewDelegate;
+@class VLCLibraryMasterDetailViewTableViewDelegate;
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
@@ -44,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTextField *placeholderLabel;
 
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
+@property (readonly) VLCLibraryMasterDetailViewTableViewDelegate *tableViewDelegate;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
