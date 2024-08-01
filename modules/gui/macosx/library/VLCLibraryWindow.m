@@ -276,6 +276,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryStreamsSegment:
         [self showMediaSourceLibrary];
         break;
+    case VLCLibraryGroupsSegment:
+    case VLCLibraryGroupsGroupSubSegment:
+        [self showGroupsLibrary];
     default:
         break;
     }
@@ -381,6 +384,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else if (segmentType == VLCLibraryStreamsSegment) {
         [_libraryMediaSourceViewController presentStreamsView];
     }
+}
+
+- (void)showGroupsLibrary
+{
+    [self.toolbarDelegate layoutForSegment:self.librarySegmentType];
+    [_libraryGroupsViewController presentGroupsView];
 }
 
 - (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
