@@ -22,18 +22,7 @@
 
 #import "VLCLibraryGroupsDataSource.h"
 
-#import "library/VLCLibraryCollectionViewFlowLayout.h"
-#import "library/VLCLibraryCollectionViewItem.h"
-#import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
-#import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryRepresentedItem.h"
-
-@interface VLCLibraryGroupsDataSource ()
-
-@property (readwrite, atomic) NSArray<VLCMediaLibraryGroup *> *groupsArray;
-
-@end
 
 @implementation VLCLibraryGroupsDataSource
 
@@ -68,179 +57,14 @@
     [self reloadData];
 }
 
-- (void)reloadData
+- (NSArray<VLCMediaLibraryGroup *> *)backingArray
 {
-    [(VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout resetLayout];
-
-    self.groupsArray = self.libraryModel.listOfGroups;
-
-    [self.masterTableView reloadData];
-    [self.detailTableView reloadData];
-    [self.collectionView reloadData];
-}
-
-- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
-{
-    return [array indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> findItem,
-                                                 const NSUInteger idx,
-                                                 BOOL * const stop) {
-        NSAssert(findItem != nil, @"Collection should not contain nil items");
-        return findItem.libraryID == libraryId;
-    }];
-}
-
-#pragma mark - table view data source and delegation
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-    if (tableView == self.masterTableView) {
-        return self.groupsArray.count;
-    }
-
-    const NSInteger selectedGroupRow = self.masterTableView.selectedRow;
-    if (tableView == self.detailTableView && selectedGroupRow > -1) {
-        return self.groupsArray[selectedGroupRow].numberOfTotalItems;
-    }
-
-    return 0;
-}
-
-- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
-                                       forTableView:(NSTableView *)tableView
-{
-    if (tableView == self.masterTableView) {
-        return self.groupsArray[row];
-    }
-
-    const NSInteger selectedGroupRow = self.masterTableView.selectedRow;
-    if (tableView == self.detailTableView && selectedGroupRow > -1) {
-        VLCMediaLibraryGroup * const group = self.groupsArray[selectedGroupRow];
-        return group.mediaItems[row];
-    }
-
-    return nil;
-}
-
-- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
-{
-    if (libraryItem == nil) {
-        return NSNotFound;
-    }
-    return [self indexOfMediaItem:libraryItem.libraryID inArray:self.groupsArray];
+    return self.libraryModel.listOfGroups;
 }
 
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     return VLCMediaLibraryParentGroupTypeGroup;
-}
-
-# pragma mark - collection view data source and delegation
-
-- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
-                                        forCollectionView:(NSCollectionView *)collectionView
-{
-    VLCMediaLibraryGroup * const group = self.groupsArray[indexPath.section];
-    return group.mediaItems[indexPath.item];
-}
-
-- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
-{
-    __block NSInteger groupMediaItemIndex = NSNotFound;
-    const NSInteger groupIndex =
-        [self.groupsArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
-                                                         const NSUInteger idx,
-                                                         BOOL * const stop) {
-            groupMediaItemIndex =
-                [group.mediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item,
-                                                                 const NSUInteger idx,
-                                                                 BOOL * const stop) {
-                    return item.libraryID == libraryItem.libraryID;
-                }];
-            return groupMediaItemIndex != NSNotFound;
-        }];
-    return groupIndex != NSNotFound
-        ? [NSIndexPath indexPathForItem:groupMediaItemIndex inSection:groupIndex]
-        : nil;
-}
-
-- (NSArray<VLCLibraryRepresentedItem *> *)representedItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
-                                                     forCollectionView:(NSCollectionView *)collectionView
-{
-    NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems =
-        [NSMutableArray arrayWithCapacity:indexPaths.count];
-
-    for (NSIndexPath * const indexPath in indexPaths) {
-        const id<VLCMediaLibraryItemProtocol> libraryItem =
-            [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-        VLCLibraryRepresentedItem * const representedItem =
-            [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
-                                                 parentType:self.currentParentType];
-        [representedItems addObject:representedItem];
-    }
-
-    return representedItems;
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
-{
-    return self.groupsArray.count;
-}
-
-- (NSInteger)collectionView:(NSCollectionView *)collectionView
-     numberOfItemsInSection:(NSInteger)section
-{
-    return self.groupsArray[section].numberOfTotalItems;
-}
-
-- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
-     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
-{
-    VLCLibraryCollectionViewItem * const viewItem =
-        [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
-    const id<VLCMediaLibraryItemProtocol> item =
-        [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-    VLCLibraryRepresentedItem * const representedItem =
-        [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
-    viewItem.representedItem = representedItem;
-    return viewItem;
-}
-
-- (NSView *)collectionView:(NSCollectionView *)collectionView
-viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
-               atIndexPath:(NSIndexPath *)indexPath
-{
-    if([kind isEqualToString:NSCollectionElementKindSectionHeader]) {
-        VLCLibraryCollectionViewSupplementaryElementView * const sectionHeadingView =
-            [collectionView makeSupplementaryViewOfKind:kind
-                                         withIdentifier:VLCLibrarySupplementaryElementViewIdentifier
-                                           forIndexPath:indexPath];
-        VLCMediaLibraryGroup * const group = self.groupsArray[indexPath.section];
-        sectionHeadingView.stringValue = group.displayString;
-        return sectionHeadingView;
-
-    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind]) {
-        NSString * const viewIdentifier =
-            VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier;
-        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemDetailView =
-            [collectionView makeSupplementaryViewOfKind:kind
-                                         withIdentifier:viewIdentifier
-                                           forIndexPath:indexPath];
-        const id<VLCMediaLibraryItemProtocol> item = [self libraryItemAtIndexPath:indexPath
-                                                                forCollectionView:collectionView];
-        VLCLibraryRepresentedItem * const representedItem =
-            [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
-
-        mediaItemDetailView.representedItem = representedItem;
-        mediaItemDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
-        return mediaItemDetailView;
-    }
-
-    return nil;
-}
-
-- (NSString *)supplementaryDetailViewKind
-{
-    return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
 }
 
 @end
