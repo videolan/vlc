@@ -22,21 +22,15 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryCollectionViewDataSource.h"
-#import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
+#import "library/VLCLibraryAbstractGroupingDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryModel;
 
-@interface VLCLibraryShowsDataSource : NSObject <VLCLibraryMasterDetailViewTableViewDataSource, VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryShowsDataSource : VLCLibraryAbstractGroupingDataSource
 
 @property (readwrite, assign) VLCLibraryModel *libraryModel;
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite) NSTableView *masterTableView;
-@property (readwrite) NSTableView *detailTableView;
-
-- (void)reloadData;
 
 @end
 
