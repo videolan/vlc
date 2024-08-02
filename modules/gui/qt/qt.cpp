@@ -896,35 +896,40 @@ static void *Thread( void *obj )
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
 
-#if defined(_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WINBLUE)
+#if defined(_WIN32)
     // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
-    //       We have to manually pick a graphics api here for
-    //       Windows 7 and Windows 8, since it may not support
-    //       the default graphics api (Direct3D 11.2).
+    //       D3D_FEATURE_LEVEL_11_1, which is required by Qt
+    //       may not be supported. In order to avoid crash,
+    //       fallback to OpenGL, or Software mode.
 
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") && qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND"))
     {
-        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8_1)
+        // If OS version is lower than Windows 8.1, and Qt version is lower than
+        // 6.6.0, do not take risk and use OpenGL (since probing is not available).
+        // If OS version is greater than or equal to Windows 8.1, and Qt version is
+        // lower than 6.6.0, take risk and do not use the fallback procedure.
+        // Qt in the contribs is already version 6.7.0, so this should not be a
+        // concern.
+        if ((QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8_1) ||
+            (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)))
         {
             // TODO: Probe D3D12 when it becomes the default.
-            {
-                // If probing is not available, use OpenGL as a compromise:
-                QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
+            // If probing is not available, use OpenGL as a compromise:
+            QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-                QRhiD3D11InitParams params;
-                if (QRhi::probe(QRhi::D3D11, &params))
-                    graphicsApi = QSGRendererInterface::Direct3D11;
-                else
-                {
-                    QRhiGles2InitParams params1;
-                    params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
-                    if (!QRhi::probe(QRhi::OpenGLES2, &params1))
-                        graphicsApi = QSGRendererInterface::Software;
-                    delete params1.fallbackSurface;
-                }
-#endif
-                QQuickWindow::setGraphicsApi(graphicsApi);
+            QRhiD3D11InitParams params;
+            if (QRhi::probe(QRhi::D3D11, &params))
+                graphicsApi = QSGRendererInterface::Direct3D11;
+            else
+            {
+                QRhiGles2InitParams params1;
+                params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
+                if (!QRhi::probe(QRhi::OpenGLES2, &params1))
+                    graphicsApi = QSGRendererInterface::Software;
+                delete params1.fallbackSurface;
             }
+#endif
+            QQuickWindow::setGraphicsApi(graphicsApi);
         }
     }
 #endif
