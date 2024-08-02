@@ -104,6 +104,10 @@
     self.collectionViewDelegate.staticItemSize = VLCLibraryCollectionViewItem.defaultVideoItemSize;
     self.collectionView.delegate = self.collectionViewDelegate;
 
+    self.collectionView.selectable = YES;
+    self.collectionView.allowsEmptySelection = YES;
+    self.collectionView.allowsMultipleSelection = YES;
+
     [self.collectionView registerClass:VLCLibraryCollectionViewItem.class
                  forItemWithIdentifier:VLCLibraryCellIdentifier];
 
