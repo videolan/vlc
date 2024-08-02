@@ -240,6 +240,8 @@ MainViewLoader {
         id: contextMenu
 
         model: root.model
+
+        ctx: MainCtx
     }
 
     // TBD: Refactor this with MusicGenres ?
