@@ -30,7 +30,7 @@
 #include <vlc_cxx_helpers.hpp>
 
 #include "util/shared_input_item.hpp"
-#include "util/base_model.hpp"
+#include "networkbasemodel.hpp"
 
 #include <memory>
 
@@ -101,39 +101,21 @@ private:
 };
 
 class NetworkMediaModelPrivate;
-class NetworkMediaModel : public BaseModel
+class NetworkMediaModel : public NetworkBaseModel
 {
     Q_OBJECT
 
 public:
     enum Role {
-        NETWORK_NAME = Qt::UserRole + 1,
-        NETWORK_MRL,
-        NETWORK_INDEXED,
+        NETWORK_INDEXED = NETWORK_BASE_MAX,
         NETWORK_CANINDEX,
-        NETWORK_TYPE,
-        NETWORK_PROTOCOL,
         NETWORK_TREE,
-        NETWORK_ARTWORK,
         NETWORK_FILE_SIZE,
         NETWORK_FILE_MODIFIED,
         NETWORK_MEDIA,
         NETWORK_MEDIA_PROGRESS,
         NETWORK_MEDIA_DURATION,
     };
-
-    enum ItemType{
-        // qt version of input_item_type_e
-        TYPE_UNKNOWN = ITEM_TYPE_UNKNOWN,
-        TYPE_FILE,
-        TYPE_DIRECTORY,
-        TYPE_DISC,
-        TYPE_CARD,
-        TYPE_STREAM,
-        TYPE_PLAYLIST,
-        TYPE_NODE,
-    };
-    Q_ENUM( ItemType )
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)
     Q_PROPERTY(QVariant tree READ getTree WRITE setTree NOTIFY treeChanged)

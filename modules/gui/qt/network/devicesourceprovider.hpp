@@ -32,18 +32,19 @@
 #include "mediatreelistener.hpp"
 
 //represents an entry of the model
-struct NetworkDeviceItem
+struct NetworkDeviceItem : public NetworkBaseItem
 {
-    NetworkDeviceItem(const SharedInputItem& item, const NetworkDeviceModel::MediaSourcePtr& mediaSource)
-        : name(qfu(item->psz_name))
-        , mainMrl(QUrl::fromEncoded(item->psz_uri))
-        , protocol(mainMrl.scheme())
-        , type( static_cast<NetworkDeviceModel::ItemType>(item->i_type))
-        , mediaSource(mediaSource)
-        , inputItem(item)
+    NetworkDeviceItem(const SharedInputItem& item, const NetworkDeviceModel::MediaSourcePtr& source)
     {
+        name = qfu(item->psz_name);
+        mainMrl = QUrl::fromEncoded(item->psz_uri);
+        protocol = mainMrl.scheme();
+        type = static_cast<NetworkDeviceModel::ItemType>(item->i_type);
+        mediaSource = source;
+        inputItem = item;
+
         id = qHash(name) ^ qHash(protocol);
-        mrls.push_back(std::make_pair(mainMrl, mediaSource));
+        mrls.push_back(std::make_pair(mainMrl, source));
 
         char* artworkUrl = input_item_GetArtworkURL(inputItem.get());
         if (artworkUrl)
@@ -54,15 +55,10 @@ struct NetworkDeviceItem
     }
 
     uint id;
-    QString name;
-    QUrl mainMrl;
     std::vector<std::pair<QUrl, NetworkDeviceModel::MediaSourcePtr>> mrls;
-    QString protocol;
-    NetworkDeviceModel::ItemType type;
     NetworkDeviceModel::MediaSourcePtr mediaSource;
     SharedInputItem inputItem;
-    QString artwork;
-};
+ };
 
 using NetworkDeviceItemPtr =std::shared_ptr<NetworkDeviceItem>;
 

@@ -221,7 +221,7 @@ NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
 }
 
 NetworkDeviceModel::NetworkDeviceModel( NetworkDeviceModelPrivate* priv, QObject* parent)
-    : BaseModel(priv, parent)
+    : NetworkBaseModel(priv, parent)
 {
 }
 
@@ -237,36 +237,21 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
 
     switch ( role )
     {
-        case NETWORK_NAME:
-            return item->name;
-        case NETWORK_MRL:
-            return item->mainMrl;
-        case NETWORK_TYPE:
-            return item->type;
-        case NETWORK_PROTOCOL:
-            return item->protocol;
         case NETWORK_SOURCE:
             return item->mediaSource->description;
         case NETWORK_TREE:
             return QVariant::fromValue( NetworkTreeItem(MediaTreePtr{ item->mediaSource->tree }, item->inputItem.get()) );
-        case NETWORK_ARTWORK:
-            return item->artwork;
         default:
-            return {};
+            return NetworkBaseModel::basedata(*item, role);
     }
 }
 
 QHash<int, QByteArray> NetworkDeviceModel::roleNames() const
 {
-    return {
-        { NETWORK_NAME, "name" },
-        { NETWORK_MRL, "mrl" },
-        { NETWORK_TYPE, "type" },
-        { NETWORK_PROTOCOL, "protocol" },
-        { NETWORK_SOURCE, "source" },
-        { NETWORK_TREE, "tree" },
-        { NETWORK_ARTWORK, "artwork" },
-    };
+    QHash<int, QByteArray> roles = NetworkBaseModel::roleNames();
+    roles[NETWORK_SOURCE] = "source";
+    roles[NETWORK_TREE] = "tree";
+    return roles;
 }
 
 void NetworkDeviceModel::setCtx(MainCtx* ctx)

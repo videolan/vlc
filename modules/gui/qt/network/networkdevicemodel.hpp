@@ -28,7 +28,7 @@
 
 #include <vlc_media_source.h>
 
-#include "util/base_model.hpp"
+#include "networkbasemodel.hpp"
 #include "util/shared_input_item.hpp"
 
 #include <memory>
@@ -38,7 +38,7 @@ Q_MOC_INCLUDE("maininterface/mainctx.hpp")
 class MainCtx;
 
 class NetworkDeviceModelPrivate;
-class NetworkDeviceModel : public BaseModel
+class NetworkDeviceModel : public NetworkBaseModel
 {
     Q_OBJECT
 
@@ -49,27 +49,9 @@ class NetworkDeviceModel : public BaseModel
 
 public: // Enums
     enum Role {
-        NETWORK_NAME = Qt::UserRole + 1,
-        NETWORK_MRL,
-        NETWORK_TYPE,
-        NETWORK_PROTOCOL,
-        NETWORK_SOURCE,
+        NETWORK_SOURCE = NetworkBaseModel::NETWORK_BASE_MAX,
         NETWORK_TREE,
-        NETWORK_ARTWORK,
     };
-
-    enum ItemType{
-        // qt version of input_item_type_e
-        TYPE_UNKNOWN = ITEM_TYPE_UNKNOWN,
-        TYPE_FILE,
-        TYPE_DIRECTORY,
-        TYPE_DISC,
-        TYPE_CARD,
-        TYPE_STREAM,
-        TYPE_PLAYLIST,
-        TYPE_NODE,
-    };
-    Q_ENUM( ItemType )
 
     enum SDCatType{
         // qt version of input_item_type_e

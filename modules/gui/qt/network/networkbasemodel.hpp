@@ -1,8 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
- * Authors: Benjamin Arnaud <bunjee@omega.gg>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,39 +16,62 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef STANDARDPATHMODEL_HPP
-#define STANDARDPATHMODEL_HPP
+#ifndef NETWORKBASEMODEL_HPP
+#define NETWORKBASEMODEL_HPP
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-// VLC includes
-#include "networkbasemodel.hpp"
+#include "util/base_model.hpp"
+#include <vlc_media_source.h>
 
-class StandardPathModelPrivate;
-class StandardPathModel : public NetworkBaseModel
+#include <QString>
+#include <QUrl>
+
+struct NetworkBaseItem;
+class NetworkBaseModel: public BaseModel
 {
     Q_OBJECT
 
-public: // Enums
-    // NOTE: Roles should be aligned with the NetworkDeviceModel.
-    enum Role
-    {
-        PATH_SOURCE = NetworkBaseModel::NETWORK_BASE_MAX,
-        PATH_TREE,
-        PATH_ARTWORK
+public:
+    enum Role {
+        NETWORK_BASE_NAME = Qt::UserRole + 1,
+        NETWORK_BASE_MRL,
+        NETWORK_BASE_TYPE,
+        NETWORK_BASE_PROTOCOL,
+        NETWORK_BASE_ARTWORK,
+        NETWORK_BASE_MAX
     };
 
-public:
-    StandardPathModel(QObject * parent = nullptr);
+    enum ItemType{
+        // qt version of input_item_type_e
+        TYPE_UNKNOWN = ITEM_TYPE_UNKNOWN,
+        TYPE_FILE,
+        TYPE_DIRECTORY,
+        TYPE_DISC,
+        TYPE_CARD,
+        TYPE_STREAM,
+        TYPE_PLAYLIST,
+        TYPE_NODE,
+    };
+    Q_ENUM( ItemType )
 
-public: // QAbstractItemModel implementation
+    using BaseModel::BaseModel;
+
     QHash<int, QByteArray> roleNames() const override;
 
-    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
-
-    Q_DECLARE_PRIVATE(StandardPathModel)
+protected:
+    QVariant basedata(const NetworkBaseItem& item, int role) const;
 };
 
-#endif // STANDARDPATHMODEL_HPP
+struct NetworkBaseItem
+{
+    QString name;
+    QUrl mainMrl;
+    QString protocol;
+    NetworkBaseModel::ItemType type;
+    QString artwork;
+};
+
+#endif /* NETWORKBASEMODEL_HPP */

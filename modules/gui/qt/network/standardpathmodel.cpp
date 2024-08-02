@@ -38,19 +38,10 @@ using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
                                               vlc_media_tree_Hold,
                                               vlc_media_tree_Release);
 
-struct StandardPathItem
+struct StandardPathItem : public NetworkBaseItem
 {
-    QString name;
-    QUrl    mrl;
-
-    QString protocol;
-
-    NetworkDeviceModel::ItemType type;
-
     SharedInputItem inputItem;
     MediaTreePtr tree;
-
-    QUrl artwork;
 };
 
 using StandardPathItemPtr =  std::shared_ptr<StandardPathItem>;
@@ -79,7 +70,7 @@ bool ascendingName(const StandardPathItemPtr& a,
 bool ascendingMrl(const StandardPathItemPtr& a,
                    const StandardPathItemPtr& b)
 {
-    return (QString::compare(a->mrl.toString(), b->mrl.toString(), Qt::CaseInsensitive) <= 0);
+    return (QString::compare(a->mainMrl.toString(), b->mainMrl.toString(), Qt::CaseInsensitive) <= 0);
 }
 
 bool descendingName(const StandardPathItemPtr& a,
@@ -91,7 +82,7 @@ bool descendingName(const StandardPathItemPtr& a,
 bool descendingMrl(const StandardPathItemPtr& a,
                    const StandardPathItemPtr& b)
 {
-    return (QString::compare(a->mrl.toString(), b->mrl.toString(), Qt::CaseInsensitive) >= 0);
+    return (QString::compare(a->mainMrl.toString(), b->mainMrl.toString(), Qt::CaseInsensitive) >= 0);
 }
 
 }
@@ -130,13 +121,13 @@ public:
         Q_Q(StandardPathModel);
         assert(m_qmlInitializing == false);
 #ifdef Q_OS_UNIX
-        addItem(QVLCUserDir(VLC_HOME_DIR), qtr("Home"), QUrl());
+        addItem(QVLCUserDir(VLC_HOME_DIR), qtr("Home"), {});
 #endif
-        addItem(QVLCUserDir(VLC_DESKTOP_DIR), qtr("Desktop"), QUrl());
-        addItem(QVLCUserDir(VLC_DOCUMENTS_DIR), qtr("Documents"), QUrl());
-        addItem(QVLCUserDir(VLC_MUSIC_DIR), qtr("Music"), QUrl());
-        addItem(QVLCUserDir(VLC_VIDEOS_DIR), qtr("Videos"), QUrl());
-        addItem(QVLCUserDir(VLC_DOWNLOAD_DIR), qtr("Download"), QUrl());
+        addItem(QVLCUserDir(VLC_DESKTOP_DIR), qtr("Desktop"), {});
+        addItem(QVLCUserDir(VLC_DOCUMENTS_DIR), qtr("Documents"), {});
+        addItem(QVLCUserDir(VLC_MUSIC_DIR), qtr("Music"), {});
+        addItem(QVLCUserDir(VLC_VIDEOS_DIR), qtr("Videos"), {});
+        addItem(QVLCUserDir(VLC_DOWNLOAD_DIR), qtr("Download"), {});
         //model is never updated, but this is still needed to fit the LocalListBaseModelPrivate requirements
         ++m_revision;
         m_loading = false;
@@ -152,14 +143,14 @@ public:
         return nullptr;
     }
 
-    void addItem(const QString & path, const QString & name, const QUrl & artwork)
+    void addItem(const QString & path, const QString & name, const QString& artwork)
     {
         QUrl url = QUrl::fromLocalFile(path);
 
         auto item = std::make_shared<StandardPathItem>();
 
         item->name = name;
-        item->mrl  = url;
+        item->mainMrl  = url;
         item->protocol = url.scheme();
         item->type = NetworkDeviceModel::TYPE_DIRECTORY;
 
@@ -200,7 +191,7 @@ public:
 // Ctor / dtor
 
 StandardPathModel::StandardPathModel(QObject * parent)
-    : BaseModel(new StandardPathModelPrivate(this), parent)
+    : NetworkBaseModel(new StandardPathModelPrivate(this), parent)
 {
 }
 
@@ -208,16 +199,10 @@ StandardPathModel::StandardPathModel(QObject * parent)
 
 QHash<int, QByteArray> StandardPathModel::roleNames() const /* override */
 {
-    return
-    {
-        { PATH_NAME, "name" },
-        { PATH_MRL, "mrl" },
-        { PATH_PROTOCOL, "protocol" },
-        { PATH_TYPE, "type" },
-        { PATH_SOURCE, "source" },
-        { PATH_TREE, "tree" },
-        { PATH_ARTWORK, "artwork" }
-    };
+    auto roles = NetworkBaseModel::roleNames();
+    roles[PATH_SOURCE] = "source";
+    roles[PATH_TREE] = "tree";
+    return roles;
 }
 
 QVariant StandardPathModel::data(const QModelIndex & index, int role) const /* override */
@@ -230,19 +215,9 @@ QVariant StandardPathModel::data(const QModelIndex & index, int role) const /* o
 
     switch (role)
     {
-        case PATH_NAME:
-            return item->name;
-        case PATH_MRL:
-            return item->mrl;
-        case PATH_PROTOCOL:
-            return item->protocol;
-        case PATH_TYPE:
-            return item->type;
         case PATH_TREE:
             return QVariant::fromValue(NetworkTreeItem(item->tree, item->inputItem.get()));
-        case PATH_ARTWORK:
-            return item->artwork;
         default:
-            return QVariant();
+            return NetworkBaseModel::basedata(*item, role);
     }
 }

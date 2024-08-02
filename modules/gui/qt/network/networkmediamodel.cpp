@@ -40,17 +40,12 @@ namespace {
 //use the same queue as in mlfoldermodel
 static const char* const ML_FOLDER_ADD_QUEUE = "ML_FOLDER_ADD_QUEUE";
 
-struct NetworkMediaItem
+struct NetworkMediaItem : public NetworkBaseItem
 {
-    QString name;
     QString uri;
-    QUrl mainMrl;
-    QString protocol;
     bool indexed;
-    NetworkMediaModel::ItemType type;
     bool canBeIndexed;
     NetworkTreeItem tree;
-    QString artwork;
     qint64 fileSize;
     QDateTime fileModified;
     MLMedia media;
@@ -487,7 +482,7 @@ struct NetworkMediaModel::ListenerCb : public MediaTreeListener::MediaTreeListen
 // NetworkMediaModel implementation
 
 NetworkMediaModel::NetworkMediaModel( QObject* parent )
-    : BaseModel( new  NetworkMediaModelPrivate(this), parent )
+    : NetworkBaseModel( new  NetworkMediaModelPrivate(this), parent )
 {
 }
 
@@ -515,21 +510,13 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
 
     switch ( role )
     {
-        case NETWORK_NAME:
-            return item->name;
-        case NETWORK_MRL:
-            return item->mainMrl;
         case NETWORK_INDEXED:
             return item->indexed;
         case NETWORK_CANINDEX:
             return item->canBeIndexed;
-        case NETWORK_TYPE:
-            return item->type;
-        case NETWORK_PROTOCOL:
-            return item->protocol;
         case NETWORK_TREE:
             return QVariant::fromValue( item->tree );
-        case NETWORK_ARTWORK:
+        case NETWORK_BASE_ARTWORK:
         {
             if (!item->artwork.isEmpty())
                 return item->artwork;
@@ -570,27 +557,24 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
             return {};
         }
         default:
-            return {};
+            return basedata(*item, role);
     }
 }
 
 QHash<int, QByteArray> NetworkMediaModel::roleNames() const
 {
-    return {
-        { NETWORK_NAME, "name" },
-        { NETWORK_MRL, "mrl" },
-        { NETWORK_INDEXED, "indexed" },
-        { NETWORK_CANINDEX, "can_index" },
-        { NETWORK_TYPE, "type" },
-        { NETWORK_PROTOCOL, "protocol" },
-        { NETWORK_TREE, "tree" },
-        { NETWORK_ARTWORK, "artwork" },
-        { NETWORK_FILE_SIZE, "fileSizeRaw64" },
-        { NETWORK_FILE_MODIFIED, "fileModified" },
-        { NETWORK_MEDIA, "media" },
-        { NETWORK_MEDIA_PROGRESS, "progress" },
-        { NETWORK_MEDIA_DURATION, "duration" }
-    };
+    auto roles = NetworkBaseModel::roleNames();
+
+    roles[NETWORK_INDEXED] = "indexed";
+    roles[NETWORK_CANINDEX] = "can_index";
+    roles[NETWORK_TREE] = "tree";
+    roles[NETWORK_FILE_SIZE] = "fileSizeRaw64";
+    roles[NETWORK_FILE_MODIFIED] = "fileModified";
+    roles[NETWORK_MEDIA] = "media";
+    roles[NETWORK_MEDIA_PROGRESS] = "progress";
+    roles[NETWORK_MEDIA_DURATION] = "duration";
+
+    return roles;
 }
 
 Qt::ItemFlags NetworkMediaModel::flags( const QModelIndex& idx ) const

@@ -1,8 +1,6 @@
 /*****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
- * Authors: Benjamin Arnaud <bunjee@omega.gg>
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -17,40 +15,35 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#ifndef STANDARDPATHMODEL_HPP
-#define STANDARDPATHMODEL_HPP
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-// VLC includes
 #include "networkbasemodel.hpp"
 
-class StandardPathModelPrivate;
-class StandardPathModel : public NetworkBaseModel
+QVariant NetworkBaseModel::basedata(const NetworkBaseItem& item, int role) const
 {
-    Q_OBJECT
-
-public: // Enums
-    // NOTE: Roles should be aligned with the NetworkDeviceModel.
-    enum Role
+    switch (role)
     {
-        PATH_SOURCE = NetworkBaseModel::NETWORK_BASE_MAX,
-        PATH_TREE,
-        PATH_ARTWORK
+    case NETWORK_BASE_NAME:
+        return item.name;
+    case NETWORK_BASE_MRL:
+        return item.mainMrl;
+    case NETWORK_BASE_TYPE:
+        return item.type;
+    case NETWORK_BASE_PROTOCOL:
+        return item.protocol;
+    case NETWORK_BASE_ARTWORK:
+        return item.artwork;
+    default:
+        return {};
     };
+}
 
-public:
-    StandardPathModel(QObject * parent = nullptr);
 
-public: // QAbstractItemModel implementation
-    QHash<int, QByteArray> roleNames() const override;
-
-    QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
-
-    Q_DECLARE_PRIVATE(StandardPathModel)
-};
-
-#endif // STANDARDPATHMODEL_HPP
+QHash<int, QByteArray> NetworkBaseModel::roleNames() const
+{
+    return {
+        { NETWORK_BASE_NAME, "name" },
+        { NETWORK_BASE_MRL, "mrl" },
+        { NETWORK_BASE_TYPE, "type" },
+        { NETWORK_BASE_PROTOCOL, "protocol" },
+        { NETWORK_BASE_ARTWORK, "artwork" },
+    };
+}
