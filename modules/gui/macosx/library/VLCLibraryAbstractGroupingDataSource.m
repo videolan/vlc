@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAbstractGroupingDataSource.h"
 
+#import "library/VLCLibraryDataTypes.h"
+
 @implementation VLCLibraryAbstractGroupingDataSource
 
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)backingArray
@@ -37,4 +39,62 @@
     [self.detailTableView reloadData];
     [self.collectionView reloadData];
 }
+
+- (NSUInteger)indexOfMediaItem:(const NSUInteger)libraryId inArray:(NSArray const *)array
+{
+    return [array indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> findItem,
+                                                 const NSUInteger idx,
+                                                 BOOL * const stop) {
+        NSAssert(findItem != nil, @"Collection should not contain nil items");
+        return findItem.libraryID == libraryId;
+    }];
+}
+
+#pragma mark - table view data source and delegation
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        return self.backingArray.count;
+    }
+
+    const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedMasterRow > -1) {
+        return self.backingArray[selectedMasterRow].mediaItems.count;
+    }
+
+    return 0;
+}
+
+- (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
+{
+    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row
+                                                                  forTableView:tableView];
+    return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        return self.backingArray[row];
+    }
+
+    const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedMasterRow > -1) {
+        const id<VLCMediaLibraryItemProtocol> item = self.backingArray[selectedMasterRow];
+        return item.mediaItems[row];
+    }
+
+    return nil;
+}
+
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return NSNotFound;
+    }
+    return [self indexOfMediaItem:libraryItem.libraryID inArray:self.backingArray];
+}
+
 @end
