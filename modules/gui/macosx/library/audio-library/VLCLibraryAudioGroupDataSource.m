@@ -331,4 +331,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return representedItems;
 }
 
+- (NSString *)supplementaryDetailViewKind
+{
+    return VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
+}
+
 @end

@@ -923,4 +923,19 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return representedItems;
 }
 
+
+- (NSString *)supplementaryDetailViewKind
+{
+    switch (self.audioLibrarySegment) {
+        case VLCAudioLibraryArtistsSegment:
+        case VLCAudioLibraryGenresSegment:
+            return nil;
+        case VLCAudioLibraryAlbumsSegment:
+            return VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
+        case VLCAudioLibrarySongsSegment:
+        default:
+            return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+    }
+}
+
 @end

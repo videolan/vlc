@@ -248,4 +248,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return nil;
 }
 
+- (NSString *)supplementaryDetailViewKind
+{
+    return VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind;
+}
+
 @end

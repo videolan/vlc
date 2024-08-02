@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryCollectionViewDataSource <NSCollectionViewDataSource>
 
+@property (readonly) NSString *supplementaryDetailViewKind;
+
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
                                         forCollectionView:(NSCollectionView *)collectionView;
 - (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
