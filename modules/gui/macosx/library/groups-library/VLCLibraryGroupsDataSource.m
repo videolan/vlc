@@ -139,4 +139,24 @@
     return group.mediaItems[indexPath.item];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    __block NSInteger groupMediaItemIndex = NSNotFound;
+    const NSInteger groupIndex =
+        [self.groupsArray indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                         const NSUInteger idx,
+                                                         BOOL * const stop) {
+            groupMediaItemIndex =
+                [group.mediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item,
+                                                                 const NSUInteger idx,
+                                                                 BOOL * const stop) {
+                    return item.libraryID == libraryItem.libraryID;
+                }];
+            return groupMediaItemIndex != NSNotFound;
+        }];
+    return groupIndex != NSNotFound
+        ? [NSIndexPath indexPathForItem:groupMediaItemIndex inSection:groupIndex]
+        : nil;
+}
+
 @end
