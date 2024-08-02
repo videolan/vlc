@@ -29,6 +29,8 @@
 #import "library/audio-library/VLCLibraryAudioGroupDataSource.h"
 #import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
+#import "library/groups-library/VLCLibraryGroupsDataSource.h"
+
 #import "library/home-library/VLCLibraryHomeViewVideoContainerViewDataSource.h"
 
 #import "library/video-library/VLCLibraryShowsDataSource.h"
@@ -283,7 +285,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     } else if ([dataSource isKindOfClass:VLCLibraryHomeViewVideoContainerViewDataSource.class] ||
                [dataSource isKindOfClass:VLCLibraryVideoDataSource.class] ||
-               [dataSource isKindOfClass:VLCLibraryShowsDataSource.class]) {
+               [dataSource isKindOfClass:VLCLibraryShowsDataSource.class] ||
+               [dataSource isKindOfClass:VLCLibraryGroupsDataSource.class]) {
         [layoutAttributesArray addObject:[self layoutAttributesForSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind atIndexPath:self.selectedIndexPath]];
     }
 
