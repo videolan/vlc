@@ -686,6 +686,7 @@ struct sout_stream_private {
 struct vlc_sout_clock_bus {
     struct {
         vlc_clock_main_t *bus;
+        vlc_clock_t *input;
     } clocks;
 };
 
@@ -797,8 +798,16 @@ struct vlc_sout_clock_bus *sout_ClockMainCreate(sout_stream_t *p_stream)
     if (bus->clocks.bus == NULL)
         goto error_bus;
 
+    vlc_clock_main_Lock(bus->clocks.bus);
+    bus->clocks.input = vlc_clock_main_CreateInputSlave(bus->clocks.bus);
+    vlc_clock_main_Unlock(bus->clocks.bus);
+    if (bus->clocks.input == NULL)
+        goto error_input;
+
     return bus;
 
+error_input:
+    vlc_clock_main_Delete(bus->clocks.bus);
 error_bus:
     free(bus);
     return NULL;
@@ -806,6 +815,7 @@ error_bus:
 
 void sout_ClockMainDelete(struct vlc_sout_clock_bus *bus)
 {
+    vlc_clock_Delete(bus->clocks.input);
     vlc_clock_main_Delete(bus->clocks.bus);
 }
 
