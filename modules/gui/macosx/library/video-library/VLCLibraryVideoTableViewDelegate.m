@@ -46,22 +46,17 @@
    viewForTableColumn:(NSTableColumn *)tableColumn
                   row:(NSInteger)row
 {
-    NSParameterAssert([tableView.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]);
-
     VLCLibraryTableCellView * const cellView =
         (VLCLibraryTableCellView *)[super tableView:tableView
                                  viewForTableColumn:tableColumn
                                                 row:row];
+    NSParameterAssert(cellView != nil);
 
-    NSObject<VLCLibraryTableViewDataSource> * const vlcDataSource =
-        (NSObject<VLCLibraryTableViewDataSource> *)tableView.dataSource;
-    NSParameterAssert(vlcDataSource != nil);
-
-    if ([vlcDataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
-        VLCLibraryVideoDataSource * const videoTableViewDataSource = 
-            (VLCLibraryVideoDataSource *)vlcDataSource;
-        NSTableView * const groupsTableView = videoTableViewDataSource.masterTableView;
-        if (tableView == groupsTableView) {
+    if ([tableView.dataSource isKindOfClass:[VLCLibraryVideoDataSource class]]) {
+        VLCLibraryVideoDataSource * const videoTableViewDataSource =
+            (VLCLibraryVideoDataSource *)tableView.dataSource;
+        NSParameterAssert(videoTableViewDataSource != nil);
+        if (tableView == videoTableViewDataSource.masterTableView) {
             cellView.representedVideoLibrarySection = row;
         }
     }
