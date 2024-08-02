@@ -57,7 +57,7 @@ extern "C" char **environ;
 #include <QTranslator>
 #ifdef _WIN32
 #include <QOperatingSystemVersion>
-#if __has_include(<rhi/qrhi.h>)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 #include <rhi/qrhi.h>
 #include <QOffscreenSurface>
 #endif
@@ -910,7 +910,7 @@ static void *Thread( void *obj )
             {
                 // If probing is not available, use OpenGL as a compromise:
                 QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
-#if __has_include(<rhi/qrhi.h>)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
                 QRhiD3D11InitParams params;
                 if (QRhi::probe(QRhi::D3D11, &params))
                     graphicsApi = QSGRendererInterface::Direct3D11;
