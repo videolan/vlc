@@ -23,6 +23,7 @@
 #import "VLCLibraryGroupsDataSource.h"
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 
@@ -187,6 +188,19 @@
      numberOfItemsInSection:(NSInteger)section
 {
     return self.groupsArray[section].numberOfTotalItems;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView
+     itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem * const viewItem =
+        [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+    const id<VLCMediaLibraryItemProtocol> item =
+        [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+    viewItem.representedItem = representedItem;
+    return viewItem;
 }
 
 @end
