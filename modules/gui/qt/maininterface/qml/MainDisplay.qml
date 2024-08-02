@@ -357,7 +357,7 @@ FocusScope {
                                    ? g_mainDisplay.width * 0.8
                                    : Helpers.clamp(g_mainDisplay.width / resizeHandle.widthFactor,
                                                    minimumWidth,
-                                                   g_mainDisplay.width / 2)
+                                                   g_mainDisplay.width / 2 + playlistLeftBorder.width / 2)
 
                     focus: true
 
