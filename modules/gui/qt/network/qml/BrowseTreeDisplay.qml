@@ -94,10 +94,33 @@ MainViewLoader {
         defaultText:  qsTr("Unknown Share")
 
         coverProvider: function(index, data) {
-            // this is used to provide context to NetworkCustomCover
-            // indexData is networkModel (model data) for this index
-            // cover is our custom cover that will be loaded insted of default DragItem cover
-            return {"indexData": data, "cover": custom_cover}
+            function _baseUri(type) {
+                switch (type) {
+                case NetworkMediaModel.TYPE_DISC:
+                    return "qrc:///sd/disc.svg"
+                case NetworkMediaModel.TYPE_CARD:
+                    return "qrc:///sd/capture-card.svg"
+                case NetworkMediaModel.TYPE_STREAM:
+                    return "qrc:///sd/stream.svg"
+                case NetworkMediaModel.TYPE_PLAYLIST:
+                    return "qrc:///sd/playlist.svg"
+                case NetworkMediaModel.TYPE_FILE:
+                    return "qrc:///sd/file.svg"
+                default:
+                    return "qrc:///sd/directory.svg"
+                }
+            }
+
+            const fallbackImage = SVGColorImage.colorize(_baseUri(data.type))
+                .background(networkDragItem.colorContext.bg.secondary)
+                .color1(networkDragItem.colorContext.fg.primary)
+                .accent(networkDragItem.colorContext.accent)
+                .uri()
+
+            return {
+                artwork: data.artwork,
+                fallback: fallbackImage
+            }
         }
 
         onRequestData: (indexes, resolve, reject) => {
@@ -110,25 +133,6 @@ MainViewLoader {
             resolve(
                 model.getItemsForIndexes(indexes)
             )
-        }
-
-        Component {
-            id: custom_cover
-
-            NetworkCustomCover {
-                networkModel: model.indexData
-
-                width: networkDragItem.coverSize
-                height: networkDragItem.coverSize
-
-                // we can not change the size of cover and shodows from here,
-                // so for best visual use scale image to fit
-                fillMode: Image.PreserveAspectCrop
-
-                bgColor: networkDragItem.colorContext.bg.secondary
-                color1: networkDragItem.colorContext.fg.primary
-                accent: networkDragItem.colorContext.accent
-            }
         }
     }
 

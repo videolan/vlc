@@ -90,6 +90,8 @@ Widgets.TableRowDelegate {
                 rectHeight: artwork.paintedHeight
             }
 
+            //FIXME: implement fillMode in RoundImage and use MediaCover here instead
+            //or directly TableCollumns.titleHeaderDelegate in place of NetworkThumbnailItem
             NetworkCustomCover {
                 id: artwork
 

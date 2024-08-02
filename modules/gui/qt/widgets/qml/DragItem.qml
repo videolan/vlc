@@ -51,7 +51,7 @@ Item {
 
     property string defaultText: qsTr("Unknown")
 
-    // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), cover: <component>}
+    // function(index, data) - returns cover for the index in the model in the form {artwork: <string> (file-name), fallback: <string> (file-name)}
     property var coverProvider: null
 
     // string => role
@@ -157,7 +157,10 @@ Item {
         }
 
         if (covers.length === 0)
-            covers.push({artwork: dragItem.defaultCover})
+            covers.push({
+                artwork: "",
+                fallback: dragItem.defaultCover
+            })
 
         _covers = covers
     }
@@ -177,7 +180,10 @@ Item {
         if (!!dragItem.coverProvider)
             return dragItem.coverProvider(index, data)
         else
-            return {artwork: data[dragItem.coverRole] || dragItem.defaultCover}
+            return {
+                artwork: data[dragItem.coverRole] || dragItem.defaultCover,
+                fallback: dragItem.defaultCover
+            }
     }
 
     function _startNativeDrag() {
@@ -415,44 +421,26 @@ Item {
             }
 
             Widgets.RoundImage {
+                id: artworkCover
+
+                anchors.centerIn: parent
+                width: coverSize
+                height: coverSize
+                radius: bg.radius
+                source: modelData.artwork ?? ""
+                sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
+            }
+
+            Widgets.RoundImage {
                 id: fallbackCover
 
                 anchors.centerIn: parent
                 width: coverSize
                 height: coverSize
                 radius: bg.radius
-                source: dragItem.defaultCover
-                sourceSize.width: width
-                sourceSize.height: height
-                visible: !loader.visible
-            }
-
-            Loader {
-                id: loader
-
-                // parent may provide extra data with covers
-                property var model: modelData
-
-                anchors.centerIn: parent
-
-                visible: (status === Loader.Ready)
-                         && (!("status" in item) || (item.status === Image.Ready))
-
-                sourceComponent: (!modelData.artwork || modelData.artwork.toString() === "") ? modelData.cover : artworkLoader
-                layer.enabled: true
-                layer.effect: OpacityMask {
-                    maskSource: Rectangle {
-                        width: bg.width
-                        height: bg.height
-                        radius: bg.radius
-                        visible: false
-                    }
-                }
-
-                onItemChanged: {
-                    if (modelData.artwork && modelData.artwork.toString() !== "")
-                        item.source = modelData.artwork
-                }
+                source: modelData.fallback ?? defaultCover
+                sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
+                visible: artworkCover.status !== Image.Ready
             }
 
             Rectangle {
@@ -510,14 +498,4 @@ Item {
         color: theme.fg.secondary
     }
 
-    Component {
-        id: artworkLoader
-
-        ScaledImage {
-            fillMode: Image.PreserveAspectCrop
-            width: coverSize
-            height: coverSize
-            cache: false
-        }
-    }
 }
