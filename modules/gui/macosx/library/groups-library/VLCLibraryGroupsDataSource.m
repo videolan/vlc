@@ -22,8 +22,8 @@
 
 #import "VLCLibraryGroupsDataSource.h"
 
-#include "library/VLCLibraryCollectionViewFlowLayout.h"
-#include "library/VLCLibraryModel.h"
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryModel.h"
 
 @interface VLCLibraryGroupsDataSource ()
 
