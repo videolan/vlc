@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryMasterDetailViewTableViewDelegate;
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
+@class VLCMediaLibraryGroup;
 
 @interface VLCLibraryGroupsViewController : NSObject
 
@@ -52,6 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 - (void)presentGroupsView;
+- (void)presentGroup:(VLCMediaLibraryGroup *)group;
 
 @end
 
