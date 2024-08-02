@@ -282,7 +282,7 @@
 {
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
 
-    self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
+    self.videoLibraryGroupsTableView.dataSource = self.libraryVideoDataSource;
     self.videoLibraryGroupsTableView.target = self.libraryVideoDataSource;
     self.videoLibraryGroupsTableView.delegate = _videoLibraryTableViewDelegate;
 
