@@ -29,4 +29,12 @@
     [self doesNotRecognizeSelector:_cmd];
     return nil;
 }
+
+- (void)reloadData
+{
+    [(VLCLibraryCollectionViewFlowLayout *)self.collectionView.collectionViewLayout resetLayout];
+    [self.masterTableView reloadData];
+    [self.detailTableView reloadData];
+    [self.collectionView reloadData];
+}
 @end
