@@ -390,10 +390,11 @@ VLC_API void sout_StreamFlush(sout_stream_t *s, void *id);
  */
 VLC_API void sout_StreamSetPCR(sout_stream_t *, vlc_tick_t pcr);
 
-VLC_API vlc_clock_main_t *sout_ClockMainCreate(sout_stream_t *) VLC_USED;
-VLC_API void sout_ClockMainDelete(vlc_clock_main_t *);
-VLC_API void sout_ClockMainSetFirstPcr(vlc_clock_main_t *, vlc_tick_t pcr);
-VLC_API vlc_clock_t *sout_ClockCreate(vlc_clock_main_t *, const es_format_t *) VLC_USED;
+struct vlc_sout_clock_bus;
+VLC_API struct vlc_sout_clock_bus *sout_ClockMainCreate(sout_stream_t *) VLC_USED;
+VLC_API void sout_ClockMainDelete(struct vlc_sout_clock_bus *);
+VLC_API void sout_ClockMainSetFirstPcr(struct vlc_sout_clock_bus *, vlc_tick_t pcr);
+VLC_API vlc_clock_t *sout_ClockCreate(struct vlc_sout_clock_bus *, const es_format_t *) VLC_USED;
 VLC_API void sout_ClockDelete(vlc_clock_t *);
 
 

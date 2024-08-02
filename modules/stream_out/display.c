@@ -83,7 +83,7 @@ typedef struct
     vlc_tick_t i_delay;
     input_resource_t *p_resource;
 
-    vlc_clock_main_t *main_clock;
+    struct vlc_sout_clock_bus *main_clock;
     bool first_pcr_signaled;
     bool error;
 } sout_stream_sys_t;

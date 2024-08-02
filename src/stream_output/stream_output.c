@@ -683,6 +683,12 @@ struct sout_stream_private {
     vlc_mutex_t lock;
 };
 
+struct vlc_sout_clock_bus {
+    struct {
+        vlc_clock_main_t *bus;
+    } clocks;
+};
+
 #define sout_stream_priv(s) \
         container_of(s, struct sout_stream_private, stream)
 
@@ -779,33 +785,46 @@ static void sout_StreamDelete( sout_stream_t *p_stream )
     vlc_object_delete(p_stream);
 }
 
-vlc_clock_main_t *sout_ClockMainCreate( sout_stream_t *p_stream )
+struct vlc_sout_clock_bus *sout_ClockMainCreate(sout_stream_t *p_stream)
 {
     struct vlc_tracer *tracer = vlc_object_get_tracer( &p_stream->obj );
-    return vlc_clock_main_New( p_stream->obj.logger, tracer );
+
+    struct vlc_sout_clock_bus *bus = malloc(sizeof *bus);
+    if (bus == NULL)
+        return NULL;
+
+    bus->clocks.bus = vlc_clock_main_New(p_stream->obj.logger, tracer);
+    if (bus->clocks.bus == NULL)
+        goto error_bus;
+
+    return bus;
+
+error_bus:
+    free(bus);
+    return NULL;
 }
 
-void sout_ClockMainDelete( vlc_clock_main_t *main_clock )
+void sout_ClockMainDelete(struct vlc_sout_clock_bus *bus)
 {
-    vlc_clock_main_Delete( main_clock );
+    vlc_clock_main_Delete(bus->clocks.bus);
 }
 
-void sout_ClockMainSetFirstPcr( vlc_clock_main_t *main_clock, vlc_tick_t pcr )
+void sout_ClockMainSetFirstPcr(struct vlc_sout_clock_bus *bus, vlc_tick_t pcr )
 {
-    vlc_clock_main_Lock( main_clock );
-    vlc_clock_main_Reset( main_clock );
-    vlc_clock_main_SetFirstPcr( main_clock, vlc_tick_now(), pcr );
-    vlc_clock_main_Unlock( main_clock );
+    vlc_clock_main_Lock(bus->clocks.bus);
+    vlc_clock_main_Reset(bus->clocks.bus);
+    vlc_clock_main_SetFirstPcr(bus->clocks.bus, vlc_tick_now(), pcr);
+    vlc_clock_main_Unlock(bus->clocks.bus);
 }
 
-vlc_clock_t *sout_ClockCreate( vlc_clock_main_t *main_clock,
-                               const es_format_t *fmt )
+vlc_clock_t *sout_ClockCreate(struct vlc_sout_clock_bus *bus,
+                              const es_format_t *fmt)
 {
-    vlc_clock_main_Lock( main_clock );
+    vlc_clock_main_Lock(bus->clocks.bus);
     vlc_clock_t *clock =
-        vlc_clock_main_CreateSlave( main_clock, NULL, fmt->i_cat,
-                                    NULL, NULL );
-    vlc_clock_main_Unlock( main_clock );
+        vlc_clock_main_CreateSlave(bus->clocks.bus, NULL, fmt->i_cat,
+                                   NULL, NULL);
+    vlc_clock_main_Unlock(bus->clocks.bus);
     return clock;
 }
 
