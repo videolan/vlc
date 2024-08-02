@@ -253,6 +253,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
             _outChainLast = &_outChain;
 
         CMSampleBufferRef buffer = [self wrapBuffer:&block];
+        if (buffer == nil)
+        {
+            vlc_mutex_unlock(&_bufferLock);
+            return;
+        }
+
         _ptsSamples += CMSampleBufferGetNumSamples(buffer);
 
         [_renderer enqueueSampleBuffer:buffer];
