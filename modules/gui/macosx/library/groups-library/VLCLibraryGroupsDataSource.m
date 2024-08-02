@@ -130,4 +130,13 @@
     return VLCMediaLibraryParentGroupTypeGroup;
 }
 
+# pragma mark - collection view data source and delegation
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtIndexPath:(NSIndexPath *)indexPath
+                                        forCollectionView:(NSCollectionView *)collectionView
+{
+    VLCMediaLibraryGroup * const group = self.groupsArray[indexPath.section];
+    return group.mediaItems[indexPath.item];
+}
+
 @end
