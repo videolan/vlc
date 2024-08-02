@@ -57,12 +57,12 @@
     }
 
     NSObject<VLCMediaLibraryItemProtocol> * const libraryItem = [vlcDataSource libraryItemAtRow:row forTableView:tableView];
-    if (libraryItem == nil) {
-        return nil;
+    if (libraryItem != nil) {
+        VLCLibraryRepresentedItem * const representedItem = 
+            [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
+                                                 parentType:vlcDataSource.currentParentType];
+        [cellView setRepresentedItem:representedItem];
     }
-
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:vlcDataSource.currentParentType];
-    [cellView setRepresentedItem:representedItem];
     return cellView;
 }
 
