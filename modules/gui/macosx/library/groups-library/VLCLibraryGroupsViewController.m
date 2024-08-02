@@ -120,6 +120,9 @@
           forSupplementaryViewOfKind:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind
                       withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewIdentifier];
 
+    self.dataSource.collectionView = self.collectionView;
+
+    self.collectionView.dataSource = self.dataSource;
     self.collectionView.delegate = self.collectionViewDelegate;
 }
 
