@@ -24,4 +24,9 @@
 
 @implementation VLCLibraryAbstractGroupingDataSource
 
+- (NSArray<id<VLCMediaLibraryItemProtocol>> *)backingArray
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
 @end

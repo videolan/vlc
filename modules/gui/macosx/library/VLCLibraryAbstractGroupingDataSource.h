@@ -22,9 +22,16 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryCollectionViewDataSource.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAbstractGroupingDataSource : NSObject
+@protocol VLCMediaLibraryItemProtocol;
+
+@interface VLCLibraryAbstractGroupingDataSource : NSObject<VLCLibraryMasterDetailViewTableViewDataSource, VLCLibraryCollectionViewDataSource>
+
+@property (readonly) NSArray<id<VLCMediaLibraryItemProtocol>> *backingArray;
 
 @end
 
