@@ -178,4 +178,15 @@
     return representedItems;
 }
 
+- (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
+{
+    return self.groupsArray.count;
+}
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView
+     numberOfItemsInSection:(NSInteger)section
+{
+    return self.groupsArray[section].numberOfTotalItems;
+}
+
 @end
