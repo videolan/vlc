@@ -22,6 +22,8 @@
 
 #import "VLCLibraryAbstractGroupingDataSource.h"
 
+#import "extensions/NSPasteboardItem+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewMediaItemSupplementaryDetailView.h"
@@ -176,12 +178,18 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
+    if ([libraryItem isKindOfClass:self.backingArray.firstObject.class]) {
+        const NSInteger itemIndex = [self indexOfMediaItem:libraryItem.libraryID
+                                                   inArray:self.backingArray];
+        return itemIndex != NSNotFound ? [NSIndexPath indexPathForItem:0 inSection:itemIndex] : nil;
+    }
+
     __block NSInteger itemInternalMediaItemIndex = NSNotFound;
     const NSInteger itemIndex =
         [self.backingArray indexOfObjectPassingTest:^BOOL(const id<VLCMediaLibraryItemProtocol> item,
                                                           const NSUInteger idx,
                                                           BOOL * const stop) {
-            itemInternalMediaItemIndex = 
+            itemInternalMediaItemIndex =
                 [self indexOfMediaItem:libraryItem.libraryID inArray:item.mediaItems];
             return itemInternalMediaItemIndex != NSNotFound;
         }];
