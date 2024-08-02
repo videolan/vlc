@@ -21,9 +21,6 @@ import QtQuick
 import QtQuick.Templates as T
 import QtQml.Models
 
-import Qt5Compat.GraphicalEffects
-
-
 import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
