@@ -22,6 +22,7 @@
 
 #import "VLCLibraryWindowNavigationSidebarViewController.h"
 
+#import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
@@ -201,6 +202,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
             (VLCLibrarySegmentBookmarkedLocation *)representedObject;
         self.libraryWindow.librarySegmentType = bookmarkedLocation.segmentType;
         [self.libraryWindow goToLocalFolderMrl:bookmarkedLocation.mrl];
+    } else if ([representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
+        [self.libraryWindow presentLibraryItem:(VLCMediaLibraryGroup *)representedObject];
     }
 }
 
