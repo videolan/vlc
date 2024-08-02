@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryHomeViewController;
 @class VLCLibraryGroupsViewController;
 @class VLCLibrarySortingMenuController;
+@class VLCMediaLibraryGroup;
 @class VLCPlaylistController;
 @class VLCCustomEmptyLibraryBrowseButton;
 @class VLCLibraryWindowSplitViewController;

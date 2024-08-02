@@ -404,6 +404,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.libraryVideoViewController presentLibraryItem:libraryItem];
 }
 
+- (void)presentGroup:(VLCMediaLibraryGroup *)group
+{
+    [self showGroupsLibrary];
+    [self.libraryGroupsViewController presentGroup:group];
+}
+
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     const BOOL isAudioGroup = [libraryItem isKindOfClass:VLCMediaLibraryAlbum.class] ||
@@ -412,6 +418,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (isAudioGroup) {
         [self presentAudioLibraryItem:libraryItem];
+        return;
+    } else if ([libraryItem isKindOfClass:VLCMediaLibraryGroup.class]) {
+        [self presentGroup:(VLCMediaLibraryGroup *)libraryItem];
         return;
     }
 
