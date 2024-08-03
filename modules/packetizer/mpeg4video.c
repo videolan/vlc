@@ -476,7 +476,7 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
         };
         if( bs_read1( &s ) ) /* video_signal_type */
         {
-            bs_read( &s, 3 );
+            bs_skip( &s, 3 );
             colour.full_range_flag = bs_read( &s, 1 );
             if( bs_read( &s, 1 ) ) /* colour description */
             {
