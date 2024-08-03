@@ -390,7 +390,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     {
         i_vo_ver_id = 1;
     }
-    ar.aspect_ratio_idc = bs_read( &s, 4 );
+    ar.aspect_ratio_idc = bs_read( &s, 4 ) & 0xf;
     if( ar.aspect_ratio_idc == 0xf )
     {
         ar.aspect_ratio_idc = 0xff; // was only coded on 4 bits in MPEG4
