@@ -24,6 +24,7 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
@@ -104,6 +105,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 - (void)reloadViews
 {
     for (NSCollectionView * const collectionView in self.collectionViews) {
+        [(VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout resetLayout];
         [collectionView reloadData];
     }
 }
