@@ -222,9 +222,8 @@ uint_fast32_t vlc_str2keycode (const char *name)
                                         sizeof (s_keys[0]), keystrcmp);
     if (d != NULL)
         code = d->i_code;
-    else
-    if (vlc_towc (name, &code) <= 0)
-        code = KEY_UNSET;
+    else if (vlc_towc (name, &code) <= 0)
+        return KEY_UNSET;
 
     if (code != KEY_UNSET)
         code |= mods;
