@@ -138,3 +138,6 @@ share/             - Common resource files.
 src/               - libvlccore source code.
 test/              - Testing system.
 ```
+
+
+Added a line to the VLC Source Repo on my end.
