@@ -244,5 +244,14 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return self.playlists[indexPathItem];
 }
 
+- (NSIndexPath *)indexPathForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    const NSUInteger idx = [self.playlists indexOfObject:libraryItem];
+    if (idx == NSNotFound) {
+        return nil;
+    }
+
+    return [NSIndexPath indexPathForItem:idx inSection:0];
+}
 
 @end
