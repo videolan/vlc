@@ -2719,25 +2719,25 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     i_minor = bs_read( &bitstream, 8 ); /* minor version num */
     i_subminor = bs_read( &bitstream, 8 ); /* subminor version num */
 
-    bs_read( &bitstream, 16 ) /*<< 4*/; /* width */
-    bs_read( &bitstream, 16 ) /*<< 4*/; /* height */
-    bs_read( &bitstream, 24 ); /* frame width */
-    bs_read( &bitstream, 24 ); /* frame height */
-    bs_read( &bitstream, 8 ); /* x offset */
-    bs_read( &bitstream, 8 ); /* y offset */
+    bs_skip( &bitstream, 16 ) /*<< 4*/; /* width */
+    bs_skip( &bitstream, 16 ) /*<< 4*/; /* height */
+    bs_skip( &bitstream, 24 ); /* frame width */
+    bs_skip( &bitstream, 24 ); /* frame height */
+    bs_skip( &bitstream, 8 ); /* x offset */
+    bs_skip( &bitstream, 8 ); /* y offset */
 
     i_fps_numerator = bs_read( &bitstream, 32 );
     i_fps_denominator = bs_read( &bitstream, 32 );
     i_fps_denominator = __MAX( i_fps_denominator, 1 );
-    bs_read( &bitstream, 24 ); /* aspect_numerator */
-    bs_read( &bitstream, 24 ); /* aspect_denominator */
+    bs_skip( &bitstream, 24 ); /* aspect_numerator */
+    bs_skip( &bitstream, 24 ); /* aspect_denominator */
 
     p_stream->fmt.video.i_frame_rate = i_fps_numerator;
     p_stream->fmt.video.i_frame_rate_base = i_fps_denominator;
 
-    bs_read( &bitstream, 8 ); /* colorspace */
+    bs_skip( &bitstream, 8 ); /* colorspace */
     p_stream->fmt.i_bitrate = bs_read( &bitstream, 24 );
-    bs_read( &bitstream, 6 ); /* quality */
+    bs_skip( &bitstream, 6 ); /* quality */
 
     i_keyframe_frequency_force = 1 << bs_read( &bitstream, 5 );
 
@@ -2975,7 +2975,7 @@ static bool Ogg_ReadFlacStreamInfo( demux_t *p_demux, logical_stream_t *p_stream
 
     bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
 
-    bs_read( &s, 1 );
+    bs_skip( &s, 1 );
     if( p_oggpacket->bytes > 0 && bs_read( &s, 7 ) != 0 )
     {
         msg_Dbg( p_demux, "Invalid FLAC STREAMINFO metadata" );
