@@ -175,18 +175,13 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     if ([libraryItem isKindOfClass:VLCAbstractMediaLibraryAudioGroup.class] && ![libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-            VLCAbstractMediaLibraryAudioGroup * const audioGroupItem = (VLCAbstractMediaLibraryAudioGroup *)libraryItem;
-            NSMutableArray<NSImage *> * const itemImages = NSMutableArray.array;
-            NSMutableSet<NSNumber *> * const itemAlbums = NSMutableSet.set;
+            NSMutableSet<NSImage *> * const itemImages = NSMutableArray.array;
 
             [audioGroupItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
-                NSNumber * const albumId = @(item.albumID);
-                if ([itemAlbums containsObject:albumId]) {
+                NSImage * const itemImage = [VLCLibraryImageCache thumbnailForLibraryItem:item];
+                if (itemImage == nil || [itemImages containsObject:itemImage]) {
                     return;
                 }
-
-                [itemAlbums addObject:albumId];
-                NSImage * const itemImage = [VLCLibraryImageCache thumbnailForLibraryItem:item];
                 [itemImages addObject:itemImage];
             }];
 
