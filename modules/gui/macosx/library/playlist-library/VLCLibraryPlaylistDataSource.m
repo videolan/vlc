@@ -170,6 +170,49 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
     });
 }
 
+#pragma mark - table view data source
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        return self.playlists.count;
+    }
+
+    const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
+    if (selectedMasterRow > -1) {
+        const id<VLCMediaLibraryItemProtocol> item = self.playlists[selectedMasterRow];
+        return item.mediaItems.count;
+    }
+
+    return 0;
+}
+
+- (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
+                                       forTableView:(NSTableView *)tableView
+{
+    if (tableView == self.masterTableView) {
+        return self.playlists[row];
+    }
+
+    const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
+    if (tableView == self.detailTableView && selectedMasterRow > -1) {
+        const id<VLCMediaLibraryItemProtocol> item = self.playlists[selectedMasterRow];
+        return item.mediaItems[row];
+    }
+
+    return nil;
+}
+
+- (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    if (libraryItem == nil) {
+        return NSNotFound;
+    }
+    return [self.playlists indexOfObjectPassingTest:^BOOL(const VLCMediaLibraryPlaylist *playlist, const NSUInteger idx, BOOL * const stop) {
+        return playlist.libraryID == libraryItem.libraryID;
+    }];
+}
+
 #pragma mark - collection view data source
 
 - (void)setCollectionViews:(NSArray<NSCollectionView *> *)collectionViews
