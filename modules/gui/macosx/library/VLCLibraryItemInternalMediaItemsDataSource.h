@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryAlbumTracksDataSource.h: MacOS X interface module
+ * VLCLibraryItemInternalMediaItemsDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Claudio Cambra <claudio.cambra@gmail.com>
+ * Authors: Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,16 +26,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaLibraryAlbum;
+@protocol VLCMediaLibraryItemProtocol;
 
-@interface VLCLibraryAlbumTracksDataSource : NSObject <VLCLibraryTableViewDataSource>
+@interface VLCLibraryItemInternalMediaItemsDataSource : NSObject <VLCLibraryTableViewDataSource>
 
-extern const CGFloat VLCLibraryTracksRowHeight;
+extern const CGFloat VLCLibraryInternalMediaItemRowHeight;
 
-@property (readwrite, retain, nonatomic, nullable) VLCMediaLibraryAlbum *representedAlbum;
+@property (readwrite, retain, nonatomic, nullable) id<VLCMediaLibraryItemProtocol> representedItem;
 
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum*)album
-             withCompletion:(nullable void(^)(void))completionHandler;
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
+            withCompletion:(nullable void(^)(void))completionHandler;
 
 @end
 

@@ -34,10 +34,9 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryItemInternalMediaItemsDataSource.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryRepresentedItem.h"
-
-#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 
 NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifier";
 

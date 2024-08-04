@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryAlbumTracksDataSource.m: MacOS X interface module
+ * VLCLibraryItemInternalMediaItemsDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,42 +20,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryAlbumTracksDataSource.h"
+#import "VLCLibraryItemInternalMediaItemsDataSource.h"
 
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 #import "library/VLCLibraryDataTypes.h"
-#import "library/audio-library/VLCLibrarySongTableCellView.h"
 
-const CGFloat VLCLibraryTracksRowHeight = 40.;
+const CGFloat VLCLibraryInternalMediaItemRowHeight = 40.;
 
-@interface VLCLibraryAlbumTracksDataSource ()
+@interface VLCLibraryItemInternalMediaItemsDataSource ()
 
-@property (readwrite, atomic) NSArray<VLCMediaLibraryMediaItem*> *tracks;
-@property (readwrite, atomic) VLCMediaLibraryAlbum *internalAlbum;
+@property (readwrite, atomic) id<VLCMediaLibraryItemProtocol> internalItem;
+@property (readwrite, atomic) NSArray<VLCMediaLibraryMediaItem*> *internalMediaItems;
 
 @end
 
-@implementation VLCLibraryAlbumTracksDataSource
+@implementation VLCLibraryItemInternalMediaItemsDataSource
 
 // TODO: Connect to library model
 
-- (VLCMediaLibraryAlbum*)representedAlbum
+- (id<VLCMediaLibraryItemProtocol>)representedItem
 {
-    return self.internalAlbum;
+    return self.internalItem;
 }
 
-- (void)setRepresentedAlbum:(VLCMediaLibraryAlbum *)representedAlbum
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)representedItem
 {
-    [self setRepresentedAlbum:representedAlbum withCompletion:nil];
+    [self setRepresentedItem:representedItem withCompletion:nil];
 }
 
-- (void)setRepresentedAlbum:(id)album
-             withCompletion:(nullable void (^)(void))completionHandler
+- (void)setRepresentedItem:(id<VLCMediaLibraryItemProtocol>)item
+            withCompletion:(nullable void (^)(void))completionHandler
 {
-    self.internalAlbum = album;
+    self.internalItem = item;
 
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        self.tracks = self.representedAlbum.mediaItems;
+        self.internalMediaItems = item.mediaItems;
 
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completionHandler != nil) {
@@ -67,28 +66,24 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    if (self.representedAlbum != nil) {
-        return self.representedAlbum.numberOfTracks;
-    }
-
-    return 0;
+    return self.representedItem == nil ? 0 : self.internalMediaItems.count;
 }
 
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
-    const id<VLCMediaLibraryItemProtocol> libraryItem = [self libraryItemAtRow:row forTableView:tableView];
-
+    const id<VLCMediaLibraryItemProtocol> libraryItem =
+        [self libraryItemAtRow:row forTableView:tableView];
     return [NSPasteboardItem pasteboardItemWithLibraryItem:libraryItem];
 }
 
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(NSTableView *)tableView
 {
-    if (row < 0 || row >= self.tracks.count) {
+    if (row < 0 || row >= self.internalMediaItems.count) {
         return nil;
     }
 
-    return self.tracks[row];
+    return self.internalMediaItems[row];
 }
 
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
@@ -97,17 +92,9 @@ const CGFloat VLCLibraryTracksRowHeight = 40.;
         return NSNotFound;
     }
 
-    NSArray<id<VLCMediaLibraryItemProtocol>> * const libraryItems = self.tracks;
-    const NSUInteger itemCount = libraryItems.count;
-
-    for (NSUInteger i = 0; i < itemCount; ++i) {
-        const id<VLCMediaLibraryItemProtocol> collectionItem = [libraryItems objectAtIndex:i];
-        if (collectionItem.libraryID == libraryItem.libraryID) {
-            return i;
-        }
-    }
-
-    return NSNotFound;
+    return [self.internalMediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem * const item, NSUInteger index, BOOL * const stop) {
+        return item.libraryID == libraryItem.libraryID;
+    }];
 }
 
 - (VLCMediaLibraryParentGroupType)currentParentType

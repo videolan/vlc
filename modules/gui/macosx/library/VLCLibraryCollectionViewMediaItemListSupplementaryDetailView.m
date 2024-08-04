@@ -31,12 +31,12 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryItemInternalMediaItemsDataSource.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
-#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 
@@ -51,7 +51,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 @interface VLCLibraryCollectionViewMediaItemListSupplementaryDetailView ()
 {
-    VLCLibraryAlbumTracksDataSource *_tracksDataSource;
+    VLCLibraryItemInternalMediaItemsDataSource *_tracksDataSource;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryController *_libraryController;
 }
@@ -62,12 +62,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (void)awakeFromNib
 {
-    _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
+    _tracksDataSource = [[VLCLibraryItemInternalMediaItemsDataSource alloc] init];
     _tracksTableViewDelegate = [[VLCLibraryAlbumTracksTableViewDelegate alloc] init];
 
     self.tableView.dataSource = _tracksDataSource;
     self.tableView.delegate = _tracksTableViewDelegate;
-    self.tableView.rowHeight = VLCLibraryTracksRowHeight;
+    self.tableView.rowHeight = VLCLibraryInternalMediaItemRowHeight;
 
     self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.primaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
@@ -134,7 +134,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
-    [_tracksDataSource setRepresentedAlbum:album withCompletion:^{
+    [_tracksDataSource setRepresentedItem:album withCompletion:^{
         __strong typeof(self) strongSelf = weakSelf;
 
         if (strongSelf) {

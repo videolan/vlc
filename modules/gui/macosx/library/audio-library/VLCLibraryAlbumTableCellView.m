@@ -35,6 +35,7 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
+#import "library/VLCLibraryItemInternalMediaItemsDataSource.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryTableCellView.h"
@@ -42,7 +43,6 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
-#import "library/audio-library/VLCLibraryAlbumTracksDataSource.h"
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
 
 NSString * const VLCAudioLibraryCellIdentifier = @"VLCAudioLibraryCellIdentifier";
@@ -54,7 +54,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 @interface VLCLibraryAlbumTableCellView ()
 {
     VLCLibraryController *_libraryController;
-    VLCLibraryAlbumTracksDataSource *_tracksDataSource;
+    VLCLibraryItemInternalMediaItemsDataSource *_tracksDataSource;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
     VLCLibraryTableView *_tracksTableView;
     NSTableColumn *_column;
@@ -131,7 +131,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
 
     const NSUInteger numberOfTracks = album.numberOfTracks;
     const CGFloat intercellSpacing = numberOfTracks > 1 ? (numberOfTracks - 1) * _tracksTableView.intercellSpacing.height : 0;
-    return numberOfTracks * VLCLibraryTracksRowHeight + intercellSpacing + VLCLibraryUIUnits.mediumSpacing;
+    return numberOfTracks * VLCLibraryInternalMediaItemRowHeight + intercellSpacing + VLCLibraryUIUnits.mediumSpacing;
 }
 
 - (void)awakeFromNib
@@ -172,10 +172,10 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         _tracksTableView.style = NSTableViewStyleFullWidth;
     }
     _tracksTableView.gridStyleMask = NSTableViewSolidHorizontalGridLineMask;
-    _tracksTableView.rowHeight = VLCLibraryTracksRowHeight;
+    _tracksTableView.rowHeight = VLCLibraryInternalMediaItemRowHeight;
     _tracksTableView.backgroundColor = [NSColor clearColor];
 
-    _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
+    _tracksDataSource = [[VLCLibraryItemInternalMediaItemsDataSource alloc] init];
     _tracksTableViewDelegate = [[VLCLibraryAlbumTracksTableViewDelegate alloc] init];
     _tracksTableView.dataSource = _tracksDataSource;
     _tracksTableView.delegate = _tracksTableViewDelegate;
@@ -222,7 +222,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.genreNameTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
-    _tracksDataSource.representedAlbum = nil;
+    _tracksDataSource.representedItem = nil;
     [_tracksTableView reloadData];
 }
 
@@ -332,7 +332,7 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
-    [_tracksDataSource setRepresentedAlbum:album withCompletion:^{
+    [_tracksDataSource setRepresentedItem:album withCompletion:^{
         __strong typeof(self) strongSelf = weakSelf;
 
         if (strongSelf) {

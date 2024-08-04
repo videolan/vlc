@@ -125,6 +125,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryHeroView.m \
 	gui/macosx/library/VLCLibraryImageCache.h \
 	gui/macosx/library/VLCLibraryImageCache.m \
+	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.h \
+	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.m \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDataSource.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.m \
@@ -206,8 +208,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/video-library/VLCLibraryVideoTableViewDelegate.m \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTableCellView.m \
-	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.h \
-	gui/macosx/library/audio-library/VLCLibraryAlbumTracksDataSource.m \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h \
 	gui/macosx/library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.m \
 	gui/macosx/library/audio-library/VLCLibraryAllAudioGroupsMediaLibraryItem.h \
