@@ -359,7 +359,7 @@ static const struct es_out_callbacks timestamps_filter_es_out_cbs =
     .destroy = timestamps_filter_es_out_Delete,
 };
 
-static es_out_t * timestamps_filter_es_out_New(es_out_t *orig)
+static inline es_out_t * timestamps_filter_es_out_New(es_out_t *orig)
 {
     struct tf_es_out_s *tf = malloc(sizeof(*tf));
     if(!tf)
