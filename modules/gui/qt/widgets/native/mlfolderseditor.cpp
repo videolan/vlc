@@ -141,7 +141,7 @@ void MLFoldersEditor::newRow(const QUrl &mrl)
 
         layout->addWidget( pb , Qt::AlignCenter );
         wid->setLayout( layout );
-        connect( pb, &QPushButton::clicked, this, [=, this]()
+        connect( pb, &QPushButton::clicked, this, [this, col1, action]()
         {
             action(this, col1->row());
         });
