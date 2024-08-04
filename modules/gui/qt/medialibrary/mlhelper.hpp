@@ -19,22 +19,16 @@
 #ifndef MLHELPER_HPP
 #define MLHELPER_HPP
 
-#include <memory>
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include <memory>
+
 #include <vlc_media_library.h>
+
 #include <QString>
 #include <QUrl>
-
-// Forward declarations
-class MLBaseModel;
-class MLItem;
-class MLItemId;
-class CoverGenerator;
-class QUrl;
 
 template<typename T>
 class MLDeleter
@@ -115,5 +109,7 @@ QUrl getParentURLFromMLItem(T *mlItem)
 
     return parentDirUrl;
 }
+
+QString getFirstSymbol(const QString &);
 
 #endif // MLHELPER_HPP

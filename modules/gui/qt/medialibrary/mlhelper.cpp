@@ -18,9 +18,6 @@
 
 #include "mlhelper.hpp"
 
-// MediaLibrary includes
-#include "mlbasemodel.hpp"
-
 #include <QDir>
 
 QString toValidLocalFile(const char *mrl)
@@ -36,4 +33,12 @@ QString urlToDisplayString(const QUrl &url)
         return QDir::toNativeSeparators(displayString);
 
     return displayString;
+}
+
+QString getFirstSymbol(const QString &str)
+{
+    QString ret("#");
+    if ( str.length() > 0 && str[0].isLetter() )
+        ret = str[0].toUpper();
+    return ret;
 }

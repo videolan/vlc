@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "mlalbummodel.hpp"
+#include "mlhelper.hpp"
 
 #include "util/vlctick.hpp"
 
