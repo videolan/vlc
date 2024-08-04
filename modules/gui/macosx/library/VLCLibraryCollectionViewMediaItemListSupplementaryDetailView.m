@@ -86,26 +86,36 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
-                           selector:@selector(handleAlbumUpdated:)
+                           selector:@selector(handleItemUpdated:)
                                name:VLCLibraryModelAlbumUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(handleItemUpdated:)
+                               name:VLCLibraryModelArtistUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(handleItemUpdated:)
+                               name:VLCLibraryModelGenreUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(handleItemUpdated:)
+                               name:VLCLibraryModelPlaylistUpdated
                              object:nil];
 }
 
-- (void)handleAlbumUpdated:(NSNotification *)notification
+- (void)handleItemUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
+    const id<VLCMediaLibraryItemProtocol> item = notification.object;
     if (self.representedItem == nil ||
-        ![self.representedItem.item isKindOfClass:VLCMediaLibraryAlbum.class]) {
-        return;
-    }
-
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)notification.object;
-    if (album == nil || self.representedItem.item.libraryID != album.libraryID) {
+        item == nil ||
+        ![self.representedItem.item.class isKindOfClass:item.class] ||
+        self.representedItem.item.libraryID != item.libraryID) {
         return;
     }
 
     VLCLibraryRepresentedItem * const representedItem = 
-        [[VLCLibraryRepresentedItem alloc] initWithItem:album
+        [[VLCLibraryRepresentedItem alloc] initWithItem:item
                                              parentType:self.representedItem.parentType];
     self.representedItem = representedItem;
 }
