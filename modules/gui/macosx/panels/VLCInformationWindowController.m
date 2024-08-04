@@ -320,7 +320,7 @@ _##field##TextField.delegate = self
             for (VLCMediaLibraryMediaItem * const mediaItem in mediaItems) {
                 @synchronized (artworkMrlSet) {
                     NSString * const itemArtworkMrl = mediaItem.smallArtworkMRL;
-                    if ([artworkMrlSet containsObject:itemArtworkMrl]) {
+                    if ([artworkMrlSet containsObject:itemArtworkMrl] || itemArtworkMrl == nil) {
                         continue;
                     }
                     [artworkMrlSet addObject:itemArtworkMrl];
