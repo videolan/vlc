@@ -26,6 +26,7 @@
 
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
@@ -229,6 +230,20 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         sectionHeadingView.stringValue = _NS("Playlists");
         return sectionHeadingView;
 
+    } else if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind]) {
+        NSString * const supplementaryDetailViewIdentifier =
+            VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier;
+        VLCLibraryCollectionViewMediaItemListSupplementaryDetailView * const supplementaryDetailView =
+            [collectionView makeSupplementaryViewOfKind:kind
+                                         withIdentifier:supplementaryDetailViewIdentifier
+                                           forIndexPath:indexPath];
+        const id<VLCMediaLibraryItemProtocol> item =
+            [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
+        VLCLibraryRepresentedItem * const representedItem =
+            [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.currentParentType];
+        supplementaryDetailView.representedItem = representedItem;
+        supplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
+        return supplementaryDetailView;
     }
 
     return nil;
