@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewAlbumSupplementaryDetailView.h: MacOS X interface module
+ * VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Claudio Cambra <claudio.cambra@gmail.com>
+ * Authors: Claudio Cambra <developer@claudiocambra.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,18 +29,18 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryRepresentedItem;
 @class VLCImageView;
 
-extern NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier;
-extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
+extern NSString *const VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier;
+extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
 
-@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
+@interface VLCLibraryCollectionViewMediaItemListSupplementaryDetailView : VLCLibraryCollectionViewSupplementaryDetailView
 
-@property (readwrite, weak) IBOutlet NSTextField *albumTitleTextField;
-@property (readwrite, weak) IBOutlet NSButton *albumPrimaryDetailTextButton;
-@property (readwrite, weak) IBOutlet NSButton *albumSecondaryDetailTextButton;
-@property (readwrite, weak) IBOutlet NSTextField *albumYearAndDurationTextField;
-@property (readwrite, weak) IBOutlet VLCImageView *albumArtworkImageView;
-@property (readwrite, weak) IBOutlet NSTableView *albumTracksTableView;
-@property (readwrite, weak) IBOutlet NSButton *playAlbumButton;
+@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet NSButton *primaryDetailTextButton;
+@property (readwrite, weak) IBOutlet NSButton *secondaryDetailTextButton;
+@property (readwrite, weak) IBOutlet NSTextField *yearAndDurationTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *artworkImageView;
+@property (readwrite, weak) IBOutlet NSTableView *tableView;
+@property (readwrite, weak) IBOutlet NSButton *playButton;
 
 - (IBAction)playAction:(id)sender;
 - (IBAction)enqueueAction:(id)sender;

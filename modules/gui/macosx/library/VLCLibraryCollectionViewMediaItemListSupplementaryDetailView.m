@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryCollectionViewAlbumSupplementaryDetailView.m: MacOS X interface module
+ * VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2021 VLC authors and VideoLAN
  *
@@ -21,7 +21,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
+#import "VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSFont+VLCAdditions.h"
@@ -44,10 +44,12 @@
 
 #import "views/VLCImageView.h"
 
-NSString *const VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
-NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind = @"VLCLibraryCollectionViewAlbumSupplementaryDetailViewIdentifier";
+NSString * const VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier =
+    @"VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier";
+NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind =
+    @"VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewIdentifier";
 
-@interface VLCLibraryCollectionViewAlbumSupplementaryDetailView ()
+@interface VLCLibraryCollectionViewMediaItemListSupplementaryDetailView ()
 {
     VLCLibraryAlbumTracksDataSource *_tracksDataSource;
     VLCLibraryAlbumTracksTableViewDelegate *_tracksTableViewDelegate;
@@ -56,31 +58,31 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
 
 @end
 
-@implementation VLCLibraryCollectionViewAlbumSupplementaryDetailView
+@implementation VLCLibraryCollectionViewMediaItemListSupplementaryDetailView
 
 - (void)awakeFromNib
 {
     _tracksDataSource = [[VLCLibraryAlbumTracksDataSource alloc] init];
     _tracksTableViewDelegate = [[VLCLibraryAlbumTracksTableViewDelegate alloc] init];
 
-    _albumTracksTableView.dataSource = _tracksDataSource;
-    _albumTracksTableView.delegate = _tracksTableViewDelegate;
-    _albumTracksTableView.rowHeight = VLCLibraryTracksRowHeight;
+    self.tableView.dataSource = _tracksDataSource;
+    self.tableView.delegate = _tracksTableViewDelegate;
+    self.tableView.rowHeight = VLCLibraryTracksRowHeight;
 
-    _albumTitleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    self.albumPrimaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
-    self.albumSecondaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.titleTextField.font = NSFont.VLCLibrarySubsectionHeaderFont;
+    self.primaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
+    self.secondaryDetailTextButton.font = NSFont.VLCLibrarySubsectionSubheaderFont;
 
-    self.albumPrimaryDetailTextButton.action = @selector(primaryDetailAction:);
-    self.albumSecondaryDetailTextButton.action = @selector(secondaryDetailAction:);
+    self.primaryDetailTextButton.action = @selector(primaryDetailAction:);
+    self.secondaryDetailTextButton.action = @selector(secondaryDetailAction:);
 
     if (@available(macOS 10.14, *)) {
-        self.albumPrimaryDetailTextButton.contentTintColor = NSColor.VLCAccentColor;
-        self.albumSecondaryDetailTextButton.contentTintColor = NSColor.secondaryLabelColor;
+        self.primaryDetailTextButton.contentTintColor = NSColor.VLCAccentColor;
+        self.secondaryDetailTextButton.contentTintColor = NSColor.secondaryLabelColor;
     }
 
     if(@available(macOS 10.12.2, *)) {
-        _playAlbumButton.bezelColor = NSColor.VLCAccentColor;
+        self.playButton.bezelColor = NSColor.VLCAccentColor;
     }
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -112,22 +114,23 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
     VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
     NSAssert(album != nil, @"represented item is not an album", nil);
 
-    _albumTitleTextField.stringValue = album.displayString;
-    _albumPrimaryDetailTextButton.title = album.artistName;
-    _albumSecondaryDetailTextButton.title = album.genreString;
-    _albumYearAndDurationTextField.stringValue = [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
+    self.titleTextField.stringValue = album.displayString;
+    self.primaryDetailTextButton.title = album.artistName;
+    self.secondaryDetailTextButton.title = album.genreString;
+    self.yearAndDurationTextField.stringValue =
+        [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
 
     const BOOL primaryActionableDetail = album.primaryActionableDetail;
     const BOOL secondaryActionableDetail = album.secondaryActionableDetail;
-    self.albumPrimaryDetailTextButton.enabled = primaryActionableDetail;
-    self.albumSecondaryDetailTextButton.enabled = secondaryActionableDetail;
+    self.primaryDetailTextButton.enabled = primaryActionableDetail;
+    self.secondaryDetailTextButton.enabled = secondaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.albumPrimaryDetailTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
-        self.albumSecondaryDetailTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
+        self.primaryDetailTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.secondaryDetailTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
-        self->_albumArtworkImageView.image = thumbnail;
+        self.artworkImageView.image = thumbnail;
     }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
@@ -135,7 +138,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewAlbumSupp
         __strong typeof(self) strongSelf = weakSelf;
 
         if (strongSelf) {
-            [strongSelf->_albumTracksTableView reloadData];
+            [strongSelf.tableView reloadData];
         }
     }];
 }

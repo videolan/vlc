@@ -30,13 +30,13 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryCollectionViewMediaItemListSupplementaryDetailView.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryRepresentedItem.h"
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 #import "library/audio-library/VLCLibraryAudioGroupHeaderView.h"
-#import "library/audio-library/VLCLibraryCollectionViewAlbumSupplementaryDetailView.h"
 
 #import "views/VLCSubScrollView.h"
 
@@ -255,13 +255,16 @@
 viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
                atIndexPath:(NSIndexPath *)indexPath
 {
-    if ([kind isEqualToString:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind]) {
+    if ([kind isEqualToString:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind]) {
         NSArray<VLCMediaLibraryAlbum *> * const albums = self.representedListOfAlbums;
         if (albums == nil || albums.count == 0 || indexPath.item >= albums.count) {
             return nil;
         }
 
-        VLCLibraryCollectionViewAlbumSupplementaryDetailView* albumSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind forIndexPath:indexPath];
+        VLCLibraryCollectionViewMediaItemListSupplementaryDetailView * const albumSupplementaryDetailView =
+            [collectionView makeSupplementaryViewOfKind:kind
+                                         withIdentifier:VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind
+                                           forIndexPath:indexPath];
 
         VLCMediaLibraryAlbum * const album = albums[indexPath.item];
         VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:_currentParentType];
@@ -333,7 +336,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
 
 - (NSString *)supplementaryDetailViewKind
 {
-    return VLCLibraryCollectionViewAlbumSupplementaryDetailViewKind;
+    return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
 }
 
 @end
