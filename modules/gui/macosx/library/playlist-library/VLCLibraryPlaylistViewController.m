@@ -41,13 +41,6 @@
 
 #import "windows/video/VLCMainVideoViewController.h"
 
-@interface VLCLibraryPlaylistViewController ()
-
-@property (readonly) NSScrollView *collectionViewScrollView;
-@property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
-
-@end
-
 @implementation VLCLibraryPlaylistViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow

@@ -24,15 +24,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryWindow;
+@class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryPlaylistDataSource;
+@class VLCLibraryWindow;
 
 @interface VLCLibraryPlaylistViewController : NSObject
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) VLCLibraryPlaylistDataSource *dataSource;
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
+
+@property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
