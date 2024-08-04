@@ -36,8 +36,6 @@
 # include <dvbpsi/dr.h>
 # include <dvbpsi/psi.h>
 
-#include "dvbpsi_compat.h"
-
 #include "streams.h"
 #include "tsutil.h"
 #include "tables.h"
