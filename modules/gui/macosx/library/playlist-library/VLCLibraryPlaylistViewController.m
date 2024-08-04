@@ -27,7 +27,10 @@
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDelegate.h"
 #import "library/VLCLibraryModel.h"
+#import "library/VLCLibraryTableCellView.h"
+#import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 
@@ -49,9 +52,12 @@
 
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
+
+        _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
+
         [self setupPlaylistCollectionView];
+        [self setupPlaylistTableView];
         [self setupPlaylistPlaceholderView];
-        [self setupPlaylistDataSource];
 
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -90,6 +96,77 @@
     _collectionView.selectable = YES;
     _collectionView.allowsMultipleSelection = NO;
     _collectionView.allowsEmptySelection = YES;
+
+    self.dataSource.collectionViews = @[self.collectionView];
+}
+
+- (void)setupPlaylistTableView
+{
+    _masterTableViewScrollView = [[NSScrollView alloc] init];
+    _detailTableViewScrollView = [[NSScrollView alloc] init];
+    _tableViewDelegate = [[VLCLibraryMasterDetailViewTableViewDelegate alloc] init];
+    _masterTableView = [[VLCLibraryTableView alloc] init];
+    _detailTableView = [[VLCLibraryTableView alloc] init];
+    _listViewSplitView = [[NSSplitView alloc] init];
+
+    self.masterTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.detailTableViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.listViewSplitView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.masterTableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.detailTableView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    const NSEdgeInsets defaultInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+
+    self.masterTableViewScrollView.hasHorizontalScroller = NO;
+    self.masterTableViewScrollView.borderType = NSNoBorder;
+    self.masterTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.masterTableViewScrollView.contentInsets = defaultInsets;
+    self.masterTableViewScrollView.scrollerInsets = scrollerInsets;
+
+    self.detailTableViewScrollView.hasHorizontalScroller = NO;
+    self.detailTableViewScrollView.borderType = NSNoBorder;
+    self.detailTableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    self.detailTableViewScrollView.contentInsets = defaultInsets;
+    self.detailTableViewScrollView.scrollerInsets = scrollerInsets;
+
+    self.masterTableViewScrollView.documentView = self.masterTableView;
+    self.detailTableViewScrollView.documentView = self.detailTableView;
+
+    self.listViewSplitView.vertical = YES;
+    self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
+    [self.listViewSplitView addArrangedSubview:self.masterTableViewScrollView];
+    [self.listViewSplitView addArrangedSubview:self.detailTableViewScrollView];
+
+    NSTableColumn * const masterColumn = [[NSTableColumn alloc] initWithIdentifier:@"playlists"];
+    NSTableColumn * const detailColumn =
+        [[NSTableColumn alloc] initWithIdentifier:@"selectedPlaylist"];
+
+    [self.masterTableView addTableColumn:masterColumn];
+    [self.detailTableView addTableColumn:detailColumn];
+
+    NSNib * const tableCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                                 bundle:nil];
+    [self.masterTableView registerNib:tableCellViewNib
+                        forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+    [self.detailTableView registerNib:tableCellViewNib
+                        forIdentifier:@"VLCLibraryTableViewCellIdentifier"];
+
+    self.masterTableView.headerView = nil;
+    self.detailTableView.headerView = nil;
+
+    self.masterTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+    self.detailTableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
+
+    self.masterTableView.delegate = self.tableViewDelegate;
+    self.detailTableView.delegate = self.tableViewDelegate;
+
+    self.dataSource.masterTableView = self.masterTableView;
+    self.dataSource.detailTableView = self.detailTableView;
+
+    self.masterTableView.dataSource = self.dataSource;
+    self.detailTableView.dataSource = self.dataSource;
 }
 
 - (void)setupPlaylistPlaceholderView
@@ -110,12 +187,6 @@
                                     multiplier:0.f
                                       constant:149.f],
     ];
-}
-
-- (void)setupPlaylistDataSource
-{
-    _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
-    _dataSource.collectionViews = @[_collectionView];
 }
 
 // TODO: This is duplicated almost verbatim across all the library view
