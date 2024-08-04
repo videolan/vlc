@@ -23,14 +23,17 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryCollectionViewDataSource.h"
+#import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
 
 @class VLCLibraryModel;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryPlaylistDataSource : NSObject<VLCLibraryCollectionViewDataSource>
+@interface VLCLibraryPlaylistDataSource : NSObject<VLCLibraryCollectionViewDataSource, VLCLibraryMasterDetailViewTableViewDataSource>
 
 @property (readonly) VLCLibraryModel *libraryModel;
+@property (readwrite) NSTableView *masterTableView;
+@property (readwrite) NSTableView *detailTableView;
 @property (readwrite, nonatomic) NSArray<NSCollectionView *> *collectionViews;
 
 @end
