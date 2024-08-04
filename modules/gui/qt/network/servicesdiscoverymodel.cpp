@@ -138,7 +138,7 @@ public:
 public: //BaseModelPrivateT implementation
     bool initializeModel() override;
 
-    LocalListCacheLoader<SDItemPtr>::ItemCompare getSortFunction() const
+    LocalListCacheLoader<SDItemPtr>::ItemCompare getSortFunction() const override
     {
         if (m_sortOrder == Qt::SortOrder::DescendingOrder)
             return [](const SDItemPtr& a, const SDItemPtr& b){
