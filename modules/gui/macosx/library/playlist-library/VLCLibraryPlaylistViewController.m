@@ -33,6 +33,7 @@
 #import "library/VLCLibraryTableView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowPersistentPreferences.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -77,6 +78,7 @@
 {
     NSParameterAssert(libraryWindow);
     _libraryWindow = libraryWindow;
+    _libraryTargetView = libraryWindow.libraryTargetView;
 }
 
 - (void)setupPlaylistCollectionView
@@ -216,13 +218,24 @@
 
 - (void)presentPlaylistLibraryView
 {
-    _libraryWindow.libraryTargetView.subviews = @[_collectionViewScrollView];
+    const VLCLibraryViewModeSegment viewModeSegment =
+        VLCLibraryWindowPersistentPreferences.sharedInstance.playlistLibraryViewMode;
+    NSView *viewToPresent = nil;
 
-    NSDictionary * const dict = @{@"playlistLibraryView": _collectionViewScrollView};
-    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[playlistLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[playlistLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+        viewToPresent = self.collectionViewScrollView;
+    } else {
+        viewToPresent = self.listViewSplitView;
+    }
+    NSParameterAssert(viewToPresent != nil);
 
-    [_collectionView reloadData];
+    self.libraryTargetView.subviews = @[viewToPresent];
+    [NSLayoutConstraint activateConstraints:@[
+        [self.libraryTargetView.topAnchor constraintEqualToAnchor:viewToPresent.topAnchor],
+        [self.libraryTargetView.bottomAnchor constraintEqualToAnchor:viewToPresent.bottomAnchor],
+        [self.libraryTargetView.leadingAnchor constraintEqualToAnchor:viewToPresent.leadingAnchor],
+        [self.libraryTargetView.trailingAnchor constraintEqualToAnchor:viewToPresent.trailingAnchor]
+    ]];
 }
 
 - (void)updatePresentedView
