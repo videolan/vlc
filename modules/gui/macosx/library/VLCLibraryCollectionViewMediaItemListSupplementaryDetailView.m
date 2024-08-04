@@ -95,7 +95,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 - (void)handleAlbumUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
-    if (self.representedItem == nil) {
+    if (self.representedItem == nil ||
+        ![self.representedItem.item isKindOfClass:VLCMediaLibraryAlbum.class]) {
         return;
     }
 
@@ -104,37 +105,45 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         return;
     }
 
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:album parentType:self.representedItem.parentType];
+    VLCLibraryRepresentedItem * const representedItem = 
+        [[VLCLibraryRepresentedItem alloc] initWithItem:album
+                                             parentType:self.representedItem.parentType];
     self.representedItem = representedItem;
 }
 
 - (void)updateRepresentation
 {
     NSAssert(self.representedItem != nil, @"no media item assigned for collection view item", nil);
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
-    NSAssert(album != nil, @"represented item is not an album", nil);
+    const id<VLCMediaLibraryItemProtocol> item = self.representedItem.item;
 
-    self.titleTextField.stringValue = album.displayString;
-    self.primaryDetailTextButton.title = album.artistName;
-    self.secondaryDetailTextButton.title = album.genreString;
-    self.yearAndDurationTextField.stringValue =
-        [NSString stringWithFormat:@"%u · %@", album.year, album.durationString];
+    self.titleTextField.stringValue = item.displayString;
+    self.primaryDetailTextButton.title = item.primaryDetailString;
+    self.secondaryDetailTextButton.title = item.secondaryDetailString;
 
-    const BOOL primaryActionableDetail = album.primaryActionableDetail;
-    const BOOL secondaryActionableDetail = album.secondaryActionableDetail;
+    if ([item isKindOfClass:VLCMediaLibraryAlbum.class]) {
+        self.yearAndDurationTextField.stringValue =
+            [NSString stringWithFormat:@"%u · %@", [(VLCMediaLibraryAlbum *)item year], item.durationString];
+    } else {
+        self.yearAndDurationTextField.stringValue = item.durationString;
+    }
+
+    const BOOL primaryActionableDetail = item.primaryActionableDetail;
+    const BOOL secondaryActionableDetail = item.secondaryActionableDetail;
     self.primaryDetailTextButton.enabled = primaryActionableDetail;
     self.secondaryDetailTextButton.enabled = secondaryActionableDetail;
     if (@available(macOS 10.14, *)) {
-        self.primaryDetailTextButton.contentTintColor = primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
-        self.secondaryDetailTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
+        self.primaryDetailTextButton.contentTintColor =
+            primaryActionableDetail ? NSColor.VLCAccentColor : NSColor.secondaryLabelColor;
+        self.secondaryDetailTextButton.contentTintColor =
+            secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
+    [VLCLibraryImageCache thumbnailForLibraryItem:item withCompletion:^(NSImage * const thumbnail) {
         self.artworkImageView.image = thumbnail;
     }];
 
     __weak typeof(self) weakSelf = self; // Prevent retain cycle
-    [_tracksDataSource setRepresentedItem:album withCompletion:^{
+    [_tracksDataSource setRepresentedItem:item withCompletion:^{
         __strong typeof(self) strongSelf = weakSelf;
 
         if (strongSelf) {
@@ -155,25 +164,25 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
 - (IBAction)primaryDetailAction:(id)sender
 {
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
-    if (album == nil || !album.primaryActionableDetail) {
+    const id<VLCMediaLibraryItemProtocol> item = self.representedItem.item;
+    if (item == nil || !item.primaryActionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    const id<VLCMediaLibraryItemProtocol> libraryItem = album.primaryActionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = item.primaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
 - (IBAction)secondaryDetailAction:(id)sender
 {
-    VLCMediaLibraryAlbum * const album = (VLCMediaLibraryAlbum *)self.representedItem.item;
-    if (album == nil || !album.secondaryActionableDetail) {
+    const id<VLCMediaLibraryItemProtocol> item = self.representedItem.item;
+    if (item == nil || !item.secondaryActionableDetail) {
         return;
     }
 
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    const id<VLCMediaLibraryItemProtocol> libraryItem = album.secondaryActionableDetailLibraryItem;
+    const id<VLCMediaLibraryItemProtocol> libraryItem = item.secondaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
 }
 
