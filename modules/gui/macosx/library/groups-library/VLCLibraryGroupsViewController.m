@@ -165,6 +165,7 @@
 
     self.listViewSplitView.vertical = YES;
     self.listViewSplitView.dividerStyle = NSSplitViewDividerStyleThin;
+    self.listViewSplitView.delegate = self;
     [self.listViewSplitView addArrangedSubview:self.groupsTableViewScrollView];
     [self.listViewSplitView addArrangedSubview:self.selectedGroupTableViewScrollView];
 
@@ -237,6 +238,19 @@
         [self.groupsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:groupRow]
                           byExtendingSelection:NO];
         [self.groupsTableView scrollRowToVisible:groupRow];
+    }
+}
+
+#pragma mark - NSSplitViewDelegate
+
+- (CGFloat)splitView:(NSSplitView *)splitView
+constrainMinCoordinate:(CGFloat)proposedMinimumPosition
+         ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex == 0) {
+        return VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth;
+    } else {
+        return VLCLibraryUIUnits.librarySplitViewMainViewMinimumWidth;
     }
 }
 

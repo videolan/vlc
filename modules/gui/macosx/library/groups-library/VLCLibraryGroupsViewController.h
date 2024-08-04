@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCMediaLibraryGroup;
 
-@interface VLCLibraryGroupsViewController : NSObject
+@interface VLCLibraryGroupsViewController : NSObject<NSSplitViewDelegate>
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
