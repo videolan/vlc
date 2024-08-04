@@ -63,6 +63,9 @@ static inline void bits_align( bits_buffer_t *p_buffer )
 static inline void bits_write( bits_buffer_t *p_buffer,
                                int i_count, uint64_t i_bits )
 {
+    if (p_buffer->i_data + i_count < p_buffer->i_size)
+        return;
+
     while( i_count > 0 )
     {
         i_count--;
