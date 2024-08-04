@@ -106,18 +106,6 @@ void MLUrlModel::deleteStream( const MLItemId itemId )
         });
 }
 
-vlc_ml_sorting_criteria_t MLUrlModel::roleToCriteria(int role) const
-{
-    switch (role) {
-    case URL_URL :
-        return VLC_ML_SORTING_DEFAULT;
-    case URL_LAST_PLAYED_DATE :
-        return VLC_ML_SORTING_LASTMODIFICATIONDATE;
-    default:
-        return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 void MLUrlModel::onVlcMlEvent(const MLEvent &event)
 {
     switch (event.i_type)

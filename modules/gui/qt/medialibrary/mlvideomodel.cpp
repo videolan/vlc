@@ -177,29 +177,9 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
     };
 }
 
-vlc_ml_sorting_criteria_t MLVideoModel::roleToCriteria(int role) const
-{
-    switch(role)
-    {
-        case VIDEO_TITLE:
-            return VLC_ML_SORTING_ALPHA;
-        case VIDEO_DURATION:
-            return VLC_ML_SORTING_DURATION;
-        case VIDEO_PLAYCOUNT:
-            return VLC_ML_SORTING_PLAYCOUNT;
-        default:
-            return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLVideoModel::nameToCriteria(QByteArray name) const
 {
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLVideoModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-{
-    return M_names_to_criteria.key(criteria, "");
 }
 
 // Protected MLBaseModel reimplementation

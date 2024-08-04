@@ -56,11 +56,6 @@ vlc_ml_sorting_criteria_t MLAlbumModel::nameToCriteria(QByteArray name) const
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-QByteArray MLAlbumModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-{
-    return M_names_to_criteria.key(criteria, "");
-}
-
 void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
 {
     switch( event.i_type )
@@ -97,23 +92,6 @@ void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
     }
 
     MLBaseModel::onVlcMlEvent( event );
-}
-
-vlc_ml_sorting_criteria_t MLAlbumModel::roleToCriteria(int role) const
-{
-    switch (role)
-    {
-    case ALBUM_TITLE :
-        return VLC_ML_SORTING_ALPHA;
-    case ALBUM_RELEASE_YEAR :
-        return VLC_ML_SORTING_RELEASEDATE;
-    case ALBUM_MAIN_ARTIST :
-        return VLC_ML_SORTING_ARTIST;
-    case ALBUM_DURATION:
-        return VLC_ML_SORTING_DURATION;
-    default:
-        return VLC_ML_SORTING_DEFAULT;
-    }
 }
 
 QVariant MLAlbumModel::itemRoleData(MLItem *item, const int role) const

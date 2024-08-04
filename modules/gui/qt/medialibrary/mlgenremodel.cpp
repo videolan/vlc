@@ -121,25 +121,9 @@ void MLGenreModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent(event);
 }
 
-vlc_ml_sorting_criteria_t MLGenreModel::roleToCriteria(int role) const
-{
-    switch (role)
-    {
-    case GENRE_NAME:
-        return VLC_ML_SORTING_ALPHA;
-    default :
-        return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
 {
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLGenreModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-{
-    return M_names_to_criteria.key(criteria, "");
 }
 
 QString MLGenreModel::getCover(MLGenre * genre) const

@@ -102,28 +102,9 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
     }
 }
 
-vlc_ml_sorting_criteria_t MLVideoFoldersModel::roleToCriteria(int role) const /* override */
-{
-    switch (role)
-    {
-        case FOLDER_TITLE:
-            return VLC_ML_SORTING_ALPHA;
-        case FOLDER_DURATION:
-            return VLC_ML_SORTING_DURATION;
-        default:
-            return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLVideoFoldersModel::nameToCriteria(QByteArray name) const /* override */
 {
     return criterias.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLVideoFoldersModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-/* override */
-{
-    return criterias.key(criteria, "");
 }
 
 std::unique_ptr<MLListCacheLoader>

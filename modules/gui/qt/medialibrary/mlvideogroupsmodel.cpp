@@ -144,30 +144,9 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
     }
 }
 
-vlc_ml_sorting_criteria_t MLVideoGroupsModel::roleToCriteria(int role) const /* override */
-{
-    switch (role)
-    {
-        case VIDEO_TITLE:
-            return VLC_ML_SORTING_ALPHA;
-        case VIDEO_DURATION:
-            return VLC_ML_SORTING_DURATION;
-        case GROUP_DATE:
-            return VLC_ML_SORTING_INSERTIONDATE;
-        default:
-            return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLVideoGroupsModel::nameToCriteria(QByteArray name) const /* override */
 {
     return criterias.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLVideoGroupsModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-/* override */
-{
-    return criterias.key(criteria, "");
 }
 
 std::unique_ptr<MLListCacheLoader> MLVideoGroupsModel::createMLLoader() const /* override */

@@ -88,11 +88,9 @@ protected: // MLBaseModel reimplementation
 private:
     void generateThumbnail(uint64_t id) const;
 
-    vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
     static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
-    QByteArray criteriaToName(vlc_ml_sorting_criteria_t criteria) const override;
 
     struct Loader : public MLListCacheLoader::MLOp
     {

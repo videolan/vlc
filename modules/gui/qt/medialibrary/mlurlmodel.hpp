@@ -71,7 +71,6 @@ protected:
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 private:
-    vlc_ml_sorting_criteria_t roleToCriteria(int role) const override;
     void onVlcMlEvent( const MLEvent &event ) override;
 
     struct Loader : public MLListCacheLoader::MLOp

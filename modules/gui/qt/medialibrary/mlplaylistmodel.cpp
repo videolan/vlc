@@ -384,29 +384,9 @@ QVariant MLPlaylistModel::itemRoleData(MLItem *item, int role) const /* override
 // Protected MLBaseModel implementation
 //-------------------------------------------------------------------------------------------------
 
-vlc_ml_sorting_criteria_t MLPlaylistModel::roleToCriteria(int role) const /* override */
-{
-    switch (role)
-    {
-        case MEDIA_TITLE:
-            return VLC_ML_SORTING_ALPHA;
-        case MEDIA_DURATION:
-            return VLC_ML_SORTING_DURATION;
-        case MEDIA_PLAYCOUNT:
-            return VLC_ML_SORTING_PLAYCOUNT;
-        default:
-            return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLPlaylistModel::nameToCriteria(QByteArray name) const /* override */
 {
     return criterias.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLPlaylistModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const /* override */
-{
-    return criterias.key(criteria, "");
 }
 
 //-------------------------------------------------------------------------------------------------

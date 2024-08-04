@@ -64,25 +64,9 @@ QHash<int, QByteArray> MLArtistModel::roleNames() const
     };
 }
 
-vlc_ml_sorting_criteria_t MLArtistModel::roleToCriteria(int role) const
-{
-    switch (role)
-    {
-    case ARTIST_NAME :
-        return VLC_ML_SORTING_ALPHA;
-    default :
-        return VLC_ML_SORTING_DEFAULT;
-    }
-}
-
 vlc_ml_sorting_criteria_t MLArtistModel::nameToCriteria(QByteArray name) const
 {
     return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
-}
-
-QByteArray MLArtistModel::criteriaToName(vlc_ml_sorting_criteria_t criteria) const
-{
-    return M_names_to_criteria.key(criteria, "");
 }
 
 void MLArtistModel::onVlcMlEvent(const MLEvent &event)
