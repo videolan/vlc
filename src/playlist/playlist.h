@@ -31,11 +31,11 @@ typedef struct input_item_t input_item_t;
 
 #ifdef TEST_PLAYLIST
 /* mock the player in tests */
-# define vlc_player_New(a,b) (VLC_UNUSED(a), malloc(1))
+# define vlc_player_New(a,b) (VLC_UNUSED(a), malloc(sizeof (vlc_player_t)))
 # define vlc_player_Delete(p) free(p)
 # define vlc_player_Lock(p) VLC_UNUSED(p)
 # define vlc_player_Unlock(p) VLC_UNUSED(p)
-# define vlc_player_AddListener(a,b,c) (VLC_UNUSED(b), malloc(1))
+# define vlc_player_AddListener(a,b,c) (VLC_UNUSED(b), malloc(sizeof(vlc_player_listener_id)))
 # define vlc_player_RemoveListener(a,b) free(b)
 # define vlc_player_SetCurrentMedia(a,b) (VLC_UNUSED(b), VLC_SUCCESS)
 # define vlc_player_SetNextMedia(a,b) (VLC_UNUSED(b), VLC_SUCCESS)
