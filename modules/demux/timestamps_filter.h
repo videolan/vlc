@@ -352,12 +352,11 @@ static void timestamps_filter_es_out_Del(es_out_t *out, es_out_id_t *id)
 
 static const struct es_out_callbacks timestamps_filter_es_out_cbs =
 {
-    timestamps_filter_es_out_Add,
-    timestamps_filter_es_out_Send,
-    timestamps_filter_es_out_Del,
-    timestamps_filter_es_out_Control,
-    timestamps_filter_es_out_Delete,
-    NULL,
+    .add = timestamps_filter_es_out_Add,
+    .send = timestamps_filter_es_out_Send,
+    .del = timestamps_filter_es_out_Del,
+    .control = timestamps_filter_es_out_Control,
+    .destroy = timestamps_filter_es_out_Delete,
 };
 
 static es_out_t * timestamps_filter_es_out_New(es_out_t *orig)
