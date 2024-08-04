@@ -294,4 +294,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return VLCMediaLibraryParentGroupTypePlaylist;
 }
 
+- (NSString *)supplementaryDetailViewKind
+{
+    return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
+}
+
 @end
