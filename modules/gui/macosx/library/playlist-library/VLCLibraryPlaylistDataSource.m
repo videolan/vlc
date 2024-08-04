@@ -105,6 +105,9 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)reloadViews
 {
+    [self.masterTableView reloadData];
+    [self.detailTableView reloadData];
+    
     for (NSCollectionView * const collectionView in self.collectionViews) {
         [(VLCLibraryCollectionViewFlowLayout *)collectionView.collectionViewLayout resetLayout];
         [collectionView reloadData];
