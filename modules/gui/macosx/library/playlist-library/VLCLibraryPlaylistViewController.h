@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
-@interface VLCLibraryPlaylistViewController : NSObject
+@interface VLCLibraryPlaylistViewController : NSObject<NSSplitViewDelegate>
 
 @property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
