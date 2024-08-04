@@ -38,7 +38,6 @@
 #import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAlbumTracksTableViewDelegate.h"
-#import "library/audio-library/VLCLibraryAlbumTableCellView.h"
 
 #import "main/VLCMain.h"
 
