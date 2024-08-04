@@ -216,18 +216,19 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     NSAssert(self.representedItem != nil, @"no item assigned for collection view item", nil);
 
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
-    _mediaTitleTextField.stringValue = actualItem.displayString;
-    _secondaryInfoTextField.stringValue = actualItem.primaryDetailString;
+    self.mediaTitleTextField.stringValue = actualItem.displayString;
+    self.secondaryInfoTextField.stringValue = actualItem.primaryDetailString;
 
-    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
-        self->_mediaImageView.image = thumbnail;
+    [VLCLibraryImageCache thumbnailForLibraryItem:actualItem
+                                   withCompletion:^(NSImage * const thumbnail) {
+        self.mediaImageView.image = thumbnail;
     }];
 
-    // TODO: Add handling for the other types
-    if([actualItem isKindOfClass:[VLCMediaLibraryMediaItem class]]) {
+    if ([actualItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
         VLCMediaLibraryMediaItem * const mediaItem = (VLCMediaLibraryMediaItem *)actualItem;
 
-        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO || mediaItem.mediaType == VLC_ML_MEDIA_TYPE_UNKNOWN) {
+        if (mediaItem.mediaType == VLC_ML_MEDIA_TYPE_VIDEO || 
+            mediaItem.mediaType == VLC_ML_MEDIA_TYPE_UNKNOWN) {
             VLCMediaLibraryTrack * const videoTrack = mediaItem.firstVideoTrack;
             [self showVideoSizeIfNeededForWidth:videoTrack.videoWidth
                                       andHeight:videoTrack.videoHeight];
@@ -237,14 +238,18 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
         }
 
         const CGFloat position = mediaItem.progress;
-        if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress && position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
-            _progressIndicator.progress = position;
-            _progressIndicator.hidden = NO;
+        if (position > VLCLibraryCollectionViewItemMinimalDisplayedProgress &&
+            position < VLCLibraryCollectionViewItemMaximumDisplayedProgress) {
+            self.progressIndicator.progress = position;
+            self.progressIndicator.hidden = NO;
         }
 
         if (mediaItem.playCount == 0) {
             [self setUnplayedIndicatorHidden:NO];
         }
+    } else {
+        self.progressIndicator.hidden = YES;
+        _videoImageViewAspectRatioConstraint.active = NO;
     }
 }
 
