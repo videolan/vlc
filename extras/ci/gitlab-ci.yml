@@ -624,7 +624,7 @@ xros-arm64:
         (cd libvlcjni && git checkout 5076ef767eb4126c74a496033ace54649ac200e7)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           CONTRIB_FLAGS="--with-prebuilt-contribs"
-        else
+        elif [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
           CONTRIB_FLAGS="--package-contribs"
         fi
         EXTRA_PARAMS="--enable-extra-checks" /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH $CONTRIB_FLAGS
