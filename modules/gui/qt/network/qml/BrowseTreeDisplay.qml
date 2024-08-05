@@ -209,21 +209,6 @@ MainViewLoader {
         MainTableView {
             id: tableView
 
-            property Component thumbnailHeader: Widgets.TableHeaderDelegate {
-                Widgets.IconLabel {
-                    height: VLCStyle.listAlbumCover_height
-                    width: VLCStyle.listAlbumCover_width
-
-                    anchors.centerIn: parent
-
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                    font.pixelSize: VLCStyle.icon_tableHeader
-                    text: VLCIcons.album_cover
-                    color: parent.colorContext.fg.secondary
-                }
-            }
-
             property Component thumbnailColumn: NetworkThumbnailItem {
                 onPlayClicked: index => playAt(index)
             }
@@ -240,7 +225,7 @@ MainViewLoader {
 
                     text: qsTr("Name"),
 
-                    headerDelegate: thumbnailHeader,
+                    headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: thumbnailColumn
                 })
             }]
@@ -255,7 +240,7 @@ MainViewLoader {
 
                     isSortable: false,
 
-                    headerDelegate: thumbnailHeader,
+                    headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: thumbnailColumn
                 }
             }, {
@@ -331,6 +316,11 @@ MainViewLoader {
 
             Widgets.TableColumns {
                 id: tableColumns
+
+                titleCover_width: VLCStyle.listAlbumCover_width
+                titleCover_height: VLCStyle.listAlbumCover_height
+
+                showTitleText: false
             }
         }
     }
