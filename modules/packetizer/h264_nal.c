@@ -449,13 +449,13 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         /* overscan */
         i_tmp = bs_read( p_bs, 1 );
         if ( i_tmp )
-            bs_read( p_bs, 1 );
+            bs_skip( p_bs, 1 );
 
         /* video signal type */
         i_tmp = bs_read( p_bs, 1 );
         if( i_tmp )
         {
-            bs_read( p_bs, 3 );
+            bs_skip( p_bs, 3 );
             p_sps->vui.colour.b_full_range = bs_read( p_bs, 1 );
             /* colour desc */
             i_tmp = bs_read( p_bs, 1 );
@@ -501,25 +501,25 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
                 uint32_t count = bs_read_ue( p_bs ) + 1;
                 if( count > 31 )
                     return false;
-                bs_read( p_bs, 4 );
-                bs_read( p_bs, 4 );
+                bs_skip( p_bs, 4 );
+                bs_skip( p_bs, 4 );
                 for( uint32_t j = 0; j < count; j++ )
                 {
                     bs_read_ue( p_bs );
                     bs_read_ue( p_bs );
-                    bs_read( p_bs, 1 );
+                    bs_skip( p_bs, 1 );
                     if( bs_error( p_bs ) )
                         return false;
                 }
-                bs_read( p_bs, 5 );
+                bs_skip( p_bs, 5 );
                 p_sps->vui.i_cpb_removal_delay_length_minus1 = bs_read( p_bs, 5 );
                 p_sps->vui.i_dpb_output_delay_length_minus1 = bs_read( p_bs, 5 );
-                bs_read( p_bs, 5 );
+                bs_skip( p_bs, 5 );
             }
         }
 
         if( p_sps->vui.b_hrd_parameters_present_flag )
-            bs_read( p_bs, 1 ); /* low delay hrd */
+            bs_skip( p_bs, 1 ); /* low delay hrd */
 
         /* pic struct info */
         p_sps->vui.b_pic_struct_present_flag = bs_read( p_bs, 1 );
@@ -527,7 +527,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         p_sps->vui.b_bitstream_restriction_flag = bs_read( p_bs, 1 );
         if( p_sps->vui.b_bitstream_restriction_flag )
         {
-            bs_read( p_bs, 1 ); /* motion vector pic boundaries */
+            bs_skip( p_bs, 1 ); /* motion vector pic boundaries */
             bs_read_ue( p_bs ); /* max bytes per pic */
             bs_read_ue( p_bs ); /* max bits per mb */
             bs_read_ue( p_bs ); /* log2 max mv h */
@@ -605,8 +605,8 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
     bs_read_se( p_bs ); /* pic_init_qp_minus26 */
     bs_read_se( p_bs ); /* pic_init_qs_minus26 */
     bs_read_se( p_bs ); /* chroma_qp_index_offset */
-    bs_read( p_bs, 1 ); /* deblocking_filter_control_present_flag */
-    bs_read( p_bs, 1 ); /* constrained_intra_pred_flag */
+    bs_skip( p_bs, 1 ); /* deblocking_filter_control_present_flag */
+    bs_skip( p_bs, 1 ); /* constrained_intra_pred_flag */
     p_pps->i_redundant_pic_present_flag = bs_read( p_bs, 1 );
 
     /* TODO */
@@ -1023,7 +1023,7 @@ bool h264_decode_sei_pic_timing(  bs_t *p_bs,
 
     if( p_sps->vui.b_hrd_parameters_present_flag )
     {
-        bs_read( p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
+        bs_skip( p_bs, p_sps->vui.i_cpb_removal_delay_length_minus1 + 1 );
         *output_delay =
             bs_read( p_bs, p_sps->vui.i_dpb_output_delay_length_minus1 + 1 );
     }
