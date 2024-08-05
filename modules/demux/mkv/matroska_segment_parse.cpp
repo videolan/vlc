@@ -56,12 +56,12 @@ static inline void fill_extra_data_alac( mkv_track_t *p_tk )
     if( unlikely( !p_tk->fmt.p_extra ) ) return;
     p_tk->fmt.i_extra = p_tk->i_extra_data + 12;
     uint8_t *p_extra = static_cast<uint8_t*>( p_tk->fmt.p_extra );
-    /* See "ALAC Specific Info (36 bytes) (required)" from
-       alac.macosforge.org/trac/browser/trunk/ALACMagicCookieDescription.txt */
+    /* 12 bytes + "ALAC Specific Info (24 bytes) (required)" from
+       https://github.com/macosforge/alac/blob/master/ALACMagicCookieDescription.txt */
     SetDWBE( p_extra, p_tk->fmt.i_extra );
     memcpy( p_extra + 4, "alac", 4 );
     SetDWBE( p_extra + 8, 0 );
-    memcpy( p_extra + 12, p_tk->p_extra_data, p_tk->fmt.i_extra - 12 );
+    memcpy( p_extra + 12, p_tk->p_extra_data, p_tk->i_extra_data );
 }
 
 static inline void fill_extra_data( mkv_track_t *p_tk, unsigned int offset )
