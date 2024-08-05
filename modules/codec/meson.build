@@ -399,22 +399,11 @@ if get_option('stream_outputs')
     )
 endif
 
-# WebVTT CSS engine requires Flex and Bison
-flex = find_program('flex', required: get_option('css_engine'))
-bison = find_program('bison', required: get_option('css_engine'))
-
-if flex.found() and bison.found() and not get_option('css_engine').disabled()
-
-    bison_gen = generator(bison,
-        output: ['@BASENAME@.c', '@BASENAME@.h'],
-        arguments: ['@INPUT@', '--defines=@OUTPUT1@', '--output=@OUTPUT0@'])
+# WebVTT CSS engine (requires Flex and Bison)
+if get_option('css_engine').require(flex.found() and bison.found(),
+        error_message: 'The CSS engine requires the Flex and Bison tools').allowed()
 
     webvtt_bison_files = bison_gen.process('webvtt/CSSGrammar.y')
-
-    flex_gen = generator(flex,
-        output: '@PLAINNAME@.yy.c',
-        arguments: ['-o', '@OUTPUT@', '@INPUT@'])
-
     webvtt_lex_files = flex_gen.process('webvtt/CSSLexer.l')
 
     webvtt_sources += [
