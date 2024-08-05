@@ -235,7 +235,7 @@ void QmlGlobalMenu::popup(QPoint pos)
 
     /* View menu, a bit different */
     submenu = m_menu->addMenu(qtr( "V&iew" ));
-    ViewMenu( p_intf, submenu );
+    ViewMenu( p_intf, submenu, m_playerViewVisible );
 
     submenu = m_menu->addMenu(qtr( "&Help" ));
     HelpMenu(submenu);
@@ -348,11 +348,11 @@ void QmlMenuBar::popupToolsMenu( QQuickItem* button )
     });
 }
 
-void QmlMenuBar::popupViewMenu( QQuickItem* button )
+void QmlMenuBar::popupViewMenu(QQuickItem* button )
 {
     popupMenuCommon(button, [this](QMenu* menu) {
         qt_intf_t* p_intf = m_ctx->getIntf();
-        ViewMenu( p_intf, menu );
+        ViewMenu( p_intf, menu, m_playerViewVisible );
     });
 }
 

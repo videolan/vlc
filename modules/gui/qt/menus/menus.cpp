@@ -281,7 +281,7 @@ void VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-void VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
+void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> playerViewVisible)
 {
     QAction *action;
 
@@ -300,21 +300,20 @@ void VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
         if( m && m->parent() == menu ) delete m;
     }
 
-    QString title;
+    if (playerViewVisible.has_value())
+    {
+        QString title;
 
-    if (mi->hasMediaLibrary())
-        title = qtr("Media Library");
-    else
-        title = qtr("Browse and Discover");
+        if (*playerViewVisible)
+            title = qtr("Show &main view");
+        else
+            title = qtr("Show &player view");
 
-    action = menu->addAction(
-#ifndef __APPLE__
-            QIcon( ":/menu/media_library.svg" ),
-#endif
-            title);
-    action->setCheckable( true );
-    connect( action, &QAction::triggered, mi, &MainCtx::setMediaLibraryVisible );
-    action->setChecked( mi->isMediaLibraryVisible() );
+        action = menu->addAction(title);
+
+        connect( action, &QAction::triggered, mi, *playerViewVisible ? &MainCtx::requestShowMainView
+                                                                     : &MainCtx::requestShowPlayerView );
+    }
 
     action = menu->addAction(
 #ifndef __APPLE__

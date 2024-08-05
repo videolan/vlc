@@ -552,16 +552,6 @@ QString MainCtx::displayMRL(const QUrl &mrl) const
     return urlToDisplayString(mrl);
 }
 
-void MainCtx::setMediaLibraryVisible( bool visible )
-{
-    if (m_mediaLibraryVisible == visible)
-        return;
-
-    m_mediaLibraryVisible = visible;
-
-    emit mediaLibraryVisibleChanged(visible);
-}
-
 void MainCtx::setPlaylistDocked( bool docked )
 {
     b_playlistDocked = docked;

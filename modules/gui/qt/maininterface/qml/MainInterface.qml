@@ -167,31 +167,21 @@ Item {
         Connections {
             target: MainCtx
 
-            function onMediaLibraryVisibleChanged() {
-                if (MainCtx.mediaLibraryVisible) {
-                    if (History.match(History.viewPath, ["mc"]))
-                        return
+            function onRequestShowMainView() {
+                if (History.match(History.viewPath, ["mc"]))
+                    return
 
-                    // NOTE: Useful when we started the application on the 'player' view.
-                    if (History.previousEmpty) {
-                        if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                            MainPlaylistController.stop()
+                if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
+                    MainPlaylistController.stop()
 
-                        _pushHome()
+                _pushHome()
+            }
 
-                        return
-                    }
+            function onRequestShowPlayerView() {
+                if (History.match(History.viewPath, ["player"]))
+                    return
 
-                    if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
-                        MainPlaylistController.stop()
-
-                    History.previous()
-                } else {
-                    if (History.match(History.viewPath, ["player"]))
-                        return
-
-                    History.push(["player"])
-                }
+                History.push(["player"])
             }
         }
 

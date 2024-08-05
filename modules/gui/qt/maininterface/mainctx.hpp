@@ -95,8 +95,6 @@ class MainCtx : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool mediaLibraryVisible READ isMediaLibraryVisible WRITE setMediaLibraryVisible
-               NOTIFY mediaLibraryVisibleChanged FINAL)
     Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged FINAL)
     Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged FINAL)
     Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged FINAL)
@@ -193,7 +191,6 @@ public:
     Q_ENUM(OsType)
 
     inline QWindow::Visibility interfaceVisibility() const { return m_windowVisibility; }
-    bool isMediaLibraryVisible() { return m_mediaLibraryVisible; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return m_playlistVisible; }
     inline double getPlaylistWidthFactor() const { return m_playlistWidthFactor; }
@@ -341,7 +338,6 @@ protected:
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
-    bool                 m_mediaLibraryVisible = true;
     bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
     double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
@@ -377,7 +373,6 @@ protected:
 public slots:
     void toggleToolbarMenu();
     void toggleInterfaceFullScreen();
-    void setMediaLibraryVisible( bool );
     void setPlaylistDocked( bool );
     void setPlaylistVisible( bool );
     void setPlaylistWidthFactor( double );
@@ -421,7 +416,6 @@ signals:
     void askRaise();
     void kc_pressed(); /* easter eggs */
 
-    void mediaLibraryVisibleChanged(bool);
     void playlistDockedChanged(bool);
     void playlistVisibleChanged(bool);
     void playlistWidthFactorChanged(double);
@@ -468,6 +462,9 @@ signals:
 
     void windowSuportExtendedFrameChanged();
     void windowExtendedMarginChanged(unsigned margin);
+
+    void requestShowMainView();
+    void requestShowPlayerView();
 
 private:
     void loadPrefs(bool callSignals);

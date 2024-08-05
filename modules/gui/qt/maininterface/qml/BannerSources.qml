@@ -475,6 +475,7 @@ T.ToolBar {
                                 Menus.QmlGlobalMenu {
                                     id: contextMenu
                                     ctx: MainCtx
+                                    playerViewVisible: History.match(History.viewPath, ["player"])
                                 }
                             }
                         }

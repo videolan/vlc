@@ -80,7 +80,7 @@ public:
 
     static void ToolsMenu( qt_intf_t *, QMenu * );
 
-    static void ViewMenu( qt_intf_t *, QMenu *);
+    static void ViewMenu( qt_intf_t *, QMenu *, std::optional<bool> playerViewVisible = std::nullopt );
 
     static void InterfacesMenu( qt_intf_t *p_intf, QMenu * );
     static void ExtensionsMenu( qt_intf_t *p_intf, QMenu * );
