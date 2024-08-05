@@ -189,8 +189,7 @@ public:
     };
     Q_ENUM(OsType)
 
-    inline bool isInterfaceFullScreen() const { return m_windowVisibility == QWindow::FullScreen; }
-    inline bool isInterfaceVisible() const { return m_windowVisibility != QWindow::Hidden; }
+    inline QWindow::Visibility interfaceVisibility() const { return m_windowVisibility; }
     bool isMediaLibraryVisible() { return m_mediaLibraryVisible; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return m_playlistVisible; }

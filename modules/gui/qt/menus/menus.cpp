@@ -343,7 +343,7 @@ void VLCMenuBar::ViewMenu( qt_intf_t *p_intf, QMenu *menu )
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
             &MainCtx::toggleInterfaceFullScreen, QString( "F11" ) );
     action->setCheckable( true );
-    action->setChecked( mi->isInterfaceFullScreen() );
+    action->setChecked( mi->interfaceVisibility() == QWindow::FullScreen );
 
     action = menu->addAction( qtr( "&View Items as Grid" ), mi,
             &MainCtx::setGridView );
@@ -891,7 +891,7 @@ void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
 
 #ifndef Q_OS_MAC
     /* Hide / Show VLC and cone */
-    if( mi->isInterfaceVisible() || b_force_visible )
+    if( mi->interfaceVisibility() != QWindow::Hidden || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
                             qtr( "&Hide VLC media player in taskbar" ), mi,
