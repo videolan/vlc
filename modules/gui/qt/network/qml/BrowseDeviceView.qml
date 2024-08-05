@@ -248,7 +248,7 @@ FocusScope {
 
                     text: qsTr("Name"),
 
-                    headerDelegate: artworkHeader,
+                    headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: artworkColumn
                 })
             }]
@@ -263,7 +263,7 @@ FocusScope {
 
                     isSortable: false,
 
-                    headerDelegate: artworkHeader,
+                    headerDelegate: tableColumns.titleHeaderDelegate,
                     colDelegate: artworkColumn
                 }
             }, {
@@ -309,25 +309,13 @@ FocusScope {
 
             onItemDoubleClicked: (index, model) => root.onDoubleClicked(model, index)
 
-            Component {
-                id: artworkHeader
+            Widgets.TableColumns {
+                id: tableColumns
 
-                Widgets.TableHeaderDelegate {
-                    Widgets.IconLabel {
+                titleCover_width: VLCStyle.listAlbumCover_width
+                titleCover_height: VLCStyle.listAlbumCover_height
 
-                        height: VLCStyle.listAlbumCover_height
-                        width: VLCStyle.listAlbumCover_width
-                        anchors.centerIn: parent
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        font.pixelSize: VLCStyle.icon_tableHeader
-
-                        text: VLCIcons.album_cover
-
-                        color: parent.colorContext.fg.secondary
-                    }
-                }
+                showTitleText: false
             }
 
             Component {
