@@ -41,6 +41,7 @@ public:
         NETWORK_BASE_TYPE,
         NETWORK_BASE_PROTOCOL,
         NETWORK_BASE_ARTWORK,
+        NETWORK_BASE_ARTWORK_FALLBACK,
         NETWORK_BASE_MAX
     };
 
@@ -60,6 +61,8 @@ public:
     using BaseModel::BaseModel;
 
     QHash<int, QByteArray> roleNames() const override;
+
+    Q_INVOKABLE QString artworkFallbackForType(const ItemType type) const;
 
 protected:
     QVariant basedata(const NetworkBaseItem& item, int role) const;

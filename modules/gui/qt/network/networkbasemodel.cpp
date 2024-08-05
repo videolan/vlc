@@ -31,11 +31,30 @@ QVariant NetworkBaseModel::basedata(const NetworkBaseItem& item, int role) const
         return item.protocol;
     case NETWORK_BASE_ARTWORK:
         return item.artwork;
+    case NETWORK_BASE_ARTWORK_FALLBACK:
+        return artworkFallbackForType(item.type);
     default:
         return {};
     };
 }
 
+QString NetworkBaseModel::artworkFallbackForType(const ItemType type) const
+{
+    switch (type) {
+    case TYPE_DISC:
+        return "qrc:///sd/disc.svg";
+    case TYPE_CARD:
+        return "qrc:///sd/capture-card.svg";
+    case TYPE_STREAM:
+        return "qrc:///sd/stream.svg";
+    case TYPE_PLAYLIST:
+        return "qrc:///sd/playlist.svg";
+    case TYPE_FILE:
+        return "qrc:///sd/file.svg";
+    default:
+        return "qrc:///sd/directory.svg";
+    }
+}
 
 QHash<int, QByteArray> NetworkBaseModel::roleNames() const
 {
@@ -45,5 +64,6 @@ QHash<int, QByteArray> NetworkBaseModel::roleNames() const
         { NETWORK_BASE_TYPE, "type" },
         { NETWORK_BASE_PROTOCOL, "protocol" },
         { NETWORK_BASE_ARTWORK, "artwork" },
+        { NETWORK_BASE_ARTWORK_FALLBACK, "artworkFallback" },
     };
 }
