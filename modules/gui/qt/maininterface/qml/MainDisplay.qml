@@ -83,6 +83,11 @@ FocusScope {
             _showMiniPlayer = true
     }
 
+    Component.onCompleted: {
+        if (MainCtx.canShowVideoPIP)
+            pipPlayerComponent.createObject(this)
+    }
+
     Navigation.cancelAction: function() {
         History.previous(Qt.BacktabFocusReason)
     }
@@ -465,36 +470,40 @@ FocusScope {
         }
     }
 
-    PIPPlayer {
-        id: playerPip
-        anchors {
-            bottom: miniPlayer.top
-            left: parent.left
-            bottomMargin: VLCStyle.margin_normal
-            leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
-        }
+    Component {
+        id: pipPlayerComponent
 
-        width: VLCStyle.dp(320, VLCStyle.scale)
-        height: VLCStyle.dp(180, VLCStyle.scale)
-        z: 2
-        visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
-        enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
-
-        dragXMin: 0
-        dragXMax: g_mainDisplay.width - playerPip.width
-        dragYMin: sourcesBanner.y + sourcesBanner.height
-        dragYMax: miniPlayer.y - playerPip.height
-
-        //keep the player visible on resize
-        Connections {
-            target: g_mainDisplay
-            function onWidthChanged() {
-                if (playerPip.x > playerPip.dragXMax)
-                    playerPip.x = playerPip.dragXMax
+        PIPPlayer {
+            id: playerPip
+            anchors {
+                bottom: miniPlayer.top
+                left: parent.left
+                bottomMargin: VLCStyle.margin_normal
+                leftMargin: VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
             }
-            function onHeightChanged() {
-                if (playerPip.y > playerPip.dragYMax)
-                    playerPip.y = playerPip.dragYMax
+
+            width: VLCStyle.dp(320, VLCStyle.scale)
+            height: VLCStyle.dp(180, VLCStyle.scale)
+            z: 2
+            visible: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+            enabled: g_mainDisplay._showMiniPlayer && MainCtx.hasEmbededVideo
+
+            dragXMin: 0
+            dragXMax: g_mainDisplay.width - playerPip.width
+            dragYMin: sourcesBanner.y + sourcesBanner.height
+            dragYMax: miniPlayer.y - playerPip.height
+
+            //keep the player visible on resize
+            Connections {
+                target: g_mainDisplay
+                function onWidthChanged() {
+                    if (playerPip.x > playerPip.dragXMax)
+                        playerPip.x = playerPip.dragXMax
+                }
+                function onHeightChanged() {
+                    if (playerPip.y > playerPip.dragYMax)
+                        playerPip.y = playerPip.dragYMax
+                }
             }
         }
     }
