@@ -30,7 +30,7 @@
 #include <libavcodec/avcodec.h>
 #include "va.h"
 
-bool vlc_va_MightDecode(enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt)
+bool vlc_va_MightDecode(enum AVPixelFormat hwfmt)
 {
     switch (hwfmt)
     {

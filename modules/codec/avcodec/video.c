@@ -722,7 +722,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     if( hwfmt == AV_PIX_FMT_NONE )
         return VLC_EGENERIC;
 
-    if (!vlc_va_MightDecode(hwfmt, swfmt))
+    if (!vlc_va_MightDecode(hwfmt))
         return VLC_EGENERIC; /* Unknown brand of hardware acceleration */
     if (p_context->width == 0 || p_context->height == 0)
     {   /* should never happen */

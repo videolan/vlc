@@ -57,12 +57,11 @@ typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
 
 /**
  * Determines whether the hardware acceleration PixelFormat can be used to
- * decode pixels similar to the software PixelFormat.
+ * decode pixels.
  * @param hwfmt the hardware acceleration pixel format
- * @param swfmt the software pixel format
  * @return true if the hardware acceleration should be supported
  */
-bool vlc_va_MightDecode(enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt);
+bool vlc_va_MightDecode(enum AVPixelFormat hwfmt);
 
 /**
  * Creates an accelerated video decoding back-end for libavcodec.
