@@ -168,6 +168,8 @@ if pulse_dep.found()
         dependencies: [libvlccore_dep, pulse_dep],
         link_with: [vlc_libcompat],
     )
+else
+    libvlc_pulse = disabler()
 endif
 
 # SRT
