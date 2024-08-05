@@ -94,24 +94,7 @@ MainViewLoader {
         defaultText:  qsTr("Unknown Share")
 
         coverProvider: function(index, data) {
-            function _baseUri(type) {
-                switch (type) {
-                case NetworkMediaModel.TYPE_DISC:
-                    return "qrc:///sd/disc.svg"
-                case NetworkMediaModel.TYPE_CARD:
-                    return "qrc:///sd/capture-card.svg"
-                case NetworkMediaModel.TYPE_STREAM:
-                    return "qrc:///sd/stream.svg"
-                case NetworkMediaModel.TYPE_PLAYLIST:
-                    return "qrc:///sd/playlist.svg"
-                case NetworkMediaModel.TYPE_FILE:
-                    return "qrc:///sd/file.svg"
-                default:
-                    return "qrc:///sd/directory.svg"
-                }
-            }
-
-            const fallbackImage = SVGColorImage.colorize(_baseUri(data.type))
+            const fallbackImage = SVGColorImage.colorize(data.artworkFallback)
                 .background(networkDragItem.colorContext.bg.secondary)
                 .color1(networkDragItem.colorContext.fg.primary)
                 .accent(networkDragItem.colorContext.accent)
