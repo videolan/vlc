@@ -39,8 +39,6 @@ FocusScope {
     //behave like a Page
     property var pagePrefix: []
 
-    property bool hasEmbededVideo: MainCtx.hasEmbededVideo
-
     readonly property int positionSliderY: controlBar.y + controlBar.sliderY
 
     readonly property string coverSource: {
@@ -543,7 +541,7 @@ FocusScope {
         Navigation.downItem: {
             if (playlistVisibility.isPlaylistVisible)
                 return playlistpopup
-            if (rootPlayer.hasEmbededVideo)
+            if (MainCtx.hasEmbededVideo)
                 return playerSpecializationLoader
             if (Player.isInteractive)
                 return toggleControlBarButton
@@ -724,7 +722,7 @@ FocusScope {
         id: navBox
         visible: Player.isInteractive && navBox.show
                     && (interactiveAutoHideTimer.running
-                    || navBox.hovered || !rootPlayer.hasEmbededVideo)
+                    || navBox.hovered || !MainCtx.hasEmbededVideo)
 
         x: rootPlayer.x + VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
         y: controlBar.y - navBox.height - VLCStyle.margin_normal
@@ -760,7 +758,7 @@ FocusScope {
     Widgets.ButtonExt {
         id: toggleControlBarButton
         visible: Player.isInteractive
-                 && rootPlayer.hasEmbededVideo
+                 && MainCtx.hasEmbededVideo
                  && !(MainCtx.pinVideoControls && !Player.fullscreen)
                  && (interactiveAutoHideTimer.running === true
                      || controlBar.state !== "hidden" || toggleControlBarButton.hovered)
@@ -773,7 +771,7 @@ FocusScope {
         iconTxt: controlBar.state === "hidden" ? VLCIcons.expand_inverted : VLCIcons.expand
 
         Navigation.parentItem: rootPlayer
-        Navigation.upItem: playlistVisibility.isPlaylistVisible ? playlistpopup : (rootPlayer.hasEmbededVideo ? playerSpecializationLoader : topBar)
+        Navigation.upItem: playlistVisibility.isPlaylistVisible ? playlistpopup : (MainCtx.hasEmbededVideo ? playerSpecializationLoader : topBar)
         Navigation.downItem: controlBar
 
         onClicked:{
@@ -817,7 +815,7 @@ FocusScope {
                 return playlistpopup
             if (Player.isInteractive)
                 return toggleControlBarButton
-            if (!rootPlayer.hasEmbededVideo)
+            if (!MainCtx.hasEmbededVideo)
                 return playerSpecializationLoader
             return topBar
         }
@@ -858,7 +856,7 @@ FocusScope {
 
     TapHandler {
         acceptedButtons: Qt.RightButton
-        enabled: !hasEmbededVideo
+        enabled: !MainCtx.hasEmbededVideo
 
         onTapped: (eventPoint, button) => {
             if (button & Qt.RightButton) {
