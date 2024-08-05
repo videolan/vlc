@@ -64,7 +64,7 @@ static inline void fill_extra_data_alac( mkv_track_t *p_tk )
        https://github.com/macosforge/alac/blob/master/ALACMagicCookieDescription.txt */
     SetDWBE( p_extra, p_tk->fmt.i_extra );
     memcpy( p_extra + 4, "alac", 4 );
-    SetDWBE( p_extra + 8, 0 );
+    SetDWBE( p_extra + 8, p_tk->i_extra_data );
     memcpy( p_extra + 12, p_tk->p_extra_data, p_tk->i_extra_data );
 }
 
