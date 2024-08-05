@@ -138,7 +138,7 @@ FocusScope {
 
         spacing: 0
 
-        Widgets.KeyNavigableListView {
+        Widgets.ListViewExt {
             id: artistList
 
             model: artistModel

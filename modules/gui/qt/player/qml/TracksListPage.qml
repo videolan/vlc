@@ -196,7 +196,7 @@ RowLayout {
                     }
                 }
 
-                Widgets.KeyNavigableListView {
+                Widgets.ListViewExt {
                     id: tracksList
 
                     model: tracksListContainer.tracksModel

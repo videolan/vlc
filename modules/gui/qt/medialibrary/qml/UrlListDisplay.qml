@@ -27,7 +27,7 @@ import VLC.Widgets as Widgets
 import VLC.Style
 
 
-Widgets.KeyNavigableTableView {
+Widgets.TableViewExt {
     id: listView_id
 
     readonly property bool isSearchable: false

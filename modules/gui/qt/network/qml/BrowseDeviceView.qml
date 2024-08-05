@@ -227,7 +227,7 @@ FocusScope {
     Component {
         id: list
 
-        Widgets.KeyNavigableTableView {
+        Widgets.TableViewExt {
             id: listView
 
             // Properties

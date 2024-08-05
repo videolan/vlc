@@ -26,7 +26,7 @@ import VLC.Util
 import VLC.Widgets as Widgets
 import VLC.Style
 
-Widgets.KeyNavigableTableView {
+Widgets.TableViewExt {
     id: root
 
     // Properties

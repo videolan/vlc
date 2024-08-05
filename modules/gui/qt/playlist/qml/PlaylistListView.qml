@@ -198,7 +198,7 @@ T.Pane {
             }
         }
 
-        Widgets.KeyNavigableListView {
+        Widgets.ListViewExt {
             id: listView
 
             Layout.fillWidth: true

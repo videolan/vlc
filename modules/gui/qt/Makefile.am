@@ -1174,8 +1174,8 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/IconToolButton.qml \
 	widgets/qml/IconTrackButton.qml \
 	widgets/qml/ImageToolButton.qml \
-	widgets/qml/KeyNavigableListView.qml \
-	widgets/qml/KeyNavigableTableView.qml \
+	widgets/qml/ListViewExt.qml \
+	widgets/qml/TableViewExt.qml \
 	widgets/qml/TableViewDelegate.qml \
 	widgets/qml/TableRowDelegate.qml \
 	widgets/qml/TableHeaderDelegate.qml \

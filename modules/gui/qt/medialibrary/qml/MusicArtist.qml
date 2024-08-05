@@ -142,7 +142,7 @@ FocusScope {
 
                     spacing: VLCStyle.tableView_spacing - VLCStyle.margin_xxxsmall
 
-                    Widgets.KeyNavigableListView {
+                    Widgets.ListViewExt {
                         id: albumsList
 
                         x: VLCStyle.margin_xlarge - VLCStyle.gridItemSelectedBorder

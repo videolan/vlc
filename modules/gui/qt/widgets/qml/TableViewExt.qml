@@ -237,7 +237,7 @@ FocusScope {
         }
     }
 
-    KeyNavigableListView {
+    ListViewExt {
         id: view
 
         anchors.fill: parent
