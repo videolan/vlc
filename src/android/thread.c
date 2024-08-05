@@ -45,6 +45,16 @@
 
 #include <vlc_atomic.h>
 
+static unsigned vlc_clock_prec;
+
+static void vlc_clock_setup_once (void)
+{
+    struct timespec res;
+    if (unlikely(clock_getres(CLOCK_MONOTONIC, &res) != 0 || res.tv_sec != 0))
+        abort ();
+    vlc_clock_prec = (res.tv_nsec + 500) / 1000;
+}
+
 /* debug */
 
 #ifndef NDEBUG
@@ -213,9 +223,26 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 /* time */
 void (vlc_tick_wait)(vlc_tick_t deadline)
 {
-    do
-        vlc_testcancel();
-    while (vlc_atomic_timedwait(&thread->killed, false, deadline) == 0);
+    static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
+
+    if (likely(thread != NULL) && thread->killable)
+    {
+        do
+            vlc_testcancel();
+        while (vlc_atomic_timedwait(&thread->killed, false, deadline) == 0);
+    }
+    else
+    {
+        /* If the deadline is already elapsed, or within the clock precision,
+         * do not even bother the system timer. */
+        pthread_once(&vlc_clock_once, vlc_clock_setup_once);
+        deadline -= vlc_clock_prec;
+
+        struct timespec ts;
+
+        vlc_tick_to_timespec(&ts, deadline);
+        while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) == EINTR);
+    }
 }
 
 void (vlc_tick_sleep)(vlc_tick_t delay)
