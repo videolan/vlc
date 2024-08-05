@@ -33,7 +33,10 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 
 DEPS_vncclient = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls $(DEPS_gnutls)
 
-VNCCLIENT_CONF := --without-libva
+VNCCLIENT_CONF = --without-libva
+ifeq ($(findstring gcrypt,$(PKGS_FOUND)),)
+VNCCLIENT_CONF += --with-libgcrypt-prefix=$(PREFIX)
+endif
 ifdef HAVE_WIN32
 VNCCLIENT_CONF += --without-pthread
 endif
