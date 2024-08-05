@@ -32,7 +32,10 @@ DEPS_rav1e += vendor-rav1e $(DEPS_vendor-rav1e) cargo-c $(DEPS_cargo-c)
 
 # vendor-rav1e
 
-$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e .rustc
+ifneq ($(call system_tool_matches_min, rustc --version,$(RUST_VERSION_MIN)),)
+$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .rustc
+endif
+$(TARBALLS)/rav1e-$(RAV1E_VERSION)-vendor.tar.bz2: .sum-rav1e
 	$(call download_vendor,rav1e-$(RAV1E_VERSION)-vendor.tar.bz2,rav1e,rav1e-$(RAV1E_VERSION).tar.gz)
 
 .sum-vendor-rav1e: rav1e-$(RAV1E_VERSION)-vendor.tar.bz2
