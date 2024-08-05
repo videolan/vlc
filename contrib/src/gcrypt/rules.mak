@@ -50,9 +50,6 @@ endif
 ifdef HAVE_DARWIN_OS
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=yes
 endif
-ifdef HAVE_BSD
-GCRYPT_CONF += --disable-asm --disable-aesni-support
-endif
 ifdef HAVE_ANDROID
 ifeq ($(ANDROID_ABI), x86)
 GCRYPT_CONF += ac_cv_sys_symbol_underscore=no
