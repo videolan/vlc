@@ -142,6 +142,8 @@ libqt_plugin_la_SOURCES = \
 	dialogs/sout/sout.cpp dialogs/sout/sout.hpp \
 	dialogs/sout/sout_widgets.cpp \
 	dialogs/sout/sout_widgets.hpp \
+	dialogs/systray/systray.cpp \
+	dialogs/systray/systray.hpp \
 	dialogs/toolbar/controlbar_profile.hpp \
 	dialogs/toolbar/controlbar_profile.cpp \
 	dialogs/toolbar/controlbar_profile_model.cpp \
@@ -399,6 +401,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/sout/profile_selector.moc.cpp \
 	dialogs/sout/sout.moc.cpp \
 	dialogs/sout/sout_widgets.moc.cpp \
+	dialogs/systray/systray.moc.cpp \
 	dialogs/toolbar/controlbar_profile.moc.cpp \
 	dialogs/toolbar/controlbar_profile_model.moc.cpp \
 	dialogs/playlists/playlists.moc.cpp \

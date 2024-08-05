@@ -43,6 +43,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "dialogs/extensions/extensions_manager.hpp"                 /* Extensions menu */
 #include "dialogs/extended/extended_panels.hpp"
+#include "dialogs/systray/systray.hpp"
 #include "util/varchoicemodel.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlrecentsmodel.hpp"
@@ -224,10 +225,11 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
     action->setCheckable( true );
     action->setChecked( THEMPL->getMediaStopAction() ==  PlaylistController::MEDIA_STOPPED_EXIT);
 
-    if( mi && mi->getSysTray() )
+    VLCSystray* systray = mi ? mi->getSysTray() : nullptr;
+    if( systray )
     {
-        action = menu->addAction( qtr( "Close to systray"), mi,
-                                 &MainCtx::toggleUpdateSystrayMenu );
+        action = menu->addAction( qtr( "Close to systray"), systray,
+                                 &VLCSystray::toggleUpdateMenu );
     }
 
     addDPStaticEntry( menu, qtr( "&Quit" ) ,
@@ -875,12 +877,13 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
  * Systray Menu                                                         *
  ************************************************************************/
 
-void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
+void VLCMenuBar::updateSystrayMenu(VLCSystray* systray, MainCtx *mi,
                                   qt_intf_t *p_intf,
                                   bool b_force_visible )
 {
+    assert(systray);
     /* Get the systray menu and clean it */
-    QMenu *sysMenu = mi->getSysTrayMenu();
+    QMenu *sysMenu = systray->contextMenu();
     // explictly delete submenus, see QTBUG-11070
     for (QAction *action : sysMenu->actions()) {
         if (action->menu()) {
@@ -894,14 +897,14 @@ void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
     if( mi->interfaceVisibility() != QWindow::Hidden || b_force_visible )
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "&Hide VLC media player in taskbar" ), mi,
-                            &MainCtx::hideUpdateSystrayMenu);
+                            qtr( "&Hide VLC media player in taskbar" ), systray,
+                            &VLCSystray::hideUpdateMenu);
     }
     else
     {
         sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Sho&w VLC media player" ), mi,
-                            &MainCtx::showUpdateSystrayMenu);
+                            qtr( "Sho&w VLC media player" ), systray,
+                            &VLCSystray::showUpdateMenu);
     }
     sysMenu->addSeparator();
 #endif
@@ -917,7 +920,7 @@ void VLCMenuBar::updateSystrayMenu( MainCtx *mi,
             ":/menu/exit.svg", &DialogsProvider::quit);
 
     /* Set the menu */
-    mi->getSysTray()->setContextMenu( sysMenu );
+    systray->setContextMenu( sysMenu );
 }
 
 

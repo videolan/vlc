@@ -21,6 +21,7 @@
 #include <player/player_controller.hpp>
 #include <playlist/playlist_controller.hpp>
 #include "util/keyhelper.hpp"
+#include "dialogs/systray/systray.hpp"
 #include <QScreen>
 #include <QQmlProperty>
 #include <cmath>
