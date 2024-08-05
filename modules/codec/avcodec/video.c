@@ -171,6 +171,7 @@ static void FrameInfoInit( decoder_sys_t *p_sys )
 static struct frame_info_s * FrameInfoGet( decoder_sys_t *p_sys, AVFrame *frame )
 {
 #if OPAQUE_REF_ONLY
+    (void)p_sys;
     /* There's no pkt to frame opaque mapping guarantee */
     return (struct frame_info_s *) frame->opaque_ref->data;
 #else
