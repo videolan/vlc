@@ -568,13 +568,14 @@ nightly-macos-arm64:
     script: |
         export PATH="${VLC_PATH}:$PATH"
         mkdir build && cd build
+        EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-extra-checks"
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs \
-                --enable-extra-checks --with-prebuilt-contribs
-        else
-            ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH --package-contribs \
-                --enable-extra-checks
+          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --package-contribs"
         fi
+        if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
+          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
+        fi
+        ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH $EXTRA_BUILD_FLAGS
 
 ios-arm64:
     extends: .apple-os-common
