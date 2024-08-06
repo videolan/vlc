@@ -477,10 +477,7 @@ libd3d11va_plugin_la_SOURCES = \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h \
 	packetizer/h26x_nal_common.h \
 	codec/avcodec/dxva_blocklist.c
-libd3d11va_plugin_la_LIBADD = libd3d11_common.la $(LIBCOM) -luuid
-if HAVE_WINSTORE
-libd3d11va_plugin_la_LIBADD += -ld3d11
-endif
+libd3d11va_plugin_la_LIBADD = libd3d11_common.la $(LIBCOM) -luuid -ld3d11
 if HAVE_AVCODEC_D3D11VA
 codec_LTLIBRARIES += libd3d11va_plugin.la
 endif
@@ -596,10 +593,7 @@ codec_LTLIBRARIES += $(LTLIBvpx)
 libvpx_alpha_plugin_la_SOURCES = codec/vpx_alpha.c codec/alpha_combine.h
 if HAVE_WIN32
 libvpx_alpha_plugin_la_SOURCES += codec/alpha_d3d11.cpp
-libvpx_alpha_plugin_la_LIBADD = $(LIBCOM) libd3d11_common.la
-if HAVE_WINSTORE
-libvpx_alpha_plugin_la_LIBADD += -ld3d11
-endif
+libvpx_alpha_plugin_la_LIBADD = $(LIBCOM) libd3d11_common.la -ld3d11
 endif
 codec_LTLIBRARIES += libvpx_alpha_plugin.la
 
@@ -666,11 +660,8 @@ libmft_plugin_la_SOURCES = codec/mft.cpp \
     codec/mft_d3d11.cpp codec/mft_d3d11.h
 libmft_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 if HAVE_WIN32
-libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la
+libmft_plugin_la_LIBADD = $(LIBCOM) -luuid -lmfplat libvlc_hxxxhelper.la libd3d11_common.la -ld3d11
 codec_LTLIBRARIES += libmft_plugin.la
-if HAVE_WINSTORE
-libmft_plugin_la_LIBADD += -ld3d11
-endif
 endif
 
 libgstdecode_plugin_la_SOURCES = codec/gstreamer/gstdecode.c \

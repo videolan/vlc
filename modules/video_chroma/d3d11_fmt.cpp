@@ -285,7 +285,6 @@ done:
 typedef struct
 {
 #if !BUILD_FOR_UAP
-    HINSTANCE                 hdll;         /* handle of the opened d3d11 dll */
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
     HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
@@ -303,16 +302,9 @@ typedef struct {
     d3d11_decoder_device_t              dec_device;
 } d3d11_decoder_device;
 
-static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
+static int D3D11_Create(d3d11_handle_t *hd3d)
 {
 #if !BUILD_FOR_UAP
-    hd3d->hdll = LoadLibrary(TEXT("D3D11.DLL"));
-    if (!hd3d->hdll)
-    {
-        msg_Warn(obj, "cannot load d3d11.dll, aborting");
-        return VLC_EGENERIC;
-    }
-
 # if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     hd3d->dxgidebug_dll = NULL;
     hd3d->pf_DXGIGetDebugInterface = NULL;
@@ -338,9 +330,6 @@ static int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d)
 static void D3D11_Destroy(d3d11_handle_t *hd3d)
 {
 #if !BUILD_FOR_UAP
-    if (hd3d->hdll)
-        FreeLibrary(hd3d->hdll);
-
 #if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     if (hd3d->dxgidebug_dll)
         FreeLibrary(hd3d->dxgidebug_dll);
@@ -427,17 +416,6 @@ static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                             IDXGIAdapter *adapter,
                             bool hw_decoding, d3d11_device_t *out)
 {
-#if !BUILD_FOR_UAP
-# define D3D11CreateDevice(a,b,c,d,e,f,g,h,i,j)   pf_CreateDevice(a,b,c,d,e,f,g,h,i,j)
-    /* */
-    PFN_D3D11_CREATE_DEVICE pf_CreateDevice;
-    pf_CreateDevice = reinterpret_cast<PFN_D3D11_CREATE_DEVICE>(GetProcAddress(hd3d->hdll, "D3D11CreateDevice"));
-    if (!pf_CreateDevice) {
-        msg_Err(obj, "Cannot locate reference to D3D11CreateDevice ABI in DLL");
-        return E_NOINTERFACE;
-    }
-#endif
-
     HRESULT hr = E_NOTIMPL;
     UINT creationFlags = 0;
 
@@ -524,7 +502,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
     if (unlikely(sys==NULL))
         return NULL;
 
-    int ret = D3D11_Create(obj, &sys->hd3d);
+    int ret = D3D11_Create(&sys->hd3d);
     if (ret != VLC_SUCCESS)
     {
         vlc_obj_free( obj, sys );
