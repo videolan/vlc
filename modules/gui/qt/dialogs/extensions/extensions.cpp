@@ -54,9 +54,6 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( qt_intf_t *_p_intf,
     assert(p_extensions_manager);
 
     vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, NULL );
-
-    connect( this, &ExtensionsDialogProvider::SignalDialog,
-             this, &ExtensionsDialogProvider::UpdateExtDialog );
 }
 
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
@@ -144,7 +141,9 @@ void ExtensionsDialogProvider::ManageDialog( extension_dialog_t *p_dialog )
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
     assert( extMgr != NULL );
     if( !extMgr->isUnloading() )
-        emit SignalDialog( p_dialog ); // Safe because we signal Qt thread
+        QMetaObject::invokeMethod(this, [this, p_dialog](){
+            UpdateExtDialog( p_dialog );
+        }); // Safe because we signal Qt thread
     else
         UpdateExtDialog( p_dialog ); // This is safe, we're already in Qt thread
 }

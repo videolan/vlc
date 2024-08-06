@@ -66,9 +66,6 @@ private slots:
 public:
     void ManageDialog( extension_dialog_t *p_dialog );
 
-signals:
-    void SignalDialog( extension_dialog_t *p_dialog );
-
 private:
     ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr,
                              extensions_manager_t *p_mgr = nullptr );
