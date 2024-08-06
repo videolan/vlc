@@ -254,8 +254,6 @@ T.ItemDelegate {
     contentItem: ColumnLayout {
         id: layout
 
-        z: 1
-
         spacing: 0
 
         Widgets.MediaCover {
