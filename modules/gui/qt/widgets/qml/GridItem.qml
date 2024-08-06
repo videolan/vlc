@@ -51,7 +51,6 @@ T.ItemDelegate {
 
     property alias image: picture.source
     property alias cacheImage: picture.cacheImage
-    property alias isImageReady: picture.isImageReady
     property alias fallbackImage: picture.fallbackImageSource
 
     property alias title: titleLabel.text
