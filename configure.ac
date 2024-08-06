@@ -1942,19 +1942,6 @@ AS_IF([test "${enable_rust}" = "yes"],[
     ])
   ])
 
-  AS_IF([test "${host}" != "${build}"],[
-    dnl RUSTUP_HOME is needed to cross-compile Rust
-    AS_IF([test -z "${RUSTUP_HOME}"],[
-      AC_MSG_CHECKING([RUSTUP_HOME from contribs])
-      AS_IF([test -d "${CONTRIB_DIR}/../bin/.rustup"],[
-        RUSTUP_HOME=$(cd "${CONTRIB_DIR}/../bin/.rustup" && pwd -P)
-        AC_MSG_RESULT([${RUSTUP_HOME}])
-      ],[
-        AC_MSG_RESULT([not found])
-      ])
-    ])
-  ])
-
   AS_IF([test -n "${RUSTUP_HOME}"],[
     RUST_ENV="${RUST_ENV} RUSTUP_HOME=\"${RUSTUP_HOME}\""
   ])
