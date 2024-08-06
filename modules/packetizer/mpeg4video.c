@@ -409,7 +409,7 @@ static int ParseVOL( decoder_t *p_dec, es_format_t *fmt,
     {
         /* vol control parameter */
         bs_skip( &s, 2 ); /* chroma_format */
-        bs_read1( &s ); /* low_delay */
+        bs_skip( &s, 1 ); /* low_delay */
 
         if( bs_read1( &s ) )
         {
