@@ -60,6 +60,7 @@ class QMenu;
 class QSize;
 class QScreen;
 class QTimer;
+class QSystemTrayIcon;
 class StandardPLPanel;
 struct vlc_window;
 class VideoSurfaceProvider;

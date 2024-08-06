@@ -21,6 +21,7 @@
 #include "menus/menus.hpp"
 #include <QSystemTrayIcon>
 #include "playlist/playlist_controller.hpp"
+#include "dialogs/dialogs_provider.hpp"
 
 using namespace vlc::playlist;
 
@@ -135,6 +136,44 @@ void VLCSystray::updateTooltipName( const QString& name )
 
 void VLCSystray::update()
 {
-    //FIXME menu should be handled here
-    VLCMenuBar::updateSystrayMenu(this, m_ctx, m_intf);
+    // explictly delete submenus, see QTBUG-11070
+    for (QAction *action : m_menu->actions()) {
+        if (action->menu()) {
+            delete action->menu();
+        }
+    }
+    m_menu->clear();
+
+#ifndef Q_OS_MAC
+    /* Hide / Show VLC and cone */
+    if( m_ctx->interfaceVisibility() != QWindow::Hidden )
+    {
+        m_menu->addAction(
+            QIcon( ":/logo/vlc16.png" ), qtr( "&Hide VLC media player in taskbar" ),
+            this, &VLCSystray::hideUpdateMenu);
+    }
+    else
+    {
+        m_menu->addAction(
+            QIcon( ":/logo/vlc16.png" ), qtr( "Sho&w VLC media player" ),
+            this, &VLCSystray::showUpdateMenu);
+    }
+    m_menu->addSeparator();
+#endif
+
+    VLCMenuBar::PopupMenuPlaylistEntries( m_menu.get(), m_intf );
+    VLCMenuBar::PopupMenuControlEntries( m_menu.get(), m_intf, false );
+
+    VLCMenuBar::VolumeEntries( m_intf, m_menu.get() );
+    m_menu->addSeparator();
+    m_menu->addAction(
+        QIcon(":/menu/file.svg"), qtr( "&Open Media" ),
+        THEDP, &DialogsProvider::openFileDialog);
+
+    m_menu->addAction(
+        QIcon(":/menu/exit.svg"), qtr( "&Quit" ),
+        THEDP, &DialogsProvider::quit);
+
+    /* Set the menu */
+    setContextMenu( m_menu.get() );
 }

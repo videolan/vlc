@@ -398,7 +398,7 @@ void VLCMenuBar::ExtensionsMenu( qt_intf_t *p_intf, QMenu *extMenu )
     extMgr->menu( extMenu );
 }
 
-static inline void VolumeEntries( qt_intf_t *p_intf, QMenu *current )
+void VLCMenuBar::VolumeEntries( qt_intf_t *p_intf, QMenu *current )
 {
     current->addSeparator();
 
@@ -872,57 +872,6 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         menu->popup( QCursor::pos() );
     return menu;
 }
-
-/************************************************************************
- * Systray Menu                                                         *
- ************************************************************************/
-
-void VLCMenuBar::updateSystrayMenu(VLCSystray* systray, MainCtx *mi,
-                                  qt_intf_t *p_intf,
-                                  bool b_force_visible )
-{
-    assert(systray);
-    /* Get the systray menu and clean it */
-    QMenu *sysMenu = systray->contextMenu();
-    // explictly delete submenus, see QTBUG-11070
-    for (QAction *action : sysMenu->actions()) {
-        if (action->menu()) {
-            delete action->menu();
-        }
-    }
-    sysMenu->clear();
-
-#ifndef Q_OS_MAC
-    /* Hide / Show VLC and cone */
-    if( mi->interfaceVisibility() != QWindow::Hidden || b_force_visible )
-    {
-        sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "&Hide VLC media player in taskbar" ), systray,
-                            &VLCSystray::hideUpdateMenu);
-    }
-    else
-    {
-        sysMenu->addAction( QIcon( ":/logo/vlc16.png" ),
-                            qtr( "Sho&w VLC media player" ), systray,
-                            &VLCSystray::showUpdateMenu);
-    }
-    sysMenu->addSeparator();
-#endif
-
-    PopupMenuPlaylistEntries( sysMenu, p_intf );
-    PopupMenuControlEntries( sysMenu, p_intf, false );
-
-    VolumeEntries( p_intf, sysMenu );
-    sysMenu->addSeparator();
-    addDPStaticEntry( sysMenu, qtr( "&Open Media" ),
-            ":/menu/file.svg", &DialogsProvider::openFileDialog);
-    addDPStaticEntry( sysMenu, qtr( "&Quit" ) ,
-            ":/menu/exit.svg", &DialogsProvider::quit);
-
-    /* Set the menu */
-    systray->setContextMenu( sysMenu );
-}
-
 
 
 /*****************************************************************************
