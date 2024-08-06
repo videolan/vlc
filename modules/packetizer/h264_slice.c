@@ -181,7 +181,7 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
                                                   p_pps->num_ref_idx_l01_default_active_minus1[1] };
 
     if( i_slice_type == 1 || i_slice_type == 6 ) /* B slices */
-        bs_read1( &s ); /* direct_spatial_mv_pred_flag */
+        bs_skip( &s, 1 ); /* direct_spatial_mv_pred_flag */
     if( i_slice_type == 0 || i_slice_type == 5 ||
         i_slice_type == 3 || i_slice_type == 8 ||
         i_slice_type == 1 || i_slice_type == 6 ) /* P SP B slices */
