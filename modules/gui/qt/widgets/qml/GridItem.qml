@@ -342,7 +342,6 @@ T.ItemDelegate {
                 color: root.selected
                     ? theme.fg.highlight
                     : theme.fg.primary
-                textFormat: Text.PlainText
             }
         }
 
@@ -355,7 +354,6 @@ T.ItemDelegate {
             color: root.selected
                 ? theme.fg.highlight
                 : theme.fg.secondary
-            textFormat: Text.PlainText
 
             Layout.preferredWidth: Math.min(root.width, implicitWidth)
             Layout.alignment: root.textAlignHCenter ? Qt.AlignCenter : Qt.AlignLeft
