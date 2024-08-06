@@ -160,7 +160,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     vlc_medialibrary_t* ml = vlc_ml_instance_get( p_intf );
     b_hasMedialibrary = (ml != NULL);
     if (b_hasMedialibrary) {
-        m_medialib = new MediaLib(p_intf);
+        m_medialib = new MediaLib(p_intf, p_intf->p_mainPlaylistController);
     }
 
     /* Controlbar Profile Model Creation */

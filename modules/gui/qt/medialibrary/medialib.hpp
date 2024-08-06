@@ -56,7 +56,7 @@ public:
     };
 
 public:
-    MediaLib(qt_intf_t* _intf, QObject* _parent = nullptr );
+    MediaLib(qt_intf_t* _intf, vlc::playlist::PlaylistController* playlistController, QObject* _parent = nullptr );
 
     void destroy();
 
@@ -199,6 +199,7 @@ private slots:
 
 private:
     qt_intf_t* m_intf;
+    vlc::playlist::PlaylistController* m_playlistController = nullptr;
     MLCustomCover *m_customCover {};
 
     bool m_idle = false;
