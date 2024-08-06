@@ -41,8 +41,7 @@ Rectangle {
 
     property alias cacheImage: image.cache
 
-    property bool isImageReady: image.status == Widgets.RoundImage.Ready
-
+    property bool _loadTimeout: false
 
     property string fallbackImageSource
 
@@ -71,11 +70,9 @@ Rectangle {
     //delay placeholder showing up
     Timer {
         id: timer
-        //changing running value will start/stop the timer,
-        //the running value will change back to false when the timer
-        //timeout regardless of the binding
-        running: image.state === Image.Loading
+
         interval: VLCStyle.duration_long
+        onTriggered: root._loadTimeout = true
     }
 
     Widgets.RoundImage {
@@ -88,6 +85,15 @@ Rectangle {
         sourceSize.width: root.pictureWidth
         sourceSize.height: root.pictureHeight
 
+        onStatusChanged: {
+            if (status === Widgets.RoundImage.Loading) {
+                root._loadTimeout = false
+                timer.start()
+            } else {
+                timer.stop()
+            }
+        }
+
         cache: false
     }
 
@@ -98,11 +104,13 @@ Rectangle {
 
         radius: root.radius
 
-        visible: !root.isImageReady && !timer.running
+        visible: image.source.toString() === "" //RoundImage.source is a QUrl
+                 || image.status === Widgets.RoundImage.Error
+                 || (image.status === Widgets.RoundImage.Loading && root._loadTimeout)
 
         // we only keep this image till there is no main image
         // try to release the resources otherwise
-        source: !root.isImageReady ? root.fallbackImageSource : ""
+        source: visible ? root.fallbackImageSource : ""
 
         sourceSize.width: root.pictureWidth
         sourceSize.height: root.pictureHeight
