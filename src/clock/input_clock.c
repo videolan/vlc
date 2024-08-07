@@ -243,7 +243,10 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         vlc_tick_t stream_diff = i_ck_stream - cl->last.stream;
         vlc_tick_t system_diff = (i_ck_system - cl->last.system) * cl->rate;
         vlc_tick_t diff = stream_diff - system_diff;
-        if (diff > CR_MAX_GAP || diff < -CR_MAX_GAP)
+
+        /* A discontinuity happen if stream timings increase much more than
+         * system timings or if the stream is going backward. */
+        if (diff > CR_MAX_GAP || stream_diff < 0)
         {
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
