@@ -21,15 +21,6 @@
 
 #include "util/vlctick.hpp"
 
-QHash<QByteArray, vlc_ml_sorting_criteria_t> MLAlbumModel::M_names_to_criteria = {
-    {"id", VLC_ML_SORTING_DEFAULT},
-    {"title", VLC_ML_SORTING_ALPHA},
-    {"release_year", VLC_ML_SORTING_RELEASEDATE},
-    {"main_artist", VLC_ML_SORTING_ARTIST},
-    //{"nb_tracks"},
-    {"duration", VLC_ML_SORTING_DURATION}
-};
-
 MLAlbumModel::MLAlbumModel(QObject *parent)
     : MLBaseModel(parent)
 {
@@ -53,7 +44,14 @@ QHash<int, QByteArray> MLAlbumModel::roleNames() const
 
 vlc_ml_sorting_criteria_t MLAlbumModel::nameToCriteria(QByteArray name) const
 {
-    return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
+    return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
+        {"id", VLC_ML_SORTING_DEFAULT},
+        {"title", VLC_ML_SORTING_ALPHA},
+        {"release_year", VLC_ML_SORTING_RELEASEDATE},
+        {"main_artist", VLC_ML_SORTING_ARTIST},
+        // {"nb_tracks"},
+        {"duration", VLC_ML_SORTING_DURATION},
+    }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
 void MLAlbumModel::onVlcMlEvent(const MLEvent &event)

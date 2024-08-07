@@ -33,12 +33,6 @@ QVariantList getVariantList(const QList<T> & desc)
     return list;
 }
 
-QHash<QByteArray, vlc_ml_sorting_criteria_t> MLVideoModel::M_names_to_criteria = {
-    {"title", VLC_ML_SORTING_ALPHA},
-    {"duration", VLC_ML_SORTING_DURATION},
-    {"playcount", VLC_ML_SORTING_PLAYCOUNT},
-};
-
 MLVideoModel::MLVideoModel(QObject* parent)
     : MLBaseModel(parent)
 {
@@ -179,7 +173,11 @@ QHash<int, QByteArray> MLVideoModel::roleNames() const
 
 vlc_ml_sorting_criteria_t MLVideoModel::nameToCriteria(QByteArray name) const
 {
-    return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
+    return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
+        {"title", VLC_ML_SORTING_ALPHA},
+        {"duration", VLC_ML_SORTING_DURATION},
+        {"playcount", VLC_ML_SORTING_PLAYCOUNT},
+    }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
 // Protected MLBaseModel reimplementation

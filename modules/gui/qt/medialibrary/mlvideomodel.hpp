@@ -90,8 +90,6 @@ private:
 
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
-    static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
-
     struct Loader : public MLListCacheLoader::MLOp
     {
         using MLListCacheLoader::MLOp::MLOp;

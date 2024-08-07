@@ -91,7 +91,8 @@ signals:
 protected:
     virtual std::unique_ptr<MLListCacheLoader> createMLLoader() const  = 0;
 
-    virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray) const {
+    virtual vlc_ml_sorting_criteria_t nameToCriteria(QByteArray /* name */) const
+    {
         return VLC_ML_SORTING_DEFAULT;
     }
 

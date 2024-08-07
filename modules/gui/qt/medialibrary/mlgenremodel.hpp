@@ -79,9 +79,6 @@ private:
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override;
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;
     };
-
-private: // Variables
-    static QHash<QByteArray, vlc_ml_sorting_criteria_t> M_names_to_criteria;
 };
 
 

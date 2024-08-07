@@ -39,10 +39,6 @@ static const int MLGENREMODEL_COVER_BLUR = 4;
 
 //-------------------------------------------------------------------------------------------------
 
-QHash<QByteArray, vlc_ml_sorting_criteria_t> MLGenreModel::M_names_to_criteria = {
-    {"name", VLC_ML_SORTING_ALPHA}
-};
-
 MLGenreModel::MLGenreModel(QObject *parent)
     : MLBaseModel(parent)
 {
@@ -123,7 +119,9 @@ void MLGenreModel::onVlcMlEvent(const MLEvent &event)
 
 vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
 {
-    return M_names_to_criteria.value(name, VLC_ML_SORTING_DEFAULT);
+    return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
+        {"name", VLC_ML_SORTING_ALPHA},
+    }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
 QString MLGenreModel::getCover(MLGenre * genre) const
