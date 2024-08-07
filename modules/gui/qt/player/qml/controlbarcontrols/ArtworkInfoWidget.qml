@@ -142,7 +142,7 @@ AbstractButton {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
 
-        Image {
+        Widgets.MediaCover {
             id: coverImage
 
             Layout.fillHeight: true
@@ -152,14 +152,15 @@ AbstractButton {
                 if (!paintOnly && Player.artwork && Player.artwork.toString())
                     return VLCAccessImage.uri(Player.artwork)
                 else
-                    return VLCStyle.noArtAlbumCover
+                    return ""
             }
 
-            sourceSize.height: root.height * MainCtx.screen.devicePixelRatio
+            fallbackImageSource: VLCStyle.noArtAlbumCover
 
-            fillMode: Image.PreserveAspectFit
+            playCoverShowPlay: false
 
-            asynchronous: true
+            pictureWidth: root.width
+            pictureHeight: root.height
 
             Accessible.role: Accessible.Graphic
             Accessible.name: qsTr("Cover")
@@ -175,7 +176,6 @@ AbstractButton {
                 anchors.centerIn: coverImage
 
                 sourceItem: coverImage
-
             }
         }
 
