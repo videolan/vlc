@@ -35,6 +35,12 @@
 # include "config.h"
 #endif
 
+#if !BUILD_FOR_UAP
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#define HAVE_DXGI_DEBUG 1
+#endif
+#endif
+
 #include <vlc_common.h>
 #include <vlc_picture.h>
 #include <vlc_charset.h>
@@ -48,7 +54,7 @@
 #include <initguid.h>
 #include <d3d11.h>
 #include <dxgi1_2.h>
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#ifdef HAVE_DXGI_DEBUG
 # include <dxgidebug.h>
 #endif
 #include <assert.h>
@@ -282,15 +288,52 @@ done:
     CoUninitialize();
 }
 
-typedef struct
+#ifdef HAVE_DXGI_DEBUG
+struct dxgi_debug_handle_t
 {
-#if !BUILD_FOR_UAP
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
     HINSTANCE                 dxgidebug_dll;
     HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
+
+    void Init()
+    {
+        dxgidebug_dll = nullptr;
+        pf_DXGIGetDebugInterface = nullptr;
+        if (IsDebuggerPresent())
+        {
+            dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+            if (dxgidebug_dll)
+            {
+                pf_DXGIGetDebugInterface =
+                        reinterpret_cast<decltype(pf_DXGIGetDebugInterface)>(GetProcAddress(dxgidebug_dll, "DXGIGetDebugInterface"));
+                if (unlikely(!pf_DXGIGetDebugInterface))
+                {
+                    FreeLibrary(dxgidebug_dll);
+                    dxgidebug_dll = nullptr;
+                }
+            }
+        }
+    }
+
+    void Release()
+    {
+        if (dxgidebug_dll)
+            FreeLibrary(dxgidebug_dll);
+    }
+
+    void LogResource()
+    {
+        if (pf_DXGIGetDebugInterface)
+        {
+            IDXGIDebug *pDXGIDebug;
+            if (SUCCEEDED(pf_DXGIGetDebugInterface(&IID_GRAPHICS_PPV_ARGS(&pDXGIDebug))))
+            {
+                pDXGIDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+                pDXGIDebug->Release();
+            }
+        }
+    }
+};
 #endif
-#endif
-} d3d11_handle_t;
 
 typedef struct {
     struct {
@@ -298,44 +341,11 @@ typedef struct {
         libvlc_video_output_cleanup_cb  cleanupDeviceCb;
     } external;
 
-    d3d11_handle_t                      hd3d;
+#ifdef HAVE_DXGI_DEBUG
+    dxgi_debug_handle_t                 dxgi_debug;
+#endif
     d3d11_decoder_device_t              dec_device;
 } d3d11_decoder_device;
-
-static int D3D11_Create(d3d11_handle_t *hd3d)
-{
-#if !BUILD_FOR_UAP
-# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    hd3d->dxgidebug_dll = NULL;
-    hd3d->pf_DXGIGetDebugInterface = NULL;
-    if (IsDebuggerPresent())
-    {
-        hd3d->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-        if (hd3d->dxgidebug_dll)
-        {
-            hd3d->pf_DXGIGetDebugInterface =
-                    reinterpret_cast<decltype(hd3d->pf_DXGIGetDebugInterface)>(GetProcAddress(hd3d->dxgidebug_dll, "DXGIGetDebugInterface"));
-            if (unlikely(!hd3d->pf_DXGIGetDebugInterface))
-            {
-                FreeLibrary(hd3d->dxgidebug_dll);
-                hd3d->dxgidebug_dll = NULL;
-            }
-        }
-    }
-# endif // !NDEBUG && HAVE_DXGIDEBUG_H
-#endif // !BUILD_FOR_UAP
-    return VLC_SUCCESS;
-}
-
-static void D3D11_Destroy(d3d11_handle_t *hd3d)
-{
-#if !BUILD_FOR_UAP
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    if (hd3d->dxgidebug_dll)
-        FreeLibrary(hd3d->dxgidebug_dll);
-#endif
-#endif
-}
 
 void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
 {
@@ -361,8 +371,10 @@ void D3D11_ReleaseDevice(d3d11_decoder_device_t *dev_sys)
     if ( sys->external.cleanupDeviceCb )
         sys->external.cleanupDeviceCb( sys->external.opaque );
 
-    D3D11_LogResources( &sys->dec_device );
-    D3D11_Destroy( &sys->hd3d );
+#ifdef HAVE_DXGI_DEBUG
+    sys->dxgi_debug.LogResource();
+    sys->dxgi_debug.Release();
+#endif
 }
 
 static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
@@ -412,7 +424,7 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
     return S_OK;
 }
 
-static HRESULT CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
+static HRESULT CreateDevice(vlc_object_t *obj,
                             IDXGIAdapter *adapter,
                             bool hw_decoding, d3d11_device_t *out)
 {
@@ -502,12 +514,9 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
     if (unlikely(sys==NULL))
         return NULL;
 
-    int ret = D3D11_Create(&sys->hd3d);
-    if (ret != VLC_SUCCESS)
-    {
-        vlc_obj_free( obj, sys );
-        return NULL;
-    }
+#ifdef HAVE_DXGI_DEBUG
+    sys->dxgi_debug.Init();
+#endif
 
     sys->external.cleanupDeviceCb = NULL;
     HRESULT hr = E_FAIL;
@@ -551,7 +560,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
             }
 #endif
 
-            hr = CreateDevice( obj, &sys->hd3d, adapter, hw_decoding, &sys->dec_device.d3d_dev );
+            hr = CreateDevice( obj, adapter, hw_decoding, &sys->dec_device.d3d_dev );
         }
         else
             goto error;
@@ -560,8 +569,10 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
 error:
     if (FAILED(hr))
     {
-        D3D11_LogResources( &sys->dec_device );
-        D3D11_Destroy(&sys->hd3d);
+#ifdef HAVE_DXGI_DEBUG
+        sys->dxgi_debug.LogResource();
+        sys->dxgi_debug.Release();
+#endif
         vlc_obj_free( obj, sys );
         return NULL;
     }
@@ -908,22 +919,11 @@ error:
     return VLC_EGENERIC;
 }
 
-void D3D11_LogResources(d3d11_decoder_device_t *dev_sys)
+void D3D11_LogResources([[maybe_unused]] d3d11_decoder_device_t *dev_sys)
 {
-#if !BUILD_FOR_UAP
-# if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+#ifdef HAVE_DXGI_DEBUG
     d3d11_decoder_device *sys = container_of(dev_sys, d3d11_decoder_device, dec_device);
-    d3d11_handle_t *hd3d = &sys->hd3d;
-    if (hd3d->pf_DXGIGetDebugInterface)
-    {
-        IDXGIDebug *pDXGIDebug;
-        if (SUCCEEDED(hd3d->pf_DXGIGetDebugInterface(&IID_GRAPHICS_PPV_ARGS(&pDXGIDebug))))
-        {
-            pDXGIDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-            pDXGIDebug->Release();
-        }
-    }
-# endif
+    sys->dxgi_debug.LogResource();
 #endif
 }
 
