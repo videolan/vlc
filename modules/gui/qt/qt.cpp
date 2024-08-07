@@ -902,7 +902,7 @@ static void *Thread( void *obj )
     //       Windows 7 and Windows 8, since it may not support
     //       the default graphics api (Direct3D 11.2).
 
-    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND"))
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") && qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND"))
     {
         if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8_1)
         {
