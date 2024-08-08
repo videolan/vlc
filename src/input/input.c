@@ -1340,6 +1340,7 @@ static int Init( input_thread_t * p_input )
 
     InitTitle( p_input, false );
 
+    SetStopStart( p_input );
     /* Load master infos */
     InputSourceStatistics( master, priv->p_item, priv->p_es_out );
 
@@ -1348,7 +1349,6 @@ static int Init( input_thread_t * p_input )
     if( priv->type != INPUT_TYPE_PREPARSING )
     {
         StartTitle( p_input );
-        SetStopStart( p_input );
         SetSubtitlesOptions( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
