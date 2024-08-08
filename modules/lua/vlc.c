@@ -258,6 +258,8 @@ char *vlclua_find_file( const char *psz_luadirname, const char *psz_name )
 void vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
                             input_item_t *p_input )
 {
+    vlc_meta_priority_t priority = file_is_playlist( L )? VLC_META_PRIORITY_PLAYLIST:
+                                                          VLC_META_PRIORITY_BASIC;
 #define TRY_META( a, b )                                        \
     lua_getfield( L, -1, a );                                   \
     if( lua_isstring( L, -1 ) &&                                \
@@ -269,7 +271,7 @@ void vlclua_read_meta_data( vlc_object_t *p_this, lua_State *L,
         vlc_meta_SetWithPriority( p_input->p_meta,              \
                                   vlc_meta_ ## b,               \
                                   psz_value,                    \
-                                  VLC_META_PRIORITY_BASIC );    \
+                                  priority );                   \
         free( psz_value );                                      \
     }                                                           \
     lua_pop( L, 1 ); /* pop a */
@@ -328,7 +330,9 @@ void vlclua_read_custom_meta_data( vlc_object_t *p_this, lua_State *L,
             const char *psz_key = lua_tostring( L, -2 );
             const char *psz_value = lua_tostring( L, -1 );
 
-            vlc_meta_SetExtra( p_input->p_meta, psz_key, psz_value );
+            vlc_meta_priority_t priority = file_is_playlist( L )? VLC_META_PRIORITY_PLAYLIST:
+                                                                  VLC_META_PRIORITY_BASIC;
+            vlc_meta_SetExtraWithPriority( p_input->p_meta, psz_key, psz_value, priority );
 
             lua_pop( L, 1 ); /* pop "value" */
         }
