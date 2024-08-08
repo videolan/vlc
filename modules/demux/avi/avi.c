@@ -683,6 +683,7 @@ static int Open( vlc_object_t * p_this )
                 {
                     tk->fmt.i_codec           =
                     tk->fmt.i_original_fourcc = FOURCC_XVID;
+                    tk->fmt.b_packetized = false;
                 }
 
                 if( IsQNAPCodec( p_vids->p_bih->biCompression ) )
