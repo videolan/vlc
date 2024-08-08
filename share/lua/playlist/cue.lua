@@ -74,6 +74,7 @@ function cue_track( global, track )
     t.date = track.date or global.date
     t.description = global.comment
     t.tracknum = track.num
+    t.trusted = true
     t.options = { ":start-time=" .. track.index01}
 
     return t

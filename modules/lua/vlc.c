@@ -95,6 +95,18 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
+/* Function to parse the trusted property of a file */
+static bool file_is_playlist( lua_State *L )
+{
+    bool trusted = false;
+    lua_getfield(L, -1, "trusted");
+    if( !lua_isnil(L, -1) && lua_isboolean(L, -1) )
+        trusted = lua_toboolean(L, -1);
+
+    lua_pop( L, 1 );
+    return trusted;
+}
+
 static char **vlclua_dir_list_append( char **restrict list, char *basedir,
                                       const char *luadirname )
 {
