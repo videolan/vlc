@@ -306,6 +306,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @property (readwrite, atomic, strong) NSString *primaryDetailString;
 @property (readwrite, atomic, strong) NSString *secondaryDetailString;
 @property (readwrite, atomic, strong) NSString *durationString;
+@property (readwrite, atomic, strong, nullable) NSArray<NSString *> *internalLabels;
 
 @end
 
@@ -349,6 +350,14 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 - (void)iterateMediaItemsWithBlock:(nonnull void (^)(VLCMediaLibraryMediaItem * _Nonnull))mediaItemBlock
 {
     [self doesNotRecognizeSelector:_cmd];
+}
+
+- (NSArray<NSString *> *)labels
+{
+    if (self.internalLabels == nil) {
+        self.internalLabels = labelsForMediaLibraryItem(self.libraryID);
+    }
+    return self.internalLabels;
 }
 
 @end
@@ -945,6 +954,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @interface VLCMediaLibraryMediaItem ()
 
 @property (readwrite, assign) vlc_medialibrary_t *p_mediaLibrary;
+@property (readwrite, strong, atomic, nullable) NSArray<NSString *> *internalLabels;
 
 @end
 
@@ -1545,6 +1555,14 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     [libraryController reloadMediaLibraryFoldersForInputItems:@[self.inputItem]];
 }
 
+- (NSArray<NSString *> *)labels
+{
+    if (self.internalLabels == nil) {
+        self.internalLabels = labelsForMediaLibraryItem(self.libraryID);
+    }
+    return self.internalLabels;
+}
+
 @end
 
 @implementation VLCMediaLibraryShow
@@ -1624,6 +1642,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetail = _secondaryActionableDetail;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
+@synthesize labels = _labels;
 
 - (instancetype)initWithDisplayString:(NSString *)displayString
               withPrimaryDetailString:(nullable NSString *)primaryDetailString

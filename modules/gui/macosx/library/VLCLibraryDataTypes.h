@@ -148,6 +148,7 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) id<VLCMediaLibraryItemProtocol> primaryActionableDetailLibraryItem;
 @property (readonly) BOOL secondaryActionableDetail;
 @property (readonly) id<VLCMediaLibraryItemProtocol> secondaryActionableDetailLibraryItem;
+@property (readonly) NSArray<NSString *> *labels;
 
 - (void)iterateMediaItemsWithBlock:(void (^)(VLCMediaLibraryMediaItem*))mediaItemBlock;
 
