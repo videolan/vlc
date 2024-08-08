@@ -20,7 +20,7 @@ default:
 
 variables:
     VLC_TEST_TIMEOUT: 60
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20240805192413
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20240808131936
     VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20240731083648
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20240731083648
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20240402131352
