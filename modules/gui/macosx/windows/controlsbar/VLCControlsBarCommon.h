@@ -60,6 +60,9 @@
 @property (readwrite, strong) IBOutlet NSButton *fullscreenButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fullscreenButtonWidthConstraint;
 
+@property (readwrite, strong) IBOutlet NSButton *pipButton;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *pipButtonWidthConstraint;
+
 @property (readwrite, strong) IBOutlet VLCBottomBarView *bottomBarView;
 
 @property (readonly) BOOL nativeFullscreenMode;
@@ -73,6 +76,7 @@
 - (IBAction)timeSliderAction:(id)sender;
 - (IBAction)volumeAction:(id)sender;
 - (IBAction)fullscreen:(id)sender;
+- (IBAction)onPipButtonClick:(id)sender;
 
 - (void)update;
 - (void)updateMuteVolumeButtonImage;

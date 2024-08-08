@@ -70,6 +70,7 @@ NSString *VLCPlayerStatisticsUpdated = @"VLCPlayerStatisticsUpdated";
 NSString *VLCPlayerTrackListChanged = @"VLCPlayerTrackListChanged";
 NSString *VLCPlayerTrackSelectionChanged = @"VLCPlayerTrackSelectionChanged";
 NSString *VLCPlayerFullscreenChanged = @"VLCPlayerFullscreenChanged";
+NSString *VLCPlayerPictureInPictureChanged = @"VLCPlayerPictureInPictureChanged";
 NSString *VLCPlayerWallpaperModeChanged = @"VLCPlayerWallpaperModeChanged";
 NSString *VLCPlayerListOfVideoOutputThreadsChanged = @"VLCPlayerListOfVideoOutputThreadsChanged";
 NSString *VLCPlayerVolumeChanged = @"VLCPlayerVolumeChanged";
@@ -1609,6 +1610,12 @@ static int BossCallback(vlc_object_t *p_this,
 - (void)toggleFullscreen
 {
     vlc_player_vout_SetFullscreen(_p_player, !_fullscreen);
+}
+
+- (void)togglePictureInPicture
+{
+    [_defaultNotificationCenter postNotificationName:VLCPlayerPictureInPictureChanged
+                                              object:self];
 }
 
 - (void)wallpaperModeChanged:(BOOL)wallpaperModeValue

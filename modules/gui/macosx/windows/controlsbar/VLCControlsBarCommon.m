@@ -1,10 +1,11 @@
 /*****************************************************************************
  * VLCControlsBarCommon.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2019 VLC authors and VideoLAN
+ * Copyright (C) 2024 VLC authors and VideoLAN
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>
+ *          Maxime Chapelet <umxprime at videolabs dot io>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -213,6 +214,11 @@
     [_artworkImageView setCropsImagesToRoundedCorners:YES];
     [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
     [_artworkImageView setContentGravity:VLCImageViewContentGravityResize];
+    
+    if (!NSClassFromString(@"PIPViewController")) {
+        self.pipButtonWidthConstraint.constant = 0;
+        self.pipButton.hidden = YES;
+    }
 
     // Update verything post-init
     [self update];
@@ -350,6 +356,11 @@
 - (IBAction)fullscreen:(id)sender
 {
     [_playerController toggleFullscreen];
+}
+
+- (IBAction)onPipButtonClick:(id)sender
+{
+    [_playerController togglePictureInPicture];
 }
 
 #pragma mark -
