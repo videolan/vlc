@@ -719,6 +719,7 @@ static int Open( vlc_object_t * p_this )
                     {
                         tk->fmt.i_codec           =
                         tk->fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
+                        tk->fmt.b_packetized = false;
                     }
 
                     /* Shitty files storing chroma in biCompression */
