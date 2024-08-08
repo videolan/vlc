@@ -113,6 +113,12 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
 
+    NSArray<NSString *> * const mediaItemLabels = self.representedItem.item.labels;
+    self.mediaItemLabelsStackView.hidden = mediaItemLabels.count == 0;
+    if (!self.mediaItemLabelsStackView.hidden) {
+        self.mediaItemLabelsTextField.stringValue = [mediaItemLabels componentsJoinedByString:@", "];
+    }
+
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         self->_mediaItemArtworkImageView.image = thumbnail;
     }];
