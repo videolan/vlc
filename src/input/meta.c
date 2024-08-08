@@ -36,9 +36,15 @@
 #include "../preparser/art.h"
 #include <vlc_charset.h>
 
+struct vlc_meta_value
+{
+    vlc_meta_priority_t priority;
+    char *value;
+};
+
 struct vlc_meta_t
 {
-    char * ppsz_meta[VLC_META_TYPE_COUNT];
+    struct vlc_meta_value meta[VLC_META_TYPE_COUNT];
 
     vlc_dictionary_t extra_tags;
 
@@ -99,23 +105,41 @@ vlc_meta_t *vlc_meta_New( void )
     vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof(*m) );
     if( !m )
         return NULL;
-    memset( m->ppsz_meta, 0, sizeof(m->ppsz_meta) );
+    for( int i = 0; i < VLC_META_TYPE_COUNT ; i++ )
+    {
+        m->meta[i].value = NULL;
+        m->meta[i].priority = VLC_META_PRIORITY_BASIC;
+    }
     m->i_status = 0;
     vlc_dictionary_init( &m->extra_tags, 0 );
     return m;
+}
+
+/* Allocate and insert the new value in the dictionary key `psz_name` */
+static void vlc_meta_InsertExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value, vlc_meta_priority_t priority )
+{
+    struct vlc_meta_value *meta_value = malloc( sizeof(*meta_value) );
+    if( meta_value )
+    {
+        meta_value->value = strdup(psz_value);
+        meta_value->priority = priority;
+        vlc_dictionary_insert( &m->extra_tags, psz_name, meta_value );
+    }
 }
 
 /* Free a dictionary key allocated by strdup() in vlc_meta_SetExtra() */
 static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
 {
     VLC_UNUSED( p_obj );
-    free( p_data );
+    struct vlc_meta_value *meta_value = p_data;
+    free( meta_value->value );
+    free( meta_value );
 }
 
 void vlc_meta_Delete( vlc_meta_t *m )
 {
     for( int i = 0; i < VLC_META_TYPE_COUNT ; i++ )
-        free( m->ppsz_meta[i] );
+        free( m->meta[i].value );
     vlc_dictionary_clear( &m->extra_tags, vlc_meta_FreeExtraKey, NULL );
     free( m );
 }
@@ -128,30 +152,33 @@ void vlc_meta_Delete( vlc_meta_t *m )
 
 void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val )
 {
-    free( p_meta->ppsz_meta[meta_type] );
+    free( p_meta->meta[meta_type].value );
     assert( psz_val == NULL || IsUTF8( psz_val ) );
-    p_meta->ppsz_meta[meta_type] = psz_val ? strdup( psz_val ) : NULL;
+    p_meta->meta[meta_type].value = psz_val ? strdup( psz_val ) : NULL;
 }
 
 const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
 {
-    return p_meta->ppsz_meta[meta_type];
+    return p_meta->meta[meta_type].value;
 }
 
 void vlc_meta_SetExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
 {
     assert( psz_name );
-    char *psz_oldvalue = (char *)vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
-    if( psz_oldvalue != kVLCDictionaryNotFound )
+    struct vlc_meta_value *old_meta_value = vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
+    if( old_meta_value != kVLCDictionaryNotFound )
         vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
                                             vlc_meta_FreeExtraKey, NULL );
     if ( psz_value )
-        vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
+        vlc_meta_InsertExtra( m, psz_name, psz_value, VLC_META_PRIORITY_BASIC );
 }
 
 const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
 {
-    return (char *)vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
+    struct vlc_meta_value *meta_value = vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
+    if( !meta_value )
+        return NULL;
+    return meta_value->value;
 }
 
 unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m )
@@ -188,10 +215,13 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
 
     for( int i = 0; i < VLC_META_TYPE_COUNT; i++ )
     {
-        if( src->ppsz_meta[i] )
+        /* overwrite metadata only when priority of src is 
+           greater than or equal to the priority of dst */
+        if( src->meta[i].value && src->meta[i].priority >= dst->meta[i].priority )
         {
-            free( dst->ppsz_meta[i] );
-            dst->ppsz_meta[i] = strdup( src->ppsz_meta[i] );
+            free( dst->meta[i].value );
+            dst->meta[i].value = strdup( src->meta[i].value );
+            dst->meta[i].priority = src->meta[i].priority;
         }
     }
 
@@ -200,10 +230,20 @@ void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
     for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
     {
         /* Always try to remove the previous value */
-        vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], vlc_meta_FreeExtraKey, NULL );
+        struct vlc_meta_value *dst_meta_value = vlc_dictionary_value_for_key( &dst->extra_tags, ppsz_all_keys[i] );
+        struct vlc_meta_value *src_meta_value = vlc_dictionary_value_for_key( &src->extra_tags, ppsz_all_keys[i] );
+        if( dst_meta_value )
+        {
+            /* overwrite metadata only when priority of src is 
+               greater than or equal to the priority of dst */
+            if( src_meta_value->priority < dst_meta_value->priority )
+                continue;
 
-        void *p_value = vlc_dictionary_value_for_key( &src->extra_tags, ppsz_all_keys[i] );
-        vlc_dictionary_insert( &dst->extra_tags, ppsz_all_keys[i], strdup( (const char*)p_value ) );
+            vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], vlc_meta_FreeExtraKey, NULL );
+        }
+
+        vlc_meta_InsertExtra( dst, ppsz_all_keys[i], src_meta_value->value, src_meta_value->priority );
+
         free( ppsz_all_keys[i] );
     }
     free( ppsz_all_keys );

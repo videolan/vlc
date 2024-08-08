@@ -62,6 +62,13 @@ typedef enum vlc_meta_type_t
 
 #define VLC_META_TYPE_COUNT 27
 
+typedef enum
+{
+    VLC_META_PRIORITY_BASIC,
+    VLC_META_PRIORITY_PLAYLIST,
+    VLC_META_PRIORITY_INBAND
+} vlc_meta_priority_t;
+
 #define ITEM_PREPARSED       1
 #define ITEM_ART_FETCHED     2
 #define ITEM_ART_NOTFOUND    4
