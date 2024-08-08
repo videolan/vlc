@@ -114,6 +114,26 @@ static NSArray<VLCMediaLibraryArtist *> *fetchArtistsForLibraryItem(library_arti
     return [mutableArray copy];
 }
 
+static NSArray<NSString *> *labelsForMediaLibraryItem(const int64_t libraryID) {
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return @[];
+    }
+
+    vlc_ml_label_list_t * const vlc_labels =
+        vlc_ml_list_media_labels(p_mediaLibrary, NULL, libraryID);
+    if (!vlc_labels) {
+        return @[];
+    }
+
+    NSMutableArray<NSString *> * const labels = NSMutableArray.array;
+    for (size_t i = 0; i < vlc_labels->i_nb_items; i++) {
+        vlc_ml_label_t * const label = &vlc_labels->p_items[i];
+        [labels addObject:toNSStr(label->psz_name)];
+    }
+    return labels.copy;
+}
+
 static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const genres)
 {
     const NSUInteger genreCount = genres.count;
