@@ -127,7 +127,7 @@ static void vlc_meta_InsertExtra( vlc_meta_t *m, const char *psz_name, const cha
     }
 }
 
-/* Free a dictionary key allocated by strdup() in vlc_meta_SetExtra() */
+/* Free a dictionary key allocated by strdup() in vlc_meta_SetExtraWithPriority() */
 static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
 {
     VLC_UNUSED( p_obj );
@@ -150,11 +150,12 @@ void vlc_meta_Delete( vlc_meta_t *m )
  * FIXME - Why don't we merge those two?
  */
 
-void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val )
+void vlc_meta_SetWithPriority( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val, vlc_meta_priority_t priority )
 {
     free( p_meta->meta[meta_type].value );
     assert( psz_val == NULL || IsUTF8( psz_val ) );
     p_meta->meta[meta_type].value = psz_val ? strdup( psz_val ) : NULL;
+    p_meta->meta[meta_type].priority = priority;
 }
 
 const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
@@ -162,7 +163,7 @@ const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
     return p_meta->meta[meta_type].value;
 }
 
-void vlc_meta_SetExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
+void vlc_meta_SetExtraWithPriority( vlc_meta_t *m, const char *psz_name, const char *psz_value, vlc_meta_priority_t priority )
 {
     assert( psz_name );
     struct vlc_meta_value *old_meta_value = vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
@@ -170,7 +171,7 @@ void vlc_meta_SetExtra( vlc_meta_t *m, const char *psz_name, const char *psz_val
         vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
                                             vlc_meta_FreeExtraKey, NULL );
     if ( psz_value )
-        vlc_meta_InsertExtra( m, psz_name, psz_value, VLC_META_PRIORITY_BASIC );
+        vlc_meta_InsertExtra( m, psz_name, psz_value, priority );
 }
 
 const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
