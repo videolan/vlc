@@ -570,10 +570,10 @@ nightly-macos-arm64:
         mkdir build && cd build
         EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --enable-extra-checks"
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --package-contribs"
+          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
         fi
         if [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
-          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --with-prebuilt-contribs"
+          EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS} --package-contribs"
         fi
         ../extras/package/apple/build.sh --sdk=$SDKNAME --arch=$HOST_ARCH $EXTRA_BUILD_FLAGS
 
