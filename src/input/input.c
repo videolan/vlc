@@ -3483,3 +3483,16 @@ bool input_CanPaceControl(input_thread_t *input)
     input_thread_private_t *priv = input_priv(input);
     return priv->master->b_can_pace_control;
 }
+
+void input_SetItemDuration(input_thread_t *input, vlc_tick_t duration)
+{
+    input_thread_private_t *priv = input_priv(input);
+    input_item_t *item = input_GetItem(input);
+
+    if( priv->i_stop == 0 ) /* consider `duration` as stop time, if stop-time not set */
+        duration -= priv->i_start;
+    else /* calculate duration based on start-time and stop-time */
+        duration = priv->i_stop - priv->i_start;
+
+    input_item_SetDuration(item, duration);
+}
