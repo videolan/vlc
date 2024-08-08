@@ -897,6 +897,11 @@ static void StartTitle( input_thread_t * p_input )
                 priv->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
+}
+
+static void SetStopStart( input_thread_t * p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
 
     /* Start/stop/run time */
     priv->i_start = llroundl(CLOCK_FREQ *
@@ -1343,6 +1348,7 @@ static int Init( input_thread_t * p_input )
     if( priv->type != INPUT_TYPE_PREPARSING )
     {
         StartTitle( p_input );
+        SetStopStart( p_input );
         SetSubtitlesOptions( p_input );
         LoadSlaves( p_input );
         InitPrograms( p_input );
