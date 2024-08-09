@@ -322,6 +322,10 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
     /* From the doc: "Call dispatch_sync after removeTimeObserver: to wait for
      * any in-flight blocks to finish executing." */
     dispatch_sync(_timeQueue, ^{});
+
+    /* Not in any doc:, stopRequestingMediaData() and flush() won't wait for
+     * any blocks to finish executing, so wait here. */
+     dispatch_sync(_dataQueue, ^{});
 }
 
 - (void)stop
