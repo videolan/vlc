@@ -236,8 +236,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    /* Don't check discontinuities if the origin has just been changed */
-    else if (cl->last.stream != VLC_TICK_INVALID && !cl->b_origin_changed)
+    else if (cl->last.stream != VLC_TICK_INVALID)
     {
         assert(cl->last.system != VLC_TICK_INVALID);
 
@@ -248,8 +247,9 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         vlc_tick_t diff = stream_diff - system_diff;
 
         /* A discontinuity happen if stream timings increase much more than
-         * system timings or if the stream is going backward. */
-        if (diff > CR_MAX_GAP || stream_diff < 0)
+         * system timings or if the stream is going backward.
+         * Don't compare system timings if the origin has just been changed */
+        if ((!cl->b_origin_changed && diff > CR_MAX_GAP) || stream_diff < 0)
         {
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
