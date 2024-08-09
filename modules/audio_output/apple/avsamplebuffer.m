@@ -298,6 +298,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     vlc_cond_signal(&_bufferWait);
     vlc_mutex_unlock(&_bufferLock);
+
+    if (_renderer.status == AVQueuedSampleBufferRenderingStatusFailed)
+    {
+        msg_Err(_aout, "AVQueuedSampleBufferRenderingStatusFailed, restarting");
+        aout_RestartRequest(_aout, false);
+    }
 }
 
 - (void)stopSyncRenderer
