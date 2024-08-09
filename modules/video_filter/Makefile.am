@@ -229,6 +229,15 @@ video_filter_LTLIBRARIES += libamf_vqenhancer_plugin.la
 endif
 endif
 
+if HAVE_AMF_FRC
+libamf_frc_plugin_la_SOURCES = video_filter/amf_frc.c \
+    hw/amf/amf_helper.c hw/amf/amf_helper.h
+if HAVE_WIN32
+libamf_frc_plugin_la_LIBADD = $(LIBCOM) libd3d11_common.la -ld3d11
+video_filter_LTLIBRARIES += libamf_frc_plugin.la
+endif
+endif
+
 # misc
 libblend_plugin_la_SOURCES = video_filter/blend.cpp
 video_filter_LTLIBRARIES += libblend_plugin.la
