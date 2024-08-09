@@ -239,10 +239,10 @@ static int CreateEntry( input_item_node_t *p_node, const struct entry_meta_s *me
         input_item_SetArtURL( p_input, meta->psz_album_art );
     if( meta->psz_language )
         input_item_SetLanguage( p_input, meta->psz_language );
-    if( meta->psz_tvgid )
-        input_item_AddInfo( p_input, "XMLTV", "tvg-id", "%s", meta->psz_tvgid );
     if( meta->psz_grouptitle )
         input_item_SetPublisher( p_input, meta->psz_grouptitle );
+    if( meta->psz_tvgid )
+        input_item_AddInfo( p_input, "XMLTV", "tvg-id", "%s", meta->psz_tvgid );
 
     input_item_node_AppendItem( p_node, p_input );
     input_item_Release( p_input );
