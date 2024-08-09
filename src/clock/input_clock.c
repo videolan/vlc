@@ -236,7 +236,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if (cl->last.stream != VLC_TICK_INVALID)
+    else if (!b_buffering && cl->last.stream != VLC_TICK_INVALID)
     {
         assert(cl->last.system != VLC_TICK_INVALID);
 
