@@ -100,15 +100,17 @@ void input_clock_Delete(input_clock_t *);
  * \param clock the input clock object to update with the new point
  * \param p_log the logger object to use
  * \param b_can_pace_control whether the input can control the speed of playback
- * \param b_buffering_allowed tells if we are allowed to bufferize more data in
-          advanced (if possible).
+ * \param b_buffering whether the input is buffering
+ * \param b_extra_buffering_allowed tells if we are allowed to bufferize more
+ *        data in advance (if possible).
  * \param i_clock the new clock reference value
  * \param i_system the timestmap at which the new reference has been reported
  *
  * \return clock update delay
  */
 vlc_tick_t input_clock_Update( input_clock_t *clock, vlc_object_t *p_log,
-                            bool b_can_pace_control, bool b_buffering_allowed,
+                            bool b_can_pace_control, bool b_buffering,
+                            bool b_extra_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );
 
 /**

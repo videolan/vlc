@@ -220,11 +220,14 @@ void input_clock_AttachListener(input_clock_t *cl,
  *  i_ck_system: date in system clock
  *****************************************************************************/
 vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
-                         bool b_can_pace_control, bool b_buffering_allowed,
+                         bool b_can_pace_control, bool b_buffering,
+                         bool b_extra_buffering_allowed,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
 {
     bool b_reset_reference = false;
     bool discontinuity = false;
+
+    b_can_pace_control |= b_buffering;
 
     assert( i_ck_stream != VLC_TICK_INVALID && i_ck_system != VLC_TICK_INVALID );
 
@@ -292,7 +295,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     {
         cl->i_buffering_duration = 0;
     }
-    else if( b_buffering_allowed )
+    else if( b_extra_buffering_allowed )
     {
         /* Try to bufferize more than necessary by reading
          * CR_BUFFERING_RATE/256 faster until we have CR_BUFFERING_TARGET.
@@ -303,7 +306,7 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         if( cl->i_buffering_duration > CR_BUFFERING_TARGET )
             cl->i_buffering_duration = CR_BUFFERING_TARGET;
     }
-    //fprintf( stderr, "input_clock_Update: %d :: %lld\n", b_buffering_allowed, cl->i_buffering_duration/1000 );
+    //fprintf( stderr, "input_clock_Update: %d :: %lld\n", b_extra_buffering_allowed, cl->i_buffering_duration/1000 );
 
     /* */
     cl->last = clock_point_Create( i_ck_system, i_ck_stream );
