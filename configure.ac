@@ -2261,6 +2261,16 @@ AS_IF([test "$enable_amf_enhancer" != "no"], [
 ])
 AM_CONDITIONAL([HAVE_AMF_ENHANCER], [test "${have_amf_enhancer}" != "no"])
 
+AC_ARG_ENABLE([amf-frc], AS_HELP_STRING([--disable-amf-frc],
+  [disable AMD FRC (default auto)]))
+have_amf_frc="no"
+AS_IF([test "$enable_amf_frc" != "no"], [
+  AC_CHECK_HEADERS([AMF/core/PropertyStorage.h AMF/components/FRC.h], [
+    have_amf_frc="yes"
+  ])
+])
+AM_CONDITIONAL([HAVE_AMF_FRC], [test "${have_amf_frc}" != "no"])
+
 dnl
 dnl special access module for Blackmagic SDI cards
 dnl
