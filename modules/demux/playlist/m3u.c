@@ -94,7 +94,7 @@ int Import_M3U( vlc_object_t *p_this )
       || (vlc_ascii_strcasecmp(type, "application/mpegurl") != 0
        && vlc_ascii_strcasecmp(type, "application/x-mpegurl") != 0
        && vlc_ascii_strcasecmp(type, "audio/mpegurl") != 0
-       && vlc_ascii_strcasecmp(type, "vnd.apple.mpegURL") != 0
+       && vlc_ascii_strcasecmp(type, "application/vnd.apple.mpegurl") != 0
        && vlc_ascii_strcasecmp(type, "audio/x-mpegurl") != 0))
      && !stream_HasExtension(p_stream, ".m3u8")
      && !stream_HasExtension(p_stream, ".m3u")
