@@ -119,6 +119,7 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleGenreUpdateEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleGroupUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handlePlaylistUpdateEvent:(const vlc_ml_event_t * const)p_event;
 
 @end
@@ -183,9 +184,14 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleGenreDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_GROUP_ADDED:
+            [libraryModel resetCachedListOfGroups];
+            break;
         case VLC_ML_EVENT_GROUP_UPDATED:
+            [libraryModel handleGroupUpdateEvent:p_event];
+            break;
         case VLC_ML_EVENT_GROUP_DELETED:
             [libraryModel resetCachedListOfGroups]; // TODO: Handle each event granularly
+            break;
         case VLC_ML_EVENT_PLAYLIST_ADDED:
             [libraryModel resetCachedListOfPlaylists];
             break;
@@ -1162,6 +1168,40 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                          usingSetter:@selector(setCachedGenres:)
                           usingQueue:_genreCacheModificationQueue
                 withNotificationName:VLCLibraryModelGenreDeleted];
+}
+
+- (void)handleGroupUpdateEvent:(const vlc_ml_event_t *const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+    VLCMediaLibraryGroup * const group = [VLCMediaLibraryGroup groupWithID:itemId];
+    if (group == nil) {
+        NSLog(@"Could not find a library group with this ID. Can't handle update.");
+        return;
+    }
+
+    dispatch_async(_groupCacheModificationQueue, ^{
+        const NSUInteger groupIdx = 
+            [self.cachedListOfGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                                    const NSUInteger idx,
+                                                                    BOOL * const stop) {
+            NSAssert(group != nil, @"Cache list should not contain nil groups");
+            return group.libraryID == itemId;
+        }];
+
+        if (groupIdx == NSNotFound) {
+            NSLog(@"Could not handle deletion of group with id %lld in model", itemId);
+            return;
+        }
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
+            [mutableGroups replaceObjectAtIndex:groupIdx withObject:group];
+            self.cachedListOfGroups = mutableGroups.copy;
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated object:group];
+        });
+    });
 }
 
 - (void)handlePlaylistUpdateEvent:(const vlc_ml_event_t * const)p_event
