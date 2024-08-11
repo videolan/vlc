@@ -233,8 +233,6 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 
 @interface VLCMediaLibraryGroup : VLCAbstractMediaLibraryItem
 
-- (instancetype)initWithGroup:(struct vlc_ml_group_t *)p_group;
-
 @property (readonly) NSString *name;
 @property (readonly) NSUInteger numberOfTotalItems;
 @property (readonly) NSUInteger numberOfVideoItems;
@@ -249,6 +247,9 @@ typedef NS_ENUM(NSUInteger, VLCMediaLibraryParentGroupType) {
 @property (readonly) NSInteger duration; // milliseconds
 @property (readonly) NSDate *creationDate;
 @property (readonly) NSDate *lastModificationDate;
+
++ (nullable instancetype)groupWithID:(int64_t)libraryID;
+- (instancetype)initWithGroup:(struct vlc_ml_group_t *)p_group;
 
 @end
 

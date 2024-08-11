@@ -779,6 +779,16 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
 @synthesize primaryActionableDetailLibraryItem = _primaryActionableDetailLibraryItem;
 @synthesize secondaryActionableDetailLibraryItem = _secondaryActionableDetailLibraryItem;
 
++ (nullable instancetype)groupWithID:(int64_t)libraryID
+{
+    vlc_medialibrary_t * const p_mediaLibrary = getMediaLibrary();
+    if (!p_mediaLibrary) {
+        return nil;
+    }
+    vlc_ml_group_t * const p_group = vlc_ml_get_group(p_mediaLibrary, libraryID);
+    return p_group ? [[VLCMediaLibraryGroup alloc] initWithGroup:p_group] : nil;
+}
+
 - (instancetype)initWithGroup:(struct vlc_ml_group_t *)p_group
 {
     NSParameterAssert(p_group != NULL);
