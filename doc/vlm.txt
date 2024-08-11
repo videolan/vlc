@@ -34,7 +34,7 @@ III - Command line syntax:
 Note: an element is a media or a schedule.
  1) Command lines:
     help
-        Displays an exhaustive commmand lines list.
+        Displays an exhaustive command lines list.
 
     new (name) broadcast|schedule [properties]
         Creates a new element. You must specify if a broadcast media, or
@@ -66,7 +66,7 @@ Note: an element is a media or a schedule.
         See Commands section for more information.
     save (config_file)
         Saves all media and schedule configurations in the (config_file)
-        configuration file. the "save" command overwrites the file if it
+        configuration file. The "save" command overwrites the file if it
         already exists. States (playing, paused, stop) are not saved.
         See Configuration File section for more information.
     load (config_file)
@@ -75,7 +75,7 @@ Note: an element is a media or a schedule.
 
  2) Properties:
  Note: except the "append" property, all property can be followed by
- another one, recursively.For example:
+ another one, recursively. For example:
  "setup pouet input file://arf.avi output udp:127.0.0.1 enabled loop"
  is a valid command line.
     Media Properties Syntax:
