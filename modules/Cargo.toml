@@ -3,6 +3,7 @@ resolver = "2"
 members = []
 
 [workspace.dependencies]
+vlcrs-core = { path = "../src/rust/vlcrs-core" }
 vlcrs-macros = { path = "../src/rust/vlcrs-macros" }
 vlcrs-messages = { path = "../src/rust/vlcrs-messages" }
 vlcrs-plugin = { path = "../src/rust/vlcrs-plugin" }
