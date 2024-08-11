@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This document presents the new clock archictecture for **VLC**, starting from
+This document presents the new clock architecture for **VLC**, starting from
 VLC 4.0.
 
 The clock is the element that manages the synchronisation of all [ES][ES],
