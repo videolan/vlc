@@ -43,6 +43,10 @@
 #define D3D_DecoderSurface  IDirect3DSurface9
 #include "directx_va.h"
 
+#ifndef FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO
+# define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO 2 // moved to libavcodec/dxva2_internal.h :/
+#endif
+
 static int Open(vlc_va_t *, AVCodecContext *, const AVPixFmtDescriptor *, enum PixelFormat,
                 const es_format_t *, picture_sys_t *p_sys);
 static void Close(vlc_va_t *, void **);
