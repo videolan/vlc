@@ -42,7 +42,15 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     QHash<int, QByteArray> roleNames() const override;
-    enum {DEFAULT_STYLE, MINIMALIST_STYLE, ONE_LINER_STYLE, SIMPLEST_STYLE, CLASSIC_STYLE};
+
+    enum class Style
+    {
+        DEFAULT_STYLE,
+        MINIMALIST_STYLE,
+        ONE_LINER_STYLE,
+        SIMPLEST_STYLE,
+        CLASSIC_STYLE
+    };
 
     // Editable:
     Q_INVOKABLE bool setData(const QModelIndex &index, const QVariant &value,
@@ -63,23 +71,31 @@ public:
 
     int selectedProfile() const;
     ControlbarProfile* currentModel() const;
-    bool setSelectedProfileFromId(int id);
 
     ControlbarProfile* cloneProfile(const ControlbarProfile* profile);
     Q_INVOKABLE void cloneSelectedProfile(const QString& newProfileName);
 
     Q_INVOKABLE ControlbarProfile* getProfile(int index) const;
 
-    Q_INVOKABLE ControlbarProfile* newProfile(const QString& name, const int id);
+    Q_INVOKABLE ControlbarProfile* newProfile(const QString& name);
     ControlbarProfile* newProfile();
 
     Q_INVOKABLE void deleteSelectedProfile();
+
+    // This is a static method, caller takes the ownership
+    // of the profile:
+    static ControlbarProfile* generateProfileFromStyle(const Style style);
+
+    // ControlbarProfileModel takes the ownership:
+    void insertProfile(std::unique_ptr<ControlbarProfile> profile, bool select);
 
 public slots:
     void save(bool clearDirty = true) const;
     bool reload();
 
     bool setSelectedProfile(int selectedProfile);
+
+    std::optional<int> findModel(const ControlbarProfile* profile) const;
 
 signals:
     void countChanged();
@@ -91,10 +107,9 @@ private:
     QVector<ControlbarProfile *> m_profiles;
 
     int m_selectedProfile = -1;
-    int m_maxId = 0;
 
     struct Profile {
-        const int id;
+        const Style id;
         const char* name;
         QVector<ControlbarProfile::Configuration> modelData;
     };

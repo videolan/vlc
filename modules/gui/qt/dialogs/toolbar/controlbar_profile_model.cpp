@@ -29,7 +29,6 @@
 #define SETTINGS_ARRAYNAME_PROFILES "Profiles"
 #define SETTINGS_KEY_NAME "Name"
 #define SETTINGS_KEY_MODEL "Model"
-#define SETTINGS_KEY_ID "Id"
 
 #define SETTINGS_CONTROL_SEPARATOR QChar(',')
 #define SETTINGS_CONFIGURATION_SEPARATOR QChar('|')
@@ -39,7 +38,83 @@ decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
         {
             {
-                MINIMALIST_STYLE,
+                Style::DEFAULT_STYLE,
+                N_("Default Style"),
+                {
+                    {
+                        PlayerControlbarModel::Videoplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::LANG_BUTTON,
+                                    ControlListModel::BOOKMARK_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON,
+                                    ControlListModel::NAVIGATION_BUTTONS
+                                },
+                                {
+                                    ControlListModel::SKIP_BACK_BUTTON,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::SKIP_FW_BUTTON
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::RENDERER_BUTTON,
+                                    ControlListModel::FULLSCREEN_BUTTON
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::LANG_BUTTON,
+                                    ControlListModel::BOOKMARK_BUTTON,
+                                    ControlListModel::EXTENDED_BUTTON
+                                },
+                                {
+                                    ControlListModel::RANDOM_BUTTON,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::LOOP_BUTTON
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::RENDERER_BUTTON,
+                                    ControlListModel::FULLSCREEN_BUTTON
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Miniplayer,
+                        {
+                            {
+                                {
+                                    ControlListModel::ARTWORK_INFO
+                                },
+                                {
+                                    ControlListModel::RANDOM_BUTTON,
+                                    ControlListModel::PREVIOUS_BUTTON,
+                                    ControlListModel::PLAY_BUTTON,
+                                    ControlListModel::NEXT_BUTTON,
+                                    ControlListModel::LOOP_BUTTON
+                                },
+                                {
+                                    ControlListModel::VOLUME,
+                                    ControlListModel::PLAYER_SWITCH_BUTTON
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                Style::MINIMALIST_STYLE,
                 N_("Minimalist Style"),
                 {
                     {
@@ -107,7 +182,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
-                ONE_LINER_STYLE,
+                Style::ONE_LINER_STYLE,
                 N_("One-liner Style"),
                 {
                     {
@@ -185,7 +260,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
-                SIMPLEST_STYLE,
+                Style::SIMPLEST_STYLE,
                 N_("Simplest Style"),
                 {
                     {
@@ -242,7 +317,7 @@ decltype (ControlbarProfileModel::m_defaults)
                 }
             },
             {
-                CLASSIC_STYLE,
+                Style::CLASSIC_STYLE,
                 N_("Classic Style"),
                 {
                     {
@@ -359,15 +434,10 @@ ControlbarProfileModel::ControlbarProfileModel(qt_intf_t *p_intf, QObject *paren
 
 void ControlbarProfileModel::insertDefaults()
 {
-    // First, add a blank new profile:
-    // ControlbarProfile will inject the default configurations during its construction.
-    m_maxId = 0;
-    newProfile(tr("Default Profile"), DEFAULT_STYLE);
-
     // Add default profiles:
     for (const auto& i : m_defaults)
     {
-        const auto ptrNewProfile = newProfile(qfut(i.name), i.id);
+        const auto ptrNewProfile = newProfile(qfut(i.name));
         if (!ptrNewProfile)
             continue;
 
@@ -562,18 +632,6 @@ ControlbarProfile* ControlbarProfileModel::currentModel() const
     return getProfile(selectedProfile());
 }
 
-/* Set the selected profile to the profile with the matching id */
-bool ControlbarProfileModel::setSelectedProfileFromId(int id)
-{
-    for(int i = 0; i < rowCount(); i++)
-    {
-        if(id == m_profiles.at(i)->id())
-            return setSelectedProfile(i);
-    }
-
-    return false;
-}
-
 void ControlbarProfileModel::save(bool clearDirty) const
 {
     assert(m_intf);
@@ -633,7 +691,6 @@ void ControlbarProfileModel::save(bool clearDirty) const
 
         settings->setValue(SETTINGS_KEY_NAME, m_profiles.at(i)->name());
         settings->setValue(SETTINGS_KEY_MODEL, val);
-        settings->setValue(SETTINGS_KEY_ID, m_profiles.at(i)->id());
     }
 
     settings->endArray();
@@ -681,7 +738,6 @@ bool ControlbarProfileModel::reload()
 
         const auto ptrNewProfile = new ControlbarProfile(this);
         ptrNewProfile->setName(settings->value(SETTINGS_KEY_NAME).toString());
-        ptrNewProfile->setId(settings->value(SETTINGS_KEY_ID).toInt());
 
         for (auto j : val)
         {
@@ -737,7 +793,6 @@ bool ControlbarProfileModel::reload()
 
     bool ok = false;
     int index = settings->value(SETTINGS_KEY_SELECTEDPROFILE).toInt(&ok);
-    m_maxId = m_profiles.isEmpty() ? 0 : m_profiles.back()->id() + 1;
 
     if (ok)
         setSelectedProfile(index);
@@ -780,6 +835,38 @@ bool ControlbarProfileModel::setSelectedProfile(int selectedProfile)
     return true;
 }
 
+std::optional<int> ControlbarProfileModel::findModel(const ControlbarProfile *profile) const
+{
+    assert(profile);
+    for (int i = 0; i < m_profiles.count(); ++i)
+    {
+        if (m_profiles[i] == profile)
+            return i;
+        else
+        {
+            assert(m_profiles[i]);
+            if (*m_profiles[i] == *profile)
+                return i;
+        }
+    }
+    return std::nullopt;
+}
+
+void ControlbarProfileModel::insertProfile(std::unique_ptr<ControlbarProfile> profile, bool select)
+{
+    assert(profile);
+    const auto ptrProfile = profile.release();
+
+    ptrProfile->setParent(this);
+
+    beginInsertRows(QModelIndex(), m_profiles.size(), m_profiles.size());
+    m_profiles.append(ptrProfile);
+    endInsertRows();
+
+    if (select)
+        setSelectedProfile(m_profiles.count() - 1);
+}
+
 ControlbarProfile *ControlbarProfileModel::getProfile(int index) const
 {
     if (index < 0 || index >= m_profiles.size())
@@ -788,7 +875,7 @@ ControlbarProfile *ControlbarProfileModel::getProfile(int index) const
     return m_profiles.at(index);
 }
 
-ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name, const int id)
+ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name)
 {
     if (name.isEmpty())
         return nullptr;
@@ -796,8 +883,6 @@ ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name, const
     const auto ptrProfile = newProfile();
 
     ptrProfile->setName(generateUniqueName(name));
-    ptrProfile->setId(id);
-    m_maxId++;
 
     return ptrProfile;
 }
@@ -817,8 +902,7 @@ ControlbarProfile *ControlbarProfileModel::newProfile()
 
 ControlbarProfile *ControlbarProfileModel::cloneProfile(const ControlbarProfile *profile)
 {
-    // Any new profiles will just have the next incremental id
-    const auto ptrNewProfile = newProfile(profile->name(), m_maxId);
+    const auto ptrNewProfile = newProfile(profile->name());
 
     if (!ptrNewProfile)
         return nullptr;
@@ -875,4 +959,22 @@ void ControlbarProfileModel::deleteSelectedProfile()
         setSelectedProfile(_selectedProfile - 1);
     else
         setSelectedProfile(_selectedProfile);
+}
+
+ControlbarProfile *ControlbarProfileModel::generateProfileFromStyle(const Style style)
+{
+    for (const auto& i : m_defaults)
+    {
+        if (i.id == style)
+        {
+            const auto ptrNewProfile = new ControlbarProfile();
+            ptrNewProfile->injectModel(i.modelData);
+            ptrNewProfile->setName(i.name);
+            ptrNewProfile->resetDirty(); // default profiles should not be dirty initially
+            return ptrNewProfile;
+        }
+    }
+
+    // Style does not exist
+    return nullptr;
 }

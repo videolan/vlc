@@ -141,12 +141,24 @@ void FirstRunWizard::finish()
 
     config_PutInt( "qt-pin-controls", ui.layoutGroup->checkedId() );
 
-    ControlbarProfileModel* controlbarModel = p_intf->p_mi->controlbarProfileModel();
-    assert(controlbarModel);
-    if( ui.layoutGroup->checkedId() )
-        controlbarModel->setSelectedProfileFromId(ControlbarProfileModel::CLASSIC_STYLE);
-    else
-        controlbarModel->setSelectedProfileFromId(ControlbarProfileModel::DEFAULT_STYLE);
+    {
+        ControlbarProfileModel* controlbarModel = p_intf->p_mi->controlbarProfileModel();
+        assert(controlbarModel);
+
+        ControlbarProfileModel::Style style;
+        if( ui.layoutGroup->checkedId() )
+            style = ControlbarProfileModel::Style::CLASSIC_STYLE;
+        else
+            style = ControlbarProfileModel::Style::DEFAULT_STYLE;
+
+        std::unique_ptr<ControlbarProfile> profile( controlbarModel->generateProfileFromStyle( style ) );
+        assert( profile );
+        const std::optional<int> index = controlbarModel->findModel( profile.get() );
+        if( index )
+            controlbarModel->setSelectedProfile( *index );
+        else
+            controlbarModel->insertProfile( std::move( profile ), true );
+    }
 
     /* Commit changes to the scanned folders for the Media Library */
     if( vlc_ml_instance_get( p_intf ) && mlFoldersEditor )
@@ -311,7 +323,6 @@ void FirstRunWizard::reject()
     config_PutInt( "qt-menubar", 0 );
     config_PutInt( "qt-titlebar", 0 );
     p_intf->p_mi->setPinVideoControls( 0 );
-    p_intf->p_mi->controlbarProfileModel()->setSelectedProfileFromId(ControlbarProfileModel::DEFAULT_STYLE);
 
     /* Folders Page settings */
     if ( mlFoldersEditor )

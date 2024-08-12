@@ -158,17 +158,6 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    id: useDefaultButton
-
-                    description: qsTr("Use Default")
-                    text: VLCIcons.history
-
-                    onClicked: {
-                        MainCtx.controlbarProfileModel.currentModel.injectDefaults(false)
-                    }
-                }
-
-                Widgets.IconToolButton {
                     description: qsTr("Delete the current profile")
                     text: VLCIcons.del
 

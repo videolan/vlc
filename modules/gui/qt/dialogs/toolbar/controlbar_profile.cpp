@@ -23,85 +23,9 @@
 #include "player/player_controlbar_model.hpp"
 
 
-decltype(ControlbarProfile::m_defaults)
-    ControlbarProfile::m_defaults =
-        {
-            {
-                PlayerControlbarModel::Videoplayer,
-                {
-                    {
-                        {
-                            ControlListModel::LANG_BUTTON,
-                            ControlListModel::BOOKMARK_BUTTON,
-                            ControlListModel::EXTENDED_BUTTON,
-                            ControlListModel::NAVIGATION_BUTTONS
-                        },
-                        {
-                            ControlListModel::SKIP_BACK_BUTTON,
-                            ControlListModel::PREVIOUS_BUTTON,
-                            ControlListModel::PLAY_BUTTON,
-                            ControlListModel::NEXT_BUTTON,
-                            ControlListModel::SKIP_FW_BUTTON
-                        },
-                        {
-                            ControlListModel::VOLUME,
-                            ControlListModel::RENDERER_BUTTON,
-                            ControlListModel::FULLSCREEN_BUTTON
-                        }
-                    }
-                }
-            },
-            {
-                PlayerControlbarModel::Audioplayer,
-                {
-                    {
-                        {
-                            ControlListModel::LANG_BUTTON,
-                            ControlListModel::BOOKMARK_BUTTON,
-                            ControlListModel::EXTENDED_BUTTON
-                        },
-                        {
-                            ControlListModel::RANDOM_BUTTON,
-                            ControlListModel::PREVIOUS_BUTTON,
-                            ControlListModel::PLAY_BUTTON,
-                            ControlListModel::NEXT_BUTTON,
-                            ControlListModel::LOOP_BUTTON
-                        },
-                        {
-                            ControlListModel::VOLUME,
-                            ControlListModel::RENDERER_BUTTON,
-                            ControlListModel::FULLSCREEN_BUTTON
-                        }
-                    }
-                }
-            },
-            {
-                PlayerControlbarModel::Miniplayer,
-                {
-                    {
-                        {
-                            ControlListModel::ARTWORK_INFO
-                        },
-                        {
-                            ControlListModel::RANDOM_BUTTON,
-                            ControlListModel::PREVIOUS_BUTTON,
-                            ControlListModel::PLAY_BUTTON,
-                            ControlListModel::NEXT_BUTTON,
-                            ControlListModel::LOOP_BUTTON
-                        },
-                        {
-                            ControlListModel::VOLUME,
-                            ControlListModel::PLAYER_SWITCH_BUTTON
-                        }
-                    }
-                }
-            }
-        };
-
-
 ControlbarProfile::ControlbarProfile(QObject *parent) : QObject(parent)
 {
-    injectDefaults();
+
 }
 
 PlayerControlbarModel *ControlbarProfile::newModel(int identifier)
@@ -189,16 +113,6 @@ void ControlbarProfile::setName(const QString &name)
     emit nameChanged(m_name);
 }
 
-void ControlbarProfile::setId( const int id )
-{
-    if(id == m_id)
-        return;
-
-    m_id = id;
-
-    emit idChanged(m_id);
-}
-
 bool ControlbarProfile::dirty() const
 {
     return (m_dirty > 0);
@@ -234,19 +148,6 @@ bool ControlbarProfile::operator==(const ControlbarProfile &model) const
     }
 
     return true;
-}
-
-int ControlbarProfile::id() const
-{
-    return m_id;
-}
-
-void ControlbarProfile::injectDefaults(bool resetDirty)
-{
-    injectModel(m_defaults);
-
-    if (resetDirty)
-        this->resetDirty(); // defaults normally should not make the profile dirty
 }
 
 void ControlbarProfile::injectModel(const QVector<ControlbarProfile::Configuration> &modelData)
