@@ -444,8 +444,10 @@ T.ToolBar {
                                     }
 
                                     onDropped: (drop) => {
-                                        if (plListView)
-                                            plListView.acceptDrop(plListView.model.count, drop)
+                                        if (plListView) {
+                                            console.assert(plListView.acceptDropFunc)
+                                            plListView.acceptDropFunc(plListView.model.count, drop)
+                                        }
                                     }
 
                                     Timer {

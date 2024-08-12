@@ -49,6 +49,8 @@ T.Pane {
 
     property alias dragItem: dragItem
 
+    property alias acceptDropFunc: listView.acceptDropFunc
+
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             contentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
