@@ -212,11 +212,16 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
 
 void CompositorVideo::windowDestroy()
 {
+    // Current thread may not be the thread where
+    // m_videoSurfaceProvider belongs to, so do not delete
+    // it here:
+    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
+               this, &CompositorVideo::onSurfacePositionChanged);
+    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
+               this, &CompositorVideo::onSurfaceSizeChanged);
+
     if (m_destroyCb)
         m_destroyCb(m_wnd);
-
-    m_videoSurfaceProvider.reset();
-    m_videoWindowHandler.reset();
 }
 
 void CompositorVideo::windowResize(unsigned width, unsigned height)
@@ -323,6 +328,8 @@ void CompositorVideo::commonGUIDestroy()
 
 void CompositorVideo::commonIntfDestroy()
 {
+    m_videoWindowHandler.reset();
+    m_videoSurfaceProvider.reset();
     unloadGUI();
 }
 
