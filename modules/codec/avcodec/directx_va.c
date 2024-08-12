@@ -43,6 +43,10 @@
 # error bogus libavcodec DXVA support
 #endif
 
+#ifndef FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO
+# define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO 2 // moved to libavcodec/dxva2_internal.h :/
+#endif
+
 #include "directx_va.h"
 #include <vlc_codecs.h> // GUID_FMT/GUID_PRINT
 
