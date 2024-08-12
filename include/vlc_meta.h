@@ -124,6 +124,7 @@ typedef struct meta_export_t
 VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 
 #define vlc_meta_Set( meta, meta_type, b )             vlc_meta_SetWithPriority( meta, meta_type, b, VLC_META_PRIORITY_BASIC )
+#define vlc_meta_SetWithPlaylistPriority( meta, meta_type, b ) vlc_meta_SetWithPriority( meta, meta_type, b, VLC_META_PRIORITY_PLAYLIST )
 #define vlc_meta_SetExtra( meta, psz_name, psz_value ) vlc_meta_SetExtraWithPriority( meta, psz_name, psz_value, VLC_META_PRIORITY_BASIC )
 
 /* Setters for meta.
