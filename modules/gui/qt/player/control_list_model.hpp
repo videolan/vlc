@@ -102,6 +102,16 @@ public:
     QVector<int> getControls() const;
     void setControls(const QVector<int>& list);
 
+    bool operator==(const ControlListModel& model) const
+    {
+        return m_controls == model.m_controls;
+    }
+
+    bool operator!=(const ControlListModel& model) const
+    {
+        return !(operator==(model));
+    }
+
 signals:
     void countChanged();
 
