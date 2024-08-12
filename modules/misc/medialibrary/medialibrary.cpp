@@ -767,6 +767,61 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }
+        case VLC_ML_FOLDER_SET_FAVORITE:
+        {
+            const char* mrl = va_arg( args, const char* );
+            bool favorite = va_arg( args, int );
+            auto folder = m_ml->folder( mrl );
+            if ( folder == nullptr )
+                return VLC_EGENERIC;
+            if ( folder->setFavorite( favorite ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_ARTIST_SET_FAVORITE:
+        {
+            int64_t artistId = va_arg( args, int64_t );
+            bool favorite = va_arg( args, int );
+            auto artist = m_ml->artist( artistId );
+            if ( artist == nullptr )
+                return VLC_EGENERIC;
+            if ( artist->setFavorite( favorite ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_ALBUM_SET_FAVORITE:
+        {
+            int64_t albumId = va_arg( args, int64_t );
+            bool favorite = va_arg( args, int );
+            auto album = m_ml->album( albumId );
+            if ( album == nullptr )
+                return VLC_EGENERIC;
+            if ( album->setFavorite( favorite ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_GENRE_SET_FAVORITE:
+        {
+            int64_t genreId = va_arg( args, int64_t );
+            bool favorite = va_arg( args, int );
+            auto genre = m_ml->genre( genreId );
+            if ( genre == nullptr )
+                return VLC_EGENERIC;
+            if ( genre->setFavorite( favorite ) == false)
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
+        case VLC_ML_PLAYLIST_SET_FAVORITE:
+        {
+            int64_t playlistId = va_arg( args, int64_t );
+            bool favorite = va_arg( args, int );
+            auto playlist = m_ml->playlist( playlistId );
+            if ( playlist == nullptr )
+                return VLC_EGENERIC;
+            if ( playlist->setFavorite( favorite ) == false )
+                return VLC_EGENERIC;
+            return VLC_SUCCESS;
+        }
         default:
             return VLC_EGENERIC;
     }

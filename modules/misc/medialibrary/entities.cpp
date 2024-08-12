@@ -328,6 +328,7 @@ bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output )
     output.i_nb_discs = input->nbDiscs();
     output.i_duration = input->duration();
     output.i_year = input->releaseYear();
+    output.b_is_favorite = input->isFavorite();
 
     if( !strdup_helper( input->title(), output.psz_title ) ||
         !strdup_helper( input->shortSummary(), output.psz_summary ) )
@@ -378,6 +379,7 @@ bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output )
     output.i_nb_tracks = input->nbTracks();
     output.i_nb_present_tracks = input->nbPresentTracks();
     output.psz_name = strdup( artistName( input ) );
+    output.b_is_favorite = input->isFavorite();
     if ( unlikely( output.psz_name == nullptr ) )
         return false;
 
@@ -392,6 +394,7 @@ bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output )
 {
     output.i_id = input->id();
     output.i_nb_tracks = input->nbTracks();
+    output.b_is_favorite = input->isFavorite();
     assert( input->name().empty() == false );
 
     if  ( !strdup_helper( input->name(), output.psz_name ) )
@@ -480,6 +483,7 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
     output.i_nb_duration_unknown = input->nbDurationUnknown();
 
     output.b_is_read_only = input->isReadOnly();
+    output.b_is_favorite = input->isFavorite();
 
     if( !strdup_helper( input->name(), output.psz_name ) ||
         !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) )
@@ -506,6 +510,7 @@ bool Convert( const medialibrary::IFolder* input, vlc_ml_folder_t& output )
     output.i_duration = input->duration();
 
     output.b_banned = input->isBanned();
+    output.b_is_favorite = input->isFavorite();
 
     if ( strdup_helper( input->name(), output.psz_name ) == false )
         return false;

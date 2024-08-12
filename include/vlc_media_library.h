@@ -296,6 +296,7 @@ typedef struct vlc_ml_playlist_t
     uint32_t i_nb_duration_unknown;
 
     bool b_is_read_only;
+    bool b_is_favorite;
 } vlc_ml_playlist_t;
 
 typedef struct vlc_ml_artist_t
@@ -309,6 +310,7 @@ typedef struct vlc_ml_artist_t
     unsigned int i_nb_album;
     unsigned int i_nb_tracks;
     uint32_t i_nb_present_tracks;
+    bool b_is_favorite;
 } vlc_ml_artist_t;
 
 typedef struct vlc_ml_artist_list_t
@@ -330,6 +332,7 @@ typedef struct vlc_ml_album_t {
     uint32_t i_nb_discs;
     int64_t i_duration; /* in ms */
     unsigned int i_year;
+    bool b_is_favorite;
 } vlc_ml_album_t;
 
 typedef struct vlc_ml_genre_t
@@ -338,6 +341,7 @@ typedef struct vlc_ml_genre_t
     char* psz_name;
     size_t i_nb_tracks;
     vlc_ml_thumbnail_t thumbnails[VLC_ML_THUMBNAIL_SIZE_COUNT];
+    bool b_is_favorite;
 } vlc_ml_genre_t;
 
 typedef struct vlc_ml_media_list_t
@@ -385,6 +389,7 @@ typedef struct vlc_ml_folder_t
     unsigned int i_nb_video; /**< The number of video for this folder */
     unsigned int i_nb_audio; /**< The number of audio for this volder */
     int64_t i_duration; /**< The sum of all the member durations of the folder in ms. */
+    bool b_is_favorite; /**< The folder's favorite state */
     bool b_present; /**< The folder's presence state */
     bool b_banned; /**< Will be true if the user required this folder to be excluded */
 } vlc_ml_folder_t;
@@ -625,7 +630,14 @@ enum vlc_ml_control
     VLC_ML_PLAYLIST_INSERT, /**< arg1: playlist id; arg2: media id; arg3: position; can fail */
     VLC_ML_PLAYLIST_MOVE,   /**< arg1: playlist id; arg2: from; arg3: to; can fail */
     VLC_ML_PLAYLIST_REMOVE, /**< arg1: playlist id; arg2: position; can fail */
-    VLC_ML_PLAYLIST_RENAME  /**< arg1: playlist id; arg2: const char*; can fail */
+    VLC_ML_PLAYLIST_RENAME,  /**< arg1: playlist id; arg2: const char*; can fail */
+
+    /* Set Favorites  */
+    VLC_ML_FOLDER_SET_FAVORITE, /**< arg1: mrl (const char*); arg2: bool; res: can fail */
+    VLC_ML_ARTIST_SET_FAVORITE, /**< arg1: artist id; arg2: bool; can fail */
+    VLC_ML_ALBUM_SET_FAVORITE, /**< arg1: album id; arg2: bool; can fail */
+    VLC_ML_GENRE_SET_FAVORITE, /**< arg1: genre id; arg2: bool; can fail */
+    VLC_ML_PLAYLIST_SET_FAVORITE, /**< arg1: playlist id; arg2: bool; can fail */
 };
 
 /**
@@ -1952,6 +1964,31 @@ static inline size_t vlc_ml_count_folder_media(vlc_medialibrary_t * p_ml,
         return 0;
 
     return count;
+}
+
+static inline int vlc_ml_folder_set_favorite( vlc_medialibrary_t* p_ml, const char* psz_mrl, bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_FOLDER_SET_FAVORITE, psz_mrl, (int)b_favorite );
+}
+
+static inline int vlc_ml_artist_set_favorite( vlc_medialibrary_t* p_ml, int64_t i_artist_id, bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_ARTIST_SET_FAVORITE, i_artist_id, (int)b_favorite );
+}
+
+static inline int vlc_ml_album_set_favorite( vlc_medialibrary_t* p_ml, int64_t i_album_id, bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_ALBUM_SET_FAVORITE, i_album_id, (int)b_favorite );
+}
+
+static inline int vlc_ml_genre_set_favorite( vlc_medialibrary_t* p_ml, int64_t i_genre_id, bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_GENRE_SET_FAVORITE, i_genre_id, (int)b_favorite );
+}
+
+static inline int vlc_ml_playlist_set_favorite( vlc_medialibrary_t *p_ml, int64_t i_playlist_id, bool b_favorite )
+{
+    return vlc_ml_control( p_ml, VLC_ML_PLAYLIST_SET_FAVORITE, i_playlist_id, (int)b_favorite );
 }
 
 #ifdef __cplusplus
