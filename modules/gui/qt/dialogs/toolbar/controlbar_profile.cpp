@@ -209,6 +209,33 @@ QString ControlbarProfile::name() const
     return m_name;
 }
 
+bool ControlbarProfile::operator==(const ControlbarProfile &model) const
+{
+    if (m_models.count() != model.m_models.count())
+        return false;
+
+    if (m_models != model.m_models)
+    {
+        // Deep comparison
+        QMapIterator<int, PlayerControlbarModel *> i(m_models);
+        while (i.hasNext())
+        {
+            i.next();
+
+            if (!model.m_models.contains(i.key()))
+                return false;
+
+            assert(model.m_models[i.key()]);
+            assert(i.value());
+
+            if (*model.m_models[i.key()] != *i.value())
+                return false;
+        }
+    }
+
+    return true;
+}
+
 int ControlbarProfile::id() const
 {
     return m_id;

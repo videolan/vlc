@@ -53,6 +53,11 @@ public:
     bool dirty() const;
     QString name() const;
 
+    bool operator==(const ControlbarProfile& model) const;
+    bool operator!=(const ControlbarProfile& model) const {
+        return !(operator==(model));
+    }
+
     // The id is a unique number supplied to each profile
     // which differentiates it independently from its index
     // in the profiles array. Provides a more stable way to
