@@ -126,6 +126,26 @@ ControlListModel *PlayerControlbarModel::right() const
     return m_right;
 }
 
+bool PlayerControlbarModel::operator==(const PlayerControlbarModel &model) const
+{
+    assert(m_left && model.m_left);
+    assert(m_center && model.m_center);
+    assert(m_right && model.m_right);
+
+    // Deep comparison
+
+    if (*m_left != *model.m_left)
+        return false;
+
+    if (*m_center != *model.m_center)
+        return false;
+
+    if (*m_right != *model.m_right)
+        return false;
+
+    return true;
+}
+
 void PlayerControlbarModel::setDirty(bool dirty)
 {
     if (m_dirty == dirty)

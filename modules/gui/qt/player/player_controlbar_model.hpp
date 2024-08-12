@@ -80,6 +80,11 @@ public:
     ControlListModel* center() const;
     ControlListModel* right() const;
 
+    bool operator==(const PlayerControlbarModel& model) const;
+    bool operator!=(const PlayerControlbarModel& model) const {
+        return !(operator==(model));
+    }
+
 public slots:
     void setDirty(bool dirty);
 
