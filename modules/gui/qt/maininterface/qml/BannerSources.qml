@@ -436,8 +436,14 @@ T.ToolBar {
                                     }
 
                                     onEntered: (drag) => {
-                                        if (drag.hasUrls || Helpers.isValidInstanceOf(drag.source, Widgets.DragItem)) {
-                                            drag.accept() // Not actually necessary, as it is accepted by default
+                                        if (plListView) {
+                                            console.assert(plListView.isDropAcceptableFunc)
+                                            console.assert(plListView.model)
+                                            if (plListView.isDropAcceptableFunc(drag, plListView.model.count)) {
+                                                drag.accept()
+                                            } else {
+                                                drag.accepted = false
+                                            }
                                         } else {
                                             drag.accepted = false
                                         }
