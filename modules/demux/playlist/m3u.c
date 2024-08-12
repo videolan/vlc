@@ -231,16 +231,18 @@ static int CreateEntry( input_item_node_t *p_node, const struct entry_meta_s *me
 
     input_item_AddOptions( p_input, meta->i_options, meta->ppsz_options, 0 );
 
+    vlc_mutex_lock( &p_input->lock );
     if( meta->psz_artist )
-        input_item_SetArtist( p_input, meta->psz_artist );
+        vlc_meta_SetWithPlaylistPriority( p_input->p_meta, vlc_meta_Artist, meta->psz_artist );
     if( meta->psz_name )
-        input_item_SetTitle( p_input, meta->psz_name );
+        vlc_meta_SetWithPlaylistPriority( p_input->p_meta, vlc_meta_Title, meta->psz_name );
     if( meta->psz_album_art )
-        input_item_SetArtURL( p_input, meta->psz_album_art );
+        vlc_meta_SetWithPlaylistPriority( p_input->p_meta, vlc_meta_ArtworkURL, meta->psz_album_art );
     if( meta->psz_language )
-        input_item_SetLanguage( p_input, meta->psz_language );
+        vlc_meta_SetWithPlaylistPriority( p_input->p_meta, vlc_meta_Language, meta->psz_language );
     if( meta->psz_grouptitle )
-        input_item_SetPublisher( p_input, meta->psz_grouptitle );
+        vlc_meta_SetWithPlaylistPriority( p_input->p_meta, vlc_meta_Publisher, meta->psz_grouptitle );
+    vlc_mutex_unlock( &p_input->lock );
     if( meta->psz_tvgid )
         input_item_AddInfo( p_input, "XMLTV", "tvg-id", "%s", meta->psz_tvgid );
 
