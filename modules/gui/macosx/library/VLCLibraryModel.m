@@ -1247,7 +1247,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    dispatch_async(_mediaItemCacheModificationQueue, ^{
+    dispatch_async(_playlistCacheModificationQueue, ^{
         NSMutableArray * const mutablePlaylists = self.cachedPlaylists.mutableCopy;
         const NSUInteger playlistIdx = [mutablePlaylists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryPlaylist * const playlist, const NSUInteger idx, BOOL * const stop) {
             NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
@@ -1273,7 +1273,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
     const int64_t itemId = p_event->modification.i_entity_id;
 
-    dispatch_async(_mediaItemCacheModificationQueue, ^{
+    dispatch_async(_playlistCacheModificationQueue, ^{
         NSMutableArray * const mutablePlaylists = self.cachedPlaylists.mutableCopy;
         const NSUInteger playlistIdx = [mutablePlaylists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryPlaylist * const playlist, const NSUInteger idx, BOOL * const stop) {
             NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
