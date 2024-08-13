@@ -27,7 +27,7 @@ MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
 
 QVariant MLAlbumTrackModel::itemRoleData(const MLItem *item, const int role) const
 {
-    const MLAlbumTrack* ml_track = static_cast<const MLAlbumTrack *>(item);
+    const MLAudio* ml_track = static_cast<const MLAudio *>(item);
     assert( ml_track );
 
     switch (role)
@@ -165,7 +165,7 @@ MLAlbumTrackModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_param
         return {};
     std::vector<std::unique_ptr<MLItem>> res;
     for( const vlc_ml_media_t& media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::make_unique<MLAlbumTrack>( ml, &media ) );
+        res.emplace_back( std::make_unique<MLAudio>( ml, &media ) );
     return res;
 }
 
@@ -176,11 +176,11 @@ MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId)
     ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
     if (!media)
         return nullptr;
-    return std::make_unique<MLAlbumTrack>(ml, media.get());
+    return std::make_unique<MLAudio>(ml, media.get());
 }
 
 /* Q_INVOKABLE */ QUrl MLAlbumTrackModel::getParentURL(const QModelIndex &index)
 {
-    MLAlbumTrack *ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
+    MLAudio *ml_track = static_cast<MLAudio *>(item(index.row()));
     return getParentURLFromURL(ml_track->mrl());
 }

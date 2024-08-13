@@ -182,8 +182,8 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlalbum.hpp \
 	medialibrary/mlalbummodel.cpp \
 	medialibrary/mlalbummodel.hpp \
-	medialibrary/mlalbumtrack.cpp \
-	medialibrary/mlalbumtrack.hpp \
+	medialibrary/mlaudio.cpp \
+	medialibrary/mlaudio.hpp \
 	medialibrary/mlalbumtrackmodel.cpp \
 	medialibrary/mlalbumtrackmodel.hpp \
 	medialibrary/mlartist.cpp \

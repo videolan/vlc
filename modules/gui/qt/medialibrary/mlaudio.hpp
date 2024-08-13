@@ -24,10 +24,10 @@
 
 #include "mlmedia.hpp"
 
-class MLAlbumTrack : public MLMedia
+class MLAudio : public MLMedia
 {
 public:
-    MLAlbumTrack(vlc_medialibrary_t *_ml, const vlc_ml_media_t *_data);
+    MLAudio(vlc_medialibrary_t *_ml, const vlc_ml_media_t *_data);
 
     QString getAlbumTitle() const;
     QString getArtist() const;

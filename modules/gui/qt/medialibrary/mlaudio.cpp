@@ -17,11 +17,11 @@
  *****************************************************************************/
 
 #include <cassert>
-#include "mlalbumtrack.hpp"
+#include "mlaudio.hpp"
 #include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 
-MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
+MLAudio::MLAudio(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
     : MLMedia( _data )
     , m_trackNumber( _data->album_track.i_track_nb )
     , m_discNumber ( _data->album_track.i_disc_nb )
@@ -44,22 +44,22 @@ MLAlbumTrack::MLAlbumTrack(vlc_medialibrary_t* _ml, const vlc_ml_media_t *_data)
     }
 }
 
-QString MLAlbumTrack::getAlbumTitle() const
+QString MLAudio::getAlbumTitle() const
 {
     return m_albumTitle;
 }
 
-QString MLAlbumTrack::getArtist() const
+QString MLAudio::getArtist() const
 {
     return m_artist;
 }
 
-unsigned int MLAlbumTrack::getTrackNumber() const
+unsigned int MLAudio::getTrackNumber() const
 {
     return m_trackNumber;
 }
 
-unsigned int MLAlbumTrack::getDiscNumber() const
+unsigned int MLAudio::getDiscNumber() const
 {
     return m_discNumber;
 }

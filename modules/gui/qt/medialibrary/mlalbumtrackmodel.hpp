@@ -24,7 +24,7 @@
 #endif
 
 #include "mlbasemodel.hpp"
-#include "mlalbumtrack.hpp"
+#include "mlaudio.hpp"
 
 class MLAlbumTrackModel : public MLBaseModel
 {
