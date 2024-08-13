@@ -64,7 +64,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: closeButton
-            color: theme.bg.secondary
+            color: theme.fg.secondary
             Layout.alignment: Qt.AlignRight | Qt.AlignTop
             Layout.column: 2
             Layout.row: 0
@@ -77,7 +77,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: upButton
-            color: theme.bg.secondary
+            color: theme.fg.secondary
             Layout.column: 1
             Layout.row: 0
             iconTxt: VLCIcons.ic_fluent_chevron_up_24
@@ -87,7 +87,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: leftButton
-            color: theme.bg.secondary
+            color: theme.fg.secondary
             Layout.column: 0
             Layout.row: 1
             iconTxt: VLCIcons.ic_fluent_chevron_left_24
@@ -97,7 +97,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: selectButton
-            color: theme.bg.secondary
+            color: theme.fg.secondary
             Layout.column: 1
             Layout.row: 1
             iconTxt: VLCIcons.ok
@@ -108,7 +108,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: rightButton
-            color: theme.bg.secondary          
+            color: theme.fg.secondary
             Layout.column: 2
             Layout.row: 1
             iconTxt: VLCIcons.ic_fluent_chevron_right_24
@@ -118,7 +118,7 @@ Control {
 
         Widgets.ActionButtonOverlay {
             id: downButton
-            color: theme.bg.secondary
+            color: theme.fg.secondary
             Layout.column: 1
             Layout.row: 2
             iconTxt: VLCIcons.ic_fluent_chevron_down_24
