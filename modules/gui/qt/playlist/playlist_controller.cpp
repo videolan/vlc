@@ -346,8 +346,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = []{
 
 //private API
 
-PlaylistControllerPrivate::PlaylistControllerPrivate(PlaylistController* playlistController)
+PlaylistControllerPrivate::PlaylistControllerPrivate(PlaylistController* playlistController, vlc_playlist_t *playlist)
     : q_ptr(playlistController)
+    , m_playlist(playlist)
 {
     fillSortKeyTitleList();
 }
@@ -363,20 +364,31 @@ PlaylistControllerPrivate::~PlaylistControllerPrivate()
 
 //public API
 
-PlaylistController::PlaylistController(QObject *parent)
+PlaylistController::PlaylistController(vlc_playlist_t *playlist, QObject *parent)
     : QObject(parent)
-    , d_ptr( new PlaylistControllerPrivate(this) )
+    , d_ptr( new PlaylistControllerPrivate(this, playlist) )
 {
+    Q_D(PlaylistController);
+    assert(playlist);
+
     connect(this, &PlaylistController::itemsMoved, this, &PlaylistController::resetSortKey);
     connect(this, &PlaylistController::itemsAdded, this, &PlaylistController::resetSortKey);
     connect(this, &PlaylistController::isEmptyChanged, [this](bool isEmpty) {if (isEmpty) emit resetSortKey();});
-}
 
-PlaylistController::PlaylistController(vlc_playlist_t *playlist, QObject *parent)
-    : QObject(parent)
-    , d_ptr( new PlaylistControllerPrivate(this) )
-{
-    setPlaylist(playlist);
+    {
+        vlc_playlist_locker locker(d->m_playlist);
+        d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
+    }
+    /*
+     * Queue a playlistInitialized to be sent after the initial state callbacks
+     * vlc_playlist_AddListener will synchronously call each callback in
+     * playlist_callbacks, which will in turn queue an async call on the Qt
+     * main thread
+     */
+    d->callAsync([this, d](){
+        d->m_initialized = true;
+        emit initializedChanged();
+    });
 }
 
 PlaylistController::~PlaylistController()
@@ -705,44 +717,11 @@ Playlist PlaylistController::getPlaylist() const
     return Playlist(d->m_playlist);
 }
 
-void PlaylistController::setPlaylist(vlc_playlist_t* newPlaylist)
-{
-    Q_D(PlaylistController);
-    if (d->m_playlist && d->m_listener)
-    {
-        vlc_playlist_locker locker(d->m_playlist);
-        vlc_playlist_RemoveListener(d->m_playlist, d->m_listener);
-        d->m_playlist = nullptr;
-        d->m_listener = nullptr;
-    }
-    if (newPlaylist)
-    {
-        vlc_playlist_locker locker(newPlaylist);
-        d->m_playlist = newPlaylist;
-        d->m_listener = vlc_playlist_AddListener(d->m_playlist, &playlist_callbacks, d, true);
-        /*
-         * Queue a playlistInitialized to be sent after the initial state callbacks
-         * vlc_playlist_AddListener will synchronously call each callback in
-         * playlist_callbacks, which will in turn queue an async call on the Qt
-         * main thread
-         */
-        d->callAsync([=](){
-            emit playlistInitialized();
-        });
-    }
-    emit playlistChanged( Playlist(newPlaylist) );
-}
-
 void PlaylistController::resetSortKey()
 {
     Q_D(PlaylistController);
     d->m_sortKey = SortKey::SORT_KEY_NONE;
     emit sortKeyChanged();
-}
-
-void PlaylistController::setPlaylist(const Playlist& playlist)
-{
-    setPlaylist(playlist.m_playlist);
 }
 
 PlaylistController::PlaybackRepeat PlaylistController::getRepeatMode() const
@@ -854,6 +833,11 @@ QVariantList PlaylistController::getSortKeyTitleList() const
     return d->sortKeyTitleList;
 }
 
+bool PlaylistController::isInitialized() const
+{
+    Q_D(const PlaylistController);
+    return d->m_initialized;
+}
 
   } // namespace playlist
 } // namespace vlc

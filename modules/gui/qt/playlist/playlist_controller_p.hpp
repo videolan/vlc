@@ -33,7 +33,7 @@ public:
     PlaylistController * const q_ptr;
 
 public:
-    PlaylistControllerPrivate(PlaylistController* playlistController);
+    PlaylistControllerPrivate(PlaylistController* playlistController, vlc_playlist_t *playlist);
     PlaylistControllerPrivate() = delete;
     ~PlaylistControllerPrivate();
 
@@ -56,6 +56,7 @@ public:
     vlc_playlist_t* m_playlist = nullptr;
     vlc_playlist_listener_id* m_listener = nullptr;
 
+    bool m_initialized = false;
     ssize_t m_currentIndex = -1;
     PlaylistItem m_currentItem;
     bool m_hasNext= false;

@@ -149,10 +149,12 @@ Item {
         Connections {
             target: MainPlaylistController
 
-            function onPlaylistInitialized() {
-                _playlistReady = true
-                if (_interfaceReady)
+            function onInitializedChanged() {
+                console.assert(MainPlaylistController.initialized)
+                if (root._interfaceReady && !root._playlistReady) {
+                    root._playlistReady = true
                     setInitialView()
+                }
             }
         }
 
@@ -186,9 +188,11 @@ Item {
         }
 
         Component.onCompleted: {
-            _interfaceReady = true;
-            if (_playlistReady)
+            root._interfaceReady = true
+            if (!root._playlistReady && MainPlaylistController.initialized) {
+                root._playlistReady = true
                 setInitialView()
+            }
         }
 
         DropArea {
