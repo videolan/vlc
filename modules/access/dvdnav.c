@@ -1516,10 +1516,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int32_t len )
             {
                 ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
 
-                if( !tk->b_configured )
-                {
                     ESNew( p_demux, i_id );
-                }
 
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
