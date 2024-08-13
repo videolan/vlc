@@ -360,7 +360,7 @@ void MainCtx::loadPrefs(const bool callSignals)
     };
 
     /* Are we in the enhanced always-video mode or not ? */
-    loadFromVLCOption(b_minimalView, "qt-minimal-view", nullptr);
+    loadFromVLCOption(m_minimalView, "qt-minimal-view", &MainCtx::minimalViewChanged);
 
     loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
 
@@ -629,6 +629,15 @@ void MainCtx::setbgCone(bool bgCone)
     m_bgCone = bgCone;
 
     emit bgConeToggled();
+}
+
+void MainCtx::setMinimalView(bool minimalView)
+{
+    if (m_minimalView == minimalView)
+        return;
+
+    m_minimalView = minimalView;
+    emit minimalViewChanged();
 }
 
 void MainCtx::setShowRemainingTime( bool show )

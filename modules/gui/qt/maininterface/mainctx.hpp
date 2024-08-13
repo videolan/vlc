@@ -134,6 +134,9 @@ class MainCtx : public QObject
     Q_PROPERTY(OsType osName READ getOSName CONSTANT)
     Q_PROPERTY(int osVersion READ getOSVersion CONSTANT)
 
+    // Expose Property Minimal View for Player View
+    Q_PROPERTY(bool minimalView READ isMinimalView WRITE setMinimalView NOTIFY minimalViewChanged FINAL)
+
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
 
@@ -239,6 +242,8 @@ public:
     inline int getOSVersion() const {return m_osVersion;}
 
     inline bool isbgCone() const {return m_bgCone; }
+    inline bool isMinimalView() const {return m_minimalView; }
+
     inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
     inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
     void setWindowSuportExtendedFrame(bool support);
@@ -329,7 +334,6 @@ protected:
     double               m_intfScaleFactor = 1.;
     int                  i_notificationSetting = 0; /// Systray Notifications
     bool                 b_hideAfterCreation = false; /// --qt-start-minimized
-    bool                 b_minimalView = false;         ///< Minimal video
     bool                 b_playlistDocked = false;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
     bool                 b_interfaceOnTop = false;      ///keep UI on top
@@ -356,6 +360,7 @@ protected:
     bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
     double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
+    bool                 m_minimalView = false;
 
     double               m_artistAlbumsWidthFactor = 4.;
 
@@ -416,6 +421,8 @@ public slots:
     void onWindowVisibilityChanged(QWindow::Visibility);
     void setHasAcrylicSurface(bool);
 
+    void setMinimalView(bool);
+
     void sendHotkey(Qt::Key key, Qt::KeyboardModifiers modifiers );
 
     void emitBoss();
@@ -429,7 +436,6 @@ protected slots:
     void onInputChanged( bool );
 
 signals:
-    void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
     void setInterfaceVisibible(bool );
     void setInterfaceFullScreen( bool );
@@ -467,6 +473,8 @@ signals:
     void pinOpacityChanged();
 
     void hasAcrylicSurfaceChanged();
+
+    void minimalViewChanged();
 
     void acrylicActiveChanged();
 
