@@ -1433,7 +1433,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             /* now select it */
             es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES, tk->es );
 
-            if( tk->fmt.i_cat == SPU_ES )
+            assert( tk->fmt.i_cat == SPU_ES );
             {
                 vlc_mutex_lock( &p_sys->event_lock );
                 p_sys->spu_es = tk->es;
@@ -1516,7 +1516,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int32_t len )
             {
                 ps_track_t *tk = &p_sys->tk[ps_id_to_tk(i_id)];
 
-                    ESNew( p_demux, i_id );
+                ESNew( p_demux, i_id );
 
                 if( tk->es &&
                     !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) )
