@@ -16,77 +16,73 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlalbumtrackmodel.hpp"
+#include "mlaudiomodel.hpp"
 #include "util/vlctick.hpp"
 #include "mlhelper.hpp"
 
-MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
+MLAudioModel::MLAudioModel(QObject *parent)
     : MLBaseModel(parent)
 {
 }
 
-QVariant MLAlbumTrackModel::itemRoleData(const MLItem *item, const int role) const
+QVariant MLAudioModel::itemRoleData(const MLItem *item, const int role) const
 {
-    const MLAudio* ml_track = static_cast<const MLAudio *>(item);
-    assert( ml_track );
+    const MLAudio* audio = static_cast<const MLAudio *>(item);
+    assert( audio );
 
     switch (role)
     {
-    // Tracks
-    case TRACK_ID:
-        return QVariant::fromValue( ml_track->getId() );
-    case TRACK_TITLE:
-        return QVariant::fromValue( ml_track->title() );
-    case TRACK_COVER:
-        return QVariant::fromValue( ml_track->smallCover() );
-    case TRACK_NUMBER:
-        return QVariant::fromValue( ml_track->getTrackNumber() );
-    case TRACK_DISC_NUMBER:
-        return QVariant::fromValue( ml_track->getDiscNumber() );
-    case TRACK_IS_LOCAL:
+    case AUDIO_ID:
+        return QVariant::fromValue( audio->getId() );
+    case AUDIO_TITLE:
+        return QVariant::fromValue( audio->title() );
+    case AUDIO_COVER:
+        return QVariant::fromValue( audio->smallCover() );
+    case AUDIO_NUMBER:
+        return QVariant::fromValue( audio->getTrackNumber() );
+    case AUDIO_DISC_NUMBER:
+        return QVariant::fromValue( audio->getDiscNumber() );
+    case AUDIO_IS_LOCAL:
     {
-        QUrl trackUrl(ml_track->mrl());
-        return QVariant::fromValue( trackUrl.isLocalFile() );
+        QUrl audioUrl(audio->mrl());
+        return QVariant::fromValue( audioUrl.isLocalFile() );
     }
-    case TRACK_DURATION :
-        return QVariant::fromValue( ml_track->duration() );
-    case TRACK_ALBUM:
-        return QVariant::fromValue( ml_track->getAlbumTitle() );
-    case TRACK_ARTIST:
-        return QVariant::fromValue( ml_track->getArtist() );
-    case TRACK_TITLE_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_track->title() ) );
-    case TRACK_ALBUM_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_track->getAlbumTitle() ) );
-    case TRACK_ARTIST_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_track->getArtist() ) );
-    case TRACK_URL:
-        return QUrl(ml_track->getMRL());
+    case AUDIO_DURATION :
+        return QVariant::fromValue( audio->duration() );
+    case AUDIO_ALBUM:
+        return QVariant::fromValue( audio->getAlbumTitle() );
+    case AUDIO_ARTIST:
+        return QVariant::fromValue( audio->getArtist() );
+    case AUDIO_TITLE_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( audio->title() ) );
+    case AUDIO_ALBUM_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( audio->getAlbumTitle() ) );
+    case AUDIO_ARTIST_FIRST_SYMBOL:
+        return QVariant::fromValue( getFirstSymbol( audio->getArtist() ) );
     default :
         return QVariant();
     }
 }
 
-QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
+QHash<int, QByteArray> MLAudioModel::roleNames() const
 {
     return {
-        { TRACK_ID, "id" },
-        { TRACK_TITLE, "title" },
-        { TRACK_COVER, "cover" },
-        { TRACK_NUMBER, "track_number" },
-        { TRACK_DISC_NUMBER, "disc_number" },
-        { TRACK_IS_LOCAL, "isLocal" },
-        { TRACK_DURATION, "duration" },
-        { TRACK_ALBUM, "album_title"},
-        { TRACK_ARTIST, "main_artist"},
-        { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},
-        { TRACK_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
-        { TRACK_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
-        { TRACK_URL, "url" }
+        { AUDIO_ID, "id" },
+        { AUDIO_TITLE, "title" },
+        { AUDIO_COVER, "cover" },
+        { AUDIO_NUMBER, "track_number" },
+        { AUDIO_DISC_NUMBER, "disc_number" },
+        { AUDIO_IS_LOCAL, "isLocal" },
+        { AUDIO_DURATION, "duration" },
+        { AUDIO_ALBUM, "album_title"},
+        { AUDIO_ARTIST, "main_artist"},
+        { AUDIO_TITLE_FIRST_SYMBOL, "title_first_symbol"},
+        { AUDIO_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
+        { AUDIO_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
     };
 }
 
-vlc_ml_sorting_criteria_t MLAlbumTrackModel::nameToCriteria(QByteArray name) const
+vlc_ml_sorting_criteria_t MLAudioModel::nameToCriteria(QByteArray name) const
 {
     return QHash<QByteArray, vlc_ml_sorting_criteria_t> {
         {"id", VLC_ML_SORTING_DEFAULT},
@@ -99,7 +95,7 @@ vlc_ml_sorting_criteria_t MLAlbumTrackModel::nameToCriteria(QByteArray name) con
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
+void MLAudioModel::onVlcMlEvent(const MLEvent &event)
 {
     switch (event.i_type)
     {
@@ -140,12 +136,12 @@ void MLAlbumTrackModel::onVlcMlEvent(const MLEvent &event)
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLAlbumTrackModel::createMLLoader() const
+MLAudioModel::createMLLoader() const
 {
-    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLAlbumTrackModel::Loader>(*this));
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLAudioModel::Loader>(*this));
 }
 
-size_t MLAlbumTrackModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
+size_t MLAudioModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     if ( m_parent.id <= 0 )
         return vlc_ml_count_audio_media(ml, queryParams);
@@ -153,7 +149,7 @@ size_t MLAlbumTrackModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_que
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLAlbumTrackModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
+MLAudioModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list;
 
@@ -170,7 +166,7 @@ MLAlbumTrackModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_param
 }
 
 std::unique_ptr<MLItem>
-MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+MLAudioModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
 {
     assert(itemId.type == VLC_ML_PARENT_UNKNOWN);
     ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
@@ -179,7 +175,7 @@ MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId)
     return std::make_unique<MLAudio>(ml, media.get());
 }
 
-/* Q_INVOKABLE */ QUrl MLAlbumTrackModel::getParentURL(const QModelIndex &index)
+/* Q_INVOKABLE */ QUrl MLAudioModel::getParentURL(const QModelIndex &index)
 {
     MLAudio *ml_track = static_cast<MLAudio *>(item(index.row()));
     return getParentURLFromURL(ml_track->mrl());

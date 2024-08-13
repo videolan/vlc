@@ -184,8 +184,8 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlalbummodel.hpp \
 	medialibrary/mlaudio.cpp \
 	medialibrary/mlaudio.hpp \
-	medialibrary/mlalbumtrackmodel.cpp \
-	medialibrary/mlalbumtrackmodel.hpp \
+	medialibrary/mlaudiomodel.cpp \
+	medialibrary/mlaudiomodel.hpp \
 	medialibrary/mlartist.cpp \
 	medialibrary/mlartist.hpp \
 	medialibrary/mlartistmodel.cpp \
@@ -431,7 +431,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/medialib.moc.cpp \
 	medialibrary/mlmediastore.moc.cpp \
 	medialibrary/mlalbummodel.moc.cpp \
-	medialibrary/mlalbumtrackmodel.moc.cpp \
+	medialibrary/mlaudiomodel.moc.cpp \
 	medialibrary/mlartistmodel.moc.cpp \
 	medialibrary/mlbookmarkmodel.moc.cpp \
 	medialibrary/mlbasemodel.moc.cpp \

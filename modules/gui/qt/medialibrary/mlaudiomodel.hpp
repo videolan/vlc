@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef MLTRACKMODEL_HPP
-#define MLTRACKMODEL_HPP
+#ifndef MLAUDIOMODEL_HPP
+#define MLAUDIOMODEL_HPP
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,32 +26,31 @@
 #include "mlbasemodel.hpp"
 #include "mlaudio.hpp"
 
-class MLAlbumTrackModel : public MLBaseModel
+class MLAudioModel : public MLBaseModel
 {
     Q_OBJECT
 
 public:
     enum Roles {
-        TRACK_ID = Qt::UserRole + 1,
-        TRACK_TITLE,
-        TRACK_COVER,
-        TRACK_NUMBER,
-        TRACK_DISC_NUMBER,
-        TRACK_IS_LOCAL,
-        TRACK_DURATION,
-        TRACK_ALBUM,
-        TRACK_ARTIST,
-        TRACK_URL,
+        AUDIO_ID = Qt::UserRole + 1,
+        AUDIO_TITLE,
+        AUDIO_COVER,
+        AUDIO_NUMBER,
+        AUDIO_DISC_NUMBER,
+        AUDIO_IS_LOCAL,
+        AUDIO_DURATION,
+        AUDIO_ALBUM,
+        AUDIO_ARTIST,
 
-        TRACK_TITLE_FIRST_SYMBOL,
-        TRACK_ALBUM_FIRST_SYMBOL,
-        TRACK_ARTIST_FIRST_SYMBOL,
+        AUDIO_TITLE_FIRST_SYMBOL,
+        AUDIO_ALBUM_FIRST_SYMBOL,
+        AUDIO_ARTIST_FIRST_SYMBOL,
     };
 
 public:
-    explicit MLAlbumTrackModel(QObject *parent = nullptr);
+    explicit MLAudioModel(QObject *parent = nullptr);
 
-    virtual ~MLAlbumTrackModel() = default;
+    virtual ~MLAudioModel() = default;
 
     QHash<int, QByteArray> roleNames() const override;
 
@@ -74,4 +73,5 @@ private:
         std::unique_ptr<MLItem> loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const override;
     };
 };
-#endif // MLTRACKMODEL_HPP
+
+#endif // MLAUDIOMODEL_HPP

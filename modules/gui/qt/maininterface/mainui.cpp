@@ -7,7 +7,7 @@
 #include "medialibrary/mlcustomcover.hpp"
 #include "medialibrary/mlalbummodel.hpp"
 #include "medialibrary/mlartistmodel.hpp"
-#include "medialibrary/mlalbumtrackmodel.hpp"
+#include "medialibrary/mlaudiomodel.hpp"
 #include "medialibrary/mlgenremodel.hpp"
 #include "medialibrary/mlurlmodel.hpp"
 #include "medialibrary/mlvideomodel.hpp"
@@ -373,7 +373,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<MLBaseModel>( uri, versionMajor, versionMinor, "MLBaseModel", "ML Base Model is uncreatable." );
         qmlRegisterType<MLAlbumModel>( uri, versionMajor, versionMinor, "MLAlbumModel" );
         qmlRegisterType<MLArtistModel>( uri, versionMajor, versionMinor, "MLArtistModel" );
-        qmlRegisterType<MLAlbumTrackModel>( uri, versionMajor, versionMinor, "MLAlbumTrackModel" );
+        qmlRegisterType<MLAudioModel>( uri, versionMajor, versionMinor, "MLAudioModel" );
         qmlRegisterType<MLGenreModel>( uri, versionMajor, versionMinor, "MLGenreModel" );
         qmlRegisterType<MLUrlModel>( uri, versionMajor, versionMinor, "MLUrlModel" );
         qmlRegisterType<MLVideoModel>( uri, versionMajor, versionMinor, "MLVideoModel" );

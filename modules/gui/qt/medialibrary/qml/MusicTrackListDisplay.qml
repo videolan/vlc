@@ -204,7 +204,7 @@ Widgets.TableViewExt {
         showCriterias: (root.sortModel === root._modelSmall)
     }
 
-    MLAlbumTrackModel {
+    MLAudioModel {
         id: rootmodel
         ml: MediaLib
 

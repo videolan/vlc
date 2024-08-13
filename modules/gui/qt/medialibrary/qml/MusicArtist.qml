@@ -382,7 +382,7 @@ FocusScope {
         defaultCover: VLCStyle.noArtAlbumCover
     }
 
-    MLAlbumTrackModel {
+    MLAudioModel {
         id: trackModel
 
         ml: MediaLib
