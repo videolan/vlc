@@ -49,20 +49,23 @@ typedef struct
     struct wl_subsurface* video_subsurface;
 
     int buffer_scale;
+
+    uint32_t compositor_interface_version;
 } qtwayland_priv_t;
 
 static void registry_global_cb(void* data, struct wl_registry* registry,
                                uint32_t id, const char* iface, uint32_t version)
 {
-    VLC_UNUSED(version);
-
     qtwayland_t* obj = (qtwayland_t*)data;
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
 
     if (!strcmp(iface, "wl_subcompositor"))
         sys->subcompositor = (struct wl_subcompositor*)wl_registry_bind(registry, id, &wl_subcompositor_interface, version);
     if (!strcmp(iface, "wl_compositor"))
+    {
+        sys->compositor_interface_version = version;
         sys->compositor = (struct wl_compositor*)wl_registry_bind(registry, id, &wl_compositor_interface, version);
+    }
 #ifdef QT_HAS_WAYLAND_PROTOCOLS
     if (!strcmp(iface, "wp_viewporter"))
         sys->viewporter = (struct wp_viewporter*)wl_registry_bind(registry, id, &wp_viewporter_interface, version);
@@ -113,10 +116,18 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
         if (sys->buffer_scale != 1)
         {
             msg_Dbg(obj, "Viewporter protocol is not available, and scale is not 1." \
-                         "Only integer scaling is possible.");
-        }
+                         "Only integer scaling may be possible.");
 
-        wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+            if (sys->compositor_interface_version >= 3)
+            {
+                wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+            }
+            else
+            {
+                msg_Dbg(obj, "Compositor interface version is below 3, integer scaling " \
+                             "is not possible.");
+            }
+        }
     }
 
     struct wl_region* region = wl_compositor_create_region(sys->compositor);
