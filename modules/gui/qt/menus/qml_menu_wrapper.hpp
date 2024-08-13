@@ -133,7 +133,8 @@ signals:
     void shownChanged();
 
 public slots:
-    void popup(QPoint pos);
+    void popup( QPoint pos );
+    void close();
 private:
     std::unique_ptr<QMenu> m_menu;
     bool m_shown = false;
@@ -222,6 +223,7 @@ public:
 
 public: // Interface
     Q_INVOKABLE void popup(const QPoint & position, bool above = false);
+    Q_INVOKABLE void close();
 
 signals:
     void aboutToHide();
@@ -245,6 +247,7 @@ public:
 
 public: // Interface
     Q_INVOKABLE void popup(const QPoint & position, bool above = false);
+    Q_INVOKABLE void close();
 
 signals:
     void aboutToHide();
@@ -267,6 +270,7 @@ public:
 
 public: // Interface
     Q_INVOKABLE void popup(const QPoint & position, bool above = false);
+    Q_INVOKABLE void close();
 
 signals:
     void aboutToHide();
@@ -346,6 +350,21 @@ public:
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+private:
+    std::unique_ptr<QMenu> m_menu;
+};
+
+class QmlAudioContextMenu : public VLCMenuBar
+{
+    Q_OBJECT
+    SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
+
+public:
+   explicit QmlAudioContextMenu(QObject *parent = nullptr);
+
+public:
+    Q_INVOKABLE void popup(const QPoint & position);
+
 private:
     std::unique_ptr<QMenu> m_menu;
 };

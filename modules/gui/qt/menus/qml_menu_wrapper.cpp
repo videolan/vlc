@@ -244,6 +244,12 @@ void QmlGlobalMenu::popup(QPoint pos)
     m_menu->popup(pos);
 }
 
+void QmlGlobalMenu::close()
+{
+    if (m_menu)
+        m_menu->close();
+}
+
 QmlMenuBarMenu::QmlMenuBarMenu(QmlMenuBar* menubar, QWidget* parent)
     : QMenu(parent)
     , m_menubar(menubar)
@@ -514,6 +520,12 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     m_positioner.popup(m_menu.get(), position, above);
 }
 
+void QmlBookmarkMenu::close()
+{
+    if (m_menu)
+        m_menu->close();
+}
+
 // QmlProgramMenu
 
 /* explicit */ QmlProgramMenu::QmlProgramMenu(QObject * parent)
@@ -547,6 +559,12 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     m_positioner.popup(m_menu.get(), position, above);
 }
 
+void QmlProgramMenu::close()
+{
+    if (m_menu)
+        m_menu->close();
+}
+
 // QmlRendererMenu
 
 /* explicit */ QmlRendererMenu::QmlRendererMenu(QObject * parent)
@@ -566,6 +584,12 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
     connect(m_menu.get(), &QMenu::aboutToShow, this, &QmlRendererMenu::aboutToShow);
 
     m_positioner.popup(m_menu.get(), position, above);
+}
+
+void QmlRendererMenu::close()
+{
+    if (m_menu)
+        m_menu->close();
 }
 
 // Tracks
@@ -640,6 +664,25 @@ void QmlAudioMenu::beforePopup(QMenu * menu) /* override */
     {
         emit triggered(Synchronize);
     });
+}
+
+QmlAudioContextMenu::QmlAudioContextMenu(QObject *parent)
+    : VLCMenuBar(parent)
+{
+}
+
+void QmlAudioContextMenu::popup(const QPoint & position)
+{
+    if (!m_ctx)
+        return;
+
+    qt_intf_t* p_intf = m_ctx->getIntf();
+    if (!p_intf)
+        return;
+    
+    m_menu.reset(PopupMenu(p_intf, false));
+    if (m_menu)
+        m_menu->popup(position);
 }
 
 //=================================================================================================
