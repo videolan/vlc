@@ -48,6 +48,7 @@ NSString * const VLCLibraryModelRecentAudioMediaItemDeleted = @"VLCLibraryModelR
 NSString * const VLCLibraryModelAlbumDeleted = @"VLCLibraryModelAlbumDeleted";
 NSString * const VLCLibraryModelArtistDeleted = @"VLCLibraryModelArtistDeleted";
 NSString * const VLCLibraryModelGenreDeleted = @"VLCLibraryModelGenreDeleted";
+NSString * const VLCLibraryModelGroupDeleted = @"VLCLibraryModelGroupDeleted";
 NSString * const VLCLibraryModelPlaylistDeleted = @"VLCLibraryModelPlaylistDeleted";
 
 NSString * const VLCLibraryModelAudioMediaItemUpdated = @"VLCLibraryModelAudioMediaItemUpdated";
@@ -114,6 +115,7 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleGenreDeletionEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handleGroupDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handlePlaylistDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemUpdateEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumUpdateEvent:(const vlc_ml_event_t * const)p_event;
@@ -190,7 +192,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleGroupUpdateEvent:p_event];
             break;
         case VLC_ML_EVENT_GROUP_DELETED:
-            [libraryModel resetCachedListOfGroups]; // TODO: Handle each event granularly
+            [libraryModel handleGroupDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_PLAYLIST_ADDED:
             [libraryModel resetCachedListOfPlaylists];
@@ -1168,6 +1170,36 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                          usingSetter:@selector(setCachedGenres:)
                           usingQueue:_genreCacheModificationQueue
                 withNotificationName:VLCLibraryModelGenreDeleted];
+}
+
+- (void)handleGroupDeletionEvent:(const vlc_ml_event_t *const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const int64_t itemId = p_event->modification.i_entity_id;
+
+    dispatch_async(_groupCacheModificationQueue, ^{
+        NSMutableArray * const mutableGroups = self.cachedListOfGroups.mutableCopy;
+        const NSUInteger groupIdx =
+            [mutableGroups indexOfObjectPassingTest:^BOOL(VLCMediaLibraryGroup * const group,
+                                                          const NSUInteger idx,
+                                                          BOOL * const stop) {
+            return group.libraryID == itemId;
+        }];
+
+        if (groupIdx == NSNotFound) {
+            NSLog(@"Could not handle deletion of groupI with id %lld in model", itemId);
+            return;
+        }
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            VLCMediaLibraryGroup * const group = mutableGroups[groupIdx];
+            [mutableGroups removeObjectAtIndex:groupIdx];
+            self.cachedListOfGroups = mutableGroups.copy;
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupDeleted
+                                                            object:group];
+        });
+    });
 }
 
 - (void)handleGroupUpdateEvent:(const vlc_ml_event_t *const)p_event
