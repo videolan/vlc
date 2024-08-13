@@ -27,46 +27,50 @@ import VLC.Util
  * state Floating {
  * }
  * state Docked {
- *   state FollowVisible {
- *      state Visible {
- *      }
- *      state Hidden {
- *      }
- *   }
- *   state ForceHidden {
- *   }
+ *    state Visible {
+ *    }
+ *    state Hidden {
+ *       state followVisible {
+ *        }
+ *       state minimalOrEmbed {
+ *       }  
+ *    }
  * }
  * @enduml
  *
  */
 FSM {
     id: fsm
-
+ 
     //incoming signals
     signal togglePlaylistVisibility()
     signal updatePlaylistVisible()
     signal updatePlaylistDocked()
     signal updateVideoEmbed()
-
-    //outcoming signals
-    signal showPlaylist()
-    signal hidePlaylist()
-
+    signal updateMinimalView()
+ 
+    //internal signals
+    signal _updateVideoEmbedOrMinimal()
+    onUpdateVideoEmbed: _updateVideoEmbedOrMinimal()
+    onUpdateMinimalView: _updateVideoEmbedOrMinimal()
+ 
     //exposed internal states
     property alias isPlaylistVisible: fsmVisible.active
-
+ 
     initialState: MainCtx.playlistDocked ? fsmDocked : fsmFloating
-
+    
     signalMap: ({
         togglePlaylistVisibility: fsm.togglePlaylistVisibility,
         updatePlaylistVisible: fsm.updatePlaylistVisible,
         updatePlaylistDocked: fsm.updatePlaylistDocked,
-        updateVideoEmbed: fsm.updateVideoEmbed
+        updateVideoEmbed: fsm.updateVideoEmbed,
+        updateMinimalView: fsm.updateMinimalView,
+        updateVideoEmbedOrMinimal: fsm._updateVideoEmbedOrMinimal,
     })
-
+ 
     FSMState {
         id: fsmFloating
-
+ 
         transitions: ({
             togglePlaylistVisibility: {
                 action: () => { MainCtx.playlistVisible = !MainCtx.playlistVisible }
@@ -77,76 +81,88 @@ FSM {
             }
         })
     }
-
+ 
     FSMState {
         id: fsmDocked
-
-        initialState: MainCtx.hasEmbededVideo ? fsmForceHidden : fsmFollowVisible
-
+ 
+        initialState: (MainCtx.hasEmbededVideo || MainCtx.minimalView || !MainCtx.playlistVisible )  
+                      ? fsmHidden : fsmVisible
+ 
+        transitions: ({
+            updatePlaylistDocked: {
+                guard: () => !MainCtx.playlistDocked,
+                target: fsmFloating
+            },
+            togglePlaylistVisibility: {
+                action: () => {
+                    MainCtx.playlistVisible = !MainCtx.playlistVisible
+                }
+            },
+        })
+ 
         FSMState {
-            id: fsmFollowVisible
-
-            initialState: MainCtx.playlistVisible ? fsmVisible : fsmHidden
-
+            id: fsmVisible
+ 
             transitions: ({
-                updatePlaylistDocked: {
-                    guard: () => !MainCtx.playlistDocked,
-                    target: fsmFloating
-                },
                 updateVideoEmbed: {
                     guard: () => MainCtx.hasEmbededVideo,
-                    target: fsmForceHidden
-                }
+                    target: fsmHidden
+                },
+                updateMinimalView: {
+                    guard: () => MainCtx.minimalView,
+                    target: fsmHidden
+                },
+                updatePlaylistVisible: {
+                    guard: () => !MainCtx.playlistVisible,
+                    target: fsmHidden
+                },
             })
+        }
+ 
+        FSMState {
+            id: fsmHidden
+
+            initialState: (MainCtx.minimalView || MainCtx.hasEmbededVideo) 
+                          ? fsmMinimalOrEmbed : fsmFollowVisible
 
             FSMState {
-                id: fsmVisible
+                id: fsmFollowVisible
+
+                function enter() {
+                    //automatic transitions
+                    if (MainCtx.playlistVisible)
+                        fsm.updatePlaylistVisible()
+                }
 
                 transitions: ({
-                    updatePlaylistVisible: {
-                        guard: () => !MainCtx.playlistVisible,
-                        target: fsmHidden
+                    updateVideoEmbedOrMinimal: {
+                        guard: () => MainCtx.hasEmbededVideo || MainCtx.minimalView,
+                        target: fsmMinimalOrEmbed
                     },
-                    togglePlaylistVisibility: {
-                        action: () => { MainCtx.playlistVisible = false },
-                        target: fsmHidden
-                    }
-                })
-            }
-
-            FSMState {
-                id: fsmHidden
-
-                transitions: ({
                     updatePlaylistVisible: {
                         guard: () => MainCtx.playlistVisible,
                         target: fsmVisible
                     },
-                    togglePlaylistVisibility: {
-                        action: () => { MainCtx.playlistVisible = true },
-                        target: fsmVisible
-                    }
                 })
             }
-        }
 
-        FSMState {
-            id: fsmForceHidden
+            FSMState {
+                id: fsmMinimalOrEmbed
 
-            transitions: ({
-                updateVideoEmbed: {
-                    guard: () => !MainCtx.hasEmbededVideo,
-                    target: fsmFollowVisible
-                },
-                updatePlaylistVisible: {
-                    guard: () => MainCtx.playlistVisible,
-                    target: fsmFollowVisible
-                },
-                togglePlaylistVisibility: {
-                    action: () => { MainCtx.playlistVisible = true },
-                    target: fsmFollowVisible
-                }
-            })
+                transitions: ({
+                    updateVideoEmbedOrMinimal: [{ //guards tested in order
+                       guard: () => MainCtx.minimalView,
+                        //no target we remain in minimal
+                    },{
+                       guard: () => !MainCtx.hasEmbededVideo,
+                         target: fsmFollowVisible
+                    }],
+                    updatePlaylistVisible: {
+                        guard: () => !MainCtx.minimalView && MainCtx.playlistVisible,
+                        target: fsmVisible
+                    },
+                })
+            }
         }
     }
 }
