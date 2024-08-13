@@ -116,7 +116,7 @@ QVariant MLVideoModel::itemRoleData(const MLItem *item, int role) const
         }
         case VIDEO_IS_LOCAL:
         {
-            QUrl videoUrl(video->getMRL());
+            QUrl videoUrl(video->mrl());
             return QVariant::fromValue( videoUrl.isLocalFile() );
         }
         case VIDEO_DURATION:
@@ -130,7 +130,7 @@ QVariant MLVideoModel::itemRoleData(const MLItem *item, int role) const
         case VIDEO_CHANNEL:
             return QVariant::fromValue( video->getChannel() );
         case VIDEO_MRL:
-            return QVariant::fromValue( video->getMRL() );
+            return QVariant::fromValue( video->mrl() );
         case VIDEO_DISPLAY_MRL:
             return QVariant::fromValue( video->getDisplayMRL() );
         case VIDEO_VIDEO_TRACK:
@@ -288,5 +288,5 @@ MLVideoModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) cons
 /* Q_INVOKABLE */ QUrl MLVideoModel::getParentURL(const QModelIndex &index)
 {
     MLVideo *video = static_cast<MLVideo *>(item(index.row()));
-    return getParentURLFromMLItem(video);
+    return getParentURLFromURL(video->mrl());
 }

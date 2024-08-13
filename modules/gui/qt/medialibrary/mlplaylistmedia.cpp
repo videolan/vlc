@@ -30,15 +30,6 @@
 MLPlaylistMedia::MLPlaylistMedia(const vlc_ml_media_t * data)
     : MLMedia(data)
 {
-    for (const vlc_ml_file_t & file : ml_range_iterate<vlc_ml_file_t>(data->p_files))
-    {
-        if (file.i_type != VLC_ML_FILE_TYPE_MAIN)
-            continue;
-
-        //FIXME: Should we store every mrl ?
-        m_mrl = QUrl::fromEncoded(file.psz_mrl);
-    }
-
     unsigned int width  = 0;
     unsigned int height = 0;
 
@@ -100,15 +91,9 @@ bool MLPlaylistMedia::isNew() const
     return (m_playCount == 1 && m_progress <= 0);
 }
 
-vlc_ml_media_type_t MLPlaylistMedia::getType() const
-{
-    return m_type;
-}
-
-
 void MLPlaylistMedia::setSmallCover(const QString& thumbnail, vlc_ml_thumbnail_status_t status)
 {
-    m_smallCover = { thumbnail, status };
+    m_smallThumbnail = { thumbnail, status };
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -126,11 +111,6 @@ QString MLPlaylistMedia::getChannel() const
 }
 
 //-------------------------------------------------------------------------------------------------
-
-QString MLPlaylistMedia::getMRL() const
-{
-    return m_mrl.toEncoded();
-}
 
 QString MLPlaylistMedia::getMRLDisplay() const
 {

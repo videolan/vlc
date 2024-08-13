@@ -329,7 +329,7 @@ QVariant MLPlaylistModel::itemRoleData(const MLItem *item, int role) const /* ov
         {
             vlc_ml_thumbnail_status_t status;
             QString thumbnail = media->smallCover(&status);
-            if ((media->getType() == VLC_ML_MEDIA_TYPE_VIDEO)
+            if ((media->type() == VLC_ML_MEDIA_TYPE_VIDEO)
                 && (status == VLC_ML_THUMBNAIL_STATUS_MISSING
                     || status == VLC_ML_THUMBNAIL_STATUS_FAILURE))
             {
@@ -349,7 +349,7 @@ QVariant MLPlaylistModel::itemRoleData(const MLItem *item, int role) const /* ov
         case MEDIA_CHANNEL:
             return QVariant::fromValue(media->getChannel());
         case MEDIA_MRL:
-            return QVariant::fromValue(media->getMRL());
+            return QVariant::fromValue(media->mrl());
         case MEDIA_DISPLAY_MRL:
             return QVariant::fromValue(media->getMRLDisplay());
         case MEDIA_VIDEO_TRACK:

@@ -182,5 +182,5 @@ MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId)
 /* Q_INVOKABLE */ QUrl MLAlbumTrackModel::getParentURL(const QModelIndex &index)
 {
     MLAlbumTrack *ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
-    return getParentURLFromMLItem(ml_track);
+    return getParentURLFromURL(ml_track->getMRL());
 }

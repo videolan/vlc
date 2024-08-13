@@ -35,6 +35,13 @@ QString urlToDisplayString(const QUrl &url)
     return displayString;
 }
 
+QUrl getParentURLFromURL(const QString &mrl)
+{
+    QUrl fileUrl(mrl);
+    QUrl parentDirUrl = fileUrl.adjusted(QUrl::RemoveFilename);
+    return parentDirUrl;
+}
+
 QString getFirstSymbol(const QString &str)
 {
     QString ret("#");

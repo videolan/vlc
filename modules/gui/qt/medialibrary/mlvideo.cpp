@@ -80,26 +80,13 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
 
     m_isNew = (m_playCount == 0 && m_progress <= 0);
 
-    m_isFavorite = data->b_is_favorite;
-
-    for( const vlc_ml_file_t& file: ml_range_iterate<vlc_ml_file_t>( data->p_files ) )
-        if( file.i_type == VLC_ML_FILE_TYPE_MAIN )
-        {
-            //FIXME should we store every mrl
-            m_mrl = QUrl::fromEncoded(file.psz_mrl);
-
-            m_fileName = QUrl(m_mrl).fileName();
-
-            break;
-        }
-
     unsigned int numChannel = 0 , maxWidth = 0 , maxHeight = 0;
     for( const vlc_ml_media_track_t& track: ml_range_iterate<vlc_ml_media_track_t>( data->p_tracks ) ) {
         if ( track.i_type == VLC_ML_TRACK_TYPE_AUDIO ) {
             numChannel = std::max( numChannel , track.a.i_nbChannels );
 
-            m_audioDesc.push_back( { QString::fromUtf8( track.psz_codec ) ,
-                                     QString::fromUtf8( track.psz_language  ) ,
+            m_audioDesc.push_back( { qfu( track.psz_codec ) ,
+                                     qfu( track.psz_language  ) ,
                                      track.a.i_nbChannels ,
                                      track.a.i_sampleRate }
                                  );
@@ -108,8 +95,8 @@ MLVideo::MLVideo(const vlc_ml_media_t* data)
             maxWidth = std::max( maxWidth, track.v.i_width );
             maxHeight = std::max( maxHeight, track.v.i_height );
 
-            m_videoDesc.push_back( { QString::fromUtf8( track.psz_codec ) ,
-                                     QString::fromUtf8( track.psz_language ) ,
+            m_videoDesc.push_back( { qfu( track.psz_codec ) ,
+                                     qfu( track.psz_language ) ,
                                      track.v.i_fpsNum }
                                  );
         } else if ( track.i_type == VLC_ML_TRACK_TYPE_SUBTITLE )
@@ -149,24 +136,9 @@ void MLVideo::setIsNew(bool isNew)
     m_isNew = isNew;
 }
 
-bool MLVideo::isFavorite() const
-{
-    return m_isFavorite;
-}
-
-void MLVideo::setIsFavorite(bool isFavorite)
-{
-    m_isFavorite = isFavorite;
-}
-
 void MLVideo::setSmallCover(vlc_ml_thumbnail_status_t status, QString mrl)
 {
-    m_smallCover = {mrl, status};
-}
-
-QString MLVideo::getMRL() const
-{
-    return m_mrl.toEncoded();
+    m_smallThumbnail = {mrl, status};
 }
 
 QString MLVideo::getDisplayMRL() const

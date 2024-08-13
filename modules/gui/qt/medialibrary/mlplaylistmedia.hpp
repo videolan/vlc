@@ -29,13 +29,8 @@
 // NOTE: We need that header for VideoDescription and AudioDescription.
 #include "mlvideo.hpp"
 
-class VLCTick;
-
 // Qt includes
 #include <QUrl>
-
-// Forward declarations
-struct vlc_medialibrary_t;
 
 class MLPlaylistMedia : public MLMedia
 {
@@ -45,15 +40,12 @@ public:
 public: // Interface
     bool isNew() const;
 
-    vlc_ml_media_type_t getType() const;
-
     void setSmallCover(const QString& thumbnail, vlc_ml_thumbnail_status_t status);
 
     QString getResolutionName() const;
 
     QString getChannel() const;
 
-    QString getMRL       () const;
     QString getMRLDisplay() const;
 
     QList<VideoDescription> getVideo() const;
@@ -61,11 +53,8 @@ public: // Interface
 
 private:
     // Properties
-    vlc_ml_media_type_t m_type;
-
     QString m_resolution;
     QString m_channel;
-    QUrl m_mrl;
     QList<VideoDescription> m_video;
     QList<AudioDescription> m_audio;
 };

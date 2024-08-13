@@ -26,23 +26,15 @@
 
 #include "qt.hpp"
 #include "mlqmltypes.hpp"
+#include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 
 #include <QObject>
+#include <QDateTime>
+#include <QTimeZone>
 
 class MLMedia : public MLItem
 {
-    Q_GADGET
-
-    Q_PROPERTY(MLItemId id READ getId CONSTANT)
-    Q_PROPERTY(QString title READ title CONSTANT FINAL)
-    Q_PROPERTY(QString fileName READ fileName CONSTANT FINAL)
-    Q_PROPERTY(QString smallCover READ smallCover CONSTANT FINAL)
-    Q_PROPERTY(QString bannerCover READ bannerCover CONSTANT FINAL)
-    Q_PROPERTY(VLCTick duration READ duration CONSTANT FINAL)
-    Q_PROPERTY(qreal progress READ progress CONSTANT FINAL)
-    Q_PROPERTY(int playCount READ playCount CONSTANT FINAL)
-
 public:
     MLMedia() : MLItem {MLItemId()} {}
 
@@ -57,38 +49,54 @@ public:
 
             return MLThumbnail{ mrl, thumbnail.i_status };
         };
+        const auto getMRL = [&media]
+        {
+            for (const vlc_ml_file_t &file: ml_range_iterate<vlc_ml_file_t>(media->p_files))
+                // FIXME: should we store every mrl?
+                if (file.i_type == VLC_ML_FILE_TYPE_MAIN)
+                    return QUrl::fromEncoded(file.psz_mrl);
+            return QUrl();
+        };
 
         m_title = qfu(media->psz_title);
         m_fileName = qfu(media->psz_filename);
-        m_smallCover = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_SMALL]);
-        m_bannerCover = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_BANNER]);
+        m_smallThumbnail = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_SMALL]);
+        m_bannerThumbnail = getThumbnail(media->thumbnails[VLC_ML_THUMBNAIL_BANNER]);
         m_duration = VLCTick::fromMS(media->i_duration);
         m_progress = media->f_progress;
         m_playCount = media->i_playcount;
+        m_mrl = getMRL();
+        m_type = media->i_type;
+        m_isFavorite = media->b_is_favorite;
+        m_lastPlayedDate = QDateTime::fromSecsSinceEpoch(media->i_last_played_date, QTimeZone::systemTimeZone());
     }
 
     QString title() const { return m_title; }
     QString fileName() const { return m_fileName; }
-    VLCTick duration() const {  return m_duration; }
+    VLCTick duration() const { return m_duration; }
     qreal progress() const { return m_progress; }
     int playCount() const { return m_playCount; }
+    QString mrl() const { return m_mrl.toEncoded(); }
+    vlc_ml_media_type_t type() const { return m_type; }
+    bool isFavorite() const { return m_isFavorite; }
+    void setIsFavorite(const bool isFavorite) { m_isFavorite = isFavorite; }
+    QDateTime lastPlayedDate() const { return m_lastPlayedDate; }
 
     QString smallCover(vlc_ml_thumbnail_status_t* status = nullptr) const
     {
-        if (status) *status = m_smallCover.status;
-        return m_smallCover.mrl;
+        if (status) *status = m_smallThumbnail.status;
+        return m_smallThumbnail.mrl;
     }
 
     QString bannerCover(vlc_ml_thumbnail_status_t* status = nullptr) const
     {
-        if (status) *status = m_bannerCover.status;
-        return m_bannerCover.mrl;
+        if (status) *status = m_bannerThumbnail.status;
+        return m_bannerThumbnail.mrl;
     }
 
     VLCTick progressTime() const { return VLCTick::fromMS(m_duration * m_progress); }
 
     Q_INVOKABLE bool valid() const { return getId().id != INVALID_MLITEMID_ID; }
-
 
 protected:
     struct MLThumbnail
@@ -99,10 +107,13 @@ protected:
 
     QString m_title;
     QString m_fileName;
-    MLThumbnail m_smallCover;
-    MLThumbnail m_bannerCover;
+    MLThumbnail m_smallThumbnail;
+    MLThumbnail m_bannerThumbnail;
     VLCTick m_duration;
     qreal m_progress;
     int m_playCount;
+    QUrl m_mrl;
+    vlc_ml_media_type_t m_type;
+    bool m_isFavorite;
+    QDateTime m_lastPlayedDate;
 };
-
