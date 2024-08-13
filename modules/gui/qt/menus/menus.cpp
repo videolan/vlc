@@ -347,6 +347,13 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> pl
     action->setCheckable( true );
     action->setChecked( mi->interfaceVisibility() == QWindow::FullScreen );
 
+    /*Minimal View*/
+    action = menu->addAction( qtr( "&Minimal View" ) );
+    action->setShortcut(QString( "Ctrl+H" ));
+    action->setCheckable( true );
+    connect( action, &QAction::triggered, mi, &MainCtx::setMinimalView );
+    action->setChecked( mi->isMinimalView() );
+
     action = menu->addAction( qtr( "&View Items as Grid" ), mi,
             &MainCtx::setGridView );
     action->setCheckable( true );
