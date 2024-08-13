@@ -43,4 +43,9 @@ Widgets.IconToolButton {
         onAboutToShow: menuBtn.requestLockUnlockAutoHide(true)
         onAboutToHide: menuBtn.requestLockUnlockAutoHide(false)
     }
+
+    function forceUnlock() {
+        if(contextMenu)
+            contextMenu.close()
+    }
 }

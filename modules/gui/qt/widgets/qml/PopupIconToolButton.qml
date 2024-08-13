@@ -37,7 +37,6 @@ Widgets.IconToolButton {
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
-
     signal menuOpened(var menu)
 
     // Settings
@@ -113,5 +112,9 @@ Widgets.IconToolButton {
             // NOTE: The opacity should be stronger on a light background for readability.
             color: popupTheme.bg.primary.alpha(popupTheme.palette.isDark ? 0.8 : 0.96)
         }
+    }
+
+    function forceUnlock () {
+        popup.close()
     }
 }

@@ -28,6 +28,10 @@ Widgets.ComboBoxExt {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    function forceUnlock () {
+        combo.popup.close()
+    }
+
     width: VLCStyle.combobox_width_normal
     height: VLCStyle.combobox_height_normal
     textRole: "display"

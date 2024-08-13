@@ -38,7 +38,6 @@ Widgets.IconToolButton {
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
-
     signal menuOpened(var menu)
 
     // Settings
@@ -73,16 +72,19 @@ Widgets.IconToolButton {
 
             onOpened: {
                 root.requestLockUnlockAutoHide(true)
-
                 root.menuOpened(menu)
             }
 
             onClosed: {
                 root.requestLockUnlockAutoHide(false)
                 root.forceActiveFocus()
-
                 root.menuOpened(null)
             }
         }
+    }
+
+    function forceUnlock() {
+        if((menuLoader)&&(menuLoader.item))
+            menuLoader.item.close()
     }
 }

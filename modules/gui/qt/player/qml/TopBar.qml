@@ -70,6 +70,9 @@ FocusScope{
     signal requestLockUnlockAutoHide(bool lock)
     signal backRequested()
 
+    ///incomming signal to request all menu and popup to close
+    signal forceUnlock()
+
     // Settings
 
     Accessible.name: qsTr("Player topbar")
@@ -444,6 +447,14 @@ FocusScope{
 
                 onAboutToShow: root.requestLockUnlockAutoHide(true)
                 onAboutToHide: root.requestLockUnlockAutoHide(false)
+            }
+
+            Connections {
+                target: root
+
+                function onForceUnlock() {
+                    contextMenu.close()
+                }
             }
         }
 

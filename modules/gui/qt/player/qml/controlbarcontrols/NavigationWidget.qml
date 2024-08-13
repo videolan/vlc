@@ -135,6 +135,10 @@ Templates.Pane {
             Navigation.rightItem: loaderC.item
 
             onLoaded: _applyItemLock(loaderB, item)
+
+            function forceUnlock() {
+                loaderB.item.close()
+            }
         }
 
         Loader {
@@ -157,6 +161,10 @@ Templates.Pane {
                                                 : loaderA.item
 
             onLoaded: _applyItemLock(loaderC, item)
+
+            function forceUnlock() {
+                loaderC.item.close()
+            }
         }
     }
 }

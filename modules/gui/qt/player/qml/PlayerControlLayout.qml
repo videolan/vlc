@@ -51,8 +51,9 @@ FocusScope {
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
-
     signal menuOpened(var menu)
+    ///incomming signal to request all menu and popup to close
+    signal forceUnlock()
 
     // Settings
 
@@ -112,6 +113,7 @@ FocusScope {
                 Component.onCompleted: {
                     requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
                     menuOpened.connect(playerControlLayout.menuOpened)
+                    playerControlLayout.forceUnlock.connect(leftRepeater.forceUnlock)
                 }
             }
 
@@ -158,8 +160,10 @@ FocusScope {
                 Component.onCompleted: {
                     requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
                     menuOpened.connect(playerControlLayout.menuOpened)
+                    playerControlLayout.forceUnlock.connect(rightRepeater.forceUnlock)
                 }
             }
+
         }
     }
 
@@ -183,6 +187,8 @@ FocusScope {
         focus: active
 
         sourceComponent: ControlLayout {
+            id: leftControlLayout
+
             model: ControlListFilter {
                 sourceModel: playerControlLayout.model.left
 
@@ -204,6 +210,7 @@ FocusScope {
             Component.onCompleted: {
                 requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
                 menuOpened.connect(playerControlLayout.menuOpened)
+                playerControlLayout.forceUnlock.connect(leftControlLayout.forceUnlock)
             }
         }
     }
@@ -244,6 +251,8 @@ FocusScope {
         }
 
         sourceComponent: ControlLayout {
+            id: centerControlLayout
+
             model: ControlListFilter {
                 sourceModel: playerControlLayout.model.center
 
@@ -264,6 +273,7 @@ FocusScope {
             Component.onCompleted: {
                 requestLockUnlockAutoHide.connect(playerControlLayout.requestLockUnlockAutoHide)
                 menuOpened.connect(playerControlLayout.menuOpened)
+                playerControlLayout.forceUnlock.connect(centerControlLayout.forceUnlock)
             }
         }
     }
@@ -285,6 +295,8 @@ FocusScope {
                 !loaderLeftRight.active
 
         sourceComponent: ControlLayout {
+            id: rightControlLayout
+
             model: ControlListFilter {
                 sourceModel: playerControlLayout.model.right
 
@@ -306,6 +318,10 @@ FocusScope {
             onRequestLockUnlockAutoHide: (lock) => playerControlLayout.requestLockUnlockAutoHide(lock)
 
             onMenuOpened: (menu) => playerControlLayout.menuOpened(menu)
+
+            Component.onCompleted:{
+                playerControlLayout.forceUnlock.connect(rightControlLayout.forceUnlock)
+            }
         }
     }
 }

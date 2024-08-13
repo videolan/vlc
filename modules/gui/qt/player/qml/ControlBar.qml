@@ -57,6 +57,9 @@ T.Pane {
 
     signal requestLockUnlockAutoHide(bool lock)
 
+    ///incomming signal to request all menu and popup to close
+    signal forceUnlock()
+
     enabled: visible
 
     Keys.priority: Keys.AfterItem
@@ -253,6 +256,10 @@ T.Pane {
             onRequestLockUnlockAutoHide: (lock) => root.requestLockUnlockAutoHide(lock)
 
             onMenuOpened: (menu) => root.applyMenu(menu)
+
+            Component.onCompleted: {
+                root.forceUnlock.connect(playerControlLayout.forceUnlock)
+            }
         }
     }
 }

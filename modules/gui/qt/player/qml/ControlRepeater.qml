@@ -31,6 +31,8 @@ Repeater {
 
     signal requestLockUnlockAutoHide(bool lock)
     signal menuOpened(var menu)
+    ///incomming signal to request all menu and popup to close
+    signal forceUnlock()
 
     // NOTE: We apply the 'navigation chain' after adding the item.
     onItemAdded: (index, item) => {
@@ -109,6 +111,9 @@ Repeater {
 
             if (item.menuOpened)
                 item.menuOpened.connect(repeater.menuOpened)
+
+            if (item.forceUnlock)
+                repeater.forceUnlock.connect(item.forceUnlock)
 
             //can't connect to enabledChanged in a Connections
             item.onEnabledChanged.connect(() => {

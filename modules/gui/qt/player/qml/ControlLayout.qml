@@ -101,8 +101,9 @@ FocusScope {
     // Signals
 
     signal requestLockUnlockAutoHide(bool lock)
-
     signal menuOpened(var menu)
+    ///incomming signal to request all menu and popup to close
+    signal forceUnlock()
 
     // Settings
 
@@ -162,6 +163,7 @@ FocusScope {
             Component.onCompleted: {
                 requestLockUnlockAutoHide.connect(controlLayout.requestLockUnlockAutoHide)
                 menuOpened.connect(controlLayout.menuOpened)
+                controlLayout.forceUnlock.connect(repeater.forceUnlock)
             }
         }
 
