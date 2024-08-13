@@ -66,6 +66,8 @@ dvdnav_status_t dvdnav_jump_to_sector_by_time(dvdnav_t *, uint64_t, int32_t);
 
 #include "disc_helper.h"
 
+#define PS_SPU_ID_OFFSET  0xbd20
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -971,7 +973,7 @@ static int Demux( demux_t *p_demux )
             for( int i = 0; i < 0x1f; i++ )
             {
                 if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
-                    ESNew( p_demux, 0xbd20 + i );
+                    ESNew( p_demux, PS_SPU_ID_OFFSET + i );
             }
             /* END HACK */
         }
@@ -999,7 +1001,7 @@ static int Demux( demux_t *p_demux )
         for( i = 0; i < 0x1f; i++ )
         {
             if( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i ) != 0xffff )
-                ESNew( p_demux, 0xbd20 + i );
+                ESNew( p_demux, PS_SPU_ID_OFFSET + i );
         }
         /* END HACK */
         break;
@@ -1418,9 +1420,9 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     /* dvdnav_get_active_spu_stream sets (in)visibility flag as 0xF0 */
     if( i_spu >= 0 && i_spu <= 0x1f )
     {
-        ps_track_t *tk = &p_sys->tk[ps_id_to_tk(0xbd20 + i_spu)];
+        ps_track_t *tk = &p_sys->tk[ps_id_to_tk(PS_SPU_ID_OFFSET + i_spu)];
 
-        ESNew( p_demux, 0xbd20 + i_spu );
+        ESNew( p_demux, PS_SPU_ID_OFFSET + i_spu );
 
         /* be sure to unselect it (reset) */
         if( tk->es )
@@ -1444,7 +1446,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
     {
         for( i_spu = 0; i_spu <= 0x1F; i_spu++ )
         {
-            ps_track_t *tk = &p_sys->tk[ps_id_to_tk(0xbd20 + i_spu)];
+            ps_track_t *tk = &p_sys->tk[ps_id_to_tk(PS_SPU_ID_OFFSET + i_spu)];
             if( tk->es )
             {
                 es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES_STATE, tk->es,
