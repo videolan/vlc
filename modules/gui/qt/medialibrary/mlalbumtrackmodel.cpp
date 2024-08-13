@@ -36,26 +36,26 @@ QVariant MLAlbumTrackModel::itemRoleData(const MLItem *item, const int role) con
     case TRACK_ID:
         return QVariant::fromValue( ml_track->getId() );
     case TRACK_TITLE:
-        return QVariant::fromValue( ml_track->getTitle() );
+        return QVariant::fromValue( ml_track->title() );
     case TRACK_COVER:
-        return QVariant::fromValue( ml_track->getCover() );
+        return QVariant::fromValue( ml_track->smallCover() );
     case TRACK_NUMBER:
         return QVariant::fromValue( ml_track->getTrackNumber() );
     case TRACK_DISC_NUMBER:
         return QVariant::fromValue( ml_track->getDiscNumber() );
     case TRACK_IS_LOCAL:
     {
-        QUrl trackUrl(ml_track->getMRL());
+        QUrl trackUrl(ml_track->mrl());
         return QVariant::fromValue( trackUrl.isLocalFile() );
     }
     case TRACK_DURATION :
-        return QVariant::fromValue( ml_track->getDuration() );
+        return QVariant::fromValue( ml_track->duration() );
     case TRACK_ALBUM:
         return QVariant::fromValue( ml_track->getAlbumTitle() );
     case TRACK_ARTIST:
         return QVariant::fromValue( ml_track->getArtist() );
     case TRACK_TITLE_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( ml_track->getTitle() ) );
+        return QVariant::fromValue( getFirstSymbol( ml_track->title() ) );
     case TRACK_ALBUM_FIRST_SYMBOL:
         return QVariant::fromValue( getFirstSymbol( ml_track->getAlbumTitle() ) );
     case TRACK_ARTIST_FIRST_SYMBOL:
@@ -182,5 +182,5 @@ MLAlbumTrackModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId)
 /* Q_INVOKABLE */ QUrl MLAlbumTrackModel::getParentURL(const QModelIndex &index)
 {
     MLAlbumTrack *ml_track = static_cast<MLAlbumTrack *>(item(index.row()));
-    return getParentURLFromURL(ml_track->getMRL());
+    return getParentURLFromURL(ml_track->mrl());
 }
