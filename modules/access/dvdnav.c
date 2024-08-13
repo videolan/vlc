@@ -1585,7 +1585,7 @@ static void ESNew( demux_t *p_demux, int i_id )
     demux_sys_t *p_sys = p_demux->p_sys;
     ps_track_t  *tk = &p_sys->tk[ps_id_to_tk(i_id)];
     bool  b_select = false;
-    int i_lang = 0xffff;
+    uint16_t i_lang = 0xffff;
 
     if( tk->b_configured ) return;
 
@@ -1656,8 +1656,7 @@ static void ESNew( demux_t *p_demux, int i_id )
         tk->fmt.psz_language = malloc( 3 );
         if( tk->fmt.psz_language )
         {
-            tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
-            tk->fmt.psz_language[1] = (i_lang     )&0xff;
+            SetWBE(tk->fmt.psz_language, i_lang);
             tk->fmt.psz_language[2] = 0;
         }
     }
