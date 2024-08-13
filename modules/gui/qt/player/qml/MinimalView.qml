@@ -58,7 +58,7 @@ Rectangle {
         id: tapNDrag
 
         anchors.fill: parent
-        active: root._showCSD
+        active: minimalViewRec._showCSD
         source: "qrc:///qt/qml/VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
     }
 

@@ -22,7 +22,6 @@ import QtQml.Models
 import Qt5Compat.GraphicalEffects
 import QtQuick.Window
 
-
 import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
@@ -52,17 +51,9 @@ FocusScope {
             VLCStyle.noArtVideoCover
         else
             VLCStyle.noArtAlbumCover
-
     }
 
     // Private
-
-    property int _lockAutoHide: 0
-
-    readonly property bool _autoHide: _lockAutoHide == 0
-                                      && rootPlayer.hasEmbededVideo
-                                      && Player.hasVideoOutput
-                                      && playlistpopup.state !== "visible"
 
     property bool _controlsUnderVideo: (MainCtx.pinVideoControls
                                         &&
@@ -102,23 +93,11 @@ FocusScope {
 
         _keyPressed = false
 
-        if (event.key === Qt.Key_Menu) {
-            toolbarAutoHide.toggleForceVisible()
-        } else {
-            rootPlayer.Navigation.defaultKeyReleaseAction(event)
-        }
-    }
-
-
-    on_AutoHideChanged: {
-        if (_autoHide)
-            toolbarAutoHide.restart()
+        rootPlayer.Navigation.defaultKeyReleaseAction(event)
     }
 
     on_ControlsUnderVideoChanged: {
         lockUnlockAutoHide(_controlsUnderVideo)
-        if (_controlsUnderVideo)
-            toolbarAutoHide.setVisibleControlBar(true)
     }
 
     Connections {
@@ -132,21 +111,21 @@ FocusScope {
     // Functions
 
     function lockUnlockAutoHide(lock) {
-        _lockAutoHide += lock ? 1 : -1;
-        console.assert(_lockAutoHide >= 0)
+        if (lock) {
+            playerToolbarVisibilityFSM.lock()
+        } else {
+            playerToolbarVisibilityFSM.unlock()
+        }
     }
 
     // Private
 
     function _onNavigationCancel() {
-        if (rootPlayer.hasEmbededVideo && controlBar.state === "visible") {
-            toolbarAutoHide.setVisibleControlBar(false)
-        } else {
-            if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
-               MainPlaylistController.stop()
-            }
-            History.previous()
+        if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
+            MainPlaylistController.stop()
         }
+
+        History.previous()
     }
 
     //we draw both the view and the window here
@@ -161,16 +140,18 @@ FocusScope {
         colorSet: ColorContext.Window
     }
 
+    PlayerToolbarVisibilityFSM {
+        id: playerToolbarVisibilityFSM
+
+        onForceUnlock:{
+            controlBar.forceUnlock()
+
+            topBar.forceUnlock()
+        }
+    }
+
     PlayerPlaylistVisibilityFSM {
         id: playlistVisibility
-
-        onShowPlaylist: {
-            MainCtx.playlistVisible = true
-        }
-
-        onHidePlaylist: {
-            MainCtx.playlistVisible = false
-        }
     }
 
     Connections {
@@ -185,6 +166,14 @@ FocusScope {
         }
         function onHasEmbededVideoChanged() {
             playlistVisibility.updateVideoEmbed()
+            playerToolbarVisibilityFSM.updateVideoEmbed()
+        }
+        function onMinimalViewChanged() {
+            playlistVisibility.updateMinimalView()
+            playerToolbarVisibilityFSM.updateMinimalView()
+        }
+        function onAskShow() {
+            playerToolbarVisibilityFSM.askShow()
         }
     }
 
@@ -201,13 +190,14 @@ FocusScope {
 
         onMouseMoved: {
             //short interval for mouse events
-            if (Player.isInteractive)
+            if ((Player.isInteractive) || (MainCtx.minimalView))
             {
                 toggleControlBarButtonAutoHide.restart()
                 videoSurface.cursorShape = Qt.ArrowCursor
             }
+
             else
-                toolbarAutoHide.setVisible(1000)
+                playerToolbarVisibilityFSM.mouseMove();
         }
     }
 
@@ -317,6 +307,8 @@ FocusScope {
             return controlBar
         }
 
+        state: (playerToolbarVisibilityFSM.started && playerToolbarVisibilityFSM.isVisible) ? "visible" : "hidden"
+
         onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
         onRequestLockUnlockAutoHide: (lock) => {
@@ -348,6 +340,11 @@ FocusScope {
             tintColor: windowTheme.bg.primary
 
             visible: MainCtx.pinVideoControls
+        }
+
+        onStateChanged: {
+            videoSurface.cursorShape = state === "visible"
+                                       ? Qt.ArrowCursor : Qt.BlankCursor
         }
     }
 
@@ -390,7 +387,6 @@ FocusScope {
         ColumnLayout {
             anchors.centerIn: parent
             spacing: 0
-
 
             Item {
                 id: coverItem
@@ -591,10 +587,7 @@ FocusScope {
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
 
-        Binding on state {
-            when: playlistVisibility.started
-            value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
-        }
+        state: (playlistVisibility.started && playlistVisibility.isPlaylistVisible) ? "visible" : "hidden"
 
         component: PlaylistListView {
             id: playlistView
@@ -679,10 +672,6 @@ FocusScope {
                 }
             }
         }
-        onStateChanged: {
-            if (state === "hidden")
-                toolbarAutoHide.restart()
-        }
     }
 
     Dialogs {
@@ -751,7 +740,7 @@ FocusScope {
         }
     }
 
-   Widgets.ButtonExt {
+    Widgets.ButtonExt {
         id: toggleControlBarButton
         visible: Player.isInteractive
                  && rootPlayer.hasEmbededVideo
@@ -770,8 +759,8 @@ FocusScope {
         Navigation.upItem: playlistVisibility.isPlaylistVisible ? playlistpopup : (audioControls.visible ? audioControls : topBar)
         Navigation.downItem: controlBar
 
-        onClicked: {
-            toolbarAutoHide.toggleForceVisible();
+        onClicked:{
+            playerToolbarVisibilityFSM.askShow();
         }
     }
 
@@ -816,6 +805,11 @@ FocusScope {
             return topBar
         }
 
+        Binding on state {
+            when: playerToolbarVisibilityFSM.started
+            value: playerToolbarVisibilityFSM.isVisible ? "visible" : "hidden"
+        }
+
         onRequestLockUnlockAutoHide: (lock) => rootPlayer.lockUnlockAutoHide(lock)
 
         identifier: (Player.hasVideoOutput) ? PlayerControlbarModel.Videoplayer
@@ -837,64 +831,47 @@ FocusScope {
             target: controlBar
         }
     }
+    
+    MinimalView {
+        id: minimalView
 
-    Timer {
-        id: toolbarAutoHide
-        running: true
-        repeat: false
-        interval: 3000
-        onTriggered: {
-            setVisibleControlBar(false)
-        }
+        focus: true
+        visible: MainCtx.minimalView && !hasEmbededVideo
+        anchors.fill: parent
+    }
 
-        function setVisibleControlBar(visible) {
-            if (visible)
-            {
-                controlBar.state = "visible"
-                topBar.state = "visible"
-                if (!controlBar.focus && !topBar.focus)
-                    controlBar.forceActiveFocus()
+    QmlAudioContextMenu {
+        id: audioContextMenu
 
-                videoSurface.cursorShape = Qt.ArrowCursor
-            }
-            else
-            {
-                if (!rootPlayer._autoHide)
-                    return;
-                controlBar.state = "hidden"
-                topBar.state = "hidden"
-                videoSurface.forceActiveFocus()
-                videoSurface.cursorShape = Qt.BlankCursor
+        ctx: MainCtx
+    }
+
+    TapHandler {
+        acceptedButtons: Qt.RightButton
+        enabled: !hasEmbededVideo
+
+        onTapped: (eventPoint, button) => {
+            if (button & Qt.RightButton) {
+                audioContextMenu.popup(eventPoint.globalPosition)
             }
         }
-
-        function setVisible(duration) {
-            setVisibleControlBar(true)
-            toolbarAutoHide.interval = duration
-            toolbarAutoHide.restart()
-        }
-
-        function toggleForceVisible() {
-            setVisibleControlBar(controlBar.state !== "visible")
-            toolbarAutoHide.stop()
-        }
-
     }
 
     //filter key events to keep toolbar
     //visible when user navigates within the control bar
     KeyEventFilter {
-        id: filter
-        target: MainCtx.intfMainWindow
-        enabled: controlBar.state === "visible"
-                 && (controlBar.focus || topBar.focus)
-        Keys.onPressed: (event) => toolbarAutoHide.setVisible(5000)
-    }
+    id: filter
+    target: MainCtx.intfMainWindow
 
-    Connections {
-        target: MainCtx
-        function onAskShow() {
-            toolbarAutoHide.toggleForceVisible()
+        Keys.onPressed: (event) => {
+            if ((Player.isInteractive) || (MainCtx.minimalView))
+            {
+                toggleControlBarButtonAutoHide.restart()
+                videoSurface.cursorShape = Qt.ArrowCursor
+            }
+
+            else
+                playerToolbarVisibilityFSM.keyboardMove()
         }
     }
 }
