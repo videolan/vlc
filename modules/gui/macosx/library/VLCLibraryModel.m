@@ -85,6 +85,7 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
     dispatch_queue_t _albumCacheModificationQueue;
     dispatch_queue_t _artistCacheModificationQueue;
     dispatch_queue_t _genreCacheModificationQueue;
+    dispatch_queue_t _groupCacheModificationQueue;
     dispatch_queue_t _playlistCacheModificationQueue;
 }
 
@@ -236,6 +237,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _albumCacheModificationQueue = dispatch_queue_create("albumCacheModificationQueue", 0);
         _artistCacheModificationQueue = dispatch_queue_create("artistCacheModificationQueue", 0);
         _genreCacheModificationQueue = dispatch_queue_create("genreCacheModificationQueue", 0);
+        _groupCacheModificationQueue = dispatch_queue_create("groupCacheModificationQueue", 0);
         _playlistCacheModificationQueue = dispatch_queue_create("playlistCacheModificationQueue", 0);
 
         _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
