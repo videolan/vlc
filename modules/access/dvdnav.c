@@ -1428,7 +1428,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
         if( tk->es )
         {
             es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES_STATE, tk->es,
-                            (bool)false );
+                            false );
 
             /* now select it */
             es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES, tk->es );
@@ -1450,7 +1450,7 @@ static void ESSubtitleUpdate( demux_t *p_demux )
             if( tk->es )
             {
                 es_out_Control( p_sys->p_tf_out, ES_OUT_SET_ES_STATE, tk->es,
-                                (bool)false );
+                                false );
             }
         }
     }
