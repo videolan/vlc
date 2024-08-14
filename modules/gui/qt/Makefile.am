@@ -225,6 +225,8 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlvideofoldersmodel.hpp \
 	medialibrary/mlvideogroupsmodel.cpp \
 	medialibrary/mlvideogroupsmodel.hpp \
+	medialibrary/mlmediamodel.cpp \
+	medialibrary/mlmediamodel.hpp \
 	medialibrary/mlvideomodel.cpp \
 	medialibrary/mlvideomodel.hpp \
 	medialibrary/mlplaylist.cpp \
@@ -444,6 +446,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/mlrecentsvideomodel.moc.cpp \
 	medialibrary/mlurlmodel.moc.cpp \
 	medialibrary/mlvideo.moc.cpp \
+	medialibrary/mlmediamodel.moc.cpp \
 	medialibrary/mlvideomodel.moc.cpp \
 	medialibrary/mlplaylistlistmodel.moc.cpp \
 	medialibrary/mlplaylistmodel.moc.cpp \
