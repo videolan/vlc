@@ -38,6 +38,60 @@ decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
         {
             {
+                Style::EMPTY_STYLE,
+                N_("Empty Style"),
+                {
+                    {
+                        PlayerControlbarModel::Videoplayer,
+                        {
+                            {
+                                {
+
+                                },
+                                {
+
+                                },
+                                {
+
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Audioplayer,
+                        {
+                            {
+                                {
+
+                                },
+                                {
+
+                                },
+                                {
+
+                                }
+                            }
+                        }
+                    },
+                    {
+                        PlayerControlbarModel::Miniplayer,
+                        {
+                            {
+                                {
+
+                                },
+                                {
+
+                                },
+                                {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {
                 Style::DEFAULT_STYLE,
                 N_("Default Style"),
                 {
@@ -437,6 +491,9 @@ void ControlbarProfileModel::insertDefaults()
     // Add default profiles:
     for (const auto& i : m_defaults)
     {
+        if (i.id == Style::EMPTY_STYLE)
+            continue;
+
         const auto ptrNewProfile = newProfile(qfut(i.name));
         if (!ptrNewProfile)
             continue;
