@@ -605,7 +605,9 @@ bool ControlbarProfileModel::insertRows(int row, int count, const QModelIndex &p
 
     for (int i = 0; i < count; ++i)
     {
-        const auto profile = new ControlbarProfile(this);
+        const auto profile = generateProfileFromStyle(Style::EMPTY_STYLE);
+        assert(profile);
+        profile->setParent(this);
         profile->setName(tr("Profile %1").arg(m_profiles.size()));
 
         m_profiles.insert(row, profile);
@@ -946,7 +948,9 @@ ControlbarProfile *ControlbarProfileModel::newProfile(const QString &name)
 
 ControlbarProfile *ControlbarProfileModel::newProfile()
 {
-    const auto ptrNewProfile = new ControlbarProfile(this);
+    const auto ptrNewProfile = generateProfileFromStyle(Style::EMPTY_STYLE);
+    assert(ptrNewProfile);
+    ptrNewProfile->setParent(this);
 
     beginInsertRows(QModelIndex(), m_profiles.size(), m_profiles.size());
 
