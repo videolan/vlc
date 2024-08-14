@@ -538,6 +538,7 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
             {
                 if (sys->external.cleanupDeviceCb)
                     sys->external.cleanupDeviceCb( sys->external.opaque );
+                msg_Err(obj, "Failed to setup external D3D11 device");
                 goto error;
             }
             hr = D3D11_CreateDeviceExternal(obj, static_cast<ID3D11DeviceContext*>(out.d3d11.device_context), out.d3d11.context_mutex,
@@ -556,14 +557,20 @@ d3d11_decoder_device_t *(D3D11_CreateDevice)(vlc_object_t *obj,
                 if (likely(hKernel32 != NULL))
                     isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
                 if (!isWin81OrGreater)
+                {
+                    msg_Dbg(obj, "D3D11 not forced on Win7/8");
                     goto error;
+                }
             }
 #endif
 
             hr = CreateDevice( obj, adapter, hw_decoding, &sys->dec_device.d3d_dev );
         }
         else
+        {
+            msg_Dbg(obj, "Unsupported engine type %d", engineType);
             goto error;
+        }
     }
 
 error:
