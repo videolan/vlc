@@ -1162,7 +1162,20 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
         return res;
 
     // look for any pixel format that we can handle
-    return GetDisplayFormatByDepth(vd, 0, 0, 0, 0, true, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
+    if (is_d3d11_opaque(fmt->i_chroma))
+    {
+        res = GetDisplayFormatByDepth(vd, 0, 0, 0, 0, true, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
+        if (res != nullptr)
+            return res;
+
+        if (!vd->obj.force)
+            // the source is hardware decoded but can't be handled
+            // let other display modules deal with it
+            return nullptr;
+        // fallthrough
+    }
+    // any format, even CPU ones
+    return GetDisplayFormatByDepth(vd, 0, 0, 0, 0, false, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
 }
 
 static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx, video_format_t *quad_fmt)
