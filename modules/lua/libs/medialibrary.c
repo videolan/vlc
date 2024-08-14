@@ -110,11 +110,11 @@ static void vlclua_ml_push_media( lua_State *L, const vlc_ml_media_t *media )
     if ( media->i_type != VLC_ML_MEDIA_TYPE_VIDEO )
         return;
 
-    const char* quality = NULL;
+    const char *quality = NULL;
     uint32_t maxChannels = 0;
     for ( size_t i = 0; i < media->p_tracks->i_nb_items; ++i )
     {
-        vlc_ml_media_track_t* track = &media->p_tracks->p_items[i];
+        vlc_ml_media_track_t *track = &media->p_tracks->p_items[i];
         if ( track->i_type == VLC_ML_TRACK_TYPE_VIDEO && quality == NULL )
         {
             uint32_t width = track->v.i_width > track->v.i_height ?
@@ -171,7 +171,7 @@ static void vlclua_ml_push_show( lua_State *L, const vlc_ml_show_t *show )
     lua_setfield( L, -2, "nbSeason" );
 }
 
-static void vlclua_ml_push_album( lua_State* L, const vlc_ml_album_t *album )
+static void vlclua_ml_push_album( lua_State *L, const vlc_ml_album_t *album )
 {
     lua_newtable( L );
     lua_pushinteger( L, album->i_id );
@@ -192,12 +192,12 @@ static void vlclua_ml_push_album( lua_State* L, const vlc_ml_album_t *album )
     lua_setfield( L, -2, "releaseYear" );
 }
 
-static void vlclua_ml_push_artist( lua_State* L, const vlc_ml_artist_t* artist )
+static void vlclua_ml_push_artist( lua_State *L, const vlc_ml_artist_t *artist )
 {
     lua_newtable( L );
     lua_pushinteger( L, artist->i_id );
     lua_setfield( L, -2, "id" );
-    lua_pushstring( L, artist->psz_name);
+    lua_pushstring( L, artist->psz_name );
     lua_setfield( L, -2, "name" );
     lua_pushboolean( L, artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE  );
     lua_setfield( L, -2, "hasThumbnail" );
@@ -207,7 +207,7 @@ static void vlclua_ml_push_artist( lua_State* L, const vlc_ml_artist_t* artist )
     lua_setfield( L, -2, "nbAlbums" );
 }
 
-static void vlclua_ml_push_genre( lua_State* L, const vlc_ml_genre_t* genre )
+static void vlclua_ml_push_genre( lua_State *L, const vlc_ml_genre_t *genre )
 {
     lua_newtable( L );
     lua_pushinteger( L, genre->i_id );
@@ -218,7 +218,7 @@ static void vlclua_ml_push_genre( lua_State* L, const vlc_ml_genre_t* genre )
     lua_setfield( L, -2, "nbTracks" );
 }
 
-static int vlclua_ml_list_media( lua_State* L, vlc_ml_media_list_t* list )
+static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
 {
     if ( list == NULL )
         return luaL_error( L, "Failed to list media" );
@@ -232,7 +232,7 @@ static int vlclua_ml_list_media( lua_State* L, vlc_ml_media_list_t* list )
     return 1;
 }
 
-static int vlclua_ml_list_show( lua_State* L, vlc_ml_show_list_t* list )
+static int vlclua_ml_list_show( lua_State *L, vlc_ml_show_list_t *list )
 {
     if ( list == NULL )
         return luaL_error( L, "Failed to list show" );
@@ -249,23 +249,23 @@ static int vlclua_ml_list_show( lua_State* L, vlc_ml_show_list_t* list )
 static void vlclua_ml_assign_params( lua_State *L, vlc_ml_query_params_t *params, uint8_t paramIndex )
 {
     *params = vlc_ml_query_params_create();
-    if (!lua_istable(L, paramIndex))
+    if (!lua_istable( L, paramIndex ))
         return;
-    lua_getfield(L, 1, "favorite_only" );
-    lua_getfield(L, 1, "limit" );
-    lua_getfield(L, 1, "offset" );
-    lua_getfield(L, 1, "desc" );
-    lua_getfield(L, 1, "sort" );
-    lua_getfield(L, 1, "pattern" );
-    
+    lua_getfield( L, 1, "favorite_only" );
+    lua_getfield( L, 1, "limit" );
+    lua_getfield( L, 1, "offset" );
+    lua_getfield( L, 1, "desc" );
+    lua_getfield( L, 1, "sort" );
+    lua_getfield( L, 1, "pattern" );
+
     //impose public_only to true until something is done about permissions
     params->b_public_only = true;
     params->b_favorite_only = lua_toboolean( L, -6 );
     params->i_nbResults = lua_tointeger( L, -5 );
     params->i_offset = lua_tointeger( L, -4 );
     params->b_desc = lua_toboolean( L, -3 );
-    params->i_sort = lua_tointeger(L, -2);
-    params->psz_pattern = lua_tostring(L, -1);
+    params->i_sort = lua_tointeger( L, -2);
+    params->psz_pattern = lua_tostring( L, -1);
 }
 
 static int vlclua_ml_video( lua_State *L )
@@ -273,8 +273,8 @@ static int vlclua_ml_video( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_media_list_t* list = vlc_ml_list_video_media( ml, &params );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_list_t *list = vlc_ml_list_video_media( ml, &params );
     return vlclua_ml_list_media( L, list );
 }
 
@@ -283,8 +283,8 @@ static int vlclua_ml_list_shows( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_show_list_t* list = vlc_ml_list_shows( ml, &params );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_show_list_t *list = vlc_ml_list_shows( ml, &params );
     return vlclua_ml_list_show( L, list );
 }
 
@@ -293,8 +293,8 @@ static int vlclua_ml_audio( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_media_list_t* list = vlc_ml_list_audio_media( ml, &params );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_list_t *list = vlc_ml_list_audio_media( ml, &params );
     return vlclua_ml_list_media( L, list );
 }
 
@@ -317,8 +317,8 @@ static int vlclua_ml_list_all_albums( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_album_list_t* list = vlc_ml_list_albums( ml, &params );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_album_list_t *list = vlc_ml_list_albums( ml, &params );
     return vlclua_ml_list_albums( L, list );
 }
 
@@ -327,9 +327,9 @@ static int vlclua_ml_list_artist_albums( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 2 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     lua_Integer artistId = luaL_checkinteger( L, 1 );
-    vlc_ml_album_list_t* list = vlc_ml_list_artist_albums( ml, &params, artistId );
+    vlc_ml_album_list_t *list = vlc_ml_list_artist_albums( ml, &params, artistId );
     return vlclua_ml_list_albums( L, list );
 }
 
@@ -338,9 +338,9 @@ static int vlclua_ml_list_genre_albums( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 2 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     lua_Integer genreId = luaL_checkinteger( L, 1 );
-    vlc_ml_album_list_t* list = vlc_ml_list_genre_albums( ml, &params, genreId );
+    vlc_ml_album_list_t *list = vlc_ml_list_genre_albums( ml, &params, genreId );
     return vlclua_ml_list_albums( L, list );
 }
 
@@ -348,8 +348,8 @@ static int vlclua_ml_get_album( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     lua_Integer albumId = luaL_checkinteger( L, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_album_t* album = vlc_ml_get_album( ml, albumId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_album_t *album = vlc_ml_get_album( ml, albumId );
     if ( album == NULL )
         return luaL_error( L, "Failed to get album" );
     vlclua_ml_push_album( L, album );
@@ -376,8 +376,8 @@ static int vlclua_ml_list_all_artists( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_artist_list_t* list = vlc_ml_list_artists( ml, &params, true );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_artist_list_t *list = vlc_ml_list_artists( ml, &params, true );
     return vlclua_ml_list_artists( L, list );
 }
 
@@ -386,9 +386,9 @@ static int vlclua_ml_list_genre_artists( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 2 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     lua_Integer genreId = luaL_checkinteger( L, 1 );
-    vlc_ml_artist_list_t* list = vlc_ml_list_genre_artists( ml, &params, genreId );
+    vlc_ml_artist_list_t *list = vlc_ml_list_genre_artists( ml, &params, genreId );
     return vlclua_ml_list_artists( L, list );
 }
 
@@ -396,8 +396,8 @@ static int vlclua_ml_get_artist( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     lua_Integer artistId = luaL_checkinteger( L, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_artist_t* artist = vlc_ml_get_artist( ml, artistId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_artist_t *artist = vlc_ml_get_artist( ml, artistId );
     if ( artist == NULL )
         return luaL_error( L, "Failed to get artist" );
     vlclua_ml_push_artist( L, artist );
@@ -410,8 +410,8 @@ static int vlclua_ml_list_genres( lua_State *L )
     vlc_object_t *p_this = vlclua_get_this( L );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_genre_list_t* list = vlc_ml_list_genres( ml, &params );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_genre_list_t *list = vlc_ml_list_genres( ml, &params );
     if ( list == NULL )
         return luaL_error( L, "Failed to list genres" );
     lua_createtable( L, list->i_nb_items, 0 );
@@ -428,8 +428,8 @@ static int vlclua_ml_get_genre( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     lua_Integer genreId = luaL_checkinteger( L, 1 );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_genre_t* genre = vlc_ml_get_genre( ml, genreId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_genre_t *genre = vlc_ml_get_genre( ml, genreId );
     if ( genre == NULL )
         return luaL_error( L, "Failed to get genre" );
     vlclua_ml_push_genre( L, genre );
@@ -443,8 +443,8 @@ static int vlclua_ml_get_media_thumbnail( lua_State *L )
 
     lua_Integer mediaId = luaL_checkinteger( L, 1 );
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_media_t* media = vlc_ml_get_media( ml, mediaId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_t *media = vlc_ml_get_media( ml, mediaId );
     if ( media == NULL ||
          media->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl == NULL )
     {
@@ -462,10 +462,10 @@ static int vlclua_ml_get_artist_thumbnail( lua_State *L )
 
     lua_Integer artistId = luaL_checkinteger( L, 1 );
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_artist_t* artist = vlc_ml_get_artist( ml, artistId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_artist_t *artist = vlc_ml_get_artist( ml, artistId );
     if ( artist == NULL ||
-         artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl == NULL )
+        artist->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl == NULL )
     {
         vlc_ml_release( artist );
         return 0;
@@ -481,8 +481,8 @@ static int vlclua_ml_get_album_thumbnail( lua_State *L )
 
     lua_Integer albumId = luaL_checkinteger( L, 1 );
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
-    vlc_ml_album_t* album = vlc_ml_get_album( ml, albumId );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_album_t *album = vlc_ml_get_album( ml, albumId );
     if ( album == NULL ||
          album->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl == NULL )
     {
@@ -497,7 +497,7 @@ static int vlclua_ml_get_album_thumbnail( lua_State *L )
 static int vlclua_ml_list_album_tracks( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     vlc_ml_query_params_t params;
     vlclua_ml_assign_params( L, &params, 2 );
     lua_Integer albumId = luaL_checkinteger( L, 1 );
@@ -508,7 +508,7 @@ static int vlclua_ml_list_album_tracks( lua_State *L )
 static int vlclua_ml_reload( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
-    vlc_medialibrary_t* ml = vlc_ml_instance_get( p_this );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     vlc_ml_reload_folder( ml, NULL );
     return 0;
 }
