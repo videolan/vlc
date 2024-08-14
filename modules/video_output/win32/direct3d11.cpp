@@ -969,8 +969,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
         if (err != VLC_SUCCESS)
         {
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-            if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+            if ( sys->swapCb == D3D11_LocalSwapchainSwap && sys->outside_opaque )
+            {
                 D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+                sys->outside_opaque = nullptr;
+            }
 #endif // WINAPI_PARTITION_DESKTOP
             return err;
         }
@@ -1020,8 +1023,11 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+        if ( sys->swapCb == D3D11_LocalSwapchainSwap && sys->outside_opaque )
+        {
             D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+            sys->outside_opaque = nullptr;
+        }
 #endif // WINAPI_PARTITION_DESKTOP
         return VLC_EGENERIC;
     }
@@ -1196,8 +1202,11 @@ static void Direct3D11Close(vout_display_t *vd)
     Direct3D11DestroyResources(vd);
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    if ( sys->swapCb == D3D11_LocalSwapchainSwap )
+    if ( sys->swapCb == D3D11_LocalSwapchainSwap && sys->outside_opaque )
+    {
         D3D11_LocalSwapchainCleanupDevice( sys->outside_opaque );
+        sys->outside_opaque = nullptr;
+    }
 #endif // WINAPI_PARTITION_DESKTOP
 
     if (sys->d3d_dev && sys->d3d_dev == &sys->local_d3d_dev->d3d_dev)
