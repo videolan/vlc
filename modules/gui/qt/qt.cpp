@@ -897,12 +897,13 @@ static void *Thread( void *obj )
     app.setProperty("initialStyle", app.style()->objectName());
 
 #if defined(_WIN32)
-    // TODO: Qt Quick RHI Fallback does not work (Qt 6.7.1).
-    //       D3D_FEATURE_LEVEL_11_1, which is required by Qt
-    //       may not be supported. In order to avoid crash,
-    //       fallback to OpenGL, or Software mode.
+    // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
+    //       We have to manually pick a graphics api here, since the default graphics
+    //       api (Direct3D 11.2) may not be supported.
 
-    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") && qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND"))
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
+        qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
+        (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
     {
         // If OS version is lower than Windows 8.1, and Qt version is lower than
         // 6.6.0, do not take risk and use OpenGL (since probing is not available).
