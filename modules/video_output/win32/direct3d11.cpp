@@ -910,9 +910,18 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
-    return FindD3D11Format( vd, sys->d3d_dev, 0, rgb_yuv,
+    const d3d_format_t *res;
+    res = FindD3D11Format( vd, sys->d3d_dev, 0, rgb_yuv,
                             bit_depth, widthDenominator+1, heightDenominator+1, alpha_bits,
                             DXGI_CHROMA_CPU, supportFlags );
+    if (res == nullptr)
+    {
+        msg_Dbg(vd, "No display format for %u-bit %u:%u%s%s%s", bit_depth, widthDenominator, heightDenominator,
+                                                          rgb_yuv & DXGI_YUV_FORMAT ? " YUV" : "",
+                                                          rgb_yuv & DXGI_RGB_FORMAT ? " RGB" : "",
+                                                          from_processor ? " supporting video processor" : "");
+    }
+    return res;
 }
 
 static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
@@ -1067,6 +1076,8 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     res = GetDirectRenderingFormat(vd, fmt->i_chroma);
     if (res != nullptr)
         return res;
+
+    msg_Dbg(vd, "Direct rendering not usable for %4.4s", (char*)&fmt->i_chroma);
 
     // look for any pixel format that we can handle with enough pixels per channel
     uint8_t bits_per_channel;
