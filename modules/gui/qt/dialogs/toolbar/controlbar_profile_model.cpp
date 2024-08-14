@@ -456,11 +456,11 @@ decltype (ControlbarProfileModel::m_defaults)
         };
 
 
-ControlbarProfileModel::ControlbarProfileModel(qt_intf_t *p_intf, QObject *parent)
+ControlbarProfileModel::ControlbarProfileModel(QSettings* settings, QObject *parent)
     : QAbstractListModel(parent),
-    m_intf(p_intf)
+    m_settings(settings)
 {
-    assert(m_intf);
+    assert(m_settings);
 
     connect(this, &QAbstractListModel::rowsInserted, this, &ControlbarProfileModel::countChanged);
     connect(this, &QAbstractListModel::rowsRemoved, this, &ControlbarProfileModel::countChanged);
@@ -693,25 +693,18 @@ ControlbarProfile* ControlbarProfileModel::currentModel() const
 
 void ControlbarProfileModel::save(bool clearDirty) const
 {
-    assert(m_intf);
-    assert(m_intf->mainSettings);
-
-    if (!m_intf || !m_intf || !m_intf->mainSettings)
-        return;
-
-    const auto settings = m_intf->mainSettings;
     const auto groupName = metaObject()->className();
 
-    settings->beginGroup(groupName);
-    settings->remove(""); // clear the group before save
+    m_settings->beginGroup(groupName);
+    m_settings->remove(""); // clear the group before save
 
-    settings->setValue(SETTINGS_KEY_SELECTEDPROFILE, selectedProfile());
+    m_settings->setValue(SETTINGS_KEY_SELECTEDPROFILE, selectedProfile());
 
-    settings->beginWriteArray(SETTINGS_ARRAYNAME_PROFILES);
+    m_settings->beginWriteArray(SETTINGS_ARRAYNAME_PROFILES);
 
     for (int i = 0; i < m_profiles.size(); ++i)
     {
-        settings->setArrayIndex(i);
+        m_settings->setArrayIndex(i);
 
         const auto& ptrModelMap = m_profiles.at(i)->m_models;
 
@@ -748,33 +741,26 @@ void ControlbarProfileModel::save(bool clearDirty) const
         if (clearDirty)
             m_profiles.at(i)->resetDirty();
 
-        settings->setValue(SETTINGS_KEY_NAME, m_profiles.at(i)->name());
-        settings->setValue(SETTINGS_KEY_MODEL, val);
+        m_settings->setValue(SETTINGS_KEY_NAME, m_profiles.at(i)->name());
+        m_settings->setValue(SETTINGS_KEY_MODEL, val);
     }
 
-    settings->endArray();
-    settings->endGroup();
+    m_settings->endArray();
+    m_settings->endGroup();
 }
 
 bool ControlbarProfileModel::reload()
 {
-    assert(m_intf);
-    assert(m_intf->mainSettings);
-
-    if (!m_intf || !m_intf || !m_intf->mainSettings)
-        return false;
-
-    const auto settings = m_intf->mainSettings;
     const auto groupName = metaObject()->className();
 
-    settings->beginGroup(groupName);
+    m_settings->beginGroup(groupName);
 
-    const int size = settings->beginReadArray(SETTINGS_ARRAYNAME_PROFILES);
+    const int size = m_settings->beginReadArray(SETTINGS_ARRAYNAME_PROFILES);
 
     if (size <= 0)
     {
-        settings->endArray();
-        settings->endGroup();
+        m_settings->endArray();
+        m_settings->endGroup();
 
         return false;
     }
@@ -784,9 +770,9 @@ bool ControlbarProfileModel::reload()
     decltype (m_profiles) profiles;
     for (int i = 0; i < size; ++i)
     {
-        settings->setArrayIndex(i);
+        m_settings->setArrayIndex(i);
 
-        const QString modelValue = settings->value(SETTINGS_KEY_MODEL).toString();
+        const QString modelValue = m_settings->value(SETTINGS_KEY_MODEL).toString();
         if (modelValue.isEmpty())
             continue;
 
@@ -796,7 +782,7 @@ bool ControlbarProfileModel::reload()
             continue;
 
         const auto ptrNewProfile = new ControlbarProfile(this);
-        ptrNewProfile->setName(settings->value(SETTINGS_KEY_NAME).toString());
+        ptrNewProfile->setName(m_settings->value(SETTINGS_KEY_NAME).toString());
 
         for (auto j : val)
         {
@@ -841,7 +827,7 @@ bool ControlbarProfileModel::reload()
         profiles.append(ptrNewProfile);
     }
 
-    settings->endArray();
+    m_settings->endArray();
 
     m_selectedProfile = -1;
     std::for_each(m_profiles.begin(), m_profiles.end(), [](auto i) { delete i; });
@@ -851,14 +837,14 @@ bool ControlbarProfileModel::reload()
     endResetModel();
 
     bool ok = false;
-    int index = settings->value(SETTINGS_KEY_SELECTEDPROFILE).toInt(&ok);
+    int index = m_settings->value(SETTINGS_KEY_SELECTEDPROFILE).toInt(&ok);
 
     if (ok)
         setSelectedProfile(index);
     else
         setSelectedProfile(0);
 
-    settings->endGroup();
+    m_settings->endGroup();
 
     return true;
 }

@@ -161,7 +161,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     }
 
     /* Controlbar Profile Model Creation */
-    m_controlbarProfileModel = new ControlbarProfileModel(p_intf, this);
+    m_controlbarProfileModel = new ControlbarProfileModel(p_intf->mainSettings, this);
 
     m_dialogFilepath = getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
 
