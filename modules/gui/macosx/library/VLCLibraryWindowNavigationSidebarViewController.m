@@ -82,6 +82,14 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                       selector:@selector(internalNodesChanged:)
                           name:VLCLibraryModelListOfGroupsReset
                         object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(internalNodesChanged:)
+                          name:VLCLibraryModelGroupUpdated
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(internalNodesChanged:)
+                          name:VLCLibraryModelGroupDeleted
+                        object:nil];
 }
 
 - (void)internalNodesChanged:(NSNotification *)notification
