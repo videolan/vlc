@@ -142,7 +142,7 @@ static picture_context_t *d3d11va_pic_context_copy(picture_context_t *ctx)
     return &pic_ctx->ctx.s;
 }
 
-static struct d3d11va_pic_context *CreatePicContext(
+static struct d3d11va_pic_context *CreatePicContext(ID3D11Resource *p_resource,
                                                   UINT slice,
                                                   ID3D11ShaderResourceView *renderSrc[DXGI_MAX_SHADER_VIEW],
                                                   vlc_video_context *vctx)
@@ -155,9 +155,6 @@ static struct d3d11va_pic_context *CreatePicContext(
         vlc_video_context_Hold(vctx),
     };
 
-    ID3D11Resource *p_resource;
-    ID3D11ShaderResourceView_GetResource(renderSrc[0], &p_resource);
-
     pic_ctx->ctx.picsys.slice_index = slice;
     pic_ctx->ctx.picsys.sharedHandle = INVALID_HANDLE_VALUE;
     for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
@@ -166,7 +163,6 @@ static struct d3d11va_pic_context *CreatePicContext(
         pic_ctx->ctx.picsys.renderSrc[i] = renderSrc[i];
     }
     AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
-    ID3D11Resource_Release(p_resource);
     return pic_ctx;
 }
 
@@ -182,9 +178,13 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     for (size_t i=0; i<DXGI_MAX_SHADER_VIEW; i++)
         resourceView[i] = sys->renderSrc[viewDesc.Texture2D.ArraySlice*DXGI_MAX_SHADER_VIEW + i];
 
-    struct d3d11va_pic_context *pic_ctx = CreatePicContext(
+    ID3D11Resource *p_resource;
+    ID3D11VideoDecoderOutputView_GetResource(surface, &p_resource);
+
+    struct d3d11va_pic_context *pic_ctx = CreatePicContext(p_resource,
                                                   viewDesc.Texture2D.ArraySlice,
                                                   resourceView, sys->vctx);
+    ID3D11Resource_Release(p_resource);
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = va_surface;
