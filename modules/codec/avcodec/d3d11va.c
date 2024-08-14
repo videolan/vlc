@@ -485,13 +485,6 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     return VLC_EGENERIC;
 }
 
-static bool CanUseDecoderPadding(const vlc_va_sys_t *sys)
-{
-    /* Qualcomm hardware has issues with textures and pixels that should not be
-    * part of the decoded area */
-    return sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_QUALCOMM;
-}
-
 /**
  * It creates a Direct3D11 decoder using the given video format
  */
