@@ -1042,12 +1042,19 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     const d3d_format_t *res = nullptr;
 
     d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
-    if (vtcx_sys != NULL &&
-        D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
+    if (vtcx_sys != NULL)
     {
-        res = D3D11_RenderFormat(vtcx_sys->format, vtcx_sys->secondary ,true);
-        if (res != nullptr)
-            return res;
+        if (D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_SHADER_LOAD ))
+        {
+            res = D3D11_RenderFormat(vtcx_sys->format, vtcx_sys->secondary ,true);
+            if (likely(res != nullptr))
+                return res;
+            msg_Dbg(vd, "Unsupported rendering texture format %s/%s", DxgiFormatToStr(vtcx_sys->format), DxgiFormatToStr(vtcx_sys->secondary));
+        }
+        else
+        {
+            msg_Dbg(vd, "Texture format %s not supported by shaders", DxgiFormatToStr(vtcx_sys->format));
+        }
     }
 
     // look for the requested pixel format first
