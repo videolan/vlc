@@ -1199,39 +1199,6 @@ static void Direct3D11Close(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D11 display adapter closed");
 }
 
-static bool CanUseTextureArray(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-
-    // 15.200.1062.1004 is wrong - 2015/08/03 - 15.7.1 WHQL
-    // 21.19.144.1281 is wrong   -
-    // 22.19.165.3 is good       - 2017/05/04 - ReLive Edition 17.5.1
-    const auto WDDM_os = []{
-        struct wddm_version wddm = {};
-        wddm.wddm         = 21;  // starting with drivers designed for W10 Anniversary Update
-        return wddm;
-    }();
-    if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_os) != VLC_SUCCESS)
-    {
-        msg_Dbg(vd, "AMD driver too old, fallback to legacy shader mode");
-        return false;
-    }
-
-    // xx.xx.1000.xxx drivers can't happen here for WDDM > 2.0
-    const auto WDDM_build = []{
-        struct wddm_version wddm = {};
-        wddm.revision      = 162;
-        return wddm;
-    }();
-    if (D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM_build) != VLC_SUCCESS)
-    {
-        msg_Dbg(vd, "Bogus AMD driver detected, fallback to legacy shader mode");
-        return false;
-    }
-
-    return true;
-}
-
 static bool BogusZeroCopy(const vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
@@ -1265,7 +1232,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     HRESULT hr;
 
     sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 ||
-            (sys->scaleProc == nullptr && !CanUseTextureArray(vd)) ||
             BogusZeroCopy(vd) || (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma));
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
