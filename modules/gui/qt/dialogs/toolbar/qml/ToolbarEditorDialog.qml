@@ -56,6 +56,21 @@ WindowDialog {
         unload()
     }
 
+    function newProfile(profileCreatorFunction) {
+        console.assert(typeof profileCreatorFunction === 'function')
+
+        const count = MainCtx.controlbarProfileModel.rowCount()
+        const npDialog = DialogsProvider.getTextDialog(null,
+                                                       qsTr("Profile Name"),
+                                                       qsTr("Please enter the new profile name:"),
+                                                       qsTr("Profile %1").arg(count + 1))
+        if (!npDialog.ok)
+            return
+
+        profileCreatorFunction(npDialog.text)
+        MainCtx.controlbarProfileModel.selectedProfile = count
+    }
+
     function _markDirty(text) {
         return (text += " *")
     }
@@ -141,19 +156,20 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    description: qsTr("New Profile")
-                    text: VLCIcons.profile_new
+                    description: qsTr("Clone the selected profile")
+                    text: VLCIcons.ic_fluent_document_copy_24_regular
 
                     onClicked: {
-                        const npDialog = DialogsProvider.getTextDialog(null,
-                                                                     qsTr("Profile Name"),
-                                                                     qsTr("Please enter the new profile name:"),
-                                                                     qsTr("Profile %1").arg(comboBox.count + 1))
-                        if (!npDialog.ok)
-                            return
+                        root.newProfile(MainCtx.controlbarProfileModel.cloneSelectedProfile)
+                    }
+                }
 
-                        MainCtx.controlbarProfileModel.cloneSelectedProfile(npDialog.text)
-                        MainCtx.controlbarProfileModel.selectedProfile = (MainCtx.controlbarProfileModel.rowCount() - 1)
+                Widgets.IconToolButton {
+                    description: qsTr("New profile")
+                    text: VLCIcons.ic_fluent_document_add_24_regular
+
+                    onClicked: {
+                        root.newProfile(MainCtx.controlbarProfileModel.newProfile)
                     }
                 }
 
