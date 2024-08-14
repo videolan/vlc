@@ -20,19 +20,6 @@
 #include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 
-template<typename T>
-QVariantList getVariantList(const QList<T> & desc)
-{
-    QVariantList list;
-
-    for (const T & item : desc)
-    {
-        list.append(QVariant::fromValue(item));
-    }
-
-    return list;
-}
-
 MLVideoModel::MLVideoModel(QObject* parent)
     : MLBaseModel(parent)
 {

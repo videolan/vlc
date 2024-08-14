@@ -29,6 +29,7 @@
 
 #include <QString>
 #include <QUrl>
+#include <QVariant>
 
 template<typename T>
 class MLDeleter
@@ -93,6 +94,19 @@ void thumbnailCopy(const MLListRange<T> &list, O dst, const int max)
         if (count == max)
             return;
     }
+}
+
+template<typename T>
+QVariantList getVariantList(const QList<T> & desc)
+{
+    QVariantList list;
+
+    for (const T & item : desc)
+    {
+        list.append(QVariant::fromValue(item));
+    }
+
+    return list;
 }
 
 QString urlToDisplayString(const QUrl &url);
