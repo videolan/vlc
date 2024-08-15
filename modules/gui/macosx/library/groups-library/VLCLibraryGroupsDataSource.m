@@ -44,7 +44,7 @@
                                name:VLCLibraryModelListOfGroupsReset
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelGroupsListReset:)
+                           selector:@selector(libraryModelGroupDeleted:)
                                name:VLCLibraryModelGroupDeleted
                              object:nil];
     [notificationCenter addObserver:self
@@ -99,6 +99,22 @@
         } else {
             [self.detailTableView reloadData];
         }
+    }
+}
+
+- (void)libraryModelGroupDeleted:(NSNotification *)notification
+{
+    VLCMediaLibraryGroup * const group = notification.object;
+    NSIndexPath * const indexPath = [self indexPathForLibraryItem:group];
+
+    if (indexPath != nil) {
+        [self.collectionView deleteItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    }
+
+    const NSInteger rowIndex = [self rowForLibraryItem:group];
+    if (rowIndex != NSNotFound) {
+        [self.masterTableView removeRowsAtIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
+                                    withAnimation:NSTableViewAnimationEffectFade];
     }
 }
 
