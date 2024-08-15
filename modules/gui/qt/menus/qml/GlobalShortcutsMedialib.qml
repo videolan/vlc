@@ -23,7 +23,7 @@ import VLC.Dialogs
 Item {
     ShortcutExt{ sequence:"Ctrl+B"; onActivated: DialogsProvider.bookmarksDialog() }
 
-    MLRecentModel {
+    MLRecentMediaModel {
         id: recentModel
         limit: 10
         ml: MediaLib
@@ -40,7 +40,7 @@ Item {
                     if (index < recentModel.count)
                     {
 
-                        const trackId = recentModel.data(recentModel.index(index, 0), MLRecentModel.MEDIA_ID)
+                        const trackId = recentModel.data(recentModel.index(index, 0), MLRecentMediaModel.MEDIA_ID)
                         if (!!trackId)
                             MediaLib.addAndPlay([trackId])
                     }

@@ -48,7 +48,7 @@
 #include "util/color_scheme_model.hpp"
 #include "util/colorizedsvgicon.hpp"
 #include "medialibrary/medialib.hpp"
-#include "medialibrary/mlrecentsmodel.hpp"
+#include "medialibrary/mlrecentmediamodel.hpp"
 #include "medialibrary/mlbookmarkmodel.hpp"
 
 
@@ -193,7 +193,7 @@ void VLCMenuBar::FileMenu(qt_intf_t *p_intf, QMenu *menu)
 
     if( mi && var_InheritBool( p_intf, "save-recentplay" ) && mi->hasMediaLibrary() )
     {
-        MLRecentsModel* recentModel = new MLRecentsModel(nullptr);
+        MLRecentMediaModel* recentModel = new MLRecentMediaModel(nullptr);
         recentModel->setMl(mi->getMediaLibrary());
         recentModel->setLimit(10);
         QMenu* recentsMenu = new RecentMenu(recentModel, mi->getMediaLibrary(), menu);

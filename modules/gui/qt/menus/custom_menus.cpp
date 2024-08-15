@@ -391,7 +391,7 @@ void BooleanPropertyAction::setModelChecked(bool checked)
 }
 
 
-RecentMenu::RecentMenu(MLRecentsModel* model, MediaLib* ml,  QWidget* parent)
+RecentMenu::RecentMenu(MLRecentMediaModel* model, MediaLib* ml,  QWidget* parent)
     : QMenu(parent)
     , m_model(model)
     , m_ml(ml)
@@ -402,11 +402,11 @@ RecentMenu::RecentMenu(MLRecentsModel* model, MediaLib* ml,  QWidget* parent)
     connect(helper, &ListMenuHelper::select, this, [this](int row, bool){
         QModelIndex index = m_model->index(row);
 
-        MLItemId id = m_model->data(index, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
+        MLItemId id = m_model->data(index, MLRecentMediaModel::MEDIA_ID).value<MLItemId>();
         m_ml->addAndPlay(id);
     });
 
-    addAction( qtr("&Clear"), model, &MLRecentsModel::clearHistory );
+    addAction( qtr("&Clear"), model, &MLRecentMediaModel::clearHistory );
 }
 
 // BookmarkMenu

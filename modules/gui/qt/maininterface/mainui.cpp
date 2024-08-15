@@ -12,7 +12,7 @@
 #include "medialibrary/mlurlmodel.hpp"
 #include "medialibrary/mlmediamodel.hpp"
 #include "medialibrary/mlvideomodel.hpp"
-#include "medialibrary/mlrecentsmodel.hpp"
+#include "medialibrary/mlrecentmediamodel.hpp"
 #include "medialibrary/mlrecentsvideomodel.hpp"
 #include "medialibrary/mlfoldersmodel.hpp"
 #include "medialibrary/mlvideogroupsmodel.hpp"
@@ -391,7 +391,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkSourcesModel>( uri, versionMajor, versionMinor, "NetworkSourcesModel");
         qmlRegisterType<AddonsModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
-        qmlRegisterType<MLRecentsModel>( uri, versionMajor, versionMinor, "MLRecentModel" );
+        qmlRegisterType<MLRecentMediaModel>( uri, versionMajor, versionMinor, "MLRecentMediaModel" );
 
         qmlRegisterType<PlaylistListContextMenu>( uri, versionMajor, versionMinor, "PlaylistListContextMenu" );
         qmlRegisterType<PlaylistMediaContextMenu>( uri, versionMajor, versionMinor, "PlaylistMediaContextMenu" );

@@ -25,7 +25,7 @@
 
 #include <QMenu>
 #include <QActionGroup>
-#include "medialibrary/mlrecentsmodel.hpp"
+#include "medialibrary/mlrecentmediamodel.hpp"
 
 class QAbstractListModel;
 
@@ -152,10 +152,10 @@ class RecentMenu : public QMenu
 {
     Q_OBJECT
 public:
-    RecentMenu(MLRecentsModel* model, MediaLib* ml, QWidget *parent = nullptr);
+    RecentMenu(MLRecentMediaModel* model, MediaLib* ml, QWidget *parent = nullptr);
 
 private:
-    MLRecentsModel* m_model = nullptr;
+    MLRecentMediaModel* m_model = nullptr;
     MediaLib* m_ml = nullptr;
 };
 

@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef ML_RECENTS_MODEL_H
-#define ML_RECENTS_MODEL_H
+#ifndef ML_RECENT_MEDIA_MODEL_H
+#define ML_RECENT_MEDIA_MODEL_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,7 +25,7 @@
 
 #include "mlmediamodel.hpp"
 
-class MLRecentsModel : public MLMediaModel
+class MLRecentMediaModel : public MLMediaModel
 {
     Q_OBJECT
 public:
@@ -34,8 +34,8 @@ public:
         RECENT_MEDIA_URL = MLMediaModel::MEDIA_ROLES_COUNT,
     };
 
-    explicit MLRecentsModel( QObject* parent = nullptr );
-    virtual ~MLRecentsModel() = default;
+    explicit MLRecentMediaModel( QObject* parent = nullptr );
+    virtual ~MLRecentMediaModel() = default;
 
     Q_INVOKABLE void clearHistory();
 
@@ -58,4 +58,4 @@ private:
     };
 };
 
-#endif // ML_RECENTS_MODEL_H
+#endif // ML_RECENT_MEDIA_MODEL_H

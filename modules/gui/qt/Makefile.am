@@ -213,8 +213,8 @@ libqt_plugin_la_SOURCES = \
 	medialibrary/mlmedia.hpp \
 	medialibrary/mlqueryparams.cpp \
 	medialibrary/mlqueryparams.hpp \
-	medialibrary/mlrecentsmodel.cpp \
-	medialibrary/mlrecentsmodel.hpp \
+	medialibrary/mlrecentmediamodel.cpp \
+	medialibrary/mlrecentmediamodel.hpp \
 	medialibrary/mlrecentsvideomodel.cpp \
 	medialibrary/mlrecentsvideomodel.hpp \
 	medialibrary/mlurlmodel.cpp \
@@ -442,7 +442,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	medialibrary/mlthreadpool.moc.cpp \
 	medialibrary/mlqmltypes.moc.cpp \
 	medialibrary/mlmedia.moc.cpp \
-	medialibrary/mlrecentsmodel.moc.cpp \
+	medialibrary/mlrecentmediamodel.moc.cpp \
 	medialibrary/mlrecentsvideomodel.moc.cpp \
 	medialibrary/mlurlmodel.moc.cpp \
 	medialibrary/mlvideo.moc.cpp \

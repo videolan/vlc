@@ -32,7 +32,7 @@
 #include "maininterface/mainctx.hpp"
 #include "util/color_scheme_model.hpp"
 #include "util/proxycolumnmodel.hpp"
-#include "medialibrary/mlrecentsmodel.hpp"
+#include "medialibrary/mlrecentmediamodel.hpp"
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
@@ -922,9 +922,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 configBool( "save-recentplay", ui.saveRecentlyPlayed );
 
                 ui.clearRecentSpacer->changeSize( 1, 1, QSizePolicy::Expanding, QSizePolicy::Minimum );
-                MLRecentsModel *recentsModel = new MLRecentsModel( ui.clearRecent );
+                MLRecentMediaModel *recentsModel = new MLRecentMediaModel( ui.clearRecent );
                 recentsModel->setMl( p_intf->p_mi->getMediaLibrary() );
-                connect( ui.clearRecent, &QPushButton::clicked, recentsModel, &MLRecentsModel::clearHistory );
+                connect( ui.clearRecent, &QPushButton::clicked, recentsModel, &MLRecentMediaModel::clearHistory );
             }
 
             break;

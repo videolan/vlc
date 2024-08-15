@@ -16,14 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlrecentsmodel.hpp"
+#include "mlrecentmediamodel.hpp"
 
-MLRecentsModel::MLRecentsModel( QObject* parent )
+MLRecentMediaModel::MLRecentMediaModel( QObject* parent )
     : MLMediaModel( parent )
 {
 }
 
-QVariant MLRecentsModel::itemRoleData(const MLItem *item , int role ) const
+QVariant MLRecentMediaModel::itemRoleData(const MLItem *item , int role ) const
 {
     const MLMedia* media = static_cast<const MLMedia *>(item);
     if ( !media )
@@ -39,7 +39,7 @@ QVariant MLRecentsModel::itemRoleData(const MLItem *item , int role ) const
     }
 }
 
-QHash<int, QByteArray> MLRecentsModel::roleNames() const
+QHash<int, QByteArray> MLRecentMediaModel::roleNames() const
 {
     QHash<int, QByteArray> hash = MLMediaModel::roleNames();
 
@@ -50,7 +50,7 @@ QHash<int, QByteArray> MLRecentsModel::roleNames() const
     return hash;
 }
 
-void MLRecentsModel::clearHistory()
+void MLRecentMediaModel::clearHistory()
 {
     m_mediaLib->runOnMLThread(this,
     //ML thread
@@ -59,7 +59,7 @@ void MLRecentsModel::clearHistory()
     });
 }
 
-void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
+void MLRecentMediaModel::onVlcMlEvent( const MLEvent &event )
 {
     switch ( event.i_type )
     {
@@ -75,18 +75,18 @@ void MLRecentsModel::onVlcMlEvent( const MLEvent &event )
 }
 
 std::unique_ptr<MLListCacheLoader>
-MLRecentsModel::createMLLoader() const
+MLRecentMediaModel::createMLLoader() const
 {
-    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsModel::Loader>(*this));
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentMediaModel::Loader>(*this));
 }
 
-size_t MLRecentsModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
+size_t MLRecentMediaModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     return vlc_ml_count_history( ml, queryParams, VLC_ML_HISTORY_TYPE_GLOBAL );
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
+MLRecentMediaModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list{ vlc_ml_list_history(
                 ml, queryParams, VLC_ML_HISTORY_TYPE_GLOBAL ) };
@@ -109,7 +109,7 @@ MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t
 // TODO: can we keep this as virtual and not pure virtual?
 //       it's same in models derived from another models.
 std::unique_ptr<MLItem>
-MLRecentsModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+MLRecentMediaModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
 {
     assert(itemId.type == VLC_ML_PARENT_UNKNOWN);
     ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
