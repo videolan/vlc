@@ -1,0 +1,56 @@
+From acc84c79a584f25bd4b8eeb8571138bfd79a88dc Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Thu, 15 Aug 2024 16:14:12 +0300
+Subject: [PATCH] Do not link D3D9
+
+On some configurations `d3d9.dll` might not be present,
+such as Windows 11 PE, reportedly.
+---
+ src/plugins/platforms/direct2d/CMakeLists.txt          | 1 -
+ src/plugins/platforms/windows/CMakeLists.txt           | 1 -
+ src/plugins/platforms/windows/qwindowsopengltester.cpp | 5 ++++-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/platforms/direct2d/CMakeLists.txt b/src/plugins/platforms/direct2d/CMakeLists.txt
+index 4357652207..1e5856be17 100644
+--- a/src/plugins/platforms/direct2d/CMakeLists.txt
++++ b/src/plugins/platforms/direct2d/CMakeLists.txt
+@@ -78,7 +78,6 @@ qt_internal_add_plugin(QWindowsDirect2DIntegrationPlugin
+         winspool
+         wtsapi32
+         comdlg32
+-        d3d9
+ )
+ 
+ # Resources:
+diff --git a/src/plugins/platforms/windows/CMakeLists.txt b/src/plugins/platforms/windows/CMakeLists.txt
+index cb9be899a7..2822184f2e 100644
+--- a/src/plugins/platforms/windows/CMakeLists.txt
++++ b/src/plugins/platforms/windows/CMakeLists.txt
+@@ -65,7 +65,6 @@ qt_internal_add_plugin(QWindowsIntegrationPlugin
+         winspool
+         wtsapi32
+         comdlg32
+-        d3d9
+ )
+ 
+ # Resources:
+diff --git a/src/plugins/platforms/windows/qwindowsopengltester.cpp b/src/plugins/platforms/windows/qwindowsopengltester.cpp
+index 6a790bcc1b..7f40d25bbb 100644
+--- a/src/plugins/platforms/windows/qwindowsopengltester.cpp
++++ b/src/plugins/platforms/windows/qwindowsopengltester.cpp
+@@ -65,7 +65,10 @@ private:
+ 
+ QDirect3D9Handle::QDirect3D9Handle()
+ {
+-    m_direct3D9 = Direct3DCreate9(D3D_SDK_VERSION);
++    QSystemLibrary d3d9dll(QStringLiteral("d3d9"));
++    typedef IDirect3D9* (*Direct3DCreate9Func)(UINT);
++    if (const auto direct3DCreate9 = (Direct3DCreate9Func)(d3d9dll.resolve("Direct3DCreate9")))
++        m_direct3D9 = direct3DCreate9(D3D_SDK_VERSION);
+ }
+ 
+ QDirect3D9Handle::~QDirect3D9Handle()
+-- 
+2.45.2
+
