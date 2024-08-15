@@ -86,10 +86,17 @@
 
     const NSInteger rowIndex = [self rowForLibraryItem:group];
     if (rowIndex != NSNotFound) {
+        const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
         [self.masterTableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
                                         columnIndexes:[NSIndexSet indexSetWithIndex:0]];
 
-        if (rowIndex == self.masterTableView.selectedRow) {
+        // Check, if the selected row was for the group that has been reloaded, if the selection in
+        // the master table view has changed after reloading the target index. In this case, we want
+        // to reselect. If the selection has been maintained then we need to reload the detail table
+        // view.
+        if (rowIndex == selectedMasterRow && self.masterTableView.selectedRow != selectedMasterRow) {
+            [self.masterTableView selectRow:selectedMasterRow byExtendingSelection:NO];
+        } else {
             [self.detailTableView reloadData];
         }
     }
