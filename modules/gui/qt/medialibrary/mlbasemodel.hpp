@@ -54,6 +54,8 @@ class MLBaseModel : public BaseModel
 
     Q_PROPERTY(MediaLib * ml READ ml WRITE setMl NOTIFY mlChanged FINAL)
 
+    Q_PROPERTY(bool favoriteOnly READ getFavoriteOnly WRITE setFavoriteOnly NOTIFY favoriteOnlyChanged FINAL)
+
 public:
     explicit MLBaseModel(QObject *parent = nullptr);
 
@@ -98,6 +100,9 @@ public:
     MediaLib* ml() const;
     void setMl(MediaLib* ml);
 
+    bool getFavoriteOnly() const;
+    void setFavoriteOnly(const bool favoriteOnly);
+
     Q_INVOKABLE void addAndPlay(const QModelIndexList &list, const QStringList &options = {});
 
     vlc_ml_sorting_criteria_t getMLSortingCriteria() const;
@@ -105,7 +110,7 @@ public:
 signals:
     void parentIdChanged();
     void mlChanged();
-
+    void favoriteOnlyChanged();
 
 protected:
     virtual std::unique_ptr<MLListCacheLoader> createMLLoader() const  = 0;
@@ -155,6 +160,7 @@ protected:
     MLItemId m_parent;
 
     MediaLib* m_mediaLib = nullptr;
+    bool m_favoriteOnly = false;
     vlc_ml_sorting_criteria_t m_mlSortingCriteria = VLC_ML_SORTING_DEFAULT;
     std::unique_ptr<vlc_ml_event_callback_t,
                     std::function<void(vlc_ml_event_callback_t*)>> m_ml_event_handle;
@@ -177,9 +183,9 @@ class MLListCacheLoader: public QObject, public ListCacheLoader<std::unique_ptr<
 public:
     struct MLOp {
     public:
-        MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc);
+        MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc, bool fav_only);
         inline MLOp(const MLBaseModel& model)
-            : MLOp(model.parentId(), model.searchPattern(), model.getMLSortingCriteria(), model.getSortOrder() == Qt::SortOrder::DescendingOrder)
+            : MLOp(model.parentId(), model.searchPattern(), model.getMLSortingCriteria(), model.getSortOrder() == Qt::SortOrder::DescendingOrder, model.getFavoriteOnly())
         {}
         virtual ~MLOp() = default;
 
@@ -193,6 +199,7 @@ public:
         QByteArray m_searchPattern;
         vlc_ml_sorting_criteria_t m_sort;
         bool m_sortDesc;
+        bool m_favoriteOnly;
     };
 
 public:

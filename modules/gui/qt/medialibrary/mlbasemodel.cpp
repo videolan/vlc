@@ -185,6 +185,7 @@ MLBaseModel::MLBaseModel(QObject *parent)
 
     connect( this, &MLBaseModel::mlChanged, this, &MLBaseModel::loadingChanged );
     connect( this, &MLBaseModel::countChanged, this, &MLBaseModel::loadingChanged );
+    connect( this, &MLBaseModel::favoriteOnlyChanged, this, &MLBaseModel::resetRequested );
 }
 
 /* For std::unique_ptr, see Effective Modern C++, Item 22 */
@@ -458,6 +459,19 @@ void MLBaseModel::setMl(MediaLib* medialib)
     m_mediaLib = medialib;
     d->initializeModel();
     mlChanged();
+}
+
+bool MLBaseModel::getFavoriteOnly() const
+{
+    return m_favoriteOnly;
+}
+
+void MLBaseModel::setFavoriteOnly(const bool favoriteOnly)
+{
+    if (m_favoriteOnly == favoriteOnly)
+        return;
+    m_favoriteOnly = favoriteOnly;
+    emit favoriteOnlyChanged();
 }
 
 MLItem *MLBaseModel::item(int signedidx) const
@@ -738,11 +752,12 @@ size_t MLListCacheLoader::loadItemByIdTask(MLItemId itemId, std::function<void (
         });
 }
 
-MLListCacheLoader::MLOp::MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc)
+MLListCacheLoader::MLOp::MLOp(MLItemId parentId, QString searchPattern, vlc_ml_sorting_criteria_t sort, bool sort_desc, bool fav_only)
     : m_parent(parentId)
     , m_searchPattern(searchPattern.toUtf8())
     , m_sort(sort)
     , m_sortDesc(sort_desc)
+    , m_favoriteOnly(fav_only)
 {
 }
 
@@ -755,5 +770,6 @@ vlc_ml_query_params_t MLListCacheLoader::MLOp::getQueryParams(size_t offset, siz
     params.i_offset = offset;
     params.i_sort = m_sort;
     params.b_desc = m_sortDesc;
+    params.b_favorite_only = m_favoriteOnly;
     return params;
 }
