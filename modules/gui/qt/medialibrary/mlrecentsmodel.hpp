@@ -23,46 +23,25 @@
 #include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_media_library.h>
+#include "mlmediamodel.hpp"
 
-#include "mlbasemodel.hpp"
-
-#include <QDateTime>
-
-class MLRecentMedia : public MLItem {
-public:
-    MLRecentMedia( const vlc_ml_media_t *_data );
-
-    MLRecentMedia( const MLRecentMedia& url );
-
-    inline QUrl getUrl() const { return m_url; }
-    inline QDateTime getLastPlayedDate() const { return m_lastPlayedDate; }
-
-private:
-    QUrl m_url;
-    QDateTime m_lastPlayedDate;
-};
-
-class MLRecentsModel : public MLBaseModel
+class MLRecentsModel : public MLMediaModel
 {
     Q_OBJECT
 public:
-    enum Roles {
-        RECENT_MEDIA_ID = Qt::UserRole + 1,
-        RECENT_MEDIA_URL,
-        RECENT_MEDIA_LAST_PLAYED_DATE
+    enum Roles
+    {
+        RECENT_MEDIA_URL = MLMediaModel::MEDIA_ROLES_COUNT,
     };
-    Q_ENUM(Roles)
 
     explicit MLRecentsModel( QObject* parent = nullptr );
     virtual ~MLRecentsModel() = default;
 
-    QHash<int, QByteArray> roleNames() const override;
-
     Q_INVOKABLE void clearHistory();
 
 protected:
+    QHash<int, QByteArray> roleNames() const override;
+
     QVariant itemRoleData(const MLItem *item, int role) const override;
 
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;

@@ -18,58 +18,36 @@
 
 #include "mlrecentsmodel.hpp"
 
-#include <QDateTime>
-#include <QTimeZone>
-
-#include "mlhelper.hpp"
-
-
-MLRecentMedia::MLRecentMedia( const vlc_ml_media_t *media )
-    : MLItem( MLItemId( media->i_id, VLC_ML_PARENT_UNKNOWN ) )
-    , m_url ( media->p_files->i_nb_items > 0 ? media->p_files->p_items[0].psz_mrl : "" )
-    , m_lastPlayedDate(QDateTime::fromSecsSinceEpoch( media->i_last_played_date, QTimeZone::systemTimeZone() ))
-{
-}
-
-MLRecentMedia::MLRecentMedia( const MLRecentMedia& media )
-    : MLItem(media.getId())
-    , m_url(media.m_url)
-    , m_lastPlayedDate(media.m_lastPlayedDate)
-{
-}
-
 MLRecentsModel::MLRecentsModel( QObject* parent )
-    : MLBaseModel( parent )
+    : MLMediaModel( parent )
 {
 }
 
 QVariant MLRecentsModel::itemRoleData(const MLItem *item , int role ) const
 {
-    const MLRecentMedia* media = static_cast<const MLRecentMedia *>(item);
+    const MLMedia* media = static_cast<const MLMedia *>(item);
     if ( !media )
         return QVariant();
 
     switch (role)
     {
-    case RECENT_MEDIA_ID:
-        return QVariant::fromValue( media->getId() );
     case Qt::DisplayRole:
     case RECENT_MEDIA_URL:
-        return QVariant::fromValue( media->getUrl().toString(QUrl::PreferLocalFile | QUrl::RemovePassword));
-    case RECENT_MEDIA_LAST_PLAYED_DATE:
-        return QVariant::fromValue( media->getLastPlayedDate().toString( QLocale::system().dateFormat( QLocale::ShortFormat )));
+        return QVariant::fromValue( QUrl::fromEncoded( media->mrl().toUtf8() ).toString( QUrl::PreferLocalFile | QUrl::RemovePassword ) );
     default :
-        return QVariant();
+        return MLMediaModel::itemRoleData(item, role);
     }
 }
 
 QHash<int, QByteArray> MLRecentsModel::roleNames() const
 {
-    return {
-        { RECENT_MEDIA_ID, "id" },
+    QHash<int, QByteArray> hash = MLMediaModel::roleNames();
+
+    hash.insert({
         { RECENT_MEDIA_URL, "url" },
-        { RECENT_MEDIA_LAST_PLAYED_DATE, "last_played_date" }
-    };
+    });
+
+    return hash;
 }
 
 void MLRecentsModel::clearHistory()
@@ -118,17 +96,32 @@ MLRecentsModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t
     std::vector<std::unique_ptr<MLItem>> res;
 
     for( vlc_ml_media_t &media: ml_range_iterate<vlc_ml_media_t>( media_list ) )
-        res.emplace_back( std::make_unique<MLRecentMedia>( &media ) );
+        if ( media.i_type != VLC_ML_MEDIA_TYPE_AUDIO )
+            res.emplace_back( std::make_unique<MLVideo>( &media ) );
+        else if ( media.i_type == VLC_ML_MEDIA_TYPE_AUDIO )
+            res.emplace_back( std::make_unique<MLAudio>( ml, &media ) );
+        else
+            Q_UNREACHABLE();
 
     return res;
 }
 
+// TODO: can we keep this as virtual and not pure virtual?
+//       it's same in models derived from another models.
 std::unique_ptr<MLItem>
 MLRecentsModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
 {
     assert(itemId.type == VLC_ML_PARENT_UNKNOWN);
     ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
-    if (!media)
+
+    if (media == nullptr)
         return nullptr;
-    return std::make_unique<MLRecentMedia>(media.get());
+
+    if (media->i_type != VLC_ML_MEDIA_TYPE_AUDIO)
+        return std::make_unique<MLVideo>(media.get());
+    else if (media->i_type == VLC_ML_MEDIA_TYPE_AUDIO)
+        return std::make_unique<MLAudio>(ml, media.get());
+    else
+        Q_UNREACHABLE();
+    return nullptr;
 }
