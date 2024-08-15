@@ -48,7 +48,7 @@
                                name:VLCLibraryModelGroupDeleted
                              object:nil];
     [notificationCenter addObserver:self
-                           selector:@selector(libraryModelGroupsListReset:)
+                           selector:@selector(libraryModelGroupUpdated:)
                                name:VLCLibraryModelGroupUpdated
                              object:nil];
 
@@ -73,6 +73,26 @@
 - (VLCMediaLibraryParentGroupType)currentParentType
 {
     return VLCMediaLibraryParentGroupTypeGroup;
+}
+
+- (void)libraryModelGroupUpdated:(NSNotification *)notification
+{
+    VLCMediaLibraryGroup * const group = notification.object;
+    NSIndexPath * const indexPath = [self indexPathForLibraryItem:group];
+
+    if (indexPath != nil) {
+        [self.collectionView reloadItemsAtIndexPaths:[NSSet setWithObject:indexPath]];
+    }
+
+    const NSInteger rowIndex = [self rowForLibraryItem:group];
+    if (rowIndex != NSNotFound) {
+        [self.masterTableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:rowIndex]
+                                        columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+
+        if (rowIndex == self.masterTableView.selectedRow) {
+            [self.detailTableView reloadData];
+        }
+    }
 }
 
 @end
