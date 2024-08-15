@@ -43,6 +43,14 @@
                            selector:@selector(libraryModelGroupsListReset:)
                                name:VLCLibraryModelListOfGroupsReset
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGroupsListReset:)
+                               name:VLCLibraryModelGroupDeleted
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelGroupsListReset:)
+                               name:VLCLibraryModelGroupUpdated
+                             object:nil];
 
     [self reloadData];
 }
