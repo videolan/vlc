@@ -242,7 +242,15 @@ static int Demux( demux_t *p_demux )
                     msg_Warn( p_demux, "found a new ASF header" );
             }
             else
+            {
                 p_sys->b_eof = true;
+                for ( int i=0; i<MAX_ASF_TRACKS; i++ )
+                {
+                    asf_track_t *tk = p_sys->track[i];
+                    if ( tk && tk->info.p_frame )
+                        Packet_Enqueue( &p_sys->packet_sys, i, &tk->info.p_frame );
+                }
+            }
         }
 
         if ( p_sys->i_time == VLC_TICK_INVALID )
