@@ -60,6 +60,8 @@ QVariant MLAlbumTrackModel::itemRoleData(MLItem *item, const int role) const
         return QVariant::fromValue( getFirstSymbol( ml_track->getAlbumTitle() ) );
     case TRACK_ARTIST_FIRST_SYMBOL:
         return QVariant::fromValue( getFirstSymbol( ml_track->getArtist() ) );
+    case TRACK_URL:
+        return QUrl(ml_track->getMRL());
     default :
         return QVariant();
     }
@@ -80,6 +82,7 @@ QHash<int, QByteArray> MLAlbumTrackModel::roleNames() const
         { TRACK_TITLE_FIRST_SYMBOL, "title_first_symbol"},
         { TRACK_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
         { TRACK_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
+        { TRACK_URL, "url" }
     };
 }
 

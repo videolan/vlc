@@ -41,6 +41,7 @@ public:
         TRACK_DURATION,
         TRACK_ALBUM,
         TRACK_ARTIST,
+        TRACK_URL,
 
         TRACK_TITLE_FIRST_SYMBOL,
         TRACK_ALBUM_FIRST_SYMBOL,
