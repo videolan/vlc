@@ -94,6 +94,7 @@ QHash<int, QByteArray> MLFoldersBaseModel::roleNames() const
     return {
         {DisplayUrl, "display_url"},
         {Banned, "banned"},
+        {MRL, "url"}
     };
 }
 
