@@ -490,6 +490,8 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
         return d->m_items[row].getAlbum();
     case ArtworkRole:
         return d->m_items[row].getArtwork();
+    case UrlRole:
+        return d->m_items[row].getUrl();
     default:
         return {};
     }

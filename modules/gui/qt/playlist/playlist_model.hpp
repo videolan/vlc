@@ -49,7 +49,8 @@ public:
         IsCurrentRole,
         ArtistRole,
         AlbumRole,
-        ArtworkRole
+        ArtworkRole,
+        UrlRole
     };
 
     PlaylistListModel(QObject *parent = nullptr);
