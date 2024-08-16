@@ -78,7 +78,8 @@ T.Pane {
                 const item = root.model.itemAt(index)
                 return {
                     "title": item.title,
-                    "cover": (!!item.artwork && item.artwork.toString() !== "") ? item.artwork : VLCStyle.noArtAlbumCover
+                    "cover": (!!item.artwork && item.artwork.toString() !== "") ? item.artwork : VLCStyle.noArtAlbumCover,
+                    "url": item.url
                 }
             }))
         }

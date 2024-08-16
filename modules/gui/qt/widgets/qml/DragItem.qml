@@ -137,16 +137,22 @@ Item {
         _data = data
 
         const covers = []
+        let mimeData = []
 
         for (let i in indexes) {
             if (covers.length === _maxCovers)
                 break
 
-            const cover = _getCover(indexes[i], data[i])
+            const element = data[i]
+            const cover = _getCover(indexes[i], element)
             if (!cover)
                 continue
 
             covers.push(cover)
+
+            const url = element.url ?? element.mrl
+            if (url)
+                mimeData.push(url)
         }
 
         if (covers.length === 0)
@@ -156,6 +162,10 @@ Item {
             })
 
         _covers = covers
+
+        if (mimeData.length > 0) {
+            Drag.mimeData = MainCtx.urlListToMimeData(mimeData)
+        }
     }
 
     function _setInputItems(inputItems) {
