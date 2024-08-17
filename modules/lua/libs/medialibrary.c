@@ -312,6 +312,32 @@ static void vlclua_ml_push_bookmark( lua_State *L, const vlc_ml_bookmark_t *book
     lua_setfield( L, -2, "description" );
 }
 
+static int vlclua_ml_get_media( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    lua_Integer mediaId = luaL_checkinteger( L, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_t *media = vlc_ml_get_media( ml, mediaId );
+    if ( media == NULL )
+        return luaL_error( L, "Failed to get media" );
+    vlclua_ml_push_media( L, media );
+    vlc_ml_release( media );
+    return 1;
+}
+
+static int vlclua_ml_get_media_by_mrl( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    const char *mediaMrl = luaL_checkstring( L, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_t *media = vlc_ml_get_media_by_mrl( ml, mediaMrl );
+    if ( media == NULL )
+        return luaL_error( L, "Failed to get media" );
+    vlclua_ml_push_media( L, media );
+    vlc_ml_release( media );
+    return 1;
+}
+
 static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
 {
     if ( list == NULL )
@@ -754,6 +780,8 @@ static int vlclua_media_bookmarks( lua_State *L )
 
 static const luaL_Reg vlclua_ml_reg[] = {
     { "video", vlclua_ml_video },
+    { "media", vlclua_ml_get_media },
+    { "media_by_mrl", vlclua_ml_get_media_by_mrl },
     { "folder", vlclua_ml_folder },
     { "folders_by_type", vlclua_ml_folders_by_type },
     { "get_folder", vlclua_ml_get_folder },
