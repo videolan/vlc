@@ -44,6 +44,14 @@ static void vlclua_ml_push_media( lua_State *L, const vlc_ml_media_t *media )
     lua_setfield( L, -2, "duration" );
     lua_pushboolean( L, media->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE  );
     lua_setfield( L, -2, "hasThumbnail" );
+    lua_pushinteger( L, media->i_playcount );
+    lua_setfield( L, -2, "playcount" );
+    lua_pushnumber( L, media->f_progress );
+    lua_setfield( L, -2, "progress" );
+    lua_pushboolean( L, media->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
+    lua_pushinteger( L, media->i_last_played_date );
+    lua_setfield( L, -2, "lastPlayedDate" );
     switch ( media->i_subtype )
     {
         case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
@@ -190,6 +198,8 @@ static void vlclua_ml_push_album( lua_State *L, const vlc_ml_album_t *album )
     lua_setfield( L, -2, "duration" );
     lua_pushinteger( L, album->i_year );
     lua_setfield( L, -2, "releaseYear" );
+    lua_pushboolean( L, album->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
 }
 
 static void vlclua_ml_push_artist( lua_State *L, const vlc_ml_artist_t *artist )
@@ -205,6 +215,8 @@ static void vlclua_ml_push_artist( lua_State *L, const vlc_ml_artist_t *artist )
     lua_setfield( L, -2, "nbTracks" );
     lua_pushinteger( L, artist->i_nb_album );
     lua_setfield( L, -2, "nbAlbums" );
+    lua_pushboolean( L, artist->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
 }
 
 static void vlclua_ml_push_genre( lua_State *L, const vlc_ml_genre_t *genre )
@@ -216,6 +228,10 @@ static void vlclua_ml_push_genre( lua_State *L, const vlc_ml_genre_t *genre )
     lua_setfield( L, -2, "name" );
     lua_pushinteger( L, genre->i_nb_tracks );
     lua_setfield( L, -2, "nbTracks" );
+    lua_pushboolean( L, genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].i_status == VLC_ML_THUMBNAIL_STATUS_AVAILABLE );
+    lua_setfield( L, -2, "hasThumbnail");
+    lua_pushboolean(L, genre->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
 }
 
 static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
