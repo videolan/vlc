@@ -260,6 +260,45 @@ static void vlclua_ml_push_genre( lua_State *L, const vlc_ml_genre_t *genre )
     lua_setfield( L, -2, "isFavorite" );
 }
 
+static void vlclua_ml_push_playlist( lua_State *L, const vlc_ml_playlist_t *playlist )
+{
+    lua_newtable( L );
+    lua_pushinteger( L, playlist->i_id );
+    lua_setfield( L, -2, "id" );
+    lua_pushstring( L, playlist->psz_name );
+    lua_setfield( L, -2, "name" );
+    lua_pushstring( L, playlist->psz_mrl );
+    lua_setfield( L, -2, "mrl" );
+    lua_pushstring( L, playlist->psz_artwork_mrl );
+    lua_setfield( L, -2, "artworkMrl" );
+    lua_pushinteger( L, playlist->i_nb_media );
+    lua_setfield( L, -2, "nbMedia" );
+    lua_pushinteger( L, playlist->i_nb_video );
+    lua_setfield( L, -2, "nbVideo" );
+    lua_pushinteger( L, playlist->i_nb_audio );
+    lua_setfield( L, -2, "nbAudio" );
+    lua_pushinteger( L, playlist->i_nb_unknown );
+    lua_setfield( L, -2, "nbUnknown" );
+    lua_pushinteger( L, playlist->i_nb_present_media );
+    lua_setfield( L, -2, "nbPresentMedia" );
+    lua_pushinteger( L, playlist->i_nb_present_video );
+    lua_setfield( L, -2, "nbPresentVideo" );
+    lua_pushinteger( L, playlist->i_nb_present_audio );
+    lua_setfield( L, -2, "nbPresentAudio" );
+    lua_pushinteger( L, playlist->i_nb_present_unknown );
+    lua_setfield( L, -2, "nbPresentUnknown" );
+    lua_pushinteger( L, playlist->i_creation_date );
+    lua_setfield( L, -2, "creationDate" );
+    lua_pushinteger( L, playlist->i_duration );
+    lua_setfield( L, -2, "duration" );
+    lua_pushinteger( L, playlist->i_nb_duration_unknown );
+    lua_setfield( L, -2, "nbDurationUnknown" );
+    lua_pushboolean( L, playlist->b_is_read_only );
+    lua_setfield( L, -2, "isReadOnly" );
+    lua_pushboolean( L, playlist->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
+}
+
 static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
 {
     if ( list == NULL )
@@ -527,6 +566,43 @@ static int vlclua_ml_get_genre( lua_State *L )
     return 1;
 }
 
+static int vlclua_ml_list_playlists( lua_State *L, vlc_ml_playlist_list_t *list )
+{
+    if ( list == NULL )
+        return luaL_error( L, "Failed to list playlists" );
+    lua_createtable( L, list->i_nb_items, 0 );
+    for ( size_t i = 0; i < list->i_nb_items; ++i )
+    {
+        vlclua_ml_push_playlist( L, &list->p_items[i] );
+        lua_rawseti( L, -2, i + 1 );
+    }
+    vlc_ml_release( list );
+    return 1;
+}
+
+static int vlclua_ml_list_all_playlists( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_playlist_list_t *list = vlc_ml_list_playlists( ml, &params, true );
+    return vlclua_ml_list_playlists( L, list );
+}
+
+static int vlclua_ml_get_playlist( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    lua_Integer playlistId = luaL_checkinteger( L, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_playlist_t *playlist = vlc_ml_get_playlist( ml, playlistId );
+    if ( playlist == NULL )
+        return luaL_error( L, "Failed to get playlist" );
+    vlclua_ml_push_playlist( L, playlist );
+    vlc_ml_release( playlist );
+    return 1;
+}
+
 static int vlclua_ml_get_media_thumbnail( lua_State *L )
 {
     if( lua_gettop( L ) < 1 ) return vlclua_error( L );
@@ -617,6 +693,8 @@ static const luaL_Reg vlclua_ml_reg[] = {
     { "artist", vlclua_ml_get_artist },
     { "genres", vlclua_ml_list_genres },
     { "genre", vlclua_ml_get_genre },
+    { "playlists", vlclua_ml_list_all_playlists },
+    { "playlist", vlclua_ml_get_playlist },
     { "album_tracks", vlclua_ml_list_album_tracks },
     { "artist_albums", vlclua_ml_list_artist_albums },
     { "genre_albums", vlclua_ml_list_genre_albums },
