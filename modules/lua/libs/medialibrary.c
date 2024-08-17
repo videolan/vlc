@@ -158,6 +158,32 @@ static void vlclua_ml_push_media( lua_State *L, const vlc_ml_media_t *media )
     lua_setfield( L, -2, "nbChannels" );
 }
 
+static void vlclua_ml_push_folder( lua_State *L, const vlc_ml_folder_t *folder )
+{
+    lua_newtable( L );
+    lua_pushinteger( L, folder->i_id );
+    lua_setfield( L, -2, "id" );
+    lua_pushstring( L, folder->psz_name );
+    lua_setfield( L, -2, "title" );
+    lua_pushstring( L, folder->psz_mrl );
+    lua_setfield( L, -2, "mrl" );
+    lua_pushinteger( L, folder->i_nb_media );
+    lua_setfield( L, -2, "nbMedia" );
+    lua_pushinteger( L, folder->i_nb_video );
+    lua_setfield( L, -2, "nbVideos" );
+    lua_pushinteger( L, folder->i_nb_audio );
+    lua_setfield( L, -2, "nbAudios" );
+    lua_pushinteger( L, folder->i_duration );
+    lua_setfield( L, -2, "duration" );
+    lua_pushboolean( L, folder->b_present );
+    lua_setfield( L, -2, "isPresent" );
+    lua_pushboolean( L, folder->b_banned );
+    lua_setfield( L, -2, "isBanned" );
+    lua_pushboolean( L, folder->b_is_favorite );
+    lua_setfield( L, -2, "isFavorite" );
+
+}
+
 static void vlclua_ml_push_show( lua_State *L, const vlc_ml_show_t *show )
 {
     lua_newtable( L );
@@ -248,6 +274,20 @@ static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
     return 1;
 }
 
+static int vlclua_ml_list_folder( lua_State *L, vlc_ml_folder_list_t *list )
+{
+    if ( list == NULL )
+        return luaL_error( L, "Failed to list folders" );
+    lua_createtable( L, list->i_nb_items, 0 );
+    for ( size_t i = 0; i < list->i_nb_items; ++i )
+    {
+        vlclua_ml_push_folder( L, &list->p_items[i] );
+        lua_rawseti( L, -2, i + 1 );
+    }
+    vlc_ml_release( list );
+    return 1;
+}
+
 static int vlclua_ml_list_show( lua_State *L, vlc_ml_show_list_t *list )
 {
     if ( list == NULL )
@@ -292,6 +332,27 @@ static int vlclua_ml_video( lua_State *L )
     vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
     vlc_ml_media_list_t *list = vlc_ml_list_video_media( ml, &params );
     return vlclua_ml_list_media( L, list );
+}
+
+static int vlclua_ml_folder( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_folder_list_t *list = vlc_ml_list_folders( ml, &params );
+    return vlclua_ml_list_folder( L, list );
+}
+
+static int vlclua_ml_folders_by_type( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_ml_media_type_t mediaType = luaL_checkinteger( L, 2 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_folder_list_t *list = vlc_ml_list_folders_by_type( ml, &params, mediaType );
+    return vlclua_ml_list_folder( L, list );
 }
 
 static int vlclua_ml_list_shows( lua_State *L )
@@ -370,6 +431,19 @@ static int vlclua_ml_get_album( lua_State *L )
         return luaL_error( L, "Failed to get album" );
     vlclua_ml_push_album( L, album );
     vlc_ml_release( album );
+    return 1;
+}
+
+static int vlclua_ml_get_folder( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    lua_Integer folderId = luaL_checkinteger( L, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_folder_t *folder = vlc_ml_get_folder( ml, folderId );
+    if ( folder == NULL )
+        return luaL_error( L, "Failed to get folder" );
+    vlclua_ml_push_folder( L, folder );
+    vlc_ml_release( folder );
     return 1;
 }
 
@@ -531,6 +605,9 @@ static int vlclua_ml_reload( lua_State *L )
 
 static const luaL_Reg vlclua_ml_reg[] = {
     { "video", vlclua_ml_video },
+    { "folder", vlclua_ml_folder },
+    { "folders_by_type", vlclua_ml_folders_by_type },
+    { "get_folder", vlclua_ml_get_folder },
     { "show_episodes", vlclua_ml_list_shows },
     { "audio", vlclua_ml_audio },
     { "media_thumbnail", vlclua_ml_get_media_thumbnail },
