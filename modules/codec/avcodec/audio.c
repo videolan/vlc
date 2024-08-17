@@ -41,8 +41,11 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 
-#include <libavutil/channel_layout.h>
+#define API_CHANNEL_LAYOUT (LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 100))
 
+#if API_CHANNEL_LAYOUT
+# include <libavutil/channel_layout.h>
+#endif
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -598,7 +601,7 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         p_sys->i_previous_channels = p_sys->p_context->ch_layout.nb_channels;
         p_sys->i_previous_layout = p_sys->p_context->ch_layout.u.mask;
     }
-#else
+#elif API_CHANNEL_LAYOUT
     if( p_sys->i_previous_channels == p_sys->p_context->channels &&
         p_sys->i_previous_layout == p_sys->p_context->channel_layout )
         return;
@@ -612,15 +615,19 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     const unsigned i_order_max = sizeof(pi_channels_map)/sizeof(*pi_channels_map);
     uint32_t pi_order_src[i_order_max];
 
-    int i_channels_src = 0;
+    int i_channels_src = 0, channel_count;
+    uint64_t channel_layout_mask;
 #if LIBAVCODEC_VERSION_CHECK(59, 999, 999, 24, 100)
-    uint64_t channel_layout_mask = p_sys->p_context->ch_layout.u.mask;
-    int channel_count = p_sys->p_context->ch_layout.nb_channels;
-#else
-    uint64_t channel_layout_mask =
+    channel_layout_mask = p_sys->p_context->ch_layout.u.mask;
+    channel_count = p_sys->p_context->ch_layout.nb_channels;
+#elif API_CHANNEL_LAYOUT
+    channel_layout_mask =
         p_sys->p_context->channel_layout ? p_sys->p_context->channel_layout :
         (uint64_t)av_get_default_channel_layout( p_sys->p_context->channels );
-    int channel_count = p_sys->p_context->channels;
+    channel_count = p_sys->p_context->channels;
+#else
+    channel_layout_mask = NULL;
+    channel_count = p_sys->p_context->channels;
 #endif
 
     if( channel_layout_mask )
