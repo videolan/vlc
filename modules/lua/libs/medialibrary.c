@@ -299,6 +299,19 @@ static void vlclua_ml_push_playlist( lua_State *L, const vlc_ml_playlist_t *play
     lua_setfield( L, -2, "isFavorite" );
 }
 
+static void vlclua_ml_push_bookmark( lua_State *L, const vlc_ml_bookmark_t *bookmark )
+{
+    lua_newtable( L );
+    lua_pushinteger( L, bookmark->i_media_id );
+    lua_setfield( L, -2, "mediaid" );
+    lua_pushinteger( L, bookmark->i_time );
+    lua_setfield( L, -2, "time" );
+    lua_pushstring( L, bookmark->psz_name );
+    lua_setfield( L, -2, "name" );
+    lua_pushstring( L, bookmark->psz_description );
+    lua_setfield( L, -2, "description" );
+}
+
 static int vlclua_ml_list_media( lua_State *L, vlc_ml_media_list_t *list )
 {
     if ( list == NULL )
@@ -335,6 +348,20 @@ static int vlclua_ml_list_show( lua_State *L, vlc_ml_show_list_t *list )
     for ( size_t i = 0; i < list->i_nb_items; ++i )
     {
         vlclua_ml_push_show( L, &list->p_items[i] );
+        lua_rawseti( L, -2, i + 1 );
+    }
+    vlc_ml_release( list );
+    return 1;
+}
+
+static int vlclua_ml_list_bookmark( lua_State *L, vlc_ml_bookmark_list_t *list )
+{
+    if ( list == NULL )
+        return luaL_error( L, "Failed to list bookmarks" );
+    lua_createtable( L, list->i_nb_items, 0 );
+    for ( size_t i = 0; i < list->i_nb_items; ++i )
+    {
+        vlclua_ml_push_bookmark( L, &list->p_items[i] );
         lua_rawseti( L, -2, i + 1 );
     }
     vlc_ml_release( list );
@@ -712,6 +739,19 @@ static int vlclua_ml_reload( lua_State *L )
     return 0;
 }
 
+static int vlclua_media_bookmarks( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    int64_t mediaId = luaL_checkinteger( L, 2 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_bookmark_list_t *list = vlc_ml_list_media_bookmarks( ml, &params, mediaId );
+    return vlclua_ml_list_bookmark( L, list );
+}
+
+
+
 static const luaL_Reg vlclua_ml_reg[] = {
     { "video", vlclua_ml_video },
     { "folder", vlclua_ml_folder },
@@ -738,6 +778,7 @@ static const luaL_Reg vlclua_ml_reg[] = {
     { "artist_thumbnail", vlclua_ml_get_artist_thumbnail },
     { "album_thumbnail", vlclua_ml_get_album_thumbnail },
     { "reload", vlclua_ml_reload },
+    { "media_bookmarks", vlclua_media_bookmarks },
     { NULL, NULL }
 };
 
