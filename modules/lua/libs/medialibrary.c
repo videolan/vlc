@@ -765,6 +765,37 @@ static int vlclua_ml_reload( lua_State *L )
     return 0;
 }
 
+static int vlclua_ml_history( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_ml_history_type_t historyType = luaL_checkinteger( L, 2 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_list_t *list = vlc_ml_list_history( ml, &params, historyType );
+    return vlclua_ml_list_media( L, list );
+}
+
+static int vlclua_ml_video_history( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_list_t *list = vlc_ml_list_video_history( ml, &params );
+    return vlclua_ml_list_media( L, list );
+}
+
+static int vlclua_ml_audio_history( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 1 );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_media_list_t *list = vlc_ml_list_audio_history( ml, &params );
+    return vlclua_ml_list_media( L, list );
+}
+
 static int vlclua_media_bookmarks( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
@@ -806,6 +837,9 @@ static const luaL_Reg vlclua_ml_reg[] = {
     { "artist_thumbnail", vlclua_ml_get_artist_thumbnail },
     { "album_thumbnail", vlclua_ml_get_album_thumbnail },
     { "reload", vlclua_ml_reload },
+    { "history", vlclua_ml_history },
+    { "video_history",vlclua_ml_video_history },
+    { "audio_history",vlclua_ml_audio_history },
     { "media_bookmarks", vlclua_media_bookmarks },
     { NULL, NULL }
 };
