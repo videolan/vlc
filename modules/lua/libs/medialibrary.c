@@ -671,6 +671,39 @@ static int vlclua_ml_list_album_tracks( lua_State *L )
     return vlclua_ml_list_media( L, list );
 }
 
+static int vlclua_ml_list_artist_tracks( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 2 );
+    lua_Integer artistId = luaL_checkinteger( L, 1 );
+    vlc_ml_media_list_t *list = vlc_ml_list_artist_tracks( ml, &params, artistId );
+    return vlclua_ml_list_media( L, list );
+}
+
+static int vlclua_ml_list_genre_tracks( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 2 );
+    lua_Integer genreId = luaL_checkinteger( L, 1 );
+    vlc_ml_media_list_t *list = vlc_ml_list_genre_tracks( ml, &params, genreId );
+    return vlclua_ml_list_media( L, list );
+}
+
+static int vlclua_ml_list_playlist_tracks( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_query_params_t params;
+    vlclua_ml_assign_params( L, &params, 2 );
+    lua_Integer playlistId = luaL_checkinteger( L, 1 );
+    vlc_ml_media_list_t *list = vlc_ml_list_playlist_media( ml, &params, playlistId );
+    return vlclua_ml_list_media( L, list );
+}
+
 static int vlclua_ml_reload( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
@@ -696,6 +729,9 @@ static const luaL_Reg vlclua_ml_reg[] = {
     { "playlists", vlclua_ml_list_all_playlists },
     { "playlist", vlclua_ml_get_playlist },
     { "album_tracks", vlclua_ml_list_album_tracks },
+    { "artist_tracks", vlclua_ml_list_artist_tracks },
+    { "genre_tracks", vlclua_ml_list_genre_tracks },
+    { "playlist_tracks", vlclua_ml_list_playlist_tracks },
     { "artist_albums", vlclua_ml_list_artist_albums },
     { "genre_albums", vlclua_ml_list_genre_albums },
     { "genre_artists", vlclua_ml_list_genre_artists },
