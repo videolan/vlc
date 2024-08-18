@@ -69,9 +69,15 @@
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-    NSIndexSet * const indices = self.selectedRowIndexes;
-    if (indices.count == 0 || self.dataSource == nil || !_vlcDataSourceConforming) {
+    if (self.dataSource == nil || !_vlcDataSourceConforming) {
         return;
+    }
+
+    NSMutableIndexSet * const indices = self.selectedRowIndexes.mutableCopy;
+    if (indices.count == 0 && self.clickedRow == -1) {
+        return;
+    } else if (indices.count == 0 && self.clickedRow >= 0) {
+        [indices addIndex:self.clickedRow];
     }
 
     if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
