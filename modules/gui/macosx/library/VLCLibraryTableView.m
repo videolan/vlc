@@ -69,24 +69,30 @@
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-    if (self.dataSource == nil || !_vlcDataSourceConforming) {
+    const id<NSTableViewDataSource> dataSource = self.dataSource;
+    if (dataSource == nil || !_vlcDataSourceConforming) {
         return;
     }
 
     NSMutableIndexSet * const indices = self.selectedRowIndexes.mutableCopy;
-    if (indices.count == 0 && self.clickedRow == -1) {
-        return;
-    } else if (indices.count == 0 && self.clickedRow >= 0) {
-        [indices addIndex:self.clickedRow];
+    const NSUInteger hasSelectedIndices = indices.count > 0;
+    const NSUInteger clickedRow = self.clickedRow;
+
+    if (!hasSelectedIndices) {
+        if (clickedRow == -1) {
+            return;
+        } else {
+            [indices addIndex:clickedRow];
+        }
     }
 
-    if([self.dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
+    if([dataSource conformsToProtocol:@protocol(VLCLibraryTableViewDataSource)]) {
         NSMutableArray<VLCLibraryRepresentedItem *> * const representedItems = 
             NSMutableArray.array;
         const id<VLCLibraryTableViewDataSource> vlcLibraryDataSource = 
-            (id<VLCLibraryTableViewDataSource>)self.dataSource;
+            (id<VLCLibraryTableViewDataSource>)dataSource;
 
-        if ([indices containsIndex:self.clickedRow]) {
+        if ([indices containsIndex:clickedRow]) {
             [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
                 const id<VLCMediaLibraryItemProtocol> mediaItem =
                     [vlcLibraryDataSource libraryItemAtRow:index forTableView:self];
@@ -99,7 +105,7 @@
             }];
         } else {
             const id<VLCMediaLibraryItemProtocol> mediaItem = 
-                [vlcLibraryDataSource libraryItemAtRow:self.clickedRow forTableView:self];
+                [vlcLibraryDataSource libraryItemAtRow:clickedRow forTableView:self];
             const VLCMediaLibraryParentGroupType parentType = 
                 vlcLibraryDataSource.currentParentType;
             VLCLibraryRepresentedItem * const representedItem = 
@@ -110,10 +116,10 @@
 
         _menuController.representedItems = representedItems;
 
-    } else if (self.dataSource.class == VLCMediaSourceDataSource.class) {
+    } else if (dataSource.class == VLCMediaSourceDataSource.class) {
         NSMutableArray<VLCInputItem *> * const mediaSourceInputItems = NSMutableArray.array;
         VLCMediaSourceDataSource * const mediaSourceDataSource = 
-            (VLCMediaSourceDataSource*)self.dataSource;
+            (VLCMediaSourceDataSource*)dataSource;
         NSAssert(mediaSourceDataSource != nil, @"This should be a valid pointer");
 
         [indices enumerateIndexesUsingBlock:^(const NSUInteger index, BOOL * const stop) {
