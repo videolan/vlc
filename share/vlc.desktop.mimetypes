@@ -173,6 +173,7 @@ audio/vnd.dolby.mlp     # IANA MLP/TrueHD
 audio/basic             # IANA mulaw
 audio/midi
 # Weird audio formats
+audio/atrac3
 audio/x-ape
 audio/x-gsm
 audio/x-musepack

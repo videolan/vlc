@@ -747,6 +747,10 @@
 			<array>
 				<string>oma</string>
 			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>audio/atrac3</string>
+			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>audio.icns</string>
 			<key>CFBundleTypeName</key>
@@ -2127,6 +2131,10 @@
 					<string>oma</string>
 				</array>
 			</dict>
+			<key>public.mime-type</key>
+			<array>
+				<string>audio/atrac3</string>
+			</array>
 		</dict>
 		<dict>
 			<key>UTTypeConformsTo</key>
