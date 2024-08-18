@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "vlcrs-core",
     "vlcrs-macros",
     "vlcrs-messages",
     "vlcrs-plugin",
