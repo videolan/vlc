@@ -1226,31 +1226,6 @@ static void Direct3D11Close(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D11 display adapter closed");
 }
 
-static bool BogusZeroCopy(const vout_display_t *vd)
-{
-    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-
-    if (sys->d3d_dev->adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
-        return false;
-
-    switch (sys->d3d_dev->adapterDesc.DeviceId)
-    {
-    case 0x687F: // RX Vega 56/64
-    case 0x6863: // RX Vega Frontier Edition
-    case 0x15DD: // RX Vega 8/11 (Ryzen iGPU)
-    {
-        const auto WDDM = []{
-            struct wddm_version wddm = {};
-            wddm.revision     = 14011; // 18.10.2 - 2018/06/11
-            return wddm;
-        }();
-        return D3D11CheckDriverVersion(sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
-    }
-    default:
-        return false;
-    }
-}
-
 /* TODO : handle errors better
    TODO : separate out into smaller functions like createshaders */
 static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_format_t *fmt)
@@ -1258,10 +1233,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     HRESULT hr;
 
-    if (unlikely(BogusZeroCopy(vd)))
-        // bogus drivers with texture arrays
-        sys->legacy_shader = true;
-    else if (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma))
+    if (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma))
         // CPU source copied in the staging texture(s)
         sys->legacy_shader = true;
     else if (sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0)
