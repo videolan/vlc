@@ -424,6 +424,7 @@ d:set_trackid(): the item's TrackID (OPTIONAL, meta data)
 
 Medialibrary
 ------------
+The `public_only` query parameter is enforced to be true by default.
 
 query_params = {
   "limit": integer,
@@ -432,10 +433,14 @@ query_params = {
   "sort": integer,
   "pattern": string,
   "favorite_only": boolean,
-  "public_only": boolean,
 }
 
 vlc.ml.video(query_params): Get video media list
+vlc.ml.media(mediaId: integer): Get media with media id parameter
+vlc.ml.media_by_mrl(mediaMrl: string): Get media with media mrl parameter
+vlc.ml.folder(query_params): Get folder list
+vlc.ml.folders_by_type(query_params, mediaType: integer): Get folders by type
+vlc.ml.get_folder(folderId: integer): Get folder with folder id parameter
 vlc.ml.show_episodes(query_params): Get the list of show episodes
 vlc.ml.audio(query_params): Get audio media list
 vlc.ml.media_thumbnail(mediaId: integer): Get media thumbnail with media id parameter
@@ -446,12 +451,22 @@ vlc.ml.artists(query_params): Get artist list
 vlc.ml.artist(artistId: integer): Get artist with artist id
 vlc.ml.genres(query_params): Get genres list
 vlc.ml.genre(genreId: integer): Get genre with genre id parameter
+vlc.ml.playlists(query_params): Get playlist list
+vlc.ml.playlist(playlistId: integer): Get playlist with playlist id
+vlc.ml.artist_tracks(artistId: integer, query_params): Get artist tracks with artist id parameter
+vlc.ml.genre_tracks(genreId: integer, query_params): Get genre tracks with genre id parameter
+vlc.ml.playlist_tracks(playlistId: integer, query_params): Get playlist tracks with playlist id parameter
 vlc.ml.artist_albums(artistId: integer, query_params): Get artist albums with artist id parameter
 vlc.ml.genre_albums(genreId: integer, query_params): Get albums with genre id parameter
 vlc.ml.genre_artists(genreId: integer, query_params): Get artists with genre id parameter
 vlc.ml.artist_thumbnail(artistId: integer): Get artist thumbnail with artist id parameter
 vlc.ml.album_thumbnail(albumId: integer): Get album thumbnail with album id parameter
+vlc.ml.genre_thumbnail(genreId: integer): Get genre thumbnail with genre id parameter
 vlc.ml.reload(): Reload folder
+vlc.ml.history(historyType: integer, query_params): Get history list
+vlc.ml.video_history(query_params): Get video history list
+vlc.ml.audio_history(query_params): Get audio history list
+vlc.ml.media_bookmarks(mediaId: integer, query_params): Get media bookmarks with media id parameter
 
 Stream
 ------
