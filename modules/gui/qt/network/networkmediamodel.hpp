@@ -115,6 +115,7 @@ public:
         NETWORK_MEDIA,
         NETWORK_MEDIA_PROGRESS,
         NETWORK_MEDIA_DURATION,
+        URL
     };
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged)

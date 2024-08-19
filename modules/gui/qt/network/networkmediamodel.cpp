@@ -557,6 +557,8 @@ QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
 
             return {};
         }
+        case URL:
+            return item->uri;
         default:
             return basedata(*item, role);
     }
@@ -574,6 +576,7 @@ QHash<int, QByteArray> NetworkMediaModel::roleNames() const
     roles[NETWORK_MEDIA] = "media";
     roles[NETWORK_MEDIA_PROGRESS] = "progress";
     roles[NETWORK_MEDIA_DURATION] = "duration";
+    roles[URL] = "url";
 
     return roles;
 }
