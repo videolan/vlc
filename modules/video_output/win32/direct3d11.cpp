@@ -138,6 +138,16 @@ typedef struct vout_display_sys_t
     picture_sys_d3d11_t      stagingSys = {};
     plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
 
+    // NV12/P010 to RGB for D3D11 < 11.1
+    struct {
+        ComPtr<ID3D11VideoDevice>               d3dviddev;
+        ComPtr<ID3D11VideoContext>              d3dvidctx;
+        ComPtr<ID3D11VideoProcessorEnumerator>  enumerator;
+        ComPtr<ID3D11VideoProcessor>            processor;
+        ComPtr<ID3D11VideoProcessorOutputView>  outputView;
+    } old_feature;
+
+
     d3d11_vertex_shader_t    projectionVShader = {};
     d3d11_vertex_shader_t    flatVShader = {};
 
@@ -401,6 +411,25 @@ static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 
         for (unsigned plane = 0; plane < DXGI_MAX_SHADER_VIEW; plane++)
             sys->stagingSys.texture[plane] = textures[plane];
+
+        if (sys->old_feature.processor)
+        {
+            HRESULT hr;
+            D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc;
+            outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
+            outDesc.Texture2D.MipSlice = 0;
+
+            hr = sys->old_feature.d3dviddev->CreateVideoProcessorOutputView(
+                                                                    textures[0],
+                                                                    sys->old_feature.enumerator.Get(),
+                                                                    &outDesc,
+                                                                    sys->old_feature.outputView.ReleaseAndGetAddressOf());
+            if (FAILED(hr))
+            {
+                msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
+                return VLC_EGENERIC;
+            }
+        }
     }
     return VLC_SUCCESS;
 }
@@ -651,6 +680,36 @@ static bool SelectRenderPlane(void *opaque, size_t plane, ID3D11RenderTargetView
     return sys->selectPlaneCb(sys->outside_opaque, plane, (void*)targetView);
 }
 
+static int assert_ProcessorInput(vout_display_t *vd, picture_sys_d3d11_t *p_sys_src)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    if (!p_sys_src->processorInput)
+    {
+        D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC inDesc{};
+        inDesc.FourCC = 0;
+        inDesc.ViewDimension = D3D11_VPIV_DIMENSION_TEXTURE2D;
+        inDesc.Texture2D.MipSlice = 0;
+        inDesc.Texture2D.ArraySlice = p_sys_src->slice_index;
+
+        HRESULT hr;
+
+        hr = sys->old_feature.d3dviddev->CreateVideoProcessorInputView(
+                                                             p_sys_src->resource[KNOWN_DXGI_INDEX],
+                                                             sys->old_feature.enumerator.Get(),
+                                                             &inDesc,
+                                                             &p_sys_src->processorInput);
+        if (FAILED(hr))
+        {
+#ifndef NDEBUG
+            msg_Dbg(vd,"Failed to create processor input for slice %d. (hr=0x%lX)", p_sys_src->slice_index, hr);
+#endif
+            return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
+}
+
+
 static void PreparePicture(vout_display_t *vd, picture_t *picture,
                            const vlc_render_subpicture *subpicture,
                            vlc_tick_t date)
@@ -736,6 +795,25 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
         }
         else if (sys->legacy_shader)
         {
+            if (sys->old_feature.processor)
+            {
+                if (assert_ProcessorInput(vd, p_sys) != VLC_SUCCESS)
+                {
+                    msg_Err(vd, "fail to create upscaler input");
+                }
+                else
+                {
+                    D3D11_VIDEO_PROCESSOR_STREAM stream{};
+                    stream.Enable = TRUE;
+                    stream.pInputSurface = p_sys->processorInput;
+
+                    sys->old_feature.d3dvidctx->VideoProcessorBlt(sys->old_feature.processor.Get(),
+                                                                  sys->old_feature.outputView.Get(),
+                                                                  0, 1, &stream);
+                }
+            }
+            else
+            {
             D3D11_TEXTURE2D_DESC texDesc;
             sys->stagingSys.texture[0]->GetDesc(&texDesc);
             D3D11_BOX box;
@@ -749,6 +827,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
                                                       0, 0, 0, 0,
                                                       p_sys->resource[KNOWN_DXGI_INDEX],
                                                       p_sys->slice_index, &box);
+            }
         }
         else
         {
@@ -1179,6 +1258,57 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     return GetDisplayFormatByDepth(vd, 0, 0, 0, 0, false, DXGI_YUV_FORMAT|DXGI_RGB_FORMAT);
 }
 
+static HRESULT SetupInternalConverter(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    auto d3d_dev = sys->d3d_dev;
+
+    HRESULT hr;
+    hr = d3d_dev->d3ddevice->QueryInterface(IID_GRAPHICS_PPV_ARGS(&sys->old_feature.d3dviddev));
+    if (unlikely(FAILED(hr)))
+    {
+        msg_Err(vd, "Could not Query ID3D11VideoDevice Interface. (hr=0x%lX)", hr);
+        return hr;
+    }
+
+    hr = d3d_dev->d3dcontext->QueryInterface(IID_GRAPHICS_PPV_ARGS(&sys->old_feature.d3dvidctx));
+    if (unlikely(FAILED(hr)))
+    {
+        msg_Err(vd, "Could not Query ID3D11VideoContext Interface. (hr=0x%lX)", hr);
+        return hr;
+    }
+
+    D3D11_VIDEO_PROCESSOR_CONTENT_DESC processorDesc{};
+    processorDesc.InputFrameFormat = D3D11_VIDEO_FRAME_FORMAT_PROGRESSIVE;
+    processorDesc.InputFrameRate = {
+        fmt->i_frame_rate, fmt->i_frame_rate_base,
+    };
+    processorDesc.InputWidth   = fmt->i_width;
+    processorDesc.InputHeight  = fmt->i_height;
+    processorDesc.OutputWidth  = fmt->i_width;
+    processorDesc.OutputHeight = fmt->i_height;
+    processorDesc.OutputFrameRate = {
+        fmt->i_frame_rate, fmt->i_frame_rate_base,
+    };
+    processorDesc.Usage = D3D11_VIDEO_USAGE_PLAYBACK_NORMAL;
+    hr = sys->old_feature.d3dviddev->CreateVideoProcessorEnumerator(&processorDesc, &sys->old_feature.enumerator);
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "Can't get a video processor for the video (error 0x%lx).", hr);
+        return hr;
+    }
+
+    hr = sys->old_feature.d3dviddev->CreateVideoProcessor(sys->old_feature.enumerator.Get(), 0,
+                                                        &sys->old_feature.processor);
+    if (FAILED(hr))
+    {
+        msg_Dbg(vd, "failed to create the processor (error 0x%lx).", hr);
+        return hr;
+    }
+
+    return S_OK;
+}
+
 static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_context *vctx, video_format_t *quad_fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
@@ -1194,17 +1324,30 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         quad_fmt->transfer           = TRANSFER_FUNC_SMPTE_ST2084;
         quad_fmt->space              = COLOR_SPACE_BT2020;
         quad_fmt->color_range        = COLOR_RANGE_FULL;
-
-        // request an input format that can be input of a VideoProcessor
-        UINT supportFlags = D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT;
-        decoder_format = FindD3D11Format( vd, sys->d3d_dev, fmt->i_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
-                                            is_d3d11_opaque(fmt->i_chroma) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU, supportFlags );
     }
-    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, decoder_format != nullptr);
+    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, false);
     if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
        return VLC_EGENERIC;
+    }
+
+    if (vctx)
+    {
+        d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
+        if (sys->picQuad.generic.textureFormat->formatTexture != vtcx_sys->format)
+        {
+            HRESULT hr;
+            // check the input format can be used as input of a VideoProcessor
+            decoder_format = FindD3D11Format( vd, sys->d3d_dev, fmt->i_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
+                                              DXGI_CHROMA_GPU, D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT );
+            hr = SetupInternalConverter(vd, fmt);
+            if (FAILED(hr))
+            {
+                msg_Err(vd, "Failed to initialize internal converter. (hr=0x%lX)", hr);
+                return VLC_EGENERIC;
+            }
+        }
     }
 
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.generic.textureFormat->name,
@@ -1249,6 +1392,9 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma))
         // CPU source copied in the staging texture(s)
+        sys->legacy_shader = true;
+    else if (sys->old_feature.d3dviddev)
+        // use a staging texture to do chroma conversion
         sys->legacy_shader = true;
     else if (sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0)
         // use a staging texture with no texture array on 9.x
