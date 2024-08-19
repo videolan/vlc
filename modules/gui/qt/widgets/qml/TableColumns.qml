@@ -67,8 +67,7 @@ Item {
 
             const value = rowModel[criteria]
 
-            // NOTE: We can't use 'instanceof' because VLCTick is uncreatable.
-            if (value.toString().indexOf("VLCTick(") === 0) {
+            if (value.formatShort) {
 
                 string += value.formatShort()
             } else if (criteria === "nb_tracks") {
