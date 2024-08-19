@@ -337,7 +337,7 @@ T.Control {
 
             onEntered: (drag) => {
                 if (!acceptDrop) {
-                    drag.accept = false
+                    drag.accepted = false
                     return
                 }
 
@@ -361,7 +361,7 @@ T.Control {
 
             onEntered: (drag) =>  {
                 if (!acceptDrop) {
-                    drag.accept = false
+                    drag.accepted = false
                     return
                 }
 
