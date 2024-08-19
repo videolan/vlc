@@ -35,27 +35,22 @@ T.Control {
     required property bool selected
     required property Widgets.DragItem dragItem
 
-    readonly property bool topContainsDrag: higherDropArea.containsDrag
-    readonly property bool bottomContainsDrag: lowerDropArea.containsDrag
+    readonly property bool topContainsDrag: dropAreaLayout.higherDropArea.containsDrag
+    readonly property bool bottomContainsDrag: dropAreaLayout.lowerDropArea.containsDrag
     readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
     required property real fixedColumnWidth
     required property real weightedColumnWidth
 
-    readonly property point drag: {
-        if (!containsDrag)
-            return Qt.point(0, 0)
-
-        const d = topContainsDrag ? higherDropArea : lowerDropArea
-        const p = d.drag
-        return mapFromItem(d, p.x, p.y)
-    }
+    readonly property point dragPosition: mapFromItem(dropAreaLayout,
+                                                      dropAreaLayout.dragPosition.x,
+                                                      dropAreaLayout.dragPosition.y)
 
     // Optional, used to show the drop indicator
-    property var isDropAcceptable
+    property alias isDropAcceptable: dropAreaLayout.isDropAcceptable
 
     // Optional, but required to drop a drag
-    property var acceptDrop
+    property alias acceptDrop: dropAreaLayout.acceptDrop
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -291,56 +286,8 @@ T.Control {
         }
     }
 
-    ColumnLayout {
+    Widgets.ListViewExt.VerticalDropAreaLayout {
+        id: dropAreaLayout
         anchors.fill: parent
-        spacing: 0
-
-        DropArea {
-            id: higherDropArea
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            onEntered: (drag) => {
-                if (!acceptDrop) {
-                    drag.accepted = false
-                    return
-                }
-
-                if (isDropAcceptable && !isDropAcceptable(drag, index)) {
-                    drag.accepted = false
-                    return
-                }
-            }
-
-            onDropped: (drop) => {
-                console.assert(acceptDrop)
-                acceptDrop(index, drop)
-            }
-        }
-
-        DropArea {
-            id: lowerDropArea
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            onEntered: (drag) =>  {
-                if (!acceptDrop) {
-                    drag.accepted = false
-                    return
-                }
-
-                if (isDropAcceptable && !isDropAcceptable(drag, index + 1)) {
-                    drag.accepted = false
-                    return
-                }
-            }
-
-            onDropped: (drop) => {
-                console.assert(acceptDrop)
-                acceptDrop(index + 1, drop)
-            }
-        }
     }
 }

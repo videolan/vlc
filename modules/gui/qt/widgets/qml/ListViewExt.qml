@@ -18,6 +18,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
+import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 
@@ -111,6 +112,78 @@ ListView {
             dropIndicatorItem = dropIndicator.createObject(this)
     }
 
+    component VerticalDropAreaLayout : ColumnLayout {
+        spacing: 0
+
+        property alias higherDropArea: higherDropArea
+        property alias lowerDropArea: lowerDropArea
+
+        property var isDropAcceptable
+        property var acceptDrop
+
+        readonly property point dragPosition: {
+            let area = null
+
+            if (higherDropArea.containsDrag)
+                area = higherDropArea
+            else if (lowerDropArea.containsDrag)
+                area = lowerDropArea
+            else
+                return Qt.point(0, 0)
+
+            const drag = area.drag
+            return Qt.point(drag.x, drag.y)
+        }
+
+        DropArea {
+            id: higherDropArea
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onEntered: (drag) => {
+                if (!acceptDrop) {
+                    drag.accepted = false
+                    return
+                }
+
+                if (isDropAcceptable && !isDropAcceptable(drag, index)) {
+                    drag.accepted = false
+                    return
+                }
+            }
+
+            onDropped: (drop) => {
+                console.assert(acceptDrop)
+                acceptDrop(index, drop)
+            }
+        }
+
+        DropArea {
+            id: lowerDropArea
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onEntered: (drag) =>  {
+                if (!acceptDrop) {
+                    drag.accepted = false
+                    return
+                }
+
+                if (isDropAcceptable && !isDropAcceptable(drag, index + 1)) {
+                    drag.accepted = false
+                    return
+                }
+            }
+
+            onDropped: (drop) => {
+                console.assert(acceptDrop)
+                acceptDrop(index + 1, drop)
+            }
+        }
+    }
+
     Component {
         id: footerDragAccessoryComponent
 
@@ -140,7 +213,7 @@ ListView {
                 }
             }
 
-            property alias drag: dropArea.drag
+            property alias dragPosition: dropArea.drag
 
             Rectangle {
                 id: firstItemIndicator
@@ -429,7 +502,7 @@ ListView {
             dragging: root.itemContainsDrag !== null
             dragPosProvider: function () {
                 const source = root.itemContainsDrag
-                const point = source.drag
+                const point = source.dragPosition
                 return root.mapFromItem(source, point.x, point.y)
             }
         }
