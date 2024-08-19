@@ -395,7 +395,7 @@ static int DxSetupOutput(vlc_va_t *va, const directx_va_mode_t *mode, const vide
     const d3d_format_t *processorInput[4];
     int idx = 0;
     const d3d_format_t *decoder_format;
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT | D3D11_FORMAT_SUPPORT_SHADER_LOAD;
+    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
     // enough sub-sampling+bit depth, with any alpha
     decoder_format = FindD3D11Format( va, sys->d3d_dev, 0, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT,
                                       mode->bit_depth, mode->log2_chroma_h+1, mode->log2_chroma_w+1, -1,
