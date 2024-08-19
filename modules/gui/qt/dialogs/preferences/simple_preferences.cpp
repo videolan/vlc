@@ -1350,8 +1350,15 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 
 void SPrefsPanel::changeStyle()
 {
-    QApplication::setStyle( getQStyleKey( m_interfaceUI.stylesCombo
-                                        , qApp->property("initialStyle").toString() ) );
+    const QString key = getQStyleKey( m_interfaceUI.stylesCombo,
+                                      qApp->property("initialStyle").toString() );
+
+    QMetaObject::invokeMethod( qApp, [key]() {
+        // Queue this call in order to prevent
+        // updating the preferences dialog when
+        // it is rejected:
+        QApplication::setStyle( key );
+    }, Qt::QueuedConnection );
 }
 
 void SPrefsPanel::langChanged( int i )
