@@ -291,6 +291,7 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
         that->UpdateName( newMediaPtr.get() );
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
+        that->m_url = vlc::wrap_cptr( input_item_GetURI( newMediaPtr.get() ) ).get();
 
         {
             vlc_player_locker lock{ that->m_player };
@@ -2121,6 +2122,7 @@ PRIMITIVETYPE_GETTER(QString, getTitle, m_title)
 PRIMITIVETYPE_GETTER(QString, getArtist, m_artist)
 PRIMITIVETYPE_GETTER(QString, getAlbum, m_album)
 PRIMITIVETYPE_GETTER(QUrl, getArtwork, m_artwork)
+PRIMITIVETYPE_GETTER(QUrl, getUrl, m_url)
 
 // High resolution time fed by SMPTE timer
 PRIMITIVETYPE_GETTER(QString, highResolutionTime, m_highResolutionTime)

@@ -110,6 +110,7 @@ public:
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged FINAL)
     Q_PROPERTY(float buffering READ getBuffering  NOTIFY bufferingChanged FINAL)
     Q_PROPERTY(float rate READ getRate WRITE setRate NOTIFY rateChanged FINAL)
+    Q_PROPERTY(QUrl url READ getUrl NOTIFY inputChanged FINAL)
 
     Q_PROPERTY(VLCTick time READ getTime WRITE setTime NOTIFY timeChanged FINAL)
     Q_PROPERTY(VLCTick remainingTime READ getRemainingTime NOTIFY remainingTimeChanged FINAL)
@@ -297,6 +298,7 @@ public slots:
     void restorePlaybackPos();
     void openVLsub();
     void acknowledgeRestoreCallback();
+    QUrl getUrl() const;
 
     //tracks
     TrackListModel* getVideoTracks();
