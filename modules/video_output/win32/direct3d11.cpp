@@ -1396,9 +1396,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     else if (sys->old_feature.d3dviddev)
         // use a staging texture to do chroma conversion
         sys->legacy_shader = true;
-    else if (sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0)
-        // use a staging texture with no texture array on 9.x
-        sys->legacy_shader = true;
     else
         sys->legacy_shader = false;
 
