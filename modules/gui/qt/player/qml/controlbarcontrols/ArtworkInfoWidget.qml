@@ -203,9 +203,11 @@ AbstractButton {
 
                 text: {
                     if (paintOnly)
-                        qsTr("Title")
+                        return qsTr("Title")
+                    else if (Player.title.length > 0)
+                        return Player.title
                     else
-                        Player.title
+                        return Player.name
                 }
                 color: theme.fg.primary
             }
