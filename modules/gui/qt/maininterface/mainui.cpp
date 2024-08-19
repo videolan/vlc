@@ -238,7 +238,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
-        qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "VLCTick", "");
+        qmlRegisterUncreatableType<VLCTick>(uri, versionMajor, versionMinor, "vlcTick", "");
         qmlRegisterType<VideoSurface>(uri, versionMajor, versionMinor, "VideoSurface");
         qmlRegisterUncreatableType<BaseModel>( uri, versionMajor, versionMinor, "BaseModel", "Base Model is uncreatable." );
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );
@@ -258,7 +258,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Dialogs
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
         qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
-        qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "DialogId", "");
+        qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "dialogId", "");
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
 
@@ -328,7 +328,7 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 0;
 
         // @uri VLC.Playlist
-        qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "PlaylistItem", "");
+        qmlRegisterUncreatableType<PlaylistItem>(uri, versionMajor, versionMinor, "playlistItem", "");
         qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
         qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
         qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
@@ -366,7 +366,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Style
         qmlRegisterUncreatableType<ColorSchemeModel>(uri, versionMajor, versionMinor, "ColorSchemeModel", "");
         qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
-        qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "ColorProperty", "");
+        qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "colorProperty", "");
         qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
@@ -420,7 +420,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.MediaLibrary
         qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
 
-        qmlRegisterUncreatableType<MLItemId>( uri, versionMajor, versionMinor, "MLItemId", "");
+        qmlRegisterUncreatableType<MLItemId>( uri, versionMajor, versionMinor, "mediaId", "");
         qmlRegisterUncreatableType<MLBaseModel>( uri, versionMajor, versionMinor, "MLBaseModel", "ML Base Model is uncreatable." );
         qmlRegisterType<MLAlbumModel>( uri, versionMajor, versionMinor, "MLAlbumModel" );
         qmlRegisterType<MLArtistModel>( uri, versionMajor, versionMinor, "MLArtistModel" );
