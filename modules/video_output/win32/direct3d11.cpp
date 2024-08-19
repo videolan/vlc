@@ -906,7 +906,8 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
     const d3d_format_t *res;
     res = FindD3D11Format( vd, sys->d3d_dev, 0, rgb_yuv,
                             bit_depth, widthDenominator+1, heightDenominator+1, alpha_bits,
-                            DXGI_CHROMA_CPU, supportFlags );
+                            from_processor ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU,
+                            supportFlags );
     if (res == nullptr)
     {
         msg_Dbg(vd, "No display format for %u-bit %u:%u%s%s%s", bit_depth, widthDenominator, heightDenominator,
