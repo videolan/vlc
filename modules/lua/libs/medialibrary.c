@@ -713,6 +713,25 @@ static int vlclua_ml_get_album_thumbnail( lua_State *L )
     return 1;
 }
 
+static int vlclua_ml_get_genre_thumbnail( lua_State *L )
+{
+    if( lua_gettop( L ) < 1 ) return vlclua_error( L );
+
+    lua_Integer genreId = luaL_checkinteger( L, 1 );
+    vlc_object_t *p_this = vlclua_get_this( L );
+    vlc_medialibrary_t *ml = vlc_ml_instance_get( p_this );
+    vlc_ml_genre_t *genre = vlc_ml_get_genre( ml, genreId );
+    if ( genre == NULL ||
+         genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl == NULL )
+    {
+        vlc_ml_release( genre );
+        return 0;
+    }
+    lua_pushstring( L, genre->thumbnails[VLC_ML_THUMBNAIL_SMALL].psz_mrl );
+    vlc_ml_release( genre );
+    return 1;
+}
+
 static int vlclua_ml_list_album_tracks( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
@@ -836,6 +855,7 @@ static const luaL_Reg vlclua_ml_reg[] = {
     { "genre_artists", vlclua_ml_list_genre_artists },
     { "artist_thumbnail", vlclua_ml_get_artist_thumbnail },
     { "album_thumbnail", vlclua_ml_get_album_thumbnail },
+    { "genre_thumbnail", vlclua_ml_get_genre_thumbnail },
     { "reload", vlclua_ml_reload },
     { "history", vlclua_ml_history },
     { "video_history",vlclua_ml_video_history },
