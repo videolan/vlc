@@ -106,6 +106,11 @@ ListView {
     
     footer: !!root.acceptDropFunc ? footerDragAccessoryComponent : null
 
+    onItemContainsDragChanged: {
+        if (!dropIndicatorItem && dropIndicator)
+            dropIndicatorItem = dropIndicator.createObject(this)
+    }
+
     Component {
         id: footerDragAccessoryComponent
 
@@ -495,9 +500,7 @@ ListView {
         }
     }
 
-    Rectangle {
-        id: dropIndicator
-
+    property Component dropIndicator: Rectangle {
         parent: {
             const item = root.itemContainsDrag
             if (!item || item.topContainsDrag === undefined || item.bottomContainsDrag === undefined)
@@ -527,6 +530,8 @@ ListView {
         visible: !!parent
         color: theme.accent
     }
+
+    property Item dropIndicatorItem
 
     // FIXME: We probably need to upgrade these RoundButton(s) eventually. And we probably need
     //        to have some kind of animation when switching pages.
