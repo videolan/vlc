@@ -1044,7 +1044,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 }
 
 static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx,
-                                              const d3d_format_t * decoder_format)
+                                              bool allow_processor)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
@@ -1063,6 +1063,14 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
         else
         {
             msg_Dbg(vd, "Texture format %s not supported by shaders", DxgiFormatToStr(vtcx_sys->format));
+            if (!D3D11_DeviceSupportsFormat( sys->d3d_dev, vtcx_sys->format, D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_INPUT ))
+            {
+                msg_Dbg(vd, "Texture format %s not supported in video processor", DxgiFormatToStr(vtcx_sys->format));
+            }
+            else
+            {
+                allow_processor = true;
+            }
         }
     }
     else
@@ -1142,13 +1150,14 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
     bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
     res = GetDisplayFormatByDepth(vd, bits_per_channel,
                                   widthDenominator, heightDenominator, alpha_bits,
-                                  decoder_format!=nullptr,
+                                  allow_processor,
                                   is_rgb ? DXGI_RGB_FORMAT : DXGI_YUV_FORMAT);
     if (res != nullptr)
         return res;
+    // check RGB instead of YUV (and vice versa)
     res = GetDisplayFormatByDepth(vd, bits_per_channel,
                                   widthDenominator, heightDenominator, alpha_bits,
-                                  decoder_format!=nullptr,
+                                  allow_processor,
                                   is_rgb ? DXGI_YUV_FORMAT : DXGI_RGB_FORMAT);
     if (res != nullptr)
         return res;
@@ -1191,7 +1200,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
         decoder_format = FindD3D11Format( vd, sys->d3d_dev, fmt->i_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
                                             is_d3d11_opaque(fmt->i_chroma) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU, supportFlags );
     }
-    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, decoder_format);
+    sys->picQuad.generic.textureFormat = SelectOutputFormat(vd, quad_fmt, vctx, decoder_format != nullptr);
     if ( !sys->picQuad.generic.textureFormat )
     {
        msg_Err(vd, "Could not get a suitable texture pixel format");
