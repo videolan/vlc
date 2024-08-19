@@ -1258,8 +1258,17 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     HRESULT hr;
 
-    sys->legacy_shader = sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0 ||
-            BogusZeroCopy(vd) || (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma));
+    if (unlikely(BogusZeroCopy(vd)))
+        // bogus drivers with texture arrays
+        sys->legacy_shader = true;
+    else if (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma))
+        // CPU source copied in the staging texture(s)
+        sys->legacy_shader = true;
+    else if (sys->d3d_dev->feature_level < D3D_FEATURE_LEVEL_10_0)
+        // use a staging texture with no texture array on 9.x
+        sys->legacy_shader = true;
+    else
+        sys->legacy_shader = false;
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
     hr = D3D11_CompilePixelShaderBlob(vd, sys->shaders, sys->d3d_dev,
