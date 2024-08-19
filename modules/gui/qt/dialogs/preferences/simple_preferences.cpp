@@ -1352,14 +1352,6 @@ void SPrefsPanel::changeStyle()
 {
     QApplication::setStyle( getQStyleKey( m_interfaceUI.stylesCombo
                                         , qApp->property("initialStyle").toString() ) );
-
-    /* force refresh on all widgets */
-    QWidgetList widgets = QApplication::allWidgets();
-    QWidgetList::iterator it = widgets.begin();
-    while( it != widgets.end() ) {
-        (*it)->update();
-        ++it;
-    };
 }
 
 void SPrefsPanel::langChanged( int i )
