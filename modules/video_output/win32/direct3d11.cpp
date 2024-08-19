@@ -889,15 +889,6 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
                             is_d3d11_opaque(i_src_chroma) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU, supportFlags );
 }
 
-static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
-{
-    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-
-    UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
-                            DXGI_CHROMA_GPU, supportFlags );
-}
-
 static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth,
                                                    uint8_t widthDenominator,
                                                    uint8_t heightDenominator,
@@ -1050,7 +1041,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 }
 
 static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_format_t *fmt, vlc_video_context *vctx,
-                                              const d3d_format_t * & decoder_format)
+                                              const d3d_format_t * decoder_format)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
@@ -1142,10 +1133,6 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
             break;
         }
     }
-
-    /* look for a decoder format that can be decoded but not used in shaders */
-    if ( is_d3d11_opaque(fmt->i_chroma) )
-        decoder_format = GetDirectDecoderFormat(vd, fmt->i_chroma);
 
     bool is_rgb = !vlc_fourcc_IsYUV(fmt->i_chroma);
     res = GetDisplayFormatByDepth(vd, bits_per_channel,
