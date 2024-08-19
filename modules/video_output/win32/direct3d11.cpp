@@ -814,19 +814,19 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
             }
             else
             {
-            D3D11_TEXTURE2D_DESC texDesc;
-            sys->stagingSys.texture[0]->GetDesc(&texDesc);
-            D3D11_BOX box;
-            box.top = 0;
-            box.bottom = __MIN(srcDesc.Height, texDesc.Height);
-            box.left = 0;
-            box.right = __MIN(srcDesc.Width, texDesc.Width);
-            box.back = 1;
-            sys->d3d_dev->d3dcontext->CopySubresourceRegion(
-                                                      sys->stagingSys.resource[KNOWN_DXGI_INDEX],
-                                                      0, 0, 0, 0,
-                                                      p_sys->resource[KNOWN_DXGI_INDEX],
-                                                      p_sys->slice_index, &box);
+                D3D11_TEXTURE2D_DESC texDesc;
+                sys->stagingSys.texture[0]->GetDesc(&texDesc);
+                D3D11_BOX box;
+                box.top = 0;
+                box.bottom = __MIN(srcDesc.Height, texDesc.Height);
+                box.left = 0;
+                box.right = __MIN(srcDesc.Width, texDesc.Width);
+                box.back = 1;
+                sys->d3d_dev->d3dcontext->CopySubresourceRegion(
+                                                        sys->stagingSys.resource[KNOWN_DXGI_INDEX],
+                                                        0, 0, 0, 0,
+                                                        p_sys->resource[KNOWN_DXGI_INDEX],
+                                                        p_sys->slice_index, &box);
             }
         }
         else
