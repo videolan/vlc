@@ -898,7 +898,11 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
 
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
+    {
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
+        if (alpha_bits == 0)
+            alpha_bits = 1; // allow the video processor to alpha opaque alpha
+    }
     const d3d_format_t *res;
     res = FindD3D11Format( vd, sys->d3d_dev, 0, rgb_yuv,
                             bit_depth, widthDenominator+1, heightDenominator+1, alpha_bits,
