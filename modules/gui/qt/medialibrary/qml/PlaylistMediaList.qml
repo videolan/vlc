@@ -408,7 +408,17 @@ MainViewLoader {
 
             header: root.header
 
-            acceptDrop: true
+            listView.isDropAcceptableFunc: function(drag, index) {
+                root._adjustDragAccepted(drag)
+                return drag.accepted
+            }
+
+            listView.acceptDropFunc: function(index, drop) {
+                return new Promise(() => { root._dropAction(drop,
+                                                            listView.itemContainsDrag.index) } )
+            }
+
+            listView.dropIndicator: null
 
             Navigation.parentItem: root
 
@@ -425,14 +435,6 @@ MainViewLoader {
 
             onRightClick: (_, _, globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
-            }
-
-            onDropEntered: (_, _, drag, _) => {
-                root._adjustDragAccepted(drag)
-            }
-
-            onDropEvent: (_, index, _, drop, _) => {
-                root._dropAction(drop, index)
             }
 
             //-------------------------------------------------------------------------------------

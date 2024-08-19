@@ -98,8 +98,6 @@ MainTableView {
 
     rowHeight: VLCStyle.tableCoverRow_height
 
-    acceptDrop: true
-
     sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                           : _modelMedium
 
@@ -121,42 +119,6 @@ MainTableView {
     onActionForSelection: (selection) => model.addAndPlay( selection )
     onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
 
-
-    onDropEntered: (delegate, index, drag, before) => {
-        if (!root.model || root.model.transactionPending)
-        {
-            drag.accepted = false
-            return
-        }
-
-        root._dropUpdatePosition(drag, index, delegate, before)
-    }
-
-    onDropUpdatePosition: (delegate, index, drag, before) => {
-        root._dropUpdatePosition(drag, index, delegate, before)
-    }
-
-    onDropExited: (delegate, index, drag, before) => {
-        root.hideLine(delegate)
-    }
-
-    onDropEvent: (delegate, index, drag, drop, before) => {
-        root.applyDrop(drop, index, delegate, before)
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Connections
-    //---------------------------------------------------------------------------------------------
-
-    Connections {
-        target: root
-
-        // NOTE: We want to hide the drop line when scrolling so its position stays relevant.
-        function onContentYChanged() {
-            hideLine(_item)
-        }
-    }
-
     //---------------------------------------------------------------------------------------------
     // Functions
     //---------------------------------------------------------------------------------------------
@@ -176,7 +138,7 @@ MainTableView {
 
     function applyDrop(drop, index, delegate, before) {
         if (listView.isDropAcceptableFunc(drop, index + (before ? 0 : 1)) === false) {
-            root.hideLine(delegate)
+            drop.accepted = false
             return Promise.resolve()
         }
 
@@ -188,14 +150,13 @@ MainTableView {
         if (dragItem === item) {
             model.move(selectionModel.selectedRows(), destinationIndex)
             root.forceActiveFocus()
-            root.hideLine(delegate)
         // NOTE: Dropping medialibrary content into the playlist.
         } else if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
             return item.getSelectedInputItem()
                         .then(inputItems => {
                             model.insert(inputItems, destinationIndex)
                         })
-                        .then(() => { root.forceActiveFocus(); root.hideLine(delegate); })
+                        .then(() => { root.forceActiveFocus(); })
         } else if (drop.hasUrls) {
             const urlList = []
             for (let url in drop.urls)
@@ -204,46 +165,9 @@ MainTableView {
             model.insert(urlList, destinationIndex)
 
             root.forceActiveFocus()
-            root.hideLine(delegate)
         }
 
         return Promise.resolve()
-    }
-
-    function _dropUpdatePosition(drag, index, delegate, before) {
-        if (listView.isDropAcceptableFunc(drag, index + (before ? 0 : 1)) === false) {
-            root.hideLine(delegate)
-            return
-        }
-
-        root.showLine(delegate, before)
-    }
-
-    //---------------------------------------------------------------------------------------------
-    // Drop line
-
-    function showLine(item, before)
-    {
-        // NOTE: We want to avoid calling mapFromItem too many times.
-        if (_item === item && _before === before)
-            return;
-
-        _item   = item;
-        _before = before;
-
-        if (before)
-            line.y = view.mapFromItem(item, 0, 0).y;
-        else
-            line.y = view.mapFromItem(item, 0, item.height).y;
-    }
-
-    function hideLine(item)
-    {
-        // NOTE: We want to make sure we're not being called after the 'showLine' function.
-        if (_item !== item)
-            return;
-
-        _item = null;
     }
 
     //---------------------------------------------------------------------------------------------

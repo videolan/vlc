@@ -34,14 +34,28 @@ T.Control {
     required property var sortModel
     required property bool selected
     required property Widgets.DragItem dragItem
-    required property bool acceptDrop
 
-    readonly property bool dragActive: dragHandler.active
-    property alias containsDrag: dropArea.containsDrag
-    property alias drag: dropArea.drag
+    readonly property bool topContainsDrag: higherDropArea.containsDrag
+    readonly property bool bottomContainsDrag: lowerDropArea.containsDrag
+    readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
 
     required property real fixedColumnWidth
     required property real weightedColumnWidth
+
+    readonly property point drag: {
+        if (!containsDrag)
+            return Qt.point(0, 0)
+
+        const d = topContainsDrag ? higherDropArea : lowerDropArea
+        const p = d.drag
+        return mapFromItem(d, p.x, p.y)
+    }
+
+    // Optional, used to show the drop indicator
+    property var isDropAcceptable
+
+    // Optional, but required to drop a drag
+    property var acceptDrop
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
@@ -50,11 +64,6 @@ T.Control {
     signal itemDoubleClicked(var index, var model)
 
     signal selectAndFocus(int modifiers, int focusReason)
-
-    signal dropEntered(var drag, bool before)
-    signal dropUpdatePosition(var drag, bool before)
-    signal dropExited(var drag, bool before)
-    signal dropEvent(var drag, var drop, bool before)
 
     property Component defaultDelegate: TableRowDelegate {
         id: defaultDelId
@@ -82,7 +91,7 @@ T.Control {
 
     hoverEnabled: true
 
-    ListView.delayRemove: dragActive
+    ListView.delayRemove: dragHandler.active
 
     Component.onCompleted: {
         Keys.menuPressed.connect(contextButton.clicked)
@@ -282,24 +291,56 @@ T.Control {
         }
     }
 
-    DropArea {
-        id: dropArea
-
-        enabled: delegate.acceptDrop
-
+    ColumnLayout {
         anchors.fill: parent
+        spacing: 0
 
-        function isBefore(drag) {
-            return drag.y < height/2
+        DropArea {
+            id: higherDropArea
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onEntered: (drag) => {
+                if (!acceptDrop) {
+                    drag.accepted = false
+                    return
+                }
+
+                if (isDropAcceptable && !isDropAcceptable(drag, index)) {
+                    drag.accepted = false
+                    return
+                }
+            }
+
+            onDropped: (drop) => {
+                console.assert(acceptDrop)
+                acceptDrop(index, drop)
+            }
         }
 
-        onEntered: (drag) => { delegate.dropEntered(drag, isBefore(drag)) }
+        DropArea {
+            id: lowerDropArea
 
-        onPositionChanged: (drag) => { delegate.dropUpdatePosition(drag, isBefore(drag)) }
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        onExited:delegate.dropExited(drag, isBefore(drag))
+            onEntered: (drag) =>  {
+                if (!acceptDrop) {
+                    drag.accepted = false
+                    return
+                }
 
-        onDropped: (drop) => { delegate.dropEvent(drag, drop, isBefore(drag)) }
+                if (isDropAcceptable && !isDropAcceptable(drag, index + 1)) {
+                    drag.accepted = false
+                    return
+                }
+            }
 
+            onDropped: (drop) => {
+                console.assert(acceptDrop)
+                acceptDrop(index + 1, drop)
+            }
+        }
     }
 }

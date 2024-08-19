@@ -99,7 +99,6 @@ FocusScope {
     property real availableRowWidth: 0
 
     property Widgets.DragItem dragItem: null
-    property bool acceptDrop: false
 
     // Private
 
@@ -161,11 +160,6 @@ FocusScope {
     signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
-
-    signal dropUpdatePosition(Item delegate, int index, var drag, bool before)
-    signal dropEntered(Item delegate, int index, var drag, bool before)
-    signal dropExited(Item delegate, int index,  var drag, bool before)
-    signal dropEvent(Item delegate, int index,  var drag, var drop, bool before)
 
     // Events
 
@@ -413,8 +407,6 @@ FocusScope {
 
             selected: selectionModel.selectedIndexesFlat.includes(index)
 
-            acceptDrop: root.acceptDrop
-
             onContextMenuButtonClicked: (menuParent, menuModel, globalMousePos) => {
                 root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
             }
@@ -425,18 +417,8 @@ FocusScope {
                 root.itemDoubleClicked(index, model)
             }
 
-            onDropEntered: (drag, before) => {
-                root.dropEntered(tableDelegate, index, drag, before)
-            }
-            onDropUpdatePosition:  (drag, before) => {
-                root.dropUpdatePosition(tableDelegate, index, drag, before)
-            }
-            onDropExited:  (drag, before) => {
-                root.dropExited(tableDelegate, index, drag, before)
-            }
-            onDropEvent:  (drag, drop, before) => {
-                root.dropEvent(tableDelegate, index, drag, drop, before)
-            }
+            isDropAcceptable: view.isDropAcceptableFunc
+            acceptDrop: view.acceptDropFunc
 
             onSelectAndFocus: (modifiers, focusReason) => {
                 selectionModel.updateSelection(modifiers, view.currentIndex, index)
