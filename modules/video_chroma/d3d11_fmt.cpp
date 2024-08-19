@@ -256,7 +256,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
     if (!uReturn)
     {
-        msg_Warn(obj, "failed to find the device");
+        msg_Warn(obj, "failed to find the device driver");
         goto done;
     }
 
