@@ -464,8 +464,8 @@ static HRESULT CreateDevice(vlc_object_t *obj,
                                D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
                                &out->d3ddevice, &out->feature_level, &out->d3dcontext);
         if (SUCCEEDED(hr)) {
-            msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
-                    driverAttempts[driver], out->feature_level);
+            msg_Dbg(obj, "Created the D3D11 device type %d level %x (flags %08x).",
+                    driverAttempts[driver], out->feature_level, creationFlags);
             if (adapter != NULL)
                 hr = adapter->GetDesc(&out->adapterDesc);
             else
