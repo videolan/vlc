@@ -883,10 +883,8 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
-    if (is_d3d11_opaque(i_src_chroma))
-        supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
     return FindD3D11Format( vd, sys->d3d_dev, i_src_chroma, DXGI_RGB_FORMAT|DXGI_YUV_FORMAT, 0, 0, 0, 0,
-                            is_d3d11_opaque(i_src_chroma) ? DXGI_CHROMA_GPU : DXGI_CHROMA_CPU, supportFlags );
+                            DXGI_CHROMA_CPU, supportFlags );
 }
 
 static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth,
@@ -1062,11 +1060,13 @@ static const d3d_format_t *SelectOutputFormat(vout_display_t *vd, const video_fo
             msg_Dbg(vd, "Texture format %s not supported by shaders", DxgiFormatToStr(vtcx_sys->format));
         }
     }
-
-    // look for the requested pixel format first
-    res = GetDirectRenderingFormat(vd, fmt->i_chroma);
-    if (res != nullptr)
-        return res;
+    else
+    {
+        // look for the requested pixel format first
+        res = GetDirectRenderingFormat(vd, fmt->i_chroma);
+        if (res != nullptr)
+            return res;
+    }
 
     msg_Dbg(vd, "Direct rendering not usable for %4.4s", (char*)&fmt->i_chroma);
 
