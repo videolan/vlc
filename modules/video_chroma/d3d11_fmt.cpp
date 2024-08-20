@@ -156,30 +156,10 @@ int D3D11_AllocateResourceView(struct vlc_logger *obj, ID3D11Device *d3ddevice,
     return VLC_SUCCESS;
 }
 
-static void SetDriverString(vlc_object_t *obj, d3d11_device_t *d3d_dev, const WCHAR *szData)
-{
-    int wddm, d3d_features, revision, build;
-    /* see https://docs.microsoft.com/en-us/windows-hardware/drivers/display/wddm-2-1-features#driver-versioning */
-    if (swscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
-    {
-        msg_Warn(obj, "the adapter DriverVersion '%ls' doesn't match the expected format", szData);
-        return;
-    }
-    d3d_dev->WDDM.wddm         = wddm;
-    d3d_dev->WDDM.d3d_features = d3d_features;
-    d3d_dev->WDDM.revision     = revision;
-    d3d_dev->WDDM.build        = build;
-    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(d3d_dev->adapterDesc.VendorId), wddm, d3d_features, revision, build);
-    if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
-    {
-        /* new Intel driver format */
-        d3d_dev->WDDM.build += (revision - 100) * 1000;
-    }
-}
-
-static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+static LARGE_INTEGER D3D11_GetSystemDriver(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     HRESULT hr;
+    LARGE_INTEGER result = {};
     IWbemLocator *pLoc = NULL;
     IWbemServices *pSvc = NULL;
     IEnumWbemClassObject* pEnumerator = NULL;
@@ -198,7 +178,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     if (FAILED(hr))
     {
         msg_Dbg(obj, "Unable to initialize COM library");
-        return;
+        return {};
     }
 
     IWbemClassObject *pclsObj = NULL;
@@ -217,7 +197,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
         msg_Dbg(obj, "Failed to create IWbemLocator object");
         goto done;
     }
-    pLoc = (IWbemLocator *)res.pItf;
+    pLoc = static_cast<IWbemLocator *>(res.pItf);
 
     hr = pLoc->ConnectServer(bRootNamespace,
                                     NULL, NULL, NULL, 0, NULL, NULL, &pSvc);
@@ -270,7 +250,17 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
         goto done;
     }
 
-    SetDriverString(obj, d3d_dev, vtProp.bstrVal);
+    int wddm, d3d_features, revision, build;
+    /* see https://docs.microsoft.com/en-us/windows-hardware/drivers/display/wddm-2-1-features#driver-versioning */
+    if (swscanf(vtProp.bstrVal, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
+    {
+        msg_Warn(obj, "the adapter DriverVersion '%ls' doesn't match the expected format", vtProp.bstrVal);
+    }
+    else
+    {
+        result.HighPart = (wddm << 16) + d3d_features;
+        result.LowPart  = (revision << 16) + build;
+    }
 
     VariantClear(&vtProp);
     pclsObj->Release();
@@ -286,6 +276,49 @@ done:
     if (pLoc)
         pLoc->Release();
     CoUninitialize();
+
+    return result;
+}
+
+static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev, IDXGIAdapter *pAdapter)
+{
+    int wddm, d3d_features, revision, build;
+    HRESULT hr;
+    LARGE_INTEGER driver = {};
+
+    hr = pAdapter->CheckInterfaceSupport(__uuidof(IDXGIDevice), &driver);
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "failed to get interface version. (hr=0x%lX)", hr);
+        driver = D3D11_GetSystemDriver(obj, d3d_dev);
+    }
+    else if (HIWORD(driver.HighPart) < 23)
+    // starting with WDDM 2.3 driver versions must be coherent
+    // https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-checkinterfacesupport#parameters
+    {
+        msg_Dbg(obj, "unsupported interface version %" PRIx64, driver.QuadPart);
+        driver = D3D11_GetSystemDriver(obj, d3d_dev);
+    }
+    else
+    {
+        assert(driver.QuadPart == D3D11_GetSystemDriver(obj, d3d_dev).QuadPart);
+    }
+
+    wddm         = HIWORD(driver.HighPart);
+    d3d_features = LOWORD(driver.HighPart);
+    revision     = HIWORD(driver.LowPart);
+    build        = LOWORD(driver.LowPart);
+
+    msg_Dbg(obj, "%s WDDM driver %d.%d.%d.%d", DxgiVendorStr(d3d_dev->adapterDesc.VendorId), wddm, d3d_features, revision, build);
+    if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_INTEL && revision >= 100)
+    {
+        /* new Intel driver format */
+        build += (revision - 100) * 1000;
+    }
+    d3d_dev->WDDM.wddm         = wddm;
+    d3d_dev->WDDM.d3d_features = d3d_features;
+    d3d_dev->WDDM.revision     = revision;
+    d3d_dev->WDDM.build        = build;
 }
 
 #ifdef HAVE_DXGI_DEBUG
@@ -403,7 +436,6 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
         return E_FAIL;
     }
     hr = pAdapter->GetDesc(&out->adapterDesc);
-    pAdapter->Release();
     if (FAILED(hr))
         msg_Warn(obj, "can't get adapter description");
 
@@ -420,7 +452,8 @@ static HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext
         out->context_mutex = CreateMutexEx( NULL, NULL, 0, SYNCHRONIZE );
     }
 
-    D3D11_GetDriverVersion(obj, out);
+    D3D11_GetDriverVersion(obj, out, pAdapter);
+    pAdapter->Release();
     return S_OK;
 }
 
@@ -467,7 +500,10 @@ static HRESULT CreateDevice(vlc_object_t *obj,
             msg_Dbg(obj, "Created the D3D11 device type %d level %x (flags %08x).",
                     driverAttempts[driver], out->feature_level, creationFlags);
             if (adapter != NULL)
+            {
                 hr = adapter->GetDesc(&out->adapterDesc);
+                D3D11_GetDriverVersion( obj, out, adapter );
+            }
             else
             {
                 IDXGIAdapter *adap = D3D11DeviceAdapter(out->d3ddevice);
@@ -476,13 +512,13 @@ static HRESULT CreateDevice(vlc_object_t *obj,
                 else
                 {
                     hr = adap->GetDesc(&out->adapterDesc);
+                    D3D11_GetDriverVersion( obj, out, adap );
                     adap->Release();
                 }
             }
             if (hr)
                 msg_Warn(obj, "can't get adapter description");
 
-            D3D11_GetDriverVersion( obj, out );
             /* we can work with legacy levels but only if forced */
             if ( obj->force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
