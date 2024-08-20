@@ -39,6 +39,7 @@ extern "C" {
 #define GPU_MANUFACTURER_INTEL         0x8086
 #define GPU_MANUFACTURER_S3            0x5333
 #define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
+#define GPU_MANUFACTURER_MICROSOFT     0x1414 // "Microsoft Basic Render Driver"
 
 #define D3D11_MAX_SHADER_VIEW  4
 

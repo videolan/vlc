@@ -141,6 +141,7 @@ const char *DxgiVendorStr(int gpu_vendor)
         { GPU_MANUFACTURER_INTEL,    "Intel"       },
         { GPU_MANUFACTURER_S3,       "S3 Graphics" },
         { GPU_MANUFACTURER_QUALCOMM, "Qualcomm"    },
+        { GPU_MANUFACTURER_MICROSOFT, "Microsoft"  },
         { 0,                         "Unknown" }
     };
 
