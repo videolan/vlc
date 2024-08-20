@@ -939,10 +939,8 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     ::vlcrs_plugin::ModuleProperties::MODULE_CB_OPEN as _,
                     #module_open_with_nul,
                     unsafe {
-                        std::mem::transmute::<
-                            <#loader as ModuleProtocol<#type_>>::Activate,
-                            *mut std::ffi::c_void
-                        >(<#loader as ModuleProtocol<#type_>>::activate_function())
+                        <#loader as ModuleProtocol<#type_>>::activate_function()
+                        as *mut std::ffi::c_void
                     }
                 )
             } != 0
@@ -958,10 +956,8 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         ::vlcrs_plugin::ModuleProperties::MODULE_CB_CLOSE as _,
                         #module_close_with_nul,
                         unsafe {
-                            std::mem::transmute::<
-                                <#loader as ModuleProtocol<#type_>>::Deactivate,
-                                *mut std::ffi::c_void
-                            >(<#loader as ModuleProtocol<#type_>>::deactivate_function().unwrap())
+                            <#loader as ModuleProtocol<#type_>>::deactivate_function().unwrap()
+                            as *mut std::ffi::c_void
                         }
                     )
                 } != 0
