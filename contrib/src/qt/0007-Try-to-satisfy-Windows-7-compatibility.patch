@@ -1,4 +1,4 @@
-From 09d078434fef71a34690b098720d8e6bfe7dc5f8 Mon Sep 17 00:00:00 2001
+From 0ecf855405af7ab941e5ddeac85373549e733fdc Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 22 Jan 2024 21:37:39 +0200
 Subject: [PATCH 7/7] Try to satisfy Windows 7 compatibility
@@ -13,7 +13,7 @@ Subject: [PATCH 7/7] Try to satisfy Windows 7 compatibility
  src/corelib/thread/qfutex_win_p.h             |  42 +++++-
  src/corelib/thread/qmutex_win.cpp             |   4 +-
  src/gui/CMakeLists.txt                        |   1 -
- src/gui/rhi/qrhid3d11.cpp                     |   9 +-
+ src/gui/rhi/qrhid3d11.cpp                     |   5 +-
  src/gui/rhi/qrhid3d12.cpp                     |  68 +++++++++-
  .../text/windows/qwindowsfontdatabasebase.cpp |  14 +-
  .../networklistmanager/CMakeLists.txt         |   1 -
@@ -31,13 +31,13 @@ Subject: [PATCH 7/7] Try to satisfy Windows 7 compatibility
  .../platforms/windows/qwindowstheme.cpp       |   6 +-
  .../platforms/windows/qwindowswindow.cpp      |  48 +++++--
  src/widgets/styles/qwindowsstyle.cpp          |  26 +++-
- 27 files changed, 523 insertions(+), 92 deletions(-)
+ 27 files changed, 518 insertions(+), 93 deletions(-)
 
 diff --git a/cmake/QtBaseConfigureTests.cmake b/cmake/QtBaseConfigureTests.cmake
-index 7713def6bf..0af3d622f9 100644
+index ebfd17bddf..34c067cd35 100644
 --- a/cmake/QtBaseConfigureTests.cmake
 +++ b/cmake/QtBaseConfigureTests.cmake
-@@ -158,16 +158,16 @@ function(qt_internal_ensure_latest_win_nt_api)
+@@ -163,16 +163,16 @@ function(qt_internal_ensure_latest_win_nt_api)
          #if !defined(_WIN32_WINNT) && !defined(WINVER)
          #error "_WIN32_WINNT and WINVER are not defined"
          #endif
@@ -60,7 +60,7 @@ index 7713def6bf..0af3d622f9 100644
              CACHE STRING "Qt platform specific pre-processor defines" FORCE)
      endif()
 diff --git a/src/corelib/CMakeLists.txt b/src/corelib/CMakeLists.txt
-index 4809e32766..ddf4c8057c 100644
+index c03d3d9e73..f1f9abce74 100644
 --- a/src/corelib/CMakeLists.txt
 +++ b/src/corelib/CMakeLists.txt
 @@ -517,17 +517,17 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_animation
@@ -127,7 +127,7 @@ index 5586d0b927..eb0264b4ee 100644
  
  #ifndef NOMINMAX
 diff --git a/src/corelib/io/qfilesystemengine_win.cpp b/src/corelib/io/qfilesystemengine_win.cpp
-index 67378e2b5d..580e141e2b 100644
+index 3ec32e31a1..106c479fc7 100644
 --- a/src/corelib/io/qfilesystemengine_win.cpp
 +++ b/src/corelib/io/qfilesystemengine_win.cpp
 @@ -1,6 +1,11 @@
@@ -288,7 +288,7 @@ index 8c7741c113..ce3586a90b 100644
  
  void QMutexPrivate::wakeUp() noexcept
 diff --git a/src/gui/CMakeLists.txt b/src/gui/CMakeLists.txt
-index 3207244afd..437a09c708 100644
+index 8ea68087cf..4e91889c00 100644
 --- a/src/gui/CMakeLists.txt
 +++ b/src/gui/CMakeLists.txt
 @@ -433,7 +433,6 @@ qt_internal_extend_target(Gui CONDITION WIN32
@@ -300,7 +300,7 @@ index 3207244afd..437a09c708 100644
  
  if(QT_FEATURE_graphicsframecapture)
 diff --git a/src/gui/rhi/qrhid3d11.cpp b/src/gui/rhi/qrhid3d11.cpp
-index 92e4cacc16..844e9c072b 100644
+index 4bea980c90..dec40ae898 100644
 --- a/src/gui/rhi/qrhid3d11.cpp
 +++ b/src/gui/rhi/qrhid3d11.cpp
 @@ -8,6 +8,7 @@
@@ -311,24 +311,20 @@ index 92e4cacc16..844e9c072b 100644
  #include "qrhid3dhelpers_p.h"
  
  QT_BEGIN_NAMESPACE
-@@ -155,8 +156,14 @@ inline Int aligned(Int v, Int byteAlign)
- 
+@@ -181,9 +182,9 @@ inline Int aligned(Int v, Int byteAlign)
  static IDXGIFactory1 *createDXGIFactory2()
  {
-+    QSystemLibrary dxgilib(QLatin1String("dxgi"));
-+    typedef HRESULT (*CreateDXGIFactory2FuncPtr)(UINT Flags, REFIID riid, void **ppFactory);
-+    const auto createDXGIFactory2 = reinterpret_cast<CreateDXGIFactory2FuncPtr>(dxgilib.resolve("CreateDXGIFactory2"));
-+    if (!createDXGIFactory2)
-+        return nullptr;
-+
      IDXGIFactory1 *result = nullptr;
 -    const HRESULT hr = CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), reinterpret_cast<void **>(&result));
-+    const HRESULT hr = createDXGIFactory2(0, __uuidof(IDXGIFactory2), reinterpret_cast<void **>(&result));
++    const HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactory2), reinterpret_cast<void **>(&result));
      if (FAILED(hr)) {
-         qWarning("CreateDXGIFactory2() failed to create DXGI factory: %s",
+-        qWarning("CreateDXGIFactory2() failed to create DXGI factory: %s",
++        qWarning("CreateDXGIFactory1() failed to create DXGI factory: %s",
              qPrintable(QSystemError::windowsComString(hr)));
+         result = nullptr;
+     }
 diff --git a/src/gui/rhi/qrhid3d12.cpp b/src/gui/rhi/qrhid3d12.cpp
-index ae6e4ac376..bce22ee6ce 100644
+index d40f14c5a3..b818646c55 100644
 --- a/src/gui/rhi/qrhid3d12.cpp
 +++ b/src/gui/rhi/qrhid3d12.cpp
 @@ -5,6 +5,7 @@
@@ -339,7 +335,7 @@ index ae6e4ac376..bce22ee6ce 100644
  #include <comdef.h>
  #include "qrhid3dhelpers_p.h"
  #include "cs_mipmap_p.h"
-@@ -124,6 +125,17 @@ QT_BEGIN_NAMESPACE
+@@ -150,6 +151,17 @@ QT_BEGIN_NAMESPACE
  // https://learn.microsoft.com/en-us/windows/win32/direct3d12/hardware-feature-levels
  static const D3D_FEATURE_LEVEL MIN_FEATURE_LEVEL = D3D_FEATURE_LEVEL_11_0;
  
@@ -357,7 +353,7 @@ index ae6e4ac376..bce22ee6ce 100644
  void QD3D12Resource::releaseResources()
  {
      if (owns) {
-@@ -190,14 +202,23 @@ bool QRhiD3D12::create(QRhi::Flags flags)
+@@ -216,14 +228,23 @@ bool QRhiD3D12::create(QRhi::Flags flags)
      UINT factoryFlags = 0;
      if (debugLayer)
          factoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
@@ -383,7 +379,7 @@ index ae6e4ac376..bce22ee6ce 100644
          }
          if (SUCCEEDED(hr)) {
              debugLayer = false;
-@@ -219,7 +240,18 @@ bool QRhiD3D12::create(QRhi::Flags flags)
+@@ -245,7 +266,18 @@ bool QRhiD3D12::create(QRhi::Flags flags)
  
      if (debugLayer) {
          ID3D12Debug1 *debug = nullptr;
@@ -403,7 +399,7 @@ index ae6e4ac376..bce22ee6ce 100644
              qCDebug(QRHI_LOG_INFO, "Enabling D3D12 debug layer");
              debug->EnableDebugLayer();
              debug->Release();
-@@ -287,7 +319,22 @@ bool QRhiD3D12::create(QRhi::Flags flags)
+@@ -313,7 +345,22 @@ bool QRhiD3D12::create(QRhi::Flags flags)
          if (minimumFeatureLevel == 0)
              minimumFeatureLevel = MIN_FEATURE_LEVEL;
  
@@ -427,7 +423,7 @@ index ae6e4ac376..bce22ee6ce 100644
                                 minimumFeatureLevel,
                                 __uuidof(ID3D12Device2),
                                 reinterpret_cast<void **>(&dev));
-@@ -2770,7 +2817,12 @@ bool QD3D12MipmapGenerator::create(QRhiD3D12 *rhiD)
+@@ -2796,7 +2843,12 @@ bool QD3D12MipmapGenerator::create(QRhiD3D12 *rhiD)
      rsDesc.Desc_1_1.pStaticSamplers = &samplerDesc;
  
      ID3DBlob *signature = nullptr;
@@ -441,7 +437,7 @@ index ae6e4ac376..bce22ee6ce 100644
      if (FAILED(hr)) {
          qWarning("Failed to serialize root signature: %s", qPrintable(QSystemError::windowsComString(hr)));
          return false;
-@@ -5025,7 +5077,11 @@ QD3D12ObjectHandle QD3D12ShaderResourceBindings::createRootSignature(const QD3D1
+@@ -5051,7 +5103,11 @@ QD3D12ObjectHandle QD3D12ShaderResourceBindings::createRootSignature(const QD3D1
      rsDesc.Desc_1_1.Flags = D3D12_ROOT_SIGNATURE_FLAGS(rsFlags);
  
      ID3DBlob *signature = nullptr;
@@ -487,12 +483,12 @@ index cef739201b..72a786efbf 100644
      qCDebug(lcQpaFonts) << __FUNCTION__ << systemFont;
      return systemFont;
 diff --git a/src/plugins/networkinformation/networklistmanager/CMakeLists.txt b/src/plugins/networkinformation/networklistmanager/CMakeLists.txt
-index f15eedf866..9e68765b89 100644
+index acd3754f4e..3c80ad3e1a 100644
 --- a/src/plugins/networkinformation/networklistmanager/CMakeLists.txt
 +++ b/src/plugins/networkinformation/networklistmanager/CMakeLists.txt
 @@ -16,7 +16,6 @@ qt_internal_add_plugin(QNLMNIPlugin
  
- qt_internal_extend_target(QNLMNIPlugin CONDITION MSVC
+ qt_internal_extend_target(QNLMNIPlugin CONDITION WIN32
      LIBRARIES
 -        runtimeobject
          oleaut32
@@ -1160,7 +1156,7 @@ index 2a01b0fa0d..b79155dab6 100644
  
      m_fonts[SystemFont] = new QFont(QWindowsFontDatabase::systemDefaultFont());
 diff --git a/src/plugins/platforms/windows/qwindowswindow.cpp b/src/plugins/platforms/windows/qwindowswindow.cpp
-index c2c093faf4..d93b01f1ed 100644
+index 220c36cc19..ad354abde0 100644
 --- a/src/plugins/platforms/windows/qwindowswindow.cpp
 +++ b/src/plugins/platforms/windows/qwindowswindow.cpp
 @@ -148,7 +148,7 @@ static QByteArray debugWinExStyle(DWORD exStyle)
@@ -1333,5 +1329,5 @@ index ae82f784ca..50d2e85871 100644
      default:
          break;
 -- 
-2.44.0
+2.45.2
 
