@@ -38,6 +38,7 @@ extern "C" {
 #define GPU_MANUFACTURER_INTEL         0x8086
 #define GPU_MANUFACTURER_S3            0x5333
 #define GPU_MANUFACTURER_QUALCOMM  0x4D4F4351
+#define GPU_MANUFACTURER_MICROSOFT     0x1414 // "Microsoft Basic Render Driver"
 
 #define DXGI_MAX_SHADER_VIEW     4
 #define DXGI_MAX_RENDER_TARGET   2 // for NV12/P010 we render Y and UV separately
