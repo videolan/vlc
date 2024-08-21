@@ -406,7 +406,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showGroupsLibrary
 {
-    [self.toolbarDelegate layoutForSegment:self.librarySegmentType];
+    [self.toolbarDelegate layoutForSegment:VLCLibraryGroupsSegment];
     [_libraryGroupsViewController presentGroupsView];
 }
 
