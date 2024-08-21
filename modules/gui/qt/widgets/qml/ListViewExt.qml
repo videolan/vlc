@@ -101,7 +101,7 @@ ListView {
     // Content width is set to the width by default
     // If the delegate does not obey it, calculate
     // the content width appropriately.
-    contentWidth: width
+    contentWidth: (orientation === ListView.Vertical) ? width : -1
     
     footer: !!root.acceptDropFunc ? footerDragAccessoryComponent : null
 
