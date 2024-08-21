@@ -92,7 +92,6 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 
 @interface VLCLibraryWindow ()
 {
-    NSInteger _librarySegmentType;
     NSInteger _currentSelectedViewModeSegment;
     VLCVideoWindowCommon *_temporaryAudioDecorativeWindow;
 }
