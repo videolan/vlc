@@ -98,10 +98,11 @@ ListView {
     section.criteria: ViewSection.FullString
     section.delegate: sectionHeading
 
-    // Content width is set to the width by default
+    // Content size is set to the size by default
     // If the delegate does not obey it, calculate
-    // the content width appropriately.
+    // the content size appropriately.
     contentWidth: (orientation === ListView.Vertical) ? width - (leftMargin + rightMargin) : -1
+    contentHeight: (orientation === ListView.Horizontal) ? height - (topMargin + bottomMargin) : -1
     
     footer: !!root.acceptDropFunc ? footerDragAccessoryComponent : null
 
