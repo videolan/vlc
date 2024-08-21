@@ -516,7 +516,7 @@ static HRESULT CreateDevice(vlc_object_t *obj,
                     adap->Release();
                 }
             }
-            if (hr)
+            if (FAILED(hr))
                 msg_Warn(obj, "can't get adapter description");
 
             /* we can work with legacy levels but only if forced */
