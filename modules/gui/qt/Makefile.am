@@ -1217,7 +1217,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ListSubtitleLabel.qml \
 	widgets/qml/PointingTooltip.qml \
 	widgets/qml/FrostedGlassEffect.qml \
-	widgets/qml/OverlayMenu.qml \
 	widgets/qml/ToolTipExt.qml \
 	widgets/qml/DropShadowImage.qml \
 	widgets/qml/DoubleShadow.qml \
