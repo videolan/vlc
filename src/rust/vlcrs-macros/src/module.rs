@@ -1,7 +1,7 @@
 //! Module macros implementation
 
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
+use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
     braced, bracketed, parenthesized, parse::Parse, parse_macro_input, punctuated::Punctuated,
@@ -971,13 +971,59 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     }
 }
 
+fn vlc_symbol(symbol_name: &str, module_name: Option<&str>) -> Ident {
+    if let Some(module_name) = module_name {
+        Ident::new(
+            &format!("{}__{}", symbol_name, module_name),
+            Span::call_site(),
+        )
+    } else {
+        Ident::new(symbol_name, Span::call_site())
+    }
+}
+
+fn vlc_entry_api_version(module_suffix: Option<&str>) -> TokenStream2 {
+    let symbol = vlc_symbol("vlc_entry_api_version", module_suffix);
+    quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn #symbol() -> *const u8 {
+            concat!(#VLC_API_VERSION_STRING, "\0").as_ptr()
+        }
+    }
+}
+
+fn vlc_entry_copyright(module_suffix: Option<&str>) -> TokenStream2 {
+    let symbol = vlc_symbol("vlc_entry_copyright", module_suffix);
+    quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn #symbol() -> *const u8 {
+            ::vlcrs_plugin::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
+        }
+    }
+}
+
+fn vlc_entry_license(module_suffix: Option<&str>) -> TokenStream2 {
+    let symbol = vlc_symbol("vlc_entry_license", module_suffix);
+    quote! {
+        #[no_mangle]
+        #[doc(hidden)]
+        extern "C" fn #symbol() -> *const u8 {
+            ::vlcrs_plugin::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
+        }
+    }
+}
+
 pub fn module(input: TokenStream) -> TokenStream {
     let module_info = parse_macro_input!(input as ModuleInfo);
 
     // TODO: Improve this with some kind environment variable passed by the build system
     // like what is done for the C side.
-    let name = format!("{}-rs", module_info.type_.to_string().to_lowercase());
+    let module_suffix = module_info.type_.to_string().to_lowercase();
+    let name = format!("{}-rs", module_suffix);
     let name_len = name.len() + 1;
+    let module_suffix = module_suffix + "_rs";
 
     let name_with_nul = tt_c_str!(module_info.type_.span() => name);
 
@@ -988,30 +1034,13 @@ pub fn module(input: TokenStream) -> TokenStream {
         pub static vlc_module_name: &[u8; #name_len] = #name_with_nul;
     };
 
-    // Copied from #define VLC_API_VERSION_STRING in include/vlc_plugin.h
-    let entry_api_version = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_api_version() -> *const u8 {
-            concat!(#VLC_API_VERSION_STRING, "\0").as_ptr()
-        }
-    };
+    let entry_api_version = vlc_entry_api_version(None);
+    let entry_copyright = vlc_entry_copyright(None);
+    let entry_license = vlc_entry_license(None);
 
-    let entry_copyright = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_copyright() -> *const u8 {
-            ::vlcrs_plugin::VLC_COPYRIGHT_VIDEOLAN.as_ptr()
-        }
-    };
-
-    let entry_license = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry_license() -> *const u8 {
-            ::vlcrs_plugin::VLC_LICENSE_LGPL_2_1_PLUS.as_ptr()
-        }
-    };
+    let entry_api_version_module_name = vlc_entry_api_version(Some(&module_suffix));
+    let entry_copyright_module_name = vlc_entry_copyright(Some(&module_suffix));
+    let entry_license_module_name = vlc_entry_license(Some(&module_suffix));
 
     let type_params = module_info.params.as_ref().map(|params| {
         let struct_name = Ident::new(
@@ -1068,51 +1097,80 @@ pub fn module(input: TokenStream) -> TokenStream {
         }
     });
 
-    let module_entry = quote! {
-        #[no_mangle]
-        #[doc(hidden)]
-        extern "C" fn vlc_entry(
-            vlc_set: ::vlcrs_plugin::sys::vlc_set_cb,
-            opaque: *mut ::std::ffi::c_void,
-        ) -> i32 {
-            use vlcrs_plugin::ModuleProtocol;
-            let mut module: *mut ::vlcrs_plugin::module_t = ::std::ptr::null_mut();
-            let mut config: *mut ::vlcrs_plugin::vlc_param = ::std::ptr::null_mut();
+    let vlc_entry = |module_suffix: Option<&str>| {
+        let symbol = vlc_symbol("vlc_entry", module_suffix);
+        quote! {
+            #[no_mangle]
+            #[doc(hidden)]
+            extern "C" fn #symbol(
+                vlc_set: ::vlcrs_plugin::sys::vlc_set_cb,
+                opaque: *mut ::std::ffi::c_void,
+            ) -> i32 {
+                use vlcrs_plugin::ModuleProtocol;
+                let mut module: *mut ::vlcrs_plugin::module_t = ::std::ptr::null_mut();
+                let mut config: *mut ::vlcrs_plugin::vlc_param = ::std::ptr::null_mut();
 
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    ::std::ptr::null_mut(),
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CREATE as _,
-                    &mut module as *mut *mut ::vlcrs_plugin::module_t,
-                )
-            } != 0
-            {
-                return -1;
+                if unsafe {
+                    vlc_set(
+                        opaque,
+                        ::std::ptr::null_mut(),
+                        ::vlcrs_plugin::ModuleProperties::MODULE_CREATE as _,
+                        &mut module as *mut *mut ::vlcrs_plugin::module_t,
+                    )
+                } != 0
+                {
+                    return -1;
+                }
+                if unsafe {
+                    vlc_set(
+                        opaque,
+                        module as _,
+                        ::vlcrs_plugin::ModuleProperties::MODULE_NAME as _,
+                        #name_with_nul,
+                    )
+                } != 0
+                {
+                    return -1;
+                }
+                #module_entry_configs
+                #submodules_entry
+                0
             }
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_NAME as _,
-                    #name_with_nul,
-                )
-            } != 0
-            {
-                return -1;
-            }
-            #module_entry_configs
-            #submodules_entry
-            0
         }
     };
+    let module_entry_module_name = vlc_entry(Some(&module_suffix));
+    let module_entry = vlc_entry(None);
+
+    let cfg_static = quote!{ #[cfg(vlc_static_plugins)] };
+    let cfg_not_static = quote!{ #[cfg(not(vlc_static_plugins))] };
 
     let expanded = quote! {
         #type_params
+
+        #cfg_static
+        #entry_api_version_module_name
+
+        #cfg_static
+        #entry_license_module_name
+
+        #cfg_static
+        #entry_copyright_module_name
+
+        #cfg_static
+        #module_entry_module_name
+
+        #cfg_not_static
         #entry_api_version
+
+        #cfg_not_static
         #entry_license
+
+        #cfg_not_static
         #entry_copyright
+
         #module_name
+
+        #cfg_not_static
         #module_entry
     };
     TokenStream::from(expanded)

@@ -7,6 +7,9 @@ license.workspace = true
 [lib]
 proc-macro = true
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vlc_static_plugins)'] }
+
 [dependencies]
 vlcrs-plugin = { path = "../vlcrs-plugin" }
 quote = "1.0"
