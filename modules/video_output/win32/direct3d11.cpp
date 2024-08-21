@@ -380,52 +380,52 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
 static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    if (sys->use_staging_texture)
+    if (!sys->use_staging_texture)
+        return VLC_SUCCESS;
+
+    /* we need a staging texture */
+    ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
+    video_format_t texture_fmt = *vd->source;
+    texture_fmt.i_width  = sys->picQuad.generic.i_width;
+    texture_fmt.i_height = sys->picQuad.generic.i_height;
+    if (!is_d3d11_opaque(fmt->i_chroma))
     {
-        /* we need a staging texture */
-        ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
-        video_format_t texture_fmt = *vd->source;
-        texture_fmt.i_width  = sys->picQuad.generic.i_width;
-        texture_fmt.i_height = sys->picQuad.generic.i_height;
-        if (!is_d3d11_opaque(fmt->i_chroma))
-        {
-            texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
-        }
+        texture_fmt.i_chroma = sys->picQuad.generic.textureFormat->fourcc;
+    }
 
-        if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt,
-                             false, textures, sys->stagingPlanes))
+    if (AllocateTextures(vd, sys->d3d_dev, sys->picQuad.generic.textureFormat, &texture_fmt,
+                            false, textures, sys->stagingPlanes))
+    {
+        msg_Err(vd, "Failed to allocate the staging texture");
+        return VLC_EGENERIC;
+    }
+
+    if (D3D11_AllocateResourceView(vlc_object_logger(vd), sys->d3d_dev->d3ddevice, sys->picQuad.generic.textureFormat,
+                                textures, 0, sys->stagingSys.renderSrc))
+    {
+        msg_Err(vd, "Failed to allocate the staging shader view");
+        return VLC_EGENERIC;
+    }
+
+    for (unsigned plane = 0; plane < DXGI_MAX_SHADER_VIEW; plane++)
+        sys->stagingSys.texture[plane] = textures[plane];
+
+    if (sys->old_feature.processor)
+    {
+        HRESULT hr;
+        D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc;
+        outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
+        outDesc.Texture2D.MipSlice = 0;
+
+        hr = sys->old_feature.d3dviddev->CreateVideoProcessorOutputView(
+                                                                textures[0],
+                                                                sys->old_feature.enumerator.Get(),
+                                                                &outDesc,
+                                                                sys->old_feature.outputView.ReleaseAndGetAddressOf());
+        if (FAILED(hr))
         {
-            msg_Err(vd, "Failed to allocate the staging texture");
+            msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
-        }
-
-        if (D3D11_AllocateResourceView(vlc_object_logger(vd), sys->d3d_dev->d3ddevice, sys->picQuad.generic.textureFormat,
-                                    textures, 0, sys->stagingSys.renderSrc))
-        {
-            msg_Err(vd, "Failed to allocate the staging shader view");
-            return VLC_EGENERIC;
-        }
-
-        for (unsigned plane = 0; plane < DXGI_MAX_SHADER_VIEW; plane++)
-            sys->stagingSys.texture[plane] = textures[plane];
-
-        if (sys->old_feature.processor)
-        {
-            HRESULT hr;
-            D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC outDesc;
-            outDesc.ViewDimension = D3D11_VPOV_DIMENSION_TEXTURE2D;
-            outDesc.Texture2D.MipSlice = 0;
-
-            hr = sys->old_feature.d3dviddev->CreateVideoProcessorOutputView(
-                                                                    textures[0],
-                                                                    sys->old_feature.enumerator.Get(),
-                                                                    &outDesc,
-                                                                    sys->old_feature.outputView.ReleaseAndGetAddressOf());
-            if (FAILED(hr))
-            {
-                msg_Dbg(vd,"Failed to create processor output. (hr=0x%lX)", hr);
-                return VLC_EGENERIC;
-            }
         }
     }
     return VLC_SUCCESS;
