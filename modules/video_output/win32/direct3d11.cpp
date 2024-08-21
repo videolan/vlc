@@ -135,6 +135,7 @@ typedef struct vout_display_sys_t
     d3d11_gpu_fence          fence = {};
 #endif
 
+    bool                     use_staging_texture = false;
     picture_sys_d3d11_t      stagingSys = {};
     plane_t                  stagingPlanes[PICTURE_PLANE_MAX];
 
@@ -150,10 +151,6 @@ typedef struct vout_display_sys_t
 
     d3d11_vertex_shader_t    projectionVShader = {};
     d3d11_vertex_shader_t    flatVShader = {};
-
-    /* copy from the decoder pool into picSquad before display
-     * Uses a Texture2D with slices rather than a Texture2DArray for the decoder */
-    bool                     legacy_shader = false;
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2] = {};
@@ -383,7 +380,7 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *viewpoint)
 static int UpdateStaging(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    if (sys->legacy_shader)
+    if (sys->use_staging_texture)
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[DXGI_MAX_SHADER_VIEW] = {0};
@@ -723,6 +720,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
         int i;
         HRESULT hr;
 
+        assert(sys->use_staging_texture);
+
         bool b_mapped = true;
         for (i = 0; i < picture->i_planes; i++) {
             hr = sys->d3d_dev->d3dcontext->Map(sys->stagingSys.resource[i],
@@ -751,6 +750,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         HRESULT hr;
+
+        assert(sys->use_staging_texture);
 
         hr = sys->d3d_dev->d3dcontext->Map(sys->stagingSys.resource[0],
                                         0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -793,7 +794,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
             srcDesc.Width  = witdh;
             srcDesc.Height = height;
         }
-        else if (sys->legacy_shader)
+        else if (sys->use_staging_texture)
         {
             if (sys->old_feature.processor)
             {
@@ -875,7 +876,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
         D3D11_UpscalerGetSRV(sys->scaleProc, SRV);
         renderSrc = SRV;
     }
-    else if (sys->legacy_shader)
+    else if (sys->use_staging_texture)
         renderSrc = sys->stagingSys.renderSrc;
     else {
         picture_sys_d3d11_t *p_sys = ActiveD3D11PictureSys(picture);
@@ -1392,12 +1393,12 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     if (sys->tonemapProc == NULL && !is_d3d11_opaque(fmt->i_chroma))
         // CPU source copied in the staging texture(s)
-        sys->legacy_shader = true;
+        sys->use_staging_texture = true;
     else if (sys->old_feature.d3dviddev)
         // use a staging texture to do chroma conversion
-        sys->legacy_shader = true;
+        sys->use_staging_texture = true;
     else
-        sys->legacy_shader = false;
+        sys->use_staging_texture = false;
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
     hr = D3D11_CompilePixelShaderBlob(vd, sys->shaders, sys->d3d_dev,
