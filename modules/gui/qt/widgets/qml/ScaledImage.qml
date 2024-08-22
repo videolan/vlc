@@ -19,13 +19,14 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Window
 
 import VLC.MainInterface
 
 Image {
     id: root
-    sourceSize: Qt.size(width * MainCtx.screen.devicePixelRatio
-                    , height * MainCtx.screen.devicePixelRatio)
+    sourceSize: Qt.size(width * Screen.devicePixelRatio,
+                        height * Screen.devicePixelRatio)
 
     property bool disableSmoothWhenIntegerUpscaling: false
 
