@@ -112,7 +112,7 @@ vlc_module_begin( )
     add_bool( "use-vlcpool", false, USEVLCPOOL_TEXT,
         USEVLCPOOL_LONGTEXT )
     add_submodule( )
-        set_callback_dec_device( OpenDecoderDevice, 100 )
+        set_callback_dec_device( OpenDecoderDevice, 1 )
         add_shortcut( "gstdecode" )
 vlc_module_end( )
 
