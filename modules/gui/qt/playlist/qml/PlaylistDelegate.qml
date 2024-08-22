@@ -171,6 +171,11 @@ T.Control {
                 visible: !statusIcon.visible
                 asynchronous: true
 
+                onStatusChanged: {
+                    if (source !== VLCStyle.noArtAlbumCover && status === Image.Error)
+                        source = VLCStyle.noArtAlbumCover
+                }
+
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
 
