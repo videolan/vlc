@@ -191,14 +191,6 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     /* VideoWidget connects for asynchronous calls */
     connect( this, &MainCtx::askToQuit, THEDP, &DialogsProvider::quit, Qt::QueuedConnection  );
 
-    QMetaObject::invokeMethod(this, [this]()
-    {
-        // *** HACKY ***
-        assert(p_intf->p_compositor->interfaceMainWindow());
-        connect(p_intf->p_compositor->interfaceMainWindow(), &QWindow::screenChanged,
-                this, &MainCtx::screenChanged);
-    }, Qt::QueuedConnection);
-
     /** END of CONNECTS**/
 
 
