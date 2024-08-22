@@ -123,8 +123,8 @@ FocusScope {
       id: artistListBackground
 
       visible: artistList.visible
-      width: artistList.width
-      height: artistList.height + artistList.displayMarginEnd
+      width: parent.width
+      height: parent.height + artistList.displayMarginEnd
 
       tintColor: artistList.colorContext.bg.secondary
 
@@ -133,6 +133,8 @@ FocusScope {
 
     RowLayout {
         anchors.fill: parent
+        anchors.leftMargin: root.leftPadding
+        anchors.rightMargin: root.rightPadding
 
         visible: artistModel.count > 0
 
@@ -182,7 +184,7 @@ FocusScope {
             header: Widgets.ViewHeader {
                 view: artistList
 
-                leftPadding: root.leftPadding + VLCStyle.margin_normal
+                leftPadding: VLCStyle.margin_normal
                 topPadding: VLCStyle.margin_xlarge
                 bottomPadding: VLCStyle.margin_small
 
@@ -200,9 +202,7 @@ FocusScope {
             }
 
             delegate: MusicArtistDelegate {
-                width: artistList.width
-
-                leftPadding: rightPadding + root.leftPadding
+                width: artistList.contentWidth
 
                 isCurrent: ListView.isCurrentItem
 
@@ -249,6 +249,9 @@ FocusScope {
 
     Widgets.EmptyLabelButton {
         anchors.fill: parent
+        anchors.leftMargin: root.leftPadding
+        anchors.rightMargin: root.rightPadding
+
         visible: !artistModel.loading && (artistModel.count <= 0)
         focus: visible
         text: qsTr("No artists found\nPlease try adding sources, by going to the Browse tab")
