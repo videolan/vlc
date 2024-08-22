@@ -171,6 +171,11 @@ AbstractButton {
                                                 .arg(artistLabel.text)
                                                 .arg(progressIndicator.text)
 
+            onStatusChanged: {
+                if (source !== VLCStyle.noArtAlbumCover && status === Image.Error)
+                    source = VLCStyle.noArtAlbumCover
+            }
+
             Widgets.DefaultShadow {
                 anchors.centerIn: coverImage
 
