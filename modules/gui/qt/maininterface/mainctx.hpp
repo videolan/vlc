@@ -145,6 +145,8 @@ class MainCtx : public QObject
     // NOTE: This is useful when we want to prioritize player hotkeys over QML keyboard navigation.
     Q_PROPERTY(bool preferHotkeys READ preferHotkeys WRITE setPreferHotkeys NOTIFY preferHotkeysChanged FINAL)
 
+    //Property for Activating bgCone in player view
+    Q_PROPERTY(bool bgCone READ isbgCone WRITE setbgCone NOTIFY bgConeToggled FINAL) 
     Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
     Q_PROPERTY(SearchCtx* search MEMBER m_search CONSTANT FINAL)
@@ -240,7 +242,8 @@ public:
 
     inline OsType getOSName() const {return m_osName;}
     inline int getOSVersion() const {return m_osVersion;}
-
+    
+    inline bool isbgCone() const {return m_bgCone; }
     inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
     inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
     void setWindowSuportExtendedFrame(bool support);
@@ -377,6 +380,7 @@ protected:
     OsType m_osName;
     int m_osVersion;
 
+    bool m_bgCone = true;
     bool m_windowSuportExtendedFrame = false;
     unsigned m_windowExtendedMargin = 0;
 
@@ -409,7 +413,8 @@ public slots:
 
     void setPinVideoControls( bool );
     void setPinOpacity( float );
-
+    
+    void setbgCone(bool);
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);
     void setHasAcrylicSurface(bool);
@@ -480,6 +485,7 @@ signals:
 
     void navBoxToggled();
 
+    void bgConeToggled();
     void windowSuportExtendedFrameChanged();
     void windowExtendedMarginChanged(unsigned margin);
 

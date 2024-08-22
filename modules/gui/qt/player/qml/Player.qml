@@ -400,6 +400,7 @@ FocusScope {
                 Layout.alignment: Qt.AlignHCenter
 
                 readonly property real sizeConstant: 2.7182
+                visible: MainCtx.bgCone
 
                 Image {
                     id: cover

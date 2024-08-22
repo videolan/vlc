@@ -359,6 +359,8 @@ void MainCtx::loadPrefs(const bool callSignals)
     /* Are we in the enhanced always-video mode or not ? */
     loadFromVLCOption(b_minimalView, "qt-minimal-view", nullptr);
 
+    loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
+
     /* Should the UI stays on top of other windows */
     loadFromVLCOption(b_interfaceOnTop, "video-on-top", [this](MainCtx *)
     {
@@ -614,6 +616,16 @@ void MainCtx::setPlayerPlaylistWidthFactor( double factor )
         m_playerPlaylistWidthFactor = factor;
         emit playerPlaylistFactorChanged(factor);
     }
+}
+
+void MainCtx::setbgCone(bool bgCone)
+{
+    if (m_bgCone == bgCone)
+        return;
+
+    m_bgCone = bgCone;
+
+    emit bgConeToggled();
 }
 
 void MainCtx::setShowRemainingTime( bool show )
