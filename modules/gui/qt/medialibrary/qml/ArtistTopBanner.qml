@@ -18,6 +18,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Window
 import QtQml.Models
 import Qt5Compat.GraphicalEffects
 
@@ -59,7 +60,7 @@ FocusScope {
 
         asynchronous: true
         source: artist.cover || VLCStyle.noArtArtist
-        sourceSize: artist.cover ? Qt.size(MainCtx.screen ? Helpers.alignUp(MainCtx.screen.availableGeometry.width, 32) : 1024, 0)
+        sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth, 32), 0)
                                  : undefined
         mipmap: !!artist.cover
         fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
