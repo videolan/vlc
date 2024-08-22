@@ -162,16 +162,14 @@ T.Control {
                 return qsTr("Media cover")
             }
 
-            Widgets.MediaCover {
+            Widgets.ScaledImage {
                 id: artwork
 
                 anchors.fill: parent
-                source: model.artwork ?? ""
-                fallbackImageSource: VLCStyle.noArtAlbumCover
+                fillMode: Image.PreserveAspectFit
+                source: (model?.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
                 visible: !statusIcon.visible
-                pictureWidth: parent.width
-                pictureHeight: parent.height
-                playCoverShowPlay: false
+                asynchronous: true
 
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
