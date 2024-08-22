@@ -90,35 +90,37 @@ typedef struct
 static vlc_tick_t
 GetLatency(audio_output_t *p_aout)
 {
-    aout_sys_t *p_sys = p_aout->sys;
+    @autoreleasepool {
+        aout_sys_t *p_sys = p_aout->sys;
 
-    Float64 unit_s;
-    vlc_tick_t latency_us = 0, us;
-    bool changed = false;
+        Float64 unit_s;
+        vlc_tick_t latency_us = 0, us;
+        bool changed = false;
 
-    us = vlc_tick_from_sec([p_sys->avInstance outputLatency]);
-    if (us != p_sys->output_latency_ticks)
-    {
-        msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us", us);
-        p_sys->output_latency_ticks = us;
-        changed = true;
+        us = vlc_tick_from_sec([p_sys->avInstance outputLatency]);
+        if (us != p_sys->output_latency_ticks)
+        {
+            msg_Dbg(p_aout, "Current device has a new outputLatency of %" PRId64 "us", us);
+            p_sys->output_latency_ticks = us;
+            changed = true;
+        }
+        latency_us += us;
+
+        us = vlc_tick_from_sec([p_sys->avInstance IOBufferDuration]);
+        if (us != p_sys->io_buffer_duration_ticks)
+        {
+            msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us", us);
+            p_sys->io_buffer_duration_ticks = us;
+            changed = true;
+        }
+        /* Don't add 'us' to 'latency_us', IOBufferDuration is already handled by
+         * the render callback (end_ticks include the current buffer length). */
+
+        if (changed)
+            msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
+                    latency_us);
+        return latency_us;
     }
-    latency_us += us;
-
-    us = vlc_tick_from_sec([p_sys->avInstance IOBufferDuration]);
-    if (us != p_sys->io_buffer_duration_ticks)
-    {
-        msg_Dbg(p_aout, "Current device has a new IOBufferDuration of %" PRId64 "us", us);
-        p_sys->io_buffer_duration_ticks = us;
-        changed = true;
-    }
-    /* Don't add 'us' to 'latency_us', IOBufferDuration is already handled by
-     * the render callback (end_ticks include the current buffer length). */
-
-    if (changed)
-        msg_Dbg(p_aout, "Current device has a new total latency of %" PRId64 "us",
-                latency_us);
-    return latency_us;
 }
 
 #pragma mark -
