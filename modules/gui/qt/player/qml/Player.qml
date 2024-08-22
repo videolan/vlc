@@ -406,12 +406,8 @@ FocusScope {
 
                     //source aspect ratio
                     readonly property real sar: paintedWidth / paintedHeight
-                    readonly property int maximumWidth: MainCtx.screen
-                                                          ? Helpers.alignUp((MainCtx.screen.availableGeometry.width / coverItem.sizeConstant), 32)
-                                                          : 1024
-                    readonly property int maximumHeight: MainCtx.screen
-                                                          ? Helpers.alignUp((MainCtx.screen.availableGeometry.height / coverItem.sizeConstant), 32)
-                                                          : 1024
+                    readonly property int maximumWidth: Helpers.alignUp((Screen.desktopAvailableWidth / coverItem.sizeConstant), 32)
+                    readonly property int maximumHeight: Helpers.alignUp((Screen.desktopAvailableHeight / coverItem.sizeConstant), 32)
 
                     readonly property int maximumSize: Math.min(maximumWidth, maximumHeight)
 
