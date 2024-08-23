@@ -294,9 +294,13 @@ case "${host_os}" in
                 PROGRAMFILES="PROGRAMFILES64"
                 LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
             ;;
-            *)
+            i?86)
                 WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
+                AX_APPEND_FLAG([-Wl,--large-address-aware], [LDFLAGS])
+            ;;
+            *)
+                AC_MSG_ERROR([Unsupported Windows architecture ${host_cpu}])
             ;;
         esac
         AC_SUBST(WINDOWS_ARCH)
