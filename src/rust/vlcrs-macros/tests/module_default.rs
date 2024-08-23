@@ -12,7 +12,7 @@ use common::TestContext;
 
 use vlcrs_macros::module;
 
-use std::ffi::c_int;
+use std::ffi::{c_int, CStr};
 use vlcrs_plugin::{ModuleProtocol,vlc_activate};
 
 unsafe extern "C"
@@ -71,6 +71,9 @@ module! {
 #[test]
 fn test_module_load_default_deactivate()
 {
+    let version = unsafe{ CStr::from_ptr(vlc_entry_api_version() as *const i8) };
+    assert_eq!(version, c"4.0.6");
+
     use vlcrs_plugin::ModuleProperties;
     let mut context = TestContext::<vlc_activate> {
         command_cursor: 0,
