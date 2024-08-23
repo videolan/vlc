@@ -28,7 +28,7 @@ function generate_info_plist()
 PLUGINS=()
 for arch in ${ARCHS}; do
   while read -r plugin; do
-    if [[ ! "${PLUGINS[@]}" =~ "${plugin}" ]]; then
+    if [[ ! " ${PLUGINS[*]} " =~ "[[:space:]]${plugin}[[:space:]]" ]]; then
       PLUGINS+=( "${plugin}" )
     fi
   done < "${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/build/modules/vlc_modules_list"
