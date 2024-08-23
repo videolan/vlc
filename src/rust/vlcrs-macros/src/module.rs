@@ -9,6 +9,8 @@ use syn::{
     MetaNameValue, RangeLimits, Token,
 };
 
+const VLC_API_VERSION_STRING: &str = "4.0.6";
+
 struct SectionInfo {
     name: LitStr,
     description: Option<LitStr>,
@@ -991,7 +993,7 @@ pub fn module(input: TokenStream) -> TokenStream {
         #[no_mangle]
         #[doc(hidden)]
         extern "C" fn vlc_entry_api_version() -> *const u8 {
-            b"4.0.6\0".as_ptr()
+            concat!(#VLC_API_VERSION_STRING, "\0").as_ptr()
         }
     };
 
