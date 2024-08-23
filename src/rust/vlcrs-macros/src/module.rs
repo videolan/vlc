@@ -4,9 +4,9 @@ use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{
-    braced, bracketed, parenthesized, parse::Parse, parse_macro_input,
-    punctuated::Punctuated, spanned::Spanned, Attribute, Error, ExprRange,
-    Ident, Lit, LitByteStr, LitInt, LitStr, MetaNameValue, RangeLimits, Token
+    braced, bracketed, parenthesized, parse::Parse, parse_macro_input, punctuated::Punctuated,
+    spanned::Spanned, Attribute, Error, ExprRange, Ident, Lit, LitByteStr, LitInt, LitStr,
+    MetaNameValue, RangeLimits, Token,
 };
 
 struct SectionInfo {
@@ -161,7 +161,7 @@ impl Parse for ModuleInfo {
                 }
                 "submodules" => {
                     input.parse::<Token![:]>()?;
-                    
+
                     let inner;
                     bracketed!(inner in input);
                     let parsed_submodules = inner.parse_terminated(SubmoduleInfo::parse)?;
@@ -710,8 +710,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         ::std::convert::Into::<::std::ffi::c_double>::into(#default_)
                     }
                 };
-                let item_type =
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_FLOAT };
+                let item_type = quote! { ::vlcrs_plugin::ConfigModule::ITEM_FLOAT };
                 let range_type = Some(quote! { ::std::ffi::c_double });
 
                 (value, item_type, range_type)
@@ -722,8 +721,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         ::std::convert::Into::<i64>::into(#default_)
                     }
                 };
-                let item_type =
-                    quote! { ::vlcrs_plugin::ConfigModule::ITEM_BOOL };
+                let item_type = quote! { ::vlcrs_plugin::ConfigModule::ITEM_BOOL };
 
                 (value, item_type, None)
             } else if param.type_ == "str" {
@@ -897,49 +895,66 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
     let module_close_with_nul = tt_c_str!(type_.span() => module_close);
 
     quote! {
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CAPABILITY as _,
-                    #capability_with_nul,
-                )
-            } != 0 {
-                return -1;
-            }
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_SCORE as _,
-                    ::std::convert::Into::<i32>::into(#score),
-                )
-            } != 0 {
-                return -1;
-            }
+        if unsafe {
+            vlc_set(
+                opaque,
+                module as _,
+                ::vlcrs_plugin::ModuleProperties::MODULE_CAPABILITY as _,
+                #capability_with_nul,
+            )
+        } != 0 {
+            return -1;
+        }
+        if unsafe {
+            vlc_set(
+                opaque,
+                module as _,
+                ::vlcrs_plugin::ModuleProperties::MODULE_SCORE as _,
+                ::std::convert::Into::<i32>::into(#score),
+            )
+        } != 0 {
+            return -1;
+        }
 
+        if unsafe {
+            vlc_set(
+                opaque,
+                module as _,
+                ::vlcrs_plugin::ModuleProperties::MODULE_DESCRIPTION as _,
+                #description_with_nul,
+            )
+        } != 0
+        {
+            return -1;
+        }
+        #module_entry_help
+        #module_entry_shortname
+        #module_entry_shortcuts
+        if unsafe {
+            vlc_set(
+                opaque,
+                module as _,
+                ::vlcrs_plugin::ModuleProperties::MODULE_CB_OPEN as _,
+                #module_open_with_nul,
+                unsafe {
+                    <#loader as ModuleProtocol<#type_>>::activate_function()
+                    as *mut std::ffi::c_void
+                }
+            )
+        } != 0
+        {
+            return -1;
+        }
+
+        if <#loader as ModuleProtocol<#type_>>::deactivate_function() != None {
             if unsafe {
                 vlc_set(
                     opaque,
                     module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_DESCRIPTION as _,
-                    #description_with_nul,
-                )
-            } != 0
-            {
-                return -1;
-            }
-            #module_entry_help
-            #module_entry_shortname
-            #module_entry_shortcuts
-            if unsafe {
-                vlc_set(
-                    opaque,
-                    module as _,
-                    ::vlcrs_plugin::ModuleProperties::MODULE_CB_OPEN as _,
-                    #module_open_with_nul,
+                    ::vlcrs_plugin::ModuleProperties::MODULE_CB_CLOSE as _,
+                    #module_close_with_nul,
                     unsafe {
-                        <#loader as ModuleProtocol<#type_>>::activate_function()
+                        <#loader as ModuleProtocol<#type_>>::deactivate_function().unwrap()
                         as *mut std::ffi::c_void
                     }
                 )
@@ -947,28 +962,11 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
             {
                 return -1;
             }
-
-            if <#loader as ModuleProtocol<#type_>>::deactivate_function() != None {
-                if unsafe {
-                    vlc_set(
-                        opaque,
-                        module as _,
-                        ::vlcrs_plugin::ModuleProperties::MODULE_CB_CLOSE as _,
-                        #module_close_with_nul,
-                        unsafe {
-                            <#loader as ModuleProtocol<#type_>>::deactivate_function().unwrap()
-                            as *mut std::ffi::c_void
-                        }
-                    )
-                } != 0
-                {
-                    return -1;
-                }
-            }
-
-            #vlc_entry_config_subcategory
-            #vlc_entry_config_params
         }
+
+        #vlc_entry_config_subcategory
+        #vlc_entry_config_params
+    }
 }
 
 pub fn module(input: TokenStream) -> TokenStream {
@@ -1014,7 +1012,10 @@ pub fn module(input: TokenStream) -> TokenStream {
     };
 
     let type_params = module_info.params.as_ref().map(|params| {
-        let struct_name = Ident::new(&format!("{}Args", module_info.type_), module_info.type_.span());
+        let struct_name = Ident::new(
+            &format!("{}Args", module_info.type_),
+            module_info.type_.span(),
+        );
 
         let params_def = params.params.iter().map(|param| {
             let rust_name = &param.name;
