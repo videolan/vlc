@@ -158,7 +158,7 @@ Commands available from API version 2
   ?command=title&val=<val>
 
 > select the chapter
-  ?command=title&val=<val>
+  ?command=chapter&val=<val>
 
 > select the audio track (use the number from the stream)
   ?command=audio_track&val=<val>
@@ -166,7 +166,7 @@ Commands available from API version 2
 > select the video track (use the number from the stream)
   ?command=video_track&val=<val>
 
-> select the sibtitle track (use the number from the stream)
+> select the subtitle track (use the number from the stream)
   ?command=subtitle_track&val=<val>
 
 playlist.xml or playlist.json:
