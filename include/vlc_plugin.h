@@ -217,7 +217,10 @@ enum vlc_config_subcat
 };
 
 /**
- * Current plugin ABI version
+ * Current plugin ABI version.
+ *
+ * \note This must be synchronized with the values from:
+ *  - src/rust/vlcrs-macros/module.rs
  */
 #define VLC_API_VERSION_STRING "4.0.6"
 
