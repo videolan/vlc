@@ -379,11 +379,15 @@ int foo() { return my_array[0]; }
                 WINDOWS_ARCH="arm"
                 PROGRAMFILES="PROGRAMFILES"
             ;;
-            *)
+            i?86)
                 WINDOWS_ARCH="x86"
                 PROGRAMFILES="PROGRAMFILES"
                 X86ASMFLAGS="-f win32"
                 X86ASMDEFS="${X86ASMDEFS} -DPREFIX"
+                AX_APPEND_FLAG([-Wl,--large-address-aware], [LDFLAGS])
+            ;;
+            *)
+                AC_MSG_ERROR([Unsupported Windows architecture ${host_cpu}])
             ;;
         esac
         AC_SUBST([WINDOWS_ARCH])
