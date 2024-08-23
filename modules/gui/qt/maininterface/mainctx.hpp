@@ -267,6 +267,8 @@ public:
                (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0));
     }
 
+    Q_INVOKABLE QJSValue urlListToMimeData(const QJSValue& array);
+
     /**
      * @brief ask for the application to terminate
      * @return true if the application can be close right away, false if it will be delayed
