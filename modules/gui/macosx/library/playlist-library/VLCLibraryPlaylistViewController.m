@@ -43,6 +43,8 @@
 
 #import "main/VLCMain.h"
 
+#import "views/VLCLoadingOverlayView.h"
+
 #import "windows/video/VLCMainVideoViewController.h"
 
 @implementation VLCLibraryPlaylistViewController
@@ -189,6 +191,42 @@
                                      attribute:NSLayoutAttributeNotAnAttribute
                                     multiplier:0.f
                                       constant:149.f],
+    ];
+}
+
+- (void)setupLoadingOverlayView
+{
+    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
+    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    _loadingOverlayViewConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1
+                                      constant:0]
     ];
 }
 
