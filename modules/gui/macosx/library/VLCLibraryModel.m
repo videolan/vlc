@@ -674,8 +674,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
 
 - (void)resetCachedMediaItemLists
 {
-    [self resetCachedListOfRecentMedia];
-    [self resetCachedListOfRecentAudioMedia];
     [self resetCachedListOfAudioMedia];
     [self resetCachedListOfVideoMedia];
     [self resetCachedListOfShows];
