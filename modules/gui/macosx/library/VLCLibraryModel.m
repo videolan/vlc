@@ -140,11 +140,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
             [libraryModel handleMediaItemUpdateEvent:p_event];
-            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_DELETED:
             [libraryModel handleMediaItemDeletionEvent:p_event];
-            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED:
             if (p_event->media_thumbnail_generated.b_success) {
@@ -949,6 +947,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                 NSLog(@"Unknown type of media type encountered, don't know what to do in update");
                 break;
         }
+
+        if (mediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+            [self resetCachedListOfShows];
+        }
     }];
 }
 
@@ -998,6 +1000,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             case VLC_ML_MEDIA_TYPE_UNKNOWN:
                 NSLog(@"Unknown type of media type encountered, don't know what to do in deletion");
                 break;
+        }
+
+        if (mediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+            [self resetCachedListOfShows];
         }
     }];
 }
