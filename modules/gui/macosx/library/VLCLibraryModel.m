@@ -137,7 +137,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
             [libraryModel resetCachedMediaItemLists];
-            [libraryModel resetCachedListOfShows]; // TODO: Handle granularly
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
             [libraryModel handleMediaItemUpdateEvent:p_event];
