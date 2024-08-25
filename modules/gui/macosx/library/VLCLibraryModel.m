@@ -102,7 +102,6 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 @property (readwrite, atomic) NSArray *cachedPlaylists;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
 
-- (void)resetCachedMediaItemLists;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
@@ -111,6 +110,7 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 - (void)resetCachedListOfMonitoredFolders;
 - (void)resetCachedListOfPlaylists;
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
+- (void)handleMediaItemAddedEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event;
@@ -136,7 +136,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     switch(p_event->i_type)
     {
         case VLC_ML_EVENT_MEDIA_ADDED:
-            [libraryModel resetCachedMediaItemLists];
+            [libraryModel handleMediaItemAddedEvent:p_event];
             break;
         case VLC_ML_EVENT_MEDIA_UPDATED:
             [libraryModel handleMediaItemUpdateEvent:p_event];
@@ -672,11 +672,23 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
-- (void)resetCachedMediaItemLists
+- (void)handleMediaItemAddedEvent:(const vlc_ml_event_t * const)p_event
 {
-    [self resetCachedListOfAudioMedia];
-    [self resetCachedListOfVideoMedia];
-    [self resetCachedListOfShows];
+    NSParameterAssert(p_event);
+    const vlc_ml_media_t * const p_media = p_event->creation.p_media;
+    NSParameterAssert(p_media);
+
+    if (p_media->i_type == VLC_ML_MEDIA_TYPE_AUDIO || p_media->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN) {
+        [self resetCachedListOfAudioMedia];
+
+        if (p_media->i_subtype == VLC_ML_MEDIA_SUBTYPE_SHOW_EPISODE) {
+            [self resetCachedListOfShows];
+        }
+    }
+
+    if (p_media->i_type == VLC_ML_MEDIA_TYPE_VIDEO || p_media->i_type == VLC_ML_MEDIA_TYPE_UNKNOWN) {
+        [self resetCachedListOfVideoMedia];
+    }
 }
 
 
