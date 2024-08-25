@@ -73,15 +73,25 @@
                                  object:nil];
 
         NSString * const playlistListResetLongLoadStartNotification = [VLCLibraryModelPlaylistListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const playlistListResetLongLoadFinishNotification = [VLCLibraryModelPlaylistListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
         NSString * const playlistDeletedLongLoadStartNotification = [VLCLibraryModelPlaylistDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const playlistDeletedLongLoadFinishNotification = [VLCLibraryModelPlaylistDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
 
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadStarted:)
                                    name:playlistListResetLongLoadStartNotification
                                  object:nil];
         [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:playlistListResetLongLoadFinishNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
                                selector:@selector(libraryModelLongLoadStarted:)
                                    name:playlistDeletedLongLoadStartNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryModelLongLoadFinished:)
+                                   name:playlistDeletedLongLoadFinishNotification
                                  object:nil];
     }
 
@@ -339,6 +349,29 @@
         self.loadingOverlayView.animator.alphaValue = 1.0;
     } completionHandler:nil];
     [self.loadingOverlayView.indicator startAnimation:self];
+}
+
+- (void)libraryModelLongLoadFinished:(NSNotification *)notification
+{
+    if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    }
+
+    [self.dataSource connect];
+
+    self.loadingOverlayView.wantsLayer = YES;
+    self.loadingOverlayView.alphaValue = 1.0;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        self.loadingOverlayView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
+        [views removeObject:self.loadingOverlayView];
+        self.libraryTargetView.subviews = views.copy;
+        [self.loadingOverlayView.indicator stopAnimation:self];
+    }];
 }
 
 #pragma mark - NSSplitViewDelegate
