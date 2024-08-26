@@ -4,8 +4,9 @@
 #
 # Authors: Denis Charmet <typx@dinauz.org>
 #          Steve Lhomme <robux4@videolabs.io>
+#          Alexandre Janniaux <ajanni@videolabs.io>
 #
-# Transform a compilation triplet into a Rust Tier 1 and Tier 2 target
+# Transform a compilation triplet from autoconf to cargo/llvm dialect
 # based on https://doc.rust-lang.org/rustc/platform-support.html
 
 DARWIN=
@@ -162,6 +163,15 @@ case $OS in
               return_triplet x86_64-apple-ios
               ;;
           esac
+        fi
+        ;;
+      tvos)
+        if test -z "$SIMULATOR"; then
+          case $ARCH in
+            aarch64|arm64)
+              return_triplet aarch64-apple-tvos
+              ;;
+           esac
         fi
         ;;
 
