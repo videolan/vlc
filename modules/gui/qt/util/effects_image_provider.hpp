@@ -28,7 +28,7 @@ class EffectsImageProvider : public QQuickImageProvider
 {
     Q_OBJECT
 
-    static constexpr const char * providerId = "effects";
+    static inline const QString providerId = QStringLiteral("effects");
 
 public:
     enum Effect
@@ -46,10 +46,13 @@ public:
         assert(engine);
 
         // Engine will take the ownership; no need to set parent in constructor
-        engine->addImageProvider(QLatin1String(providerId), this);
+        engine->addImageProvider(providerId, this);
     }
 
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize) override;
+
+    static QObject* instance(class QQmlEngine *engine,
+                             class QJSEngine *scriptEngine);
 
     Q_INVOKABLE static QUrl url(Effect effect, const QVariantMap& properties);
 };

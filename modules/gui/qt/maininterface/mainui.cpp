@@ -78,38 +78,6 @@
 
 using  namespace vlc::playlist;
 
-namespace {
-
-template<class T>
-class SingletonRegisterHelper
-{
-    static QPointer<T> m_instance;
-
-public:
-    static QObject* callback(QQmlEngine *engine, QJSEngine *)
-    {
-        assert(m_instance);
-        engine->setObjectOwnership(m_instance, QQmlEngine::ObjectOwnership::CppOwnership);
-        return m_instance;
-    }
-
-    static void setInstance(T* instance)
-    {
-        assert(!m_instance);
-        m_instance = instance;
-    }
-
-    static T* getInstance()
-    {
-        return m_instance;
-    }
-};
-template<class T>
-QPointer<T> SingletonRegisterHelper<T>::m_instance = nullptr;
-
-} // anonymous namespace
-
-
 MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  QObject *parent)
     : QObject(parent)
     , m_intf(p_intf)
@@ -119,34 +87,6 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_intf);
     assert(m_mainCtx);
     assert(m_interfaceWindow);
-
-    SingletonRegisterHelper<MainCtx>::setInstance(mainCtx);
-
-    assert(m_intf->p_mainPlayerController);
-    SingletonRegisterHelper<PlayerController>::setInstance(m_intf->p_mainPlayerController);
-
-    assert(m_intf->p_mainPlaylistController);
-    SingletonRegisterHelper<PlaylistController>::setInstance(m_intf->p_mainPlaylistController);
-
-    assert(VLCDialogModel::getInstance<false>());
-    SingletonRegisterHelper<VLCDialogModel>::setInstance(VLCDialogModel::getInstance<false>());
-    assert(DialogsProvider::getInstance());
-    SingletonRegisterHelper<DialogsProvider>::setInstance(DialogsProvider::getInstance());
-
-    assert(DialogErrorModel::getInstance<false>());
-    SingletonRegisterHelper<DialogErrorModel>::setInstance( DialogErrorModel::getInstance<false>() );
-
-    SingletonRegisterHelper<NavigationHistory>::setInstance( new NavigationHistory(this) );
-    SingletonRegisterHelper<SystemPalette>::setInstance( new SystemPalette(this) );
-    SingletonRegisterHelper<QmlKeyHelper>::setInstance( new QmlKeyHelper(this) );
-    SingletonRegisterHelper<SVGColorImage>::setInstance( new SVGColorImage(this) );
-    SingletonRegisterHelper<VLCAccessImage>::setInstance( new VLCAccessImage(this) );
-
-    if (m_mainCtx->hasMediaLibrary())
-    {
-        assert(m_mainCtx->getMediaLibrary());
-        SingletonRegisterHelper<MediaLib>::setInstance(m_mainCtx->getMediaLibrary());
-    }
 
     registerQMLTypes();
 }
@@ -170,7 +110,8 @@ bool MainUI::setup(QQmlEngine* engine)
     engine->addImportPath(":/qt/qml");
 #endif
 
-    SingletonRegisterHelper<EffectsImageProvider>::setInstance(new EffectsImageProvider(engine));
+    if (!EffectsImageProvider::instance(engine, engine))
+        new EffectsImageProvider(engine);
     engine->addImageProvider(QStringLiteral("svgcolor"), new SVGColorImageImageProvider());
     engine->addImageProvider(QStringLiteral("vlcaccess"), new VLCAccessImageProvider());
 
@@ -228,10 +169,10 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 0;
 
         // @uri VLC.MainInterface
-        qmlRegisterSingletonType<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", SingletonRegisterHelper<MainCtx>::callback);
+        qmlRegisterSingletonInstance<MainCtx>(uri, versionMajor, versionMinor, "MainCtx", m_mainCtx);
         qmlRegisterUncreatableType<SearchCtx>(uri, versionMajor, versionMinor, "SearchCtx", "");
         qmlRegisterUncreatableType<SortCtx>(uri, versionMajor, versionMinor, "SortCtx", "");
-        qmlRegisterSingletonType<NavigationHistory>(uri, versionMajor, versionMinor, "History", SingletonRegisterHelper<NavigationHistory>::callback);
+        qmlRegisterSingletonInstance<NavigationHistory>(uri, versionMajor, versionMinor, "History", new NavigationHistory(this));
         qmlRegisterUncreatableType<QAbstractItemModel>(uri, versionMajor, versionMinor, "QtAbstractItemModel", "");
         qmlRegisterUncreatableType<QWindow>(uri, versionMajor, versionMinor, "QtWindow", "");
         qmlRegisterUncreatableType<QScreen>(uri, versionMajor, versionMinor, "QtScreen", "");
@@ -255,10 +196,13 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Dialogs
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
         qmlRegisterType<VLCDialog>( uri, versionMajor, versionMinor, "VLCDialog" );
-        qmlRegisterSingletonType<VLCDialogModel>(uri, versionMajor, versionMinor, "VLCDialogModel", SingletonRegisterHelper<VLCDialogModel>::callback);
+        assert(VLCDialogModel::getInstance<false>());
+        qmlRegisterSingletonInstance<VLCDialogModel>(uri, versionMajor, versionMinor, "VLCDialogModel", VLCDialogModel::getInstance<false>());
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "dialogId", "");
-        qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
-        qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);
+        assert(DialogsProvider::getInstance());
+        qmlRegisterSingletonInstance<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", DialogsProvider::getInstance());
+        assert(DialogErrorModel::getInstance<false>());
+        qmlRegisterSingletonInstance<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", DialogErrorModel::getInstance<false>());
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
@@ -290,7 +234,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<TitleListModel>(uri, versionMajor, versionMinor, "TitleListModel", "available titles of a media" );
         qmlRegisterUncreatableType<ChapterListModel>(uri, versionMajor, versionMinor, "ChapterListModel", "available chapters of a media" );
         qmlRegisterUncreatableType<ProgramListModel>(uri, versionMajor, versionMinor, "ProgramListModel", "available programs of a media" );
-        qmlRegisterSingletonType<PlayerController>(uri, versionMajor, versionMinor, "Player", SingletonRegisterHelper<PlayerController>::callback);
+        assert(m_intf->p_mainPlayerController);
+        qmlRegisterSingletonInstance<PlayerController>(uri, versionMajor, versionMinor, "Player", m_intf->p_mainPlayerController);
 
         qmlRegisterType<QmlBookmarkMenu>( uri, versionMajor, versionMinor, "QmlBookmarkMenu" );
         qmlRegisterType<QmlProgramMenu>( uri, versionMajor, versionMinor, "QmlProgramMenu" );
@@ -331,7 +276,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<PlaylistListModel>( uri, versionMajor, versionMinor, "PlaylistListModel" );
         qmlRegisterType<PlaylistController>( uri, versionMajor, versionMinor, "PlaylistController" );
         qmlRegisterType<PlaylistContextMenu>( uri, versionMajor, versionMinor, "PlaylistContextMenu" );
-        qmlRegisterSingletonType<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", SingletonRegisterHelper<PlaylistController>::callback);
+        assert(m_intf->p_mainPlaylistController);
+        qmlRegisterSingletonInstance<PlaylistController>(uri, versionMajor, versionMinor, "MainPlaylistController", m_intf->p_mainPlaylistController);
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
@@ -378,11 +324,11 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 0;
 
         // @uri VLC.Util
-        qmlRegisterSingletonType<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", SingletonRegisterHelper<QmlKeyHelper>::callback);
-        qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", SingletonRegisterHelper<EffectsImageProvider>::callback);
+        qmlRegisterSingletonInstance<QmlKeyHelper>(uri, versionMajor, versionMinor, "KeyHelper", new QmlKeyHelper(this));
+        qmlRegisterSingletonType<EffectsImageProvider>(uri, versionMajor, versionMinor, "Effects", EffectsImageProvider::instance);
         qmlRegisterUncreatableType<SVGColorImageBuilder>(uri, versionMajor, versionMinor, "SVGColorImageBuilder", "");
-        qmlRegisterSingletonType<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", SingletonRegisterHelper<SVGColorImage>::callback);
-        qmlRegisterSingletonType<VLCAccessImage>(uri, versionMajor, versionMinor, "VLCAccessImage", SingletonRegisterHelper<VLCAccessImage>::callback);
+        qmlRegisterSingletonInstance<SVGColorImage>(uri, versionMajor, versionMinor, "SVGColorImage", new SVGColorImage(this));
+        qmlRegisterSingletonInstance<VLCAccessImage>(uri, versionMajor, versionMinor, "VLCAccessImage", new VLCAccessImage(this));
         qmlRegisterType<DelayEstimator>( uri, versionMajor, versionMinor, "DelayEstimator" );
 
         qmlRegisterType<ImageLuminanceExtractor>( uri, versionMajor, versionMinor, "ImageLuminanceExtractor");
@@ -417,7 +363,8 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 0;
 
         // @uri VLC.MediaLibrary
-        qmlRegisterSingletonType<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", SingletonRegisterHelper<MediaLib>::callback);
+        assert(m_mainCtx->getMediaLibrary());
+        qmlRegisterSingletonInstance<MediaLib>(uri, versionMajor, versionMinor, "MediaLib", m_mainCtx->getMediaLibrary());
 
         qmlRegisterUncreatableType<MLItemId>( uri, versionMajor, versionMinor, "mediaId", "");
         qmlRegisterUncreatableType<MLBaseModel>( uri, versionMajor, versionMinor, "MLBaseModel", "ML Base Model is uncreatable." );
