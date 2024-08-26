@@ -102,6 +102,8 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 @property (readwrite, atomic) NSArray *cachedPlaylists;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
 
+- (void)resetCachedListOfRecentMedia;
+- (void)resetCachedListOfRecentAudioMedia;
 - (void)resetCachedListOfArtists;
 - (void)resetCachedListOfAlbums;
 - (void)resetCachedListOfGenres;
@@ -204,6 +206,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_FOLDER_UPDATED:
         case VLC_ML_EVENT_FOLDER_DELETED:
             [libraryModel resetCachedListOfMonitoredFolders];
+            break;
+        case VLC_ML_EVENT_HISTORY_CHANGED:
+            [libraryModel resetCachedListOfRecentMedia];
+            [libraryModel resetCachedListOfRecentAudioMedia];
             break;
         default:
             break;
