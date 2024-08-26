@@ -1886,6 +1886,16 @@ AM_CONDITIONAL([ENABLE_SOUT], [test "${enable_sout}" != "no"])
 dnl
 dnl Rust Modules
 dnl
+AC_ARG_WITH([rust-std],
+    AS_HELP_STRING([--with-rust-std[=ARGS]],
+                   [Specify how to find Rust standard library. If ARGS is build-std=STDARGS, it forwards parameters to Cargo as -Z build-std=STDARGS. (default auto)]))
+AS_CASE(["${with_rust_std}"],
+        [build-std=*],  [cargo_build_std_args=-Z"${with_rust_std}"],
+        [auto],         [cargo_build_std_args=""],
+        [""],           [cargo_build_std_args=""],
+        [AC_MSG_ERROR([Unknown option ${with_rust_std} for --with-rust-std=])])
+AC_SUBST([CARGO_BUILD_STD], [${cargo_build_std_args}])
+
 AC_ARG_ENABLE([rust],
   AS_HELP_STRING([--enable-rust],
     [enable building Rust modules (default disabled)]))
