@@ -128,6 +128,24 @@ StreamFormat::StreamFormat(const void *data_, size_t sz)
     type = Type::Unknown;
     const char moov[] = "ftypmoovmoofemsg";
 
+    /* Skip PNG junk */
+    if(sz >= 20 && !memcmp(data, "\x89PNG\x0D\x0A\x1A\x0A", 8))
+    {
+        data += 8;
+        sz -= 8;
+        while(sz >= 12)
+        {
+            uint32_t chunk = GetDWBE(data);
+            vlc_fourcc_t cktype = VLC_FOURCC(data[4], data[5], data[6], data[7]);
+            if(chunk > sz - 12)
+                break;
+            sz -= chunk + 12;
+            data += chunk + 12;
+            if(cktype == VLC_FOURCC('I','E','N','D'))
+                break;
+        }
+    }
+
     /* Skipped ID3 if any */
     while(sz > 10 && ID3TAG_IsTag(data, false))
     {
