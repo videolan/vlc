@@ -4062,7 +4062,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   QT_MINIMUM_MIN=$(echo ${QT_MINIMUM_VERSION} | cut -d "." -f 2-2)
   QT_VERSION_MAJ=$(echo ${QT_VERSION_CORE} | cut -d "." -f -1)
   QT_VERSION_MIN=$(echo ${QT_VERSION_CORE} | cut -d "." -f 2-2)
-  AS_IF([ test "${QT_VERSION_MAJ}" -lt "${QT_MINIMUM_MAJ}" || (test "${QT_VERSION_MAJ}" = "${QT_MINIMUM_MAJ}" && test "${QT_VERSION_MIN}" -lt "${QT_MINIMUM_MIN}") ], [
+  AS_IF([test "${QT_VERSION_MAJ:-0}" -lt "${QT_MINIMUM_MAJ}" || (test "${QT_VERSION_MAJ:-0}" = "${QT_MINIMUM_MAJ}" && test "${QT_VERSION_MIN:-0}" -lt "${QT_MINIMUM_MIN}") ], [
     AC_MSG_RESULT([(${QT_VERSION_CORE}) no])
     have_qt="no"
   ],[
@@ -4264,7 +4264,7 @@ AM_CONDITIONAL([HAVE_QT_DECLARATIVE_PRIVATE], [test "${have_qt_declarative_priva
 AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_CORE_PRIVATE], [test "${have_qt_core_private}" = "yes"])
 AM_CONDITIONAL([HAVE_FXC], [test "${have_fxc}" = "yes"])
-AM_CONDITIONAL([HAVE_QT67], [test "${QT_VERSION_MAJ}" -gt "6" || (test "${QT_VERSION_MAJ}" = "6" && test "${QT_VERSION_MIN}" -ge "7")])
+AM_CONDITIONAL([HAVE_QT67], [test "${QT_VERSION_MAJ:-0}" -gt "6" || (test "${QT_VERSION_MAJ:-0}" = "6" && test "${QT_VERSION_MIN:-0}" -ge "7")])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
