@@ -153,7 +153,7 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
 
 MainUI::~MainUI()
 {
-
+    qmlClearTypeRegistrations();
 }
 
 bool MainUI::setup(QQmlEngine* engine)
