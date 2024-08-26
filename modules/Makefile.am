@@ -15,7 +15,7 @@ EXTRA_LTLIBRARIES =
 
 if HAVE_RUST
 
-LIBTOOL_CARGO_EXE = $(srcdir)/libtool_cargo.sh
+LIBTOOL_CARGO_EXE = $(abs_srcdir)/libtool_cargo.sh
 
 CARGO_BUILD_ARGS = --target=@RUST_TARGET@ --release \
 	--crate-type=staticlib
