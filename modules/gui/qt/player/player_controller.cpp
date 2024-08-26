@@ -1014,6 +1014,15 @@ static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_tim
     });
 }
 
+
+static void on_art_fetch_ended_callback(input_item_t *p_item, bool fetched,
+                                     void *userdata)
+{
+    PlayerControllerPrivate *me = reinterpret_cast<PlayerControllerPrivate *>(userdata);
+    me->onArtFetchEnded(p_item, fetched);
+}
+
+
 } //extern "C"
 
 static const struct vlc_player_cbs player_cbs = {
@@ -1079,6 +1088,15 @@ static const vlc_player_timer_cbs player_timer_cbs = []{
 static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = {
     on_player_timer_smpte_update
 };
+
+// art fetcher callbacks
+
+static const struct vlc_metadata_cbs art_fetcher_cbs  = []{
+    struct vlc_metadata_cbs cbs{};
+    cbs.on_art_fetch_ended = on_art_fetch_ended_callback;
+    return cbs;
+}();
+
 
 PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontroller, qt_intf_t *p_intf)
     : q_ptr(playercontroller)
@@ -1150,8 +1168,6 @@ PlayerController::PlayerController( qt_intf_t *_p_intf )
              this, &PlayerController::menusUpdateAudio );
     connect( &d_ptr->m_position_timer, &QTimer::timeout, this, &PlayerController::updatePositionFromTimer );
     connect( &d_ptr->m_time_timer, &QTimer::timeout, this, &PlayerController::updateTimeFromTimer );
-
-    input_preparser_cbs.on_art_fetch_ended = onArtFetchEnded_callback;
 }
 
 PlayerController::~PlayerController()
@@ -1957,29 +1973,22 @@ void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
         libvlc_MetadataRequest( vlc_object_instance(d->p_intf), p_item,
                                 (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
                                            : META_REQUEST_OPTION_FETCH_LOCAL,
-                                &input_preparser_cbs, this, 0, NULL );
+                               &art_fetcher_cbs, d, 0, NULL );
     }
 }
 
-void PlayerController::onArtFetchEnded_callback(input_item_t *p_item, bool fetched,
-                                                void *userdata)
+void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)
 {
-    PlayerController *me = reinterpret_cast<PlayerController *>(userdata);
-    me->onArtFetchEnded(p_item, fetched);
-}
+    Q_Q(PlayerController);
 
-void PlayerController::onArtFetchEnded(input_item_t *p_item, bool)
-{
-    Q_D(PlayerController);
-
-    vlc_player_locker lock{ d->m_player };
-    bool b_current_item = (p_item == vlc_player_GetCurrentMedia( d->m_player ));
+    vlc_player_locker lock{ m_player };
+    bool b_current_item = (p_item == vlc_player_GetCurrentMedia( m_player ));
     /* No input will signal the cover art to update,
          * let's do it ourself */
     if ( b_current_item )
-        d->UpdateArt( p_item );
+        UpdateArt( p_item );
     else
-        emit artChanged( p_item );
+        emit q->artChanged( p_item );
 }
 
 const QString PlayerController::decodeArtURL( input_item_t *p_item )
