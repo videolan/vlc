@@ -7,3 +7,5 @@
 //!
 //! If you need a vlc core C API that is not ported or wrapped yet here,
 //! then do so first instead of bypassing this crate.
+
+pub mod object;
