@@ -15,8 +15,10 @@ use vlcrs_macros::module;
 use std::ffi::{c_int, CStr};
 use vlcrs_plugin::{ModuleProtocol,vlc_activate};
 
+use vlcrs_core::object::Object;
+
 unsafe extern "C"
-fn activate_filter(_obj: *mut vlcrs_plugin::vlc_object_t) -> c_int
+fn activate_filter(_obj: *mut Object) -> c_int
 {
     0
 }

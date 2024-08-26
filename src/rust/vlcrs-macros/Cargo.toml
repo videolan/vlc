@@ -11,6 +11,7 @@ proc-macro = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vlc_static_plugins)'] }
 
 [dependencies]
+vlcrs-core = { path = "../vlcrs-core" }
 vlcrs-plugin = { path = "../vlcrs-plugin" }
 quote = "1.0"
 syn = { version = "1.0", features = ["full"] }

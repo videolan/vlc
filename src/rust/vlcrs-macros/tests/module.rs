@@ -15,14 +15,16 @@ use std::ffi::c_int;
 
 use vlcrs_plugin::{vlc_activate, vlc_deactivate};
 
+use vlcrs_core::object::Object;
+
 unsafe extern "C"
-fn activate_test<T: SpecificCapabilityModule>(_obj: *mut vlcrs_plugin::vlc_object_t) -> c_int
+fn activate_test<T: SpecificCapabilityModule>(_obj: *mut Object) -> c_int
 {
     0
 }
 
 unsafe extern "C"
-fn deactivate_test<T: SpecificCapabilityModule>(_obj: *mut vlcrs_plugin::vlc_object_t)
+fn deactivate_test<T: SpecificCapabilityModule>(_obj: *mut Object)
 {}
 
 use vlcrs_plugin::ModuleProtocol;

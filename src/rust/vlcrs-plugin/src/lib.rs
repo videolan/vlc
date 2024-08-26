@@ -3,6 +3,8 @@
 
 pub mod sys;
 
+use vlcrs_core::object::Object;
+
 pub const VLC_COPYRIGHT_VIDEOLAN : &str = r#"
 \x43\x6f\x70\x79\x72\x69\x67\x68\x74\x20\x28\x43\x29\x20\x74\x68
 \x65\x20\x56\x69\x64\x65\x6f\x4c\x41\x4e\x20\x56\x4c\x43\x20\x6d
@@ -19,7 +21,6 @@ pub const VLC_LICENSE_LGPL_2_1_PLUS : &str = r#"
 #[allow(non_camel_case_types)]
 #[allow(unused)]
 extern {
-    pub type vlc_object_t;
     pub type module_t;
     pub type vlc_param;
 }
@@ -196,9 +197,9 @@ impl TryFrom<i32> for ModuleProperties {
 
 use std::ffi::c_int;
 #[allow(non_camel_case_types)]
-pub type vlc_activate = unsafe extern "C" fn(*mut vlc_object_t) -> c_int;
+pub type vlc_activate = unsafe extern "C" fn(*mut Object) -> c_int;
 #[allow(non_camel_case_types)]
-pub type vlc_deactivate = unsafe extern "C" fn(*mut vlc_object_t);
+pub type vlc_deactivate = unsafe extern "C" fn(*mut Object);
 
 ///
 /// Exposes the activation and deactivation functions for modules.
