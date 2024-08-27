@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 # SPDX-License-Identifier: LGPL-2.1-or-later
 # Copyright (C) 2022 Loïc Branstett <loic@videolabs.io>
+# Copyright (C) 2024 Alexandre Janniaux <ajanni@videolabs.io>
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by
@@ -21,15 +22,36 @@
 
 set -e # Automaticly exit on error
 
-CARGO_RUSTC_CMD=${@:1:$#-2} # all other args
-MODULE_PROJECT_DIR=${@:$#-1:1} # second last argument
-LT_CONVENIENCE=${@:$#:1} # last argument
+
+CFGS= 
+
+CARGO_RUSTC_CMD=
+while test $# -gt 2; do
+    case "$1" in
+        --cfg)
+            CFGS="${CFGS} --cfg $2"
+            shift; shift;
+            ;;
+        *)
+            CARGO_RUSTC_CMD="${CARGO_RUSTC_CMD} $1"
+            shift;
+            ;;
+    esac
+done
+
+if [ $# -lt 2 ]; then
+    echo "Invalid usage"
+    exit 1
+fi
+
+MODULE_PROJECT_DIR=$1
+LT_CONVENIENCE=$2
 
 # Build the project a first time without anything specitial)
-$CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml"
+$CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" -- ${CFGS}
 
 # "Build" the project a second time and fetch the native-static-libs to link with
-NATIVE_STATIC_LIBS=$($CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" --quiet -- --print native-static-libs 2>&1 | grep "native-static-libs" | sed "s/note: native-static-libs://" | sed "s/-lvlccore//")
+NATIVE_STATIC_LIBS=$($CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" --quiet -- ${CFGS} --print native-static-libs 2>&1 | grep "native-static-libs" | sed "s/note: native-static-libs://" | sed "s/-lvlccore//")
 
 STATIC_LIB_NAME=$(echo $LT_CONVENIENCE | sed "s/\.la/\.a/")
 STATIC_LIB_DEP=$(echo $LT_CONVENIENCE | sed "s/\.la/\.d/")
