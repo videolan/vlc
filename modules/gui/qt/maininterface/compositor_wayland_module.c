@@ -150,6 +150,8 @@ static void Disable(qtwayland_t* obj)
 static void Move(struct qtwayland_t* obj, int x, int y)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+    if(sys->video_subsurface == NULL)
+        return;
     wl_subsurface_set_position(sys->video_subsurface, x, y);
     wl_surface_commit(sys->video_surface);
 }
