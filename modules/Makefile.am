@@ -26,6 +26,7 @@ LIBTOOL_CARGO = \
 	RUSTTARGET="@RUST_TARGET@" \
 	RUSTFLAGS="-C panic=abort -C opt-level=z" \
 	CARGO_TARGET_DIR="target-rust" \
+	LIBTOOL="$(LIBTOOL)" \
 	$(LIBTOOL_CARGO_EXE) $(CARGO) rustc $(CARGO_BUILD_ARGS)
 
 CARGO_PLUGINS_INV = ${LTLIBRARIES:%rs_plugin.la=%rs_plugin}

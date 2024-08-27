@@ -22,6 +22,7 @@
 
 set -e # Automaticly exit on error
 
+: "${LIBTOOL:="../libtool"}"
 
 CFGS= 
 
@@ -58,7 +59,7 @@ STATIC_LIB_DEP=$(echo $LT_CONVENIENCE | sed "s/\.la/\.d/")
 CARGO_STATIC_LIB_PATH="$CARGO_TARGET_DIR/$RUSTTARGET/release/$STATIC_LIB_NAME"
 CARGO_STATIC_DEP_PATH="$CARGO_TARGET_DIR/$RUSTTARGET/release/$STATIC_LIB_DEP"
 
-LT_VERSION=$(../libtool --version | grep "libtool")
+LT_VERSION=$(${LIBTOOL} --version | grep "libtool")
 
 cat <<EOF > $LT_CONVENIENCE
 # $LT_CONVENIENCE - a libtool library file
