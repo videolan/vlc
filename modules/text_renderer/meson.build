@@ -30,32 +30,31 @@ endif
 # TODO: Anroid-specific sources
 # TODO: Fribidi support
 # TODO: Harfbuzz support
-if freetype_dep.found()
-    vlc_modules += {
-        'name' : 'freetype',
-        'sources' : freetype_srcs,
-        'dependencies' : freetype_deps,
-        'cpp_args' : freetype_cppargs
-    }
-endif
+
+vlc_modules += {
+    'name' : 'freetype',
+    'sources' : freetype_srcs,
+    'dependencies' : freetype_deps,
+    'cpp_args' : freetype_cppargs,
+    'enabled' : freetype_dep.found(),
+}
 
 # SVG plugin
-if rsvg_dep.found()
-    vlc_modules += {
-        'name' : 'svg',
-        'sources' : files('svg.c'),
-        'dependencies' : [rsvg_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'svg',
+    'sources' : files('svg.c'),
+    'dependencies' : [rsvg_dep],
+    'enabled' : rsvg_dep.found(),
+}
 
 # macOS text to speech
-if have_osx
-    vlc_modules += {
-        'name' : 'nsspeechsynthesizer',
-        'sources' : files('nsspeechsynthesizer.m'),
-        'dependencies' : [cocoa_dep]
-    }
-endif
+vlc_modules += {
+    'name' : 'nsspeechsynthesizer',
+    'sources' : files('nsspeechsynthesizer.m'),
+    'dependencies' : [cocoa_dep],
+    'enabled' : have_osx,
+}
+
 
 # Windows SAPI text to speech
 if host_system == 'windows'
@@ -64,12 +63,14 @@ if host_system == 'windows'
         '#include <sapi.h>',
         '#include <sphelper.h>'
     ]))
-
-    if have_sapi
-        vlc_modules += {
-            'name' : 'sapi',
-            'sources' : files('sapi.cpp'),
-            'cpp_args' : libcom_cppflags
-        }
-    endif
+else
+    have_sapi = false
 endif
+
+vlc_modules += {
+    'name' : 'sapi',
+    'sources' : files('sapi.cpp'),
+    'cpp_args' : libcom_cppflags,
+    'enabled' : have_sapi,
+}
+
