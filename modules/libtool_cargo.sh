@@ -106,5 +106,5 @@ mkdir -p "./.libs"
 ln -sf "../$LT_CONVENIENCE" "./.libs/$LT_CONVENIENCE"
 cp "$CARGO_STATIC_LIB_PATH" "./.libs/$STATIC_LIB_NAME"
 
-echo -n "$LT_CONVENIENCE:" > "./.libs/$STATIC_LIB_DEP"
+printf "%s" "$LT_CONVENIENCE:" > "./.libs/$STATIC_LIB_DEP"
 cat "$CARGO_STATIC_DEP_PATH" | cut -d ':' -f2 >> "./.libs/$STATIC_LIB_DEP"
