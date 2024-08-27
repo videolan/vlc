@@ -630,6 +630,11 @@ option('libgcrypt',
     value: 'auto',
     description: 'libgcrypt support')
 
+option('fontconfig',
+    type: 'feature',
+    value: 'auto',
+    description: 'fontconfig support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
@@ -648,7 +653,6 @@ option('libgcrypt',
 # TODO: Missing vdpau
 # TODO: Missing fribidi
 # TODO: Missing harfbuzz
-# TODO: Missing fontconfig
 # TODO: Missing directx
 # TODO: Missing kva
 # TODO: Missing mmal

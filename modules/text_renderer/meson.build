@@ -17,6 +17,7 @@ freetype_srcs = files(
     'freetype/lru.c',
 )
 freetype_cppargs = []
+freetype_cargs = []
 if host_system == 'windows'
     freetype_srcs += files('freetype/fonts/dwrite.cpp')
     freetype_cppargs += libcom_cppflags
@@ -31,10 +32,20 @@ endif
 # TODO: Fribidi support
 # TODO: Harfbuzz support
 
+fontconfig_dep = dependency('fontconfig', version: '>= 2.11',
+    required: get_option('fontconfig').disable_auto_if(host_system in ['darwin', 'windows']))
+
+if fontconfig_dep.found()
+    freetype_srcs += files('freetype/fonts/fontconfig.c')
+    freetype_cargs += '-DHAVE_FONTCONFIG'
+    freetype_deps += fontconfig_dep
+endif
+
 vlc_modules += {
     'name' : 'freetype',
     'sources' : freetype_srcs,
     'dependencies' : freetype_deps,
+    'c_args' : freetype_cargs,
     'cpp_args' : freetype_cppargs,
     'enabled' : freetype_dep.found(),
 }
