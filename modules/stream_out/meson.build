@@ -21,6 +21,13 @@ vlc_modules += {
     'shortname' : 's_o_dela',
 }
 
+# sideload
+vlc_modules += {
+    'name' : 'stream_out_sideload',
+    'sources' : files('sideload.c'),
+    'shortname' : 's_o_side',
+}
+
 # stats
 vlc_modules += {
     'name' : 'stream_out_stats',
