@@ -54,7 +54,7 @@ endif
 libsvg_plugin_la_SOURCES = text_renderer/svg.c
 libsvg_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(SVG_CFLAGS)
 libsvg_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(textdir)'
-libsvg_plugin_la_LIBADD = $(SVG_LIBS)
+libsvg_plugin_la_LIBADD = $(SVG_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libsvg_plugin.la
 text_LTLIBRARIES += $(LTLIBsvg)
 

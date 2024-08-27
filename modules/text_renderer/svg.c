@@ -37,6 +37,7 @@
 #include <vlc_strings.h>
 #include <vlc_memstream.h>
 
+#include <math.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -208,25 +209,44 @@ static void Destroy( vlc_object_t *p_this )
     free( p_filter->p_sys );
 }
 
-static void svg_RescaletoFit( filter_t *p_filter, int *width, int *height, float *scale )
+static void svg_RescaletoFit(filter_t *p_filter, double *width, double *height)
 {
-    *scale = 1.0;
+    double scale = 1.0;
 
     if( *width > 0 && *height > 0 )
     {
         if( (unsigned)*width > p_filter->fmt_out.video.i_visible_width )
-            *scale = (1.0 * p_filter->fmt_out.video.i_visible_width / *width);
+            scale = ((double)p_filter->fmt_out.video.i_visible_width / *width);
 
         if( (unsigned)*height > p_filter->fmt_out.video.i_visible_height )
         {
-            float y_scale = (1.0 * p_filter->fmt_out.video.i_visible_height / *height);
-            if( y_scale < *scale )
-                *scale = y_scale;
+            double y_scale = ((double)p_filter->fmt_out.video.i_visible_height / *height);
+            if( y_scale < scale )
+                scale = y_scale;
         }
 
-        *width *= *scale;
-        *height *= *scale;
+        *width *= scale;
+        *height *= scale;
     }
+}
+
+static bool svg_GetDimensionsInPixels( RsvgHandle *handle, double *width, double *height )
+{
+#if LIBRSVG_MAJOR_VERSION > 2 || (LIBRSVG_MAJOR_VERSION == 2 && LIBRSVG_MINOR_VERSION >= 52)
+    RsvgRectangle outRect;
+    if (!rsvg_handle_get_geometry_for_element( handle, NULL, &outRect, NULL, NULL ))
+        return false;
+
+    *width = outRect.width;
+    *height = outRect.height;
+    return true;
+#else
+    RsvgDimensionData dim;
+    rsvg_handle_get_dimensions( handle, &dim );
+    *width = dim.width;
+    *height = dim.height;
+    return true;
+#endif
 }
 
 static picture_t * svg_RenderPicture( filter_t *p_filter,
@@ -243,18 +263,22 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
         return NULL;
     }
 
-    RsvgDimensionData dim;
-    rsvg_handle_get_dimensions( p_handle, &dim );
-    float scale;
-    svg_RescaletoFit( p_filter, &dim.width, &dim.height, &scale );
+    double width, height;
+    if (!svg_GetDimensionsInPixels( p_handle, &width, &height ))
+    {
+        msg_Err( p_filter, "Unable to obtain SVG dimensions for rendering" );
+        g_object_unref(G_OBJECT(p_handle));
+        return NULL;
+    }
+    svg_RescaletoFit(p_filter, &width, &height);
 
     /* Create a new subpicture region */
     video_format_t fmt;
     video_format_Init( &fmt, VLC_CODEC_BGRA ); /* CAIRO_FORMAT_ARGB32 == VLC_CODEC_BGRA, go figure */
     fmt.i_bits_per_pixel = 32;
     fmt.i_chroma = VLC_CODEC_BGRA;
-    fmt.i_width = fmt.i_visible_width = dim.width;
-    fmt.i_height = fmt.i_visible_height = dim.height;
+    fmt.i_width = fmt.i_visible_width = ceil(width);
+    fmt.i_height = fmt.i_visible_height = height;
     fmt.transfer = TRANSFER_FUNC_SRGB;
     fmt.primaries = COLOR_PRIMARIES_SRGB;
     fmt.space = COLOR_SPACE_SRGB;
@@ -290,7 +314,11 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
         return NULL;
     }
 
+#if LIBRSVG_MAJOR_VERSION > 2 || (LIBRSVG_MAJOR_VERSION == 2 && LIBRSVG_MINOR_VERSION >= 46)
+    if ( ! rsvg_handle_render_document( p_handle, cr, &(RsvgRectangle){ .height = height, .width = width }, NULL ) )
+#else
     if( ! rsvg_handle_render_cairo( p_handle, cr ) )
+#endif
     {
         msg_Err( p_filter, "error while rendering SVG" );
         cairo_destroy( cr );
