@@ -22,6 +22,7 @@
 #include <playlist/playlist_controller.hpp>
 #include "util/keyhelper.hpp"
 #include "dialogs/systray/systray.hpp"
+#include "widgets/native/qvlcframe.hpp"
 #include <QScreen>
 #include <QQmlProperty>
 #include <cmath>

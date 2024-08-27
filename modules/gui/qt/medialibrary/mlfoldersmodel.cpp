@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "mlfoldersmodel.hpp"
+#include "medialibrary/medialib.hpp"
 #include <cassert>
 
 static const char* const ML_FOLDER_ADD_QUEUE = "ML_FOLDER_ADD_QUEUE";

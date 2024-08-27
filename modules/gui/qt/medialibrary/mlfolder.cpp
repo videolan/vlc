@@ -19,7 +19,7 @@
  *****************************************************************************/
 
 #include "mlfolder.hpp"
-
+#include "medialibrary/medialib.hpp"
 #include "util/vlctick.hpp"
 
 // Ctor / dtor

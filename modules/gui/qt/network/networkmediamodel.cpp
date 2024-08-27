@@ -20,6 +20,7 @@
 #include "mediatreelistener.hpp"
 
 #include "maininterface/mainctx.hpp"
+#include "medialibrary/medialib.hpp"
 #include "medialibrary/mlmedia.hpp"
 #include "medialibrary/mlmediastore.hpp"
 

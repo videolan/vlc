@@ -22,6 +22,7 @@
 #include <QFile>
 #include <maininterface/mainctx.hpp>
 #include <vlc_modules.h>
+#include <vlc_picture.h>
 
 namespace {
 

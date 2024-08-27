@@ -45,6 +45,7 @@
 #include "dialogs/extended/extended_panels.hpp"
 #include "dialogs/systray/systray.hpp"
 #include "util/varchoicemodel.hpp"
+#include "util/color_scheme_model.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlrecentsmodel.hpp"
 #include "medialibrary/mlbookmarkmodel.hpp"

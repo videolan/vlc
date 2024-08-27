@@ -21,6 +21,7 @@
 # include "config.h"
 #endif
 #include <vlc_window.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include "compositor_x11.hpp"
 #include "compositor_x11_renderwindow.hpp"

@@ -29,6 +29,7 @@
 
 Q_MOC_INCLUDE("playlist/playlist_controller.hpp")
 Q_MOC_INCLUDE("playlist/playlist_model.hpp")
+Q_MOC_INCLUDE("player/player_controller.hpp")
 Q_MOC_INCLUDE("network/networkdevicemodel.hpp")
 Q_MOC_INCLUDE("network/networkmediamodel.hpp")
 Q_MOC_INCLUDE("medialibrary/mlplaylistlistmodel.hpp")

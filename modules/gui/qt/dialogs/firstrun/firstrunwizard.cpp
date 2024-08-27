@@ -20,6 +20,7 @@
 #include "util/color_scheme_model.hpp"
 #include "maininterface/mainctx.hpp"
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
+#include "medialibrary/medialib.hpp"
 
 #include <QPushButton>
 #include <QButtonGroup>
@@ -28,6 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_configuration.h>
 #include <vlc_url.h>
+#include <vlc_cxx_helpers.hpp>
 
 FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)
                : QWizard( parent )

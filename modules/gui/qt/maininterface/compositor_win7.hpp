@@ -21,6 +21,7 @@
 #include "compositor_dummy.hpp"
 #include "videosurface.hpp"
 #include "video_window_handler.hpp"
+#include <QWidget>
 #include <QAbstractNativeEventFilter>
 #include <memory>
 

@@ -33,6 +33,7 @@
 #include <QWindow>
 #include <QScreen>
 #include <QLibrary>
+#include <QSettings>
 #include <versionhelpers.h>
 
 #include "compositor_dcomp.hpp"

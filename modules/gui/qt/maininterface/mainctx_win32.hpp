@@ -25,11 +25,13 @@
 #define MAIN_INTERFACE_WIN32_HPP
 
 #include "maininterface/mainctx.hpp"
+#include "player/player_controller.hpp"
 #include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
 #include <wrl/client.h>
 
 #include <objbase.h>
+#include <shobjidl.h>
 
 class WinTaskbarWidget : public QObject, public QAbstractNativeEventFilter
 {

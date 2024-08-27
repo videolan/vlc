@@ -26,26 +26,18 @@
 
 #include "qt.hpp"
 
-#include "widgets/native/qvlcframe.hpp"
-#include "player/player_controller.hpp"
-#include "util/color_scheme_model.hpp"
-#include "medialibrary/medialib.hpp"
-#include <playlist/playlist_common.hpp>
-
 #include <QtQuick/QQuickView>
 #include <QApplication>
-
-#ifdef _WIN32
-# include <shobjidl.h>
-#endif
-
-#include <atomic>
+#include <QQuickItem>
 
 Q_MOC_INCLUDE( "dialogs/toolbar/controlbar_profile_model.hpp" )
 Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
 Q_MOC_INCLUDE( "playlist/playlist_controller.hpp" )
 Q_MOC_INCLUDE( "maininterface/mainctx_submodels.hpp" )
 Q_MOC_INCLUDE( "maininterface/videosurface.hpp" )
+Q_MOC_INCLUDE( "medialibrary/medialib.hpp" )
+Q_MOC_INCLUDE( "player/player_controller.hpp" )
+Q_MOC_INCLUDE( "util/color_scheme_model.hpp" )
 #ifdef UPDATE_CHECK
 Q_MOC_INCLUDE( "dialogs/help/help.hpp" )
 #endif
@@ -72,6 +64,9 @@ class SearchCtx;
 class SortCtx;
 class WorkerThreadSet;
 class VLCSystray;
+class MediaLib;
+class ColorSchemeModel;
+class VLCVarChoiceModel;
 #ifdef UPDATE_CHECK
 class UpdateModel;
 #endif
@@ -146,7 +141,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool preferHotkeys READ preferHotkeys WRITE setPreferHotkeys NOTIFY preferHotkeysChanged FINAL)
 
     //Property for Activating bgCone in player view
-    Q_PROPERTY(bool bgCone READ isbgCone WRITE setbgCone NOTIFY bgConeToggled FINAL) 
+    Q_PROPERTY(bool bgCone READ isbgCone WRITE setbgCone NOTIFY bgConeToggled FINAL)
     Q_PROPERTY(bool windowSuportExtendedFrame READ windowSuportExtendedFrame NOTIFY windowSuportExtendedFrameChanged)
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
     Q_PROPERTY(SearchCtx* search MEMBER m_search CONSTANT FINAL)
@@ -242,7 +237,7 @@ public:
 
     inline OsType getOSName() const {return m_osName;}
     inline int getOSVersion() const {return m_osVersion;}
-    
+
     inline bool isbgCone() const {return m_bgCone; }
     inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
     inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
@@ -413,7 +408,7 @@ public slots:
 
     void setPinVideoControls( bool );
     void setPinOpacity( float );
-    
+
     void setbgCone(bool);
     void updateIntfScaleFactor();
     void onWindowVisibilityChanged(QWindow::Visibility);

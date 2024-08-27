@@ -28,7 +28,6 @@
 #include "mainctx_win32.hpp"
 
 #include "maininterface/compositor.hpp"
-#include "player/player_controller.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "dialogs/dialogs_provider.hpp"
 #include "widgets/native/interface_widgets.hpp"

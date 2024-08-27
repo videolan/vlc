@@ -40,9 +40,12 @@
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
 
+#include "util/color_scheme_model.hpp"
+
 #include "widgets/native/interface_widgets.hpp"     // bgWidget, videoWidget
 
 #include "playlist/playlist_controller.hpp"
+#include "player/player_controller.hpp"
 
 #include "dialogs/dialogs_provider.hpp"
 #include "dialogs/systray/systray.hpp"

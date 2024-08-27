@@ -23,6 +23,7 @@
 #include "medialibrary/mlbookmarkmodel.hpp"
 #include "network/networkdevicemodel.hpp"
 #include "network/networkmediamodel.hpp"
+#include "player/player_controller.hpp"
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
