@@ -638,7 +638,12 @@ option('fontconfig',
 option('fribidi',
     type: 'feature',
     value: 'auto',
-    description: 'Fribidi support for bidirectional text and complex scripts (Arabic, Farsi, Thai...)')
+    description: 'Fribidi support')
+
+option('harfbuzz',
+    type: 'feature',
+    value: 'auto',
+    description: 'Harfbuzz support')
 
 # TODO: Missing live555
 # TODO: Missing v4l2
@@ -656,7 +661,6 @@ option('fribidi',
 # TODO: Missing tremor
 # TODO: Missing x26410b
 # TODO: Missing vdpau
-# TODO: Missing harfbuzz
 # TODO: Missing directx
 # TODO: Missing kva
 # TODO: Missing mmal

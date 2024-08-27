@@ -48,6 +48,13 @@ if fribidi_dep.found()
     freetype_deps += fribidi_dep
 endif
 
+harfbuzz_dep = dependency('harfbuzz', required: get_option('harfbuzz'))
+
+if harfbuzz_dep.found()
+    freetype_cargs += '-DHAVE_HARFBUZZ'
+    freetype_deps += harfbuzz_dep
+endif
+
 vlc_modules += {
     'name' : 'freetype',
     'sources' : freetype_srcs,
