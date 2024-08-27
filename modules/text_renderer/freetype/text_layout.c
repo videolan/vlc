@@ -318,6 +318,7 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
                                   ruby_block_t **pp_ruby,
                                   int i_runs_size )
 {
+    VLC_UNUSED(p_filter);
     paragraph_t *p_paragraph = calloc( 1, sizeof( paragraph_t ) );
     if( !p_paragraph )
         return 0;
