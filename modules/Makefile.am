@@ -20,11 +20,16 @@ LIBTOOL_CARGO_EXE = $(abs_srcdir)/libtool_cargo.sh
 CARGO_BUILD_ARGS = --target=@RUST_TARGET@ --release \
 	--crate-type=staticlib
 
+RUSTFLAGS = -C panic=abort -C opt-level=z
+if !HAVE_DYNAMIC_PLUGINS
+RUSTFLAGS += --cfg vlc_static_plugins
+endif
+
 LIBTOOL_CARGO = \
 	TARGET_CC=$(CC) TARGET_AR=$(AR) \
 	TARGET_CFLAGS="$(CFLAGS)" \
 	RUSTTARGET="@RUST_TARGET@" \
-	RUSTFLAGS="-C panic=abort -C opt-level=z" \
+	RUSTFLAGS="${RUSTFLAGS}" \
 	CARGO_TARGET_DIR="target-rust" \
 	LIBTOOL="$(LIBTOOL)" \
 	$(LIBTOOL_CARGO_EXE) $(CARGO) rustc $(CARGO_BUILD_ARGS)
