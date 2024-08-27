@@ -41,6 +41,7 @@
 #include <glib.h>
 #include <glib/gstdio.h>
 #include <glib-object.h>                                  /* g_object_unref( ) */
+#include <vlc_memstream.h>
 #include <librsvg/rsvg.h>
 #include <cairo.h>
 
@@ -307,28 +308,29 @@ static picture_t * svg_RenderPicture( filter_t *p_filter,
 
 static char * SegmentsToSVG( text_segment_t *p_segment, int i_height, int *pi_total_size )
 {
-    char *psz_result = NULL;
+    struct vlc_memstream stream;
+    vlc_memstream_open(&stream);
 
     i_height = 6 * i_height / 100;
     *pi_total_size = 0;
 
     for( ; p_segment; p_segment = p_segment->p_next )
     {
-        char *psz_prev = psz_result;
         char *psz_encoded = vlc_xml_encode( p_segment->psz_text );
-        if( psz_encoded == NULL ||
-            asprintf( &psz_result, "%s<tspan x='0' dy='%upx'>%s</tspan>\n",
-                                   (psz_prev) ? psz_prev : "",
-                                    i_height,
-                                    psz_encoded ) < 0 )
-            psz_result = NULL;
-        free( psz_prev );
+        if ( !psz_encoded )
+            continue;
+
+        vlc_memstream_printf( &stream, "<tspan x='0' dy='%upx'>%s</tspan>\n",
+                              i_height, psz_encoded );
         free( psz_encoded );
 
         *pi_total_size += i_height;
     }
 
-    return psz_result;
+    if (vlc_memstream_close( &stream ))
+        return NULL;
+
+    return stream.ptr;
 }
 
 static subpicture_region_t *RenderText( filter_t *p_filter,
