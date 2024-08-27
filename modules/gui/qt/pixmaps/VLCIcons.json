@@ -88,6 +88,8 @@
         {"key":"window_close", "path": "./icons/window_close.svg" },
         {"key":"window_maximize", "path": "./icons/window_maximize.svg" },
         {"key":"window_minimize", "path": "./icons/window_minimize.svg" },
-        {"key":"window_restore", "path": "./icons/window_restore.svg" }
+        {"key":"window_restore", "path": "./icons/window_restore.svg" },
+        {"key":"ic_fluent_document_add_24_regular", "path": "./icons/ic_fluent_document_add_24_regular.svg"},
+        {"key":"ic_fluent_document_copy_24_regular", "path": "./icons/ic_fluent_document_copy_24_regular.svg"}
     ]
 }
