@@ -41,6 +41,13 @@ if fontconfig_dep.found()
     freetype_deps += fontconfig_dep
 endif
 
+fribidi_dep = dependency('fribidi', required: get_option('fribidi'))
+
+if fribidi_dep.found()
+    freetype_cargs += '-DHAVE_FRIBIDI'
+    freetype_deps += fribidi_dep
+endif
+
 vlc_modules += {
     'name' : 'freetype',
     'sources' : freetype_srcs,

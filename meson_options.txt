@@ -635,6 +635,11 @@ option('fontconfig',
     value: 'auto',
     description: 'fontconfig support')
 
+option('fribidi',
+    type: 'feature',
+    value: 'auto',
+    description: 'Fribidi support for bidirectional text and complex scripts (Arabic, Farsi, Thai...)')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
@@ -651,7 +656,6 @@ option('fontconfig',
 # TODO: Missing tremor
 # TODO: Missing x26410b
 # TODO: Missing vdpau
-# TODO: Missing fribidi
 # TODO: Missing harfbuzz
 # TODO: Missing directx
 # TODO: Missing kva
