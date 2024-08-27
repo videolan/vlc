@@ -151,6 +151,7 @@ QWindow* CompositorWayland::interfaceMainWindow() const
 void CompositorWayland::destroyMainInterface()
 {
     unloadGUI();
+    m_qmlView.reset();
 }
 
 void CompositorWayland::unloadGUI()
@@ -158,7 +159,12 @@ void CompositorWayland::unloadGUI()
     //needs to be released before the window
     m_interfaceWindowHandler.reset();
 
-    m_qmlView.reset();
+    //at this point we need to unload the QML content but the window still need to
+    //be valid as it may still be used by the vout window.
+    //we cant' just delete the qmlEngine as the QmlView as the root item is parented to the QmlView
+    //setSource() to nothing will effectively destroy the root item
+    m_qmlView->setSource(QUrl());
+
     commonGUIDestroy();
 }
 
