@@ -98,5 +98,7 @@ QtObject {
     readonly property string window_maximize : "\ue052"
     readonly property string window_minimize : "\ue053"
     readonly property string window_restore : "\ue054"
+    readonly property string ic_fluent_document_add_24_regular: "\ue055"
+    readonly property string ic_fluent_document_copy_24_regular: "\ue056"
 
 }
