@@ -72,8 +72,22 @@ public:
     [[nodiscard]] virtual bool init() = 0;
 
     [[nodiscard]] virtual bool makeMainInterface(MainCtx* intf) = 0;
+
+    /**
+     * @brief destroyMainInterface must released all resources, this is called before
+     * destroying the compositor
+     */
     virtual void destroyMainInterface() = 0;
 
+    /**
+     * @brief unloadGUI must destroy the resources associated to the UI part,
+     * this includes QML resources.
+     * Resources that are dependencies of the video surfaces should not be
+     * destroyed as the video window may be destroyed after the interface.
+     *
+     * this means that if your video depends on a QQuickView, you must unload
+     * the QML content but keep the QQuickView
+     */
     virtual void unloadGUI() = 0;
 
     [[nodiscard]] virtual bool setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb) = 0;
@@ -131,9 +145,23 @@ protected:
     bool setBlurBehind(QWindow* window, bool enable = true);
 
 protected:
+    /**
+     * @brief commonGUICreate setup the QML view for video composition
+     * this should be called from makeMainInterface specialisation
+     */
     bool commonGUICreate(QWindow* window, QmlUISurface* , CompositorVideo::Flags flags);
     bool commonGUICreate(QWindow* window, QQuickView* , CompositorVideo::Flags flags);
+
+    /**
+     * @brief commonIntfDestroy release GUI resources allocated by commonGUICreate
+     * this should be called from unloadGUI specialisation
+     */
     void commonGUIDestroy();
+
+    /**
+     * @brief commonIntfDestroy release interface resources allocated by commonGUICreate
+     * this should be called from destroyMainInterface specialisation
+     */
     void commonIntfDestroy();
 
 private:
