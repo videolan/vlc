@@ -17,9 +17,9 @@ for arch in $ARCHS; do
     BUILD_DIR="${BUILT_PRODUCTS_DIR}/build-${PLATFORM_NAME}-${arch}/"
     if [ ! -f "${BUILD_DIR}/build/config.h" ] || [ ! -d "${SRCROOT}/contrib/${arch}-${PLATFORM_NAME}" ]; then
         mkdir -p "${BUILD_DIR}"
-        (cd "${BUILD_DIR}" && env -i NO_COLOR=1 V=1 VERBOSE=1 MAKEFLAGS="$MAKEFLAGS" "${SCRIPTDIR}/build.sh" \
+        (cd "${BUILD_DIR}" && env -i HOME="${HOME}" NO_COLOR=1 V=1 VERBOSE=1 MAKEFLAGS="$MAKEFLAGS" "${SCRIPTDIR}/build.sh" \
             --enable-shared --arch="${arch}" --sdk="${PLATFORM_NAME}")
     else
-        (cd "${BUILD_DIR}/build/" && env -i NO_COLOR=1 ./compile MAKEFLAGS="$MAKEFLAGS" V=1 VERBOSE=1)
+        (cd "${BUILD_DIR}/build/" && env -i HOME="${HOME}" NO_COLOR=1 ./compile MAKEFLAGS="$MAKEFLAGS" V=1 VERBOSE=1)
     fi
 done
