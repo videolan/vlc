@@ -404,9 +404,26 @@ bool InterfaceWindowHandler::applyKeyEvent(QKeyEvent * event) const
 
     // NOTE: When the item has visual focus we let it handle the key. When the item does not
     //       inherit from QQuickControl we have to declare the 'visualFocus' property ourselves.
-    if (item && QQmlProperty(item, "visualFocus", qmlContext(item)).read().toBool())
+    if (item)
     {
-        return false;
+
+        QVariant visualFocus = QQmlProperty::read(item, "visualFocus", qmlContext(item));
+        if (visualFocus.isValid())
+        {
+            if (visualFocus.toBool())
+                return false;
+        }
+        //while being QuickControls TextField and TextArea don't provide visualFocus property
+        //here we check their (non control) parent class, this should cover all text input widgets
+        else if (item->inherits("QQuickTextInput") || item->inherits("QQuickTextEdit"))
+        {
+            QVariant activeFocus = QQmlProperty::read(item, "activeFocus", qmlContext(item));
+            if (activeFocus.isValid())
+            {
+                if (activeFocus.toBool())
+                    return false;
+            }
+        }
     }
 
     event->accept();
