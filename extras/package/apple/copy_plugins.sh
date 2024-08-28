@@ -48,13 +48,20 @@ for plugin in "${PLUGINS[@]}"; do
     done
     FRAMEWORK_DIR="${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/${plugin}.framework"
     FRAMEWORK_BIN_PATH="${FRAMEWORK_DIR}/${plugin}"
-    mkdir -p "${FRAMEWORK_DIR}"
-    lipo -create \
-        -output "${FRAMEWORK_BIN_PATH}" \
-        "${INPUT_FILES[@]}"
-    install_name_tool -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore" \
-        "${FRAMEWORK_BIN_PATH}"
-    dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
-    generate_info_plist "${plugin}" > "${FRAMEWORK_DIR}/Info.plist"
-    codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${FRAMEWORK_DIR}"
+
+    for file in "${INPUT_FILES[@]}"; do
+        if [ -f "${FRAMEWORK_BIN_PATH}" ] && [ "$file" -ot "${FRAMEWORK_BIN_PATH}" ]; then
+            continue
+        fi
+        mkdir -p "${FRAMEWORK_DIR}"
+        lipo -create \
+            -output "${FRAMEWORK_BIN_PATH}" \
+            "${INPUT_FILES[@]}"
+        install_name_tool -change "@rpath/libvlccore.dylib" "@rpath/vlccore.framework/vlccore" \
+            "${FRAMEWORK_BIN_PATH}"
+        dsymutil -o "${FRAMEWORK_DIR}.dSYM" "${FRAMEWORK_BIN_PATH}"
+        generate_info_plist "${plugin}" > "${FRAMEWORK_DIR}/Info.plist"
+        codesign --force --sign "${EXPANDED_CODE_SIGN_IDENTITY}" "${FRAMEWORK_DIR}"
+        break
+    done
 done
