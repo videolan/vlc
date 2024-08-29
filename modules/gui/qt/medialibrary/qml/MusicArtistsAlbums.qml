@@ -214,13 +214,40 @@ FocusScope {
             Widgets.HorizontalResizeHandle {
                 id: resizeHandle
 
+                property bool _inhibitMainCtxUpdate: false
+
                 anchors {
                     top: parent.top
                     bottom: parent.bottom
                     right: parent.right
                 }
+
                 sourceWidth: root.width
                 targetWidth: artistList.width
+
+                onWidthFactorChanged: {
+                    if (!_inhibitMainCtxUpdate)
+                        MainCtx.artistAlbumsWidthFactor = widthFactor
+                }
+
+                Component.onCompleted:  _updateFromMainCtx()
+
+                function _updateFromMainCtx() {
+                    if (widthFactor == MainCtx.artistAlbumsWidthFactor)
+                        return
+
+                    _inhibitMainCtxUpdate = true
+                    widthFactor = MainCtx.artistAlbumsWidthFactor
+                    _inhibitMainCtxUpdate = false
+                }
+
+                Connections {
+                    target: MainCtx
+
+                    function onArtistAlbumsWidthFactorChanged() {
+                        resizeHandle._updateFromMainCtx()
+                    }
+                }
             }
         }
 
