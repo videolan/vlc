@@ -138,6 +138,27 @@ bool CompositorDirectComposition::init()
         return false;
     }
 
+    const QString& sceneGraphBackend = qEnvironmentVariable("QT_QUICK_BACKEND");
+    if (!sceneGraphBackend.isEmpty() /* if empty, RHI is used */ &&
+        sceneGraphBackend != QLatin1String("rhi"))
+    {
+        // No RHI means no D3D11 or D3D12, the graphics API check
+        // below is only relevant when RHI is in use.
+        // If QT_QUICK_BACKEND is set to software or openvg, then
+        // `QQuickWindow::graphicsApi()` might still report D3D11 or
+        // D3D12 until the scene graph is initialized.
+        // Unlike `QQuickWindow::graphicsApi()`, `sceneGraphBackend()`
+        // is only valid after the window is constructed, so instead
+        // of using `QQuickWindow::sceneGraphBackend()`, simply probe
+        // the environment variable.
+        return false;
+    }
+
+    const auto graphicsApi = QQuickWindow::graphicsApi();
+    if (graphicsApi != QSGRendererInterface::Direct3D11 &&
+        graphicsApi != QSGRendererInterface::Direct3D12)
+        return false;
+
     return true;
 }
 
@@ -225,53 +246,22 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
 
     bool appropriateGraphicsApi = true;
 
-    QEventLoop eventLoop;
     connect(quickViewPtr,
-            &QQuickWindow::sceneGraphInitialized,
-            &eventLoop,
-            [&eventLoop, &appropriateGraphicsApi, quickViewPtr, this]() {
-                if (QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D11 ||
-                    QQuickWindow::graphicsApi() == QSGRendererInterface::Direct3D12)
-                {
-                    connect(quickViewPtr,
-                            &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
-                            this,
-                            [this, &eventLoop]() {
-                                setup();
-                                eventLoop.quit();
-                            },
-                            Qt::SingleShotConnection);
-                }
-                else
-                {
-                    appropriateGraphicsApi = false;
-                    eventLoop.quit();
-                }
-        }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
-
-    connect(quickViewPtr,
-            &QQuickWindow::sceneGraphError,
-            &eventLoop,
-            [&eventLoop, &appropriateGraphicsApi](QQuickWindow::SceneGraphError error, const QString &message) {
-                qWarning() << "CompositorDComp: Scene Graph Error: " << error << ", Message: " << message;
-                appropriateGraphicsApi = false;
-                eventLoop.quit();
-        }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
-
-    CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC;
+            &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
+            this,
+            &CompositorDirectComposition::setup,
+            Qt::SingleShotConnection);
 
     m_quickView->create();
 
-    const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, flags);
+    const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC);
 
-    if (ret)
-        m_quickView->show();
-    else
+    if (!ret)
         return false;
 
-    if (!m_quickView->isSceneGraphInitialized())
-        eventLoop.exec();
-    return (ret && appropriateGraphicsApi);
+    m_quickView->show();
+
+    return true;
 }
 
 void CompositorDirectComposition::onSurfacePositionChanged(const QPointF& position)
