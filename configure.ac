@@ -1931,16 +1931,17 @@ AS_IF([test "${enable_rust}" = "yes"],[
     AC_MSG_ERROR([Unsupported Rust target for ${host}])
   ])
 
-  AS_IF([test -n "${CARGO_HOME}"],[
-    AS_IF([test -x "${CARGO_HOME}/bin/cargo"],[
-      ac_cv_prog_CARGO="${CARGO_HOME}/bin/cargo"
-    ])
+  AS_IF([test -z "${CARGO_HOME}"], [
+    dnl CARGO_HOME default to the home folder
+    dnl https://doc.rust-lang.org/cargo/guide/cargo-home.html
+    CARGO_HOME="${HOME}/.cargo"
   ])
 
-  AC_CHECK_PROGS(CARGO, [cargo], [no])
+  AC_PATH_PROGS(CARGO, [cargo], [no], [${CARGO_HOME}/bin:${PATH}])
   AS_IF([test "$CARGO" = "no"],[
     AC_MSG_ERROR([cargo not found. cargo is required to build Rust modules])
   ])
+
   AC_DEFINE(ENABLE_RUST, 1, [Define to 1 for building rust modules.])
 ])
 AM_CONDITIONAL([HAVE_RUST], [test "${enable_rust}" = "yes"])
