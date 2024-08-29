@@ -95,7 +95,14 @@ ViewBlockingRectangle::ViewBlockingRectangle(QQuickItem *parent)
 {
     setFlag(QQuickItem::ItemHasContents);
     connect(this, &ViewBlockingRectangle::colorChanged, this, &QQuickItem::update);
-    connect(this, &ViewBlockingRectangle::windowChanged, this, [this] { m_windowChanged = true; });
+    connect(this, &ViewBlockingRectangle::windowChanged, this, [this] {
+        if (window())
+        {
+            // The new window might use an appropriate graphics API:
+            setFlag(QQuickItem::ItemHasContents);
+            m_windowChanged = true;
+        }
+    });
 }
 
 QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
@@ -124,7 +131,18 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
         {
             rectangleNode = window()->createRectangleNode();
             assert(rectangleNode);
-            assert(rectangleNode->material());
+
+            const auto material = rectangleNode->material();
+            if (!material ||
+                material == reinterpret_cast<QSGMaterial*>(1) /* Qt may explicitly set the material pointer to 1 in OpenVG */)
+            {
+                // Scene graph adaptation does not support shading
+                qmlDebug(this) << "ViewBlockingRectangle is being used under an incompatible scene graph adaptation.";
+                delete rectangleNode;
+                setFlag(QQuickItem::ItemHasContents, false);
+                return nullptr;
+            }
+
             rectangleNode->material()->setFlag(QSGMaterial::Blending, false);
         }
     }
