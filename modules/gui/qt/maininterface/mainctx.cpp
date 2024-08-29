@@ -234,6 +234,8 @@ MainCtx::~MainCtx()
     settings->setValue( "playlist-width-factor", QString::number( m_playlistWidthFactor ) );
     settings->setValue( "player-playlist-width-factor", QString::number( m_playerPlaylistWidthFactor ) );
 
+    settings->setValue( "artist-albums-width-factor", QString::number( m_artistAlbumsWidthFactor ) );
+
     settings->setValue( "grid-view", m_gridView );
     settings->setValue( "grouping", m_grouping );
 
@@ -366,6 +368,9 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
     loadFromSettings(m_playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
 
     loadFromSettings(m_playerPlaylistWidthFactor, "MainWindow/player-playlist-width-factor", 4.0 , &MainCtx::playerPlaylistFactorChanged);
+
+    loadFromSettings(m_artistAlbumsWidthFactor, "MainWindow/artist-albums-width-factor"
+                     , 4.0 , &MainCtx::artistAlbumsWidthFactorChanged);
 
     loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainCtx::gridViewChanged);
 
@@ -906,4 +911,18 @@ bool WindowStateHolder::holdOnTop(QWindow *window, Source source, bool hold)
     window->setProperty("__windowOnTop", QVariant::fromValue(onTopCounter));
 
     return onTopCounter != 0;
+}
+
+double MainCtx::artistAlbumsWidthFactor() const
+{
+    return m_artistAlbumsWidthFactor;
+}
+
+void MainCtx::setArtistAlbumsWidthFactor(double newArtistAlbumsWidthFactor)
+{
+    if (qFuzzyCompare(m_artistAlbumsWidthFactor, newArtistAlbumsWidthFactor))
+        return;
+
+    m_artistAlbumsWidthFactor = newArtistAlbumsWidthFactor;
+    emit artistAlbumsWidthFactorChanged( m_artistAlbumsWidthFactor );
 }

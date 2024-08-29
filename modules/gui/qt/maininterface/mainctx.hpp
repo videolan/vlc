@@ -98,6 +98,7 @@ class MainCtx : public QObject
     Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged FINAL)
     Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged FINAL)
     Q_PROPERTY(double playerPlaylistWidthFactor READ getPlayerPlaylistWidthFactor WRITE setPlayerPlaylistWidthFactor NOTIFY playerPlaylistFactorChanged FINAL)
+    Q_PROPERTY(double artistAlbumsWidthFactor READ artistAlbumsWidthFactor WRITE setArtistAlbumsWidthFactor NOTIFY artistAlbumsWidthFactorChanged FINAL)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged FINAL)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(bool showRemainingTime READ isShowRemainingTime WRITE setShowRemainingTime NOTIFY showRemainingTimeChanged FINAL)
@@ -291,6 +292,9 @@ public:
 
     Q_INVOKABLE QString displayMRL(const QUrl &mrl) const;
 
+    double artistAlbumsWidthFactor() const;
+    void setArtistAlbumsWidthFactor(double newArtistAlbumsWidthFactor);
+
 protected:
     /* Systray */
     void initSystray();
@@ -338,6 +342,8 @@ protected:
     bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
     double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
+
+    double               m_artistAlbumsWidthFactor = 4.;
 
     VLCVarChoiceModel* m_extraInterfaces = nullptr;
 
@@ -460,6 +466,8 @@ signals:
 
     void requestShowMainView();
     void requestShowPlayerView();
+
+    void artistAlbumsWidthFactorChanged( double );
 
 private:
     void loadPrefs(bool callSignals);
