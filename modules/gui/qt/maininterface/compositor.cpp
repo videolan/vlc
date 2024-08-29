@@ -265,11 +265,12 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
     m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
-    if (flags & CompositorVideo::CAN_SHOW_PIP)
+    const bool backendIsOpenVg = QQuickWindow::sceneGraphBackend() == QLatin1String("openvg");
+    if (!backendIsOpenVg && (flags & CompositorVideo::CAN_SHOW_PIP))
     {
         m_mainCtx->setCanShowVideoPIP(true);
     }
-    if (flags & CompositorVideo::HAS_ACRYLIC)
+    if (!backendIsOpenVg && (flags & CompositorVideo::HAS_ACRYLIC))
     {
         setBlurBehind(window, true);
     }
