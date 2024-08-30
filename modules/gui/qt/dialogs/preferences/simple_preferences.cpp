@@ -192,29 +192,7 @@ static int getDefaultAudioVolume(const char *aout)
     return -1;
 }
 
-namespace
-{
-#if !defined( _WIN32)
-    void fillStylesCombo( QComboBox *stylesCombo, const QString &initialStyle)
-    {
-        stylesCombo->addItem( qtr("System's default") );
-        stylesCombo->addItems( QStyleFactory::keys() );
-        stylesCombo->setCurrentIndex( stylesCombo->findText( initialStyle ) );
-        stylesCombo->insertSeparator( 1 );
-        if ( stylesCombo->currentIndex() < 0 )
-            stylesCombo->setCurrentIndex( 0 ); /* default */
-    }
-#endif
-
-    QString getQStyleKey(const QComboBox *stylesCombo, const QString &defaultStyleName)
-    {
-        vlc_assert( stylesCombo );
-        const int index = stylesCombo->currentIndex();
-        if (stylesCombo->currentIndex() == 0)
-            return defaultStyleName;
-        return QStyleFactory::keys().at( index - 2 );
-    }
-}
+static const QString styleSettingsKey = QStringLiteral("MainWindow/QtStyle");
 
 class PropertyResetter
 {
@@ -774,7 +752,25 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             }
 
 #if !defined( _WIN32)
-            fillStylesCombo( ui.stylesCombo, getSettings()->value( "MainWindow/QtStyle", "" ).toString() );
+            {
+                // Populate styles combobox:
+                assert(qApp->property("initialStyle").isValid());
+                const QString& initialStyle = qApp->property("initialStyle").toString();
+                ui.stylesCombo->addItem( qtr( "System's default (%1)" ).arg( initialStyle ), initialStyle );
+                const QStringList& styles = QStyleFactory::keys();
+                for ( const auto& i : styles )
+                {
+                    ui.stylesCombo->addItem( i, i );
+                }
+                const auto style = getSettings()->value( styleSettingsKey );
+
+                if ( style.isValid() && style.canConvert<QString>() )
+                    ui.stylesCombo->setCurrentText( style.toString() );
+                ui.stylesCombo->insertSeparator( 1 );
+                if ( ui.stylesCombo->currentIndex() < 0 )
+                    ui.stylesCombo->setCurrentIndex( 0 ); /* default */
+            }
+
             m_resetters.push_back( std::make_unique<PropertyResetter>( ui.stylesCombo, "currentIndex" ) );
 
             connect( ui.stylesCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -1242,7 +1238,10 @@ void SPrefsPanel::apply()
         //if( m_interfaceUI.qt->isChecked() )
             config_PutPsz( "intf", "" );
 #if !defined( _WIN32)
-        getSettings()->setValue( "MainWindow/QtStyle", getQStyleKey(  m_interfaceUI.stylesCombo , "" ) );
+        if ( m_interfaceUI.stylesCombo->currentIndex() > 0 )
+            getSettings()->setValue( styleSettingsKey, m_interfaceUI.stylesCombo->currentData().toString() );
+        else
+            getSettings()->remove( styleSettingsKey );
 #endif
 
 #ifdef _WIN32
@@ -1350,14 +1349,13 @@ void SPrefsPanel::lastfm_Changed( int i_state )
 
 void SPrefsPanel::changeStyle()
 {
-    const QString key = getQStyleKey( m_interfaceUI.stylesCombo,
-                                      qApp->property("initialStyle").toString() );
+    const QString style = m_interfaceUI.stylesCombo->currentData().toString();
 
-    QMetaObject::invokeMethod( qApp, [key]() {
+    QMetaObject::invokeMethod( qApp, [style]() {
         // Queue this call in order to prevent
         // updating the preferences dialog when
         // it is rejected:
-        QApplication::setStyle( key );
+        QApplication::setStyle( style );
     }, Qt::QueuedConnection );
 }
 
