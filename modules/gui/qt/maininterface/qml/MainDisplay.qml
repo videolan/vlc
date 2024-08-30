@@ -371,6 +371,8 @@ FocusScope {
                     topPadding: VLCStyle.layoutTitle_top_padding
                     bottomPadding: VLCStyle.margin_normal + Math.max(VLCStyle.applicationVerticalMargin - g_mainDisplay.displayMargin, 0)
 
+                    useAcrylic: !VLCStyle.isScreenSmall
+
                     Navigation.parentItem: mainColumn
                     Navigation.upItem: sourcesBanner
                     Navigation.downItem: miniPlayer.visible ? miniPlayer : null
