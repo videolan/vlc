@@ -248,6 +248,8 @@ Item {
         signal startDrag()
         signal stopDrag()
 
+        signal allImagesAreLoaded()
+
         //internal signals
         signal resolveData(var requestId, var indexes)
         signal resolveInputItems(var requestId, var indexes)
@@ -258,7 +260,8 @@ Item {
             stopDrag: stopDrag,
             resolveData: resolveData,
             resolveInputItems: resolveInputItems,
-            resolveFailed: resolveFailed
+            resolveFailed: resolveFailed,
+            allImagesAreLoaded: allImagesAreLoaded
         })
 
         initialState: fsmDragInactive
@@ -354,10 +357,29 @@ Item {
                         action: (requestId, items) => {
                             dragItem._setInputItems(items)
                         },
-                        target: fsmLoadingDone,
+                        target: fsmWaitingForImages,
                     },
                     resolveFailed: fsmLoadingFailed
                 })
+            }
+
+            FSMState {
+                id: fsmWaitingForImages
+
+                transitions: ({
+                    allImagesAreLoaded: {
+                        target: fsmLoadingDone
+                    }
+                })
+
+                function enter() {
+                    if (coverRepeater.notReadyCount === 0) {
+                        // By the time the state changes
+                        // the images might have been
+                        // already loaded:
+                        fsm.allImagesAreLoaded()
+                    }
+                }
             }
 
             FSMState {
@@ -405,6 +427,19 @@ Item {
 
         model: dragItem._covers
 
+        property int notReadyCount: count
+
+        onModelChanged: {
+            notReadyCount = count
+        }
+
+        onNotReadyCountChanged: {
+            if (notReadyCount === 0) {
+                // All the images are loaded, don't wait anymore
+                fsm.allImagesAreLoaded()
+            }
+        }
+
         Item {
             required property var modelData
             required property int index
@@ -437,18 +472,18 @@ Item {
                 radius: bg.radius
                 source: modelData.artwork ?? ""
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
-            }
 
-            Widgets.RoundImage {
-                id: fallbackCover
-
-                anchors.centerIn: parent
-                width: coverSize
-                height: coverSize
-                radius: bg.radius
-                source: modelData.fallback ?? defaultCover
-                sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
-                visible: artworkCover.status !== Image.Ready
+                onStatusChanged: {
+                    if (status === Widgets.RoundImage.Ready)
+                        coverRepeater.notReadyCount -= 1
+                    else if (status === Widgets.RoundImage.Error) {
+                        const fallbackSource = modelData.fallback ?? defaultCover
+                        if (source === fallbackSource)
+                            coverRepeater.notReadyCount -= 1
+                        else
+                            source = fallbackSource
+                    }
+                }
             }
 
             Rectangle {
