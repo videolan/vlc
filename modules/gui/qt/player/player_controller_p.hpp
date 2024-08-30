@@ -45,7 +45,7 @@ public:
     void UpdateInfo( input_item_t *p_item );
     void UpdateStats( const input_stats_t& stats );
     void UpdateProgram(vlc_player_list_action action, const vlc_player_program *prgm);
-    void UpdateVouts(vout_thread_t **vouts, size_t i_vouts);
+    void UpdateVouts(vout_thread_t **vouts, size_t i_vouts, vlc_player_vout_action action);
     void UpdateTrackSelection(vlc_es_id_t *trackid, bool selected);
     void UpdateSpuOrder(vlc_es_id_t *es_id, enum vlc_vout_order spu_order);
     int interpolateTime(vlc_tick_t system_now);
@@ -148,6 +148,7 @@ public:
     bool            m_hasVideo = false;
     bool            m_fullscreen = false;
     bool            m_wallpaperMode = false;
+    int m_vout_ref = 0;
 
     //aout properties
     VLCVarChoiceModel m_audioStereoMode;

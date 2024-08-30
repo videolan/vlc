@@ -205,11 +205,17 @@ void PlayerControllerPrivate::UpdateInfo( input_item_t *p_item )
     emit q->infoChanged( p_item );
 }
 
-void PlayerControllerPrivate::UpdateVouts(vout_thread_t **vouts, size_t i_vouts)
+void PlayerControllerPrivate::UpdateVouts(vout_thread_t **vouts, size_t i_vouts, enum vlc_player_vout_action action)
 {
     Q_Q(PlayerController);
     bool hadVideo = m_hasVideo;
-    m_hasVideo = i_vouts > 0;
+
+    if (action == VLC_PLAYER_VOUT_STARTED)
+        ++m_vout_ref;
+    else if (action == VLC_PLAYER_VOUT_STOPPED)
+        --m_vout_ref;
+    assert(m_vout_ref >= 0);
+    m_hasVideo = (m_vout_ref > 0);
 
     vout_thread_t* main_vout = nullptr;
     if (m_hasVideo)
@@ -777,7 +783,7 @@ static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_ite
 }
 
 
-static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action,
+static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_action action,
     vout_thread_t *, enum vlc_vout_order order, vlc_es_id_t *es_id, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
@@ -798,8 +804,8 @@ static void on_player_vout_changed(vlc_player_t *player, enum vlc_player_vout_ac
             });
 
             //call on object thread
-            that->callAsync([that,voutsPtr,i_vout] () {
-                that->UpdateVouts(voutsPtr.get(), i_vout);
+            that->callAsync([that,voutsPtr,i_vout,action] () {
+                that->UpdateVouts(voutsPtr.get(), i_vout, action);
             });
             break;
         }
