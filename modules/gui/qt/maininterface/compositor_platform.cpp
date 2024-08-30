@@ -95,6 +95,8 @@ bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx)
     m_quickWindow->setOpacity(0.0);
     m_quickWindow->setOpacity(1.0);
 
+    m_rootWindow->installEventFilter(this);
+
     m_rootWindow->show();
     m_videoWindow->show();
     m_quickWindow->show();
@@ -151,6 +153,28 @@ QQuickItem *CompositorPlatform::activeFocusItem() const
 {
     assert(m_quickWindow);
     return m_quickWindow->activeFocusItem();
+}
+
+bool CompositorPlatform::eventFilter(QObject *watched, QEvent *event)
+{
+    // Forward drag events to the child quick window,
+    // as it is not done automatically by Qt with
+    // nested windows:
+    if (m_quickWindow && watched == m_rootWindow.get())
+    {
+        switch (event->type()) {
+        case QEvent::DragEnter:
+        case QEvent::DragLeave:
+        case QEvent::DragMove:
+        case QEvent::DragResponse:
+        case QEvent::Drop:
+            QApplication::sendEvent(m_quickWindow, event);
+            return true;
+        default:
+            break;
+        };
+    }
+    return false;
 }
 
 int CompositorPlatform::windowEnable(const vlc_window_cfg_t *)

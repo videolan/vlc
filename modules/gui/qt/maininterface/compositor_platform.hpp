@@ -46,6 +46,8 @@ public:
     Type type() const override;
     QQuickItem * activeFocusItem() const override;
 
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
