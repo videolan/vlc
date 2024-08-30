@@ -94,9 +94,11 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
                 return QVariant::fromValue(group->getTitle());
             case VIDEO_THUMBNAIL:
             {
-                return ml()->customCover()->get(group->getId()
-                                                , QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT)
-                                                , QStringLiteral(":/placeholder/noart_videoCover.svg"));
+                return MLCustomCover::url(
+                    group->getId(),
+                    QSize(MLVIDEOGROUPSMODEL_COVER_WIDTH, MLVIDEOGROUPSMODEL_COVER_HEIGHT),
+                    QStringLiteral(":/placeholder/noart_videoCover.svg")
+                );
             }
             case VIDEO_DURATION:
                 return QVariant::fromValue(group->getDuration());

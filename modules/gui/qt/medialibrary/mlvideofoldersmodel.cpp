@@ -83,9 +83,9 @@ QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const 
             return QVariant::fromValue( getFirstSymbol(folder->getTitle()) );
         case FOLDER_THUMBNAIL:
         {
-            return ml()->customCover()->get(folder->getId()
-                                            , QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT)
-                                            , QStringLiteral(":/placeholder/noart_videoCover.svg"));
+            return MLCustomCover::url(folder->getId()
+                                    , QSize(MLVIDEOFOLDERSMODEL_COVER_WIDTH, MLVIDEOFOLDERSMODEL_COVER_HEIGHT)
+                                    , QStringLiteral(":/placeholder/noart_videoCover.svg"));
         }
         case FOLDER_DURATION:
             return QVariant::fromValue(folder->getDuration());

@@ -126,13 +126,13 @@ vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
 
 QString MLGenreModel::getCover(MLGenre * genre) const
 {
-    return ml()->customCover()->get(genre->getId()
-                                    , QSize(MLGENREMODEL_COVER_WIDTH, MLGENREMODEL_COVER_HEIGHT)
-                                    , m_coverDefault
-                                    , MLGENREMODEL_COVER_COUNTX
-                                    , MLGENREMODEL_COVER_COUNTY
-                                    , MLGENREMODEL_COVER_BLUR
-                                    , true);
+    return MLCustomCover::url(genre->getId()
+                            , QSize(MLGENREMODEL_COVER_WIDTH, MLGENREMODEL_COVER_HEIGHT)
+                            , m_coverDefault
+                            , MLGENREMODEL_COVER_COUNTX
+                            , MLGENREMODEL_COVER_COUNTY
+                            , MLGENREMODEL_COVER_BLUR
+                            , true);
 }
 
 //-------------------------------------------------------------------------------------------------

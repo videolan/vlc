@@ -80,8 +80,6 @@ using  namespace vlc::playlist;
 
 namespace {
 
-const QString MLCUSTOMCOVER_PROVIDERID = "mlcustomcover";
-
 template<class T>
 class SingletonRegisterHelper
 {
@@ -163,10 +161,7 @@ bool MainUI::setup(QQmlEngine* engine)
 
     if (m_mainCtx->hasMediaLibrary())
     {
-        auto customCover = new MLCustomCover(MLCUSTOMCOVER_PROVIDERID, m_mainCtx->getMediaLibrary());
-        m_mainCtx->getMediaLibrary()->setCustomCover(customCover);
-
-        engine->addImageProvider(MLCUSTOMCOVER_PROVIDERID, customCover);
+        engine->addImageProvider(MLCustomCover::providerId, new MLCustomCover(m_mainCtx->getMediaLibrary()));
     }
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)

@@ -31,9 +31,11 @@ class MediaLib;
 class MLCustomCover : public QQuickAsyncImageProvider
 {
 public:
-    MLCustomCover(const QString &providerId, MediaLib *ml);
+    MLCustomCover(MediaLib *ml);
 
-    QString get(const MLItemId &parentId
+    inline static const char* providerId = "mlcustomcover";
+
+    static QString url(const MLItemId &parentId
                 , const QSize &size
                 , const QString &defaultCover
                 , const int countX = 2
@@ -44,7 +46,6 @@ public:
     QQuickImageResponse *requestImageResponse(const QString &id, const QSize &requestedSize);
 
 private:
-    const QString m_providerId;
     MediaLib *m_ml = nullptr;
 };
 

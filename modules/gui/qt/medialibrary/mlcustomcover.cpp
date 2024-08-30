@@ -281,18 +281,17 @@ private:
 };
 
 
-MLCustomCover::MLCustomCover(const QString &providerId, MediaLib *ml)
-    : m_providerId {providerId}
-    , m_ml {ml}
+MLCustomCover::MLCustomCover(MediaLib *ml)
+    : m_ml {ml}
 {
 }
 
-QString MLCustomCover::get(const MLItemId &parentId, const QSize &size, const QString &defaultCover
+QString MLCustomCover::url(const MLItemId &parentId, const QSize &size, const QString &defaultCover
                            , const int countX, const int countY, const int blur, const bool split_duplicate)
 {
     QUrl url;
     url.setScheme(QStringLiteral("image"));
-    url.setHost(m_providerId);
+    url.setHost(MLCustomCover::providerId);
     url.setQuery(toQuery({parentId, size, countX, countY, blur, split_duplicate, defaultCover}));
     return url.toString();
 }

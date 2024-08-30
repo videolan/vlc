@@ -358,10 +358,10 @@ void MLPlaylistListModel::setTransactionPending(const bool value)
 
 QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
 {
-    return ml()->customCover()->get(playlist->getId()
-                                    , m_coverSize
-                                    , m_coverDefault
-                                    , PLAYLIST_COVERX, PLAYLIST_COVERY);
+    return MLCustomCover::url(playlist->getId()
+                            , m_coverSize
+                            , m_coverDefault
+                            , PLAYLIST_COVERX, PLAYLIST_COVERY);
 }
 
 //-------------------------------------------------------------------------------------------------

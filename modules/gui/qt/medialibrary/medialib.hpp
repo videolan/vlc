@@ -27,9 +27,6 @@
 #include "mlthreadpool.hpp"
 #include "mlqmltypes.hpp"
 
-
-class MLCustomCover;
-
 namespace vlc {
 namespace playlist {
 class Media;
@@ -177,9 +174,6 @@ public:
      */
     void cancelMLTask(const QObject* object, quint64 taskId);
 
-   MLCustomCover *customCover() const;
-   void setCustomCover(MLCustomCover *newCustomCover);
-
 signals:
     void discoveryStarted();
     void discoveryCompleted();
@@ -200,7 +194,6 @@ private slots:
 private:
     qt_intf_t* m_intf;
     vlc::playlist::PlaylistController* m_playlistController = nullptr;
-    MLCustomCover *m_customCover {};
 
     bool m_idle = false;
     bool m_discoveryPending = false;
