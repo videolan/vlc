@@ -99,7 +99,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
 
 - (void)reloadData
 {
-    self.playlists = _libraryModel.listOfPlaylists;
+    self.playlists = [self.libraryModel listOfPlaylistsOfType:self.playlistType];
     [self reloadViews];
 }
 
