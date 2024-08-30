@@ -351,4 +351,14 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     return VLCLibraryCollectionViewMediaItemListSupplementaryDetailViewKind;
 }
 
+- (void)setPlaylistType:(vlc_ml_playlist_type_t)playlistType
+{
+    if (self.playlistType == playlistType) {
+        return;
+    }
+
+    _playlistType = playlistType;
+    [self reloadData];
+}
+
 @end

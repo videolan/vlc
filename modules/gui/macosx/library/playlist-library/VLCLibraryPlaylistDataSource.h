@@ -25,6 +25,8 @@
 #import "library/VLCLibraryCollectionViewDataSource.h"
 #import "library/VLCLibraryMasterDetailViewTableViewDataSource.h"
 
+#import <vlc_media_library.h>
+
 @class VLCLibraryModel;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -35,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite) NSTableView *masterTableView;
 @property (readwrite) NSTableView *detailTableView;
 @property (readwrite, nonatomic) NSArray<NSCollectionView *> *collectionViews;
+@property (readwrite, nonatomic) vlc_ml_playlist_type_t playlistType;
 
 @end
 
