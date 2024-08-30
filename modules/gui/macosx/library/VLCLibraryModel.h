@@ -109,6 +109,8 @@ extern NSString * const VLCLibraryModelPlaylistUpdated;
 
 @property (readwrite, nonatomic) NSString *filterString;
 
+- (size_t)numberOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType;
+- (nullable NSArray<VLCMediaLibraryPlaylist *> *)listOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType;
 - (nullable NSArray<VLCMediaLibraryAlbum *> *)listAlbumsOfParentType:(const enum vlc_ml_parent_type)parentType forID:(int64_t)ID;
 - (NSArray<id<VLCMediaLibraryItemProtocol>> *)listOfLibraryItemsOfParentType:(const VLCMediaLibraryParentGroupType)parentType;
 - (NSArray<VLCMediaLibraryMediaItem *> *)listOfMediaItemsForParentType:(const VLCMediaLibraryParentGroupType)parentType;

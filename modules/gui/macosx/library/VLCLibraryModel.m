@@ -744,6 +744,36 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     });
 }
 
+- (size_t)numberOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType
+{
+    // TODO: Update query parameters when library sort/filter change
+    const vlc_ml_query_params_t queryParams = self.queryParams;
+    return vlc_ml_count_playlists(_p_mediaLibrary, &queryParams, playlistType);
+}
+
+- (nullable NSArray<VLCMediaLibraryPlaylist *> *)listOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType
+{
+    const vlc_ml_query_params_t queryParams = self.queryParams;
+    vlc_ml_playlist_list_t * const p_playlistList =
+        vlc_ml_list_playlists(_p_mediaLibrary, &queryParams, playlistType);
+    if (p_playlistList == NULL) {
+        return nil;
+    }
+
+    NSMutableArray * const mutableArray =
+        [[NSMutableArray alloc] initWithCapacity:p_playlistList->i_nb_items];
+    for (size_t x = 0; x < p_playlistList->i_nb_items; x++) {
+        VLCMediaLibraryPlaylist * const playlist =
+            [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&p_playlistList->p_items[x]];
+        if (playlist) {
+            [mutableArray addObject:playlist];
+        }
+    }
+
+    vlc_ml_playlist_list_release(p_playlistList);
+    return mutableArray.copy;
+}
+
 - (void)resetCachedListOfMonitoredFolders
 {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
