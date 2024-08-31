@@ -1313,7 +1313,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         dispatch_sync(dispatch_get_main_queue(), ^{
             [mutablePlaylists replaceObjectAtIndex:playlistIdx withObject:playlist];
             self.cachedPlaylists = mutablePlaylists.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistDeleted object:playlist];
+            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistUpdated object:playlist];
         });
     });
 }
