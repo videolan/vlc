@@ -301,7 +301,9 @@
 
 - (void)updatePresentedView
 {
-    if (VLCMain.sharedInstance.libraryController.libraryModel.numberOfPlaylists <= 0) {
+    const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
+    VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    if ([libraryModel numberOfPlaylistsOfType:playlistType] <= 0) {
         [self presentPlaceholderPlaylistLibraryView];
     } else {
         [self presentPlaylistLibraryView];
@@ -319,10 +321,12 @@
     NSParameterAssert(notification);
     VLCLibraryModel * const model = (VLCLibraryModel *)notification.object;
     NSAssert(model, @"Notification object should be a VLCLibraryModel");
+    const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
+    const size_t numberOfPlaylists = [model numberOfPlaylistsOfType:playlistType];
 
     if (_libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegment &&
-        ((model.numberOfPlaylists == 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_libraryWindow.emptyLibraryView]) ||
-         (model.numberOfPlaylists > 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
+        ((numberOfPlaylists == 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_libraryWindow.emptyLibraryView]) ||
+         (numberOfPlaylists > 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
         _libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
