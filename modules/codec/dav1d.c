@@ -84,43 +84,34 @@ struct decoder_sys_t
     Dav1dContext *c;
 };
 
-static const struct
-{
-    vlc_fourcc_t          i_chroma;
-    enum Dav1dPixelLayout i_chroma_id;
-    uint8_t               i_bitdepth;
-    enum Dav1dTransferCharacteristics transfer_characteristics;
-} chroma_table[] =
-{
-    /* Transfer characteristic-dependent mappings must come first */
-    {VLC_CODEC_GBR_PLANAR, DAV1D_PIXEL_LAYOUT_I444, 8, DAV1D_TRC_SRGB},
-    {VLC_CODEC_GBR_PLANAR_10L, DAV1D_PIXEL_LAYOUT_I444, 10, DAV1D_TRC_SRGB},
-
-    {VLC_CODEC_GREY, DAV1D_PIXEL_LAYOUT_I400, 8, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I420, DAV1D_PIXEL_LAYOUT_I420, 8, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I422, DAV1D_PIXEL_LAYOUT_I422, 8, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I444, DAV1D_PIXEL_LAYOUT_I444, 8, DAV1D_TRC_UNKNOWN},
-
-    {VLC_CODEC_I420_10L, DAV1D_PIXEL_LAYOUT_I420, 10, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I422_10L, DAV1D_PIXEL_LAYOUT_I422, 10, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I444_10L, DAV1D_PIXEL_LAYOUT_I444, 10, DAV1D_TRC_UNKNOWN},
-
-    {VLC_CODEC_I420_12L, DAV1D_PIXEL_LAYOUT_I420, 12, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I422_12L, DAV1D_PIXEL_LAYOUT_I422, 12, DAV1D_TRC_UNKNOWN},
-    {VLC_CODEC_I444_12L, DAV1D_PIXEL_LAYOUT_I444, 12, DAV1D_TRC_UNKNOWN},
-};
-
 static vlc_fourcc_t FindVlcChroma(const Dav1dPicture *img)
 {
+    static const vlc_fourcc_t chroma_table_rgb[] = { VLC_CODEC_GBR_PLANAR, VLC_CODEC_GBR_PLANAR_10L };
+    static const vlc_fourcc_t chroma_table[][3] = {
+        [DAV1D_PIXEL_LAYOUT_I400] = { VLC_CODEC_GREY, VLC_CODEC_GREY_10L, VLC_CODEC_GREY_12L },
+        [DAV1D_PIXEL_LAYOUT_I420] = { VLC_CODEC_I420, VLC_CODEC_I420_10L,  VLC_CODEC_I420_12L },
+        [DAV1D_PIXEL_LAYOUT_I422] = { VLC_CODEC_I422, VLC_CODEC_I422_10L,  VLC_CODEC_I422_12L },
+        [DAV1D_PIXEL_LAYOUT_I444] = { VLC_CODEC_I444, VLC_CODEC_I444_10L,  VLC_CODEC_I444_12L },
+    };
 
-    for (unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++)
-        if (chroma_table[i].i_chroma_id == img->p.layout &&
-            chroma_table[i].i_bitdepth == img->p.bpc &&
-            (chroma_table[i].transfer_characteristics == DAV1D_TRC_UNKNOWN ||
-             chroma_table[i].transfer_characteristics == img->seq_hdr->trc))
-            return chroma_table[i].i_chroma;
+    // AV1 signals RGB with the combination of the identity matrix, the BT.709 primaries and the sRGB/YCC transfer function.
+    // See: "5.5.2. Color config syntax" from https://aomediacodec.github.io/av1-spec/av1-spec.pdf
+    if( img->p.layout == DAV1D_PIXEL_LAYOUT_I444 &&
+        img->seq_hdr->mtrx == DAV1D_MC_IDENTITY &&
+        img->seq_hdr->pri == DAV1D_COLOR_PRI_BT709 &&
+        img->seq_hdr->trc == DAV1D_TRC_SRGB )
+    {
+        if( img->seq_hdr->hbd < 0 || img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table_rgb) )
+            return 0;
+        return chroma_table_rgb[img->seq_hdr->hbd];
+    }
 
-    return 0;
+    if( img->seq_hdr->layout < 0 || img->seq_hdr->layout >= (int)ARRAY_SIZE(chroma_table) )
+        return 0;
+    if( img->seq_hdr->hbd < 0 || img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table[0]) )
+        return 0;
+
+    return chroma_table[img->seq_hdr->layout][img->seq_hdr->hbd];
 }
 
 static int NewPicture(Dav1dPicture *img, void *cookie)
@@ -179,6 +170,8 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     v->multiview_mode = dec->fmt_in.video.multiview_mode;
     v->pose = dec->fmt_in.video.pose;
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec = FindVlcChroma(img);
+    if (dec->fmt_out.i_codec == 0)
+        return -1;
 
     if (decoder_UpdateVideoFormat(dec) == VLC_SUCCESS)
     {
