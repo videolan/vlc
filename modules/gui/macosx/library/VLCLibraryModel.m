@@ -97,7 +97,6 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 @property (readwrite, atomic) NSArray *cachedListOfGroups;
 @property (readwrite, atomic) NSArray *cachedRecentMedia;
 @property (readwrite, atomic) NSArray *cachedRecentAudioMedia;
-@property (readwrite, atomic) NSArray *cachedPlaylists;
 @property (readwrite, atomic) NSArray *cachedListOfMonitoredFolders;
 
 - (void)resetCachedListOfRecentMedia;
@@ -108,9 +107,9 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 - (void)resetCachedListOfShows;
 - (void)resetCachedListOfGroups;
 - (void)resetCachedListOfMonitoredFolders;
-- (void)resetCachedListOfPlaylists;
 - (void)mediaItemThumbnailGenerated:(VLCMediaLibraryMediaItem *)mediaItem;
 - (void)handleMediaItemAddedEvent:(const vlc_ml_event_t * const)p_event;
+- (void)handlePlaylistAddedEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleMediaItemDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleAlbumDeletionEvent:(const vlc_ml_event_t * const)p_event;
 - (void)handleArtistDeletionEvent:(const vlc_ml_event_t * const)p_event;
@@ -192,7 +191,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             [libraryModel handleGroupDeletionEvent:p_event];
             break;
         case VLC_ML_EVENT_PLAYLIST_ADDED:
-            [libraryModel resetCachedListOfPlaylists];
+            [libraryModel handlePlaylistAddedEvent:p_event];
             break;
         case VLC_ML_EVENT_PLAYLIST_UPDATED:
             [libraryModel handlePlaylistUpdateEvent:p_event];
@@ -1245,23 +1244,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         return;
     }
 
-    dispatch_async(_playlistCacheModificationQueue, ^{
-        NSMutableArray * const mutablePlaylists = self.cachedPlaylists.mutableCopy;
-        const NSUInteger playlistIdx = [mutablePlaylists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryPlaylist * const playlist, const NSUInteger idx, BOOL * const stop) {
-            NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
-            return playlist.libraryID == itemId;
-        }];
-
-        if (playlistIdx == NSNotFound) {
-            NSLog(@"Could not handle deletion of playlist with id %lld in model", itemId);
-            return;
-        }
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [mutablePlaylists replaceObjectAtIndex:playlistIdx withObject:playlist];
-            self.cachedPlaylists = mutablePlaylists.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistUpdated object:playlist];
-        });
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistUpdated
+                                                        object:playlist];
     });
 }
 
@@ -1270,25 +1255,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     NSParameterAssert(p_event != NULL);
 
     const int64_t itemId = p_event->modification.i_entity_id;
-
-    dispatch_async(_playlistCacheModificationQueue, ^{
-        NSMutableArray * const mutablePlaylists = self.cachedPlaylists.mutableCopy;
-        const NSUInteger playlistIdx = [mutablePlaylists indexOfObjectPassingTest:^BOOL(VLCMediaLibraryPlaylist * const playlist, const NSUInteger idx, BOOL * const stop) {
-            NSAssert(playlist != nil, @"Cache list should not contain nil playlists");
-            return playlist.libraryID == itemId;
-        }];
-
-        if (playlistIdx == NSNotFound) {
-            NSLog(@"Could not handle deletion of playlist with id %lld in model", itemId);
-            return;
-        }
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            VLCMediaLibraryPlaylist * const playlist = mutablePlaylists[playlistIdx];
-            [mutablePlaylists removeObjectAtIndex:playlistIdx];
-            self.cachedPlaylists = mutablePlaylists.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistDeleted object:playlist];
-        });
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistDeleted 
+                                                        object:@(itemId)];
     });
 }
 
