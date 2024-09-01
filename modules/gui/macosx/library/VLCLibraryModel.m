@@ -78,7 +78,6 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
     size_t _initialGenreCount;
     size_t _initialShowCount;
     size_t _initialGroupCount;
-    size_t _initialPlaylistCount;
     size_t _initialRecentsCount;
     size_t _initialRecentAudioCount;
 
@@ -87,7 +86,6 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
     dispatch_queue_t _artistCacheModificationQueue;
     dispatch_queue_t _genreCacheModificationQueue;
     dispatch_queue_t _groupCacheModificationQueue;
-    dispatch_queue_t _playlistCacheModificationQueue;
 }
 
 @property (readwrite, atomic) NSArray *cachedAudioMedia;
@@ -249,7 +247,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         _artistCacheModificationQueue = dispatch_queue_create("artistCacheModificationQueue", 0);
         _genreCacheModificationQueue = dispatch_queue_create("genreCacheModificationQueue", 0);
         _groupCacheModificationQueue = dispatch_queue_create("groupCacheModificationQueue", 0);
-        _playlistCacheModificationQueue = dispatch_queue_create("playlistCacheModificationQueue", 0);
 
         _defaultNotificationCenter = NSNotificationCenter.defaultCenter;
         [_defaultNotificationCenter addObserver:self
@@ -268,8 +265,6 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialGenreCount = vlc_ml_count_genres(self->_p_mediaLibrary, &queryParameters);
             self->_initialShowCount = vlc_ml_count_shows(self->_p_mediaLibrary, &queryParameters);
             self->_initialGroupCount = vlc_ml_count_groups(self->_p_mediaLibrary, &queryParameters);
-            self->_initialPlaylistCount =
-                vlc_ml_count_playlists(self->_p_mediaLibrary, &queryParameters, VLC_ML_PLAYLIST_TYPE_ALL);
 
             queryParameters.i_nbResults = self->_recentMediaLimit;
             self->_initialRecentsCount = vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
@@ -697,56 +692,8 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
     }
 }
 
-
-- (size_t)numberOfPlaylists
-{
-    if (!_cachedPlaylists) {
-        [self resetCachedListOfPlaylists];
-        // Return initial count here, otherwise it will return 0 on the first time
-        return _initialPlaylistCount;
-    }
-
-    return _cachedPlaylists.count;
-}
-
-- (NSArray<VLCMediaLibraryPlaylist *> *)listOfPlaylists
-{
-    if (!_cachedPlaylists) {
-        [self resetCachedListOfPlaylists];
-    }
-
-    return _cachedPlaylists;
-}
-
-- (void)resetCachedListOfPlaylists
-{
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        const vlc_ml_query_params_t queryParameters = [self queryParams];
-        vlc_ml_playlist_list_t * const p_playlist_list = vlc_ml_list_playlists(self->_p_mediaLibrary, &queryParameters, VLC_ML_PLAYLIST_TYPE_ALL);
-        if (p_playlist_list == NULL) {
-            return;
-        }
-
-        NSMutableArray * const mutableArray = [[NSMutableArray alloc] initWithCapacity:p_playlist_list->i_nb_items];
-        for (size_t x = 0; x < p_playlist_list->i_nb_items; x++) {
-            VLCMediaLibraryPlaylist * const playlist = [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:&p_playlist_list->p_items[x]];
-            if (playlist != nil) {
-                [mutableArray addObject:playlist];
-            }
-        }
-
-        vlc_ml_playlist_list_release(p_playlist_list);
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.cachedPlaylists = mutableArray.copy;
-            [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistListReset object:self];
-        });
-    });
-}
-
 - (size_t)numberOfPlaylistsOfType:(const enum vlc_ml_playlist_type_t)playlistType
 {
-    // TODO: Update query parameters when library sort/filter change
     const vlc_ml_query_params_t queryParams = self.queryParams;
     return vlc_ml_count_playlists(_p_mediaLibrary, &queryParams, playlistType);
 }
