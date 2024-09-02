@@ -359,6 +359,11 @@ FocusScope {
         if (_currentRange[0] === _currentRange[1])
             return
 
+        // anchoring and expand item animation conflicts
+        // causing view range oscilate on two different values
+        if (animateExpandItem.running || animateRetractItem.running)
+            return
+
         // fix anchor for some duration, so that index remains
         // same during whole resize operation
         const dirty = (Date.now() - _anchoredIdxUpdate) > VLCStyle.duration_veryLong
