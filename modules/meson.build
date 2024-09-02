@@ -427,63 +427,6 @@ if get_option('rust').enabled()
             '--config', f'source.vendored-sources.directory="@vendored_rust_deps_sources@"']
     endif
 
-    vlcrs_core = custom_target('vlcrs_core-cargo',
-        capture: false,
-        console: true,
-        build_by_default: true,
-        input: files(
-            'vlcrs-core/Cargo.toml',
-            'vlcrs-core/src/error.rs',
-            'vlcrs-core/src/input_item.rs',
-            'vlcrs-core/src/lib.rs',
-            'vlcrs-core/src/messages.rs',
-            'vlcrs-core/src/module/args.rs',
-            'vlcrs-core/src/module/capi.rs',
-            'vlcrs-core/src/module.rs',
-            'vlcrs-core/src/object.rs',
-            'vlcrs-core/src/tick.rs',
-            'vlcrs-core/src/url.rs',
-            'vlcrs-core/sys/build.rs',
-            'vlcrs-core/sys/Cargo.toml',
-            'vlcrs-core/sys/src/lib.rs',
-            'vlcrs-core/sys/wrapper.h',
-        ),
-        output: 'libvlcrs_core.rlib',
-        depfile: 'libvlcrs_core.d',
-        depends: module_cargo_depends,
-        env: {
-          'RUSTFLAGS': rust_flags,
-          'CARGO_TARGET_DIR': cargo_target_dir
-        },
-        command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
-            cargo_bin, 'build', '--locked', extra_cargo_args,
-            '--manifest-path', files('Cargo.toml'),
-            '-p', 'vlcrs-core']
-    )
-    vlcrs_core_macros = custom_target('vlcrs_core_macros-cargo',
-        capture: false,
-        console: true,
-        build_by_default: true,
-        input: files(
-            'vlcrs-core/macros/Cargo.toml',
-            'vlcrs-core/macros/src/lib.rs',
-            'vlcrs-core/macros/src/module.rs',
-        ),
-        depfile: 'libvlcrs_core_macros.d',
-        output: 'libvlcrs_core_macros.so',
-        depends: module_cargo_depends,
-        env: {
-          'RUSTFLAGS': rust_flags,
-          'CARGO_TARGET_DIR': cargo_target_dir
-        },
-        command: [cargo_output, '--output', '@OUTDIR@', '--depfile',
-            cargo_bin, 'build', '--locked', extra_cargo_args,
-            '--manifest-path', files('Cargo.toml'),
-            '-p', 'vlcrs-core-macros']
-    )
-
-    module_cargo_depends += [vlcrs_core, vlcrs_core_macros]
-
     foreach module : vlc_rust_modules
         if not module.has_key('name')
             error('Got invalid vlc_rust_modules entry without \'name\' key')
