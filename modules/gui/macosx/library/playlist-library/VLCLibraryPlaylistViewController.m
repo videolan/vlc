@@ -65,15 +65,15 @@
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
-                                   name:VLCLibraryModelPlaylistListReset
+                                   name:VLCLibraryModelPlaylistAdded
                                  object:nil];
         [notificationCenter addObserver:self
                                selector:@selector(libraryModelUpdated:)
                                    name:VLCLibraryModelPlaylistDeleted
                                  object:nil];
 
-        NSString * const playlistListResetLongLoadStartNotification = [VLCLibraryModelPlaylistListReset stringByAppendingString:VLCLongNotificationNameStartSuffix];
-        NSString * const playlistListResetLongLoadFinishNotification = [VLCLibraryModelPlaylistListReset stringByAppendingString:VLCLongNotificationNameFinishSuffix];
+        NSString * const playlistListResetLongLoadStartNotification = [VLCLibraryModelPlaylistAdded stringByAppendingString:VLCLongNotificationNameStartSuffix];
+        NSString * const playlistListResetLongLoadFinishNotification = [VLCLibraryModelPlaylistAdded stringByAppendingString:VLCLongNotificationNameFinishSuffix];
         NSString * const playlistDeletedLongLoadStartNotification = [VLCLibraryModelPlaylistDeleted stringByAppendingString:VLCLongNotificationNameStartSuffix];
         NSString * const playlistDeletedLongLoadFinishNotification = [VLCLibraryModelPlaylistDeleted stringByAppendingString:VLCLongNotificationNameFinishSuffix];
 

@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString * const VLCLibraryModelArtistListReset;
 extern NSString * const VLCLibraryModelAlbumListReset;
 extern NSString * const VLCLibraryModelGenreListReset;
-extern NSString * const VLCLibraryModelPlaylistListReset;
+extern NSString * const VLCLibraryModelPlaylistAdded;
 extern NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated;
 extern NSString * const VLCLibraryModelMediaItemThumbnailGenerated;
 

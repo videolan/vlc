@@ -30,7 +30,6 @@
 NSString * const VLCLibraryModelArtistListReset = @"VLCLibraryModelArtistListReset";
 NSString * const VLCLibraryModelAlbumListReset = @"VLCLibraryModelAlbumListReset";
 NSString * const VLCLibraryModelGenreListReset = @"VLCLibraryModelGenreListReset";
-NSString * const VLCLibraryModelPlaylistListReset = @"VLCLibraryModelPlaylistListReset";
 NSString * const VLCLibraryModelListOfMonitoredFoldersUpdated = @"VLCLibraryModelListOfMonitoredFoldersUpdated";
 NSString * const VLCLibraryModelMediaItemThumbnailGenerated = @"VLCLibraryModelMediaItemThumbnailGenerated";
 
@@ -40,6 +39,8 @@ NSString * const VLCLibraryModelRecentsMediaListReset = @"VLCLibraryModelRecents
 NSString * const VLCLibraryModelRecentAudioMediaListReset = @"VLCLibraryModelRecentAudioMediaListReset";
 NSString * const VLCLibraryModelListOfShowsReset = @"VLCLibraryModelListOfShowsReset";
 NSString * const VLCLibraryModelListOfGroupsReset = @"VLCLibraryModelListOfGroupsReset";
+
+NSString * const VLCLibraryModelPlaylistAdded = @"VLCLibraryModelPlaylistAdded";
 
 NSString * const VLCLibraryModelAudioMediaItemDeleted = @"VLCLibraryModelAudioMediaItemDeleted";
 NSString * const VLCLibraryModelVideoMediaItemDeleted = @"VLCLibraryModelVideoMediaItemDeleted";
@@ -1230,6 +1231,24 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self.cachedListOfGroups = mutableGroups.copy;
             [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelGroupUpdated object:group];
         });
+    });
+}
+
+- (void)handlePlaylistAddedEvent:(const vlc_ml_event_t * const)p_event
+{
+    NSParameterAssert(p_event != NULL);
+
+    const vlc_ml_playlist_t * const p_playlist = p_event->creation.p_playlist;
+    VLCMediaLibraryPlaylist * const playlist =
+        [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:p_playlist];
+    if (playlist == nil) {
+        NSLog(@"Could not find a library playlist with this ID. Can't handle update.");
+        return;
+    }
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [self->_defaultNotificationCenter postNotificationName:VLCLibraryModelPlaylistAdded
+                                                        object:playlist];
     });
 }
 
