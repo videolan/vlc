@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#include <vlc_media_library.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryCollectionViewDelegate;
@@ -53,6 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 - (void)presentPlaylistsView;
+- (void)presentPlaylistsViewForPlaylistType:(enum vlc_ml_playlist_type_t)playlistType;
 
 @end
 

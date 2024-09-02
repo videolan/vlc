@@ -316,6 +316,12 @@
     [self updatePresentedView];
 }
 
+- (void)presentPlaylistsViewForPlaylistType:(enum vlc_ml_playlist_type_t)playlistType
+{
+    self.dataSource.playlistType = playlistType;
+    [self presentPlaylistsView];
+}
+
 - (void)libraryModelUpdated:(NSNotification *)notification
 {
     NSParameterAssert(notification);
