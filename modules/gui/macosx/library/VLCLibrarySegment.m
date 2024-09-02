@@ -100,6 +100,11 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
         ];
+    } else if (self.segmentType == VLCLibraryPlaylistsSegment) {
+        return @[
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment]
+        ];
     } else if (self.segmentType == VLCLibraryBrowseSegment) {
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
         NSArray<NSString *> *bookmarkedLocations =
