@@ -301,6 +301,7 @@ Item {
                 dragItem._dropPromise = null
                 dragItem._dropFailedCallback = null
                 dragItem._dropCallback = null
+                dragItem._inputItems = undefined
 
                 MainCtx.setCursor(Qt.DragMoveCursor)
             }
