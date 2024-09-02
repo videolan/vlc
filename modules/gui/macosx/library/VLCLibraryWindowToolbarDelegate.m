@@ -161,6 +161,8 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
         case VLCLibraryGroupsSegment:
         case VLCLibraryGroupsGroupSubSegment:
         case VLCLibraryPlaylistsSegment:
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             [self setForwardsBackwardsToolbarItemsVisible:NO];
             [self setSortOrderToolbarItemVisible:YES];
             [self setLibrarySearchToolbarItemVisible:YES];
