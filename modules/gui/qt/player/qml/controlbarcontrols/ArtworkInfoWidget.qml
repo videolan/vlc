@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 
@@ -155,7 +156,7 @@ AbstractButton {
                     return VLCStyle.noArtAlbumCover
             }
 
-            sourceSize.height: root.height * MainCtx.screen.devicePixelRatio
+            sourceSize.height: root.height * Screen.devicePixelRatio
 
             fillMode: Image.PreserveAspectFit
 
