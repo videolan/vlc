@@ -1042,11 +1042,10 @@ FocusScope {
             animateRetractItem.start()
         }
 
-        NumberAnimation {
+        SmoothedAnimation {
             id: animateRetractItem;
             target: root;
             properties: "_expandItemVerticalSpace"
-            easing.type: Easing.OutQuad
             duration: VLCStyle.duration_long
             to: 0
             onStopped: {
@@ -1056,11 +1055,10 @@ FocusScope {
             }
         }
 
-        NumberAnimation {
+        SmoothedAnimation {
             id: animateExpandItem;
             target: root;
             properties: "_expandItemVerticalSpace"
-            easing.type: Easing.InQuad
             duration: VLCStyle.duration_long
             from: 0
         }
