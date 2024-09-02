@@ -192,6 +192,10 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Shows");
         case VLCLibraryPlaylistsSegment:
             return _NS("Playlists");
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+            return _NS("Music Playlists");
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+            return _NS("Video Playlists");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -225,7 +229,11 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryPlaylistsSegment:
+            return [NSImage imageNamed:@"NSListViewTemplate"];
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+            return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryBrowseSegment:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
@@ -271,6 +279,12 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryPlaylistsSegment:
             return [NSImage imageWithSystemSymbolName:@"music.note.list"
                              accessibilityDescription:@"Playlists icon"];
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"music.note.list"
+                             accessibilityDescription:@"Music playlists icon"];
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"list.and.film"
+                             accessibilityDescription:@"Video playlists icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];

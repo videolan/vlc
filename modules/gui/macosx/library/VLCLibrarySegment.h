@@ -38,6 +38,8 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
     VLCLibrarySongsMusicSubSegment,
     VLCLibraryGenresMusicSubSegment,
     VLCLibraryPlaylistsSegment,
+    VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment,
+    VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment,
     VLCLibraryBrowseSegment,
     VLCLibraryBrowseBookmarkedLocationSubSegment,
     VLCLibraryStreamsSegment,
