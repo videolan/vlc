@@ -222,7 +222,6 @@ Item {
         if (Drag.active) {
             // reject all pending requests
             ++dragItem._grabImageRequest
-            _pendingNativeDragStart = true
 
             fsm.startDrag()
         } else {
@@ -332,6 +331,7 @@ Item {
                         guard: (requestId, data) => requestId === dragItem._currentRequest,
                         action: (requestId, data) => {
                             dragItem._setData(data)
+                            _pendingNativeDragStart = true
                         },
                         target: fsmRequestInputItem
                     },
