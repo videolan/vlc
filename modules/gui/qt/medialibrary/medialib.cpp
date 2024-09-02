@@ -34,42 +34,12 @@ MediaLib::MediaLib(qt_intf_t *_intf, vlc::playlist::PlaylistController* playlist
 {
     m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
-
-    /* https://xkcd.com/221/ */
-    m_mlThreadPool.setMaxThreadCount(4);
+    m_runner = new MLThreadRunner(m_ml);
 }
 
 MediaLib::~MediaLib()
 {
-    assert(m_objectTasks.empty());
-    assert(m_runningTasks.empty());
-}
-
-void MediaLib::destroy()
-{
-    m_shuttingDown = true;
-    //try to cancel as many tasks as possible
-    for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
-    {
-        const QObject* object = taskIt.key();
-        quint64 key = taskIt.value();
-        auto task = m_runningTasks.value(key, nullptr);
-        if (m_mlThreadPool.tryTake(task))
-        {
-            delete task;
-            m_runningTasks.remove(key);
-            taskIt = m_objectTasks.erase(taskIt);
-            if (m_objectTasks.count(object) == 0)
-                disconnect(object, &QObject::destroyed, this, &MediaLib::runOnMLThreadTargetDestroyed);
-        }
-        else
-            ++taskIt;
-    }
-
-    if (m_runningTasks.empty())
-    {
-        deleteLater();
-    }
+    m_runner->destroy();
 }
 
 static void convertMLItemToPlaylistMedias(vlc_medialibrary_t* ml, const MLItemId & itemId, const QStringList &options, QVector<vlc::playlist::Media>& medias)
@@ -434,13 +404,54 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
     }
 }
 
+
+
+MLThreadRunner::MLThreadRunner(vlc_medialibrary_t* ml)
+    : m_ml(ml)
+{
+    m_mlThreadPool.setMaxThreadCount(4);
+}
+
+MLThreadRunner::~MLThreadRunner()
+{
+    assert(m_objectTasks.empty());
+    assert(m_runningTasks.empty());
+}
+
+void MLThreadRunner::destroy()
+{
+    m_shuttingDown = true;
+    //try to cancel as many tasks as possible
+    for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
+    {
+        const QObject* object = taskIt.key();
+        quint64 key = taskIt.value();
+        auto task = m_runningTasks.value(key, nullptr);
+        if (m_mlThreadPool.tryTake(task))
+        {
+            delete task;
+            m_runningTasks.remove(key);
+            taskIt = m_objectTasks.erase(taskIt);
+            if (m_objectTasks.count(object) == 0)
+                disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
+        }
+        else
+            ++taskIt;
+    }
+
+    if (m_runningTasks.empty())
+    {
+        deleteLater();
+    }
+}
+
 quint64 MediaLib::runOnMLThread(const QObject* obj,
                 std::function< void(vlc_medialibrary_t* ml)> mlCb,
                 std::function< void()> uiCb,
                 const char* queue)
 {
     struct NoCtx{};
-    return runOnMLThread<NoCtx>(obj,
+    return m_runner->runOnMLThread<NoCtx>(obj,
     [mlCb](vlc_medialibrary_t* ml, NoCtx&){
         mlCb(ml);
     },
@@ -455,7 +466,7 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
                 std::function< void(quint64)> uiCb, const char* queue)
 {
     struct NoCtx{};
-    return runOnMLThread<NoCtx>(obj,
+    return m_runner->runOnMLThread<NoCtx>(obj,
     [mlCb](vlc_medialibrary_t* ml, NoCtx&){
         mlCb(ml);
     },
@@ -470,7 +481,7 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
                 const char* queue)
 {
     struct NoCtx{};
-    return runOnMLThread<NoCtx>(obj,
+    return m_runner->runOnMLThread<NoCtx>(obj,
     [mlCb](vlc_medialibrary_t* ml, NoCtx&){
         mlCb(ml);
     },
@@ -479,8 +490,12 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
     queue);
 }
 
-
 void MediaLib::cancelMLTask(const QObject* object, quint64 taskId)
+{
+    m_runner->cancelMLTask(object, taskId);
+}
+
+void MLThreadRunner::cancelMLTask(const QObject* object, quint64 taskId)
 {
     assert(taskId != 0);
 
@@ -494,10 +509,10 @@ void MediaLib::cancelMLTask(const QObject* object, quint64 taskId)
     m_runningTasks.remove(taskId);
     m_objectTasks.remove(object, taskId);
     if (m_objectTasks.count(object) == 0)
-        disconnect(object, &QObject::destroyed, this, &MediaLib::runOnMLThreadTargetDestroyed);
+        disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
 }
 
-void MediaLib::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
+void MLThreadRunner::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
 {
     if (m_shuttingDown)
     {
@@ -506,7 +521,7 @@ void MediaLib::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target
             m_runningTasks.remove(target);
             m_objectTasks.remove(object, target);
             if (m_objectTasks.count(object) == 0)
-                disconnect(object, &QObject::destroyed, this, &MediaLib::runOnMLThreadTargetDestroyed);
+                disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
         }
         if (m_runningTasks.empty())
             deleteLater();
@@ -518,12 +533,12 @@ void MediaLib::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target
         m_runningTasks.remove(target);
         m_objectTasks.remove(object, target);
         if (m_objectTasks.count(object) == 0)
-            disconnect(object, &QObject::destroyed, this, &MediaLib::runOnMLThreadTargetDestroyed);
+            disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
     }
     runner->deleteLater();
 }
 
-void MediaLib::runOnMLThreadTargetDestroyed(QObject * object)
+void MLThreadRunner::runOnMLThreadTargetDestroyed(QObject * object)
 {
     if (m_objectTasks.contains(object))
     {

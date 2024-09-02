@@ -294,7 +294,7 @@ MainCtx::~MainCtx()
     var_DelCallback( libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     if (m_medialib)
-        m_medialib->destroy();
+        delete m_medialib;
 
     p_intf->p_mi = NULL;
 }
