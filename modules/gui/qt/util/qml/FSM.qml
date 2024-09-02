@@ -134,8 +134,7 @@ FSMState {
         const transitions = state.transitions[event]
         if (transitions === undefined) {
             console.warn(`undefined transition for ${state}::${event}`)
-            //FIXME: comparing object to QML type with instanceof fails with 5.12
-        } else if (transitions === null || transitions.toString().startsWith("FSMState")) {
+        } else if (transitions === null || (transitions instanceof FSMState)) {
             _changeState(transitions)
             return true
         } else if (Helpers.isArray(transitions)) {
