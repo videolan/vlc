@@ -282,7 +282,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return [NSImage imageWithSystemSymbolName:@"tv"
                              accessibilityDescription:@"Shows icon"];
         case VLCLibraryPlaylistsSegment:
-            return [NSImage imageWithSystemSymbolName:@"music.note.list"
+            return [NSImage imageWithSystemSymbolName:@"list.triangle"
                              accessibilityDescription:@"Playlists icon"];
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
             return [NSImage imageWithSystemSymbolName:@"music.note.list"
