@@ -64,6 +64,7 @@ typedef struct
 
     /* */
     bool    b_extract;
+    bool    discontinuity;
     int     pi_extraction[AOUT_CHAN_MAX];
     int     i_previous_channels;
     uint64_t i_previous_layout;
@@ -256,6 +257,7 @@ int InitAudioDec( vlc_object_t *obj )
     p_sys->b_extract = false;
     p_sys->i_previous_channels = 0;
     p_sys->i_previous_layout = 0;
+    p_sys->discontinuity = false;
 
     /* */
     /* Try to set as much information as possible but do not trust it */
@@ -288,6 +290,7 @@ static void Flush( decoder_t *p_dec )
     if( ctx->codec_id == AV_CODEC_ID_MP2 ||
         ctx->codec_id == AV_CODEC_ID_MP3 )
         p_sys->i_reject_count = 3;
+    p_sys->discontinuity = false;
 }
 
 /*****************************************************************************
@@ -367,6 +370,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     if (unlikely(frame == NULL))
         goto end;
 
+    bool send_failed = false;
     for( int ret = 0; ret == 0; )
     {
         /* Feed in the loop as buffer could have been full on first iterations */
@@ -400,7 +404,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     char errorstring[AV_ERROR_MAX_STRING_SIZE];
                     if( !av_strerror( ret, errorstring, AV_ERROR_MAX_STRING_SIZE ) )
                         msg_Err( p_dec, "%s", errorstring );
-                    goto drop;
+
+                    /* Signal an error, but continue to receive all output
+                     * frames. A discontinuity will be triggered for the
+                     * output frame coming right after the dropped one. */
+                    send_failed = true;
+                    block_Release( p_block );
+                    *pp_block = p_block = NULL;
                 }
             }
         }
@@ -446,6 +456,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_converted->i_length = date_Increment( &p_sys->end_date,
                                                       p_converted->i_nb_samples ) - p_converted->i_pts;
 
+                if (p_sys->discontinuity)
+                {
+                    p_sys->discontinuity = false;
+                    p_converted->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+                }
                 decoder_QueueAudio( p_dec, p_converted );
             }
 
@@ -463,11 +478,19 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
     };
 
+    if (send_failed)
+    {
+        /* Signal a discontinuity for the next output frame. */
+        p_sys->discontinuity = true;
+    }
+
     return VLCDEC_SUCCESS;
 
 end:
     b_error = true;
 drop:
+    /* Signal a discontinuity for the next output frame. */
+    p_sys->discontinuity = true;
     if( pp_block )
     {
         assert( *pp_block == p_block );
