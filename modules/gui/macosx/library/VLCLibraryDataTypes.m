@@ -868,7 +868,7 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     return [[VLCMediaLibraryPlaylist alloc] initWithPlaylist:p_playlist];
 }
 
-- (instancetype)initWithPlaylist:(struct vlc_ml_playlist_t *)p_playlist
+- (instancetype)initWithPlaylist:(const struct vlc_ml_playlist_t * const)p_playlist
 {
     self = [super init];
     if (self && p_playlist != NULL) {
