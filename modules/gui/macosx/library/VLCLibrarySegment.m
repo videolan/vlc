@@ -198,9 +198,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryPlaylistsSegment:
             return _NS("Playlists");
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
-            return _NS("Music Playlists");
+            return _NS("Music playlists");
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
-            return _NS("Video Playlists");
+            return _NS("Video playlists");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
