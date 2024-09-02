@@ -32,6 +32,10 @@ NSString * const VLCLibraryGenreLibraryViewModePreferenceKey = @"GenreLibraryVie
 NSString * const VLCLibrarySongsLibraryViewModePreferenceKey = @"SongsLibraryViewMode";
 NSString * const VLCLibraryArtistLibraryViewModePreferenceKey = @"ArtistLibraryViewMode";
 NSString * const VLCLibraryPlaylistLibraryViewModePreferenceKey = @"PlaylistLibraryViewMode";
+NSString * const VLCLibraryMusicOnlyPlaylistLibraryViewModePreferenceKey = 
+    @"MusicOnlyPlaylistLibraryViewMode";
+NSString * const VLCLibraryVideoOnlyPlaylistLibraryViewModePreferenceKey = 
+    @"VideoOnlyPlaylistLibraryViewMode";
 NSString * const VLCLibraryBrowseLibraryViewModePreferenceKey = @"BrowseLibraryViewMode";
 NSString * const VLCLibraryStreamLibraryViewModePreferenceKey = @"StreamLibraryViewMode";
 NSString * const VLCLibraryGroupsLibraryViewModePreferenceKey = @"GroupsLibraryViewMode";
@@ -169,6 +173,28 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 {
     [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryPlaylistLibraryViewModePreferenceKey
                                               value:playlistLibraryViewMode];
+}
+
+- (VLCLibraryViewModeSegment)musicOnlyPlaylistLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryPlaylistLibraryViewModePreferenceKey];
+}
+
+- (void)setMusicOnlyPlaylistLibraryViewMode:(VLCLibraryViewModeSegment)musicOnlyPlaylistLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryMusicOnlyPlaylistLibraryViewModePreferenceKey
+                                              value:musicOnlyPlaylistLibraryViewMode];
+}
+
+- (VLCLibraryViewModeSegment)videoOnlyPlaylistLibraryViewMode
+{
+    return [self libraryViewModePreferenceWithKey:VLCLibraryPlaylistLibraryViewModePreferenceKey];
+}
+
+- (void)setVideoOnlyPlaylistLibraryViewMode:(VLCLibraryViewModeSegment)videoOnlyPlaylistLibraryViewMode
+{
+    [self setLibraryWindowViewModePreferenceWithKey:VLCLibraryVideoOnlyPlaylistLibraryViewModePreferenceKey
+                                              value:videoOnlyPlaylistLibraryViewMode];
 }
 
 - (VLCLibraryViewModeSegment)browseLibraryViewMode
