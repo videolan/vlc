@@ -177,7 +177,7 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 
 - (VLCLibraryViewModeSegment)musicOnlyPlaylistLibraryViewMode
 {
-    return [self libraryViewModePreferenceWithKey:VLCLibraryPlaylistLibraryViewModePreferenceKey];
+    return [self libraryViewModePreferenceWithKey:VLCLibraryMusicOnlyPlaylistLibraryViewModePreferenceKey];
 }
 
 - (void)setMusicOnlyPlaylistLibraryViewMode:(VLCLibraryViewModeSegment)musicOnlyPlaylistLibraryViewMode
@@ -188,7 +188,7 @@ static VLCLibraryWindowPersistentPreferences *sharedInstance = nil;
 
 - (VLCLibraryViewModeSegment)videoOnlyPlaylistLibraryViewMode
 {
-    return [self libraryViewModePreferenceWithKey:VLCLibraryPlaylistLibraryViewModePreferenceKey];
+    return [self libraryViewModePreferenceWithKey:VLCLibraryVideoOnlyPlaylistLibraryViewModePreferenceKey];
 }
 
 - (void)setVideoOnlyPlaylistLibraryViewMode:(VLCLibraryViewModeSegment)videoOnlyPlaylistLibraryViewMode
