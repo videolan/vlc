@@ -309,7 +309,7 @@ RoundImage::RoundImage(QQuickItem *parent) : QQuickItem {parent}
 
     connect(this, &QQuickItem::windowChanged, this, [this](const QQuickWindow* const window) {
         if (window)
-            setDPR(window->devicePixelRatio());
+            setDPR(window->effectiveDevicePixelRatio());
         else if (Q_LIKELY(qGuiApp))
             setDPR(qGuiApp->devicePixelRatio());
     });
