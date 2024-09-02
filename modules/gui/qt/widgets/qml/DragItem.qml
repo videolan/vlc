@@ -94,7 +94,7 @@ Item {
 
     readonly property int _displayedCoversCount: Math.min(_indexesSize, _maxCovers + 1)
 
-    property var _inputItems: []
+    property var _inputItems
 
     property var _data: []
 
@@ -273,7 +273,22 @@ Item {
             }
 
             transitions: ({
-                startDrag: fsmDragActive
+                startDrag: fsmDragActive,
+                resolveInputItems: {
+                    guard: (requestId, items) => requestId === dragItem._currentRequest,
+                    action: (requestId, items) => {
+                        if (dragItem._dropCallback) {
+                            dragItem._dropCallback(items)
+                        }
+                    }
+                },
+                resolveFailed: {
+                    action: () => {
+                        if (dragItem._dropFailedCallback) {
+                            dragItem._dropFailedCallback()
+                        }
+                    }
+                }
             })
         }
 
@@ -283,6 +298,10 @@ Item {
             initialState: fsmRequestData
 
             function enter() {
+                dragItem._dropPromise = null
+                dragItem._dropFailedCallback = null
+                dragItem._dropCallback = null
+
                 MainCtx.setCursor(Qt.DragMoveCursor)
             }
 
@@ -290,13 +309,6 @@ Item {
                 MainCtx.restoreCursor()
 
                 _pendingNativeDragStart = false
-
-                if (dragItem._dropFailedCallback) {
-                    dragItem._dropFailedCallback()
-                }
-                dragItem._dropPromise = null
-                dragItem._dropFailedCallback = null
-                dragItem._dropCallback = null
             }
 
             transitions: ({
