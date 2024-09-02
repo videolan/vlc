@@ -84,6 +84,7 @@
 
 #import <vlc_common.h>
 #import <vlc_configuration.h>
+#import <vlc_media_library.h>
 #import <vlc_url.h>
 
 const CGFloat VLCLibraryWindowMinimalWidth = 604.;
@@ -283,7 +284,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showAudioLibrary];
         break;
     case VLCLibraryPlaylistsSegment:
-        [self showPlaylistLibrary];
+        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_ALL];
+        break;
+    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY];
+        break;
+    case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY];
         break;
     case VLCLibraryBrowseSegment:
     case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -396,10 +403,16 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.libraryAudioViewController presentAudioView];
 }
 
-- (void)showPlaylistLibrary
+- (void)showPlaylistLibrary:(enum vlc_ml_playlist_type_t)playlistType
 {
-    [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsSegment];
-    [_libraryPlaylistViewController presentPlaylistsView];
+    if (playlistType == VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY) {
+        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment];
+    } else if (playlistType == VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY) {
+        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment];
+    } else {
+        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsSegment];
+    }
+    [self.libraryPlaylistViewController presentPlaylistsViewForPlaylistType:playlistType];
 }
 
 - (void)showMediaSourceLibrary
