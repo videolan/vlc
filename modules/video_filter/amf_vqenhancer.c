@@ -158,6 +158,13 @@ static int D3D11CreateAMFVQE(filter_t *filter)
     if (!video_format_IsSimilar(&filter->fmt_in.video, &filter->fmt_out.video))
         return VLC_EGENERIC;
 
+    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
+    if (dev_sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
+    {
+        msg_Err(filter, "AMF filter only supported with AMD GPUs");
+        return VLC_ENOTSUP;
+    }
+
     struct filter_sys_t *sys = vlc_obj_calloc(VLC_OBJECT(filter), 1, sizeof(*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -179,8 +186,6 @@ static int D3D11CreateAMFVQE(filter_t *filter)
         msg_Err(filter, "Unsupported DXGI format %s", cfg->name);
         return VLC_EGENERIC;
     }
-
-    d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
 
     int err = vlc_AMFCreateContext(&sys->amf);
     if (err != VLC_SUCCESS)
