@@ -557,8 +557,7 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog( OpenDialog::OpenTab tab )
 {
-    OpenDialog::getInstance(p_intf, false,
-                             OpenDialog::OPEN_AND_ENQUEUE )->showTab( tab );
+    OpenDialog::getInstance(p_intf, OpenDialog::OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
 /**
@@ -857,13 +856,13 @@ void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
 
 void DialogsProvider::openAndStreamingDialogs()
 {
-    OpenDialog::getInstance(p_intf, false, OpenDialog::OPEN_AND_STREAM )
+    OpenDialog::getInstance(p_intf, OpenDialog::OPEN_AND_STREAM )
                                 ->showTab( OpenDialog::OPEN_FILE_TAB );
 }
 
 void DialogsProvider::openAndTranscodingDialogs()
 {
-    OpenDialog::getInstance(p_intf, false, OpenDialog::OPEN_AND_SAVE )
+    OpenDialog::getInstance(p_intf, OpenDialog::OPEN_AND_SAVE )
                                 ->showTab( OpenDialog::OPEN_FILE_TAB );
 }
 

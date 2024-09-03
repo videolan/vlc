@@ -64,7 +64,7 @@ public:
 
 public:
     static OpenDialog * getInstance(qt_intf_t *p_intf,
-                                bool b_rawInstance = false, ActionFlag _action_flag = OPEN_AND_PLAY,
+                                ActionFlag _action_flag = OPEN_AND_PLAY,
                                 bool b_selectMode = false );
 
     void showTab( OpenDialog::OpenTab = OPEN_FILE_TAB );

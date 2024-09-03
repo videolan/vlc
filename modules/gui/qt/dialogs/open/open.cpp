@@ -41,24 +41,22 @@
 #endif
 
 OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
-    bool b_rawInstance, OpenDialog::ActionFlag _action_flag, bool b_selectMode )
+    OpenDialog::ActionFlag _action_flag, bool b_selectMode )
 {
     const auto instance = Singleton<OpenDialog>::getInstance(nullptr,
                                                              p_intf,
                                                              b_selectMode,
                                                              _action_flag);
 
-    if( !b_rawInstance )
-    {
-        /* Request the instance but change small details:
-           - Button menu */
-        if( b_selectMode )
-            _action_flag = SELECT; /* This should be useless, but we never know
-                                      if the call is correct */
-        instance->setWindowModality( Qt::WindowModal );
-        instance->i_action_flag = _action_flag;
-        instance->setMenuAction();
-    }
+
+    /* Request the instance but change small details:
+       - Button menu */
+    if( b_selectMode )
+        _action_flag = SELECT; /* This should be useless, but we never know
+                                  if the call is correct */
+    instance->i_action_flag = _action_flag;
+    instance->setMenuAction();
+
     return instance;
 }
 
