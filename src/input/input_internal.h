@@ -640,15 +640,20 @@ input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name)
 bool input_CanPaceControl(input_thread_t *input);
 
 /**
- * Set the duration of the input item.
+ * Calculates the duration of the item in an input thread.
  *
- * This function sets the duration of the input item associated with the input thread.
- * It uses the 'start-time' and 'stop-time' values to calculate the track duration.
+ * This function determines the duration of a track item based on the start and 
+ * stop times stored in the input thread's private data. If the stop time is not 
+ * set (i.e., equals zero), the function considers the given `duration` as the 
+ * stop time and calculates the effective duration based on the start time. 
+ * Otherwise, it calculates the duration using the set start and stop times.
  *
- * @param input The input thread object.
- * @param duration The duration to be set, in vlc_tick_t units.
+ * @param input   Pointer to the input_thread_t object.
+ * @param duration The initial duration value, used if the stop time is not set.
+ *
+ * @return The calculated duration based on the start and stop times.
  */
-void input_SetItemDuration(input_thread_t *input, vlc_tick_t duration);
+vlc_tick_t input_GetItemDuration(input_thread_t *input, vlc_tick_t duration);
 
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)

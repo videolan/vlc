@@ -56,8 +56,11 @@ input_item_parser_InputEvent(input_thread_t *input,
     switch (event->type)
     {
         case INPUT_EVENT_TIMES:
-            input_SetItemDuration(input, event->times.length);
+        {
+            vlc_tick_t duration = input_GetItemDuration(input, event->times.length);
+            input_item_SetDuration(input_GetItem(input), duration);
             break;
+        }
         case INPUT_EVENT_STATE:
             parser->state = event->state.value;
             break;

@@ -916,6 +916,7 @@ input_thread_Events(input_thread_t *input_thread,
         {
             bool changed = false;
             vlc_tick_t system_date = VLC_TICK_INVALID;
+            vlc_tick_t duration = input_GetItemDuration(input->thread, event->times.length);
 
             if (event->times.time != VLC_TICK_INVALID
              && (input->time != event->times.time
@@ -930,10 +931,10 @@ input_thread_Events(input_thread_t *input_thread,
 
                 vlc_player_input_UpdateTime(input);
             }
-            if (input->length != event->times.length)
+            if (input->length != duration)
             {
-                input->length = event->times.length;
-                input_SetItemDuration(input->thread, event->times.length);
+                input->length = duration;
+                input_item_SetDuration(input_GetItem(input->thread), duration);
                 vlc_player_SendEvent(player, on_length_changed, input->length);
                 changed = true;
             }
