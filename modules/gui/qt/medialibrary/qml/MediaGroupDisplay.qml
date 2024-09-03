@@ -40,6 +40,15 @@ VideoAll {
     // NOTE: The title of the group.
     property string title: ""
 
+    sectionProperty: {
+        switch (model.sortCriteria) {
+        case "title":
+            return "title_first_symbol"
+        default:
+            return ""
+        }
+    }
+
     // Children
 
     model: MLVideoModel {
