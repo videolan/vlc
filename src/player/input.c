@@ -862,6 +862,7 @@ input_thread_Events(input_thread_t *input_thread,
 {
     struct vlc_player_input *input = user_data;
     vlc_player_t *player = input->player;
+    input_thread_private_t *priv = input_priv(input_thread);
 
     assert(input_thread == input->thread);
 
@@ -881,7 +882,7 @@ input_thread_Events(input_thread_t *input_thread,
                                    event->output_clock.master, &point,
                                    VLC_TICK_INVALID,
                                    event->output_clock.frame_rate,
-                                   event->output_clock.frame_rate_base);
+                                   event->output_clock.frame_rate_base, 0);
         }
         else
         {
@@ -956,7 +957,7 @@ input_thread_Events(input_thread_t *input_thread,
                     .system_date = system_date,
                 };
                 vlc_player_UpdateTimer(player, NULL, false, &point,
-                                       input->normal_time, 0, 0);
+                                       input->normal_time, 0, 0, priv->i_start);
             }
             break;
         }

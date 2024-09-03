@@ -490,7 +490,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
                        bool es_source_is_master,
                        const struct vlc_player_timer_point *point,
                        vlc_tick_t normal_time,
-                       unsigned frame_rate, unsigned frame_rate_base);
+                       unsigned frame_rate, unsigned frame_rate_base,
+                       vlc_tick_t start_offset);
 
 void
 vlc_player_RemoveTimerSource(vlc_player_t *player, vlc_es_id_t *es_source);

@@ -435,7 +435,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
                        bool es_source_is_master,
                        const struct vlc_player_timer_point *point,
                        vlc_tick_t normal_time,
-                       unsigned frame_rate, unsigned frame_rate_base)
+                       unsigned frame_rate, unsigned frame_rate_base,
+                       vlc_tick_t start_offset)
 {
     assert(point);
     /* A null source can't be the master */
@@ -460,6 +461,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
             player->timer.last_ts = VLC_TICK_INVALID;
             force_update = true;
         }
+        if (start_offset > 0)
+            player->timer.start_offset = start_offset;
         /* Will likely be overridden by non input source */
         player->timer.input_position = point->position;
 
