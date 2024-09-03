@@ -601,7 +601,7 @@ qml_modules += {
     'sources': files(
         'medialibrary/qml/ArtistTopBanner.qml',
         'medialibrary/qml/AudioGridItem.qml',
-        'medialibrary/qml/MediaGroupDisplay.qml',
+        'medialibrary/qml/VideoGroupDisplay.qml',
         'medialibrary/qml/MusicAlbums.qml',
         'medialibrary/qml/MusicAlbumsDisplay.qml',
         'medialibrary/qml/MusicAlbumsGridExpandDelegate.qml',

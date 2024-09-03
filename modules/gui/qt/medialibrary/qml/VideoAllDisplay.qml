@@ -73,7 +73,7 @@ Widgets.PageLoader {
     Component {
         id: componentGroup
 
-        MediaGroupDisplay {
+        VideoGroupDisplay {
             id: group
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
