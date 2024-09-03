@@ -41,19 +41,15 @@
 #endif
 
 OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
-    OpenDialog::ActionFlag _action_flag, bool b_selectMode )
+    OpenDialog::ActionFlag _action_flag )
 {
     const auto instance = Singleton<OpenDialog>::getInstance(nullptr,
                                                              p_intf,
-                                                             b_selectMode,
                                                              _action_flag);
 
 
     /* Request the instance but change small details:
        - Button menu */
-    if( b_selectMode )
-        _action_flag = SELECT; /* This should be useless, but we never know
-                                  if the call is correct */
     instance->i_action_flag = _action_flag;
     instance->setMenuAction();
 
@@ -62,14 +58,10 @@ OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
 
 OpenDialog::OpenDialog( QWindow *parent,
                         qt_intf_t *_p_intf,
-                        bool b_selectMode,
                         OpenDialog::ActionFlag _action_flag )
     :  QVLCDialog( parent, _p_intf )
 {
     i_action_flag = _action_flag;
-
-    if( b_selectMode ) /* Select mode */
-        i_action_flag = SELECT;
 
     /* Basic Creation of the Window */
     ui.setupUi( this );
@@ -280,7 +272,7 @@ void OpenDialog::browseInputSlave()
 {
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
-    OpenDialog *od = new OpenDialog( parentWindow, p_intf, true, SELECT );
+    OpenDialog *od = new OpenDialog( parentWindow, p_intf, SELECT );
     od->exec();
     ui.slaveText->setText( od->getMRL( false ) );
     delete od;

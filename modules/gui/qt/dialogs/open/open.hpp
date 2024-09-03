@@ -64,8 +64,7 @@ public:
 
 public:
     static OpenDialog * getInstance(qt_intf_t *p_intf,
-                                ActionFlag _action_flag = OPEN_AND_PLAY,
-                                bool b_selectMode = false );
+                                   ActionFlag _action_flag = OPEN_AND_PLAY);
 
     void showTab( OpenDialog::OpenTab = OPEN_FILE_TAB );
     QString getMRL( bool b = true );
@@ -81,8 +80,8 @@ public slots:
     void transcode();
 
 private:
-    OpenDialog( QWindow *parent, qt_intf_t *, bool b_selectMode,
-                ActionFlag _action_flag = OPEN_AND_PLAY );
+    OpenDialog(QWindow *parent, qt_intf_t *,
+               ActionFlag _action_flag = OPEN_AND_PLAY );
     virtual ~OpenDialog();
 
     QString optionsMRL;
