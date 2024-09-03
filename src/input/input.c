@@ -1943,7 +1943,19 @@ static bool Control( input_thread_t *p_input,
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
-            if( demux_SetPosition( priv->master->p_demux, param.pos.f_val,
+            vlc_tick_t i_length = InputSourceGetLength(priv->master, priv->p_item);
+            double f_val;
+            if( i_length > 0 )
+            {
+                /* Calculate the updated position according to the current track duration */
+                if (priv->i_stop != 0)
+                    f_val = (priv->i_start + param.pos.f_val * (priv->i_stop - priv->i_start)) / i_length;
+                else
+                    f_val = (priv->i_start + param.pos.f_val * (i_length - priv->i_start)) / i_length;
+            }
+            else
+                f_val = param.pos.f_val;
+            if( demux_SetPosition( priv->master->p_demux, f_val,
                                    !param.pos.b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
