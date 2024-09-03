@@ -25,7 +25,6 @@
 
 // VLC includes
 #include <widgets/native/qvlcframe.hpp>
-#include <util/singleton.hpp>
 
 // Forward declarations
 class MLPlaylistListModel;
@@ -34,11 +33,11 @@ class QLineEdit;
 class QLabel;
 class QPushButton;
 
-class PlaylistsDialog : public QVLCFrame, public Singleton<PlaylistsDialog>
+class PlaylistsDialog : public QVLCFrame
 {
     Q_OBJECT
 
-private: // Ctor / dtor
+public: // Ctor / dtor
     PlaylistsDialog(qt_intf_t *);
 
     ~PlaylistsDialog() override;
@@ -70,9 +69,6 @@ private:
     QLabel * m_label;
 
     QPushButton * m_button;
-
-private:
-    friend class Singleton<PlaylistsDialog>;
 };
 
 #endif

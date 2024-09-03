@@ -29,21 +29,21 @@
 /* Auto-generated from .ui files */
 #include "ui_podcast_configuration.h"
 
-class PodcastConfigDialog : public QVLCDialog, public Singleton<PodcastConfigDialog>
+class PodcastConfigDialog : public QVLCDialog
 {
     Q_OBJECT
 
-private:
+public:
     PodcastConfigDialog( qt_intf_t * );
     virtual ~PodcastConfigDialog();
 
-    Ui::PodcastConfiguration ui;
 public slots:
     void accept();
     void add();
     void remove();
 
-    friend class    Singleton<PodcastConfigDialog>;
+private:
+    Ui::PodcastConfiguration ui;
 };
 
 #endif

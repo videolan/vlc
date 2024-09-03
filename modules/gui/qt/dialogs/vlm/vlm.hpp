@@ -34,7 +34,6 @@
 #include "ui_vlm.h"
 
 #include "widgets/native/qvlcframe.hpp"
-#include "util/singleton.hpp"
 #include <QDateTime>
 
 enum{
@@ -61,18 +60,19 @@ class VLMAWidget;
 class VLMWrapper;
 
 
-class VLMDialog : public QVLCFrame, public Singleton<VLMDialog>
+class VLMDialog : public QVLCFrame
 {
     Q_OBJECT
 
 public:
+    VLMDialog( qt_intf_t * );
+    virtual ~VLMDialog();
+
     void toggleVisible();
+
 
 private:
     VLMWrapper *vlm;
-
-    VLMDialog( qt_intf_t * );
-    virtual ~VLMDialog();
 
     Ui::Vlm ui;
 
@@ -102,8 +102,6 @@ private slots:
     void selectOutput();
     bool exportVLMConf();
     bool importVLMConf();
-
-    friend class    Singleton<VLMDialog>;
 };
 
 class VLMWrapper

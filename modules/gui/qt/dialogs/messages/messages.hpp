@@ -24,7 +24,6 @@
 #define QVLC_MESSAGES_DIALOG_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"
-#include "util/singleton.hpp"
 
 /* Auto-generated from .ui files */
 #include "ui_messages_panel.h"
@@ -35,13 +34,15 @@ class QTreeWidget;
 class QTreeWidgetItem;
 class MsgEvent;
 
-class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
+class MessagesDialog : public QVLCFrame
 {
     Q_OBJECT
-private:
+
+public:
     MessagesDialog( qt_intf_t * );
     virtual ~MessagesDialog();
 
+private:
     Ui::messagesPanelWidget ui;
     static void sinkMessage( void *, vlc_log_t *, unsigned );
     void customEvent( QEvent * );
@@ -65,7 +66,6 @@ private slots:
 private:
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
 
-    friend class    Singleton<MessagesDialog>;
     QToolButton *updateButton;
     QMutex messageLocker;
 #ifndef NDEBUG

@@ -25,30 +25,27 @@
 
 #include "widgets/native/qvlcframe.hpp"
 
-#include "util/singleton.hpp"
-
 class QLabel;
 class QTextEdit;
 class QTimer;
 class EPGItem;
 class EPGWidget;
 
-class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
+class EpgDialog : public QVLCFrame
 {
     Q_OBJECT
-protected:
-    void showEvent(QShowEvent * event) override;
+public:
 
-private:
     EpgDialog( qt_intf_t * );
     virtual ~EpgDialog();
+
+protected:
+    void showEvent(QShowEvent * event) override;
 
     EPGWidget *epg;
     QTextEdit *description;
     QLabel *title;
     QTimer *timer;
-
-    friend class    Singleton<EpgDialog>;
 
 private slots:
     void scheduleUpdate();

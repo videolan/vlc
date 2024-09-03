@@ -26,12 +26,11 @@
 #include "widgets/native/qvlcframe.hpp"
 
 #include "extended_panels.hpp"
-#include "util/singleton.hpp"
 #include "player/player_controller.hpp"
 
 class QTabWidget;
 
-class ExtendedDialog : public QVLCDialog, public Singleton<ExtendedDialog>
+class ExtendedDialog : public QVLCDialog
 {
     Q_OBJECT
 public:
@@ -44,10 +43,12 @@ public:
     };
     void showTab( int i );
     int currentTab();
-private:
+
+public:
     ExtendedDialog( qt_intf_t * );
     virtual ~ExtendedDialog();
 
+private:
     SyncControls *syncW;
     ExtVideo *videoEffect;
     Equalizer *equal;
@@ -60,8 +61,6 @@ private slots:
     void saveConfig();
     void putAudioConfig( const QString& name, const QVariant value );
     void putVideoConfig( const QString& name, const QVariant value );
-
-    friend class    Singleton<ExtendedDialog>;
 };
 
 #endif

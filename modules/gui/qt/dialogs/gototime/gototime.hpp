@@ -24,25 +24,25 @@
 #define QVLC_GOTOTIME_DIALOG_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"
-#include "util/singleton.hpp"
 
 class QTimeEdit;
 
-class GotoTimeDialog : public QVLCDialog, public Singleton<GotoTimeDialog>
+class GotoTimeDialog : public QVLCDialog
 {
     Q_OBJECT
-private:
+public:
     GotoTimeDialog( qt_intf_t * );
     virtual ~GotoTimeDialog();
-    QTimeEdit *timeEdit;
+
+    void toggleVisible();
+
 private slots:
     void close() override;
     void cancel() override;
     void reset();
 
-    friend class    Singleton<GotoTimeDialog>;
-public:
-    void toggleVisible();
+private:
+    QTimeEdit *timeEdit = nullptr;
 };
 
 #endif

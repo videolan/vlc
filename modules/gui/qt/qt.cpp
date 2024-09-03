@@ -1055,8 +1055,9 @@ static void *Thread( void *obj )
              getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
         {
             /* The constructor of the update Dialog will do the 1st request */
-            UpdateDialog::getInstance( p_intf );
-            getSettings()->setValue( "updatedate", QDate::currentDate() );
+            //FIXME Update is no longer a singleton and calling DialogProvider::updateDialog would open the dialog everytime
+            //UpdateDialog::getInstance( p_intf );
+            //getSettings()->setValue( "updatedate", QDate::currentDate() );
         }
     }
 #endif

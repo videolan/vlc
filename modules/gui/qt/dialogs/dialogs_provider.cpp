@@ -79,26 +79,8 @@ DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
 
 DialogsProvider::~DialogsProvider()
 {
-    MediaInfoDialog::killInstance();
-    MessagesDialog::killInstance();
-    BookmarksDialog::killInstance();
-#ifdef ENABLE_VLM
-    VLMDialog::killInstance();
-#endif
-    HelpDialog::killInstance();
-#ifdef UPDATE_CHECK
-    UpdateDialog::killInstance();
-#endif
-    PluginDialog::killInstance();
-    EpgDialog::killInstance();
-    PlaylistsDialog::killInstance();
-    ExtendedDialog::killInstance();
-    GotoTimeDialog::killInstance();
-    AboutDialog::killInstance();
-    PodcastConfigDialog::killInstance();
     OpenDialog::killInstance();
     ErrorsDialog::killInstance();
-    FirstRunWizard::killInstance();
 
     /* free parentless menus  */
     VLCMenuBar::freeRendererMenu();
@@ -269,79 +251,76 @@ void DialogsProvider::prefsDialog()
 
 void DialogsProvider::firstRunDialog()
 {
-    FirstRunWizard *p = FirstRunWizard::getInstance( p_intf );
-    QVLCDialog::setWindowTransientParent(p, nullptr, p_intf);
-    p->show();
+    ensureDialog(m_firstRunDialog);
+    QVLCDialog::setWindowTransientParent(m_firstRunDialog.get(), nullptr, p_intf);
+    m_firstRunDialog->show();
 }
 
 void DialogsProvider::extendedDialog()
 {
-    ExtendedDialog *extDialog = ExtendedDialog::getInstance(p_intf );
-
-    if( !extDialog->isVisible() || /* Hidden */
-        extDialog->currentTab() != 0 )  /* wrong tab */
-        extDialog->showTab( 0 );
+    ensureDialog(m_extendedDialog);
+    if( !m_extendedDialog->isVisible() || /* Hidden */
+        m_extendedDialog->currentTab() != 0 )  /* wrong tab */
+        m_extendedDialog->showTab( 0 );
     else
-        extDialog->hide();
+        m_extendedDialog->hide();
 }
 
 void DialogsProvider::synchroDialog()
 {
-    ExtendedDialog *extDialog = ExtendedDialog::getInstance(p_intf );
-
-    if( !extDialog->isVisible() || /* Hidden */
-        extDialog->currentTab() != 2 )  /* wrong tab */
-        extDialog->showTab( 2 );
+    ensureDialog(m_extendedDialog);
+    if( !m_extendedDialog->isVisible() || /* Hidden */
+        m_extendedDialog->currentTab() != 2 )  /* wrong tab */
+        m_extendedDialog->showTab( 2 );
     else
-        extDialog->hide();
+        m_extendedDialog->hide();
 }
 
 void DialogsProvider::messagesDialog(int page)
 {
-    MessagesDialog *msgDialog = MessagesDialog::getInstance( p_intf );
-
-    if(!msgDialog->isVisible() || page)
-        msgDialog->showTab(page);
+    ensureDialog(m_messagesDialog);
+    if(!m_messagesDialog->isVisible() || page)
+        m_messagesDialog->showTab(page);
     else
-        msgDialog->toggleVisible();
+        m_messagesDialog->toggleVisible();
 }
 
 void DialogsProvider::gotoTimeDialog()
 {
-    GotoTimeDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_vlmDialog);
 }
 
 #ifdef ENABLE_VLM
 void DialogsProvider::vlmDialog()
 {
-    VLMDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_vlmDialog);
 }
 #endif
 
 void DialogsProvider::helpDialog()
 {
-    HelpDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_helpDialog);
 }
 
 #ifdef UPDATE_CHECK
 void DialogsProvider::updateDialog()
 {
-    UpdateDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_updateDialog);
 }
 #endif
 
 void DialogsProvider::aboutDialog()
 {
-    AboutDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_aboutDialog);
 }
 
 void DialogsProvider::mediaInfoDialog( void )
 {
-    MediaInfoDialog *dialog = MediaInfoDialog::getInstance( p_intf );
-    if( !dialog->isVisible() || dialog->currentTab() != MediaInfoDialog::META_PANEL )
-        dialog->showTab( MediaInfoDialog::META_PANEL );
+    ensureDialog(m_mediaInfoDialog);
+    if( !m_mediaInfoDialog->isVisible() || m_mediaInfoDialog->currentTab() != MediaInfoDialog::META_PANEL )
+        m_mediaInfoDialog->showTab( MediaInfoDialog::META_PANEL );
     else
-        dialog->hide();
+        m_mediaInfoDialog->hide();
 }
 
 void DialogsProvider::mediaInfoDialog( const SharedInputItem& inputItem )
@@ -425,48 +404,49 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
 
 void DialogsProvider::mediaCodecDialog()
 {
-    MediaInfoDialog *dialog = MediaInfoDialog::getInstance( p_intf );
-    if( !dialog->isVisible() || dialog->currentTab() != MediaInfoDialog::INFO_PANEL )
-        dialog->showTab( MediaInfoDialog::INFO_PANEL );
+    ensureDialog(m_mediaInfoDialog);
+
+    if( !m_mediaInfoDialog->isVisible() || m_mediaInfoDialog->currentTab() != MediaInfoDialog::INFO_PANEL )
+        m_mediaInfoDialog->showTab( MediaInfoDialog::INFO_PANEL );
     else
-        dialog->hide();
+        m_mediaInfoDialog->hide();
 }
 
 void DialogsProvider::playlistsDialog()
 {
-    PlaylistsDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_playlistDialog);
 }
 
 void DialogsProvider::playlistsDialog( const QVariantList & medias )
 {
-    PlaylistsDialog * dialog = PlaylistsDialog::getInstance( p_intf );
+    ensureDialog(m_playlistDialog);
 
-    dialog->setMedias(medias);
+    m_playlistDialog->setMedias(medias);
 
-    dialog->show();
+    m_playlistDialog->show();
 
     // FIXME: We shouldn't have to call this on here.
-    dialog->getInstance( p_intf )->activateWindow();
+    m_playlistDialog->activateWindow();
 }
 
 void DialogsProvider::bookmarksDialog()
 {
-    BookmarksDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_bookmarkDialog);
 }
 
 void DialogsProvider::podcastConfigureDialog()
 {
-    PodcastConfigDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_podcastDialog);
 }
 
 void DialogsProvider::pluginDialog()
 {
-    PluginDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_pluginDialog);
 }
 
 void DialogsProvider::epgDialog()
 {
-    EpgDialog::getInstance( p_intf )->toggleVisible();
+    toggleDialogVisible(m_egpDialog);
 }
 
 void DialogsProvider::setPopupMenu()
@@ -963,4 +943,19 @@ void DialogsProvider::sendKey( int key )
 
      // forward key to vlc core when not a key accelerator
      var_SetInteger( vlc_object_instance(p_intf), "key-pressed", key );
+}
+
+
+template<typename T>
+void DialogsProvider::ensureDialog(std::unique_ptr<T>& dialog)
+{
+    if (!dialog)
+        dialog = std::make_unique<T>(p_intf);
+}
+
+template<typename T>
+void DialogsProvider::toggleDialogVisible(std::unique_ptr<T>& dialog)
+{
+    ensureDialog(dialog);
+    dialog->toggleVisible();
 }

@@ -25,21 +25,23 @@
 #define QVLC_BOOKMARKS_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"
-#include "util/singleton.hpp"
 
 class QPushButton;
 class MLBookmarkModel;
 class QTreeView;
 
-class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
+class BookmarksDialog : public QVLCFrame
 {
     Q_OBJECT
+
 public:
-    void toggleVisible();
-private:
     BookmarksDialog( qt_intf_t * );
     virtual ~BookmarksDialog();
 
+public:
+    void toggleVisible();
+
+private:
     QTreeView *bookmarksList;
     QPushButton *clearButton;
     QPushButton *delButton;
@@ -53,8 +55,6 @@ private slots:
     void extract();
     void activateItem( const QModelIndex& index );
     void updateButtons();
-
-    friend class    Singleton<BookmarksDialog>;
 };
 
 #endif

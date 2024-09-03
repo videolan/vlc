@@ -38,28 +38,22 @@
 
 class QEvent;
 
-class HelpDialog : public QVLCFrame, public Singleton<HelpDialog>
+class HelpDialog : public QVLCFrame
 {
     Q_OBJECT
-private:
+public:
     HelpDialog( qt_intf_t * );
     virtual ~HelpDialog();
 
 public slots:
     void close() override { toggleVisible(); }
-
-    friend class    Singleton<HelpDialog>;
 };
 
-class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
+class AboutDialog : public QVLCDialog
 {
     Q_OBJECT
-private:
+public:
     AboutDialog( qt_intf_t * );
-    Ui::aboutWidget ui;
-
-public slots:
-    friend class    Singleton<AboutDialog>;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
@@ -67,6 +61,7 @@ protected:
 
 private:
     bool b_advanced;
+    Ui::aboutWidget ui;
 
 private slots:
     void showLicense();
@@ -76,18 +71,18 @@ private slots:
 
 #if defined(UPDATE_CHECK)
 
-class UpdateDialog : public QVLCFrame, public Singleton<UpdateDialog>
+class UpdateDialog : public QVLCFrame
 {
     Q_OBJECT
 public:
+    UpdateDialog( qt_intf_t * );
+    virtual ~UpdateDialog();
+
     static const QEvent::Type UDOkEvent;
     static const QEvent::Type UDErrorEvent;
     void updateNotify( bool );
 
 private:
-    UpdateDialog( qt_intf_t * );
-    virtual ~UpdateDialog();
-
     Ui::updateWidget ui;
     update_t *p_update;
     void customEvent( QEvent * ) override;
@@ -97,8 +92,6 @@ private slots:
     void close() override { toggleVisible(); }
 
     void UpdateOrDownload();
-
-    friend class    Singleton<UpdateDialog>;
 };
 #endif
 

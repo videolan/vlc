@@ -71,6 +71,21 @@ class QEvent;
 class QSignalMapper;
 class VLCMenuBar;
 
+class FirstRunWizard;
+class ExtendedDialog;
+class MessagesDialog;
+class GotoTimeDialog;
+class VLMDialog;
+class HelpDialog;
+class AboutDialog;
+class MediaInfoDialog;
+class PlaylistsDialog;
+class BookmarksDialog;
+class PodcastConfigDialog;
+class PluginDialog;
+class EpgDialog;
+class UpdateDialog;
+
 class DialogsProvider : public QObject, public Singleton<DialogsProvider>
 {
     Q_OBJECT
@@ -123,10 +138,33 @@ private:
     std::unique_ptr<QMenu> audioPopupMenu;
     std::unique_ptr<QMenu> miscPopupMenu;
 
+    std::unique_ptr<FirstRunWizard> m_firstRunDialog;
+    std::unique_ptr<ExtendedDialog> m_extendedDialog;
+    std::unique_ptr<MessagesDialog> m_messagesDialog;
+    std::unique_ptr<GotoTimeDialog> m_gotoTimeDialog;
+    std::unique_ptr<VLMDialog> m_vlmDialog;
+    std::unique_ptr<HelpDialog> m_helpDialog;
+    std::unique_ptr<AboutDialog> m_aboutDialog;
+    std::unique_ptr<MediaInfoDialog> m_mediaInfoDialog;
+    std::unique_ptr<PlaylistsDialog> m_playlistDialog;
+    std::unique_ptr<BookmarksDialog> m_bookmarkDialog;
+    std::unique_ptr<PodcastConfigDialog> m_podcastDialog;
+    std::unique_ptr<PluginDialog> m_pluginDialog;
+    std::unique_ptr<EpgDialog> m_egpDialog;
+#ifdef UPDATE_CHECK
+    std::unique_ptr<UpdateDialog> m_updateDialog;
+#endif
+
+
     QWidget* root;
     bool b_isDying;
 
     void openDialog( int );
+
+    template<typename T>
+    inline void ensureDialog(std::unique_ptr<T>& dialog);
+    template<typename T>
+    void toggleDialogVisible(std::unique_ptr<T>& dialog);
 
 public slots:
     void playlistsDialog();

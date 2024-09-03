@@ -24,7 +24,6 @@
 #define QVLC_PLUGIN_DIALOG_H_ 1
 
 #include "widgets/native/qvlcframe.hpp"
-#include "util/singleton.hpp"
 
 #include <QStringList>
 #include <QTreeWidgetItem>
@@ -60,20 +59,19 @@ extern "C" {
     typedef struct extension_t extension_t;
 };
 
-class PluginDialog : public QVLCFrame, public Singleton<PluginDialog>
+class PluginDialog : public QVLCFrame
 {
     Q_OBJECT
 
-private:
+public:
     PluginDialog( qt_intf_t * );
     virtual ~PluginDialog();
 
+private:
     QTabWidget *tabs;
     PluginTab *pluginTab;
     ExtensionTab *extensionTab;
     AddonsTab *addonsTab;
-
-    friend class Singleton<PluginDialog>;
 };
 
 class PluginTab : public QVLCFrame
