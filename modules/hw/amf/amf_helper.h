@@ -29,6 +29,7 @@ struct vlc_amf_context
 {
     AMT_TYPE(AMFFactory) *pFactory;
     AMT_TYPE(AMFContext) *Context;
+    amf_uint64           Version;
     void            *Private;
 };
 

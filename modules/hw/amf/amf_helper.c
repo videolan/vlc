@@ -21,12 +21,12 @@ int vlc_AMFCreateContext(struct vlc_amf_context *c)
     if (hLib == NULL)
         return VLC_ENOTSUP;
 
-    amf_uint64 version = 0;
+    c->Version = 0;
     AMF_RESULT res;
     AMFQueryVersion_Fn queryVersion = (AMFQueryVersion_Fn)GetProcAddress(hLib, AMF_QUERY_VERSION_FUNCTION_NAME);
     if (unlikely(queryVersion == NULL))
         goto error;
-    res = queryVersion(&version);
+    res = queryVersion(&c->Version);
     if (unlikely(res != AMF_OK))
         goto error;
 
@@ -34,7 +34,7 @@ int vlc_AMFCreateContext(struct vlc_amf_context *c)
     c->Context = NULL;
 
     AMFInit_Fn init = (AMFInit_Fn)GetProcAddress(hLib, AMF_INIT_FUNCTION_NAME);
-    res = init(version, &c->pFactory);
+    res = init(c->Version, &c->pFactory); // use the highest possible value for that DLL
     if (unlikely(res != AMF_OK))
         goto error;
 
