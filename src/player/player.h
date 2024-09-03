@@ -218,6 +218,7 @@ struct vlc_player_timer
     vlc_tick_t input_length;
     vlc_tick_t input_normal_time;
     vlc_tick_t last_ts;
+    vlc_tick_t start_offset;
     double input_position;
 
     vlc_tick_t seek_ts;

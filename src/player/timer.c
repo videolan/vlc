@@ -34,6 +34,7 @@ vlc_player_ResetTimer(vlc_player_t *player)
     player->timer.input_length = VLC_TICK_INVALID;
     player->timer.input_normal_time = VLC_TICK_0;
     player->timer.last_ts = VLC_TICK_INVALID;
+    player->timer.start_offset = 0;
     player->timer.input_position = 0;
     player->timer.smpte_source.smpte.last_framenum = ULONG_MAX;
     player->timer.seek_ts = VLC_TICK_INVALID;
@@ -318,7 +319,7 @@ vlc_player_UpdateTimerSource(vlc_player_t *player,
     assert(player->timer.input_normal_time >= VLC_TICK_0);
 
     source->point.rate = rate;
-    source->point.ts = ts - player->timer.input_normal_time + VLC_TICK_0;
+    source->point.ts = ts - player->timer.input_normal_time - player->timer.start_offset + VLC_TICK_0;
     source->point.length = player->timer.input_length;
 
     /* Put an invalid date for the first point in order to disable
@@ -330,7 +331,7 @@ vlc_player_UpdateTimerSource(vlc_player_t *player,
         source->point.system_date = system_date;
 
     if (source->point.length != VLC_TICK_INVALID)
-        source->point.position = (ts - player->timer.input_normal_time)
+        source->point.position = (ts - player->timer.input_normal_time - player->timer.start_offset)
                                / (double) source->point.length;
     else
         source->point.position = player->timer.input_position;
