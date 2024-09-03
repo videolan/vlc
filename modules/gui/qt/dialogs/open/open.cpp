@@ -41,7 +41,7 @@
 #endif
 
 OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
-        bool b_rawInstance, int _action_flag, bool b_selectMode )
+    bool b_rawInstance, OpenDialog::ActionFlag _action_flag, bool b_selectMode )
 {
     const auto instance = Singleton<OpenDialog>::getInstance(nullptr,
                                                              p_intf,
@@ -65,7 +65,7 @@ OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
 OpenDialog::OpenDialog( QWindow *parent,
                         qt_intf_t *_p_intf,
                         bool b_selectMode,
-                        int _action_flag )
+                        OpenDialog::ActionFlag _action_flag )
     :  QVLCDialog( parent, _p_intf )
 {
     i_action_flag = _action_flag;
@@ -245,7 +245,7 @@ QString OpenDialog::getOptions()
     return ui.advancedLineInput->text();
 }
 
-void OpenDialog::showTab( int i_tab )
+void OpenDialog::showTab( OpenDialog::OpenTab i_tab )
 {
     if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
     ui.Tab->setCurrentIndex( i_tab );

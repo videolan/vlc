@@ -529,36 +529,36 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
  * Open Dialog first - Simple Open then
  ****************************************************************************/
 
-void DialogsProvider::openDialog( int i_tab )
+void DialogsProvider::openDialog( OpenDialog::OpenTab i_tab )
 {
     OpenDialog::getInstance(p_intf )->showTab( i_tab );
 }
 void DialogsProvider::openDialog()
 {
-    openDialog( OPEN_FILE_TAB );
+    openDialog( OpenDialog::OPEN_FILE_TAB );
 }
 void DialogsProvider::openFileDialog()
 {
-    openDialog( OPEN_FILE_TAB );
+    openDialog( OpenDialog::OPEN_FILE_TAB );
 }
 void DialogsProvider::openDiscDialog()
 {
-    openDialog( OPEN_DISC_TAB );
+    openDialog( OpenDialog::OPEN_DISC_TAB );
 }
 void DialogsProvider::openNetDialog()
 {
-    openDialog( OPEN_NETWORK_TAB );
+    openDialog( OpenDialog::OPEN_NETWORK_TAB );
 }
 void DialogsProvider::openCaptureDialog()
 {
-    openDialog( OPEN_CAPTURE_TAB );
+    openDialog( OpenDialog::OPEN_CAPTURE_TAB );
 }
 
 /* Same as the open one, but force the enqueue */
-void DialogsProvider::PLAppendDialog( int tab )
+void DialogsProvider::PLAppendDialog( OpenDialog::OpenTab tab )
 {
     OpenDialog::getInstance(p_intf, false,
-                             OPEN_AND_ENQUEUE )->showTab( tab );
+                             OpenDialog::OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
 /**
@@ -857,14 +857,14 @@ void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
 
 void DialogsProvider::openAndStreamingDialogs()
 {
-    OpenDialog::getInstance(p_intf, false, OPEN_AND_STREAM )
-                                ->showTab( OPEN_FILE_TAB );
+    OpenDialog::getInstance(p_intf, false, OpenDialog::OPEN_AND_STREAM )
+                                ->showTab( OpenDialog::OPEN_FILE_TAB );
 }
 
 void DialogsProvider::openAndTranscodingDialogs()
 {
-    OpenDialog::getInstance(p_intf, false, OPEN_AND_SAVE )
-                                ->showTab( OPEN_FILE_TAB );
+    OpenDialog::getInstance(p_intf, false, OpenDialog::OPEN_AND_SAVE )
+                                ->showTab( OpenDialog::OPEN_FILE_TAB );
 }
 
 void  DialogsProvider::loadMediaFile( const es_format_category_e category, const int filter , const QString &dialogTitle)

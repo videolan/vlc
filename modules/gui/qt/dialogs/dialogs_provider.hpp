@@ -159,7 +159,7 @@ private:
     QWidget* root;
     bool b_isDying;
 
-    void openDialog( int );
+    void openDialog( OpenDialog::OpenTab );
 
     template<typename T>
     inline void ensureDialog(std::unique_ptr<T>& dialog);
@@ -207,8 +207,6 @@ public slots:
     void openNetDialog();
     void openCaptureDialog();
 
-    void PLAppendDialog( int tab = OPEN_FILE_TAB );
-
     void PLOpenDir();
     void PLAppendDir();
 
@@ -225,6 +223,9 @@ public slots:
     void loadVideoFile();
 
     void quit();
+
+public:
+    void PLAppendDialog( OpenDialog::OpenTab tab = OpenDialog::OPEN_FILE_TAB );
 
 signals:
     void releaseMouseEvents();
