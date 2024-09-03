@@ -556,7 +556,7 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
 
     /* Seek to start position */
     if( priv->i_start > 0 )
-        input_SetTime( p_input, priv->i_start, false );
+        input_SetTime( p_input, 0, false );
     else
         input_SetPosition( p_input, 0.0f, false );
 
@@ -926,7 +926,7 @@ static void SetStopStart( input_thread_t * p_input )
         msg_Dbg( p_input, "starting at time: %"PRId64"s",
                  SEC_FROM_VLC_TICK(priv->i_start) );
 
-        input_SetTime( p_input, priv->i_start, false );
+        input_SetTime( p_input, 0, false );
     }
     if( priv->i_stop > 0 && priv->i_stop <= priv->i_start )
     {
@@ -1985,7 +1985,7 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control(&priv->p_es_out->out, ES_OUT_RESET_PCR);
 
-            i_ret = demux_SetTime( priv->master->p_demux, param.time.i_val,
+            i_ret = demux_SetTime( priv->master->p_demux, priv->i_start + param.time.i_val,
                                    !param.time.b_fast_seek );
             if( i_ret )
             {
@@ -1993,7 +1993,7 @@ static bool Control( input_thread_t *p_input,
                 /* Emulate it with a SET_POS */
                 if( i_length > 0 )
                 {
-                    double f_pos = (double)param.time.i_val / (double)i_length;
+                    double f_pos = (double)(priv->i_start + param.time.i_val) / (double)i_length;
                     i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
                                                !param.time.b_fast_seek );
                 }
