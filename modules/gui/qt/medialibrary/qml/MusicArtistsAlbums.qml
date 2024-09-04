@@ -119,18 +119,6 @@ FocusScope {
         model: artistModel
     }
 
-    Widgets.AcrylicBackground {
-      id: artistListBackground
-
-      visible: artistList.visible
-      width: parent.width
-      height: parent.height + artistList.displayMarginEnd
-
-      tintColor: artistList.colorContext.bg.secondary
-
-      focus: false
-    }
-
     RowLayout {
         anchors.fill: parent
         anchors.leftMargin: root.leftPadding
@@ -159,6 +147,17 @@ FocusScope {
 
             fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
                                                                           : artistListBackground.alternativeColor
+
+            Widgets.AcrylicBackground {
+                id: artistListBackground
+
+                z: -1
+
+                anchors.fill: parent
+                anchors.bottomMargin: -artistList.displayMarginEnd
+
+                tintColor: artistList.colorContext.bg.secondary
+            }
 
             // To get blur effect while scrolling in mainview
             displayMarginEnd: g_mainDisplay.displayMargin
