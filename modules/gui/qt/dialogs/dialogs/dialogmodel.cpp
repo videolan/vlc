@@ -99,6 +99,14 @@ void DialogErrorModel::onError(void * p_data,
     });
 }
 
+void DialogErrorModel::pushError(const QString & title, const QString& message)
+{
+    DialogError error;
+    error.title = title;
+    error.text = message;
+    pushError(error);
+}
+
 void DialogErrorModel::pushError(const DialogError & error)
 {
     int row = m_data.count();

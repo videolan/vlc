@@ -92,6 +92,10 @@ public: // QAbstractItemModel implementation
 public: // QAbstractItemModel reimplementation
     QHash<int, QByteArray> roleNames() const override;
 
+public slots:
+    ///manually push an error
+    void pushError(const QString & title, const QString& message);
+
 private: // Functions
     void pushError(const DialogError & error);
 
