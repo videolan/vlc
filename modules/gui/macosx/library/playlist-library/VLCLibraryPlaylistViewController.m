@@ -273,8 +273,30 @@
     [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
+    const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
+    NSString *placeholderPlaylistsString = nil;
+    switch (playlistType) {
+        case VLC_ML_PLAYLIST_TYPE_ALL:
+            placeholderPlaylistsString =
+                _NS("Your favorite playlists will appear here.\n"
+                    "Go to the Browse section to add playlists you love.");
+            break;
+        case VLC_ML_PLAYLIST_TYPE_AUDIO:
+        case VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY:
+            placeholderPlaylistsString =
+                _NS("Your favorite music playlists will appear here.\n"
+                    "Go to the Browse section to add playlists you love.");
+            break;
+        case VLC_ML_PLAYLIST_TYPE_VIDEO:
+        case VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY:
+            placeholderPlaylistsString =
+                _NS("Your favorite video playlists will appear here.\n"
+                    "Go to the Browse section to add playlists you love.");
+            break;
+    }
+
     _libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
-    _libraryWindow.placeholderLabel.stringValue = _NS("Your favorite playlists will appear here.\nGo to the Browse section to add playlists you love.");
+    _libraryWindow.placeholderLabel.stringValue = placeholderPlaylistsString;
 }
 
 - (void)presentPlaylistLibraryView
