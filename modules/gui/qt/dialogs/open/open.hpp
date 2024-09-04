@@ -63,14 +63,15 @@ public:
 
 
 public:
-    static OpenDialog * getInstance(qt_intf_t *p_intf,
-                                   ActionFlag _action_flag = OPEN_AND_PLAY);
+    static OpenDialog * getInstance(qt_intf_t *p_intf);
 
-    void showTab( OpenDialog::OpenTab = OPEN_FILE_TAB );
+    void showTab( OpenDialog::OpenTab tab, OpenDialog::ActionFlag action );
     QString getMRL( bool b = true );
 
     QStringList getMRLs();
     QString getOptions();
+
+    void setActionFlag(ActionFlag action_flag);
 
 public slots:
     void selectSlots();
@@ -80,8 +81,7 @@ public slots:
     void transcode();
 
 private:
-    OpenDialog(QWindow *parent, qt_intf_t *,
-               ActionFlag _action_flag = OPEN_AND_PLAY );
+    OpenDialog(qt_intf_t * , QWindow *parent = nullptr);
     virtual ~OpenDialog();
 
     QString optionsMRL;
@@ -94,7 +94,7 @@ private:
     DiscOpenPanel *discOpenPanel;
     CaptureOpenPanel *captureOpenPanel;
 
-    ActionFlag i_action_flag;
+    ActionFlag i_action_flag = OPEN_AND_PLAY;
     QStringList SeparateEntries( const QString& );
 
     QPushButton *cancelButton, *selectButton;

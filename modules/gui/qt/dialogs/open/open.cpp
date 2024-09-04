@@ -40,29 +40,15 @@
 # define DEBUG_QT 1
 #endif
 
-OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf,
-    OpenDialog::ActionFlag _action_flag )
+OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf )
 {
-    const auto instance = Singleton<OpenDialog>::getInstance(nullptr,
-                                                             p_intf,
-                                                             _action_flag);
-
-
-    /* Request the instance but change small details:
-       - Button menu */
-    instance->i_action_flag = _action_flag;
-    instance->setMenuAction();
-
+    const auto instance = Singleton<OpenDialog>::getInstance(p_intf, nullptr);
     return instance;
 }
 
-OpenDialog::OpenDialog( QWindow *parent,
-                        qt_intf_t *_p_intf,
-                        OpenDialog::ActionFlag _action_flag )
+OpenDialog::OpenDialog(qt_intf_t *_p_intf, QWindow* parent )
     :  QVLCDialog( parent, _p_intf )
 {
-    i_action_flag = _action_flag;
-
     /* Basic Creation of the Window */
     ui.setupUi( this );
     setWindowTitle( qtr( "Open Media" ) );
@@ -178,6 +164,14 @@ OpenDialog::OpenDialog( QWindow *parent,
     resize( getSettings()->value( "OpenDialog/size", QSize( 500, 400 ) ).toSize() );
 }
 
+void OpenDialog::setActionFlag(OpenDialog::ActionFlag flag)
+{
+    if (i_action_flag == flag)
+        return;
+    i_action_flag = flag;
+    setMenuAction();
+}
+
 /* Finish the dialog and decide if you open another one after */
 void OpenDialog::setMenuAction()
 {
@@ -235,8 +229,9 @@ QString OpenDialog::getOptions()
     return ui.advancedLineInput->text();
 }
 
-void OpenDialog::showTab( OpenDialog::OpenTab i_tab )
+void OpenDialog::showTab( OpenDialog::OpenTab i_tab, OpenDialog::ActionFlag i_action )
 {
+    setActionFlag(i_action);
     if( i_tab == OPEN_CAPTURE_TAB ) captureOpenPanel->initialize();
     ui.Tab->setCurrentIndex( i_tab );
     show();
@@ -272,7 +267,8 @@ void OpenDialog::browseInputSlave()
 {
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
-    OpenDialog *od = new OpenDialog( parentWindow, p_intf, SELECT );
+    OpenDialog *od = new OpenDialog( p_intf, parentWindow );
+    od->setActionFlag(SELECT);
     od->exec();
     ui.slaveText->setText( od->getMRL( false ) );
     delete od;
