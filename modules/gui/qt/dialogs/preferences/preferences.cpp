@@ -31,6 +31,8 @@
 #include "expert_view.hpp"
 #include "dialogs/preferences/complete_preferences.hpp"
 #include "dialogs/preferences/simple_preferences.hpp"
+#include "dialogs/dialogs/dialogmodel.hpp"
+#include "dialogs/dialogs_provider.hpp"
 #include "widgets/native/searchlineedit.hpp"
 #include "widgets/native/qvlcframe.hpp"
 #include "maininterface/mainctx.hpp"
@@ -353,8 +355,18 @@ void PrefsDialog::save()
     /* Save to file */
     if( config_SaveConfigFile( p_intf ) != 0 )
     {
-        ErrorsDialog::getInstance (p_intf)->addError( qtr( "Cannot save Configuration" ),
-            qtr("Preferences file could not be saved") );
+        DialogErrorModel::getInstance(p_intf)->pushError(
+            qtr( "Cannot save Configuration" ),
+            qtr("Preferences file could not be saved")
+        );
+        if (p_intf->b_isDialogProvider)
+        {
+            //at this point we are closing the preference dialog which is modal,
+            //we need to postpone the dialog raising up
+            QMetaObject::invokeMethod(DialogsProvider::getInstance(), [](){
+                DialogsProvider::getInstance()->messagesDialog(1);
+            }, Qt::QueuedConnection);
+        }
     }
 
     if( p_intf->p_mi )
