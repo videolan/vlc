@@ -1045,23 +1045,6 @@ static void *Thread( void *obj )
     /* Explain how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
-#ifdef UPDATE_CHECK
-    /* Checking for VLC updates */
-    if( var_InheritBool( p_intf, "qt-updates-notif" ) &&
-        !var_InheritBool( p_intf, "qt-privacy-ask" ) )
-    {
-        int interval = var_InheritInteger( p_intf, "qt-updates-days" );
-        if( QDate::currentDate() >
-             getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
-        {
-            /* The constructor of the update Dialog will do the 1st request */
-            //FIXME Update is no longer a singleton and calling DialogProvider::updateDialog would open the dialog everytime
-            //UpdateDialog::getInstance( p_intf );
-            //getSettings()->setValue( "updatedate", QDate::currentDate() );
-        }
-    }
-#endif
-
     /* Tell the main LibVLC thread we are ready */
     {
         vlc::threads::mutex_locker locker (lock);

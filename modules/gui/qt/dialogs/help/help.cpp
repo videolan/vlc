@@ -28,6 +28,7 @@
 #include "qt.hpp"
 #include "help.hpp"
 #include "util/qt_dirs.hpp"
+#include "maininterface/mainctx.hpp"
 
 #include <vlc_about.h>
 #include <vlc_intf_strings.h>
@@ -180,27 +181,131 @@ void AboutDialog::showEvent( QShowEvent *event )
 
 #ifdef UPDATE_CHECK
 
+struct UpdateModelPrivate
+{
+    Q_DECLARE_PUBLIC(UpdateModel)
+public:
+    UpdateModelPrivate(UpdateModel * pub)
+        : q_ptr(pub)
+    {
+    }
+
+    update_t* m_update = nullptr;
+
+    update_release_t* m_release = nullptr;
+    UpdateModel::Status m_status = UpdateModel::Unchecked;
+
+    UpdateModel* q_ptr = nullptr;
+};
+
+static void UpdateCallback(void *data, bool b_ret)
+{
+    auto that = (UpdateModelPrivate*)data;
+    QMetaObject::invokeMethod(that->q_func(), [that, b_ret](){
+        if (!b_ret)
+        {
+            that->m_status = UpdateModel::CheckFailed;
+            that->m_release = nullptr;
+        }
+        else
+        {
+            bool needUpdate = update_NeedUpgrade( that->m_update );
+            if (!needUpdate)
+            {
+                that->m_status = UpdateModel::UpToDate;
+                that->m_release = nullptr;
+            }
+            else
+            {
+                that->m_status = UpdateModel::NeedUpdate;
+                that->m_release = update_GetRelease(that->m_update);
+            }
+        }
+        emit that->q_func()->updateStatusChanged();
+    });
+}
+
+UpdateModel::UpdateModel(qt_intf_t * p_intf)
+    : d_ptr(new UpdateModelPrivate(this))
+{
+    Q_D(UpdateModel);
+    d->m_update = update_New( p_intf );
+}
+
+UpdateModel::~UpdateModel()
+{
+    Q_D(UpdateModel);
+    update_Delete( d->m_update );
+}
+
+void UpdateModel::checkUpdate()
+{
+    Q_D(UpdateModel);
+    if (d->m_status == Checking)
+        return;
+    d->m_release = nullptr;
+    d->m_status = Checking;
+    emit updateStatusChanged();
+    update_Check( d->m_update, UpdateCallback, d );
+}
+
+bool UpdateModel::download(QString destDir)
+{
+    Q_D(UpdateModel);
+    if (d->m_status != NeedUpdate)
+        return false;
+    update_Download( d->m_update, qtu( destDir ) );
+    return true;
+}
+
+UpdateModel::Status UpdateModel::updateStatus() const
+{
+    Q_D(const UpdateModel);
+    return d->m_status;
+}
+
+int UpdateModel::getMajor() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return d->m_release->i_major;
+}
+int UpdateModel::getMinor() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return d->m_release->i_minor;
+}
+int UpdateModel::getRevision() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return d->m_release->i_revision;
+}
+int UpdateModel::getExtra() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return d->m_release->i_extra;
+}
+QString UpdateModel::getDescription() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return qfu( d->m_release->psz_desc );
+}
+QString UpdateModel::getUrl() const
+{
+    Q_D(const UpdateModel);
+    if (!d->m_release) return 0;
+    return qfu( d->m_release->psz_desc );
+}
+
+
+
 /*****************************************************************************
  * UpdateDialog
  *****************************************************************************/
-/* callback to get information from the core */
-static void UpdateCallback( void *data, bool b_ret )
-{
-    UpdateDialog* UDialog = (UpdateDialog *)data;
-    QEvent* event;
-
-    if( b_ret )
-        event = new QEvent( UpdateDialog::UDOkEvent );
-    else
-        event = new QEvent( UpdateDialog::UDErrorEvent );
-
-    QApplication::postEvent( UDialog, event );
-}
-
-const QEvent::Type UpdateDialog::UDOkEvent =
-        (QEvent::Type)QEvent::registerEventType();
-const QEvent::Type UpdateDialog::UDErrorEvent =
-        (QEvent::Type)QEvent::registerEventType();
 
 UpdateDialog::UpdateDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
 {
@@ -219,40 +324,41 @@ UpdateDialog::UpdateDialog( qt_intf_t *_p_intf ) : QVLCFrame( _p_intf )
     setWindowTitle( qtr( "VLC media player updates" ) );
     setWindowRole( "vlc-update" );
 
-    BUTTONACT( recheckButton, &UpdateDialog::UpdateOrDownload );
+    BUTTONACT( recheckButton, &UpdateDialog::checkOrDownload );
     connect( ui.updateDialogButtonBox, &QDialogButtonBox::rejected, this, &UpdateDialog::close );
 
-    connect( ui.updateNotifyButtonBox, &QDialogButtonBox::accepted, this, &UpdateDialog::UpdateOrDownload );
+    connect( ui.updateNotifyButtonBox, &QDialogButtonBox::accepted, this, &UpdateDialog::checkOrDownload );
     connect( ui.updateNotifyButtonBox, &QDialogButtonBox::rejected, this, &UpdateDialog::close );
-
-    /* Create the update structure */
-    p_update = update_New( p_intf );
-    b_checked = false;
 
     setMinimumSize( 300, 300 );
     setMaximumSize( 500, 300 );
 
     restoreWidgetPosition( "Update", maximumSize() );
 
-    /* Check for updates */
-    UpdateOrDownload();
+    m_model = p_intf->p_mi->getUpdateModel();
+    connect(m_model, &UpdateModel::updateStatusChanged, this, &UpdateDialog::updateUI);
+    /* update status*/
+    updateUI();
 }
 
 UpdateDialog::~UpdateDialog()
 {
-    update_Delete( p_update );
     saveWidgetPosition( "Update" );
 }
 
 /* Check for updates */
-void UpdateDialog::UpdateOrDownload()
+void UpdateDialog::checkOrDownload()
 {
-    if( !b_checked )
+    switch (m_model->updateStatus()) {
+    case UpdateModel::Unchecked:
+    case UpdateModel::UpToDate:
+    case UpdateModel::CheckFailed:
     {
         ui.stackedWidget->setCurrentWidget( ui.updateRequestPage );
-        update_Check( p_update, UpdateCallback, this );
+        m_model->checkUpdate();
+        break;
     }
-    else
+    case UpdateModel::NeedUpdate:
     {
         QString dest_dir = QDir::tempPath();
         if( !dest_dir.isEmpty() )
@@ -260,67 +366,65 @@ void UpdateDialog::UpdateOrDownload()
             dest_dir = toNativeSepNoSlash( dest_dir ) + DIR_SEP;
             msg_Dbg( p_intf, "Downloading to folder: %s", qtu( dest_dir ) );
             toggleVisible();
-            update_Download( p_update, qtu( dest_dir ) );
+            m_model->download(dest_dir);
             /* FIXME: We should trigger a change to another dialog here ! */
         }
+        break;
     }
-}
-
-/* Handle the events */
-void UpdateDialog::customEvent( QEvent *event )
-{
-    if( event->type() == UDOkEvent )
-        updateNotify( true );
-    else
-        updateNotify( false );
+    default: // Checking
+        break;
+    }
 }
 
 /* Notify the end of the update_Check */
-void UpdateDialog::updateNotify( bool b_result )
+void UpdateDialog::updateUI( )
 {
-    /* The update finish without errors */
-    if( b_result )
+    switch (m_model->updateStatus()) {
+    case UpdateModel::NeedUpdate:
     {
-        if( update_NeedUpgrade( p_update ) )
+        ui.stackedWidget->setCurrentWidget( ui.updateNotifyPage );
+        int extra = m_model->getExtra();
+        QString message = QString(
+                              qtr( "A new version of VLC (%1.%2.%3%4) is available." ) )
+                              .arg( m_model->getMajor() )
+                              .arg( m_model->getMinor() )
+                              .arg( m_model->getRevision()  )
+                              .arg( extra == 0 ? "" : "." + QString::number( extra ) );
+
+        ui.updateNotifyLabel->setText( message );
+        message = m_model->getDescription().replace( "\n", "<br/>" );
+
+        /* Try to highlight releases featuring security changes */
+        int i_index = message.indexOf( "security", Qt::CaseInsensitive );
+        if ( i_index >= 0 )
         {
-            ui.stackedWidget->setCurrentWidget( ui.updateNotifyPage );
-            update_release_t *p_release = update_GetRelease( p_update );
-            assert( p_release );
-            b_checked = true;
-            QString message = QString(
-                    qtr( "A new version of VLC (%1.%2.%3%4) is available." ) )
-                .arg( QString::number( p_release->i_major ) )
-                .arg( QString::number( p_release->i_minor ) )
-                .arg( QString::number( p_release->i_revision ) )
-                .arg( p_release->i_extra == 0 ? "" : "." + QString::number( p_release->i_extra ) );
-
-            ui.updateNotifyLabel->setText( message );
-            message = qfu( p_release->psz_desc ).replace( "\n", "<br/>" );
-
-            /* Try to highlight releases featuring security changes */
-            int i_index = message.indexOf( "security", Qt::CaseInsensitive );
-            if ( i_index >= 0 )
-            {
-                message.insert( i_index + 8, "</font>" );
-                message.insert( i_index, "<font style=\"color:red\">" );
-            }
-            ui.updateNotifyTextEdit->setHtml( message );
-
-            /* Force the dialog to be shown */
-            this->show();
+            message.insert( i_index + 8, "</font>" );
+            message.insert( i_index, "<font style=\"color:red\">" );
         }
-        else
-        {
-            ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
-            ui.updateDialogLabel->setText(
-                    qtr( "You have the latest version of VLC media player." ) );
-        }
+        ui.updateNotifyTextEdit->setHtml( message );
+        break;
     }
-    else
+    case UpdateModel::UpToDate:
     {
         ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
         ui.updateDialogLabel->setText(
-                    qtr( "An error occurred while checking for updates..." ) );
+            qtr( "You have the latest version of VLC media player." ) );
+        break;
+    }
+    case UpdateModel::CheckFailed:
+    {
+        ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
+        ui.updateDialogLabel->setText(
+            qtr( "An error occurred while checking for updates..." ) );
+        break;
+    }
+    case UpdateModel::Checking:
+    {
+        ui.stackedWidget->setCurrentWidget( ui.updateDialogPage );
+        ui.updateDialogLabel->setText(
+            qtr( "Checking for updates..." ) );
+        break;
+    }
     }
 }
 

@@ -71,6 +71,53 @@ private slots:
 
 #if defined(UPDATE_CHECK)
 
+class UpdateModelPrivate;
+class UpdateModel : public QObject
+{
+    Q_OBJECT
+
+public:
+    enum Status {
+        Unchecked,
+        Checking,
+        UpToDate,
+        NeedUpdate,
+        CheckFailed
+    };
+    Q_ENUM(Status)
+
+    Q_PROPERTY(Status updateStatus READ updateStatus NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(int major READ getMajor NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(int minor READ getMinor NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(int revision READ getRevision NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(int extra READ getExtra NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(QString description READ getDescription NOTIFY updateStatusChanged FINAL)
+    Q_PROPERTY(QString url READ getUrl NOTIFY updateStatusChanged FINAL)
+
+public:
+    explicit UpdateModel(qt_intf_t * p_intf);
+    ~UpdateModel();
+
+    Q_INVOKABLE void checkUpdate();
+
+    Q_INVOKABLE bool download(QString destDir);
+
+    Status updateStatus() const;
+    int getMajor() const;
+    int getMinor() const;
+    int getRevision() const;
+    int getExtra() const;
+    QString getDescription() const;
+    QString getUrl() const;
+
+signals:
+    void updateStatusChanged();
+
+private:
+    Q_DECLARE_PRIVATE(UpdateModel)
+    QScopedPointer<UpdateModelPrivate> d_ptr;
+};
+
 class UpdateDialog : public QVLCFrame
 {
     Q_OBJECT
@@ -78,20 +125,14 @@ public:
     UpdateDialog( qt_intf_t * );
     virtual ~UpdateDialog();
 
-    static const QEvent::Type UDOkEvent;
-    static const QEvent::Type UDErrorEvent;
-    void updateNotify( bool );
-
 private:
     Ui::updateWidget ui;
-    update_t *p_update;
-    void customEvent( QEvent * ) override;
-    bool b_checked;
+    UpdateModel* m_model = nullptr;
 
 private slots:
+    void checkOrDownload();
+    void updateUI();
     void close() override { toggleVisible(); }
-
-    void UpdateOrDownload();
 };
 #endif
 

@@ -46,6 +46,9 @@ Q_MOC_INCLUDE( "util/csdbuttonmodel.hpp" )
 Q_MOC_INCLUDE( "playlist/playlist_controller.hpp" )
 Q_MOC_INCLUDE( "maininterface/mainctx_submodels.hpp" )
 Q_MOC_INCLUDE( "maininterface/videosurface.hpp" )
+#ifdef UPDATE_CHECK
+Q_MOC_INCLUDE( "dialogs/help/help.hpp" )
+#endif
 
 class CSDButtonModel;
 class QSettings;
@@ -69,6 +72,9 @@ class SearchCtx;
 class SortCtx;
 class WorkerThreadSet;
 class VLCSystray;
+#ifdef UPDATE_CHECK
+class UpdateModel;
+#endif
 
 namespace vlc {
 namespace playlist {
@@ -143,6 +149,10 @@ class MainCtx : public QObject
     Q_PROPERTY(unsigned windowExtendedMargin READ windowExtendedMargin WRITE setWindowExtendedMargin NOTIFY windowExtendedMarginChanged)
     Q_PROPERTY(SearchCtx* search MEMBER m_search CONSTANT FINAL)
     Q_PROPERTY(SortCtx* sort MEMBER m_sort CONSTANT FINAL)
+
+#ifdef UPDATE_CHECK
+    Q_PROPERTY(UpdateModel* updateModel READ getUpdateModel CONSTANT FINAL)
+#endif
 
 public:
     /* tors */
@@ -295,6 +305,10 @@ public:
     double artistAlbumsWidthFactor() const;
     void setArtistAlbumsWidthFactor(double newArtistAlbumsWidthFactor);
 
+#ifdef UPDATE_CHECK
+    UpdateModel* getUpdateModel() const;
+#endif
+
 protected:
     /* Systray */
     void initSystray();
@@ -370,6 +384,11 @@ protected:
 
     SearchCtx* m_search = nullptr;
     SortCtx* m_sort = nullptr;
+
+#ifdef UPDATE_CHECK
+    //m_updateModel is created on first access
+    mutable std::unique_ptr<UpdateModel> m_updateModel;
+#endif
 
     mutable std::unique_ptr<WorkerThreadSet> m_workersThreads;
 

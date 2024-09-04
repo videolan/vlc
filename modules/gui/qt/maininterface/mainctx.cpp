@@ -52,6 +52,7 @@
 #include "menus/menus.hpp"                            // Menu creation
 
 #include "dialogs/toolbar/controlbar_profile_model.hpp"
+#include "dialogs/help/help.hpp"
 
 #include <QKeyEvent>
 
@@ -216,6 +217,40 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     {
         QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
     }
+
+
+#ifdef UPDATE_CHECK
+    /* Checking for VLC updates */
+    if( var_InheritBool( p_intf, "qt-updates-notif" ) &&
+        !var_InheritBool( p_intf, "qt-privacy-ask" ) )
+    {
+        int interval = var_InheritInteger( p_intf, "qt-updates-days" );
+        if( QDate::currentDate() >
+            getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
+        {
+            /* check for update at startup */
+            m_updateModel = std::make_unique<UpdateModel>(p_intf);
+            connect(m_updateModel.get(), &UpdateModel::updateStatusChanged, this, [this](){
+                switch (m_updateModel->updateStatus())
+                {
+                case UpdateModel::Checking:
+                case UpdateModel::Unchecked:
+                    break;
+                case UpdateModel::NeedUpdate:
+                    qWarning() << "Need Udpate";
+                    THEDP->updateDialog();
+                    [[fallthrough]];
+                case UpdateModel::UpToDate:
+                case UpdateModel::CheckFailed:
+                    disconnect(m_updateModel.get(), nullptr, this, nullptr);
+                    break;
+                }
+            });
+            m_updateModel->checkUpdate();
+            getSettings()->setValue( "updatedate", QDate::currentDate() );
+        }
+    }
+#endif
 }
 
 MainCtx::~MainCtx()
@@ -926,3 +961,12 @@ void MainCtx::setArtistAlbumsWidthFactor(double newArtistAlbumsWidthFactor)
     m_artistAlbumsWidthFactor = newArtistAlbumsWidthFactor;
     emit artistAlbumsWidthFactorChanged( m_artistAlbumsWidthFactor );
 }
+
+#ifdef UPDATE_CHECK
+UpdateModel* MainCtx::getUpdateModel() const
+{
+    if (!m_updateModel)
+        m_updateModel = std::make_unique<UpdateModel>(p_intf);
+    return m_updateModel.get();
+}
+#endif
