@@ -54,7 +54,6 @@
 #include "dialogs/podcast/podcast_configuration.hpp"
 #include "dialogs/plugins/plugins.hpp"
 #include "dialogs/epg/epg.hpp"
-#include "dialogs/errors/errors.hpp"
 #include "dialogs/playlists/playlists.hpp"
 #include "dialogs/firstrun/firstrunwizard.hpp"
 
@@ -79,8 +78,6 @@ DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
 
 DialogsProvider::~DialogsProvider()
 {
-    ErrorsDialog::killInstance();
-
     /* free parentless menus  */
     VLCMenuBar::freeRendererMenu();
 }

@@ -97,7 +97,6 @@ libqt_plugin_la_SOURCES = \
 	dialogs/epg/EPGWidget.cpp \
 	dialogs/epg/EPGWidget.hpp \
 	dialogs/epg/epg.cpp dialogs/epg/epg.hpp \
-	dialogs/errors/errors.cpp dialogs/errors/errors.hpp \
 	dialogs/extended/extended.cpp dialogs/extended/extended.hpp \
 	dialogs/extended/extended_panels.cpp \
 	dialogs/extended/extended_panels.hpp \
@@ -372,7 +371,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	dialogs/epg/EPGView.moc.cpp \
 	dialogs/epg/EPGWidget.moc.cpp \
 	dialogs/epg/epg.moc.cpp \
-	dialogs/errors/errors.moc.cpp \
 	dialogs/extended/extended.moc.cpp \
 	dialogs/extended/extended_panels.moc.cpp \
 	dialogs/extensions/extensions.moc.cpp \

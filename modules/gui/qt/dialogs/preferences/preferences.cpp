@@ -26,7 +26,6 @@
 #endif
 
 #include "dialogs/preferences/preferences.hpp"
-#include "dialogs/errors/errors.hpp"
 
 #include "expert_view.hpp"
 #include "dialogs/preferences/complete_preferences.hpp"
