@@ -36,7 +36,7 @@ RowLayout {
     readonly property ColorContext colorContext: ColorContext {
         id: theme
 
-        colorSet: ColorContext.Window // copied from TracksPage, maybe use Pane?
+        colorSet: ColorContext.View
     }
 
     //FIXME make TrackMenuController a proper type (see TrackMenu)
@@ -206,7 +206,7 @@ RowLayout {
                     focus: true
                     clip: true
 
-                    fadingEdge.backgroundColor: "transparent"
+                    fadingEdge.backgroundColor: theme.bg.primary
 
                     Accessible.role: Accessible.List
                     Accessible.name: qsTr("Track list")
