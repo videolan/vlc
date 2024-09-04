@@ -375,6 +375,23 @@ static void Display(vout_display_t *vd, picture_t *picture)
         subpicture_Display(vd);
 }
 
+static void SetVideoLayout(vout_display_t *vd, bool crop)
+{
+    struct sys *sys = vd->sys;
+
+    video_format_t rot_fmt;
+    video_format_ApplyRotation(&rot_fmt, &sys->fmt);
+    if (crop)
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
+                                      rot_fmt.i_visible_width,
+                                      rot_fmt.i_visible_height,
+                                      0, 0);
+    else if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
+                                      0, 0,
+                                      rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+}
+
 static int Control(vout_display_t *vd, int query)
 {
     struct sys *sys = vd->sys;
@@ -392,12 +409,7 @@ static int Control(vout_display_t *vd, int query)
 
         video_format_CopyCrop(&sys->fmt, vd->source);
 
-        video_format_t rot_fmt;
-        video_format_ApplyRotation(&rot_fmt, &sys->fmt);
-        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
-                                      rot_fmt.i_visible_width,
-                                      rot_fmt.i_visible_height,
-                                      0, 0);
+        SetVideoLayout(vd, true);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -407,12 +419,8 @@ static int Control(vout_display_t *vd, int query)
 
         sys->fmt.i_sar_num = vd->source->i_sar_num;
         sys->fmt.i_sar_den = vd->source->i_sar_den;
-        video_format_t rot_fmt;
-        video_format_ApplyRotation(&rot_fmt, &sys->fmt);
-        if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
-            AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0,
-                                          rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 
+        SetVideoLayout(vd, false);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
