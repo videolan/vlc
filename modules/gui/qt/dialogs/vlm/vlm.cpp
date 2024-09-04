@@ -355,11 +355,11 @@ void VLMDialog::selectOutput()
 {
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
-    SoutDialog *s = new SoutDialog( parentWindow, p_intf );
-    if( s->exec() == QDialog::Accepted )
+    SoutDialog s( parentWindow, p_intf );
+    if( s.exec() == QDialog::Accepted )
     {
-        int i = s->getChain().indexOf( " " );
-        ui.outputLedit->setText( s->getChain().left( i ) );
+        int i = s.getChain().indexOf( " " );
+        ui.outputLedit->setText( s.getChain().left( i ) );
     }
 }
 
