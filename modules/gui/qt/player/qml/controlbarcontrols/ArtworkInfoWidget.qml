@@ -79,14 +79,22 @@ AbstractButton {
 
         if (KeyHelper.matchOk(event)) {
             event.accepted = true
-
-            History.push(["player"])
+            clicked()
         }
     }
 
     // Events
 
-    onClicked: History.push(["player"])
+    onClicked: {
+        if (History.match(History.viewPath, ["player"])) {
+            if (MainCtx.mediaLibraryAvailable)
+                History.push(["mc", "video"])
+            else
+                History.push(["mc", "home"])
+        } else {
+            History.push(["player"])
+        }
+    }
 
     // Children
 
@@ -117,7 +125,7 @@ AbstractButton {
 
             grabPermissions: TapHandler.CanTakeOverFromHandlersOfDifferentType | TapHandler.ApprovesTakeOverByAnything
 
-            onTapped: History.push(["player"])
+            onTapped: root.clicked()
         }
 
         DragHandler {
