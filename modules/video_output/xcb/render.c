@@ -75,7 +75,6 @@ typedef struct vout_display_sys_t {
     xcb_window_t root;
     char *filter;
 
-    vout_display_place_t place;
     int32_t src_x;
     int32_t src_y;
     vlc_fourcc_t spu_chromas[2];
@@ -220,6 +219,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic,
                     vlc_tick_t date)
 {
     const video_format_t *fmt = vd->source;
+    const vout_display_place_t *place = vd->place;
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
 
@@ -259,8 +259,8 @@ static void Prepare(vout_display_t *vd, picture_t *pic,
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
                          sys->picture.crop, XCB_RENDER_PICTURE_NONE,
                          sys->picture.scale, sys->src_x, sys->src_y, 0, 0,
-                         sys->place.x, sys->place.y,
-                         sys->place.width, sys->place.height);
+                         place->x, place->y,
+                         place->width, place->height);
     if (offset != (size_t)-1)
         PictureDetach(vd);
 
@@ -318,8 +318,7 @@ static void CreateBuffers(vout_display_t *vd)
     xcb_render_create_picture(conn, sys->picture.scale, sys->drawable.scale,
                               sys->format.argb, 0, NULL);
 
-    vout_display_place_t *place = &sys->place;
-    vout_display_PlacePicture(place, vd->source, &vd->cfg->display);
+    const vout_display_place_t *place = vd->place;
 
     /* Homogeneous coordinates transform from destination(place)
      * to source(fmt) */
