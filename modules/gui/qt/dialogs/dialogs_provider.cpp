@@ -79,7 +79,6 @@ DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
 
 DialogsProvider::~DialogsProvider()
 {
-    OpenDialog::killInstance();
     ErrorsDialog::killInstance();
 
     /* free parentless menus  */
@@ -531,7 +530,8 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
 
 void DialogsProvider::openDialog( OpenDialog::OpenTab i_tab )
 {
-    OpenDialog::getInstance(p_intf )->showTab( i_tab, OpenDialog::OPEN_AND_PLAY );
+    ensureDialog(m_openDialog);
+    m_openDialog->showTab( i_tab, OpenDialog::OPEN_AND_PLAY );
 }
 void DialogsProvider::openDialog()
 {
@@ -557,7 +557,8 @@ void DialogsProvider::openCaptureDialog()
 /* Same as the open one, but force the enqueue */
 void DialogsProvider::PLAppendDialog( OpenDialog::OpenTab tab )
 {
-    OpenDialog::getInstance(p_intf )->showTab( tab, OpenDialog::OPEN_AND_ENQUEUE );
+    ensureDialog(m_openDialog);
+    m_openDialog->showTab( tab, OpenDialog::OPEN_AND_ENQUEUE );
 }
 
 /**
@@ -856,14 +857,14 @@ void DialogsProvider::streamingDialog(const QList<QUrl> &urls, bool b_stream )
 
 void DialogsProvider::openAndStreamingDialogs()
 {
-    OpenDialog::getInstance(p_intf )
-        ->showTab( OpenDialog::OPEN_FILE_TAB, OpenDialog::OPEN_AND_STREAM );
+    ensureDialog(m_openDialog);
+    m_openDialog->showTab( OpenDialog::OPEN_FILE_TAB, OpenDialog::OPEN_AND_STREAM );
 }
 
 void DialogsProvider::openAndTranscodingDialogs()
 {
-    OpenDialog::getInstance(p_intf )
-        ->showTab( OpenDialog::OPEN_FILE_TAB, OpenDialog::OPEN_AND_SAVE );
+    ensureDialog(m_openDialog);
+    m_openDialog->showTab( OpenDialog::OPEN_FILE_TAB, OpenDialog::OPEN_AND_SAVE );
 }
 
 void  DialogsProvider::loadMediaFile( const es_format_category_e category, const int filter , const QString &dialogTitle)

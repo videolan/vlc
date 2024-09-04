@@ -71,6 +71,7 @@ class QEvent;
 class QSignalMapper;
 class VLCMenuBar;
 
+class OpenDialog;
 class FirstRunWizard;
 class ExtendedDialog;
 class MessagesDialog;
@@ -138,6 +139,7 @@ private:
     std::unique_ptr<QMenu> audioPopupMenu;
     std::unique_ptr<QMenu> miscPopupMenu;
 
+    std::unique_ptr<OpenDialog> m_openDialog;
     std::unique_ptr<FirstRunWizard> m_firstRunDialog;
     std::unique_ptr<ExtendedDialog> m_extendedDialog;
     std::unique_ptr<MessagesDialog> m_messagesDialog;

@@ -40,12 +40,6 @@
 # define DEBUG_QT 1
 #endif
 
-OpenDialog* OpenDialog::getInstance(  qt_intf_t *p_intf )
-{
-    const auto instance = Singleton<OpenDialog>::getInstance(p_intf, nullptr);
-    return instance;
-}
-
 OpenDialog::OpenDialog(qt_intf_t *_p_intf, QWindow* parent )
     :  QVLCDialog( parent, _p_intf )
 {
@@ -267,11 +261,10 @@ void OpenDialog::browseInputSlave()
 {
     QWidget* windowWidget = window();
     QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
-    OpenDialog *od = new OpenDialog( p_intf, parentWindow );
-    od->setActionFlag(SELECT);
-    od->exec();
-    ui.slaveText->setText( od->getMRL( false ) );
-    delete od;
+    OpenDialog od( p_intf, parentWindow );
+    od.setActionFlag(SELECT);
+    od.exec();
+    ui.slaveText->setText( od.getMRL( false ) );
 }
 
 /* Function called on signal currentChanged triggered */

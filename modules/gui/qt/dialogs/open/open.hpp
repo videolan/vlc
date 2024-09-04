@@ -38,11 +38,9 @@
 
 class QString;
 
-class OpenDialog : public QVLCDialog, public Singleton<OpenDialog>
+class OpenDialog : public QVLCDialog
 {
     Q_OBJECT
-
-    friend Singleton<OpenDialog>;
 
 public:
     enum OpenTab {
@@ -63,7 +61,8 @@ public:
 
 
 public:
-    static OpenDialog * getInstance(qt_intf_t *p_intf);
+    OpenDialog(qt_intf_t * , QWindow *parent = nullptr);
+    virtual ~OpenDialog();
 
     void showTab( OpenDialog::OpenTab tab, OpenDialog::ActionFlag action );
     QString getMRL( bool b = true );
@@ -81,9 +80,6 @@ public slots:
     void transcode();
 
 private:
-    OpenDialog(qt_intf_t * , QWindow *parent = nullptr);
-    virtual ~OpenDialog();
-
     QString optionsMRL;
     QString storedMethod;
     QStringList itemsMRL;

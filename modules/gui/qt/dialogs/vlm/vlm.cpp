@@ -342,11 +342,13 @@ void VLMDialog::clearWidgets()
 
 void VLMDialog::selectInput()
 {
-    OpenDialog *o = OpenDialog::getInstance( p_intf );
-    o->setActionFlag(OpenDialog::SELECT);
-    o->exec();
-    ui.inputLedit->setText( o->getMRL( false ) );
-    inputOptions = o->getOptions();
+    QWidget* windowWidget = window();
+    QWindow* parentWindow = windowWidget ? windowWidget->windowHandle() : nullptr;
+    OpenDialog o( p_intf, parentWindow );
+    o.setActionFlag(OpenDialog::SELECT);
+    o.exec();
+    ui.inputLedit->setText( o.getMRL( false ) );
+    inputOptions = o.getOptions();
 }
 
 void VLMDialog::selectOutput()
