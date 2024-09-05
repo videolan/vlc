@@ -160,15 +160,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     self.libraryWindow.librarySegmentType = segment.segmentType;
 
-    if (segmentType > VLCLibraryVideoSegment && segmentType <= VLCLibraryShowsVideoSubSegment) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryVideoSegment]];
-    } else if (segmentType >= VLCLibraryMusicSegment && segmentType <= VLCLibraryGenresMusicSubSegment) {
+    if (segmentType == VLCLibraryMusicSegment) {
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
-    } else if (segmentType >= VLCLibraryBrowseSegment &&
-               segmentType <= VLCLibraryBrowseBookmarkedLocationSubSegment) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryBrowseSegment]];
-    } else if (segmentType == VLCLibraryGroupsGroupSubSegment) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryGroupsSegment]];
     }
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:segmentType];
