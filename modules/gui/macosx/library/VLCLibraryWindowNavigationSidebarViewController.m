@@ -195,14 +195,19 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 {
     NSAssert(outlineView == _outlineView, @"VLCLibraryWindowNavigationSidebarController should only be a delegate for the libraryWindow nav sidebar outline view!");
 
-    if (proposedSelectionIndexes.count == 0 || proposedSelectionIndexes.firstIndex != VLCLibraryMusicSegment) {
-        return proposedSelectionIndexes;
-    } else {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
-        NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegment];
-        const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
-        return [NSIndexSet indexSetWithIndex:artistsIndex];
+    if (proposedSelectionIndexes.count > 0) {
+        NSTreeNode * const node = [self.outlineView itemAtRow:proposedSelectionIndexes.firstIndex];
+        VLCLibrarySegment * const segment = (VLCLibrarySegment *)node.representedObject;
+
+        if (segment.segmentType == VLCLibraryMusicSegment) {
+            [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
+            NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegment];
+            const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
+            return [NSIndexSet indexSetWithIndex:artistsIndex];
+        }
     }
+
+    return proposedSelectionIndexes;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
