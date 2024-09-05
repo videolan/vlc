@@ -152,6 +152,9 @@ MetaPanel::MetaPanel( QWidget *parent,
     art_cover = new CoverArtLabel( this, p_intf );
     metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignCenter );
 
+    fingerprintButton->setMinimumWidth( std::max( fingerprintButton->minimumSizeHint().width(),
+                                                  art_cover->minimumSizeHint().width() ) );
+
     ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
 
     label = new QLabel( qtr( "Comments" ) ); label->setFont( smallFont );
