@@ -788,7 +788,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
         switch (hevc_getNALType(p_nal))
         {
             case HEVC_NAL_VPS:
-                if(params.i_vps_count != HEVC_DCR_VPS_COUNT)
+                if(params.i_vps_count != ARRAY_SIZE(params.p_vps))
                 {
                     params.p_vps[params.i_vps_count] = p_nal;
                     params.rgi_vps[params.i_vps_count] = i_nal;
@@ -796,7 +796,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
                 }
                 break;
             case HEVC_NAL_SPS:
-                if(params.i_sps_count != HEVC_DCR_SPS_COUNT)
+                if(params.i_sps_count != ARRAY_SIZE(params.p_sps))
                 {
                     params.p_sps[params.i_sps_count] = p_nal;
                     params.rgi_sps[params.i_sps_count] = i_nal;
@@ -804,7 +804,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
                 }
                 break;
             case HEVC_NAL_PPS:
-                if(params.i_pps_count != HEVC_DCR_PPS_COUNT)
+                if(params.i_pps_count != ARRAY_SIZE(params.p_pps))
                 {
                     params.p_pps[params.i_pps_count] = p_nal;
                     params.rgi_pps[params.i_pps_count] = i_nal;
@@ -812,7 +812,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
                 }
                 break;
             case HEVC_NAL_PREF_SEI:
-                if(params.i_seipref_count != HEVC_DCR_SEI_COUNT)
+                if(params.i_seipref_count != ARRAY_SIZE(params.p_seipref))
                 {
                     params.p_seipref[params.i_seipref_count] = p_nal;
                     params.rgi_seipref[params.i_seipref_count] = i_nal;
@@ -820,7 +820,7 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
                 }
                 break;
             case HEVC_NAL_SUFF_SEI:
-                if(params.i_seisuff_count != HEVC_DCR_SEI_COUNT)
+                if(params.i_seisuff_count != ARRAY_SIZE(params.p_seisuff))
                 {
                     params.p_seisuff[params.i_seisuff_count] = p_nal;
                     params.rgi_seisuff[params.i_seisuff_count] = i_nal;
