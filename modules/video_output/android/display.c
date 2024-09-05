@@ -63,7 +63,6 @@ struct sys
 {
     AWindowHandler *awh;
     android_video_context_t *avctx;
-    video_format_t fmt;
     struct subpicture sub;
 };
 
@@ -276,8 +275,8 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
     const vlc_window_cfg_t win_cfg = {
         .is_fullscreen = true,
         .is_decorated = false,
-        .width = sys->fmt.i_width,
-        .height = sys->fmt.i_height,
+        .width = vd->source->i_width,
+        .height = vd->source->i_height,
     };
 
     const vlc_window_owner_t win_owner = {
@@ -379,12 +378,8 @@ static void SetVideoLayout(vout_display_t *vd)
 {
     struct sys *sys = vd->sys;
 
-    video_format_CopyCrop(&sys->fmt, vd->source);
-    sys->fmt.i_sar_num = vd->source->i_sar_num;
-    sys->fmt.i_sar_den = vd->source->i_sar_den;
-
     video_format_t rot_fmt;
-    video_format_ApplyRotation(&rot_fmt, &sys->fmt);
+    video_format_ApplyRotation(&rot_fmt, vd->source);
     AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
                                   rot_fmt.i_visible_width,
                                   rot_fmt.i_visible_height,
@@ -466,8 +461,6 @@ static int Open(vout_display_t *vd,
     if (sys == NULL)
         return VLC_ENOMEM;
 
-    video_format_ApplyRotation(&sys->fmt, vd->source);
-
     sys->awh = awh;
     sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
     assert(sys->avctx);
@@ -498,7 +491,7 @@ static int Open(vout_display_t *vd,
     }
 
     video_format_t rot_fmt;
-    video_format_ApplyRotation(&rot_fmt, &sys->fmt);
+    video_format_ApplyRotation(&rot_fmt, vd->source);
 
     AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
                                   rot_fmt.i_visible_width,
