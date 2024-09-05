@@ -74,6 +74,7 @@ vlc_module_begin ()
     add_integer_with_range("dav1d-thread-tiles", 0, 0, DAV1D_MAX_TILE_THREADS,
                 THREAD_TILES_TEXT, THREAD_TILES_LONGTEXT)
 #endif
+    add_bool( "dav1d-all-layers", false, "Display all spatial layers", NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -465,6 +466,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     if (p_sys->s.n_frame_threads == 0)
         p_sys->s.n_frame_threads = __MAX(1, vlc_GetCPUCount());
 #endif
+    p_sys->s.all_layers = var_InheritBool( p_this, "dav1d-all-layers" );
     p_sys->s.allocator.cookie = dec;
     p_sys->s.allocator.alloc_picture_callback = NewPicture;
     p_sys->s.allocator.release_picture_callback = FreePicture;
