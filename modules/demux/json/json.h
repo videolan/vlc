@@ -61,15 +61,19 @@ struct json_member {
     struct json_value value;
 };
 
-size_t json_read(void *data, void *buf, size_t max);
-void json_parse_error(void *log, const char *msg);
+size_t json_read(void *opaque, void *buf, size_t max);
+void json_parse_error(void *opaque, const char *msg);
 char *json_unescape(const char *, size_t);
 
-int json_parse(void *log, struct json_object *result);
+int json_parse(void *opaque, struct json_object *result);
 void json_free(struct json_object *);
 
 const struct json_value *json_get(const struct json_object *obj,
                                   const char *name);
+const struct json_object *json_get_object(const struct json_object *obj,
+                                          const char *name);
+const struct json_array *json_get_array(const struct json_object *obj,
+                                 const char *name);
 const char *json_get_str(const struct json_object *obj, const char *name);
 double json_get_num(const struct json_object *obj, const char *name);
 

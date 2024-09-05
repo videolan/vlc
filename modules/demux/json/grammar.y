@@ -22,7 +22,7 @@
 %define api.prefix {json}
 
 %lex-param { void *scanner }
-%parse-param { void *log }
+%parse-param { void *opaque }
 %parse-param { void *scanner }
 %parse-param { struct json_object *result }
 
@@ -144,14 +144,14 @@ static void json_append(struct json_object *o, struct json_member m)
 
 %{
 
-static void yyerror(void *log, void *scanner, struct json_object *result,
-			const char *msg)
+static void yyerror(void *opaque, void *scanner, struct json_object *result,
+                    const char *msg)
 {
-	json_parse_error(log, msg);
+	json_parse_error(opaque, msg);
 	(void) scanner; (void) result;
 }
 
-extern int jsonlex_init_extra(void *, void **);
+extern int jsonlex_init_extra(const void *, void **);
 extern int yylex(YYSTYPE *value, void *scanner);
 extern int jsonlex_destroy(void *);
 

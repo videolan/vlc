@@ -134,6 +134,21 @@ const struct json_value *json_get(const struct json_object *obj,
     return NULL;
 }
 
+const struct json_object *json_get_object(const struct json_object *obj,
+                                          const char *name)
+{
+    const struct json_value *v = json_get(obj, name);
+    return (v != NULL && v->type == JSON_OBJECT) ? &v->object : NULL;
+}
+
+const struct json_array *json_get_array(const struct json_object *obj,
+                                 const char *name)
+{
+    const struct json_value *v = json_get(obj, name);
+    return (v != NULL && v->type == JSON_ARRAY) ? &v->array : NULL;
+}
+
+
 const char *json_get_str(const struct json_object *obj, const char *name)
 {
     const struct json_value *v = json_get(obj, name);
