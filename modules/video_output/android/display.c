@@ -490,13 +490,7 @@ static int Open(vout_display_t *vd,
         sys->sub.window = NULL;
     }
 
-    video_format_t rot_fmt;
-    video_format_ApplyRotation(&rot_fmt, vd->source);
-
-    AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
-                                  rot_fmt.i_visible_width,
-                                  rot_fmt.i_visible_height,
-                                  rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+    SetVideoLayout(vd);
 
     static const struct vlc_display_operations ops = {
         .close = Close,
