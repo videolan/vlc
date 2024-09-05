@@ -379,6 +379,10 @@ static void SetVideoLayout(vout_display_t *vd, bool crop)
 {
     struct sys *sys = vd->sys;
 
+    video_format_CopyCrop(&sys->fmt, vd->source);
+    sys->fmt.i_sar_num = vd->source->i_sar_num;
+    sys->fmt.i_sar_den = vd->source->i_sar_den;
+
     video_format_t rot_fmt;
     video_format_ApplyRotation(&rot_fmt, &sys->fmt);
     if (crop)
@@ -407,8 +411,6 @@ static int Control(vout_display_t *vd, int query)
                 vd->source->i_visible_width,
                 vd->source->i_visible_height);
 
-        video_format_CopyCrop(&sys->fmt, vd->source);
-
         SetVideoLayout(vd, true);
         return VLC_SUCCESS;
     }
@@ -416,9 +418,6 @@ static int Control(vout_display_t *vd, int query)
     {
         msg_Dbg(vd, "change source aspect: %d/%d", vd->source->i_sar_num,
                 vd->source->i_sar_den);
-
-        sys->fmt.i_sar_num = vd->source->i_sar_num;
-        sys->fmt.i_sar_den = vd->source->i_sar_den;
 
         SetVideoLayout(vd, false);
         return VLC_SUCCESS;
