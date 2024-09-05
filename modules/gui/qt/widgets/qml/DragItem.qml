@@ -132,10 +132,6 @@ Item {
 
     enabled: false
 
-    // Offscreen render:
-    layer.enabled: true
-    layer.effect: Item { }
-
     function _setData(data) {
         console.assert(data.length === indexes.length)
         _data = data
@@ -191,11 +187,7 @@ Item {
 
         const requestId = ++dragItem._grabImageRequest
 
-        visible = true
-
         const s = dragItem.grabToImage(function (result) {
-            visible = false
-
             if (requestId !== dragItem._grabImageRequest
                     || fsmDragInactive.active)
                 return
