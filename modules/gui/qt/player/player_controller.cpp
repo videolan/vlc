@@ -278,9 +278,11 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
     if (!new_media)
     {
         that->callAsync([that] () {
+            {
+                vlc_player_locker lock{ that->m_player };
+                that->m_currentItem.reset(nullptr);
+            }
             emit that->q_func()->inputChanged(false);
-            vlc_player_locker lock{ that->m_player };
-            that->m_currentItem.reset(nullptr);
         });
         return;
     }
