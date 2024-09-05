@@ -80,6 +80,7 @@ MediaInfoDialog::MediaInfoDialog(qt_intf_t *_p_intf,
     closeButton->setDefault( true );
 
     QLabel *uriLabel = new QLabel( qtr( "Location:" ) );
+    uriLabel->setMaximumWidth(uriLabel->minimumSizeHint().width());
     uriLine = new QLineEdit;
     uriLine->setReadOnly( true );
 
