@@ -331,7 +331,7 @@ struct hevc_dcr_params
 {
     const uint8_t *p_vps[HEVC_DCR_VPS_COUNT],
                   *p_sps[HEVC_DCR_SPS_COUNT],
-                  *p_pps[HEVC_DCR_VPS_COUNT],
+                  *p_pps[HEVC_DCR_PPS_COUNT],
                   *p_seipref[HEVC_DCR_SEI_COUNT],
                   *p_seisuff[HEVC_DCR_SEI_COUNT];
     uint16_t rgi_vps[HEVC_DCR_VPS_COUNT],
