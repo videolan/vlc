@@ -466,7 +466,7 @@ static int Open(vout_display_t *vd,
     if (sys == NULL)
         return VLC_ENOMEM;
 
-    video_format_ApplyRotation(&sys->fmt, fmtp);
+    video_format_ApplyRotation(&sys->fmt, vd->source);
 
     sys->awh = awh;
     sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
