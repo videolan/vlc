@@ -201,6 +201,21 @@ libgcrypt_dep = dependency('libgcrypt',
 # Rust support
 cargo_bin = find_program('cargo', required: get_option('rust'))
 
+# JSON library
+json_bison_files = bison_gen.process('demux/json/grammar.y')
+json_lex_files = flex_gen.process('demux/json/lexicon.l')
+
+vlc_json_lib = static_library('vlc_json',
+    sources: [
+      json_bison_files,
+      json_lex_files,
+      'demux/json/json.c',
+    ],
+    include_directories: [vlc_include_dirs, 'demux/json/'],
+    install: false,
+    pic: true
+)
+
 # Array that holds all enabled VLC module dicts
 vlc_modules = []
 vlc_rust_modules = []
