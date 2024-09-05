@@ -375,7 +375,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
         subpicture_Display(vd);
 }
 
-static void SetVideoLayout(vout_display_t *vd, bool crop)
+static void SetVideoLayout(vout_display_t *vd)
 {
     struct sys *sys = vd->sys;
 
@@ -385,16 +385,10 @@ static void SetVideoLayout(vout_display_t *vd, bool crop)
 
     video_format_t rot_fmt;
     video_format_ApplyRotation(&rot_fmt, &sys->fmt);
-    if (crop)
-        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
-                                      rot_fmt.i_visible_width,
-                                      rot_fmt.i_visible_height,
-                                      rot_fmt.i_sar_num, rot_fmt.i_sar_den);
-    else if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
-        AWindowHandler_setVideoLayout(sys->awh, 0, 0,
-                                      rot_fmt.i_visible_width,
-                                      rot_fmt.i_visible_height,
-                                      rot_fmt.i_sar_num, rot_fmt.i_sar_den);
+    AWindowHandler_setVideoLayout(sys->awh, 0, 0,
+                                  rot_fmt.i_visible_width,
+                                  rot_fmt.i_visible_height,
+                                  rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 }
 
 static int Control(vout_display_t *vd, int query)
@@ -412,7 +406,7 @@ static int Control(vout_display_t *vd, int query)
                 vd->source->i_visible_width,
                 vd->source->i_visible_height);
 
-        SetVideoLayout(vd, true);
+        SetVideoLayout(vd);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
@@ -420,7 +414,7 @@ static int Control(vout_display_t *vd, int query)
         msg_Dbg(vd, "change source aspect: %d/%d", vd->source->i_sar_num,
                 vd->source->i_sar_den);
 
-        SetVideoLayout(vd, false);
+        SetVideoLayout(vd);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
