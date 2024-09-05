@@ -161,7 +161,6 @@ MetaPanel::MetaPanel( QWidget *parent,
     description_text->setAcceptRichText( false );
     metaLayout->addWidget( description_text, line, 0, 1, 7 );
     connect( description_text, &QTextEdit::textChanged, this, &MetaPanel::enterEditMode );
-    line++;
 
     /* VLC_META_SETTING: Useless */
     /* ADD_META( TRACKID )  Useless ? */
