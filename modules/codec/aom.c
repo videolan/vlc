@@ -496,7 +496,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     int i_tile_rows = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-rows" );
     int i_tile_columns = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-columns" );
 #ifdef AOM_CTRL_AV1E_SET_ROW_MT
-    bool b_row_mt = var_GetBool( p_enc, SOUT_CFG_PREFIX "row-mt" );
+    bool b_row_mt = var_InheritBool( p_enc, SOUT_CFG_PREFIX "row-mt" );
 #endif
 
     /* TODO: implement higher profiles, bit depths and other pixformats. */
