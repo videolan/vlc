@@ -117,7 +117,7 @@ framework_conditions = [
 
 foreach framework_spec : framework_conditions
     foreach framework_name : framework_spec['frameworks']
-        if framework_spec['condition']
+        if not framework_spec['condition']
             # Not-found dependency
             frameworks += { framework_name: disabler() }
         else
