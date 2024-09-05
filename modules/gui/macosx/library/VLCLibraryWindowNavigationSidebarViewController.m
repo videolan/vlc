@@ -103,6 +103,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:currentSegmentType];
     const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
+    [self expandParentsOfNode:targetNode];
     [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
                   byExtendingSelection:NO];
 
@@ -172,6 +173,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:segmentType];
     const NSInteger segmentIndex = [self.outlineView rowForItem:targetNode];
+    [self expandParentsOfNode:targetNode];
     [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:segmentIndex]
                   byExtendingSelection:NO];
 }
