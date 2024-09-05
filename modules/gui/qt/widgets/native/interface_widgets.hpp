@@ -55,9 +55,10 @@ private:
     qt_intf_t *p_intf;
     SharedInputItem p_item;
 
-public slots:
     void showArtUpdate( const QString& );
-    void showArtUpdate( input_item_t * );
+    void showArtUpdate( );
+
+public slots:
     void askForUpdate();
     void setArtFromFile();
     void clear();

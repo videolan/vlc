@@ -269,19 +269,6 @@ void MetaPanel::update( const SharedInputItem& p_item )
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
-    // If a artURL is available as a local file, directly display it !
-
-    QString file;
-    char *psz_art = input_item_GetArtURL( inputItem );
-    if( psz_art )
-    {
-        char *psz = vlc_uri2path( psz_art );
-        free( psz_art );
-        file = qfu( psz );
-        free( psz );
-    }
-
-    art_cover->showArtUpdate( file );
     art_cover->setItem( p_item );
 }
 

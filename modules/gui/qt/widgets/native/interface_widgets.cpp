@@ -62,14 +62,9 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     connect( action, &QAction::triggered, this, &CoverArtLabel::setArtFromFile );
     addAction( action );
 
-    p_item = SharedInputItem{ THEMIM->getInput() } ;
-    if( p_item )
-    {
-        showArtUpdate( p_item.get() );
-        setContextMenuPolicy( Qt::ActionsContextMenu );
-    }
-    else
-        showArtUpdate( "" );
+    setItem( SharedInputItem{ THEMIM->getInput() } );
+    if ( !p_item )
+        showArtUpdate( );
 }
 
 CoverArtLabel::~CoverArtLabel()
@@ -90,6 +85,8 @@ void CoverArtLabel::setItem( const SharedInputItem& _p_item )
         setContextMenuPolicy( Qt::ActionsContextMenu );
     else
         setContextMenuPolicy( Qt::NoContextMenu );
+
+    showArtUpdate( );
 }
 
 void CoverArtLabel::mouseDoubleClickEvent( QMouseEvent *event )
@@ -117,14 +114,10 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     setPixmap( pix );
 }
 
-void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
+void CoverArtLabel::showArtUpdate( )
 {
-    /* not for me */
-    if ( _p_item != p_item.get() )
-        return;
-
     QString url;
-    if ( _p_item ) url = THEMIM->decodeArtURL( _p_item );
+    if ( p_item ) url = THEMIM->decodeArtURL( p_item.get() );
     showArtUpdate( url );
 }
 
