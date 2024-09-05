@@ -81,6 +81,9 @@ CoverArtLabel::~CoverArtLabel()
 
 void CoverArtLabel::setItem( const SharedInputItem& _p_item )
 {
+    if( _p_item == p_item )
+        return;
+
     p_item = _p_item;
 
     if( p_item )
