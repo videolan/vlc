@@ -113,9 +113,9 @@ MediaInfoDialog::MediaInfoDialog(qt_intf_t *_p_intf,
          **/
         connect( THEMIM, &PlayerController::infoChanged,
                   IP, &InfoPanel::update, Qt::DirectConnection  );
-        connect( THEMIM, &PlayerController::currentMetaChanged,
-            MP, [this](input_item_t* const inputItem) {
-                MP->update( SharedInputItem { inputItem } );
+        connect( THEMIM, &PlayerController::inputChanged,
+            MP, [this]() {
+                MP->update( SharedInputItem { THEMIM->getInput() } );
             }, Qt::DirectConnection  );
         connect( THEMIM, &PlayerController::currentMetaChanged,
                   EMP, &ExtraMetaPanel::update, Qt::DirectConnection );
