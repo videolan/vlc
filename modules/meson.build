@@ -90,7 +90,6 @@ framework_conditions = [
             'AudioToolbox',
             'IOKit',
             'QuartzCore',
-            'QuartzText',
             'CoreText',
             'CoreAudio',
             'CoreImage',
