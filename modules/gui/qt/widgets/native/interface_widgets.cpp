@@ -46,7 +46,6 @@
 CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     : QLabel( parent ), p_intf( _p_i )
 {
-    setContextMenuPolicy( Qt::ActionsContextMenu );
     connect( THEMIM, QOverload<QString>::of(&PlayerController::artChanged),
              this, QOverload<const QString&>::of(&CoverArtLabel::showArtUpdate) );
 
@@ -67,6 +66,7 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, qt_intf_t *_p_i )
     if( p_item )
     {
         showArtUpdate( p_item.get() );
+        setContextMenuPolicy( Qt::ActionsContextMenu );
     }
     else
         showArtUpdate( "" );
@@ -82,6 +82,11 @@ CoverArtLabel::~CoverArtLabel()
 void CoverArtLabel::setItem( const SharedInputItem& _p_item )
 {
     p_item = _p_item;
+
+    if( p_item )
+        setContextMenuPolicy( Qt::ActionsContextMenu );
+    else
+        setContextMenuPolicy( Qt::NoContextMenu );
 }
 
 void CoverArtLabel::mouseDoubleClickEvent( QMouseEvent *event )
@@ -122,13 +127,14 @@ void CoverArtLabel::showArtUpdate( input_item_t *_p_item )
 
 void CoverArtLabel::askForUpdate()
 {
+    assert( p_item );
+
     THEMIM->requestArtUpdate( p_item.get(), true );
 }
 
 void CoverArtLabel::setArtFromFile()
 {
-    if( !p_item )
-        return;
+    assert( p_item );
 
     QUrl fileUrl = QFileDialog::getOpenFileUrl( this, qtr( "Choose Cover Art" ),
         p_intf->p_mi->getDialogFilePath(), qtr( "Image Files (*.gif *.jpg *.jpeg *.png)" ) );
