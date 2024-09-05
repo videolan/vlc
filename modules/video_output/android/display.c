@@ -385,7 +385,7 @@ static void SetVideoLayout(vout_display_t *vd)
 
     video_format_t rot_fmt;
     video_format_ApplyRotation(&rot_fmt, &sys->fmt);
-    AWindowHandler_setVideoLayout(sys->awh, 0, 0,
+    AWindowHandler_setVideoLayout(sys->awh, rot_fmt.i_width, rot_fmt.i_height,
                                   rot_fmt.i_visible_width,
                                   rot_fmt.i_visible_height,
                                   rot_fmt.i_sar_num, rot_fmt.i_sar_den);
