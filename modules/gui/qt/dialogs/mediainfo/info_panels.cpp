@@ -134,7 +134,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     fingerprintButton = new QPushButton( qtr("&Fingerprint") );
     fingerprintButton->setToolTip( qtr( "Find meta data using audio fingerprinting" ) );
-    fingerprintButton->setVisible( false );
+    fingerprintButton->setEnabled( false );
     metaLayout->addWidget( fingerprintButton, line, 7 , 3, -1 );
     connect( fingerprintButton, &QPushButton::clicked, this, &MetaPanel::fingerprint );
 
@@ -225,7 +225,7 @@ void MetaPanel::update( const SharedInputItem& p_item )
     psz_meta = input_item_GetURI( inputItem );
     if( !EMPTY_STR( psz_meta ) )
         emit uriSet( qfu( psz_meta ) );
-    fingerprintButton->setVisible( Chromaprint::isSupported( QString( psz_meta ) ) );
+    fingerprintButton->setEnabled( Chromaprint::isSupported( QString( psz_meta ) ) );
     free( psz_meta );
 
     /* Other classic though */
@@ -351,7 +351,7 @@ void MetaPanel::clear()
     publisher_text->clear();
     encodedby_text->clear();
     art_cover->clear();
-    fingerprintButton->setVisible( false );
+    fingerprintButton->setEnabled( false );
     lblURL->clear();
 
     setEditMode( false );
