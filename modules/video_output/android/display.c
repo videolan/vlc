@@ -602,26 +602,25 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
     {
-        msg_Dbg(vd, "change source crop: %ux%u @ %ux%u aspect: %u/%u",
-                vd->source->i_x_offset, vd->source->i_y_offset,
-                vd->source->i_visible_width,
-                vd->source->i_visible_height,
-                vd->source->i_sar_num,
-                vd->source->i_sar_den);
+        if (query == VOUT_DISPLAY_CHANGE_SOURCE_PLACE)
+            msg_Dbg(vd, "change source place: %dx%d @ %ux%u",
+                    vd->place->x, vd->place->y,
+                    vd->place->width, vd->place->height);
+        else
+            msg_Dbg(vd, "change source crop: %ux%u @ %ux%u aspect: %u/%u",
+                    vd->source->i_x_offset, vd->source->i_y_offset,
+                    vd->source->i_visible_width,
+                    vd->source->i_visible_height,
+                    vd->source->i_sar_num,
+                    vd->source->i_sar_den);
         if (sys->asc.sc != NULL)
             UpdateASCGeometry(vd);
         else
             SetVideoLayout(vd);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        msg_Dbg(vd, "change source place: %dx%d @ %ux%u",
-                vd->place->x, vd->place->y,
-                vd->place->width, vd->place->height);
-        if (sys->asc.sc != NULL)
-            UpdateASCGeometry(vd);
-        return VLC_SUCCESS;
     default:
         msg_Warn(vd, "Unknown request in android-display: %d", query);
         return VLC_EGENERIC;
