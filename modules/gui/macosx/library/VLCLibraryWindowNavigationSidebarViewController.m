@@ -136,6 +136,20 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     return nil;
 }
 
+- (void)expandParentsOfNode:(NSTreeNode *)targetNode
+{
+    NSMutableArray * const parentNodes = NSMutableArray.array;
+    NSTreeNode *currentNode = targetNode.parentNode;
+    while (currentNode != nil) {
+        [parentNodes insertObject:currentNode atIndex:0];
+        currentNode = currentNode.parentNode;
+    }
+
+    for (NSTreeNode * const node in parentNodes) {
+        [self.outlineView expandItem:node];
+    }
+}
+
 - (void)selectSegment:(NSInteger)segmentType
 {
     NSAssert(segmentType > VLCLibraryLowSentinelSegment &&
