@@ -392,7 +392,8 @@ static void SetVideoLayout(vout_display_t *vd, bool crop)
                                       rot_fmt.i_sar_num, rot_fmt.i_sar_den);
     else if (rot_fmt.i_sar_num != 0 && rot_fmt.i_sar_den != 0)
         AWindowHandler_setVideoLayout(sys->awh, 0, 0,
-                                      0, 0,
+                                      rot_fmt.i_visible_width,
+                                      rot_fmt.i_visible_height,
                                       rot_fmt.i_sar_num, rot_fmt.i_sar_den);
 }
 
