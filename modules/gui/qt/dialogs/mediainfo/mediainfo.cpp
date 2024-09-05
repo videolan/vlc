@@ -77,6 +77,7 @@ MediaInfoDialog::MediaInfoDialog(qt_intf_t *_p_intf,
     saveMetaButton = new QPushButton( qtr( "&Save Metadata" ) );
     saveMetaButton->hide();
     QPushButton *closeButton = new QPushButton( qtr( "&Close" ) );
+    closeButton->setMaximumWidth(closeButton->minimumSizeHint().width());
     closeButton->setDefault( true );
 
     QLabel *uriLabel = new QLabel( qtr( "Location:" ) );
