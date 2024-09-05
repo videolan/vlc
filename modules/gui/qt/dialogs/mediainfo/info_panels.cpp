@@ -150,7 +150,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     /* ART_URL */
     art_cover = new CoverArtLabel( this, p_intf );
-    metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignLeft );
+    metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignCenter );
 
     ADD_META( VLC_META_ENCODED_BY, encodedby_text, 0, 7 ); line++;
 
