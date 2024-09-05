@@ -666,9 +666,10 @@ h264_helper_get_annexb_config(const struct hxxx_helper *hh)
     const struct hxxx_helper_nal *pp_nal_lists[] = {
         hh->h264.sps_list, hh->h264.pps_list, hh->h264.spsext_list };
     const size_t p_nal_counts[] = { hh->h264.i_sps_count, hh->h264.i_pps_count, hh->h264.i_spsext_count };
-    const size_t p_nal_maxs[] = { H264_SPS_ID_MAX+1, H264_PPS_ID_MAX+1, H264_SPSEXT_ID_MAX+1 };
+    const size_t p_nal_maxs[] = {
+        ARRAY_SIZE(hh->h264.sps_list), ARRAY_SIZE(hh->h264.pps_list), ARRAY_SIZE(hh->h264.spsext_list) };
 
-    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 3 );
+    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, ARRAY_SIZE(p_nal_counts) );
 }
 
 static block_t *
@@ -682,9 +683,10 @@ hevc_helper_get_annexb_config(const struct hxxx_helper *hh)
         hh->hevc.vps_list, hh->hevc.sps_list, hh->hevc.pps_list };
     const size_t p_nal_counts[] = { hh->hevc.i_vps_count, hh->hevc.i_sps_count,
                                     hh->hevc.i_pps_count };
-    const size_t p_nal_maxs[] = { HEVC_VPS_ID_MAX+1, HEVC_SPS_ID_MAX+1, HEVC_PPS_ID_MAX+1 };
+    const size_t p_nal_maxs[] = {
+        ARRAY_SIZE(hh->hevc.vps_list), ARRAY_SIZE(hh->hevc.sps_list), ARRAY_SIZE(hh->hevc.pps_list) };
 
-    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, 3 );
+    return hxxx_helper_get_annexb_config( pp_nal_lists, p_nal_counts, p_nal_maxs, ARRAY_SIZE(p_nal_counts) );
 }
 
 static block_t *
