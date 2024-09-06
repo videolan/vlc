@@ -130,11 +130,13 @@ FocusScope {
         }
 
         onTransactionPendingChanged: {
-            if (transactionPending)
+            if (transactionPending) {
+                MainCtx.setCursor(root, Qt.BusyCursor)
                 visibilityTimer.start()
-            else {
+            } else {
                 visibilityTimer.stop()
                 progressIndicator.visible = false
+                MainCtx.unsetCursor(root)
             }
         }
     }
@@ -150,13 +152,6 @@ FocusScope {
         z: 99
 
         text: qsTr("Processing...")
-
-        onVisibleChanged: {
-            if (visible)
-                MainCtx.setCursor(root, Qt.BusyCursor)
-            else
-                MainCtx.unsetCursor(root)
-        }
 
         Timer {
             id: visibilityTimer
