@@ -293,13 +293,9 @@ Item {
                 dragItem._dropFailedCallback = null
                 dragItem._dropCallback = null
                 dragItem._inputItems = undefined
-
-                MainCtx.setCursor(Qt.DragMoveCursor)
             }
 
             function exit() {
-                MainCtx.restoreCursor()
-
                 _pendingNativeDragStart = false
             }
 
