@@ -277,6 +277,7 @@
     intf_thread_t *p_intf = getIntf();
     msg_Dbg(p_intf, "Deinitializing extensions manager");
 
+    [self unloadExtensions];
     _extensionDialogProvider = nil;
     if (p_extensions_manager)
         vlc_object_delete(p_extensions_manager);
