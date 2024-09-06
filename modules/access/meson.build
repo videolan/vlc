@@ -202,6 +202,7 @@ endif
 
 
 ## Optical media
+#
 
 # VCD and CD-DA access module
 if get_option('vcd_module')
@@ -238,10 +239,10 @@ if get_option('vcd_module')
             'sources' : files(
                 'cdda.c',
                 'vcd/cdrom.c',
-                '../misc/webservices/json.c',
                 '../misc/webservices/musicbrainz.c',
             ),
             'c_args' : vcd_cdda_flags,
+            'link_with' : vlc_json_lib,
             'dependencies' : [libcddb_dep, vcd_cdda_darwin_deps]
         }
 

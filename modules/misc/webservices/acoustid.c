@@ -22,6 +22,9 @@
 # include "config.h"
 #endif
 
+#include <vlc_common.h>
+#include <vlc_messages.h>
+
 #include "json_helper.h"
 #include "acoustid.h"
 
@@ -39,36 +42,43 @@ void acoustid_result_release( acoustid_result_t * r )
     free( r->recordings.p_recordings );
 }
 
-static void parse_artists( const json_value *node, acoustid_mb_result_t *record )
+static void parse_artists( const struct json_array *artists, acoustid_mb_result_t *record )
 {
     /* take only main */
-    if ( !node || node->type != json_array || node->u.array.length < 1 )
+    if ( artists->size < 1)
         return;
-    record->psz_artist = json_dupstring( node->u.array.values[ 0 ], "name" );
+    if (artists->entries[0].type == JSON_OBJECT) {
+        record->psz_artist = json_dupstring( &artists->entries[ 0 ].object, "name" );
+    }
 }
 
-static void parse_recordings( vlc_object_t *p_obj, const json_value *node, acoustid_result_t *p_result )
+static void parse_recordings( vlc_object_t *p_obj, const struct json_object *object,
+                              acoustid_result_t *p_result )
 {
-    if ( !node || node->type != json_array ) return;
-    p_result->recordings.p_recordings = calloc( node->u.array.length, sizeof(acoustid_mb_result_t) );
+    const struct json_array *recordings = json_get_array(object, "recordings");
+    if (recordings == NULL)
+        return;
+    p_result->recordings.p_recordings = calloc( recordings->size, sizeof(acoustid_mb_result_t) );
     if ( ! p_result->recordings.p_recordings ) return;
-    p_result->recordings.count = node->u.array.length;
+    p_result->recordings.count = recordings->size;
 
-    for( unsigned int i=0; i<node->u.array.length; i++ )
+    for( unsigned int i = 0; i < recordings->size; i++ )
     {
         acoustid_mb_result_t *record = & p_result->recordings.p_recordings[ i ];
-        const json_value *recordnode = node->u.array.values[ i ];
-        if ( !recordnode || recordnode->type != json_object )
+        struct json_value *recordnode = &recordings->entries[ i ];
+        if ( recordnode->type != JSON_OBJECT )
             break;
-        record->psz_title = json_dupstring( recordnode, "title" );
-        const json_value *value = json_getbyname( recordnode, "id" );
-        if ( value && value->type == json_string )
+        record->psz_title = json_dupstring( &recordnode->object, "title" );
+        const char *id = json_get_str( &recordnode->object, "id" );
+        if ( id != NULL )
         {
-            size_t i_len = strlen( value->u.string.ptr );
+            size_t i_len = strlen( id );
             i_len = __MIN( i_len, MB_ID_SIZE );
-            memcpy( record->s_musicbrainz_id, value->u.string.ptr, i_len );
+            memcpy( record->s_musicbrainz_id, id, i_len );
         }
-        parse_artists( json_getbyname( recordnode, "artists" ), record );
+        const struct json_array *artists = json_get_array(&recordnode->object,
+                                                          "artists");
+        parse_artists( artists, record );
         msg_Dbg( p_obj, "recording %d title %s %36s %s", i, record->psz_title,
                  record->s_musicbrainz_id, record->psz_artist );
     }
@@ -77,49 +87,59 @@ static void parse_recordings( vlc_object_t *p_obj, const json_value *node, acous
 static bool ParseJson( vlc_object_t *p_obj, const void *p_buffer, size_t i_buffer,
                        acoustid_results_t *p_results )
 {
-    json_value *root = json_parse_document( p_obj, p_buffer, i_buffer );
-    if( !root )
-        return false;
+    struct json_helper_sys sys;
+    sys.logger = p_obj->logger;
+    sys.buffer = p_buffer;
+    sys.size = i_buffer;
 
-    const json_value *node = json_getbyname( root, "status" );
-    if ( !node || node->type != json_string )
+    struct json_object json;
+    int val = json_parse(&sys, &json);
+    if (val) {
+        msg_Dbg( p_obj, "error: could not parse json!");
+        return false;
+    }
+
+    const char *status = json_get_str(&json, "status");
+    if (status == NULL)
     {
         msg_Warn( p_obj, "status node not found or invalid" );
-        goto error;
+        json_free(&json);
+        return false;
     }
-    if ( strcmp( node->u.string.ptr, "ok" ) != 0 )
+    if (strcmp(status, "ok") != 0)
     {
         msg_Warn( p_obj, "Bad request status" );
-        goto error;
+        json_free(&json);
+        return false;
     }
-    node = json_getbyname( root, "results" );
-    if ( !node || node->type != json_array )
+    const struct json_array *results = json_get_array(&json, "results");
+    if (results == NULL)
     {
         msg_Warn( p_obj, "Bad results array or no results" );
-        goto error;
+        json_free(&json);
+        return false;
     }
-    p_results->p_results = calloc( node->u.array.length, sizeof(acoustid_result_t) );
-    if ( ! p_results->p_results ) goto error;
-    p_results->count = node->u.array.length;
-    for( unsigned int i=0; i<node->u.array.length; i++ )
+    p_results->p_results = calloc(results->size, sizeof(acoustid_result_t));
+    if ( ! p_results->p_results ) {
+        json_free(&json);
+        return false;
+    }
+    p_results->count = results->size;
+    for( unsigned int i=0; i<results->size; i++ )
     {
-        const json_value *resultnode = node->u.array.values[i];
-        if ( resultnode && resultnode->type == json_object )
+        const struct json_value *resultnode = &results->entries[i];
+        if ( resultnode->type == JSON_OBJECT )
         {
             acoustid_result_t *p_result = & p_results->p_results[i];
-            const json_value *value = json_getbyname( resultnode, "score" );
-            if ( value && value->type == json_double )
-                p_result->d_score = value->u.dbl;
-            p_result->psz_id = json_dupstring( resultnode, "id" );
-            parse_recordings( p_obj, json_getbyname( resultnode, "recordings" ), p_result );
+            double score = json_get_num(&resultnode->object, "score");
+            if (score != NAN)
+                p_result->d_score = score;
+            p_result->psz_id = json_dupstring(&resultnode->object, "id");
+            parse_recordings( p_obj, &resultnode->object, p_result );
         }
     }
-    json_value_free( root );
+    json_free(&json);
     return true;
-
-error:
-    if ( root ) json_value_free( root );
-    return false;
 }
 
 int acoustid_lookup_fingerprint( const acoustid_config_t *p_cfg, acoustid_fingerprint_t *p_data )

@@ -27,10 +27,10 @@ vlc_modules += {
     'name' : 'fingerprinter',
     'sources' : files(
         'fingerprinter.c',
-        'webservices/json.c',
         'webservices/acoustid.c',
     ),
-    'dependencies' : [m_lib]
+    'dependencies' : [m_lib],
+    'link_with' : vlc_json_lib,
 }
 
 # libxml2 module

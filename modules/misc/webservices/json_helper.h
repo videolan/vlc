@@ -26,57 +26,13 @@
 
 #include <limits.h>
 
-#include "json.h"
+#include "../../demux/json/json.h"
 
 static inline
-const json_value * json_getbyname(const json_value *object, const char *psz_name)
+char * json_dupstring(const struct json_object *obj, const char *key)
 {
-    if (object->type != json_object) return NULL;
-    for (unsigned int i=0; i < object->u.object.length; i++)
-        if (strcmp(object->u.object.values[i].name, psz_name) == 0)
-            return object->u.object.values[i].value;
-    return NULL;
-}
-
-static inline
-char * jsongetstring(const json_value *node, const char *key)
-{
-    node = json_getbyname(node, key);
-    if (node && node->type == json_string)
-        return node->u.string.ptr;
-    return NULL;
-}
-
-static inline
-char * json_dupstring(const json_value *node, const char *key)
-{
-    const char *str = jsongetstring(node, key);
+    const char *str = json_get_str(obj, key);
     return (str) ? strdup(str) : NULL;
-}
-
-static inline
-json_value * json_parse_document(vlc_object_t *p_obj, const char *psz_buffer, size_t i_buffer)
-{
-    json_settings settings;
-    char psz_error[128];
-    memset (&settings, 0, sizeof (json_settings));
-    json_value *root = json_parse_ex(&settings, psz_buffer, i_buffer, psz_error);
-    if (root == NULL)
-    {
-        msg_Warn(p_obj, "Can't parse json data: %s", psz_error);
-        goto error;
-    }
-    if (root->type != json_object)
-    {
-        msg_Warn(p_obj, "wrong json root node");
-        goto error;
-    }
-
-    return root;
-
-error:
-    if (root) json_value_free(root);
-    return NULL;
 }
 
 static inline
@@ -121,6 +77,32 @@ void * json_retrieve_document(vlc_object_t *p_obj, const char *psz_url, size_t *
     p_buffer[*buf_size++] = '\0';
 
     return p_buffer;
+}
+
+struct json_helper_sys {
+    struct vlc_logger *logger;
+    const char *buffer;
+    size_t size;
+};
+
+void json_parse_error(void *data, const char *msg)
+{
+    struct json_helper_sys *sys = data;
+
+    vlc_error(sys->logger, "%s", msg);
+}
+
+size_t json_read(void *data, void *buf, size_t size)
+{
+    struct json_helper_sys *sys = data;
+
+    /* Read the smallest number of byte between size and the string length */
+    size_t s = size < sys->size ? size : sys->size; 
+    memcpy(buf, sys->buffer, s);
+
+    sys->buffer += s;
+    sys->size -= s;
+    return s;
 }
 
 #endif
