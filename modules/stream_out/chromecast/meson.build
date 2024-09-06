@@ -56,11 +56,11 @@ vlc_modules += {
         'chromecast_common.h',
         'chromecast_ctrl.cpp',
         'chromecast_communication.cpp',
-        '../../misc/webservices/json.c',
-        '../../misc/webservices/json.h',
+        '../../demux/json/json.c',
         '../renderer_common.cpp',
         '../renderer_common.hpp') +
         chromecast_proto,
     'dependencies' : [socket_libs, protobuf_dep],
+    'link_with' : vlc_json_lib,
     'enabled': get_option('stream_outputs') and protobuf_dep.found() and protoc.found(),
 }

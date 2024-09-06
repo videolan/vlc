@@ -140,10 +140,10 @@ libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/cast.cpp stre
                                              stream_out/renderer_common.hpp \
                                              stream_out/renderer_common.cpp \
                                              stream_out/chromecast/chromecast_common.h stream_out/chromecast/chromecast_ctrl.cpp \
-                                             misc/webservices/json.h misc/webservices/json.c stream_out/chromecast/chromecast_communication.cpp
+                                             stream_out/chromecast/chromecast_communication.cpp
 nodist_libstream_out_chromecast_plugin_la_SOURCES = stream_out/chromecast/@PROTOBUF_VERSION@/cast_channel.pb.cc
 libstream_out_chromecast_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Istream_out/chromecast/@PROTOBUF_VERSION@ $(CHROMECAST_CFLAGS)
-libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS)
+libstream_out_chromecast_plugin_la_LIBADD = $(CHROMECAST_LIBS) $(SOCKET_LIBS) libvlc_json.la 
 CLEANFILES += $(nodist_libstream_out_chromecast_plugin_la_SOURCES)
 
 if ENABLE_SOUT

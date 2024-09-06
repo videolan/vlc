@@ -221,10 +221,10 @@ private:
 
     void mainLoop();
     void processAuthMessage( const castchannel::CastMessage& msg );
-    void processHeartBeatMessage( const castchannel::CastMessage& msg );
-    bool processReceiverMessage( const castchannel::CastMessage& msg );
-    void processMediaMessage( const castchannel::CastMessage& msg );
-    void processConnectionMessage( const castchannel::CastMessage& msg );
+    void processHeartBeatMessage( const castchannel::CastMessage& msg , const struct json_object *entry );
+    bool processReceiverMessage( const castchannel::CastMessage& msg , const struct json_object *entry );
+    void processMediaMessage( const castchannel::CastMessage& msg , const struct json_object *entry );
+    void processConnectionMessage( const castchannel::CastMessage& msg , const struct json_object *entry );
 
 private:
     static void* ChromecastThread(void* p_data);
