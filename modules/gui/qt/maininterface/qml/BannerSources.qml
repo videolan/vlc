@@ -422,17 +422,10 @@ T.ToolBar {
                                     anchors.fill: parent
 
                                     onContainsDragChanged: {
-                                        if (containsDrag) {
+                                        if (containsDrag)
                                             _timer.restart()
-
-                                            if (plListView)
-                                                MainCtx.setCursor(Qt.DragCopyCursor)
-                                        } else {
+                                        else
                                             _timer.stop()
-
-                                            if (plListView)
-                                                MainCtx.restoreCursor()
-                                        }
                                     }
 
                                     onEntered: (drag) => {
