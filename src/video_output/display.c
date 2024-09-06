@@ -98,12 +98,14 @@ static void vout_display_PlaceRotatedPicture(vout_display_place_t *restrict plac
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                            source, dp);
 
-    const unsigned width  = source->i_visible_width;
-    const unsigned height = source->i_visible_height;
     /* Compute the height if we use the width to fill up display_width */
-    const int64_t scaled_height = (int64_t)height * display_width  * dp->sar.num * source->i_sar_den / (width  * source->i_sar_num * dp->sar.den);
+    const int64_t scaled_height =
+        (int64_t)source->i_visible_height * source->i_sar_den * dp->sar.num * display_width /
+                (source->i_visible_width  * source->i_sar_num * dp->sar.den);
     /* And the same but switching width/height */
-    const int64_t scaled_width  = (int64_t)width  * display_height * dp->sar.den * source->i_sar_num / (height * source->i_sar_den * dp->sar.num);
+    const int64_t scaled_width  =
+        (int64_t)source->i_visible_width  * source->i_sar_num * dp->sar.den * display_height /
+                (source->i_visible_height * source->i_sar_den * dp->sar.num);
 
     if (source->projection_mode == PROJECTION_MODE_RECTANGULAR) {
         bool fit_height;
