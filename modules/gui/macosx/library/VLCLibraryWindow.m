@@ -391,6 +391,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
     [lvc presentHomeView];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showVideoLibrary
@@ -400,6 +401,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     [lvc presentVideoView];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showShowLibrary
@@ -409,6 +411,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
     [lvc presentShowsView];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showAudioLibrary
@@ -418,6 +421,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
     [lvc presentAudioView];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showPlaylistLibrary:(enum vlc_ml_playlist_type_t)playlistType
@@ -433,6 +437,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:self];
     [lvc presentPlaylistsViewForPlaylistType:playlistType];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showMediaSourceLibrary
@@ -447,7 +452,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else if (segmentType == VLCLibraryStreamsSegment) {
         [self.libraryMediaSourceViewController presentStreamsView];
     }
-    _librarySegmentViewController = self.libraryMediaSourceViewController;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)showGroupsLibrary
@@ -457,24 +462,28 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:self];
     [lvc presentGroupsView];
     _librarySegmentViewController = lvc;
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showAudioLibrary];
     [(VLCLibraryAudioViewController *)self.librarySegmentViewController presentLibraryItem:libraryItem];
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)presentVideoLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showVideoLibrary];
     [(VLCLibraryVideoViewController *)self.librarySegmentViewController presentLibraryItem:libraryItem];
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)presentGroupLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showGroupsLibrary];
     [(VLCLibraryAudioViewController *)self.librarySegmentViewController presentLibraryItem:libraryItem];
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
@@ -508,6 +517,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [self goToBrowseSection:self];
     [self.libraryMediaSourceViewController presentLocalFolderMrl:mrl];
+    [self handleLibraryTargetViewChanged];
 }
 
 - (IBAction)sortLibrary:(id)sender
@@ -719,6 +729,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                     multiplier:1.
                                       constant:0.]
     ]];
+    [self handleLibraryTargetViewChanged];
 }
 
 - (void)enableVideoPlaybackAppearance
