@@ -91,6 +91,9 @@ const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
+NSString * const VLCLibraryWindowLibraryTargetViewChangedNotification =
+    @"VLCLibraryWindowLibraryTargetViewChangedNotification";
+
 @interface VLCLibraryWindow ()
 {
     NSInteger _currentSelectedViewModeSegment;
