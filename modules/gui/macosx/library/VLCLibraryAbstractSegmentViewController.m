@@ -22,6 +22,22 @@
 
 #import "VLCLibraryAbstractSegmentViewController.h"
 
+#import "VLCLibraryWindow.h"
+
 @implementation VLCLibraryAbstractSegmentViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    NSParameterAssert(libraryWindow);
+    self = [super init];
+    if (self) {
+        _libraryWindow = libraryWindow;
+        _libraryTargetView = libraryWindow.libraryTargetView;
+        _emptyLibraryView = libraryWindow.emptyLibraryView;
+        _placeholderImageView = libraryWindow.placeholderImageView;
+        _placeholderLabel = libraryWindow.placeholderLabel;
+    }
+    return self;
+}
 
 @end
