@@ -395,12 +395,14 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
 
+    [self.audioGroupDataSource connect];
     [self reloadData];
 }
 
 - (void)disconnect
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+    [self.audioGroupDataSource disconnect];
 }
 
 + (void)setupCollectionView:(NSCollectionView *)collectionView
