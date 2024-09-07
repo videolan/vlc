@@ -257,7 +257,7 @@
 // itself, or move this into a common superclass
 - (void)presentPlaceholderPlaylistLibraryView
 {
-    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.audioPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint * const constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {

@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibrarySegment.h"
+#import "library/VLCLibraryAbstractSegmentViewController.h"
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
@@ -33,10 +34,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioViewController : NSObject
+@interface VLCLibraryAudioViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *audioLibraryView;
 @property (readonly) NSSplitView *audioLibrarySplitView;
 @property (readonly) NSScrollView *audioCollectionSelectionTableViewScrollView;
@@ -52,15 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *audioLibraryGridModeSplitViewListTableView;
 @property (readonly) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readonly) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
-@property (readonly) NSImageView *placeholderImageView;
-@property (readonly) NSTextField *placeholderLabel;
-@property (readonly) NSView *emptyLibraryView;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;
 @property (readonly) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
-
-@property (readonly) NSArray<NSLayoutConstraint *> *audioPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
