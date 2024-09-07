@@ -52,6 +52,7 @@
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
     NSMutableSet<NSString *> *_ongoingLongLoadingNotifications;
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
+    NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
 }
 @end
 
@@ -59,7 +60,7 @@
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithLibraryWindow:libraryWindow];
 
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
@@ -104,15 +105,9 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
-    _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
     _homeLibraryView = libraryWindow.homeLibraryView;
     _homeLibraryStackViewScrollView = libraryWindow.homeLibraryStackViewScrollView;
     _homeLibraryStackView = libraryWindow.homeLibraryStackView;
-
-    _placeholderImageView = libraryWindow.placeholderImageView;
-    _placeholderLabel = libraryWindow.placeholderLabel;
-    _emptyLibraryView = libraryWindow.emptyLibraryView;
 }
 
 - (void)setupLoadingOverlayView
@@ -160,15 +155,15 @@
 
 - (void)setupHomePlaceholderView
 {
-    _homePlaceholderImageViewSizeConstraints = @[
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+    _internalPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
                                      attribute:NSLayoutAttributeWidth
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
                                      attribute:NSLayoutAttributeNotAnAttribute
                                     multiplier:0.f
                                       constant:182.f],
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
                                      attribute:NSLayoutAttributeHeight
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
@@ -189,6 +184,11 @@
 }
 
 #pragma mark - Show the video library view
+
+- (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
+{
+    return _internalPlaceholderImageViewSizeConstraints;
+}
 
 - (void)updatePresentedView
 {
@@ -215,7 +215,7 @@
     for (NSLayoutConstraint * const constraint in videoPlaceholderConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint *constraint in self.homePlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint *constraint in self.placeholderImageViewSizeConstraints) {
         constraint.active = YES;
     }
 
@@ -225,7 +225,7 @@
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
-    NSDictionary * const dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
+    NSDictionary * const dict = NSDictionaryOfVariableBindings(self.emptyLibraryView);
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
     [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
@@ -267,7 +267,7 @@
          (videoCount > 0 && !homeLibraryViewPresent) ||
          (audioCount == 0 && !emptyLibraryViewPresent) ||
          (audioCount > 0 && !homeLibraryViewPresent)) &&
-        _libraryWindow.videoViewController.view.hidden) {
+        self.libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
     }

@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryAbstractSegmentViewController.h"
+
 @class VLCLoadingOverlayView;
 @class VLCLibraryWindow;
 @class VLCLibraryHomeViewStackViewController;
@@ -32,24 +34,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the home library views
 
-@interface VLCLibraryHomeViewController : NSObject
+@interface VLCLibraryHomeViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *homeLibraryView;
 @property (readonly) NSScrollView *homeLibraryStackViewScrollView;
 @property (readonly) NSStackView *homeLibraryStackView;
 @property (readonly) NSSegmentedControl *segmentedTitleControl;
-@property (readonly) NSImageView *placeholderImageView;
-@property (readonly) NSTextField *placeholderLabel;
-@property (readonly) NSView *emptyLibraryView;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryHomeViewStackViewController *stackViewController;
 
-@property (readonly) NSArray<NSLayoutConstraint *> *homePlaceholderImageViewSizeConstraints;
-
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
+
 - (void)presentHomeView;
 
 @end
