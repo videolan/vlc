@@ -262,6 +262,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _gridVsListSegmentedControl.selectedSegment = _currentSelectedViewModeSegment;
 }
 
+- (void)handleLibraryTargetViewChanged
+{
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter postNotificationName:VLCLibraryWindowLibraryTargetViewChangedNotification
+                                 object:self.libraryTargetView];
+}
+
 - (void)setViewForSelectedSegment
 {
     switch (_librarySegmentType) {
