@@ -91,8 +91,10 @@ const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-NSString * const VLCLibraryWindowLibraryTargetViewChangedNotification =
-    @"VLCLibraryWindowLibraryTargetViewChangedNotification";
+NSString * const VLCLibraryWindowEmbeddedVideoViewPresentedNotification =
+    @"VLCLibraryWindowEmbeddedVideoViewPresentedNotification";
+NSString * const VLCLibraryWindowEmbeddedVideoViewDismissedNotification =
+    @"VLCLibraryWindowEmbeddedVideoViewDismissedNotification";
 
 @interface VLCLibraryWindow ()
 {
@@ -711,6 +713,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                     multiplier:1.
                                       constant:0.]
     ]];
+    
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter postNotificationName:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
+                                 object:self];
 }
 
 - (void)enableVideoPlaybackAppearance
@@ -732,7 +738,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)disableVideoPlaybackAppearance
 {
     [self makeFirstResponder:self.splitViewController.playlistSidebarViewController.view];
-    [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows:NSNormalWindowLevel];
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     self.alphaValue = 1.0;
@@ -741,6 +747,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
+
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter postNotificationName:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
+                                 object:self];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event

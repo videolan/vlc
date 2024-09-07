@@ -134,10 +134,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                    name:audioMediaDeletedLongLoadFinishNotification
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(libraryTargetViewChanged:)
-                                   name:VLCLibraryWindowLibraryTargetViewChangedNotification
+                               selector:@selector(libraryWindowPresentedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
                                  object:nil];
-
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryWindowDismissedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
+                                 object:nil];
     }
 
     return self;
@@ -680,22 +683,14 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }];
 }
 
-- (void)libraryTargetViewChanged:(NSNotification *)notification
+- (void)libraryWindowPresentedVideoView:(NSNotification *)notification
 {
-    NSParameterAssert(notification != nil);
-    NSView * const libraryTargetView = notification.object;
-    NSParameterAssert(libraryTargetView == self.libraryTargetView);
-    
-    if ([libraryTargetView.subviews containsObject:self.emptyLibraryView] ||
-        [libraryTargetView.subviews containsObject:self.audioLibraryView]) {
-        // TODO: Check if the library target segment is a music one if we are showing the empty
-        // TODO: library view
-        NSLog(@"Showing audio library view, keeping data sources connected");
-        return;
-    }
-
-    NSLog(@"Disconnecting audio library data sources");
     [self.audioDataSource disconnect];
+}
+
+- (void)libraryWindowDismissedVideoView:(NSNotification *)notification
+{
+    [self.audioDataSource connect];
 }
 
 @end
