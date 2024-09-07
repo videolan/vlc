@@ -78,6 +78,7 @@
 		5307A6F52967859F001E0C6A /* NSImage+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5307A6F42967859F001E0C6A /* NSImage+VLCAdditions.m */; };
 		5307A6F82969904D001E0C6A /* VLCLibraryMediaSourceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5307A6F72969904D001E0C6A /* VLCLibraryMediaSourceViewController.m */; };
 		53088E152AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53088E142AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m */; };
+		530F32B32C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 530F32B22C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m */; };
 		5310AFB12B4FE72700E75F9A /* NSArray+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */; };
 		5310AFB52B53EC4F00E75F9A /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB32B53EC4E00E75F9A /* iCarousel.m */; };
 		531343E72A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531343E62A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m */; };
@@ -292,6 +293,8 @@
 		53088E122AD6EADF00C21358 /* VLCLibraryCarouselViewItemView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryCarouselViewItemView.xib; sourceTree = "<group>"; };
 		53088E132AD7802C00C21358 /* VLCLibraryCarouselViewItemView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCarouselViewItemView.h; sourceTree = "<group>"; };
 		53088E142AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryCarouselViewItemView.m; sourceTree = "<group>"; };
+		530F32B12C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryAbstractSegmentViewController.h; sourceTree = "<group>"; };
+		530F32B22C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryAbstractSegmentViewController.m; sourceTree = "<group>"; };
 		5310AFAF2B4FE72700E75F9A /* NSArray+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+VLCAdditions.h"; sourceTree = "<group>"; };
 		5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+VLCAdditions.m"; sourceTree = "<group>"; };
 		5310AFB32B53EC4E00E75F9A /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
@@ -1307,6 +1310,8 @@
 				53F0E92C299B002300491D49 /* VLCInputNodePathControlItem.m */,
 				5360E9A62C5CF6270046BA8B /* VLCLibraryAbstractGroupingDataSource.h */,
 				5360E9A72C5CF6270046BA8B /* VLCLibraryAbstractGroupingDataSource.m */,
+				530F32B12C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.h */,
+				530F32B22C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m */,
 				53088E132AD7802C00C21358 /* VLCLibraryCarouselViewItemView.h */,
 				53088E142AD7802C00C21358 /* VLCLibraryCarouselViewItemView.m */,
 				5317FE05294E8D1A001702F0 /* VLCLibraryCollectionViewDataSource.h */,
@@ -2183,6 +2188,7 @@
 				536EFBF5295BCB8300F4CB13 /* VLCLibraryUIUnits.m in Sources */,
 				1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */,
 				537BD6862C59216600446ED0 /* VLCLibraryGroupsViewController.m in Sources */,
+				530F32B32C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m in Sources */,
 				7DE82E7922843781002D341A /* VLCLibraryAlbumTableCellView.m in Sources */,
 				7D67318622C8F4060000AD40 /* VLCMediaSourceCollectionViewItem.m in Sources */,
 				536283F0291146BC00640C15 /* VLCLibraryTableView.m in Sources */,
