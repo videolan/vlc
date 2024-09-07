@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryAbstractSegmentViewController.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryCollectionViewDelegate;
@@ -31,10 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCMediaLibraryGroup;
 
-@interface VLCLibraryGroupsViewController : NSObject<NSSplitViewDelegate>
+@interface VLCLibraryGroupsViewController : VLCLibraryAbstractSegmentViewController<NSSplitViewDelegate>
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) NSCollectionView *collectionView;
 @property (readonly) NSSplitView *listViewSplitView;
@@ -42,9 +42,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryTableView *groupsTableView;
 @property (readonly) NSScrollView *selectedGroupTableViewScrollView;
 @property (readonly) VLCLibraryTableView *selectedGroupTableView;
-@property (readonly) NSView *emptyLibraryView;
-@property (readonly) NSImageView *placeholderImageView;
-@property (readonly) NSTextField *placeholderLabel;
 
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
 @property (readonly) VLCLibraryMasterDetailViewTableViewDelegate *tableViewDelegate;

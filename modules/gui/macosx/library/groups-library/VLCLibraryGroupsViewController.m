@@ -44,24 +44,13 @@
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
-        [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupDataSource];
         [self setupGridViewModeViews];
         [self setupListViewModeViews];
     }
     return self;
-}
-
-- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
-{
-    NSParameterAssert(libraryWindow);
-    _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
-    _emptyLibraryView = libraryWindow.emptyLibraryView;
-    _placeholderImageView = libraryWindow.placeholderImageView;
-    _placeholderLabel = libraryWindow.placeholderLabel;
 }
 
 - (void)setupDataSource
