@@ -40,4 +40,10 @@
     return self;
 }
 
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    [self doesNotRecognizeSelector:_cmd];
+    return nil;
+}
+
 @end
