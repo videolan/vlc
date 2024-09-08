@@ -28,11 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryAbstractSegmentViewController : NSObject
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *emptyLibraryView;
 @property (readonly) NSImageView *placeholderImageView;
 @property (readonly) NSTextField *placeholderLabel;
+@property (readonly, weak) VLCLibraryWindow *libraryWindow;
 @property (readwrite) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;

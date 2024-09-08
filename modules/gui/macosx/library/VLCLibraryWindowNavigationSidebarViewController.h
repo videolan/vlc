@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowNavigationSidebarViewController : NSViewController<NSOutlineViewDelegate>
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
+@property (readonly, weak) VLCLibraryWindow *libraryWindow;
 @property (readonly) NSArray<VLCLibrarySegment *> *segments;
 @property (readonly) NSTreeController *treeController;
 
