@@ -42,7 +42,7 @@
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithLibraryWindow:libraryWindow];
     if (self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupBaseDataSource];
@@ -67,8 +67,6 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
-    _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
     _mediaSourceView = libraryWindow.mediaSourceView;
     _mediaSourceTableView = libraryWindow.mediaSourceTableView;
     _collectionView = libraryWindow.mediaSourceCollectionView;
@@ -120,22 +118,22 @@
 - (void)setupPlaceholderLabel
 {
     if (@available(macOS 10.12, *)) {
-        _placeholderLabel = [NSTextField labelWithString:_NS("No files")];
+        _browsePlaceholderLabel = [NSTextField labelWithString:_NS("No files")];
     } else {
-        _placeholderLabel = [[NSTextField alloc] init];
-        self.placeholderLabel.stringValue = _NS("No files");
-        self.placeholderLabel.editable = NO;
+        _browsePlaceholderLabel = [[NSTextField alloc] init];
+        self.browsePlaceholderLabel.stringValue = _NS("No files");
+        self.browsePlaceholderLabel.editable = NO;
     }
-    self.placeholderLabel.font = NSFont.VLClibrarySectionHeaderFont;
-    self.placeholderLabel.textColor = NSColor.secondaryLabelColor;
-    self.placeholderLabel.alignment = NSTextAlignmentCenter;
-    self.placeholderLabel.backgroundColor = NSColor.clearColor;
-    self.placeholderLabel.bezeled = NO;
-    self.placeholderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.mediaSourceView addSubview:self.placeholderLabel];
+    self.browsePlaceholderLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.browsePlaceholderLabel.textColor = NSColor.secondaryLabelColor;
+    self.browsePlaceholderLabel.alignment = NSTextAlignmentCenter;
+    self.browsePlaceholderLabel.backgroundColor = NSColor.clearColor;
+    self.browsePlaceholderLabel.bezeled = NO;
+    self.browsePlaceholderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.mediaSourceView addSubview:self.browsePlaceholderLabel];
     [self.mediaSourceView addConstraints:@[
-        [self.placeholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
-        [self.placeholderLabel.centerYAnchor constraintEqualToAnchor:self.mediaSourceView.centerYAnchor],
+        [self.browsePlaceholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
+        [self.browsePlaceholderLabel.centerYAnchor constraintEqualToAnchor:self.mediaSourceView.centerYAnchor],
     ]];
     [self updatePlaceholderLabel:nil];
 }
@@ -155,7 +153,7 @@
 
 - (void)updatePlaceholderLabel:(NSNotification *)notification
 {
-    self.placeholderLabel.hidden = self.mediaSourceTableView.numberOfRows > 0;
+    self.browsePlaceholderLabel.hidden = self.mediaSourceTableView.numberOfRows > 0;
 }
 
 - (void)presentBrowseView
@@ -170,14 +168,14 @@
 
 - (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
 {
-    _libraryTargetView.subviews = @[];
+    self.libraryTargetView.subviews = @[];
 
     if (_mediaSourceView.superview == nil) {
         _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
-        _libraryTargetView.subviews = @[_mediaSourceView];
+        self.libraryTargetView.subviews = @[_mediaSourceView];
         NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
+        [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
+        [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
     }
 
     _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegment ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;

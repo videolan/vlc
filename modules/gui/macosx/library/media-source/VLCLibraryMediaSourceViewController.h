@@ -22,16 +22,16 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryAbstractSegmentViewController.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputNodePathControl;
 @class VLCLibraryWindow;
 @class VLCMediaSourceBaseDataSource;
 
-@interface VLCLibraryMediaSourceViewController : NSObject
+@interface VLCLibraryMediaSourceViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *mediaSourceView;
 @property (readonly) NSTableView *mediaSourceTableView;
 @property (readonly) NSCollectionView *collectionView;
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCInputNodePathControl *pathControl;
 @property (readonly) NSVisualEffectView *pathControlVisualEffectView;
 @property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
-@property (readonly) NSTextField *placeholderLabel;
+@property (readonly) NSTextField *browsePlaceholderLabel; // Use library window's placeholder views?
 @property (readonly) NSLayoutConstraint *pathControlViewTopConstraintToSuperview;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
