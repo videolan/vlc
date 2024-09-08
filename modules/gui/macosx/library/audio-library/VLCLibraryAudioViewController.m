@@ -333,12 +333,19 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView.scrollerInsets = audioScrollViewScrollerInsets;
 }
 
-#pragma mark - Show the audio view
+#pragma mark - Superclass property overrides
 
 - (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
 {
     return _internalPlaceholderImageViewSizeConstraints;
 }
+
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    return self.audioDataSource;
+}
+
+#pragma mark - Show the audio view
 
 - (void)presentAudioView
 {
@@ -681,16 +688,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         self.libraryTargetView.subviews = views.copy;
         [self.loadingOverlayView.indicator stopAnimation:self];
     }];
-}
-
-- (void)libraryWindowPresentedVideoView:(NSNotification *)notification
-{
-    [self.audioDataSource disconnect];
-}
-
-- (void)libraryWindowDismissedVideoView:(NSNotification *)notification
-{
-    [self.audioDataSource connect];
 }
 
 @end
