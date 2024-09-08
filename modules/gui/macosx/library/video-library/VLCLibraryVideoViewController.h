@@ -48,8 +48,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
-@property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
-@property (readonly) VLCLibraryShowsDataSource *libraryShowsDataSource;
+@property (readonly, nullable) VLCLibraryVideoDataSource *libraryVideoDataSource;
+@property (readonly, nullable) VLCLibraryShowsDataSource *libraryShowsDataSource;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;

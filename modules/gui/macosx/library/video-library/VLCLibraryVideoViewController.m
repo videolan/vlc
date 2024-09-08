@@ -84,8 +84,6 @@
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupTableViews];
-        [self setupVideoDataSource];
-        [self setupShowsDataSource];
         [self setupCollectionView];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
@@ -295,6 +293,8 @@
 
 - (void)updatePresentedVideoLibraryView
 {
+    _libraryShowsDataSource = nil;
+    [self setupVideoDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
 
     self.videoLibraryGroupsTableView.dataSource = self.libraryVideoDataSource;
@@ -320,6 +320,8 @@
 
 - (void)updatePresentedShowsLibraryView
 {
+    _libraryVideoDataSource = nil;
+    [self setupShowsDataSource];
     self.videoLibraryCollectionView.dataSource = self.libraryShowsDataSource;
 
     self.videoLibraryGroupsTableView.dataSource = self.libraryShowsDataSource;
