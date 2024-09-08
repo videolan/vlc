@@ -601,6 +601,8 @@ int OpenDecoder(vlc_object_t *o)
     vlc_picture_chain_Init(&p_sys->alpha->decoded);
     es_format_Init(&p_sys->alpha->fmt_out, VIDEO_ES, 0);
 
+    es_format_Clean(&fmt);
+
     vlc_mutex_init(&p_sys->lock);
     vlc_vector_init(&p_sys->missing_alpha);
     dec->p_sys = p_sys;
@@ -648,8 +650,10 @@ void CloseDecoder(vlc_object_t *o)
     vpx_alpha *p_sys = dec->p_sys;
 
     es_format_Clean(&p_sys->opaque->fmt_out);
+    es_format_Clean(&p_sys->opaque->fmt_in);
     decoder_Destroy(&p_sys->opaque->dec);
     es_format_Clean(&p_sys->alpha->fmt_out);
+    es_format_Clean(&p_sys->alpha->fmt_in);
     decoder_Destroy(&p_sys->alpha->dec);
 
     if (p_sys->pool)
