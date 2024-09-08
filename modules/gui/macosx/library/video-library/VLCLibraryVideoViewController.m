@@ -65,6 +65,7 @@
 
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 
+    NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
     NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 
     VLCNoResultsLabel *_noResultsLabel;
@@ -75,7 +76,7 @@
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithLibraryWindow:libraryWindow];
 
     if(self) {
         _videoLibraryTableViewDelegate = [[VLCLibraryVideoTableViewDelegate alloc] init];
@@ -127,8 +128,6 @@
 - (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     NSParameterAssert(libraryWindow);
-    _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
     _videoLibraryView = libraryWindow.videoLibraryView;
     _videoLibrarySplitView = libraryWindow.videoLibrarySplitView;
     _videoLibraryCollectionViewScrollView = libraryWindow.videoLibraryCollectionViewScrollView;
@@ -137,10 +136,6 @@
     _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
-
-    _placeholderImageView = libraryWindow.placeholderImageView;
-    _placeholderLabel = libraryWindow.placeholderLabel;
-    _emptyLibraryView = libraryWindow.emptyLibraryView;
 }
 
 - (void)setupDataSources
@@ -204,15 +199,15 @@
 
 - (void)setupVideoPlaceholderView
 {
-    _videoPlaceholderImageViewSizeConstraints = @[
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+    _internalPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
                                      attribute:NSLayoutAttributeWidth
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
                                      attribute:NSLayoutAttributeNotAnAttribute
                                     multiplier:0.f
                                       constant:182.f],
-        [NSLayoutConstraint constraintWithItem:_placeholderImageView
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
                                      attribute:NSLayoutAttributeHeight
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
@@ -280,6 +275,11 @@
 
 #pragma mark - Show the video library view
 
+- (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
+{
+    return _internalPlaceholderImageViewSizeConstraints;
+}
+
 - (void)updatePresentedVideoLibraryView
 {
     self.videoLibraryCollectionView.dataSource = self.libraryVideoDataSource;
@@ -332,7 +332,7 @@
 
 - (void)presentVideoView
 {
-    _libraryTargetView.subviews = @[];
+    self.libraryTargetView.subviews = @[];
     [self updatePresentedVideoLibraryView];
 }
 
@@ -344,28 +344,28 @@
 
 - (void)presentPlaceholderVideoLibraryView
 {
-    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryPlaylistViewController.placeholderImageViewConstraints) {
+    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryPlaylistViewController.placeholderImageViewConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint * const constraint in _videoPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {
         constraint.active = YES;
     }
 
-    _emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         self.libraryTargetView.subviews = @[self.emptyLibraryView, self.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_emptyLibraryView);
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    NSDictionary *dict = NSDictionaryOfVariableBindings(self.emptyLibraryView);
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self.emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[self.emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
-    _placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
-    _placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
+    self.placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
+    self.placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
 }
 
 - (void)presentNoResultsView
@@ -397,8 +397,8 @@
     }
 
     NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [_libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         _videoLibrarySplitView.hidden = YES;
@@ -418,16 +418,16 @@
     const NSUInteger videoCount = model.numberOfVideoMedia;
     const NSUInteger showsCount = model.numberOfShows;
 
-    if (_libraryWindow.librarySegmentType == VLCLibraryVideoSegment &&
-        ((videoCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
-         (videoCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
-        _libraryWindow.videoViewController.view.hidden) {
+    if (self.libraryWindow.librarySegmentType == VLCLibraryVideoSegment &&
+        ((videoCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
+         (videoCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+        self.libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedVideoLibraryView];
-    } else if (_libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegment &&
-         ((showsCount == 0 && ![_libraryTargetView.subviews containsObject:_emptyLibraryView]) ||
-          (showsCount > 0 && ![_libraryTargetView.subviews containsObject:_videoLibraryView])) &&
-         _libraryWindow.videoViewController.view.hidden) {
+    } else if (self.libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegment &&
+         ((showsCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
+          (showsCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
+         self.libraryWindow.videoViewController.view.hidden) {
 
          [self updatePresentedShowsLibraryView];
      }

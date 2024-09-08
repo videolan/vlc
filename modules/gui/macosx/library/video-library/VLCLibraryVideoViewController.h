@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryAbstractSegmentViewController.h"
+
 @class VLCLoadingOverlayView;
 @class VLCLibraryWindow;
 @class VLCLibraryVideoDataSource;
@@ -33,10 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the video library views
 
-@interface VLCLibraryVideoViewController : NSObject
+@interface VLCLibraryVideoViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSView *videoLibraryView;
 @property (readonly) NSSplitView *videoLibrarySplitView;
 @property (readonly) NSScrollView *videoLibraryCollectionViewScrollView;
@@ -45,15 +45,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTableView *videoLibraryGroupSelectionTableView;
 @property (readonly) NSScrollView *videoLibraryGroupsTableViewScrollView;
 @property (readonly) NSTableView *videoLibraryGroupsTableView;
-@property (readonly) NSImageView *placeholderImageView;
-@property (readonly) NSTextField *placeholderLabel;
-@property (readonly) NSView *emptyLibraryView;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;
 @property (readonly) VLCLibraryShowsDataSource *libraryShowsDataSource;
-
-@property (readonly) NSArray<NSLayoutConstraint *> *videoPlaceholderImageViewSizeConstraints;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)presentVideoView;

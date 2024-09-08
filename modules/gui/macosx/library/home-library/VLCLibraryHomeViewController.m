@@ -211,7 +211,7 @@
     for (NSLayoutConstraint * const constraint in audioPlaceholderConstraints) {
         constraint.active = NO;
     }
-    NSArray<NSLayoutConstraint *> * const videoPlaceholderConstraints = self.libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints;
+    NSArray<NSLayoutConstraint *> * const videoPlaceholderConstraints = self.libraryWindow.libraryVideoViewController.placeholderImageViewSizeConstraints;
     for (NSLayoutConstraint * const constraint in videoPlaceholderConstraints) {
         constraint.active = NO;
     }
