@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryMasterDetailViewTableViewDataSource <VLCLibraryTableViewDataSource>
 
-@property (readwrite) NSTableView *masterTableView;
-@property (readwrite) NSTableView *detailTableView;
+@property (readwrite, weak) NSTableView *masterTableView;
+@property (readwrite, weak) NSTableView *detailTableView;
 
 @end
 

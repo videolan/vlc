@@ -33,10 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const VLCLibraryVideoDataSourceDisplayedCollectionChangedNotification;
 
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite) NSTableView *masterTableView;
-@property (readwrite) NSTableView *detailTableView;
 @property (readwrite, weak) VLCLibraryModel *libraryModel;
+@property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, weak) NSTableView *masterTableView;
+@property (readwrite, weak) NSTableView *detailTableView;
 
 - (void)reloadData;
 

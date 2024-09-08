@@ -34,8 +34,8 @@ extern NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollecti
 
 @interface VLCLibraryHomeViewVideoContainerViewDataSource : NSObject <VLCLibraryCollectionViewDataSource, iCarouselDataSource>
 
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign) iCarousel *carouselView;
+@property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, weak) iCarousel *carouselView;
 @property (readwrite, assign, nonatomic) VLCLibraryVideoCollectionViewGroupDescriptor *groupDescriptor;
 @property (readwrite, assign) VLCLibraryHomeViewVideoGridContainerView *parentCell;
 

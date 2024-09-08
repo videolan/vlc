@@ -33,9 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSArray<id<VLCMediaLibraryItemProtocol>> *backingArray;
 
-@property (readwrite) NSCollectionView *collectionView;
-@property (readwrite) NSTableView *masterTableView;
-@property (readwrite) NSTableView *detailTableView;
+@property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, weak) NSTableView *masterTableView;
+@property (readwrite, weak) NSTableView *detailTableView;
 
 - (void)reloadData;
 

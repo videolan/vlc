@@ -39,9 +39,9 @@ extern NSString * const VLCMediaSourceDataSourceNodeChanged;
 
 @property (readwrite, retain) VLCMediaSource *displayedMediaSource;
 @property (readwrite, retain, nonatomic) VLCInputNode *nodeToDisplay;
-@property (readwrite, assign) NSCollectionView *collectionView;
-@property (readwrite, assign) NSTableView *tableView;
-@property (readwrite) VLCInputNodePathControl *pathControl;
+@property (readwrite, weak) NSCollectionView *collectionView;
+@property (readwrite, weak) NSTableView *tableView;
+@property (readwrite, weak) VLCInputNodePathControl *pathControl;
 
 - (void)setupViews;
 - (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
