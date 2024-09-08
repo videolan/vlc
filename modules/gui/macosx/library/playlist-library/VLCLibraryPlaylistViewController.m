@@ -255,6 +255,11 @@
     return _internalPlaceholderImageViewSizeConstraints;
 }
 
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    return self.dataSource;
+}
+
 // TODO: This is duplicated almost verbatim across all the library view
 // controllers. Ideally we should have the placeholder view handle this
 // itself, or move this into a common superclass
