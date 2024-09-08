@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryShowsDataSource : VLCLibraryAbstractGroupingDataSource
 
-@property (readwrite, assign) VLCLibraryModel *libraryModel;
+@property (readwrite, weak) VLCLibraryModel *libraryModel;
 
 @end
 

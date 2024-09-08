@@ -33,9 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryPlaylistDataSource : NSObject<VLCLibraryCollectionViewDataSource, VLCLibraryMasterDetailViewTableViewDataSource>
 
-@property (readonly) VLCLibraryModel *libraryModel;
 @property (readwrite) NSTableView *masterTableView;
 @property (readwrite) NSTableView *detailTableView;
+@property (readonly, weak) VLCLibraryModel *libraryModel;
 @property (readwrite, nonatomic) NSArray<NSCollectionView *> *collectionViews;
 @property (readwrite, nonatomic) vlc_ml_playlist_type_t playlistType;
 
