@@ -23,22 +23,17 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCLibraryDataSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol VLCMediaLibraryItemProtocol;
-
-@protocol VLCLibraryTableViewDataSource <NSTableViewDataSource>
+@protocol VLCLibraryTableViewDataSource <NSTableViewDataSource, VLCLibraryDataSource>
 
 @property (readonly) VLCMediaLibraryParentGroupType currentParentType;
 
 - (NSInteger)rowForLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (id<VLCMediaLibraryItemProtocol>)libraryItemAtRow:(NSInteger)row
                                        forTableView:(nullable NSTableView *)tableView;
-
-@optional
-- (void)connect;
-- (void)disconnect;
 
 @end
 

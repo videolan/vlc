@@ -22,12 +22,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryDataSource.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryRepresentedItem;
 @protocol VLCMediaLibraryItemProtocol;
 
-@protocol VLCLibraryCollectionViewDataSource <NSCollectionViewDataSource>
+@protocol VLCLibraryCollectionViewDataSource <NSCollectionViewDataSource, VLCLibraryDataSource>
 
 @property (readonly) NSString *supplementaryDetailViewKind;
 
@@ -38,10 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                      forCollectionView:(NSCollectionView *)collectionView;
 
 - (void)reloadData;
-
-@optional
-- (void)connect;
-- (void)disconnect;
 
 @end
 
