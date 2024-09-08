@@ -36,8 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign, nonatomic) CGFloat collectionViewMinimumInteritemSpacing;
 @property (readwrite, assign, nonatomic) NSEdgeInsets collectionViewSectionInset;
 
-@property (readwrite, assign, nonatomic) NSStackView *collectionsStackView;
-@property (readwrite, assign, nonatomic) NSScrollView *collectionsStackViewScrollView;
+@property (readwrite, weak, nonatomic) NSStackView *collectionsStackView;
+@property (readwrite, weak, nonatomic) NSScrollView *collectionsStackViewScrollView;
 
 @property (readonly) VLCLibraryHeroView *heroView;
 @property (readonly) VLCLibraryHomeViewVideoCarouselContainerView *recentsView;

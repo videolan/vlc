@@ -37,14 +37,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryVideoViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) NSView *videoLibraryView;
-@property (readonly) NSSplitView *videoLibrarySplitView;
-@property (readonly) NSScrollView *videoLibraryCollectionViewScrollView;
-@property (readonly) NSCollectionView *videoLibraryCollectionView;
-@property (readonly) NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
-@property (readonly) NSTableView *videoLibraryGroupSelectionTableView;
-@property (readonly) NSScrollView *videoLibraryGroupsTableViewScrollView;
-@property (readonly) NSTableView *videoLibraryGroupsTableView;
+@property (readonly, weak) NSView *videoLibraryView;
+@property (readonly, weak) NSSplitView *videoLibrarySplitView;
+@property (readonly, weak) NSScrollView *videoLibraryCollectionViewScrollView;
+@property (readonly, weak) NSCollectionView *videoLibraryCollectionView;
+@property (readonly, weak) NSScrollView *videoLibraryGroupSelectionTableViewScrollView;
+@property (readonly, weak) NSTableView *videoLibraryGroupSelectionTableView;
+@property (readonly, weak) NSScrollView *videoLibraryGroupsTableViewScrollView;
+@property (readonly, weak) NSTableView *videoLibraryGroupsTableView;
+
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryVideoDataSource *libraryVideoDataSource;

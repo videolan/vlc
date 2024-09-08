@@ -32,18 +32,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryMediaSourceViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) NSView *mediaSourceView;
-@property (readonly) NSTableView *mediaSourceTableView;
-@property (readonly) NSCollectionView *collectionView;
-@property (readonly) NSScrollView *collectionViewScrollView;
-@property (readonly) NSTableView *tableView;
-@property (readonly) NSScrollView *tableViewScrollView;
-@property (readonly) NSButton *homeButton;
-@property (readonly) VLCInputNodePathControl *pathControl;
-@property (readonly) NSVisualEffectView *pathControlVisualEffectView;
-@property (readonly) NSSegmentedControl *gridVsListSegmentedControl;
+@property (readonly, weak) NSView *mediaSourceView;
+@property (readonly, weak) NSTableView *mediaSourceTableView;
+@property (readonly, weak) NSCollectionView *collectionView;
+@property (readonly, weak) NSScrollView *collectionViewScrollView;
+@property (readonly, weak) NSTableView *tableView;
+@property (readonly, weak) NSScrollView *tableViewScrollView;
+@property (readonly, weak) NSButton *homeButton;
+@property (readonly, weak) VLCInputNodePathControl *pathControl;
+@property (readonly, weak) NSVisualEffectView *pathControlVisualEffectView;
+@property (readonly, weak) NSSegmentedControl *gridVsListSegmentedControl;
 @property (readonly) NSTextField *browsePlaceholderLabel; // Use library window's placeholder views?
-@property (readonly) NSLayoutConstraint *pathControlViewTopConstraintToSuperview;
+@property (readonly, weak) NSLayoutConstraint *pathControlViewTopConstraintToSuperview;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
 

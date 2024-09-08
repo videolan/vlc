@@ -36,11 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHomeViewController : VLCLibraryAbstractSegmentViewController
 
-@property (readonly) NSView *homeLibraryView;
-@property (readonly) NSScrollView *homeLibraryStackViewScrollView;
-@property (readonly) NSStackView *homeLibraryStackView;
-@property (readonly) VLCLoadingOverlayView *loadingOverlayView;
+@property (readonly, weak) NSView *homeLibraryView;
+@property (readonly, weak) NSScrollView *homeLibraryStackViewScrollView;
+@property (readonly, weak) NSStackView *homeLibraryStackView;
 
+@property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 @property (readonly) VLCLibraryHomeViewStackViewController *stackViewController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
