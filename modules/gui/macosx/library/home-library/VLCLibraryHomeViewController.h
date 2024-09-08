@@ -39,7 +39,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSView *homeLibraryView;
 @property (readonly) NSScrollView *homeLibraryStackViewScrollView;
 @property (readonly) NSStackView *homeLibraryStackView;
-@property (readonly) NSSegmentedControl *segmentedTitleControl;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryHomeViewStackViewController *stackViewController;
