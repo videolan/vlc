@@ -22,7 +22,8 @@
 
 #import "VLCLibraryAbstractSegmentViewController.h"
 
-#import "VLCLibraryWindow.h"
+#import "library/VLCLibraryDataSource.h"
+#import "library/VLCLibraryWindow.h"
 
 @implementation VLCLibraryAbstractSegmentViewController
 
@@ -36,6 +37,16 @@
         _emptyLibraryView = libraryWindow.emptyLibraryView;
         _placeholderImageView = libraryWindow.placeholderImageView;
         _placeholderLabel = libraryWindow.placeholderLabel;
+
+        NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryWindowPresentedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryWindowDismissedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
+                                 object:nil];
     }
     return self;
 }
@@ -44,6 +55,16 @@
 {
     [self doesNotRecognizeSelector:_cmd];
     return nil;
+}
+
+- (void)libraryWindowPresentedVideoView:(NSNotification *)notification
+{
+    [self.currentDataSource disconnect];
+}
+
+- (void)libraryWindowDismissedVideoView:(NSNotification *)notification
+{
+    [self.currentDataSource connect];
 }
 
 @end
