@@ -189,6 +189,11 @@
     self.selectedGroupTableView.dataSource = self.dataSource;
 }
 
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    return self.dataSource;
+}
+
 - (void)presentGroupsView
 {
     const VLCLibraryViewModeSegment viewModeSegment =
