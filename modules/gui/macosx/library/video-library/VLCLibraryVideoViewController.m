@@ -291,6 +291,18 @@
     return _internalPlaceholderImageViewSizeConstraints;
 }
 
+- (id<VLCLibraryDataSource>)currentDataSource
+{
+    const NSInteger librarySegmentType = self.libraryWindow.librarySegmentType;
+    if (librarySegmentType == VLCLibraryVideoSegment) {
+        return self.libraryVideoDataSource;
+    } else if (librarySegmentType == VLCLibraryShowsVideoSubSegment) {
+        return self.libraryShowsDataSource;
+    } else {
+        return nil;
+    }
+}
+
 - (void)updatePresentedVideoLibraryView
 {
     _libraryShowsDataSource = nil;
