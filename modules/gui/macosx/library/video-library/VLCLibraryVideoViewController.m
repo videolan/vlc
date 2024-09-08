@@ -83,7 +83,9 @@
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupPropertiesFromLibraryWindow:libraryWindow];
-        [self setupDataSources];
+        [self setupTableViews];
+        [self setupVideoDataSource];
+        [self setupShowsDataSource];
         [self setupCollectionView];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
@@ -138,27 +140,38 @@
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
 }
 
-- (void)setupDataSources
+- (void)setupTableViews
 {
-    _videoLibrarySplitView.delegate = _splitViewDelegate;
+    // Split view with table views
+    self.videoLibrarySplitView.delegate = _splitViewDelegate;
     [_splitViewDelegate resetDefaultSplitForSplitView:self.videoLibrarySplitView];
 
-    _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
-    _libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    _libraryVideoDataSource.masterTableView = _videoLibraryGroupsTableView;
-    _libraryVideoDataSource.detailTableView = _videoLibraryGroupSelectionTableView;
-    _libraryVideoDataSource.collectionView = _videoLibraryCollectionView;
+    NSNib * const tableCellViewNib =
+        [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class)
+                                 bundle:nil];
+    [self.videoLibraryGroupsTableView registerNib:tableCellViewNib
+                                    forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+    [self.videoLibraryGroupSelectionTableView registerNib:tableCellViewNib 
+                                            forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
+}
 
+- (void)setupVideoDataSource
+{
+    _libraryVideoDataSource = [[VLCLibraryVideoDataSource alloc] init];
+    self.libraryVideoDataSource.libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
+    self.libraryVideoDataSource.masterTableView = self.videoLibraryGroupsTableView;
+    self.libraryVideoDataSource.detailTableView = self.videoLibraryGroupSelectionTableView;
+    self.libraryVideoDataSource.collectionView = self.videoLibraryCollectionView;
+}
+
+- (void)setupShowsDataSource
+{
     _libraryShowsDataSource = [[VLCLibraryShowsDataSource alloc] init];
     self.libraryShowsDataSource.libraryModel =
         VLCMain.sharedInstance.libraryController.libraryModel;
     self.libraryShowsDataSource.collectionView = self.videoLibraryCollectionView;
     self.libraryShowsDataSource.masterTableView = self.videoLibraryGroupsTableView;
     self.libraryShowsDataSource.detailTableView = self.videoLibraryGroupSelectionTableView;
-
-    NSNib * const tableCellViewNib = [[NSNib alloc] initWithNibNamed:NSStringFromClass(VLCLibraryTableCellView.class) bundle:nil];
-    [_videoLibraryGroupsTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
-    [_videoLibraryGroupSelectionTableView registerNib:tableCellViewNib forIdentifier:@"VLCVideoLibraryTableViewCellIdentifier"];
 }
 
 - (void)setupCollectionView
