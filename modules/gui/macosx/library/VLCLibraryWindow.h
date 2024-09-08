@@ -62,7 +62,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
-@property (readwrite, strong) IBOutlet NSOutlineView *navSidebarOutlineView;
+@property (readwrite, weak) IBOutlet NSOutlineView *navSidebarOutlineView;
 @property (readwrite, weak) IBOutlet NSView *homeLibraryView;
 @property (readwrite, weak) IBOutlet NSScrollView *homeLibraryStackViewScrollView;
 @property (readwrite, weak) IBOutlet NSStackView *homeLibraryStackView;

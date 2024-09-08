@@ -38,12 +38,12 @@ extern NSString * const VLCLibraryTableCellViewIdentifier;
 
 + (instancetype)fromNibWithOwner:(id)owner;
 
-@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
-@property (readwrite, assign) IBOutlet NSTextField *singlePrimaryTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *secondaryTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *primaryTitleTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;
+@property (readwrite, weak) IBOutlet NSTextField *singlePrimaryTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *secondaryTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *primaryTitleTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *representedImageView;
+@property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
 
 @property (readwrite, strong, nonatomic) VLCLibraryRepresentedItem *representedItem;
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;

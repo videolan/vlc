@@ -30,11 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHeroView : NSView
 
-@property (readwrite) IBOutlet VLCImageView *largeImageView;
-@property (readwrite) IBOutlet NSTextField *explanationTextField;
-@property (readwrite) IBOutlet NSTextField *titleTextField;
-@property (readwrite) IBOutlet NSTextField *detailTextField;
-@property (readwrite) IBOutlet NSButton *playButton;
+@property (readwrite, weak) IBOutlet VLCImageView *largeImageView;
+@property (readwrite, weak) IBOutlet NSTextField *explanationTextField;
+@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *detailTextField;
+@property (readwrite, weak) IBOutlet NSButton *playButton;
 
 @property (readwrite, nonatomic) VLCLibraryRepresentedItem *representedItem;
 

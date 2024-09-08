@@ -30,8 +30,8 @@ extern NSString *VLCMediaSourceDeviceCellIdentifier;
 
 @interface VLCMediaSourceDeviceCollectionViewItem : NSCollectionViewItem
 
-@property (readwrite, assign) IBOutlet NSTextField *titleTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, weak) IBOutlet NSTextField *titleTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *mediaImageView;
 
 @end
 

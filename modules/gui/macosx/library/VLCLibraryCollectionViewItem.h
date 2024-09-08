@@ -42,18 +42,18 @@ extern NSString *VLCLibraryCellIdentifier;
 
 @property (readwrite, assign) BOOL deselectWhenClickedIfSelected;
 
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
-@property (readwrite, assign) IBOutlet NSTextField *unplayedIndicatorTextField;
-@property (readwrite, assign) IBOutlet NSTextField *secondaryInfoTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
-@property (readwrite, assign) IBOutlet VLCLinearProgressIndicator *progressIndicator;
-@property (readwrite, assign) IBOutlet NSBox *highlightBox;
-@property (readwrite, assign) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
-@property (readwrite, assign) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
-@property (readwrite, assign) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
+@property (readwrite, weak) IBOutlet NSTextField *mediaTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *annotationTextField;
+@property (readwrite, weak) IBOutlet NSTextField *unplayedIndicatorTextField;
+@property (readwrite, weak) IBOutlet NSTextField *secondaryInfoTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, weak) IBOutlet NSButton *addToPlaylistButton;
+@property (readwrite, weak) IBOutlet VLCLinearProgressIndicator *progressIndicator;
+@property (readwrite, weak) IBOutlet NSBox *highlightBox;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToLeadingUnplayedIndicatorConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *trailingSecondaryTextToTrailingSuperviewConstraint;
 
 @property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
 

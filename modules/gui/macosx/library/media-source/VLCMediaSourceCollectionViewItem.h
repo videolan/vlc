@@ -31,11 +31,11 @@ extern NSString *VLCMediaSourceCellIdentifier;
 
 @interface VLCMediaSourceCollectionViewItem : NSCollectionViewItem
 
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *annotationTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, assign) IBOutlet NSButton *addToPlaylistButton;
+@property (readwrite, weak) IBOutlet NSTextField *mediaTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *annotationTextField;
+@property (readwrite, weak) IBOutlet VLCImageView *mediaImageView;
+@property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, weak) IBOutlet NSButton *addToPlaylistButton;
 
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
 

@@ -39,14 +39,14 @@ extern NSString * const VLCLibraryAlbumTableCellTableViewColumnIdentifier;
 
 + (instancetype)fromNibWithOwner:(id)owner;
 
-@property (readwrite, assign) IBOutlet VLCTrackingView *trackingView;
-@property (readwrite, assign) IBOutlet VLCImageView *representedImageView;
-@property (readwrite, assign) IBOutlet NSTextField *albumNameTextField;
-@property (readwrite, assign) IBOutlet NSButton *artistNameTextButton;
-@property (readwrite, assign) IBOutlet NSButton *genreNameTextButton;
-@property (readwrite, assign) IBOutlet NSTextField *summaryTextField;
-@property (readwrite, assign) IBOutlet NSTextField *yearTextField;
-@property (readwrite, assign) IBOutlet NSButton *playInstantlyButton;
+@property (readwrite, weak) IBOutlet VLCTrackingView *trackingView;
+@property (readwrite, weak) IBOutlet VLCImageView *representedImageView;
+@property (readwrite, weak) IBOutlet NSTextField *albumNameTextField;
+@property (readwrite, weak) IBOutlet NSButton *artistNameTextButton;
+@property (readwrite, weak) IBOutlet NSButton *genreNameTextButton;
+@property (readwrite, weak) IBOutlet NSTextField *summaryTextField;
+@property (readwrite, weak) IBOutlet NSTextField *yearTextField;
+@property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
 
 @property (readonly) CGFloat height;
 @property (readwrite, assign, nonatomic) VLCLibraryRepresentedItem *representedItem;
