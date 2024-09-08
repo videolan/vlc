@@ -34,8 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, retain, nonatomic) VLCLibraryRepresentedItem *representedItem;
 
-@property (readwrite, assign) NSCollectionViewItem *selectedItem;
-@property (readwrite, assign) NSScrollView *parentScrollView;
+@property (readwrite) NSCollectionViewItem *selectedItem;
+@property (readwrite, weak) NSScrollView *parentScrollView;
 
 @property (readwrite, assign, nonatomic) NSCollectionViewScrollDirection layoutScrollDirection;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *contentViewTopConstraint;
