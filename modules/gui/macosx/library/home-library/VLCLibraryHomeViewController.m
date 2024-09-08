@@ -97,6 +97,15 @@
                                        name:finishedNotification
                                      object:nil];
         }
+        
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryWindowPresentedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
+                                 object:nil];
+        [notificationCenter addObserver:self
+                               selector:@selector(libraryWindowDismissedVideoView:)
+                                   name:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
+                                 object:nil];
     }
 
     return self;
@@ -325,5 +334,16 @@
         [self.loadingOverlayView.indicator stopAnimation:self];
     }];
 }
+
+- (void)libraryWindowPresentedVideoView:(NSNotification *)notification
+{
+    [self.stackViewController disconnectContainers];
+}
+
+- (void)libraryWindowDismissedVideoView:(NSNotification *)notification
+{
+    [self.stackViewController connectContainers];
+}
+
 
 @end
