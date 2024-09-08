@@ -36,13 +36,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, assign) NSCollectionViewItem *selectedItem;
 @property (readwrite, assign) NSScrollView *parentScrollView;
-@property (readwrite, assign) VLCSubScrollView *internalScrollView;
 
 @property (readwrite, assign, nonatomic) NSCollectionViewScrollDirection layoutScrollDirection;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *contentViewTopConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *contentViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *contentViewLeftConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *contentViewRightConstraint;
+@property (readwrite, weak) IBOutlet VLCSubScrollView *internalScrollView;
 
 - (void)updateRepresentation;
 
