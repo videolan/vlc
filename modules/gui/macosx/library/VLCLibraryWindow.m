@@ -431,15 +431,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
     [self.toolbarDelegate layoutForSegment:segmentType];
-    VLCLibraryMediaSourceViewController * const lvc =
-        [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
     if (segmentType == VLCLibraryBrowseSegment) {
-        [lvc presentBrowseView];
+        [self.libraryMediaSourceViewController presentBrowseView];
     } else if (segmentType == VLCLibraryStreamsSegment) {
-        [lvc presentStreamsView];
+        [self.libraryMediaSourceViewController presentStreamsView];
     }
-    _librarySegmentViewController = lvc;
+    _librarySegmentViewController = self.libraryMediaSourceViewController;
 }
 
 - (void)showGroupsLibrary
