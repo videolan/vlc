@@ -344,10 +344,9 @@
 
 - (void)presentPlaceholderVideoLibraryView
 {
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryPlaylistViewController.placeholderImageViewConstraints) {
+    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
+        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
+    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {

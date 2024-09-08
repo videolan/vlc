@@ -30,13 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
 @class VLCInputNodePathControl;
-@class VLCLibraryAudioViewController;
+@class VLCLibraryAbstractSegmentViewController;
 @class VLCLibraryMediaSourceViewController;
 @class VLCLibraryNavigationStack;
-@class VLCLibraryPlaylistViewController;
-@class VLCLibraryVideoViewController;
-@class VLCLibraryHomeViewController;
-@class VLCLibraryGroupsViewController;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaLibraryGroup;
 @class VLCPlaylistController;
@@ -122,12 +118,8 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (readwrite, weak) IBOutlet VLCLibraryWindowSplitViewController *splitViewController;
 @property (readwrite) VLCLibraryNavigationStack *navigationStack;
-@property (readonly) VLCLibraryAudioViewController *libraryAudioViewController;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
-@property (readonly) VLCLibraryVideoViewController *libraryVideoViewController;
-@property (readonly) VLCLibraryHomeViewController *libraryHomeViewController;
-@property (readonly) VLCLibraryGroupsViewController *libraryGroupsViewController;
-@property (readonly) VLCLibraryPlaylistViewController *libraryPlaylistViewController;
+@property (readonly) VLCLibraryAbstractSegmentViewController *librarySegmentViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
 

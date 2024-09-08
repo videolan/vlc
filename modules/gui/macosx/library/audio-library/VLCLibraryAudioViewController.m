@@ -341,10 +341,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentPlaceholderAudioView
 {
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryVideoViewController.placeholderImageViewSizeConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryPlaylistViewController.placeholderImageViewConstraints) {
+    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
+        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
+    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {

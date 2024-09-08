@@ -260,10 +260,9 @@
 // itself, or move this into a common superclass
 - (void)presentPlaceholderPlaylistLibraryView
 {
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryVideoViewController.placeholderImageViewSizeConstraints) {
+    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
+        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
+    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {

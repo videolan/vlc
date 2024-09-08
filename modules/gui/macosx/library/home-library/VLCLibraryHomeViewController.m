@@ -207,12 +207,9 @@
 
 - (void)presentPlaceholderHomeLibraryView
 {
-    NSArray<NSLayoutConstraint *> * const audioPlaceholderConstraints = self.libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints;
-    for (NSLayoutConstraint * const constraint in audioPlaceholderConstraints) {
-        constraint.active = NO;
-    }
-    NSArray<NSLayoutConstraint *> * const videoPlaceholderConstraints = self.libraryWindow.libraryVideoViewController.placeholderImageViewSizeConstraints;
-    for (NSLayoutConstraint * const constraint in videoPlaceholderConstraints) {
+    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
+        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
+    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
         constraint.active = NO;
     }
     for (NSLayoutConstraint *constraint in self.placeholderImageViewSizeConstraints) {
