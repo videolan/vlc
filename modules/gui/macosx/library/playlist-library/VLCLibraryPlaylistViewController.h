@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryAbstractSegmentViewController.h"
+
 #include <vlc_media_library.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -33,10 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
-@interface VLCLibraryPlaylistViewController : NSObject<NSSplitViewDelegate>
+@interface VLCLibraryPlaylistViewController : VLCLibraryAbstractSegmentViewController<NSSplitViewDelegate>
 
-@property (readonly) VLCLibraryWindow *libraryWindow;
-@property (readonly) NSView *libraryTargetView;
 @property (readonly) NSSplitView *listViewSplitView;
 @property (readonly) NSScrollView *masterTableViewScrollView;
 @property (readonly) VLCLibraryTableView *masterTableView;
@@ -44,7 +44,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCLibraryTableView *detailTableView;
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) NSCollectionView *collectionView;
-@property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 @property (readonly) NSArray<NSLayoutConstraint *> *loadingOverlayViewConstraints;
 

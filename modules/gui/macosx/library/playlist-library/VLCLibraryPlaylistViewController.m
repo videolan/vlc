@@ -47,15 +47,19 @@
 
 #import "windows/video/VLCMainVideoViewController.h"
 
+@interface VLCLibraryPlaylistViewController ()
+{
+    NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
+}
+@end
+
 @implementation VLCLibraryPlaylistViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super init];
+    self = [super initWithLibraryWindow:libraryWindow];
 
     if (self) {
-        [self setupPropertiesFromLibraryWindow:libraryWindow];
-
         _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
 
         [self setupPlaylistCollectionView];
@@ -98,16 +102,10 @@
     return self;
 }
 
-- (void)setupPropertiesFromLibraryWindow:(VLCLibraryWindow*)libraryWindow
-{
-    NSParameterAssert(libraryWindow);
-    _libraryWindow = libraryWindow;
-    _libraryTargetView = libraryWindow.libraryTargetView;
-}
-
 - (void)setupPlaylistCollectionView
 {
-    _collectionViewScrollView = [[NSScrollView alloc] initWithFrame:_libraryWindow.libraryTargetView.frame];
+    _collectionViewScrollView = 
+        [[NSScrollView alloc] initWithFrame:self.libraryWindow.libraryTargetView.frame];
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
     _collectionView = [[NSCollectionView alloc] init];
 
@@ -198,15 +196,15 @@
 
 - (void)setupPlaylistPlaceholderView
 {
-    _placeholderImageViewConstraints = @[
-        [NSLayoutConstraint constraintWithItem:_libraryWindow.placeholderImageView
+    _internalPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.libraryWindow.placeholderImageView
                                      attribute:NSLayoutAttributeWidth
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
                                      attribute:NSLayoutAttributeNotAnAttribute
                                     multiplier:0.f
                                       constant:149.f],
-        [NSLayoutConstraint constraintWithItem:_libraryWindow.placeholderImageView
+        [NSLayoutConstraint constraintWithItem:self.libraryWindow.placeholderImageView
                                      attribute:NSLayoutAttributeHeight
                                      relatedBy:NSLayoutRelationEqual
                                         toItem:nil
@@ -252,26 +250,31 @@
     ];
 }
 
+- (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
+{
+    return _internalPlaceholderImageViewSizeConstraints;
+}
+
 // TODO: This is duplicated almost verbatim across all the library view
 // controllers. Ideally we should have the placeholder view handle this
 // itself, or move this into a common superclass
 - (void)presentPlaceholderPlaylistLibraryView
 {
-    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryAudioViewController.placeholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint * const constraint in _libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
+    for (NSLayoutConstraint * const constraint in self.libraryWindow.libraryVideoViewController.videoPlaceholderImageViewSizeConstraints) {
         constraint.active = NO;
     }
-    for (NSLayoutConstraint * const constraint in _placeholderImageViewConstraints) {
+    for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {
         constraint.active = YES;
     }
 
-    _libraryWindow.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    _libraryWindow.libraryTargetView.subviews = @[_libraryWindow.emptyLibraryView];
-    NSDictionary * const dict = @{@"emptyLibraryView": _libraryWindow.emptyLibraryView};
-    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [_libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    self.libraryWindow.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.libraryWindow.libraryTargetView.subviews = @[self.libraryWindow.emptyLibraryView];
+    NSDictionary * const dict = @{@"emptyLibraryView": self.libraryWindow.emptyLibraryView};
+    [self.libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     NSString *placeholderPlaylistsString = nil;
@@ -295,8 +298,8 @@
             break;
     }
 
-    _libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
-    _libraryWindow.placeholderLabel.stringValue = placeholderPlaylistsString;
+    self.libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
+    self.libraryWindow.placeholderLabel.stringValue = placeholderPlaylistsString;
 }
 
 - (void)presentPlaylistLibraryView
@@ -334,7 +337,7 @@
 
 - (void)presentPlaylistsView
 {
-    _libraryWindow.libraryTargetView.subviews = @[];
+    self.libraryWindow.libraryTargetView.subviews = @[];
     [self updatePresentedView];
 }
 
@@ -352,10 +355,10 @@
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     const size_t numberOfPlaylists = [model numberOfPlaylistsOfType:playlistType];
 
-    if (_libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegment &&
-        ((numberOfPlaylists == 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_libraryWindow.emptyLibraryView]) ||
-         (numberOfPlaylists > 0 && ![_libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
-        _libraryWindow.videoViewController.view.hidden) {
+    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegment &&
+        ((numberOfPlaylists == 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:self.libraryWindow.emptyLibraryView]) ||
+         (numberOfPlaylists > 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
+        self.libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedView];
     }
