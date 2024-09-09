@@ -297,7 +297,9 @@ void ExtVideo::clean()
 
 static QString ChangeFiltersString( qt_intf_t *p_intf, const char *psz_filter_type, const char *psz_name, bool b_add )
 {
-    char* psz_chain = var_GetString( p_intf, psz_filter_type );
+    char *psz_chain = nullptr;
+    if (const auto vout = THEMIM->getVout(); vout != nullptr)
+        psz_chain = var_GetString( vout.get(), psz_filter_type );
 
     QString const chain = QString( psz_chain ? psz_chain : "" );
     QStringList list = chain.split( ':', Qt::SkipEmptyParts );
