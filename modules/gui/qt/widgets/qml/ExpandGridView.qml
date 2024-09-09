@@ -356,8 +356,11 @@ FocusScope {
 
     // layouts such that views indexes are preserved during a resize
     function _anchoredLayout(forceLayout) {
-        if (_currentRange[0] === _currentRange[1])
+        if (_currentRange[0] === _currentRange[1]) {
+            // empty view, we may still need to update internal variables here
+            flickable.layout(forceLayout)
             return
+        }
 
         // anchoring and expand item animation conflicts
         // causing view range oscilate on two different values
