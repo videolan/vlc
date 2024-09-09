@@ -2325,7 +2325,7 @@ static void vout_InitSource(vout_thread_sys_t *vout)
     char *psz_ar = var_InheritString(&vout->obj, "aspect-ratio");
     if (psz_ar) {
         vlc_rational_t ar;
-        if (GetAspectRatio(psz_ar, &ar))
+        if (vout_ParseDisplayAspectRatio(&ar, psz_ar))
             vout->source.dar = ar;
         free(psz_ar);
     }

@@ -611,7 +611,7 @@ static int CropBorderCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-bool GetAspectRatio(const char *ar_str, vlc_rational_t *ar)
+bool vout_ParseDisplayAspectRatio(vlc_rational_t *ar, const char *ar_str)
 {
     if (*ar_str == '\0') {
         *ar = VLC_DAR_FROM_SOURCE;
@@ -634,7 +634,7 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
     VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
     vlc_rational_t ar;
 
-    if (GetAspectRatio(newval.psz_string, &ar))
+    if (vout_ParseDisplayAspectRatio(&ar, newval.psz_string))
         vout_ChangeDisplayAspectRatio(vout, ar);
     return VLC_SUCCESS;
 }
