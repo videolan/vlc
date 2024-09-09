@@ -87,6 +87,14 @@ static void queue_sub(decoder_t *dec, subpicture_t *p_subpic)
     subpicture_Delete(p_subpic);
 }
 
+static decoder_t *decoder_create(vlc_object_t *parent)
+{
+    struct decoder_owner *owner = vlc_object_create(parent, sizeof(*owner));
+    if (unlikely(owner == NULL))
+        return NULL;
+    return &owner->dec;
+}
+
 static int decoder_load(decoder_t *decoder, bool is_packetizer,
                          const es_format_t *restrict fmt)
 {
@@ -130,20 +138,17 @@ void test_decoder_destroy(decoder_t *decoder)
 decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
 {
     assert(parent && fmt);
-    decoder_t *packetizer = NULL;
-    decoder_t *decoder = NULL;
+    decoder_t *packetizer = decoder_create(parent);
+    decoder_t *decoder = decoder_create(parent);
 
-    struct decoder_owner *pkt_owner = vlc_object_create(parent, sizeof(*pkt_owner));
-    struct decoder_owner *owner = vlc_object_create(parent, sizeof(*owner));
-
-    if (pkt_owner == NULL || owner == NULL)
+    if (packetizer == NULL || decoder == NULL)
     {
-        if (pkt_owner)
-            vlc_object_delete(&pkt_owner->dec);
+        if (packetizer)
+            vlc_object_delete(packetizer);
         return NULL;
     }
-    packetizer = &pkt_owner->dec;
-    decoder = &owner->dec;
+
+    struct decoder_owner *owner = dec_get_owner(decoder);
     owner->packetizer = packetizer;
 
     static const struct decoder_owner_callbacks dec_video_cbs =
