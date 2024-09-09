@@ -1828,8 +1828,7 @@ static int vout_Start(vout_thread_sys_t *vout, vlc_video_context *vctx, const vo
 
     vout_SetDisplayCrop(sys->display, &crop);
 
-    if (num != 0 && den != 0)
-        vout_SetDisplayAspect(sys->display, num, den);
+    vout_SetDisplayAspect(sys->display, num, den);
     vlc_queuedmutex_unlock(&sys->display_lock);
 
     sys->displayed.current       = NULL;
