@@ -1301,7 +1301,7 @@ static int PrerenderPicture(vout_thread_sys_t *sys, picture_t *filtered,
     }
 
     /* Render the direct buffer */
-    vout_UpdateDisplaySourceProperties(vd, &todisplay->format, &sys->source.dar);
+    vout_UpdateDisplaySourceProperties(vd, &todisplay->format);
 
     todisplay = vout_ConvertForDisplay(vd, todisplay);
     if (todisplay == NULL) {

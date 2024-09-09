@@ -22,5 +22,5 @@
 
 #include "vout_wrapper.h"
 
-void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *, const vlc_rational_t *forced_dar);
+void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *);
 void VoutFixFormatAR(video_format_t *);

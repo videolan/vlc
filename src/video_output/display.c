@@ -565,17 +565,17 @@ void VoutFixFormatAR(video_format_t *fmt)
     }
 }
 
-void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source, const vlc_rational_t *forced_dar)
+void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     int err1 = VLC_SUCCESS, err2;
 
-    video_format_t fixed_src = *source;
-    VoutFixFormatAR( &fixed_src );
-    if (fixed_src.i_sar_num * osys->source.i_sar_den !=
-        fixed_src.i_sar_den * osys->source.i_sar_num) {
+    if (osys->dar.den == VLC_DAR_FROM_SOURCE.den && osys->dar.num == VLC_DAR_FROM_SOURCE.num) {
+        video_format_t fixed_src = *source;
+        VoutFixFormatAR( &fixed_src );
+        if (fixed_src.i_sar_num * osys->source.i_sar_den !=
+            fixed_src.i_sar_den * osys->source.i_sar_num) {
 
-        if (forced_dar->num == 0) {
             osys->source.i_sar_num = fixed_src.i_sar_num;
             osys->source.i_sar_den = fixed_src.i_sar_den;
 
