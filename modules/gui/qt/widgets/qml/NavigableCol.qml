@@ -20,6 +20,7 @@ import QtQuick
 import QtQuick.Templates as T
 
 import VLC.MainInterface
+import VLC.Util
 
 T.Control {
     id: root
@@ -67,7 +68,7 @@ T.Control {
                 const item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
-                    item.forceActiveFocus(Qt.TabFocusReason);
+                    Helpers.transferFocus(item, Qt.TabFocusReason);
 
                     return;
                 }
@@ -79,7 +80,7 @@ T.Control {
                 const item = repeater.itemAt(i);
 
                 if (item.visible && item.enabled) {
-                    item.forceActiveFocus(Qt.BacktabFocusReason);
+                    Helpers.transferFocus(item, Qt.BacktabFocusReason);
 
                     return;
                 }
@@ -103,7 +104,7 @@ T.Control {
             }
 
             if (itemFocus)
-                itemFocus.forceActiveFocus(focusReason);
+                Helpers.transferFocus(itemFocus, focusReason);
         }
     }
 
@@ -121,7 +122,7 @@ T.Control {
         const item = repeater.itemAt(indexFocus);
 
         if (item.visible && item.enabled) {
-            item.forceActiveFocus(focusReason);
+            Helpers.transferFocus(item, focusReason);
 
             return true;
         }
@@ -163,7 +164,7 @@ T.Control {
                     if (i == -1)
                         root.Navigation.defaultNavigationUp();
                     else
-                        repeater.itemAt(i).forceActiveFocus(Qt.BacktabFocusReason);
+                        Helpers.transferFocus(repeater.itemAt(i), Qt.BacktabFocusReason);
                 }
 
                 item.Navigation.downAction = function() {
@@ -178,7 +179,7 @@ T.Control {
                     if (i == repeater.count)
                         root.Navigation.defaultNavigationDown();
                     else
-                        repeater.itemAt(i).forceActiveFocus(Qt.TabFocusReason);
+                        Helpers.transferFocus(repeater.itemAt(i), Qt.TabFocusReason);
                 }
             }
 
