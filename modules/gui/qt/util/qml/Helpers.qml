@@ -30,6 +30,16 @@ QtObject {
         return (!!object && (object instanceof type))
     }
 
+    function transferFocus(item, reason) {
+        if (item.activeFocus && item.focusReason === reason)
+            return
+
+        if (item.setCurrentItemFocus)
+            item.setCurrentItemFocus(reason)
+        else
+            item.forceActiveFocus(reason)
+    }
+
     // NOTE: This allows us to force another 'reason' even when the item has activeFocus.
     function enforceFocus(item, reason) {
         if (item.activeFocus && item.focusReason === reason)
