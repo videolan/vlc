@@ -572,7 +572,8 @@ bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den)
         (num != 0) == (den != 0))
         return true;
     else if (*ar_str == '\0') {
-        *num = *den = 0;
+        *num = VLC_DAR_FROM_SOURCE.num;
+        *den = VLC_DAR_FROM_SOURCE.den;
         return true;
     }
     return false;

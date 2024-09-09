@@ -30,6 +30,9 @@
 typedef struct input_thread_t input_thread_t;
 typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 
+///< Use the aspect ratio from the source video format
+#define VLC_DAR_FROM_SOURCE  ((vlc_rational_t){0, 0})
+
 /**
  * Vout configuration
  */

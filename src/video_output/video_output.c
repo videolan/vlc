@@ -2136,8 +2136,7 @@ vout_thread_t *vout_Create(vlc_object_t *object)
     }
 
     video_format_Init(&sys->original, 0);
-    sys->source.dar.num = 0;
-    sys->source.dar.den = 0;
+    sys->source.dar = VLC_DAR_FROM_SOURCE;
     sys->source.crop.mode = VOUT_CROP_NONE;
     sys->snapshot = vout_snapshot_New();
     vout_statistic_Init(&sys->statistic);
