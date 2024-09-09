@@ -56,13 +56,22 @@ void filter_AddProxyCallbacks( vlc_object_t *obj, filter_t *filter,
     {
         char *name = *pname;
         int var_type = var_Type(filter, name);
-        if (var_Type(obj, name) || config_GetType(name) == 0)
+        if (config_GetType(name) == 0)
         {
             free(name);
             continue;
         }
-        var_Create(obj, name,
-                   var_type | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
+
+        /* Create a mapping variable of the filter value if it does not exist.
+         * These variables shouldn't be removed on proxy removal as they allow
+         * keeping track of the filter state between filter chain resets. */
+        const bool not_mapped = (var_Type(obj, name) == 0);
+        if (not_mapped)
+        {
+            var_Create(obj, name,
+                       var_type | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND);
+        }
+
         if ((var_type & VLC_VAR_ISCOMMAND))
             var_AddCallback(obj, name, TriggerFilterCallback, filter);
         else
@@ -94,7 +103,6 @@ void filter_DelProxyCallbacks( vlc_object_t *obj, filter_t *filter,
             var_DelCallback(obj, name, TriggerFilterCallback, filter);
         else if (filter_var_type)
             var_DelCallback(obj, name, restart_cb, obj);
-        var_Destroy(obj, name);
         free(name);
     }
     free(names);

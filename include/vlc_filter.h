@@ -365,8 +365,13 @@ static inline int filter_GetInputAttachments( filter_t *p_filter,
 }
 
 /**
- * This function duplicates every variables from the filter, and adds a proxy
- * callback to trigger filter events from obj.
+ * This function allow dynamically changing filter variables from a different
+ * object via VLC variables mapping.
+ *
+ * It maps the filter's variables on the proxy objects and bind them with a var
+ * callback that forwards changes to the filter.
+ * This is especially useful for manipulating filter chains via a single parent
+ * object.
  *
  * \param obj the object to add the callback proxy to
  * \param filter the filter object for which the callback will be proxified
@@ -379,8 +384,9 @@ VLC_API void filter_AddProxyCallbacks( vlc_object_t *obj, filter_t *filter,
     filter_AddProxyCallbacks(VLC_OBJECT(a), b, c)
 
 /**
- * This function removes the callbacks previously added to every duplicated
- * variables, and removes them afterward.
+ * This function unbind the callbacks from the proxy object.
+ *
+ * \note It does not remove the mapped variable to keep track of their state.
  *
  * \param obj the object to remove the callback proxy from
  * \param filter the filter object for which the callback was proxified
