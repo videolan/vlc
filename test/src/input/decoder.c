@@ -133,15 +133,16 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
     decoder_t *packetizer = NULL;
     decoder_t *decoder = NULL;
 
-    packetizer = vlc_object_create(parent, sizeof(*packetizer));
+    struct decoder_owner *pkt_owner = vlc_object_create(parent, sizeof(*pkt_owner));
     struct decoder_owner *owner = vlc_object_create(parent, sizeof(*owner));
 
-    if (packetizer == NULL || owner == NULL)
+    if (pkt_owner == NULL || owner == NULL)
     {
-        if (packetizer)
-            vlc_object_delete(packetizer);
+        if (pkt_owner)
+            vlc_object_delete(&pkt_owner->dec);
         return NULL;
     }
+    packetizer = &pkt_owner->dec;
     decoder = &owner->dec;
     owner->packetizer = packetizer;
 
