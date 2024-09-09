@@ -352,6 +352,7 @@ static int Open(vlc_object_t *p_this)
 
     if (probe_stream(p_demux) != VLC_SUCCESS) {
         //TyClose(p_demux);
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
