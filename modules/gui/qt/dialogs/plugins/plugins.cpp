@@ -464,7 +464,7 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsModel->setFilterRole( Qt::DisplayRole );
     addonsView->setModel( addonsModel );
 
-    connect( signalMapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
+    connect( signalMapper, &QSignalMapper::mappedInt,
              addonsModel, &AddonsSortFilterProxyModel::setTypeFilter );
 
     connect( searchInput, &SearchLineEdit::textChanged,

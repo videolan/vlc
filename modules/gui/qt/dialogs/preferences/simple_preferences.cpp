@@ -228,7 +228,7 @@ SPrefsCatList::SPrefsCatList( qt_intf_t *_p_intf, QWidget *_parent ) :
        set focus (keys) when it manages the buttons's exclusivity.
        See QT bugs 131 & 816 and QAbstractButton's source code. */
     QSignalMapper *mapper = new QSignalMapper( layout );
-    connect( mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL, this, &SPrefsCatList::switchPanel );
+    connect( mapper, &QSignalMapper::mappedInt, this, &SPrefsCatList::switchPanel );
     qreal dpr = devicePixelRatioF();
 
     auto addCategory = [&]( QString label, QString ltooltip, QString icon, int numb) {

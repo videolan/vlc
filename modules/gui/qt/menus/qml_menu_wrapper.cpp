@@ -797,7 +797,7 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
         connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
 
         mapper->setMapping(action, options["information"].toInt());
-        connect(mapper, QSIGNALMAPPER_MAPPEDINT_SIGNAL,
+        connect(mapper, &QSignalMapper::mappedInt,
                 this, &PlaylistMediaContextMenu::showMediaInformation);
     }
 
