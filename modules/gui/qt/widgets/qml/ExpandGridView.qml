@@ -178,7 +178,10 @@ FocusScope {
             flickable.layout(true)
     }
 
-    onHeightChanged: _anchoredLayout(false)
+    // view needs to be relayout, since items may move
+    onWidthChanged: Qt.callLater(_anchoredLayout, true)
+    onHeightChanged: Qt.callLater(_anchoredLayout, true)
+
     onContentWidthChanged: _anchoredLayout(true)
     onContentHeightChanged: _anchoredLayout(true)
 
