@@ -619,6 +619,7 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     p_sys->p_es           = NULL;
     p_sys->i_data_pos = p_sys->i_data_size = 0;
+    p_sys->i_frame_samples = 0;
     p_sys->i_chans_to_reorder = 0;
     p_sys->i_channel_mask = 0;
 
