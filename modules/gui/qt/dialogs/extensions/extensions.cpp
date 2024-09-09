@@ -71,8 +71,6 @@ ExtensionDialog* ExtensionsDialogProvider::CreateExtDialog(
                                                    p_extensions_manager,
                                                    p_dialog );
     p_dialog->p_sys_intf = (void*) dialog;
-    connect( dialog, &ExtensionDialog::destroyDialog,
-             this, &ExtensionsDialogProvider::DestroyExtDialog );
     return dialog;
 }
 

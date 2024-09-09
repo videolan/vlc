@@ -101,9 +101,6 @@ private slots:
     void SyncSelection( QObject *object );
     void parentDestroyed();
 
-signals:
-    void destroyDialog( extension_dialog_t *p_dialog );
-
 public:
     ExtensionDialog( qt_intf_t *p_intf,
                      extensions_manager_t *p_mgr,
