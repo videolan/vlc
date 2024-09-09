@@ -249,6 +249,7 @@ typedef struct {
     struct vout_crop crop;
 
     /* */
+    vlc_rational_t dar;
     video_format_t source;          // format coming from the decoder
     video_format_t display_fmt;     // format required on the input of the display module
     vlc_video_context *src_vctx;
@@ -671,6 +672,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    osys->dar = (vlc_rational_t){dar_num, dar_den};
 
     unsigned sar_num, sar_den;
     if (dar_num > 0 && dar_den > 0) {
