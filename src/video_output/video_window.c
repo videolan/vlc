@@ -146,7 +146,7 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
     {
         case VLC_WINDOW_MOUSE_MOVED:
             vlc_mouse_SetPosition(m, ev->x, ev->y);
-            state->mouse.last_left_press = INT64_MIN;
+            state->mouse.last_left_press = VLC_TICK_MIN;
             break;
 
         case VLC_WINDOW_MOUSE_PRESSED:
@@ -156,11 +156,11 @@ static void vout_display_window_MouseEvent(vlc_window_t *window,
             {
                 const vlc_tick_t now = vlc_tick_now();
 
-                if (state->mouse.last_left_press != INT64_MIN
+                if (state->mouse.last_left_press != VLC_TICK_MIN
                  && now - state->mouse.last_left_press < DOUBLE_CLICK_TIME)
                 {
                     m->b_double_click = true;
-                    state->mouse.last_left_press = INT64_MIN;
+                    state->mouse.last_left_press = VLC_TICK_MIN;
                 }
                 else
                     state->mouse.last_left_press = now;
@@ -395,7 +395,7 @@ vlc_window_t *vout_display_window_New(vout_thread_t *vout)
     vlc_mutex_init(&state->lock);
     vlc_mouse_Init(&state->mouse.window);
     vlc_mouse_Init(&state->mouse.video);
-    state->mouse.last_left_press = INT64_MIN;
+    state->mouse.last_left_press = VLC_TICK_MIN;
     state->mouse.event = NULL;
     state->vout = vout;
 
