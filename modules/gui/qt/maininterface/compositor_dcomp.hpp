@@ -25,6 +25,8 @@
 #include "video_window_handler.hpp"
 
 #include <QPointer>
+#include <QWaitCondition>
+#include <QMutex>
 
 #include <memory>
 
@@ -78,6 +80,15 @@ protected:
     void windowDestroy() override;
 
 private:
+    enum class SetupState {
+        Uninitialized,
+        Success,
+        Fail
+    };
+    SetupState m_setupState = SetupState::Uninitialized;
+    QWaitCondition m_setupStateCond;
+    QMutex m_setupStateLock;
+
     std::unique_ptr<QQuickView> m_quickView;
 
     IDCompositionDevice *m_dcompDevice = nullptr;

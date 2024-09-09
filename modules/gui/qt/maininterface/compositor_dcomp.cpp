@@ -229,6 +229,12 @@ void CompositorDirectComposition::setup()
             }
         }
     }
+
+    {
+        QMutexLocker lock(&m_setupStateLock);
+        m_setupState = SetupState::Success;
+        m_setupStateCond.notify_all();
+    }
 }
 
 bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
@@ -244,8 +250,6 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
 
     m_quickView->installEventFilter(this);
 
-    bool appropriateGraphicsApi = true;
-
     connect(quickViewPtr,
             &QQuickWindow::frameSwapped, // At this stage, we can be sure that QRhi and QRhiSwapChain are valid.
             this,
@@ -258,6 +262,16 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
 
     if (!ret)
         return false;
+
+    connect(quickViewPtr,
+            &QQuickWindow::sceneGraphError,
+            this,
+            [this](QQuickWindow::SceneGraphError error, const QString &message) {
+                qWarning() << "CompositorDComp: Scene Graph Error: " << error << ", Message: " << message;
+                QMutexLocker lock(&m_setupStateLock);
+                m_setupState = SetupState::Fail;
+                m_setupStateCond.notify_all();
+            }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
 
     m_quickView->show();
 
@@ -296,6 +310,20 @@ void CompositorDirectComposition::unloadGUI()
 
 bool CompositorDirectComposition::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
+    {
+        QMutexLocker lock(&m_setupStateLock);
+        while (m_setupState == SetupState::Uninitialized)
+        {
+            const bool ret = m_setupStateCond.wait(&m_setupStateLock, QDeadlineTimer(2500));
+            if (!ret)
+                return false;
+        }
+        if (m_setupState != SetupState::Success)
+        {
+            return false;
+        }
+    }
+
     assert(m_dcompDevice);
 
     const HRESULT hr = m_dcompDevice->CreateVisual(&m_videoVisual);
