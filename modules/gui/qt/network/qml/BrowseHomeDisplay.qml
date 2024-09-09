@@ -33,6 +33,9 @@ FocusScope {
 
     // Properties
 
+    property bool _initialized: false
+    property bool _resetFocusPendingAfterInitialization: false
+
     property int leftPadding: 0
     property int rightPadding: 0
 
@@ -69,8 +72,24 @@ FocusScope {
 
     focus: true
 
-    onActiveFocusChanged: resetFocus()
 
+    Component.onCompleted: {
+        _initialized = true
+        if (_resetFocusPendingAfterInitialization) {
+            resetFocus()
+
+            _resetFocusPendingAfterInitialization = false
+        }
+    }
+
+    onActiveFocusChanged: {
+        if (!_initialized) {
+            _resetFocusPendingAfterInitialization = true
+            return
+        }
+
+        resetFocus()
+    }
 
     function setCurrentItemFocus(reason) {
         if (foldersSection.visible)
