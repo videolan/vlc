@@ -69,8 +69,8 @@ FocusScope {
 
     focus: true
 
-    Component.onCompleted: resetFocus()
     onActiveFocusChanged: resetFocus()
+
 
     function setCurrentItemFocus(reason) {
         if (foldersSection.visible)
@@ -256,20 +256,20 @@ FocusScope {
     }
 
     function resetFocus() {
+        if (!activeFocus)
+            return
+
         for (let i = 0; i < column.count; ++i) {
             const widget = column.itemAt(i)
             if (widget.activeFocus && widget.visible)
                 return
         }
 
-        let found  = false;
         for (let i = 0; i < column.count; ++i){
             const widget = column.itemAt(i)
-            if (widget.visible && !found) {
-                widget.focus = true
-                found = true
-            } else {
-                widget.focus = false
+            if (widget.visible) {
+                Helpers.transferFocus(widget, Qt.TabFocusReason)
+                break
             }
         }
     }
