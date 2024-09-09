@@ -636,6 +636,7 @@ static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
 
+    bool use_scaler = false;
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
@@ -652,7 +653,19 @@ static int Control(vout_display_t *vd, int query)
 
             sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
             sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
+
+            use_scaler = true;
         }
+    }
+
+    if (!use_scaler)
+    {
+        sys->picQuad.quad_fmt.i_sar_num        = vd->source->i_sar_num;
+        sys->picQuad.quad_fmt.i_sar_den        = vd->source->i_sar_den;
+        sys->picQuad.quad_fmt.i_x_offset       = vd->source->i_x_offset;
+        sys->picQuad.quad_fmt.i_y_offset       = vd->source->i_y_offset;
+        sys->picQuad.quad_fmt.i_visible_width  = vd->source->i_visible_width;
+        sys->picQuad.quad_fmt.i_visible_height = vd->source->i_visible_height;
     }
 
     CommonControl( vd, &sys->area, query );
