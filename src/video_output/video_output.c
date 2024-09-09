@@ -548,18 +548,13 @@ void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
     vlc_queuedmutex_unlock(&sys->display_lock);
 }
 
-static void vout_SetAspectRatio(vout_thread_sys_t *sys, vlc_rational_t dar)
-{
-    sys->source.dar = dar;
-}
-
 void vout_ChangeDisplayAspectRatio(vout_thread_t *vout, vlc_rational_t dar)
 {
     vout_thread_sys_t *sys = VOUT_THREAD_TO_SYS(vout);
     assert(!sys->dummy);
 
     vlc_mutex_lock(&sys->window_lock);
-    vout_SetAspectRatio(sys, dar);
+    sys->source.dar = dar;
 
     vout_UpdateWindowSizeLocked(sys);
 
@@ -2331,7 +2326,7 @@ static void vout_InitSource(vout_thread_sys_t *vout)
     if (psz_ar) {
         vlc_rational_t ar;
         if (GetAspectRatio(psz_ar, &ar))
-            vout_SetAspectRatio(vout, ar);
+            vout->source.dar = ar;
         free(psz_ar);
     }
 
