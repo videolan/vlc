@@ -33,7 +33,7 @@ void vout_FilterFlush(vout_display_t *);
 
 void vout_SetDisplayFitting(vout_display_t *, enum vlc_video_fitting);
 void vout_SetDisplayZoom(vout_display_t *, unsigned num, unsigned den);
-void vout_SetDisplayAspect(vout_display_t *, unsigned num, unsigned den);
+void vout_SetDisplayAspect(vout_display_t *, vlc_rational_t dar);
 void vout_SetDisplayCrop(vout_display_t *, const struct vout_crop *);
 void vout_SetDisplayViewpoint(vout_display_t *, const vlc_viewpoint_t *);
 int vout_SetDisplayFormat(vout_display_t *, const video_format_t *fmt,

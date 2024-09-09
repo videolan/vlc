@@ -698,10 +698,10 @@ static int UpdateSourceSAR(vout_display_t *vd, const video_format_t *source)
     return vout_SetSourceAspect(vd, sar_num, sar_den);
 }
 
-void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
+void vout_SetDisplayAspect(vout_display_t *vd, vlc_rational_t dar)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    osys->dar = (vlc_rational_t){dar_num, dar_den};
+    osys->dar = dar;
 
     int err1 = UpdateSourceSAR(vd, vd->source);
     if (err1 != VLC_SUCCESS)

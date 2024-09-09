@@ -160,7 +160,7 @@ void vout_ChangeDisplaySize(vout_thread_t *, unsigned width, unsigned height,
                             void (*ack_cb)(void *), void *opaque);
 void vout_ChangeDisplayFitting(vout_thread_t *, enum vlc_video_fitting);
 void vout_ChangeZoom(vout_thread_t *, unsigned num, unsigned den);
-void vout_ChangeDisplayAspectRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ChangeDisplayAspectRatio(vout_thread_t *, vlc_rational_t dar);
 void vout_ChangeCrop(vout_thread_t *, const struct vout_crop *);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeInterlacing(vout_thread_t *, bool);

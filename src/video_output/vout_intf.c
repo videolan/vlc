@@ -635,7 +635,7 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
     vlc_rational_t ar;
 
     if (GetAspectRatio(newval.psz_string, &ar))
-        vout_ChangeDisplayAspectRatio(vout, ar.num, ar.den);
+        vout_ChangeDisplayAspectRatio(vout, ar);
     return VLC_SUCCESS;
 }
 
