@@ -169,28 +169,30 @@ static const struct
     enum aom_img_fmt i_chroma_id;
     uint8_t          i_bitdepth;
     enum aom_transfer_characteristics transfer_characteristics;
-
+    enum aom_color_primaries color_primaries;
+    enum aom_matrix_coefficients matrix_coefficients;
 } chroma_table[] =
 {
     /* Transfer characteristic-dependent mappings must come first */
-    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_SRGB },
-    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_SRGB },
+    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_SRGB, AOM_CICP_CP_BT_709, AOM_CICP_MC_IDENTITY },
+    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_SRGB , AOM_CICP_CP_BT_709, AOM_CICP_MC_IDENTITY },
+    { VLC_CODEC_GBR_PLANAR_12L, AOM_IMG_FMT_I44416, 12, AOM_CICP_TC_SRGB , AOM_CICP_CP_BT_709, AOM_CICP_MC_IDENTITY },
 
-    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
 
-    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
 
-    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
 
-    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, AOM_CICP_TC_UNSPECIFIED },
-    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
+    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
 
-    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, AOM_CICP_TC_UNSPECIFIED },
+    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, AOM_CICP_TC_UNSPECIFIED, AOM_CICP_CP_UNSPECIFIED, AOM_CICP_MC_UNSPECIFIED },
 };
 
 static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
@@ -199,7 +201,11 @@ static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
         if( chroma_table[i].i_chroma_id == img->fmt &&
             chroma_table[i].i_bitdepth == img->bit_depth &&
             ( chroma_table[i].transfer_characteristics == AOM_CICP_TC_UNSPECIFIED ||
-              chroma_table[i].transfer_characteristics == img->tc ) )
+              chroma_table[i].transfer_characteristics == img->tc ) &&
+            ( chroma_table[i].color_primaries == AOM_CICP_CP_UNSPECIFIED ||
+              chroma_table[i].color_primaries == img->cp ) &&
+            ( chroma_table[i].matrix_coefficients == AOM_CICP_MC_UNSPECIFIED ||
+              chroma_table[i].matrix_coefficients == img->mc ) )
             return chroma_table[i].i_chroma;
 
     return 0;
