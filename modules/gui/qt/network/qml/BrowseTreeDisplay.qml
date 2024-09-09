@@ -37,6 +37,11 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
+    readonly property int headerLeftPadding: (contentLeftMargin > 0)
+                                             ? contentLeftMargin : VLCStyle.dynamicAppMargins(width)
+    readonly property int headerRightPadding: (contentRightMargin > 0)
+                                              ? contentRightMargin : VLCStyle.dynamicAppMargins(width)
+
     // fixme remove this
     property Item _currentView: currentItem
 
@@ -137,8 +142,8 @@ MainViewLoader {
             headerDelegate: BrowseTreeHeader {
                 providerModel: root.model
 
-                leftPadding: root.contentLeftMargin
-                rightPadding: root.contentRightMargin
+                leftPadding: root.headerLeftPadding
+                rightPadding: root.headerRightPadding
 
                 width: gridView.width
 
@@ -276,8 +281,8 @@ MainViewLoader {
             header: BrowseTreeHeader {
                 providerModel: root.model
 
-                leftPadding: root.contentLeftMargin
-                rightPadding: root.contentRightMargin
+                leftPadding: root.contentLeftPadding
+                rightPadding: root.contentRightPadding
 
                 width: tableView.width
 
@@ -410,6 +415,9 @@ MainViewLoader {
                 id: header
 
                 focus: true
+
+                leftPadding: root.headerLeftPadding
+                rightPadding: root.headerRightPadding
 
                 providerModel: root.model
 
