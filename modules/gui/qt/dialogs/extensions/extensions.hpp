@@ -78,7 +78,6 @@ class ExtensionDialog : public QDialog
     Q_OBJECT
 private:
     qt_intf_t *p_intf;
-    extensions_manager_t *p_extensions_manager;
     extension_t *p_extension;
     extension_dialog_t *p_dialog;
     bool has_lock; ///< Indicates whether Qt thread owns the lock
@@ -103,7 +102,6 @@ private slots:
 
 public:
     ExtensionDialog( qt_intf_t *p_intf,
-                     extensions_manager_t *p_mgr,
                      extension_dialog_t *p_dialog );
     virtual ~ExtensionDialog();
 

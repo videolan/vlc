@@ -68,7 +68,6 @@ ExtensionDialog* ExtensionsDialogProvider::CreateExtDialog(
         extension_dialog_t *p_dialog )
 {
     ExtensionDialog *dialog = new ExtensionDialog( p_intf,
-                                                   p_extensions_manager,
                                                    p_dialog );
     p_dialog->p_sys_intf = (void*) dialog;
     return dialog;
@@ -161,10 +160,11 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
 
 
 ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
-                                  extensions_manager_t *p_mgr,
                                   extension_dialog_t *_p_dialog )
-         : QDialog( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )
-         , p_dialog( _p_dialog ), has_lock(true)
+    : QDialog( NULL )
+    , p_intf( _p_intf )
+    , p_dialog( _p_dialog )
+    , has_lock(true)
 {
     assert( p_dialog );
     connect( ExtensionsDialogProvider::getInstance(), &ExtensionsDialogProvider::destroyed,
