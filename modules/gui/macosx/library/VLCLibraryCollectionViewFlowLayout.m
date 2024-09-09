@@ -236,12 +236,12 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
 
 - (NSCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSCollectionViewLayoutAttributes *attributes = [super layoutAttributesForItemAtIndexPath:indexPath];
-
     if(_selectedIndexPath == nil || indexPath == _selectedIndexPath) {
-        return attributes;
+        return [super layoutAttributesForItemAtIndexPath:indexPath];
     }
 
+    NSCollectionViewLayoutAttributes * const attributes =
+        [super layoutAttributesForItemAtIndexPath:indexPath].copy;
     [attributes setFrame:[self frameForDisplacedAttributes:attributes]];
     return attributes;
 }
@@ -255,9 +255,10 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     NSRect selectedItemFrame = [[self layoutAttributesForItemAtIndexPath:_selectedIndexPath] frame];
 
     // Computed attributes from parent
-    NSMutableArray<__kindof NSCollectionViewLayoutAttributes *> *layoutAttributesArray = [[super layoutAttributesForElementsInRect:rect] mutableCopy];
+    NSMutableArray<__kindof NSCollectionViewLayoutAttributes *> * const layoutAttributesArray =
+        [super layoutAttributesForElementsInRect:rect].mutableCopy;
     for (int i = 0; i < layoutAttributesArray.count; i++) {
-        NSCollectionViewLayoutAttributes * const attributes = layoutAttributesArray[i];
+        NSCollectionViewLayoutAttributes * const attributes = layoutAttributesArray[i].copy;
         NSString * const elementKind = attributes.representedElementKind;
 
         if (@available(macOS 10.12, *)) {
@@ -328,8 +329,8 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     }
 
     // Default attributes
-    NSCollectionViewLayoutAttributes *attributes = [super layoutAttributesForSupplementaryViewOfKind:elementKind
-                                                                                         atIndexPath:indexPath];
+    NSCollectionViewLayoutAttributes * const attributes =
+        [super layoutAttributesForSupplementaryViewOfKind:elementKind atIndexPath:indexPath].copy;
     [attributes setFrame:[self frameForDisplacedAttributes:attributes]];
     return attributes;
 }
