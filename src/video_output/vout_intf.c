@@ -126,7 +126,7 @@ static const struct
 static const struct
 {
     char psz_value[8];
-    char psz_label[8];
+    char psz_label[12];
 } p_aspect_ratio_values[] = {
     { "", N_("Default") },
     { "16:9", "16:9" },
@@ -137,6 +137,7 @@ static const struct
     { "235:100", "2.35:1" },
     { "239:100", "2.39:1" },
     { "5:4", "5:4" },
+    { "fill", N_("Fill Window") },
 };
 
 static const struct
@@ -614,6 +615,10 @@ bool GetAspectRatio(const char *ar_str, vlc_rational_t *ar)
 {
     if (*ar_str == '\0') {
         *ar = VLC_DAR_FROM_SOURCE;
+        return true;
+    }
+    if (strcmp(ar_str,"fill")==0) {
+        *ar = VLC_DAR_FILL_DISPLAY;
         return true;
     }
     if (sscanf(ar_str, "%u:%u", &ar->num, &ar->den) == 2 &&

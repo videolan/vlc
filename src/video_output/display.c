@@ -507,6 +507,8 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
     osys->source.i_visible_height = bottom - top;
     video_format_Print(VLC_OBJECT(vd), "CROPPED ", &osys->source);
 
+    err1 = UpdateSourceSAR(vd, vd->source);
+
     bool place_changed = PlaceVideoInDisplay(osys);
 
     err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
@@ -606,6 +608,8 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
 
+    err1 = UpdateSourceSAR(vd, vd->source);
+
     bool place_changed = PlaceVideoInDisplay(osys);
 
     err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE);
@@ -674,6 +678,11 @@ static int UpdateSourceSAR(vout_display_t *vd, const video_format_t *source)
         VoutFixFormatAR( &fixed_src );
         sar_num = fixed_src.i_sar_num;
         sar_den = fixed_src.i_sar_den;
+    } else if (VLC_DAR_IS_FILL_DISPLAY(osys->dar)) {
+        // trick vout_display_PlacePicture to fill the display
+        vlc_ureduce(&sar_num, &sar_den,
+                    (uint64_t)osys->cfg.display.width  * osys->source.i_visible_height,
+                    (uint64_t)osys->cfg.display.height * osys->source.i_visible_width, 0);
     } else if (unlikely(osys->dar.num == 0 || osys->dar.den == 0)) {
         // bogus values should be filtered in GetAspectRatio()
         vlc_assert_unreachable();

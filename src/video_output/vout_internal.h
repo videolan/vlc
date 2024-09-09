@@ -32,9 +32,14 @@ typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 
 ///< Use the aspect ratio from the source video format
 #define VLC_DAR_FROM_SOURCE  ((vlc_rational_t){0, 0})
+///< Use the whole display area to show the video
+#define VLC_DAR_FILL_DISPLAY ((vlc_rational_t){1, 0})
 
 #define VLC_DAR_IS_FROM_SOURCE(r) \
     ((r).num == VLC_DAR_FROM_SOURCE.num && (r).den == VLC_DAR_FROM_SOURCE.den)
+
+#define VLC_DAR_IS_FILL_DISPLAY(r) \
+    ((r).num == VLC_DAR_FILL_DISPLAY.num && (r).den == VLC_DAR_FILL_DISPLAY.den)
 
 /**
  * Vout configuration
