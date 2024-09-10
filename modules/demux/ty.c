@@ -699,7 +699,8 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* get the PTS from this packet if it has one.
          * on S1, only 0x06 has PES.  On S2, however, most all do.
          * Do NOT Pass the PES Header to the MPEG2 codec */
-        esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, 5 );
+        size_t search_len = __MIN(l_rec_size - sizeof(ty_VideoPacket), 5);
+        esOffset1 = find_es_header( ty_VideoPacket, p_block_in->p_buffer, search_len );
         if( esOffset1 != -1 )
         {
             //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
