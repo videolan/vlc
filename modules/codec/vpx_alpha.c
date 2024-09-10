@@ -128,17 +128,26 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
 
     for (int i=0; i<opaque->i_planes; i++)
         out->p[i] = opaque->p[i];
+
     if (alpha)
+    {
         out->p[opaque->i_planes] = alpha->p[0];
-    else
+        return out;
+    }
+
     {
         // use the dummy opaque plane attached in the picture context
         struct pic_alpha_plane *p = alpha_ctx->plane;
-        if (out->p_sys == NULL)
+        if (p == NULL)
         {
             int plane_size = bdec->fmt_out.video.i_width * bdec->fmt_out.video.i_height;
             p = malloc(sizeof(*p) + plane_size);
-            if (likely(p != NULL))
+            if (unlikely(p == NULL))
+            {
+                picture_Release(out);
+                return NULL;
+            }
+
             {
                 p->p.i_lines = bdec->fmt_out.video.i_height;
                 p->p.i_visible_lines = bdec->fmt_out.video.i_y_offset + bdec->fmt_out.video.i_visible_height;
@@ -151,11 +160,6 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
 
                 alpha_ctx->plane = p;
             }
-        }
-        if (unlikely(p == NULL))
-        {
-            picture_Release(out);
-            return NULL;
         }
         out->p[opaque->i_planes] = p->p;
     }
