@@ -450,6 +450,12 @@ static int Demux( demux_t *p_demux )
         /* read in this record's payload */
         if( !( p_block_in = vlc_stream_Block( p_demux->s, l_rec_size ) ) )
             return 0;
+        if (p_block_in->i_buffer != (unsigned long) l_rec_size)
+        {
+            msg_Err(p_demux, "Unexpected EOF");
+            block_Release(p_block_in);
+            return 0;
+        }
 
         /* set these as 'unknown' for now */
         p_block_in->i_pts =
