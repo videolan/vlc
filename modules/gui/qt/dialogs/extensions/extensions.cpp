@@ -53,13 +53,13 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( qt_intf_t *_p_intf,
     assert(p_intf);
     assert(p_extensions_manager);
 
-    vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, NULL );
+    vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, this );
 }
 
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
 {
     msg_Dbg( p_intf, "ExtensionsDialogProvider is quitting..." );
-    vlc_dialog_provider_set_ext_callback( p_intf, NULL, NULL );
+    vlc_dialog_provider_set_ext_callback( p_intf, nullptr, nullptr );
 }
 
 /** Create a dialog
@@ -148,7 +148,7 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
 {
     (void) p_data;
 
-    ExtensionsDialogProvider *p_edp = ExtensionsDialogProvider::getInstance();
+    auto p_edp = static_cast<ExtensionsDialogProvider*>(p_data);
     if( p_edp )
         p_edp->ManageDialog( p_ext_dialog );
 }
