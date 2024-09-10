@@ -57,8 +57,8 @@ static inline void bits_align( bits_buffer_t *p_buffer )
     if( p_buffer->i_mask != 0x80 && p_buffer->i_data < p_buffer->i_size )
     {
         p_buffer->i_mask = 0x80;
-        p_buffer->i_data++;
-        p_buffer->p_data[p_buffer->i_data] = 0x00;
+        if( ++p_buffer->i_data < p_buffer->i_size )
+            p_buffer->p_data[p_buffer->i_data] = 0x00;
     }
 }
 
