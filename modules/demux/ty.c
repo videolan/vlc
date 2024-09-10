@@ -1789,6 +1789,8 @@ static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     p_chunk += CHUNK_HEADER_SIZE;       /* skip past rec count & SEQ bytes */
     //msg_Dbg(p_demux, "probe: chunk has %d recs", i_num_recs);
     p_hdrs = parse_chunk_headers(p_chunk, i_num_recs, &i_payload_size);
+    if (unlikely(p_hdrs == NULL))
+        return VLC_ENOMEM;
     /* scan headers.
      * 1. check video packets.  Presence of 0x6e0 means S1.
      *    No 6e0 but have be0 means S2.
@@ -1949,16 +1951,19 @@ static int get_chunk_header(demux_t *p_demux)
         return 0;
 
     /* read the record headers into a temp buffer */
-    p_hdr_buf = xmalloc(i_num_recs * REC_SIZE);
+    p_hdr_buf = malloc(i_num_recs * REC_SIZE);
+    if (p_hdr_buf == NULL)
+        return VLC_ENOMEM;
     if (vlc_stream_Read(p_demux->s, p_hdr_buf, i_num_recs * REC_SIZE) < i_num_recs * REC_SIZE) {
         free( p_hdr_buf );
         p_sys->eof = true;
         return 0;
     }
     /* parse them */
-    p_sys->rec_hdrs = parse_chunk_headers(p_hdr_buf, i_num_recs,
-            &i_payload_size);
+    p_sys->rec_hdrs = parse_chunk_headers(p_hdr_buf, i_num_recs, &i_payload_size);
     free(p_hdr_buf);
+    if (unlikely(p_sys->rec_hdrs == NULL))
+        return VLC_ENOMEM;
 
     p_sys->i_stuff_cnt = CHUNK_SIZE - 4 -
         (p_sys->i_num_recs * REC_SIZE) - i_payload_size;
@@ -1976,7 +1981,9 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
     ty_rec_hdr_t *p_hdrs, *p_rec_hdr;
 
     *pi_payload_size = 0;
-    p_hdrs = xmalloc(i_num_recs * sizeof(ty_rec_hdr_t));
+    p_hdrs = vlc_alloc(i_num_recs, sizeof(ty_rec_hdr_t));
+    if (unlikely(p_hdrs == NULL))
+        return NULL;
 
     for (i = 0; i < i_num_recs; i++)
     {
