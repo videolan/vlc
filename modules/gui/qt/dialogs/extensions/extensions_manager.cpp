@@ -55,12 +55,7 @@ ExtensionsManager::ExtensionsManager( qt_intf_t *_p_intf, QObject *parent )
 ExtensionsManager::~ExtensionsManager()
 {
     msg_Dbg( p_intf, "Killing extension dialog provider" );
-    ExtensionsDialogProvider::killInstance();
-    if( p_extensions_manager )
-    {
-        module_unneed( p_extensions_manager, p_extensions_manager->p_module );
-        vlc_object_delete(p_extensions_manager);
-    }
+    unloadExtensions();
 }
 
 bool ExtensionsManager::loadExtensions()
@@ -116,6 +111,11 @@ void ExtensionsManager::unloadExtensions()
     if( !p_extensions_manager )
         return;
     b_unloading = true;
+    extension_t* p_ext = nullptr;
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
+    {
+        extension_Deactivate(p_extensions_manager, p_ext);
+    }
     ExtensionsDialogProvider::killInstance();
     module_unneed( p_extensions_manager, p_extensions_manager->p_module );
     vlc_object_delete(p_extensions_manager);

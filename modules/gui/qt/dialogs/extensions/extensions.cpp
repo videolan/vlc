@@ -59,6 +59,8 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( qt_intf_t *_p_intf,
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
 {
     msg_Dbg( p_intf, "ExtensionsDialogProvider is quitting..." );
+    for (ExtensionDialog* dialog: m_dialogs)
+        delete dialog;
     vlc_dialog_provider_set_ext_callback( p_intf, nullptr, nullptr );
 }
 
@@ -69,7 +71,7 @@ ExtensionDialog* ExtensionsDialogProvider::CreateExtDialog(
 {
     ExtensionDialog *dialog = new ExtensionDialog( p_intf,
                                                    p_dialog );
-    p_dialog->p_sys_intf = (void*) dialog;
+    m_dialogs.insert(dialog);
     return dialog;
 }
 
@@ -81,8 +83,8 @@ int ExtensionsDialogProvider::DestroyExtDialog( extension_dialog_t *p_dialog )
     ExtensionDialog *dialog = ( ExtensionDialog* ) p_dialog->p_sys_intf;
     if( !dialog )
         return VLC_EGENERIC;
+    m_dialogs.erase(dialog);
     delete dialog;
-    p_dialog->p_sys_intf = NULL;
     vlc_cond_signal( &p_dialog->cond );
     return VLC_SUCCESS;
 }
@@ -153,8 +155,6 @@ ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
     , has_lock(true)
 {
     assert( p_dialog );
-    connect( ExtensionsDialogProvider::getInstance(), &ExtensionsDialogProvider::destroyed,
-             this, &ExtensionDialog::parentDestroyed );
 
     msg_Dbg( p_intf, "Creating a new dialog: '%s'", p_dialog->psz_title );
     this->setWindowFlags( Qt::WindowMinMaxButtonsHint
@@ -168,11 +168,15 @@ ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
     connect( inputMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncInput );
     selectMapper = new QSignalMapper( this );
     connect( selectMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncSelection );
+
+    p_dialog->p_sys_intf = this;
 }
 
 ExtensionDialog::~ExtensionDialog()
 {
     msg_Dbg( p_intf, "Deleting extension dialog '%s'", qtu(windowTitle()) );
+    p_dialog->p_sys_intf = nullptr;
+    vlc_cond_signal( &p_dialog->cond );
 }
 
 QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
@@ -668,12 +672,4 @@ void ExtensionDialog::keyPressEvent( QKeyEvent *event )
         QDialog::keyPressEvent( event );
         return;
     }
-}
-
-void ExtensionDialog::parentDestroyed()
-{
-    msg_Dbg( p_intf, "About to destroy dialog '%s'", p_dialog->psz_title );
-    deleteLater(); // May not work at this point (event loop can be ended)
-    p_dialog->p_sys_intf = NULL;
-    vlc_cond_signal( &p_dialog->cond );
 }
