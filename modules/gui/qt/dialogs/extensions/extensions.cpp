@@ -104,23 +104,18 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     }
 
     vlc_mutex_lock( &p_dialog->lock );
-    if( !p_dialog->b_kill && !dialog )
+    if( !p_dialog->b_kill )
     {
-        dialog = CreateExtDialog( p_dialog );
-        dialog->setVisible( !p_dialog->b_hide );
-        dialog->has_lock = false;
-    }
-    else if( !p_dialog->b_kill && dialog )
-    {
+        if (!dialog)
+        {
+            dialog = CreateExtDialog( p_dialog );
+        }
         dialog->has_lock = true;
         dialog->UpdateWidgets();
-        if( strcmp( qtu( dialog->windowTitle() ),
-                    p_dialog->psz_title ) != 0 )
-            dialog->setWindowTitle( qfu( p_dialog->psz_title ) );
         dialog->has_lock = false;
         dialog->setVisible( !p_dialog->b_hide );
     }
-    else if( p_dialog->b_kill )
+    else
     {
         DestroyExtDialog( p_dialog );
     }
@@ -182,8 +177,6 @@ ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
     connect( inputMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncInput );
     selectMapper = new QSignalMapper( this );
     connect( selectMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncSelection );
-
-    UpdateWidgets();
 }
 
 ExtensionDialog::~ExtensionDialog()
@@ -479,6 +472,11 @@ void ExtensionDialog::SyncSelection( QObject *object )
 void ExtensionDialog::UpdateWidgets()
 {
     assert( p_dialog );
+    vlc_mutex_assert(&p_dialog->lock);
+
+    if( strcmp( qtu( windowTitle() ), p_dialog->psz_title ) != 0 )
+        setWindowTitle( qfu( p_dialog->psz_title ) );
+
     extension_widget_t *p_widget;
     ARRAY_FOREACH( p_widget, p_dialog->widgets )
     {
