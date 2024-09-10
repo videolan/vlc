@@ -90,8 +90,7 @@ int ExtensionsDialogProvider::DestroyExtDialog( extension_dialog_t *p_dialog )
 /**
  * Update/Create/Destroy a dialog
  **/
-ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
-        extension_dialog_t *p_dialog )
+void ExtensionsDialogProvider::UpdateExtDialog(extension_dialog_t *p_dialog )
 {
     assert( p_dialog );
 
@@ -100,7 +99,7 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     {
         /* This extension could not be activated properly but tried
            to create a dialog. We must ignore it. */
-        return NULL;
+        return;
     }
 
     vlc_mutex_lock( &p_dialog->lock );
@@ -121,23 +120,6 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     }
     vlc_cond_signal( &p_dialog->cond );
     vlc_mutex_unlock( &p_dialog->lock );
-    return dialog;
-}
-
-/**
- * Ask the dialog manager to create/update/kill the dialog. Thread-safe.
- **/
-void ExtensionsDialogProvider::ManageDialog( extension_dialog_t *p_dialog )
-{
-    assert( p_dialog );
-    ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
-    assert( extMgr != NULL );
-    if( !extMgr->isUnloading() )
-        QMetaObject::invokeMethod(this, [this, p_dialog](){
-            UpdateExtDialog( p_dialog );
-        }); // Safe because we signal Qt thread
-    else
-        UpdateExtDialog( p_dialog ); // This is safe, we're already in Qt thread
 }
 
 /**
@@ -149,8 +131,17 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
     (void) p_data;
 
     auto p_edp = static_cast<ExtensionsDialogProvider*>(p_data);
-    if( p_edp )
-        p_edp->ManageDialog( p_ext_dialog );
+    if (!p_edp)
+        return;
+
+    //use auto connection here
+    // * either we are in extension thread and this is safe to carry the extension_dialog_t
+    //   through queued connection as the extension wait that we signal its condition variable
+    // * either we are in Qt thread (during destruction for instance) and we want direct connection
+    QMetaObject::invokeMethod(p_edp, [p_edp, p_ext_dialog]() {
+        p_edp->UpdateExtDialog( p_ext_dialog );
+    });
+
 }
 
 

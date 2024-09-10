@@ -54,22 +54,19 @@ class ExtensionsDialogProvider : public QObject, public Singleton<ExtensionsDial
 
     Q_OBJECT
 
-private:
-    qt_intf_t *p_intf;
-    extensions_manager_t *p_extensions_manager;
-
-private slots:
-    ExtensionDialog* CreateExtDialog( extension_dialog_t *p_dialog );
-    int DestroyExtDialog( extension_dialog_t *p_dialog );
-    ExtensionDialog* UpdateExtDialog( extension_dialog_t *p_dialog );
-
 public:
-    void ManageDialog( extension_dialog_t *p_dialog );
+    void UpdateExtDialog( extension_dialog_t *p_dialog );
 
 private:
     ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr,
                              extensions_manager_t *p_mgr = nullptr );
     virtual ~ExtensionsDialogProvider();
+
+    ExtensionDialog* CreateExtDialog( extension_dialog_t *p_dialog );
+    int DestroyExtDialog( extension_dialog_t *p_dialog );
+
+    qt_intf_t *p_intf = nullptr;
+    extensions_manager_t *p_extensions_manager = nullptr;
 };
 
 
