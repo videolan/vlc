@@ -272,7 +272,7 @@ static int ty_stream_seek_time(demux_t *, uint64_t);
 static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
                                           int i_num_recs, int *pi_payload_size);
 static int probe_stream(demux_t *p_demux);
-static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk);
+static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk);
 static int  parse_master(demux_t *p_demux);
 
 static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_block_in );
@@ -1729,7 +1729,10 @@ static int probe_stream(demux_t *p_demux)
 
     /* the real work: analyze this chunk */
     for (i = 0; i < CHUNK_PEEK_COUNT; i++) {
-        analyze_chunk(p_demux, p_buf);
+        int ret = analyze_chunk(p_demux, p_buf);
+        if (ret != 0)
+            return VLC_EGENERIC;
+
         if (p_sys->tivo_series != TIVO_SERIES_UNKNOWN &&
             p_sys->audio_type  != TIVO_AUDIO_UNKNOWN &&
             p_sys->tivo_type   != TIVO_TYPE_UNKNOWN)
@@ -1756,7 +1759,7 @@ static int probe_stream(demux_t *p_demux)
 
 /* ======================================================================== */
 /* gather statistics for this chunk & set our tivo-type vars accordingly */
-static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
+static int analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_num_recs, i;
@@ -1766,14 +1769,14 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
 
     /* skip if it's a Part header */
     if( U32_AT( &p_chunk[ 0 ] ) == TIVO_PES_FILEID )
-        return;
+        return VLC_SUCCESS;
 
     /* number of records in chunk (we ignore high order byte;
      * rarely are there > 256 chunks & we don't need that many anyway) */
     i_num_recs = p_chunk[0];
     if (i_num_recs < 5 || i_num_recs >= MAX_NUM_RECS) {
         /* try again with the next chunk.  Sometimes there are dead ones */
-        return;
+        return VLC_SUCCESS;
     }
 
     p_chunk += CHUNK_HEADER_SIZE;       /* skip past rec count & SEQ bytes */
@@ -1863,6 +1866,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
         }
     }
     free(p_hdrs);
+    return VLC_SUCCESS;
 }
 
 
