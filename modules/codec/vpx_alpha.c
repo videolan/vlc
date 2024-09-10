@@ -68,6 +68,7 @@ struct cpu_alpha_context
     picture_context_t  ctx;
     picture_t          *opaque;
     picture_t          *alpha; // may be NULL if the alpha layer was missing
+    struct pic_alpha_plane *plane;
 };
 
 static void cpu_alpha_destroy(picture_context_t *ctx)
@@ -77,6 +78,7 @@ static void cpu_alpha_destroy(picture_context_t *ctx)
     if (!vlc_atomic_rc_dec(&pctx->rc))
         return;
 
+    free(pctx->plane);
     picture_Release(pctx->opaque);
     if (pctx->alpha)
         picture_Release(pctx->alpha);
@@ -130,8 +132,8 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
         out->p[opaque->i_planes] = alpha->p[0];
     else
     {
-        // use the dummy opaque plane attached in the picture p_sys
-        struct pic_alpha_plane *p = out->p_sys;
+        // use the dummy opaque plane attached in the picture context
+        struct pic_alpha_plane *p = alpha_ctx->plane;
         if (out->p_sys == NULL)
         {
             int plane_size = bdec->fmt_out.video.i_width * bdec->fmt_out.video.i_height;
@@ -147,7 +149,7 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
                 p->p.p_pixels = p->buffer;
                 memset(p->p.p_pixels, 0xFF, plane_size);
 
-                out->p_sys = p;
+                alpha_ctx->plane = p;
             }
         }
         if (unlikely(p == NULL))
