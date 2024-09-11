@@ -135,34 +135,30 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
         return out;
     }
 
+    // use the dummy opaque plane attached in the picture context
+    struct pic_alpha_plane *p = alpha_ctx->plane;
+    if (p == NULL)
     {
-        // use the dummy opaque plane attached in the picture context
-        struct pic_alpha_plane *p = alpha_ctx->plane;
-        if (p == NULL)
+        int plane_size = bdec->fmt_out.video.i_width * bdec->fmt_out.video.i_height;
+        p = malloc(sizeof(*p) + plane_size);
+        if (unlikely(p == NULL))
         {
-            int plane_size = bdec->fmt_out.video.i_width * bdec->fmt_out.video.i_height;
-            p = malloc(sizeof(*p) + plane_size);
-            if (unlikely(p == NULL))
-            {
-                picture_Release(out);
-                return NULL;
-            }
-
-            {
-                p->p.i_lines = bdec->fmt_out.video.i_height;
-                p->p.i_visible_lines = bdec->fmt_out.video.i_y_offset + bdec->fmt_out.video.i_visible_height;
-
-                p->p.i_pitch = bdec->fmt_out.video.i_width;
-                p->p.i_visible_pitch = bdec->fmt_out.video.i_x_offset + bdec->fmt_out.video.i_visible_width;
-                p->p.i_pixel_pitch = 1;
-                p->p.p_pixels = p->buffer;
-                memset(p->p.p_pixels, 0xFF, plane_size);
-
-                alpha_ctx->plane = p;
-            }
+            picture_Release(out);
+            return NULL;
         }
-        out->p[opaque->i_planes] = p->p;
+
+        p->p.i_lines = bdec->fmt_out.video.i_height;
+        p->p.i_visible_lines = bdec->fmt_out.video.i_y_offset + bdec->fmt_out.video.i_visible_height;
+
+        p->p.i_pitch = bdec->fmt_out.video.i_width;
+        p->p.i_visible_pitch = bdec->fmt_out.video.i_x_offset + bdec->fmt_out.video.i_visible_width;
+        p->p.i_pixel_pitch = 1;
+        p->p.p_pixels = p->buffer;
+        memset(p->p.p_pixels, 0xFF, plane_size);
+
+        alpha_ctx->plane = p;
     }
+    out->p[opaque->i_planes] = p->p;
     return out;
 }
 
