@@ -341,6 +341,7 @@ static int dts_header_ParseLBRExtSubstream( vlc_dts_header_t *p_header,
     bs_skip( &s, 16 );
     uint16_t nLBRScaledBitRate_LSW = bs_read( &s, 16 );
     p_header->i_bitrate = nLBRScaledBitRate_LSW | ((nLBRBitRateMSnybbles & 0xF0) << 12);
+    p_header->i_frame_size = 0;
     return VLC_SUCCESS;
 }
 
