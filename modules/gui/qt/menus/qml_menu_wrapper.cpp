@@ -101,12 +101,16 @@ void SortMenu::popup(const QPoint &point, const bool popupAbovePoint, const QVar
         shownChanged();
     } );
 
+    const auto actionGroup = new QActionGroup(m_menu.get());
+    actionGroup->setExclusive(true);
+
     // model => [{text: "", checked: <bool>, order: <sort order> if checked else <invalid>}...]
     for (int i = 0; i != model.size(); ++i)
     {
         const auto obj = model[i].toMap();
 
         auto action = m_menu->addAction(obj.value("text").toString());
+        action->setActionGroup(actionGroup);
         action->setCheckable(true);
 
         const bool checked = obj.value("checked").toBool();
