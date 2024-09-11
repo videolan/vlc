@@ -232,8 +232,6 @@ QtObject {
 
     readonly property int artistBanner_height: MainCtx.dp(200, scale)
 
-    readonly property int playlistDelegate_verticalPadding: MainCtx.dp(6, scale)
-
     //global application size, updated by the root widget
     property int appWidth: 0
     property int appHeight: 0

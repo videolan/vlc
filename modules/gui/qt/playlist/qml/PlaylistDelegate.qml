@@ -64,7 +64,7 @@ T.Control {
 
     hoverEnabled: true
 
-    verticalPadding: VLCStyle.playlistDelegate_verticalPadding
+    verticalPadding: VLCStyle.margin_xxxsmall
 
     leftPadding: VLCStyle.margin_normal
 
