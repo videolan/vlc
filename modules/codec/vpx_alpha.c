@@ -4,6 +4,7 @@
 // Copyright © 2023 VideoLabs, VLC authors and VideoLAN
 
 // Authors: Steve Lhomme <robux4@videolabs.io>
+//          Alexandre Janniaux <ajanni@videolabs.io>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -63,6 +64,7 @@ static vlc_decoder_device *GetDevice( decoder_t *dec )
 
 struct cpu_alpha_context
 {
+    vlc_atomic_rc_t    rc;
     picture_context_t  ctx;
     picture_t          *opaque;
     picture_t          *alpha; // may be NULL if the alpha layer was missing
@@ -71,6 +73,10 @@ struct cpu_alpha_context
 static void cpu_alpha_destroy(picture_context_t *ctx)
 {
     struct cpu_alpha_context *pctx = container_of(ctx, struct cpu_alpha_context, ctx);
+
+    if (!vlc_atomic_rc_dec(&pctx->rc))
+        return;
+
     picture_Release(pctx->opaque);
     if (pctx->alpha)
         picture_Release(pctx->alpha);
@@ -80,13 +86,9 @@ static void cpu_alpha_destroy(picture_context_t *ctx)
 static picture_context_t *cpu_alpha_copy(picture_context_t *src)
 {
     struct cpu_alpha_context *pctx = container_of(src, struct cpu_alpha_context, ctx);
-    struct cpu_alpha_context *alpha_ctx = calloc(1, sizeof(*alpha_ctx));
-    if (unlikely(alpha_ctx == NULL))
-        return NULL;
-    alpha_ctx->ctx = *src;
-    alpha_ctx->opaque = picture_Hold(pctx->opaque);
-    alpha_ctx->alpha  = alpha_ctx->alpha ? picture_Hold(pctx->alpha) : NULL;
-    return &alpha_ctx->ctx;
+
+    vlc_atomic_rc_inc(&pctx->rc);
+    return &pctx->ctx;
 }
 
 struct pic_alpha_plane
@@ -114,6 +116,7 @@ static picture_t *CombinePicturesCPU(decoder_t *bdec, picture_t *opaque, picture
         picture_Release(out);
         return NULL;
     }
+    vlc_atomic_rc_init(&alpha_ctx->rc);
     alpha_ctx->ctx = (picture_context_t) {
         cpu_alpha_destroy, cpu_alpha_copy, NULL
     };
