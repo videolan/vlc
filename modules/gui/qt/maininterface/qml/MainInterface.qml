@@ -176,7 +176,14 @@ Item {
                 if (MainCtx.hasEmbededVideo && MainCtx.canShowVideoPIP === false)
                     MainPlaylistController.stop()
 
-                _pushHome()
+                if (History.previousEmpty) {
+                    if (MainCtx.mediaLibraryAvailable)
+                        History.update(["mc", "video"])
+                    else
+                        History.update(["mc", "home"])
+                    loadCurrentHistoryView(Qt.OtherFocusReason)
+                } else
+                    History.previous()
             }
 
             function onRequestShowPlayerView() {
