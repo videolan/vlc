@@ -43,6 +43,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 {
     return @[
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVLCTitleSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
@@ -182,6 +183,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     switch (segmentType) {
         case VLCLibraryVLCTitleSegment:
             return _NS("VLC");
+        case VLCLibraryHeaderSegment:
+            return _NS("Library");
         case VLCLibraryHomeSegment:
             return _NS("Home");
         case VLCLibraryMusicSegment:
@@ -227,6 +230,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     switch (segmentType) {
         case VLCLibraryVLCTitleSegment:
             return NSApp.applicationIconImage;
+        case VLCLibraryHeaderSegment:
+            return nil;
         case VLCLibraryHomeSegment:
             return [NSImage imageNamed:@"bw-home"];
         case VLCLibraryMusicSegment:
@@ -264,6 +269,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         switch (segmentType) {
         case VLCLibraryVLCTitleSegment:
             return NSApp.applicationIconImage;
+        case VLCLibraryHeaderSegment:
+            return nil;
         case VLCLibraryHomeSegment:
             return [NSImage imageWithSystemSymbolName:@"house"
                              accessibilityDescription:@"Home icon"];
