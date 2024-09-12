@@ -53,25 +53,10 @@ Item {
 
     function setInitialView() {
         //set the initial view
-        const loadPlayer = !MainPlaylistController.empty;
-
-        if (loadPlayer)
-        {
-            if (MainCtx.mediaLibraryAvailable)
-                History.update(["mc", "video"])
-            else
-                History.update(["mc", "home"])
-            History.push(["player"])
-        }
+        if (!MainPlaylistController.empty)
+            MainCtx.requestShowPlayerView()
         else
-            _pushHome()
-    }
-
-    function _pushHome() {
-        if (MainCtx.mediaLibraryAvailable)
-            History.push(["mc", "video"])
-        else
-            History.push(["mc", "home"])
+            MainCtx.requestShowMainView()
     }
 
     function loadCurrentHistoryView(focusReason) {
@@ -265,12 +250,8 @@ Item {
             Connections {
                 target: Player
                 function onPlayingStateChanged() {
-                    if (Player.playingState === Player.PLAYING_STATE_STOPPED
-                            && History.match(History.viewPath, ["player"]) ) {
-                        if (History.previousEmpty)
-                            _pushHome()
-                        else
-                            History.previous()
+                    if (Player.playingState === Player.PLAYING_STATE_STOPPED) {
+                        MainCtx.requestShowMainView()
                     }
                 }
             }

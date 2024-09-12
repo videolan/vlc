@@ -87,12 +87,9 @@ AbstractButton {
 
     onClicked: {
         if (History.match(History.viewPath, ["player"])) {
-            if (MainCtx.mediaLibraryAvailable)
-                History.push(["mc", "video"])
-            else
-                History.push(["mc", "home"])
+            MainCtx.requestShowMainView()
         } else {
-            History.push(["player"])
+            MainCtx.requestShowPlayerView()
         }
     }
 

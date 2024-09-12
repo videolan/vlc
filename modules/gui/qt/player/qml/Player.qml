@@ -315,7 +315,7 @@ FocusScope {
             if (MainCtx.hasEmbededVideo && !MainCtx.canShowVideoPIP) {
                MainPlaylistController.stop()
             }
-            History.previous()
+            MainCtx.requestShowMainView()
         }
 
         FadeControllerStateGroup {

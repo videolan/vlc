@@ -548,8 +548,7 @@ FocusScope {
         target: Player
         function onHasVideoOutputChanged() {
             if (Player.hasVideoOutput && MainCtx.hasEmbededVideo) {
-                if (!History.match(History.viewPath, ["player"]))
-                    History.push(["player"])
+                MainCtx.requestShowPlayerView()
             } else {
                 _showMiniPlayer = false;
             }

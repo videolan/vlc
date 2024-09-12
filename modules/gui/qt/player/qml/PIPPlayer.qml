@@ -62,7 +62,7 @@ T.Control {
         TapHandler {
             gesturePolicy: TapHandler.WithinBounds
 
-            onDoubleTapped: History.push(["player"])
+            onDoubleTapped: MainCtx.requestShowPlayerView()
             onTapped: MainPlaylistController.togglePlayPause()
         }
 
@@ -148,7 +148,7 @@ T.Control {
 
             hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
 
-            onClicked: History.push(["player"])
+            onClicked: MainCtx.requestShowPlayerView()
         }
     }
 }

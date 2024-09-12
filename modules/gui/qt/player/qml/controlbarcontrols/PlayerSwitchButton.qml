@@ -27,9 +27,9 @@ Widgets.IconToolButton {
 
     onClicked: {
         if (History.match(History.viewPath, ["player"]))
-            History.previous()
+            MainCtx.requestShowMainView()
         else
-            History.push(["player"])
+            MainCtx.requestShowPlayerView()
     }
 
     description: qsTr("Switch Player")

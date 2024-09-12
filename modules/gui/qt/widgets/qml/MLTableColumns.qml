@@ -25,6 +25,6 @@ TableColumns {
 
     onPlayClicked: function (model) {
         MediaLib.addAndPlay(model.id)
-        History.push(["player"])
+        MainCtx.requestShowPlayerView()
     }
 }

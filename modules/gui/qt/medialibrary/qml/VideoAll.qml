@@ -94,12 +94,12 @@ MainViewLoader {
 
     function onAction(indexes) {
         model.addAndPlay( indexes )
-        History.push(["player"])
+        MainCtx.requestShowPlayerView()
     }
 
     function onDoubleClick(object) {
         MediaLib.addAndPlay(object.id)
-        History.push(["player"])
+        MainCtx.requestShowPlayerView()
     }
 
     // Private events
