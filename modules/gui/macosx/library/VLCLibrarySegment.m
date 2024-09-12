@@ -219,7 +219,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
-            NSAssert(true, @"Invalid segment value");
+            NSAssert(NO, @"Invalid segment value");
     }
     return nil;
 }
@@ -256,7 +256,13 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryGroupsSegment:
         case VLCLibraryGroupsGroupSubSegment:
             return [NSImage imageNamed:@"NSTouchBarTagIcon"];
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
+            NSAssert(NO, @"Invalid segment value");
+            return nil;
     }
+
+    return nil;
 }
 
 - (NSImage *)newIconImageForType:(VLCLibrarySegmentType)segmentType
@@ -316,10 +322,13 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryGroupsGroupSubSegment:
             return [NSImage imageWithSystemSymbolName:@"play.rectangle"
                              accessibilityDescription:@"Group icon"];
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
+            NSAssert(NO, @"Invalid segment value");
+            return nil;
         }
-    } else {
-        return nil;
     }
+    return nil;
 }
 
 - (NSImage *)iconForType:(VLCLibrarySegmentType)segmentType
