@@ -266,7 +266,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryVLCTitleSegment:
             return NSApp.applicationIconImage;
         case VLCLibraryHeaderSegment:
-            return nil;
+            return [NSImage imageWithSystemSymbolName:@"books.vertical.fill"
+                             accessibilityDescription:@"Library icon"];
         case VLCLibraryHomeSegment:
             return [NSImage imageWithSystemSymbolName:@"house"
                              accessibilityDescription:@"Home icon"];
