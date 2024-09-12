@@ -236,4 +236,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     }
 }
 
+- (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
+{
+    NSTreeNode * const treeNode = (NSTreeNode *)item;
+    VLCLibrarySegment * const segment = (VLCLibrarySegment *)treeNode.representedObject;
+    return segment.segmentType == VLCLibraryHeaderSegment;
+}
+
 @end
