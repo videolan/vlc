@@ -157,6 +157,10 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
              segmentType < VLCLibraryHighSentinelSegment,
              @"Invalid segment type value provided");
 
+    if (segmentType == VLCLibraryVLCTitleSegment || segmentType == VLCLibraryHeaderSegment) {
+        return;
+    }
+
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     self.libraryWindow.librarySegmentType = segment.segmentType;
 
@@ -194,7 +198,10 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         NSTreeNode * const node = [self.outlineView itemAtRow:proposedSelectionIndexes.firstIndex];
         VLCLibrarySegment * const segment = (VLCLibrarySegment *)node.representedObject;
 
-        if (segment.segmentType == VLCLibraryMusicSegment) {
+        if (segment.segmentType == VLCLibraryVLCTitleSegment ||
+            segment.segmentType == VLCLibraryHeaderSegment) {
+            return NSIndexSet.indexSet;
+        } else if (segment.segmentType == VLCLibraryMusicSegment) {
             [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
             NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegment];
             const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
