@@ -37,8 +37,6 @@ import VLC.Util
  * state Hidden {
  *    state NormalHidden {
  *    }
- *    state MinimalView {
- *    }
  * }
  * @enduml
  *
@@ -55,7 +53,6 @@ FSM {
     signal unlock()
     signal forceUnlock()
     signal timeout()
-    signal updateMinimalView()
     signal updateVideoEmbed()
  
     //exposed internal states
@@ -64,7 +61,7 @@ FSM {
     property int lockCount: 0 // Track the number of locks
     property int timeoutDuration: 3000
 
-    initialState: ((Player.isInteractive && MainCtx.hasEmbededVideo) || MainCtx.minimalView) 
+    initialState: ((Player.isInteractive && MainCtx.hasEmbededVideo))
                   ? fsmHidden : fsmVisible
  
     signalMap: ({
@@ -74,7 +71,6 @@ FSM {
         lock: fsm.lock,
         timeout: fsm.timeout,
         unlock: fsm.unlock,
-        updateMinimalView: fsm.updateMinimalView,
         updateVideoEmbed: fsm.updateVideoEmbed,
     })
  
@@ -82,13 +78,6 @@ FSM {
         id: fsmVisible
 
         initialState: fsmNormalVisible
- 
-        transitions: ({
-            updateMinimalView: {
-                guard: () => MainCtx.minimalView,
-                target: fsmHidden
-            }
-        })
  
         FSMState {
             id: fsmNormalVisible
@@ -166,15 +155,12 @@ FSM {
                 unlock: [{
                     action: () => { fsm.lockCount--; },
                     guard: () => fsm.lockCount === 1,
-                    target: fsmNormalVisible,                    
+                    target: fsmNormalVisible,
                 }, {
                     guard: () => fsm.lockCount > 1,
                     action: () => { fsm.lockCount--; }
                 }],
-                updateMinimalView: {
-                    guard: () => MainCtx.minimalView,
-                    target: fsmMinimalView
-                }
+
             })
         }
     }
@@ -186,50 +172,26 @@ FSM {
             fsm.lockCount = 0;
             fsm.forceUnlock();
         }
-    
-        initialState: MainCtx.minimalView ? fsmMinimalView : fsmNormalHidden
-    
-        FSMState {
-            id: fsmNormalHidden
-    
-            transitions: ({
-                mouseMove: {
-                    guard: () => !Player.isInteractive,
-                    action: () => {
-                        fsm.timeoutDuration = 3000
-                    },
-                    target: fsmVisible
-                },
-                keyboardMove: {
-                    guard: () => !Player.isInteractive,
-                    action: () => {
-                        fsm.timeoutDuration = 5000
-                    },
-                    target: fsmVisible
-                },
-                askShow: {
-                    target: fsmVisible
-                },
-                updateMinimalView: {
-                    guard: () => MainCtx.minimalView,
-                    target: fsmMinimalView
-                }
-            })
-        }
-    
-        FSMState {
-            id: fsmMinimalView
 
-            transitions: ({
-                updateMinimalView: {
-                    guard: () => !MainCtx.minimalView,
-                    target: fsmVisible,
-                    action: () => {
-                        fsm.timeoutDuration = 3000
-                    }
-                }
-            })
-        }
+        transitions: ({
+            mouseMove: {
+                guard: () => !Player.isInteractive,
+                action: () => {
+                    fsm.timeoutDuration = 3000
+                },
+                target: fsmVisible
+            },
+            keyboardMove: {
+                guard: () => !Player.isInteractive,
+                action: () => {
+                    fsm.timeoutDuration = 5000
+                },
+                target: fsmVisible
+            },
+            askShow: {
+                target: fsmVisible
+            },
+        })
     }
  
     Timer {
