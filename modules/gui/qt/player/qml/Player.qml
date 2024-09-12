@@ -168,10 +168,6 @@ FocusScope {
             playlistVisibility.updateVideoEmbed()
             playerToolbarVisibilityFSM.updateVideoEmbed()
         }
-        function onMinimalViewChanged() {
-            playlistVisibility.updateMinimalView()
-            playerToolbarVisibilityFSM.updateMinimalView()
-        }
         function onAskShow() {
             playerToolbarVisibilityFSM.askShow()
         }
@@ -190,7 +186,7 @@ FocusScope {
 
         onMouseMoved: {
             //short interval for mouse events
-            if ((Player.isInteractive) || (MainCtx.minimalView))
+            if (Player.isInteractive)
             {
                 toggleControlBarButtonAutoHide.restart()
                 videoSurface.cursorShape = Qt.ArrowCursor
@@ -831,14 +827,6 @@ FocusScope {
             target: controlBar
         }
     }
-    
-    MinimalView {
-        id: minimalView
-
-        focus: true
-        visible: MainCtx.minimalView && !hasEmbededVideo
-        anchors.fill: parent
-    }
 
     QmlAudioContextMenu {
         id: audioContextMenu
@@ -864,7 +852,7 @@ FocusScope {
     target: MainCtx.intfMainWindow
 
         Keys.onPressed: (event) => {
-            if ((Player.isInteractive) || (MainCtx.minimalView))
+            if (Player.isInteractive)
             {
                 toggleControlBarButtonAutoHide.restart()
                 videoSurface.cursorShape = Qt.ArrowCursor
