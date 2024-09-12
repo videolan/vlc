@@ -32,7 +32,7 @@ import VLC.Util
  *    state Hidden {
  *       state followVisible {
  *        }
- *       state minimalOrEmbed {
+ *       state embed {
  *       }  
  *    }
  * }
@@ -47,12 +47,10 @@ FSM {
     signal updatePlaylistVisible()
     signal updatePlaylistDocked()
     signal updateVideoEmbed()
-    signal updateMinimalView()
  
     //internal signals
-    signal _updateVideoEmbedOrMinimal()
-    onUpdateVideoEmbed: _updateVideoEmbedOrMinimal()
-    onUpdateMinimalView: _updateVideoEmbedOrMinimal()
+    signal _updateVideoEmbed()
+    onUpdateVideoEmbed: _updateVideoEmbed()
  
     //exposed internal states
     property alias isPlaylistVisible: fsmVisible.active
@@ -64,8 +62,7 @@ FSM {
         updatePlaylistVisible: fsm.updatePlaylistVisible,
         updatePlaylistDocked: fsm.updatePlaylistDocked,
         updateVideoEmbed: fsm.updateVideoEmbed,
-        updateMinimalView: fsm.updateMinimalView,
-        updateVideoEmbedOrMinimal: fsm._updateVideoEmbedOrMinimal,
+        updateVideoEmbed: fsm._updateVideoEmbed,
     })
  
     FSMState {
@@ -85,7 +82,7 @@ FSM {
     FSMState {
         id: fsmDocked
  
-        initialState: (MainCtx.hasEmbededVideo || MainCtx.minimalView || !MainCtx.playlistVisible )  
+        initialState: (MainCtx.hasEmbededVideo || !MainCtx.playlistVisible )
                       ? fsmHidden : fsmVisible
  
         transitions: ({
@@ -108,10 +105,6 @@ FSM {
                     guard: () => MainCtx.hasEmbededVideo,
                     target: fsmHidden
                 },
-                updateMinimalView: {
-                    guard: () => MainCtx.minimalView,
-                    target: fsmHidden
-                },
                 updatePlaylistVisible: {
                     guard: () => !MainCtx.playlistVisible,
                     target: fsmHidden
@@ -122,8 +115,7 @@ FSM {
         FSMState {
             id: fsmHidden
 
-            initialState: (MainCtx.minimalView || MainCtx.hasEmbededVideo) 
-                          ? fsmMinimalOrEmbed : fsmFollowVisible
+            initialState: MainCtx.hasEmbededVideo ? fsmEmbed : fsmFollowVisible
 
             FSMState {
                 id: fsmFollowVisible
@@ -135,9 +127,9 @@ FSM {
                 }
 
                 transitions: ({
-                    updateVideoEmbedOrMinimal: {
-                        guard: () => MainCtx.hasEmbededVideo || MainCtx.minimalView,
-                        target: fsmMinimalOrEmbed
+                    updateVideoEmbed: {
+                        guard: () => MainCtx.hasEmbededVideo,
+                        target: fsmEmbed
                     },
                     updatePlaylistVisible: {
                         guard: () => MainCtx.playlistVisible,
@@ -147,18 +139,15 @@ FSM {
             }
 
             FSMState {
-                id: fsmMinimalOrEmbed
+                id: fsmEmbed
 
                 transitions: ({
-                    updateVideoEmbedOrMinimal: [{ //guards tested in order
-                       guard: () => MainCtx.minimalView,
-                        //no target we remain in minimal
-                    },{
-                       guard: () => !MainCtx.hasEmbededVideo,
-                         target: fsmFollowVisible
-                    }],
+                    updateVideoEmbed: { //guards tested in order{
+                        guard: () => !MainCtx.hasEmbededVideo,
+                        target: fsmFollowVisible
+                    },
                     updatePlaylistVisible: {
-                        guard: () => !MainCtx.minimalView && MainCtx.playlistVisible,
+                        guard: () => MainCtx.playlistVisible,
                         target: fsmVisible
                     },
                 })
