@@ -44,9 +44,13 @@ Item {
                                       && MainCtx.clientSideDecoration
                                       && (MainCtx.intfMainWindow.visibility === Window.Windowed)
 
+    //when exiting minimal mode, what is the page to restore
+    property bool _minimalRestorePlayer: false
+
     readonly property var _pageModel: [
         { name: "mc", url: "qrc:///qt/qml/VLC/MainInterface/MainDisplay.qml" },
         { name: "player", url:"qrc:///qt/qml/VLC/Player/Player.qml" },
+        { name: "minimal", url:"qrc:///qt/qml/VLC/Player/MinimalView.qml" },
     ]
 
     property var _oldHistoryPath: ([])
@@ -155,6 +159,10 @@ Item {
             target: MainCtx
 
             function onRequestShowMainView() {
+                root._minimalRestorePlayer = false
+                if (MainCtx.minimalView)
+                    return
+
                 if (History.match(History.viewPath, ["mc"]))
                     return
 
@@ -172,10 +180,33 @@ Item {
             }
 
             function onRequestShowPlayerView() {
-                if (History.match(History.viewPath, ["player"]))
+                root._minimalRestorePlayer = true
+                if (MainCtx.minimalView)
                     return
 
-                History.push(["player"])
+                if (!History.match(History.viewPath, ["player"]))
+                    History.push(["player"])
+            }
+
+            function onMinimalViewChanged() {
+                const isCurrentlyMinimal = History.match(History.viewPath, ["minimal"])
+
+                if (MainCtx.minimalView && !isCurrentlyMinimal) {
+                    const isCurrentlyPlayer = History.match(History.viewPath, ["player"])
+                    if (isCurrentlyPlayer) {
+                        History.update(["minimal"])
+                        loadCurrentHistoryView(Qt.OtherFocusReason)
+                    } else {
+                        History.push(["minimal"])
+                    }
+                } else if (!MainCtx.minimalView && isCurrentlyMinimal) {
+                    if (root._minimalRestorePlayer) {
+                        History.update(["player"])
+                        loadCurrentHistoryView(Qt.OtherFocusReason)
+                    } else {
+                        History.previous()
+                    }
+                }
             }
         }
 
