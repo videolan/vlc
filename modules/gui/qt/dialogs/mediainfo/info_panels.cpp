@@ -132,13 +132,13 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META( VLC_META_LANGUAGE, language_text, 7, -1 ); line++;
     ADD_META( VLC_META_PUBLISHER, publisher_text, 0, 7 );
 
+    /* Fingerprint button on the same line */
     fingerprintButton = new QPushButton( qtr("&Fingerprint") );
     fingerprintButton->setToolTip( qtr( "Find meta data using audio fingerprinting" ) );
     fingerprintButton->setEnabled( false );
-    metaLayout->addWidget( fingerprintButton, line, 7 , 3, -1, Qt::AlignCenter );
+    metaLayout->addWidget( fingerprintButton, line++, 7 , 1, -1, Qt::AlignCenter );
     connect( fingerprintButton, &QPushButton::clicked, this, &MetaPanel::fingerprint );
 
-    line++;
 
     ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
 
