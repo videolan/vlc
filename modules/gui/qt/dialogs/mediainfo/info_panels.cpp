@@ -139,12 +139,11 @@ MetaPanel::MetaPanel( QWidget *parent,
     metaLayout->addWidget( fingerprintButton, line++, 7 , 1, -1, Qt::AlignCenter );
     connect( fingerprintButton, &QPushButton::clicked, this, &MetaPanel::fingerprint );
 
-
-    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
-
     /* ART_URL */
     art_cover = new CoverArtLabel( this, p_intf );
     metaLayout->addWidget( art_cover, line, 7, 6, 3, Qt::AlignCenter );
+
+    ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
 
     fingerprintButton->setMinimumWidth( std::max( fingerprintButton->minimumSizeHint().width(),
                                                   art_cover->minimumSizeHint().width() ) );
