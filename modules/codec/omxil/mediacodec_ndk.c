@@ -356,6 +356,11 @@ static int Start(mc_api *api, union mc_api_args *p_args)
         syms.AMediaFormat.setInt32(p_sys->p_format, "width", p_args->video.i_width);
         syms.AMediaFormat.setInt32(p_sys->p_format, "height", p_args->video.i_height);
         syms.AMediaFormat.setInt32(p_sys->p_format, "rotation-degrees", p_args->video.i_angle);
+
+        syms.AMediaFormat.setInt32(p_sys->p_format, "color-range", p_args->video.color_range);
+        syms.AMediaFormat.setInt32(p_sys->p_format, "color-standard", p_args->video.color_standard);
+        syms.AMediaFormat.setInt32(p_sys->p_format, "color-transfer", p_args->video.color_transfer);
+
         if (p_args->video.p_surface)
         {
             p_anw = p_args->video.p_surface;

@@ -638,6 +638,10 @@ static int Start(mc_api *api, union mc_api_args *p_args)
         if (p_args->video.i_angle != 0)
             SET_INTEGER(jformat, "rotation-degrees", p_args->video.i_angle);
 
+        SET_INTEGER(jformat, "color-range", p_args->video.color_range);
+        SET_INTEGER(jformat, "color-standard", p_args->video.color_standard);
+        SET_INTEGER(jformat, "color-transfer", p_args->video.color_transfer);
+
         if (b_direct_rendering)
         {
             /* feature-tunneled-playback available since API 21 */
