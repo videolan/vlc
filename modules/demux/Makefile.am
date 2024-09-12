@@ -504,6 +504,7 @@ libvlc_adaptive_la_SOURCES += \
     mux/mp4/libmp4mux.c \
     mux/mp4/libmp4mux.h \
     packetizer/h264_nal.c \
+    packetizer/h266_nal.c \
     packetizer/hevc_nal.c
 libvlc_adaptive_la_CXXFLAGS = $(AM_CXXFLAGS) -I$(srcdir)/demux/adaptive
 libvlc_adaptive_la_LIBADD = $(SOCKET_LIBS) $(LIBM) libvlc_mp4.la

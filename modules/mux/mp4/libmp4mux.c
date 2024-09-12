@@ -26,6 +26,7 @@
 
 #include "libmp4mux.h"
 #include "../../demux/mp4/libmp4.h" /* flags */
+#include "../../packetizer/h266_nal.h"
 #include "../../packetizer/hevc_nal.h"
 #include "../../packetizer/h264_nal.h" /* h264_AnnexB_get_spspps */
 #include "../../packetizer/hxxx_nal.h"
@@ -846,6 +847,45 @@ static bo_t *GetHvcCTag(const uint8_t *p_extra, size_t i_extra,
     return hvcC;
 }
 
+static bo_t *GetVvcCTag(const uint8_t *p_extra, size_t i_extra,
+                        bool b_completeness)
+{
+
+    /* Generate hvcC box matching iso/iec 14496-15 3rd edition */
+    bo_t *vvcC = box_full_new("vvcC", 0, 0);
+    if(!vvcC || !i_extra)
+        return vvcC;
+
+    /* Extradata is already an VVCDecoderConfigurationRecord */
+    if(h266_isvvcC(p_extra, i_extra))
+    {
+        (void) bo_add_mem(vvcC, i_extra, p_extra);
+        return vvcC;
+    }
+
+    struct h266_dcr_params params = { .i_vps_count = 0, .p_values = NULL };
+    const uint8_t *p_nal;
+    size_t i_nal;
+
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init(&it, p_extra, i_extra, 0);
+    while(hxxx_annexb_iterate_next(&it, &p_nal, &i_nal))
+        h266_add_NALtoParams(p_nal, i_nal, &params);
+
+    size_t i_dcr;
+    uint8_t *p_dcr = h266_create_DecoderConfigurationRecord(&params, b_completeness, &i_dcr);
+    if(!p_dcr)
+    {
+        bo_free(vvcC);
+        return NULL;
+    }
+
+    bo_add_mem(vvcC, i_dcr, p_dcr);
+    free(p_dcr);
+
+    return vvcC;
+}
+
 static bo_t *GetWaveFormatExTag(es_format_t *p_fmt, const char *tag)
 {
     bo_t *box = box_new(tag);
@@ -1351,6 +1391,7 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* FIXME: find a way to know if no non-VCL units are in the stream (->hvc1)
      * see 14496-15 8.4.1.1.1 */
     case VLC_CODEC_HEVC: memcpy(fcc, "hev1", 4); break;
+    case VLC_CODEC_VVC:  memcpy(fcc, "vvc1", 4); break;
     case VLC_CODEC_YV12: memcpy(fcc, "yv12", 4); b_colr = b_fiel = true; break;
     case VLC_CODEC_YUYV: memcpy(fcc, "YUY2", 4); b_colr = b_fiel= true; break;
     case VLC_CODEC_UYVY: memcpy(fcc, "2vuy", 4); b_colr = b_fiel= true; break;
@@ -1442,6 +1483,10 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     case VLC_CODEC_HEVC:
         /* Write HvcC without forcing VPS/SPS/PPS/SEI array_completeness */
         box_gather(vide, GetHvcCTag(p_extradata, i_extradata, false));
+        break;
+
+    case VLC_CODEC_VVC:
+        box_gather(vide, GetVvcCTag(p_extradata, i_extradata, false));
         break;
     }
 
@@ -2373,6 +2418,14 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
         {
             if(p_obj)
                 msg_Err(p_obj, "HEVC muxing from AnnexB source is unsupported");
+            return false;
+        }
+        break;
+    case VLC_CODEC_VVC:
+        if(!p_fmt->i_extra)
+        {
+            if(p_obj)
+                msg_Err(p_obj, "H266 muxing from AnnexB source is unsupported");
             return false;
         }
         break;

@@ -501,6 +501,7 @@ vlc_modules += {
         '../mux/mp4/libmp4mux.h',
         '../packetizer/h264_nal.c',
         '../packetizer/hevc_nal.c',
+        '../packetizer/h266_nal.c',
 
         # General adaptive sources
 

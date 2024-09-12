@@ -662,6 +662,7 @@ static int BlockConvert(mp4_stream_t *p_stream, block_t **out)
             break;
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
+        case VLC_CODEC_VVC:
             p_block = hxxx_AnnexB_to_xVC(p_block, 4);
             break;
         case VLC_CODEC_SUBT:

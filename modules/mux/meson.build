@@ -21,6 +21,7 @@ vlc_modules += {
         'mp4/mp4.c',
         'mp4/libmp4mux.c',
         'extradata.c',
+        '../packetizer/h266_nal.c',
         '../packetizer/av1_obu.c'),
     'link_with': [hxxxhelper_lib],
 }

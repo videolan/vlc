@@ -22,6 +22,7 @@ libmux_mp4_plugin_la_SOURCES = mux/mp4/mp4.c \
 	mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \
         demux/mp4/libmp4.h mux/av1_pack.h \
 	packetizer/hxxx_nal.c packetizer/hxxx_nal.h \
+        packetizer/h266_nal.c packetizer/h266_nal.h \
         packetizer/hevc_nal.c packetizer/hevc_nal.h \
         packetizer/h264_nal.c packetizer/h264_nal.h
 libmux_mp4_plugin_la_SOURCES += $(extradata_builder_SOURCES)
