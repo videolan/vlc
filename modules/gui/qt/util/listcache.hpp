@@ -171,6 +171,22 @@ public:
     int updateItem(ItemType&& newItem);
 
     /**
+     * insert an item in the cache and notify changes
+     */
+    void insertItem(ItemType&& item, int position);
+
+    /**
+     * @brief insertItemList insert items in the cache at position p position and
+     * notify changes
+     * @param first iterator to the first element to insert (list.begin)
+     * @param last iterator past the last element to insert (list.end())
+     * @param position insertion position 0 is equivalent to push_front
+     * @note items are "moved" into the cache
+     */
+    template<typename IterType>
+    void insertItemList(IterType first, IterType last, int position);
+
+    /**
      * Removes from the cache list given its item id
      *
      * it returns the index row when the id is found and removed, -1 otherwise

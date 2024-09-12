@@ -412,6 +412,28 @@ void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
 }
 
 
+void MLBaseModel::insertItemInCache(std::unique_ptr<MLItem> mlItem, int position)
+{
+    Q_D(MLBaseModel);
+    if (!d->m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    d->m_cache->insertItem(std::move(mlItem), position);
+}
+
+void MLBaseModel::insertItemListInCache(std::vector<std::unique_ptr<MLItem>>&& items, int position)
+{
+    Q_D(MLBaseModel);
+    if (!d->m_cache)
+    {
+        emit resetRequested();
+        return;
+    }
+    d->m_cache->insertItemList(items.begin(), items.end(), position);
+}
+
 void MLBaseModel::moveRangeInCache(int first, int last, int to)
 {
     Q_D(MLBaseModel);

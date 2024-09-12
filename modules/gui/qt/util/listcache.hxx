@@ -200,6 +200,58 @@ int ListCache<T>::deleteItem(const std::function<bool (const ItemType&)>&& f)
     return pos;
 }
 
+
+template<typename T>
+void ListCache<T>::insertItem(ItemType&& item, int position)
+{
+    //we can't update an item locally while the model has pending updates
+    //no worry, we'll receive the update once the actual model notifies us
+    if (m_oldData)
+        return;
+
+    //we can't insert an item before we have any cache
+    if (unlikely(!m_cachedData))
+        return;
+
+    if (unlikely(position < 0 || position > (int)m_cachedData->list.size()))
+        return;
+
+    emit beginInsertRows(position, position);
+    m_cachedData->list.insert(m_cachedData->list.begin() + position, std::move(item));
+    m_cachedData->loadedCount++;
+    m_cachedData->maximumCount++;
+    m_cachedData->queryCount++;
+    emit endInsertRows();
+    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
+}
+
+template<typename T>
+template<typename IterType>
+void ListCache<T>::insertItemList(IterType first, IterType last, int position)
+{
+    //we can't update an item locally while the model has pending updates
+    //no worry, we'll receive the update once the actual model notifies us
+    if (m_oldData)
+        return;
+
+    //we can't insert an item before we have any cache
+    if (unlikely(!m_cachedData))
+        return;
+
+    if (unlikely(position < 0 || position > (int)m_cachedData->list.size()))
+        return;
+
+    size_t count = std::distance(first, last);
+    emit beginInsertRows(position, position + (int)count - 1);
+    std::move(first, last, std::inserter(m_cachedData->list, m_cachedData->list.begin() + position));
+    m_cachedData->loadedCount += count;
+    m_cachedData->maximumCount += count;
+    m_cachedData->queryCount += count;
+    emit endInsertRows();
+    emit localSizeChanged(m_cachedData->queryCount, m_cachedData->maximumCount);
+}
+
+
 template<typename T>
 void ListCache<T>::moveRange(int first, int last, int to)
 {

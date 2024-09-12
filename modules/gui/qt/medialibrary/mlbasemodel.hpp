@@ -106,6 +106,12 @@ protected:
     //update and notify changes on an item if this item is in the cache
     void updateItemInCache(const MLItemId& id);
 
+    //insert item at position @p position in the cache and notify changes
+    void insertItemInCache(std::unique_ptr<MLItem> mlItem, int position);
+
+    //insert items from list @p items at position @p position in the cache and notify changes
+    void insertItemListInCache(std::vector<std::unique_ptr<MLItem>>&& items, int position);
+
     //delete and notify deletion of an item if this item is in the cache
     //this is only to reflect changes from the ML, it won't alter the database
     void deleteItemInCache(const MLItemId& mlid);
