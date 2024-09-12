@@ -59,9 +59,12 @@
 
     setTransactionPending(true);
 
-    m_mediaLib->runOnMLThread(this,
+    struct Ctx {
+        std::vector<std::unique_ptr<MLItem>> medias;
+    };
+    m_mediaLib->runOnMLThread<Ctx>(this,
     //ML thread
-    [medias, id, at](vlc_medialibrary_t* ml) {
+    [medias, id, at](vlc_medialibrary_t* ml, Ctx& ctx) {
         std::vector<int64_t> mediaIdList;
         for (const auto& media : medias)
         {
@@ -77,8 +80,8 @@
                 if (ml_media == nullptr)
                     continue;
             }
-
             mediaIdList.push_back(ml_media->i_id);
+            ctx.medias.emplace_back(std::make_unique<MLPlaylistMedia>(ml_media));
             vlc_ml_media_release(ml_media);
         }
         if (mediaIdList.size() == 0)
@@ -87,7 +90,8 @@
         vlc_ml_playlist_insert(ml, id, mediaIdList.data(), mediaIdList.size(), at);
     },
     //UI thread
-    [this]() {
+    [this, at](quint64, Ctx& ctx) {
+        insertItemListInCache(std::move(ctx.medias), at);
         m_need_reset = true;
         endTransaction();
     });
