@@ -476,6 +476,7 @@ some_sources = files(
     'util/dismiss_popup_event_filter.hpp',
     'util/list_selection_model.cpp',
     'util/list_selection_model.hpp',
+    'util/model_recovery_agent.hpp',
     'widgets/native/animators.cpp',
     'widgets/native/animators.hpp',
     'widgets/native/customwidgets.cpp',

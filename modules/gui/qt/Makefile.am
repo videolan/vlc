@@ -327,6 +327,7 @@ libqt_plugin_la_SOURCES = \
 	util/dismiss_popup_event_filter.hpp \
 	util/list_selection_model.cpp \
 	util/list_selection_model.hpp \
+	util/model_recovery_agent.hpp \
 	widgets/native/animators.cpp \
 	widgets/native/animators.hpp \
 	widgets/native/customwidgets.cpp widgets/native/customwidgets.hpp \
