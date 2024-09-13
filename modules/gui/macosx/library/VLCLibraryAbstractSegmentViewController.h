@@ -34,9 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSView *emptyLibraryView;
 @property (readonly, weak) NSImageView *placeholderImageView;
 @property (readonly, weak) NSTextField *placeholderLabel;
-@property (readwrite) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
 
-@property (readonly) id<VLCLibraryDataSource> currentDataSource; // Implement getter in subclass
+// Implement getters for these properties in subclass
+@property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
+@property (readonly) id<VLCLibraryDataSource> currentDataSource;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
