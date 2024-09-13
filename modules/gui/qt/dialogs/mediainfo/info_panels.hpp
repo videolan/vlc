@@ -76,7 +76,6 @@ private:
     QLineEdit *encodedby_text;
     CoverArtLabel *art_cover;
 
-    QLabel   *lblURL;
     QString  currentURL;
 
     QPushButton *fingerprintButton;

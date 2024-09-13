@@ -140,12 +140,6 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     line++;
 
-    lblURL = new QLabel;
-    lblURL->setOpenExternalLinks( true );
-    lblURL->setTextFormat( Qt::RichText );
-    lblURL->setMaximumWidth( 128 );
-    metaLayout->addWidget( lblURL, line -1, 7, 1, -1 );
-
     ADD_META( VLC_META_COPYRIGHT, copyright_text, 0,  7 ); line++;
 
     /* ART_URL */
@@ -253,19 +247,6 @@ void MetaPanel::update( const SharedInputItem& p_item )
         nowplaying_text->setText( qfu( psz_meta ) );
     free( psz_meta );
 
-    /* URL */
-    psz_meta = input_item_GetURL( inputItem );
-    if( !EMPTY_STR( psz_meta ) )
-    {
-        QString newURL = qfu(psz_meta);
-        if( currentURL != newURL )
-        {
-            currentURL = newURL;
-            lblURL->setText( "<a href='" + currentURL + "'>" +
-                             currentURL.remove( QRegularExpression( QStringLiteral( ".*://" ) ) ) + "</a>" );
-        }
-    }
-    free( psz_meta );
 #undef UPDATE_META_INT
 #undef UPDATE_META
 
@@ -342,7 +323,6 @@ void MetaPanel::clear()
     encodedby_text->clear();
     art_cover->clear();
     fingerprintButton->setEnabled( false );
-    lblURL->clear();
 
     setEditMode( false );
     emit uriSet( "" );
