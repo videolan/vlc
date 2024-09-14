@@ -38,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Implement getters for these properties in subclass
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
 @property (readonly) id<VLCLibraryDataSource> currentDataSource;
+@property (readonly) BOOL connected; // Meaning to library model notifications
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
