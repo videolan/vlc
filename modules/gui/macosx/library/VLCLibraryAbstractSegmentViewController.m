@@ -47,4 +47,14 @@
     return nil;
 }
 
+- (void)connect
+{
+    [self.currentDataSource connect];
+}
+
+- (void)disconnect
+{
+    [self.currentDataSource disconnect];
+}
+
 @end
