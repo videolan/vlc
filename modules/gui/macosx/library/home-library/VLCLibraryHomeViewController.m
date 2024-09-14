@@ -326,4 +326,14 @@
     }];
 }
 
+- (void)connect
+{
+    [self.stackViewController connectContainers];
+}
+
+- (void)disconnect
+{
+    [self.stackViewController disconnectContainers];
+}
+
 @end
