@@ -133,14 +133,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                selector:@selector(libraryModelLongLoadFinished:)
                                    name:audioMediaDeletedLongLoadFinishNotification
                                  object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryWindowPresentedVideoView:)
-                                   name:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
-                                 object:nil];
-        [notificationCenter addObserver:self
-                               selector:@selector(libraryWindowDismissedVideoView:)
-                                   name:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
-                                 object:nil];
     }
 
     return self;

@@ -91,11 +91,6 @@ const CGFloat VLCLibraryWindowMinimalWidth = 604.;
 const CGFloat VLCLibraryWindowMinimalHeight = 307.;
 const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWindow";
 
-NSString * const VLCLibraryWindowEmbeddedVideoViewPresentedNotification =
-    @"VLCLibraryWindowEmbeddedVideoViewPresentedNotification";
-NSString * const VLCLibraryWindowEmbeddedVideoViewDismissedNotification =
-    @"VLCLibraryWindowEmbeddedVideoViewDismissedNotification";
-
 @interface VLCLibraryWindow ()
 {
     NSInteger _currentSelectedViewModeSegment;
@@ -713,10 +708,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                     multiplier:1.
                                       constant:0.]
     ]];
-    
-    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-    [defaultCenter postNotificationName:VLCLibraryWindowEmbeddedVideoViewPresentedNotification
-                                 object:self];
 }
 
 - (void)enableVideoPlaybackAppearance
@@ -733,6 +724,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.videoViewController showControls];
 
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = YES;
+
+    [self.librarySegmentViewController.currentDataSource disconnect];
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -748,9 +741,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self showControlsBarImmediately];
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
 
-    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-    [defaultCenter postNotificationName:VLCLibraryWindowEmbeddedVideoViewDismissedNotification
-                                 object:self];
+    [self.librarySegmentViewController.currentDataSource connect];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event

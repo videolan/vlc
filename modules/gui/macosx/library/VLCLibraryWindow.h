@@ -54,8 +54,6 @@ typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
 extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;
 extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
-extern NSString * const VLCLibraryWindowEmbeddedVideoViewPresentedNotification;
-extern NSString * const VLCLibraryWindowEmbeddedVideoViewDismissedNotification;
 
 @property (readonly) NSView *libraryTargetView;
 
