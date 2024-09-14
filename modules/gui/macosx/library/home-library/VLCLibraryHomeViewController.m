@@ -282,7 +282,9 @@
         return;
     }
 
-    [self.stackViewController disconnectContainers];
+    if (self.connected) {
+        [self.stackViewController disconnectContainers];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
@@ -309,7 +311,9 @@
         return;
     }
 
-    [self.stackViewController connectContainers];
+    if (self.connected) {
+        [self.stackViewController connectContainers];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;

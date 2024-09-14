@@ -519,7 +519,9 @@
         return;
     }
 
-    [self.libraryVideoDataSource disconnect];
+    if (self.connected) {
+        [self.libraryVideoDataSource disconnect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
@@ -541,7 +543,9 @@
         return;
     }
 
-    [self.libraryVideoDataSource connect];
+    if (self.connected) {
+        [self.libraryVideoDataSource connect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;

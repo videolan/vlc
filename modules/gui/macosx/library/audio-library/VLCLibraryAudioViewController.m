@@ -641,8 +641,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
-    [self.audioDataSource disconnect];
-    [self.audioGroupDataSource disconnect];
+    if (self.connected) {
+        [self.audioDataSource disconnect];
+        [self.audioGroupDataSource disconnect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
@@ -664,8 +666,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         return;
     }
 
-    [self.audioDataSource connect];
-    [self.audioGroupDataSource connect];
+    if (self.connected) {
+        [self.audioDataSource connect];
+        [self.audioGroupDataSource connect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;

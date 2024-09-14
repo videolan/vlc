@@ -368,13 +368,16 @@
     }
 }
 
+// TODO: Duplicated a lot, move to abstract view controller?
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
     if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
 
-    [self.dataSource disconnect];
+    if (self.connected) {
+        [self.dataSource disconnect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 0.0;
@@ -396,7 +399,9 @@
         return;
     }
 
-    [self.dataSource connect];
+    if (self.connected) {
+        [self.dataSource connect];
+    }
 
     self.loadingOverlayView.wantsLayer = YES;
     self.loadingOverlayView.alphaValue = 1.0;
