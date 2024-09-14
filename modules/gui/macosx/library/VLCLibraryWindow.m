@@ -725,7 +725,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = YES;
 
-    [self.librarySegmentViewController.currentDataSource disconnect];
+    [self.librarySegmentViewController disconnect];
 }
 
 - (void)disableVideoPlaybackAppearance
@@ -741,7 +741,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self showControlsBarImmediately];
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
 
-    [self.librarySegmentViewController.currentDataSource connect];
+    [self.librarySegmentViewController connect];
 }
 
 - (void)mouseMoved:(NSEvent *)o_event
