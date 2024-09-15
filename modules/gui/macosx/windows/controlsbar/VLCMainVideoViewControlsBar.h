@@ -34,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)openBookmarks:(id)sender;
 - (IBAction)openSubtitlesMenu:(id)sender;
 - (IBAction)openAudioMenu:(id)sender;
+- (IBAction)openVideoMenu:(id)sender;
 - (IBAction)toggleFloatOnTop:(id)sender;
 
 @end

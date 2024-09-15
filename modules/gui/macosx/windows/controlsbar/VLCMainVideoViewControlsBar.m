@@ -139,6 +139,14 @@
                             inView:((NSView *)sender).superview];
 }
 
+- (IBAction)openVideoMenu:(id)sender
+{
+    NSMenu * const menu = VLCMain.sharedInstance.mainMenu.videoMenu;
+    [menu popUpMenuPositioningItem:nil
+                        atLocation:self.videoButton.frame.origin
+                            inView:((NSView *)sender).superview];
+}
+
 - (IBAction)toggleFloatOnTop:(id)sender
 {
     VLCVideoWindowCommon * const window = (VLCVideoWindowCommon *)self.floatOnTopButton.window;
