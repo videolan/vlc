@@ -63,6 +63,9 @@
     _audioButton.toolTip = _NS("Audio settings");
     _audioButton.accessibilityLabel = _audioButton.toolTip;
 
+    self.videoButton.toolTip = _NS("Video settings");
+    self.videoButton.accessibilityLabel = self.videoButton.toolTip;
+
     _playlistController = VLCMain.sharedInstance.playlistController;
     _playerController = _playlistController.playerController;
 
