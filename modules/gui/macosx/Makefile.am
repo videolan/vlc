@@ -317,6 +317,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/panels/dialogs/VLCTextfieldPanelController.m \
 	gui/macosx/playlist/VLCPlaybackContinuityController.h \
 	gui/macosx/playlist/VLCPlaybackContinuityController.m \
+	gui/macosx/playlist/VLCPlayerChapter.h \
+	gui/macosx/playlist/VLCPlayerChapter.m \
 	gui/macosx/playlist/VLCPlayerController.h \
 	gui/macosx/playlist/VLCPlayerController.m \
 	gui/macosx/playlist/VLCPlaylistController.h \
