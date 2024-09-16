@@ -891,27 +891,6 @@ static int ReadMeta( vlc_object_t* p_this)
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
 
-    char *psz_path = vlc_uri2path( psz_uri );
-#if VLC_WINSTORE_APP && TAGLIB_VERSION >= TAGLIB_VERSION_1_11
-    if( psz_path == NULL )
-    {
-        free( psz_uri );
-        return VLC_EGENERIC;
-    }
-    free( psz_path );
-
-    stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
-    free( psz_uri );
-    if( p_stream == NULL )
-        return VLC_EGENERIC;
-
-    VlcIostream s( p_stream );
-    f = FileRef( &s );
-#else /* VLC_WINSTORE_APP */
-    free( psz_uri );
-    if( psz_path == NULL )
-        return VLC_EGENERIC;
-
     if( !b_extensions_registered )
     {
 #if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
@@ -920,6 +899,20 @@ static int ReadMeta( vlc_object_t* p_this)
         b_extensions_registered = true;
     }
 
+#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+    stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
+    free( psz_uri );
+    if( p_stream == NULL )
+        return VLC_EGENERIC;
+
+    VlcIostream s( p_stream );
+    f = FileRef( &s );
+#else // !TAGLIB_VERSION_1_11
+    char *psz_path = vlc_uri2path( psz_uri );
+    free( psz_uri );
+    if( psz_path == NULL )
+        return VLC_EGENERIC;
+
 #if defined(_WIN32)
     wchar_t *wpath = ToWide( psz_path );
     if( wpath == NULL )
@@ -927,23 +920,13 @@ static int ReadMeta( vlc_object_t* p_this)
         free( psz_path );
         return VLC_EGENERIC;
     }
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
-    FileStream stream( wpath, true );
-    f = FileRef( &stream );
-#else /* TAGLIB_VERSION */
     f = FileRef( wpath );
-#endif /* TAGLIB_VERSION */
     free( wpath );
 #else /* _WIN32 */
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
-    FileStream stream( psz_path, true );
-    f = FileRef( &stream );
-#else /* TAGLIB_VERSION */
     f = FileRef( psz_path );
-#endif /* TAGLIB_VERSION */
 #endif /* _WIN32 */
     free( psz_path );
-#endif /* VLC_WINSTORE_APP */
+#endif // !TAGLIB_VERSION_1_11
 
     if( f.isNull() )
         return VLC_EGENERIC;
