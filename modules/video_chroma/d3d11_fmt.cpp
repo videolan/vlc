@@ -301,7 +301,10 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev, I
     }
     else
     {
-        assert(driver.QuadPart == D3D11_GetSystemDriver(obj, d3d_dev).QuadPart);
+#ifndef NDEBUG
+        const auto check_old_way = D3D11_GetSystemDriver(obj, d3d_dev);
+        assert(driver.QuadPart == check_old_way.QuadPart || check_old_way.QuadPart == 0);
+#endif
     }
 
     wddm         = HIWORD(driver.HighPart);
