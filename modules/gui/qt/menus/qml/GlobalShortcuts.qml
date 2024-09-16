@@ -48,6 +48,9 @@ Item {
     ShortcutExt{ sequence:"F10"; onActivated: MainCtx.toggleToolbarMenu() }
     ShortcutExt{ sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen() }
 
+    ShortcutExt{ sequence: StandardKey.ZoomIn; onActivated: MainCtx.incrementIntfUserScaleFactor(true) }
+    ShortcutExt{ sequence: StandardKey.ZoomOut; onActivated: MainCtx.incrementIntfUserScaleFactor(false) }
+
     Loader {
         active: MainCtx.mediaLibraryAvailable
         source: "qrc:///qt/qml/VLC/Menus/GlobalShortcutsMedialib.qml"
