@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
+#import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 
@@ -47,15 +48,18 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
                                                                        context:nil];
 
     self.splitView.wantsLayer = YES;
+
     _navSidebarViewController = [[VLCLibraryWindowNavigationSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     _libraryTargetViewController = [[NSViewController alloc] init];
     _playlistSidebarViewController = [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+    _chaptersSidebarViewController = [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
 
     self.libraryTargetViewController.view = self.libraryWindow.libraryTargetView;
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
     _playlistSidebarItem = [NSSplitViewItem sidebarWithViewController:self.playlistSidebarViewController];
+    _chaptersSidebarItem = [NSSplitViewItem sidebarWithViewController:self.chaptersSidebarViewController];
 
     if (@available(macOS 11.0, *)) {
         _navSidebarItem.allowsFullHeightLayout = YES;
@@ -63,10 +67,16 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
 
     _navSidebarItem.preferredThicknessFraction = 0.2;
     _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
+
     _playlistSidebarItem.preferredThicknessFraction = 0.2;
     _playlistSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
     _playlistSidebarItem.canCollapse = YES;
     _playlistSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
+
+    self.chaptersSidebarItem.preferredThicknessFraction = 0.2;
+    self.chaptersSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
+    self.chaptersSidebarItem.canCollapse = YES;
+    self.chaptersSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
 
     self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
 }
