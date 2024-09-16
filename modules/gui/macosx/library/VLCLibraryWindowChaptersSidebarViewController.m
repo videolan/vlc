@@ -42,6 +42,7 @@
 
     _chaptersArrayController = [[NSArrayController alloc] init];
 
+    [self.tableView deselectAll:self];
     [self.tableView bind:NSContentBinding
                 toObject:self.chaptersArrayController
              withKeyPath:@"arrangedObjects" 
@@ -90,15 +91,28 @@
    viewForTableColumn:(NSTableColumn *)tableColumn
                   row:(NSInteger)row
 {
-    NSTableCellView * const cellView = 
-        [tableView makeViewWithIdentifier:@"VLCLibraryWindowChaptersTableViewNameCellIdentifier" 
-                                    owner:self];
-    NSAssert(cellView != nil, @"Provided cell view for chapters table view should be valid!");
-    [cellView.textField bind:NSValueBinding
-                    toObject:cellView
-                 withKeyPath:@"objectValue.name"
-                     options:nil];
-    return cellView;
+    if ([tableColumn.identifier isEqualToString:@"VLCLibraryWindowChaptersTableViewNameColumnIdentifier"]) {
+        NSTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:@"VLCLibraryWindowChaptersTableViewNameCellIdentifier"
+                                        owner:self];
+        [cellView.textField bind:NSValueBinding
+                            toObject:cellView
+                         withKeyPath:@"objectValue.name"
+                             options:nil];
+        return cellView;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCLibraryWindowChaptersTableViewTimeColumnIdentifier"]) {
+        NSTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:@"VLCLibraryWindowChaptersTableViewTimeCellIdentifier"
+                                        owner:self];
+        [cellView.textField bind:NSValueBinding
+                            toObject:cellView
+                         withKeyPath:@"objectValue.timeString"
+                             options:nil];
+        return cellView;
+    }
+
+    NSAssert(NO, @"Provided cell view for chapters table view should be valid!");
+    return nil;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
