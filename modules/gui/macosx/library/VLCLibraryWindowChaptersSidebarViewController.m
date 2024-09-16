@@ -24,6 +24,7 @@
 
 #import "library/VLCLibraryDataTypes.h"
 #import "main/VLCMain.h"
+#import "playlist/VLCPlayerChapter.h"
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
@@ -71,15 +72,16 @@
         self.chaptersArrayController.content = @[];
         return;
     }
-    const struct vlc_player_chapter * const chapters = title->chapters;
+    const struct vlc_player_chapter * const pp_chapters = title->chapters;
     const size_t chapterCount = title->chapter_count;
 
-    NSMutableArray * const chaptersArray = [NSMutableArray arrayWithCapacity:chapterCount];
+    NSMutableArray * const chapters = [NSMutableArray arrayWithCapacity:chapterCount];
     for (size_t i = 0; i < chapterCount; i++) {
-        struct vlc_player_chapter chapter = chapters[i];
-        [chaptersArray addObject:[NSString stringWithFormat:@"%zu. %@", i + 1, @(chapter.name)]];
+        struct vlc_player_chapter p_chapter = pp_chapters[i];
+        VLCPlayerChapter * const chapter = [[VLCPlayerChapter alloc] initWithChapter:&p_chapter];
+        [chapters addObject:chapter];
     }
-    self.chaptersArrayController.content = chaptersArray.copy;
+    self.chaptersArrayController.content = chapters.copy;
 }
 
 @end
