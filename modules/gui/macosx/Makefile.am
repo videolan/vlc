@@ -168,6 +168,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindow.m \
 	gui/macosx/library/VLCLibraryWindowController.h \
 	gui/macosx/library/VLCLibraryWindowController.m \
+	gui/macosx/library/VLCLibraryWindowAbstractSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowAbstractSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowChaptersSidebarViewController.h \
 	gui/macosx/library/VLCLibraryWindowChaptersSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowNavigationSidebarOutlineView.h \

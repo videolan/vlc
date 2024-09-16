@@ -90,6 +90,7 @@
 		5325C57D29302E6800B2B63A /* VLCLibraryAudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5325C57B29302E6800B2B63A /* VLCLibraryAudioViewController.m */; };
 		533B5D2C29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 533B5D2B29CF94C6003DE887 /* VLCBookmarksTableViewDataSource.m */; };
 		5341F14A2C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5341F1492C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m */; };
+		5341F14D2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5341F14C2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m */; };
 		534E73E229D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */; };
 		534E73E529D2FF07009982DE /* VLCBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E73E429D2FF07009982DE /* VLCBookmark.m */; };
 		534E8E3A29A06325009503F8 /* VLCMainVideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 534E8E3929A06325009503F8 /* VLCMainVideoViewController.m */; };
@@ -321,6 +322,8 @@
 		5341F1472C96E544003BDF0A /* VLCLibraryWindowChaptersView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryWindowChaptersView.xib; sourceTree = "<group>"; };
 		5341F1482C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowChaptersSidebarViewController.h; sourceTree = "<group>"; };
 		5341F1492C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowChaptersSidebarViewController.m; sourceTree = "<group>"; };
+		5341F14B2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowAbstractSidebarViewController.h; sourceTree = "<group>"; };
+		5341F14C2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowAbstractSidebarViewController.m; sourceTree = "<group>"; };
 		534E73E029D2EDB1009982DE /* VLCBookmarksTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmarksTableViewDelegate.h; sourceTree = "<group>"; };
 		534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksTableViewDelegate.m; sourceTree = "<group>"; };
 		534E73E329D2FF07009982DE /* VLCBookmark.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmark.h; sourceTree = "<group>"; };
@@ -1380,6 +1383,8 @@
 				536EFBF4295BCB8300F4CB13 /* VLCLibraryUIUnits.m */,
 				7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */,
 				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
+				5341F14B2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.h */,
+				5341F14C2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m */,
 				5341F1482C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.h */,
 				5341F1492C9757EF003BDF0A /* VLCLibraryWindowChaptersSidebarViewController.m */,
 				5362550B293FD639005D64FA /* VLCLibraryWindowController.h */,
@@ -2166,6 +2171,7 @@
 				539BA79F298C726200918C36 /* VLCAspectRatioRetainingVideoWindow.m in Sources */,
 				7D61DCE4236C1937008133CF /* VLCCustomWindowButton.m in Sources */,
 				7DFFF90123682D4800C8B0C9 /* VLCDetachedAudioWindow.m in Sources */,
+				5341F14D2C981B7C003BDF0A /* VLCLibraryWindowAbstractSidebarViewController.m in Sources */,
 				7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */,
 				5352B37329DF29BF0011CE03 /* VLCMainVideoViewControlsBar.m in Sources */,
 				7D445D812202524000263D34 /* VLCPlaylistController.m in Sources */,
