@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowChaptersSidebarViewController">
+            <connections>
+                <outlet property="view" destination="SIR-0h-28I" id="yx0-b1-Be5"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView identifier="VLCLibraryWindowPlaylistSidebarIdentifier" id="SIR-0h-28I">
+            <rect key="frame" x="0.0" y="0.0" width="510" height="246"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YBa-WG-Kx3">
+                    <rect key="frame" x="18" y="205" width="474" height="31"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="Chapters" id="zar-2A-ajz">
+                        <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zf4-pf-0V2">
+                    <rect key="frame" x="20" y="192" width="470" height="5"/>
+                </box>
+                <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="18" horizontalPageScroll="10" verticalLineScroll="18" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4vZ-4x-fwW">
+                    <rect key="frame" x="0.0" y="0.0" width="510" height="194"/>
+                    <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="H6H-Cp-iPh">
+                        <rect key="frame" x="0.0" y="0.0" width="510" height="194"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="16" rowSizeStyle="automatic" viewBased="YES" id="5mv-Qc-JwM" customClass="VLCPlaylistTableView">
+                                <rect key="frame" x="0.0" y="0.0" width="510" height="194"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <size key="intercellSpacing" width="3" height="2"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                <tableColumns>
+                                    <tableColumn width="478" minWidth="40" maxWidth="1000" id="9yW-DI-c08">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border">
+                                            <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        </tableHeaderCell>
+                                        <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" title="Text Cell" id="JOU-jI-2dC">
+                                            <font key="font" metaFont="message"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                        <prototypeCellViews>
+                                            <tableCellView id="ZTp-fs-5fE">
+                                                <rect key="frame" x="11" y="1" width="487" height="16"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Wdd-df-zUi">
+                                                        <rect key="frame" x="0.0" y="0.0" width="487" height="16"/>
+                                                        <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="deP-dG-o27">
+                                                            <font key="font" metaFont="message"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="Wdd-df-zUi" firstAttribute="centerX" secondItem="ZTp-fs-5fE" secondAttribute="centerX" id="AaT-vo-1Ga"/>
+                                                    <constraint firstItem="Wdd-df-zUi" firstAttribute="centerY" secondItem="ZTp-fs-5fE" secondAttribute="centerY" id="Qto-WT-KUv"/>
+                                                    <constraint firstItem="Wdd-df-zUi" firstAttribute="leading" secondItem="ZTp-fs-5fE" secondAttribute="leading" constant="2" id="bXZ-3r-JQC"/>
+                                                </constraints>
+                                                <connections>
+                                                    <outlet property="textField" destination="Wdd-df-zUi" id="61g-Ze-nvR"/>
+                                                </connections>
+                                            </tableCellView>
+                                        </prototypeCellViews>
+                                    </tableColumn>
+                                </tableColumns>
+                            </tableView>
+                        </subviews>
+                        <nil key="backgroundColor"/>
+                    </clipView>
+                    <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="L1S-02-OQF">
+                        <rect key="frame" x="-100" y="-100" width="0.0" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="IJr-bf-Dsz">
+                        <rect key="frame" x="494" y="0.0" width="16" height="27"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" constant="20" id="0Sl-8y-RFJ"/>
+                <constraint firstItem="zf4-pf-0V2" firstAttribute="top" secondItem="YBa-WG-Kx3" secondAttribute="bottom" constant="10" id="A0L-2t-C2L"/>
+                <constraint firstItem="zf4-pf-0V2" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" constant="20" id="Ekv-lb-XRR"/>
+                <constraint firstItem="4vZ-4x-fwW" firstAttribute="top" secondItem="zf4-pf-0V2" secondAttribute="bottom" id="Q2S-Bl-E4g"/>
+                <constraint firstItem="YBa-WG-Kx3" firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" id="RT4-Am-iDe"/>
+                <constraint firstAttribute="trailing" secondItem="4vZ-4x-fwW" secondAttribute="trailing" id="Vo4-sT-MAu"/>
+                <constraint firstAttribute="bottom" secondItem="4vZ-4x-fwW" secondAttribute="bottom" id="aRK-vR-wkV"/>
+                <constraint firstItem="YBa-WG-Kx3" firstAttribute="top" secondItem="SIR-0h-28I" secondAttribute="top" constant="10" id="cXi-j9-N7N"/>
+                <constraint firstItem="4vZ-4x-fwW" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" id="ran-Af-QyV"/>
+                <constraint firstItem="YBa-WG-Kx3" firstAttribute="leading" secondItem="zf4-pf-0V2" secondAttribute="leading" id="x90-5w-NkC"/>
+            </constraints>
+            <point key="canvasLocation" x="-148" y="45"/>
+        </customView>
+    </objects>
+</document>
