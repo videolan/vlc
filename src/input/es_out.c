@@ -3846,7 +3846,8 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         vlc_tick_t i_normal_time = va_arg( args, vlc_tick_t );
         vlc_tick_t i_length = va_arg( args, vlc_tick_t );
 
-        source->i_normal_time = i_normal_time;
+        if (i_normal_time != VLC_TICK_INVALID)
+            source->i_normal_time = i_normal_time;
 
         if( source != p_sys->main_source )
             return VLC_SUCCESS;
@@ -3878,8 +3879,6 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
             f_position -= (double)i_delay / i_length;
         if (f_position < 0)
             f_position = 0;
-
-        assert(i_normal_time >= VLC_TICK_0);
 
         input_SendEventTimes(p_sys->p_input, f_position, i_time,
                              i_normal_time, i_length);

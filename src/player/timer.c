@@ -448,7 +448,8 @@ vlc_player_UpdateTimer(vlc_player_t *player, vlc_es_id_t *es_source,
     if (!es_source) /* input source */
     {
         /* Only valid for input sources */
-        if (player->timer.input_normal_time != normal_time)
+        if (normal_time != VLC_TICK_INVALID
+         && player->timer.input_normal_time != normal_time)
         {
             player->timer.input_normal_time = normal_time;
             player->timer.last_ts = VLC_TICK_INVALID;

@@ -942,7 +942,6 @@ input_thread_Events(input_thread_t *input_thread,
 
             if (input->normal_time != event->times.normal_time)
             {
-                assert(event->times.normal_time != VLC_TICK_INVALID);
                 input->normal_time = event->times.normal_time;
                 changed = true;
             }

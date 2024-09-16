@@ -592,9 +592,9 @@ static void InputSourceStatistics(input_source_t *source, input_item_t *item,
 
     i_length = InputSourceGetLength( source, item );
 
-    /* In case of failure (not implemented or in case of seek), use VLC_TICK_0. */
+    /* In case of failure (not implemented or in case of seek), use VLC_TICK_INVALID. */
     if (demux_Control( source->p_demux, DEMUX_GET_NORMAL_TIME, &i_normal_time ) != VLC_SUCCESS)
-        i_normal_time = VLC_TICK_0;
+        i_normal_time = VLC_TICK_INVALID;
 
     es_out_SetTimes( out, f_position, i_time, i_normal_time, i_length );
 }
