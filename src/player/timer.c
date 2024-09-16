@@ -358,7 +358,7 @@ vlc_player_UpdateTimerBestSource(vlc_player_t *player, vlc_es_id_t *es_source,
         source->es = es_source;
 
     /* Notify the best source */
-    if (source->es == es_source)
+    if (source->es == es_source || force_update)
     {
         if (source->point.rate != point->rate)
         {
