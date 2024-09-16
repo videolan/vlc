@@ -1060,12 +1060,12 @@ if qt6_dep.found()
     test_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
     if test_qt6_dep.found()
         qml_test_moc = qt6.compile_moc(
-            sources : files('tests/qml_test.cpp'),
+            headers : files('tests/qml_test.hpp'),
             dependencies : [test_qt6_dep, qt6_dep]
         )
         qml_test = executable(
           'qml_test',
-          [files('tests/qml_test.cpp'), qml_test_moc],
+          [files('tests/qml_test.cpp', 'tests/qml_test.hpp'), qml_test_moc],
           qt6pre_qrc,
           build_by_default: false,
           dependencies: [test_qt6_dep, qt6_dep],
