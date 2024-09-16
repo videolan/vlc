@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+                              nibName:(NSString *)nibName;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -22,11 +22,20 @@
 
 #import "VLCLibraryWindowAbstractSidebarViewController.h"
 
-@interface VLCLibraryWindowAbstractSidebarViewController ()
 
-@end
 
 @implementation VLCLibraryWindowAbstractSidebarViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+                              nibName:(NSString *)nibName
+{
+    self = [super initWithNibName:nibName bundle:nil];
+    if (self) {
+        _libraryWindow = libraryWindow;
+        _mainVideoModeEnabled = NO;
+    }
+    return self;
+}
 
 - (void)viewDidLoad
 {
