@@ -22,11 +22,13 @@
 
 #import "VLCLibraryWindowChaptersSidebarViewController.h"
 
-@interface VLCLibraryWindowChaptersSidebarViewController ()
-
-@end
-
 @implementation VLCLibraryWindowChaptersSidebarViewController
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    return [super initWithLibraryWindow:libraryWindow
+                                nibName:@"VLCLibraryWindowChaptersView"];
+}
 
 - (void)viewDidLoad
 {
