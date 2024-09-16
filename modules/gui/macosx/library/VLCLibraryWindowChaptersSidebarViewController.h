@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowChaptersSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
 
+@property (readwrite, weak) IBOutlet NSTableView *tableView;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 @end
