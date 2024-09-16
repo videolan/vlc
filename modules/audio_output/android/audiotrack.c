@@ -148,7 +148,6 @@ static struct
         jmethodID write;
         jmethodID writeV23;
         jmethodID writeShortV23;
-        jmethodID writeBufferV21;
         jmethodID writeFloat;
         jmethodID getAudioSessionId;
         jmethodID getBufferSizeInFrames;
@@ -291,10 +290,8 @@ AudioTrack_InitJNI( vlc_object_t *p_aout)
 
     GET_ID( GetMethodID, AudioTrack.writeV23, "write", "([BIII)I", false );
     GET_ID( GetMethodID, AudioTrack.writeShortV23, "write", "([SIII)I", false );
-    if( !jfields.AudioTrack.writeV23 )
-        GET_ID( GetMethodID, AudioTrack.writeBufferV21, "write", "(Ljava/nio/ByteBuffer;II)I", false );
 
-    if( jfields.AudioTrack.writeV23 || jfields.AudioTrack.writeBufferV21 )
+    if( jfields.AudioTrack.writeV23 )
     {
         GET_CONST_INT( AudioTrack.WRITE_NON_BLOCKING, "WRITE_NON_BLOCKING", true );
 #ifdef AUDIOTRACK_USE_FLOAT
