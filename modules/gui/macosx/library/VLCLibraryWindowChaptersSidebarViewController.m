@@ -101,4 +101,15 @@
     return cellView;
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    VLCPlayerChapter * const selectedChapter = 
+        self.chaptersArrayController.selectedObjects.firstObject;
+    if (selectedChapter == nil) {
+        return;
+    }
+
+    [VLCMain.sharedInstance.playlistController.playerController setTimeFast:selectedChapter.time];
+}
+
 @end
