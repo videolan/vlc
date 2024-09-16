@@ -37,27 +37,17 @@
 #import "views/VLCRoundedCornerTextField.h"
 #import "windows/VLCOpenWindowController.h"
 
-@interface VLCLibraryWindowPlaylistSidebarViewController()
-
-@property (readwrite) BOOL internalMainVideoModeEnabled;
-
-@end
-
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super initWithNibName:@"VLCLibraryWindowPlaylistView" bundle:nil];
-    if (self) {
-        _libraryWindow = libraryWindow;
-        _internalMainVideoModeEnabled = NO;
-    }
-    return self;
+    return [super initWithLibraryWindow:libraryWindow
+                                nibName:@"VLCLibraryWindowPlaylistView"];
 }
 
 - (void)viewDidLoad
 {
-    self.mainVideoModeEnabled = NO;
+    [super viewDidLoad];
 
     self.dragDropView.dropTarget = self.libraryWindow;
     self.counterTextField.useStrongRounding = YES;
@@ -79,19 +69,9 @@
     self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     [self.tableView reloadData];
 
-    self.titleLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.titleLabel.stringValue = _NS("Playlist");
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
-
-    [self updateColorsBasedOnAppearance:self.view.effectiveAppearance];
-
-    if (@available(macOS 10.14, *)) {
-        [NSApplication.sharedApplication addObserver:self
-                                          forKeyPath:@"effectiveAppearance"
-                                             options:NSKeyValueObservingOptionNew
-                                             context:nil];
-    }
 
     [self repeatStateUpdated:nil];
     [self shuffleStateUpdated:nil];
@@ -109,20 +89,10 @@
 
 #pragma mark - appearance setters
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
-                       context:(void *)context
-{
-    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
-        NSAppearance * const effectiveAppearance = change[NSKeyValueChangeNewKey];
-        [self updateColorsBasedOnAppearance:effectiveAppearance];
-    }
-}
-
 - (void)updateColorsBasedOnAppearance:(NSAppearance *)appearance
 {
-    NSParameterAssert(appearance);
+    [super updateColorsBasedOnAppearance:appearance];
+
     BOOL isDark = NO;
     if (@available(macOS 10.14, *)) {
         isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] || 
@@ -133,32 +103,12 @@
     // appearance's name despite responding to the effectiveAppearance change (???) so it is a
     // better idea to pull from the general system theme preference, which is always up-to-date
     if (isDark) {
-        self.titleLabel.textColor = NSColor.VLClibraryDarkTitleColor;
-        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
         self.dragDropImageBackgroundBox.hidden = NO;
     } else {
-        self.titleLabel.textColor = NSColor.VLClibraryLightTitleColor;
-        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.bottomButtonsSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
         self.dragDropImageBackgroundBox.hidden = YES;
     }
-}
-
-- (BOOL)mainVideoModeEnabled
-{
-    return self.internalMainVideoModeEnabled;
-}
-
-- (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
-{
-    self.internalMainVideoModeEnabled = mainVideoModeEnabled;
-    CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.mediumSpacing;
-    if (!mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
-        // Compensate for full content view window's titlebar height, prevent top being cut off
-        internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
-    }
-    self.topInternalConstraint.constant = internalTopConstraintConstant;
 }
 
 #pragma mark - table view interaction

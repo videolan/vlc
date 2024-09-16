@@ -22,21 +22,18 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "VLCLibraryWindowAbstractSidebarViewController.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
-@class VLCLibraryWindow;
 @class VLCPlaylistController;
 @class VLCPlaylistDataSource;
 @class VLCPlaylistSortingMenuController;
 @class VLCRoundedCornerTextField;
 
-@interface VLCLibraryWindowPlaylistSidebarViewController : NSViewController
+@interface VLCLibraryWindowPlaylistSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
 
-@property (readonly, weak) VLCLibraryWindow *libraryWindow;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
-@property (readwrite, weak) IBOutlet NSTextField *titleLabel;
-@property (readwrite, weak) IBOutlet NSBox *titleSeparator;
 @property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *counterTextField;
 @property (readwrite, weak) IBOutlet NSTableView *tableView;
 @property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
@@ -49,8 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistSortingMenuController *sortingMenuController;
-
-@property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
