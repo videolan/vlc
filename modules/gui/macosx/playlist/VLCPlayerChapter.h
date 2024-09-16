@@ -22,9 +22,17 @@
 
 #import <Foundation/Foundation.h>
 
+#import <vlc_player.h>
+#import <vlc_tick.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlayerChapter : NSObject
+
+@property (readonly) NSString *name;
+@property (readonly) vlc_tick_t time;
+
+- (instancetype)initWithChapter:(const struct vlc_player_chapter *)p_chapter;
 
 @end
 

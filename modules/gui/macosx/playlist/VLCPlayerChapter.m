@@ -22,6 +22,18 @@
 
 #import "VLCPlayerChapter.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCPlayerChapter
+
+- (instancetype)initWithChapter:(const struct vlc_player_chapter *)p_chapter
+{
+    self = [super init];
+    if (self && p_chapter != NULL) {
+        _name = toNSStr(p_chapter->name);
+        _time = p_chapter->time;
+    }
+    return self;
+}
 
 @end
