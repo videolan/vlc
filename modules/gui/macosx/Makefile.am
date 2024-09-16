@@ -180,6 +180,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/VLCLibraryWindowPlaylistSidebarViewController.h \
 	gui/macosx/library/VLCLibraryWindowPlaylistSidebarViewController.m \
+	gui/macosx/library/VLCLibraryWindowSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.h \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
