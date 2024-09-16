@@ -56,7 +56,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView id="ZTp-fs-5fE">
+                                            <tableCellView identifier="VLCLibraryWindowChaptersTableViewNameCellIdentifier" id="ZTp-fs-5fE">
                                                 <rect key="frame" x="11" y="1" width="487" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -81,6 +81,9 @@
                                         </prototypeCellViews>
                                     </tableColumn>
                                 </tableColumns>
+                                <connections>
+                                    <outlet property="delegate" destination="-2" id="n2S-Eb-GVz"/>
+                                </connections>
                             </tableView>
                         </subviews>
                         <nil key="backgroundColor"/>

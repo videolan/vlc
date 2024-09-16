@@ -84,4 +84,21 @@
     self.chaptersArrayController.content = chapters.copy;
 }
 
+# pragma mark - NSTableView delegation
+
+- (NSView *)tableView:(NSTableView *)tableView
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
+{
+    NSTableCellView * const cellView = 
+        [tableView makeViewWithIdentifier:@"VLCLibraryWindowChaptersTableViewNameCellIdentifier" 
+                                    owner:self];
+    NSAssert(cellView != nil, @"Provided cell view for chapters table view should be valid!");
+    [cellView.textField bind:NSValueBinding
+                    toObject:cellView
+                 withKeyPath:@"objectValue.name"
+                     options:nil];
+    return cellView;
+}
+
 @end
