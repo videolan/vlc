@@ -22,7 +22,10 @@
 
 #import "VLCLibraryWindowAbstractSidebarViewController.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
 
+#import "library/VLCLibraryUIUnits.h"
 
 @implementation VLCLibraryWindowAbstractSidebarViewController
 
@@ -40,7 +43,49 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do view setup here.
+
+    self.titleLabel.font = NSFont.VLClibrarySectionHeaderFont;
+
+    [self updateColorsBasedOnAppearance:self.view.effectiveAppearance];
+
+    if (@available(macOS 10.14, *)) {
+        [NSApplication.sharedApplication addObserver:self
+                                          forKeyPath:@"effectiveAppearance"
+                                             options:NSKeyValueObservingOptionNew
+                                             context:nil];
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if ([keyPath isEqualToString:@"effectiveAppearance"]) {
+        NSAppearance * const effectiveAppearance = change[NSKeyValueChangeNewKey];
+        [self updateColorsBasedOnAppearance:effectiveAppearance];
+    }
+}
+
+- (void)updateColorsBasedOnAppearance:(NSAppearance *)appearance
+{
+    NSParameterAssert(appearance);
+    BOOL isDark = NO;
+    if (@available(macOS 10.14, *)) {
+        isDark = [appearance.name isEqualToString:NSAppearanceNameDarkAqua] ||
+                 [appearance.name isEqualToString:NSAppearanceNameVibrantDark];
+    }
+
+    // If we try to pull the view's effectiveAppearance we are going to get the previous
+    // appearance's name despite responding to the effectiveAppearance change (???) so it is a
+    // better idea to pull from the general system theme preference, which is always up-to-date
+    if (isDark) {
+        self.titleLabel.textColor = NSColor.VLClibraryDarkTitleColor;
+        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
+    } else {
+        self.titleLabel.textColor = NSColor.VLClibraryLightTitleColor;
+        self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
+    }
 }
 
 @end

@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
                               nibName:(NSString *)nibName;
+- (void)updateColorsBasedOnAppearance:(NSAppearance *)appearance;
 
 @end
 
