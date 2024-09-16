@@ -45,6 +45,7 @@
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
@@ -724,6 +725,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.videoViewController showControls];
 
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = YES;
+    self.splitViewController.chaptersSidebarViewController.mainVideoModeEnabled = YES;
 
     [self.librarySegmentViewController disconnect];
 }
@@ -740,7 +742,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
     self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
-
+    self.splitViewController.chaptersSidebarViewController.mainVideoModeEnabled = NO;
     [self.librarySegmentViewController connect];
 }
 
