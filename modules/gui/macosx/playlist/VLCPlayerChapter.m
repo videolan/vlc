@@ -32,6 +32,7 @@
     if (self && p_chapter != NULL) {
         _name = toNSStr(p_chapter->name);
         _time = p_chapter->time;
+        _timeString = [NSString stringWithTimeFromTicks:_time];
     }
     return self;
 }

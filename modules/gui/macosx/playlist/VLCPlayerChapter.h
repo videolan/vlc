@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSString *name;
 @property (readonly) vlc_tick_t time;
+@property (readonly) NSString *timeString;
 
 - (instancetype)initWithChapter:(const struct vlc_player_chapter *)p_chapter;
 
