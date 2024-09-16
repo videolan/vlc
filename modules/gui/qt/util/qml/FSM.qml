@@ -81,6 +81,9 @@ FSMState {
 
     property bool started: false
 
+    property bool _isProcessing: false
+    property var _eventQueue: []
+
     /**
      * @param {FSMState} state state handling the event
      * @param {string} event name of the event
@@ -147,6 +150,15 @@ FSMState {
         } else {
             return _evaluateTransition(state, event, transitions, ...args)
         }
+    }
+
+    function _processEventQueue() {
+        fsm._isProcessing = true
+        while (fsm._eventQueue.length > 0) {
+            const e  = fsm._eventQueue.shift()
+            handleSignal(fsm, e.event, ...e.args)
+        }
+        fsm._isProcessing = false
     }
 
     /**
@@ -311,12 +323,15 @@ FSMState {
 
         for (const signalName of Object.keys(signalMap)) {
             signalMap[signalName].connect((...args) => {
-                //use callLater to ensure transitions are ordered.
-                //signal are not queued by default, this is an issue
-                //if an action/enter/exit function raise another signal
-                Qt.callLater(() => {
-                    handleSignal(fsm, signalName, ...args)
+                //events needs to be processed in order
+                //by default qml signals will process last emited first serve
+                //so we need a queue to store the call order
+                fsm._eventQueue.push({
+                    event: signalName,
+                    args: [...args]
                 })
+                if (!fsm._isProcessing)
+                    fsm._processEventQueue()
             })
         }
 
