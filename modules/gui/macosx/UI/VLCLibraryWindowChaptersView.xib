@@ -7,6 +7,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowChaptersSidebarViewController">
             <connections>
+                <outlet property="titleLabel" destination="YBa-WG-Kx3" id="aGs-bf-pQ6"/>
+                <outlet property="titleSeparator" destination="zf4-pf-0V2" id="apt-PB-Kle"/>
+                <outlet property="topInternalConstraint" destination="cXi-j9-N7N" id="gPL-cO-V5B"/>
                 <outlet property="view" destination="SIR-0h-28I" id="yx0-b1-Be5"/>
             </connections>
         </customObject>
