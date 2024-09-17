@@ -30,6 +30,9 @@
                             <segment label="Chapters" width="100" tag="1"/>
                         </segments>
                     </segmentedCell>
+                    <connections>
+                        <action selector="viewModeSelectorAction:" target="-2" id="WaU-yo-IIj"/>
+                    </connections>
                 </segmentedControl>
             </subviews>
             <constraints>

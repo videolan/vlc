@@ -44,6 +44,20 @@
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+
+    [self viewSelectorAction:self.viewSelector];
+}
+
+- (IBAction)viewSelectorAction:(id)sender
+{
+    NSParameterAssert(sender == self.viewSelector);
+    const NSInteger selectedSegment = self.viewSelector.selectedSegment;
+    if (selectedSegment == 0) {
+        self.targetView.subviews = @[self.playlistSidebarViewController.view];
+    } else if (selectedSegment == 1) {
+        self.targetView.subviews = @[self.chaptersSidebarViewController.view];
+    }
+    NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
 }
 
 @end
