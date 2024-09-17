@@ -22,6 +22,8 @@
 
 #import "VLCLibraryWindowSidebarViewController.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 
@@ -44,6 +46,11 @@
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+
+    self.viewSelector.segmentCount = 2;
+    [self.viewSelector setLabel:_NS("Playlist") forSegment:0];
+    [self.viewSelector setLabel:_NS("Chapters") forSegment:1];
+    self.viewSelector.selectedSegment = 0;
 
     [self viewSelectorAction:self.viewSelector];
 }
