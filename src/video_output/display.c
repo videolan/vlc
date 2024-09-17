@@ -576,11 +576,8 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
         if (fixed_src.i_sar_num * osys->source.i_sar_den !=
             fixed_src.i_sar_den * osys->source.i_sar_num) {
 
-            osys->source.i_sar_num = fixed_src.i_sar_num;
-            osys->source.i_sar_den = fixed_src.i_sar_den;
-
-            err2 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
-                                        osys->source.i_sar_den);
+            err2 = vout_SetSourceAspect(vd, fixed_src.i_sar_num,
+                                        fixed_src.i_sar_den);
             if (err2 != VLC_SUCCESS)
                 err1 = err2;
         }
