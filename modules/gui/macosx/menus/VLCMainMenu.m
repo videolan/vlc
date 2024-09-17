@@ -1469,7 +1469,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)showPlaylist:(id)sender
 {
     [VLCMain.sharedInstance.libraryWindowController.window makeKeyAndOrderFront:sender];
-    [VLCMain.sharedInstance.libraryWindow.splitViewController togglePlaylistSidebar:self];
+    [VLCMain.sharedInstance.libraryWindow.splitViewController toggleMultifunctionSidebar:self];
 }
 
 #pragma mark - Help and Docs

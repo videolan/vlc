@@ -535,7 +535,7 @@
 {
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil) {
-        [libraryWindow.splitViewController togglePlaylistSidebar:self];
+        [libraryWindow.splitViewController toggleMultifunctionSidebar:self];
     }
 }
 

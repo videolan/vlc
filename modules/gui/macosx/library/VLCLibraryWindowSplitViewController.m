@@ -88,7 +88,7 @@
     self.navSidebarItem.animator.collapsed = !navigationSidebarCollapsed;
 }
 
-- (IBAction)togglePlaylistSidebar:(id)sender
+- (IBAction)toggleMultifunctionSidebar:(id)sender
 {
     const BOOL sidebarCollapsed = self.sidebarItem.isCollapsed;
     self.sidebarItem.animator.collapsed = !sidebarCollapsed;

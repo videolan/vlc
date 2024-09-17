@@ -371,7 +371,7 @@
                                 <font key="font" metaFont="systemBold" size="12"/>
                             </buttonCell>
                             <connections>
-                                <action selector="togglePlaylistSidebar:" target="Kkr-kI-gpb" id="Xgc-1s-bBZ"/>
+                                <action selector="toggleMultifunctionSidebar:" target="Kkr-kI-gpb" id="Xgc-1s-bBZ"/>
                             </connections>
                         </button>
                     </toolbarItem>
