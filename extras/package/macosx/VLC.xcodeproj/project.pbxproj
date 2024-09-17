@@ -330,6 +330,7 @@
 		5341F14F2C983AF1003BDF0A /* VLCPlayerChapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlayerChapter.m; sourceTree = "<group>"; };
 		5341F1512C9865DD003BDF0A /* VLCLibraryWindowSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowSidebarViewController.h; sourceTree = "<group>"; };
 		5341F1522C9865DD003BDF0A /* VLCLibraryWindowSidebarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowSidebarViewController.m; sourceTree = "<group>"; };
+		5341F1532C9865DD003BDF0A /* VLCLibraryWindowSidebarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = VLCLibraryWindowSidebarView.xib; path = ../library/VLCLibraryWindowSidebarView.xib; sourceTree = "<group>"; };
 		534E73E029D2EDB1009982DE /* VLCBookmarksTableViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmarksTableViewDelegate.h; sourceTree = "<group>"; };
 		534E73E129D2EDB1009982DE /* VLCBookmarksTableViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksTableViewDelegate.m; sourceTree = "<group>"; };
 		534E73E329D2FF07009982DE /* VLCBookmark.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCBookmark.h; sourceTree = "<group>"; };
@@ -2074,6 +2075,7 @@
 				5341F1472C96E544003BDF0A /* VLCLibraryWindowChaptersView.xib */,
 				53D21A1B2BB428A20085C71B /* VLCLibraryWindowNavigationSidebarView.xib */,
 				53D21A1C2BB428F00085C71B /* VLCLibraryWindowPlaylistView.xib */,
+				5341F1532C9865DD003BDF0A /* VLCLibraryWindowSidebarView.xib */,
 			);
 			name = XIBs;
 			path = ../../../modules/gui/macosx/UI;
