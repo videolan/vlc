@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCVideoUIView.m: iOS UIView vout window provider
  *****************************************************************************
- * Copyright (C) 2001-2017 VLC authors and VideoLAN
+ * Copyright (C) 2001-2024 VLC authors and VideoLAN
  * Copyright (C) 2020 Videolabs
  *
  * Authors: Pierre d'Herbemont <pdherbemont at videolan dot org>
@@ -11,6 +11,7 @@
  *          Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *          Eric Petit <titer@m0k.org>
  *          Alexandre Janniaux <ajanni@videolabs.io>
+ *          Maxime Chapelet <umxprime at videolabs dot io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -80,7 +81,7 @@
     BOOL _resizing;
 
     /* Parent view defined by libvlc_media_player_set_nsobject. */
-    UIView *_viewContainer;
+    id _viewContainer;
 
     /* Window observer for mouse-like events. */
     UITapGestureRecognizer *_tapRecognizer;
@@ -135,7 +136,7 @@
             initWithTarget:self action:@selector(tapRecognized:)];
     }
 
-    CGSize size = _viewContainer.bounds.size;
+    CGSize size = self.viewContainerBounds.size;
     _width = size.width;
     _height = size.height;
     [self reportEvent:^{
@@ -145,11 +146,17 @@
     return self;
 }
 
+- (CGRect)viewContainerBounds {
+    if ([_viewContainer respondsToSelector:@selector(bounds)])
+        return (CGRect)[_viewContainer bounds];
+    return CGRectZero;
+}
+
 - (BOOL)fetchViewContainer
 {
     @try {
         /* get the object we will draw into */
-        UIView *viewContainer = (__bridge UIView*)var_InheritAddress (_wnd, "drawable-nsobject");
+        id viewContainer = (__bridge id)var_InheritAddress (_wnd, "drawable-nsobject");
         if (unlikely(viewContainer == nil)) {
             msg_Err(_wnd, "provided view container is nil");
             return NO;
@@ -160,8 +167,13 @@
             return NO;
         }
 
-        if (![viewContainer isKindOfClass:[UIView class]]) {
-            msg_Err(_wnd, "passed ObjC object not of class UIView");
+        if (unlikely(![viewContainer respondsToSelector:@selector(addSubview:)])) {
+            msg_Err(_wnd, "view container doesn't responds to addSubview:");
+            return NO;
+        }
+
+        if (unlikely(![viewContainer respondsToSelector:@selector(bounds)])) {
+            msg_Err(_wnd, "view container doesn't responds to bounds");
             return NO;
         }
 
@@ -173,7 +185,7 @@
          * in the core for the display are happening. */
         _viewContainer = viewContainer;
 
-        self.frame = viewContainer.bounds;
+        self.frame = self.viewContainerBounds;
 
         return YES;
     } @catch (NSException *exception) {

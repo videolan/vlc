@@ -1,11 +1,12 @@
 /*****************************************************************************
  * libvlc_media_player.h:  libvlc_media_player external API
  *****************************************************************************
- * Copyright (C) 1998-2015 VLC authors and VideoLAN
+ * Copyright (C) 1998-2024 VLC authors and VideoLAN
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Jean-Paul Saman <jpsaman@videolan.org>
  *          Pierre d'Herbemont <pdherbemont@videolan.org>
+ *          Maxime Chapelet <umxprime at videolabs dot io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -894,22 +895,52 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         void* opaque );
 
 /**
- * Set the NSView handler where the media player should render its video output.
+ * Set the handler where the media player should display its video output.
  *
- * Use the vout called "macosx".
- *
- * The drawable is an NSObject that follow the VLCVideoViewEmbedding
- * protocol:
+ * The drawable is an `NSObject` that require responding to two selectors
+ * like in this protocol:
  *
  * @code{.m}
- * @protocol VLCVideoViewEmbedding <NSObject>
- * - (void)addVoutSubview:(NSView *)view;
- * - (void)removeVoutSubview:(NSView *)view;
+ * @protocol VLCDrawable <NSObject>
+ * - (void)addSubview:(VLCView *)view;
+ * - (CGRect)bounds;
  * @end
  * @endcode
  *
- * Or it can be an NSView object.
- *
+ * In this protocol `VLCView` type can either be a `UIView` or a `NSView` type
+ * class.
+ * VLCDrawable protocol conformance isn't mandatory but a drawable must respond
+ * to both `addSubview:` and `bounds` selectors.
+ * 
+ * Additionally, a drawable can also conform to the `VLCPictureInPictureDrawable`
+ * protocol to allow picture in picture support :
+ * 
+ * @code{.m}
+ * @protocol VLCPictureInPictureMediaControlling <NSObject>
+ * - (void)play;
+ * - (void)pause;
+ * - (void)seekBy:(int64_t)offset;
+ * - (int64_t)mediaLength;
+ * - (int64_t)mediaTime;
+ * - (BOOL)isMediaPlaying;
+ * @end
+ * 
+ * @protocol VLCPictureInPictureWindowControlling <NSObject>
+ * - (void)startPictureInPicture;
+ * - (void)stopPictureInPicture;
+ * - (void)invalidatePlaybackState;
+ * @end
+ * 
+ * @protocol VLCPictureInPictureDrawable <NSObject>
+ * - (id<VLCPictureInPictureMediaControlling>) mediaController;
+ * - (void (^)(id<VLCPictureInPictureWindowControlling>)) pictureInPictureReady;
+ * @end
+ * @endcode
+ * 
+ * Be aware that full `VLCPictureInPictureDrawable` conformance is mandatory to
+ * enable picture in picture support and that time values in
+ * `VLCPictureInPictureMediaControlling` methods are expressed in milliseconds.
+ * 
  * If you want to use it along with Qt see the QMacCocoaViewContainer. Then
  * the following code should work:
  * @code{.mm}
@@ -924,8 +955,8 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
  * You can find a live example in VLCVideoView in VLCKit.framework.
  *
  * \param p_mi the Media Player
- * \param drawable the drawable that is either an NSView or an object following
- * the VLCVideoViewEmbedding protocol.
+ * \param drawable the drawable that is either an NSView, a UIView or any 
+ * NSObject responding to `addSubview:` and `bounds` selectors
  */
 LIBVLC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable );
 

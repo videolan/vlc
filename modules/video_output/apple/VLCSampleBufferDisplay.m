@@ -2,7 +2,7 @@
  * VLCSampleBufferDisplay.m: video output display using
  * AVSampleBufferDisplayLayer on macOS
  *****************************************************************************
- * Copyright (C) 2023 VLC authors and VideoLAN
+ * Copyright (C) 2023-2024 VLC authors and VideoLAN
  *
  * Authors: Maxime Chapelet <umxprime at videolabs dot io>
  *
@@ -31,21 +31,15 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_atomic.h>
+#include <vlc_modules.h>
 
-# import <TargetConditionals.h>
-# if TARGET_OS_OSX
-#     import <Cocoa/Cocoa.h>
-#     define VLCView NSView
-# else
-#     import <Foundation/Foundation.h>
-#     import <UIKit/UIKit.h>
-#     define VLCView UIView
-# endif
+#import "VLCDrawable.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 
 #include "../../codec/vt_utils.h"
+#include "vlc_pip_controller.h"
 
 #import <VideoToolbox/VideoToolbox.h>
 
@@ -469,13 +463,8 @@ static void DeleteCVPXConverter( filter_t * p_converter )
     vlc_object_delete(p_converter);
 }
 
-/**
- * Protocol declaration that drawable-nsobject should follow
- */
-@protocol VLCOpenGLVideoViewEmbedding <NSObject>
-- (void)addVoutSubview:(VLCView *)view;
-- (void)removeVoutSubview:(VLCView *)view;
-@end
+static pip_controller_t * CreatePipController( vout_display_t *vd, void *cbs_opaque );
+static void DeletePipController( pip_controller_t * pipcontroller );
 
 #pragma mark -
 @class VLCSampleBufferSubpicture, VLCSampleBufferDisplay;
@@ -650,16 +639,26 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 #pragma mark -
 
-@interface VLCSampleBufferDisplay: NSObject {
+@interface VLCSampleBufferDisplay: NSObject <VLCPictureInPictureWindowControlling>
+{
     @public
+    vout_display_place_t place;
     filter_t *converter;
 }
-    @property (nonatomic) id<VLCOpenGLVideoViewEmbedding> container;
+    @property (nonatomic, readonly, weak) VLCView *window;
+    @property (nonatomic, readonly, weak) id drawable;
+    @property (nonatomic, readonly) vout_display_t *vd;
     @property (nonatomic) VLCSampleBufferDisplayView *displayView;
     @property (nonatomic) AVSampleBufferDisplayLayer *displayLayer;
     @property (nonatomic) VLCSampleBufferSubpictureView *spuView;
     @property (nonatomic) VLCSampleBufferSubpicture *subpicture;
     @property (nonatomic) id<VLCPixelBufferRotationContext> rotationContext;
+
+    @property (nonatomic, readonly) pip_controller_t *pipcontroller;
+
+    - (instancetype)init NS_UNAVAILABLE;
+    + (instancetype)new NS_UNAVAILABLE;
+    - (instancetype)initWithVoutDisplay:(vout_display_t *)vd;
 @end
 
 @implementation VLCSampleBufferDisplay
@@ -677,6 +676,126 @@ shouldInheritContentsScale:(CGFloat)newScale
     return _rotationContext;
 }
 
+
+- (instancetype)initWithVoutDisplay:(vout_display_t *)vd
+{
+    self = [super init];
+    if (!self)
+        return nil;
+    
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_NSOBJECT)
+        return nil;
+    
+    VLCView *window = (__bridge VLCView *)vd->cfg->window->handle.nsobject;
+    if (!window) {
+        msg_Err(vd, "No window found!");
+        return nil;
+    }
+
+    _window = window;
+
+    _drawable = (__bridge id)var_InheritAddress (vd, "drawable-nsobject");
+
+    _pipcontroller = CreatePipController(vd, (__bridge void *)self);
+
+    _vd = vd;
+    
+    return self;
+}
+
+- (void)preparePictureInPicture {
+    if ( !_pipcontroller)
+        return;
+    
+    if ( _pipcontroller->ops->set_display_layer ) {
+        _pipcontroller->ops->set_display_layer(
+            _pipcontroller,
+            (__bridge void*)_displayView.displayLayer
+        );
+    }
+    
+    if ( ![_drawable conformsToProtocol:@protocol(VLCPictureInPictureDrawable)] )
+        return;
+    
+    id<VLCPictureInPictureDrawable> drawable = (id<VLCPictureInPictureDrawable>)_drawable;
+    
+    drawable.pictureInPictureReady(self);
+}
+
+- (void)prepareDisplay {
+    @synchronized(_displayLayer) {
+        if (_displayLayer)
+            return;
+    }
+
+    VLCSampleBufferDisplay *sys = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (sys.displayView)
+            return;
+
+        VLCSampleBufferDisplayView *displayView;
+        VLCSampleBufferSubpictureView *spuView;
+        VLCView *window = sys.window;
+        
+        displayView = 
+            [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:sys.vd];
+        spuView = [VLCSampleBufferSubpictureView new];
+        [window addSubview:displayView];
+        [window addSubview:spuView];
+        [displayView setFrame:[window bounds]];
+        [spuView setFrame:[window bounds]];
+
+        vout_display_PlacePicture(
+            &sys->place, sys.vd->source, &sys.vd->cfg->display
+        );
+
+        sys.displayView = displayView;
+        sys.spuView = spuView;
+        @synchronized(sys.displayLayer) {
+            sys.displayLayer = displayView.displayLayer;
+        }
+        [sys preparePictureInPicture];
+    });
+}
+
+- (void)close {
+    VLCSampleBufferDisplay *sys = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [sys.displayView removeFromSuperview];
+        [sys.spuView removeFromSuperview];
+    });
+    DeletePipController(_pipcontroller);
+}
+
+#pragma mark - VLCDisplayPictureInPictureControlling
+
+- (void)startPictureInPicture {
+    if ( _pipcontroller
+            && _pipcontroller->ops->start_pip ) {
+        _pipcontroller->ops->start_pip(
+            _pipcontroller
+        );
+    }
+}
+
+- (void)stopPictureInPicture {
+    if ( _pipcontroller
+            && _pipcontroller->ops->stop_pip ) {
+        _pipcontroller->ops->stop_pip(
+            _pipcontroller
+        );
+    }
+}
+
+- (void)invalidatePlaybackState {
+    if ( _pipcontroller
+            && _pipcontroller->ops->invalidate_pip ) {
+        _pipcontroller->ops->invalidate_pip(
+            _pipcontroller
+        );
+    }
+}
+
 @end
 
 #pragma mark -
@@ -689,13 +808,7 @@ static void Close(vout_display_t *vd)
 
     DeleteCVPXConverter(sys->converter);
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([sys.container respondsToSelector:@selector(removeVoutSubview:)]) {
-            [sys.container removeVoutSubview:sys.displayView];
-        }
-        [sys.displayView removeFromSuperview];
-        [sys.spuView removeFromSuperview];
-    });
+    [sys close];
 }
 
 static void RenderPicture(vout_display_t *vd, picture_t *pic, vlc_tick_t date) {
@@ -952,40 +1065,7 @@ static void PrepareDisplay (vout_display_t *vd) {
     VLCSampleBufferDisplay *sys;
     sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
 
-    @synchronized(sys.displayLayer) {
-        if (sys.displayLayer)
-            return;
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (sys.displayView)
-            return;
-        VLCSampleBufferDisplayView *displayView =
-            [[VLCSampleBufferDisplayView alloc] initWithVoutDisplay:vd];
-        VLCSampleBufferSubpictureView *spuView =
-            [VLCSampleBufferSubpictureView new];
-        id container = sys.container;
-        //TODO: Is it still relevant ?
-        if ([container respondsToSelector:@selector(addVoutSubview:)]) {
-            [container addVoutSubview:displayView];
-            [container addVoutSubview:spuView];
-        } else if ([container isKindOfClass:[VLCView class]]) {
-            VLCView *containerView = container;
-            [containerView addSubview:displayView];
-            [containerView addSubview:spuView];
-            [displayView setFrame:containerView.bounds];
-            [spuView setFrame:containerView.bounds];
-        } else {
-            displayView = nil;
-            spuView = nil;
-        }
-
-        sys.displayView = displayView;
-        sys.spuView = spuView;
-        @synchronized(sys.displayLayer) {
-            sys.displayLayer = displayView.displayLayer;
-        }
-    });
+    [sys prepareDisplay];
 }
 
 static void Prepare (vout_display_t *vd, picture_t *pic,
@@ -1023,6 +1103,41 @@ static int Control (vout_display_t *vd, int query)
     return VLC_SUCCESS;
 }
 
+static pip_controller_t * CreatePipController( vout_display_t *vd, void *cbs_opaque )
+{
+    pip_controller_t *pip_controller = vlc_object_create(vd, sizeof(pip_controller_t));
+
+    module_t **mods;
+    ssize_t total = vlc_module_match("pictureinpicture", NULL, false, &mods, NULL);
+    for (ssize_t i = 0; i < total; ++i)
+    {
+        int (*open)(pip_controller_t *) = vlc_module_map(vd->obj.logger, mods[i]);
+
+        if (open && open(pip_controller) == VLC_SUCCESS)
+        {
+            free(mods);
+            return pip_controller;
+        }
+    }
+
+    free(mods);
+    vlc_object_delete(pip_controller);
+    return NULL;
+}
+
+static void DeletePipController( pip_controller_t * pip_controller )
+{
+    if (pip_controller == NULL)
+        return;
+
+    if( pip_controller->ops->close )
+    {
+        pip_controller->ops->close(pip_controller);
+    }
+
+    vlc_object_delete(pip_controller);
+}
+
 static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
@@ -1032,14 +1147,6 @@ static int Open (vout_display_t *vd,
         return VLC_EGENERIC;
     }
 
-    if (vd->cfg->window->type != VLC_WINDOW_TYPE_NSOBJECT)
-        return VLC_EGENERIC;
-
-    VLCSampleBufferDisplay *sys = [VLCSampleBufferDisplay new];
-    if (sys == nil) {
-        return VLC_ENOMEM;
-    }
-
     // Display will only work with CVPX video context
     filter_t *converter = NULL;
     if (!vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_CVPX)) {
@@ -1047,24 +1154,24 @@ static int Open (vout_display_t *vd,
         if (!converter)
             return VLC_EGENERIC;
     }
-    sys->converter = converter;
 
     @autoreleasepool {
-        id container = (__bridge id)vd->cfg->window->handle.nsobject;
-        if (!container) {
-            msg_Err(vd, "No drawable-nsobject found!");
+        VLCSampleBufferDisplay *sys = 
+            [[VLCSampleBufferDisplay alloc] initWithVoutDisplay:vd];
+
+        if (sys == nil) {
             DeleteCVPXConverter(converter);
-            return VLC_EGENERIC;
+            return VLC_ENOMEM;
         }
 
-        sys.container = container;
+        sys->converter = converter;
 
         vd->sys = (__bridge_retained void*)sys;
 
         static const struct vlc_display_operations ops = {
             Close, Prepare, Display, Control, NULL, NULL, NULL,
         };
-
+        
         vd->ops = &ops;
 
         static const vlc_fourcc_t subfmts[] = {
