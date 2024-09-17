@@ -500,6 +500,8 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
     else if (i_index == MC_API_INFO_OUTPUT_FORMAT_CHANGED)
     {
         AMediaFormat *format = syms.AMediaCodec.getOutputFormat(p_sys->p_codec);
+        if (unlikely(format == NULL))
+            return MC_API_ERROR;
 
         p_out->type = MC_OUT_TYPE_CONF;
         p_out->b_eos = false;
@@ -521,6 +523,7 @@ static int GetOutput(mc_api *api, int i_index, mc_api_out *p_out)
             p_out->conf.audio.channel_mask  = GetFormatInteger(format, "channel-mask");
             p_out->conf.audio.sample_rate   = GetFormatInteger(format, "sample-rate");
         }
+        syms.AMediaFormat.delete(format);
         return 1;
     }
     return 0;
