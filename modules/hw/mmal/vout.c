@@ -462,7 +462,7 @@ static MMAL_STATUS_T isp_check(vout_display_t * const vd, vout_display_sys_t * c
 /* TV service */
 static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1,
                 uint32_t param2);
-static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt);
+static void adjust_refresh_rate(vout_display_t *vd);
 static int set_latency_target(vout_display_t *vd, bool enable);
 
 // Mmal
@@ -518,7 +518,7 @@ place_to_mmal_rect(const vout_display_place_t place)
 }
 
 static void
-place_dest(vout_display_t *vd, const video_format_t * fmt)
+place_dest(vout_display_t *vd)
 {
     vout_display_sys_t * const sys = vd->sys;
     // Ignore what VLC thinks might be going on with display size
@@ -528,12 +528,12 @@ place_dest(vout_display_t *vd, const video_format_t * fmt)
     dp.width = sys->display_width;
     dp.height = sys->display_height;
     dp.fitting = VLC_VIDEO_FIT_SMALLER;
-    vout_display_PlacePicture(&place, fmt, &dp);
+    vout_display_PlacePicture(&place, vd->source, &dp);
 
     sys->dest_rect = place_to_mmal_rect(place);
 }
 
-static int configure_display(vout_display_t *vd, const video_format_t *fmt)
+static int configure_display(vout_display_t *vd)
 {
     vout_display_sys_t * const sys = vd->sys;
     MMAL_DISPLAYREGION_T display_region;
@@ -541,8 +541,8 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
 
     isp_check(vd, sys);
 
-    sys->input->format->es->video.par.num = fmt->i_sar_num;
-    sys->input->format->es->video.par.den = fmt->i_sar_den;
+    sys->input->format->es->video.par.num = vd->source->i_sar_num;
+    sys->input->format->es->video.par.den = vd->source->i_sar_den;
 
     status = mmal_port_format_commit(sys->input);
     if (status != MMAL_SUCCESS) {
@@ -550,7 +550,7 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
                         sys->input->name, status, mmal_status_to_string(status));
         return -EINVAL;
     }
-    place_dest(vd, fmt);
+    place_dest(vd);
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
@@ -571,7 +571,7 @@ static int configure_display(vout_display_t *vd, const video_format_t *fmt)
     sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
     sys->native_interlaced = var_InheritBool(vd, MMAL_NATIVE_INTERLACED);
     if (sys->adjust_refresh_rate) {
-        adjust_refresh_rate(vd, fmt);
+        adjust_refresh_rate(vd);
         set_latency_target(vd, true);
     }
 
@@ -691,7 +691,7 @@ static int vd_control(vout_display_t *vd, int query)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         {
-            if (configure_display(vd, vd->source) >= 0)
+            if (configure_display(vd) >= 0)
                 ret = VLC_SUCCESS;
             break;
         }
@@ -786,7 +786,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
         sys->b_progressive = p_pic->b_progressive;
         sys->i_frame_rate = p_pic->format.i_frame_rate;
         sys->i_frame_rate_base = p_pic->format.i_frame_rate_base;
-        configure_display(vd, &p_pic->format);
+        configure_display(vd);
     }
 
     // Subpics can either turn up attached to the main pic or in the
@@ -873,14 +873,14 @@ static int set_latency_target(vout_display_t *vd, bool enable)
     return VLC_SUCCESS;
 }
 
-static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
+static void adjust_refresh_rate(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     TV_DISPLAY_STATE_T display_state;
     TV_SUPPORTED_MODE_NEW_T supported_modes[VC_TV_MAX_MODE_IDS];
     char response[20]; /* answer is hvs_update_fields=%1d */
     int num_modes;
-    double frame_rate = (double)fmt->i_frame_rate / fmt->i_frame_rate_base;
+    double frame_rate = (double)vd->source->i_frame_rate / vd->source->i_frame_rate_base;
     int best_id = -1;
     double best_score, score;
     int i;
@@ -898,8 +898,8 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
                                 mode->scan_mode == HDMI_INTERLACED)
                     continue;
             } else {
-                if (mode->width != vd->fmt->i_visible_width ||
-                        mode->height != vd->fmt->i_visible_height)
+                if (mode->width  != vd->source->i_visible_width ||
+                    mode->height != vd->source->i_visible_height)
                     continue;
                 if (mode->scan_mode != sys->b_progressive ? HDMI_NONINTERLACED : HDMI_INTERLACED)
                     continue;
@@ -1184,7 +1184,7 @@ static int OpenMmalVout(vout_display_t *vd,
         sys->display_height = vd->cfg->display.height;
     }
 
-    place_dest(vd, vd->source);  // Sets sys->dest_rect
+    place_dest(vd);  // Sets sys->dest_rect
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
