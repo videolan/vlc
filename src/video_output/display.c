@@ -671,14 +671,19 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     osys->dar = (vlc_rational_t){dar_num, dar_den};
 
+    if (dar_num == VLC_DAR_FROM_SOURCE.num && dar_den == VLC_DAR_FROM_SOURCE.den)
+        // use the source aspect ratio that we don't have yet
+        // see vout_UpdateDisplaySourceProperties()
+        return;
+
     unsigned sar_num, sar_den;
-    if (dar_num > 0 && dar_den > 0) {
+    if (unlikely(dar_num == 0 || dar_den == 0)) {
+        // bogus values should be filtered in GetAspectRatio()
+        vlc_assert_unreachable();
+    } else {
         sar_num = dar_num * osys->source.i_visible_height;
         sar_den = dar_den * osys->source.i_visible_width;
         vlc_ureduce(&sar_num, &sar_den, sar_num, sar_den, 0);
-    } else {
-        sar_num = 0;
-        sar_den = 0;
     }
 
     int err1 = vout_SetSourceAspect(vd, sar_num, sar_den);
