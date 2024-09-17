@@ -24,17 +24,12 @@
 
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
-#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarViewController.h"
 
 #import "main/VLCMain.h"
 
 #import "windows/video/VLCMainVideoViewController.h"
-
-// Make sure these match the identifiers in the XIB
-static NSString * const VLCLibraryWindowNavigationSidebarIdentifier = @"VLCLibraryWindowNavigationSidebarIdentifier";
-static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibraryWindowPlaylistSidebarIdentifier";
 
 @implementation VLCLibraryWindowSplitViewController
 
@@ -51,15 +46,13 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
 
     _navSidebarViewController = [[VLCLibraryWindowNavigationSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     _libraryTargetViewController = [[NSViewController alloc] init];
-    _playlistSidebarViewController = [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
-    _chaptersSidebarViewController = [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+    _sidebarViewController = [[VLCLibraryWindowSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
 
     self.libraryTargetViewController.view = self.libraryWindow.libraryTargetView;
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
-    _playlistSidebarItem = [NSSplitViewItem sidebarWithViewController:self.playlistSidebarViewController];
-    _chaptersSidebarItem = [NSSplitViewItem sidebarWithViewController:self.chaptersSidebarViewController];
+    _sidebarItem = [NSSplitViewItem sidebarWithViewController:self.sidebarViewController];
 
     if (@available(macOS 11.0, *)) {
         _navSidebarItem.allowsFullHeightLayout = YES;
@@ -68,17 +61,12 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
     _navSidebarItem.preferredThicknessFraction = 0.2;
     _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
 
-    _playlistSidebarItem.preferredThicknessFraction = 0.2;
-    _playlistSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
-    _playlistSidebarItem.canCollapse = YES;
-    _playlistSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
+    self.sidebarItem.preferredThicknessFraction = 0.2;
+    self.sidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
+    self.sidebarItem.canCollapse = YES;
+    self.sidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
 
-    self.chaptersSidebarItem.preferredThicknessFraction = 0.2;
-    self.chaptersSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
-    self.chaptersSidebarItem.canCollapse = YES;
-    self.chaptersSidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
-
-    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, _playlistSidebarItem];
+    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, self.sidebarItem];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -102,10 +90,10 @@ static NSString * const VLCLibraryWindowPlaylistSidebarIdentifier = @"VLCLibrary
 
 - (IBAction)togglePlaylistSidebar:(id)sender
 {
-    const BOOL playlistSidebarCollapsed = self.playlistSidebarItem.isCollapsed;
-    self.playlistSidebarItem.animator.collapsed = !playlistSidebarCollapsed;
+    const BOOL sidebarCollapsed = self.sidebarItem.isCollapsed;
+    self.sidebarItem.animator.collapsed = !sidebarCollapsed;
 
-    const NSControlStateValue controlState = self.playlistSidebarItem.isCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
+    const NSControlStateValue controlState = self.sidebarItem.isCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
     self.libraryWindow.playQueueToggle.state = controlState;
     self.libraryWindow.videoViewController.playlistButton.state = controlState;
 }

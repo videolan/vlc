@@ -29,7 +29,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
@@ -406,11 +406,12 @@
 
 - (void)updatePlaylistToggleState
 {
+    // TODO: Rename playlist stuff
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
-        NSView * const playlistView =
-            libraryWindow.splitViewController.playlistSidebarViewController.view;
-        self.playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:playlistView] ?
+        NSView * const sidebarView =
+            libraryWindow.splitViewController.sidebarViewController.view;
+        self.playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:sidebarView] ?
             NSControlStateValueOff : NSControlStateValueOn;
     }
 }

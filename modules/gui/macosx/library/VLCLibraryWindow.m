@@ -48,7 +48,7 @@
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
-#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 #import "library/VLCLibraryWindowToolbarDelegate.h"
 
@@ -724,15 +724,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self hideControlsBarImmediately];
     [self.videoViewController showControls];
 
-    self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = YES;
-    self.splitViewController.chaptersSidebarViewController.mainVideoModeEnabled = YES;
+    self.splitViewController.sidebarViewController.mainVideoModeEnabled = YES;
 
     [self.librarySegmentViewController disconnect];
 }
 
 - (void)disableVideoPlaybackAppearance
 {
-    [self makeFirstResponder:self.splitViewController.playlistSidebarViewController.view];
+    [self makeFirstResponder:self.splitViewController.sidebarViewController.view];
     [VLCMain.sharedInstance.voutProvider updateWindowLevelForHelperWindows:NSNormalWindowLevel];
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
@@ -741,8 +740,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setViewForSelectedSegment];
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
-    self.splitViewController.playlistSidebarViewController.mainVideoModeEnabled = NO;
-    self.splitViewController.chaptersSidebarViewController.mainVideoModeEnabled = NO;
+    self.splitViewController.sidebarViewController.mainVideoModeEnabled = NO;
     [self.librarySegmentViewController connect];
 }
 
