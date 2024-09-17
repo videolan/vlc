@@ -527,6 +527,10 @@ static int vout_SetSourceAspect(vout_display_t *vd,
     int err1 = VLC_SUCCESS, err2;
 
     assert(sar_num > 0 && sar_den > 0);
+    if (osys->source.i_sar_num * sar_den == osys->source.i_sar_den * sar_num)
+        // value unchanged
+        return err1;
+
     osys->source.i_sar_num = sar_num;
     osys->source.i_sar_den = sar_den;
 
@@ -572,14 +576,9 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
     if (osys->dar.den == VLC_DAR_FROM_SOURCE.den && osys->dar.num == VLC_DAR_FROM_SOURCE.num) {
         video_format_t fixed_src = *source;
         VoutFixFormatAR( &fixed_src );
-        if (fixed_src.i_sar_num * osys->source.i_sar_den !=
-            fixed_src.i_sar_den * osys->source.i_sar_num) {
-
-            err2 = vout_SetSourceAspect(vd, fixed_src.i_sar_num,
-                                        fixed_src.i_sar_den);
-            if (err2 != VLC_SUCCESS)
-                err1 = err2;
-        }
+        err2 = vout_SetSourceAspect(vd, fixed_src.i_sar_num, fixed_src.i_sar_den);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
     }
     if (source->i_x_offset       != osys->source.i_x_offset ||
         source->i_y_offset       != osys->source.i_y_offset ||
