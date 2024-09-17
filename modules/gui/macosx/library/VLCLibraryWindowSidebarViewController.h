@@ -22,6 +22,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCLibraryWindow;
+@class VLCLibraryWindowChaptersSidebarViewController;
+@class VLCLibraryWindowPlaylistSidebarViewController;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
@@ -29,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryWindowSidebarViewController : NSViewController
 
 @property (readonly, weak) VLCLibraryWindow *libraryWindow;
+
+@property (readonly) VLCLibraryWindowPlaylistSidebarViewController *playlistSidebarViewController;
+@property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

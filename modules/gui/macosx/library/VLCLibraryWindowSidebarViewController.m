@@ -22,6 +22,9 @@
 
 #import "VLCLibraryWindowSidebarViewController.h"
 
+#import "library/VLCLibraryWindowChaptersSidebarViewController.h"
+#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+
 @implementation VLCLibraryWindowSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -36,7 +39,11 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do view setup here.
+
+    _playlistSidebarViewController =
+        [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+    _chaptersSidebarViewController =
+        [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 }
 
 @end
