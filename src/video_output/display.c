@@ -526,10 +526,9 @@ static int vout_SetSourceAspect(vout_display_t *vd,
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     int err1 = VLC_SUCCESS, err2;
 
-    if (sar_num > 0 && sar_den > 0) {
-        osys->source.i_sar_num = sar_num;
-        osys->source.i_sar_den = sar_den;
-    }
+    assert(sar_num > 0 && sar_den > 0);
+    osys->source.i_sar_num = sar_num;
+    osys->source.i_sar_den = sar_den;
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
