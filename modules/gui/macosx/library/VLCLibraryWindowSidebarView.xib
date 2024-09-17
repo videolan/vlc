@@ -7,7 +7,9 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowSidebarViewController">
             <connections>
+                <outlet property="targetView" destination="mtn-R7-eBE" id="xPy-9k-VIg"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+                <outlet property="viewSelector" destination="xML-YA-Xws" id="Ifc-Ns-N50"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
