@@ -279,7 +279,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
     while (_renderer.readyForMoreMediaData || !_dateReached)
     {
-        if (!_dateReached)
+        if (!_dateReached && !_stopped)
         {
             /* Start playback at the requested date */
 
@@ -307,7 +307,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
                     deadline = _lastDate - writtenTicks;
                 }
 
-                if (timeout != 0)
+                if (timeout != 0 && !_stopped)
                 {
                     msg_Dbg(_aout, "started");
                     [self startNow:0];
@@ -377,12 +377,12 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 
 - (void)stopSyncRenderer
 {
+    vlc_mutex_lock(&_bufferLock);
     _sync.rate = 0.0f;
 
     [_renderer stopRequestingMediaData];
     [_renderer flush];
 
-    vlc_mutex_lock(&_bufferLock);
     if (_dateReached)
         [_sync removeTimeObserver:_observer];
 
