@@ -24,6 +24,15 @@
 
 @implementation VLCLibraryWindowSidebarViewController
 
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    self = [super initWithNibName:@"VLCLibraryWindowSidebarView" bundle:nil];
+    if (self) {
+        _libraryWindow = libraryWindow;
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
