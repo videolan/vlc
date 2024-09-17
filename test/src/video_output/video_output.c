@@ -170,12 +170,20 @@ static void Display(vout_display_t *vd, picture_t *picture)
     (void) picture;
 }
 
+static int Control(vout_display_t *vd, int query)
+{
+    (void) vd;
+    (void) query;
+    return VLC_SUCCESS;
+}
+
 static int OpenDisplay(vout_display_t *vd, video_format_t *fmtp,
                        struct vlc_video_context *vctx)
 {
     static const struct vlc_display_operations ops =
     {
         .display = Display,
+        .control = Control,
     };
     vd->ops = &ops;
 
