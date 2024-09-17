@@ -365,14 +365,9 @@ ListView {
 
     function updateItemContainsDrag(item, set) {
         if (set) {
-            // This callLater is needed because in Qt 5.15,
-            // an item might set itemContainsDrag, before
-            // the owning item releases it.
-            Qt.callLater(function() {
-                if (itemContainsDrag)
-                    console.debug(item + " set itemContainsDrag before it was released!")
-                itemContainsDrag = item
-            })
+            if (itemContainsDrag)
+                console.debug(item + " set itemContainsDrag before it was released!")
+            itemContainsDrag = item
         } else {
             if (itemContainsDrag !== item)
                 console.debug(item + " released itemContainsDrag that is not owned!")
