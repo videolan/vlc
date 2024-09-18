@@ -64,6 +64,7 @@
 #define PHASE_CHECK_INTERVAL 100
 
 static int OpenMmalVout(vout_display_t *, video_format_t *, vlc_video_context *);
+static int OpenMmalWindow(vlc_window_t *);
 
 #define SUBS_MAX 4
 
@@ -79,9 +80,13 @@ vlc_module_begin()
                     NULL)
     add_bool(MMAL_NATIVE_INTERLACED, false, MMAL_NATIVE_INTERLACE_TEXT,
                     MMAL_NATIVE_INTERLACE_LONGTEXT)
-    add_string(MMAL_DISPLAY_NAME, "auto", MMAL_DISPLAY_TEXT,
-                    MMAL_DISPLAY_LONGTEXT)
     set_callback_display(OpenMmalVout, 16)  // 1 point better than ASCII art
+
+    add_submodule()
+        set_capability("vout window", 10)
+        set_callback(OpenMmalWindow)
+        add_string(MMAL_DISPLAY_NAME, "auto", MMAL_DISPLAY_TEXT,
+                        MMAL_DISPLAY_LONGTEXT)
 vlc_module_end()
 
 typedef struct vout_subpic_s {
@@ -90,8 +95,6 @@ typedef struct vout_subpic_s {
 } vout_subpic_t;
 
 typedef struct vout_display_sys_t {
-    vlc_mutex_t manage_mutex;
-
     vlc_decoder_device *dec_dev;
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
@@ -100,10 +103,6 @@ typedef struct vout_display_sys_t {
 
     int buffers_in_transit; /* number of buffers currently pushed to mmal component */
     unsigned num_buffers; /* number of buffers allocated at mmal port */
-
-    int display_id;
-    unsigned display_width;
-    unsigned display_height;
 
     MMAL_RECT_T dest_rect;      // Output rectangle in display coords
 
@@ -114,7 +113,6 @@ typedef struct vout_display_sys_t {
     int phase_offset; /* currently applied offset to presentation time in ns */
     int layer; /* the dispman layer (z-index) used for video rendering */
 
-    bool need_configure_display; /* indicates a required display reconfigure to main thread */
     bool adjust_refresh_rate;
     bool native_interlaced;
     bool b_top_field_first; /* cached interlaced settings to detect changes for native mode */
@@ -460,8 +458,6 @@ static MMAL_STATUS_T isp_check(vout_display_t * const vd, vout_display_sys_t * c
 }
 
 /* TV service */
-static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1,
-                uint32_t param2);
 static void adjust_refresh_rate(vout_display_t *vd);
 static int set_latency_target(vout_display_t *vd, bool enable);
 
@@ -475,35 +471,6 @@ static void vd_input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf)
     VLC_UNUSED(port);
 
     mmal_buffer_header_release(buf);
-}
-
-static int query_resolution(vout_display_t *vd, const int display_id, unsigned *width, unsigned *height)
-{
-    TV_DISPLAY_STATE_T display_state = {0};
-    int ret = 0;
-
-    if (vc_tv_get_display_state_id(display_id, &display_state) == 0) {
-        msg_Dbg(vd, "State=%#x", display_state.state);
-        if (display_state.state & 0xFF) {
-            msg_Dbg(vd, "HDMI: %dx%d", display_state.display.hdmi.width, display_state.display.hdmi.height);
-            *width = display_state.display.hdmi.width;
-            *height = display_state.display.hdmi.height;
-            vout_display_SetSize(vd, *width, *height);
-        } else if (display_state.state & 0xFF00) {
-            msg_Dbg(vd, "SDTV: %dx%d", display_state.display.sdtv.width, display_state.display.sdtv.height);
-            *width = display_state.display.sdtv.width;
-            *height = display_state.display.sdtv.height;
-            vout_display_SetSize(vd, *width, *height);
-        } else {
-            msg_Warn(vd, "Invalid display state %"PRIx32, display_state.state);
-            ret = -1;
-        }
-    } else {
-        msg_Warn(vd, "Failed to query display resolution");
-        ret = -1;
-    }
-
-    return ret;
 }
 
 static MMAL_RECT_T
@@ -521,14 +488,9 @@ static void
 place_dest(vout_display_t *vd)
 {
     vout_display_sys_t * const sys = vd->sys;
-    // Ignore what VLC thinks might be going on with display size
-    struct vout_display_placement dp = vd->cfg->display;
     vout_display_place_t place;
 
-    dp.width = sys->display_width;
-    dp.height = sys->display_height;
-    dp.fitting = VLC_VIDEO_FIT_SMALLER;
-    vout_display_PlacePicture(&place, vd->source, &dp);
+    vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
 
     sys->dest_rect = place_to_mmal_rect(place);
 }
@@ -704,27 +666,6 @@ static int vd_control(vout_display_t *vd, int query)
     return ret;
 }
 
-static void vd_manage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    unsigned width, height;
-
-    vlc_mutex_lock(&sys->manage_mutex);
-
-    if (sys->need_configure_display) {
-        if (query_resolution(vd, sys->display_id, &width, &height) >= 0) {
-            sys->display_width = width;
-            sys->display_height = height;
-//            vlc_window_ReportSize(vd->cfg->window, width, height);
-        }
-
-        sys->need_configure_display = false;
-    }
-
-    vlc_mutex_unlock(&sys->manage_mutex);
-}
-
-
 static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const sys,
                           const vlc_render_subpicture * const spic)
 {
@@ -772,8 +713,6 @@ static void vd_prepare(vout_display_t *vd, picture_t *p_pic,
 {
     VLC_UNUSED(date);
     vout_display_sys_t * const sys = vd->sys;
-
-    vd_manage(vd);
 
     if (sys->force_config ||
         p_pic->format.i_frame_rate != sys->i_frame_rate ||
@@ -833,20 +772,6 @@ static void vd_control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     mmal_buffer_header_release(buffer);
 }
 
-static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1, uint32_t param2)
-{
-    VLC_UNUSED(reason);
-    VLC_UNUSED(param1);
-    VLC_UNUSED(param2);
-
-    vout_display_t *vd = (vout_display_t *)callback_data;
-    vout_display_sys_t *sys = vd->sys;
-
-    vlc_mutex_lock(&sys->manage_mutex);
-    sys->need_configure_display = true;
-    vlc_mutex_unlock(&sys->manage_mutex);
-}
-
 static int set_latency_target(vout_display_t *vd, bool enable)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -885,9 +810,9 @@ static void adjust_refresh_rate(vout_display_t *vd)
     double best_score, score;
     int i;
 
-    vc_tv_get_display_state_id(sys->display_id, &display_state);
+    vc_tv_get_display_state_id(vd->cfg->window->handle.display_id, &display_state);
     if(display_state.display.hdmi.mode != HDMI_MODE_OFF) {
-        num_modes = vc_tv_hdmi_get_supported_modes_new_id(sys->display_id, display_state.display.hdmi.group,
+        num_modes = vc_tv_hdmi_get_supported_modes_new_id(vd->cfg->window->handle.display_id, display_state.display.hdmi.group,
                         supported_modes, VC_TV_MAX_MODE_IDS, NULL, NULL);
 
         for (i = 0; i < num_modes; ++i) {
@@ -915,7 +840,7 @@ static void adjust_refresh_rate(vout_display_t *vd)
         if((best_id >= 0) && (display_state.display.hdmi.mode != supported_modes[best_id].code)) {
             msg_Info(vd, "Setting HDMI refresh rate to %"PRIu32,
                             supported_modes[best_id].frame_rate);
-            vc_tv_hdmi_power_on_explicit_new_id(sys->display_id, HDMI_MODE_HDMI,
+            vc_tv_hdmi_power_on_explicit_new_id(vd->cfg->window->handle.display_id, HDMI_MODE_HDMI,
                             supported_modes[best_id].group,
                             supported_modes[best_id].code);
         }
@@ -986,8 +911,6 @@ static void CloseMmalVout(vout_display_t * vd)
 {
     vout_display_sys_t * const sys = vd->sys;
     char response[20]; /* answer is hvs_update_fields=%1d */
-
-    vc_tv_unregister_callback_full(tvservice_cb, vd);
 
     // Shouldn't be anything here - but just in case
     for (unsigned int i = 0; i != SUBS_MAX; ++i)
@@ -1074,6 +997,9 @@ static const struct vlc_display_operations ops = {
 static int OpenMmalVout(vout_display_t *vd,
                         video_format_t *fmtp, vlc_video_context *vctx)
 {
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_MMAL)
+        return VLC_ENOTSUP;
+
     vout_display_sys_t *sys;
     MMAL_DISPLAYREGION_T display_region;
     MMAL_STATUS_T status;
@@ -1106,25 +1032,7 @@ static int OpenMmalVout(vout_display_t *vd,
         goto fail;
     }
 
-    vlc_mutex_init(&sys->manage_mutex);
-
-    vc_tv_register_callback(tvservice_cb, vd);
-
     sys->layer = var_InheritInteger(vd, MMAL_LAYER_NAME);
-
-    {
-        const char *display_name = var_InheritString(vd, MMAL_DISPLAY_NAME);
-        int qt_num = -1;
-        int display_id = find_display_num(display_name);
-//        sys->display_id = display_id < 0 ? vc_tv_get_default_display_id() : display_id;
-        sys->display_id = display_id >= 0 ? display_id : DISPMANX_ID_HDMI;
-        if (display_id < -1)
-            msg_Warn(vd, "Unknown display device: '%s'", display_name);
-        else
-            msg_Dbg(vd, "Display device: %s, qt=%d id=%d display=%d", display_name,
-                    qt_num, display_id, sys->display_id);
-        free(display_name);
-    }
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);
     if (status != MMAL_SUCCESS) {
@@ -1178,17 +1086,11 @@ static int OpenMmalVout(vout_display_t *vd,
         }
     }
 
-    if (query_resolution(vd, sys->display_id, &sys->display_width, &sys->display_height) < 0)
-    {
-        sys->display_width = vd->cfg->display.width;
-        sys->display_height = vd->cfg->display.height;
-    }
-
     place_dest(vd);  // Sets sys->dest_rect
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
-    display_region.display_num = sys->display_id;
+    display_region.display_num = vd->cfg->window->handle.display_id;
     display_region.fullscreen = MMAL_FALSE;
     display_src_rect(vd, &display_region.src_rect);
     display_region.dest_rect = sys->dest_rect;
@@ -1238,7 +1140,7 @@ static int OpenMmalVout(vout_display_t *vd,
             goto fail;
         }
         if ((status = hw_mmal_subpic_open(VLC_OBJECT(vd), &sub->sub, sub->component->input[0],
-                                          sys->display_id, sys->layer + i + 1)) != MMAL_SUCCESS) {
+                                          vd->cfg->window->handle.display_id, sys->layer + i + 1)) != MMAL_SUCCESS) {
             msg_Dbg(vd, "Failed to open subpic %d", i);
             goto fail;
         }
@@ -1264,4 +1166,82 @@ fail:
     CloseMmalVout(vd);
 
     return ret;
+}
+
+///////////////////////////////
+
+static int send_resolution(vlc_window_t *wnd)
+{
+    TV_DISPLAY_STATE_T display_state = {0};
+    int ret = VLC_SUCCESS;
+
+    if (vc_tv_get_display_state_id(wnd->handle.display_id, &display_state) == 0) {
+        msg_Dbg(wnd, "State=%#x", display_state.state);
+        if (display_state.state & 0xFF) {
+            msg_Dbg(wnd, "HDMI: %dx%d", display_state.display.hdmi.width, display_state.display.hdmi.height);
+            vlc_window_ReportSize(wnd, display_state.display.hdmi.width, display_state.display.hdmi.height);
+        } else if (display_state.state & 0xFF00) {
+            msg_Dbg(wnd, "SDTV: %dx%d", display_state.display.sdtv.width, display_state.display.sdtv.height);
+            vlc_window_ReportSize(wnd, display_state.display.sdtv.width, display_state.display.sdtv.height);
+        } else {
+            msg_Warn(wnd, "Invalid display state %"PRIx32, display_state.state);
+            ret = VLC_EINVAL;
+        }
+    } else {
+        msg_Warn(wnd, "Failed to query display resolution");
+        ret = VLC_EACCES;
+    }
+
+    return ret;
+}
+
+static void tvservice_cb(void *callback_data, uint32_t reason, uint32_t param1, uint32_t param2)
+{
+    VLC_UNUSED(reason);
+    VLC_UNUSED(param1);
+    VLC_UNUSED(param2);
+
+    vlc_window_t *wnd = callback_data;
+    send_resolution(wnd);
+}
+
+static int EnableWindow(vlc_window_t *wnd, const vlc_window_cfg_t *cfg)
+{
+    int err = send_resolution(wnd);
+    if (err != VLC_SUCCESS)
+        return err;
+
+    vc_tv_register_callback(tvservice_cb, wnd);
+    return VLC_SUCCESS;
+}
+
+static void DisableWindow(vlc_window_t *wnd)
+{
+    vc_tv_unregister_callback_full(tvservice_cb, wnd);
+}
+
+static int OpenMmalWindow(vlc_window_t *wnd)
+{
+    {
+        char *display_name = var_InheritString(wnd, MMAL_DISPLAY_NAME);
+        int qt_num = -1;
+        int display_id = find_display_num(display_name);
+//        wnd->handle.display_id = display_id < 0 ? vc_tv_get_default_display_id() : display_id;
+        wnd->handle.display_id = display_id >= 0 ? display_id : DISPMANX_ID_HDMI;
+        if (display_id < -1)
+            msg_Warn(wnd, "Unknown display device: '%s'", display_name);
+        else
+            msg_Dbg(wnd, "Display device: %s, qt=%d id=%d display=%d", display_name,
+                    qt_num, display_id, wnd->handle.display_id);
+        free(display_name);
+    }
+
+    static const struct vlc_window_operations ops = {
+        .enable = EnableWindow,
+        .disable = DisableWindow,
+    };
+
+    wnd->type = VLC_WINDOW_TYPE_MMAL;
+    wnd->ops = &ops;
+    return VLC_SUCCESS;
 }
