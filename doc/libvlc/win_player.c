@@ -82,6 +82,8 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
                     else if (strcmp(AspectRatio,"5:4")==0)
                         AspectRatio = "1:1";
                     else if (strcmp(AspectRatio,"1:1")==0)
+                        AspectRatio = "fill";
+                    else if (strcmp(AspectRatio,"fill")==0)
                         AspectRatio = NULL;
                     libvlc_video_set_aspect_ratio( ctx->p_mediaplayer, AspectRatio );
                 }
