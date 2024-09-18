@@ -46,13 +46,10 @@ static void DialogCallback( extension_dialog_t *p_ext_dialog,
                             void *p_data );
 
 
-ExtensionsDialogProvider::ExtensionsDialogProvider( qt_intf_t *_p_intf,
-                                                    extensions_manager_t *p_mgr )
-        : QObject( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )
+ExtensionsDialogProvider::ExtensionsDialogProvider(qt_intf_t *_p_intf)
+        : QObject( NULL ), p_intf( _p_intf )
 {
     assert(p_intf);
-    assert(p_extensions_manager);
-
     vlc_dialog_provider_set_ext_callback( p_intf, DialogCallback, this );
 }
 

@@ -59,8 +59,7 @@ public:
     void UpdateExtDialog( extension_dialog_t *p_dialog );
 
 private:
-    ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr,
-                             extensions_manager_t *p_mgr = nullptr );
+    ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr);
     virtual ~ExtensionsDialogProvider();
 
     ExtensionDialog* CreateExtDialog( extension_dialog_t *p_dialog );
@@ -68,7 +67,6 @@ private:
 
     std::unordered_set<ExtensionDialog*> m_dialogs;
     qt_intf_t *p_intf = nullptr;
-    extensions_manager_t *p_extensions_manager = nullptr;
 };
 
 

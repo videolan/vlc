@@ -86,8 +86,7 @@ bool ExtensionsManager::loadExtensions()
         }
 
         /* Initialize dialog provider */
-        p_edp = ExtensionsDialogProvider::getInstance( p_intf,
-                                                       p_extensions_manager );
+        p_edp = ExtensionsDialogProvider::getInstance( p_intf );
         if( !p_edp )
         {
             msg_Err( p_intf, "Unable to create dialogs provider for extensions" );
