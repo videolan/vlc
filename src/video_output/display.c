@@ -679,9 +679,9 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         // bogus values should be filtered in GetAspectRatio()
         vlc_assert_unreachable();
     } else {
-        sar_num = dar_num * osys->source.i_visible_height;
-        sar_den = dar_den * osys->source.i_visible_width;
-        vlc_ureduce(&sar_num, &sar_den, sar_num, sar_den, 0);
+        vlc_ureduce(&sar_num, &sar_den,
+                    (uint64_t)dar_num * osys->source.i_visible_height,
+                    (uint64_t)dar_den * osys->source.i_visible_width, 0);
     }
 
     int err1 = vout_SetSourceAspect(vd, sar_num, sar_den);
