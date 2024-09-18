@@ -63,8 +63,9 @@
         self.targetView.subviews = @[self.playlistSidebarViewController.view];
     } else if (selectedSegment == 1) {
         self.targetView.subviews = @[self.chaptersSidebarViewController.view];
+    } else {
+        NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
     }
-    NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
 }
 
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
