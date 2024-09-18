@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 @class VLCLibraryWindowNavigationSidebarViewController;
-@class VLCLibraryWindowSidebarViewController;
+@class VLCLibraryWindowSidebarRootViewController;
 
 typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
     VLCLibraryWindowNavigationSidebarSplitViewDividerIndex = 0,
@@ -40,11 +40,11 @@ typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
 
 @property (readonly) VLCLibraryWindowNavigationSidebarViewController *navSidebarViewController;
 @property (readonly) NSViewController *libraryTargetViewController;
-@property (readonly) VLCLibraryWindowSidebarViewController *sidebarViewController;
+@property (readonly) VLCLibraryWindowSidebarRootViewController *multifunctionSidebarViewController;
 
 @property (readonly) NSSplitViewItem *navSidebarItem;
 @property (readonly) NSSplitViewItem *libraryTargetViewItem;
-@property (readonly) NSSplitViewItem *sidebarItem;
+@property (readonly) NSSplitViewItem *multifunctionSidebarItem;
 
 - (IBAction)toggleNavigationSidebar:(id)sender;
 - (IBAction)toggleMultifunctionSidebar:(id)sender;

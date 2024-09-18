@@ -25,7 +25,7 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarViewController.h"
-#import "library/VLCLibraryWindowSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarRootViewController.h"
 
 #import "main/VLCMain.h"
 
@@ -44,15 +44,17 @@
 
     self.splitView.wantsLayer = YES;
 
-    _navSidebarViewController = [[VLCLibraryWindowNavigationSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+    _navSidebarViewController =
+        [[VLCLibraryWindowNavigationSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     _libraryTargetViewController = [[NSViewController alloc] init];
-    _sidebarViewController = [[VLCLibraryWindowSidebarViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+    _multifunctionSidebarViewController =
+        [[VLCLibraryWindowSidebarRootViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
 
     self.libraryTargetViewController.view = self.libraryWindow.libraryTargetView;
 
     _navSidebarItem = [NSSplitViewItem sidebarWithViewController:self.navSidebarViewController];
     _libraryTargetViewItem = [NSSplitViewItem splitViewItemWithViewController:self.libraryTargetViewController];
-    _sidebarItem = [NSSplitViewItem sidebarWithViewController:self.sidebarViewController];
+    _multifunctionSidebarItem = [NSSplitViewItem sidebarWithViewController:self.multifunctionSidebarViewController];
 
     if (@available(macOS 11.0, *)) {
         _navSidebarItem.allowsFullHeightLayout = YES;
@@ -61,12 +63,14 @@
     _navSidebarItem.preferredThicknessFraction = 0.2;
     _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
 
-    self.sidebarItem.preferredThicknessFraction = 0.2;
-    self.sidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
-    self.sidebarItem.canCollapse = YES;
-    self.sidebarItem.collapseBehavior = NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
+    self.multifunctionSidebarItem.preferredThicknessFraction = 0.2;
+    self.multifunctionSidebarItem.maximumThickness =
+        VLCLibraryUIUnits.libraryWindowPlaylistSidebarMaxWidth;
+    self.multifunctionSidebarItem.canCollapse = YES;
+    self.multifunctionSidebarItem.collapseBehavior =
+        NSSplitViewItemCollapseBehaviorPreferResizingSiblingsWithFixedSplitView;
 
-    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, self.sidebarItem];
+    self.splitViewItems = @[_navSidebarItem, _libraryTargetViewItem, self.multifunctionSidebarItem];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -90,10 +94,11 @@
 
 - (IBAction)toggleMultifunctionSidebar:(id)sender
 {
-    const BOOL sidebarCollapsed = self.sidebarItem.isCollapsed;
-    self.sidebarItem.animator.collapsed = !sidebarCollapsed;
+    const BOOL sidebarCollapsed = self.multifunctionSidebarItem.isCollapsed;
+    self.multifunctionSidebarItem.animator.collapsed = !sidebarCollapsed;
 
-    const NSControlStateValue controlState = self.sidebarItem.isCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
+    const NSControlStateValue controlState =
+        self.multifunctionSidebarItem.isCollapsed ? NSControlStateValueOff : NSControlStateValueOn;
     self.libraryWindow.playQueueToggle.state = controlState;
     self.libraryWindow.videoViewController.playlistButton.state = controlState;
 }

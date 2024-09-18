@@ -29,7 +29,7 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarRootViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
@@ -410,7 +410,7 @@
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
         NSView * const sidebarView =
-            libraryWindow.splitViewController.sidebarViewController.view;
+            libraryWindow.splitViewController.multifunctionSidebarViewController.view;
         self.playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:sidebarView] ?
             NSControlStateValueOff : NSControlStateValueOn;
     }

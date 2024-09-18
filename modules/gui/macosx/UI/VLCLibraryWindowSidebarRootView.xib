@@ -5,7 +5,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowSidebarViewController">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowSidebarRootViewController">
             <connections>
                 <outlet property="targetView" destination="mtn-R7-eBE" id="xPy-9k-VIg"/>
                 <outlet property="topInternalConstraint" destination="wLu-wg-aAu" id="5mi-fc-vAS"/>

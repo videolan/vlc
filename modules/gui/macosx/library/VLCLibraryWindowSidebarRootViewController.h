@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowSidebarViewController.h: MacOS X interface module
+ * VLCLibraryWindowSidebarRootViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 
-@interface VLCLibraryWindowSidebarViewController : NSViewController
+@interface VLCLibraryWindowSidebarRootViewController : NSViewController
 
 @property (readonly, weak) VLCLibraryWindow *libraryWindow;
 

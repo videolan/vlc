@@ -180,8 +180,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowPersistentPreferences.m \
 	gui/macosx/library/VLCLibraryWindowPlaylistSidebarViewController.h \
 	gui/macosx/library/VLCLibraryWindowPlaylistSidebarViewController.m \
-	gui/macosx/library/VLCLibraryWindowSidebarViewController.h \
-	gui/macosx/library/VLCLibraryWindowSidebarViewController.m \
+	gui/macosx/library/VLCLibraryWindowSidebarRootViewController.h \
+	gui/macosx/library/VLCLibraryWindowSidebarRootViewController.m \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.h \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
@@ -478,7 +478,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryWindowChaptersView.xib \
 	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
 	gui/macosx/UI/VLCLibraryWindowPlaylistView.xib \
-	gui/macosx/UI/VLCLibraryWindowSidebarView.xib \
+	gui/macosx/UI/VLCLibraryWindowSidebarRootView.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCarouselViewItemView.xib \

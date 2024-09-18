@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowSidebarViewController.m: MacOS X interface module
+ * VLCLibraryWindowSidebarRootViewController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryWindowSidebarViewController.h"
+#import "VLCLibraryWindowSidebarRootViewController.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
@@ -38,7 +38,7 @@
 const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
 const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
-@implementation VLCLibraryWindowSidebarViewController
+@implementation VLCLibraryWindowSidebarRootViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {

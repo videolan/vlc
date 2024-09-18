@@ -25,7 +25,7 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryWindow.h"
-#import "library/VLCLibraryWindowSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarRootViewController.h"
 #import "library/VLCLibraryWindowSplitViewController.h"
 
 #import "main/VLCMain.h"
@@ -131,7 +131,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 - (void)updatePlayqueueToggleState
 {
     NSView * const playlistView =
-        self.libraryWindow.splitViewController.sidebarViewController.view;
+        self.libraryWindow.splitViewController.multifunctionSidebarViewController.view;
     NSSplitView * const sv = self.libraryWindow.mainSplitView;
     self.libraryWindow.playQueueToggle.state =
         ![sv.arrangedSubviews containsObject:playlistView] || [sv isSubviewCollapsed:playlistView] ?
