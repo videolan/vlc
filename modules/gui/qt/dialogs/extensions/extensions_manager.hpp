@@ -80,7 +80,7 @@ private:
     static ExtensionsManager* instance;
     qt_intf_t *p_intf;
     extensions_manager_t *p_extensions_manager;
-    ExtensionsDialogProvider *p_edp;
+    std::unique_ptr<ExtensionsDialogProvider> p_edp;
 
     QSignalMapper *menuMapper;
     bool b_unloading;  ///< Work around threads + emit issues, see isUnloading

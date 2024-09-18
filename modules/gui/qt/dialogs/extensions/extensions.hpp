@@ -24,7 +24,6 @@
 #define EXTENSIONS_HPP
 
 #include "qt.hpp"
-#include "util/singleton.hpp"
 
 #include <cassert>
 #include <unordered_set>
@@ -46,22 +45,20 @@ extern "C" {
     typedef struct extension_t extension_t;
 };
 
-class ExtensionsDialogProvider : public QObject, public Singleton<ExtensionsDialogProvider>
+class ExtensionsDialogProvider : public QObject
 {
     /** This is the dialog provider for Extensions dialogs
      * @todo Add a setExtManager() function (with vlc_object_hold)
      **/
-    friend class Singleton<ExtensionsDialogProvider>;
-
     Q_OBJECT
 
 public:
-    void UpdateExtDialog( extension_dialog_t *p_dialog );
-
-private:
     ExtensionsDialogProvider( qt_intf_t *p_intf = nullptr);
     virtual ~ExtensionsDialogProvider();
 
+    void UpdateExtDialog( extension_dialog_t *p_dialog );
+
+private:
     ExtensionDialog* CreateExtDialog( extension_dialog_t *p_dialog );
     int DestroyExtDialog( extension_dialog_t *p_dialog );
 

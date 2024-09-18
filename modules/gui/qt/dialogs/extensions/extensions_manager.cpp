@@ -41,7 +41,6 @@
 
 ExtensionsManager::ExtensionsManager( qt_intf_t *_p_intf, QObject *parent )
         : QObject( parent ), p_intf( _p_intf ), p_extensions_manager( NULL )
-        , p_edp( NULL )
 {
     menuMapper = new QSignalMapper( this );
     connect( menuMapper, &QSignalMapper::mappedInt, this, &ExtensionsManager::triggerMenu );
@@ -86,18 +85,8 @@ bool ExtensionsManager::loadExtensions()
         }
 
         /* Initialize dialog provider */
-        p_edp = ExtensionsDialogProvider::getInstance( p_intf );
-        if( !p_edp )
-        {
-            msg_Err( p_intf, "Unable to create dialogs provider for extensions" );
-            module_unneed( p_extensions_manager,
-                           p_extensions_manager->p_module );
-            vlc_object_delete(p_extensions_manager);
-            p_extensions_manager = NULL;
-            b_failed = true;
-            emit extensionsUpdated();
-            return false;
-        }
+        assert(!p_edp);
+        p_edp = std::make_unique<ExtensionsDialogProvider>(p_intf);
         b_unloading = false;
     }
     b_failed = false;
@@ -115,7 +104,7 @@ void ExtensionsManager::unloadExtensions()
     {
         extension_Deactivate(p_extensions_manager, p_ext);
     }
-    ExtensionsDialogProvider::killInstance();
+    p_edp.reset();
     module_unneed( p_extensions_manager, p_extensions_manager->p_module );
     vlc_object_delete(p_extensions_manager);
     p_extensions_manager = NULL;
