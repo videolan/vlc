@@ -17,17 +17,15 @@
  *****************************************************************************/
 
 #include "mlvideomodel.hpp"
-#include "mlhelper.hpp"
-#include "util/vlctick.hpp"
 
 MLVideoModel::MLVideoModel(QObject* parent)
-    : MLBaseModel(parent)
+    : MLMediaModel(parent)
 {
 }
 
 // Interface
 
-/* Q_INVOKABLE */ void MLVideoModel::setItemPlayed(const QModelIndex & index, bool played)
+void MLVideoModel::setItemPlayed(const QModelIndex & index, bool played)
 {
     MLVideo * video = static_cast<MLVideo *>(item(index.row()));
 
@@ -50,29 +48,6 @@ MLVideoModel::MLVideoModel(QObject* parent)
     emit dataChanged(index, index, { VIDEO_IS_NEW });
 }
 
-/* Q_INVOKABLE */ void MLVideoModel::setItemFavorite(const QModelIndex & index, bool favorite)
-{
-    MLVideo * video = static_cast<MLVideo *>(item(index.row()));
-
-    if (video == nullptr)
-        return;
-
-    assert(m_mediaLib);
-
-    int64_t id = video->getId().id;
-
-    // ML thread
-    m_mediaLib->runOnMLThread(this, [id, favorite] (vlc_medialibrary_t * ml)
-    {
-        vlc_ml_media_set_favorite(ml, id, favorite);
-    });
-
-    // NOTE: We want the change to be visible right away.
-    video->setIsFavorite(favorite);
-
-    emit dataChanged(index, index, { VIDEO_IS_FAVORITE });
-}
-
 QVariant MLVideoModel::itemRoleData(const MLItem *item, int role) const
 {
     const auto video = static_cast<const MLVideo *>(item);
@@ -81,81 +56,45 @@ QVariant MLVideoModel::itemRoleData(const MLItem *item, int role) const
 
     switch (role)
     {
-        case VIDEO_ID:
-            return QVariant::fromValue( video->getId() );
-        case VIDEO_IS_NEW:
-            return QVariant::fromValue( video->isNew() );
-        case VIDEO_IS_FAVORITE:
-            return QVariant::fromValue( video->isFavorite() );
-        case VIDEO_FILENAME:
-            return QVariant::fromValue( video->fileName() );
-        case VIDEO_TITLE:
-            return QVariant::fromValue( video->title() );
-        case VIDEO_THUMBNAIL:
-        {
-            vlc_ml_thumbnail_status_t status;
-            const QString thumbnail = video->smallCover(&status);
-            if (status == VLC_ML_THUMBNAIL_STATUS_MISSING || status == VLC_ML_THUMBNAIL_STATUS_FAILURE)
-            {
-                generateThumbnail(item->getId().id);
-            }
-            return QVariant::fromValue( thumbnail );
-        }
-        case VIDEO_IS_LOCAL:
-        {
-            QUrl videoUrl(video->mrl());
-            return QVariant::fromValue( videoUrl.isLocalFile() );
-        }
-        case VIDEO_DURATION:
-            return QVariant::fromValue( video->duration() );
-        case VIDEO_PROGRESS:
-            return QVariant::fromValue( video->progress() );
-        case VIDEO_PLAYCOUNT:
-            return QVariant::fromValue( video->playCount() );
-        case VIDEO_RESOLUTION:
-            return QVariant::fromValue( video->getResolutionName() );
-        case VIDEO_CHANNEL:
-            return QVariant::fromValue( video->getChannel() );
-        case VIDEO_MRL:
-            return QVariant::fromValue( video->mrl() );
-        case VIDEO_DISPLAY_MRL:
-            return QVariant::fromValue( video->getDisplayMRL() );
-        case VIDEO_VIDEO_TRACK:
-            return getVariantList( video->getVideoDesc() );
-        case VIDEO_AUDIO_TRACK:
-            return getVariantList( video->getAudioDesc() );
-        case VIDEO_SUBTITLE_TRACK:
-            return getVariantList( video->getSubtitleDesc() );
-        case VIDEO_TITLE_FIRST_SYMBOL:
-            return QVariant::fromValue( getFirstSymbol( video->title() ) );
-
-        default:
-            return {};
+    case VIDEO_THUMBNAIL: // TODO: remove (a similar role already MEDIA_SMALL_COVER)
+        return MLMediaModel::itemRoleData(item, MLMediaModel::MEDIA_SMALL_COVER);
+    case VIDEO_IS_NEW:
+        return QVariant::fromValue(video->isNew());
+    case VIDEO_RESOLUTION:
+        return QVariant::fromValue(video->getResolutionName());
+    case VIDEO_CHANNEL:
+        return QVariant::fromValue(video->getChannel());
+    case VIDEO_DISPLAY_MRL:
+        return QVariant::fromValue(video->getDisplayMRL());
+    case VIDEO_VIDEO_TRACK:
+        return getVariantList(video->getVideoDesc());
+    case VIDEO_AUDIO_TRACK:
+        return getVariantList(video->getAudioDesc());
+    case VIDEO_SUBTITLE_TRACK:
+        return getVariantList(video->getSubtitleDesc());
+    default:
+        return MLMediaModel::itemRoleData(item, role);
     }
+
+    return {};
 }
 
 QHash<int, QByteArray> MLVideoModel::roleNames() const
 {
-    return {
-        { VIDEO_ID, "id" },
-        { VIDEO_IS_NEW, "isNew" },
-        { VIDEO_IS_FAVORITE, "isFavorite" },
-        { VIDEO_FILENAME, "fileName" },
-        { VIDEO_TITLE, "title" },
-        { VIDEO_THUMBNAIL, "thumbnail" },
-        { VIDEO_IS_LOCAL, "isLocal"},
-        { VIDEO_DURATION, "duration" },
-        { VIDEO_PROGRESS, "progress" },
-        { VIDEO_PLAYCOUNT, "playcount" },
-        { VIDEO_RESOLUTION, "resolution_name" },
-        { VIDEO_CHANNEL, "channel" },
-        { VIDEO_MRL, "mrl" },
-        { VIDEO_DISPLAY_MRL, "display_mrl" },
-        { VIDEO_AUDIO_TRACK, "audioDesc" },
-        { VIDEO_VIDEO_TRACK, "videoDesc" },
-        { VIDEO_SUBTITLE_TRACK, "subtitleDesc" },
-        { VIDEO_TITLE_FIRST_SYMBOL, "title_first_symbol"},
-    };
+    QHash<int, QByteArray> hash = MLMediaModel::roleNames();
+
+    hash.insert({
+        {VIDEO_THUMBNAIL, "thumbnail"}, // TODO: remove (a similar roleName already "small_cover")
+        {VIDEO_IS_NEW, "isNew"},
+        {VIDEO_RESOLUTION, "resolution_name"},
+        {VIDEO_CHANNEL, "channel"},
+        {VIDEO_DISPLAY_MRL, "display_mrl"},
+        {VIDEO_VIDEO_TRACK, "videoDesc"},
+        {VIDEO_AUDIO_TRACK, "audioDesc"},
+        {VIDEO_SUBTITLE_TRACK, "subtitleDesc"},
+    });
+
+    return hash;
 }
 
 vlc_ml_sorting_criteria_t MLVideoModel::nameToCriteria(QByteArray name) const
@@ -270,10 +209,4 @@ MLVideoModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) cons
     if (!media)
         return nullptr;
     return std::make_unique<MLVideo>(media.get());
-}
-
-/* Q_INVOKABLE */ QUrl MLVideoModel::getParentURL(const QModelIndex &index)
-{
-    MLVideo *video = static_cast<MLVideo *>(item(index.row()));
-    return getParentURLFromURL(video->mrl());
 }

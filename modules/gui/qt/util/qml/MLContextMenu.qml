@@ -128,11 +128,11 @@ NativeMenu {
     }
 
     function addFavorite(dataList, options, indexes) {
-        model.setItemFavorite(indexes[0], true)
+        model.setMediaIsFavorite(indexes[0], true)
     }
 
     function removeFavorite(dataList, options, indexes) {
-        model.setItemFavorite(indexes[0], false)
+        model.setMediaIsFavorite(indexes[0], false)
     }
 
     function markSeen(dataList, options, indexes) {

@@ -88,9 +88,9 @@ QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) c
             case Qt::DisplayRole:
                 return QVariant::fromValue(group->getTitle());
             // NOTE: These are the conditions for QML view(s).
-            case VIDEO_ID:
+            case MEDIA_ID:
                 return QVariant::fromValue(group->getId());
-            case VIDEO_TITLE:
+            case MEDIA_TITLE:
                 return QVariant::fromValue(group->getTitle());
             case VIDEO_THUMBNAIL:
             {
@@ -100,7 +100,7 @@ QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) c
                     QStringLiteral(":/placeholder/noart_videoCover.svg")
                 );
             }
-            case VIDEO_DURATION:
+            case MEDIA_DURATION:
                 return QVariant::fromValue(group->getDuration());
             case GROUP_IS_VIDEO:
                 return false;

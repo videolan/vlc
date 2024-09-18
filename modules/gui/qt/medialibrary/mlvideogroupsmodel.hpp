@@ -35,7 +35,7 @@ public:
     enum Roles
     {
         // NOTE: Group specific.
-        GROUP_IS_VIDEO = VIDEO_TITLE_FIRST_SYMBOL + 1,
+        GROUP_IS_VIDEO = MLVideoModel::VIDEO_ROLES_COUNT,
         GROUP_TITLE_FIRST_SYMBOL,
         GROUP_DATE,
         GROUP_COUNT
@@ -44,10 +44,11 @@ public:
 public:
     explicit MLVideoGroupsModel(QObject * parent = nullptr);
 
-public: // MLVideoModel reimplementation
-    QHash<int, QByteArray> roleNames() const override;
+    virtual ~MLVideoGroupsModel() = default;
 
 protected: // MLVideoModel reimplementation
+    QHash<int, QByteArray> roleNames() const override;
+
     QVariant itemRoleData(const MLItem *item, int role = Qt::DisplayRole) const override;
 
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;

@@ -16,66 +16,45 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef MCVIDEOMODEL_H
-#define MCVIDEOMODEL_H
+#ifndef MLVIDEOMODEL_H
+#define MLVIDEOMODEL_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_media_library.h>
+#include "mlmediamodel.hpp"
 
-#include "mlbasemodel.hpp"
-#include "mlvideo.hpp"
-
-#include <QObject>
-
-class MLVideoModel : public MLBaseModel
+class MLVideoModel : public MLMediaModel
 {
     Q_OBJECT
 
 public:
-    enum Role {
-        VIDEO_ID = Qt::UserRole + 1,
+    enum Roles
+    {
+        VIDEO_THUMBNAIL = MLMediaModel::MEDIA_ROLES_COUNT, // TODO: remove (a similar role already MEDIA_SMALL_COVER)
         VIDEO_IS_NEW,
-        VIDEO_IS_FAVORITE,
-        VIDEO_FILENAME,
-        VIDEO_TITLE,
-        VIDEO_THUMBNAIL,
-        VIDEO_IS_LOCAL,
-        VIDEO_DURATION,
-        VIDEO_PROGRESS,
-        VIDEO_PLAYCOUNT,
         VIDEO_RESOLUTION,
         VIDEO_CHANNEL,
-        VIDEO_MRL,
         VIDEO_DISPLAY_MRL,
         VIDEO_VIDEO_TRACK,
         VIDEO_AUDIO_TRACK,
         VIDEO_SUBTITLE_TRACK,
-
-        VIDEO_TITLE_FIRST_SYMBOL,
+        VIDEO_ROLES_COUNT,
     };
-
 
 public:
     explicit MLVideoModel(QObject* parent = nullptr);
 
     virtual ~MLVideoModel() = default;
 
-    QHash<int, QByteArray> roleNames() const override;
-
-    Q_INVOKABLE QUrl getParentURL(const QModelIndex & index);
-
 public: // Interface
-    // NOTE: These functions are useful when we want to apply a change before the database event.
-
+    // NOTE: This function is useful when we want to apply a change before the database event.
     Q_INVOKABLE void setItemPlayed(const QModelIndex & index, bool played);
 
-    Q_INVOKABLE void setItemFavorite(const QModelIndex & index, bool played);
-
 protected:
+    QHash<int, QByteArray> roleNames() const override;
+
     QVariant itemRoleData(const MLItem *item, int role) const override;
 
     void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t ) override;
@@ -100,5 +79,4 @@ private:
     };
 };
 
-#endif // MCVIDEOMODEL_H
-
+#endif // MLVIDEOMODEL_H
