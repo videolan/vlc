@@ -209,7 +209,7 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
 #pragma mark - VLCPixelBufferRotationContextVT
 
 #if IS_VT_ROTATION_API_AVAILABLE
-
+API_AVAILABLE(ios(16.0), tvos(16.0), macosx(13.0))
 @interface VLCPixelBufferRotationContextVT : NSObject <VLCPixelBufferRotationContext>
 
 @end
@@ -241,22 +241,20 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
     if (_rotation == rotation)
         return;
     _rotation = rotation;
-    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
-        switch (rotation) {
-            case kVLCSampleBufferPixelRotation_90CW:
-                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CW90);
-                break;
-            case kVLCSampleBufferPixelRotation_180:
-                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_180);
-                break;
-            case kVLCSampleBufferPixelRotation_90CCW:
-                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CCW90);
-                break;
-            case kVLCSampleBufferPixelRotation_0:
-            default:
-                VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_0);
-                break;
-        }
+    switch (rotation) {
+        case kVLCSampleBufferPixelRotation_90CW:
+            VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CW90);
+            break;
+        case kVLCSampleBufferPixelRotation_180:
+            VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_180);
+            break;
+        case kVLCSampleBufferPixelRotation_90CCW:
+            VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_CCW90);
+            break;
+        case kVLCSampleBufferPixelRotation_0:
+        default:
+            VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_Rotation, kVTRotation_0);
+            break;
     }
 }
 
@@ -264,10 +262,8 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
     if (_flip == flip)
         return;
     _flip = flip;
-    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
-        VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipHorizontalOrientation, flip & kVLCSampleBufferPixelFlip_H ? kCFBooleanTrue : kCFBooleanFalse);
-        VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipVerticalOrientation, flip & kVLCSampleBufferPixelFlip_V ? kCFBooleanTrue : kCFBooleanFalse);
-    }
+    VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipHorizontalOrientation, flip & kVLCSampleBufferPixelFlip_H ? kCFBooleanTrue : kCFBooleanFalse);
+    VTSessionSetProperty(_rotationSession, kVTPixelRotationPropertyKey_FlipVerticalOrientation, flip & kVLCSampleBufferPixelFlip_V ? kCFBooleanTrue : kCFBooleanFalse);
 }
 
 - (CVPixelBufferRef)rotate:(CVPixelBufferRef)pixelBuffer {
@@ -279,13 +275,8 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
     if (!rotated)
         return NULL;
 
-    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
-        OSStatus status = VTPixelRotationSessionRotateImage(_rotationSession, pixelBuffer, rotated);
-        if (status != noErr) {
-            CFRelease(rotated);
-            return NULL;
-        }
-    } else {
+    OSStatus status = VTPixelRotationSessionRotateImage(_rotationSession, pixelBuffer, rotated);
+    if (status != noErr) {
         CFRelease(rotated);
         return NULL;
     }
@@ -295,11 +286,8 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
 
 - (void)dealloc
 {
-    if (_rotationSession)
-    {
-        if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *)) {
-            VTPixelRotationSessionInvalidate(_rotationSession);
-        }
+    if (_rotationSession) {
+        VTPixelRotationSessionInvalidate(_rotationSession);
         CFRelease(_rotationSession);
     }
 }
@@ -680,9 +668,8 @@ shouldInheritContentsScale:(CGFloat)newScale
 {
     if (_rotationContext)
         return _rotationContext;
-#if IS_VT_ROTATION_API_AVAILABLE
-    _rotationContext = [VLCPixelBufferRotationContextVT new];
-#endif
+    if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *))
+        _rotationContext = [VLCPixelBufferRotationContextVT new];
     if (!_rotationContext)
         _rotationContext = [VLCPixelBufferRotationContextCI new];
     return _rotationContext;
