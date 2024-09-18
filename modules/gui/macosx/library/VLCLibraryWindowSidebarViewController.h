@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSSegmentedControl *viewSelector;
 @property (readwrite, weak) IBOutlet NSView *targetView;
 
+@property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
+
 @property (readonly) VLCLibraryWindowPlaylistSidebarViewController *playlistSidebarViewController;
 @property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
 

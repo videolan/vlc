@@ -67,4 +67,11 @@
     NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
 }
 
+- (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
+{
+    _mainVideoModeEnabled = mainVideoModeEnabled;
+    self.playlistSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
+    self.chaptersSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
+}
+
 @end
