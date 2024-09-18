@@ -506,7 +506,7 @@ static int configure_display(vout_display_t *vd)
     if (status != MMAL_SUCCESS) {
         msg_Err(vd, "Failed to commit format for input port %s (status=%"PRIx32" %s)",
                         sys->input->name, status, mmal_status_to_string(status));
-        return -EINVAL;
+        return VLC_EINVAL;
     }
     place_dest(vd);
 
@@ -523,7 +523,7 @@ static int configure_display(vout_display_t *vd)
     if (status != MMAL_SUCCESS) {
         msg_Err(vd, "Failed to set display region (status=%"PRIx32" %s)",
                         status, mmal_status_to_string(status));
-        return -EINVAL;
+        return VLC_EINVAL;
     }
 
     sys->adjust_refresh_rate = var_InheritBool(vd, MMAL_ADJUST_REFRESHRATE_NAME);
@@ -533,7 +533,7 @@ static int configure_display(vout_display_t *vd)
         set_latency_target(vd, true);
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 static void vd_display(vout_display_t *vd, picture_t *p_pic)
@@ -641,25 +641,19 @@ static int vd_reset_pictures(vout_display_t *vd, video_format_t *fmt)
 
 static int vd_control(vout_display_t *vd, int query)
 {
-    int ret = VLC_EGENERIC;
-
     switch (query) {
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            if (configure_display(vd) >= 0)
-                ret = VLC_SUCCESS;
-            break;
-        }
+            return configure_display(vd);
 
         default:
             msg_Warn(vd, "Unknown control query %d", query);
             break;
     }
 
-    return ret;
+    return VLC_EGENERIC;
 }
 
 static int attach_subpics(vout_display_t * const vd, vout_display_sys_t * const sys,
