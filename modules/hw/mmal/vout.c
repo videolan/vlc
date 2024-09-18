@@ -488,11 +488,7 @@ static void
 place_dest(vout_display_t *vd)
 {
     vout_display_sys_t * const sys = vd->sys;
-    vout_display_place_t place;
-
-    vout_display_PlacePicture(&place, vd->source, &vd->cfg->display);
-
-    sys->dest_rect = place_to_mmal_rect(place);
+    sys->dest_rect = place_to_mmal_rect(*vd->place);
 }
 
 static int configure_display(vout_display_t *vd)
