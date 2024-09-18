@@ -31,7 +31,7 @@
                         </segments>
                     </segmentedCell>
                     <connections>
-                        <action selector="viewModeSelectorAction:" target="-2" id="WaU-yo-IIj"/>
+                        <action selector="viewSelectorAction:" target="-2" id="grl-ZG-Bjt"/>
                     </connections>
                 </segmentedControl>
             </subviews>
