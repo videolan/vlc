@@ -35,6 +35,9 @@
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
+const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
+const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
+
 @implementation VLCLibraryWindowSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -60,9 +63,11 @@
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.viewSelector.segmentCount = 2;
-    [self.viewSelector setLabel:_NS("Playlist") forSegment:0];
-    [self.viewSelector setLabel:_NS("Chapters") forSegment:1];
-    self.viewSelector.selectedSegment = 0;
+    [self.viewSelector setLabel:_NS("Playlist")
+                     forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
+    [self.viewSelector setLabel:_NS("Chapters")
+                     forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
+    self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
 
     [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
@@ -84,9 +89,11 @@
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
-    [self.viewSelector setEnabled:chaptersEnabled forSegment:1];
-    if (!chaptersEnabled && self.viewSelector.selectedSegment == 1) {
-        self.viewSelector.selectedSegment = 0;
+    [self.viewSelector setEnabled:chaptersEnabled
+                       forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
+    if (!chaptersEnabled &&
+        self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
+        self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
         [self viewSelectorAction:self.viewSelector];
     }
 }
@@ -95,9 +102,9 @@
 {
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
-    if (selectedSegment == 0) {
+    if (selectedSegment == VLCLibraryWindowSidebarViewPlaylistSegment) {
         [self setViewOnSidebarTargetView:self.playlistSidebarViewController.view];
-    } else if (selectedSegment == 1) {
+    } else if (selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
         [self setViewOnSidebarTargetView:self.chaptersSidebarViewController.view];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
