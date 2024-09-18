@@ -177,37 +177,30 @@ ExtensionDialog::~ExtensionDialog()
 
 QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
 {
-    QLabel *label = NULL;
-    QPushButton *button = NULL;
-    QTextBrowser *textArea = NULL;
-    QLineEdit *textInput = NULL;
-    QCheckBox *checkBox = NULL;
-    QComboBox *comboBox = NULL;
-    QListWidget *list = NULL;
-    SpinningIcon *spinIcon = NULL;
-    struct extension_widget_t::extension_widget_value_t *p_value = NULL;
-
     assert( p_widget->p_sys_intf == NULL );
 
     switch( p_widget->type )
     {
         case EXTENSION_WIDGET_LABEL:
-            label = new QLabel( qfu( p_widget->psz_text ), this );
+        {
+            auto label = new QLabel( qfu( p_widget->psz_text ), this );
             p_widget->p_sys_intf = label;
             label->setTextFormat( Qt::RichText );
             label->setOpenExternalLinks( true );
             return label;
-
+        }
         case EXTENSION_WIDGET_BUTTON:
-            button = new QPushButton( qfu( p_widget->psz_text ), this );
+        {
+            auto button = new QPushButton( qfu( p_widget->psz_text ), this );
             clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
             connect( button, &QPushButton::clicked,
                      clickMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = button;
             return button;
-
+        }
         case EXTENSION_WIDGET_IMAGE:
-            label = new QLabel( this );
+        {
+            auto label = new QLabel( this );
             label->setPixmap( QPixmap( qfu( p_widget->psz_text ) ) );
             if( p_widget->i_width > 0 )
                 label->setMaximumWidth( p_widget->i_width );
@@ -216,16 +209,18 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             label->setScaledContents( true );
             p_widget->p_sys_intf = label;
             return label;
-
+        }
         case EXTENSION_WIDGET_HTML:
-            textArea = new QTextBrowser( this );
+        {
+            auto textArea = new QTextBrowser( this );
             textArea->setOpenExternalLinks( true );
             textArea->setHtml( qfu( p_widget->psz_text ) );
             p_widget->p_sys_intf = textArea;
             return textArea;
-
+        }
         case EXTENSION_WIDGET_TEXT_FIELD:
-            textInput = new QLineEdit( this );
+        {
+            auto textInput = new QLineEdit( this );
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Normal );
@@ -235,9 +230,10 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                      inputMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = textInput;
             return textInput;
-
+        }
         case EXTENSION_WIDGET_PASSWORD:
-            textInput = new QLineEdit( this );
+        {
+            auto textInput = new QLineEdit( this );
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Password );
@@ -247,9 +243,10 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                      inputMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = textInput;
             return textInput;
-
+        }
         case EXTENSION_WIDGET_CHECK_BOX:
-            checkBox = new QCheckBox( this );
+        {
+            auto checkBox = new QCheckBox( this );
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
             clickMapper->setMapping( checkBox, new WidgetMapper( checkBox, p_widget ) );
@@ -257,11 +254,12 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                      clickMapper, QOverload<>::of(&QSignalMapper::map) );
             p_widget->p_sys_intf = checkBox;
             return checkBox;
-
+        }
         case EXTENSION_WIDGET_DROPDOWN:
-            comboBox = new QComboBox( this );
+        {
+            auto comboBox = new QComboBox( this );
             comboBox->setEditable( false );
-            for( p_value = p_widget->p_values;
+            for( auto p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
             {
@@ -278,11 +276,12 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             connect( comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
                      selectMapper, QOverload<>::of(&QSignalMapper::map) );
             return comboBox;
-
+        }
         case EXTENSION_WIDGET_LIST:
-            list = new QListWidget( this );
+        {
+            auto list = new QListWidget( this );
             list->setSelectionMode( QAbstractItemView::ExtendedSelection );
-            for( p_value = p_widget->p_values;
+            for( auto p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
             {
@@ -295,13 +294,14 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             connect( list, &QListWidget::itemSelectionChanged,
                      selectMapper, QOverload<>::of(&QSignalMapper::map) );
             return list;
-
+        }
         case EXTENSION_WIDGET_SPIN_ICON:
-            spinIcon = new SpinningIcon( this );
+        {
+            auto spinIcon = new SpinningIcon( this );
             spinIcon->play( p_widget->i_spin_loops );
             p_widget->p_sys_intf = spinIcon;
             return spinIcon;
-
+        }
         default:
             msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
             return NULL;
@@ -318,7 +318,6 @@ int ExtensionDialog::TriggerClick( QObject *object )
     WidgetMapper *mapping = static_cast< WidgetMapper* >( object );
     extension_widget_t *p_widget = mapping->getWidget();
 
-    QCheckBox *checkBox = NULL;
     int i_ret = VLC_EGENERIC;
 
     bool lockedHere = false;
@@ -336,11 +335,12 @@ int ExtensionDialog::TriggerClick( QObject *object )
             break;
 
         case EXTENSION_WIDGET_CHECK_BOX:
-            checkBox = static_cast< QCheckBox* >( p_widget->p_sys_intf );
+        {
+            auto checkBox = static_cast< QCheckBox* >( p_widget->p_sys_intf );
             p_widget->b_checked = checkBox->isChecked();
             i_ret = VLC_SUCCESS;
             break;
-
+        }
         default:
             msg_Dbg( p_intf, "A click event was triggered by a wrong widget" );
             break;
@@ -533,63 +533,61 @@ void ExtensionDialog::UpdateWidgets()
 
 QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
 {
-    QLabel *label = NULL;
-    QPushButton *button = NULL;
-    QTextBrowser *textArea = NULL;
-    QLineEdit *textInput = NULL;
-    QCheckBox *checkBox = NULL;
-    QComboBox *comboBox = NULL;
-    QListWidget *list = NULL;
-    SpinningIcon *spinIcon = NULL;
-    struct extension_widget_t::extension_widget_value_t *p_value = NULL;
-
     assert( p_widget->p_sys_intf != NULL );
 
     switch( p_widget->type )
     {
         case EXTENSION_WIDGET_LABEL:
-            label = static_cast< QLabel* >( p_widget->p_sys_intf );
+        {
+            auto label = static_cast< QLabel* >( p_widget->p_sys_intf );
             label->setText( qfu( p_widget->psz_text ) );
             return label;
-
+        }
         case EXTENSION_WIDGET_BUTTON:
+        {
             // FIXME: looks like removeMappings does not work
-            button = static_cast< QPushButton* >( p_widget->p_sys_intf );
+            auto button = static_cast< QPushButton* >( p_widget->p_sys_intf );
             button->setText( qfu( p_widget->psz_text ) );
             clickMapper->removeMappings( button );
             clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
             connect( button, &QPushButton::clicked,
                      clickMapper, QOverload<>::of(&QSignalMapper::map) );
             return button;
-
+        }
         case EXTENSION_WIDGET_IMAGE:
-            label = static_cast< QLabel* >( p_widget->p_sys_intf );
+        {
+            auto label = static_cast< QLabel* >( p_widget->p_sys_intf );
             label->setPixmap( QPixmap( qfu( p_widget->psz_text ) ) );
             return label;
-
+        }
         case EXTENSION_WIDGET_HTML:
-            textArea = static_cast< QTextBrowser* >( p_widget->p_sys_intf );
+        {
+            auto textArea = static_cast< QTextBrowser* >( p_widget->p_sys_intf );
             textArea->setHtml( qfu( p_widget->psz_text ) );
             return textArea;
-
+        }
         case EXTENSION_WIDGET_TEXT_FIELD:
-            textInput = static_cast< QLineEdit* >( p_widget->p_sys_intf );
+        {
+            auto textInput = static_cast< QLineEdit* >( p_widget->p_sys_intf );
             textInput->setText( qfu( p_widget->psz_text ) );
             return textInput;
-
+        }
         case EXTENSION_WIDGET_PASSWORD:
-            textInput = static_cast< QLineEdit* >( p_widget->p_sys_intf );
+        {
+            auto textInput = static_cast< QLineEdit* >( p_widget->p_sys_intf );
             textInput->setText( qfu( p_widget->psz_text ) );
             return textInput;
-
+        }
         case EXTENSION_WIDGET_CHECK_BOX:
-            checkBox = static_cast< QCheckBox* >( p_widget->p_sys_intf );
+        {
+            auto checkBox = static_cast< QCheckBox* >( p_widget->p_sys_intf );
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
             return checkBox;
-
+        }
         case EXTENSION_WIDGET_DROPDOWN:
-            comboBox = static_cast< QComboBox* >( p_widget->p_sys_intf );
+        {
+            auto comboBox = static_cast< QComboBox* >( p_widget->p_sys_intf );
             // method widget:clear()
             if ( p_widget->p_values == NULL )
             {
@@ -597,7 +595,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
                 return comboBox;
             }
             // method widget:addvalue()
-            for( p_value = p_widget->p_values;
+            for( auto p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
             {
@@ -605,11 +603,12 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
                     comboBox->addItem( qfu( p_value->psz_text ), p_value->i_id );
             }
             return comboBox;
-
+        }
         case EXTENSION_WIDGET_LIST:
-            list = static_cast< QListWidget* >( p_widget->p_sys_intf );
+        {
+            auto list = static_cast< QListWidget* >( p_widget->p_sys_intf );
             list->clear();
-            for( p_value = p_widget->p_values;
+            for( auto p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
             {
@@ -619,16 +618,17 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
                 list->addItem( item );
             }
             return list;
-
+        }
         case EXTENSION_WIDGET_SPIN_ICON:
-            spinIcon = static_cast< SpinningIcon* >( p_widget->p_sys_intf );
+        {
+            auto spinIcon = static_cast< SpinningIcon* >( p_widget->p_sys_intf );
             if( !spinIcon->isPlaying() && p_widget->i_spin_loops != 0 )
                 spinIcon->play( p_widget->i_spin_loops );
             else if( spinIcon->isPlaying() && p_widget->i_spin_loops == 0 )
                 spinIcon->stop();
             p_widget->i_height = p_widget->i_width = 16;
             return spinIcon;
-
+        }
         default:
             msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
             return NULL;
