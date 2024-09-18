@@ -415,6 +415,9 @@ void ExtraMetaPanel::update( input_item_t *p_item )
     if( char const* psz_disc = vlc_meta_Get( p_meta,  vlc_meta_DiscNumber ) )
         add_row( VLC_META_DISCNUMBER, psz_disc );
 
+    if( char const* psz_url = vlc_meta_Get( p_meta, vlc_meta_URL ) )
+        add_row( VLC_META_URL, psz_url );
+
     char ** ppsz_keys = vlc_meta_CopyExtraNames( p_meta );
     if( ppsz_keys )
     {
