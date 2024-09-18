@@ -25,10 +25,15 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
+#import "main/VLCMain.h"
+
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+
+#import "playlist/VLCPlayerController.h"
+#import "playlist/VLCPlaylistController.h"
 
 @implementation VLCLibraryWindowSidebarViewController
 
@@ -59,7 +64,31 @@
     [self.viewSelector setLabel:_NS("Chapters") forSegment:1];
     self.viewSelector.selectedSegment = 0;
 
+    [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(titleListChanged:)
+                               name:VLCPlayerTitleListChanged
+                             object:nil];
+}
+
+- (void)titleListChanged:(NSNotification *)notification
+{
+    [self updateViewSelectorState];
+}
+
+- (void)updateViewSelectorState
+{
+    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayerController * const playerController = playlistController.playerController;
+    const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
+    [self.viewSelector setEnabled:chaptersEnabled forSegment:1];
+    if (!chaptersEnabled && self.viewSelector.selectedSegment == 1) {
+        self.viewSelector.selectedSegment = 0;
+        [self viewSelectorAction:self.viewSelector];
+    }
 }
 
 - (IBAction)viewSelectorAction:(id)sender
