@@ -482,6 +482,9 @@ static int stream_CheckReady (vlc_aout_stream *stream)
                 aout_OutputDelete (aout);
             stream->filter_format = stream->mixer_format = stream->input_format;
             stream->filters_cfg = AOUT_FILTERS_CFG_INIT;
+
+            stream_Reset(stream);
+
             if (aout_OutputNew(aout, stream, &stream->mixer_format, stream->input_profile,
                                &stream->filter_format, &stream->filters_cfg))
                 stream->mixer_format.i_format = 0;
@@ -495,8 +498,6 @@ static int stream_CheckReady (vlc_aout_stream *stream)
              * change from the user. */
             if ((restart & AOUT_RESTART_OUTPUT_DEC) == AOUT_RESTART_OUTPUT_DEC)
                 status = AOUT_DEC_CHANGED;
-
-            stream_Reset(stream);
         }
         else if (tracer != NULL)
             vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id, "filters_restart");
