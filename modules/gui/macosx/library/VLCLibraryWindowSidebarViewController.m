@@ -52,6 +52,8 @@
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
+    self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
+
     self.viewSelector.segmentCount = 2;
     [self.viewSelector setLabel:_NS("Playlist") forSegment:0];
     [self.viewSelector setLabel:_NS("Chapters") forSegment:1];
@@ -65,12 +67,24 @@
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
     if (selectedSegment == 0) {
-        self.targetView.subviews = @[self.playlistSidebarViewController.view];
+        [self setViewOnSidebarTargetView:self.playlistSidebarViewController.view];
     } else if (selectedSegment == 1) {
-        self.targetView.subviews = @[self.chaptersSidebarViewController.view];
+        [self setViewOnSidebarTargetView:self.chaptersSidebarViewController.view];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
     }
+}
+
+- (void)setViewOnSidebarTargetView:(NSView *)view
+{
+    self.targetView.subviews = @[view];
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [view.topAnchor constraintEqualToAnchor:self.targetView.topAnchor],
+        [view.bottomAnchor constraintEqualToAnchor:self.targetView.bottomAnchor],
+        [view.leadingAnchor constraintEqualToAnchor:self.targetView.leadingAnchor],
+        [view.trailingAnchor constraintEqualToAnchor:self.targetView.trailingAnchor]
+    ]];
 }
 
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
