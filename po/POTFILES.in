@@ -768,6 +768,7 @@ modules/gui/qt/medialibrary/mlvideogroupsmodel.cpp
 modules/gui/qt/medialibrary/mlvideogroupsmodel.hpp
 modules/gui/qt/medialibrary/qml/ArtistTopBanner.qml
 modules/gui/qt/medialibrary/qml/AudioGridItem.qml
+modules/gui/qt/medialibrary/qml/MediaView.qml
 modules/gui/qt/medialibrary/qml/VideoGroupDisplay.qml
 modules/gui/qt/medialibrary/qml/MusicAlbums.qml
 modules/gui/qt/medialibrary/qml/MusicAlbumsDisplay.qml
