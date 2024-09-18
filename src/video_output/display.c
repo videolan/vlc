@@ -458,6 +458,7 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     unsigned left, top, right, bottom;
+    int err1 = VLC_SUCCESS, err2;
 
     video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
 
@@ -505,21 +506,24 @@ static int vout_UpdateSourceCrop(vout_display_t *vd)
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+    if (err2 != VLC_SUCCESS)
+        err1 = err2;
+
     if (place_changed)
     {
-        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
-        if (res2 != VLC_SUCCESS)
-            res1 = res2;
+        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
     }
-    return res1;
+    return err1;
 }
 
 static int vout_SetSourceAspect(vout_display_t *vd,
                                 unsigned sar_num, unsigned sar_den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    int err1, err2 = VLC_SUCCESS;
+    int err1 = VLC_SUCCESS, err2;
 
     if (sar_num > 0 && sar_den > 0) {
         osys->source.i_sar_num = sar_num;
@@ -528,23 +532,26 @@ static int vout_SetSourceAspect(vout_display_t *vd,
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
+    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
+    if (err2 != VLC_SUCCESS)
+        err1 = err2;
 
     /* If a crop ratio is requested, recompute the parameters */
     if (osys->crop.mode != VOUT_CROP_NONE)
+    {
         err2 = vout_UpdateSourceCrop(vd);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
+    }
 
     if (place_changed)
     {
-        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
-        if (res2 != VLC_SUCCESS)
-            err1 = res2;
+        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
     }
 
-    if (err1 != VLC_SUCCESS)
-        return err1;
-
-    return err2;
+    return err1;
 }
 
 void VoutFixFormatAR(video_format_t *fmt)
@@ -560,7 +567,7 @@ void VoutFixFormatAR(video_format_t *fmt)
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source, const vlc_rational_t *forced_dar)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-    int err1 = VLC_SUCCESS, err2 = VLC_SUCCESS;
+    int err1 = VLC_SUCCESS, err2;
 
     video_format_t fixed_src = *source;
     VoutFixFormatAR( &fixed_src );
@@ -571,8 +578,10 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
             osys->source.i_sar_num = fixed_src.i_sar_num;
             osys->source.i_sar_den = fixed_src.i_sar_den;
 
-            err1 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
+            err2 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
                                         osys->source.i_sar_den);
+            if (err2 != VLC_SUCCESS)
+                err1 = err2;
         }
     }
     if (source->i_x_offset       != osys->source.i_x_offset ||
@@ -585,31 +594,36 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
         /* Force the vout to reapply the current user crop settings
          * over the new decoder crop settings. */
         err2 = vout_UpdateSourceCrop(vd);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
     }
 
-    if (err1 != VLC_SUCCESS || err2 != VLC_SUCCESS)
+    if (err1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 
 void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    int err1 = VLC_SUCCESS, err2;
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
 
     bool place_changed = PlaceVideoInDisplay(osys);
 
-    int res1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE);
+    err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE);
+    if (err2 != VLC_SUCCESS)
+        err1 = err2;
 
     if (place_changed)
     {
-        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
-        if (res2 != VLC_SUCCESS)
-            res1 = res2;
+        err2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (err2 != VLC_SUCCESS)
+            err1 = err2;
     }
 
-    if (res1 != VLC_SUCCESS)
+    if (err1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 
@@ -625,8 +639,8 @@ void vout_SetDisplayFitting(vout_display_t *vd, enum vlc_video_fitting fit)
     bool place_changed = PlaceVideoInDisplay(osys);
     if (place_changed)
     {
-        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
-        if (res2 != VLC_SUCCESS)
+        int err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (err1 != VLC_SUCCESS)
             vout_display_Reset(vd);
     }
 }
@@ -648,8 +662,8 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
     bool place_changed = PlaceVideoInDisplay(osys);
     if (place_changed)
     {
-        int res2 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
-        if (res2 != VLC_SUCCESS)
+        int err1 = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_PLACE);
+        if (err1 != VLC_SUCCESS)
             vout_display_Reset(vd);
     }
 }
@@ -668,7 +682,8 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         sar_den = 0;
     }
 
-    if (vout_SetSourceAspect(vd, sar_num, sar_den) != VLC_SUCCESS)
+    int err1 = vout_SetSourceAspect(vd, sar_num, sar_den);
+    if (err1 != VLC_SUCCESS)
         vout_display_Reset(vd);
 }
 
@@ -680,7 +695,8 @@ void vout_SetDisplayCrop(vout_display_t *vd,
     if (!vout_CropEqual(crop, &osys->crop)) {
         osys->crop = *crop;
 
-        if (vout_UpdateSourceCrop(vd) != VLC_SUCCESS)
+        int err1 = vout_UpdateSourceCrop(vd);
+        if (err1 != VLC_SUCCESS)
             vout_display_Reset(vd);
     }
 }
