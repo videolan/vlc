@@ -280,7 +280,7 @@ static void send_parsed_changed( libvlc_media_t *p_md,
     /* Duration event */
     event.type = libvlc_MediaDurationChanged;
     event.u.media_duration_changed.new_duration =
-        input_item_GetDuration( p_md->p_input_item );
+        libvlc_time_from_vlc_tick(input_item_GetDuration( p_md->p_input_item ));
     libvlc_event_send( &p_md->event_manager, &event );
 
     /* Meta event */
