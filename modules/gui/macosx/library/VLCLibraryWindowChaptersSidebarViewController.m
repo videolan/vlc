@@ -56,6 +56,8 @@
              withKeyPath:@"sortDescriptors"
                  options:nil];
 
+    [self updateChapterList];
+    
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(titleListChanged:)
@@ -64,6 +66,11 @@
 }
 
 - (void)titleListChanged:(NSNotification *)notification
+{
+    [self updateChapterList];
+}
+
+- (void)updateChapterList
 {
     VLCPlayerController * const playerController =
         VLCMain.sharedInstance.playlistController.playerController;
