@@ -17,11 +17,9 @@
  *****************************************************************************/
 
 #include "mlaudiomodel.hpp"
-#include "util/vlctick.hpp"
-#include "mlhelper.hpp"
 
 MLAudioModel::MLAudioModel(QObject *parent)
-    : MLBaseModel(parent)
+    : MLMediaModel(parent)
 {
 }
 
@@ -32,54 +30,42 @@ QVariant MLAudioModel::itemRoleData(const MLItem *item, const int role) const
 
     switch (role)
     {
-    case AUDIO_ID:
-        return QVariant::fromValue( audio->getId() );
-    case AUDIO_TITLE:
-        return QVariant::fromValue( audio->title() );
-    case AUDIO_COVER:
-        return QVariant::fromValue( audio->smallCover() );
-    case AUDIO_NUMBER:
-        return QVariant::fromValue( audio->getTrackNumber() );
+    case AUDIO_COVER: // TODO: remove (a similar role already MEDIA_SMALL_COVER)
+        return MLMediaModel::itemRoleData(item, MLMediaModel::MEDIA_SMALL_COVER);
+    case AUDIO_TRACK_NUMBER:
+        return QVariant::fromValue(audio->getTrackNumber());
     case AUDIO_DISC_NUMBER:
-        return QVariant::fromValue( audio->getDiscNumber() );
-    case AUDIO_IS_LOCAL:
-    {
-        QUrl audioUrl(audio->mrl());
-        return QVariant::fromValue( audioUrl.isLocalFile() );
-    }
-    case AUDIO_DURATION :
-        return QVariant::fromValue( audio->duration() );
-    case AUDIO_ALBUM:
-        return QVariant::fromValue( audio->getAlbumTitle() );
+        return QVariant::fromValue(audio->getDiscNumber());
     case AUDIO_ARTIST:
-        return QVariant::fromValue( audio->getArtist() );
-    case AUDIO_TITLE_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( audio->title() ) );
-    case AUDIO_ALBUM_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( audio->getAlbumTitle() ) );
+        return QVariant::fromValue(audio->getArtist());
     case AUDIO_ARTIST_FIRST_SYMBOL:
-        return QVariant::fromValue( getFirstSymbol( audio->getArtist() ) );
-    default :
-        return QVariant();
+        return QVariant::fromValue(getFirstSymbol(audio->getArtist()));
+    case AUDIO_ALBUM:
+        return QVariant::fromValue(audio->getAlbumTitle());
+    case AUDIO_ALBUM_FIRST_SYMBOL:
+        return QVariant::fromValue(getFirstSymbol(audio->getAlbumTitle()));
+    default:
+        return MLMediaModel::itemRoleData(item, role);
     }
+
+    return {};
 }
 
 QHash<int, QByteArray> MLAudioModel::roleNames() const
 {
-    return {
-        { AUDIO_ID, "id" },
-        { AUDIO_TITLE, "title" },
-        { AUDIO_COVER, "cover" },
-        { AUDIO_NUMBER, "track_number" },
-        { AUDIO_DISC_NUMBER, "disc_number" },
-        { AUDIO_IS_LOCAL, "isLocal" },
-        { AUDIO_DURATION, "duration" },
-        { AUDIO_ALBUM, "album_title"},
-        { AUDIO_ARTIST, "main_artist"},
-        { AUDIO_TITLE_FIRST_SYMBOL, "title_first_symbol"},
-        { AUDIO_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
-        { AUDIO_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
-    };
+    QHash<int, QByteArray> hash = MLMediaModel::roleNames();
+
+    hash.insert({
+        {AUDIO_COVER, "cover"}, // TODO: remove (a similar roleName already "small_cover")
+        {AUDIO_TRACK_NUMBER, "track_number"},
+        {AUDIO_DISC_NUMBER, "disc_number"},
+        {AUDIO_ARTIST, "main_artist"},
+        {AUDIO_ARTIST_FIRST_SYMBOL, "main_artist_first_symbol"},
+        {AUDIO_ALBUM, "album_title"},
+        {AUDIO_ALBUM_FIRST_SYMBOL, "album_title_first_symbol"},
+    });
+
+    return hash;
 }
 
 vlc_ml_sorting_criteria_t MLAudioModel::nameToCriteria(QByteArray name) const
@@ -173,10 +159,4 @@ MLAudioModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) cons
     if (!media)
         return nullptr;
     return std::make_unique<MLAudio>(ml, media.get());
-}
-
-/* Q_INVOKABLE */ QUrl MLAudioModel::getParentURL(const QModelIndex &index)
-{
-    MLAudio *ml_track = static_cast<MLAudio *>(item(index.row()));
-    return getParentURLFromURL(ml_track->mrl());
 }

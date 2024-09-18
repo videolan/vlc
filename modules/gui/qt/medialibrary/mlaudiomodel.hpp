@@ -23,28 +23,22 @@
 #include "config.h"
 #endif
 
-#include "mlbasemodel.hpp"
-#include "mlaudio.hpp"
+#include "mlmediamodel.hpp"
 
-class MLAudioModel : public MLBaseModel
+class MLAudioModel : public MLMediaModel
 {
     Q_OBJECT
 
 public:
-    enum Roles {
-        AUDIO_ID = Qt::UserRole + 1,
-        AUDIO_TITLE,
-        AUDIO_COVER,
-        AUDIO_NUMBER,
+    enum Roles
+    {
+        AUDIO_COVER = MLMediaModel::MEDIA_ROLES_COUNT, // TODO: remove (a similar role already MEDIA_SMALL_COVER)
+        AUDIO_TRACK_NUMBER,
         AUDIO_DISC_NUMBER,
-        AUDIO_IS_LOCAL,
-        AUDIO_DURATION,
-        AUDIO_ALBUM,
         AUDIO_ARTIST,
-
-        AUDIO_TITLE_FIRST_SYMBOL,
-        AUDIO_ALBUM_FIRST_SYMBOL,
         AUDIO_ARTIST_FIRST_SYMBOL,
+        AUDIO_ALBUM,
+        AUDIO_ALBUM_FIRST_SYMBOL,
     };
 
 public:
@@ -52,11 +46,9 @@ public:
 
     virtual ~MLAudioModel() = default;
 
+protected:
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE QUrl getParentURL(const QModelIndex &index);
-
-protected:
     QVariant itemRoleData(const MLItem *item, int role) const override;
 
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
