@@ -8,7 +8,6 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowChaptersSidebarViewController">
             <connections>
                 <outlet property="tableView" destination="5mv-Qc-JwM" id="C8u-Vw-BUa"/>
-                <outlet property="titleLabel" destination="YBa-WG-Kx3" id="dx4-rw-rKx"/>
                 <outlet property="titleSeparator" destination="zf4-pf-0V2" id="MJk-Fh-4O3"/>
                 <outlet property="view" destination="SIR-0h-28I" id="yx0-b1-Be5"/>
             </connections>
@@ -19,25 +18,17 @@
             <rect key="frame" x="0.0" y="0.0" width="835" height="246"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YBa-WG-Kx3">
-                    <rect key="frame" x="18" y="205" width="799" height="31"/>
-                    <textFieldCell key="cell" lineBreakMode="clipping" title="Chapters" id="zar-2A-ajz">
-                        <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
-                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
                 <box verticalHuggingPriority="751" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="zf4-pf-0V2">
-                    <rect key="frame" x="20" y="192" width="795" height="5"/>
+                    <rect key="frame" x="20" y="243" width="795" height="5"/>
                 </box>
                 <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4vZ-4x-fwW">
-                    <rect key="frame" x="0.0" y="0.0" width="835" height="194"/>
+                    <rect key="frame" x="0.0" y="0.0" width="835" height="245"/>
                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="H6H-Cp-iPh">
-                        <rect key="frame" x="0.0" y="0.0" width="835" height="194"/>
+                        <rect key="frame" x="0.0" y="0.0" width="835" height="245"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="firstColumnOnly" columnReordering="NO" columnResizing="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" id="5mv-Qc-JwM" customClass="VLCPlaylistTableView">
-                                <rect key="frame" x="0.0" y="0.0" width="835" height="194"/>
+                                <rect key="frame" x="0.0" y="0.0" width="835" height="245"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -127,15 +118,12 @@
             </subviews>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" constant="20" id="0Sl-8y-RFJ"/>
-                <constraint firstItem="zf4-pf-0V2" firstAttribute="top" secondItem="YBa-WG-Kx3" secondAttribute="bottom" constant="10" id="A0L-2t-C2L"/>
                 <constraint firstItem="zf4-pf-0V2" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" constant="20" id="Ekv-lb-XRR"/>
                 <constraint firstItem="4vZ-4x-fwW" firstAttribute="top" secondItem="zf4-pf-0V2" secondAttribute="bottom" id="Q2S-Bl-E4g"/>
-                <constraint firstItem="YBa-WG-Kx3" firstAttribute="trailing" secondItem="zf4-pf-0V2" secondAttribute="trailing" id="RT4-Am-iDe"/>
                 <constraint firstAttribute="trailing" secondItem="4vZ-4x-fwW" secondAttribute="trailing" id="Vo4-sT-MAu"/>
                 <constraint firstAttribute="bottom" secondItem="4vZ-4x-fwW" secondAttribute="bottom" id="aRK-vR-wkV"/>
-                <constraint firstItem="YBa-WG-Kx3" firstAttribute="top" secondItem="SIR-0h-28I" secondAttribute="top" constant="10" id="cXi-j9-N7N"/>
+                <constraint firstItem="zf4-pf-0V2" firstAttribute="top" secondItem="SIR-0h-28I" secondAttribute="top" id="fUf-47-MSy"/>
                 <constraint firstItem="4vZ-4x-fwW" firstAttribute="leading" secondItem="SIR-0h-28I" secondAttribute="leading" id="ran-Af-QyV"/>
-                <constraint firstItem="YBa-WG-Kx3" firstAttribute="leading" secondItem="zf4-pf-0V2" secondAttribute="leading" id="x90-5w-NkC"/>
             </constraints>
             <point key="canvasLocation" x="-312.5" y="45"/>
         </customView>

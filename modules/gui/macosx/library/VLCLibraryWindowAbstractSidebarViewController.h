@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryWindowAbstractSidebarViewController : NSViewController
 
 @property (readonly, weak) VLCLibraryWindow *libraryWindow;
-@property (readwrite, weak) IBOutlet NSTextField *titleLabel;
 @property (readwrite, weak) IBOutlet NSBox *titleSeparator;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow

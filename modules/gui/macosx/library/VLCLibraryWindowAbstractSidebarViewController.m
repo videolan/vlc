@@ -43,9 +43,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
-    self.titleLabel.font = NSFont.VLClibrarySectionHeaderFont;
-
     [self updateColorsBasedOnAppearance:self.view.effectiveAppearance];
 
     if (@available(macOS 10.14, *)) {
@@ -80,10 +77,8 @@
     // appearance's name despite responding to the effectiveAppearance change (???) so it is a
     // better idea to pull from the general system theme preference, which is always up-to-date
     if (isDark) {
-        self.titleLabel.textColor = NSColor.VLClibraryDarkTitleColor;
         self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorDarkColor;
     } else {
-        self.titleLabel.textColor = NSColor.VLClibraryLightTitleColor;
         self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
     }
 }

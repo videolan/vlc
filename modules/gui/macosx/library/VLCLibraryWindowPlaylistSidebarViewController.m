@@ -69,7 +69,6 @@
     self.tableView.rowHeight = VLCLibraryUIUnits.mediumTableViewRowHeight;
     [self.tableView reloadData];
 
-    self.titleLabel.stringValue = _NS("Playlist");
     self.openMediaButton.title = _NS("Open media...");
     self.dragDropImageBackgroundBox.fillColor = NSColor.VLClibrarySeparatorLightColor;
 
