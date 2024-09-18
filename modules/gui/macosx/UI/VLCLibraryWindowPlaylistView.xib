@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="System colors introduced in macOS 10.14" minToolsVersion="10.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +18,6 @@
                 <outlet property="tableView" destination="Ubg-RS-LWE" id="ZiJ-ca-sOj"/>
                 <outlet property="titleLabel" destination="Dkf-kU-x6H" id="Ahd-Md-7ii"/>
                 <outlet property="titleSeparator" destination="ik5-L4-VLw" id="qht-tq-0rB"/>
-                <outlet property="topInternalConstraint" destination="9cu-Nw-dau" id="QIS-MS-lEM"/>
                 <outlet property="view" destination="NJR-gf-yTs" id="P3C-tn-4va"/>
             </connections>
         </customObject>
@@ -28,7 +27,7 @@
             <rect key="frame" x="0.0" y="0.0" width="510" height="317"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dkf-kU-x6H">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dkf-kU-x6H">
                     <rect key="frame" x="18" y="276" width="66" height="31"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="G1i-Fd-u8z">
                         <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
@@ -36,7 +35,7 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jFQ-fK-HXk" customClass="VLCRoundedCornerTextField">
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jFQ-fK-HXk" customClass="VLCRoundedCornerTextField">
                     <rect key="frame" x="455" y="284" width="37" height="16"/>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="tb3-x5-A5U">
                         <font key="font" metaFont="message"/>
@@ -204,7 +203,7 @@
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-lw-hfk">
-                            <rect key="frame" x="446" y="-5" width="24.5" height="32"/>
+                            <rect key="frame" x="446" y="10" width="24.5" height="17"/>
                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="trash" catalog="system" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="DEr-Gg-n7Z">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                 <font key="font" metaFont="system"/>

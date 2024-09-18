@@ -8,6 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowSidebarViewController">
             <connections>
                 <outlet property="targetView" destination="mtn-R7-eBE" id="xPy-9k-VIg"/>
+                <outlet property="topInternalConstraint" destination="wLu-wg-aAu" id="5mi-fc-vAS"/>
                 <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
                 <outlet property="viewSelector" destination="xML-YA-Xws" id="Ifc-Ns-N50"/>
             </connections>

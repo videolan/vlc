@@ -23,7 +23,10 @@
 #import "VLCLibraryWindowSidebarViewController.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSWindow+VLCAdditions.h"
 
+#import "library/VLCLibraryUIUnits.h"
+#import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 
@@ -41,6 +44,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    self.mainVideoModeEnabled = NO;
 
     _playlistSidebarViewController =
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
@@ -71,8 +76,12 @@
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
 {
     _mainVideoModeEnabled = mainVideoModeEnabled;
-    self.playlistSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
-    self.chaptersSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
+    CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.smallSpacing;
+    if (!mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
+        // Compensate for full content view window's titlebar height, prevent top being cut off
+        internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
+    }
+    self.topInternalConstraint.constant = internalTopConstraintConstant;
 }
 
 @end

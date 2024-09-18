@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *viewSelector;
 @property (readwrite, weak) IBOutlet NSView *targetView;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
 
 @property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 

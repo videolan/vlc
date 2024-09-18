@@ -24,7 +24,6 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
-#import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -37,7 +36,6 @@
     self = [super initWithNibName:nibName bundle:nil];
     if (self) {
         _libraryWindow = libraryWindow;
-        _mainVideoModeEnabled = NO;
     }
     return self;
 }
@@ -45,7 +43,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.mainVideoModeEnabled = NO;
 
     self.titleLabel.font = NSFont.VLClibrarySectionHeaderFont;
 
@@ -89,17 +86,6 @@
         self.titleLabel.textColor = NSColor.VLClibraryLightTitleColor;
         self.titleSeparator.borderColor = NSColor.VLClibrarySeparatorLightColor;
     }
-}
-
-- (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
-{
-    _mainVideoModeEnabled = mainVideoModeEnabled;
-    CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.mediumSpacing;
-    if (!mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
-        // Compensate for full content view window's titlebar height, prevent top being cut off
-        internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
-    }
-    self.topInternalConstraint.constant = internalTopConstraintConstant;
 }
 
 @end
