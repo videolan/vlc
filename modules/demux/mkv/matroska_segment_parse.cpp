@@ -1257,6 +1257,9 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
         {
             debug( vars, "ChapterProcess" );
 
+            if ( !var_InheritBool( vars.p_demuxer, "mkv-use-chapter-codec") )
+                return;
+
             chapter_codec_cmds_c *p_ccodec = NULL;
 
             for( size_t j = 0; j < cp.ListSize(); j++ )
