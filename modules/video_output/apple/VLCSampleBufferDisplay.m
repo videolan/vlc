@@ -668,8 +668,10 @@ shouldInheritContentsScale:(CGFloat)newScale
 {
     if (_rotationContext)
         return _rotationContext;
+#if IS_VT_ROTATION_API_AVAILABLE
     if (@available(iOS 16.0, tvOS 16.0, macOS 13.0, *))
         _rotationContext = [VLCPixelBufferRotationContextVT new];
+#endif
     if (!_rotationContext)
         _rotationContext = [VLCPixelBufferRotationContextCI new];
     return _rotationContext;
