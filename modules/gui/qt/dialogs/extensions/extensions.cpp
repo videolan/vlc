@@ -159,13 +159,6 @@ ExtensionDialog::ExtensionDialog( qt_intf_t *_p_intf,
     this->setWindowTitle( qfu( p_dialog->psz_title ) );
 
     layout = new QGridLayout( this );
-    clickMapper = new QSignalMapper( this );
-    connect( clickMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::TriggerClick );
-    inputMapper = new QSignalMapper( this );
-    connect( inputMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncInput );
-    selectMapper = new QSignalMapper( this );
-    connect( selectMapper, &QSignalMapper::mappedObject, this, &ExtensionDialog::SyncSelection );
-
     p_dialog->p_sys_intf = this;
 }
 
@@ -174,6 +167,11 @@ ExtensionDialog::~ExtensionDialog()
     msg_Dbg( p_intf, "Deleting extension dialog '%s'", qtu(windowTitle()) );
     p_dialog->p_sys_intf = nullptr;
     vlc_cond_signal( &p_dialog->cond );
+
+    //we need to manually disconnect the objects as we are listenning to their destroyed
+    //signals or they will be emitted after m_widgetMapping is destroyed and cause use after free
+    for (QObject* obj: m_widgetMapping.keys())
+        disconnect(obj, nullptr, this, nullptr);
 }
 
 QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
@@ -193,9 +191,9 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
         case EXTENSION_WIDGET_BUTTON:
         {
             auto button = new QPushButton( qfu( p_widget->psz_text ), this );
-            clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
+            setWidgetMapping(button, p_widget);
             connect( button, &QPushButton::clicked,
-                     clickMapper, QOverload<>::of(&QSignalMapper::map) );
+                    this, &ExtensionDialog::TriggerClick );
             p_widget->p_sys_intf = button;
             return button;
         }
@@ -225,10 +223,9 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Normal );
-            inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
-            /// @note: maybe it would be wiser to use textEdited here?
+            setWidgetMapping(textInput, p_widget);
             connect( textInput, &QLineEdit::textChanged,
-                     inputMapper, QOverload<>::of(&QSignalMapper::map) );
+                     this, &ExtensionDialog::SyncInput );
             p_widget->p_sys_intf = textInput;
             return textInput;
         }
@@ -238,10 +235,10 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             textInput->setText( qfu( p_widget->psz_text ) );
             textInput->setReadOnly( false );
             textInput->setEchoMode( QLineEdit::Password );
-            inputMapper->setMapping( textInput, new WidgetMapper( textInput, p_widget ) );
+            setWidgetMapping(textInput, p_widget);
             /// @note: maybe it would be wiser to use textEdited here?
             connect( textInput, &QLineEdit::textChanged,
-                     inputMapper, QOverload<>::of(&QSignalMapper::map) );
+                    this, &ExtensionDialog::SyncInput );
             p_widget->p_sys_intf = textInput;
             return textInput;
         }
@@ -250,9 +247,9 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             auto checkBox = new QCheckBox( this );
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
-            clickMapper->setMapping( checkBox, new WidgetMapper( checkBox, p_widget ) );
+            setWidgetMapping(checkBox, p_widget);
             connect( checkBox, &QCheckBox::stateChanged,
-                     clickMapper, QOverload<>::of(&QSignalMapper::map) );
+                     this, &ExtensionDialog::TriggerClick );
             p_widget->p_sys_intf = checkBox;
             return checkBox;
         }
@@ -273,9 +270,9 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                 if( idx >= 0 )
                     comboBox->setCurrentIndex( idx );
             }
-            selectMapper->setMapping( comboBox, new WidgetMapper( comboBox, p_widget ) );
+            setWidgetMapping(comboBox, p_widget);
             connect( comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
+                     this, &ExtensionDialog::SyncSelection );
             return comboBox;
         }
         case EXTENSION_WIDGET_LIST:
@@ -291,9 +288,9 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
                 item->setData( Qt::UserRole, p_value->i_id );
                 list->addItem( item );
             }
-            selectMapper->setMapping( list, new WidgetMapper( list, p_widget ) );
+            setWidgetMapping(list, p_widget);
             connect( list, &QListWidget::itemSelectionChanged,
-                     selectMapper, QOverload<>::of(&QSignalMapper::map) );
+                     this, &ExtensionDialog::SyncSelection );
             return list;
         }
         case EXTENSION_WIDGET_SPIN_ICON:
@@ -313,11 +310,10 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
  * Forward click event to the extension
  * @param object A WidgetMapper, whose data() is the p_widget
  **/
-int ExtensionDialog::TriggerClick( QObject *object )
+int ExtensionDialog::TriggerClick()
 {
-    assert( object != NULL );
-    WidgetMapper *mapping = static_cast< WidgetMapper* >( object );
-    extension_widget_t *p_widget = mapping->getWidget();
+    extension_widget_t *p_widget = getWidgetMapping(sender());
+    assert(p_widget);
 
     int i_ret = VLC_EGENERIC;
 
@@ -360,9 +356,10 @@ int ExtensionDialog::TriggerClick( QObject *object )
  * Synchronize psz_text with the widget's text() value on update
  * @param object A WidgetMapper
  **/
-void ExtensionDialog::SyncInput( QObject *object )
+void ExtensionDialog::SyncInput()
 {
-    assert( object != NULL );
+    extension_widget_t *p_widget = getWidgetMapping(sender());
+    assert(p_widget);
 
     bool lockedHere = false;
     if( !has_lock )
@@ -372,8 +369,6 @@ void ExtensionDialog::SyncInput( QObject *object )
         lockedHere = true;
     }
 
-    WidgetMapper *mapping = static_cast< WidgetMapper* >( object );
-    extension_widget_t *p_widget = mapping->getWidget();
     assert( p_widget->type == EXTENSION_WIDGET_TEXT_FIELD
             || p_widget->type == EXTENSION_WIDGET_PASSWORD );
     /* Synchronize psz_text with the new value */
@@ -393,10 +388,12 @@ void ExtensionDialog::SyncInput( QObject *object )
  * Synchronize parameter b_selected in the values list
  * @param object A WidgetMapper
  **/
-void ExtensionDialog::SyncSelection( QObject *object )
+void ExtensionDialog::SyncSelection()
 {
-    assert( object != NULL );
     struct extension_widget_t::extension_widget_value_t *p_value;
+
+    extension_widget_t *p_widget = getWidgetMapping(sender());
+    assert(p_widget);
 
     bool lockedHere = false;
     if( !has_lock )
@@ -406,8 +403,6 @@ void ExtensionDialog::SyncSelection( QObject *object )
         lockedHere = true;
     }
 
-    WidgetMapper *mapping = static_cast< WidgetMapper* >( object );
-    extension_widget_t *p_widget = mapping->getWidget();
     assert( p_widget->type == EXTENSION_WIDGET_DROPDOWN
             || p_widget->type == EXTENSION_WIDGET_LIST );
 
@@ -549,10 +544,9 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
             // FIXME: looks like removeMappings does not work
             auto button = static_cast< QPushButton* >( p_widget->p_sys_intf );
             button->setText( qfu( p_widget->psz_text ) );
-            clickMapper->removeMappings( button );
-            clickMapper->setMapping( button, new WidgetMapper( button, p_widget ) );
+            setWidgetMapping(button, p_widget);
             connect( button, &QPushButton::clicked,
-                     clickMapper, QOverload<>::of(&QSignalMapper::map) );
+                     this, &ExtensionDialog::TriggerClick );
             return button;
         }
         case EXTENSION_WIDGET_IMAGE:
@@ -645,6 +639,24 @@ void ExtensionDialog::DestroyWidget( extension_widget_t *p_widget,
     p_widget->p_sys_intf = NULL;
     if( b_cond )
         vlc_cond_signal( &p_dialog->cond );
+}
+
+void ExtensionDialog::setWidgetMapping(QObject* object, extension_widget_t *ext_widget)
+{
+    if (!ext_widget) {
+        m_widgetMapping.remove(object);
+        return;
+    }
+
+    m_widgetMapping.insert(object, ext_widget);
+    connect(object, &QWidget::destroyed, this, [this](QObject* obj){
+        m_widgetMapping.remove(obj);
+    });
+}
+
+extension_widget_t* ExtensionDialog::getWidgetMapping(QObject* obj) const
+{
+    return m_widgetMapping.value(obj, nullptr);
 }
 
 /** Implement closeEvent() in order to intercept the event */
