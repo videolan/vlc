@@ -137,7 +137,7 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
         uint32_t srcHeight = CVPixelBufferGetHeight(pixelBuffer);
         uint32_t dstWidth = rotated ? srcHeight : srcWidth;
         uint32_t dstHeight = rotated ? srcWidth : srcHeight;
-#if TARGET_OS_VISION
+#if defined(TARGET_OS_VISION) && TARGET_OS_VISION
         const int numValues = 5;
 #else
         const int numValues = 6;
@@ -150,7 +150,7 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
             kCVPixelBufferMetalCompatibilityKey,
 #if TARGET_OS_OSX
             kCVPixelBufferOpenGLCompatibilityKey,
-#elif !TARGET_OS_VISION
+#elif !defined(TARGET_OS_VISION) || !TARGET_OS_VISION
             kCVPixelBufferOpenGLESCompatibilityKey,
 #endif
         };
@@ -161,7 +161,7 @@ typedef NS_ENUM(NSUInteger, VLCSampleBufferPixelFlip) {
             (__bridge CFNumberRef)(@(dstHeight)),
             (__bridge CFDictionaryRef)@{},
             kCFBooleanTrue,
-#if !TARGET_OS_VISION
+#if !defined(TARGET_OS_VISION) || !TARGET_OS_VISION
             kCFBooleanTrue
 #endif
         };
