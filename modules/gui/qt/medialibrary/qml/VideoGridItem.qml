@@ -27,7 +27,7 @@ import VLC.Style
 Widgets.GridItem {
     id: root
 
-    property alias showNewIndicator: image.visible
+    property bool showNewIndicator: false
     
     property var labels
 
@@ -49,6 +49,20 @@ Widgets.GridItem {
     pictureOverlay: Item {
         width: root.pictureWidth
         height: root.pictureHeight
+
+        Widgets.ScaledImage {
+            id: image
+
+            anchors.right: parent.right
+            anchors.top: parent.top
+
+            width: VLCStyle.gridItem_newIndicator
+            height: width
+
+            visible: root.showNewIndicator
+
+            source: VLCStyle.newIndicator
+        }
 
         Widgets.VideoQualityLabels {
             anchors {
@@ -79,18 +93,4 @@ Widgets.GridItem {
     }
 
     onPlayClicked: root.play()
-
-    Widgets.ScaledImage {
-        id: image
-
-        anchors.right: parent.right
-        anchors.top: parent.top
-
-        width: VLCStyle.gridItem_newIndicator
-        height: width
-
-        visible: false
-
-        source: VLCStyle.newIndicator
-    }
 }
