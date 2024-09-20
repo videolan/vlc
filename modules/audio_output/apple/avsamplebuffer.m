@@ -408,7 +408,7 @@ customBlock_Free(void *refcon, void *doomedMemoryBlock, size_t sizeInBytes)
 {
     NSNotificationCenter *notifCenter = [NSNotificationCenter defaultCenter];
 
-    if (_ptsSamples > 0)
+    if (_ptsSamples >= 0)
         [self stopSyncRenderer];
 
     [_sync removeRenderer:_renderer atTime:kCMTimeInvalid completionHandler:nil];
