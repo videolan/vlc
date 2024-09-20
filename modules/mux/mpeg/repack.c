@@ -25,6 +25,7 @@
 #include <vlc_block.h>
 
 #include "repack.h"
+#include "../../packetizer/h266_nal.h"
 #include "../../packetizer/hevc_nal.h"
 #include "../../packetizer/h264_nal.h"
 #include "../../packetizer/hxxx_nal.h"
@@ -49,6 +50,63 @@ static void AnnexBInject(block_t **pp_pes,
         memcpy(&(*pp_pes)->p_buffer[i_au], p_extra, i_extra);
 }
 
+static void PES_RepackVVC(block_t **pp_pes,
+                           const uint8_t *p_extra, size_t i_extra)
+{
+    uint8_t audata[] = { 0x00, 0x00, 0x00, 0x01, 0x00, 0xA1, 0x28 };
+    size_t i_au = sizeof(audata);
+    size_t i_aucurrent = 0;
+    uint8_t au_payload_byte = 0;
+
+    hxxx_iterator_ctx_t ctx;
+    hxxx_iterator_init(&ctx, (*pp_pes)->p_buffer, (*pp_pes)->i_buffer, 0);
+    const uint8_t *p_nal; size_t i_nal;
+    while(hxxx_annexb_iterate_next(&ctx, &p_nal, &i_nal))
+    {
+        if(i_nal < 2)
+            return;
+        uint8_t type = h266_getNALType(p_nal);
+        switch(type)
+        {
+        case H266_NAL_IDR_W_RADL:
+        case H266_NAL_IDR_N_LP:
+        case H266_NAL_CRA:
+        case H266_NAL_GDR:
+        case H266_NAL_RSV_IRAP_11:
+            if(!au_payload_byte)
+                au_payload_byte = 0x80 | (0x00 << 5) | 0x08;
+            goto out;
+        case H266_NAL_AUD:
+            i_au = 0;
+            i_aucurrent = i_nal + (p_nal - (*pp_pes)->p_buffer);
+            if(i_nal >= 3)
+                au_payload_byte = p_nal[2];
+            break;
+        case H266_NAL_VPS:
+        case H266_NAL_PPS:
+        case H266_NAL_SPS:
+            i_extra = 0;
+            break;
+        default:
+            if(type < H266_NAL_OPI)
+                goto out;
+            break;
+        }
+    }
+
+out:
+    if(au_payload_byte)
+        audata[6] = au_payload_byte;
+
+    if(i_aucurrent && i_extra) /* strip existing AU for now */
+    {
+        (*pp_pes)->p_buffer += i_aucurrent;
+        (*pp_pes)->i_buffer -= i_aucurrent;
+        i_au = sizeof(audata);
+    }
+
+    AnnexBInject(pp_pes, p_extra, i_extra, audata, i_au);
+}
 
 static void PES_RepackHEVC(block_t **pp_pes,
                                     const uint8_t *p_extra, size_t i_extra)
@@ -164,6 +222,9 @@ block_t * PES_Repack(vlc_fourcc_t i_codec,
 
     switch(i_codec)
     {
+        case VLC_CODEC_VVC:
+            PES_RepackVVC(pp_pes, p_extra, i_extra);
+            break;
         case VLC_CODEC_HEVC:
             PES_RepackHEVC(pp_pes, p_extra, i_extra);
             break;

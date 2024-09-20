@@ -1387,6 +1387,7 @@ static int MuxStreams( sout_mux_t *p_mux )
         if( (p_input->p_fmt->i_codec == VLC_CODEC_DIRAC) ||
             (p_input->p_fmt->i_codec == VLC_CODEC_H264) ||
             (p_input->p_fmt->i_codec == VLC_CODEC_HEVC) ||
+            (p_input->p_fmt->i_codec == VLC_CODEC_VVC) ||
             (p_input->p_fmt->i_codec == VLC_CODEC_MP2V)
           )
         {

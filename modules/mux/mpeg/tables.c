@@ -340,6 +340,7 @@ static void UpdateServiceType( struct service_info *info,
             i_type = 0x01;
             break;
 
+        case 0x33: /* VVC */
         case 0x24: /* HEVC */
         case 0x10: /* MPEG4 */
         case 0x1b: /* H264 */
@@ -768,6 +769,10 @@ int FillPMTESParams( ts_mux_standard standard, const es_format_t *fmt,
         ts->i_stream_type = 0x10;
         pes->i_stream_id = 0xe0;
         pes->i_es_id = ts->i_pid;
+        break;
+    case VLC_CODEC_VVC:
+        ts->i_stream_type = 0x33;
+        pes->i_stream_id = 0xe0;
         break;
     case VLC_CODEC_HEVC:
         ts->i_stream_type = 0x24;
