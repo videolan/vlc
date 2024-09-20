@@ -468,8 +468,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     NSEdgeInsets scrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
     scrollViewInsets.top += scrollViewsTopSpace;
-    NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    scrollerInsets.top += scrollViewsTopSpace;
+    const NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
 
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = scrollViewInsets;
