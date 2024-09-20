@@ -96,6 +96,11 @@ typedef struct hls_playlist
 
     bool ended;
 
+    /**
+     * Total duration of the muxed data.
+     */
+    vlc_tick_t muxed_duration;
+
     struct vlc_list node;
 } hls_playlist_t;
 
@@ -146,6 +151,10 @@ typedef struct
     struct hls_storage *manifest;
     httpd_url_t *http_manifest;
 
+    /**
+     * Global advancement of the stream in media time.
+     */
+    vlc_tick_t elapsed_stream_time;
     vlc_tick_t first_pcr;
 
     size_t current_memory_cached;
@@ -536,6 +545,7 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
             hls_storage_GetSize(to_be_removed->storage);
     }
 
+    const vlc_tick_t length = segment.length;
     const int status = hls_segment_queue_NewSegment(
         &playlist->segments, segment.begin, segment.length);
     if (unlikely(status != VLC_SUCCESS))
@@ -545,6 +555,7 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
                   playlist->segments.total_segments + 1);
         return status;
     }
+    playlist->muxed_duration += length;
 
     vlc_debug(playlist->logger,
               "Segment '%u' created",
@@ -613,8 +624,14 @@ static ssize_t AccessOutWrite(sout_access_out_t *access, block_t *block)
     {
         hls_playlists_foreach (it)
         {
-            if (ExtractAndAddSegment(it, sys) != VLC_SUCCESS)
-                return -1;
+            while (IsSegmentReady(it->type,
+                                  &it->muxed_output,
+                                  sys->config.segment_length) &&
+                   it->muxed_duration < sys->elapsed_stream_time)
+            {
+                if (ExtractAndAddSegment(it, sys) != VLC_SUCCESS)
+                    return -1;
+            }
         }
     }
     return size;
@@ -692,6 +709,7 @@ static hls_playlist_t *CreatePlaylist(sout_stream_t *stream,
     playlist->type = type;
     playlist->config = &sys->config;
     playlist->ended = false;
+    playlist->muxed_duration = 0;
 
     playlist->url = FormatPlaylistManifestURL(playlist);
     if (unlikely(playlist->url == NULL))
@@ -904,14 +922,15 @@ static void SetPCR(sout_stream_t *stream, vlc_tick_t pcr)
         return;
     }
 
-    const vlc_tick_t stream_time = pcr - sys->first_pcr;
+    sys->elapsed_stream_time = pcr - sys->first_pcr;
     const hls_playlist_t *playlist;
     vlc_list_foreach_const (playlist, &sys->media_playlists, node)
     {
         if (playlist->type != HLS_PLAYLIST_TYPE_WEBVTT)
             continue;
 
-        hls_sub_segmenter_SignalStreamUpdate(playlist->mux, stream_time);
+        hls_sub_segmenter_SignalStreamUpdate(playlist->mux,
+                                             sys->elapsed_stream_time);
     }
 }
 
@@ -1054,6 +1073,7 @@ static int Open(vlc_object_t *this)
     vlc_list_init(&sys->variant_playlists);
     vlc_list_init(&sys->media_playlists);
 
+    sys->elapsed_stream_time = 0;
     sys->first_pcr = VLC_TICK_INVALID;
 
     sys->current_memory_cached = 0;
