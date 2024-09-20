@@ -322,6 +322,24 @@ FocusScope {
 
                             readonly property real sizeConstant: 2.7182
 
+                            Widgets.DynamicShadow {
+                                anchors.centerIn: cover
+                                sourceItem: cover
+
+                                color: Qt.rgba(0, 0, 0, .18)
+                                yOffset: VLCStyle.dp(24)
+                                blurRadius: VLCStyle.dp(54)
+                            }
+
+                            Widgets.DynamicShadow {
+                                anchors.centerIn: cover
+                                sourceItem: cover
+
+                                color: Qt.rgba(0, 0, 0, .22)
+                                yOffset: VLCStyle.dp(5)
+                                blurRadius: VLCStyle.dp(14)
+                            }
+
                             Image {
                                 id: cover
 
@@ -349,19 +367,6 @@ FocusScope {
                                 onStatusChanged: {
                                     if (status === Image.Ready)
                                         backgroundImage.scheduleUpdate()
-                                }
-
-                                // TODO: Qt >= 6.4 Investigate using MultiEffect.
-                                Widgets.DoubleShadow {
-                                    anchors.centerIn: parent
-                                    sourceItem: parent
-
-                                    cache: false
-
-                                    primaryVerticalOffset: VLCStyle.dp(24)
-                                    primaryBlurRadius: VLCStyle.dp(54)
-                                    secondaryVerticalOffset: VLCStyle.dp(5)
-                                    secondaryBlurRadius: VLCStyle.dp(14)
                                 }
                             }
                         }
