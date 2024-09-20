@@ -480,23 +480,42 @@ static hls_block_chain_t ExtractCommonSegment(hls_block_chain_t *muxed_output,
 {
     hls_block_chain_t segment = {.begin = muxed_output->begin};
 
+    vlc_tick_t gop_length = 0;
     block_t *prev = NULL;
+    block_t *segment_end = NULL;
     for (block_t *it = muxed_output->begin; it != NULL; it = it->p_next)
     {
-        if (segment.length + it->i_length > max_segment_length)
+        if (it->i_flags & BLOCK_FLAG_HEADER)
         {
-            muxed_output->begin = it;
-
-            if (prev != NULL)
-                prev->p_next = NULL;
-            return segment;
+            segment_end = prev;
+            segment.length += gop_length;
+            gop_length = 0;
         }
-        segment.length += it->i_length;
-        muxed_output->length -= it->i_length;
+        if (segment.length + gop_length + it->i_length > max_segment_length)
+        {
+            if (segment_end == NULL)
+            {
+                segment_end = prev;
+                segment.length += gop_length;
+                gop_length = 0;
+            }
+            break;
+        }
+        gop_length += it->i_length;
         prev = it;
     }
 
-    hls_block_chain_Reset(muxed_output);
+    if (segment_end != NULL)
+    {
+        muxed_output->begin = segment_end->p_next;
+        segment_end->p_next = NULL;
+        muxed_output->length -= segment.length;
+    }
+    else
+    {
+        segment.length = gop_length;
+        hls_block_chain_Reset(muxed_output);
+    }
     return segment;
 }
 
@@ -681,7 +700,7 @@ static sout_mux_t *CreatePlaylistMuxer(sout_access_out_t *access,
     switch(type)
     {
         case HLS_PLAYLIST_TYPE_TS:
-            return sout_MuxNew(access, "ts");
+            return sout_MuxNew(access, "ts{use-key-frames}");
         case HLS_PLAYLIST_TYPE_WEBVTT:
             return CreateSubtitleSegmenter(access, config);
     }
