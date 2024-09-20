@@ -466,18 +466,18 @@ referenceSizeForHeaderInSection:(NSInteger)section
     const CGFloat pathControlVisualEffectViewHeight = _pathControlVisualEffectView.frame.size.height;
     const CGFloat scrollViewsTopSpace = visible ? pathControlVisualEffectViewHeight + VLCLibraryUIUnits.mediumSpacing : VLCLibraryUIUnits.mediumSpacing;
 
-    NSEdgeInsets collectionViewScrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    collectionViewScrollViewInsets.top += scrollViewsTopSpace;
-    NSEdgeInsets collectionViewScrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
-    collectionViewScrollerInsets.top += scrollViewsTopSpace;
+    NSEdgeInsets scrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
+    scrollViewInsets.top += scrollViewsTopSpace;
+    NSEdgeInsets scrollerInsets = VLCLibraryUIUnits.libraryViewScrollViewScrollerInsets;
+    scrollerInsets.top += scrollViewsTopSpace;
 
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _collectionViewScrollView.contentInsets = collectionViewScrollViewInsets;
-    _collectionViewScrollView.scrollerInsets = collectionViewScrollerInsets;
+    _collectionViewScrollView.contentInsets = scrollViewInsets;
+    _collectionViewScrollView.scrollerInsets = scrollerInsets;
 
-    NSEdgeInsets tableViewScrollViewInsets = VLCLibraryUIUnits.libraryViewScrollViewContentInsets;
-    tableViewScrollViewInsets.top = scrollViewsTopSpace;
-    _tableViewScrollView.contentInsets = tableViewScrollViewInsets;
+    _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
+    _tableViewScrollView.contentInsets = scrollViewInsets;
+    _tableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 - (void)returnHome
