@@ -798,6 +798,12 @@ qml_modules += {
     ),
 }
 
+if qt6_dep.version().version_compare('>=6.5.0')
+    qml_dynamicshadow_file = 'widgets/qml/DynamicShadow.qml'
+else
+    qml_dynamicshadow_file = 'widgets/qml/compat/DynamicShadow.qml'
+endif
+
 qml_modules += {
     'name' : 'VLC.Widgets',
     'target' : 'widgets',
@@ -880,7 +886,8 @@ qml_modules += {
         'widgets/qml/PopupIconToolButton.qml',
         'widgets/qml/PartialEffect.qml',
         'widgets/qml/ViewHeader.qml',
-        'widgets/qml/ProgressIndicator.qml'
+        'widgets/qml/ProgressIndicator.qml',
+        qml_dynamicshadow_file,
     ),
 }
 
