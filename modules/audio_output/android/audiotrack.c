@@ -1230,7 +1230,7 @@ AudioTrack_ReportTiming( JNIEnv *env, aout_stream_t *stream )
 
     if( frame_us <= 0 )
         return VLC_EGENERIC;
-    aout_stream_TimingReport( stream, now, frame_us );
+    aout_stream_TimingReport( stream, now, frame_us + p_sys->first_pts );
 
     return VLC_SUCCESS;
 }
