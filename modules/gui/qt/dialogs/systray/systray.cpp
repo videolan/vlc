@@ -97,11 +97,7 @@ void VLCSystray::handleClick(
     {
     case QSystemTrayIcon::Trigger:
     case QSystemTrayIcon::DoubleClick:
-#ifdef Q_OS_MAC
-        VLCMenuBar::updateSystrayMenu( this, p_intf );
-#else
         toggleUpdateMenu();
-#endif
         break;
     case QSystemTrayIcon::MiddleClick:
         if (PlaylistController* const playlistController = m_intf->p_mainPlaylistController)
