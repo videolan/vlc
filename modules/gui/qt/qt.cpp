@@ -536,10 +536,13 @@ static void *Thread( void * );
 static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 
 #ifdef Q_OS_MAC
+static void ThreadDarwin(void *);
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
 #include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
+#include <dispatch/dispatch.h>
 static void Abort( void *obj )
 {
+    (void)obj;
     triggerQuit();
 }
 #endif
@@ -579,7 +582,6 @@ static int OpenInternal( qt_intf_t *p_intf )
     /* Get the playlist before the lock to avoid a lock-order-inversion */
     vlc_playlist_t *playlist = vlc_intf_GetMainPlaylist(p_intf->intf);
 
-#ifndef Q_OS_MAC
     vlc::threads::mutex_locker locker (lock);
     if (busy || open_state == OPEN_STATE_ERROR)
     {
@@ -587,7 +589,6 @@ static int OpenInternal( qt_intf_t *p_intf )
             msg_Err (p_intf, "cannot start Qt multiple times");
         return VLC_EGENERIC;
     }
-#endif
 
     p_intf->p_mi = NULL;
 
@@ -599,7 +600,7 @@ static int OpenInternal( qt_intf_t *p_intf )
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
-    Thread( (void *)p_intf );
+    dispatch_async_f(dispatch_get_main_queue(), static_cast<void*>(p_intf), ThreadDarwin);
 #else
     if( vlc_clone( &p_intf->thread, Thread, p_intf ) )
     {
@@ -610,10 +611,8 @@ static int OpenInternal( qt_intf_t *p_intf )
     /* Wait for the interface to be ready. This prevents the main
      * LibVLC thread from starting video playback before we can create
      * an embedded video window. */
-#ifndef Q_OS_MAC
     while (open_state == OPEN_STATE_INIT)
         wait_ready.wait(lock);
-#endif
 
     if (open_state == OPEN_STATE_ERROR)
     {
@@ -1053,15 +1052,6 @@ static void *Thread( void *obj )
         open_state = OPEN_STATE_OPENED;
         wait_ready.signal();
     }
-#ifdef Q_OS_MAC
-    /* We took over main thread, register and start here */
-    if( !p_intf->b_isDialogProvider )
-    {
-        vlc_playlist_Lock( p_intf->p_playlist );
-        vlc_playlist_Start( p_intf->p_playlist );
-        vlc_playlist_Unlock( p_intf->p_playlist );
-    }
-#endif
 
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
@@ -1078,18 +1068,21 @@ static void *Thread( void *obj )
     return ThreadCleanup( p_intf, CLEANUP_APP_TERMINATED );
 }
 
+#ifdef Q_OS_MAC
+static void ThreadDarwin(void *opaque)
+{
+    Thread(opaque);
+}
+#endif
+
 static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
 {
     {
-#ifndef Q_OS_MAC
         vlc::threads::mutex_locker locker (lock);
-#endif
         if( cleanupReason == CLEANUP_ERROR )
         {
             open_state = OPEN_STATE_ERROR;
-#ifndef Q_OS_MAC
             wait_ready.signal();
-#endif
         }
         else
             open_state = OPEN_STATE_INIT;

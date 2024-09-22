@@ -161,6 +161,9 @@ int OpenIntf (vlc_object_t *p_this)
                 retcode = VLC_EGENERIC;
                 return;
             }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSApp run];
+            });
         }
     });
 
@@ -169,15 +172,18 @@ int OpenIntf (vlc_object_t *p_this)
 
 void CloseIntf (vlc_object_t *p_this)
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    void (^release_intf)() = ^{
         @autoreleasepool {
             msg_Dbg(p_this, "Closing macosx interface");
             [VLCMain.sharedInstance applicationWillTerminate:nil];
             [VLCMain killInstance];
         }
-
         p_interface_thread = nil;
-    });
+    };
+    if (CFRunLoopGetCurrent() == CFRunLoopGetMain())
+        release_intf();
+    else
+        dispatch_sync(dispatch_get_main_queue(), release_intf);
 }
 
 /*****************************************************************************
