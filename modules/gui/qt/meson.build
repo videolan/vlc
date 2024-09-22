@@ -610,6 +610,7 @@ qml_modules += {
     'sources': files(
         'medialibrary/qml/ArtistTopBanner.qml',
         'medialibrary/qml/AudioGridItem.qml',
+        'medialibrary/qml/HomeDisplay.qml',
         'medialibrary/qml/HomePage.qml',
         'medialibrary/qml/MediaView.qml',
         'medialibrary/qml/VideoGroupDisplay.qml',

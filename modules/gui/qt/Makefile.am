@@ -1012,6 +1012,7 @@ libqml_module_medialibrary_a_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS)
 libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/ArtistTopBanner.qml \
 	medialibrary/qml/AudioGridItem.qml \
+	medialibrary/qml/HomeDisplay.qml \
 	medialibrary/qml/HomePage.qml \
 	medialibrary/qml/MediaView.qml \
 	medialibrary/qml/VideoGroupDisplay.qml \

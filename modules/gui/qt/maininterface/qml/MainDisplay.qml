@@ -102,6 +102,14 @@ FocusScope {
 
     readonly property var pageModel: [
         {
+            listed: true,
+            displayText: qsTr("Home"),
+            icon: VLCIcons.home,
+            name: "home",
+            url: MainCtx.mediaLibraryAvailable ?
+                 "qrc:///qt/qml/VLC/MediaLibrary/HomeDisplay.qml" :
+                 "qrc:///qt/qml/VLC/MainInterface/NoMedialibHome.qml"
+        }, {
             listed: MainCtx.mediaLibraryAvailable,
             displayText: qsTr("Video"),
             icon: VLCIcons.topbar_video,
@@ -113,12 +121,6 @@ FocusScope {
             icon: VLCIcons.topbar_music,
             name: "music",
             url: "qrc:///qt/qml/VLC/MediaLibrary/MusicDisplay.qml"
-        }, {
-            listed: !MainCtx.mediaLibraryAvailable,
-            displayText: qsTr("Home"),
-            icon: VLCIcons.home,
-            name: "home",
-            url: "qrc:///qt/qml/VLC/MainInterface/NoMedialibHome.qml"
         }, {
             listed: true,
             displayText: qsTr("Browse"),

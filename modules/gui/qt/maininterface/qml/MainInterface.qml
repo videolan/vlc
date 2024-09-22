@@ -171,10 +171,7 @@ Item {
                     MainPlaylistController.stop()
 
                 if (History.previousEmpty) {
-                    if (MainCtx.mediaLibraryAvailable)
-                        History.update(["mc", "video"])
-                    else
-                        History.update(["mc", "home"])
+                    History.update(["mc", "home"])
                     loadCurrentHistoryView(Qt.OtherFocusReason)
                 } else
                     History.previous()
