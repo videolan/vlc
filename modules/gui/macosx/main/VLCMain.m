@@ -141,36 +141,43 @@ intf_thread_t *getIntf()
 
 int OpenIntf (vlc_object_t *p_this)
 {
-    @autoreleasepool {
-        intf_thread_t *p_intf = (intf_thread_t*) p_this;
-        p_interface_thread = p_intf;
-        msg_Dbg(p_intf, "Starting macosx interface");
+    __block int retcode = VLC_SUCCESS;
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            intf_thread_t *p_intf = (intf_thread_t*) p_this;
+            p_interface_thread = p_intf;
+            msg_Dbg(p_intf, "Starting macosx interface");
 
-        @try {
-            VLCApplication * const application = VLCApplication.sharedApplication;
-            NSCAssert(application != nil, @"VLCApplication must not be nil");
+            @try {
+                VLCApplication * const application = VLCApplication.sharedApplication;
+                NSCAssert(application != nil, @"VLCApplication must not be nil");
 
-            VLCMain * const main = VLCMain.sharedInstance;
-            NSCAssert(main != nil, @"VLCMain must not be nil");
+                VLCMain * const main = VLCMain.sharedInstance;
+                NSCAssert(main != nil, @"VLCMain must not be nil");
 
-            msg_Dbg(p_intf, "Finished loading macosx interface");
-            return VLC_SUCCESS;
-        } @catch (NSException *exception) {
-            msg_Err(p_intf, "Loading the macosx interface failed. Do you have a valid window server?");
-            return VLC_EGENERIC;
+                msg_Dbg(p_intf, "Finished loading macosx interface");
+            } @catch (NSException *exception) {
+                msg_Err(p_intf, "Loading the macosx interface failed. Do you have a valid window server?");
+                retcode = VLC_EGENERIC;
+                return;
+            }
         }
-    }
+    });
+
+    return retcode;
 }
 
 void CloseIntf (vlc_object_t *p_this)
 {
-    @autoreleasepool {
-        msg_Dbg(p_this, "Closing macosx interface");
-        [VLCMain.sharedInstance applicationWillTerminate:nil];
-        [VLCMain killInstance];
-    }
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            msg_Dbg(p_this, "Closing macosx interface");
+            [VLCMain.sharedInstance applicationWillTerminate:nil];
+            [VLCMain killInstance];
+        }
 
-    p_interface_thread = nil;
+        p_interface_thread = nil;
+    });
 }
 
 /*****************************************************************************

@@ -267,22 +267,38 @@ int main(int i_argc, const char *ppsz_argv[])
     argc += i_argc;
     argv[argc] = NULL;
 
-    /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new(argc, argv);
-    if (vlc == NULL)
-        return 1;
-
+    dispatch_queue_t intf_queue = dispatch_queue_create("org.videolan.vlc", NULL);
+    __block bool intf_started = true;
+    __block libvlc_instance_t *vlc = NULL;
     int ret = 1;
-    libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_terminate, NULL);
-    libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
-    libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
+    dispatch_async(intf_queue, ^{
+        /* Initialize libvlc */
+        vlc = libvlc_new(argc, argv);
+        if (vlc == NULL)
+        {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                intf_started = false;
+                CFRunLoopStop(CFRunLoopGetMain());
+            });
+            return;
+        }
 
-    if (libvlc_InternalAddIntf(vlc->p_libvlc_int, NULL)) {
-        fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
-        goto out;
-    }
+        libvlc_SetExitHandler(vlc->p_libvlc_int, vlc_terminate, NULL);
+        libvlc_set_app_id(vlc, "org.VideoLAN.VLC", PACKAGE_VERSION, PACKAGE_NAME);
+        libvlc_set_user_agent(vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
 
-    libvlc_InternalPlay(vlc->p_libvlc_int);
+
+        if (libvlc_InternalAddIntf(vlc->p_libvlc_int, NULL)) {
+            fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                intf_started = false;
+                CFRunLoopStop(CFRunLoopGetMain());
+            });
+            return;
+        }
+
+        libvlc_InternalPlay(vlc->p_libvlc_int);
+    });
 
     /*
      * Run the main loop. If the mac interface is not initialized, only the CoreFoundation
@@ -290,17 +306,16 @@ int main(int i_argc, const char *ppsz_argv[])
      * before actually starting the loop.
      */
     @autoreleasepool {
-        if(NSApp == nil) {
-            CFRunLoopRun();
-
-        } else {
-            [NSApp run];
-        }
+        CFRunLoopRun();
     }
+
+    if (!intf_started)
+        goto out;
 
     ret = 0;
     /* Cleanup */
 out:
+    dispatch_release(intf_queue);
     free(argv);
 
     dispatch_release(sigIntSource);
