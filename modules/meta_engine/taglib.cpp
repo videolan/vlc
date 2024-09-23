@@ -557,6 +557,45 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
     }
 }
 
+static void AddAPICToAttachments( demux_meta_t* p_demux_meta,
+                                  vlc_meta_t* p_meta,
+                                  const String &mimeType,
+                                  const String &description,
+                                  const char *p_data,
+                                  size_t i_data,
+                                  bool b_default = false )
+{
+    char *psz_name;
+    if( asprintf( &psz_name, "%i", p_demux_meta->i_attachments ) == -1 )
+        return;
+
+    input_attachment_t *p_attachment =
+        vlc_input_attachment_New( psz_name,
+                                  mimeType.toCString(),
+                                  description.toCString(),
+                                  p_data, i_data );
+    free( psz_name );
+    if( !p_attachment )
+        return;
+
+    msg_Dbg( p_demux_meta, "Found embedded art: %s (%zu bytes)",
+             p_attachment->psz_mime, p_attachment->i_data );
+
+    TAB_APPEND_CAST( (input_attachment_t**),
+                     p_demux_meta->i_attachments, p_demux_meta->attachments,
+                     p_attachment );
+
+    if( b_default )
+    {
+        char *psz_url;
+        if( asprintf( &psz_url, "attachment://%s",
+                      p_attachment->psz_name ) == -1 )
+            return;
+        vlc_meta_SetArtURL( p_meta, psz_url );
+        free( psz_url );
+    }
+}
+
 /**
  * Fills attachments list from ID3 APIC tags
  * @param tag: the APIC tags list
@@ -606,36 +645,10 @@ static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
             continue;
         }
 
-        char *psz_name;
-        if( asprintf( &psz_name, "%i", p_demux_meta->i_attachments ) == -1 )
-            continue;
-
-        input_attachment_t *p_attachment =
-                vlc_input_attachment_New( psz_name,
-                                          mimeType.toCString(),
-                                          description.toCString(),
-                                          p->picture().data(),
-                                          p->picture().size() );
-        free( psz_name );
-        if( !p_attachment )
-            continue;
-
-        msg_Dbg( p_demux_meta, "Found embedded art: %s (%zu bytes)",
-                 p_attachment->psz_mime, p_attachment->i_data );
-
-        TAB_APPEND_CAST( (input_attachment_t**),
-                         p_demux_meta->i_attachments, p_demux_meta->attachments,
-                         p_attachment );
-
-        if( p == defaultPic )
-        {
-            char *psz_url;
-            if( asprintf( &psz_url, "attachment://%s",
-                          p_attachment->psz_name ) == -1 )
-                continue;
-            vlc_meta_SetArtURL( p_meta, psz_url );
-            free( psz_url );
-        }
+        AddAPICToAttachments( p_demux_meta, p_meta,
+                              mimeType, description,
+                              p->picture().data(), p->picture().size(),
+                              p == defaultPic );
     }
 }
 
