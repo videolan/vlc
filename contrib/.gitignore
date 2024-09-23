@@ -3,6 +3,11 @@ include
 lib
 libexec
 share
+doc
+metatypes
+mkspecs
+modules
+plugins
 python-venv
 vlc-contrib-*.tar.xz
 vlc-contrib-*.tar.bz2
