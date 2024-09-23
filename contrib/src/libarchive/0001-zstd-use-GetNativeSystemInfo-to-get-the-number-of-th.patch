@@ -1,0 +1,36 @@
+From 51214b8cbd6008105fd94807dfc9c0699459e9e2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 23 Sep 2024 13:37:22 +0200
+Subject: [PATCH] zstd: use GetNativeSystemInfo() to get the number of threads
+
+GetActiveProcessorCount() is not available in UWP [1] and
+it's not available before Windows 7.
+
+SYSTEM_INFO::dwNumberOfProcessors gives the same information [2]
+
+[1] https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-getactiveprocessorcount
+[2] https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-system_info
+---
+ libarchive/archive_write_add_filter_zstd.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libarchive/archive_write_add_filter_zstd.c b/libarchive/archive_write_add_filter_zstd.c
+index 7ea3d18c..89b90387 100644
+--- a/libarchive/archive_write_add_filter_zstd.c
++++ b/libarchive/archive_write_add_filter_zstd.c
+@@ -280,9 +280,9 @@ archive_compressor_zstd_options(struct archive_write_filter *f, const char *key,
+ #elif !defined(__CYGWIN__) && defined(_WIN32_WINNT) && \
+     _WIN32_WINNT >= 0x0601 /* _WIN32_WINNT_WIN7 */
+ 		if (threads == 0) {
+-			DWORD winCores = GetActiveProcessorCount(
+-			    ALL_PROCESSOR_GROUPS);
+-			threads = (intmax_t)winCores;
++			SYSTEM_INFO systemInfo;
++			GetNativeSystemInfo(&systemInfo);
++			threads = (intmax_t)systemInfo.dwNumberOfProcessors;
+ 		}
+ #endif
+ 		if (threads < 0 || threads > INT_MAX) {
+-- 
+2.45.0.windows.1
+
