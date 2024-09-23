@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.7.0
+LIBARCHIVE_VERSION := 3.7.6
 LIBARCHIVE_URL := $(GITHUB)/libarchive/libarchive/releases/download/v$(LIBARCHIVE_VERSION)/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -36,7 +36,7 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
-	$(APPLY) $(SRC)/libarchive/0001-Fix-usage-of-GetVolumePathNameW-in-UWP-before-20H1.patch
+	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
