@@ -228,7 +228,10 @@ int main(int i_argc, const char *ppsz_argv[])
 
 
     /* Handle parameters */
-    const char *argv[i_argc + 2];
+    const char **argv = calloc(i_argc + 2, sizeof (argv[0]));
+    if (argv == NULL)
+        exit(1);
+
     int argc = 0;
 
     argv[argc++] = "--no-ignore-config";
@@ -298,6 +301,8 @@ int main(int i_argc, const char *ppsz_argv[])
     ret = 0;
     /* Cleanup */
 out:
+    free(argv);
+
     dispatch_release(sigIntSource);
     dispatch_release(sigTermSource);
     dispatch_release(sigChldSource);
