@@ -550,6 +550,14 @@ static hls_block_chain_t ExtractSegment(hls_playlist_t *playlist)
     return ExtractCommonSegment(&playlist->muxed_output, seglen);
 }
 
+static bool IsSegmentSelfDecodable(const hls_block_chain_t *segment)
+{
+    if (segment->begin == NULL)
+        return false;
+
+    return segment->begin->i_flags & BLOCK_FLAG_HEADER;
+}
+
 static int ExtractAndAddSegment(hls_playlist_t *playlist,
                                 sout_stream_sys_t *sys)
 {
@@ -564,6 +572,7 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
             hls_storage_GetSize(to_be_removed->storage);
     }
 
+    const bool self_decodable = IsSegmentSelfDecodable(&segment);
     const vlc_tick_t length = segment.length;
     const int status = hls_segment_queue_NewSegment(
         &playlist->segments, segment.begin, segment.length);
@@ -575,6 +584,24 @@ static int ExtractAndAddSegment(hls_playlist_t *playlist,
         return status;
     }
     playlist->muxed_duration += length;
+
+    if (!self_decodable)
+    {
+        vlc_warning(
+            playlist->logger,
+            "Segment '%u' does not start with a synchronization frame. It will "
+            "not be decodable on its own and will likely fail as a seek point.",
+            playlist->segments.total_segments);
+        if (playlist->type != HLS_PLAYLIST_TYPE_WEBVTT)
+        {
+            vlc_warning(
+                playlist->logger,
+                "It is probably due to a GOP being too large to fit in %" PRIi64
+                "s segments. Please adjust your encoding parameters or set a "
+                "larger segment size.",
+                SEC_FROM_VLC_TICK(playlist->config->segment_length));
+        }
+    }
 
     vlc_debug(playlist->logger,
               "Segment '%u' created",
