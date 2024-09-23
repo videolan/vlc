@@ -745,9 +745,7 @@ shouldInheritContentsScale:(CGFloat)newScale
         [displayView setFrame:[window bounds]];
         [spuView setFrame:[window bounds]];
 
-        vout_display_PlacePicture(
-            &sys->place, sys.vd->source, &sys.vd->cfg->display
-        );
+        sys->place = *sys.vd->place;
 
         sys.displayView = displayView;
         sys.spuView = spuView;
