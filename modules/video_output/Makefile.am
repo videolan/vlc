@@ -92,7 +92,7 @@ if HAVE_IOS_OR_TVOS
 libpictureinpicturecontroller_plugin_la_SOURCES = video_output/apple/VLCPictureInPictureController.m
 libpictureinpicturecontroller_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
 libpictureinpicturecontroller_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)' \
-	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit
+	-Wl,-framework,AVFoundation,-framework,Foundation,-framework,AVKit,-framework,UIKit,-framework,QuartzCore,-framework,CoreMedia
 vout_LTLIBRARIES += libpictureinpicturecontroller_plugin.la
 endif
 
