@@ -602,28 +602,32 @@ static void AddAPICToAttachments( demux_meta_t* p_demux_meta,
  * @param p_demux_meta: the demuxer meta
  * @param p_meta: the meta
  */
+
+template<class T, class L>
+    const T * getDefaultPic(const L &list)
+{
+    const T *defaultPic = nullptr;
+    int bestscore = 0;
+    for( auto iter = list.begin(); iter != list.end(); ++iter )
+    {
+        const T* p = static_cast<const T*>(*iter);
+        if( !p )
+            continue;
+        int score = p->type() >= ARRAY_SIZE(ID3v2_cover_scores) ? 0 : ID3v2_cover_scores[p->type()];
+        if(defaultPic == nullptr || score > bestscore)
+        {
+            defaultPic = p;
+            bestscore = score;
+        }
+    }
+    return defaultPic;
+}
+
 static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
                                       demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
-    const ID3v2::AttachedPictureFrame *defaultPic = nullptr;
-    for( auto iter = list.begin(); iter != list.end(); ++iter )
-    {
-        const ID3v2::AttachedPictureFrame* p =
-                dynamic_cast<const ID3v2::AttachedPictureFrame*>(*iter);
-        if( !p )
-            continue;
-        if(defaultPic == nullptr)
-        {
-            defaultPic = p;
-        }
-        else
-        {
-            int scorea = defaultPic->type() >= ARRAY_SIZE(ID3v2_cover_scores) ? 0 : ID3v2_cover_scores[defaultPic->type()];
-            int scoreb = p->type() >= ARRAY_SIZE(ID3v2_cover_scores) ? 0 : ID3v2_cover_scores[p->type()];
-            if(scoreb > scorea)
-                defaultPic = p;
-        }
-    }
+    const ID3v2::AttachedPictureFrame *defaultPic =
+        getDefaultPic<ID3v2::AttachedPictureFrame, ID3v2::FrameList>(list);
 
     for( auto iter = list.begin(); iter != list.end(); ++iter )
     {
