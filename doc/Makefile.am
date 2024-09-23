@@ -21,6 +21,7 @@ LIBVLC_SAMPLES = \
 	libvlc/parser.c \
 	libvlc/media_discoverer.c \
 	libvlc/renderer_discoverer.c \
+	libvlc/player.c \
 	$(NULL)
 
 # Check that samples that depends only on LibVLC can build
@@ -32,6 +33,7 @@ samples_libvlc_thumbnailer_SOURCES = libvlc/thumbnailer.c
 samples_libvlc_parser_SOURCES = libvlc/parser.c
 samples_libvlc_media_discoverer_SOURCES = libvlc/media_discoverer.c
 samples_libvlc_renderer_discoverer_SOURCES = libvlc/renderer_discoverer.c
+samples_libvlc_player_SOURCES = libvlc/player.c
 
 check_PROGRAMS = \
 	samples_libvlc_example \
@@ -39,6 +41,7 @@ check_PROGRAMS = \
 	samples_libvlc_parser \
 	samples_libvlc_media_discoverer \
 	samples_libvlc_renderer_discoverer \
+	samples_libvlc_player \
 	$(NULL)
 
 nobase_doc_DATA = $(LIBVLC_SAMPLES)
