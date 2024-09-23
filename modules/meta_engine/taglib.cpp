@@ -75,6 +75,7 @@
 #include <asffile.h>
 #include <apetag.h>
 #include <flacfile.h>
+#include <flacpicture.h>
 #include <mpcfile.h>
 #include <mpegfile.h>
 #include <mp4file.h>
@@ -656,6 +657,24 @@ static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
     }
 }
 
+static void ProcessAPICListFromFLAC( const List< FLAC::Picture * > &list,
+                                     demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
+{
+    const FLAC::Picture *defaultPic =
+        getDefaultPic<FLAC::Picture, List< FLAC::Picture * >>(list);
+
+    for( auto iter = list.begin(); iter != list.end(); ++iter )
+    {
+        const FLAC::Picture* p = static_cast<const FLAC::Picture*>(*iter);
+        if( !p )
+            continue;
+        AddAPICToAttachments( p_demux_meta, p_meta,
+                              p->mimeType(), p->description(),
+                              p->data().data(), p->data().size(),
+                              p == defaultPic );
+    }
+}
+
 static void ReadMetaFromBasicTag(const Tag* tag, vlc_meta_t *dest)
 {
 #define SET( accessor, meta )                                                  \
@@ -1095,6 +1114,7 @@ static int ReadMeta( vlc_object_t* p_this)
             ReadMetaFromId3v2( flac->ID3v2Tag(), p_demux_meta, p_meta );
         else if( flac->xiphComment() )
             ReadMetaFromXiph( flac->xiphComment(), p_demux_meta, p_meta );
+        ProcessAPICListFromFLAC( flac->pictureList(), p_demux_meta, p_meta );
     }
     else if( MP4::File *mp4 = dynamic_cast<MP4::File*>(f.file()) )
     {
