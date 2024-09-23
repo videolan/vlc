@@ -98,7 +98,6 @@ static block_t *ParseMPEGBlock( decoder_t *, block_t * );
 static int ParseVOL( decoder_t *, es_format_t *, uint8_t *, int );
 static int ParseVO( decoder_t *, block_t * );
 static int ParseVOP( decoder_t *, block_t * );
-static unsigned vlc_log2( unsigned int );
 
 #define VIDEO_OBJECT_MASK                       0x01f
 #define VIDEO_OBJECT_LAYER_MASK                 0x00f
@@ -610,31 +609,3 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
     return VLC_SUCCESS;
 }
 
-/* look at libavutil av_log2 ;) */
-static unsigned vlc_log2( unsigned int v )
-{
-    unsigned n = 0;
-    static const unsigned vlc_log2_table[16] =
-    {
-        0,0,1,1,2,2,2,2, 3,3,3,3,3,3,3,3
-    };
-
-    if( v&0xffff0000 )
-    {
-        v >>= 16;
-        n += 16;
-    }
-    if( v&0xff00 )
-    {
-        v >>= 8;
-        n += 8;
-    }
-    if( v&0xf0 )
-    {
-        v >>= 4;
-        n += 4;
-    }
-    n += vlc_log2_table[v];
-
-    return n;
-}
