@@ -166,6 +166,7 @@ typedef struct vout_display_sys_t
     // upscaling
     enum d3d11_upscale       upscaleMode = upscale_LinearSampler;
     d3d11_scaler             *scaleProc = nullptr;
+    vout_display_place_t     scalePlace;
 
     // HDR mode
     enum d3d11_hdr           hdrMode = hdr_Auto;
@@ -282,9 +283,12 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
             sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
             sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
 
-            vout_display_place_t before_place = sys->area.place;
-            vout_display_PlacePicture(&sys->area.place, &sys->picQuad.quad_fmt, &vd->cfg->display);
-            sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->area.place);
+            vout_display_place_t before_place = sys->scalePlace;
+            sys->scalePlace.x = 0;
+            sys->scalePlace.y = 0;
+            sys->scalePlace.width = sys->picQuad.quad_fmt.i_width;
+            sys->scalePlace.height = sys->picQuad.quad_fmt.i_height;
+            sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
         }
     }
 
@@ -341,12 +345,17 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
 static void UpdateSize(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    msg_Dbg(vd, "Detected size change %dx%d", sys->area.place.width,
-            sys->area.place.height);
+    msg_Dbg(vd, "Detected size change %dx%d", vd->cfg->display.width,
+            vd->cfg->display.height);
 
     UpdateDisplayFormat(vd, vd->fmt);
 
-    sys->picQuad.UpdateViewport( &sys->area.place, sys->display.pixelFormat );
+    const vout_display_place_t *quad_place;
+    if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        quad_place = &sys->scalePlace;
+    else
+        quad_place = vd->place;
+    sys->picQuad.UpdateViewport( quad_place, sys->display.pixelFormat );
 
     d3d11_device_lock( sys->d3d_dev );
 
@@ -689,10 +698,14 @@ static int Control(vout_display_t *vd, int query)
         // fallthrough
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+    if (use_scaler)
     {
-        vout_display_place_t before_place = sys->area.place;
-        vout_display_PlacePicture(&sys->area.place, &sys->picQuad.quad_fmt, &vd->cfg->display);
-        sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->area.place);
+        vout_display_place_t before_place = sys->scalePlace;
+        sys->scalePlace.x = 0;
+        sys->scalePlace.y = 0;
+        sys->scalePlace.width = sys->picQuad.quad_fmt.i_width;
+        sys->scalePlace.height = sys->picQuad.quad_fmt.i_height;
+        sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
         break;
     }
     }
@@ -1131,7 +1144,10 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     InitScaleProcessor(vd);
 
-    sys->area.place = *vd->place;
+    sys->scalePlace.x = 0;
+    sys->scalePlace.y = 0;
+    sys->scalePlace.width = vd->cfg->display.width;
+    sys->scalePlace.height = vd->cfg->display.height;
     sys->area.place_changed = true;
 
     err = UpdateDisplayFormat(vd, &sys->picQuad.quad_fmt);
@@ -1575,7 +1591,12 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       return VLC_EGENERIC;
     }
 
-    sys->picQuad.UpdateViewport( &sys->area.place, sys->display.pixelFormat );
+    const vout_display_place_t *quad_place;
+    if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
+        quad_place = &sys->scalePlace;
+    else
+        quad_place = vd->place;
+    sys->picQuad.UpdateViewport( quad_place, sys->display.pixelFormat );
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
