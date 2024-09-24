@@ -35,6 +35,7 @@
 #include <vlc_url.h>                /* vlc_uri2path */
 #include <vlc_mime.h>               /* mime type */
 #include <vlc_fs.h>
+#include <vlc_charset.h>
 
 #include <sys/stat.h>
 
@@ -82,7 +83,6 @@
 #include <oggfile.h>
 #include <oggflacfile.h>
 #include <opusfile.h>
-#include "../demux/xiph_metadata.h"
 #include "ID3Pictures.h"
 
 #include <aifffile.h>
@@ -858,61 +858,8 @@ static void ReadMetaFromXiph( Ogg::XiphComment* tag, demux_meta_t* p_demux_meta,
         }
     }
 
-    // Try now to get embedded art
-    StringList mime_list { tag->fieldListMap()[ "COVERARTMIME" ] };
-    StringList art_list { tag->fieldListMap()[ "COVERART" ] };
-
-    input_attachment_t *p_attachment;
-
-    if( mime_list.size() != 0 && art_list.size() != 0 )
-    {
-        // We get only the first cover art
-        if( mime_list.size() > 1 || art_list.size() > 1 )
-            msg_Warn( p_demux_meta, "Found %i embedded arts, so using only the first one",
-                    art_list.size() );
-
-        const char* psz_name = "cover";
-        const char* psz_mime = mime_list[0].toCString(true);
-        const char* psz_description = "cover";
-
-        uint8_t *p_data;
-        int i_data = vlc_b64_decode_binary( &p_data, art_list[0].toCString(false) );
-
-        msg_Dbg( p_demux_meta, "Found embedded art: %s (%s) is %i bytes",
-                psz_name, psz_mime, i_data );
-
-        p_attachment = vlc_input_attachment_New( psz_name, psz_mime,
-                psz_description, p_data, i_data );
-        free( p_data );
-    }
-    else
-    {
-        StringList block_picture_list { tag->fieldListMap()[ "METADATA_BLOCK_PICTURE" ] };
-        if( block_picture_list.size() == 0 )
-            return;
-
-        uint8_t *p_data;
-        int i_cover_score;
-        int i_cover_idx;
-        int i_data = vlc_b64_decode_binary( &p_data, block_picture_list[0].toCString(false) );
-        i_cover_score = i_cover_idx = 0;
-        /* TODO: Use i_cover_score / i_cover_idx to select the picture. */
-        p_attachment = ParseFlacPicture( p_data, i_data, 0,
-            &i_cover_score, &i_cover_idx );
-        free( p_data );
-    }
-
-    if (p_attachment) {
-        TAB_APPEND_CAST( (input_attachment_t**),
-                p_demux_meta->i_attachments, p_demux_meta->attachments,
-                p_attachment );
-
-        char *psz_url;
-        if( asprintf( &psz_url, "attachment://%s", p_attachment->psz_name ) != -1 ) {
-            vlc_meta_SetArtURL( p_meta, psz_url );
-            free( psz_url );
-        }
-    }
+    // Taglib extracts if(key == "METADATA_BLOCK_PICTURE" || key == "COVERART")
+    ProcessAPICListFromFLAC( tag->pictureList(), p_demux_meta, p_meta );
 }
 
 /**
