@@ -149,13 +149,13 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         CommonDisplaySizeChanged(&sys->area);
+        sys->area.place_changed = true; // needs a ChangeSize() call
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->area.place_changed = true;
-        // fallthrough
+        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        CommonPlacePicture(vd, &sys->area);
         break;
     }
     return VLC_SUCCESS;
@@ -182,10 +182,9 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area, vd->source);
+    CommonInit(&sys->area, NULL);
     if (CommonWindowInit(vd, &sys->area, false))
         goto error;
-    CommonPlacePicture(vd, &sys->area);
 
     /* */
     if (Init(vd, fmtp))
@@ -226,20 +225,20 @@ static void Display(vout_display_t *vd, picture_t *picture)
     video_format_t fmt_rot;
     video_format_ApplyRotation(&fmt_rot, vd->source);
 
-    if (sys->area.place.width  != fmt_rot.i_visible_width ||
-        sys->area.place.height != fmt_rot.i_visible_height) {
+    if (vd->place->width  != fmt_rot.i_visible_width ||
+        vd->place->height != fmt_rot.i_visible_height) {
         SetStretchBltMode(hdc, COLORONCOLOR);
 
-        StretchBlt(hdc, sys->area.place.x, sys->area.place.y,
-                   sys->area.place.width, sys->area.place.height,
+        StretchBlt(hdc, vd->place->x, vd->place->y,
+                   vd->place->width, vd->place->height,
                    sys->off_dc,
                    fmt_rot.i_x_offset, fmt_rot.i_y_offset,
                    fmt_rot.i_x_offset + fmt_rot.i_visible_width,
                    fmt_rot.i_y_offset + fmt_rot.i_visible_height,
                    SRCCOPY);
     } else {
-        BitBlt(hdc, sys->area.place.x, sys->area.place.y,
-               sys->area.place.width, sys->area.place.height,
+        BitBlt(hdc, vd->place->x, vd->place->y,
+               vd->place->width, vd->place->height,
                sys->off_dc,
                fmt_rot.i_x_offset, fmt_rot.i_y_offset,
                SRCCOPY);
