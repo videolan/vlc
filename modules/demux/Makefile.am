@@ -1,7 +1,8 @@
 demuxdir = $(pluginsdir)/demux
 demux_LTLIBRARIES =
 
-libxiph_metadata_la_SOURCES = demux/xiph_metadata.h demux/xiph_metadata.c
+libxiph_metadata_la_SOURCES = demux/xiph_metadata.h demux/xiph_metadata.c \
+			      meta_engine/ID3Pictures.h
 libxiph_metadata_la_LDFLAGS = -static
 noinst_LTLIBRARIES += libxiph_metadata.la
 

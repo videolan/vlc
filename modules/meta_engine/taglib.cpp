@@ -82,6 +82,7 @@
 #include <oggflacfile.h>
 #include <opusfile.h>
 #include "../demux/xiph_metadata.h"
+#include "ID3Pictures.h"
 
 #include <aifffile.h>
 #include <wavfile.h>
@@ -565,33 +566,6 @@ static void ReadMetaFromASF( ASF::Tag* tag, demux_meta_t* p_demux_meta, vlc_meta
 static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
                                       demux_meta_t* p_demux_meta, vlc_meta_t* p_meta )
 {
-    /* Preferred type of image
-     * The 21 types are defined in id3v2 standard:
-     * http://www.id3.org/id3v2.4.0-frames */
-    static const uint8_t scores[] = {
-        0,  /* Other */
-        5,  /* 32x32 PNG image that should be used as the file icon */
-        4,  /* File icon of a different size or format. */
-        20, /* Front cover image of the album. */
-        19, /* Back cover image of the album. */
-        13, /* Inside leaflet page of the album. */
-        18, /* Image from the album itself. */
-        17, /* Picture of the lead artist or soloist. */
-        16, /* Picture of the artist or performer. */
-        14, /* Picture of the conductor. */
-        15, /* Picture of the band or orchestra. */
-        9,  /* Picture of the composer. */
-        8,  /* Picture of the lyricist or text writer. */
-        7,  /* Picture of the recording location or studio. */
-        10, /* Picture of the artists during recording. */
-        11, /* Picture of the artists during performance. */
-        6,  /* Picture from a movie or video related to the track. */
-        1,  /* Picture of a large, coloured fish. */
-        12, /* Illustration related to the track. */
-        3,  /* Logo of the band or performer. */
-        2   /* Logo of the publisher (record company). */
-    };
-
     const ID3v2::AttachedPictureFrame *defaultPic = nullptr;
     for( auto iter = list.begin(); iter != list.end(); ++iter )
     {
@@ -605,8 +579,8 @@ static void ProcessAPICListFromId3v2( const ID3v2::FrameList &list,
         }
         else
         {
-            int scorea = defaultPic->type() >= ARRAY_SIZE(scores) ? 0 : scores[defaultPic->type()];
-            int scoreb = p->type() >= ARRAY_SIZE(scores) ? 0 : scores[p->type()];
+            int scorea = defaultPic->type() >= ARRAY_SIZE(ID3v2_cover_scores) ? 0 : ID3v2_cover_scores[defaultPic->type()];
+            int scoreb = p->type() >= ARRAY_SIZE(ID3v2_cover_scores) ? 0 : ID3v2_cover_scores[p->type()];
             if(scoreb > scorea)
                 defaultPic = p;
         }

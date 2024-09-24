@@ -4,6 +4,7 @@ libfolder_plugin_la_SOURCES = meta_engine/folder.c
 meta_LTLIBRARIES = libfolder_plugin.la
 
 libtaglib_plugin_la_SOURCES = meta_engine/taglib.cpp \
+			      meta_engine/ID3Pictures.h \
 	demux/xiph_metadata.h demux/xiph_metadata.c
 libtaglib_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(TAGLIB_CFLAGS)
 libtaglib_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(metadir)'
