@@ -282,7 +282,9 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
             sys->picQuad.generic.i_width = sys->picQuad.quad_fmt.i_width;
             sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
 
-            CommonPlacePicture(vd, &sys->area);
+            vout_display_place_t before_place = sys->area.place;
+            vout_display_PlacePicture(&sys->area.place, &sys->picQuad.quad_fmt, &vd->cfg->display);
+            sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->area.place);
         }
     }
 
@@ -534,7 +536,7 @@ static int Open(vout_display_t *vd,
     if (ret != VLC_SUCCESS)
         goto error;
 
-    CommonInit(&sys->area, &sys->picQuad.quad_fmt);
+    CommonInit(&sys->area, nullptr);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = (libvlc_video_update_output_cb)var_InheritAddress( vd, "vout-cb-update-output" );
@@ -687,8 +689,12 @@ static int Control(vout_display_t *vd, int query)
         // fallthrough
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        CommonPlacePicture(vd, &sys->area);
+    {
+        vout_display_place_t before_place = sys->area.place;
+        vout_display_PlacePicture(&sys->area.place, &sys->picQuad.quad_fmt, &vd->cfg->display);
+        sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->area.place);
         break;
+    }
     }
 
     if ( sys->area.place_changed )
@@ -1125,7 +1131,8 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 
     InitScaleProcessor(vd);
 
-    CommonPlacePicture(vd, &sys->area);
+    sys->area.place = *vd->place;
+    sys->area.place_changed = true;
 
     err = UpdateDisplayFormat(vd, &sys->picQuad.quad_fmt);
     if (err != VLC_SUCCESS) {
