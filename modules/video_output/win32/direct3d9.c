@@ -413,7 +413,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     /* */
     region->texture = sys->sceneTexture;
     Direct3D9SetupVertices(region->vertex, &texture_visible_rect, vd->source,
-                           &sys->area.place, 255, vd->source->orientation);
+                           vd->place, 255, vd->source->orientation);
     return VLC_SUCCESS;
 }
 
@@ -1669,10 +1669,9 @@ static int Control(vout_display_t *vd, int query)
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->area.place_changed = true;
-        // fallthrough
+        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        CommonPlacePicture(vd, &sys->area);
         break;
     }
     return VLC_SUCCESS;
@@ -1770,7 +1769,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area, vd->source);
+    CommonInit(&sys->area, NULL);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -1788,8 +1787,6 @@ static int Open(vout_display_t *vd,
         sys->swapCb              = LocalSwapchainSwap;
         sys->startEndRenderingCb = NULL;
     }
-
-    CommonPlacePicture(vd, &sys->area);
 
     sys->dec_device = context ? vlc_video_context_HoldDevice(context) : NULL;
     sys->d3d9_device = GetD3D9OpaqueDevice(sys->dec_device);
