@@ -49,9 +49,9 @@
 #include "d3d11_tonemap.h"
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include "d3d11_swapchain.h"
+#include "common.h"
 #endif
 
-#include "common.h"
 #include "../../video_chroma/copy.h"
 
 #include <dxgi1_6.h>

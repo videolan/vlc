@@ -33,7 +33,6 @@ extern "C" {
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
 #define RECTHeight(r)  (LONG)((r).bottom - (r).top)
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 struct event_thread_t;
 
 /*****************************************************************************
@@ -45,7 +44,6 @@ int  CommonWindowInit(vout_display_t *, struct event_thread_t **,
 void CommonWindowClean(struct event_thread_t *);
 HWND CommonVideoHWND(const struct event_thread_t *);
 void CommonDisplaySizeChanged(struct event_thread_t *);
-#endif /* WINAPI_PARTITION_DESKTOP */
 
 # ifdef __cplusplus
 }

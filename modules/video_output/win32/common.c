@@ -41,7 +41,6 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* */
 int CommonWindowInit(vout_display_t *vd, struct event_thread_t **event,
                      bool projection_gestures)
@@ -79,4 +78,3 @@ void CommonDisplaySizeChanged(struct event_thread_t *event)
         EventThreadUpdateSize(event);
     }
 }
-#endif /* WINAPI_PARTITION_DESKTOP */

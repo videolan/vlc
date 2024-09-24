@@ -217,8 +217,7 @@ libdirect3d11_plugin_la_SOURCES = video_output/win32/direct3d11.cpp \
  video_output/win32/d3d11_shaders.cpp video_output/win32/d3d11_shaders.h \
  video_output/win32/d3d11_tonemap.cpp video_output/win32/d3d11_tonemap.h \
  video_output/win32/d3d_shaders.c video_output/win32/d3d_shaders.h \
- video_output/win32/d3d_dynamic_shader.c video_output/win32/d3d_dynamic_shader.h \
- video_output/win32/common.c video_output/win32/common.h
+ video_output/win32/d3d_dynamic_shader.c video_output/win32/d3d_dynamic_shader.h
 libdirect3d11_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(LIBCOMCXXFLAGS)
 libdirect3d11_plugin_la_LIBADD = libchroma_copy.la libd3d11_common.la $(LIBCOM) -luuid -ldxgi -ld3d11
 libdirect3d11_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
@@ -226,6 +225,7 @@ if !HAVE_WINSTORE
 libdirect3d11_plugin_la_CPPFLAGS += -DHAVE_WIN32_SENSORS
 libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \
+ video_output/win32/common.c video_output/win32/common.h \
  video_output/win32/d3d11_swapchain.cpp video_output/win32/d3d11_swapchain.h \
  video_output/win32/dxgi_swapchain.cpp video_output/win32/dxgi_swapchain.h \
  video_output/win32/sensors.cpp \
