@@ -120,6 +120,7 @@ enum d3d11_hdr
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area = {};
+    bool                     place_changed = false;
 
     int                      log_level = 1;
 
@@ -288,7 +289,7 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
             sys->scalePlace.y = 0;
             sys->scalePlace.width = sys->picQuad.quad_fmt.i_width;
             sys->scalePlace.height = sys->picQuad.quad_fmt.i_height;
-            sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
+            sys->place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
         }
     }
 
@@ -367,7 +368,7 @@ static void UpdateSize(vout_display_t *vd)
 
     d3d11_device_unlock( sys->d3d_dev );
 
-    sys->area.place_changed = false;
+    sys->place_changed = false;
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
@@ -694,7 +695,7 @@ static int Control(vout_display_t *vd, int query)
 #endif /* WINAPI_PARTITION_DESKTOP */
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        sys->area.place_changed = true;
+        sys->place_changed = true;
         // fallthrough
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -705,12 +706,12 @@ static int Control(vout_display_t *vd, int query)
         sys->scalePlace.y = 0;
         sys->scalePlace.width = sys->picQuad.quad_fmt.i_width;
         sys->scalePlace.height = sys->picQuad.quad_fmt.i_height;
-        sys->area.place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
+        sys->place_changed |= !vout_display_PlaceEquals(&before_place, &sys->scalePlace);
         break;
     }
     }
 
-    if ( sys->area.place_changed )
+    if ( sys->place_changed )
     {
         UpdateSize(vd);
     }
@@ -1148,7 +1149,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
     sys->scalePlace.y = 0;
     sys->scalePlace.width = vd->cfg->display.width;
     sys->scalePlace.height = vd->cfg->display.height;
-    sys->area.place_changed = true;
+    sys->place_changed = true;
 
     err = UpdateDisplayFormat(vd, &sys->picQuad.quad_fmt);
     if (err != VLC_SUCCESS) {

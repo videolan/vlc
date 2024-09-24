@@ -43,7 +43,7 @@
 
 void CommonInit(display_win32_area_t *area)
 {
-    area->place_changed = false;
+    area->event = NULL;
 }
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)

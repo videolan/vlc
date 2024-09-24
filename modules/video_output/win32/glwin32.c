@@ -63,6 +63,7 @@ vlc_module_end()
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area;
+    bool                     place_changed;
 
     vlc_gl_t              *gl;
     vout_display_opengl_t *vgl;
@@ -90,7 +91,7 @@ static int Control(vout_display_t *vd, int query)
         CommonDisplaySizeChanged(&sys->area);
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        sys->area.place_changed = true;
+        sys->place_changed = true;
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -130,7 +131,7 @@ UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
     ret = vout_display_opengl_UpdateFormat(sys->vgl, fmt, vctx);
 
     // /* Force to recompute the viewport on next picture */
-    sys->area.place_changed = true;
+    sys->place_changed = true;
 
     /* Restore viewpoint */
     int vp_ret = vout_display_opengl_SetViewpoint(sys->vgl, &sys->viewpoint);
@@ -170,6 +171,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     /* */
+    sys->place_changed = false;
     CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
@@ -252,7 +254,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
         return;
-    if (sys->area.place_changed)
+    if (sys->place_changed)
     {
         vout_display_place_t place = *vd->place;
 
@@ -262,7 +264,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         vlc_gl_Resize (sys->gl, place.width, place.height);
         vout_display_opengl_SetOutputSize(sys->vgl, vd->cfg->display.width, vd->cfg->display.height);
         vout_display_opengl_Viewport(sys->vgl, place.x, place.y, place.width, place.height);
-        sys->area.place_changed = false;
+        sys->place_changed = false;
     }
     vout_display_opengl_Prepare (sys->vgl, picture, subpicture);
     vlc_gl_ReleaseCurrent (sys->gl);

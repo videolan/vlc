@@ -120,6 +120,7 @@ static const vlc_fourcc_t d3d_subpicture_chromas[] = {
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area;
+    bool                     place_changed;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
@@ -1107,7 +1108,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     vout_display_sys_t *sys = vd->sys;
 
     /* Position Change */
-    if (sys->area.place_changed) {
+    if (sys->place_changed) {
 #if 0 /* need that when bicubic filter is available */
         RECT rect;
         UINT width, height;
@@ -1127,7 +1128,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         UpdateOutput(vd, vd->fmt, NULL);
 
         sys->clear_scene = true;
-        sys->area.place_changed = false;
+        sys->place_changed = false;
     }
 
     d3d9_device_t *p_d3d9_dev = &sys->d3d9_device->d3ddev;
@@ -1668,7 +1669,7 @@ static int Control(vout_display_t *vd, int query)
         CommonDisplaySizeChanged(&sys->area);
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        sys->area.place_changed = true;
+        sys->place_changed = true;
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -1769,6 +1770,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->place_changed = false;
     CommonInit(&sys->area);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );

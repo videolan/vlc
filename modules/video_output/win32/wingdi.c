@@ -60,6 +60,7 @@ vlc_module_end ()
 typedef struct vout_display_sys_t
 {
     display_win32_area_t     area;
+    bool                     place_changed;
 
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
@@ -125,7 +126,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->area.place_changed)
+    if (sys->place_changed)
     {
         HDC hdc = GetDC(CommonVideoHWND(&sys->area));
         int err = ChangeSize(vd, hdc);
@@ -134,7 +135,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         if (unlikely(err != VLC_SUCCESS))
             return;
 
-        sys->area.place_changed = false;
+        sys->place_changed = false;
     }
 
     assert((LONG)picture->format.i_visible_width  == sys->bmiInfo.bmiHeader.biWidth &&
@@ -149,10 +150,10 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         CommonDisplaySizeChanged(&sys->area);
-        sys->area.place_changed = true; // needs a ChangeSize() call
+        sys->place_changed = true; // needs a ChangeSize() call
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        sys->area.place_changed = true;
+        sys->place_changed = true;
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
@@ -182,6 +183,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->place_changed = true;
     CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area, false))
         goto error;

@@ -36,7 +36,6 @@ extern "C" {
 
 typedef struct display_win32_area_t
 {
-    bool                  place_changed;
     struct event_thread_t *event; // only use if sys.event is not NULL
 } display_win32_area_t;
 
