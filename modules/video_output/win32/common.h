@@ -30,30 +30,23 @@
 extern "C" {
 #endif// __cplusplus
 
+#define RECTWidth(r)   (LONG)((r).right - (r).left)
+#define RECTHeight(r)  (LONG)((r).bottom - (r).top)
+
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+struct event_thread_t;
+
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
 
-typedef struct display_win32_area_t
-{
-    struct event_thread_t *event; // only use if sys.event is not NULL
-} display_win32_area_t;
-
-#define RECTWidth(r)   (LONG)((r).right - (r).left)
-#define RECTHeight(r)  (LONG)((r).bottom - (r).top)
-
-/*****************************************************************************
- * Prototypes from common.c
- *****************************************************************************/
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-int  CommonWindowInit(vout_display_t *, display_win32_area_t *,
+int  CommonWindowInit(vout_display_t *, struct event_thread_t **,
                       bool projection_gestures);
-void CommonWindowClean(display_win32_area_t *);
-HWND CommonVideoHWND(const display_win32_area_t *);
-void CommonDisplaySizeChanged(display_win32_area_t *);
+void CommonWindowClean(struct event_thread_t *);
+HWND CommonVideoHWND(const struct event_thread_t *);
+void CommonDisplaySizeChanged(struct event_thread_t *);
 #endif /* WINAPI_PARTITION_DESKTOP */
 
-void CommonInit(display_win32_area_t *);
 # ifdef __cplusplus
 }
 # endif

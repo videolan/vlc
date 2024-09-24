@@ -59,7 +59,7 @@ vlc_module_end ()
  *****************************************************************************/
 typedef struct vout_display_sys_t
 {
-    display_win32_area_t     area;
+    struct event_thread_t    *video_wnd;
     bool                     place_changed;
 
     /* Our offscreen bitmap and its framebuffer */
@@ -128,9 +128,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     if (sys->place_changed)
     {
-        HDC hdc = GetDC(CommonVideoHWND(&sys->area));
+        HDC hdc = GetDC(CommonVideoHWND(sys->video_wnd));
         int err = ChangeSize(vd, hdc);
-        ReleaseDC(CommonVideoHWND(&sys->area), hdc);
+        ReleaseDC(CommonVideoHWND(sys->video_wnd), hdc);
 
         if (unlikely(err != VLC_SUCCESS))
             return;
@@ -149,7 +149,7 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        CommonDisplaySizeChanged(&sys->area);
+        CommonDisplaySizeChanged(sys->video_wnd);
         sys->place_changed = true; // needs a ChangeSize() call
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
@@ -184,8 +184,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     sys->place_changed = true;
-    CommonInit(&sys->area);
-    if (CommonWindowInit(vd, &sys->area, false))
+    if (CommonWindowInit(vd, &sys->video_wnd, false))
         goto error;
 
     /* */
@@ -210,7 +209,7 @@ static void Close(vout_display_t *vd)
 
     Clean(vd);
 
-    CommonWindowClean(&sys->area);
+    CommonWindowClean(sys->video_wnd);
 
     free(sys);
 }
@@ -220,7 +219,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    HDC hdc = GetDC(CommonVideoHWND(&sys->area));
+    HDC hdc = GetDC(CommonVideoHWND(sys->video_wnd));
 
     SelectObject(sys->off_dc, sys->off_bitmap);
 
@@ -246,7 +245,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
                SRCCOPY);
     }
 
-    ReleaseDC(CommonVideoHWND(&sys->area), hdc);
+    ReleaseDC(CommonVideoHWND(sys->video_wnd), hdc);
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
@@ -256,7 +255,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     /* Initialize an offscreen bitmap for direct buffer operations. */
 
     /* */
-    HDC window_dc = GetDC(CommonVideoHWND(&sys->area));
+    HDC window_dc = GetDC(CommonVideoHWND(sys->video_wnd));
 
     /* */
     int i_depth = GetDeviceCaps(window_dc, PLANES) *
@@ -288,7 +287,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
         break;
     default:
         msg_Err(vd, "screen depth %i not supported", i_depth);
-        ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
+        ReleaseDC(CommonVideoHWND(sys->video_wnd), window_dc);
         return VLC_EGENERIC;
     }
 
@@ -306,7 +305,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     if (err != VLC_SUCCESS)
         DeleteDC(sys->off_dc);
 
-    ReleaseDC(CommonVideoHWND(&sys->area), window_dc);
+    ReleaseDC(CommonVideoHWND(sys->video_wnd), window_dc);
 
     return err;
 }

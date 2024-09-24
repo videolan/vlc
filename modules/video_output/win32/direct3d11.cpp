@@ -119,7 +119,9 @@ enum d3d11_hdr
 
 typedef struct vout_display_sys_t
 {
-    display_win32_area_t     area = {};
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    struct event_thread_t    *video_wnd = nullptr;
+#endif
     bool                     place_changed = false;
 
     int                      log_level = 1;
@@ -546,8 +548,6 @@ static int Open(vout_display_t *vd,
     if (ret != VLC_SUCCESS)
         goto error;
 
-    CommonInit(&sys->area);
-
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = (libvlc_video_update_output_cb)var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = (libvlc_video_swap_cb)var_InheritAddress( vd, "vout-cb-swap" );
@@ -579,7 +579,7 @@ static int Open(vout_display_t *vd,
 #else // WINAPI_PARTITION_DESKTOP
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_HWND)
         {
-            if (CommonWindowInit(vd, &sys->area,
+            if (CommonWindowInit(vd, &sys->video_wnd,
                        sys->projection_mode != PROJECTION_MODE_RECTANGULAR))
                 goto error;
         }
@@ -591,7 +591,7 @@ static int Open(vout_display_t *vd,
                                                         vd->cfg->window->display.dcomp_device,
                                                         vd->cfg->window->handle.dcomp_visual);
         else
-            swap = DXGI_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(&sys->area));
+            swap = DXGI_CreateLocalSwapchainHandleHwnd(VLC_OBJECT(vd), CommonVideoHWND(sys->video_wnd));
         if (unlikely(swap == NULL))
             goto error;
 
@@ -645,7 +645,7 @@ static void Close(vout_display_t *vd)
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     D3D_ReleaseShaderCompiler(sys->shaders);
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    CommonWindowClean(&sys->area);
+    CommonWindowClean(sys->video_wnd);
 #endif
     Direct3D11Close(vd);
     delete sys;
@@ -691,7 +691,7 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        CommonDisplaySizeChanged(&sys->area);
+        CommonDisplaySizeChanged(sys->video_wnd);
 #endif /* WINAPI_PARTITION_DESKTOP */
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:

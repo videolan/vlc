@@ -41,46 +41,42 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(display_win32_area_t *area)
-{
-    area->event = NULL;
-}
-
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* */
-int CommonWindowInit(vout_display_t *vd, display_win32_area_t *area,
+int CommonWindowInit(vout_display_t *vd, struct event_thread_t **event,
                      bool projection_gestures)
 {
+    *event = NULL;
     if (unlikely(vd->cfg->window == NULL))
         return VLC_EGENERIC;
 
     /* */
-    area->event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window,
-                                    &vd->cfg->display,
-                                    projection_gestures ? &vd->owner : NULL);
-    if (!area->event)
+    *event = EventThreadCreate(VLC_OBJECT(vd), vd->cfg->window,
+                               &vd->cfg->display,
+                               projection_gestures ? &vd->owner : NULL);
+    if (!*event)
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
 
-HWND CommonVideoHWND(const display_win32_area_t *area)
+HWND CommonVideoHWND(const struct event_thread_t *event)
 {
-    return EventThreadVideoHWND(area->event);
+    return EventThreadVideoHWND(event);
 }
 
 /* */
-void CommonWindowClean(display_win32_area_t *sys)
+void CommonWindowClean(struct event_thread_t *event)
 {
-    EventThreadDestroy(sys->event);
+    EventThreadDestroy(event);
 }
 
-void CommonDisplaySizeChanged(display_win32_area_t *area)
+void CommonDisplaySizeChanged(struct event_thread_t *event)
 {
     // Update dimensions
-    if (area->event != NULL)
+    if (event != NULL)
     {
-        EventThreadUpdateSize(area->event);
+        EventThreadUpdateSize(event);
     }
 }
 #endif /* WINAPI_PARTITION_DESKTOP */

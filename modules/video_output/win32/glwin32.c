@@ -62,7 +62,7 @@ vlc_module_end()
  *****************************************************************************/
 typedef struct vout_display_sys_t
 {
-    display_win32_area_t     area;
+    struct event_thread_t    *video_wnd;
     bool                     place_changed;
 
     vlc_gl_t              *gl;
@@ -88,7 +88,7 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        CommonDisplaySizeChanged(&sys->area);
+        CommonDisplaySizeChanged(sys->video_wnd);
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
@@ -113,7 +113,7 @@ static vlc_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
         return NULL;
 
     wnd->type = VLC_WINDOW_TYPE_HWND;
-    wnd->handle.hwnd = CommonVideoHWND(&sys->area);
+    wnd->handle.hwnd = CommonVideoHWND(sys->video_wnd);
     wnd->ops = &embedVideoWindow_Ops;
     return wnd;
 }
@@ -172,8 +172,7 @@ static int Open(vout_display_t *vd,
 
     /* */
     sys->place_changed = false;
-    CommonInit(&sys->area);
-    if (CommonWindowInit(vd, &sys->area,
+    if (CommonWindowInit(vd, &sys->video_wnd,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
 
@@ -239,7 +238,7 @@ static void Close(vout_display_t *vd)
         vlc_object_delete(surface);
     }
 
-    CommonWindowClean(&sys->area);
+    CommonWindowClean(sys->video_wnd);
 
     free(sys);
 }

@@ -119,7 +119,7 @@ static const vlc_fourcc_t d3d_subpicture_chromas[] = {
 
 typedef struct vout_display_sys_t
 {
-    display_win32_area_t     area;
+    struct event_thread_t    *video_wnd;
     bool                     place_changed;
 
     bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
@@ -1113,7 +1113,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         RECT rect;
         UINT width, height;
 
-        GetClientRect(CommonVideoHWND(&sys->area), &rect);
+        GetClientRect(CommonVideoHWND(sys->video_wnd), &rect);
         width  = RECTWidth(rect);
         height = RECTHeight(rect);
 
@@ -1242,9 +1242,9 @@ static void Swap(vout_display_t *vd)
 
     HRESULT hr;
     if (sys->d3d9_device->hd3d.use_ex) {
-        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, CommonVideoHWND(&sys->area), NULL, 0);
+        hr = IDirect3DDevice9Ex_PresentEx(p_d3d9_dev->devex, &src, &src, CommonVideoHWND(sys->video_wnd), NULL, 0);
     } else {
-        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, CommonVideoHWND(&sys->area), NULL);
+        hr = IDirect3DDevice9_Present(p_d3d9_dev->dev, &src, &src, CommonVideoHWND(sys->video_wnd), NULL);
     }
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%lX", hr);
@@ -1666,7 +1666,7 @@ static int Control(vout_display_t *vd, int query)
     vout_display_sys_t *sys = vd->sys;
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-        CommonDisplaySizeChanged(&sys->area);
+        CommonDisplaySizeChanged(sys->video_wnd);
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
@@ -1771,7 +1771,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     sys->place_changed = false;
-    CommonInit(&sys->area);
+    sys->video_wnd = NULL;
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = var_InheritAddress( vd, "vout-cb-update-output" );
@@ -1781,7 +1781,7 @@ static int Open(vout_display_t *vd,
     if ( sys->swapCb == NULL || sys->startEndRenderingCb == NULL || sys->updateOutputCb == NULL )
     {
         /* use our own callbacks, since there isn't any external ones */
-        if (CommonWindowInit(vd, &sys->area, false))
+        if (CommonWindowInit(vd, &sys->video_wnd, false))
             goto error;
 
         sys->outside_opaque = vd;
@@ -1856,7 +1856,7 @@ static int Open(vout_display_t *vd,
     return VLC_SUCCESS;
 error:
     Direct3D9Close(vd);
-    CommonWindowClean(&sys->area);
+    CommonWindowClean(sys->video_wnd);
     Direct3D9Destroy(sys);
     free(vd->sys);
     return VLC_EGENERIC;
@@ -1871,7 +1871,7 @@ static void Close(vout_display_t *vd)
 
     Direct3D9Close(vd);
 
-    CommonWindowClean(&sys->area);
+    CommonWindowClean(sys->video_wnd);
 
     Direct3D9Destroy(sys);
 
