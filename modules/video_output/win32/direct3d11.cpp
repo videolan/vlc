@@ -354,6 +354,8 @@ static void UpdateSize(vout_display_t *vd)
 
     d3d11_device_unlock( sys->d3d_dev );
 
+    sys->area.place_changed = false;
+
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
              sys->picQuad.cropViewport[0].TopLeftX, sys->picQuad.cropViewport[0].TopLeftY,
@@ -675,7 +677,6 @@ static int Control(vout_display_t *vd, int query)
     if ( sys->area.place_changed )
     {
         UpdateSize(vd);
-        sys->area.place_changed =false;
     }
 
     return VLC_SUCCESS;
