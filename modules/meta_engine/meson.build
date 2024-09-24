@@ -9,7 +9,7 @@ taglib_dep = dependency('taglib', version: '>= 1.11', required: get_option('tagl
 if taglib_dep.found()
     vlc_modules += {
         'name' : 'taglib',
-        'sources' : files('taglib.cpp', '../demux/xiph_metadata.c'),
+        'sources' : files('taglib.cpp'),
         'dependencies' : [taglib_dep, z_dep]
     }
 endif
