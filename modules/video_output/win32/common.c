@@ -107,6 +107,15 @@ void CommonWindowClean(display_win32_area_t *sys)
 {
     EventThreadDestroy(sys->event);
 }
+
+void CommonDisplaySizeChanged(display_win32_area_t *area)
+{
+    // Update dimensions
+    if (area->event != NULL)
+    {
+        EventThreadUpdateSize(area->event);
+    }
+}
 #endif /* WINAPI_PARTITION_DESKTOP */
 
 void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
@@ -114,13 +123,8 @@ void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        // Update dimensions
-        if (area->event != NULL)
-        {
-            EventThreadUpdateSize(area->event);
-        }
+        CommonDisplaySizeChanged(area);
 #endif /* WINAPI_PARTITION_DESKTOP */
-        CommonPlacePicture(vd, area);
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         area->place_changed = true;
