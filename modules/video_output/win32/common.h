@@ -36,8 +36,6 @@ extern "C" {
 
 typedef struct display_win32_area_t
 {
-    /* Coordinates of dest images (used when blitting to display) */
-    vout_display_place_t  place;
     bool                  place_changed;
     struct event_thread_t *event; // only use if sys.event is not NULL
 } display_win32_area_t;
