@@ -36,6 +36,10 @@
 
 #include <x265.h>
 
+#ifndef X265_MAX_FRAME_THREADS
+# define X265_MAX_FRAME_THREADS 16
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -156,6 +160,8 @@ static int  Open (vlc_object_t *p_this)
     x265_param_default(param);
 
     param->frameNumThreads = vlc_GetCPUCount();
+    if(param->frameNumThreads > X265_MAX_FRAME_THREADS)
+        param->frameNumThreads = X265_MAX_FRAME_THREADS;
     param->bEnableWavefront = 0; // buggy in x265, use frame threading for now
     param->maxCUSize = 16; /* use smaller macroblock */
 
