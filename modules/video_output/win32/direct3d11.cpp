@@ -864,7 +864,6 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
                 sys->picQuad.generic.i_width  = sys->picQuad.quad_fmt.i_width;
                 sys->picQuad.generic.i_height = sys->picQuad.quad_fmt.i_height;
 
-                CommonPlacePicture(vd, &sys->area);
                 UpdateSize(vd);
             }
         }
