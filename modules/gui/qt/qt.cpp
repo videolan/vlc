@@ -866,6 +866,34 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic_impl );
     Q_INIT_RESOURCE( qmake_QtQuick_Layouts );
     Q_INIT_RESOURCE( qmake_QtQuick_Templates );
+    // Qt Quick Effects:
+    Q_INIT_RESOURCE( qmake_QtQuick_Effects );
+    Q_INIT_RESOURCE( effects );
+    Q_INIT_RESOURCE( multieffect_shaders1 );
+    Q_INIT_RESOURCE( multieffect_shaders2 );
+    Q_INIT_RESOURCE( multieffect_shaders3 );
+    Q_INIT_RESOURCE( multieffect_shaders4 );
+    Q_INIT_RESOURCE( multieffect_shaders5 );
+    Q_INIT_RESOURCE( multieffect_shaders6 );
+    Q_INIT_RESOURCE( multieffect_shaders7 );
+    Q_INIT_RESOURCE( multieffect_shaders8 );
+    Q_INIT_RESOURCE( multieffect_shaders9 );
+    Q_INIT_RESOURCE( multieffect_shaders10 );
+    Q_INIT_RESOURCE( multieffect_shaders11 );
+    Q_INIT_RESOURCE( multieffect_shaders12 );
+    Q_INIT_RESOURCE( multieffect_shaders13 );
+    Q_INIT_RESOURCE( multieffect_shaders14 );
+    Q_INIT_RESOURCE( multieffect_shaders15 );
+    Q_INIT_RESOURCE( multieffect_shaders16 );
+    Q_INIT_RESOURCE( multieffect_shaders17 );
+    Q_INIT_RESOURCE( multieffect_shaders18 );
+    Q_INIT_RESOURCE( multieffect_shaders19 );
+    Q_INIT_RESOURCE( multieffect_shaders20 );
+    Q_INIT_RESOURCE( multieffect_shaders21 );
+    Q_INIT_RESOURCE( multieffect_shaders22 );
+    Q_INIT_RESOURCE( multieffect_shaders23 );
+    Q_INIT_RESOURCE( multieffect_shaders24 );
+    Q_INIT_RESOURCE( multieffect_shaders25 );
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     Q_INIT_RESOURCE( QuickControls2Basic_raw_qml_0 );
