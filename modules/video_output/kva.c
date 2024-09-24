@@ -883,7 +883,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             int y = i_mouse_y;
 
             /* Invert Y coordinate */
-            y = vd->cfg.display.height - y;
+            y = vd->cfg->display.height - y;
 
             vlc_window_ReportMouseMoved( vd->cfg->window, x, y );
 
