@@ -24,7 +24,8 @@ struct d3d11_scaler *D3D11_UpscalerCreate(vlc_object_t *, d3d11_device_t*, vlc_f
 void D3D11_UpscalerDestroy(struct d3d11_scaler *);
 int D3D11_UpscalerUpdate(vlc_object_t *, struct d3d11_scaler *, d3d11_device_t*,
                          const video_format_t *, video_format_t *,
-                         const vout_display_placement *);
+                         unsigned display_width, unsigned display_height,
+                         const vout_display_place_t *);
 int D3D11_UpscalerScale(vlc_object_t *, struct d3d11_scaler *, picture_sys_d3d11_t *);
 bool D3D11_UpscalerUsed(const struct d3d11_scaler *);
 void D3D11_UpscalerGetSRV(const struct d3d11_scaler *, ID3D11ShaderResourceView *SRV[DXGI_MAX_SHADER_VIEW]);

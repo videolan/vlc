@@ -232,7 +232,8 @@ static void ReleaseSRVs(d3d11_scaler *scaleProc)
 
 int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device_t*d3d_dev,
                          const video_format_t *fmt, video_format_t *quad_fmt,
-                         const vout_display_placement *cfg)
+                         unsigned display_width, unsigned display_height,
+                         const vout_display_place_t *video_place)
 {
     HRESULT hr;
     ID3D11Texture2D *_upscaled[DXGI_MAX_SHADER_VIEW];
@@ -242,14 +243,9 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     black.RGBA.A = 1.f;
     bool upscale = false;
 
-    vout_display_place_t place{};
-    auto display = *cfg;
-    display.fitting = VLC_VIDEO_FIT_SMALLER;
-    vout_display_PlacePicture(&place, fmt, &display);
-
     unsigned out_width, out_height;
-    out_width  = (display.width + (scaleProc->d3d_fmt->widthDenominator-1)) & ~(scaleProc->d3d_fmt->widthDenominator-1);
-    out_height = (display.height + (scaleProc->d3d_fmt->heightDenominator-1)) & ~(scaleProc->d3d_fmt->heightDenominator-1);
+    out_width  = (display_width + (scaleProc->d3d_fmt->widthDenominator-1)) & ~(scaleProc->d3d_fmt->widthDenominator-1);
+    out_height = (display_height + (scaleProc->d3d_fmt->heightDenominator-1)) & ~(scaleProc->d3d_fmt->heightDenominator-1);
 
     quad_fmt->i_x_offset = 0;
     quad_fmt->i_width = quad_fmt->i_visible_width = out_width;
@@ -259,10 +255,10 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     quad_fmt->i_sar_den = 1;
 
     if (scaleProc->Width == out_width && scaleProc->Height == out_height &&
-        vout_display_PlaceEquals(&scaleProc->place, &place))
+        vout_display_PlaceEquals(&scaleProc->place, video_place))
         // do nothing
         return VLC_SUCCESS;
-    scaleProc->place = place;
+    scaleProc->place = *video_place;
 
     scaleProc->usable = false;
 
@@ -439,10 +435,10 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     srcRect.bottom = srcRect.top  + fmt->i_visible_height;
 
     RECT dstRect;
-    dstRect.left   = place.x;
-    dstRect.top    = place.y;
-    dstRect.right  = dstRect.left + place.width;
-    dstRect.bottom = dstRect.top  + place.height;
+    dstRect.left   = video_place->x;
+    dstRect.top    = video_place->y;
+    dstRect.right  = dstRect.left + video_place->width;
+    dstRect.bottom = dstRect.top  + video_place->height;
 
     d3d11_device_lock(d3d_dev);
     scaleProc->d3dvidctx->VideoProcessorSetStreamSourceRect(scaleProc->processor.Get(),
@@ -457,8 +453,8 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
     if (scaleProc->super_res)
     {
         // only use super resolution when source is smaller than display
-        upscale = fmt->i_visible_width < place.width
-               || fmt->i_visible_height < place.height;
+        upscale = fmt->i_visible_width < video_place->width
+               || fmt->i_visible_height < video_place->height;
 
         if (d3d_dev->adapterDesc.VendorId == GPU_MANUFACTURER_NVIDIA)
         {

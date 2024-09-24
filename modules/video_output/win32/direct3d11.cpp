@@ -266,7 +266,9 @@ static int UpdateDisplayFormat(vout_display_t *vd, const video_format_t *fmt)
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
-                             vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
+                             vd->source, &sys->picQuad.quad_fmt,
+                             vd->cfg->display.width, vd->cfg->display.height,
+                             vd->place);
 
         if (D3D11_UpscalerUsed(sys->scaleProc))
         {
@@ -644,7 +646,9 @@ static int Control(vout_display_t *vd, int query)
     if (sys->upscaleMode == upscale_VideoProcessor || sys->upscaleMode == upscale_SuperResolution)
     {
         D3D11_UpscalerUpdate(VLC_OBJECT(vd), sys->scaleProc, sys->d3d_dev,
-                             vd->source, &sys->picQuad.quad_fmt, &vd->cfg->display);
+                             vd->source, &sys->picQuad.quad_fmt,
+                             vd->cfg->display.width, vd->cfg->display.height,
+                             vd->place);
 
         if (sys->scaleProc && D3D11_UpscalerUsed(sys->scaleProc))
         {
