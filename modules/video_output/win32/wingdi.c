@@ -60,6 +60,7 @@ vlc_module_end ()
 typedef struct vout_display_sys_t
 {
     struct event_thread_t    *video_wnd;
+    bool                     size_changed;
     bool                     place_changed;
 
     /* Our offscreen bitmap and its framebuffer */
@@ -76,10 +77,8 @@ static void           Display(vout_display_t *, picture_t *);
 static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
 
-static int ChangeSize(vout_display_t *vd, HDC hdc)
+static bool ChangeSize(vout_display_t *vd, HDC hdc)
 {
-    vout_display_sys_t *sys = vd->sys;
-
     // clear the background, even if creating the writable buffer fails
     RECT display = {
         .left   = 0,
@@ -87,7 +86,12 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
         .top    = 0,
         .bottom = vd->cfg->display.height,
     };
-    FillRect(hdc, &display, GetStockObject(BLACK_BRUSH));
+    return FillRect(hdc, &display, GetStockObject(BLACK_BRUSH)) == 0;
+}
+
+static bool ChangePlace(vout_display_t *vd, HDC hdc)
+{
+    vout_display_sys_t *sys = vd->sys;
 
     video_format_t fmt_rot;
     video_format_ApplyRotation(&fmt_rot, vd->source);
@@ -107,7 +111,7 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
                                            DIB_RGB_COLORS,
                                            &p_pic_buffer, NULL, 0);
         if (unlikely(sys->off_bitmap == NULL))
-            return VLC_EINVAL;
+            return true;
         sys->pic_buf.p_pixels = p_pic_buffer;
         sys->pic_buf.i_pixel_pitch = (bih->biBitCount + 7) / 8;
         sys->pic_buf.i_pitch = sys->pic_buf.i_visible_pitch =
@@ -115,7 +119,7 @@ static int ChangeSize(vout_display_t *vd, HDC hdc)
         sys->pic_buf.i_lines = sys->pic_buf.i_visible_lines =
             fmt_rot.i_visible_height;
     }
-    return VLC_SUCCESS;
+    return false;
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -126,16 +130,22 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->place_changed)
+    if (sys->place_changed || sys->size_changed)
     {
-        HDC hdc = GetDC(CommonVideoHWND(sys->video_wnd));
-        int err = ChangeSize(vd, hdc);
-        ReleaseDC(CommonVideoHWND(sys->video_wnd), hdc);
+        bool err = false;
+        HWND hwnd = CommonVideoHWND(sys->video_wnd);
+        HDC hdc = GetDC(hwnd);
+        if (sys->size_changed)
+            err |= ChangeSize(vd, hdc);
+        if (sys->place_changed)
+            err |= ChangePlace(vd, hdc);
+        ReleaseDC(hwnd, hdc);
 
-        if (unlikely(err != VLC_SUCCESS))
+        if (unlikely(err))
             return;
 
         sys->place_changed = false;
+        sys->size_changed = false;
     }
 
     assert((LONG)picture->format.i_visible_width  == sys->bmiInfo.bmiHeader.biWidth &&
@@ -150,7 +160,7 @@ static int Control(vout_display_t *vd, int query)
     switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         CommonDisplaySizeChanged(sys->video_wnd);
-        sys->place_changed = true; // needs a ChangeSize() call
+        sys->size_changed = true;
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->place_changed = true;
@@ -183,6 +193,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->size_changed = true;
     sys->place_changed = true;
     if (CommonWindowInit(vd, &sys->video_wnd, false))
         goto error;
