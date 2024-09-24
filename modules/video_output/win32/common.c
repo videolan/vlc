@@ -120,10 +120,13 @@ void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
             EventThreadUpdateSize(area->event);
         }
 #endif /* WINAPI_PARTITION_DESKTOP */
+        CommonPlacePicture(vd, area);
+        break;
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        area->place_changed = true;
         // fallthrough
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         CommonPlacePicture(vd, area);
         break;
 
