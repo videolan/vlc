@@ -91,10 +91,9 @@ static int Control(vout_display_t *vd, int query)
         break;
     case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
         sys->area.place_changed = true;
-        // fallthrough
+        break;
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        CommonPlacePicture(vd, &sys->area);
         break;
     }
     return VLC_SUCCESS;
@@ -171,11 +170,10 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     /* */
-    CommonInit(&sys->area, vd->source);
+    CommonInit(&sys->area, NULL);
     if (CommonWindowInit(vd, &sys->area,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
-    CommonPlacePicture(vd, &sys->area);
 
     vlc_window_SetTitle(vd->cfg->window, VOUT_TITLE " (OpenGL output)");
 
