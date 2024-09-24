@@ -187,13 +187,16 @@ FocusScope {
         onMouseMoved: {
             //short interval for mouse events
             if (Player.isInteractive)
-            {
-                toggleControlBarButtonAutoHide.restart()
-                videoSurface.cursorShape = Qt.ArrowCursor
-            }
-
+                interactiveAutoHideTimer.restart()
             else
                 playerToolbarVisibilityFSM.mouseMove();
+        }
+
+        Binding on cursorShape {
+            when: topBar.state === "hidden"
+                  && controlBar.state === "hidden"
+                  && !interactiveAutoHideTimer.running
+            value: Qt.BlankCursor
         }
     }
 
@@ -336,11 +339,6 @@ FocusScope {
             tintColor: windowTheme.bg.primary
 
             visible: MainCtx.pinVideoControls
-        }
-
-        onStateChanged: {
-            videoSurface.cursorShape = state === "visible"
-                                       ? Qt.ArrowCursor : Qt.BlankCursor
         }
     }
 
@@ -685,23 +683,17 @@ FocusScope {
     }
 
     Timer {
-        // toggleControlBarButton's visibility depends on this timer
-        id: toggleControlBarButtonAutoHide
-        running: true
+        // NavigationBox's visibility depends on this timer
+        id: interactiveAutoHideTimer
+        running: false
         repeat: false
         interval: 3000
-
-        onTriggered: {
-            // Cursor hides when toggleControlBarButton is not visible
-            videoSurface.forceActiveFocus()
-            videoSurface.cursorShape = Qt.BlankCursor
-        }
     }
 
     NavigationBox {
         id: navBox
         visible: Player.isInteractive && navBox.show
-                    && (toggleControlBarButtonAutoHide.running
+                    && (interactiveAutoHideTimer.running
                     || navBox.hovered || !rootPlayer.hasEmbededVideo)
 
         x: rootPlayer.x + VLCStyle.margin_normal + VLCStyle.applicationHorizontalMargin
@@ -718,10 +710,9 @@ FocusScope {
         }
     }
 
-    // NavigationBox's visibility depends on this timer
     Connections {
         target: MainCtx
-        function onNavBoxToggled() { toggleControlBarButtonAutoHide.restart() }
+        function onNavBoxToggled() { interactiveAutoHideTimer.restart() }
     }
 
     Connections {
@@ -741,7 +732,7 @@ FocusScope {
         visible: Player.isInteractive
                  && rootPlayer.hasEmbededVideo
                  && !(MainCtx.pinVideoControls && !Player.fullscreen)
-                 && (toggleControlBarButtonAutoHide.running === true
+                 && (interactiveAutoHideTimer.running === true
                      || controlBar.state !== "hidden" || toggleControlBarButton.hovered)
         focus: true
         anchors {
@@ -853,11 +844,7 @@ FocusScope {
 
         Keys.onPressed: (event) => {
             if (Player.isInteractive)
-            {
-                toggleControlBarButtonAutoHide.restart()
-                videoSurface.cursorShape = Qt.ArrowCursor
-            }
-
+                interactiveAutoHideTimer.restart()
             else
                 playerToolbarVisibilityFSM.keyboardMove()
         }
