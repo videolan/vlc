@@ -4,7 +4,7 @@
 
 # Common Xiph metadata library
 xiph_meta_lib = static_library('xiph_metadata',
-    sources: files('xiph_metadata.c'),
+    sources: files('xiph_metadata.c', '../meta_engine/ID3Pictures.h'),
     include_directories: [vlc_include_dirs],
     install: false,
     pic: true
