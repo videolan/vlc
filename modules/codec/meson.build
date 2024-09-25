@@ -22,15 +22,6 @@ vlc_modules += {
     'sources' : files('spdif.c')
 }
 
-# DTS Coherent Acoustics decoder
-dca_dep = dependency('libdca', version: '>= 0.0.5', required: get_option('dca'))
-vlc_modules += {
-    'name' : 'dca',
-    'sources' : files('dca.c'),
-    'dependencies' : [dca_dep, m_lib],
-    'enabled' : dca_dep.found(),
-}
-
 # adpcm codec
 vlc_modules += {
     'name' : 'adpcm',

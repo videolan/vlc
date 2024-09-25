@@ -2950,11 +2950,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([FDKAAC], [], [fdk-aac], [FDK-AAC encoder], [disabled])
 
 dnl
-dnl DTS Coherent Acoustics decoder plugin
-dnl
-PKG_ENABLE_MODULES_VLC([DCA], [dca], [libdca >= 0.0.5], [DTS Coherent Acoustics support with libdca], [auto])
-
-dnl
 dnl  Flac plugin
 dnl
 PKG_ENABLE_MODULES_VLC([FLAC], [], [flac], [libflac decoder/encoder support], [auto])

@@ -200,11 +200,6 @@ option('ogg',
     value : 'auto',
     description : 'Enable/disable libogg support')
 
-option('dca',
-    type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable libdca support')
-
 option('mpg123',
     type : 'feature',
     value : 'auto',
