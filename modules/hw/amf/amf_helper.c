@@ -34,7 +34,7 @@ int vlc_AMFCreateContext(struct vlc_amf_context *c)
     c->Context = NULL;
 
     AMFInit_Fn init = (AMFInit_Fn)GetProcAddress(hLib, AMF_INIT_FUNCTION_NAME);
-    res = init(c->Version, &c->pFactory); // use the highest possible value for that DLL
+    res = init(AMF_FULL_VERSION, &c->pFactory);
     if (unlikely(res != AMF_OK))
         goto error;
 
