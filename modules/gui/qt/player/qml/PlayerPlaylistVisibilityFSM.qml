@@ -43,15 +43,14 @@ FSM {
     id: fsm
  
     //incoming signals
+
+    //user clicked on the playlist button
     signal togglePlaylistVisibility()
+    //playlist visibility update externally
     signal updatePlaylistVisible()
     signal updatePlaylistDocked()
     signal updateVideoEmbed()
- 
-    //internal signals
-    signal _updateVideoEmbed()
-    onUpdateVideoEmbed: _updateVideoEmbed()
- 
+
     //exposed internal states
     property alias isPlaylistVisible: fsmVisible.active
  
@@ -62,7 +61,6 @@ FSM {
         updatePlaylistVisible: fsm.updatePlaylistVisible,
         updatePlaylistDocked: fsm.updatePlaylistDocked,
         updateVideoEmbed: fsm.updateVideoEmbed,
-        updateVideoEmbed: fsm._updateVideoEmbed,
     })
  
     FSMState {
@@ -90,15 +88,14 @@ FSM {
                 guard: () => !MainCtx.playlistDocked,
                 target: fsmFloating
             },
-            togglePlaylistVisibility: {
-                action: () => {
-                    MainCtx.playlistVisible = !MainCtx.playlistVisible
-                }
-            },
         })
  
         FSMState {
             id: fsmVisible
+
+            function enter() {
+                MainCtx.playlistVisible = true
+            }
  
             transitions: ({
                 updateVideoEmbed: {
@@ -107,7 +104,10 @@ FSM {
                 },
                 updatePlaylistVisible: {
                     guard: () => !MainCtx.playlistVisible,
-                    target: fsmHidden
+                    target: fsmFollowVisible
+                },
+                togglePlaylistVisibility: {
+                    target: fsmFollowVisible
                 },
             })
         }
@@ -121,9 +121,7 @@ FSM {
                 id: fsmFollowVisible
 
                 function enter() {
-                    //automatic transitions
-                    if (MainCtx.playlistVisible)
-                        fsm.updatePlaylistVisible()
+                    MainCtx.playlistVisible = false
                 }
 
                 transitions: ({
@@ -135,6 +133,9 @@ FSM {
                         guard: () => MainCtx.playlistVisible,
                         target: fsmVisible
                     },
+                    togglePlaylistVisibility: {
+                        target: fsmVisible
+                    },
                 })
             }
 
@@ -142,9 +143,15 @@ FSM {
                 id: fsmEmbed
 
                 transitions: ({
-                    updateVideoEmbed: { //guards tested in order{
-                        guard: () => !MainCtx.hasEmbededVideo,
+                    updateVideoEmbed: [{ //guards tested in order{
+                        guard: () => !MainCtx.hasEmbededVideo && !MainCtx.playlistVisible,
                         target: fsmFollowVisible
+                    }, {
+                        guard: () => !MainCtx.hasEmbededVideo && MainCtx.playlistVisible,
+                        target: fsmVisible
+                    }],
+                    togglePlaylistVisibility: {
+                        target: fsmVisible
                     },
                     updatePlaylistVisible: {
                         guard: () => MainCtx.playlistVisible,
