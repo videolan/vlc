@@ -499,20 +499,10 @@ static const char *const fit_descriptions[] = {
     "pixels (1:1). If you have a 16:9 screen, you might need to change this " \
     "to 4:3 in order to keep proportions.")
 
-#define SKIP_FRAMES_TEXT N_("Skip frames")
-#define SKIP_FRAMES_LONGTEXT N_( \
-    "Enables framedropping on MPEG2 stream. Framedropping " \
-    "occurs when your computer is not powerful enough" )
-
 #define DROP_LATE_FRAMES_TEXT N_("Drop late frames")
 #define DROP_LATE_FRAMES_LONGTEXT N_( \
     "This drops frames that are late (arrive to the video output after " \
     "their intended display date)." )
-
-#define QUIET_SYNCHRO_TEXT N_("Quiet synchro")
-#define QUIET_SYNCHRO_LONGTEXT N_( \
-    "This avoids flooding the message log with debug output from the " \
-    "video output synchronization mechanism.")
 
 #define KEYBOARD_EVENTS_TEXT N_("Key press events")
 #define KEYBOARD_EVENTS_LONGTEXT N_( \
@@ -1661,10 +1651,8 @@ vlc_module_begin ()
     add_bool( "drop-late-frames", true, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT )
     /* Used in vout_synchro */
-    add_bool( "skip-frames", true, SKIP_FRAMES_TEXT,
-              SKIP_FRAMES_LONGTEXT )
-    add_bool( "quiet-synchro", false, QUIET_SYNCHRO_TEXT,
-              QUIET_SYNCHRO_LONGTEXT )
+    add_obsolete_bool( "skip-frames" ) /* since 4.0.0 */
+    add_obsolete_bool( "quiet-synchro" ) /* since 4.0.0 */
     add_bool( "keyboard-events", true, KEYBOARD_EVENTS_TEXT,
               KEYBOARD_EVENTS_LONGTEXT )
     add_bool( "mouse-events", true, MOUSE_EVENTS_TEXT,
