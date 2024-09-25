@@ -967,14 +967,15 @@ static inline vlc_tick_t GetRenderDelay(vout_thread_sys_t *sys)
     return vout_chrono_GetHigh(&sys->chrono.render) + VOUT_MWAIT_TOLERANCE;
 }
 
-static bool IsPictureLateToStaticFilter(vout_thread_sys_t *vout, const video_format_t *fmt,
+static bool IsPictureLateToStaticFilter(vout_thread_sys_t *vout,
                                         vlc_tick_t time_until_display)
 {
     vout_thread_sys_t *sys = vout;
+    const es_format_t *static_es = filter_chain_GetFmtOut(sys->filter.chain_static);
     const vlc_tick_t prepare_decoded_duration =
         vout_chrono_GetHigh(&sys->chrono.render) +
         vout_chrono_GetHigh(&sys->chrono.static_filter);
-    return IsPictureLateToProcess(vout, fmt, time_until_display, prepare_decoded_duration);
+    return IsPictureLateToProcess(vout, &static_es->video, time_until_display, prepare_decoded_duration);
 }
 
 /* */
@@ -1025,8 +1026,7 @@ static picture_t *PreparePicture(vout_thread_sys_t *vout, bool reuse_decoded,
                 }
 
                 if (is_late_dropped
-                 && IsPictureLateToStaticFilter(vout, &decoded->format,
-                                                system_pts - system_now))
+                 && IsPictureLateToStaticFilter(vout, system_pts - system_now))
                 {
                     picture_Release(decoded);
                     vout_statistic_AddLost(&sys->statistic, 1);
