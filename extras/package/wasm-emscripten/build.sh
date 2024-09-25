@@ -133,7 +133,7 @@ cd "$VLC_SRCPATH"/contrib/contrib-emscripten
 diagnostic "vlc contribs: bootstrap"
 ../bootstrap --disable-disc --disable-sout --disable-net \
             --disable-aom --disable-faad2 --disable-chromaprint \
-            --disable-mad --disable-libmpeg2 --disable-nvcodec \
+            --disable-mad --disable-nvcodec \
             --disable-tremor --disable-vpx --disable-theora \
             --disable-postproc --disable-gmp --disable-gcrypt \
             --disable-gpgerror --disable-fontconfig \
