@@ -823,7 +823,7 @@ static void ChangeFilters(vout_thread_sys_t *vout)
             if (likely(e)) {
                 e->name = name;
                 e->cfg  = cfg;
-                if (!strcmp(e->name, "postproc"))
+                if (!strcmp(e->name, "postproc") || !strcmp(e->name, "amf_frc"))
                     vlc_array_append_or_abort(&array_static, e);
                 else
                     vlc_array_append_or_abort(&array_interactive, e);
