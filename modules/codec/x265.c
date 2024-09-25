@@ -59,7 +59,6 @@ typedef struct
     x265_param      param;
 
     unsigned        frame_count;
-    vlc_tick_t      initial_date;
 #ifndef NDEBUG
     vlc_tick_t      start;
 #endif
@@ -79,13 +78,11 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
     if (likely(p_pict)) {
         pic.pts = p_pict->date;
-        if (unlikely(p_sys->initial_date == VLC_TICK_INVALID)) {
-            p_sys->initial_date = p_pict->date;
 #ifndef NDEBUG
+        if (unlikely(p_sys->start == VLC_TICK_INVALID)) {
             p_sys->start = vlc_tick_now();
-#endif
         }
-
+#endif
         for (int i = 0; i < p_pict->i_planes; i++) {
             pic.planes[i] = p_pict->p[i].p_pixels;
             pic.stride[i] = p_pict->p[i].i_pitch;
@@ -121,8 +118,8 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
                 p_enc->fmt_in.video.i_frame_rate_base,
                 p_enc->fmt_in.video.i_frame_rate );
 
-    p_block->i_pts = p_sys->initial_date + pic.poc * p_block->i_length;
-    p_block->i_dts = p_sys->initial_date + p_sys->frame_count++ * p_block->i_length;
+    p_block->i_pts = pic.pts;
+    p_block->i_dts = pic.dts;
 
     switch (pic.sliceType)
     {
@@ -240,7 +237,9 @@ static int  Open (vlc_object_t *p_this)
     }
 
     p_sys->frame_count = 0;
-    p_sys->initial_date = VLC_TICK_INVALID;
+#ifndef NDEBUG
+    p_sys->start = VLC_TICK_INVALID;
+#endif
 
     static const struct vlc_encoder_operations ops =
     {
