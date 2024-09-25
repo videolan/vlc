@@ -2964,6 +2964,19 @@ typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
         int64_t system_date_us, void *data);
 
 /**
+ * Callback prototype that notify when the player is seeking or finished
+ * seeking
+ *
+ * \warning It is forbidden to call any Media Player functions from here.
+ *
+ * \param value point of the seek request or NULL when seeking is finished
+ * value.system_date_us = INT64_MAX in that case
+ * \param data opaque pointer set by libvlc_media_player_watch_time()
+ */
+typedef void (*libvlc_media_player_watch_time_on_seek)(
+        const libvlc_media_player_time_point_t *value, void *data);
+
+/**
  * Watch for times updates
  *
  * \warning Only one watcher can be registered at a time. Calling this function
@@ -2986,6 +2999,7 @@ libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
                                int64_t min_period_us,
                                libvlc_media_player_watch_time_on_update on_update,
                                libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
+                               libvlc_media_player_watch_time_on_seek on_seek,
                                void *cbs_data);
 
 /**
