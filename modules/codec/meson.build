@@ -22,15 +22,6 @@ vlc_modules += {
     'sources' : files('spdif.c')
 }
 
-# a52 codec
-a52_lib = cc.find_library('a52', required: get_option('a52'))
-vlc_modules += {
-    'name' : 'a52',
-    'sources' : files('a52.c'),
-    'dependencies' : [a52_lib],
-    'enabled' : a52_lib.found(),
-}
-
 # DTS Coherent Acoustics decoder
 dca_dep = dependency('libdca', version: '>= 0.0.5', required: get_option('dca'))
 vlc_modules += {

@@ -18,7 +18,6 @@ OPTIONS="
       --enable-avformat
       --enable-swscale
       --enable-postproc
-      --enable-a52
       --enable-flac
       --enable-libmpeg2
       --enable-vorbis

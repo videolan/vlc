@@ -203,7 +203,7 @@ if [ $BUILD_MODE -eq 1 ]; then
     emconfigure "$VLC_SRCPATH"/configure --host=wasm32-unknown-emscripten --enable-debug \
                         $SHARED_CONFIGURE_FLAGS $EXTRA_CONFIGURE_FLAGS --disable-vlc \
                         --enable-avcodec --enable-avformat --enable-swscale --enable-postproc \
-                        --disable-sout --disable-vlm --disable-a52 --disable-xcb --disable-lua \
+                        --disable-sout --disable-vlm --disable-xcb --disable-lua \
                         --disable-addonmanagermodules --disable-ssp --disable-nls \
                         --enable-gles2 \
                         --with-contrib="$VLC_SRCPATH"/contrib/wasm32-unknown-emscripten \

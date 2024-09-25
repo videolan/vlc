@@ -2949,41 +2949,6 @@ dnl fdk-aac encoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([FDKAAC], [], [fdk-aac], [FDK-AAC encoder], [disabled])
 
-
-dnl
-dnl A52/AC3 decoder plugin
-dnl
-AC_ARG_ENABLE([a52],
-  AS_HELP_STRING([--enable-a52], [A/52 support with liba52 (default enabled)]))
-if test "${enable_a52}" != "no"
-then
-  AC_ARG_WITH([a52],
-    AS_HELP_STRING([--with-a52=PATH], [a52 headers and libraries]))
-    if test -z "${with_a52}"
-    then
-      LDFLAGS_test=""
-      CPPFLAGS_test=""
-    else
-      LDFLAGS_test="-L${with_a52}/lib"
-      CPPFLAGS_test="-I${with_a52}/include"
-    fi
-    VLC_SAVE_FLAGS
-    CPPFLAGS="${CPPFLAGS} ${CPPFLAGS_test} ${CPPFLAGS_a52}"
-    LDFLAGS="${LDFLAGS} ${LDFLAGS_test} ${LIBS_a52}"
-    AC_CHECK_HEADERS([a52dec/a52.h], [
-      AC_CHECK_LIB([a52], [a52_free], [
-        VLC_ADD_PLUGIN([a52])
-        VLC_ADD_LIBS([a52],[${LDFLAGS_test} -la52 $LIBM])
-        VLC_ADD_CPPFLAGS([a52],[${CPPFLAGS_test}])
-      ],[
-        AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
-        ], [$LIBM])
-    ],[
-      AC_MSG_ERROR([Could not find liba52 on your system: you may get it from http://liba52.sf.net/. Alternatively you can use --disable-a52 to disable the a52 plugin.])
-    ])
-    VLC_RESTORE_FLAGS
-fi
-
 dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl

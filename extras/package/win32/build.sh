@@ -231,12 +231,11 @@ case $LICENSE in
     l)
         # LGPL v3 + ad-clauses
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --enable-ad-clauses"
-        CONFIGFLAGS="$CONFIGFLAGS --disable-a52 --enable-live555"
+        CONFIGFLAGS="$CONFIGFLAGS --enable-live555"
     ;;
     a)
         # LGPL v2.1 + ad-clauses
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --disable-gnuv3 --enable-ad-clauses"
-        CONFIGFLAGS="$CONFIGFLAGS --disable-a52"
     ;;
     g|*)
         # GPL v3

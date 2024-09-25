@@ -16,13 +16,6 @@ endif
 libspdif_plugin_la_SOURCES = codec/spdif.c
 codec_LTLIBRARIES += libspdif_plugin.la
 
-liba52_plugin_la_SOURCES = codec/a52.c
-liba52_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_a52)
-liba52_plugin_la_LIBADD = $(LIBS_a52)
-liba52_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-EXTRA_LTLIBRARIES += liba52_plugin.la
-codec_LTLIBRARIES += $(LTLIBa52)
-
 libdca_plugin_la_SOURCES = codec/dca.c
 libdca_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DCA_CFLAGS)
 libdca_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

@@ -176,12 +176,10 @@ case $LICENSE in
     l)
         # LGPL v3 + ad-clauses
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --enable-ad-clauses"
-        VLC_CONFIGURE_ARGS="$VLC_CONFIGURE_ARGS --disable-a52"
     ;;
     a)
         # LGPL v2.1 + ad-clauses
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-gpl --disable-gnuv3 --enable-ad-clauses"
-        VLC_CONFIGURE_ARGS="$VLC_CONFIGURE_ARGS --disable-a52"
     ;;
     g|*)
         # GPL v3

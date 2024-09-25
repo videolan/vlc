@@ -385,11 +385,6 @@ option('medialibrary',
     value : 'auto',
     description : 'Enable/disable medialibrary support')
 
-option('a52',
-    type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable a52 support')
-
 option('faad',
     type : 'feature',
     value : 'auto',
