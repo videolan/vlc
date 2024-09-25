@@ -19,7 +19,6 @@ OPTIONS="
       --enable-swscale
       --enable-postproc
       --enable-flac
-      --enable-libmpeg2
       --enable-vorbis
       --enable-png
       --enable-x264

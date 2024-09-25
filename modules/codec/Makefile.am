@@ -87,14 +87,6 @@ libdavs2_plugin_la_LIBADD = $(DAVS2_LIBS) $(LIBM)
 EXTRA_LTLIBRARIES += libdavs2_plugin.la
 codec_LTLIBRARIES += $(LTLIBdavs2)
 
-liblibmpeg2_plugin_la_SOURCES = codec/libmpeg2.c \
-	codec/synchro.c codec/synchro.h
-liblibmpeg2_plugin_la_CFLAGS = $(AM_CFLAGS) $(CFLAGS_libmpeg2)
-liblibmpeg2_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-liblibmpeg2_plugin_la_LIBADD = $(LIBS_libmpeg2)
-EXTRA_LTLIBRARIES += liblibmpeg2_plugin.la
-codec_LTLIBRARIES += $(LTLIBlibmpeg2)
-
 librawvideo_plugin_la_SOURCES = codec/rawvideo.c
 codec_LTLIBRARIES += librawvideo_plugin.la
 

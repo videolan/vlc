@@ -134,15 +134,6 @@ vlc_modules += {
     'sources' : files('cdg.c')
 }
 
-# libmpeg2 decoder
-mpeg2_dep = dependency('libmpeg2', version: '> 0.3.2', required: get_option('mpeg2'))
-vlc_modules += {
-    'name' : 'libmpeg2',
-    'sources' : files('libmpeg2.c', 'synchro.c'),
-    'dependencies' : [mpeg2_dep],
-    'enabled' : mpeg2_dep.found(),
-}
-
 # Raw video codec
 vlc_modules += {
     'name' : 'rawvideo',
