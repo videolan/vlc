@@ -306,7 +306,11 @@ FocusScope {
             return controlBar
         }
 
-        state: (playerToolbarVisibilityFSM.started && playerToolbarVisibilityFSM.isVisible) ? "visible" : "hidden"
+        //initial state value is "", using a binding avoid animation on startup
+        Binding on state {
+            when: playerToolbarVisibilityFSM.started
+            value: playerToolbarVisibilityFSM.isVisible ? "visible" : "hidden"
+        }
 
         onTogglePlaylistVisibility: playlistVisibility.togglePlaylistVisibility()
 
@@ -581,7 +585,11 @@ FocusScope {
         focus: false
         edge: Widgets.DrawerExt.Edges.Right
 
-        state: (playlistVisibility.started && playlistVisibility.isPlaylistVisible) ? "visible" : "hidden"
+        //initial state value is "", using a binding avoid animation on startup
+        Binding on state {
+            when: playlistVisibility.started
+            value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
+        }
 
         component: PlaylistListView {
             id: playlistView
@@ -792,6 +800,7 @@ FocusScope {
             return topBar
         }
 
+        //initial state value is "", using a binding avoid animation on startup
         Binding on state {
             when: playerToolbarVisibilityFSM.started
             value: playerToolbarVisibilityFSM.isVisible ? "visible" : "hidden"
