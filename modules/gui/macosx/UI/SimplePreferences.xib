@@ -54,7 +54,6 @@
                 <outlet property="input_recordBox" destination="3623" id="eSr-8K-LtQ"/>
                 <outlet property="input_recordButton" destination="3616" id="Saw-OZ-ydg"/>
                 <outlet property="input_recordTextField" destination="3614" id="Ecp-9y-KOl"/>
-                <outlet property="input_skipFramesCheckbox" destination="lem-yf-jZB" id="r05-tX-CCa"/>
                 <outlet property="input_skipLoopLabel" destination="3434" id="N1W-pG-ln6"/>
                 <outlet property="input_skipLoopPopup" destination="3435" id="ia2-kQ-VwV"/>
                 <outlet property="input_urlhandlerButton" destination="3742" id="1GV-O9-8SF"/>
