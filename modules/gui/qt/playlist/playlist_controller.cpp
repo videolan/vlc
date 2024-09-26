@@ -406,6 +406,11 @@ void PlaylistController::append(const QVariantList& sourceList, bool startPlayin
     append(toMediaList(sourceList), startPlaying);
 }
 
+void PlaylistController::append(const QVariant &source, bool startPlaying)
+{
+    append(QVariantList{source}, startPlaying);
+}
+
 void PlaylistController::insert(unsigned index, const QVariantList& sourceList, bool startPlaying)
 {
     insert(index, toMediaList(sourceList), startPlaying);
