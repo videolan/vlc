@@ -398,8 +398,12 @@ const directx_va_mode_t *directx_va_Setup(vlc_va_t *va, const directx_sys_t *dx_
     fmt_out->i_height = surface_height;
 
     /* FIXME transmit a video_format_t by VaSetup directly */
-    fmt_out->i_frame_rate      = avctx->framerate.num;
-    fmt_out->i_frame_rate_base = avctx->framerate.den;
+    if (avctx->framerate.num && avctx->framerate.den &&
+        (!fmt_out->i_frame_rate || !fmt_out->i_frame_rate_base))
+    {
+        fmt_out->i_frame_rate      = avctx->framerate.num;
+        fmt_out->i_frame_rate_base = avctx->framerate.den;
+    }
 
     /* */
     const directx_va_mode_t *res = FindVideoServiceConversion(va, dx_sys, fmt, fmt_out, avctx, desc);
