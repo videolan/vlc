@@ -754,7 +754,8 @@ int MediaLibrary::Control( int query, va_list args )
                 return VLC_EGENERIC;
             uint32_t from = va_arg( args, uint32_t );
             uint32_t to   = va_arg( args, uint32_t );
-            if ( playlist->move(from, to) == false )
+            const uint32_t count   = va_arg( args, uint32_t );
+            if ( playlist->move(from, to, count) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }

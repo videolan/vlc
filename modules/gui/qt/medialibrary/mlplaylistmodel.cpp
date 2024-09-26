@@ -112,7 +112,7 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
             int localTo = to;
             for (int i = high; i >= low; i--)
             {
-                vlc_ml_playlist_move(ml, playlistId, i, localTo  - 1);
+                vlc_ml_playlist_move(ml, playlistId, i, localTo  - 1, 1);
                 localTo--;
             }
             ctx.newTo = localTo;
@@ -136,7 +136,7 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
             int localTo = to;
             for (int i = low; i <= high; i++)
             {
-                vlc_ml_playlist_move(ml, playlistId, i, localTo);
+                vlc_ml_playlist_move(ml, playlistId, i, localTo, 1);
                 localTo++;
             }
             ctx.newTo = localTo;
