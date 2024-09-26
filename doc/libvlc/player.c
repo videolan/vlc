@@ -26,10 +26,14 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <sys/select.h>
+#include <time.h>
 
 #ifdef __linux__
 #include <termios.h>
-#include <unistd.h>
+#include <fcntl.h>
 #endif
 
 #include <vlc/vlc.h>
@@ -38,8 +42,17 @@ struct context
 {
     libvlc_media_list_t *mlist;
     libvlc_media_player_t *mp;
+
     int playing_idx;
     char *playing_title;
+
+    int pipefds[2];
+
+    pthread_mutex_t mainloop_lock;
+    libvlc_media_player_time_point_t time_point;
+    libvlc_time_t paused_date;
+    bool time_seeking;
+    float volume;
 };
 
 static void
@@ -66,7 +79,7 @@ get_next_media_locked(struct context *ctx)
 }
 
 static void
-on_media_changed(void *opaque, libvlc_media_t *media)
+player_on_media_changed(void *opaque, libvlc_media_t *media)
 {
     struct context *ctx = opaque;
 
@@ -80,7 +93,6 @@ on_media_changed(void *opaque, libvlc_media_t *media)
     /* Fetch the next media from the mlist */
     libvlc_media_list_lock(ctx->mlist);
     ctx->playing_idx = libvlc_media_list_index_of_item(ctx->mlist, media);
-    fprintf(stderr, "ctx->playing_idx: %d\n", ctx->playing_idx);
     assert(ctx->playing_idx >= 0);
 
     libvlc_media_t *next_media = get_next_media_locked(ctx);
@@ -95,7 +107,7 @@ on_media_changed(void *opaque, libvlc_media_t *media)
 }
 
 static void
-on_media_subitems_changed(void *opaque, libvlc_media_t *media)
+player_on_media_subitems_changed(void *opaque, libvlc_media_t *media)
 {
     struct context *ctx = opaque;
 
@@ -140,37 +152,137 @@ on_media_subitems_changed(void *opaque, libvlc_media_t *media)
     }
 }
 
-static int
-context_init(struct context *ctx, libvlc_instance_t *libvlc)
+static void
+player_on_audio_volume_changed(void *opaque, float volume)
 {
-    ctx->mlist = libvlc_media_list_new();
-    if (ctx->mlist == NULL)
-        return -ENOMEM;
+    struct context *ctx = opaque;
 
-    static const struct libvlc_media_player_cbs cbs = {
-        .version = 0,
-        .on_media_changed = on_media_changed,
-        .on_media_subitems_changed = on_media_subitems_changed,
-    };
+    pthread_mutex_lock(&ctx->mainloop_lock);
+    ctx->volume = volume;
+    pthread_mutex_unlock(&ctx->mainloop_lock);
 
-    ctx->mp = libvlc_media_player_new(libvlc, &cbs, ctx);
-    if (ctx->mp == NULL)
+    char buf = 'u';
+    write(ctx->pipefds[1], &buf, 1);
+}
+
+static void
+player_time_on_update(void *opaque,
+                      const libvlc_media_player_time_point_t *value)
+{
+    struct context *ctx = opaque;
+
+    if (ctx->time_seeking)
+        return;
+
+    pthread_mutex_lock(&ctx->mainloop_lock);
+    ctx->paused_date = 0;
+    ctx->time_point = *value;
+    pthread_mutex_unlock(&ctx->mainloop_lock);
+
+    char buf = 'u';
+    write(ctx->pipefds[1], &buf, 1);
+}
+
+static void
+player_time_on_paused(void *opaque, libvlc_time_t system_date_us)
+{
+    struct context *ctx = opaque;
+
+    fprintf(stderr, "player_time_on_paused\n");
+    pthread_mutex_lock(&ctx->mainloop_lock);
+    ctx->paused_date = system_date_us;
+    pthread_mutex_unlock(&ctx->mainloop_lock);
+
+    char buf = 'u';
+    write(ctx->pipefds[1], &buf, 1);
+}
+
+static void
+player_time_on_seek(void *opaque, const libvlc_media_player_time_point_t *value)
+{
+    struct context *ctx = opaque;
+
+    pthread_mutex_lock(&ctx->mainloop_lock);
+    if (value != NULL)
     {
-        libvlc_media_list_release(ctx->mlist);
-        return -ENOMEM;
+        ctx->time_point = *value;
+        ctx->time_seeking = true;
     }
+    else
+        ctx->time_seeking = false;
+    pthread_mutex_unlock(&ctx->mainloop_lock);
 
-    ctx->playing_idx = 0;
-    ctx->playing_title = NULL;
-    return 0;
+    char buf = 'u';
+    write(ctx->pipefds[1], &buf, 1);
 }
 
 static void
 context_destroy(struct context *ctx)
 {
     libvlc_media_list_release(ctx->mlist);
+    libvlc_media_player_unwatch_time(ctx->mp);
     libvlc_media_player_release(ctx->mp);
+
+    pthread_mutex_destroy(&ctx->mainloop_lock);
+    close(ctx->pipefds[0]);
+    close(ctx->pipefds[1]);
+
     free(ctx->playing_title);
+}
+
+static int
+context_init(struct context *ctx, libvlc_instance_t *libvlc)
+{
+    ctx->playing_idx = 0;
+    ctx->playing_title = NULL;
+    ctx->paused_date = 0;
+    ctx->time_seeking = false;
+    ctx->volume = 1.f;
+
+    int ret = pipe(ctx->pipefds);
+    if (ret != 0)
+        return -errno;
+
+    pthread_mutex_init(&ctx->mainloop_lock, NULL);
+
+    ctx->mlist = libvlc_media_list_new();
+    if (ctx->mlist == NULL)
+        goto error_pipe;
+
+    static const struct libvlc_media_player_cbs cbs = {
+        .version = 0,
+        .on_media_changed = player_on_media_changed,
+        .on_media_subitems_changed = player_on_media_subitems_changed,
+        .on_audio_volume_changed = player_on_audio_volume_changed,
+    };
+
+    ctx->mp = libvlc_media_player_new(libvlc, &cbs, ctx);
+    if (ctx->mp == NULL)
+        goto error_mlist;
+
+    static const struct libvlc_media_player_watch_time_cbs time_cbs = {
+        .version = 0,
+        .on_update = player_time_on_update,
+        .on_paused = player_time_on_paused,
+        .on_seek = player_time_on_seek,
+    };
+
+    ret = libvlc_media_player_watch_time(ctx->mp, 500000ULL,
+                                         &time_cbs, ctx);
+    if (ret != 0)
+        goto error_mp;
+
+    return 0;
+
+error_mp:
+    libvlc_media_player_release(ctx->mp);
+error_mlist:
+    libvlc_media_list_release(ctx->mlist);
+error_pipe:
+    pthread_mutex_destroy(&ctx->mainloop_lock);
+    close(ctx->pipefds[0]);
+    close(ctx->pipefds[1]);
+    return -ENOMEM;
 }
 
 static int
@@ -214,12 +326,14 @@ context_parse_argv(struct context *ctx, int argc, const char **argv)
 static void
 setup_terminal(void)
 {
-    /* Avoid pressing enter to read commands */
 #ifdef __linux__
+    fcntl(STDIN_FILENO, F_SETFL, fcntl(STDIN_FILENO, F_GETFL) | O_NONBLOCK);
+
+    /* Avoid pressing enter to read commands */
     struct termios oldt, newt;
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
-    newt.c_lflag &= ~ICANON;
+    newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 #endif
 }
@@ -260,12 +374,12 @@ play_previous(struct context *ctx)
 }
 
 static void
-increase_volume(struct context *ctx, int sign)
+increase_volume(struct context *ctx, int value)
 {
     int volume = libvlc_audio_get_volume(ctx->mp);
     if (volume == -1)
         return;
-    volume += 10 * sign;
+    volume += value;
     if (volume < 0)
         volume = 0;
     else if (volume > 200)
@@ -273,14 +387,16 @@ increase_volume(struct context *ctx, int sign)
     libvlc_audio_set_volume(ctx->mp, volume);
 }
 
-static void
-mainloop(struct context *ctx)
+static int
+mainloop_handle_command(struct context *ctx, const char *command, size_t len)
 {
-    int c;
-    while ((c = getchar()) != EOF)
+    if (len == 1)
     {
-        switch (c)
+        switch (command[0])
         {
+            case EOF:
+            case 'q':
+                return -1;
             case 'p':
                 play_previous(ctx);
                 break;
@@ -290,29 +406,186 @@ mainloop(struct context *ctx)
             case ' ':
                 libvlc_media_player_pause(ctx->mp);
                 break;
-            case 'q':
-                return;
             case 'e':
                 libvlc_media_player_next_frame(ctx->mp);
-                break;
-            case '\033':
-                /* Escape char when pressing arrow keys */
-                break;
-            case 'D':
-                libvlc_media_player_jump_time(ctx->mp, -1000);
-                break;
-            case 'A':
-                increase_volume(ctx, 1);
-                break;
-            case 'C':
-                libvlc_media_player_jump_time(ctx->mp, 1000);
-                break;
-            case 'B':
-                increase_volume(ctx, -1);
                 break;
             default:
                 print_ui(ctx);
                 break;
+        }
+    }
+    else if (len > 2 && command[0] == '\033' && command[1] == '[')
+    {
+        /* Basic arrow key handling on Linux:
+         * '\033' + '[' + 'A', 'B', 'C' or 'D' for all 4 keys
+         * '\033' + "[1;5" + 'A', 'B', 'C' or 'D' for ctrol + 4 keys
+         */
+        bool ctrol_pressed;
+        char c;
+        if (len == 6 && strncmp("1;5", &command[2], 3) == 0)
+        {
+            c = command[5];
+            ctrol_pressed = true;
+        }
+        else if (len == 3)
+        {
+            c = command[2];
+            ctrol_pressed = false;
+        }
+        else
+            return 0;
+
+        int seek_jump = 1000; /* 1 second jump */
+        int vol_jump = 5; /* 5% jump */
+        if (ctrol_pressed)
+        {
+            seek_jump *= 10; /* 10 seconds jump */
+            vol_jump = 10; /* 10% jump */
+        }
+
+        switch (c)
+        {
+            case 'D':
+                libvlc_media_player_jump_time(ctx->mp, -seek_jump);
+                break;
+            case 'A':
+                increase_volume(ctx, vol_jump);
+                break;
+            case 'C':
+                libvlc_media_player_jump_time(ctx->mp, seek_jump);
+                break;
+            case 'B':
+                increase_volume(ctx, -vol_jump);
+                break;
+        }
+    }
+
+    return 0;
+}
+
+
+static size_t
+format_time_us(libvlc_time_t us, char *buffer, size_t buffer_size)
+{
+    time_t seconds = us / 1000000;
+
+    struct tm tm;
+    gmtime_r(&seconds, &tm);
+    return strftime(buffer, buffer_size, "%k:%M:%S", &tm);
+}
+
+static bool
+mainloop_display_ui(struct context *ctx)
+{
+    bool run_timer;
+    pthread_mutex_lock(&ctx->mainloop_lock);
+
+    libvlc_time_t ts_us;
+    double pos;
+    if (!ctx->time_seeking)
+    {
+        libvlc_time_t date = ctx->paused_date > 0 ? ctx->paused_date
+                                                  : libvlc_clock();
+        int ret =
+            libvlc_media_player_time_point_interpolate(&ctx->time_point, date,
+                                                       &ts_us, &pos);
+        if (ret != 0)
+        {
+            pthread_mutex_unlock(&ctx->mainloop_lock);
+            return false;
+        }
+
+        run_timer = ctx->paused_date == 0 && ctx->time_point.system_date_us != INT64_MAX;
+    }
+    else
+    {
+        ts_us = ctx->time_point.ts_us;
+        pos = ctx->time_point.position;
+        run_timer = false;
+    }
+    float volume = ctx->volume * 100;
+    pos *= 100;
+    libvlc_time_t length_us = ctx->time_point.length_us;
+    pthread_mutex_unlock(&ctx->mainloop_lock);
+
+    unsigned time_100ms = ((unsigned)(ts_us / 1000.0) % 1000) / 100;
+
+    char buffer_time[256];
+    size_t len = format_time_us(ts_us, buffer_time, sizeof(buffer_time));
+    if (len > 0)
+    {
+        char buffer_length[256];
+
+        len = format_time_us(length_us, buffer_length, sizeof(buffer_length));
+        fprintf(stdout, "| time: %s.%u / %s | pos: %5.1f%% | vol: %3.0f%%\n",
+                buffer_time, time_100ms, len > 0 ? buffer_length : "",
+                pos, volume);
+        fflush(stdout);
+    }
+    return run_timer;
+}
+
+static void
+mainloop(struct context *ctx)
+{
+    bool run_timer = false;
+
+    for (;;)
+    {
+        fd_set rfds;
+        int nfds = 0;
+
+        FD_ZERO(&rfds);
+        FD_SET(STDIN_FILENO, &rfds);
+        FD_SET(ctx->pipefds[0], &rfds);
+
+        assert(ctx->pipefds[0] > STDIN_FILENO);
+        nfds = ctx->pipefds[0] + 1;
+
+        struct timeval tv_buf = {
+            .tv_sec = 0,
+            .tv_usec = 100000, /* Update pos/time every 100ms */
+        };
+        struct timeval *tv = run_timer ? &tv_buf : NULL;
+
+        int retval = select(nfds, &rfds, NULL, NULL, tv);
+        if (retval == -1)
+        {
+             perror("select()");
+             return;
+        }
+        else if (retval == 0)
+            run_timer = mainloop_display_ui(ctx);
+        else
+        {
+            if (FD_ISSET(STDIN_FILENO, &rfds))
+            {
+                char buf[128];
+                ssize_t len = read(STDIN_FILENO, buf, sizeof(buf));
+                if (len == -1 && errno != EAGAIN)
+                {
+                    perror("read()");
+                    return;
+                }
+                else if (len == 0)
+                    continue;
+
+                retval = mainloop_handle_command(ctx, buf, len);
+                if (retval == -1)
+                    return;
+            }
+
+            if (FD_ISSET(ctx->pipefds[0], &rfds))
+            {
+                char buf;
+                ssize_t len = read(ctx->pipefds[0], &buf, 1);
+                if (len == -1)
+                {
+                    perror("read()");
+                    return;
+                }
+                run_timer = mainloop_display_ui(ctx);
+            }
         }
     }
 }
