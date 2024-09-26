@@ -767,7 +767,8 @@ int MediaLibrary::Control( int query, va_list args )
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
             uint32_t position = va_arg( args, uint32_t );
-            if ( playlist->remove(position) == false )
+            uint32_t count = va_arg( args, uint32_t );
+            if ( playlist->remove(position, count) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }

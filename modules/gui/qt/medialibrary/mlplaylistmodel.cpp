@@ -238,7 +238,7 @@ void MLPlaylistModel::removeImpl(int64_t playlistId, const std::vector<std::pair
     [playlistId, range](vlc_medialibrary_t* ml) {
         for (int i = range.second; i >= range.first; i--)
         {
-            vlc_ml_playlist_remove(ml, playlistId, i);
+            vlc_ml_playlist_remove(ml, playlistId, i, 1);
         }
     },
     //UI thread
