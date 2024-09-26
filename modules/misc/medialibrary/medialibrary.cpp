@@ -729,12 +729,19 @@ int MediaLibrary::Control( int query, va_list args )
         {
             auto priorityAccess = m_ml->acquirePriorityAccess();
 
-            auto playlist = m_ml->playlist( va_arg( args, int64_t ) );
+            const auto playlist_id = va_arg( args, int64_t );
+            const auto *media_ids = va_arg( args, int64_t* );
+            const auto media_id_count = va_arg( args, size_t );
+            if (media_id_count == 0)
+                return VLC_EINVAL;
+
+            auto playlist = m_ml->playlist( playlist_id );
             if ( playlist == nullptr )
                 return VLC_EGENERIC;
-            int64_t  mediaId  = va_arg( args, int64_t );
             uint32_t position = va_arg( args, uint32_t );
-            if ( playlist->add(mediaId, position) == false )
+            if ( media_id_count > 1 && playlist->add(std::vector<int64_t>{media_ids, media_ids + media_id_count}, position) == false )
+                return VLC_EGENERIC;
+            else if ( media_id_count == 1 && playlist->add(*media_ids, position) == false )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
         }

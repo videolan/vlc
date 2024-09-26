@@ -78,7 +78,7 @@
                     continue;
             }
 
-            vlc_ml_playlist_insert(ml, id, ml_media->i_id, insertPos);
+            vlc_ml_playlist_insert(ml, id, &ml_media->i_id, 1, insertPos);
             vlc_ml_media_release(ml_media);
 
             insertPos++;
