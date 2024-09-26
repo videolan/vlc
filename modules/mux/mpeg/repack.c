@@ -53,9 +53,9 @@ static void AnnexBInject(block_t **pp_pes,
 static void PES_RepackHEVC(block_t **pp_pes,
                                     const uint8_t *p_extra, size_t i_extra)
 {
-    size_t i_au = 6;
-    size_t i_aucurrent = 0;
     const uint8_t audata[] = { 0x00, 0x00, 0x00, 0x01, 0x46, 0x01 };
+    size_t i_au = sizeof(audata);
+    size_t i_aucurrent = 0;
     hxxx_iterator_ctx_t ctx;
     hxxx_iterator_init(&ctx, (*pp_pes)->p_buffer, (*pp_pes)->i_buffer, 0);
     const uint8_t *p_nal; size_t i_nal;
@@ -86,7 +86,7 @@ static void PES_RepackHEVC(block_t **pp_pes,
     {
         (*pp_pes)->p_buffer += i_aucurrent;
         (*pp_pes)->i_buffer -= i_aucurrent;
-        i_au = 6;
+        i_au = sizeof(audata);
     }
 
     AnnexBInject(pp_pes, p_extra, i_extra, audata, i_au);
@@ -95,9 +95,9 @@ static void PES_RepackHEVC(block_t **pp_pes,
 static void PES_RepackH264(block_t **pp_pes,
                                     const uint8_t *p_extra, size_t i_extra)
 {
-    size_t i_au = 6;
-    size_t i_aucurrent = 0;
     const uint8_t audata[] = { 0x00, 0x00, 0x00, 0x01, 0x09, 0xf0 };
+    size_t i_au = sizeof(audata);
+    size_t i_aucurrent = 0;
     hxxx_iterator_ctx_t ctx;
     hxxx_iterator_init(&ctx, (*pp_pes)->p_buffer, (*pp_pes)->i_buffer, 0);
     const uint8_t *p_nal; size_t i_nal;
@@ -127,7 +127,7 @@ static void PES_RepackH264(block_t **pp_pes,
     {
         (*pp_pes)->p_buffer += i_aucurrent;
         (*pp_pes)->i_buffer -= i_aucurrent;
-        i_au = 6;
+        i_au = sizeof(audata);
     }
 
     AnnexBInject(pp_pes, p_extra, i_extra, audata, i_au);
