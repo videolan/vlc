@@ -64,11 +64,11 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
                 continue;
 
             for (const vlc_ml_media_t & media : ml_range_iterate<vlc_ml_media_t>(list))
-                vlc_ml_playlist_append(ml, playlistId, media.i_id);
+                vlc_ml_playlist_append(ml, playlistId, &media.i_id, 1);
         }
         // NOTE: Otherwise we add the media directly.
         else
-            vlc_ml_playlist_append(ml, playlistId, itemId.id);
+            vlc_ml_playlist_append(ml, playlistId, &itemId.id, 1);
     }
 }
 
@@ -160,7 +160,7 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
                         continue;
                 }
 
-                vlc_ml_playlist_append(ml, playlistId.id, ml_media->i_id);
+                vlc_ml_playlist_append(ml, playlistId.id, &ml_media->i_id, 1);
                 vlc_ml_media_release(ml_media);
             }
         }
