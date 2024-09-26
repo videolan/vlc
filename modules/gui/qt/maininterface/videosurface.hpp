@@ -143,10 +143,14 @@ protected slots:
     void updateSurfaceSize();
     void updateSurfacePositionAndSize();
 
+    void updateParentChanged();
+
 private:
     QPointF m_oldHoverPos;
 
     QPointer<VideoSurfaceProvider> m_provider;
+
+    std::vector<QPointer<QQuickItem>> m_parentList;
 
     bool m_sizeDirty = false;
     bool m_positionDirty = false;
