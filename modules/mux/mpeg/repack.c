@@ -70,7 +70,7 @@ static void PES_RepackHEVC(block_t **pp_pes,
         {
             case HEVC_NAL_AUD:
                 i_au = 0;
-                i_aucurrent = 2 + (p_nal - (*pp_pes)->p_buffer);
+                i_aucurrent = i_nal + (p_nal - (*pp_pes)->p_buffer);
                 break;
             case HEVC_NAL_VPS:
             case HEVC_NAL_PPS:
@@ -112,7 +112,7 @@ static void PES_RepackH264(block_t **pp_pes,
         {
             case H264_NAL_AU_DELIMITER:
                 i_au = 0;
-                i_aucurrent = 2 + (p_nal - (*pp_pes)->p_buffer);
+                i_aucurrent = i_nal + (p_nal - (*pp_pes)->p_buffer);
                 break;
             case H264_NAL_SPS:
             case H264_NAL_PPS:
