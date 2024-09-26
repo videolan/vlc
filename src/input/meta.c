@@ -158,9 +158,16 @@ void vlc_meta_SetWithPriority( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, co
     p_meta->meta[meta_type].priority = priority;
 }
 
-const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
+const char *vlc_meta_GetWithPriority(const vlc_meta_t *meta, vlc_meta_type_t meta_type, vlc_meta_priority_t *restrict priority)
 {
-    return p_meta->meta[meta_type].value;
+    assert(meta != NULL);
+    assert(meta_type >= 0);
+    assert(meta_type < VLC_META_TYPE_COUNT);
+
+    if (priority != NULL) {
+        *priority = meta->meta[meta_type].priority;
+    }
+    return meta->meta[meta_type].value;
 }
 
 void vlc_meta_SetExtraWithPriority( vlc_meta_t *m, const char *psz_name, const char *psz_value, vlc_meta_priority_t priority )
@@ -174,13 +181,20 @@ void vlc_meta_SetExtraWithPriority( vlc_meta_t *m, const char *psz_name, const c
         vlc_meta_InsertExtra( m, psz_name, psz_value, priority );
 }
 
-const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
+const char *vlc_meta_GetExtraWithPriority(const vlc_meta_t *m, const char *name, vlc_meta_priority_t *priority)
 {
-    struct vlc_meta_value *meta_value = vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
-    if( !meta_value )
+    assert(m != NULL);
+    assert(name != NULL);
+
+    struct vlc_meta_value *meta_value = vlc_dictionary_value_for_key(&m->extra_tags, name);
+    if(meta_value == NULL)
         return NULL;
+    if (priority != NULL) {
+        *priority = meta_value->priority;
+    }
     return meta_value->value;
 }
+
 
 unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m )
 {

@@ -81,7 +81,7 @@ struct vlc_meta_t;
 VLC_API vlc_meta_t * vlc_meta_New( void ) VLC_USED;
 VLC_API void vlc_meta_Delete( vlc_meta_t *m );
 VLC_API void vlc_meta_SetWithPriority( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val, vlc_meta_priority_t priority );
-VLC_API const char * vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type );
+VLC_API const char *vlc_meta_GetWithPriority(const vlc_meta_t *p_meta, vlc_meta_type_t meta_type, vlc_meta_priority_t *restrict priority);
 
 /**
  * set the meta extra
@@ -93,7 +93,7 @@ VLC_API const char * vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t met
  * \param priority metadata priority (in terms of vlc_meta_priority_t)
  */
 VLC_API void vlc_meta_SetExtraWithPriority( vlc_meta_t *m, const char *psz_name, const char *psz_value, vlc_meta_priority_t priority );
-VLC_API const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name );
+VLC_API const char *vlc_meta_GetExtraWithPriority(const vlc_meta_t *m, const char *name, vlc_meta_priority_t *priority);
 VLC_API unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m );
 
 /**
@@ -125,6 +125,9 @@ VLC_API int input_item_WriteMeta(vlc_object_t *, input_item_t *);
 
 #define vlc_meta_Set( meta, meta_type, b )             vlc_meta_SetWithPriority( meta, meta_type, b, VLC_META_PRIORITY_BASIC )
 #define vlc_meta_SetExtra( meta, psz_name, psz_value ) vlc_meta_SetExtraWithPriority( meta, psz_name, psz_value, VLC_META_PRIORITY_BASIC )
+
+#define vlc_meta_Get(meta, meta_type) vlc_meta_GetWithPriority(meta, meta_type, NULL)
+#define vlc_meta_GetExtra(meta, psz_name) vlc_meta_GetExtraWithPriority(meta, psz_name, NULL)
 
 /* Setters for meta.
  * Warning: Make sure to use the input_item meta setters (defined in vlc_input_item.h)

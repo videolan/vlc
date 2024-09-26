@@ -680,8 +680,8 @@ vlc_list_children
 vlc_meta_SetExtraWithPriority
 vlc_meta_CopyExtraNames
 vlc_meta_Delete
-vlc_meta_Get
-vlc_meta_GetExtra
+vlc_meta_GetWithPriority
+vlc_meta_GetExtraWithPriority
 vlc_meta_GetExtraCount
 vlc_meta_GetStatus
 vlc_meta_Merge
