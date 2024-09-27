@@ -62,7 +62,7 @@
     m_mediaLib->runOnMLThread(this,
     //ML thread
     [medias, id, at](vlc_medialibrary_t* ml) {
-        int insertPos = at;
+        std::vector<int64_t> mediaIdList;
         for (const auto& media : medias)
         {
             assert(media.raw());
@@ -78,12 +78,13 @@
                     continue;
             }
 
-            vlc_ml_playlist_insert(ml, id, &ml_media->i_id, 1, insertPos);
+            mediaIdList.push_back(ml_media->i_id);
             vlc_ml_media_release(ml_media);
-
-            insertPos++;
         }
+        if (mediaIdList.size() == 0)
+            return;
 
+        vlc_ml_playlist_insert(ml, id, mediaIdList.data(), mediaIdList.size(), at);
     },
     //UI thread
     [this]() {
@@ -109,13 +110,9 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
         //ML thread
         [playlistId, high, low, to = ranges.lowTo]
         (vlc_medialibrary_t* ml, Ctx& ctx) {
-            int localTo = to;
-            for (int i = high; i >= low; i--)
-            {
-                vlc_ml_playlist_move(ml, playlistId, i, localTo  - 1, 1);
-                localTo--;
-            }
-            ctx.newTo = localTo;
+            int nbElement = high - low + 1;
+            vlc_ml_playlist_move(ml, playlistId, low, to - 1, nbElement);
+            ctx.newTo = to - nbElement;
         },
         //UI thread
         [this, playlistId, high, low, r = std::move(ranges)](quint64, Ctx& ctx) mutable {
@@ -133,13 +130,9 @@ void MLPlaylistModel::moveImpl(int64_t playlistId, HighLowRanges&& ranges)
         m_mediaLib->runOnMLThread<Ctx>(this,
         //ML thread
         [playlistId, high, low, to = ranges.highTo](vlc_medialibrary_t* ml, Ctx& ctx) {
-            int localTo = to;
-            for (int i = low; i <= high; i++)
-            {
-                vlc_ml_playlist_move(ml, playlistId, i, localTo, 1);
-                localTo++;
-            }
-            ctx.newTo = localTo;
+            int nbElement = high - low + 1;
+            vlc_ml_playlist_move(ml, playlistId, low, to, nbElement);
+            ctx.newTo = to + nbElement;
         },
         //UI thread
         [this, playlistId, low, high, r = std::move(ranges)](quint64, Ctx& ctx) mutable {
@@ -236,10 +229,7 @@ void MLPlaylistModel::removeImpl(int64_t playlistId, const std::vector<std::pair
     m_mediaLib->runOnMLThread(this,
     //ML thread
     [playlistId, range](vlc_medialibrary_t* ml) {
-        for (int i = range.second; i >= range.first; i--)
-        {
-            vlc_ml_playlist_remove(ml, playlistId, i, 1);
-        }
+        vlc_ml_playlist_remove(ml, playlistId, range.first, range.second - range.first + 1);
     },
     //UI thread
     [this, playlistId, range, rows = std::move(rangeList), index]() {
