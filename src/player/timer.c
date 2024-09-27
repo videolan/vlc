@@ -263,7 +263,8 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
     vlc_list_foreach(timer, &bestsource->listeners, node)
     {
         timer->last_update_date = VLC_TICK_INVALID;
-        timer->cbs->on_discontinuity(system_date, timer->data);
+        if (timer->cbs->on_discontinuity != NULL)
+            timer->cbs->on_discontinuity(system_date, timer->data);
     }
 
     vlc_mutex_unlock(&player->timer.lock);
