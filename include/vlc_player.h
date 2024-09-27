@@ -3365,6 +3365,9 @@ struct vlc_player_timer_cbs
      * from the user or because the playback is stopped. The player user should
      * stop its "interpolate" timer.
      *
+     * @warning The player is not locked from this callback. It is forbidden
+     * to call any player functions from here.
+     *
      * @param system_date system date of this event, only valid when paused. It
      * can be used to interpolate the last updated point to this date in order
      * to get the last paused ts/position.
@@ -3374,6 +3377,9 @@ struct vlc_player_timer_cbs
 
     /**
      * Called when the player is seeking or finished seeking
+     *
+     * @warning The player is not locked from this callback. It is forbidden
+     * to call any player functions from here.
      *
      * @param value point of the seek request or NULL when seeking is finished
      * value.system_date = VLC_TICK_MAX in that case
