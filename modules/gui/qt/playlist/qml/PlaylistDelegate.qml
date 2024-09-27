@@ -200,29 +200,25 @@ T.Control {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.leftMargin: VLCStyle.margin_large
-            spacing: VLCStyle.margin_xsmall
+            spacing: VLCStyle.margin_xxxsmall
 
             Widgets.ListLabel {
                 id: textInfo
 
-                Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 font.weight: model.isCurrent ? Font.Bold : Font.DemiBold
                 text: model.title
                 color: theme.fg.primary
-                verticalAlignment: Text.AlignTop
             }
 
             Widgets.ListSubtitleLabel {
                 id: textArtist
 
-                Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 text: model.artist || qsTr("Unknown Artist")
                 color: theme.fg.primary
-                verticalAlignment: Text.AlignBottom
             }
         }
 
