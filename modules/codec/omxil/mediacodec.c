@@ -468,7 +468,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.video.p_surface = p_sys->video.p_surface;
         args.video.p_jsurface = p_sys->video.p_jsurface;
 
-        switch (p_dec->fmt_out.video.primaries)
+        switch (p_dec->fmt_out.video.color_range)
         {
             case COLOR_RANGE_FULL:
                 args.video.color_range = MC_COLOR_RANGE_FULL;
