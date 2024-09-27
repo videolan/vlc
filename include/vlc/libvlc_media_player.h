@@ -2947,11 +2947,16 @@ typedef void (*libvlc_media_player_watch_time_on_update)(
         const libvlc_media_player_time_point_t *value, void *data);
 
 /**
- * Callback prototype that notify when the player is paused or a discontinuity
- * occurred.
+ * Callback prototype that notify when the timer is paused.
  *
- * Likely caused by seek from the user or because the playback is stopped. The
- * player user should stop its "interpolate" timer.
+ * This event is sent when the player is paused or stopping. The player
+ * user should stop its "interpolate" timer.
+ *
+ * \note libvlc_media_player_watch_time_on_update() can be called when paused
+ * for those 2 reasons:
+ * - playback is resumed (libvlc_media_player_time_point_t.system_date is valid)
+ * - a track, likely video (next-frame) is outputted when paused
+ *   (libvlc_media_player_time_point_t.system_date = INT64_MAX)
  *
  * \warning It is forbidden to call any Media Player functions from here.
  *
@@ -2960,7 +2965,7 @@ typedef void (*libvlc_media_player_watch_time_on_update)(
  * date in order to get the last paused ts/position.
  * \param data opaque pointer set by libvlc_media_player_watch_time()
  */
-typedef void (*libvlc_media_player_watch_time_on_discontinuity)(
+typedef void (*libvlc_media_player_watch_time_on_paused)(
         int64_t system_date_us, void *data);
 
 /**
@@ -2988,8 +2993,7 @@ typedef void (*libvlc_media_player_watch_time_on_seek)(
  * updates, use it to avoid flood from too many source updates, set it to 0 to
  * receive all updates.
  * \param on_update callback to listen to update events (must not be NULL)
- * \param on_discontinuity callback to listen to discontinuity events (can be
- * be NULL)
+ * \param on_paused callback to listen to paused events (can be NULL)
  * \param cbs_data opaque pointer used by the callbacks
  * \return 0 on success, -1 on error (allocation error, or if already watching)
  * \version LibVLC 4.0.0 or later
@@ -2998,7 +3002,7 @@ LIBVLC_API int
 libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
                                int64_t min_period_us,
                                libvlc_media_player_watch_time_on_update on_update,
-                               libvlc_media_player_watch_time_on_discontinuity on_discontinuity,
+                               libvlc_media_player_watch_time_on_paused on_paused,
                                libvlc_media_player_watch_time_on_seek on_seek,
                                void *cbs_data);
 
