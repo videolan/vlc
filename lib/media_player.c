@@ -2267,7 +2267,7 @@ static void player_timer_on_update(const struct vlc_player_timer_point *point,
     p_mi->timer.on_update(&libpoint, p_mi->timer.cbs_data);
 }
 
-static void player_timer_on_discontinuity(vlc_tick_t system_date, void *data)
+static void player_timer_on_paused(vlc_tick_t system_date, void *data)
 {
     libvlc_media_player_t *p_mi = data;
 
@@ -2307,7 +2307,7 @@ libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
 
     static const struct vlc_player_timer_cbs player_timer_cbs = {
         .on_update = player_timer_on_update,
-        .on_discontinuity = player_timer_on_discontinuity,
+        .on_paused = player_timer_on_paused,
         .on_seek = player_timer_on_seek,
     };
 

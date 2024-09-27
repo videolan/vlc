@@ -168,13 +168,13 @@ struct report_timer
     {
         REPORT_TIMER_POINT,
         REPORT_TIMER_TC,
-        REPORT_TIMER_DISCONTINUITY,
+        REPORT_TIMER_PAUSED,
     } type;
     union
     {
         struct vlc_player_timer_point point;
         struct vlc_player_timer_smpte_timecode tc;
-        vlc_tick_t discontinuity_date;
+        vlc_tick_t paused_date;
     };
 };
 typedef struct VLC_VECTOR(struct report_timer) vec_report_timer;
@@ -2343,13 +2343,13 @@ timers_on_update(const struct vlc_player_timer_point *point, void *data)
 }
 
 static void
-timers_on_discontinuity(vlc_tick_t system_date, void *data)
+timers_on_paused(vlc_tick_t system_date, void *data)
 {
     struct timer_state *timer = data;
     struct report_timer report =
     {
-        .type = REPORT_TIMER_DISCONTINUITY,
-        .discontinuity_date = system_date,
+        .type = REPORT_TIMER_PAUSED,
+        .paused_date = system_date,
     };
     bool success = vlc_vector_push(&timer->vec, report);
     assert(success);
@@ -2523,8 +2523,8 @@ test_timers_playback(struct ctx *ctx, struct timer_state timers[],
             }
             else
             {
-                assert(report->type == REPORT_TIMER_DISCONTINUITY);
-                assert(report->discontinuity_date == VLC_TICK_INVALID);
+                assert(report->type == REPORT_TIMER_PAUSED);
+                assert(report->paused_date == VLC_TICK_INVALID);
             }
         }
     }
@@ -2613,7 +2613,7 @@ test_timers(struct ctx *ctx)
     static const struct vlc_player_timer_cbs cbs =
     {
         .on_update = timers_on_update,
-        .on_discontinuity = timers_on_discontinuity,
+        .on_paused = timers_on_paused,
     };
     static const struct vlc_player_timer_smpte_cbs smpte_cbs =
     {

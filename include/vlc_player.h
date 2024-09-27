@@ -3361,19 +3361,25 @@ struct vlc_player_timer_cbs
     void (*on_update)(const struct vlc_player_timer_point *value, void *data);
 
     /**
-     * The player is paused or a discontinuity occurred, likely caused by seek
-     * from the user or because the playback is stopped. The player user should
-     * stop its "interpolate" timer.
+     * The player timer is paused.
+     *
+     * This event is sent when the player is paused or stopping. The player
+     * user should stop its "interpolate" timer.
+     *
+     * @note on_update() can be called when paused for those 2 reasons:
+     * - playback is resumed (vlc_player_timer_point.system_date is valid)
+     * - a track, likely video (next-frame) is outputted when paused
+     *   (vlc_player_timer_point.system_date = INT64_MAX)
      *
      * @warning The player is not locked from this callback. It is forbidden
      * to call any player functions from here.
      *
-     * @param system_date system date of this event, only valid when paused. It
+     * @param system_date system date of this event, not valid when stopped. It
      * can be used to interpolate the last updated point to this date in order
      * to get the last paused ts/position.
      * @param data opaque pointer set by vlc_player_AddTimer()
      */
-    void (*on_discontinuity)(vlc_tick_t system_date, void *data);
+    void (*on_paused)(vlc_tick_t system_date, void *data);
 
     /**
      * Called when the player is seeking or finished seeking

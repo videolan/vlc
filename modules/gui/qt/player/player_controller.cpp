@@ -954,7 +954,7 @@ static void on_player_timer_update(const struct vlc_player_timer_point *point,
     });
 }
 
-static void on_player_timer_discontinuity(vlc_tick_t system_date, void *data)
+static void on_player_timer_paused(vlc_tick_t system_date, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     that->callAsync([that,system_date](){
@@ -1083,7 +1083,7 @@ static const vlc_player_aout_cbs player_aout_cbs = []{
 static const vlc_player_timer_cbs player_timer_cbs = []{
     struct vlc_player_timer_cbs cbs {};
     cbs.on_update = on_player_timer_update;
-    cbs.on_discontinuity = on_player_timer_discontinuity;
+    cbs.on_paused = on_player_timer_paused;
     cbs.on_seek = on_player_timer_seek;
     return cbs;
 }();

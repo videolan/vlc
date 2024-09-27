@@ -216,10 +216,6 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
                 /* signal discontinuity only on best source */
                 if (bestsource->es == es_source)
                 {
-                    /* And only once */
-                    if (source->point.system_date != VLC_TICK_INVALID)
-                        notify = true;
-
                     /* There can be several discontinuities on the same source
                      * for one seek request, hence the need of the
                      * 'timer.seeking' variable to notify only once the end of
@@ -247,6 +243,7 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
 
         case VLC_PLAYER_TIMER_EVENT_STOPPING:
             player->timer.stopping = true;
+            notify = true;
             break;
 
         default:
@@ -263,8 +260,8 @@ vlc_player_UpdateTimerEvent(vlc_player_t *player, vlc_es_id_t *es_source,
     vlc_list_foreach(timer, &bestsource->listeners, node)
     {
         timer->last_update_date = VLC_TICK_INVALID;
-        if (timer->cbs->on_discontinuity != NULL)
-            timer->cbs->on_discontinuity(system_date, timer->data);
+        if (timer->cbs->on_paused != NULL)
+            timer->cbs->on_paused(system_date, timer->data);
     }
 
     vlc_mutex_unlock(&player->timer.lock);
