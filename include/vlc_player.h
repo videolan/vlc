@@ -3341,7 +3341,7 @@ struct vlc_player_timer_smpte_timecode
 struct vlc_player_timer_cbs
 {
     /**
-     * Called when the state or the time changed.
+     * Called when the state or the time changed (mandatory).
      *
      * Get notified when the time is updated by the input or output source. The
      * input source is the 'demux' or the 'access_demux'. The output source are
@@ -3361,7 +3361,7 @@ struct vlc_player_timer_cbs
     void (*on_update)(const struct vlc_player_timer_point *value, void *data);
 
     /**
-     * The player timer is paused.
+     * The player timer is paused (can be NULL).
      *
      * This event is sent when the player is paused or stopping. The player
      * user should stop its "interpolate" timer.
@@ -3382,7 +3382,7 @@ struct vlc_player_timer_cbs
     void (*on_paused)(vlc_tick_t system_date, void *data);
 
     /**
-     * Called when the player is seeking or finished seeking
+     * Called when the player is seeking or finished seeking (can be NULL).
      *
      * @warning The player is not locked from this callback. It is forbidden
      * to call any player functions from here.
