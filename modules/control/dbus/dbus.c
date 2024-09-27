@@ -163,7 +163,7 @@ static void player_aout_on_volume_changed(audio_output_t *, float, void *);
 static void player_aout_on_mute_changed(audio_output_t *, bool, void *);
 
 static void player_vout_on_fullscreen_changed(vout_thread_t *, bool, void *);
-static void player_timer_on_discontinuity(vlc_tick_t system_dae, void *data);
+static void player_timer_on_seek(const struct vlc_player_timer_point *, void *);
 static void player_timer_on_update(const struct vlc_player_timer_point *, void *);
 
 /*****************************************************************************
@@ -318,7 +318,7 @@ static int Open( vlc_object_t *p_this )
     static struct vlc_player_timer_cbs const player_timer_cbs =
     {
         .on_update = player_timer_on_update,
-        .on_discontinuity = player_timer_on_discontinuity,
+        .on_seek = player_timer_on_seek,
     };
     p_sys->player_timer =
         vlc_player_AddTimer(player, VLC_TICK_FROM_SEC(1), &player_timer_cbs, p_intf);
@@ -1271,16 +1271,12 @@ player_timer_on_update(const struct vlc_player_timer_point *value, void *data)
 }
 
 static void
-player_timer_on_discontinuity(vlc_tick_t system_date, void *data)
+player_timer_on_seek(const struct vlc_player_timer_point *value, void *data)
 {
+    (void) value;
     intf_thread_t *intf = data;
-    intf_sys_t *sys = intf->p_sys;
 
-    bool stopping = sys->i_playing_state == PLAYBACK_STATE_STOPPED;
-    bool paused = system_date != VLC_TICK_INVALID;
-
-    if( !paused && !stopping )
-        add_event_signal(intf, &(callback_info_t){ .signal = SIGNAL_SEEK });
+    add_event_signal(intf, &(callback_info_t){ .signal = SIGNAL_SEEK });
 }
 
 /*****************************************************************************
