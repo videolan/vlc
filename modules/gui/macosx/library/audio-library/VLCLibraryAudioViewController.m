@@ -375,9 +375,10 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
-    NSDictionary * const dict = NSDictionaryOfVariableBindings(self.emptyLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self.emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[self.emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    NSView * const emptyLibraryView = self.emptyLibraryView;
+    NSDictionary * const dict = NSDictionaryOfVariableBindings(emptyLibraryView);
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     self.emptyLibraryView.identifier = VLCLibraryPlaceholderAudioViewIdentifier;
 }

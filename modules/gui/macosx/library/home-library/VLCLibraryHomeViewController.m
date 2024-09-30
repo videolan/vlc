@@ -222,9 +222,10 @@
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
-    NSDictionary * const dict = NSDictionaryOfVariableBindings(self.emptyLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    NSView * const emptyLibraryView = self.emptyLibraryView;
+    NSDictionary * const dict = NSDictionaryOfVariableBindings(emptyLibraryView);
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
 
     self.placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
     self.placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
