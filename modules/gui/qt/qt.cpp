@@ -536,10 +536,9 @@ static void *Thread( void * );
 static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason );
 
 #ifdef Q_OS_MAC
-static void ThreadDarwin(void *);
 /* Used to abort the app.exec() on OSX after libvlc_Quit is called */
 #include "../../../lib/libvlc_internal.h" /* libvlc_SetExitHandler */
-#include <dispatch/dispatch.h>
+#include <CoreFoundation/CFRunLoop.h>
 static void Abort( void *obj )
 {
     (void)obj;
@@ -600,7 +599,10 @@ static int OpenInternal( qt_intf_t *p_intf )
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( vlc_object_instance(p_intf), Abort, p_intf );
-    dispatch_async_f(dispatch_get_main_queue(), static_cast<void*>(p_intf), ThreadDarwin);
+    CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
+        Thread(static_cast<void*>(p_intf));
+    });
+    CFRunLoopWakeUp(CFRunLoopGetMain());
 #else
     if( vlc_clone( &p_intf->thread, Thread, p_intf ) )
     {
@@ -1067,13 +1069,6 @@ static void *Thread( void *obj )
     msg_Dbg( p_intf, "QApp exec() finished" );
     return ThreadCleanup( p_intf, CLEANUP_APP_TERMINATED );
 }
-
-#ifdef Q_OS_MAC
-static void ThreadDarwin(void *opaque)
-{
-    Thread(opaque);
-}
-#endif
 
 static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
 {
