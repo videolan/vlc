@@ -142,7 +142,8 @@ intf_thread_t *getIntf()
 int OpenIntf (vlc_object_t *p_this)
 {
     __block int retcode = VLC_SUCCESS;
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    __block dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    CFRunLoopPerformBlock(CFRunLoopGetMain(), kCFRunLoopDefaultMode, ^{
         @autoreleasepool {
             intf_thread_t *p_intf = (intf_thread_t*) p_this;
             p_interface_thread = p_intf;
@@ -161,11 +162,13 @@ int OpenIntf (vlc_object_t *p_this)
                 retcode = VLC_EGENERIC;
                 return;
             }
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSApp run];
-            });
+            dispatch_semaphore_signal(sem);
+            [NSApp run];
         }
     });
+    CFRunLoopWakeUp(CFRunLoopGetMain());
+
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
 
     return retcode;
 }
