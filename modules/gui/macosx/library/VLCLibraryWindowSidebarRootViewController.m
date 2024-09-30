@@ -42,7 +42,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
-    self = [super initWithNibName:@"VLCLibraryWindowSidebarView" bundle:nil];
+    self = [super initWithNibName:@"VLCLibraryWindowSidebarRootView" bundle:nil];
     if (self) {
         _libraryWindow = libraryWindow;
     }
