@@ -240,7 +240,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
             type_str = "thumbnailing ";
             break;
         default:
-            type_str = "";
+            type_str = "playback";
             break;
     }
     msg_Dbg( p_input, "Creating an input for %s'%s'", type_str, psz_name);
