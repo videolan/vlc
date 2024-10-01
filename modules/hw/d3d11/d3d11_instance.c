@@ -83,6 +83,12 @@ void D3D11_FilterHoldInstance(filter_t *filter, d3d11_device_t *out, D3D11_TEXTU
     {
         ID3D11DeviceContext_AddRef(out->d3dcontext);
         ID3D11Device_AddRef(out->d3ddevice);
+        IDXGIAdapter *adap = D3D11DeviceAdapter(out->d3ddevice);
+        if (adap != NULL)
+        {
+            IDXGIAdapter_GetDesc(adap, &out->adapterDesc);
+            IDXGIAdapter_Release(adap);
+        }
         D3D11_GetDriverVersion(filter, out);
     }
 
