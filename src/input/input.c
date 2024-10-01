@@ -264,7 +264,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->p_sout   = NULL;
     priv->b_out_pace_control = priv->type == INPUT_TYPE_THUMBNAILING;
-    priv->p_renderer = p_renderer && priv->type != INPUT_TYPE_PREPARSING ?
+    priv->p_renderer = p_renderer && priv->type == INPUT_TYPE_PLAYBACK ?
                 vlc_renderer_item_hold( p_renderer ) : NULL;
 
     priv->viewpoint_changed = false;
@@ -286,8 +286,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
 
     /* setup the preparse depth of the item
      * if we are preparsing, use the i_preparse_depth of the parent item */
-    if( priv->type == INPUT_TYPE_PREPARSING
-     || priv->type == INPUT_TYPE_THUMBNAILING )
+    if( priv->type != INPUT_TYPE_PLAYBACK )
     {
         p_input->obj.logger = NULL;
         p_input->obj.no_interact = true;
@@ -350,7 +349,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     input_item_SetESNowPlaying( p_item, NULL );
 
     /* */
-    if( priv->type != INPUT_TYPE_PREPARSING && var_InheritBool( p_input, "stats" ) )
+    if( priv->type == INPUT_TYPE_PLAYBACK && var_InheritBool( p_input, "stats" ) )
         priv->stats = input_stats_Create();
     else
         priv->stats = NULL;
@@ -759,7 +758,7 @@ static int InitSout( input_thread_t * p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
 
-    if( priv->type == INPUT_TYPE_PREPARSING )
+    if( priv->type != INPUT_TYPE_PLAYBACK )
         return VLC_SUCCESS;
 
     /* Find a usable sout and attach it to p_input */
@@ -845,7 +844,7 @@ static void InitTitle( input_thread_t * p_input, bool had_titles )
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *p_master = priv->master;
 
-    if( priv->type == INPUT_TYPE_PREPARSING )
+    if( priv->type != INPUT_TYPE_PLAYBACK )
         return;
 
     vlc_mutex_lock( &priv->p_item->lock );
@@ -1361,7 +1360,7 @@ static int Init( input_thread_t * p_input )
         }
     }
 
-    if( priv->type != INPUT_TYPE_PREPARSING && priv->p_sout )
+    if( priv->type == INPUT_TYPE_PLAYBACK && priv->p_sout )
     {
         priv->b_out_pace_control = sout_StreamIsSynchronous(priv->p_sout);
         msg_Dbg( p_input, "starting in %ssync mode",
@@ -2783,7 +2782,7 @@ static int InputSourceInit( input_source_t *in, input_thread_t *p_input,
 
     /* get attachment
      * FIXME improve for preparsing: move it after GET_META and check psz_arturl */
-    if( input_priv(p_input)->type != INPUT_TYPE_PREPARSING )
+    if( input_priv(p_input)->type == INPUT_TYPE_PLAYBACK )
     {
         if( demux_Control( in->p_demux, DEMUX_GET_TITLE_INFO,
                            &in->title, &in->i_title,
