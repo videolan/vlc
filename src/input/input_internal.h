@@ -334,6 +334,10 @@ struct vlc_input_thread_cfg
     vlc_renderer_item_t *renderer;
     const struct vlc_input_thread_callbacks *cbs;
     void *cbs_data;
+
+    struct {
+        bool subitems;
+    } preparsing;
 };
 /**
  * Create a new input_thread_t.
@@ -441,6 +445,7 @@ typedef struct input_thread_private_t
     void *cbs_data;
 
     enum input_type type;
+    bool preparse_subitems;
 
     /* Current state */
     int         i_state;

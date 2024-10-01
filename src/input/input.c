@@ -252,6 +252,7 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     priv->cbs = cfg->cbs;
     priv->cbs_data = cfg->cbs_data;
     priv->type = cfg->type;
+    priv->preparse_subitems = cfg->preparsing.subitems;
     priv->i_start = 0;
     priv->i_stop  = 0;
     priv->i_title_offset = input_priv(p_input)->i_seekpoint_offset = 0;
@@ -437,7 +438,8 @@ static void *Preparse( void *data )
     if( !Init( p_input ) )
     {   /* if the demux is a playlist, call Mainloop that will call
          * demux_Demux in order to fetch sub items */
-        if ( input_item_ShouldPreparseSubItems( priv->p_item )
+        if( ( priv->preparse_subitems
+           || input_item_ShouldPreparseSubItems( priv->p_item ) )
          && priv->master->p_demux->pf_readdir != NULL )
             MainLoop( p_input, false );
         End( p_input );
