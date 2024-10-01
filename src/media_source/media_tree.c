@@ -350,9 +350,9 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
     VLC_UNUSED(id);
     VLC_UNUSED(preparser_callbacks);
 #else
-    media->i_preparse_depth = 1;
     vlc_MetadataRequest(libvlc, media, META_REQUEST_OPTION_SCOPE_ANY |
-                        META_REQUEST_OPTION_DO_INTERACT,
+                        META_REQUEST_OPTION_DO_INTERACT |
+                        META_REQUEST_OPTION_PARSE_SUBITEMS,
                         &preparser_callbacks, tree, 0, id);
 #endif
 }
