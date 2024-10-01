@@ -84,16 +84,8 @@ public:
      */
     CheckableListMenu(QString title, QAbstractListModel* model, QActionGroup::ExclusionPolicy grouping = QActionGroup::ExclusionPolicy::None, QWidget *parent = nullptr);
 
-private slots:
-    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
-    void onRowInserted(const QModelIndex &parent, int first, int last);
-    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-    void onModelAboutToBeReset();
-    void onModelReset();
-
-private:
-    QAbstractListModel* m_model;
-    QActionGroup* m_actionGroup = nullptr;
+protected:
+    QAbstractListModel* m_model = nullptr;
 };
 
 class QQuickImageResponse;

@@ -217,90 +217,12 @@ CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , 
     , m_model(model)
 {
     this->setTitle(title);
-    if (grouping != QActionGroup::ExclusionPolicy::None)
-    {
-        m_actionGroup = new QActionGroup(this);
-        m_actionGroup->setExclusionPolicy(grouping);
-    }
 
-    connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this, &CheckableListMenu::onRowsAboutToBeRemoved);
-    connect(m_model, &QAbstractListModel::rowsInserted, this, &CheckableListMenu::onRowInserted);
-    connect(m_model, &QAbstractListModel::dataChanged, this, &CheckableListMenu::onDataChanged);
-    connect(m_model, &QAbstractListModel::modelAboutToBeReset, this, &CheckableListMenu::onModelAboutToBeReset);
-    connect(m_model, &QAbstractListModel::modelReset, this, &CheckableListMenu::onModelReset);
-    onModelReset();
-}
-
-void CheckableListMenu::onRowsAboutToBeRemoved(const QModelIndex &, int first, int last)
-{
-    for (int i = last; i >= first; i--)
-    {
-        QAction* action = actions()[i];
-        if (m_actionGroup)
-            m_actionGroup->removeAction(action);
-        delete action;
-    }
-    if (actions().count() == 0)
-        setEnabled(false);
-}
-
-void CheckableListMenu::onRowInserted(const QModelIndex &, int first, int last)
-{
-    for (int i = first; i <= last; i++)
-    {
-        QModelIndex index = m_model->index(i);
-        QString title = m_model->data(index, Qt::DisplayRole).toString();
-        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
-
-        QAction *choiceAction = new QAction(title, this);
-        addAction(choiceAction);
-        if (m_actionGroup)
-            m_actionGroup->addAction(choiceAction);
-        connect(choiceAction, &QAction::triggered, [this, i](bool checked){
-            QModelIndex dataIndex = m_model->index(i);
-            m_model->setData(dataIndex, QVariant::fromValue<bool>(checked), Qt::CheckStateRole);
-        });
-        choiceAction->setCheckable(true);
-        choiceAction->setChecked(checked);
-        setEnabled(true);
-    }
-}
-
-void CheckableListMenu::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> & )
-{
-    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
-    {
-        if (i >= actions().size())
-            break;
-        QAction *choiceAction = actions()[i];
-
-        QModelIndex index = m_model->index(i);
-        QString title = m_model->data(index, Qt::DisplayRole).toString();
-        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
-
-        choiceAction->setText(title);
-        choiceAction->setChecked(checked);
-    }
-}
-
-void CheckableListMenu::onModelAboutToBeReset()
-{
-    for (QAction* action  :actions())
-    {
-        if (m_actionGroup)
-            m_actionGroup->removeAction(action);
-        delete action;
-    }
-    setEnabled(false);
-}
-
-void CheckableListMenu::onModelReset()
-{
-    int nb_rows = m_model->rowCount();
-    if (nb_rows == 0)
-        setEnabled(false);
-    else
-        onRowInserted({}, 0, nb_rows - 1);
+    ListMenuHelper* helper = new ListMenuHelper(this, model, nullptr, this);
+    helper->getActionGroup()->setExclusionPolicy(grouping);
+    connect(helper, &ListMenuHelper::select, this, [this](int row, bool checked){
+        m_model->setData(m_model->index(row), checked, Qt::CheckStateRole);
+    });
 }
 
 // ListMenuHelper
