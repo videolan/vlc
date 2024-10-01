@@ -224,6 +224,7 @@ Parse(struct task *task, vlc_tick_t deadline)
     const struct input_item_parser_cfg cfg = {
         .cbs = &cbs,
         .cbs_data = task,
+        .subitems = task->options & META_REQUEST_OPTION_PARSE_SUBITEMS,
     };
     task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
