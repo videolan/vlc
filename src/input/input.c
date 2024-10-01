@@ -2528,9 +2528,9 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, es_out_t *p_es_out,
     vlc_object_t *obj = VLC_OBJECT(p_input);
 
     /* create the underlying access stream */
+    bool preparsing = priv->type == INPUT_TYPE_PREPARSING;
     stream_t *p_stream = stream_AccessNew( obj, p_input, p_es_out,
-                                           priv->type == INPUT_TYPE_PREPARSING,
-                                           url );
+                                           preparsing, url );
     if( p_stream == NULL )
         return NULL;
 
@@ -2565,7 +2565,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input, es_out_t *p_es_out,
 
     /* create a regular demux with the access stream created */
     demux_t *demux = demux_NewAdvanced( obj, p_input, psz_demux, url, p_stream,
-                                        p_es_out, priv->type == INPUT_TYPE_PREPARSING );
+                                        p_es_out, preparsing );
     if( demux != NULL )
         return demux;
 
