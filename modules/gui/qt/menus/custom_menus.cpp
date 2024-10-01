@@ -36,6 +36,7 @@
 
 // Menus includes
 #include "menus/menus.hpp"
+#include "player/player_controller.hpp"
 
 // Qt includes
 #include <QMenu>
@@ -51,164 +52,101 @@
 
 #include "util/vlcaccess_image_provider.hpp"
 
-RendererAction::RendererAction( vlc_renderer_item_t *p_item_ )
-    : QAction()
-{
-    p_item = p_item_;
-    vlc_renderer_item_hold( p_item );
-    if( vlc_renderer_item_flags( p_item ) & VLC_RENDERER_CAN_VIDEO )
-        setIcon( QIcon( ":/menu/movie.svg" ) );
-    else
-        setIcon( QIcon( ":/menu/music.svg" ) );
-    setText( vlc_renderer_item_name( p_item ) );
-    setCheckable(true);
-}
-
-RendererAction::~RendererAction()
-{
-    vlc_renderer_item_release( p_item );
-}
-
-vlc_renderer_item_t * RendererAction::getItem()
-{
-    return p_item;
-}
-
-RendererMenu::RendererMenu( QMenu *parent, qt_intf_t *p_intf_ )
-    : QMenu( parent ), p_intf( p_intf_ )
+RendererMenu::RendererMenu( QMenu* parent, qt_intf_t* intf, PlayerController* player )
+    : QMenu( parent)
+    , p_intf( intf )
+    , m_renderManager(player->getRendererManager())
 {
     setTitle( qtr("&Renderer") );
 
-    group = new QActionGroup( this );
-
     QAction *action = new QAction( qtr("<Local>"), this );
     action->setCheckable(true);
+    action->setChecked(!m_renderManager->useRenderer());
+    connect(action, &QAction::triggered, this, [this](bool checked){
+        if (checked) {
+            m_renderManager->disableRenderer();
+        }
+    });
     addAction( action );
-    group->addAction(action);
+    connect(m_renderManager,  &RendererManager::useRendererChanged, action,
+            [action, this](){
+                action->setChecked(!m_renderManager->useRenderer());
+    });
 
-    vlc_player_Lock( p_intf_->p_player );
-    if ( vlc_player_GetRenderer( p_intf->p_player ) == nullptr )
-        action->setChecked( true );
-    vlc_player_Unlock( p_intf_->p_player );
+    QAction* separator = addSeparator();
 
-    addSeparator();
+    ListMenuHelper* helper = new ListMenuHelper(this, m_renderManager, separator, this);
+    connect(helper, &ListMenuHelper::select, this, [this](int row, bool checked){
+        m_renderManager->setData(m_renderManager->index(row), checked, Qt::CheckStateRole);
+    });
+
+    QActionGroup* actionGroup = helper->getActionGroup();
+    actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::Exclusive);
+    //the <Local> node is part of the group
+    actionGroup->addAction(action);
 
     QWidget *statusWidget = new QWidget();
     statusWidget->setLayout( new QVBoxLayout );
-    QLabel *label = new QLabel();
-    label->setObjectName( "statuslabel" );
-    statusWidget->layout()->addWidget( label );
-    QProgressBar *pb = new QProgressBar();
-    pb->setObjectName( "statusprogressbar" );
-    pb->setMaximumHeight( 10 );
-    pb->setStyleSheet( QString("\
-        QProgressBar:horizontal {\
-            border: none;\
-            background: transparent;\
-            padding: 1px;\
-        }\
-        QProgressBar::chunk:horizontal {\
-            background: qlineargradient(x1: 0, y1: 0.5, x2: 1, y2: 0.5, \
-                        stop: 0 white, stop: 0.4 orange, stop: 0.6 orange, stop: 1 white);\
-        }") );
-    pb->setRange( 0, 0 );
-    pb->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Maximum );
-    statusWidget->layout()->addWidget( pb );
+    m_statusLabel = new QLabel();
+    statusWidget->layout()->addWidget( m_statusLabel );
+    m_statusProgressBar = new QProgressBar();
+    m_statusProgressBar->setMaximumHeight( 10 );
+    m_statusProgressBar->setStyleSheet( QString(R"RAW(
+        QProgressBar:horizontal {
+            border: none;
+            background: transparent;
+            padding: 1px;
+        }
+        QProgressBar::chunk:horizontal {
+            background: qlineargradient(x1: 0, y1: 0.5, x2: 1, y2: 0.5,
+                        stop: 0 white, stop: 0.4 orange, stop: 0.6 orange, stop: 1 white);
+        })RAW") );
+    m_statusProgressBar->setRange( 0, 0 );
+    m_statusProgressBar->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Maximum );
+    statusWidget->layout()->addWidget( m_statusProgressBar );
+
     QWidgetAction *qwa = new QWidgetAction( this );
     qwa->setDefaultWidget( statusWidget );
     qwa->setDisabled( true );
     addAction( qwa );
-    status = qwa;
+    m_statusAction = qwa;
 
-    RendererManager *manager = RendererManager::getInstance( p_intf );
-    connect( this, &RendererMenu::aboutToShow, manager, &RendererManager::StartScan );
-    connect( group, &QActionGroup::triggered, this, &RendererMenu::RendererSelected );
-    connect( manager, SIGNAL(rendererItemAdded( vlc_renderer_item_t * )),
-             this, SLOT(addRendererItem( vlc_renderer_item_t * )), Qt::DirectConnection );
-    connect( manager, SIGNAL(rendererItemRemoved( vlc_renderer_item_t * )),
-             this, SLOT(removeRendererItem( vlc_renderer_item_t * )), Qt::DirectConnection );
-    connect( manager, &RendererManager::statusUpdated, this, &RendererMenu::updateStatus );
+    connect( this, &RendererMenu::aboutToShow, m_renderManager, &RendererManager::StartScan );
+    connect( m_renderManager, &RendererManager::statusChanged, this, &RendererMenu::updateStatus );
+    connect( m_renderManager, &RendererManager::scanRemainChanged, this, &RendererMenu::updateStatus );
+    updateStatus();
 }
 
 RendererMenu::~RendererMenu()
-{
-    reset();
-}
+{}
 
-void RendererMenu::updateStatus( int val )
+void RendererMenu::updateStatus()
 {
-    QProgressBar *pb = findChild<QProgressBar *>("statusprogressbar");
-    QLabel *label = findChild<QLabel *>("statuslabel");
-    if( val >= RendererManager::RendererStatus::RUNNING )
+
+    switch (m_renderManager->getStatus())
     {
-        label->setText( qtr("Scanning...").
-               append( QString(" (%1s)").arg( val ) ) );
-        pb->setVisible( true );
-        status->setVisible( true );
+    case RendererManager::RendererStatus::RUNNING:
+    {
+        int scanRemain = m_renderManager->getScanRemain();
+        m_statusLabel->setText( qtr("Scanning...").
+               append( QString(" (%1s)").arg( scanRemain ) ) );
+        m_statusProgressBar->setVisible( true );
+        m_statusAction->setVisible( true );
+        break;
     }
-    else if( val == RendererManager::RendererStatus::FAILED )
+    case RendererManager::RendererStatus::FAILED:
     {
-        label->setText( "Failed (no discovery module available)" );
-        pb->setVisible( false );
-        status->setVisible( true );
+        m_statusLabel->setText( "Failed (no discovery module available)" );
+        m_statusProgressBar->setVisible( false );
+        m_statusAction->setVisible( true );
+        break;
     }
-    else status->setVisible( false );
-}
-
-void RendererMenu::addRendererItem( vlc_renderer_item_t *p_item )
-{
-    QAction *action = new RendererAction( p_item );
-    insertAction( status, action );
-    group->addAction( action );
-}
-
-void RendererMenu::removeRendererItem( vlc_renderer_item_t *p_item )
-{
-    foreach (QAction* action, group->actions())
-    {
-        RendererAction *ra = qobject_cast<RendererAction *>( action );
-        if( !ra || ra->getItem() != p_item )
-            continue;
-        removeRendererAction( ra );
-        delete ra;
+    case RendererManager::RendererStatus::IDLE:
+        m_statusAction->setVisible( false );
         break;
     }
 }
 
-void RendererMenu::addRendererAction(QAction *action)
-{
-    insertAction( status, action );
-    group->addAction( action );
-}
-
-void RendererMenu::removeRendererAction(QAction *action)
-{
-    removeAction( action );
-    group->removeAction( action );
-}
-
-void RendererMenu::reset()
-{
-    /* reset the list of renderers */
-    foreach (QAction* action, group->actions())
-    {
-        RendererAction *ra = qobject_cast<RendererAction *>( action );
-        if( ra )
-        {
-            removeRendererAction( ra );
-            delete ra;
-        }
-    }
-}
-
-void RendererMenu::RendererSelected(QAction *action)
-{
-    RendererAction *ra = qobject_cast<RendererAction *>( action );
-    if( ra )
-        RendererManager::getInstance( p_intf )->SelectRenderer( ra->getItem() );
-    else
-        RendererManager::getInstance( p_intf )->SelectRenderer( NULL );
-}
 
 /*   CheckableListMenu   */
 
@@ -384,9 +322,15 @@ void ListMenuHelper::onDataChanged(const QModelIndex & topLeft,
         if (udpateIcon)
         {
             QVariant iconPath = m_model->data(index, Qt::DecorationRole);
-            if (iconPath.isValid() && iconPath.canConvert<QString>())
+            if (iconPath.isValid())
             {
-                action->setIcon(QIcon(iconPath.toString()));
+                QUrl iconUrl;
+                if (iconPath.canConvert<QUrl>())
+                    iconUrl = iconPath.toUrl();
+                else if (iconPath.canConvert<QString>())
+                    iconUrl = QUrl::fromEncoded(iconPath.toString().toUtf8());
+
+                setIcon(action, iconUrl);
             }
         }
     }

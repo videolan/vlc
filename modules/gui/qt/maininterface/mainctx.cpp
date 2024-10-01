@@ -260,8 +260,6 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
 MainCtx::~MainCtx()
 {
-    RendererManager::killInstance();
-
     /* Save states */
 
     settings->beginGroup("MainWindow");

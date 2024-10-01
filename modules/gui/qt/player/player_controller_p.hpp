@@ -24,6 +24,7 @@
 #include "input_models.hpp"
 #include "util/varchoicemodel.hpp"
 #include "util/shared_input_item.hpp"
+#include "util/renderer_manager.hpp"
 
 #include <QTimer>
 #include <QUrl>
@@ -172,6 +173,8 @@ public:
     //others
     QString         m_artUrl;
     struct input_stats_t m_stats;
+
+    RendererManager m_rendererManager;
 
     // meta
     QString m_title;

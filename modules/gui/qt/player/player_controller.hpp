@@ -34,12 +34,14 @@
 #include "util/varchoicemodel.hpp"
 #include "util/vlctick.hpp"
 
+Q_MOC_INCLUDE("util/renderer_manager.hpp")
 
 using vlc_player_locker = vlc_locker<vlc_player_t, vlc_player_Lock, vlc_player_Unlock>;
 
 using SharedVOutThread = vlc_shared_data_ptr_type(vout_thread_t, vout_Hold, vout_Release);
 using SharedAOut = vlc_shared_data_ptr_type(audio_output_t, aout_Hold, aout_Release);
 
+class RendererManager;
 class QSignalMapper;
 
 class IMEvent : public QEvent
@@ -191,6 +193,7 @@ public:
     Q_PROPERTY(VLCTick ABLoopA READ getABLoopA NOTIFY ABLoopAChanged FINAL)
     Q_PROPERTY(VLCTick ABLoopB READ getABLoopB NOTIFY ABLoopBChanged FINAL)
     Q_PROPERTY(bool recording READ isRecording WRITE setRecording NOTIFY recordingChanged FINAL)
+    Q_PROPERTY(RendererManager* rendererManager READ getRendererManager CONSTANT FINAL)
 
     // High resolution time fed by SMPTE Timer
     Q_PROPERTY(QString highResolutionTime READ highResolutionTime NOTIFY highResolutionTimeChanged FINAL)
@@ -393,6 +396,9 @@ public slots:
     QString getArtist() const;
     QString getAlbum() const;
     QUrl getArtwork() const;
+
+    //Renderer
+    RendererManager* getRendererManager();
 
 signals:
     //playback

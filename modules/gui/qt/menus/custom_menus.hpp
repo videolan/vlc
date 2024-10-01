@@ -29,45 +29,6 @@
 
 class QAbstractListModel;
 
-class RendererAction : public QAction
-{
-    Q_OBJECT
-
-    public:
-        RendererAction( vlc_renderer_item_t * );
-        ~RendererAction();
-        vlc_renderer_item_t *getItem();
-
-    private:
-        vlc_renderer_item_t *p_item;
-};
-
-class RendererMenu : public QMenu
-{
-    Q_OBJECT
-
-public:
-    RendererMenu( QMenu *, qt_intf_t * );
-    virtual ~RendererMenu();
-    void reset();
-
-private slots:
-    void addRendererItem( vlc_renderer_item_t * );
-    void removeRendererItem( vlc_renderer_item_t * );
-    void updateStatus( int );
-    void RendererSelected( QAction* );
-
-private:
-    void addRendererAction( QAction * );
-    void removeRendererAction( QAction * );
-    static vlc_renderer_item_t* getMatchingRenderer( const QVariant &,
-                                                     vlc_renderer_item_t* );
-    QAction *status;
-    QActionGroup *group;
-    qt_intf_t *p_intf;
-};
-
-
 /*
  * Construct a menu from a QAbstractListModel with Qt::DisplayRole and Qt::CheckStateRole
  */
@@ -160,6 +121,32 @@ private:
     QObject* m_model;
     QString m_propertyName;
 };
+
+class RendererManager;
+class QProgressBar;
+class QLabel;
+class PlayerController;
+class RendererMenu : public QMenu
+{
+    Q_OBJECT
+
+public:
+    RendererMenu( QMenu* parent, qt_intf_t* intf, PlayerController* playerController );
+    virtual ~RendererMenu();
+
+private slots:
+    void updateStatus();
+
+protected:
+    QProgressBar* m_statusProgressBar;
+    QLabel* m_statusLabel;
+
+    QAction *m_statusAction;
+    QActionGroup *group;
+    qt_intf_t *p_intf;
+    RendererManager* m_renderManager = nullptr;
+};
+
 
 class RecentMenu : public QMenu
 {

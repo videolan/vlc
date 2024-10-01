@@ -578,7 +578,7 @@ void QmlProgramMenu::close()
     if (m_ctx == nullptr)
         return;
 
-    m_menu = std::make_unique<RendererMenu>(nullptr, m_ctx->getIntf());
+    m_menu = std::make_unique<RendererMenu>(nullptr, m_ctx->getIntf(), m_ctx->getIntf()->p_mainPlayerController);
 
     connect(m_menu.get(), &QMenu::aboutToHide, this, &QmlRendererMenu::aboutToHide);
     connect(m_menu.get(), &QMenu::aboutToShow, this, &QmlRendererMenu::aboutToShow);

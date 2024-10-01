@@ -527,7 +527,7 @@ void VLCMenuBar::NavigMenu( qt_intf_t *p_intf, QMenu *menu )
     menu->addSeparator();
 
     if ( !VLCMenuBar::rendererMenu )
-        VLCMenuBar::rendererMenu = new RendererMenu( NULL, p_intf );
+        VLCMenuBar::rendererMenu = new RendererMenu( NULL, p_intf, p_intf->p_mainPlayerController );
 
     menu->addMenu( VLCMenuBar::rendererMenu );
     menu->addSeparator();

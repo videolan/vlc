@@ -1,38 +1,30 @@
+/*****************************************************************************
+ * Copyright (C) 2024 VLC authors and VideoLAN
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 #ifndef RENDERER_MANAGER_HPP
 #define RENDERER_MANAGER_HPP
 
 #include "qt.hpp"
-#include "util/singleton.hpp"
+#include <QAbstractListModel>
 
-#include <QObject>
-#include <QEvent>
-#include <QTimer>
-#include <QVector>
-#include <QHash>
-
-extern "C" {
-    typedef struct vlc_renderer_item_t vlc_renderer_item_t;
-}
-
-class RendererManagerEvent : public QEvent
-{
-public:
-    static const QEvent::Type AddedEvent;
-    static const QEvent::Type RemovedEvent;
-
-    RendererManagerEvent( QEvent::Type type, vlc_renderer_item_t *p_item_ );
-    virtual ~RendererManagerEvent();
-
-    vlc_renderer_item_t * getItem() const { return p_item; }
-
-private:
-    vlc_renderer_item_t *p_item;
-};
-
-class RendererManager : public QObject, public Singleton<RendererManager>
+class RendererManagerPrivate;
+class RendererManager : public QAbstractListModel
 {
     Q_OBJECT
-    friend class Singleton<RendererManager>;
 
 public:
     enum RendererStatus
@@ -41,36 +33,53 @@ public:
         IDLE = -1,
         RUNNING,
     };
-    RendererManager( qt_intf_t * );
+    Q_ENUM(RendererStatus)
+
+    enum Roles {
+        NAME = Qt::UserRole,
+        TYPE,
+        DEMUX_FILTER,
+        SOUT,
+        ICON_URI,
+        FLAGS,
+        SELECTED
+    };
+
+    ///remaining time before scan timeout
+    Q_PROPERTY(int scanRemain READ getScanRemain NOTIFY scanRemainChanged FINAL)
+    Q_PROPERTY(RendererStatus status READ getStatus NOTIFY statusChanged FINAL)
+    Q_PROPERTY(bool useRenderer READ useRenderer NOTIFY useRendererChanged FINAL)
+
+public:
+    RendererManager( qt_intf_t* intf, vlc_player_t* player );
     virtual ~RendererManager();
-    void customEvent( QEvent * );
+
+    void disableRenderer();
 
 public slots:
-    void SelectRenderer( vlc_renderer_item_t * );
     void StartScan();
     void StopScan();
 
+    //QAbstractListModel override
+public:
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+    QHash<int,QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+
+    //properties accessor
+public:
+    int getScanRemain() const;
+    RendererStatus getStatus() const;
+    bool useRenderer() const;
 signals:
-    void rendererItemAdded( vlc_renderer_item_t * );   /* For non queued only */
-    void rendererItemRemoved( vlc_renderer_item_t * ); /* For non queued only */
-    void statusUpdated( int );
+    void statusChanged();
+    void scanRemainChanged();
+    void useRendererChanged();
 
 private:
-    static void renderer_event_item_added( vlc_renderer_discovery_t *,
-                                           vlc_renderer_item_t * );
-    static void renderer_event_item_removed( vlc_renderer_discovery_t *,
-                                             vlc_renderer_item_t * );
-
-    typedef std::pair<bool, vlc_renderer_item_t *> ItemEntry;
-    qt_intf_t* const p_intf;
-    const vlc_renderer_item_t *p_selected_item;
-    QVector<vlc_renderer_discovery_t*> m_rds;
-    QHash<QString, ItemEntry> m_items;
-    QTimer m_stop_scan_timer;
-    unsigned m_scan_remain;
-
-private slots:
-    void RendererMenuCountdown();
+    Q_DECLARE_PRIVATE(RendererManager);
+    QScopedPointer<RendererManagerPrivate> d_ptr;
 };
 
 #endif // RENDERER_MANAGER_HPP

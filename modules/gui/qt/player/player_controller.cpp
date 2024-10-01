@@ -1125,6 +1125,7 @@ PlayerControllerPrivate::PlayerControllerPrivate(PlayerController *playercontrol
     , m_audioMixMode((audio_output_t*)nullptr, "mix-mode")
     , m_audioDeviceList(m_player)
     , m_audioVisualization((audio_output_t*)nullptr, "visual")
+    , m_rendererManager(p_intf, m_player)
 {
     {
         vlc_player_locker locker{m_player};
@@ -2067,7 +2068,7 @@ QABSTRACTLIST_GETTER( VLCVarChoiceModel, getDeinterlaceMode, m_deinterlaceMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioStereoMode, m_audioStereoMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioMixMode, m_audioMixMode)
 QABSTRACTLIST_GETTER( VLCVarChoiceModel, getAudioVisualizations, m_audioVisualization)
-
+QABSTRACTLIST_GETTER( RendererManager, getRendererManager, m_rendererManager)
 
 #undef QABSTRACTLIST_GETTER
 
