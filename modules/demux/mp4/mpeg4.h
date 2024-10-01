@@ -38,6 +38,12 @@ static inline bool MPEG4_Codec_By_ObjectType(uint8_t oti,
         case 0x21: /* H.264 */
             *pi_codec = VLC_CODEC_H264;
             break;
+        case 0x22: /* H.265 */
+            *pi_codec = VLC_CODEC_HEVC;
+            break;
+        case 0x23: /* H.266 */
+            *pi_codec = VLC_CODEC_VVC;
+            break;
         case 0x40:
         case 0x41:
             *pi_codec = VLC_CODEC_MP4A;
@@ -104,8 +110,14 @@ static inline bool MPEG4_Codec_By_ObjectType(uint8_t oti,
         case 0xad:
             *pi_codec = VLC_CODEC_OPUS;
             break;
+        case 0xB1:
+            *pi_codec = VLC_CODEC_VP9;
+            break;
         case 0xDD:
             *pi_codec = VLC_CODEC_VORBIS;
+            break;
+        case 0xE1:
+            *pi_codec = VLC_CODEC_QCELP;
             break;
         default:
             return false;
