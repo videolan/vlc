@@ -108,6 +108,7 @@ input_item_Parse(vlc_object_t *obj, input_item_t *item,
         .type = INPUT_TYPE_PREPARSING,
         .cbs = &input_cbs,
         .cbs_data = parser,
+        .preparsing.subitems = cfg->subitems,
     };
     parser->input = input_Create(obj, item, &input_cfg );
     if (!parser->input || input_Start(parser->input))

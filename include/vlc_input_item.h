@@ -472,6 +472,8 @@ struct input_item_parser_cfg {
     const input_item_parser_cbs_t *cbs;
     /** Opaque data used by parser callbacks */
     void *cbs_data;
+    /** true to parse subitems (from a folder or a playlist file) */
+    bool subitems;
 };
 
 /**
