@@ -1242,7 +1242,7 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
         if (name == NULL)
             name = "unknown";
 
-        msg_Err(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
+        msg_Dbg(p_dec, "output: %d %s, %dx%d stride %d %d, crop %d %d %d %d",
                 p_sys->video.i_pixel_format, name,
                 p_out->conf.video.width, p_out->conf.video.height,
                 p_out->conf.video.stride, p_out->conf.video.slice_height,
