@@ -193,7 +193,7 @@ static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc
     return NULL;
 }
 
-void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+static void D3D11_GetSystemDriver(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
 
@@ -235,13 +235,43 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     }
 }
 #else /* VLC_WINSTORE_APP */
-void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+static void D3D11_GetSystemDriver(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
     VLC_UNUSED(obj);
     VLC_UNUSED(d3d_dev);
     return;
 }
 #endif /* VLC_WINSTORE_APP */
+
+void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
+{
+    memset(&d3d_dev->WDDM, 0, sizeof(d3d_dev->WDDM));
+
+    LARGE_INTEGER driver = { 0 };
+    HRESULT hr;
+    IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
+    hr = IDXGIAdapter_CheckInterfaceSupport(pAdapter, &IID_IDXGIDevice, &driver);
+
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "failed to get interface version. (hr=0x%lX)", hr);
+        D3D11_GetSystemDriver(obj, d3d_dev);
+    }
+    else if (HIWORD(driver.HighPart) < 23)
+    // starting with WDDM 2.3 driver versions must be coherent
+    // https://learn.microsoft.com/en-us/windows/win32/api/dxgi/nf-dxgi-idxgiadapter-checkinterfacesupport#parameters
+    {
+        msg_Dbg(obj, "unsupported interface version %" PRIx64, driver.QuadPart);
+        D3D11_GetSystemDriver(obj, d3d_dev);
+    }
+    else
+    {
+        d3d_dev->WDDM.wddm         = HIWORD(driver.HighPart);
+        d3d_dev->WDDM.d3d_features = LOWORD(driver.LowPart);
+        d3d_dev->WDDM.revision     = HIWORD(driver.LowPart);
+        d3d_dev->WDDM.build        = LOWORD(driver.LowPart);
+    }
+}
 
 void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
 {
