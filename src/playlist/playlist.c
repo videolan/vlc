@@ -54,6 +54,7 @@ vlc_playlist_New(vlc_object_t *parent)
     playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     playlist->order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     playlist->idgen = 0;
+    playlist->recursive = VLC_PLAYLIST_RECURSIVE_COLLAPSE;
 #ifdef TEST_PLAYLIST
     playlist->libvlc = NULL;
     playlist->auto_preparse = false;
@@ -61,6 +62,16 @@ vlc_playlist_New(vlc_object_t *parent)
     assert(parent);
     playlist->libvlc = vlc_object_instance(parent);
     playlist->auto_preparse = var_InheritBool(parent, "auto-preparse");
+
+    char *rec = var_InheritString(parent, "recursive");
+    if (rec != NULL)
+    {
+        if (!strcasecmp(rec, "none"))
+            playlist->recursive = VLC_PLAYLIST_RECURSIVE_NONE;
+        else if (!strcasecmp(rec, "expand"))
+            playlist->recursive = VLC_PLAYLIST_RECURSIVE_EXPAND;
+        free(rec);
+    }
 #endif
 
     return playlist;

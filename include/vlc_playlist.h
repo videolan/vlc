@@ -901,9 +901,11 @@ vlc_playlist_PlayAt(vlc_playlist_t *playlist, size_t index)
  *
  * \param playlist the playlist (not necessarily locked)
  * \param media the media to preparse
+ * \param parse_subitems true to parse subitems (from a folder or a playlist file)
  */
 VLC_API void
-vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *media);
+vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *media,
+                      bool parse_subitems);
 
 /**
  * Export the playlist to a file.
