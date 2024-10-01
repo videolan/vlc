@@ -28,7 +28,6 @@
 
 void input_item_UpdateTracksInfo( input_item_t *item, const es_format_t *fmt,
                                   const char *es_id, bool stable );
-bool input_item_ShouldPreparseSubItems( input_item_t *p_i );
 
 typedef struct input_item_owner
 {

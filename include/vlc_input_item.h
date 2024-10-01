@@ -130,9 +130,6 @@ struct input_item_t
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
 
-    int         i_preparse_depth;    /**< How many level of sub items can be preparsed:
-                                          -1: recursive, 0: none, >0: n levels */
-
     bool        b_preparse_interact; /**< Force interaction with the user when
                                           preparsing.*/
 

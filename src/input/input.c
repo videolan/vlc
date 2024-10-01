@@ -284,28 +284,10 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( !p_item->p_stats )
         p_item->p_stats = calloc( 1, sizeof(*p_item->p_stats) );
 
-    /* setup the preparse depth of the item
-     * if we are preparsing, use the i_preparse_depth of the parent item */
     if( priv->type != INPUT_TYPE_PLAYBACK )
     {
         p_input->obj.logger = NULL;
         p_input->obj.no_interact = true;
-    }
-    else
-    {
-        char *psz_rec = var_InheritString( p_parent, "recursive" );
-
-        if( psz_rec != NULL )
-        {
-            if ( !strcasecmp( psz_rec, "none" ) )
-                p_item->i_preparse_depth = 0;
-            else if ( !strcasecmp( psz_rec, "collapse" ) )
-                p_item->i_preparse_depth = 1;
-            else
-                p_item->i_preparse_depth = -1; /* default is expand */
-            free (psz_rec);
-        } else
-            p_item->i_preparse_depth = -1;
     }
 
     /* Make sure the interaction option is honored */
@@ -438,8 +420,7 @@ static void *Preparse( void *data )
     if( !Init( p_input ) )
     {   /* if the demux is a playlist, call Mainloop that will call
          * demux_Demux in order to fetch sub items */
-        if( ( priv->preparse_subitems
-           || input_item_ShouldPreparseSubItems( priv->p_item ) )
+        if( priv->preparse_subitems
          && priv->master->p_demux->pf_readdir != NULL )
             MainLoop( p_input, false );
         End( p_input );
