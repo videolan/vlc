@@ -378,24 +378,14 @@ MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
     return item ? item->get() : nullptr;
 }
 
-void MLBaseModel::updateItemInCache(const MLItemId& mlid)
+void MLBaseModel::updateItemInCache(const MLItemId&)
 {
     Q_D(MLBaseModel);
-    if (!d->m_cache)
-    {
-        emit resetRequested();
-        return;
-    }
-    MLItem* item = findInCache(mlid, nullptr);
-    if (!item) // items isn't loaded
-        return;
-
-    if (!m_itemLoader)
-        m_itemLoader = createMLLoader();
-    m_itemLoader->loadItemByIdTask(mlid,
-        [d](qint64, std::unique_ptr<MLItem>&& item) {
-            d->m_cache->updateItem(std::move(item));
-    });
+    // we can't safely update the item in the cache because our view may have a filter
+    // and the update may cause the item filtered state to change requiring it to enter/leave
+    // the cache
+    emit resetRequested();
+    return;
 }
 
 void MLBaseModel::deleteItemInCache(const MLItemId& mlid)
