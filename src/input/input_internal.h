@@ -49,7 +49,7 @@ typedef struct input_thread_t
  *****************************************************************************/
 
 enum input_type {
-    INPUT_TYPE_NONE,
+    INPUT_TYPE_PLAYBACK,
     INPUT_TYPE_PREPARSING,
     INPUT_TYPE_THUMBNAILING,
 };

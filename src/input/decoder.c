@@ -2276,7 +2276,7 @@ vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const 
         .clock = clock,
         .resource = p_resource,
         .sout = NULL,
-        .input_type = INPUT_TYPE_NONE,
+        .input_type = INPUT_TYPE_PLAYBACK,
         .cbs = NULL, .cbs_data = NULL,
     };
     return decoder_New( p_parent, &cfg );

@@ -1137,7 +1137,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.has_audio_tracks = input->ml.has_video_tracks = false;
 
     input->thread = input_Create(player, input_thread_Events, input, item,
-                                 INPUT_TYPE_NONE, player->resource,
+                                 INPUT_TYPE_PLAYBACK, player->resource,
                                  player->renderer);
     if (!input->thread)
     {

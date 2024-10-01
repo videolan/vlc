@@ -73,7 +73,7 @@ vlc_input_decoder_Create(vlc_object_t *parent, const es_format_t *fmt, const cha
         .clock = clock,
         .resource = p_resource,
         .sout = NULL,
-        .input_type = INPUT_TYPE_NONE,
+        .input_type = INPUT_TYPE_PLAYBACK,
         .cbs = NULL, .cbs_data = NULL,
     };
     return vlc_input_decoder_New(parent, &cfg);
@@ -367,7 +367,7 @@ int main(void)
     input_source_t *source = InputSourceNew();
 
     struct vlc_input_es_out *out =
-        input_EsOutNew(input, source, 1.f, INPUT_TYPE_NONE);
+        input_EsOutNew(input, source, 1.f, INPUT_TYPE_PLAYBACK);
     assert(out != NULL);
 
     es_out_SetMode(out, ES_OUT_MODE_AUTO);
