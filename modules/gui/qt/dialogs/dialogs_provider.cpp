@@ -387,7 +387,7 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
 
         const int result = libvlc_MetadataRequest( vlc_object_instance( p_intf ),
                                                    inputItem,
-                                                   static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED),
+                                                   static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_PARSE_SUBITEMS),
                                                    &cbs,
                                                    this,
                                                    0,
