@@ -225,6 +225,7 @@ Parse(struct task *task, vlc_tick_t deadline)
         .cbs = &cbs,
         .cbs_data = task,
         .subitems = task->options & META_REQUEST_OPTION_PARSE_SUBITEMS,
+        .interact = task->options & META_REQUEST_OPTION_DO_INTERACT,
     };
     task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
@@ -359,8 +360,6 @@ int vlc_preparser_Push( vlc_preparser_t *preparser,
     vlc_mutex_lock( &item->lock );
     enum input_item_type_e i_type = item->i_type;
     int b_net = item->b_net;
-    if( i_options & META_REQUEST_OPTION_DO_INTERACT )
-        item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
 
     if (!(i_options & META_REQUEST_OPTION_SCOPE_FORCED))
