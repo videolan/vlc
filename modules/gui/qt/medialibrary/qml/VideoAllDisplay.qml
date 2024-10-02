@@ -43,9 +43,6 @@ Widgets.PageLoader {
     }, {
         name: "group",
         component: componentGroup
-    }, {
-        name: "recentVideos",
-        component: componentRecentVideos
     }]
 
     // Events
@@ -91,19 +88,4 @@ Widgets.PageLoader {
             displayMarginEnd: g_mainDisplay.displayMargin
         }
     }
-
-    Component {
-        id: componentRecentVideos
-
-        VideoRecentVideosDisplay {
-            function isInfoExpandPanelAvailable(/* modelIndexData */) {
-                return true
-            }
-
-            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
-
-            displayMarginEnd: g_mainDisplay.displayMargin
-        }
-    }
-
 }

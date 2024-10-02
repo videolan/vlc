@@ -1039,8 +1039,6 @@ libqml_module_medialibrary_a_QML = \
 	medialibrary/qml/PlaylistMedia.qml \
 	medialibrary/qml/PlaylistMediaDisplay.qml \
 	medialibrary/qml/VideoPlaylistsDisplay.qml \
-	medialibrary/qml/VideoRecentVideos.qml \
-	medialibrary/qml/VideoRecentVideosDisplay.qml \
 	medialibrary/qml/VideoGridItem.qml \
 	medialibrary/qml/VideoInfoExpandPanel.qml \
 	medialibrary/qml/VideoListDisplay.qml \

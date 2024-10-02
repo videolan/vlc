@@ -82,7 +82,13 @@ VideoAll {
 
     sectionProperty: _meta?.sectionProperty ?? ""
 
-    headerPositioning: headerItem.model.count > 0 ? ListView.InlineHeader : ListView.OverlayHeader
+    header: Widgets.ViewHeader {
+        view: root
+
+        visible: view.count > 0
+
+        text: qsTr("All")
+    }
 
     // Functions
 
@@ -257,34 +263,6 @@ VideoAll {
             function isInfoExpandPanelAvailable(modelIndexData) {
                 return false
             }
-        }
-    }
-
-    header: VideoRecentVideos {
-        width: root.width
-
-        nbItemPerRow: root.currentItem?.nbItemPerRow ?? 0
-
-        allVideosContentLeftMargin: root.currentItem?.contentLeftMargin ?? 0
-        allVideosContentRightMargin: root.currentItem?.contentRightMargin ?? 0
-
-        subtitleText: qsTr("Videos")
-
-        visible: (root.model?.count ?? 0) > 0
-
-        Navigation.parentItem: root
-
-        Navigation.downAction: function() {
-            currentItem.setCurrentItemFocus(Qt.TabFocusReason)
-        }
-
-        onImplicitHeightChanged: {
-            // implicitHeight depends on underlying ml model initialization
-            // and may update after view did resetFocus on initialization which
-            // will break resetFocus's scrolling (because header height changed)
-            // try to reapply reset focus here (ref #27071)
-            if (root.currentIndex <= 0 || root.currentIndex === root.initialIndex)
-                root.resetFocus()
         }
     }
 }
