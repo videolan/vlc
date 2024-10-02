@@ -1136,9 +1136,19 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
     input->ml.pos = -1.f;
     input->ml.has_audio_tracks = input->ml.has_video_tracks = false;
 
-    input->thread = input_Create(player, input_thread_Events, input, item,
-                                 INPUT_TYPE_PLAYBACK, player->resource,
-                                 player->renderer);
+    static const struct vlc_input_thread_callbacks cbs = {
+        .on_event = input_thread_Events,
+    };
+
+    const struct vlc_input_thread_cfg cfg = {
+        .type = INPUT_TYPE_PLAYBACK,
+        .resource = player->resource,
+        .renderer = player->renderer,
+        .cbs = &cbs,
+        .cbs_data = input,
+    };
+
+    input->thread = input_Create(player, item, &cfg);
     if (!input->thread)
     {
         free(input);

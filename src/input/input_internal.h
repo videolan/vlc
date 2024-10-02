@@ -321,10 +321,20 @@ struct vlc_input_event
     };
 };
 
-typedef void (*input_thread_events_cb)( input_thread_t *input,
-                                        const struct vlc_input_event *event,
-                                        void *userdata);
+struct vlc_input_thread_callbacks
+{
+    void (*on_event)(input_thread_t *input, const struct vlc_input_event *event,
+                     void *userdata);
+};
 
+struct vlc_input_thread_cfg
+{
+    enum input_type type;
+    input_resource_t *resource;
+    vlc_renderer_item_t *renderer;
+    const struct vlc_input_thread_callbacks *cbs;
+    void *cbs_data;
+};
 /**
  * Create a new input_thread_t.
  *
@@ -332,19 +342,13 @@ typedef void (*input_thread_events_cb)( input_thread_t *input,
  * adding callback on the variables/events you want to monitor.
  *
  * \param p_parent a vlc_object
- * \param events_cb the events virtual table
- * \param events_data an opaque given to the events callbacks (\p events_cb)
  * \param p_item an input item
- * \param type the type of task the input is created for (thumbnailing, playback, ...)
- * \param p_resource an optional input ressource
- * \param p_renderer an optional renderer object to render the input to
+ * \param cfg pointer to a configuration struct, mandatory
  * \return a pointer to the spawned input thread
  */
-input_thread_t * input_Create( vlc_object_t *p_parent,
-                               input_thread_events_cb events_cb, void *events_data,
-                               input_item_t *, enum input_type type,
-                               input_resource_t *, vlc_renderer_item_t* p_renderer ) VLC_USED;
-#define input_Create(a,b,c,d,e,f,g) input_Create(VLC_OBJECT(a),b,c,d,e,f,g)
+input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *item,
+                               const struct vlc_input_thread_cfg *cfg ) VLC_USED;
+#define input_Create(a,b,c) input_Create(VLC_OBJECT(a),b,c)
 
 int input_Start( input_thread_t * );
 
@@ -433,8 +437,8 @@ typedef struct input_thread_private_t
 {
     struct input_thread_t input;
 
-    input_thread_events_cb events_cb;
-    void *events_data;
+    const struct vlc_input_thread_callbacks *cbs;
+    void *cbs_data;
 
     enum input_type type;
 

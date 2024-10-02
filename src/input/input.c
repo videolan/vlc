@@ -207,12 +207,11 @@ input_item_t *input_GetItem( input_thread_t *p_input )
 }
 
 #undef input_Create
-input_thread_t *input_Create( vlc_object_t *p_parent,
-                              input_thread_events_cb events_cb, void *events_data,
-                              input_item_t *p_item, enum input_type type,
-                              input_resource_t *p_resource,
-                              vlc_renderer_item_t *p_renderer )
+input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
+                               const struct vlc_input_thread_cfg *cfg )
 {
+    assert(cfg != NULL);
+
     /* Allocate descriptor */
     input_thread_private_t *priv;
 
@@ -231,7 +230,7 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
 
     char * psz_name = input_item_GetName( p_item );
     const char *type_str;
-    switch (type)
+    switch (cfg->type)
     {
         case INPUT_TYPE_PREPARSING:
             type_str = "preparsing ";
@@ -250,9 +249,9 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
     /* Init Common fields */
-    priv->events_cb = events_cb;
-    priv->events_data = events_data;
-    priv->type = type;
+    priv->cbs = cfg->cbs;
+    priv->cbs_data = cfg->cbs_data;
+    priv->type = cfg->type;
     priv->i_start = 0;
     priv->i_stop  = 0;
     priv->i_title_offset = input_priv(p_input)->i_seekpoint_offset = 0;
@@ -264,8 +263,8 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->p_sout   = NULL;
     priv->b_out_pace_control = priv->type == INPUT_TYPE_THUMBNAILING;
-    priv->p_renderer = p_renderer && priv->type == INPUT_TYPE_PLAYBACK ?
-                vlc_renderer_item_hold( p_renderer ) : NULL;
+    priv->p_renderer = cfg->renderer && priv->type == INPUT_TYPE_PLAYBACK ?
+                vlc_renderer_item_hold( cfg->renderer ) : NULL;
 
     priv->viewpoint_changed = false;
     /* Fetch the viewpoint from the mediaplayer or the playlist if any */
@@ -326,8 +325,8 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
     priv->slave   = NULL;
 
     /* */
-    if( p_resource )
-        priv->p_resource = input_resource_Hold( p_resource );
+    if( cfg->resource )
+        priv->p_resource = input_resource_Hold( cfg->resource );
     else
         priv->p_resource = input_resource_New( VLC_OBJECT( p_input ) );
     input_resource_SetInput( priv->p_resource, p_input );

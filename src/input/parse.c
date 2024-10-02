@@ -99,8 +99,17 @@ input_item_Parse(input_item_t *item, vlc_object_t *obj,
     parser->state = INIT_S;
     parser->cbs = cbs;
     parser->userdata = userdata;
-    parser->input = input_Create(obj, input_item_parser_InputEvent, parser,
-                                 item, INPUT_TYPE_PREPARSING, NULL, NULL);
+
+    static const struct vlc_input_thread_callbacks input_cbs = {
+        .on_event = input_item_parser_InputEvent,
+    };
+
+    const struct vlc_input_thread_cfg cfg = {
+        .type = INPUT_TYPE_PREPARSING,
+        .cbs = &input_cbs,
+        .cbs_data = parser,
+    };
+    parser->input = input_Create(obj, item, &cfg );
     if (!parser->input || input_Start(parser->input))
     {
         if (parser->input)

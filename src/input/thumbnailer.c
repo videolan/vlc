@@ -170,9 +170,18 @@ RunnableRun(void *userdata)
 
     vlc_tick_t now = vlc_tick_now();
 
+    static const struct vlc_input_thread_callbacks cbs = {
+        .on_event = on_thumbnailer_input_event,
+    };
+
+    const struct vlc_input_thread_cfg cfg = {
+        .type = INPUT_TYPE_THUMBNAILING,
+        .cbs = &cbs,
+        .cbs_data = task,
+    };
+
     input_thread_t* input =
-            input_Create( thumbnailer->parent, on_thumbnailer_input_event, task,
-                          task->item, INPUT_TYPE_THUMBNAILING, NULL, NULL );
+            input_Create( thumbnailer->parent, task->item, &cfg );
     if (!input)
         goto error;
 

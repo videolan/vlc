@@ -31,8 +31,8 @@ static inline void input_SendEvent(input_thread_t *p_input,
                                    const struct vlc_input_event *event)
 {
     input_thread_private_t *priv = input_priv(p_input);
-    if(priv->events_cb)
-        priv->events_cb(p_input, event, priv->events_data);
+    if (priv->cbs != NULL && priv->cbs->on_event != NULL)
+        priv->cbs->on_event(p_input, event, priv->cbs_data);
 }
 
 /*****************************************************************************
