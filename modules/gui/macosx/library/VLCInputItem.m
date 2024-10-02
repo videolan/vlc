@@ -30,6 +30,7 @@
 #import "library/VLCLibraryController.h"
 
 #import <vlc_url.h>
+#import <vlc_preparser.h>
 
 NSString *VLCInputItemParsingSucceeded = @"VLCInputItemParsingSucceeded";
 NSString *VLCInputItemParsingFailed = @"VLCInputItemParsingFailed";
@@ -589,14 +590,16 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
         return VLC_ENOENT;
     }
 
-    return libvlc_MetadataRequest(vlc_object_instance(getIntf()),
-                                  _vlcInputItem,
-                                  META_REQUEST_OPTION_SCOPE_ANY |
-                                  META_REQUEST_OPTION_FETCH_LOCAL |
-                                  META_REQUEST_OPTION_PARSE_SUBITEMS,
-                                  &preparseCallbacks,
-                                  (__bridge void *)self,
-                                  -1, NULL);
+    vlc_preparser_t *parser = libvlc_GetMainPreparser(vlc_object_instance(getIntf()));
+    if (unlikely(parser == NULL))
+        return VLC_ENOMEM;
+
+    return vlc_preparser_Push(parser, _vlcInputItem,
+                              META_REQUEST_OPTION_SCOPE_ANY |
+                              META_REQUEST_OPTION_FETCH_LOCAL |
+                              META_REQUEST_OPTION_PARSE_SUBITEMS,
+                              &preparseCallbacks,
+                              (__bridge void *)self, -1, NULL);
 }
 
 - (void)subTreeAdded:(input_item_node_t *)p_node
