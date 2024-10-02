@@ -25,6 +25,7 @@
 #define _INPUT_FETCHER_H 1
 
 #include <vlc_input_item.h>
+#include <vlc_preparser.h>
 
 /**
  * Fetcher opaque structure.

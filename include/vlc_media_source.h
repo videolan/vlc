@@ -24,6 +24,7 @@
 #include <vlc_common.h>
 #include <vlc_input_item.h>
 #include <vlc_services_discovery.h>
+#include <vlc_preparser.h>
 
 #ifdef __cplusplus
 extern "C" {
