@@ -130,9 +130,6 @@ struct input_item_t
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
 
-    bool        b_preparse_interact; /**< Force interaction with the user when
-                                          preparsing.*/
-
     void        *libvlc_owner;       /**< LibVLC private data, can only be set
                                           before events are registered. */
 };

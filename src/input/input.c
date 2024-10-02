@@ -293,7 +293,7 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Make sure the interaction option is honored */
     if( !var_InheritBool( p_input, "interact" ) )
         p_input->obj.no_interact = true;
-    else if( p_item->b_preparse_interact || cfg->interact )
+    else if( cfg->interact )
     {
         /* If true, this item was asked explicitly to interact with the user
          * (via libvlc_MetadataRequest). Sub items created from this input won't
