@@ -520,10 +520,12 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
 
 - (void)parseInputItem
 {
-    _p_parserID = input_item_Parse(_vlcInputItem,
-                                   VLC_OBJECT(getIntf()),
-                                   &parserCallbacks,
-                                   (__bridge void *) self);
+    const struct input_item_parser_cfg cfg = {
+        .cbs = &parserCallbacks,
+        .cbs_data = (__bridge void *) self,
+    };
+
+    _p_parserID = input_item_Parse(VLC_OBJECT(getIntf()), _vlcInputItem, &cfg);
 }
 
 - (void)cancelParsing

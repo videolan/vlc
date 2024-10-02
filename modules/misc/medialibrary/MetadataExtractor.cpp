@@ -232,11 +232,15 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         &MetadataExtractor::onParserSubtreeAdded,
         &MetadataExtractor::onAttachmentsAdded,
     };
+
+    const struct input_item_parser_cfg cfg= {
+        .cbs = &cbs,
+        .cbs_data = std::addressof( ctx ),
+    };
     m_currentCtx = &ctx;
     ctx.inputItem->i_preparse_depth = 1;
     ctx.inputParser = {
-        input_item_Parse( ctx.inputItem.get(), m_obj, &cbs,
-                          std::addressof( ctx ) ),
+        input_item_Parse( m_obj, ctx.inputItem.get(), &cfg ),
         &input_item_parser_id_Release
     };
     if ( ctx.inputParser == nullptr )

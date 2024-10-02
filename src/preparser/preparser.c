@@ -221,7 +221,11 @@ Parse(struct task *task, vlc_tick_t deadline)
     };
 
     vlc_object_t *obj = task->preparser->owner;
-    task->parser = input_item_Parse(task->item, obj, &cbs, task);
+    const struct input_item_parser_cfg cfg = {
+        .cbs = &cbs,
+        .cbs_data = task,
+    };
+    task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
     {
         atomic_store_explicit(&task->preparse_status, ITEM_PREPARSE_FAILED,

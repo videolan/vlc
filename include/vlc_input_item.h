@@ -465,23 +465,32 @@ typedef struct input_item_parser_cbs_t
 } input_item_parser_cbs_t;
 
 /**
+ * input item parser configuration struct
+ */
+struct input_item_parser_cfg {
+    /** Callbacks to be notified of the end of the parsing, can't be NULL */
+    const input_item_parser_cbs_t *cbs;
+    /** Opaque data used by parser callbacks */
+    void *cbs_data;
+};
+
+/**
  * Parse an item asynchronously
  *
  * @note The parsing is done asynchronously. The user can call
  * input_item_parser_id_Interrupt() before receiving the on_ended() event in
  * order to interrupt it.
  *
- * @param item the item to parse
  * @param parent the parent obj
- * @param cbs callbacks to be notified of the end of the parsing
- * @param userdata opaque data used by parser callbacks
+ * @param item the item to parse
+ * @param cfg pointer to a configuration struct, can't be NULL
  *
  * @return a parser instance or NULL in case of error, the parser needs to be
  * released with input_item_parser_id_Release()
  */
 VLC_API input_item_parser_id_t *
-input_item_Parse(input_item_t *item, vlc_object_t *parent,
-                 const input_item_parser_cbs_t *cbs, void *userdata) VLC_USED;
+input_item_Parse(vlc_object_t *parent, input_item_t *item,
+                 const struct input_item_parser_cfg *cfg) VLC_USED;
 
 /**
  * Interrupts & cancels the parsing

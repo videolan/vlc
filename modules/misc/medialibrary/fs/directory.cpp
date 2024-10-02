@@ -170,7 +170,12 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
         nullptr,
     };
 
-    auto inputParser = vlc::wrap_cptr( input_item_Parse( media, VLC_OBJECT( libvlc ), &cbs, &req ),
+    const struct input_item_parser_cfg cfg= {
+        .cbs = &cbs,
+        .cbs_data = &req,
+    };
+
+    auto inputParser = vlc::wrap_cptr( input_item_Parse( VLC_OBJECT( libvlc ), media, &cfg ),
                                        &input_item_parser_id_Release );
 
     if ( inputParser == nullptr )
