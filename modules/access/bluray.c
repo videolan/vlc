@@ -142,6 +142,12 @@ static const char * bluray_event_debug_strings[] =
 #define BD_REGION_LONGTEXT  N_("Blu-Ray player region code. "\
                                 "Some discs can be played only with a correct region code.")
 
+#define BD_BDJ_SETTINGS_TEXT        N_("BD-J")
+#define BD_BDJ_JAVA_HOME_TEXT       N_("JAVA_HOME")
+#define BD_BDJ_JAVA_HOME_LONGTEXT   N_(\
+    "JRE (Java Runtime Environment) location used to execute BD-J content. "\
+    "If undefined, use automatic detection.")
+
 static const char *const ppsz_region_code[] = {
     "A", "B", "C" };
 static const char *const ppsz_region_code_text[] = {
@@ -152,6 +158,9 @@ static const char *const ppsz_region_code_text[] = {
 
 #if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,8,0)
 # define BLURAY_DEMUX
+#endif
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(1,3,0)
+# define BLURAY_SET_JAVA_HOME // Capable to set custom JAVA_HOME
 #endif
 
 #ifndef BD_STREAM_TYPE_VIDEO_HEVC
@@ -174,6 +183,13 @@ vlc_module_begin ()
     add_bool("bluray-menu", true, BD_MENU_TEXT, BD_MENU_LONGTEXT)
     add_string("bluray-region", ppsz_region_code[REGION_DEFAULT], BD_REGION_TEXT, BD_REGION_LONGTEXT)
         change_string_list(ppsz_region_code, ppsz_region_code_text)
+
+#if defined(BLURAY_SET_JAVA_HOME)
+    set_section(BD_BDJ_SETTINGS_TEXT, NULL)
+#  ifdef BLURAY_SET_JAVA_HOME
+    add_directory("bluray-java-home", NULL, BD_BDJ_JAVA_HOME_TEXT, BD_BDJ_JAVA_HOME_LONGTEXT)
+#  endif
+#endif
 
     add_shortcut("bluray", "file")
 
@@ -830,7 +846,18 @@ static int blurayOpen(vlc_object_t *object)
         /* If we're passed a block device, try to convert it to the mount point. */
         FindMountPoint(&p_sys->psz_bd_path);
 
-        p_sys->bluray = bd_open(p_sys->psz_bd_path, NULL);
+        /* Set opening settings */
+        p_sys->bluray = bd_init();
+#ifdef BLURAY_SET_JAVA_HOME
+        char *psz_java_home = var_InheritString(p_demux, "bluray-java-home");
+        bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_JAVA_HOME, psz_java_home);
+        free(psz_java_home);
+#endif
+
+        if (!bd_open_disc(p_sys->bluray, p_sys->psz_bd_path, NULL)) {
+            bd_close(p_sys->bluray);
+            p_sys->bluray = NULL;
+        }
     }
     if (!p_sys->bluray) {
         goto error;
