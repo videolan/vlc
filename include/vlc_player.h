@@ -3387,8 +3387,11 @@ struct vlc_player_timer_cbs
      * @warning The player is not locked from this callback. It is forbidden
      * to call any player functions from here.
      *
+     * @note on_update() can be called when seeking. It corresponds to tracks
+     * updating their points prior to receiving the asynchronous seek event.
+     * The user could discard them manually.
+     *
      * @param value point of the seek request or NULL when seeking is finished
-     * value.system_date = VLC_TICK_MAX in that case
      * @param data opaque pointer set by vlc_player_AddTimer()
      */
     void (*on_seek)(const struct vlc_player_timer_point *value, void *data);
