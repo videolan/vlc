@@ -39,6 +39,7 @@
 #include <vlc_url.h>
 #include <vlc_thumbnailer.h>
 #include <vlc_atomic.h>
+#include <vlc_preparser.h>
 
 #include "../src/libvlc.h"
 
@@ -740,6 +741,10 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
             return -1;
 
     libvlc_int_t *libvlc = inst->p_libvlc_int;
+    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
+    if (unlikely(parser == NULL))
+        return -1;
+
     input_item_t *item = media->p_input_item;
     input_item_meta_request_option_t parse_scope = 0;
     int ret;
@@ -769,9 +774,8 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
     parse_scope |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
-    ret = libvlc_MetadataRequest(libvlc, item, parse_scope,
-                                 &preparser_callbacks, media,
-                                 timeout, media);
+    ret = vlc_preparser_Push(parser, item, parse_scope,
+                             &preparser_callbacks, media, timeout, media);
     if (ret != VLC_SUCCESS)
     {
         atomic_fetch_sub_explicit(&media->worker_count, 1,
@@ -785,7 +789,10 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 void
 libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 {
-    libvlc_MetadataCancel(inst->p_libvlc_int, media);
+    libvlc_int_t *libvlc = inst->p_libvlc_int;
+    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
+    if (unlikely(parser != NULL))
+        vlc_preparser_Cancel(parser, media);
 }
 
 // Get Parsed status for media descriptor object
