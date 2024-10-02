@@ -23,6 +23,7 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_preparser.h>
 #include <vlc_vector.h>
 #include "../player/player.h"
 #include "randomizer.h"
@@ -54,6 +55,7 @@ enum vlc_playlist_recursive_parsing
 struct vlc_playlist
 {
     vlc_player_t *player;
+    vlc_preparser_t *parser;
     libvlc_int_t *libvlc;
     enum vlc_playlist_media_stopped_action stopped_action;
     bool auto_preparse;

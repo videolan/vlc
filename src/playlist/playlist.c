@@ -37,6 +37,17 @@ vlc_playlist_New(vlc_object_t *parent)
     if (unlikely(!playlist))
         return NULL;
 
+#ifdef TEST_PLAYLIST
+    playlist->parser = NULL;
+#else
+    playlist->parser = libvlc_GetMainPreparser(vlc_object_instance(parent));
+    if (unlikely(playlist->parser == NULL))
+    {
+        free(playlist);
+        return NULL;
+    }
+#endif
+
     bool ok = vlc_playlist_PlayerInit(playlist, parent);
     if (unlikely(!ok))
     {
@@ -56,11 +67,9 @@ vlc_playlist_New(vlc_object_t *parent)
     playlist->idgen = 0;
     playlist->recursive = VLC_PLAYLIST_RECURSIVE_COLLAPSE;
 #ifdef TEST_PLAYLIST
-    playlist->libvlc = NULL;
     playlist->auto_preparse = false;
 #else
     assert(parent);
-    playlist->libvlc = vlc_object_instance(parent);
     playlist->auto_preparse = var_InheritBool(parent, "auto-preparse");
 
     char *rec = var_InheritString(parent, "recursive");

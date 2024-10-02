@@ -28,7 +28,6 @@
 #include "item.h"
 #include "playlist.h"
 #include "notify.h"
-#include "libvlc.h" /* for vlc_MetadataRequest() */
 
 typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
 
@@ -120,14 +119,15 @@ vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input,
     VLC_UNUSED(input);
     VLC_UNUSED(preparser_callbacks);
 #else
-    /* vlc_MetadataRequest is not exported */
+    assert(playlist->parser != NULL);
+
     input_item_meta_request_option_t options =
         META_REQUEST_OPTION_SCOPE_LOCAL | META_REQUEST_OPTION_FETCH_LOCAL;
     if (parse_subitems)
         options |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
-    vlc_MetadataRequest(playlist->libvlc, input, options,
-                        &preparser_callbacks, playlist, -1, NULL);
+    vlc_preparser_Push(playlist->parser, input, options,
+                       &preparser_callbacks, playlist, -1, NULL);
 #endif
 }
 
