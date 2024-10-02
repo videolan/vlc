@@ -53,6 +53,7 @@ struct libvlc_media_player_t
         libvlc_media_player_watch_time_on_paused on_paused;
         libvlc_media_player_watch_time_on_seek on_seek;
         void *cbs_data;
+        bool seeking;
     } timer;
 };
 

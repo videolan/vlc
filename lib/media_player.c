@@ -2262,6 +2262,9 @@ static void player_timer_on_update(const struct vlc_player_timer_point *point,
 {
     libvlc_media_player_t *p_mi = data;
 
+    if (p_mi->timer.seeking)
+        return;
+
     const libvlc_media_player_time_point_t libpoint = PLAYER_TIME_CORE_TO_LIB(point);
 
     p_mi->timer.on_update(&libpoint, p_mi->timer.cbs_data);
@@ -2289,9 +2292,13 @@ static void player_timer_on_seek(const struct vlc_player_timer_point *point,
     {
         const libvlc_media_player_time_point_t libpoint = PLAYER_TIME_CORE_TO_LIB(point);
         p_mi->timer.on_seek(&libpoint, p_mi->timer.cbs_data);
+        p_mi->timer.seeking = true;
     }
     else
+    {
         p_mi->timer.on_seek(NULL, p_mi->timer.cbs_data);
+        p_mi->timer.seeking = false;
+    }
 }
 
 int
@@ -2325,6 +2332,7 @@ libvlc_media_player_watch_time(libvlc_media_player_t *p_mi,
     p_mi->timer.on_paused = on_paused;
     p_mi->timer.on_seek = on_seek;
     p_mi->timer.cbs_data = cbs_data;
+    p_mi->timer.seeking = false;
 
     p_mi->timer.id = vlc_player_AddTimer(player, VLC_TICK_FROM_US(min_period_us),
                                          &player_timer_cbs, p_mi);

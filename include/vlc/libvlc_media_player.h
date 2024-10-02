@@ -2974,6 +2974,8 @@ typedef void (*libvlc_media_player_watch_time_on_paused)(
  *
  * \warning It is forbidden to call any Media Player functions from here.
  *
+ * \note It is not possible to receive points via on_update() while seeking.
+ *
  * \param value point of the seek request or NULL when seeking is finished
  * \param data opaque pointer set by libvlc_media_player_watch_time()
  */
