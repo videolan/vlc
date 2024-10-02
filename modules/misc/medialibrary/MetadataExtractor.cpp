@@ -227,7 +227,7 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( ctx.inputItem == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    const input_item_parser_cbs_t cbs = {
+    static const input_item_parser_cbs_t cbs = {
         &MetadataExtractor::onParserEnded,
         &MetadataExtractor::onParserSubtreeAdded,
         &MetadataExtractor::onAttachmentsAdded,
