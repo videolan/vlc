@@ -30,6 +30,7 @@
 #include <vlc_threads.h>
 #include <vlc_fs.h>
 #include <vlc_input_item.h>
+#include <vlc_preparser.h>
 
 static void media_parse_ended(const libvlc_event_t *event, void *user_data)
 {
@@ -239,16 +240,18 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     const struct vlc_metadata_cbs cbs = {
         .on_preparse_ended = input_item_preparse_timeout,
     };
-    i_ret = libvlc_MetadataRequest(vlc->p_libvlc_int, p_item,
-                                   META_REQUEST_OPTION_SCOPE_LOCAL |
-                                   META_REQUEST_OPTION_FETCH_LOCAL,
-                                   &cbs, &sem, timeout, vlc);
+    vlc_preparser_t *parser = libvlc_GetMainPreparser(vlc->p_libvlc_int);
+    assert(parser != NULL);
+    i_ret = vlc_preparser_Push(parser, p_item,
+                               META_REQUEST_OPTION_SCOPE_LOCAL |
+                               META_REQUEST_OPTION_FETCH_LOCAL,
+                               &cbs, &sem, timeout, vlc);
     assert(i_ret == 0);
 
     if (wait_and_cancel > 0)
     {
         vlc_tick_sleep( VLC_TICK_FROM_MS(wait_and_cancel) );
-        libvlc_MetadataCancel(vlc->p_libvlc_int, vlc);
+        vlc_preparser_Cancel(parser, vlc);
 
     }
     vlc_sem_wait(&sem);
@@ -463,7 +466,7 @@ int main(int i_argc, char *ppsz_argv[])
     test_media_subitems (vlc);
     test_media_tracks (vlc);
 
-    /* Testing libvlc_MetadataRequest timeout and libvlc_MetadataCancel. For
+    /* Testing vlc_preparser_Push timeout and vlc_preparser_Cancel. For
      * that, we need to create a local input_item_t based on a pipe. There is
      * no way to do that with a libvlc_media_t, that's why we don't use
      * libvlc_media_parse*() */
