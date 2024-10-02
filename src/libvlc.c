@@ -454,6 +454,13 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
     }
 }
 
+vlc_preparser_t *
+libvlc_GetMainPreparser(libvlc_int_t *libvlc)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+    return priv->parser;
+}
+
 int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                         input_item_meta_request_option_t i_options,
                         const struct vlc_metadata_cbs *cbs,

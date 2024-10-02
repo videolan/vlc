@@ -103,6 +103,14 @@ VLC_API void vlc_preparser_Delete( vlc_preparser_t *preparser );
  */
 VLC_API void vlc_preparser_Deactivate( vlc_preparser_t *preparser );
 
+/**
+ * Recover the main preparser from libvlc
+ *
+ * @param libvlc valid libvlc object
+ * @return the main preparser (can be NULL)
+ */
+VLC_API vlc_preparser_t *libvlc_GetMainPreparser(libvlc_int_t *libvlc);
+
 /** @} vlc_preparser */
 
 #endif
