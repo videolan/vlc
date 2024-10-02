@@ -338,6 +338,7 @@ struct vlc_input_thread_cfg
     struct {
         bool subitems;
     } preparsing;
+    bool interact;
 };
 /**
  * Create a new input_thread_t.
