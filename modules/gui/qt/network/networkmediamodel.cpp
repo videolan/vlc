@@ -356,7 +356,9 @@ public:
             return false;
 
         auto libvlc = vlc_object_instance(q->m_ctx->getIntf());
-
+        auto parser = libvlc_GetMainPreparser(libvlc);
+        if (unlikely(parser == NULL))
+            return false;
 
         m_listener.reset();
         m_items.clear();
@@ -408,7 +410,7 @@ public:
             input_item_node_t* mediaNode = nullptr;
             input_item_node_t* parent = nullptr;
             vlc_media_tree_Lock(tree);
-            vlc_media_tree_PreparseCancel( libvlc, this );
+            vlc_preparser_Cancel( parser, this );
             std::vector<SharedInputItem> itemList;
             q->m_path = {QVariant::fromValue(PathNode(q->m_treeItem, q->m_name))};
             if (vlc_media_tree_Find( tree, q->m_treeItem.media.get(), &mediaNode, &parent))
@@ -436,7 +438,7 @@ public:
         }
 
         m_preparseSem.acquire();
-        vlc_media_tree_Preparse( tree, libvlc, q->m_treeItem.media.get(), this );
+        vlc_media_tree_Preparse( tree, parser, q->m_treeItem.media.get(), this );
 
         m_listener = std::move( l );
 
@@ -494,9 +496,13 @@ NetworkMediaModel::~NetworkMediaModel()
     if (!d->m_preparseSem.tryAcquire())
     {
         auto libvlc = vlc_object_instance(m_ctx->getIntf());
-        vlc_media_tree_PreparseCancel( libvlc, this );
-        //wait for the callback call on cancel
-        d->m_preparseSem.acquire();
+        auto parser = libvlc_GetMainPreparser(libvlc);
+        if (likely(parser != NULL))
+        {
+            vlc_preparser_Cancel( parser, this );
+            //wait for the callback call on cancel
+            d->m_preparseSem.acquire();
+        }
     }
 }
 

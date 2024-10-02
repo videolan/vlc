@@ -235,23 +235,14 @@ vlc_media_tree_Find(vlc_media_tree_t *tree, const input_item_t *media,
  * Preparse a media, and expand it in the media tree on subitems added.
  *
  * \param tree   the media tree (not necessarily locked)
- * \param libvlc the libvlc instance
+ * \param parser a valid preparser
  * \param media  the media to preparse
- * \param id     a task identifier
+ * \param id     a task identifier, cancel it via vlc_preparser_Cancel()
  */
 VLC_API void
-vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
+vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
                         input_item_t *media, void *id);
 
-
-/**
- * Cancel a media tree preparse request
- *
- * \param libvlc the libvlc instance
- * \param id the preparse task id
- */
-VLC_API void
-vlc_media_tree_PreparseCancel(libvlc_int_t *libvlc, void* id);
 
 /**
  * Media source.

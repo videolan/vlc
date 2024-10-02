@@ -316,7 +316,12 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
-    vlc_media_tree_Preparse(_p_mediaSource->tree, _p_libvlcInstance, inputNode.inputItem.vlcInputItem, NULL);
+    vlc_preparser_t *parser = libvlc_GetMainPreparser(_p_libvlcInstance);
+    if (unlikely(parser == NULL))
+        return;
+
+    vlc_media_tree_Preparse(_p_mediaSource->tree, parser,
+                            inputNode.inputItem.vlcInputItem, NULL);
 }
 
 - (void)clearChildNodesForNode:(nonnull input_item_node_t*)inputNode

@@ -341,37 +341,19 @@ static const struct vlc_metadata_cbs preparser_callbacks = {
 };
 
 void
-vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
+vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
                         input_item_t *media, void* id)
 {
 #ifdef TEST_MEDIA_SOURCE
     VLC_UNUSED(tree);
-    VLC_UNUSED(libvlc);
+    VLC_UNUSED(parser);
     VLC_UNUSED(media);
     VLC_UNUSED(id);
     VLC_UNUSED(preparser_callbacks);
 #else
-    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
-    if (unlikely(parser == NULL))
-        return;
     vlc_preparser_Push(parser, media, META_REQUEST_OPTION_SCOPE_ANY |
                        META_REQUEST_OPTION_DO_INTERACT |
                        META_REQUEST_OPTION_PARSE_SUBITEMS,
                        &preparser_callbacks, tree, 0, id);
-#endif
-}
-
-
-void
-vlc_media_tree_PreparseCancel(libvlc_int_t *libvlc, void* id)
-{
-#ifdef TEST_MEDIA_SOURCE
-    VLC_UNUSED(libvlc);
-    VLC_UNUSED(id);
-#else
-    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
-    if (unlikely(parser == NULL))
-        return;
-    vlc_preparser_Cancel(parser, id);
 #endif
 }
