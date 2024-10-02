@@ -172,6 +172,7 @@ static bool request_metadata_sync( libvlc_int_t *libvlc, input_item_t *media,
         .cbs = &cbs,
         .cbs_data = &req,
         .subitems = true,
+        .interact = false,
     };
 
     auto inputParser = vlc::wrap_cptr( input_item_Parse( VLC_OBJECT( libvlc ), media, &cfg ),

@@ -471,6 +471,8 @@ struct input_item_parser_cfg {
     void *cbs_data;
     /** true to parse subitems (from a folder or a playlist file) */
     bool subitems;
+    /** true to trigger dialog interactions when needed */
+    bool interact;
 };
 
 /**

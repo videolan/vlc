@@ -237,6 +237,7 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         .cbs = &cbs,
         .cbs_data = std::addressof( ctx ),
         .subitems = true,
+        .interact = false,
     };
     m_currentCtx = &ctx;
     ctx.inputParser = {
