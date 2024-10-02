@@ -2975,7 +2975,6 @@ typedef void (*libvlc_media_player_watch_time_on_paused)(
  * \warning It is forbidden to call any Media Player functions from here.
  *
  * \param value point of the seek request or NULL when seeking is finished
- * value.system_date_us = INT64_MAX in that case
  * \param data opaque pointer set by libvlc_media_player_watch_time()
  */
 typedef void (*libvlc_media_player_watch_time_on_seek)(
