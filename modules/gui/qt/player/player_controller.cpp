@@ -32,6 +32,7 @@
 #include <vlc_es.h>
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_vout.h>
+#include <vlc_preparser.h>
 
 #include <QFile>
 #include <QDir>
@@ -1973,10 +1974,13 @@ void PlayerController::requestArtUpdate( input_item_t *p_item, bool b_forced )
             if ( status & ( ITEM_ART_NOTFOUND|ITEM_ART_FETCHED ) )
                 return;
         }
-        libvlc_MetadataRequest( vlc_object_instance(d->p_intf), p_item,
-                                (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
-                                           : META_REQUEST_OPTION_FETCH_LOCAL,
-                               &art_fetcher_cbs, d, 0, NULL );
+        vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance(d->p_intf) );
+        if (unlikely(parser == NULL))
+            return;
+        vlc_preparser_Push( parser, p_item,
+                            (b_forced) ? META_REQUEST_OPTION_FETCH_ANY
+                                       : META_REQUEST_OPTION_FETCH_LOCAL,
+                            &art_fetcher_cbs, d, 0, NULL );
     }
 }
 

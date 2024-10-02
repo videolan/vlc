@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_intf_strings.h>
+#include <vlc_preparser.h>
 
 #include "qt.hpp"
 #include "dialogs_provider.hpp"
@@ -385,15 +386,15 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
             NULL
         };
 
-        const int result = libvlc_MetadataRequest( vlc_object_instance( p_intf ),
-                                                   inputItem,
-                                                   static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_PARSE_SUBITEMS),
-                                                   &cbs,
-                                                   this,
-                                                   0,
-                                                   NULL );
+        vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance( p_intf ) );
+        if (unlikely(parser == NULL))
+            return;
+
+        const int result = vlc_preparser_Push( parser, inputItem,
+                                               static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_PARSE_SUBITEMS),
+                                               &cbs, this, 0, NULL );
         if( Q_UNLIKELY( result != VLC_SUCCESS ) )
-            msg_Warn( p_intf, "libvlc_MetadataRequest() failed for input item %p (%s, %s)",
+            msg_Warn( p_intf, "vlc_preparser_Push() failed for input item %p (%s, %s)",
                       inputItem, inputItem->psz_name, inputItem->psz_uri );
     }
 }
