@@ -203,12 +203,6 @@ int intf_InsertItem(libvlc_int_t *, const char *mrl, unsigned optc,
                     const char * const *optv, unsigned flags);
 void intf_DestroyAll( libvlc_int_t * );
 
-int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
-                        input_item_meta_request_option_t i_options,
-                        const struct vlc_metadata_cbs *cbs,
-                        void *cbs_userdata,
-                        int timeout, void *id);
-
 /*
  * Variables stuff
  */

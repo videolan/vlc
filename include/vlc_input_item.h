@@ -544,13 +544,6 @@ struct vlc_metadata_cbs {
                                  size_t count, void *userdata);
 };
 
-VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,
-                                    input_item_meta_request_option_t,
-                                    const struct vlc_metadata_cbs *cbs,
-                                    void *cbs_userdata,
-                                    int, void * );
-VLC_API void libvlc_MetadataCancel( libvlc_int_t *, void * );
-
 /******************
  * Input stats
  ******************/
