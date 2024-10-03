@@ -147,6 +147,10 @@ static const char * bluray_event_debug_strings[] =
 #define BD_BDJ_JAVA_HOME_LONGTEXT   N_(\
     "JRE (Java Runtime Environment) location used to execute BD-J content. "\
     "If undefined, use automatic detection.")
+#define BD_BDJ_PERS_STOR_TEXT       N_("Persistent storage")
+#define BD_BDJ_PERS_STOR_LONGTEXT   N_(\
+    "Enable/disable BD-J persistent storage. "\
+    "If disabled, persistent files created by the BD-J application are deleted at close.")
 
 static const char *const ppsz_region_code[] = {
     "A", "B", "C" };
@@ -158,6 +162,9 @@ static const char *const ppsz_region_code_text[] = {
 
 #if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,8,0)
 # define BLURAY_DEMUX
+#endif
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(1,0,0)
+# define BLURAY_ENABLE_PERSISTENT_STORAGE // Enable/Disable persistent storage
 #endif
 #if BLURAY_VERSION >= BLURAY_VERSION_CODE(1,3,0)
 # define BLURAY_SET_JAVA_HOME // Capable to set custom JAVA_HOME
@@ -184,10 +191,13 @@ vlc_module_begin ()
     add_string("bluray-region", ppsz_region_code[REGION_DEFAULT], BD_REGION_TEXT, BD_REGION_LONGTEXT)
         change_string_list(ppsz_region_code, ppsz_region_code_text)
 
-#if defined(BLURAY_SET_JAVA_HOME)
+#if defined(BLURAY_SET_JAVA_HOME) || defined(BLURAY_ENABLE_PERSISTENT_STORAGE)
     set_section(BD_BDJ_SETTINGS_TEXT, NULL)
 #  ifdef BLURAY_SET_JAVA_HOME
     add_directory("bluray-java-home", NULL, BD_BDJ_JAVA_HOME_TEXT, BD_BDJ_JAVA_HOME_LONGTEXT)
+#  endif
+#  ifdef BLURAY_ENABLE_PERSISTENT_STORAGE
+    add_bool("bluray-persistent-storage", true, BD_BDJ_PERS_STOR_TEXT, BD_BDJ_PERS_STOR_LONGTEXT)
 #  endif
 #endif
 
@@ -852,6 +862,10 @@ static int blurayOpen(vlc_object_t *object)
         char *psz_java_home = var_InheritString(p_demux, "bluray-java-home");
         bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_JAVA_HOME, psz_java_home);
         free(psz_java_home);
+#endif
+#ifdef BLURAY_ENABLE_PERSISTENT_STORAGE
+        bool b_persistent_storage = var_InheritBool(p_demux, "bluray-persistent-storage");
+        bd_set_player_setting(p_sys->bluray, BLURAY_PLAYER_SETTING_PERSISTENT_STORAGE, b_persistent_storage);
 #endif
 
         if (!bd_open_disc(p_sys->bluray, p_sys->psz_bd_path, NULL)) {
