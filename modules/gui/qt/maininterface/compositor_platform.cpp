@@ -113,6 +113,7 @@ void CompositorPlatform::destroyMainInterface()
 
 void CompositorPlatform::unloadGUI()
 {
+    m_rootWindow->removeEventFilter(this);
     m_interfaceWindowHandler.reset();
     delete m_quickWindow;
     commonGUIDestroy();
