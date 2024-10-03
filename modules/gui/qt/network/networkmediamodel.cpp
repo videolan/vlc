@@ -355,8 +355,7 @@ public:
         if (!q->m_ctx || !m_hasTree || m_qmlInitializing)
             return false;
 
-        auto libvlc = vlc_object_instance(q->m_ctx->getIntf());
-        auto parser = libvlc_GetMainPreparser(libvlc);
+        auto parser = q->m_ctx->getPreparser();
         if (unlikely(parser == NULL))
             return false;
 
@@ -495,8 +494,7 @@ NetworkMediaModel::~NetworkMediaModel()
     //this can only be acquired from UI thread
     if (!d->m_preparseSem.tryAcquire())
     {
-        auto libvlc = vlc_object_instance(m_ctx->getIntf());
-        auto parser = libvlc_GetMainPreparser(libvlc);
+        auto parser = m_ctx->getPreparser();
         if (likely(parser != NULL))
         {
             vlc_preparser_Cancel( parser, this );
