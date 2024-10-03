@@ -249,6 +249,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
     p_sys->i_state = STATE_NOSYNC;
     p_sys->b_discontuinity = false;
     block_BytestreamInit(&p_sys->bytestream);
+    p_sys->i_aac_profile = -1;
     p_sys->b_latm_cfg = false;
     p_sys->i_warnings = 0;
 
