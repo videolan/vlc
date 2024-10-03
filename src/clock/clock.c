@@ -201,6 +201,17 @@ static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
                                  VLC_TRACE_END);
 }
 
+static vlc_tick_t ComputeOffset(vlc_clock_main_t *main,
+                          struct vlc_clock_context *ctx,
+                          vlc_tick_t system_now,
+                          vlc_tick_t ts,
+                          double rate)
+{
+    (void)main;
+
+    return system_now - ((vlc_tick_t) (ts * ctx->coeff / rate));
+}
+
 static void context_reset(struct vlc_clock_context *ctx)
 {
     ctx->coeff = 1.0f;
@@ -437,7 +448,7 @@ static void vlc_clock_master_update_coeff(
         vlc_clock_SendEvent(main_clock, discontinuity);
     }
 
-    ctx->offset = system_now - ((vlc_tick_t) (ts * ctx->coeff / rate));
+    ctx->offset = ComputeOffset(main_clock, ctx, system_now, ts, rate);
 
     if (main_clock->tracer != NULL && clock->track_str_id != NULL)
         vlc_tracer_Trace(main_clock->tracer,
