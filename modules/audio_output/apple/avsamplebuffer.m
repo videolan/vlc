@@ -129,7 +129,7 @@ API_AVAILABLE(macos(MIN_MACOS), ios(MIN_IOS), tvos(MIN_TVOS) VISIONOS_API_AVAILA
 
 - (void)dealloc
 {
-    block_ChainRelease(_outChain);
+    assert(_outChain == NULL);
 }
 
 static void
