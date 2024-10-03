@@ -86,7 +86,6 @@ endif
 .aom: aom toolchain.cmake
 	rm -rf $(PREFIX)/include/aom
 	cd $< && rm -rf aom_build && mkdir -p aom_build
-	cd $< && mkdir -p aom_build
 	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
 	cd $< && $(CMAKEBUILD) aom_build
 	$(call pkg_static,"aom_build/aom.pc")
