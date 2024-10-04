@@ -110,7 +110,9 @@ static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
     sys->hw.context_mutex = sys->d3d_dev->context_mutex;
+#ifndef FF_DXVA_WORKAROUND_GONE
     sys->hw.workaround = sys->selected_decoder->workaround;
+#endif
     avctx->hwaccel_context = &sys->hw;
 }
 

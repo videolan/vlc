@@ -104,7 +104,9 @@ static void SetupAVCodecContext(void *opaque, AVCodecContext *avctx)
     vlc_va_sys_t *sys = opaque;
     sys->hw.cfg = &sys->cfg;
     sys->hw.surface = sys->hw_surface;
+#ifndef FF_DXVA_WORKAROUND_GONE
     sys->hw.workaround = sys->selected_decoder->workaround;
+#endif
     avctx->hwaccel_context = &sys->hw;
 }
 

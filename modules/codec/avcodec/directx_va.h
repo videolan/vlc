@@ -43,6 +43,10 @@
 extern "C" {
 #endif
 
+#ifndef FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO
+#define FF_DXVA_WORKAROUND_GONE 1
+#endif
+
 typedef struct input_list_t {
     void (*pf_release)(struct input_list_t *);
     GUID *list;
@@ -59,7 +63,9 @@ typedef struct {
     };
     enum AVCodecID codec;
     const int    *p_profiles; // NULL or ends with 0
+#ifndef FF_DXVA_WORKAROUND_GONE
     int           workaround;
+#endif
 } directx_va_mode_t;
 
 #define MAX_SURFACE_COUNT (64)

@@ -43,10 +43,6 @@
 # error bogus libavcodec DXVA support
 #endif
 
-#ifndef FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO
-# define FF_DXVA2_WORKAROUND_INTEL_CLEARVIDEO 2 // moved to libavcodec/dxva2_internal.h :/
-#endif
-
 #include "directx_va.h"
 #include <vlc_codecs.h> // GUID_FMT/GUID_PRINT
 
@@ -205,8 +201,13 @@ DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2, 0x17127009, 0xa00f, 0x4ce1, 0x99, 0
 DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2_420, 0x2d80bed6, 0x9cac, 0x4835, 0x9e, 0x91, 0x32, 0x7b, 0xbc, 0x4f, 0x9e, 0xe8);
 #endif // !_DIRECTX_AV1_VA_
 
+#ifndef FF_DXVA_WORKAROUND_GONE
 #define DEF_DXVA_MODE(name, guid, bitdepth, chroma_w, chroma_h, avcodecid, profiles, workaround) \
     { name, guid, bitdepth, { chroma_w, chroma_h }, avcodecid, profiles, workaround }
+#else
+#define DEF_DXVA_MODE(name, guid, bitdepth, chroma_w, chroma_h, avcodecid, profiles, workaround) \
+    { name, guid, bitdepth, { chroma_w, chroma_h }, avcodecid, profiles }
+#endif
 
 #define DEF_DXVA_MODE_420_8B(name, guid, avcodecid, profiles) \
     DEF_DXVA_MODE(name, guid, 8, 1, 1, avcodecid, profiles, 0)
