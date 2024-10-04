@@ -316,8 +316,6 @@ static const directx_va_mode_t DXVA_MODES[] = {
     { "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, {1, 1}, 0, NULL, 0 },
     { "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, {1, 1}, 0, NULL, 0 },
 #endif
-
-    { NULL, NULL, 0, {0, 0}, 0, NULL, 0 }
 };
 
 static const directx_va_mode_t *FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
@@ -325,7 +323,7 @@ static const directx_va_mode_t *FindVideoServiceConversion(vlc_va_t *, const dir
 
 static char *directx_va_GetDecoderName(const GUID *guid)
 {
-    for (unsigned i = 0; DXVA_MODES[i].name; i++) {
+    for (size_t i = 0; i < ARRAY_SIZE(DXVA_MODES); i++) {
         if (IsEqualGUID(DXVA_MODES[i].guid, guid))
             return strdup(DXVA_MODES[i].name);
     }
@@ -475,8 +473,8 @@ static const directx_va_mode_t * FindVideoServiceConversion(vlc_va_t *va, const 
     }
 
     /* Try all supported mode by our priority */
-    const directx_va_mode_t *mode = DXVA_MODES;
-    for (; mode->name; ++mode) {
+    for (size_t i=0; i<ARRAY_SIZE(DXVA_MODES); ++i) {
+        const directx_va_mode_t *mode = &DXVA_MODES[i];
         if (!mode->codec || mode->codec != avctx->codec_id)
             continue;
 
