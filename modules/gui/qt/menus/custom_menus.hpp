@@ -167,18 +167,9 @@ class RecentMenu : public QMenu
 public:
     RecentMenu(MLRecentsModel* model, MediaLib* ml, QWidget *parent = nullptr);
 
-private slots:
-    void onRowsRemoved(const QModelIndex &parent, int first, int last);
-    void onRowInserted(const QModelIndex &parent, int first, int last);
-    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
-    void onModelReset();
-
 private:
     MLRecentsModel* m_model = nullptr;
-    QAction* m_separator = nullptr;
     MediaLib* m_ml = nullptr;
-
-    QList<QAction *> m_actions;
 };
 
 class BookmarkMenu : public QMenu

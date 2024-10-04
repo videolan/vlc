@@ -53,6 +53,7 @@ QVariant MLRecentsModel::itemRoleData(MLItem *item , int role ) const
     {
     case RECENT_MEDIA_ID:
         return QVariant::fromValue( media->getId() );
+    case Qt::DisplayRole:
     case RECENT_MEDIA_URL:
         return QVariant::fromValue( media->getUrl().toString(QUrl::PreferLocalFile | QUrl::RemovePassword));
     case RECENT_MEDIA_LAST_PLAYED_DATE:

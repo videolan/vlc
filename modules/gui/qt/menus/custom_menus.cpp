@@ -452,83 +452,17 @@ RecentMenu::RecentMenu(MLRecentsModel* model, MediaLib* ml,  QWidget* parent)
     , m_model(model)
     , m_ml(ml)
 {
-    connect(m_model, &MLRecentsModel::rowsRemoved, this, &RecentMenu::onRowsRemoved);
-    connect(m_model, &MLRecentsModel::rowsInserted, this, &RecentMenu::onRowInserted);
-    connect(m_model, &MLRecentsModel::dataChanged, this, &RecentMenu::onDataChanged);
-    connect(m_model, &MLRecentsModel::modelReset, this, &RecentMenu::onModelReset);
-    m_separator = addSeparator();
-    addAction( qtr("&Clear"), m_model, &MLRecentsModel::clearHistory );
-    onModelReset();
-}
+    QAction* separator = addSeparator();
 
-void RecentMenu::onRowsRemoved(const QModelIndex&, int first, int last)
-{
-    for (int i = first; i <= last; i++)
-    {
-        delete m_actions.at(i);
-    }
+    ListMenuHelper* helper = new ListMenuHelper(this, model, separator, this);
+    connect(helper, &ListMenuHelper::select, this, [this](int row, bool){
+        QModelIndex index = m_model->index(row);
 
-    QList<QAction *>::iterator begin = m_actions.begin();
+        MLItemId id = m_model->data(index, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
+        m_ml->addAndPlay(id);
+    });
 
-    m_actions.erase(begin + first, begin + last + 1);
-
-    if (m_actions.isEmpty())
-        setEnabled(false);
-}
-
-void RecentMenu::onRowInserted(const QModelIndex&, int first, int last)
-{
-    QAction * before;
-
-    if (first < m_actions.count())
-        before = m_actions.at(first);
-    else
-        // NOTE: In that case we insert *before* the 'Clear' separator.
-        before = m_separator;
-
-    for (int i = first; i <= last; i++)
-    {
-        QModelIndex index = m_model->index(i);
-        QString url = m_model->data(index, MLRecentsModel::RECENT_MEDIA_URL).toString();
-
-        QAction *choiceAction = new QAction(url, this);
-
-        // NOTE: We are adding sequentially *before* the next action in the list.
-        insertAction(before, choiceAction);
-
-        m_actions.insert(i, choiceAction);
-
-        connect(choiceAction, &QAction::triggered, [this, choiceAction](){
-            QModelIndex index = m_model->index(m_actions.indexOf(choiceAction));
-
-            MLItemId id = m_model->data(index, MLRecentsModel::RECENT_MEDIA_ID).value<MLItemId>();
-            m_ml->addAndPlay(id);
-        });
-        setEnabled(true);
-    }
-}
-
-void RecentMenu::onDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& )
-{
-    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
-    {
-        QModelIndex index = m_model->index(i);
-        QString title = m_model->data(index, MLRecentsModel::RECENT_MEDIA_URL).toString();
-
-        m_actions.at(i)->setText(title);
-    }
-}
-
-void RecentMenu::onModelReset()
-{
-    qDeleteAll(m_actions);
-    m_actions.clear();
-
-    int nb_rows = m_model->rowCount();
-    if (nb_rows == 0 || nb_rows == -1)
-        setEnabled(false);
-    else
-        onRowInserted({}, 0, nb_rows - 1);
+    addAction( qtr("&Clear"), model, &MLRecentsModel::clearHistory );
 }
 
 // BookmarkMenu
