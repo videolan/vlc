@@ -1,7 +1,7 @@
-From 40322f6f15f54966b58c8afcbbe8a450351186dd Mon Sep 17 00:00:00 2001
+From 1be62d64ffd3c498265fc2387a61fdac7899d85c Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 31 May 2021 13:36:39 +0200
-Subject: [PATCH 09/10] fix MediaFoundation compilation if WINVER was forced by
+Subject: [PATCH 5/9] fix MediaFoundation compilation if WINVER was forced by
  the user
 
 In mingw64 and Windows Kits the MF_MT_VIDEO_ROTATION is defined if WINVER is at
@@ -27,7 +27,7 @@ index 48e3a63efc..98cf3c8db2 100644
  
  #include "mf_utils.h"
 diff --git a/libavcodec/mfenc.c b/libavcodec/mfenc.c
-index 3c50a6c074..3092e4e003 100644
+index b8f8a25f43..737e4fcc81 100644
 --- a/libavcodec/mfenc.c
 +++ b/libavcodec/mfenc.c
 @@ -19,7 +19,9 @@
@@ -41,5 +41,5 @@ index 3c50a6c074..3092e4e003 100644
  
  #include "encode.h"
 -- 
-2.37.3.windows.1
+2.45.0.windows.1
 

@@ -1,7 +1,7 @@
-From 308c7e89093e370082ea7341bdb0d4eb7a6bc52a Mon Sep 17 00:00:00 2001
+From 122235558093bb6fb6edceca51a8a11ef8e055c4 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 20 Feb 2024 13:21:36 +0100
-Subject: [PATCH 11/11] avcodec/videotoolboxenc: disable calls on unsupported
+Subject: [PATCH 6/9] avcodec/videotoolboxenc: disable calls on unsupported
  iOS/tvOS version
 
 VTCopySupportedPropertyDictionaryForEncoder and kVTCompressionPropertyKey_EncoderID are not
@@ -10,40 +10,41 @@ available.
 "supported_props" seems to be read but never used.
 We don't need to dump encoder data for debugging in those cases.
 ---
- libavcodec/videotoolboxenc.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ libavcodec/videotoolboxenc.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/libavcodec/videotoolboxenc.c b/libavcodec/videotoolboxenc.c
-index b0e827d14a..5d1bc8cba8 100644
+index da7b291b03..6b263ee6e9 100644
 --- a/libavcodec/videotoolboxenc.c
 +++ b/libavcodec/videotoolboxenc.c
-@@ -1159,7 +1159,7 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+@@ -1203,8 +1203,10 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+         return AVERROR_EXTERNAL;
      }
  
- #if defined (MAC_OS_X_VERSION_10_13) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_13)
+-#if defined (MAC_OS_X_VERSION_10_13) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_13)
 -    if (__builtin_available(macOS 10.13, *)) {
++#if (TARGET_OS_OSX    && defined(__MAC_13_0)    && __MAC_OS_X_VERSION_MAX_ALLOWED  >= __MAC_13_0)     || \
++    (TARGET_OS_IOS    && defined(__IPHONE_11_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)  || \
++    (TARGET_OS_TV     && defined(__TVOS_11_0)   && __TV_OS_VERSION_MAX_ALLOWED     >= __TVOS_11_0)
 +    if (__builtin_available(macOS 10.13, iOS 11, tvOS 11, *)) {
-         status = VTCopySupportedPropertyDictionaryForEncoder(avctx->width,
-                                                              avctx->height,
-                                                              codec_type,
-@@ -1171,8 +1171,6 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
+         if (vtctx->supported_props) {
+             CFRelease(vtctx->supported_props);
+             vtctx->supported_props = NULL;
+@@ -1220,12 +1222,12 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
              av_log(avctx, AV_LOG_ERROR,"Error retrieving the supported property dictionary err=%"PRId64"\n", (int64_t)status);
              return AVERROR_EXTERNAL;
          }
 -    }
 -#endif
  
-     // Dump the init encoder
-     {
-@@ -1201,6 +1199,8 @@ static int vtenc_create_encoder(AVCodecContext   *avctx,
-         if (encoderID != NULL)
-             CFRelease(encoderID);
-     }
+     status = vt_dump_encoder(avctx);
+     if (status < 0)
+         return status;
 +    }
 +#endif
  
      if (avctx->flags & AV_CODEC_FLAG_QSCALE && !vtenc_qscale_enabled()) {
          av_log(avctx, AV_LOG_ERROR, "Error: -q:v qscale not available for encoder. Use -b:v bitrate instead.\n");
 -- 
-2.37.3.windows.1
+2.45.0.windows.1
 

@@ -6,9 +6,10 @@
 
 ifndef USE_LIBAV
 FFMPEG_HASH=71fb6132637a2a430375c24afc381fff8b854fe7
-FFMPEG_MAJVERSION := 6.1
-FFMPEG_REVISION := 1
-FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_MAJVERSION := 7.1
+FFMPEG_REVISION := 0
+# FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
@@ -191,6 +192,8 @@ FFMPEGCONF += --disable-w32threads --enable-pthreads --extra-libs="-lpthread"
 DEPS_ffmpeg += winpthreads $(DEPS_winpthreads)
 # disable modules not compatible with XP
 FFMPEGCONF += --disable-mediafoundation --disable-amf --disable-schannel
+# We don't currently support D3D12 in VLC
+FFMPEGCONF += --disable-d3d12va
 ifndef HAVE_WINSTORE
 FFMPEGCONF += --enable-dxva2
 else
