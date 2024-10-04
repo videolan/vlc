@@ -355,11 +355,12 @@ void ListMenuHelper::onRowsInserted(const QModelIndex &, int first, int last)
 
         QAction * action = new QAction(name, this);
 
-        action->setCheckable(true);
-
-        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
-
-        action->setChecked(checked);
+        QVariant checked = m_model->data(index, Qt::CheckStateRole);
+        if (checked.isValid() && checked.canConvert<bool>())
+        {
+            action->setCheckable(true);
+            action->setChecked(checked.toBool());
+        }
 
         // NOTE: We are adding sequentially *before* the next action in the list.
         m_menu->insertAction(before, action);
@@ -402,12 +403,11 @@ void ListMenuHelper::onDataChanged(const QModelIndex & topLeft,
         QModelIndex index = m_model->index(i, 0);
 
         QString name = m_model->data(index, Qt::DisplayRole).toString();
-
         action->setText(name);
 
-        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
-
-        action->setChecked(checked);
+        QVariant checked = m_model->data(index, Qt::CheckStateRole);
+        if (checked.isValid() && checked.canConvert<bool>())
+            action->setChecked(checked.toBool());
     }
 }
 
