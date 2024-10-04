@@ -65,7 +65,7 @@ vlc_playlist_New(vlc_object_t *parent)
     playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     playlist->order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     playlist->idgen = 0;
-    playlist->recursive = VLC_PLAYLIST_RECURSIVE_COLLAPSE;
+    playlist->recursive = VLC_PLAYLIST_PREPARSING_COLLAPSE;
 #ifdef TEST_PLAYLIST
     playlist->auto_preparse = false;
 #else
@@ -76,9 +76,9 @@ vlc_playlist_New(vlc_object_t *parent)
     if (rec != NULL)
     {
         if (!strcasecmp(rec, "none"))
-            playlist->recursive = VLC_PLAYLIST_RECURSIVE_NONE;
+            playlist->recursive = VLC_PLAYLIST_PREPARSING_ENABLED;
         else if (!strcasecmp(rec, "expand"))
-            playlist->recursive = VLC_PLAYLIST_RECURSIVE_EXPAND;
+            playlist->recursive = VLC_PLAYLIST_PREPARSING_RECURSIVE;
         free(rec);
     }
 #endif

@@ -122,12 +122,12 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
     {
         switch (playlist->recursive)
         {
-            case VLC_PLAYLIST_RECURSIVE_NONE:
+            case VLC_PLAYLIST_PREPARSING_ENABLED:
                 parse_subitems = false;
                 break;
-            case VLC_PLAYLIST_RECURSIVE_COLLAPSE:
+            case VLC_PLAYLIST_PREPARSING_COLLAPSE:
                 break;
-            case VLC_PLAYLIST_RECURSIVE_EXPAND:
+            case VLC_PLAYLIST_PREPARSING_RECURSIVE:
                 parse_subitems = true;
                 break;
             default: vlc_assert_unreachable();

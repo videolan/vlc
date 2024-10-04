@@ -154,6 +154,17 @@ struct vlc_playlist_sort_criterion
     enum vlc_playlist_sort_order order;
 };
 
+/** Preparsing depth */
+enum vlc_playlist_preparsing
+{
+    /** Auto parse items but don't auto-parse sub items */
+    VLC_PLAYLIST_PREPARSING_ENABLED,
+    /** Auto parse sub items of items (1 level depth) */
+    VLC_PLAYLIST_PREPARSING_COLLAPSE,
+    /** Auto parse all sub items recursively */
+    VLC_PLAYLIST_PREPARSING_RECURSIVE,
+};
+
 /**
  * Action when a media is stopped
  *

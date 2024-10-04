@@ -45,13 +45,6 @@ typedef struct input_item_t input_item_t;
 
 typedef struct VLC_VECTOR(vlc_playlist_item_t *) playlist_item_vector_t;
 
-enum vlc_playlist_recursive_parsing
-{
-    VLC_PLAYLIST_RECURSIVE_NONE,
-    VLC_PLAYLIST_RECURSIVE_COLLAPSE,
-    VLC_PLAYLIST_RECURSIVE_EXPAND,
-};
-
 struct vlc_playlist
 {
     vlc_player_t *player;
@@ -59,7 +52,7 @@ struct vlc_playlist
     libvlc_int_t *libvlc;
     enum vlc_playlist_media_stopped_action stopped_action;
     bool auto_preparse;
-    enum vlc_playlist_recursive_parsing recursive;
+    enum vlc_playlist_preparsing recursive;
     /* all remaining fields are protected by the lock of the player */
     struct vlc_player_listener_id *player_listener;
     playlist_item_vector_t items;
