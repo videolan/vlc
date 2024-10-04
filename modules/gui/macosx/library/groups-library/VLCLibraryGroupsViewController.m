@@ -42,6 +42,12 @@
 
 #import "main/VLCMain.h"
 
+@interface VLCLibraryGroupsViewController ()
+{
+    NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
+}
+@end
+
 @implementation VLCLibraryGroupsViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -51,6 +57,7 @@
         [self setupDataSource];
         [self setupGridViewModeViews];
         [self setupListViewModeViews];
+        [self setupPlaceholderView];
     }
     return self;
 }
@@ -191,9 +198,34 @@
     self.selectedGroupTableView.dataSource = self.dataSource;
 }
 
+- (void)setupPlaceholderView
+{
+    _internalPlaceholderImageViewSizeConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
+                                     attribute:NSLayoutAttributeWidth
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:182.f],
+        [NSLayoutConstraint constraintWithItem:self.placeholderImageView
+                                     attribute:NSLayoutAttributeHeight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:nil
+                                     attribute:NSLayoutAttributeNotAnAttribute
+                                    multiplier:0.f
+                                      constant:114.f],
+    ];
+}
+
 - (id<VLCLibraryDataSource>)currentDataSource
 {
     return self.dataSource;
+}
+
+- (NSArray<NSLayoutConstraint *> *)placeholderImageViewSizeConstraints
+{
+    return _internalPlaceholderImageViewSizeConstraints;
 }
 
 - (void)presentPlaceholderGroupsView
