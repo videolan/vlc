@@ -222,7 +222,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
     }
 
-    m_network_preparser = libvlc_GetMainPreparser(libvlc);
+    m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), 1, 0);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
@@ -297,6 +297,9 @@ MainCtx::~MainCtx()
 
     if (m_medialib)
         delete m_medialib;
+
+    if (m_network_preparser)
+        vlc_preparser_Delete(m_network_preparser);
 
     p_intf->p_mi = NULL;
 }
