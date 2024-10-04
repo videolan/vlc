@@ -210,6 +210,8 @@ DEFINE_GUID(DXVA_ModeAV1_VLD_12bit_Profile2_420, 0x2d80bed6, 0x9cac, 0x4835, 0x9
 
 #define DEF_DXVA_MODE_420_8B(name, guid, avcodecid, profiles) \
     DEF_DXVA_MODE(name, guid, 8, 1, 1, avcodecid, profiles, 0)
+#define DEF_DXVA_MODE_420_10B(name, guid, avcodecid, profiles) \
+    DEF_DXVA_MODE(name, guid, 10, 1, 1, avcodecid, profiles, 0)
 
 
 /* XXX Preferred modes must come first */
@@ -288,7 +290,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     /* HEVC */
     // Intel specific GUID support
     DEF_DXVA_MODE_420_8B( "HEVC Main profile (Intel)",                                      &DXVA_ModeHEVC_VLD_Main_Intel,           AV_CODEC_ID_HEVC, PROF_HEVC_MAIN ),
-    DEF_DXVA_MODE( "HEVC Main 10 profile (Intel)",                                                 &DXVA_ModeHEVC_VLD_Main10_Intel,        10, 1, 1, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10, 0 ),
+    DEF_DXVA_MODE_420_10B( "HEVC Main 10 profile (Intel)",                                  &DXVA_ModeHEVC_VLD_Main10_Intel,         AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10 ),
 #ifdef FF_DXVA2_WORKAROUND_HEVC_REXT
     DEF_DXVA_MODE( "HEVC Main profile 4:2:2 Range Extension (Intel)",                       &DXVA_ModeHEVC_VLD_Main12_Intel,         8, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
     DEF_DXVA_MODE( "HEVC Main 10 profile 4:2:2 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main422_10_Intel,    10, 1, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
@@ -298,7 +300,7 @@ static const directx_va_mode_t DXVA_MODES[] = {
     DEF_DXVA_MODE( "HEVC Main 12 profile 4:4:4 Range Extension (Intel)",                    &DXVA_ModeHEVC_VLD_Main444_12_Intel,    12, 0, 0, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN_REXT, FF_DXVA2_WORKAROUND_HEVC_REXT ),
 #endif
     DEF_DXVA_MODE_420_8B( "HEVC Main profile",                                              &DXVA_ModeHEVC_VLD_Main,                AV_CODEC_ID_HEVC, PROF_HEVC_MAIN ),
-    DEF_DXVA_MODE( "HEVC Main 10 profile",                                                         &DXVA_ModeHEVC_VLD_Main10,              10, 1, 1, AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10, 0 ),
+    DEF_DXVA_MODE_420_10B( "HEVC Main 10 profile",                                          &DXVA_ModeHEVC_VLD_Main10,              AV_CODEC_ID_HEVC, PROF_HEVC_MAIN10 ),
 
     /* H.261 */
     DEF_DXVA_MODE_420_8B( "H.261 decoder, restricted profile A",                                          &DXVA_ModeH261_A,                       0, NULL ),
@@ -315,14 +317,14 @@ static const directx_va_mode_t DXVA_MODES[] = {
     /* VPx */
     DEF_DXVA_MODE_420_8B( "VP8",                                                                          &DXVA_ModeVP8_VLD,                      0, NULL ),
     DEF_DXVA_MODE_420_8B( "VP9 profile 0",                                                  &DXVA_ModeVP9_VLD_Profile0,             AV_CODEC_ID_VP9, PROF_VP9_MAIN ),
-    DEF_DXVA_MODE( "VP9 profile 2",                                                                &DXVA_ModeVP9_VLD_10bit_Profile2,       10, 1, 1, AV_CODEC_ID_VP9, PROF_VP9_10, 0 ),
+    DEF_DXVA_MODE_420_10B( "VP9 profile 2",                                                 &DXVA_ModeVP9_VLD_10bit_Profile2,       AV_CODEC_ID_VP9, PROF_VP9_10 ),
     DEF_DXVA_MODE_420_8B( "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                0, NULL ),
 
     /* AV1 */
     DEF_DXVA_MODE_420_8B( "AV1 Main profile 8",                                             &DXVA_ModeAV1_VLD_Profile0,             ENABLED_AV1_CODECID, PROF_AV1_MAIN ),
-    DEF_DXVA_MODE( "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_MAIN, 0 ),
+    DEF_DXVA_MODE_420_10B( "AV1 Main profile 10",                                           &DXVA_ModeAV1_VLD_Profile0,             ENABLED_AV1_CODECID, PROF_AV1_MAIN ),
     DEF_DXVA_MODE_420_8B( "AV1 High profile 8",                                             &DXVA_ModeAV1_VLD_Profile1,             ENABLED_AV1_CODECID, PROF_AV1_HIGH ),
-    DEF_DXVA_MODE( "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_HIGH, 0 ),
+    DEF_DXVA_MODE_420_10B( "AV1 High profile 10",                                           &DXVA_ModeAV1_VLD_Profile1,             ENABLED_AV1_CODECID, PROF_AV1_HIGH ),
 };
 
 static const directx_va_mode_t *FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
