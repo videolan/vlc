@@ -222,7 +222,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
     }
 
-    m_preparser = libvlc_GetMainPreparser(libvlc);
+    m_network_preparser = libvlc_GetMainPreparser(libvlc);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

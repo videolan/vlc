@@ -355,7 +355,7 @@ public:
         if (!q->m_ctx || !m_hasTree || m_qmlInitializing)
             return false;
 
-        auto parser = q->m_ctx->getPreparser();
+        auto parser = q->m_ctx->getNetworkPreparser();
         if (unlikely(parser == NULL))
             return false;
 
@@ -494,7 +494,7 @@ NetworkMediaModel::~NetworkMediaModel()
     //this can only be acquired from UI thread
     if (!d->m_preparseSem.tryAcquire())
     {
-        auto parser = m_ctx->getPreparser();
+        auto parser = m_ctx->getNetworkPreparser();
         if (likely(parser != NULL))
         {
             vlc_preparser_Cancel( parser, this );

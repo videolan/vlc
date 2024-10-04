@@ -167,7 +167,7 @@ public:
 public:
     /* Getters */
     inline qt_intf_t* getIntf() const { return p_intf; }
-    inline vlc_preparser_t *getPreparser() const { return m_preparser; };
+    inline vlc_preparser_t *getNetworkPreparser() const { return m_network_preparser; };
     bool smoothScroll() const { return m_smoothScroll; }
 
     VLCSystray* getSysTray() { return m_systray.get(); }
@@ -321,7 +321,7 @@ protected:
     void initSystray();
 
     qt_intf_t* p_intf = nullptr;
-    vlc_preparser_t *m_preparser = nullptr;
+    vlc_preparser_t *m_network_preparser = nullptr;
 
     bool m_hasEmbededVideo = false;
     VideoSurfaceProvider* m_videoSurfaceProvider = nullptr;
