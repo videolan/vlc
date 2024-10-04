@@ -130,7 +130,7 @@ private slots:
     void onTriggered(bool checked);
 
 signals:
-    void select(int index);
+    void select(int index, bool checked);
 
     void countChanged(int count);
 

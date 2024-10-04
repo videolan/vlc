@@ -428,11 +428,11 @@ void ListMenuHelper::onModelReset()
         onRowsInserted(QModelIndex(), 0, count - 1);
 }
 
-void ListMenuHelper::onTriggered(bool)
+void ListMenuHelper::onTriggered(bool checked)
 {
     QAction * action = static_cast<QAction *> (sender());
 
-    emit select(m_actions.indexOf(action));
+    emit select(m_actions.indexOf(action), checked);
 }
 
 /*     BooleanPropertyAction    */
@@ -566,7 +566,7 @@ BookmarkMenu::BookmarkMenu(MediaLib * mediaLib, vlc_player_t * player, QWidget *
 
     ListMenuHelper * helper = new ListMenuHelper(this, model, nullptr, this);
 
-    connect(helper, &ListMenuHelper::select, [model](int index)
+    connect(helper, &ListMenuHelper::select, [model](int index, bool )
     {
         model->select(model->index(index, 0));
     });

@@ -467,7 +467,7 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
     ListMenuHelper * helper = new ListMenuHelper(m_menu.get(), titles, sectionChapters, m_menu.get());
 
-    connect(helper, &ListMenuHelper::select, [titles](int index)
+    connect(helper, &ListMenuHelper::select, [titles](int index, bool)
     {
         titles->setData(titles->index(index), true, Qt::CheckStateRole);
     });
@@ -486,7 +486,7 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
     helper = new ListMenuHelper(m_menu.get(), chapters, sectionBookmarks, m_menu.get());
 
-    connect(helper, &ListMenuHelper::select, [chapters](int index)
+    connect(helper, &ListMenuHelper::select, [chapters](int index, bool)
     {
         chapters->setData(chapters->index(index), true, Qt::CheckStateRole);
     });
@@ -511,7 +511,7 @@ bool QmlMenuPositioner::eventFilter(QObject * object, QEvent * event)
 
         helper = new ListMenuHelper(m_menu.get(), bookmarks, nullptr, m_menu.get());
 
-        connect(helper, &ListMenuHelper::select, [bookmarks](int index)
+        connect(helper, &ListMenuHelper::select, [bookmarks](int index, bool)
         {
             bookmarks->select(bookmarks->index(index, 0));
         });
@@ -551,7 +551,7 @@ void QmlBookmarkMenu::close()
 
     ListMenuHelper * helper = new ListMenuHelper(m_menu.get(), programs, nullptr, m_menu.get());
 
-    connect(helper, &ListMenuHelper::select, [programs](int index)
+    connect(helper, &ListMenuHelper::select, [programs](int index, bool)
     {
         programs->setData(programs->index(index), true, Qt::CheckStateRole);
     });
