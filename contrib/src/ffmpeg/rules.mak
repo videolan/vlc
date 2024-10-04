@@ -15,6 +15,7 @@ FFMPEG_BASENAME := $(subst .,_,$(subst \,_,$(subst /,_,$(FFMPEG_HASH))))
 FFMPEGCONF = --prefix="$(PREFIX)" --enable-static --disable-shared \
 	--extra-ldflags="$(LDFLAGS)" \
 	--cc="$(CC)" \
+	--host-cc="$(BUILDCC)" \
 	--pkg-config="$(PKG_CONFIG)" \
 	--disable-doc \
 	--disable-encoder=vorbis \
