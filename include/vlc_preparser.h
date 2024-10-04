@@ -81,9 +81,13 @@ struct vlc_metadata_cbs {
  * This function creates the preparser object and thread.
  *
  * @param obj the parent object
+ * @param max_threads the maximum number of threads used to parse, must be >= 1
+ * @param default_timeout default timeout of the preparser, 0 for no limits.
  * @return a valid preparser object or NULL in case of error
  */
-VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj );
+VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
+                                            unsigned max_threads,
+                                            vlc_tick_t default_timeout );
 
 /**
  * This function enqueues the provided item to be preparsed or fetched.

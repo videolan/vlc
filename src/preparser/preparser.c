@@ -314,15 +314,15 @@ Interrupt(struct task *task)
     vlc_sem_post(&task->preparse_ended);
 }
 
-vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent )
+vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
+                                    vlc_tick_t default_timeout )
 {
+    assert(max_threads >= 1);
+    assert(default_timeout >= 0);
+
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
         return NULL;
-
-    int max_threads = var_InheritInteger(parent, "preparse-threads");
-    if (max_threads < 1)
-        max_threads = 1;
 
     preparser->executor = vlc_executor_New(max_threads);
     if (!preparser->executor)
@@ -331,10 +331,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent )
         return NULL;
     }
 
-    preparser->default_timeout =
-        VLC_TICK_FROM_MS(var_InheritInteger(parent, "preparse-timeout"));
-    if (preparser->default_timeout < 0)
-        preparser->default_timeout = 0;
+    preparser->default_timeout = default_timeout;
 
     preparser->owner = parent;
     preparser->fetcher = input_fetcher_New( parent );

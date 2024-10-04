@@ -235,7 +235,17 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Meta data handling
      */
-    priv->parser = vlc_preparser_New(VLC_OBJECT(p_libvlc));
+
+    int max_threads = var_InheritInteger(p_libvlc, "preparse-threads");
+    if (max_threads < 1)
+        max_threads = 1;
+
+    vlc_tick_t default_timeout =
+        VLC_TICK_FROM_MS(var_InheritInteger(p_libvlc, "preparse-timeout"));
+    if (default_timeout < 0)
+        default_timeout = 0;
+    priv->parser = vlc_preparser_New(VLC_OBJECT(p_libvlc), max_threads,
+                                     default_timeout);
     if( !priv->parser )
         goto error;
 
