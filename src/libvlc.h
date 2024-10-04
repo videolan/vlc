@@ -203,6 +203,9 @@ int intf_InsertItem(libvlc_int_t *, const char *mrl, unsigned optc,
                     const char * const *optv, unsigned flags);
 void intf_DestroyAll( libvlc_int_t * );
 
+vlc_playlist_t *
+libvlc_GetMainPlaylist(libvlc_int_t *libvlc);
+
 /*
  * Variables stuff
  */

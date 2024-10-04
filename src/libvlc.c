@@ -64,6 +64,7 @@
 #include <vlc_media_library.h>
 #include <vlc_thumbnailer.h>
 #include <vlc_tracer.h>
+#include "player/player.h"
 
 #include "libvlc.h"
 
@@ -460,3 +461,68 @@ libvlc_GetMainPreparser(libvlc_int_t *libvlc)
     libvlc_priv_t *priv = libvlc_priv(libvlc);
     return priv->parser;
 }
+
+static void
+PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
+{
+    enum vlc_playlist_playback_order order;
+    if (var_InheritBool(obj, "random"))
+        order = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    else
+        order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+
+    /* repeat = repeat current; loop = repeat all */
+    enum vlc_playlist_playback_repeat repeat;
+    if (var_InheritBool(obj, "repeat"))
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+    else if (var_InheritBool(obj, "loop"))
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    else
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+
+    enum vlc_playlist_media_stopped_action media_stopped_action;
+    if (var_InheritBool(obj, "play-and-exit"))
+        media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
+    else if (var_InheritBool(obj, "play-and-stop"))
+        media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_STOP;
+    else if (var_InheritBool(obj, "play-and-pause"))
+        media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_PAUSE;
+    else
+        media_stopped_action = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
+
+    bool start_paused = var_InheritBool(obj, "start-paused");
+    bool playlist_cork = var_InheritBool(obj, "playlist-cork");
+
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_SetPlaybackOrder(playlist, order);
+    vlc_playlist_SetPlaybackRepeat(playlist, repeat);
+    vlc_playlist_SetMediaStoppedAction(playlist, media_stopped_action);
+
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    /* the playlist and the player share the same lock, and this is not an
+     * implementation detail */
+    vlc_player_SetStartPaused(player, start_paused);
+    vlc_player_SetPauseOnCork(player, playlist_cork);
+
+    vlc_playlist_Unlock(playlist);
+}
+
+vlc_playlist_t *
+libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    vlc_mutex_lock(&priv->lock);
+    vlc_playlist_t *playlist = priv->main_playlist;
+    if (priv->main_playlist == NULL)
+    {
+        playlist = priv->main_playlist = vlc_playlist_New(VLC_OBJECT(libvlc));
+        if (playlist)
+            PlaylistConfigureFromVariables(playlist, VLC_OBJECT(libvlc));
+    }
+    vlc_mutex_unlock(&priv->lock);
+
+    return playlist;
+}
+
