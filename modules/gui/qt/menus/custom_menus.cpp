@@ -439,25 +439,37 @@ void ListMenuHelper::onRowsRemoved(const QModelIndex &, int first, int last)
 }
 
 void ListMenuHelper::onDataChanged(const QModelIndex & topLeft,
-                                   const QModelIndex & bottomRight, const QVector<int> &)
+                                   const QModelIndex & bottomRight, const QVector<int> & roles)
 {
+    const bool updateDisplay = roles.contains(Qt::DisplayRole);
+    const bool updateChecked = roles.contains(Qt::CheckStateRole);
+    const bool udpateIcon = roles.contains(Qt::DecorationRole);
+
     for (int i = topLeft.row(); i <= bottomRight.row(); i++)
     {
         QAction * action = m_actions.at(i);
-
         QModelIndex index = m_model->index(i, 0);
 
-        QString name = m_model->data(index, Qt::DisplayRole).toString();
-        action->setText(name);
-
-        QVariant checked = m_model->data(index, Qt::CheckStateRole);
-        if (checked.isValid() && checked.canConvert<bool>())
-            action->setChecked(checked.toBool());
-
-        QVariant iconPath = m_model->data(index, Qt::DecorationRole);
-        if (iconPath.isValid() && iconPath.canConvert<QString>())
+        if (updateDisplay)
         {
-            action->setIcon(QIcon(iconPath.toString()));
+            QString name = m_model->data(index, Qt::DisplayRole).toString();
+            action->setText(name);
+        }
+
+        if (updateChecked)
+        {
+            QVariant checked = m_model->data(index, Qt::CheckStateRole);
+            if (checked.isValid() && checked.canConvert<bool>())
+                action->setChecked(checked.toBool());
+        }
+
+        if (udpateIcon)
+        {
+            QVariant iconPath = m_model->data(index, Qt::DecorationRole);
+            if (iconPath.isValid() && iconPath.canConvert<QString>())
+            {
+                action->setIcon(QIcon(iconPath.toString()));
+            }
         }
     }
 }
