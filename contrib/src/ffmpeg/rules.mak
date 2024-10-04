@@ -243,7 +243,6 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_VERSION).tar.xz:
 ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(UNPACK)
 ifdef USE_FFMPEG
-	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avutil-define-WC_ERR_INVALID_CHARS-when-it-s-missing.patch
