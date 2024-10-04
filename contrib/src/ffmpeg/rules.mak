@@ -202,7 +202,7 @@ FFMPEGCONF += --target-os=sunos --enable-pic
 endif
 
 ifdef HAVE_EMSCRIPTEN
-FFMPEGCONF+= --arch=wasm32 --target-os=emscripten --enable-pic
+FFMPEGCONF+= --arch=wasm32 --target-os=none --enable-pic
 endif
 
 # Build
@@ -236,7 +236,6 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.xz .sum-ffmpeg
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-mpeg12dec-don-t-call-hw-end_frame-when-start.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-avcodec-mpeg12dec-don-t-end-a-slice-without-first_sl.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-fix-mf_utils-compilation-with-mingw64.patch
-	$(APPLY) $(SRC)/ffmpeg/0001-ffmpeg-add-target_os-support-for-emscripten.patch
 	$(APPLY) $(SRC)/ffmpeg/0011-avcodec-videotoolboxenc-disable-calls-on-unsupported.patch
 	$(APPLY) $(SRC)/ffmpeg/avcodec-fix-compilation-visionos.patch
 	$(MOVE)
