@@ -75,8 +75,15 @@ static const int PROF_HEVC_MAIN_REXT[]  = { FF_PROFILE_HEVC_REXT,
 static const int PROF_VP9_MAIN[]    = { FF_PROFILE_VP9_0, FF_PROFILE_UNKNOWN };
 static const int PROF_VP9_10[]      = { FF_PROFILE_VP9_2, FF_PROFILE_UNKNOWN };
 
+#if LIBAVCODEC_VERSION_CHECK( 58, 112, 103 )
+#define ENABLED_AV1_CODECID  AV_CODEC_ID_AV1
 static const int PROF_AV1_MAIN[]    = { FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
 static const int PROF_AV1_HIGH[]    = { FF_PROFILE_AV1_HIGH, FF_PROFILE_AV1_MAIN, FF_PROFILE_UNKNOWN };
+#else
+#define ENABLED_AV1_CODECID  0
+#define PROF_AV1_MAIN      NULL
+#define PROF_AV1_HIGH      NULL
+#endif
 
 #if defined(__MINGW64_VERSION_MAJOR) // mingw-w64 doesn't have all the standard GUIDs
 
@@ -308,17 +315,10 @@ static const directx_va_mode_t DXVA_MODES[] = {
     DEF_DXVA_MODE( "VP9 profile Intel",                                                            &DXVA_ModeVP9_VLD_Intel,                8, 1, 1, 0, NULL, 0 ),
 
     /* AV1 */
-#if LIBAVCODEC_VERSION_CHECK( 58, 112, 103 )
-    DEF_DXVA_MODE( "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, 1, 1, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 ),
-    DEF_DXVA_MODE( "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, 1, 1, AV_CODEC_ID_AV1, PROF_AV1_MAIN, 0 ),
-    DEF_DXVA_MODE( "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, 1, 1, AV_CODEC_ID_AV1, PROF_AV1_HIGH, 0 ),
-    DEF_DXVA_MODE( "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, 1, 1, AV_CODEC_ID_AV1, PROF_AV1_HIGH, 0 ),
-#else
-    DEF_DXVA_MODE( "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, 1, 1, 0, NULL, 0 ),
-    DEF_DXVA_MODE( "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, 1, 1, 0, NULL, 0 ),
-    DEF_DXVA_MODE( "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, 1, 1, 0, NULL, 0 ),
-    DEF_DXVA_MODE( "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, 1, 1, 0, NULL, 0 ),
-#endif
+    DEF_DXVA_MODE( "AV1 Main profile 8",                                                           &DXVA_ModeAV1_VLD_Profile0,             8, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_MAIN, 0 ),
+    DEF_DXVA_MODE( "AV1 Main profile 10",                                                          &DXVA_ModeAV1_VLD_Profile0,            10, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_MAIN, 0 ),
+    DEF_DXVA_MODE( "AV1 High profile 8",                                                           &DXVA_ModeAV1_VLD_Profile1,             8, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_HIGH, 0 ),
+    DEF_DXVA_MODE( "AV1 High profile 10",                                                          &DXVA_ModeAV1_VLD_Profile1,            10, 1, 1, ENABLED_AV1_CODECID, PROF_AV1_HIGH, 0 ),
 };
 
 static const directx_va_mode_t *FindVideoServiceConversion(vlc_va_t *, const directx_sys_t *, const es_format_t *, video_format_t *fmt_out,
