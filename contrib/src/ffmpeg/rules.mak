@@ -1,9 +1,10 @@
 # FFmpeg
 
 FFMPEG_HASH=ec47a3b95f88fc3f820b900038ac439e4eb3fede
-FFMPEG_MAJVERSION := 6.1
-FFMPEG_REVISION := 1
-FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_MAJVERSION := 7.1
+FFMPEG_REVISION := 0
+# FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
+FFMPEG_VERSION := $(FFMPEG_MAJVERSION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
 FFMPEG_GITURL := $(VIDEOLAN_GIT)/ffmpeg.git
@@ -169,10 +170,12 @@ endif
 # Windows
 ifdef HAVE_WIN32
 ifndef HAVE_VISUALSTUDIO
-DEPS_ffmpeg += wine-headers mingw12-fixes
+DEPS_ffmpeg += wine-headers $(DEPS_wine-headers) mingw12-fixes $(DEPS_mingw12-fixes) d3d12 $(DEPS_d3d12)
 endif
 FFMPEGCONF += --target-os=mingw32
 FFMPEGCONF += --enable-w32threads
+# We don't currently support D3D12 in VLC
+FFMPEGCONF += --disable-d3d12va
 ifndef HAVE_WINSTORE
 FFMPEGCONF += --enable-dxva2
 else
