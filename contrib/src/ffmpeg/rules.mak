@@ -170,7 +170,7 @@ endif
 
 # Linux
 ifdef HAVE_LINUX
-FFMPEGCONF += --target-os=linux --enable-pic --extra-libs="-lm"
+FFMPEGCONF += --target-os=linux --enable-pic
 
 endif
 
