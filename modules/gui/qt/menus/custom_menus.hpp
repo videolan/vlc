@@ -24,6 +24,7 @@
 #include "qt.hpp"
 
 #include <QMenu>
+#include <QActionGroup>
 #include "medialibrary/mlrecentsmodel.hpp"
 
 class QAbstractListModel;
@@ -114,6 +115,8 @@ public:
 
 public: // Interface
     int count() const;
+
+    QActionGroup* getActionGroup() const;
 
 private slots:
     void onRowsInserted(const QModelIndex & parent, int first, int last);

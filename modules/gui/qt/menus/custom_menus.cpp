@@ -330,6 +330,12 @@ int ListMenuHelper::count() const
     return m_actions.count();
 }
 
+QActionGroup* ListMenuHelper::getActionGroup() const
+{
+    return m_group;
+}
+
+
 // Private slots
 
 void ListMenuHelper::onRowsInserted(const QModelIndex &, int first, int last)
