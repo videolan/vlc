@@ -110,7 +110,7 @@ static const struct vlc_metadata_cbs preparser_callbacks = {
     .on_subtree_added = on_subtree_added,
 };
 
-void
+static void
 vlc_playlist_Preparse(vlc_playlist_t *playlist, input_item_t *input,
                       bool parse_subitems)
 {
