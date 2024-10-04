@@ -103,6 +103,8 @@ private:
     QActionGroup* m_actionGroup = nullptr;
 };
 
+class QQuickImageResponse;
+
 // NOTE: This class is a helper to populate and maintain a QMenu from an QAbstractListModel.
 class ListMenuHelper : public QObject
 {
@@ -112,6 +114,7 @@ public:
     // NOTE: The model actions will be inserted before 'before' or at the end if it's NULL.
     ListMenuHelper(QMenu * menu, QAbstractListModel * model, QAction * before = nullptr,
                    QObject * parent = nullptr);
+    virtual ~ListMenuHelper();
 
 public: // Interface
     int count() const;
@@ -135,6 +138,8 @@ signals:
     void countChanged(int count);
 
 private:
+    void setIcon(QAction* action,  const QUrl& iconUrl);
+
     QMenu * m_menu = nullptr;
 
     QActionGroup * m_group = nullptr;
@@ -144,6 +149,8 @@ private:
     QList<QAction *> m_actions;
 
     QAction * m_before = nullptr;
+
+    std::unique_ptr<QQuickImageResponse> m_iconLoader;
 };
 
 /**

@@ -49,6 +49,8 @@
 #include <QMetaProperty>
 #include <QMetaMethod>
 
+#include "util/vlcaccess_image_provider.hpp"
+
 RendererAction::RendererAction( vlc_renderer_item_t *p_item_ )
     : QAction()
 {
@@ -323,6 +325,9 @@ ListMenuHelper::ListMenuHelper(QMenu * menu, QAbstractListModel * model, QAction
     connect(m_model, &QAbstractListModel::modelReset, this, &ListMenuHelper::onModelReset);
 }
 
+
+ListMenuHelper::~ListMenuHelper()
+{}
 // Interface
 
 int ListMenuHelper::count() const
@@ -333,6 +338,34 @@ int ListMenuHelper::count() const
 QActionGroup* ListMenuHelper::getActionGroup() const
 {
     return m_group;
+}
+
+
+void ListMenuHelper::setIcon(QAction* action,  const QUrl& iconUrl)
+{
+
+    if (!iconUrl.isValid())
+    {
+        action->setIcon({});
+        return;
+    }
+
+    if (m_iconLoader)
+    {
+        disconnect(m_iconLoader.get(), nullptr, this, nullptr);
+        m_iconLoader->cancel();
+    }
+    m_iconLoader.reset(VLCAccessImageProvider::requestImageResponseUnWrapped(iconUrl, {64,64}));
+    connect(m_iconLoader.get(), &QQuickImageResponse::finished, this, [this, action] {
+        std::unique_ptr<QQuickTextureFactory> factory(m_iconLoader->textureFactory());
+        if (!factory)
+        {
+            action->setIcon({});
+            return;
+        }
+        QImage img = factory->image();
+        action->setIcon(QIcon(QPixmap::fromImage(img)));
+    });
 }
 
 
@@ -360,6 +393,18 @@ void ListMenuHelper::onRowsInserted(const QModelIndex &, int first, int last)
         {
             action->setCheckable(true);
             action->setChecked(checked.toBool());
+        }
+
+        QVariant iconPath = m_model->data(index, Qt::DecorationRole);
+        if (iconPath.isValid())
+        {
+            QUrl iconUrl;
+            if (iconPath.canConvert<QUrl>())
+                iconUrl = iconPath.toUrl();
+            else if (iconPath.canConvert<QString>())
+                iconUrl = QUrl::fromEncoded(iconPath.toString().toUtf8());
+
+            setIcon(action, iconUrl);
         }
 
         // NOTE: We are adding sequentially *before* the next action in the list.
@@ -408,6 +453,12 @@ void ListMenuHelper::onDataChanged(const QModelIndex & topLeft,
         QVariant checked = m_model->data(index, Qt::CheckStateRole);
         if (checked.isValid() && checked.canConvert<bool>())
             action->setChecked(checked.toBool());
+
+        QVariant iconPath = m_model->data(index, Qt::DecorationRole);
+        if (iconPath.isValid() && iconPath.canConvert<QString>())
+        {
+            action->setIcon(QIcon(iconPath.toString()));
+        }
     }
 }
 
