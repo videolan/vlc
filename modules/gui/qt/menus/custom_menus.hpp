@@ -75,12 +75,6 @@ class CheckableListMenu : public QMenu
 {
     Q_OBJECT
 public:
-    enum GroupingMode {
-        GROUPED_EXLUSIVE,
-        GROUPED_OPTIONAL,
-        UNGROUPED
-    };
-
     /**
      * @brief CheckableListMenu
      * @param title the title of the menu
@@ -88,7 +82,7 @@ public:
      * @param grouping whether the menu should use an ActionGroup or not
      * @param parent QObject parent
      */
-    CheckableListMenu(QString title, QAbstractListModel* model ,  GroupingMode grouping = UNGROUPED, QWidget *parent = nullptr);
+    CheckableListMenu(QString title, QAbstractListModel* model, QActionGroup::ExclusionPolicy grouping = QActionGroup::ExclusionPolicy::None, QWidget *parent = nullptr);
 
 private slots:
     void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
@@ -99,7 +93,6 @@ private slots:
 
 private:
     QAbstractListModel* m_model;
-    GroupingMode m_grouping;
     QActionGroup* m_actionGroup = nullptr;
 };
 

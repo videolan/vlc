@@ -212,19 +212,15 @@ void RendererMenu::RendererSelected(QAction *action)
 
 /*   CheckableListMenu   */
 
-CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , GroupingMode grouping,  QWidget *parent)
+CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , QActionGroup::ExclusionPolicy grouping,  QWidget *parent)
     : QMenu(parent)
     , m_model(model)
-    , m_grouping(grouping)
 {
     this->setTitle(title);
-    if (m_grouping != UNGROUPED)
+    if (grouping != QActionGroup::ExclusionPolicy::None)
     {
         m_actionGroup = new QActionGroup(this);
-        if (m_grouping == GROUPED_OPTIONAL)
-        {
-            m_actionGroup->setExclusionPolicy(QActionGroup::ExclusionPolicy::ExclusiveOptional);
-        }
+        m_actionGroup->setExclusionPolicy(grouping);
     }
 
     connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this, &CheckableListMenu::onRowsAboutToBeRemoved);
