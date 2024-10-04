@@ -527,7 +527,37 @@ libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
     vlc_playlist_t *playlist = priv->main_playlist;
     if (priv->main_playlist == NULL)
     {
-        playlist = priv->main_playlist = vlc_playlist_New(VLC_OBJECT(libvlc));
+        bool auto_preparse = var_InheritBool(libvlc, "auto-preparse");
+        enum vlc_playlist_preparsing rec = VLC_PLAYLIST_PREPARSING_DISABLED;
+        int max_threads = 1;
+        vlc_tick_t default_timeout = 0;
+
+        if (auto_preparse)
+        {
+            rec = VLC_PLAYLIST_PREPARSING_COLLAPSE;
+
+            char *rec_str = var_InheritString(libvlc, "recursive");
+            if (rec_str != NULL)
+            {
+                if (!strcasecmp(rec_str, "none"))
+                    rec = VLC_PLAYLIST_PREPARSING_ENABLED;
+                else if (!strcasecmp(rec_str, "expand"))
+                    rec = VLC_PLAYLIST_PREPARSING_RECURSIVE;
+                free(rec_str);
+            }
+            max_threads = var_InheritInteger(libvlc, "preparse-threads");
+            if (max_threads < 1)
+                max_threads = 1;
+
+            default_timeout =
+                VLC_TICK_FROM_MS(var_InheritInteger(libvlc, "preparse-timeout"));
+            if (default_timeout < 0)
+                default_timeout = 0;
+        }
+
+        playlist = priv->main_playlist = vlc_playlist_New(VLC_OBJECT(libvlc),
+                                                          rec, max_threads,
+                                                          default_timeout);
         if (playlist)
             PlaylistConfigureFromVariables(playlist, VLC_OBJECT(libvlc));
     }
@@ -535,4 +565,3 @@ libvlc_GetMainPlaylist(libvlc_int_t *libvlc)
 
     return playlist;
 }
-

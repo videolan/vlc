@@ -31,26 +31,32 @@
 #include "player.h"
 
 vlc_playlist_t *
-vlc_playlist_New(vlc_object_t *parent)
+vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
+                 unsigned preparse_max_threads, vlc_tick_t preparse_timeout)
 {
     vlc_playlist_t *playlist = malloc(sizeof(*playlist));
     if (unlikely(!playlist))
         return NULL;
 
-#ifdef TEST_PLAYLIST
-    playlist->parser = NULL;
-#else
-    playlist->parser = libvlc_GetMainPreparser(vlc_object_instance(parent));
-    if (unlikely(playlist->parser == NULL))
+    if (rec != VLC_PLAYLIST_PREPARSING_DISABLED)
     {
-        free(playlist);
-        return NULL;
+        playlist->parser = vlc_preparser_New(parent, preparse_max_threads,
+                                             preparse_timeout);
+        if (playlist->parser == NULL)
+        {
+            free(playlist);
+            return NULL;
+        }
     }
-#endif
+    else
+        playlist->parser = NULL;
+    playlist->recursive = rec;
 
     bool ok = vlc_playlist_PlayerInit(playlist, parent);
     if (unlikely(!ok))
     {
+        if (playlist->parser != NULL)
+            vlc_preparser_Delete(playlist->parser);
         free(playlist);
         return NULL;
     }
@@ -65,23 +71,6 @@ vlc_playlist_New(vlc_object_t *parent)
     playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     playlist->order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     playlist->idgen = 0;
-    playlist->recursive = VLC_PLAYLIST_PREPARSING_COLLAPSE;
-#ifdef TEST_PLAYLIST
-    playlist->auto_preparse = false;
-#else
-    assert(parent);
-    playlist->auto_preparse = var_InheritBool(parent, "auto-preparse");
-
-    char *rec = var_InheritString(parent, "recursive");
-    if (rec != NULL)
-    {
-        if (!strcasecmp(rec, "none"))
-            playlist->recursive = VLC_PLAYLIST_PREPARSING_ENABLED;
-        else if (!strcasecmp(rec, "expand"))
-            playlist->recursive = VLC_PLAYLIST_PREPARSING_RECURSIVE;
-        free(rec);
-    }
-#endif
 
     return playlist;
 }
@@ -91,9 +80,14 @@ vlc_playlist_Delete(vlc_playlist_t *playlist)
 {
     assert(vlc_list_is_empty(&playlist->listeners));
 
+    if (playlist->parser != NULL)
+        vlc_preparser_Deactivate(playlist->parser);
+
     vlc_playlist_PlayerDestroy(playlist);
     randomizer_Destroy(&playlist->randomizer);
     vlc_playlist_ClearItems(playlist);
+    if (playlist->parser != NULL)
+        vlc_preparser_Delete(playlist->parser);
     free(playlist);
 }
 

@@ -118,7 +118,7 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
     VLC_UNUSED(preparser_callbacks);
 #endif
 
-    if (playlist->auto_preparse && !input_item_IsPreparsed(input))
+    if (playlist->parser != NULL && !input_item_IsPreparsed(input))
     {
         switch (playlist->recursive)
         {
@@ -132,7 +132,6 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
                 break;
             default: vlc_assert_unreachable();
         }
-        assert(playlist->parser != NULL);
 
         input_item_meta_request_option_t options =
             META_REQUEST_OPTION_SCOPE_LOCAL | META_REQUEST_OPTION_FETCH_LOCAL;

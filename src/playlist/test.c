@@ -76,7 +76,7 @@ DestroyMediaArray(input_item_t *const array[], size_t count)
 static void
 test_append(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -112,7 +112,7 @@ test_append(void)
 static void
 test_insert(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[15];
@@ -161,7 +161,7 @@ test_insert(void)
 static void
 test_move(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -206,7 +206,7 @@ test_move(void)
 static void
 test_remove(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -237,7 +237,7 @@ test_remove(void)
 static void
 test_clear(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -258,7 +258,7 @@ test_clear(void)
 static void
 test_expand_item(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[16];
@@ -563,7 +563,7 @@ callback_on_has_next_changed(vlc_playlist_t *playlist, bool has_next,
 static void
 test_items_added_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -657,7 +657,7 @@ test_items_added_callbacks(void)
 static void
 test_items_moved_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -773,7 +773,7 @@ test_items_moved_callbacks(void)
 static void
 test_items_removed_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -864,7 +864,7 @@ test_items_removed_callbacks(void)
 static void
 test_items_reset_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -918,7 +918,7 @@ test_items_reset_callbacks(void)
 static void
 test_playback_repeat_changed_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
@@ -949,7 +949,7 @@ test_playback_repeat_changed_callbacks(void)
 static void
 test_playback_order_changed_callbacks(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     playlist->order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
@@ -980,7 +980,7 @@ test_playback_order_changed_callbacks(void)
 static void
 test_callbacks_on_add_listener(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1039,7 +1039,7 @@ test_callbacks_on_add_listener(void)
 static void
 test_index_of(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1068,7 +1068,7 @@ test_index_of(void)
 static void
 test_prev(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[4];
@@ -1144,7 +1144,7 @@ test_prev(void)
 static void
 test_next(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[3];
@@ -1220,7 +1220,7 @@ test_next(void)
 static void
 test_goto(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1336,7 +1336,7 @@ test_goto(void)
 static void
 test_request_insert(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[5];
@@ -1381,7 +1381,7 @@ test_request_insert(void)
 static void
 test_request_remove_with_matching_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1433,7 +1433,7 @@ test_request_remove_with_matching_hint(void)
 static void
 test_request_remove_without_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1485,7 +1485,7 @@ test_request_remove_without_hint(void)
 static void
 test_request_remove_adapt(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[11];
@@ -1557,7 +1557,7 @@ test_request_remove_adapt(void)
 static void
 test_request_move_with_matching_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1613,7 +1613,7 @@ test_request_move_with_matching_hint(void)
 static void
 test_request_move_without_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1684,7 +1684,7 @@ test_request_move_without_hint(void)
 static void
 test_request_move_adapt(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[16];
@@ -1785,7 +1785,7 @@ test_request_move_adapt(void)
 static void
 test_request_move_to_end_adapt(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[16];
@@ -1886,7 +1886,7 @@ test_request_move_to_end_adapt(void)
 static void
 test_request_goto_with_matching_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1933,7 +1933,7 @@ test_request_goto_with_matching_hint(void)
 static void
 test_request_goto_without_hint(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -1980,7 +1980,7 @@ test_request_goto_without_hint(void)
 static void
 test_request_goto_adapt(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -2029,7 +2029,7 @@ test_request_goto_adapt(void)
 static void
 test_random(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[6];
@@ -2168,7 +2168,7 @@ test_random(void)
 static void
 test_shuffle(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -2248,7 +2248,7 @@ test_shuffle(void)
 static void
 test_sort(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
@@ -2352,7 +2352,7 @@ test_sort(void)
 static void
 test_stable_sort(void)
 {
-    vlc_playlist_t *playlist = vlc_playlist_New(NULL);
+    vlc_playlist_t *playlist = vlc_playlist_New(NULL, VLC_PLAYLIST_PREPARSING_DISABLED, 0, 0);
     assert(playlist);
 
     input_item_t *media[10];
