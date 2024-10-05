@@ -42,6 +42,8 @@ NSString *VLCPlaylistCurrentItemIndexChanged = @"VLCPlaylistCurrentItemIndexChan
 NSString *VLCPlaylistItemsAdded = @"VLCPlaylistItemsAdded";
 NSString *VLCPlaylistItemsRemoved = @"VLCPlaylistItemsRemoved";
 
+NSString * const VLCLibraryPlaylistModeDefaultsKey = @"VLCLibraryPlaylistMode";
+
 @interface VLCPlaylistController ()
 {
     NSNotificationCenter *_defaultNotificationCenter;
@@ -244,7 +246,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         /* set initial values, further updates through callbacks */
         vlc_playlist_Lock(_p_playlist);
         _unsorted = YES;
-        _libraryPlaylistMode = NO;
+        _libraryPlaylistMode =
+            [NSUserDefaults.standardUserDefaults boolForKey:VLCLibraryPlaylistModeDefaultsKey];
         _playbackOrder = vlc_playlist_GetPlaybackOrder(_p_playlist);
         _playbackRepeat = vlc_playlist_GetPlaybackRepeat(_p_playlist);
         _playlistListenerID = vlc_playlist_AddListener(_p_playlist,
@@ -584,6 +587,13 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetPlaybackRepeat(_p_playlist, playbackRepeat);
     vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)setLibraryPlaylistMode:(BOOL)libraryPlaylistMode
+{
+    _libraryPlaylistMode = libraryPlaylistMode;
+    [NSUserDefaults.standardUserDefaults setBool:libraryPlaylistMode
+                                          forKey:VLCLibraryPlaylistModeDefaultsKey];
 }
 
 #pragma mark - properties

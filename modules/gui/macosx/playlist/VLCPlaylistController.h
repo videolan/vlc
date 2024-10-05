@@ -104,7 +104,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  */
 @property (readwrite, nonatomic) enum vlc_playlist_playback_order playbackOrder;
 
-@property (readwrite) BOOL libraryPlaylistMode;
+@property (readwrite, nonatomic) BOOL libraryPlaylistMode;
 
 /**
  * Define the action to perform after playback of the current media stopped (for any reason)
