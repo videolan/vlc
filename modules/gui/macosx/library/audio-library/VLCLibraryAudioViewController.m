@@ -72,8 +72,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
 
-    NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
-
     VLCNoResultsLabel *_noResultsLabel;
 }
 @end
@@ -96,7 +94,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _splitViewDelegate = [[VLCLibraryTwoPaneSplitViewDelegate alloc] init];
 
         [self setupAudioPlaceholderView];
-        [self setupLoadingOverlayView];
         [self setupAudioCollectionView];
         [self setupGridModeSplitView];
         [self setupAudioTableViews];
@@ -157,6 +154,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListTableView = libraryWindow.audioLibraryGridModeSplitViewListTableView;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
     _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
+    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupAudioDataSource
@@ -258,42 +256,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _NS("Your favorite albums will appear here.\nGo to the Browse section to add albums you love."),
         _NS("Your favorite tracks will appear here.\nGo to the Browse section to add tracks you love."),
         _NS("Your favorite genres will appear here.\nGo to the Browse section to add genres you love."),
-    ];
-}
-
-- (void)setupLoadingOverlayView
-{
-    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
-    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
-    _loadingOverlayViewConstraints = @[
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0]
     ];
 }
 
@@ -652,7 +614,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
     self.libraryTargetView.subviews = views;
-    [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+    [self.libraryTargetView addConstraints:self.libraryWindow.loadingOverlayViewConstraints];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.duration = 0.5;
@@ -679,7 +641,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        [self.libraryTargetView removeConstraints:self.libraryWindow.loadingOverlayViewConstraints];
         NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
         [views removeObject:self.loadingOverlayView];
         self.libraryTargetView.subviews = views.copy;

@@ -51,8 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSTableView *audioLibraryGridModeSplitViewListTableView;
 @property (readonly, weak) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
 @property (readonly, weak) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
-
-@property (readonly) VLCLoadingOverlayView *loadingOverlayView;
+@property (readonly, weak) VLCLoadingOverlayView *loadingOverlayView;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;
 @property (readonly) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
