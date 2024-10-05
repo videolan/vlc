@@ -199,7 +199,9 @@
         return;
     }
 
-    VLCLibraryRepresentedItem * const item = [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem parentType:item.parentType];
+    VLCLibraryRepresentedItem * const item =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:mediaItem
+                                             parentType:self.representedItem.parentType];
     self.representedItem = item;
 }
 
