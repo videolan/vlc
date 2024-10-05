@@ -51,7 +51,6 @@
 {
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
     NSMutableSet<NSString *> *_ongoingLongLoadingNotifications;
-    NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
     NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
 }
 @end
@@ -64,7 +63,6 @@
 
     if(self) {
         [self setupPropertiesFromLibraryWindow:libraryWindow];
-        [self setupLoadingOverlayView];
         [self setupGridViewController];
         [self setupHomePlaceholderView];
         [self setupHomeLibraryViews];
@@ -108,42 +106,7 @@
     _homeLibraryView = libraryWindow.homeLibraryView;
     _homeLibraryStackViewScrollView = libraryWindow.homeLibraryStackViewScrollView;
     _homeLibraryStackView = libraryWindow.homeLibraryStackView;
-}
-
-- (void)setupLoadingOverlayView
-{
-    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
-    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
-    _loadingOverlayViewConstraints = @[
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0]
-    ];
+    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupGridViewController
@@ -292,7 +255,7 @@
 
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
     self.libraryTargetView.subviews = views;
-    [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+    [self.libraryTargetView addConstraints:self.libraryWindow.loadingOverlayViewConstraints];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.duration = 0.5;
@@ -323,7 +286,7 @@
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        [self.libraryTargetView removeConstraints:self.libraryWindow.loadingOverlayViewConstraints];
         NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
         [views removeObject:self.loadingOverlayView];
         self.libraryTargetView.subviews = views.copy;
