@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCCustomEmptyLibraryBrowseButton;
 @class VLCLibraryWindowSplitViewController;
 @class VLCLibraryWindowToolbarDelegate;
+@class VLCLoadingOverlayView;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -112,6 +113,9 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;
 @property (nonatomic, readwrite, strong) IBOutlet NSTextField *placeholderLabel;
 @property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
+
+@property (readonly) VLCLoadingOverlayView *loadingOverlayView;
+@property (readonly) NSArray<NSLayoutConstraint *> *loadingOverlayViewConstraints;
 
 @property (readwrite, nonatomic) NSInteger librarySegmentType;
 @property (readwrite) BOOL nonembedded;

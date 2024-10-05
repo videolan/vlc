@@ -71,6 +71,7 @@
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
+#import "views/VLCLoadingOverlayView.h"
 #import "views/VLCRoundedCornerTextField.h"
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
@@ -186,6 +187,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
     [self setViewForSelectedSegment];
+    [self setupLoadingOverlayView];
 }
 
 - (void)dealloc
@@ -204,6 +206,42 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     [super encodeRestorableStateWithCoder:coder];
     [coder encodeInteger:_librarySegmentType forKey:@"macosx-library-selected-segment"];
+}
+
+- (void)setupLoadingOverlayView
+{
+    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
+    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
+    _loadingOverlayViewConstraints = @[
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1
+                                      constant:0],
+        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.libraryTargetView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1
+                                      constant:0]
+    ];
 }
 
 #pragma mark - misc. user interactions
