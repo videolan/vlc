@@ -66,7 +66,6 @@
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 
     NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
-    NSArray<NSLayoutConstraint *> *_loadingOverlayViewConstraints;
 
     VLCNoResultsLabel *_noResultsLabel;
 }
@@ -87,7 +86,6 @@
         [self setupCollectionView];
         [self setupVideoPlaceholderView];
         [self setupVideoLibraryViews];
-        [self setupLoadingOverlayView];
 
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -136,6 +134,7 @@
     _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
+    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupTableViews
@@ -246,42 +245,6 @@
     _videoLibraryGroupSelectionTableViewScrollView.automaticallyAdjustsContentInsets = NO;
     _videoLibraryGroupSelectionTableViewScrollView.contentInsets = defaultInsets;
     _videoLibraryGroupSelectionTableViewScrollView.scrollerInsets = scrollerInsets;
-}
-
-- (void)setupLoadingOverlayView
-{
-    _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
-    self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
-    _loadingOverlayViewConstraints = @[
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0]
-    ];
 }
 
 #pragma mark - Show the video library view
@@ -528,7 +491,7 @@
 
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
     self.libraryTargetView.subviews = views;
-    [self.libraryTargetView addConstraints:_loadingOverlayViewConstraints];
+    [self.libraryTargetView addConstraints:self.libraryWindow.loadingOverlayViewConstraints];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.duration = 0.5;
@@ -554,7 +517,7 @@
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        [self.libraryTargetView removeConstraints:_loadingOverlayViewConstraints];
+        [self.libraryTargetView removeConstraints:self.libraryWindow.loadingOverlayViewConstraints];
         NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
         [views removeObject:self.loadingOverlayView];
         self.libraryTargetView.subviews = views.copy;
