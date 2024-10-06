@@ -50,8 +50,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCNoResultsLabel.h"
-
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
 
@@ -65,8 +63,6 @@
     id<VLCMediaLibraryItemProtocol> _awaitingPresentingLibraryItem;
 
     NSArray<NSLayoutConstraint *> *_internalPlaceholderImageViewSizeConstraints;
-
-    VLCNoResultsLabel *_noResultsLabel;
 }
 @end
 
@@ -285,7 +281,7 @@
         const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
         [self presentVideoLibraryView:viewModeSegment];
     } else if (self.libraryVideoDataSource.libraryModel.filterString.length > 0) {
-        [self presentNoResultsView];
+        [self.libraryWindow displayNoResultsMessage];
     } else {
         [self presentPlaceholderVideoLibraryView];
     }
@@ -312,7 +308,7 @@
         const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.showsLibraryViewMode;
         [self presentVideoLibraryView:viewModeSegment];
     } else if (self.libraryShowsDataSource.libraryModel.filterString.length > 0) {
-        [self presentNoResultsView];
+        [self.libraryWindow displayNoResultsMessage];
     } else {
         [self presentPlaceholderVideoLibraryView];
     }
@@ -333,25 +329,6 @@
     [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
                                               usingConstraints:self.placeholderImageViewSizeConstraints
                                              displayingMessage:_NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.")];
-}
-
-- (void)presentNoResultsView
-{
-    if (_noResultsLabel == nil) {
-        _noResultsLabel = [[VLCNoResultsLabel alloc] init];
-        _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-
-    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[_noResultsLabel, self.libraryWindow.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[_noResultsLabel];
-    }
-
-    [NSLayoutConstraint activateConstraints:@[
-        [_noResultsLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
-        [_noResultsLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
-    ]];
 }
 
 - (void)presentVideoLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
