@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindowSplitViewController;
 @class VLCLibraryWindowToolbarDelegate;
 @class VLCLoadingOverlayView;
+@class VLCNoResultsLabel;
 
 @protocol VLCMediaLibraryItemProtocol;
 
@@ -117,6 +118,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
 @property (readonly) NSArray<NSLayoutConstraint *> *loadingOverlayViewConstraints;
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
+@property (readonly) VLCNoResultsLabel *noResultsLabel;
 
 @property (readwrite, nonatomic) NSInteger librarySegmentType;
 @property (readwrite) BOOL nonembedded;
@@ -142,6 +144,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)displayLibraryPlaceholderViewWithImage:(NSImage *)image
                               usingConstraints:(NSArray<NSLayoutConstraint *> *)constraints
                              displayingMessage:(NSString *)message;
+- (void)displayNoResultsMessage;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (void)goToLocalFolderMrl:(NSString *)mrl;
 

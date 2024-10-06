@@ -72,6 +72,7 @@
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCLoadingOverlayView.h"
+#import "views/VLCNoResultsLabel.h"
 #import "views/VLCRoundedCornerTextField.h"
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
@@ -519,6 +520,25 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self displayLibraryView:self.emptyLibraryView];
     self.placeholderImageView.image = image;
     self.placeholderLabel.stringValue = message;
+}
+
+- (void)displayNoResultsMessage
+{
+    if (self.noResultsLabel == nil) {
+        _noResultsLabel = [[VLCNoResultsLabel alloc] init];
+        _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    }
+    
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.noResultsLabel, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[_noResultsLabel];
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        [self.noResultsLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
+        [self.noResultsLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
+    ]];
 }
 
 - (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
