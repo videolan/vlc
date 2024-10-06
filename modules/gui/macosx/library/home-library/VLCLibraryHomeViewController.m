@@ -176,36 +176,14 @@
         constraint.active = YES;
     }
 
-    self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.libraryWindow.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView];
-    }
-    NSView * const emptyLibraryView = self.emptyLibraryView;
-    NSDictionary * const dict = NSDictionaryOfVariableBindings(emptyLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-
+    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
     self.placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
     self.placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
 }
 
 - (void)presentHomeLibraryView
 {
-    self.homeLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.homeLibraryView, self.libraryWindow.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[self.homeLibraryView];
-    }
-
-    NSDictionary * const dict = NSDictionaryOfVariableBindings(_homeLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_homeLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_homeLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-
-    const VLCLibraryViewModeSegment viewModeSegment = VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode;
-
+    [self.libraryWindow displayLibraryView:self.homeLibraryView];
     self.homeLibraryStackViewScrollView.hidden = NO;
     [self.stackViewController reloadData];
 }
