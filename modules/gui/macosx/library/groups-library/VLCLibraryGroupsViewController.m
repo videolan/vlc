@@ -267,14 +267,7 @@
         viewToPresent = self.listViewSplitView;
     }
     NSParameterAssert(viewToPresent != nil);
-
-    self.libraryTargetView.subviews = @[viewToPresent];
-    [NSLayoutConstraint activateConstraints:@[
-        [self.libraryTargetView.topAnchor constraintEqualToAnchor:viewToPresent.topAnchor],
-        [self.libraryTargetView.bottomAnchor constraintEqualToAnchor:viewToPresent.bottomAnchor],
-        [self.libraryTargetView.leadingAnchor constraintEqualToAnchor:viewToPresent.leadingAnchor],
-        [self.libraryTargetView.trailingAnchor constraintEqualToAnchor:viewToPresent.trailingAnchor]
-    ]];
+    [self.libraryWindow displayLibraryView:viewToPresent];
 }
 
 - (void)presentGroup:(VLCMediaLibraryGroup *)group
