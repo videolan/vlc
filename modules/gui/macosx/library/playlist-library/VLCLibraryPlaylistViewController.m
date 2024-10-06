@@ -237,11 +237,7 @@
         constraint.active = YES;
     }
 
-    self.libraryWindow.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.libraryWindow.libraryTargetView.subviews = @[self.libraryWindow.emptyLibraryView];
-    NSDictionary * const dict = @{@"emptyLibraryView": self.libraryWindow.emptyLibraryView};
-    [self.libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryWindow.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
+    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
 
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     NSString *placeholderPlaylistsString = nil;
@@ -281,14 +277,7 @@
         viewToPresent = self.listViewSplitView;
     }
     NSParameterAssert(viewToPresent != nil);
-
-    self.libraryTargetView.subviews = @[viewToPresent];
-    [NSLayoutConstraint activateConstraints:@[
-        [self.libraryTargetView.topAnchor constraintEqualToAnchor:viewToPresent.topAnchor],
-        [self.libraryTargetView.bottomAnchor constraintEqualToAnchor:viewToPresent.bottomAnchor],
-        [self.libraryTargetView.leadingAnchor constraintEqualToAnchor:viewToPresent.leadingAnchor],
-        [self.libraryTargetView.trailingAnchor constraintEqualToAnchor:viewToPresent.trailingAnchor]
-    ]];
+    [self.libraryWindow displayLibraryView:viewToPresent];
 }
 
 - (void)updatePresentedView
@@ -304,7 +293,6 @@
 
 - (void)presentPlaylistsView
 {
-    self.libraryWindow.libraryTargetView.subviews = @[];
     [self updatePresentedView];
 }
 
