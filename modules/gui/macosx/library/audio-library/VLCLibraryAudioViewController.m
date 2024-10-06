@@ -51,7 +51,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCLoadingOverlayView.h"
 #import "views/VLCNoResultsLabel.h"
 
 #import "windows/video/VLCVoutView.h"
@@ -154,7 +153,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     _audioLibraryGridModeSplitViewListTableView = libraryWindow.audioLibraryGridModeSplitViewListTableView;
     _audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
     _audioLibraryGridModeSplitViewListSelectionCollectionView = libraryWindow.audioLibraryGridModeSplitViewListSelectionCollectionView;
-    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupAudioDataSource
@@ -332,8 +330,9 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 
     self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews =
+            @[self.emptyLibraryView, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
@@ -352,8 +351,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
     }
 
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[_noResultsLabel, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[_noResultsLabel, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[_noResultsLabel];
     }
@@ -367,8 +366,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)prepareAudioLibraryView
 {
     self.audioLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.audioLibraryView, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.audioLibraryView, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.audioLibraryView];
     }
