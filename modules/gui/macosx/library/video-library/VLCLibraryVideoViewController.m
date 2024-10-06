@@ -50,7 +50,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCLoadingOverlayView.h"
 #import "views/VLCNoResultsLabel.h"
 
 #import "windows/video/VLCVoutView.h"
@@ -134,7 +133,6 @@
     _videoLibraryGroupSelectionTableView = libraryWindow.videoLibraryGroupSelectionTableView;
     _videoLibraryGroupsTableViewScrollView = libraryWindow.videoLibraryGroupsTableViewScrollView;
     _videoLibraryGroupsTableView = libraryWindow.videoLibraryGroupsTableView;
-    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupTableViews
@@ -344,8 +342,8 @@
     }
 
     self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
@@ -365,8 +363,8 @@
         _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
     }
 
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[_noResultsLabel, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[_noResultsLabel, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[_noResultsLabel];
     }
