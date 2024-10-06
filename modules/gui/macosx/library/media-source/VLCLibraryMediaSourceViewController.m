@@ -168,16 +168,7 @@
 
 - (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
 {
-    self.libraryTargetView.subviews = @[];
-
-    if (_mediaSourceView.superview == nil) {
-        _mediaSourceView.translatesAutoresizingMaskIntoConstraints = NO;
-        self.libraryTargetView.subviews = @[_mediaSourceView];
-        NSDictionary *dict = NSDictionaryOfVariableBindings(_mediaSourceView);
-        [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_mediaSourceView(>=572.)]|" options:0 metrics:0 views:dict]];
-        [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_mediaSourceView(>=444.)]|" options:0 metrics:0 views:dict]];
-    }
-
+    [self.libraryWindow displayLibraryView:self.mediaSourceView];
     _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegment ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     [_baseDataSource reloadViews];
 }
