@@ -306,30 +306,13 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentPlaceholderAudioView
 {
-    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
-        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
-    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {
-        constraint.active = YES;
-    }
-
     const NSInteger selectedLibrarySegment = self.audioDataSource.audioLibrarySegment;
     NSAssert(selectedLibrarySegment != VLCAudioLibraryRecentsSegment &&
              selectedLibrarySegment != VLCAudioLibraryUnknownSegment,
              @"Received invalid audio library segment from audio data source!");
-
-    if(selectedLibrarySegment < _placeholderImageNames.count && selectedLibrarySegment >= 0) {
-        self.placeholderImageView.image = [NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]];
-    }
-
-    if(selectedLibrarySegment < _placeholderLabelStrings.count && selectedLibrarySegment >= 0) {
-        self.placeholderLabel.stringValue = _placeholderLabelStrings[selectedLibrarySegment];
-    }
-
-    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
-    self.emptyLibraryView.identifier = VLCLibraryPlaceholderAudioViewIdentifier;
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:_placeholderImageNames[selectedLibrarySegment]]
+                                              usingConstraints:self.placeholderImageViewSizeConstraints
+                                             displayingMessage:_placeholderLabelStrings[selectedLibrarySegment]];
 }
 
 - (void)presentNoResultsView
