@@ -228,17 +228,6 @@
 // itself, or move this into a common superclass
 - (void)presentPlaceholderPlaylistLibraryView
 {
-    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
-        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
-    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {
-        constraint.active = YES;
-    }
-
-    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
-
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     NSString *placeholderPlaylistsString = nil;
     switch (playlistType) {
@@ -261,8 +250,9 @@
             break;
     }
 
-    self.libraryWindow.placeholderImageView.image = [NSImage imageNamed:@"placeholder-group2"];
-    self.libraryWindow.placeholderLabel.stringValue = placeholderPlaylistsString;
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-group2"]
+                                              usingConstraints:self.placeholderImageViewSizeConstraints
+                                             displayingMessage:placeholderPlaylistsString];
 }
 
 - (void)presentPlaylistLibraryView
