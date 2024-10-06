@@ -781,6 +781,27 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = NO;
 }
 
+- (void)showLoadingOverlay
+{
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    }
+
+    self.loadingOverlayView.wantsLayer = YES;
+    self.loadingOverlayView.alphaValue = 0.0;
+
+    NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
+    self.libraryTargetView.subviews = views;
+    [self.libraryTargetView addConstraints:self.loadingOverlayViewConstraints];
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 0.5;
+        self.loadingOverlayView.animator.alphaValue = 1.0;
+    } completionHandler:nil];
+    [self.loadingOverlayView.indicator startAnimation:self];
+
+}
+
 - (void)mouseMoved:(NSEvent *)o_event
 {
     if (!self.videoViewController.view.hidden) {
