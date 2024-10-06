@@ -478,51 +478,18 @@
 
 - (void)libraryModelLongLoadStarted:(NSNotification *)notification
 {
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        return;
-    }
-
     if (self.connected) {
         [self.libraryVideoDataSource disconnect];
     }
-
-    self.loadingOverlayView.wantsLayer = YES;
-    self.loadingOverlayView.alphaValue = 0.0;
-
-    NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
-    self.libraryTargetView.subviews = views;
-    [self.libraryTargetView addConstraints:self.libraryWindow.loadingOverlayViewConstraints];
-
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 0.5;
-        self.loadingOverlayView.animator.alphaValue = 1.0;
-    } completionHandler:nil];
-    [self.loadingOverlayView.indicator startAnimation:self];
+    [self.libraryWindow showLoadingOverlay];
 }
 
 - (void)libraryModelLongLoadFinished:(NSNotification *)notification
 {
-    if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        return;
-    }
-
     if (self.connected) {
         [self.libraryVideoDataSource connect];
     }
-
-    self.loadingOverlayView.wantsLayer = YES;
-    self.loadingOverlayView.alphaValue = 1.0;
-
-    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
-        context.duration = 1.0;
-        self.loadingOverlayView.animator.alphaValue = 0.0;
-    } completionHandler:^{
-        [self.libraryTargetView removeConstraints:self.libraryWindow.loadingOverlayViewConstraints];
-        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
-        [views removeObject:self.loadingOverlayView];
-        self.libraryTargetView.subviews = views.copy;
-        [self.loadingOverlayView.indicator stopAnimation:self];
-    }];
+    [self.libraryWindow hideLoadingOverlay];
 }
 
 @end
