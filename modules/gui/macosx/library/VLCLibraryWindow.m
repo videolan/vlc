@@ -487,6 +487,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     _librarySegmentViewController = lvc;
 }
 
+- (void)displayLibraryView:(NSView *)view
+{
+    view.translatesAutoresizingMaskIntoConstraints = NO;
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[view, self.loadingOverlayView];
+    } else {
+        self.libraryTargetView.subviews = @[view];
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        [view.topAnchor constraintEqualToAnchor:self.libraryTargetView.topAnchor],
+        [view.bottomAnchor constraintEqualToAnchor:self.libraryTargetView.bottomAnchor],
+        [view.leftAnchor constraintEqualToAnchor:self.libraryTargetView.leftAnchor],
+        [view.rightAnchor constraintEqualToAnchor:self.libraryTargetView.rightAnchor]
+    ]];
+}
+
 - (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showAudioLibrary];

@@ -137,6 +137,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 - (void)showLoadingOverlay;
 - (void)hideLoadingOverlay;
 
+- (void)displayLibraryView:(NSView *)view;
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (void)goToLocalFolderMrl:(NSString *)mrl;
 
