@@ -43,7 +43,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCLoadingOverlayView.h"
 
 #import "windows/video/VLCMainVideoViewController.h"
 
@@ -61,7 +60,6 @@
 
     if (self) {
         _dataSource = [[VLCLibraryPlaylistDataSource alloc] init];
-        _loadingOverlayView = libraryWindow.loadingOverlayView;
 
         [self setupPlaylistCollectionView];
         [self setupPlaylistTableView];
