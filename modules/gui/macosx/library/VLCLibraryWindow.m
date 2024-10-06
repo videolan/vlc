@@ -504,6 +504,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     ]];
 }
 
+- (void)displayLibraryPlaceholderViewWithImage:(NSImage *)image
+                              usingConstraints:(NSArray<NSLayoutConstraint *> *)constraints
+                             displayingMessage:(NSString *)message
+{
+    for (NSLayoutConstraint * const constraint in self.placeholderImageViewConstraints) {
+        constraint.active = NO;
+    }
+    _placeholderImageViewConstraints = constraints;
+    for (NSLayoutConstraint * const constraint in constraints) {
+        constraint.active = YES;
+    }
+
+    [self displayLibraryView:self.emptyLibraryView];
+    self.placeholderImageView.image = image;
+    self.placeholderLabel.stringValue = message;
+}
+
 - (void)presentAudioLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showAudioLibrary];
