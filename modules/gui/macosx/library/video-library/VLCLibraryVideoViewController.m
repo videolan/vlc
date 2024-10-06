@@ -330,18 +330,9 @@
 
 - (void)presentPlaceholderVideoLibraryView
 {
-    NSArray<NSLayoutConstraint *> * const oldViewPlaceholderConstraints =
-        self.libraryWindow.librarySegmentViewController.placeholderImageViewSizeConstraints;
-    for (NSLayoutConstraint * const constraint in oldViewPlaceholderConstraints) {
-        constraint.active = NO;
-    }
-    for (NSLayoutConstraint * const constraint in self.placeholderImageViewSizeConstraints) {
-        constraint.active = YES;
-    }
-
-    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
-    self.placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
-    self.placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
+    [self.libraryWindow displayLibraryPlaceholderViewWithImage:[NSImage imageNamed:@"placeholder-video"]
+                                              usingConstraints:self.placeholderImageViewSizeConstraints
+                                             displayingMessage:_NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.")];
 }
 
 - (void)presentNoResultsView
