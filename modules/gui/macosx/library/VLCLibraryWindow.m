@@ -802,6 +802,27 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 }
 
+- (void)hideLoadingOverlay
+{
+    if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    }
+
+    self.loadingOverlayView.wantsLayer = YES;
+    self.loadingOverlayView.alphaValue = 1.0;
+
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        context.duration = 1.0;
+        self.loadingOverlayView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        [self.libraryTargetView removeConstraints:self.loadingOverlayViewConstraints];
+        NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
+        [views removeObject:self.loadingOverlayView];
+        self.libraryTargetView.subviews = views.copy;
+        [self.loadingOverlayView.indicator stopAnimation:self];
+    }];
+}
+
 - (void)mouseMoved:(NSEvent *)o_event
 {
     if (!self.videoViewController.view.hidden) {
