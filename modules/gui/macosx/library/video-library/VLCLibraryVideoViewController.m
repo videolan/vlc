@@ -320,13 +320,11 @@
 
 - (void)presentVideoView
 {
-    self.libraryTargetView.subviews = @[];
     [self updatePresentedVideoLibraryView];
 }
 
 - (void)presentShowsView
 {
-    self.libraryTargetView.subviews = @[];
     [self updatePresentedShowsLibraryView];
 }
 
@@ -341,17 +339,7 @@
         constraint.active = YES;
     }
 
-    self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.libraryWindow.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView];
-    }
-    NSView * const emptyLibraryView = self.emptyLibraryView;
-    NSDictionary *dict = NSDictionaryOfVariableBindings(emptyLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[emptyLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[emptyLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-
+    [self.libraryWindow displayLibraryView:self.emptyLibraryView];
     self.placeholderImageView.image = [NSImage imageNamed:@"placeholder-video"];
     self.placeholderLabel.stringValue = _NS("Your favorite videos will appear here.\nGo to the Browse section to add videos you love.");
 }
@@ -377,23 +365,13 @@
 
 - (void)presentVideoLibraryView:(VLCLibraryViewModeSegment)viewModeSegment
 {
-    _videoLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.videoLibraryView, self.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[self.videoLibraryView];
-    }
-
-    NSDictionary *dict = NSDictionaryOfVariableBindings(_videoLibraryView);
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_videoLibraryView(>=572.)]|" options:0 metrics:0 views:dict]];
-    [self.libraryTargetView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_videoLibraryView(>=444.)]|" options:0 metrics:0 views:dict]];
-
+    [self.libraryWindow displayLibraryView:self.videoLibraryView];
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        _videoLibrarySplitView.hidden = YES;
-        _videoLibraryCollectionViewScrollView.hidden = NO;
+        self.videoLibrarySplitView.hidden = YES;
+        self.videoLibraryCollectionViewScrollView.hidden = NO;
     } else if (viewModeSegment == VLCLibraryListViewModeSegment) {
-        _videoLibrarySplitView.hidden = NO;
-        _videoLibraryCollectionViewScrollView.hidden = YES;
+        self.videoLibrarySplitView.hidden = NO;
+        self.videoLibraryCollectionViewScrollView.hidden = YES;
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
