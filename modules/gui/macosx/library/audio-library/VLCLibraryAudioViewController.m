@@ -51,8 +51,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCNoResultsLabel.h"
-
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
 
@@ -70,8 +68,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryAudioTableViewDelegate *_audioLibraryTableViewDelegate;
     VLCLibraryAudioGroupTableViewDelegate *_audioGroupLibraryTableViewDelegate;
     VLCLibraryTwoPaneSplitViewDelegate *_splitViewDelegate;
-
-    VLCNoResultsLabel *_noResultsLabel;
 }
 @end
 
@@ -315,25 +311,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
                                              displayingMessage:_placeholderLabelStrings[selectedLibrarySegment]];
 }
 
-- (void)presentNoResultsView
-{
-    if (_noResultsLabel == nil) {
-        _noResultsLabel = [[VLCNoResultsLabel alloc] init];
-        _noResultsLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    }
-
-    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[_noResultsLabel, self.libraryWindow.loadingOverlayView];
-    } else {
-        self.libraryTargetView.subviews = @[_noResultsLabel];
-    }
-
-    [NSLayoutConstraint activateConstraints:@[
-        [_noResultsLabel.centerXAnchor constraintEqualToAnchor:self.libraryTargetView.centerXAnchor],
-        [_noResultsLabel.centerYAnchor constraintEqualToAnchor:self.libraryTargetView.centerYAnchor]
-    ]];
-}
-
 - (void)hideAllViews
 {
     _audioLibrarySplitView.hidden = YES;
@@ -423,7 +400,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
         [VLCMain.sharedInstance.libraryWindow updateGridVsListViewModeSegmentedControl];
     } else if (self.audioDataSource.libraryModel.filterString.length > 0) {
-        [self presentNoResultsView];
+        [self.libraryWindow displayNoResultsMessage];
     } else {
         [self presentPlaceholderAudioView];
     }
