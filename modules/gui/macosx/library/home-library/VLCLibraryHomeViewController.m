@@ -43,8 +43,6 @@
 
 #import "main/VLCMain.h"
 
-#import "views/VLCLoadingOverlayView.h"
-
 #import "windows/video/VLCMainVideoViewController.h"
 
 @interface VLCLibraryHomeViewController ()
@@ -106,7 +104,6 @@
     _homeLibraryView = libraryWindow.homeLibraryView;
     _homeLibraryStackViewScrollView = libraryWindow.homeLibraryStackViewScrollView;
     _homeLibraryStackView = libraryWindow.homeLibraryStackView;
-    _loadingOverlayView = libraryWindow.loadingOverlayView;
 }
 
 - (void)setupGridViewController
@@ -180,8 +177,8 @@
     }
 
     self.emptyLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.emptyLibraryView, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.emptyLibraryView];
     }
@@ -197,8 +194,8 @@
 - (void)presentHomeLibraryView
 {
     self.homeLibraryView.translatesAutoresizingMaskIntoConstraints = NO;
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
-        self.libraryTargetView.subviews = @[self.homeLibraryView, self.loadingOverlayView];
+    if ([self.libraryTargetView.subviews containsObject:self.libraryWindow.loadingOverlayView]) {
+        self.libraryTargetView.subviews = @[self.homeLibraryView, self.libraryWindow.loadingOverlayView];
     } else {
         self.libraryTargetView.subviews = @[self.homeLibraryView];
     }
