@@ -135,10 +135,6 @@ actionCallback(encodedBy);
                            selector:@selector(mediaItemWasParsed:)
                                name:VLCInputItemParsingSucceeded
                              object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(mediaItemWasParsed:)
-                               name:VLCInputItemPreparsingSucceeded
-                             object:nil];
 
     [self initStrings];
 
@@ -462,7 +458,7 @@ _##field##TextField.delegate = self
 {
     NSParameterAssert(inputItem != nil);
     if (!inputItem.preparsed) {
-        [inputItem preparseInputItem];
+        [inputItem parseInputItem];
     }
 
 #define FILL_FIELD_FROM_INPUTITEM(field)                            \

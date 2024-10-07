@@ -35,10 +35,6 @@
 NSString *VLCInputItemParsingSucceeded = @"VLCInputItemParsingSucceeded";
 NSString *VLCInputItemParsingFailed = @"VLCInputItemParsingFailed";
 NSString *VLCInputItemSubtreeAdded = @"VLCInputItemSubtreeAdded";
-NSString *VLCInputItemPreparsingSkipped = @"VLCInputItemPreparsingSkipped";
-NSString *VLCInputItemPreparsingFailed = @"VLCInputItemPreparsingFailed";
-NSString *VLCInputItemPreparsingTimeOut = @"VLCInputItemPreparsingTimeOut";
-NSString *VLCInputItemPreparsingSucceeded = @"VLCInputItemPreparsingSucceeded";
 NSString * const VLCInputItemCommonDataDifferingFlagString = @"<differing>";
 
 @interface VLCInputItem()
@@ -48,7 +44,6 @@ NSString * const VLCInputItemCommonDataDifferingFlagString = @"<differing>";
 
 - (void)parsingEnded:(int)status;
 - (void)subTreeAdded:(input_item_node_t *)p_node;
-- (void)preparsingEnded:(enum input_item_preparse_status)status;
 
 @end
 
@@ -73,21 +68,6 @@ static void cb_subtree_added(input_item_t *p_item, input_item_node_t *p_node, vo
 static const struct input_item_parser_cbs_t parserCallbacks =
 {
     cb_parsing_ended,
-    cb_subtree_added,
-};
-
-static void cb_preparse_ended(input_item_t *p_item, enum input_item_preparse_status status, void *p_data)
-{
-    VLC_UNUSED(p_item);
-    dispatch_async(dispatch_get_main_queue(), ^{
-        VLCInputItem *inputItem = (__bridge VLCInputItem *)p_data;
-        [inputItem preparsingEnded:status];
-    });
-}
-
-static const struct vlc_metadata_cbs preparseCallbacks = {
-    cb_preparse_ended,
-    NULL,
     cb_subtree_added,
 };
 
@@ -564,44 +544,6 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
         return (BOOL)_vlcInputItem->b_net;
     }
     return YES;
-}
-
-- (void)preparsingEnded:(enum input_item_preparse_status)status
-{
-    NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
-    switch (status) {
-        case ITEM_PREPARSE_SKIPPED:
-            [notificationCenter postNotificationName:VLCInputItemPreparsingSkipped object:self];
-            break;
-        case ITEM_PREPARSE_FAILED:
-            [notificationCenter postNotificationName:VLCInputItemPreparsingFailed object:self];
-            break;
-        case ITEM_PREPARSE_TIMEOUT:
-            [notificationCenter postNotificationName:VLCInputItemPreparsingTimeOut object:self];
-
-        case ITEM_PREPARSE_DONE:
-        default:
-            [notificationCenter postNotificationName:VLCInputItemPreparsingSucceeded object:self];
-            break;
-    }
-}
-
-- (int)preparseInputItem
-{
-    if (!_vlcInputItem) {
-        return VLC_ENOENT;
-    }
-
-    vlc_preparser_t *parser = libvlc_GetMainPreparser(vlc_object_instance(getIntf()));
-    if (unlikely(parser == NULL))
-        return VLC_ENOMEM;
-
-    return vlc_preparser_Push(parser, _vlcInputItem,
-                              META_REQUEST_OPTION_SCOPE_ANY |
-                              META_REQUEST_OPTION_FETCH_LOCAL |
-                              META_REQUEST_OPTION_PARSE_SUBITEMS,
-                              &preparseCallbacks,
-                              (__bridge void *)self, -1, NULL);
 }
 
 - (void)subTreeAdded:(input_item_node_t *)p_node

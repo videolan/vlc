@@ -79,7 +79,6 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 - (void)parseInputItem;
 - (void)cancelParsing;
 
-- (int)preparseInputItem;
 - (int)writeMetadataToFile;
 
 - (void)thumbnailWithSize:(NSSize)size 
