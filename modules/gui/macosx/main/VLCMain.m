@@ -160,6 +160,7 @@ int OpenIntf (vlc_object_t *p_this)
             } @catch (NSException *exception) {
                 msg_Err(p_intf, "Loading the macosx interface failed. Do you have a valid window server?");
                 retcode = VLC_EGENERIC;
+                dispatch_semaphore_signal(sem);
                 return;
             }
             dispatch_semaphore_signal(sem);
