@@ -36,7 +36,10 @@
  * Local prototypes.
  *****************************************************************************/
 
+typedef struct vlc_preparser_t vlc_preparser_t;
+
 intf_thread_t *getIntf(void);
+vlc_preparser_t *getNetworkPreparser();
 
 extern NSString *VLCConfigurationChangedNotification;
 

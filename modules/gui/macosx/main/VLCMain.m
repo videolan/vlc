@@ -42,6 +42,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_variables.h>
+#include <vlc_preparser.h>
 
 #import "extensions/NSString+Helpers.h"
 
@@ -133,10 +134,16 @@ NSString *VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotific
  *****************************************************************************/
 
 static intf_thread_t *p_interface_thread;
+static vlc_preparser_t *p_network_preparser;
 
 intf_thread_t *getIntf()
 {
     return p_interface_thread;
+}
+
+vlc_preparser_t *getNetworkPreparser()
+{
+    return p_network_preparser;
 }
 
 int OpenIntf (vlc_object_t *p_this)
@@ -147,6 +154,14 @@ int OpenIntf (vlc_object_t *p_this)
         @autoreleasepool {
             intf_thread_t *p_intf = (intf_thread_t*) p_this;
             p_interface_thread = p_intf;
+
+            p_network_preparser = vlc_preparser_New(p_this, 1, 0);
+            if (p_network_preparser == nil)
+            {
+                retcode = VLC_ENOMEM;
+                dispatch_semaphore_signal(sem);
+                return;
+            }
             msg_Dbg(p_intf, "Starting macosx interface");
 
             @try {
@@ -183,6 +198,9 @@ void CloseIntf (vlc_object_t *p_this)
             [VLCMain killInstance];
         }
         p_interface_thread = nil;
+
+        vlc_preparser_Delete(p_network_preparser);
+        p_network_preparser = nil;
     };
     if (CFRunLoopGetCurrent() == CFRunLoopGetMain())
         release_intf();
