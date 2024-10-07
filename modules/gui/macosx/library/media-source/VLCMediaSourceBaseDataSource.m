@@ -580,9 +580,9 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)presentLocalFolderMrl:(NSString *)mrl
 {
-    libvlc_int_t * const p_libvlcInstance = vlc_object_instance(getIntf());
+    vlc_preparser_t *p_preparser = getNetworkPreparser();
     VLCMediaSource * const mediaSource =
-        [[VLCMediaSource alloc] initWithLocalFolderMrl:mrl andLibVLCInstance:p_libvlcInstance];
+        [[VLCMediaSource alloc] initWithLocalFolderMrl:mrl andPreparser:p_preparser];
     if (mediaSource == nil) {
         NSLog(@"Could not create valid media source for mrl: %@", mrl);
         return;

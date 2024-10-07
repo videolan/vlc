@@ -23,6 +23,7 @@
 #import <Foundation/Foundation.h>
 
 #import <vlc_media_source.h>
+#import <vlc_preparser.h>
 
 @class VLCInputItem;
 @class VLCInputNode;
@@ -36,13 +37,13 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 
 @interface VLCMediaSource : NSObject
 
-- (instancetype)initForLocalDevices:(libvlc_int_t *)p_libvlcInstance;
+- (instancetype)initForLocalDevices:(vlc_preparser_t *)p_preparser;
 - (instancetype)initWithMediaSource:(vlc_media_source_t *)p_mediaSource
-                  andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance
+                  andPreparser:(vlc_preparser_t *)p_preparser
                         forCategory:(enum services_discovery_category_e)category;
-- (instancetype)initMyFoldersMediaSourceWithLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
+- (instancetype)initMyFoldersMediaSourceWithPreparser:(vlc_preparser_t *)p_preparser;
 - (instancetype)initWithLocalFolderMrl:(NSString *)mrl
-                     andLibVLCInstance:(libvlc_int_t *)p_libvlcInstance;
+                     andPreparser:(vlc_preparser_t *)p_preparser;
 
 - (void)preparseInputNodeWithinTree:(VLCInputNode *)inputNode;
 - (void)clearChildNodesForNode:(input_item_node_t*)inputNode;
