@@ -156,7 +156,8 @@ private:
 #ifdef UPDATE_CHECK
     std::unique_ptr<UpdateDialog> m_updateDialog;
 #endif
-
+    std::unique_ptr<input_item_parser_id_t,
+                    decltype(&input_item_parser_id_Release)> m_parser;
 
     QWidget* root;
     bool b_isDying;

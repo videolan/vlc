@@ -72,7 +72,8 @@
                                            N_("Open Folder") )
 
 DialogsProvider::DialogsProvider( qt_intf_t *_p_intf )
-    : QObject( NULL ), p_intf( _p_intf )
+    : QObject( NULL ), p_intf( _p_intf ), m_parser( nullptr, &input_item_parser_id_Release )
+
 {
     b_isDying = false;
 }
@@ -364,38 +365,37 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
     }
     else
     {
-        static const struct vlc_metadata_cbs cbs = {
+        static const input_item_parser_cbs_t cbs = {
             // on_preparse_ended
-            []( input_item_t * const item, enum input_item_preparse_status status, void * const userData ) {
+            []( input_item_t * const item, int status, void * const userData ) {
                 const auto dp = static_cast<DialogsProvider *>( userData );
 
-                if ( status == ITEM_PREPARSE_TIMEOUT || status == ITEM_PREPARSE_FAILED )
+                if ( status != VLC_SUCCESS )
                     qWarning( "Could not preparse input item %p. Status %i", item, status );
 
                 const SharedInputItem sharedInputItem{ item };
 
                 QMetaObject::invokeMethod( dp, [dp, sharedInputItem]() {
+                        dp->m_parser.reset();
                         dp->mediaInfoDialog( sharedInputItem );
                     }, Qt::QueuedConnection );
             },
-            // on_art_fetch_ended
-            NULL,
             // on_subtree_added
             NULL,
             // on_attachments_added
-            NULL
+            NULL,
         };
 
-        vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance( p_intf ) );
-        if (unlikely(parser == NULL))
-            return;
+        const struct input_item_parser_cfg cfg = {
+            .cbs = &cbs,
+            .cbs_data = this,
+            .subitems = true,
+            .interact = false,
+        };
 
-        const int result = vlc_preparser_Push( parser, inputItem,
-                                               static_cast<input_item_meta_request_option_t>(META_REQUEST_OPTION_SCOPE_ANY | META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_PARSE_SUBITEMS),
-                                               &cbs, this, 0, NULL );
-        if( Q_UNLIKELY( result != VLC_SUCCESS ) )
-            msg_Warn( p_intf, "vlc_preparser_Push() failed for input item %p (%s, %s)",
-                      inputItem, inputItem->psz_name, inputItem->psz_uri );
+        m_parser = vlc::wrap_cptr( input_item_Parse( VLC_OBJECT( p_intf ),
+                                   inputItem, &cfg ),
+                                   &input_item_parser_id_Release );
     }
 }
 
