@@ -125,7 +125,7 @@ void CoverArtLabel::askForUpdate()
 {
     assert( p_item );
 
-    THEMIM->requestArtUpdate( p_item.get(), true );
+    THEMIM->requestArtUpdate( p_item.get() );
 }
 
 void CoverArtLabel::setArtFromFile()

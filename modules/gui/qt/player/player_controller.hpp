@@ -266,7 +266,7 @@ public:
     SharedAOut getAout();
     int AddAssociatedMedia(enum es_format_category_e cat, const QString& uri, bool select, bool notify, bool check_ext);
 
-    void requestArtUpdate( input_item_t *p_item, bool b_forced );
+    void requestArtUpdate( input_item_t *p_item );
     void setArt( input_item_t *p_item, QString fileUrl );
     static const QString decodeArtURL( input_item_t *p_item );
     void updatePosition();
