@@ -274,10 +274,12 @@
 {
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     VLCLibraryModel * const libraryModel = VLCMain.sharedInstance.libraryController.libraryModel;
-    if ([libraryModel numberOfPlaylistsOfType:playlistType] <= 0) {
-        [self presentPlaceholderPlaylistLibraryView];
-    } else {
+    if ([libraryModel numberOfPlaylistsOfType:playlistType] > 0) {
         [self presentPlaylistLibraryView];
+    } else if (self.dataSource.libraryModel.filterString.length > 0) {
+        [self.libraryWindow displayNoResultsMessage];
+    } else {
+        [self presentPlaceholderPlaylistLibraryView];
     }
 }
 
