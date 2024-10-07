@@ -28,6 +28,8 @@
 #include <QTimer>
 #include <QUrl>
 
+typedef struct vlc_preparser_t vlc_preparser_t;
+
 class PlayerControllerPrivate {
     Q_DISABLE_COPY(PlayerControllerPrivate)
 public:
@@ -74,6 +76,7 @@ public:
 public:
     qt_intf_t           *p_intf;
     vlc_player_t            *m_player;
+    vlc_preparser_t         *m_preparser = nullptr;
 
     //callbacks
     vlc_player_listener_id* m_player_listener = nullptr;

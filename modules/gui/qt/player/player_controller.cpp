@@ -62,6 +62,8 @@ PlayerControllerPrivate::~PlayerControllerPrivate()
     vlc_player_aout_RemoveListener( m_player, m_player_aout_listener );
     vlc_player_RemoveListener( m_player, m_player_listener );
     vlc_player_RemoveTimer( m_player, m_player_timer );
+    if (m_preparser != nullptr)
+        vlc_preparser_Delete(m_preparser);
 }
 
 bool PlayerControllerPrivate::isCurrentItemSynced()
@@ -1957,12 +1959,15 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
 {
     Q_D(PlayerController);
 
-    /* check if it has already been enqueued */
-    vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance(d->p_intf) );
-    if (unlikely(parser == NULL))
-        return;
-    vlc_preparser_Push( parser, p_item, META_REQUEST_OPTION_FETCH_ANY,
-                        &art_fetcher_cbs, d, 0, NULL );
+    if (d->m_preparser == nullptr)
+    {
+        d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1, 0);
+        if (unlikely(d->m_preparser == nullptr))
+            return;
+    }
+
+    vlc_preparser_Push( d->m_preparser, p_item, META_REQUEST_OPTION_FETCH_ANY,
+                        &art_fetcher_cbs, d, 0, nullptr );
 }
 
 void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)
