@@ -526,6 +526,8 @@ static const struct vlc_metadata_cbs preparseCallbacks = {
         .cbs_data = (__bridge void *) self,
     };
 
+    if (_p_parserID)
+        input_item_parser_id_Release(_p_parserID);
     _p_parserID = input_item_Parse(VLC_OBJECT(getIntf()), _vlcInputItem, &cfg);
 }
 
