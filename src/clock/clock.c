@@ -373,7 +373,6 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
                     system_now, ts, drift, clock->context ? clock->context->clock_id : 0);
 }
 
-
 static void vlc_clock_master_update_coeff(
     vlc_clock_t *clock, struct vlc_clock_context *ctx,
     vlc_tick_t system_now, vlc_tick_t ts, double rate)
