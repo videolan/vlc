@@ -237,22 +237,20 @@
 
 - (void)presentGroupsView
 {
-    if (self.dataSource.libraryModel.numberOfGroups == 0) {
-        [self presentPlaceholderGroupsView];
-        return;
-    }
-
     const VLCLibraryViewModeSegment viewModeSegment =
         VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
-    NSView *viewToPresent = nil;
 
-    if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        viewToPresent = self.collectionViewScrollView;
+    if (self.dataSource.libraryModel.numberOfGroups > 0) {
+        if (viewModeSegment == VLCLibraryGridViewModeSegment) {
+            [self.libraryWindow displayLibraryView:self.collectionViewScrollView];
+        } else {
+            [self.libraryWindow displayLibraryView:self.listViewSplitView];
+        }
+    } else if (self.dataSource.libraryModel.filterString.length > 0) {
+        [self.libraryWindow displayNoResultsMessage];
     } else {
-        viewToPresent = self.listViewSplitView;
+        [self presentPlaceholderGroupsView];
     }
-    NSParameterAssert(viewToPresent != nil);
-    [self.libraryWindow displayLibraryView:viewToPresent];
 }
 
 - (void)presentGroup:(VLCMediaLibraryGroup *)group
