@@ -98,9 +98,20 @@ T.Control {
 
     contentItem: Rectangle {
         color: "#10000000"
-        visible: hoverHandler.hovered
+        visible: hoverHandler.hovered ||
+                 playButton.hovered ||
+                 closeButton.hovered ||
+                 fullscreenButton.hovered
+
+        // Raise the content item so that the handlers of the control do
+        // not handle events that are to be handled by the handlers/items
+        // of the content item. Raising the content item should be fine
+        // because content item is supposed to be the foreground item.
+        z: 1
 
         Widgets.IconButton {
+            id: playButton
+
             anchors.centerIn: parent
 
             font.pixelSize: VLCStyle.icon_large
@@ -111,12 +122,12 @@ T.Control {
                   ? VLCIcons.pause_filled
                   : VLCIcons.play_filled
 
-            hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
-
             onClicked: MainPlaylistController.togglePlayPause()
         }
 
         Widgets.IconButton {
+            id: closeButton
+
             anchors {
                 top: parent.top
                 topMargin: VLCStyle.margin_small
@@ -128,12 +139,12 @@ T.Control {
             description: qsTr("close video")
             text: VLCIcons.close
 
-            hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
-
             onClicked: MainPlaylistController.stop()
         }
 
         Widgets.IconButton {
+            id: fullscreenButton
+
             anchors {
                 top: parent.top
                 topMargin: VLCStyle.margin_small
@@ -145,8 +156,6 @@ T.Control {
 
             description: qsTr("maximize player")
             text: VLCIcons.fullscreen
-
-            hoverEnabled: MainCtx.qtQuickControlRejectsHoverEvents()
 
             onClicked: MainCtx.requestShowPlayerView()
         }
