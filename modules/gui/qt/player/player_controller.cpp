@@ -1961,13 +1961,19 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
 
     if (d->m_preparser == nullptr)
     {
-        d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1, 0);
+        vlc_tick_t default_timeout =
+            VLC_TICK_FROM_MS(var_InheritInteger(d->p_intf, "preparse-timeout"));
+        if (default_timeout < 0)
+            default_timeout = 0;
+
+        d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1,
+                                           default_timeout);
         if (unlikely(d->m_preparser == nullptr))
             return;
     }
 
     vlc_preparser_Push( d->m_preparser, p_item, META_REQUEST_OPTION_FETCH_ANY,
-                        &art_fetcher_cbs, d, 0, nullptr );
+                        &art_fetcher_cbs, d, -1, nullptr );
 }
 
 void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)
