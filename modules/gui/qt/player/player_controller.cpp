@@ -1957,14 +1957,12 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
 {
     Q_D(PlayerController);
 
-    {
-        /* check if it has already been enqueued */
-        vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance(d->p_intf) );
-        if (unlikely(parser == NULL))
-            return;
-        vlc_preparser_Push( parser, p_item, META_REQUEST_OPTION_FETCH_ANY,
-                            &art_fetcher_cbs, d, 0, NULL );
-    }
+    /* check if it has already been enqueued */
+    vlc_preparser_t *parser = libvlc_GetMainPreparser( vlc_object_instance(d->p_intf) );
+    if (unlikely(parser == NULL))
+        return;
+    vlc_preparser_Push( parser, p_item, META_REQUEST_OPTION_FETCH_ANY,
+                        &art_fetcher_cbs, d, 0, NULL );
 }
 
 void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)
