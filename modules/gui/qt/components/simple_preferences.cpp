@@ -775,7 +775,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             optionWidgets["skinRB"] = ui.skins;
             optionWidgets["qtRB"] = ui.qt;
-#if !defined( _WIN32)
+
             ui.stylesCombo->addItem( qtr("System's default") );
             ui.stylesCombo->addItems( QStyleFactory::keys() );
             ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
@@ -786,10 +786,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
             optionWidgets["styleCB"] = ui.stylesCombo;
-#else
-            ui.stylesCombo->hide();
-            ui.stylesLabel->hide();
-#endif
+
             radioGroup = new QButtonGroup(this);
             radioGroup->addButton( ui.qt, 0 );
             radioGroup->addButton( ui.skins, 1 );
