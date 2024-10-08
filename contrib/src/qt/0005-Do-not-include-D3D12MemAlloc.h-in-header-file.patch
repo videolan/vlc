@@ -3,6 +3,9 @@ From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Mon, 22 Jan 2024 21:19:55 +0200
 Subject: [PATCH 5/7] Do not include D3D12MemAlloc.h in header file
 
+D3D12MemAlloc.h is a third-party header and is not deployed with
+the Qt installation, which makes `qrhid3d12_p.h` useless. This is
+fixed by including D3D12MemAlloc.h in the source file instead.
 ---
  src/gui/rhi/qrhid3d12.cpp | 11 +++++++++++
  src/gui/rhi/qrhid3d12_p.h | 17 +++++++----------
