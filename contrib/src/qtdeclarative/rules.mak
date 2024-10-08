@@ -35,8 +35,6 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
 	$(APPLY) $(SRC)/qtdeclarative/0001-Fix-incorrect-library-inclusion.patch
-	$(APPLY) $(SRC)/qtdeclarative/0002-Fix-build-with-no-feature-network.patch
-	$(APPLY) $(SRC)/qtdeclarative/0001-Take-care-of-asyncResponses-when-qml_network-is-disa.patch
 	# disable unused CLI tools: qml, qmleasing, qmldom, qmlformat, qmltc
 	sed -i.orig -e 's,add_subdirectory(qml),#add_subdirectory(qml),' $(UNPACK_DIR)/tools/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmleasing),#add_subdirectory(qmleasing),' $(UNPACK_DIR)/tools/CMakeLists.txt
@@ -50,6 +48,7 @@ qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum
 	sed -i.orig -e 's,add_subdirectory(quickdialogs),#add_subdirectory(quickdialogs),' $(UNPACK_DIR)/src/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(qmldom),#add_subdirectory(qmldom),' $(UNPACK_DIR)/src/CMakeLists.txt
 	sed -i.orig -e 's,add_subdirectory(quickwidgets),#add_subdirectory(quickwidgets),' $(UNPACK_DIR)/src/CMakeLists.txt
+	sed -i.orig -e 's,add_subdirectory(quickvectorimage),#add_subdirectory(quickvectorimage),' $(UNPACK_DIR)/src/CMakeLists.txt
 	$(MOVE)
 
 QT_DECLARATIVE_COMMON_CONFIG := \

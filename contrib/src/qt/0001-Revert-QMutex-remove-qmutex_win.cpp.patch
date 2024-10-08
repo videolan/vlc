@@ -1,7 +1,7 @@
 From a566b1d5192a99b41ae13706668b7c8bf786e204 Mon Sep 17 00:00:00 2001
 From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Sun, 14 Jan 2024 23:34:29 +0200
-Subject: [PATCH 3/7] Revert "QMutex: remove qmutex_win.cpp"
+Subject: [PATCH] Revert "QMutex: remove qmutex_win.cpp"
 
 qmutex_win.cpp is useful for Windows 7 where futex is not
 available.
