@@ -73,6 +73,8 @@ public:
 
     static QString wrapUri(QString path);
 
+    static QQuickImageResponse* requestImageResponseUnWrapped(const QUrl, const QSize &requestedSize, ImagePostProcessCb cb = nullptr);
+
 private:
     ImagePostProcessCb postProcessCb;
 };

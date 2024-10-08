@@ -127,6 +127,12 @@ public:
         return errorStr;
     }
 
+    void cancel() override
+    {
+        reader.reset();
+        emit finished();
+    }
+
 private:
     void handleImageRead()
     {
@@ -169,6 +175,11 @@ QString VLCAccessImageProvider::wrapUri(QString path)
     QUrlQuery query;
     query.addQueryItem(PATH_KEY, path);
     return QStringLiteral("image://vlcaccess/?") + query.toString(QUrl::FullyEncoded);
+}
+
+QQuickImageResponse* VLCAccessImageProvider::requestImageResponseUnWrapped(const QUrl url, const QSize &requestedSize, VLCAccessImageProvider::ImagePostProcessCb cb)
+{
+    return new VLCAccessImageResponse(url, requestedSize, cb);
 }
 
 //// VLCImageAccess
