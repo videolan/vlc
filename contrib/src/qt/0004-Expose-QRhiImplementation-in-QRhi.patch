@@ -3,6 +3,10 @@ From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Thu, 18 Jan 2024 17:30:26 +0200
 Subject: [PATCH 4/7] Expose QRhiImplementation in QRhi
 
+Exposing QRhiImplementation is necessary, because that
+is how the IDCompositionDevice instance created by Qt
+is accessed. This is only relevant for the Direct
+Composition integration.
 ---
  src/gui/rhi/qrhi.h | 3 +++
  1 file changed, 3 insertions(+)
