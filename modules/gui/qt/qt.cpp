@@ -856,7 +856,9 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
     Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );
     Q_INIT_RESOURCE( qmake_QtQml );
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     Q_INIT_RESOURCE( qmake_QtQml_Base );
+#endif
     Q_INIT_RESOURCE( qmake_QtQml_Models );
     Q_INIT_RESOURCE( qmake_QtQml_WorkerScript );
     Q_INIT_RESOURCE( qmake_QtQuick );
