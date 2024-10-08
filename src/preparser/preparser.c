@@ -125,13 +125,9 @@ PreparserRemoveTask(vlc_preparser_t *preparser, struct task *task)
 static void
 NotifyPreparseEnded(struct task *task, bool art_fetched)
 {
+    (void) art_fetched;
     if (task->cbs == NULL)
         return;
-
-    if (task->options & META_REQUEST_OPTION_FETCH_ANY
-     && task->cbs->on_art_fetch_ended)
-        task->cbs->on_art_fetch_ended(task->item, art_fetched,
-                                      task->userdata);
 
     if (task->cbs->on_preparse_ended) {
         int status = atomic_load_explicit(&task->preparse_status,
