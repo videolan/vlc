@@ -35,6 +35,8 @@
 #include <vlc_arrays.h>
 #include <vlc_threads.h>
 
+typedef struct vlc_preparser_t vlc_preparser_t;
+
 /* Note well: this header is included from LibVLC core.
  * Therefore, static inline functions MUST NOT call LibVLC functions here
  * (this can cause linkage failure on some platforms). */
@@ -99,6 +101,10 @@ struct libvlc_instance_t
     libvlc_int_t *p_libvlc_int;
     vlc_atomic_rc_t ref_count;
     struct libvlc_callback_entry_list_t *p_callback_list;
+
+    vlc_mutex_t lazy_init_lock;
+    vlc_preparser_t *parser;
+
     struct
     {
         void (*cb) (void *, int, const libvlc_log_t *, const char *, va_list);
@@ -143,5 +149,7 @@ static inline vlc_tick_t vlc_tick_from_libvlc_time(libvlc_time_t time)
 {
     return VLC_TICK_FROM_MS(time);
 }
+
+vlc_preparser_t *libvlc_get_preparser(libvlc_instance_t *instance);
 
 #endif

@@ -740,8 +740,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
          || expected == libvlc_media_parsed_status_done)
             return -1;
 
-    libvlc_int_t *libvlc = inst->p_libvlc_int;
-    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
+    vlc_preparser_t *parser = libvlc_get_preparser(inst);
     if (unlikely(parser == NULL))
         return -1;
 
@@ -789,10 +788,9 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 void
 libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 {
-    libvlc_int_t *libvlc = inst->p_libvlc_int;
-    vlc_preparser_t *parser = libvlc_GetMainPreparser(libvlc);
-    if (unlikely(parser != NULL))
-        vlc_preparser_Cancel(parser, media);
+    vlc_preparser_t *parser = libvlc_get_preparser(inst);
+    assert(parser != NULL);
+    vlc_preparser_Cancel(parser, media);
 }
 
 // Get Parsed status for media descriptor object
