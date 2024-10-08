@@ -57,7 +57,9 @@
     Q_IMPORT_QML_PLUGIN(QtGraphicalEffectsPrivatePlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlPlugin)
     Q_IMPORT_QML_PLUGIN(QtQmlWorkerScriptPlugin)
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     Q_IMPORT_QML_PLUGIN(QtQmlMetaPlugin)
+#endif
 
 #ifdef _WIN32
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
