@@ -133,8 +133,25 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
             default: vlc_assert_unreachable();
         }
 
+        bool input_net;
+        enum input_item_type_e input_type = input_item_GetType(input, &input_net);
+
+        if (input_net)
+            return;
+
+        switch (input_type)
+        {
+            case ITEM_TYPE_NODE:
+            case ITEM_TYPE_FILE:
+            case ITEM_TYPE_DIRECTORY:
+            case ITEM_TYPE_PLAYLIST:
+                break;
+            default:
+                return;
+        }
+
         input_item_meta_request_option_t options =
-            META_REQUEST_OPTION_SCOPE_LOCAL | META_REQUEST_OPTION_FETCH_LOCAL;
+            META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_FETCH_LOCAL;
         if (parse_subitems)
             options |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
