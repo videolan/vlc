@@ -3,6 +3,9 @@ From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Sun, 14 Jan 2024 23:34:29 +0200
 Subject: [PATCH 3/7] Revert "QMutex: remove qmutex_win.cpp"
 
+qmutex_win.cpp is useful for Windows 7 where futex is not
+available.
+
 This reverts commit b6e30e9fee98f9cdfec4c54c980864f65632519c.
 ---
  src/corelib/CMakeLists.txt            |  2 ++
