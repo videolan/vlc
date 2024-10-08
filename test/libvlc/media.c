@@ -245,7 +245,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
                                                 1, VLC_TICK_FROM_MS(timeout));
     assert(parser != NULL);
     i_ret = vlc_preparser_Push(parser, p_item,
-                               META_REQUEST_OPTION_SCOPE_LOCAL |
+                               META_REQUEST_OPTION_PARSE |
                                META_REQUEST_OPTION_FETCH_LOCAL,
                                &cbs, &sem, -1, parser);
     assert(i_ret == 0);

@@ -90,7 +90,7 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item,
 
     task->parser = NULL;
     vlc_sem_init(&task->preparse_ended, 0);
-    atomic_init(&task->preparse_status, ITEM_PREPARSE_SKIPPED);
+    atomic_init(&task->preparse_status, ITEM_PREPARSE_FAILED);
     atomic_init(&task->interrupted, false);
 
     task->runnable.run = RunnableRun;
@@ -269,8 +269,7 @@ RunnableRun(void *userdata)
     vlc_tick_t deadline = task->timeout ? vlc_tick_now() + task->timeout
                                         : VLC_TICK_INVALID;
 
-    if (task->options & (META_REQUEST_OPTION_SCOPE_ANY|
-                         META_REQUEST_OPTION_SCOPE_FORCED))
+    if (task->options & META_REQUEST_OPTION_PARSE)
     {
         if (atomic_load(&task->interrupted))
         {
@@ -350,35 +349,8 @@ int vlc_preparser_Push( vlc_preparser_t *preparser,
     if( atomic_load( &preparser->deactivated ) )
         return VLC_EGENERIC;
 
-    vlc_mutex_lock( &item->lock );
-    enum input_item_type_e i_type = item->i_type;
-    int b_net = item->b_net;
-    vlc_mutex_unlock( &item->lock );
-
-    if (!(i_options & META_REQUEST_OPTION_SCOPE_FORCED))
-    {
-        switch( i_type )
-        {
-            case ITEM_TYPE_NODE:
-            case ITEM_TYPE_FILE:
-            case ITEM_TYPE_DIRECTORY:
-            case ITEM_TYPE_PLAYLIST:
-                if( !b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK )
-                    break;
-                /* fallthrough */
-            default:
-                if( ( i_options & META_REQUEST_OPTION_FETCH_ANY ) == 0 )
-                {
-                    /* Nothing to do (no preparse and not fetch), notify it */
-                    if (cbs && cbs->on_preparse_ended)
-                        cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED,
-                                               cbs_userdata);
-                    return VLC_SUCCESS;
-                }
-                /* Continue without parsing (but fetching) */
-                i_options &= ~META_REQUEST_OPTION_SCOPE_ANY;
-        }
-    }
+    assert(i_options & META_REQUEST_OPTION_PARSE
+        || i_options & META_REQUEST_OPTION_FETCH_ANY);
 
     vlc_tick_t timeout = timeout_ms == -1 ? preparser->default_timeout
                                           : VLC_TICK_FROM_MS(timeout_ms);

@@ -151,7 +151,7 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
         }
 
         input_item_meta_request_option_t options =
-            META_REQUEST_OPTION_SCOPE_FORCED | META_REQUEST_OPTION_FETCH_LOCAL;
+            META_REQUEST_OPTION_PARSE | META_REQUEST_OPTION_FETCH_LOCAL;
         if (parse_subitems)
             options |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
