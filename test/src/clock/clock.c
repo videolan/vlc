@@ -570,6 +570,8 @@ static void normal_check(const struct clock_ctx *ctx, size_t update_count,
         vlc_clock_ConvertToSystem(ctx->slave, expected_system_end,
                                   stream_end, 1.0f, NULL);
     vlc_clock_Unlock(ctx->slave);
+    fprintf(stderr, "%s:%d: converted=%" PRId64 " == expected_system_end=%" PRId64 "\n",
+            __func__, __LINE__, converted, expected_system_end);
     assert(converted == expected_system_end);
 }
 
@@ -743,6 +745,9 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, ctx->stream_start, 1.0f, NULL);
     vlc_clock_Unlock(ctx->slave);
+
+    fprintf(stderr, "%s:%d converted=%" PRId64 " == system_start=%" PRId64 "\n",
+            __func__, __LINE__, converted, system_start);
     assert(converted == system_start);
 }
 
@@ -771,7 +776,10 @@ static void contexts_run(const struct clock_ctx *ctx)
     /* Check that the converted point is valid */
     converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context0,
                                           1.0f, &clock_id);
+    fprintf(stderr, "%s:%d: clock_id=%" PRIu32 " == 0\n", __func__, __LINE__, clock_id);
     assert(clock_id == 0);
+    fprintf(stderr, "%s:%d: converted=%"PRId64 " == system=%" PRId64 "\n",
+            __func__, __LINE__, converted, system);
     assert(converted == system);
     vlc_clock_Update(ctx->slave, system, stream_context0, 1.0f);
 
@@ -784,7 +792,9 @@ static void contexts_run(const struct clock_ctx *ctx)
     /* Check that we can use the new context (or new origin) */
     converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context1,
                                           1.0f, &clock_id);
+    fprintf(stderr, "%s:%d: clock_id=%" PRIu32 " == 1\n", __func__, __LINE__, clock_id);
     assert(clock_id == 1);
+    fprintf(stderr, "%s:%d: converted=%"PRId64 " == system=%" PRId64 "\n", __func__, __LINE__, converted, system);
     assert(converted == system);
 
     /* Check that we can still use the old context when converting a point
@@ -792,7 +802,10 @@ static void contexts_run(const struct clock_ctx *ctx)
     converted = vlc_clock_ConvertToSystem(ctx->slave, system,
                                           VLC_TICK_FROM_MS(10) + stream_context0,
                                           1.0f, &clock_id);
+    fprintf(stderr, "%s:%d: clock_id=%" PRIu32 " == 0\n", __func__, __LINE__, clock_id);
     assert(clock_id == 0);
+    fprintf(stderr, "%s:%d: converted=%"PRId64 " == system=%" PRId64 "\n",
+            __func__, __LINE__, converted, system_context0 + VLC_TICK_FROM_MS(10));
     assert(converted == system_context0 + VLC_TICK_FROM_MS(10));
 
     /* Update on the newest context will cause previous contexts to be removed */
@@ -806,7 +819,10 @@ static void contexts_run(const struct clock_ctx *ctx)
     /* Check that we can use the new context (or new origin) */
     converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context2,
                                           1.0f, &clock_id);
+    fprintf(stderr, "%s:%d: clock_id=%" PRIu32 " == 2\n", __func__, __LINE__, clock_id);
     assert(clock_id == 2);
+    fprintf(stderr, "%s:%d: converted=%"PRId64 " == system=%" PRId64 "\n",
+            __func__, __LINE__, converted, system);
     assert(converted == system);
     /* Update on the newest context will cause previous contexts to be removed */
     vlc_clock_Update(ctx->slave, system, stream_context2, 1.0f);
@@ -816,7 +832,10 @@ static void contexts_run(const struct clock_ctx *ctx)
     system += VLC_TICK_FROM_MS(100);
     converted = vlc_clock_ConvertToSystem(ctx->slave, system, stream_context1, 1.0f,
                                           &clock_id);
+    fprintf(stderr, "%s:%d: clock_id=%" PRIu32 " == 2\n", __func__, __LINE__, clock_id);
     assert(clock_id == 2);
+    fprintf(stderr, "%s:%d: converted=%"PRId64 " == system=%" PRId64 "\n",
+            __func__, __LINE__, converted, system_context0);
     assert(converted != system_context0);
 
     vlc_clock_main_Unlock(ctx->mainclk);
