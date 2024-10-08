@@ -123,6 +123,7 @@ void CompositorWin7::destroyMainInterface()
 
 void CompositorWin7::unloadGUI()
 {
+    m_interfaceWindowHandler.reset();
     m_qmlView.reset();
     commonGUIDestroy();
 }
