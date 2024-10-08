@@ -1021,11 +1021,12 @@ static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_tim
 }
 
 
-static void on_art_fetch_ended_callback(input_item_t *p_item, bool fetched,
-                                     void *userdata)
+static void on_preparse_ended_callback(input_item_t *p_item,
+                                       enum input_item_preparse_status,
+                                       void *userdata)
 {
     PlayerControllerPrivate *me = reinterpret_cast<PlayerControllerPrivate *>(userdata);
-    me->onArtFetchEnded(p_item, fetched);
+    me->onArtFetchEnded(p_item, input_item_IsArtFetched(p_item));
 }
 
 
@@ -1099,7 +1100,7 @@ static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = {
 
 static const struct vlc_metadata_cbs art_fetcher_cbs  = []{
     struct vlc_metadata_cbs cbs{};
-    cbs.on_art_fetch_ended = on_art_fetch_ended_callback;
+    cbs.on_preparse_ended = on_preparse_ended_callback;
     return cbs;
 }();
 
