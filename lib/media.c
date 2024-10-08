@@ -315,9 +315,6 @@ static void input_item_preparse_ended(input_item_t *item,
 
     switch( status )
     {
-        case ITEM_PREPARSE_SKIPPED:
-            new_status = libvlc_media_parsed_status_skipped;
-            break;
         case ITEM_PREPARSE_FAILED:
             new_status = libvlc_media_parsed_status_failed;
             break;
@@ -759,16 +756,58 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
                                                   memory_order_relaxed,
                                                   memory_order_relaxed));
 
-    if (parse_flag & libvlc_media_parse_local)
-        parse_scope |= META_REQUEST_OPTION_SCOPE_LOCAL;
-    if (parse_flag & libvlc_media_parse_network)
-        parse_scope |= META_REQUEST_OPTION_SCOPE_NETWORK;
+    bool input_net;
+    enum input_item_type_e input_type = input_item_GetType(item, &input_net);
+
+    bool do_parse, do_fetch;
     if (parse_flag & libvlc_media_parse_forced)
-        parse_scope |= META_REQUEST_OPTION_SCOPE_FORCED;
+        do_parse = true;
+    else
+    {
+        if (input_net && (parse_flag & libvlc_media_parse_network) == 0)
+            do_parse = false;
+        else if (parse_flag & libvlc_media_parse_local)
+        {
+            switch (input_type)
+            {
+                case ITEM_TYPE_NODE:
+                case ITEM_TYPE_FILE:
+                case ITEM_TYPE_DIRECTORY:
+                case ITEM_TYPE_PLAYLIST:
+                    do_parse = true;
+                    break;
+                default:
+                    do_parse = false;
+                    break;
+            }
+        }
+        else
+            do_parse = false;
+    }
+
+    if (do_parse)
+        parse_scope |= META_REQUEST_OPTION_PARSE;
+
+    do_fetch = false;
     if (parse_flag & libvlc_media_fetch_local)
+    {
         parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
+        do_fetch = true;
+    }
     if (parse_flag & libvlc_media_fetch_network)
+    {
         parse_scope |= META_REQUEST_OPTION_FETCH_NETWORK;
+        do_fetch = true;
+    }
+
+    if (!do_parse && !do_fetch)
+    {
+        send_parsed_changed( media, libvlc_media_parsed_status_skipped );
+        atomic_fetch_sub_explicit(&media->worker_count, 1,
+                                  memory_order_relaxed);
+        return 0;
+    }
+
     if (parse_flag & libvlc_media_do_interact)
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
     parse_scope |= META_REQUEST_OPTION_PARSE_SUBITEMS;
