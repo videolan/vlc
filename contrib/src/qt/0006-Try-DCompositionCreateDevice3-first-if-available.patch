@@ -3,6 +3,9 @@ From: Fatih Uzunoglu <fuzun54@outlook.com>
 Date: Wed, 24 Jan 2024 16:31:06 +0200
 Subject: [PATCH 6/7] Try DCompositionCreateDevice3() first if available
 
+When the native acrylic effect is not available, the application uses
+effects that can be created through IDCompositionDevice3 with the
+Direct Composition integration.
 ---
  src/gui/rhi/qrhid3dhelpers.cpp | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
