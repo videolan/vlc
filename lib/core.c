@@ -29,6 +29,7 @@
 #include <vlc/vlc.h>
 
 #include <vlc_preparser.h>
+#include <vlc_thumbnailer.h>
 #include <vlc_interface.h>
 
 #include <stdarg.h>
@@ -82,6 +83,7 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 
     vlc_mutex_init(&p_new->lazy_init_lock);
     p_new->parser = NULL;
+    p_new->thumbnailer = NULL;
 
     return p_new;
 
@@ -107,6 +109,8 @@ void libvlc_release( libvlc_instance_t *p_instance )
 
         if (p_instance->parser != NULL)
             vlc_preparser_Delete(p_instance->parser);
+        if (p_instance->thumbnailer != NULL)
+            vlc_thumbnailer_Release(p_instance->thumbnailer);
 
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );
@@ -269,6 +273,21 @@ vlc_preparser_t *libvlc_get_preparser(libvlc_instance_t *instance)
     vlc_mutex_unlock(&instance->lazy_init_lock);
 
     return parser;
+}
+
+vlc_thumbnailer_t *libvlc_get_thumbnailer(libvlc_instance_t *instance)
+{
+    vlc_mutex_lock(&instance->lazy_init_lock);
+    vlc_thumbnailer_t *thumb = instance->thumbnailer;
+
+    if (thumb == NULL)
+    {
+        thumb = instance->thumbnailer =
+            vlc_thumbnailer_Create(VLC_OBJECT(instance->p_libvlc_int));
+    }
+    vlc_mutex_unlock(&instance->lazy_init_lock);
+
+    return thumb;
 }
 
 const char vlc_module_name[] = "libvlc";
