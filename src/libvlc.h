@@ -183,7 +183,6 @@ typedef struct libvlc_priv_t
     vlc_keystore      *p_memory_keystore; ///< memory keystore
     intf_thread_t *interfaces;  ///< Linked-list of interfaces
     vlc_playlist_t *main_playlist;
-    struct vlc_preparser_t *parser; ///< Input item meta data handler
     vlc_media_source_provider_t *media_source_provider;
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance

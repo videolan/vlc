@@ -1004,7 +1004,6 @@ vlc_playlist_Resume
 vlc_playlist_Export
 vlc_playlist_SetMediaStoppedAction
 vlc_intf_GetMainPlaylist
-libvlc_GetMainPreparser
 vlc_media_source_Hold
 vlc_media_source_Release
 vlc_media_source_provider_Get

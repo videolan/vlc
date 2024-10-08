@@ -236,19 +236,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Meta data handling
      */
 
-    int max_threads = var_InheritInteger(p_libvlc, "preparse-threads");
-    if (max_threads < 1)
-        max_threads = 1;
-
-    vlc_tick_t default_timeout =
-        VLC_TICK_FROM_MS(var_InheritInteger(p_libvlc, "preparse-timeout"));
-    if (default_timeout < 0)
-        default_timeout = 0;
-    priv->parser = vlc_preparser_New(VLC_OBJECT(p_libvlc), max_threads,
-                                     default_timeout);
-    if( !priv->parser )
-        goto error;
-
     priv->media_source_provider = vlc_media_source_provider_New( VLC_OBJECT( p_libvlc ) );
     if( !priv->media_source_provider )
         goto error;
@@ -357,9 +344,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
-    if (priv->parser != NULL)
-        vlc_preparser_Deactivate(priv->parser);
-
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
     intf_DestroyAll( p_libvlc );
@@ -386,9 +370,6 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
         free( pidfile );
     }
 #endif
-
-    if (priv->parser != NULL)
-        vlc_preparser_Delete(priv->parser);
 
     if (priv->main_playlist)
         vlc_playlist_Delete(priv->main_playlist);
@@ -463,13 +444,6 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
                          VLC_INPUT_OPTION_TRUSTED );
         free( mrl );
     }
-}
-
-vlc_preparser_t *
-libvlc_GetMainPreparser(libvlc_int_t *libvlc)
-{
-    libvlc_priv_t *priv = libvlc_priv(libvlc);
-    return priv->parser;
 }
 
 static void
