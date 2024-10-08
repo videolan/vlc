@@ -395,6 +395,16 @@ VLC_API input_item_t *input_item_Hold(input_item_t *);
 /** Releases an input item, i.e. decrements its reference counter. */
 VLC_API void input_item_Release(input_item_t *);
 
+static inline enum input_item_type_e
+input_item_GetType( input_item_t *p_i, bool *is_network )
+{
+    vlc_mutex_lock( &p_i->lock );
+    enum input_item_type_e type = p_i->i_type;
+    *is_network = p_i->b_net;
+    vlc_mutex_unlock( &p_i->lock );
+    return type;
+}
+
 /**
  * Record prefix string.
  * TODO make it configurable.
