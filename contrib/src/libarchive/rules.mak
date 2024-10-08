@@ -29,6 +29,13 @@ ifdef HAVE_WIN32
 LIBARCHIVE_CONF += -DENABLE_OPENSSL=OFF
 endif
 
+ifdef HAVE_MACOSX
+# these functions are detected as present but there are not until macOS 10.10
+# the minimum supported value is 10.7, in each case missing the functions falls
+# back to an alternative
+LIBARCHIVE_CONF += -DHAVE_FDOPENDIR:INTERNAL= -DHAVE_OPENAT:INTERNAL= -DHAVE_FSTATAT:INTERNAL= -DHAVE_LINKAT:INTERNAL=
+endif
+
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
 
