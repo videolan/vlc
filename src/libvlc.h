@@ -186,7 +186,6 @@ typedef struct libvlc_priv_t
     vlc_media_source_provider_t *media_source_provider;
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
-    struct vlc_thumbnailer_t *p_thumbnailer; ///< Lazily instantiated media thumbnailer
     struct vlc_tracer *tracer; ///< Tracer callbacks
 
     /* Exit callback */
