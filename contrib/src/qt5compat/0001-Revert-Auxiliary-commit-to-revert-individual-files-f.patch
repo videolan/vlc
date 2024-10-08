@@ -4,6 +4,10 @@ Date: Fri, 19 Apr 2024 15:59:48 +0300
 Subject: [PATCH 1/2] Revert "Auxiliary commit to revert individual files from
  0ba059c6dc8b7c0f6ac4a277c96b6b16e43053a2"
 
+This effectively reverts deprecated Qt Graphical Effects to its more
+primitive Qt 6.3 version. This is done to prevent linking to Qt
+Shader Tools library, which increases the size considerably when
+statically linked.
 ---
  CMakeLists.txt                                |   5 -
  src/imports/graphicaleffects5/CMakeLists.txt  |  14 --
