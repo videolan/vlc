@@ -327,7 +327,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     preparser->default_timeout = default_timeout;
 
     preparser->owner = parent;
-    preparser->fetcher = input_fetcher_New( parent );
+    preparser->fetcher = input_fetcher_New( parent, META_REQUEST_OPTION_FETCH_ANY );
     atomic_init( &preparser->deactivated, false );
 
     vlc_mutex_init(&preparser->lock);

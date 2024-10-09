@@ -425,8 +425,10 @@ static void RunSearchNetwork(void *userdata)
     TaskDelete(task);
 }
 
-input_fetcher_t* input_fetcher_New( vlc_object_t* owner )
+input_fetcher_t* input_fetcher_New( vlc_object_t* owner,
+                                    input_item_meta_request_option_t request_type )
 {
+    assert(request_type & META_REQUEST_OPTION_FETCH_ANY);
     input_fetcher_t* fetcher = malloc( sizeof( *fetcher ) );
 
     if( unlikely( !fetcher ) )
@@ -436,28 +438,44 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner )
     if (max_threads < 1)
         max_threads = 1;
 
-    fetcher->executor_local = vlc_executor_New(max_threads);
-    if (!fetcher->executor_local)
+    if (request_type & META_REQUEST_OPTION_FETCH_LOCAL)
     {
-        free(fetcher);
-        return NULL;
+        fetcher->executor_local = vlc_executor_New(max_threads);
+        if (!fetcher->executor_local)
+        {
+            free(fetcher);
+            return NULL;
+        }
     }
+    else
+        fetcher->executor_local = NULL;
 
-    fetcher->executor_network = vlc_executor_New(max_threads);
-    if (!fetcher->executor_network)
+    if (request_type & META_REQUEST_OPTION_FETCH_NETWORK)
     {
-        vlc_executor_Delete(fetcher->executor_local);
-        free(fetcher);
-        return NULL;
+        fetcher->executor_network = vlc_executor_New(max_threads);
+        if (!fetcher->executor_network)
+        {
+            if (fetcher->executor_local)
+                vlc_executor_Delete(fetcher->executor_local);
+            free(fetcher);
+            return NULL;
+        }
+
+        fetcher->executor_downloader = vlc_executor_New(max_threads);
+        if (!fetcher->executor_downloader)
+        {
+            if (fetcher->executor_network)
+                vlc_executor_Delete(fetcher->executor_network);
+            if (fetcher->executor_local)
+                vlc_executor_Delete(fetcher->executor_local);
+            free(fetcher);
+            return NULL;
+        }
     }
-
-    fetcher->executor_downloader = vlc_executor_New(max_threads);
-    if (!fetcher->executor_downloader)
+    else
     {
-        vlc_executor_Delete(fetcher->executor_network);
-        vlc_executor_Delete(fetcher->executor_local);
-        free(fetcher);
-        return NULL;
+        fetcher->executor_network = NULL;
+        fetcher->executor_downloader = NULL;
     }
 
     fetcher->owner = owner;
@@ -475,6 +493,10 @@ int input_fetcher_Push(input_fetcher_t* fetcher, input_item_t* item,
     const input_fetcher_callbacks_t *cbs, void *cbs_userdata)
 {
     assert(options & META_REQUEST_OPTION_FETCH_ANY);
+    if (options & META_REQUEST_OPTION_FETCH_LOCAL)
+        assert(fetcher->executor_local != NULL);
+    if (options & META_REQUEST_OPTION_FETCH_NETWORK)
+        assert(fetcher->executor_network != NULL);
 
     vlc_executor_t *executor = options & META_REQUEST_OPTION_FETCH_LOCAL
                              ? fetcher->executor_local
@@ -508,9 +530,12 @@ void input_fetcher_Delete( input_fetcher_t* fetcher )
 {
     CancelAllTasks(fetcher);
 
-    vlc_executor_Delete(fetcher->executor_local);
-    vlc_executor_Delete(fetcher->executor_network);
-    vlc_executor_Delete(fetcher->executor_downloader);
+    if (fetcher->executor_local)
+        vlc_executor_Delete(fetcher->executor_local);
+    if (fetcher->executor_network)
+        vlc_executor_Delete(fetcher->executor_network);
+    if (fetcher->executor_downloader)
+        vlc_executor_Delete(fetcher->executor_downloader);
 
     vlc_dictionary_clear( &fetcher->album_cache, FreeCacheEntry, NULL );
     free( fetcher );
