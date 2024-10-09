@@ -54,6 +54,7 @@ struct vaapi_vctx
     VADisplay va_dpy;
     AVBufferRef *hwframes_ref;
     vlc_sem_t pool_sem;
+    bool dynamic_pool;
 };
 
 typedef struct {
@@ -71,7 +72,7 @@ static void vaapi_dec_pic_context_destroy(picture_context_t *context)
 
     av_frame_free(&pic_ctx->avframe);
 
-    if (!pic_ctx->cloned)
+    if (!pic_ctx->cloned && !vaapi_vctx->dynamic_pool)
         vlc_sem_post(&vaapi_vctx->pool_sem);
 
     free(pic_ctx);
@@ -105,20 +106,23 @@ static int Get(vlc_va_t *va, picture_t *pic, AVCodecContext *ctx, AVFrame *frame
         vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_VAAPI);
 
     /* If all frames are out, wait for a frame to be released. */
-    vlc_sem_wait(&vaapi_vctx->pool_sem);
+    if(!vaapi_vctx->dynamic_pool)
+        vlc_sem_wait(&vaapi_vctx->pool_sem);
 
     int ret = av_hwframe_get_buffer(ctx->hw_frames_ctx, frame, 0);
     if (ret)
     {
         msg_Err(va, "vaapi_va: av_hwframe_get_buffer failed: %d\n", ret);
-        vlc_sem_post(&vaapi_vctx->pool_sem);
+        if(!vaapi_vctx->dynamic_pool)
+            vlc_sem_post(&vaapi_vctx->pool_sem);
         return ret;
     }
 
     vaapi_dec_pic_context *vaapi_pic_ctx = malloc(sizeof(*vaapi_pic_ctx));
     if (unlikely(vaapi_pic_ctx == NULL))
     {
-        vlc_sem_post(&vaapi_vctx->pool_sem);
+        if(!vaapi_vctx->dynamic_pool)
+            vlc_sem_post(&vaapi_vctx->pool_sem);
         return VLC_ENOMEM;
     }
 
@@ -266,6 +270,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
     vaapi_vctx->va_dpy = va_dpy;
     vaapi_vctx->hwframes_ref = hwframes_ref;
     vlc_sem_init(&vaapi_vctx->pool_sem, hwframes_ctx->initial_pool_size);
+    vaapi_vctx->dynamic_pool = hwframes_ctx->initial_pool_size < 1;
 
     msg_Info(va, "Using %s", vaQueryVendorString(va_dpy));
 
