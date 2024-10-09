@@ -333,6 +333,23 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     VLC_RANLIB="$TRIPLET-ranlib"
 fi
 
+if [ -z "$PKG_CONFIG" ]; then
+    if [ "$(unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL)" = "FAIL" ]; then
+        # $TRIPLET-pkg-config DOESNT WORK
+        # on Debian it pretends it works to autoconf
+        VLC_PKG_CONFIG="pkg-config"
+        if [ -z "$PKG_CONFIG_LIBDIR" ]; then
+            VLC_PKG_CONFIG_LIBDIR="/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        else
+            VLC_PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        fi
+        export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
+    fi
+else
+    VLC_PKG_CONFIG="$PKG_CONFIG"
+fi
+export PKG_CONFIG="$VLC_PKG_CONFIG"
+
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
@@ -383,23 +400,6 @@ if [ -n "$VLC_RANLIB" ]; then
 fi
 
 info "Configuring VLC"
-if [ -z "$PKG_CONFIG" ]; then
-    if [ `unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL` = "FAIL" ]; then
-        # $TRIPLET-pkg-config DOESNT WORK
-        # on Debian it pretends it works to autoconf
-        VLC_PKG_CONFIG="pkg-config"
-        if [ -z "$PKG_CONFIG_LIBDIR" ]; then
-            VLC_PKG_CONFIG_LIBDIR="/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
-        else
-            VLC_PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
-        fi
-        export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
-    else
-        # $TRIPLET-pkg-config WORKs
-        VLC_PKG_CONFIG="$TRIPLET-pkg-config"
-    fi
-    export PKG_CONFIG="$VLC_PKG_CONFIG"
-fi
 
 mkdir -p $SHORTARCH
 cd $SHORTARCH
