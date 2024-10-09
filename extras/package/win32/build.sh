@@ -229,14 +229,23 @@ else
 fi
 fi
 
+VLC_CFLAGS="$CFLAGS"
+unset CFLAGS
+VLC_CXXFLAGS="$CXXFLAGS"
+unset CXXFLAGS
+VLC_CPPFLAGS="$CPPFLAGS"
+unset CPPFLAGS
+VLC_LDFLAGS="$LDFLAGS"
+unset LDFLAGS
+
 if [ ! -z "$BUILD_UCRT" ]; then
     WIDL=${TRIPLET}-widl
-    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0xE00 -D_UCRT"
+    VLC_CPPFLAGS="$VLC_CPPFLAGS -D__MSVCRT_VERSION__=0xE00 -D_UCRT"
 
     if [ ! -z "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
         TRIPLET=${TRIPLET}uwp
-        CPPFLAGS="$CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
+        VLC_CPPFLAGS="$VLC_CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
 
         if [ -z "$NTDDI" ]; then
             WINVER=0x0A00
@@ -248,27 +257,27 @@ if [ ! -z "$BUILD_UCRT" ]; then
         fi
 
         # WinstoreCompat: hopefully can go away someday
-        LDFLAGS="$LDFLAGS -lwindowsapp -lwindowsappcompat"
-        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
-        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
-        CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
+        VLC_LDFLAGS="$VLC_LDFLAGS -lwindowsapp -lwindowsappcompat"
+        VLC_CFLAGS="$VLC_CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
+        VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
+        VLC_CPPFLAGS="$VLC_CPPFLAGS -DWINSTORECOMPAT"
         if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
-            CFLAGS="$CFLAGS -Wno-unused-command-line-argument"
-            CXXFLAGS="$CXXFLAGS -Wno-unused-command-line-argument"
+            VLC_CFLAGS="$VLC_CFLAGS -Wno-unused-command-line-argument"
+            VLC_CXXFLAGS="$VLC_CXXFLAGS -Wno-unused-command-line-argument"
         fi
     else
         SHORTARCH="$SHORTARCH-ucrt"
         WINVER=0x0601
     fi
 
-    LDFLAGS="$LDFLAGS -lucrt"
+    VLC_LDFLAGS="$VLC_LDFLAGS -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
         # assume gcc
         NEWSPECFILE="$(pwd)/specfile-$SHORTARCH"
         # tell gcc to replace msvcrt with ucrtbase+ucrt
         $CC -dumpspecs | sed -e "s/-lmsvcrt/-lucrt/" > $NEWSPECFILE
-        CFLAGS="$CFLAGS -specs=$NEWSPECFILE"
-        CXXFLAGS="$CXXFLAGS -specs=$NEWSPECFILE"
+        VLC_CFLAGS="$VLC_CFLAGS -specs=$NEWSPECFILE"
+        VLC_CXXFLAGS="$VLC_CXXFLAGS -specs=$NEWSPECFILE"
 
         if [ ! -z "$WINSTORE" ]; then
             # trick to provide these libraries instead of -ladvapi32 -lshell32 -luser32 -lkernel32
@@ -279,28 +288,30 @@ if [ ! -z "$BUILD_UCRT" ]; then
         fi
     fi
 
+    LDFLAGS="$VLC_LDFLAGS"
     # the values are not passed to the makefiles/configures
     export LDFLAGS
 else
     # use the regular msvcrt
-    CPPFLAGS="$CPPFLAGS -D__MSVCRT_VERSION__=0x700"
+    VLC_CPPFLAGS="$VLC_CPPFLAGS -D__MSVCRT_VERSION__=0x700"
 fi
 
 if [ -n "$NTDDI" ]; then
     WINVER=$(echo ${NTDDI} |cut -c 1-6)
-    CPPFLAGS="$CPPFLAGS -DNTDDI_VERSION=$NTDDI"
+    VLC_CPPFLAGS="$VLC_CPPFLAGS -DNTDDI_VERSION=$NTDDI"
 fi
 if [ -z "$WINVER" ]; then
     # The current minimum for VLC 3.0 is Windows XP SP1
     WINVER=0x0502
 fi
-CPPFLAGS="$CPPFLAGS -D_WIN32_WINNT=${WINVER} -DWINVER=${WINVER}"
+VLC_CPPFLAGS="$VLC_CPPFLAGS -D_WIN32_WINNT=${WINVER} -DWINVER=${WINVER}"
 
+CPPFLAGS="$VLC_CPPFLAGS"
 # the values are not passed to the makefiles/configures
 export CPPFLAGS
 
-CFLAGS="$CPPFLAGS $CFLAGS"
-CXXFLAGS="$CPPFLAGS $CXXFLAGS"
+VLC_CFLAGS="$VLC_CPPFLAGS $VLC_CFLAGS"
+VLC_CXXFLAGS="$VLC_CPPFLAGS $VLC_CXXFLAGS"
 
 info "Building contribs"
 echo $PATH
@@ -309,8 +320,8 @@ mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 if [ ! -z "$WITH_PDB" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-pdb"
     if [ ! -z "$PDB_MAP" ]; then
-        CFLAGS="$CFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
-        CXXFLAGS="$CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
+        VLC_CFLAGS="$VLC_CFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
+        VLC_CXXFLAGS="$VLC_CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
     fi
 fi
 if [ ! -z "$BREAKPAD" ]; then
@@ -333,6 +344,9 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     RANLIB="$VLC_RANLIB"
     export RANLIB
 fi
+
+CFLAGS="$VLC_CFLAGS"
+CXXFLAGS="$VLC_CXXFLAGS"
 
 export CFLAGS
 export CXXFLAGS
