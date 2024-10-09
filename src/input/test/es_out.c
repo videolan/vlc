@@ -152,10 +152,11 @@ void vlc_input_decoder_DecodeWithStatus(
     bool do_pace,
     struct vlc_input_decoder_status *status)
 {
-    (void)owner; (void)frame; (void)do_pace; (void)status;
+    (void)owner; (void)do_pace;
 
     if (status != NULL)
         *status = (struct vlc_input_decoder_status){ .format.changed = false };
+    vlc_frame_Release(frame);
 }
 
 void vlc_input_decoder_Drain(vlc_input_decoder_t *owner)
@@ -440,6 +441,11 @@ int main(void)
 
     es_out_SetMode(out, ES_OUT_MODE_END);
     es_out_Delete(&out->out);
+
+    input_source_Release(source);
+    input_item_Release(item);
+    vlc_object_delete(&input->obj);
+    vlc_object_delete(root);
 
     return VLC_SUCCESS;
 }
