@@ -104,8 +104,8 @@ on_preparse_ended(input_item_t *media, int status, void *userdata)
     vlc_playlist_Unlock(playlist);
 }
 
-static const struct vlc_metadata_cbs preparser_callbacks = {
-    .on_preparse_ended = on_preparse_ended,
+static const input_item_parser_cbs_t preparser_callbacks = {
+    .on_ended = on_preparse_ended,
     .on_subtree_added = on_subtree_added,
 };
 

@@ -236,8 +236,8 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     vlc_sem_t sem;
     vlc_sem_init (&sem, 0);
-    const struct vlc_metadata_cbs cbs = {
-        .on_preparse_ended = input_item_preparse_timeout,
+    const input_item_parser_cbs_t cbs = {
+        .on_ended = input_item_preparse_timeout,
     };
 
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),

@@ -1097,9 +1097,9 @@ static const struct vlc_player_timer_smpte_cbs player_timer_smpte_cbs = {
 
 // art fetcher callbacks
 
-static const struct vlc_metadata_cbs art_fetcher_cbs  = []{
-    struct vlc_metadata_cbs cbs{};
-    cbs.on_preparse_ended = on_preparse_ended_callback;
+static const input_item_parser_cbs_t art_fetcher_cbs  = []{
+    input_item_parser_cbs_t cbs{};
+    cbs.on_ended = on_preparse_ended_callback;
     return cbs;
 }();
 

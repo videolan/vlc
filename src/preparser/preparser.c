@@ -48,7 +48,7 @@ struct task
     vlc_preparser_t *preparser;
     input_item_t *item;
     input_item_meta_request_option_t options;
-    const struct vlc_metadata_cbs *cbs;
+    const input_item_parser_cbs_t *cbs;
     void *userdata;
     void *id;
     vlc_tick_t timeout;
@@ -69,7 +69,7 @@ static void RunnableRun(void *);
 static struct task *
 TaskNew(vlc_preparser_t *preparser, input_item_t *item,
         input_item_meta_request_option_t options,
-        const struct vlc_metadata_cbs *cbs, void *userdata,
+        const input_item_parser_cbs_t *cbs, void *userdata,
         void *id, vlc_tick_t timeout)
 {
     assert(timeout >= 0);
@@ -129,10 +129,10 @@ NotifyPreparseEnded(struct task *task, bool art_fetched)
     if (task->cbs == NULL)
         return;
 
-    if (task->cbs->on_preparse_ended) {
+    if (task->cbs->on_ended) {
         int status = atomic_load_explicit(&task->preparse_status,
                                           memory_order_relaxed);
-        task->cbs->on_preparse_ended(task->item, status, task->userdata);
+        task->cbs->on_ended(task->item, status, task->userdata);
     }
 }
 
@@ -341,7 +341,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
 
 int vlc_preparser_Push( vlc_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
-    const struct vlc_metadata_cbs *cbs, void *cbs_userdata,
+    const input_item_parser_cbs_t *cbs, void *cbs_userdata,
     int timeout_ms, void *id )
 {
     if( atomic_load( &preparser->deactivated ) )

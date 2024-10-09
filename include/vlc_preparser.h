@@ -55,14 +55,6 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_PARSE_SUBITEMS = 0x10,
 } input_item_meta_request_option_t;
 
-struct vlc_metadata_cbs {
-    void (*on_preparse_ended)(input_item_t *, int status, void *userdata);
-    void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
-    void (*on_attachments_added)(input_item_t *item,
-                                 input_attachment_t *const *array,
-                                 size_t count, void *userdata);
-};
-
 /**
  * This function creates the preparser object and thread.
  *
@@ -97,7 +89,7 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  */
 VLC_API int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
                                 input_item_meta_request_option_t option,
-                                const struct vlc_metadata_cbs *cbs,
+                                const input_item_parser_cbs_t *cbs,
                                 void *cbs_userdata,
                                 int timeout, void *id );
 

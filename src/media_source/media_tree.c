@@ -333,9 +333,9 @@ vlc_media_tree_Remove(vlc_media_tree_t *tree, input_item_t *media)
     return true;
 }
 
-static const struct vlc_metadata_cbs preparser_callbacks = {
+static const input_item_parser_cbs_t preparser_callbacks = {
+    .on_ended = media_subtree_preparse_ended,
     .on_subtree_added = media_subtree_changed,
-    .on_preparse_ended = media_subtree_preparse_ended
 };
 
 void

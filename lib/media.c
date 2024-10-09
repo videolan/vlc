@@ -718,8 +718,8 @@ libvlc_media_get_filestat( libvlc_media_t *p_md, unsigned type, uint64_t *out )
     return 1;
 }
 
-static const struct vlc_metadata_cbs preparser_callbacks = {
-    .on_preparse_ended = input_item_preparse_ended,
+static const input_item_parser_cbs_t preparser_callbacks = {
+    .on_ended = input_item_preparse_ended,
     .on_subtree_added = input_item_subtree_added,
     .on_attachments_added = input_item_attachments_added,
 };
