@@ -412,6 +412,8 @@ if [ -z "$PKG_CONFIG" ]; then
     fi
 fi
 
+MCONFIGFLAGS="$MCONFIGFLAGS -Dc_args='${VLC_CFLAGS}' -Dc_link_args='${VLC_LDFLAGS}' -Dcpp_args='${VLC_CXXFLAGS}' -Dcpp_link_args='${VLC_LDFLAGS}'"
+
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
      MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
