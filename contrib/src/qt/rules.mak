@@ -17,7 +17,7 @@ PKGS_ALL += qt-tools
 
 DEPS_qt = qt-tools harfbuzz $(DEPS_harfbuzz) jpeg $(DEPS_jpeg) png $(DEPS_png) zlib $(DEPS_zlib) vulkan-headers $(DEPS_vulkan-headers)
 ifdef HAVE_WIN32
-DEPS_qt += d3d12 $(DEPS_d3d12) dcomp $(DEPS_dcomp)
+DEPS_qt += d3d12 $(DEPS_d3d12) dcomp $(DEPS_dcomp) uiautomationcore $(DEPS_uiautomationcore)
 else
 DEPS_qt += freetype2 $(DEPS_freetype2)
 endif
