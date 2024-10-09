@@ -14,7 +14,7 @@ PKGS += winrt_headers alloweduwp
 else  # !HAVE_WINSTORE
 PKGS += dcomp
 endif # !HAVE_WINSTORE
-PKGS += dxva dxvahd mingw11-fixes mingw12-fixes mft10 d3d12
+PKGS += dxva dxvahd mingw11-fixes mingw12-fixes mft10 d3d12 uiautomationcore
 
 ifdef HAVE_WINSTORE
 PKGS_FOUND += winrt_headers
@@ -26,7 +26,7 @@ ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dcomp
 endif
 ifeq ($(call mingw_at_least, 11), true)
-PKGS_FOUND += dxvahd
+PKGS_FOUND += dxvahd uiautomationcore
 endif # MINGW 11
 ifeq ($(call mingw_at_least, 12), true)
 PKGS_FOUND += mingw11-fixes d3d12
@@ -43,7 +43,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads winrt_headers dxva dxvahd dcomp mingw11-fixes mingw12-fixes alloweduwp mft10 d3d12
+PKGS_ALL += winpthreads winrt_headers dxva dxvahd dcomp mingw11-fixes mingw12-fixes alloweduwp mft10 d3d12 uiautomationcore
 
 # $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 # 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -194,4 +194,22 @@ endif
 	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
 	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a DATA= HEADERS=
 	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libd3d12.a install-$(MINGW64_BUILDDIR)LIBRARIES
+	touch $@
+
+.sum-uiautomationcore: .sum-mingw64
+	touch $@
+
+.uiautomationcore: mingw64
+	install -d "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/uiautomation.h           "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/uiautomationcore.h       "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/uiautomationcoreapi.h    "$(PREFIX)/include"
+	install $</mingw-w64-headers/include/uiautomationclient.h     "$(PREFIX)/include"
+
+	# Trick mingw-w64 into just building libuiautomationcore.a
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
+	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
+	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libuiautomationcore.a DATA= HEADERS=
+	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libuiautomationcore.a install-$(MINGW64_BUILDDIR)LIBRARIES
 	touch $@
