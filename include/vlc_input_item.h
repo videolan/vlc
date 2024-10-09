@@ -434,7 +434,8 @@ typedef struct input_item_parser_cbs_t
      * @note This callback is mandatory.
      *
      * @param item the parsed item
-     * @param status VLC_SUCCESS in case of success, an error otherwise
+     * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
+     * timeout, an error otherwise
      * @param userdata user data set by input_item_Parse()
      */
     void (*on_ended)(input_item_t *item, int status, void *userdata);
