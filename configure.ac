@@ -3986,6 +3986,7 @@ AC_ARG_ENABLE([qt],
   ])
 ])
 have_qt_gtk="no"
+have_qt_qtest="no"
 have_qt_quick_test="no"
 have_qt_declarative_private="no"
 have_qt_gui_private="no"
@@ -4091,6 +4092,24 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
         have_qt="no"
       ])
+
+      AC_MSG_CHECKING([for Qt QTest])
+      (${QMAKE} ${srcdir}/modules/gui/qt/qtest.pro -o ${ac_pwd}/modules/gui/qt/qmake-qtest) 2>/dev/null
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-qtest],[
+        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-qtest
+        AC_MSG_RESULT([yes])
+        QT_QTEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_libs)
+        QT_QTEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_cflags)
+        QT_QTEST_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_cflags)
+        AC_SUBST([QT_QTEST_LIBS])
+        AC_SUBST([QT_QTEST_CFLAGS])
+        AC_SUBST([QT_QTEST_LDFLAGS])
+        have_qt_qtest="yes"
+      ],[
+        AC_MSG_RESULT([no])
+      ])
+      rm -f ${ac_pwd}/modules/gui/qt/qmake-qtest
 
       AC_MSG_CHECKING([for QuickTest])
       (${QMAKE} ${srcdir}/modules/gui/qt/quicktest.pro -o ${ac_pwd}/modules/gui/qt/qmake-quicktest) 2>/dev/null
@@ -4217,6 +4236,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AC_SUBST([QT_INDIRECT_LIBS])
 AM_CONDITIONAL([ENABLE_QT], [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT_GTK], [test "${have_qt_gtk}" = "yes"])
+AM_CONDITIONAL([HAVE_QT_QTEST], [test "${have_qt_qtest}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_QUICK_TEST], [test "${have_qt_quick_test}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_DECLARATIVE_PRIVATE], [test "${have_qt_declarative_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
