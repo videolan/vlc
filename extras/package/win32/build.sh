@@ -310,10 +310,6 @@ if [ ! -z "$BUILD_UCRT" ]; then
             sed -i -e "s/-lkernel32//" $NEWSPECFILE
         fi
     fi
-
-    LDFLAGS="$VLC_LDFLAGS"
-    # the values are not passed to the makefiles/configures
-    export LDFLAGS
 else
     # use the regular msvcrt
     VLC_CPPFLAGS="$VLC_CPPFLAGS -D__MSVCRT_VERSION__=0x700"
@@ -328,10 +324,6 @@ if [ -z "$WINVER" ]; then
     WINVER=0x0601
 fi
 VLC_CPPFLAGS="$VLC_CPPFLAGS -D_WIN32_WINNT=${WINVER} -DWINVER=${WINVER}"
-
-CPPFLAGS="$VLC_CPPFLAGS"
-# the values are not passed to the makefiles/configures
-export CPPFLAGS
 
 VLC_CFLAGS="$VLC_CPPFLAGS $VLC_CFLAGS"
 VLC_CXXFLAGS="$VLC_CPPFLAGS $VLC_CXXFLAGS"
@@ -366,33 +358,27 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     export RANLIB
 fi
 
-CFLAGS="$VLC_CFLAGS"
-CXXFLAGS="$VLC_CXXFLAGS"
-
-export CFLAGS
-export CXXFLAGS
-
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" = "yes" ]; then
     if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
     else
-        make prebuilt || PREBUILT_FAILED=yes
+        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make prebuilt || PREBUILT_FAILED=yes
     fi
 else
     PREBUILT_FAILED=yes
 fi
-make list
+CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make list
 if [ -n "$PREBUILT_FAILED" ]; then
-    make -j$JOBS fetch
-    make -j$JOBS -k || make -j1
+    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make -j$JOBS fetch
+    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make -j$JOBS -k || CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make -j1
     if [ "$PACKAGE" = "yes" ]; then
-        make package
+        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make package
     fi
 else
-    make -j$JOBS tools
+    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" make -j$JOBS tools
 fi
 cd ../..
 
@@ -479,6 +465,20 @@ ${VLC_ROOT_PATH}/bootstrap
 
 mkdir -p $SHORTARCH
 cd $SHORTARCH
+
+# set environment that will be kept in config.status
+if [ -n "$VLC_CPPFLAGS" ]; then
+    export CPPFLAGS="$VLC_CPPFLAGS"
+fi
+if [ -n "$VLC_CFLAGS" ]; then
+    export CFLAGS="$VLC_CFLAGS"
+fi
+if [ -n "$VLC_CXXFLAGS" ]; then
+    export CXXFLAGS="$VLC_CXXFLAGS"
+fi
+if [ -n "$VLC_LDFLAGS" ]; then
+    export LDFLAGS="$VLC_LDFLAGS"
+fi
 
 info "Configuring VLC"
 ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
