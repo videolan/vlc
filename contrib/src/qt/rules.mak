@@ -65,6 +65,8 @@ endif
 
 ifdef HAVE_WIN32
 QTBASE_CONFIG += -DFEATURE_style_fusion=OFF
+# Enable direct2d, but do not build the direct2d platform plugin:
+QTBASE_CONFIG += -DFEATURE_direct2d=ON -DFEATURE_direct2d1_1=OFF
 endif
 
 ifdef ENABLE_PDB
