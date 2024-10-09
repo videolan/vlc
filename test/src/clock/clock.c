@@ -738,7 +738,7 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     vlc_clock_main_Lock(ctx->mainclk);
     vlc_clock_main_ChangePause(ctx->mainclk, system, true);
     vlc_clock_main_Unlock(ctx->mainclk);
-    system += 1;
+    system += 100;
 
     vlc_clock_Lock(ctx->slave);
     vlc_tick_t converted = vlc_clock_ConvertToSystem(ctx->slave, system, ctx->stream_start, 1.0f, NULL);
