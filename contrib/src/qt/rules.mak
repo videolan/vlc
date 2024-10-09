@@ -79,6 +79,15 @@ QTBASE_COMMON_CONFIG := -DFEATURE_pkg_config=OFF -DINPUT_openssl=no \
 	-DFEATURE_pdf=OFF \
 	-DQT_BUILD_EXAMPLES=OFF
 
+ifdef HAVE_WIN32
+ifndef HAVE_CLANG
+# GCC 12.2 can not compile the Qt 6.8 bundled PCRE2 with the stack clash protection option.
+# Since stack clash protection option is said to be irrelevant for Windows, we can simply
+# disable it:
+QTBASE_COMMON_CONFIG += -DFEATURE_stack_clash_protection=OFF
+endif
+endif
+
 QTBASE_CONFIG += $(QTBASE_COMMON_CONFIG) \
     -DFEATURE_gif=OFF \
 	-DFEATURE_harfbuzz=ON -DFEATURE_system_harfbuzz=ON -DFEATURE_jpeg=ON -DFEATURE_system_jpeg=ON \
