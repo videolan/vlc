@@ -79,7 +79,7 @@ static void cb_children_removed(vlc_media_tree_t *p_tree,
 
 static void cb_preparse_ended(vlc_media_tree_t *p_tree,
                               input_item_node_t *p_node,
-                              enum input_item_preparse_status status,
+                              int status,
                               void *p_data)
 {
     dispatch_async(dispatch_get_main_queue(), ^{

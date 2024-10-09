@@ -306,8 +306,7 @@ static void send_parsed_changed( libvlc_media_t *p_md,
  * input_item_preparse_ended (Private) (vlc event Callback)
  */
 static void input_item_preparse_ended(input_item_t *item,
-                                      enum input_item_preparse_status status,
-                                      void *user_data)
+                                      int status, void *user_data)
 {
     VLC_UNUSED(item);
     libvlc_media_t * p_md = user_data;
@@ -315,13 +314,13 @@ static void input_item_preparse_ended(input_item_t *item,
 
     switch( status )
     {
-        case ITEM_PREPARSE_FAILED:
+        case VLC_EGENERIC:
             new_status = libvlc_media_parsed_status_failed;
             break;
-        case ITEM_PREPARSE_TIMEOUT:
+        case VLC_ETIMEOUT:
             new_status = libvlc_media_parsed_status_timeout;
             break;
-        case ITEM_PREPARSE_DONE:
+        case VLC_SUCCESS:
             new_status = libvlc_media_parsed_status_done;
             break;
         default:

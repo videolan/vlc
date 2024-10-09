@@ -170,9 +170,7 @@ media_subtree_changed(input_item_t *media, input_item_node_t *node,
 }
 
 static void
-media_subtree_preparse_ended(input_item_t *media,
-                             enum input_item_preparse_status status,
-                             void *user_data)
+media_subtree_preparse_ended(input_item_t *media, int status, void *user_data)
 {
     vlc_media_tree_t *tree = user_data;
 

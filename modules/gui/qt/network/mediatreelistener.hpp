@@ -46,7 +46,7 @@ public:
         virtual void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) = 0;
         virtual void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) = 0;
         virtual void onItemRemoved( MediaTreePtr tree, input_item_node_t* node, input_item_node_t *const children[], size_t count ) = 0;
-        virtual void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, enum input_item_preparse_status status ) = 0;
+        virtual void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, int status ) = 0;
     };
 
 public:

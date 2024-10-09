@@ -476,7 +476,7 @@ struct NetworkMediaModel::ListenerCb : public MediaTreeListener::MediaTreeListen
     void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override;
     void onItemAdded( MediaTreePtr tree, input_item_node_t* parent, input_item_node_t *const children[], size_t count ) override;
     void onItemRemoved( MediaTreePtr tree, input_item_node_t * node, input_item_node_t *const children[], size_t count ) override;
-    void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, enum input_item_preparse_status status ) override;
+    void onItemPreparseEnded( MediaTreePtr tree, input_item_node_t* node, int status ) override;
 
     NetworkMediaModel *model;
 };
@@ -920,7 +920,7 @@ void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, enum input_item_preparse_status )
+void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, int )
 {
     model->d_func()->m_preparseSem.release();
     SharedInputItem p_node { node->p_item };

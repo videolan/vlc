@@ -27,7 +27,7 @@ struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeLis
         , mediaSource(std::move(mediaSource))
     {}
 
-    inline void onItemPreparseEnded( MediaTreePtr, input_item_node_t *, enum input_item_preparse_status ) override final {}
+    inline void onItemPreparseEnded( MediaTreePtr, input_item_node_t *, int ) override final {}
 
     void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override
     {

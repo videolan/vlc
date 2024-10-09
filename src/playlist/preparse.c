@@ -88,13 +88,12 @@ on_subtree_added(input_item_t *media, input_item_node_t *subtree,
 }
 
 static void
-on_preparse_ended(input_item_t *media,
-                  enum input_item_preparse_status status, void *userdata)
+on_preparse_ended(input_item_t *media, int status, void *userdata)
 {
     VLC_UNUSED(media); /* retrieved by subtree->p_item */
     vlc_playlist_t *playlist = userdata;
 
-    if (status != ITEM_PREPARSE_DONE)
+    if (status != VLC_SUCCESS)
         return;
 
     vlc_playlist_Lock(playlist);

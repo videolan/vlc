@@ -1022,8 +1022,7 @@ static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_tim
 
 
 static void on_preparse_ended_callback(input_item_t *p_item,
-                                       enum input_item_preparse_status,
-                                       void *userdata)
+                                       int, void *userdata)
 {
     PlayerControllerPrivate *me = reinterpret_cast<PlayerControllerPrivate *>(userdata);
     me->onArtFetchEnded(p_item, input_item_IsArtFetched(p_item));

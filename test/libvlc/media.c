@@ -209,13 +209,12 @@ static void test_media_tracks(libvlc_instance_t *vlc)
 }
 
 static void input_item_preparse_timeout( input_item_t *item,
-                                         enum input_item_preparse_status status,
-                                         void *user_data )
+                                         int status, void *user_data )
 {
     VLC_UNUSED(item);
     vlc_sem_t *p_sem = user_data;
 
-    assert( status == ITEM_PREPARSE_TIMEOUT );
+    assert( status == VLC_ETIMEOUT );
     vlc_sem_post(p_sem);
 }
 

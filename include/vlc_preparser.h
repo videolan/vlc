@@ -55,16 +55,8 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_PARSE_SUBITEMS = 0x10,
 } input_item_meta_request_option_t;
 
-/* status of the on_preparse_ended() callback */
-enum input_item_preparse_status
-{
-    ITEM_PREPARSE_FAILED,
-    ITEM_PREPARSE_TIMEOUT,
-    ITEM_PREPARSE_DONE
-};
-
 struct vlc_metadata_cbs {
-    void (*on_preparse_ended)(input_item_t *, enum input_item_preparse_status status, void *userdata);
+    void (*on_preparse_ended)(input_item_t *, int status, void *userdata);
     void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
     void (*on_attachments_added)(input_item_t *item,
                                  input_attachment_t *const *array,

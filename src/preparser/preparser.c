@@ -90,7 +90,7 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item,
 
     task->parser = NULL;
     vlc_sem_init(&task->preparse_ended, 0);
-    atomic_init(&task->preparse_status, ITEM_PREPARSE_FAILED);
+    atomic_init(&task->preparse_status, VLC_EGENERIC);
     atomic_init(&task->interrupted, false);
 
     task->runnable.run = RunnableRun;
@@ -149,9 +149,7 @@ OnParserEnded(input_item_t *item, int status, void *task_)
          */
         return;
 
-    atomic_store_explicit(&task->preparse_status,
-                          status == VLC_SUCCESS ? ITEM_PREPARSE_DONE
-                                                : ITEM_PREPARSE_FAILED,
+    atomic_store_explicit(&task->preparse_status, status,
                           memory_order_relaxed);
     vlc_sem_post(&task->preparse_ended);
 }
@@ -184,7 +182,7 @@ SetItemPreparsed(struct task *task)
 {
     int status = atomic_load_explicit(&task->preparse_status,
                                       memory_order_relaxed);
-    if (status == ITEM_PREPARSE_DONE)
+    if (status == VLC_SUCCESS)
         input_item_SetPreparsed(task->item);
 }
 
@@ -226,7 +224,7 @@ Parse(struct task *task, vlc_tick_t deadline)
     task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
     {
-        atomic_store_explicit(&task->preparse_status, ITEM_PREPARSE_FAILED,
+        atomic_store_explicit(&task->preparse_status, VLC_EGENERIC,
                               memory_order_relaxed);
         return;
     }
@@ -238,7 +236,7 @@ Parse(struct task *task, vlc_tick_t deadline)
         if (vlc_sem_timedwait(&task->preparse_ended, deadline))
         {
             atomic_store_explicit(&task->preparse_status,
-                                  ITEM_PREPARSE_TIMEOUT, memory_order_relaxed);
+                                  VLC_ETIMEOUT, memory_order_relaxed);
             atomic_store(&task->interrupted, true);
         }
 
@@ -304,7 +302,7 @@ Interrupt(struct task *task)
     atomic_store(&task->interrupted, true);
 
     /* Wake up the preparser cond_wait */
-    atomic_store_explicit(&task->preparse_status, ITEM_PREPARSE_TIMEOUT,
+    atomic_store_explicit(&task->preparse_status, VLC_ETIMEOUT,
                           memory_order_relaxed);
     vlc_sem_post(&task->preparse_ended);
 }

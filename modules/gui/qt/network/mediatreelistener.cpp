@@ -24,8 +24,7 @@ static void onItemRemoved(vlc_media_tree_t *, input_item_node_t *node,
 }
 
 static void onItemPreparseEnded(vlc_media_tree_t *, input_item_node_t * node,
-                                enum input_item_preparse_status status,
-                                void *userdata)
+                                int status, void *userdata)
 {
     auto* self = static_cast<MediaTreeListener*>( userdata );
     self->cb->onItemPreparseEnded( self->tree, node, status );

@@ -123,8 +123,7 @@ struct vlc_media_tree_callbacks
      */
     void
     (*on_preparse_end)(vlc_media_tree_t *tree, input_item_node_t * node,
-                       enum input_item_preparse_status status,
-                       void *userdata);
+                       int status, void *userdata);
 };
 
 /**
