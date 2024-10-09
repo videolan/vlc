@@ -345,10 +345,6 @@ fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qt5compat --disable-qtshadertools --disable-qtwayland"
 fi
-if [ ! -z "$WINSTORE" ]; then
-    # we don't use a special toolchain to trigger the detection in contribs so force it manually
-    export HAVE_WINSTORE=1
-fi
 
 if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     # avoid using gcc-ar with the clang toolchain, if both are installed
