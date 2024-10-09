@@ -356,6 +356,23 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     VLC_RANLIB="$TRIPLET-ranlib"
 fi
 
+if [ -z "$PKG_CONFIG" ]; then
+    if [ "$(unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL)" = "FAIL" ]; then
+        # $TRIPLET-pkg-config DOESNT WORK
+        # on Debian it pretends it works to autoconf
+        VLC_PKG_CONFIG="pkg-config"
+        if [ -z "$PKG_CONFIG_LIBDIR" ]; then
+            VLC_PKG_CONFIG_LIBDIR="/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        else
+            VLC_PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
+        fi
+        export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
+    fi
+else
+    VLC_PKG_CONFIG="$PKG_CONFIG"
+fi
+export PKG_CONFIG="$VLC_PKG_CONFIG"
+
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
@@ -379,24 +396,6 @@ else
     CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" make -j$JOBS tools
 fi
 cd ../..
-
-if [ -z "$PKG_CONFIG" ]; then
-    if [ "$(unset PKG_CONFIG_LIBDIR; $TRIPLET-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL)" = "FAIL" ]; then
-        # $TRIPLET-pkg-config DOESNT WORK
-        # on Debian it pretends it works to autoconf
-        VLC_PKG_CONFIG="pkg-config"
-        if [ -z "$PKG_CONFIG_LIBDIR" ]; then
-            VLC_PKG_CONFIG_LIBDIR="/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
-        else
-            VLC_PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
-        fi
-        export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
-    else
-        # $TRIPLET-pkg-config WORKs
-        VLC_PKG_CONFIG="$TRIPLET-pkg-config"
-    fi
-    export PKG_CONFIG="$VLC_PKG_CONFIG"
-fi
 
 MCONFIGFLAGS="$MCONFIGFLAGS -Dc_args='${VLC_CFLAGS}' -Dc_link_args='${VLC_LDFLAGS}' -Dcpp_args='${VLC_CXXFLAGS}' -Dcpp_link_args='${VLC_LDFLAGS}'"
 
