@@ -395,6 +395,12 @@ void vlc_preparser_Deactivate( vlc_preparser_t* preparser )
     vlc_preparser_Cancel(preparser, NULL);
 }
 
+void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
+                               vlc_tick_t timeout )
+{
+    preparser->default_timeout = timeout;
+}
+
 void vlc_preparser_Delete( vlc_preparser_t *preparser )
 {
     /* In case vlc_preparser_Deactivate() has not been called */

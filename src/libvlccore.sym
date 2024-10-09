@@ -1045,3 +1045,4 @@ vlc_preparser_Push
 vlc_preparser_Cancel
 vlc_preparser_Delete
 vlc_preparser_Deactivate
+vlc_preparser_SetTimeout
