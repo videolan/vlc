@@ -348,28 +348,59 @@ else
     VLC_PKG_CONFIG="$PKG_CONFIG"
 fi
 
+# generate the config.mak for contribs
+test -e config.mak && unlink config.mak
+exec 3>config.mak || return $?
+
+printf '# This file was automatically generated!\n\n' >&3
+if [ -n "$VLC_CPPFLAGS" ]; then
+    printf '%s := %s\n' "CPPFLAGS" "${VLC_CPPFLAGS}" >&3
+fi
+if [ -n "$VLC_CFLAGS" ]; then
+    printf '%s := %s\n' "CFLAGS" "${VLC_CFLAGS}" >&3
+fi
+if [ -n "$VLC_CXXFLAGS" ]; then
+    printf '%s := %s\n' "CXXFLAGS" "${VLC_CXXFLAGS}" >&3
+fi
+if [ -n "$VLC_LDFLAGS" ]; then
+    printf '%s := %s\n' "LDFLAGS" "${VLC_LDFLAGS}" >&3
+fi
+if [ -n "$VLC_AR" ]; then
+    printf '%s := %s\n' "AR" "${VLC_AR}" >&3
+fi
+if [ -n "$VLC_RANLIB" ]; then
+    printf '%s := %s\n' "RANLIB" "${VLC_RANLIB}" >&3
+fi
+if [ -n "$VLC_PKG_CONFIG" ]; then
+    printf '%s := %s\n' "PKG_CONFIG" "${VLC_PKG_CONFIG}" >&3
+fi
+if [ -n "$VLC_PKG_CONFIG_LIBDIR" ]; then
+    printf '%s := %s\n' "PKG_CONFIG_LIBDIR" "${VLC_PKG_CONFIG_LIBDIR}" >&3
+fi
+
+
 ${VLC_ROOT_PATH}/contrib/bootstrap --host=$TRIPLET --prefix=../$CONTRIB_PREFIX $CONTRIBFLAGS
 
 # Rebuild the contribs or use the prebuilt ones
 if [ "$PREBUILT" = "yes" ]; then
     if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
-        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
+        make prebuilt PREBUILT_URL="$VLC_PREBUILT_CONTRIBS_URL" || PREBUILT_FAILED=yes
     else
-        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make prebuilt || PREBUILT_FAILED=yes
+        make prebuilt || PREBUILT_FAILED=yes
     fi
-    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make .luac
+    make .luac
 else
     PREBUILT_FAILED=yes
 fi
-CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make list
+make list
 if [ -n "$PREBUILT_FAILED" ]; then
-    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make -j$JOBS fetch
-    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make -j$JOBS -k || CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make -j1
+    make -j$JOBS fetch
+    make -j$JOBS -k || make -j1
     if [ "$PACKAGE" = "yes" ]; then
-        CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make package
+        make package
     fi
 else
-    CFLAGS="$VLC_CFLAGS" CXXFLAGS="$VLC_CXXFLAGS" CPPFLAGS="$VLC_CPPFLAGS" LDFLAGS="$VLC_LDFLAGS" AR="$VLC_AR" RANLIB="$VLC_RANLIB" PKG_CONFIG="$VLC_PKG_CONFIG" PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR" make .luac
+    make .luac
 fi
 cd ../..
 
