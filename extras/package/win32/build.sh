@@ -329,10 +329,12 @@ fi
 
 if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     # avoid using gcc-ar with the clang toolchain, if both are installed
-    AR="$TRIPLET-ar"
+    VLC_AR="$TRIPLET-ar"
+    AR="$VLC_AR"
     export AR
     # avoid using gcc-ranlib with the clang toolchain, if both are installed
-    RANLIB="$TRIPLET-ranlib"
+    VLC_RANLIB="$TRIPLET-ranlib"
+    RANLIB="$VLC_RANLIB"
     export RANLIB
 fi
 
