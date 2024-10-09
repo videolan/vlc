@@ -1538,6 +1538,28 @@ base_model_test_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
 check_PROGRAMS = base_model_test
 TESTS = base_model_test
 
+if HAVE_QT_QTEST
+
+LIBVLC = -L../../../lib -lvlc
+
+test_renderer_manager_model_SOURCES = \
+	tests/test_renderer_manager_model.cpp \
+    util/renderer_manager.hpp util/renderer_manager.cpp
+
+nodist_test_renderer_manager_model_SOURCES = \
+	tests/test_renderer_manager_model.moc \
+    util/renderer_manager.moc.cpp
+
+BUILT_SOURCES += tests/test_renderer_manager_model.moc
+CLEANFILES += tests/test_renderer_manager_model.moc
+test_renderer_manager_model_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS) -I$(builddir)/tests -DTOP_BUILDDIR=\"$(abs_top_builddir)\"
+test_renderer_manager_model_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(QT_QTEST_CFLAGS) -fPIC $(CXXFLAGS_qt)
+test_renderer_manager_model_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(LIBVLC)
+test_renderer_manager_model_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
+check_PROGRAMS += test_renderer_manager_model
+TESTS += test_renderer_manager_model
+
+endif
 
 QML_LOG_COMPILER = $(builddir)/qml_test -input
 

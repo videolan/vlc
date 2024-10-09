@@ -1066,18 +1066,18 @@ if qt6_dep.found()
         'link_with' : qmllibs,
     }
 
-    test_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
-    if test_qt6_dep.found()
+    quicktest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
+    if quicktest_qt6_dep.found()
         qml_test_moc = qt6.compile_moc(
             headers : files('tests/qml_test.hpp'),
-            dependencies : [test_qt6_dep, qt6_dep]
+            dependencies : [quicktest_qt6_dep, qt6_dep]
         )
         qml_test = executable(
           'qml_test',
           [files('tests/qml_test.cpp', 'tests/qml_test.hpp'), qml_test_moc],
           qt6pre_qrc,
           build_by_default: false,
-          dependencies: [test_qt6_dep, qt6_dep],
+          dependencies: [quicktest_qt6_dep, qt6_dep],
           link_with: qmllibs,
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
@@ -1101,4 +1101,26 @@ if qt6_dep.found()
         'link_with': [libvlccore],
         'dependencies': [qt6_dep, qt_extra_deps],
     }
+
+    qtest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['Test'], required: false)
+    if qtest_qt6_dep.found()
+        vlc_tests += {
+            'name': 'test_qt_renderer_manager',
+            'sources': files(
+                'tests/test_renderer_manager_model.cpp',
+                'util/renderer_manager.hpp',
+                'util/renderer_manager.cpp'
+            ),
+            'moc_sources': files(
+                'tests/test_renderer_manager_model.cpp'
+            ),
+            'moc_headers': files(
+                'util/renderer_manager.hpp'
+            ),
+            'suite': ['qt'],
+            'include_directories' : qt_include_dir,
+            'link_with': [libvlccore, libvlc],
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+    endif
 endif
