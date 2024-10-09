@@ -747,10 +747,10 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
     {
         switch (fmt->i_format)
         {
+            static_assert(ARRAY_SIZE(formats) >= 3, "fallback array too small");
             case VLC_CODEC_DTS:
                 if (input_profile > 0)
                 {
-                    assert(ARRAY_SIZE(formats) >= 3);
                     /* DTSHD can be played as DTSHD or as DTS */
                     formats[0] = VLC_CODEC_DTSHD;
                     formats[1] = VLC_CODEC_DTS;
@@ -759,7 +759,6 @@ int aout_OutputNew(audio_output_t *aout, vlc_aout_stream *stream,
             case VLC_CODEC_A52:
                 if (input_profile > 0)
                 {
-                    assert(ARRAY_SIZE(formats) >= 3);
                     formats[0] = VLC_CODEC_EAC3;
                     formats[1] = VLC_CODEC_A52;
                 }
