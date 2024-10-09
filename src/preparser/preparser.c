@@ -341,8 +341,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
 
 int vlc_preparser_Push( vlc_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
-    const input_item_parser_cbs_t *cbs, void *cbs_userdata,
-    int timeout_ms, void *id )
+    const input_item_parser_cbs_t *cbs, void *cbs_userdata, void *id )
 {
     if( atomic_load( &preparser->deactivated ) )
         return VLC_EGENERIC;
@@ -350,10 +349,9 @@ int vlc_preparser_Push( vlc_preparser_t *preparser,
     assert(i_options & META_REQUEST_OPTION_PARSE
         || i_options & META_REQUEST_OPTION_FETCH_ANY);
 
-    vlc_tick_t timeout = timeout_ms == -1 ? preparser->default_timeout
-                                          : VLC_TICK_FROM_MS(timeout_ms);
     struct task *task =
-        TaskNew(preparser, item, i_options, cbs, cbs_userdata, id, timeout);
+        TaskNew(preparser, item, i_options, cbs, cbs_userdata, id,
+                preparser->default_timeout);
     if( !task )
         return VLC_ENOMEM;
 

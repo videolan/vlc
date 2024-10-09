@@ -78,9 +78,6 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  * @param option preparse flag, cf @ref input_item_meta_request_option_t
  * @param cbs callback to listen to events (can't be NULL)
  * @param cbs_userdata opaque pointer used by the callbacks
- * @param timeout maximum time allowed to preparse the item. If -1, the default
- * "preparse-timeout" option will be used as a timeout. If 0, it will wait
- * indefinitely. If > 0, the timeout will be used (in milliseconds).
  * @param id unique id provided by the caller. This is can be used to cancel
  * the request with vlc_preparser_Cancel()
  * @returns VLC_SUCCESS if the item was scheduled for preparsing, an error code
@@ -90,8 +87,7 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
 VLC_API int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
                                 input_item_meta_request_option_t option,
                                 const input_item_parser_cbs_t *cbs,
-                                void *cbs_userdata,
-                                int timeout, void *id );
+                                void *cbs_userdata, void *id );
 
 /**
  * This function cancel all preparsing requests for a given id
