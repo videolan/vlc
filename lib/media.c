@@ -811,8 +811,13 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
     parse_scope |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
+    if (timeout == -1)
+        timeout = var_InheritInteger(inst->p_libvlc_int, "preparse-timeout");
+
+    vlc_preparser_SetTimeout(parser, VLC_TICK_FROM_MS(timeout));
+
     ret = vlc_preparser_Push(parser, item, parse_scope,
-                             &preparser_callbacks, media, timeout, media);
+                             &preparser_callbacks, media, -1, media);
     if (ret != VLC_SUCCESS)
     {
         atomic_fetch_sub_explicit(&media->worker_count, 1,
