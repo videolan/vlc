@@ -41,7 +41,9 @@ vlc_playlist_New(vlc_object_t *parent, enum vlc_playlist_preparsing rec,
     if (rec != VLC_PLAYLIST_PREPARSING_DISABLED)
     {
         playlist->parser = vlc_preparser_New(parent, preparse_max_threads,
-                                             preparse_timeout);
+                                             preparse_timeout,
+                                             META_REQUEST_OPTION_PARSE |
+                                             META_REQUEST_OPTION_FETCH_ANY);
         if (playlist->parser == NULL)
         {
             free(playlist);

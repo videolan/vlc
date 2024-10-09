@@ -61,11 +61,15 @@ typedef enum input_item_meta_request_option_t
  * @param obj the parent object
  * @param max_threads the maximum number of threads used to parse, must be >= 1
  * @param default_timeout default timeout of the preparser, 0 for no limits.
+ * @param request_type a combination of META_REQUEST_OPTION_PARSE,
+ * META_REQUEST_OPTION_FETCH_LOCAL and META_REQUEST_OPTION_FETCH_NETWORK, it is
+ * used to setup the executors for each domain.
  * @return a valid preparser object or NULL in case of error
  */
 VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
                                             unsigned max_threads,
-                                            vlc_tick_t default_timeout );
+                                            vlc_tick_t default_timeout,
+                                            input_item_meta_request_option_t request_type );
 
 /**
  * This function enqueues the provided item to be preparsed or fetched.

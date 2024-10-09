@@ -268,7 +268,9 @@ vlc_preparser_t *libvlc_get_preparser(libvlc_instance_t *instance)
 
         parser = instance->parser =
             vlc_preparser_New(VLC_OBJECT(instance->p_libvlc_int), max_threads,
-                              default_timeout);
+                              default_timeout,
+                              META_REQUEST_OPTION_PARSE |
+                              META_REQUEST_OPTION_FETCH_ANY);
     }
     vlc_mutex_unlock(&instance->lazy_init_lock);
 

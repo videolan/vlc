@@ -308,33 +308,50 @@ Interrupt(struct task *task)
 }
 
 vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
-                                    vlc_tick_t default_timeout )
+                                    vlc_tick_t default_timeout,
+                                    input_item_meta_request_option_t request_type )
 {
     assert(max_threads >= 1);
     assert(default_timeout >= 0);
+    assert(request_type & (META_REQUEST_OPTION_FETCH_ANY|META_REQUEST_OPTION_PARSE));
 
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
         return NULL;
 
-    preparser->executor = vlc_executor_New(max_threads);
-    if (!preparser->executor)
+    if (request_type & META_REQUEST_OPTION_PARSE)
     {
-        free(preparser);
-        return NULL;
+        preparser->executor = vlc_executor_New(max_threads);
+        if (!preparser->executor)
+        {
+            free(preparser);
+            return NULL;
+        }
     }
+    else
+        preparser->executor = NULL;
 
     preparser->default_timeout = default_timeout;
 
     preparser->owner = parent;
-    preparser->fetcher = input_fetcher_New( parent, META_REQUEST_OPTION_FETCH_ANY );
+    if (request_type & META_REQUEST_OPTION_FETCH_ANY)
+    {
+        preparser->fetcher = input_fetcher_New(parent, request_type);
+        if (unlikely(preparser->fetcher == NULL))
+        {
+            if (preparser->executor != NULL)
+                vlc_executor_Delete(preparser->executor);
+            free(preparser);
+            return NULL;
+        }
+    }
+    else
+        preparser->fetcher = NULL;
+
     atomic_init( &preparser->deactivated, false );
 
     vlc_mutex_init(&preparser->lock);
     vlc_list_init(&preparser->submitted_tasks);
-
-    if( unlikely( !preparser->fetcher ) )
-        msg_Warn( parent, "unable to create art fetcher" );
 
     return preparser;
 }
@@ -349,20 +366,33 @@ int vlc_preparser_Push( vlc_preparser_t *preparser,
     assert(i_options & META_REQUEST_OPTION_PARSE
         || i_options & META_REQUEST_OPTION_FETCH_ANY);
 
+    assert(!(i_options & META_REQUEST_OPTION_PARSE)
+        || preparser->executor != NULL);
+    assert(!(i_options & META_REQUEST_OPTION_FETCH_ANY)
+        || preparser->fetcher != NULL);
+
     struct task *task =
         TaskNew(preparser, item, i_options, cbs, cbs_userdata, id,
                 preparser->default_timeout);
     if( !task )
         return VLC_ENOMEM;
 
-    PreparserAddTask(preparser, task);
+    if (preparser->executor != NULL)
+    {
+        PreparserAddTask(preparser, task);
 
-    vlc_executor_Submit(preparser->executor, &task->runnable);
-    return VLC_SUCCESS;
+        vlc_executor_Submit(preparser->executor, &task->runnable);
+
+        return VLC_SUCCESS;
+    }
+    return Fetch(task);
 }
 
 void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id )
 {
+    if (preparser->executor == NULL)
+        return; /* TODO: the fetcher should be cancellable too */
+
     vlc_mutex_lock(&preparser->lock);
 
     struct task *task;
@@ -404,7 +434,8 @@ void vlc_preparser_Delete( vlc_preparser_t *preparser )
     /* In case vlc_preparser_Deactivate() has not been called */
     vlc_preparser_Cancel(preparser, NULL);
 
-    vlc_executor_Delete(preparser->executor);
+    if (preparser->executor != NULL)
+        vlc_executor_Delete(preparser->executor);
 
     if( preparser->fetcher )
         input_fetcher_Delete( preparser->fetcher );
