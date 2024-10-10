@@ -98,6 +98,13 @@ T.Pane {
         colorSet: ColorContext.Window
     }
 
+    TextMetrics {
+        id: timeTextMetrics
+        font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
+                                                                                       : VLCStyle.fontSize_normal
+        text: "00--00" // Some extra space to compensate non-monospaced fonts.
+    }
+
     background: Rectangle {
         color: theme.bg.primary
     }
@@ -116,13 +123,16 @@ T.Pane {
         readonly property list<Item> strayItems: [
             T.Label {
                 id: mediaTime
+
+                Layout.preferredWidth: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
+
                 text: {
                     const length = Player.length
                     return Player.time.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0)
                 }
                 color: theme.fg.primary
-                font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
-                                                                                               : VLCStyle.fontSize_normal
+                font: timeTextMetrics.font
+                horizontalAlignment: Text.AlignHCenter
 
                 anchors.left: (parent === pseudoRow) ? parent.left : undefined
                 anchors.verticalCenter: (parent === pseudoRow) ? parent.verticalCenter : undefined
@@ -130,11 +140,14 @@ T.Pane {
             T.Label {
                 id: mediaRemainingTime
 
+                Layout.preferredWidth: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? timeTextMetrics.width : -1
+
                 text: (MainCtx.showRemainingTime && Player.remainingTime.valid())
                       ? "-" + Player.remainingTime.formatHMS()
                       : Player.length.formatHMS()
                 color: mediaTime.color
-                font.pixelSize: mediaTime.font.pixelSize
+                font: timeTextMetrics.font
+                horizontalAlignment: Text.AlignHCenter
 
                 visible: root.showRemainingTime
 
