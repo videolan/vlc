@@ -77,7 +77,6 @@ class PlayerControllerPrivate;
 class PlayerController : public QObject
 {
     Q_OBJECT
-    friend class VLCMenuBar;
 
 public:
     enum ABLoopState {
@@ -483,13 +482,9 @@ signals:
     // Program Event changes
     void epgChanged();
 
-private slots:
-    void menusUpdateAudio( const QString& );
-
 private:
     Q_DECLARE_PRIVATE(PlayerController)
     QScopedPointer<PlayerControllerPrivate> d_ptr;
-    QSignalMapper *menusAudioMapper; //used by VLCMenuBar
 };
 
 #endif

@@ -1169,10 +1169,6 @@ PlayerController::PlayerController( qt_intf_t *_p_intf )
     : QObject(NULL)
     , d_ptr( new PlayerControllerPrivate(this, _p_intf) )
 {
-    /* Audio Menu */
-    menusAudioMapper = new QSignalMapper(this);
-    connect( menusAudioMapper, &QSignalMapper::mappedString,
-             this, &PlayerController::menusUpdateAudio );
     connect( &d_ptr->m_position_timer, &QTimer::timeout, this, &PlayerController::updatePositionFromTimer );
     connect( &d_ptr->m_time_timer, &QTimer::timeout, this, &PlayerController::updateTimeFromTimer );
 }
@@ -1742,14 +1738,6 @@ bool PlayerController::hasAudioVisualization() const
 {
     Q_D(const PlayerController);
     return d->m_audioVisualization.hasCurrent();
-}
-
-
-void PlayerController::menusUpdateAudio( const QString& data )
-{
-    SharedAOut aout = getAout();
-    if( aout )
-        aout_DeviceSet( aout.get(), qtu(data) );
 }
 
 void PlayerController::updatePosition()

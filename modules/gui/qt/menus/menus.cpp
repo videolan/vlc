@@ -423,13 +423,7 @@ void VLCMenuBar::AudioMenu( qt_intf_t *p_intf, QMenu * current )
     {
         current->addMenu(new CheckableListMenu(qtr( "Audio &Track" ), THEMIM->getAudioTracks(), QActionGroup::ExclusionPolicy::ExclusiveOptional, current));
 
-        QAction *audioDeviceAction = new QAction( qtr( "&Audio Device" ), current );
-        QMenu *audioDeviceSubmenu = new QMenu( current );
-        audioDeviceAction->setMenu( audioDeviceSubmenu );
-        current->addAction( audioDeviceAction );
-        connect(audioDeviceSubmenu, &QMenu::aboutToShow, [=]() {
-            updateAudioDevice( p_intf, audioDeviceSubmenu );
-        });
+        current->addMenu(new CheckableListMenu(qtr( "&Audio Device" ), THEMIM->getAudioDevices(), QActionGroup::ExclusionPolicy::Exclusive, current));
 
         VLCVarChoiceModel *mix_mode = THEMIM->getAudioMixMode();
         if (mix_mode->rowCount() == 0)
@@ -878,51 +872,4 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
     if( show )
         menu->popup( QCursor::pos() );
     return menu;
-}
-
-
-/*****************************************************************************
- * Private methods.
- *****************************************************************************/
-
-void VLCMenuBar::updateAudioDevice( qt_intf_t * p_intf, QMenu *current )
-{
-    char **ids, **names;
-    char *selected;
-
-    if( !current )
-        return;
-
-    current->clear();
-    SharedAOut aout = THEMIM->getAout();
-    if (!aout)
-        return;
-
-    int i_result = aout_DevicesList( aout.get(), &ids, &names);
-    if( i_result < 0 )
-        return;
-
-    selected = aout_DeviceGet( aout.get() );
-
-    QActionGroup *actionGroup = new QActionGroup(current);
-    QAction *action;
-
-    for( int i = 0; i < i_result; i++ )
-    {
-        action = new QAction( qfue( names[i] ), actionGroup );
-        action->setData( qfu(ids[i]) );
-        action->setCheckable( true );
-        if( (selected && !strcmp( ids[i], selected ) ) ||
-            (selected == NULL && ids[i] && ids[i][0] == '\0' ) )
-            action->setChecked( true );
-        actionGroup->addAction( action );
-        current->addAction( action );
-        connect(action, &QAction::triggered, THEMIM->menusAudioMapper, QOverload<>::of(&QSignalMapper::map));
-        THEMIM->menusAudioMapper->setMapping(action, ids[i]);
-        free( ids[i] );
-        free( names[i] );
-    }
-    free( ids );
-    free( names );
-    free( selected );
 }
