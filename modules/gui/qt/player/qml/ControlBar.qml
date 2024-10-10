@@ -116,7 +116,10 @@ T.Pane {
         readonly property list<Item> strayItems: [
             T.Label {
                 id: mediaTime
-                text: Player.time.formatHMS()
+                text: {
+                    const length = Player.length
+                    return Player.time.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0)
+                }
                 color: theme.fg.primary
                 font.pixelSize: (textPosition === ControlBar.TimeTextPosition.LeftRightSlider) ? VLCStyle.fontSize_small
                                                                                                : VLCStyle.fontSize_normal
