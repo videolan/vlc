@@ -250,8 +250,12 @@ AbstractButton {
                 text: {
                     if (paintOnly)
                         " -- / -- "
-                    else
-                        Player.time.formatHMS() + " / " + Player.length.formatHMS()
+                    else {
+                        const length = Player.length
+                        return Player.time.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0) +
+                                " / " +
+                                length.formatHMS()
+                    }
                 }
                 color: theme.fg.secondary
             }
