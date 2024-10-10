@@ -71,6 +71,10 @@
 
 #include <QOperatingSystemVersion>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+#include <QStyleHints>
+#endif
+
 #ifdef _WIN32
 #include <QFileInfo>
 #endif
@@ -135,6 +139,31 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
 
     settings = getSettings();
     m_colorScheme = new ColorSchemeModel(this);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    connect(m_colorScheme, &ColorSchemeModel::currentChanged, qGuiApp, [colorScheme = m_colorScheme]() {
+        QStyleHints *const styleHints = qGuiApp->styleHints();
+        if (unlikely(!styleHints))
+            return;
+
+        Qt::ColorScheme scheme;
+        switch (colorScheme->currentScheme())
+        {
+        case ColorSchemeModel::ColorScheme::Day:
+            scheme = Qt::ColorScheme::Light;
+            break;
+        case ColorSchemeModel::ColorScheme::Night:
+            scheme = Qt::ColorScheme::Dark;
+            break;
+        case ColorSchemeModel::ColorScheme::System:
+        default:
+            styleHints->unsetColorScheme();
+            return;
+        }
+
+        styleHints->setColorScheme(scheme);
+    });
+#endif
 
     m_sort = new SortCtx(this);
     m_search = new SearchCtx(this);
