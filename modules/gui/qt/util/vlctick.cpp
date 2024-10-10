@@ -50,13 +50,18 @@ bool VLCTick::valid() const
     return m_ticks != VLC_TICK_INVALID;
 }
 
-QString VLCTick::formatHMS() const
+bool VLCTick::isSubSecond() const
+{
+    return (MS_FROM_VLC_TICK(m_ticks) < 1000);
+}
+
+QString VLCTick::formatHMS(int formatFlags) const
 {
     if (m_ticks == VLC_TICK_INVALID)
         return "--:--";
 
     int64_t t_ms = MS_FROM_VLC_TICK(m_ticks);
-    if (t_ms >= 1000)
+    if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
     {
         //truncate milliseconds toward 0
         int64_t t_sec = t_ms / 1000;
@@ -78,7 +83,7 @@ QString VLCTick::formatHMS() const
         return qtr("%1 ms").arg(MS_FROM_VLC_TICK(m_ticks));
 }
 
-QString VLCTick::formatLong() const
+QString VLCTick::formatLong(int formatFlags) const
 {
     if (m_ticks == VLC_TICK_INVALID)
         return "--:--";
@@ -96,7 +101,7 @@ QString VLCTick::formatLong() const
                 .arg(hour)
                 .arg(min);
     }
-    else if (t_ms >= 1000)
+    else if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
     {
         //round to the nearest second
         t_ms = roundNearestMultiple(t_ms, 1000);
@@ -115,7 +120,7 @@ QString VLCTick::formatLong() const
         return qtr("%1 ms").arg(t_ms);
 }
 
-QString VLCTick::formatShort() const
+QString VLCTick::formatShort(int formatFlags) const
 {
     if (m_ticks == VLC_TICK_INVALID)
         return "--:--";
@@ -133,7 +138,7 @@ QString VLCTick::formatShort() const
                 .arg(hour)
                 .arg(min, 2, 10, QChar('0'));
     }
-    else if (t_ms >= 1000)
+    else if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
     {
         //round to the nearest second
         t_ms = roundNearestMultiple(t_ms, 1000);

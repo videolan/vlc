@@ -30,6 +30,11 @@ class VLCTick
 {
     Q_GADGET
 public:
+    enum FormatFlag {
+        SubSecondFormattedAsMS = 1
+    };
+    Q_ENUM(FormatFlag)
+
     VLCTick();
     VLCTick(vlc_tick_t ticks);
 
@@ -39,6 +44,7 @@ public:
 
     /**
      * @brief formatHMS
+     * @param formatFlags flags to specialize formatting, default is SubSecondFormattedAsMS for legacy reasons
      * @return time as HH:MM:SS
      *
      * this method should be used to present running time or
@@ -46,26 +52,28 @@ public:
      *
      * milliseconds will be truncated towards 0
      */
-    Q_INVOKABLE QString formatHMS() const;
+    Q_INVOKABLE QString formatHMS(int formatFlags = SubSecondFormattedAsMS) const;
 
     /**
      * @brief formatLong
+     * @param formatFlags flags to specialize formatting, default is SubSecondFormattedAsMS for legacy reasons
      * @return time in literal form
      * 1h 2min
      * 5 min
      * 10 sec
      * 43 ms
      */
-    Q_INVOKABLE QString formatLong() const;
+    Q_INVOKABLE QString formatLong(int formatFlags = SubSecondFormattedAsMS) const;
 
     /**
      * @brief formatShort
+     * @param formatFlags flags to specialize formatting, default is SubSecondFormattedAsMS for legacy reasons
      * @return time in literal form
      * 1h02
      * 02:42
      * 43 ms
      */
-    Q_INVOKABLE QString formatShort() const;
+    Q_INVOKABLE QString formatShort(int formatFlags = SubSecondFormattedAsMS) const;
 
 
     Q_INVOKABLE VLCTick scale(float) const;
