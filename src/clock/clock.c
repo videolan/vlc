@@ -744,9 +744,6 @@ static void vlc_clock_slave_reset(vlc_clock_t *clock)
     if (clock->context != NULL && clock->context != ctx)
         vlc_clock_switch_context(clock, ctx);
 
-    main_clock->wait_sync_ref_priority = UINT_MAX;
-    ctx->wait_sync_ref = clock_point_Create(VLC_TICK_INVALID, VLC_TICK_INVALID);
-
     vlc_clock_on_update(clock, VLC_TICK_INVALID, VLC_TICK_INVALID,
                         VLC_TICK_INVALID, 1.0f, 0, 0);
 }
