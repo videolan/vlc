@@ -83,10 +83,13 @@ T.ProgressBar {
         text: {
             let _text
 
+            const length = Player.length
             if (hoverHandler.hovered)
-                _text = Player.length.scale(pos.x / control.width).formatHMS()
+                _text = length.scale(pos.x / control.width)
             else
-                _text = Player.time.formatHMS()
+                _text = Player.time
+
+            _text = _text.formatHMS(length.isSubSecond() ? length.SubSecondFormattedAsMS : 0)
 
             if (Player.hasChapters)
                 _text += " - " + Player.chapters.getNameAtPosition(control._tooltipPosition)
