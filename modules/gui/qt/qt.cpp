@@ -1010,6 +1010,7 @@ static void *Thread( void *obj )
     app.setDesktopFileName( PACKAGE );
 
     DialogErrorModel::getInstance( p_intf );
+    VLCDialogModel::getInstance( p_intf );
 
     /* Initialize the Dialog Provider and the Main Input Manager */
     DialogsProvider::getInstance( p_intf );
@@ -1143,6 +1144,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
      */
     DialogsProvider::killInstance();
 
+    VLCDialogModel::killInstance();
     DialogErrorModel::killInstance();
 
     /* Destroy the main playlist controller */

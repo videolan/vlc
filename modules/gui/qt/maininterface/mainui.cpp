@@ -128,6 +128,8 @@ MainUI::MainUI(qt_intf_t *p_intf, MainCtx *mainCtx, QWindow* interfaceWindow,  Q
     assert(m_intf->p_mainPlaylistController);
     SingletonRegisterHelper<PlaylistController>::setInstance(m_intf->p_mainPlaylistController);
 
+    assert(VLCDialogModel::getInstance<false>());
+    SingletonRegisterHelper<VLCDialogModel>::setInstance(VLCDialogModel::getInstance<false>());
     assert(DialogsProvider::getInstance());
     SingletonRegisterHelper<DialogsProvider>::setInstance(DialogsProvider::getInstance());
 
@@ -252,7 +254,8 @@ void MainUI::registerQMLTypes()
 
         // @uri VLC.Dialogs
         qmlRegisterType<AboutModel>( uri, versionMajor, versionMinor, "AboutModel" );
-        qmlRegisterType<DialogModel>(uri, versionMajor, versionMinor, "DialogModel");
+        qmlRegisterType<VLCDialog>( uri, versionMajor, versionMinor, "VLCDialog" );
+        qmlRegisterSingletonType<VLCDialogModel>(uri, versionMajor, versionMinor, "VLCDialogModel", SingletonRegisterHelper<VLCDialogModel>::callback);
         qmlRegisterUncreatableType<DialogId>( uri, versionMajor, versionMinor, "dialogId", "");
         qmlRegisterSingletonType<DialogsProvider>(uri, versionMajor, versionMinor, "DialogsProvider", SingletonRegisterHelper<DialogsProvider>::callback);
         qmlRegisterSingletonType<DialogErrorModel>(uri, versionMajor, versionMinor, "DialogErrorModel", SingletonRegisterHelper<DialogErrorModel>::callback);

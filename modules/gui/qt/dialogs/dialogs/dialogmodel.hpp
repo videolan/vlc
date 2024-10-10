@@ -31,6 +31,9 @@
 
 // Qt includes
 #include <QAbstractListModel>
+#include <QQmlEngine>
+#include <QMutex>
+#include <QWaitCondition>
 
 #include "qt.hpp"
 #include "util/singleton.hpp"
@@ -119,59 +122,40 @@ private: // Variables
     friend class Singleton<DialogErrorModel>;
 };
 
-class DialogModel : public QObject
+/**
+ * this class expose vlc_dialog events and allow to reply
+ * to use it, instantiate the object, connect the signals then
+ * register it in VLCDialogModel
+ */
+class VLCDialog: public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
-
-public: // Enums
-    // NOTE: Is it really useful to have this declared here ?
-    enum QuestionType { QUESTION_NORMAL, QUESTION_WARNING, QUESTION_CRITICAL };
+public:
+    enum QuestionType {
+        QUESTION_NORMAL = VLC_DIALOG_QUESTION_NORMAL,
+        QUESTION_WARNING = VLC_DIALOG_QUESTION_WARNING,
+        QUESTION_CRITICAL = VLC_DIALOG_QUESTION_CRITICAL
+    };
     Q_ENUM(QuestionType)
 
-public:
-    explicit DialogModel(QObject *parent = nullptr);
-    ~DialogModel();
-
-public: // Interface
+signals:
+    //dialog user actions
     Q_INVOKABLE void post_login(DialogId dialogId, const QString & username,
-                                const QString & password, bool store = false);
+                    const QString & password, bool store = false);
 
     Q_INVOKABLE void post_action1(DialogId dialogId);
     Q_INVOKABLE void post_action2(DialogId dialogId);
 
     Q_INVOKABLE void dismiss(DialogId dialogId);
 
-private: // Static functions
-    static void onLogin(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
-                        const char * psz_text, const char * psz_default_username,
-                        bool b_ask_store);
+    //dialog request
 
-    static void onQuestion(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
-                           const char * psz_text, vlc_dialog_question_type i_type,
-                           const char * psz_cancel, const char * psz_action1,
-                           const char * psz_action2);
-
-    static void onProgress(void * p_data, vlc_dialog_id * dialogId, const char * psz_title,
-                           const char * psz_text, bool b_indeterminate, float f_position,
-                           const char *psz_cancel);
-
-    static void onProgressUpdated(void * p_data, vlc_dialog_id * dialogId, float f_value,
-                                  const char * psz_text);
-
-    static void onCancelled(void * p_data, vlc_dialog_id * dialogId);
-
-public:
-    MainCtx* getCtx() const;
-    void setCtx(MainCtx*);
-
-signals:
     void login(DialogId dialogId, const QString & title,
                const QString & text, const QString & defaultUsername,
                bool b_ask_store);
 
-    void question(DialogId dialogId, const QString & title, const QString & text, int type,
+    void question(DialogId dialogId, const QString & title, const QString & text, QuestionType type,
                   const QString & cancel, const QString & action1, const QString & action2);
 
     void progress(DialogId dialogId, const QString & title, const QString & text,
@@ -180,11 +164,46 @@ signals:
     void progressUpdated(DialogId dialogId, float f_value, const QString & text);
 
     void cancelled(DialogId dialogId);
+};
 
-    void ctxChanged();
+/**
+ * This class listen to vlc_dialog_t events and forward them to VLCDialog
+ */
+class VLCDialogModel : public QObject, public Singleton<VLCDialogModel>
+{
+    Q_OBJECT
+
+    Q_PROPERTY(VLCDialog* provider READ getProvider WRITE setProvider NOTIFY providerChanged FINAL)
+
+public:
+    explicit VLCDialogModel(qt_intf_t* intf, QObject *parent = nullptr);
+    ~VLCDialogModel();
+
+public:
+    VLCDialog* getProvider() const;
+    void setProvider(VLCDialog*);
+
+public:
+    //block dialog until m_provider is available the call the callback on it
+    void dialogCallback(vlc_dialog_id*, std::function<void(VLCDialog* provider)>);
+
+signals:
+    void providerChanged();
 
 private:
-    MainCtx* m_ctx = nullptr;
+    qt_intf_t* m_intf = nullptr;
+    QMutex  m_lock;
+    //waiting for the provider to be set
+    QWaitCondition m_providerWait;
+
+    //during destruction, waiting for dialogCallback to finish
+    QWaitCondition m_pendingDialogCond;
+    unsigned m_pendingDialog = 0;
+
+    VLCDialog* m_provider = nullptr;
+    bool m_shuttingDown = false;
+
+    friend class Singleton<VLCDialogModel>;
 };
 
 #endif // DIALOGMODEL_HPP

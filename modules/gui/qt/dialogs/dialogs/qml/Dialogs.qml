@@ -53,10 +53,10 @@ Item {
 
     Component.onDestruction: {
         if (questionDialog.dialogId !== null) {
-            dialogModel.dismiss(questionDialog.dialogId)
+            vlcDialog.dismiss(questionDialog.dialogId)
             questionDialog.dialogId = null
         } if (loginDialog.dialogId !== null) {
-            dialogModel.dismiss(loginDialog.dialogId)
+            vlcDialog.dismiss(loginDialog.dialogId)
             loginDialog.dialogId = null
         }
     }
@@ -73,18 +73,26 @@ Item {
     // Connections
     //---------------------------------------------------------------------------------------------
 
-    Connections
+    VLCDialog
     {
-        target: dialogModel
+        id: vlcDialog
 
-        function onLogin(dialogId, title, text, defaultUsername, askStore) {
+        Component.onCompleted: {
+            VLCDialogModel.provider = vlcDialog
+        }
+
+        Component.onDestruction: {
+            VLCDialogModel.provider = null
+        }
+
+        onLogin: (dialogId, title, text, defaultUsername, askStore) => {
             loginDialog.dialogId = dialogId
             loginDialog.title = title
             loginDialog.defaultUsername = defaultUsername
             loginDialog.open()
         }
 
-        function onQuestion(dialogId, title, text, type, cancel, action1, action2) {
+        onQuestion: (dialogId, title, text, type, cancel, action1, action2) => {
             questionDialog.dialogId = dialogId
             questionDialog.title = title
             questionDialog.text = text
@@ -94,7 +102,7 @@ Item {
             questionDialog.open()
         }
 
-        function onProgress(dialogId, title, text, indeterminate, position, cancel) {
+        onProgress: (dialogId, title, text, indeterminate, position, cancel) => {
             progressDialog.dialogId = dialogId
             progressDialog.title = title
             progressDialog.text = text
@@ -104,7 +112,7 @@ Item {
             progressDialog.open()
         }
 
-        function onProgressUpdated(dialogId, position, text) {
+        onProgressUpdated: (dialogId, position, text) => {
             if (progressDialog.dialogId !== dialogId) {
                 console.warn("progress event on an inexisting dialog")
                 return
@@ -113,21 +121,21 @@ Item {
             progressDialog.position = position
         }
 
-        function onCancelled(dialogId) {
+        onCancelled: (dialogId) => {
             if (questionDialog.dialogId === dialogId) {
                 questionDialog.close()
                 questionDialog.dialogId = null
-                dialogModel.dismiss(dialogId)
+                dismiss(dialogId)
             } else if (loginDialog.dialogId === dialogId)  {
                 loginDialog.close()
                 loginDialog.dialogId = null
-                dialogModel.dismiss(dialogId)
+                dismiss(dialogId)
             } else if (progressDialog.dialogId === dialogId) {
                 progressDialog.close()
                 progressDialog.dialogId = null
-                dialogModel.dismiss(dialogId)
+                dismiss(dialogId)
             } else {
-                dialogModel.dismiss(dialogId)
+                dismiss(dialogId)
             }
         }
     }
@@ -145,12 +153,6 @@ Item {
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
-
-    DialogModel {
-        id: dialogModel
-        ctx: MainCtx
-    }
-
 
     Widgets.DrawerExt {
         id: errorPopup
@@ -391,13 +393,13 @@ Item {
 
         onAccepted: {
             if (loginDialog.dialogId !== null) {
-                dialogModel.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
+                vlcDialog.post_login(loginDialog.dialogId, username.text, password.text, savePassword.checked)
                 loginDialog.dialogId = null
             }
         }
         onRejected: {
             if (loginDialog.dialogId !== null) {
-                dialogModel.dismiss(loginDialog.dialogId)
+                vlcDialog.dismiss(loginDialog.dialogId)
                 loginDialog.dialogId = null
             }
         }
@@ -466,7 +468,7 @@ Item {
                     text: progressDialog.cancelTxt
 
                     onClicked: {
-                        dialogModel.dismiss(progressDialog.dialogId)
+                        vlcDialog.dismiss(progressDialog.dialogId)
                         progressDialog.dialogId = null
                         progressDialog.close()
                     }
@@ -529,7 +531,7 @@ Item {
                         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.dismiss(questionDialog.dialogId)
+                            vlcDialog.dismiss(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }
@@ -548,7 +550,7 @@ Item {
                         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.post_action1(questionDialog.dialogId)
+                            vlcDialog.post_action1(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }
@@ -565,7 +567,7 @@ Item {
                         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
                         onClicked: {
-                            dialogModel.post_action2(questionDialog.dialogId)
+                            vlcDialog.post_action2(questionDialog.dialogId)
                             questionDialog.dialogId = null
                             questionDialog.close()
                         }
