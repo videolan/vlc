@@ -1541,8 +1541,15 @@ TESTS = base_model_test
 if HAVE_QT_QTEST
 
 LIBVLC = -L../../../lib -lvlc
+QT_QTEST_COMMON_cppflags = $(libqt_plugin_la_CPPFLAGS) -I$(builddir)/tests -DTOP_BUILDDIR=\"$(abs_top_builddir)\"
+QT_QTEST_COMMON_cxxflags = $(AM_CXXFLAGS) $(QT_CFLAGS) $(QT_QTEST_CFLAGS) -fPIC $(CXXFLAGS_qt)
+QT_QTEST_COMMON_ldadd = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(LIBVLC)
+QT_QTEST_COMMON_ldflags = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
+
+# test_renderer_manager_model
 
 test_renderer_manager_model_SOURCES = \
+	tests/vlc_stub_modules.cpp \
 	tests/test_renderer_manager_model.cpp \
     util/renderer_manager.hpp util/renderer_manager.cpp
 
@@ -1552,10 +1559,10 @@ nodist_test_renderer_manager_model_SOURCES = \
 
 BUILT_SOURCES += tests/test_renderer_manager_model.moc
 CLEANFILES += tests/test_renderer_manager_model.moc
-test_renderer_manager_model_CPPFLAGS = $(libqt_plugin_la_CPPFLAGS) -I$(builddir)/tests -DTOP_BUILDDIR=\"$(abs_top_builddir)\"
-test_renderer_manager_model_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(QT_QTEST_CFLAGS) -fPIC $(CXXFLAGS_qt)
-test_renderer_manager_model_LDADD = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(LIBVLC)
-test_renderer_manager_model_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
+test_renderer_manager_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_renderer_manager_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_renderer_manager_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_renderer_manager_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_renderer_manager_model
 TESTS += test_renderer_manager_model
 

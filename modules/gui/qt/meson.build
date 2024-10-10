@@ -1107,6 +1107,7 @@ if qt6_dep.found()
         vlc_tests += {
             'name': 'test_qt_renderer_manager',
             'sources': files(
+                'tests/vlc_stub_modules.cpp',
                 'tests/test_renderer_manager_model.cpp',
                 'util/renderer_manager.hpp',
                 'util/renderer_manager.cpp'

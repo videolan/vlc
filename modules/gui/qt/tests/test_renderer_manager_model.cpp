@@ -15,122 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-/* Define a builtin module for mocked parts */
-#define MODULE_NAME renderer_manager_test
-#undef VLC_DYNAMIC_PLUGIN
-
-#include "../../../../test/libvlc/test.h"
-
-#include <vlc/vlc.h>
-
-#include <vlc_common.h>
-#include <vlc_plugin.h>
-#include <vlc_playlist.h>
-#include <vlc_services_discovery.h>
-#include <vlc_renderer_discovery.h>
-#include <vlc_probe.h>
-#include <vlc_interface.h>
-#include <vlc_player.h>
-
-#include "../../../../lib/libvlc_internal.h"
-
-#include "qt.hpp"
-
-namespace vlc {
-class Compositor {};
-}
-
-static vlc_renderer_discovery_t* g_rd = nullptr;
-static bool g_rd_probe_enabled = false;
-
-static int OpenRD( vlc_object_t* p_this )
-{
-    g_rd = (vlc_renderer_discovery_t *)p_this;
-    return VLC_SUCCESS;
-}
-
-static void CloseRD( vlc_object_t* )
-{
-    g_rd = nullptr;
-
-}
-
-static int vlc_rd_probe_open(vlc_object_t *obj) {
-    auto probe = (struct vlc_probe_t *)obj;
-
-    if (g_rd_probe_enabled)
-        vlc_rd_probe_add(probe, "rd", "a fake renderer for testing purpose");
-    //only probe ourself
-    return VLC_PROBE_STOP;
-}
-
-static qt_intf_t* g_intf = nullptr;
-
-static int OpenIntf(vlc_object_t* p_this)
-{
-    auto intfThread = reinterpret_cast<intf_thread_t*>(p_this);
-    libvlc_int_t* libvlc = vlc_object_instance( p_this );
-
-    /* Ensure initialization of objects in qt_intf_t. */
-    g_intf = vlc_object_create<qt_intf_t>( libvlc );
-    if (!g_intf)
-        return VLC_ENOMEM;
-
-    g_intf->obj.logger = vlc_LogHeaderCreate(libvlc->obj.logger, "qt");
-    if (!g_intf->obj.logger)
-    {
-        vlc_object_delete(g_intf);
-        return VLC_EGENERIC;
-    }
-    g_intf->intf = intfThread;
-    intfThread->p_sys = reinterpret_cast<intf_sys_t*>(g_intf);
-    return VLC_SUCCESS;
-}
-
-static void CloseIntf( vlc_object_t *p_this )
-{
-    intf_thread_t* intfThread = (intf_thread_t*)(p_this);
-    auto p_intf = reinterpret_cast<qt_intf_t*>(intfThread->p_sys);
-    if (!p_intf)
-        return;
-    vlc_LogDestroy(p_intf->obj.logger);
-    vlc_object_delete(p_intf);
-}
-
-vlc_module_begin()
-    set_callbacks(OpenIntf, CloseIntf)
-    set_capability("interface", 0)
-add_submodule()
-    set_capability("renderer_discovery", 0)
-    add_shortcut("rd")
-    set_callbacks(OpenRD, CloseRD)
-add_submodule()
-    set_capability("renderer probe", 10000)
-    set_callback(vlc_rd_probe_open)
-vlc_module_end()
-
-extern "C" {
-
-const char vlc_module_name[] = MODULE_STRING;
-VLC_EXPORT vlc_plugin_cb vlc_static_modules[] = {
-    VLC_SYMBOL(vlc_entry),
-    NULL
-};
-}
-
 #include <QTest>
 #include <QAbstractItemModelTester>
+
+#include "vlc_stub_modules.hpp"
+
 #include "../util/renderer_manager.hpp"
-#include <vlc_cxx_helpers.hpp>
 
 using RendererItemPtr = vlc_shared_data_ptr_type(vlc_renderer_item_t,
     vlc_renderer_item_hold,
     vlc_renderer_item_release);
-
 
 class TestClass : public QObject
 {
@@ -143,7 +37,7 @@ private:
         RendererItemPtr item(vlc_renderer_item_new(
                 "type", qtu(name), qtu(sout), "extra sout",
                 nullptr, "icon://", i ));
-        vlc_rd_add_item( g_rd, item.get() );
+        vlc_rd_add_item( rd(), item.get() );
         return item;
     }
 
@@ -158,47 +52,49 @@ private:
         QCOMPARE(m_model->data(idx, RendererManager::FLAGS), id);
     }
 
+    vlc_renderer_discovery_t* rd() const
+    {
+        return m_env->renderDiscovery;
+    }
+
 private slots:
     void initTestCase() {
-        test_init();
-
-        m_vlc = libvlc_new(test_defaults_nargs, test_defaults_args);
-        libvlc_InternalAddIntf(m_vlc->p_libvlc_int, MODULE_STRING);
-        libvlc_InternalPlay(m_vlc->p_libvlc_int);
-
-        m_playlist = vlc_intf_GetMainPlaylist(g_intf->intf);
-        m_player = vlc_playlist_GetPlayer( m_playlist );
+        m_env = std::make_unique<VLCTestingEnv>();
+        QVERIFY(m_env->init());
+        m_player = m_env->intf->p_player;
     }
 
     void cleanupTestCase() {
-        libvlc_release(m_vlc);
+        m_player = nullptr;
+        m_env.reset();
     }
 
     void init() {
-        g_rd_probe_enabled = true;
-        m_model = new RendererManager(g_intf, m_player);
+        m_env->renderDiscoveryProbeEnabled = true;
+
+        m_model = new RendererManager(m_env->intf, m_player);
         //QAbstractItemModelTester checks that QAbstractItemModel events are coherents
-        m_modelTester = new QAbstractItemModelTester(m_model);
-        QVERIFY(g_rd == nullptr);
+        m_modelTester = std::make_unique<QAbstractItemModelTester>(m_model);
+        QVERIFY(rd() == nullptr);
     }
 
     void cleanup() {
-        delete m_modelTester;
+        m_modelTester.reset();
         delete m_model;
-        QVERIFY(g_rd == nullptr);
+        QVERIFY(rd() == nullptr);
     }
 
     void testEmpty() {
-        QVERIFY(g_rd == nullptr);
+        QVERIFY(rd() == nullptr);
         //model is empty before scan
         QCOMPARE(m_model->rowCount(), 0);
         m_model->StartScan();
-        QVERIFY(g_rd != nullptr);
+        QVERIFY(rd() != nullptr);
         QCOMPARE(m_model->rowCount(), 0);
         QCOMPARE(m_model->getStatus(), RendererManager::RUNNING);
         //scan didn't find anything
         m_model->StopScan();
-        QVERIFY(g_rd == nullptr);
+        QVERIFY(rd() == nullptr);
         QCOMPARE(m_model->rowCount(), 0);
         QCOMPARE(m_model->getStatus(), RendererManager::IDLE);
     }
@@ -209,7 +105,7 @@ private slots:
         QCOMPARE(m_model->rowCount(), 0);
         QCOMPARE(m_model->getStatus(), RendererManager::RUNNING);
 
-        QVERIFY(g_rd != nullptr);
+        QVERIFY(rd() != nullptr);
 
         for (int i = 0; i < 5; ++i) {
             pushDummyRDItem(i);
@@ -227,12 +123,12 @@ private slots:
         }
 
         //module is closed
-        QVERIFY(g_rd == nullptr);
+        QVERIFY(rd() == nullptr);
     }
 
     void testTwoPassesIdentical() {
         m_model->StartScan();
-        QVERIFY(g_rd != nullptr);
+        QVERIFY(rd() != nullptr);
         QCOMPARE(m_model->rowCount(), 0);
         for (int i = 0; i < 5; ++i) {
             pushDummyRDItem(i);
@@ -290,7 +186,7 @@ private slots:
             pushDummyRDItem(i);
         }
         QCOMPARE(m_model->rowCount(), 7);
-        vlc_rd_remove_item(g_rd, item.get());
+        vlc_rd_remove_item(rd(), item.get());
         QCOMPARE(m_model->rowCount(), 6);
         m_model->StopScan();
         QCOMPARE(m_model->rowCount(), 6);
@@ -423,7 +319,7 @@ private slots:
 
         //selected item is removed
         QCOMPARE(m_model->rowCount(), 5);
-        vlc_rd_remove_item( g_rd, r3.get() );
+        vlc_rd_remove_item( rd(), r3.get() );
 
         //item is held by model
         QCOMPARE(m_model->useRenderer(), true);
@@ -439,11 +335,11 @@ private slots:
 
         //item should be gone after next scan
         m_model->StartScan();
-        vlc_rd_add_item( g_rd, r0.get() );
-        vlc_rd_add_item( g_rd, r1.get() );
-        vlc_rd_add_item( g_rd, r2.get() );
+        vlc_rd_add_item( rd(), r0.get() );
+        vlc_rd_add_item( rd(), r1.get() );
+        vlc_rd_add_item( rd(), r2.get() );
         //no r3
-        vlc_rd_add_item( g_rd, r4.get() );
+        vlc_rd_add_item( rd(), r4.get() );
         m_model->StopScan();
         QCOMPARE(m_model->rowCount(), 4);
 
@@ -451,8 +347,8 @@ private slots:
         selidx = m_model->index(2);
         m_model->setData(selidx, true, RendererManager::SELECTED);
         m_model->StartScan();
-        vlc_rd_add_item( g_rd, r0.get() );
-        vlc_rd_add_item( g_rd, r1.get() );
+        vlc_rd_add_item( rd(), r0.get() );
+        vlc_rd_add_item( rd(), r1.get() );
         m_model->StopScan();
         QCOMPARE(m_model->rowCount(), 3);
         QCOMPARE(m_model->data(selidx, RendererManager::SELECTED), true);
@@ -472,20 +368,20 @@ private slots:
 
     //failed state when no renderer manager is found
     void testNoProbes() {
-        g_rd_probe_enabled = false;
+        m_env->renderDiscoveryProbeEnabled = false;
         QCOMPARE(m_model->getStatus(), RendererManager::IDLE);
         m_model->StartScan();
         QCOMPARE(m_model->getStatus(), RendererManager::FAILED);
         QCOMPARE(m_model->rowCount(), 0);
-        QVERIFY(g_rd == nullptr);
-        g_rd_probe_enabled = true;
+        QVERIFY(rd() == nullptr);
+        m_env->renderDiscoveryProbeEnabled = true;
     }
 private:
-    libvlc_instance_t* m_vlc = nullptr;
-    vlc_playlist_t* m_playlist = nullptr;
+
+    std::unique_ptr<VLCTestingEnv> m_env;
     vlc_player_t* m_player = nullptr;
-    QAbstractItemModelTester* m_modelTester = nullptr;
-    RendererManager* m_model;
+    std::unique_ptr<QAbstractItemModelTester> m_modelTester;
+    RendererManager* m_model = nullptr;
 };
 
 QTEST_GUILESS_MAIN(TestClass)
