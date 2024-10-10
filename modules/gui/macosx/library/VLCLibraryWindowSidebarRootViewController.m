@@ -22,6 +22,7 @@
 
 #import "VLCLibraryWindowSidebarRootViewController.h"
 
+#import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -55,6 +56,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
     self.mainVideoModeEnabled = NO;
 
+    [self setupPlaylistTitle];
+
     _playlistSidebarViewController =
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
@@ -78,6 +81,31 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
                                name:VLCPlayerTitleListChanged
                              object:nil];
 }
+
+- (void)setupPlaylistTitle
+{
+    _playlistHeaderLabel = [[NSTextField alloc] init];
+    self.playlistHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.playlistHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.playlistHeaderLabel.stringValue = _NS("Playlist");
+    self.playlistHeaderLabel.editable = NO;
+    self.playlistHeaderLabel.bezeled = NO;
+    self.playlistHeaderLabel.drawsBackground = NO;
+    self.playlistHeaderLabel.textColor = NSColor.headerTextColor;
+
+    [self.view addSubview:self.playlistHeaderLabel];
+    _playlistHeaderTopConstraint = 
+        [self.playlistHeaderLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor
+                                                           constant:VLCLibraryUIUnits.smallSpacing];
+    [NSLayoutConstraint activateConstraints:@[
+        self.playlistHeaderTopConstraint,
+        [self.playlistHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
+                                                              constant:-VLCLibraryUIUnits.smallSpacing],
+        [self.playlistHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
+                                                               constant:VLCLibraryUIUnits.smallSpacing] 
+    ]];
+} 
+
 
 - (void)titleListChanged:(NSNotification *)notification
 {

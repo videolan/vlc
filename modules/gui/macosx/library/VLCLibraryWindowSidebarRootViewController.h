@@ -40,6 +40,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 
+@property (readonly) NSLayoutConstraint *playlistHeaderTopConstraint;
+@property (readonly) NSTextField *playlistHeaderLabel;
+
 @property (readonly) VLCLibraryWindowPlaylistSidebarViewController *playlistSidebarViewController;
 @property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
 
