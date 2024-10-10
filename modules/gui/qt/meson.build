@@ -1121,7 +1121,28 @@ if qt6_dep.found()
             'suite': ['qt'],
             'include_directories' : qt_include_dir,
             'link_with': [libvlccore, libvlc],
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep]
+        }
+
+        vlc_tests += {
+            'name': 'test_qt_dialog_model',
+            'sources': files(
+                'tests/vlc_stub_modules.cpp',
+                'tests/test_vlc_dialog_model.cpp',
+                'dialogs/dialogs/dialogmodel.hpp',
+                'dialogs/dialogs/dialogmodel.cpp'
+            ),
+            'moc_sources': files(
+                'tests/test_vlc_dialog_model.cpp'
+            ),
+            'moc_headers': files(
+                'dialogs/dialogs/dialogmodel.hpp'
+            ),
+            'suite': ['qt'],
+            'include_directories' : qt_include_dir,
+            'link_with': [libvlccore, libvlc],
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
         }
+
     endif
 endif

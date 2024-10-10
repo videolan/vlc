@@ -1566,6 +1566,26 @@ test_renderer_manager_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_renderer_manager_model
 TESTS += test_renderer_manager_model
 
+# test_vlc_dialog_model
+
+test_vlc_dialog_model_SOURCES = \
+	tests/vlc_stub_modules.cpp \
+	tests/test_vlc_dialog_model.cpp \
+	dialogs/dialogs/dialogmodel.cpp
+
+nodist_test_vlc_dialog_model_SOURCES = \
+	tests/test_vlc_dialog_model.moc \
+	dialogs/dialogs/dialogmodel.moc.cpp
+
+BUILT_SOURCES += tests/test_vlc_dialog_model.moc
+CLEANFILES += tests/test_vlc_dialog_model.moc
+test_vlc_dialog_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_vlc_dialog_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_vlc_dialog_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_vlc_dialog_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_vlc_dialog_model
+TESTS += test_vlc_dialog_model
+
 endif
 
 QML_LOG_COMPILER = $(builddir)/qml_test -input
