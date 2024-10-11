@@ -33,6 +33,7 @@
 #include "playlist/playlist_model.hpp"
 #include "playlist/playlist_controller.hpp"
 
+#include "util/csdmenu.hpp"
 #include "util/item_key_event_filter.hpp"
 #include "util/imageluminanceextractor.hpp"
 #include "util/keyhelper.hpp"
@@ -182,8 +183,8 @@ void MainUI::registerQMLTypes()
         qmlRegisterUncreatableType<VLCVarChoiceModel>(uri, versionMajor, versionMinor, "VLCVarChoiceModel", "generic variable with choice model" );
         qmlRegisterUncreatableType<CSDButton>(uri, versionMajor, versionMinor, "CSDButton", "");
         qmlRegisterUncreatableType<CSDButtonModel>(uri, versionMajor, versionMinor, "CSDButtonModel", "has CSD buttons and provides for communicating CSD events between UI and backend");
+        qmlRegisterTypesAndRevisions<CSDMenu>( uri, versionMajor);
         qmlRegisterUncreatableType<NavigationAttached>( uri, versionMajor, versionMinor, "Navigation", "Navigation is only available via attached properties");
-
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }

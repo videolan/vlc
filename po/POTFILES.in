@@ -884,6 +884,7 @@ modules/gui/qt/qt.hpp
 modules/gui/qt/util/color_scheme_model.cpp
 modules/gui/qt/util/covergenerator.cpp
 modules/gui/qt/util/covergenerator.hpp
+modules/gui/qt/util/csdmenu.cpp
 modules/gui/qt/util/imagehelper.cpp
 modules/gui/qt/util/imagehelper.hpp
 modules/gui/qt/util/qt_dirs.cpp
