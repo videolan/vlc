@@ -18,20 +18,18 @@
 
 //CSD is only supported on Qt 5.15
 import QtQuick
-import QtQuick.Window
 
 import VLC.MainInterface
 
 Item {
+    property alias csdMenuVisible: csdMenu.menuVisible
+
     TapHandler {
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onSingleTapped: (eventPoint, button) => {
             if (button & Qt.RightButton) {
-                const systemButton = MainCtx.csdButtonModel.systemMenuButton
-                if (systemButton) {
-                    systemButton.showSystemMenu(eventPoint.position)
-                }
+                csdMenu.popup(parent.mapToGlobal(eventPoint.position.x, eventPoint.position.y))
             }
         }
 
@@ -65,4 +63,8 @@ Item {
         }
     }
 
+    CSDMenu {
+        id: csdMenu
+        ctx: MainCtx
+    }
 }

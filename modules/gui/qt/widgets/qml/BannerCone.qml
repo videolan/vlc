@@ -27,8 +27,8 @@ import VLC.Util
 Image {
     id: root
 
-    property var button: MainCtx.csdButtonModel.systemMenuButton
     required property color color
+    property alias csdMenuVisible: csdMenu.menuVisible
 
     sourceSize.width: VLCStyle.icon_normal
     sourceSize.height: VLCStyle.icon_normal
@@ -39,41 +39,39 @@ Image {
 
     focus: false
 
-    Loader {
-        anchors.fill: root
-        enabled: MainCtx.clientSideDecoration && root.button
+    TapHandler {
+        enabled:  MainCtx.clientSideDecoration
 
-        sourceComponent: MouseArea {
-            onClicked: { root.button.click() }
-            onDoubleClicked: { root.button.doubleClick() }
+        gesturePolicy: TapHandler.WithinBounds
 
-            Connections {
-                // don't target MouseArea for position since we
-                // need position updates of cone, inresepect of BannerSources
-                // to correctly track cone's global position
-                target: root
-
-                // handles VLCStyle.scale changes
-                function onXChanged() { Qt.callLater(root.updateRect) }
-                function onYChanged() { Qt.callLater(root.updateRect) }
-                function onWidthChanged() { Qt.callLater(root.updateRect) }
-                function onHeightChanged() { Qt.callLater(root.updateRect) }
+        onSingleTapped: (eventPoint, button) => {
+            if (button === Qt.LeftButton){
+                doubleTapFilter.start()
             }
+        }
 
-            Connections {
-                target: VLCStyle
-
-                // handle window resize
-                function onAppWidthChanged() { Qt.callLater(root.updateRect) }
-                function onAppHeightChanged() { Qt.callLater(root.updateRect) }
+        onDoubleTapped: (eventPoint, button) => {
+            if (button === Qt.LeftButton) {
+                doubleTapFilter.stop()
+                MainCtx.intfMainWindow.close()
             }
         }
     }
 
-    function updateRect() {
-        const rect = root.mapToItem(null, 0, 0, width, height)
+    CSDMenu {
+        id: csdMenu
+        ctx: MainCtx
+    }
 
-        if (button)
-            button.rect = rect
+    //SingleTapped is always notified, perform the action only if the double tap doesn't occur
+    Timer {
+        id: doubleTapFilter
+
+        interval: VLCStyle.duration_short
+
+        onTriggered: {
+            //popup below the widget
+            csdMenu.popup(root.mapToGlobal(0, root.height + VLCStyle.margin_xxsmall))
+        }
     }
 }

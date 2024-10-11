@@ -276,13 +276,7 @@ FocusScope{
 
                 color: theme.accent
 
-                Connections {
-                    target: logo.button
-
-                    function onSystemMenuVisibilityChanged() {
-                        root.requestLockUnlockAutoHide(visible)
-                    }
-                }
+                onCsdMenuVisibleChanged: root.requestLockUnlockAutoHide(csdMenuVisible)
             }
         }
 
