@@ -58,6 +58,8 @@ $(TARBALLS)/x264-$(X264_VERSION).tar.xz:
 	touch $@
 
 .sum-x264: x264-$(X264_VERSION).tar.xz
+	$(call check_githash,$(X264_VERSION))
+	touch $@
 
 x264 x26410b: %: x264-$(X264_VERSION).tar.xz .sum-%
 	$(UNPACK)
