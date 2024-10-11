@@ -53,11 +53,49 @@ struct filter_sys_t
     date_t                         next_output_pts;
 };
 
-static picture_t *PictureFromTexture(filter_t *filter, d3d11_device_t *d3d_dev, ID3D11Texture2D *out)
+struct d3d11amf_pic_context
+{
+    struct d3d11_pic_context  ctx;
+    AMFData                   *data;
+};
+
+#define D3D11AMF_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
+    container_of((pic_ctx), struct d3d11amf_pic_context, ctx.s)
+
+
+static void d3d11amf_pic_context_destroy(picture_context_t *ctx)
+{
+    struct d3d11amf_pic_context *pic_ctx = D3D11AMF_PICCONTEXT_FROM_PICCTX(ctx);
+    struct AMFData *data = pic_ctx->data;
+    static_assert(offsetof(struct d3d11amf_pic_context, ctx.s) == 0,
+        "Cast assumption failure");
+    d3d11_pic_context_destroy(ctx);
+    data->pVtbl->Release(data);
+}
+
+static picture_context_t *d3d11amf_pic_context_copy(picture_context_t *ctx)
+{
+    struct d3d11amf_pic_context *src_ctx = D3D11AMF_PICCONTEXT_FROM_PICCTX(ctx);
+    struct d3d11amf_pic_context *pic_ctx = malloc(sizeof(*pic_ctx));
+    if (unlikely(pic_ctx==NULL))
+        return NULL;
+    *pic_ctx = *src_ctx;
+    vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
+    pic_ctx->data->pVtbl->Acquire(pic_ctx->data);
+    for (int i=0;i<DXGI_MAX_SHADER_VIEW; i++)
+    {
+        pic_ctx->ctx.picsys.resource[i]  = src_ctx->ctx.picsys.resource[i];
+        pic_ctx->ctx.picsys.renderSrc[i] = src_ctx->ctx.picsys.renderSrc[i];
+    }
+    AcquireD3D11PictureSys(&pic_ctx->ctx.picsys);
+    return &pic_ctx->ctx.s;
+}
+
+static picture_t *PictureFromTexture(filter_t *filter, d3d11_device_t *d3d_dev, ID3D11Texture2D *out, AMFData* data)
 {
     struct filter_sys_t *sys = filter->p_sys;
 
-    struct d3d11_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
+    struct d3d11amf_pic_context *pic_ctx = calloc(1, sizeof(*pic_ctx));
     if (unlikely(pic_ctx == NULL))
         return NULL;
 
@@ -67,19 +105,20 @@ static picture_t *PictureFromTexture(filter_t *filter, d3d11_device_t *d3d_dev, 
         msg_Err(filter, "Failed to map create the temporary picture.");
         goto done;
     }
-    p_dst->context = &pic_ctx->s;
+    p_dst->context = &pic_ctx->ctx.s;
 
     D3D11_PictureAttach(p_dst, out, sys->cfg);
 
     if (unlikely(D3D11_AllocateResourceView(vlc_object_logger(filter), d3d_dev->d3ddevice, sys->cfg,
-                                            pic_ctx->picsys.texture, 0, pic_ctx->picsys.renderSrc) != VLC_SUCCESS))
+                                            pic_ctx->ctx.picsys.texture, 0, pic_ctx->ctx.picsys.renderSrc) != VLC_SUCCESS))
         goto done;
 
-    pic_ctx->s = (picture_context_t) {
-        d3d11_pic_context_destroy, d3d11_pic_context_copy,
+    pic_ctx->ctx.s = (picture_context_t) {
+        d3d11amf_pic_context_destroy, d3d11amf_pic_context_copy,
         vlc_video_context_Hold(filter->vctx_out),
     };
-    pic_ctx->picsys.sharedHandle = INVALID_HANDLE_VALUE;
+    pic_ctx->ctx.picsys.sharedHandle = INVALID_HANDLE_VALUE;
+    pic_ctx->data = data;
 
     return p_dst;
 done:
@@ -142,10 +181,12 @@ static picture_t * Filter(filter_t *filter, picture_t *p_pic)
 
         assert(amfOutput->pVtbl->GetMemoryType(amfOutput) == AMF_MEMORY_DX11);
         ID3D11Texture2D *out = packed->pVtbl->GetNative(packed);
-        picture_t *dst = PictureFromTexture(filter, &dev_sys->d3d_dev, out);
-        amfOutput->pVtbl->Release(amfOutput);
+        picture_t *dst = PictureFromTexture(filter, &dev_sys->d3d_dev, out, amfOutput);
         if (dst == NULL)
+        {
+            amfOutput->pVtbl->Release(amfOutput);
             break;
+        }
 
         picture_CopyProperties(dst, p_pic);
         if (!got_output)
