@@ -510,6 +510,8 @@ if host_system == 'windows'
         'maininterface/compositor_win7.cpp',
         'maininterface/compositor_win7.hpp',
         'style/windowsthemeprovider.cpp',
+        'util/csdmenu_win32.c',
+        'util/csdmenu_win32.h',
     )
 
     if cdata.has('HAVE_DCOMP_H')

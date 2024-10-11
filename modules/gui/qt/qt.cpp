@@ -72,6 +72,7 @@ extern "C" char **environ;
 #ifdef _WIN32
 # include "maininterface/mainctx_win32.hpp"
 #include "maininterface/win32windoweffects_module.hpp"
+#include "util/csdmenu_win32.h"
 #else
 # include "maininterface/mainctx.hpp"   /* MainCtx creation */
 #endif
@@ -469,6 +470,11 @@ vlc_module_begin ()
         set_description( "Provides window effects on Windows." )
         set_capability( "qtwindoweffects", 10 )
         set_callback( QtWin32WindowEffectsOpen )
+    add_submodule ()
+        add_shortcut( "QtWin32CSDMenu" )
+        set_description( "Provides csd menu on Windows." )
+        set_capability( "qtcsdmenu", 10 )
+        set_callback( QtWin32CSDMenuOpen )
 #endif
     add_submodule()
         set_capability("qt theme provider", 1)

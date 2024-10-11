@@ -533,7 +533,9 @@ libqt_plugin_la_SOURCES += \
 	maininterface/compositor_win7.hpp \
 	style/windowsthemeprovider.cpp \
 	maininterface/win32windoweffects_module.cpp \
-	maininterface/win32windoweffects_module.hpp
+	maininterface/win32windoweffects_module.hpp \
+	util/csdmenu_win32.c \
+	util/csdmenu_win32.h
 
 nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
 	maininterface/compositor_win7.moc.cpp
