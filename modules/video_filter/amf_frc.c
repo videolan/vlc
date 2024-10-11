@@ -24,6 +24,8 @@
 
 #include <assert.h>
 
+static GUID  AMFVLCTextureArrayIndexGUID = { 0x28115527, 0xe7c3, 0x4b66, {0x99, 0xd3, 0x4f, 0x2a, 0xe6, 0xb4, 0x7f, 0xaf} };
+
 static const char *const ppsz_filter_options[] = {
     "frc-indicator", NULL
 };
@@ -44,7 +46,6 @@ struct filter_sys_t
 {
     struct vlc_amf_context         amf;
     AMFComponent                   *amf_frc;
-    AMFSurface                     *amfInput;
     const d3d_format_t             *cfg;
 
     enum AMF_FRC_MODE_TYPE         mode;
@@ -95,39 +96,23 @@ static picture_t * Filter(filter_t *filter, picture_t *p_pic)
     picture_sys_d3d11_t *src_sys = ActiveD3D11PictureSys(p_pic);
 
     AMF_RESULT res;
-    AMFSurface *submitSurface;
-
-    AMFPlane *packedStaging = sys->amfInput->pVtbl->GetPlane(sys->amfInput, AMF_PLANE_PACKED);
-    ID3D11Resource *amfStaging = packedStaging->pVtbl->GetNative(packedStaging);
-
-#ifndef NDEBUG
-    ID3D11Texture2D *staging = (ID3D11Texture2D *)amfStaging;
-    D3D11_TEXTURE2D_DESC stagingDesc, inputDesc;
-    ID3D11Texture2D_GetDesc(staging, &stagingDesc);
-    ID3D11Texture2D_GetDesc(src_sys->texture[KNOWN_DXGI_INDEX], &inputDesc);
-    assert(stagingDesc.Width == inputDesc.Width);
-    assert(stagingDesc.Height == inputDesc.Height);
-    assert(stagingDesc.Format == inputDesc.Format);
-#endif
+    AMFSurface *submitSurface = NULL;
 
     d3d11_decoder_device_t *dev_sys = GetD3D11OpaqueContext( filter->vctx_in );
 
-#if 0
-    if (src_sys->slice_index == 0)
-    sys->amf.Context->pVtbl->CreateSurfaceFromDX11Native(sys->amf.Context, )
-#endif
-    // copy source into staging as it may not be shared and we can't select a slice
-    d3d11_device_lock( &dev_sys->d3d_dev );
-    ID3D11DeviceContext_CopySubresourceRegion(dev_sys->d3d_dev.d3dcontext, amfStaging,
-                                            0,
-                                            0, 0, 0,
-                                            src_sys->resource[KNOWN_DXGI_INDEX],
-                                            src_sys->slice_index,
-                                            NULL);
-    d3d11_device_unlock( &dev_sys->d3d_dev );
-    submitSurface = sys->amfInput;
+    res = sys->amf.Context->pVtbl->CreateSurfaceFromDX11Native(sys->amf.Context, (void*)src_sys->resource[KNOWN_DXGI_INDEX], &submitSurface, NULL);
+    if (res != AMF_OK)
+    {
+        msg_Err(filter, "filter surface allocation failed (err=%d)", res);
+        if (submitSurface)
+            submitSurface->pVtbl->Release(submitSurface);
+        return p_pic;
+    }
+    amf_int subResourceIndex = src_sys->slice_index;
+    ID3D11Resource_SetPrivateData(src_sys->resource[KNOWN_DXGI_INDEX], &AMFVLCTextureArrayIndexGUID, sizeof(subResourceIndex), &subResourceIndex);
 
     res = sys->amf_frc->pVtbl->SubmitInput(sys->amf_frc, (AMFData*)submitSurface);
+    submitSurface->pVtbl->Release(submitSurface);
     if (res == AMF_INPUT_FULL)
     {
         msg_Dbg(filter, "filter input full, skip this frame");
@@ -192,7 +177,6 @@ static picture_t * Filter(filter_t *filter, picture_t *p_pic)
 static void D3D11CloseAMFFRC(filter_t *filter)
 {
     struct filter_sys_t *sys = filter->p_sys;
-    sys->amfInput->pVtbl->Release(sys->amfInput);
     sys->amf_frc->pVtbl->Release(sys->amf_frc);
     vlc_video_context_Release(filter->vctx_out);
 }
@@ -323,14 +307,6 @@ static int D3D11CreateAMFFRC(filter_t *filter)
     if (res != AMF_OK)
         goto error;
 
-    res = sys->amf.Context->pVtbl->AllocSurface(sys->amf.Context, AMF_MEMORY_DX11,
-                                                amf_fmt,
-                                                filter->fmt_in.video.i_width,
-                                                filter->fmt_in.video.i_height,
-                                                &sys->amfInput);
-    if (res != AMF_OK)
-        goto error;
-
     sys->cfg = cfg;
     static const struct vlc_filter_operations filter_ops =
     {
@@ -358,8 +334,6 @@ static int D3D11CreateAMFFRC(filter_t *filter)
 
     return VLC_SUCCESS;
 error:
-    if (sys->amfInput)
-        sys->amfInput->pVtbl->Release(sys->amfInput);
     if (sys->amf_frc != NULL)
         sys->amf_frc->pVtbl->Release(sys->amf_frc);
     vlc_AMFReleaseContext(&sys->amf);
