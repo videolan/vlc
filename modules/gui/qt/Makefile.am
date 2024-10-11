@@ -623,6 +623,7 @@ nodist_libqt_plugin_la_SOURCES += \
 libqt_wayland_plugin_la_CFLAGS = $(AM_CFLAGS) $(WAYLAND_CLIENT_CFLAGS)
 libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS)
 libqt_wayland_plugin_la_SOURCES = \
+	maininterface/qt_wayland_plugin.c \
 	maininterface/compositor_wayland_module.c \
 	maininterface/compositor_wayland_module.h
 
@@ -630,9 +631,16 @@ libqt_wayland_plugin_la_SOURCES = \
 #if WAYLAND_SCANNER
 libqt_wayland_plugin_la_CFLAGS += -DQT_HAS_WAYLAND_PROTOCOLS -I$(builddir)/maininterface
 
+libqt_wayland_plugin_la_SOURCES += \
+	util/csdmenu_wayland.c \
+	util/csdmenu_wayland.h \
+	util/csdmenu_module.h
+
 nodist_libqt_wayland_plugin_la_SOURCES = \
 	maininterface/viewporter-client-protocol.h \
-	maininterface/viewporter-protocol.c
+	maininterface/viewporter-protocol.c \
+	maininterface/xdg-shell-client-protocol.h \
+	maininterface/xdg-shell-protocol.c
 
 BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
 
@@ -643,6 +651,12 @@ maininterface/viewporter-client-protocol.h: \
 maininterface/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml \
 		maininterface/viewporter-client-protocol.h
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
+
+maininterface/xdg-shell-client-protocol.h: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml Makefile.am
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
+
+maininterface/xdg-shell-protocol.c: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 #endif

@@ -43,5 +43,6 @@ typedef struct qtwayland_t
     void (*close)(struct qtwayland_t*);
 } qtwayland_t;
 
+int OpenCompositor(vlc_object_t* p_this);
 
 #endif // COMPOSITOR_WAYLAND_MODULE_H

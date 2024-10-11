@@ -289,7 +289,7 @@ void CSDMenu::popup(const QPoint &pos)
         if (d->m_plateform == QT_CSD_PLATFORM_WINDOWS)
         {
             event.platform = QT_CSD_PLATFORM_WINDOWS;
-            event.data.win32.hwnd = window->winId()
+            event.data.win32.hwnd = reinterpret_cast<void*>(window->winId());
         }
 #else
 

@@ -286,7 +286,7 @@ error:
     return false;
 }
 
-static int Open(vlc_object_t* p_this)
+int OpenCompositor(vlc_object_t* p_this)
 {
     qtwayland_t* obj = (qtwayland_t*)p_this;
 
@@ -323,10 +323,3 @@ static int Open(vlc_object_t* p_this)
 
     return VLC_SUCCESS;
 }
-
-vlc_module_begin()
-    set_shortname(N_("QtWayland"))
-    set_description(N_(" calls for compositing with Qt"))
-    set_capability("qtwayland", 10)
-    set_callback(Open)
-vlc_module_end()
