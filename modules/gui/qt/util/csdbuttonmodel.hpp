@@ -90,21 +90,6 @@ private:
     bool m_externalPressed = false;
 };
 
-
-class SystemMenuButton : public CSDButton
-{
-    Q_OBJECT
-
-public:
-    SystemMenuButton(QObject *parent = nullptr) : CSDButton {SystemMenuButton::SystemMenu, parent} {}
-
-    Q_INVOKABLE virtual void showSystemMenu(const QPoint &windowpos) = 0;
-
-signals:
-    void systemMenuVisibilityChanged(bool visible);
-};
-
-
 class MainCtx;
 
 
@@ -113,17 +98,10 @@ class CSDButtonModel : public QObject
     Q_OBJECT
     Q_PROPERTY(QList<CSDButton *> windowCSDButtons READ windowCSDButtons CONSTANT)
 
-    Q_PROPERTY(CSDButton *systemMenuButton READ systemMenuButton CONSTANT)
-
 public:
     CSDButtonModel(MainCtx *mainCtx, QObject *parent = nullptr);
 
     QList<CSDButton *> windowCSDButtons() const;
-    CSDButton *systemMenuButton() const;
-
-    // set by internal implmentation
-    // all the actions are also handled by implementation
-    void setSystemMenuButton(std::shared_ptr<SystemMenuButton> button);
 
 private slots:
     void minimizeButtonClicked();
@@ -135,9 +113,6 @@ private:
 
     // CSD window action buttons i.e minimize, maximize, close
     QList<CSDButton *> m_windowCSDButtons;
-
-    // sysmenu button, available on windows only
-    std::shared_ptr<SystemMenuButton> m_systemMenuButton = nullptr;
 };
 
 
