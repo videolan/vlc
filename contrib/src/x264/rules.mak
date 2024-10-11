@@ -38,7 +38,7 @@ endif
 ifdef HAVE_CROSS_COMPILE
 ifndef HAVE_DARWIN_OS
 ifdef HAVE_ANDROID
-X264CONF += --cross-prefix="$(subst ar,,$(AR))"
+X264CONF += --cross-prefix="$(subst ld,,$(LD))"
 else
 X264CONF += --cross-prefix="$(HOST)-"
 endif
