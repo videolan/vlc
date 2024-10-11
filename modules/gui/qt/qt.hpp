@@ -98,10 +98,6 @@ struct qt_intf_t
     PlayerController* p_mainPlayerController;
     std::unique_ptr<vlc::Compositor>  p_compositor;
 
-#ifdef _WIN32
-    bool disable_volume_keys;
-#endif
-
     int refCount;
     bool isShuttingDown;
 };

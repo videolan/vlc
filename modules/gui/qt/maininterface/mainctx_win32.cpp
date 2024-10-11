@@ -782,14 +782,23 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
 MainCtxWin32::MainCtxWin32(qt_intf_t * _p_intf )
     : MainCtx( _p_intf )
 {
-    /* Volume keys */
-    p_intf->disable_volume_keys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
+    m_disableVolumeKeys = var_InheritBool( _p_intf, "qt-disable-volume-keys" );
 }
 
 void MainCtxWin32::reloadPrefs()
 {
-    p_intf->disable_volume_keys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
     MainCtx::reloadPrefs();
+    bool disableVolumeKeys = var_InheritBool( p_intf, "qt-disable-volume-keys" );
+    if (disableVolumeKeys != m_disableVolumeKeys)
+    {
+        m_disableVolumeKeys = disableVolumeKeys;
+        emit disableVolumeKeysChanged(disableVolumeKeys);
+    }
+}
+
+bool MainCtxWin32::getDisableVolumeKeys() const
+{
+    return m_disableVolumeKeys;
 }
 
 // InterfaceWindowHandlerWin32
@@ -798,6 +807,13 @@ InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, Mai
     : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
     , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx, window, window))
 {
+    auto mainCtxWin32 = qobject_cast<MainCtxWin32*>(mainCtx);
+    assert(mainCtxWin32);
+    m_disableVolumeKeys = mainCtxWin32->getDisableVolumeKeys();
+    connect(mainCtxWin32, &MainCtxWin32::disableVolumeKeysChanged, this, [this](bool disable){
+        m_disableVolumeKeys = disable;
+    });
+
     auto systemMenuButton = std::make_shared<WinSystemMenuButton>(mainCtx->intfMainWindow(), nullptr);
     mainCtx->csdButtonModel()->setSystemMenuButton(systemMenuButton);
 
@@ -910,7 +926,7 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
         case WM_APPCOMMAND:
             cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
 
-            if( p_intf->disable_volume_keys &&
+            if( m_disableVolumeKeys &&
                     (   cmd == APPCOMMAND_VOLUME_DOWN   ||
                         cmd == APPCOMMAND_VOLUME_UP     ||
                         cmd == APPCOMMAND_VOLUME_MUTE ) )

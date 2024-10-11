@@ -79,12 +79,22 @@ private:
 class MainCtxWin32 : public MainCtx
 {
     Q_OBJECT
+    Q_PROPERTY(bool disableVolumeKeys READ getDisableVolumeKeys NOTIFY disableVolumeKeysChanged FINAL)
 public:
     explicit MainCtxWin32(qt_intf_t *);
     virtual ~MainCtxWin32() = default;
 
+public:
+    bool getDisableVolumeKeys() const;
+
 public slots:
     void reloadPrefs() override;
+
+signals:
+    void disableVolumeKeysChanged(bool);
+
+private:
+    bool m_disableVolumeKeys = false;
 };
 
 class InterfaceWindowHandlerWin32 : public InterfaceWindowHandler, public QAbstractNativeEventFilter
@@ -103,6 +113,8 @@ protected:
 private:
     void updateCSDWindowSettings() override;
     QObject *m_CSDWindowEventHandler {};
+
+    bool m_disableVolumeKeys = false;
 };
 
 #endif // MAIN_INTERFACE_WIN32_HPP
