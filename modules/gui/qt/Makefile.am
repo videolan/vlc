@@ -583,6 +583,23 @@ nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_x11_renderwindow.moc.cpp \
 	maininterface/compositor_x11_uisurface.moc.cpp
 
+#extra X11 features
+
+libqt_x11_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(XCB_CFLAGS) $(XCB_RENDER_CFLAGS) $(XCB_COMPOSITE_CFLAGS) $(XCB_DAMAGE_CFLAGS) $(XCB_XFIXES_CFLAGS)
+libqt_x11_plugin_la_LIBADD = $(XCB_LIBS) $(XCB_RENDER_LIBS) $(XCB_COMPOSITE_LIBS) $(XCB_DAMAGE_LIBS) $(XCB_XFIXES_LIBS)
+libqt_x11_plugin_la_SOURCES = \
+	maininterface/qt_x11_plugin.c \
+	maininterface/compositor_x11_utils.hpp \
+	maininterface/compositor_x11_utils.cpp \
+	util/csdmenu_module.h \
+	util/csdmenu_x11.cpp \
+	util/csdmenu_x11.h
+
+if ENABLE_QT
+gui_LTLIBRARIES += libqt_x11_plugin.la
+endif
+
+
 endif
 endif
 endif

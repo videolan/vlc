@@ -1059,6 +1059,23 @@ if qt6_dep.found()
         endif
     endif
 
+    if (xcb_dep.found() and xcb_render_dep.found() and xcb_xfixes_dep.found())
+
+        vlc_modules += {
+            'name' : 'qt_x11',
+            'include_directories' : qt_include_dir,
+            'sources' : files(
+                'maininterface/qt_x11_plugin.c',
+                'maininterface/compositor_x11_utils.hpp',
+                'maininterface/compositor_x11_utils.cpp',
+                'util/csdmenu_module.h',
+                'util/csdmenu_x11.cpp',
+                'util/csdmenu_x11.h'
+            ),
+            'dependencies' : [xcb_dep, xcb_render_dep, xcb_xfixes_dep]
+        }
+    endif
+
     # TODO support qmlcachegen
 
     vlc_modules += {
