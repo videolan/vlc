@@ -117,8 +117,14 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
+    
     [self.viewSelector setEnabled:chaptersEnabled
                        forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
+    self.viewSelector.hidden = !chaptersEnabled;
+    self.topInternalConstraint.active = self.viewSelector.hidden;
+    self.playlistHeaderLabel.hidden = chaptersEnabled;
+    self.playlistHeaderTopConstraint.active = self.playlistHeaderLabel.hidden;
+    
     if (!chaptersEnabled &&
         self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
         self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
