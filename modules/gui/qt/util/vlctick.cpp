@@ -61,7 +61,7 @@ QString VLCTick::formatHMS(int formatFlags) const
         return "--:--";
 
     int64_t t_ms = MS_FROM_VLC_TICK(m_ticks);
-    if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
+    if (!isSubSecond() || !(formatFlags & SubSecondFormattedAsMS))
     {
         //truncate milliseconds toward 0
         int64_t t_sec = t_ms / 1000;
@@ -101,7 +101,7 @@ QString VLCTick::formatLong(int formatFlags) const
                 .arg(hour)
                 .arg(min);
     }
-    else if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
+    else if (!isSubSecond() || !(formatFlags & SubSecondFormattedAsMS))
     {
         //round to the nearest second
         t_ms = roundNearestMultiple(t_ms, 1000);
@@ -138,7 +138,7 @@ QString VLCTick::formatShort(int formatFlags) const
                 .arg(hour)
                 .arg(min, 2, 10, QChar('0'));
     }
-    else if (t_ms >= 1000 || !(formatFlags & SubSecondFormattedAsMS))
+    else if (!isSubSecond() || !(formatFlags & SubSecondFormattedAsMS))
     {
         //round to the nearest second
         t_ms = roundNearestMultiple(t_ms, 1000);
