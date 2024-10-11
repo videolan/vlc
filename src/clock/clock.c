@@ -807,6 +807,8 @@ vlc_clock_output_start(vlc_clock_t *clock,
     vlc_clock_main_t *main_clock = clock->owner;
     vlc_mutex_assert(&main_clock->lock);
 
+    if (clock->last_conversion == VLC_TICK_INVALID)
+        clock->last_conversion = start_date;
 
     /* Attach to the correct context in case of reset */
     struct vlc_clock_context *context
@@ -1214,7 +1216,7 @@ static vlc_clock_t *vlc_clock_main_Create(vlc_clock_main_t *main_clock,
     clock->cbs_data = cbs_data;
     clock->priority = priority;
     assert(!cbs || cbs->on_update);
-    clock->last_conversion = 0;
+    clock->last_conversion = VLC_TICK_INVALID;
 
     if (input)
     {
