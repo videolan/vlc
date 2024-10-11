@@ -33,10 +33,13 @@ X264CONF += --enable-pic
 endif
 ifdef HAVE_CROSS_COMPILE
 ifndef HAVE_DARWIN_OS
-X264CONF += --cross-prefix="$(HOST)-"
-endif
 ifdef HAVE_ANDROID
 X264CONF += --cross-prefix="$(subst ar,,$(AR))"
+else
+X264CONF += --cross-prefix="$(HOST)-"
+endif
+endif
+ifdef HAVE_ANDROID
 # broken text relocations
 ifeq ($(ANDROID_ABI), x86)
 X264CONF += --disable-asm
