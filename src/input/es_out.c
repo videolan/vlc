@@ -962,7 +962,7 @@ static void EsOutChangePosition(es_out_sys_t *p_sys, bool b_flush,
         input_clock_Reset(pgrm->p_input_clock);
         vlc_clock_main_Lock(pgrm->clocks.main);
         pgrm->i_last_pcr = VLC_TICK_INVALID;
-        vlc_clock_main_Reset(pgrm->clocks.main);
+        vlc_clock_Reset(pgrm->clocks.input);
         vlc_clock_main_Unlock(pgrm->clocks.main);
     }
 
