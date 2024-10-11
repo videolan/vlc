@@ -42,6 +42,8 @@ public:
 
     Q_INVOKABLE bool valid() const;
 
+    Q_INVOKABLE bool isSubSecond() const;
+
     /**
      * @brief formatHMS
      * @param formatFlags flags to specialize formatting, default is SubSecondFormattedAsMS for legacy reasons
