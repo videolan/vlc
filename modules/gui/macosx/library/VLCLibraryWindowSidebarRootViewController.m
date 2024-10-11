@@ -166,6 +166,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
     }
     self.topInternalConstraint.constant = internalTopConstraintConstant;
+    self.playlistHeaderTopConstraint.constant = internalTopConstraintConstant;
 }
 
 @end
