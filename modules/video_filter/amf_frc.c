@@ -112,7 +112,9 @@ static picture_t * Filter(filter_t *filter, picture_t *p_pic)
     bool got_output = sys->mode != FRC_x2_PRESENT;
     do {
         AMFData *amfOutput = NULL;
+        d3d11_device_lock( &dev_sys->d3d_dev ); // may consider to connect with AMFContext::LockDX11()/UnlockDX11()
         res = sys->amf_frc->pVtbl->QueryOutput(sys->amf_frc, &amfOutput);
+        d3d11_device_unlock( &dev_sys->d3d_dev );
         if (res != AMF_OK && res != AMF_REPEAT)
         {
             msg_Err(filter, "filter gave no output (err=%d)", res);
