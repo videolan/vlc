@@ -165,8 +165,13 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
 {
     _mainVideoModeEnabled = mainVideoModeEnabled;
+    [self updateTopConstraints];
+}
+
+- (void)updateTopConstraints
+{
     CGFloat internalTopConstraintConstant = VLCLibraryUIUnits.smallSpacing;
-    if (!mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
+    if (!self.mainVideoModeEnabled && self.libraryWindow.styleMask & NSFullSizeContentViewWindowMask) {
         // Compensate for full content view window's titlebar height, prevent top being cut off
         internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
     }
