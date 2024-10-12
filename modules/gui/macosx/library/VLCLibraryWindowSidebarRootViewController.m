@@ -53,10 +53,9 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self setupPlaylistTitle];
 
     self.mainVideoModeEnabled = NO;
-
-    [self setupPlaylistTitle];
 
     _playlistSidebarViewController =
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
