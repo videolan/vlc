@@ -102,7 +102,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         [self.playlistHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
                                                               constant:-VLCLibraryUIUnits.smallSpacing],
         [self.playlistHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
-                                                               constant:VLCLibraryUIUnits.smallSpacing] 
+                                                               constant:VLCLibraryUIUnits.largeSpacing] 
     ]];
 } 
 
