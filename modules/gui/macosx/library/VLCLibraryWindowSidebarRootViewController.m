@@ -121,9 +121,15 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     [self.viewSelector setEnabled:chaptersEnabled
                        forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
     self.viewSelector.hidden = !chaptersEnabled;
+    
     self.topInternalConstraint.active = self.viewSelector.hidden;
+    
+    const NSLayoutPriority priority =
+        chaptersEnabled ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
     self.playlistHeaderLabel.hidden = chaptersEnabled;
-    self.playlistHeaderTopConstraint.active = self.playlistHeaderLabel.hidden;
+    [self.playlistHeaderLabel setContentCompressionResistancePriority:priority
+                                                       forOrientation:NSLayoutConstraintOrientationVertical];
+    self.playlistHeaderTopConstraint.active = !self.playlistHeaderLabel.hidden;
     
     if (!chaptersEnabled &&
         self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
