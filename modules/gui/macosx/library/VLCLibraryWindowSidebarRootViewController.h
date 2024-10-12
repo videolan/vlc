@@ -36,7 +36,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, weak) IBOutlet NSSegmentedControl *viewSelector;
 @property (readwrite, weak) IBOutlet NSView *targetView;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *topInternalConstraint;
+
+// Retain strongly as when showing/hiding the view selector this can get deallocated otherwise
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *topInternalConstraint;
 
 @property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 
