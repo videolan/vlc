@@ -22,6 +22,7 @@
 
 #import "VLCRoundedCornerTextField.h"
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
 
 const CGFloat VLCRoundedCornerTextFieldLightCornerRadius = 3.;
 const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
@@ -61,6 +62,11 @@ const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
     self.layer.cornerRadius = VLCRoundedCornerTextFieldLightCornerRadius;
     self.layer.masksToBounds = YES;
     self.layer.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor.CGColor;
+    self.font = NSFont.VLCLibraryItemAnnotationFont;
+    self.textColor = NSColor.VLClibraryAnnotationColor;
+    self.alignment = NSTextAlignmentCenter;
+    self.bezeled = NO;
+    self.editable = NO;
 }
 
 - (void)setBackgroundColor:(NSColor *)backgroundColor
