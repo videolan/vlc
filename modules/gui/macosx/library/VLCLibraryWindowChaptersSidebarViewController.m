@@ -28,6 +28,12 @@
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
+@interface VLCLibraryWindowChaptersSidebarViewController ()
+
+@property (readwrite) NSUInteger internalItemCount;
+
+@end
+
 @implementation VLCLibraryWindowChaptersSidebarViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -65,6 +71,16 @@
                              object:nil];
 }
 
+- (BOOL)supportsItemCount
+{
+    return YES;
+}
+
+- (NSUInteger)itemCount
+{
+    return self.internalItemCount;
+}
+
 - (void)titleListChanged:(NSNotification *)notification
 {
     [self updateChapterList];
@@ -83,6 +99,7 @@
     const struct vlc_player_chapter * const pp_chapters = title->chapters;
     const size_t chapterCount = title->chapter_count;
 
+    self.internalItemCount = chapterCount;
     NSMutableArray * const chapters = [NSMutableArray arrayWithCapacity:chapterCount];
     for (size_t i = 0; i < chapterCount; i++) {
         struct vlc_player_chapter p_chapter = pp_chapters[i];
