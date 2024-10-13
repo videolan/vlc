@@ -46,6 +46,15 @@ const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
     return self;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setupCustomAppearance];
+    }
+    return self;
+}
+
 - (void)setupCustomAppearance
 {
     self.wantsLayer = YES;
