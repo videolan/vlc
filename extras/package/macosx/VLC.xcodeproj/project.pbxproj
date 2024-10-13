@@ -310,6 +310,7 @@
 		5317FE02294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDelegate.h; sourceTree = "<group>"; };
 		5317FE03294E3DD3001702F0 /* VLCLibraryCollectionViewDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryCollectionViewDelegate.m; sourceTree = "<group>"; };
 		5317FE05294E8D1A001702F0 /* VLCLibraryCollectionViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryCollectionViewDataSource.h; sourceTree = "<group>"; };
+		53222C002CBBDBEE00CB9FA2 /* VLCLibraryWindowSidebarChildViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowSidebarChildViewController.h; sourceTree = "<group>"; };
 		532572012C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibrarySegmentBookmarkedLocation.h; sourceTree = "<group>"; };
 		532572022C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibrarySegmentBookmarkedLocation.m; sourceTree = "<group>"; };
 		532572042C3EF3710068DEC3 /* VLCLibraryWindowNavigationSidebarOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowNavigationSidebarOutlineView.h; sourceTree = "<group>"; };
@@ -1404,6 +1405,7 @@
 				5352B37529E149AC0011CE03 /* VLCLibraryWindowPersistentPreferences.m */,
 				53D21A1D2BB465600085C71B /* VLCLibraryWindowPlaylistSidebarViewController.h */,
 				53D21A1E2BB465600085C71B /* VLCLibraryWindowPlaylistSidebarViewController.m */,
+				53222C002CBBDBEE00CB9FA2 /* VLCLibraryWindowSidebarChildViewController.h */,
 				5341F1512C9865DD003BDF0A /* VLCLibraryWindowSidebarRootViewController.h */,
 				5341F1522C9865DD003BDF0A /* VLCLibraryWindowSidebarRootViewController.m */,
 				53F0209F2A91115D00E79705 /* VLCLibraryWindowSplitViewController.h */,
