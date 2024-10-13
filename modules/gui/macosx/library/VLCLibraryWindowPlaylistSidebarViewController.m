@@ -86,6 +86,16 @@
                              object:nil];
 }
 
+- (BOOL)supportsItemCount
+{
+    return YES;
+}
+
+- (NSUInteger)itemCount
+{
+    return [self.playlistController.playlistDataSource numberOfRowsInTableView:self.tableView];
+}
+
 #pragma mark - appearance setters
 
 - (void)updateColorsBasedOnAppearance:(NSAppearance *)appearance
