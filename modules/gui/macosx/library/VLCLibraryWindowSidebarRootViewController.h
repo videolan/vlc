@@ -22,6 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class VLCRoundedCornerTextField;
 @class VLCLibraryWindow;
 @class VLCLibraryWindowChaptersSidebarViewController;
 @class VLCLibraryWindowPlaylistSidebarViewController;
@@ -42,6 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
 
+@property (readonly) VLCRoundedCornerTextField *counterLabel;
+@property (readonly) NSLayoutConstraint *counterLabelInHeaderConstraint;
+@property (readonly) NSLayoutConstraint *counterLabelInChildViewConstraint;
 @property (readonly) NSLayoutConstraint *playlistHeaderTopConstraint;
 @property (readonly) NSTextField *playlistHeaderLabel;
 

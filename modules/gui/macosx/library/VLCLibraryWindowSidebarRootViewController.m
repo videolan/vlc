@@ -36,6 +36,8 @@
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
+#include "views/VLCRoundedCornerTextField.h"
+
 const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
 const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
@@ -54,6 +56,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 {
     [super viewDidLoad];
     [self setupPlaylistTitle];
+    [self setupCounterLabel];
     [self setupViewSelector];
 
     self.mainVideoModeEnabled = NO;
@@ -107,6 +110,31 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     [self.viewSelector setLabel:_NS("Chapters")
                      forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
     self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+}
+
+- (void)setupCounterLabel
+{
+    _counterLabel = [[VLCRoundedCornerTextField alloc] init];
+    self.counterLabel.useStrongRounding = YES;
+    self.counterLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.counterLabel setContentCompressionResistancePriority:NSLayoutPriorityRequired
+                                                 forOrientation:NSLayoutConstraintOrientationHorizontal];
+    [self.counterLabel setContentCompressionResistancePriority:NSLayoutPriorityRequired
+                                                 forOrientation:NSLayoutConstraintOrientationVertical];
+
+    [self.view addSubview:self.counterLabel];
+
+    _counterLabelInHeaderConstraint = 
+        [self.counterLabel.centerYAnchor constraintEqualToAnchor:self.playlistHeaderLabel.centerYAnchor];
+    _counterLabelInChildViewConstraint =
+        [self.counterLabel.topAnchor constraintEqualToAnchor:self.targetView.topAnchor
+                                                    constant:VLCLibraryUIUnits.smallSpacing];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        self.counterLabelInHeaderConstraint,
+        [self.counterLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor
+                                                         constant:-VLCLibraryUIUnits.largeSpacing]
+    ]];
 }
 
 - (void)titleListChanged:(NSNotification *)notification
