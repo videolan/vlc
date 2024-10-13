@@ -54,6 +54,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 {
     [super viewDidLoad];
     [self setupPlaylistTitle];
+    [self setupViewSelector];
 
     self.mainVideoModeEnabled = NO;
 
@@ -63,13 +64,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    self.viewSelector.segmentCount = 2;
-    [self.viewSelector setLabel:_NS("Playlist")
-                     forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
-    [self.viewSelector setLabel:_NS("Chapters")
-                     forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
-    self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
 
     [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
@@ -103,8 +97,17 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         [self.playlistHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
                                                                constant:VLCLibraryUIUnits.largeSpacing] 
     ]];
-} 
+}
 
+- (void)setupViewSelector
+{
+    self.viewSelector.segmentCount = 2;
+    [self.viewSelector setLabel:_NS("Playlist")
+                     forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
+    [self.viewSelector setLabel:_NS("Chapters")
+                     forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
+    self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+}
 
 - (void)titleListChanged:(NSNotification *)notification
 {
