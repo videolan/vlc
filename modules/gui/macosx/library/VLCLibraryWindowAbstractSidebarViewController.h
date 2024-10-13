@@ -22,11 +22,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryWindowSidebarChildViewController.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
 
-@interface VLCLibraryWindowAbstractSidebarViewController : NSViewController
+@interface VLCLibraryWindowAbstractSidebarViewController : NSViewController<VLCLibraryWindowSidebarChildViewController>
 
 @property (readonly, weak) VLCLibraryWindow *libraryWindow;
 @property (readwrite, weak) IBOutlet NSBox *titleSeparator;
