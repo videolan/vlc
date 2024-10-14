@@ -34,6 +34,8 @@ $(TARBALLS)/mingw-w64-v$(MINGW64_VERSION).tar.bz2:
 
 # .sum-pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2
 .sum-pthreads: mingw-w64-$(MINGW64_HASH).tar.xz
+	$(call check_githash,$(MINGW64_HASH))
+	touch $@
 
 # pthreads: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-pthreads
 pthreads: mingw-w64-$(MINGW64_HASH).tar.xz .sum-pthreads
