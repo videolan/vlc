@@ -1955,11 +1955,9 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
         if (default_timeout < 0)
             default_timeout = 0;
 
-        int options = (int) META_REQUEST_OPTION_PARSE | (int) META_REQUEST_OPTION_FETCH_ANY;
-
         d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1,
                                            default_timeout,
-                                           (input_item_meta_request_option_t) options);
+                                           META_REQUEST_OPTION_FETCH_ANY);
         if (unlikely(d->m_preparser == nullptr))
             return;
     }
