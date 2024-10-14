@@ -383,8 +383,7 @@ static void RunSearchLocal(void *userdata)
     if( SearchByScope( task, FETCHER_SCOPE_LOCAL ) == VLC_SUCCESS )
         goto end; /* done */
 
-    if( var_InheritBool( fetcher->owner, "metadata-network-access" ) &&
-        task->options & META_REQUEST_OPTION_FETCH_NETWORK )
+    if( task->options & META_REQUEST_OPTION_FETCH_NETWORK )
     {
         int ret = Submit(fetcher, fetcher->executor_network, task->item,
                          task->options, task->cbs, task->userdata);
