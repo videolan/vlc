@@ -497,12 +497,6 @@ int input_fetcher_Push(input_fetcher_t* fetcher, input_item_t* item,
     if (options & META_REQUEST_OPTION_FETCH_NETWORK)
         assert(fetcher->executor_network != NULL);
 
-    if (!var_InheritBool( fetcher->owner, "metadata-network-access" ))
-    {
-        // only keep META_REQUEST_OPTION_FETCH_LOCAL based on the assert above
-        options = options & ~META_REQUEST_OPTION_FETCH_NETWORK;
-    }
-
     vlc_executor_t *executor = options & META_REQUEST_OPTION_FETCH_LOCAL
                              ? fetcher->executor_local
                              : fetcher->executor_network;
