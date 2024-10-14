@@ -34,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryWindowPlaylistSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
 
-@property (readwrite, weak) IBOutlet VLCRoundedCornerTextField *counterTextField;
 @property (readwrite, weak) IBOutlet NSTableView *tableView;
 @property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
 @property (readwrite, weak) IBOutlet NSBox *dragDropImageBackgroundBox;

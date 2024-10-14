@@ -52,10 +52,6 @@
     [super viewDidLoad];
 
     self.dragDropView.dropTarget = self.libraryWindow;
-    self.counterTextField.useStrongRounding = YES;
-    self.counterTextField.font = [NSFont boldSystemFontOfSize:NSFont.systemFontSize];
-    self.counterTextField.textColor = NSColor.VLClibraryAnnotationColor;
-    self.counterTextField.hidden = YES;
 
     _playlistController = VLCMain.sharedInstance.playlistController;
     _dataSource = [[VLCPlaylistDataSource alloc] init];
