@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +28,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL supportsItemCount;
 @property (readonly) NSUInteger itemCount;
+
+@optional
+
+@property (readwrite, nonatomic, nullable) NSTextField *counterLabel;
 
 @end
 
