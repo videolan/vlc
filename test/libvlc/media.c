@@ -240,15 +240,14 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
         .on_ended = input_item_preparse_timeout,
     };
 
+    input_item_meta_request_option_t options =
+        META_REQUEST_OPTION_PARSE | META_REQUEST_OPTION_FETCH_LOCAL;
+
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                 1, VLC_TICK_FROM_MS(timeout),
-                                                META_REQUEST_OPTION_PARSE |
-                                                META_REQUEST_OPTION_FETCH_ANY);
+                                                options);
     assert(parser != NULL);
-    i_ret = vlc_preparser_Push(parser, p_item,
-                               META_REQUEST_OPTION_PARSE |
-                               META_REQUEST_OPTION_FETCH_LOCAL,
-                               &cbs, &sem, parser);
+    i_ret = vlc_preparser_Push(parser, p_item, options, &cbs, &sem, parser);
     assert(i_ret == 0);
 
     if (wait_and_cancel > 0)
