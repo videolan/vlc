@@ -30,6 +30,8 @@
 
 @implementation VLCLibraryWindowAbstractSidebarViewController
 
+@synthesize supportsItemCount = _supportsItemCount;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
                               nibName:(NSString *)nibName
 {
