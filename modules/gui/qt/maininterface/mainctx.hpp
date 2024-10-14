@@ -211,7 +211,7 @@ public:
     inline bool isShowRemainingTime() const  { return m_showRemainingTime; }
     inline double getIntfScaleFactor() const { return m_intfScaleFactor; }
     inline double getIntfUserScaleFactor() const { return m_intfUserScaleFactor; }
-    inline int CSDBorderSize() const { return 5 * getIntfScaleFactor(); }
+    inline int CSDBorderSize() const { return 5; }
     inline double getMinIntfUserScaleFactor() const { return MIN_INTF_USER_SCALE_FACTOR; }
     inline double getMaxIntfUserScaleFactor() const { return MAX_INTF_USER_SCALE_FACTOR; }
     inline bool hasMediaLibrary() const { return b_hasMedialibrary; }
