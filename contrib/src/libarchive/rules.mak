@@ -1,5 +1,5 @@
 # LIBARCHIVE
-LIBARCHIVE_VERSION := 3.7.6
+LIBARCHIVE_VERSION := 3.7.7
 LIBARCHIVE_URL := http://www.libarchive.org/downloads/libarchive-$(LIBARCHIVE_VERSION).tar.gz
 
 PKGS += libarchive
@@ -44,7 +44,6 @@ $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 libarchive: libarchive-$(LIBARCHIVE_VERSION).tar.gz .sum-libarchive
 	$(UNPACK)
 	$(APPLY) $(SRC)/libarchive/0001-zstd-use-GetNativeSystemInfo-to-get-the-number-of-th.patch
-	$(APPLY) $(SRC)/libarchive/0001-Don-t-use-Windows-bcrypt-when-building-for-Windows-X.patch
 	$(call pkg_static,"build/pkgconfig/libarchive.pc.in")
 	$(MOVE)
 
