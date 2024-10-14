@@ -36,6 +36,8 @@
 
 @implementation VLCLibraryWindowChaptersSidebarViewController
 
+@synthesize counterLabel = _counterLabel;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     return [super initWithLibraryWindow:libraryWindow
@@ -76,9 +78,10 @@
     return YES;
 }
 
-- (NSUInteger)itemCount
+- (void)setCounterLabel:(NSTextField *)counterLabel
 {
-    return self.internalItemCount;
+    _counterLabel = counterLabel;
+    self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", self.internalItemCount];
 }
 
 - (void)titleListChanged:(NSNotification *)notification
@@ -107,6 +110,7 @@
         [chapters addObject:chapter];
     }
     self.chaptersArrayController.content = chapters.copy;
+    self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", chapterCount];
 }
 
 # pragma mark - NSTableView delegation
