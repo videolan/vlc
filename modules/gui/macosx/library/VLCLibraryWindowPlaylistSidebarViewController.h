@@ -43,6 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *repeatButton;
 @property (readwrite, weak) IBOutlet NSButton *shuffleButton;
 
+@property (readwrite, nonatomic) NSTextField *counterLabel;
+
 @property (readonly) VLCPlaylistController *playlistController;
 @property (readonly) VLCPlaylistDataSource *dataSource;
 @property (readonly) VLCPlaylistSortingMenuController *sortingMenuController;

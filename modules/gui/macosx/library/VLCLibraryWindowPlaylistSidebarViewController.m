@@ -39,6 +39,8 @@
 
 @implementation VLCLibraryWindowPlaylistSidebarViewController
 
+@synthesize counterLabel = _counterLabel;
+
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     return [super initWithLibraryWindow:libraryWindow
@@ -60,7 +62,7 @@
     self.dataSource.playlistController = self.playlistController;
     self.dataSource.tableView = self.tableView;
     self.dataSource.dragDropView = self.dragDropView;
-    self.dataSource.counterTextField = self.counterTextField;
+    self.dataSource.counterTextField = self.counterLabel;
     [self.dataSource prepareForUse];
     self.playlistController.playlistDataSource = self.dataSource;
 
@@ -91,9 +93,10 @@
     return YES;
 }
 
-- (NSUInteger)itemCount
+- (void)setCounterLabel:(NSTextField *)counterLabel
 {
-    return [self.playlistController.playlistDataSource numberOfRowsInTableView:self.tableView];
+    _counterLabel = counterLabel;
+    self.dataSource.counterTextField = counterLabel;
 }
 
 #pragma mark - appearance setters
