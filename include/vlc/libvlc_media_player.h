@@ -3043,6 +3043,7 @@ typedef void (*libvlc_media_player_watch_time_on_seek)(
  * receive all updates.
  * \param on_update callback to listen to update events (must not be NULL)
  * \param on_paused callback to listen to paused events (can be NULL)
+ * \param on_seek callback to listen to seek events (can be NULL)
  * \param cbs_data opaque pointer used by the callbacks
  * \return 0 on success, -1 on error (allocation error, or if already watching)
  * \version LibVLC 4.0.0 or later
