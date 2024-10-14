@@ -84,13 +84,4 @@ const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
     }
 }
 
-- (void)setStringValue:(NSString *)stringValue
-{
-    if (stringValue != nil) {
-        [super setStringValue:[NSString stringWithFormat:@" %@ ", stringValue]];
-    } else {
-        [super setStringValue:@""];
-    }
-}
-
 @end
