@@ -42,6 +42,12 @@
 const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
 const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
+@interface VLCLibraryWindowSidebarRootViewController ()
+
+@property (readwrite) NSViewController<VLCLibraryWindowSidebarChildViewController> *currentChildVc;
+
+@end
+
 @implementation VLCLibraryWindowSidebarRootViewController
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
@@ -192,9 +198,12 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
 - (void)setChildViewController:(NSViewController<VLCLibraryWindowSidebarChildViewController> *)viewController
 {
+    self.currentChildVc.counterLabel = nil; // Stop old vc manipulating the counter label
+    self.currentChildVc = viewController;
+    
     self.counterLabel.hidden = !viewController.supportsItemCount;
     if (viewController.supportsItemCount) {
-        self.counterLabel.stringValue = [NSString stringWithFormat:@"%u", viewController.itemCount];
+        viewController.counterLabel = self.counterLabel;
     }
 
     NSView * const view = viewController.view;
