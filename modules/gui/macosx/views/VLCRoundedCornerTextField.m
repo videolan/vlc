@@ -58,6 +58,7 @@ const CGFloat VLCRoundedCornerTextFieldStrongCornerRadius = 10.;
 
 - (void)setupCustomAppearance
 {
+    self.drawsBackground = NO;
     self.wantsLayer = YES;
     self.layer.cornerRadius = VLCRoundedCornerTextFieldLightCornerRadius;
     self.layer.masksToBounds = YES;
