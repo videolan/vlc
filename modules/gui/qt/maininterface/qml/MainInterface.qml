@@ -100,7 +100,7 @@ Item {
         Binding {
             target: MainCtx
             property: "windowExtendedMargin"
-            value: _extendedFrameVisible ? VLCStyle.dp(20, VLCStyle.scale) : 0
+            value: _extendedFrameVisible ? 20 : 0
         }
 
         Window.onWindowChanged: {
