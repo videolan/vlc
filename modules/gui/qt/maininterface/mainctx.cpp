@@ -251,10 +251,8 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
     }
 
-    int options = (int) META_REQUEST_OPTION_PARSE | (int) META_REQUEST_OPTION_FETCH_ANY;
-
     m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), 1, 0,
-                                            (input_item_meta_request_option_t) options);
+                                            META_REQUEST_OPTION_PARSE);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
