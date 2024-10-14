@@ -22,6 +22,7 @@
 
 #import "VLCLibraryWindowChaptersSidebarViewController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "main/VLCMain.h"
 #import "playlist/VLCPlayerChapter.h"
@@ -71,6 +72,11 @@
                            selector:@selector(titleListChanged:)
                                name:VLCPlayerTitleListChanged
                              object:nil];
+}
+
+- (NSString *)title
+{
+    return _NS("Chapters");
 }
 
 - (BOOL)supportsItemCount

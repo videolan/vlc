@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol VLCLibraryWindowSidebarChildViewController <NSObject>
 
+@property (readonly) NSString *title;
 @property (readonly) BOOL supportsItemCount;
 
 @optional

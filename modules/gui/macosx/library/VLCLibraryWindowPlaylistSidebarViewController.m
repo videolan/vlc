@@ -84,6 +84,11 @@
                              object:nil];
 }
 
+- (NSString *)title
+{
+    return _NS("Playlist");
+}
+
 - (BOOL)supportsItemCount
 {
     return YES;
