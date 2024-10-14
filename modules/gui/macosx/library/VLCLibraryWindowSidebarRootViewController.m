@@ -32,6 +32,7 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "library/VLCLibraryWindowSidebarChildViewController.h"
 
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
@@ -181,16 +182,22 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
     if (selectedSegment == VLCLibraryWindowSidebarViewPlaylistSegment) {
-        [self setViewOnSidebarTargetView:self.playlistSidebarViewController.view];
+        [self setChildViewController:self.playlistSidebarViewController];
     } else if (selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
-        [self setViewOnSidebarTargetView:self.chaptersSidebarViewController.view];
+        [self setChildViewController:self.chaptersSidebarViewController];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
     }
 }
 
-- (void)setViewOnSidebarTargetView:(NSView *)view
+- (void)setChildViewController:(NSViewController<VLCLibraryWindowSidebarChildViewController> *)viewController
 {
+    self.counterLabel.hidden = !viewController.supportsItemCount;
+    if (viewController.supportsItemCount) {
+        self.counterLabel.stringValue = [NSString stringWithFormat:@"%u", viewController.itemCount];
+    }
+
+    NSView * const view = viewController.view;
     self.targetView.subviews = @[view];
     view.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
