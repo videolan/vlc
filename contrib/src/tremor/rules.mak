@@ -11,7 +11,7 @@ $(TARBALLS)/tremor-git.tar.xz:
 	$(call download_git,$(TREMOR_URL),master,$(TREMOR_HASH))
 
 .sum-tremor: tremor-git.tar.xz
-	$(warning Integrity check skipped.)
+	$(call check_githash,$(TREMOR_HASH))
 	touch $@
 
 tremor: tremor-git.tar.xz .sum-tremor
