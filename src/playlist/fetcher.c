@@ -294,7 +294,7 @@ static void SearchLocal( playlist_fetcher_t* fetcher, struct fetcher_request* re
     if( SearchByScope( fetcher, req, FETCHER_SCOPE_LOCAL ) == VLC_SUCCESS )
         return; /* done */
 
-    if( var_InheritBool( fetcher->owner, "metadata-network-access" ) ||
+    if( var_InheritBool( fetcher->owner, "metadata-network-access" ) &&
         req->options & META_REQUEST_OPTION_SCOPE_NETWORK )
     {
         if( background_worker_Push( fetcher->network, req, NULL, 0 ) )
