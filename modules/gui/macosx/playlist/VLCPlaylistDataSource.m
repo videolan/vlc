@@ -48,6 +48,13 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     _playlistModel = _playlistController.playlistModel;
 }
 
+- (void)setCounterTextField:(NSTextField *)counterTextField
+{
+    _counterTextField = counterTextField;
+    self.counterTextField.stringValue =
+        [NSString stringWithFormat:@"%lu", _playlistModel.numberOfPlaylistItems];
+}
+
 - (void)prepareForUse
 {
     [_tableView registerForDraggedTypes:@[VLCMediaLibraryMediaItemPasteboardType, VLCMediaLibraryMediaItemUTI, VLCPlaylistItemPasteboardType, NSFilenamesPboardType]];
@@ -96,9 +103,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 {
     NSUInteger numberOfPlaylistItems = _playlistModel.numberOfPlaylistItems;
     self.dragDropView.hidden = numberOfPlaylistItems > 0 ? YES : NO;
-    self.counterTextField.hidden = numberOfPlaylistItems == 0 ? YES : NO;
     self.counterTextField.stringValue = [NSString stringWithFormat:@"%lu", numberOfPlaylistItems];
-
     [_tableView reloadData];
 }
 
