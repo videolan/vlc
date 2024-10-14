@@ -90,7 +90,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     _playlistHeaderLabel = [[NSTextField alloc] init];
     self.playlistHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.playlistHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
-    self.playlistHeaderLabel.stringValue = _NS("Playlist");
     self.playlistHeaderLabel.editable = NO;
     self.playlistHeaderLabel.bezeled = NO;
     self.playlistHeaderLabel.drawsBackground = NO;
@@ -112,9 +111,9 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 - (void)setupViewSelector
 {
     self.viewSelector.segmentCount = 2;
-    [self.viewSelector setLabel:_NS("Playlist")
+    [self.viewSelector setLabel:self.playlistSidebarViewController.title
                      forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
-    [self.viewSelector setLabel:_NS("Chapters")
+    [self.viewSelector setLabel:self.chaptersSidebarViewController.title
                      forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
     self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
 }
@@ -205,6 +204,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     if (viewController.supportsItemCount) {
         viewController.counterLabel = self.counterLabel;
     }
+
+    self.playlistHeaderLabel.stringValue = viewController.title;
 
     NSView * const view = viewController.view;
     self.targetView.subviews = @[view];
