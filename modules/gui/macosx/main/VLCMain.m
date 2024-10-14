@@ -156,8 +156,7 @@ int OpenIntf (vlc_object_t *p_this)
             p_interface_thread = p_intf;
 
             p_network_preparser = vlc_preparser_New(p_this, 1, 0,
-                                                    META_REQUEST_OPTION_PARSE |
-                                                    META_REQUEST_OPTION_FETCH_ANY);
+                                                    META_REQUEST_OPTION_PARSE);
             if (p_network_preparser == nil)
             {
                 retcode = VLC_ENOMEM;
