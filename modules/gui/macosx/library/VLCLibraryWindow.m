@@ -795,6 +795,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)enableVideoPlaybackAppearance
 {
+    VLCPlayerController * const playerController = self.playerController;
+    if (!playerController.videoTracksEnabled ||
+        playerController.selectedVideoTrack == nil ||
+        playerController.selectedVideoTrack.selected == NO) {
+        return;
+    }
+
     const BOOL isEmbedded = var_InheritBool(getIntf(), "embedded-video");
     if (!isEmbedded) {
         [self presentExternalWindows];
