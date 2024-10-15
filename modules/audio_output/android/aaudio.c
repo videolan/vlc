@@ -81,6 +81,10 @@ struct sys
     /* Number of bytes to write before sending a timing report */
     size_t timing_report_delay_bytes;
     vlc_tick_t first_pts;
+
+    /* Channel reordering */
+    uint8_t chans_to_reorder;
+    uint8_t chan_table[AOUT_CHAN_MAX];
 };
 
 /* dlopen/dlsym symbols */
@@ -521,6 +525,15 @@ OpenAAudioStream(aout_stream_t *stream)
     }
 
     vt.AAudioStreamBuilder_setFormat(builder, sys->cfg.format);
+
+    uint32_t chans_out[AOUT_CHAN_MAX];
+    AndroidDevice_GetChanOrder(sys->fmt.i_physical_channels, chans_out,
+                               AOUT_CHAN_MAX );
+    sys->chans_to_reorder =
+        aout_CheckChannelReorder(NULL, chans_out,
+                                 sys->fmt.i_physical_channels,
+                                 sys->chan_table );
+
     vt.AAudioStreamBuilder_setChannelCount(builder, sys->fmt.i_channels);
 
     /* Setup the session-id */
@@ -571,6 +584,21 @@ PrepareAudioFormat(aout_stream_t *stream, audio_sample_format_t *fmt)
     if (sys->cfg.session_id == 0)
         sys->cfg.session_id = AAUDIO_SESSION_ID_ALLOCATE;
 
+    {
+        /* Without the proper setChannelMask API, support only mono, stereo,
+         * 5.1 and 7.1 */
+        unsigned channels = aout_FormatNbChannels( &sys->fmt );
+        if (channels > 7)
+            sys->fmt.i_physical_channels = AOUT_CHANS_7_1;
+        else if (channels > 5)
+            sys->fmt.i_physical_channels = AOUT_CHANS_5_1;
+        else if (channels == 1)
+            sys->fmt.i_physical_channels = AOUT_CHAN_LEFT;
+        else
+            sys->fmt.i_physical_channels = AOUT_CHANS_STEREO;
+        aout_FormatPrepare(fmt);
+    }
+
     if (fmt->i_format == VLC_CODEC_S16N)
         sys->cfg.format = AAUDIO_FORMAT_PCM_I16;
     else
@@ -615,6 +643,11 @@ Play(aout_stream_t *stream, vlc_frame_t *frame, vlc_tick_t date)
     }
 
     assert(sys->as);
+
+    if (sys->chans_to_reorder > 0)
+       aout_ChannelReorder(frame->p_buffer, frame->i_buffer,
+                           sys->chans_to_reorder, sys->chan_table,
+                           sys->fmt.i_format );
 
     vlc_mutex_lock(&sys->lock);
 
