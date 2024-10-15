@@ -477,6 +477,10 @@ if [ -n "$BUILD_MESON" ]; then
     mkdir -p $SHORTARCH-meson
     rm -rf $SHORTARCH-meson/meson-private
 
+    if [ -n "$WITH_PDB" ]; then
+        VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-pdb="
+    fi
+
     info "Configuring VLC"
     BUILD_PATH="$( pwd -P )"
     cd ${VLC_ROOT_PATH}
