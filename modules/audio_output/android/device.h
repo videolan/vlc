@@ -32,6 +32,45 @@ enum android_audio_device_type
 };
 #define ANDROID_AUDIO_DEVICE_MAX_CHANNELS 8
 
+static inline void
+AndroidDevice_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[],
+                            size_t chan_out_max )
+{
+    assert( chan_out_max >= AOUT_CHAN_MAX);
+    memset( p_chans_out, 0, chan_out_max * sizeof(uint32_t) );
+
+#define HAS_CHAN( x ) ( ( i_physical_channels & (x) ) == (x) )
+    /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
+    int i = 0;
+
+    if( HAS_CHAN( AOUT_CHAN_LEFT ) )
+        p_chans_out[i++] = AOUT_CHAN_LEFT;
+    if( HAS_CHAN( AOUT_CHAN_RIGHT ) )
+        p_chans_out[i++] = AOUT_CHAN_RIGHT;
+
+    if( HAS_CHAN( AOUT_CHAN_CENTER ) )
+        p_chans_out[i++] = AOUT_CHAN_CENTER;
+
+    if( HAS_CHAN( AOUT_CHAN_LFE ) )
+        p_chans_out[i++] = AOUT_CHAN_LFE;
+
+    if( HAS_CHAN( AOUT_CHAN_REARLEFT ) )
+        p_chans_out[i++] = AOUT_CHAN_REARLEFT;
+    if( HAS_CHAN( AOUT_CHAN_REARRIGHT ) )
+        p_chans_out[i++] = AOUT_CHAN_REARRIGHT;
+
+    if( HAS_CHAN( AOUT_CHAN_REARCENTER ) )
+        p_chans_out[i++] = AOUT_CHAN_REARCENTER;
+
+    if( HAS_CHAN( AOUT_CHAN_MIDDLELEFT ) )
+        p_chans_out[i++] = AOUT_CHAN_MIDDLELEFT;
+    if( HAS_CHAN( AOUT_CHAN_MIDDLERIGHT ) )
+        p_chans_out[i++] = AOUT_CHAN_MIDDLERIGHT;
+
+    assert( i <= AOUT_CHAN_MAX );
+#undef HAS_CHAN
+}
+
 struct aout_stream
 {
     struct vlc_object_t obj;

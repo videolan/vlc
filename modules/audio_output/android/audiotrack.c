@@ -598,45 +598,6 @@ AudioTrack_GetLatencyUs( JNIEnv *env, aout_stream_t *stream )
     return 0;
 }
 
-static void
-AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[],
-                         size_t chan_out_max )
-{
-    assert( chan_out_max >= AOUT_CHAN_MAX);
-    memset( p_chans_out, 0, chan_out_max * sizeof(uint32_t) );
-
-#define HAS_CHAN( x ) ( ( i_physical_channels & (x) ) == (x) )
-    /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
-    int i = 0;
-
-    if( HAS_CHAN( AOUT_CHAN_LEFT ) )
-        p_chans_out[i++] = AOUT_CHAN_LEFT;
-    if( HAS_CHAN( AOUT_CHAN_RIGHT ) )
-        p_chans_out[i++] = AOUT_CHAN_RIGHT;
-
-    if( HAS_CHAN( AOUT_CHAN_CENTER ) )
-        p_chans_out[i++] = AOUT_CHAN_CENTER;
-
-    if( HAS_CHAN( AOUT_CHAN_LFE ) )
-        p_chans_out[i++] = AOUT_CHAN_LFE;
-
-    if( HAS_CHAN( AOUT_CHAN_REARLEFT ) )
-        p_chans_out[i++] = AOUT_CHAN_REARLEFT;
-    if( HAS_CHAN( AOUT_CHAN_REARRIGHT ) )
-        p_chans_out[i++] = AOUT_CHAN_REARRIGHT;
-
-    if( HAS_CHAN( AOUT_CHAN_REARCENTER ) )
-        p_chans_out[i++] = AOUT_CHAN_REARCENTER;
-
-    if( HAS_CHAN( AOUT_CHAN_MIDDLELEFT ) )
-        p_chans_out[i++] = AOUT_CHAN_MIDDLELEFT;
-    if( HAS_CHAN( AOUT_CHAN_MIDDLERIGHT ) )
-        p_chans_out[i++] = AOUT_CHAN_MIDDLERIGHT;
-
-    assert( i <= AOUT_CHAN_MAX );
-#undef HAS_CHAN
-}
-
 struct role {
     char vlc[16];
 };
@@ -1761,8 +1722,8 @@ StartPCM( JNIEnv *env, aout_stream_t *stream, unsigned i_max_channels )
         return i_ret;
 
     uint32_t p_chans_out[AOUT_CHAN_MAX];
-    AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out,
-                             AOUT_CHAN_MAX );
+    AndroidDevice_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out,
+                                AOUT_CHAN_MAX );
     p_sys->i_chans_to_reorder =
         aout_CheckChannelReorder( NULL, p_chans_out,
                                   p_sys->fmt.i_physical_channels,
