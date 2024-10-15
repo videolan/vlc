@@ -167,6 +167,9 @@ protected:
 private:
     bool commonGUICreateImpl(QWindow* window, CompositorVideo::Flags flags);
 
+private slots:
+    void adjustBlurBehind();
+
 protected slots:
     virtual void onSurfacePositionChanged(const QPointF&) {}
     virtual void onSurfaceSizeChanged(const QSizeF&) {}

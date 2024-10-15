@@ -20,6 +20,7 @@
 
 #include <QOperatingSystemVersion>
 #include <QWindow>
+#include <QRegion>
 
 #include <cassert>
 
@@ -65,8 +66,10 @@ static bool isEffectAvailable(const QWindow* window, const WindowEffectsModule::
     };
 }
 
-static void setBlurBehind(QWindow* const window, const bool enable = true)
+static void setBlurBehind(QWindow* const window, const bool enable = true, const QRegion& region = {})
 {
+    Q_UNUSED(region);
+
     assert(window);
     assert(window->winId()); // use QWindow::create() before calling this function
 

@@ -271,6 +271,7 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     {
         m_mainCtx->setCanShowVideoPIP(true);
     }
+    m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
     if (!backendIsOpenVg && (flags & CompositorVideo::HAS_ACRYLIC))
     {
         if (Q_LIKELY(!window->isActive()))
@@ -292,7 +293,6 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 #else
     m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
 #endif
-    m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
 
 #ifdef _WIN32
     m_taskbarWidget = std::make_unique<WinTaskbarWidget>(m_intf, window);
@@ -300,6 +300,40 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 #endif
     m_ui = std::make_unique<MainUI>(m_intf, m_mainCtx, window);
     return true;
+}
+
+void CompositorVideo::adjustBlurBehind()
+{
+    if (m_mainCtx && m_windowEffectsModule)
+    {
+        if (QWindow *const window = interfaceMainWindow())
+        {
+            assert(m_windowEffectsModule->isEffectAvailable(window, WindowEffectsModule::BlurBehind));
+            const bool blurBehind = m_mainCtx->hasAcrylicSurface();
+            if (blurBehind && m_mainCtx->windowSuportExtendedFrame() && m_mainCtx->useClientSideDecoration())
+            {
+                QRegion blurRegion;
+                const QRegion maskRegion = window->mask();
+                if (maskRegion.isEmpty())
+                {
+                    // If there is window mask, we assume that the content area is smaller than the
+                    // window geometry. We also assume that in that case window has custom margins
+                    // set (Wayland case). KWin 6.2 Wayland already considers window custom margins
+                    // when applying the blur effect, but KWin X11 does not consider `_GTK_FRAME_EXTENTS`.
+                    // Since the mask region represents the actual content area, and the outside region
+                    // is included in the frame margins, we can set the blur region only if the mask is
+                    // empty. This fixes blur backdrop applied to client shadows on X11:
+                    const auto margin = m_mainCtx->windowExtendedMargin();
+                    blurRegion = QRegion(margin, margin, window->width() - 2 * margin, window->height() - 2 * margin);
+                }
+                m_windowEffectsModule->setBlurBehind(window, true, blurRegion);
+            }
+            else
+            {
+                m_windowEffectsModule->setBlurBehind(window, blurBehind, {});
+            }
+        }
+    }
 }
 
 bool CompositorVideo::commonGUICreate(QWindow* window, QmlUISurface* qmlSurface, CompositorVideo::Flags flags)
@@ -385,7 +419,33 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
     if (!m_windowEffectsModule->isEffectAvailable(window, WindowEffectsModule::BlurBehind))
         return false;
 
-    m_windowEffectsModule->setBlurBehind(window, enable);
     m_mainCtx->setHasAcrylicSurface(enable);
+
+    if (m_mainCtx->windowSuportExtendedFrame())
+    {
+        assert(m_mainCtx);
+
+        if (enable)
+        {
+            connect(window, &QWindow::widthChanged, this, &CompositorVideo::adjustBlurBehind, Qt::UniqueConnection);
+            connect(window, &QWindow::heightChanged, this, &CompositorVideo::adjustBlurBehind, Qt::UniqueConnection);
+            connect(m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, &CompositorVideo::adjustBlurBehind, Qt::UniqueConnection);
+            connect(m_mainCtx, &MainCtx::useClientSideDecorationChanged, this, &CompositorVideo::adjustBlurBehind, Qt::UniqueConnection);
+        }
+        else
+        {
+            disconnect(window, &QWindow::widthChanged, this, &CompositorVideo::adjustBlurBehind);
+            disconnect(window, &QWindow::heightChanged, this, &CompositorVideo::adjustBlurBehind);
+            disconnect(m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, &CompositorVideo::adjustBlurBehind);
+            disconnect(m_mainCtx, &MainCtx::useClientSideDecorationChanged, this, &CompositorVideo::adjustBlurBehind);
+        }
+
+        adjustBlurBehind();
+    }
+    else
+    {
+        m_windowEffectsModule->setBlurBehind(window, enable, {});
+    }
+
     return true;
 }

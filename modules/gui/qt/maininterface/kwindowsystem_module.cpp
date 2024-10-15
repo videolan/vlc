@@ -39,9 +39,9 @@ static bool isEffectAvailable(const QWindow*, const WindowEffectsModule::Effect 
     return KWindowEffects::isEffectAvailable(kWindowEffect);
 }
 
-static void setBlurBehind(QWindow* const window, const bool enable = true)
+static void setBlurBehind(QWindow* const window, const bool enable = true, const QRegion& region = {})
 {
-    KWindowEffects::enableBlurBehind(window, enable, QRegion());
+    KWindowEffects::enableBlurBehind(window, enable, region);
 }
 
 static int Open(vlc_object_t* const p_this)

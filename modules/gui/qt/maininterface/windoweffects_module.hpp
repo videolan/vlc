@@ -20,6 +20,8 @@
 
 #include <vlc_common.h>
 
+#include <QRegion>
+
 class QWindow;
 
 struct WindowEffectsModule
@@ -34,7 +36,12 @@ struct WindowEffectsModule
     void *p_sys = nullptr;
 
     bool (*isEffectAvailable)(const QWindow* window, Effect effect);
-    void (*setBlurBehind)(QWindow* window, bool enable);
+
+    // NOTE: Region is not guaranteed to be respected.
+    // WARNING: Care must be taken for Qt library ABI compatibility.
+    //          For example, KWindowSystem may be built with Qt that are not
+    //          binary compatible with the version the application uses.
+    void (*setBlurBehind)(QWindow* window, bool enable, const QRegion& region);
 };
 
 #endif // WINDOWEFFECTSMODULE_HPP
