@@ -409,18 +409,20 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     return ret == VLC_SUCCESS ? id : 0;
 }
 
-void vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id )
+size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id )
 {
     if (preparser->executor == NULL)
-        return; /* TODO: the fetcher should be cancellable too */
+        return 0; /* TODO: the fetcher should be cancellable too */
 
     vlc_mutex_lock(&preparser->lock);
 
     struct task *task;
+    size_t count = 0;
     vlc_list_foreach(task, &preparser->submitted_tasks, node)
     {
         if (id == VLC_PREPARSER_REQ_ID_INVALID || task->id == id)
         {
+            count++;
             bool canceled =
                 vlc_executor_Cancel(preparser->executor, &task->runnable);
             if (canceled)
@@ -436,6 +438,8 @@ void vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id )
     }
 
     vlc_mutex_unlock(&preparser->lock);
+
+    return count;
 }
 
 void vlc_preparser_Deactivate( vlc_preparser_t* preparser )

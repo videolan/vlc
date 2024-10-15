@@ -253,7 +253,8 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     if (wait_and_cancel > 0)
     {
         vlc_tick_sleep( VLC_TICK_FROM_MS(wait_and_cancel) );
-        vlc_preparser_Cancel(parser, id);
+        size_t count = vlc_preparser_Cancel(parser, id);
+        assert(count == 1);
 
     }
     vlc_sem_wait(&sem);

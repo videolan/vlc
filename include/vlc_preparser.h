@@ -102,9 +102,10 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
  * @param preparser the preparser object
  * @param id unique id returned by vlc_preparser_Push(),
  * VLC_PREPARSER_REQ_ID_INVALID to cancels all tasks
+ * @return number of tasks cancelled
  */
-VLC_API void vlc_preparser_Cancel( vlc_preparser_t *preparser,
-                                   vlc_preparser_req_id id );
+VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
+                                     vlc_preparser_req_id id );
 
 /**
  * This function destroys the preparser object and thread.
