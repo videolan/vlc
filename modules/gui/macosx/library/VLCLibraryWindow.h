@@ -130,7 +130,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
 @property (readonly) VLCPlaylistController *playlistController;
 
-- (void)reopenVideoView;
+- (void)enableVideoPlaybackAppearance;
 - (void)disableVideoPlaybackAppearance;
 - (void)hideControlsBar;
 - (void)showControlsBar;

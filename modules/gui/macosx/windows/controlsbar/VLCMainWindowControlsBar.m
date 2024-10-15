@@ -139,7 +139,7 @@
 
 - (IBAction)artworkButtonAction:(id)sender
 {
-    [VLCMain.sharedInstance.libraryWindow reopenVideoView];
+    [VLCMain.sharedInstance.libraryWindow enableVideoPlaybackAppearance];
 }
 
 #pragma mark -

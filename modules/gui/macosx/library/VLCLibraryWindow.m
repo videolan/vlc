@@ -701,12 +701,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 }
 
-// This handles reopening the video view when the user has closed it.
-- (void)reopenVideoView
-{
-    [self enableVideoPlaybackAppearance];
-}
-
 - (void)hideControlsBarImmediately
 {
     self.controlsBarHeightConstraint.constant = 0;
