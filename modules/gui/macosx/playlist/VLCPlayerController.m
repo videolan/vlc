@@ -1482,6 +1482,15 @@ static int BossCallback(vlc_object_t *p_this,
     return enabled;
 }
 
+- (VLCTrackMetaData *)selectedVideoTrack
+{
+    vlc_player_Lock(_p_player);
+    const struct vlc_player_track * const p_track =
+        vlc_player_GetSelectedTrack(_p_player, VIDEO_ES);
+    vlc_player_Unlock(_p_player);
+    return [[VLCTrackMetaData alloc] initWithTrackStructure:p_track];
+}
+
 - (void)programListChanged
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerProgramListChanged
