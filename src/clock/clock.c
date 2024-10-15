@@ -623,6 +623,16 @@ vlc_clock_input_start(vlc_clock_t *clock,
     main_clock->wait_sync_ref_priority = UINT_MAX;
 }
 
+static void vlc_clock_slave_reset(vlc_clock_t *clock);
+static void vlc_clock_input_reset(vlc_clock_t *clock)
+{
+    vlc_clock_main_t *main_clock = clock->owner;
+    if (main_clock->master == clock)
+        vlc_clock_master_reset(clock);
+    else
+        vlc_clock_slave_reset(clock);
+}
+
 static vlc_tick_t
 vlc_clock_monotonic_to_system(vlc_clock_t *clock, struct vlc_clock_context *ctx,
                               vlc_tick_t now, vlc_tick_t ts, double rate)
@@ -1126,7 +1136,7 @@ static const struct vlc_clock_ops slave_ops = {
 
 static const struct vlc_clock_ops input_master_ops = {
     .update = vlc_clock_master_update,
-    .reset = vlc_clock_master_reset,
+    .reset = vlc_clock_input_reset,
     .set_delay = vlc_clock_master_set_delay,
     .to_system = vlc_clock_master_to_system,
     .start = vlc_clock_input_start,
@@ -1134,7 +1144,7 @@ static const struct vlc_clock_ops input_master_ops = {
 
 static const struct vlc_clock_ops input_slave_ops = {
     .update = vlc_clock_slave_update,
-    .reset = vlc_clock_slave_reset,
+    .reset = vlc_clock_input_reset,
     .set_delay = vlc_clock_slave_set_delay,
     .to_system = vlc_clock_slave_to_system,
     .start = vlc_clock_input_start,
