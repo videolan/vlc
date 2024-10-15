@@ -599,8 +599,12 @@ AudioTrack_GetLatencyUs( JNIEnv *env, aout_stream_t *stream )
 }
 
 static void
-AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
+AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[],
+                         size_t chan_out_max )
 {
+    assert( chan_out_max >= AOUT_CHAN_MAX);
+    memset( p_chans_out, 0, chan_out_max * sizeof(uint32_t) );
+
 #define HAS_CHAN( x ) ( ( i_physical_channels & (x) ) == (x) )
     /* samples will be in the following order: FL FR FC LFE BL BR BC SL SR */
     int i = 0;
@@ -1757,8 +1761,8 @@ StartPCM( JNIEnv *env, aout_stream_t *stream, unsigned i_max_channels )
         return i_ret;
 
     uint32_t p_chans_out[AOUT_CHAN_MAX];
-    memset( p_chans_out, 0, sizeof(p_chans_out) );
-    AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out );
+    AudioTrack_GetChanOrder( p_sys->fmt.i_physical_channels, p_chans_out,
+                             AOUT_CHAN_MAX );
     p_sys->i_chans_to_reorder =
         aout_CheckChannelReorder( NULL, p_chans_out,
                                   p_sys->fmt.i_physical_channels,
