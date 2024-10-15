@@ -37,6 +37,7 @@
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -796,9 +797,13 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)enableVideoPlaybackAppearance
 {
     VLCPlayerController * const playerController = self.playerController;
-    if (!playerController.videoTracksEnabled ||
-        playerController.selectedVideoTrack == nil ||
-        playerController.selectedVideoTrack.selected == NO) {
+    const BOOL videoTrackDisabled =
+        !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
+    const BOOL audioTrackDisabled =
+        !playerController.audioTracksEnabled || !playerController.selectedAudioTrack.selected;
+    const BOOL currentItemIsAudio =
+        playerController.videoTracks.count == 0 && playerController.audioTracks.count > 0;
+    if ((videoTrackDisabled && audioTrackDisabled) || (videoTrackDisabled && !currentItemIsAudio)) {
         return;
     }
 
