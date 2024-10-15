@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_player.h>
+#include <vlc_preparser.h>
 #include <vlc_atomic.h>
 
 struct libvlc_media_t
@@ -48,6 +49,7 @@ struct libvlc_media_t
     atomic_uint worker_count;
 
     _Atomic libvlc_media_parsed_status_t parsed_status;
+    vlc_preparser_req_id id;
 };
 
 /* Media Descriptor */

@@ -39,7 +39,6 @@
 #include <vlc_url.h>
 #include <vlc_thumbnailer.h>
 #include <vlc_atomic.h>
-#include <vlc_preparser.h>
 
 #include "../src/libvlc.h"
 
@@ -372,6 +371,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(input_item_t *p_input_item )
 
     p_md->p_input_item->libvlc_owner = p_md;
     atomic_init(&p_md->parsed_status, libvlc_media_parsed_status_none);
+    p_md->id = VLC_PREPARSER_REQ_ID_INVALID;
 
     libvlc_event_manager_init( &p_md->event_manager, p_md );
 
@@ -742,7 +742,6 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 
     input_item_t *item = media->p_input_item;
     input_item_meta_request_option_t parse_scope = 0;
-    int ret;
     unsigned int ref = atomic_load_explicit(&media->worker_count,
                                             memory_order_relaxed);
     do
@@ -816,9 +815,9 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
 
     vlc_preparser_SetTimeout(parser, VLC_TICK_FROM_MS(timeout));
 
-    ret = vlc_preparser_Push(parser, item, parse_scope,
-                             &preparser_callbacks, media, media);
-    if (ret != VLC_SUCCESS)
+    media->id = vlc_preparser_Push(parser, item, parse_scope,
+                             &preparser_callbacks, media);
+    if (media->id == VLC_PREPARSER_REQ_ID_INVALID)
     {
         atomic_fetch_sub_explicit(&media->worker_count, 1,
                                   memory_order_relaxed);
@@ -833,7 +832,11 @@ libvlc_media_parse_stop(libvlc_instance_t *inst, libvlc_media_t *media)
 {
     vlc_preparser_t *parser = libvlc_get_preparser(inst);
     assert(parser != NULL);
-    vlc_preparser_Cancel(parser, media);
+    if (media->id != VLC_PREPARSER_REQ_ID_INVALID)
+    {
+        vlc_preparser_Cancel(parser, media->id);
+        media->id = VLC_PREPARSER_REQ_ID_INVALID;
+    }
 }
 
 // Get Parsed status for media descriptor object

@@ -1968,7 +1968,7 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
             META_REQUEST_OPTION_FETCH_LOCAL;
 
     vlc_preparser_Push( d->m_preparser, p_item, fetch_options,
-                        &art_fetcher_cbs, d, nullptr );
+                        &art_fetcher_cbs, d  );
 }
 
 void PlayerControllerPrivate::onArtFetchEnded(input_item_t *p_item, bool)

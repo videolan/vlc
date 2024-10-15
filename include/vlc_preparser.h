@@ -42,6 +42,9 @@
  * It will also issue art fetching requests.
  */
 typedef struct vlc_preparser_t vlc_preparser_t;
+typedef size_t vlc_preparser_req_id;
+
+#define VLC_PREPARSER_REQ_ID_INVALID 0
 
 typedef enum input_item_meta_request_option_t
 {
@@ -84,22 +87,24 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  * @param cbs_userdata opaque pointer used by the callbacks
  * @param id unique id provided by the caller. This is can be used to cancel
  * the request with vlc_preparser_Cancel()
- * @returns VLC_SUCCESS if the item was scheduled for preparsing, an error code
- * otherwise
- * If this returns an error, the on_preparse_ended will *not* be invoked
+ * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * item was scheduled for preparsing. If this returns an
+ * error, the on_preparse_ended will *not* be invoked
  */
-VLC_API int vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
-                                input_item_meta_request_option_t option,
-                                const input_item_parser_cbs_t *cbs,
-                                void *cbs_userdata, void *id );
+VLC_API vlc_preparser_req_id
+vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
+                    input_item_meta_request_option_t option,
+                    const input_item_parser_cbs_t *cbs, void *cbs_userdata );
 
 /**
  * This function cancel all preparsing requests for a given id
  *
  * @param preparser the preparser object
- * @param id unique id given to vlc_preparser_Push()
+ * @param id unique id returned by vlc_preparser_Push(),
+ * VLC_PREPARSER_REQ_ID_INVALID to cancels all tasks
  */
-VLC_API void vlc_preparser_Cancel( vlc_preparser_t *preparser, void *id );
+VLC_API void vlc_preparser_Cancel( vlc_preparser_t *preparser,
+                                   vlc_preparser_req_id id );
 
 /**
  * This function destroys the preparser object and thread.

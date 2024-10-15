@@ -338,20 +338,19 @@ static const input_item_parser_cbs_t preparser_callbacks = {
     .on_subtree_added = media_subtree_changed,
 };
 
-void
+vlc_preparser_req_id
 vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
-                        input_item_t *media, void* id)
+                        input_item_t *media)
 {
 #ifdef TEST_MEDIA_SOURCE
     VLC_UNUSED(tree);
     VLC_UNUSED(parser);
     VLC_UNUSED(media);
-    VLC_UNUSED(id);
     VLC_UNUSED(preparser_callbacks);
 #else
-    vlc_preparser_Push(parser, media, META_REQUEST_OPTION_PARSE |
-                       META_REQUEST_OPTION_DO_INTERACT |
-                       META_REQUEST_OPTION_PARSE_SUBITEMS,
-                       &preparser_callbacks, tree, id);
+    return vlc_preparser_Push(parser, media, META_REQUEST_OPTION_PARSE |
+                              META_REQUEST_OPTION_DO_INTERACT |
+                              META_REQUEST_OPTION_PARSE_SUBITEMS,
+                              &preparser_callbacks, tree);
 #endif
 }

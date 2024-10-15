@@ -155,6 +155,6 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
             options |= META_REQUEST_OPTION_PARSE_SUBITEMS;
 
         vlc_preparser_Push(playlist->parser, input, options,
-                           &preparser_callbacks, playlist, NULL);
+                           &preparser_callbacks, playlist);
     }
 }

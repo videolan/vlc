@@ -317,7 +317,7 @@ static const char *const myFoldersDescription = "My Folders";
     }
 
     vlc_media_tree_Preparse(_p_mediaSource->tree, _p_preparser,
-                            inputNode.inputItem.vlcInputItem, NULL);
+                            inputNode.inputItem.vlcInputItem);
 }
 
 - (void)clearChildNodesForNode:(nonnull input_item_node_t*)inputNode
