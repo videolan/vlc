@@ -116,8 +116,9 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
  * \param thumbnailer A thumbnailer object
  * \param id unique id returned by vlc_thumbnailer_Request*(),
  * VLC_THUMBNAILER_REQ_ID_INVALID to cancels all tasks
+ * \return number of tasks cancelled
  */
-VLC_API void
+VLC_API size_t
 vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id );
 
 /**

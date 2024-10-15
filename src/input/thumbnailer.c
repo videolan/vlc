@@ -286,15 +286,17 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                          userdata);
 }
 
-void vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )
+size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )
 {
     vlc_mutex_lock(&thumbnailer->lock);
 
     task_t *task;
+    size_t count = 0;
     vlc_list_foreach(task, &thumbnailer->submitted_tasks, node)
     {
         if (id == VLC_THUMBNAILER_REQ_ID_INVALID || task->id == id)
         {
+            count++;
             bool canceled =
                 vlc_executor_Cancel(thumbnailer->executor, &task->runnable);
             if (canceled)
@@ -312,6 +314,8 @@ void vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req
     }
 
     vlc_mutex_unlock(&thumbnailer->lock);
+
+    return count;
 }
 
 vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent)
