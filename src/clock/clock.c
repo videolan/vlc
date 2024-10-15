@@ -669,7 +669,8 @@ vlc_clock_monotonic_to_system(vlc_clock_t *clock, struct vlc_clock_context *ctx,
     vlc_clock_main_t *main_clock = clock->owner;
 
     if (clock->priority < main_clock->wait_sync_ref_priority
-     && ctx == main_clock->context)
+     && ctx == main_clock->context
+     && main_clock->first_pcr.system != VLC_TICK_INVALID)
     {
         /* XXX: This input_delay calculation is needed until we (finally) get
          * ride of the input clock. This code is adapted from input_clock.c and
@@ -699,7 +700,6 @@ vlc_clock_monotonic_to_system(vlc_clock_t *clock, struct vlc_clock_context *ctx,
         ctx->wait_sync_ref = clock_point_Create(now + delay, ts);
     }
 
-    assert(ctx->wait_sync_ref.stream != VLC_TICK_INVALID);
 
     return (ts - ctx->wait_sync_ref.stream) / rate + ctx->wait_sync_ref.system;
 }
