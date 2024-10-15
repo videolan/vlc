@@ -6,6 +6,7 @@ vlc_modules += {
       'visual/window.c', 'visual/window.h',
       'visual/window_presets.h'),
     'dependencies' : [opengl_dep, m_lib],
+    'c_args' : [ contrib_inc_args ],
     'enabled' : opengl_dep.found(),
 }
 
