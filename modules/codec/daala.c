@@ -35,10 +35,10 @@
 #include <vlc_meta.h>
 #include "../demux/xiph.h"
 
-#include <daala/codec.h>
-#include <daala/daaladec.h>
+#include <codec.h>
+#include <daaladec.h>
 #ifdef ENABLE_SOUT
-#include <daala/daalaenc.h>
+#include <daalaenc.h>
 #endif
 
 #include <limits.h>
