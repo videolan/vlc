@@ -135,27 +135,26 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
         vlc_mutex_lock( &ctx.lock );
 
-        vlc_thumbnailer_request_t* p_req;
+        vlc_thumbnailer_req_id id;
         if ( test_params[i].b_use_pos )
         {
-            p_req = vlc_thumbnailer_RequestByPos( p_thumbnailer, test_params[i].f_pos,
+            id = vlc_thumbnailer_RequestByPos( p_thumbnailer, test_params[i].f_pos,
                 test_params[i].b_fast_seek ?
                     VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
                 p_item, test_params[i].i_timeout, thumbnailer_callback, &ctx );
         }
         else
         {
-            p_req = vlc_thumbnailer_RequestByTime( p_thumbnailer, test_params[i].i_time,
+            id = vlc_thumbnailer_RequestByTime( p_thumbnailer, test_params[i].i_time,
                 test_params[i].b_fast_seek ?
                     VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
                 p_item, test_params[i].i_timeout, thumbnailer_callback, &ctx );
         }
-        assert( p_req != NULL );
+        assert( id != VLC_THUMBNAILER_REQ_ID_INVALID );
 
         while ( ctx.b_done == false )
             vlc_cond_wait( &ctx.cond, &ctx.lock );
 
-        vlc_thumbnailer_DestroyRequest( p_thumbnailer, p_req );
         vlc_mutex_unlock( &ctx.lock );
 
         input_item_Release( p_item );
@@ -184,11 +183,11 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     input_item_t* p_item = input_item_New( psz_mrl, "mock item" );
     assert( p_item != NULL );
 
-    vlc_thumbnailer_request_t* p_req = vlc_thumbnailer_RequestByTime( p_thumbnailer,
+    vlc_thumbnailer_req_id id = vlc_thumbnailer_RequestByTime( p_thumbnailer,
         VLC_TICK_INVALID, VLC_THUMBNAILER_SEEK_PRECISE, p_item,
         VLC_TICK_INVALID, thumbnailer_callback_cancel, NULL );
 
-    vlc_thumbnailer_DestroyRequest( p_thumbnailer, p_req );
+    vlc_thumbnailer_Cancel( p_thumbnailer, id );
 
     /* Check that thumbnailer_callback_cancel is not called, even after the
      * normal termination of the parsing. */

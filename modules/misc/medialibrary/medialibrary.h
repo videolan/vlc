@@ -41,7 +41,6 @@
 struct vlc_event_t;
 struct vlc_object_t;
 struct vlc_thumbnailer_t;
-struct vlc_thumbnailer_request_t;
 
 class Logger;
 
@@ -129,7 +128,6 @@ class Thumbnailer : public medialibrary::IThumbnailer
         Thumbnailer* thumbnailer;
         bool done;
         picture_t* thumbnail;
-        vlc_thumbnailer_request_t* request;
     };
 public:
     Thumbnailer(vlc_medialibrary_module_t* ml);

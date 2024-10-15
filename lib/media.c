@@ -924,7 +924,7 @@ struct libvlc_media_thumbnail_request_t
     unsigned int height;
     bool crop;
     libvlc_picture_type_t type;
-    vlc_thumbnailer_request_t* req;
+    vlc_thumbnailer_req_id id;
 };
 
 static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
@@ -970,14 +970,14 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     req->type = picture_type;
     req->crop = crop;
     libvlc_media_retain( md );
-    req->req = vlc_thumbnailer_RequestByTime( thumb,
+    req->id = vlc_thumbnailer_RequestByTime( thumb,
         vlc_tick_from_libvlc_time( time ),
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
         timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
-    if ( req->req == NULL )
+    if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {
         free( req );
         libvlc_media_release( md );
@@ -1013,13 +1013,13 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
     req->crop = crop;
     req->type = picture_type;
     libvlc_media_retain( md );
-    req->req = vlc_thumbnailer_RequestByPos( thumb, pos,
+    req->id = vlc_thumbnailer_RequestByPos( thumb, pos,
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
         timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
-    if ( req->req == NULL )
+    if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {
         free( req );
         libvlc_media_release( md );
@@ -1035,7 +1035,7 @@ void libvlc_media_thumbnail_request_destroy( libvlc_media_thumbnail_request_t *r
     vlc_thumbnailer_t *thumb = libvlc_get_thumbnailer(req->instance);
     assert(thumb != NULL);
 
-    vlc_thumbnailer_DestroyRequest( thumb, req->req );
+    vlc_thumbnailer_Cancel( thumb, req->id );
     libvlc_media_release( req->md );
     libvlc_release(req->instance);
     free( req );

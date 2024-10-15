@@ -28,10 +28,6 @@
 #include <vlc_executor.h>
 #include "input_internal.h"
 
-typedef size_t vlc_thumbnailer_req_id;
-
-#define VLC_THUMBNAILER_REQ_ID_INVALID 0
-
 struct vlc_thumbnailer_t
 {
     vlc_object_t* parent;
@@ -57,8 +53,6 @@ struct seek_target
         double pos;
     };
 };
-
-typedef struct vlc_thumbnailer_request_t vlc_thumbnailer_request_t;
 
 typedef struct task
 {
@@ -239,7 +233,7 @@ error:
     TaskDestroy(task);
 }
 
-static vlc_thumbnailer_request_t *
+static vlc_thumbnailer_req_id
 RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
               enum vlc_thumbnailer_seek_speed speed, input_item_t *item,
               vlc_tick_t timeout, vlc_thumbnailer_cb cb, void *userdata)
@@ -248,7 +242,7 @@ RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
     task_t *task = TaskNew(thumbnailer, item, seek_target, fast_seek, cb,
                            userdata, timeout);
     if (!task)
-        return NULL;
+        return 0;
 
     vlc_mutex_lock(&thumbnailer->lock);
     vlc_thumbnailer_req_id id = task->id = thumbnailer->current_id++;
@@ -260,10 +254,10 @@ RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
 
     vlc_executor_Submit(thumbnailer->executor, &task->runnable);
 
-    return (void *)(uintptr_t) id;
+    return id;
 }
 
-vlc_thumbnailer_request_t *
+vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
                                vlc_tick_t time,
                                enum vlc_thumbnailer_seek_speed speed,
@@ -278,7 +272,7 @@ vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
                          userdata);
 }
 
-vlc_thumbnailer_request_t *
+vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                               double pos, enum vlc_thumbnailer_seek_speed speed,
                               input_item_t *item, vlc_tick_t timeout,
@@ -292,12 +286,11 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                          userdata);
 }
 
-void vlc_thumbnailer_DestroyRequest( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_request_t *req )
+void vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )
 {
     vlc_mutex_lock(&thumbnailer->lock);
 
     task_t *task;
-    vlc_thumbnailer_req_id id = (uintptr_t) req;
     vlc_list_foreach(task, &thumbnailer->submitted_tasks, node)
     {
         if (id == VLC_THUMBNAILER_REQ_ID_INVALID || task->id == id)

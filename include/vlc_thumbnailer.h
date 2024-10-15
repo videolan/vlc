@@ -27,7 +27,9 @@
 #include <vlc_tick.h>
 
 typedef struct vlc_thumbnailer_t vlc_thumbnailer_t;
-typedef struct vlc_thumbnailer_request_t vlc_thumbnailer_request_t;
+typedef size_t vlc_thumbnailer_req_id;
+
+#define VLC_THUMBNAILER_REQ_ID_INVALID 0
 
 /**
  * \brief vlc_thumbnailer_cb defines a callback invoked on thumbnailing completion or error
@@ -71,17 +73,15 @@ enum vlc_thumbnailer_seek_speed
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * \param cb A user callback to be called on completion (success & error)
  * \param user_data An opaque value, provided as pf_cb's first parameter
- * \return An opaque request object, or NULL in case of failure
+ * \returns > 0 if the item was scheduled for thumbnailing, 0 in case of error.
  *
- * If this function returns a valid request object, the callback is guaranteed
- * to be called, even in case of later failure (except if destroyed early by
+ * If this function returns a valid id, the callback is guaranteed
+ * to be called, even in case of later failure (except if cancelled early by
  * the user).
- * The returned request object must be freed with
- * vlc_thumbnailer_DestroyRequest().
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
-VLC_API vlc_thumbnailer_request_t*
+VLC_API vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
                                vlc_tick_t time,
                                enum vlc_thumbnailer_seek_speed speed,
@@ -96,17 +96,15 @@ vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * \param cb A user callback to be called on completion (success & error)
  * \param user_data An opaque value, provided as pf_cb's first parameter
- * \return An opaque request object, or NULL in case of failure
- *
- * If this function returns a valid request object, the callback is guaranteed
- * to be called, even in case of later failure (except if destroyed early by
- * the user).
- * The returned request object must be freed with
- * vlc_thumbnailer_DestroyRequest().
+
+ * @return VLC_THUMBNAILER_REQ_ID_INVALID in case of error, or a valid id if
+ * the item was scheduled for preparsing.  If this function returns a valid id,
+ * the callback is guaranteed to be called, even in case of later failure
+ * (except if cancelled early by the user).
  * The provided input_item will be held by the thumbnailer and can safely be
- * released after calling this function.
+ * released safely after calling this function.
  */
-VLC_API vlc_thumbnailer_request_t*
+VLC_API vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                               double pos,
                               enum vlc_thumbnailer_seek_speed speed,
@@ -114,16 +112,13 @@ vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                               vlc_thumbnailer_cb cb, void* user_data );
 
 /**
- * \brief vlc_thumbnailer_DestroyRequest Destroy a thumbnail request
+ * \brief vlc_thumbnailer_Camcel Cancel a thumbnail request
  * \param thumbnailer A thumbnailer object
- * \param request An opaque thumbnail request object
- *
- * The request can be destroyed before receiving a callback (in that case, the
- * callback won't be called) or after (to release resources).
+ * \param id unique id returned by vlc_thumbnailer_Request*(),
+ * VLC_THUMBNAILER_REQ_ID_INVALID to cancels all tasks
  */
 VLC_API void
-vlc_thumbnailer_DestroyRequest( vlc_thumbnailer_t* thumbnailer,
-                                vlc_thumbnailer_request_t* request );
+vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id );
 
 /**
  * \brief vlc_thumbnailer_Release releases a thumbnailer and cancel all pending requests
