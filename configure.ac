@@ -713,13 +713,6 @@ dnl Check for broken versions of mingw-runtime compatability library
         CPPFLAGS="${CPPFLAGS} -D__USE_MINGW_ANSI_STDIO=0"
     ])
 
-    dnl Check for the need to include the mingwex lib for mingw32
-    VLC_SAVE_FLAGS
-    AC_CHECK_LIB([mingwex], [opendir],
-        AC_CHECK_LIB([mingw32], [opendir],,
-            [VLC_ADD_LIBS([libvlccore],[-lmingwex])])
-    )
-    VLC_RESTORE_FLAGS
     ], [
         AC_MSG_RESULT([Not compiling with mingw])
     ])

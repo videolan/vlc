@@ -316,7 +316,6 @@ endif
 have_mingw = false
 have_win_desktop = false
 have_win_store = false
-mingw_libs = []
 libcom_cppflags = []
 
 if host_system == 'windows'
@@ -408,16 +407,6 @@ ucrt_version_test = '''
             cdata.set(d.get(0), d.get(1))
             vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
         endforeach
-
-        # Check for the need to link to the mingwex lib for MinGW-w64 32bit
-        mingwex_lib = cc.find_library('mingwex', required: false)
-
-        if mingwex_lib.found() and not cc.find_library('mingw32', required: false).found()
-            mingw_libs += mingwex_lib
-        endif
-
-        # TODO: enable when meson 0.63 is required
-        # add_project_dependencies(mingw_libs, language: ['c', 'cpp'])
 
         # fno-strict-aliasing is necessary for WRL and IID_PPV_ARGS to work safely
         # MSVC doesn't have this option but doesn't do pointer aliasing, so it
