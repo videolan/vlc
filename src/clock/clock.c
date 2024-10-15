@@ -677,12 +677,12 @@ vlc_clock_monotonic_to_system(vlc_clock_t *clock, struct vlc_clock_context *ctx,
          * is used to introduce the same delay than the input clock (first PTS
          * - first PCR). */
         vlc_tick_t pcr_delay = 0;
-        if (main_clock->first_pcr.system != VLC_TICK_INVALID)
-            pcr_delay = (ts - main_clock->first_pcr.stream) / rate +
-                main_clock->first_pcr.system - now;
-        else if (ctx->start_time.system != VLC_TICK_INVALID)
+        if (ctx->start_time.system != VLC_TICK_INVALID)
             pcr_delay = (ts - ctx->start_time.stream) / rate +
                 ctx->start_time.system - now;
+        else if (main_clock->first_pcr.system != VLC_TICK_INVALID)
+            pcr_delay = (ts - main_clock->first_pcr.stream) / rate +
+                main_clock->first_pcr.system - now;
 
         if (pcr_delay > MAX_PCR_DELAY)
         {
