@@ -761,14 +761,17 @@ vlc_modules += {
 # VP8/VP9 with alpha pseudo-decoder
 vpx_alpha_sources = files('vpx_alpha.c')
 vpx_alpha_with = [ ]
+vpx_alpha_deps = [ ]
 if host_system == 'windows'
     vpx_alpha_sources += files('alpha_d3d11.cpp')
     vpx_alpha_with += [ d3d11_common_lib ]
+    vpx_alpha_deps += [ cc.find_library('d3d11') ]
 endif
 vlc_modules += {
     'name' : 'vpx_alpha',
     'sources' : vpx_alpha_sources,
-    'link_with' : vpx_alpha_with
+    'link_with' : vpx_alpha_with,
+    'dependencies' : [vpx_alpha_deps],
 }
 
 # libaom AV1 codec

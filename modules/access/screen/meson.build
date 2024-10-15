@@ -22,7 +22,7 @@ if get_option('screen').allowed()
     if host_system == 'windows'
       screen_files += files('win32.c', 'dxgi.cpp')
       gdi32_dep = cc.find_library('gdi32')
-      screen_deps += [gdi32_dep]
+      screen_deps += [gdi32_dep, cc.find_library('d3d11')]
       screen_cppargs += libcom_cppflags
       screen_link_with += d3d11_common_lib
     else
