@@ -156,7 +156,7 @@ opengles_dep = frameworks['OpenGLES']
 # WASAPI-related dependency
 ksuser_lib = cc.find_library('ksuser',
                              has_headers: ['audioclient.h'],
-                             required: host_system == 'windows' and get_option('wasapi'))
+                             required: host_system == 'windows' and get_option('wasapi').enabled())
 
 # Helper libraries for modules
 # These are helper libraries used by some modules
@@ -405,7 +405,7 @@ if get_option('rust').enabled()
         '3': ['-C', 'opt-level=3'],
         's': ['-C', 'opt-level=s'],
     }
-    
+
     print_static_libs_rustc = run_command([cargo_rustc_static_libs, cargo_bin],
         check: true, capture: true)
     rust_common_link_args = print_static_libs_rustc.stdout().split()
@@ -414,7 +414,7 @@ if get_option('rust').enabled()
     # meson where array += element is not equal to array += array
     rust_flags = get_option('extra_rust_flags')
     rust_flags += rust_optimization_args[get_option('optimization')]
-    
+
     cargo_target_dir = join_paths(meson.current_build_dir(), 'cargo_target')
 
     extra_cargo_args = []
