@@ -146,10 +146,10 @@ LoadSymbols(aout_stream_t *stream)
         goto end;
     }
 
-#define AAUDIO_DLSYM(name) \
+#define AAUDIO_DLSYM(name, critical) \
     do { \
         void *sym = dlsym(vt.handle, #name); \
-        if (unlikely(!sym)) { \
+        if (unlikely(!sym) && critical) { \
             msg_Err(stream, "Failed to load symbol "#name); \
             init_state = 0; \
             goto end; \
@@ -157,30 +157,30 @@ LoadSymbols(aout_stream_t *stream)
         *(void **) &vt.name = sym; \
     } while(0)
 
-    AAUDIO_DLSYM(AAudio_createStreamBuilder);
-    AAUDIO_DLSYM(AAudio_convertResultToText);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setChannelCount);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setDeviceId);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setFormat);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setDataCallback);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setErrorCallback);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setPerformanceMode);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setSessionId);
-    AAUDIO_DLSYM(AAudioStreamBuilder_setUsage);
-    AAUDIO_DLSYM(AAudioStreamBuilder_openStream);
-    AAUDIO_DLSYM(AAudioStreamBuilder_delete);
-    AAUDIO_DLSYM(AAudioStream_requestStart);
-    AAUDIO_DLSYM(AAudioStream_requestStop);
-    AAUDIO_DLSYM(AAudioStream_requestPause);
-    AAUDIO_DLSYM(AAudioStream_requestFlush);
-    AAUDIO_DLSYM(AAudioStream_getDeviceId);
-    AAUDIO_DLSYM(AAudioStream_getSampleRate);
-    AAUDIO_DLSYM(AAudioStream_getTimestamp);
-    AAUDIO_DLSYM(AAudioStream_write);
-    AAUDIO_DLSYM(AAudioStream_close);
-    AAUDIO_DLSYM(AAudioStream_getState);
-    AAUDIO_DLSYM(AAudioStream_waitForStateChange);
-    AAUDIO_DLSYM(AAudioStream_getSessionId);
+    AAUDIO_DLSYM(AAudio_createStreamBuilder, true);
+    AAUDIO_DLSYM(AAudio_convertResultToText, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setChannelCount, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setDeviceId, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setFormat, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setDataCallback, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setErrorCallback, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setPerformanceMode, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setSessionId, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setUsage, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_openStream, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_delete, true);
+    AAUDIO_DLSYM(AAudioStream_requestStart, true);
+    AAUDIO_DLSYM(AAudioStream_requestStop, true);
+    AAUDIO_DLSYM(AAudioStream_requestPause, true);
+    AAUDIO_DLSYM(AAudioStream_requestFlush, true);
+    AAUDIO_DLSYM(AAudioStream_getDeviceId, true);
+    AAUDIO_DLSYM(AAudioStream_getSampleRate, true);
+    AAUDIO_DLSYM(AAudioStream_getTimestamp, true);
+    AAUDIO_DLSYM(AAudioStream_write, true);
+    AAUDIO_DLSYM(AAudioStream_close, true);
+    AAUDIO_DLSYM(AAudioStream_getState, true);
+    AAUDIO_DLSYM(AAudioStream_waitForStateChange, true);
+    AAUDIO_DLSYM(AAudioStream_getSessionId, true);
 #undef AAUDIO_DLSYM
 
     init_state = 1;
