@@ -632,10 +632,7 @@ if host_system == 'windows'
         install: false
     )
 
-    mft_deps = [ cc.find_library('mfplat') ]
-    if get_option('winstore_app')
-        mft_deps += [ cc.find_library('d3d11') ]
-    endif
+    mft_deps = [ cc.find_library('mfplat'), cc.find_library('d3d11') ]
     vlc_modules += {
         'name' : 'mft',
         'sources' : files(

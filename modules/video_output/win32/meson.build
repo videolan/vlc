@@ -9,10 +9,9 @@ d3d11_sources = files('direct3d11.cpp', 'd3d11_quad.cpp', 'd3d11_scaler.cpp',
 d3d11_link_with = [ d3d11_common_lib ]
 d3d11_cargs = []
 d3d11_cxxargs = [ libcom_cppflags ]
-d3d11_deps = [ cc.find_library('dxgi') ]
+d3d11_deps = [ cc.find_library('dxgi'), cc.find_library('d3d11') ]
 if get_option('winstore_app')
     d3d11_deps += [
-        cc.find_library('d3d11'),
         cc.find_library('d3dcompiler_47')
     ]
 else
