@@ -426,8 +426,6 @@ else
 fi
 cd ../..
 
-MCONFIGFLAGS="$MCONFIGFLAGS -Dc_args='${VLC_CFLAGS}' -Dc_link_args='${VLC_LDFLAGS}' -Dcpp_args='${VLC_CXXFLAGS}' -Dcpp_link_args='${VLC_LDFLAGS}'"
-
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
      MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
@@ -482,7 +480,11 @@ if [ -n "$BUILD_MESON" ]; then
     info "Configuring VLC"
     BUILD_PATH="$( pwd -P )"
     cd ${VLC_ROOT_PATH}
-    meson setup ${BUILD_PATH}/$SHORTARCH-meson $MCONFIGFLAGS --cross-file ${BUILD_PATH}/contrib/contrib-$SHORTARCH/crossfile.meson --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
+    meson setup ${BUILD_PATH}/$SHORTARCH-meson \
+        -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS}" \
+        $MCONFIGFLAGS \
+        --cross-file ${BUILD_PATH}/contrib/contrib-$SHORTARCH/crossfile.meson \
+        --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
 
     info "Compiling"
     cd ${BUILD_PATH}/$SHORTARCH-meson
