@@ -772,6 +772,8 @@ extern const CGFloat VLCVolumeDefault;
 
 @property (readonly) VLCTrackMetaData *selectedVideoTrack;
 
+@property (readonly) BOOL audioTracksEnabled;
+
 #pragma mark - video output properties
 
 /**

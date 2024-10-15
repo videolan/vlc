@@ -1496,6 +1496,14 @@ static int BossCallback(vlc_object_t *p_this,
     return [self selectedTrackMetadataOfCategory:VIDEO_ES];
 }
 
+- (BOOL)audioTracksEnabled
+{
+    vlc_player_Lock(_p_player);
+    const BOOL enabled = vlc_player_IsAudioEnabled(_p_player);
+    vlc_player_Unlock(_p_player);
+    return enabled;
+}
+
 - (void)programListChanged
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerProgramListChanged
