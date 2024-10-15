@@ -32,6 +32,8 @@ struct vlc_thumbnailer_t
 {
     vlc_object_t* parent;
     vlc_executor_t *executor;
+    vlc_mutex_t lock;
+    vlc_cond_t cond_ended;
 };
 
 struct seek_target
@@ -68,8 +70,6 @@ struct vlc_thumbnailer_request_t
     vlc_thumbnailer_cb cb;
     void* userdata;
 
-    vlc_mutex_t lock;
-    vlc_cond_t cond_ended;
     enum
     {
         RUNNING,
@@ -101,8 +101,6 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
     task->userdata = userdata;
     task->timeout = timeout;
 
-    vlc_mutex_init(&task->lock);
-    vlc_cond_init(&task->cond_ended);
     task->status = RUNNING;
     task->pic = NULL;
 
@@ -140,14 +138,15 @@ on_thumbnailer_input_event( input_thread_t *input,
          return;
 
     task_t *task = userdata;
+    vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
 
-    vlc_mutex_lock(&task->lock);
+    vlc_mutex_lock(&thumbnailer->lock);
     if (task->status != RUNNING)
     {
         /* We may receive a THUMBNAIL_READY event followed by an
          * INPUT_EVENT_STATE (end of stream), we must only consider the first
          * one. */
-        vlc_mutex_unlock(&task->lock);
+        vlc_mutex_unlock(&thumbnailer->lock);
         return;
     }
 
@@ -156,8 +155,8 @@ on_thumbnailer_input_event( input_thread_t *input,
     if (event->type == INPUT_EVENT_THUMBNAIL_READY)
         task->pic = picture_Hold(event->thumbnail);
 
-    vlc_cond_signal(&task->cond_ended);
-    vlc_mutex_unlock(&task->lock);
+    vlc_cond_signal(&thumbnailer->cond_ended);
+    vlc_mutex_unlock(&thumbnailer->lock);
 }
 
 static void
@@ -200,11 +199,11 @@ RunnableRun(void *userdata)
         goto error;
     }
 
-    vlc_mutex_lock(&task->lock);
+    vlc_mutex_lock(&thumbnailer->lock);
     if (task->timeout == VLC_TICK_INVALID)
     {
         while (task->status == RUNNING)
-            vlc_cond_wait(&task->cond_ended, &task->lock);
+            vlc_cond_wait(&thumbnailer->cond_ended, &thumbnailer->lock);
     }
     else
     {
@@ -212,13 +211,13 @@ RunnableRun(void *userdata)
         int timeout = 0;
         while (task->status == RUNNING && timeout == 0)
             timeout =
-                vlc_cond_timedwait(&task->cond_ended, &task->lock, deadline);
+                vlc_cond_timedwait(&thumbnailer->cond_ended, &thumbnailer->lock, deadline);
     }
     picture_t* pic = task->pic;
     task->pic = NULL;
 
     bool notify = task->status != INTERRUPTED;
-    vlc_mutex_unlock(&task->lock);
+    vlc_mutex_unlock(&thumbnailer->lock);
 
     if (notify)
         NotifyThumbnail(task, pic);
@@ -236,11 +235,12 @@ error:
 static void
 Interrupt(task_t *task)
 {
+    vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
     /* Wake up RunnableRun() which will call input_Stop() */
-    vlc_mutex_lock(&task->lock);
+    vlc_mutex_lock(&thumbnailer->lock);
     task->status = INTERRUPTED;
-    vlc_cond_signal(&task->cond_ended);
-    vlc_mutex_unlock(&task->lock);
+    vlc_cond_signal(&thumbnailer->cond_ended);
+    vlc_mutex_unlock(&thumbnailer->lock);
 }
 
 static task_t *
@@ -320,6 +320,8 @@ vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent)
     }
 
     thumbnailer->parent = parent;
+    vlc_mutex_init(&thumbnailer->lock);
+    vlc_cond_init(&thumbnailer->cond_ended);
 
     return thumbnailer;
 }
