@@ -75,6 +75,11 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
                                       VLC_TICK_FROM_SEC( 3 ),
                                       &onThumbnailComplete, &ctx );
 
+        if (ctx.request == nullptr)
+        {
+            m_currentContext = nullptr;
+            return false;
+        }
         while ( ctx.done == false )
             m_cond.wait( m_mutex );
         m_currentContext = nullptr;
