@@ -731,6 +731,10 @@ static void convert_paused_common(const struct clock_ctx *ctx, vlc_clock_t *upda
     const vlc_tick_t system_start = ctx->system_start;
     vlc_tick_t system = system_start;
 
+    vlc_clock_main_Lock(ctx->mainclk);
+    vlc_clock_main_SetFirstPcr(ctx->mainclk, ctx->system_start, ctx->stream_start);
+    vlc_clock_main_Unlock(ctx->mainclk);
+
     vlc_clock_Lock(updater);
     vlc_clock_Update(updater, ctx->system_start, ctx->stream_start, 1.0f);
     vlc_clock_Unlock(updater);
