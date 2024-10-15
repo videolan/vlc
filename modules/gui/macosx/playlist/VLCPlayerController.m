@@ -1504,6 +1504,11 @@ static int BossCallback(vlc_object_t *p_this,
     return enabled;
 }
 
+- (VLCTrackMetaData *)selectedAudioTrack
+{
+    return [self selectedTrackMetadataOfCategory:AUDIO_ES];
+}
+
 - (void)programListChanged
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerProgramListChanged
