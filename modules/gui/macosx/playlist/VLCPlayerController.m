@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCPlayerController.h"
+#include "vlc_player.h"
 
 #import <vlc_configuration.h>
 #import <vlc_url.h>
@@ -1471,6 +1472,14 @@ static int BossCallback(vlc_object_t *p_this,
 - (NSArray<VLCTrackMetaData *> *)subtitleTracks
 {
     return [self tracksForCategory:SPU_ES];
+}
+
+- (BOOL)videoTracksEnabled
+{
+    vlc_player_Lock(_p_player);
+    const BOOL enabled = vlc_player_IsVideoEnabled(_p_player);
+    vlc_player_Unlock(_p_player);
+    return enabled;
 }
 
 - (void)programListChanged

@@ -768,6 +768,8 @@ extern const CGFloat VLCVolumeDefault;
  */
 @property (readonly, nullable) NSArray<VLCTrackMetaData *>* subtitleTracks;
 
+@property (readonly) BOOL videoTracksEnabled;
+
 #pragma mark - video output properties
 
 /**
