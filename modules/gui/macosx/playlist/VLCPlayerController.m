@@ -1474,6 +1474,15 @@ static int BossCallback(vlc_object_t *p_this,
     return [self tracksForCategory:SPU_ES];
 }
 
+- (VLCTrackMetaData *)selectedTrackMetadataOfCategory:(enum es_format_category_e)category
+{
+    vlc_player_Lock(_p_player);
+    const struct vlc_player_track * const p_track =
+        vlc_player_GetSelectedTrack(_p_player, category);
+    vlc_player_Unlock(_p_player);
+    return [[VLCTrackMetaData alloc] initWithTrackStructure:p_track];
+}
+
 - (BOOL)videoTracksEnabled
 {
     vlc_player_Lock(_p_player);
@@ -1484,11 +1493,7 @@ static int BossCallback(vlc_object_t *p_this,
 
 - (VLCTrackMetaData *)selectedVideoTrack
 {
-    vlc_player_Lock(_p_player);
-    const struct vlc_player_track * const p_track =
-        vlc_player_GetSelectedTrack(_p_player, VIDEO_ES);
-    vlc_player_Unlock(_p_player);
-    return [[VLCTrackMetaData alloc] initWithTrackStructure:p_track];
+    return [self selectedTrackMetadataOfCategory:VIDEO_ES];
 }
 
 - (void)programListChanged
