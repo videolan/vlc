@@ -183,6 +183,7 @@ static bool stream_IsDrained(vlc_aout_stream *stream)
 static int stream_StartDiscontinuity(vlc_aout_stream *stream, block_t *block)
 {
     audio_output_t *aout = aout_stream_aout(stream);
+    struct vlc_tracer *tracer = aout_stream_tracer(stream);
     assert(!stream->discontinuity.draining);
 
     /* Changing timings of the stream module while playing is an intricate
@@ -196,6 +197,10 @@ static int stream_StartDiscontinuity(vlc_aout_stream *stream, block_t *block)
      *  - Flush when the stream is finally drained
      *  - Play back all blocks that were saved
      */
+
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
+                              "discontinuity_start");
 
     msg_Dbg(aout, "discontinuity: at %"PRId64" us, draining output",
             block->i_pts);
@@ -220,6 +225,7 @@ static void stream_ResetDiscontinuity(vlc_aout_stream *stream)
 static int stream_HandleDiscontinuity(vlc_aout_stream *stream, block_t *block)
 {
     audio_output_t *aout = aout_stream_aout(stream);
+    struct vlc_tracer *tracer = aout_stream_tracer(stream);
 
     block_ChainLastAppend(&stream->discontinuity.fifo_last, block);
 
@@ -234,6 +240,10 @@ static int stream_HandleDiscontinuity(vlc_aout_stream *stream, block_t *block)
                           &length);
     block = stream->discontinuity.fifo_first;
 
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
+                              "discontinuity_flush");
+
     msg_Dbg(aout, "discontinuity: flushing output");
 
     /* Reset the discontinuity state, and flush */
@@ -243,6 +253,10 @@ static int stream_HandleDiscontinuity(vlc_aout_stream *stream, block_t *block)
     msg_Dbg(aout, "discontinuity: playing back %d blocks for a total length of "
             "%"PRId64" us", count, length);
 
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
+                              "discontinuity_play");
+
     /* Play back all blocks past the discontinuity */
     for (block_t *next; block != NULL; block = next)
     {
@@ -251,6 +265,11 @@ static int stream_HandleDiscontinuity(vlc_aout_stream *stream, block_t *block)
 
         vlc_aout_stream_Play(stream, block);
     }
+
+    if (tracer != NULL)
+        vlc_tracer_TraceEvent(tracer, "RENDER", stream->str_id,
+                              "discontinuity_end");
+
     return AOUT_DEC_SUCCESS;
 }
 
