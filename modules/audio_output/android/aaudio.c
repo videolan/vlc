@@ -95,6 +95,7 @@ static struct {
     void                  (*AAudioStreamBuilder_setDeviceId)(AAudioStreamBuilder *, int32_t);
     void                  (*AAudioStreamBuilder_setFormat)(AAudioStreamBuilder *, aaudio_format_t);
     void                  (*AAudioStreamBuilder_setChannelCount)(AAudioStreamBuilder *, int32_t);
+    void                  (*AAudioStreamBuilder_setChannelMask)(AAudioStreamBuilder *, aaudio_channel_mask_t);
     void                  (*AAudioStreamBuilder_setDataCallback)(AAudioStreamBuilder *, AAudioStream_dataCallback, void *);
     void                  (*AAudioStreamBuilder_setErrorCallback)(AAudioStreamBuilder *, AAudioStream_errorCallback,  void *);
     void                  (*AAudioStreamBuilder_setPerformanceMode)(AAudioStreamBuilder *, aaudio_performance_mode_t);
@@ -160,6 +161,7 @@ LoadSymbols(aout_stream_t *stream)
     AAUDIO_DLSYM(AAudio_createStreamBuilder, true);
     AAUDIO_DLSYM(AAudio_convertResultToText, true);
     AAUDIO_DLSYM(AAudioStreamBuilder_setChannelCount, true);
+    AAUDIO_DLSYM(AAudioStreamBuilder_setChannelMask, false);
     AAUDIO_DLSYM(AAudioStreamBuilder_setDeviceId, true);
     AAUDIO_DLSYM(AAudioStreamBuilder_setFormat, true);
     AAUDIO_DLSYM(AAudioStreamBuilder_setDataCallback, true);
@@ -510,6 +512,31 @@ CloseAAudioStream(aout_stream_t *stream)
     sys->as = NULL;
 }
 
+static aaudio_channel_mask_t
+VLCMaskToAaudio(uint16_t vlc_mask)
+{
+    aaudio_channel_mask_t mask = 0;
+    if (vlc_mask & AOUT_CHAN_CENTER)
+        mask |= AAUDIO_CHANNEL_FRONT_CENTER;
+    if (vlc_mask & AOUT_CHAN_LEFT)
+        mask |= AAUDIO_CHANNEL_FRONT_LEFT;
+    if (vlc_mask & AOUT_CHAN_RIGHT)
+        mask |= AAUDIO_CHANNEL_FRONT_RIGHT;
+    if (vlc_mask & AOUT_CHAN_REARCENTER)
+        mask |= AAUDIO_CHANNEL_BACK_CENTER;
+    if (vlc_mask & AOUT_CHAN_REARLEFT)
+        mask |= AAUDIO_CHANNEL_BACK_LEFT;
+    if (vlc_mask & AOUT_CHAN_REARRIGHT)
+        mask |= AAUDIO_CHANNEL_BACK_RIGHT;
+    if (vlc_mask & AOUT_CHAN_MIDDLELEFT)
+        mask |= AAUDIO_CHANNEL_SIDE_LEFT;
+    if (vlc_mask & AOUT_CHAN_MIDDLERIGHT)
+        mask |= AAUDIO_CHANNEL_SIDE_RIGHT;
+    if (vlc_mask & AOUT_CHAN_LFE)
+        mask |= AAUDIO_CHANNEL_LOW_FREQUENCY;
+    return mask;
+}
+
 static int
 OpenAAudioStream(aout_stream_t *stream)
 {
@@ -534,7 +561,14 @@ OpenAAudioStream(aout_stream_t *stream)
                                  sys->fmt.i_physical_channels,
                                  sys->chan_table );
 
-    vt.AAudioStreamBuilder_setChannelCount(builder, sys->fmt.i_channels);
+    if (vt.AAudioStreamBuilder_setChannelMask != NULL)
+    {
+        aaudio_channel_mask_t mask =
+            VLCMaskToAaudio(sys->fmt.i_physical_channels);
+        vt.AAudioStreamBuilder_setChannelMask(builder, mask);
+    }
+    else
+        vt.AAudioStreamBuilder_setChannelCount(builder, sys->fmt.i_channels);
 
     /* Setup the session-id */
     vt.AAudioStreamBuilder_setSessionId(builder, sys->cfg.session_id);
@@ -584,6 +618,7 @@ PrepareAudioFormat(aout_stream_t *stream, audio_sample_format_t *fmt)
     if (sys->cfg.session_id == 0)
         sys->cfg.session_id = AAUDIO_SESSION_ID_ALLOCATE;
 
+    if (vt.AAudioStreamBuilder_setChannelMask == NULL)
     {
         /* Without the proper setChannelMask API, support only mono, stereo,
          * 5.1 and 7.1 */
