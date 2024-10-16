@@ -172,13 +172,15 @@ vlc_clock_RemoveListener(vlc_clock_t *clock, vlc_clock_listener_id *listener_id)
 
 static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
                                const char *id, vlc_tick_t now, vlc_tick_t pts,
-                               vlc_tick_t drift)
+                               vlc_tick_t drift, uint32_t clock_id)
 {
     if (now != VLC_TICK_MAX && now != VLC_TICK_INVALID)
     {
         vlc_tracer_TraceWithTs(tracer, vlc_tick_now(),
                                VLC_TRACE("type", type),
                                VLC_TRACE("id", id),
+                               VLC_TRACE("mode", "realtime"),
+                               VLC_TRACE("clock_id", (int64_t)clock_id),
                                VLC_TRACE_TICK_NS("pts", pts),
                                VLC_TRACE_TICK_NS("render_ts", now),
                                VLC_TRACE_TICK_NS("drift", drift),
@@ -186,6 +188,7 @@ static inline void TraceRender(struct vlc_tracer *tracer, const char *type,
         vlc_tracer_TraceWithTs(tracer, now,
                                VLC_TRACE("type", type),
                                VLC_TRACE("id", id),
+                               VLC_TRACE("mode", "representative"),
                                VLC_TRACE_TICK_NS("render_pts", pts),
                                VLC_TRACE_TICK_NS("drift", drift),
                                VLC_TRACE_END);
@@ -367,7 +370,7 @@ static inline void vlc_clock_on_update(vlc_clock_t *clock,
     if (main_clock->tracer != NULL && clock->track_str_id != NULL &&
         system_now != VLC_TICK_INVALID && system_now != VLC_TICK_MAX)
         TraceRender(main_clock->tracer, "RENDER", clock->track_str_id,
-                    system_now, ts, drift);
+                    system_now, ts, drift, clock->context ? clock->context->clock_id : 0);
 }
 
 
