@@ -816,13 +816,17 @@ static int
 Start(aout_stream_t *stream, audio_sample_format_t *fmt,
       enum android_audio_device_type adev)
 {
-    (void) adev;
-
     if (!AOUT_FMT_LINEAR(fmt))
         return VLC_EGENERIC;
 
     if (LoadSymbols(stream) != VLC_SUCCESS)
         return VLC_EGENERIC;
+
+    if (adev == ANDROID_AUDIO_DEVICE_STEREO)
+    {
+        fmt->i_physical_channels = AOUT_CHANS_STEREO;
+        aout_FormatPrepare(fmt);
+    }
 
     struct sys *sys = stream->sys = malloc(sizeof(*sys));
     if (unlikely(sys == NULL))
