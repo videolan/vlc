@@ -345,6 +345,8 @@ if [ -z "$PKG_CONFIG" ]; then
         else
             VLC_PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR:/usr/$TRIPLET/lib/pkgconfig:/usr/lib/$TRIPLET/pkgconfig"
         fi
+    else
+        VLC_PKG_CONFIG="$TRIPLET-pkg-config"
     fi
 else
     VLC_PKG_CONFIG="$PKG_CONFIG"
