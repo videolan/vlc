@@ -129,7 +129,6 @@ vlc_modules += {
 
 ## Tests
 
-if host_system != 'windows' # can't use alarm
 # Chroma copy SSE test
 chroma_copy_sse_test = executable(
     'chroma_copy_sse_test',
@@ -149,4 +148,3 @@ chroma_copy_test = executable(
     include_directories: [vlc_include_dirs]
 )
 test('chroma_copy', chroma_copy_test, suite: 'video_chroma')
-endif
