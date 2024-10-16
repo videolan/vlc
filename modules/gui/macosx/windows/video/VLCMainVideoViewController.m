@@ -172,7 +172,9 @@
         ],
     ]];
 
-    [self.view addSubview:_audioDecorativeView positioned:NSWindowAbove relativeTo:_voutView];
+    [self.view addSubview:self.audioDecorativeView
+               positioned:NSWindowBelow
+               relativeTo:self.mainControlsView];
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
