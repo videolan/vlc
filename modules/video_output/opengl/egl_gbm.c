@@ -172,6 +172,10 @@ static void Resize(vlc_gl_t* gl, unsigned width, unsigned height)
     if (sys->gbm.surface)
         gbm_surface_destroy(sys->gbm.surface);
 
+    sys->gbm.surface = NULL;
+    sys->gbm.bo_prev = NULL;
+    sys->gbm.bo_next = NULL;
+
     sys->egl.surface =  CreateSurface(gl, width, height);
 }
 
