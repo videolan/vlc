@@ -186,6 +186,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playerTrackSelectionChanged:)
+                               name:VLCPlayerTrackSelectionChanged
+                             object:nil];
 
     _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
@@ -689,19 +693,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else {
         [self disableVideoPlaybackAppearance];
     }
-
-    VLCPlayerController * const playerController = self.playerController;
-    const BOOL videoTrackDisabled =
-        !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
-    const BOOL audioTrackDisabled =
-        !playerController.audioTracksEnabled || !playerController.selectedAudioTrack.selected;
-    const BOOL currentItemIsAudio =
-        playerController.videoTracks.count == 0 && playerController.audioTracks.count > 0;
-    const BOOL artworkButtonDisabled =
-        (videoTrackDisabled && audioTrackDisabled) || (videoTrackDisabled && !currentItemIsAudio);
-    self.artworkButton.enabled = !artworkButtonDisabled;
-    self.artworkButton.hidden = artworkButtonDisabled;
-    self.controlsBar.thumbnailTrackingView.enabled = !artworkButtonDisabled;
 }
 
 - (void)playerStateChanged:(NSNotification *)notification
@@ -714,6 +705,23 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (self.videoViewController.view.isHidden) {
         [self showControlsBar];
     }
+}
+
+- (void)playerTrackSelectionChanged:(NSNotification *)notification
+{
+    VLCPlayerController * const playerController = self.playerController;
+    const BOOL videoTrackDisabled =
+        !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
+    const BOOL audioTrackDisabled =
+        !playerController.audioTracksEnabled || !playerController.selectedAudioTrack.selected;
+    const BOOL currentItemIsAudio =
+        playerController.videoTracks.count == 0 && playerController.audioTracks.count > 0;
+    const BOOL artworkButtonDisabled =
+        (videoTrackDisabled && audioTrackDisabled) || (videoTrackDisabled && !currentItemIsAudio);
+    self.artworkButton.enabled = !artworkButtonDisabled;
+    self.artworkButton.hidden = artworkButtonDisabled;
+    self.controlsBar.thumbnailTrackingView.enabled = !artworkButtonDisabled;
+    self.controlsBar.thumbnailTrackingView.viewToHide.hidden = artworkButtonDisabled;
 }
 
 - (void)hideControlsBarImmediately
