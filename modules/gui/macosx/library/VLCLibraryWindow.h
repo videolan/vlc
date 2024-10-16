@@ -26,7 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCControlsBarCommon;
+@class VLCMainWindowControlsBar;
 @class VLCDragDropView;
 @class VLCRoundedCornerTextField;
 @class VLCInputNodePathControl;
@@ -59,7 +59,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (readonly) NSView *libraryTargetView;
 
-@property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
+@property (nonatomic, weak) IBOutlet VLCMainWindowControlsBar *controlsBar;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
