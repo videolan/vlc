@@ -1,0 +1,26 @@
+From c5dd262ca6a31ec77a12fe0141fa4de875c6e7ba Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Wed, 16 Oct 2024 10:43:58 +0200
+Subject: [PATCH] Fix libunwind static linking on Android toolchains
+
+As well as llvm-mingw with -static-libgcc.
+---
+ source/CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
+index 8a3128bb7..8250f9ec7 100755
+--- a/source/CMakeLists.txt
++++ b/source/CMakeLists.txt
+@@ -882,6 +882,8 @@ if(X265_LATEST_TAG)
+     foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
+         if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
+             list(APPEND PLIBLIST "${LIB}")
++        elseif(${LIB} MATCHES "-l:libunwind.a") # android toolchain
++            list(APPEND IMPLICITS_LIST "-lunwind")
+         else()
+             list(APPEND PLIBLIST "-l${LIB}")
+         endif()
+-- 
+2.45.0.windows.1
+

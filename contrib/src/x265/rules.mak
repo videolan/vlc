@@ -27,6 +27,7 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
 	$(APPLY) $(SRC)/x265/x265-no-pdb-install.patch
 	$(APPLY) $(SRC)/x265/x265-enable-detect512.patch
+	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
 	$(call pkg_static,"source/x265.pc.in")
 ifndef HAVE_WIN32
 	$(APPLY) $(SRC)/x265/x265-pkg-libs.patch
