@@ -192,6 +192,11 @@ then
         chmod +x build/bin/wine
     fi
 fi
+HOST="$(cc -dumpmachine)"
+HOST_ARCH="${HOST%%-*}"
+if [ "$HOST_ARCH" = "$ARCH" ]; then
+    VLC_EXE_WRAPPER="wine"
+fi
 
 cd ../../
 
@@ -485,13 +490,43 @@ if [ -n "$BUILD_MESON" ]; then
         VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-pdb="
     fi
 
+    # generate the crossfile.meson
+    test -e $SHORTARCH-meson/crossfile.meson && unlink $SHORTARCH-meson/crossfile.meson
+    exec 3>$SHORTARCH-meson/crossfile.meson || return $?
+
+    printf '# This file was automatically generated!\n\n' >&3
+    printf '[binaries]\n' >&3
+    printf 'c = '"'"'%s'"'"'\n' "${CC}" >&3
+    printf 'cpp = '"'"'%s'"'"'\n' "${CXX:-$TRIPLET-g++}" >&3
+    if [ -n "$VLC_AR" ]; then
+        printf 'ar = '"'"'%s'"'"'\n' "${VLC_AR}" >&3
+    fi
+    if [ -n "$VLC_RANLIB" ]; then
+        printf 'ranlib = '"'"'%s'"'"'\n' "${VLC_RANLIB}" >&3
+    fi
+    printf 'strip = '"'"'%s'"'"'\n' "${TRIPLET}-strip" >&3
+    if [ -n "$VLC_PKG_CONFIG" ]; then
+        printf 'pkg-config = '"'"'%s'"'"'\n' "${VLC_PKG_CONFIG}" >&3
+    fi
+    printf 'windres = '"'"'%s'"'"'\n' "${TRIPLET}-windres" >&3
+    if [ -n "$VLC_EXE_WRAPPER" ]; then
+        printf 'exe_wrapper = '"'"'%s'"'"'\n' "${VLC_EXE_WRAPPER}" >&3
+    fi
+
+    printf '\n[host_machine]\n' >&3
+    printf 'system = '"'"'windows'"'"'\n' >&3
+    printf 'cpu_family = '"'"'%s'"'"'\n' "${ARCH}" >&3
+    printf 'endian = '"'"'little'"'"'\n' >&3
+    printf 'cpu = '"'"'%s'"'"'\n' "${ARCH}" >&3
+
+
     info "Configuring VLC"
     BUILD_PATH="$( pwd -P )"
     cd ${VLC_ROOT_PATH}
     meson setup ${BUILD_PATH}/$SHORTARCH-meson \
         -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS} -static-libstdc++" \
         $MCONFIGFLAGS \
-        --cross-file ${BUILD_PATH}/contrib/contrib-$SHORTARCH/crossfile.meson \
+        --cross-file ${BUILD_PATH}/$SHORTARCH-meson/crossfile.meson \
         --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
 
     info "Compiling"
