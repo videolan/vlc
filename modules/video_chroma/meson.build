@@ -134,6 +134,7 @@ chroma_copy_sse_test = executable(
     'chroma_copy_sse_test',
     chroma_copy_lib_srcs,
     c_args: ['-DCOPY_TEST'],
+    link_with: [vlc_libcompat],
     dependencies: [libvlccore_dep],
     include_directories: [vlc_include_dirs]
 )
@@ -144,6 +145,7 @@ chroma_copy_test = executable(
     'chroma_copy_test',
     chroma_copy_lib_srcs,
     c_args: ['-DCOPY_TEST', '-DCOPY_TEST_NOOPTIM'],
+    link_with: [vlc_libcompat],
     dependencies: [libvlccore_dep],
     include_directories: [vlc_include_dirs]
 )
