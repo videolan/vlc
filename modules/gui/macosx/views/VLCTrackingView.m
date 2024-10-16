@@ -63,6 +63,10 @@
 
 - (void)handleMouseEnter
 {
+    if (!self.enabled) {
+        return;
+    }
+
     _mouseIn = YES;
     [self performTransition];
     if (self.mouseEnteredBlock) {
@@ -72,6 +76,10 @@
 
 - (void)handleMouseExit
 {
+    if (!self.enabled) {
+        return;
+    }
+
     _mouseIn = NO;
     [self performTransition];
     if (self.mouseExitedBlock) {
