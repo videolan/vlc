@@ -481,7 +481,7 @@ if [ -n "$BUILD_MESON" ]; then
     BUILD_PATH="$( pwd -P )"
     cd ${VLC_ROOT_PATH}
     meson setup ${BUILD_PATH}/$SHORTARCH-meson \
-        -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS}" \
+        -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS} -static-libstdc++" \
         $MCONFIGFLAGS \
         --cross-file ${BUILD_PATH}/contrib/contrib-$SHORTARCH/crossfile.meson \
         --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
