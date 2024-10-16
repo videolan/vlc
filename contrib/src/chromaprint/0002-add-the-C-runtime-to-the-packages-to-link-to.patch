@@ -1,24 +1,26 @@
-From 6726ebef3eec9dcc9d08b2ad6ae352bacb215e5e Mon Sep 17 00:00:00 2001
+From 78e7305d566b81f34470a4f21519a47d635ee147 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 5 Sep 2022 16:13:05 +0200
 Subject: [PATCH 2/2] add the C++ runtime to the packages to link to
 
 gcc needs libstdc++ and clang needs libc++.
 ---
- CMakeLists.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ CMakeLists.txt | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 0dbd9bd..67fa620 100644
+index 0dbd9bd..6facfdf 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -197,6 +197,21 @@ else()
+@@ -197,6 +197,23 @@ else()
  endif()
  
  if(NOT BUILD_FRAMEWORK)
 +	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
-+		if (LIB MATCHES "-l.*")
++		if (IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
 +			list(APPEND PKG_CXX_LIBS "${LIB}")
++		elseif(${LIB} MATCHES "-l:libunwind.a") # android toolchain
++			list(APPEND IMPLICITS_LIST "-lunwind")
 +		else()
 +			list(APPEND PKG_CXX_LIBS "-l${LIB}")
 +		endif()
@@ -35,5 +37,5 @@ index 0dbd9bd..67fa620 100644
  	install(
          FILES ${CMAKE_CURRENT_BINARY_DIR}/libchromaprint.pc
 -- 
-2.27.0.windows.1
+2.45.0.windows.1
 
