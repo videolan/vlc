@@ -75,8 +75,9 @@
 #import "views/VLCLoadingOverlayView.h"
 #import "views/VLCNoResultsLabel.h"
 #import "views/VLCRoundedCornerTextField.h"
+#import "views/VLCTrackingView.h"
 
-#import "windows/controlsbar/VLCControlsBarCommon.h"
+#import "windows/controlsbar/VLCMainWindowControlsBar.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCVideoOutputProvider.h"
@@ -688,6 +689,19 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else {
         [self disableVideoPlaybackAppearance];
     }
+
+    VLCPlayerController * const playerController = self.playerController;
+    const BOOL videoTrackDisabled =
+        !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
+    const BOOL audioTrackDisabled =
+        !playerController.audioTracksEnabled || !playerController.selectedAudioTrack.selected;
+    const BOOL currentItemIsAudio =
+        playerController.videoTracks.count == 0 && playerController.audioTracks.count > 0;
+    const BOOL artworkButtonDisabled =
+        (videoTrackDisabled && audioTrackDisabled) || (videoTrackDisabled && !currentItemIsAudio);
+    self.artworkButton.enabled = !artworkButtonDisabled;
+    self.artworkButton.hidden = artworkButtonDisabled;
+    self.controlsBar.thumbnailTrackingView.enabled = !artworkButtonDisabled;
 }
 
 - (void)playerStateChanged:(NSNotification *)notification
