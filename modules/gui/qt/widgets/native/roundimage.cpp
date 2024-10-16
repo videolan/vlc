@@ -619,7 +619,7 @@ void RoundImage::adjustQSGCustomGeometry(const QQuickWindow* const window)
         // This allows making the texture opaque, as long as
         // source image is also opaque, for optimization
         // purposes.
-        if (window->format().samples() != -1)
+        if (window->format().samples() >= 2)
             m_QSGCustomGeometry = true;
         // No need to regenerate as transparent part will not
         // matter. However, in order for the material to not
