@@ -98,3 +98,26 @@ if have_osx or have_ios or have_tvos
         'objc_args' : ['-fobjc-arc']
     }
 endif
+
+if host_system == 'windows'
+vlc_modules += {
+    'name' : 'mmdevice',
+    'sources' : files('mmdevice.c'),
+    'enabled' : have_win_desktop,
+}
+
+vlc_modules += {
+    'name' : 'winstore',
+    'sources' : files('winstore.c'),
+    'enabled' : have_win_store,
+}
+
+vlc_modules += {
+    'name' : 'wasapi',
+    'sources' : files('wasapi.c'),
+    'dependencies' : [ksuser_lib],
+    'enabled' : get_option('wasapi')
+      .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
+      .allowed() and ksuser_lib.found()
+}
+endif
