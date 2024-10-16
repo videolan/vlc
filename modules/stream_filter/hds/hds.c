@@ -1557,7 +1557,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                     new_stream->metadata_len = medias[i].metadata_len;
                 }
 
-                if( ! sys->live )
+                if( ! sys->live && bootstraps[j].data )
                 {
                     parse_BootstrapData( (vlc_object_t*)s,
                                          new_stream,
@@ -1579,7 +1579,7 @@ static int parse_Manifest( stream_t *s, manifest_t *m )
                             total_duration += chunk->duration;
                     }
                 }
-                else
+                else if( bootstraps[j].url )
                 {
                     if( !(new_stream->abst_url = strdup( bootstraps[j].url ) ) )
                     {
