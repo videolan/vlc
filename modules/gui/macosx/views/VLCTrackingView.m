@@ -31,6 +31,40 @@
 
 @implementation VLCTrackingView
 
+- (instancetype)initWithFrame:(NSRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        [self setupProperties];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setupProperties];
+    }
+    return self;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setupProperties];
+    }
+    return self;
+}
+
+- (void)setupProperties
+{
+    _mouseIn = NO;
+    _animatesTransition = YES;
+    _enabled = YES;
+}
+
 - (void)performTransition
 {
     if (self.animatesTransition) {
