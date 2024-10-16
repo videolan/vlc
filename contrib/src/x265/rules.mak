@@ -35,6 +35,7 @@ x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(APPLY) $(SRC)/x265/x265-enable-detect512.patch
 	$(APPLY) $(SRC)/x265/0001-api-use-LoadLibraryExA-instead-of-LoadLibraryA.patch
 	$(APPLY) $(SRC)/x265/0001-threadpool-disable-group-affinity-in-UWP-builds.patch
+	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
 	$(call pkg_static,"source/x265.pc.in")
 	$(MOVE)
 
