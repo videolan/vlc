@@ -284,6 +284,13 @@
              <item row="11" column="2" colspan="2">
               <widget class="QComboBox" name="autoRaiseComboBox"/>
              </item>
+             <item row="4" column="2">
+              <widget class="QCheckBox" name="qtdark">
+               <property name="text">
+                <string>Use a dark palette</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

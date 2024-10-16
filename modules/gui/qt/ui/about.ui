@@ -65,10 +65,6 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(245, 245, 245);
-color:rgb(0,0,0);</string>
-     </property>
      <layout class="QGridLayout" name="gridLayout">
       <item row="2" column="2" rowspan="4">
        <widget class="QStackedWidget" name="stackedWidget">
@@ -287,9 +283,6 @@ margin-bottom: 6px;</string>
        <width>0</width>
        <height>60</height>
       </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(230, 230, 230);color:rgb(0,0,0);</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="margin">

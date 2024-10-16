@@ -63,6 +63,9 @@ enum{
     NOTIFICATION_ALWAYS = 2,
 };
 
+bool isDarkPaletteEnabled(intf_thread_t *);
+void applyDarkPalette();
+
 struct intf_sys_t
 {
     vlc_thread_t thread;

@@ -27,6 +27,7 @@
 # include "config.h"
 #endif
 
+#include "qt.hpp"
 #include "components/simple_preferences.hpp"
 #include "components/preferences_widgets.hpp"
 
@@ -771,6 +772,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 /* defaults to qt */
                 ui.qt->setChecked( true );
             }
+            
+            if ( var_InheritBool( p_intf, "qt-dark-palette" ) )
+                ui.qtdark->setChecked( true ); /*dark palette*/
+            
             free( psz_intf );
 
             optionWidgets["skinRB"] = ui.skins;
@@ -793,6 +798,20 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( radioGroup, buttonClicked( int ),
                      ui.styleStackedWidget, setCurrentIndex( int ) );
             ui.styleStackedWidget->setCurrentIndex( radioGroup->checkedId() );
+
+			CONFIG_BOOL( "qt-dark-palette", qtdark );
+			// Connecting the stateChanged signal of the checkbox
+			connect(ui.qtdark, &QCheckBox::stateChanged, ui.stylesCombo, [combobox = ui.stylesCombo](const int state) {
+				if (state == Qt::CheckState::Checked) {
+					// Set the current style to "Fusion"
+					combobox->setCurrentText(QStringLiteral("Fusion"));
+					// Apply the dark palette
+					applyDarkPalette();
+				} else {
+					// Remove the custom palette and revert to the default
+					QApplication::setPalette(QApplication::style()->standardPalette());
+				}
+			});
 
             CONNECT( ui.minimalviewBox, toggled( bool ),
                      ui.mainPreview, setNormalPreview( bool ) );

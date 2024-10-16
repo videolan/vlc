@@ -22,12 +22,10 @@
  *****************************************************************************/
 
 #include "qt.hpp"
-
-#include <QWidget>
-#include <QSettings>
+#include "util/qvlcframe.hpp"
 
 class QCheckBox;
-class FirstRun : public QWidget
+class FirstRun : public QVLCDialog
 {
     Q_OBJECT
     public:
