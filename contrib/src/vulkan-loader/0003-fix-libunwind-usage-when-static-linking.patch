@@ -1,0 +1,34 @@
+From ce897781c15a650f59b0c2ffa7dced738b34fa60 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 17 Oct 2024 11:56:18 +0200
+Subject: [PATCH 3/3] fix libunwind usage when static linking
+
+It ends up with
+- set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "atomic;m;-l:libunwind.a;dl;c;-l:libunwind.a;dl")
+- set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "windowsapp;windowsapp;ucrt;windowsapp;ucrtapp;c++;mingw32;-l:libunwind.a;moldname;mingwex;mingw32;-l:libunwind.a;moldname;mingwex")
+---
+ loader/CMakeLists.txt | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
+index 98da79ab8..93ab25f06 100644
+--- a/loader/CMakeLists.txt
++++ b/loader/CMakeLists.txt
+@@ -335,7 +335,13 @@ include(FindPkgConfig QUIET)
+ if(PKG_CONFIG_FOUND)
+     set(VK_API_VERSION "${LOADER_GENERATED_HEADER_VERSION}")
+     foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
+-        set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
++        if (IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++            set(PRIVATE_LIBS "${PRIVATE_LIBS} ${LIB}")
++        elseif(${LIB} MATCHES "-l:libunwind.a") # android toolchain
++            set(PRIVATE_LIBS "${PRIVATE_LIBS} -lunwind")
++        else()
++            set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
++        endif()
+     endforeach()
+     if(MSVC)
+         set(VULKAN_LIB_SUFFIX "-1")
+-- 
+2.45.0.windows.1
+

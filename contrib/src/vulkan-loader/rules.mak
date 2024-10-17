@@ -40,6 +40,7 @@ vulkan-loader: Vulkan-Loader-$(VULKAN_LOADER_VERSION).tar.gz .sum-vulkan-loader
 # https://github.com/msys2/MINGW-packages/tree/master/mingw-w64-vulkan-loader
 	$(APPLY) $(SRC)/vulkan-loader/002-proper-def-files-for-32bit.patch
 	$(APPLY) $(SRC)/vulkan-loader/004-disable-suffix-in-static-lib.patch
+	$(APPLY) $(SRC)/vulkan-loader/0003-fix-libunwind-usage-when-static-linking.patch
 ifeq ($(HOST),i686-w64-mingw32)
 	cp -v $(SRC)/vulkan-loader/libvulkan-32.def $(UNPACK_DIR)/loader/vulkan-1.def
 endif

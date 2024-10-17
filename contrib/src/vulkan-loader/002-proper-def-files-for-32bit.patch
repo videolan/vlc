@@ -1,5 +1,16 @@
+From 56ce783d2cad375cb29f19be43b5dda7061ded3c Mon Sep 17 00:00:00 2001
+From: Alexey Pavlov <alexpux@gmail.com>
+Date: Fri, 8 Nov 2019 07:40:41 +0100
+Subject: [PATCH 1/3] proper def files for 32bit
+
+---
+ loader/CMakeLists.txt       | 15 +++++++++++++--
+ loader/vk_loader_platform.h |  8 +++++++-
+ loader/vulkan-1.def         |  2 +-
+ 3 files changed, 21 insertions(+), 4 deletions(-)
+
 diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
-index 8bb10fd..fc38ecc 100644
+index d1606f549..0552c5bdd 100644
 --- a/loader/CMakeLists.txt
 +++ b/loader/CMakeLists.txt
 @@ -127,7 +127,7 @@ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG}Note that this may be unsafe, as the C co
@@ -35,7 +46,7 @@ index 8bb10fd..fc38ecc 100644
      endif()
  elseif(APPLE)
      # For MacOS, use the C code and force the compiler's tail-call optimization instead of using assembly code.
-@@ -261,6 +263,7 @@ endif()
+@@ -217,6 +219,7 @@ endif()
  
  if(WIN32)
      add_library(loader-opt STATIC ${OPT_LOADER_SRCS})
@@ -43,7 +54,7 @@ index 8bb10fd..fc38ecc 100644
      target_link_libraries(loader-opt PUBLIC loader_specific_options)
      add_dependencies(loader-opt loader_asm_gen_files)
      set_target_properties(loader-opt PROPERTIES CMAKE_C_FLAGS_DEBUG "${MODIFIED_C_FLAGS_DEBUG}")
-@@ -237,10 +240,17 @@ if(WIN32)
+@@ -237,9 +240,17 @@ if(WIN32)
      # when adding the suffix the import and runtime library names must be consistent
      # mingw: libvulkan-1.dll.a / libvulkan-1.dll
      # msvc: vulkan-1.lib / vulkan-1.dll
@@ -51,7 +62,6 @@ index 8bb10fd..fc38ecc 100644
      set_target_properties(vulkan
                            PROPERTIES
                            OUTPUT_NAME vulkan-1)
--
 +    else()
 +    set_target_properties(vulkan
 +                          PROPERTIES
@@ -59,11 +69,11 @@ index 8bb10fd..fc38ecc 100644
 +                          RUNTIME_OUTPUT_NAME vulkan-1
 +                          ARCHIVE_OUTPUT_NAME vulkan)
 +    endif()
+ 
      if(MSVC AND ENABLE_WIN10_ONECORE)
          target_link_libraries(vulkan OneCoreUAP.lib LIBCMT.LIB LIBCMTD.LIB LIBVCRUNTIME.LIB LIBUCRT.LIB)
-         set_target_properties(vulkan PROPERTIES LINK_FLAGS "/NODEFAULTLIB")
 diff --git a/loader/vk_loader_platform.h b/loader/vk_loader_platform.h
-index 507a901..6b8fc48 100644
+index 594a24986..6bbe6798b 100644
 --- a/loader/vk_loader_platform.h
 +++ b/loader/vk_loader_platform.h
 @@ -77,7 +77,13 @@
@@ -82,7 +92,7 @@ index 507a901..6b8fc48 100644
  #elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590)
  #define LOADER_EXPORT __attribute__((visibility("default")))
 diff --git a/loader/vulkan-1.def b/loader/vulkan-1.def
-index 6a88b55..1d26b1f 100644
+index f1aab7880..0b8a68ff8 100644
 --- a/loader/vulkan-1.def
 +++ b/loader/vulkan-1.def
 @@ -22,7 +22,7 @@
@@ -94,3 +104,6 @@ index 6a88b55..1d26b1f 100644
  EXPORTS
     vkCreateInstance
     vkDestroyInstance
+-- 
+2.45.0.windows.1
+
