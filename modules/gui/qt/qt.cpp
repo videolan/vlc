@@ -1115,22 +1115,9 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     if ( p_intf->p_compositor )
     {
         if (cleanupReason == CLEANUP_INTF_CLOSED)
-        {
             p_intf->p_compositor->unloadGUI();
-            delete p_intf->p_mi;
-            p_intf->p_mi = nullptr;
-        }
         else // CLEANUP_APP_TERMINATED
-        {
             p_intf->p_compositor->destroyMainInterface();
-            delete p_intf->p_mi;
-            p_intf->p_mi = nullptr;
-
-            delete p_intf->mainSettings;
-            p_intf->mainSettings = nullptr;
-
-            p_intf->p_compositor.reset();
-        }
     }
 
     /* */
@@ -1143,9 +1130,21 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
        Settings must be destroyed after that.
      */
     DialogsProvider::killInstance();
-
     VLCDialogModel::killInstance();
     DialogErrorModel::killInstance();
+
+    if ( p_intf->p_compositor &&  cleanupReason == CLEANUP_APP_TERMINATED)
+    {
+        p_intf->p_compositor.reset();
+
+        //destroy MainCtx
+        delete p_intf->p_mi;
+        p_intf->p_mi = nullptr;
+
+        delete p_intf->mainSettings;
+        p_intf->mainSettings = nullptr;
+
+    }
 
     /* Destroy the main playlist controller */
     if (p_intf->p_mainPlaylistController)
