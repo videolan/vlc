@@ -272,7 +272,16 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     }
     if (!backendIsOpenVg && (flags & CompositorVideo::HAS_ACRYLIC))
     {
-        setBlurBehind(window, true);
+        if (Q_LIKELY(!window->isActive()))
+        {
+            connect(window, &QWindow::activeChanged, this, [this, window = QPointer(window)]() {
+               setBlurBehind(window, true);
+            }, Qt::SingleShotConnection);
+        }
+        else
+        {
+            setBlurBehind(window, true);
+        }
     }
     m_videoWindowHandler = std::make_unique<VideoWindowHandler>(m_intf);
     m_videoWindowHandler->setWindow( window );
@@ -282,7 +291,6 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
 #else
     m_interfaceWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, window);
 #endif
-    m_mainCtx->setHasAcrylicSurface(m_blurBehind);
     m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
 
 #ifdef _WIN32
@@ -376,6 +384,6 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
         return false;
 
     m_windowEffectsModule->setBlurBehind(window, enable);
-    m_blurBehind = enable;
+    m_mainCtx->setHasAcrylicSurface(enable);
     return true;
 }

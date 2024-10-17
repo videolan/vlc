@@ -209,7 +209,7 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 
     m_qmlView->show();
 
-    if (m_blurBehind)
+    if (m_mainCtx->hasAcrylicSurface())
         m_renderWindow->m_hasAcrylic = true;
 
     m_renderWindow->setInterfaceWindow(m_qmlView.get());

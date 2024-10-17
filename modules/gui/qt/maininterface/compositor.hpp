@@ -187,7 +187,6 @@ protected:
     std::unique_ptr<WinTaskbarWidget> m_taskbarWidget;
 #endif
 
-    bool m_blurBehind = false;
     WindowEffectsModule* m_windowEffectsModule = nullptr;
     bool m_failedToLoadWindowEffectsModule = false;
 };

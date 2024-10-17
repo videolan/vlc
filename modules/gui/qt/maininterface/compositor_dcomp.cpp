@@ -213,7 +213,7 @@ void CompositorDirectComposition::setup()
 
     m_dcompDevice->Commit();
 
-    if (!m_blurBehind)
+    if (!m_mainCtx->hasAcrylicSurface())
     {
         if (var_InheritBool(m_intf, "qt-backdrop-blur"))
         {
