@@ -229,7 +229,10 @@ RoundImageRequest::~RoundImageRequest()
     if (m_imageResponse)
     {
         if (m_cancelOnDelete)
+        {
+            disconnect(m_imageResponse, &QQuickImageResponse::finished, this, &RoundImageRequest::handleImageResponseFinished);
             m_imageResponse->cancel();
+        }
 
         m_imageResponse->deleteLater();
     }
