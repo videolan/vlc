@@ -22,6 +22,13 @@
 
 #import "VLCLibraryWindowTitlesSidebarViewController.h"
 
+#import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryDataTypes.h"
+#import "main/VLCMain.h"
+#import "playlist/VLCPlayerController.h"
+#import "playlist/VLCPlayerTitle.h"
+#import "playlist/VLCPlaylistController.h"
+
 @interface VLCLibraryWindowTitlesSidebarViewController ()
 
 @property (readwrite) NSUInteger internalItemCount;
@@ -41,7 +48,24 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do view setup here.
+
+    _titlesArrayController = [[NSArrayController alloc] init];
+
+    [self.tableView deselectAll:self];
+    [self.tableView bind:NSContentBinding
+                toObject:self.titlesArrayController
+             withKeyPath:@"arrangedObjects"
+                 options:nil];
+    [self.tableView bind:NSSelectionIndexesBinding
+                toObject:self.titlesArrayController
+             withKeyPath:@"selectionIndexes"
+                 options:nil];
+    [self.tableView bind:NSSortDescriptorsBinding
+                toObject:self.titlesArrayController
+             withKeyPath:@"sortDescriptors"
+                 options:nil];
+
+    [self updateTitleList];
 }
 
 - (NSString *)title
@@ -58,6 +82,46 @@
 {
     _counterLabel = counterLabel;
     self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", self.internalItemCount];
+}
+
+- (void)updateTitleList
+{
+    VLCPlayerController * const playerController =
+        VLCMain.sharedInstance.playlistController.playerController;
+    const size_t titleCount = playerController.numberOfTitlesOfCurrentMedia;
+    self.internalItemCount = titleCount;
+    self.titlesArrayController.content = playerController.titlesOfCurrentMedia;
+    self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", titleCount];
+}
+
+# pragma mark - NSTableView delegation
+
+- (NSView *)tableView:(NSTableView *)tableView
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
+{
+    if ([tableColumn.identifier isEqualToString:@"VLCLibraryWindowTitlesTableViewNameColumnIdentifier"]) {
+        NSTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:@"VLCLibraryWindowTitlesTableViewNameCellIdentifier"
+                                        owner:self];
+        [cellView.textField bind:NSValueBinding
+                            toObject:cellView
+                         withKeyPath:@"objectValue.name"
+                             options:nil];
+        return cellView;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCLibraryWindowTitlesTableViewLengthColumnIdentifier"]) {
+        NSTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:@"VLCLibraryWindowTitlesTableViewLengthCellIdentifier"
+                                        owner:self];
+        [cellView.textField bind:NSValueBinding
+                            toObject:cellView
+                         withKeyPath:@"objectValue.lengthString"
+                             options:nil];
+        return cellView;
+    }
+
+    NSAssert(NO, @"Provided cell view for titles table view should be valid!");
+    return nil;
 }
 
 @end
