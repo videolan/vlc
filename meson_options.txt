@@ -5,6 +5,11 @@ option('vlc',
     value : true,
     description : 'Build the VLC executable program.')
 
+option('tests',
+    type : 'feature',
+    value : 'auto',
+    description : 'Build the VLC test executables.')
+
 option('nls',
     type : 'feature',
     value : 'auto',

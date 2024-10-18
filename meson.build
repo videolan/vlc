@@ -1064,9 +1064,13 @@ subdir('bin')
 # VLC plugins
 subdir('modules')
 
-# Integration and non-regression tests, some unittest are there too but the
-# modules/, src/ and lib/ folders should be favoured for those.
-subdir('test')
+if (get_option('tests')
+    .disable_auto_if(host_system in ['windows'])
+    .allowed())
+    # Integration and non-regression tests, some unittest are there too but the
+    # modules/, src/ and lib/ folders should be favoured for those.
+    subdir('test')
+endif
 
 if get_option('rust').allowed()
     warning('''
