@@ -130,23 +130,23 @@ vlc_modules += {
 ## Tests
 
 # Chroma copy SSE test
-chroma_copy_sse_test = executable(
-    'chroma_copy_sse_test',
-    chroma_copy_lib_srcs,
-    c_args: ['-DCOPY_TEST'],
-    link_with: [vlc_libcompat],
-    dependencies: [libvlccore_dep],
-    include_directories: [vlc_include_dirs]
-)
-test('chroma_copy_sse', chroma_copy_sse_test, suite: 'video_chroma')
+vlc_tests += {
+    'name': 'chroma_copy_sse_test',
+    'sources': chroma_copy_lib_srcs,
+    'suite' : ['video_chroma'],
+    'c_args': ['-DCOPY_TEST'],
+    'link_with': [vlc_libcompat],
+    'dependencies': [libvlccore_dep],
+    'include_directories': [vlc_include_dirs]
+}
 
 # Chroma copy test
-chroma_copy_test = executable(
-    'chroma_copy_test',
-    chroma_copy_lib_srcs,
-    c_args: ['-DCOPY_TEST', '-DCOPY_TEST_NOOPTIM'],
-    link_with: [vlc_libcompat],
-    dependencies: [libvlccore_dep],
-    include_directories: [vlc_include_dirs]
-)
-test('chroma_copy', chroma_copy_test, suite: 'video_chroma')
+vlc_tests += {
+    'name': 'chroma_copy_test',
+    'sources': chroma_copy_lib_srcs,
+    'suite' : ['video_chroma'],
+    'c_args': ['-DCOPY_TEST', '-DCOPY_TEST_NOOPTIM'],
+    'link_with': [vlc_libcompat],
+    'dependencies': [libvlccore_dep],
+    'include_directories': [vlc_include_dirs]
+}
