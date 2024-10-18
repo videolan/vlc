@@ -24,13 +24,40 @@
 
 @interface VLCLibraryWindowTitlesSidebarViewController ()
 
+@property (readwrite) NSUInteger internalItemCount;
+
 @end
 
 @implementation VLCLibraryWindowTitlesSidebarViewController
 
-- (void)viewDidLoad {
+@synthesize counterLabel = _counterLabel;
+
+- (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
+{
+    return [super initWithLibraryWindow:libraryWindow
+                                nibName:@"VLCLibraryWindowTitlesView"];
+}
+
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do view setup here.
+}
+
+- (NSString *)title
+{
+    return _NS("Titles");
+}
+
+- (BOOL)supportsItemCount
+{
+    return YES;
+}
+
+- (void)setCounterLabel:(NSTextField *)counterLabel
+{
+    _counterLabel = counterLabel;
+    self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", self.internalItemCount];
 }
 
 @end
