@@ -14,7 +14,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView identifier="VLCLibraryWindowPlaylistSidebarIdentifier" id="SIR-0h-28I">
+        <customView identifier="VLCLibraryWindowChaptersViewIdentifier" id="SIR-0h-28I">
             <rect key="frame" x="0.0" y="0.0" width="835" height="246"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
