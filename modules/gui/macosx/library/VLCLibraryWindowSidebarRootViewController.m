@@ -161,8 +161,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
     const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
     
-    [self.viewSelector setEnabled:chaptersEnabled || titlesEnabled
-                       forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
     self.viewSelector.hidden = !chaptersEnabled && !titlesEnabled;
     self.topInternalConstraint.active = !self.viewSelector.hidden;
 
@@ -182,9 +180,10 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
     counterLabelConstraintToActivate.active = YES;
     counterLabelConstraintToDeactivate.active = NO;
     
-    if ((!chaptersEnabled && self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) ||
-        (!titlesEnabled && self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewTitlesSegment)) {
-        self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+    NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:self.viewSelector.selectedSegment];
+    if ((!chaptersEnabled && [selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) ||
+        (!titlesEnabled && [selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title])) {
+        self.viewSelector.selectedSegment = 0;
         [self viewSelectorAction:self.viewSelector];
     }
 }
@@ -193,11 +192,12 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
 {
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
-    if (selectedSegment == VLCLibraryWindowSidebarViewPlaylistSegment) {
+    NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:selectedSegment];
+    if ([selectedSegmentLabel isEqualToString:self.playlistSidebarViewController.title]) {
         [self setChildViewController:self.playlistSidebarViewController];
-    } else if (selectedSegment == VLCLibraryWindowSidebarViewTitlesSegment) {
+    } else if ([selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title]) {
         [self setChildViewController:self.titlesSidebarViewController];
-    } else if (selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
+    } else if ([selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) {
         [self setChildViewController:self.chaptersSidebarViewController];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
