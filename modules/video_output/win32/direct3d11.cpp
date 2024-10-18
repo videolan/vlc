@@ -1662,7 +1662,12 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         picture_t *quad_picture = (*region)[i];
         d3d11_quad_t *quad;
         if (quad_picture != NULL)
+        {
             quad = static_cast<d3d11_quad_t*>(quad_picture->p_sys);
+
+            video_format_Clean(&quad->quad_fmt);
+            video_format_Copy(&quad->quad_fmt, &r->p_picture->format);
+        }
         else
         {
             d3d11_quad_t *d3dquad = new (std::nothrow) d3d11_quad_t;
