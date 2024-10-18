@@ -33,6 +33,7 @@
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
+#import "library/VLCLibraryWindowTitlesSidebarViewController.h"
 
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
@@ -40,7 +41,8 @@
 #include "views/VLCRoundedCornerTextField.h"
 
 const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
-const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
+const NSInteger VLCLibraryWindowSidebarViewTitlesSegment = 1;
+const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
 
 @interface VLCLibraryWindowSidebarRootViewController ()
 
@@ -71,6 +73,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+    _titlesSidebarViewController =
+        [[VLCLibraryWindowTitlesSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -110,9 +114,11 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
 - (void)setupViewSelector
 {
-    self.viewSelector.segmentCount = 2;
+    self.viewSelector.segmentCount = 3;
     [self.viewSelector setLabel:self.playlistSidebarViewController.title
                      forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
+    [self.viewSelector setLabel:self.titlesSidebarViewController.title
+                     forSegment:VLCLibraryWindowSidebarViewTitlesSegment];
     [self.viewSelector setLabel:self.chaptersSidebarViewController.title
                      forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
     self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
@@ -188,6 +194,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
     if (selectedSegment == VLCLibraryWindowSidebarViewPlaylistSegment) {
         [self setChildViewController:self.playlistSidebarViewController];
+    } else if (selectedSegment == VLCLibraryWindowSidebarViewTitlesSegment) {
+        [self setChildViewController:self.titlesSidebarViewController];
     } else if (selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
         [self setChildViewController:self.chaptersSidebarViewController];
     } else {
