@@ -231,10 +231,13 @@ RoundImageRequest::~RoundImageRequest()
         if (m_cancelOnDelete)
         {
             disconnect(m_imageResponse, &QQuickImageResponse::finished, this, &RoundImageRequest::handleImageResponseFinished);
+            connect(m_imageResponse, &QQuickImageResponse::finished, m_imageResponse, &QObject::deleteLater);
             m_imageResponse->cancel();
         }
-
-        m_imageResponse->deleteLater();
+        else
+        {
+            m_imageResponse->deleteLater();
+        }
     }
     g_imageCache.removeRequest(m_key);
 }
