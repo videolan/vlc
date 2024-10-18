@@ -64,7 +64,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     [super viewDidLoad];
     [self setupPlaylistTitle];
     [self setupCounterLabel];
-    [self setupViewSelector];
 
     self.mainVideoModeEnabled = NO;
 
@@ -75,6 +74,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
+    [self setupViewSelector];
     [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
 
