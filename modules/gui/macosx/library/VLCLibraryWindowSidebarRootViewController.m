@@ -40,10 +40,6 @@
 
 #include "views/VLCRoundedCornerTextField.h"
 
-const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
-const NSInteger VLCLibraryWindowSidebarViewTitlesSegment = 1;
-const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
-
 @interface VLCLibraryWindowSidebarRootViewController ()
 
 @property (readwrite) NSViewController<VLCLibraryWindowSidebarChildViewController> *currentChildVc;
@@ -78,7 +74,7 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
-    [self setupViewSelector];
+    [self setupViewSelectorSegments];
     [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
 
@@ -112,16 +108,24 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
     ]];
 }
 
-- (void)setupViewSelector
+- (void)setupViewSelectorSegments
 {
-    self.viewSelector.segmentCount = 3;
+    self.viewSelector.segmentCount = 1;
     [self.viewSelector setLabel:self.playlistSidebarViewController.title
-                     forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
-    [self.viewSelector setLabel:self.titlesSidebarViewController.title
-                     forSegment:VLCLibraryWindowSidebarViewTitlesSegment];
-    [self.viewSelector setLabel:self.chaptersSidebarViewController.title
-                     forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
-    self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+                         forSegment:self.viewSelector.segmentCount - 1];
+
+    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayerController * const playerController = playlistController.playerController;
+    if (playerController.numberOfTitlesOfCurrentMedia > 0) {
+        self.viewSelector.segmentCount++; 
+        [self.viewSelector setLabel:self.titlesSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+    }
+    if (playerController.numberOfChaptersForCurrentTitle > 0) {
+        self.viewSelector.segmentCount++;
+        [self.viewSelector setLabel:self.chaptersSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+    }
 }
 
 - (void)setupCounterLabel
@@ -156,6 +160,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
 
 - (void)updateViewSelectorState
 {
+    [self setupViewSelectorSegments];
+
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
     const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
