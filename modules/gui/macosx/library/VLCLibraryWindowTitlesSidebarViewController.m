@@ -66,6 +66,12 @@
                  options:nil];
 
     [self updateTitleList];
+
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(titleListChanged:)
+                               name:VLCPlayerTitleListChanged
+                             object:nil];
 }
 
 - (NSString *)title
@@ -82,6 +88,11 @@
 {
     _counterLabel = counterLabel;
     self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", self.internalItemCount];
+}
+
+- (void)titleListChanged:(NSNotification *)notification
+{
+    [self updateTitleList];
 }
 
 - (void)updateTitleList
