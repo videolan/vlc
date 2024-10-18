@@ -27,10 +27,11 @@
 
 @implementation VLCPlayerTitle
 
-- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title
+- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title atIndex:(size_t)index
 {
     self = [super init];
     if (self) {
+        _index = index;
         _name = toNSStr(p_title->name);
         _length = p_title->length;
         _lengthString = [NSString stringWithTimeFromTicks:_length];

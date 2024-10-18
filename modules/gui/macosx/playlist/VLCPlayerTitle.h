@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlayerTitle : NSObject
 
+@property (readonly) size_t index;
 @property (readonly) NSString *name;
 @property (readonly) vlc_tick_t length;
 @property (readonly) NSString *lengthString;
@@ -37,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSUInteger chapterCount;
 @property (readonly) NSArray<VLCPlayerChapter *> *chapters;
 
-- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title;
+- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title atIndex:(size_t)index;
 
 @end
 
