@@ -326,6 +326,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/playlist/VLCPlayerChapter.m \
 	gui/macosx/playlist/VLCPlayerController.h \
 	gui/macosx/playlist/VLCPlayerController.m \
+	gui/macosx/playlist/VLCPlayerTitle.h \
+	gui/macosx/playlist/VLCPlayerTitle.m \
 	gui/macosx/playlist/VLCPlaylistController.h \
 	gui/macosx/playlist/VLCPlaylistController.m \
 	gui/macosx/playlist/VLCPlaylistDataSource.h \
