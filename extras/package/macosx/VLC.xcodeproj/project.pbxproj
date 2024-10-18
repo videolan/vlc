@@ -142,6 +142,7 @@
 		53C1EF8B2B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C1EF852B466B13001AEEF5 /* VLCLibraryHomeViewVideoGridContainerView.m */; };
 		53C1EF8C2B466B13001AEEF5 /* VLCLibraryHomeViewStackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53C1EF862B466B13001AEEF5 /* VLCLibraryHomeViewStackViewController.m */; };
 		53CBE30B2C159A4D006BF2E3 /* VLCNoResultsLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 53CBE30A2C159A4D006BF2E3 /* VLCNoResultsLabel.m */; };
+		53D021352CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D021332CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.m */; };
 		53D21A1F2BB465600085C71B /* VLCLibraryWindowPlaylistSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D21A1E2BB465600085C71B /* VLCLibraryWindowPlaylistSidebarViewController.m */; };
 		53D8ED9A2B583AAF00142EAD /* VLCLibraryModelChangeDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53D8ED992B583AAF00142EAD /* VLCLibraryModelChangeDelegate.m */; };
 		53ED472329C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53ED472229C74D1F00795DB1 /* VLCLibraryAudioTableViewDelegate.m */; };
@@ -438,6 +439,8 @@
 		53C1EF8A2B466B13001AEEF5 /* VLCLibraryHomeViewStackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewStackViewController.h; sourceTree = "<group>"; };
 		53CBE3092C159A4D006BF2E3 /* VLCNoResultsLabel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCNoResultsLabel.h; sourceTree = "<group>"; };
 		53CBE30A2C159A4D006BF2E3 /* VLCNoResultsLabel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCNoResultsLabel.m; sourceTree = "<group>"; };
+		53D021322CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowTitlesSidebarViewController.h; sourceTree = "<group>"; };
+		53D021332CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryWindowTitlesSidebarViewController.m; sourceTree = "<group>"; };
 		53D21A1B2BB428A20085C71B /* VLCLibraryWindowNavigationSidebarView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryWindowNavigationSidebarView.xib; sourceTree = "<group>"; };
 		53D21A1C2BB428F00085C71B /* VLCLibraryWindowPlaylistView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCLibraryWindowPlaylistView.xib; sourceTree = "<group>"; };
 		53D21A1D2BB465600085C71B /* VLCLibraryWindowPlaylistSidebarViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryWindowPlaylistSidebarViewController.h; sourceTree = "<group>"; };
@@ -1410,6 +1413,8 @@
 				5341F1522C9865DD003BDF0A /* VLCLibraryWindowSidebarRootViewController.m */,
 				53F0209F2A91115D00E79705 /* VLCLibraryWindowSplitViewController.h */,
 				53F020A02A91115D00E79705 /* VLCLibraryWindowSplitViewController.m */,
+				53D021322CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.h */,
+				53D021332CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.m */,
 				53F020A22A91D4A100E79705 /* VLCLibraryWindowToolbarDelegate.h */,
 				53F020A32A91D4A100E79705 /* VLCLibraryWindowToolbarDelegate.m */,
 			);
@@ -2219,6 +2224,7 @@
 				1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */,
 				537BD6862C59216600446ED0 /* VLCLibraryGroupsViewController.m in Sources */,
 				530F32B32C8C757600233C03 /* VLCLibraryAbstractSegmentViewController.m in Sources */,
+				53D021352CC225C6003C008F /* VLCLibraryWindowTitlesSidebarViewController.m in Sources */,
 				7DE82E7922843781002D341A /* VLCLibraryAlbumTableCellView.m in Sources */,
 				7D67318622C8F4060000AD40 /* VLCMediaSourceCollectionViewItem.m in Sources */,
 				536283F0291146BC00640C15 /* VLCLibraryTableView.m in Sources */,

@@ -185,6 +185,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowSidebarRootViewController.m \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.h \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.m \
+	gui/macosx/library/VLCLibraryWindowTitlesSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowTitlesSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.h \
