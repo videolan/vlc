@@ -158,17 +158,18 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
 {
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
+    const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
     
-    [self.viewSelector setEnabled:chaptersEnabled
+    [self.viewSelector setEnabled:chaptersEnabled || titlesEnabled
                        forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
-    self.viewSelector.hidden = !chaptersEnabled;
+    self.viewSelector.hidden = !chaptersEnabled && !titlesEnabled;
     self.topInternalConstraint.active = !self.viewSelector.hidden;
 
-    const NSLayoutPriority priority =
-        chaptersEnabled ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
+    const NSLayoutPriority playlistCompressionPriority =
+        self.viewSelector.hidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
     self.playlistHeaderLabel.hidden = chaptersEnabled;
-    [self.playlistHeaderLabel setContentCompressionResistancePriority:priority
+    [self.playlistHeaderLabel setContentCompressionResistancePriority:playlistCompressionPriority
                                                        forOrientation:NSLayoutConstraintOrientationVertical];
     self.playlistHeaderTopConstraint.active = !self.playlistHeaderLabel.hidden;
 
@@ -181,8 +182,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 2;
     counterLabelConstraintToActivate.active = YES;
     counterLabelConstraintToDeactivate.active = NO;
     
-    if (!chaptersEnabled &&
-        self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
+    if ((!chaptersEnabled && self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) ||
+        (!titlesEnabled && self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewTitlesSegment)) {
         self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
         [self viewSelectorAction:self.viewSelector];
     }
