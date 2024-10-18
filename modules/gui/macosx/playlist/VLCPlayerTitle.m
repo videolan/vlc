@@ -22,6 +22,30 @@
 
 #import "VLCPlayerTitle.h"
 
+#import "extensions/NSString+Helpers.h"
+#import "playlist/VLCPlayerChapter.h"
+
 @implementation VLCPlayerTitle
+
+- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title
+{
+    self = [super init];
+    if (self) {
+        _name = toNSStr(p_title->name);
+        _length = p_title->length;
+        _lengthString = [NSString stringWithTimeFromTicks:_length];
+        _flags = p_title->flags;
+        _chapterCount = p_title->chapter_count;
+
+        NSMutableArray * const chapters = [NSMutableArray arrayWithCapacity:self.chapterCount];
+        for (int i = 0; i < self.chapterCount; i++) {
+            VLCPlayerChapter * const chapter =
+                [[VLCPlayerChapter alloc] initWithChapter:&p_title->chapters[i]];
+            [chapters addObject:chapter];
+        }
+        _chapters = chapters.copy;
+    }
+    return self;
+}
 
 @end

@@ -22,6 +22,8 @@
 
 #import <Foundation/Foundation.h>
 
+#include <vlc_player.h>
+
 @class VLCPlayerChapter;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -34,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSUInteger flags;
 @property (readonly) NSUInteger chapterCount;
 @property (readonly) NSArray<VLCPlayerChapter *> *chapters;
+
+- (instancetype)initWithTitle:(const struct vlc_player_title *)p_title;
 
 @end
 
