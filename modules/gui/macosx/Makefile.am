@@ -482,6 +482,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
 	gui/macosx/UI/VLCLibraryWindowPlaylistView.xib \
 	gui/macosx/UI/VLCLibraryWindowSidebarRootView.xib \
+	gui/macosx/UI/VLCLibraryWindowTitlesView.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCarouselViewItemView.xib \
