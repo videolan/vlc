@@ -97,7 +97,7 @@ T.ToolButton {
 
         color: control.backgroundColor
 
-        border.color: visualFocus ? theme.visualFocus : "transparent"
+        border.color: visualFocus ? theme.visualFocus : theme.border
     }
 
     contentItem: Widgets.IconLabel {
