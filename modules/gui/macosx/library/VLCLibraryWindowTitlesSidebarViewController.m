@@ -124,4 +124,15 @@
     return nil;
 }
 
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    VLCPlayerTitle * const selectedTitle =
+        self.titlesArrayController.selectedObjects.firstObject;
+    if (selectedTitle == nil) {
+        return;
+    }
+
+    [VLCMain.sharedInstance.playlistController.playerController setSelectedTitleIndex:selectedTitle.index];
+}
+
 @end
