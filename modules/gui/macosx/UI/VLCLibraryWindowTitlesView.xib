@@ -46,7 +46,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibraryWindowChaptersTableViewNameCellIdentifier" id="ZTp-fs-5fE">
+                                            <tableCellView identifier="VLCLibraryWindowTitlesTableViewNameCellIdentifier" id="ZTp-fs-5fE">
                                                 <rect key="frame" x="11" y="1" width="741" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -66,8 +66,8 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibraryWindowTitlesTableViewTimeColumnIdentifier" editable="NO" width="64" minWidth="64" maxWidth="100" id="KEN-Nu-Iyj">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Time">
+                                    <tableColumn identifier="VLCLibraryWindowTitlesTableViewLengthColumnIdentifier" editable="NO" width="64" minWidth="64" maxWidth="100" id="KEN-Nu-Iyj">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Length">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </tableHeaderCell>
@@ -78,7 +78,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibraryWindowChaptersTableViewTimeCellIdentifier" id="frg-DF-b49">
+                                            <tableCellView identifier="VLCLibraryWindowTitlesTableViewTimeCellIdentifier" id="frg-DF-b49">
                                                 <rect key="frame" x="755" y="1" width="68" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
