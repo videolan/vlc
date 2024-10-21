@@ -1145,17 +1145,18 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     VLCDialogModel::killInstance();
     DialogErrorModel::killInstance();
 
+    //destroy MainCtx, Compositor shouldn't not use MainCtx after `unloadGUI`
+    if (p_intf->p_mi) {
+        delete p_intf->p_mi;
+        p_intf->p_mi = nullptr;
+    }
+
     if ( p_intf->p_compositor &&  cleanupReason == CLEANUP_APP_TERMINATED)
     {
         p_intf->p_compositor.reset();
 
-        //destroy MainCtx
-        delete p_intf->p_mi;
-        p_intf->p_mi = nullptr;
-
         delete p_intf->mainSettings;
         p_intf->mainSettings = nullptr;
-
     }
 
     /* Destroy the main playlist controller */
