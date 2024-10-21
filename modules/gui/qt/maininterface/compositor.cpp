@@ -333,6 +333,7 @@ void CompositorVideo::commonGUIDestroy()
     m_taskbarWidget.reset();
 #endif
     m_interfaceWindowHandler.reset();
+    m_mainCtx = nullptr;
 }
 
 void CompositorVideo::commonIntfDestroy()
