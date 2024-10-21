@@ -106,6 +106,8 @@ CompositorDirectComposition::CompositorDirectComposition( qt_intf_t* p_intf,  QO
 
 CompositorDirectComposition::~CompositorDirectComposition()
 {
+    //m_acrylicSurface should be released before the RHI context is destroyed
+    assert(!m_acrylicSurface);
     destroyMainInterface();
 }
 
@@ -219,13 +221,12 @@ void CompositorDirectComposition::setup()
         {
             try
             {
-                m_acrylicSurface = new CompositorDCompositionAcrylicSurface(m_intf, this, m_mainCtx, m_dcompDevice);
+                m_acrylicSurface = std::make_unique<CompositorDCompositionAcrylicSurface>(m_intf, this, m_mainCtx, m_dcompDevice);
             }
             catch (const std::exception& exception)
             {
                 if (const auto what = exception.what())
                     msg_Warn(m_intf, "%s", what);
-                delete m_acrylicSurface.data();
             }
         }
     }
@@ -303,6 +304,7 @@ void CompositorDirectComposition::destroyMainInterface()
 
 void CompositorDirectComposition::unloadGUI()
 {
+    m_acrylicSurface.reset();
     m_interfaceWindowHandler.reset();
     m_quickView.reset();
     commonGUIDestroy();
@@ -393,7 +395,7 @@ bool CompositorDirectComposition::eventFilter(QObject *watched, QEvent *event)
             static_cast<QPlatformSurfaceEvent *>(event)->surfaceEventType() == QPlatformSurfaceEvent::SurfaceAboutToBeDestroyed)
         {
             m_videoVisual.Reset();
-            delete m_acrylicSurface.data();
+            m_acrylicSurface.reset();
             // Just in case root visual deletes its children
             // when it is deleted: (Qt's UI visual should be
             // deleted by Qt itself)

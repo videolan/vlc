@@ -34,7 +34,6 @@
 
 class MainCtx;
 class WinTaskbarWidget;
-
 class QQuickView;
 
 class IDCompositionVisual;
@@ -42,6 +41,8 @@ class IDCompositionDevice;
 class IDCompositionTarget;
 
 namespace vlc {
+
+class CompositorDCompositionAcrylicSurface;
 
 class CompositorDirectComposition : public CompositorVideo
 {
@@ -96,7 +97,7 @@ private:
     Microsoft::WRL::ComPtr<IDCompositionVisual> m_videoVisual;
     IDCompositionVisual *m_uiVisual = nullptr;
 
-    QPointer<class CompositorDCompositionAcrylicSurface> m_acrylicSurface;
+    std::unique_ptr<CompositorDCompositionAcrylicSurface> m_acrylicSurface;
 };
 
 }
