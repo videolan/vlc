@@ -439,6 +439,8 @@ public slots:
     virtual void reloadPrefs();
     VLCVarChoiceModel* getExtraInterfaces();
 
+    bool pasteFromClipboard();
+
 protected slots:
     void onInputChanged( bool );
 

@@ -61,6 +61,8 @@
 #include <QUrl>
 #include <QDate>
 #include <QMimeData>
+#include <QClipboard>
+#include <QInputDialog>
 
 #include <QQmlProperty>
 #include <QQmlContext>
@@ -827,6 +829,66 @@ void MainCtx::emitRaise()
 VLCVarChoiceModel* MainCtx::getExtraInterfaces()
 {
     return m_extraInterfaces;
+}
+
+bool MainCtx::pasteFromClipboard()
+{
+    assert(qApp);
+    const QClipboard *const clipboard = qApp->clipboard();
+    if (Q_UNLIKELY(!clipboard))
+        return false;
+    const QMimeData *mimeData = clipboard->mimeData(QClipboard::Selection);
+    if (!mimeData || !mimeData->hasUrls())
+        mimeData = clipboard->mimeData(QClipboard::Clipboard);
+
+    if (Q_UNLIKELY(!mimeData))
+        return false;
+
+    QList<QUrl> urlList = mimeData->urls();
+    QString text = mimeData->text();
+
+    if (urlList.count() > 1 || text.contains('\n'))
+    {
+        // NOTE: The reason that mime data for `text/uri-list` is not used
+        //       directly as the placeholder of the input dialog instead of
+        //       re-constructing is to decode the urls in the list.
+        QString placeholder;
+
+        if (urlList.isEmpty())
+        {
+            placeholder = std::move(text);
+        }
+        else
+        {
+            for (const auto& i : urlList)
+                placeholder += i.toString(QUrl::PrettyDecoded) + '\n';
+            placeholder.chop(1);
+        }
+
+        bool ok = false;
+        const QString ret = QInputDialog::getMultiLineText(nullptr,
+                                                           qtr("Paste from clipboard"),
+                                                           qtr("Do you want to enqueue the following URLs into the playlist?"),
+                                                           placeholder,
+                                                           &ok);
+        if (!ok)
+            return false;
+
+        for (const auto& i : QStringView(ret).split('\n'))
+        {
+            if (i.length() > 0)
+                THEMPL->append(i.trimmed().toString(), false);
+        }
+
+        return true;
+    }
+    else if ((urlList.count() == 1) || mimeData->hasText())
+    {
+        THEDP->openUrlDialog();
+        return true;
+    }
+
+    return false;
 }
 
 /*****************************************************************************
