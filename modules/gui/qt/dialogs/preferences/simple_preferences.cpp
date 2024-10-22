@@ -1208,10 +1208,10 @@ void SPrefsPanel::apply()
         QByteArray devicepath = m_inputCodecUI.DVDDeviceComboBox->currentText().toUtf8();
         if( devicepath.size() > 0 )
         {
-            config_PutPsz( "dvd", devicepath );
-            config_PutPsz( "vcd", devicepath );
+            config_PutPsz( "dvd", devicepath.constData() );
+            config_PutPsz( "vcd", devicepath.constData() );
             if( module_exists( "cdda" ) )
-                config_PutPsz( "cd-audio", devicepath );
+                config_PutPsz( "cd-audio", devicepath.constData() );
         }
 
 #define CaC( name, factor ) config_PutInt( name, i_comboValue * factor )

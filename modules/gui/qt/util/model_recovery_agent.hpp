@@ -102,15 +102,15 @@ public:
 
             if (model->isEmpty())
             {
-                remove(recoveryFileName);
+                remove(recoveryFileName.constData());
                 return;
             }
 
-            if (model->serialize(tmpFileName) != VLC_SUCCESS)
+            if (model->serialize(tmpFileName.constData()) != VLC_SUCCESS)
                 return;
 
-            remove(recoveryFileName);
-            if (!rename(tmpFileName, recoveryFileName))
+            remove(recoveryFileName.constData());
+            if (!rename(tmpFileName.constData(), recoveryFileName.constData()))
             {
                 assert(m_settings);
                 m_settings->sync();

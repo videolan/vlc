@@ -29,6 +29,7 @@ libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-DQT_STRICT_ITERATORS \
 	-DQT_USE_QSTRINGBUILDER \
 	-DQT_NO_CAST_TO_ASCII \
+	-DQT_NO_CAST_FROM_BYTEARRAY \
 	-I$(srcdir) -I$(builddir) \
 	-I$(builddir)/dialogs/extended \
 	-I$(builddir)/dialogs/fingerprint \

@@ -580,7 +580,7 @@ int PlaylistController::serialize(const QString &fileName)
 {
     Q_D(PlaylistController);
     vlc_playlist_locker lock{d->m_playlist};
-    return vlc_playlist_Export(d->m_playlist, fileName.toUtf8(), "export-m3u8");
+    return vlc_playlist_Export(d->m_playlist, qtu(fileName), "export-m3u8");
 }
 
 int PlaylistController::currentIndex() const

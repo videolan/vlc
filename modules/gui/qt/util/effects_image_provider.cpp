@@ -228,7 +228,7 @@ QImage EffectsImageProvider::requestImage(const QString &id, QSize *size, const 
         const QUrlQuery query(url);
 
         std::unique_ptr<IEffect> effect;
-        switch (static_cast<EffectsImageProvider::Effect>(effectMetaEnum.keyToValue(url.path().toLatin1())))
+        switch (static_cast<EffectsImageProvider::Effect>(effectMetaEnum.keyToValue(url.path().toLatin1().constData())))
         {
         case EffectsImageProvider::RectDropShadow:
             effect = std::make_unique<RectDropShadowEffect>(queryToVariantMap(query));
