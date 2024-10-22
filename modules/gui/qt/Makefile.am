@@ -13,6 +13,7 @@ SUFFIXES += .ui .h .hpp .moc.cpp
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DQT_USE_QSTRINGBUILDER \
+	-DQT_NO_CAST_FROM_BYTEARRAY \
 	-I$(srcdir)/gui/qt -I$(builddir)/gui/qt
 libqt_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) $(CXXFLAGS_qt)
 libqt_plugin_la_LIBADD = $(QT_LIBS) $(LIBS_qt) $(LIBM)

@@ -1095,10 +1095,10 @@ void SPrefsPanel::apply()
             qobject_cast<QComboBox *>(optionWidgets["inputLE"])->currentText().toUtf8();
         if( devicepath.size() > 0 )
         {
-            config_PutPsz( p_intf, "dvd", devicepath );
-            config_PutPsz( p_intf, "vcd", devicepath );
+            config_PutPsz( p_intf, "dvd", devicepath.constData() );
+            config_PutPsz( p_intf, "vcd", devicepath.constData() );
             if( module_exists( "cdda" ) )
-                config_PutPsz( p_intf, "cd-audio", devicepath );
+                config_PutPsz( p_intf, "cd-audio", devicepath.constData() );
         }
 
 #define CaC( name, factor ) config_PutInt( p_intf, name, i_comboValue * factor )
