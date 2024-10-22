@@ -584,8 +584,8 @@ FocusScope {
 
             anchors.fill: parent
 
-            opacity: (MainCtx.intfMainWindow.visibility === Window.FullScreen) ? MainCtx.pinOpacity
-                                                                               : 1.0
+            opacity: (MainCtx.intfMainWindow.visibility === Window.FullScreen && MainCtx.hasEmbededVideo) ? MainCtx.pinOpacity
+                                                                                                          : 1.0
 
             tintColor: windowTheme.bg.primary
 
@@ -843,7 +843,7 @@ FocusScope {
 
             visible: !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls
 
-            opacity: MainCtx.pinVideoControls ? MainCtx.pinOpacity : 0.7
+            opacity: (Window.visibility === Window.FullScreen && MainCtx.hasEmbededVideo) ? MainCtx.pinOpacity : 0.7
 
             color: windowTheme.bg.primary
         }
