@@ -133,8 +133,6 @@ T.Slider {
     HoverHandler {
         id: hoverHandler
 
-        acceptedPointerTypes: PointerDevice.Mouse
-
         enabled: true
 
         target: background
