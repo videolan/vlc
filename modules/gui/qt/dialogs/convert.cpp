@@ -156,7 +156,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
 
 void ConvertDialog::fileBrowse()
 {
-    QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+    QString fileExtension = ( ! profile->isEnabled() ) ? QStringLiteral(".*") : QStringLiteral(".") + profile->getMux();
 
     outgoingMRL = QFileDialog::getSaveFileUrl( this, qtr( "Save file..." ),
         p_intf->p_sys->filepath,
@@ -208,7 +208,7 @@ void ConvertDialog::close()
             // Multiple, use the convention.
             else
             {
-                QString fileExtension = ( ! profile->isEnabled() ) ? ".*" : "." + profile->getMux();
+                QString fileExtension = ( ! profile->isEnabled() ) ? QStringLiteral(".*") : QStringLiteral(".") + profile->getMux();
 
                 newFileName = incomingMRLs->at(i);
 

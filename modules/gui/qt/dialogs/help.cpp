@@ -306,7 +306,7 @@ void UpdateDialog::updateNotify( bool b_result )
                 .arg( QString::number( p_release->i_major ) )
                 .arg( QString::number( p_release->i_minor ) )
                 .arg( QString::number( p_release->i_revision ) )
-                .arg( p_release->i_extra == 0 ? "" : "." + QString::number( p_release->i_extra ) );
+                .arg( p_release->i_extra == 0 ? QStringLiteral("") : QStringLiteral(".") + QString::number( p_release->i_extra ) );
 
             ui.updateNotifyLabel->setText( message );
             message = qfu( p_release->psz_desc ).replace( "\n", "<br/>" );
