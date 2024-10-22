@@ -389,7 +389,7 @@ void UpdateDialog::updateUI( )
                               .arg( m_model->getMajor() )
                               .arg( m_model->getMinor() )
                               .arg( m_model->getRevision()  )
-                              .arg( extra == 0 ? "" : "." + QString::number( extra ) );
+                              .arg( extra == 0 ? QStringLiteral("") : QStringLiteral(".") + QString::number( extra ) );
 
         ui.updateNotifyLabel->setText( message );
         message = m_model->getDescription().replace( "\n", "<br/>" );
