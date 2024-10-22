@@ -843,7 +843,8 @@ FocusScope {
 
             visible: !MainCtx.hasEmbededVideo || MainCtx.pinVideoControls
 
-            opacity: (Window.visibility === Window.FullScreen && MainCtx.hasEmbededVideo) ? MainCtx.pinOpacity : 0.7
+            opacity: (Window.visibility === Window.FullScreen && MainCtx.hasEmbededVideo) ? MainCtx.pinOpacity
+                                                                                          : ((AcrylicController.enabled || !MainCtx.hasEmbededVideo) ? 0.7 : 1.0)
 
             color: windowTheme.bg.primary
         }
