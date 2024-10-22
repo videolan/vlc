@@ -167,6 +167,8 @@ T.ItemDelegate {
         DragHandler {
             id: dragHandler
 
+            acceptedDevices: PointerDevice.AllDevices & ~(PointerDevice.TouchScreen)
+
             target: null
 
             grabPermissions: PointerHandler.CanTakeOverFromHandlersOfDifferentType | PointerHandler.ApprovesTakeOverByAnything
