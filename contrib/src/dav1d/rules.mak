@@ -1,6 +1,7 @@
 # libdav1d
 
-DAV1D_VERSION := 1.4.3
+
+DAV1D_VERSION := 1.5.0
 DAV1D_URL := $(VIDEOLAN)/dav1d/$(DAV1D_VERSION)/dav1d-$(DAV1D_VERSION).tar.xz
 
 PKGS += dav1d
