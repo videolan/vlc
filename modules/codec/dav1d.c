@@ -115,14 +115,14 @@ static vlc_fourcc_t FindVlcChroma(const Dav1dPicture *img)
         img->seq_hdr->pri == DAV1D_COLOR_PRI_BT709 &&
         img->seq_hdr->trc == DAV1D_TRC_SRGB )
     {
-        if( img->seq_hdr->hbd < 0 || img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table_rgb) )
+        if( img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table_rgb) )
             return 0;
         return chroma_table_rgb[img->seq_hdr->hbd];
     }
 
     if( img->seq_hdr->layout < 0 || img->seq_hdr->layout >= (int)ARRAY_SIZE(chroma_table) )
         return 0;
-    if( img->seq_hdr->hbd < 0 || img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table[0]) )
+    if( img->seq_hdr->hbd >= (int)ARRAY_SIZE(chroma_table[0]) )
         return 0;
 
     return chroma_table[img->seq_hdr->layout][img->seq_hdr->hbd];
