@@ -3391,6 +3391,15 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
                             b_extra_buffering_allowed,
                             i_pcr, vlc_tick_now() );
 
+        if (tracer != NULL)
+        {
+            vlc_tracer_Trace(tracer,
+                             VLC_TRACE("type", "DEMUX"),
+                             VLC_TRACE("id", "input"),
+                             VLC_TRACE_TICK_NS("buffering", -i_late),
+                             VLC_TRACE_END);
+        }
+
         if( !p_sys->p_pgrm )
             return VLC_SUCCESS;
 
