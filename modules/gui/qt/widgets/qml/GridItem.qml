@@ -374,7 +374,6 @@ T.ItemDelegate {
 
             HoverHandler {
                 id: subtitleTxtMouseHandler
-                acceptedDevices: PointerDevice.Mouse
             }
         }
     }
