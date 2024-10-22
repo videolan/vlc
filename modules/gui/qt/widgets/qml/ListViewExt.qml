@@ -536,8 +536,6 @@ ListView {
     }
 
     TapHandler {
-        acceptedDevices: PointerDevice.Mouse
-
         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         grabPermissions: PointerHandler.TakeOverForbidden
