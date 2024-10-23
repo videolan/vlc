@@ -319,8 +319,6 @@ public:
             // handle it to relay if mouse is on the CSD buttons
             // required for snap layouts menu (WINDOWS 11)
 
-            setAllUnhovered();
-
             // Get the point in screen coordinates.
             POINT point = { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) };
 
@@ -369,13 +367,21 @@ public:
             {
             case HTCLOSE:
                 setHovered(CSDButton::Close);
+                setHovered(CSDButton::Minimize, false);
+                setHovered(CSDButton::MaximizeRestore, false);
                 break;
             case HTMINBUTTON:
                 setHovered(CSDButton::Minimize);
+                setHovered(CSDButton::Close, false);
+                setHovered(CSDButton::MaximizeRestore, false);
                 break;
             case HTMAXBUTTON:
                 setHovered(CSDButton::MaximizeRestore);
+                setHovered(CSDButton::Close, false);
+                setHovered(CSDButton::Minimize, false);
                 break;
+            default:
+                setAllUnhovered();
             }
 
             // If we haven't previously asked for mouse tracking, request mouse
@@ -529,11 +535,11 @@ private:
         return nullptr;
     }
 
-    void setHovered(CSDButton::ButtonType type)
+    void setHovered(CSDButton::ButtonType type, bool hovered = true)
     {
         for (auto button : m_buttonmodel->windowCSDButtons()) {
             if (button->type() == type) {
-                button->setShowHovered(true);
+                button->setShowHovered(hovered);
                 return ;
             }
         }
