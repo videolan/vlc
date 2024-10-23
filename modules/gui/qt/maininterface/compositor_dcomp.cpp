@@ -327,7 +327,7 @@ bool CompositorDirectComposition::setupVoutWindow(vlc_window_t *p_wnd, VoutDestr
         QMutexLocker lock(&m_setupStateLock);
         while (m_setupState == SetupState::Uninitialized)
         {
-            const bool ret = m_setupStateCond.wait(&m_setupStateLock, QDeadlineTimer(2500));
+            const bool ret = m_setupStateCond.wait(&m_setupStateLock);
             if (!ret)
                 return false;
         }
