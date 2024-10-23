@@ -33,6 +33,7 @@ T.Button {
     property string iconTxt: ""
     property bool showHovered: false
     property bool isThemeDark: false
+    property bool externalPressed: false
 
     readonly property bool _paintHovered: control.hovered || showHovered
 
@@ -50,7 +51,7 @@ T.Button {
         height: control.height
         width: control.width
         color: {
-            if (control.pressed)
+            if (control.pressed || (control.externalPressed && control._paintHovered))
                 return control.isThemeDark ? Qt.lighter(control.hoverColor, 1.2)
                                            : Qt.darker(control.hoverColor, 1.2)
 
