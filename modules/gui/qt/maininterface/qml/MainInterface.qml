@@ -253,7 +253,12 @@ Item {
                        so check if mimedata has valid url in text and use it
                        if we didn't get any normal Urls()*/
 
-                    urls.push(drop.text)
+                    if (drop.text.includes("\n")) {
+                        const normalizedLineEndingsDropText = drop.text.replace("\r\n", "\n")
+                        urls.push(...normalizedLineEndingsDropText.split("\n"))
+                    } else {
+                        urls.push(drop.text)
+                    }
                 }
 
                 if (urls.length > 0) {
