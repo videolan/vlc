@@ -1088,6 +1088,58 @@ error:
     return NULL;
 }
 
+int input_item_Update(input_item_t *dst, input_item_t *src)
+{
+    assert(dst != NULL);
+    assert(src != NULL);
+
+    if (strcmp(dst->psz_uri, src->psz_uri)) {
+        return VLC_EGENERIC;
+    }
+
+    input_item_t *tmp = input_item_Copy(src);
+    if (tmp == NULL) {
+        return VLC_EGENERIC;
+    }
+
+    vlc_mutex_lock(&dst->lock);
+    if (dst->psz_name == NULL) {
+        dst->psz_name = tmp->psz_name;
+        tmp->psz_name = NULL;
+    }
+    dst->i_duration = tmp->i_duration;
+
+    struct input_item_es item_es;
+    vlc_vector_foreach(item_es, &dst->es_vec) {
+        free(item_es.id);
+        es_format_Clean(&item_es.es);
+    }
+    vlc_vector_clear(&dst->es_vec);
+    dst->es_vec = tmp->es_vec;
+    vlc_vector_init(&tmp->es_vec);
+
+    if (tmp->p_meta != NULL) {
+        if (dst->p_meta != NULL) {
+            vlc_meta_Merge(dst->p_meta, tmp->p_meta);
+        } else {
+            dst->p_meta = tmp->p_meta;
+            tmp->p_meta = NULL;
+        }
+    }
+
+    for( int i = 0; i < dst->i_slaves; i++ )
+        input_item_slave_Delete( dst->pp_slaves[i] );
+    TAB_CLEAN(dst->i_slaves, dst->pp_slaves );
+    dst->i_slaves = tmp->i_slaves;
+    tmp->i_slaves = 0;
+    dst->pp_slaves = tmp->pp_slaves;
+    tmp->pp_slaves = NULL;
+    vlc_mutex_unlock(&dst->lock);
+
+    input_item_Release(tmp);
+    return VLC_SUCCESS;
+}
+
 struct item_type_entry
 {
     const char *psz_scheme;

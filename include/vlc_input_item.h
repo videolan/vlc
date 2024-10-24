@@ -389,6 +389,21 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
  */
 VLC_API input_item_t * input_item_Copy(input_item_t * ) VLC_USED;
 
+/**
+ * Update an input item with data from another input item.
+ *
+ * Copies metadata and associated fields from @p src to @p dst. The function
+ * creates a temporary copy of the source item and transfers ownership of
+ * relevant data fields (such as name, URI, duration, meta, ES and slave lists)
+ * to the destination item, replacing any existing values.
+ *
+ * @param[in,out] dst   Destination input item to be updated.
+ * @param[in]     src   Source input item containing new values.
+ *
+ * @return VLC_SUCCESS on success, or VLC_EGENERIC on failure.
+ */
+VLC_API int input_item_Update(input_item_t *dst, input_item_t *src);
+
 /** Holds an input item, i.e. creates a new reference. */
 VLC_API input_item_t *input_item_Hold(input_item_t *);
 
