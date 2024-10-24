@@ -447,6 +447,12 @@ void MainUI::registerQMLTypes()
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 5, 0)
+    // Dummy QtQuick.Effects module
+    qmlRegisterModule("QtQuick.Effects", 0, 0);
+    // Do not protect, types can still be registered.
+#endif
 }
 
 void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)

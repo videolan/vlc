@@ -25,6 +25,7 @@ import QtQuick.Layouts
 import QtQuick.Templates
 import QtQuick.Controls
 import QtQuick.Window
+import QtQuick.Effects
 import Qt5Compat.GraphicalEffects
 
 
