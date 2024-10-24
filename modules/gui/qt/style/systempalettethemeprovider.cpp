@@ -121,12 +121,12 @@ static void setQtColorSetBg(vlc_qt_theme_provider_t* obj,
 }
 
 static void setQtColorSetBorder(vlc_qt_theme_provider_t* obj,
-    vlc_qt_theme_color_set set, QPalette::ColorRole roleBg, QPalette::ColorRole roleFg)
+    vlc_qt_theme_color_set set, QPalette::ColorRole roleBg, QPalette::ColorRole roleFg, float blend = 0.5)
 {
     auto sys = static_cast<SystemePaletteObserver*>(obj->p_sys);
     QColor fg = sys->m_palette.color(QPalette::Normal, roleFg);
     QColor bg = sys->m_palette.color(QPalette::Normal, roleBg);
-    setQtColor(obj, set, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, blendColors(bg, fg));
+    setQtColor(obj, set, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, blendColors(bg, fg, blend));
 }
 
 
@@ -237,7 +237,7 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
 
         setQtColor(obj, CS, VQTC_SECTION_FG, VQTC_NAME_SECONDARY, VQTC_STATE_NORMAL, secondaryTextButton);
 
-        setQtColorSetBorder(obj, CS, QPalette::Button, QPalette::ButtonText);
+        setQtColorSetBorder(obj, CS, QPalette::Button, QPalette::ButtonText, 0.8);
 
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_NEGATIVE, VQTC_STATE_NORMAL, negative);
         setQtColor(obj, CS, VQTC_SECTION_BG, VQTC_NAME_NEGATIVE, VQTC_STATE_HOVERED, negativeHover);
