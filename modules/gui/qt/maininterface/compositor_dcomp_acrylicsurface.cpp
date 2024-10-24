@@ -319,10 +319,10 @@ try
     vlc_assert(!m_dummyWindow);
     // lDwmpCreateSharedMultiWindowVisual requires a window with disabled live (thumbnail) preview
     // use a hidden dummy window to avoid disabling live preview of main window
-    m_dummyWindow = ::CreateWindowExA(WS_EX_TOOLWINDOW, "STATIC", "dummy", WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
+    m_dummyWindow = ::CreateWindowExA(WS_EX_TOOLWINDOW, "STATIC", "dummy", 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL);
     if (!m_dummyWindow)
         throw DXError("failed to create dummy window",  static_cast<HRESULT>(GetLastError()));
-
+    ShowWindow(m_dummyWindow, SW_SHOWNOACTIVATE);
     int attr = DWM_CLOAKED_APP;
     DwmSetWindowAttribute(m_dummyWindow, DWMWA_CLOAK, &attr, sizeof attr);
 
