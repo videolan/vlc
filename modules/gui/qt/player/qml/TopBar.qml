@@ -198,6 +198,14 @@ FocusScope{
         anchors.fill: parent
         active: root.showCSD
         source: "qrc:///qt/qml/VLC/Widgets/CSDTitlebarTapNDrapHandler.qml"
+
+        Connections {
+            target: tapNDrag.item
+            enabled: tapNDrag.status === Loader.Ready
+            function onCsdMenuVisibleChanged() {
+                root.requestLockUnlockAutoHide(tapNDrag.item.csdMenuVisible)
+            }
+        }
     }
 
     // Components -
