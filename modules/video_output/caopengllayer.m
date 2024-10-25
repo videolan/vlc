@@ -595,12 +595,12 @@ static int Control (vout_display_t *vd, int query)
 - (instancetype)initWithVoutDisplay:(vout_display_t *)vd
 {
     self = [super init];
-    if (self) {
-        _vlc_vd = vd;
+    if (self == nil)
+        return nil;
+    _vlc_vd = vd;
 
-        self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-        self.wantsLayer = YES;
-    }
+    self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    self.wantsLayer = YES;
     return self;
 }
 
