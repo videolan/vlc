@@ -353,10 +353,6 @@ static int Open (vout_display_t *vd,
     @autoreleasepool {
         vout_display_sys_t *sys;
 
-        vd->sys = sys = vlc_obj_calloc(vd, 1, sizeof(*sys));
-        if (sys == NULL)
-            return VLC_ENOMEM;
-
         // Only use this video output on macOS 10.14 or higher
         // currently, as it has some issues on at least macOS 10.7
         // and the old NSView based output still works fine on old
@@ -364,10 +360,13 @@ static int Open (vout_display_t *vd,
         if (@available(macOS 10.14, *)) {
             // This is intentionally left empty, as the check
             // can not be negated or combined with other conditions!
-        } else {
-            if (!vd->obj.force)
-                return VLC_EGENERIC;
+        } else if (!vd->obj.force) {
+            return VLC_EGENERIC;
         }
+
+        vd->sys = sys = calloc(1, sizeof(*sys));
+        if (sys == NULL)
+            return VLC_ENOMEM;
 
         id container = vd->cfg->window->handle.nsobject;
         if (!container) {
@@ -514,6 +513,7 @@ static void Close(vout_display_t *vd)
         [videoView release];
         [container release];
         [videoLayer release];
+        free(sys);
     });
 }
 
