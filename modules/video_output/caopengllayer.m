@@ -392,6 +392,7 @@ static int Open (vout_display_t *vd,
         sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (unlikely(!sys->gl))
         {
+            CGLReleaseContext(cgl_ctx);
             Close(vd);
             return VLC_ENOMEM;
         }
