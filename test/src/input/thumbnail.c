@@ -161,7 +161,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         input_item_Release( p_item );
         free( psz_mrl );
 
-        vlc_thumbnailer_Release( p_thumbnailer );
+        vlc_thumbnailer_Delete( p_thumbnailer );
     }
 }
 
@@ -197,7 +197,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 
     input_item_Release( p_item );
 
-    vlc_thumbnailer_Release( p_thumbnailer );
+    vlc_thumbnailer_Delete( p_thumbnailer );
 }
 
 int main( void )

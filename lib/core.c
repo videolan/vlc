@@ -110,7 +110,7 @@ void libvlc_release( libvlc_instance_t *p_instance )
         if (p_instance->parser != NULL)
             vlc_preparser_Delete(p_instance->parser);
         if (p_instance->thumbnailer != NULL)
-            vlc_thumbnailer_Release(p_instance->thumbnailer);
+            vlc_thumbnailer_Delete(p_instance->thumbnailer);
 
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );

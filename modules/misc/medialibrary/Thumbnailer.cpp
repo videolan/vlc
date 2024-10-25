@@ -35,7 +35,7 @@
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
     , m_currentContext( nullptr )
-    , m_thumbnailer( nullptr, &vlc_thumbnailer_Release )
+    , m_thumbnailer( nullptr, &vlc_thumbnailer_Delete )
 {
     m_thumbnailer.reset( vlc_thumbnailer_Create( VLC_OBJECT( ml ),
                                                   VLC_TICK_FROM_SEC( 3 ) ) );

@@ -122,10 +122,10 @@ VLC_API size_t
 vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id );
 
 /**
- * \brief vlc_thumbnailer_Release releases a thumbnailer and cancel all pending requests
+ * \brief vlc_thumbnailer_Delete Deletes a thumbnailer and cancel all pending requests
  * \param thumbnailer A thumbnailer object
  */
-VLC_API void vlc_thumbnailer_Release( vlc_thumbnailer_t* thumbnailer );
+VLC_API void vlc_thumbnailer_Delete( vlc_thumbnailer_t* thumbnailer );
 
 /**
  * Do not use, libVLC only fonction, will be removed soon

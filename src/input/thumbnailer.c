@@ -342,7 +342,7 @@ void vlc_thumbnailer_SetTimeout( vlc_thumbnailer_t *thumbnailer,
     thumbnailer->timeout = timeout;
 }
 
-void vlc_thumbnailer_Release( vlc_thumbnailer_t *thumbnailer )
+void vlc_thumbnailer_Delete( vlc_thumbnailer_t *thumbnailer )
 {
     vlc_executor_Delete(thumbnailer->executor);
     free( thumbnailer );
