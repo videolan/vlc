@@ -6,3 +6,6 @@ license.workspace = true
 
 [dependencies]
 vlcrs-messages = { path = "../vlcrs-messages" }
+
+[dev-dependencies]
+vlcrs-macros.workspace = true
