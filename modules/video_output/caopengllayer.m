@@ -368,20 +368,22 @@ static int Open (vout_display_t *vd,
         if (sys == NULL)
             return VLC_ENOMEM;
 
-        id container = vd->cfg->window->handle.nsobject;
+        id container = (__bridge id)vd->cfg->window->handle.nsobject;
         if (!container) {
             msg_Err(vd, "No drawable-nsobject found!");
-            goto error;
+            Close(vd);
+            return VLC_EGENERIC;
         }
 
         // Retain container, released in Close
-        sys->container = [container retain];
+        sys->container = container;
 
         // Create the CGL context
         CGLContextObj cgl_ctx = vlc_CreateCGLContext();
         if (cgl_ctx == NULL) {
             msg_Err(vd, "Failure to create CGL context!");
-            goto error;
+            Close(vd);
+            return VLC_EGENERIC;
         }
 
         // Create a pseudo-context object which provides needed callbacks
@@ -389,7 +391,11 @@ static int Open (vout_display_t *vd,
         // by a proper opengl provider module, but we do not have that currently.
         sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (unlikely(!sys->gl))
-            goto error;
+        {
+            Close(vd);
+            return VLC_ENOMEM;
+        }
+
 
         static const struct vlc_gl_operations gl_ops =
         {
@@ -414,7 +420,7 @@ static int Open (vout_display_t *vd,
 
             // Create video view
             sys->videoView = [[VLCVideoLayerView alloc] initWithVoutDisplay:vd];
-            sys->videoLayer = (VLCCAOpenGLLayer*)[[sys->videoView layer] retain];
+            sys->videoLayer = (VLCCAOpenGLLayer*)[sys->videoView layer];
             // Add video view to container
             if ([container respondsToSelector:@selector(addVoutSubview:)]) {
                 [container addVoutSubview:sys->videoView];
@@ -423,8 +429,6 @@ static int Open (vout_display_t *vd,
                 [containerView addSubview:sys->videoView];
                 [sys->videoView setFrame:containerView.bounds];
             } else {
-                [sys->videoView release];
-                [sys->videoLayer release];
                 sys->videoView = nil;
                 sys->videoLayer = nil;
             }
@@ -438,7 +442,8 @@ static int Open (vout_display_t *vd,
             msg_Err(vd,
                     "Invalid drawable-nsobject object, must either be an NSView "
                     "or comply with the VLCOpenGLVideoViewEmbedding protocol");
-            goto error;
+            Close(vd);
+            return VLC_EGENERIC;
         }
 
 
@@ -446,7 +451,10 @@ static int Open (vout_display_t *vd,
         const vlc_fourcc_t *spu_chromas;
 
         if (vlc_gl_MakeCurrent(sys->gl))
-            goto error;
+        {
+            Close(vd);
+            return VLC_EGENERIC;
+        }
 
         sys->vgl = vout_display_opengl_New(fmt, &spu_chromas, sys->gl,
                                            &vd->cfg->viewpoint, context);
@@ -454,7 +462,8 @@ static int Open (vout_display_t *vd,
 
         if (sys->vgl == NULL) {
             msg_Err(vd, "Error while initializing OpenGL display");
-            goto error;
+            Close(vd);
+            return VLC_EGENERIC;
         }
 
         vd->info.subpicture_chromas = spu_chromas;
@@ -463,10 +472,6 @@ static int Open (vout_display_t *vd,
 
         atomic_init(&sys->is_ready, false);
         return VLC_SUCCESS;
-
-    error:
-        Close(vd);
-        return VLC_EGENERIC;
     }
 }
 
@@ -497,22 +502,16 @@ static void Close(vout_display_t *vd)
         free(glsys);
     }
 
-    // Copy pointers out of sys, as sys can be gone already
-    // when the dispatch_async block is run!
-    id container = sys->container;
-    VLCVideoLayerView *videoView = sys->videoView;
-    VLCCAOpenGLLayer *videoLayer = sys->videoLayer;
-
     dispatch_async(dispatch_get_main_queue(), ^{
         // Remove vout subview from container
-        if ([container respondsToSelector:@selector(removeVoutSubview:)]) {
-            [container removeVoutSubview:videoView];
+        if ([sys->container respondsToSelector:@selector(removeVoutSubview:)]) {
+            [sys->container removeVoutSubview:sys->videoView];
         }
-        [videoView removeFromSuperview];
+        [sys->videoView removeFromSuperview];
 
-        [videoView release];
-        [container release];
-        [videoLayer release];
+        sys->videoView = nil;
+        sys->container = nil;
+        sys->videoLayer = nil;
         free(sys);
     });
 }
@@ -638,7 +637,7 @@ static int Control (vout_display_t *vd, int query)
 
         VLCCAOpenGLLayer *layer = [[VLCCAOpenGLLayer alloc] initWithVoutDisplay:_vlc_vd];
         layer.delegate = self;
-        return [layer autorelease];
+        return layer;
     }
 }
 
@@ -706,8 +705,6 @@ shouldInheritContentsScale:(CGFloat)newScale
 - (void)dealloc
 {
     CGLReleaseContext(_glContext);
-    [_displayLock release];
-    [super dealloc];
 }
 
 - (void)display
