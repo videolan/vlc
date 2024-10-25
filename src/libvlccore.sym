@@ -831,8 +831,7 @@ vlc_es_id_GetStrId
 vlc_es_id_IsStrIdStable
 vlc_encoder_Destroy
 vlc_thumbnailer_Create
-vlc_thumbnailer_RequestByTime
-vlc_thumbnailer_RequestByPos
+vlc_thumbnailer_Request
 vlc_thumbnailer_Cancel
 vlc_thumbnailer_Delete
 vlc_thumbnailer_SetTimeout

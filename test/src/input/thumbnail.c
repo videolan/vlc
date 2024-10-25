@@ -137,20 +137,23 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         vlc_mutex_lock( &ctx.lock );
 
         vlc_thumbnailer_req_id id;
+        struct vlc_thumbnailer_seek_arg seek_arg;
         if ( test_params[i].b_use_pos )
         {
-            id = vlc_thumbnailer_RequestByPos( p_thumbnailer, test_params[i].f_pos,
-                test_params[i].b_fast_seek ?
-                    VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-                p_item, thumbnailer_callback, &ctx );
+            seek_arg.type = VLC_THUMBNAILER_SEEK_POS;
+            seek_arg.pos = test_params[i].f_pos;
+            seek_arg.speed = test_params[i].b_fast_seek ?
+                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
         }
         else
         {
-            id = vlc_thumbnailer_RequestByTime( p_thumbnailer, test_params[i].i_time,
-                test_params[i].b_fast_seek ?
-                    VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-                p_item, thumbnailer_callback, &ctx );
+            seek_arg.type = VLC_THUMBNAILER_SEEK_TIME;
+            seek_arg.time = test_params[i].i_time;
+            seek_arg.speed = test_params[i].b_fast_seek ?
+                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
         }
+        id = vlc_thumbnailer_Request( p_thumbnailer, p_item, &seek_arg,
+                                      thumbnailer_callback, &ctx );
         assert( id != VLC_THUMBNAILER_REQ_ID_INVALID );
 
         while ( ctx.b_done == false )
@@ -185,9 +188,9 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     input_item_t* p_item = input_item_New( psz_mrl, "mock item" );
     assert( p_item != NULL );
 
-    vlc_thumbnailer_req_id id = vlc_thumbnailer_RequestByTime( p_thumbnailer,
-        VLC_TICK_INVALID, VLC_THUMBNAILER_SEEK_PRECISE, p_item,
-        thumbnailer_callback_cancel, NULL );
+    vlc_thumbnailer_req_id id =
+        vlc_thumbnailer_Request( p_thumbnailer, p_item, NULL,
+                                 thumbnailer_callback_cancel, NULL );
 
     vlc_thumbnailer_Cancel( p_thumbnailer, id );
 

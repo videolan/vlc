@@ -56,20 +56,40 @@ typedef void(*vlc_thumbnailer_cb)( void* data, picture_t* thumbnail );
 VLC_API vlc_thumbnailer_t*
 vlc_thumbnailer_Create(vlc_object_t* parent, vlc_tick_t timeout) VLC_USED;
 
-enum vlc_thumbnailer_seek_speed
+/**
+ * Thumbnailer seek argument
+ */
+struct vlc_thumbnailer_seek_arg
 {
-    /** Precise, but potentially slow */
-    VLC_THUMBNAILER_SEEK_PRECISE,
-    /** Fast, but potentially imprecise */
-    VLC_THUMBNAILER_SEEK_FAST,
+    enum
+    {
+        /** Seek by time */
+        VLC_THUMBNAILER_SEEK_TIME,
+        /** Seek by position */
+        VLC_THUMBNAILER_SEEK_POS,
+    } type;
+    union
+    {
+        /** Seek time if type == VLC_THUMBNAILER_SEEK_TIME */
+        vlc_tick_t time;
+        /** Seek position if type == VLC_THUMBNAILER_SEEK_POS */
+        double pos;
+    };
+    enum
+    {
+        /** Precise, but potentially slow */
+        VLC_THUMBNAILER_SEEK_PRECISE,
+        /** Fast, but potentially imprecise */
+        VLC_THUMBNAILER_SEEK_FAST,
+    } speed;
 };
 
 /**
- * \brief vlc_thumbnailer_RequestByTime Requests a thumbnailer at a given time
+ * \brief vlc_thumbnailer_Request Requests a thumbnailer
  * \param thumbnailer A thumbnailer object
- * \param time The time at which the thumbnail should be taken
- * \param speed The seeking speed \sa{enum vlc_thumbnailer_seek_speed}
  * \param input_item The input item to generate the thumbnail for
+ * \param seek_arg pointer to a seek struct, that tell at which time the
+ * thumbnail should be taken
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * \param cb A user callback to be called on completion (success & error)
  * \param user_data An opaque value, provided as pf_cb's first parameter
@@ -82,34 +102,10 @@ enum vlc_thumbnailer_seek_speed
  * released safely after calling this function.
  */
 VLC_API vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
-                               vlc_tick_t time,
-                               enum vlc_thumbnailer_seek_speed speed,
-                               input_item_t *input_item,
-                               vlc_thumbnailer_cb cb, void* user_data );
-/**
- * \brief vlc_thumbnailer_RequestByTime Requests a thumbnailer at a given time
- * \param thumbnailer A thumbnailer object
- * \param pos The position at which the thumbnail should be taken
- * \param speed The seeking speed \sa{enum vlc_thumbnailer_seek_speed}
- * \param input_item The input item to generate the thumbnail for
- * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
- * \param cb A user callback to be called on completion (success & error)
- * \param user_data An opaque value, provided as pf_cb's first parameter
-
- * @return VLC_THUMBNAILER_REQ_ID_INVALID in case of error, or a valid id if
- * the item was scheduled for preparsing.  If this function returns a valid id,
- * the callback is guaranteed to be called, even in case of later failure
- * (except if cancelled early by the user).
- * The provided input_item will be held by the thumbnailer and can safely be
- * released safely after calling this function.
- */
-VLC_API vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              double pos,
-                              enum vlc_thumbnailer_seek_speed speed,
-                              input_item_t *input_item,
-                              vlc_thumbnailer_cb cb, void* user_data );
+vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
+                         input_item_t *input_item,
+                         const struct vlc_thumbnailer_seek_arg *seek_arg,
+                         vlc_thumbnailer_cb cb, void* user_data );
 
 /**
  * \brief vlc_thumbnailer_Camcel Cancel a thumbnail request

@@ -41,26 +41,11 @@ struct vlc_thumbnailer_t
     struct vlc_list submitted_tasks; /**< list of struct task */
 };
 
-struct seek_target
-{
-    enum
-    {
-        VLC_THUMBNAILER_SEEK_TIME,
-        VLC_THUMBNAILER_SEEK_POS,
-    } type;
-    union
-    {
-        vlc_tick_t time;
-        double pos;
-    };
-};
-
 typedef struct task
 {
     vlc_thumbnailer_t *thumbnailer;
 
-    struct seek_target seek_target;
-    bool fast_seek;
+    struct vlc_thumbnailer_seek_arg seek_arg;
     input_item_t *item;
     vlc_thumbnailer_cb cb;
     void* userdata;
@@ -83,7 +68,7 @@ static void RunnableRun(void *);
 
 static task_t *
 TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
-        struct seek_target seek_target, bool fast_seek,
+        const struct vlc_thumbnailer_seek_arg *seek_arg,
         vlc_thumbnailer_cb cb, void *userdata)
 {
     task_t *task = malloc(sizeof(*task));
@@ -92,8 +77,8 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
 
     task->thumbnailer = thumbnailer;
     task->item = item;
-    task->seek_target = seek_target;
-    task->fast_seek = fast_seek;
+    task->seek_arg = *seek_arg;
+
     task->cb = cb;
     task->userdata = userdata;
 
@@ -178,12 +163,16 @@ RunnableRun(void *userdata)
     if (!input)
         goto error;
 
-    if (task->seek_target.type == VLC_THUMBNAILER_SEEK_TIME)
-        input_SetTime(input, task->seek_target.time, task->fast_seek);
+    assert(task->seek_arg.speed == VLC_THUMBNAILER_SEEK_PRECISE
+        || task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST);
+    bool fast_seek = task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST;
+
+    if (task->seek_arg.type == VLC_THUMBNAILER_SEEK_TIME)
+        input_SetTime(input, task->seek_arg.time, fast_seek);
     else
     {
-        assert(task->seek_target.type == VLC_THUMBNAILER_SEEK_POS);
-        input_SetPosition(input, task->seek_target.pos, task->fast_seek);
+        assert(task->seek_arg.type == VLC_THUMBNAILER_SEEK_POS);
+        input_SetPosition(input, task->seek_arg.pos, fast_seek);
     }
 
     int ret = input_Start(input);
@@ -228,14 +217,13 @@ error:
     TaskDestroy(task);
 }
 
-static vlc_thumbnailer_req_id
-RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
-              enum vlc_thumbnailer_seek_speed speed, input_item_t *item,
-              vlc_thumbnailer_cb cb, void *userdata)
+vlc_thumbnailer_req_id
+vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
+                         input_item_t *item,
+                         const struct vlc_thumbnailer_seek_arg *seek_arg,
+                         vlc_thumbnailer_cb cb, void* userdata )
 {
-    bool fast_seek = speed == VLC_THUMBNAILER_SEEK_FAST;
-    task_t *task = TaskNew(thumbnailer, item, seek_target, fast_seek, cb,
-                           userdata);
+    task_t *task = TaskNew(thumbnailer, item, seek_arg, cb, userdata);
     if (!task)
         return 0;
 
@@ -250,33 +238,6 @@ RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
     vlc_executor_Submit(thumbnailer->executor, &task->runnable);
 
     return id;
-}
-
-vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
-                               vlc_tick_t time,
-                               enum vlc_thumbnailer_seek_speed speed,
-                               input_item_t *item,
-                               vlc_thumbnailer_cb cb, void* userdata )
-{
-    struct seek_target seek_target = {
-        .type = VLC_THUMBNAILER_SEEK_TIME,
-        .time = time,
-    };
-    return RequestCommon(thumbnailer, seek_target, speed, item, cb, userdata);
-}
-
-vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              double pos, enum vlc_thumbnailer_seek_speed speed,
-                              input_item_t *item,
-                              vlc_thumbnailer_cb cb, void* userdata )
-{
-    struct seek_target seek_target = {
-        .type = VLC_THUMBNAILER_SEEK_POS,
-        .pos = pos,
-    };
-    return RequestCommon(thumbnailer, seek_target, speed, item, cb, userdata);
 }
 
 size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )

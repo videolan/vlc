@@ -71,10 +71,14 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
+        struct vlc_thumbnailer_seek_arg seek_arg = {
+            .type = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_POS,
+            .pos = position,
+            .speed = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_FAST,
+        };
         vlc_thumbnailer_req_id requestId =
-            vlc_thumbnailer_RequestByPos( m_thumbnailer.get(), position,
-                                          VLC_THUMBNAILER_SEEK_FAST, item.get(),
-                                          &onThumbnailComplete, &ctx );
+            vlc_thumbnailer_Request( m_thumbnailer.get(), item.get(), &seek_arg,
+                                     &onThumbnailComplete, &ctx );
 
         if (requestId == VLC_THUMBNAILER_REQ_ID_INVALID)
         {
