@@ -50,11 +50,11 @@ typedef void(*vlc_thumbnailer_cb)( void* data, picture_t* thumbnail );
 /**
  * \brief vlc_thumbnailer_Create Creates a thumbnailer object
  * \param parent A VLC object
+ * @param timeout timeout of the thumbnailer, 0 for no limits.
  * \return A thumbnailer object, or NULL in case of failure
  */
 VLC_API vlc_thumbnailer_t*
-vlc_thumbnailer_Create(vlc_object_t* parent)
-VLC_USED;
+vlc_thumbnailer_Create(vlc_object_t* parent, vlc_tick_t timeout) VLC_USED;
 
 enum vlc_thumbnailer_seek_speed
 {
@@ -85,7 +85,7 @@ VLC_API vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
                                vlc_tick_t time,
                                enum vlc_thumbnailer_seek_speed speed,
-                               input_item_t *input_item, vlc_tick_t timeout,
+                               input_item_t *input_item,
                                vlc_thumbnailer_cb cb, void* user_data );
 /**
  * \brief vlc_thumbnailer_RequestByTime Requests a thumbnailer at a given time
@@ -108,7 +108,7 @@ VLC_API vlc_thumbnailer_req_id
 vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
                               double pos,
                               enum vlc_thumbnailer_seek_speed speed,
-                              input_item_t *input_item, vlc_tick_t timeout,
+                              input_item_t *input_item,
                               vlc_thumbnailer_cb cb, void* user_data );
 
 /**
@@ -126,5 +126,11 @@ vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id i
  * \param thumbnailer A thumbnailer object
  */
 VLC_API void vlc_thumbnailer_Release( vlc_thumbnailer_t* thumbnailer );
+
+/**
+ * Do not use, libVLC only fonction, will be removed soon
+ */
+VLC_API void vlc_thumbnailer_SetTimeout( vlc_thumbnailer_t *thumbnailer,
+                                         vlc_tick_t timeout ) VLC_DEPRECATED;
 
 #endif // VLC_THUMBNAILER_H

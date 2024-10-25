@@ -285,7 +285,7 @@ vlc_thumbnailer_t *libvlc_get_thumbnailer(libvlc_instance_t *instance)
     if (thumb == NULL)
     {
         thumb = instance->thumbnailer =
-            vlc_thumbnailer_Create(VLC_OBJECT(instance->p_libvlc_int));
+            vlc_thumbnailer_Create(VLC_OBJECT(instance->p_libvlc_int), 0);
     }
     vlc_mutex_unlock(&instance->lazy_init_lock);
 

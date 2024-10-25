@@ -959,6 +959,8 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     if (unlikely(thumb == NULL))
         return NULL;
 
+    vlc_thumbnailer_SetTimeout( thumb, vlc_tick_from_libvlc_time( timeout ) );
+
     libvlc_media_thumbnail_request_t *req = malloc( sizeof( *req ) );
     if ( unlikely( req == NULL ) )
         return NULL;
@@ -975,7 +977,6 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {
@@ -1002,6 +1003,8 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
     if (unlikely(thumb == NULL))
         return NULL;
 
+    vlc_thumbnailer_SetTimeout( thumb, vlc_tick_from_libvlc_time( timeout ) );
+
     libvlc_media_thumbnail_request_t *req = malloc( sizeof( *req ) );
     if ( unlikely( req == NULL ) )
         return NULL;
@@ -1017,7 +1020,6 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
         speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         md->p_input_item,
-        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
         media_on_thumbnail_ready, req );
     if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {

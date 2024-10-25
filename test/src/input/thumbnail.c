@@ -108,10 +108,6 @@ static void thumbnailer_callback( void* data, picture_t* thumbnail )
 
 static void test_thumbnails( libvlc_instance_t* p_vlc )
 {
-    vlc_thumbnailer_t* p_thumbnailer = vlc_thumbnailer_Create(
-                VLC_OBJECT( p_vlc->p_libvlc_int ) );
-    assert( p_thumbnailer != NULL );
-
     struct test_ctx ctx;
     vlc_cond_init( &ctx.cond );
     vlc_mutex_init( &ctx.lock );
@@ -122,6 +118,11 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
         ctx.test_idx = i;
         ctx.b_done = false;
+
+        vlc_thumbnailer_t* p_thumbnailer = vlc_thumbnailer_Create(
+                    VLC_OBJECT( p_vlc->p_libvlc_int ), test_params[i].i_timeout );
+        assert( p_thumbnailer != NULL );
+
 
         if ( asprintf( &psz_mrl, "mock://video_track_count=%u;audio_track_count=%u"
                        ";length=%" PRId64 ";can_control_pace=%s;video_chroma=ARGB;video_add_track_at=%" PRId64,
@@ -141,14 +142,14 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
             id = vlc_thumbnailer_RequestByPos( p_thumbnailer, test_params[i].f_pos,
                 test_params[i].b_fast_seek ?
                     VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-                p_item, test_params[i].i_timeout, thumbnailer_callback, &ctx );
+                p_item, thumbnailer_callback, &ctx );
         }
         else
         {
             id = vlc_thumbnailer_RequestByTime( p_thumbnailer, test_params[i].i_time,
                 test_params[i].b_fast_seek ?
                     VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-                p_item, test_params[i].i_timeout, thumbnailer_callback, &ctx );
+                p_item, thumbnailer_callback, &ctx );
         }
         assert( id != VLC_THUMBNAILER_REQ_ID_INVALID );
 
@@ -159,8 +160,9 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
         input_item_Release( p_item );
         free( psz_mrl );
+
+        vlc_thumbnailer_Release( p_thumbnailer );
     }
-    vlc_thumbnailer_Release( p_thumbnailer );
 }
 
 static void thumbnailer_callback_cancel( void* data, picture_t* p_thumbnail )
@@ -173,7 +175,7 @@ static void thumbnailer_callback_cancel( void* data, picture_t* p_thumbnail )
 static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 {
     vlc_thumbnailer_t* p_thumbnailer = vlc_thumbnailer_Create(
-                VLC_OBJECT( p_vlc->p_libvlc_int ) );
+                VLC_OBJECT( p_vlc->p_libvlc_int ), VLC_TICK_INVALID );
     assert( p_thumbnailer != NULL );
 
     const char* psz_mrl = "mock://video_track_count=0;audio_track_count=1;"
@@ -185,7 +187,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 
     vlc_thumbnailer_req_id id = vlc_thumbnailer_RequestByTime( p_thumbnailer,
         VLC_TICK_INVALID, VLC_THUMBNAILER_SEEK_PRECISE, p_item,
-        VLC_TICK_INVALID, thumbnailer_callback_cancel, NULL );
+        thumbnailer_callback_cancel, NULL );
 
     vlc_thumbnailer_Cancel( p_thumbnailer, id );
 
