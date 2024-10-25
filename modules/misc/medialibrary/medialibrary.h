@@ -137,7 +137,7 @@ public:
     void stop() override;
 
 private:
-    static void onThumbnailComplete( void* data, picture_t* thumbnail );
+    static void onThumbnailComplete( picture_t* thumbnail, void* data );
 
 private:
     vlc_medialibrary_module_t* m_ml;

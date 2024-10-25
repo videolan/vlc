@@ -47,7 +47,7 @@ typedef struct task
 
     struct vlc_thumbnailer_seek_arg seek_arg;
     input_item_t *item;
-    vlc_thumbnailer_cb cb;
+    const struct vlc_thumbnailer_cbs *cbs;
     void* userdata;
 
     enum
@@ -69,7 +69,7 @@ static void RunnableRun(void *);
 static task_t *
 TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
         const struct vlc_thumbnailer_seek_arg *seek_arg,
-        vlc_thumbnailer_cb cb, void *userdata)
+        const struct vlc_thumbnailer_cbs *cbs, void *userdata )
 {
     task_t *task = malloc(sizeof(*task));
     if (!task)
@@ -84,7 +84,7 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
     else
         task->seek_arg = *seek_arg;
 
-    task->cb = cb;
+    task->cbs = cbs;
     task->userdata = userdata;
 
     task->status = RUNNING;
@@ -107,8 +107,7 @@ TaskDestroy(task_t *task)
 
 static void NotifyThumbnail(task_t *task, picture_t *pic)
 {
-    assert(task->cb);
-    task->cb(task->userdata, pic);
+    task->cbs->on_ended(pic, task->userdata);
 }
 
 static void
@@ -232,9 +231,11 @@ vlc_thumbnailer_req_id
 vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
                          input_item_t *item,
                          const struct vlc_thumbnailer_seek_arg *seek_arg,
-                         vlc_thumbnailer_cb cb, void* userdata )
+                         const struct vlc_thumbnailer_cbs *cbs, void *userdata )
 {
-    task_t *task = TaskNew(thumbnailer, item, seek_arg, cb, userdata);
+    assert( cbs != NULL && cbs->on_ended != NULL );
+
+    task_t *task = TaskNew(thumbnailer, item, seek_arg, cbs, userdata);
     if (!task)
         return 0;
 

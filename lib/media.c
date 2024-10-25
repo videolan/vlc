@@ -927,7 +927,7 @@ struct libvlc_media_thumbnail_request_t
     vlc_thumbnailer_req_id id;
 };
 
-static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
+static void media_on_thumbnail_ready( picture_t* thumbnail, void* data )
 {
     libvlc_media_thumbnail_request_t *req = data;
     libvlc_media_t *p_media = req->md;
@@ -972,8 +972,11 @@ libvlc_media_thumbnail_request( libvlc_instance_t *inst,
     req->type = picture_type;
     req->crop = crop;
     libvlc_media_retain( md );
+    static const struct vlc_thumbnailer_cbs cbs = {
+        .on_ended = media_on_thumbnail_ready,
+    };
     req->id = vlc_thumbnailer_Request( thumb, md->p_input_item, seek_arg,
-                                       media_on_thumbnail_ready, req );
+                                       &cbs, req );
     if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {
         free( req );

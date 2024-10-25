@@ -32,20 +32,29 @@ typedef size_t vlc_thumbnailer_req_id;
 #define VLC_THUMBNAILER_REQ_ID_INVALID 0
 
 /**
- * \brief vlc_thumbnailer_cb defines a callback invoked on thumbnailing completion or error
- *
- * This callback will always be called, provided vlc_thumbnailer_Request returned
- * a non NULL request, and provided the request is not cancelled before its
- * completion.
- * In case of failure, p_thumbnail will be NULL.
- * The picture, if any, is owned by the thumbnailer, and must be acquired by using
- * \link picture_Hold \endlink to use it pass the callback's scope.
- *
- * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last parameter
- * \param thumbnail The generated thumbnail, or NULL in case of failure or timeout
+ * thumbnailer callbacks
  */
-typedef void(*vlc_thumbnailer_cb)( void* data, picture_t* thumbnail );
-
+struct vlc_thumbnailer_cbs
+{
+    /**
+     * Event received on thumbnailing completion or error
+     *
+     * This callback will always be called, provided vlc_thumbnailer_Request
+     * returned a valid request, and provided the request is not cancelled
+     * before its completion.
+     *
+     * @note This callback is mandatory.
+     *
+     * In case of failure, p_thumbnail will be NULL.  The picture, if any, is
+     * owned by the thumbnailer, and must be acquired by using \link
+     * picture_Hold \endlink to use it pass the callback's scope.
+     * \param thumbnail The generated thumbnail, or NULL in case of failure or
+     * timeout
+     * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last
+     * parameter
+     */
+    void (*on_ended)(picture_t* thumbnail, void *data);
+};
 
 /**
  * \brief vlc_thumbnailer_Create Creates a thumbnailer object
@@ -93,8 +102,8 @@ struct vlc_thumbnailer_seek_arg
  * \param seek_arg pointer to a seek struct, that tell at which time the
  * thumbnail should be taken, NULL to disable seek
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
- * \param cb A user callback to be called on completion (success & error)
- * \param user_data An opaque value, provided as pf_cb's first parameter
+ * \param cbs callback to listen to events (can't be NULL)
+ * \param cbs_userdata opaque pointer used by the callbacks
  * \returns > 0 if the item was scheduled for thumbnailing, 0 in case of error.
  *
  * If this function returns a valid id, the callback is guaranteed
@@ -107,7 +116,8 @@ VLC_API vlc_thumbnailer_req_id
 vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
                          input_item_t *input_item,
                          const struct vlc_thumbnailer_seek_arg *seek_arg,
-                         vlc_thumbnailer_cb cb, void* user_data );
+                         const struct vlc_thumbnailer_cbs *cbs,
+                         void *cbs_userdata );
 
 /**
  * \brief vlc_thumbnailer_Camcel Cancel a thumbnail request
