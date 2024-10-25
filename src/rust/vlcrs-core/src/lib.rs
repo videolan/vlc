@@ -1,6 +1,7 @@
 #![deny(unsafe_op_in_unsafe_fn)]
 #![feature(extern_types)]
 #![feature(associated_type_defaults)]
+#![feature(c_size_t)]
 
 //! The `vlcrs-core` crate.
 //!
