@@ -12,27 +12,29 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use vlcrs_plugin::ModuleProtocol;
+use vlcrs_core::plugin::ModuleProtocol;
 
-extern {
+extern "C" {
     // Create a dummy different type to change the activation function.
     #[allow(non_camel_case_types)]
     pub type vlc_filter_t;
 }
 
 #[allow(non_camel_case_types)]
-type vlc_filter_activate = unsafe extern "C" fn (_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
+type vlc_filter_activate = unsafe extern "C" fn(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
 
-unsafe extern "C"
-fn activate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int
-{
+unsafe extern "C" fn activate_filter<T: TestFilterCapability>(
+    _obj: *mut vlc_filter_t,
+    valid: &mut bool,
+) -> c_int {
     T::open(_obj, valid);
     0
 }
 
-unsafe extern "C"
-fn activate_other_filter<T: TestOtherCapability>(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int
-{
+unsafe extern "C" fn activate_other_filter<T: TestOtherCapability>(
+    _obj: *mut vlc_filter_t,
+    valid: &mut bool,
+) -> c_int {
     T::open(_obj, valid);
     0
 }
@@ -46,11 +48,11 @@ pub struct FilterModuleLoader;
 /// Signal the core that we can load modules with this loader
 ///
 impl<T> ModuleProtocol<T> for FilterModuleLoader
-    where T: TestFilterCapability
+where
+    T: TestFilterCapability,
 {
     type Activate = vlc_filter_activate;
-    fn activate_function() -> Self::Activate
-    {
+    fn activate_function() -> Self::Activate {
         activate_filter::<T>
     }
 }
@@ -71,13 +73,14 @@ impl TestFilterCapability for TestModuleFilter {
 }
 
 /* Implement dummy module capability */
-pub trait TestOtherCapability  {
+pub trait TestOtherCapability {
     fn open(obj: *mut vlc_filter_t, bool: &mut bool);
 }
 
 struct TestOtherCapabilityLoader;
 impl<T> ModuleProtocol<T> for TestOtherCapabilityLoader
-    where T: TestOtherCapability
+where
+    T: TestOtherCapability,
 {
     type Activate = vlc_filter_activate;
     fn activate_function() -> Self::Activate {
@@ -93,7 +96,6 @@ impl TestOtherCapability for TestModuleFilter {
         *valid = true;
     }
 }
-
 
 //
 // Define a module manifest using this module capability
@@ -123,9 +125,8 @@ module! {
 // module.
 //
 #[test]
-fn test_module_manifest_multiple_capabilities()
-{
-    use vlcrs_plugin::ModuleProperties;
+fn test_module_manifest_multiple_capabilities() {
+    use vlcrs_core::plugin::ModuleProperties;
     let mut context = TestContext::<vlc_filter_activate> {
         command_cursor: 0,
         commands: vec![

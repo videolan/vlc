@@ -12,30 +12,33 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::c_int;
-use vlcrs_plugin::ModuleProtocol;
+use vlcrs_core::plugin::ModuleProtocol;
 
-extern {
+extern "C" {
     // Create a dummy different type to change the activation function.
     #[allow(non_camel_case_types)]
     pub type vlc_filter_t;
 }
 
 #[allow(non_camel_case_types)]
-type vlc_filter_activate = unsafe extern "C" fn (_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
+type vlc_filter_activate = unsafe extern "C" fn(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
 
 #[allow(non_camel_case_types)]
-type vlc_filter_deactivate = unsafe extern "C" fn (_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
+type vlc_filter_deactivate =
+    unsafe extern "C" fn(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int;
 
-unsafe extern "C"
-fn activate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int
-{
+unsafe extern "C" fn activate_filter<T: TestFilterCapability>(
+    _obj: *mut vlc_filter_t,
+    valid: &mut bool,
+) -> c_int {
     T::open(_obj, valid);
     0
 }
 
-unsafe extern "C"
-fn deactivate_filter<T: TestFilterCapability>(_obj: *mut vlc_filter_t, valid: &mut bool) -> c_int
-{
+unsafe extern "C" fn deactivate_filter<T: TestFilterCapability>(
+    _obj: *mut vlc_filter_t,
+    valid: &mut bool,
+) -> c_int {
     T::close(_obj, valid);
     0
 }
@@ -49,13 +52,13 @@ pub struct FilterModuleLoader;
 /// Signal the core that we can load modules with this loader
 ///
 impl<T> ModuleProtocol<T> for FilterModuleLoader
-    where T: TestFilterCapability
+where
+    T: TestFilterCapability,
 {
     type Activate = vlc_filter_activate;
     type Deactivate = vlc_filter_deactivate;
 
-    fn activate_function() -> Self::Activate
-    {
+    fn activate_function() -> Self::Activate {
         activate_filter::<T>
     }
 
@@ -103,9 +106,8 @@ module! {
 // module.
 //
 #[test]
-fn test_module_load_specific_open()
-{
-    use vlcrs_plugin::ModuleProperties;
+fn test_module_load_specific_open() {
+    use vlcrs_core::plugin::ModuleProperties;
     let mut context = TestContext::<vlc_filter_activate, vlc_filter_deactivate> {
         command_cursor: 0,
         commands: vec![

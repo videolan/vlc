@@ -13,36 +13,31 @@ use vlcrs_macros::module;
 
 use std::ffi::c_int;
 
-use vlcrs_plugin::{vlc_activate, vlc_deactivate};
+use vlcrs_core::plugin::{vlc_activate, vlc_deactivate};
 
 use vlcrs_core::object::Object;
 
-unsafe extern "C"
-fn activate_test<T: SpecificCapabilityModule>(_obj: *mut Object) -> c_int
-{
+unsafe extern "C" fn activate_test<T: SpecificCapabilityModule>(_obj: *mut Object) -> c_int {
     0
 }
 
-unsafe extern "C"
-fn deactivate_test<T: SpecificCapabilityModule>(_obj: *mut Object)
-{}
+unsafe extern "C" fn deactivate_test<T: SpecificCapabilityModule>(_obj: *mut Object) {}
 
-use vlcrs_plugin::ModuleProtocol;
+use vlcrs_core::plugin::ModuleProtocol;
 
 pub struct ModuleLoader;
 impl<T> ModuleProtocol<T> for ModuleLoader
-    where T: SpecificCapabilityModule
+where
+    T: SpecificCapabilityModule,
 {
     type Activate = vlc_activate;
     type Deactivate = vlc_deactivate;
 
-    fn activate_function() -> Self::Activate
-    {
+    fn activate_function() -> Self::Activate {
         activate_test::<T>
     }
 
-    fn deactivate_function() -> Option<Self::Deactivate>
-    {
+    fn deactivate_function() -> Option<Self::Deactivate> {
         Some(deactivate_test::<T>)
     }
 }
@@ -68,9 +63,8 @@ module! {
 }
 
 #[test]
-fn test_module_load_common_activate()
-{
-    use vlcrs_plugin::ModuleProperties;
+fn test_module_load_common_activate() {
+    use vlcrs_core::plugin::ModuleProperties;
 
     let mut context = TestContext::<vlc_activate> {
         command_cursor: 0,

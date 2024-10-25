@@ -3,7 +3,6 @@ members = [
     "src/rust/vlcrs-core",
     "src/rust/vlcrs-macros",
     "src/rust/vlcrs-messages",
-    "src/rust/vlcrs-plugin",
     "src/rust/vlcrs-utils",
 ]
 resolver = "2"

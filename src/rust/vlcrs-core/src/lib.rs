@@ -1,4 +1,6 @@
 #![deny(unsafe_op_in_unsafe_fn)]
+#![feature(extern_types)]
+#![feature(associated_type_defaults)]
 
 //! The `vlcrs-core` crate.
 //!
@@ -7,5 +9,7 @@
 //!
 //! If you need a vlc core C API that is not ported or wrapped yet here,
 //! then do so first instead of bypassing this crate.
+
+pub mod plugin;
 
 pub mod object;

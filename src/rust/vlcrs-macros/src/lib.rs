@@ -9,7 +9,7 @@ mod module;
 /// ```no_run
 /// # #![feature(associated_type_defaults)]
 /// # use vlcrs_macros::module;
-/// # use vlcrs_plugin::ModuleProtocol;
+/// # use vlcrs_core::plugin::ModuleProtocol;
 /// # use std::ffi::{c_int, c_void};
 /// # type ActivateFunction = unsafe extern "C" fn() -> c_int;
 /// # type DeactivateFunction = unsafe extern "C" fn() -> c_void;
@@ -63,7 +63,7 @@ mod module;
 /// ```no_run
 /// # #![feature(associated_type_defaults)]
 /// # use vlcrs_macros::module;
-/// # use vlcrs_plugin::ModuleProtocol;
+/// # use vlcrs_core::plugin::ModuleProtocol;
 /// # use std::ffi::{c_int, c_void};
 /// # type ActivateFunction = unsafe extern "C" fn() -> c_int;
 /// # type DeactivateFunction = unsafe extern "C" fn() -> c_void;

@@ -13,16 +13,13 @@ use common::TestContext;
 use vlcrs_macros::module;
 
 use std::ffi::{c_int, CStr};
-use vlcrs_plugin::{ModuleProtocol,vlc_activate};
+use vlcrs_core::plugin::{vlc_activate, ModuleProtocol};
 
 use vlcrs_core::object::Object;
 
-unsafe extern "C"
-fn activate_filter(_obj: *mut Object) -> c_int
-{
+unsafe extern "C" fn activate_filter(_obj: *mut Object) -> c_int {
     0
 }
-
 
 //
 // Create an implementation loader for the TestFilterCapability
@@ -33,12 +30,12 @@ pub struct FilterModuleLoader;
 /// Signal the core that we can load modules with this loader
 ///
 impl<T> ModuleProtocol<T> for FilterModuleLoader
-    where T: TestNoDeactivateCapability
+where
+    T: TestNoDeactivateCapability,
 {
     type Activate = vlc_activate;
     type Deactivate = *mut ();
-    fn activate_function() -> vlc_activate
-    {
+    fn activate_function() -> vlc_activate {
         activate_filter
     }
 }
@@ -71,12 +68,11 @@ module! {
 // module.
 //
 #[test]
-fn test_module_load_default_deactivate()
-{
-    let version = unsafe{ CStr::from_ptr(vlc_entry_api_version() as *const i8) };
+fn test_module_load_default_deactivate() {
+    let version = unsafe { CStr::from_ptr(vlc_entry_api_version() as *const i8) };
     assert_eq!(version, c"4.0.6");
 
-    use vlcrs_plugin::ModuleProperties;
+    use vlcrs_core::plugin::ModuleProperties;
     let mut context = TestContext::<vlc_activate> {
         command_cursor: 0,
         commands: vec![
