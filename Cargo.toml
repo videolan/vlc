@@ -10,3 +10,7 @@ resolver = "2"
 [workspace.package]
 version = "4.0.0"
 license = "LGPL-2.1-or-later"
+
+[workspace.dependencies]
+vlcrs-core = { path = "./vlcrs-core" }
+vlcrs-macros = { path = "./vlcrs-macros" }
