@@ -37,6 +37,7 @@ OPENGL_VOUT_COMMONSOURCES = \
 # Convenience library for OpenGL components -- OpenGL only
 libvlc_opengl_la_SOURCES = $(OPENGL_COMMONSOURCES)
 libvlc_opengl_la_CFLAGS = $(OPENGL_COMMONCFLAGS)
+libvlc_opengl_la_CPPFLAGS =
 libvlc_opengl_la_LIBADD = $(OPENGL_COMMONLIBS) $(LIBM)
 libvlc_opengl_la_LDFLAGS = -static -no-undefined
 
@@ -97,6 +98,7 @@ endif
 libgl_plugin_la_SOURCES = video_output/opengl/display.c \
     $(OPENGL_VOUT_COMMONSOURCES)
 libgl_plugin_la_CFLAGS = $(AM_CFLAGS) $(GL_CFLAGS) $(OPENGL_COMMONCFLAGS)
+libgl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libgl_plugin_la_LIBADD = libvlc_opengl.la
 if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
@@ -104,6 +106,8 @@ endif # HAVE_GL
 
 if HAVE_OSX
 vout_LTLIBRARIES += libgl_plugin.la
+libvlc_opengl_la_CPPFLAGS += -DGL_SILENCE_DEPRECATION
+libgl_plugin_la_CPPFLAGS += -DGL_SILENCE_DEPRECATION
 endif
 
 libglfilter_draw_plugin_la_SOURCES = video_output/opengl/filter_draw.c
