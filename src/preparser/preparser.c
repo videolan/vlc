@@ -228,7 +228,6 @@ Parse(struct task *task, vlc_tick_t deadline)
     else
         if (vlc_sem_timedwait(&task->preparse_ended, deadline))
         {
-            atomic_store(&task->interrupted, true);
             input_item_parser_id_Release(task->parser);
             task->preparse_status = VLC_ETIMEOUT;
             return;
@@ -277,7 +276,7 @@ RunnableRun(void *userdata)
 
     PreparserRemoveTask(preparser, task);
 
-    if (atomic_load(&task->interrupted))
+    if (task->preparse_status == VLC_ETIMEOUT)
         goto end;
 
     int ret = Fetch(task);
