@@ -218,6 +218,16 @@ static void input_item_preparse_timeout( input_item_t *item,
     vlc_sem_post(p_sem);
 }
 
+static void input_item_preparse_cancel( input_item_t *item,
+                                        int status, void *user_data )
+{
+    VLC_UNUSED(item);
+    vlc_sem_t *p_sem = user_data;
+
+    assert( status == -EINTR );
+    vlc_sem_post(p_sem);
+}
+
 static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
                                         int wait_and_cancel)
 {
@@ -237,7 +247,8 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
     vlc_sem_t sem;
     vlc_sem_init (&sem, 0);
     const input_item_parser_cbs_t cbs = {
-        .on_ended = input_item_preparse_timeout,
+        .on_ended = wait_and_cancel > 0 ? input_item_preparse_cancel
+                                        : input_item_preparse_timeout,
     };
 
     input_item_meta_request_option_t options =
@@ -255,7 +266,6 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
         vlc_tick_sleep( VLC_TICK_FROM_MS(wait_and_cancel) );
         size_t count = vlc_preparser_Cancel(parser, id);
         assert(count == 1);
-
     }
     vlc_sem_wait(&sem);
 
