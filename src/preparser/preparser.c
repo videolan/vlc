@@ -400,9 +400,16 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
               && vlc_executor_Cancel(preparser->executor, &task->runnable);
             if (canceled)
             {
-                NotifyPreparseEnded(task, true);
                 vlc_list_remove(&task->node);
+                vlc_mutex_unlock(&preparser->lock);
+                NotifyPreparseEnded(task, true);
                 TaskDelete(task);
+
+                /* Small optimisation in the likely case where the user cancel
+                 * only one task */
+                if (id != VLC_PREPARSER_REQ_ID_INVALID)
+                    return count;
+                vlc_mutex_lock(&preparser->lock);
             }
             else
                 /* The task will be finished and destroyed after run() */
