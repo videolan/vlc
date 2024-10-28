@@ -146,13 +146,6 @@ OnParserEnded(input_item_t *item, int status, void *task_)
     VLC_UNUSED(item);
     struct task *task = task_;
 
-    if (atomic_load(&task->interrupted))
-        /*
-         * On interruption, the call to input_item_parser_id_Release() may
-         * trigger this "parser ended" callback. Ignore it.
-         */
-        return;
-
     task->preparse_status = status;
     vlc_sem_post(&task->preparse_ended);
 }
