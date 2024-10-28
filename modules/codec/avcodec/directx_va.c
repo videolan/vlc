@@ -431,7 +431,13 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
     if (mode->p_profiles == NULL)
         return true;
 
-    int profile = fmt->i_profile >= 0 ? fmt->i_profile : avctx->profile;
+    int profile;
+    if (fmt->i_profile >= 0)
+        profile = fmt->i_profile;
+    else if (avctx->profile != FF_PROFILE_UNKNOWN)
+        profile = avctx->profile;
+    else
+        profile = -1;
     if (mode->codec == AV_CODEC_ID_H264 && profile == -1)
     {
         uint8_t h264_profile;
@@ -446,7 +452,7 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
     }
 
     bool is_supported = false;
-    if (profile <= 0)
+    if (profile == -1)
         is_supported = true;
     else for (const int *p_profile = &mode->p_profiles[0]; *p_profile != FF_PROFILE_UNKNOWN; ++p_profile)
     {
