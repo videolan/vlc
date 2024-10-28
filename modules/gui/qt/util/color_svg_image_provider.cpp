@@ -215,7 +215,7 @@ SVGColorImageBuilder::SVGColorImageBuilder(QString path, QObject* parent)
 QString SVGColorImageBuilder::uri() const
 {
 
-    auto ret = QString{"image://svgcolor/?"} + m_query.toString(QUrl::FullyEncoded);
+    const QString ret = QStringLiteral("image://svgcolor/?") + m_query.toString(QUrl::FullyEncoded);
     return ret;
 }
 
