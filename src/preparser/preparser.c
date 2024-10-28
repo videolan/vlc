@@ -406,9 +406,6 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
 
 size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id )
 {
-    if (preparser->executor == NULL)
-        return 0; /* TODO: the fetcher should be cancellable too */
-
     vlc_mutex_lock(&preparser->lock);
 
     struct task *task;
@@ -418,8 +415,9 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
         if (id == VLC_PREPARSER_REQ_ID_INVALID || task->id == id)
         {
             count++;
-            bool canceled =
-                vlc_executor_Cancel(preparser->executor, &task->runnable);
+            /* TODO: the fetcher should be cancellable too */
+            bool canceled = preparser->executor != NULL
+              && vlc_executor_Cancel(preparser->executor, &task->runnable);
             if (canceled)
             {
                 NotifyPreparseEnded(task, false);
