@@ -452,9 +452,8 @@ static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *
     }
 
     bool is_supported = false;
-    if (profile == -1)
-        is_supported = true;
-    else for (const int *p_profile = &mode->p_profiles[0]; *p_profile != FF_PROFILE_UNKNOWN; ++p_profile)
+    if (profile != -1)
+    for (const int *p_profile = &mode->p_profiles[0]; *p_profile != FF_PROFILE_UNKNOWN; ++p_profile)
     {
         if (*p_profile == profile)
         {
