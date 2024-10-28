@@ -97,7 +97,7 @@ typedef struct
     picture_t *p_pic;
     vlc_tick_t date;
     int scale;
-    bool alarm;
+    bool use_alarm_indicator;
     int barWidth;
 
 } BarGraph_t;
@@ -269,7 +269,7 @@ static void Draw(BarGraph_t *b)
     int minus8  = iec_scale(- 8) * scale + 20;
     int minus18 = iec_scale(-18) * scale + 20;
     int *i_values  = b->i_values;
-    const uint8_t *indicator_color = b->alarm ? bright_red : black;
+    const uint8_t *indicator_color = b->use_alarm_indicator ? bright_red : black;
 
     for (int i = 0; i < nbChannels; i++) {
         int pi = 30 + i * (5 + barWidth);
@@ -320,7 +320,7 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
             parse_i_values(p_BarGraph, newval.psz_string);
         Draw(p_BarGraph);
     } else if (!strcmp(psz_var, CFG_PREFIX "alarm")) {
-        p_BarGraph->alarm = newval.b_bool;
+        p_BarGraph->use_alarm_indicator = newval.b_bool;
         Draw(p_BarGraph);
     } else if (!strcmp(psz_var, CFG_PREFIX "barWidth")) {
         p_BarGraph->barWidth = newval.i_int;
@@ -529,7 +529,7 @@ static int OpenCommon(filter_t *p_filter, bool b_sub)
     p_BarGraph->i_alpha = VLC_CLIP(p_BarGraph->i_alpha, 0, 255);
     p_BarGraph->i_values = NULL;
     parse_i_values(p_BarGraph, &(char){ 0 });
-    p_BarGraph->alarm = false;
+    p_BarGraph->use_alarm_indicator = false;
 
     p_BarGraph->barWidth = var_CreateGetInteger(p_filter, CFG_PREFIX "barWidth");
     p_BarGraph->scale = var_CreateGetInteger( p_filter, CFG_PREFIX "barHeight");
