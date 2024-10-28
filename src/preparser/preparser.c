@@ -132,6 +132,10 @@ PreparserRemoveTask(vlc_preparser_t *preparser, struct task *task)
 static void
 NotifyPreparseEnded(struct task *task)
 {
+    if (!atomic_load(&task->interrupted)
+     && task->preparse_status == VLC_SUCCESS)
+        input_item_SetPreparsed(task->item);
+
     if (task->cbs == NULL)
         return;
 
@@ -179,22 +183,12 @@ OnParserAttachmentsAdded(input_item_t *item,
 }
 
 static void
-SetItemPreparsed(struct task *task)
-{
-    if (task->preparse_status == VLC_SUCCESS)
-        input_item_SetPreparsed(task->item);
-}
-
-static void
 OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
 {
     VLC_UNUSED(item);
     VLC_UNUSED(fetched);
 
     struct task *task = userdata;
-
-    if (!atomic_load(&task->interrupted))
-        SetItemPreparsed(task);
 
     NotifyPreparseEnded(task);
     TaskDelete(task);
@@ -288,9 +282,6 @@ RunnableRun(void *userdata)
 
     if (ret == VLC_SUCCESS)
         return; /* Remove the task and notify from the fetcher callback */
-
-    if (!atomic_load(&task->interrupted))
-        SetItemPreparsed(task);
 
 end:
     NotifyPreparseEnded(task);
