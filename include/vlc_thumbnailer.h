@@ -63,6 +63,8 @@ struct vlc_thumbnailer_seek_arg
 {
     enum
     {
+        /** Don't seek */
+        VLC_THUMBNAILER_SEEK_NONE,
         /** Seek by time */
         VLC_THUMBNAILER_SEEK_TIME,
         /** Seek by position */
@@ -89,7 +91,7 @@ struct vlc_thumbnailer_seek_arg
  * \param thumbnailer A thumbnailer object
  * \param input_item The input item to generate the thumbnail for
  * \param seek_arg pointer to a seek struct, that tell at which time the
- * thumbnail should be taken
+ * thumbnail should be taken, NULL to disable seek
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * \param cb A user callback to be called on completion (success & error)
  * \param user_data An opaque value, provided as pf_cb's first parameter

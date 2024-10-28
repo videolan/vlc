@@ -77,7 +77,12 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
 
     task->thumbnailer = thumbnailer;
     task->item = item;
-    task->seek_arg = *seek_arg;
+    if (seek_arg == NULL)
+        task->seek_arg = (struct vlc_thumbnailer_seek_arg) {
+            .type = VLC_THUMBNAILER_SEEK_NONE,
+        };
+    else
+        task->seek_arg = *seek_arg;
 
     task->cb = cb;
     task->userdata = userdata;
@@ -167,12 +172,18 @@ RunnableRun(void *userdata)
         || task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST);
     bool fast_seek = task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST;
 
-    if (task->seek_arg.type == VLC_THUMBNAILER_SEEK_TIME)
-        input_SetTime(input, task->seek_arg.time, fast_seek);
-    else
+    switch (task->seek_arg.type)
     {
-        assert(task->seek_arg.type == VLC_THUMBNAILER_SEEK_POS);
-        input_SetPosition(input, task->seek_arg.pos, fast_seek);
+        case VLC_THUMBNAILER_SEEK_NONE:
+            break;
+        case VLC_THUMBNAILER_SEEK_TIME:
+            input_SetTime(input, task->seek_arg.time, fast_seek);
+            break;
+        case VLC_THUMBNAILER_SEEK_POS:
+            input_SetPosition(input, task->seek_arg.pos, fast_seek);
+            break;
+        default:
+            vlc_assert_unreachable();
     }
 
     int ret = input_Start(input);
