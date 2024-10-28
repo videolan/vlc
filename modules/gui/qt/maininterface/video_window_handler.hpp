@@ -65,7 +65,6 @@ private:
     bool m_videoFullScreen = false;
     bool m_autoresize = false;
 
-    QRect   m_lastWinGeometry;
     QScreen* m_lastWinScreen = nullptr;
 
     bool m_hasWayland = false;

@@ -119,8 +119,6 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     m_videoFullScreen = fs;
     if( fs )
     {
-        m_lastWinGeometry = m_window->geometry();
-
         int numscreen = var_InheritInteger( m_intf, "qt-fullscreen-screennumber" );
 
         auto screenList = QApplication::screens();
@@ -141,15 +139,10 @@ void VideoWindowHandler::setVideoFullScreen( bool fs )
     }
     else
     {
-        bool hold = WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, false);
+        WindowStateHolder::holdFullscreen(m_window,  WindowStateHolder::VIDEO, false);
 
         if( m_lastWinScreen != NULL && !m_hasWayland )
             m_window->setScreen(m_lastWinScreen);
-        if( !hold && m_lastWinGeometry.isNull() == false )
-        {
-            m_window->setGeometry( m_lastWinGeometry );
-            m_lastWinGeometry = QRect();
-        }
     }
 }
 
