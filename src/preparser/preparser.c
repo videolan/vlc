@@ -130,9 +130,8 @@ PreparserRemoveTask(vlc_preparser_t *preparser, struct task *task)
 }
 
 static void
-NotifyPreparseEnded(struct task *task, bool art_fetched)
+NotifyPreparseEnded(struct task *task)
 {
-    (void) art_fetched;
     if (task->cbs == NULL)
         return;
 
@@ -191,7 +190,7 @@ OnArtFetchEnded(input_item_t *item, bool fetched, void *userdata)
     if (!atomic_load(&task->interrupted))
         SetItemPreparsed(task);
 
-    NotifyPreparseEnded(task, fetched);
+    NotifyPreparseEnded(task);
     TaskDelete(task);
 }
 
@@ -288,7 +287,7 @@ RunnableRun(void *userdata)
         SetItemPreparsed(task);
 
 end:
-    NotifyPreparseEnded(task, false);
+    NotifyPreparseEnded(task);
     TaskDelete(task);
 }
 
@@ -406,7 +405,7 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
               && vlc_executor_Cancel(preparser->executor, &task->runnable);
             if (canceled)
             {
-                NotifyPreparseEnded(task, false);
+                NotifyPreparseEnded(task);
                 vlc_list_remove(&task->node);
                 TaskDelete(task);
             }
