@@ -56,7 +56,7 @@ struct task
     input_item_parser_id_t *parser;
 
     vlc_sem_t preparse_ended;
-    atomic_int preparse_status;
+    int preparse_status;
     atomic_bool interrupted;
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
@@ -85,7 +85,7 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item,
 
     task->parser = NULL;
     vlc_sem_init(&task->preparse_ended, 0);
-    atomic_init(&task->preparse_status, VLC_EGENERIC);
+    task->preparse_status = VLC_EGENERIC;
     atomic_init(&task->interrupted, false);
 
     task->runnable.run = RunnableRun;
@@ -136,11 +136,8 @@ NotifyPreparseEnded(struct task *task, bool art_fetched)
     if (task->cbs == NULL)
         return;
 
-    if (task->cbs->on_ended) {
-        int status = atomic_load_explicit(&task->preparse_status,
-                                          memory_order_relaxed);
-        task->cbs->on_ended(task->item, status, task->userdata);
-    }
+    if (task->cbs->on_ended)
+        task->cbs->on_ended(task->item, task->preparse_status, task->userdata);
 }
 
 static void
@@ -156,8 +153,7 @@ OnParserEnded(input_item_t *item, int status, void *task_)
          */
         return;
 
-    atomic_store_explicit(&task->preparse_status, status,
-                          memory_order_relaxed);
+    task->preparse_status = status;
     vlc_sem_post(&task->preparse_ended);
 }
 
@@ -187,9 +183,7 @@ OnParserAttachmentsAdded(input_item_t *item,
 static void
 SetItemPreparsed(struct task *task)
 {
-    int status = atomic_load_explicit(&task->preparse_status,
-                                      memory_order_relaxed);
-    if (status == VLC_SUCCESS)
+    if (task->preparse_status == VLC_SUCCESS)
         input_item_SetPreparsed(task->item);
 }
 
@@ -231,8 +225,7 @@ Parse(struct task *task, vlc_tick_t deadline)
     task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
     {
-        atomic_store_explicit(&task->preparse_status, VLC_EGENERIC,
-                              memory_order_relaxed);
+        task->preparse_status = VLC_EGENERIC;
         return;
     }
 
@@ -242,13 +235,17 @@ Parse(struct task *task, vlc_tick_t deadline)
     else
         if (vlc_sem_timedwait(&task->preparse_ended, deadline))
         {
-            atomic_store_explicit(&task->preparse_status,
-                                  VLC_ETIMEOUT, memory_order_relaxed);
             atomic_store(&task->interrupted, true);
+            input_item_parser_id_Release(task->parser);
+            task->preparse_status = VLC_ETIMEOUT;
+            return;
         }
 
     /* This call also interrupts the parsing if it is still running */
     input_item_parser_id_Release(task->parser);
+
+    if (atomic_load(&task->interrupted))
+        task->preparse_status = VLC_ETIMEOUT;
 }
 
 static int
@@ -308,9 +305,6 @@ Interrupt(struct task *task)
 {
     atomic_store(&task->interrupted, true);
 
-    /* Wake up the preparser cond_wait */
-    atomic_store_explicit(&task->preparse_status, VLC_ETIMEOUT,
-                          memory_order_relaxed);
     vlc_sem_post(&task->preparse_ended);
 }
 
