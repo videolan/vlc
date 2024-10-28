@@ -36,7 +36,6 @@
 
 #include <qconfig.h>
 
-#define QT_NO_CAST_TO_ASCII
 #include <QString>
 
 static_assert (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0),

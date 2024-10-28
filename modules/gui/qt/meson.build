@@ -7,7 +7,7 @@ qt6 = import('qt6')
 qt_include_dir = include_directories('.')
 
 qt_extra_deps = []
-qt_extra_flags = ['-DQT_STRICT_ITERATORS','-DQT_USE_QSTRINGBUILDER']
+qt_extra_flags = ['-DQT_STRICT_ITERATORS','-DQT_USE_QSTRINGBUILDER','-DQT_NO_CAST_TO_ASCII']
 qt_cppargs = []
 qt_link_args = []
 

@@ -28,6 +28,7 @@ vlc_qt_check_LDFLAGS = $(AM_LDFLAGS) $(QT_LDFLAGS)
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(CPPFLAGS_qt) \
 	-DQT_STRICT_ITERATORS \
 	-DQT_USE_QSTRINGBUILDER \
+	-DQT_NO_CAST_TO_ASCII \
 	-I$(srcdir) -I$(builddir) \
 	-I$(builddir)/dialogs/extended \
 	-I$(builddir)/dialogs/fingerprint \
