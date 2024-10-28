@@ -104,11 +104,10 @@ struct vlc_thumbnailer_seek_arg
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * \param cbs callback to listen to events (can't be NULL)
  * \param cbs_userdata opaque pointer used by the callbacks
- * \returns > 0 if the item was scheduled for thumbnailing, 0 in case of error.
+ * \return VLC_THUMBNAILER_REQ_ID_INVALID in case of error, or a valid id if the
+ * item was scheduled for thumbnailing. If this returns an
+ * error, the on_ended callback will *not* be invoked
  *
- * If this function returns a valid id, the callback is guaranteed
- * to be called, even in case of later failure (except if cancelled early by
- * the user).
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
