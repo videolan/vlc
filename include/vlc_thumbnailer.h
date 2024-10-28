@@ -45,9 +45,11 @@ struct vlc_thumbnailer_cbs
      *
      * @note This callback is mandatory.
      *
-     * In case of failure, p_thumbnail will be NULL.  The picture, if any, is
-     * owned by the thumbnailer, and must be acquired by using \link
-     * picture_Hold \endlink to use it pass the callback's scope.
+     * In case of failure, timeout or cancellation, p_thumbnail will be NULL.
+     * The picture, if any, is owned by the thumbnailer, and must be acquired
+     * by using \link picture_Hold \endlink to use it pass the callback's
+     * scope.
+     *
      * \param thumbnail The generated thumbnail, or NULL in case of failure or
      * timeout
      * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last

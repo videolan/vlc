@@ -209,13 +209,12 @@ RunnableRun(void *userdata)
     picture_t* pic = task->pic;
     task->pic = NULL;
 
-    bool notify = task->status != INTERRUPTED;
+    bool interrupted = task->status == INTERRUPTED;
 
     vlc_list_remove(&task->node);
     vlc_mutex_unlock(&thumbnailer->lock);
 
-    if (notify)
-        NotifyThumbnail(task, pic);
+    NotifyThumbnail(task, interrupted ? NULL : pic);
 
     if (pic)
         picture_Release(pic);
@@ -268,7 +267,15 @@ size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_r
             if (canceled)
             {
                 vlc_list_remove(&task->node);
+                vlc_mutex_unlock(&thumbnailer->lock);
+                NotifyThumbnail(task, NULL);
                 TaskDestroy(task);
+
+                /* Small optimisation in the likely case where the user cancel
+                 * only one task */
+                if (id != VLC_THUMBNAILER_REQ_ID_INVALID)
+                    return count;
+                vlc_mutex_lock(&thumbnailer->lock);
             }
             else
             {

@@ -173,9 +173,9 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
 static void thumbnailer_callback_cancel( picture_t* p_thumbnail, void *data )
 {
-    (void) data; (void) p_thumbnail;
+    (void) data;
     /* This callback should not be called since the request is cancelled */
-    vlc_assert_unreachable();
+    assert( p_thumbnail == NULL );
 }
 
 static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
