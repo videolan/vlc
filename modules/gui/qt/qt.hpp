@@ -38,9 +38,6 @@
 
 #include <QString>
 
-static_assert (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0),
-               "Update your Qt version to at least 6.2.0");
-
 enum {
     IMEventTypeOffset     = 0,
     MsgEventTypeOffset    = 100
