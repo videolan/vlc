@@ -156,6 +156,9 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
     VLC_UNUSED(item);
     struct task *task = task_;
 
+    if (atomic_load(&task->interrupted))
+        return;
+
     if (task->cbs && task->cbs->on_subtree_added)
         task->cbs->on_subtree_added(task->item, subtree, task->userdata);
 }
@@ -167,6 +170,9 @@ OnParserAttachmentsAdded(input_item_t *item,
 {
     VLC_UNUSED(item);
     struct task *task = task_;
+
+    if (atomic_load(&task->interrupted))
+        return;
 
     if (task->cbs && task->cbs->on_attachments_added)
         task->cbs->on_attachments_added(task->item, array, count, task->userdata);
