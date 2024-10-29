@@ -33,7 +33,6 @@
 #include "audioformat_jni.h"
 
 #define THREAD_NAME "android_audio"
-#define GET_ENV() android_getEnv(VLC_OBJECT(stream), THREAD_NAME)
 #define JNI_CALL(what, obj, method, ...) (*env)->what(env, obj, method, ##__VA_ARGS__)
 #define JNI_CALL_INT(obj, method, ...) JNI_CALL(CallIntMethod, obj, method, ##__VA_ARGS__)
 #define JNI_CALL_VOID(obj, method, ...) JNI_CALL(CallVoidMethod, obj, method, ##__VA_ARGS__)
