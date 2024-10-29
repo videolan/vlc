@@ -1127,9 +1127,18 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     if ( p_intf->p_compositor )
     {
         if (cleanupReason == CLEANUP_INTF_CLOSED)
+            {
             p_intf->p_compositor->unloadGUI();
+            delete p_intf->p_mi;
+            p_intf->p_mi = nullptr;
+            }
         else // CLEANUP_APP_TERMINATED
+            {
             p_intf->p_compositor->destroyMainInterface();
+            p_intf->p_compositor.reset();
+            delete p_intf->mainSettings;
+            p_intf->mainSettings = nullptr;
+            }
     }
 
     /* */
@@ -1149,14 +1158,6 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     if (p_intf->p_mi) {
         delete p_intf->p_mi;
         p_intf->p_mi = nullptr;
-    }
-
-    if ( p_intf->p_compositor &&  cleanupReason == CLEANUP_APP_TERMINATED)
-    {
-        p_intf->p_compositor.reset();
-
-        delete p_intf->mainSettings;
-        p_intf->mainSettings = nullptr;
     }
 
     /* Destroy the main playlist controller */
