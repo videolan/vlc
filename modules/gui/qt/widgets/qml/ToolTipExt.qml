@@ -39,6 +39,11 @@ T.ToolTip {
 
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
+    Component.onCompleted: {
+        if (typeof control.popupType === "number")
+            control.popupType = 1 // Popup.Window
+    }
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Tooltip
