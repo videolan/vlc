@@ -33,8 +33,6 @@
 #include <dlfcn.h>
 #include <math.h>
 
-#include "../../video_output/android/env.h"
-
 // For native audio
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
@@ -54,8 +52,6 @@
         msg_Err(aout, msg" (%" PRIu32 ")", (uint32_t)result); \
         goto error; \
     }
-
-#define CHECK_NATIVE_SAMPLE_RATE (__ANDROID_API__ < 21)
 
 typedef SLresult (*slCreateEngine_t)(
         SLObjectItf*, SLuint32, const SLEngineOption*, SLuint32,
@@ -327,29 +323,6 @@ static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext
     vlc_mutex_unlock(&sys->lock);
 }
 
-#if CHECK_NATIVE_SAMPLE_RATE
-static int aout_get_native_sample_rate(audio_output_t *aout)
-{
-    JNIEnv *p_env;
-    if (!(p_env = android_getEnv(VLC_OBJECT(aout), "opensles")))
-        return -1;
-    jclass cls = (*p_env)->FindClass (p_env, "android/media/AudioTrack");
-    if ((*p_env)->ExceptionCheck(p_env))
-    {
-        (*p_env)->ExceptionClear(p_env);
-        return -1;
-    }
-    jmethodID method = (*p_env)->GetStaticMethodID(p_env, cls,
-                                                   "getNativeOutputSampleRate",
-                                                   "(I)I");
-    /* 3 for AudioManager.STREAM_MUSIC */
-    int sample_rate = (*p_env)->CallStaticIntMethod(p_env, cls, method, 3);
-    (*p_env)->DeleteLocalRef(p_env, cls);
-    msg_Dbg(aout, "%s: %d", __func__, sample_rate);
-    return sample_rate;
-}
-#endif
-
 static int Open (vlc_object_t *obj)
 {
     audio_output_t *aout = (audio_output_t *)obj;
@@ -503,17 +476,6 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-#if CHECK_NATIVE_SAMPLE_RATE
-    if (aout_get_native_sample_rate(aout) < (int)fmt->i_rate) {
-        // Don't try to play back a sample rate higher than the native one,
-        // since OpenSL ES will try to use the fast path, which AudioFlinger
-        // will reject (fast path can't do resampling), and will end up with
-        // too small buffers for the resampling. See http://b.android.com/59453
-        // for details. This bug is fixed in 5.0
-        result = SL_RESULT_UNKNOWN_ERROR;
-    }
-    else
-#endif
         result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);

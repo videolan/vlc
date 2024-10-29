@@ -16,7 +16,7 @@ noinst_LTLIBRARIES += \
 endif
 
 libopensles_android_plugin_la_SOURCES = audio_output/android/opensles.c
-libopensles_android_plugin_la_LIBADD = libandroid_env.la $(LIBDL) $(LIBM)
+libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
 
 libandroid_audiotrack_plugin_la_SOURCES = audio_output/android/audiotrack.c audio_output/android/device.h
 libandroid_audiotrack_plugin_la_LIBADD = libandroid_env.la \
