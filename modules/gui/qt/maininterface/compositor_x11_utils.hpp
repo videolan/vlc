@@ -19,25 +19,11 @@
 #define COMPOSITOR_X11_UTILS_HPP
 #include <memory>
 
-#include <QWidget>
-
 #include <xcb/xcb.h>
 #include <xcb/render.h>
 #include <xcb/composite.h>
 
-
 namespace vlc {
-
-class DummyNativeWidget : public QWidget
-{
-    Q_OBJECT
-public:
-    DummyNativeWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    virtual ~DummyNativeWidget();
-
-    //override paintEnging to suppress warning
-    QPaintEngine* paintEngine() const override;
-};
 
 template<typename T, typename R, R RELEASE>
 class X11Resource {

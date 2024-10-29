@@ -581,8 +581,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_x11.moc.cpp \
 	maininterface/compositor_x11_renderclient.moc.cpp \
 	maininterface/compositor_x11_renderwindow.moc.cpp \
-	maininterface/compositor_x11_uisurface.moc.cpp \
-	maininterface/compositor_x11_utils.moc.cpp
+	maininterface/compositor_x11_uisurface.moc.cpp
 
 endif
 endif

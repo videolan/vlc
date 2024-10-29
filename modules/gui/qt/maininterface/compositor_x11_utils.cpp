@@ -15,44 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#include <xcb/xfixes.h>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+
 #include <vlc_cxx_helpers.hpp>
+
+#include <xcb/xfixes.h>
+
 #include "compositor_x11_utils.hpp"
 
-#include <QWindow>
-
 namespace vlc {
-
-DummyNativeWidget::DummyNativeWidget(QWidget* parent, Qt::WindowFlags f)
-    : QWidget(parent, f)
-{
-    setAttribute(Qt::WA_NativeWindow, true);
-    setAttribute(Qt::WA_OpaquePaintEvent, true);
-    setAttribute(Qt::WA_PaintOnScreen, true);
-    setAttribute(Qt::WA_MouseTracking, true);
-    setAttribute(Qt::WA_TranslucentBackground, false);
-    QWindow* w =  window()->windowHandle();
-    assert(w);
-    /*
-     * force the window not to have an alpha channel, the  parent window
-     * may have an alpha channel and child widget would inhertit the format
-     * even if we set Qt::WA_TranslucentBackground to false. having an alpha
-     * in this surface would lead to the video begin semi-tranparent.
-     */
-    QSurfaceFormat format = w->format();
-    format.setAlphaBufferSize(0);
-    w->setFormat(format);
-}
-
-DummyNativeWidget::~DummyNativeWidget()
-{
-
-}
-
-QPaintEngine* DummyNativeWidget::paintEngine() const
-{
-    return nullptr;
-}
 
 bool queryExtension(xcb_connection_t* conn, const char* name, uint8_t* first_event_out, uint8_t* first_error_out)
 {
@@ -133,10 +106,10 @@ void setTransparentForMouseEvent(xcb_connection_t* conn, xcb_window_t window)
 //see https://specifications.freedesktop.org/wm-spec/wm-spec-latest.html#idm45894597940912
 bool wmScreenHasCompositor(xcb_connection_t* conn, int screen)
 {
-     QByteArray propName("_NET_WM_CM_S");
-     propName += QByteArray::number(screen);
+     std::string propName("_NET_WM_CM_S");
+    propName += std::to_string(screen);
 
-     xcb_atom_t atom = getInternAtom(conn, propName.constData());
+     xcb_atom_t atom = getInternAtom(conn, propName.c_str());
      if (atom == 0)
         return false;
 

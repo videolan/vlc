@@ -22,6 +22,8 @@
 #include "videosurface.hpp"
 #include <memory>
 
+#include <QWidget>
+
 #include <xcb/xcb.h>
 
 class QObject;
@@ -67,6 +69,18 @@ private:
     std::unique_ptr<CompositorX11UISurface> m_qmlView;
     std::unique_ptr<CompositorX11RenderWindow> m_renderWindow;
 };
+
+class DummyNativeWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    DummyNativeWidget(QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    virtual ~DummyNativeWidget();
+
+    //override paintEnging to suppress warning
+    QPaintEngine* paintEngine() const override;
+};
+
 
 }
 
