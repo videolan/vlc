@@ -59,7 +59,8 @@ ToolTipExt {
                 id: arrow
 
                 anchors.horizontalCenter: parent.horizontalCenter
-                anchors.horizontalCenterOffset: _x - pointingTooltip.x
+                anchors.horizontalCenterOffset: (pointingTooltip.popupType === 1 /* Popup.Window */) ? 0
+                                                                                                     : (pointingTooltip._x - pointingTooltip.x)
                 anchors.verticalCenter: parent.top
 
                 implicitWidth: VLCStyle.dp(10, VLCStyle.scale)
