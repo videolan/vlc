@@ -721,6 +721,32 @@ static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
     return VLC_SUCCESS;
 }
 
+static block_t * MP4_CDP_Convert( block_t *p_block )
+{
+    /* FinalCut ST334-2 CDP put inside CC violation */
+    if (p_block->i_buffer < 8 + 7)
+        goto out;
+
+    if(memcmp(&p_block->p_buffer[4], "ccdp", 4))
+        goto out;
+
+    uint_fast32_t ccdp_size = GetDWBE(p_block->p_buffer);
+    if (ccdp_size > p_block->i_buffer || ccdp_size < 8)
+        goto out;
+
+    p_block->p_buffer += 8;
+    p_block->i_buffer = ccdp_size - 8;
+    /* Let cc.h handle extraction */
+    cc_data_t cc;
+    cc_Init(&cc);
+    cc_Extract(&cc, CC_PAYLOAD_CDP, true, p_block->p_buffer, p_block->i_buffer);
+    memcpy(p_block->p_buffer, cc.p_data, cc.i_data);
+    p_block->i_buffer = cc.i_data;
+
+out:
+    return p_block;
+}
+
 static block_t * MP4_EIA608_Convert( block_t * p_block )
 {
     /* Rebuild codec data from encap */
@@ -730,6 +756,9 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     /* always need at least 10 bytes (atom size+header+1pair)*/
     if (p_block->i_buffer < 8)
         goto out;
+
+    if(!memcmp(&p_block->p_buffer[4], "ccdp", 4))
+        return MP4_CDP_Convert(p_block);
 
     uint_fast32_t cdat_size = GetDWBE(p_block->p_buffer) - 8;
     if (cdat_size > p_block->i_buffer)
