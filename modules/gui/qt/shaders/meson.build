@@ -18,7 +18,7 @@ shader_sources = [
 
 shader_files = files(shader_sources)
 
-qt_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir')
+qt_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir', configtool: '-query QT_HOST_BINS')
 qsb = find_program(qt_bin_directory + '/qsb', required: true)
 
 qsb_params = ['--glsl=100 es,120,150', '--batchable', '-O']
