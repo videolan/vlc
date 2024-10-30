@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputStats;
 @class VLCTrackMetaData;
+@class VLCPlayerTitle;
 @class VLCProgramMetaData;
 @class VLCInputItem;
 
@@ -528,6 +529,8 @@ extern const CGFloat VLCVolumeDefault;
  * @note listen to VLCPlayerTitleListChanged to be notified about changes to this property
  */
 @property (readonly) size_t numberOfTitlesOfCurrentMedia;
+
+@property (readonly) NSArray<VLCPlayerTitle *> *titlesOfCurrentMedia;
 
 /**
  * get a vlc_player_title by the index

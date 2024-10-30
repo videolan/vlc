@@ -27,11 +27,16 @@
 #import <vlc_url.h>
 
 #import "extensions/NSString+Helpers.h"
+
+#import "library/VLCInputItem.h"
+
 #import "main/VLCMain.h"
+
 #import "os-integration/VLCRemoteControlService.h"
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
-#import "library/VLCInputItem.h"
+
+#import "playlist/VLCPlayerTitle.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"
@@ -1153,6 +1158,18 @@ static int BossCallback(vlc_object_t *p_this,
         return 0;
     }
     return vlc_player_title_list_GetCount(_currentTitleList);
+}
+
+- (NSArray<VLCPlayerTitle *> *)titlesOfCurrentMedia
+{
+    const size_t count = [self numberOfTitlesOfCurrentMedia];
+    NSMutableArray<VLCPlayerTitle *> * const titles = NSMutableArray.array;
+    for (size_t i = 0; i < count; i++) {
+        const struct vlc_player_title * const p_title = [self titleAtIndexForCurrentMedia:i];
+        VLCPlayerTitle * const title = [[VLCPlayerTitle alloc] initWithTitle:p_title atIndex:i];
+        [titles addObject:title];
+    }
+    return titles.copy;
 }
 
 - (void)selectedChapterChanged:(size_t)chapterIndex

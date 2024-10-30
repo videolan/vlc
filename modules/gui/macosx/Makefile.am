@@ -185,6 +185,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowSidebarRootViewController.m \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.h \
 	gui/macosx/library/VLCLibraryWindowSplitViewController.m \
+	gui/macosx/library/VLCLibraryWindowTitlesSidebarViewController.h \
+	gui/macosx/library/VLCLibraryWindowTitlesSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.h \
@@ -324,6 +326,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/playlist/VLCPlayerChapter.m \
 	gui/macosx/playlist/VLCPlayerController.h \
 	gui/macosx/playlist/VLCPlayerController.m \
+	gui/macosx/playlist/VLCPlayerTitle.h \
+	gui/macosx/playlist/VLCPlayerTitle.m \
 	gui/macosx/playlist/VLCPlaylistController.h \
 	gui/macosx/playlist/VLCPlaylistController.m \
 	gui/macosx/playlist/VLCPlaylistDataSource.h \
@@ -480,6 +484,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/VLCLibraryWindowNavigationSidebarView.xib \
 	gui/macosx/UI/VLCLibraryWindowPlaylistView.xib \
 	gui/macosx/UI/VLCLibraryWindowSidebarRootView.xib \
+	gui/macosx/UI/VLCLibraryWindowTitlesView.xib \
 	gui/macosx/UI/VLCLibraryTableCellView.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCarouselViewItemView.xib \

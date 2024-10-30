@@ -32,84 +32,91 @@ typedef size_t vlc_thumbnailer_req_id;
 #define VLC_THUMBNAILER_REQ_ID_INVALID 0
 
 /**
- * \brief vlc_thumbnailer_cb defines a callback invoked on thumbnailing completion or error
- *
- * This callback will always be called, provided vlc_thumbnailer_Request returned
- * a non NULL request, and provided the request is not cancelled before its
- * completion.
- * In case of failure, p_thumbnail will be NULL.
- * The picture, if any, is owned by the thumbnailer, and must be acquired by using
- * \link picture_Hold \endlink to use it pass the callback's scope.
- *
- * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last parameter
- * \param thumbnail The generated thumbnail, or NULL in case of failure or timeout
+ * thumbnailer callbacks
  */
-typedef void(*vlc_thumbnailer_cb)( void* data, picture_t* thumbnail );
-
+struct vlc_thumbnailer_cbs
+{
+    /**
+     * Event received on thumbnailing completion or error
+     *
+     * This callback will always be called, provided vlc_thumbnailer_Request
+     * returned a valid request, and provided the request is not cancelled
+     * before its completion.
+     *
+     * @note This callback is mandatory.
+     *
+     * In case of failure, p_thumbnail will be NULL.  The picture, if any, is
+     * owned by the thumbnailer, and must be acquired by using \link
+     * picture_Hold \endlink to use it pass the callback's scope.
+     * \param thumbnail The generated thumbnail, or NULL in case of failure or
+     * timeout
+     * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last
+     * parameter
+     */
+    void (*on_ended)(picture_t* thumbnail, void *data);
+};
 
 /**
  * \brief vlc_thumbnailer_Create Creates a thumbnailer object
  * \param parent A VLC object
+ * @param timeout timeout of the thumbnailer, 0 for no limits.
  * \return A thumbnailer object, or NULL in case of failure
  */
 VLC_API vlc_thumbnailer_t*
-vlc_thumbnailer_Create(vlc_object_t* parent)
-VLC_USED;
+vlc_thumbnailer_Create(vlc_object_t* parent, vlc_tick_t timeout) VLC_USED;
 
-enum vlc_thumbnailer_seek_speed
+/**
+ * Thumbnailer seek argument
+ */
+struct vlc_thumbnailer_seek_arg
 {
-    /** Precise, but potentially slow */
-    VLC_THUMBNAILER_SEEK_PRECISE,
-    /** Fast, but potentially imprecise */
-    VLC_THUMBNAILER_SEEK_FAST,
+    enum
+    {
+        /** Don't seek */
+        VLC_THUMBNAILER_SEEK_NONE,
+        /** Seek by time */
+        VLC_THUMBNAILER_SEEK_TIME,
+        /** Seek by position */
+        VLC_THUMBNAILER_SEEK_POS,
+    } type;
+    union
+    {
+        /** Seek time if type == VLC_THUMBNAILER_SEEK_TIME */
+        vlc_tick_t time;
+        /** Seek position if type == VLC_THUMBNAILER_SEEK_POS */
+        double pos;
+    };
+    enum
+    {
+        /** Precise, but potentially slow */
+        VLC_THUMBNAILER_SEEK_PRECISE,
+        /** Fast, but potentially imprecise */
+        VLC_THUMBNAILER_SEEK_FAST,
+    } speed;
 };
 
 /**
- * \brief vlc_thumbnailer_RequestByTime Requests a thumbnailer at a given time
+ * \brief vlc_thumbnailer_Request Requests a thumbnailer
  * \param thumbnailer A thumbnailer object
- * \param time The time at which the thumbnail should be taken
- * \param speed The seeking speed \sa{enum vlc_thumbnailer_seek_speed}
  * \param input_item The input item to generate the thumbnail for
+ * \param seek_arg pointer to a seek struct, that tell at which time the
+ * thumbnail should be taken, NULL to disable seek
  * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
- * \param cb A user callback to be called on completion (success & error)
- * \param user_data An opaque value, provided as pf_cb's first parameter
- * \returns > 0 if the item was scheduled for thumbnailing, 0 in case of error.
+ * \param cbs callback to listen to events (can't be NULL)
+ * \param cbs_userdata opaque pointer used by the callbacks
+ * \return VLC_THUMBNAILER_REQ_ID_INVALID in case of error, or a valid id if the
+ * item was scheduled for thumbnailing. If this returns an
+ * error, the on_ended callback will *not* be invoked
  *
- * If this function returns a valid id, the callback is guaranteed
- * to be called, even in case of later failure (except if cancelled early by
- * the user).
  * The provided input_item will be held by the thumbnailer and can safely be
  * released safely after calling this function.
  */
 VLC_API vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
-                               vlc_tick_t time,
-                               enum vlc_thumbnailer_seek_speed speed,
-                               input_item_t *input_item, vlc_tick_t timeout,
-                               vlc_thumbnailer_cb cb, void* user_data );
-/**
- * \brief vlc_thumbnailer_RequestByTime Requests a thumbnailer at a given time
- * \param thumbnailer A thumbnailer object
- * \param pos The position at which the thumbnail should be taken
- * \param speed The seeking speed \sa{enum vlc_thumbnailer_seek_speed}
- * \param input_item The input item to generate the thumbnail for
- * \param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
- * \param cb A user callback to be called on completion (success & error)
- * \param user_data An opaque value, provided as pf_cb's first parameter
-
- * @return VLC_THUMBNAILER_REQ_ID_INVALID in case of error, or a valid id if
- * the item was scheduled for preparsing.  If this function returns a valid id,
- * the callback is guaranteed to be called, even in case of later failure
- * (except if cancelled early by the user).
- * The provided input_item will be held by the thumbnailer and can safely be
- * released safely after calling this function.
- */
-VLC_API vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              double pos,
-                              enum vlc_thumbnailer_seek_speed speed,
-                              input_item_t *input_item, vlc_tick_t timeout,
-                              vlc_thumbnailer_cb cb, void* user_data );
+vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
+                         input_item_t *input_item,
+                         const struct vlc_thumbnailer_seek_arg *seek_arg,
+                         const struct vlc_thumbnailer_cbs *cbs,
+                         void *cbs_userdata );
 
 /**
  * \brief vlc_thumbnailer_Camcel Cancel a thumbnail request
@@ -122,9 +129,15 @@ VLC_API size_t
 vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id );
 
 /**
- * \brief vlc_thumbnailer_Release releases a thumbnailer and cancel all pending requests
+ * \brief vlc_thumbnailer_Delete Deletes a thumbnailer and cancel all pending requests
  * \param thumbnailer A thumbnailer object
  */
-VLC_API void vlc_thumbnailer_Release( vlc_thumbnailer_t* thumbnailer );
+VLC_API void vlc_thumbnailer_Delete( vlc_thumbnailer_t* thumbnailer );
+
+/**
+ * Do not use, libVLC only fonction, will be removed soon
+ */
+VLC_API void vlc_thumbnailer_SetTimeout( vlc_thumbnailer_t *thumbnailer,
+                                         vlc_tick_t timeout ) VLC_DEPRECATED;
 
 #endif // VLC_THUMBNAILER_H

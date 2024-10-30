@@ -1064,9 +1064,7 @@ subdir('bin')
 # VLC plugins
 subdir('modules')
 
-if (get_option('tests')
-    .disable_auto_if(host_system in ['windows'])
-    .allowed())
+if (get_option('tests').allowed())
     # Integration and non-regression tests, some unittest are there too but the
     # modules/, src/ and lib/ folders should be favoured for those.
     subdir('test')

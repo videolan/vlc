@@ -62,6 +62,40 @@ void CSDButton::setRect(const QRect &newRect)
     emit rectChanged();
 }
 
+bool CSDButton::externalPressed() const
+{
+    return m_externalPressed;
+}
+
+void CSDButton::setExternalPressed()
+{
+    if (m_externalPressed)
+        return;
+    m_externalPressed = true;
+    emit externalPressedChanged();
+}
+
+void CSDButton::unsetExternalPressed()
+{
+    if (!m_externalPressed)
+        return;
+    m_externalPressed = false;
+    emit externalPressedChanged();
+};
+
+void CSDButton::externalPress()
+{
+    setExternalPressed();
+}
+
+void CSDButton::externalRelease()
+{
+    if (!m_externalPressed)
+        return;
+    unsetExternalPressed();
+    click();
+}
+
 void CSDButton::click()
 {
     emit clicked();

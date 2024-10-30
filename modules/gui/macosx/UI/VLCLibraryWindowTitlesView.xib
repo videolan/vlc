@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23094" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23094"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowChaptersSidebarViewController">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowTitlesSidebarViewController">
             <connections>
                 <outlet property="tableView" destination="5mv-Qc-JwM" id="C8u-Vw-BUa"/>
                 <outlet property="titleSeparator" destination="zf4-pf-0V2" id="MJk-Fh-4O3"/>
@@ -14,7 +14,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView identifier="VLCLibraryWindowChaptersViewIdentifier" id="SIR-0h-28I">
+        <customView identifier="VLCLibraryWindowTitlesViewIdentifier" id="SIR-0h-28I">
             <rect key="frame" x="0.0" y="0.0" width="835" height="246"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
@@ -34,7 +34,7 @@
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="VLCLibraryWindowChaptersTableViewNameColumnIdentifier" editable="NO" width="736" minWidth="100" maxWidth="1000" id="9yW-DI-c08">
+                                    <tableColumn identifier="VLCLibraryWindowTitlesTableViewNameColumnIdentifier" editable="NO" width="736" minWidth="100" maxWidth="1000" id="9yW-DI-c08">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Title">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
@@ -46,7 +46,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibraryWindowChaptersTableViewNameCellIdentifier" id="ZTp-fs-5fE">
+                                            <tableCellView identifier="VLCLibraryWindowTitlesTableViewNameCellIdentifier" id="ZTp-fs-5fE">
                                                 <rect key="frame" x="11" y="1" width="741" height="16"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -66,8 +66,8 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCLibraryWindowChaptersTableViewTimeColumnIdentifier" editable="NO" width="64" minWidth="64" maxWidth="100" id="KEN-Nu-Iyj">
-                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Time">
+                                    <tableColumn identifier="VLCLibraryWindowTitlesTableViewLengthColumnIdentifier" editable="NO" width="64" minWidth="64" maxWidth="100" id="KEN-Nu-Iyj">
+                                        <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Length">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </tableHeaderCell>
@@ -78,7 +78,7 @@
                                         </textFieldCell>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
                                         <prototypeCellViews>
-                                            <tableCellView identifier="VLCLibraryWindowChaptersTableViewTimeCellIdentifier" id="frg-DF-b49">
+                                            <tableCellView identifier="VLCLibraryWindowTitlesTableViewTimeCellIdentifier" id="frg-DF-b49">
                                                 <rect key="frame" x="755" y="1" width="68" height="17"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>

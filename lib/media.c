@@ -927,7 +927,7 @@ struct libvlc_media_thumbnail_request_t
     vlc_thumbnailer_req_id id;
 };
 
-static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
+static void media_on_thumbnail_ready( picture_t* thumbnail, void* data )
 {
     libvlc_media_thumbnail_request_t *req = data;
     libvlc_media_t *p_media = req->md;
@@ -945,19 +945,21 @@ static void media_on_thumbnail_ready( void* data, picture_t* thumbnail )
 }
 
 // Start an asynchronous thumbnail generation
-libvlc_media_thumbnail_request_t*
-libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
-                                        libvlc_media_t *md, libvlc_time_t time,
-                                        libvlc_thumbnailer_seek_speed_t speed,
-                                        unsigned int width, unsigned int height,
-                                        bool crop, libvlc_picture_type_t picture_type,
-                                        libvlc_time_t timeout )
+static libvlc_media_thumbnail_request_t*
+libvlc_media_thumbnail_request( libvlc_instance_t *inst,
+                                libvlc_media_t *md,
+                                const struct vlc_thumbnailer_seek_arg *seek_arg,
+                                unsigned int width, unsigned int height,
+                                bool crop, libvlc_picture_type_t picture_type,
+                                libvlc_time_t timeout )
 {
     assert( md );
 
     vlc_thumbnailer_t *thumb = libvlc_get_thumbnailer(inst);
     if (unlikely(thumb == NULL))
         return NULL;
+
+    vlc_thumbnailer_SetTimeout( thumb, vlc_tick_from_libvlc_time( timeout ) );
 
     libvlc_media_thumbnail_request_t *req = malloc( sizeof( *req ) );
     if ( unlikely( req == NULL ) )
@@ -970,13 +972,11 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     req->type = picture_type;
     req->crop = crop;
     libvlc_media_retain( md );
-    req->id = vlc_thumbnailer_RequestByTime( thumb,
-        vlc_tick_from_libvlc_time( time ),
-        speed == libvlc_media_thumbnail_seek_fast ?
-            VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-        md->p_input_item,
-        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
-        media_on_thumbnail_ready, req );
+    static const struct vlc_thumbnailer_cbs cbs = {
+        .on_ended = media_on_thumbnail_ready,
+    };
+    req->id = vlc_thumbnailer_Request( thumb, md->p_input_item, seek_arg,
+                                       &cbs, req );
     if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
     {
         free( req );
@@ -985,6 +985,24 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
     }
     libvlc_retain(inst);
     return req;
+}
+
+libvlc_media_thumbnail_request_t*
+libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
+                                        libvlc_media_t *md, libvlc_time_t time,
+                                        libvlc_thumbnailer_seek_speed_t speed,
+                                        unsigned int width, unsigned int height,
+                                        bool crop, libvlc_picture_type_t picture_type,
+                                        libvlc_time_t timeout )
+{
+    const struct vlc_thumbnailer_seek_arg seek_arg = {
+        .type = VLC_THUMBNAILER_SEEK_TIME,
+        .time = vlc_tick_from_libvlc_time( time ),
+        .speed = speed == libvlc_media_thumbnail_seek_fast ?
+            VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
+    };
+    return libvlc_media_thumbnail_request( inst, md, &seek_arg, width, height,
+                                           crop, picture_type, timeout );
 }
 
 // Start an asynchronous thumbnail generation
@@ -996,37 +1014,14 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
                                        bool crop, libvlc_picture_type_t picture_type,
                                        libvlc_time_t timeout )
 {
-    assert( md );
-
-    vlc_thumbnailer_t *thumb = libvlc_get_thumbnailer(inst);
-    if (unlikely(thumb == NULL))
-        return NULL;
-
-    libvlc_media_thumbnail_request_t *req = malloc( sizeof( *req ) );
-    if ( unlikely( req == NULL ) )
-        return NULL;
-
-    req->instance = inst;
-    req->md = md;
-    req->width = width;
-    req->height = height;
-    req->crop = crop;
-    req->type = picture_type;
-    libvlc_media_retain( md );
-    req->id = vlc_thumbnailer_RequestByPos( thumb, pos,
-        speed == libvlc_media_thumbnail_seek_fast ?
+    const struct vlc_thumbnailer_seek_arg seek_arg = {
+        .type = VLC_THUMBNAILER_SEEK_POS,
+        .pos = pos,
+        .speed = speed == libvlc_media_thumbnail_seek_fast ?
             VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
-        md->p_input_item,
-        timeout > 0 ? vlc_tick_from_libvlc_time( timeout ) : VLC_TICK_INVALID,
-        media_on_thumbnail_ready, req );
-    if ( req->id == VLC_PREPARSER_REQ_ID_INVALID )
-    {
-        free( req );
-        libvlc_media_release( md );
-        return NULL;
-    }
-    libvlc_retain(inst);
-    return req;
+    };
+    return libvlc_media_thumbnail_request( inst, md, &seek_arg, width, height,
+                                           crop, picture_type, timeout );
 }
 
 // Destroy a thumbnail request

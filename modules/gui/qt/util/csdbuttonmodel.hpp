@@ -33,6 +33,7 @@ class CSDButton : public QObject
     Q_PROPERTY(ButtonType type READ type CONSTANT)
     Q_PROPERTY(bool showHovered READ showHovered WRITE setShowHovered NOTIFY showHoveredChanged)
     Q_PROPERTY(QRect rect READ rect WRITE setRect NOTIFY rectChanged)
+    Q_PROPERTY(bool externalPressed READ externalPressed NOTIFY externalPressedChanged FINAL)
 
 public:
     enum ButtonType
@@ -63,6 +64,12 @@ public:
     const QRect &rect() const;
     void setRect(const QRect &newRect);
 
+    bool externalPressed() const;
+    void setExternalPressed();
+    void unsetExternalPressed();
+    void externalPress();
+    void externalRelease();
+
 public slots:
     // signals to perfrom action associated with button
     // actions are dependent on implmentation
@@ -74,11 +81,13 @@ signals:
     void rectChanged();
     void clicked();
     void doubleClicked();
+    void externalPressedChanged();
 
 private:
     const ButtonType m_type;
     bool m_showHovered = false;
     QRect m_rect;
+    bool m_externalPressed = false;
 };
 
 

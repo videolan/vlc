@@ -319,8 +319,6 @@ public:
             // handle it to relay if mouse is on the CSD buttons
             // required for snap layouts menu (WINDOWS 11)
 
-            setAllUnhovered();
-
             // Get the point in screen coordinates.
             POINT point = { GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam) };
 
@@ -369,13 +367,21 @@ public:
             {
             case HTCLOSE:
                 setHovered(CSDButton::Close);
+                setHovered(CSDButton::Minimize, false);
+                setHovered(CSDButton::MaximizeRestore, false);
                 break;
             case HTMINBUTTON:
                 setHovered(CSDButton::Minimize);
+                setHovered(CSDButton::Close, false);
+                setHovered(CSDButton::MaximizeRestore, false);
                 break;
             case HTMAXBUTTON:
                 setHovered(CSDButton::MaximizeRestore);
+                setHovered(CSDButton::Close, false);
+                setHovered(CSDButton::Minimize, false);
                 break;
+            default:
+                setAllUnhovered();
             }
 
             // If we haven't previously asked for mouse tracking, request mouse
@@ -402,22 +408,57 @@ public:
             break;
         }
 
+        case WM_NCLBUTTONUP:
         case WM_NCLBUTTONDOWN:
         {
+            void (CSDButton::*function)();
+            void (CSDButton::*functionForOthers)() = nullptr;
+
+            if (msg->message == WM_NCLBUTTONDOWN)
+                function = &CSDButton::externalPress;
+            else if (msg->message == WM_NCLBUTTONUP)
+            {
+                function = &CSDButton::externalRelease;
+                functionForOthers = &CSDButton::unsetExternalPressed;
+            }
+            else
+                Q_UNREACHABLE();
 
             // manually trigger button here, UI will never get click
             // signal because we have captured the mouse in non client area
             switch ( msg->wParam )
             {
             case HTCLOSE:
-                trigger(CSDButton::Close);
+                trigger(CSDButton::Close, function);
+                if (functionForOthers)
+                {
+                    trigger(CSDButton::Minimize, functionForOthers);
+                    trigger(CSDButton::MaximizeRestore, functionForOthers);
+                }
                 break;
             case HTMINBUTTON:
-                trigger(CSDButton::Minimize);
+                trigger(CSDButton::Minimize, function);
+                if (functionForOthers)
+                {
+                    trigger(CSDButton::Close, functionForOthers);
+                    trigger(CSDButton::MaximizeRestore, functionForOthers);
+                }
                 break;
             case HTMAXBUTTON:
-                trigger(CSDButton::MaximizeRestore);
+                trigger(CSDButton::MaximizeRestore, function);
+                if (functionForOthers)
+                {
+                    trigger(CSDButton::Close, functionForOthers);
+                    trigger(CSDButton::Minimize, functionForOthers);
+                }
                 break;
+            default:
+                if (functionForOthers)
+                {
+                    trigger(CSDButton::Close, functionForOthers);
+                    trigger(CSDButton::Minimize, functionForOthers);
+                    trigger(CSDButton::MaximizeRestore, functionForOthers);
+                }
             }
 
 
@@ -494,11 +535,11 @@ private:
         return nullptr;
     }
 
-    void setHovered(CSDButton::ButtonType type)
+    void setHovered(CSDButton::ButtonType type, bool hovered = true)
     {
         for (auto button : m_buttonmodel->windowCSDButtons()) {
             if (button->type() == type) {
-                button->setShowHovered(true);
+                button->setShowHovered(hovered);
                 return ;
             }
         }
@@ -506,11 +547,11 @@ private:
         vlc_assert_unreachable();
     }
 
-    void trigger(CSDButton::ButtonType type)
+    void trigger(CSDButton::ButtonType type, void (CSDButton::*function)())
     {
         for (auto button : m_buttonmodel->windowCSDButtons()) {
             if (button->type() == type) {
-                button->click();
+                (button->*function)();
                 return ;
             }
         }

@@ -35,14 +35,15 @@
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
     , m_currentContext( nullptr )
-    , m_thumbnailer( nullptr, &vlc_thumbnailer_Release )
+    , m_thumbnailer( nullptr, &vlc_thumbnailer_Delete )
 {
-    m_thumbnailer.reset( vlc_thumbnailer_Create( VLC_OBJECT( ml ) ) );
+    m_thumbnailer.reset( vlc_thumbnailer_Create( VLC_OBJECT( ml ),
+                                                  VLC_TICK_FROM_SEC( 3 ) ) );
     if ( unlikely( m_thumbnailer == nullptr ) )
         throw std::runtime_error( "Failed to instantiate a vlc_thumbnailer_t" );
 }
 
-void Thumbnailer::onThumbnailComplete( void* data, picture_t* thumbnail )
+void Thumbnailer::onThumbnailComplete( picture_t* thumbnail, void *data )
 {
     ThumbnailerCtx* ctx = static_cast<ThumbnailerCtx*>( data );
 
@@ -70,11 +71,18 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
+        struct vlc_thumbnailer_seek_arg seek_arg = {
+            .type = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_POS,
+            .pos = position,
+            .speed = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_FAST,
+        };
+
+        static const struct vlc_thumbnailer_cbs cbs = {
+            .on_ended = onThumbnailComplete,
+        };
         vlc_thumbnailer_req_id requestId =
-            vlc_thumbnailer_RequestByPos( m_thumbnailer.get(), position,
-                                          VLC_THUMBNAILER_SEEK_FAST, item.get(),
-                                          VLC_TICK_FROM_SEC( 3 ),
-                                          &onThumbnailComplete, &ctx );
+            vlc_thumbnailer_Request( m_thumbnailer.get(), item.get(), &seek_arg,
+                                     &cbs, &ctx );
 
         if (requestId == VLC_THUMBNAILER_REQ_ID_INVALID)
         {

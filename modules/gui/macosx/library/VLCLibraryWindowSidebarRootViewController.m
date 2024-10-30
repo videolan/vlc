@@ -33,14 +33,12 @@
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
 #import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
+#import "library/VLCLibraryWindowTitlesSidebarViewController.h"
 
 #import "playlist/VLCPlayerController.h"
 #import "playlist/VLCPlaylistController.h"
 
 #include "views/VLCRoundedCornerTextField.h"
-
-const NSInteger VLCLibraryWindowSidebarViewPlaylistSegment = 0;
-const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
 @interface VLCLibraryWindowSidebarRootViewController ()
 
@@ -64,7 +62,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     [super viewDidLoad];
     [self setupPlaylistTitle];
     [self setupCounterLabel];
-    [self setupViewSelector];
 
     self.mainVideoModeEnabled = NO;
 
@@ -72,9 +69,16 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
         [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+    _titlesSidebarViewController =
+        [[VLCLibraryWindowTitlesSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
 
     self.targetView.translatesAutoresizingMaskIntoConstraints = NO;
 
+    if (@available(macOS 10.13, *)) {
+        self.viewSelector.segmentDistribution = NSSegmentDistributionFillEqually;
+    }
+
+    [self setupViewSelectorSegments];
     [self updateViewSelectorState];
     [self viewSelectorAction:self.viewSelector];
 
@@ -90,7 +94,6 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     _playlistHeaderLabel = [[NSTextField alloc] init];
     self.playlistHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.playlistHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
-    self.playlistHeaderLabel.stringValue = _NS("Playlist");
     self.playlistHeaderLabel.editable = NO;
     self.playlistHeaderLabel.bezeled = NO;
     self.playlistHeaderLabel.drawsBackground = NO;
@@ -109,14 +112,24 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     ]];
 }
 
-- (void)setupViewSelector
+- (void)setupViewSelectorSegments
 {
-    self.viewSelector.segmentCount = 2;
-    [self.viewSelector setLabel:_NS("Playlist")
-                     forSegment:VLCLibraryWindowSidebarViewPlaylistSegment];
-    [self.viewSelector setLabel:_NS("Chapters")
-                     forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
-    self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+    self.viewSelector.segmentCount = 1;
+    [self.viewSelector setLabel:self.playlistSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+
+    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayerController * const playerController = playlistController.playerController;
+    if (playerController.numberOfTitlesOfCurrentMedia > 0) {
+        self.viewSelector.segmentCount++; 
+        [self.viewSelector setLabel:self.titlesSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+    }
+    if (playerController.numberOfChaptersForCurrentTitle > 0) {
+        self.viewSelector.segmentCount++;
+        [self.viewSelector setLabel:self.chaptersSidebarViewController.title
+                         forSegment:self.viewSelector.segmentCount - 1];
+    }
 }
 
 - (void)setupCounterLabel
@@ -151,19 +164,20 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 
 - (void)updateViewSelectorState
 {
+    [self setupViewSelectorSegments];
+
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
+    const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
     
-    [self.viewSelector setEnabled:chaptersEnabled
-                       forSegment:VLCLibraryWindowSidebarViewChaptersSegment];
-    self.viewSelector.hidden = !chaptersEnabled;
+    self.viewSelector.hidden = !chaptersEnabled && !titlesEnabled;
     self.topInternalConstraint.active = !self.viewSelector.hidden;
 
-    const NSLayoutPriority priority =
-        chaptersEnabled ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
+    const NSLayoutPriority playlistCompressionPriority =
+        self.viewSelector.hidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
     self.playlistHeaderLabel.hidden = chaptersEnabled;
-    [self.playlistHeaderLabel setContentCompressionResistancePriority:priority
+    [self.playlistHeaderLabel setContentCompressionResistancePriority:playlistCompressionPriority
                                                        forOrientation:NSLayoutConstraintOrientationVertical];
     self.playlistHeaderTopConstraint.active = !self.playlistHeaderLabel.hidden;
 
@@ -176,9 +190,10 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     counterLabelConstraintToActivate.active = YES;
     counterLabelConstraintToDeactivate.active = NO;
     
-    if (!chaptersEnabled &&
-        self.viewSelector.selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
-        self.viewSelector.selectedSegment = VLCLibraryWindowSidebarViewPlaylistSegment;
+    NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:self.viewSelector.selectedSegment];
+    if ((!chaptersEnabled && [selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) ||
+        (!titlesEnabled && [selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title])) {
+        self.viewSelector.selectedSegment = 0;
         [self viewSelectorAction:self.viewSelector];
     }
 }
@@ -187,9 +202,12 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
 {
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
-    if (selectedSegment == VLCLibraryWindowSidebarViewPlaylistSegment) {
+    NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:selectedSegment];
+    if ([selectedSegmentLabel isEqualToString:self.playlistSidebarViewController.title]) {
         [self setChildViewController:self.playlistSidebarViewController];
-    } else if (selectedSegment == VLCLibraryWindowSidebarViewChaptersSegment) {
+    } else if ([selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title]) {
+        [self setChildViewController:self.titlesSidebarViewController];
+    } else if ([selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) {
         [self setChildViewController:self.chaptersSidebarViewController];
     } else {
         NSAssert(NO, @"Invalid or unknown segment selected for sidebar!");
@@ -205,6 +223,8 @@ const NSInteger VLCLibraryWindowSidebarViewChaptersSegment = 1;
     if (viewController.supportsItemCount) {
         viewController.counterLabel = self.counterLabel;
     }
+
+    self.playlistHeaderLabel.stringValue = viewController.title;
 
     NSView * const view = viewController.view;
     self.targetView.subviews = @[view];

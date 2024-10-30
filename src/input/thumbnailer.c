@@ -36,37 +36,18 @@ struct vlc_thumbnailer_t
     vlc_cond_t cond_ended;
 
     vlc_thumbnailer_req_id current_id;
+    vlc_tick_t timeout;
 
     struct vlc_list submitted_tasks; /**< list of struct task */
-};
-
-struct seek_target
-{
-    enum
-    {
-        VLC_THUMBNAILER_SEEK_TIME,
-        VLC_THUMBNAILER_SEEK_POS,
-    } type;
-    union
-    {
-        vlc_tick_t time;
-        double pos;
-    };
 };
 
 typedef struct task
 {
     vlc_thumbnailer_t *thumbnailer;
 
-    struct seek_target seek_target;
-    bool fast_seek;
+    struct vlc_thumbnailer_seek_arg seek_arg;
     input_item_t *item;
-    /**
-     * A positive value will be used as the timeout duration
-     * VLC_TICK_INVALID means no timeout
-     */
-    vlc_tick_t timeout;
-    vlc_thumbnailer_cb cb;
+    const struct vlc_thumbnailer_cbs *cbs;
     void* userdata;
 
     enum
@@ -87,8 +68,8 @@ static void RunnableRun(void *);
 
 static task_t *
 TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
-        struct seek_target seek_target, bool fast_seek,
-        vlc_thumbnailer_cb cb, void *userdata, vlc_tick_t timeout)
+        const struct vlc_thumbnailer_seek_arg *seek_arg,
+        const struct vlc_thumbnailer_cbs *cbs, void *userdata )
 {
     task_t *task = malloc(sizeof(*task));
     if (!task)
@@ -96,11 +77,15 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
 
     task->thumbnailer = thumbnailer;
     task->item = item;
-    task->seek_target = seek_target;
-    task->fast_seek = fast_seek;
-    task->cb = cb;
+    if (seek_arg == NULL)
+        task->seek_arg = (struct vlc_thumbnailer_seek_arg) {
+            .type = VLC_THUMBNAILER_SEEK_NONE,
+        };
+    else
+        task->seek_arg = *seek_arg;
+
+    task->cbs = cbs;
     task->userdata = userdata;
-    task->timeout = timeout;
 
     task->status = RUNNING;
     task->pic = NULL;
@@ -122,8 +107,7 @@ TaskDestroy(task_t *task)
 
 static void NotifyThumbnail(task_t *task, picture_t *pic)
 {
-    assert(task->cb);
-    task->cb(task->userdata, pic);
+    task->cbs->on_ended(pic, task->userdata);
 }
 
 static void
@@ -183,12 +167,22 @@ RunnableRun(void *userdata)
     if (!input)
         goto error;
 
-    if (task->seek_target.type == VLC_THUMBNAILER_SEEK_TIME)
-        input_SetTime(input, task->seek_target.time, task->fast_seek);
-    else
+    assert(task->seek_arg.speed == VLC_THUMBNAILER_SEEK_PRECISE
+        || task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST);
+    bool fast_seek = task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST;
+
+    switch (task->seek_arg.type)
     {
-        assert(task->seek_target.type == VLC_THUMBNAILER_SEEK_POS);
-        input_SetPosition(input, task->seek_target.pos, task->fast_seek);
+        case VLC_THUMBNAILER_SEEK_NONE:
+            break;
+        case VLC_THUMBNAILER_SEEK_TIME:
+            input_SetTime(input, task->seek_arg.time, fast_seek);
+            break;
+        case VLC_THUMBNAILER_SEEK_POS:
+            input_SetPosition(input, task->seek_arg.pos, fast_seek);
+            break;
+        default:
+            vlc_assert_unreachable();
     }
 
     int ret = input_Start(input);
@@ -199,14 +193,14 @@ RunnableRun(void *userdata)
     }
 
     vlc_mutex_lock(&thumbnailer->lock);
-    if (task->timeout == VLC_TICK_INVALID)
+    if (thumbnailer->timeout == VLC_TICK_INVALID)
     {
         while (task->status == RUNNING)
             vlc_cond_wait(&thumbnailer->cond_ended, &thumbnailer->lock);
     }
     else
     {
-        vlc_tick_t deadline = now + task->timeout;
+        vlc_tick_t deadline = now + thumbnailer->timeout;
         int timeout = 0;
         while (task->status == RUNNING && timeout == 0)
             timeout =
@@ -233,14 +227,15 @@ error:
     TaskDestroy(task);
 }
 
-static vlc_thumbnailer_req_id
-RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
-              enum vlc_thumbnailer_seek_speed speed, input_item_t *item,
-              vlc_tick_t timeout, vlc_thumbnailer_cb cb, void *userdata)
+vlc_thumbnailer_req_id
+vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
+                         input_item_t *item,
+                         const struct vlc_thumbnailer_seek_arg *seek_arg,
+                         const struct vlc_thumbnailer_cbs *cbs, void *userdata )
 {
-    bool fast_seek = speed == VLC_THUMBNAILER_SEEK_FAST;
-    task_t *task = TaskNew(thumbnailer, item, seek_target, fast_seek, cb,
-                           userdata, timeout);
+    assert( cbs != NULL && cbs->on_ended != NULL );
+
+    task_t *task = TaskNew(thumbnailer, item, seek_arg, cbs, userdata);
     if (!task)
         return 0;
 
@@ -255,35 +250,6 @@ RequestCommon(vlc_thumbnailer_t *thumbnailer, struct seek_target seek_target,
     vlc_executor_Submit(thumbnailer->executor, &task->runnable);
 
     return id;
-}
-
-vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByTime( vlc_thumbnailer_t *thumbnailer,
-                               vlc_tick_t time,
-                               enum vlc_thumbnailer_seek_speed speed,
-                               input_item_t *item, vlc_tick_t timeout,
-                               vlc_thumbnailer_cb cb, void* userdata )
-{
-    struct seek_target seek_target = {
-        .type = VLC_THUMBNAILER_SEEK_TIME,
-        .time = time,
-    };
-    return RequestCommon(thumbnailer, seek_target, speed, item, timeout, cb,
-                         userdata);
-}
-
-vlc_thumbnailer_req_id
-vlc_thumbnailer_RequestByPos( vlc_thumbnailer_t *thumbnailer,
-                              double pos, enum vlc_thumbnailer_seek_speed speed,
-                              input_item_t *item, vlc_tick_t timeout,
-                              vlc_thumbnailer_cb cb, void* userdata )
-{
-    struct seek_target seek_target = {
-        .type = VLC_THUMBNAILER_SEEK_POS,
-        .pos = pos,
-    };
-    return RequestCommon(thumbnailer, seek_target, speed, item, timeout, cb,
-                         userdata);
 }
 
 size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )
@@ -318,8 +284,10 @@ size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_r
     return count;
 }
 
-vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent)
+vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent, vlc_tick_t timeout )
 {
+    assert(timeout >= 0);
+
     vlc_thumbnailer_t *thumbnailer = malloc( sizeof( *thumbnailer ) );
     if ( unlikely( thumbnailer == NULL ) )
         return NULL;
@@ -333,6 +301,7 @@ vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent)
 
     thumbnailer->parent = parent;
     thumbnailer->current_id = 1;
+    thumbnailer->timeout = timeout;
     vlc_mutex_init(&thumbnailer->lock);
     vlc_cond_init(&thumbnailer->cond_ended);
     vlc_list_init(&thumbnailer->submitted_tasks);
@@ -340,7 +309,13 @@ vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent)
     return thumbnailer;
 }
 
-void vlc_thumbnailer_Release( vlc_thumbnailer_t *thumbnailer )
+void vlc_thumbnailer_SetTimeout( vlc_thumbnailer_t *thumbnailer,
+                                 vlc_tick_t timeout )
+{
+    thumbnailer->timeout = timeout;
+}
+
+void vlc_thumbnailer_Delete( vlc_thumbnailer_t *thumbnailer )
 {
     vlc_executor_Delete(thumbnailer->executor);
     free( thumbnailer );

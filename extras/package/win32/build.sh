@@ -483,6 +483,10 @@ if [ ! -z "$INSTALL_PATH" ]; then
 fi
 
 if [ -n "$BUILD_MESON" ]; then
+    # disable alarm() calls in tests. The timeout is handled by meson
+    VLC_CFLAGS="$VLC_CFLAGS -Dalarm="
+    VLC_CXXFLAGS="$VLC_CXXFLAGS -Dalarm="
+
     mkdir -p $SHORTARCH-meson
     rm -rf $SHORTARCH-meson/meson-private
 

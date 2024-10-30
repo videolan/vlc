@@ -36,7 +36,7 @@ struct vlc_preparser_t
     vlc_object_t* owner;
     input_fetcher_t* fetcher;
     vlc_executor_t *executor;
-    vlc_tick_t default_timeout;
+    vlc_tick_t timeout;
     atomic_bool deactivated;
 
     vlc_mutex_t lock;
@@ -52,7 +52,6 @@ struct task
     const input_item_parser_cbs_t *cbs;
     void *userdata;
     vlc_preparser_req_id id;
-    vlc_tick_t timeout;
 
     input_item_parser_id_t *parser;
 
@@ -70,10 +69,8 @@ static void RunnableRun(void *);
 static struct task *
 TaskNew(vlc_preparser_t *preparser, input_item_t *item,
         input_item_meta_request_option_t options,
-        const input_item_parser_cbs_t *cbs, void *userdata, vlc_tick_t timeout)
+        const input_item_parser_cbs_t *cbs, void *userdata)
 {
-    assert(timeout >= 0);
-
     struct task *task = malloc(sizeof(*task));
     if (!task)
         return NULL;
@@ -83,7 +80,6 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item,
     task->options = options;
     task->cbs = cbs;
     task->userdata = userdata;
-    task->timeout = timeout;
 
     input_item_Hold(item);
 
@@ -275,8 +271,8 @@ RunnableRun(void *userdata)
     struct task *task = userdata;
     vlc_preparser_t *preparser = task->preparser;
 
-    vlc_tick_t deadline = task->timeout ? vlc_tick_now() + task->timeout
-                                        : VLC_TICK_INVALID;
+    vlc_tick_t deadline = preparser->timeout ? vlc_tick_now() + preparser->timeout
+                                             : VLC_TICK_INVALID;
 
     if (task->options & META_REQUEST_OPTION_PARSE)
     {
@@ -319,11 +315,11 @@ Interrupt(struct task *task)
 }
 
 vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
-                                    vlc_tick_t default_timeout,
+                                    vlc_tick_t timeout,
                                     input_item_meta_request_option_t request_type )
 {
     assert(max_threads >= 1);
-    assert(default_timeout >= 0);
+    assert(timeout >= 0);
     assert(request_type & (META_REQUEST_OPTION_FETCH_ANY|META_REQUEST_OPTION_PARSE));
 
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
@@ -342,7 +338,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     else
         preparser->executor = NULL;
 
-    preparser->default_timeout = default_timeout;
+    preparser->timeout = timeout;
 
     preparser->owner = parent;
     if (request_type & META_REQUEST_OPTION_FETCH_ANY)
@@ -385,8 +381,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
         || preparser->fetcher != NULL);
 
     struct task *task =
-        TaskNew(preparser, item, i_options, cbs, cbs_userdata,
-                preparser->default_timeout);
+        TaskNew(preparser, item, i_options, cbs, cbs_userdata);
     if( !task )
         return 0;
 
@@ -451,7 +446,7 @@ void vlc_preparser_Deactivate( vlc_preparser_t* preparser )
 void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
                                vlc_tick_t timeout )
 {
-    preparser->default_timeout = timeout;
+    preparser->timeout = timeout;
 }
 
 void vlc_preparser_Delete( vlc_preparser_t *preparser )

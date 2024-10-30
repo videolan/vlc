@@ -62,6 +62,8 @@ Row {
 
             showHovered: modelData.showHovered
 
+            externalPressed: modelData.externalPressed
+
             color: (modelData.type === CSDButton.Close && (hovered || modelData.showHovered))
                    ? "white"
                    : windowButtonGroup.color
