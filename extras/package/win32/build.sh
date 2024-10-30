@@ -516,6 +516,7 @@ if [ -n "$BUILD_MESON" ]; then
     if [ -n "$VLC_EXE_WRAPPER" ]; then
         printf 'exe_wrapper = '"'"'%s'"'"'\n' "${VLC_EXE_WRAPPER}" >&3
     fi
+    printf 'cmake = '"'"'%s'"'"'\n' "$(command -v cmake)" >&3
 
     printf '\n[host_machine]\n' >&3
     printf 'system = '"'"'windows'"'"'\n' >&3
@@ -529,6 +530,7 @@ if [ -n "$BUILD_MESON" ]; then
     cd ${VLC_ROOT_PATH}
     meson setup ${BUILD_PATH}/$SHORTARCH-meson \
         -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS} -static-libstdc++" \
+        -Dcmake_prefix_path="${BUILD_PATH}/contrib/$CONTRIB_PREFIX" \
         $MCONFIGFLAGS \
         --cross-file ${BUILD_PATH}/$SHORTARCH-meson/crossfile.meson \
         --cross-file ${BUILD_PATH}/contrib/$CONTRIB_PREFIX/share/meson/cross/contrib.ini
