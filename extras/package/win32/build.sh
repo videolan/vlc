@@ -494,6 +494,7 @@ if [ -n "$BUILD_MESON" ]; then
         VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-pdb="
     fi
 
+    BUILD_PATH="$( pwd -P )"
     # generate the crossfile.meson
     test -e $SHORTARCH-meson/crossfile.meson && unlink $SHORTARCH-meson/crossfile.meson
     exec 3>$SHORTARCH-meson/crossfile.meson || return $?
@@ -517,6 +518,9 @@ if [ -n "$BUILD_MESON" ]; then
         printf 'exe_wrapper = '"'"'%s'"'"'\n' "${VLC_EXE_WRAPPER}" >&3
     fi
     printf 'cmake = '"'"'%s'"'"'\n' "$(command -v cmake)" >&3
+    if [ -z "$DISABLEGUI" ]; then
+        printf 'qmake6 = '"'"'%s'"'"'\n' "${BUILD_PATH}/contrib/${CONTRIB_PREFIX}/bin/qmake6" >&3
+    fi
 
     printf '\n[host_machine]\n' >&3
     printf 'system = '"'"'windows'"'"'\n' >&3
@@ -526,7 +530,6 @@ if [ -n "$BUILD_MESON" ]; then
 
 
     info "Configuring VLC"
-    BUILD_PATH="$( pwd -P )"
     cd ${VLC_ROOT_PATH}
     meson setup ${BUILD_PATH}/$SHORTARCH-meson \
         -Dc_args="${VLC_CFLAGS}" -Dc_link_args="${VLC_LDFLAGS}" -Dcpp_args="${VLC_CXXFLAGS}" -Dcpp_link_args="${VLC_LDFLAGS} -static-libstdc++" \
