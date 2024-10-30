@@ -100,6 +100,7 @@
                                     </tableColumn>
                                 </tableColumns>
                                 <connections>
+                                    <action selector="tableViewAction:" target="-2" id="Luw-YH-8N4"/>
                                     <outlet property="delegate" destination="-2" id="n2S-Eb-GVz"/>
                                 </connections>
                             </tableView>

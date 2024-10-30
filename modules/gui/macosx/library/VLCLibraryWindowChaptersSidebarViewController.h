@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
+- (IBAction)tableViewAction:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END

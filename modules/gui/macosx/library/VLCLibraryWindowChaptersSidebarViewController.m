@@ -119,6 +119,17 @@
     self.counterLabel.stringValue = [NSString stringWithFormat:@"%lu", chapterCount];
 }
 
+- (IBAction)tableViewAction:(id)sender
+{
+    VLCPlayerChapter * const selectedChapter =
+        self.chaptersArrayController.selectedObjects.firstObject;
+    if (selectedChapter == nil) {
+        return;
+    }
+
+    [VLCMain.sharedInstance.playlistController.playerController setTimeFast:selectedChapter.time];
+}
+
 # pragma mark - NSTableView delegation
 
 - (NSView *)tableView:(NSTableView *)tableView
@@ -147,17 +158,6 @@
 
     NSAssert(NO, @"Provided cell view for chapters table view should be valid!");
     return nil;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    VLCPlayerChapter * const selectedChapter = 
-        self.chaptersArrayController.selectedObjects.firstObject;
-    if (selectedChapter == nil) {
-        return;
-    }
-
-    [VLCMain.sharedInstance.playlistController.playerController setTimeFast:selectedChapter.time];
 }
 
 @end
