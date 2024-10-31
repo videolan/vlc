@@ -33,7 +33,7 @@ if mtp_dep.found()
 endif
 
 # UPnP Plugin (Intel SDK)
-upnp_dep = dependency('libupnp', required: get_option('upnp'))
+upnp_dep = dependency('libupnp', 'UPNP', required: get_option('upnp'))
 if upnp_dep.found()
 
     upnp_darwin_deps = []

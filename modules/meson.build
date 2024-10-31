@@ -186,7 +186,7 @@ avcodec_dep  = dependency('libavcodec', version: '>= 58.54.100', required: get_o
 avutil_dep   = dependency('libavutil', version: '>= 56.31.100', required: false)
 
 # Freetype, used by text_renderer and ASS access
-freetype_dep = dependency('freetype2', required: get_option('freetype'))
+freetype_dep = dependency('freetype2', 'freetype', required: get_option('freetype'))
 
 # ZVBI, used by Linsys SDI access and VBI/Teletext decoders
 zvbi_dep = dependency('zvbi-0.2', version: '>= 0.2.28', required: false)

@@ -175,7 +175,7 @@ vlc_modules += {
 }
 
 # JPEG codec
-jpeg_dep = dependency('libjpeg', required: get_option('jpeg'))
+jpeg_dep = dependency('libjpeg', 'libjpeg-turbo', required: get_option('jpeg'))
 vlc_modules += {
     'name' : 'jpeg',
     'sources' : files('jpeg.c'),
@@ -413,10 +413,10 @@ vlc_modules += {
 
 ## Xiph.org codecs
 
-ogg_dep = dependency('ogg', required: get_option('ogg'))
+ogg_dep = dependency('ogg', 'Ogg', required: get_option('ogg'))
 
 # FLAC codec
-flac_dep = dependency('flac', required: get_option('flac'))
+flac_dep = dependency('flac', 'FLAC', required: get_option('flac'))
 vlc_modules += {
     'name' : 'flac',
     'sources' : files('flac.c'),
@@ -474,7 +474,7 @@ vlc_modules += {
 }
 
 # Vorbis codec
-vorbis_dep    = dependency('vorbis', version: '>= 1.1', required: get_option('vorbis'))
+vorbis_dep    = dependency('vorbis', 'Vorbis', version: '>= 1.1', required: get_option('vorbis'))
 vorbisenc_dep = dependency('vorbisenc', version: '>= 1.1', required: get_option('vorbis'))
 vlc_modules += {
     'name' : 'vorbis',

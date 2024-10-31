@@ -256,8 +256,8 @@ vlc_modules += {
 }
 
 # MKV demux
-libebml_dep = dependency('libebml', required: get_option('matroska'))
-libmatroska_dep = dependency('libmatroska', required: get_option('matroska'))
+libebml_dep = dependency('libebml', 'EBML', required: get_option('matroska'))
+libmatroska_dep = dependency('libmatroska', 'Matroska', required: get_option('matroska'))
 if libebml_dep.found() and libmatroska_dep.found()
     vlc_modules += {
         'name' : 'mkv',
