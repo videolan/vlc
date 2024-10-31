@@ -502,21 +502,21 @@ if [ -n "$BUILD_MESON" ]; then
 
     printf '# This file was automatically generated!\n\n' >&3
     printf '[binaries]\n' >&3
-    printf 'c = '"'"'%s'"'"'\n' "${CC}" >&3
-    printf 'cpp = '"'"'%s'"'"'\n' "${CXX:-$TRIPLET-g++}" >&3
+    printf 'c = '"'"'%s'"'"'\n' "$(command -v ${CC})" >&3
+    printf 'cpp = '"'"'%s'"'"'\n' "$(command -v ${CXX:-$TRIPLET-g++})" >&3
     if [ -n "$VLC_AR" ]; then
-        printf 'ar = '"'"'%s'"'"'\n' "${VLC_AR}" >&3
+        printf 'ar = '"'"'%s'"'"'\n' "$(command -v ${VLC_AR})" >&3
     fi
     if [ -n "$VLC_RANLIB" ]; then
-        printf 'ranlib = '"'"'%s'"'"'\n' "${VLC_RANLIB}" >&3
+        printf 'ranlib = '"'"'%s'"'"'\n' "$(command -v ${VLC_RANLIB})" >&3
     fi
-    printf 'strip = '"'"'%s'"'"'\n' "${TRIPLET}-strip" >&3
+    printf 'strip = '"'"'%s'"'"'\n' "$(command -v ${TRIPLET}-strip)" >&3
     if [ -n "$VLC_PKG_CONFIG" ]; then
-        printf 'pkg-config = '"'"'%s'"'"'\n' "${VLC_PKG_CONFIG}" >&3
+        printf 'pkg-config = '"'"'%s'"'"'\n' "$(command -v ${VLC_PKG_CONFIG})" >&3
     fi
-    printf 'windres = '"'"'%s'"'"'\n' "${TRIPLET}-windres" >&3
+    printf 'windres = '"'"'%s'"'"'\n' "$(command -v ${TRIPLET}-windres)" >&3
     if [ -n "$VLC_EXE_WRAPPER" ]; then
-        printf 'exe_wrapper = '"'"'%s'"'"'\n' "${VLC_EXE_WRAPPER}" >&3
+        printf 'exe_wrapper = '"'"'%s'"'"'\n' "$(command -v ${VLC_EXE_WRAPPER})" >&3
     fi
     printf 'cmake = '"'"'%s'"'"'\n' "$(command -v cmake)" >&3
     if [ -z "$DISABLEGUI" ]; then
