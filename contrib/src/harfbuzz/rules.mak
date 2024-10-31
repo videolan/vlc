@@ -33,6 +33,6 @@ endif
 
 .harfbuzz: harfbuzz crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTTOOLS) $(MESON) $(HARFBUZZ_CONF)
+	$(MESON) $(HARFBUZZ_CONF)
 	+$(MESONBUILD)
 	touch $@
