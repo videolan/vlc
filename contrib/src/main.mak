@@ -544,7 +544,6 @@ ifdef HAVE_CROSS_COMPILE
 # expected.
 MESONFLAGS += --cross-file $(abspath crossfile.meson)
 MESON = env -i PATH="$(PATH)" \
-	CMAKE="$(shell command -v cmake)" \
 	CMAKE_PREFIX_PATH="$(PREFIX)" \
 	meson setup -Dpkg_config_path="$(PKG_CONFIG_PATH)" \
 	$(MESONFLAGS)
@@ -813,6 +812,7 @@ endif
 
 crossfile.meson: $(SRC)/gen-meson-machinefile.py
 	$(HOSTVARS_MESON) \
+	CMAKE="$(shell command -v cmake)" \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
