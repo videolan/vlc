@@ -435,6 +435,7 @@ else
 fi
 cd ../..
 
+MCONFIGFLAGS="$MCONFIGFLAGS --prefer-static"
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
      MCONFIGFLAGS="$MCONFIGFLAGS --buildtype debugoptimized"
