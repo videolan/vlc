@@ -347,8 +347,6 @@ HOSTTOOLS := \
 	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
 	PKG_CONFIG="$(PKG_CONFIG)"
 
-HOSTVARS_MESON := $(HOSTTOOLS)
-
 ifdef HAVE_BITCODE_ENABLED
 CFLAGS := $(CFLAGS) -fembed-bitcode
 CXXFLAGS := $(CXXFLAGS) -fembed-bitcode
@@ -810,7 +808,7 @@ endif
 endif
 
 crossfile.meson: $(SRC)/gen-meson-machinefile.py
-	$(HOSTVARS_MESON) \
+	$(HOSTTOOLS) \
 	CMAKE="$(shell command -v cmake)" \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \

@@ -20,6 +20,6 @@ glib: glib-$(GLIB_MINOR_VERSION).tar.xz .sum-glib
 
 .glib: glib
 	$(MESONCLEAN)
-	$(HOSTVARS_MESON) $(MESON)
+	$(HOSTTOOLS) $(MESON)
 	+$(MESONBUILD)
 	touch $@

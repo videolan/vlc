@@ -39,6 +39,6 @@ librist: librist-$(LIBRIST_VERSION).tar.gz .sum-librist
 
 .librist: librist crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTVARS_MESON) $(MESON) $(LIBRIST_CONF)
+	$(HOSTTOOLS) $(MESON) $(LIBRIST_CONF)
 	+$(MESONBUILD)
 	touch $@

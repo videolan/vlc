@@ -34,6 +34,6 @@ endif
 
 .opus: opus crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTVARS_MESON) $(MESON) $(OPUS_CONF)
+	$(HOSTTOOLS) $(MESON) $(OPUS_CONF)
 	+$(MESONBUILD)
 	touch $@
