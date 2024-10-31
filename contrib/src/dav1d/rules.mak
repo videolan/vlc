@@ -22,6 +22,6 @@ dav1d: dav1d-$(DAV1D_VERSION).tar.xz .sum-dav1d
 
 .dav1d: dav1d crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTVARS_MESON) $(MESON) $(DAV1D_CONF)
+	$(HOSTTOOLS) $(MESON) $(DAV1D_CONF)
 	+$(MESONBUILD)
 	touch $@

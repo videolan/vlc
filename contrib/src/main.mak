@@ -296,8 +296,6 @@ HOSTTOOLS := \
 	PATH="$(PREFIX)/bin:$(PATH)" \
 	PKG_CONFIG="$(PKG_CONFIG)"
 
-HOSTVARS_MESON := $(HOSTTOOLS)
-
 # Add these flags after Meson consumed the CFLAGS/CXXFLAGS
 # as when setting those for Meson, it would apply to tests
 # and cause the check if symbols have underscore prefix to
@@ -660,7 +658,7 @@ endif
 
 
 crossfile.meson: $(SRC)/gen-meson-crossfile.py
-	$(HOSTVARS_MESON) \
+	$(HOSTTOOLS) \
 	WINDRES="$(WINDRES)" \
 	PKG_CONFIG="$(PKG_CONFIG)" \
 	HOST_SYSTEM="$(MESON_SYSTEM_NAME)" \
