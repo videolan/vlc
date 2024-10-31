@@ -19,7 +19,7 @@ medialibrary: medialibrary-$(MEDIALIBRARY_VERSION).tar.bz2 .sum-medialibrary
 
 .medialibrary: medialibrary crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTTOOLS) $(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true
+	$(MESON) -Dlibvlc=disabled -Dlibtool_workaround=true
 	+$(MESONBUILD)
 	touch $@
 

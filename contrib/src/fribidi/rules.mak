@@ -19,6 +19,6 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.xz .sum-fribidi
 # FIXME: DEPS_fribidi = iconv $(DEPS_iconv)
 .fribidi: fribidi crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTTOOLS) $(MESON) -Ddocs=false -Dbin=false -Dtests=false
+	$(MESON) -Ddocs=false -Dbin=false -Dtests=false
 	+$(MESONBUILD)
 	touch $@

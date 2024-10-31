@@ -25,6 +25,6 @@ endif
 
 .libdsm: libdsm crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTTOOLS) $(MESON) -Dauto_features=disabled -Dbinaries=false
+	$(MESON) -Dauto_features=disabled -Dbinaries=false
 	+$(MESONBUILD)
 	touch $@

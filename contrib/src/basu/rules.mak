@@ -34,6 +34,6 @@ basu: basu-$(BASU_VERSION).tar.gz .sum-basu
 
 .basu: basu crossfile.meson
 	$(MESONCLEAN)
-	$(HOSTTOOLS) $(MESON)
+	$(MESON)
 	+$(MESONBUILD)
 	touch $@

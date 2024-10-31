@@ -546,7 +546,7 @@ MESON = env -i PATH="$(PATH)" \
 	$(MESONFLAGS)
 
 else
-MESON = meson setup $(MESONFLAGS)
+MESON = $(HOSTTOOLS) meson setup $(MESONFLAGS)
 endif
 MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
 MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
