@@ -517,7 +517,7 @@ CMAKE += -DCMAKE_LINK_LIBRARY_SUFFIX:STRING=.a
 endif
 
 MESONFLAGS = $(BUILD_DIR) $< --default-library static --prefix "$(PREFIX)" \
-	--backend ninja -Dlibdir=lib
+	--backend ninja -Dlibdir=lib -Dcmake_prefix_path="$(PREFIX)"
 ifndef WITH_OPTIMIZATION
 MESONFLAGS += --buildtype debug
 else
@@ -544,7 +544,6 @@ ifdef HAVE_CROSS_COMPILE
 # expected.
 MESONFLAGS += --cross-file $(abspath crossfile.meson)
 MESON = env -i PATH="$(PATH)" \
-	CMAKE_PREFIX_PATH="$(PREFIX)" \
 	meson setup -Dpkg_config_path="$(PKG_CONFIG_PATH)" \
 	$(MESONFLAGS)
 
