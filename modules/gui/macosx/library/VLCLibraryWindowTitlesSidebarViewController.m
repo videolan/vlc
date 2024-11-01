@@ -131,8 +131,8 @@
     VLCPlayerController * const playerController =
         VLCMain.sharedInstance.playlistController.playerController;
     const NSUInteger selectedTitleIndex = playerController.selectedTitleIndex;
-    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedTitleIndex]
-                byExtendingSelection:NO];
+    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:selectedTitleIndex];
+    [self.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
 }
 
 # pragma mark - NSTableView delegation
