@@ -66,6 +66,7 @@
                  options:nil];
 
     [self updateTitleList];
+    [self updateTitleSelection];
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
