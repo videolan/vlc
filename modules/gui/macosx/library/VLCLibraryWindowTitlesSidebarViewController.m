@@ -72,6 +72,10 @@
                            selector:@selector(titleListChanged:)
                                name:VLCPlayerTitleListChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(titleSelectionChanged:)
+                               name:VLCPlayerTitleSelectionChanged
+                             object:nil];
 }
 
 - (NSString *)title
@@ -114,6 +118,20 @@
     }
 
     [VLCMain.sharedInstance.playlistController.playerController setSelectedTitleIndex:selectedTitle.index];
+}
+
+- (void)titleSelectionChanged:(NSNotification *)notification
+{
+    [self updateTitleSelection];
+}
+
+- (void)updateTitleSelection
+{
+    VLCPlayerController * const playerController =
+        VLCMain.sharedInstance.playlistController.playerController;
+    const NSUInteger selectedTitleIndex = playerController.selectedTitleIndex;
+    [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedTitleIndex]
+                byExtendingSelection:NO];
 }
 
 # pragma mark - NSTableView delegation
