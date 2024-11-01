@@ -66,6 +66,7 @@
                  options:nil];
 
     [self updateChapterList];
+    [self updateSelectedChapter];
     
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
