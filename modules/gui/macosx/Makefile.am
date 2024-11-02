@@ -368,10 +368,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCDefaultValueSliderCell.m \
 	gui/macosx/views/VLCDragDropView.h \
 	gui/macosx/views/VLCDragDropView.m \
-	gui/macosx/views/VLCHUDOutlineView.h \
-	gui/macosx/views/VLCHUDOutlineView.m \
-	gui/macosx/views/VLCHUDTableCornerView.h \
-	gui/macosx/views/VLCHUDTableCornerView.m \
 	gui/macosx/views/VLCImageButton.h \
 	gui/macosx/views/VLCImageButton.m \
 	gui/macosx/views/VLCImageView.h \
