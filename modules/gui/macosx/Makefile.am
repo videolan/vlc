@@ -372,8 +372,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCHUDOutlineView.m \
 	gui/macosx/views/VLCHUDTableCornerView.h \
 	gui/macosx/views/VLCHUDTableCornerView.m \
-	gui/macosx/views/VLCHUDTableView.h \
-	gui/macosx/views/VLCHUDTableView.m \
 	gui/macosx/views/VLCImageButton.h \
 	gui/macosx/views/VLCImageButton.m \
 	gui/macosx/views/VLCImageView.h \
