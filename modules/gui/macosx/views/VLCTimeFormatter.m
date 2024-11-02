@@ -22,7 +22,16 @@
 
 #import "VLCTimeFormatter.h"
 
+#import "extensions/NSString+Helpers.h"
+
 @implementation VLCTimeFormatter
+
+- (NSString *)stringForObjectValue:(id)obj
+{
+    NSParameterAssert([obj isKindOfClass:NSNumber.class]);
+    NSNumber * const time = obj;
+    return [NSString stringWithTime:time.longLongValue];
+}
 
 - (BOOL)getObjectValue:(out id _Nullable *)obj
              forString:(NSString *)string
