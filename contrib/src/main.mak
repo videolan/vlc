@@ -326,7 +326,7 @@ endif
 
 # Add these flags after CMake consumed the CFLAGS/CXXFLAGS
 # CMake handles the optimization level with CMAKE_BUILD_TYPE
-HOSTVARS_CMAKE := $(HOSTTOOLS) \
+HOSTVARS_CMAKE := \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
