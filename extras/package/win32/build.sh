@@ -287,12 +287,18 @@ if [ ! -z "$BUILD_UCRT" ]; then
             fi
         fi
 
+        if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
+            VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments"
+            VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments"
+            VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
+        fi
         VLC_LDFLAGS="$VLC_LDFLAGS -lwindowsapp"
         VLC_CFLAGS="$VLC_CFLAGS -Wl,-lwindowsapp"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-lwindowsapp"
         if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
-            VLC_CFLAGS="$VLC_CFLAGS -Wno-unused-command-line-argument"
-            VLC_CXXFLAGS="$VLC_CXXFLAGS -Wno-unused-command-line-argument"
+            VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
+            VLC_CFLAGS="$VLC_CFLAGS --end-no-unused-arguments"
+            VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
         fi
     else
         SHORTARCH="$SHORTARCH-ucrt"
