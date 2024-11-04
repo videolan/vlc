@@ -137,44 +137,6 @@
 {
     _audioDecorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self];
     _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.view addConstraints:@[
-        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.view
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.view
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.view
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:_audioDecorativeView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.view
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1.
-                                      constant:0.
-        ],
-    ]];
-
-    [self.view addSubview:self.audioDecorativeView
-               positioned:NSWindowBelow
-               relativeTo:self.mainControlsView];
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
@@ -234,7 +196,43 @@
         VLCInputItem * const inputItem = controller.currentMedia;
         decorativeViewVisible = inputItem != nil && controller.videoTracks.count == 0;
     }
-    _audioDecorativeView.hidden = !decorativeViewVisible;
+
+    NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
+    self.voutContainingView.subviews = @[targetView];
+    [self.voutContainingView addConstraints:@[
+        [NSLayoutConstraint constraintWithItem:targetView
+                                     attribute:NSLayoutAttributeTop
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.voutContainingView
+                                     attribute:NSLayoutAttributeTop
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:targetView
+                                     attribute:NSLayoutAttributeBottom
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.voutContainingView
+                                     attribute:NSLayoutAttributeBottom
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:targetView
+                                     attribute:NSLayoutAttributeLeft
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.voutContainingView
+                                     attribute:NSLayoutAttributeLeft
+                                    multiplier:1.
+                                      constant:0.
+        ],
+        [NSLayoutConstraint constraintWithItem:targetView
+                                     attribute:NSLayoutAttributeRight
+                                     relatedBy:NSLayoutRelationEqual
+                                        toItem:self.voutContainingView
+                                     attribute:NSLayoutAttributeRight
+                                    multiplier:1.
+                                      constant:0.
+        ],
+    ]];
 
     if (decorativeViewVisible) {
         [self setAutohideControls:NO];
