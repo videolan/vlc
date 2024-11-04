@@ -333,6 +333,9 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     VLC_AR="$TRIPLET-ar"
     # avoid using gcc-ranlib with the clang toolchain, if both are installed
     VLC_RANLIB="$TRIPLET-ranlib"
+    # force linking with the static C++ runtime of LLVM
+    VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a -static-libstdc++ --end-no-unused-arguments"
+    VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a --end-no-unused-arguments"
 fi
 
 if [ -z "$PKG_CONFIG" ]; then
