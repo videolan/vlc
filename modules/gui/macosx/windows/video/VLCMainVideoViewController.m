@@ -507,7 +507,7 @@
         return;
     [self.view.window orderOut:self.view.window];
     _voutViewController = [PIPVoutViewController new];
-    _voutViewController.view = _voutView;
+    _voutViewController.view = self.voutContainingView;
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
@@ -555,15 +555,19 @@
 }
 
 - (void)pipWillClose:(PIPViewController *)pip {
-    [_voutView removeFromSuperview];
-    [_voutContainingView addSubview:_voutView];
-    [_voutContainingView.topAnchor constraintEqualToAnchor:_voutView.topAnchor].active = YES;
-    [_voutContainingView.bottomAnchor constraintEqualToAnchor:_voutView.bottomAnchor].active = YES;
-    [_voutContainingView.leftAnchor constraintEqualToAnchor:_voutView.leftAnchor].active = YES;
-    [_voutContainingView.rightAnchor constraintEqualToAnchor:_voutView.rightAnchor].active = YES;
+    [self.voutContainingView removeFromSuperview];
+    [self.view addSubview:self.voutContainingView
+               positioned:NSWindowBelow
+               relativeTo:self.mainControlsView];
+    [NSLayoutConstraint activateConstraints:@[
+        [self.voutContainingView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
+        [self.voutContainingView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+        [self.voutContainingView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
+        [self.voutContainingView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor]
+    ]];
     _voutViewController = nil;
     pip.replacementWindow = self.view.window;
-    pip.replacementRect = self.voutContainingView.frame;
+    pip.replacementRect = self.view.frame;
 }
 
 - (void)pipDidClose:(PIPViewController *)pip {
