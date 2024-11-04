@@ -44,9 +44,6 @@ _add_environ_val('CMAKE_OSX_SYSROOT', 'OSX_SYSROOT')
 _add_environ_val('CMAKE_C_COMPILER', 'CC')
 _add_environ_val('CMAKE_CXX_COMPILER', 'CXX')
 
-_add_environ_val('CMAKE_C_SYSROOT_FLAG', 'C_SYSROOT_FLAG')
-_add_environ_val('CMAKE_CXX_SYSROOT_FLAG', 'CXX_SYSROOT_FLAG')
-
 _add_environ_val('CMAKE_ANDROID_NDK', 'ANDROID_NDK')
 _add_environ_val('CMAKE_ANDROID_ARCH_ABI', 'ANDROID_ABI')
 _add_environ_val('CMAKE_ANDROID_API', 'ANDROID_API')
