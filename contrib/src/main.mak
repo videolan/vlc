@@ -672,6 +672,7 @@ endif
 else
 	echo "set(CMAKE_AR $(AR) CACHE FILEPATH \"Archiver\")" >> $@
 endif
+	echo "set(CMAKE_LINKER $(LD))" >> $@
 ifdef HAVE_CROSS_COMPILE
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
 ifdef HAVE_ANDROID
