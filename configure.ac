@@ -1064,7 +1064,7 @@ PKG_PROG_PKG_CONFIG()
 
 dnl On some OS we need static linking
 AS_IF([test -n "${PKG_CONFIG}" ],[
-    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "darwin" -o "${SYS}" = "os2" ],[
+    AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "darwin" -o "${SYS}" = "os2" -o "${SYS}" = "emscripten" ],[
         PKG_CONFIG="${PKG_CONFIG} --static"
     ])
 ])
