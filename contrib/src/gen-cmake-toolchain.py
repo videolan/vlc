@@ -53,6 +53,8 @@ _add_environ_val('CMAKE_ANDROID_NDK', 'ANDROID_NDK')
 _add_environ_val('CMAKE_ANDROID_ARCH_ABI', 'ANDROID_ABI')
 _add_environ_val('CMAKE_ANDROID_API', 'ANDROID_API')
 
+_add_environ_val('PKG_CONFIG_EXECUTABLE', 'PKG_CONFIG')
+
 _add_environ_val('CMAKE_FIND_ROOT_PATH', 'PREFIX')
 
 _add_environ_val('CMAKE_FIND_ROOT_PATH', 'FIND_ROOT_PATH')
