@@ -687,6 +687,7 @@ endif
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
+	echo "set(PKG_CONFIG_EXECUTABLE $(PKG_CONFIG))" >> $@
 ifeq ($(findstring msys,$(BUILD)),msys)
 	echo "set(CMAKE_FIND_ROOT_PATH `cygpath -m $(PREFIX)`)" >> $@
 else
