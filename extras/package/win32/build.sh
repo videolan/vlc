@@ -317,8 +317,8 @@ echo $PATH
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 if [ ! -z "$WITH_PDB" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-pdb"
-    VLC_CFLAGS="$VLC_CFLAGS -gcodeview"
-    VLC_CXXFLAGS="$VLC_CXXFLAGS -gcodeview"
+    VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments -gcodeview --end-no-unused-arguments"
+    VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments -gcodeview --end-no-unused-arguments"
     if [ ! -z "$PDB_MAP" ]; then
         VLC_CFLAGS="$VLC_CFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
