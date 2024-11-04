@@ -41,9 +41,6 @@ _add_environ_val('CMAKE_LINKER', 'LD')
 
 _add_environ_val('CMAKE_OSX_SYSROOT', 'OSX_SYSROOT')
 
-# we should not have to set this
-_add_environ_val('_CMAKE_TOOLCHAIN_PREFIX', 'TOOLCHAIN_PREFIX')
-
 _add_environ_val('CMAKE_C_COMPILER', 'CC')
 _add_environ_val('CMAKE_CXX_COMPILER', 'CXX')
 
