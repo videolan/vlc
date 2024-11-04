@@ -262,7 +262,7 @@ if [ ! -z "$BUILD_UCRT" ]; then
             VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
         fi
         # WinstoreCompat: hopefully can go away someday
-        VLC_LDFLAGS="$VLC_LDFLAGS -lwindowsapp -lwindowsappcompat"
+        VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-lwindowsapp -Wl,-lwindowsappcompat"
         VLC_CFLAGS="$VLC_CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         VLC_CPPFLAGS="$VLC_CPPFLAGS -DWINSTORECOMPAT"
