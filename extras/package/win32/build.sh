@@ -546,55 +546,55 @@ if [ -n "$BUILD_MESON" ]; then
     cd ${BUILD_PATH}/$SHORTARCH-meson
     meson compile -j $JOBS
 else
-info "Bootstrapping"
-${VLC_ROOT_PATH}/bootstrap
+    info "Bootstrapping"
+    ${VLC_ROOT_PATH}/bootstrap
 
-mkdir -p $SHORTARCH
-cd $SHORTARCH
+    mkdir -p $SHORTARCH
+    cd $SHORTARCH
 
-# set environment that will be kept in config.status
-if [ -n "$VLC_CPPFLAGS" ]; then
-    export CPPFLAGS="$VLC_CPPFLAGS"
-fi
-if [ -n "$VLC_CFLAGS" ]; then
-    export CFLAGS="$VLC_CFLAGS"
-fi
-if [ -n "$VLC_CXXFLAGS" ]; then
-    export CXXFLAGS="$VLC_CXXFLAGS"
-fi
-if [ -n "$VLC_LDFLAGS" ]; then
-    export LDFLAGS="$VLC_LDFLAGS"
-fi
-if [ -n "$VLC_AR" ]; then
-    export AR="$VLC_AR"
-fi
-if [ -n "$VLC_RANLIB" ]; then
-    export RANLIB="$VLC_RANLIB"
-fi
-if [ -n "$VLC_PKG_CONFIG" ]; then
-    export PKG_CONFIG="$VLC_PKG_CONFIG"
-fi
-if [ -n "$VLC_PKG_CONFIG_LIBDIR" ]; then
-    export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
-fi
+    # set environment that will be kept in config.status
+    if [ -n "$VLC_CPPFLAGS" ]; then
+        export CPPFLAGS="$VLC_CPPFLAGS"
+    fi
+    if [ -n "$VLC_CFLAGS" ]; then
+        export CFLAGS="$VLC_CFLAGS"
+    fi
+    if [ -n "$VLC_CXXFLAGS" ]; then
+        export CXXFLAGS="$VLC_CXXFLAGS"
+    fi
+    if [ -n "$VLC_LDFLAGS" ]; then
+        export LDFLAGS="$VLC_LDFLAGS"
+    fi
+    if [ -n "$VLC_AR" ]; then
+        export AR="$VLC_AR"
+    fi
+    if [ -n "$VLC_RANLIB" ]; then
+        export RANLIB="$VLC_RANLIB"
+    fi
+    if [ -n "$VLC_PKG_CONFIG" ]; then
+        export PKG_CONFIG="$VLC_PKG_CONFIG"
+    fi
+    if [ -n "$VLC_PKG_CONFIG_LIBDIR" ]; then
+        export PKG_CONFIG_LIBDIR="$VLC_PKG_CONFIG_LIBDIR"
+    fi
 
-info "Configuring VLC"
-${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
+    info "Configuring VLC"
+    ${SCRIPT_PATH}/configure.sh --host=$TRIPLET --with-contrib=../contrib/$CONTRIB_PREFIX "$WIXPATH" $CONFIGFLAGS
 
-info "Compiling"
-make -j$JOBS
+    info "Compiling"
+    make -j$JOBS
 
-if [ "$INSTALLER" = "n" ]; then
-make package-win32-debug-7zip
-make -j$JOBS package-win32 package-msi
-elif [ "$INSTALLER" = "r" ]; then
-make package-win32
-elif [ "$INSTALLER" = "u" ]; then
-make package-win32-release
-sha512sum vlc-*-release.7z
-elif [ "$INSTALLER" = "m" ]; then
-make package-msi
-elif [ ! -z "$INSTALL_PATH" ]; then
-make package-win-common
-fi
+    if [ "$INSTALLER" = "n" ]; then
+        make package-win32-debug-7zip
+        make -j$JOBS package-win32 package-msi
+    elif [ "$INSTALLER" = "r" ]; then
+        make package-win32
+    elif [ "$INSTALLER" = "u" ]; then
+        make package-win32-release
+        sha512sum vlc-*-release.7z
+    elif [ "$INSTALLER" = "m" ]; then
+        make package-msi
+    elif [ ! -z "$INSTALL_PATH" ]; then
+        make package-win-common
+    fi
 fi
