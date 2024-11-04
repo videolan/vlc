@@ -37,6 +37,7 @@ _add_environ_val('CMAKE_CXX_COMPILER_RANLIB', 'RANLIB')
 _add_environ_val('CMAKE_AR', 'AR')
 _add_environ_val('CMAKE_C_COMPILER_AR', 'AR')
 _add_environ_val('CMAKE_CXX_COMPILER_AR', 'AR')
+_add_environ_val('CMAKE_LINKER', 'LD')
 
 _add_environ_val('CMAKE_OSX_SYSROOT', 'OSX_SYSROOT')
 
