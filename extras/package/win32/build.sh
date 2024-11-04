@@ -292,7 +292,7 @@ if [ ! -z "$BUILD_UCRT" ]; then
             VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments"
             VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
         fi
-        VLC_LDFLAGS="$VLC_LDFLAGS -lwindowsapp"
+        VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-lwindowsapp"
         VLC_CFLAGS="$VLC_CFLAGS -Wl,-lwindowsapp"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-lwindowsapp"
         if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
