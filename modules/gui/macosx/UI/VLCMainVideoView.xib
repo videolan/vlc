@@ -495,17 +495,17 @@
                 </progressIndicator>
             </subviews>
             <constraints>
+                <constraint firstItem="D4V-Zd-qvB" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="0vg-TG-O1c"/>
                 <constraint firstItem="MTR-ds-I8o" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="2cq-kJ-XAR"/>
+                <constraint firstAttribute="bottom" secondItem="D4V-Zd-qvB" secondAttribute="bottom" id="D7Y-ck-iZE"/>
                 <constraint firstAttribute="trailing" secondItem="MTR-ds-I8o" secondAttribute="trailing" id="E2t-0S-hdB"/>
-                <constraint firstItem="D4V-Zd-qvB" firstAttribute="leading" secondItem="MTR-ds-I8o" secondAttribute="leading" id="LJf-4H-NXB"/>
-                <constraint firstItem="D4V-Zd-qvB" firstAttribute="top" secondItem="MTR-ds-I8o" secondAttribute="top" id="M6r-Gq-UVy"/>
                 <constraint firstItem="xOQ-YR-iAc" firstAttribute="top" secondItem="CvV-yX-Nbh" secondAttribute="bottom" constant="20" id="S0Y-3b-Ibd"/>
                 <constraint firstItem="MTR-ds-I8o" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="TJ3-v0-eiw"/>
-                <constraint firstItem="D4V-Zd-qvB" firstAttribute="bottom" secondItem="MTR-ds-I8o" secondAttribute="bottom" id="cC2-Et-2M0"/>
+                <constraint firstAttribute="trailing" secondItem="D4V-Zd-qvB" secondAttribute="trailing" id="XP7-9K-6UE"/>
                 <constraint firstItem="xOQ-YR-iAc" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="enR-Xo-ume"/>
                 <constraint firstItem="1GA-GG-Sdx" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xOQ-YR-iAc" secondAttribute="bottom" constant="20" id="jM9-dz-8jm"/>
                 <constraint firstAttribute="bottom" secondItem="MTR-ds-I8o" secondAttribute="bottom" id="mbp-Lj-iuX"/>
-                <constraint firstItem="D4V-Zd-qvB" firstAttribute="trailing" secondItem="MTR-ds-I8o" secondAttribute="trailing" id="uy6-SD-44y"/>
+                <constraint firstItem="D4V-Zd-qvB" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="n1X-TQ-EW3"/>
             </constraints>
             <point key="canvasLocation" x="66" y="-232"/>
         </customView>
