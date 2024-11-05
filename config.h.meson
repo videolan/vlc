@@ -3,6 +3,12 @@
 /* Define to 1 to allow running VLC as root (uid 0). */
 #mesondefine ALLOW_RUN_AS_ROOT
 
+/* Define to 1 if AVX inline assembly is available. */
+#mesondefine CAN_COMPILE_AVX
+
+/* Define to 1 if AVX2 inline assembly is available. */
+#mesondefine CAN_COMPILE_AVX2
+
 /* Define to 1 if SSE2 inline assembly is available. */
 #mesondefine CAN_COMPILE_SSE2
 
@@ -78,6 +84,9 @@
 
 /* Support for __attribute__((packed)) for structs */
 #mesondefine HAVE_ATTRIBUTE_PACKED
+
+/* Define to 1 if AVX2 intrinsics are available. */
+#mesondefine HAVE_AVX2_INTRINSICS
 
 /* Define to 1 if you have the `backtrace' function. */
 #mesondefine HAVE_BACKTRACE
