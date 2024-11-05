@@ -981,7 +981,9 @@ cdata.set_quoted('PKGDATADIR', pkgdatadir_path)
 cdata.set_quoted('LOCALEDIR', localedir_path)
 
 # Enable stream outputs
-cdata.set('ENABLE_SOUT', get_option('stream_outputs'))
+if get_option('stream_outputs')
+    cdata.set('ENABLE_SOUT', 1)
+endif
 
 # Enable VLM
 if get_option('videolan_manager')
@@ -993,10 +995,14 @@ endif
 
 # Allow running as root
 # (useful for people running on embedded platforms)
-cdata.set('ALLOW_RUN_AS_ROOT', get_option('run_as_root'))
+if get_option('run_as_root')
+    cdata.set('ALLOW_RUN_AS_ROOT', 1)
+endif
 
 # Optimize for memory usage vs speed
-cdata.set('OPTIMIZE_MEMORY', get_option('optimize_memory'))
+if get_option('optimize_memory')
+    cdata.set('OPTIMIZE_MEMORY', 1)
+endif
 
 # Allow binary package maintainer to pass a custom string
 # to avoid cache problem
