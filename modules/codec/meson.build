@@ -605,7 +605,7 @@ vlc_modules += {
         libva_dep.found()
 }
 
-
+d3d11_common_lib = []
 if host_system == 'windows'
     d3d11_common_lib = static_library('d3d11_common',
         files(
@@ -620,6 +620,7 @@ if host_system == 'windows'
             cc.find_library('dxguid'),
             cc.find_library('wbemuuid'),
             cc.find_library('uuid'),
+            cc.find_library('d3d11'),
         ]
     )
     d3d9_common_lib = static_library('d3d9_common',
