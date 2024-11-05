@@ -208,7 +208,6 @@ endif
 if get_option('vcd_module')
     vcd_cdda_flags = []
 
-    # TODO: Add gcrypt dependency if it's present
     libcddb_dep = dependency('libcddb', version: '>= 0.9.5', required: get_option('libcddb'))
     if libcddb_dep.found()
         vcd_cdda_flags += '-DHAVE_LIBCDDB'
@@ -226,7 +225,7 @@ if get_option('vcd_module')
         needed_vcd_unix_headers_present = false
     endif
 
-    if (needed_vcd_unix_headers_present or 
+    if (needed_vcd_unix_headers_present or
         host_system in ['windows'] or have_osx)
 
         vcd_cdda_darwin_deps = []
@@ -243,7 +242,7 @@ if get_option('vcd_module')
             ),
             'c_args' : vcd_cdda_flags,
             'link_with' : vlc_json_lib,
-            'dependencies' : [libcddb_dep, vcd_cdda_darwin_deps]
+            'dependencies' : [libcddb_dep, vcd_cdda_darwin_deps, gcrypt_dep]
         }
 
         vlc_modules += {
