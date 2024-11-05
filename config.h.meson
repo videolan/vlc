@@ -92,6 +92,9 @@
 /* Define if the compiler supports typeof. */
 #mesondefine HAVE_CXX_TYPEOF
 
+/* Define to 1 if you have the <d3d11_4.h> header file. */
+#mesondefine HAVE_D3D11_4_H
+
 /* Define to 1 if you have the <dcomp.h> header file. */
 #mesondefine HAVE_DCOMP_H
 
@@ -100,6 +103,12 @@
 
 /* Define to 1 if you have the `dup3' function. */
 #mesondefine HAVE_DUP3
+
+/* Define to 1 if you have the <dxgi1_6.h> header file. */
+#mesondefine HAVE_DXGI1_6_H
+
+/* Define to 1 if you have the <dxgidebug.h> header file. */
+#mesondefine HAVE_DXGIDEBUG_H
 
 /* Define to 1 if you have the `eventfd' function. */
 #mesondefine HAVE_EVENTFD
