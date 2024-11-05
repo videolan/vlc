@@ -649,6 +649,17 @@ if host_system == 'windows'
         'link_with' : [ d3d11_common_lib ],
         'dependencies' : mft_deps
     }
+
+    vlc_modules += {
+        'name' : 'dmo',
+        'sources' : files(
+                'dmo/dmo.c',
+                'dmo/buffer.c',
+            ),
+        'dependencies': [
+            cc.find_library('uuid'),
+        ]
+    }
 endif
 
 # OpenMAX IL codec
