@@ -1052,11 +1052,6 @@ if flex.found() and bison.found()
         arguments: ['-o', '@OUTPUT@', '@INPUT@'])
 endif
 
-# Generate config.h
-configure_file(input: 'config.h.meson',
-  output: 'config.h',
-  configuration: cdata)
-
 # Some missing functions are implemented in compat
 subdir('compat')
 
@@ -1074,6 +1069,11 @@ subdir('bin')
 
 # VLC plugins
 subdir('modules')
+
+# Generate config.h
+configure_file(input: 'config.h.meson',
+  output: 'config.h',
+  configuration: cdata)
 
 if (get_option('tests').allowed())
     # Integration and non-regression tests, some unittest are there too but the
