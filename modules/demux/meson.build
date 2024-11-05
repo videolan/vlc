@@ -339,11 +339,6 @@ vlc_modules += {
 aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribb24'))
 libdvbpsi_dep = dependency('libdvbpsi', version: '>= 1.2.0', required: get_option('libdvbpsi'))
 if libdvbpsi_dep.found()
-    arrib24_define = []
-    if aribb24_dep.found()
-        arrib24_define += '-DHAVE_ARIBB24=1'
-    endif
-
     vlc_modules += {
         'name' : 'ts',
         'sources' : files(
@@ -370,7 +365,6 @@ if libdvbpsi_dep.found()
             '../codec/opus_header.c',
         ),
         'dependencies' : [libdvbpsi_dep, aribb24_dep],
-        'c_args' : arrib24_define
     }
 endif
 
