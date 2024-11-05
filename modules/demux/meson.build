@@ -585,9 +585,8 @@ vlc_modules += {
 
     ),
     'include_directories' : include_directories('adaptive', './'),
-    'dependencies' : [socket_libs, m_lib, z_dep],
+    'dependencies' : [socket_libs, m_lib, z_dep, gcrypt_dep],
     'link_with' : vlc_http_lib,
-    # TODO: Add optional GCRYPT dependency!
 }
 
 # noseek demux
