@@ -640,6 +640,16 @@ option('harfbuzz',
     value: 'auto',
     description: 'Harfbuzz support')
 
+option('d3d11va',
+    type: 'feature',
+    value: 'auto',
+    description: 'Direct3D11 avcodec support')
+
+option('dxva2',
+    type: 'feature',
+    value: 'auto',
+    description: 'DXVA2 avcodec support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
@@ -651,8 +661,6 @@ option('harfbuzz',
 # TODO: Missing gst-decode
 # TODO: Missing merge-ffmpeg
 # TODO: Missing libva
-# TODO: Missing dxva2
-# TODO: Missing d3d11va
 # TODO: Missing tremor
 # TODO: Missing x26410b
 # TODO: Missing vdpau

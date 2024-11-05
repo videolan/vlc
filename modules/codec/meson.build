@@ -651,6 +651,53 @@ if host_system == 'windows'
         'dependencies' : mft_deps
     }
 
+    if (get_option('d3d11va').
+        enable_auto_if(cc.check_header('libavcodec/d3d11va.h', args: [contrib_inc_args]))
+        .allowed())
+        cdata.set('HAVE_LIBAVCODEC_D3D11VA_H', 1)
+        vlc_modules += {
+            'name' : 'd3d11va',
+            'sources' : files(
+                    'avcodec/d3d11va.c',
+                    'avcodec/directx_va.c',
+                    'avcodec/va_surface.c',
+                    '../packetizer/h264_nal.c',
+                    '../packetizer/hevc_nal.c',
+                    'avcodec/dxva_blocklist.c',
+                ),
+            'cpp_args' : libcom_cppflags,
+            'link_with' : [ d3d11_common_lib ],
+            'include_directories' : [
+                vlc_include_dirs,
+                include_directories('avcodec')
+            ],
+            'dependencies' : [avcodec_dep, avutil_dep],
+        }
+    endif
+
+    if (get_option('dxva2').
+        enable_auto_if(cc.check_header('libavcodec/dxva2.h', args: [contrib_inc_args]))
+        .allowed())
+        cdata.set('HAVE_LIBAVCODEC_DXVA2_H', 1)
+        vlc_modules += {
+            'name' : 'dxva2',
+            'sources' : files(
+                    'avcodec/dxva2.c',
+                    'avcodec/directx_va.c',
+                    'avcodec/va_surface.c',
+                    '../packetizer/h264_nal.c',
+                    '../packetizer/hevc_nal.c',
+                    'avcodec/dxva_blocklist.c',
+                ),
+            'link_with' : [ d3d9_common_lib ],
+            'include_directories' : [
+                vlc_include_dirs,
+                include_directories('avcodec')
+            ],
+            'dependencies' : [avcodec_dep, avutil_dep],
+        }
+    endif
+
     vlc_modules += {
         'name' : 'dmo',
         'sources' : files(
