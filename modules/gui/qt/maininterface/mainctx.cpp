@@ -774,7 +774,7 @@ VideoSurfaceProvider* MainCtx::getVideoSurfaceProvider() const
  * Events stuff
  ************************************************************************/
 
-bool MainCtx::onWindowClose( QWindow* )
+void MainCtx::onWindowClose( QWindow* )
 {
     PlaylistController* playlistController = p_intf->p_mainPlaylistController;
     PlayerController* playerController = p_intf->p_mainPlayerController;
@@ -792,12 +792,10 @@ bool MainCtx::onWindowClose( QWindow* )
             }
         });
         playlistController->stop();
-        return false;
     }
     else
     {
         emit askToQuit(); /* ask THEDP to quit, so we have a unique method */
-        return true;
     }
 }
 

@@ -244,18 +244,9 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
             }
         }
 
-        bool ret = m_mainCtx->onWindowClose(m_window);
-        if (ret)
-        {
-            /* Accept session quit. Otherwise we break the desktop mamager. */
-            event->accept();
-            return false;
-        }
-        else
-        {
-            event->ignore();
-            return true;
-        }
+        m_mainCtx->onWindowClose(m_window);
+        event->ignore();
+        return true;
     }
     default:
         break;

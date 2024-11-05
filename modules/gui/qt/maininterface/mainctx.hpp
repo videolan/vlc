@@ -278,9 +278,8 @@ public:
 
     /**
      * @brief ask for the application to terminate
-     * @return true if the application can be close right away, false if it will be delayed
      */
-    bool onWindowClose(QWindow* );
+    void onWindowClose(QWindow* );
 
     bool acrylicActive() const;
     void setAcrylicActive(bool newAcrylicActive);
