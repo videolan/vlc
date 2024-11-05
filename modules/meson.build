@@ -194,10 +194,6 @@ zvbi_dep = dependency('zvbi-0.2', version: '>= 0.2.28', required: false)
 # rsvg, used by SVG codec and text renderer
 rsvg_dep = dependency('librsvg-2.0', version: '>= 2.9.0', required: get_option('rsvg'))
 
-# libgcrypt, used by rtp, access, stream_out
-libgcrypt_dep = dependency('libgcrypt',
-                            version: '>= 1.6.0',
-                            required: get_option('libgcrypt'))
 # Rust support
 cargo_bin = find_program('cargo', required: get_option('rust'))
 

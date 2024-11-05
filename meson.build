@@ -1022,7 +1022,9 @@ if get_option('default_monospace_font_family') != ''
     cdata.set_quoted('DEFAULT_MONOSPACE_FAMILY', get_option('default_monospace_font_family'))
 endif
 
-gcrypt_dep = dependency('libgcrypt', required: get_option('libgcrypt'))
+gcrypt_dep = dependency('libgcrypt',
+                         version: '>= 1.6.0',
+                         required: get_option('libgcrypt'))
 
 # Flex/Bison support
 # This defines the `bison_gen` and `flex_gen` generator variables to be used
