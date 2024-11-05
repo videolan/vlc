@@ -61,6 +61,9 @@
 /* Define to 1 if you have the `aligned_alloc' function. */
 #mesondefine HAVE_ALIGNED_ALLOC
 
+/* AMD HQScaler supported */
+#mesondefine HAVE_AMF_SCALER
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #mesondefine HAVE_ARPA_INET_H
 

@@ -650,6 +650,11 @@ option('dxva2',
     value: 'auto',
     description: 'DXVA2 avcodec support')
 
+option('amf_scaler',
+    type: 'feature',
+    value: 'auto',
+    description: 'AMF HQScaler support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
