@@ -39,7 +39,7 @@ endif
 
 # HTTP PUT
 vlc_modules += {
-    'name' : 'access_output_http_put',
+    'name' : 'access_http_put',
     'sources' : files('http-put.c'),
     'include_directories' : include_directories('../access/http'),
     'link_with' : [vlc_http_lib]
