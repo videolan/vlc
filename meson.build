@@ -441,8 +441,7 @@ ucrt_version_test = '''
     if get_option('winstore_app')
         have_win_store = true
         windowsappcompat_lib = cc.find_library('windowsappcompat')
-        # TODO: enable when meson 0.63 is required
-        # add_project_dependencies(windowsappcompat_lib, language: ['c', 'cpp'])
+        add_project_dependencies(windowsappcompat_lib, language: ['c', 'cpp'])
     else
         have_win_desktop = true
     endif
