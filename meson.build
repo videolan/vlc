@@ -347,7 +347,7 @@ windows_version_test = '''
     endforeach
 
     # Check for HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY type
-    if cc.has_type('PROCESS_MITIGATION_IMAGE_LOAD_POLICY', prefix: '#include <winnt.h>')
+    if cc.has_type('PROCESS_MITIGATION_IMAGE_LOAD_POLICY', prefix: '#include <windows.h>')
         cdata.set('HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY', 1)
     endif
 
