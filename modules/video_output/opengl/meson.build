@@ -28,7 +28,7 @@ if opengl_dep.found() and not (have_ios or have_tvos)
                                    ])
 
     vlc_modules += {
-        'name' : 'libgl',
+        'name' : 'gl',
         'sources' : [
                 files('display.c'),
                 opengl_vout_commonsources
@@ -61,7 +61,7 @@ if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.f
     endif
 
     vlc_modules += {
-        'name' : 'interop_sw',
+        'name' : 'glinterop_sw',
         'sources' : files('interop_sw.c'),
         'dependencies' : interop_sw_deps,
         'c_args' : interop_sw_cargs,
@@ -74,7 +74,7 @@ if have_win_desktop
     opengl32_lib = cc.find_library('opengl32', required: false)
     if opengl32_lib.found() and not missing_win_glew
         vlc_modules += {
-            'name' : 'interop_dxva2',
+            'name' : 'glinterop_dxva2',
             'sources' : files('interop_dxva2.c'),
             'c_args' : [ contrib_inc_args ],
             'dependencies' : [ opengl32_lib ],
