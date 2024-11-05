@@ -131,6 +131,9 @@
 /* Define to 1 if you have the <sys/auxv.h> header file */
 #mesondefine HAVE_SYS_AUXV_H
 
+/* Defined if having gcrypt */
+#mesondefine HAVE_GCRYPT
+
 /* Define to 1 if you have the `getauxval' function. */
 #mesondefine HAVE_GETAUXVAL
 

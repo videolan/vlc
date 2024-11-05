@@ -1025,6 +1025,9 @@ endif
 gcrypt_dep = dependency('libgcrypt',
                          version: '>= 1.6.0',
                          required: get_option('libgcrypt'))
+if gcrypt_dep.found()
+    cdata.set('HAVE_GCRYPT', 1)
+endif
 
 # Flex/Bison support
 # This defines the `bison_gen` and `flex_gen` generator variables to be used
