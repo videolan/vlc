@@ -139,6 +139,9 @@ subdir('buildsystem/simd_checks')
 
 # zlib library
 z_dep = dependency('zlib', required: false)
+if z_dep.found()
+    cdata.set('HAVE_ZLIB', 1)
+endif
 
 # Math library
 m_lib = cc.find_library('m', required: false)
@@ -235,7 +238,7 @@ check_c_headers = [
     ['valgrind/valgrind.h'],
     ['X11/Xlib.h'],
     ['xlocale.h'],
-    ['zlib.h'],
+    ['zlib.h', { 'args' : [contrib_inc_args] }],
     ['wordexp.h'],
     ['dxgi1_6.h'],
     ['dxgidebug.h'],
