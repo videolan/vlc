@@ -169,8 +169,8 @@ FocusScope {
         anchors {
             left: parent.left
             right: parent.right
-            top: (MainCtx.hasEmbededVideo && !rootPlayer._controlsUnderVideo) ? parent.top : topBar.bottom
-            bottom: (MainCtx.hasEmbededVideo && !rootPlayer._controlsUnderVideo) ? parent.bottom : controlBar.top
+            top: (MainCtx.hasEmbededVideo && rootPlayer._controlsUnderVideo) ? topBar.bottom : parent.top
+            bottom: (MainCtx.hasEmbededVideo && rootPlayer._controlsUnderVideo) ? controlBar.top : parent.bottom
         }
 
         sourceComponent: MainCtx.hasEmbededVideo ? videoComponent : audioComponent
