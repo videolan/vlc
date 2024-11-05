@@ -36,6 +36,36 @@ vlc_modules += {
     'sources' : files('antiflicker.c')
 }
 
+if host_system == 'windows'
+    vlc_modules += {
+        'name' : 'amf_frc',
+        'sources' : files(
+                'amf_frc.c',
+                '../hw/amf/amf_helper.c',
+            ),
+        'link_with': [ d3d11_common_lib ],
+        'dependencies': [ contrib_dep, cc.find_library('d3d11')],
+        'enabled' : get_option('amf_frc').allowed() \
+                    and cc.find_library('d3d11').found() \
+                    and cc.check_header('AMF/core/PropertyStorage.h', args: [contrib_inc_args]) \
+                    and cc.check_header('AMF/components/FRC.h', args: [contrib_inc_args]),
+    }
+
+    vlc_modules += {
+        'name' : 'amf_vqenhancer',
+        'sources' : files(
+                'amf_vqenhancer.c',
+                '../hw/amf/amf_helper.c',
+            ),
+        'link_with': [ d3d11_common_lib ],
+        'dependencies': [ contrib_dep, cc.find_library('d3d11') ],
+        'enabled' : get_option('amf_vqenhancer').allowed() \
+                    and cc.find_library('d3d11').found() \
+                    and cc.check_header('AMF/core/PropertyStorage.h', args: [contrib_inc_args]) \
+                    and cc.check_header('AMF/components/VQEnhancer.h', args: [contrib_inc_args]),
+    }
+endif
+
 # Ball filter
 vlc_modules += {
     'name' : 'ball',
