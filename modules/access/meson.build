@@ -288,7 +288,7 @@ endif
 libbluray_dep = dependency('libbluray', version: '>= 1.1.0', required: get_option('bluray'))
 if libbluray_dep.found()
     vlc_modules += {
-        'name' : 'bluray',
+        'name' : 'libbluray',
         'sources' : files('bluray.c'),
         'dependencies' : [libbluray_dep]
     }
