@@ -135,8 +135,7 @@ vlc_modules += {
         'rtcp.c',
         'rtsp.c',
     ),
-    'dependencies' : [socket_libs]
-    # TODO: Add optional GCrypt dependency
+    'dependencies' : [socket_libs, srtp_dep]
 }
 
 # Chromaprint module
