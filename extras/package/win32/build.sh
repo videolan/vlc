@@ -360,7 +360,7 @@ if [ "$RELEASE" != "yes" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
 fi
 if [ -n "$DISABLEGUI" ]; then
-    CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qt5compat --disable-qtshadertools --disable-qtwayland"
+    CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtshadertools --disable-qtwayland"
 fi
 
 if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
