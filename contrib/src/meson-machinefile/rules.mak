@@ -21,7 +21,7 @@ meson-machinefile/contrib.ini: $(SRC)/gen-meson-machinefile.py meson-machinefile
 	PREFIX="$(PREFIX)" \
 	$(SRC)/gen-meson-machinefile.py \
 		--type external-$(CROSS_OR_NATIVE) \
-		$(foreach tool,$(filter-out $(PKGS_FOUND),$(PKGS.tools)),--binary $(tool):$(PKGS.tools.$(tool).path)) \
+		$(foreach tool,$(filter-out $(PKGS_FOUND),$(PKGS.tools)),--binary $(PKGS.tools.$(tool).config-tool):$(PKGS.tools.$(tool).path)) \
 		$@
 
 # Dummy target, there is nothing to check

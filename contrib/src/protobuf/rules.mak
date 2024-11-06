@@ -18,6 +18,7 @@ ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += protoc
 endif
 endif
+PKGS.tools.protoc.config-tool = protoc
 PKGS.tools.protoc.path = $(BUILDBINDIR)/protoc
 
 ifeq ($(call system_tool_majmin, protoc --version),$(PROTOBUF_MAJPACKAGE).$(PROTOBUF_MAJVERSION))
