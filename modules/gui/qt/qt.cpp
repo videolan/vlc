@@ -853,8 +853,6 @@ static void *Thread( void *obj )
 #endif
     Q_INIT_RESOURCE( shaders );
 
-    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
-    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );
     Q_INIT_RESOURCE( qmake_QtQml );
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     Q_INIT_RESOURCE( qmake_QtQml_Base );
@@ -869,6 +867,7 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qmake_QtQuick_Controls_Basic_impl );
     Q_INIT_RESOURCE( qmake_QtQuick_Layouts );
     Q_INIT_RESOURCE( qmake_QtQuick_Templates );
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     // Qt Quick Effects:
     Q_INIT_RESOURCE( qmake_QtQuick_Effects );
     Q_INIT_RESOURCE( effects );
@@ -897,6 +896,13 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( multieffect_shaders23 );
     Q_INIT_RESOURCE( multieffect_shaders24 );
     Q_INIT_RESOURCE( multieffect_shaders25 );
+#else
+    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects );
+    Q_INIT_RESOURCE( qmake_Qt5Compat_GraphicalEffects_private );
+    Q_INIT_RESOURCE( qtgraphicaleffectsplugin_raw_qml_0 );
+    Q_INIT_RESOURCE( qtgraphicaleffectsprivate_raw_qml_0 );
+    Q_INIT_RESOURCE( qtgraphicaleffectsshaders );
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     Q_INIT_RESOURCE( QuickControls2Basic_raw_qml_0 );
@@ -906,9 +912,6 @@ static void *Thread( void *obj )
     Q_INIT_RESOURCE( qtquickcontrols2basicstyleplugin );
 #endif
 
-    Q_INIT_RESOURCE( qtgraphicaleffectsplugin_raw_qml_0 );
-    Q_INIT_RESOURCE( qtgraphicaleffectsprivate_raw_qml_0 );
-    Q_INIT_RESOURCE( qtgraphicaleffectsshaders );
     // Q_INIT_RESOURCE( qtquickshapes_shaders );
 #endif
 
