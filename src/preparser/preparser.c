@@ -304,6 +304,9 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     if (!preparser)
         return NULL;
 
+    preparser->timeout = timeout;
+    preparser->owner = parent;
+
     if (request_type & VLC_PREPARSER_TYPE_PARSE)
     {
         preparser->parser = vlc_executor_New(max_threads);
@@ -316,9 +319,6 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     else
         preparser->parser = NULL;
 
-    preparser->timeout = timeout;
-
-    preparser->owner = parent;
     if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
     {
         preparser->fetcher = input_fetcher_New(parent, request_type);
