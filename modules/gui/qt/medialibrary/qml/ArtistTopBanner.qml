@@ -20,7 +20,6 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
 import QtQml.Models
-import Qt5Compat.GraphicalEffects
 
 import VLC.MainInterface
 import VLC.MediaLibrary
@@ -73,7 +72,7 @@ FocusScope {
         layer.textureSize: Qt.size(width * .75, height * .75)
     }
 
-    FastBlur {
+    Widgets.BlurEffect {
         anchors.fill: background
         source: background
         radius: VLCStyle.dp(4, VLCStyle.scale)
