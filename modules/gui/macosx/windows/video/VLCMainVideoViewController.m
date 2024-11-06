@@ -577,8 +577,13 @@
     pip.replacementRect = self.view.frame;
 }
 
-- (void)pipDidClose:(PIPViewController *)pip {
-    [self.view.window orderFront:self.view.window];
+- (void)pipDidClose:(PIPViewController *)pip
+{
+    NSWindow * const window = self.view.window;
+    if ([window isKindOfClass:VLCLibraryWindow.class]) {
+        [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
+    }
+    [window makeKeyAndOrderFront:window];
 }
 
 - (void)pipActionPlay:(PIPViewController *)pip {
