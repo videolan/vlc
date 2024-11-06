@@ -1,0 +1,129 @@
+From 4d0144a9cc4efa195ae3e7f6b99b2daa9ad47b54 Mon Sep 17 00:00:00 2001
+From: Nirbheek Chauhan <nirbheek@centricular.com>
+Date: Fri, 3 Feb 2023 17:27:48 +0530
+Subject: [PATCH] Fix usage of pthread_jit_write_protect_np() on macOS and iOS
+
+The API is not available on iOS at all, and is only available on macOS
+starting from macOS 11, as can be seen in `pthread/pthread.h` in the
+Xcode SDK:
+
+```
+__API_AVAILABLE(macos(11.0))
+__API_UNAVAILABLE(ios, tvos, watchos, driverkit)
+void pthread_jit_write_protect_np(int enabled);
+
+__API_AVAILABLE(macos(11.0))
+__API_UNAVAILABLE(ios, tvos, watchos, driverkit)
+int pthread_jit_write_protect_supported_np(void);
+```
+
+The configuration check for this is actually wrong. We should detect
+availability of the API at compile time and use it conditionally at
+runtime. The code now checks the following cases:
+
+1. Are we building for macOS?
+2. Do we have a new-enough SDK that defines MAC_OS_VERSION_11_0 and
+   hence has pthread_jit_write_* available?
+3. Is the maximum macOS version allowed at least macOS 11.0, so we
+   have a possibility of using this API at runtime?
+4. Are we running on macOS 11.0 or newer?
+
+Also: we need to ensure that pthread_jit_write_protect_supported_np()
+actually returns true before using the API, because if you're shipping
+an app, you need to set `com.apple.security.cs.allow-jit` in your app
+otherwise the API won't work if you've opted in to Hardened Runtime.
+See: https://developer.apple.com/documentation/apple-silicon/porting-just-in-time-compilers-to-apple-silicon
+
+Fixes https://gitlab.freedesktop.org/gstreamer/orc/-/issues/44
+---
+ meson.build       |  8 --------
+ orc/orccompiler.c | 26 ++++++++++++++++----------
+ 2 files changed, 16 insertions(+), 18 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index ef636d0..b1901d3 100644
+--- a/meson.build
++++ b/meson.build
+@@ -130,14 +130,6 @@ cdata.set('HAVE_MONOTONIC_CLOCK', cc.compiles(monotonic_test))
+ cdata.set('HAVE_GETTIMEOFDAY', cc.has_function('gettimeofday'))
+ cdata.set('HAVE_POSIX_MEMALIGN', cc.has_function('posix_memalign', prefix : '#include <stdlib.h>'))
+ cdata.set('HAVE_MMAP', cc.has_function('mmap'))
+-
+-# pthread_jit_write_protect_np() is available but unusable on iOS simulator
+-if host_os == 'ios' and cpu_family == 'x86_64'
+-  cdata.set('HAVE_PTHREAD_JIT', false)
+-else
+-  cdata.set('HAVE_PTHREAD_JIT', cc.has_function('pthread_jit_write_protect_np'))
+-endif
+-
+ cdata.set('HAVE_SYS_TIME_H', cc.has_header('sys/time.h'))
+ cdata.set('HAVE_UNISTD_H', cc.has_header('unistd.h'))
+ cdata.set('HAVE_VALGRIND_VALGRIND_H', cc.has_header('valgrind/valgrind.h'))
+diff --git a/orc/orccompiler.c b/orc/orccompiler.c
+index a391e86..19bec9e 100644
+--- a/orc/orccompiler.c
++++ b/orc/orccompiler.c
+@@ -6,7 +6,7 @@
+ #include <stdlib.h>
+ #include <stdarg.h>
+ 
+-#if defined(HAVE_PTHREAD_JIT)
++#ifdef __APPLE__
+   #include <pthread.h>
+ #endif
+ 
+@@ -64,6 +64,17 @@ int _orc_compiler_flag_randomize;
+ /* For Windows */
+ int _orc_codemem_alignment;
+ 
++#if defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
++G_ALWAYS_INLINE
++static void
++orc_pthread_jit_write_protect_np (int protect)
++{
++  if (__builtin_available (macOS 10.11, *))
++    if (pthread_jit_write_protect_supported_np ())
++      pthread_jit_write_protect_np (protect);
++}
++#endif
++
+ void
+ _orc_compiler_init (void)
+ {
+@@ -126,11 +137,6 @@ _orc_compiler_init (void)
+     }
+   }
+ #endif
+-
+-#if defined(HAVE_PTHREAD_JIT)
+-  ORC_INFO("pthread_jit_write_protect_supported_np() = %i",
+-      pthread_jit_write_protect_supported_np());
+-#endif
+ }
+ 
+ int
+@@ -456,8 +462,8 @@ orc_program_compile_full (OrcProgram *program, OrcTarget *target,
+   program->orccode->code_size = compiler->codeptr - compiler->code;
+   orc_code_allocate_codemem (program->orccode, program->orccode->code_size);
+ 
+-#if defined(HAVE_PTHREAD_JIT)
+-  pthread_jit_write_protect_np(0);
++#if defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
++  orc_pthread_jit_write_protect_np (0);
+ #endif
+ #if defined(HAVE_CODEMEM_VIRTUALALLOC)
+   /* Ensure that code region is writable before memcpy */
+@@ -475,8 +481,8 @@ orc_program_compile_full (OrcProgram *program, OrcTarget *target,
+     compiler->target->flush_cache (program->orccode);
+   }
+ 
+-#if defined(HAVE_PTHREAD_JIT)
+-  pthread_jit_write_protect_np(1);
++#if defined(MAC_OS_VERSION_11_0) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
++  orc_pthread_jit_write_protect_np (1);
+ #endif
+ #if defined(HAVE_CODEMEM_VIRTUALALLOC)
+   /* Code region is now ready for execution */
+-- 
+2.45.0.windows.1
+

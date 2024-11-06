@@ -14,6 +14,7 @@ $(TARBALLS)/orc-$(ORC_VERSION).tar.bz2:
 
 orc: orc-$(ORC_VERSION).tar.bz2 .sum-orc
 	$(UNPACK)
+	$(APPLY) $(SRC)/orc/0001-Fix-usage-of-pthread_jit_write_protect_np-on-macOS-a.patch
 	$(MOVE)
 
 ORC_CONF := -Dauto_features=disabled
