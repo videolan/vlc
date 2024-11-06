@@ -53,8 +53,6 @@ struct task
     void *userdata;
     vlc_preparser_req_id id;
 
-    input_item_parser_id_t *parser;
-
     vlc_sem_t preparse_ended;
     int preparse_status;
     atomic_bool interrupted;
@@ -80,7 +78,6 @@ TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
 
     input_item_Hold(item);
 
-    task->parser = NULL;
     vlc_sem_init(&task->preparse_ended, 0);
     task->preparse_status = VLC_EGENERIC;
     atomic_init(&task->interrupted, false);
@@ -208,8 +205,9 @@ Parse(struct task *task, vlc_tick_t deadline)
         .subitems = task->options & VLC_PREPARSER_OPTION_SUBITEMS,
         .interact = task->options & VLC_PREPARSER_OPTION_INTERACT,
     };
-    task->parser = input_item_Parse(obj, task->item, &cfg);
-    if (!task->parser)
+    input_item_parser_id_t *parser =
+        input_item_Parse(obj, task->item, &cfg);
+    if (parser == NULL)
     {
         task->preparse_status = VLC_EGENERIC;
         return;
@@ -221,13 +219,13 @@ Parse(struct task *task, vlc_tick_t deadline)
     else
         if (vlc_sem_timedwait(&task->preparse_ended, deadline))
         {
-            input_item_parser_id_Release(task->parser);
+            input_item_parser_id_Release(parser);
             task->preparse_status = VLC_ETIMEOUT;
             return;
         }
 
     /* This call also interrupts the parsing if it is still running */
-    input_item_parser_id_Release(task->parser);
+    input_item_parser_id_Release(parser);
 }
 
 static int
