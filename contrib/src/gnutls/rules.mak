@@ -34,6 +34,9 @@ gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g $(UNPACK_DIR)/lib/includes/gnutls/gnutls.h.in
 
+	# disable __faccessat usage on Darwin as it's not available on our minimum target
+	$(APPLY) $(SRC)/gnutls/__faccessat-darwin.patch
+
 	# replace HANDLE_FLAG_INHERIT which may not be available in older UWP
 	sed -i.orig -e s/HANDLE_FLAG_INHERIT/0x1/g $(UNPACK_DIR)/gl/fcntl.c
 
