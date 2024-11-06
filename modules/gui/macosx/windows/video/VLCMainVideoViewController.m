@@ -500,35 +500,44 @@
     [_overlayView setNeedsDisplay:YES];
 }
 
-- (void)pictureInPictureChanged:(VLCPlayerController *)playerController {
-    if (_voutViewController)
+- (void)pictureInPictureChanged:(VLCPlayerController *)playerController
+{
+    if (_voutViewController) {
         return;
-    [self.view.window orderOut:self.view.window];
+    }
+
+    NSWindow * const window = self.view.window;
+    [window orderOut:window];
     _voutViewController = [PIPVoutViewController new];
     _voutViewController.view = self.voutContainingView;
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
     
-    VLCInputItem *item = controller.currentMedia;
+    VLCInputItem * const item = controller.currentMedia;
     input_item_t * const p_input = item.vlcInputItem;
     vlc_mutex_lock(&p_input->lock);
     const struct input_item_es *item_es;
-    vlc_vector_foreach_ref(item_es, &p_input->es_vec)
-    {
-        if (item_es->es.i_cat != VIDEO_ES)
+    vlc_vector_foreach_ref(item_es, &p_input->es_vec) {
+        if (item_es->es.i_cat != VIDEO_ES) {
             continue;
-        const video_format_t *fmt = &item_es->es.video;
+        }
+        const video_format_t * const fmt = &item_es->es.video;
         unsigned int width = fmt->i_visible_width;
         unsigned int height = fmt->i_visible_height;
-        if (fmt->i_sar_num && fmt->i_sar_den)
+        if (fmt->i_sar_num && fmt->i_sar_den) {
             height = (height * fmt->i_sar_den) / fmt->i_sar_num;
+        }
         _pipViewController.aspectRatio = CGSizeMake(width, height);
         break;
     }
     vlc_mutex_unlock(&p_input->lock);
-    _pipViewController.title = self.view.window.title;
+    _pipViewController.title = window.title;
     [_pipViewController presentViewControllerAsPictureInPicture:_voutViewController];
+    
+    if ([window isKindOfClass:VLCLibraryWindow.class]) {
+        [self returnToLibrary:self];
+    }
 }
 
 - (IBAction)togglePlaylist:(id)sender
