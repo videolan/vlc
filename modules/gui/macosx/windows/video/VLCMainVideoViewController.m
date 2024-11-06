@@ -557,11 +557,13 @@
 }
 #pragma mark - PIPViewControllerDelegate
 
-- (BOOL)pipShouldClose:(PIPViewController *)pip {
+- (BOOL)pipShouldClose:(PIPViewController *)pip
+{
     return YES;
 }
 
-- (void)pipWillClose:(PIPViewController *)pip {
+- (void)pipWillClose:(PIPViewController *)pip
+{
     [self.voutContainingView removeFromSuperview];
     [self.view addSubview:self.voutContainingView
                positioned:NSWindowBelow
@@ -586,9 +588,10 @@
     [window makeKeyAndOrderFront:window];
 }
 
-- (void)pipActionPlay:(PIPViewController *)pip {
+- (void)pipActionPlay:(PIPViewController *)pip
+{
     VLCPlayerController * const controller =
-    VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playlistController.playerController;
     if (controller.playerState == VLC_PLAYER_STATE_PAUSED) {
         [controller resume];
     } else {
@@ -596,7 +599,8 @@
     }
 }
 
-- (void)pipActionStop:(PIPViewController *)pip {
+- (void)pipActionStop:(PIPViewController *)pip
+{
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playlistController.playerController;
     [controller pause];
