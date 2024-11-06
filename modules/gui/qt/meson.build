@@ -801,8 +801,10 @@ qml_modules += {
 
 if qt6_dep.version().version_compare('>=6.5.0')
     qml_dynamicshadow_file = 'widgets/qml/DynamicShadow.qml'
+    qml_blureffect_file = 'widgets/qml/BlurEffect.qml'
 else
     qml_dynamicshadow_file = 'widgets/qml/compat/DynamicShadow.qml'
+    qml_blureffect_file = 'widgets/qml/compat/BlurEffect.qml'
 endif
 
 qml_modules += {
@@ -889,6 +891,7 @@ qml_modules += {
         'widgets/qml/ViewHeader.qml',
         'widgets/qml/ProgressIndicator.qml',
         qml_dynamicshadow_file,
+        qml_blureffect_file,
     ),
 }
 
