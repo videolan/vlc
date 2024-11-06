@@ -348,9 +348,9 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
     VLC_UNUSED(media);
     VLC_UNUSED(preparser_callbacks);
 #else
-    return vlc_preparser_Push(parser, media, META_REQUEST_OPTION_PARSE |
-                              META_REQUEST_OPTION_DO_INTERACT |
-                              META_REQUEST_OPTION_PARSE_SUBITEMS,
+    return vlc_preparser_Push(parser, media, VLC_PREPARSER_TYPE_PARSE |
+                              VLC_PREPARSER_OPTION_INTERACT |
+                              VLC_PREPARSER_OPTION_SUBITEMS,
                               &preparser_callbacks, tree);
 #endif
 }

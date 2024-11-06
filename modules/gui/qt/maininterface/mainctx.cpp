@@ -252,7 +252,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     }
 
     m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), 1, 0,
-                                            META_REQUEST_OPTION_PARSE);
+                                            VLC_PREPARSER_TYPE_PARSE);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

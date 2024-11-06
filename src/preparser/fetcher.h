@@ -42,12 +42,11 @@ typedef struct input_fetcher_callbacks_t {
 /**
  * This function creates the fetcher object and thread.
  *
- * @param request_type a combination of META_REQUEST_OPTION_FETCH_LOCAL and
- * META_REQUEST_OPTION_FETCH_NETWORK, it is used to setup the executors for
+ * @param request_type a combination of VLC_PREPARSER_TYPE_FETCHMETA_LOCAL and
+ * VLC_PREPARSER_TYPE_FETCHMETA_NET, it is used to setup the executors for
  * each domain.
  */
-input_fetcher_t *input_fetcher_New( vlc_object_t *,
-                                    input_item_meta_request_option_t request_type );
+input_fetcher_t *input_fetcher_New( vlc_object_t *, int request_type );
 
 /**
  * This function enqueues the provided item to be art fetched.
@@ -55,8 +54,7 @@ input_fetcher_t *input_fetcher_New( vlc_object_t *,
  * The input item is retained until the art fetching is done or until the
  * fetcher object is destroyed.
  */
-int input_fetcher_Push( input_fetcher_t *, input_item_t *,
-                        input_item_meta_request_option_t,
+int input_fetcher_Push( input_fetcher_t *, input_item_t *, int,
                         const input_fetcher_callbacks_t *, void * );
 
 /**

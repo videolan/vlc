@@ -149,10 +149,9 @@ vlc_playlist_AutoPreparse(vlc_playlist_t *playlist, input_item_t *input,
                 return;
         }
 
-        input_item_meta_request_option_t options =
-            META_REQUEST_OPTION_PARSE | META_REQUEST_OPTION_FETCH_LOCAL;
+        int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
         if (parse_subitems)
-            options |= META_REQUEST_OPTION_PARSE_SUBITEMS;
+            options |= VLC_PREPARSER_OPTION_SUBITEMS;
 
         vlc_preparser_Push(playlist->parser, input, options,
                            &preparser_callbacks, playlist);

@@ -46,17 +46,14 @@ typedef size_t vlc_preparser_req_id;
 
 #define VLC_PREPARSER_REQ_ID_INVALID 0
 
-typedef enum input_item_meta_request_option_t
-{
-    META_REQUEST_OPTION_NONE          = 0x00,
-    META_REQUEST_OPTION_PARSE         = 0x01,
-    META_REQUEST_OPTION_FETCH_LOCAL   = 0x02,
-    META_REQUEST_OPTION_FETCH_NETWORK = 0x04,
-    META_REQUEST_OPTION_FETCH_ANY     =
-        META_REQUEST_OPTION_FETCH_LOCAL|META_REQUEST_OPTION_FETCH_NETWORK,
-    META_REQUEST_OPTION_DO_INTERACT   = 0x08,
-    META_REQUEST_OPTION_PARSE_SUBITEMS = 0x10,
-} input_item_meta_request_option_t;
+#define VLC_PREPARSER_TYPE_PARSE            0x01
+#define VLC_PREPARSER_TYPE_FETCHMETA_LOCAL  0x02
+#define VLC_PREPARSER_TYPE_FETCHMETA_NET    0x04
+#define VLC_PREPARSER_TYPE_FETCHMETA_ALL \
+    (VLC_PREPARSER_TYPE_FETCHMETA_LOCAL|VLC_PREPARSER_TYPE_FETCHMETA_NET)
+
+#define VLC_PREPARSER_OPTION_INTERACT 0x1000
+#define VLC_PREPARSER_OPTION_SUBITEMS 0x2000
 
 /**
  * This function creates the preparser object and thread.
@@ -64,15 +61,14 @@ typedef enum input_item_meta_request_option_t
  * @param obj the parent object
  * @param max_threads the maximum number of threads used to parse, must be >= 1
  * @param timeout timeout of the preparser, 0 for no limits.
- * @param request_type a combination of META_REQUEST_OPTION_PARSE,
- * META_REQUEST_OPTION_FETCH_LOCAL and META_REQUEST_OPTION_FETCH_NETWORK, it is
- * used to setup the executors for each domain.
+ * @param types a combination of VLC_PREPARSER_TYPE_* flags, it is used to
+ * setup the executors for each domain. Its possible to select more than one
+ * types
  * @return a valid preparser object or NULL in case of error
  */
 VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
                                             unsigned max_threads,
-                                            vlc_tick_t timeout,
-                                            input_item_meta_request_option_t request_type );
+                                            vlc_tick_t timeout, int types );
 
 /**
  * This function enqueues the provided item to be preparsed or fetched.
@@ -82,7 +78,9 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  *
  * @param preparser the preparser object
  * @param item a valid item to preparse
- * @param option preparse flag, cf @ref input_item_meta_request_option_t
+ * @param type_option a combination of VLC_PREPARSER_TYPE_* and
+ * VLC_PREPARSER_OPTION_* flags. The type must be in the set specified in
+ * vlc_preparser_New() (it is possible to select less types).
  * @param cbs callback to listen to events (can't be NULL)
  * @param cbs_userdata opaque pointer used by the callbacks
  * @param id unique id provided by the caller. This is can be used to cancel
@@ -92,8 +90,7 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
  * error, the on_preparse_ended will *not* be invoked
  */
 VLC_API vlc_preparser_req_id
-vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
-                    input_item_meta_request_option_t option,
+vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_option,
                     const input_item_parser_cbs_t *cbs, void *cbs_userdata );
 
 /**

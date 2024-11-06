@@ -1957,15 +1957,14 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
 
         d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1,
                                            default_timeout,
-                                           META_REQUEST_OPTION_FETCH_ANY);
+                                           VLC_PREPARSER_TYPE_FETCHMETA_ALL);
         if (unlikely(d->m_preparser == nullptr))
             return;
     }
 
-    input_item_meta_request_option_t fetch_options =
-        var_InheritBool( d->p_intf, "metadata-network-access" ) ?
-            META_REQUEST_OPTION_FETCH_ANY :
-            META_REQUEST_OPTION_FETCH_LOCAL;
+    int fetch_options = var_InheritBool( d->p_intf, "metadata-network-access" ) ?
+            VLC_PREPARSER_TYPE_FETCHMETA_ALL :
+            VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
 
     vlc_preparser_Push( d->m_preparser, p_item, fetch_options,
                         &art_fetcher_cbs, d  );

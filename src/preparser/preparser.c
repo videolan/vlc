@@ -48,7 +48,7 @@ struct task
 {
     vlc_preparser_t *preparser;
     input_item_t *item;
-    input_item_meta_request_option_t options;
+    int options;
     const input_item_parser_cbs_t *cbs;
     void *userdata;
     vlc_preparser_req_id id;
@@ -67,8 +67,7 @@ struct task
 static void RunnableRun(void *);
 
 static struct task *
-TaskNew(vlc_preparser_t *preparser, input_item_t *item,
-        input_item_meta_request_option_t options,
+TaskNew(vlc_preparser_t *preparser, input_item_t *item, int options,
         const input_item_parser_cbs_t *cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
@@ -212,8 +211,8 @@ Parse(struct task *task, vlc_tick_t deadline)
     const struct input_item_parser_cfg cfg = {
         .cbs = &cbs,
         .cbs_data = task,
-        .subitems = task->options & META_REQUEST_OPTION_PARSE_SUBITEMS,
-        .interact = task->options & META_REQUEST_OPTION_DO_INTERACT,
+        .subitems = task->options & VLC_PREPARSER_OPTION_SUBITEMS,
+        .interact = task->options & VLC_PREPARSER_OPTION_INTERACT,
     };
     task->parser = input_item_Parse(obj, task->item, &cfg);
     if (!task->parser)
@@ -241,11 +240,11 @@ static int
 Fetch(struct task *task)
 {
     input_fetcher_t *fetcher = task->preparser->fetcher;
-    if (!fetcher || !(task->options & META_REQUEST_OPTION_FETCH_ANY))
+    if (!fetcher || !(task->options & VLC_PREPARSER_TYPE_FETCHMETA_ALL))
         return VLC_ENOENT;
 
     return input_fetcher_Push(fetcher, task->item,
-                              task->options & META_REQUEST_OPTION_FETCH_ANY,
+                              task->options & VLC_PREPARSER_TYPE_FETCHMETA_ALL,
                               &input_fetcher_callbacks, task);
 }
 
@@ -260,7 +259,7 @@ RunnableRun(void *userdata)
     vlc_tick_t deadline = preparser->timeout ? vlc_tick_now() + preparser->timeout
                                              : VLC_TICK_INVALID;
 
-    if (task->options & META_REQUEST_OPTION_PARSE)
+    if (task->options & VLC_PREPARSER_TYPE_PARSE)
     {
         if (atomic_load(&task->interrupted))
         {
@@ -295,18 +294,17 @@ Interrupt(struct task *task)
 }
 
 vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
-                                    vlc_tick_t timeout,
-                                    input_item_meta_request_option_t request_type )
+                                    vlc_tick_t timeout, int request_type )
 {
     assert(max_threads >= 1);
     assert(timeout >= 0);
-    assert(request_type & (META_REQUEST_OPTION_FETCH_ANY|META_REQUEST_OPTION_PARSE));
+    assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|VLC_PREPARSER_TYPE_PARSE));
 
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
         return NULL;
 
-    if (request_type & META_REQUEST_OPTION_PARSE)
+    if (request_type & VLC_PREPARSER_TYPE_PARSE)
     {
         preparser->executor = vlc_executor_New(max_threads);
         if (!preparser->executor)
@@ -321,7 +319,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     preparser->timeout = timeout;
 
     preparser->owner = parent;
-    if (request_type & META_REQUEST_OPTION_FETCH_ANY)
+    if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
     {
         preparser->fetcher = input_fetcher_New(parent, request_type);
         if (unlikely(preparser->fetcher == NULL))
@@ -345,23 +343,23 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
 }
 
 vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
-                                  input_item_meta_request_option_t i_options,
-                                  const input_item_parser_cbs_t *cbs,
-                                  void *cbs_userdata )
+                                         int type_options,
+                                         const input_item_parser_cbs_t *cbs,
+                                         void *cbs_userdata )
 {
     if( atomic_load( &preparser->deactivated ) )
         return 0;
 
-    assert(i_options & META_REQUEST_OPTION_PARSE
-        || i_options & META_REQUEST_OPTION_FETCH_ANY);
+    assert(type_options & VLC_PREPARSER_TYPE_PARSE
+        || type_options & VLC_PREPARSER_TYPE_FETCHMETA_ALL);
 
-    assert(!(i_options & META_REQUEST_OPTION_PARSE)
+    assert(!(type_options & VLC_PREPARSER_TYPE_PARSE)
         || preparser->executor != NULL);
-    assert(!(i_options & META_REQUEST_OPTION_FETCH_ANY)
+    assert(!(type_options & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
         || preparser->fetcher != NULL);
 
     struct task *task =
-        TaskNew(preparser, item, i_options, cbs, cbs_userdata);
+        TaskNew(preparser, item, type_options, cbs, cbs_userdata);
     if( !task )
         return 0;
 

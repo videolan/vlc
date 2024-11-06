@@ -741,7 +741,7 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         return -1;
 
     input_item_t *item = media->p_input_item;
-    input_item_meta_request_option_t parse_scope = 0;
+    int parse_scope = 0;
     unsigned int ref = atomic_load_explicit(&media->worker_count,
                                             memory_order_relaxed);
     do
@@ -784,17 +784,17 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
     }
 
     if (do_parse)
-        parse_scope |= META_REQUEST_OPTION_PARSE;
+        parse_scope |= VLC_PREPARSER_TYPE_PARSE;
 
     do_fetch = false;
     if (parse_flag & libvlc_media_fetch_local)
     {
-        parse_scope |= META_REQUEST_OPTION_FETCH_LOCAL;
+        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
         do_fetch = true;
     }
     if (parse_flag & libvlc_media_fetch_network)
     {
-        parse_scope |= META_REQUEST_OPTION_FETCH_NETWORK;
+        parse_scope |= VLC_PREPARSER_TYPE_FETCHMETA_NET;
         do_fetch = true;
     }
 
@@ -807,8 +807,8 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
     }
 
     if (parse_flag & libvlc_media_do_interact)
-        parse_scope |= META_REQUEST_OPTION_DO_INTERACT;
-    parse_scope |= META_REQUEST_OPTION_PARSE_SUBITEMS;
+        parse_scope |= VLC_PREPARSER_OPTION_INTERACT;
+    parse_scope |= VLC_PREPARSER_OPTION_SUBITEMS;
 
     if (timeout == -1)
         timeout = var_InheritInteger(inst->p_libvlc_int, "preparse-timeout");

@@ -71,7 +71,7 @@ static void RunSearchNetwork(void *);
 
 static struct task *
 TaskNew(input_fetcher_t *fetcher, vlc_executor_t *executor, input_item_t *item,
-        input_item_meta_request_option_t options,
+        int options,
         const input_fetcher_callbacks_t *cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
@@ -127,7 +127,7 @@ FetcherRemoveTask(input_fetcher_t *fetcher, struct task *task)
 
 static int
 Submit(input_fetcher_t *fetcher, vlc_executor_t *executor, input_item_t *item,
-       input_item_meta_request_option_t options,
+       int options,
        const input_fetcher_callbacks_t *cbs, void *userdata)
 {
     struct task *task =
@@ -380,7 +380,7 @@ static void RunSearchLocal(void *userdata)
     if( SearchByScope( task, FETCHER_SCOPE_LOCAL ) == VLC_SUCCESS )
         goto end; /* done */
 
-    if( task->options & META_REQUEST_OPTION_FETCH_NETWORK )
+    if( task->options & VLC_PREPARSER_TYPE_FETCHMETA_NET )
     {
         int ret = Submit(fetcher, fetcher->executor_network, task->item,
                          task->options, task->cbs, task->userdata);
@@ -422,9 +422,9 @@ static void RunSearchNetwork(void *userdata)
 }
 
 input_fetcher_t* input_fetcher_New( vlc_object_t* owner,
-                                    input_item_meta_request_option_t request_type )
+                                    int request_type )
 {
-    assert(request_type & META_REQUEST_OPTION_FETCH_ANY);
+    assert(request_type & VLC_PREPARSER_TYPE_FETCHMETA_ALL);
     input_fetcher_t* fetcher = malloc( sizeof( *fetcher ) );
 
     if( unlikely( !fetcher ) )
@@ -434,7 +434,7 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner,
     if (max_threads < 1)
         max_threads = 1;
 
-    if (request_type & META_REQUEST_OPTION_FETCH_LOCAL)
+    if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_LOCAL)
     {
         fetcher->executor_local = vlc_executor_New(max_threads);
         if (!fetcher->executor_local)
@@ -446,7 +446,7 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner,
     else
         fetcher->executor_local = NULL;
 
-    if (request_type & META_REQUEST_OPTION_FETCH_NETWORK)
+    if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_NET)
     {
         fetcher->executor_network = vlc_executor_New(max_threads);
         if (!fetcher->executor_network)
@@ -483,16 +483,16 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner,
 }
 
 int input_fetcher_Push(input_fetcher_t* fetcher, input_item_t* item,
-    input_item_meta_request_option_t options,
-    const input_fetcher_callbacks_t *cbs, void *cbs_userdata)
+                       int options,
+                       const input_fetcher_callbacks_t *cbs, void *cbs_userdata)
 {
-    assert(options & META_REQUEST_OPTION_FETCH_ANY);
-    if (options & META_REQUEST_OPTION_FETCH_LOCAL)
+    assert(options & VLC_PREPARSER_TYPE_FETCHMETA_ALL);
+    if (options & VLC_PREPARSER_TYPE_FETCHMETA_LOCAL)
         assert(fetcher->executor_local != NULL);
-    if (options & META_REQUEST_OPTION_FETCH_NETWORK)
+    if (options & VLC_PREPARSER_TYPE_FETCHMETA_NET)
         assert(fetcher->executor_network != NULL);
 
-    vlc_executor_t *executor = options & META_REQUEST_OPTION_FETCH_LOCAL
+    vlc_executor_t *executor = options & VLC_PREPARSER_TYPE_FETCHMETA_LOCAL
                              ? fetcher->executor_local
                              : fetcher->executor_network;
 

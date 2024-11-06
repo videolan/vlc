@@ -251,8 +251,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
                                         : input_item_preparse_timeout,
     };
 
-    input_item_meta_request_option_t options =
-        META_REQUEST_OPTION_PARSE | META_REQUEST_OPTION_FETCH_LOCAL;
+    int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
 
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                 1, VLC_TICK_FROM_MS(timeout),
