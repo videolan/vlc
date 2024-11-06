@@ -19,8 +19,6 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import Qt5Compat.GraphicalEffects
-
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets

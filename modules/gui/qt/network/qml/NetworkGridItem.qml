@@ -18,8 +18,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQml.Models
-import Qt5Compat.GraphicalEffects
-
 
 import VLC.Widgets as Widgets
 import VLC.Network
