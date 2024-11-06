@@ -465,7 +465,7 @@ static int OpenEncoder(vlc_object_t *p_this)
             p_sys->quality = quality;
             break;
         default:
-            msg_Warn(p_this, "Unexpected quality %lu, forcing %d", quality, VPX_DL_BEST_QUALITY);
+            msg_Warn(p_this, "Unexpected quality %lu, forcing %lu", quality, (unsigned long)VPX_DL_BEST_QUALITY);
             p_sys->quality = VPX_DL_BEST_QUALITY;
             break;
     }
