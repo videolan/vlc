@@ -136,11 +136,7 @@ NotifyPreparseEnded(struct task *task, bool cancelled)
     else if (task->preparse_status == VLC_SUCCESS)
         input_item_SetPreparsed(task->item);
 
-    if (task->cbs == NULL)
-        return;
-
-    if (task->cbs->on_ended)
-        task->cbs->on_ended(task->item, task->preparse_status, task->userdata);
+    task->cbs->on_ended(task->item, task->preparse_status, task->userdata);
 }
 
 static void
@@ -163,7 +159,7 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
     if (atomic_load(&task->interrupted))
         return;
 
-    if (task->cbs && task->cbs->on_subtree_added)
+    if (task->cbs->on_subtree_added)
         task->cbs->on_subtree_added(task->item, subtree, task->userdata);
 }
 
@@ -178,7 +174,7 @@ OnParserAttachmentsAdded(input_item_t *item,
     if (atomic_load(&task->interrupted))
         return;
 
-    if (task->cbs && task->cbs->on_attachments_added)
+    if (task->cbs->on_attachments_added)
         task->cbs->on_attachments_added(task->item, array, count, task->userdata);
 }
 
@@ -356,6 +352,8 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
         || preparser->parser != NULL);
     assert(!(type_options & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
         || preparser->fetcher != NULL);
+
+    assert(cbs != NULL && cbs->on_ended != NULL);
 
     struct task *task =
         TaskNew(preparser, item, type_options, cbs, cbs_userdata);
