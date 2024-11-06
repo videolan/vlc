@@ -4008,6 +4008,7 @@ have_qt_quick_test="no"
 have_qt_declarative_private="no"
 have_qt_gui_private="no"
 have_qt_core_private="no"
+have_qt65="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
@@ -4043,6 +4044,10 @@ AS_IF([test "${enable_qt}" != "no"], [
     have_qt="no"
   ],[
     AC_MSG_RESULT([(${QT_VERSION_CORE}) yes])
+
+  AS_IF([test "${QT_VERSION_MAJ:-0}" -gt "6" || (test "${QT_VERSION_MAJ:-0}" = "6" && test "${QT_VERSION_MIN:-0}" -ge "5")], [
+    have_qt65="yes"
+  ], [])
 
   QT_BIN_DIRECTORY="$(${QT_PATHS}         -query QT_HOST_BINS 2>/dev/null)"
   QMAKE="${QT_PATHS}"
@@ -4092,6 +4097,12 @@ AS_IF([test "${enable_qt}" != "no"], [
 
       AC_CHECK_PROGS(PYTHON3, [python3], [no])
       AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${with_qtconf}])
+
+      AS_IF([test "${have_qt65}" = "yes"], [
+        qt_qml_effects_module="QtQuick.Effects"
+      ], [
+        qt_qml_effects_module="Qt5Compat.GraphicalEffects"
+      ])
       AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE6}" \
             --qtconf "${with_qtconf}" \
@@ -4101,7 +4112,7 @@ AS_IF([test "${enable_qt}" != "no"], [
             QtQuick.Layouts="" \
             QtQuick.Window="" \
             QtQuick.Controls="" \
-            Qt5Compat.GraphicalEffects="" \
+            ${qt_qml_effects_module}="" \
             >&AS_MESSAGE_FD ], [
         AC_MSG_RESULT([yes])
       ],[
@@ -4260,7 +4271,7 @@ AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 AM_CONDITIONAL([HAVE_QT_CORE_PRIVATE], [test "${have_qt_core_private}" = "yes"])
 AM_CONDITIONAL([HAVE_FXC], [test "${have_fxc}" = "yes"])
 AM_CONDITIONAL([HAVE_QT67], [test "${QT_VERSION_MAJ:-0}" -gt "6" || (test "${QT_VERSION_MAJ:-0}" = "6" && test "${QT_VERSION_MIN:-0}" -ge "7")])
-AM_CONDITIONAL([HAVE_QT65], [test "${QT_VERSION_MAJ:-0}" -gt "6" || (test "${QT_VERSION_MAJ:-0}" = "6" && test "${QT_VERSION_MIN:-0}" -ge "5")])
+AM_CONDITIONAL([HAVE_QT65], [test "${have_qt65}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
