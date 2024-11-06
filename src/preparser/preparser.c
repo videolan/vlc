@@ -26,17 +26,23 @@
 #include <vlc_atomic.h>
 #include <vlc_executor.h>
 #include <vlc_preparser.h>
-#include <vlc_thumbnailer.h>
 
 #include "input/input_interface.h"
 #include "input/input_internal.h"
 #include "fetcher.h"
+
+union vlc_preparser_cbs
+{
+    const input_item_parser_cbs_t *parser;
+    const struct vlc_thumbnailer_cbs *thumbnailer;
+};
 
 struct vlc_preparser_t
 {
     vlc_object_t* owner;
     input_fetcher_t* fetcher;
     vlc_executor_t *parser;
+    vlc_executor_t *thumbnailer;
     vlc_tick_t timeout;
     atomic_bool deactivated;
 
@@ -50,9 +56,12 @@ struct task
     vlc_preparser_t *preparser;
     input_item_t *item;
     int options;
-    const input_item_parser_cbs_t *cbs;
+    struct vlc_preparser_seek_arg seek_arg;
+    union vlc_preparser_cbs cbs;
     void *userdata;
     vlc_preparser_req_id id;
+
+    picture_t *pic;
 
     vlc_sem_t preparse_ended;
     int preparse_status;
@@ -63,42 +72,10 @@ struct task
     struct vlc_list node; /**< node of vlc_preparser_t.submitted_tasks */
 };
 
-struct vlc_thumbnailer_t
-{
-    vlc_object_t* parent;
-    vlc_executor_t *executor;
-    vlc_mutex_t lock;
-
-    vlc_thumbnailer_req_id current_id;
-    vlc_tick_t timeout;
-
-    struct vlc_list submitted_tasks; /**< list of struct th_task */
-};
-
-typedef struct th_task
-{
-    vlc_thumbnailer_t *thumbnailer;
-
-    struct vlc_thumbnailer_seek_arg seek_arg;
-    input_item_t *item;
-    const struct vlc_thumbnailer_cbs *cbs;
-    void* userdata;
-
-    vlc_sem_t preparse_ended;
-    int preparse_status;
-    atomic_bool interrupted;
-
-    picture_t *pic;
-
-    vlc_thumbnailer_req_id id;
-
-    struct vlc_runnable runnable; /**< to be passed to the executor */
-    struct vlc_list node; /**< node of vlc_thumbnailer_t.submitted_tasks */
-} th_task_t;
-
 static struct task *
 TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
-        int options, const input_item_parser_cbs_t *cbs, void *userdata)
+        int options, const struct vlc_preparser_seek_arg *seek_arg,
+        union vlc_preparser_cbs cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
     if (!task)
@@ -109,6 +86,14 @@ TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
     task->options = options;
     task->cbs = cbs;
     task->userdata = userdata;
+    task->pic = NULL;
+
+    if (seek_arg == NULL)
+        task->seek_arg = (struct vlc_preparser_seek_arg) {
+            .type = VLC_PREPARSER_SEEK_NONE,
+        };
+    else
+        task->seek_arg = *seek_arg;
 
     input_item_Hold(item);
 
@@ -165,7 +150,8 @@ NotifyPreparseEnded(struct task *task)
     else if (task->preparse_status == VLC_SUCCESS)
         input_item_SetPreparsed(task->item);
 
-    task->cbs->on_ended(task->item, task->preparse_status, task->userdata);
+    task->cbs.parser->on_ended(task->item, task->preparse_status,
+                               task->userdata);
 }
 
 static void
@@ -188,8 +174,8 @@ OnParserSubtreeAdded(input_item_t *item, input_item_node_t *subtree,
     if (atomic_load(&task->interrupted))
         return;
 
-    if (task->cbs->on_subtree_added)
-        task->cbs->on_subtree_added(task->item, subtree, task->userdata);
+    if (task->cbs.parser->on_subtree_added)
+        task->cbs.parser->on_subtree_added(task->item, subtree, task->userdata);
 }
 
 static void
@@ -203,8 +189,9 @@ OnParserAttachmentsAdded(input_item_t *item,
     if (atomic_load(&task->interrupted))
         return;
 
-    if (task->cbs->on_attachments_added)
-        task->cbs->on_attachments_added(task->item, array, count, task->userdata);
+    if (task->cbs.parser->on_attachments_added)
+        task->cbs.parser->on_attachments_added(task->item, array, count, 
+                                               task->userdata);
 }
 
 static void
@@ -311,11 +298,6 @@ end:
     TaskDelete(task);
 }
 
-static void NotifyThumbnail(th_task_t *task, picture_t *pic)
-{
-    task->cbs->on_ended(task->item, task->preparse_status, pic, task->userdata);
-}
-
 static void
 on_thumbnailer_input_event( input_thread_t *input,
                             const struct vlc_input_event *event, void *userdata )
@@ -326,7 +308,7 @@ on_thumbnailer_input_event( input_thread_t *input,
                                                  event->state.value != END_S ) ) )
          return;
 
-    th_task_t *task = userdata;
+    struct task *task = userdata;
 
     if (event->type == INPUT_EVENT_THUMBNAIL_READY)
     {
@@ -337,19 +319,12 @@ on_thumbnailer_input_event( input_thread_t *input,
 }
 
 static void
-ThTaskDestroy(th_task_t *task)
-{
-    input_item_Release(task->item);
-    free(task);
-}
-
-static void
 ThumbnailerRun(void *userdata)
 {
     vlc_thread_set_name("vlc-run-thumb");
 
-    th_task_t *task = userdata;
-    vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
+    struct task *task = userdata;
+    vlc_preparser_t *preparser = task->preparser;
 
     static const struct vlc_input_thread_callbacks cbs = {
         .on_event = on_thumbnailer_input_event,
@@ -361,27 +336,27 @@ ThumbnailerRun(void *userdata)
         .cbs_data = task,
     };
 
-    vlc_tick_t deadline = thumbnailer->timeout != VLC_TICK_INVALID ?
-                          vlc_tick_now() + thumbnailer->timeout :
+    vlc_tick_t deadline = preparser->timeout != VLC_TICK_INVALID ?
+                          vlc_tick_now() + preparser->timeout :
                           VLC_TICK_INVALID;
 
     input_thread_t* input =
-            input_Create( thumbnailer->parent, task->item, &cfg );
+            input_Create( preparser->owner, task->item, &cfg );
     if (!input)
         goto error;
 
-    assert(task->seek_arg.speed == VLC_THUMBNAILER_SEEK_PRECISE
-        || task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST);
-    bool fast_seek = task->seek_arg.speed == VLC_THUMBNAILER_SEEK_FAST;
+    assert(task->seek_arg.speed == VLC_PREPARSER_SEEK_PRECISE
+        || task->seek_arg.speed == VLC_PREPARSER_SEEK_FAST);
+    bool fast_seek = task->seek_arg.speed == VLC_PREPARSER_SEEK_FAST;
 
     switch (task->seek_arg.type)
     {
-        case VLC_THUMBNAILER_SEEK_NONE:
+        case VLC_PREPARSER_SEEK_NONE:
             break;
-        case VLC_THUMBNAILER_SEEK_TIME:
+        case VLC_PREPARSER_SEEK_TIME:
             input_SetTime(input, task->seek_arg.time, fast_seek);
             break;
-        case VLC_THUMBNAILER_SEEK_POS:
+        case VLC_PREPARSER_SEEK_POS:
             input_SetPosition(input, task->seek_arg.pos, fast_seek);
             break;
         default:
@@ -409,11 +384,13 @@ ThumbnailerRun(void *userdata)
     picture_t* pic = task->pic;
     task->pic = NULL;
 
-    vlc_mutex_lock(&thumbnailer->lock);
+    vlc_mutex_lock(&preparser->lock);
     vlc_list_remove(&task->node);
-    vlc_mutex_unlock(&thumbnailer->lock);
+    vlc_mutex_unlock(&preparser->lock);
 
-    NotifyThumbnail(task, task->preparse_status == VLC_SUCCESS ? pic : NULL);
+    task->cbs.thumbnailer->on_ended(task->item, task->preparse_status,
+                                    task->preparse_status == VLC_SUCCESS ?
+                                    pic : NULL, task->userdata);
 
     if (pic)
         picture_Release(pic);
@@ -422,7 +399,7 @@ ThumbnailerRun(void *userdata)
     input_Close(input);
 
 error:
-    ThTaskDestroy(task);
+    TaskDelete(task);
 }
 
 static void
@@ -438,7 +415,9 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
 {
     assert(max_threads >= 1);
     assert(timeout >= 0);
-    assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|VLC_PREPARSER_TYPE_PARSE));
+    assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|
+                           VLC_PREPARSER_TYPE_PARSE|
+                           VLC_PREPARSER_TYPE_THUMBNAIL));
 
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
@@ -465,6 +444,15 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     else
         preparser->fetcher = NULL;
 
+    if (request_type & VLC_PREPARSER_TYPE_THUMBNAIL)
+    {
+        preparser->thumbnailer = vlc_executor_New(1);
+        if (!preparser->thumbnailer)
+            goto error_thumbnail;
+    }
+    else
+        preparser->thumbnailer = NULL;
+
     atomic_init( &preparser->deactivated, false );
 
     vlc_mutex_init(&preparser->lock);
@@ -473,6 +461,9 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
 
     return preparser;
 
+error_thumbnail:
+    if (preparser->fetcher != NULL)
+        input_fetcher_Delete(preparser->fetcher);
 error_fetcher:
     if (preparser->parser != NULL)
         vlc_executor_Delete(preparser->parser);
@@ -489,6 +480,8 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     if( atomic_load( &preparser->deactivated ) )
         return VLC_PREPARSER_REQ_ID_INVALID;
 
+    assert((type_options & VLC_PREPARSER_TYPE_THUMBNAIL) == 0);
+
     assert(type_options & VLC_PREPARSER_TYPE_PARSE
         || type_options & VLC_PREPARSER_TYPE_FETCHMETA_ALL);
 
@@ -499,8 +492,12 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
 
     assert(cbs != NULL && cbs->on_ended != NULL);
 
-    struct task *task =
-        TaskNew(preparser, ParserRun, item, type_options, cbs, cbs_userdata);
+    union vlc_preparser_cbs task_cbs = {
+        .parser = cbs,
+    };
+
+    struct task *task = TaskNew(preparser, ParserRun, item, type_options, NULL,
+                                task_cbs, cbs_userdata);
     if( !task )
         return VLC_PREPARSER_REQ_ID_INVALID;
 
@@ -523,6 +520,35 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     return ret == VLC_SUCCESS ? id : 0;
 }
 
+vlc_preparser_req_id
+vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
+                                 const struct vlc_preparser_seek_arg *seek_arg,
+                                 const struct vlc_thumbnailer_cbs *cbs,
+                                 void *cbs_userdata )
+{
+    if( atomic_load( &preparser->deactivated ) )
+        return VLC_PREPARSER_REQ_ID_INVALID;
+
+    assert(preparser->thumbnailer != NULL);
+    assert(cbs != NULL && cbs->on_ended != NULL);
+
+    union vlc_preparser_cbs task_cbs = {
+        .thumbnailer = cbs,
+    };
+
+    struct task *task =
+        TaskNew(preparser, ThumbnailerRun, item, VLC_PREPARSER_TYPE_THUMBNAIL,
+                seek_arg, task_cbs, cbs_userdata);
+    if (task == NULL)
+        return VLC_PREPARSER_REQ_ID_INVALID;
+
+    vlc_preparser_req_id id = PreparserAddTask(preparser, task);
+
+    vlc_executor_Submit(preparser->thumbnailer, &task->runnable);
+
+    return id;
+}
+
 size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id )
 {
     vlc_mutex_lock(&preparser->lock);
@@ -542,8 +568,13 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
                 vlc_list_remove(&task->node);
                 vlc_mutex_unlock(&preparser->lock);
                 task->preparse_status = -EINTR;
-                task->cbs->parser.on_ended(task->item, task->preparse_status,
-                                           task->userdata);
+                if (task->options == VLC_PREPARSER_TYPE_THUMBNAIL)
+                    task->cbs.thumbnailer->on_ended(task->item,
+                                                    task->preparse_status, NULL,
+                                                    task->userdata);
+                else
+                    task->cbs.parser->on_ended(task->item, task->preparse_status,
+                                               task->userdata);
                 TaskDelete(task);
 
                 /* Small optimisation in the likely case where the user cancel
@@ -586,144 +617,8 @@ void vlc_preparser_Delete( vlc_preparser_t *preparser )
     if( preparser->fetcher )
         input_fetcher_Delete( preparser->fetcher );
 
+    if (preparser->thumbnailer != NULL)
+        vlc_executor_Delete(preparser->thumbnailer);
+
     free( preparser );
-}
-
-static void ThumbnailerRun(void *);
-
-static th_task_t *
-ThTaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
-        const struct vlc_thumbnailer_seek_arg *seek_arg,
-        const struct vlc_thumbnailer_cbs *cbs, void *userdata )
-{
-    th_task_t *task = malloc(sizeof(*task));
-    if (!task)
-        return NULL;
-
-    vlc_sem_init(&task->preparse_ended, 0);
-    atomic_init(&task->interrupted, false);
-    task->preparse_status = VLC_EGENERIC;
-
-    task->thumbnailer = thumbnailer;
-    task->item = item;
-    if (seek_arg == NULL)
-        task->seek_arg = (struct vlc_thumbnailer_seek_arg) {
-            .type = VLC_THUMBNAILER_SEEK_NONE,
-        };
-    else
-        task->seek_arg = *seek_arg;
-
-    task->cbs = cbs;
-    task->userdata = userdata;
-
-    task->pic = NULL;
-
-    task->runnable.run = ThumbnailerRun;
-    task->runnable.userdata = task;
-
-    input_item_Hold(item);
-
-    return task;
-}
-
-vlc_thumbnailer_req_id
-vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
-                         input_item_t *item,
-                         const struct vlc_thumbnailer_seek_arg *seek_arg,
-                         const struct vlc_thumbnailer_cbs *cbs, void *userdata )
-{
-    assert( cbs != NULL && cbs->on_ended != NULL );
-
-    th_task_t *task = ThTaskNew(thumbnailer, item, seek_arg, cbs, userdata);
-    if (!task)
-        return 0;
-
-    vlc_mutex_lock(&thumbnailer->lock);
-    vlc_thumbnailer_req_id id = task->id = thumbnailer->current_id++;
-    static_assert(VLC_THUMBNAILER_REQ_ID_INVALID == 0, "Invalid id should be 0");
-    if (unlikely(thumbnailer->current_id == 0)) /* unsigned wrapping */
-        ++thumbnailer->current_id;
-    vlc_list_append(&task->node, &thumbnailer->submitted_tasks);
-    vlc_mutex_unlock(&thumbnailer->lock);
-
-    vlc_executor_Submit(thumbnailer->executor, &task->runnable);
-
-    return id;
-}
-
-size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_req_id id )
-{
-    vlc_mutex_lock(&thumbnailer->lock);
-
-    th_task_t *task;
-    size_t count = 0;
-    vlc_list_foreach(task, &thumbnailer->submitted_tasks, node)
-    {
-        if (id == VLC_THUMBNAILER_REQ_ID_INVALID || task->id == id)
-        {
-            count++;
-            bool canceled =
-                vlc_executor_Cancel(thumbnailer->executor, &task->runnable);
-            if (canceled)
-            {
-                vlc_list_remove(&task->node);
-                vlc_mutex_unlock(&thumbnailer->lock);
-                task->preparse_status = -EINTR;
-                NotifyThumbnail(task, NULL);
-                ThTaskDestroy(task);
-
-                /* Small optimisation in the likely case where the user cancel
-                 * only one task */
-                if (id != VLC_THUMBNAILER_REQ_ID_INVALID)
-                    return count;
-                vlc_mutex_lock(&thumbnailer->lock);
-            }
-            else
-            {
-                /* The task will be finished and destroyed after run() */
-                atomic_store(&task->interrupted, true);
-                vlc_sem_post(&task->preparse_ended);
-            }
-        }
-    }
-
-    vlc_mutex_unlock(&thumbnailer->lock);
-
-    return count;
-}
-
-vlc_thumbnailer_t *vlc_thumbnailer_Create( vlc_object_t* parent, vlc_tick_t timeout )
-{
-    assert(timeout >= 0);
-
-    vlc_thumbnailer_t *thumbnailer = malloc( sizeof( *thumbnailer ) );
-    if ( unlikely( thumbnailer == NULL ) )
-        return NULL;
-
-    thumbnailer->executor = vlc_executor_New(1);
-    if (!thumbnailer->executor)
-    {
-        free(thumbnailer);
-        return NULL;
-    }
-
-    thumbnailer->parent = parent;
-    thumbnailer->current_id = 1;
-    thumbnailer->timeout = timeout;
-    vlc_mutex_init(&thumbnailer->lock);
-    vlc_list_init(&thumbnailer->submitted_tasks);
-
-    return thumbnailer;
-}
-
-void vlc_thumbnailer_SetTimeout( vlc_thumbnailer_t *thumbnailer,
-                                 vlc_tick_t timeout )
-{
-    thumbnailer->timeout = timeout;
-}
-
-void vlc_thumbnailer_Delete( vlc_thumbnailer_t *thumbnailer )
-{
-    vlc_executor_Delete(thumbnailer->executor);
-    free( thumbnailer );
 }

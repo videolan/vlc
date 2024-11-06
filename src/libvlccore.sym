@@ -830,11 +830,6 @@ vlc_es_id_GetCat
 vlc_es_id_GetStrId
 vlc_es_id_IsStrIdStable
 vlc_encoder_Destroy
-vlc_thumbnailer_Create
-vlc_thumbnailer_Request
-vlc_thumbnailer_Cancel
-vlc_thumbnailer_Delete
-vlc_thumbnailer_SetTimeout
 vlc_player_AddAssociatedMedia
 vlc_player_AddListener
 vlc_player_AddMetadataListener
@@ -1042,6 +1037,7 @@ vlc_input_attachment_New
 vlc_input_attachment_Hold
 vlc_preparser_New
 vlc_preparser_Push
+vlc_preparser_GenerateThumbnail
 vlc_preparser_Cancel
 vlc_preparser_Delete
 vlc_preparser_Deactivate

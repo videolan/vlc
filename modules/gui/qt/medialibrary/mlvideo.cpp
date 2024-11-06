@@ -20,7 +20,6 @@
 
 #include <cassert>
 
-#include <vlc_thumbnailer.h>
 #include "mlhelper.hpp"
 #include "util/vlctick.hpp"
 

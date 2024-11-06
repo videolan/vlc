@@ -36,7 +36,7 @@
 #include <vlc_threads.h>
 
 typedef struct vlc_preparser_t vlc_preparser_t;
-typedef struct vlc_thumbnailer_t vlc_thumbnailer_t;
+typedef struct vlc_preparser_t vlc_preparser_t;
 
 /* Note well: this header is included from LibVLC core.
  * Therefore, static inline functions MUST NOT call LibVLC functions here
@@ -105,7 +105,7 @@ struct libvlc_instance_t
 
     vlc_mutex_t lazy_init_lock;
     vlc_preparser_t *parser;
-    vlc_thumbnailer_t *thumbnailer;
+    vlc_preparser_t *thumbnailer;
 
     struct
     {
@@ -153,6 +153,6 @@ static inline vlc_tick_t vlc_tick_from_libvlc_time(libvlc_time_t time)
 }
 
 vlc_preparser_t *libvlc_get_preparser(libvlc_instance_t *instance);
-vlc_thumbnailer_t *libvlc_get_thumbnailer(libvlc_instance_t *instance);
+vlc_preparser_t *libvlc_get_thumbnailer(libvlc_instance_t *instance);
 
 #endif

@@ -101,7 +101,6 @@ install_headers(
     'vlc_subpicture.h',
     'vlc_text_style.h',
     'vlc_threads.h',
-    'vlc_thumbnailer.h',
     'vlc_tick.h',
     'vlc_timestamp_helper.h',
     'vlc_tls.h',

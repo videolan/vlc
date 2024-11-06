@@ -107,7 +107,6 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_subpicture.h \
 	../include/vlc_text_style.h \
 	../include/vlc_threads.h \
-	../include/vlc_thumbnailer.h \
 	../include/vlc_tick.h \
 	../include/vlc_timestamp_helper.h \
 	../include/vlc_tls.h \

@@ -49,11 +49,76 @@ typedef size_t vlc_preparser_req_id;
 #define VLC_PREPARSER_TYPE_PARSE            0x01
 #define VLC_PREPARSER_TYPE_FETCHMETA_LOCAL  0x02
 #define VLC_PREPARSER_TYPE_FETCHMETA_NET    0x04
+#define VLC_PREPARSER_TYPE_THUMBNAIL        0x08
 #define VLC_PREPARSER_TYPE_FETCHMETA_ALL \
     (VLC_PREPARSER_TYPE_FETCHMETA_LOCAL|VLC_PREPARSER_TYPE_FETCHMETA_NET)
 
 #define VLC_PREPARSER_OPTION_INTERACT 0x1000
 #define VLC_PREPARSER_OPTION_SUBITEMS 0x2000
+
+/** Preparser thumbnailer callbacks */
+struct vlc_thumbnailer_cbs
+{
+    /**
+     * Event received on thumbnailing completion or error
+     *
+     * This callback will always be called, provided
+     * vlc_preparser_GenerateThumbnail() returned a valid request, and provided
+     * the request is not cancelled before its completion.
+     *
+     * @note This callback is mandatory if calling
+     * vlc_preparser_GenerateThumbnail()
+     *
+     * In case of failure, timeout or cancellation, p_thumbnail will be NULL.
+     * The picture, if any, is owned by the thumbnailer, and must be acquired
+     * by using \link picture_Hold \endlink to use it pass the callback's
+     * scope.
+     *
+     * @param item item used for the thumbnailer
+     *
+     * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
+     * timeout, -EINTR if cancelled, an error otherwise
+     *
+     * @param thumbnail The generated thumbnail, or NULL in case of failure or
+     * timeout
+     *
+     * @param data opaque pointer passed by
+     * vlc_preparser_GenerateThumbnail()
+     *
+     */
+    void (*on_ended)(input_item_t *item, int status, picture_t* thumbnail,
+                     void *data);
+};
+
+/**
+ * Preparser seek argument
+ */
+struct vlc_preparser_seek_arg
+{
+    enum
+    {
+        /** Don't seek */
+        VLC_PREPARSER_SEEK_NONE,
+        /** Seek by time */
+        VLC_PREPARSER_SEEK_TIME,
+        /** Seek by position */
+        VLC_PREPARSER_SEEK_POS,
+    } type;
+    union
+    {
+        /** Seek time if type == VLC_PREPARSER_SEEK_TIME */
+        vlc_tick_t time;
+        /** Seek position if type == VLC_PREPARSER_SEEK_POS */
+        double pos;
+    };
+    enum
+    {
+        /** Precise, but potentially slow */
+        VLC_PREPARSER_SEEK_PRECISE,
+        /** Fast, but potentially imprecise */
+        VLC_PREPARSER_SEEK_FAST,
+    } speed;
+};
 
 /**
  * This function creates the preparser object and thread.
@@ -92,6 +157,29 @@ VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
 VLC_API vlc_preparser_req_id
 vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_option,
                     const input_item_parser_cbs_t *cbs, void *cbs_userdata );
+
+/**
+ * This function enqueues the provided item for generating a thumbnail
+ *
+ * @param preparser the preparser object
+ * @param item a valid item to generate the thumbnail for
+ * @param seek_arg pointer to a seek struct, that tell at which time the
+ * thumbnail should be taken, NULL to disable seek
+ * @param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
+ * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * item was scheduled for thumbnailing. If this returns an
+ * error, the thumbnailer.on_ended callback will *not* be invoked
+ *
+ * The provided input_item will be held by the thumbnailer and can safely be
+ * released safely after calling this function.
+ */
+VLC_API vlc_preparser_req_id
+vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
+                                 const struct vlc_preparser_seek_arg *seek_arg,
+                                 const struct vlc_thumbnailer_cbs *cbs,
+                                 void *cbs_userdata );
 
 /**
  * This function cancel all preparsing requests for a given id

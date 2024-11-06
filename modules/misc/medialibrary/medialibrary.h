@@ -40,7 +40,7 @@
 
 struct vlc_event_t;
 struct vlc_object_t;
-struct vlc_thumbnailer_t;
+struct vlc_preparser_t;
 
 class Logger;
 
@@ -144,7 +144,7 @@ private:
     vlc::threads::mutex m_mutex;
     vlc::threads::condition_variable m_cond;
     ThumbnailerCtx* m_currentContext;
-    std::unique_ptr<vlc_thumbnailer_t, void(*)(vlc_thumbnailer_t*)> m_thumbnailer;
+    std::unique_ptr<vlc_preparser_t, void(*)(vlc_preparser_t*)> m_thumbnailer;
 };
 
 class MediaLibrary : public medialibrary::IMediaLibraryCb

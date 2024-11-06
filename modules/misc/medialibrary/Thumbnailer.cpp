@@ -24,23 +24,24 @@
 
 #include "medialibrary.h"
 
-#include <vlc_thumbnailer.h>
 #include <vlc_fs.h>
 #include <vlc_block.h>
 #include <vlc_url.h>
 #include <vlc_cxx_helpers.hpp>
+#include <vlc_preparser.h>
 
 #include <stdexcept>
 
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
     , m_currentContext( nullptr )
-    , m_thumbnailer( nullptr, &vlc_thumbnailer_Delete )
+    , m_thumbnailer( nullptr, &vlc_preparser_Delete )
 {
-    m_thumbnailer.reset( vlc_thumbnailer_Create( VLC_OBJECT( ml ),
-                                                  VLC_TICK_FROM_SEC( 3 ) ) );
+    m_thumbnailer.reset( vlc_preparser_New( VLC_OBJECT( ml ), 1,
+                                            VLC_TICK_FROM_SEC( 3 ),
+                                            VLC_PREPARSER_TYPE_THUMBNAIL ) );
     if ( unlikely( m_thumbnailer == nullptr ) )
-        throw std::runtime_error( "Failed to instantiate a vlc_thumbnailer_t" );
+        throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }
 
 void Thumbnailer::onThumbnailComplete( input_item_t *, int, picture_t* thumbnail, void *data )
@@ -71,20 +72,20 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
-        struct vlc_thumbnailer_seek_arg seek_arg = {
-            .type = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_POS,
+        struct vlc_preparser_seek_arg seek_arg = {
+            .type = vlc_preparser_seek_arg::VLC_PREPARSER_SEEK_POS,
             .pos = position,
-            .speed = vlc_thumbnailer_seek_arg::VLC_THUMBNAILER_SEEK_FAST,
+            .speed = vlc_preparser_seek_arg::VLC_PREPARSER_SEEK_FAST,
         };
 
         static const struct vlc_thumbnailer_cbs cbs = {
             .on_ended = onThumbnailComplete,
         };
-        vlc_thumbnailer_req_id requestId =
-            vlc_thumbnailer_Request( m_thumbnailer.get(), item.get(), &seek_arg,
-                                     &cbs, &ctx );
+        vlc_preparser_req_id requestId =
+            vlc_preparser_GenerateThumbnail( m_thumbnailer.get(), item.get(),
+                                             &seek_arg, &cbs, &ctx );
 
-        if (requestId == VLC_THUMBNAILER_REQ_ID_INVALID)
+        if (requestId == VLC_PREPARSER_REQ_ID_INVALID)
         {
             m_currentContext = nullptr;
             return false;

@@ -22,7 +22,7 @@
 #include "../lib/libvlc_internal.h"
 
 #include <vlc_common.h>
-#include <vlc_thumbnailer.h>
+#include <vlc_preparser.h>
 #include <vlc_input_item.h>
 #include <vlc_picture.h>
 
@@ -128,8 +128,9 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         ctx.test_idx = i;
         ctx.b_done = false;
 
-        vlc_thumbnailer_t* p_thumbnailer = vlc_thumbnailer_Create(
-                    VLC_OBJECT( p_vlc->p_libvlc_int ), test_params[i].i_timeout );
+        vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
+                    VLC_OBJECT( p_vlc->p_libvlc_int ), 1, test_params[i].i_timeout,
+                    VLC_PREPARSER_TYPE_THUMBNAIL );
         assert( p_thumbnailer != NULL );
 
 
@@ -145,28 +146,28 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
         vlc_mutex_lock( &ctx.lock );
 
-        vlc_thumbnailer_req_id id;
-        struct vlc_thumbnailer_seek_arg seek_arg;
+        vlc_preparser_req_id id;
+        struct vlc_preparser_seek_arg seek_arg;
         if ( test_params[i].b_use_pos )
         {
-            seek_arg.type = VLC_THUMBNAILER_SEEK_POS;
+            seek_arg.type = VLC_PREPARSER_SEEK_POS;
             seek_arg.pos = test_params[i].f_pos;
             seek_arg.speed = test_params[i].b_fast_seek ?
-                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
+                VLC_PREPARSER_SEEK_FAST : VLC_PREPARSER_SEEK_PRECISE;
         }
         else
         {
-            seek_arg.type = VLC_THUMBNAILER_SEEK_TIME;
+            seek_arg.type = VLC_PREPARSER_SEEK_TIME;
             seek_arg.time = test_params[i].i_time;
             seek_arg.speed = test_params[i].b_fast_seek ?
-                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
+                VLC_PREPARSER_SEEK_FAST : VLC_PREPARSER_SEEK_PRECISE;
         }
         static const struct vlc_thumbnailer_cbs cbs = {
             .on_ended = thumbnailer_callback,
         };
-        id = vlc_thumbnailer_Request( p_thumbnailer, p_item, &seek_arg,
-                                      &cbs, &ctx );
-        assert( id != VLC_THUMBNAILER_REQ_ID_INVALID );
+        id = vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, &seek_arg,
+                                              &cbs, &ctx );
+        assert( id != VLC_PREPARSER_REQ_ID_INVALID );
 
         while ( ctx.b_done == false )
             vlc_cond_wait( &ctx.cond, &ctx.lock );
@@ -176,7 +177,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         input_item_Release( p_item );
         free( psz_mrl );
 
-        vlc_thumbnailer_Delete( p_thumbnailer );
+        vlc_preparser_Delete( p_thumbnailer );
     }
 }
 
@@ -193,8 +194,9 @@ static void thumbnailer_callback_cancel( input_item_t *item, int status,
 
 static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 {
-    vlc_thumbnailer_t* p_thumbnailer = vlc_thumbnailer_Create(
-                VLC_OBJECT( p_vlc->p_libvlc_int ), VLC_TICK_INVALID );
+    vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
+                VLC_OBJECT( p_vlc->p_libvlc_int ), 1, VLC_TICK_INVALID,
+                VLC_PREPARSER_TYPE_THUMBNAIL );
     assert( p_thumbnailer != NULL );
 
     const char* psz_mrl = "mock://video_track_count=0;audio_track_count=1;"
@@ -210,16 +212,16 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
 
     vlc_sem_t sem;
     vlc_sem_init(&sem, 0);
-    vlc_thumbnailer_req_id id =
-        vlc_thumbnailer_Request( p_thumbnailer, p_item, NULL, &cbs, &sem );
+    vlc_preparser_req_id id =
+        vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, NULL, &cbs, &sem );
 
-    vlc_thumbnailer_Cancel( p_thumbnailer, id );
+    vlc_preparser_Cancel( p_thumbnailer, id );
 
     vlc_sem_wait(&sem);
 
     input_item_Release( p_item );
 
-    vlc_thumbnailer_Delete( p_thumbnailer );
+    vlc_preparser_Delete( p_thumbnailer );
 }
 
 int main( void )
