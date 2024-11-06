@@ -327,9 +327,11 @@ Item {
 
     //draw the window drop shadow ourselve when the windowing system doesn't
     //provide them but support extended frame
-    RectangularGlow {
+    Widgets.RectangularGlow {
         id: effect
         z: -1
+        hollow: true // hollow because the interface may be translucent if the window has backdrop blur
+        blending: false // stacked below everything, no need for blending even though it is not opaque
         visible: _extendedFrameVisible
         anchors.fill: g_mainInterface
         spread: 0.0
