@@ -311,10 +311,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     {
         preparser->parser = vlc_executor_New(max_threads);
         if (!preparser->parser)
-        {
-            free(preparser);
-            return NULL;
-        }
+            goto error_parser;
     }
     else
         preparser->parser = NULL;
@@ -323,12 +320,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     {
         preparser->fetcher = input_fetcher_New(parent, request_type);
         if (unlikely(preparser->fetcher == NULL))
-        {
-            if (preparser->parser != NULL)
-                vlc_executor_Delete(preparser->parser);
-            free(preparser);
-            return NULL;
-        }
+            goto error_fetcher;
     }
     else
         preparser->fetcher = NULL;
@@ -340,6 +332,13 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
     preparser->current_id = 1;
 
     return preparser;
+
+error_fetcher:
+    if (preparser->parser != NULL)
+        vlc_executor_Delete(preparser->parser);
+error_parser:
+    free(preparser);
+    return NULL;
 }
 
 vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
