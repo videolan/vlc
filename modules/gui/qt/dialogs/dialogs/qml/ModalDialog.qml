@@ -19,8 +19,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
-
 
 import VLC.MainInterface
 import VLC.Widgets as Widgets
@@ -55,7 +53,7 @@ Dialog {
     }
 
     Overlay.modal: Item {
-        FastBlur {
+        Widgets.BlurEffect {
             anchors.fill: parent
             anchors.topMargin: MainCtx.windowExtendedMargin
             anchors.leftMargin: MainCtx.windowExtendedMargin
