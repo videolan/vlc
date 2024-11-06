@@ -173,9 +173,10 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
 static void thumbnailer_callback_cancel( picture_t* p_thumbnail, void *data )
 {
-    (void) data;
-    /* This callback should not be called since the request is cancelled */
     assert( p_thumbnail == NULL );
+
+    vlc_sem_t *sem = data;
+    vlc_sem_post(sem);
 }
 
 static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
@@ -195,14 +196,14 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
         .on_ended = thumbnailer_callback_cancel,
     };
 
+    vlc_sem_t sem;
+    vlc_sem_init(&sem, 0);
     vlc_thumbnailer_req_id id =
-        vlc_thumbnailer_Request( p_thumbnailer, p_item, NULL, &cbs, NULL );
+        vlc_thumbnailer_Request( p_thumbnailer, p_item, NULL, &cbs, &sem );
 
     vlc_thumbnailer_Cancel( p_thumbnailer, id );
 
-    /* Check that thumbnailer_callback_cancel is not called, even after the
-     * normal termination of the parsing. */
-    (vlc_tick_sleep)(VLC_TICK_FROM_MS(250));
+    vlc_sem_wait(&sem);
 
     input_item_Release( p_item );
 
