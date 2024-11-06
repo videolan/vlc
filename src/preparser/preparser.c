@@ -264,7 +264,7 @@ ParserRun(void *userdata)
 
     PreparserRemoveTask(preparser, task);
 
-    if (task->preparse_status == VLC_ETIMEOUT)
+    if (task->preparse_status == VLC_ETIMEOUT || atomic_load(&task->interrupted))
         goto end;
 
     int ret = Fetch(task);
