@@ -64,11 +64,9 @@ struct task
     struct vlc_list node; /**< node of vlc_preparser_t.submitted_tasks */
 };
 
-static void RunnableRun(void *);
-
 static struct task *
-TaskNew(vlc_preparser_t *preparser, input_item_t *item, int options,
-        const input_item_parser_cbs_t *cbs, void *userdata)
+TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
+        int options, const input_item_parser_cbs_t *cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
     if (!task)
@@ -87,7 +85,7 @@ TaskNew(vlc_preparser_t *preparser, input_item_t *item, int options,
     task->preparse_status = VLC_EGENERIC;
     atomic_init(&task->interrupted, false);
 
-    task->runnable.run = RunnableRun;
+    task->runnable.run = run;
     task->runnable.userdata = task;
 
     return task;
@@ -356,7 +354,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     assert(cbs != NULL && cbs->on_ended != NULL);
 
     struct task *task =
-        TaskNew(preparser, item, type_options, cbs, cbs_userdata);
+        TaskNew(preparser, RunnableRun, item, type_options, cbs, cbs_userdata);
     if( !task )
         return 0;
 
