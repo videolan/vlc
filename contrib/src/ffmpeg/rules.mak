@@ -253,6 +253,8 @@ ifdef USE_FFMPEG
 	$(APPLY) $(SRC)/ffmpeg/0001-bring-back-XP-support.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-avcodec-vp9-Do-not-destroy-uninitialized-mutexes-con.patch
 	$(APPLY) $(SRC)/ffmpeg/0001-dxva2_hevc-don-t-use-frames-as-reference-if-they-are.patch
+	$(APPLY) $(SRC)/ffmpeg/0001-Replace-all-occurences-of-av_mallocz_array-by-av_cal.patch
+	$(APPLY) $(SRC)/ffmpeg/0002-compat-w32dlfcn.h-Remove-MAX_PATH-limit-and-replace-.patch
 endif
 ifdef USE_LIBAV
 	$(APPLY) $(SRC)/ffmpeg/libav_gsm.patch
