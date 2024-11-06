@@ -38,10 +38,10 @@ struct vlc_thumbnailer_t
     vlc_thumbnailer_req_id current_id;
     vlc_tick_t timeout;
 
-    struct vlc_list submitted_tasks; /**< list of struct task */
+    struct vlc_list submitted_tasks; /**< list of struct th_task */
 };
 
-typedef struct task
+typedef struct th_task
 {
     vlc_thumbnailer_t *thumbnailer;
 
@@ -62,16 +62,16 @@ typedef struct task
 
     struct vlc_runnable runnable; /**< to be passed to the executor */
     struct vlc_list node; /**< node of vlc_thumbnailer_t.submitted_tasks */
-} task_t;
+} th_task_t;
 
-static void RunnableRun(void *);
+static void ThumbnailerRun(void *);
 
-static task_t *
-TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
+static th_task_t *
+ThTaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
         const struct vlc_thumbnailer_seek_arg *seek_arg,
         const struct vlc_thumbnailer_cbs *cbs, void *userdata )
 {
-    task_t *task = malloc(sizeof(*task));
+    th_task_t *task = malloc(sizeof(*task));
     if (!task)
         return NULL;
 
@@ -90,7 +90,7 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
     task->status = RUNNING;
     task->pic = NULL;
 
-    task->runnable.run = RunnableRun;
+    task->runnable.run = ThumbnailerRun;
     task->runnable.userdata = task;
 
     input_item_Hold(item);
@@ -99,13 +99,13 @@ TaskNew(vlc_thumbnailer_t *thumbnailer, input_item_t *item,
 }
 
 static void
-TaskDestroy(task_t *task)
+ThTaskDestroy(th_task_t *task)
 {
     input_item_Release(task->item);
     free(task);
 }
 
-static void NotifyThumbnail(task_t *task, picture_t *pic)
+static void NotifyThumbnail(th_task_t *task, picture_t *pic)
 {
     task->cbs->on_ended(pic, task->userdata);
 }
@@ -120,7 +120,7 @@ on_thumbnailer_input_event( input_thread_t *input,
                                                  event->state.value != END_S ) ) )
          return;
 
-    task_t *task = userdata;
+    th_task_t *task = userdata;
     vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
 
     vlc_mutex_lock(&thumbnailer->lock);
@@ -143,11 +143,11 @@ on_thumbnailer_input_event( input_thread_t *input,
 }
 
 static void
-RunnableRun(void *userdata)
+ThumbnailerRun(void *userdata)
 {
     vlc_thread_set_name("vlc-run-thumb");
 
-    task_t *task = userdata;
+    th_task_t *task = userdata;
     vlc_thumbnailer_t *thumbnailer = task->thumbnailer;
 
     vlc_tick_t now = vlc_tick_now();
@@ -223,7 +223,7 @@ RunnableRun(void *userdata)
     input_Close(input);
 
 error:
-    TaskDestroy(task);
+    ThTaskDestroy(task);
 }
 
 vlc_thumbnailer_req_id
@@ -234,7 +234,7 @@ vlc_thumbnailer_Request( vlc_thumbnailer_t *thumbnailer,
 {
     assert( cbs != NULL && cbs->on_ended != NULL );
 
-    task_t *task = TaskNew(thumbnailer, item, seek_arg, cbs, userdata);
+    th_task_t *task = ThTaskNew(thumbnailer, item, seek_arg, cbs, userdata);
     if (!task)
         return 0;
 
@@ -255,7 +255,7 @@ size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_r
 {
     vlc_mutex_lock(&thumbnailer->lock);
 
-    task_t *task;
+    th_task_t *task;
     size_t count = 0;
     vlc_list_foreach(task, &thumbnailer->submitted_tasks, node)
     {
@@ -269,7 +269,7 @@ size_t vlc_thumbnailer_Cancel( vlc_thumbnailer_t* thumbnailer, vlc_thumbnailer_r
                 vlc_list_remove(&task->node);
                 vlc_mutex_unlock(&thumbnailer->lock);
                 NotifyThumbnail(task, NULL);
-                TaskDestroy(task);
+                ThTaskDestroy(task);
 
                 /* Small optimisation in the likely case where the user cancel
                  * only one task */
