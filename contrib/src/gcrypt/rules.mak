@@ -5,6 +5,10 @@ GCRYPT_URL := $(GNUGPG)/libgcrypt/libgcrypt-$(GCRYPT_VERSION).tar.bz2
 PKGS += gcrypt
 ifeq ($(call need_pkg,"libgcrypt"),)
 PKGS_FOUND += gcrypt
+else
+PKGS.tools += gcrypt
+PKGS.tools.gcrypt.config-tool = libgcrypt-config
+PKGS.tools.gcrypt.path = $(PREFIX)/bin/libgcrypt-config
 endif
 
 $(TARBALLS)/libgcrypt-$(GCRYPT_VERSION).tar.bz2:
