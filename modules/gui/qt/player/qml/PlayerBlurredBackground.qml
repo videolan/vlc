@@ -19,8 +19,8 @@
 
 import QtQuick
 
-import Qt5Compat.GraphicalEffects
 import VLC.Util
+import VLC.Widgets as Widgets
 
 Item {
     id: rootItem
@@ -50,7 +50,7 @@ Item {
         mipmap: false
     }
 
-    FastBlur {
+    Widgets.BlurEffect {
         id: blur
 
         source: blurSource
