@@ -243,7 +243,7 @@ Fetch(struct task *task)
 }
 
 static void
-RunnableRun(void *userdata)
+ParserRun(void *userdata)
 {
     vlc_thread_set_name("vlc-run-prepars");
 
@@ -354,7 +354,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     assert(cbs != NULL && cbs->on_ended != NULL);
 
     struct task *task =
-        TaskNew(preparser, RunnableRun, item, type_options, cbs, cbs_userdata);
+        TaskNew(preparser, ParserRun, item, type_options, cbs, cbs_userdata);
     if( !task )
         return 0;
 
