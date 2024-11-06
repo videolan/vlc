@@ -50,12 +50,15 @@ struct vlc_thumbnailer_cbs
      * by using \link picture_Hold \endlink to use it pass the callback's
      * scope.
      *
+     * \param item item used for the thumbnailer
+     * \param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
+     * timeout, -EINTR if cancelled, an error otherwise
      * \param thumbnail The generated thumbnail, or NULL in case of failure or
      * timeout
      * \param data Is the opaque pointer passed as vlc_thumbnailer_Request last
      * parameter
      */
-    void (*on_ended)(picture_t* thumbnail, void *data);
+    void (*on_ended)(input_item_t *item, int status, picture_t* thumbnail, void *data);
 };
 
 /**

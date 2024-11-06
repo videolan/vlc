@@ -43,7 +43,7 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         throw std::runtime_error( "Failed to instantiate a vlc_thumbnailer_t" );
 }
 
-void Thumbnailer::onThumbnailComplete( picture_t* thumbnail, void *data )
+void Thumbnailer::onThumbnailComplete( input_item_t *, int, picture_t* thumbnail, void *data )
 {
     ThumbnailerCtx* ctx = static_cast<ThumbnailerCtx*>( data );
 

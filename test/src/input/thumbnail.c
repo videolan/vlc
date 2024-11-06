@@ -68,8 +68,10 @@ struct test_ctx
     bool b_done;
 };
 
-static void thumbnailer_callback( picture_t* thumbnail, void *data )
+static void thumbnailer_callback( input_item_t *item, int status,
+                                  picture_t* thumbnail, void *data )
 {
+    (void) item;
     struct test_ctx* p_ctx = data;
     vlc_mutex_lock( &p_ctx->lock );
 
@@ -78,6 +80,7 @@ static void thumbnailer_callback( picture_t* thumbnail, void *data )
         assert( test_params[p_ctx->test_idx].b_expected_success &&
                 "Expected failure but got a thumbnail" );
         assert( thumbnail->format.i_chroma == VLC_CODEC_ARGB );
+        assert( status == VLC_SUCCESS );
 
         /* TODO: Enable this once the new clock is merged */
 #if 0
@@ -98,8 +101,14 @@ static void thumbnailer_callback( picture_t* thumbnail, void *data )
 #endif
     }
     else
+    {
         assert( !test_params[p_ctx->test_idx].b_expected_success &&
                 "Expected a thumbnail but got a failure" );
+        if (test_params[p_ctx->test_idx].i_timeout == VLC_TICK_INVALID)
+            assert( status == VLC_EGENERIC );
+        else
+            assert( status == VLC_ETIMEOUT );
+    }
 
     p_ctx->b_done = true;
     vlc_cond_signal( &p_ctx->cond );
@@ -171,9 +180,12 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
     }
 }
 
-static void thumbnailer_callback_cancel( picture_t* p_thumbnail, void *data )
+static void thumbnailer_callback_cancel( input_item_t *item, int status,
+                                         picture_t* p_thumbnail, void *data )
 {
+    (void) item;
     assert( p_thumbnail == NULL );
+    assert( status == -EINTR );
 
     vlc_sem_t *sem = data;
     vlc_sem_post(sem);

@@ -927,8 +927,12 @@ struct libvlc_media_thumbnail_request_t
     vlc_thumbnailer_req_id id;
 };
 
-static void media_on_thumbnail_ready( picture_t* thumbnail, void* data )
+static void media_on_thumbnail_ready( input_item_t *item, int status,
+                                      picture_t* thumbnail, void* data )
 {
+    (void) item;
+    (void) status;
+
     libvlc_media_thumbnail_request_t *req = data;
     libvlc_media_t *p_media = req->md;
     libvlc_event_t event;

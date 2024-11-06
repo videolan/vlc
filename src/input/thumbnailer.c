@@ -107,7 +107,7 @@ ThTaskDestroy(th_task_t *task)
 
 static void NotifyThumbnail(th_task_t *task, picture_t *pic)
 {
-    task->cbs->on_ended(pic, task->userdata);
+    task->cbs->on_ended(task->item, task->preparse_status, pic, task->userdata);
 }
 
 static void
