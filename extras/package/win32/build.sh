@@ -181,14 +181,14 @@ fi
 cd ../../
 
 CONTRIB_PREFIX=$TRIPLET
-if [ ! -z "$BUILD_UCRT" ]; then
+if [ -n "$BUILD_UCRT" ]; then
 
     if [ ! "$COMPILING_WITH_UCRT" -gt 0 ]; then
         echo "UCRT builds need a UCRT toolchain"
         exit 1
     fi
 
-    if [ ! -z "$WINSTORE" ]; then
+    if [ -n "$WINSTORE" ]; then
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-disc --disable-srt --disable-sdl --disable-SDL_image --disable-caca"
         # modplug uses GlobalAlloc/Free and lstrcpyA/wsprintfA/lstrcpynA
         CONTRIBFLAGS="$CONTRIBFLAGS --disable-modplug"
@@ -238,11 +238,11 @@ unset CPPFLAGS
 VLC_LDFLAGS="$LDFLAGS"
 unset LDFLAGS
 
-if [ ! -z "$BUILD_UCRT" ]; then
+if [ -n "$BUILD_UCRT" ]; then
     WIDL=${TRIPLET}-widl
     VLC_CPPFLAGS="$VLC_CPPFLAGS -D__MSVCRT_VERSION__=0xE00 -D_UCRT"
 
-    if [ ! -z "$WINSTORE" ]; then
+    if [ -n "$WINSTORE" ]; then
         SHORTARCH="$SHORTARCH-uwp"
         TRIPLET=${TRIPLET}uwp
         VLC_CPPFLAGS="$VLC_CPPFLAGS -DWINAPI_FAMILY=WINAPI_FAMILY_APP -D_UNICODE -DUNICODE"
@@ -285,7 +285,7 @@ if [ ! -z "$BUILD_UCRT" ]; then
         VLC_CFLAGS="$VLC_CFLAGS -specs=$NEWSPECFILE"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -specs=$NEWSPECFILE"
 
-        if [ ! -z "$WINSTORE" ]; then
+        if [ -n "$WINSTORE" ]; then
             # trick to provide these libraries instead of -ladvapi32 -lshell32 -luser32 -lkernel32
             sed -i -e "s/-ladvapi32/-lwindowsapp -lwindowsappcompat/" $NEWSPECFILE
             sed -i -e "s/-lshell32//" $NEWSPECFILE
@@ -325,13 +325,13 @@ if [ -n "$WITH_PDB" ]; then
         VLC_CXXFLAGS="$VLC_CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
     fi
 fi
-if [ ! -z "$BREAKPAD" ]; then
+if [ -n "$BREAKPAD" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --enable-breakpad"
 fi
 if [ "$RELEASE" != "yes" ]; then
      CONTRIBFLAGS="$CONTRIBFLAGS --disable-optim"
 fi
-if [ ! -z "$DISABLEGUI" ]; then
+if [ -n "$DISABLEGUI" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --disable-qt --disable-qtsvg --disable-qtdeclarative --disable-qtgraphicaleffects --disable-qtquickcontrols2"
 fi
 
@@ -459,22 +459,22 @@ fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
 fi
-if [ ! -z "$BREAKPAD" ]; then
+if [ -n "$BREAKPAD" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
 fi
-if [ ! -z "$WITH_PDB" ]; then
+if [ -n "$WITH_PDB" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-pdb"
 fi
-if [ ! -z "$EXTRA_CHECKS" ]; then
+if [ -n "$EXTRA_CHECKS" ]; then
     CFLAGS="$CFLAGS -Werror=incompatible-pointer-types -Werror=missing-field-initializers"
     CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers"
 fi
-if [ ! -z "$DISABLEGUI" ]; then
+if [ -n "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
 fi
-if [ ! -z "$WINSTORE" ]; then
+if [ -n "$WINSTORE" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-winstore-app"
     # uses CreateFile to access files/drives outside of the app
     CONFIGFLAGS="$CONFIGFLAGS --disable-vcd"
@@ -486,7 +486,7 @@ if [ ! -z "$WINSTORE" ]; then
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-dvdread --enable-caca"
 fi
-if [ ! -z "$INSTALL_PATH" ]; then
+if [ -n "$INSTALL_PATH" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --prefix=$INSTALL_PATH"
 fi
 
@@ -503,6 +503,6 @@ make package-win32
 elif [ "$INSTALLER" = "u" ]; then
 make package-win32-release
 sha512sum vlc-*-release.7z
-elif [ ! -z "$INSTALL_PATH" ]; then
+elif [ -n "$INSTALL_PATH" ]; then
 make package-win-install
 fi
