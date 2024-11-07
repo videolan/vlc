@@ -58,7 +58,7 @@ vlc_fourcc_t vlc_va_GetChroma(enum PixelFormat hwfmt, enum PixelFormat swfmt)
             }
             break;
 
-#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
+#if LIBAV_UTIL_VERSION_CHECK(54, 13, 1, 24, 100)
         case AV_PIX_FMT_D3D11VA_VLD:
             switch (swfmt)
             {

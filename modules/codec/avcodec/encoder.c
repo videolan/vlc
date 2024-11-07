@@ -47,7 +47,7 @@
 #include "avcodec.h"
 #include "avcommon.h"
 
-#define API_CHANNEL_LAYOUT (LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 100))
+#define API_CHANNEL_LAYOUT (LIBAV_UTIL_VERSION_CHECK( 52, 2, 6, 0, 100))
 
 #if API_CHANNEL_LAYOUT
 # include <libavutil/channel_layout.h>

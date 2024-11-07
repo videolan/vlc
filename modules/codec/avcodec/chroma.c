@@ -180,7 +180,7 @@ static const struct
     {VLC_CODEC_GBR_PLANAR_16B, AV_PIX_FMT_GBRP16BE, 0, 0, 0 },
 
     /* XYZ */
-#if LIBAVUTIL_VERSION_CHECK(52, 10, 0, 25, 100)
+#if LIBAV_UTIL_VERSION_CHECK(52, 10, 0, 25, 100)
     {VLC_CODEC_XYZ12, AV_PIX_FMT_XYZ12, 0xfff0, 0xfff0, 0xfff0},
 #endif
     { 0, 0, 0, 0, 0 }

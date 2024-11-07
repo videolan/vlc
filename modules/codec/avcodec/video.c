@@ -257,12 +257,12 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
         case AVCOL_TRC_BT2020_12:
             fmt->transfer = TRANSFER_FUNC_BT2020;
             break;
-#if LIBAVUTIL_VERSION_CHECK( 55, 14, 0, 31, 100)
+#if LIBAV_UTIL_VERSION_CHECK( 55, 14, 0, 31, 100)
         case AVCOL_TRC_ARIB_STD_B67:
             fmt->transfer = TRANSFER_FUNC_ARIB_B67;
             break;
 #endif
-#if LIBAVUTIL_VERSION_CHECK( 55, 17, 0, 37, 100)
+#if LIBAV_UTIL_VERSION_CHECK( 55, 17, 0, 37, 100)
         case AVCOL_TRC_SMPTE2084:
             fmt->transfer = TRANSFER_FUNC_SMPTE_ST2084;
             break;
@@ -687,7 +687,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
 static const enum PixelFormat hwfmts[] =
 {
 #ifdef _WIN32
-#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
+#if LIBAV_UTIL_VERSION_CHECK(54, 13, 1, 24, 100)
     AV_PIX_FMT_D3D11VA_VLD,
 #endif
     AV_PIX_FMT_DXVA2_VLD,
