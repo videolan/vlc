@@ -859,17 +859,6 @@ hxxx_helper_get_current_sar(const struct hxxx_helper *hh, int *p_num, int *p_den
 }
 
 int
-h264_helper_get_current_dpb_values(const struct hxxx_helper *hh,
-                                   uint8_t *p_depth, unsigned *p_delay)
-{
-    const struct hxxx_helper_nal *hsps = h264_helper_get_current_sps(hh);
-    if (hsps == NULL)
-        return VLC_EGENERIC;
-    return h264_get_dpb_values(hsps->h264_sps, p_depth, p_delay) ?
-           VLC_SUCCESS : VLC_EGENERIC;
-}
-
-int
 hxxx_helper_get_current_profile_level(const struct hxxx_helper *hh,
                                       uint8_t *p_profile, uint8_t *p_level)
 {
