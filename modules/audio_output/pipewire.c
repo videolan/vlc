@@ -117,9 +117,12 @@ static void stream_state_changed(void *data, enum pw_stream_state old,
 /**
  * Retrieve latest timings
  */
-static int stream_update_latency(struct vlc_pw_stream *s)
+static int stream_update_latency(struct vlc_pw_stream *s, vlc_tick_t *now)
 {
     struct pw_time ts;
+
+    /* PW monotonic clock, same than vlc_tick_now() */
+    *now = VLC_TICK_FROM_NS(pw_stream_get_nsec(s->stream));
 
     if (pw_stream_get_time_n(s->stream, &ts, sizeof (ts)) < 0
      || ts.rate.denom == 0)
@@ -140,7 +143,8 @@ static int stream_update_latency(struct vlc_pw_stream *s)
 static void stream_process(void *data)
 {
     struct vlc_pw_stream *s = data;
-    int val = stream_update_latency(s);
+    vlc_tick_t now;
+    int val = stream_update_latency(s, &now);
     struct pw_buffer *b = pw_stream_dequeue_buffer(s->stream);
 
     if (likely(b != NULL)) {
@@ -156,8 +160,6 @@ static void stream_process(void *data)
         chunk->offset = 0;
         chunk->stride = s->stride;
         chunk->size = 0;
-
-        vlc_tick_t now = vlc_tick_now();
 
         /* Adjust start time */
         if (s->starting) {
