@@ -25,7 +25,7 @@
 
 #include <vlc_memstream.h>
 
-#include "../../codec/hxxx_helper.h"
+#include "../../packetizer/h264_nal.h"
 #include "../../packetizer/hevc_nal.h"
 #include "../../packetizer/hxxx_ep3b.h"
 #include "../../packetizer/hxxx_nal.h"
@@ -34,17 +34,29 @@
 static int FormatAVC(struct vlc_memstream *ms, const es_format_t *fmt)
 {
     /* Parse the h264 constraint flag. */
-    uint8_t constraints = 0;
-    uint8_t profile = 0;
-    uint8_t level = 0;
-    struct hxxx_helper hh;
-    hxxx_helper_init(&hh, NULL, fmt->i_codec, 0, 0);
-    if (hxxx_helper_set_extra(&hh, fmt->p_extra, fmt->i_extra) == VLC_SUCCESS)
+    hxxx_iterator_ctx_t it;
+    hxxx_iterator_init(&it, fmt->p_extra, fmt->i_extra, 0);
+    const uint8_t *nal = NULL;
+    size_t nal_size;
+    if (hxxx_annexb_iterate_next(&it, &nal, &nal_size))
     {
-        h264_helper_get_constraint_flag(&hh, &constraints);
-        hxxx_helper_get_current_profile_level(&hh, &profile, &level);
+        switch (h264_getNALType(nal))
+        {
+        case H264_NAL_SPS:
+            break;
+        default:
+            nal = NULL;
+            break;
+        }
     }
-    hxxx_helper_clean(&hh);
+
+    /* NAL units aren't provisioned. Codec description will be minimal. */
+    if (unlikely(nal == NULL || nal_size<4))
+        return VLC_SUCCESS;
+
+    uint8_t profile = nal[1];
+    uint8_t constraints = nal[2];
+    uint8_t level = nal[3];
 
     const int written = vlc_memstream_printf(
         ms, "avc1.%02X%02X%02X", profile, constraints, level);
