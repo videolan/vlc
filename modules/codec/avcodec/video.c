@@ -1307,7 +1307,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         }
 
         /* Compute the PTS */
-#if LIBAVCODEC_VERSION_CHECK(57, 24, 0, 61, 100)
+#if LIBAV_CODEC_VERSION_CHECK(57, 24, 0, 61, 100)
 # if LIBAVCODEC_VERSION_MICRO >= 100
         vlc_tick_t i_pts = frame->best_effort_timestamp;
 # else
