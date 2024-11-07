@@ -139,6 +139,12 @@ struct vlc_preparser_cfg
     unsigned max_parser_threads;
 
     /**
+     * The maximum number of threads used by the thumbnailer, 0 for default
+     * (1 thread)
+     */
+    unsigned max_thumbnailer_threads;
+
+    /**
      * Timeout of the preparser and/or thumbnailer, 0 for no limits.
      */
     vlc_tick_t timeout;

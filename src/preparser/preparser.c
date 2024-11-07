@@ -424,6 +424,9 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
 
     unsigned parser_threads = cfg->max_parser_threads == 0 ? 1 :
                               cfg->max_parser_threads;
+    unsigned thumbnailer_threads = cfg->max_thumbnailer_threads == 0 ? 1 :
+                                   cfg->max_thumbnailer_threads;
+
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
         return NULL;
@@ -451,7 +454,7 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
 
     if (request_type & VLC_PREPARSER_TYPE_THUMBNAIL)
     {
-        preparser->thumbnailer = vlc_executor_New(1);
+        preparser->thumbnailer = vlc_executor_New(thumbnailer_threads);
         if (!preparser->thumbnailer)
             goto error_thumbnail;
     }
