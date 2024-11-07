@@ -38,10 +38,13 @@
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 
+#define DISTRO_KLUDGE 50
+#include <vlc_modules.h>
+
 vlc_module_begin ()
     set_shortname( "PulseAudio" )
     set_description( N_("Pulseaudio audio output") )
-    set_capability( "audio output", 160 )
+    set_capability( "audio output", 160 + DISTRO_KLUDGE )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_shortcut( "pulseaudio", "pa" )
     set_callbacks( Open, Close )
@@ -67,6 +70,9 @@ typedef struct
     pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
     pa_time_event *drain_trigger; /**< Drain stream trigger */
     bool draining;
+#if DISTRO_KLUDGE > 0
+    bool is_pipewire;
+#endif
     pa_cvolume cvolume; /**< actual sink input volume */
 
     bool start_date_reached;
@@ -1163,6 +1169,13 @@ static void server_info_cb(pa_context *ctx, const pa_server_info *info,
 
     msg_Dbg(aout, "server %s version %s on %s@%s", info->server_name,
             info->server_version, info->user_name, info->host_name);
+#if DISTRO_KLUDGE > 0
+    aout_sys_t *sys = aout->sys;
+
+    sys->is_pipewire = strcasestr(info->server_name, "pipewire") != NULL;
+    pa_threaded_mainloop_signal(sys->mainloop, 0);
+#endif
+
     (void) ctx;
 }
 
@@ -1231,10 +1244,26 @@ static int Open(vlc_object_t *obj)
     aout->mute_set = MuteSet;
     aout->device_select = StreamMove;
 
+#if DISTRO_KLUDGE > 0
+    sys->is_pipewire = false;
+#endif
     pa_threaded_mainloop_lock(sys->mainloop);
     op = pa_context_get_server_info(sys->context, server_info_cb, aout);
     if (likely(op != NULL))
+    {
+#if DISTRO_KLUDGE > 0
+        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
+        if (sys->is_pipewire && module_exists("aout_pipewire")) {
+            msg_Dbg(aout, "refusing to use PipeWire");
+            pa_threaded_mainloop_unlock(sys->mainloop);
+            vlc_pa_disconnect(obj, sys->context, sys->mainloop);
+            free(sys);
+            return -ENOTSUP;
+        }
+#endif
         pa_operation_unref(op);
+    }
 
     /* Sinks (output devices) list */
     op = pa_context_get_sink_info_list(sys->context, sink_add_cb, aout);
