@@ -182,9 +182,9 @@ make -j$JOBS
 
 # avoid installing wine on WSL
 # wine is needed to build Qt with shaders
-if test -z "`command -v wine`"
+if test -z "$(command -v wine)"
 then
-    if test -n "`command -v wsl.exe`"
+    if test -n "$(command -v wsl.exe)"
     then
         echo "Using wsl.exe to replace wine"
         echo "#!/bin/sh" > build/bin/wine
@@ -281,7 +281,7 @@ if [ -n "$BUILD_UCRT" ]; then
         if [ -z "$NTDDI" ]; then
             WINVER=0x0A00
         else
-            WINVER=`echo ${NTDDI} |cut -c 1-6`
+            WINVER=$(echo ${NTDDI} |cut -c 1-6)
             if [ "$WINVER" != "0x0A00" ]; then
                 echo "Unsupported SDK/NTDDI version ${NTDDI} for Winstore"
             fi
@@ -307,7 +307,7 @@ if [ -n "$BUILD_UCRT" ]; then
     VLC_LDFLAGS="$VLC_LDFLAGS -lucrt"
     if [ ! "$COMPILING_WITH_CLANG" -gt 0 ]; then
         # assume gcc
-        NEWSPECFILE="`pwd`/specfile-$SHORTARCH"
+        NEWSPECFILE="$(pwd)/specfile-$SHORTARCH"
         # tell gcc to replace msvcrt with ucrtbase+ucrt
         $CC -dumpspecs | sed -e "s/-lmsvcrt/-lucrt/" > $NEWSPECFILE
         VLC_CFLAGS="$VLC_CFLAGS -specs=$NEWSPECFILE"
@@ -327,7 +327,7 @@ else
 fi
 
 if [ -n "$NTDDI" ]; then
-    WINVER=`echo ${NTDDI} |cut -c 1-6`
+    WINVER=$(echo ${NTDDI} |cut -c 1-6)
     VLC_CPPFLAGS="$VLC_CPPFLAGS -DNTDDI_VERSION=$NTDDI"
 fi
 if [ -z "$WINVER" ]; then
