@@ -251,8 +251,14 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         QMetaObject::invokeMethod(m_medialib, &MediaLib::reload, Qt::QueuedConnection);
     }
 
-    m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), 1, 0,
-                                            VLC_PREPARSER_TYPE_PARSE);
+    const struct vlc_preparser_cfg cfg = []{
+        struct vlc_preparser_cfg cfg{};
+        cfg.types = VLC_PREPARSER_TYPE_PARSE;
+        cfg.max_parser_threads = 1;
+        cfg.timeout = 0;
+        return cfg;
+    }();
+    m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), &cfg);
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */

@@ -121,19 +121,38 @@ struct vlc_preparser_seek_arg
 };
 
 /**
+ * Preparser creation configuration
+ */
+struct vlc_preparser_cfg
+{
+    /**
+     * A combination of VLC_PREPARSER_TYPE_* flags, it is used to
+     * setup the executors for each domain. Its possible to select more than
+     * one type
+     */
+    int types;
+
+    /**
+     * The maximum number of threads used by the parser, 0 for default
+     * (1 thread)
+     */
+    unsigned max_parser_threads;
+
+    /**
+     * Timeout of the preparser and/or thumbnailer, 0 for no limits.
+     */
+    vlc_tick_t timeout;
+};
+
+/**
  * This function creates the preparser object and thread.
  *
  * @param obj the parent object
- * @param max_threads the maximum number of threads used to parse, must be >= 1
- * @param timeout timeout of the preparser, 0 for no limits.
- * @param types a combination of VLC_PREPARSER_TYPE_* flags, it is used to
- * setup the executors for each domain. Its possible to select more than one
- * types
+ * @param cfg a pointer to a valid confiuration struct
  * @return a valid preparser object or NULL in case of error
  */
 VLC_API vlc_preparser_t *vlc_preparser_New( vlc_object_t *obj,
-                                            unsigned max_threads,
-                                            vlc_tick_t timeout, int types );
+                                            const struct vlc_preparser_cfg *cfg );
 
 /**
  * This function enqueues the provided item to be preparsed or fetched.

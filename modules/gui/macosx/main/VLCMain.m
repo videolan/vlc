@@ -155,8 +155,12 @@ int OpenIntf (vlc_object_t *p_this)
             intf_thread_t *p_intf = (intf_thread_t*) p_this;
             p_interface_thread = p_intf;
 
-            p_network_preparser = vlc_preparser_New(p_this, 1, 0,
-                                                    VLC_PREPARSER_TYPE_PARSE);
+            const struct vlc_preparser_cfg cfg = {
+                .types = VLC_PREPARSER_TYPE_PARSE,
+                .max_parser_threads = 1,
+                .timeout = 0,
+            };
+            p_network_preparser = vlc_preparser_New(p_this, &cfg);
             if (p_network_preparser == nil)
             {
                 retcode = VLC_ENOMEM;

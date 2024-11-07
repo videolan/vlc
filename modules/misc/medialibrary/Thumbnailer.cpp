@@ -37,9 +37,13 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     , m_currentContext( nullptr )
     , m_thumbnailer( nullptr, &vlc_preparser_Delete )
 {
-    m_thumbnailer.reset( vlc_preparser_New( VLC_OBJECT( ml ), 1,
-                                            VLC_TICK_FROM_SEC( 3 ),
-                                            VLC_PREPARSER_TYPE_THUMBNAIL ) );
+    const struct vlc_preparser_cfg cfg = []{
+        struct vlc_preparser_cfg cfg{};
+        cfg.types = VLC_PREPARSER_TYPE_THUMBNAIL;
+        cfg.timeout = VLC_TICK_FROM_SEC( 3 );
+        return cfg;
+    }();
+    m_thumbnailer.reset( vlc_preparser_New( VLC_OBJECT( ml ), &cfg ) );
     if ( unlikely( m_thumbnailer == nullptr ) )
         throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }

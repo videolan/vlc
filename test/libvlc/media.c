@@ -253,9 +253,13 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     int options = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_LOCAL;
 
+    const struct vlc_preparser_cfg cfg = {
+        .types = options,
+        .max_parser_threads = 1,
+        .timeout = VLC_TICK_FROM_MS(timeout),
+    };
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
-                                                1, VLC_TICK_FROM_MS(timeout),
-                                                options);
+                                                &cfg);
     assert(parser != NULL);
     vlc_preparser_req_id id = vlc_preparser_Push(parser, p_item, options, &cbs, &sem);
     assert(id != VLC_PREPARSER_REQ_ID_INVALID);

@@ -410,25 +410,30 @@ Interrupt(struct task *task)
     vlc_sem_post(&task->preparse_ended);
 }
 
-vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent, unsigned max_threads,
-                                    vlc_tick_t timeout, int request_type )
+vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
+                                    const struct vlc_preparser_cfg *cfg )
 {
-    assert(max_threads >= 1);
-    assert(timeout >= 0);
+    assert(cfg != NULL);
+
+    assert(cfg->timeout >= 0);
+
+    int request_type = cfg->types;
     assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|
                            VLC_PREPARSER_TYPE_PARSE|
                            VLC_PREPARSER_TYPE_THUMBNAIL));
 
+    unsigned parser_threads = cfg->max_parser_threads == 0 ? 1 :
+                              cfg->max_parser_threads;
     vlc_preparser_t* preparser = malloc( sizeof *preparser );
     if (!preparser)
         return NULL;
 
-    preparser->timeout = timeout;
+    preparser->timeout = cfg->timeout;
     preparser->owner = parent;
 
     if (request_type & VLC_PREPARSER_TYPE_PARSE)
     {
-        preparser->parser = vlc_executor_New(max_threads);
+        preparser->parser = vlc_executor_New(parser_threads);
         if (!preparser->parser)
             goto error_parser;
     }

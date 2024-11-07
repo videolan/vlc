@@ -1955,9 +1955,14 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
         if (default_timeout < 0)
             default_timeout = 0;
 
-        d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), 1,
-                                           default_timeout,
-                                           VLC_PREPARSER_TYPE_FETCHMETA_ALL);
+        const struct vlc_preparser_cfg cfg = [default_timeout]{
+            struct vlc_preparser_cfg cfg{};
+            cfg.types = VLC_PREPARSER_TYPE_FETCHMETA_ALL;
+            cfg.max_parser_threads = 1;
+            cfg.timeout = default_timeout;
+            return cfg;
+        }();
+        d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), &cfg);
         if (unlikely(d->m_preparser == nullptr))
             return;
     }
