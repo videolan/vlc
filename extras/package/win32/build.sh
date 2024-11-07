@@ -465,6 +465,7 @@ if [ ! -z "$WITH_PDB" ]; then
 fi
 if [ ! -z "$EXTRA_CHECKS" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-extra-checks"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dextra_checks=true"
 fi
 if [ ! -z "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
