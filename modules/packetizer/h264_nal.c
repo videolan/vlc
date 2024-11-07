@@ -878,13 +878,6 @@ bool h264_get_sps_profile_tier_level( const h264_sequence_parameter_set_t *p_sps
     return true;
 }
 
-bool h264_get_constraints_set( const h264_sequence_parameter_set_t *p_sps,
-                               uint8_t *pi_constraints )
-{
-    *pi_constraints = p_sps->i_constraint_set_flags;
-    return true;
-}
-
 bool h264_get_picture_size( const h264_sequence_parameter_set_t *p_sps,
                             unsigned *p_ox, unsigned *p_oy,
                             unsigned *p_w, unsigned *p_h,
