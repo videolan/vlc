@@ -1252,14 +1252,17 @@ static int Open(vlc_object_t *obj)
     if (likely(op != NULL))
     {
 #if DISTRO_KLUDGE > 0
-        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
-            pa_threaded_mainloop_wait(sys->mainloop);
-        if (sys->is_pipewire && module_exists("aout_pipewire")) {
-            msg_Dbg(aout, "refusing to use PipeWire");
-            pa_threaded_mainloop_unlock(sys->mainloop);
-            vlc_pa_disconnect(obj, sys->context, sys->mainloop);
-            free(sys);
-            return -ENOTSUP;
+        if (!obj->force)
+        {
+            while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+                pa_threaded_mainloop_wait(sys->mainloop);
+            if (sys->is_pipewire && module_exists("aout_pipewire")) {
+                msg_Dbg(aout, "refusing to use PipeWire");
+                pa_threaded_mainloop_unlock(sys->mainloop);
+                vlc_pa_disconnect(obj, sys->context, sys->mainloop);
+                free(sys);
+                return -ENOTSUP;
+            }
         }
 #endif
         pa_operation_unref(op);
