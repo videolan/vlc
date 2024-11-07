@@ -167,6 +167,54 @@ static int test_extrainit(vlc_fourcc_t codec,
     return 0;
 }
 
+static int test_configuration_change(vlc_fourcc_t codec,
+                                     const uint8_t *p_annexb, size_t i_annexb,
+                                     size_t i_borkoffset)
+{
+    fprintf(stderr,"test_configuration_change\n");
+
+    struct hxxx_helper hlpr;
+    hxxx_helper_init(&hlpr, NULL, codec, 0, 0);
+
+    block_t *b = block_Alloc(i_annexb);
+    if(!b)
+        return 1;
+    memcpy(b->p_buffer, p_annexb, i_annexb);
+
+    dump_hex("in", b->p_buffer, b->i_buffer);
+
+    assert(!hxxx_helper_has_new_config(&hlpr));
+    b = hxxx_helper_process_block(&hlpr, b);
+    if(!b)
+        return 1;
+
+    /* now have a config */
+    assert(hxxx_helper_has_new_config(&hlpr));
+
+    b = hxxx_helper_process_block(&hlpr, b);
+    if(!b)
+        return 1;
+
+    /* should not have a new config */
+    assert(!hxxx_helper_has_new_config(&hlpr));
+
+    /* patch our SPS */
+    b->p_buffer[i_borkoffset] = ~ b->p_buffer[i_borkoffset];
+    dump_hex("in new", b->p_buffer, b->i_buffer);
+    b = hxxx_helper_process_block(&hlpr, b);
+    if(!b)
+        return 1;
+
+    /* now have a new SPS/PPS config */
+    assert(hxxx_helper_has_new_config(&hlpr));
+
+    block_Release(b);
+
+    hxxx_helper_clean(&hlpr);
+
+    return 0;
+}
+
 static int test_any(struct hxxx_helper *hlpr,
                     const uint8_t *p_in, size_t i_in,
                     const uint8_t *p_out, size_t i_out,
@@ -266,6 +314,14 @@ static int test_annexb(void)
     ret = test_extrainit(VLC_CODEC_HEVC,
                 test_extradata_raw_h265_annexb, sizeof(test_extradata_raw_h265_annexb),
                 test_extradata_raw_h265_hvc1, sizeof(test_extradata_raw_h265_hvc1));
+    if(ret) return ret;
+
+    ret = test_configuration_change(VLC_CODEC_H264,
+                test_samples_raw_h264_annexb, sizeof(test_samples_raw_h264_annexb), 4+2); // poke constraints
+    if(ret) return ret;
+
+    ret = test_configuration_change(VLC_CODEC_HEVC,
+                test_samples_raw_h265_annexb, sizeof(test_samples_raw_h265_annexb), 4+2); // poke profiletieridc
     if(ret) return ret;
 
     return 0;
