@@ -71,8 +71,8 @@ vlc_tests += {
 }
 
 vlc_tests += {
-    'name' : 'test_src_input_thumbnail',
-    'sources' : files('input/thumbnail.c'),
+    'name' : 'test_src_preparser_thumbnail',
+    'sources' : files('preparser/thumbnail.c'),
     'suite' : ['src', 'test_src'],
     'link_with' : [libvlc, libvlccore],
     'module_depends' : ['demux_mock', 'rawvideo']
