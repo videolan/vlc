@@ -61,7 +61,7 @@ struct sout_mux_sys_t
     bool     b_write_header;
     bool     b_write_keyframe;
     bool     b_error;
-#if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+#if LIBAV_FORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
     bool     b_header_done;
 #endif
 };
@@ -80,7 +80,7 @@ static int IOWrite( void *opaque, uint8_t *buf, int buf_size );
 static int IOWrite( void *opaque, const uint8_t *buf, int buf_size );
 #endif
 static int64_t IOSeek( void *opaque, int64_t offset, int whence );
-#if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+#if LIBAV_FORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
 # if FF_API_AVIO_WRITE_NONCONST
 static int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
                               enum AVIODataMarkerType type, int64_t time);
@@ -168,7 +168,7 @@ int avformat_OpenMux( vlc_object_t *p_this )
     p_sys->b_write_header = true;
     p_sys->b_write_keyframe = false;
     p_sys->b_error = false;
-#if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+#if LIBAV_FORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
     p_sys->io->write_data_type = IOWriteTyped;
     p_sys->b_header_done = false;
 #endif
@@ -419,7 +419,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     return VLC_SUCCESS;
 }
 
-#if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+#if LIBAV_FORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
 # if FF_API_AVIO_WRITE_NONCONST
 int IOWriteTyped(void *opaque, uint8_t *buf, int buf_size,
                               enum AVIODataMarkerType type, int64_t time)
@@ -545,7 +545,7 @@ static int IOWrite( void *opaque, const uint8_t *buf, int buf_size )
 
     if( p_sys->b_write_header )
         p_buf->i_flags |= BLOCK_FLAG_HEADER;
-#if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
+#if LIBAV_FORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
     if( !p_sys->b_header_done )
         p_buf->i_flags |= BLOCK_FLAG_HEADER;
 #endif
