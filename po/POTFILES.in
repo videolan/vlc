@@ -582,12 +582,6 @@ modules/gui/macosx/views/VLCDefaultValueSliderCell.h
 modules/gui/macosx/views/VLCDefaultValueSliderCell.m
 modules/gui/macosx/views/VLCDragDropView.h
 modules/gui/macosx/views/VLCDragDropView.m
-modules/gui/macosx/views/VLCHUDOutlineView.h
-modules/gui/macosx/views/VLCHUDOutlineView.m
-modules/gui/macosx/views/VLCHUDTableCornerView.h
-modules/gui/macosx/views/VLCHUDTableCornerView.m
-modules/gui/macosx/views/VLCHUDTableView.h
-modules/gui/macosx/views/VLCHUDTableView.m
 modules/gui/macosx/views/VLCImageButton.h
 modules/gui/macosx/views/VLCImageButton.m
 modules/gui/macosx/views/VLCImageView.h
