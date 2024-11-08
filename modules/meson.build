@@ -320,6 +320,11 @@ subdir('visualization')
 # lua module
 subdir('lua')
 
+# muxer modules
+if get_option('stream_outputs')
+    subdir('mux')
+endif
+
 # Qt check executable
 # This has to be declared here as it needs to end up
 # in the modules folder, not in gui/qt/ subfolder as
