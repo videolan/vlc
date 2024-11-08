@@ -271,6 +271,14 @@ vlc_modules += {
     'enabled' : aribb24_dep.found()
 }
 
+libaribcaption_dep = dependency('libaribcaption', required: get_option('aribcaption'))
+vlc_modules += {
+    'name' : 'aribcaption',
+    'sources' : files('arib/libaribcaption.c'),
+    'dependencies' : [libaribcaption_dep],
+    'enabled' : libaribcaption_dep.found()
+}
+
 # scte18 decoder
 vlc_modules += {
     'name' : 'scte18',

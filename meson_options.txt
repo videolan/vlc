@@ -695,6 +695,12 @@ option('aribb25',
     value: 'auto',
     description: 'ARIB STD-B25 support')
 
+option('aribcaption',
+    type: 'feature',
+    value: 'auto',
+    description: 'ARIB caption decoder/renderer support')
+
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
