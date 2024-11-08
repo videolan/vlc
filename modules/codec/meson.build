@@ -102,7 +102,19 @@ vlc_modules += {
 }
 
 # libmad codec
-mad_dep = dependency('mad', required: get_option('mad'))
+if get_option('mad').allowed()
+mad_dep = disabler()
+# TODO add support for a custom folder for libmad
+if cc.check_header('mad.h')
+    mad_dep = cc.find_library('mad')
+elif cc.check_header('mad.h', include_directories: include_directories( contrib_incdir ) )
+    if cc.find_library('mad', dirs: contrib_libdir).found()
+        mad_dep = declare_dependency(
+            dependencies: [cc.find_library('mad', dirs: contrib_libdir)],
+            include_directories: [include_directories( contrib_incdir )])
+    endif
+endif
+endif
 vlc_modules += {
     'name' : 'mad',
     'sources' : files('mad.c'),
