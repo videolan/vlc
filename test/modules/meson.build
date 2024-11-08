@@ -65,6 +65,7 @@ vlc_tests += {
     'module_depends' : vlc_plugins_targets.keys()
 }
 
+if not(host_system == 'windows')
 vlc_tests += {
     'name' : 'test_modules_tls',
     'sources' : files('misc/tls.c'),
@@ -72,6 +73,7 @@ vlc_tests += {
     'link_with' : [libvlc, libvlccore],
     'module_depends' : vlc_plugins_targets.keys()
 }
+endif
 
 vlc_tests += {
     'name' : 'test_modules_demux_timestamps_filter',
