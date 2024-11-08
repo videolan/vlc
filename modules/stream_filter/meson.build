@@ -19,10 +19,10 @@ if z_dep.found()
   }
 endif
 
-# TODO: Add !HAVE_WINSTORE check
 vlc_modules += {
     'name' : 'prefetch',
-    'sources' : files('prefetch.c')
+    'sources' : files('prefetch.c'),
+    'enabled' : not have_win_store
 }
 
 vlc_modules += {
