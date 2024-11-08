@@ -340,6 +340,11 @@ option('soxr',
     value : 'auto',
     description : 'Enable/disable soxr support')
 
+option('speex',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable speex support')
+
 option('speexdsp',
     type : 'feature',
     value : 'auto',

@@ -475,6 +475,15 @@ vlc_modules += {
     'enabled' : daaladec_dep.found() and daalaenc_dep.found(),
 }
 
+# Speex codec plugin
+speex_dep = dependency('speex', version: '>= 1.0.5', required: get_option('speex'))
+vlc_modules += {
+    'name' : 'speex',
+    'sources' : files('speex.c'),
+    'dependencies' : [speex_dep],
+    'enabled' : speex_dep.found(),
+}
+
 # Vorbis codec
 vorbis_dep    = dependency('vorbis', 'Vorbis', version: '>= 1.1', required: get_option('vorbis'))
 vorbisenc_dep = dependency('vorbisenc', version: '>= 1.1', required: get_option('vorbis'))
