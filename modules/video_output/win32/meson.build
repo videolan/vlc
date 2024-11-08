@@ -32,25 +32,29 @@ if get_option('amf_scaler').allowed()
     endif
 endif
 
-vlc_modules += {
-    'name' : 'direct3d11',
-    'sources' : d3d11_sources,
-    'link_with' : d3d11_link_with,
-    'c_args' : d3d11_cargs,
-    'cpp_args' : d3d11_cxxargs,
-    'dependencies' : d3d11_deps
-}
+if get_option('directx').allowed()
+    vlc_modules += {
+        'name' : 'direct3d11',
+        'sources' : d3d11_sources,
+        'link_with' : d3d11_link_with,
+        'c_args' : d3d11_cargs,
+        'cpp_args' : d3d11_cxxargs,
+        'dependencies' : d3d11_deps
+    }
+endif
 
 if have_win_desktop
-    # Direct3D9 video output
-    vlc_modules += {
-        'name' : 'direct3d9',
-        'sources' : files('direct3d9.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
-        'link_with' : [ d3d9_common_lib, chroma_copy_lib ],
-        'dependencies' : [
-            cc.find_library('user32')
-        ]
-    }
+    if get_option('directx').allowed()
+        # Direct3D9 video output
+        vlc_modules += {
+            'name' : 'direct3d9',
+            'sources' : files('direct3d9.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
+            'link_with' : [ d3d9_common_lib, chroma_copy_lib ],
+            'dependencies' : [
+                cc.find_library('user32')
+            ]
+        }
+    endif
 
     # GDI video output
     vlc_modules += {

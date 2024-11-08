@@ -665,6 +665,11 @@ option('amf_vqenhancer',
     value: 'auto',
     description: 'AMF VQ Enhancer support')
 
+option('directx',
+    type: 'feature',
+    value: 'auto',
+    description: 'DirectX support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
@@ -679,7 +684,6 @@ option('amf_vqenhancer',
 # TODO: Missing tremor
 # TODO: Missing x26410b
 # TODO: Missing vdpau
-# TODO: Missing directx
 # TODO: Missing kva
 # TODO: Missing mmal
 # TODO: Missing sndio
