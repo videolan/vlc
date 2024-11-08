@@ -426,6 +426,18 @@ vlc_modules += {
     'dependencies' : [socket_libs, threads_dep]
 }
 
+# MMS
+vlc_modules += {
+    'name' : 'access_mms',
+    'sources' : files(
+        'mms/mms.c',
+        'mms/mmsh.c',
+        'mms/mmstu.c',
+        'mms/buffer.c',
+        'mms/asf.c',
+    ),
+    'dependencies' : [socket_libs]
+}
 
 ## Misc
 
