@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment version="101000" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customView id="WRu-Ic-lQK" customClass="VLCMainVideoViewAudioMediaDecorativeView">
-            <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+        <customView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="WRu-Ic-lQK" customClass="VLCMainVideoViewAudioMediaDecorativeView">
+            <rect key="frame" x="0.0" y="0.0" width="316" height="336"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cDv-dn-65H">
-                    <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cDv-dn-65H">
+                    <rect key="frame" x="0.0" y="0.0" width="316" height="336"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="noart" id="3lz-lJ-nIL"/>
                 </imageView>
-                <visualEffectView blendingMode="withinWindow" material="HUDWindow" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="D1e-fS-bwO">
-                    <rect key="frame" x="0.0" y="0.0" width="720" height="480"/>
+                <visualEffectView horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" blendingMode="withinWindow" material="HUDWindow" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="D1e-fS-bwO">
+                    <rect key="frame" x="0.0" y="0.0" width="316" height="336"/>
                 </visualEffectView>
-                <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="40P-sL-Mzq">
-                    <rect key="frame" x="232" y="112" width="256" height="256"/>
+                <imageView wantsLayer="YES" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="40P-sL-Mzq">
+                    <rect key="frame" x="95" y="105" width="126" height="126"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="256" id="PdS-Zh-d9T"/>
                         <constraint firstAttribute="width" secondItem="40P-sL-Mzq" secondAttribute="height" multiplier="1:1" id="dje-mE-ZfL"/>
+                        <constraint firstAttribute="height" relation="lessThanOrEqual" constant="256" id="m0P-G9-9hZ"/>
                     </constraints>
                     <shadow key="shadow" blurRadius="20">
                         <color key="color" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -34,9 +33,12 @@
             </subviews>
             <constraints>
                 <constraint firstItem="40P-sL-Mzq" firstAttribute="centerX" secondItem="WRu-Ic-lQK" secondAttribute="centerX" id="4Ib-c0-egD"/>
+                <constraint firstItem="40P-sL-Mzq" firstAttribute="bottom" relation="lessThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="bottom" constant="-20" id="DHs-x0-cB0"/>
                 <constraint firstAttribute="trailing" secondItem="D1e-fS-bwO" secondAttribute="trailing" id="J68-x2-cY5"/>
                 <constraint firstItem="D1e-fS-bwO" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="KBI-Gr-tTT"/>
+                <constraint firstItem="40P-sL-Mzq" firstAttribute="width" relation="lessThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="width" multiplier="0.4" id="Kuw-Nx-ZmH"/>
                 <constraint firstAttribute="bottom" secondItem="cDv-dn-65H" secondAttribute="bottom" id="Sv1-Hf-eCe"/>
+                <constraint firstItem="40P-sL-Mzq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="D1e-fS-bwO" secondAttribute="top" constant="20" id="TVt-Xt-aoo"/>
                 <constraint firstItem="cDv-dn-65H" firstAttribute="leading" secondItem="WRu-Ic-lQK" secondAttribute="leading" id="bZL-GN-AAt"/>
                 <constraint firstItem="cDv-dn-65H" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="dvc-kq-jk8"/>
                 <constraint firstItem="D1e-fS-bwO" firstAttribute="top" secondItem="WRu-Ic-lQK" secondAttribute="top" id="eDP-U6-Qt6"/>
