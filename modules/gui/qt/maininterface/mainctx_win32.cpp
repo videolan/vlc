@@ -405,54 +405,24 @@ public:
         case WM_NCLBUTTONUP:
         case WM_NCLBUTTONDOWN:
         {
-            void (CSDButton::*function)();
-            void (CSDButton::*functionForOthers)() = nullptr;
-
-            if (msg->message == WM_NCLBUTTONDOWN)
-                function = &CSDButton::externalPress;
-            else if (msg->message == WM_NCLBUTTONUP)
-            {
-                function = &CSDButton::externalRelease;
-                functionForOthers = &CSDButton::unsetExternalPressed;
-            }
-            else
-                Q_UNREACHABLE();
+            const bool pressed = (msg->message == WM_NCLBUTTONDOWN);
 
             // manually trigger button here, UI will never get click
             // signal because we have captured the mouse in non client area
             switch ( msg->wParam )
             {
             case HTCLOSE:
-                trigger(CSDButton::Close, function);
-                if (functionForOthers)
-                {
-                    trigger(CSDButton::Minimize, functionForOthers);
-                    trigger(CSDButton::MaximizeRestore, functionForOthers);
-                }
+                handleButtonActionExclusive(CSDButton::Close, pressed);
                 break;
             case HTMINBUTTON:
-                trigger(CSDButton::Minimize, function);
-                if (functionForOthers)
-                {
-                    trigger(CSDButton::Close, functionForOthers);
-                    trigger(CSDButton::MaximizeRestore, functionForOthers);
-                }
+                handleButtonActionExclusive(CSDButton::Minimize, pressed);
                 break;
             case HTMAXBUTTON:
-                trigger(CSDButton::MaximizeRestore, function);
-                if (functionForOthers)
-                {
-                    trigger(CSDButton::Close, functionForOthers);
-                    trigger(CSDButton::Minimize, functionForOthers);
-                }
+                handleButtonActionExclusive(CSDButton::MaximizeRestore, pressed);
                 break;
             default:
-                if (functionForOthers)
-                {
-                    trigger(CSDButton::Close, functionForOthers);
-                    trigger(CSDButton::Minimize, functionForOthers);
-                    trigger(CSDButton::MaximizeRestore, functionForOthers);
-                }
+                resetPressedState();
+                break;
             }
 
 
@@ -536,16 +506,29 @@ private:
         }
     }
 
-    void trigger(CSDButton::ButtonType type, void (CSDButton::*function)())
+    void handleButtonActionExclusive(CSDButton::ButtonType type, bool pressed)
     {
-        for (auto button : m_buttonmodel->windowCSDButtons()) {
-            if (button->type() == type) {
-                (button->*function)();
-                return ;
+        for (auto button : m_buttonmodel->windowCSDButtons())
+        {
+            if (pressed)
+            {
+                if (button->type() == type)
+                    button->externalPress();
+            }
+            else
+            {
+                if (button->type() == type)
+                    button->externalRelease();
+                else
+                    button->unsetExternalPressed();
             }
         }
+    }
 
-        vlc_assert_unreachable();
+    void resetPressedState()
+    {
+        for (auto button : m_buttonmodel->windowCSDButtons())
+            button->unsetExternalPressed();
     }
 
     void setAllUnhovered()
