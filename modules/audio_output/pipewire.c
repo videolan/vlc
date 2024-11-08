@@ -48,6 +48,7 @@ struct vlc_pw_stream {
     struct {
         vlc_frame_t *head;
         vlc_frame_t **tailp;
+        size_t size;
     } queue;
 
     struct {
@@ -219,6 +220,7 @@ static void stream_process(void *data)
             assert((length % s->stride) == 0);
             const size_t written = length / s->stride;
             s->time.injected += written;
+            s->queue.size -= length;
 
             if (block->i_buffer > 0) {
                 assert(room == 0);
@@ -292,13 +294,16 @@ static void vlc_pw_stream_play(struct vlc_pw_stream *s, vlc_frame_t *block,
         pw_stream_set_active(s->stream, true);
         assert(!s->starting);
         s->starting = true;
-        s->start = date;
         s->time.next_update = date;
         s->first_pts = block->i_pts;
     }
+    if (s->starting)
+        s->start = date
+                 - vlc_tick_from_samples(s->queue.size / s->stride, s->time.rate);
 
     *(s->queue.tailp) = block;
     s->queue.tailp = &block->p_next;
+    s->queue.size += block->i_buffer;
 out:
     s->draining = false;
     vlc_pw_unlock(s->context);
@@ -332,6 +337,7 @@ static void vlc_pw_stream_flush(struct vlc_pw_stream *s)
     vlc_frame_ChainRelease(s->queue.head);
     s->queue.head = NULL;
     s->queue.tailp = &s->queue.head;
+    s->queue.size = 0;
     s->time.pts = VLC_TICK_INVALID;
     s->time.injected = 0;
     s->first_pts = s->start = VLC_TICK_INVALID;
@@ -579,6 +585,7 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     s->stride = fmt->i_bytes_per_frame;
     s->queue.head = NULL;
     s->queue.tailp = &s->queue.head;
+    s->queue.size = 0;
     s->time.pts = VLC_TICK_INVALID;
     s->time.rate = fmt->i_rate;
     s->time.injected = 0;
