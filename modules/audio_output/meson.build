@@ -120,4 +120,11 @@ vlc_modules += {
       .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
       .allowed() and ksuser_lib.found()
 }
+
+vlc_modules += {
+    'name' : 'waveout',
+    'sources' : files('waveout.c'),
+    'dependencies' : [cc.find_library('winmm')],
+    'enabled' : have_win_desktop,
+}
 endif
