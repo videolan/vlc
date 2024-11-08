@@ -690,6 +690,11 @@ option('archive',
     value: 'auto',
     description: 'libarchive support')
 
+option('aribb25',
+    type: 'feature',
+    value: 'auto',
+    description: 'ARIB STD-B25 support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec

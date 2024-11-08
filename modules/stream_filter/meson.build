@@ -44,3 +44,11 @@ vlc_modules += {
     'name' : 'skiptags',
     'sources' : files('skiptags.c')
 }
+
+aribb25_dep = dependency('aribb25', version:'>= 0.2.6', required: get_option('aribb25'))
+vlc_modules += {
+    'name' : 'aribcam',
+    'sources' : files('aribcam.c'),
+    'dependencies' : [aribb25_dep],
+    'enabled': aribb25_dep.found(),
+}
