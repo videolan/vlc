@@ -593,7 +593,7 @@
 // #undef ZVBI_COMPILED
 
 /* Define to 64 for large files support. */
-#mesondefine _FILE_OFFSET_BITS
+#define _FILE_OFFSET_BITS 64
 
 /* Alias fdatasync() to fsync() if missing. */
 #mesondefine fdatasync
