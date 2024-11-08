@@ -650,6 +650,7 @@ if host_system == 'windows'
                 '../packetizer/hevc_nal.c'
             ),
         'link_with' : [ d3d11_common_lib ],
+        'cpp_args' : libcom_cppflags,
         'dependencies' : mft_deps
     }
 
@@ -823,16 +824,19 @@ vlc_modules += {
 vpx_alpha_sources = files('vpx_alpha.c')
 vpx_alpha_with = [ ]
 vpx_alpha_deps = [ ]
+vpx_alpha_cxx_args = [ ]
 if host_system == 'windows'
     vpx_alpha_sources += files('alpha_d3d11.cpp')
     vpx_alpha_with += [ d3d11_common_lib ]
     vpx_alpha_deps += [ cc.find_library('d3d11') ]
+    vpx_alpha_cxx_args += libcom_cppflags
 endif
 vlc_modules += {
     'name' : 'vpx_alpha',
     'sources' : vpx_alpha_sources,
     'link_with' : vpx_alpha_with,
     'dependencies' : [vpx_alpha_deps],
+    'cpp_args' : vpx_alpha_cxx_args,
 }
 
 # libaom AV1 codec
