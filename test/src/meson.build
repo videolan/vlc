@@ -46,6 +46,7 @@ if gcrypt_dep.found()
     }
 endif
 
+if not(host_system == 'windows')
 vlc_tests += {
     'name' : 'test_src_input_stream',
     'sources' : files('input/stream.c'),
@@ -62,6 +63,7 @@ vlc_tests += {
     'c_args' : ['-DTEST_NET'],
     'module_depends' : vlc_plugins_targets.keys()
 }
+endif
 
 vlc_tests += {
     'name' : 'test_src_input_stream_fifo',
