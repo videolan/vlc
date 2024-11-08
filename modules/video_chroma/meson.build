@@ -109,6 +109,35 @@ vlc_modules += {
     'sources' : files('orient.c'),
 }
 
+d3d11_common_lib = []
+if host_system == 'windows'
+    d3d11_common_lib = static_library('d3d11_common',
+        files(
+            'd3d11_fmt.cpp',
+            'dxgi_fmt.c',
+            ),
+        include_directories: [vlc_include_dirs],
+        cpp_args : libcom_cppflags,
+        pic: true,
+        install: false,
+        dependencies: [
+            cc.find_library('dxguid'),
+            cc.find_library('wbemuuid'),
+            cc.find_library('uuid'),
+            cc.find_library('d3d11'),
+        ]
+    )
+    d3d9_common_lib = static_library('d3d9_common',
+        files(
+            'd3d9_fmt.c',
+            'dxgi_fmt.c',
+            ),
+        include_directories: [vlc_include_dirs],
+        pic: true,
+        install: false
+    )
+endif
+
 # CVPX chroma converter
 # TODO: Set minimum versions for tvOS and iOS
 vlc_modules += {
