@@ -581,7 +581,8 @@
 
 - (void)pipDidClose:(PIPViewController *)pip
 {
-    NSWindow * const window = self.view.window;
+    VLCVideoWindowCommon * const window =
+        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
     }
