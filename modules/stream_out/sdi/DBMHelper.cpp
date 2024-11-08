@@ -24,7 +24,6 @@
 
 #include <vlc_common.h>
 #include <vlc_es.h>
-#include <vlc_decklink.h>
 
 #include "DBMHelper.hpp"
 

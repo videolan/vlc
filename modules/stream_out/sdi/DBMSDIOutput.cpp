@@ -28,7 +28,6 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_interrupt.h>
-#include <vlc_decklink.h>
 
 #include "DBMHelper.hpp"
 #include "DBMSDIOutput.hpp"

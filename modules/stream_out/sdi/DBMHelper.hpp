@@ -21,6 +21,8 @@
 #ifndef DBMHELPER_HPP
 #define DBMHELPER_HPP
 
+#include "../../access/vlc_decklink.h"
+
 namespace Decklink
 {
     class Helper
