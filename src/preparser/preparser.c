@@ -339,7 +339,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
                                          void *cbs_userdata )
 {
     if( atomic_load( &preparser->deactivated ) )
-        return 0;
+        return VLC_PREPARSER_REQ_ID_INVALID;
 
     assert(type_options & VLC_PREPARSER_TYPE_PARSE
         || type_options & VLC_PREPARSER_TYPE_FETCHMETA_ALL);
@@ -354,7 +354,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
     struct task *task =
         TaskNew(preparser, ParserRun, item, type_options, cbs, cbs_userdata);
     if( !task )
-        return 0;
+        return VLC_PREPARSER_REQ_ID_INVALID;
 
     if (preparser->parser != NULL)
     {
