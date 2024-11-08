@@ -246,6 +246,13 @@ ListView {
 
                 property bool dropOperationOngoing: false
 
+                onDropOperationOngoingChanged: {
+                    if (dropOperationOngoing)
+                        MainCtx.setCursor(root, Qt.BusyCursor)
+                    else
+                        MainCtx.unsetCursor(root)
+                }
+
                 onEntered: function(drag) {
                     if (!root.isDropAcceptableFunc || !root.isDropAcceptableFunc(drag, root.model.rowCount())
                             || !root.acceptDropFunc) {
