@@ -105,12 +105,15 @@ endif
 
 # Coloured ASCII art (Caca)
 caca_dep = dependency('caca', version: '>= 0.99.beta14', required: get_option('caca'))
+caca_deps = [ caca_dep ]
+if not (host_system in ['windows', 'darwin'])
+    caca_deps += x11_dep
+endif
 if caca_dep.found()
     vlc_modules += {
         'name' : 'caca',
         'sources' : files('caca.c'),
-        'dependencies' : [caca_dep, x11_dep]
-        # TODO: Properly conditonalize X11 dependency
+        'dependencies' : [caca_deps],
     }
 endif
 
