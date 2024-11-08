@@ -347,6 +347,7 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, vlc_preparser_t *parser,
     VLC_UNUSED(parser);
     VLC_UNUSED(media);
     VLC_UNUSED(preparser_callbacks);
+    return VLC_PREPARSER_REQ_ID_INVALID;
 #else
     return vlc_preparser_Push(parser, media, VLC_PREPARSER_TYPE_PARSE |
                               VLC_PREPARSER_OPTION_INTERACT |
