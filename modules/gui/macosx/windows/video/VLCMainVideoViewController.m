@@ -89,6 +89,8 @@
 
     BOOL _isFadingIn;
 }
+
+@property NSWindow *retainedWindow;
 @end
 
 @implementation VLCMainVideoViewController
@@ -508,6 +510,8 @@
 
     NSWindow * const window = self.view.window;
     [window orderOut:window];
+    self.retainedWindow = window;
+
     _voutViewController = [PIPVoutViewController new];
     _voutViewController.view = self.voutContainingView;
     VLCPlayerController * const controller =
@@ -564,14 +568,14 @@
 
 - (void)pipWillClose:(PIPViewController *)pip
 {
-    VLCVideoWindowCommon * const window =
-        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
+    NSWindow * const window = self.retainedWindow;
     pip.replacementWindow = window;
     pip.replacementRect = self.view.frame;
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
     }
     [window makeKeyAndOrderFront:window];
+    self.retainedWindow = nil;
 }
 
 - (void)pipDidClose:(PIPViewController *)pip
