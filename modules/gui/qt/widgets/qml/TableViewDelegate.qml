@@ -291,5 +291,7 @@ T.Control {
     Widgets.ListViewExt.VerticalDropAreaLayout {
         id: dropAreaLayout
         anchors.fill: parent
+
+        view: delegate.ListView.view
     }
 }
