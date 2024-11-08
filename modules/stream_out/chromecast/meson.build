@@ -49,7 +49,7 @@ vlc_modules += {
 }
 
 vlc_modules += {
-    'name' : 'chromecast',
+    'name' : 'stream_out_chromecast',
     'sources' : files(
         'cast.cpp',
         'chromecast.h',
