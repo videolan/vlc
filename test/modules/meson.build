@@ -6,6 +6,7 @@ vlc_tests += {
     'module_depends' : vlc_plugins_targets.keys()
 }
 
+if not (host_system == 'windows') # missing mkdtemp()
 vlc_tests += {
     'name' : 'test_modules_misc_medialibrary',
     'sources' : files('misc/medialibrary.c'),
@@ -14,6 +15,7 @@ vlc_tests += {
     'module_depends' : vlc_plugins_targets.keys(),
     #'module_depends' : ['medialibrary', 'demux_mock', 'jpeg', 'png', 'rawvid'],
 }
+endif
 
 vlc_tests += {
     'name' : 'test_modules_packetizer_helpers',
