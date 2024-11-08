@@ -366,19 +366,13 @@ public:
             switch ( msg->wParam )
             {
             case HTCLOSE:
-                setHovered(CSDButton::Close);
-                setHovered(CSDButton::Minimize, false);
-                setHovered(CSDButton::MaximizeRestore, false);
+                hoverExclusive(CSDButton::Close);
                 break;
             case HTMINBUTTON:
-                setHovered(CSDButton::Minimize);
-                setHovered(CSDButton::Close, false);
-                setHovered(CSDButton::MaximizeRestore, false);
+                hoverExclusive(CSDButton::Minimize);
                 break;
             case HTMAXBUTTON:
-                setHovered(CSDButton::MaximizeRestore);
-                setHovered(CSDButton::Close, false);
-                setHovered(CSDButton::Minimize, false);
+                hoverExclusive(CSDButton::MaximizeRestore);
                 break;
             default:
                 setAllUnhovered();
@@ -535,16 +529,11 @@ private:
         return nullptr;
     }
 
-    void setHovered(CSDButton::ButtonType type, bool hovered = true)
+    void hoverExclusive(CSDButton::ButtonType type)
     {
         for (auto button : m_buttonmodel->windowCSDButtons()) {
-            if (button->type() == type) {
-                button->setShowHovered(hovered);
-                return ;
-            }
+            button->setShowHovered(button->type() == type);
         }
-
-        vlc_assert_unreachable();
     }
 
     void trigger(CSDButton::ButtonType type, void (CSDButton::*function)())
