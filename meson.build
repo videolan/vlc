@@ -873,11 +873,6 @@ endif
 
 if not have_sockaddr_storage
     cdata.set('sockaddr_storage', 'sockaddr')
-endif
-
-# Check for struct ss_family type
-# Define it to `sa_family` if missing
-if not cc.has_type('struct ss_family', prefix: '#include <sys/socket.h>')
     cdata.set('ss_family', 'sa_family')
 endif
 
