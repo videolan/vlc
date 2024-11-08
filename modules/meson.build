@@ -296,6 +296,9 @@ subdir('services_discovery')
 # stream output modules
 subdir('stream_out')
 
+# stream extractor modules
+subdir('stream_extractor')
+
 # stream filter modules
 subdir('stream_filter')
 

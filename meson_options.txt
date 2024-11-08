@@ -685,6 +685,11 @@ option('sftp',
     value: 'auto',
     description: 'SFTP file transfer via libssh2')
 
+option('archive',
+    type: 'feature',
+    value: 'auto',
+    description: 'libarchive support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
