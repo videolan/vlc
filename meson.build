@@ -865,12 +865,14 @@ endif
 
 # Check for struct sockaddr_storage type
 # Define it to `sockaddr` if missing
-have_sockaddr_storage = cc.has_type('struct sockaddr_storage', prefix: '#include <sys/socket.h>')
-
-if not have_sockaddr_storage
-    have_sockaddr_storage = cc.has_type('struct sockaddr_storage', prefix: '#include <winsock2.h>')
+sockaddr_prefix = '#include <sys/types.h>\n'
+if host_system == 'windows'
+    sockaddr_prefix += '#include <winsock2.h>'
+else
+    sockaddr_prefix += '#include <sys/socket.h>'
 endif
 
+have_sockaddr_storage = cc.has_type('struct sockaddr_storage', prefix: sockaddr_prefix)
 if not have_sockaddr_storage
     cdata.set('sockaddr_storage', 'sockaddr')
     cdata.set('ss_family', 'sa_family')
