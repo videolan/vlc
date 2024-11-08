@@ -55,8 +55,9 @@ struct ItemEntry
     bool currentScan = true;
 };
 
-struct RendererManagerPrivate
+class RendererManagerPrivate
 {
+public:
     RendererManagerPrivate(RendererManager* pub, qt_intf_t* const intf, vlc_player_t* const player)
         : p_intf(intf)
         , m_player(player)
