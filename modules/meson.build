@@ -253,6 +253,9 @@ subdir('audio_output')
 # control modules
 subdir('control')
 
+# hardware modules
+subdir('hw')
+
 # gui modules
 subdir('gui')
 
