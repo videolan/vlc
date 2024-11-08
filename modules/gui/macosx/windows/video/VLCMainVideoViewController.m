@@ -575,14 +575,11 @@
         [self.voutContainingView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor]
     ]];
     _voutViewController = nil;
-    pip.replacementWindow = self.view.window;
-    pip.replacementRect = self.view.frame;
-}
 
-- (void)pipDidClose:(PIPViewController *)pip
-{
     VLCVideoWindowCommon * const window =
         [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
+    pip.replacementWindow = window;
+    pip.replacementRect = self.view.frame;
     if ([window isKindOfClass:VLCLibraryWindow.class]) {
         [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
     }
