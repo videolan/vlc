@@ -295,7 +295,7 @@ static void vlc_pw_stream_play(struct vlc_pw_stream *s, vlc_frame_t *block,
         pw_stream_set_active(s->stream, true);
         assert(!s->starting);
         s->starting = true;
-        s->time.next_update = date;
+        s->time.next_update = VLC_TICK_0;
         s->first_pts = block->i_pts;
     }
     if (s->starting)
