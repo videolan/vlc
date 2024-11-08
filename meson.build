@@ -947,7 +947,7 @@ cdata.set('PACKAGE_VERSION_MAJOR',      vlc_version_major)
 cdata.set('PACKAGE_VERSION_MINOR',      vlc_version_minor)
 cdata.set('PACKAGE_VERSION_REVISION',   vlc_version_revision)
 cdata.set('PACKAGE_VERSION_EXTRA',      vlc_version_extra)
-cdata.set('PACKAGE_VERSION_DEV',        vlc_version_type)
+cdata.set_quoted('PACKAGE_VERSION_DEV', vlc_version_type)
 
 cdata.set('LIBVLC_ABI_MAJOR', libvlc_abi_version_major)
 cdata.set('LIBVLC_ABI_MINOR', libvlc_abi_version_minor)
