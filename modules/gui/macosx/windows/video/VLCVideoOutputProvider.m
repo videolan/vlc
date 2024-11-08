@@ -642,6 +642,11 @@ static int WindowFloatOnTop(vlc_object_t *obj,
     [NSNotificationCenter.defaultCenter postNotificationName:VLCWindowShouldUpdateLevel object:self userInfo:@{VLCWindowLevelKey : @(_currentWindowLevel)}];
 }
 
+- (VLCVideoWindowCommon *)videoWindowForVoutView:(VLCVoutView *)voutView
+{
+    return [self.voutWindows objectForKey:[NSValue valueWithPointer:voutView.voutWindow]];
+}
+
 #pragma mark -
 #pragma mark Property methods
 

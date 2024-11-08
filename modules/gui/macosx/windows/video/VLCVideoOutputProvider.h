@@ -49,4 +49,6 @@ extern NSString * const VLCWindowFloatOnTopEnabledNotificationKey;
 
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level;
 
+- (VLCVideoWindowCommon *)videoWindowForVoutView:(VLCVoutView *)voutView;
+
 @end
