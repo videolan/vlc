@@ -842,6 +842,13 @@ vlc_modules += {
     'enabled' : dav1d_dep.found(),
 }
 
+# tests
+vlc_modules += {
+    'name': 'hxxxhelper_testdec',
+    'sources': files('hxxx_helper_testdec.c'),
+    'link_with' : [hxxxhelper_lib],
+    'include_directories': [vlc_include_dirs],
+}
 
 ## Hardware encoders
 
