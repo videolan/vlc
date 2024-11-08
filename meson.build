@@ -1015,6 +1015,10 @@ if get_option('binary_version') != ''
     cdata.set_quoted('DISTRO_VERSION', get_option('binary_version'))
 endif
 
+if get_option('css_engine').allowed()
+    cdata.set('HAVE_CSS', 1)
+endif
+
 
 # Font options
 if get_option('default_font_path') != ''

@@ -98,6 +98,9 @@
    standard. */
 #mesondefine HAVE_BROKEN_QSORT_R
 
+/* Define if CSS engine is built */
+#mesondefine HAVE_CSS
+
 /* Define to 1 if C++ headers define locale_t */
 #mesondefine HAVE_CXX_LOCALE_T
 
