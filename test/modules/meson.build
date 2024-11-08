@@ -92,15 +92,9 @@ vlc_tests += {
 
 vlc_tests += {
     'name' : 'test_modules_codec_hxxx_helper',
-    'sources' : files(
-        'codec/hxxx_helper.c',
-        '../../modules/codec/hxxx_helper.c',
-        '../../modules/packetizer/hxxx_nal.c',
-        '../../modules/packetizer/h264_slice.c',
-        '../../modules/packetizer/h264_nal.c',
-        '../../modules/packetizer/hevc_nal.c'),
+    'sources' : files('codec/hxxx_helper.c'),
     'suite' : ['modules', 'test_modules'],
-    'link_with' : [libvlc, libvlccore],
+    'link_with' : [libvlc, libvlccore, hxxxhelper_lib],
     'module_depends' : vlc_plugins_targets.keys()
 }
 

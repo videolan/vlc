@@ -197,6 +197,22 @@ rsvg_dep = dependency('librsvg-2.0', version: '>= 2.9.0', required: get_option('
 # Rust support
 cargo_bin = find_program('cargo', required: get_option('rust'))
 
+# hxxx common helper lib
+hxxxhelper_lib = static_library(
+    'hxxxhelper',
+    files(
+        'codec/hxxx_helper.c',
+        'packetizer/hxxx_nal.c',
+        'packetizer/hxxx_sei.c',
+        'packetizer/h264_slice.c',
+        'packetizer/h264_nal.c',
+        'packetizer/hevc_nal.c',
+    ),
+    include_directories: [vlc_include_dirs],
+    pic: true,
+    install: false
+)
+
 # JSON library
 json_bison_files = bison_gen.process('demux/json/grammar.y')
 json_lex_files = flex_gen.process('demux/json/lexicon.l')

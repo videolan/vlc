@@ -519,12 +519,6 @@ if host_system == 'darwin'
             'videotoolbox/dpb.h',
             'videotoolbox/pacer.c',
             'videotoolbox/pacer.h',
-            'hxxx_helper.c',
-            '../packetizer/hxxx_nal.c',
-            '../packetizer/hxxx_sei.c',
-            '../packetizer/h264_slice.c',
-            '../packetizer/h264_nal.c',
-            '../packetizer/hevc_nal.c'
         ),
         'dependencies' : [
             frameworks['VideoToolbox'],
@@ -532,19 +526,13 @@ if host_system == 'darwin'
             frameworks['CoreMedia'],
             frameworks['CoreVideo'],
         ],
-        'link_with' : [libvlc_vtutils],
+        'link_with' : [hxxxhelper_lib, libvlc_vtutils],
     }
 
     vlc_modules += {
         'name' : 'videotoolbox_enc',
         'sources' : files(
             'videotoolbox/encoder.c',
-            'hxxx_helper.c',
-            '../packetizer/hxxx_nal.c',
-            '../packetizer/hxxx_sei.c',
-            '../packetizer/h264_slice.c',
-            '../packetizer/h264_nal.c',
-            '../packetizer/hevc_nal.c'
         ),
         'dependencies' : [
             frameworks['VideoToolbox'],
@@ -552,7 +540,7 @@ if host_system == 'darwin'
             frameworks['CoreMedia'],
             frameworks['CoreVideo'],
         ],
-        'link_with' : [libvlc_vtutils],
+        'link_with' : [hxxxhelper_lib, libvlc_vtutils],
     }
 
 endif
@@ -624,14 +612,8 @@ if host_system == 'windows'
                 'mft.cpp',
                 'mft_d3d.cpp',
                 'mft_d3d11.cpp',
-                'hxxx_helper.c',
-                '../packetizer/hxxx_nal.c',
-                '../packetizer/hxxx_sei.c',
-                '../packetizer/h264_slice.c',
-                '../packetizer/h264_nal.c',
-                '../packetizer/hevc_nal.c'
             ),
-        'link_with' : [ d3d11_common_lib ],
+        'link_with' : [ hxxxhelper_lib, d3d11_common_lib ],
         'cpp_args' : libcom_cppflags,
         'dependencies' : mft_deps
     }
