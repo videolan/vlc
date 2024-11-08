@@ -564,6 +564,18 @@
 
 - (void)pipWillClose:(PIPViewController *)pip
 {
+    VLCVideoWindowCommon * const window =
+        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
+    pip.replacementWindow = window;
+    pip.replacementRect = self.view.frame;
+    if ([window isKindOfClass:VLCLibraryWindow.class]) {
+        [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
+    }
+    [window makeKeyAndOrderFront:window];
+}
+
+- (void)pipDidClose:(PIPViewController *)pip
+{
     [self.voutContainingView removeFromSuperview];
     [self.view addSubview:self.voutContainingView
                positioned:NSWindowBelow
@@ -575,15 +587,6 @@
         [self.voutContainingView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor]
     ]];
     _voutViewController = nil;
-
-    VLCVideoWindowCommon * const window =
-        [VLCMain.sharedInstance.voutProvider videoWindowForVoutView:self.voutView];
-    pip.replacementWindow = window;
-    pip.replacementRect = self.view.frame;
-    if ([window isKindOfClass:VLCLibraryWindow.class]) {
-        [(VLCLibraryWindow *)window enableVideoPlaybackAppearance];
-    }
-    [window makeKeyAndOrderFront:window];
 }
 
 - (void)pipActionPlay:(PIPViewController *)pip
