@@ -212,6 +212,16 @@ vlc_json_lib = static_library('vlc_json',
     pic: true
 )
 
+# deinterlace common helper lib
+deinterlacecommon_lib = static_library(
+    'deinterlace_common',
+    files('video_filter/deinterlace/common.c'),
+    include_directories: [vlc_include_dirs],
+    pic: true,
+    install: false
+)
+
+
 # Array that holds all enabled VLC module dicts
 vlc_modules = []
 vlc_rust_modules = []

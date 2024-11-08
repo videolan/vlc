@@ -289,15 +289,6 @@ vlc_modules += {
     'enabled' : host_system == 'darwin',
 }
 
-# deinterlace common helper lib
-deinterlacecommon_lib = static_library(
-    'deinterlace_common',
-    files('deinterlace/common.c'),
-    include_directories: [vlc_include_dirs],
-    pic: true,
-    install: false
-)
-
 # deinterlace filter
 vlc_modules += {
     'name' : 'deinterlace',
