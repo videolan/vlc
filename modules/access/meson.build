@@ -338,6 +338,18 @@ if host_system == 'windows'
         'dependencies' : [strmiids_lib],
         'cpp_args' : libcom_cppflags
     }
+
+    vlc_modules += {
+        'name' : 'dshow',
+        'sources' : files(
+            'dshow/dshow.cpp',
+            'dshow/filter.cpp',
+            'dshow/crossbar.cpp',
+        ),
+        'dependencies' : [ksuser_lib, strmiids_lib],
+        'cpp_args' : libcom_cppflags,
+        'enabled' : ksuser_lib.found() and have_win_desktop
+    }
 endif
 
 
