@@ -675,6 +675,16 @@ option('directx',
     value: 'auto',
     description: 'DirectX support')
 
+option('libssh2',
+    type: 'feature',
+    value: 'auto',
+    description: 'libssh2 support')
+
+option('sftp',
+    type: 'feature',
+    value: 'auto',
+    description: 'SFTP file transfer via libssh2')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec

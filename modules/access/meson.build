@@ -350,6 +350,15 @@ vlc_modules += {
     'dependencies' : [socket_libs]
 }
 
+# SFTP
+libssh2_dep = dependency('libssh2', required: get_option('libssh2'))
+vlc_modules += {
+    'name' : 'sftp',
+    'sources' : files('sftp.c'),
+    'dependencies' : [libssh2_dep],
+    'enabled': libssh2_dep.found() and get_option('sftp').allowed(),
+}
+
 # Gopher
 vlc_modules += {
     'name' : 'gopher',
