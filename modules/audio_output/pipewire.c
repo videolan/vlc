@@ -194,7 +194,8 @@ static void stream_process(void *data)
             memset(dst, 0, skip);
             dst += skip;
             room -= skip;
-        } else if (s->time.pts != VLC_TICK_INVALID && now >= s->time.next_update) {
+        } else if (s->time.pts != VLC_TICK_INVALID && now >= s->time.next_update
+                && s->first_pts != VLC_TICK_INVALID) {
             vlc_tick_t elapsed = now - s->time.pts;
             /* A sample injected now would be delayed by the following amount of vlc_tick_t */
             vlc_tick_t delay = vlc_tick_from_samples(s->time.frames, s->time.rate)
