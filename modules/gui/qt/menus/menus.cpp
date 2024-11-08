@@ -759,12 +759,7 @@ QMenu* VLCMenuBar::PopupMenu( qt_intf_t *p_intf, bool show )
         /* Add a fullscreen switch button, since it is the most used function */
         if( p_vout )
         {
-            b_isFullscreen = THEMIM->isFullscreen();
-            if (b_isFullscreen)
-                menu->addAction(new BooleanPropertyAction(qtr( "Leave Fullscreen" ), THEMIM, "fullscreen", menu) );
-            else
-                menu->addAction(new BooleanPropertyAction(qtr( "&Fullscreen" ), THEMIM, "fullscreen", menu) );
-
+            menu->addAction(new BooleanPropertyAction(qtr( "&Fullscreen" ), THEMIM, "fullscreen", menu) );
             menu->addSeparator();
         }
 
