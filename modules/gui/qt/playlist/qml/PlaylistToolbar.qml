@@ -54,7 +54,6 @@ RowLayout {
                       : VLCIcons.repeat_all
             checked: MainPlaylistController.repeatMode !== PlaylistController.PLAYBACK_REPEAT_NONE
             onClicked: MainPlaylistController.toggleRepeatMode()
-            focusPolicy: Qt.NoFocus
         }
     }
 
@@ -76,7 +75,6 @@ RowLayout {
             description: qsTr("Shuffle")
             text: VLCIcons.shuffle
             onClicked: MainPlaylistController.toggleRandom()
-            focusPolicy: Qt.NoFocus
         }
     }
 
@@ -99,8 +97,6 @@ RowLayout {
             checked: MainPlaylistController.sortKey !== PlaylistController.SORT_KEY_NONE
 
             popupAbove: true
-
-            focusPolicy: Qt.NoFocus
 
             model: MainPlaylistController.sortKeyTitleList
 
@@ -147,7 +143,6 @@ RowLayout {
             description: qsTr("Clear playqueue")
             text: VLCIcons.playlist_clear
             onClicked: MainPlaylistController.clear()
-            focusPolicy: Qt.NoFocus
         }
     }
 }
