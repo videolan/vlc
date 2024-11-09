@@ -2034,7 +2034,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("A_QUICKTIME/QDMC") {
             vars.p_fmt->i_cat   = AUDIO_ES;
-            vars.p_fmt->i_codec = VLC_FOURCC('Q','D','M','C');
+            vars.p_fmt->i_codec = VLC_CODEC_QDMC;
 
             fill_extra_data( vars.p_tk, 0 );
         }
