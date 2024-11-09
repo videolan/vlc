@@ -73,6 +73,13 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     self.sortOrderToolbarItem.toolTip = _NS("Select Sorting Mode");
     self.togglePlaylistToolbarItem.toolTip = _NS("Toggle Playqueue");
 
+    self.vlcIconToolbarItem.minSize = NSMakeSize(18, 18);
+    self.vlcIconToolbarItem.maxSize = NSMakeSize(18, 18);
+
+    NSImageView * const vlcIconImageView = [[NSImageView alloc] initWithFrame:NSZeroRect];
+    vlcIconImageView.image = NSApp.applicationIconImage;
+    self.vlcIconToolbarItem.view = vlcIconImageView;;
+
     // Hide renderers toolbar item at first. Start discoveries and wait for notifications about
     // renderers being added or removed to keep hidden or show depending on outcome
     [self hideToolbarItem:self.renderersToolbarItem];
