@@ -270,7 +270,7 @@
 - (void)playImmediately:(BOOL)playImmediately
 {
     VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
-    if (playlistController.libraryPlaylistMode || self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
+    if (playlistController.libraryPlaylistMode && self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
         [self playLibraryModeImmediately:playImmediately];
     } else {
         [self playIndividualModeImmediately:playImmediately];
