@@ -472,8 +472,22 @@
                             </connections>
                         </button>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="068A0B88-812C-44BE-8997-704367CF5226" label="VLC" paletteLabel="VLC" image="VLC" title="VLC" id="XND-sc-TDa">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="28" height="28"/>
+                        <size key="maxSize" width="28" height="28"/>
+                        <imageView key="view" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="KR4-pI-siG">
+                            <rect key="frame" x="1" y="14" width="28" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="28" id="Vst-mC-big"/>
+                                <constraint firstAttribute="width" secondItem="KR4-pI-siG" secondAttribute="height" multiplier="1:1" id="Y7q-Mz-W5J"/>
+                            </constraints>
+                            <imageCell key="cell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="VLC" id="AiE-o7-B5v"/>
+                        </imageView>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
+                    <toolbarItem reference="XND-sc-TDa"/>
                     <toolbarItem reference="5oK-0W-JJh"/>
                     <toolbarItem reference="6Ie-eu-GDn"/>
                     <toolbarItem reference="g2e-7o-Qet"/>
