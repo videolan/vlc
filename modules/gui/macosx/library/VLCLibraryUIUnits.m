@@ -221,6 +221,11 @@
     return 48.;
 }
 
++ (const CGFloat)libraryWindowNavSidebarMinWidth
+{
+    return 180.;
+}
+
 + (const CGFloat)libraryWindowNavSidebarMaxWidth
 {
     return 300.;

@@ -61,6 +61,7 @@
     }
 
     _navSidebarItem.preferredThicknessFraction = 0.2;
+    _navSidebarItem.minimumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMinWidth;
     _navSidebarItem.maximumThickness = VLCLibraryUIUnits.libraryWindowNavSidebarMaxWidth;
 
     self.multifunctionSidebarItem.preferredThicknessFraction = 0.2;
