@@ -31,8 +31,6 @@
 
 - (void)resetDefaultSplitForSplitView:(NSSplitView *)splitView
 {
-    VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
-    const CGFloat libraryWindowWidth = libraryWindow.frame.size.width;
     [splitView setPosition:VLCLibraryUIUnits.librarySplitViewSelectionViewDefaultWidth
           ofDividerAtIndex:0];
 }
