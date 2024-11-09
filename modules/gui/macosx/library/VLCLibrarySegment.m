@@ -42,8 +42,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 + (NSArray<VLCLibrarySegment *> *)librarySegments
 {
     return @[
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
