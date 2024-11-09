@@ -312,7 +312,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return [NSImage imageWithSystemSymbolName:@"play.rectangle"
                              accessibilityDescription:@"Group icon"];
         case VLCLibraryExploreHeaderSegment:
-            return [NSImage imageWithSystemSymbolName:@"sailboat"
+            return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
                              accessibilityDescription:@"Explore icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
