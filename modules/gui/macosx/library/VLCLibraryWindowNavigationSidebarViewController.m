@@ -29,6 +29,8 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
 
@@ -187,6 +189,11 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSAssert(cellView != nil, @"Provided cell view for navigation outline view should be valid!");
     [cellView.textField bind:NSValueBinding toObject:cellView withKeyPath:@"objectValue.displayString" options:nil];
     [cellView.imageView bind:NSImageBinding toObject:cellView withKeyPath:@"objectValue.displayImage" options:nil];
+
+    if (@available(macOS 10.14, *)) {
+        cellView.imageView.contentTintColor = NSColor.VLCAccentColor;
+    }
+
     return cellView;
 }
 
