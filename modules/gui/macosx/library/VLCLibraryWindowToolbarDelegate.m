@@ -240,12 +240,14 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 
     [self insertToolbarItem:self.backwardsToolbarItem 
                   inFrontOf:@[self.trackingSeparatorToolbarItem,
-                              self.toggleNavSidebarToolbarItem]];
+                              self.toggleNavSidebarToolbarItem,
+                              self.vlcIconToolbarItem]];
 
     [self insertToolbarItem:self.forwardsToolbarItem
                   inFrontOf:@[self.backwardsToolbarItem,
                               self.trackingSeparatorToolbarItem,
-                              self.toggleNavSidebarToolbarItem]];
+                              self.toggleNavSidebarToolbarItem,
+                              self.vlcIconToolbarItem]];
 }
 
 - (void)setSortOrderToolbarItemVisible:(BOOL)visible
@@ -260,7 +262,8 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
                               self.forwardsToolbarItem,
                               self.backwardsToolbarItem,
                               self.trackingSeparatorToolbarItem,
-                              self.toggleNavSidebarToolbarItem]];
+                              self.toggleNavSidebarToolbarItem,
+                              self.vlcIconToolbarItem]];
 }
 
 - (void)setLibrarySearchToolbarItemVisible:(BOOL)visible
@@ -295,7 +298,8 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
                   inFrontOf:@[self.forwardsToolbarItem,
                               self.backwardsToolbarItem,
                               self.trackingSeparatorToolbarItem,
-                              self.toggleNavSidebarToolbarItem]];
+                              self.toggleNavSidebarToolbarItem,
+                              self.vlcIconToolbarItem]];
 }
 
 @end
