@@ -47,9 +47,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment]
     ];
 }
 
@@ -204,16 +204,16 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Music playlists");
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return _NS("Video playlists");
+        case VLCLibraryGroupsSegment:
+            return _NS("Groups");
+        case VLCLibraryGroupsGroupSubSegment:
+            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryStreamsSegment:
             return _NS("Streams");
-        case VLCLibraryGroupsSegment:
-            return _NS("Groups");
-        case VLCLibraryGroupsGroupSubSegment:
-            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -243,14 +243,14 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
+        case VLCLibraryGroupsSegment:
+        case VLCLibraryGroupsGroupSubSegment:
+            return [NSImage imageNamed:@"NSTouchBarTagIcon"];
         case VLCLibraryBrowseSegment:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
         case VLCLibraryStreamsSegment:
-            return [NSImage imageNamed:@"NSActionTemplate"];
-        case VLCLibraryGroupsSegment:
-        case VLCLibraryGroupsGroupSubSegment:
-            return [NSImage imageNamed:@"NSTouchBarTagIcon"];
+            return [NSImage imageNamed:@"NSActionTemplate"]; 
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -300,6 +300,12 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [NSImage imageWithSystemSymbolName:@"list.and.film"
                              accessibilityDescription:@"Video playlists icon"];
+        case VLCLibraryGroupsSegment:
+            return [NSImage imageWithSystemSymbolName:@"rectangle.3.group"
+                             accessibilityDescription:@"Groups icon"];
+        case VLCLibraryGroupsGroupSubSegment:
+            return [NSImage imageWithSystemSymbolName:@"play.rectangle"
+                             accessibilityDescription:@"Group icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];
@@ -309,12 +315,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryStreamsSegment:
             return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
                              accessibilityDescription:@"Streams icon"];
-        case VLCLibraryGroupsSegment:
-            return [NSImage imageWithSystemSymbolName:@"rectangle.3.group"
-                             accessibilityDescription:@"Groups icon"];
-        case VLCLibraryGroupsGroupSubSegment:
-            return [NSImage imageWithSystemSymbolName:@"play.rectangle"
-                             accessibilityDescription:@"Group icon"];
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
