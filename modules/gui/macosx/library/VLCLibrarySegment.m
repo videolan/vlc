@@ -48,6 +48,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryExploreHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
     ];
@@ -208,6 +209,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Groups");
         case VLCLibraryGroupsGroupSubSegment:
             NSAssert(NO, @"displayStringForType should not be called for this segment type");
+        case VLCLibraryExploreHeaderSegment:
+            return _NS("Explore");
         case VLCLibraryBrowseSegment:
             return _NS("Browse");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
@@ -246,6 +249,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryGroupsSegment:
         case VLCLibraryGroupsGroupSubSegment:
             return [NSImage imageNamed:@"NSTouchBarTagIcon"];
+        case VLCLibraryExploreHeaderSegment:
+            return nil;
         case VLCLibraryBrowseSegment:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
@@ -306,6 +311,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryGroupsGroupSubSegment:
             return [NSImage imageWithSystemSymbolName:@"play.rectangle"
                              accessibilityDescription:@"Group icon"];
+        case VLCLibraryExploreHeaderSegment:
+            return [NSImage imageWithSystemSymbolName:@"sailboat"
+                             accessibilityDescription:@"Explore icon"];
         case VLCLibraryBrowseSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Browse icon"];

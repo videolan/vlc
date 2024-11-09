@@ -145,6 +145,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     switch(segment) {
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHeaderSegment:
+        case VLCLibraryExploreHeaderSegment:
             vlc_assert_unreachable();
         case VLCLibraryHomeSegment:
             [self setForwardsBackwardsToolbarItemsVisible:NO];
