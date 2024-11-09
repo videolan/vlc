@@ -2297,7 +2297,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("S_TEXT/USF") {
             ONLY_FMT(SPU);
-            vars.p_tk->fmt.i_codec = VLC_FOURCC( 'u', 's', 'f', ' ' );
+            vars.p_tk->fmt.i_codec = VLC_CODEC_USF;
             vars.p_tk->fmt.subs.psz_encoding = strdup( "UTF-8" );
             fill_extra_data( vars.p_tk, 0 );
         }
