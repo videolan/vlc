@@ -37,6 +37,7 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 
 @property (readonly, strong) NSToolbarItem *trackingSeparatorToolbarItem;
 
+@property (readwrite, weak) IBOutlet NSToolbarItem *vlcIconToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *toggleNavSidebarToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *backwardsToolbarItem;
 @property (readwrite, weak) IBOutlet NSToolbarItem *forwardsToolbarItem;

@@ -1544,6 +1544,7 @@
                 <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="xoK-Zo-nwh"/>
                 <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="PX9-gs-T5Z"/>
                 <outlet property="toolbar" destination="pr3-TD-J2z" id="0bl-3Z-WiA"/>
+                <outlet property="vlcIconToolbarItem" destination="XND-sc-TDa" id="bFb-Nx-LRb"/>
             </connections>
         </customObject>
         <viewController id="Kkr-kI-gpb" customClass="VLCLibraryWindowSplitViewController">
