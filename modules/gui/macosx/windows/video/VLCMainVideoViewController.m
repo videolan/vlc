@@ -552,12 +552,7 @@
     [self.view addSubview:self.voutContainingView
                positioned:NSWindowBelow
                relativeTo:self.mainControlsView];
-    [NSLayoutConstraint activateConstraints:@[
-        [self.voutContainingView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [self.voutContainingView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
-        [self.voutContainingView.leftAnchor constraintEqualToAnchor:self.view.leftAnchor],
-        [self.voutContainingView.rightAnchor constraintEqualToAnchor:self.view.rightAnchor]
-    ]];
+    [self.voutContainingView constrainToFillSuperview];
     _voutViewController = nil;
 }
 
