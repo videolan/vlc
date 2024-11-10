@@ -487,7 +487,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtu
 }
 
 /* Needed by matroska_segment::Seek() and Seek */
-void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
+static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   const KaxBlockAdditions *additions,
                   vlc_tick_t i_pts, int64_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
