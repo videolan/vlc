@@ -748,41 +748,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     NSLog(@"Presenting video view in main library window.");
 
-    NSView *videoView = self.videoViewController.view;
+    NSView * const videoView = self.videoViewController.view;
     videoView.translatesAutoresizingMaskIntoConstraints = NO;
     videoView.hidden = NO;
 
     [_libraryTargetView addSubview:videoView];
-    [_libraryTargetView addConstraints:@[
-        [NSLayoutConstraint constraintWithItem:videoView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1.
-                                      constant:0.],
-        [NSLayoutConstraint constraintWithItem:videoView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1.
-                                      constant:0.],
-        [NSLayoutConstraint constraintWithItem:videoView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1.
-                                      constant:0.],
-        [NSLayoutConstraint constraintWithItem:videoView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:_libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1.
-                                      constant:0.]
-    ]];
+    [videoView constrainToFillSuperview];
 }
 
 - (void)enableVideoPlaybackAppearance
