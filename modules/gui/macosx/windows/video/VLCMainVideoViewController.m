@@ -23,6 +23,7 @@
 
 #import "VLCMainVideoViewController.h"
 
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
@@ -201,40 +202,7 @@
 
     NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
     self.voutContainingView.subviews = @[targetView];
-    [self.voutContainingView addConstraints:@[
-        [NSLayoutConstraint constraintWithItem:targetView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.voutContainingView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:targetView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.voutContainingView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:targetView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.voutContainingView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1.
-                                      constant:0.
-        ],
-        [NSLayoutConstraint constraintWithItem:targetView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.voutContainingView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1.
-                                      constant:0.
-        ],
-    ]];
+    [targetView constrainToFillSuperview];
 
     if (decorativeViewVisible) {
         [self setAutohideControls:NO];
