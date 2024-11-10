@@ -22,6 +22,8 @@
 
 #import "VLCLibraryHomeViewVideoGridContainerView.h"
 
+#import "extensions/NSView+VLCAdditions.h"
+
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -62,40 +64,7 @@
     [self setupScrollView];
 
     [self addSubview:_scrollView];
-    [self addConstraints:@[
-        [NSLayoutConstraint constraintWithItem:_scrollView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:0
-        ],
-        [NSLayoutConstraint constraintWithItem:_scrollView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1
-                                      constant:0
-        ],
-        [NSLayoutConstraint constraintWithItem:_scrollView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0
-        ],
-        [NSLayoutConstraint constraintWithItem:_scrollView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0
-        ],
-    ]];
+    [self.scrollView constrainToFillSuperview];
 
     [self setContentHuggingPriority:NSLayoutPriorityDefaultLow
                      forOrientation:NSLayoutConstraintOrientationHorizontal];
