@@ -39,7 +39,7 @@
                                 </textFieldCell>
                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                 <prototypeCellViews>
-                                    <tableCellView identifier="HeaderCell" id="kOq-UZ-niu">
+                                    <tableCellView identifier="VLCLibrarySegmentHeaderCellIdentifier" id="kOq-UZ-niu">
                                         <rect key="frame" x="11" y="0.0" width="29" height="0.0"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                         <subviews>
