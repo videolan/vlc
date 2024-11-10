@@ -80,6 +80,10 @@
 
 - (NSArray<NSLayoutConstraint *> *)applyConstraintsToFillSuperview
 {
+    if (self.superview == nil) {
+        NSLog(@"WARNING: %@ does not have a valid superview, cannot apply constraints to fill superview", self);
+        return nil;
+    }
     return [self constraintsToFillView:self.superview activate:YES];
 }
 
