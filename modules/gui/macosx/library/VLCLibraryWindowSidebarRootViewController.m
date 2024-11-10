@@ -24,6 +24,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "main/VLCMain.h"
@@ -229,12 +230,7 @@
     NSView * const view = viewController.view;
     self.targetView.subviews = @[view];
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [view.topAnchor constraintEqualToAnchor:self.targetView.topAnchor],
-        [view.bottomAnchor constraintEqualToAnchor:self.targetView.bottomAnchor],
-        [view.leadingAnchor constraintEqualToAnchor:self.targetView.leadingAnchor],
-        [view.trailingAnchor constraintEqualToAnchor:self.targetView.trailingAnchor]
-    ]];
+    [view constrainToFillSuperview];
 }
 
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
