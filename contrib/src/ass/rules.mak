@@ -1,5 +1,5 @@
 # ASS
-ASS_VERSION := 0.17.1
+ASS_VERSION := 0.17.3
 ASS_URL := $(GITHUB)/libass/libass/releases/download/$(ASS_VERSION)/libass-$(ASS_VERSION).tar.gz
 
 PKGS += ass
