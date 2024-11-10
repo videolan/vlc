@@ -538,7 +538,7 @@ static void ReleaseVpxAlpha(void *opaque)
 
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
-                  KaxBlockAdditions *additions,
+                  const KaxBlockAdditions *additions,
                   vlc_tick_t i_pts, int64_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
@@ -654,10 +654,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 size_t i_addition = 0;
                 if(additions)
                 {
-                    KaxBlockMore *blockmore = FindChild<KaxBlockMore>(*additions);
+                    auto blockmore = FindChild<const KaxBlockMore>(*additions);
                     if(blockmore)
                     {
-                        KaxBlockAdditional *addition = FindChild<KaxBlockAdditional>(*blockmore);
+                        auto addition = FindChild<const KaxBlockAdditional>(*blockmore);
                         if(addition)
                         {
                             i_addition = static_cast<std::string::size_type>(addition->GetSize());
@@ -705,16 +705,16 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         case VLC_CODEC_VP9:
             if (additions && track.fmt.i_level) // contains alpha extradata
             {
-                KaxBlockMore *blockMore = FindChild<KaxBlockMore>(*additions);
+                auto blockMore = FindChild<const KaxBlockMore>(*additions);
                 if(blockMore == nullptr)
                     break;
-                KaxBlockAddID *addId = FindChild<KaxBlockAddID>(*blockMore);
+                auto addId = FindChild<const KaxBlockAddID>(*blockMore);
                 if(addId == nullptr)
                     break;
                 if (static_cast<uint64_t>(*addId) != 1)
                     break;
 
-                KaxBlockAdditional *addition = FindChild<KaxBlockAdditional>(*blockMore);
+                auto addition = FindChild<const KaxBlockAdditional>(*blockMore);
                 if(addition == nullptr)
                     break;
 
