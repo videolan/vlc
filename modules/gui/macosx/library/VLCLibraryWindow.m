@@ -753,7 +753,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     videoView.hidden = NO;
 
     [_libraryTargetView addSubview:videoView];
-    [videoView constrainToFillSuperview];
+    [videoView applyConstraintsToFillSuperview];
 }
 
 - (void)enableVideoPlaybackAppearance
@@ -810,7 +810,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
     self.libraryTargetView.subviews = views;
-    [self.loadingOverlayView constrainToFillSuperview];
+    [self.loadingOverlayView applyConstraintsToFillSuperview];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.duration = 0.5;

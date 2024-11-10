@@ -68,7 +68,7 @@
     [super viewWillAppear];
 
     if (self.view.superview) {
-        [self.view constrainToFillSuperview];
+        [self.view applyConstraintsToFillSuperview];
     }
 }
 
@@ -199,7 +199,7 @@
 
     NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
     self.voutContainingView.subviews = @[targetView];
-    [targetView constrainToFillSuperview];
+    [targetView applyConstraintsToFillSuperview];
 
     if (decorativeViewVisible) {
         [self setAutohideControls:NO];
@@ -549,7 +549,7 @@
     [self.view addSubview:self.voutContainingView
                positioned:NSWindowBelow
                relativeTo:self.mainControlsView];
-    [self.voutContainingView constrainToFillSuperview];
+    [self.voutContainingView applyConstraintsToFillSuperview];
     _voutViewController = nil;
 }
 

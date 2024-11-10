@@ -230,7 +230,7 @@
     NSView * const view = viewController.view;
     self.targetView.subviews = @[view];
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    [view constrainToFillSuperview];
+    [view applyConstraintsToFillSuperview];
 }
 
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled

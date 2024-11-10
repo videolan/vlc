@@ -64,7 +64,7 @@
     [self setupScrollView];
 
     [self addSubview:_scrollView];
-    [self.scrollView constrainToFillSuperview];
+    [self.scrollView applyConstraintsToFillSuperview];
 
     [self setContentHuggingPriority:NSLayoutPriorityDefaultLow
                      forOrientation:NSLayoutConstraintOrientationHorizontal];

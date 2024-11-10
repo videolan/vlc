@@ -78,12 +78,12 @@
     }
 }
 
-- (NSArray<NSLayoutConstraint *> *)constrainToFillSuperview
+- (NSArray<NSLayoutConstraint *> *)applyConstraintsToFillSuperview
 {
-    return [self constrainToFillView:self.superview activate:YES];
+    return [self constraintsToFillView:self.superview activate:YES];
 }
 
-- (NSArray<NSLayoutConstraint *> *)constrainToFillView:(NSView *)view activate:(BOOL)activate
+- (NSArray<NSLayoutConstraint *> *)constraintsToFillView:(NSView *)view activate:(BOOL)activate
 {
     NSArray<NSLayoutConstraint *> * const constraints = @[
         [self.leadingAnchor constraintEqualToAnchor:view.leadingAnchor],

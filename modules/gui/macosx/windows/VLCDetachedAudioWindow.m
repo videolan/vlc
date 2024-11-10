@@ -55,7 +55,7 @@
     [self.contentView addSubview:self.decorativeView 
                       positioned:NSWindowBelow
                       relativeTo:self.overlayView];
-    [self.decorativeView constrainToFillSuperview];
+    [self.decorativeView applyConstraintsToFillSuperview];
 }
 
 - (void)awakeFromNib
