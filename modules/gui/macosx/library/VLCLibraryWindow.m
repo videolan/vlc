@@ -753,7 +753,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     videoView.hidden = NO;
 
     [_libraryTargetView addSubview:videoView];
-    NSDictionary *dict = NSDictionaryOfVariableBindings(videoView);
     [_libraryTargetView addConstraints:@[
         [NSLayoutConstraint constraintWithItem:videoView
                                      attribute:NSLayoutAttributeTop
