@@ -68,10 +68,7 @@
     [super viewWillAppear];
 
     if (self.view.superview) {
-        [self.view.superview.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-        [self.view.superview.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-        [self.view.superview.leftAnchor constraintEqualToAnchor:self.view.leftAnchor].active = YES;
-        [self.view.superview.rightAnchor constraintEqualToAnchor:self.view.rightAnchor].active = YES;
+        [self.view constrainToFillSuperview];
     }
 }
 
