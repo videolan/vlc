@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)enableSubviews:(BOOL)enabled;
 - (NSArray<NSLayoutConstraint *> *)constrainToFillView:(NSView *)view activate:(BOOL)activate;
+- (NSArray<NSLayoutConstraint *> *)constrainToFillSuperview;
 
 @end
 
