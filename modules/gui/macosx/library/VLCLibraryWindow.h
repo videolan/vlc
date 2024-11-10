@@ -116,7 +116,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (nonatomic, readwrite, strong) IBOutlet VLCCustomEmptyLibraryBrowseButton *placeholderGoToBrowseButton;
 
 @property (readonly) VLCLoadingOverlayView *loadingOverlayView;
-@property (readonly) NSArray<NSLayoutConstraint *> *loadingOverlayViewConstraints;
 @property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewConstraints;
 @property (readonly) VLCNoResultsLabel *noResultsLabel;
 

@@ -215,36 +215,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     _loadingOverlayView = [[VLCLoadingOverlayView alloc] init];
     self.loadingOverlayView.translatesAutoresizingMaskIntoConstraints = NO;
-    _loadingOverlayViewConstraints = @[
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeTop
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeTop
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeRight
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeRight
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeBottom
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeBottom
-                                    multiplier:1
-                                      constant:0],
-        [NSLayoutConstraint constraintWithItem:self.loadingOverlayView
-                                     attribute:NSLayoutAttributeLeft
-                                     relatedBy:NSLayoutRelationEqual
-                                        toItem:self.libraryTargetView
-                                     attribute:NSLayoutAttributeLeft
-                                    multiplier:1
-                                      constant:0]
-    ];
 }
 
 #pragma mark - misc. user interactions
@@ -870,7 +840,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     NSArray * const views = [self.libraryTargetView.subviews arrayByAddingObject:self.loadingOverlayView];
     self.libraryTargetView.subviews = views;
-    [self.libraryTargetView addConstraints:self.loadingOverlayViewConstraints];
+    [self.loadingOverlayView constrainToFillSuperview];
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
         context.duration = 0.5;
@@ -893,7 +863,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         context.duration = 1.0;
         self.loadingOverlayView.animator.alphaValue = 0.0;
     } completionHandler:^{
-        [self.libraryTargetView removeConstraints:self.loadingOverlayViewConstraints];
         NSMutableArray * const views = self.libraryTargetView.subviews.mutableCopy;
         [views removeObject:self.loadingOverlayView];
         self.libraryTargetView.subviews = views.copy;
