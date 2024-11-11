@@ -18,12 +18,11 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" id="3qj-hs-qA9">
-            <rect key="frame" x="0.0" y="0.0" width="801" height="110"/>
-            <autoresizingMask key="autoresizingMask"/>
+        <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3qj-hs-qA9">
+            <rect key="frame" x="0.0" y="0.0" width="801" height="50"/>
             <subviews>
-                <button horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="z8M-pF-aNN">
-                    <rect key="frame" x="10" y="39" width="148" height="32"/>
+                <button verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="z8M-pF-aNN">
+                    <rect key="frame" x="0.0" y="9" width="152" height="32"/>
                     <buttonCell key="cell" type="inline" title="Open file" bezelStyle="inline" image="internaldrive.fill" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="BaI-vV-jQU">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
@@ -32,8 +31,8 @@
                         <action selector="openFileAction:" target="-2" id="gYu-Rh-hXw"/>
                     </connections>
                 </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="cJy-ck-xd6">
-                    <rect key="frame" x="168" y="39" width="148" height="32"/>
+                <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cJy-ck-xd6">
+                    <rect key="frame" x="162" y="9" width="152" height="32"/>
                     <buttonCell key="cell" type="inline" title="Open disc" bezelStyle="inline" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="92c-b8-kwg">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
@@ -43,8 +42,8 @@
                         <action selector="openDiscAction:" target="-2" id="ltB-iP-KRf"/>
                     </connections>
                 </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="j8l-xq-Zuw">
-                    <rect key="frame" x="326" y="39" width="149" height="32"/>
+                <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j8l-xq-Zuw">
+                    <rect key="frame" x="324" y="9" width="153" height="32"/>
                     <buttonCell key="cell" type="inline" title="Open URL" bezelStyle="inline" image="network" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="2Vn-hv-Uao">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
@@ -53,8 +52,8 @@
                         <action selector="openUrlAction:" target="-2" id="2EZ-NA-cvU"/>
                     </connections>
                 </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="y5B-QJ-eG5">
-                    <rect key="frame" x="485" y="39" width="148" height="32"/>
+                <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="y5B-QJ-eG5">
+                    <rect key="frame" x="487" y="9" width="152" height="32"/>
                     <buttonCell key="cell" type="inline" title="Open capture device" bezelStyle="inline" image="recordingtape" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="6uQ-ex-ony">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
@@ -63,8 +62,8 @@
                         <action selector="openCaptureDeviceAction:" target="-2" id="Wce-91-sgv"/>
                     </connections>
                 </button>
-                <button translatesAutoresizingMaskIntoConstraints="NO" id="g9j-oN-Lyd">
-                    <rect key="frame" x="643" y="39" width="148" height="32"/>
+                <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="g9j-oN-Lyd">
+                    <rect key="frame" x="649" y="9" width="152" height="32"/>
                     <buttonCell key="cell" type="inline" title="Browse" bezelStyle="inline" image="folder.fill" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="0K4-If-7Qb">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" size="11" name=".SFNS-Semibold"/>
@@ -74,7 +73,9 @@
                     </connections>
                 </button>
             </subviews>
-            <edgeInsets key="edgeInsets" left="10" right="10" top="10" bottom="10"/>
+            <constraints>
+                <constraint firstAttribute="height" constant="50" id="q8R-0R-ebR"/>
+            </constraints>
             <visibilityPriorities>
                 <integer value="1000"/>
                 <integer value="1000"/>
