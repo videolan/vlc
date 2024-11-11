@@ -91,16 +91,19 @@
 - (void)generateCustomContainers
 {
     _actionsViewController = [[VLCLibraryHomeViewActionsViewController alloc] init];
-    _leadingContainerCount += 1;
-    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
-
     _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
-    _leadingContainerCount += 1;
-    [self addView:self.heroView toStackView:self.collectionsStackView];
-    [self.heroView setOptimalRepresentedItem];
+    _leadingContainerCount += 2;
 
+    [self addCustomContainerViews];
     [self audioRecentsChanged:nil];
     [self recentsChanged:nil];
+}
+
+- (void)addCustomContainerViews
+{
+    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
+    [self addView:self.heroView toStackView:self.collectionsStackView];
+    [self.heroView setOptimalRepresentedItem];
 }
 
 - (BOOL)recentMediaPresent
@@ -295,9 +298,7 @@
     [_collectionsStackView setHuggingPriority:NSLayoutPriorityDefaultHigh
                                forOrientation:NSLayoutConstraintOrientationVertical];
 
-    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
-    [self addView:self.heroView toStackView:_collectionsStackView];
-    [self.heroView setOptimalRepresentedItem];
+    [self addCustomContainerViews];
 
     for (NSView<VLCLibraryHomeViewContainerView> * const containerView in _containers) {
         [self addContainerView:containerView toStackView:_collectionsStackView];
