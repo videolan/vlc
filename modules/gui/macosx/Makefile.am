@@ -193,6 +193,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsViewController.h \
 	gui/macosx/library/groups-library/VLCLibraryGroupsViewController.m \
+	gui/macosx/library/home-library/VLCLibraryHomeViewActionButtonCell.h \
+	gui/macosx/library/home-library/VLCLibraryHomeViewActionButtonCell.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewActionsView.h \
 	gui/macosx/library/home-library/VLCLibraryHomeViewActionsView.m \
 	gui/macosx/library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h \

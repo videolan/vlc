@@ -82,6 +82,7 @@
 		531062192CE4AEFB0087F863 /* VLCStatusNotifierView.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062182CE4AEFB0087F863 /* VLCStatusNotifierView.m */; };
 		531062112CE1CB520087F863 /* VLCLibraryHomeViewActionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062102CE1CB520087F863 /* VLCLibraryHomeViewActionsViewController.m */; };
 		531062112CE1CB520087F863 /* VLCLibraryHomeViewActionsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062102CE1CB520087F863 /* VLCLibraryHomeViewActionsView.m */; };
+		531062162CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 531062152CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m */; };
 		5310AFB12B4FE72700E75F9A /* NSArray+VLCAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */; };
 		5310AFB52B53EC4F00E75F9A /* iCarousel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5310AFB32B53EC4E00E75F9A /* iCarousel.m */; };
 		531343E72A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 531343E62A8E7B94007AEDFA /* VLCLibraryWindowNavigationSidebarViewController.m */; };
@@ -308,6 +309,8 @@
 		531062102CE1CB520087F863 /* VLCLibraryHomeViewActionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewActionsViewController.m; sourceTree = "<group>"; };
 		5310620F2CE1CB520087F863 /* VLCLibraryHomeViewActionsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewActionsView.h; sourceTree = "<group>"; };
 		531062102CE1CB520087F863 /* VLCLibraryHomeViewActionsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewActionsView.m; sourceTree = "<group>"; };
+		531062142CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCLibraryHomeViewActionButtonCell.h; sourceTree = "<group>"; };
+		531062152CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLibraryHomeViewActionButtonCell.m; sourceTree = "<group>"; };
 		5310AFAF2B4FE72700E75F9A /* NSArray+VLCAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+VLCAdditions.h"; sourceTree = "<group>"; };
 		5310AFB02B4FE72700E75F9A /* NSArray+VLCAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+VLCAdditions.m"; sourceTree = "<group>"; };
 		5310AFB32B53EC4E00E75F9A /* iCarousel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = iCarousel.m; sourceTree = "<group>"; };
@@ -1606,6 +1609,8 @@
 		5350E4EB2B1B210E00F276CB /* home-library */ = {
 			isa = PBXGroup;
 			children = (
+				531062142CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.h */,
+				531062152CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m */,
 				5310620F2CE1CB520087F863 /* VLCLibraryHomeViewActionsView.h */,
 				531062102CE1CB520087F863 /* VLCLibraryHomeViewActionsView.m */,
 				535F1BBE2B4892A200C78D98 /* VLCLibraryHomeViewAudioCarouselContainerView.h */,
@@ -2229,6 +2234,7 @@
 				1CCC89012078A3D500E5626F /* Preferences.xib in Sources */,
 				7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */,
 				1CCC89022078A3D500E5626F /* ResumeDialog.xib in Sources */,
+				531062162CE259290087F863 /* VLCLibraryHomeViewActionButtonCell.m in Sources */,
 				532572032C3D79D80068DEC3 /* VLCLibrarySegmentBookmarkedLocation.m in Sources */,
 				7DE7232E22A51F8D00D72616 /* VLCPositionFormatter.m in Sources */,
 				534E8E3A29A06325009503F8 /* VLCMainVideoViewController.m in Sources */,
