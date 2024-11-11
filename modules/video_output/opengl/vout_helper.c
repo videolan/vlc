@@ -55,6 +55,7 @@ struct vout_display_opengl_t {
 
     struct vlc_gl_interop *interop;
     struct vlc_gl_renderer *renderer; /**< weak reference */
+    struct vlc_gl_filter *renderer_filter; /**< weak reference */
 
     struct vlc_gl_filters *filters;
 
@@ -101,7 +102,7 @@ ResizeFormatToGLMaxTexSize(video_format_t *fmt, unsigned int max_tex_size)
 static struct vlc_gl_filters *
 CreateFilters(vlc_gl_t *gl, const struct vlc_gl_api *api,
               struct vlc_gl_interop *interop,
-              struct vlc_gl_renderer **out_renderer)
+              struct vlc_gl_filter **out_renderer)
 {
     struct vlc_gl_filters *filters = vlc_gl_filters_New(gl, api, interop, gl->orientation);
     if (!filters)
@@ -168,7 +169,7 @@ CreateFilters(vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     /* The renderer is a special filter: we need its concrete instance to
      * forward SetViewpoint() */
-    *out_renderer = renderer_filter->sys;
+    *out_renderer = renderer_filter;
 
     return filters;
 
@@ -223,12 +224,13 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     }
     GL_ASSERT_NOERROR(vt);
 
-    vgl->filters = CreateFilters(gl, api, vgl->interop, &vgl->renderer);
+    vgl->filters = CreateFilters(gl, api, vgl->interop, &vgl->renderer_filter);
     if (!vgl->filters)
     {
         msg_Err(gl, "Could not create filters");
         goto delete_interop;
     }
+    vgl->renderer = vgl->renderer_filter->sys;
     GL_ASSERT_NOERROR(vt);
 
     vgl->sub_interop = vlc_gl_interop_NewForSubpictures(gl);
@@ -307,7 +309,7 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
         return VLC_EGENERIC;
     }
 
-    struct vlc_gl_renderer *renderer;
+    struct vlc_gl_filter *renderer;
     struct vlc_gl_filters *filters = CreateFilters(gl, api, interop, &renderer);
     if (!filters)
     {
@@ -322,7 +324,8 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
 
     vgl->interop = interop;
     vgl->filters = filters;
-    vgl->renderer = renderer;
+    vgl->renderer = renderer->sys;
+    vgl->renderer_filter = renderer;
 
     vlc_gl_renderer_SetViewpoint(vgl->renderer, &vgl->viewpoint);
 
