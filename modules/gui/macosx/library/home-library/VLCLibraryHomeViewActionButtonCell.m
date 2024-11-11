@@ -42,7 +42,17 @@
     [separatorPath stroke];
     [separatorPath fill];
 
-    [self.image drawInRect:cellFrame];
+    const CGSize imageSize = self.image.size;
+    NSImage * const image = [NSImage imageWithSize:imageSize
+                                           flipped:NO
+                                    drawingHandler:^BOOL(NSRect dstRect) {
+        [NSColor.VLCAccentColor set];
+        const NSRect imageRect = {NSZeroPoint, imageSize};
+        [self.image drawInRect:imageRect];
+        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
+        return YES;
+    }];
+    [image drawInRect:cellFrame];
 }
 
 @end
