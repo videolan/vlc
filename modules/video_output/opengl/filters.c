@@ -4,6 +4,8 @@
  * Copyright (C) 2020 VLC authors and VideoLAN
  * Copyright (C) 2020 Videolabs
  *
+ * Authors: Alexandre Janniaux <ajanni@videolabs.io>
+ *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation; either version 2.1 of the License, or
@@ -206,6 +208,84 @@ vlc_gl_filters_Delete(struct vlc_gl_filters *filters)
     free(filters);
 }
 
+static struct vlc_gl_filter_priv *
+vlc_gl_filters_CreateNewFilter(struct vlc_gl_filters *filters,
+                               struct vlc_gl_filter_priv *prev_filter,
+                               const char *name,
+                               const config_chain_t *config)
+{
+    struct vlc_gl_filter *filter = vlc_gl_filter_New(filters->gl, filters->api);
+    if (!filter)
+        return NULL;
+    filter->gl = filters->gl;
+
+    struct vlc_gl_filter_priv *priv = vlc_gl_filter_PRIV(filter);
+    vlc_list_init(&priv->blend_subfilters);
+
+    struct vlc_gl_tex_size size_in;
+    struct vlc_gl_format *glfmt = &priv->glfmt_in;
+
+    if (!prev_filter)
+    {
+        size_in.width = filters->interop->fmt_out.i_visible_width;
+        size_in.height = filters->interop->fmt_out.i_visible_height;
+
+        assert(filters->importer);
+        *glfmt = filters->importer->glfmt;
+    }
+    else
+    {
+        size_in = prev_filter->size_out;
+
+        /* If the previous filter operated on planes, then its output chroma is
+         * the same as its input chroma. Otherwise, it's RGBA. */
+        vlc_fourcc_t chroma = prev_filter->filter.config.filter_planes
+                            ? prev_filter->glfmt_in.fmt.i_chroma
+                            : VLC_CODEC_RGBA;
+
+        video_format_t *fmt = &glfmt->fmt;
+        video_format_Init(fmt, chroma);
+        fmt->i_width = fmt->i_visible_width = prev_filter->size_out.width;
+        fmt->i_height = fmt->i_visible_height = prev_filter->size_out.height;
+
+        glfmt->tex_target = GL_TEXTURE_2D;
+        glfmt->tex_count = prev_filter->plane_count;
+
+        size_t size = glfmt->tex_count * sizeof(GLsizei);
+        memcpy(glfmt->tex_widths, prev_filter->plane_widths, size);
+        memcpy(glfmt->tex_heights, prev_filter->plane_heights, size);
+    }
+
+    /* By default, the output size is the same as the input size. The filter
+     * may change it during its Open(). */
+    priv->size_out = size_in;
+
+    int ret = vlc_gl_filter_LoadModule(filters->gl, name, filter, config,
+                                       glfmt, &priv->size_out);
+    if (ret != VLC_SUCCESS)
+    {
+        /* Creation failed, do not call close() */
+        msg_Err(filters->gl, "Could not load OpenGL filter '%s'", name);
+        filter->ops = NULL;
+        vlc_gl_filter_Delete(filter);
+        return NULL;
+    }
+
+    /* A blend filter may not change its output size. */
+    assert(!filter->config.blend
+           || (priv->size_out.width == size_in.width
+            && priv->size_out.height == size_in.height));
+
+    /* A filter operating on planes may not blend. */
+    assert(!filter->config.filter_planes || !filter->config.blend);
+
+    /* A filter operating on planes may not use anti-aliasing. */
+    assert(!filter->config.filter_planes || !filter->config.msaa_level);
+    vlc_gl_filter_InitPlaneSizes(filter);
+
+    return priv;
+}
+
 struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config)
@@ -311,6 +391,36 @@ vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
     }
 
     return filter;
+}
+
+struct vlc_gl_filter *
+vlc_gl_filters_Replace(struct vlc_gl_filters *filters, struct vlc_gl_filter *old_filter,
+                       const char *name, const config_chain_t *config)
+{
+    struct vlc_gl_filter_priv *old_priv = vlc_gl_filter_PRIV(old_filter);
+    struct vlc_gl_filter *prev_filter = NULL;
+    struct vlc_gl_filter_priv *priv_prev = vlc_gl_filter_PRIV(prev_filter);
+
+    struct vlc_gl_filter_priv *new_filter = vlc_gl_filters_CreateNewFilter(filters, priv_prev, name, config);
+    if (new_filter == NULL)
+        return NULL;
+
+    assert(!new_filter->filter.config.blend && !old_filter->config.blend);
+    vlc_gl_filter_InitPlaneSizes(old_filter);
+
+    /* Move previous subfilter to the new filter */
+    struct vlc_gl_filter_priv *subfilter;
+    vlc_list_foreach(subfilter, &old_priv->blend_subfilters, node)
+    {
+        vlc_list_remove(&subfilter->node);
+        vlc_list_append(&subfilter->node, &new_filter->blend_subfilters);
+    }
+
+    /* Append to the main filter list */
+    vlc_list_replace(&old_priv->node, &new_filter->node);
+    vlc_gl_filter_Delete(old_filter);
+
+    return &new_filter->filter;
 }
 
 int

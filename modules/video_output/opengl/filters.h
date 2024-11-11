@@ -68,6 +68,12 @@ struct vlc_gl_filter *
 vlc_gl_filters_Append(struct vlc_gl_filters *filters, const char *name,
                       const config_chain_t *config);
 
+struct vlc_gl_filter *
+vlc_gl_filters_Replace(struct vlc_gl_filters *filters,
+                       struct vlc_gl_filter *filter,
+                       const char *name,
+                       const config_chain_t *config);
+
 /**
  * Init the framebuffers for the appended filters.
  *
