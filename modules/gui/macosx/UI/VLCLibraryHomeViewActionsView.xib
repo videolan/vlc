@@ -8,6 +8,11 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryHomeViewActionsViewController">
             <connections>
+                <outlet property="openBrowseButton" destination="g9j-oN-Lyd" id="Gad-Bg-ZhJ"/>
+                <outlet property="openCaptureDeviceButton" destination="y5B-QJ-eG5" id="hUf-CT-JUe"/>
+                <outlet property="openDiscButton" destination="cJy-ck-xd6" id="qow-kq-9qL"/>
+                <outlet property="openFileButton" destination="z8M-pF-aNN" id="G1e-Zn-YLQ"/>
+                <outlet property="openUrlButton" destination="j8l-xq-Zuw" id="JfA-hN-6i9"/>
                 <outlet property="view" destination="3qj-hs-qA9" id="4Bl-bI-qxa"/>
             </connections>
         </customObject>
