@@ -52,7 +52,28 @@
         NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
         return YES;
     }];
-    [image drawInRect:cellFrame];
+
+    const CGSize cellSize = cellFrame.size;
+    const CGFloat cellWidth = cellSize.width;
+    const CGFloat cellHeight = cellSize.height;
+    const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
+    CGFloat imageWidth, imageHeight;
+
+    // Try to scale focusing on width first, if this yields a height that is too large, switch
+    if (cellWidth / originalImageAspectRatio > cellHeight) {
+        imageHeight = cellHeight;
+        imageWidth = cellHeight * originalImageAspectRatio;
+    } else {
+        imageWidth = cellWidth;
+        imageHeight = imageWidth / originalImageAspectRatio;
+    }
+
+    const CGPoint cellOrigin = cellFrame.origin;
+    const NSRect imageRect = NSMakeRect(cellOrigin.x + (cellWidth - imageWidth) / 2,
+                                        cellOrigin.y + (cellHeight - imageHeight) / 2,
+                                        imageWidth,
+                                        imageHeight);
+    [image drawInRect:imageRect];
 }
 
 @end
