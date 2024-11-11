@@ -24,4 +24,9 @@
 
 @implementation VLCLibraryHomeViewActionsViewController
 
+- (instancetype)init
+{
+    return [super initWithNibName:@"VLCLibraryHomeViewActionsView" bundle:nil];
+}
+
 @end
