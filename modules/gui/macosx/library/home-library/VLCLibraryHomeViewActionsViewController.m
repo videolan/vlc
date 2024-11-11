@@ -22,6 +22,7 @@
 
 #import "VLCLibraryHomeViewActionsViewController.h"
 
+#import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryWindow.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
@@ -31,6 +32,17 @@
 - (instancetype)init
 {
     return [super initWithNibName:@"VLCLibraryHomeViewActionsView" bundle:nil];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+
+    self.openFileButton.title = _NS("Open file");
+    self.openDiscButton.title = _NS("Open disc");
+    self.openUrlButton.title = _NS("Open URL");
+    self.openCaptureDeviceButton.title = _NS("Open capture device");
+    self.openBrowseButton.title = _NS("Browse");
 }
 
 - (IBAction)openFileAction:(id)sender
