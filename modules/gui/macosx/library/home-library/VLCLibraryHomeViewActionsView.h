@@ -24,13 +24,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryHomeViewActionsViewController : NSViewController
+@interface VLCLibraryHomeViewActionsView : NSStackView
 
 @property (readwrite, weak) IBOutlet NSButton *openFileButton;
 @property (readwrite, weak) IBOutlet NSButton *openDiscButton;
 @property (readwrite, weak) IBOutlet NSButton *openUrlButton;
 @property (readwrite, weak) IBOutlet NSButton *openCaptureDeviceButton;
 @property (readwrite, weak) IBOutlet NSButton *openBrowseButton;
+
++ (instancetype)fromNibWithOwner:(id)owner;
 
 - (IBAction)openFileAction:(id)sender;
 - (IBAction)openDiscAction:(id)sender;

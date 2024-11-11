@@ -30,7 +30,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
-#import "library/home-library/VLCLibraryHomeViewActionsViewController.h"
+#import "library/home-library/VLCLibraryHomeViewActionsView.h"
 #import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
@@ -90,7 +90,7 @@
 
 - (void)generateCustomContainers
 {
-    _actionsViewController = [[VLCLibraryHomeViewActionsViewController alloc] init];
+    _actionsView = [VLCLibraryHomeViewActionsView fromNibWithOwner:self];
     _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
     _leadingContainerCount += 2;
 
@@ -101,7 +101,7 @@
 
 - (void)addCustomContainerViews
 {
-    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
+    [self addView:self.actionsView toStackView:self.collectionsStackView];
     [self addView:self.heroView toStackView:self.collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 }
@@ -188,9 +188,9 @@
 - (void)reloadData
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
-            [self.heroView setOptimalRepresentedItem];
+        [self.heroView setOptimalRepresentedItem];
 
+        for (NSView<VLCLibraryHomeViewContainerView> * const containerView in self->_containers) {
             if ([containerView isKindOfClass:VLCLibraryHomeViewBaseCarouselContainerView.class]) {
                 VLCLibraryHomeViewBaseCarouselContainerView * const baseContainerView = (VLCLibraryHomeViewBaseCarouselContainerView *)containerView;
                 [baseContainerView.dataSource reloadData];

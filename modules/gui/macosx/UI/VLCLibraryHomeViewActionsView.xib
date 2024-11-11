@@ -6,19 +6,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryHomeViewActionsViewController">
-            <connections>
-                <outlet property="openBrowseButton" destination="g9j-oN-Lyd" id="Gad-Bg-ZhJ"/>
-                <outlet property="openCaptureDeviceButton" destination="y5B-QJ-eG5" id="hUf-CT-JUe"/>
-                <outlet property="openDiscButton" destination="cJy-ck-xd6" id="qow-kq-9qL"/>
-                <outlet property="openFileButton" destination="z8M-pF-aNN" id="G1e-Zn-YLQ"/>
-                <outlet property="openUrlButton" destination="j8l-xq-Zuw" id="JfA-hN-6i9"/>
-                <outlet property="view" destination="3qj-hs-qA9" id="4Bl-bI-qxa"/>
-            </connections>
-        </customObject>
+        <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3qj-hs-qA9">
+        <stackView distribution="fillEqually" orientation="horizontal" alignment="centerY" spacing="10" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3qj-hs-qA9" customClass="VLCLibraryHomeViewActionsView">
             <rect key="frame" x="0.0" y="0.0" width="801" height="50"/>
             <subviews>
                 <button verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="z8M-pF-aNN">
@@ -28,7 +19,7 @@
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openFileAction:" target="-2" id="gYu-Rh-hXw"/>
+                        <action selector="openFileAction:" target="3qj-hs-qA9" id="WNK-Gq-vbI"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cJy-ck-xd6">
@@ -39,7 +30,7 @@
                         <imageReference key="image" image="opticaldisc.fill" catalog="system" symbolScale="default"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openDiscAction:" target="-2" id="ltB-iP-KRf"/>
+                        <action selector="openDiscAction:" target="3qj-hs-qA9" id="J6M-0U-hKB"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j8l-xq-Zuw">
@@ -49,7 +40,7 @@
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openUrlAction:" target="-2" id="2EZ-NA-cvU"/>
+                        <action selector="openUrlAction:" target="3qj-hs-qA9" id="hON-OU-Kvy"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="y5B-QJ-eG5">
@@ -59,7 +50,7 @@
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openCaptureDeviceAction:" target="-2" id="Wce-91-sgv"/>
+                        <action selector="openCaptureDeviceAction:" target="3qj-hs-qA9" id="wNJ-8K-1tJ"/>
                     </connections>
                 </button>
                 <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="g9j-oN-Lyd">
@@ -69,7 +60,7 @@
                         <font key="font" size="11" name=".SFNS-Semibold"/>
                     </buttonCell>
                     <connections>
-                        <action selector="openBrowseAction:" target="-2" id="CFa-9m-KrR"/>
+                        <action selector="openBrowseAction:" target="3qj-hs-qA9" id="T8n-Bm-2ni"/>
                     </connections>
                 </button>
             </subviews>
@@ -90,6 +81,13 @@
                 <real value="3.4028234663852886e+38"/>
                 <real value="3.4028234663852886e+38"/>
             </customSpacing>
+            <connections>
+                <outlet property="openBrowseButton" destination="g9j-oN-Lyd" id="hRd-gf-7ar"/>
+                <outlet property="openCaptureDeviceButton" destination="y5B-QJ-eG5" id="sYh-WY-Hr0"/>
+                <outlet property="openDiscButton" destination="cJy-ck-xd6" id="5Kg-qb-mAA"/>
+                <outlet property="openFileButton" destination="z8M-pF-aNN" id="B3d-7J-NQ3"/>
+                <outlet property="openUrlButton" destination="j8l-xq-Zuw" id="Hw0-VI-0vH"/>
+            </connections>
             <point key="canvasLocation" x="28.5" y="-120"/>
         </stackView>
     </objects>

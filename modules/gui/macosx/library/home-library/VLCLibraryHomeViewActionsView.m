@@ -20,23 +20,27 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryHomeViewActionsViewController.h"
+#import "VLCLibraryHomeViewActionsView.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSView+VLCAdditions.h"
 #import "library/VLCLibraryWindow.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
-@implementation VLCLibraryHomeViewActionsViewController
+@implementation VLCLibraryHomeViewActionsView
 
-- (instancetype)init
++ (instancetype)fromNibWithOwner:(id)owner
 {
-    return [super initWithNibName:@"VLCLibraryHomeViewActionsView" bundle:nil];
+    return (VLCLibraryHomeViewActionsView*)[NSView fromNibNamed:@"VLCLibraryHomeViewActionsView"
+                                                      withClass:VLCLibraryHomeViewActionsView.class
+                                                      withOwner:owner];
 }
 
-- (void)viewDidLoad
+
+- (void)awakeFromNib
 {
-    [super viewDidLoad];
+    [super awakeFromNib];
 
     self.openFileButton.title = _NS("Open file");
     self.openDiscButton.title = _NS("Open disc");
