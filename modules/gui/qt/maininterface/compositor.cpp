@@ -381,7 +381,7 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
         }
     }
 
-    if (!m_windowEffectsModule->isEffectAvailable(WindowEffectsModule::BlurBehind))
+    if (!m_windowEffectsModule->isEffectAvailable(window, WindowEffectsModule::BlurBehind))
         return false;
 
     m_windowEffectsModule->setBlurBehind(window, enable);

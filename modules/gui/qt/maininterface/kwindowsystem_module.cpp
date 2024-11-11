@@ -23,7 +23,7 @@
 
 #include <KWindowEffects>
 
-static bool isEffectAvailable(const WindowEffectsModule::Effect effect)
+static bool isEffectAvailable(const QWindow*, const WindowEffectsModule::Effect effect)
 {
     KWindowEffects::Effect kWindowEffect;
 
@@ -54,7 +54,7 @@ static int Open(vlc_object_t* const p_this)
     // In that case, simply fail here,
     // so that another potentially compatible
     // module can be loaded instead:
-    if (!isEffectAvailable(WindowEffectsModule::BlurBehind))
+    if (!isEffectAvailable(nullptr, WindowEffectsModule::BlurBehind))
         return VLC_EGENERIC;
 
     const auto obj = reinterpret_cast<WindowEffectsModule*>(p_this);

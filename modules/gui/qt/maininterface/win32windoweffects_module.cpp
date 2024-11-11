@@ -25,12 +25,34 @@
 
 #include <dwmapi.h>
 
-static bool isEffectAvailable(const WindowEffectsModule::Effect effect)
+static bool isEffectAvailable(const QWindow* window, const WindowEffectsModule::Effect effect)
 {
     // Version check is done on module open, no need to re-do it here.
     switch (effect)
     {
     case WindowEffectsModule::BlurBehind:
+        // NOTE: Qt does not officially support translucent window with frame.
+        //       The documentation states that `Qt::FramelessWindowHint` is
+        //       required on certain platforms, such as Windows. Otherwise,
+        //       The window starts with a white background, which is a widely
+        //       known Windows issue regardless of translucency, but the white
+        //       background is never cleared if the window clear color is
+        //       translucent. In this case, minimizing and restoring the window
+        //       makes the background cleared, but this still does not make
+        //       it a portable solution.
+        // NOTE: See QTBUG-56201, QTBUG-120691. From the reports, it appears
+        //       that Nvidia graphics is "fine" with translucent framed window
+        //       while Intel graphics is not. However, the said issue above
+        //       is still a concern with Nvidia graphics according to my own
+        //       experience.
+        // TODO: Ideally, we should at least use the frameless window hint
+        //       when CSD is in use and use native backdrop effect since
+        //       the custom solution has more chance to cause issues.
+        if (!window->flags().testFlag(Qt::FramelessWindowHint))
+        {
+            qDebug("Target window is not frameless, window can not be translucent for the Windows 11 22H2 native acrylic backdrop effect.");
+            return false;
+        }
         return true;
     default:
         return false;

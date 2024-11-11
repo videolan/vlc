@@ -33,7 +33,7 @@ struct WindowEffectsModule
     module_t *p_module = nullptr;
     void *p_sys = nullptr;
 
-    bool (*isEffectAvailable)(Effect effect);
+    bool (*isEffectAvailable)(const QWindow* window, Effect effect);
     void (*setBlurBehind)(QWindow* window, bool enable);
 };
 
