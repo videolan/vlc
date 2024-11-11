@@ -22,6 +22,25 @@
 
 #import "VLCLibraryHomeViewActionButtonCell.h"
 
+#import "extensions/NSColor+VLCAdditions.h"
+
 @implementation VLCLibraryHomeViewActionButtonCell
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+    [NSColor.VLCSubtleBorderColor setStroke];
+    [NSColor.windowBackgroundColor setFill];
+
+    NSBezierPath * const separatorPath = NSBezierPath.bezierPath;
+    [separatorPath moveToPoint:NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame))];
+    [separatorPath lineToPoint:NSMakePoint(NSMaxX(cellFrame), NSMaxY(cellFrame))];
+    [separatorPath lineToPoint:NSMakePoint(NSMaxX(cellFrame), NSMinY(cellFrame))];
+    [separatorPath lineToPoint:NSMakePoint(NSMinX(cellFrame), NSMinY(cellFrame))];
+    [separatorPath lineToPoint:NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame))];
+    separatorPath.lineWidth = 1.0;
+
+    [separatorPath stroke];
+    [separatorPath fill];
+}
 
 @end
