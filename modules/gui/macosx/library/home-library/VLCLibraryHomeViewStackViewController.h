@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryHeroView;
+@class VLCLibraryHomeViewActionsViewController;
 @class VLCLibraryHomeViewAudioCarouselContainerView;
 @class VLCLibraryHomeViewVideoCarouselContainerView;
 @protocol VLCMediaLibraryItemProtocol;
@@ -39,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak, nonatomic) NSStackView *collectionsStackView;
 @property (readwrite, weak, nonatomic) NSScrollView *collectionsStackViewScrollView;
 
+@property (readonly) VLCLibraryHomeViewActionsViewController *actionsViewController;
 @property (readonly) VLCLibraryHeroView *heroView;
 @property (readonly) VLCLibraryHomeViewVideoCarouselContainerView *recentsView;
 @property (readonly) VLCLibraryHomeViewAudioCarouselContainerView *audioRecentsView;

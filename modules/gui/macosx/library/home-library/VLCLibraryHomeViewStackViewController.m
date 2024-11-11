@@ -30,6 +30,7 @@
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryUIUnits.h"
 
+#import "library/home-library/VLCLibraryHomeViewActionsViewController.h"
 #import "library/home-library/VLCLibraryHomeViewAudioCarouselContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewContainerView.h"
 #import "library/home-library/VLCLibraryHomeViewVideoCarouselContainerView.h"
@@ -89,6 +90,10 @@
 
 - (void)generateCustomContainers
 {
+    _actionsViewController = [[VLCLibraryHomeViewActionsViewController alloc] init];
+    _leadingContainerCount += 1;
+    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
+
     _heroView = [VLCLibraryHeroView fromNibWithOwner:self];
     _leadingContainerCount += 1;
     [self addView:self.heroView toStackView:self.collectionsStackView];
@@ -290,7 +295,7 @@
     [_collectionsStackView setHuggingPriority:NSLayoutPriorityDefaultHigh
                                forOrientation:NSLayoutConstraintOrientationVertical];
 
-
+    [self addView:self.actionsViewController.view toStackView:self.collectionsStackView];
     [self addView:self.heroView toStackView:_collectionsStackView];
     [self.heroView setOptimalRepresentedItem];
 
