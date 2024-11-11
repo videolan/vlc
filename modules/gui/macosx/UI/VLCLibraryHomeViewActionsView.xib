@@ -23,6 +23,9 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openFileAction:" target="-2" id="gYu-Rh-hXw"/>
+                    </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="cJy-ck-xd6">
                     <rect key="frame" x="168" y="39" width="148" height="32"/>
@@ -31,6 +34,9 @@
                         <font key="font" metaFont="smallSystemBold"/>
                         <imageReference key="image" image="opticaldisc.fill" catalog="system" symbolScale="default"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openDiscAction:" target="-2" id="ltB-iP-KRf"/>
+                    </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="j8l-xq-Zuw">
                     <rect key="frame" x="326" y="39" width="149" height="32"/>
@@ -38,6 +44,9 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openUrlAction:" target="-2" id="2EZ-NA-cvU"/>
+                    </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="y5B-QJ-eG5">
                     <rect key="frame" x="485" y="39" width="148" height="32"/>
@@ -45,6 +54,9 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openCaptureDeviceAction:" target="-2" id="Wce-91-sgv"/>
+                    </connections>
                 </button>
                 <button translatesAutoresizingMaskIntoConstraints="NO" id="g9j-oN-Lyd">
                     <rect key="frame" x="643" y="39" width="148" height="32"/>
@@ -52,6 +64,9 @@
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" size="11" name=".SFNS-Semibold"/>
                     </buttonCell>
+                    <connections>
+                        <action selector="openBrowseAction:" target="-2" id="CFa-9m-KrR"/>
+                    </connections>
                 </button>
             </subviews>
             <edgeInsets key="edgeInsets" left="10" right="10" top="10" bottom="10"/>

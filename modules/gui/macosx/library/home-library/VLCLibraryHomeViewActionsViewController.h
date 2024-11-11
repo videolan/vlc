@@ -26,6 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryHomeViewActionsViewController : NSViewController
 
+- (IBAction)openFileAction:(id)sender;
+- (IBAction)openDiscAction:(id)sender;
+- (IBAction)openUrlAction:(id)sender;
+- (IBAction)openCaptureDeviceAction:(id)sender;
+- (IBAction)openBrowseAction:(id)sender;
+
 @end
 
 NS_ASSUME_NONNULL_END

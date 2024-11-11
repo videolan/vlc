@@ -22,11 +22,40 @@
 
 #import "VLCLibraryHomeViewActionsViewController.h"
 
+#import "library/VLCLibraryWindow.h"
+#import "main/VLCMain.h"
+#import "menus/VLCMainMenu.h"
+
 @implementation VLCLibraryHomeViewActionsViewController
 
 - (instancetype)init
 {
     return [super initWithNibName:@"VLCLibraryHomeViewActionsView" bundle:nil];
+}
+
+- (IBAction)openFileAction:(id)sender
+{
+    [VLCMain.sharedInstance.mainMenu intfOpenFile:self];
+}
+
+- (IBAction)openDiscAction:(id)sender
+{
+    [VLCMain.sharedInstance.mainMenu intfOpenDisc:self];
+}
+
+- (IBAction)openUrlAction:(id)sender
+{
+    [VLCMain.sharedInstance.mainMenu intfOpenNet:self];
+}
+
+- (IBAction)openCaptureDeviceAction:(id)sender
+{
+    [VLCMain.sharedInstance.mainMenu intfOpenCapture:self];
+}
+
+- (IBAction)openBrowseAction:(id)sender
+{
+    [VLCMain.sharedInstance.libraryWindow goToBrowseSection:self];
 }
 
 @end
