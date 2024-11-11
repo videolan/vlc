@@ -41,6 +41,8 @@
 
     [separatorPath stroke];
     [separatorPath fill];
+
+    [self.image drawInRect:cellFrame];
 }
 
 @end
