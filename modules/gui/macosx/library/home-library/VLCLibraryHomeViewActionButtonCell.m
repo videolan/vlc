@@ -32,12 +32,17 @@
     [NSColor.VLCSubtleBorderColor setStroke];
     [NSColor.windowBackgroundColor setFill];
 
+    const CGFloat cellMinX = NSMinX(cellFrame);
+    const CGFloat cellMinY = NSMinY(cellFrame);
+    const CGFloat cellMaxX = NSMaxX(cellFrame);
+    const CGFloat cellMaxY = NSMaxY(cellFrame);
+
     NSBezierPath * const separatorPath = NSBezierPath.bezierPath;
-    [separatorPath moveToPoint:NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame))];
-    [separatorPath lineToPoint:NSMakePoint(NSMaxX(cellFrame), NSMaxY(cellFrame))];
-    [separatorPath lineToPoint:NSMakePoint(NSMaxX(cellFrame), NSMinY(cellFrame))];
-    [separatorPath lineToPoint:NSMakePoint(NSMinX(cellFrame), NSMinY(cellFrame))];
-    [separatorPath lineToPoint:NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame))];
+    [separatorPath moveToPoint:NSMakePoint(cellMinX, cellMaxY)];
+    [separatorPath lineToPoint:NSMakePoint(cellMaxX, cellMaxY)];
+    [separatorPath lineToPoint:NSMakePoint(cellMaxX, cellMinY)];
+    [separatorPath lineToPoint:NSMakePoint(cellMinX, cellMinY)];
+    [separatorPath lineToPoint:NSMakePoint(cellMinX, cellMaxY)];
     separatorPath.lineWidth = 1.0;
 
     [separatorPath stroke];
@@ -52,7 +57,7 @@
         NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont
     };
     const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
-    [self.title drawInRect:CGRectMake(NSMinX(cellFrame), NSMaxY(cellFrame) - titleSize.height, cellWidth, 20)
+    [self.title drawInRect:CGRectMake(cellMinX, cellMaxY - titleSize.height, cellWidth, 20)
             withAttributes:titleAttributes];
 
     const CGSize imageSize = self.image.size;
