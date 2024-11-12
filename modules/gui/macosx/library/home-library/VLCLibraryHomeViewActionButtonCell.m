@@ -82,7 +82,7 @@
             if (self.isHighlighted) {
                 [NSColor.VLCSubtleBorderColor set];
             } else {
-                [NSColor.VLCAccentColor set];
+                [NSColor.VLCSubtlerAccentColor set];
             }
             const NSRect imageRect = {NSZeroPoint, imageSize};
             [self.image drawInRect:imageRect];
