@@ -325,7 +325,7 @@ public:
             // Map the point to client coordinates.
             ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
-            // excluse resize handle area
+            // exclude resize handle area
             if ((m_window->windowState() != Qt::WindowFullScreen)
                 && (point.y < resizeBorderHeight(m_window)
                     || point.x > (m_window->width() * m_window->devicePixelRatio() - resizeBorderWidth(m_window))))
@@ -467,7 +467,7 @@ private:
         // that somehow breaks snaplayouts menu with WS_CAPTION style ^_____^
         //
         // warning2: if you set negative margin, the window will start painting
-        // default CSD button underneath the qml layer, you won't be able to see
+        // server-side buttons underneath the qml layer, you won't be able to see
         // it but those will capture all your CSD events.
         margin.cxLeftWidth = (m_useClientSideDecoration ? 1 : 0);
 
