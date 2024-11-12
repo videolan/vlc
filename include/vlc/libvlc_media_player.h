@@ -7,6 +7,7 @@
  *          Jean-Paul Saman <jpsaman@videolan.org>
  *          Pierre d'Herbemont <pdherbemont@videolan.org>
  *          Maxime Chapelet <umxprime at videolabs dot io>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -2432,6 +2433,29 @@ LIBVLC_API float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
  */
 LIBVLC_API void libvlc_video_set_adjust_float( libvlc_media_player_t *p_mi,
                                                    unsigned option, float value );
+/**
+ * Change the projection mode used for rendering the source.
+ *
+ * This changes how the source is mapped to the output w.r.t. 360 playback.
+ *
+ * \param p_mi libvlc media player instance
+ * \param projection_mode the considered projection mode for the source
+ * \version LibVLC 4.0.0 and later.
+ */
+LIBVLC_API void
+libvlc_video_set_projection_mode(libvlc_media_player_t *player,
+                                 libvlc_video_projection_t projection_mode);
+
+/**
+ * Remove previously set projection mode.
+ *
+ * Remove the effects from previous call to libvlc_video_set_projection_mode.
+ *
+ * \param p_mi libvlc media player instance
+ * \version LibVLC 4.0.0 and later.
+ */
+LIBVLC_API void
+libvlc_video_unset_projection_mode(libvlc_media_player_t *player);
 
 /** @} video */
 

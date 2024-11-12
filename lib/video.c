@@ -8,6 +8,7 @@
  *          Filippo Carone <littlejohn@videolan.org>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
  *          Damien Fouilleul <damienf a_t videolan dot org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -862,4 +863,35 @@ float libvlc_video_get_adjust_float( libvlc_media_player_t *p_mi,
                                      unsigned option )
 {
     return get_float( p_mi, "adjust", adjust_option_bynumber(option) );
+}
+
+void libvlc_video_unset_projection_mode(libvlc_media_player_t *player)
+{
+    var_SetInteger(player, "projection-mode", -1);
+
+    /* Apply to current video outputs (if any) */
+    size_t n;
+    vout_thread_t **pp_vouts = GetVouts(player, &n);
+    for (size_t i = 0; i < n; i++)
+    {
+        var_SetInteger(pp_vouts[i], "projection-mode", -1);
+        vout_Release(pp_vouts[i]);
+    }
+    free (pp_vouts);
+}
+
+void libvlc_video_set_projection_mode(libvlc_media_player_t *player,
+                                      libvlc_video_projection_t projection_mode)
+{
+    var_SetInteger(player, "projection-mode", projection_mode);
+
+    /* Apply to current video outputs (if any) */
+    size_t n;
+    vout_thread_t **pp_vouts = GetVouts(player, &n);
+    for (size_t i = 0; i < n; i++)
+    {
+        var_SetInteger(pp_vouts[i], "projection-mode", projection_mode);
+        vout_Release(pp_vouts[i]);
+    }
+    free (pp_vouts);
 }
