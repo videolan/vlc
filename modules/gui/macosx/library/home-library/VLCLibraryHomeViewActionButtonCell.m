@@ -72,12 +72,13 @@
     }];
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
+    const CGFloat imageAvailableVerticalSpace = cellHeight - titleSize.height;
     CGFloat imageWidth, imageHeight;
 
     // Try to scale focusing on width first, if this yields a height that is too large, switch
-    if (cellWidth / originalImageAspectRatio > cellHeight) {
-        imageHeight = cellHeight;
-        imageWidth = cellHeight * originalImageAspectRatio;
+    if (cellWidth / originalImageAspectRatio > imageAvailableVerticalSpace) {
+        imageHeight = imageAvailableVerticalSpace;
+        imageWidth = imageHeight * originalImageAspectRatio;
     } else {
         imageWidth = cellWidth;
         imageHeight = imageWidth / originalImageAspectRatio;
