@@ -93,6 +93,22 @@ vlc_modules += {
     'sources' : files('vgl.c')
 }
 
+vlc_modules += {
+    'name' : 'decklinkoutput',
+    'sources' : files('decklink.cpp',
+                    '../stream_out/sdi/Ancillary.cpp',
+                    '../stream_out/sdi/Ancillary.hpp',
+                    '../stream_out/sdi/DBMHelper.cpp',
+                    '../stream_out/sdi/DBMHelper.hpp',
+                    '../stream_out/sdi/SDIGenerator.cpp',
+                    '../stream_out/sdi/SDIGenerator.hpp',
+                    '../stream_out/sdi/V210.cpp',
+                    '../stream_out/sdi/V210.hpp'),
+    'dependencies' : [dl_lib, decklink_dep],
+    'cpp_args' : decklink_cpp_args,
+    'enabled' : decklink_dep.found(),
+}
+
 # Kernel Mode Setting
 drm_dep = dependency('libdrm', version: '>= 2.4.83', required: get_option('drm'))
 if drm_dep.found()
