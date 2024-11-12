@@ -278,6 +278,11 @@ static const struct pw_stream_events stream_events = {
     .trigger_done = stream_trigger_done,
 };
 
+static enum pw_stream_state vlc_pw_stream_get_state(struct vlc_pw_stream *s)
+{
+    return pw_stream_get_state(s->stream, NULL);
+}
+
 /**
  * Queues an audio buffer for playback.
  */
@@ -286,7 +291,7 @@ static void vlc_pw_stream_play(struct vlc_pw_stream *s, vlc_frame_t *block,
 {
     assert((block->i_buffer % s->stride) == 0);
     vlc_pw_lock(s->context);
-    if (pw_stream_get_state(s->stream, NULL) == PW_STREAM_STATE_ERROR) {
+    if (vlc_pw_stream_get_state(s) == PW_STREAM_STATE_ERROR) {
         vlc_frame_Release(block);
         goto out;
     }
@@ -360,7 +365,7 @@ static void vlc_pw_stream_drain(struct vlc_pw_stream *s)
 {
     vlc_pw_lock(s->context);
     s->first_pts = s->start = VLC_TICK_INVALID;
-    if (pw_stream_get_state(s->stream, NULL) == PW_STREAM_STATE_ERROR)
+    if (vlc_pw_stream_get_state(s) == PW_STREAM_STATE_ERROR)
         stream_drained(s); /* Don't wait on a failed stream */
     else if (s->queue.head == NULL)
         pw_stream_flush(s->stream, true); /* Drain now */
@@ -621,8 +626,7 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
                       params, ARRAY_SIZE(params));
 
     /* Wait for the stream to be ready */
-    while ((state = pw_stream_get_state(s->stream,
-                                        NULL)) == PW_STREAM_STATE_CONNECTING)
+    while ((state = vlc_pw_stream_get_state(s)) == PW_STREAM_STATE_CONNECTING)
         vlc_pw_wait(s->context);
     vlc_pw_unlock(s->context);
 
