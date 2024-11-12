@@ -80,7 +80,7 @@
 {
     if (self.cropsImagesToRoundedCorners) {
         self.layer.cornerRadius = VLCLibraryUIUnits.cornerRadius;
-        self.layer.borderWidth = 1.;
+        self.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
     } else {
         self.layer.cornerRadius = 0.;
         self.layer.borderWidth = 0.;

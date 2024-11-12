@@ -53,7 +53,7 @@ NSString * const VLCLibraryAudioGroupHeaderViewIdentifier = @"VLCLibraryAudioGro
 
     self.backgroundEffectView.wantsLayer = YES;
     self.backgroundEffectView.layer.cornerRadius = VLCLibraryUIUnits.smallSpacing;
-    self.backgroundEffectView.layer.borderWidth = 1;
+    self.backgroundEffectView.layer.borderWidth = VLCLibraryUIUnits.borderThickness;
     [self updateColoredAppearance:self.effectiveAppearance];
 }
 

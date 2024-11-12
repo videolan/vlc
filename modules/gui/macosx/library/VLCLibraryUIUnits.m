@@ -56,6 +56,11 @@
     return 5.;
 }
 
++ (const CGFloat)borderThickness
+{
+    return 1.;
+}
+
 + (const CGFloat)scrollBarSmallSideSize
 {
     return 16;

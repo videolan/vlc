@@ -42,7 +42,7 @@
         [NSBezierPath bezierPathWithRoundedRect:cellFrame
                                         xRadius:VLCLibraryUIUnits.cornerRadius
                                         yRadius:VLCLibraryUIUnits.cornerRadius];
-    separatorPath.lineWidth = 1.0;
+    separatorPath.lineWidth = VLCLibraryUIUnits.borderThickness;
     [separatorPath stroke];
     [separatorPath fill];
 
