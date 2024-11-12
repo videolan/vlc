@@ -23,6 +23,7 @@
 #import "VLCLibraryHomeViewActionButtonCell.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSFont+VLCAdditions.h"
 
 @implementation VLCLibraryHomeViewActionButtonCell
 
@@ -42,6 +43,18 @@
     [separatorPath stroke];
     [separatorPath fill];
 
+    const CGSize cellSize = cellFrame.size;
+    const CGFloat cellWidth = cellSize.width;
+    const CGFloat cellHeight = cellSize.height;
+
+    NSDictionary<NSAttributedStringKey, id> * const titleAttributes = @{
+        NSForegroundColorAttributeName: NSColor.controlTextColor,
+        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont
+    };
+    const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
+    [self.title drawInRect:CGRectMake(NSMinX(cellFrame), NSMaxY(cellFrame) - titleSize.height, cellWidth, 20)
+            withAttributes:titleAttributes];
+
     const CGSize imageSize = self.image.size;
     NSImage * const image = [NSImage imageWithSize:imageSize
                                            flipped:NO
@@ -53,9 +66,6 @@
         return YES;
     }];
 
-    const CGSize cellSize = cellFrame.size;
-    const CGFloat cellWidth = cellSize.width;
-    const CGFloat cellHeight = cellSize.height;
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
     CGFloat imageWidth, imageHeight;
 
