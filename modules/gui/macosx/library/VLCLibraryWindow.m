@@ -804,6 +804,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self setViewForSelectedSegment];
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
+    [self updateArtworkButtonEnabledState];
     self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = NO;
 }
 
