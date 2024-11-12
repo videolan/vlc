@@ -36,6 +36,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(APPLY) $(SRC)/ass/0001-aarch64-Set-the-right-intended-alignment-for-constan.patch
 	$(call update_autoconfig,.)
 	$(call pkg_static,"libass.pc.in")
 	$(MOVE)
