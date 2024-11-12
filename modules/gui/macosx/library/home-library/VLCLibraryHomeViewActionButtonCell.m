@@ -58,9 +58,12 @@
     const CGFloat cellWidth = cellSize.width;
     const CGFloat cellHeight = cellSize.height;
 
+    NSMutableParagraphStyle * const titleParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+    titleParagraphStyle.alignment = NSTextAlignmentCenter;
     NSDictionary<NSAttributedStringKey, id> * const titleAttributes = @{
         NSForegroundColorAttributeName: NSColor.controlTextColor,
-        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont
+        NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont,
+        NSParagraphStyleAttributeName: titleParagraphStyle
     };
     const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
     const CGFloat titleHeight = titleSize.height + VLCLibraryUIUnits.smallSpacing;
