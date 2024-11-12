@@ -51,6 +51,11 @@
     return 5;
 }
 
++ (const CGFloat)cornerRadius
+{
+    return 5.;
+}
+
 + (const CGFloat)scrollBarSmallSideSize
 {
     return 16;

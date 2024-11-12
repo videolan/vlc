@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) const CGFloat mediumSpacing;
 @property (class, readonly) const CGFloat smallSpacing;
 
+@property (class, readonly) const CGFloat cornerRadius;
+
 @property (class, readonly) const CGFloat scrollBarSmallSideSize;
 
 @property (class, readonly) const CGFloat largeTableViewRowHeight;
