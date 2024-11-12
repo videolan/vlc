@@ -318,6 +318,9 @@ static void input_item_preparse_ended(input_item_t *item,
         case VLC_ETIMEOUT:
             new_status = libvlc_media_parsed_status_timeout;
             break;
+        case -EINTR:
+            new_status = libvlc_media_parsed_status_cancelled;
+            break;
         case VLC_SUCCESS:
             new_status = libvlc_media_parsed_status_done;
             break;
