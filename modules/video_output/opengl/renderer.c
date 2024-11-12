@@ -38,6 +38,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_opengl_filter.h>
+#include <vlc_configuration.h>
 
 #include "gl_util.h"
 #include "vout_helper.h"
@@ -356,8 +357,7 @@ vlc_gl_renderer_SetViewpoint(struct vlc_gl_renderer *renderer,
         UpdateFOVy(renderer);
         UpdateZ(renderer);
     }
-    const video_format_t *fmt = &renderer->sampler->glfmt.fmt;
-    getViewpointMatrixes(renderer, fmt->projection_mode);
+    getViewpointMatrixes(renderer, renderer->projection_mode);
 
     return VLC_SUCCESS;
 }
@@ -377,8 +377,7 @@ vlc_gl_renderer_SetOutputSize(struct vlc_gl_renderer *renderer, unsigned width,
     UpdateFOVy(renderer);
     UpdateZ(renderer);
 
-    const video_format_t *fmt = &renderer->sampler->glfmt.fmt;
-    getViewpointMatrixes(renderer, fmt->projection_mode);
+    getViewpointMatrixes(renderer, renderer->projection_mode);
 }
 
 static int
@@ -675,7 +674,7 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
     unsigned nbVertices, nbIndices;
 
     int i_ret;
-    switch (fmt->projection_mode)
+    switch (renderer->projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
         i_ret = BuildRectangle(&vertexCoord, &textureCoord, &nbVertices,
@@ -797,8 +796,10 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
                      const struct vlc_gl_format *glfmt,
                      struct vlc_gl_tex_size *size_out)
 {
-    (void) config;
     (void) size_out;
+
+    const char * const options[] = { "projection-mode", NULL };
+    config_ChainParse(filter, "", options, config);
 
     const opengl_vtable_t *vt = &filter->api->vt;
 
@@ -827,6 +828,18 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     renderer->api = filter->api;
     renderer->vt = vt;
     renderer->dump_shaders = var_InheritInteger(filter, "verbose") >= 4;
+
+    int projection_mode = var_InheritInteger(filter, "projection-mode");
+    switch (projection_mode)
+    {
+        case PROJECTION_MODE_RECTANGULAR:
+            renderer->projection_mode = projection_mode;
+            break;
+        default:
+        case -1:
+            renderer->projection_mode = sampler->glfmt.fmt.projection_mode;
+            break;
+    }
 
     int ret = opengl_link_program(filter);
     if (ret != VLC_SUCCESS)

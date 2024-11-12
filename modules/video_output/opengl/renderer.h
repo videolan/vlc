@@ -101,6 +101,9 @@ struct vlc_gl_renderer
      *     f_sar = (float) target_width / target_height */
     unsigned target_width;
     unsigned target_height;
+
+    /* Projection mode for the input data */
+    video_projection_mode_t projection_mode;
 };
 
 vlc_gl_filter_open_fn vlc_gl_renderer_Open;
