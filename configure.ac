@@ -3830,10 +3830,20 @@ AS_IF([test -n "$PKG_CONFIG"],[
     AC_PATH_PROGS(PROTOC, [protoc], no, ["${CONTRIB_DIR}/../bin:$PATH"])
     AS_IF([test "${PROTOC}" != "no"], [
         dnl silently checks the protoc version matches the protobuf library
-        PROTOBUF_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '// | cut -d '.' -f -2)"
-        protoc_ver_next="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+        PROTOC_FULL_VERSION="$(eval ${PROTOC} --version 2>/dev/null | head -1 | sed s/'.* '//)"
+        PROTOC_MAJ_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -1)"
+        AS_IF([test "${PROTOC_MAJ_VERSION}" -lt "22" ], [
+            dnl protoc x.y.z is compatible with protobuf x.y.z
+            PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION})"
+            PROTOBUF_TEST="protobuf-lite == ${PROTOBUF_VERSION}"
+        ],[
+            dnl protoc x.y is compatible with protobuf x.y.*
+            PROTOBUF_VERSION="$(echo ${PROTOC_FULL_VERSION} | cut -d '.' -f -2)"
+            PROTOBUF_MAX_VERSION="${PROTOBUF_VERSION%.*}.$((${PROTOBUF_VERSION##*.}+1))"
+            PROTOBUF_TEST="protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${PROTOBUF_MAX_VERSION}"
+        ])
         AC_MSG_CHECKING([protobuf-lite matches ${PROTOC} version ${PROTOBUF_VERSION}])
-        ($PKG_CONFIG --exists --print-errors "protobuf-lite >= ${PROTOBUF_VERSION} protobuf-lite < ${protoc_ver_next}") 2>&AS_MESSAGE_FD
+        ($PKG_CONFIG --exists --print-errors "${PROTOBUF_TEST}") 2>&AS_MESSAGE_FD
         ac_status=$?
         AS_IF([test $ac_status = 0],[
             protoc_matching=yes
