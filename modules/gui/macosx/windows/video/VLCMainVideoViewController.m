@@ -467,6 +467,11 @@
     [_overlayView setNeedsDisplay:YES];
 }
 
+- (BOOL)pipIsActive
+{
+    return _voutViewController != nil;
+}
+
 - (void)pictureInPictureChanged:(VLCPlayerController *)playerController
 {
     if (_voutViewController) {
