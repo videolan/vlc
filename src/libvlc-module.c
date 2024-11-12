@@ -336,6 +336,10 @@ static const char *const ppsz_align_descriptions[] =
 #define FULLSCREEN_LONGTEXT N_( \
     "Start video in fullscreen mode" )
 
+#define PROJECTION_MODE_TEXT N_("360 videos projection mode")
+#define PROJECTION_MODE_LONGTEXT N_( \
+    "Change the 360 video projection mode.")
+
 #define VIDEO_ON_TOP_TEXT N_("Always on top")
 #define VIDEO_ON_TOP_LONGTEXT N_( \
     "Always place the video window on top of other windows." )
@@ -1644,6 +1648,9 @@ vlc_module_begin ()
               GRAYSCALE_LONGTEXT )
     add_bool( "fullscreen", false, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
         change_short('f')
+        change_safe ()
+    add_integer("projection-mode", -1, PROJECTION_MODE_TEXT, PROJECTION_MODE_LONGTEXT)
+        change_volatile ()
         change_safe ()
     add_bool( "embedded-video", true, EMBEDDED_TEXT, EMBEDDED_LONGTEXT )
     add_bool( "xlib", true, "", "" )
