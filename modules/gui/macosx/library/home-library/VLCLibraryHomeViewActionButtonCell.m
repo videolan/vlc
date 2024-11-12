@@ -58,8 +58,11 @@
         NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont
     };
     const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
-    const CGFloat titleHeight = titleSize.height;
-    [self.title drawInRect:CGRectMake(cellMinX, cellMaxY - titleHeight, cellWidth, 20)
+    const CGFloat titleHeight = titleSize.height + VLCLibraryUIUnits.smallSpacing;
+    [self.title drawInRect:CGRectMake(cellMinX + VLCLibraryUIUnits.smallSpacing,
+                                      cellMaxY - titleHeight,
+                                      cellWidth - VLCLibraryUIUnits.smallSpacing * 2,
+                                      titleHeight)
             withAttributes:titleAttributes];
 
     const CGSize imageSize = self.image.size;
