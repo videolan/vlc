@@ -26,6 +26,14 @@
 #import "extensions/NSFont+VLCAdditions.h"
 #import "library/VLCLibraryUIUnits.h"
 
+@interface VLCLibraryHomeViewActionButtonCell ()
+
+@property NSImage *cachedImage;
+@property BOOL prevIsHighlighted;
+@property NSRect prevFrame;
+
+@end
+
 @implementation VLCLibraryHomeViewActionButtonCell
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
@@ -63,19 +71,28 @@
             withAttributes:titleAttributes];
 
     const CGSize imageSize = self.image.size;
-    NSImage * const image = [NSImage imageWithSize:imageSize
-                                           flipped:NO
-                                    drawingHandler:^BOOL(NSRect dstRect) {
-        if (self.isHighlighted) {
-            [NSColor.VLCSubtleBorderColor set];
-        } else {
-            [NSColor.VLCAccentColor set];
-        }
-        const NSRect imageRect = {NSZeroPoint, imageSize};
-        [self.image drawInRect:imageRect];
-        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
-        return YES;
-    }];
+
+    if (self.cachedImage != self.image ||
+        self.prevIsHighlighted != self.isHighlighted ||
+        !NSEqualRects(self.prevFrame, cellFrame)) {
+
+        self.cachedImage = [NSImage imageWithSize:imageSize
+                                          flipped:NO
+                                   drawingHandler:^BOOL(NSRect dstRect) {
+            if (self.isHighlighted) {
+                [NSColor.VLCSubtleBorderColor set];
+            } else {
+                [NSColor.VLCAccentColor set];
+            }
+            const NSRect imageRect = {NSZeroPoint, imageSize};
+            [self.image drawInRect:imageRect];
+            NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
+            return YES;
+        }];
+
+        self.prevIsHighlighted = self.isHighlighted;
+        self.prevFrame = cellFrame;
+    } 
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
     const CGFloat imageAvailableVerticalSpace =
@@ -96,7 +113,7 @@
                                         cellOrigin.y + (cellHeight - imageHeight) / 2,
                                         imageWidth,
                                         imageHeight);
-    [image drawInRect:imageRect];
+    [self.cachedImage drawInRect:imageRect];
 }
 
 @end
