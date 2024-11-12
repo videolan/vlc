@@ -691,8 +691,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         !playerController.audioTracksEnabled || !playerController.selectedAudioTrack.selected;
     const BOOL currentItemIsAudio =
         playerController.videoTracks.count == 0 && playerController.audioTracks.count > 0;
+    const BOOL pipOpen = self.videoViewController.pipIsActive;
     const BOOL artworkButtonDisabled =
-        (videoTrackDisabled && audioTrackDisabled) || (videoTrackDisabled && !currentItemIsAudio);
+        (videoTrackDisabled && audioTrackDisabled) ||
+        (videoTrackDisabled && !currentItemIsAudio) ||
+        pipOpen;
     self.artworkButton.enabled = !artworkButtonDisabled;
     self.artworkButton.hidden = artworkButtonDisabled;
     self.controlsBar.thumbnailTrackingView.enabled = !artworkButtonDisabled;
