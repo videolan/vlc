@@ -24,6 +24,7 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
+#import "library/VLCLibraryUIUnits.h"
 
 @implementation VLCLibraryHomeViewActionButtonCell
 
@@ -73,7 +74,8 @@
     }];
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
-    const CGFloat imageAvailableVerticalSpace = cellHeight - titleHeight;
+    const CGFloat imageAvailableVerticalSpace =
+        cellHeight - titleHeight - VLCLibraryUIUnits.largeSpacing;
     CGFloat imageWidth, imageHeight;
 
     // Try to scale focusing on width first, if this yields a height that is too large, switch
