@@ -114,9 +114,6 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     for(auto attr: attributes)
     {
-        if(*attr.ns != NS_DASH)
-            continue;
-
         if(attr.name == "mediaPresentationDuration")
         {
             mpd->duration.Set(IsoTime(attr.value));
