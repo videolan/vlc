@@ -38,6 +38,11 @@
     return [NSColor colorWithRed:1. green:.38 blue:.04 alpha:1.];
 }
 
++ (NSColor *)VLCSubtlerAccentColor
+{
+    return [NSColor.VLCAccentColor colorWithAlphaComponent:0.8];
+}
+
 + (NSColor *)VLClibraryLightTitleColor
 {
     return [NSColor colorWithRed:0.15 green:0.16 blue:0.17 alpha:1.];

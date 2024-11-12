@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSColor (VLCAdditions)
 
 @property (class, readonly) NSColor *VLCAccentColor;
+@property (class, readonly) NSColor *VLCSubtlerAccentColor;
 @property (class, readonly) NSColor *VLClibraryLightTitleColor;
 @property (class, readonly) NSColor *VLClibraryDarkTitleColor;
 @property (class, readonly) NSColor *VLClibrarySubtitleColor;
