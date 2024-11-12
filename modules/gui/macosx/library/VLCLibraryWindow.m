@@ -679,6 +679,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)playerTrackSelectionChanged:(NSNotification *)notification
 {
+    [self updateArtworkButtonEnabledState];
+}
+
+- (void)updateArtworkButtonEnabledState
+{
     VLCPlayerController * const playerController = self.playerController;
     const BOOL videoTrackDisabled =
         !playerController.videoTracksEnabled || !playerController.selectedVideoTrack.selected;
