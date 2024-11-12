@@ -1,0 +1,70 @@
+From 159cefc9074a9b816d62c6b4251521ab515ecaca Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Tue, 12 Nov 2024 10:08:13 +0200
+Subject: [PATCH] aarch64: Set the right intended alignment for constants
+
+The align parameter to these macros is passed to the gas directive
+.align. This directive is architecture dependent; on some
+architectures, the given alignment is an alignment in bytes,
+while on others, its the power of two to align to. On aarch64,
+.align is for power of two alignment, see [1] for details; i.e.
+it behaves the same as .p2align.
+
+This means that when the macros are invoked with align=16, we
+actually requested 64 KB alignment, not 16 byte alignment. Fix
+this, setting the alignment to the intended 16 byte alignment.
+
+This fixes building for aarch64-windows targets with assert enabled
+versions of Clang; such versions of Clang error out with
+"unsupported section alignment" on this case, while regular release
+versions of Clang silently let this issue pass.
+
+[1] https://sourceware.org/binutils/docs/as/Align.html
+---
+ libass/aarch64/blend_bitmaps.S | 2 +-
+ libass/aarch64/blur.S          | 2 +-
+ libass/aarch64/rasterizer.S    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/libass/aarch64/blend_bitmaps.S b/libass/aarch64/blend_bitmaps.S
+index 2e8f053..a58c09b 100644
+--- a/libass/aarch64/blend_bitmaps.S
++++ b/libass/aarch64/blend_bitmaps.S
+@@ -18,7 +18,7 @@
+ 
+ #include "asm.S"
+ 
+-const edge_mask, align=16
++const edge_mask, align=4
+     .dcb.b 16, 0xFF
+     .dcb.b 16, 0x00
+ endconst
+diff --git a/libass/aarch64/blur.S b/libass/aarch64/blur.S
+index de8b508..292ee84 100644
+--- a/libass/aarch64/blur.S
++++ b/libass/aarch64/blur.S
+@@ -18,7 +18,7 @@
+ 
+ #include "asm.S"
+ 
+-const words_zero, align=16
++const words_zero, align=4
+     .dc.w 0, 0, 0, 0, 0, 0, 0, 0
+ endconst
+ 
+diff --git a/libass/aarch64/rasterizer.S b/libass/aarch64/rasterizer.S
+index 5fde704..514fba2 100644
+--- a/libass/aarch64/rasterizer.S
++++ b/libass/aarch64/rasterizer.S
+@@ -28,7 +28,7 @@
+ #endif
+ 
+ 
+-const words_index, align=16
++const words_index, align=4
+     .dc.w 0, 1, 2, 3, 4, 5, 6, 7
+ endconst
+ 
+-- 
+2.34.1
+

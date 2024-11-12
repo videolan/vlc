@@ -37,6 +37,7 @@ $(TARBALLS)/libass-$(ASS_VERSION).tar.gz:
 
 libass: libass-$(ASS_VERSION).tar.gz .sum-ass
 	$(UNPACK)
+	$(APPLY) $(SRC)/ass/0001-aarch64-Set-the-right-intended-alignment-for-constan.patch
 	$(MOVE)
 
 DEPS_ass = freetype2 $(DEPS_freetype2) fribidi $(DEPS_fribidi) iconv $(DEPS_iconv) harfbuzz $(DEPS_harfbuzz)
