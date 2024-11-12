@@ -38,14 +38,11 @@
     const CGFloat cellMaxX = NSMaxX(cellFrame);
     const CGFloat cellMaxY = NSMaxY(cellFrame);
 
-    NSBezierPath * const separatorPath = NSBezierPath.bezierPath;
-    [separatorPath moveToPoint:NSMakePoint(cellMinX, cellMaxY)];
-    [separatorPath lineToPoint:NSMakePoint(cellMaxX, cellMaxY)];
-    [separatorPath lineToPoint:NSMakePoint(cellMaxX, cellMinY)];
-    [separatorPath lineToPoint:NSMakePoint(cellMinX, cellMinY)];
-    [separatorPath lineToPoint:NSMakePoint(cellMinX, cellMaxY)];
+    NSBezierPath * const separatorPath =
+        [NSBezierPath bezierPathWithRoundedRect:cellFrame
+                                        xRadius:VLCLibraryUIUnits.cornerRadius
+                                        yRadius:VLCLibraryUIUnits.cornerRadius];
     separatorPath.lineWidth = 1.0;
-
     [separatorPath stroke];
     [separatorPath fill];
 
