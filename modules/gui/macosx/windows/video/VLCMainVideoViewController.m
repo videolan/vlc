@@ -474,7 +474,7 @@
 
 - (void)pictureInPictureChanged:(VLCPlayerController *)playerController
 {
-    if (_voutViewController) {
+    if (self.pipIsActive) {
         return;
     }
 
