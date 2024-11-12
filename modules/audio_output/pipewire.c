@@ -634,9 +634,21 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     pw_stream_connect(s->stream, PW_DIRECTION_OUTPUT, PW_ID_ANY, flags,
                       params, ARRAY_SIZE(params));
 
-    /* Wait for the stream to be ready */
-    while ((state = vlc_pw_stream_get_state(s)) == PW_STREAM_STATE_CONNECTING)
-        vlc_pw_wait(s->context);
+    if (encoding == SPA_AUDIO_IEC958_CODEC_PCM)
+    {
+        /* Wait for the PCM stream to be ready */
+        while ((state = vlc_pw_stream_get_state(s)) == PW_STREAM_STATE_CONNECTING)
+            vlc_pw_wait(s->context);
+    }
+    else
+    {
+        /* In case of passthrough, an error can be triggered just after the
+         * CONNECTING -> PAUSED state, so wait for the STREAMING state or any
+         * errors. */
+        while ((state = vlc_pw_stream_get_state(s)) == PW_STREAM_STATE_CONNECTING
+             || state == PW_STREAM_STATE_PAUSED)
+            vlc_pw_wait(s->context);
+    }
     vlc_pw_unlock(s->context);
 
     switch (state) {
