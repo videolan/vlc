@@ -57,7 +57,8 @@
         NSFontAttributeName: NSFont.VLCLibrarySubsectionSubheaderFont
     };
     const NSSize titleSize = [self.title sizeWithAttributes:titleAttributes];
-    [self.title drawInRect:CGRectMake(cellMinX, cellMaxY - titleSize.height, cellWidth, 20)
+    const CGFloat titleHeight = titleSize.height;
+    [self.title drawInRect:CGRectMake(cellMinX, cellMaxY - titleHeight, cellWidth, 20)
             withAttributes:titleAttributes];
 
     const CGSize imageSize = self.image.size;
@@ -72,7 +73,7 @@
     }];
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
-    const CGFloat imageAvailableVerticalSpace = cellHeight - titleSize.height;
+    const CGFloat imageAvailableVerticalSpace = cellHeight - titleHeight;
     CGFloat imageWidth, imageHeight;
 
     // Try to scale focusing on width first, if this yields a height that is too large, switch
