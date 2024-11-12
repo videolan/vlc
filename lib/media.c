@@ -325,7 +325,7 @@ static void input_item_preparse_ended(input_item_t *item,
             new_status = libvlc_media_parsed_status_done;
             break;
         default:
-            return;
+            vlc_assert_unreachable();
     }
     send_parsed_changed( p_md, new_status );
 
