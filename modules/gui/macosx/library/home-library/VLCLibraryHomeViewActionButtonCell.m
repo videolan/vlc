@@ -66,7 +66,11 @@
     NSImage * const image = [NSImage imageWithSize:imageSize
                                            flipped:NO
                                     drawingHandler:^BOOL(NSRect dstRect) {
-        [NSColor.VLCAccentColor set];
+        if (self.isHighlighted) {
+            [NSColor.VLCSubtleBorderColor set];
+        } else {
+            [NSColor.VLCAccentColor set];
+        }
         const NSRect imageRect = {NSZeroPoint, imageSize};
         [self.image drawInRect:imageRect];
         NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
