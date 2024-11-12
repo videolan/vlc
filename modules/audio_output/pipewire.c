@@ -63,6 +63,7 @@ struct vlc_pw_stream {
     vlc_tick_t first_pts;
     bool starting;
     bool draining;
+    bool error;
 
     audio_output_t *aout;
 };
@@ -107,7 +108,10 @@ static void stream_state_changed(void *data, enum pw_stream_state old,
     struct vlc_pw_stream *s = data;
 
     if (state == PW_STREAM_STATE_ERROR)
+    {
         vlc_pw_error(s->context, "stream error: %s", err);
+        s->error = true;
+    }
     else
         vlc_pw_debug(s->context, "stream %s",
                      pw_stream_state_as_string(state));
@@ -280,7 +284,10 @@ static const struct pw_stream_events stream_events = {
 
 static enum pw_stream_state vlc_pw_stream_get_state(struct vlc_pw_stream *s)
 {
-    return pw_stream_get_state(s->stream, NULL);
+    /* PW Workaround: The error state can be notified via
+     * stream_state_changed() but never returned by pw_stream_get_state() */
+    return s->error ? PW_STREAM_STATE_ERROR
+                    : pw_stream_get_state(s->stream, NULL);
 }
 
 /**
@@ -351,6 +358,7 @@ static void vlc_pw_stream_flush(struct vlc_pw_stream *s)
     s->first_pts = s->start = VLC_TICK_INVALID;
     s->starting = false;
     s->draining = false;
+    s->error = false;
     pw_stream_flush(s->stream, false);
     vlc_pw_unlock(s->context);
 }
@@ -600,6 +608,7 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     s->first_pts = s->start = VLC_TICK_INVALID;
     s->starting = false;
     s->draining = false;
+    s->error = false;
     s->aout = aout;
 
     vlc_pw_lock(s->context);
