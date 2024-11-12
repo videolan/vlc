@@ -78,7 +78,7 @@
 
     const CGFloat originalImageAspectRatio = imageSize.width / imageSize.height;
     const CGFloat imageAvailableVerticalSpace =
-        cellHeight - titleHeight - VLCLibraryUIUnits.largeSpacing;
+        cellHeight - titleHeight - VLCLibraryUIUnits.largeSpacing * 2;
     CGFloat imageWidth, imageHeight;
 
     // Try to scale focusing on width first, if this yields a height that is too large, switch
