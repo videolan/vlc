@@ -1,7 +1,7 @@
 From 2dbcebff1e80541d8aa71041f36a086856987373 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Tue, 23 Jan 2018 13:01:22 +0100
-Subject: [PATCH 8/9] fix crash on bogus frame reference in VC1/MPEG-2 with
+Subject: [PATCH 8/9] fix crash on bogus frame reference in MPEG-2 with
  DXVA
 
 ---
@@ -18,30 +18,12 @@ index d88e782414..c3097cb6e5 100644
      memset(pp, 0, sizeof(*pp));
      pp->wDeblockedPictureIndex       = 0;
 -    if (s->pict_type != AV_PICTURE_TYPE_I)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_pic.data[0])
++    if (s->pict_type != AV_PICTURE_TYPE_I && s->last_pic.ptr)
          pp->wForwardRefPictureIndex  = ff_dxva2_get_surface_index(avctx, ctx, s->last_pic.ptr->f, 0);
      else
          pp->wForwardRefPictureIndex  = 0xffff;
 -    if (s->pict_type == AV_PICTURE_TYPE_B)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_pic.data[0])
-         pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_pic.ptr->f, 0);
-     else
-         pp->wBackwardRefPictureIndex = 0xffff;
-diff --git a/libavcodec/dxva2_vc1.c b/libavcodec/dxva2_vc1.c
-index bc9ad9648e..b7608228b0 100644
---- a/libavcodec/dxva2_vc1.c
-+++ b/libavcodec/dxva2_vc1.c
-@@ -58,11 +58,11 @@ void ff_dxva2_vc1_fill_picture_parameters(AVCodecContext *avctx,
-     }
- 
-     memset(pp, 0, sizeof(*pp));
--    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_pic.ptr)
-+    if (s->pict_type != AV_PICTURE_TYPE_I && !v->bi_type && s->last_pic.ptr && s->last_pic.data[0])
-         pp->wForwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->last_pic.ptr->f, 0);
-     else
-         pp->wForwardRefPictureIndex = 0xffff;
--    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_pic.ptr)
-+    if (s->pict_type == AV_PICTURE_TYPE_B && !v->bi_type && s->next_pic.ptr && s->next_pic.data[0])
++    if (s->pict_type == AV_PICTURE_TYPE_B && s->next_pic.ptr)
          pp->wBackwardRefPictureIndex = ff_dxva2_get_surface_index(avctx, ctx, s->next_pic.ptr->f, 0);
      else
          pp->wBackwardRefPictureIndex = 0xffff;
