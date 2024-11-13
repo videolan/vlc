@@ -41,7 +41,6 @@ public:
         assert(p_intf);
         if (isWindow())
         {
-            ensurePolished();
             QVLCDialog::setWindowTransientParent(this, nullptr, p_intf);
         }
     }

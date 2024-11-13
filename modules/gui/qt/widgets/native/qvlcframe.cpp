@@ -246,6 +246,7 @@ void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_i
     if (!parent)
         return;
 
+    widget->ensurePolished();
     widget->createWinId();
     QWindow* handle  = widget->windowHandle();
     handle->setTransientParent(parent);
