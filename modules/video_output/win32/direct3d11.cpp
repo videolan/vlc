@@ -5,6 +5,7 @@
  *
  * Authors: Martell Malone <martellmalone@gmail.com>
  *          Steve Lhomme <robux4@gmail.com>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -144,7 +145,7 @@ typedef struct vout_display_sys_t
         ComPtr<ID3D11VideoProcessorOutputView>  outputView;
     } old_feature;
 
-
+    video_projection_mode_t  projection_mode;
     d3d11_vertex_shader_t    projectionVShader = {};
     d3d11_vertex_shader_t    flatVShader = {};
 
@@ -493,6 +494,13 @@ error:
     msg_Dbg(vd, "failed to create the tone mapper, using default HDR mode");
 }
 
+static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
+{
+    vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
+    sys->projection_mode = projection;
+    return Direct3D11CreateFormatResources(vd, vd->source);
+}
+
 static const auto ops = []{
     struct vlc_display_operations ops {};
     ops.close = Close;
@@ -500,6 +508,7 @@ static const auto ops = []{
     ops.display = Display;
     ops.control = Control;
     ops.set_viewpoint = SetViewpoint;
+    ops.change_source_projection = ChangeSourceProjection;
     return ops;
 }();
 
@@ -542,6 +551,7 @@ static int Open(vout_display_t *vd,
         dev_sys = sys->local_d3d_dev;
     }
     sys->d3d_dev = &dev_sys->d3d_dev;
+    sys->projection_mode = vd->cfg->projection;
 
     InitTonemapProcessor(vd, vd->source);
 
@@ -554,7 +564,7 @@ static int Open(vout_display_t *vd,
         if (vd->cfg->window->type == VLC_WINDOW_TYPE_HWND)
         {
             if (CommonWindowInit(vd, &sys->area,
-                       vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
+                       sys->projection_mode != PROJECTION_MODE_RECTANGULAR))
                 goto error;
         }
 
@@ -890,7 +900,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
         renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(sys->d3d_dev, &sys->picQuad,
-                     vd->source->projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                     sys->projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
                      renderSrc, SelectRenderPlane, sys);
 
     if (subpicture) {
@@ -1421,7 +1431,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    if (D3D11_AllocateQuad(vd, sys->d3d_dev, sys->picQuad.quad_fmt.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    if (D3D11_AllocateQuad(vd, sys->d3d_dev, sys->projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not allocate quad buffers.");
        return VLC_EGENERIC;
@@ -1440,8 +1450,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         return VLC_EGENERIC;
     }
 
-    if ( vd->source->projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
-         vd->source->projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
+    if ( sys->projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
+         sys->projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
         D3D11_UpdateViewpoint( vd, sys->d3d_dev, &sys->picQuad, &vd->cfg->viewpoint,
                                (float) vd->cfg->display.width / vd->cfg->display.height );
 
