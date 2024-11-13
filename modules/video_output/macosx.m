@@ -145,7 +145,7 @@ static int Open (vout_display_t *vd,
     if (vd->cfg->window->type != VLC_WINDOW_TYPE_NSOBJECT)
         return VLC_EGENERIC;
 
-    vout_display_sys_t *sys = vlc_obj_calloc (vd, 1, sizeof(*sys));
+    vout_display_sys_t *sys = calloc(1, sizeof(*sys));
 
     if (!sys)
         return VLC_ENOMEM;
@@ -286,6 +286,7 @@ static void Close(vout_display_t *vd)
             [viewContainer release];
             [glView removeFromSuperview];
             [glView release];
+            free(sys);
         });
     }
 }
