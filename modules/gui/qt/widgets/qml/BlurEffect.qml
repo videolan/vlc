@@ -27,5 +27,7 @@ MultiEffect {
     blurEnabled: true
     blur: 1.0
 
+    autoPaddingEnabled: false
+
     property alias radius: effect.blurMax
 }
