@@ -1,7 +1,17 @@
-diff -ru musepack.orig/CMakeLists.txt musepack/CMakeLists.txt
---- musepack.orig/CMakeLists.txt	2011-08-08 10:21:17.000000000 +0300
-+++ musepack/CMakeLists.txt	2011-08-08 10:21:03.000000000 +0300
-@@ -16,7 +16,7 @@
+From 1f177a63ae04331f07be40b6cbfda312c51ac0c8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <remi@remlab.net>
+Date: Mon, 8 Aug 2011 17:31:04 +0200
+Subject: [PATCH 1/7] do not clobber our precious CFLAGS
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b13f78c..a6478c5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,7 +16,7 @@ endif(WIN32)
  add_definitions(-DFAST_MATH -DCVD_FASTLOG)
  
  if(NOT MSVC)
@@ -10,3 +20,6 @@ diff -ru musepack.orig/CMakeLists.txt musepack/CMakeLists.txt
  endif(NOT MSVC)
  
  add_subdirectory(libmpcdec)
+-- 
+2.45.0.windows.1
+
