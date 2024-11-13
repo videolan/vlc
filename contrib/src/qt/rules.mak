@@ -29,6 +29,10 @@ ifndef HAVE_CROSS_COMPILE
 PKGS_FOUND += qt-tools
 else ifdef QT_USES_SYSTEM_TOOLS
 PKGS_FOUND += qt-tools
+else
+PKGS.tools += qt-tools
+PKGS.tools.qt-tools.config-tool = qmake6
+PKGS.tools.qt-tools.path = $(PREFIX)/bin/qmake6
 endif
 
 $(TARBALLS)/qtbase-everywhere-src-$(QTBASE_VERSION_FULL).tar.xz:
