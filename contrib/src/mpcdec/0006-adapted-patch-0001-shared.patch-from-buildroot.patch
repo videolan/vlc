@@ -1,7 +1,7 @@
-From 617c72c7df93da5bcca2febbad066e31a411d976 Mon Sep 17 00:00:00 2001
+From 714e0e572ea7746831b5fa5434ea2669180e702f Mon Sep 17 00:00:00 2001
 From: r2d <r2d@c51c8d5e-032a-db11-a0f2-0002b3467eef>
 Date: Sun, 14 Feb 2016 22:07:10 +0000
-Subject: [PATCH 6/6] adapted patch 0001-shared.patch from buildroot:
+Subject: [PATCH 6/7] adapted patch 0001-shared.patch from buildroot:
  https://git.busybox.net/buildroot/tree/package/musepack/0001-shared.patch
  original changelog :
 
@@ -16,7 +16,7 @@ git-svn-id: http://svn.musepack.net/libmpc/trunk@491 c51c8d5e-032a-db11-a0f2-000
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/libmpcdec/CMakeLists.txt b/libmpcdec/CMakeLists.txt
-index fb18968..fa9c800 100644
+index 5579d55..7ce5e94 100644
 --- a/libmpcdec/CMakeLists.txt
 +++ b/libmpcdec/CMakeLists.txt
 @@ -4,7 +4,6 @@ SET(mpcdec_VERSION_PATCH 1)
@@ -29,7 +29,7 @@ index fb18968..fa9c800 100644
  	${libmpc_SOURCE_DIR}/include/mpc/reader.h
 @@ -12,12 +11,16 @@ install(FILES
  	${libmpc_SOURCE_DIR}/include/mpc/mpc_types.h
- 	DESTINATION include/mpcdec COMPONENT headers)
+ 	DESTINATION include/mpc COMPONENT headers)
  
 +include_directories(${libmpc_SOURCE_DIR}/include)
  if(SHARED)
@@ -49,5 +49,5 @@ index fb18968..fa9c800 100644
  endif(SHARED)
  
 -- 
-2.37.3.windows.1
+2.45.0.windows.1
 
