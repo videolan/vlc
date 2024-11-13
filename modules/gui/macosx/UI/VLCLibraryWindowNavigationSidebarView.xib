@@ -103,7 +103,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
-                <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="ktP-pW-HNz">
+                <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="ktP-pW-HNz" customClass="VLCStatusNotifierView">
                     <rect key="frame" x="0.0" y="0.0" width="163" height="26"/>
                     <subviews>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bT3-Rj-1sP">
@@ -127,6 +127,10 @@
                         <constraint firstItem="bT3-Rj-1sP" firstAttribute="leading" secondItem="uvb-DL-v2Y" secondAttribute="trailing" constant="5" id="oAa-Vo-uGC"/>
                         <constraint firstAttribute="bottom" secondItem="uvb-DL-v2Y" secondAttribute="bottom" constant="5" id="wqe-yn-z5G"/>
                     </constraints>
+                    <connections>
+                        <outlet property="label" destination="bT3-Rj-1sP" id="1VQ-rK-Dc5"/>
+                        <outlet property="progressIndicator" destination="uvb-DL-v2Y" id="TmU-8b-Gqf"/>
+                    </connections>
                 </visualEffectView>
             </subviews>
             <constraints>

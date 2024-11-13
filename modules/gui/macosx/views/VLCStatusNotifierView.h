@@ -24,7 +24,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCStatusNotifierView : NSView
+@interface VLCStatusNotifierView : NSVisualEffectView
+
+@property (readwrite, weak) IBOutlet NSProgressIndicator *progressIndicator;
+@property (readwrite, weak) IBOutlet NSTextField *label;
 
 @end
 
