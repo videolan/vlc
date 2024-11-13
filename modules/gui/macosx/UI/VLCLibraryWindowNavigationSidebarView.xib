@@ -103,11 +103,39 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>
+                <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="ktP-pW-HNz">
+                    <rect key="frame" x="0.0" y="0.0" width="163" height="26"/>
+                    <subviews>
+                        <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bT3-Rj-1sP">
+                            <rect key="frame" x="24" y="5" width="136" height="16"/>
+                            <textFieldCell key="cell" selectable="YES" title="State changed…" id="7Bd-PT-Muh">
+                                <font key="font" usesAppearanceFont="YES"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                        <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="uvb-DL-v2Y">
+                            <rect key="frame" x="5" y="5" width="16" height="16"/>
+                        </progressIndicator>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="bT3-Rj-1sP" secondAttribute="bottom" constant="5" id="0Oa-ae-42L"/>
+                        <constraint firstAttribute="trailing" secondItem="bT3-Rj-1sP" secondAttribute="trailing" constant="5" id="89E-uL-PDh"/>
+                        <constraint firstItem="uvb-DL-v2Y" firstAttribute="leading" secondItem="ktP-pW-HNz" secondAttribute="leading" constant="5" id="8fh-AX-6Yy"/>
+                        <constraint firstItem="bT3-Rj-1sP" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="Ywb-cy-Ftx"/>
+                        <constraint firstItem="uvb-DL-v2Y" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="akG-qb-5B7"/>
+                        <constraint firstItem="bT3-Rj-1sP" firstAttribute="leading" secondItem="uvb-DL-v2Y" secondAttribute="trailing" constant="5" id="oAa-Vo-uGC"/>
+                        <constraint firstAttribute="bottom" secondItem="uvb-DL-v2Y" secondAttribute="bottom" constant="5" id="wqe-yn-z5G"/>
+                    </constraints>
+                </visualEffectView>
             </subviews>
             <constraints>
+                <constraint firstAttribute="trailing" secondItem="ktP-pW-HNz" secondAttribute="trailing" id="8dk-br-RRR"/>
                 <constraint firstItem="gLW-4d-ery" firstAttribute="top" secondItem="1Xo-OM-LAE" secondAttribute="top" id="Be0-YZ-eO8"/>
                 <constraint firstAttribute="bottom" secondItem="gLW-4d-ery" secondAttribute="bottom" id="Vzj-Cg-x22"/>
                 <constraint firstAttribute="trailing" secondItem="gLW-4d-ery" secondAttribute="trailing" id="YZ5-5U-g5o"/>
+                <constraint firstAttribute="bottom" secondItem="ktP-pW-HNz" secondAttribute="bottom" id="htA-jD-bR8"/>
+                <constraint firstItem="ktP-pW-HNz" firstAttribute="leading" secondItem="1Xo-OM-LAE" secondAttribute="leading" id="sCi-Dr-FZw"/>
                 <constraint firstItem="gLW-4d-ery" firstAttribute="leading" secondItem="1Xo-OM-LAE" secondAttribute="leading" id="yWF-0n-RPp"/>
             </constraints>
             <point key="canvasLocation" x="-256" y="-334"/>
