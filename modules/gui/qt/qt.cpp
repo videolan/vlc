@@ -853,6 +853,16 @@ static void *Thread( void *obj )
 #endif
     Q_INIT_RESOURCE( shaders );
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    // NOTE:  Qt declarative 6.8.0 initializes scenegraph_shaders,
+    //        but not scenegraph_curve_shaders. Curve shaders
+    //        are used in particular cases even when curve
+    //        rendering is not explicitly enabled, this was
+    //        observed with underlined text on Windows which lead
+    //        access violation in the scene graph thread.
+    Q_INIT_RESOURCE( scenegraph_curve_shaders );
+#endif
+
     Q_INIT_RESOURCE( qmake_QtQml );
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
     Q_INIT_RESOURCE( qmake_QtQml_Base );
