@@ -40,6 +40,10 @@ FirstRunWizard::FirstRunWizard( qt_intf_t *_p_intf, QWidget *parent)
     setWindowTitle( qtr( "Welcome" ) );
     setWindowModality( Qt::WindowModal );
 
+    // NOTE: Aero style seems to be incompatible with
+    //       Qt Modern Windows Style dark mode
+    setWizardStyle(QWizard::ModernStyle);
+
     /* Build the Ui */
     ui.setupUi( this );
 
