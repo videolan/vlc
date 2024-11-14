@@ -482,7 +482,7 @@ if [ -n "$WINSTORE" ]; then
     MCONFIGFLAGS="$MCONFIGFLAGS -Dvcd_module=false"
     # other modules that were disabled in the old UWP builds
     CONFIGFLAGS="$CONFIGFLAGS --disable-dxva2"
-    # MCONFIGFLAGS="$MCONFIGFLAGS -Ddxva2=disabled"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Ddxva2=disabled"
 
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-caca"
