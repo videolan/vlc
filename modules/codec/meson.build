@@ -41,7 +41,7 @@ vlc_modules += {
 }
 
 # faad decoder plugin
-faad_lib = cc.find_library('faad', required: get_option('faad'))
+faad_lib = dependency('faad2', required: get_option('faad'))
 vlc_modules += {
     'name' : 'faad',
     'sources' : files('faad.c'),

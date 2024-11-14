@@ -742,5 +742,4 @@ option('aribcaption',
 # TODO: Missing osx_notifications
 # TODO: Missing dsm
 # TODO: Missing asdcplib
-# TODO: Missing faad2
 # TODO: Missing chromecast
