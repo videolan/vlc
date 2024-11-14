@@ -25,6 +25,12 @@ import VLC.Widgets as Widgets
 T.Control {
     id: root
 
+    // Properties
+    readonly property int extraMargin: VLCStyle.dynamicAppMargins(width)
+
+    readonly property int contentLeftMargin: extraMargin + VLCStyle.layout_left_margin
+    readonly property int contentRightMargin: extraMargin + VLCStyle.layout_right_margin
+
     // Aliases
 
     default property alias contents: column.data
@@ -56,8 +62,9 @@ T.Control {
         id: column
 
         anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
 
-        width: root.width
+        width: root.width - root.contentLeftMargin - root.contentRightMargin
 
         spacing: root.spacing
 
