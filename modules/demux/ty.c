@@ -116,6 +116,7 @@ static const uint8_t ty_AC3AudioPacket[] = { 0x00, 0x00, 0x01, 0xbd };
 #define CHUNK_SIZE        ( 128 * 1024 )
 #define REC_SIZE 16
 #define CHUNK_HEADER_SIZE 4
+#define MAX_NUM_RECS ((CHUNK_SIZE - CHUNK_HEADER_SIZE) / REC_SIZE)
 
 typedef struct
 {
@@ -1770,7 +1771,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     /* number of records in chunk (we ignore high order byte;
      * rarely are there > 256 chunks & we don't need that many anyway) */
     i_num_recs = p_chunk[0];
-    if (i_num_recs < 5) {
+    if (i_num_recs < 5 || i_num_recs >= MAX_NUM_RECS) {
         /* try again with the next chunk.  Sometimes there are dead ones */
         return;
     }
@@ -1920,6 +1921,10 @@ static int get_chunk_header(demux_t *p_demux)
         p_sys->i_num_recs = i_num_recs = p_peek[0];
         p_sys->i_seq_rec = p_peek[1];
     }
+
+    if (i_num_recs >= MAX_NUM_RECS)
+        return 0;
+
     p_sys->i_cur_rec = 0;
     p_sys->b_first_chunk = false;
 
