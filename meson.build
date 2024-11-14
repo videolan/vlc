@@ -151,6 +151,14 @@ dl_lib = cc.find_library('dl', required: false)
 
 # iconv library
 iconv_dep = dependency('iconv', required: false)
+if not iconv_dep.found()
+    # check in contribs
+    if cc.has_function('iconv_open', prefix: vlc_conf_prefix + '#include <iconv.h>',
+                       dependencies: [contrib_dep, cc.find_library('iconv', dirs: contrib_libdir)])
+        iconv_dep = declare_dependency(
+            dependencies: [contrib_dep, cc.find_library('iconv', dirs: contrib_libdir)])
+    endif
+endif
 iconv_const_test = '''
     #include <stddef.h>
     #include <iconv.h>
@@ -163,7 +171,7 @@ if iconv_dep.found()
     cdata.set('HAVE_ICONV', 1)
 
     # Check if iconv() prototype uses const
-    if cc.compiles(iconv_const_test, name: 'Test iconv() for const-using prototype')
+    if cc.compiles(iconv_const_test, name: 'Test iconv() for const-using prototype', dependencies: iconv_dep)
         cdata.set('ICONV_CONST', 'const')
     else
         cdata.set('ICONV_CONST', '')
