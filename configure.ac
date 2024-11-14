@@ -942,9 +942,7 @@ dnl __STDC_NO_THREADS__ can't be trusted on some platforms.
 dnl check for its availability explicitely
 AC_CHECK_HEADERS([threads.h])
 
-AC_CHECK_LIB([anl],[getaddrinfo_a],[
-  AC_DEFINE(HAVE_LIBANL, 1, [Define to 1 if you have the anl library])
-])
+AC_CHECK_LIB([anl],[getaddrinfo_a],[])
 
 dnl Check for dynamic plugins
 LIBDL=""
@@ -1948,8 +1946,6 @@ AS_IF([test "${enable_rust}" = "yes"],[
   AS_IF([test "$CARGO" = "no"],[
     AC_MSG_ERROR([cargo not found. cargo is required to build Rust modules])
   ])
-
-  AC_DEFINE(ENABLE_RUST, 1, [Define to 1 for building rust modules.])
 ])
 AM_CONDITIONAL([HAVE_RUST], [test "${enable_rust}" = "yes"])
 
@@ -2036,10 +2032,6 @@ dnl
 AC_ARG_ENABLE([addonmanagermodules],
   AS_HELP_STRING([--disable-addonmanagermodules],
     [disable the addons manager modules (default enabled)]))
-if test "${enable_addonmanagermodules}" != "no"
-then
-  AC_DEFINE(ENABLE_ADDONMANAGERMODULES, 1, [Define if you want the addons manager modules])
-fi
 AM_CONDITIONAL([ENABLE_ADDONMANAGERMODULES], [test "${enable_addonmanagermodules}" != "no"])
 
 
@@ -3318,9 +3310,6 @@ PKG_CHECK_MODULES([GL], [gl], [
   AC_MSG_RESULT([${have_gl}])
 ])
 AM_CONDITIONAL([HAVE_GL], [test "${have_gl}" = "yes"])
-AS_IF([test "${have_gl}" = "yes"], [
-  AC_DEFINE([HAVE_GL], 1, [Defined if having OpenGL])
-])
 
 dnl OpenGL ES 2: depends on EGL 1.1
 PKG_HAVE_WITH_MODULES([GLES2], [glesv2], [enable GLES2 support (default auto)])
@@ -3334,7 +3323,6 @@ AC_ARG_ENABLE(vulkan,
 
 AS_IF([test "$enable_vulkan" != "no"], [
   PKG_CHECK_MODULES([VULKAN], [vulkan >= 1.0.26], [
-    AC_DEFINE([HAVE_VULKAN], [1], [Define to 1 if vulkan is enabled.])
   ], [
     AS_IF([test -n "${enable_vulkan}"], [
       AC_MSG_ERROR([${VULKAN_PKG_ERRORS}.])
