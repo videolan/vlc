@@ -399,6 +399,18 @@ vlc_modules += {
     'enabled' : mpc_dep.found(),
 }
 
+# sid
+sid_dep = dependency('libsidplay2', required: get_option('sid'))
+if cpp.check_header('sidplay/builders/resid.h', dependencies: sid_dep)
+resid_dep = cpp.find_library('resid-builder', dirs: contrib_libdir)
+vlc_modules += {
+    'name' : 'sid',
+    'sources' : files('sid.cpp'),
+    'dependencies' : [sid_dep, resid_dep],
+    'enabled': sid_dep.found() and resid_dep.found()
+}
+endif
+
 
 # Adaptive streams demuxer
 
