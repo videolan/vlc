@@ -29,6 +29,7 @@ vlc_modules += {
     'name' : 'projectm',
     'sources' : files('projectm.cpp'),
     'dependencies' : [projectm_dep],
+    'cpp_args' : [ '-std=gnu++14' ],
     'enabled' : projectm_dep.found() and host_system != 'windows'
 }
 
