@@ -145,6 +145,11 @@ option('qt_qml_debug',
     value: false,
     description: 'Enable/disable Qt QML debugger')
 
+option('skins2',
+    type : 'feature',
+    value : 'auto',
+    description : 'skins interface module support')
+
 option('dbus',
     type : 'feature',
     value : 'auto',
@@ -723,7 +728,6 @@ option('aribcaption',
 # TODO: Missing kai
 # TODO: Missing qt-qml-cache
 # TODO: Missing qt-qml-debug
-# TODO: Missing skins2
 # TODO: Missing libtar
 # TODO: Missing macosx
 # TODO: Missing sparkle

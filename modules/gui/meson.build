@@ -27,3 +27,6 @@ endif
 
 # Qt interface module
 subdir('qt')
+
+# skins2 interface module
+subdir('skins2')
