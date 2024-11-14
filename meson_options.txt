@@ -725,9 +725,13 @@ option('sid',
     value: 'auto',
     description: 'C64 sid demux support')
 
+option('nvdec',
+    type: 'feature',
+    value: 'auto',
+    description: 'NVDEC decoder support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
-# TODO: Missing nvdec
 # TODO: Missing decklink
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
