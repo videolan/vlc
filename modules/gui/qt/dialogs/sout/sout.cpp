@@ -43,6 +43,10 @@ SoutDialog::SoutDialog( QWindow *parent, qt_intf_t *_p_intf, const QString& inpu
     setWindowTitle( qtr( "Stream Output" ) );
     setWindowRole( "vlc-stream-output" );
 
+    // NOTE: Aero style seems to be incompatible with
+    //       Qt Modern Windows Style dark mode
+    setWizardStyle(QWizard::ModernStyle);
+
     QVLCDialog::setWindowTransientParent(this, parent , p_intf);
 
     /* UI stuff */
