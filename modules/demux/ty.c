@@ -115,6 +115,7 @@ static const uint8_t ty_AC3AudioPacket[] = { 0x00, 0x00, 0x01, 0xbd };
 #define TIVO_PART_LENGTH  ( 0x20000000 )    /* 536,870,912 bytes */
 #define CHUNK_SIZE        ( 128 * 1024 )
 #define REC_SIZE 16
+#define CHUNK_HEADER_SIZE 4
 
 typedef struct
 {
@@ -1774,7 +1775,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
         return;
     }
 
-    p_chunk += 4;       /* skip past rec count & SEQ bytes */
+    p_chunk += CHUNK_HEADER_SIZE;       /* skip past rec count & SEQ bytes */
     //msg_Dbg(p_demux, "probe: chunk has %d recs", i_num_recs);
     p_hdrs = parse_chunk_headers(p_chunk, i_num_recs, &i_payload_size);
     /* scan headers.
