@@ -315,6 +315,9 @@
    `PROCESS_MITIGATION_IMAGE_LOAD_POLICY'. */
 #mesondefine HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
 
+/* Define to 1 if using libprojectM 2.x */
+#mesondefine HAVE_PROJECTM2
+
 /* Define to 1 if you have the <pthread.h> header file. */
 #mesondefine HAVE_PTHREAD_H
 
