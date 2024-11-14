@@ -269,9 +269,6 @@ subdir('audio_output')
 # control modules
 subdir('control')
 
-# hardware modules
-subdir('hw')
-
 # gui modules
 subdir('gui')
 
@@ -313,6 +310,9 @@ subdir('video_filter')
 
 # video output modules
 subdir('video_output')
+
+# hardware modules
+subdir('hw')
 
 # video splitter modules
 subdir('video_splitter')
