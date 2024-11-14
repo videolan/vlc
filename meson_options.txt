@@ -680,6 +680,11 @@ option('directx',
     value: 'auto',
     description: 'DirectX support')
 
+option('projectm',
+    type: 'feature',
+    value: 'auto',
+    description: 'projectM visualization plugin')
+
 option('libssh2',
     type: 'feature',
     value: 'auto',
@@ -732,7 +737,6 @@ option('aribcaption',
 # TODO: Missing macosx
 # TODO: Missing sparkle
 # TODO: Missing lirc
-# TODO: Missing projectm
 # TODO: Missing vsxu
 # TODO: Missing kwallet
 # TODO: Missing osx_notifications
