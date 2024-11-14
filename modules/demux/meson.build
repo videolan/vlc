@@ -20,12 +20,19 @@ vlc_modules += {
 
 # OGG demux
 ogg_dep = dependency('ogg', version: '>= 1.0', required: get_option('ogg'))
+ogg_deps = [ogg_dep]
+ogg_c_args = []
+if vorbis_dep.found()
+    ogg_c_args += ['-DHAVE_LIBVORBIS']
+    ogg_deps += vorbis_dep
+endif
 if ogg_dep.found()
     vlc_modules += {
         'name' : 'ogg',
         'sources' : files('ogg.c', 'oggseek.c', 'ogg_granule.c'),
         'link_with' : [xiph_meta_lib],
-        'dependencies' : [ogg_dep]
+        'dependencies' : ogg_deps,
+        'c_args' : ogg_c_args,
     }
 endif
 
