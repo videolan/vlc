@@ -37,8 +37,8 @@ FocusScope {
     //margin to apply
     property int bottomMargin: 0
     property int topMargin: 0
-    property int leftMargin: VLCStyle.margin_normal + leftPadding
-    property int rightMargin: VLCStyle.margin_normal + rightPadding
+    property int leftMargin: VLCStyle.layout_left_margin + leftPadding
+    property int rightMargin: VLCStyle.layout_right_margin + rightPadding
 
     property int leftPadding: 0
     property int rightPadding: 0
