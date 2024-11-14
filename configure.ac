@@ -2803,8 +2803,8 @@ dnl
 dnl A52/AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
-  [  --enable-a52            A/52 support with liba52 (default enabled)])
-if test "${enable_a52}" != "no"
+  [  --enable-a52            A/52 support with liba52 (default disabled)])
+if test "${enable_a52}" = "yes"
 then
   AC_ARG_WITH(a52,
     [  --with-a52=PATH         a52 headers and libraries])
