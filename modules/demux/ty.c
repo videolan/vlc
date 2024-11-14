@@ -1985,6 +1985,7 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
     if (unlikely(p_hdrs == NULL))
         return NULL;
 
+    long total_l_rec_size = 0;
     for (i = 0; i < i_num_recs; i++)
     {
         const uint8_t *record_header = p_buf + (i * REC_SIZE);
@@ -2010,6 +2011,12 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
         {
             p_rec_hdr->l_rec_size = ( record_header[ 0 ] << 8 |
                 record_header[ 1 ] ) << 4 | ( record_header[ 2 ] >> 4 );
+            total_l_rec_size += p_rec_hdr->l_rec_size;
+            if (total_l_rec_size > (CHUNK_SIZE - CHUNK_HEADER_SIZE))
+            {
+                free(p_hdrs);
+                return NULL;
+            }
             *pi_payload_size += p_rec_hdr->l_rec_size;
             p_rec_hdr->b_ext = false;
             p_rec_hdr->l_ty_pts = U64_AT( &record_header[ 8 ] );
