@@ -30,7 +30,7 @@ vlc_modules += {
     'sources' : files('projectm.cpp'),
     'dependencies' : [projectm_dep],
     'cpp_args' : [ '-std=gnu++14' ],
-    'enabled' : projectm_dep.found() and host_system != 'windows'
+    'enabled' : projectm_dep.found()
 }
 
 # Visual visualization plugin
