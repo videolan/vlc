@@ -115,6 +115,7 @@ static const uint8_t ty_AC3AudioPacket[] = { 0x00, 0x00, 0x01, 0xbd };
 #define TIVO_PES_FILEID   ( 0xf5467abd )
 #define TIVO_PART_LENGTH  ( 0x20000000 )    /* 536,870,912 bytes */
 #define CHUNK_SIZE        ( 128 * 1024 )
+#define REC_SIZE 16
 
 typedef struct
 {
@@ -909,7 +910,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
         /* SA PES Header, No Audio Data                     */
         /* ================================================ */
-        if ( ( esOffset1 == 0 ) && ( l_rec_size == 16 ) )
+        if ( ( esOffset1 == 0 ) && ( l_rec_size == REC_SIZE ) )
         {
             p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block_in->p_buffer[
                         SA_PTS_OFFSET ] );
@@ -1080,7 +1081,7 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
     for ( int i=0; i<p_sys->i_cur_rec; i++)
         l_skip_amt += p_sys->rec_hdrs[i].l_rec_size;
     if( vlc_stream_Seek(p_demux->s, ((p_sys->i_cur_chunk-1) * CHUNK_SIZE) +
-                        (p_sys->i_num_recs * 16) + l_skip_amt + 4) != VLC_SUCCESS )
+                        (p_sys->i_num_recs * REC_SIZE) + l_skip_amt + 4) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     /* to hell with syncing any audio or video, just start reading records... :) */
@@ -1697,6 +1698,7 @@ static int parse_master(demux_t *p_demux)
 }
 
 
+
 /* ======================================================================== */
 /* "Peek" at some chunks.  Skip over the Part header if we find it.
  * We parse the peeked data and determine audio type,
@@ -1824,7 +1826,7 @@ static void analyze_chunk(demux_t *p_demux, const uint8_t *p_chunk)
     /* if tivo_type still unknown, we can check PTS location
      * in MPEG packets to determine tivo_type */
     if (p_sys->tivo_type == TIVO_TYPE_UNKNOWN) {
-        uint32_t i_data_offset = (16 * i_num_recs);
+        uint32_t i_data_offset = (REC_SIZE * i_num_recs);
         for (i=0; i<i_num_recs; i++) {
             if ((p_hdrs[i].subrec_type << 0x08 | p_hdrs[i].rec_type) == 0x3c0 &&
                     p_hdrs[i].l_rec_size > 15) {
@@ -1925,8 +1927,8 @@ static int get_chunk_header(demux_t *p_demux)
         return 0;
 
     /* read the record headers into a temp buffer */
-    p_hdr_buf = xmalloc(i_num_recs * 16);
-    if (vlc_stream_Read(p_demux->s, p_hdr_buf, i_num_recs * 16) < i_num_recs * 16) {
+    p_hdr_buf = xmalloc(i_num_recs * REC_SIZE);
+    if (vlc_stream_Read(p_demux->s, p_hdr_buf, i_num_recs * REC_SIZE) < i_num_recs * REC_SIZE) {
         free( p_hdr_buf );
         p_sys->eof = true;
         return 0;
@@ -1937,7 +1939,7 @@ static int get_chunk_header(demux_t *p_demux)
     free(p_hdr_buf);
 
     p_sys->i_stuff_cnt = CHUNK_SIZE - 4 -
-        (p_sys->i_num_recs * 16) - i_payload_size;
+        (p_sys->i_num_recs * REC_SIZE) - i_payload_size;
     if (p_sys->i_stuff_cnt > 0)
         msg_Dbg( p_demux, "chunk has %d stuff bytes at end",
                  p_sys->i_stuff_cnt );
@@ -1956,7 +1958,7 @@ static ty_rec_hdr_t *parse_chunk_headers( const uint8_t *p_buf,
 
     for (i = 0; i < i_num_recs; i++)
     {
-        const uint8_t *record_header = p_buf + (i * 16);
+        const uint8_t *record_header = p_buf + (i * REC_SIZE);
         p_rec_hdr = &p_hdrs[i];     /* for brevity */
         p_rec_hdr->rec_type = record_header[3];
         p_rec_hdr->subrec_type = record_header[2] & 0x0f;
