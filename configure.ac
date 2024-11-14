@@ -2836,7 +2836,7 @@ fi
 dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DCA], [dca], [libdca >= 0.0.5], [DTS Coherent Acoustics support with libdca], [auto])
+PKG_ENABLE_MODULES_VLC([DCA], [dca], [libdca >= 0.0.5], [DTS Coherent Acoustics support with libdca], [disabled])
 
 dnl
 dnl  Flac plugin

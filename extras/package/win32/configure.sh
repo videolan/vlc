@@ -7,7 +7,6 @@ OPTIONS="
       --enable-flac
       --enable-theora
       --enable-avcodec --enable-merge-ffmpeg
-      --enable-dca
       --enable-mpc
       --enable-libass
       --enable-schroedinger

@@ -30,6 +30,8 @@
  * be subject to the terms of that later license.
  *****************************************************************************/
 
+#warning This module is not officially supported anymore
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
