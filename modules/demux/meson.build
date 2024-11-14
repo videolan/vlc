@@ -368,6 +368,16 @@ if libdvbpsi_dep.found()
     }
 endif
 
+# GME
+gme_dep = dependency('libgme', required: get_option('gme'))
+vlc_modules += {
+    'name' : 'gme',
+    'sources' : files('gme.c'),
+    'dependencies' : [gme_dep],
+    'enabled': gme_dep.found(),
+}
+
+
 # Adaptive streams demuxer
 
 vlc_modules += {

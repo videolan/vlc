@@ -710,12 +710,15 @@ option('aribcaption',
     value: 'auto',
     description: 'ARIB caption decoder/renderer support')
 
+option('gme',
+    type: 'feature',
+    value: 'auto',
+    description: 'Game Music Emu support')
 
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
 # TODO: Missing decklink
-# TODO: Missing gme
 # TODO: Missing sid
 # TODO: Missing mpc
 # TODO: Missing rpi-omxil
