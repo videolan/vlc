@@ -377,6 +377,28 @@ vlc_modules += {
     'enabled': gme_dep.found(),
 }
 
+# mpc
+if get_option('mpc').allowed()
+mpc_dep = disabler()
+if cc.check_header('mpc/mpcdec.h')
+    mpc_dep = cc.find_library('mpcdec')
+    cdata.set('HAVE_MPC_MPCDEC_H', 1)
+elif cc.check_header('mpc/mpcdec.h', include_directories: include_directories( contrib_incdir ) )
+    if cc.find_library('mpcdec', dirs: contrib_libdir).found()
+        mpc_dep = declare_dependency(
+            dependencies: [cc.find_library('mpcdec', dirs: contrib_libdir)],
+            include_directories: [include_directories( contrib_incdir )])
+        cdata.set('HAVE_MPC_MPCDEC_H', 1)
+    endif
+endif
+endif
+vlc_modules += {
+    'name' : 'mpc',
+    'sources' : files('mpc.c'),
+    'dependencies' : [mpc_dep, m_lib],
+    'enabled' : mpc_dep.found(),
+}
+
 
 # Adaptive streams demuxer
 

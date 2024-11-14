@@ -715,12 +715,16 @@ option('gme',
     value: 'auto',
     description: 'Game Music Emu support')
 
+option('mpc',
+    type: 'feature',
+    value: 'auto',
+    description: 'libmpcdec support')
+
 # TODO: Missing live555
 # TODO: Missing v4l2
 # TODO: Missing nvdec
 # TODO: Missing decklink
 # TODO: Missing sid
-# TODO: Missing mpc
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
 # TODO: Missing merge-ffmpeg

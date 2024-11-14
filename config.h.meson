@@ -274,6 +274,8 @@
 /* Define to 1 if you have the `mmap' function. */
 #mesondefine HAVE_MMAP
 
+/* Define to 1 if you have the <mpc/mpcdec.h> header file. */
+#mesondefine HAVE_MPC_MPCDEC_H
 
 /* Define to 1 if you have the NANF function */
 #mesondefine HAVE_NANF
