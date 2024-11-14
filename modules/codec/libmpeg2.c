@@ -33,6 +33,9 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
+#warning This module is not officially supported anymore
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif

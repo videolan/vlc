@@ -29,7 +29,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-avcodec --disable-avformat \
 	--disable-postproc --disable-swscale \
 	--disable-dbus \
-	--disable-mad --disable-libmpeg2 \
+	--disable-mad \
 	--disable-faad --disable-skins2 \
 	--disable-live555 \
 	--disable-lua \

@@ -2846,7 +2846,7 @@ PKG_ENABLE_MODULES_VLC([FLAC], [], [flac], [libflac decoder/encoder support], [a
 dnl
 dnl  Libmpeg2 plugin
 dnl
-PKG_ENABLE_MODULES_VLC([LIBMPEG2], [], [libmpeg2 > 0.3.2], [libmpeg2 decoder support], [auto])
+PKG_ENABLE_MODULES_VLC([LIBMPEG2], [], [libmpeg2 > 0.3.2], [libmpeg2 decoder support], [disabled])
 
 dnl
 dnl  Vorbis plugin
