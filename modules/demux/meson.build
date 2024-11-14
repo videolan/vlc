@@ -352,6 +352,16 @@ vlc_modules += {
 # TS demux
 aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribb24'))
 libdvbpsi_dep = dependency('libdvbpsi', version: '>= 1.2.0', required: get_option('libdvbpsi'))
+
+libdvbpsi_c_args = []
+libdvbcsa_dep = dependency('dvbcsa', required: get_option('dvbcsa'))
+if libdvbcsa_dep.found()
+    if cc.has_function('dvbcsa_decrypt', dependencies: [libdvbcsa_dep]) and \
+       cc.check_header('dvbcsa/dvbcsa.h', dependencies: [libdvbcsa_dep])
+        libdvbpsi_c_args += ['-DHAVE_DVBCSA']
+    endif
+endif
+
 if libdvbpsi_dep.found()
     vlc_modules += {
         'name' : 'ts',
@@ -378,7 +388,8 @@ if libdvbpsi_dep.found()
             '../codec/atsc_a65.c',
             '../codec/opus_header.c',
         ),
-        'dependencies' : [libdvbpsi_dep, aribb24_dep],
+        'dependencies' : [libdvbpsi_dep, aribb24_dep, libdvbcsa_dep],
+        'c_args' : libdvbpsi_c_args,
     }
 endif
 

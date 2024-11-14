@@ -439,6 +439,11 @@ option('libdvbpsi',
     value : 'auto',
     description : 'Enable/disable libdvbpsi support')
 
+option('dvbcsa',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable libdvbcsa support')
+
 option('aribb24',
     type : 'feature',
     value : 'auto',

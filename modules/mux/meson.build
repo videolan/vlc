@@ -55,7 +55,7 @@ vlc_modules += {
         'mpeg/tsutil.c',
         'mpeg/ts.c',
     ),
-    'dependencies': [ libdvbpsi_dep ],
+    'dependencies': [ libdvbpsi_dep, libdvbcsa_dep ],
     'enabled': libdvbpsi_dep.found(),
 }
 
