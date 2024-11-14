@@ -34,6 +34,8 @@ sidplay-libs: sidplay-libs-$(SID_VERSION).tar.gz .sum-sidplay2
 	$(APPLY) $(SRC)/sidplay2/sidplay2-char-cast.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-fix-overflow.patch
 	$(APPLY) $(SRC)/sidplay2/sidplay2-cxxtest.patch
+	# don't depend on libtool to use libsidplay2
+	sed -i.orig 's,$${libdir}/libsidplay2.la,-L$${libdir} -lsidplay2,' "$(UNPACK_DIR)/libsidplay/unix/libsidplay2.pc.in"
 	$(MOVE)
 
 .sidplay2: sidplay-libs
