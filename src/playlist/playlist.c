@@ -85,13 +85,11 @@ vlc_playlist_Delete(vlc_playlist_t *playlist)
     assert(vlc_list_is_empty(&playlist->listeners));
 
     if (playlist->parser != NULL)
-        vlc_preparser_Deactivate(playlist->parser);
+        vlc_preparser_Delete(playlist->parser);
 
     vlc_playlist_PlayerDestroy(playlist);
     randomizer_Destroy(&playlist->randomizer);
     vlc_playlist_ClearItems(playlist);
-    if (playlist->parser != NULL)
-        vlc_preparser_Delete(playlist->parser);
     free(playlist);
 }
 
