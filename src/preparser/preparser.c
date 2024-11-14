@@ -44,7 +44,6 @@ struct vlc_preparser_t
     vlc_executor_t *parser;
     vlc_executor_t *thumbnailer;
     vlc_tick_t timeout;
-    atomic_bool deactivated;
 
     vlc_mutex_t lock;
     vlc_preparser_req_id current_id;
@@ -461,8 +460,6 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
     else
         preparser->thumbnailer = NULL;
 
-    atomic_init( &preparser->deactivated, false );
-
     vlc_mutex_init(&preparser->lock);
     vlc_list_init(&preparser->submitted_tasks);
     preparser->current_id = 1;
@@ -485,9 +482,6 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
                                          const input_item_parser_cbs_t *cbs,
                                          void *cbs_userdata )
 {
-    if( atomic_load( &preparser->deactivated ) )
-        return VLC_PREPARSER_REQ_ID_INVALID;
-
     assert((type_options & VLC_PREPARSER_TYPE_THUMBNAIL) == 0);
 
     assert(type_options & VLC_PREPARSER_TYPE_PARSE
@@ -534,9 +528,6 @@ vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
                                  const struct vlc_thumbnailer_cbs *cbs,
                                  void *cbs_userdata )
 {
-    if( atomic_load( &preparser->deactivated ) )
-        return VLC_PREPARSER_REQ_ID_INVALID;
-
     assert(preparser->thumbnailer != NULL);
     assert(cbs != NULL && cbs->on_ended != NULL);
 
@@ -600,12 +591,6 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
     vlc_mutex_unlock(&preparser->lock);
 
     return count;
-}
-
-void vlc_preparser_Deactivate( vlc_preparser_t* preparser )
-{
-    atomic_store( &preparser->deactivated, true );
-    vlc_preparser_Cancel(preparser, 0);
 }
 
 void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,

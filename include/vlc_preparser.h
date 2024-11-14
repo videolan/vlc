@@ -226,16 +226,6 @@ VLC_API size_t vlc_preparser_Cancel( vlc_preparser_t *preparser,
 VLC_API void vlc_preparser_Delete( vlc_preparser_t *preparser );
 
 /**
- * This function deactivates the preparser
- *
- * All pending requests will be removed, and it will block until the currently
- * running entity has finished (if any).
- *
- * @param preparser the preparser object
- */
-VLC_API void vlc_preparser_Deactivate( vlc_preparser_t *preparser );
-
-/**
  * Do not use, libVLC only fonction, will be removed soon
  */
 VLC_API void vlc_preparser_SetTimeout( vlc_preparser_t *preparser,
