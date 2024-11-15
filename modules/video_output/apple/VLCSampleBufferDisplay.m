@@ -1132,7 +1132,10 @@ static int Open (vout_display_t *vd,
         vd->sys = (__bridge_retained void*)sys;
 
         static const struct vlc_display_operations ops = {
-            Close, Prepare, Display, Control, NULL, NULL, NULL,
+            .close = Close,
+            .prepare = Prepare,
+            .display = Display,
+            .control = Control,
         };
         
         vd->ops = &ops;
