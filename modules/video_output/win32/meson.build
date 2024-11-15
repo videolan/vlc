@@ -10,7 +10,7 @@ d3d11_link_with = [ d3d11_common_lib, chroma_copy_lib ]
 d3d11_cargs = []
 d3d11_cxxargs = [ libcom_cppflags ]
 d3d11_deps = [ cc.find_library('dxgi'), cc.find_library('d3d11') ]
-if get_option('winstore_app')
+if have_win_store
     d3d11_deps += [
         cc.find_library('d3dcompiler_47')
     ]
