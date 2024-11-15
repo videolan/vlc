@@ -664,7 +664,7 @@ if host_system == 'windows'
 
     if (get_option('dxva2').
         enable_auto_if(cc.check_header('libavcodec/dxva2.h', args: [contrib_inc_args]))
-        .allowed())
+        .allowed() and have_win_desktop)
         cdata.set('HAVE_LIBAVCODEC_DXVA2_H', 1)
         vlc_modules += {
             'name' : 'dxva2',

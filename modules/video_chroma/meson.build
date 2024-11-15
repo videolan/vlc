@@ -127,6 +127,7 @@ if host_system == 'windows'
             cc.find_library('d3d11'),
         ]
     )
+    if have_win_desktop
     d3d9_common_lib = static_library('d3d9_common',
         files(
             'd3d9_fmt.c',
@@ -134,8 +135,9 @@ if host_system == 'windows'
             ),
         include_directories: [vlc_include_dirs],
         pic: true,
-        install: false
+        install: false,
     )
+    endif
 endif
 
 # CVPX chroma converter
