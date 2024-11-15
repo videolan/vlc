@@ -102,6 +102,25 @@ if host_system == 'darwin'
     add_languages('objc', native: false)
 endif
 
+if host_machine.cpu_family().startswith('x86')
+    if add_languages('nasm', native: false, required: false)
+        vlc_nasm_args = []
+        if host_machine.cpu_family() == 'x86'
+            vlc_nasm_args += ['-DARCH_X86_64=0']
+            if host_system in ['darwin', 'windows']
+                vlc_nasm_args += ['-DPREFIX']
+            endif
+        else
+            vlc_nasm_args += ['-DARCH_X86_64=1']
+            if host_system == 'darwin'
+                vlc_nasm_args += ['-DPREFIX']
+            endif
+        endif
+        add_project_arguments(vlc_nasm_args, language: ['nasm'])
+        cdata.set('HAVE_X86ASM', 1)
+    endif
+endif
+
 # Rust build system
 cargo_bin = find_program('cargo', required: get_option('rust'))
 

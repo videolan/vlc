@@ -377,6 +377,7 @@ foreach module : vlc_modules
         'c_args',
         'cpp_args',
         'objc_args',
+        'nasm_args',
         'extra_files',
         'enabled',
     ]
@@ -413,6 +414,7 @@ foreach module : vlc_modules
         c_args: [module.get('c_args', []), common_args],
         cpp_args: [module.get('cpp_args', []), common_args],
         objc_args: [module.get('objc_args', []), common_args],
+        nasm_args: [module.get('nasm_args', []), []],
         extra_files: module.get('extra_files', []),
         build_by_default: true,
         install: true,

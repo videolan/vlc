@@ -120,6 +120,9 @@ Currently the modules dict accepts the following keys:
 @param 	objc_args
 		Additional flags to pass to the Objective-C compiler.
 
+@param 	nasm_args
+		Additional flags to pass to the NASM compiler.
+
 @param  link_args
 		Additional flags to pass to the dynamic linker. Do _not_ use this to specify
 		additional libraries to link with, use the `dependencies` instead.

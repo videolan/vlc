@@ -473,6 +473,9 @@
 /* Define to 1 if you have the `writev' function. */
 #mesondefine HAVE_WRITEV
 
+/* Use external asm on x86. */
+#mesondefine HAVE_X86ASM
+
 /* Define to 1 if you have the <xlocale.h> header file. */
 #mesondefine HAVE_XLOCALE_H
 
