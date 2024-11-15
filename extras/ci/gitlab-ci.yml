@@ -16,6 +16,7 @@ variables:
     VLC_WIN32_IMAGE: registry.videolan.org/vlc-debian-win32-3.0:20211008142723
     VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-3.0:20211008140026
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20200706065223
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20241111035123
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20230621085943
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20190627090437
@@ -36,6 +37,11 @@ variables:
 .variables-win64: &variables-win64
         SHORTARCH: win64
         HOST_ARCH: x86_64
+        TRIPLET: $HOST_ARCH-w64-mingw32
+
+.variables-win64-arm: &variables-win64-arm
+        SHORTARCH: arm64
+        HOST_ARCH: aarch64
         TRIPLET: $HOST_ARCH-w64-mingw32
 
 .variables-macos-x86_64: &variables-macos-x86_64
@@ -117,6 +123,17 @@ win64:
     image:
         name: $VLC_WIN64_IMAGE
     variables: *variables-win64
+
+win64-arm-llvm:
+    extends: .win-common
+    image:
+        name: $VLC_WIN_LLVM_UCRT_IMAGE
+    variables:
+        <<: *variables-win64-arm
+        UWP_EXTRA_BUILD_FLAGS: -u -x -S 0x0A000006
+        # Clang <= 15 produces incorrect unwind info for code with
+        # branch protection enabled on Windows.
+        CONFIGFLAGS: --disable-branch-protection
 
 uwp64-libvlc-llvm:
     extends: .win-common
