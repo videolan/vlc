@@ -290,9 +290,7 @@ vlc_modules += {
 }
 
 # deinterlace filter
-vlc_modules += {
-    'name' : 'deinterlace',
-    'sources' : files(
+deinterlace_sources = files(
         'deinterlace/deinterlace.c',
         'deinterlace/merge.c',
         'deinterlace/helpers.c',
@@ -301,9 +299,18 @@ vlc_modules += {
         'deinterlace/algo_yadif.c',
         'deinterlace/algo_phosphor.c',
         'deinterlace/algo_ivtc.c',
-    ),
-    # Inline ASM doesn't build with -O0
-    # bring back if needed when inline ASM is supported 'c_args' : ['-O2'],
+    )
+deinterlace_cargs=[]
+if cdata.has('HAVE_X86ASM')
+    deinterlace_sources+=files('deinterlace/yadif_x86.asm')
+    # inline ASM doesn't build with -O0
+    deinterlace_cargs+=['-O2']
+endif
+vlc_modules += {
+    'name' : 'deinterlace',
+    'sources' : deinterlace_sources,
+    'c_args' : deinterlace_cargs,
+    'include_directories' : include_directories('../../extras/include/x86'),
     'link_with' : [deinterlacecommon_lib]
 }
 
