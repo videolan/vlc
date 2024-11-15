@@ -61,6 +61,8 @@ extern NSString * const VLCLibraryModelGenreUpdated;
 extern NSString * const VLCLibraryModelGroupUpdated;
 extern NSString * const VLCLibraryModelPlaylistUpdated;
 
+extern NSString * const VLCLibraryModelDiscoveryStarted;
+
 @interface VLCLibraryModel : NSObject
 
 + (NSUInteger)modelIndexFromModelItemNotification:(NSNotification * const)aNotification;

@@ -62,6 +62,8 @@ NSString * const VLCLibraryModelGenreUpdated = @"VLCLibraryModelGenreUpdated";
 NSString * const VLCLibraryModelGroupUpdated = @"VLCLibraryModelGroupUpdated";
 NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdated";
 
+NSString * const VLCLibraryModelDiscoveryStarted = @"VLCLibraryModelDiscoveryStarted";
+
 @interface VLCLibraryModel ()
 {
     vlc_medialibrary_t *_p_mediaLibrary;
@@ -208,6 +210,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_HISTORY_CHANGED:
             [libraryModel resetCachedListOfRecentMedia];
             [libraryModel resetCachedListOfRecentAudioMedia];
+            break;
+        case VLC_ML_EVENT_DISCOVERY_STARTED:
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelDiscoveryStarted
+                                                              object:nil];
             break;
         default:
             break;
