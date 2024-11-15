@@ -223,10 +223,13 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
         case VLC_ML_EVENT_DISCOVERY_PROGRESS:
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString * const entryPoint = toNSStr(p_event->discovery_progress.psz_entry_point);
+                NSDictionary<NSString *, NSString *> * const info = entryPoint == nil
+                    ? nil
+                    : @{@"entryPoint": entryPoint};
                 NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
                 [defaultCenter postNotificationName:VLCLibraryModelDiscoveryProgress
                                              object:nil
-                                           userInfo:@{@"entryPoint": entryPoint}];
+                                           userInfo:info];
             });
             break;
         case VLC_ML_EVENT_DISCOVERY_COMPLETED:
