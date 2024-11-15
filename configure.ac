@@ -118,11 +118,11 @@ X86ASMFLAGS=""
 case "${host_cpu}" in
     i?86)
     X86ASMFLAGS="-f elf32"
-    X86ASMDEFS="-DARCH_X86_32=1 -DARCH_X86_64=0"
+    X86ASMDEFS="-DARCH_X86_64=0"
         ;;
     x86_64)
     X86ASMFLAGS="-f elf64"
-    X86ASMDEFS="-DARCH_X86_32=0 -DARCH_X86_64=1"
+    X86ASMDEFS="-DARCH_X86_64=1"
         ;;
 esac
 
@@ -411,7 +411,7 @@ int foo() { return my_array[0]; }
     AC_LIBOBJ([gai_strerror])
     AC_CHECK_FUNCS([if_nametoindex])
     X86ASMFLAGS="-f aout"
-    X86ASMDEFS="-DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX"
+    X86ASMDEFS="-DARCH_X86_64=0 -DPREFIX"
     ;;
   *emscripten*)
     SYS=emscripten
