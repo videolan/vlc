@@ -213,7 +213,7 @@ SECTION .text
 %endmacro
 
 %macro YADIF 0
-%if ARCH_X86_32
+%if ARCH_X86_64 == 0
 cglobal yadif_filter_line, 4, 6, 8, 112, dst, prev, cur, next, w, prefs, \
                                         mrefs, parity, mode
 %else
@@ -222,7 +222,7 @@ cglobal yadif_filter_line, 4, 7, 8,  80, dst, prev, cur, next, w, prefs, \
 %endif
     cmp      DWORD wm, 0
     jle .ret
-%if ARCH_X86_32
+%if ARCH_X86_64 == 0
     LEA            r4, pb_1
   %define pb_1 rsp + 80
   %define pw_1 rsp + 96
@@ -249,7 +249,7 @@ cglobal yadif_filter_line, 4, 7, 8,  80, dst, prev, cur, next, w, prefs, \
 
 .ret:
     RET
-%if ARCH_X86_32
+%if ARCH_X86_64 == 0
   %undef pb_1
   %undef pw_1
 %endif
