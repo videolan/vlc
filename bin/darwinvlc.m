@@ -322,7 +322,8 @@ out:
     dispatch_release(sigTermSource);
     dispatch_release(sigChldSource);
 
-    libvlc_release(vlc);
+    if (vlc)
+        libvlc_release(vlc);
 
 #ifdef HAVE_BREAKPAD
     if (breakpad)
