@@ -346,7 +346,7 @@ struct timezone;
 int gettimeofday(struct timeval *, struct timezone *);
 #endif
 
-#if defined(WIN32) && !defined(WINSTORECOMPAT)
+#if defined(WIN32) && !defined(WINSTORECOMPAT) && defined(HAVE_GETPID)
 #include <winapifamily.h>
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 // getpid is incorrectly detected in UWP so we won't use the compat version
