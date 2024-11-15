@@ -63,6 +63,7 @@ extern NSString * const VLCLibraryModelPlaylistUpdated;
 
 extern NSString * const VLCLibraryModelDiscoveryStarted;
 extern NSString * const VLCLibraryModelDiscoveryProgress;
+extern NSString * const VLCLibraryModelDiscoveryCompleted;
 
 @interface VLCLibraryModel : NSObject
 

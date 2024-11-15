@@ -64,6 +64,7 @@ NSString * const VLCLibraryModelPlaylistUpdated = @"VLCLibraryModelPlaylistUpdat
 
 NSString * const VLCLibraryModelDiscoveryStarted = @"VLCLibraryModelDiscoveryStarted";
 NSString * const VLCLibraryModelDiscoveryProgress = @"VLCLibraryModelDiscoveryProgress";
+NSString * const VLCLibraryModelDiscoveryCompleted = @"VLCLibraryModelDiscoveryCompleted";
 
 @interface VLCLibraryModel ()
 {
@@ -224,6 +225,10 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                                             userInfo:@{@"entryPoint": entryPointName}];
             break;
         }
+        case VLC_ML_EVENT_DISCOVERY_COMPLETED:
+            [NSNotificationCenter.defaultCenter postNotificationName:VLCLibraryModelDiscoveryCompleted
+                                                              object:nil];
+            break;
         default:
             break;
     }
