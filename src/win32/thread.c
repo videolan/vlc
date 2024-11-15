@@ -52,8 +52,7 @@
 #define NTDDI_WIN10_RS1  0x0A000002
 #endif
 
-#if NTDDI_VERSION >= NTDDI_WIN10_RS1 && defined(__MINGW64_VERSION_MAJOR)
-// SetThreadDescription is not defined yet in mingw64
+#if NTDDI_VERSION >= NTDDI_WIN10_RS1 && defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 10
 WINBASEAPI HRESULT WINAPI SetThreadDescription(HANDLE,PCWSTR);
 #endif
 
