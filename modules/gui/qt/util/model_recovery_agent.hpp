@@ -97,8 +97,8 @@ public:
 
             assert(!m_recoveryFileName.isEmpty());
 
-            const char* tmpFileName = (m_recoveryFileName + QStringLiteral(".part")).toLatin1();
-            const char* recoveryFileName = m_recoveryFileName.toLatin1();
+            const QByteArray tmpFileName = (m_recoveryFileName + QStringLiteral(".part")).toLatin1();
+            const QByteArray recoveryFileName = m_recoveryFileName.toLatin1();
 
             if (model->isEmpty())
             {
