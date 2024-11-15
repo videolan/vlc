@@ -42,6 +42,8 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/0018-Remove-qtypetraits.h-s-contents-altogether.patch
 	$(APPLY) $(SRC)/qt/0019-QFileSystemEngine-only-define-FILE_ID_INFO-for-build.patch
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
+	# fix forcing the WINVER/_WIN32_WINNT version without NTDDI_VERSION
+	sed -i.orig -e "s/DEFINES += WINVER/DEFINES += NTDDI_VERSION=0x06000000 WINVER/" "$(UNPACK_DIR)/src/network/kernel/kernel.pri"
 	$(MOVE)
 
 ifdef HAVE_MACOSX
