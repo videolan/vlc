@@ -125,6 +125,13 @@ void DialogErrorModel::pushError(const DialogError & error)
         repeatedNotificationCount = 1;
     }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    assert(qGuiApp);
+    const int badgeNumber = qGuiApp->property("badgeNumber").toInt() + 1;
+    qGuiApp->setBadgeNumber(badgeNumber);
+    qGuiApp->setProperty("badgeNumber", badgeNumber);
+#endif
+
     emit countChanged();
 }
 
@@ -150,6 +157,12 @@ int DialogErrorModel::repeatedMessageCount() const
 void DialogErrorModel::resetRepeatedMessageCount()
 {
    repeatedNotificationCount = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    // Errors are dismissed, or error dialog is opened.
+    assert(qGuiApp);
+    qGuiApp->setBadgeNumber(0);
+    qGuiApp->setProperty("badgeNumber", 0);
+#endif
 }
 
 //=================================================================================================
