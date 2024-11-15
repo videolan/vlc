@@ -22,13 +22,31 @@
 
 #import "VLCStatusNotifierView.h"
 
+#import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryModel.h"
+
 @implementation VLCStatusNotifierView
 
-- (void)drawRect:(NSRect)dirtyRect
+- (void)awakeFromNib
 {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
+    NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
+    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryStarted object:nil];
+    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryProgress object:nil];
+    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryCompleted object:nil];
+    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryFailed object:nil];
+}
+
+- (void)updateStatus:(NSNotification *)notification
+{
+    if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
+        self.label.stringValue = _NS("Discovering media…");
+    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
+        self.label.stringValue = _NS("Discovering media…");
+    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
+        self.label.stringValue = _NS("Media discovery completed");
+    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
+        self.label.stringValue = _NS("Media discovery failed");
+    }
 }
 
 @end
