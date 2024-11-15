@@ -525,7 +525,10 @@ add_project_arguments(cc.first_supported_argument(['-Werror-implicit-function-de
 # Check if other libs are needed
 #
 rt_lib = []
-possible_rt_libs = ['rt', 'pthread']
+possible_rt_libs = ['rt']
+if host_system != 'windows'
+    possible_rt_libs += ['pthread']
+endif
 foreach l : possible_rt_libs
     possible_rt_lib_lib = cc.find_library(l, required: false)
     if possible_rt_lib_lib.found() and \
