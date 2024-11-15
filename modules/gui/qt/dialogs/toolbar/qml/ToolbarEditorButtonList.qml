@@ -44,8 +44,8 @@ GridView {
 
     property alias removeInfoRectVisible: removeInfoRect.visible
 
-    signal dragStarted(int id)
-    signal dragStopped(int id)
+    signal controlDragStarted(int id)
+    signal controlDragStopped(int id)
 
 
     readonly property ColorContext colorContext: ColorContext {
@@ -142,7 +142,7 @@ GridView {
 
         drag.onActiveChanged: {
             if (drag.active) {
-                dragStarted(mIndex)
+                root.controlDragStarted(mIndex)
 
                 buttonDragItem.text = PlayerControlbarControls.controlList[model.index].label
                 buttonDragItem.Drag.source = this
@@ -152,7 +152,7 @@ GridView {
             } else {
                 buttonDragItem.Drag.drop()
 
-                dragStopped(mIndex)
+                root.controlDragStopped(mIndex)
 
                 GridView.delayRemove = false
             }

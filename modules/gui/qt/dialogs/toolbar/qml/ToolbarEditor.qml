@@ -278,8 +278,8 @@ Item {
                     Layout.margins: VLCStyle.margin_xxsmall
 
                     Component.onCompleted: {
-                        dragStarted.connect(root.dragStarted)
-                        dragStopped.connect(root.dragStopped)
+                        controlDragStarted.connect(root.dragStarted)
+                        controlDragStopped.connect(root.dragStopped)
                     }
                 }
             }
