@@ -16,7 +16,7 @@ if xcb_dep.found() and xcb_randr_dep.found()
         'sources' : files('panoramix.c'),
         'dependencies' : [xcb_dep, xcb_randr_dep]
     }
-elif host_system == 'windows'
+elif host_system == 'windows' and have_win_desktop
     vlc_modules += {
         'name' : 'panoramix',
         'sources' : files('panoramix.c')

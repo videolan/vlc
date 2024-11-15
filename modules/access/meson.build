@@ -106,6 +106,7 @@ vlc_modules += {
     'dependencies' : [ksuser_lib],
     'enabled' : get_option('wasapi')
       .require(host_system == 'windows', error_message: 'WASAPI requires Windows')
+      .disable_auto_if(have_win_store)
       .allowed() and ksuser_lib.found()
 }
 
@@ -327,7 +328,7 @@ if host_system == 'linux'
     endif
 endif
 
-if host_system == 'windows'
+if host_system == 'windows' and have_win_desktop
     strmiids_lib = cc.find_library('strmiids', required: true)
     vlc_modules += {
         'name' : 'dtv',
@@ -410,7 +411,7 @@ vlc_modules += {
 }
 
 # Windows UNC
-if host_system == 'windows'
+if host_system == 'windows' and not have_win_store
     mpr_lib = cc.find_library('mpr', required: true)
     netapi32_lib = cc.find_library('netapi32', required: true)
 

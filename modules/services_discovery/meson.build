@@ -84,7 +84,7 @@ if xcb_dep.found()
 endif
 
 # Windows drive discovery
-if host_system == 'windows'
+if host_system == 'windows' and have_win_desktop
     vlc_modules += {
         'name' : 'windrive',
         'sources' : files('windrive.c')

@@ -79,7 +79,7 @@ if dbus_dep.found()
     }
 endif
 
-if host_system == 'windows'
+if host_system == 'windows' and have_win_desktop
 
     # NT service control
     vlc_modules += {

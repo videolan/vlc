@@ -693,7 +693,8 @@ if host_system == 'windows'
             ),
         'dependencies': [
             cc.find_library('uuid'),
-        ]
+        ],
+        'enabled' : have_win_desktop,
     }
 endif
 
