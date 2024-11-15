@@ -142,7 +142,7 @@ public:
 
     Q_INVOKABLE void explore(const PlaylistItem& pItem);
 
-    void serialize(const QString& fileName);
+    int serialize(const QString& fileName);
 
 public:
     PlaylistController(vlc_playlist_t *playlist, QObject *parent = nullptr);
