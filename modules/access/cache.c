@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 
-#include "access/cache.h"
+#include "cache.h"
 
 #include <assert.h>
 
