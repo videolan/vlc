@@ -100,7 +100,14 @@ public:
             const char* tmpFileName = (m_recoveryFileName + QStringLiteral(".part")).toLatin1();
             const char* recoveryFileName = m_recoveryFileName.toLatin1();
 
-            model->serialize(tmpFileName);
+            if (model->isEmpty())
+            {
+                remove(recoveryFileName);
+                return;
+            }
+
+            if (model->serialize(tmpFileName) != VLC_SUCCESS)
+                return;
 
             remove(recoveryFileName);
             if (!rename(tmpFileName, recoveryFileName))
