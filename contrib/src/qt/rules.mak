@@ -50,7 +50,8 @@ endif
 ifdef HAVE_WIN32
 # filter out the contrib includes as Qt doesn't ike pthread-GC2 headers
 QT_VARS := CFLAGS="$(shell echo $$CFLAGS | sed 's@ -I$$(PREFIX)/include@@g')" \
-         CXXFLAGS="$(shell echo $$CXXFLAGS | sed 's@ -I$$(PREFIX)/include@@g')"
+         CXXFLAGS="$(shell echo $$CXXFLAGS | sed 's@ -I$$(PREFIX)/include@@g')" \
+         LDFLAGS="-L$(PREFIX)/lib $(EXTRA_LDFLAGS)"
 ifdef HAVE_CLANG
 QT_SPEC := win32-clang-g++
 else
