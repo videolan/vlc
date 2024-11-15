@@ -79,7 +79,8 @@ GridView {
             if (isFromList())
                 return
 
-            drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
+            drop.source.dndView.model.remove(drop.source.DelegateModel.itemsIndex)
+            drop.accept(Qt.MoveAction)
         }
     }
 

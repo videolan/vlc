@@ -81,13 +81,17 @@ ListView {
             // moving from same section
             playerBtnDND.model.move(drag.source.DelegateModel.itemsIndex,
                                     destIndex)
+            drag.source.visible = true
+            drag.accept(Qt.MoveAction)
         } else if (drag.source.objectName === "buttonsList") {
             // moving from buttonsList
             playerBtnDND.model.insert(destIndex, {"id" : drag.source.mIndex})
+            drag.accept(Qt.CopyAction)
         } else {
             // moving between sections or views
             playerBtnDND.model.insert(destIndex, {"id" : drag.source.controlId})
             drag.source.dndView.model.remove(drag.source.DelegateModel.itemsIndex)
+            drag.accept(Qt.MoveAction)
         }
     }
 
@@ -155,10 +159,10 @@ ListView {
             onDropped: (drop) => {
                 let destIndex = playerBtnDND.count
 
-                if (drag.source.dndView === playerBtnDND)
+                if (drop.source.dndView === playerBtnDND)
                     --destIndex
 
-                dropEvent(drag, destIndex)
+                dropEvent(drop, destIndex)
             }
         }
     }

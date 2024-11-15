@@ -75,7 +75,10 @@ T.Control {
 
             } else {
                 dragAutoScrollHandler.dragItem = null
-                drag.target.Drag.drop()
+                control.visible = false
+                const action = drag.target.Drag.drop()
+                if (action === Qt.IgnoreAction)
+                    control.visible = true
                 removeInfoRectVisible = false
                 root.dragStopped(controlId)
             }
@@ -103,11 +106,11 @@ T.Control {
         onDropped: (drop) => {
             let destIndex = parent.DelegateModel.itemsIndex
 
-            if((drag.source.dndView === dndView)
-                    && (drag.source.DelegateModel.itemsIndex < destIndex))
+            if((drop.source.dndView === dndView)
+                    && (drop.source.DelegateModel.itemsIndex < destIndex))
                 --destIndex
 
-            dropEvent(drag, destIndex)
+            dropEvent(drop, destIndex)
         }
     }
 
