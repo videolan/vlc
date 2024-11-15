@@ -60,6 +60,7 @@ T.Pane {
             color: colorContext.fg.primary
 
             Layout.fillWidth: true
+            Layout.fillHeight: true
         }
 
         Widgets.ButtonExt {
