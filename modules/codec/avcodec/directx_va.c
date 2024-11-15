@@ -23,6 +23,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+#include <process.h>
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP

@@ -29,6 +29,7 @@
   * See https://msdn.microsoft.com/en-us/library/windows/desktop/hh162912%28v=vs.85%29.aspx
   **/
 
+#include <process.h>
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP

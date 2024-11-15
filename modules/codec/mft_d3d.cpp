@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #ifndef _MSC_VER // including mfapi with mingw-w64 is not clean for UWP yet
+#include <process.h>
 #include <winapifamily.h>
 #undef WINAPI_FAMILY
 #define WINAPI_FAMILY WINAPI_FAMILY_DESKTOP_APP
