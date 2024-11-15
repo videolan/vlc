@@ -189,8 +189,7 @@ bool ColorContext::setInheritedPalette(SystemPalette* palette)
         return false;
     if (m_palette)
     {
-        disconnect(m_palette, &SystemPalette::sourceChanged, this, &ColorContext::colorsChanged);
-        disconnect(m_palette, &SystemPalette::paletteChanged, this, &ColorContext::colorsChanged);
+        disconnect(m_palette, nullptr, this, nullptr);
     }
 
     m_palette = palette;
@@ -199,6 +198,17 @@ bool ColorContext::setInheritedPalette(SystemPalette* palette)
     {
         connect(m_palette, &SystemPalette::sourceChanged, this, &ColorContext::colorsChanged);
         connect(m_palette, &SystemPalette::paletteChanged, this, &ColorContext::colorsChanged);
+        connect(m_palette, &SystemPalette::destroyed, this, [this](){
+            if (m_parentContext)
+            {
+                if (m_hasExplicitPalette)
+                    connect(m_parentContext, &ColorContext::paletteChanged, this, &ColorContext::setInheritedPalette);
+                setInheritedPalette(m_parentContext->m_palette);
+            }
+            else
+                setInheritedPalette(nullptr);
+            m_hasExplicitPalette = false;
+        });
     }
     else
         m_initialized = false;
