@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCLibraryWindowNavigationSidebarOutlineView;
 @class VLCLibrarySegment;
+@class VLCStatusNotifierView;
 
 @interface VLCLibraryWindowNavigationSidebarViewController : NSViewController<NSOutlineViewDelegate>
 
@@ -35,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSTreeController *treeController;
 
 @property (readwrite, weak) IBOutlet VLCLibraryWindowNavigationSidebarOutlineView *outlineView;
+@property (readwrite, weak) IBOutlet NSScrollView *outlineViewScrollView;
+@property (readwrite, weak) IBOutlet VLCStatusNotifierView *statusNotifierView;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 - (void)selectSegment:(NSInteger)segmentType;

@@ -8,6 +8,8 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowNavigationSidebarViewController">
             <connections>
                 <outlet property="outlineView" destination="7u8-Zm-gnd" id="8i3-ld-a1v"/>
+                <outlet property="outlineViewScrollView" destination="gLW-4d-ery" id="JQw-Jv-XP4"/>
+                <outlet property="statusNotifierView" destination="ktP-pW-HNz" id="uQE-6w-4Z6"/>
                 <outlet property="view" destination="1Xo-OM-LAE" id="SlX-HR-4N2"/>
             </connections>
         </customObject>
