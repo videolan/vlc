@@ -86,7 +86,7 @@
 
 - (NSString *)title
 {
-    return _NS("Playlist");
+    return _NS("Play Queue");
 }
 
 - (BOOL)supportsItemCount
