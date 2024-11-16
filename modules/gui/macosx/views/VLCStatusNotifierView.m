@@ -29,6 +29,8 @@
 
 - (void)awakeFromNib
 {
+    self.label.stringValue = _NS("Idle");
+
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryStarted object:nil];
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryProgress object:nil];
@@ -39,14 +41,28 @@
 - (void)updateStatus:(NSNotification *)notification
 {
     if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
-        self.label.stringValue = _NS("Discovering media…");
+        [self presentTransientMessage:_NS("Discovering media…")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
-        self.label.stringValue = _NS("Discovering media…");
+        [self presentTransientMessage:_NS("Discovering media…")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
-        self.label.stringValue = _NS("Media discovery completed");
+        [self presentTransientMessage:_NS("Media discovery completed")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
-        self.label.stringValue = _NS("Media discovery failed");
+        [self presentTransientMessage:_NS("Media discovery failed")];
     }
+}
+
+- (void)presentTransientMessage:(NSString *)message
+{
+    self.label.stringValue = message;
+    [self.progressIndicator startAnimation:self];
+    [self performSelector:@selector(clearTransientMessage) withObject:nil afterDelay:2.0];
+}
+
+- (void)clearTransientMessage
+{
+    }
+    self.label.stringValue = _NS("Idle");
+    [self.progressIndicator stopAnimation:self];
 }
 
 @end
