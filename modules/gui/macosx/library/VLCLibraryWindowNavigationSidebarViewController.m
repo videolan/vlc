@@ -30,6 +30,7 @@
 #import "library/VLCLibraryWindowNavigationSidebarOutlineView.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
+#import "extensions/NSWindow+VLCAdditions.h"
 
 #import "views/VLCStatusNotifierView.h"
 
@@ -39,6 +40,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 @interface VLCLibraryWindowNavigationSidebarViewController ()
 
 @property BOOL ignoreSegmentSelectionChanges;
+@property (readonly) NSEdgeInsets scrollViewInsets;
 
 @end
 
@@ -76,6 +78,13 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                options:nil];
 
     [_outlineView reloadData];
+
+    const NSEdgeInsets scrollViewInsets = self.outlineViewScrollView.contentInsets;
+    _scrollViewInsets =
+        NSEdgeInsetsMake(scrollViewInsets.top + self.libraryWindow.titlebarHeight,
+                         scrollViewInsets.left,
+                         scrollViewInsets.bottom,
+                         scrollViewInsets.right);
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self
@@ -124,6 +133,12 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)statusViewActivated:(NSNotification *)notification
 {
+    const CGFloat statusNotifierHeight = self.statusNotifierView.frame.size.height;
+    self.outlineViewScrollView.contentInsets =
+        NSEdgeInsetsMake(self.scrollViewInsets.top,
+                         self.scrollViewInsets.left,
+                         self.scrollViewInsets.bottom + statusNotifierHeight,
+                         self.scrollViewInsets.right);
     self.statusNotifierView.hidden = NO;
     self.statusNotifierView.animator.alphaValue = 1.0;
 }
@@ -134,6 +149,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         self.statusNotifierView.animator.alphaValue = 0.0;
     } completionHandler:^{
         self.statusNotifierView.hidden = YES;
+        self.outlineViewScrollView.contentInsets = self.scrollViewInsets;
     }];
 }
 
