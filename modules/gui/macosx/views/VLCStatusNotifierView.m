@@ -106,8 +106,6 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
         [self presentTransientMessage:_NS("Discovering media")];
         self.permanentDiscoveryMessageActive = YES;
         [self displayStartLoad];
-    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryProgress]) {
-        [self addMessage:_NS("Discovering media")];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         self.permanentDiscoveryMessageActive = NO;
         [self displayFinishLoad];
