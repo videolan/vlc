@@ -330,7 +330,7 @@ Item {
     Widgets.RectangularGlow {
         id: effect
         z: -1
-        hollow: true // hollow because the interface may be translucent if the window has backdrop blur
+        hollow: Window.window && (Window.window.color.a < 1.0) // the interface may be translucent if the window has backdrop blur
         blending: false // stacked below everything, no need for blending even though it is not opaque
         visible: _extendedFrameVisible
         anchors.fill: g_mainInterface
