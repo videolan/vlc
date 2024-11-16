@@ -28,6 +28,7 @@
 @interface VLCStatusNotifierView ()
 
 @property NSUInteger remainingCount;
+@property (nonatomic) BOOL permanentDiscoveryMessageActive;
 
 @end
 
@@ -36,6 +37,7 @@
 - (void)awakeFromNib
 {
     self.remainingCount = 0;
+    self.permanentDiscoveryMessageActive = NO;
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
@@ -45,16 +47,33 @@
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryFailed object:nil];
 }
 
+- (void)setPermanentDiscoveryMessageActive:(BOOL)permanentDiscoveryMessageActive
+{
+    if (_permanentDiscoveryMessageActive == permanentDiscoveryMessageActive) {
+        return;
+    }
+
+    _permanentDiscoveryMessageActive = permanentDiscoveryMessageActive;
+    if (permanentDiscoveryMessageActive) {
+        self.remainingCount++;
+    } else {
+        self.remainingCount--;
+    }
+}
+
 - (void)updateStatus:(NSNotification *)notification
 {
     if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
         [self presentTransientMessage:_NS("Discovering media…")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
         [self presentTransientMessage:_NS("Discovering media…")];
+        self.permanentDiscoveryMessageActive = YES;
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         [self presentTransientMessage:_NS("Media discovery completed")];
+        self.permanentDiscoveryMessageActive = NO;
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         [self presentTransientMessage:_NS("Media discovery failed")];
+        self.permanentDiscoveryMessageActive = NO;
     }
 }
 
