@@ -30,6 +30,7 @@
 @property NSUInteger remainingCount;
 @property NSUInteger loadingCount;
 @property (nonatomic) BOOL permanentDiscoveryMessageActive;
+@property NSMutableSet<NSString *> *longNotifications;
 
 @end
 
@@ -40,6 +41,7 @@
     self.remainingCount = 0;
     self.loadingCount = 0;
     self.permanentDiscoveryMessageActive = NO;
+    self.longNotifications = NSMutableSet.set;
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
@@ -95,6 +97,18 @@
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         self.permanentDiscoveryMessageActive = NO;
         [self presentTransientMessage:_NS("Media discovery failed")];
+    } else if ([notification.name containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notification.name]) {
+        [self.longNotifications addObject:notification.name];
+        self.label.stringValue = _NS("Loading library items…");
+        self.remainingCount++;
+        [self displayStartLoad];
+    } else if ([notification.name containsString:VLCLongNotificationNameFinishSuffix]) {
+        NSString * const loadingNotification =
+            [notification.name stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
+        [self.longNotifications removeObject:loadingNotification];
+        self.remainingCount--;
+        [self displayFinishLoad];
+        [self presentTransientMessage:_NS("Library items loaded")];
     }
 }
 
