@@ -56,8 +56,10 @@
     _permanentDiscoveryMessageActive = permanentDiscoveryMessageActive;
     if (permanentDiscoveryMessageActive) {
         self.remainingCount++;
+        [self.progressIndicator startAnimation:self];
     } else {
         self.remainingCount--;
+        [self.progressIndicator stopAnimation:self];
     }
 }
 
@@ -66,13 +68,13 @@
     if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
         [self presentTransientMessage:_NS("Discovering media…")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
-        [self presentTransientMessage:_NS("Discovering media…")];
+        self.label.stringValue = _NS("Discovering media…");
         self.permanentDiscoveryMessageActive = YES;
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
-        [self presentTransientMessage:_NS("Media discovery completed")];
+        self.label.stringValue = _NS("Media discovery completed");
         self.permanentDiscoveryMessageActive = NO;
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
-        [self presentTransientMessage:_NS("Media discovery failed")];
+        self.label.stringValue = _NS("Media discovery failed");
         self.permanentDiscoveryMessageActive = NO;
     }
 }
@@ -80,7 +82,6 @@
 - (void)presentTransientMessage:(NSString *)message
 {
     self.label.stringValue = message;
-    [self.progressIndicator startAnimation:self];
     [self performSelector:@selector(clearTransientMessage) withObject:nil afterDelay:2.0];
     self.remainingCount++;
 }
@@ -92,7 +93,6 @@
         return;
     }
     self.label.stringValue = _NS("Idle");
-    [self.progressIndicator stopAnimation:self];
 }
 
 @end
