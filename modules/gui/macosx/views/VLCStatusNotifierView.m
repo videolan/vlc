@@ -25,10 +25,17 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryModel.h"
 
+@interface VLCStatusNotifierView ()
+
+@property NSUInteger remainingCount;
+
+@end
+
 @implementation VLCStatusNotifierView
 
 - (void)awakeFromNib
 {
+    self.remainingCount = 0;
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
@@ -56,10 +63,14 @@
     self.label.stringValue = message;
     [self.progressIndicator startAnimation:self];
     [self performSelector:@selector(clearTransientMessage) withObject:nil afterDelay:2.0];
+    self.remainingCount++;
 }
 
 - (void)clearTransientMessage
 {
+    self.remainingCount--;
+    if (self.remainingCount > 0) {
+        return;
     }
     self.label.stringValue = _NS("Idle");
     [self.progressIndicator stopAnimation:self];
