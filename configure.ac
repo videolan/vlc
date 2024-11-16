@@ -3742,7 +3742,7 @@ AS_IF([test "${enable_pipewire}" != "no"], [
       ], [true])
     ])
   done
-  AS_IF([test "${enable_pipewire}" = "yes" -a -n "${enable_pipewire}"], [
+  AS_IF([test "${enable_pipewire}" = "yes" -a "${have_pipewire}" = "no"], [
     AC_MSG_ERROR([$PIPEWIRE_PKG_ERRORS. Pipewire required.])
   ])
 ])
