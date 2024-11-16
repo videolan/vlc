@@ -27,10 +27,10 @@
 
 @interface VLCStatusNotifierView ()
 
-@property NSUInteger remainingCount;
 @property NSUInteger loadingCount;
-@property (nonatomic) BOOL permanentDiscoveryMessageActive;
+@property BOOL permanentDiscoveryMessageActive;
 @property NSMutableSet<NSString *> *longNotifications;
+@property NSMutableArray<NSString *> *messages;
 
 @end
 
@@ -38,10 +38,10 @@
 
 - (void)awakeFromNib
 {
-    self.remainingCount = 0;
     self.loadingCount = 0;
     self.permanentDiscoveryMessageActive = NO;
     self.longNotifications = NSMutableSet.set;
+    self.messages = NSMutableArray.array;
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
@@ -64,20 +64,21 @@
     }
 }
 
-- (void)setPermanentDiscoveryMessageActive:(BOOL)permanentDiscoveryMessageActive
+- (void)addMessage:(NSString *)message
 {
-    if (_permanentDiscoveryMessageActive == permanentDiscoveryMessageActive) {
+    [self.messages addObject:message];
+    self.label.stringValue = [self.messages componentsJoinedByString:@"\n"];
+}
+
+- (void)removeMessage:(NSString *)message
+{
+    [self.messages removeObject:message];
+    if (self.messages.count == 0) {
+        self.label.stringValue = _NS("Idle");
         return;
     }
 
-    _permanentDiscoveryMessageActive = permanentDiscoveryMessageActive;
-    if (permanentDiscoveryMessageActive) {
-        self.remainingCount++;
-        [self displayStartLoad];
-    } else {
-        self.remainingCount--;
-        [self displayFinishLoad];
-    }
+    self.label.stringValue = [self.messages componentsJoinedByString:@"\n"];
 }
 
 - (void)updateStatus:(NSNotification *)notification
@@ -88,26 +89,27 @@
     }
 
     if ([notificationName isEqualToString:VLCLibraryModelDiscoveryStarted]) {
-        [self presentTransientMessage:_NS("Discovering media…")];
-    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryProgress]) {
-        self.label.stringValue = _NS("Discovering media…");
+        [self presentTransientMessage:_NS("Discovering media")];
         self.permanentDiscoveryMessageActive = YES;
+        [self displayStartLoad];
+    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryProgress]) {
+        [self addMessage:_NS("Discovering media")];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         self.permanentDiscoveryMessageActive = NO;
+        [self displayFinishLoad];
         [self presentTransientMessage:_NS("Media discovery completed")];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         self.permanentDiscoveryMessageActive = NO;
+        [self displayFinishLoad];
         [self presentTransientMessage:_NS("Media discovery failed")];
     } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
         [self.longNotifications addObject:notificationName];
-        self.label.stringValue = _NS("Loading library items…");
-        self.remainingCount++;
+        [self addMessage:_NS("Loading library items")];
         [self displayStartLoad];
     } else if ([notificationName containsString:VLCLongNotificationNameFinishSuffix]) {
         NSString * const loadingNotification =
             [notificationName stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
         [self.longNotifications removeObject:loadingNotification];
-        self.remainingCount--;
         [self displayFinishLoad];
         [self presentTransientMessage:_NS("Library items loaded")];
     }
@@ -115,18 +117,8 @@
 
 - (void)presentTransientMessage:(NSString *)message
 {
-    self.label.stringValue = message;
-    [self performSelector:@selector(clearTransientMessage) withObject:nil afterDelay:2.0];
-    self.remainingCount++;
-}
-
-- (void)clearTransientMessage
-{
-    self.remainingCount--;
-    if (self.remainingCount > 0) {
-        return;
-    }
-    self.label.stringValue = _NS("Idle");
+    [self addMessage:message];
+    [self performSelector:@selector(removeMessage:) withObject:message afterDelay:2.0];
 }
 
 @end
