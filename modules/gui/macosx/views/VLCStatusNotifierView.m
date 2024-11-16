@@ -37,6 +37,9 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
 
 @property (readonly) NSString *loadingLibraryItemsMessage;
 @property (readonly) NSString *libraryItemsLoadedMessage;
+@property (readonly) NSString *discoveringMediaMessage;
+@property (readonly) NSString *discoveryCompletedMessage;
+@property (readonly) NSString *discoveryFailedMessage;
 
 @end
 
@@ -51,6 +54,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
 
     _loadingLibraryItemsMessage = _NS("Loading library items");
     _libraryItemsLoadedMessage = _NS("Library items loaded");
+    _discoveringMediaMessage = _NS("Discovering media");
+    _discoveryCompletedMessage = _NS("Media discovery completed");
 
     self.label.stringValue = _NS("Idle");
 
@@ -103,17 +108,17 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
     }
 
     if ([notificationName isEqualToString:VLCLibraryModelDiscoveryStarted]) {
-        [self presentTransientMessage:_NS("Discovering media")];
+        [self presentTransientMessage:self.discoveringMediaMessage];
         self.permanentDiscoveryMessageActive = YES;
         [self displayStartLoad];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         self.permanentDiscoveryMessageActive = NO;
         [self displayFinishLoad];
-        [self presentTransientMessage:_NS("Media discovery completed")];
+        [self presentTransientMessage:self.discoveryCompletedMessage];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         self.permanentDiscoveryMessageActive = NO;
         [self displayFinishLoad];
-        [self presentTransientMessage:_NS("Media discovery failed")];
+        [self presentTransientMessage:self.discoveryFailedMessage];
     } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
         if (self.longNotifications.count == 0) {
             [self addMessage:self.loadingLibraryItemsMessage];
