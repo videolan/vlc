@@ -24,6 +24,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCStatusNotifierViewActivated;
+extern NSString * const VLCStatusNotifierViewDeactivated;
+
 @interface VLCStatusNotifierView : NSVisualEffectView
 
 @property (readwrite, weak) IBOutlet NSProgressIndicator *progressIndicator;

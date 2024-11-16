@@ -25,6 +25,9 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryModel.h"
 
+NSString * const VLCStatusNotifierViewActivated = @"VLCStatusNotifierViewActivated";
+NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeactivated";
+
 @interface VLCStatusNotifierView ()
 
 @property NSUInteger loadingCount;
@@ -73,6 +76,9 @@
 
 - (void)addMessage:(NSString *)message
 {
+    if (self.messages.count == 0) {
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewActivated object:self];
+    }
     [self.messages addObject:message];
     self.label.stringValue = [self.messages componentsJoinedByString:@"\n"];
 }
@@ -82,6 +88,7 @@
     [self.messages removeObject:message];
     if (self.messages.count == 0) {
         self.label.stringValue = _NS("Idle");
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewDeactivated object:self];
         return;
     }
 
