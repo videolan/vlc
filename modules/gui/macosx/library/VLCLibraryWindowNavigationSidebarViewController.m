@@ -86,6 +86,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                          scrollViewInsets.bottom,
                          scrollViewInsets.right);
 
+    self.statusNotifierView.postsFrameChangedNotifications = YES;
+
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self
                       selector:@selector(internalNodesChanged:)
@@ -110,6 +112,10 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     [defaultCenter addObserver:self
                       selector:@selector(statusViewDeactivated:)
                           name:VLCStatusNotifierViewDeactivated
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(statusViewSizeChanged:)
+                          name:NSViewFrameDidChangeNotification
                         object:nil];
 }
 
@@ -151,6 +157,20 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         self.statusNotifierView.hidden = YES;
         self.outlineViewScrollView.contentInsets = self.scrollViewInsets;
     }];
+}
+
+- (void)statusViewSizeChanged:(NSNotification *)notification
+{
+    if (self.statusNotifierView.hidden) {
+        return;
+    }
+
+    const CGFloat statusNotifierHeight = self.statusNotifierView.frame.size.height;
+    self.outlineViewScrollView.contentInsets =
+        NSEdgeInsetsMake(self.scrollViewInsets.top,
+                         self.scrollViewInsets.left,
+                         self.scrollViewInsets.bottom + statusNotifierHeight,
+                         self.scrollViewInsets.right);
 }
 
 - (NSTreeNode *)nodeForSegmentType:(VLCLibrarySegmentType)segmentType
