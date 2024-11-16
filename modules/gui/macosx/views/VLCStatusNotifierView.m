@@ -116,8 +116,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
         [self presentTransientMessage:_NS("Media discovery failed")];
     } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
         if (self.longNotifications.count == 0) {
-            [self removeMessage:self.libraryItemsLoadedMessage];
             [self addMessage:self.loadingLibraryItemsMessage];
+            [self removeMessage:self.libraryItemsLoadedMessage];
             [self displayStartLoad];
         }
         [self.longNotifications addObject:notificationName];
@@ -127,8 +127,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
         [self.longNotifications removeObject:loadingNotification];
         if (self.longNotifications.count == 0) {
             [self displayFinishLoad];
-            [self removeMessage:self.loadingLibraryItemsMessage];
             [self presentTransientMessage:self.libraryItemsLoadedMessage];
+            [self removeMessage:self.loadingLibraryItemsMessage];
         }
     }
 }
