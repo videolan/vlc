@@ -82,29 +82,30 @@
 
 - (void)updateStatus:(NSNotification *)notification
 {
-    if (![notification.name hasPrefix:@"VLC"]) {
+    NSString * const notificationName = notification.name;
+    if (![notificationName hasPrefix:@"VLC"]) {
         return;
     }
 
-    if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
+    if ([notificationName isEqualToString:VLCLibraryModelDiscoveryStarted]) {
         [self presentTransientMessage:_NS("Discovering media…")];
-    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
+    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryProgress]) {
         self.label.stringValue = _NS("Discovering media…");
         self.permanentDiscoveryMessageActive = YES;
-    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
+    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         self.permanentDiscoveryMessageActive = NO;
         [self presentTransientMessage:_NS("Media discovery completed")];
-    } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
+    } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         self.permanentDiscoveryMessageActive = NO;
         [self presentTransientMessage:_NS("Media discovery failed")];
-    } else if ([notification.name containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notification.name]) {
-        [self.longNotifications addObject:notification.name];
+    } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
+        [self.longNotifications addObject:notificationName];
         self.label.stringValue = _NS("Loading library items…");
         self.remainingCount++;
         [self displayStartLoad];
-    } else if ([notification.name containsString:VLCLongNotificationNameFinishSuffix]) {
+    } else if ([notificationName containsString:VLCLongNotificationNameFinishSuffix]) {
         NSString * const loadingNotification =
-            [notification.name stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
+            [notificationName stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
         [self.longNotifications removeObject:loadingNotification];
         self.remainingCount--;
         [self displayFinishLoad];
