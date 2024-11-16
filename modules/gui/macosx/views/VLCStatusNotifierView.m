@@ -28,6 +28,7 @@
 @interface VLCStatusNotifierView ()
 
 @property NSUInteger remainingCount;
+@property NSUInteger loadingCount;
 @property (nonatomic) BOOL permanentDiscoveryMessageActive;
 
 @end
@@ -37,11 +38,28 @@
 - (void)awakeFromNib
 {
     self.remainingCount = 0;
+    self.loadingCount = 0;
     self.permanentDiscoveryMessageActive = NO;
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:nil object:nil];
+}
+
+- (void)displayStartLoad
+{
+    if (self.loadingCount == 0) {
+        [self.progressIndicator startAnimation:self];
+    }
+    self.loadingCount++;
+}
+
+- (void)displayFinishLoad
+{
+    self.loadingCount--;
+    if (self.loadingCount == 0) {
+        [self.progressIndicator stopAnimation:self];
+    }
 }
 
 - (void)setPermanentDiscoveryMessageActive:(BOOL)permanentDiscoveryMessageActive
@@ -53,10 +71,10 @@
     _permanentDiscoveryMessageActive = permanentDiscoveryMessageActive;
     if (permanentDiscoveryMessageActive) {
         self.remainingCount++;
-        [self.progressIndicator startAnimation:self];
+        [self displayStartLoad];
     } else {
         self.remainingCount--;
-        [self.progressIndicator stopAnimation:self];
+        [self displayFinishLoad];
     }
 }
 
