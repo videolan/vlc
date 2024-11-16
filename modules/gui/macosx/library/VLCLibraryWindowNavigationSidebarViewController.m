@@ -31,6 +31,8 @@
 
 #import "extensions/NSColor+VLCAdditions.h"
 
+#import "views/VLCStatusNotifierView.h"
+
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
 
@@ -92,6 +94,14 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                       selector:@selector(internalNodesChanged:)
                           name:VLCLibraryModelGroupDeleted
                         object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(statusViewActivated:)
+                          name:VLCStatusNotifierViewActivated
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(statusViewDeactivated:)
+                          name:VLCStatusNotifierViewDeactivated
+                        object:nil];
 }
 
 - (void)internalNodesChanged:(NSNotification *)notification
@@ -110,6 +120,21 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                   byExtendingSelection:NO];
 
     self.ignoreSegmentSelectionChanges = NO;
+}
+
+- (void)statusViewActivated:(NSNotification *)notification
+{
+    self.statusNotifierView.hidden = NO;
+    self.statusNotifierView.animator.alphaValue = 1.0;
+}
+
+- (void)statusViewDeactivated:(NSNotification *)notification
+{
+    [NSAnimationContext runAnimationGroup:^(NSAnimationContext * const context) {
+        self.statusNotifierView.animator.alphaValue = 0.0;
+    } completionHandler:^{
+        self.statusNotifierView.hidden = YES;
+    }];
 }
 
 - (NSTreeNode *)nodeForSegmentType:(VLCLibrarySegmentType)segmentType
