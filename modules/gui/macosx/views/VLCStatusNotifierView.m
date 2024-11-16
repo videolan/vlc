@@ -90,11 +90,11 @@
         self.label.stringValue = _NS("Discovering media…");
         self.permanentDiscoveryMessageActive = YES;
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
-        self.label.stringValue = _NS("Media discovery completed");
         self.permanentDiscoveryMessageActive = NO;
+        [self presentTransientMessage:_NS("Media discovery completed")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryFailed]) {
-        self.label.stringValue = _NS("Media discovery failed");
         self.permanentDiscoveryMessageActive = NO;
+        [self presentTransientMessage:_NS("Media discovery failed")];
     }
 }
 
