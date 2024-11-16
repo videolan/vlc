@@ -98,7 +98,6 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
 {
     [self.messages removeObject:message];
     if (self.messages.count == 0) {
-        self.label.stringValue = _NS("Idle");
         [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewDeactivated object:self];
         return;
     }
