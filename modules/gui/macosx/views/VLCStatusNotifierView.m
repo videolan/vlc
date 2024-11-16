@@ -58,6 +58,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
     _discoveryCompletedMessage = _NS("Media discovery completed");
 
     self.label.stringValue = _NS("Idle");
+    self.progressIndicator.hidden = YES;
+    self.infoImageView.hidden = NO;
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
     [defaultCenter addObserver:self selector:@selector(updateStatus:) name:nil object:nil];
@@ -66,6 +68,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
 - (void)displayStartLoad
 {
     if (self.loadingCount == 0) {
+        self.infoImageView.hidden = YES;
+        self.progressIndicator.hidden = NO;
         [self.progressIndicator startAnimation:self];
     }
     self.loadingCount++;
@@ -76,6 +80,8 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
     self.loadingCount--;
     if (self.loadingCount == 0) {
         [self.progressIndicator stopAnimation:self];
+        self.progressIndicator.hidden = YES;
+        self.infoImageView.hidden = NO;
     }
 }
 

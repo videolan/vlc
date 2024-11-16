@@ -122,20 +122,29 @@
                         <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="uvb-DL-v2Y">
                             <rect key="frame" x="5" y="5" width="16" height="16"/>
                         </progressIndicator>
+                        <imageView wantsLayer="YES" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Teh-MM-hCO">
+                            <rect key="frame" x="5" y="2" width="16" height="22"/>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="info.circle.fill" catalog="system" id="IHH-jG-V9R"/>
+                        </imageView>
                     </subviews>
                     <constraints>
+                        <constraint firstItem="Teh-MM-hCO" firstAttribute="bottom" secondItem="uvb-DL-v2Y" secondAttribute="bottom" id="0Nc-6c-urZ"/>
                         <constraint firstAttribute="bottom" secondItem="bT3-Rj-1sP" secondAttribute="bottom" constant="5" id="0Oa-ae-42L"/>
                         <constraint firstItem="Y8P-v6-LbG" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" id="55Y-cA-vSR"/>
                         <constraint firstAttribute="trailing" secondItem="bT3-Rj-1sP" secondAttribute="trailing" constant="5" id="89E-uL-PDh"/>
                         <constraint firstItem="uvb-DL-v2Y" firstAttribute="leading" secondItem="ktP-pW-HNz" secondAttribute="leading" constant="5" id="8fh-AX-6Yy"/>
                         <constraint firstItem="Y8P-v6-LbG" firstAttribute="leading" secondItem="ktP-pW-HNz" secondAttribute="leading" id="EKo-34-VRz"/>
+                        <constraint firstItem="Teh-MM-hCO" firstAttribute="top" secondItem="uvb-DL-v2Y" secondAttribute="top" id="Hjv-2U-78c"/>
                         <constraint firstItem="bT3-Rj-1sP" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="Ywb-cy-Ftx"/>
                         <constraint firstItem="uvb-DL-v2Y" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="akG-qb-5B7"/>
                         <constraint firstAttribute="trailing" secondItem="Y8P-v6-LbG" secondAttribute="trailing" id="cE4-8g-Jxj"/>
+                        <constraint firstItem="Teh-MM-hCO" firstAttribute="trailing" secondItem="uvb-DL-v2Y" secondAttribute="trailing" id="cdy-jb-RyP"/>
+                        <constraint firstItem="Teh-MM-hCO" firstAttribute="leading" secondItem="uvb-DL-v2Y" secondAttribute="leading" id="l8B-34-eN9"/>
                         <constraint firstItem="bT3-Rj-1sP" firstAttribute="leading" secondItem="uvb-DL-v2Y" secondAttribute="trailing" constant="5" id="oAa-Vo-uGC"/>
                         <constraint firstAttribute="bottom" secondItem="uvb-DL-v2Y" secondAttribute="bottom" constant="5" id="wqe-yn-z5G"/>
                     </constraints>
                     <connections>
+                        <outlet property="infoImageView" destination="Teh-MM-hCO" id="DaC-qt-REr"/>
                         <outlet property="label" destination="bT3-Rj-1sP" id="1VQ-rK-Dc5"/>
                         <outlet property="progressIndicator" destination="uvb-DL-v2Y" id="TmU-8b-Gqf"/>
                     </connections>
@@ -155,5 +164,6 @@
     </objects>
     <resources>
         <image name="NSActionTemplate" width="20" height="20"/>
+        <image name="info.circle.fill" catalog="system" width="15" height="15"/>
     </resources>
 </document>

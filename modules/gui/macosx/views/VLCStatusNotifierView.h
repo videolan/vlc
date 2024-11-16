@@ -31,6 +31,7 @@ extern NSString * const VLCStatusNotifierViewDeactivated;
 
 @property (readwrite, weak) IBOutlet NSProgressIndicator *progressIndicator;
 @property (readwrite, weak) IBOutlet NSTextField *label;
+@property (readwrite, weak) IBOutlet NSImageView *infoImageView;
 
 @end
 
