@@ -108,17 +108,21 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
     }
 
     if ([notificationName isEqualToString:VLCLibraryModelDiscoveryStarted]) {
-        [self presentTransientMessage:self.discoveringMediaMessage];
+        [self addMessage:self.discoveringMediaMessage];
+        [self removeMessage:self.discoveryCompletedMessage];
+        [self removeMessage:self.discoveryFailedMessage];
         self.permanentDiscoveryMessageActive = YES;
         [self displayStartLoad];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryCompleted]) {
         self.permanentDiscoveryMessageActive = NO;
         [self displayFinishLoad];
         [self presentTransientMessage:self.discoveryCompletedMessage];
+        [self removeMessage:self.discoveringMediaMessage];
     } else if ([notificationName isEqualToString:VLCLibraryModelDiscoveryFailed]) {
         self.permanentDiscoveryMessageActive = NO;
         [self displayFinishLoad];
         [self presentTransientMessage:self.discoveryFailedMessage];
+        [self removeMessage:self.discoveringMediaMessage];
     } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
         if (self.longNotifications.count == 0) {
             [self addMessage:self.loadingLibraryItemsMessage];
