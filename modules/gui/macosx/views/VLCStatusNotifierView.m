@@ -41,10 +41,7 @@
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
-    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryStarted object:nil];
-    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryProgress object:nil];
-    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryCompleted object:nil];
-    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:VLCLibraryModelDiscoveryFailed object:nil];
+    [defaultCenter addObserver:self selector:@selector(updateStatus:) name:nil object:nil];
 }
 
 - (void)setPermanentDiscoveryMessageActive:(BOOL)permanentDiscoveryMessageActive
@@ -65,6 +62,10 @@
 
 - (void)updateStatus:(NSNotification *)notification
 {
+    if (![notification.name hasPrefix:@"VLC"]) {
+        return;
+    }
+
     if ([notification.name isEqualToString:VLCLibraryModelDiscoveryStarted]) {
         [self presentTransientMessage:_NS("Discovering media…")];
     } else if ([notification.name isEqualToString:VLCLibraryModelDiscoveryProgress]) {
