@@ -32,6 +32,9 @@
 @property NSMutableSet<NSString *> *longNotifications;
 @property NSMutableArray<NSString *> *messages;
 
+@property (readonly) NSString *loadingLibraryItemsMessage;
+@property (readonly) NSString *libraryItemsLoadedMessage;
+
 @end
 
 @implementation VLCStatusNotifierView
@@ -42,6 +45,10 @@
     self.permanentDiscoveryMessageActive = NO;
     self.longNotifications = NSMutableSet.set;
     self.messages = NSMutableArray.array;
+
+    _loadingLibraryItemsMessage = _NS("Loading library items");
+    _libraryItemsLoadedMessage = _NS("Library items loaded");
+
     self.label.stringValue = _NS("Idle");
 
     NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
@@ -103,15 +110,21 @@
         [self displayFinishLoad];
         [self presentTransientMessage:_NS("Media discovery failed")];
     } else if ([notificationName containsString:VLCLongNotificationNameStartSuffix] && ![self.longNotifications containsObject:notificationName]) {
+        if (self.longNotifications.count == 0) {
+            [self removeMessage:self.libraryItemsLoadedMessage];
+            [self addMessage:self.loadingLibraryItemsMessage];
+            [self displayStartLoad];
+        }
         [self.longNotifications addObject:notificationName];
-        [self addMessage:_NS("Loading library items")];
-        [self displayStartLoad];
     } else if ([notificationName containsString:VLCLongNotificationNameFinishSuffix]) {
         NSString * const loadingNotification =
             [notificationName stringByReplacingOccurrencesOfString:VLCLongNotificationNameFinishSuffix withString:VLCLongNotificationNameStartSuffix];
         [self.longNotifications removeObject:loadingNotification];
-        [self displayFinishLoad];
-        [self presentTransientMessage:_NS("Library items loaded")];
+        if (self.longNotifications.count == 0) {
+            [self displayFinishLoad];
+            [self removeMessage:self.loadingLibraryItemsMessage];
+            [self presentTransientMessage:self.libraryItemsLoadedMessage];
+        }
     }
 }
 
