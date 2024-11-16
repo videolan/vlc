@@ -108,6 +108,9 @@
                 <visualEffectView blendingMode="behindWindow" material="sidebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="ktP-pW-HNz" customClass="VLCStatusNotifierView">
                     <rect key="frame" x="0.0" y="0.0" width="163" height="26"/>
                     <subviews>
+                        <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="Y8P-v6-LbG">
+                            <rect key="frame" x="0.0" y="23" width="163" height="5"/>
+                        </box>
                         <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="bT3-Rj-1sP">
                             <rect key="frame" x="24" y="5" width="136" height="16"/>
                             <textFieldCell key="cell" selectable="YES" title="State changed…" id="7Bd-PT-Muh">
@@ -122,10 +125,13 @@
                     </subviews>
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="bT3-Rj-1sP" secondAttribute="bottom" constant="5" id="0Oa-ae-42L"/>
+                        <constraint firstItem="Y8P-v6-LbG" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" id="55Y-cA-vSR"/>
                         <constraint firstAttribute="trailing" secondItem="bT3-Rj-1sP" secondAttribute="trailing" constant="5" id="89E-uL-PDh"/>
                         <constraint firstItem="uvb-DL-v2Y" firstAttribute="leading" secondItem="ktP-pW-HNz" secondAttribute="leading" constant="5" id="8fh-AX-6Yy"/>
+                        <constraint firstItem="Y8P-v6-LbG" firstAttribute="leading" secondItem="ktP-pW-HNz" secondAttribute="leading" id="EKo-34-VRz"/>
                         <constraint firstItem="bT3-Rj-1sP" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="Ywb-cy-Ftx"/>
                         <constraint firstItem="uvb-DL-v2Y" firstAttribute="top" secondItem="ktP-pW-HNz" secondAttribute="top" constant="5" id="akG-qb-5B7"/>
+                        <constraint firstAttribute="trailing" secondItem="Y8P-v6-LbG" secondAttribute="trailing" id="cE4-8g-Jxj"/>
                         <constraint firstItem="bT3-Rj-1sP" firstAttribute="leading" secondItem="uvb-DL-v2Y" secondAttribute="trailing" constant="5" id="oAa-Vo-uGC"/>
                         <constraint firstAttribute="bottom" secondItem="uvb-DL-v2Y" secondAttribute="bottom" constant="5" id="wqe-yn-z5G"/>
                     </constraints>
