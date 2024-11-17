@@ -26,10 +26,10 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistItem.h"
-#import "playlist/VLCPlaylistModel.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueItem.h"
+#import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
 
 #import "views/VLCBottomBarView.h"
@@ -64,7 +64,7 @@
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
 
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
 }
 @end

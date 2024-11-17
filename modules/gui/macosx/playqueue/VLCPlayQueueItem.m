@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistItem.m: MacOS X interface module
+ * VLCPlayQueueItem.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistItem.h"
+#import "VLCPlayQueueItem.h"
 
 #import <vlc_input.h>
 #import <vlc_url.h>
@@ -31,7 +31,7 @@
 
 NSString *VLCPlaylistItemPasteboardType = @"org.videolan.vlc.playlistitemtype";
 
-@implementation VLCPlaylistItem
+@implementation VLCPlayQueueItem
 
 - (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item
 {

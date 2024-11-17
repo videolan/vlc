@@ -36,7 +36,7 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/VLCPositionFormatter.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayQueueController.h"
 #import "windows/convertandsave/VLCOutput.h"
 #import "windows/VLCOpenInputMetadata.h"
 

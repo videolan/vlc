@@ -32,8 +32,8 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 @interface VLCPlaybackProgressSliderCell ()
 {

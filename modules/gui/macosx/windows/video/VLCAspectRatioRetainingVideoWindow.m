@@ -23,7 +23,7 @@
 #import "VLCAspectRatioRetainingVideoWindow.h"
 
 #import "main/VLCMain.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayerController.h"
 #import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVoutView.h"
 

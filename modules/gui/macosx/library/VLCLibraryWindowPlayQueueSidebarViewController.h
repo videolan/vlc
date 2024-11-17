@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowPlaylistSidebarViewController.h: MacOS X interface module
+ * VLCLibraryWindowPlayQueueSidebarViewController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -27,12 +27,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCDragDropView;
-@class VLCPlaylistController;
-@class VLCPlaylistDataSource;
-@class VLCPlaylistSortingMenuController;
+@class VLCPlayQueueController;
+@class VLCPlayQueueDataSource;
+@class VLCPlayQueueSortingMenuController;
 @class VLCRoundedCornerTextField;
 
-@interface VLCLibraryWindowPlaylistSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
+@interface VLCLibraryWindowPlayQueueSidebarViewController : VLCLibraryWindowAbstractSidebarViewController
 
 @property (readwrite, weak) IBOutlet NSTableView *tableView;
 @property (readwrite, weak) IBOutlet VLCDragDropView *dragDropView;
@@ -44,9 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) NSTextField *counterLabel;
 
-@property (readonly) VLCPlaylistController *playlistController;
-@property (readonly) VLCPlaylistDataSource *dataSource;
-@property (readonly) VLCPlaylistSortingMenuController *sortingMenuController;
+@property (readonly) VLCPlayQueueController *playlistController;
+@property (readonly) VLCPlayQueueDataSource *dataSource;
+@property (readonly) VLCPlayQueueSortingMenuController *sortingMenuController;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

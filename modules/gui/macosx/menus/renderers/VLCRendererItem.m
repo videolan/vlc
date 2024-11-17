@@ -23,7 +23,7 @@
 #import "VLCRendererItem.h"
 
 #import "extensions/NSString+Helpers.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayerController.h"
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>

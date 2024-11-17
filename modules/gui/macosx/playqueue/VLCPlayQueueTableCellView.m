@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistTableViewCell.m: MacOS X interface module
+ * VLCPlayQueueTableViewCell.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistTableCellView.h"
+#import "VLCPlayQueueTableCellView.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
@@ -31,13 +31,13 @@
 
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistItem.h"
+#import "playqueue/VLCPlayQueueItem.h"
 
 #import "views/VLCImageView.h"
 
 #import <vlc_configuration.h>
 
-@implementation VLCPlaylistTableCellView
+@implementation VLCPlayQueueTableCellView
 
 - (void)dealloc
 {
@@ -76,7 +76,7 @@
         NSColor.secondaryLabelColor;
 }
 
-- (void)setRepresentedPlaylistItem:(VLCPlaylistItem *)item
+- (void)setRepresentedPlaylistItem:(VLCPlayQueueItem *)item
 {
     [VLCLibraryImageCache thumbnailForPlaylistItem:item withCompletion:^(NSImage * const thumbnail) {
         self.audioArtworkImageView.image = thumbnail;

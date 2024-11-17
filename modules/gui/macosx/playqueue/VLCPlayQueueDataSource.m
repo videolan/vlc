@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistDataSource.m: MacOS X interface module
+ * VLCPlayQueueDataSource.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,13 +20,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistDataSource.h"
+#import "VLCPlayQueueDataSource.h"
 
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistTableCellView.h"
-#import "playlist/VLCPlaylistItem.h"
-#import "playlist/VLCPlaylistModel.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueTableCellView.h"
+#import "playqueue/VLCPlayQueueItem.h"
+#import "playqueue/VLCPlayQueueModel.h"
 #import "views/VLCDragDropView.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCInputItem.h"
@@ -34,15 +34,15 @@
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
-@interface VLCPlaylistDataSource ()
+@interface VLCPlayQueueDataSource ()
 {
-    VLCPlaylistModel *_playlistModel;
+    VLCPlayQueueModel *_playlistModel;
 }
 @end
 
-@implementation VLCPlaylistDataSource
+@implementation VLCPlayQueueDataSource
 
-- (void)setPlaylistController:(VLCPlaylistController *)playlistController
+- (void)setPlaylistController:(VLCPlayQueueController *)playlistController
 {
     _playlistController = playlistController;
     _playlistModel = _playlistController.playlistModel;
@@ -67,11 +67,11 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCPlaylistTableCellView *cellView = [tableView makeViewWithIdentifier:VLCPlaylistCellIdentifier owner:self];
+    VLCPlayQueueTableCellView *cellView = [tableView makeViewWithIdentifier:VLCPlaylistCellIdentifier owner:self];
 
     if (cellView == nil) {
         /* the following code saves us an instance of NSViewController which we don't need */
-        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlaylistTableCellView" bundle:nil];
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlayQueueTableCellView" bundle:nil];
         NSArray *topLevelObjects;
         if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
             msg_Err(getIntf(), "Failed to load nib file to show playlist items");
@@ -79,7 +79,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         }
 
         for (id topLevelObject in topLevelObjects) {
-            if ([topLevelObject isKindOfClass:[VLCPlaylistTableCellView class]]) {
+            if ([topLevelObject isKindOfClass:[VLCPlayQueueTableCellView class]]) {
                 cellView = topLevelObject;
                 break;
             }
@@ -87,7 +87,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         cellView.identifier = VLCPlaylistCellIdentifier;
     }
 
-    VLCPlaylistItem *item = [_playlistModel playlistItemAtIndex:row];
+    VLCPlayQueueItem *item = [_playlistModel playlistItemAtIndex:row];
     if (!item) {
         msg_Err(getIntf(), "playlist model did not return an item for representation");
         return cellView;
@@ -110,7 +110,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
     NSPasteboardItem *pboardItem = [[NSPasteboardItem alloc] init];
-    VLCPlaylistItem *playlistItem = [_playlistModel playlistItemAtIndex:row];
+    VLCPlayQueueItem *playlistItem = [_playlistModel playlistItemAtIndex:row];
     [pboardItem setString:[@(playlistItem.uniqueID) stringValue] forType:VLCPlaylistItemPasteboardType];
     return pboardItem;
 }

@@ -32,8 +32,8 @@
 #import "main/CompatibilityFixes.h"
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 
 #import "windows/video/VLCMainVideoViewController.h"
 #import "windows/video/VLCVideoOutputProvider.h"
@@ -144,7 +144,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)mediaMetadataChanged:(NSNotification *)aNotification
 {
-    VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
     VLCInputItem *inputItem = [playlistController currentlyPlayingInputItem];
     if (inputItem == NULL || _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self setTitle:_NS("VLC media player")];

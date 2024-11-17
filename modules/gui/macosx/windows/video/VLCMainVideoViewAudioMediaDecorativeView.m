@@ -29,8 +29,8 @@
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryImageCache.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 
 @implementation VLCMainVideoViewAudioMediaDecorativeView
 

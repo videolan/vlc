@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistTableViewCell.h: MacOS X interface module
+ * VLCPlayQueueItem.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,25 +20,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
-
-@class VLCImageView;
-@class VLCPlaylistItem;
+#import <Foundation/Foundation.h>
+#import <vlc_playlist.h>
+#import <vlc_tick.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCPlaylistTableCellView : NSTableCellView
+@class VLCInputItem;
+@class VLCMediaLibraryMediaItem;
 
-@property (readwrite, assign, nonatomic) VLCPlaylistItem *representedPlaylistItem;
-@property (readwrite, nonatomic) BOOL representsCurrentPlaylistItem;
+extern NSString *VLCPlaylistItemPasteboardType;
 
-@property (readwrite, assign) IBOutlet NSTextField *artistTextField;
-@property (readwrite, assign) IBOutlet NSTextField *secondaryMediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
-@property (readwrite, assign) IBOutlet NSTextField *durationTextField;
-@property (readwrite, assign) IBOutlet VLCImageView *mediaImageView;
-@property (readwrite, assign) IBOutlet NSTextField *audioMediaTypeIndicator;
-@property (readwrite, assign) IBOutlet VLCImageView *audioArtworkImageView;
+@interface VLCPlayQueueItem : NSObject
+
+@property (readonly) vlc_playlist_item_t *playlistItem;
+@property (readonly) uint64_t uniqueID;
+@property (readwrite, retain) NSString *title;
+@property (readonly, copy, nullable) NSURL *url;
+@property (readonly, copy, nullable) NSString *path;
+@property (readwrite, assign) vlc_tick_t duration;
+@property (readonly, nullable) VLCInputItem *inputItem;
+@property (readonly, nullable) VLCMediaLibraryMediaItem *mediaLibraryItem;
+
+@property (readwrite, retain, nullable) NSString *artistName;
+@property (readwrite, retain, nullable) NSString *albumName;
+@property (readonly) NSURL *artworkURL;
+
+- (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item;
+- (void)updateRepresentation;
 
 @end
 

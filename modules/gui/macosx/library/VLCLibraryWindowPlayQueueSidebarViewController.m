@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindowPlaylistSidebarViewController.m: MacOS X interface module
+ * VLCLibraryWindowPlayQueueSidebarViewController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "VLCLibraryWindowPlayQueueSidebarViewController.h"
 
 #import "extensions/NSColor+VLCAdditions.h"
 #import "extensions/NSFont+VLCAdditions.h"
@@ -30,21 +30,21 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistDataSource.h"
-#import "playlist/VLCPlaylistSortingMenuController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueDataSource.h"
+#import "playqueue/VLCPlayQueueSortingMenuController.h"
 #import "views/VLCDragDropView.h"
 #import "views/VLCRoundedCornerTextField.h"
 #import "windows/VLCOpenWindowController.h"
 
-@implementation VLCLibraryWindowPlaylistSidebarViewController
+@implementation VLCLibraryWindowPlayQueueSidebarViewController
 
 @synthesize counterLabel = _counterLabel;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow
 {
     return [super initWithLibraryWindow:libraryWindow
-                                nibName:@"VLCLibraryWindowPlaylistView"];
+                                nibName:@"VLCLibraryWindowPlayQueueView"];
 }
 
 - (void)viewDidLoad
@@ -54,7 +54,7 @@
     self.dragDropView.dropTarget = self.libraryWindow;
 
     _playlistController = VLCMain.sharedInstance.playlistController;
-    _dataSource = [[VLCPlaylistDataSource alloc] init];
+    _dataSource = [[VLCPlayQueueDataSource alloc] init];
     self.dataSource.playlistController = self.playlistController;
     self.dataSource.tableView = self.tableView;
     self.dataSource.dragDropView = self.dragDropView;
@@ -227,7 +227,7 @@
 - (IBAction)sortPlaylist:(id)sender
 {
     if (!self.sortingMenuController) {
-        _sortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
+        _sortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     }
     [NSMenu popUpContextMenu:self.sortingMenuController.playlistSortingMenu
                    withEvent:NSApp.currentEvent

@@ -25,7 +25,7 @@
 @class VLCRoundedCornerTextField;
 @class VLCLibraryWindow;
 @class VLCLibraryWindowChaptersSidebarViewController;
-@class VLCLibraryWindowPlaylistSidebarViewController;
+@class VLCLibraryWindowPlayQueueSidebarViewController;
 @class VLCLibraryWindowTitlesSidebarViewController;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSLayoutConstraint *playlistHeaderTopConstraint;
 @property (readonly) NSTextField *playlistHeaderLabel;
 
-@property (readonly) VLCLibraryWindowPlaylistSidebarViewController *playlistSidebarViewController;
+@property (readonly) VLCLibraryWindowPlayQueueSidebarViewController *playlistSidebarViewController;
 @property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
 @property (readonly) VLCLibraryWindowTitlesSidebarViewController *titlesSidebarViewController;
 

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistModel.m: MacOS X interface module
+ * VLCPlayQueueModel.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,20 +20,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistModel.h"
+#import "VLCPlayQueueModel.h"
 
 #import <vlc_common.h>
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistItem.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueItem.h"
 
-@interface VLCPlaylistModel ()
+@interface VLCPlayQueueModel ()
 {
     NSMutableArray *_playlistArray;
 }
 @end
 
-@implementation VLCPlaylistModel
+@implementation VLCPlayQueueModel
 
 - (instancetype)init
 {
@@ -54,7 +54,7 @@
     [_playlistArray removeAllObjects];
 }
 
-- (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index
+- (VLCPlayQueueItem *)playlistItemAtIndex:(NSInteger)index
 {
     if (index < 0 || index > _playlistArray.count) {
         return nil;
@@ -75,7 +75,7 @@
 
 - (void)moveItemAtIndex:(size_t)index toTarget:(size_t)target
 {
-    VLCPlaylistItem *item = [_playlistArray objectAtIndex:index];
+    VLCPlayQueueItem *item = [_playlistArray objectAtIndex:index];
     [_playlistArray removeObjectAtIndex:index];
     [_playlistArray insertObject:item atIndex:target];
 }
@@ -87,7 +87,7 @@
 
 - (void)updateItemAtIndex:(size_t)index
 {
-    VLCPlaylistItem *item = _playlistArray[index];
+    VLCPlayQueueItem *item = _playlistArray[index];
     [item updateRepresentation];
 }
 

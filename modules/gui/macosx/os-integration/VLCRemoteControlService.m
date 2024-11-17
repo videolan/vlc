@@ -26,8 +26,8 @@
 #import "VLCRemoteControlService.h"
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -39,7 +39,7 @@
 
 @interface VLCRemoteControlService()
 {
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
 }
 @end

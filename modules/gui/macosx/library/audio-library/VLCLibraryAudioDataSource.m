@@ -48,10 +48,10 @@
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSPasteboardItem+VLCAdditions.h"
 
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistItem.h"
-#import "playlist/VLCPlaylistModel.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueItem.h"
+#import "playqueue/VLCPlayQueueModel.h"
 
 #import "views/VLCImageView.h"
 #import "views/VLCSubScrollView.h"

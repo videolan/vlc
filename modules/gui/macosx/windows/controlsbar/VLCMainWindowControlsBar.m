@@ -33,10 +33,10 @@
 
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistItem.h"
-#import "playlist/VLCPlaylistModel.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueItem.h"
+#import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlayerController.h"
 
 #import "views/VLCTimeField.h"
 #import "views/VLCTrackingView.h"
@@ -53,7 +53,7 @@
 {
     NSImage *_alwaysMuteImage;
 
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
 }
 @end

@@ -36,7 +36,7 @@
 #import "os-integration/iTunes.h"
 #import "os-integration/Spotify.h"
 
-#import "playlist/VLCPlayerTitle.h"
+#import "playqueue/VLCPlayerTitle.h"
 
 #import "windows/video/VLCVoutView.h"
 #import "windows/video/VLCMainVideoViewController.h"

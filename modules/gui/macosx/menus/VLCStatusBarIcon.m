@@ -25,8 +25,8 @@
 
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 #import "library/VLCInputItem.h"
 #import "windows/VLCDetachedAudioWindow.h"
 
@@ -449,7 +449,7 @@
 // Action: Toggle Play / Pause
 - (IBAction)statusBarIconTogglePlayPause:(id)sender
 {
-    VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController *playerController = playlistController.playerController;
     enum vlc_player_state playerState = playerController.playerState;
     if (playerState != VLC_PLAYER_STATE_PAUSED) {
@@ -476,7 +476,7 @@
 // Action: Toggle random playback (shuffle)
 - (IBAction)statusBarIconToggleRandom:(id)sender
 {
-    VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
     playlistController.playbackOrder = (playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM) ? VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL : VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
 }
 

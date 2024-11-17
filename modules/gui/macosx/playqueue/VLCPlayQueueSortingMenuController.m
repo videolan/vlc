@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistSortingMenuController.m: MacOS X interface module
+ * VLCPlayQueueSortingMenuController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
@@ -20,19 +20,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistSortingMenuController.h"
+#import "VLCPlayQueueSortingMenuController.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
-@interface VLCPlaylistSortingMenuController () <NSMenuDelegate>
+@interface VLCPlayQueueSortingMenuController () <NSMenuDelegate>
 {
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
 }
 @end
 
-@implementation VLCPlaylistSortingMenuController
+@implementation VLCPlayQueueSortingMenuController
 
 - (instancetype)init
 {

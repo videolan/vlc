@@ -26,8 +26,8 @@
 
 #import "main/VLCMain.h"
 #import "extensions/NSString+Helpers.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 
 #import <vlc_configuration.h>
 #import <vlc_actions.h>

@@ -25,16 +25,16 @@
 #import "imported/SPMediaKeyTap/SPMediaKeyTap.h"
 #import "imported/AppleRemote/AppleRemote.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistModel.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlayerController.h"
 #import "os-integration/VLCSystemVolume.h"
 
 #import <vlc_configuration.h>
 
 @interface VLCClickerManager()
 {
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
 
     /* media key support */

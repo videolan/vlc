@@ -44,9 +44,9 @@
 #import "panels/VLCInformationWindowController.h"
 #import "panels/VLCTimeSelectionPanelController.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistSortingMenuController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueSortingMenuController.h"
 #import "preferences/VLCSimplePrefsController.h"
 
 #import "windows/VLCAboutWindowController.h"
@@ -102,9 +102,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
-    VLCPlaylistSortingMenuController *_playlistSortingController;
+    VLCPlayQueueSortingMenuController *_playlistSortingController;
     VLCInformationWindowController *_infoWindowController;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
@@ -158,7 +158,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
-    _playlistSortingController = [[VLCPlaylistSortingMenuController alloc] init];
+    _playlistSortingController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortPlaylist.submenu = _playlistSortingController.playlistSortingMenu;
 
     [self mediaItemChanged:nil];

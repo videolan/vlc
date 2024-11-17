@@ -37,8 +37,8 @@
 #import "panels/VLCBookmarksWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 
 #import "windows/video/VLCAspectRatioRetainingVideoWindow.h"
 #import "windows/video/VLCMainVideoViewController.h"

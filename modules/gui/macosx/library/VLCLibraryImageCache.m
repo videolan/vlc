@@ -29,7 +29,7 @@
 
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistItem.h"
+#import "playqueue/VLCPlayQueueItem.h"
 
 NSUInteger kVLCMaximumLibraryImageCacheSize = 50;
 uint32_t kVLCDesiredThumbnailWidth = 512;
@@ -162,7 +162,7 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     }
 }
 
-+ (void)thumbnailForPlaylistItem:(VLCPlaylistItem *)playlistItem 
++ (void)thumbnailForPlaylistItem:(VLCPlayQueueItem *)playlistItem 
                   withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
     return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem 

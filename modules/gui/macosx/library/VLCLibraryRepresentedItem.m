@@ -32,7 +32,7 @@
 
 #import "main/VLCMain.h"
 
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 @interface VLCLibraryRepresentedItem ()
 {
@@ -232,7 +232,7 @@
 
 - (void)playLibraryModeImmediately:(BOOL)playImmediately
 {
-    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCLibraryController * const libraryController = VLCMain.sharedInstance.libraryController;
 
     // If play immediately, play first item, queue following items
@@ -269,7 +269,7 @@
 
 - (void)playImmediately:(BOOL)playImmediately
 {
-    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
     if (playlistController.libraryPlaylistMode && self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
         [self playLibraryModeImmediately:playImmediately];
     } else {

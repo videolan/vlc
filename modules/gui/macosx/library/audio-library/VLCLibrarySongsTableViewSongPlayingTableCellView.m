@@ -25,8 +25,8 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 @implementation VLCLibrarySongsTableViewSongPlayingTableCellView
 

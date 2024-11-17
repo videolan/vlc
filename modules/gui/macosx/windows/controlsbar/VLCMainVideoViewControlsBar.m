@@ -32,8 +32,8 @@
 
 #import "panels/VLCBookmarksWindowController.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 
 #import "views/VLCWrappableTextField.h"
 
@@ -43,7 +43,7 @@
 
 @interface VLCMainVideoViewControlsBar ()
 {
-    VLCPlaylistController *_playlistController;
+    VLCPlayQueueController *_playlistController;
     VLCPlayerController *_playerController;
 }
 @end

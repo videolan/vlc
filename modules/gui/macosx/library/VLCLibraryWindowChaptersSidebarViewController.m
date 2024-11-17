@@ -25,9 +25,9 @@
 #import "extensions/NSString+Helpers.h"
 #import "library/VLCLibraryDataTypes.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlayerChapter.h"
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayerChapter.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 @interface VLCLibraryWindowChaptersSidebarViewController ()
 

@@ -1,9 +1,12 @@
 /*****************************************************************************
- * VLCPlaylistDataSource.h: MacOS X interface module
+ * VLCPlayQueueTableView.h: table view subclass for the playlist
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2003-2019 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Derk-Jan Hartman <hartman at videola/n dot org>
+ *          Benjamin Pracht <bigben at videolab dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,21 +25,9 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class VLCPlaylistController;
-@class VLCDragDropView;
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCPlaylistDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
-
-@property (readwrite, assign, nonatomic) VLCPlaylistController *playlistController;
-@property (readwrite, assign) NSTableView *tableView;
-@property (readwrite, assign) VLCDragDropView *dragDropView;
-@property (readwrite, nonatomic) NSTextField *counterTextField;
-
-- (void)prepareForUse;
-- (void)playlistUpdated;
-- (void)scrollToCurrentPlaylistItem;
+@interface VLCPlayQueueTableView : NSTableView
 
 @end
 

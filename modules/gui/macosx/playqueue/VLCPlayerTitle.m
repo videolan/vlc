@@ -23,7 +23,7 @@
 #import "VLCPlayerTitle.h"
 
 #import "extensions/NSString+Helpers.h"
-#import "playlist/VLCPlayerChapter.h"
+#import "playqueue/VLCPlayerChapter.h"
 
 @implementation VLCPlayerTitle
 

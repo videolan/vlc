@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistMenuController.m: MacOS X interface module
+ * VLCPlayQueueMenuController.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
@@ -22,22 +22,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistMenuController.h"
+#import "VLCPlayQueueMenuController.h"
 
 #import "extensions/NSString+Helpers.h"
 #import "extensions/NSMenu+VLCAdditions.h"
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistModel.h"
-#import "playlist/VLCPlaylistItem.h"
-#import "playlist/VLCPlaylistSortingMenuController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlayQueueItem.h"
+#import "playqueue/VLCPlayQueueSortingMenuController.h"
 #import "windows/VLCOpenWindowController.h"
 #import "panels/VLCInformationWindowController.h"
 
-@interface VLCPlaylistMenuController ()
+@interface VLCPlayQueueMenuController ()
 {
-    VLCPlaylistController *_playlistController;
-    VLCPlaylistSortingMenuController *_playlistSortingMenuController;
+    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueSortingMenuController *_playlistSortingMenuController;
     VLCInformationWindowController *_informationWindowController;
 
     NSMenuItem *_playMenuItem;
@@ -54,7 +54,7 @@
 
 @end
 
-@implementation VLCPlaylistMenuController
+@implementation VLCPlayQueueMenuController
 
 - (instancetype)init
 {
@@ -86,7 +86,7 @@
     _clearPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the playlist") action:@selector(clearPlaylist:) keyEquivalent:@""];
     _clearPlaylistMenuItem.target = self;
 
-    _playlistSortingMenuController = [[VLCPlaylistSortingMenuController alloc] init];
+    _playlistSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
     [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
 
@@ -156,7 +156,7 @@
     NSIndexSet * const selectedIndices = self.playlistTableView.selectedRowIndexes;
 
     [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
-        VLCPlaylistItem * const item =
+        VLCPlayQueueItem * const item =
             [self->_playlistController.playlistModel playlistItemAtIndex:idx];
         if (item == nil) {
             return;
@@ -175,7 +175,7 @@
     if (selectedRow == -1)
         return;
 
-    VLCPlaylistItem *item = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
+    VLCPlayQueueItem *item = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
     if (item == nil)
         return;
 

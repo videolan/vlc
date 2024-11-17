@@ -36,8 +36,8 @@
 #import "coreinteraction/VLCHotkeysController.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 #import "windows/video/VLCVideoWindowCommon.h"
 
 #import <vlc_actions.h>

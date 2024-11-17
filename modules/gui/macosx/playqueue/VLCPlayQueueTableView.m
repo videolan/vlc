@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistTableView.m: table view subclass for the playlist
+ * VLCPlayQueueTableView.m: table view subclass for the playlist
  *****************************************************************************
  * Copyright (C) 2003-2019 VLC authors and VideoLAN
  *
@@ -23,24 +23,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCPlaylistTableView.h"
+#import "VLCPlayQueueTableView.h"
 
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistMenuController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueMenuController.h"
 
-@interface VLCPlaylistTableView ()
+@interface VLCPlayQueueTableView ()
 
-@property (readonly, atomic) VLCPlaylistMenuController *menuController;
+@property (readonly, atomic) VLCPlayQueueMenuController *menuController;
 
 @end
 
-@implementation VLCPlaylistTableView
+@implementation VLCPlayQueueTableView
 
 - (NSMenu *)menuForEvent:(NSEvent *)event
 {
     if (self.menuController == nil) {
-        _menuController = [[VLCPlaylistMenuController alloc] init];
+        _menuController = [[VLCPlayQueueMenuController alloc] init];
         self.menuController.playlistTableView = self;
     }
 
@@ -70,7 +70,7 @@
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
         {
-            VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+            VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
             [playlistController removeItemsAtIndexes:selectedIndexes];
             break;
         }

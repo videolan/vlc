@@ -1,9 +1,11 @@
 /*****************************************************************************
- * VLCPlaylistModel.h: MacOS X interface module
+ * VLCPlayQueueMenuController.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
- * Authors: Felix Paul Kühne <fkuehne # videolan -dot- org>
+ * Authors: Benjamin Pracht <bigben at videolan dot org>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
+ *          David Fuhrmann <dfuhrmann # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,26 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Foundation/Foundation.h>
-#import <vlc_playlist.h>
-
-@class VLCPlaylistController;
-@class VLCPlaylistItem;
+#import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCPlaylistModel : NSObject
+@interface VLCPlayQueueMenuController : NSObject
 
-@property (readwrite, assign) VLCPlaylistController *playlistController;
-@property (readonly) NSUInteger numberOfPlaylistItems;
-
-- (void)dropExistingData;
-- (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index;
-- (void)addItems:(NSArray *)array;
-- (void)addItems:(NSArray *)array atIndex:(size_t)index count:(size_t)count;
-- (void)moveItemAtIndex:(size_t)index toTarget:(size_t)target;
-- (void)removeItemsInRange:(NSRange)range;
-- (void)updateItemAtIndex:(size_t)index;
+@property (readwrite, weak, nonatomic) NSTableView *playlistTableView;
+@property (readonly) NSMenu *playlistMenu;
 
 @end
 

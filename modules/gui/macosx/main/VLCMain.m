@@ -65,10 +65,10 @@
 #import "panels/VLCVideoEffectsWindowController.h"
 #import "panels/VLCTrackSynchronizationWindowController.h"
 
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistModel.h"
-#import "playlist/VLCPlaybackContinuityController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueModel.h"
+#import "playqueue/VLCPlaybackContinuityController.h"
 
 #import "preferences/prefs.h"
 #import "preferences/VLCSimplePrefsController.h"
@@ -257,7 +257,7 @@ static VLCMain *sharedInstance = nil;
 
         VLCApplication.sharedApplication.delegate = self;
 
-        _playlistController = [[VLCPlaylistController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
+        _playlistController = [[VLCPlayQueueController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
         _libraryController = [[VLCLibraryController alloc] init];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];
 

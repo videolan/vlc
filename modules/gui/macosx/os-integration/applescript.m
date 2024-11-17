@@ -31,8 +31,8 @@
 #import <vlc_url.h>
 
 #import "main/VLCMain.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayerController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
 /*****************************************************************************
@@ -70,7 +70,7 @@
 
 - (id)performDefaultImplementation
 {
-    VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController *playerController = [playlistController playerController];
 
     NSString *commandString = [[self commandDescription] commandName];

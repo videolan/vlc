@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlaylistController.h: MacOS X interface module
+ * VLCPlayQueueController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -25,8 +25,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCPlaylistModel;
-@class VLCPlaylistDataSource;
+@class VLCPlayQueueModel;
+@class VLCPlayQueueDataSource;
 @class VLCPlayerController;
 @class VLCPlaylistExportModuleDescription;
 @class VLCOpenInputMetadata;
@@ -40,7 +40,7 @@ extern NSString *VLCPlaylistCurrentItemIndexChanged;
 extern NSString *VLCPlaylistItemsAdded;
 extern NSString *VLCPlaylistItemsRemoved;
 
-@interface VLCPlaylistController : NSObject
+@interface VLCPlayQueueController : NSObject
 
 - (instancetype)initWithPlaylist:(vlc_playlist_t *)playlist;
 
@@ -54,12 +54,12 @@ extern NSString *VLCPlaylistItemsRemoved;
  * The playlist model caching the contents of the playlist controlled by
  * the instance of this class.
  */
-@property (readonly) VLCPlaylistModel *playlistModel;
+@property (readonly) VLCPlayQueueModel *playlistModel;
 
 /**
  * The datasource instance used to actually display the playlist.
  */
-@property (readwrite, assign) VLCPlaylistDataSource *playlistDataSource;
+@property (readwrite, assign) VLCPlayQueueDataSource *playlistDataSource;
 
 /**
  * The player instance associated with the playlist

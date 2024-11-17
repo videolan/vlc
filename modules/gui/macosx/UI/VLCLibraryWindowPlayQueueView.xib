@@ -6,7 +6,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlaylistSidebarViewController">
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowPlayQueueSidebarViewController">
             <connections>
                 <outlet property="bottomButtonsSeparator" destination="ew3-Pn-diG" id="N5L-cw-953"/>
                 <outlet property="dragDropImageBackgroundBox" destination="aUB-Ld-N2o" id="9xc-5h-uRF"/>
@@ -34,7 +34,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="510" height="210"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="16" rowSizeStyle="automatic" viewBased="YES" id="Ubg-RS-LWE" customClass="VLCPlaylistTableView">
+                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" autosaveColumns="NO" rowHeight="16" rowSizeStyle="automatic" viewBased="YES" id="Ubg-RS-LWE" customClass="VLCPlayQueueTableView">
                                 <rect key="frame" x="0.0" y="0.0" width="510" height="210"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>

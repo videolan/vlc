@@ -34,7 +34,7 @@
 
 #import "panels/VLCInformationWindowController.h"
 
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 #import <vlc_input.h>
 #import <vlc_url.h>

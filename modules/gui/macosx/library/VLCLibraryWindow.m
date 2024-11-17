@@ -34,8 +34,8 @@
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"

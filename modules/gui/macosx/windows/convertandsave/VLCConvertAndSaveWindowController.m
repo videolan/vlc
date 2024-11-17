@@ -27,8 +27,8 @@
 #import "main/VLCMain.h"
 #import "panels/dialogs/VLCPopupPanelController.h"
 #import "panels/dialogs/VLCTextfieldPanelController.h"
-#import "playlist/VLCPlaylistController.h"
-#import "playlist/VLCPlaylistModel.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueModel.h"
 #import "views/VLCDragDropView.h"
 #import "windows/VLCOpenInputMetadata.h"
 
@@ -316,7 +316,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     }
     inputMetaItem.playbackOptions = options;
 
-    VLCPlaylistController *playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
     [playlistController addPlaylistItems:@[inputMetaItem]];
     [playlistController playItemAtIndex:(playlistController.playlistModel.numberOfPlaylistItems -1)];
 

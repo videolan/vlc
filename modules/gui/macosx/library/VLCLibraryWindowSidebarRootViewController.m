@@ -32,12 +32,12 @@
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowChaptersSidebarViewController.h"
-#import "library/VLCLibraryWindowPlaylistSidebarViewController.h"
+#import "library/VLCLibraryWindowPlayQueueSidebarViewController.h"
 #import "library/VLCLibraryWindowSidebarChildViewController.h"
 #import "library/VLCLibraryWindowTitlesSidebarViewController.h"
 
-#import "playlist/VLCPlayerController.h"
-#import "playlist/VLCPlaylistController.h"
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 #include "views/VLCRoundedCornerTextField.h"
 
@@ -67,7 +67,7 @@
     self.mainVideoModeEnabled = NO;
 
     _playlistSidebarViewController =
-        [[VLCLibraryWindowPlaylistSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
+        [[VLCLibraryWindowPlayQueueSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _titlesSidebarViewController =
@@ -119,7 +119,7 @@
     [self.viewSelector setLabel:self.playlistSidebarViewController.title
                          forSegment:self.viewSelector.segmentCount - 1];
 
-    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
     if (playerController.numberOfTitlesOfCurrentMedia > 0) {
         self.viewSelector.segmentCount++; 
@@ -167,7 +167,7 @@
 {
     [self setupViewSelectorSegments];
 
-    VLCPlaylistController * const playlistController = VLCMain.sharedInstance.playlistController;
+    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
     VLCPlayerController * const playerController = playlistController.playerController;
     const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;

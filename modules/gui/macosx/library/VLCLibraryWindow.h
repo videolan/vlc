@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryNavigationStack;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaLibraryGroup;
-@class VLCPlaylistController;
+@class VLCPlayQueueController;
 @class VLCCustomEmptyLibraryBrowseButton;
 @class VLCLibraryWindowSplitViewController;
 @class VLCLibraryWindowToolbarDelegate;
@@ -127,7 +127,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
 @property (readonly) VLCLibraryAbstractSegmentViewController *librarySegmentViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
-@property (readonly) VLCPlaylistController *playlistController;
+@property (readonly) VLCPlayQueueController *playlistController;
 
 - (void)enableVideoPlaybackAppearance;
 - (void)disableVideoPlaybackAppearance;
