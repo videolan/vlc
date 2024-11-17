@@ -32,6 +32,10 @@ FocusScope {
 
     property var artist: ({})
 
+    readonly property int _extraMargin: VLCStyle.dynamicAppMargins(width)
+    readonly property int _contentLeftMargin: VLCStyle.layout_left_margin + _extraMargin
+    readonly property int _contentRightMargin: VLCStyle.layout_right_margin + _extraMargin
+
     //the index to "go to" when the view is loaded
     property int initialIndex: 0
 
@@ -115,7 +119,7 @@ FocusScope {
             Widgets.ViewHeader {
                 view: root
 
-                leftPadding: VLCStyle.margin_xlarge
+                leftPadding: root._contentLeftMargin
                 bottomPadding: VLCStyle.layoutTitle_bottom_padding -
                                (MainCtx.gridView ? 0 : VLCStyle.gridItemSelectedBorder)
 
@@ -145,9 +149,9 @@ FocusScope {
                     Widgets.ListViewExt {
                         id: albumsList
 
-                        x: VLCStyle.margin_xlarge - VLCStyle.gridItemSelectedBorder
+                        x: root._contentLeftMargin - VLCStyle.gridItemSelectedBorder
 
-                        width: root.width - root.rightPadding - x * 2
+                        width: root.width - root.rightPadding - root._contentLeftMargin - root._contentRightMargin
                         height: gridHelper.cellHeight + topMargin + bottomMargin + VLCStyle.margin_xxxsmall
 
                         leftMargin: VLCStyle.gridItemSelectedBorder
@@ -232,7 +236,7 @@ FocusScope {
                     Widgets.ViewHeader {
                         view: root
 
-                        leftPadding: VLCStyle.margin_xlarge
+                        leftPadding: root._contentLeftMargin
                         topPadding: 0
 
                         text: qsTr("Tracks")
