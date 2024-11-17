@@ -144,7 +144,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 
 - (void)playInputItemInstantly:(id)sender
 {
-    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
+    [VLCMain.sharedInstance.playQueueController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
 }
 
 @end

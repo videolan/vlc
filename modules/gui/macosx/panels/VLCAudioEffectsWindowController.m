@@ -119,7 +119,7 @@ static inline void enableTextField(NSTextField *const __unsafe_unretained textFi
     self = [super initWithWindowNibName:@"AudioEffects"];
     if (self) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self->_playerController = VLCMain.sharedInstance.playlistController.playerController;
+            self->_playerController = VLCMain.sharedInstance.playQueueController.playerController;
 
             NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
             if ([defaults boolForKey:@"AudioEffectApplyProfileOnStartup"])

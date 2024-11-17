@@ -98,7 +98,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
 
 - (void)currentlyPlayingItemChanged:(NSNotification *)aNotification
 {
-    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentInputItem = playerController.currentMedia;
     if (!currentInputItem) {
         return;

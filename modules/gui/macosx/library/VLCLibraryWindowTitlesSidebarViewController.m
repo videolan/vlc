@@ -103,7 +103,7 @@
 - (void)updateTitleList
 {
     VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     const size_t titleCount = playerController.numberOfTitlesOfCurrentMedia;
     self.internalItemCount = titleCount;
     self.titlesArrayController.content = playerController.titlesOfCurrentMedia;
@@ -118,7 +118,7 @@
         return;
     }
 
-    [VLCMain.sharedInstance.playlistController.playerController setSelectedTitleIndex:selectedTitle.index];
+    [VLCMain.sharedInstance.playQueueController.playerController setSelectedTitleIndex:selectedTitle.index];
 }
 
 - (void)titleSelectionChanged:(NSNotification *)notification
@@ -129,7 +129,7 @@
 - (void)updateTitleSelection
 {
     VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     const NSUInteger selectedTitleIndex = playerController.selectedTitleIndex;
     NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:selectedTitleIndex];
     [self.tableView selectRowIndexes:indexSet byExtendingSelection:NO];

@@ -34,7 +34,7 @@
 
 @interface VLCClickerManager()
 {
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
 
     /* media key support */
@@ -54,8 +54,8 @@
 {
     self = [super init];
     if (self) {
-        _playlistController = VLCMain.sharedInstance.playlistController;
-        _playerController = [_playlistController playerController];
+        _playQueueController = VLCMain.sharedInstance.playQueueController;
+        _playerController = [_playQueueController playerController];
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
 
         /* init media key support */
@@ -118,7 +118,7 @@
         _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
     VLCMain * const main = VLCMain.sharedInstance;
-    if (b_mediaKeySupport && (main.playlistController.playlistModel.numberOfPlaylistItems > 0)) {
+    if (b_mediaKeySupport && (main.playQueueController.playlistModel.numberOfPlaylistItems > 0)) {
         if (!b_mediaKeyTrapEnabled) {
             [self enableMediaKeySupport];
         }
@@ -155,7 +155,7 @@
         return;
     }
 
-    BOOL numberOfMediaLargerThanZero = [[VLCMain.sharedInstance.playlistController playlistModel] numberOfPlaylistItems] > 0;
+    BOOL numberOfMediaLargerThanZero = [[VLCMain.sharedInstance.playQueueController playlistModel] numberOfPlaylistItems] > 0;
 
     if (b_mediaKeyTrapEnabled && !numberOfMediaLargerThanZero) {
         [self disableMediaKeySupport];
@@ -180,7 +180,7 @@
 
         if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
             if (keyState == 0 && keyRepeat == 0) {
-                [_playlistController playNextItem];
+                [_playQueueController playNextItem];
             } else if (keyRepeat == 1) {
                 [_playerController jumpForwardShort];
                 b_mediakeyJustJumped = YES;
@@ -192,7 +192,7 @@
 
         if ((keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped) {
             if (keyState == 0 && keyRepeat == 0) {
-                [_playlistController playPreviousItem];
+                [_playQueueController playPreviousItem];
             } else if (keyRepeat == 1) {
                 [_playerController jumpBackwardShort];
                 b_mediakeyJustJumped = YES;
@@ -282,13 +282,13 @@
             if (config_GetInt("macosx-appleremote-prevnext"))
                 [_playerController jumpForwardShort];
             else
-                [_playlistController playNextItem];
+                [_playQueueController playNextItem];
             break;
         case kRemoteButtonLeft:
             if (config_GetInt("macosx-appleremote-prevnext"))
                 [_playerController jumpBackwardShort];
             else
-                [_playlistController playPreviousItem];
+                [_playQueueController playPreviousItem];
             break;
         case kRemoteButtonRight_Hold:
         case kRemoteButtonLeft_Hold:

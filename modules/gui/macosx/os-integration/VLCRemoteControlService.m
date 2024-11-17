@@ -39,7 +39,7 @@
 
 @interface VLCRemoteControlService()
 {
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
 }
 @end
@@ -67,8 +67,8 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 {
     self = [super init];
     if (self) {
-        _playlistController = VLCMain.sharedInstance.playlistController;
-        _playerController = [_playlistController playerController];
+        _playQueueController = VLCMain.sharedInstance.playQueueController;
+        _playerController = [_playQueueController playerController];
 
         NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
@@ -227,14 +227,14 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     MPRemoteCommandCenter *cc = [MPRemoteCommandCenter sharedCommandCenter];
 
     if (event.command == cc.playCommand) {
-        return [_playlistController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
+        return [_playQueueController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
     }
     if (event.command == cc.pauseCommand) {
-        [_playlistController pausePlayback];
+        [_playQueueController pausePlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.stopCommand) {
-        [_playlistController stopPlayback];
+        [_playQueueController stopPlayback];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.togglePlayPauseCommand) {
@@ -242,10 +242,10 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.nextTrackCommand) {
-        return [_playlistController playNextItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
+        return [_playQueueController playNextItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.previousTrackCommand) {
-        return [_playlistController playPreviousItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
+        return [_playQueueController playPreviousItem] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusCommandFailed;
     }
     if (event.command == cc.skipForwardCommand) {
         [_playerController jumpForwardMedium];
@@ -265,21 +265,21 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         MPRepeatType repeatType = repeatEvent.repeatType;
         switch (repeatType) {
             case MPRepeatTypeAll:
-                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_ALL];
+                [_playQueueController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_ALL];
                  break;
 
             case MPRepeatTypeOne:
-                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT];
+                [_playQueueController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT];
                 break;
 
             default:
-                [_playlistController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];;
+                [_playQueueController setPlaybackRepeat:VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];;
                 break;
         }
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeShuffleModeCommand) {
-        [_playlistController setPlaybackOrder:[_playlistController playbackOrder] == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
+        [_playQueueController setPlaybackOrder:[_playQueueController playbackOrder] == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
         return MPRemoteCommandHandlerStatusSuccess;
     }
 

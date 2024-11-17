@@ -53,14 +53,14 @@
 
     self.dragDropView.dropTarget = self.libraryWindow;
 
-    _playlistController = VLCMain.sharedInstance.playlistController;
+    _playQueueController = VLCMain.sharedInstance.playQueueController;
     _dataSource = [[VLCPlayQueueDataSource alloc] init];
-    self.dataSource.playlistController = self.playlistController;
+    self.dataSource.playQueueController = self.playQueueController;
     self.dataSource.tableView = self.tableView;
     self.dataSource.dragDropView = self.dragDropView;
     self.dataSource.counterTextField = self.counterLabel;
     [self.dataSource prepareForUse];
-    self.playlistController.playlistDataSource = self.dataSource;
+    self.playQueueController.playlistDataSource = self.dataSource;
 
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.dataSource;
@@ -132,7 +132,7 @@
     if (selectedRow == -1) {
         return;
     }
-    [VLCMain.sharedInstance.playlistController playItemAtIndex:selectedRow];
+    [VLCMain.sharedInstance.playQueueController playItemAtIndex:selectedRow];
 }
 
 #pragma mark - open media handling
@@ -146,10 +146,10 @@
 
 - (IBAction)shuffleAction:(id)sender
 {
-    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    if (_playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playQueueController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
     } else {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+        _playQueueController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     }
 }
 
@@ -159,11 +159,11 @@
         self.shuffleButton.image = [NSImage imageWithSystemSymbolName:@"shuffle"
                                              accessibilityDescription:@"Shuffle"];
         self.shuffleButton.contentTintColor =
-            self.playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+            self.playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
                 nil : NSColor.VLCAccentColor;
     } else {
         self.shuffleButton.image =
-            self.playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
+            self.playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL ?
                 [NSImage imageNamed:@"shuffleOff"] :
                 [[NSImage imageNamed:@"shuffleOn"] imageTintedWithColor:NSColor.VLCAccentColor];
     }
@@ -171,23 +171,23 @@
 
 - (IBAction)repeatAction:(id)sender
 {
-    const enum vlc_playlist_playback_repeat repeatState = self.playlistController.playbackRepeat;
+    const enum vlc_playlist_playback_repeat repeatState = self.playQueueController.playbackRepeat;
     switch (repeatState) {
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+            self.playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
             break;
         case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+            self.playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
             break;
         default:
-            self.playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+            self.playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
             break;
     }
 }
 
 - (void)repeatStateUpdated:(NSNotification *)aNotification
 {
-    const enum vlc_playlist_playback_repeat repeatState = self.playlistController.playbackRepeat;
+    const enum vlc_playlist_playback_repeat repeatState = self.playQueueController.playbackRepeat;
 
     if (@available(macOS 11.0, *)) {
         switch (repeatState) {
@@ -236,7 +236,7 @@
 
 - (IBAction)clearPlaylist:(id)sender
 {
-    [self.playlistController clearPlaylist];
+    [self.playQueueController clearPlaylist];
 }
 
 @end

@@ -36,7 +36,7 @@
 
 @interface VLCPlayQueueMenuController ()
 {
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayQueueSortingMenuController *_playlistSortingMenuController;
     VLCInformationWindowController *_informationWindowController;
 
@@ -61,7 +61,7 @@
     self = [super init];
     if (self) {
         [self createMenu];
-        _playlistController = VLCMain.sharedInstance.playlistController;
+        _playQueueController = VLCMain.sharedInstance.playQueueController;
     }
     return self;
 }
@@ -135,15 +135,15 @@
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
     if (selectedRow != -1) {
-        [_playlistController playItemAtIndex:selectedRow];
+        [_playQueueController playItemAtIndex:selectedRow];
     } else {
-        [_playlistController startPlaylist];
+        [_playQueueController startPlaylist];
     }
 }
 
 - (void)remove:(id)sender
 {
-    [_playlistController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
+    [_playQueueController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
 }
 
 - (void)showInformationPanel:(id)sender
@@ -157,7 +157,7 @@
 
     [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
         VLCPlayQueueItem * const item =
-            [self->_playlistController.playlistModel playlistItemAtIndex:idx];
+            [self->_playQueueController.playlistModel playlistItemAtIndex:idx];
         if (item == nil) {
             return;
         }
@@ -175,7 +175,7 @@
     if (selectedRow == -1)
         return;
 
-    VLCPlayQueueItem *item = [_playlistController.playlistModel playlistItemAtIndex:selectedRow];
+    VLCPlayQueueItem *item = [_playQueueController.playlistModel playlistItemAtIndex:selectedRow];
     if (item == nil)
         return;
 
@@ -188,7 +188,7 @@
     NSInteger selectedRow = self.playlistTableView.selectedRow;
 
     [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
-        [self->_playlistController addPlaylistItems:files
+        [self->_playQueueController addPlaylistItems:files
                                          atPosition:selectedRow
                                       startPlayback:NO];
     }];
@@ -196,7 +196,7 @@
 
 - (void)clearPlaylist:(id)sender
 {
-    [_playlistController clearPlaylist];
+    [_playQueueController clearPlaylist];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem

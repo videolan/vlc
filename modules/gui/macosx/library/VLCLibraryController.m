@@ -97,7 +97,7 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
         msg_Err(getIntf(), "No input item found for media id %lli", mediaItem.libraryID);
         return VLC_ENOENT;
     }
-    int ret = [VLCMain.sharedInstance.playlistController addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
+    int ret = [VLCMain.sharedInstance.playQueueController addInputItem:p_inputItem atPosition:-1 startPlayback:playImmediately];
     input_item_Release(p_inputItem);
     return ret;
 }

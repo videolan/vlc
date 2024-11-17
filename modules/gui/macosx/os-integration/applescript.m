@@ -50,7 +50,7 @@
             VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
             inputMetadata.MRLString = parameterString;
 
-            [VLCMain.sharedInstance.playlistController addPlaylistItems:@[inputMetadata]];
+            [VLCMain.sharedInstance.playQueueController addPlaylistItems:@[inputMetadata]];
         }
     }
     return nil;
@@ -70,11 +70,11 @@
 
 - (id)performDefaultImplementation
 {
-    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
-    VLCPlayerController *playerController = [playlistController playerController];
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    VLCPlayerController * const playerController = [playQueueController playerController];
 
-    NSString *commandString = [[self commandDescription] commandName];
-    NSString *parameterString = [self directParameter];
+    NSString * const commandString = [[self commandDescription] commandName];
+    NSString * const parameterString = [self directParameter];
 
     if (commandString == nil || commandString.length == 0) {
         return nil;
@@ -85,9 +85,9 @@
     } else if ([commandString isEqualToString:@"stop"]) {
         [playerController stop];
     } else if ([commandString isEqualToString:@"previous"]) {
-        [playlistController playPreviousItem];
+        [playQueueController playPreviousItem];
     } else if ([commandString isEqualToString:@"next"]) {
-        [playlistController playNextItem];
+        [playQueueController playNextItem];
     } else if ([commandString isEqualToString:@"fullscreen"]) {
         [playerController toggleFullscreen];
     } else if ([commandString isEqualToString:@"mute"]) {
@@ -152,9 +152,9 @@
         } else
             [playerController jumpBackwardShort];
     } else if ([commandString isEqualToString:@"incrementPlaybackRate"]) {
-        [VLCMain.sharedInstance.playlistController.playerController incrementPlaybackRate];
+        [VLCMain.sharedInstance.playQueueController.playerController incrementPlaybackRate];
     } else if ([commandString isEqualToString:@"decrementPlaybackRate"]) {
-        [VLCMain.sharedInstance.playlistController.playerController decrementPlaybackRate];
+        [VLCMain.sharedInstance.playQueueController.playerController decrementPlaybackRate];
     } else {
         msg_Err(getIntf(), "Unhandled AppleScript command '%s'", [commandString UTF8String]);
     }
@@ -171,22 +171,22 @@
 
 - (BOOL)scriptFullscreenMode
 {
-    return [VLCMain.sharedInstance.playlistController.playerController fullscreen];
+    return [VLCMain.sharedInstance.playQueueController.playerController fullscreen];
 }
 
 - (void)setScriptFullscreenMode:(BOOL)mode
 {
-    [VLCMain.sharedInstance.playlistController.playerController setFullscreen:mode];
+    [VLCMain.sharedInstance.playQueueController.playerController setFullscreen:mode];
 }
 
 - (BOOL)muted
 {
-    return [VLCMain.sharedInstance.playlistController.playerController mute];
+    return [VLCMain.sharedInstance.playQueueController.playerController mute];
 }
 
 - (BOOL)playing
 {
-    enum vlc_player_state playerState = [VLCMain.sharedInstance.playlistController.playerController playerState];
+    enum vlc_player_state playerState = [VLCMain.sharedInstance.playQueueController.playerController playerState];
 
     if (playerState == VLC_PLAYER_STATE_STARTED || playerState == VLC_PLAYER_STATE_PLAYING) {
         return YES;
@@ -197,62 +197,62 @@
 
 - (float)audioVolume
 {
-    return [VLCMain.sharedInstance.playlistController.playerController volume];
+    return [VLCMain.sharedInstance.playQueueController.playerController volume];
 }
 
 - (void)setAudioVolume:(float)volume
 {
-    [VLCMain.sharedInstance.playlistController.playerController setVolume:volume];
+    [VLCMain.sharedInstance.playQueueController.playerController setVolume:volume];
 }
 
 - (long long)audioDesync
 {
-    return MS_FROM_VLC_TICK([VLCMain.sharedInstance.playlistController.playerController audioDelay]);
+    return MS_FROM_VLC_TICK([VLCMain.sharedInstance.playQueueController.playerController audioDelay]);
 }
 
 - (void)setAudioDesync:(long long)audioDelay
 {
-    [VLCMain.sharedInstance.playlistController.playerController setAudioDelay: VLC_TICK_FROM_MS(audioDelay)];
+    [VLCMain.sharedInstance.playQueueController.playerController setAudioDelay: VLC_TICK_FROM_MS(audioDelay)];
 }
 
 - (int)currentTime
 {
-    return (int)SEC_FROM_VLC_TICK([VLCMain.sharedInstance.playlistController.playerController time]);
+    return (int)SEC_FROM_VLC_TICK([VLCMain.sharedInstance.playQueueController.playerController time]);
 }
 
 - (void)setCurrentTime:(int)currentTime
 {
-    [VLCMain.sharedInstance.playlistController.playerController setTimeFast: VLC_TICK_FROM_SEC(currentTime)];
+    [VLCMain.sharedInstance.playQueueController.playerController setTimeFast: VLC_TICK_FROM_SEC(currentTime)];
 }
 
 - (float)playbackRate
 {
-    return VLCMain.sharedInstance.playlistController.playerController.playbackRate;
+    return VLCMain.sharedInstance.playQueueController.playerController.playbackRate;
 }
 
 - (void)setPlaybackRate:(float)playbackRate
 {
-    [VLCMain.sharedInstance.playlistController.playerController setPlaybackRate:playbackRate];
+    [VLCMain.sharedInstance.playQueueController.playerController setPlaybackRate:playbackRate];
 }
 
 - (NSInteger)durationOfCurrentItem
 {
-    return SEC_FROM_VLC_TICK(VLCMain.sharedInstance.playlistController.playerController.durationOfCurrentMediaItem);
+    return SEC_FROM_VLC_TICK(VLCMain.sharedInstance.playQueueController.playerController.durationOfCurrentMediaItem);
 }
 
 - (NSString *)pathOfCurrentItem
 {
-    return VLCMain.sharedInstance.playlistController.playerController.URLOfCurrentMediaItem.path;
+    return VLCMain.sharedInstance.playQueueController.playerController.URLOfCurrentMediaItem.path;
 }
 
 - (NSString *)nameOfCurrentItem
 {
-    return VLCMain.sharedInstance.playlistController.playerController.nameOfCurrentMediaItem;
+    return VLCMain.sharedInstance.playQueueController.playerController.nameOfCurrentMediaItem;
 }
 
 - (BOOL)playbackShowsMenu
 {
-    const struct vlc_player_title * const currentTitle = VLCMain.sharedInstance.playlistController.playerController.selectedTitle;
+    const struct vlc_player_title * const currentTitle = VLCMain.sharedInstance.playQueueController.playerController.selectedTitle;
     if (currentTitle == NULL) {
         return NO;
     }
@@ -266,50 +266,50 @@
 
 - (BOOL)recordable
 {
-    return VLCMain.sharedInstance.playlistController.playerController.recordable;
+    return VLCMain.sharedInstance.playQueueController.playerController.recordable;
 }
 
 - (BOOL)recordingEnabled
 {
-    return VLCMain.sharedInstance.playlistController.playerController.enableRecording;
+    return VLCMain.sharedInstance.playQueueController.playerController.enableRecording;
 }
 
 - (void)setRecordingEnabled:(BOOL)recordingEnabled
 {
-    [VLCMain.sharedInstance.playlistController.playerController setEnableRecording:recordingEnabled];
+    [VLCMain.sharedInstance.playQueueController.playerController setEnableRecording:recordingEnabled];
 }
 
 - (BOOL)shuffledPlayback
 {
-    const enum vlc_playlist_playback_order playbackOrder = VLCMain.sharedInstance.playlistController.playbackOrder;
+    const enum vlc_playlist_playback_order playbackOrder = VLCMain.sharedInstance.playQueueController.playbackOrder;
     return playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? YES : NO;
 }
 
 - (void)setShuffledPlayback:(BOOL)shuffledPlayback
 {
-    [VLCMain.sharedInstance.playlistController setPlaybackOrder: shuffledPlayback ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
+    [VLCMain.sharedInstance.playQueueController setPlaybackOrder: shuffledPlayback ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL];
 }
 
 - (BOOL)repeatOne
 {
-    const enum vlc_playlist_playback_repeat repeatMode = VLCMain.sharedInstance.playlistController.playbackRepeat;
+    const enum vlc_playlist_playback_repeat repeatMode = VLCMain.sharedInstance.playQueueController.playbackRepeat;
     return repeatMode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT ? YES : NO;
 }
 
 - (void)setRepeatOne:(BOOL)repeatOne
 {
-    [VLCMain.sharedInstance.playlistController setPlaybackRepeat: repeatOne == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
+    [VLCMain.sharedInstance.playQueueController setPlaybackRepeat: repeatOne == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
 }
 
 - (BOOL)repeatAll
 {
-    const enum vlc_playlist_playback_repeat repeatMode = VLCMain.sharedInstance.playlistController.playbackRepeat;
+    const enum vlc_playlist_playback_repeat repeatMode = VLCMain.sharedInstance.playQueueController.playbackRepeat;
     return repeatMode == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL ? YES : NO;
 }
 
 - (void)setRepeatAll:(BOOL)repeatAll
 {
-    [VLCMain.sharedInstance.playlistController setPlaybackRepeat: repeatAll == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
+    [VLCMain.sharedInstance.playQueueController setPlaybackRepeat: repeatAll == YES ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE];
 }
 
 @end

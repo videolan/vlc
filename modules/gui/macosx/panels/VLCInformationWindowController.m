@@ -419,7 +419,7 @@ _##field##TextField.delegate = self
 {
     NSAssert(self.representedInputItems.count == 1, @"Should not be updating stats for many items");
     VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentPlayingItem = playerController.currentMedia;
     VLCInputItem * const firstItem = self.representedInputItems.firstObject;
     NSAssert([currentPlayingItem.MRL isEqualToString:firstItem.MRL],

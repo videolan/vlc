@@ -83,7 +83,7 @@ extern NSString *VLCConfigurationChangedNotification;
 @property (readwrite) VLCLibraryWindowController *libraryWindowController;
 @property (readonly) VLCMainMenu *mainMenu;
 @property (readonly) VLCOpenWindowController *open;
-@property (readonly) VLCPlayQueueController *playlistController;
+@property (readonly) VLCPlayQueueController *playQueueController;
 @property (readonly) VLCPrefs *preferences;
 @property (readonly) VLCSimplePrefsController *simplePreferences;
 @property (readonly) VLCTrackSynchronizationWindowController *trackSyncPanel;

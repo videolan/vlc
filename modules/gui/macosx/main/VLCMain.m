@@ -257,7 +257,7 @@ static VLCMain *sharedInstance = nil;
 
         VLCApplication.sharedApplication.delegate = self;
 
-        _playlistController = [[VLCPlayQueueController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
+        _playQueueController = [[VLCPlayQueueController alloc] initWithPlaylist:vlc_intf_GetMainPlaylist(_p_intf)];
         _libraryController = [[VLCLibraryController alloc] init];
         _continuityController = [[VLCPlaybackContinuityController alloc] init];
 
@@ -274,7 +274,7 @@ static VLCMain *sharedInstance = nil;
         _audioEffectsPanel = [[VLCAudioEffectsWindowController alloc] init];
 
         if ([NSApp currentSystemPresentationOptions] & NSApplicationPresentationFullScreen)
-            [_playlistController.playerController setFullscreen:YES];
+            [_playQueueController.playerController setFullscreen:YES];
     }
 
     return self;
@@ -369,13 +369,13 @@ static VLCMain *sharedInstance = nil;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
     [NSApp activateIgnoringOtherApps:YES];
-    [_playlistController stopPlayback];
+    [_playQueueController stopPlayback];
 }
 
 /* don't be enthusiastic about an update if we currently play a video */
 - (BOOL)updaterMayCheckForUpdates:(SUUpdater *)bundle
 {
-    if ([_playlistController.playerController activeVideoPlayback])
+    if ([_playQueueController.playerController activeVideoPlayback])
         return NO;
 
     return YES;
@@ -448,7 +448,7 @@ static VLCMain *sharedInstance = nil;
         [o_result addObject:inputMetadata];
     }
 
-    [_playlistController addPlaylistItems:o_result];
+    [_playQueueController addPlaylistItems:o_result];
 }
 
 /* When user click in the Dock icon our double click in the finder */

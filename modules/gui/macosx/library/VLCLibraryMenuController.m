@@ -164,7 +164,7 @@
                playImmediately:(BOOL)playImmediately
 {
     NSParameterAssert(inputItem);
-    [VLCMain.sharedInstance.playlistController addInputItem:_representedInputItems.firstObject.vlcInputItem
+    [VLCMain.sharedInstance.playQueueController addInputItem:_representedInputItems.firstObject.vlcInputItem
                                                  atPosition:-1
                                               startPlayback:playImmediately];
 }

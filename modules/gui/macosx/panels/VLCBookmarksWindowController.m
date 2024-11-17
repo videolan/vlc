@@ -143,7 +143,7 @@
     VLCBookmark * const bookmark = [_tableViewDataSource bookmarkForRow:selectedRow];
     vlc_tick_t bookmarkTime = VLC_TICK_FROM_MS(bookmark.bookmarkTime);
 
-    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playQueueController.playerController;
     [playerController setTimeFast:bookmarkTime];
 }
 

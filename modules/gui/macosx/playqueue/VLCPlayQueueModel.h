@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlayQueueModel : NSObject
 
-@property (readwrite, assign) VLCPlayQueueController *playlistController;
+@property (readwrite, assign) VLCPlayQueueController *playQueueController;
 @property (readonly) NSUInteger numberOfPlaylistItems;
 
 - (void)dropExistingData;

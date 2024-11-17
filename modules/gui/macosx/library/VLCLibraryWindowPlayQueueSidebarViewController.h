@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readwrite, nonatomic) NSTextField *counterLabel;
 
-@property (readonly) VLCPlayQueueController *playlistController;
+@property (readonly) VLCPlayQueueController *playQueueController;
 @property (readonly) VLCPlayQueueDataSource *dataSource;
 @property (readonly) VLCPlayQueueSortingMenuController *sortingMenuController;
 

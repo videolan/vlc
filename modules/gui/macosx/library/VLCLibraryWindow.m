@@ -157,7 +157,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     VLCMain *mainInstance = VLCMain.sharedInstance;
-    _playlistController = [mainInstance playlistController];
+    _playQueueController = [mainInstance playQueueController];
 
     libvlc_int_t *libvlc = vlc_object_instance(getIntf());
     var_AddCallback(libvlc, "intf-toggle-fscontrol", ShowFullscreenController, (__bridge void *)self);
@@ -621,7 +621,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
             [metadataArray addObject:inputMetadata];
         }
-        [_playlistController addPlaylistItems:metadataArray];
+        [_playQueueController addPlaylistItems:metadataArray];
 
         return YES;
     }
@@ -653,7 +653,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self enableVideoPlaybackAppearance];
     } else if (!self.videoViewController.view.hidden) {
         // If we are switching to audio media then keep the active main video view open
-        NSURL * const currentMediaUrl = _playlistController.playerController.URLOfCurrentMediaItem;
+        NSURL * const currentMediaUrl = _playQueueController.playerController.URLOfCurrentMediaItem;
         VLCMediaLibraryMediaItem * const mediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:currentMediaUrl];
         const BOOL decorativeViewVisible = mediaItem != nil && mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
 
@@ -667,7 +667,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)playerStateChanged:(NSNotification *)notification
 {
-    if (_playlistController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
+    if (_playQueueController.playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self hideControlsBar];
         return;
     }

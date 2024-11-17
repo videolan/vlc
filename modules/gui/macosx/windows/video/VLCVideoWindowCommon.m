@@ -127,7 +127,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
     o_temp_view = [[NSView alloc] init];
     [o_temp_view setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
-    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _playerController = VLCMain.sharedInstance.playQueueController.playerController;
     _videoViewController = [[VLCMainVideoViewController alloc] init];
 
     [self mediaMetadataChanged:nil];
@@ -144,16 +144,16 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
 
 - (void)mediaMetadataChanged:(NSNotification *)aNotification
 {
-    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
-    VLCInputItem *inputItem = [playlistController currentlyPlayingInputItem];
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    VLCInputItem * const inputItem = [playQueueController currentlyPlayingInputItem];
     if (inputItem == NULL || _playerController.playerState == VLC_PLAYER_STATE_STOPPED) {
         [self setTitle:_NS("VLC media player")];
         self.representedURL = nil;
         return;
     }
 
-    NSString *title = inputItem.title;
-    NSString *nowPlaying = inputItem.nowPlaying;
+    NSString * const title = inputItem.title;
+    NSString * const nowPlaying = inputItem.nowPlaying;
     if (nowPlaying) {
         [self setTitle:[NSString stringWithFormat:@"%@ — %@", title, nowPlaying]];
     } else {

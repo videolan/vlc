@@ -97,7 +97,7 @@ static void bookmarksLibraryCallback(void *p_data, const vlc_ml_event_t *p_event
 
 - (void)setup
 {
-    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _playerController = VLCMain.sharedInstance.playQueueController.playerController;
     _mediaLibrary = vlc_ml_instance_get(getIntf());
     [self updateLibraryItemId];
 

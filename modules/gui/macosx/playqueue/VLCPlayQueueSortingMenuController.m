@@ -28,7 +28,7 @@
 
 @interface VLCPlayQueueSortingMenuController () <NSMenuDelegate>
 {
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
 }
 @end
 
@@ -39,7 +39,7 @@
     self = [super init];
     if (self) {
         [self createMenu];
-        _playlistController = VLCMain.sharedInstance.playlistController;
+        _playQueueController = VLCMain.sharedInstance.playQueueController;
     }
     return self;
 }
@@ -84,7 +84,7 @@
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-    if (_playlistController.unsorted) {
+    if (_playQueueController.unsorted) {
         return;
     }
     NSInteger count = _playlistSortingMenu.numberOfItems;
@@ -93,10 +93,10 @@
         menuItem.state = NSOffState;
     }
 
-    NSMenuItem *menuItem = [_playlistSortingMenu itemWithTag:_playlistController.lastSortKey];
+    NSMenuItem *menuItem = [_playlistSortingMenu itemWithTag:_playQueueController.lastSortKey];
     menuItem.state = NSOnState;
 
-    menuItem = [_playlistSortingMenu itemWithTag:_playlistController.lastSortOrder + 100];
+    menuItem = [_playlistSortingMenu itemWithTag:_playQueueController.lastSortOrder + 100];
     menuItem.state = NSOnState;
 }
 
@@ -104,28 +104,28 @@
 {
     enum vlc_playlist_sort_key sortKey = (enum vlc_playlist_sort_key)[sender tag];
     enum vlc_playlist_sort_order sortOrder;
-    if (_playlistController.unsorted) {
+    if (_playQueueController.unsorted) {
         /* we don't have an order and the user can only do a single selection - pick the most popular */
         sortOrder = VLC_PLAYLIST_SORT_ORDER_ASCENDING;
     } else {
-        sortOrder = _playlistController.lastSortOrder;
+        sortOrder = _playQueueController.lastSortOrder;
     }
 
-    [_playlistController sortByKey:sortKey andOrder:sortOrder];
+    [_playQueueController sortByKey:sortKey andOrder:sortOrder];
 }
 
 - (void)selectSortOrder:(id)sender
 {
     enum vlc_playlist_sort_key sortKey;
     enum vlc_playlist_sort_order sortOrder = (enum vlc_playlist_sort_order)([sender tag] - 100);
-    if (_playlistController.unsorted) {
+    if (_playQueueController.unsorted) {
         /* we don't have a key and the user can only do a single selection - pick the most popular */
         sortKey = VLC_PLAYLIST_SORT_KEY_TITLE;
     } else {
-        sortKey = _playlistController.lastSortKey;
+        sortKey = _playQueueController.lastSortKey;
     }
 
-    [_playlistController sortByKey:sortKey andOrder:sortOrder];
+    [_playQueueController sortByKey:sortKey andOrder:sortOrder];
 }
 
 @end

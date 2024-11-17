@@ -316,9 +316,9 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     }
     inputMetaItem.playbackOptions = options;
 
-    VLCPlayQueueController *playlistController = VLCMain.sharedInstance.playlistController;
-    [playlistController addPlaylistItems:@[inputMetaItem]];
-    [playlistController playItemAtIndex:(playlistController.playlistModel.numberOfPlaylistItems -1)];
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    [playQueueController addPlaylistItems:@[inputMetaItem]];
+    [playQueueController playItemAtIndex:(playQueueController.playlistModel.numberOfPlaylistItems -1)];
 
     [self.window performClose:sender];
 }

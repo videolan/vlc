@@ -123,7 +123,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)updateAtoBLoopState
 {
     VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
 
     _abLoopState = playerController.abLoopState;
     _aToBLoopAMarkPosition = playerController.aLoopPosition;

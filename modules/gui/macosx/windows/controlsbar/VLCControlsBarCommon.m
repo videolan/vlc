@@ -64,7 +64,7 @@
     BOOL just_triggered_next;
     BOOL just_triggered_previous;
 
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
 }
 @end
@@ -75,8 +75,8 @@
 {
     [super awakeFromNib];
 
-    _playlistController = VLCMain.sharedInstance.playlistController;
-    _playerController = _playlistController.playerController;
+    _playQueueController = VLCMain.sharedInstance.playQueueController;
+    _playerController = _playQueueController.playerController;
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -246,7 +246,7 @@
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_bwd_event) >= 0.35) {
         // seems like no further event occurred, so let's switch the playback item
-        [_playlistController playPreviousItem];
+        [_playQueueController playPreviousItem];
         just_triggered_previous = NO;
     }
 }
@@ -281,7 +281,7 @@
 {
     if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) >= 0.35) {
         // seems like no further event occurred, so let's switch the playback item
-        [_playlistController playNextItem];
+        [_playQueueController playNextItem];
         just_triggered_next = NO;
     }
 }
@@ -460,8 +460,8 @@
 
     [self.timeSlider setEnabled: b_seekable];
 
-    [self.forwardButton setEnabled: (b_seekable || _playlistController.hasNextPlaylistItem || b_chapters)];
-    [self.backwardButton setEnabled: (b_seekable || _playlistController.hasPreviousPlaylistItem || b_chapters)];
+    [self.forwardButton setEnabled: (b_seekable || _playQueueController.hasNextPlaylistItem || b_chapters)];
+    [self.backwardButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlaylistItem || b_chapters)];
     [self updateCurrentItemDisplayControls:aNotification];
 }
 

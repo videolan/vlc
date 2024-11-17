@@ -87,13 +87,13 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
     if (_currentInput) {
         /* continue playback where you left off */
-        [self storePlaybackPositionForItem:_currentInput player:VLCMain.sharedInstance.playlistController.playerController];
+        [self storePlaybackPositionForItem:_currentInput player:VLCMain.sharedInstance.playQueueController.playerController];
     }
 }
 
 - (void)inputItemChanged:(NSNotification *)aNotification
 {
-    VLCPlayerController * const playerController = VLCMain.sharedInstance.playlistController.playerController;
+    VLCPlayerController * const playerController = VLCMain.sharedInstance.playQueueController.playerController;
 
     // Cancel pending resume dialogs
     [_resumeDialogController cancel];

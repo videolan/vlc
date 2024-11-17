@@ -65,13 +65,13 @@
     if (!_representedMediaItem ||
         !_representedMediaItem.inputItem ||
         !VLCMain.sharedInstance ||
-        !VLCMain.sharedInstance.playlistController ||
-        !VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem) {
+        !VLCMain.sharedInstance.playQueueController ||
+        !VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem) {
 
         return false;
     }
 
-    return [_representedMediaItem.inputItem.MRL isEqualToString:VLCMain.sharedInstance.playlistController.currentlyPlayingInputItem.MRL];
+    return [_representedMediaItem.inputItem.MRL isEqualToString:VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem.MRL];
 }
 
 - (void)updatePlayState
@@ -83,7 +83,7 @@
 
     NSString *text = @"";
 
-    switch(VLCMain.sharedInstance.playlistController.playerController.playerState) {
+    switch(VLCMain.sharedInstance.playQueueController.playerController.playerState) {
         case VLC_PLAYER_STATE_PAUSED:
             text = @"⏸︎";
             break;

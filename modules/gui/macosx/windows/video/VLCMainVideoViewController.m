@@ -138,7 +138,7 @@
     _audioDecorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self];
     _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
 }
 
@@ -485,7 +485,7 @@
     _voutViewController = [PIPVoutViewController new];
     _voutViewController.view = self.voutContainingView;
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
     
     VLCInputItem * const item = controller.currentMedia;
@@ -561,7 +561,7 @@
 - (void)pipActionPlay:(PIPViewController *)pip
 {
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     if (controller.playerState == VLC_PLAYER_STATE_PAUSED) {
         [controller resume];
     } else {
@@ -572,13 +572,13 @@
 - (void)pipActionStop:(PIPViewController *)pip
 {
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     [controller pause];
 }
 
 - (void)pipActionPause:(PIPViewController *)pip {
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     [controller pause];
 }
 

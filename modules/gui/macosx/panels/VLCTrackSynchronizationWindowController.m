@@ -57,7 +57,7 @@
 
 - (void)windowDidLoad
 {
-    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _playerController = VLCMain.sharedInstance.playQueueController.playerController;
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
                            selector:@selector(updateValues:)

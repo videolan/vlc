@@ -62,7 +62,7 @@
 {
     self.title = @"";
 
-    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _playerController = VLCMain.sharedInstance.playQueueController.playerController;
 
     VLCTrackingView * const trackingView = self.contentView;
     trackingView.viewToHide = self.overlayView;

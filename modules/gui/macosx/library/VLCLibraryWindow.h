@@ -127,7 +127,7 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
 @property (readonly) VLCLibraryAbstractSegmentViewController *librarySegmentViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;
-@property (readonly) VLCPlayQueueController *playlistController;
+@property (readonly) VLCPlayQueueController *playQueueController;
 
 - (void)enableVideoPlaybackAppearance;
 - (void)disableVideoPlaybackAppearance;

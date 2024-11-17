@@ -43,7 +43,7 @@
 
 @interface VLCMainVideoViewControlsBar ()
 {
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
 }
 @end
@@ -66,8 +66,8 @@
     self.videoButton.toolTip = _NS("Video settings");
     self.videoButton.accessibilityLabel = self.videoButton.toolTip;
 
-    _playlistController = VLCMain.sharedInstance.playlistController;
-    _playerController = _playlistController.playerController;
+    _playQueueController = VLCMain.sharedInstance.playQueueController;
+    _playerController = _playQueueController.playerController;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self

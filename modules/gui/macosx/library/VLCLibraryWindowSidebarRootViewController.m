@@ -119,8 +119,8 @@
     [self.viewSelector setLabel:self.playlistSidebarViewController.title
                          forSegment:self.viewSelector.segmentCount - 1];
 
-    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
-    VLCPlayerController * const playerController = playlistController.playerController;
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    VLCPlayerController * const playerController = playQueueController.playerController;
     if (playerController.numberOfTitlesOfCurrentMedia > 0) {
         self.viewSelector.segmentCount++; 
         [self.viewSelector setLabel:self.titlesSidebarViewController.title
@@ -167,8 +167,8 @@
 {
     [self setupViewSelectorSegments];
 
-    VLCPlayQueueController * const playlistController = VLCMain.sharedInstance.playlistController;
-    VLCPlayerController * const playerController = playlistController.playerController;
+    VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
+    VLCPlayerController * const playerController = playQueueController.playerController;
     const BOOL titlesEnabled = playerController.numberOfTitlesOfCurrentMedia > 0;
     const BOOL chaptersEnabled = playerController.numberOfChaptersForCurrentTitle > 0;
     

@@ -103,7 +103,7 @@
 - (void)updateChapterList
 {
     VLCPlayerController * const playerController =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
 
     const struct vlc_player_title * const title = playerController.selectedTitle;
     if (title == NULL) {
@@ -132,7 +132,7 @@
         return;
     }
 
-    [VLCMain.sharedInstance.playlistController.playerController setTimeFast:selectedChapter.time];
+    [VLCMain.sharedInstance.playQueueController.playerController setTimeFast:selectedChapter.time];
 }
 
 - (void)chapterSelectionChanged:(NSNotification *)notification
@@ -143,7 +143,7 @@
 - (void)updateSelectedChapter
 {
     const NSUInteger selectedChapterIndex =
-        VLCMain.sharedInstance.playlistController.playerController.selectedChapterIndex;
+        VLCMain.sharedInstance.playQueueController.playerController.selectedChapterIndex;
     NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:selectedChapterIndex];
     [self.tableView selectRowIndexes:indexSet byExtendingSelection:NO];
 }

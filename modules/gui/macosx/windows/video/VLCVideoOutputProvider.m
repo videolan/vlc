@@ -451,7 +451,7 @@ static int WindowFloatOnTop(vlc_object_t *obj,
 - (VLCVoutView *)setupVoutForWindow:(vlc_window_t *)p_wnd
       withProposedVideoViewPosition:(NSRect)videoViewPosition
 {
-    _playerController = VLCMain.sharedInstance.playlistController.playerController;
+    _playerController = VLCMain.sharedInstance.playQueueController.playerController;
     VLCVideoWindowCommon *newVideoWindow = [self setupVideoWindow];
     VLCVoutView *voutView = newVideoWindow.videoViewController.voutView;
 

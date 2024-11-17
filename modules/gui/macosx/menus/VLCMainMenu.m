@@ -102,7 +102,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCAboutWindowController *_aboutWindowController;
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
-    VLCPlayQueueController *_playlistController;
+    VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
     VLCPlayQueueSortingMenuController *_playlistSortingController;
     VLCInformationWindowController *_infoWindowController;
@@ -126,8 +126,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)awakeFromNib
 {
-    _playlistController = VLCMain.sharedInstance.playlistController;
-    _playerController = _playlistController.playerController;
+    _playQueueController = VLCMain.sharedInstance.playQueueController;
+    _playerController = _playQueueController.playerController;
 
     /* check whether the user runs OSX with a RTL language */
     NSArray *languages = [NSLocale preferredLanguages];
@@ -830,31 +830,31 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)prev:(id)sender
 {
-    [_playlistController playPreviousItem];
+    [_playQueueController playPreviousItem];
 }
 
 - (IBAction)next:(id)sender
 {
-    [_playlistController playNextItem];
+    [_playQueueController playNextItem];
 }
 
 - (IBAction)random:(id)sender
 {
-    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM) {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    if (_playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM) {
+        _playQueueController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
     } else {
-        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+        _playQueueController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
     }
 }
 
 - (IBAction)repeat:(id)sender
 {
-    if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT) {
-        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
-    } else if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL) {
-        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    if (_playQueueController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT) {
+        _playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    } else if (_playQueueController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL) {
+        _playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     } else {
-        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+        _playQueueController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
     }
 }
 
@@ -891,10 +891,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
-    if (_playlistController.actionAfterStop != VLC_PLAYLIST_MEDIA_STOPPED_EXIT) {
-        _playlistController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
+    if (_playQueueController.actionAfterStop != VLC_PLAYLIST_MEDIA_STOPPED_EXIT) {
+        _playQueueController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
     } else {
-        _playlistController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
+        _playQueueController.actionAfterStop = VLC_PLAYLIST_MEDIA_STOPPED_CONTINUE;
     }
 }
 
@@ -939,13 +939,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)toggleLibraryPlaylistMode:(id)sender
 {
-    _playlistController.libraryPlaylistMode = !_playlistController.libraryPlaylistMode;
+    _playQueueController.libraryPlaylistMode = !_playQueueController.libraryPlaylistMode;
     [self updateLibraryPlaylistMode];
 }
 
 - (void)updateLibraryPlaylistMode
 {
-    const BOOL libraryPlaylistMode = _playlistController.libraryPlaylistMode;
+    const BOOL libraryPlaylistMode = _playQueueController.libraryPlaylistMode;
     _libraryPlaylistMode.state = libraryPlaylistMode ? NSOnState : NSOffState;
 }
 
@@ -1348,7 +1348,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)intfOpenFile:(id)sender
 {
     [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
-        [self->_playlistController addPlaylistItems:files];
+        [self->_playQueueController addPlaylistItems:files];
     }];
 }
 
@@ -1382,7 +1382,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_playlistSaveAccessoryText setStringValue: _NS("File Format:")];
     [_playlistSaveAccessoryPopup removeAllItems];
 
-    NSArray *availableExportModules = _playlistController.availablePlaylistExportModules;
+    NSArray *availableExportModules = _playQueueController.availablePlaylistExportModules;
     NSUInteger count = availableExportModules.count;
     NSMutableArray *allowedFileTypes = [NSMutableArray arrayWithCapacity:count];
     for (NSUInteger x = 0; x < count; x++) {
@@ -1407,7 +1407,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             filename = [filename stringByAppendingPathExtension:exportModule.fileExtension];
         }
 
-        [_playlistController exportPlaylistToPath:filename exportModule:exportModule];
+        [_playQueueController exportPlaylistToPath:filename exportModule:exportModule];
     }
 }
 
@@ -1538,7 +1538,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         _infoWindowController.mainMenuInstance = YES;
     }
 
-    _infoWindowController.representedInputItems = @[_playlistController.currentlyPlayingInputItem];
+    _infoWindowController.representedInputItems = @[_playQueueController.currentlyPlayingInputItem];
     [_infoWindowController toggleWindow:sender];
 }
 
@@ -1546,7 +1546,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
-    enum vlc_player_state playerState = [_playlistController playerController].playerState;
+    enum vlc_player_state playerState = [_playQueueController playerController].playerState;
 
     switch (playerState) {
         case VLC_PLAYER_STATE_PLAYING:
@@ -1565,7 +1565,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playModeChanged:(NSNotification *)aNotification
 {
-    enum vlc_playlist_playback_repeat repeatState = _playlistController.playbackRepeat;
+    enum vlc_playlist_playback_repeat repeatState = _playQueueController.playbackRepeat;
     switch (repeatState) {
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
             [self setRepeatAll];
@@ -1583,7 +1583,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playOrderChanged:(NSNotification *)aNotification
 {
-    [_random setState:_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM];
+    [_random setState:_playQueueController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM];
 }
 
 - (void)setPlay
@@ -1930,7 +1930,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (BOOL)validateMenuItem:(NSMenuItem *)mi
 {
     BOOL enabled = YES;
-    VLCInputItem *inputItem = _playlistController.currentlyPlayingInputItem;
+    VLCInputItem *inputItem = _playQueueController.currentlyPlayingInputItem;
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
         if (!inputItem)
@@ -1938,19 +1938,19 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == _previous          ||
                mi == _voutMenuprev      ||
                mi == _dockMenuprevious) {
-        enabled = _playlistController.hasPreviousPlaylistItem;
+        enabled = _playQueueController.hasPreviousPlaylistItem;
     } else if (
                mi == _next              ||
                mi == _voutMenunext      ||
                mi == _dockMenunext) {
-        enabled = _playlistController.hasNextPlaylistItem;
+        enabled = _playQueueController.hasNextPlaylistItem;
     } else if (mi == _record || mi == _voutMenuRecord) {
         enabled = _playerController.recordable;
     } else if (mi == _random) {
-        enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
+        enum vlc_playlist_playback_order playbackOrder = [_playQueueController playbackOrder];
         [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
     } else if (mi == _quitAfterPB) {
-        BOOL state = _playlistController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
+        BOOL state = _playQueueController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
         [mi setState: state ? NSOnState : NSOffState];
     } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
         enabled = _playerController.seekable;

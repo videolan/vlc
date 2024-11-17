@@ -59,7 +59,7 @@
 - (void)updateCoverArt
 {
     VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playlistController.playerController;
+        VLCMain.sharedInstance.playQueueController.playerController;
     if (controller.currentMedia) {
         [VLCLibraryImageCache thumbnailForInputItem:controller.currentMedia 
                                      withCompletion:^(NSImage * const thumbnail) {
