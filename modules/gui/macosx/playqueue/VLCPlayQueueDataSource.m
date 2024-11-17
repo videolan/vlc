@@ -32,11 +32,11 @@
 #import "library/VLCInputItem.h"
 #import "windows/VLCOpenInputMetadata.h"
 
-static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
+static NSString *VLCPlayQueueCellIdentifier = @"VLCPlayQueueCellIdentifier";
 
 @interface VLCPlayQueueDataSource ()
 {
-    VLCPlayQueueModel *_playlistModel;
+    VLCPlayQueueModel *_playQueueModel;
 }
 @end
 
@@ -45,14 +45,14 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 - (void)setPlayQueueController:(VLCPlayQueueController *)playQueueController
 {
     _playQueueController = playQueueController;
-    _playlistModel = _playQueueController.playlistModel;
+    _playQueueModel = _playQueueController.playQueueModel;
 }
 
 - (void)setCounterTextField:(NSTextField *)counterTextField
 {
     _counterTextField = counterTextField;
     self.counterTextField.stringValue =
-        [NSString stringWithFormat:@"%lu", _playlistModel.numberOfPlaylistItems];
+        [NSString stringWithFormat:@"%lu", _playQueueModel.numberOfPlayQueueItems];
 }
 
 - (void)prepareForUse
@@ -62,12 +62,13 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return _playlistModel.numberOfPlaylistItems;
+    return _playQueueModel.numberOfPlayQueueItems;
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCPlayQueueTableCellView *cellView = [tableView makeViewWithIdentifier:VLCPlaylistCellIdentifier owner:self];
+    VLCPlayQueueTableCellView *cellView =
+        [tableView makeViewWithIdentifier:VLCPlayQueueCellIdentifier owner:self];
 
     if (cellView == nil) {
         /* the following code saves us an instance of NSViewController which we don't need */
@@ -84,33 +85,33 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
                 break;
             }
         }
-        cellView.identifier = VLCPlaylistCellIdentifier;
+        cellView.identifier = VLCPlayQueueCellIdentifier;
     }
 
-    VLCPlayQueueItem *item = [_playlistModel playlistItemAtIndex:row];
+    VLCPlayQueueItem * const item = [_playQueueModel playQueueItemAtIndex:row];
     if (!item) {
         msg_Err(getIntf(), "playlist model did not return an item for representation");
         return cellView;
     }
 
-    cellView.representedPlaylistItem = item;
-    cellView.representsCurrentPlaylistItem = _playQueueController.currentPlaylistIndex == row;
+    cellView.representedPlayQueueItem = item;
+    cellView.representsCurrentPlayQueueItem = _playQueueController.currentPlayQueueIndex == row;
 
     return cellView;
 }
 
-- (void)playlistUpdated
+- (void)playQueueUpdated
 {
-    NSUInteger numberOfPlaylistItems = _playlistModel.numberOfPlaylistItems;
-    self.dragDropView.hidden = numberOfPlaylistItems > 0 ? YES : NO;
-    self.counterTextField.stringValue = [NSString stringWithFormat:@"%lu", numberOfPlaylistItems];
+    const NSUInteger numberOfPlayQueueItems = _playQueueModel.numberOfPlayQueueItems;
+    self.dragDropView.hidden = numberOfPlayQueueItems > 0 ? YES : NO;
+    self.counterTextField.stringValue = [NSString stringWithFormat:@"%lu", numberOfPlayQueueItems];
     [_tableView reloadData];
 }
 
 - (id<NSPasteboardWriting>)tableView:(NSTableView *)tableView pasteboardWriterForRow:(NSInteger)row
 {
-    NSPasteboardItem *pboardItem = [[NSPasteboardItem alloc] init];
-    VLCPlayQueueItem *playlistItem = [_playlistModel playlistItemAtIndex:row];
+    NSPasteboardItem * const pboardItem = [[NSPasteboardItem alloc] init];
+    VLCPlayQueueItem * const playlistItem = [_playQueueModel playQueueItemAtIndex:row];
     [pboardItem setString:[@(playlistItem.uniqueID) stringValue] forType:VLCPlaylistItemPasteboardType];
     return pboardItem;
 }
@@ -162,7 +163,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
                 inputMetadata.MRLString = url.absoluteString;
                 [metadataArray addObject:inputMetadata];
             }
-            [_playQueueController addPlaylistItems:metadataArray];
+            [_playQueueController addPlayQueueItems:metadataArray];
 
             return YES;
         }
@@ -189,9 +190,9 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     return YES;
 }
 
-- (void)scrollToCurrentPlaylistItem
+- (void)scrollToCurrentPlayQueueItem
 {
-    [_tableView scrollRowToVisible:_playQueueController.currentPlaylistIndex];
+    [_tableView scrollRowToVisible:_playQueueController.currentPlayQueueIndex];
 }
 
 @end

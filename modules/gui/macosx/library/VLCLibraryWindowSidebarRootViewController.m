@@ -61,12 +61,12 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self setupPlaylistTitle];
+    [self setupPlayQueueTitle];
     [self setupCounterLabel];
 
     self.mainVideoModeEnabled = NO;
 
-    _playlistSidebarViewController =
+    _playQueueSidebarViewController =
         [[VLCLibraryWindowPlayQueueSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
     _chaptersSidebarViewController =
         [[VLCLibraryWindowChaptersSidebarViewController alloc] initWithLibraryWindow:self.libraryWindow];
@@ -90,34 +90,34 @@
                              object:nil];
 }
 
-- (void)setupPlaylistTitle
+- (void)setupPlayQueueTitle
 {
-    _playlistHeaderLabel = [[NSTextField alloc] init];
-    self.playlistHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.playlistHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
-    self.playlistHeaderLabel.editable = NO;
-    self.playlistHeaderLabel.bezeled = NO;
-    self.playlistHeaderLabel.drawsBackground = NO;
-    self.playlistHeaderLabel.textColor = NSColor.headerTextColor;
+    _playQueueHeaderLabel = [[NSTextField alloc] init];
+    self.playQueueHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.playQueueHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.playQueueHeaderLabel.editable = NO;
+    self.playQueueHeaderLabel.bezeled = NO;
+    self.playQueueHeaderLabel.drawsBackground = NO;
+    self.playQueueHeaderLabel.textColor = NSColor.headerTextColor;
 
-    [self.view addSubview:self.playlistHeaderLabel];
-    _playlistHeaderTopConstraint = 
-        [self.playlistHeaderLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor
-                                                           constant:VLCLibraryUIUnits.smallSpacing];
+    [self.view addSubview:self.playQueueHeaderLabel];
+    _playQueueHeaderTopConstraint = 
+        [self.playQueueHeaderLabel.topAnchor constraintEqualToAnchor:self.view.topAnchor
+                                                            constant:VLCLibraryUIUnits.smallSpacing];
     [NSLayoutConstraint activateConstraints:@[
-        self.playlistHeaderTopConstraint,
-        [self.playlistHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
-                                                              constant:-VLCLibraryUIUnits.smallSpacing],
-        [self.playlistHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
-                                                               constant:VLCLibraryUIUnits.largeSpacing] 
+        self.playQueueHeaderTopConstraint,
+        [self.playQueueHeaderLabel.bottomAnchor constraintEqualToAnchor:self.targetView.topAnchor
+                                                               constant:-VLCLibraryUIUnits.smallSpacing],
+        [self.playQueueHeaderLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor
+                                                                constant:VLCLibraryUIUnits.largeSpacing] 
     ]];
 }
 
 - (void)setupViewSelectorSegments
 {
     self.viewSelector.segmentCount = 1;
-    [self.viewSelector setLabel:self.playlistSidebarViewController.title
-                         forSegment:self.viewSelector.segmentCount - 1];
+    [self.viewSelector setLabel:self.playQueueSidebarViewController.title
+                     forSegment:self.viewSelector.segmentCount - 1];
 
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
     VLCPlayerController * const playerController = playQueueController.playerController;
@@ -146,7 +146,7 @@
     [self.view addSubview:self.counterLabel];
 
     _counterLabelInHeaderConstraint = 
-        [self.counterLabel.centerYAnchor constraintEqualToAnchor:self.playlistHeaderLabel.centerYAnchor];
+        [self.counterLabel.centerYAnchor constraintEqualToAnchor:self.playQueueHeaderLabel.centerYAnchor];
     _counterLabelInChildViewConstraint =
         [self.counterLabel.topAnchor constraintEqualToAnchor:self.targetView.topAnchor
                                                     constant:VLCLibraryUIUnits.smallSpacing];
@@ -175,12 +175,12 @@
     self.viewSelector.hidden = !chaptersEnabled && !titlesEnabled;
     self.topInternalConstraint.active = !self.viewSelector.hidden;
 
-    const NSLayoutPriority playlistCompressionPriority =
+    const NSLayoutPriority playQueueCompressionPriority =
         self.viewSelector.hidden ? NSLayoutPriorityDefaultLow : NSLayoutPriorityRequired;
-    self.playlistHeaderLabel.hidden = chaptersEnabled;
-    [self.playlistHeaderLabel setContentCompressionResistancePriority:playlistCompressionPriority
-                                                       forOrientation:NSLayoutConstraintOrientationVertical];
-    self.playlistHeaderTopConstraint.active = !self.playlistHeaderLabel.hidden;
+    self.playQueueHeaderLabel.hidden = chaptersEnabled;
+    [self.playQueueHeaderLabel setContentCompressionResistancePriority:playQueueCompressionPriority
+                                                        forOrientation:NSLayoutConstraintOrientationVertical];
+    self.playQueueHeaderTopConstraint.active = !self.playQueueHeaderLabel.hidden;
 
     NSLayoutConstraint * const counterLabelConstraintToActivate = self.viewSelector.hidden
         ? self.counterLabelInHeaderConstraint
@@ -204,8 +204,8 @@
     NSParameterAssert(sender == self.viewSelector);
     const NSInteger selectedSegment = self.viewSelector.selectedSegment;
     NSString * const selectedSegmentLabel = [self.viewSelector labelForSegment:selectedSegment];
-    if ([selectedSegmentLabel isEqualToString:self.playlistSidebarViewController.title]) {
-        [self setChildViewController:self.playlistSidebarViewController];
+    if ([selectedSegmentLabel isEqualToString:self.playQueueSidebarViewController.title]) {
+        [self setChildViewController:self.playQueueSidebarViewController];
     } else if ([selectedSegmentLabel isEqualToString:self.titlesSidebarViewController.title]) {
         [self setChildViewController:self.titlesSidebarViewController];
     } else if ([selectedSegmentLabel isEqualToString:self.chaptersSidebarViewController.title]) {
@@ -225,7 +225,7 @@
         viewController.counterLabel = self.counterLabel;
     }
 
-    self.playlistHeaderLabel.stringValue = viewController.title;
+    self.playQueueHeaderLabel.stringValue = viewController.title;
 
     NSView * const view = viewController.view;
     self.targetView.subviews = @[view];
@@ -247,7 +247,7 @@
         internalTopConstraintConstant += self.libraryWindow.titlebarHeight;
     }
     self.topInternalConstraint.constant = internalTopConstraintConstant;
-    self.playlistHeaderTopConstraint.constant = internalTopConstraintConstant;
+    self.playQueueHeaderTopConstraint.constant = internalTopConstraintConstant;
 }
 
 @end

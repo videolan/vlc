@@ -418,7 +418,7 @@ NSString *const VLCOpenTextFieldWasClicked = @"VLCOpenTextFieldWasClicked";
     /* apply the options to our item(s) */
     inputMetadata.playbackOptions = options;
 
-    [VLCMain.sharedInstance.playQueueController addPlaylistItems:@[inputMetadata]];
+    [VLCMain.sharedInstance.playQueueController addPlayQueueItems:@[inputMetadata]];
 }
 
 - (void)addSubtitleOptionsToArray:(NSMutableArray *)options

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlayQueueTableView.m: table view subclass for the playlist
+ * VLCPlayQueueTableView.m: table view subclass for the play queue
  *****************************************************************************
  * Copyright (C) 2003-2019 VLC authors and VideoLAN
  *
@@ -41,15 +41,15 @@
 {
     if (self.menuController == nil) {
         _menuController = [[VLCPlayQueueMenuController alloc] init];
-        self.menuController.playlistTableView = self;
+        self.menuController.playQueueTableView = self;
     }
 
-    NSPoint pt = [self convertPoint: [event locationInWindow] fromView: nil];
-    NSInteger row = [self rowAtPoint:pt];
+    const NSPoint pt = [self convertPoint: [event locationInWindow] fromView: nil];
+    const NSInteger row = [self rowAtPoint:pt];
     if (row != -1 && ![[self selectedRowIndexes] containsIndex: row])
         [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 
-    return self.menuController.playlistMenu;
+    return self.menuController.playQueueMenu;
 }
 
 - (void)keyDown:(NSEvent *)event

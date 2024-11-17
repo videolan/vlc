@@ -46,7 +46,7 @@
 
 - (void)createMenu
 {
-    _playlistSortingMenu = [[NSMenu alloc] init];
+    _playQueueSortingMenu = [[NSMenu alloc] init];
 
     NSArray *titles = @[_NS("Title"),
                         _NS("Duration"),
@@ -64,10 +64,10 @@
         NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:titles[x] action:@selector(selectSortKey:) keyEquivalent:@""];
         menuItem.target = self;
         menuItem.tag = x;
-        [_playlistSortingMenu addItem:menuItem];
+        [_playQueueSortingMenu addItem:menuItem];
     }
 
-    [_playlistSortingMenu addItem:[NSMenuItem separatorItem]];
+    [_playQueueSortingMenu addItem:[NSMenuItem separatorItem]];
 
     titles = @[_NS("Ascending"),
                _NS("Descending")];
@@ -76,10 +76,10 @@
         NSMenuItem *menuItem = [[NSMenuItem alloc] initWithTitle:titles[x] action:@selector(selectSortOrder:) keyEquivalent:@""];
         menuItem.target = self;
         menuItem.tag = x + 100;
-        [_playlistSortingMenu addItem:menuItem];
+        [_playQueueSortingMenu addItem:menuItem];
     }
 
-    _playlistSortingMenu.delegate = self;
+    _playQueueSortingMenu.delegate = self;
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
@@ -87,16 +87,16 @@
     if (_playQueueController.unsorted) {
         return;
     }
-    NSInteger count = _playlistSortingMenu.numberOfItems;
+    NSInteger count = _playQueueSortingMenu.numberOfItems;
     for (NSInteger x = 0; x < count; x++) {
-        NSMenuItem *menuItem = [_playlistSortingMenu itemAtIndex:x];
+        NSMenuItem *menuItem = [_playQueueSortingMenu itemAtIndex:x];
         menuItem.state = NSOffState;
     }
 
-    NSMenuItem *menuItem = [_playlistSortingMenu itemWithTag:_playQueueController.lastSortKey];
+    NSMenuItem *menuItem = [_playQueueSortingMenu itemWithTag:_playQueueController.lastSortKey];
     menuItem.state = NSOnState;
 
-    menuItem = [_playlistSortingMenu itemWithTag:_playQueueController.lastSortOrder + 100];
+    menuItem = [_playQueueSortingMenu itemWithTag:_playQueueController.lastSortOrder + 100];
     menuItem.state = NSOnState;
 }
 

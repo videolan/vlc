@@ -202,8 +202,8 @@
     // FIXME: re-add chapter navigation as needed
     bool b_chapters = false;
 
-    [self.prevButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlaylistItem || b_chapters)];
-    [self.nextButton setEnabled: (b_seekable || _playQueueController.hasNextPlaylistItem || b_chapters)];
+    [self.prevButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlayQueueItem || b_chapters)];
+    [self.nextButton setEnabled: (b_seekable || _playQueueController.hasNextPlayQueueItem || b_chapters)];
     [self updateCurrentItemDisplayControls:aNotification];
 }
 

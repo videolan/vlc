@@ -54,8 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)openMedia:(id)sender;
 - (IBAction)shuffleAction:(id)sender;
 - (IBAction)repeatAction:(id)sender;
-- (IBAction)sortPlaylist:(id)sender;
-- (IBAction)clearPlaylist:(id)sender;
+- (IBAction)sortPlayQueue:(id)sender;
+- (IBAction)clearPlayQueue:(id)sender;
 
 @end
 

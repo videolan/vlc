@@ -227,7 +227,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     MPRemoteCommandCenter *cc = [MPRemoteCommandCenter sharedCommandCenter];
 
     if (event.command == cc.playCommand) {
-        return [_playQueueController startPlaylist] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
+        return [_playQueueController startPlayQueue] ? MPRemoteCommandHandlerStatusSuccess : MPRemoteCommandHandlerStatusNoActionableNowPlayingItem;
     }
     if (event.command == cc.pauseCommand) {
         [_playQueueController pausePlayback];

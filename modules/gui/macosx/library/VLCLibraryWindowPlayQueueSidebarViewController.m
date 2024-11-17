@@ -60,7 +60,7 @@
     self.dataSource.dragDropView = self.dragDropView;
     self.dataSource.counterTextField = self.counterLabel;
     [self.dataSource prepareForUse];
-    self.playQueueController.playlistDataSource = self.dataSource;
+    self.playQueueController.playQueueDataSource = self.dataSource;
 
     self.tableView.dataSource = self.dataSource;
     self.tableView.delegate = self.dataSource;
@@ -224,19 +224,19 @@
     }
 }
 
-- (IBAction)sortPlaylist:(id)sender
+- (IBAction)sortPlayQueue:(id)sender
 {
     if (!self.sortingMenuController) {
         _sortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     }
-    [NSMenu popUpContextMenu:self.sortingMenuController.playlistSortingMenu
+    [NSMenu popUpContextMenu:self.sortingMenuController.playQueueSortingMenu
                    withEvent:NSApp.currentEvent
                      forView:sender];
 }
 
-- (IBAction)clearPlaylist:(id)sender
+- (IBAction)clearPlayQueue:(id)sender
 {
-    [self.playQueueController clearPlaylist];
+    [self.playQueueController clearPlayQueue];
 }
 
 @end

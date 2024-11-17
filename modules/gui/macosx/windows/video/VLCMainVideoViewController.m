@@ -81,7 +81,7 @@
 {
     NSTimer *_hideControlsTimer;
     NSLayoutConstraint *_returnButtonBottomConstraint;
-    NSLayoutConstraint *_playlistButtonBottomConstraint;
+    NSLayoutConstraint *_playQueueButtonBottomConstraint;
     PIPViewController *_pipViewController;
     PIPVoutViewController *_voutViewController;
 
@@ -158,7 +158,7 @@
     _autohideControls = YES;
 
     [self setDisplayLibraryControls:NO];
-    [self updatePlaylistToggleState];
+    [self updatePlayQueueToggleState];
     [self updateLibraryControls];
 
     _returnButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_returnButton
@@ -168,16 +168,16 @@
                                                                  attribute:NSLayoutAttributeBottom
                                                                 multiplier:1.
                                                                   constant:0];
-    _playlistButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_playlistButton
-                                                                   attribute:NSLayoutAttributeBottom
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:_fakeTitleBar
-                                                                   attribute:NSLayoutAttributeBottom
-                                                                  multiplier:1.
-                                                                    constant:0];
+    _playQueueButtonBottomConstraint = [NSLayoutConstraint constraintWithItem:_playQueueButton
+                                                                    attribute:NSLayoutAttributeBottom
+                                                                    relatedBy:NSLayoutRelationEqual
+                                                                       toItem:_fakeTitleBar
+                                                                    attribute:NSLayoutAttributeBottom
+                                                                   multiplier:1.
+                                                                     constant:0];
 
     _returnButtonBottomConstraint.active = NO;
-    _playlistButtonBottomConstraint.active = NO;
+    _playQueueButtonBottomConstraint.active = NO;
 
     [self setupAudioDecorativeView];
     [self.controlsBar update];
@@ -274,7 +274,7 @@
     return [_centralControlsStackView mouse:mousePos inRect:_centralControlsStackView.frame] ||
         [_controlsBar.bottomBarView mouse:mousePos inRect: _controlsBar.bottomBarView.frame] ||
         [_returnButton mouse:mousePos inRect: _returnButton.frame] ||
-        [_playlistButton mouse:mousePos inRect: _playlistButton.frame];
+        [_playQueueButton mouse:mousePos inRect: _playQueueButton.frame];
 }
 
 - (void)stopAutohideTimer
@@ -345,7 +345,7 @@
 - (void)showControls
 {
     [self stopAutohideTimer];
-    [self updatePlaylistToggleState];
+    [self updatePlayQueueToggleState];
     [self updateLibraryControls];
 
     if (!_autohideControls) {
@@ -368,17 +368,17 @@
     _displayLibraryControls = displayLibraryControls;
 
     _returnButton.hidden = !displayLibraryControls;
-    _playlistButton.hidden = !displayLibraryControls;
+    _playQueueButton.hidden = !displayLibraryControls;
 }
 
-- (void)updatePlaylistToggleState
+- (void)updatePlayQueueToggleState
 {
     // TODO: Rename playlist stuff
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
         NSView * const sidebarView =
             libraryWindow.splitViewController.multifunctionSidebarViewController.view;
-        self.playlistButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:sidebarView] ?
+        self.playQueueButton.state = [libraryWindow.mainSplitView isSubviewCollapsed:sidebarView] ?
             NSControlStateValueOff : NSControlStateValueOn;
     }
 }
@@ -425,9 +425,9 @@
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
 
     _returnButtonTopConstraint.constant = buttonTopSpace;
-    _playlistButtonTopConstraint.constant = buttonTopSpace;
+    _playQueueButtonTopConstraint.constant = buttonTopSpace;
     _returnButtonBottomConstraint.active = placeInFakeToolbar;
-    _playlistButtonBottomConstraint.active = placeInFakeToolbar;
+    _playQueueButtonBottomConstraint.active = placeInFakeToolbar;
 
     NSControlSize buttonSize = NSControlSizeRegular;
 
@@ -441,27 +441,27 @@
         buttonSize = NSControlSizeMini;
     }
 
-    NSControlSize previousButtonSize = _playlistButton.controlSize;
+    NSControlSize previousButtonSize = _playQueueButton.controlSize;
     _returnButton.controlSize = buttonSize;
-    _playlistButton.controlSize = buttonSize;
+    _playQueueButton.controlSize = buttonSize;
 
     // HACK: Upon changing the control size the actual highlight of toggled/hovered buttons doesn't change
     // properly, at least for recessed buttons. This is most obvious on the toggleable playlist button.
     // So reset the state and then retoggle once done.
     if (previousButtonSize != buttonSize) {
-        NSControlStateValue returnButtonControlState = _returnButton.state;
-        NSControlStateValue playlistButtonControlState = _playlistButton.state;
+        const NSControlStateValue returnButtonControlState = _returnButton.state;
+        const NSControlStateValue playQueueButtonControlState = _playQueueButton.state;
         _returnButton.state = NSControlStateValueOff;
-        _playlistButton.state = NSControlStateValueOff;
+        _playQueueButton.state = NSControlStateValueOff;
         _returnButton.state = returnButtonControlState;
-        _playlistButton.state = playlistButtonControlState;
+        _playQueueButton.state = playQueueButtonControlState;
     }
 
-    const CGFloat realButtonSpace = (windowTitlebarHeight - _playlistButton.cell.cellSize.height) / 2;
+    const CGFloat realButtonSpace = (windowTitlebarHeight - _playQueueButton.cell.cellSize.height) / 2;
     const NSRect windowButtonBox = [self windowButtonsRect];
 
     _returnButtonLeadingConstraint.constant = placeInFakeToolbar ? windowButtonBox.size.width + VLCLibraryUIUnits.mediumSpacing + realButtonSpace : VLCLibraryUIUnits.largeSpacing;
-    _playlistButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCLibraryUIUnits.largeSpacing;
+    _playQueueButtonTrailingConstraint.constant = placeInFakeToolbar ? realButtonSpace: VLCLibraryUIUnits.largeSpacing;
 
     _overlayView.drawGradientForTopControls = !placeInFakeToolbar;
     [_overlayView setNeedsDisplay:YES];
@@ -514,7 +514,7 @@
     }
 }
 
-- (IBAction)togglePlaylist:(id)sender
+- (IBAction)togglePlayQueue:(id)sender
 {
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil) {

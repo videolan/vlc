@@ -162,10 +162,10 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
     }
 }
 
-+ (void)thumbnailForPlaylistItem:(VLCPlayQueueItem *)playlistItem 
++ (void)thumbnailForPlayQueueItem:(VLCPlayQueueItem *)playQueueItem
                   withCompletion:(nonnull void (^)(const NSImage * _Nonnull))completionHandler
 {
-    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playlistItem.inputItem 
+    return [VLCLibraryImageCache.sharedImageCache imageForInputItem:playQueueItem.inputItem
                                                      withCompletion:completionHandler];
 }
 

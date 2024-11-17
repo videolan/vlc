@@ -76,7 +76,7 @@ int  WindowOpen   (vlc_window_t *);
 #define DISPLAY_STATUS_ICONMENU_TEXT N_("Display VLC status menu icon")
 #define DISPLAY_STATUS_ICONMENU_LONGTEXT N_("By default, VLC will show the statusbar icon menu. However, you can choose to disable it (restart required).")
 
-#define USE_APPLE_REMOTE_PREVNEXT_TEXT N_("Control playlist items with the Apple Remote")
+#define USE_APPLE_REMOTE_PREVNEXT_TEXT N_("Control play queue items with the Apple Remote")
 #define USE_APPLE_REMOTE_PREVNEXT_LONGTEXT N_("By default, VLC will allow you to switch to the next or previous item with the Apple Remote. You can disable this behavior with this option.")
 
 #define USE_MEDIAKEYS_TEXT N_("Control playback with media keys")

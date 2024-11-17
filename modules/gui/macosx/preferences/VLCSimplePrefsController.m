@@ -404,7 +404,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_intf_largeFontInListsCheckbox setTitle: _NS("Use large text for list views")];
 
     [_intf_playbackBehaviourBox setTitle:_NS("Playback behaviour")];
-    [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on playlist item change")];
+    [_intf_enableNotificationsCheckbox setTitle: _NS("Enable notifications on play queue item change")];
     [_intf_pauseitunesLabel setStringValue:_NS("Control external music players")];
 
     [_intf_networkBox setTitle: _NS("Privacy / Network Interaction")];
@@ -905,7 +905,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [alert setMessageText:_NS("Reset Preferences")];
     [alert setInformativeText:_NS("This will reset VLC media player's preferences.\n\n"
                                   "Note that VLC will restart during the process, so your current "
-                                  "playlist will be emptied and eventual playback, streaming or "
+                                  "play queue will be emptied and eventual playback, streaming or "
                                   "transcoding activities will stop immediately.\n\n"
                                   "The Media Library will not be affected.\n\n"
                                   "Are you sure you want to continue?")];

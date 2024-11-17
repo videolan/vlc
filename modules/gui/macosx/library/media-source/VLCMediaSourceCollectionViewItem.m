@@ -109,7 +109,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     _mediaTitleTextField.stringValue = @"";
     _annotationTextField.hidden = YES;
     _mediaImageView.image = nil;
-    _addToPlaylistButton.hidden = NO;
+    _addToPlayQueueButton.hidden = NO;
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
@@ -159,7 +159,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     [VLCMain.sharedInstance.playQueueController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:YES];
 }
 
-- (IBAction)addToPlaylist:(id)sender
+- (IBAction)addToPlayQueue:(id)sender
 {
     [VLCMain.sharedInstance.playQueueController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:NO];
 }

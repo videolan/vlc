@@ -68,12 +68,12 @@
                                    name:VLCConfigurationChangedNotification
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(playlistUpdated:)
-                                   name:VLCPlaylistItemsAdded
+                               selector:@selector(playQueueUpdated:)
+                                   name:VLCPlayQueueItemsAdded
                                  object:nil];
         [notificationCenter addObserver:self
-                               selector:@selector(playlistUpdated:)
-                                   name:VLCPlaylistItemsRemoved
+                               selector:@selector(playQueueUpdated:)
+                                   name:VLCPlayQueueItemsRemoved
                                  object:nil];
 
         /* init Apple Remote support */
@@ -118,7 +118,7 @@
         _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
     VLCMain * const main = VLCMain.sharedInstance;
-    if (b_mediaKeySupport && (main.playQueueController.playlistModel.numberOfPlaylistItems > 0)) {
+    if (b_mediaKeySupport && (main.playQueueController.playQueueModel.numberOfPlayQueueItems > 0)) {
         if (!b_mediaKeyTrapEnabled) {
             [self enableMediaKeySupport];
         }
@@ -149,13 +149,13 @@
     [_mediaKeyController stopWatchingMediaKeys];
 }
 
-- (void)playlistUpdated:(NSNotification *)aNotification
+- (void)playQueueUpdated:(NSNotification *)aNotification
 {
     if (!_mediaKeyController) {
         return;
     }
 
-    BOOL numberOfMediaLargerThanZero = [[VLCMain.sharedInstance.playQueueController playlistModel] numberOfPlaylistItems] > 0;
+    BOOL numberOfMediaLargerThanZero = VLCMain.sharedInstance.playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
 
     if (b_mediaKeyTrapEnabled && !numberOfMediaLargerThanZero) {
         [self disableMediaKeySupport];

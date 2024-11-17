@@ -370,7 +370,7 @@ NSString *VLCWindowShouldShowController = @"VLCWindowShouldShowController";
         [o_fullscreen_window setFullscreen: YES];
         [o_fullscreen_window setAcceptsMouseMovedEvents:YES];
 
-        /* Make sure video view gets visible in case the playlist was visible before */
+        /* Make sure video view gets visible in case the play queue was visible before */
         b_video_view_was_hidden = [_videoViewController.view isHidden];
         [_videoViewController.view setHidden: NO];
         _videoViewController.view.translatesAutoresizingMaskIntoConstraints = YES;

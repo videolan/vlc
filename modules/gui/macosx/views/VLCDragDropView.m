@@ -45,7 +45,7 @@
     return self;
 }
 
-- (void)enablePlaylistItems
+- (void)enablePlayQueueItems
 {
     [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
 }

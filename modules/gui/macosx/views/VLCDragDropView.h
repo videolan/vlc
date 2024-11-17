@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) id<VLCDragDropTarget> dropTarget;
 @property (nonatomic, assign) BOOL drawBorder;
 
-- (void)enablePlaylistItems;
+- (void)enablePlayQueueItems;
 
 @end
 

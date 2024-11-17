@@ -460,8 +460,8 @@
 
     [self.timeSlider setEnabled: b_seekable];
 
-    [self.forwardButton setEnabled: (b_seekable || _playQueueController.hasNextPlaylistItem || b_chapters)];
-    [self.backwardButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlaylistItem || b_chapters)];
+    [self.forwardButton setEnabled: (b_seekable || _playQueueController.hasNextPlayQueueItem || b_chapters)];
+    [self.backwardButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlayQueueItem || b_chapters)];
     [self updateCurrentItemDisplayControls:aNotification];
 }
 

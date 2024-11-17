@@ -48,7 +48,7 @@ extern NSString *VLCLibraryCellIdentifier;
 @property (readwrite, weak) IBOutlet NSTextField *secondaryInfoTextField;
 @property (readwrite, weak) IBOutlet VLCImageView *mediaImageView;
 @property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
-@property (readwrite, weak) IBOutlet NSButton *addToPlaylistButton;
+@property (readwrite, weak) IBOutlet NSButton *addToPlayQueueButton;
 @property (readwrite, weak) IBOutlet VLCLinearProgressIndicator *progressIndicator;
 @property (readwrite, weak) IBOutlet NSBox *highlightBox;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *imageViewAspectRatioConstraint;

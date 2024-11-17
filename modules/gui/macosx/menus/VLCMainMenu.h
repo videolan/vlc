@@ -87,8 +87,8 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *random;
 @property (readwrite, weak) IBOutlet NSMenuItem *repeat;
 @property (readwrite, weak) IBOutlet NSMenuItem *AtoBloop;
-@property (readwrite, weak) IBOutlet NSMenuItem *libraryPlaylistMode;
-@property (readwrite, weak) IBOutlet NSMenuItem *sortPlaylist;
+@property (readwrite, weak) IBOutlet NSMenuItem *libraryPlayQueueMode;
+@property (readwrite, weak) IBOutlet NSMenuItem *sortPlayQueue;
 @property (readwrite, weak) IBOutlet NSMenuItem *quitAfterPB;
 @property (readwrite, weak) IBOutlet NSMenuItem *fwd;
 @property (readwrite, weak) IBOutlet NSMenuItem *bwd;
@@ -179,7 +179,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *audioeffects;
 @property (readwrite, weak) IBOutlet NSMenuItem *videoeffects;
 @property (readwrite, weak) IBOutlet NSMenuItem *bookmarks;
-@property (readwrite, weak) IBOutlet NSMenuItem *playlist;
+@property (readwrite, weak) IBOutlet NSMenuItem *playQueue;
 @property (readwrite, weak) IBOutlet NSMenuItem *detachedAudioWindow;
 @property (readwrite, weak) IBOutlet NSMenuItem *info;
 @property (readwrite, weak) IBOutlet NSMenuItem *errorsAndWarnings;
@@ -259,7 +259,7 @@
 - (IBAction)toggleRecord:(id)sender;
 - (IBAction)setPlaybackRate:(id)sender;
 - (IBAction)toggleAtoBloop:(id)sender;
-- (IBAction)toggleLibraryPlaylistMode:(id)sender;
+- (IBAction)toggleLibraryPlayQueueMode:(id)sender;
 - (IBAction)selectRenderer:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
@@ -291,6 +291,6 @@
 - (IBAction)showErrorsAndWarnings:(id)sender;
 - (IBAction)showMessagesPanel:(id)showMessagesPanel;
 - (IBAction)showMainWindow:(id)sender;
-- (IBAction)showPlaylist:(id)sender;
+- (IBAction)showPlayQueue:(id)sender;
 
 @end

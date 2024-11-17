@@ -7,7 +7,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMediaSourceCollectionViewItem">
             <connections>
-                <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="ywN-PH-QZt"/>
+                <outlet property="addToPlayQueueButton" destination="Ubz-8I-W2F" id="ywN-PH-QZt"/>
                 <outlet property="annotationTextField" destination="kHQ-HZ-YIi" id="XX9-Sc-oam"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
@@ -73,7 +73,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addToPlaylist:" target="-2" id="Lxc-A8-UMA"/>
+                        <action selector="addToPlayQueue:" target="-2" id="Lxc-A8-UMA"/>
                     </connections>
                 </button>
             </subviews>

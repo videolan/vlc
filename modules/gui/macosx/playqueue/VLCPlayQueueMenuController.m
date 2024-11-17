@@ -37,15 +37,15 @@
 @interface VLCPlayQueueMenuController ()
 {
     VLCPlayQueueController *_playQueueController;
-    VLCPlayQueueSortingMenuController *_playlistSortingMenuController;
+    VLCPlayQueueSortingMenuController *_playQueueSortingMenuController;
     VLCInformationWindowController *_informationWindowController;
 
     NSMenuItem *_playMenuItem;
     NSMenuItem *_removeMenuItem;
     NSMenuItem *_informationMenuItem;
     NSMenuItem *_revealInFinderMenuItem;
-    NSMenuItem *_addFilesToPlaylistMenuItem;
-    NSMenuItem *_clearPlaylistMenuItem;
+    NSMenuItem *_addFilesToPlayQueueMenuItem;
+    NSMenuItem *_clearPlayQueueMenuItem;
     NSMenuItem *_sortMenuItem;
 }
 
@@ -80,15 +80,15 @@
     _informationMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Information...") action:@selector(showInformationPanel:) keyEquivalent:@""];
     _informationMenuItem.target = self;
 
-    _addFilesToPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlaylist:) keyEquivalent:@""];
-    _addFilesToPlaylistMenuItem.target = self;
+    _addFilesToPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Add File...") action:@selector(addFilesToPlayQueue:) keyEquivalent:@""];
+    _addFilesToPlayQueueMenuItem.target = self;
 
-    _clearPlaylistMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the playlist") action:@selector(clearPlaylist:) keyEquivalent:@""];
-    _clearPlaylistMenuItem.target = self;
+    _clearPlayQueueMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Clear the play queue") action:@selector(clearPlayQueue:) keyEquivalent:@""];
+    _clearPlayQueueMenuItem.target = self;
 
-    _playlistSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
+    _playQueueSortingMenuController = [[VLCPlayQueueSortingMenuController alloc] init];
     _sortMenuItem = [[NSMenuItem alloc] initWithTitle:_NS("Sort") action:nil keyEquivalent:@""];
-    [_sortMenuItem setSubmenu:_playlistSortingMenuController.playlistSortingMenu];
+    [_sortMenuItem setSubmenu:_playQueueSortingMenuController.playQueueSortingMenu];
 
     self.items = @[
         _playMenuItem,
@@ -96,54 +96,54 @@
         _revealInFinderMenuItem,
         _informationMenuItem,
         NSMenuItem.separatorItem,
-        _addFilesToPlaylistMenuItem,
-        _clearPlaylistMenuItem,
+        _addFilesToPlayQueueMenuItem,
+        _clearPlayQueueMenuItem,
         _sortMenuItem
     ];
 
     self.multipleSelectionItems = @[
         _removeMenuItem,
         NSMenuItem.separatorItem,
-        _addFilesToPlaylistMenuItem,
-        _clearPlaylistMenuItem,
+        _addFilesToPlayQueueMenuItem,
+        _clearPlayQueueMenuItem,
         _sortMenuItem
     ];
 
-    _playlistMenu = [[NSMenu alloc] init];
-    _playlistMenu.itemArray = self.items;
+    _playQueueMenu = [[NSMenu alloc] init];
+    _playQueueMenu.itemArray = self.items;
 }
 
-- (void)setPlaylistTableView:(NSTableView *)playlistTableView
+- (void)setPlayQueueTableView:(NSTableView *)playQueueTableView
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
-    if (self.playlistTableView != nil) {
+    if (self.playQueueTableView != nil) {
         [notificationCenter removeObserver:self
                                       name:NSTableViewSelectionDidChangeNotification
-                                    object:self.playlistTableView];
+                                    object:self.playQueueTableView];
     }
 
-    _playlistTableView = playlistTableView;
+    _playQueueTableView = playQueueTableView;
     [notificationCenter addObserver:self
                            selector:@selector(tableViewSelectionDidChange:)
                                name:NSTableViewSelectionDidChangeNotification
-                             object:self.playlistTableView];
+                             object:self.playQueueTableView];
 
 }
 
 - (void)play:(id)sender
 {
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    NSInteger selectedRow = self.playQueueTableView.selectedRow;
 
     if (selectedRow != -1) {
         [_playQueueController playItemAtIndex:selectedRow];
     } else {
-        [_playQueueController startPlaylist];
+        [_playQueueController startPlayQueue];
     }
 }
 
 - (void)remove:(id)sender
 {
-    [_playQueueController removeItemsAtIndexes:self.playlistTableView.selectedRowIndexes];
+    [_playQueueController removeItemsAtIndexes:self.playQueueTableView.selectedRowIndexes];
 }
 
 - (void)showInformationPanel:(id)sender
@@ -153,11 +153,11 @@
     }
 
     NSMutableArray * const inputItems = NSMutableArray.array;
-    NSIndexSet * const selectedIndices = self.playlistTableView.selectedRowIndexes;
+    NSIndexSet * const selectedIndices = self.playQueueTableView.selectedRowIndexes;
 
     [selectedIndices enumerateIndexesUsingBlock:^(const NSUInteger idx, BOOL * const stop) {
         VLCPlayQueueItem * const item =
-            [self->_playQueueController.playlistModel playlistItemAtIndex:idx];
+            [self->_playQueueController.playQueueModel playQueueItemAtIndex:idx];
         if (item == nil) {
             return;
         }
@@ -170,12 +170,12 @@
 
 - (void)revealInFinder:(id)sender
 {
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    NSInteger selectedRow = self.playQueueTableView.selectedRow;
 
     if (selectedRow == -1)
         return;
 
-    VLCPlayQueueItem *item = [_playQueueController.playlistModel playlistItemAtIndex:selectedRow];
+    VLCPlayQueueItem *item = [_playQueueController.playQueueModel playQueueItemAtIndex:selectedRow];
     if (item == nil)
         return;
 
@@ -183,37 +183,37 @@
     [NSWorkspace.sharedWorkspace selectFile:path inFileViewerRootedAtPath:path];
 }
 
-- (void)addFilesToPlaylist:(id)sender
+- (void)addFilesToPlayQueue:(id)sender
 {
-    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    NSInteger selectedRow = self.playQueueTableView.selectedRow;
 
     [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
-        [self->_playQueueController addPlaylistItems:files
-                                         atPosition:selectedRow
-                                      startPlayback:NO];
+        [self->_playQueueController addPlayQueueItems:files
+                                           atPosition:selectedRow
+                                        startPlayback:NO];
     }];
 }
 
-- (void)clearPlaylist:(id)sender
+- (void)clearPlayQueue:(id)sender
 {
-    [_playQueueController clearPlaylist];
+    [_playQueueController clearPlayQueue];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem
 {
-    if (menuItem == _addFilesToPlaylistMenuItem) {
+    if (menuItem == _addFilesToPlayQueueMenuItem) {
         return YES;
 
-    } else if (menuItem == _clearPlaylistMenuItem) {
-        return (self.playlistTableView.numberOfRows > 0);
+    } else if (menuItem == _clearPlayQueueMenuItem) {
+        return (self.playQueueTableView.numberOfRows > 0);
 
     } else if (menuItem == _removeMenuItem ||
                menuItem == _playMenuItem ||
                menuItem == _informationMenuItem) {
-        return (self.playlistTableView.numberOfSelectedRows > 0);
+        return (self.playQueueTableView.numberOfSelectedRows > 0);
 
     } else if (menuItem == _revealInFinderMenuItem) {
-        return (self.playlistTableView.numberOfSelectedRows == 1);
+        return (self.playQueueTableView.numberOfSelectedRows == 1);
     }
 
     return NO;
@@ -222,15 +222,15 @@
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     NSTableView * const tableView = notification.object;
-    if (tableView != self.playlistTableView) {
+    if (tableView != self.playQueueTableView) {
         return;
     }
 
     const BOOL multipleSelection = tableView.selectedRowIndexes.count > 1;
     if (multipleSelection) {
-        self.playlistMenu.itemArray = self.multipleSelectionItems;
+        self.playQueueMenu.itemArray = self.multipleSelectionItems;
     } else {
-        self.playlistMenu.itemArray = self.items;
+        self.playQueueMenu.itemArray = self.items;
     }
 }
 

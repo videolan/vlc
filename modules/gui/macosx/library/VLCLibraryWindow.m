@@ -621,7 +621,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
             [metadataArray addObject:inputMetadata];
         }
-        [_playQueueController addPlaylistItems:metadataArray];
+        [_playQueueController addPlayQueueItems:metadataArray];
 
         return YES;
     }

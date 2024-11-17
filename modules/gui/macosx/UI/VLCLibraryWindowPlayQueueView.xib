@@ -181,7 +181,7 @@
                                 <constraint firstAttribute="width" constant="24" id="uLL-RT-XeW"/>
                             </constraints>
                             <connections>
-                                <action selector="sortPlaylist:" target="-2" id="BAl-CA-um5"/>
+                                <action selector="sortPlayQueue:" target="-2" id="BAl-CA-um5"/>
                             </connections>
                         </button>
                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aKS-lw-hfk">
@@ -195,7 +195,7 @@
                                 <constraint firstAttribute="width" constant="24" id="bgh-Lr-Mae"/>
                             </constraints>
                             <connections>
-                                <action selector="clearPlaylist:" target="-2" id="DEh-0j-CpD"/>
+                                <action selector="clearPlayQueue:" target="-2" id="DEh-0j-CpD"/>
                             </connections>
                         </button>
                     </subviews>

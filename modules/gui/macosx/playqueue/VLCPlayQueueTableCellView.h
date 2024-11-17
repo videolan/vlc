@@ -27,10 +27,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface VLCPlayQueueTableCellView : NSTableCellView
 
-@property (readwrite, assign, nonatomic) VLCPlayQueueItem *representedPlaylistItem;
-@property (readwrite, nonatomic) BOOL representsCurrentPlaylistItem;
+@property (readwrite, assign, nonatomic) VLCPlayQueueItem *representedPlayQueueItem;
+@property (readwrite, nonatomic) BOOL representsCurrentPlayQueueItem;
 
 @property (readwrite, assign) IBOutlet NSTextField *artistTextField;
 @property (readwrite, assign) IBOutlet NSTextField *secondaryMediaTitleTextField;

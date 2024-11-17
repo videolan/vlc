@@ -68,7 +68,7 @@
                 <outlet property="hide_others" destination="145" id="TV9-HK-Ave"/>
                 <outlet property="info" destination="1192" id="BPE-5A-AU4"/>
                 <outlet property="jumpToTime" destination="5138" id="XK6-rV-lr9"/>
-                <outlet property="libraryPlaylistMode" destination="Zo7-ru-vku" id="uNJ-jw-lG2"/>
+                <outlet property="libraryPlayQueueMode" destination="Zo7-ru-vku" id="uNJ-jw-lG2"/>
                 <outlet property="license" destination="2834" id="0tU-nu-6dP"/>
                 <outlet property="mcopyItem" destination="197" id="aBx-7l-f4e"/>
                 <outlet property="messages" destination="1003" id="q4C-pt-kQo"/>
@@ -85,8 +85,8 @@
                 <outlet property="open_recent" destination="4815" id="Hzh-wK-cxa"/>
                 <outlet property="pasteItem" destination="203" id="H04-s9-3uF"/>
                 <outlet property="play" destination="5142" id="B2I-n1-EOc"/>
+                <outlet property="playQueue" destination="1002" id="nhI-Gw-yev"/>
                 <outlet property="player" destination="999" id="A2q-jC-Whd"/>
-                <outlet property="playlist" destination="1002" id="nhI-Gw-yev"/>
                 <outlet property="postprocessing" destination="2133" id="Yn3-kZ-0qr"/>
                 <outlet property="postprocessingMenu" destination="2132" id="7NO-zF-sUN"/>
                 <outlet property="prefs" destination="801" id="Kaq-ct-Qwu"/>
@@ -118,7 +118,7 @@
                 <outlet property="services" destination="1996" id="X3H-XI-xFK"/>
                 <outlet property="show_all" destination="150" id="XQ2-CW-0PI"/>
                 <outlet property="snapshot" destination="2249" id="6bO-HY-I3I"/>
-                <outlet property="sortPlaylist" destination="lkj-Wj-TYr" id="T45-2w-c0O"/>
+                <outlet property="sortPlayQueue" destination="lkj-Wj-TYr" id="T45-2w-c0O"/>
                 <outlet property="stop" destination="5156" id="irh-Cr-vBT"/>
                 <outlet property="subtitleSize" destination="5543" id="PTJ-Qy-QQd"/>
                 <outlet property="subtitleSizeLabel" destination="Jqh-Tt-S94" id="xLh-4s-Sis"/>
@@ -449,7 +449,7 @@
                             <menuItem title="Library Playlist Mode" id="Zo7-ru-vku">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="toggleLibraryPlaylistMode:" target="-2" id="p9z-8M-8a4"/>
+                                    <action selector="toggleLibraryPlayQueueMode:" target="-2" id="p9z-8M-8a4"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Sort Playlist" id="lkj-Wj-TYr">
@@ -729,7 +729,7 @@
                             <menuItem title="Playlist" keyEquivalent="p" id="1002">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
-                                    <action selector="showPlaylist:" target="-2" id="Kqz-Ng-6tj"/>
+                                    <action selector="showPlayQueue:" target="-2" id="Kqz-Ng-6tj"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Detached Audio Window..." keyEquivalent="a" id="pI6-7D-CgE">

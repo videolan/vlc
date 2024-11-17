@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCPlayQueueTableView.h: table view subclass for the playlist
+ * VLCPlayQueueTableView.h: table view subclass for the play queue
  *****************************************************************************
  * Copyright (C) 2003-2019 VLC authors and VideoLAN
  *

@@ -166,7 +166,7 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     [_okButton setEnabled: NO];
 
     // setup drop view
-    [_dropBox enablePlaylistItems];
+    [_dropBox enablePlayQueueItems];
     [_dropBox setDropTarget:self];
 
     [self resetCustomizationSheetBasedOnProfile:[self.profileValueList firstObject]];
@@ -317,8 +317,8 @@ NSString *VLCConvertAndSaveProfileNamesKey = @"CASProfileNames";
     inputMetaItem.playbackOptions = options;
 
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
-    [playQueueController addPlaylistItems:@[inputMetaItem]];
-    [playQueueController playItemAtIndex:(playQueueController.playlistModel.numberOfPlaylistItems -1)];
+    [playQueueController addPlayQueueItems:@[inputMetaItem]];
+    [playQueueController playItemAtIndex:(playQueueController.playQueueModel.numberOfPlayQueueItems -1)];
 
     [self.window performClose:sender];
 }

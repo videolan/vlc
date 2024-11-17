@@ -1542,7 +1542,7 @@
                 <outlet property="renderersToolbarItem" destination="YEO-08-Qzi" id="pXm-Aj-4Qg"/>
                 <outlet property="sortOrderToolbarItem" destination="Tbc-Ik-FaO" id="MFb-EI-Dsa"/>
                 <outlet property="toggleNavSidebarToolbarItem" destination="5oK-0W-JJh" id="xoK-Zo-nwh"/>
-                <outlet property="togglePlaylistToolbarItem" destination="Lf2-ec-tHh" id="PX9-gs-T5Z"/>
+                <outlet property="togglePlayQueueToolbarItem" destination="Lf2-ec-tHh" id="PX9-gs-T5Z"/>
                 <outlet property="toolbar" destination="pr3-TD-J2z" id="0bl-3Z-WiA"/>
                 <outlet property="vlcIconToolbarItem" destination="XND-sc-TDa" id="bFb-Nx-LRb"/>
             </connections>

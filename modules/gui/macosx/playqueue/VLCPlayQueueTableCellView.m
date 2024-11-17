@@ -44,9 +44,9 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
+- (void)setRepresentsCurrentPlayQueueItem:(BOOL)representsCurrentPlayQueueItem
 {
-    _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
+    _representsCurrentPlayQueueItem = representsCurrentPlayQueueItem;
 
     [self updateFonts];
     [self updateColouredElements];
@@ -54,11 +54,11 @@
 
 - (void)updateFonts
 {
-    NSFont * const displayedFont = _representsCurrentPlaylistItem ?
+    NSFont * const displayedFont = _representsCurrentPlayQueueItem ?
         [NSFont boldSystemFontOfSize:NSFont.systemFontSize] :
         [NSFont systemFontOfSize:NSFont.systemFontSize];
 
-    NSFont * const sublineDisplayedFont = _representsCurrentPlaylistItem ?
+    NSFont * const sublineDisplayedFont = _representsCurrentPlayQueueItem ?
         [NSFont boldSystemFontOfSize:NSFont.smallSystemFontSize] :
         [NSFont systemFontOfSize:NSFont.smallSystemFontSize];
 
@@ -71,14 +71,14 @@
 - (void)updateColouredElements
 {
 
-    self.audioMediaTypeIndicator.textColor = _representsCurrentPlaylistItem ?
+    self.audioMediaTypeIndicator.textColor = _representsCurrentPlayQueueItem ?
         NSColor.labelColor :
         NSColor.secondaryLabelColor;
 }
 
-- (void)setRepresentedPlaylistItem:(VLCPlayQueueItem *)item
+- (void)setRepresentedPlayQueueItem:(VLCPlayQueueItem *)item
 {
-    [VLCLibraryImageCache thumbnailForPlaylistItem:item withCompletion:^(NSImage * const thumbnail) {
+    [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
         self.audioArtworkImageView.image = thumbnail;
         self.mediaImageView.image = thumbnail;
     }];
@@ -117,7 +117,7 @@
 
     self.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
 
-    _representedPlaylistItem = item;
+    _representedPlayQueueItem = item;
 }
 
 @end

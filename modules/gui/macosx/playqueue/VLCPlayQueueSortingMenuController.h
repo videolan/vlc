@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlayQueueSortingMenuController : NSObject
 
-@property (readonly) NSMenu *playlistSortingMenu;
+@property (readonly) NSMenu *playQueueSortingMenu;
 
 @end
 

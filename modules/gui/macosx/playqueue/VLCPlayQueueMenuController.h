@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlayQueueMenuController : NSObject
 
-@property (readwrite, weak, nonatomic) NSTableView *playlistTableView;
-@property (readonly) NSMenu *playlistMenu;
+@property (readwrite, weak, nonatomic) NSTableView *playQueueTableView;
+@property (readonly) NSMenu *playQueueMenu;
 
 @end
 

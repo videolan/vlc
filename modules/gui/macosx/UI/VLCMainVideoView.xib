@@ -18,9 +18,9 @@
                 <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
                 <outlet property="overlayView" destination="FGS-tq-54S" id="RSC-7m-N0y"/>
-                <outlet property="playlistButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
-                <outlet property="playlistButtonTopConstraint" destination="VyM-t4-y6F" id="V94-GS-KcS"/>
-                <outlet property="playlistButtonTrailingConstraint" destination="rWa-NJ-Aju" id="tzU-Iz-CXl"/>
+                <outlet property="playQueueButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
+                <outlet property="playQueueButtonTopConstraint" destination="VyM-t4-y6F" id="V94-GS-KcS"/>
+                <outlet property="playQueueButtonTrailingConstraint" destination="rWa-NJ-Aju" id="tzU-Iz-CXl"/>
                 <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
                 <outlet property="returnButtonLeadingConstraint" destination="BkP-RA-uxn" id="CsI-gH-SYp"/>
                 <outlet property="returnButtonTopConstraint" destination="0l2-eC-67c" id="78K-sz-kmV"/>
@@ -464,7 +464,7 @@
                                 </buttonCell>
                                 <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
-                                    <action selector="togglePlaylist:" target="-2" id="WrP-vg-etw"/>
+                                    <action selector="togglePlayQueue:" target="-2" id="WrP-vg-etw"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -515,9 +515,9 @@
         <image name="NSListViewTemplate" width="21" height="15"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="16" height="15"/>
-        <image name="backward.fill" catalog="system" width="19" height="12"/>
+        <image name="backward.fill" catalog="system" width="20" height="12"/>
         <image name="bookmark.circle" catalog="system" width="15" height="15"/>
-        <image name="forward.fill" catalog="system" width="19" height="12"/>
+        <image name="forward.fill" catalog="system" width="20" height="12"/>
         <image name="photo.tv" catalog="system" width="19" height="15"/>
         <image name="pin.fill" catalog="system" width="19" height="22"/>
         <image name="pip.enter" catalog="system" width="20" height="16"/>

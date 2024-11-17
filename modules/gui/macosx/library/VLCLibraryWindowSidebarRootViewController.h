@@ -47,10 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) VLCRoundedCornerTextField *counterLabel;
 @property (readonly) NSLayoutConstraint *counterLabelInHeaderConstraint;
 @property (readonly) NSLayoutConstraint *counterLabelInChildViewConstraint;
-@property (readonly) NSLayoutConstraint *playlistHeaderTopConstraint;
-@property (readonly) NSTextField *playlistHeaderLabel;
+@property (readonly) NSLayoutConstraint *playQueueHeaderTopConstraint;
+@property (readonly) NSTextField *playQueueHeaderLabel;
 
-@property (readonly) VLCLibraryWindowPlayQueueSidebarViewController *playlistSidebarViewController;
+@property (readonly) VLCLibraryWindowPlayQueueSidebarViewController *playQueueSidebarViewController;
 @property (readonly) VLCLibraryWindowChaptersSidebarViewController *chaptersSidebarViewController;
 @property (readonly) VLCLibraryWindowTitlesSidebarViewController *titlesSidebarViewController;
 

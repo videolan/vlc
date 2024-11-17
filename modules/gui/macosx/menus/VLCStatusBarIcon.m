@@ -279,12 +279,12 @@
 
 - (void)hasPreviousChanged:(NSNotification *)aNotification
 {
-    backwardsButton.enabled = VLCMain.sharedInstance.playQueueController.hasPreviousPlaylistItem;
+    backwardsButton.enabled = VLCMain.sharedInstance.playQueueController.hasPreviousPlayQueueItem;
 }
 
 - (void)hasNextChanged:(NSNotification *)aNotification
 {
-    forwardButton.enabled = VLCMain.sharedInstance.playQueueController.hasNextPlaylistItem;
+    forwardButton.enabled = VLCMain.sharedInstance.playQueueController.hasNextPlayQueueItem;
 }
 
 /* Updates the Metadata for the currently
@@ -457,7 +457,7 @@
     } else if (playerState == VLC_PLAYER_STATE_PAUSED) {
         [playerController resume];
     } else {
-        [playQueueController startPlaylist];
+        [playQueueController startPlayQueue];
     }
 }
 

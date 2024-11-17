@@ -71,7 +71,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 
     self.libraryViewModeToolbarItem.toolTip = _NS("Grid View or List View");
     self.sortOrderToolbarItem.toolTip = _NS("Select Sorting Mode");
-    self.togglePlaylistToolbarItem.toolTip = _NS("Toggle Playqueue");
+    self.togglePlayQueueToolbarItem.toolTip = _NS("Toggle Play Queue");
 
     self.vlcIconToolbarItem.minSize = NSMakeSize(18, 18);
     self.vlcIconToolbarItem.maxSize = NSMakeSize(18, 18);
@@ -137,12 +137,14 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
 
 - (void)updatePlayqueueToggleState
 {
-    NSView * const playlistView =
+    NSView * const multifunctionSidebar =
         self.libraryWindow.splitViewController.multifunctionSidebarViewController.view;
     NSSplitView * const sv = self.libraryWindow.mainSplitView;
     self.libraryWindow.playQueueToggle.state =
-        ![sv.arrangedSubviews containsObject:playlistView] || [sv isSubviewCollapsed:playlistView] ?
-                NSControlStateValueOff : NSControlStateValueOn;
+        ![sv.arrangedSubviews containsObject:multifunctionSidebar] ||
+        [sv isSubviewCollapsed:multifunctionSidebar]
+            ? NSControlStateValueOff
+            : NSControlStateValueOn;
 }
 
 #pragma mark - convenience method for configuration of toolbar items layout
@@ -281,10 +283,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
         return;
     }
 
-    // Display as far to the right as possible, but not in front of the playlist toggle button
+    // Display as far to the right as possible, but not in front of the multifunc bar toggle button
     NSMutableArray<NSToolbarItem *> * const currentToolbarItems =
         [NSMutableArray arrayWithArray:self.toolbar.items];
-    if (currentToolbarItems.lastObject == self.togglePlaylistToolbarItem) {
+    if (currentToolbarItems.lastObject == self.togglePlayQueueToolbarItem) {
         [currentToolbarItems removeLastObject];
     }
 

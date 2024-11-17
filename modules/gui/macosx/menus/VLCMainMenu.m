@@ -104,7 +104,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     VLCAddonsWindowController *_addonsController;
     VLCPlayQueueController *_playQueueController;
     VLCPlayerController *_playerController;
-    VLCPlayQueueSortingMenuController *_playlistSortingController;
+    VLCPlayQueueSortingMenuController *_playQueueSortingController;
     VLCInformationWindowController *_infoWindowController;
 
     __strong VLCTimeSelectionPanelController *_timeSelectionPanel;
@@ -158,13 +158,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _rendererMenuController = [[VLCRendererMenuController alloc] init];
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
-    _playlistSortingController = [[VLCPlayQueueSortingMenuController alloc] init];
-    _sortPlaylist.submenu = _playlistSortingController.playlistSortingMenu;
+    _playQueueSortingController = [[VLCPlayQueueSortingMenuController alloc] init];
+    _sortPlayQueue.submenu = _playQueueSortingController.playQueueSortingMenu;
 
     [self mediaItemChanged:nil];
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
-    [self updateLibraryPlaylistMode];
+    [self updateLibraryPlayQueueMode];
 
     NSNotificationCenter *notificationCenter = NSNotificationCenter.defaultCenter;
     [notificationCenter addObserver:self
@@ -394,8 +394,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_random setTitle: _NS("Random")];
     [_repeat setTitle: _NS("Repeat")];
     [_AtoBloop setTitle: _NS("A→B Loop")];
-    [_libraryPlaylistMode setTitle: _NS("Library Playlist Mode")];
-    [_sortPlaylist setTitle: _NS("Sort Playlist")];
+    [_libraryPlayQueueMode setTitle: _NS("Library Play Queue Mode")];
+    [_sortPlayQueue setTitle: _NS("Sort Play Queue")];
     [_quitAfterPB setTitle: _NS("Quit after Playback")];
     [_fwd setTitle: _NS("Step Forward")];
     [_bwd setTitle: _NS("Step Backward")];
@@ -480,7 +480,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_audioeffects setTitle: _NS("Audio Effects...")];
     [_videoeffects setTitle: _NS("Video Effects...")];
     [_bookmarks setTitle: _NS("Bookmarks...")];
-    [_playlist setTitle: _NS("Playlist...")];
+    [_playQueue setTitle: _NS("Play Queue...")];
     [_detachedAudioWindow setTitle: _NS("Detached Audio Window...")];
     [_info setTitle: _NS("Media Information...")];
     [_messages setTitle: _NS("Messages...")];
@@ -937,16 +937,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_playerController setABLoop];
 }
 
-- (IBAction)toggleLibraryPlaylistMode:(id)sender
+- (IBAction)toggleLibraryPlayQueueMode:(id)sender
 {
-    _playQueueController.libraryPlaylistMode = !_playQueueController.libraryPlaylistMode;
-    [self updateLibraryPlaylistMode];
+    _playQueueController.libraryPlayQueueMode = !_playQueueController.libraryPlayQueueMode;
+    [self updateLibraryPlayQueueMode];
 }
 
-- (void)updateLibraryPlaylistMode
+- (void)updateLibraryPlayQueueMode
 {
-    const BOOL libraryPlaylistMode = _playQueueController.libraryPlaylistMode;
-    _libraryPlaylistMode.state = libraryPlaylistMode ? NSOnState : NSOffState;
+    const BOOL libraryPlayQueueMode = _playQueueController.libraryPlayQueueMode;
+    _libraryPlayQueueMode.state = libraryPlayQueueMode ? NSOnState : NSOffState;
 }
 
 - (IBAction)goToSpecificTime:(id)sender
@@ -1348,7 +1348,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (IBAction)intfOpenFile:(id)sender
 {
     [[VLCMain.sharedInstance open] openFileWithAction:^(NSArray *files) {
-        [self->_playQueueController addPlaylistItems:files];
+        [self->_playQueueController addPlayQueueItems:files];
     }];
 }
 
@@ -1466,7 +1466,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [VLCMain.sharedInstance.libraryWindow makeKeyAndOrderFront:sender];
 }
 
-- (IBAction)showPlaylist:(id)sender
+- (IBAction)showPlayQueue:(id)sender
 {
     [VLCMain.sharedInstance.libraryWindowController.window makeKeyAndOrderFront:sender];
     [VLCMain.sharedInstance.libraryWindow.splitViewController toggleMultifunctionSidebar:self];
@@ -1938,12 +1938,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == _previous          ||
                mi == _voutMenuprev      ||
                mi == _dockMenuprevious) {
-        enabled = _playQueueController.hasPreviousPlaylistItem;
+        enabled = _playQueueController.hasPreviousPlayQueueItem;
     } else if (
                mi == _next              ||
                mi == _voutMenunext      ||
                mi == _dockMenunext) {
-        enabled = _playQueueController.hasNextPlaylistItem;
+        enabled = _playQueueController.hasNextPlayQueueItem;
     } else if (mi == _record || mi == _voutMenuRecord) {
         enabled = _playerController.recordable;
     } else if (mi == _random) {

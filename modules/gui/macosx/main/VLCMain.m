@@ -448,7 +448,7 @@ static VLCMain *sharedInstance = nil;
         [o_result addObject:inputMetadata];
     }
 
-    [_playQueueController addPlaylistItems:o_result];
+    [_playQueueController addPlayQueueItems:o_result];
 }
 
 /* When user click in the Dock icon our double click in the finder */

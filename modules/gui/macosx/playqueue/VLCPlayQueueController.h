@@ -32,13 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCOpenInputMetadata;
 @class VLCInputItem;
 
-extern NSString *VLCPlaybackOrderChanged;
-extern NSString *VLCPlaybackRepeatChanged;
-extern NSString *VLCPlaybackHasPreviousChanged;
-extern NSString *VLCPlaybackHasNextChanged;
-extern NSString *VLCPlaylistCurrentItemIndexChanged;
-extern NSString *VLCPlaylistItemsAdded;
-extern NSString *VLCPlaylistItemsRemoved;
+extern NSString * const VLCPlaybackOrderChanged;
+extern NSString * const VLCPlaybackRepeatChanged;
+extern NSString * const VLCPlaybackHasPreviousChanged;
+extern NSString * const VLCPlaybackHasNextChanged;
+extern NSString * const VLCPlayQueueCurrentItemIndexChanged;
+extern NSString * const VLCPlayQueueItemsAdded;
+extern NSString * const VLCPlayQueueItemsRemoved;
 
 @interface VLCPlayQueueController : NSObject
 
@@ -54,12 +54,12 @@ extern NSString *VLCPlaylistItemsRemoved;
  * The playlist model caching the contents of the playlist controlled by
  * the instance of this class.
  */
-@property (readonly) VLCPlayQueueModel *playlistModel;
+@property (readonly) VLCPlayQueueModel *playQueueModel;
 
 /**
  * The datasource instance used to actually display the playlist.
  */
-@property (readwrite, assign) VLCPlayQueueDataSource *playlistDataSource;
+@property (readwrite, assign) VLCPlayQueueDataSource *playQueueDataSource;
 
 /**
  * The player instance associated with the playlist
@@ -71,7 +71,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  @return index of the current playlist index or -1 if none
  @warning just because the current index is valid does not imply that it is playing!
  */
-@property (readonly) size_t currentPlaylistIndex;
+@property (readonly) size_t currentPlayQueueIndex;
 
 /**
  * input of the currently playing item
@@ -84,13 +84,13 @@ extern NSString *VLCPlaylistItemsRemoved;
  * indicates whether there is a previous item in the list the user could go back to
  * @note Subscribe to the VLCPlaybackHasPreviousChanged notification to be notified about changes
  */
-@property (readonly) BOOL hasPreviousPlaylistItem;
+@property (readonly) BOOL hasPreviousPlayQueueItem;
 
 /**
  * indicates whether there is a next item in the list the user could move on to
  * @note Subscribe to the VLCPlaybackHasNextChanged notification to be notified about changes
  */
-@property (readonly) BOOL hasNextPlaylistItem;
+@property (readonly) BOOL hasNextPlayQueueItem;
 
 /**
  * sets and gets the playback repeat mode according to the enum defined in the core
@@ -104,7 +104,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  */
 @property (readwrite, nonatomic) enum vlc_playlist_playback_order playbackOrder;
 
-@property (readwrite, nonatomic) BOOL libraryPlaylistMode;
+@property (readwrite, nonatomic) BOOL libraryPlayQueueMode;
 
 /**
  * Define the action to perform after playback of the current media stopped (for any reason)
@@ -118,7 +118,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  * Simplified version to add new items to the end of the current playlist
  * @param array array of items. Each item is an instance of VLCOpenInputMetadata.
  */
-- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)array;
+- (void)addPlayQueueItems:(NSArray <VLCOpenInputMetadata *> *)array;
 
 /**
  * Add new items to the playlist, at specified index.
@@ -126,9 +126,9 @@ extern NSString *VLCPlaylistItemsRemoved;
  * @param insertionIndex index for new items, -1 for appending at end
  * @param startPlayback starts playback of first item if true
  */
-- (void)addPlaylistItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
-              atPosition:(size_t)insertionIndex
-           startPlayback:(BOOL)startPlayback;
+- (void)addPlayQueueItems:(NSArray <VLCOpenInputMetadata *> *)itemArray
+               atPosition:(size_t)insertionIndex
+            startPlayback:(BOOL)startPlayback;
 
 /**
  * Add new item to the playlist if you already have an input item
@@ -158,7 +158,7 @@ extern NSString *VLCPlaylistItemsRemoved;
 /**
  * Clear the entire playlist
  */
-- (void)clearPlaylist;
+- (void)clearPlayQueue;
 
 /**
  * Sort the entire playlist listen based on:
@@ -188,7 +188,7 @@ extern NSString *VLCPlaylistItemsRemoved;
  * Start the playlist
  * @return Returns VLC_SUCCESS on success.
  */
-- (int)startPlaylist;
+- (int)startPlayQueue;
 
 /**
  * Play the previous item in the list (if any)

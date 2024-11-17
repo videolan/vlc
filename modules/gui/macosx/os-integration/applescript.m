@@ -50,7 +50,7 @@
             VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
             inputMetadata.MRLString = parameterString;
 
-            [VLCMain.sharedInstance.playQueueController addPlaylistItems:@[inputMetadata]];
+            [VLCMain.sharedInstance.playQueueController addPlayQueueItems:@[inputMetadata]];
         }
     }
     return nil;

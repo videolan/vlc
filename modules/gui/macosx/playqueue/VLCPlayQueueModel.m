@@ -29,7 +29,7 @@
 
 @interface VLCPlayQueueModel ()
 {
-    NSMutableArray *_playlistArray;
+    NSMutableArray *_playQueueArray;
 }
 @end
 
@@ -39,55 +39,55 @@
 {
     self = [super init];
     if (self) {
-        _playlistArray = [[NSMutableArray alloc] init];
+        _playQueueArray = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
-- (NSUInteger)numberOfPlaylistItems
+- (NSUInteger)numberOfPlayQueueItems
 {
-    return _playlistArray.count;
+    return _playQueueArray.count;
 }
 
 - (void)dropExistingData
 {
-    [_playlistArray removeAllObjects];
+    [_playQueueArray removeAllObjects];
 }
 
-- (VLCPlayQueueItem *)playlistItemAtIndex:(NSInteger)index
+- (VLCPlayQueueItem *)playQueueItemAtIndex:(NSInteger)index
 {
-    if (index < 0 || index > _playlistArray.count) {
+    if (index < 0 || index > _playQueueArray.count) {
         return nil;
     }
     
-    return _playlistArray[index];
+    return _playQueueArray[index];
 }
 
 - (void)addItems:(NSArray *)array
 {
-    [_playlistArray addObjectsFromArray:array];
+    [_playQueueArray addObjectsFromArray:array];
 }
 
 - (void)addItems:(NSArray *)array atIndex:(size_t)index count:(size_t)count
 {
-    [_playlistArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)]];
+    [_playQueueArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)]];
 }
 
 - (void)moveItemAtIndex:(size_t)index toTarget:(size_t)target
 {
-    VLCPlayQueueItem *item = [_playlistArray objectAtIndex:index];
-    [_playlistArray removeObjectAtIndex:index];
-    [_playlistArray insertObject:item atIndex:target];
+    VLCPlayQueueItem * const item = [_playQueueArray objectAtIndex:index];
+    [_playQueueArray removeObjectAtIndex:index];
+    [_playQueueArray insertObject:item atIndex:target];
 }
 
 - (void)removeItemsInRange:(NSRange)range
 {
-    [_playlistArray removeObjectsInRange:range];
+    [_playQueueArray removeObjectsInRange:range];
 }
 
 - (void)updateItemAtIndex:(size_t)index
 {
-    VLCPlayQueueItem *item = _playlistArray[index];
+    VLCPlayQueueItem * const item = _playQueueArray[index];
     [item updateRepresentation];
 }
 

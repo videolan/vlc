@@ -40,11 +40,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSStackView *centralControlsStackView;
 @property (readwrite, strong) IBOutlet VLCMainVideoViewControlsBar *controlsBar;
 @property (readwrite, strong) IBOutlet NSButton *returnButton;
-@property (readwrite, strong) IBOutlet NSButton *playlistButton;
+@property (readwrite, strong) IBOutlet NSButton *playQueueButton;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonTopConstraint;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *returnButtonLeadingConstraint;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *playlistButtonTopConstraint;
-@property (readwrite, strong) IBOutlet NSLayoutConstraint *playlistButtonTrailingConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTopConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *playQueueButtonTrailingConstraint;
 @property (readwrite, strong) IBOutlet NSVisualEffectView *fakeTitleBar;
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)showControls;
 - (void)hideControls;
 
-- (IBAction)togglePlaylist:(id)sender;
+- (IBAction)togglePlayQueue:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;
 
 @end

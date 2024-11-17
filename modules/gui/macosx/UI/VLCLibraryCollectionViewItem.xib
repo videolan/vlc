@@ -8,7 +8,7 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryCollectionViewItem">
             <connections>
-                <outlet property="addToPlaylistButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
+                <outlet property="addToPlayQueueButton" destination="Ubz-8I-W2F" id="k0q-b1-PZi"/>
                 <outlet property="annotationTextField" destination="tm2-NW-WsZ" id="Miy-RS-Rol"/>
                 <outlet property="highlightBox" destination="Vwd-1n-Sbd" id="h1g-hL-1gh"/>
                 <outlet property="imageViewAspectRatioConstraint" destination="f7c-vp-30m" id="2As-9A-WOn"/>
@@ -101,7 +101,7 @@
                         <font key="font" metaFont="system"/>
                     </buttonCell>
                     <connections>
-                        <action selector="addToPlaylist:" target="-2" id="2C9-Rn-VAb"/>
+                        <action selector="addToPlayQueue:" target="-2" id="2C9-Rn-VAb"/>
                     </connections>
                 </button>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VAn-gF-QiZ">

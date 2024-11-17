@@ -241,7 +241,7 @@
     return 300.;
 }
 
-+ (const CGFloat)libraryWindowPlaylistSidebarMaxWidth
++ (const CGFloat)libraryWindowPlayQueueSidebarMaxWidth
 {
     return 400.;
 }

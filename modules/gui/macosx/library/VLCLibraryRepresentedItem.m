@@ -113,7 +113,7 @@
 
 - (int64_t)parentItemIdForAudioItem:(const id<VLCMediaLibraryItemProtocol>)item
 {
-    // Decide which other items we are going to be adding to the playlist when playing the item.
+    // Decide which other items we are going to be adding to the play queue when playing the item.
     // Key for playing in library mode, not in individual mode
     int64_t parentItemId = NSNotFound;
 
@@ -222,7 +222,7 @@
     __block BOOL startingPlayImmediately = playImmediately;
 
     [self.item iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem* mediaItem) {
-        [libraryController appendItemToPlaylist:mediaItem playImmediately:startingPlayImmediately];
+        [libraryController appendItemToPlayQueue:mediaItem playImmediately:startingPlayImmediately];
 
         if (startingPlayImmediately) {
             startingPlayImmediately = NO;
@@ -252,7 +252,7 @@
 
     for (NSUInteger i = startingIndex; i < parentItemCount; i++) {
         const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
-        [libraryController appendItemToPlaylist:mediaItem playImmediately:startingPlayImmediately];
+        [libraryController appendItemToPlayQueue:mediaItem playImmediately:startingPlayImmediately];
 
         if (startingPlayImmediately) {
             startingPlayImmediately = NO;
@@ -262,7 +262,7 @@
     if (playQueueController.playbackRepeat != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE) {
         for (NSUInteger i = 0; i < startingIndex; i++) {
             const id<VLCMediaLibraryItemProtocol> mediaItem = [parentItems objectAtIndex:i];
-            [libraryController appendItemToPlaylist:mediaItem playImmediately:NO];
+            [libraryController appendItemToPlayQueue:mediaItem playImmediately:NO];
         }
     }
 }
@@ -270,7 +270,7 @@
 - (void)playImmediately:(BOOL)playImmediately
 {
     VLCPlayQueueController * const playQueueController = VLCMain.sharedInstance.playQueueController;
-    if (playQueueController.libraryPlaylistMode && self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
+    if (playQueueController.libraryPlayQueueMode && self.parentType != VLCMediaLibraryParentGroupTypeUnknown) {
         [self playLibraryModeImmediately:playImmediately];
     } else {
         [self playIndividualModeImmediately:playImmediately];

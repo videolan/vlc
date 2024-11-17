@@ -35,8 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, nonatomic) NSTextField *counterTextField;
 
 - (void)prepareForUse;
-- (void)playlistUpdated;
-- (void)scrollToCurrentPlaylistItem;
+- (void)playQueueUpdated;
+- (void)scrollToCurrentPlayQueueItem;
 
 @end
 
