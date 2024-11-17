@@ -446,13 +446,13 @@
                                     <action selector="toggleAtoBloop:" target="-2" id="Wrv-He-P33"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Library Playlist Mode" id="Zo7-ru-vku">
+                            <menuItem title="Library Play Queue Mode" id="Zo7-ru-vku">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleLibraryPlayQueueMode:" target="-2" id="p9z-8M-8a4"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Sort Playlist" id="lkj-Wj-TYr">
+                            <menuItem title="Sort Play Queue" id="lkj-Wj-TYr">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="5141"/>
@@ -726,7 +726,7 @@
                                     <action selector="showMainWindow:" target="-2" id="BXQ-oU-PvS"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Playlist" keyEquivalent="p" id="1002">
+                            <menuItem title="Play Queue" keyEquivalent="p" id="1002">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="showPlayQueue:" target="-2" id="Kqz-Ng-6tj"/>

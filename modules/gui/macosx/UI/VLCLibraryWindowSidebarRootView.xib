@@ -27,7 +27,7 @@
                     <segmentedCell key="cell" borderStyle="border" alignment="left" style="capsule" trackingMode="selectOne" id="F97-9E-PoR">
                         <font key="font" metaFont="system"/>
                         <segments>
-                            <segment label="Playlist" width="100" selected="YES"/>
+                            <segment label="Play Queue" width="100" selected="YES"/>
                             <segment label="Chapters" width="100" tag="1"/>
                         </segments>
                     </segmentedCell>

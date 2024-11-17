@@ -361,7 +361,7 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="0F5C2845-FFED-400C-8869-4785561D4CE3" label="Toggle Playlist" paletteLabel="Toggle Playlist" image="list.triangle" catalog="system" sizingBehavior="auto" id="Lf2-ec-tHh">
+                    <toolbarItem implicitItemIdentifier="0F5C2845-FFED-400C-8869-4785561D4CE3" label="Toggle Play Queue" paletteLabel="Toggle Play Queue" image="list.triangle" catalog="system" sizingBehavior="auto" id="Lf2-ec-tHh">
                         <nil key="toolTip"/>
                         <button key="view" wantsLayer="YES" verticalHuggingPriority="750" id="IaO-se-D0g">
                             <rect key="frame" x="29" y="14" width="26" height="19"/>
