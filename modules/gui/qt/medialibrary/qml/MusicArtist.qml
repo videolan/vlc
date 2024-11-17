@@ -203,6 +203,7 @@ FocusScope {
 
                             title: model.title || qsTr("Unknown title")
                             subtitle: model.release_year || ""
+                            subtitleVisible: true
                             textAlignHCenter: true
                             dragItem: albumDragItem
 
