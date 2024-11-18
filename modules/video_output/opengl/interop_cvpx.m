@@ -51,7 +51,6 @@ struct priv
         PFNGLACTIVETEXTUREPROC ActiveTexture;
         PFNGLBINDTEXTUREPROC BindTexture;
         PFNGLTEXPARAMETERIPROC TexParameteri;
-        PFNGLTEXPARAMETERFPROC TexParameterf;
     } gl;
 };
 
@@ -104,8 +103,8 @@ tc_cvpx_update(const struct vlc_gl_interop *interop, uint32_t textures[],
         priv->gl.BindTexture(interop->tex_target, textures[i]);
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        priv->gl.TexParameterf(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        priv->gl.TexParameteri(interop->tex_target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         priv->gl.BindTexture(interop->tex_target, 0);
         priv->last_cvtexs[i] = cvtex;
     }
@@ -200,7 +199,6 @@ Open(struct vlc_gl_interop *interop)
     LOAD_FUNCTION(ActiveTexture);
     LOAD_FUNCTION(BindTexture);
     LOAD_FUNCTION(TexParameteri);
-    LOAD_FUNCTION(TexParameterf);
 
 #if TARGET_OS_IPHONE
     const GLenum tex_target = GL_TEXTURE_2D;
