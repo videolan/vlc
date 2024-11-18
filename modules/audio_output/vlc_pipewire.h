@@ -27,10 +27,10 @@ struct spa_hook;
 struct pw_properties;
 struct pw_registry_events;
 
-void vlc_pw_log(struct vlc_pw_context *ctx, int prio,
+VLC_EXPORT void vlc_pw_log(struct vlc_pw_context *ctx, int prio,
                 const char *file, unsigned int line, const char *func,
                 const char *fmt, ...);
-int vlc_pw_perror(struct vlc_pw_context *ctx, const char *file,
+VLC_EXPORT int vlc_pw_perror(struct vlc_pw_context *ctx, const char *file,
                   unsigned int line, const char *func, const char *desc);
 
 #define vlc_pw_log(ctx, prio, ...) \
@@ -44,18 +44,18 @@ int vlc_pw_perror(struct vlc_pw_context *ctx, const char *file,
 #define vlc_pw_perror(ctx, desc) \
         vlc_pw_perror(ctx, __FILE__, __LINE__, __func__, desc)
 
-void vlc_pw_lock(struct vlc_pw_context *ctx);
-void vlc_pw_unlock(struct vlc_pw_context *ctx);
-void vlc_pw_signal(struct vlc_pw_context *ctx);
-void vlc_pw_wait(struct vlc_pw_context *ctx);
+VLC_EXPORT void vlc_pw_lock(struct vlc_pw_context *ctx);
+VLC_EXPORT void vlc_pw_unlock(struct vlc_pw_context *ctx);
+VLC_EXPORT void vlc_pw_signal(struct vlc_pw_context *ctx);
+VLC_EXPORT void vlc_pw_wait(struct vlc_pw_context *ctx);
 
-struct pw_stream *vlc_pw_stream_new(struct vlc_pw_context *ctx,
+VLC_EXPORT struct pw_stream *vlc_pw_stream_new(struct vlc_pw_context *ctx,
                                     const char *name, struct pw_properties *);
 
-void vlc_pw_roundtrip_unlocked(struct vlc_pw_context *ctx);
+VLC_EXPORT void vlc_pw_roundtrip_unlocked(struct vlc_pw_context *ctx);
 
-int vlc_pw_registry_listen(struct vlc_pw_context *ctx, struct spa_hook *hook,
+VLC_EXPORT int vlc_pw_registry_listen(struct vlc_pw_context *ctx, struct spa_hook *hook,
                            const struct pw_registry_events *, void *);
 
-void vlc_pw_disconnect(struct vlc_pw_context *ctx);
-struct vlc_pw_context *vlc_pw_connect(vlc_object_t *obj, const char *name);
+VLC_EXPORT void vlc_pw_disconnect(struct vlc_pw_context *ctx);
+VLC_EXPORT struct vlc_pw_context *vlc_pw_connect(vlc_object_t *obj, const char *name);

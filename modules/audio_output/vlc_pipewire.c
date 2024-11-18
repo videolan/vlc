@@ -34,6 +34,8 @@
 #include <vlc_tick.h>
 #include "vlc_pipewire.h"
 
+const char vlc_module_name[] = "vlcpipewire";
+
 struct vlc_pw_context {
     struct pw_thread_loop *loop;
     struct pw_context *context;
