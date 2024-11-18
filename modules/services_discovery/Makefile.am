@@ -41,6 +41,13 @@ if HAVE_OSX
 libupnp_plugin_la_LDFLAGS += -Wl,-framework,CoreFoundation,-framework,SystemConfiguration
 endif
 
+libpipewirelist_plugin_la_SOURCES = services_discovery/pipewire.c
+libpipewirelist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PIPEWIRE_CFLAGS)
+libpipewirelist_plugin_la_LIBADD = libvlc_pipewire.la $(PIPEWIRE_LIBS)
+if HAVE_PIPEWIRE
+sd_LTLIBRARIES += libpipewirelist_plugin.la
+endif
+
 libpulselist_plugin_la_SOURCES = services_discovery/pulse.c
 libpulselist_plugin_la_CFLAGS = $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulselist_plugin_la_LIBADD = libvlc_pulse.la $(PULSE_LIBS)
