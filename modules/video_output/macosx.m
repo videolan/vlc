@@ -184,8 +184,8 @@ static int Open (vout_display_t *vd,
         /* We don't wait, that means that we'll have to be careful about releasing
          * container.
          * That's why we'll release on main thread in Close(). */
-        if ([(id)container respondsToSelector:@selector(addVoutSubview:)])
-            [(id)container performSelectorOnMainThread:@selector(addVoutSubview:)
+        if ([container respondsToSelector:@selector(addVoutSubview:)])
+            [container performSelectorOnMainThread:@selector(addVoutSubview:)
                                             withObject:sys->glView
                                          waitUntilDone:NO];
         else if ([container isKindOfClass:[NSView class]]) {
