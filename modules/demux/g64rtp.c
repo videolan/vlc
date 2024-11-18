@@ -834,9 +834,14 @@ static int Open( vlc_object_t * p_this )
     {
         case 0x1F:
         case 0x1D:
+        case 0x21:
+        case 0x31:
+        case 0x34:
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
             break;
         case 0x3D:
+        case 0x41:
+        case 0x43:
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_HEVC );
             break;
         case 0xD2:
