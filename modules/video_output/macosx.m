@@ -150,14 +150,16 @@ static int Open (vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
     sys->cfg = *vd->cfg;
+    sys->has_first_frame = false;
+    sys->current = NULL;
+    sys->vgl = NULL;
+    sys->gl = NULL;
 
     @autoreleasepool {
         if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
             msg_Err (vd, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
         vd->sys = sys;
-        sys->vgl = NULL;
-        sys->gl = NULL;
 
         /* Get the drawable object */
         id container = vd->cfg->window->handle.nsobject;
