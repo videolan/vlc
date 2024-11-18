@@ -92,7 +92,7 @@ ModalDialog {
             RowLayout {
                 anchors.fill: parent
 
-                Widgets.TextToolButton {
+                Widgets.ButtonExt {
                     id: cancelBtn
                     Layout.fillWidth: true
                     focus: true
@@ -105,7 +105,7 @@ ModalDialog {
                     Keys.onPressed: (event) => okBtn.Navigation.defaultKeyAction(event)
                 }
 
-                Widgets.TextToolButton {
+                Widgets.ButtonExt {
                     id: okBtn
                     Layout.fillWidth: true
                     visible: okBtn.text !== ""
