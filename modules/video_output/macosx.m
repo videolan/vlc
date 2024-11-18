@@ -321,7 +321,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
         {
             [sys->glView render];
             vlc_gl_ReleaseCurrent(sys->gl);
-            vlc_gl_Swap(sys->gl);
         }
         [sys->glView setVoutFlushing:NO];
     }
