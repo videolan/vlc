@@ -107,18 +107,8 @@ Window {
             onReset: root.reset()
 
 
-            delegate: Widgets.TextToolButton {
-                id: button
+            delegate: Widgets.ButtonExt {
 
-                colorContext.palette: VLCStyle.palette
-
-                // NOTE: We specify a dedicated background with borders to improve clarity.
-                background: Widgets.AnimatedBackground {
-                    enabled: button.colorContext.initialized
-                    color: button.colorContext.bg.primary
-                    border.width: VLCStyle.border
-                    border.color: button.colorContext.border
-                }
             }
         }
     }
