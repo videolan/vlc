@@ -184,18 +184,17 @@ static int Open (vout_display_t *vd,
         /* We don't wait, that means that we'll have to be careful about releasing
          * container.
          * That's why we'll release on main thread in Close(). */
-        if ([container respondsToSelector:@selector(addVoutSubview:)])
-            [container performSelectorOnMainThread:@selector(addVoutSubview:)
-                                            withObject:sys->glView
-                                         waitUntilDone:NO];
+        if ([container respondsToSelector:@selector(addVoutSubview:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [container addVoutSubview: sys->glView];
+            });
+        }
         else if ([container isKindOfClass:[NSView class]]) {
-            NSView *parentView = container;
-            [parentView performSelectorOnMainThread:@selector(addSubview:)
-                                         withObject:sys->glView
-                                      waitUntilDone:NO];
-            [sys->glView performSelectorOnMainThread:@selector(setFrameToBoundsOfView:)
-                                          withObject:[NSValue valueWithPointer:parentView]
-                                       waitUntilDone:NO];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSView *parentView = container;
+                [parentView addSubview:sys->glView];
+                [sys->glView setFrame:[parentView bounds]];
+            });
         } else {
             msg_Err(vd, "Invalid drawable-nsobject object. drawable-nsobject must either be an NSView or comply to the @protocol VLCVideoViewEmbedding.");
             goto error;
@@ -486,15 +485,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
     [super dealloc];
-}
-
-/**
- * Gets called by the Open() method.
- */
-- (void)setFrameToBoundsOfView:(NSValue *)value
-{
-    NSView *parentView = [value pointerValue];
-    [self setFrame:[parentView bounds]];
 }
 
 /**
