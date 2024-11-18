@@ -44,6 +44,8 @@ qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(APPLY) $(SRC)/qt/systray-no-sound.patch
 	# fix forcing the WINVER/_WIN32_WINNT version without NTDDI_VERSION
 	sed -i.orig -e "s/DEFINES += WINVER/DEFINES += NTDDI_VERSION=0x06000000 WINVER/" "$(UNPACK_DIR)/src/network/kernel/kernel.pri"
+	# TOUCHINPUT is properly defined in mingw since v4
+	sed -i.orig -e "s/defined(Q_CC_MINGW) || !defined(TOUCHEVENTF_MOVE)/!defined(TOUCHEVENTF_MOVE)/" "$(UNPACK_DIR)/src/plugins/platforms/windows/qtwindows_additional.h"
 	$(MOVE)
 
 ifdef HAVE_MACOSX
