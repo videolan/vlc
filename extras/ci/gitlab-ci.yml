@@ -20,14 +20,14 @@ default:
 
 variables:
     VLC_TEST_TIMEOUT: 60
-    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20241111035123
-    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20241111035123
-    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20241111035123
+    VLC_WIN64_IMAGE: registry.videolan.org/vlc-debian-win64-posix:20241118101328
+    VLC_WIN_LLVM_MSVCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-msvcrt:20241118101328
+    VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20241118101328
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20241112155431
-    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20240731083648
+    VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android:20241118101328
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-focal:20231013031754
     VLC_RASPBIAN_IMAGE: registry.videolan.org/vlc-ubuntu-raspberry:20240806085528
-    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20240731083648
+    VLC_WASM_EMSCRIPTEN: registry.videolan.org/vlc-debian-wasm-emscripten:20241118101328
 
 .variables-debian: &variables-debian
         HOST_ARCH: x86_64
