@@ -162,12 +162,12 @@ static int Open (vout_display_t *vd,
         vd->sys = sys;
 
         /* Get the drawable object */
-        id container = vd->cfg->window->handle.nsobject;
+        id container = (__bridge id)vd->cfg->window->handle.nsobject;
         assert(container != nil);
 
         /* This will be released in Close(), on
          * main thread, after we are done using it. */
-        sys->container = [container retain];
+        sys->container = container;
 
         /* Get our main view*/
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -276,18 +276,16 @@ static void Close(vout_display_t *vd)
             vlc_object_delete(sys->gl);
         }
 
-        VLCOpenGLVideoView *glView = sys->glView;
-        id<VLCVideoViewEmbedding> viewContainer = sys->container;
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ([viewContainer respondsToSelector:@selector(removeVoutSubview:)]) {
+            if ([sys->container respondsToSelector:@selector(removeVoutSubview:)]) {
                 /* This will retain sys->glView */
-                [viewContainer removeVoutSubview:sys->glView];
+                [sys->container removeVoutSubview:sys->glView];
             }
 
             /* release on main thread as explained in Open() */
-            [viewContainer release];
-            [glView removeFromSuperview];
-            [glView release];
+            sys->container = nil;
+            [sys->glView removeFromSuperview];
+            sys->glView = nil;
             free(sys);
         });
     }
@@ -446,7 +444,6 @@ static void OpenglSwap (vlc_gl_t *gl)
         return nil;
 
     self = [super initWithFrame:NSMakeRect(0,0,10,10) pixelFormat:fmt];
-    [fmt release];
 
     if (!self)
         return nil;
@@ -484,7 +481,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-    [super dealloc];
 }
 
 /**
