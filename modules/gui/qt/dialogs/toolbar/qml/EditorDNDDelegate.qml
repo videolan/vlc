@@ -49,7 +49,7 @@ T.Control {
     
     readonly property ColorContext colorContext: ColorContext {
         id: theme
-        colorSet: ColorContext.ToolButton
+        colorSet: ColorContext.Item
     }
 
     MouseArea {

@@ -141,6 +141,10 @@ GridView {
 
         readonly property int mIndex: PlayerControlbarControls.controlList[model.index].id
 
+        readonly property ColorContext colorContext: ColorContext {
+            colorSet: ColorContext.Item
+        }
+
         drag.onActiveChanged: {
             if (drag.active) {
                 root.controlDragStarted(mIndex)
@@ -174,7 +178,7 @@ GridView {
             color: "transparent"
 
             border.width: VLCStyle.dp(1, VLCStyle.scale)
-            border.color: containsMouse && !buttonDragItem.Drag.active ? theme.border
+            border.color: containsMouse && !buttonDragItem.Drag.active ? colorContext.border
                                                                        : "transparent"
 
             ColumnLayout {
@@ -186,7 +190,7 @@ GridView {
                     Layout.preferredHeight: VLCStyle.icon_medium
                     Layout.alignment: Qt.AlignHCenter
 
-                    color: theme.fg.primary
+                    color: colorContext.fg.primary
                     text: PlayerControlbarControls.controlList[model.index].label
                 }
 
@@ -194,7 +198,7 @@ GridView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
-                    color: theme.fg.secondary
+                    color: colorContext.fg.secondary
                     elide: Text.ElideNone
                     fontSizeMode: Text.Fit
                     text: PlayerControlbarControls.controlList[model.index].text
