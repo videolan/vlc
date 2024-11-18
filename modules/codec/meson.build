@@ -107,11 +107,10 @@ mad_dep = disabler()
 # TODO add support for a custom folder for libmad
 if cc.check_header('mad.h')
     mad_dep = cc.find_library('mad')
-elif cc.check_header('mad.h', include_directories: include_directories( contrib_incdir ) )
+elif cc.check_header('mad.h', dependencies: contrib_dep )
     if cc.find_library('mad', dirs: contrib_libdir).found()
         mad_dep = declare_dependency(
-            dependencies: [cc.find_library('mad', dirs: contrib_libdir)],
-            include_directories: [include_directories( contrib_incdir )])
+            dependencies: [cc.find_library('mad', dirs: contrib_libdir), contrib_dep])
     endif
 endif
 endif

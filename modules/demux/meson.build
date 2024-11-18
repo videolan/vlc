@@ -389,11 +389,10 @@ mpc_dep = disabler()
 if cc.check_header('mpc/mpcdec.h')
     mpc_dep = cc.find_library('mpcdec')
     cdata.set('HAVE_MPC_MPCDEC_H', 1)
-elif cc.check_header('mpc/mpcdec.h', include_directories: include_directories( contrib_incdir ) )
+elif cc.check_header('mpc/mpcdec.h', dependencies: contrib_dep )
     if cc.find_library('mpcdec', dirs: contrib_libdir).found()
         mpc_dep = declare_dependency(
-            dependencies: [cc.find_library('mpcdec', dirs: contrib_libdir)],
-            include_directories: [include_directories( contrib_incdir )])
+            dependencies: [cc.find_library('mpcdec', dirs: contrib_libdir), contrib_dep])
         cdata.set('HAVE_MPC_MPCDEC_H', 1)
     endif
 endif

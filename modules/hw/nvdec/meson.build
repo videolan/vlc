@@ -2,9 +2,8 @@ if get_option('nvdec').allowed()
 nvdec_dep = disabler()
 if cc.check_header('ffnvcodec/dynlink_loader.h')
     nvdec_dep = enabler()
-elif cc.check_header('ffnvcodec/dynlink_loader.h', include_directories: include_directories( contrib_incdir ) )
-    nvdec_dep = declare_dependency(
-        include_directories: [include_directories( contrib_incdir )])
+elif cc.check_header('ffnvcodec/dynlink_loader.h', dependencies: contrib_dep )
+    nvdec_dep = contrib_dep
 endif
 endif
 vlc_modules += {
