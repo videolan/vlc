@@ -170,9 +170,10 @@ static int Open (vout_display_t *vd,
         sys->container = [container retain];
 
         /* Get our main view*/
-        [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:)
-                                             withObject:[NSValue valueWithPointer:&sys->glView]
-                                          waitUntilDone:YES];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            sys->glView = [[VLCOpenGLVideoView alloc] init];
+        });
+
         if (!sys->glView) {
             msg_Err(vd, "Initialization of open gl view failed");
             goto error;
@@ -418,13 +419,6 @@ static void OpenglSwap (vlc_gl_t *gl)
 @implementation VLCOpenGLVideoView
 
 #define VLCAssertMainThread() assert([[NSThread currentThread] isMainThread])
-
-
-+ (void)getNewView:(NSValue *)value
-{
-    id *ret = [value pointerValue];
-    *ret = [[self alloc] init];
-}
 
 /**
  * Gets called by the Open() method.
