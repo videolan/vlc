@@ -93,7 +93,7 @@ T.Button {
         enabled: theme.initialized && !control.extBackgroundAnimation
 
         color: theme.bg.primary
-        border.color: control.visualFocus ? control.colorFocus : "transparent"
+        border.color: control.visualFocus ? control.colorFocus : theme.border
     }
 
     contentItem: Item {
