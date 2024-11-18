@@ -61,12 +61,18 @@ if HAVE_ALSA
 aout_LTLIBRARIES += libalsa_plugin.la
 endif
 
-libaout_pipewire_plugin_la_SOURCES = \
-	audio_output/vlc_pipewire.c audio_output/vlc_pipewire.h \
-	audio_output/pipewire.c
+libvlc_pipewire_la_SOURCES = audio_output/vlc_pipewire.c audio_output/vlc_pipewire.h
+libvlc_pipewire_la_CFLAGS = $(AM_CFLAGS) $(PIPEWIRE_CFLAGS)
+libvlc_pipewire_la_LIBADD = $(PIPEWIRE_LIBS) $(LTLIBVLCCORE)
+libvlc_pipewire_la_LDFLAGS = \
+	-no-undefined \
+	-export-symbols-regex ^vlc_pw_ \
+	-version-info 0:0:0
+libaout_pipewire_plugin_la_SOURCES = audio_output/pipewire.c
 libaout_pipewire_plugin_la_CFLAGS = $(AM_CFLAGS) $(PIPEWIRE_CFLAGS)
-libaout_pipewire_plugin_la_LIBADD = $(PIPEWIRE_LIBS) $(LIBM)
+libaout_pipewire_plugin_la_LIBADD = libvlc_pipewire.la $(PIPEWIRE_LIBS) $(LIBM)
 if HAVE_PIPEWIRE
+pkglib_LTLIBRARIES += libvlc_pipewire.la
 aout_LTLIBRARIES += libaout_pipewire_plugin.la
 endif
 
