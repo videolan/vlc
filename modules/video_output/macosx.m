@@ -325,8 +325,8 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic)
             vlc_gl_ReleaseCurrent(sys->gl);
         }
         [sys->glView setVoutFlushing:NO];
+        sys->has_first_frame = true;
     }
-    sys->has_first_frame = true;
 }
 
 static void UpdatePlace (vout_display_t *vd, const vout_display_cfg_t *cfg)
