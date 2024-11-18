@@ -94,7 +94,7 @@
 {
     _playQueueHeaderLabel = [[NSTextField alloc] init];
     self.playQueueHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    self.playQueueHeaderLabel.font = NSFont.VLClibrarySectionHeaderFont;
+    self.playQueueHeaderLabel.font = NSFont.VLCLibrarySubsectionHeaderFont;
     self.playQueueHeaderLabel.editable = NO;
     self.playQueueHeaderLabel.bezeled = NO;
     self.playQueueHeaderLabel.drawsBackground = NO;
