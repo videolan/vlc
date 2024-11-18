@@ -281,7 +281,7 @@
                                     <action selector="intfOpenDisc:" target="-2" id="Y60-I1-fEt"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Open Network..." keyEquivalent="n" id="446">
+                            <menuItem title="Open Stream..." keyEquivalent="n" id="446">
                                 <connections>
                                     <action selector="intfOpenNet:" target="-2" id="76C-uE-5DX"/>
                                 </connections>

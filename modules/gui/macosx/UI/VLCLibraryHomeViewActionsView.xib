@@ -38,7 +38,7 @@
                 </button>
                 <button verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="j8l-xq-Zuw">
                     <rect key="frame" x="324" y="0.0" width="153" height="128"/>
-                    <buttonCell key="cell" type="inline" title="Open URL" bezelStyle="inline" image="network" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="2Vn-hv-Uao" customClass="VLCLibraryHomeViewActionButtonCell">
+                    <buttonCell key="cell" type="inline" title="Open Stream" bezelStyle="inline" image="network" catalog="system" imagePosition="above" alignment="center" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="2Vn-hv-Uao" customClass="VLCLibraryHomeViewActionButtonCell">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>
                     </buttonCell>

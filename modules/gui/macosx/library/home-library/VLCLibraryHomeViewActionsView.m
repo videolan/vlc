@@ -44,7 +44,7 @@
 
     self.openFileButton.title = _NS("Open file");
     self.openDiscButton.title = _NS("Open disc");
-    self.openUrlButton.title = _NS("Open URL");
+    self.openUrlButton.title = _NS("Open stream");
     self.openCaptureDeviceButton.title = _NS("Open capture device");
     self.openBrowseButton.title = _NS("Browse");
 }

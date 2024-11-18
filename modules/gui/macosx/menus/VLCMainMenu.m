@@ -360,7 +360,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     [_open_generic setTitle: _NS("Advanced Open File...")];
     [_open_file setTitle: _NS("Open File...")];
     [_open_disc setTitle: _NS("Open Disc...")];
-    [_open_net setTitle: _NS("Open Network...")];
+    [_open_net setTitle: _NS("Open Stream...")];
     [_open_capture setTitle: _NS("Open Capture Device...")];
     [_open_recent setTitle: _NS("Open Recent")];
     [_close_window setTitle: _NS("Close Window")];
