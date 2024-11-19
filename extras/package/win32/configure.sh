@@ -12,7 +12,6 @@ OPTIONS="
       --enable-goom
       --enable-sse
       --enable-libcddb
-      --enable-zvbi --disable-telx
-      --enable-nls"
+      --enable-zvbi --disable-telx"
 
 sh "$(dirname $0)"/../../../configure ${OPTIONS}  "$@"

@@ -456,6 +456,9 @@ fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"
      MCONFIGFLAGS="$MCONFIGFLAGS -Dnls=disabled"
+else
+     CONFIGFLAGS="$CONFIGFLAGS --enable-nls"
+     MCONFIGFLAGS="$MCONFIGFLAGS -Dnls=enabled"
 fi
 if [ -n "$BREAKPAD" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --with-breakpad=$BREAKPAD"
