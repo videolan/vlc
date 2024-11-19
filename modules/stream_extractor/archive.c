@@ -686,6 +686,7 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
     }
 
     p_sys->b_eof = false;
+    int ret = VLC_SUCCESS;
 
     if( !p_sys->b_seekable_archive || p_sys->b_dead
       || archive_seek_data( p_sys->p_archive, i_req, SEEK_SET ) < 0 )
@@ -696,6 +697,12 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
         uint64_t i_skip = i_req - p_sys->i_offset;
 
+
+        /* The 1st try is the original skip.
+         * The 2nd try is to go back to the previous position in case of
+         * failure. */
+        uint64_t preskip_offset = p_sys->i_offset;
+        for (unsigned i = 0; i < 2; ++i)
         {
             if( i_req < p_sys->i_offset )
             {
@@ -708,14 +715,19 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
                 i_skip = i_req;
             }
-            if( archive_skip_decompressed( p_extractor, &i_skip ) )
-            {
-                msg_Warn( p_extractor, "failed to skip to seek position %"
-                          PRIu64 "/%" PRId64, i_req,
-                          archive_entry_size( p_sys->p_entry ) );
-                p_sys->i_offset += i_skip;
-                return VLC_EGENERIC;
-            }
+
+            if( archive_skip_decompressed( p_extractor, &i_skip ) == 0 )
+                break; /* Success */
+            msg_Warn( p_extractor, "failed to skip to seek position %"
+                      PRIu64 "/%" PRId64, i_req,
+                      archive_entry_size( p_sys->p_entry ) );
+            ret = VLC_EGENERIC;
+
+            /* Seek back to the original offset before failure */
+            i_req = preskip_offset;
+            if( i_req == p_sys->i_offset )
+                break; /* no data was skipped, no need for a 2nd try */
+            assert( i_req < p_sys->i_offset );
         }
     }
     else
@@ -725,7 +737,7 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
     }
 
     p_sys->i_offset = i_req;
-    return VLC_SUCCESS;
+    return ret;
 }
 
 
