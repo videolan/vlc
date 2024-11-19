@@ -696,24 +696,26 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
         uint64_t i_skip = i_req - p_sys->i_offset;
 
-        /* RECREATE LIBARCHIVE HANDLE IF WE ARE SEEKING BACKWARDS */
-
-        if( i_req < p_sys->i_offset )
         {
-            if( archive_extractor_reset( p_extractor ) )
+            if( i_req < p_sys->i_offset )
             {
-                msg_Err( p_extractor, "unable to reset libarchive handle" );
+                /* RECREATE LIBARCHIVE HANDLE IF WE ARE SEEKING BACKWARDS */
+                if( archive_extractor_reset( p_extractor ) )
+                {
+                    msg_Err( p_extractor, "unable to reset libarchive handle" );
+                    return VLC_EGENERIC;
+                }
+
+                i_skip = i_req;
+            }
+            if( archive_skip_decompressed( p_extractor, &i_skip ) )
+            {
+                msg_Warn( p_extractor, "failed to skip to seek position %"
+                          PRIu64 "/%" PRId64, i_req,
+                          archive_entry_size( p_sys->p_entry ) );
+                p_sys->i_offset += i_skip;
                 return VLC_EGENERIC;
             }
-
-            i_skip = i_req;
-        }
-        if( archive_skip_decompressed( p_extractor, &i_skip ) )
-        {
-            msg_Warn( p_extractor, "failed to skip to seek position %" PRIu64 "/%" PRId64,
-                      i_req, archive_entry_size( p_sys->p_entry ) );
-            p_sys->i_offset += i_skip;
-            return VLC_EGENERIC;
         }
     }
     else
