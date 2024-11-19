@@ -85,7 +85,11 @@ option('sse',
     value : 'auto',
     description : 'SSE (2-4) optimizations')
 
-# TODO: Missing avx option
+option('avx',
+    type : 'feature',
+    value : 'auto',
+    description : 'AVX (1-2) optimizations')
+
 # TODO: Missing neon option
 # TODO: Missing sve option
 # TODO: Missing altivec option

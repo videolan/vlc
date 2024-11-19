@@ -1,8 +1,10 @@
 # SIMD checks
 
 enable_sse = false
+enable_avx = false
 if host_machine.cpu_family().startswith('x86')
     enable_sse = get_option('sse').allowed()
+    enable_avx = get_option('avx').allowed()
 endif
 
 # Check for fully workin SSE2 intrinsics
@@ -99,7 +101,7 @@ endif
 have_sse4A = can_compile_sse4A
 
 # Check for fully workin AVX2 intrinsics
-have_avx2_intrinsics = cc.compiles('''
+have_avx2_intrinsics = enable_avx and cc.compiles('''
     #include <immintrin.h>
     #include <stdint.h>
     uint64_t frobzor;
@@ -121,7 +123,7 @@ if have_avx2_intrinsics
 endif
 
 # Check for AVX inline assembly support
-can_compile_avx = cc.compiles('''
+can_compile_avx = enable_avx and cc.compiles('''
     void f() {
         void *p;
         asm volatile("vxorps %%ymm1,%%ymm2,%%ymm3"::"r"(p):"ymm1", "ymm2", "ymm3");
@@ -133,7 +135,7 @@ endif
 have_avx = can_compile_avx
 
 # Check for AVX2 inline assembly support
-can_compile_avx2 = cc.compiles('''
+can_compile_avx2 = enable_avx and cc.compiles('''
     void f() {
         void *p;
         asm volatile("vpunpckhqdq %%ymm1,%%ymm2,%%ymm3"::"r"(p):"ymm1", "ymm2", "ymm3");
