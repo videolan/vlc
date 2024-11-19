@@ -1,7 +1,12 @@
 # SIMD checks
 
+enable_sse = false
+if host_machine.cpu_family().startswith('x86')
+    enable_sse = get_option('sse').allowed()
+endif
+
 # Check for fully workin SSE2 intrinsics
-have_sse2_intrinsics = cc.compiles('''
+have_sse2_intrinsics = enable_sse and cc.compiles('''
     #include <emmintrin.h>
     #include <stdint.h>
     uint64_t frobzor;
@@ -23,7 +28,7 @@ if have_sse2_intrinsics
 endif
 
 # Check for SSE2 inline assembly support
-can_compile_sse2 = cc.compiles('''
+can_compile_sse2 = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("punpckhqdq %%xmm1,%%xmm2"::"r"(p):"xmm1", "xmm2");
@@ -35,7 +40,7 @@ endif
 have_sse2 = can_compile_sse2
 
 # Check for SSE3 inline assembly support
-can_compile_sse3 = cc.compiles('''
+can_compile_sse3 = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -46,7 +51,7 @@ if can_compile_sse3
 endif
 
 # Check for SSSE3 inline assembly support
-can_compile_2_sse3 = cc.compiles('''
+can_compile_2_sse3 = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p):"xmm0");
@@ -58,7 +63,7 @@ endif
 have_sse3 = can_compile_sse3 and can_compile_2_sse3
 
 # Check for SSE4.1 inline assembly support
-can_compile_sse4_1 = cc.compiles('''
+can_compile_sse4_1 = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -70,7 +75,7 @@ endif
 have_sse4_1 = can_compile_sse4_1
 
 # Check for SSE4.2 inline assembly support
-can_compile_sse4_2 = cc.compiles('''
+can_compile_sse4_2 = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("pcmpgtq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
@@ -82,7 +87,7 @@ endif
 have_sse4_2 = can_compile_sse4_2
 
 # Check for SSE4A inline assembly support
-can_compile_sse4A = cc.compiles('''
+can_compile_sse4A = enable_sse and cc.compiles('''
     void f() {
         void *p;
         asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");

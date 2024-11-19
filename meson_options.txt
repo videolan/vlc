@@ -80,7 +80,11 @@ option('vendored_rust_deps',
     value : 'no',
     description : 'Should use vendored sources: `no`, `yes` or PATH_TO_VENDORED_SOURCES')
 
-# TODO: Missing sse option
+option('sse',
+    type : 'feature',
+    value : 'auto',
+    description : 'SSE (2-4) optimizations')
+
 # TODO: Missing avx option
 # TODO: Missing neon option
 # TODO: Missing sve option
