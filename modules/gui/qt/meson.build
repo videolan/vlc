@@ -1061,6 +1061,10 @@ if qt6_dep.found()
         endif
     endif
 
+    if get_option('update-check').allowed() and gcrypt_dep.found()
+        qt_extra_flags += '-DUPDATE_CHECK'
+    endif
+
     if (xcb_dep.found() and xcb_render_dep.found() and xcb_xfixes_dep.found())
 
         vlc_modules += {

@@ -35,7 +35,7 @@ vlc_tests += {
     'link_with' : [libvlc, libvlccore],
 }
 
-if gcrypt_dep.found()
+if gcrypt_dep.found() and get_option('update-check').allowed()
     vlc_tests += {
         'name' : 'test_src_crypto_update',
         'sources' : files('crypto/update.c'),

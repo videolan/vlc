@@ -369,6 +369,15 @@ elif host_system == 'linux'
     endif
 endif
 
+if get_option('update-check').allowed()
+    if not gcrypt_dep.found()
+        error('libgcrypt is required for update checking system')
+    endif
+    libvlccore_sources += [ 'misc/update.c', 'misc/update_crypto.c' ]
+    vlccore_cargs += '-DUPDATE_CHECK'
+    libvlccore_deps += gcrypt_dep
+endif
+
 libvlccore = library(
     'vlccore',
     libvlccore_sources, vlc_about, fourcc, rev_target,

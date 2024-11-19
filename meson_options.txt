@@ -65,6 +65,11 @@ option('winstore_app',
     value : false,
     description : 'Build targeted for Windows Store apps')
 
+option('update-check',
+    type : 'feature',
+    value : 'disabled',
+    description : 'update checking system')
+
 option('rust',
     type : 'feature',
     value : 'disabled',
@@ -93,7 +98,6 @@ option('avx',
 # TODO: Missing neon option
 # TODO: Missing sve option
 # TODO: Missing altivec option
-# TODO: Missing update-check option
 
 # Font options
 
