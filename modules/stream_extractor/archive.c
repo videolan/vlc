@@ -81,6 +81,9 @@ struct private_sys_t
 
     libarchive_callback_t** pp_callback_data;
     size_t i_callback_data;
+
+    const uint8_t *last_arcbuf;
+    size_t last_arcsize;
 };
 
 struct libarchive_callback_t {
@@ -399,6 +402,8 @@ static int archive_extractor_reset( stream_extractor_t* p_extractor )
     p_sys->i_offset = 0;
     p_sys->b_eof = false;
     p_sys->b_dead = false;
+    p_sys->last_arcbuf = NULL;
+    p_sys->last_arcsize = 0;
     return VLC_SUCCESS;
 }
 
@@ -424,6 +429,8 @@ static private_sys_t* setup( vlc_object_t* obj, stream_t* source,
 
     p_sys->source = source;
     p_sys->p_obj = obj;
+    p_sys->last_arcbuf = NULL;
+    p_sys->last_arcsize = 0;
 
     return p_sys;
 
@@ -581,8 +588,6 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
 
 static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_size )
 {
-    char dummy_buffer[ 8192 ];
-
     private_sys_t* p_sys = p_extractor->p_sys;
     libarchive_t* p_arc = p_sys->p_archive;
     ssize_t       i_ret;
@@ -593,12 +598,39 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
     if( p_sys->b_eof )
         return 0;
 
-    i_ret = archive_read_data( p_arc,
-      p_data ? p_data :                        dummy_buffer,
-      p_data ? i_size : __MIN( i_size, sizeof( dummy_buffer ) ) );
+    const void *arcbuf = NULL;
+    size_t arcsize = 0;
+    la_int64_t arcoffset = 0;
+    if( p_sys->last_arcbuf == NULL )
+    {
+        i_ret = archive_read_data_block( p_arc, &arcbuf, &arcsize, &arcoffset);
+        assert(arcoffset == (la_int64_t) p_sys->i_offset); (void)arcoffset;
+    }
+    else
+    {
+        i_ret = ARCHIVE_OK;
+        arcbuf = p_sys->last_arcbuf;
+        arcsize = p_sys->last_arcsize;
+    }
 
     switch( i_ret )
     {
+        case ARCHIVE_OK:
+        case ARCHIVE_EOF:
+            if( i_size >= arcsize )
+            {
+                i_size = arcsize;
+                p_sys->last_arcbuf = NULL;
+                p_sys->last_arcsize = 0;
+            }
+            else
+            {
+                p_sys->last_arcbuf = (uint8_t *)arcbuf + i_size;
+                p_sys->last_arcsize = arcsize - i_size;
+            }
+            if( p_data != NULL)
+                memcpy( p_data, arcbuf, i_size );
+            break;
         case ARCHIVE_RETRY:
         case ARCHIVE_FAILED:
             msg_Dbg( p_extractor, "libarchive: %s", archive_error_string( p_arc ) );
@@ -613,8 +645,8 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
             goto fatal_error;
     }
 
-    p_sys->i_offset += i_ret;
-    return i_ret;
+    p_sys->i_offset += i_size;
+    return i_size;
 
 fatal_error:
     p_sys->b_dead = true;
@@ -683,6 +715,11 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
             p_sys->i_offset += i_skip;
             return VLC_EGENERIC;
         }
+    }
+    else
+    {
+        p_sys->last_arcbuf = NULL;
+        p_sys->last_arcsize = 0;
     }
 
     p_sys->i_offset = i_req;
