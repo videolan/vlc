@@ -474,7 +474,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     av1_OBU_sequence_header_t *sequence_hdr = NULL;
     if (dec->fmt_in->i_extra > 4)
     {
-        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
+        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationRecord
         // and then one or more OBU
         const uint8_t *obu_start = ((const uint8_t*) dec->fmt_in->p_extra) + 4;
         int obu_size = dec->fmt_in->i_extra - 4;

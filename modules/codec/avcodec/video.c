@@ -782,7 +782,7 @@ static int ExtractAV1Profile(AVCodecContext *p_context, const es_format_t *fmt_i
 
     if (fmt_in->i_extra > 4)
     {
-        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationBox
+        // in ISOBMFF/WebM/Matroska the first 4 bytes are from the AV1CodecConfigurationRecord
         // and then one or more OBU
         const uint8_t *obu_start = ((const uint8_t*) fmt_in->p_extra) + 4;
         int obu_size = fmt_in->i_extra - 4;
