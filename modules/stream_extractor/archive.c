@@ -530,6 +530,7 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
     vlc_readdir_helper_init( &rdh, p_directory, p_node);
     struct archive_entry* entry;
     int archive_status;
+    unsigned item_count = 0;
 
     while( !( archive_status = archive_read_next_header( p_arc, &entry ) ) )
     {
@@ -564,6 +565,7 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
             int64_t size = archive_entry_size( entry );
             if( size >= 0 )
                 input_item_AddStat( p_item, "size", size );
+            item_count++;
         }
         free( mrl );
 
@@ -571,8 +573,10 @@ static int ReadDir( stream_directory_t* p_directory, input_item_node_t* p_node )
             break;
     }
 
-    vlc_readdir_helper_finish( &rdh, archive_status == ARCHIVE_EOF );
-    return archive_status == ARCHIVE_EOF ? VLC_SUCCESS : VLC_EGENERIC;
+    bool success = item_count > 0 || archive_status == ARCHIVE_EOF;
+
+    vlc_readdir_helper_finish( &rdh, success );
+    return success ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_size )
