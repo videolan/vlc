@@ -60,6 +60,8 @@ struct vout_display_opengl_t {
 
     struct vlc_gl_interop *sub_interop;
     struct vlc_gl_sub_renderer *sub_renderer;
+
+    vlc_viewpoint_t viewpoint;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -247,6 +249,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GL_ASSERT_NOERROR(vt);
 
+    vlc_viewpoint_init(&vgl->viewpoint);
     if (fmt->projection_mode != PROJECTION_MODE_RECTANGULAR
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
         msg_Err(gl, "Could not set viewpoint");
@@ -321,6 +324,8 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
     vgl->filters = filters;
     vgl->renderer = renderer;
 
+    vlc_gl_renderer_SetViewpoint(vgl->renderer, &vgl->viewpoint);
+
     return VLC_SUCCESS;
 }
 
@@ -348,7 +353,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
 int vout_display_opengl_SetViewpoint(vout_display_opengl_t *vgl,
                                      const vlc_viewpoint_t *p_vp)
 {
-    return vlc_gl_renderer_SetViewpoint(vgl->renderer, p_vp);
+    int ret = vlc_gl_renderer_SetViewpoint(vgl->renderer, p_vp);
+    if (ret == VLC_SUCCESS)
+        vgl->viewpoint = *p_vp;
+    return ret;
 }
 
 void vout_display_opengl_SetOutputSize(vout_display_opengl_t *vgl,
