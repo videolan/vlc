@@ -43,6 +43,7 @@
 #endif
 
 #include "../packetizer/iso_color_tables.h"
+#include "../packetizer/av1_obu.h"
 
 #ifndef AOM_USAGE_GOOD_QUALITY
 # define AOM_USAGE_GOOD_QUALITY 0
@@ -585,6 +586,41 @@ static int OpenEncoder(vlc_object_t *p_this)
         .encode_video = Encode,
     };
     p_enc->ops = &ops;
+
+    /* "The caller owns the memory associated with this buffer, and must free the
+       'buf' member of the aom_fixed_buf_t as well as the aom_fixed_buf_t pointer.
+       Memory returned must be freed via call to free()." */
+    aom_fixed_buf_t *p_headers = aom_codec_get_global_headers(ctx);
+
+    if (p_headers) {
+
+        av1_OBU_sequence_header_t *p_sequence_header = AV1_OBU_parse_sequence_header(p_headers->buf, p_headers->sz);
+        if (!p_sequence_header) {
+            free(p_headers->buf);
+            free(p_headers);
+            goto error;
+        }
+
+        p_enc->fmt_out.i_extra =
+                AV1_create_DecoderConfigurationRecord((uint8_t **)&p_enc->fmt_out.p_extra,
+                                                      p_sequence_header,
+                                                      1,
+                                                      (const uint8_t **)&p_headers->buf,
+                                                      &p_headers->sz);
+
+        /* Free everything regardless of whether or not the config record parsing succeeded. */
+        free(p_headers->buf);
+        free(p_headers);
+        AV1_release_sequence_header(p_sequence_header);
+
+        if (!p_enc->fmt_out.i_extra) {
+            msg_Err(p_enc, "Could not create decoder configuration record");
+            goto error;
+        }
+
+    } else {
+        goto error;
+    }
 
     return VLC_SUCCESS;
 

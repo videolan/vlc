@@ -576,7 +576,8 @@ endif
 codec_LTLIBRARIES += libvpx_alpha_plugin.la
 
 libaom_plugin_la_SOURCES = codec/aom.c \
-                           packetizer/iso_color_tables.h
+                           packetizer/iso_color_tables.h \
+                           packetizer/av1_obu.c packetizer/av1_obu.h
 libaom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaom_plugin_la_CFLAGS = $(AM_CFLAGS) $(AOM_CFLAGS) $(CPPFLAGS_aom)
 libaom_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'

@@ -840,7 +840,7 @@ vlc_modules += {
 aom_dep = dependency('aom', required: get_option('aom'))
 vlc_modules += {
     'name' : 'aom',
-    'sources' : files('aom.c'),
+    'sources' : files('aom.c', '../packetizer/av1_obu.c'),
     'dependencies' : [aom_dep],
     'enabled' : aom_dep.found(),
 }
