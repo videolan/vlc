@@ -445,6 +445,12 @@ else
 fi
 cd ../..
 
+# configuration matching configure.sh (goom is called goom2, theora is theoradec+theoraenc)
+MCONFIGFLAGS="-Dupdate-check=enabled -Dlua=enabled -Dflac=enabled -Dtheoradec=enabled -Dtheoraenc=enabled \
+    -Davcodec=enabled -Dmerge-ffmpeg=true \
+    -Dlibass=enabled -Dschroedinger=enabled -Dshout=enabled -Dgoom2=enabled \
+    -Dsse=enabled -Dlibcddb=enabled -Dzvbi=enabled -Dtelx=disabled $MCONFIGFLAGS"
+
 MCONFIGFLAGS="$MCONFIGFLAGS --prefer-static"
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
