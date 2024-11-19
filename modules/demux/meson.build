@@ -239,7 +239,8 @@ if avformat_dep.found()
         ),
         'dependencies' : [avformat_dep, avutil_dep],
         'link_with' : [libavcodec_common],
-        'link_args' : symbolic_linkargs
+        'link_args' : symbolic_linkargs,
+        'enabled' : not get_option('merge-ffmpeg'),
     }
 endif
 

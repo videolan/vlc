@@ -99,6 +99,7 @@ if avcodec_dep.found()
         'name' : 'packetizer_avparser',
         'sources' : files('avparser.c'),
         'dependencies' : [avutil_dep, avcodec_dep],
-        'link_with' : [libavcodec_common]
+        'link_with' : [libavcodec_common],
+        'enabled' : not get_option('merge-ffmpeg'),
     }
 endif

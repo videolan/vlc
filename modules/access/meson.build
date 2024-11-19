@@ -491,7 +491,8 @@ if avformat_dep.found()
         'name' : 'avio',
         'sources' : files('avio.c'),
         'dependencies' : [avutil_dep, avformat_dep, m_lib],
-        'link_args' : symbolic_linkargs
+        'link_args' : symbolic_linkargs,
+        'enabled' : not get_option('merge-ffmpeg')
     }
 endif
 

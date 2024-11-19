@@ -184,6 +184,11 @@ option('avcodec',
     value : 'enabled',
     description : 'Enable/disable avcodec support')
 
+option('merge-ffmpeg',
+    type : 'boolean',
+    value : false,
+    description : 'merge FFmpeg-based plugins')
+
 option('libva',
     type: 'feature',
     value: 'auto',

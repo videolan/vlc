@@ -583,7 +583,19 @@ if get_option('stream_outputs')
     avcodec_extra_sources += 'avcodec/encoder.c'
 endif
 
-# TODO: Implement the merge-ffmpeg option
+avcodec_deps = [ avutil_dep, avcodec_dep ]
+avcodec_cargs = []
+if get_option('merge-ffmpeg')
+    avcodec_extra_sources += [
+        '../demux/avformat/demux.c',
+        '../access/avio.c',
+        '../packetizer/avparser.c' ]
+    avcodec_deps += [ avformat_dep, m_lib ]
+    avcodec_cargs += '-DMERGE_FFMPEG'
+    if get_option('stream_outputs')
+        avcodec_extra_sources += '../demux/avformat/mux.c'
+    endif
+endif
 
 vlc_modules += {
     'name' : 'avcodec',
@@ -598,7 +610,8 @@ vlc_modules += {
             '../packetizer/av1.h',
             avcodec_extra_sources
     ),
-    'dependencies' : [avutil_dep, avcodec_dep],
+    'dependencies' : avcodec_deps,
+    'c_args' : avcodec_cargs,
     'link_with' : [libavcodec_common],
     'link_args' : symbolic_linkargs,
     'enabled' : avcodec_dep.found(),
