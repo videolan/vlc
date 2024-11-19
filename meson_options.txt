@@ -80,9 +80,6 @@ option('vendored_rust_deps',
     value : 'no',
     description : 'Should use vendored sources: `no`, `yes` or PATH_TO_VENDORED_SOURCES')
 
-# TODO: Missing pdb option, this should probably be solved in meson itself
-
-# TODO: Missing ssp option
 # TODO: Missing sse option
 # TODO: Missing avx option
 # TODO: Missing neon option
