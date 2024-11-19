@@ -126,8 +126,12 @@ static int stream_update_latency(struct vlc_pw_stream *s, vlc_tick_t *now)
 {
     struct pw_time ts;
 
+#if PW_CHECK_VERSION(1, 1, 0)
     /* PW monotonic clock, same than vlc_tick_now() */
     *now = VLC_TICK_FROM_NS(pw_stream_get_nsec(s->stream));
+#else
+    *now = vlc_tick_now();
+#endif
 
     if (pw_stream_get_time_n(s->stream, &ts, sizeof (ts)) < 0
      || ts.rate.denom == 0)
