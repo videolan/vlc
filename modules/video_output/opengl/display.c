@@ -116,12 +116,6 @@ UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
     /* Force to recompute the viewport on next picture */
     sys->place_changed = true;
 
-    /* Restore viewpoint */
-    int vp_ret = vout_display_opengl_SetViewpoint(sys->vgl, &sys->viewpoint);
-    /* The viewpoint previously applied is necessarily valid */
-    assert(vp_ret == VLC_SUCCESS);
-    (void) vp_ret;
-
     vlc_gl_ReleaseCurrent(sys->gl);
 
     return ret;
