@@ -67,7 +67,7 @@ static musicbrainz_lookup_t * musicbrainz_lookup(vlc_object_t *p_obj, const char
         if (val) {
             msg_Dbg( p_obj, "error: could not parse json!");
             free(p_buffer);
-            return false;
+            return NULL;
         }
     }
     free(p_buffer);
