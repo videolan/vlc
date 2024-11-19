@@ -4796,7 +4796,7 @@ dnl  the VLC binary
 dnl
 AC_ARG_ENABLE([vlc],
   AS_HELP_STRING([--enable-vlc], [build the VLC media player (default enabled)]))
-AM_CONDITIONAL([BUILD_VLC], [test "${enable_vlc}" != "no"])
+AM_CONDITIONAL([BUILD_VLC], [test "${enable_vlc}" != "no" -a "$vlc_winstore_app" = "0"])
 
 dnl
 dnl Fuzzer (at the end not to mess dependencies FLAGS)
