@@ -56,7 +56,11 @@ static musicbrainz_lookup_t * musicbrainz_lookup(vlc_object_t *p_obj, const char
     {
         p_lookup->root = json_parse_document(p_obj, p_buffer);
         if (!p_lookup->root)
+        {
             msg_Dbg(p_obj, "No results");
+            musicbrainz_lookup_release(p_lookup);
+            p_lookup = NULL;
+        }
     }
     free(p_buffer);
     return p_lookup;
