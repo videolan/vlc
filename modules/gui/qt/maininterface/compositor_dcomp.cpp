@@ -274,8 +274,19 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
                 m_setupStateCond.notify_all();
             }, static_cast<Qt::ConnectionType>(Qt::SingleShotConnection | Qt::DirectConnection));
 
-    m_quickView->show();
+    // Qt "terminates the application" by default if there is no connection made to the signal
+    // QQuickWindow::sceneGraphError(). We need to do the same, because by the time the error
+    // is reported, it will likely be too late (`makeMainInterface()` already returned true,
+    // which is the latest point recovery is still possible) to recover from that error and
+    // the interface will remain unfunctional. It was proposed to wait here until the scene
+    // graph is done, but that was not changed in order not to slow down the application
+    // start up.
+    connect(quickViewPtr,
+            &QQuickWindow::sceneGraphError,
+            m_mainCtx,
+            &MainCtx::askToQuit);
 
+    m_quickView->show();
     return true;
 }
 
