@@ -468,8 +468,8 @@ if [ -n "$EXTRA_CHECKS" ]; then
     MCONFIGFLAGS="$MCONFIGFLAGS -Dextra_checks=true"
 fi
 if [ -n "$DISABLEGUI" ]; then
-    CONFIGFLAGS="$CONFIGFLAGS --disable-vlc --disable-qt --disable-skins2"
-    MCONFIGFLAGS="$MCONFIGFLAGS -Dvlc=false -Dqt=disabled"
+    CONFIGFLAGS="$CONFIGFLAGS --disable-qt --disable-skins2"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=disabled"
     # MCONFIGFLAGS="$MCONFIGFLAGS -Dskins2=disabled"
 else
     CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
