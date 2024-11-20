@@ -249,6 +249,21 @@ input_thread_t * input_Create( vlc_object_t *p_parent, input_item_t *p_item,
     input_item_ApplyOptions( VLC_OBJECT(p_input), p_item );
 
     /* Init Common fields */
+
+    switch (cfg->hw_dec)
+    {
+        case INPUT_CFG_HW_DEC_DEFAULT:
+            priv->hw_dec = var_InheritBool(p_input, "hw-dec");
+            break;
+        case INPUT_CFG_HW_DEC_DISABLED:
+            priv->hw_dec = false;
+            break;
+        case INPUT_CFG_HW_DEC_ENABLED:
+            priv->hw_dec = true;
+            break;
+        default: vlc_assert_unreachable();
+    }
+
     priv->cbs = cfg->cbs;
     priv->cbs_data = cfg->cbs_data;
     priv->type = cfg->type;

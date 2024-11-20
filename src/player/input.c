@@ -1142,6 +1142,7 @@ vlc_player_input_New(vlc_player_t *player, input_item_t *item)
 
     const struct vlc_input_thread_cfg cfg = {
         .type = INPUT_TYPE_PLAYBACK,
+        .hw_dec = INPUT_CFG_HW_DEC_DEFAULT,
         .resource = player->resource,
         .renderer = player->renderer,
         .cbs = &cbs,

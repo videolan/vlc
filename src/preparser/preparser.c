@@ -331,6 +331,7 @@ ThumbnailerRun(void *userdata)
 
     const struct vlc_input_thread_cfg cfg = {
         .type = INPUT_TYPE_THUMBNAILING,
+        .hw_dec = INPUT_CFG_HW_DEC_DEFAULT,
         .cbs = &cbs,
         .cbs_data = task,
     };

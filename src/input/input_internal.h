@@ -330,6 +330,12 @@ struct vlc_input_thread_callbacks
 struct vlc_input_thread_cfg
 {
     enum input_type type;
+    enum
+    {
+        INPUT_CFG_HW_DEC_DEFAULT,
+        INPUT_CFG_HW_DEC_DISABLED,
+        INPUT_CFG_HW_DEC_ENABLED,
+    } hw_dec;
     input_resource_t *resource;
     vlc_renderer_item_t *renderer;
     const struct vlc_input_thread_callbacks *cbs;
@@ -446,6 +452,7 @@ typedef struct input_thread_private_t
     void *cbs_data;
 
     enum input_type type;
+    bool hw_dec;
     bool preparse_subitems;
 
     /* Current state */
