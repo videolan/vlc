@@ -179,12 +179,6 @@ win64:
         <<: *variables-win64
         LIBVLC_EXTRA_BUILD_FLAGS: -x
 
-win64-llvm:
-    extends: .win-common
-    image:
-        name: $VLC_WIN_LLVM_MSVCRT_IMAGE
-    variables: *variables-win64
-
 win64-arm-llvm:
     extends: .win-common
     image:
