@@ -117,7 +117,7 @@ public:
     {
         Q_Q(NetworkDeviceModel);
 
-        if (m_qmlInitializing || !q->m_ctx || q->m_sdSource == NetworkDeviceModel::CAT_UNDEFINED || q->m_sourceName.isEmpty())
+        if (m_qmlInitializing || !m_ctx || m_sdSource == NetworkDeviceModel::CAT_UNDEFINED || m_sourceName.isEmpty())
             return false;
 
         m_items.clear();

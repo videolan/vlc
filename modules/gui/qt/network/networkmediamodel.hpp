@@ -141,15 +141,15 @@ public:
     void setCtx(MainCtx* ctx);
     void setTree(QVariant tree);
 
-    inline MainCtx* getCtx() const { return m_ctx; }
-    inline QVariant getTree() const { return QVariant::fromValue( m_treeItem); }
-    inline QVariantList getPath() const { return m_path; }
+    MainCtx* getCtx() const;
+    QVariant getTree() const;
+    QVariantList getPath() const;
 
-    inline QString getName() const { return m_name; }
-    inline QUrl getUrl() const { return m_url; }
-    inline ItemType getType() const { return m_type; }
-    inline bool isIndexed() const { return m_indexed; }
-    inline bool canBeIndexed() const { return m_canBeIndexed; }
+    QString getName() const;
+    QUrl getUrl() const;
+    ItemType getType() const;
+    bool isIndexed() const;
+    bool canBeIndexed() const;
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist( int index );
@@ -175,18 +175,6 @@ signals:
     void pathChanged();
 
 private:
-    //properties of the current node
-    QString m_name;
-    QUrl m_url;
-    ItemType m_type = ItemType::TYPE_UNKNOWN;
-    bool m_indexed = false;
-    bool m_canBeIndexed  = false;
-
-    MainCtx* m_ctx = nullptr;
-    NetworkTreeItem m_treeItem;
-    QVariantList m_path;
-
-    struct ListenerCb;
     Q_DECLARE_PRIVATE(NetworkMediaModel);
 };
 

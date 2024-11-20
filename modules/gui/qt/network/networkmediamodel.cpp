@@ -144,8 +144,7 @@ public:
 
     void removeItem(const SharedInputItem& node, const std::vector<SharedInputItem>& itemsList)
     {
-        Q_Q(NetworkMediaModel);
-        if (node != q->m_treeItem.media)
+        if (node != m_treeItem.media)
             return;
 
         for (auto p_item : itemsList)
@@ -352,38 +351,38 @@ public:
     {
         Q_Q(NetworkMediaModel);
 
-        if (!q->m_ctx || !m_hasTree || m_qmlInitializing)
+        if (!m_ctx || !m_hasTree || m_qmlInitializing)
             return false;
 
-        auto parser = q->m_ctx->getNetworkPreparser();
+        auto parser = m_ctx->getNetworkPreparser();
         if (unlikely(parser == NULL))
             return false;
 
         m_listener.reset();
         m_items.clear();
 
-        if (!q->m_treeItem)
+        if (!m_treeItem)
             return false;
 
-        auto tree = q->m_treeItem.tree.get();
-        auto l = std::make_unique<MediaTreeListener>( q->m_treeItem.tree,
-                                                     std::make_unique<NetworkMediaModel::ListenerCb>(q) );
+        auto tree = m_treeItem.tree.get();
+        auto l = std::make_unique<MediaTreeListener>( m_treeItem.tree,
+                                                     std::make_unique<NetworkMediaModelPrivate::ListenerCb>(q) );
         if ( l->listener == nullptr )
             return false;
 
-        if (q->m_treeItem.media)
+        if (m_treeItem.media)
         {
-            q->m_name = q->m_treeItem.media->psz_name;
+            m_name = m_treeItem.media->psz_name;
             emit q->nameChanged();
-            q->m_url = QUrl::fromEncoded( QByteArray{ q->m_treeItem.media->psz_uri }.append( '/' ) );
+            m_url = QUrl::fromEncoded( QByteArray{ m_treeItem.media->psz_uri }.append( '/' ) );
             emit q->urlChanged();
-            q->m_type = static_cast<NetworkMediaModel::ItemType>(q->m_treeItem.media->i_type);
+            m_type = static_cast<NetworkMediaModel::ItemType>(m_treeItem.media->i_type);
             emit q->typeChanged();
-            q->m_canBeIndexed = canBeIndexed( q->m_url, q->m_type );
+            m_canBeIndexed = canBeIndexed( m_url, m_type );
             emit q->canBeIndexedChanged();
             if (m_mediaLib)
             {
-                auto uri = QByteArray(q->m_treeItem.media->psz_uri).append('/');
+                auto uri = QByteArray(m_treeItem.media->psz_uri).append('/');
                 struct Ctx {
                     bool succeed;
                     bool isIndexed;
@@ -399,7 +398,7 @@ public:
                         Q_Q(NetworkMediaModel);
                         if (!ctx.succeed)
                             return;
-                        q->m_indexed = ctx.isIndexed;
+                        m_indexed = ctx.isIndexed;
                         emit q->isIndexedChanged();
                     });
             }
@@ -412,16 +411,16 @@ public:
             if (m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
                 vlc_preparser_Cancel( parser, m_parserId );
             std::vector<SharedInputItem> itemList;
-            q->m_path = {QVariant::fromValue(PathNode(q->m_treeItem, q->m_name))};
-            if (vlc_media_tree_Find( tree, q->m_treeItem.media.get(), &mediaNode, &parent))
+            m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
+            if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, &parent))
             {
                 itemList.reserve(mediaNode->i_children);
                 for (int i = 0; i < mediaNode->i_children; i++)
                     itemList.emplace_back(mediaNode->pp_children[i]->p_item);
 
                 while (parent && parent->p_item) {
-                    q->m_path.push_front(QVariant::fromValue(PathNode(
-                        NetworkTreeItem(q->m_treeItem.tree, parent->p_item),
+                    m_path.push_front(QVariant::fromValue(PathNode(
+                        NetworkTreeItem(m_treeItem.tree, parent->p_item),
                         parent->p_item->psz_name)));
                     input_item_node_t *node = nullptr;
                     input_item_node_t *grandParent = nullptr;
@@ -433,12 +432,12 @@ public:
             }
             vlc_media_tree_Unlock(tree);
             if (!itemList.empty())
-                refreshMediaList( q->m_treeItem.tree, std::move( itemList ), true );
+                refreshMediaList( m_treeItem.tree, std::move( itemList ), true );
             emit q->pathChanged();
         }
 
         m_preparseSem.acquire();
-        m_parserId = vlc_media_tree_Preparse( tree, parser, q->m_treeItem.media.get() );
+        m_parserId = vlc_media_tree_Preparse( tree, parser, m_treeItem.media.get() );
 
         m_listener = std::move( l );
 
@@ -467,13 +466,26 @@ public:
     std::unique_ptr<MediaTreeListener> m_listener;
     QHash<QString, NetworkMediaItemPtr> m_items;
     std::unique_ptr<MLMediaStore> m_MLMedias;
+
+    //properties of the current node
+    QString m_name;
+    QUrl m_url;
+    NetworkMediaModel::ItemType m_type = NetworkMediaModel::ItemType::TYPE_UNKNOWN;
+    bool m_indexed = false;
+    bool m_canBeIndexed  = false;
+
+    MainCtx* m_ctx = nullptr;
+    NetworkTreeItem m_treeItem;
+    QVariantList m_path;
+
+    struct ListenerCb;
 private:
     vlc_preparser_req_id m_parserId;
 };
 
 // NetworkMediaModel::ListenerCb implementation
 
-struct NetworkMediaModel::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
+struct NetworkMediaModelPrivate::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
     ListenerCb(NetworkMediaModel *model) : model(model) {}
 
     void onItemCleared( MediaTreePtr tree, input_item_node_t* node ) override;
@@ -497,7 +509,7 @@ NetworkMediaModel::~NetworkMediaModel()
     //this can only be acquired from UI thread
     if (!d->m_preparseSem.tryAcquire())
     {
-        auto parser = m_ctx->getNetworkPreparser();
+        auto parser = d->m_ctx->getNetworkPreparser();
         if (likely(parser != NULL))
         {
             if (d->m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
@@ -514,7 +526,7 @@ NetworkMediaModel::~NetworkMediaModel()
 QVariant NetworkMediaModel::data( const QModelIndex& index, int role ) const
 {
     Q_D(const NetworkMediaModel);
-    if (!m_ctx)
+    if (!d->m_ctx)
         return {};
     const NetworkMediaItem* item = d->getItemForRow(index.row());
     if (!item)
@@ -659,9 +671,9 @@ void NetworkMediaModel::setIndexed(bool indexed)
 {
     Q_D(NetworkMediaModel);
 
-    if (indexed == m_indexed || !m_canBeIndexed)
+    if (indexed == d->m_indexed || !d->m_canBeIndexed)
         return;
-    QString url = m_url.toString( QUrl::FullyEncoded );
+    QString url = d->m_url.toString( QUrl::FullyEncoded );
     struct Ctx {
         bool success;
     };
@@ -680,7 +692,7 @@ void NetworkMediaModel::setIndexed(bool indexed)
     [this, indexed](quint64, Ctx& ctx){
         if (ctx.success)
         {
-            m_indexed = indexed;
+            d_func()->m_indexed = indexed;
             emit isIndexedChanged();
         }
     },
@@ -690,11 +702,11 @@ void NetworkMediaModel::setIndexed(bool indexed)
 void NetworkMediaModel::setCtx(MainCtx* ctx)
 {
     Q_D(NetworkMediaModel);
-    if (m_ctx == ctx)
+    if (d->m_ctx == ctx)
         return;
 
     assert(ctx);
-    m_ctx = ctx;
+    d->m_ctx = ctx;
     d->m_mediaLib = ctx->getMediaLibrary();
 
     d->m_MLMedias.reset();
@@ -716,9 +728,9 @@ void NetworkMediaModel::setTree(QVariant parentTree)
 {
     Q_D(NetworkMediaModel);
     if (parentTree.canConvert<NetworkTreeItem>())
-        m_treeItem = parentTree.value<NetworkTreeItem>();
+        d->m_treeItem = parentTree.value<NetworkTreeItem>();
     else
-        m_treeItem = NetworkTreeItem();
+        d->m_treeItem = NetworkTreeItem();
     d->m_hasTree = true;
 
     d->initializeModel();
@@ -728,7 +740,7 @@ void NetworkMediaModel::setTree(QVariant parentTree)
 bool NetworkMediaModel::insertIntoPlaylist(const QModelIndexList &itemIdList, const ssize_t playlistIndex)
 {
     Q_D(NetworkMediaModel);
-    if (!(m_ctx && d->m_hasTree))
+    if (!(d->m_ctx && d->m_hasTree))
         return false;
     QVector<vlc::playlist::Media> medias;
     medias.reserve( itemIdList.size() );
@@ -745,21 +757,21 @@ bool NetworkMediaModel::insertIntoPlaylist(const QModelIndexList &itemIdList, co
     }
     if (medias.isEmpty())
         return false;
-    m_ctx->getIntf()->p_mainPlaylistController->insert(playlistIndex, medias, false);
+    d->m_ctx->getIntf()->p_mainPlaylistController->insert(playlistIndex, medias, false);
     return true;
 }
 
 bool NetworkMediaModel::addToPlaylist(const int index)
 {
     Q_D(NetworkMediaModel);
-    if (!(m_ctx && d->m_hasTree))
+    if (!(d->m_ctx && d->m_hasTree))
         return false;
     const NetworkMediaItem* item = d->getItemForRow(index);
     if (!item)
         return false;
 
     vlc::playlist::Media media{ item->tree.media.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{ media }, false);
+    d->m_ctx->getIntf()->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{ media }, false);
     return true;
 }
 
@@ -797,7 +809,7 @@ bool NetworkMediaModel::addToPlaylist(const QModelIndexList &itemIdList)
 bool NetworkMediaModel::addAndPlay(int index)
 {
     Q_D(NetworkMediaModel);
-    if (!(m_ctx && d->m_hasTree))
+    if (!(d->m_ctx && d->m_hasTree))
         return false;
 
     const NetworkMediaItem* item = d->getItemForRow(index);
@@ -805,7 +817,7 @@ bool NetworkMediaModel::addAndPlay(int index)
         return false;
 
     vlc::playlist::Media media{ item->tree.media.get() };
-    m_ctx->getIntf()->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{ media }, true);
+    d->m_ctx->getIntf()->p_mainPlaylistController->append( QVector<vlc::playlist::Media>{ media }, true);
     return true;
 }
 
@@ -869,19 +881,55 @@ QVariantList NetworkMediaModel::getItemsForIndexes(const QModelIndexList & index
     return items;
 }
 
-void NetworkMediaModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item_node_t* node)
+MainCtx* NetworkMediaModel::getCtx() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_ctx;
+}
+QVariant NetworkMediaModel::getTree() const {
+    Q_D(const NetworkMediaModel);
+    return QVariant::fromValue( d->m_treeItem);
+}
+QVariantList NetworkMediaModel::getPath() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_path;
+}
+
+QString NetworkMediaModel::getName() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_name;
+}
+QUrl NetworkMediaModel::getUrl() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_url;
+}
+NetworkMediaModel::ItemType NetworkMediaModel::getType() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_type;
+}
+bool NetworkMediaModel::isIndexed() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_indexed;
+}
+bool NetworkMediaModel::canBeIndexed() const {
+    Q_D(const NetworkMediaModel);
+    return d->m_canBeIndexed;
+}
+
+
+void NetworkMediaModelPrivate::ListenerCb::onItemCleared( MediaTreePtr tree, input_item_node_t* node)
 {
     SharedInputItem p_node { node->p_item };
     QMetaObject::invokeMethod(model, [model=model, p_node = std::move(p_node), tree = std::move(tree)]() {
-        if (p_node != model->m_treeItem.media)
+        NetworkMediaModelPrivate* d = model->d_func();
+        if (p_node != d->m_treeItem.media)
             return;
         input_item_node_t *res;
         input_item_node_t *parent;
         // XXX is tree == m_treeItem.tree?
-        vlc_media_tree_Lock( model->m_treeItem.tree.get() );
-        bool found = vlc_media_tree_Find( model->m_treeItem.tree.get(), model->m_treeItem.media.get(),
+        vlc_media_tree_Lock( d->m_treeItem.tree.get() );
+        bool found = vlc_media_tree_Find( d->m_treeItem.tree.get(), d->m_treeItem.media.get(),
                                           &res, &parent );
-        vlc_media_tree_Unlock( model->m_treeItem.tree.get() );
+        vlc_media_tree_Unlock( d->m_treeItem.tree.get() );
         if (!found)
             return;
 
@@ -894,7 +942,7 @@ void NetworkMediaModel::ListenerCb::onItemCleared( MediaTreePtr tree, input_item
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_node_t* parent,
+void NetworkMediaModelPrivate::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_node_t* parent,
                                                  input_item_node_t *const children[],
                                                  size_t count )
 {
@@ -905,12 +953,12 @@ void NetworkMediaModel::ListenerCb::onItemAdded( MediaTreePtr tree, input_item_n
         itemList.emplace_back(children[i]->p_item);
 
     QMetaObject::invokeMethod(model, [model=model, p_parent = std::move(p_parent), tree = std::move(tree), itemList=std::move(itemList)]() {
-        if ( p_parent == model->m_treeItem.media )
+        if ( p_parent == model->d_func()->m_treeItem.media )
             model->d_func()->refreshMediaList( std::move( tree ), std::move( itemList ), false );
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node_t * node,
+void NetworkMediaModelPrivate::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node_t * node,
                                                    input_item_node_t *const children[],
                                                    size_t count )
 {
@@ -927,12 +975,12 @@ void NetworkMediaModel::ListenerCb::onItemRemoved( MediaTreePtr, input_item_node
     }, Qt::QueuedConnection);
 }
 
-void NetworkMediaModel::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, int )
+void NetworkMediaModelPrivate::ListenerCb::onItemPreparseEnded(MediaTreePtr, input_item_node_t* node, int )
 {
     model->d_func()->m_preparseSem.release();
     SharedInputItem p_node { node->p_item };
     QMetaObject::invokeMethod(model, [model=model, p_node=std::move(p_node)]() {
-        if (p_node != model->m_treeItem.media)
+        if (p_node != model->d_func()->m_treeItem.media)
             return;
 
         model->d_func()->m_loading = false;
