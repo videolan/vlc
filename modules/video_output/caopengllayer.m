@@ -340,6 +340,117 @@ static void *gl_cb_GetProcAddress(vlc_gl_t *vlc_gl, const char *name)
 #pragma mark -
 #pragma mark Module functions
 
+static void Close(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    atomic_store(&sys->is_ready, false);
+    [sys->videoLayer vlcClose];
+    [sys->videoView vlcClose];
+
+    if (sys->vgl && !vlc_gl_MakeCurrent(sys->gl)) {
+        vout_display_opengl_Delete(sys->vgl);
+        vlc_gl_ReleaseCurrent(sys->gl);
+    }
+
+
+    if (sys->gl) {
+        struct vlc_gl_sys *glsys = sys->gl->sys;
+
+        // It should never happen that the context is destroyed and we
+        // still have a previous context set, as it would mean non-balanced
+        // calls to MakeCurrent/ReleaseCurrent.
+        assert(glsys->cgl_prev == NULL);
+
+        CGLReleaseContext(glsys->cgl);
+        vlc_object_delete(sys->gl);
+        free(glsys);
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Remove vout subview from container
+        if ([sys->container respondsToSelector:@selector(removeVoutSubview:)]) {
+            [sys->container removeVoutSubview:sys->videoView];
+        }
+        [sys->videoView removeFromSuperview];
+
+        sys->videoView = nil;
+        sys->container = nil;
+        sys->videoLayer = nil;
+        free(sys);
+    });
+}
+
+static void PictureRender (vout_display_t *vd, picture_t *pic,
+                           const vlc_render_subpicture *subpicture,
+                           vlc_tick_t date)
+{
+    VLC_UNUSED(date);
+    vout_display_sys_t *sys = vd->sys;
+
+    if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
+    {
+        vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
+        vlc_gl_ReleaseCurrent(sys->gl);
+
+        atomic_store(&sys->is_ready, true);
+    }
+}
+
+static void PictureDisplay (vout_display_t *vd, picture_t *pic)
+{
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(pic);
+
+
+    [sys->videoLayer displayFromVout];
+}
+
+static int Control (vout_display_t *vd, int query)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (!vd->sys)
+        return VLC_EGENERIC;
+
+    switch (query)
+    {
+        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+            return VLC_SUCCESS;
+
+        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        {
+            @synchronized(sys->videoLayer)
+            {
+                vout_display_cfg_t cfg = *vd->cfg;
+                cfg.display.width = sys->cfg.display.width;
+                cfg.display.height = sys->cfg.display.height;
+
+                sys->cfg = cfg;
+
+                vout_display_PlacePicture(&sys->place, vd->source, &cfg.display);
+                // Reverse vertical alignment as the GL tex are Y inverted
+                sys->place.y = cfg.display.height - (sys->place.y + sys->place.height);
+            }
+
+            // Note!
+            // No viewport or aspect ratio is set here, as that needs to be set
+            // when rendering. The viewport is always set to match the layer
+            // size by the OS right before the OpenGL render callback, so
+            // setting it here has no effect.
+            return VLC_SUCCESS;
+        }
+
+        default:
+            msg_Err (vd, "Unhandled request %d", query);
+            return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * Open: This function allocates and initializes the OpenGL vout method.
  *****************************************************************************/
@@ -474,117 +585,6 @@ static int Open (vout_display_t *vd,
         atomic_init(&sys->is_ready, false);
         return VLC_SUCCESS;
     }
-}
-
-static void Close(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    atomic_store(&sys->is_ready, false);
-    [sys->videoLayer vlcClose];
-    [sys->videoView vlcClose];
-
-    if (sys->vgl && !vlc_gl_MakeCurrent(sys->gl)) {
-        vout_display_opengl_Delete(sys->vgl);
-        vlc_gl_ReleaseCurrent(sys->gl);
-    }
-
-
-    if (sys->gl) {
-        struct vlc_gl_sys *glsys = sys->gl->sys;
-
-        // It should never happen that the context is destroyed and we
-        // still have a previous context set, as it would mean non-balanced
-        // calls to MakeCurrent/ReleaseCurrent.
-        assert(glsys->cgl_prev == NULL);
-
-        CGLReleaseContext(glsys->cgl);
-        vlc_object_delete(sys->gl);
-        free(glsys);
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Remove vout subview from container
-        if ([sys->container respondsToSelector:@selector(removeVoutSubview:)]) {
-            [sys->container removeVoutSubview:sys->videoView];
-        }
-        [sys->videoView removeFromSuperview];
-
-        sys->videoView = nil;
-        sys->container = nil;
-        sys->videoLayer = nil;
-        free(sys);
-    });
-}
-
-static void PictureRender (vout_display_t *vd, picture_t *pic,
-                           const vlc_render_subpicture *subpicture,
-                           vlc_tick_t date)
-{
-    VLC_UNUSED(date);
-    vout_display_sys_t *sys = vd->sys;
-
-    if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
-    {
-        vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
-        vlc_gl_ReleaseCurrent(sys->gl);
-
-        atomic_store(&sys->is_ready, true);
-    }
-}
-
-static void PictureDisplay (vout_display_t *vd, picture_t *pic)
-{
-    vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(pic);
-
-
-    [sys->videoLayer displayFromVout];
-}
-
-static int Control (vout_display_t *vd, int query)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!vd->sys)
-        return VLC_EGENERIC;
-
-    switch (query)
-    {
-        case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-            return VLC_SUCCESS;
-
-        case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-        case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        {
-            @synchronized(sys->videoLayer)
-            {
-                vout_display_cfg_t cfg = *vd->cfg;
-                cfg.display.width = sys->cfg.display.width;
-                cfg.display.height = sys->cfg.display.height;
-
-                sys->cfg = cfg;
-
-                vout_display_PlacePicture(&sys->place, vd->source, &cfg.display);
-                // Reverse vertical alignment as the GL tex are Y inverted
-                sys->place.y = cfg.display.height - (sys->place.y + sys->place.height);
-            }
-
-            // Note!
-            // No viewport or aspect ratio is set here, as that needs to be set
-            // when rendering. The viewport is always set to match the layer
-            // size by the OS right before the OpenGL render callback, so
-            // setting it here has no effect.
-            return VLC_SUCCESS;
-        }
-
-        default:
-            msg_Err (vd, "Unhandled request %d", query);
-            return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
 }
 
 #pragma mark -
