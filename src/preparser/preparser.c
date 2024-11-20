@@ -584,13 +584,20 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
                 vlc_list_remove(&task->node);
                 vlc_mutex_unlock(&preparser->lock);
                 task->preparse_status = -EINTR;
-                if (task->options == VLC_PREPARSER_TYPE_THUMBNAIL)
+                if (task->options & (VLC_PREPARSER_TYPE_PARSE |
+                                     VLC_PREPARSER_TYPE_FETCHMETA_ALL))
+                {
+                    assert((task->options & VLC_PREPARSER_TYPE_THUMBNAIL) == 0);
+                    task->cbs.parser->on_ended(task->item, task->preparse_status,
+                                               task->userdata);
+                }
+                else
+                {
+                    assert(task->options & VLC_PREPARSER_TYPE_THUMBNAIL);
                     task->cbs.thumbnailer->on_ended(task->item,
                                                     task->preparse_status, NULL,
                                                     task->userdata);
-                else
-                    task->cbs.parser->on_ended(task->item, task->preparse_status,
-                                               task->userdata);
+                }
                 TaskDelete(task);
 
                 /* Small optimisation in the likely case where the user cancel
