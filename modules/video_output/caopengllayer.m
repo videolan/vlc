@@ -321,6 +321,37 @@ static void *gl_cb_GetProcAddress(vlc_gl_t *vlc_gl, const char *name)
     return dlsym(RTLD_DEFAULT, name);
 }
 
+static int OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
+                      const struct vlc_gl_cfg *cfg)
+{
+    struct vlc_gl_sys *glsys = calloc(1, sizeof(*glsys));
+    if (unlikely(!glsys))
+        return VLC_ENOMEM;
+
+    // Create the CGL context
+    CGLContextObj cgl_ctx = vlc_CreateCGLContext();
+    if (cgl_ctx == NULL) {
+        msg_Err(gl, "Failure to create CGL context!");
+        free(glsys);
+        return VLC_EGENERIC;
+    }
+
+    glsys->cgl = cgl_ctx;
+    glsys->cgl_prev = NULL;
+
+    static const struct vlc_gl_operations gl_ops =
+    {
+        .make_current = gl_cb_MakeCurrent,
+        .release_current = gl_cb_ReleaseCurrent,
+        .swap = gl_cb_Swap,
+        .get_proc_address = gl_cb_GetProcAddress,
+    };
+    gl->ops = &gl_ops;
+    gl->api_type = VLC_OPENGL;
+    gl->sys = glsys;
+
+    return VLC_SUCCESS;
+}
 
 #pragma mark -
 #pragma mark Module functions
@@ -474,43 +505,25 @@ static int Open (vout_display_t *vd,
         // Retain container, released in Close
         sys->container = container;
 
-        // Create the CGL context
-        CGLContextObj cgl_ctx = vlc_CreateCGLContext();
-        if (cgl_ctx == NULL) {
-            msg_Err(vd, "Failure to create CGL context!");
-            Close(vd);
-            return VLC_EGENERIC;
-        }
-
         // Create a pseudo-context object which provides needed callbacks
         // for VLC to deal with the CGL context. Usually this should be done
         // by a proper opengl provider module, but we do not have that currently.
         sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (unlikely(!sys->gl))
         {
-            CGLReleaseContext(cgl_ctx);
             Close(vd);
             return VLC_ENOMEM;
         }
 
-
-        static const struct vlc_gl_operations gl_ops =
-        {
-            .make_current = gl_cb_MakeCurrent,
-            .release_current = gl_cb_ReleaseCurrent,
-            .swap = gl_cb_Swap,
-            .get_proc_address = gl_cb_GetProcAddress,
+        const struct vlc_gl_cfg gl_cfg = {
+            .need_alpha = false,
         };
-        sys->gl->ops = &gl_ops;
-        sys->gl->api_type = VLC_OPENGL;
 
-        struct vlc_gl_sys *glsys = sys->gl->sys = malloc(sizeof(*glsys));
-        if (unlikely(!glsys)) {
+        int ret = OpenOpenGL(sys->gl, vd->cfg->display.width, vd->cfg->display.height, &gl_cfg);
+        if (ret != VLC_SUCCESS) {
             Close(vd);
-            return VLC_ENOMEM;
+            return ret;
         }
-        glsys->cgl = cgl_ctx;
-        glsys->cgl_prev = NULL;
 
         dispatch_sync(dispatch_get_main_queue(), ^{
            sys->cfg = *vd->cfg;
