@@ -75,13 +75,10 @@ struct vlc_thumbnailer_cbs
      * scope.
      *
      * @param item item used for the thumbnailer
-     *
      * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
      * timeout, -EINTR if cancelled, an error otherwise
-     *
      * @param thumbnail The generated thumbnail, or NULL in case of failure or
      * timeout
-     *
      * @param data opaque pointer passed by
      * vlc_preparser_GenerateThumbnail()
      *
