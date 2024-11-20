@@ -119,6 +119,9 @@ struct vlc_thumbnailer_arg
             VLC_THUMBNAILER_SEEK_FAST,
         } speed;
     } seek;
+
+    /** True to enable hardware decoder */
+    bool hw_dec;
 };
 
 /**

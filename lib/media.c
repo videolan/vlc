@@ -1008,6 +1008,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_instance_t *inst,
             .speed = speed == libvlc_media_thumbnail_seek_fast ?
                 VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         },
+        .hw_dec = false,
     };
     return libvlc_media_thumbnail_request( inst, md, &thumb_arg, width, height,
                                            crop, picture_type, timeout );
@@ -1029,6 +1030,7 @@ libvlc_media_thumbnail_request_by_pos( libvlc_instance_t *inst,
             .speed = speed == libvlc_media_thumbnail_seek_fast ?
                 VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE,
         },
+        .hw_dec = false,
     };
     return libvlc_media_thumbnail_request( inst, md, &thumb_arg, width, height,
                                            crop, picture_type, timeout );

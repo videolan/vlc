@@ -166,6 +166,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
             thumb_arg.seek.speed = test_params[i].b_fast_seek ?
                 VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
         }
+        thumb_arg.hw_dec = false;
         static const struct vlc_thumbnailer_cbs cbs = {
             .on_ended = thumbnailer_callback,
         };

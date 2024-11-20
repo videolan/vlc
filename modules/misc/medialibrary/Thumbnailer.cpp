@@ -82,6 +82,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
                 .pos = position,
                 .speed = vlc_thumbnailer_arg::seek::VLC_THUMBNAILER_SEEK_FAST,
             },
+            .hw_dec = false,
         };
 
         static const struct vlc_thumbnailer_cbs cbs = {

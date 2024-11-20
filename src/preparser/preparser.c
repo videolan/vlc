@@ -90,6 +90,7 @@ TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
     if (thumb_arg == NULL)
         task->thumb_arg = (struct vlc_thumbnailer_arg) {
             .seek.type = VLC_THUMBNAILER_SEEK_NONE,
+            .hw_dec = false,
         };
     else
         task->thumb_arg = *thumb_arg;
@@ -331,7 +332,8 @@ ThumbnailerRun(void *userdata)
 
     const struct vlc_input_thread_cfg cfg = {
         .type = INPUT_TYPE_THUMBNAILING,
-        .hw_dec = INPUT_CFG_HW_DEC_DEFAULT,
+        .hw_dec = task->thumb_arg.hw_dec ? INPUT_CFG_HW_DEC_ENABLED
+                                         : INPUT_CFG_HW_DEC_DISABLED,
         .cbs = &cbs,
         .cbs_data = task,
     };
