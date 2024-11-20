@@ -313,10 +313,6 @@
 /* Define to 1 if you have the `posix_memalign' function. */
 #mesondefine HAVE_POSIX_MEMALIGN
 
-/* Define to 1 if the system has the type
-   `PROCESS_MITIGATION_IMAGE_LOAD_POLICY'. */
-#mesondefine HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
-
 /* Define to 1 if using libprojectM 2.x */
 #mesondefine HAVE_PROJECTM2
 

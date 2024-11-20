@@ -4781,14 +4781,6 @@ AS_IF([test "${SYS}" = "mingw32"], [
 ])
 AM_CONDITIONAL([HAVE_MAKENSIS], [test "$MAKENSIS" != "no" && test "$nsis_version_ok" = "yes"])
 
-dnl
-dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY
-dnl It should only be available when building for win10, but some SDKs define it unconditionnaly
-dnl
-if test "${SYS}" = "mingw32"; then
-    AC_CHECK_TYPES([PROCESS_MITIGATION_IMAGE_LOAD_POLICY],,,[#include <windows.h>])
-fi
-
 EXTEND_HELP_STRING([Components:])
 
 dnl

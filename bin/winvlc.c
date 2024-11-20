@@ -81,19 +81,6 @@ static BOOL SetDefaultDllDirectories_(DWORD flags)
 
 static void PrioritizeSystem32(void)
 {
-#ifndef HAVE_PROCESS_MITIGATION_IMAGE_LOAD_POLICY
-    typedef struct _PROCESS_MITIGATION_IMAGE_LOAD_POLICY {
-      union {
-        DWORD  Flags;
-        struct {
-          DWORD NoRemoteImages  :1;
-          DWORD NoLowMandatoryLabelImages  :1;
-          DWORD PreferSystem32Images  :1;
-          DWORD ReservedFlags  :29;
-        };
-      };
-    } PROCESS_MITIGATION_IMAGE_LOAD_POLICY;
-#endif
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
     BOOL (WINAPI *SetProcessMitigationPolicy)(PROCESS_MITIGATION_POLICY, PVOID, SIZE_T);
     HINSTANCE h_Kernel32 = GetModuleHandle(TEXT("kernel32.dll"));
