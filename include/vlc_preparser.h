@@ -56,7 +56,11 @@ typedef size_t vlc_preparser_req_id;
 #define VLC_PREPARSER_OPTION_INTERACT 0x1000
 #define VLC_PREPARSER_OPTION_SUBITEMS 0x2000
 
-/** Preparser thumbnailer callbacks */
+/**
+ * Preparser thumbnailer callbacks
+ *
+ * Used by vlc_preparser_GenerateThumbnail()
+ */
 struct vlc_thumbnailer_cbs
 {
     /**
@@ -89,6 +93,8 @@ struct vlc_thumbnailer_cbs
 
 /**
  * Thumbnailer argument
+ *
+ * Used by vlc_preparser_GenerateThumbnail()
  */
 struct vlc_thumbnailer_arg
 {
@@ -97,7 +103,7 @@ struct vlc_thumbnailer_arg
     {
         enum
         {
-            /** Don't seek */
+            /** Don't seek (default) */
             VLC_THUMBNAILER_SEEK_NONE,
             /** Seek by time */
             VLC_THUMBNAILER_SEEK_TIME,
@@ -120,7 +126,7 @@ struct vlc_thumbnailer_arg
         } speed;
     } seek;
 
-    /** True to enable hardware decoder */
+    /** True to enable hardware decoder (false by default) */
     bool hw_dec;
 };
 
@@ -192,9 +198,7 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_opt
  *
  * @param preparser the preparser object
  * @param item a valid item to generate the thumbnail for
- * @param arg pointer to a seek struct, that tell at which time the
- * thumbnail should be taken, NULL to disable seek
- * @param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
+ * @param arg pointer to the arg struct, NULL for default options
  * @param cbs callback to listen to events (can't be NULL)
  * @param cbs_userdata opaque pointer used by the callbacks
  * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
