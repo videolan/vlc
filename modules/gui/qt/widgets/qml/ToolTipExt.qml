@@ -44,6 +44,23 @@ T.ToolTip {
             control.popupType = 1 // Popup.Window
     }
 
+    // NOTE: The tool tip often moves around, particularly noticable
+    //       with the attached (global) tool tip, and pointing tool
+    //       tip. Ideally, we could override property `visible` and
+    //       call `QQuickPopup::open()` with `Qt.callLater()`, but
+    //       the property is marked as FINAL. At the same time,
+    //       Qt disables the timer when the delay is 0, ideally we
+    //       need a timer with 0 delay, but 1 millisecond should
+    //       not be a big deal.
+    // NOTE: Mispositioned tool tip upon being visible is observed
+    //       especially with the independent window (`Popup.Window`)
+    //       setting. We need to make sure that its position is
+    //       adjusted before the tool tip is shown. For that reason,
+    //       be careful to not use complex bindings for the position
+    //       and text, as they may not be resolved as soon as the
+    //       tool tip is shown (single event loop cycle).
+    delay: 1
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.Tooltip
