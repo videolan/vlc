@@ -60,6 +60,7 @@ struct vlc_input_decoder_cfg
     input_resource_t *resource;
     sout_stream_t *sout;
     enum input_type input_type;
+    bool hw_dec;
     unsigned cc_decoder;
     const struct vlc_input_decoder_callbacks *cbs;
     void *cbs_data;

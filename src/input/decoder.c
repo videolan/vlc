@@ -121,6 +121,8 @@ struct vlc_input_decoder_t
     vlc_clock_t     *p_clock;
     const char *psz_id;
 
+    bool hw_dec;
+
     const struct vlc_input_decoder_callbacks *cbs;
     void *cbs_userdata;
 
@@ -816,7 +818,7 @@ static vlc_decoder_device * ModuleThread_GetDecoderDevice( decoder_t *p_dec )
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
 
     /* Requesting a decoder device will automatically enable hw decoding */
-    if( !var_InheritBool( p_dec, "hw-dec" ) )
+    if (!p_owner->hw_dec)
         return NULL;
 
     int created_vout = CreateVoutIfNeeded(p_owner);
@@ -1951,6 +1953,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     p_owner->p_clock = cfg->clock;
     p_owner->i_preroll_end = PREROLL_NONE;
     p_owner->p_resource = cfg->resource;
+    p_owner->hw_dec = cfg->hw_dec;
     p_owner->cbs = cfg->cbs;
     p_owner->cbs_userdata = cfg->cbs_data;
     p_owner->p_aout = NULL;
@@ -2277,6 +2280,7 @@ vlc_input_decoder_Create( vlc_object_t *p_parent, const es_format_t *fmt, const 
         .resource = p_resource,
         .sout = NULL,
         .input_type = INPUT_TYPE_PLAYBACK,
+        .hw_dec = var_InheritBool( p_parent, "hw-dec" ),
         .cbs = NULL, .cbs_data = NULL,
     };
     return decoder_New( p_parent, &cfg );

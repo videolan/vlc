@@ -353,6 +353,9 @@ int main(void)
     var_Create(root, "captions", VLC_VAR_INTEGER);
     var_SetInteger(root, "captions", 608);
 
+    var_Create(root, "hw-dec", VLC_VAR_BOOL);
+    var_SetBool(root, "hw-dec", false);
+
     input_item_t *item = input_item_NewStream("mock://", "mock", 0);
 
     input_thread_private_t *priv = vlc_object_create(root, sizeof(*priv));
