@@ -20,74 +20,12 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <tlhelp32.h>
+#include <psapi.h>
 #include "pluginapi.h"
 
 /* Defines */
 #define NSIS_MAX_STRLEN 1024
 
-#define SystemProcessInformation     5
-#define STATUS_SUCCESS               0x00000000L
-#define STATUS_INFO_LENGTH_MISMATCH  0xC0000004L
-
-typedef struct _SYSTEM_THREAD_INFO {
-  FILETIME ftCreationTime;
-  DWORD dwUnknown1;
-  DWORD dwStartAddress;
-  DWORD dwOwningPID;
-  DWORD dwThreadID;
-  DWORD dwCurrentPriority;
-  DWORD dwBasePriority;
-  DWORD dwContextSwitches;
-  DWORD dwThreadState;
-  DWORD dwUnknown2;
-  DWORD dwUnknown3;
-  DWORD dwUnknown4;
-  DWORD dwUnknown5;
-  DWORD dwUnknown6;
-  DWORD dwUnknown7;
-} SYSTEM_THREAD_INFO;
-
-typedef struct _SYSTEM_PROCESS_INFO {
-  DWORD dwOffset;
-  DWORD dwThreadCount;
-  DWORD dwUnkown1[6];
-  FILETIME ftCreationTime;
-  DWORD dwUnkown2;
-  DWORD dwUnkown3;
-  DWORD dwUnkown4;
-  DWORD dwUnkown5;
-  DWORD dwUnkown6;
-  WCHAR *pszProcessName;
-  DWORD dwBasePriority;
-  DWORD dwProcessID;
-  DWORD dwParentProcessID;
-  DWORD dwHandleCount;
-  DWORD dwUnkown7;
-  DWORD dwUnkown8;
-  DWORD dwVirtualBytesPeak;
-  DWORD dwVirtualBytes;
-  DWORD dwPageFaults;
-  DWORD dwWorkingSetPeak;
-  DWORD dwWorkingSet;
-  DWORD dwUnkown9;
-  DWORD dwPagedPool;
-  DWORD dwUnkown10;
-  DWORD dwNonPagedPool;
-  DWORD dwPageFileBytesPeak;
-  DWORD dwPageFileBytes;
-  DWORD dwPrivateBytes;
-  DWORD dwUnkown11;
-  DWORD dwUnkown12;
-  DWORD dwUnkown13;
-  DWORD dwUnkown14;
-  SYSTEM_THREAD_INFO ati[ANYSIZE_ARRAY];
-} SYSTEM_PROCESS_INFO;
-
-
-/* Include conversion functions */
-//#define xatoi
-//#define xitoa
 
 /* Global variables */
 TCHAR szBuf[NSIS_MAX_STRLEN];
@@ -178,14 +116,14 @@ void NiceTerminate(DWORD id, BOOL bClose, BOOL *bSuccess, BOOL *bFailed)
 	if (bClose)
 		EnumWindows(EnumWindowsProc, (LPARAM)&window);
 	if (window.prev_hwnd != NULL)
-	{	  
+	{
 	  if (GetExitCodeProcess(hProc,&ec) && ec == STILL_ACTIVE)
 		if (WaitForSingleObject(hProc, 3000) == WAIT_OBJECT_0)
 		{
 		  *bSuccess = bDone = TRUE;
 		}
 		else;
-	  else 
+	  else
 	  {
 		  *bSuccess = bDone = TRUE;
 	  }
@@ -256,7 +194,6 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
 {
   TCHAR szName[MAX_PATH];
   OSVERSIONINFO osvi;
-  HMODULE hLib;
   HANDLE hProc;
   ULONG uError;
   BOOL bFound=FALSE;
@@ -271,83 +208,63 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
       osvi.dwPlatformId != VER_PLATFORM_WIN32_WINDOWS)
     return 605;
 
-  if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
+  size_t process_count = 512;
+  DWORD *processIDs = NULL;
+  for (;;)
   {
-    // WinNT/2000/XP
-
-    SYSTEM_PROCESS_INFO *spi;
-    SYSTEM_PROCESS_INFO *spiCount;
-    DWORD dwSize=0x4000;
-    DWORD dwData;
-    ULONG (WINAPI *NtQuerySystemInformationPtr)(ULONG, PVOID, LONG, PULONG);
-
-    if ((hLib=LoadLibraryW(L"NTDLL.DLL")) != NULL)
+    processIDs = realloc(processIDs, process_count * sizeof(DWORD));
+    if (unlikely(processIDs == NULL))
+        break;
+    DWORD readSize;
+    if (!EnumProcesses(processIDs, process_count*sizeof(DWORD), &readSize))
     {
-      NtQuerySystemInformationPtr=(ULONG(WINAPI *)(ULONG, PVOID, LONG, PULONG))GetProcAddress(hLib, "NtQuerySystemInformation");
+        free(processIDs);
+        processIDs = NULL;
+        break;
+    }
+    if (readSize < process_count * sizeof(DWORD))
+    {
+        process_count = readSize / sizeof(DWORD);
+        break;
+    }
 
-      if (NtQuerySystemInformationPtr)
+    // there might be more processes
+    process_count *= 2;
+  }
+  if (processIDs != NULL)
+  {
+    const size_t cmpsize = lstrlen(szProcessName);
+    for (size_t i=0; i<process_count; i++)
+    {
+      hProc = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processIDs[i]);
+      if (hProc != NULL)
       {
-        while (1)
+        DWORD proclen = sizeof(szName);
+        BOOL got = QueryFullProcessImageName(hProc, PROCESS_NAME_NATIVE, szName, &proclen);
+        CloseHandle(hProc);
+        if (got != FALSE)
         {
-          if ((spi=LocalAlloc(LMEM_FIXED, dwSize)) != NULL)
+
+          if (proclen < cmpsize + 1)
           {
-            uError=(*NtQuerySystemInformationPtr)(SystemProcessInformation, spi, dwSize, &dwData);
+            continue;
+          }
+          if (szName[proclen - cmpsize - 1] == TEXT('\\') &&
+              !lstrcmpi(szProcessName, &szName[proclen - cmpsize]))
+          {
+            // Process found
+            bFound=TRUE;
 
-            if (uError == STATUS_SUCCESS) break;
-
-            LocalFree(spi);
-
-            if (uError != STATUS_INFO_LENGTH_MISMATCH)
+            if (bTerminate == TRUE)
             {
-              uError=608;
-              break;
+              NiceTerminate(processIDs[i], bClose, &bSuccess, &bFailed);
             }
+            else break;
           }
-          else
-          {
-            uError=608;
-            break;
-          }
-          dwSize*=2;
         }
       }
-      else uError=607;
-
-      FreeLibrary(hLib);
     }
-    else uError=606;
-
-    if (uError != STATUS_SUCCESS) return uError;
-
-    spiCount=spi;
-
-    while (1)
-    {
-      if (spiCount->pszProcessName)
-      {
-
-#ifdef UNICODE
-	    lstrcpyn(szName, spiCount->pszProcessName, MAX_PATH);
-#else
-	    WideCharToMultiByte(CP_ACP, 0, spiCount->pszProcessName, -1, szName, MAX_PATH, NULL, NULL);
-#endif		
-
-        if (!lstrcmpi(szName, szProcessName))
-        {
-          // Process found
-          bFound=TRUE;
-
-          if (bTerminate == TRUE)
-          {
-			  NiceTerminate(spiCount->dwProcessID, bClose, &bSuccess, &bFailed);
-          }
-          else break;
-        }
-      }
-      if (spiCount->dwOffset == 0) break;
-      spiCount=(SYSTEM_PROCESS_INFO *)((char *)spiCount + spiCount->dwOffset);
-    }
-    LocalFree(spi);
+    free(processIDs);
   }
 
   if (bFound == FALSE) return 603;
