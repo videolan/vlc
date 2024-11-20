@@ -562,9 +562,23 @@ size_t vlc_preparser_Cancel( vlc_preparser_t *preparser, vlc_preparser_req_id id
         if (id == VLC_PREPARSER_REQ_ID_INVALID || task->id == id)
         {
             count++;
-            /* TODO: the fetcher should be cancellable too */
-            bool canceled = preparser->parser != NULL
-              && vlc_executor_Cancel(preparser->parser, &task->runnable);
+
+            bool canceled;
+            if (task->options & VLC_PREPARSER_TYPE_PARSE)
+            {
+                assert(preparser->parser != NULL);
+                canceled = vlc_executor_Cancel(preparser->parser,
+                                               &task->runnable);
+            }
+            else if (task->options & VLC_PREPARSER_TYPE_THUMBNAIL)
+            {
+                assert(preparser->thumbnailer != NULL);
+                canceled = vlc_executor_Cancel(preparser->thumbnailer,
+                                               &task->runnable);
+            }
+            else /* TODO: the fetcher should be cancellable too */
+                canceled = false;
+
             if (canceled)
             {
                 vlc_list_remove(&task->node);
