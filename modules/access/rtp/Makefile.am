@@ -38,6 +38,7 @@ rtpparsedir = $(accessdir)/rtp
 rtpparse_LTLIBRARIES = \
 	librtp_ac3_plugin.la \
 	librtp_mpeg12_plugin.la \
+	librtp_mpeg4_plugin.la \
 	librtp_pcm_plugin.la \
 	librtp_raw_plugin.la \
 	librtp_h264_plugin.la \
@@ -47,6 +48,8 @@ rtpparse_LTLIBRARIES = \
 
 librtp_ac3_plugin_la_SOURCES = access/rtp/ac3.c
 librtp_mpeg12_plugin_la_SOURCES = access/rtp/mpeg12.c
+
+librtp_mpeg4_plugin_la_SOURCES = access/rtp/mpeg4.c
 
 librtp_pcm_plugin_la_SOURCES = access/rtp/pcm.c
 librtp_pcm_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/rtp
