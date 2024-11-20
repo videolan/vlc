@@ -202,7 +202,7 @@ static void entry_meta_Init( struct entry_meta_s *e )
 {
     memset(e, 0, sizeof(*e));
     e->i_duration = INPUT_DURATION_INDEFINITE;
-    e->priority = VLC_META_PRIORITY_PLAYLIST;
+    e->priority = VLC_META_PRIORITY_BASIC;
 }
 
 static void entry_meta_Clean( struct entry_meta_s *e )
@@ -288,6 +288,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 psz_parse += sizeof("EXTINF:") - 1;
                 meta.i_duration = INPUT_DURATION_INDEFINITE;
                 parseEXTINF( psz_parse, pf_dup, &meta );
+                meta.priority = VLC_META_PRIORITY_PLAYLIST;
             }
             else if( !strncasecmp( psz_parse, "EXTGRP:", sizeof("EXTGRP:") -1 ) )
             {
@@ -319,6 +320,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 {
                     free( meta.psz_album_art );
                     meta.psz_album_art = pf_dup( psz_parse );
+                    meta.priority = VLC_META_PRIORITY_PLAYLIST;
                 }
             }
             else if ( !strncasecmp( psz_parse, "PLAYLIST:",
