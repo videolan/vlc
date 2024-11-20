@@ -176,7 +176,7 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
         ![libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
 
         dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-            NSMutableSet<NSImage *> * const itemImages = NSMutableArray.array;
+            NSMutableSet<NSImage *> * const itemImages = NSMutableSet.set;
 
             [libraryItem iterateMediaItemsWithBlock:^(VLCMediaLibraryMediaItem * const item) {
                 NSImage * const itemImage = [VLCLibraryImageCache thumbnailForLibraryItem:item];
