@@ -271,13 +271,13 @@ option('theoradec',
 
 option('daaladec',
     type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable daaladec support')
+    value : 'disabled',
+    description : 'Enable/disable experimental daaladec support')
 
 option('daalaenc',
     type : 'feature',
-    value : 'auto',
-    description : 'Enable/disable daalaenc support')
+    value : 'disabled',
+    description : 'Enable/disable experimental daalaenc support')
 
 option('vorbis',
     type : 'feature',
