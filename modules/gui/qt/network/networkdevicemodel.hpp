@@ -84,10 +84,10 @@ public:
     void setSdSource(SDCatType s);
     void setSourceName(const QString& sourceName);
 
-    inline MainCtx* getCtx() const { return m_ctx; }
-    inline SDCatType getSdSource() const { return m_sdSource; }
-    inline QString getName() const { return m_name; }
-    inline QString getSourceName() const { return m_sourceName; }
+    MainCtx* getCtx() const;
+    SDCatType getSdSource() const;
+    QString getName() const;
+    QString getSourceName() const;
 
     Q_INVOKABLE bool insertIntoPlaylist( const QModelIndexList& itemIdList, ssize_t playlistIndex );
     Q_INVOKABLE bool addToPlaylist(int row );
@@ -111,11 +111,6 @@ private:
     bool initializeMediaSources();
 
 private:
-    MainCtx* m_ctx = nullptr;
-    SDCatType m_sdSource = CAT_UNDEFINED;
-    QString m_sourceName; // '*' -> all sources
-    QString m_name; // source long name
-
     Q_DECLARE_PRIVATE(NetworkDeviceModel)
 };
 
