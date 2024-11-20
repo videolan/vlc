@@ -106,7 +106,7 @@ input_item_Parse(vlc_object_t *obj, input_item_t *item,
 
     const struct vlc_input_thread_cfg input_cfg = {
         .type = INPUT_TYPE_PREPARSING,
-        .hw_dec = INPUT_CFG_HW_DEC_DEFAULT,
+        .hw_dec = INPUT_CFG_HW_DEC_DISABLED,
         .cbs = &input_cbs,
         .cbs_data = parser,
         .preparsing.subitems = cfg->subitems,
