@@ -70,7 +70,6 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     if ( unlikely( item == nullptr ) )
         return false;
 
-    input_item_AddOption( item.get(), "no-hwdec", VLC_INPUT_OPTION_TRUSTED );
     ctx.done = false;
     ctx.thumbnailer = this;
     {
