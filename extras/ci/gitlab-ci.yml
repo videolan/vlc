@@ -622,13 +622,13 @@ xros-arm64:
         name: $VLC_ANDROID_IMAGE
     script: |
         git clone https://code.videolan.org/videolan/libvlcjni.git
-        (cd libvlcjni && git checkout 6eb83177884f08b68e4283de7d9bb5d33379385d)
+        (cd libvlcjni && git checkout 11413ec511ef618e26b0934e71eed7da110685fe)
         if [ -n "$VLC_PREBUILT_CONTRIBS_URL" ]; then
           CONTRIB_FLAGS="--with-prebuilt-contribs"
         elif [ "${CI_COMMIT_BRANCH}" = "${CI_DEFAULT_BRANCH}" -a "${CI_PROJECT_PATH}" = "videolan/vlc" ]; then
           CONTRIB_FLAGS="--package-contribs"
         fi
-        EXTRA_PARAMS="--enable-extra-checks" /bin/sh ./libvlcjni/buildsystem/compile-libvlc.sh --no-jni -a $ANDROID_ARCH $CONTRIB_FLAGS
+        EXTRA_PARAMS="--enable-extra-checks" /bin/sh ./libvlcjni/buildsystem/build-libvlc.sh -a $ANDROID_ARCH $CONTRIB_FLAGS
 
 android-arm:
     extends: .android-common
