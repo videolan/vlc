@@ -245,7 +245,9 @@ QVariant NetworkDeviceModel::data( const QModelIndex& index, int role ) const
         case NETWORK_SOURCE:
             return item->mediaSource->description;
         case NETWORK_TREE:
-            return QVariant::fromValue( NetworkTreeItem(MediaTreePtr{ item->mediaSource->tree }, item->inputItem.get()) );
+            return QVariant::fromValue( NetworkTreeItem(
+                item->mediaSource,
+                item->inputItem.get()) );
         default:
             return NetworkBaseModel::basedata(*item, role);
     }

@@ -49,9 +49,26 @@ class NetworkTreeItem
 {
     Q_GADGET
 public:
-    NetworkTreeItem() : tree(nullptr), media(nullptr) {}
+    NetworkTreeItem() : source(nullptr), tree(nullptr), media(nullptr) {}
+
+    NetworkTreeItem( MediaSourcePtr source, input_item_t* m )
+        : source(source)
+        , tree( source->tree )
+        , media( m )
+    {
+    }
+
     NetworkTreeItem( MediaTreePtr tree, input_item_t* m )
-        : tree( std::move( tree ) )
+        : source( nullptr )
+        , tree( tree )
+        , media( m )
+    {
+    }
+
+    //create a NetworkTreeItem with the same source/tree as parent
+    NetworkTreeItem( NetworkTreeItem& parent, input_item_t* m )
+        : source( parent.source )
+        , tree( parent.tree )
         , media( m )
     {
     }
@@ -74,6 +91,7 @@ public:
         return ret;
     }
 
+    MediaSourcePtr source;
     MediaTreePtr tree;
     SharedInputItem media;
 };

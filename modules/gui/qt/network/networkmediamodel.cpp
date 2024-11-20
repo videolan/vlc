@@ -171,7 +171,7 @@ public:
     }
 
     void refreshMediaList(
-        MediaTreePtr tree,
+        NetworkTreeItem& treeItem,
         std::vector<SharedInputItem> children,
         bool clear )
     {
@@ -228,7 +228,7 @@ public:
                     item->fileModified = QDateTime::fromSecsSinceEpoch(time, QTimeZone::systemTimeZone());
             }
 
-            item->tree = NetworkTreeItem( tree, inputItem.get() );
+            item->tree = NetworkTreeItem(treeItem, inputItem.get() );
 
             if ( m_mediaLib && item->canBeIndexed)
             {
@@ -420,7 +420,7 @@ public:
 
                 while (parent && parent->p_item) {
                     m_path.push_front(QVariant::fromValue(PathNode(
-                        NetworkTreeItem(m_treeItem.tree, parent->p_item),
+                        NetworkTreeItem(m_treeItem, parent->p_item),
                         parent->p_item->psz_name)));
                     input_item_node_t *node = nullptr;
                     input_item_node_t *grandParent = nullptr;
@@ -432,7 +432,7 @@ public:
             }
             vlc_media_tree_Unlock(tree);
             if (!itemList.empty())
-                refreshMediaList( m_treeItem.tree, std::move( itemList ), true );
+                refreshMediaList( m_treeItem, std::move( itemList ), true );
             emit q->pathChanged();
         }
 
@@ -938,7 +938,7 @@ void NetworkMediaModelPrivate::ListenerCb::onItemCleared( MediaTreePtr tree, inp
         for (int i = 0; i < res->i_children; i++)
             itemList.emplace_back(res->pp_children[i]->p_item);
 
-        model->d_func()->refreshMediaList( std::move( tree ), std::move( itemList ), true );
+        model->d_func()->refreshMediaList(  d->m_treeItem, std::move( itemList ), true );
     }, Qt::QueuedConnection);
 }
 
@@ -953,8 +953,9 @@ void NetworkMediaModelPrivate::ListenerCb::onItemAdded( MediaTreePtr tree, input
         itemList.emplace_back(children[i]->p_item);
 
     QMetaObject::invokeMethod(model, [model=model, p_parent = std::move(p_parent), tree = std::move(tree), itemList=std::move(itemList)]() {
-        if ( p_parent == model->d_func()->m_treeItem.media )
-            model->d_func()->refreshMediaList( std::move( tree ), std::move( itemList ), false );
+        NetworkMediaModelPrivate* d = model->d_func();
+        if ( p_parent == d->m_treeItem.media )
+            d->refreshMediaList(  d->m_treeItem , std::move( itemList ), false );
     }, Qt::QueuedConnection);
 }
 
