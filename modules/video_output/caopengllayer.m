@@ -46,17 +46,6 @@
 #include "opengl/renderer.h"
 #include "opengl/vout_helper.h"
 
-/*****************************************************************************
- * Vout interface
- *****************************************************************************/
-static int Open(vout_display_t *vd, video_format_t *fmt, vlc_video_context *context);
-static void Close(vout_display_t *vd);
-
-static void PictureRender   (vout_display_t *vd, picture_t *pic, const vlc_render_subpicture *subpicture,
-                             vlc_tick_t date);
-static void PictureDisplay  (vout_display_t *vd, picture_t *pic);
-static int Control          (vout_display_t *vd, int);
-
 /**
  * Protocol declaration that drawable-nsobject should follow
  */
