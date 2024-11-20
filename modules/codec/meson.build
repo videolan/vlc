@@ -282,7 +282,7 @@ vlc_modules += {
     'enabled' : aribb24_dep.found()
 }
 
-libaribcaption_dep = dependency('libaribcaption', required: get_option('aribcaption'))
+libaribcaption_dep = dependency('libaribcaption', 'aribcaption', required: get_option('aribcaption'))
 vlc_modules += {
     'name' : 'aribcaption',
     'sources' : files('arib/libaribcaption.c'),
