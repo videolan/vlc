@@ -76,10 +76,12 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
-        struct vlc_preparser_seek_arg seek_arg = {
-            .type = vlc_preparser_seek_arg::VLC_PREPARSER_SEEK_POS,
-            .pos = position,
-            .speed = vlc_preparser_seek_arg::VLC_PREPARSER_SEEK_FAST,
+        struct vlc_thumbnailer_arg thumb_arg = {
+            .seek = {
+                .type = vlc_thumbnailer_arg::seek::VLC_THUMBNAILER_SEEK_POS,
+                .pos = position,
+                .speed = vlc_thumbnailer_arg::seek::VLC_THUMBNAILER_SEEK_FAST,
+            },
         };
 
         static const struct vlc_thumbnailer_cbs cbs = {
@@ -87,7 +89,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
         };
         vlc_preparser_req_id requestId =
             vlc_preparser_GenerateThumbnail( m_thumbnailer.get(), item.get(),
-                                             &seek_arg, &cbs, &ctx );
+                                             &thumb_arg, &cbs, &ctx );
 
         if (requestId == VLC_PREPARSER_REQ_ID_INVALID)
         {

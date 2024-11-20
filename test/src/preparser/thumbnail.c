@@ -151,25 +151,25 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         vlc_mutex_lock( &ctx.lock );
 
         vlc_preparser_req_id id;
-        struct vlc_preparser_seek_arg seek_arg;
+        struct vlc_thumbnailer_arg thumb_arg;
         if ( test_params[i].b_use_pos )
         {
-            seek_arg.type = VLC_PREPARSER_SEEK_POS;
-            seek_arg.pos = test_params[i].f_pos;
-            seek_arg.speed = test_params[i].b_fast_seek ?
-                VLC_PREPARSER_SEEK_FAST : VLC_PREPARSER_SEEK_PRECISE;
+            thumb_arg.seek.type = VLC_THUMBNAILER_SEEK_POS;
+            thumb_arg.seek.pos = test_params[i].f_pos;
+            thumb_arg.seek.speed = test_params[i].b_fast_seek ?
+                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
         }
         else
         {
-            seek_arg.type = VLC_PREPARSER_SEEK_TIME;
-            seek_arg.time = test_params[i].i_time;
-            seek_arg.speed = test_params[i].b_fast_seek ?
-                VLC_PREPARSER_SEEK_FAST : VLC_PREPARSER_SEEK_PRECISE;
+            thumb_arg.seek.type = VLC_THUMBNAILER_SEEK_TIME;
+            thumb_arg.seek.time = test_params[i].i_time;
+            thumb_arg.seek.speed = test_params[i].b_fast_seek ?
+                VLC_THUMBNAILER_SEEK_FAST : VLC_THUMBNAILER_SEEK_PRECISE;
         }
         static const struct vlc_thumbnailer_cbs cbs = {
             .on_ended = thumbnailer_callback,
         };
-        id = vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, &seek_arg,
+        id = vlc_preparser_GenerateThumbnail( p_thumbnailer, p_item, &thumb_arg,
                                               &cbs, &ctx );
         assert( id != VLC_PREPARSER_REQ_ID_INVALID );
 

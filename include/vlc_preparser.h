@@ -88,33 +88,37 @@ struct vlc_thumbnailer_cbs
 };
 
 /**
- * Preparser seek argument
+ * Thumbnailer argument
  */
-struct vlc_preparser_seek_arg
+struct vlc_thumbnailer_arg
 {
-    enum
+    /** Seek argument */
+    struct seek
     {
-        /** Don't seek */
-        VLC_PREPARSER_SEEK_NONE,
-        /** Seek by time */
-        VLC_PREPARSER_SEEK_TIME,
-        /** Seek by position */
-        VLC_PREPARSER_SEEK_POS,
-    } type;
-    union
-    {
-        /** Seek time if type == VLC_PREPARSER_SEEK_TIME */
-        vlc_tick_t time;
-        /** Seek position if type == VLC_PREPARSER_SEEK_POS */
-        double pos;
-    };
-    enum
-    {
-        /** Precise, but potentially slow */
-        VLC_PREPARSER_SEEK_PRECISE,
-        /** Fast, but potentially imprecise */
-        VLC_PREPARSER_SEEK_FAST,
-    } speed;
+        enum
+        {
+            /** Don't seek */
+            VLC_THUMBNAILER_SEEK_NONE,
+            /** Seek by time */
+            VLC_THUMBNAILER_SEEK_TIME,
+            /** Seek by position */
+            VLC_THUMBNAILER_SEEK_POS,
+        } type;
+        union
+        {
+            /** Seek time if type == VLC_THUMBNAILER_SEEK_TIME */
+            vlc_tick_t time;
+            /** Seek position if type == VLC_THUMBNAILER_SEEK_POS */
+            double pos;
+        };
+        enum
+        {
+            /** Precise, but potentially slow */
+            VLC_THUMBNAILER_SEEK_PRECISE,
+            /** Fast, but potentially imprecise */
+            VLC_THUMBNAILER_SEEK_FAST,
+        } speed;
+    } seek;
 };
 
 /**
@@ -185,7 +189,7 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_opt
  *
  * @param preparser the preparser object
  * @param item a valid item to generate the thumbnail for
- * @param seek_arg pointer to a seek struct, that tell at which time the
+ * @param arg pointer to a seek struct, that tell at which time the
  * thumbnail should be taken, NULL to disable seek
  * @param timeout A timeout value, or VLC_TICK_INVALID to disable timeout
  * @param cbs callback to listen to events (can't be NULL)
@@ -199,7 +203,7 @@ vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item, int type_opt
  */
 VLC_API vlc_preparser_req_id
 vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
-                                 const struct vlc_preparser_seek_arg *seek_arg,
+                                 const struct vlc_thumbnailer_arg *arg,
                                  const struct vlc_thumbnailer_cbs *cbs,
                                  void *cbs_userdata );
 

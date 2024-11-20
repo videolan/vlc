@@ -55,7 +55,7 @@ struct task
     vlc_preparser_t *preparser;
     input_item_t *item;
     int options;
-    struct vlc_preparser_seek_arg seek_arg;
+    struct vlc_thumbnailer_arg thumb_arg;
     union vlc_preparser_cbs cbs;
     void *userdata;
     vlc_preparser_req_id id;
@@ -73,7 +73,7 @@ struct task
 
 static struct task *
 TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
-        int options, const struct vlc_preparser_seek_arg *seek_arg,
+        int options, const struct vlc_thumbnailer_arg *thumb_arg,
         union vlc_preparser_cbs cbs, void *userdata)
 {
     struct task *task = malloc(sizeof(*task));
@@ -87,12 +87,12 @@ TaskNew(vlc_preparser_t *preparser, void (*run)(void *), input_item_t *item,
     task->userdata = userdata;
     task->pic = NULL;
 
-    if (seek_arg == NULL)
-        task->seek_arg = (struct vlc_preparser_seek_arg) {
-            .type = VLC_PREPARSER_SEEK_NONE,
+    if (thumb_arg == NULL)
+        task->thumb_arg = (struct vlc_thumbnailer_arg) {
+            .seek.type = VLC_THUMBNAILER_SEEK_NONE,
         };
     else
-        task->seek_arg = *seek_arg;
+        task->thumb_arg = *thumb_arg;
 
     input_item_Hold(item);
 
@@ -345,19 +345,19 @@ ThumbnailerRun(void *userdata)
     if (!input)
         goto error;
 
-    assert(task->seek_arg.speed == VLC_PREPARSER_SEEK_PRECISE
-        || task->seek_arg.speed == VLC_PREPARSER_SEEK_FAST);
-    bool fast_seek = task->seek_arg.speed == VLC_PREPARSER_SEEK_FAST;
+    assert(task->thumb_arg.seek.speed == VLC_THUMBNAILER_SEEK_PRECISE
+        || task->thumb_arg.seek.speed == VLC_THUMBNAILER_SEEK_FAST);
+    bool fast_seek = task->thumb_arg.seek.speed == VLC_THUMBNAILER_SEEK_FAST;
 
-    switch (task->seek_arg.type)
+    switch (task->thumb_arg.seek.type)
     {
-        case VLC_PREPARSER_SEEK_NONE:
+        case VLC_THUMBNAILER_SEEK_NONE:
             break;
-        case VLC_PREPARSER_SEEK_TIME:
-            input_SetTime(input, task->seek_arg.time, fast_seek);
+        case VLC_THUMBNAILER_SEEK_TIME:
+            input_SetTime(input, task->thumb_arg.seek.time, fast_seek);
             break;
-        case VLC_PREPARSER_SEEK_POS:
-            input_SetPosition(input, task->seek_arg.pos, fast_seek);
+        case VLC_THUMBNAILER_SEEK_POS:
+            input_SetPosition(input, task->thumb_arg.seek.pos, fast_seek);
             break;
         default:
             vlc_assert_unreachable();
@@ -525,7 +525,7 @@ vlc_preparser_req_id vlc_preparser_Push( vlc_preparser_t *preparser, input_item_
 
 vlc_preparser_req_id
 vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
-                                 const struct vlc_preparser_seek_arg *seek_arg,
+                                 const struct vlc_thumbnailer_arg *thumb_arg,
                                  const struct vlc_thumbnailer_cbs *cbs,
                                  void *cbs_userdata )
 {
@@ -538,7 +538,7 @@ vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
 
     struct task *task =
         TaskNew(preparser, ThumbnailerRun, item, VLC_PREPARSER_TYPE_THUMBNAIL,
-                seek_arg, task_cbs, cbs_userdata);
+                thumb_arg, task_cbs, cbs_userdata);
     if (task == NULL)
         return VLC_PREPARSER_REQ_ID_INVALID;
 
