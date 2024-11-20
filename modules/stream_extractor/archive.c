@@ -190,8 +190,8 @@ static la_ssize_t libarchive_read_cb( libarchive_t* p_arc, void* p_obj,
     stream_t*  p_source = p_cb->p_source;
     private_sys_t* p_sys = p_cb->p_sys;
 
-    ssize_t i_ret = vlc_stream_Read( p_source, &p_sys->buffer,
-      sizeof( p_sys->buffer ) );
+    ssize_t i_ret = vlc_stream_Read( p_source, p_sys->buffer,
+                                     sizeof( p_sys->buffer ) );
 
     if( i_ret < 0 )
     {
