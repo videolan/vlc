@@ -251,10 +251,6 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
     return ret;
 }
 
-static const struct vlc_display_operations ops = {
-    Close, PictureRender, PictureDisplay, Control, NULL, SetViewpoint, NULL,
-};
-
 /**
  * Flush the OpenGL context
  * In case of double-buffering swaps the back buffer with the front buffer.
@@ -580,6 +576,13 @@ static int Open (vout_display_t *vd,
 
         vd->info.subpicture_chromas = spu_chromas;
 
+        static const struct vlc_display_operations ops = {
+            .close = Close,
+            .prepare = PictureRender,
+            .display = PictureDisplay,
+            .control = Control,
+            .set_viewpoint = SetViewpoint,
+        };
         vd->ops = &ops;
 
         atomic_init(&sys->is_ready, false);
