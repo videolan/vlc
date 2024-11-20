@@ -187,10 +187,11 @@ const NSUInteger kVLCCompositeImageDefaultCompositedGridItemCount = 4;
             }];
 
             const NSSize size = NSMakeSize(kVLCDesiredThumbnailWidth, kVLCDesiredThumbnailHeight);
+            NSArray<NSImage *> * const itemImagesArray = itemImages.allObjects;
             NSArray<NSValue *> * const frames =
-                [NSImage framesForCompositeImageSquareGridWithImages:itemImages size:size gridItemCount:kVLCCompositeImageDefaultCompositedGridItemCount];
+                [NSImage framesForCompositeImageSquareGridWithImages:itemImagesArray size:size gridItemCount:kVLCCompositeImageDefaultCompositedGridItemCount];
             NSImage * const compositeImage =
-                [NSImage compositeImageWithImages:itemImages frames:frames size:size];
+                [NSImage compositeImageWithImages:itemImagesArray frames:frames size:size];
 
             dispatch_async(dispatch_get_main_queue(), ^{
                 completionHandler(compositeImage);
