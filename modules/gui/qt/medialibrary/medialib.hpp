@@ -35,9 +35,6 @@ class Media;
 
 struct vlc_medialibrary_t;
 
-class MLThreadRunner;
-class RunOnMLThreadBaseRunner;
-
 class MediaLib : public QObject
 {
     Q_OBJECT
@@ -192,128 +189,10 @@ private:
     /* Medialibrary */
     vlc_medialibrary_t* m_ml;
     std::unique_ptr<vlc_ml_event_callback_t, std::function<void(vlc_ml_event_callback_t*)>> m_event_cb;
-    MLThreadRunner* m_runner = nullptr;
+    ThreadRunner* m_runner = nullptr;
 
     QMap<QVector<MLItemId>, QVector<QJSValue>> m_inputItemQuery;
 };
-
-class MLThreadRunner : public QObject
-{
-    Q_OBJECT
-
-public:
-    enum MLTaskStatus {
-        ML_TASK_STATUS_SUCCEED,
-        ML_TASK_STATUS_CANCELED
-    };
-
-    MLThreadRunner(vlc_medialibrary_t* ml);
-    ~MLThreadRunner();
-
-    void destroy();
-    void cancelMLTask(const QObject* object, quint64 taskId);
-
-    template<typename Ctx>
-    quint64 runOnMLThread(const QObject* obj,
-                          std::function<void (vlc_medialibrary_t*, Ctx&)> mlFun,
-                          std::function<void (quint64 taskId, Ctx&)> uiFun,
-                          const char* queue);
-
-private:
-    vlc_medialibrary_t* m_ml = nullptr;
-    MLThreadPool m_mlThreadPool;
-
-    bool m_shuttingDown = false;
-    quint64 m_taskId = 1;
-    QMap<quint64, RunOnMLThreadBaseRunner*> m_runningTasks;
-    QMultiMap<const QObject*, quint64> m_objectTasks;
-
-
-private slots:
-    void runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
-    void runOnMLThreadTargetDestroyed(QObject * object);
-};
-
-class RunOnMLThreadBaseRunner : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    virtual ~RunOnMLThreadBaseRunner() = default;
-    virtual void runUICallback() = 0;
-    virtual void cancel() = 0;
-signals:
-    void done(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
-};
-
-template<typename Ctx>
-class RunOnMLThreadRunner : public RunOnMLThreadBaseRunner {
-public:
-    RunOnMLThreadRunner(
-        quint64 taskId,
-        const QObject* obj,
-        std::function<void (vlc_medialibrary_t*, Ctx&)> mlFun,
-        std::function<void (quint64, Ctx&)> uiFun,
-        vlc_medialibrary_t* ml
-    )
-        : RunOnMLThreadBaseRunner()
-        , m_taskId(taskId)
-        , m_obj(obj)
-        , m_mlFun(mlFun)
-        , m_uiFun(uiFun)
-        , m_ml(ml)
-    {
-        setAutoDelete(false);
-    }
-
-    void run() override
-    {
-        if (m_canceled)
-        {
-            emit done(this, m_taskId, m_obj, MLThreadRunner::ML_TASK_STATUS_CANCELED);
-            return;
-        }
-        m_mlFun(m_ml, m_ctx);
-        emit done(this, m_taskId, m_obj, MLThreadRunner::ML_TASK_STATUS_SUCCEED);
-    }
-
-    //called from UI thread
-    void runUICallback() override
-    {
-        m_uiFun(m_taskId, m_ctx);
-    }
-
-    void cancel() override
-    {
-        m_canceled = true;
-    }
-private:
-    std::atomic_bool m_canceled {false};
-    quint64 m_taskId;
-    Ctx m_ctx; //default constructed
-    const QObject* m_obj = nullptr;
-    std::function<void (vlc_medialibrary_t*, Ctx&)> m_mlFun;
-    std::function<void (quint64, Ctx&)> m_uiFun;
-    vlc_medialibrary_t* m_ml = nullptr;
-};
-
-template<typename Ctx>
-quint64 MLThreadRunner::runOnMLThread(const QObject* obj,
-                            std::function<void (vlc_medialibrary_t*, Ctx&)> mlFun,
-                            std::function<void (quint64 taskId, Ctx&)> uiFun,
-                            const char* queue)
-{
-    if (m_shuttingDown)
-        return 0;
-
-    auto taskId = m_taskId++;
-    auto runnable = new RunOnMLThreadRunner<Ctx>(taskId, obj, mlFun, uiFun, m_ml);
-    connect(runnable, &RunOnMLThreadBaseRunner::done, this, &MLThreadRunner::runOnMLThreadDone);
-    connect(obj, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
-    m_runningTasks.insert(taskId, runnable);
-    m_objectTasks.insert(obj, taskId);
-    m_mlThreadPool.start(runnable, queue);
-    return taskId;
-}
 
 template<typename Ctx>
 quint64 MediaLib::runOnMLThread(const QObject* obj,
@@ -321,5 +200,5 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
                                     std::function<void (quint64 taskId, Ctx&)> uiFun,
                                     const char* queue)
 {
-    return m_runner->runOnMLThread<Ctx>(obj, mlFun, uiFun, queue);
+    return m_runner->runOnThread<Ctx>(obj, [ml = m_ml, mlFun](Ctx& ctx){mlFun(ml,ctx);}, uiFun, queue);
 }

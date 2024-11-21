@@ -34,7 +34,7 @@ MediaLib::MediaLib(qt_intf_t *_intf, vlc::playlist::PlaylistController* playlist
 {
     m_event_cb.reset( vlc_ml_event_register_callback( m_ml, MediaLib::onMediaLibraryEvent,
                                                       this ) );
-    m_runner = new MLThreadRunner(m_ml);
+    m_runner = new ThreadRunner();
 }
 
 MediaLib::~MediaLib()
@@ -404,55 +404,14 @@ void MediaLib::onMediaLibraryEvent( void* data, const vlc_ml_event_t* event )
     }
 }
 
-
-
-MLThreadRunner::MLThreadRunner(vlc_medialibrary_t* ml)
-    : m_ml(ml)
-{
-    m_mlThreadPool.setMaxThreadCount(4);
-}
-
-MLThreadRunner::~MLThreadRunner()
-{
-    assert(m_objectTasks.empty());
-    assert(m_runningTasks.empty());
-}
-
-void MLThreadRunner::destroy()
-{
-    m_shuttingDown = true;
-    //try to cancel as many tasks as possible
-    for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
-    {
-        const QObject* object = taskIt.key();
-        quint64 key = taskIt.value();
-        auto task = m_runningTasks.value(key, nullptr);
-        if (m_mlThreadPool.tryTake(task))
-        {
-            delete task;
-            m_runningTasks.remove(key);
-            taskIt = m_objectTasks.erase(taskIt);
-            if (m_objectTasks.count(object) == 0)
-                disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
-        }
-        else
-            ++taskIt;
-    }
-
-    if (m_runningTasks.empty())
-    {
-        deleteLater();
-    }
-}
-
 quint64 MediaLib::runOnMLThread(const QObject* obj,
                 std::function< void(vlc_medialibrary_t* ml)> mlCb,
                 std::function< void()> uiCb,
                 const char* queue)
 {
     struct NoCtx{};
-    return m_runner->runOnMLThread<NoCtx>(obj,
-    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+    return m_runner->runOnThread<NoCtx>(obj,
+    [mlCb, ml=m_ml](NoCtx&){
         mlCb(ml);
     },
     [uiCb](quint64, NoCtx&){
@@ -466,8 +425,8 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
                 std::function< void(quint64)> uiCb, const char* queue)
 {
     struct NoCtx{};
-    return m_runner->runOnMLThread<NoCtx>(obj,
-    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+    return m_runner->runOnThread<NoCtx>(obj,
+    [mlCb, ml=m_ml](NoCtx&){
         mlCb(ml);
     },
     [uiCb](quint64 requestId, NoCtx&){
@@ -481,8 +440,8 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
                 const char* queue)
 {
     struct NoCtx{};
-    return m_runner->runOnMLThread<NoCtx>(obj,
-    [mlCb](vlc_medialibrary_t* ml, NoCtx&){
+    return m_runner->runOnThread<NoCtx>(obj,
+    [mlCb, ml=m_ml](NoCtx&){
         mlCb(ml);
     },
     [](quint64, NoCtx&){
@@ -492,66 +451,6 @@ quint64 MediaLib::runOnMLThread(const QObject* obj,
 
 void MediaLib::cancelMLTask(const QObject* object, quint64 taskId)
 {
-    m_runner->cancelMLTask(object, taskId);
+    m_runner->cancelTask(object, taskId);
 }
 
-void MLThreadRunner::cancelMLTask(const QObject* object, quint64 taskId)
-{
-    assert(taskId != 0);
-
-    auto task = m_runningTasks.value(taskId, nullptr);
-    if (!task)
-        return;
-    task->cancel();
-    bool removed = m_mlThreadPool.tryTake(task);
-    if (removed)
-        delete task;
-    m_runningTasks.remove(taskId);
-    m_objectTasks.remove(object, taskId);
-    if (m_objectTasks.count(object) == 0)
-        disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
-}
-
-void MLThreadRunner::runOnMLThreadDone(RunOnMLThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
-{
-    if (m_shuttingDown)
-    {
-        if (m_runningTasks.contains(target))
-        {
-            m_runningTasks.remove(target);
-            m_objectTasks.remove(object, target);
-            if (m_objectTasks.count(object) == 0)
-                disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
-        }
-        if (m_runningTasks.empty())
-            deleteLater();
-    }
-    else if (m_runningTasks.contains(target))
-    {
-        if (status == ML_TASK_STATUS_SUCCEED)
-            runner->runUICallback();
-        m_runningTasks.remove(target);
-        m_objectTasks.remove(object, target);
-        if (m_objectTasks.count(object) == 0)
-            disconnect(object, &QObject::destroyed, this, &MLThreadRunner::runOnMLThreadTargetDestroyed);
-    }
-    runner->deleteLater();
-}
-
-void MLThreadRunner::runOnMLThreadTargetDestroyed(QObject * object)
-{
-    if (m_objectTasks.contains(object))
-    {
-        for (auto taskId : m_objectTasks.values(object))
-        {
-            auto task = m_runningTasks.value(taskId, nullptr);
-            assert(task);
-            bool removed = m_mlThreadPool.tryTake(task);
-            if (removed)
-                delete task;
-            m_runningTasks.remove(taskId);
-        }
-        m_objectTasks.remove(object);
-        //no need to disconnect QObject::destroyed, as object is currently being destroyed
-    }
-}

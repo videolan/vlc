@@ -119,3 +119,102 @@ QRunnable* MLThreadPool::getNextTaskFromQueue(const QString& queueName)
     queue.pop_front();
     return task;
 }
+
+ThreadRunner::ThreadRunner()
+{
+    m_threadPool.setMaxThreadCount(4);
+}
+
+ThreadRunner::~ThreadRunner()
+{
+    assert(m_objectTasks.empty());
+    assert(m_runningTasks.empty());
+}
+
+void ThreadRunner::destroy()
+{
+    m_shuttingDown = true;
+    //try to cancel as many tasks as possible
+    for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
+    {
+        const QObject* object = taskIt.key();
+        quint64 key = taskIt.value();
+        auto task = m_runningTasks.value(key, nullptr);
+        if (m_threadPool.tryTake(task))
+        {
+            delete task;
+            m_runningTasks.remove(key);
+            taskIt = m_objectTasks.erase(taskIt);
+            if (m_objectTasks.count(object) == 0)
+                disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+        }
+        else
+            ++taskIt;
+    }
+
+    if (m_runningTasks.empty())
+    {
+        deleteLater();
+    }
+}
+
+void ThreadRunner::cancelTask(const QObject* object, quint64 taskId)
+{
+    assert(taskId != 0);
+
+    auto task = m_runningTasks.value(taskId, nullptr);
+    if (!task)
+        return;
+    task->cancel();
+    bool removed = m_threadPool.tryTake(task);
+    if (removed)
+        delete task;
+    m_runningTasks.remove(taskId);
+    m_objectTasks.remove(object, taskId);
+    if (m_objectTasks.count(object) == 0)
+        disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+}
+
+void ThreadRunner::runOnThreadDone(RunOnThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
+{
+    if (m_shuttingDown)
+    {
+        if (m_runningTasks.contains(target))
+        {
+            m_runningTasks.remove(target);
+            m_objectTasks.remove(object, target);
+            if (m_objectTasks.count(object) == 0)
+                disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+        }
+        if (m_runningTasks.empty())
+            deleteLater();
+    }
+    else if (m_runningTasks.contains(target))
+    {
+        if (status == ML_TASK_STATUS_SUCCEED)
+            runner->runUICallback();
+        m_runningTasks.remove(target);
+        m_objectTasks.remove(object, target);
+        if (m_objectTasks.count(object) == 0)
+            disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+    }
+    runner->deleteLater();
+}
+
+void ThreadRunner::runOnThreadTargetDestroyed(QObject * object)
+{
+    if (m_objectTasks.contains(object))
+    {
+        for (auto taskId : m_objectTasks.values(object))
+        {
+            auto task = m_runningTasks.value(taskId, nullptr);
+            assert(task);
+            bool removed = m_threadPool.tryTake(task);
+            if (removed)
+                delete task;
+            m_runningTasks.remove(taskId);
+        }
+        m_objectTasks.remove(object);
+        //no need to disconnect QObject::destroyed, as object is currently being destroyed
+    }
+}

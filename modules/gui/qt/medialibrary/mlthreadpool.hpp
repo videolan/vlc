@@ -80,4 +80,119 @@ private:
     QMap<QString, QQueue<QRunnable*>> m_serialTasks;
 };
 
+class RunOnThreadBaseRunner;
+
+class ThreadRunner : public QObject
+{
+    Q_OBJECT
+
+public:
+    enum MLTaskStatus {
+        ML_TASK_STATUS_SUCCEED,
+        ML_TASK_STATUS_CANCELED
+    };
+
+    ThreadRunner();
+    ~ThreadRunner();
+
+    void destroy();
+    void cancelTask(const QObject* object, quint64 taskId);
+
+    template<typename Ctx>
+    quint64 runOnThread(const QObject* obj,
+                          std::function<void (Ctx&)> mlFun,
+                          std::function<void (quint64 taskId, Ctx&)> uiFun,
+                          const char* queue = nullptr);
+
+private slots:
+    void runOnThreadDone(RunOnThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
+    void runOnThreadTargetDestroyed(QObject * object);
+
+private:
+    MLThreadPool m_threadPool;
+
+    bool m_shuttingDown = false;
+    quint64 m_taskId = 1;
+    QMap<quint64, RunOnThreadBaseRunner*> m_runningTasks;
+    QMultiMap<const QObject*, quint64> m_objectTasks;
+};
+
+class RunOnThreadBaseRunner : public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    virtual ~RunOnThreadBaseRunner() = default;
+    virtual void runUICallback() = 0;
+    virtual void cancel() = 0;
+signals:
+    void done(RunOnThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
+};
+
+template<typename Ctx>
+class RunOnThreadRunner : public RunOnThreadBaseRunner {
+public:
+    RunOnThreadRunner(
+        quint64 taskId,
+        const QObject* obj,
+        std::function<void (Ctx&)> mlFun,
+        std::function<void (quint64, Ctx&)> uiFun
+        )
+        : RunOnThreadBaseRunner()
+        , m_taskId(taskId)
+        , m_obj(obj)
+        , m_mlFun(mlFun)
+        , m_uiFun(uiFun)
+    {
+        setAutoDelete(false);
+    }
+
+    void run() override
+    {
+        if (m_canceled)
+        {
+            emit done(this, m_taskId, m_obj, ThreadRunner::ML_TASK_STATUS_CANCELED);
+            return;
+        }
+        m_mlFun(m_ctx);
+        emit done(this, m_taskId, m_obj, ThreadRunner::ML_TASK_STATUS_SUCCEED);
+    }
+
+    //called from UI thread
+    void runUICallback() override
+    {
+        m_uiFun(m_taskId, m_ctx);
+    }
+
+    void cancel() override
+    {
+        m_canceled = true;
+    }
+private:
+    std::atomic_bool m_canceled {false};
+    quint64 m_taskId;
+    Ctx m_ctx; //default constructed
+    const QObject* m_obj = nullptr;
+    std::function<void (Ctx&)> m_mlFun;
+    std::function<void (quint64, Ctx&)> m_uiFun;
+};
+
+template<typename Ctx>
+quint64 ThreadRunner::runOnThread(const QObject* obj,
+                                      std::function<void (Ctx&)> mlFun,
+                                      std::function<void (quint64 taskId, Ctx&)> uiFun,
+                                      const char* queue)
+{
+    if (m_shuttingDown)
+        return 0;
+
+    auto taskId = m_taskId++;
+    auto runnable = new RunOnThreadRunner<Ctx>(taskId, obj, mlFun, uiFun);
+    connect(runnable, &RunOnThreadBaseRunner::done, this, &ThreadRunner::runOnThreadDone);
+    connect(obj, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+    m_runningTasks.insert(taskId, runnable);
+    m_objectTasks.insert(obj, taskId);
+    m_threadPool.start(runnable, queue);
+    return taskId;
+}
+
 #endif // MLTHREADPOOL_HPP
