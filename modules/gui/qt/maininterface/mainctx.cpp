@@ -292,11 +292,15 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         }
     }
 #endif
+
+    m_threadRunner = new ThreadRunner();
 }
 
 MainCtx::~MainCtx()
 {
     /* Save states */
+
+    m_threadRunner->destroy();
 
     settings->beginGroup("MainWindow");
     settings->setValue( "pl-dock-status", b_playlistDocked );
@@ -605,6 +609,10 @@ WorkerThreadSet* MainCtx::workersThreads() const
     }
 
     return m_workersThreads.get();
+}
+ThreadRunner* MainCtx::threadRunner() const
+{
+    return m_threadRunner;
 }
 
 QUrl MainCtx::folderMRL(const QString &fileMRL) const

@@ -71,6 +71,7 @@ class VLCVarChoiceModel;
 class UpdateModel;
 #endif
 struct vlc_preparser_t;
+class ThreadRunner;
 
 namespace vlc {
 namespace playlist {
@@ -302,6 +303,7 @@ public:
     Q_INVOKABLE bool useXmasCone() const;
 
     WorkerThreadSet *workersThreads() const;
+    ThreadRunner* threadRunner() const;
 
     Q_INVOKABLE QUrl folderMRL(const QString &fileMRL) const;
     Q_INVOKABLE QUrl folderMRL(const QUrl &fileMRL) const;
@@ -399,6 +401,7 @@ protected:
 #endif
 
     mutable std::unique_ptr<WorkerThreadSet> m_workersThreads;
+    ThreadRunner* m_threadRunner = nullptr;
 
 public slots:
     void toggleToolbarMenu();
