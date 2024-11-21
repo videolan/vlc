@@ -15,7 +15,8 @@ shader_sources = [
     'SubTexture.vert',
     'PlayerBlurredBackground.frag',
     'HollowRectangularGlow.frag',
-    'RectangularGlow.frag'
+    'RectangularGlow.frag',
+    'SDFAARoundedTexture.frag'
 ]
 
 shader_files = files(shader_sources)

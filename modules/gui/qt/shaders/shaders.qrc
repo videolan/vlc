@@ -10,5 +10,6 @@
         <file alias="PlayerBlurredBackground.frag.qsb">PlayerBlurredBackground.frag.qsb</file>
         <file alias="HollowRectangularGlow.frag.qsb">HollowRectangularGlow.frag.qsb</file>
         <file alias="RectangularGlow.frag.qsb">RectangularGlow.frag.qsb</file>
+        <file alias="SDFAARoundedTexture.frag.qsb">SDFAARoundedTexture.frag.qsb</file>
     </qresource>
 </RCC>
