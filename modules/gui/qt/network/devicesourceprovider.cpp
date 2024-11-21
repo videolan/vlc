@@ -18,7 +18,8 @@
 
 #include "devicesourceprovider.hpp"
 #include "networkmediamodel.hpp"
-
+#include "maininterface/mainctx.hpp"
+#include "medialibrary/mlthreadpool.hpp"
 
 //handle discovery events from the media source provider
 struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
@@ -86,67 +87,94 @@ struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeLis
 };
 
 
-DeviceSourceProvider::DeviceSourceProvider(NetworkDeviceModel::SDCatType sdSource
-                                           , const QString &sourceName, QObject *parent)
+DeviceSourceProvider::DeviceSourceProvider(
+    NetworkDeviceModel::SDCatType sdSource,
+    const QString &sourceName,
+    MainCtx* ctx,
+    QObject* parent)
     : QObject(parent)
+    , m_ctx(ctx)
     , m_sdSource {sdSource}
     , m_sourceName {sourceName}
 {
 }
 
-void DeviceSourceProvider::init(qt_intf_t *intf)
+DeviceSourceProvider::~DeviceSourceProvider()
+{
+    if (m_taskId != 0)
+        m_ctx->threadRunner()->cancelTask(this, m_taskId);
+}
+
+void DeviceSourceProvider::init()
 {
     using SourceMetaPtr = std::unique_ptr<vlc_media_source_meta_list_t,
                                           decltype( &vlc_media_source_meta_list_Delete )>;
 
-    auto libvlc = vlc_object_instance(intf);
+    struct Ctx {
+        bool success = false;
+        QString name;
+        std::vector<MediaSourcePtr> sources;
 
-    auto provider = vlc_media_source_provider_Get( libvlc );
-    SourceMetaPtr providerList( vlc_media_source_provider_List(
-                                    provider,
-                                    static_cast<services_discovery_category_e>(m_sdSource) ),
-                               &vlc_media_source_meta_list_Delete );
+    };
+    m_taskId = m_ctx->threadRunner()->runOnThread<Ctx>(
+        this,
+        //Worker thread
+        [intf = m_ctx->getIntf(), sdSource = m_sdSource, nameFilter = m_sourceName](Ctx& ctx){
+            auto libvlc = vlc_object_instance(intf);
 
-    if (!providerList)
-    {
-        emit failed();
-        return;
-    }
+            auto provider = vlc_media_source_provider_Get( libvlc );
+            SourceMetaPtr providerList( vlc_media_source_provider_List(
+                                           provider,
+                                           static_cast<services_discovery_category_e>(sdSource) ),
+                                       &vlc_media_source_meta_list_Delete );
 
-    size_t nbProviders = vlc_media_source_meta_list_Count( providerList.get() );
-    for ( auto i = 0u; i < nbProviders; ++i )
-    {
-        auto meta = vlc_media_source_meta_list_Get( providerList.get(), i );
-        const QString sourceName = qfu( meta->name );
-        if ( m_sourceName != '*' && m_sourceName != sourceName )
-            continue;
+            if (!providerList)
+                return;
 
-        m_name += m_name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
+            size_t nbProviders = vlc_media_source_meta_list_Count( providerList.get() );
+            size_t found = 0;
+            QString name;
 
-        MediaSourcePtr mediaSource(
+            for ( size_t i = 0u; i < nbProviders; ++i )
+            {
+                auto meta = vlc_media_source_meta_list_Get( providerList.get(), i );
+                const QString sourceName = qfu( meta->name );
+                if ( nameFilter != '*' && nameFilter != sourceName )
+                    continue;
+
+                ctx.name += name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
+
+                MediaSourcePtr mediaSource(
                     vlc_media_source_provider_GetMediaSource(provider, meta->name)
                     , false );
 
-        if ( mediaSource == nullptr )
-            continue;
+                if (!mediaSource)
+                    continue;
 
-        std::unique_ptr<MediaTreeListener> l{ new MediaTreeListener(
-            MediaTreePtr{ mediaSource->tree },
-            std::make_unique<DeviceSourceProvider::ListenerCb>(this, mediaSource) ) };
-        if ( l->listener == nullptr )
-            break;
+                ctx.sources.push_back(mediaSource);
+            }
+        },
+        //UI thread
+        [this](quint64, Ctx& ctx){
+            m_name = ctx.name;
+            emit nameUpdated( m_name );
 
-        m_mediaSources.push_back( std::move( mediaSource ) );
-        m_listeners.push_back( std::move( l ) );
-    }
+            for (auto& mediaSource : ctx.sources) {
 
-    if ( !m_name.isEmpty() )
-        emit nameUpdated( m_name );
+                std::unique_ptr<MediaTreeListener> l{ new MediaTreeListener(
+                    MediaTreePtr{ mediaSource->tree },
+                    std::make_unique<DeviceSourceProvider::ListenerCb>(this, mediaSource) ) };
+                if ( l->listener == nullptr )
+                    continue;
+                m_mediaSources.push_back( std::move( mediaSource ) );
+                m_listeners.push_back( std::move( l ) );
+            }
 
-    if ( !m_listeners.empty() )
-        emit itemsUpdated( m_items );
-    else
-        emit failed();
+            if ( !m_listeners.empty() )
+                emit itemsUpdated( m_items );
+            else
+                emit failed();
+        });
 }
 
 void DeviceSourceProvider::addItems(const std::vector<SharedInputItem> &inputList,

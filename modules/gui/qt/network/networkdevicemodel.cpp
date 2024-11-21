@@ -20,7 +20,6 @@
 #include <QTimer>
 
 #include "maininterface/mainctx.hpp"
-#include "util/workerthreadset.hpp"
 
 #include "devicesourceprovider.hpp"
 #include "networkmediamodel.hpp"
@@ -123,26 +122,14 @@ public:
         m_items.clear();
 
         if (m_sources)
-        {
-            q->disconnect( m_sources );
-            m_sources->deleteLater();
-            m_sources = nullptr;
-        }
+            m_sources.reset();
 
         m_name = QString {};
         emit q->nameChanged();
 
-        m_sources = new DeviceSourceProvider( m_sdSource, m_sourceName );
-        m_ctx->workersThreads()->assignToWorkerThread( m_sources );
+        m_sources = std::make_unique<DeviceSourceProvider>( m_sdSource, m_sourceName, m_ctx );
 
-        // make sure we're not releasing resources on main thread
-        // by clearing copies of model before source provider
-        QObject::connect(q, &QObject::destroyed, m_sources, [sources = m_sources]()
-        {
-            sources->deleteLater();
-        });
-
-        QObject::connect(m_sources, &DeviceSourceProvider::failed, q,
+        QObject::connect(m_sources.get(), &DeviceSourceProvider::failed, q,
                 [this]()
         {
             m_items.clear();
@@ -151,14 +138,14 @@ public:
             invalidateCache();
         });
 
-        QObject::connect(m_sources, &DeviceSourceProvider::nameUpdated, q,
+        QObject::connect(m_sources.get(), &DeviceSourceProvider::nameUpdated, q,
                 [this, q](QString name)
         {
             m_name = name;
             emit q->nameChanged();
         });
 
-        QObject::connect(m_sources, &DeviceSourceProvider::itemsUpdated, q,
+        QObject::connect(m_sources.get(), &DeviceSourceProvider::itemsUpdated, q,
                 [this](NetworkDeviceItemSet items)
         {
             m_items = items;
@@ -167,11 +154,7 @@ public:
             invalidateCache();
         });
 
-        QMetaObject::invokeMethod(m_sources,
-                                  [sources = this->m_sources, intf = m_ctx->getIntf()]()
-        {
-            sources->init( intf );
-        });
+        m_sources->init();
 
         //service discovery don't notify preparse end
         m_loading = false;
@@ -212,7 +195,7 @@ public: //LocalListCacheLoader::ModelSource
 
 public:
     NetworkDeviceItemSet m_items;
-    QPointer<DeviceSourceProvider> m_sources {};
+    std::unique_ptr<DeviceSourceProvider> m_sources;
 
     MainCtx* m_ctx = nullptr;
     NetworkDeviceModel::SDCatType m_sdSource = NetworkDeviceModel::CAT_UNDEFINED;

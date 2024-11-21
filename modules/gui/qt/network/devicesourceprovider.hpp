@@ -86,9 +86,11 @@ public:
 
     DeviceSourceProvider(NetworkDeviceModel::SDCatType sdSource,
                          const QString &sourceName,
+                         MainCtx* ctx,
                          QObject *parent = nullptr);
+    virtual ~DeviceSourceProvider();
 
-    void init(qt_intf_t *intf);
+    void init();
 
 signals:
     void failed();
@@ -104,6 +106,10 @@ private:
 
     void removeItems(const std::vector<SharedInputItem>& inputList,
                      const MediaSourcePtr& mediaSource);
+
+
+    MainCtx* m_ctx = nullptr;
+    quint64 m_taskId = 0;
 
     NetworkDeviceModel::SDCatType m_sdSource;
     QString m_sourceName; // '*' -> all sources
