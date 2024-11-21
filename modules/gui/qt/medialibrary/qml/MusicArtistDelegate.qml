@@ -158,8 +158,7 @@ T.ItemDelegate {
         spacing: VLCStyle.margin_xsmall
 
         Widgets.RoundImage {
-            implicitWidth: VLCStyle.play_cover_small
-            implicitHeight: VLCStyle.play_cover_small
+            Layout.preferredHeight: VLCStyle.play_cover_small
             Layout.fillHeight: true
             Layout.preferredWidth: height
 
@@ -174,6 +173,9 @@ T.ItemDelegate {
 
             Rectangle {
                 anchors.fill: parent
+
+                anchors.margins: -border.width
+                z: -1
 
                 radius: VLCStyle.play_cover_small
 

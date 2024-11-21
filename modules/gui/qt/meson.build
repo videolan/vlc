@@ -900,6 +900,7 @@ qml_modules += {
         'widgets/qml/ProgressIndicator.qml',
         qml_dynamicshadow_file,
         qml_blureffect_file,
+        'widgets/qml/RoundImage.qml',
     ),
 }
 

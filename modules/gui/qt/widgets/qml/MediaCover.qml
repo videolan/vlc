@@ -86,7 +86,7 @@ Rectangle {
         sourceSize.height: root.pictureHeight
 
         onStatusChanged: {
-            if (status === Widgets.RoundImage.Loading) {
+            if (status === Image.Loading) {
                 root._loadTimeout = false
                 timer.start()
             } else {
@@ -105,8 +105,8 @@ Rectangle {
         radius: root.radius
 
         visible: image.source.toString() === "" //RoundImage.source is a QUrl
-                 || image.status === Widgets.RoundImage.Error
-                 || (image.status === Widgets.RoundImage.Loading && root._loadTimeout)
+                 || image.status === Image.Error
+                 || (image.status === Image.Loading && root._loadTimeout)
 
         // we only keep this image till there is no main image
         // try to release the resources otherwise

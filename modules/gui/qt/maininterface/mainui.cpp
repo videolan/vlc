@@ -60,7 +60,6 @@
 #include "menus/qml_menu_wrapper.hpp"
 
 #include "widgets/native/csdthemeimage.hpp"
-#include "widgets/native/roundimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
 #include "widgets/native/viewblockingrectangle.hpp"
 #if QT_VERSION < QT_VERSION_CHECK(6, 4, 0)
@@ -346,7 +345,6 @@ void MainUI::registerQMLTypes()
         const int versionMinor = 0;
 
         // @uri VLC.Widgets
-        qmlRegisterType<RoundImage>( uri, versionMajor, versionMinor, "RoundImage" );
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
 

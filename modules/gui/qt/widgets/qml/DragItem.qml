@@ -474,9 +474,9 @@ Item {
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
 
                 onStatusChanged: {
-                    if (status === Widgets.RoundImage.Ready)
+                    if (status === Image.Ready)
                         coverRepeater.notReadyCount -= 1
-                    else if (status === Widgets.RoundImage.Error) {
+                    else if (status === Image.Error) {
                         const fallbackSource = modelData.fallback ?? defaultCover
                         if (source === fallbackSource)
                             coverRepeater.notReadyCount -= 1

@@ -133,7 +133,7 @@ FocusScope {
 
                     sourceItem: parent
 
-                    visible: (parent.status === Widgets.RoundImage.Ready)
+                    visible: (parent.status === Image.Ready)
                 }
             }
         }
