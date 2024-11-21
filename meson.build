@@ -491,9 +491,6 @@ add_project_arguments(cc.get_supported_arguments([
     '-Wformat-security',
     '-Wduplicated-branches',
     '-Wduplicated-cond',
-]), language: ['c', 'cpp'])
-
-add_project_arguments(cc.get_supported_arguments([
     '-Wbad-function-cast',
     '-Wwrite-strings',
     '-Wmissing-prototypes',
@@ -505,19 +502,34 @@ add_project_arguments(cc.get_supported_arguments([
     '-pipe'
 ]), language: ['c'])
 
+add_project_arguments(cpp.get_supported_arguments([
+    '-Wextra',
+    '-Wsign-compare',
+    '-Wundef',
+    '-Wpointer-arith',
+    '-Wvolatile-register-var',
+    '-Wformat',
+    '-Wformat-security',
+    '-Wduplicated-branches',
+    '-Wduplicated-cond',
+]), language: ['cpp'])
+
 if get_option('extra_checks')
     add_project_arguments(cc.get_supported_arguments([
         '-Werror=missing-field-initializers',
         '-Werror=format',
-        '-Werror=return-mismatch'
-    ]), language: ['c', 'cpp'])
-    add_project_arguments(cc.get_supported_arguments([
+        '-Werror=return-mismatch',
         '-Werror=incompatible-pointer-types',
         '-Werror=restrict',
         '-Werror=int-conversion',
         '-Werror=implicit-int',
         '-Werror=declaration-missing-parameter-type'
     ]), language: ['c'])
+    add_project_arguments(cpp.get_supported_arguments([
+        '-Werror=missing-field-initializers',
+        '-Werror=format',
+        '-Werror=return-mismatch'
+    ]), language: ['cpp'])
 endif
 
 if get_option('branch_protection') \
