@@ -62,6 +62,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    self.collectionsStackView.subviews = @[];
+}
+
 - (void)setup
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
