@@ -157,7 +157,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.audio.i_rate = i_rate;
         p_dec->fmt_out.audio.i_channels = i_channels;
         p_dec->fmt_out.audio.i_physical_channels
-            = mpeg4_asc_channelsbyindex[i_channels];
+            = MPEG4_asc_channelsbyindex[i_channels];
         date_Init( &p_sys->date, i_rate, 1 );
     }
     else
@@ -328,7 +328,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         p_dec->fmt_out.audio.i_rate = i_rate;
         p_dec->fmt_out.audio.i_channels = i_channels;
         p_dec->fmt_out.audio.i_physical_channels
-            = mpeg4_asc_channelsbyindex[i_channels];
+            = MPEG4_asc_channelsbyindex[i_channels];
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
@@ -399,7 +399,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                     p_dec->fmt_out.audio.i_rate = i_rate;
                     p_dec->fmt_out.audio.i_channels = i_channels;
                     p_dec->fmt_out.audio.i_physical_channels
-                        = mpeg4_asc_channelsbyindex[i_channels];
+                        = MPEG4_asc_channelsbyindex[i_channels];
                     date_Init( &p_sys->date, i_rate, 1 );
                 }
             }

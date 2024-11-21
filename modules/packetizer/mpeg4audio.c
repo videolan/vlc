@@ -57,62 +57,6 @@
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-typedef struct
-{
-    enum mpeg4_audioObjectType i_object_type;
-    unsigned i_samplerate;
-    uint8_t i_channel_configuration;
-    int8_t i_sbr;          // 0: no sbr, 1: sbr, -1: unknown
-    int8_t i_ps;           // 0: no ps,  1: ps,  -1: unknown
-
-    struct
-    {
-        enum mpeg4_audioObjectType i_object_type;
-        unsigned i_samplerate;
-        uint8_t i_channel_configuration;
-    } extension;
-
-    /* GASpecific */
-    unsigned i_frame_length;   // 1024 or 960
-
-} mpeg4_asc_t;
-
-#define LATM_MAX_EXTRA_SIZE 64
-typedef struct
-{
-    uint8_t i_program;
-    uint8_t i_layer;
-
-    unsigned i_frame_length;         // type 1
-    uint8_t i_frame_length_type;
-    uint8_t i_frame_length_index;   // type 3 4 5 6 7
-
-    mpeg4_asc_t cfg;
-
-    /* Raw configuration */
-    size_t i_extra;
-    uint8_t extra[LATM_MAX_EXTRA_SIZE];
-
-} latm_stream_t;
-
-#define LATM_MAX_LAYER (8)
-#define LATM_MAX_PROGRAM (16)
-typedef struct
-{
-    bool b_same_time_framing;
-    uint8_t i_sub_frames;
-    uint8_t i_programs;
-
-    uint8_t pi_layers[LATM_MAX_PROGRAM];
-
-    uint8_t pi_stream[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
-
-    uint8_t i_streams;
-    latm_stream_t stream[LATM_MAX_PROGRAM*LATM_MAX_LAYER];
-
-    uint32_t i_other_data;
-    int16_t  i_crc;  /* -1 if not set */
-} latm_mux_t;
 
 typedef struct
 {
@@ -140,7 +84,7 @@ typedef struct
 
     /* LOAS */
     bool b_latm_cfg;
-    latm_mux_t latm;
+    MPEG4_streammux_config_t latm;
 
     int i_warnings;
 } decoder_sys_t;
@@ -167,13 +111,6 @@ enum {
     TYPE_LOAS
 };
 
-static const int pi_sample_rates[16] =
-{
-    96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
-    16000, 12000, 11025, 8000,  7350,  0,     0,     0
-};
-
-
 static int ChannelConfigurationToVLC(uint8_t i_channel)
 {
     if (i_channel == 7)
@@ -187,17 +124,17 @@ static int AOTtoAACProfile(uint8_t i_object_type)
 {
     switch(i_object_type)
     {
-        case AOT_AAC_MAIN:
-        case AOT_AAC_LC:
-        case AOT_AAC_SSR:
-        case AOT_AAC_LTP:
-        case AOT_AAC_SBR:
-        case AOT_AAC_SC:
-        case AOT_ER_AAC_LD:
-        case AOT_AAC_PS:
-        case AOT_ER_AAC_ELD:
+        case MPEG4_AOT_AAC_MAIN:
+        case MPEG4_AOT_AAC_LC:
+        case MPEG4_AOT_AAC_SSR:
+        case MPEG4_AOT_AAC_LTP:
+        case MPEG4_AOT_AAC_SBR:
+        case MPEG4_AOT_AAC_SC:
+        case MPEG4_AOT_ER_AAC_LD:
+        case MPEG4_AOT_AAC_PS:
+        case MPEG4_AOT_ER_AAC_ELD:
             {
-            static_assert(AOT_AAC_MAIN == AAC_PROFILE_MAIN + 1,
+            static_assert(MPEG4_AOT_AAC_MAIN == AAC_PROFILE_MAIN + 1,
                           "invalid profile to object mapping");
             return i_object_type - 1;
             }
@@ -217,8 +154,6 @@ static void ClosePacketizer(vlc_object_t *);
 
 static block_t *Packetize    (decoder_t *, block_t **);
 static void     Flush( decoder_t * );
-
-static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool);
 
 /*****************************************************************************
  * Module descriptor
@@ -299,10 +234,10 @@ static int OpenPacketizer(vlc_object_t *p_this)
 
     if(p_dec->fmt_in->i_extra)
     {
-        mpeg4_asc_t asc;
+        MPEG4_asc_t asc;
         bs_t s;
         bs_init(&s, p_dec->fmt_in->p_extra, p_dec->fmt_in->i_extra);
-        if(Mpeg4ReadAudioSpecificConfig(&s, &asc, true) == VLC_SUCCESS)
+        if(MPEG4_read_AudioSpecificConfig(&s, &asc, true) == VLC_SUCCESS)
         {
             p_dec->fmt_out.audio.i_rate = asc.i_samplerate;
             p_dec->fmt_out.audio.i_frame_length = asc.i_frame_length;
@@ -493,443 +428,6 @@ static int LOASSyncInfo(uint8_t p_header[LOAS_HEADER_SIZE], unsigned int *pi_hea
     return ((p_header[1] & 0x1f) << 8) + p_header[2];
 }
 
-static int Mpeg4GAProgramConfigElement(bs_t *s)
-{
-    /* TODO compute channels count ? */
-    int i_tag = bs_read(s, 4);
-    if (i_tag != 0x05)
-        return -1;
-    bs_skip(s, 2 + 4); // object type + sampling index
-    int i_num_front = bs_read(s, 4);
-    int i_num_side = bs_read(s, 4);
-    int i_num_back = bs_read(s, 4);
-    int i_num_lfe = bs_read(s, 2);
-    int i_num_assoc_data = bs_read(s, 3);
-    int i_num_valid_cc = bs_read(s, 4);
-
-    if (bs_read1(s))
-        bs_skip(s, 4); // mono downmix
-    if (bs_read1(s))
-        bs_skip(s, 4); // stereo downmix
-    if (bs_read1(s))
-        bs_skip(s, 2+1); // matrix downmix + pseudo_surround
-
-    bs_skip(s, i_num_front * (1+4));
-    bs_skip(s, i_num_side * (1+4));
-    bs_skip(s, i_num_back * (1+4));
-    bs_skip(s, i_num_lfe * (4));
-    bs_skip(s, i_num_assoc_data * (4));
-    bs_skip(s, i_num_valid_cc * (5));
-    bs_align(s);
-    int i_comment = bs_read(s, 8);
-    bs_skip(s, i_comment * 8);
-    return 0;
-}
-
-static int Mpeg4GASpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
-{
-    p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
-    if(p_cfg->i_object_type == AOT_ER_AAC_LD) /* 14496-3 4.5.1.1 */
-        p_cfg->i_frame_length >>= 1;
-    else if(p_cfg->i_object_type == AOT_AAC_SSR)
-        p_cfg->i_frame_length = 256;
-
-    if (bs_read1(s))     // depend on core coder
-        bs_skip(s, 14);   // core coder delay
-
-    int i_extension_flag = bs_read1(s);
-    if (p_cfg->i_channel_configuration == 0)
-        Mpeg4GAProgramConfigElement(s);
-    if (p_cfg->i_object_type == AOT_AAC_SC ||
-        p_cfg->i_object_type == AOT_ER_AAC_SC)
-        bs_skip(s, 3);    // layer
-
-    if (i_extension_flag) {
-        if (p_cfg->i_object_type == AOT_ER_BSAC)
-            bs_skip(s, 5 + 11);   // numOfSubFrame + layer length
-        if (p_cfg->i_object_type == AOT_ER_AAC_LC ||
-            p_cfg->i_object_type == AOT_ER_AAC_LTP ||
-            p_cfg->i_object_type == AOT_ER_AAC_SC ||
-            p_cfg->i_object_type == AOT_ER_AAC_LD)
-            bs_skip(s, 1+1+1);    // ER data : section scale spectral */
-        if (bs_read1(s))     // extension 3
-            fprintf(stderr, "Mpeg4GASpecificConfig: error 1\n");
-    }
-    return 0;
-}
-
-static int Mpeg4ELDSpecificConfig(mpeg4_asc_t *p_cfg, bs_t *s)
-{
-    p_cfg->i_frame_length = bs_read1(s) ? 480 : 512;
-
-    /* ELDSpecificConfig Table 4.180 */
-
-    bs_skip(s, 3);
-    if(bs_read1(s)) /* ldSbrPresentFlag */
-    {
-        bs_skip(s, 2);
-        /* ld_sbr_header(channelConfiguration) Table 4.181 */
-        unsigned numSbrHeader;
-        switch(p_cfg->i_channel_configuration)
-        {
-            case 1: case 2:
-                numSbrHeader = 1;
-                break;
-            case 3:
-                numSbrHeader = 2;
-                break;
-            case 4: case 5: case 6:
-                numSbrHeader = 3;
-                break;
-            case 7:
-                numSbrHeader = 4;
-                break;
-            default:
-                numSbrHeader = 0;
-                break;
-        }
-        for( ; numSbrHeader; numSbrHeader-- )
-        {
-            /* sbr_header() Table 4.63 */
-            bs_read(s, 14);
-            bool header_extra_1 = bs_read1(s);
-            bool header_extra_2 = bs_read1(s);
-            if(header_extra_1)
-                bs_read(s, 5);
-            if(header_extra_2)
-                bs_read(s, 6);
-        }
-    }
-
-    for(unsigned eldExtType = bs_read(s, 4);
-        eldExtType != 0x0 /* ELDEXT_TERM */;
-        eldExtType = bs_read(s, 4))
-    {
-        unsigned eldExtLen = bs_read(s, 4);
-        unsigned eldExtLenAdd = 0;
-        if(eldExtLen == 15)
-        {
-            eldExtLenAdd = bs_read(s, 8);
-            eldExtLen += eldExtLenAdd;
-        }
-        if(eldExtLenAdd == 255)
-            eldExtLen += bs_read(s, 16);
-        /* reserved extensions */
-        for(; eldExtLen; eldExtLen--)
-            bs_skip(s, 8);
-    }
-
-    return 0;
-}
-
-static enum mpeg4_audioObjectType Mpeg4ReadAudioObjectType(bs_t *s)
-{
-    int i_type = bs_read(s, 5);
-    if (i_type == 31)
-        i_type = 32 + bs_read(s, 6);
-    return i_type;
-}
-
-static unsigned Mpeg4ReadAudioSamplerate(bs_t *s)
-{
-    int i_index = bs_read(s, 4);
-    if (i_index != 0x0f)
-        return pi_sample_rates[i_index];
-    return bs_read(s, 24);
-}
-
-static int Mpeg4ReadAudioSpecificConfig(bs_t *s, mpeg4_asc_t *p_cfg, bool b_withext)
-{
-    p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
-    p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate(s);
-    p_cfg->i_channel_configuration = bs_read(s, 4);
-
-    p_cfg->i_sbr = -1;
-    p_cfg->i_ps  = -1;
-    p_cfg->extension.i_object_type = 0;
-    p_cfg->extension.i_samplerate = 0;
-    p_cfg->extension.i_channel_configuration = 0;
-    p_cfg->i_frame_length = 0;
-
-    if (p_cfg->i_object_type == AOT_AAC_SBR ||
-        p_cfg->i_object_type == AOT_AAC_PS) {
-        p_cfg->i_sbr = 1;
-        if (p_cfg->i_object_type == AOT_AAC_PS)
-           p_cfg->i_ps = 1;
-        p_cfg->extension.i_object_type = AOT_AAC_SBR;
-        p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
-
-        p_cfg->i_object_type = Mpeg4ReadAudioObjectType(s);
-        if(p_cfg->i_object_type == AOT_ER_BSAC)
-            p_cfg->extension.i_channel_configuration = bs_read(s, 4);
-    }
-
-    switch(p_cfg->i_object_type)
-    {
-    case AOT_AAC_MAIN:
-    case AOT_AAC_LC:
-    case AOT_AAC_SSR:
-    case AOT_AAC_LTP:
-    case AOT_AAC_SC:
-    case AOT_TWINVQ:
-    case AOT_ER_AAC_LC:
-    case AOT_ER_AAC_LTP:
-    case AOT_ER_AAC_SC:
-    case AOT_ER_TWINVQ:
-    case AOT_ER_BSAC:
-    case AOT_ER_AAC_LD:
-        Mpeg4GASpecificConfig(p_cfg, s);
-        break;
-    case AOT_CELP:
-        // CelpSpecificConfig();
-    case AOT_HVXC:
-        // HvxcSpecificConfig();
-    case AOT_TTSI:
-        // TTSSSpecificConfig();
-    case AOT_MAIN_SYNTHETIC:
-    case AOT_WAVETABLES:
-    case AOT_GENERAL_MIDI:
-    case AOT_ALGORITHMIC:
-        // StructuredAudioSpecificConfig();
-    case AOT_ER_CELP:
-        // ERCelpSpecificConfig();
-    case AOT_ER_HXVC:
-        // ERHvxcSpecificConfig();
-    case AOT_ER_HILN:
-    case AOT_ER_Parametric:
-        // ParametricSpecificConfig();
-    case AOT_SSC:
-        // SSCSpecificConfig();
-    case AOT_LAYER1:
-    case AOT_LAYER2:
-    case AOT_LAYER3:
-        // MPEG_1_2_SpecificConfig();
-    case AOT_DST:
-        // DSTSpecificConfig();
-    case AOT_ALS:
-        // ALSSpecificConfig();
-    case AOT_SLS:
-    case AOT_SLS_NON_CORE:
-        // SLSSpecificConfig();
-    case AOT_ER_AAC_ELD:
-        Mpeg4ELDSpecificConfig(p_cfg, s);
-        break;
-    case AOT_SMR_SIMPLE:
-    case AOT_SMR_MAIN:
-        // SymbolicMusicSpecificConfig();
-    default:
-        // error
-        return VLC_EGENERIC;
-    }
-
-    switch(p_cfg->i_object_type)
-    {
-    case AOT_ER_AAC_LC:
-    case AOT_ER_AAC_LTP:
-    case AOT_ER_AAC_SC:
-    case AOT_ER_TWINVQ:
-    case AOT_ER_BSAC:
-    case AOT_ER_AAC_LD:
-    case AOT_ER_CELP:
-    case AOT_ER_HXVC:
-    case AOT_ER_HILN:
-    case AOT_ER_Parametric:
-    case AOT_ER_AAC_ELD:
-    {
-        int epConfig = bs_read(s, 2);
-        if (epConfig == 2 || epConfig == 3)
-            //ErrorProtectionSpecificConfig();
-        if (epConfig == 3)
-            if (bs_read1(s)) {
-                // TODO : directMapping
-            }
-        break;
-    }
-    default:
-        break;
-    }
-
-    if (b_withext && p_cfg->extension.i_object_type != AOT_AAC_SBR &&
-        !bs_eof(s) && bs_read(s, 11) == 0x2b7)
-    {
-        p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType(s);
-        if (p_cfg->extension.i_object_type == AOT_AAC_SBR)
-        {
-            p_cfg->i_sbr  = bs_read1(s);
-            if (p_cfg->i_sbr == 1) {
-                p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
-                if (bs_read(s, 11) == 0x548)
-                   p_cfg->i_ps = bs_read1(s);
-            }
-        }
-        else if (p_cfg->extension.i_object_type == AOT_ER_BSAC)
-        {
-            p_cfg->i_sbr  = bs_read1(s);
-            if(p_cfg->i_sbr)
-                p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate(s);
-            p_cfg->extension.i_channel_configuration = bs_read(s, 4);
-        }
-    }
-
-#if 0
-    static const char *ppsz_otype[] = {
-        "NULL",
-        "AAC Main", "AAC LC", "AAC SSR", "AAC LTP", "SBR", "AAC Scalable",
-        "TwinVQ",
-        "CELP", "HVXC",
-        "Reserved", "Reserved",
-        "TTSI",
-        "Main Synthetic", "Wavetables Synthesis", "General MIDI",
-        "Algorithmic Synthesis and Audio FX",
-        "ER AAC LC",
-        "Reserved",
-        "ER AAC LTP", "ER AAC Scalable", "ER TwinVQ", "ER BSAC", "ER AAC LD",
-        "ER CELP", "ER HVXC", "ER HILN", "ER Parametric",
-        "SSC",
-        "PS", "MPEG Surround", "Escape",
-        "Layer 1", "Layer 2", "Layer 3",
-        "DST", "ALS", "SLS", "SLS non-core", "ELD",
-        "SMR Simple", "SMR Main",
-    };
-
-    fprintf(stderr, "Mpeg4ReadAudioSpecificInfo: t=%s(%d)f=%d c=%d sbr=%d\n",
-            ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type,
-            p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr);
-#endif
-    return bs_error(s) ? VLC_EGENERIC : VLC_SUCCESS;
-}
-
-static uint32_t LatmGetValue(bs_t *s)
-{
-    uint32_t v = 0;
-    for (int i = 1 + bs_read(s, 2); i > 0; i--)
-        v = (v << 8) + bs_read(s, 8);
-    return v;
-}
-
-static size_t AudioSpecificConfigBitsToBytes(bs_t *s, uint32_t i_bits, uint8_t *p_data)
-{
-    size_t i_extra = __MIN((i_bits + 7) / 8, LATM_MAX_EXTRA_SIZE);
-    for (size_t i = 0; i < i_extra; i++) {
-        const uint32_t i_read = __MIN(8, i_bits - 8*i);
-        p_data[i] = bs_read(s, i_read) << (8-i_read);
-    }
-    return i_extra;
-}
-
-static int LatmReadStreamMuxConfiguration(latm_mux_t *m, bs_t *s)
-{
-    int i_mux_version;
-    int i_mux_versionA;
-
-    i_mux_version = bs_read(s, 1);
-    i_mux_versionA = 0;
-    if (i_mux_version)
-        i_mux_versionA = bs_read(s, 1);
-
-    if (i_mux_versionA != 0) /* support only A=0 */
-        return -1;
-
-    memset(m, 0, sizeof(*m));
-
-    if (i_mux_versionA == 0)
-        if (i_mux_version == 1)
-            LatmGetValue(s); /* taraBufferFullness */
-
-    if(bs_eof(s))
-        return -1;
-
-    m->b_same_time_framing = bs_read1(s);
-    m->i_sub_frames = 1 + bs_read(s, 6);
-    m->i_programs = 1 + bs_read(s, 4);
-
-    for (uint8_t i_program = 0; i_program < m->i_programs; i_program++) {
-        if(bs_eof(s))
-            return -1;
-        m->pi_layers[i_program] = 1+bs_read(s, 3);
-
-        for (uint8_t i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++) {
-            latm_stream_t *st = &m->stream[m->i_streams];
-            bool b_previous_cfg;
-
-            m->pi_stream[i_program][i_layer] = m->i_streams;
-            st->i_program = i_program;
-            st->i_layer = i_layer;
-
-            b_previous_cfg = false;
-            if (i_program != 0 || i_layer != 0)
-                b_previous_cfg = bs_read1(s);
-
-            if (b_previous_cfg) {
-                assert(m->i_streams > 0);
-                st->cfg = m->stream[m->i_streams-1].cfg;
-            } else {
-                uint32_t asc_size = 0;
-                if(i_mux_version > 0)
-                    asc_size = LatmGetValue(s);
-                bs_t asc_bs = *s;
-                Mpeg4ReadAudioSpecificConfig(&asc_bs, &st->cfg, i_mux_version > 0);
-                if (i_mux_version == 0)
-                    asc_size = bs_pos(&asc_bs) - bs_pos(s);
-                asc_bs = *s;
-                st->i_extra = AudioSpecificConfigBitsToBytes(&asc_bs, asc_size, st->extra);
-                bs_skip(s, asc_size);
-            }
-
-            st->i_frame_length_type = bs_read(s, 3);
-            switch(st->i_frame_length_type)
-            {
-            case 0:
-            {
-                bs_skip(s, 8); /* latmBufferFullnes */
-                if (!m->b_same_time_framing)
-                    if (st->cfg.i_object_type == AOT_AAC_SC ||
-                        st->cfg.i_object_type == AOT_CELP ||
-                        st->cfg.i_object_type == AOT_ER_AAC_SC ||
-                        st->cfg.i_object_type == AOT_ER_CELP)
-                        bs_skip(s, 6); /* eFrameOffset */
-                break;
-            }
-            case 1:
-                st->i_frame_length = bs_read(s, 9);
-                break;
-            case 3: case 4: case 5:
-                st->i_frame_length_index = bs_read(s, 6); // celp
-                break;
-            case 6: case 7:
-                st->i_frame_length_index = bs_read(s, 1); // hvxc
-            default:
-                break;
-            }
-            /* Next stream */
-            m->i_streams++;
-        }
-    }
-
-    if(bs_error(s) || bs_eof(s))
-        return -1;
-
-    /* other data */
-    if (bs_read1(s)) {
-        if (i_mux_version == 1)
-            m->i_other_data = LatmGetValue(s);
-        else {
-            int b_continue;
-            do {
-                b_continue = bs_read1(s);
-                m->i_other_data = (m->i_other_data << 8) + bs_read(s, 8);
-            } while (b_continue);
-        }
-    }
-
-    /* crc */
-    m->i_crc = -1;
-    if (bs_read1(s))
-        m->i_crc = bs_read(s, 8);
-
-    return bs_error(s) ? -1 : 0;
-}
-
 static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -939,9 +437,9 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
     bs_init(&s, p_buffer, i_buffer);
 
     /* Read the stream mux configuration if present */
-    if (!bs_read1(&s) && !LatmReadStreamMuxConfiguration(&p_sys->latm, &s) &&
+    if (!bs_read1(&s) && !MPEG4_parse_StreamMuxConfig(&s, &p_sys->latm) &&
             p_sys->latm.i_streams > 0) {
-        const latm_stream_t *st = &p_sys->latm.stream[0];
+        const MPEG4_audio_stream_t *st = &p_sys->latm.stream[0];
 
         if(st->cfg.i_samplerate == 0 || st->cfg.i_frame_length == 0 ||
            ChannelConfigurationToVLC(st->cfg.i_channel_configuration) == 0)
@@ -996,12 +494,12 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
         msg_Err(p_dec, "latm sub frames not yet supported, please send a sample");
 
     for (uint8_t i_sub = 0; i_sub < p_sys->latm.i_sub_frames; i_sub++) {
-        unsigned pi_payload[LATM_MAX_PROGRAM][LATM_MAX_LAYER];
+        unsigned pi_payload[MPEG4_STREAMMUX_MAX_PROGRAM][MPEG4_STREAMMUX_MAX_LAYER];
         if (p_sys->latm.b_same_time_framing) {
             /* Payload length */
             for (uint8_t i_program = 0; i_program < p_sys->latm.i_programs; i_program++) {
                 for (uint8_t i_layer = 0; i_layer < p_sys->latm.pi_layers[i_program]; i_layer++) {
-                    latm_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
+                    MPEG4_audio_stream_t *st = &p_sys->latm.stream[p_sys->latm.pi_stream[i_program][i_layer]];
                     if (st->i_frame_length_type == 0) {
                         unsigned i_payload = 0;
                         for (;;) {
@@ -1055,7 +553,7 @@ static int LOASParse(decoder_t *p_dec, uint8_t *p_buffer, int i_buffer)
 
             for (int i_chunk = 0; i_chunk < i_chunks; i_chunk++) {
                 const int streamIndex = bs_read(&s, 4);
-                latm_stream_t *st = &p_sys->latm.stream[streamIndex];
+                MPEG4_audio_stream_t *st = &p_sys->latm.stream[streamIndex];
                 const int i_program = st->i_program;
                 const int i_layer = st->i_layer;
 
