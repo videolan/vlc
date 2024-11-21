@@ -35,7 +35,7 @@ const char *vlc_sdp_fmtp_get_str(const struct vlc_sdp_pt *desc,
     while (p != NULL) {
         p += strspn(p, " ");
 
-        if (strncmp(p, name, namelen) == 0 && p[namelen] == '=') {
+        if (vlc_ascii_strncasecmp(p, name, namelen) == 0 && p[namelen] == '=') {
             p += namelen + 1;
             *lenp = strcspn(p, ";");
             return p;
