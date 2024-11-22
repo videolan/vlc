@@ -131,7 +131,11 @@ static void Close(vlc_va_t *va, AVCodecContext* ctx)
     free(sys);
 }
 
-static const struct vlc_va_operations ops = { Lock, Close, };
+static const struct vlc_va_operations ops =
+{
+    .get = Lock,
+    .close = Close,
+};
 
 const struct vlc_video_context_operations vdpau_vctx_ops = {
     NULL,

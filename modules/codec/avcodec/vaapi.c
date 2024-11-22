@@ -158,7 +158,11 @@ static void vaapi_ctx_destroy(void *priv)
     av_buffer_unref(&vaapi_vctx->hwframes_ref);
 }
 
-static const struct vlc_va_operations ops = { Get, Delete, };
+static const struct vlc_va_operations ops =
+{
+    .get = Get,
+    .close = Delete,
+};
 
 static const struct vlc_video_context_operations vaapi_ctx_ops =
 {

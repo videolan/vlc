@@ -226,7 +226,11 @@ static void Close(vlc_va_t *va, AVCodecContext* ctx)
         ctx->hwaccel_context = NULL;
 }
 
-static const struct vlc_va_operations ops = { Get, Close, };
+static const struct vlc_va_operations ops =
+{
+    .get = Get,
+    .close = Close,
+};
 
 static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
                 const es_format_t *fmt_in, vlc_decoder_device *dec_device,
