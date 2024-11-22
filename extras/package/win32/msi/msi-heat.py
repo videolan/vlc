@@ -27,7 +27,6 @@ import hashlib
 parser = argparse.ArgumentParser(description="Generate WIX compatible wxs listing")
 parser.add_argument('-d', "--dir", type=pathlib.Path, help='directory with files to list')
 parser.add_argument('-out', type=argparse.FileType('w', encoding='UTF-8'), help="output file")
-parser.add_argument('-pdb', action=argparse.BooleanOptionalAction, help='keep PDB files', default=False)
 parser.add_argument('-dr', "--directory-reference", help='directory reference')
 parser.add_argument('-cg', "--component-group", help='component group')
 args, remaining = parser.parse_known_args()
@@ -50,7 +49,7 @@ args.out.write('        <DirectoryRef Id="{}">\r\n'.format(args.directory_refere
 
 fileIdList =[]
 
-def outputDir(top, parent: str, dir: str, with_pdb: bool):
+def outputDir(top, parent: str, dir: str):
     cwd = top.joinpath(parent).joinpath(dir)
     dirName = os.path.join(parent, dir)
     if dir=='':
@@ -75,13 +74,13 @@ def outputDir(top, parent: str, dir: str, with_pdb: bool):
         for file in cwd.iterdir():
             if file.is_dir():
                 # args.out.write('         dir    <{}>\r\n'.format(file))
-                outputDir(top, dirName, file.name, with_pdb)
+                outputDir(top, dirName, file.name)
 
     args.out.write('                </Directory>\r\n')
 
 print(args.dir.parent)
 print(args.dir.name)
-outputDir(args.dir, '', '', args.pdb)
+outputDir(args.dir, '', '')
 
 # args.out.write('            </Directory>\r\n')
 args.out.write('        </DirectoryRef>\r\n')
