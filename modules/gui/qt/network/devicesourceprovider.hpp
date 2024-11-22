@@ -27,11 +27,13 @@
 #include <QString>
 #include <QSet>
 #include <vector>
+#include <QMutex>
 
 #include "networkdevicemodel.hpp"
 #include "mediatreelistener.hpp"
 #include "util/shared_input_item.hpp"
 #include "vlcmediasourcewrapper.hpp"
+#include "util/singleton.hpp"
 
 static inline std::size_t qHash(const SharedInputItem& item, size_t seed = 0) noexcept
 {
@@ -50,6 +52,8 @@ public:
     ~MediaSourceModel();
 
 public:
+    void init();
+
     const std::vector<SharedInputItem>& getMedias() const;
 
     QString getDescription() const;
@@ -74,6 +78,23 @@ private:
 };
 typedef QSharedPointer<MediaSourceModel> SharedMediaSourceModel;
 
+
+class MediaSourceCache : public Singleton<MediaSourceCache>
+{
+public:
+    SharedMediaSourceModel getMediaSourceModel(vlc_media_source_provider_t* provider, const char* name);
+
+private:
+    MediaSourceCache() = default;
+    ~MediaSourceCache() = default;
+    friend class Singleton<MediaSourceCache>;
+
+private:
+    //we keep a weak pointer to the model sources, if no other party is
+    //referencing the source, then it will be freed,
+    std::map<QString, QWeakPointer<MediaSourceModel>> m_cache;
+    QMutex m_mutex;
+};
 
 class DeviceSourceProvider : public QObject
 {

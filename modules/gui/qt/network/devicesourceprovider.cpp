@@ -89,10 +89,6 @@ struct MediaSourceModel::ListenerCb : public MediaTreeListener::MediaTreeListene
 MediaSourceModel::MediaSourceModel(MediaSourcePtr& mediaSource)
     : m_mediaSource(mediaSource)
 {
-    m_listenner = std::make_unique<MediaTreeListener>(
-        MediaTreePtr{ mediaSource->tree },
-        std::make_unique<MediaSourceModel::ListenerCb>(this, mediaSource)
-    );
 }
 
 MediaSourceModel::~MediaSourceModel()
@@ -105,6 +101,17 @@ MediaSourceModel::~MediaSourceModel()
     m_medias.clear();
 
     m_mediaSource.reset();
+}
+
+void MediaSourceModel::init()
+{
+    if (m_listenner)
+        return;
+
+    m_listenner = std::make_unique<MediaTreeListener>(
+        MediaTreePtr{ m_mediaSource->tree },
+        std::make_unique<MediaSourceModel::ListenerCb>(this, m_mediaSource)
+        );
 }
 
 const std::vector<SharedInputItem>& MediaSourceModel::getMedias() const
@@ -172,6 +179,28 @@ void MediaSourceModel::removeItems(const std::vector<SharedInputItem> &inputList
     }
 }
 
+SharedMediaSourceModel MediaSourceCache::getMediaSourceModel(vlc_media_source_provider_t* provider, const char* name)
+{
+    //MediaSourceCache may be accessed by multiple threads
+    QMutexLocker lock{&m_mutex};
+
+    QString key = qfu(name);
+    auto it = m_cache.find(key);
+    if (it != m_cache.end())
+    {
+        SharedMediaSourceModel ref = it->second.toStrongRef();
+        if (ref)
+            return ref;
+    }
+    MediaSourcePtr mediaSource(
+        vlc_media_source_provider_GetMediaSource(provider, name),
+        false );
+
+    SharedMediaSourceModel item = SharedMediaSourceModel::create(mediaSource);
+    m_cache[key] = item;
+    return item;
+}
+
 DeviceSourceProvider::DeviceSourceProvider(
     NetworkDeviceModel::SDCatType sdSource,
     const QString &sourceName,
@@ -198,13 +227,13 @@ void DeviceSourceProvider::init()
     struct Ctx {
         bool success = false;
         QString name;
-        std::vector<MediaSourcePtr> sources;
-
+        std::vector<SharedMediaSourceModel> sources;
     };
+    QThread* thread = QThread::currentThread();
     m_taskId = m_ctx->threadRunner()->runOnThread<Ctx>(
         this,
         //Worker thread
-        [intf = m_ctx->getIntf(), sdSource = m_sdSource, nameFilter = m_sourceName](Ctx& ctx){
+        [intf = m_ctx->getIntf(), sdSource = m_sdSource, nameFilter = m_sourceName, thread](Ctx& ctx){
             auto libvlc = vlc_object_instance(intf);
 
             auto provider = vlc_media_source_provider_Get( libvlc );
@@ -227,9 +256,9 @@ void DeviceSourceProvider::init()
 
                 ctx.name += ctx.name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
 
-                MediaSourcePtr mediaSource(
-                    vlc_media_source_provider_GetMediaSource(provider, meta->name)
-                    , false );
+                SharedMediaSourceModel mediaSource = MediaSourceCache::getInstance()->getMediaSourceModel(provider, meta->name);
+                //ensure this QObject don't live in the worker thread
+                mediaSource->moveToThread(thread);
 
                 if (!mediaSource)
                     continue;
@@ -243,7 +272,8 @@ void DeviceSourceProvider::init()
             emit nameUpdated( m_name );
 
             for (auto& mediaSource : ctx.sources) {
-                m_mediaSources.push_back( SharedMediaSourceModel::create(mediaSource ) );
+                mediaSource->init();
+                m_mediaSources.push_back( mediaSource );
             }
 
             if ( !m_mediaSources.empty() )

@@ -86,6 +86,7 @@ extern "C" char **environ;
 #include "util/shared_input_item.hpp"
 #include "util/model_recovery_agent.hpp"
 #include "network/networkmediamodel.hpp"
+#include "network/devicesourceprovider.hpp"
 #include "playlist/playlist_common.hpp"
 #include "playlist/playlist_item.hpp"
 #include "dialogs/dialogs/dialogmodel.hpp"
@@ -1165,6 +1166,7 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
     DialogsProvider::killInstance();
     VLCDialogModel::killInstance();
     DialogErrorModel::killInstance();
+    MediaSourceCache::killInstance();
 
     //destroy MainCtx, Compositor shouldn't not use MainCtx after `unloadGUI`
     if (p_intf->p_mi) {
