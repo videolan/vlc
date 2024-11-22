@@ -829,7 +829,10 @@ static int Open( vlc_object_t * p_this )
     const uint8_t *p_peek;
     if( vlc_stream_Peek( p_demux->s, &p_peek, G64_WRAP_HEADER_BYTES + 6 ) !=
         G64_WRAP_HEADER_BYTES + 6 )
+    {
+        free( psz_title );
         return VLC_EGENERIC;
+    }
 
     switch( p_peek[G64_WRAP_HEADER_BYTES + 1] )
     {
