@@ -380,7 +380,6 @@ MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
 
 void MLBaseModel::updateItemInCache(const MLItemId&)
 {
-    Q_D(MLBaseModel);
     // we can't safely update the item in the cache because our view may have a filter
     // and the update may cause the item filtered state to change requiring it to enter/leave
     // the cache
