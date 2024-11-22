@@ -117,8 +117,6 @@ Item {
                 timer.stop()
             }
         }
-
-        cache: false
     }
 
     Widgets.RoundImage {
