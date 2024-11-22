@@ -451,7 +451,8 @@ static struct vlc_rtp_es *g64_rtp_mux_request( struct vlc_rtp_pt *pt,
 static void g64_rtp_pt_clear( struct vlc_rtp_pt *pt, void **pptriv )
 {
     vlc_rtp_pt_end( pt, *pptriv );
-    pt->ops->release( pt );
+    if (pt->ops->release != NULL)
+        pt->ops->release( pt );
     *pptriv = NULL;
 }
 
