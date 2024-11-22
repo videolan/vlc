@@ -22,7 +22,7 @@
 #endif
 
 #include "FormatNamespace.hpp"
-#include "../../mp4/mpeg4.h"
+#include "../../../packetizer/mpeg4systems.h"
 #include "../../../packetizer/mpeg4audio.h"
 #include "../tools/Helper.h"
 
@@ -58,9 +58,9 @@ void FormatNamespace::ParseMPEG4Elements(const std::vector<std::string> &element
         return;
 
     uint8_t objectType = std::stoi(elements.at(0).substr(0,2), nullptr, 16);
-    if(!MPEG4_Codec_By_ObjectType(objectType, nullptr, 0,
-                                  &fmt.i_codec,
-                                  &fmt.i_profile))
+    if(!MPEG4_get_codec_by_ObjectType(objectType, nullptr, 0,
+                                      &fmt.i_codec,
+                                      &fmt.i_profile))
         return;
 
     switch(objectType)

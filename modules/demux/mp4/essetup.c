@@ -30,7 +30,7 @@
 #include "avci.h"
 #include "../xiph.h"
 #include "../../packetizer/iso_color_tables.h"
-#include "mpeg4.h"
+#include "../../packetizer/mpeg4systems.h"
 #include "qt_palette.h"
 
 #include <vlc_demux.h>
@@ -110,7 +110,7 @@ static void SetupESDS( demux_t *p_demux, const mp4_track_t *p_track,
 
         /* Fallback */
     default:
-        if( MPEG4_Codec_By_ObjectType( p_decconfig->i_objectProfileIndication,
+        if( MPEG4_get_codec_by_ObjectType( p_decconfig->i_objectProfileIndication,
                                        p_decconfig->p_decoder_specific_info,
                                        p_decconfig->i_decoder_specific_info_len,
                                        &p_fmt->i_codec,
