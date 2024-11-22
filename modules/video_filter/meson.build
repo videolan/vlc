@@ -312,11 +312,16 @@ vlc_modules += {
 
 # Postproc filter
 postproc_dep = dependency('libpostproc', required: get_option('postproc'))
+postproc_c_args = []
 if postproc_dep.found()
+    if cc.check_header('postproc/postprocess.h', dependencies: [postproc_dep])
+        postproc_c_args += ['-DHAVE_POSTPROC_POSTPROCESS_H']
+    endif
     vlc_modules += {
     'name' : 'postproc',
     'sources' : files('postproc.c'),
-    'dependencies' : [m_lib, postproc_dep]
+    'dependencies' : [m_lib, postproc_dep],
+    'c_args' : postproc_c_args,
     }
 endif
 
