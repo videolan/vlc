@@ -35,7 +35,6 @@
 #include "compositor.hpp"
 #include "util/renderer_manager.hpp"
 #include "util/csdbuttonmodel.hpp"
-#include "util/workerthreadset.hpp"
 
 #include "widgets/native/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -601,15 +600,6 @@ inline void MainCtx::initSystray()
         m_systray = std::make_unique<VLCSystray>(this);
 }
 
-WorkerThreadSet* MainCtx::workersThreads() const
-{
-    if (!m_workersThreads)
-    {
-        m_workersThreads.reset( new WorkerThreadSet );
-    }
-
-    return m_workersThreads.get();
-}
 ThreadRunner* MainCtx::threadRunner() const
 {
     return m_threadRunner;

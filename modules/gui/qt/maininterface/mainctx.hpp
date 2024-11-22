@@ -62,7 +62,6 @@ class VideoSurfaceProvider;
 class ControlbarProfileModel;
 class SearchCtx;
 class SortCtx;
-class WorkerThreadSet;
 class VLCSystray;
 class MediaLib;
 class ColorSchemeModel;
@@ -302,7 +301,6 @@ public:
 
     Q_INVOKABLE bool useXmasCone() const;
 
-    WorkerThreadSet *workersThreads() const;
     ThreadRunner* threadRunner() const;
 
     Q_INVOKABLE QUrl folderMRL(const QString &fileMRL) const;
@@ -400,7 +398,6 @@ protected:
     mutable std::unique_ptr<UpdateModel> m_updateModel;
 #endif
 
-    mutable std::unique_ptr<WorkerThreadSet> m_workersThreads;
     ThreadRunner* m_threadRunner = nullptr;
 
 public slots:
