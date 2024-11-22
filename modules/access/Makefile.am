@@ -69,6 +69,13 @@ if HAVE_JACK
 access_LTLIBRARIES += libaccess_jack_plugin.la
 endif
 
+libpipewiresrc_plugin_la_SOURCES = access/pipewire.c
+libpipewiresrc_plugin_la_CFLAGS = $(AM_CFLAGS) $(PIPEWIRE_CFLAGS)
+libpipewiresrc_plugin_la_LIBADD = libvlc_pipewire.la $(PIPEWIRE_LIBS)
+if HAVE_PIPEWIRE
+access_LTLIBRARIES += libpipewiresrc_plugin.la
+endif
+
 libpulsesrc_plugin_la_SOURCES = access/pulse.c
 libpulsesrc_plugin_la_CFLAGS= $(AM_CFLAGS) $(PULSE_CFLAGS)
 libpulsesrc_plugin_la_LIBADD = libvlc_pulse.la $(PULSE_LIBS)
