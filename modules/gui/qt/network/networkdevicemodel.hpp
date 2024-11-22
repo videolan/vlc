@@ -107,10 +107,6 @@ signals:
     void itemsUpdated();
 
 private:
-    void refreshDeviceList(MediaSourcePtr mediaSource, input_item_node_t* const children[], size_t count , bool clear);
-    bool initializeMediaSources();
-
-private:
     Q_DECLARE_PRIVATE(NetworkDeviceModel)
 };
 
