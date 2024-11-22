@@ -150,8 +150,6 @@ moc_headers = files(
     'widgets/native/interface_widgets.hpp',
     'widgets/native/navigation_attached.hpp',
     'widgets/native/mlfolderseditor.hpp',
-    'widgets/native/roundimage.hpp',
-    'widgets/native/roundimage_p.hpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
 )
@@ -497,8 +495,6 @@ some_sources = files(
     'widgets/native/mlfolderseditor.hpp',
     'widgets/native/qvlcframe.cpp',
     'widgets/native/qvlcframe.hpp',
-    'widgets/native/roundimage.cpp',
-    'widgets/native/roundimage.hpp',
     'widgets/native/searchlineedit.cpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.cpp',

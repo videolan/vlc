@@ -348,7 +348,6 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/mlfolderseditor.hpp \
 	widgets/native/qvlcframe.cpp \
 	widgets/native/qvlcframe.hpp \
-	widgets/native/roundimage.cpp widgets/native/roundimage.hpp widgets/native/roundimage_p.hpp \
 	widgets/native/searchlineedit.cpp widgets/native/searchlineedit.hpp \
 	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp \
 	widgets/native/doubleclickignoringitem.hpp
@@ -496,8 +495,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/interface_widgets.moc.cpp \
 	widgets/native/navigation_attached.moc.cpp \
 	widgets/native/mlfolderseditor.moc.cpp \
-	widgets/native/roundimage.moc.cpp \
-	widgets/native/roundimage_p.moc.cpp \
 	widgets/native/searchlineedit.moc.cpp \
 	widgets/native/viewblockingrectangle.moc.cpp
 
