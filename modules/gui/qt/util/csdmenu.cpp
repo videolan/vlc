@@ -34,6 +34,14 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
+#if defined(Q_OS_UNIX))
+#define QT_FEATURE_wayland 1
+#else
+#define QT_FEATURE_wayland -1
+#endif
+#endif
+
 struct xdg_surface;
 
 namespace {
@@ -155,7 +163,7 @@ public:
             info.data.x11.connection = reinterpret_cast<struct xcb_connection_t*>(native->nativeResourceForIntegration(QByteArrayLiteral("connection")));
         }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0) && QT_CONFIG(wayland)
         if (m_plateform == QT_CSD_PLATFORM_WAYLAND)
         {
             info.platform = QT_CSD_PLATFORM_WAYLAND;
@@ -300,7 +308,7 @@ void CSDMenu::popup(const QPoint &pos)
             event.data.x11.window = window->winId();
         }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0) && QT_CONFIG(wayland)
         if (d->m_plateform == QT_CSD_PLATFORM_WAYLAND)
         {
             event.platform = QT_CSD_PLATFORM_WAYLAND;
