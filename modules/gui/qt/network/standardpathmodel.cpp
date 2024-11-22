@@ -213,7 +213,7 @@ QVariant StandardPathModel::data(const QModelIndex & index, int role) const /* o
     switch (role)
     {
         case PATH_TREE:
-            return QVariant::fromValue(NetworkTreeItem(item->tree, item->inputItem.get()));
+            return QVariant::fromValue(NetworkTreeItem(item->tree, item->inputItem));
         default:
             return NetworkBaseModel::basedata(*item, role);
     }

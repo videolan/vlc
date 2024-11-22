@@ -24,6 +24,7 @@
 
 #include "vlcmediasourcewrapper.hpp"
 #include "util/shared_input_item.hpp"
+#include "devicesourceprovider.hpp"
 
 #include "networkbasemodel.hpp"
 
@@ -39,25 +40,25 @@ class NetworkTreeItem
 public:
     NetworkTreeItem() : source(nullptr), tree(nullptr), media(nullptr) {}
 
-    NetworkTreeItem( MediaSourcePtr source, input_item_t* m )
+    NetworkTreeItem( SharedMediaSourceModel source, const SharedInputItem& item )
         : source(source)
-        , tree( source->tree )
-        , media( m )
+        , tree(source->getTree())
+        , media(item)
     {
     }
 
-    NetworkTreeItem( MediaTreePtr tree, input_item_t* m )
-        : source( nullptr )
-        , tree( tree )
-        , media( m )
+    NetworkTreeItem( MediaTreePtr tree, const SharedInputItem& item )
+        : source(nullptr)
+        , tree(tree)
+        , media(item)
     {
     }
 
-    //create a NetworkTreeItem with the same source/tree as parent
-    NetworkTreeItem( NetworkTreeItem& parent, input_item_t* m )
-        : source( parent.source )
-        , tree( parent.tree )
-        , media( m )
+    //build a NetworkTreeItem with the same source/tree as parent
+    NetworkTreeItem(NetworkTreeItem& parent, const SharedInputItem& item)
+        : source(parent.source)
+        , tree(parent.tree)
+        , media(item)
     {
     }
 
@@ -77,7 +78,7 @@ public:
         return vlc_media_tree_Find( tree.get(), media.get(), &node, nullptr);
     }
 
-    MediaSourcePtr source;
+    SharedMediaSourceModel source;
     MediaTreePtr tree;
     SharedInputItem media;
 };

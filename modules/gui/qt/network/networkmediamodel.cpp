@@ -53,7 +53,6 @@ struct NetworkMediaItem : public NetworkBaseItem
 };
 
 using NetworkMediaItemPtr = std::shared_ptr<NetworkMediaItem>;
-using NetworkMediaItemSet = std::unordered_set<NetworkMediaItemPtr>;
 
 inline bool isADir(const NetworkMediaItemPtr& x)
 {
@@ -228,7 +227,7 @@ public:
                     item->fileModified = QDateTime::fromSecsSinceEpoch(time, QTimeZone::systemTimeZone());
             }
 
-            item->tree = NetworkTreeItem(treeItem, inputItem.get() );
+            item->tree = NetworkTreeItem(treeItem, inputItem );
 
             if ( m_mediaLib && item->canBeIndexed)
             {
@@ -419,9 +418,10 @@ public:
                     for (int i = 0; i < mediaNode->i_children; i++)
                         itemList.emplace_back(mediaNode->pp_children[i]->p_item);
 
+
                     while (parent && parent->p_item) {
                         m_path.push_front(QVariant::fromValue(PathNode(
-                            NetworkTreeItem(m_treeItem, parent->p_item),
+                            NetworkTreeItem(m_treeItem, SharedInputItem{parent->p_item}),
                             parent->p_item->psz_name)));
                         input_item_node_t *node = nullptr;
                         input_item_node_t *grandParent = nullptr;

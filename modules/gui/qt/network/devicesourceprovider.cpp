@@ -22,10 +22,10 @@
 #include "medialibrary/mlthreadpool.hpp"
 
 //handle discovery events from the media source provider
-struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
-    ListenerCb(DeviceSourceProvider* provider, MediaSourcePtr mediaSource)
-        : provider(provider)
-        , mediaSource(std::move(mediaSource))
+struct MediaSourceModel::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
+    ListenerCb(MediaSourceModel* model, MediaSourcePtr& mediaSource)
+        : m_model(model)
+        , m_mediaSource(mediaSource)
     {}
 
     inline void onItemPreparseEnded( MediaTreePtr, input_item_node_t *, int ) override final {}
@@ -57,11 +57,11 @@ struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeLis
         for ( auto i = 0u; i < count; ++i )
             itemList.emplace_back( children[i]->p_item );
 
-        QMetaObject::invokeMethod(provider, [provider = this->provider,
+        QMetaObject::invokeMethod(m_model, [model = this->m_model,
                                   itemList = std::move(itemList),
-                                  mediaSource = this->mediaSource]()
+                                  mediaSource = this->m_mediaSource]()
         {
-            provider->removeItems(itemList, mediaSource);
+            model->removeItems(itemList, mediaSource);
         });
     }
 
@@ -74,18 +74,103 @@ struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeLis
         for (size_t i = 0; i < count; i++)
             itemList.emplace_back(children[i]->p_item);
 
-        QMetaObject::invokeMethod(provider, [provider = this->provider,
+        QMetaObject::invokeMethod(m_model, [model = this->m_model,
                                   itemList = std::move(itemList),
-                                  mediaSource = this->mediaSource, clear]()
+                                  mediaSource = this->m_mediaSource, clear]()
         {
-            provider->addItems(itemList, mediaSource, clear);
+            model->addItems(itemList, mediaSource, clear);
         });
     }
 
-    DeviceSourceProvider *provider;
-    MediaSourcePtr mediaSource;
+    MediaSourceModel* m_model;
+    MediaSourcePtr m_mediaSource;
 };
 
+MediaSourceModel::MediaSourceModel(MediaSourcePtr& mediaSource)
+    : m_mediaSource(mediaSource)
+{
+    m_listenner = std::make_unique<MediaTreeListener>(
+        MediaTreePtr{ mediaSource->tree },
+        std::make_unique<MediaSourceModel::ListenerCb>(this, mediaSource)
+    );
+}
+
+MediaSourceModel::~MediaSourceModel()
+{
+    //reset the listenner before the source
+    m_listenner.reset();
+
+    for (const SharedInputItem & media : m_medias)
+        emit mediaRemoved(media);
+    m_medias.clear();
+
+    m_mediaSource.reset();
+}
+
+const std::vector<SharedInputItem>& MediaSourceModel::getMedias() const
+{
+    return m_medias;
+}
+
+QString MediaSourceModel::getDescription() const
+{
+    return qfu(m_mediaSource->description);
+}
+
+MediaTreePtr MediaSourceModel::getTree() const
+{
+    return MediaTreePtr(m_mediaSource->tree);
+}
+
+void MediaSourceModel::addItems(const std::vector<SharedInputItem> &inputList,
+                                    const MediaSourcePtr &mediaSource, const bool clear)
+{
+    if (mediaSource != m_mediaSource)
+    {
+        qWarning() << "unexpected media source";
+        return;
+    }
+
+    if (clear)
+    {
+        for (const SharedInputItem & media : m_medias)
+            emit mediaRemoved(media);
+        m_medias.clear();
+    }
+
+    for (const SharedInputItem & inputItem : inputList)
+    {
+        auto it = std::find(
+            m_medias.cbegin(), m_medias.cend(),
+            inputItem
+        );
+        if (it != m_medias.end())
+            continue;
+
+        emit mediaAdded(inputItem);
+        m_medias.push_back(std::move(inputItem));
+    }
+}
+
+void MediaSourceModel::removeItems(const std::vector<SharedInputItem> &inputList,
+                                       const MediaSourcePtr &mediaSource)
+{
+    if (mediaSource != m_mediaSource)
+    {
+        qWarning() << "unexpected media source";
+        return;
+    }
+
+    for (const SharedInputItem& inputItem : inputList)
+    {
+        auto it = std::remove(m_medias.begin(), m_medias.end(), inputItem);
+        if (it != m_medias.end())
+        {
+            m_medias.erase(it);
+            mediaRemoved(inputItem);
+        }
+    }
+}
 
 DeviceSourceProvider::DeviceSourceProvider(
     NetworkDeviceModel::SDCatType sdSource,
@@ -132,8 +217,6 @@ void DeviceSourceProvider::init()
                 return;
 
             size_t nbProviders = vlc_media_source_meta_list_Count( providerList.get() );
-            size_t found = 0;
-            QString name;
 
             for ( size_t i = 0u; i < nbProviders; ++i )
             {
@@ -142,7 +225,7 @@ void DeviceSourceProvider::init()
                 if ( nameFilter != '*' && nameFilter != sourceName )
                     continue;
 
-                ctx.name += name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
+                ctx.name += ctx.name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
 
                 MediaSourcePtr mediaSource(
                     vlc_media_source_provider_GetMediaSource(provider, meta->name)
@@ -160,97 +243,17 @@ void DeviceSourceProvider::init()
             emit nameUpdated( m_name );
 
             for (auto& mediaSource : ctx.sources) {
-
-                std::unique_ptr<MediaTreeListener> l{ new MediaTreeListener(
-                    MediaTreePtr{ mediaSource->tree },
-                    std::make_unique<DeviceSourceProvider::ListenerCb>(this, mediaSource) ) };
-                if ( l->listener == nullptr )
-                    continue;
-                m_mediaSources.push_back( std::move( mediaSource ) );
-                m_listeners.push_back( std::move( l ) );
+                m_mediaSources.push_back( SharedMediaSourceModel::create(mediaSource ) );
             }
 
-            if ( !m_listeners.empty() )
-                emit itemsUpdated( m_items );
+            if ( !m_mediaSources.empty() )
+                emit itemsUpdated();
             else
                 emit failed();
         });
 }
 
-void DeviceSourceProvider::addItems(const std::vector<SharedInputItem> &inputList,
-                                    const MediaSourcePtr &mediaSource, const bool clear)
+const std::vector<SharedMediaSourceModel>& DeviceSourceProvider::getMediaSources() const
 {
-    bool dataChanged = false;
-
-    if (clear)
-    {
-        const qsizetype removed = m_items.removeIf([&mediaSource](const NetworkDeviceItemPtr &item)
-        {
-            return item->mediaSource == mediaSource;
-        });
-
-        if (removed > 0)
-            dataChanged = true;
-    }
-
-    for (const SharedInputItem & inputItem : inputList)
-    {
-        auto newItem = std::make_shared<NetworkDeviceItem>(inputItem, mediaSource);
-        auto it = m_items.find(newItem);
-        if (it != m_items.end())
-        {
-            (*it)->mrls.push_back(std::make_pair(newItem->mainMrl, mediaSource));
-        }
-        else
-        {
-            m_items.insert(std::move(newItem));
-            dataChanged = true;
-        }
-    }
-
-    if (dataChanged)
-    {
-        emit itemsUpdated(m_items);
-    }
-}
-
-void DeviceSourceProvider::removeItems(const std::vector<SharedInputItem> &inputList,
-                                       const MediaSourcePtr &mediaSource)
-{
-    bool dataChanged = false;
-    for (const SharedInputItem& p_item : inputList)
-    {
-        auto oldItem = std::make_shared<NetworkDeviceItem>(p_item, mediaSource);
-        NetworkDeviceItemSet::iterator it = m_items.find(oldItem);
-        if (it != m_items.end())
-        {
-            bool found = false;
-
-            const NetworkDeviceItemPtr& item = *it;
-            if (item->mrls.size() > 1)
-            {
-                auto mrlIt = std::find_if(
-                    item->mrls.begin(), item->mrls.end(),
-                    [&oldItem]( const std::pair<QUrl, MediaSourcePtr>& mrl ) {
-                        return mrl.first.matches(oldItem->mainMrl, QUrl::StripTrailingSlash)
-                            && mrl.second == oldItem->mediaSource;
-                    });
-
-                if ( mrlIt != item->mrls.end() )
-                {
-                    found = true;
-                    item->mrls.erase( mrlIt );
-                }
-            }
-
-            if (!found)
-            {
-                m_items.erase(it);
-                dataChanged = true;
-            }
-        }
-    }
-
-    if (dataChanged)
-        emit itemsUpdated(m_items);
+    return m_mediaSources;
 }
