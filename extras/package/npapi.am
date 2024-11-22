@@ -30,9 +30,9 @@ npapi-vlc/configure: stamp-npapi
 	$(SHELL) ./autogen.sh
 	touch $@
 
-if ENABLE_PDB
-ENABLE_PDB_OPTION = --enable-pdb
-endif
+# if ENABLE_PDB
+# ENABLE_PDB_OPTION = --enable-pdb
+# endif
 
 npapi-vlc/Makefile: npapi-vlc/configure
 	cd npapi-vlc && \
