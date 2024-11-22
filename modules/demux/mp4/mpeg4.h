@@ -38,10 +38,10 @@ static inline bool MPEG4_Codec_By_ObjectType(uint8_t oti,
         case 0x21: /* H.264 */
             *pi_codec = VLC_CODEC_H264;
             break;
-        case 0x22: /* H.265 */
+        case 0x23: /* H.265 */
             *pi_codec = VLC_CODEC_HEVC;
             break;
-        case 0x23: /* H.266 */
+        case 0x33: /* H.266 */
             *pi_codec = VLC_CODEC_VVC;
             break;
         case 0x40:
