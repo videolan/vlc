@@ -176,6 +176,10 @@ FocusScope {
 
         property int cursorShape
 
+        // Have padding here, so that the content (unlike background) does not go behind the top bar or the control bar:
+        property real topPadding: (anchors.top === parent.top) ? topBar.height : 0
+        property real bottomPadding: (anchors.bottom === parent.bottom) ? controlBar.height : 0
+
         Component {
             id: videoComponent
 
@@ -253,9 +257,13 @@ FocusScope {
             id: audioComponent
 
             FocusScope {
+                id: audioFocusScope
                 // Audio
 
                 focus: true
+
+                property real topPadding: playerSpecializationLoader.topPadding
+                property real bottomPadding: playerSpecializationLoader.bottomPadding
 
                 // background image
                 Rectangle {
@@ -294,8 +302,8 @@ FocusScope {
                     }
 
                     anchors.fill: parent
-                    anchors.topMargin: VLCStyle.margin_xsmall
-                    anchors.bottomMargin: VLCStyle.margin_xsmall
+                    anchors.topMargin: VLCStyle.margin_xsmall + audioFocusScope.topPadding
+                    anchors.bottomMargin: VLCStyle.margin_xsmall + audioFocusScope.bottomPadding
 
                     onWheel: (wheel) => {
                         wheel.accepted = true
