@@ -64,7 +64,7 @@ def outputDir(top, parent: str, dir: str):
             if not file.is_dir():
                 # args.out.write('          file   <{}>\r\n'.format(file))
                 if not file.name.endswith('.pdb'):
-                    outname = os.path.join(top.name, file.relative_to(top))
+                    outname = os.path.join(top.name, str(file.relative_to(top)))
                     fileId = generate_id('cmp', outname)
                     args.out.write('                    <Component Id="{}" Guid="*">\r\n'.format(fileId))
                     fileIdList.append(fileId)
