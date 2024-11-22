@@ -41,7 +41,8 @@ T.ToolTip {
 
     Component.onCompleted: {
         if (typeof control.popupType === "number")
-            control.popupType = 1 // Popup.Window
+            if (Qt.platform.pluginName !== "wayland") // FIXME: Qt 6.8.0 Wayland is not reliable
+                control.popupType = 1 // Popup.Window
     }
 
     // NOTE: The tool tip often moves around, particularly noticable
