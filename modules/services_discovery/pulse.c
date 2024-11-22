@@ -36,6 +36,8 @@
 static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
+#include <vlc_modules.h>
+
 VLC_SD_PROBE_HELPER("pulse", N_("Audio capture"), SD_CAT_DEVICES);
 
 vlc_module_begin ()
@@ -55,11 +57,28 @@ typedef struct
     void                 *root_card;
     pa_context           *context;
     pa_threaded_mainloop *mainloop;
+    bool is_pipewire;
 } services_discovery_sys_t;
 
 static void SourceCallback(pa_context *, const pa_source_info *, int, void *);
 static void ContextCallback(pa_context *, pa_subscription_event_type_t,
                             uint32_t, void *);
+
+static void server_info_cb(pa_context *ctx, const pa_server_info *info,
+                           void *userdata)
+{
+    services_discovery_t *sd = userdata;
+
+    msg_Dbg(sd, "server %s version %s on %s@%s", info->server_name,
+            info->server_version, info->user_name, info->host_name);
+
+    services_discovery_sys_t *sys = sd->p_sys;
+
+    sys->is_pipewire = strcasestr(info->server_name, "pipewire") != NULL;
+    pa_threaded_mainloop_signal(sys->mainloop, 0);
+
+    (void) ctx;
+}
 
 static int Open (vlc_object_t *obj)
 {
@@ -83,10 +102,27 @@ static int Open (vlc_object_t *obj)
     sys->context = ctx;
     sys->root = NULL;
     sys->root_card = NULL;
+    sys->is_pipewire = false;
+
+    pa_threaded_mainloop_lock(sys->mainloop);
+    op = pa_context_get_server_info(sys->context, server_info_cb, sd);
+    if (likely(op != NULL))
+    {
+        while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+            pa_threaded_mainloop_wait(sys->mainloop);
+        if (sys->is_pipewire && module_exists("pipewirelist"))
+        {
+            msg_Dbg(sd, "refusing to use PipeWire");
+            pa_threaded_mainloop_unlock(sys->mainloop);
+            vlc_pa_disconnect(obj, sys->context, sys->mainloop);
+            free(sys);
+            return -ENOTSUP;
+        }
+        pa_operation_unref(op);
+    }
 
     /* Subscribe for source events */
     const pa_subscription_mask_t mask = PA_SUBSCRIPTION_MASK_SOURCE;
-    pa_threaded_mainloop_lock (sys->mainloop);
     pa_context_set_subscribe_callback (ctx, ContextCallback, sd);
     op = pa_context_subscribe (ctx, mask, NULL, NULL);
     if (likely(op != NULL))
