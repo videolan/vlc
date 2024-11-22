@@ -288,7 +288,7 @@ static int parse_file_header( stream_t *s, char **ppsz_title )
     uint8_t prevoffset[4];
     char *psz_title = NULL, **pp_meta = &psz_title;
 
-    if( vlc_stream_Peek( s, &p_peek, 7 ) != 7 ||
+    if( vlc_stream_Peek( s, &p_peek, 27 ) != 27 ||
         memcmp( p_peek, "Genetec", 7 ) )
         return VLC_EGENERIC;
 
