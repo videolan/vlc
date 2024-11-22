@@ -19,17 +19,10 @@
 #ifndef MLNETWORKDEVICEMODEL_HPP
 #define MLNETWORKDEVICEMODEL_HPP
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <QAbstractListModel>
 #include <QUrl>
 
-#include <vlc_media_source.h>
-
 #include "networkbasemodel.hpp"
-#include "util/shared_input_item.hpp"
 
 #include <memory>
 
@@ -63,13 +56,6 @@ public: // Enums
     };
     Q_ENUM( SDCatType )
 
-public: // Declarations
-    using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
-                                    vlc_media_source_Hold, vlc_media_source_Release);
-
-    using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                                  vlc_media_tree_Hold,
-                                                  vlc_media_tree_Release);
 public:
     NetworkDeviceModel( QObject* parent = nullptr );
     virtual ~NetworkDeviceModel() = default;

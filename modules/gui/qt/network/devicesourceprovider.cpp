@@ -23,7 +23,7 @@
 
 //handle discovery events from the media source provider
 struct DeviceSourceProvider::ListenerCb : public MediaTreeListener::MediaTreeListenerCb {
-    ListenerCb(DeviceSourceProvider* provider, NetworkDeviceModel::MediaSourcePtr mediaSource)
+    ListenerCb(DeviceSourceProvider* provider, MediaSourcePtr mediaSource)
         : provider(provider)
         , mediaSource(std::move(mediaSource))
     {}

@@ -19,6 +19,10 @@
 #ifndef SHAREDINPUTITEM_HPP
 #define SHAREDINPUTITEM_HPP
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <QMetaType>
 
 #include <vlc_common.h>

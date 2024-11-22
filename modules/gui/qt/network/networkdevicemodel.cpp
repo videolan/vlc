@@ -28,6 +28,8 @@
 #include "playlist/playlist_controller.hpp"
 
 #include "util/shared_input_item.hpp"
+#include "vlcmediasourcewrapper.hpp"
+
 #include "util/locallistbasemodel.hpp"
 
 namespace

@@ -24,7 +24,6 @@
 #include "networkmediamodel.hpp"
 
 #include "util/locallistbasemodel.hpp"
-#include "util/shared_input_item.hpp"
 
 // VLC includes
 #include <vlc_media_source.h>
@@ -34,9 +33,7 @@
 #include <QStandardPaths>
 #include <QUrl>
 
-using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                              vlc_media_tree_Hold,
-                                              vlc_media_tree_Release);
+#include "vlcmediasourcewrapper.hpp"
 
 struct StandardPathItem : public NetworkBaseItem
 {
@@ -98,7 +95,7 @@ public:
         : LocalListBaseModelPrivate<StandardPathItemPtr>(pub)
     {}
 
-    StandardPathLoader::ItemCompare getSortFunction() const
+    StandardPathLoader::ItemCompare getSortFunction() const override
     {
         if (m_sortCriteria == "mrl")
         {
@@ -157,12 +154,12 @@ public:
         input_item_t * inputItem = input_item_NewDirectory(qtu(url.toString()), qtu(name), ITEM_LOCAL);
         item->inputItem = SharedInputItem(inputItem, false);
 
-        vlc_media_tree_t * tree = vlc_media_tree_New();
-        vlc_media_tree_Lock(tree);
-        vlc_media_tree_Add(tree, &(tree->root), inputItem);
-        vlc_media_tree_Unlock(tree);
+        item->tree = MediaTreePtr(vlc_media_tree_New(), false);
+        {
+            MediaTreeLocker lock{item->tree};
+            vlc_media_tree_Add(item->tree.get(), &(item->tree->root), inputItem);
+        }
 
-        item->tree = MediaTreePtr(tree, false);
         item->artwork = artwork;
 
         m_items.emplace_back(std::move(item));

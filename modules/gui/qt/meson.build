@@ -385,6 +385,7 @@ some_sources = files(
     'network/servicesdiscoverymodel.hpp',
     'network/standardpathmodel.cpp',
     'network/standardpathmodel.hpp',
+    'network/vlcmediasourcewrapper.hpp',
     'style/qtthemeprovider.hpp',
     'style/colorcontext.cpp',
     'style/colorcontext.hpp',

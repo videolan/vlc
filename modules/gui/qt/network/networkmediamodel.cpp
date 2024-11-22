@@ -364,8 +364,8 @@ public:
         if (!m_treeItem)
             return false;
 
-        auto tree = m_treeItem.tree.get();
-        auto l = std::make_unique<MediaTreeListener>( m_treeItem.tree,
+        auto& tree = m_treeItem.tree;
+        auto l = std::make_unique<MediaTreeListener>(tree,
                                                      std::make_unique<NetworkMediaModelPrivate::ListenerCb>(q) );
         if ( l->listener == nullptr )
             return false;
@@ -407,37 +407,38 @@ public:
         {
             input_item_node_t* mediaNode = nullptr;
             input_item_node_t* parent = nullptr;
-            vlc_media_tree_Lock(tree);
-            if (m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
-                vlc_preparser_Cancel( parser, m_parserId );
             std::vector<SharedInputItem> itemList;
-            m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
-            if (vlc_media_tree_Find( tree, m_treeItem.media.get(), &mediaNode, &parent))
             {
-                itemList.reserve(mediaNode->i_children);
-                for (int i = 0; i < mediaNode->i_children; i++)
-                    itemList.emplace_back(mediaNode->pp_children[i]->p_item);
+                MediaTreeLocker lock{tree};
+                if (m_parserId != VLC_PREPARSER_REQ_ID_INVALID)
+                    vlc_preparser_Cancel( parser, m_parserId );
+                m_path = {QVariant::fromValue(PathNode(m_treeItem, m_name))};
+                if (vlc_media_tree_Find( tree.get(), m_treeItem.media.get(), &mediaNode, &parent))
+                {
+                    itemList.reserve(mediaNode->i_children);
+                    for (int i = 0; i < mediaNode->i_children; i++)
+                        itemList.emplace_back(mediaNode->pp_children[i]->p_item);
 
-                while (parent && parent->p_item) {
-                    m_path.push_front(QVariant::fromValue(PathNode(
-                        NetworkTreeItem(m_treeItem, parent->p_item),
-                        parent->p_item->psz_name)));
-                    input_item_node_t *node = nullptr;
-                    input_item_node_t *grandParent = nullptr;
-                    if (!vlc_media_tree_Find( tree, parent->p_item, &node, &grandParent)) {
-                        break;
+                    while (parent && parent->p_item) {
+                        m_path.push_front(QVariant::fromValue(PathNode(
+                            NetworkTreeItem(m_treeItem, parent->p_item),
+                            parent->p_item->psz_name)));
+                        input_item_node_t *node = nullptr;
+                        input_item_node_t *grandParent = nullptr;
+                        if (!vlc_media_tree_Find( tree.get(), parent->p_item, &node, &grandParent)) {
+                            break;
+                        }
+                        parent = grandParent;
                     }
-                    parent = grandParent;
                 }
             }
-            vlc_media_tree_Unlock(tree);
             if (!itemList.empty())
                 refreshMediaList( m_treeItem, std::move( itemList ), true );
             emit q->pathChanged();
         }
 
         m_preparseSem.acquire();
-        m_parserId = vlc_media_tree_Preparse( tree, parser, m_treeItem.media.get() );
+        m_parserId = vlc_media_tree_Preparse( tree.get(), parser, m_treeItem.media.get() );
 
         m_listener = std::move( l );
 
@@ -926,12 +927,14 @@ void NetworkMediaModelPrivate::ListenerCb::onItemCleared( MediaTreePtr tree, inp
         input_item_node_t *res;
         input_item_node_t *parent;
         // XXX is tree == m_treeItem.tree?
-        vlc_media_tree_Lock( d->m_treeItem.tree.get() );
-        bool found = vlc_media_tree_Find( d->m_treeItem.tree.get(), d->m_treeItem.media.get(),
-                                          &res, &parent );
-        vlc_media_tree_Unlock( d->m_treeItem.tree.get() );
-        if (!found)
-            return;
+
+        {
+            MediaTreeLocker lock{ d->m_treeItem.tree };
+            bool found = vlc_media_tree_Find( d->m_treeItem.tree.get(), d->m_treeItem.media.get(),
+                                             &res, &parent );
+            if (!found)
+                return;
+        }
 
         std::vector<SharedInputItem> itemList;
         itemList.reserve( static_cast<size_t>(res->i_children) );

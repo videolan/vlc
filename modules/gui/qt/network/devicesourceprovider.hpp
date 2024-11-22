@@ -30,11 +30,13 @@
 
 #include "networkdevicemodel.hpp"
 #include "mediatreelistener.hpp"
+#include "util/shared_input_item.hpp"
+#include "vlcmediasourcewrapper.hpp"
 
 //represents an entry of the model
 struct NetworkDeviceItem : public NetworkBaseItem
 {
-    NetworkDeviceItem(const SharedInputItem& item, const NetworkDeviceModel::MediaSourcePtr& source)
+    NetworkDeviceItem(const SharedInputItem& item, const MediaSourcePtr& source)
     {
         name = qfu(item->psz_name);
         mainMrl = QUrl::fromEncoded(item->psz_uri);
@@ -55,10 +57,10 @@ struct NetworkDeviceItem : public NetworkBaseItem
     }
 
     uint id;
-    std::vector<std::pair<QUrl, NetworkDeviceModel::MediaSourcePtr>> mrls;
-    NetworkDeviceModel::MediaSourcePtr mediaSource;
+    std::vector<std::pair<QUrl, MediaSourcePtr>> mrls;
+    MediaSourcePtr mediaSource;
     SharedInputItem inputItem;
- };
+};
 
 using NetworkDeviceItemPtr =std::shared_ptr<NetworkDeviceItem>;
 
@@ -82,8 +84,6 @@ class DeviceSourceProvider : public QObject
     Q_OBJECT
 
 public:
-    using MediaSourcePtr = NetworkDeviceModel::MediaSourcePtr;
-
     DeviceSourceProvider(NetworkDeviceModel::SDCatType sdSource,
                          const QString &sourceName,
                          MainCtx* ctx,

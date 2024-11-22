@@ -19,17 +19,12 @@
 #ifndef MLNETWORKMEDIAMODEL_HPP
 #define MLNETWORKMEDIAMODEL_HPP
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include <QAbstractListModel>
 #include <QUrl>
 
-#include <vlc_media_source.h>
-#include <vlc_cxx_helpers.hpp>
-
+#include "vlcmediasourcewrapper.hpp"
 #include "util/shared_input_item.hpp"
+
 #include "networkbasemodel.hpp"
 
 #include <memory>
@@ -37,13 +32,6 @@
 Q_MOC_INCLUDE( "maininterface/mainctx.hpp" )
 
 class MainCtx;
-
-using MediaSourcePtr = vlc_shared_data_ptr_type(vlc_media_source_t,
-                                vlc_media_source_Hold, vlc_media_source_Release);
-
-using MediaTreePtr = vlc_shared_data_ptr_type(vlc_media_tree_t,
-                                              vlc_media_tree_Hold,
-                                              vlc_media_tree_Release);
 
 class NetworkTreeItem
 {
@@ -84,11 +72,9 @@ public:
     }
 
     bool isValid() {
-        vlc_media_tree_Lock(tree.get());
+        MediaTreeLocker lock{ tree };
         input_item_node_t* node;
-        bool ret = vlc_media_tree_Find( tree.get(), media.get(), &node, nullptr);
-        vlc_media_tree_Unlock(tree.get());
-        return ret;
+        return vlc_media_tree_Find( tree.get(), media.get(), &node, nullptr);
     }
 
     MediaSourcePtr source;
