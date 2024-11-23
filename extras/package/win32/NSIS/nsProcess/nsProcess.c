@@ -213,7 +213,7 @@ int FIND_PROC_BY_NAME(TCHAR *szProcessName, BOOL bTerminate, BOOL bClose)
   for (;;)
   {
     processIDs = realloc(processIDs, process_count * sizeof(DWORD));
-    if (unlikely(processIDs == NULL))
+    if (processIDs == NULL)
         break;
     DWORD readSize;
     if (!EnumProcesses(processIDs, process_count*sizeof(DWORD), &readSize))
