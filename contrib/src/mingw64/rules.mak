@@ -159,6 +159,7 @@ endif
 .sum-alloweduwp: .sum-mingw64
 	touch $@
 
+.alloweduwp: BUILD_DIR=$</vlc_build_alloweduwp
 .alloweduwp: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/fileapi.h      "$(PREFIX)/include"
@@ -182,6 +183,7 @@ endif
 .sum-d3d12: .sum-mingw64
 	touch $@
 
+.d3d12: BUILD_DIR=$</vlc_build_d3d12
 .d3d12: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/d3d12.h             "$(PREFIX)/include"
@@ -199,6 +201,7 @@ endif
 .sum-uiautomationcore: .sum-mingw64
 	touch $@
 
+.uiautomationcore: BUILD_DIR=$</vlc_build_uiautomationcore
 .uiautomationcore: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/uiautomation.h           "$(PREFIX)/include"
