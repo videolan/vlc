@@ -127,6 +127,7 @@ endif
 .sum-alloweduwp: .sum-mingw64
 	touch $@
 
+.alloweduwp: BUILD_DIR=$</vlc_build_alloweduwp
 .alloweduwp: mingw64
 	install -d "$(PREFIX)/include"
 	install $</mingw-w64-headers/include/fileapi.h "$(PREFIX)/include"
