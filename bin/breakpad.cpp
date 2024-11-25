@@ -30,6 +30,7 @@
 #include <memory>
 #include <map>
 #include <string>
+#include <sstream>
 
 using google_breakpad::ExceptionHandler;
 
@@ -47,10 +48,10 @@ extern "C"
 
 void CheckCrashDump( const wchar_t* path )
 {
-    wchar_t pattern[MAX_PATH];
+    std::wstringstream pattern;
     WIN32_FIND_DATAW data;
-    _snwprintf( pattern, MAX_PATH, L"%s/*.dmp", path );
-    HANDLE h = FindFirstFileW( pattern, &data );
+    pattern << path << L"/*.dmp";
+    HANDLE h = FindFirstFileW( pattern.str().c_str(), &data );
     if (h == INVALID_HANDLE_VALUE)
         return;
     int answer = MessageBoxW( NULL, L"Ooops: VLC media player just crashed.\n" \
@@ -61,17 +62,17 @@ void CheckCrashDump( const wchar_t* path )
     params[L"ver"] = WIDEN(PACKAGE_VERSION);
     do
     {
-        wchar_t fullPath[MAX_PATH];
-        _snwprintf( fullPath, MAX_PATH, L"%s/%s", path, data.cFileName );
+        std::wstringstream fullPath;
+        fullPath << path << L'/' << data.cFileName;
         if( answer == IDYES )
         {
             std::map<std::wstring, std::wstring> files;
-            files[L"upload_file_minidump"] = fullPath;
+            files[L"upload_file_minidump"] = fullPath.str();
             google_breakpad::HTTPUpload::SendRequest(
                             WIDEN( BREAKPAD_URL "/reports" ), params, files,
                             NULL, NULL, NULL );
         }
-        DeleteFileW( fullPath );
+        DeleteFileW( fullPath.str().c_str() );
     } while ( FindNextFileW( h, &data ) );
     FindClose(h);
 }
