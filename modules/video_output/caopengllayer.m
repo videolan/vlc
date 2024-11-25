@@ -63,6 +63,7 @@
     vlc_gl_t *_gl; // All accesses to this must be @synchronized(self)
                    // unless you can be sure it won't be called in teardown
     CGLContextObj _glContext;
+    atomic_bool _is_ready;
 }
 
 @property (nonatomic, copy) void (^render)(NSSize displaySize);
@@ -70,6 +71,7 @@
 - (instancetype)init:(vlc_gl_t *)gl context:(CGLContextObj)context;
 - (void)displayFromVout;
 - (void)vlcClose;
+- (void)markReady;
 @end
 
 /**
@@ -229,7 +231,6 @@ static CGLContextObj vlc_CreateCGLContext(void)
 
 struct vlc_gl_sys
 {
-    atomic_bool is_ready;
     VLCVideoLayerView *videoView; // Layer-backed view that creates videoLayer
     VLCCAOpenGLLayer *videoLayer; // Backing layer of videoView
 };
@@ -292,12 +293,8 @@ static void *gl_cb_GetProcAddress(vlc_gl_t *vlc_gl, const char *name)
 static void CloseOpenGL(vlc_gl_t *gl)
 {
     struct vlc_gl_sys *sys = gl->sys;
-
-    atomic_store(&sys->is_ready, false);
-
     [sys->videoLayer vlcClose];
     [sys->videoView vlcClose];
-
     dispatch_async(dispatch_get_main_queue(), ^{
 
         sys->videoView = nil;
@@ -321,7 +318,6 @@ static int OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
         return VLC_ENOMEM;
 
     gl->sys = glsys;
-    atomic_init(&glsys->is_ready, false);
     dispatch_sync(dispatch_get_main_queue(), ^{
         @autoreleasepool {
             VLCVideoLayerView *videoView = [[VLCVideoLayerView alloc] init:gl];
@@ -388,7 +384,9 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
         vlc_gl_ReleaseCurrent(sys->gl);
 
         struct vlc_gl_sys *glsys = sys->gl->sys;
-        atomic_store(&glsys->is_ready, true);
+        VLCVideoLayerView *view = glsys->videoView;
+        VLCCAOpenGLLayer *layer = (VLCCAOpenGLLayer *)[view layer];
+        [layer markReady];
     }
 }
 
@@ -743,6 +741,8 @@ shouldInheritContentsScale:(CGFloat)newScale
         _glContext = CGLRetainContext(context);
         assert(_glContext != NULL);
 
+        atomic_init(&_is_ready, false);
+
         [CATransaction lock];
         self.needsDisplayOnBoundsChange = YES;
         self.autoresizingMask = kCALayerWidthSizable | kCALayerHeightSizable;
@@ -755,6 +755,10 @@ shouldInheritContentsScale:(CGFloat)newScale
     return self;
 }
 
+- (void)markReady {
+    atomic_store(&_is_ready, true);
+}
+
 /**
  * Invalidates VLC objects (notably _voutDisplay)
  * This method must be called in VLCs module Close (or indirectly by the View).
@@ -762,6 +766,7 @@ shouldInheritContentsScale:(CGFloat)newScale
 - (void)vlcClose
 {
     @synchronized (self) {
+        atomic_store(&_is_ready, false);
         _gl = NULL;
     }
 }
@@ -804,9 +809,7 @@ shouldInheritContentsScale:(CGFloat)newScale
     @synchronized(self) {
         if (!_gl)
             return NO;
-         struct vlc_gl_sys *sys = _gl->sys;
-
-        return (atomic_load(&sys->is_ready));
+        return _is_ready;
     }
 }
 
