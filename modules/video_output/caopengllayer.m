@@ -89,6 +89,10 @@
 
 - (instancetype)init:(vlc_gl_t *)gl;
 - (void)vlcClose;
+
+- (int)lockContext;
+- (void)unlockContext;
+- (void)swap;
 @end
 
 typedef struct vout_display_sys_t {
@@ -250,10 +254,8 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 static void gl_cb_Swap(vlc_gl_t *vlc_gl)
 {
     struct vlc_gl_sys *sys = vlc_gl->sys;
-    // Copies a double-buffered contexts back buffer to front buffer, calling
-    // glFlush before this is not needed and discouraged for performance reasons.
-    // An implicit glFlush happens before CGLFlushDrawable returns.
-    CGLFlushDrawable(sys->cgl);
+    VLCVideoLayerView *view = sys->videoView;
+    [view swap];
 }
 
 /**
@@ -263,26 +265,9 @@ static void gl_cb_Swap(vlc_gl_t *vlc_gl)
  */
 static int gl_cb_MakeCurrent(vlc_gl_t *vlc_gl)
 {
-    CGLError err;
     struct vlc_gl_sys *sys = vlc_gl->sys;
-
-    sys->cgl_prev = CGLGetCurrentContext();
-
-    if (sys->cgl_prev != sys->cgl) {
-        err = CGLSetCurrentContext(sys->cgl);
-        if (err != kCGLNoError) {
-            msg_Err(vlc_gl, "Failure setting current CGLContext: %s", CGLErrorString(err));
-            return VLC_EGENERIC;
-        }
-    }
-
-    err = CGLLockContext(sys->cgl);
-    if (err != kCGLNoError) {
-        msg_Err(vlc_gl, "Failure locking CGLContext: %s", CGLErrorString(err));
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
+    VLCVideoLayerView *view = sys->videoView;
+    return [view lockContext];
 }
 
 /**
@@ -291,26 +276,9 @@ static int gl_cb_MakeCurrent(vlc_gl_t *vlc_gl)
  */
 static void gl_cb_ReleaseCurrent(vlc_gl_t *vlc_gl)
 {
-    CGLError err;
     struct vlc_gl_sys *sys = vlc_gl->sys;
-
-    assert(CGLGetCurrentContext() == sys->cgl);
-
-    err = CGLUnlockContext(sys->cgl);
-    if (err != kCGLNoError) {
-        msg_Err(vlc_gl, "Failure unlocking CGLContext: %s", CGLErrorString(err));
-        abort();
-    }
-
-    if (sys->cgl_prev != sys->cgl) {
-        err = CGLSetCurrentContext(sys->cgl_prev);
-        if (err != kCGLNoError) {
-            msg_Err(vlc_gl, "Failure restoring previous CGLContext: %s", CGLErrorString(err));
-            abort();
-        }
-    }
-
-    sys->cgl_prev = NULL;
+    VLCVideoLayerView *view = sys->videoView;
+    [view unlockContext];
 }
 
 /**
@@ -646,6 +614,58 @@ static int Open (vout_display_t *vd,
     self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     self.wantsLayer = YES;
     return self;
+}
+
+- (int)lockContext {
+    struct vlc_gl_sys *glsys = _gl->sys;
+    glsys->cgl_prev = CGLGetCurrentContext();
+
+    CGLError err;
+    if (glsys->cgl_prev != glsys->cgl) {
+        err = CGLSetCurrentContext(glsys->cgl);
+        if (err != kCGLNoError) {
+            msg_Err(_gl, "Failure setting current CGLContext: %s", CGLErrorString(err));
+            return VLC_EGENERIC;
+        }
+    }
+
+    err = CGLLockContext(glsys->cgl);
+    if (err != kCGLNoError) {
+        msg_Err(_gl, "Failure locking CGLContext: %s", CGLErrorString(err));
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+- (void)unlockContext {
+    struct vlc_gl_sys *glsys = _gl->sys;
+    CGLError err;
+
+    assert(CGLGetCurrentContext() == glsys->cgl);
+
+    err = CGLUnlockContext(glsys->cgl);
+    if (err != kCGLNoError) {
+        msg_Err(_gl, "Failure unlocking CGLContext: %s", CGLErrorString(err));
+        abort();
+    }
+
+    if (glsys->cgl_prev != glsys->cgl) {
+        err = CGLSetCurrentContext(glsys->cgl_prev);
+        if (err != kCGLNoError) {
+            msg_Err(_gl, "Failure restoring previous CGLContext: %s", CGLErrorString(err));
+            abort();
+        }
+    }
+
+    glsys->cgl_prev = NULL;
+}
+
+- (void)swap {
+    struct vlc_gl_sys *glsys = _gl->sys;
+    // Copies a double-buffered contexts back buffer to front buffer, calling
+    // glFlush before this is not needed and discouraged for performance reasons.
+    // An implicit glFlush happens before CGLFlushDrawable returns.
+    CGLFlushDrawable(glsys->cgl);
 }
 
 /**
