@@ -177,7 +177,7 @@ static GLint vlc_SearchGLRendererId() {
  * one that works on the given hardware.
  * \return CGLContextObj or NULL in case of error
  */
-CGLContextObj vlc_CreateCGLContext()
+static CGLContextObj vlc_CreateCGLContext(void)
 {
     CGLError err;
     GLint npix = 0;
