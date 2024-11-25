@@ -67,7 +67,7 @@
 
 @property (nonatomic, copy) void (^render)(NSSize displaySize);
 
-- (instancetype)init:(vlc_gl_t *)gl;
+- (instancetype)init:(vlc_gl_t *)gl context:(CGLContextObj)context;
 - (void)displayFromVout;
 - (void)vlcClose;
 @end
@@ -85,6 +85,9 @@
 #endif
 {
     vlc_gl_t *_gl; // All accesses to this must be @synchronized(self)
+
+    CGLContextObj _context; // The CGL context managed by us
+    CGLContextObj _context_previous; // The previously current CGL context, if any
 }
 
 - (instancetype)init:(vlc_gl_t *)gl;
@@ -225,9 +228,6 @@ static CGLContextObj vlc_CreateCGLContext(void)
 
 struct vlc_gl_sys
 {
-    CGLContextObj cgl; // The CGL context managed by us
-    CGLContextObj cgl_prev; // The previously current CGL context, if any
-
     id<VLCOpenGLVideoViewEmbedding> container;
 
     atomic_bool is_ready;
@@ -297,14 +297,8 @@ static void CloseOpenGL(vlc_gl_t *gl)
 
     atomic_store(&sys->is_ready, false);
 
-    // It should never happen that the context is destroyed and we
-    // still have a previous context set, as it would mean non-balanced
-    // calls to MakeCurrent/ReleaseCurrent.
-    assert(sys->cgl_prev == NULL);
-
     [sys->videoLayer vlcClose];
     [sys->videoView vlcClose];
-    CGLReleaseContext(sys->cgl);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         // Remove vout subview from container
@@ -334,19 +328,8 @@ static int OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
     if (unlikely(!glsys))
         return VLC_ENOMEM;
 
-    // Create the CGL context
-    CGLContextObj cgl_ctx = vlc_CreateCGLContext();
-    if (cgl_ctx == NULL) {
-        msg_Err(gl, "Failure to create CGL context!");
-        free(glsys);
-        return VLC_EGENERIC;
-    }
-
     gl->sys = glsys;
-    glsys->cgl = cgl_ctx;
-    glsys->cgl_prev = NULL;
     atomic_init(&glsys->is_ready, false);
-
     dispatch_sync(dispatch_get_main_queue(), ^{
         @autoreleasepool {
             // Create video view
@@ -611,25 +594,30 @@ static int Open (vout_display_t *vd,
         return nil;
     _gl = gl;
 
+    _context = vlc_CreateCGLContext();
+    if (_context == NULL) {
+        msg_Err(_gl, "Failure to create CGL context!");
+        return nil;
+    }
+
     self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     self.wantsLayer = YES;
     return self;
 }
 
 - (int)lockContext {
-    struct vlc_gl_sys *glsys = _gl->sys;
-    glsys->cgl_prev = CGLGetCurrentContext();
+    _context_previous = CGLGetCurrentContext();
 
     CGLError err;
-    if (glsys->cgl_prev != glsys->cgl) {
-        err = CGLSetCurrentContext(glsys->cgl);
+    if (_context_previous != _context) {
+        err = CGLSetCurrentContext(_context);
         if (err != kCGLNoError) {
             msg_Err(_gl, "Failure setting current CGLContext: %s", CGLErrorString(err));
             return VLC_EGENERIC;
         }
     }
 
-    err = CGLLockContext(glsys->cgl);
+    err = CGLLockContext(_context);
     if (err != kCGLNoError) {
         msg_Err(_gl, "Failure locking CGLContext: %s", CGLErrorString(err));
         return VLC_EGENERIC;
@@ -638,34 +626,32 @@ static int Open (vout_display_t *vd,
 }
 
 - (void)unlockContext {
-    struct vlc_gl_sys *glsys = _gl->sys;
     CGLError err;
 
-    assert(CGLGetCurrentContext() == glsys->cgl);
+    assert(CGLGetCurrentContext() == _context);
 
-    err = CGLUnlockContext(glsys->cgl);
+    err = CGLUnlockContext(_context);
     if (err != kCGLNoError) {
         msg_Err(_gl, "Failure unlocking CGLContext: %s", CGLErrorString(err));
         abort();
     }
 
-    if (glsys->cgl_prev != glsys->cgl) {
-        err = CGLSetCurrentContext(glsys->cgl_prev);
+    if (_context_previous != _context) {
+        err = CGLSetCurrentContext(_context_previous);
         if (err != kCGLNoError) {
             msg_Err(_gl, "Failure restoring previous CGLContext: %s", CGLErrorString(err));
             abort();
         }
     }
 
-    glsys->cgl_prev = NULL;
+    _context_previous = NULL;
 }
 
 - (void)swap {
-    struct vlc_gl_sys *glsys = _gl->sys;
     // Copies a double-buffered contexts back buffer to front buffer, calling
     // glFlush before this is not needed and discouraged for performance reasons.
     // An implicit glFlush happens before CGLFlushDrawable returns.
-    CGLFlushDrawable(glsys->cgl);
+    CGLFlushDrawable(_context);
 }
 
 /**
@@ -682,7 +668,13 @@ static int Open (vout_display_t *vd,
 {
     @synchronized (self) {
         _gl = NULL;
+
+        // It should never happen that the context is destroyed and we
+        // still have a previous context set, as it would mean non-balanced
+        // calls to MakeCurrent/ReleaseCurrent.
+        assert(_context_previous == NULL);
     }
+    CGLReleaseContext(_context);
 }
 
 - (void)viewWillStartLiveResize
@@ -700,7 +692,8 @@ static int Open (vout_display_t *vd,
     @synchronized(self) {
         NSAssert(_gl != NULL, @"Cannot create backing layer without vout display!");
 
-        VLCCAOpenGLLayer *layer = [[VLCCAOpenGLLayer alloc] init:_gl];
+        assert(_context != NULL);
+        VLCCAOpenGLLayer *layer = [[VLCCAOpenGLLayer alloc] init:_gl context:_context];
         layer.delegate = self;
         return layer;
     }
@@ -733,15 +726,15 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 @implementation VLCCAOpenGLLayer
 
-- (instancetype)init:(vlc_gl_t *)gl
+- (instancetype)init:(vlc_gl_t *)gl context:(CGLContextObj)context
 {
     self = [super init];
     if (self) {
         _displayLock = [[NSLock alloc] init];
         _gl = gl;
 
-        struct vlc_gl_sys *glsys = gl->sys;
-        _glContext = CGLRetainContext(glsys->cgl);
+        _glContext = CGLRetainContext(context);
+        assert(_glContext != NULL);
 
         [CATransaction lock];
         self.needsDisplayOnBoundsChange = YES;
