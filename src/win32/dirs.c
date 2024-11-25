@@ -227,16 +227,19 @@ static char *config_GetAppDir (void)
 #if !VLC_WINSTORE_APP
     /* if portable directory exists, use it */
     WCHAR path[MAX_PATH];
-    if (GetModuleFileName (NULL, path, MAX_PATH))
+    if (GetModuleFileNameW (NULL, path, MAX_PATH))
     {
-        WCHAR *lastDir = wcsrchr (path, TEXT('\\'));
+        WCHAR *lastDir = wcsrchr (path, L'\\');
         if (lastDir)
         {
-            wcscpy (lastDir + 1, TEXT("portable"));
-            DWORD attrib = GetFileAttributes (path);
-            if (attrib != INVALID_FILE_ATTRIBUTES &&
-                    (attrib & FILE_ATTRIBUTE_DIRECTORY))
-                return FromWide (path);
+            *lastDir = L'\0';
+            if (wcscat_s(path, ARRAY_SIZE(path), TEXT("\\portable")) == 0)
+            {
+                DWORD attrib = GetFileAttributesW (path);
+                if (attrib != INVALID_FILE_ATTRIBUTES &&
+                        (attrib & FILE_ATTRIBUTE_DIRECTORY))
+                    return FromWide (path);
+            }
         }
     }
 #endif
