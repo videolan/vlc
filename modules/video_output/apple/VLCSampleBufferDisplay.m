@@ -1139,6 +1139,9 @@ static void DeletePipController( pip_controller_t * pip_controller )
 static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
+    if (var_InheritBool(vd, "force-darwin-legacy-display")) {
+        return VLC_EGENERIC;
+    }
     // Display isn't compatible with 360 content hence opening with this kind
     // of projection should fail if display use isn't forced
     if (!vd->obj.force && fmt->projection_mode != PROJECTION_MODE_RECTANGULAR) {
@@ -1186,8 +1189,25 @@ static int Open (vout_display_t *vd,
 /*
  * Module descriptor
  */
+
+#define FORCE_LEGACY_DISPLAY_TEXT N_("Force fallback to legacy display")
+#define FORCE_LEGACY_DISPLAY_LONGTEXT N_( \
+    "Triggers an initialization failure to allow fallback to any other legacy display.")
+
+#define HELP_TEXT N_("This display handles hardware decoded pixel buffers "\
+                     "and renders them in a view/layer. "\
+                     "It can also convert and display software decoded frame buffers. "\
+                     "This is the default display for Apple platforms. "\
+                     "--force-darwin-legacy-display option can be used to abort the "\
+                     "display's initialization and allows fallback to legacy displays like "\
+                     "other OpenGL/ES based video outputs.")
+
 vlc_module_begin()
     set_description(N_("CoreMedia sample buffers based video output display"))
     set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_bool("force-darwin-legacy-display", false,
+             FORCE_LEGACY_DISPLAY_TEXT, FORCE_LEGACY_DISPLAY_LONGTEXT)
+        change_volatile()
+    set_help(HELP_TEXT)
     set_callback_display(Open, 600)
 vlc_module_end()
