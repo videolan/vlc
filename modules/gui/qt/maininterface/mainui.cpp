@@ -99,9 +99,6 @@ MainUI::~MainUI()
 
 bool MainUI::setup(QQmlEngine* engine)
 {
-    engine->setOutputWarningsToStandardError(false);
-    connect(engine, &QQmlEngine::warnings, this, &MainUI::onQmlWarning);
-
     if (m_mainCtx->hasMediaLibrary())
     {
         engine->addImageProvider(MLCustomCover::providerId, new MLCustomCover(m_mainCtx->getMediaLibrary()));
@@ -405,33 +402,4 @@ void MainUI::registerQMLTypes()
     qmlRegisterModule("Qt5Compat.GraphicalEffects", 0, 0);
     // Do not protect, types can still be registered.
 #endif
-}
-
-void MainUI::onQmlWarning(const QList<QQmlError>& qmlErrors)
-{
-    for( const auto& error: qmlErrors )
-    {
-        vlc_log_type type;
-
-        switch( error.messageType() )
-        {
-        case QtInfoMsg:
-            type = VLC_MSG_INFO; break;
-        case QtWarningMsg:
-            type = VLC_MSG_WARN; break;
-        case QtCriticalMsg:
-        case QtFatalMsg:
-            type = VLC_MSG_ERR; break;
-        case QtDebugMsg:
-        default:
-            type = VLC_MSG_DBG;
-        }
-
-        msg_Generic( m_intf,
-                     type,
-                     "qml message %s:%i %s",
-                     qtu(error.url().toString()),
-                     error.line(),
-                     qtu(error.description()) );
-    }
 }

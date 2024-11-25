@@ -28,9 +28,6 @@ public:
     VLC_USED
     QQuickItem* createRootItem();
 
-private slots:
-    void onQmlWarning(const QList<QQmlError>& errors);
-
 private:
     void registerQMLTypes();
     static QObject* getMainCtxInstance(QQmlEngine *, QJSEngine *);
