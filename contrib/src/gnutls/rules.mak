@@ -31,6 +31,10 @@ $(TARBALLS)/gnutls-$(GNUTLS_VERSION).tar.xz:
 
 gnutls: gnutls-$(GNUTLS_VERSION).tar.xz .sum-gnutls
 	$(UNPACK)
+	# fix forbidden UWP call which can't be upstreamed as they won't
+	# differentiate for winstore, only _WIN32_WINNT
+	$(APPLY) $(SRC)/gnutls/0001-fcntl-do-not-call-GetHandleInformation-in-Winstore-a.patch
+
 	# disable the dllimport in static linking (pkg-config --static doesn't handle Cflags.private)
 	sed -i.orig -e s/"_SYM_EXPORT __declspec(dllimport)"/"_SYM_EXPORT"/g $(UNPACK_DIR)/lib/includes/gnutls/gnutls.h.in
 
