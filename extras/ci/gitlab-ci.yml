@@ -191,12 +191,12 @@ win64-arm-llvm:
         # branch protection enabled on Windows.
         CONFIGFLAGS: --disable-branch-protection
 
-uwp64-libvlc-llvm:
+uwp32-libvlc-llvm:
     extends: .win-common
     image:
         name: $VLC_WIN_LLVM_UCRT_IMAGE
     variables:
-        <<: *variables-win64
+        <<: *variables-win32
         VLCARCH: win64-uwp
         LIBVLC_EXTRA_BUILD_FLAGS: -z
         UWP_EXTRA_BUILD_FLAGS: -u -w -x -S 0x0A000007 -m
