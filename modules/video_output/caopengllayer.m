@@ -85,6 +85,7 @@
 #endif
 {
     vlc_gl_t *_gl; // All accesses to this must be @synchronized(self)
+    id _container;
 
     CGLContextObj _context; // The CGL context managed by us
     CGLContextObj _context_previous; // The previously current CGL context, if any
@@ -228,13 +229,10 @@ static CGLContextObj vlc_CreateCGLContext(void)
 
 struct vlc_gl_sys
 {
-    id<VLCOpenGLVideoViewEmbedding> container;
-
     atomic_bool is_ready;
     VLCVideoLayerView *videoView; // Layer-backed view that creates videoLayer
     VLCCAOpenGLLayer *videoLayer; // Backing layer of videoView
 };
-
 static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -301,14 +299,8 @@ static void CloseOpenGL(vlc_gl_t *gl)
     [sys->videoView vlcClose];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        // Remove vout subview from container
-        if ([sys->container respondsToSelector:@selector(removeVoutSubview:)]) {
-            [sys->container removeVoutSubview:sys->videoView];
-        }
-        [sys->videoView removeFromSuperview];
 
         sys->videoView = nil;
-        sys->container = nil;
         sys->videoLayer = nil;
         free(sys);
     });
@@ -332,20 +324,11 @@ static int OpenOpenGL(vlc_gl_t *gl, unsigned width, unsigned height,
     atomic_init(&glsys->is_ready, false);
     dispatch_sync(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            // Create video view
-            glsys->videoView = [[VLCVideoLayerView alloc] init:gl];
+            VLCVideoLayerView *videoView = [[VLCVideoLayerView alloc] init:gl];
+            if (videoView == nil)
+                return;
+            glsys->videoView = videoView;
             glsys->videoLayer = (VLCCAOpenGLLayer*)[glsys->videoView layer];
-            // Add video view to container
-            if ([container respondsToSelector:@selector(addVoutSubview:)]) {
-                [container addVoutSubview:glsys->videoView];
-            } else if ([container isKindOfClass:[NSView class]]) {
-                NSView *containerView = container;
-                [containerView addSubview:glsys->videoView];
-                [glsys->videoView setFrame:containerView.bounds];
-            } else {
-                glsys->videoView = nil;
-                glsys->videoLayer = nil;
-            }
         }
     });
 
@@ -600,6 +583,22 @@ static int Open (vout_display_t *vd,
         return nil;
     }
 
+    _container = (__bridge id)gl->surface->handle.nsobject;
+    assert(_container != nil);
+
+    // Add video view to container
+    if ([_container respondsToSelector:@selector(addVoutSubview:)]) {
+        [_container addVoutSubview:self];
+    } else if ([_container isKindOfClass:[NSView class]]) {
+        NSView *containerView = _container;
+        [containerView addSubview:self];
+        [self setFrame:containerView.bounds];
+    } else {
+        CGLReleaseContext(_context);
+        _context = NULL;
+        return nil;
+    }
+
     self.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
     self.wantsLayer = YES;
     return self;
@@ -675,6 +674,14 @@ static int Open (vout_display_t *vd,
         assert(_context_previous == NULL);
     }
     CGLReleaseContext(_context);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Remove vout subview from container
+        if ([_container respondsToSelector:@selector(removeVoutSubview:)]) {
+            [_container removeVoutSubview:self];
+        }
+        [self removeFromSuperview];
+    });
 }
 
 - (void)viewWillStartLiveResize
