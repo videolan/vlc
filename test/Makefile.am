@@ -30,6 +30,7 @@ check_PROGRAMS = \
 	test_src_input_stream \
 	test_src_input_stream_fifo \
 	test_src_preparser_thumbnail \
+	test_src_preparser_thumbnail_to_files \
 	test_src_input_decoder \
 	test_src_player \
 	test_src_player_monotonic_clock \
@@ -180,6 +181,8 @@ test_src_input_stream_fifo_SOURCES = src/input/stream_fifo.c
 test_src_input_stream_fifo_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_preparser_thumbnail_SOURCES = src/preparser/thumbnail.c
 test_src_preparser_thumbnail_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_src_preparser_thumbnail_to_files_SOURCES = src/preparser/thumbnail_to_files.c
+test_src_preparser_thumbnail_to_files_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_src_player_SOURCES = src/player/player.c
 test_src_player_LDADD = $(LIBVLCCORE) $(LIBVLC) $(LIBM)
 test_src_player_monotonic_clock_SOURCES = src/player/player.c
