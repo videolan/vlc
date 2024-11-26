@@ -72,19 +72,12 @@ private:
     struct EventInfo {
         enum {
             ESMouseEvent,
-            ActionEvent,
             ButtonDataEvent,
         } type;
 
         EventInfo( const vlc_mouse_t & state_old, const vlc_mouse_t & state_new )
             : type( ESMouseEvent )
             , mouse{ state_old, state_new }
-        {
-        }
-
-        EventInfo( NavivationKey key )
-            : type( ActionEvent )
-            , nav{ key }
         {
         }
 
@@ -114,7 +107,6 @@ private:
 
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
 
-    void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
     void HandleButtonData( EventInfo const& );
 
@@ -143,7 +135,7 @@ private:
         vlc_cond_signal( &wait );
     }
 
-    void HandleKeyEvent( NavivationKey key );
+    bool HandleKeyEvent( NavivationKey key );
     void HandleMousePressed( unsigned x, unsigned y );
     void HandleButtonData( block_t * );
 };

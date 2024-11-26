@@ -100,7 +100,8 @@ int event_thread_t::SendEventNav( demux_query_e nav_query )
     if( !is_running )
         return VLC_EGENERIC;
 
-    QueueEvent( EventInfo{ key } );
+    if ( !HandleKeyEvent( key ) )
+        return VLC_EGENERIC;
 
     return VLC_SUCCESS;
 }
@@ -145,10 +146,6 @@ void event_thread_t::EventThread()
                     HandleMouseEvent( ev );
                     break;
 
-                case EventInfo::ActionEvent:
-                    HandleKeyEvent( ev );
-                    break;
-
                 case EventInfo::ButtonDataEvent:
                     HandleButtonData( ev );
                     break;
@@ -166,14 +163,7 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
-void event_thread_t::HandleKeyEvent( EventInfo const& ev )
-{
-    msg_Dbg( p_demux, "Handle Key Event");
-
-    HandleKeyEvent( ev.nav.key );
-}
-
-void event_thread_t::HandleKeyEvent( NavivationKey key )
+bool event_thread_t::HandleKeyEvent( NavivationKey key )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
@@ -181,10 +171,10 @@ void event_thread_t::HandleKeyEvent( NavivationKey key )
 
     auto interpretor = p_sys->GetDVDInterpretor();
     if (!interpretor)
-        return;
+        return false;
 
     // process the button action
-    interpretor->HandleKeyEvent( key );
+    return interpretor->HandleKeyEvent( key );
 }
 
 void event_thread_t::HandleMouseEvent( EventInfo const& event )

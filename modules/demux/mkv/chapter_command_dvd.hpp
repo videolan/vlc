@@ -35,7 +35,7 @@ public:
 
     bool Interpret( const binary * p_command, size_t i_size = 8 );
 
-    void HandleKeyEvent( NavivationKey );
+    bool HandleKeyEvent( NavivationKey );
     void HandleMousePressed( unsigned x, unsigned y );
 
     void SetPci(const uint8_t *, unsigned size);
@@ -92,7 +92,7 @@ protected:
         return false;
     }
 
-    void ProcessNavAction( uint16_t button );
+    bool ProcessNavAction( uint16_t button );
 
     std::string GetRegTypeName( bool b_value, uint16_t value ) const
     {
