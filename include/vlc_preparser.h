@@ -50,6 +50,7 @@ typedef size_t vlc_preparser_req_id;
 #define VLC_PREPARSER_TYPE_FETCHMETA_LOCAL  0x02
 #define VLC_PREPARSER_TYPE_FETCHMETA_NET    0x04
 #define VLC_PREPARSER_TYPE_THUMBNAIL        0x08
+#define VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES 0x10
 #define VLC_PREPARSER_TYPE_FETCHMETA_ALL \
     (VLC_PREPARSER_TYPE_FETCHMETA_LOCAL|VLC_PREPARSER_TYPE_FETCHMETA_NET)
 
@@ -92,9 +93,44 @@ struct vlc_thumbnailer_cbs
 };
 
 /**
+ * Preparser thumbnailer to file callbacks
+ *
+ * Used by vlc_preparser_GenerateThumbnailToFiles()
+ */
+struct vlc_thumbnailer_to_files_cbs
+{
+    /**
+     * Event received on thumbnailing completion or error
+     *
+     * This callback will always be called, provided
+     *
+     * vlc_preparser_GenerateThumbnailToFiles() returned a valid request, and
+     * provided the request is not cancelled before its completion.
+     *
+     * @note This callback is mandatory if calling
+     * vlc_preparser_GenerateThumbnailToFiles()
+     *
+     * @param item item used for the thumbnailer
+     * @param status VLC_SUCCESS in case of success, VLC_ETIMEOUT in case of
+     * timeout, -EINTR if cancelled, an error otherwise. A success mean that an
+     * image was generated but it is still possible that the export failed,
+     * check result_array to assure export were successful.
+     * @param array of results, if result_array[i] is true, the outputs[i] from
+     * vlc_preparser_GenerateThumbnailToFiles() succeeded.
+     * @param result_count size of the array, same than the output_count arg
+     * from vlc_preparser_GenerateThumbnailToFiles()
+     * @param data opaque pointer passed by
+     * vlc_preparser_GenerateThumbnailToFiles()
+     */
+    void (*on_ended)(input_item_t *item, int status,
+                     const bool *result_array, size_t result_count, void *data);
+};
+
+/**
  * Thumbnailer argument
  *
- * Used by vlc_preparser_GenerateThumbnail()
+ * Used by vlc_preparser_GenerateThumbnail() and
+ * vlc_preparser_GenerateThumbnailToFiles()
  */
 struct vlc_thumbnailer_arg
 {
@@ -128,6 +164,55 @@ struct vlc_thumbnailer_arg
 
     /** True to enable hardware decoder (false by default) */
     bool hw_dec;
+};
+
+/**
+ * Thumbnailer output format
+ */
+enum vlc_thumbnailer_format
+{
+    VLC_THUMBNAILER_FORMAT_PNG,
+    VLC_THUMBNAILER_FORMAT_WEBP,
+    VLC_THUMBNAILER_FORMAT_JPEG,
+};
+
+/**
+ * Thumbnailer output argument
+ *
+ * Used by vlc_preparser_GenerateThumbnailToFiles()
+ */
+struct vlc_thumbnailer_output
+{
+    /**
+     * Thumbnailer output format
+     */
+    enum vlc_thumbnailer_format format;
+
+    /**
+     * Requested width of the thumbnail
+     *
+     * cf. picture_Export() documentation.
+     */
+    int width;
+
+    /**
+     * Requested Height of the thumbnail
+     *
+     * cf. picture_Export() documentation.
+     */
+    int height;
+
+    /**
+     * True if the thumbnail should be cropped
+     *
+     * cf. picture_Export() documentation.
+     */
+    bool crop;
+
+    /** File output path of the thumbnail */
+    const char *file_path;
+    /** File mode bits (cf. "mode_t mode" in `man 2 open`) */
+    unsigned int creat_mode;
 };
 
 /**
@@ -213,6 +298,54 @@ vlc_preparser_GenerateThumbnail( vlc_preparser_t *preparser, input_item_t *item,
                                  const struct vlc_thumbnailer_arg *arg,
                                  const struct vlc_thumbnailer_cbs *cbs,
                                  void *cbs_userdata );
+
+/**
+ * Get the best possible format
+ *
+ * @param[out] format pointer to the best format
+ * @param[out] out_ext pointer to the extension of the format
+ * @return 0 if a format was found, VLC_ENOENT otherwise (in case there are no
+ * "image encoder" modules)
+ */
+VLC_API int
+vlc_preparser_GetBestThumbnailerFormat(enum vlc_thumbnailer_format *format,
+                                       const char **out_ext);
+
+/**
+ * Check if the format is handled by VLC
+ *
+ * @param format format to check
+ * @return 0 if the format was found, VLC_ENOENT otherwise (in case there are
+ * no "image encoder" modules)
+ */
+VLC_API int
+vlc_preparser_CheckThumbnailerFormat(enum vlc_thumbnailer_format format);
+
+/**
+ * This function generates a thumbnail to one or several files
+ *
+ * @param preparser the preparser object
+ * @param item a valid item to generate the thumbnail for
+ * @param arg pointer to the arg struct, NULL for default options
+ * @param outputs array of outputs, one file will be generated per output for a
+ * single thumbnail
+ * @param output_count outputs array size, must be > 1
+ * @param cbs callback to listen to events (can't be NULL)
+ * @param cbs_userdata opaque pointer used by the callbacks
+ * @return VLC_PREPARSER_REQ_ID_INVALID in case of error, or a valid id if the
+ * item was scheduled for thumbnailing. If this returns an
+ * error, the thumbnailer.on_ended callback will *not* be invoked
+ *
+ * The provided input_item will be held by the thumbnailer and can safely be
+ * released safely after calling this function.
+ */
+VLC_API vlc_preparser_req_id
+vlc_preparser_GenerateThumbnailToFiles( vlc_preparser_t *preparser, input_item_t *item,
+                                        const struct vlc_thumbnailer_arg *arg,
+                                        const struct vlc_thumbnailer_output *outputs,
+                                        size_t output_count,
+                                        const struct vlc_thumbnailer_to_files_cbs *cbs,
+                                        void *cbs_userdata );
 
 /**
  * This function cancel all preparsing requests for a given id
