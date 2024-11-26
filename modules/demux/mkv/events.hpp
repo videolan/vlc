@@ -125,7 +125,7 @@ private:
     typedef std::list<EventInfo> pending_events_t;
     pending_events_t pending_events; // protected by "lock"
 
-    void QueueEvent(const EventInfo e)
+    void QueueEvent(const EventInfo & e)
     {
         vlc_mutex_locker lock_guard( &lock );
 
