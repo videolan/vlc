@@ -49,7 +49,7 @@ void Merge8BitGeneric( void *_p_dest, const void *_p_s1,
     const uint8_t *p_s2 = _p_s2;
 
     for( ; i_bytes > 0; i_bytes-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 
 void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
@@ -60,7 +60,7 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
     const uint16_t *p_s2 = _p_s2;
 
     for( size_t i_words = i_bytes / 2; i_words > 0; i_words-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 
 #if defined(CAN_COMPILE_SSE2)
@@ -73,7 +73,7 @@ void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     const uint8_t *p_s2 = _p_s2;
 
     for( ; i_bytes > 0 && ((uintptr_t)p_s1 & 15); i_bytes-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 
     for( ; i_bytes >= 16; i_bytes -= 16 )
     {
@@ -88,7 +88,7 @@ void Merge8BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     }
 
     for( ; i_bytes > 0; i_bytes-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 
 VLC_SSE
@@ -101,7 +101,7 @@ void Merge16BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
 
     size_t i_words = i_bytes / 2;
     for( ; i_words > 0 && ((uintptr_t)p_s1 & 15); i_words-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 
     for( ; i_words >= 8; i_words -= 8 )
     {
@@ -116,7 +116,7 @@ void Merge16BitSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
     }
 
     for( ; i_words > 0; i_words-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 
 #endif
@@ -134,7 +134,7 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
     /* Use C until the first 16-bytes aligned destination pixel */
     while( (uintptr_t)p_dest & 0xF )
     {
-        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
+        *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) + 1) >> 1;
     }
 
     if( ( (int)p_s1 & 0xF ) | ( (int)p_s2 & 0xF ) )
@@ -186,7 +186,7 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
     p_end += 15;
 
     while( p_dest < p_end )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
+        *p_dest++ = ( *p_s1++ + *p_s2++ + 1) >> 1;
 }
 #endif
 
