@@ -386,9 +386,7 @@ ThumbnailerRun(void *userdata)
     picture_t* pic = task->pic;
     task->pic = NULL;
 
-    vlc_mutex_lock(&preparser->lock);
-    vlc_list_remove(&task->node);
-    vlc_mutex_unlock(&preparser->lock);
+    PreparserRemoveTask(preparser, task);
 
     task->cbs.thumbnailer->on_ended(task->item, task->preparse_status,
                                     task->preparse_status == VLC_SUCCESS ?
