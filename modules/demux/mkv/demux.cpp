@@ -53,9 +53,10 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
     /* verify the EBML Header... it shouldn't be bigger than 1kB */
     p_l0 = p_stream1->estream.FindNextID(EBML_INFO(EbmlHead), 1024);
-    if (p_l0 == NULL)
+    if (p_l0 == nullptr || p_l0->IsDummy())
     {
         msg_Err( p_demux, "No EBML header found" );
+        delete p_l0;
         return false;
     }
 
@@ -89,13 +90,14 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
     // find all segments in this file
     p_l0 = p_stream1->estream.FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
-    if (p_l0 == NULL)
+    if (p_l0 == nullptr || p_l0->IsDummy())
     {
         msg_Err( p_demux, "No segment found" );
+        delete p_l0;
         return false;
     }
 
-    while (p_l0 != 0)
+    while (p_l0 != nullptr)
     {
         bool b_l0_handled = false;
 
@@ -130,10 +132,15 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
         {
             p_l0->SkipData(p_stream1->estream, Context_KaxMatroska);
             p_l0 = p_stream1->estream.FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
+            if (p_l0 != nullptr && p_l0->IsDummy())
+            {
+                delete p_l0;
+                p_l0 = nullptr;
+            }
         }
         else
         {
-            p_l0 = NULL;
+            p_l0 = nullptr;
         }
 
         if( b_l0_handled == false )

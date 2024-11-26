@@ -703,10 +703,11 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     es.I_O().setFilePointer( i_element_position, seek_beginning );
     el = es.FindNextID( ClassInfos, 0xFFFFFFFFL);
 
-    if( el == NULL )
+    if( el == nullptr || el->IsDummy() )
     {
         msg_Err( &sys.demuxer, "cannot load some cues/chapters/tags etc. (broken seekhead or file)" );
         es.I_O().setFilePointer( i_sav_position, seek_beginning );
+        delete el;
         return false;
     }
 
