@@ -22,6 +22,8 @@ breakpad: breakpad-$(BREAKPAD_VERSION).tar.gz .sum-breakpad
 
 BREAKPAD_CONF := --disable-processor
 
+.breakpad: BUILD_DIR=$</
+.breakpad: BUILD_SRC=.
 .breakpad: breakpad
 	# Framework
 ifdef HAVE_MACOSX
@@ -37,7 +39,7 @@ ifdef HAVE_MACOSX
 		install build/Release/dump_syms "$(PREFIX)/bin"
 else
 	$(RECONF)
-	$(MAKEBUILDDIR)
+	# $(MAKEBUILDDIR)
 	$(MAKECONFIGURE) $(BREAKPAD_CONF)
 	+Configuration=Release $(MAKEBUILD)
 	+Configuration=Release $(MAKEBUILD) install
