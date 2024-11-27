@@ -563,12 +563,7 @@ ${MementoSectionRestore}
 @HAVE_WIN64_TRUE@    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on 64-bit operating systems.$\nPlease get the 32-bit version and try again."
 @HAVE_WIN64_TRUE@    Quit
 @HAVE_WIN64_TRUE@ ${EndUnless}
-${If} ${AtLeastWinXP}
-    ${If} ${IsWinXP}
-    ${AndIf} ${AtMostServicePack} 1
-        Goto WinTooOld
-    ${Endif}
-${Else}
+${IfNot} ${AtLeastWin7}
     Goto WinTooOld
 ${Endif}
 
@@ -578,7 +573,7 @@ StrCpy $INSTDIR "$@PROGRAMFILES@\VideoLAN\VLC"
 Goto WinOk
 
 WinTooOld:
-    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on Windows XP SP2 and newer."
+    MessageBox MB_OK|MB_ICONSTOP "This version of VLC only runs on Windows 7 and newer."
     Quit
 
 WinOk:
