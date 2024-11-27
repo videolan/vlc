@@ -30,6 +30,7 @@
 #include "widgets/native/searchlineedit.hpp"
 #include "dialogs/extensions/extensions_manager.hpp"
 #include "addons_manager.hpp"
+#include "network/servicesdiscoverymodel.hpp"
 #include "widgets/native/animators.hpp"
 #include "util/imagehelper.hpp"
 
@@ -66,6 +67,7 @@
 #include <QStackedWidget>
 #include <QPainterPath>
 #include <QSignalMapper>
+#include <QtQml/QQmlFile>
 
 //match the image source (width/height)
 #define SCORE_ICON_WIDTH_SCALE 4
@@ -356,9 +358,11 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
 
     signalMapper = new QSignalMapper();
 
-    auto addCategory = [this, leftPane]( const QString& label, const QString& ltooltip, int numb) {
+    auto addCategory = [this, leftPane]( const QString& label, const QString& ltooltip,  ServicesDiscoveryModel::Type type) {
         auto button = new QToolButton( this );
-        button->setIcon( iconFromCategory( numb ) );
+
+        QString iconpath = QQmlFile::urlToLocalFileOrQrc(ServicesDiscoveryModel::getIconForType( type ));
+        button->setIcon( QIcon{ iconpath } );
         button->setText( label );
         button->setToolTip( ltooltip );
         button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
@@ -367,38 +371,38 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
         button->setMinimumSize( 32, 32 );
         button->setAutoRaise( true );
         button->setCheckable( true );
-        if ( numb == -1 )
+        if ( type == ServicesDiscoveryModel::Type::TYPE_NONE )
             button->setChecked( true );
         button->setAutoExclusive( true );
         connect( button, &QToolButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map) );
-        signalMapper->setMapping( button, numb );
+        signalMapper->setMapping( button, static_cast<int>(type) );
         leftPane->layout()->addWidget( button );
     };
 
     addCategory( qtr("All"), qtr("Interface Settings"),
-                  -1 );
+                  ServicesDiscoveryModel::Type::TYPE_NONE );
     addCategory( qtr("Skins"),
                   qtr( "Skins customize player's appearance."
                        " You can activate them through preferences." ),
-                  ADDON_SKIN2 );
+                  ServicesDiscoveryModel::Type::TYPE_SKIN2 );
     addCategory( qtr("Playlist parsers"),
                   qtr( "Playlist parsers add new capabilities to read"
                        " internet streams or extract meta data." ),
-                  ADDON_PLAYLIST_PARSER );
+                  ServicesDiscoveryModel::Type::TYPE_PLAYLIST_PARSER );
     addCategory( qtr("Service Discovery"),
                   qtr( "Service discoveries adds new sources to your playlist"
                        " such as web radios, video websites, ..." ),
-                  ADDON_SERVICE_DISCOVERY );
+                  ServicesDiscoveryModel::Type::TYPE_SERVICE_DISCOVERY );
     addCategory( qtr("Interfaces"),
                   "",
-                  ADDON_INTERFACE );
+                  ServicesDiscoveryModel::Type::TYPE_INTERFACE );
     addCategory( qtr("Art and meta fetchers"),
                   qtr( "Retrieves extra info and art for playlist items" ),
-                  ADDON_META );
+                  ServicesDiscoveryModel::Type::TYPE_META );
     addCategory( qtr("Extensions"),
                   qtr( "Extensions brings various enhancements."
                        " Check descriptions for more details" ),
-                  ADDON_EXTENSION );
+                  ServicesDiscoveryModel::Type::TYPE_EXTENSION );
 
     // Right Pane
     rightPane->layout()->setContentsMargins(0, 0, 0, 0);
@@ -422,20 +426,44 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
     connect( installedOnlyBox, &QCheckBox::stateChanged, this, &AddonsTab::installChecked );
 
+    // Model
+    m_model = std::make_unique<ServicesDiscoveryModel>( );
+    //model expect QMLlike behavior
+    m_model->classBegin();
+    m_model->setCtx(p_intf->p_mi);
+    connect( signalMapper, &QSignalMapper::mappedInt,
+            m_model.get(), [model = m_model.get()](int mapped){
+                model->setTypeFilter(static_cast<ServicesDiscoveryModel::Type>(mapped));
+            });
+
+    connect( searchInput, &SearchLineEdit::textChanged,
+            m_model.get(), &ServicesDiscoveryModel::setSearchPattern );
+
+
+    // Update button
     QPushButton *reposyncButton = new QPushButton( QIcon( ":/menu/update.svg" ),
                                               qtr("Find more addons online") );
     reposyncButton->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( ONLYLOCALADDONS, reposyncButton );
     switchStack->setCurrentIndex( ONLYLOCALADDONS );
     connect( reposyncButton, &QPushButton::clicked, this, &AddonsTab::reposync );
+    connect(
+        m_model.get(), &ServicesDiscoveryModel::loadingChanged,
+        this, [this]() {
+            if ( !m_model->loading()) {
+                spinnerAnimation->stop();
+                addonsView->viewport()->update();
+            }
+        });
 
     leftPane->layout()->addItem( new QSpacerItem( 0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding ) );
 
     // Main View
-    AddonsManager *AM = AddonsManager::getInstance( p_intf );
 
     // ListView
     addonsView = new QListView( this );
+    addonsView->setModel(m_model.get());
+
     connect( addonsView, &QListView::activated, this, &AddonsTab::moreInformation );
     layout->addWidget( addonsView );
 
@@ -455,30 +483,9 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     addonsView->setDropIndicatorShown( true );
     addonsView->setDragDropMode( QAbstractItemView::DropOnly );
 
-    // Model
-    AddonsListModel *model = new AddonsListModel( AM, addonsView );
-    addonsModel = new AddonsSortFilterProxyModel( addonsView );
-    addonsModel->setDynamicSortFilter( true );
-    addonsModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
-    addonsModel->setSortRole( Qt::DisplayRole );
-    addonsModel->sort( 0, Qt::AscendingOrder );
-    addonsModel->setSourceModel( model );
-    addonsModel->setFilterRole( Qt::DisplayRole );
-    addonsView->setModel( addonsModel );
-
-    connect( signalMapper, &QSignalMapper::mappedInt,
-             addonsModel, &AddonsSortFilterProxyModel::setTypeFilter );
-
-    connect( searchInput, &SearchLineEdit::textChanged,
-             addonsModel, &AddonsSortFilterProxyModel::setFilterFixedString );
-
     connect( addonsView->selectionModel(), &QItemSelectionModel::currentChanged,
              addonsView, QOverload<const QModelIndex&>::of(&QListView::edit) );
 
-    connect( AM, SIGNAL(addonAdded( addon_entry_t * )),
-             model, SLOT(addonAdded( addon_entry_t * )) );
-    connect( AM, SIGNAL(addonChanged( const addon_entry_t * )),
-             model, SLOT(addonChanged( const addon_entry_t * )) );
 
     QList<QString> frames;
     frames << ":/misc/wait1.svg";
@@ -489,6 +496,9 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     connect( spinnerAnimation, &PixmapAnimator::pixmapReady,
              addonsView->viewport(), QOverload<>::of(&QWidget::update) );
     addonsView->viewport()->installEventFilter( this );
+
+    //model expect QMLlike behavior
+    m_model->componentComplete();
 }
 
 AddonsTab::~AddonsTab()
@@ -530,7 +540,7 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
             point -= QPoint( textsize.width() / 2, -spinner.height() );
             painter.drawText( point, text );
         }
-        else if ( addonsModel->rowCount() == 0 )
+        else if ( m_model->rowCount() == 0 )
         {
             QWidget *viewport = qobject_cast<QWidget *>( obj );
             if ( !viewport ) break;
@@ -540,14 +550,6 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
             QPoint point = viewport->geometry().center();
             point -= QPoint( size.width() / 2, size.height() / 2 );
             painter.drawText( point, text );
-        }
-        break;
-    case QEvent::Show:
-        if ( !b_localdone && addonsView->model()->rowCount() < 1 )
-        {
-            b_localdone = true;
-            AddonsManager *AM = AddonsManager::getInstance( p_intf );
-            AM->findInstalled();
         }
         break;
     case QEvent::DragEnter:
@@ -580,8 +582,7 @@ bool AddonsTab::eventFilter( QObject *obj, QEvent *event )
             return false;
         if ( dropEvent->mimeData()->urls().count() )
         {
-            AddonsManager *AM = AddonsManager::getInstance( p_intf );
-            AM->findDesignatedAddon( dropEvent->mimeData()->urls().first().toString() );
+            m_model->loadFromExternalRepository(dropEvent->mimeData()->urls().first());
             dropEvent->acceptProposedAction();
         }
         return true;
@@ -605,9 +606,9 @@ void AddonsTab::moreInformation()
 void AddonsTab::installChecked( int i )
 {
     if ( i == Qt::Checked )
-        addonsModel->setStatusFilter( ADDON_INSTALLED );
+        m_model->setStateFilter( ServicesDiscoveryModel::State::STATE_INSTALLED );
     else
-        addonsModel->setStatusFilter( 0 );
+        m_model->setStateFilter( ServicesDiscoveryModel::State::STATE_NONE );
 }
 
 void AddonsTab::reposync()
@@ -616,11 +617,10 @@ void AddonsTab::reposync()
     if ( tab )
     {
         tab->setCurrentIndex( WITHONLINEADDONS );
-        AddonsManager *AM = AddonsManager::getInstance( p_intf );
-        connect( AM, &AddonsManager::discoveryEnded, spinnerAnimation, &PixmapAnimator::stop );
-        connect( AM, &AddonsManager::discoveryEnded, addonsView->viewport(), QOverload<>::of(&QWidget::update) );
+
         spinnerAnimation->start();
-        AM->findNewAddons();
+
+        m_model->loadFromDefaultRepository();
     }
 }
 
@@ -1151,11 +1151,11 @@ void AddonItemDelegate::paint( QPainter *painter,
                                const QModelIndex &index ) const
 {
     QStyleOptionViewItem newopt = option;
-    int i_state = index.data( AddonsListModel::StateRole ).toInt();
-    int i_type = index.data( AddonsListModel::TypeRole ).toInt();
+    auto i_state = index.data( ServicesDiscoveryModel::Role::STATE ).value<ServicesDiscoveryModel::State>();
+    auto i_type = index.data( ServicesDiscoveryModel::Role::TYPE ).value<ServicesDiscoveryModel::Type>();
 
     /* Draw Background gradient by addon type */
-    QColor backgroundColor = AddonsListModel::getColorByAddonType( i_type );
+    QColor backgroundColor = ServicesDiscoveryModel::getColorForType( i_type );
 
     if ( backgroundColor.isValid() )
     {
@@ -1176,7 +1176,7 @@ void AddonItemDelegate::paint( QPainter *painter,
     /* Draw common base  */
     QString name = index.data( Qt::DisplayRole ).toString();
     QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
-    QString description = index.data( ExtensionListModel::SummaryRole ).toString();
+    QString description = index.data( ServicesDiscoveryModel::Role::SUMMARY ).toString();
 
     commonPaint(
         painter,
@@ -1191,7 +1191,7 @@ void AddonItemDelegate::paint( QPainter *painter,
     painter->setRenderHint( QPainter::TextAntialiasing );
 
     /* Addon status */
-    if ( i_state == ADDON_INSTALLED )
+    if ( i_state == ServicesDiscoveryModel::State::STATE_INSTALLED )
     {
         painter->save();
         painter->setRenderHint( QPainter::Antialiasing );
@@ -1229,14 +1229,14 @@ void AddonItemDelegate::paint( QPainter *painter,
     textrect.translate( 0, newopt.fontMetrics.height() * 2 );
 
     /* Version */
-    QString version = index.data( AddonsListModel::VersionRole ).toString();
+    QString version = index.data( ServicesDiscoveryModel::Role::ADDON_VERSION).toString();
     if ( !version.isEmpty() )
         painter->drawText( textrect, Qt::AlignLeft, qtr("Version %1").arg( version ) );
 
     textrect.translate( 0, newopt.fontMetrics.height() );
 
     /* Score */
-    int i_score = index.data( AddonsListModel::ScoreRole ).toInt();
+    int i_score = index.data( ServicesDiscoveryModel::Role::SCORE).toInt();
     QPixmap scoreicon;
     if ( i_score )
     {
@@ -1244,7 +1244,7 @@ void AddonItemDelegate::paint( QPainter *painter,
         int i_scoreicon_width = i_scoreicon_height * SCORE_ICON_WIDTH_SCALE;
         scoreicon = ImageHelper::loadSvgToPixmap( ":/addons/addon_score.svg",
                     i_scoreicon_width, i_scoreicon_height );
-        int i_width = ( (float) i_score / ADDON_MAX_SCORE ) * i_scoreicon_width;
+        int i_width = ( (float) i_score / ServicesDiscoveryModel::getMaxScore() ) * i_scoreicon_width;
         /* Erase the end (value) of our pixmap with a shadow */
         QPainter erasepainter( &scoreicon );
         erasepainter.setCompositionMode( QPainter::CompositionMode_SourceIn );
@@ -1256,7 +1256,7 @@ void AddonItemDelegate::paint( QPainter *painter,
     }
 
     /* Downloads # */
-    int i_downloads = index.data( AddonsListModel::DownloadsCountRole ).toInt();
+    int i_downloads = index.data( ServicesDiscoveryModel::DOWNLOAD_COUNT).toInt();
     if ( i_downloads )
         painter->drawText( textrect.translated( scoreicon.width() + margins.left(), 0 ),
                            Qt::AlignLeft, qtr("%1 downloads").arg( i_downloads ) );
@@ -1267,12 +1267,14 @@ void AddonItemDelegate::paint( QPainter *painter,
     {
         if ( animator->isRunning() && animator->getIndex() == index )
         {
-            if ( i_state != ADDON_INSTALLING && i_state != ADDON_UNINSTALLING )
+            if ( i_state != ServicesDiscoveryModel::State::STATE_INSTALLING
+                && i_state != ServicesDiscoveryModel::State::STATE_UNINSTALLING )
                 animator->run( false );
         }
         /* Create our installation progress overlay */
 
-        if ( i_state == ADDON_INSTALLING || i_state == ADDON_UNINSTALLING )
+        if ( i_state == ServicesDiscoveryModel::State::STATE_INSTALLING
+            || i_state == ServicesDiscoveryModel::State::STATE_UNINSTALLING )
         {
             painter->save();
             painter->setCompositionMode( QPainter::CompositionMode_SourceOver );
@@ -1332,10 +1334,10 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
     connect( infoButton, &QPushButton::clicked, this, &AddonItemDelegate::showInfo );
     editorWidget->layout()->addWidget( infoButton );
 
-    if ( ADDON_MANAGEABLE &
-         index.data( AddonsListModel::FlagsRole ).toInt() )
+    if ( index.data( ServicesDiscoveryModel::Role::MANAGEABLE).toBool() )
     {
-        if ( index.data( AddonsListModel::StateRole ).toInt() == ADDON_INSTALLED )
+        if ( index.data( ServicesDiscoveryModel::Role::STATE ).value<ServicesDiscoveryModel::State>()
+            == ServicesDiscoveryModel::State::STATE_INSTALLED )
             installButton = new QPushButton( QIcon( ":/menu/remove.svg" ),
                                              qtr("&Uninstall"), parent );
         else
@@ -1365,12 +1367,12 @@ void AddonItemDelegate::updateEditorGeometry( QWidget *editor,
 void AddonItemDelegate::setModelData( QWidget *editor, QAbstractItemModel *model,
                                       const QModelIndex &index ) const
 {
-    model->setData( index, editor->property("Addon::state"), AddonsListModel::StateRole );
+    model->setData( index, editor->property("Addon::state"), ServicesDiscoveryModel::Role::STATE);
 }
 
 void AddonItemDelegate::setEditorData( QWidget *editor, const QModelIndex &index ) const
 {
-    editor->setProperty("Addon::state", index.data( AddonsListModel::StateRole ) );
+    editor->setProperty("Addon::state", index.data( ServicesDiscoveryModel::Role::STATE ) );
 }
 
 void AddonItemDelegate::setAnimator( DelegateAnimationHelper *animator_ )
@@ -1390,13 +1392,13 @@ void AddonItemDelegate::editButtonClicked()
 {
     QWidget *editor = qobject_cast<QWidget *>(sender()->parent());
     if ( !editor ) return;
-    int value = editor->property("Addon::state").toInt();
-    if ( value == ADDON_INSTALLED )
+    auto value = editor->property("Addon::state").value<ServicesDiscoveryModel::State>();
+    if ( value == ServicesDiscoveryModel::State::STATE_INSTALLED )
         /* uninstall */
-        editor->setProperty("Addon::state", ADDON_UNINSTALLING );
+        editor->setProperty("Addon::state", QVariant::fromValue(ServicesDiscoveryModel::State::STATE_UNINSTALLING) );
     else
         /* install */
-        editor->setProperty("Addon::state", ADDON_INSTALLING );
+        editor->setProperty("Addon::state", QVariant::fromValue(ServicesDiscoveryModel::State::STATE_INSTALLING) );
     emit commitData( editor );
     emit closeEditor( editor );
 }
@@ -1495,7 +1497,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     setWindowModality( Qt::WindowModal );
 
     // Window title
-    setWindowTitle( qtr( "About" ) + " " + index.data(Qt::DisplayRole).toString() );
+    setWindowTitle( qtr( "About" ) + " " + index.data(ServicesDiscoveryModel::Role::NAME).toString() );
 
     // Layout
     QGridLayout *layout = new QGridLayout( this );
@@ -1511,7 +1513,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     layout->addWidget( iconLabel, 1, 0, 2, 1 );
 
     // Title
-    label = new QLabel( index.data(Qt::DisplayRole).toString(), this );
+    label = new QLabel( index.data(ServicesDiscoveryModel::Role::NAME).toString(), this );
     QFont font = label->font();
     font.setBold( true );
     font.setPointSizeF( font.pointSizeF() * 1.3f );
@@ -1529,12 +1531,12 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     layout->addWidget( textContent, 1, 1, 4, -1 );
 
     // Type
-    QString type = AddonsManager::getAddonType( index.data(AddonsListModel::TypeRole).toInt() );
+    QString type = ServicesDiscoveryModel::getLabelForType( index.data(ServicesDiscoveryModel::Role::TYPE).value<ServicesDiscoveryModel::Type>() );
     textContent->append( QString("<b>%1:</b> %2<br/>")
                          .arg( qtr("Type") ).arg( type ) );
 
     // Version
-    QString version = index.data(ExtensionListModel::VersionRole).toString();
+    QString version = index.data(ServicesDiscoveryModel::Role::ADDON_VERSION).toString();
     if ( !version.isEmpty() )
     {
         textContent->append( QString("<b>%1:</b> %2<br/>")
@@ -1542,7 +1544,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     }
 
     // Author
-    QString author = index.data(ExtensionListModel::AuthorRole).toString();
+    QString author = index.data(ServicesDiscoveryModel::Role::AUTHOR).toString();
     if ( !author.isEmpty() )
     {
         textContent->append( QString("<b>%1:</b> %2<br/>")
@@ -1551,10 +1553,10 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
 
     // Summary
     textContent->append( QString("%1<br/>\n")
-                .arg( index.data(AddonsListModel::SummaryRole).toString() ) );
+                .arg( index.data(ServicesDiscoveryModel::Role::SUMMARY).toString() ) );
 
     // Description
-    QString description = index.data(AddonsListModel::DescriptionRole).toString();
+    QString description = index.data(ServicesDiscoveryModel::Role::DESCRIPTION).toString();
     if ( !description.isEmpty() )
     {
         textContent->append( QString("<hr/>\n%1")
@@ -1562,7 +1564,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     }
 
     // URL
-    QString sourceUrl = index.data(ExtensionListModel::LinkRole).toString();
+    QString sourceUrl = index.data(ServicesDiscoveryModel::Role::LINK).toString();
     if ( !sourceUrl.isEmpty() )
     {
         label = new QLabel( "<b>" + qtr( "Website" ) + ":</b>", this );
@@ -1574,7 +1576,7 @@ AddonInfoDialog::AddonInfoDialog( const QModelIndex &index,
     }
 
     // Script files
-    QList<QVariant> list = index.data(ExtensionListModel::FilenameRole).toList();
+    QList<QVariant> list = index.data(ServicesDiscoveryModel::Role::FILENAME).toList();
     if ( ! list.empty() )
     {
         label = new QLabel( "<b>" + qtr( "Files" ) + ":</b>", this );

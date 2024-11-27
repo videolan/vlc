@@ -54,6 +54,7 @@ class AddonsManager;
 class PixmapAnimator;
 class DelegateAnimationHelper;
 class AddonsSortFilterProxyModel;
+class ServicesDiscoveryModel;
 
 extern "C" {
     typedef struct extension_t extension_t;
@@ -148,11 +149,11 @@ private:
         WITHONLINEADDONS
     };
     QListView *addonsView;
-    AddonsSortFilterProxyModel *addonsModel;
     /* Wait spinner */
     PixmapAnimator *spinnerAnimation;
     bool b_localdone;
     QSignalMapper *signalMapper;
+    std::unique_ptr<ServicesDiscoveryModel> m_model;
 };
 
 class PluginTreeItem : public QTreeWidgetItem
