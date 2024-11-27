@@ -19,8 +19,6 @@ ${LangFileString} Desc_Section02a \
     "Adds icons to your start menu for easy access"
 ${LangFileString} Desc_Section02b \
     "Adds icon to your desktop for easy access"
-${LangFileString} Desc_Section03 \
-    "The VLC Mozilla and Mozilla Firefox plugin"
 ${LangFileString} Desc_Section04 \
     "The VLC ActiveX plugin"
 ${LangFileString} Desc_Section05 \

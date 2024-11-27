@@ -27,7 +27,6 @@ ManifestDPIAware true
 Unicode true
 
 !define INSTALL_ACTIVEX
-!define INSTALL_MOZILLA
 
 Var ReinstallType
 Var ReinstallUninstallBtn
@@ -539,9 +538,6 @@ ${MementoSectionDone}
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "$(Desc_Section01)"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02a} "$(Desc_Section02a)"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC02b} "$(Desc_Section02b)"
-!ifdef INSTALL_MOZILLA
-  !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "$(Desc_Section03)"
-!endif
 !ifdef INSTALL_ACTIVEX
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "$(Desc_Section04)"
 !endif

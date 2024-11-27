@@ -15,7 +15,6 @@ ${LangFileString} Name_Section08 "Wyczyścić pamięć podręczną i usunąć us
 ${LangFileString} Desc_Section01 "Pliki samego odtwarzacza"
 ${LangFileString} Desc_Section02a "Dodaje skrót łatwego dostępu w Twoim Menu Start"
 ${LangFileString} Desc_Section02b "Dodaje ikonę łatwego dostępu na Twoim pulpicie"
-${LangFileString} Desc_Section03 "Wtyczka VLC Mozilla i Mozilla Firefox"
 ${LangFileString} Desc_Section04 "Wtyczka VLC ActiveX"
 ${LangFileString} Desc_Section05 "Rejestracja VLC do odtwarzania płyt DVD i CD"
 ${LangFileString} Desc_Section06 "Ustawia VLC media player jako domyślną aplikację dla poszczególnego typu pliku"

@@ -15,7 +15,6 @@ ${LangFileString} Name_Section08 "Вилучити налаштування і �
 ${LangFileString} Desc_Section01 "Сам медіапрогравач"
 ${LangFileString} Desc_Section02a "Додає піктограми до вашого меню „Пуск“ для легкого доступу"
 ${LangFileString} Desc_Section02b "Додає піктограми до вашого робочого столу для легкого доступу"
-${LangFileString} Desc_Section03 "Модуль VLC для Mozilla та Mozilla Firefox"
 ${LangFileString} Desc_Section04 "Модуль VLC ActiveX"
 ${LangFileString} Desc_Section05 "Реєстрація відтворення DVD та CD"
 ${LangFileString} Desc_Section06 "Установлює медіапрогравач VLC як типову програму для вказаного типу файлів"

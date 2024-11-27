@@ -18,8 +18,6 @@ ${LangFileString} Desc_Section02a \
     "ئایکۆن بۆ مێنیوی دەستپێک زیاد ئەکات بۆ پێگەیشتنی بە ئاسانی"
 ${LangFileString} Desc_Section02b \
     "ئایکۆن بۆ ڕوومێزەکەت زیاد ئەکات بۆ پێگەیشتنی بە ئاسانی"
-${LangFileString} Desc_Section03 \
-    "پێوەکراوی مۆزیلا فایەرفۆکس و مۆزیلای VLC"
 ${LangFileString} Desc_Section04 \
     "پێوەکراوی ActiveX ـی VLC"
 ${LangFileString} Desc_Section05 \

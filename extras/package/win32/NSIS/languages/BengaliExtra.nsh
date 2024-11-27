@@ -18,8 +18,6 @@ ${LangFileString} Desc_Section02a \
     "সহজ এক্সেসের জন্য আপনার স্টার্ট মেনুতে আইকন যোগ করে"
 ${LangFileString} Desc_Section02b \
     "সহজ এক্সেসের জন্য আপনার ডেস্কটপে আইকন যোগ করে"
-${LangFileString} Desc_Section03 \
-    "ভিএলসি মজিলা এবং মজিলা ফায়ারফক্স প্লাগিন"
 ${LangFileString} Desc_Section04 \
     "ভিএলসি ActiveX প্লাগিন"
 ${LangFileString} Desc_Section05 \

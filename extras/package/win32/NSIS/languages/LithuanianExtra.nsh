@@ -15,7 +15,6 @@ ${LangFileString} Name_Section08 "Ištrinti ankstesnes VLC nuostatas bei podėl�
 ${LangFileString} Desc_Section01 "Pats kūrinių grotuvas"
 ${LangFileString} Desc_Section02a "Prideda ženkliukus prie jūsų „Pradžios“ meniu – kad būtų lengviau pasiekti"
 ${LangFileString} Desc_Section02b "Prideda ženkliukus jūsų darbalaukyje – kad būtų lengviau pasiekti"
-${LangFileString} Desc_Section03 "VLC Mozilla ir Mozilla Firefox papildinys"
 ${LangFileString} Desc_Section04 "VLC ActiveX papildinys"
 ${LangFileString} Desc_Section05 "DVD ir CD atkūrimo registracija"
 ${LangFileString} Desc_Section06 "Priskiria VLC grotuvą numatytąją programa nurodytam failų tipui"

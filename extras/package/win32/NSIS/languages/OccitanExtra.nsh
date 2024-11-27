@@ -18,8 +18,6 @@ ${LangFileString} Desc_Section02a \
     "Apondre una icòna al menut de partença"
 ${LangFileString} Desc_Section02b \
     "Apondre una icòna sus lo burèu"
-${LangFileString} Desc_Section03 \
-    "The VLC Mozilla and Mozilla Firefox plugin"
 ${LangFileString} Desc_Section04 \
     "The VLC ActiveX plugin"
 ${LangFileString} Desc_Section05 \

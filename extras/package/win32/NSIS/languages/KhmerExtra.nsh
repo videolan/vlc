@@ -15,7 +15,6 @@ ${LangFileString} Name_Section08 "លុប​ចំណូលចិត្ត ន
 ${LangFileString} Desc_Section01 "កម្មវិធី​ចាក់​មេឌៀ"
 ${LangFileString} Desc_Section02a "បន្ថែម​រូបតំណាង​ទៅ​ម៉ឺនុយ​ចាប់ផ្ដើម​របស់​អ្នក​សម្រាប់​ការ​ចូល​ដំណើរការ​ងាយ​ស្រួល"
 ${LangFileString} Desc_Section02b "បន្ថែម​រូបតំណាង​ទៅ​ផ្ទៃ​តុ​របស់​អ្នក​សម្រាប់​ការ​ចូល​ដំណើរការ​ងាយស្រួល"
-${LangFileString} Desc_Section03 "VLC Mozilla និង​កម្មវិធី​ជំនួយ Mozilla Firefox"
 ${LangFileString} Desc_Section04 "កម្មវិធី​ជំនួយ VLC ActiveX"
 ${LangFileString} Desc_Section05 "ការ​ចុះ​ឈ្មោះ​ការ​ចាក់​ឡើង​វិញ​ឌីវីឌី និង​ស៊ីឌី"
 ${LangFileString} Desc_Section06 "កំណត់​កម្មវិធី​ចាក់​មេឌៀ VLC ជា​កម្មវិធី​លំនាំដើម​សម្រាប់​ប្រភេទ​ឯកសារ​ដែល​បាន​បញ្ជាក់"

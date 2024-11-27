@@ -18,8 +18,6 @@ ${LangFileString} Desc_Section02a \
     "Добавяне на икона в старт менюто за бърз достъп"
 ${LangFileString} Desc_Section02b \
     "Добавяне на икона на десктоп за бърз достъп"
-${LangFileString} Desc_Section03 \
-    "Плъгин на VLC за Mozilla и Mozilla Firefox"
 ${LangFileString} Desc_Section04 \
     "Плъгин на VLC за ActiveX"
 ${LangFileString} Desc_Section05 \

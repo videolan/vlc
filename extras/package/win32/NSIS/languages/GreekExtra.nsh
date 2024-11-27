@@ -15,7 +15,6 @@ ${LangFileString} Name_Section08 "Διαγραφή προτιμήσεων και
 ${LangFileString} Desc_Section01 "Ο αναπαραγωγός πολυμέσων"
 ${LangFileString} Desc_Section02a "Προσθήκη εικονιδίων στο μενού έναρξης για εύκολη πρόσβαση"
 ${LangFileString} Desc_Section02b "Προσθήκη εικονιδίων στην επιφάνεια εργασίας για εύκολη πρόσβαση"
-${LangFileString} Desc_Section03 "Πρόσθετα του VLC για τα Mozilla και Mozilla Firefox"
 ${LangFileString} Desc_Section04 "Το εμφύτευμα ActiveX του VLC"
 ${LangFileString} Desc_Section05 "Εγγραφή για την αναπαραγωγή DVD και CD"
 ${LangFileString} Desc_Section06 "Ορίστε το VLC media player ως την προεπιλεγμένη εφαρμογή για το συγκεκριμένο τύπο αρχείου"

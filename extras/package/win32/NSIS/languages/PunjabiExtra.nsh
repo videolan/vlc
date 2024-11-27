@@ -18,8 +18,6 @@ ${LangFileString} Desc_Section02a \
     "ਸੌਖੀ ਵਰਤੋਂ ਲਈ ਤੁਹਾਡੇ ਸਟਾਰਟ ਮੇਨੂ ਲਈ ਆਈਕਾਨ ਸ਼ਾਮਲ ਕਰੋ"
 ${LangFileString} Desc_Section02b \
     "ਸੌਖੀ ਵਰਤੋਂ ਲਈ ਤੁਹਾਡੇ ਡੈਸਕਟਾਪ ਵਿੱਚ ਆਈਕਾਨ ਸ਼ਾਮਲ ਕਰੋ"
-${LangFileString} Desc_Section03 \
-    "VLC ਮੋਜ਼ੀਲਾ ਅਤੇ ਮੋਜ਼ੀਲਾ ਫਾਇਰਫਾਕਸ ਪਲੱਗਇਨ"
 ${LangFileString} Desc_Section04 \
     "VLC ActiveX ਪਲੱਗਇਨ"
 ${LangFileString} Desc_Section05 \
