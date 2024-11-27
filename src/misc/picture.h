@@ -22,6 +22,7 @@
 #include <stddef.h>
 
 #include <vlc_picture.h>
+#include <vlc_list.h>
 struct vlc_ancillary;
 
 typedef struct
@@ -32,6 +33,9 @@ typedef struct
         void (*destroy)(picture_t *);
         void *opaque;
     } gc;
+
+    void *pool; /* Only used by picture_pool.c */
+    struct vlc_list pool_node; /* Only used by picture_pool.c */
 
     /** Private ancillary struct. Don't use it directly, but use it via
      * picture_AttachAncillary() and picture_GetAncillary(). */

@@ -229,6 +229,8 @@ static bool picture_InitPrivate(const video_format_t *restrict p_fmt,
     else
         priv->gc.destroy = picture_DestroyDummy;
 
+    priv->pool = NULL;
+
     vlc_ancillary_array_Init(&priv->ancillaries);
 
     return true;

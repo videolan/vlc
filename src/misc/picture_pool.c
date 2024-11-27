@@ -35,20 +35,18 @@
 #include <vlc_threads.h>
 #include <vlc_picture_pool.h>
 #include <vlc_atomic.h>
+#include <vlc_list.h>
 #include "picture.h"
 
 #define POOL_MAX (CHAR_BIT * sizeof (unsigned long long))
-
-static_assert ((POOL_MAX & (POOL_MAX - 1)) == 0, "Not a power of two");
 
 struct picture_pool_t {
     vlc_mutex_t lock;
     vlc_cond_t  wait;
 
-    unsigned long long available;
     vlc_atomic_rc_t    refs;
-    unsigned short     picture_count;
-    picture_t  *picture[];
+    struct vlc_list inuse_list;
+    struct vlc_list available_list;
 };
 
 static void picture_pool_Destroy(picture_pool_t *pool)
@@ -56,29 +54,39 @@ static void picture_pool_Destroy(picture_pool_t *pool)
     if (!vlc_atomic_rc_dec(&pool->refs))
         return;
 
-    aligned_free(pool);
+    assert(vlc_list_is_empty(&pool->inuse_list));
+
+    free(pool);
 }
 
 void picture_pool_Release(picture_pool_t *pool)
 {
-    for (unsigned i = 0; i < pool->picture_count; i++)
-        picture_Release(pool->picture[i]);
+    picture_priv_t *priv;
+    vlc_list_foreach(priv, &pool->available_list, pool_node)
+    {
+        assert(priv->pool == pool);
+        priv->pool = NULL;
+        picture_Release(&priv->picture);
+    }
     picture_pool_Destroy(pool);
 }
 
 static void picture_pool_ReleaseClone(picture_t *clone)
 {
-    picture_priv_t *priv = (picture_priv_t *)clone;
-    uintptr_t sys = (uintptr_t)priv->gc.opaque;
-    picture_pool_t *pool = (void *)(sys & ~(POOL_MAX - 1));
-    unsigned offset = sys & (POOL_MAX - 1);
-    picture_t *picture = pool->picture[offset];
+    picture_priv_t *priv = container_of(clone, picture_priv_t, picture);
 
-    picture_Release(picture);
+    /* Retrieve the original pic that was cloned */
+    picture_t *original = priv->gc.opaque;
+    picture_priv_t *original_priv = container_of(original, picture_priv_t, picture);
+
+    picture_pool_t *pool = original_priv->pool;
+    assert(pool != NULL);
 
     vlc_mutex_lock(&pool->lock);
-    assert(!(pool->available & (1ULL << offset)));
-    pool->available |= 1ULL << offset;
+
+    vlc_list_remove(&original_priv->pool_node);
+    vlc_list_append(&original_priv->pool_node, &pool->available_list);
+
     vlc_cond_signal(&pool->wait);
     vlc_mutex_unlock(&pool->lock);
 
@@ -86,13 +94,10 @@ static void picture_pool_ReleaseClone(picture_t *clone)
 }
 
 static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
-                                            unsigned offset)
+                                            picture_t *picture)
 {
-    picture_t *picture = pool->picture[offset];
-    uintptr_t sys = ((uintptr_t)pool) + offset;
-
     picture_t *clone = picture_InternalClone(picture, picture_pool_ReleaseClone,
-                                 (void*)sys);
+                                             picture);
     if (clone != NULL) {
         assert(!picture_HasChainedPics(clone));
         vlc_atomic_rc_inc(&pool->refs);
@@ -100,28 +105,33 @@ static picture_t *picture_pool_ClonePicture(picture_pool_t *pool,
     return clone;
 }
 
+static void picture_pool_AppendPic(picture_pool_t *pool, picture_t *pic)
+{
+    picture_priv_t *priv = container_of(pic, picture_priv_t, picture);
+    assert(priv->pool == NULL);
+    vlc_list_append(&priv->pool_node, &pool->available_list);
+    priv->pool = pool;
+}
+
 picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
 {
     if (unlikely(count > POOL_MAX))
         return NULL;
 
-    picture_pool_t *pool;
-    size_t size = sizeof (*pool) + count * sizeof (picture_t *);
+    picture_pool_t *pool = malloc(sizeof(*pool));
 
-    size += (-size) & (POOL_MAX - 1);
-    pool = aligned_alloc(POOL_MAX, size);
     if (unlikely(pool == NULL))
         return NULL;
 
+    vlc_list_init(&pool->inuse_list);
+    vlc_list_init(&pool->available_list);
+
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
-    if (count == POOL_MAX)
-        pool->available = ~0ULL;
-    else
-        pool->available = (1ULL << count) - 1;
     vlc_atomic_rc_init(&pool->refs);
-    pool->picture_count = count;
-    memcpy(pool->picture, tab, count * sizeof (picture_t *));
+
+    for (unsigned i = 0; i < count; ++i)
+        picture_pool_AppendPic(pool, tab[i]);
     return pool;
 }
 
@@ -154,23 +164,38 @@ error:
     return NULL;
 }
 
+static picture_t *picture_pool_GetAvailableLocked(picture_pool_t *pool)
+{
+    picture_priv_t *priv = vlc_list_first_entry_or_null(&pool->available_list,
+                                                        picture_priv_t,
+                                                        pool_node);
+    assert(priv != NULL);
+
+    assert(priv->pool == pool);
+
+    vlc_list_remove(&priv->pool_node);
+    vlc_list_append(&priv->pool_node, &pool->inuse_list);
+
+    return &priv->picture;
+}
+
 picture_t *picture_pool_Get(picture_pool_t *pool)
 {
 
     vlc_mutex_lock(&pool->lock);
     assert(vlc_atomic_rc_get(&pool->refs) > 0);
 
-    if (pool->available == 0)
+    if (vlc_list_is_empty(&pool->available_list))
     {
         vlc_mutex_unlock(&pool->lock);
         return NULL;
     }
 
-    int i = stdc_trailing_zeros(pool->available);
-    pool->available &= ~(1ULL << i);
+    picture_t *pic = picture_pool_GetAvailableLocked(pool);
+
     vlc_mutex_unlock(&pool->lock);
 
-    return picture_pool_ClonePicture(pool, i);
+    return picture_pool_ClonePicture(pool, pic);
 }
 
 picture_t *picture_pool_Wait(picture_pool_t *pool)
@@ -178,12 +203,12 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     vlc_mutex_lock(&pool->lock);
     assert(vlc_atomic_rc_get(&pool->refs) > 0);
 
-    while (pool->available == 0)
+    while (vlc_list_is_empty(&pool->available_list))
         vlc_cond_wait(&pool->wait, &pool->lock);
 
-    int i = stdc_trailing_zeros(pool->available);
-    pool->available &= ~(1ULL << i);
+    picture_t *pic = picture_pool_GetAvailableLocked(pool);
+
     vlc_mutex_unlock(&pool->lock);
 
-    return picture_pool_ClonePicture(pool, i);
+    return picture_pool_ClonePicture(pool, pic);
 }
