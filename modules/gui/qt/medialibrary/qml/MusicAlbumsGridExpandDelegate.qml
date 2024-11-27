@@ -368,49 +368,6 @@ FocusScope {
 
             fadingEdge.backgroundColor: headerColor
 
-            property Component titleDelegate: Widgets.TableRowDelegate {
-                id: title
-
-                RowLayout {
-                    anchors.fill: parent
-
-                    Widgets.ListLabel {
-                        text: title.rowModel?.track_number ?? ""
-                        color: theme.fg.primary
-                        font.weight: Font.Normal
-
-                        Layout.fillHeight: true
-                        Layout.leftMargin: VLCStyle.margin_xxsmall
-                        Layout.preferredWidth: VLCStyle.margin_large
-                    }
-
-                    Widgets.ListLabel {
-                        text: title.rowModel?.title ?? ""
-                        color: theme.fg.primary
-
-                        Layout.fillHeight: true
-                        Layout.fillWidth: true
-                    }
-                }
-            }
-
-            property Component titleHeaderDelegate: Widgets.TableHeaderDelegate {
-                id: headerDelegate
-                Row {
-                    anchors.fill: parent
-                    Widgets.CaptionLabel {
-                        text: "#"
-                        width: VLCStyle.margin_large
-                        color: headerDelegate.colorContext.fg.secondary
-                    }
-
-                    Widgets.CaptionLabel {
-                        text: qsTr("Title")
-                        color: headerDelegate.colorContext.fg.secondary
-                    }
-                }
-            }
-
             header: Loader {
                 sourceComponent: VLCStyle.isScreenSmall
                                  ? header_small
@@ -434,7 +391,22 @@ FocusScope {
                 currentIndex = 0
             }
 
-            sortModel: [{
+            sortModel: [
+            {
+                size: .2,
+
+                model: {
+                    criteria: "track_number",
+
+                    visible: true,
+
+                    text: qsTr("#"),
+
+                    showSection: "",
+
+                    hCenterText: true
+                }
+            },{
                 weight: 1,
 
                 model: {
@@ -445,9 +417,6 @@ FocusScope {
                     text: qsTr("Title"),
 
                     showSection: "",
-
-                    colDelegate: titleDelegate,
-                    headerDelegate: titleHeaderDelegate
                 }
             }, {
                 size: 1,
