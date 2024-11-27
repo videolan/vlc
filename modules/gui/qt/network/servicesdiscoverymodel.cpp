@@ -338,6 +338,44 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
     }
 }
 
+bool ServicesDiscoveryModel::setData(const QModelIndex& index, const QVariant &value, int role)
+{
+    if ( role == Role::STATE )
+    {
+        auto i_value = value.value<ServicesDiscoveryModel::State>();
+        if ( i_value == ServicesDiscoveryModel::State::STATE_INSTALLING )
+        {
+            installService(index.row());
+        }
+        else if ( i_value == ServicesDiscoveryModel::State::STATE_UNINSTALLING )
+        {
+            removeService(index.row());
+        }
+    }
+    return true;
+}
+
+Qt::ItemFlags ServicesDiscoveryModel::flags( const QModelIndex &index ) const
+{
+    Q_D(const ServicesDiscoveryModel);
+    Qt::ItemFlags qtFlags = BaseModel::flags(index);
+
+    const SDItem* item = d->getItemForRow(index.row());
+    if (!item)
+        return qtFlags;
+
+    {
+        vlc_mutex_locker locker{&item->entry->lock};
+        addon_state_t addonState = item->entry->e_state;
+        if (addonState == ADDON_INSTALLING || addonState == ADDON_UNINSTALLING)
+            qtFlags &= ~Qt::ItemIsEnabled;
+
+    }
+    qtFlags |= Qt::ItemIsEditable;
+
+    return qtFlags;
+}
+
 QHash<int, QByteArray> ServicesDiscoveryModel::roleNames() const
 {
     return {
