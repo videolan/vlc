@@ -4012,8 +4012,6 @@ have_qt65="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
-  AC_PATH_PROGS(QMAKE6, [qmake6], qmake6, ["$PATH:${CONTRIB_DIR}/../bin"])
-
   AC_ARG_WITH([qtconf],
     AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
   )
@@ -4024,6 +4022,22 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_MSG_RESULT([yes])
     ],[
       AC_MSG_RESULT([no])
+    ])
+  ])
+
+  AC_PATH_PROGS(QMAKE6, [qmake6], qmake6)
+  AS_IF([test -z "${QMAKE6}"], [
+    have_qt="no"
+  ],[
+    AS_IF([test -n "${with_qtconf}"], [
+      QT_BIN_DIRECTORY="$(${QMAKE6} -qtconf ${with_qtconf} -query QT_HOST_BINS 2>/dev/null)"
+      AC_MSG_CHECKING([if qmake6 is found with qtconf])
+      AS_IF([test -n "${QT_BIN_DIRECTORY}" -a -x "${QT_BIN_DIRECTORY}/qmake6"], [
+        QMAKE6="${QT_BIN_DIRECTORY}/qmake6"
+        AC_MSG_RESULT([yes])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
     ])
   ])
 
