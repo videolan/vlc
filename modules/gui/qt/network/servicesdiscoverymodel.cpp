@@ -60,9 +60,9 @@ public:
                 dir.cd("art");
                 dir.mkdir("qt-addon-covers");
                 dir.cd("qt-addon-covers");
-
-                QString id = addons_uuid_to_psz( &addon->uuid );
-                QString filename = QString("addon_thumbnail_%1.png").arg(id);
+                char* uuidStr = addons_uuid_to_psz( &addon->uuid );
+                QString filename = QString("addon_thumbnail_%1.png").arg(uuidStr);
+                free(uuidStr);
                 QString absoluteFilePath =  dir.absoluteFilePath(filename);
 
                 if ( !QFileInfo::exists( absoluteFilePath )) {
