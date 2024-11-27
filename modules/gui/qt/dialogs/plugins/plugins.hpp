@@ -53,7 +53,6 @@ class ExtensionsManager;
 class AddonsManager;
 class PixmapAnimator;
 class DelegateAnimationHelper;
-class AddonsSortFilterProxyModel;
 class ServicesDiscoveryModel;
 
 extern "C" {
@@ -212,74 +211,6 @@ private:
     QList<ExtensionCopy*> extensions;
 };
 
-class AddonsListModel: public ExtensionListModel
-{
-    Q_OBJECT
-
-public:
-    AddonsListModel( AddonsManager *AM, QObject *parent = 0 );
-    virtual ~AddonsListModel();
-    QVariant data( const QModelIndex& index, int role ) const override;
-    QModelIndex index( int row, int column = 0,
-                       const QModelIndex& = QModelIndex() ) const override;
-    int rowCount( const QModelIndex& = QModelIndex() ) const override;
-    Qt::ItemFlags flags( const QModelIndex &index ) const override;
-    bool setData( const QModelIndex &index, const QVariant &value, int role ) override;
-
-    enum
-    {
-        TypeRole = FilenameRole + 1,
-        DescriptionRole,
-        UUIDRole,
-        FlagsRole,
-        StateRole,
-        DownloadsCountRole,
-        ScoreRole
-    };
-
-    static QColor getColorByAddonType( int );
-
-protected slots:
-    void addonAdded( addon_entry_t * );
-    void addonChanged( const addon_entry_t * );
-
-protected:
-
-    class Addon
-    {
-    public:
-        Addon( addon_entry_t * );
-        ~Addon();
-        bool operator==( const Addon & other ) const;
-        bool operator==( const addon_entry_t * p_other ) const;
-        QVariant data( int ) const;
-    private:
-        addon_entry_t * p_entry;
-    };
-
-    QList<Addon*> addons;
-    AddonsManager *AM;
-};
-
-class AddonsSortFilterProxyModel : public QSortFilterProxyModel
-{
-    Q_OBJECT
-
-public:
-    AddonsSortFilterProxyModel( QObject *parent = 0 );
-
-public slots:
-    virtual void setTypeFilter( int );
-    virtual void setStatusFilter( int );
-
-protected:
-    bool filterAcceptsRow( int, const QModelIndex & ) const override;
-
-private:
-    int i_type_filter;
-    int i_status_filter;
-};
-
 class ExtensionItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
@@ -350,4 +281,3 @@ public:
 };
 
 #endif
-
