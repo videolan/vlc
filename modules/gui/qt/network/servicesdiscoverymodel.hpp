@@ -98,6 +98,10 @@ public: //invokable functions
     Q_INVOKABLE void loadFromDefaultRepository();
     Q_INVOKABLE void loadFromExternalRepository(QUrl uri);
 
+    Q_INVOKABLE static QString getLabelForType(Type type);
+    Q_INVOKABLE static QColor getColorForType(Type type);
+    Q_INVOKABLE static QString getIconForType(Type type);
+
     static int getMaxScore();
 
 public: // properties

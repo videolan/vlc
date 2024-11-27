@@ -496,6 +496,81 @@ void ServicesDiscoveryModel::setStateFilter(ServicesDiscoveryModel::State state)
     emit stateFilterChanged();
 }
 
+QString ServicesDiscoveryModel::getLabelForType(ServicesDiscoveryModel::Type type)
+{
+    switch ( type )
+    {
+    case Type::TYPE_SKIN2 :
+        return qtr( "Skins" );
+    case Type::TYPE_PLAYLIST_PARSER:
+        return qtr("Playlist parsers");
+    case Type::TYPE_SERVICE_DISCOVERY:
+        return qtr("Service Discovery");
+    case Type::TYPE_INTERFACE:
+        return qtr("Interfaces");
+    case Type::TYPE_META:
+        return qtr("Art and meta fetchers");
+    case Type::TYPE_EXTENSION:
+        return qtr("Extensions");
+    default:
+        return qtr("Unknown");
+    }
+}
+
+QColor ServicesDiscoveryModel::getColorForType(ServicesDiscoveryModel::Type type)
+{
+    QColor color;
+    switch( type )
+    {
+    case Type::TYPE_EXTENSION:
+        color = QColor(0xDB, 0xC5, 0x40);
+        break;
+    case Type::TYPE_PLAYLIST_PARSER:
+        color = QColor(0x36, 0xBB, 0x59);
+        break;
+    case Type::TYPE_SERVICE_DISCOVERY:
+        color = QColor(0xDB, 0x52, 0x40);
+        break;
+    case Type::TYPE_SKIN2:
+        color = QColor(0x8B, 0xD6, 0xFC);
+        break;
+    case Type::TYPE_INTERFACE:
+        color = QColor(0x00, 0x13, 0x85);
+        break;
+    case Type::TYPE_META:
+        color = QColor(0xCD, 0x23, 0xBF);
+        break;
+    case Type::TYPE_PLUGIN:
+    case Type::TYPE_UNKNOWN:
+    case Type::TYPE_OTHER:
+    default:
+        break;
+    }
+    return color;
+}
+
+QString ServicesDiscoveryModel::getIconForType(ServicesDiscoveryModel::Type type)
+{
+    switch( type )
+    {
+    case ServicesDiscoveryModel::Type::TYPE_EXTENSION:
+        return QStringLiteral("qrc:///addons/addon_yellow.svg");
+    case ServicesDiscoveryModel::Type::TYPE_PLAYLIST_PARSER:
+        return QStringLiteral("qrc:///addons/addon_green.svg");
+    case ServicesDiscoveryModel::Type::TYPE_SERVICE_DISCOVERY:
+        return QStringLiteral("qrc:///addons/addon_red.svg");
+    case ServicesDiscoveryModel::Type::TYPE_SKIN2:
+        return QStringLiteral("qrc:///addons/addon_cyan.svg");
+    case ServicesDiscoveryModel::Type::TYPE_INTERFACE:
+        return QStringLiteral("qrc:///addons/addon_blue.svg");
+    case ServicesDiscoveryModel::Type::TYPE_META:
+        return QStringLiteral("qrc:///addons/addon_magenta.svg");
+    default:
+        return QStringLiteral("qrc:///addons/addon_default.svg");
+    }
+    vlc_assert_unreachable();
+}
+
 int ServicesDiscoveryModel::getMaxScore()
 {
     return ADDON_MAX_SCORE;
