@@ -178,6 +178,7 @@ public: //LocalListCacheLoader implementation
     }
 
 public: // data
+    MainCtx* m_ctx = nullptr;
     addons_manager_t* m_manager = nullptr;
     SDItemList m_items;
 };
@@ -190,7 +191,7 @@ ServicesDiscoveryModel::ServicesDiscoveryModel( QObject* parent )
 QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) const
 {
     Q_D(const ServicesDiscoveryModel);
-    if (!m_ctx)
+    if (!d->m_ctx)
         return {};
 
     const SDItem* item = d->getItemForRow(index.row());
@@ -279,13 +280,19 @@ void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
 {
     Q_D(ServicesDiscoveryModel);
 
-    if (ctx == m_ctx)
+    if (ctx == d->m_ctx)
         return;
 
     assert(ctx);
-    m_ctx = ctx;
+    d->m_ctx = ctx;
     d->initializeModel();
     emit ctxChanged();
+}
+
+MainCtx* ServicesDiscoveryModel::getCtx() const
+{
+    Q_D(const ServicesDiscoveryModel);
+    return d->m_ctx;
 }
 
 static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry )
@@ -322,7 +329,7 @@ static void addonChangedCallback( addons_manager_t *manager, addon_entry_t *entr
 bool ServicesDiscoveryModelPrivate::initializeModel()
 {
     Q_Q(ServicesDiscoveryModel);
-    if (m_qmlInitializing || !q->m_ctx)
+    if (m_qmlInitializing || !m_ctx)
         return false;
 
     if ( m_manager )
@@ -336,7 +343,7 @@ bool ServicesDiscoveryModelPrivate::initializeModel()
         addonChangedCallback,
     };
 
-    m_manager = addons_manager_New( VLC_OBJECT( q->m_ctx->getIntf() ), &owner );
+    m_manager = addons_manager_New( VLC_OBJECT( m_ctx->getIntf() ), &owner );
     assert( m_manager );
 
     emit q->loadingChanged();

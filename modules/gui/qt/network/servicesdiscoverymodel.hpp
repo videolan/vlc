@@ -68,14 +68,12 @@ public: //invokable functions
 
 public: // properties
     void setCtx(MainCtx* ctx);
-    inline MainCtx* getCtx() const { return m_ctx; }
+    MainCtx* getCtx() const;
 
 signals:
     void ctxChanged();
 
 private:
-    MainCtx* m_ctx = nullptr;
-
     Q_DECLARE_PRIVATE(ServicesDiscoveryModel);
 };
 
