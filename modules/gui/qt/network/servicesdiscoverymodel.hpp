@@ -46,15 +46,24 @@ public:
     };
     Q_ENUM(State)
 
-    enum Role {
-        SERVICE_NAME = Qt::UserRole + 1,
-        SERVICE_AUTHOR,
-        SERVICE_SUMMARY,
-        SERVICE_DESCRIPTION,
-        SERVICE_DOWNLOADS,
-        SERVICE_SCORE,
-        SERVICE_STATE,
-        SERVICE_ARTWORK
+    enum Role : int {
+        NAME = Qt::UserRole + 1,
+        AUTHOR,
+        SUMMARY,
+        DESCRIPTION,
+        DOWNLOADS,
+        SCORE,
+        STATE,
+        TYPE,
+        ARTWORK,
+        LINK,
+        FILENAME,
+        ADDON_VERSION, //VERSION conflicts with config.h define
+        UUID,
+        DOWNLOAD_COUNT,
+        BROKEN,
+        MANAGEABLE,
+        UPDATABLE,
     };
     Q_ENUM(Role)
 

@@ -27,6 +27,7 @@
 
 #include <memory>
 #include <QPixmap>
+#include <QQmlFile>
 
 #include <vlc_media_source.h>
 #include <vlc_addons.h>
@@ -245,34 +246,93 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
 
     switch ( role )
     {
-        case Role::SERVICE_NAME:
+        case Qt::DisplayRole:
+        case Role::NAME:
             return item->name;
-        case Role::SERVICE_AUTHOR:
+        case Role::AUTHOR:
             return item->author;
-        case Role::SERVICE_SUMMARY:
+        case Role::SUMMARY:
             return item->summary;
-        case Role::SERVICE_DESCRIPTION:
+        case Role::DESCRIPTION:
             return item->description;
-        case Role::SERVICE_DOWNLOADS:
+        case Role::DOWNLOADS:
         {
             vlc_mutex_locker locker{&item->entry->lock};
             return QVariant::fromValue( item->entry->i_downloads );
         }
-        case Role::SERVICE_SCORE:
+        case Role::SCORE:
         {
             vlc_mutex_locker locker{&item->entry->lock};
             return item->entry->i_score;
         }
-        case Role::SERVICE_STATE:
+        case Role::STATE:
         {
             vlc_mutex_locker locker{&item->entry->lock};
             return item->entry->e_state;
         }
-        case Role::SERVICE_ARTWORK:
+        case Role::ARTWORK:
         {
             vlc_mutex_locker locker{&item->entry->lock};
             return item->artworkUrl;
         }
+        case Role::TYPE:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return QVariant::fromValue(item->entry->e_type);
+        }
+        case Role::LINK:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return QString{ item->entry->psz_source_uri };
+        }
+        case Role::ADDON_VERSION:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return qfu(item->entry->psz_version);
+        }
+        case Role::UUID:
+            return item->uuid;
+        case Role::DOWNLOAD_COUNT:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return QVariant::fromValue(item->entry->i_downloads);
+        }
+        case Role::FILENAME:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            QList<QString> list;
+            addon_file_t *p_file;
+            ARRAY_FOREACH( p_file, item->entry->files )
+            list << qfu( p_file->psz_filename );
+            return QVariant{ list };
+        }
+        case  Role::BROKEN:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return item->entry->e_flags & ADDON_BROKEN;
+        }
+        case  Role::MANAGEABLE:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return item->entry->e_flags & ADDON_MANAGEABLE;
+        }
+        case  Role::UPDATABLE:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            return item->entry->e_flags & ADDON_UPDATABLE;
+        }
+
+        case Qt::ToolTipRole:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
+            if ( !( item->entry->e_flags & ADDON_MANAGEABLE ) )
+            {
+                return qtr("This addon has been installed manually. VLC can't manage it by itself.");
+            }
+            return QVariant{};
+        }
+        case Qt::DecorationRole:
+            return QPixmap{QQmlFile::urlToLocalFileOrQrc(item->artworkUrl)};
         default:
             return {};
     }
@@ -281,14 +341,23 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
 QHash<int, QByteArray> ServicesDiscoveryModel::roleNames() const
 {
     return {
-        { Role::SERVICE_NAME, "name" },
-        { Role::SERVICE_AUTHOR, "author"},
-        { Role::SERVICE_SUMMARY, "summary" },
-        { Role::SERVICE_DESCRIPTION, "description" },
-        { Role::SERVICE_DOWNLOADS, "downloads" },
-        { Role::SERVICE_SCORE, "score" },
-        { Role::SERVICE_STATE, "state" },
-        { Role::SERVICE_ARTWORK, "artwork" }
+        { Role::NAME, "name" },
+        { Role::AUTHOR, "author"},
+        { Role::SUMMARY, "summary" },
+        { Role::DESCRIPTION, "description" },
+        { Role::DOWNLOADS, "downloads" },
+        { Role::SCORE, "score" },
+        { Role::STATE, "state" },
+        { Role::ARTWORK, "artwork" },
+        { Role::TYPE, "type" },
+        { Role::LINK, "link" },
+        { Role::FILENAME, "filename" },
+        { Role::ADDON_VERSION, "version" },
+        { Role::UUID, "uuid" },
+        { Role::DOWNLOAD_COUNT, "downloadCount" },
+        { Role::BROKEN, "broken" },
+        { Role::MANAGEABLE, "manageable" },
+        { Role::UPDATABLE, "updatable" },
     };
 }
 
