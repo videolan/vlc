@@ -82,6 +82,9 @@ public: //invokable functions
     Q_INVOKABLE void installService(int idx);
     Q_INVOKABLE void removeService(int idx);
 
+    Q_INVOKABLE void loadFromDefaultRepository();
+    Q_INVOKABLE void loadFromExternalRepository(QUrl uri);
+
 public: // properties
     void setCtx(MainCtx* ctx);
     MainCtx* getCtx() const;

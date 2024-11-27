@@ -42,6 +42,10 @@ Widgets.ListViewExt {
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
+
+        Component.onCompleted: {
+            discoveryModel.loadFromDefaultRepository()
+        }
     }
 
     topMargin: VLCStyle.margin_large

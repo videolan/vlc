@@ -162,6 +162,17 @@ public:
         return nullptr;
     }
 
+    bool gatherRepository(const char* uri)
+    {
+        Q_Q(ServicesDiscoveryModel);
+        if (!m_manager)
+            return false;
+        m_loading = true;
+        emit q->loadingChanged();
+        addons_manager_Gather( m_manager, uri);
+        return true;
+    }
+
 public: //BaseModelPrivateT implementation
     bool initializeModel() override;
 
@@ -309,6 +320,17 @@ void ServicesDiscoveryModel::removeService(int idx)
     addons_manager_Remove( d->m_manager, uuid );
 }
 
+void ServicesDiscoveryModel::loadFromDefaultRepository()
+{
+    Q_D(ServicesDiscoveryModel);
+    d->gatherRepository("repo://");
+}
+
+void ServicesDiscoveryModel::loadFromExternalRepository(QUrl uri)
+{
+    Q_D(ServicesDiscoveryModel);
+    d->gatherRepository(uri.toEncoded().constData());
+}
 
 void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
 {
@@ -416,7 +438,10 @@ bool ServicesDiscoveryModelPrivate::initializeModel()
 
     emit q->loadingChanged();
     addons_manager_LoadCatalog( m_manager );
-    addons_manager_Gather( m_manager, "repo://" );
+
+    m_revision++;
+    m_loading = false;
+    emit q->loadingChanged();
     return true;
 }
 
@@ -424,8 +449,6 @@ bool ServicesDiscoveryModelPrivate::initializeModel()
 void ServicesDiscoveryModelPrivate::addonFound( AddonPtr addon )
 {
     m_items.emplace_back(std::make_shared<SDItem>(addon));
-    m_revision++;
-    invalidateCache();
 }
 
 void ServicesDiscoveryModelPrivate::addonChanged( AddonPtr addon )
@@ -443,4 +466,6 @@ void ServicesDiscoveryModelPrivate::discoveryEnded()
     assert( m_loading );
     m_loading = false;
     emit q->loadingChanged();
+    m_revision++;
+    invalidateCache();
 }
