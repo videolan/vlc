@@ -261,7 +261,7 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
         case Role::SERVICE_SCORE:
         {
             vlc_mutex_locker locker{&item->entry->lock};
-            return item->entry->i_score / 100;
+            return item->entry->i_score;
         }
         case Role::SERVICE_STATE:
         {
@@ -387,6 +387,11 @@ void ServicesDiscoveryModel::setStateFilter(ServicesDiscoveryModel::State state)
     invalidateCache();
 
     emit stateFilterChanged();
+}
+
+int ServicesDiscoveryModel::getMaxScore()
+{
+    return ADDON_MAX_SCORE;
 }
 
 static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry )

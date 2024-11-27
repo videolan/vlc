@@ -34,6 +34,8 @@ public:
     Q_PROPERTY(Type typeFilter READ getTypeFilter WRITE setTypeFilter NOTIFY typeFilterChanged FINAL)
     Q_PROPERTY(State stateFilter READ getStateFilter WRITE setStateFilter NOTIFY stateFilterChanged FINAL)
 
+    Q_PROPERTY(int maxScore READ getMaxScore CONSTANT FINAL)
+
     enum class State // equivalent to addon_state_t
     {
         STATE_NOTINSTALLED = 0,
@@ -84,6 +86,8 @@ public: //invokable functions
 
     Q_INVOKABLE void loadFromDefaultRepository();
     Q_INVOKABLE void loadFromExternalRepository(QUrl uri);
+
+    static int getMaxScore();
 
 public: // properties
     void setCtx(MainCtx* ctx);

@@ -151,7 +151,9 @@ Widgets.ListViewExt {
                 }
 
                 Widgets.CaptionLabel {
-                    text: qsTr("Score: %1/5  Downloads: %2").arg(model.score).arg(model.downloads)
+                    text: qsTr("Score: %1/5  Downloads: %2")
+                        .arg( (5 * model.score / discoveryModel.maxScore).toFixed(1) )
+                        .arg(model.downloads)
                     topPadding: VLCStyle.margin_xsmall
                     color: servicesView.colorContext.fg.secondary
                     Layout.fillWidth: true
