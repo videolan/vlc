@@ -1,7 +1,9 @@
+// SPDX-License-Identifier: LGPL-2.1-or-later
 /*****************************************************************************
  * media_player.c: Libvlc API Media Instance management functions
  *****************************************************************************
  * Copyright (C) 2005-2015 VLC authors and VideoLAN
+ * Copyright (C) 2020-2026 Alexandre Janniaux <ajanni@videolabs.io>
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -673,6 +675,12 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create( mp, "vout-cb-select-plane", VLC_VAR_ADDRESS );
 
     var_Create (mp, "dec-dev", VLC_VAR_STRING);
+
+    mp->vout.default_gl = var_GetString(mp, "gl");
+    mp->vout.default_gles2 = var_GetString(mp, "gles2");
+    mp->vout.default_vout = var_GetString(mp, "vout");
+    mp->vout.default_dec_dev = var_GetString(mp, "dec-dev");
+
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #if defined (_WIN32) || defined (__OS2__)
     var_Create (mp, "drawable-hwnd", VLC_VAR_INTEGER);
@@ -877,6 +885,11 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     libvlc_event_manager_destroy(&p_mi->event_manager);
     libvlc_media_release( p_mi->p_md );
 
+    free(p_mi->vout.default_dec_dev);
+    free(p_mi->vout.default_vout);
+    free(p_mi->vout.default_gl);
+    free(p_mi->vout.default_gles2);
+
     libvlc_instance_t *instance = p_mi->p_libvlc_instance;
     vlc_object_delete(p_mi);
     libvlc_release(instance);
@@ -1070,12 +1083,32 @@ int libvlc_media_player_set_renderer( libvlc_media_player_t *p_mi,
     return 0;
 }
 
+static void libvlc_media_player_switch_vout(libvlc_media_player_t *player,
+                                            libvlc_media_player_vout_detach_cb vout_detach)
+{
+    if (player->vout.window_detach != NULL)
+        player->vout.window_detach(player);
+    player->vout.window_detach = vout_detach;
+}
+
+static void libvlc_media_player_detach_video_callbacks(libvlc_media_player_t *player)
+{
+    var_SetAddress(player, "vmem-lock", NULL);
+    var_SetAddress(player, "vmem-unlock", NULL);
+    var_SetAddress(player, "vmem-display", NULL);
+    var_SetAddress(player, "vmem-data", NULL);
+    var_SetString(player, "dec-dev", player->vout.default_dec_dev);
+    var_SetString(player, "vout", player->vout.default_vout);
+    var_SetString(player, "window", "any");
+}
+
 void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     void *(*lock_cb) (void *, void **),
     void (*unlock_cb) (void *, void *, void *const *),
     void (*display_cb) (void *, void *),
     void *opaque )
 {
+    libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_video_callbacks);
     var_SetAddress( mp, "vmem-lock", lock_cb );
     var_SetAddress( mp, "vmem-unlock", unlock_cb );
     var_SetAddress( mp, "vmem-display", display_cb );
@@ -1102,6 +1135,27 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
     var_SetInteger( mp, "vmem-pitch", pitch );
 }
 
+static void libvlc_media_player_detach_output_callbacks(libvlc_media_player_t *player)
+{
+    var_SetString(player, "dec-dev", player->vout.default_dec_dev);
+    var_SetString(player, "vout", player->vout.default_vout);
+    var_SetString(player, "gl", player->vout.default_gl);
+    var_SetString(player, "gles", player->vout.default_gles2);
+    var_SetString(player, "window", "any");
+
+    var_SetInteger(player, "vout-cb-type", libvlc_video_engine_disable);
+    var_SetAddress(player, "vout-cb-opaque", NULL);
+    var_SetAddress(player, "vout-cb-setup", NULL);
+    var_SetAddress(player, "vout-cb-cleanup", NULL);
+    var_SetAddress(player, "vout-cb-window-cb", NULL);
+    var_SetAddress(player, "vout-cb-update-output", NULL);
+    var_SetAddress(player, "vout-cb-swap", NULL);
+    var_SetAddress(player, "vout-cb-get-proc-address", NULL);
+    var_SetAddress(player, "vout-cb-make-current", NULL);
+    var_SetAddress(player, "vout-cb-metadata", NULL);
+    var_SetAddress(player, "vout-cb-select-plane", NULL);
+}
+
 bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        libvlc_video_engine_t engine,
                                        libvlc_video_output_setup_cb setup_cb,
@@ -1116,41 +1170,47 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
                                        void *opaque)
 {
     static_assert(libvlc_video_engine_disable == 0, "No engine set must default to 0");
+
+
+    if (engine == libvlc_video_engine_disable)
+    {
+        libvlc_media_player_switch_vout(mp, NULL);
+        return true;
+    }
+
     var_SetString( mp, "window", "wextern");
 
-    if( engine == libvlc_video_engine_gles2 )
+    if (engine == libvlc_video_engine_gles2)
     {
-        var_SetString ( mp, "vout", "gles2" );
-        var_SetString ( mp, "gles2", "vgl" );
+        var_SetString(mp, "vout", "gles2");
+        var_SetString(mp, "gles2", "vgl");
+        libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_output_callbacks);
     }
-    else if( engine == libvlc_video_engine_opengl )
+    else if (engine == libvlc_video_engine_opengl)
     {
-        var_SetString ( mp, "vout", "gl" );
-        var_SetString ( mp, "gl", "vgl");
+        var_SetString(mp, "vout", "gl");
+        var_SetString(mp, "gl", "vgl");
+        libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_output_callbacks);
     }
-    else if ( engine == libvlc_video_engine_d3d11 )
+    else if (engine == libvlc_video_engine_d3d11)
     {
-        var_SetString ( mp, "vout", "d3d11drawable" );
-        var_SetString ( mp, "dec-dev", "d3d11" );
+        var_SetString(mp, "vout", "d3d11drawable");
+        var_SetString(mp, "dec-dev", "d3d11");
+        libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_output_callbacks);
     }
-    else if ( engine == libvlc_video_engine_d3d9 )
+    else if (engine == libvlc_video_engine_d3d9)
     {
-        var_SetString ( mp, "vout", "direct3d9" );
-        var_SetString ( mp, "dec-dev", "d3d9" );
+        var_SetString(mp, "vout", "direct3d9");
+        var_SetString(mp, "dec-dev", "d3d9");
+        libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_output_callbacks);
     }
-    else if ( engine == libvlc_video_engine_anw )
+    else if (engine == libvlc_video_engine_anw)
     {
         /* Force android-display is using MediaCodec or fallback to GL (any) */
-        var_SetString ( mp, "vout", "android-display,any" );
-        var_SetString ( mp, "dec-dev", "android" );
-        var_SetString( mp, "window", "android");
-    }
-    else if ( engine == libvlc_video_engine_disable )
-    {
-        // use the default display module
-        var_SetString ( mp, "vout", "any" );
-        // use the default window
-        var_SetString( mp, "window", "any" );
+        var_SetString(mp, "vout", "android-display,any");
+        var_SetString(mp, "dec-dev", "android");
+        var_SetString(mp, "window", "android");
+        libvlc_media_player_switch_vout(mp, libvlc_media_player_detach_output_callbacks);
     }
     else
         return false;
@@ -1169,6 +1229,11 @@ bool libvlc_video_set_output_callbacks(libvlc_media_player_t *mp,
     return true;
 }
 
+static void libvlc_media_player_detach_nsobject(libvlc_media_player_t *player)
+{
+    var_SetAddress(player, "drawable-nsobject", NULL);
+}
+
 /**************************************************************************
  * set_nsobject
  **************************************************************************/
@@ -1176,10 +1241,9 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
                                         void * drawable )
 {
     assert (p_mi != NULL);
+    libvlc_media_player_switch_vout(p_mi, libvlc_media_player_detach_nsobject);
+
 #ifdef __APPLE__
-    var_SetString (p_mi, "dec-dev", "any");
-    var_SetString (p_mi, "vout", "any");
-    var_SetString (p_mi, "window", "any");
     var_SetAddress (p_mi, "drawable-nsobject", drawable);
 #else
     (void)drawable;
@@ -1203,6 +1267,13 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 #endif
 }
 
+static void libvlc_media_player_detach_xwindow(libvlc_media_player_t *player)
+{
+    /* Window variable is not configurable from libvlc */
+    var_SetString(player, "window", "any");
+    var_SetInteger(player, "drawable-xid", 0);
+}
+
 /**************************************************************************
  * set_xwindow
  **************************************************************************/
@@ -1210,9 +1281,8 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable )
 {
     assert (p_mi != NULL);
+    libvlc_media_player_switch_vout(p_mi, libvlc_media_player_detach_xwindow);
 
-    var_SetString (p_mi, "dec-dev", "any");
-    var_SetString (p_mi, "vout", "any");
     var_SetString (p_mi, "window", drawable ? "embed-xid,any" : "any");
     var_SetInteger (p_mi, "drawable-xid", drawable);
 }
@@ -1225,6 +1295,13 @@ uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
     return var_GetInteger (p_mi, "drawable-xid");
 }
 
+static void libvlc_media_player_detach_hwnd(libvlc_media_player_t *player)
+{
+    /* Window variable is not configurable from libvlc */
+    var_SetString(player, "window", "any");
+    var_SetInteger(player, "drawable-hwnd", 0);
+}
+
 /**************************************************************************
  * set_hwnd
  **************************************************************************/
@@ -1232,9 +1309,8 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                                    void *drawable )
 {
     assert (p_mi != NULL);
+    libvlc_media_player_switch_vout(p_mi, libvlc_media_player_detach_hwnd);
 #if defined (_WIN32) || defined (__OS2__)
-    var_SetString (p_mi, "dec-dev", "any");
-    var_SetString (p_mi, "vout", "any");
     var_SetString (p_mi, "window",
                    (drawable != NULL) ? "embed-hwnd,any" : "any");
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
@@ -1260,6 +1336,12 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 #endif
 }
 
+static void libvlc_media_player_detach_android_context(libvlc_media_player_t *player)
+{
+    var_SetAddress(player, "drawable-androidwindow", NULL);
+}
+
+
 /**************************************************************************
  * set_android_context
  **************************************************************************/
@@ -1267,6 +1349,7 @@ void libvlc_media_player_set_android_context( libvlc_media_player_t *p_mi,
                                               void *p_awindow_handler )
 {
     assert (p_mi != NULL);
+    libvlc_media_player_switch_vout(p_mi, libvlc_media_player_detach_android_context);
 #ifdef __ANDROID__
     var_SetAddress (p_mi, "drawable-androidwindow", p_awindow_handler);
 #else

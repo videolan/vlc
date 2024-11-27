@@ -33,6 +33,7 @@
 
 #include "../modules/audio_filter/equalizer_presets.h"
 
+typedef void (*libvlc_media_player_vout_detach_cb)(libvlc_media_player_t *player);
 struct libvlc_media_player_t
 {
     struct vlc_object_t obj;
@@ -55,6 +56,23 @@ struct libvlc_media_player_t
         void *cbs_data;
         bool seeking;
     } timer;
+
+    struct {
+        /*
+         * Tracks the active libvlc window/output integration and the default
+         * values to restore when switching integrations. Each setter installs
+         * a detach callback that resets the variables it touched (vout, gl,
+         * gles2, dec-dev, window, vmem-*, vout-cb-*). The next setter calls the
+         * current detach callback before configuring its own state, so callers
+         * can safely switch between window providers and output/video callbacks
+         * without leaving stale configuration behind.
+         */
+        libvlc_media_player_vout_detach_cb window_detach;
+        char *default_dec_dev;
+        char *default_vout;
+        char *default_gl;
+        char *default_gles2;
+    } vout;
 };
 
 /**
