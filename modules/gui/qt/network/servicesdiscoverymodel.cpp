@@ -40,11 +40,12 @@ using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
 
 class SDItem {
 public:
+    //
     SDItem( AddonPtr addon )
     {
         vlc_mutex_locker locker{&addon->lock};
         name = qfu( addon->psz_name );
-        summery = qfu( addon->psz_summary ).trimmed();
+        summary = qfu( addon->psz_summary ).trimmed();
         description = qfu( addon->psz_description ).trimmed();
         author = qfu( addon->psz_author );
         sourceUrl = QUrl( addon->psz_source_uri );
@@ -86,7 +87,7 @@ public:
 public:
     QByteArray  uuid;
     QString name;
-    QString summery;
+    QString summary;
     QString description;
     QString author;
     QUrl sourceUrl;
@@ -205,7 +206,7 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
         case Role::SERVICE_AUTHOR:
             return item->author;
         case Role::SERVICE_SUMMARY:
-            return item->summery;
+            return item->summary;
         case Role::SERVICE_DESCRIPTION:
             return item->description;
         case Role::SERVICE_DOWNLOADS:
