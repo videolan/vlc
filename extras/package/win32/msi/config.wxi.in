@@ -18,14 +18,14 @@
 
     <?define Platform= "@WINDOWS_ARCH@" ?>
 
-    <?if $(var.Platform) = "x64" ?>
-        <?define Win64 = "yes" ?>
-        <?define PlatformString = "64-bit"?>
-        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
-    <?else ?>
+    <?if $(var.Platform) = "x86" ?>
         <?define Win64 = "no" ?>
         <?define PlatformString = "32-bit"?>
         <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+    <?else ?>
+        <?define Win64 = "yes" ?>
+        <?define PlatformString = "64-bit"?>
+        <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
     <?endif ?>
 
     <?define AppFolder = "VLC" ?>
