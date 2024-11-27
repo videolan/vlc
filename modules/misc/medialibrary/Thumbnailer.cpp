@@ -32,6 +32,7 @@
 
 #include <climits>
 #include <stdexcept>
+#include <climits>
 
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
     : m_ml( ml )
@@ -40,8 +41,9 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
 {
     const struct vlc_preparser_cfg cfg = []{
         struct vlc_preparser_cfg cfg{};
-        cfg.types = VLC_PREPARSER_TYPE_THUMBNAIL;
+        cfg.types = VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES;
         cfg.timeout = VLC_TICK_FROM_SEC( 3 );
+        cfg.max_thumbnailer_threads = 1;
         return cfg;
     }();
     m_thumbnailer.reset( vlc_preparser_New( VLC_OBJECT( ml ), &cfg ) );
@@ -49,14 +51,19 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         throw std::runtime_error( "Failed to instantiate a vlc_preparser_t" );
 }
 
-void Thumbnailer::onThumbnailComplete( input_item_t *, int, picture_t* thumbnail, void *data )
+void Thumbnailer::onThumbnailToFilesComplete(input_item_t *, int ,
+                                             const bool *result_array,
+                                             size_t result_count, void *data)
 {
     ThumbnailerCtx* ctx = static_cast<ThumbnailerCtx*>( data );
 
     vlc::threads::mutex_locker lock( ctx->thumbnailer->m_mutex );
     ctx->done = true;
-    if (thumbnail != nullptr)
-        ctx->thumbnail = picture_Hold(thumbnail);
+    if (result_count != 1) {
+        ctx->error = true;
+    } else {
+        ctx->error = !result_array[0];
+    }
     ctx->thumbnailer->m_currentContext = nullptr;
     ctx->thumbnailer->m_cond.broadcast();
 }
@@ -79,7 +86,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
 
     ctx.done = false;
     ctx.thumbnailer = this;
-    ctx.thumbnail = NULL;
+    ctx.error = true;
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
@@ -92,12 +99,25 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
             .hw_dec = false,
         };
 
-        static const struct vlc_thumbnailer_cbs cbs = {
-            .on_ended = onThumbnailComplete,
+        struct vlc_thumbnailer_output thumb_out = {
+            .format = VLC_THUMBNAILER_FORMAT_JPEG,
+            .width = (int)desiredWidth,
+            .height = (int)desiredHeight,
+            .crop = true,
+            .file_path = dest.c_str(),
+            .creat_mode = 0600,
         };
-        vlc_preparser_req_id requestId =
-            vlc_preparser_GenerateThumbnail( m_thumbnailer.get(), item.get(),
-                                             &thumb_arg, &cbs, &ctx );
+
+        static const struct vlc_thumbnailer_to_files_cbs cbs = {
+            .on_ended = onThumbnailToFilesComplete,
+        };
+
+        vlc_preparser_req_id requestId;
+        requestId = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(), 
+                                                           item.get(),
+                                                           &thumb_arg,
+                                                           &thumb_out, 1,
+                                                           &cbs, &ctx);
 
         if (requestId == VLC_PREPARSER_REQ_ID_INVALID)
         {
@@ -109,21 +129,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
         m_currentContext = nullptr;
     }
 
-    if ( ctx.thumbnail == nullptr )
-        return false;
-
-    block_t* block;
-    if ( picture_Export( VLC_OBJECT( m_ml ), &block, nullptr, ctx.thumbnail,
-                         VLC_CODEC_JPEG, desiredWidth, desiredHeight, true ) != VLC_SUCCESS )
-        return false;
-    auto blockPtr = vlc::wrap_cptr( block, &block_Release );
-
-    auto f = vlc::wrap_cptr( vlc_fopen( dest.c_str(), "wb" ), &fclose );
-    if ( f == nullptr )
-        return false;
-    if ( fwrite( block->p_buffer, block->i_buffer, 1, f.get() ) != 1 )
-        return false;
-    return true;
+    return !ctx.error;
 }
 
 void Thumbnailer::stop()

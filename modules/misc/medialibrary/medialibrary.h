@@ -34,6 +34,7 @@
 #include <vlc_input.h>
 #include <vlc_media_library.h>
 #include <vlc_cxx_helpers.hpp>
+#include <vlc_preparser.h>
 
 #include <cstdarg>
 #include <type_traits>
@@ -120,14 +121,10 @@ class Thumbnailer : public medialibrary::IThumbnailer
 {
     struct ThumbnailerCtx
     {
-        ~ThumbnailerCtx()
-        {
-            if ( thumbnail != nullptr )
-                picture_Release( thumbnail );
-        }
         Thumbnailer* thumbnailer;
         bool done;
-        picture_t* thumbnail;
+        bool error;
+        vlc_preparser_req_id id;
     };
 public:
     Thumbnailer(vlc_medialibrary_module_t* ml);
@@ -137,7 +134,9 @@ public:
     void stop() override;
 
 private:
-    static void onThumbnailComplete( input_item_t *, int, picture_t* thumbnail, void *data );
+    static void onThumbnailToFilesComplete(input_item_t *item, int status,
+                                           const bool *result_array,
+                                           size_t result_count, void *data);
 
 private:
     vlc_medialibrary_module_t* m_ml;
