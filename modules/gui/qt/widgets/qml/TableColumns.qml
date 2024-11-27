@@ -45,6 +45,13 @@ Item {
         return []
     }
 
+    // function (rowModel, colModel) -> string
+    // implement this function for providing custom text for title column
+    property var _titleTextProvider: function (rowModel, colModel) {
+        const text = rowModel?.[colModel.criteria]
+        return text || qsTr("Unknown Title")
+    }
+
     // this is called in reponse to user request to play
     // model is associated row data of delegate
     signal playClicked(var model)
@@ -132,61 +139,14 @@ Item {
                 onPlayIconClicked: root.playClicked(titleDel.rowModel)
             }
 
-            Column {
+            TitleText {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
 
                 Layout.topMargin: VLCStyle.margin_xxsmall
                 Layout.bottomMargin: VLCStyle.margin_xxsmall
 
-                Widgets.TextAutoScroller {
-                    id: textRect
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-
-                    height: (root.showCriterias) ? Math.round(parent.height / 2)
-                                                 : parent.height
-
-                    visible: root.showTitleText
-                    enabled: visible
-
-                    clip: scrolling
-
-                    label: text
-
-                    forceScroll: titleDel.currentlyFocused
-
-                    Widgets.ListLabel {
-                        id: text
-
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: (titleDel.rowModel && root.showTitleText)
-                              ? (titleDel.rowModel[titleDel.colModel.criteria] || qsTr("Unknown Title"))
-                              : ""
-
-                        color: titleDel.selected
-                            ? titleDel.colorContext.fg.highlight
-                            : titleDel.colorContext.fg.primary
-
-                    }
-                }
-
-                Widgets.MenuCaption {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-
-                    height: textRect.height
-
-                    visible: root.showCriterias
-                    enabled: visible
-
-                    text: (visible) ? root.getCriterias(titleDel.colModel, titleDel.rowModel) : ""
-
-                    color: titleDel.selected
-                        ? titleDel.colorContext.fg.highlight
-                        : titleDel.colorContext.fg.secondary
-                }
+                source: titleDel
             }
         }
     }
@@ -209,17 +169,12 @@ Item {
                 color: titleHeadDel.colorContext.fg.secondary
             }
 
-            Widgets.CaptionLabel {
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+            TitleHeaderText {
                 height: parent.height
 
                 color: titleHeadDel.colorContext.fg.secondary
 
                 text: titleHeadDel.colModel.text ?? ""
-                visible: root.showTitleText
-
-                Accessible.ignored: true
             }
         }
     }
@@ -237,6 +192,28 @@ Item {
             text: VLCIcons.time
             font.pixelSize: VLCStyle.icon_tableHeader
             color: parent.colorContext.fg.secondary
+        }
+    }
+
+    property Component titleTextDelegate: TableRowDelegate {
+        id: titleTextdel
+
+        TitleText {
+            anchors.fill: parent
+
+            source: titleTextdel
+        }
+    }
+
+    property Component titleTextHeaderDelegate: TableHeaderDelegate {
+        id: titleHeaderTextDel
+
+        TitleHeaderText {
+            height: parent.height
+
+            color: titleHeaderTextDel.colorContext.fg.secondary
+
+            text: titleHeaderTextDel.colModel.text ?? ""
         }
     }
 
@@ -264,6 +241,68 @@ Item {
 
         font.pixelSize: VLCStyle.fontSize_normal
         text: "000h00"
+    }
+
+    component TitleHeaderText: Widgets.CaptionLabel {
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+
+        visible: root.showTitleText
+
+        Accessible.ignored: true
+    }
+
+    component TitleText: Column {
+        required property var source
+
+        Widgets.TextAutoScroller {
+            id: textRect
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height: (root.showCriterias) ? Math.round(parent.height / 2)
+                                         : parent.height
+
+            visible: root.showTitleText
+            enabled: visible
+
+            clip: scrolling
+
+            label: text
+
+            forceScroll: source.currentlyFocused
+
+            Widgets.ListLabel {
+                id: text
+
+                anchors.verticalCenter: parent.verticalCenter
+                text: (source.rowModel && root.showTitleText)
+                      ? root._titleTextProvider(source.rowModel, source.colModel)
+                      : ""
+
+                color: source.selected
+                    ? source.colorContext.fg.highlight
+                    : source.colorContext.fg.primary
+
+            }
+        }
+
+        Widgets.MenuCaption {
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            height: textRect.height
+
+            visible: root.showCriterias
+            enabled: visible
+
+            text: (visible) ? root.getCriterias(source.colModel, source.rowModel) : ""
+
+            color: source.selected
+                ? source.colorContext.fg.highlight
+                : source.colorContext.fg.secondary
+        }
     }
 
 }
