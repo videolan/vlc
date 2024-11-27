@@ -174,7 +174,7 @@ WindowDialog {
                 }
 
                 Widgets.IconToolButton {
-                    description: qsTr("Delete the current profile")
+                    description: qsTr("Delete the current profile.\nDeleting all profiles brings back the default styles.")
                     text: VLCIcons.del
 
                     onClicked: {
