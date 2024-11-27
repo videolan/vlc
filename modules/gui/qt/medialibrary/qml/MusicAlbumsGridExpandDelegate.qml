@@ -364,6 +364,60 @@ FocusScope {
         MusicTrackListDisplay {
             id: tracks
 
+            readonly property var _titleModel: [{
+                weight: 1,
+
+                model: {
+                    criteria: "title",
+
+                    visible: true,
+
+                    text: VLCStyle.isScreenSmall ? qsTr("Tracks") : qsTr("Title"),
+
+                    showSection: "",
+
+                    subCriterias: ["track_number", "duration"],
+
+                    colDelegate: tableColumns.titleTextDelegate,
+                    headerDelegate: tableColumns.titleTextHeaderDelegate
+                }
+            }]
+
+            readonly property var _allModel: [
+            {
+                size: .2,
+
+                model: {
+                    criteria: "track_number",
+
+                    visible: true,
+
+                    text: qsTr("#"),
+
+                    showSection: "",
+
+                    hCenterText: true
+                }
+            },
+                ..._titleModel,
+            {
+                size: 1,
+
+                model: {
+                    criteria: "duration",
+
+                    visible: true,
+
+                    text: qsTr("Duration"),
+
+                    showSection: "",
+
+                    colDelegate: tableColumns.timeColDelegate,
+                    headerDelegate: tableColumns.timeHeaderDelegate
+                }
+            }]
+
+
             headerColor: theme.bg.secondary
 
             fadingEdge.backgroundColor: headerColor
@@ -391,56 +445,19 @@ FocusScope {
                 currentIndex = 0
             }
 
-            sortModel: [
-            {
-                size: .2,
-
-                model: {
-                    criteria: "track_number",
-
-                    visible: true,
-
-                    text: qsTr("#"),
-
-                    showSection: "",
-
-                    hCenterText: true
-                }
-            },{
-                weight: 1,
-
-                model: {
-                    criteria: "title",
-
-                    visible: true,
-
-                    text: qsTr("Title"),
-
-                    showSection: "",
-                }
-            }, {
-                size: 1,
-
-                model: {
-                    criteria: "duration",
-
-                    visible: true,
-
-                    text: qsTr("Duration"),
-
-                    showSection: "",
-
-                    colDelegate: tableColumns.timeColDelegate,
-                    headerDelegate: tableColumns.timeHeaderDelegate
-                }
-            }]
+            sortModel: VLCStyle.isScreenSmall
+                       ? _titleModel // use criterias text with small screens
+                       : _allModel
 
             Navigation.parentItem: root
             Navigation.leftItem: VLCStyle.isScreenSmall ? null : root.enqueueActionBtn
             Navigation.upItem: headerItem
 
+
             Widgets.MLTableColumns {
                 id: tableColumns
+
+                showCriterias: VLCStyle.isScreenSmall
             }
         }
     }
