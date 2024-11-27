@@ -208,7 +208,7 @@ T.Control {
                 Layout.fillWidth: true
 
                 font.weight: model.isCurrent ? Font.Bold : Font.DemiBold
-                text: model.title
+                text: model.title || qsTr("Unknown Title")
                 color: theme.fg.primary
             }
 
