@@ -33,6 +33,29 @@
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_addons.h>
 
+#define CHECK_ADDON_TYPE_MATCH(type) \
+    static_assert(static_cast<addon_type_t>(ServicesDiscoveryModel::Type::TYPE_ ## type) == ADDON_##type)
+
+CHECK_ADDON_TYPE_MATCH(UNKNOWN);
+CHECK_ADDON_TYPE_MATCH(PLAYLIST_PARSER);
+CHECK_ADDON_TYPE_MATCH(SERVICE_DISCOVERY);
+CHECK_ADDON_TYPE_MATCH(SKIN2);
+CHECK_ADDON_TYPE_MATCH(PLUGIN);
+CHECK_ADDON_TYPE_MATCH(INTERFACE);
+CHECK_ADDON_TYPE_MATCH(META);
+CHECK_ADDON_TYPE_MATCH(OTHER);
+
+#undef CHECK_ADDON_TYPE_MATCH
+
+#define CHECK_ADDON_STATE_MATCH(type) \
+    static_assert(static_cast<addon_state_t>(ServicesDiscoveryModel::State::STATE_ ## type) == ADDON_##type)
+
+CHECK_ADDON_STATE_MATCH(INSTALLING);
+CHECK_ADDON_STATE_MATCH(INSTALLED);
+CHECK_ADDON_STATE_MATCH(UNINSTALLING);
+
+#undef CHECK_ADDON_STATE_MATCH
+
 namespace {
 
 using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
@@ -165,14 +188,22 @@ public: //LocalListCacheLoader implementation
     //return the data matching the pattern
     SDItemList getModelData(const QString& pattern) const override
     {
-        if (pattern.isEmpty())
+        if (pattern.isEmpty()
+            && m_typeFilter == ServicesDiscoveryModel::Type::TYPE_NONE
+            && m_stateFilter == ServicesDiscoveryModel::State::STATE_NONE)
             return m_items;
 
         SDItemList items;
         std::copy_if(
             m_items.cbegin(), m_items.cend(),
             std::back_inserter(items),
-            [&pattern](const SDItemPtr& item) {
+            [&pattern, filter = m_typeFilter, state = m_stateFilter](const SDItemPtr& item) {
+                if (state != ServicesDiscoveryModel::State::STATE_NONE
+                    && static_cast<ServicesDiscoveryModel::State>(item->entry->e_state) != state)
+                    return false;
+                if (filter != ServicesDiscoveryModel::Type::TYPE_NONE
+                    && static_cast<ServicesDiscoveryModel::Type>(item->entry->e_type) != filter)
+                        return false;
                 return item->name.contains(pattern, Qt::CaseInsensitive);
             });
         return items;
@@ -182,6 +213,8 @@ public: // data
     MainCtx* m_ctx = nullptr;
     addons_manager_t* m_manager = nullptr;
     SDItemList m_items;
+    ServicesDiscoveryModel::Type m_typeFilter = ServicesDiscoveryModel::Type::TYPE_NONE;
+    ServicesDiscoveryModel::State m_stateFilter = ServicesDiscoveryModel::State::STATE_NONE;
 };
 
 ServicesDiscoveryModel::ServicesDiscoveryModel( QObject* parent )
@@ -296,10 +329,46 @@ MainCtx* ServicesDiscoveryModel::getCtx() const
     return d->m_ctx;
 }
 
+ServicesDiscoveryModel::Type ServicesDiscoveryModel::getTypeFilter() const
+{
+    Q_D(const ServicesDiscoveryModel);
+    return d->m_typeFilter;
+}
+
+void ServicesDiscoveryModel::setTypeFilter(ServicesDiscoveryModel::Type type)
+{
+    Q_D(ServicesDiscoveryModel);
+    if (type == d->m_typeFilter)
+        return;
+    d->m_typeFilter = type;
+
+    d->m_revision++;
+    invalidateCache();
+
+    emit typeFilterChanged();
+}
+
+ServicesDiscoveryModel::State ServicesDiscoveryModel::getStateFilter() const
+{
+    Q_D(const ServicesDiscoveryModel);
+    return d->m_stateFilter;
+}
+
+void ServicesDiscoveryModel::setStateFilter(ServicesDiscoveryModel::State state)
+{
+    Q_D(ServicesDiscoveryModel);
+    if (state == d->m_stateFilter)
+        return;
+    d->m_stateFilter = state;
+
+    d->m_revision++;
+    invalidateCache();
+
+    emit stateFilterChanged();
+}
+
 static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry )
 {
-    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
-        return;
     ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
     QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
         {
@@ -318,8 +387,6 @@ static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
 
 static void addonChangedCallback( addons_manager_t *manager, addon_entry_t *entry )
 {
-    if (entry->e_type != ADDON_SERVICE_DISCOVERY)
-        return;
     ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
     QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
         {

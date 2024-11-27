@@ -38,6 +38,7 @@ Widgets.ListViewExt {
 
         ctx: MainCtx
 
+        typeFilter: ServicesDiscoveryModel.TYPE_SERVICE_DISCOVERY
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
@@ -111,25 +112,25 @@ Widgets.ListViewExt {
                         id: action_btn
 
                         focus: true
-                        iconTxt: model.state === ServicesDiscoveryModel.INSTALLED ? VLCIcons.del : VLCIcons.add
-                        busy: model.state === ServicesDiscoveryModel.INSTALLING || model.state === ServicesDiscoveryModel.UNINSTALLING
+                        iconTxt: model.state === ServicesDiscoveryModel.STATE_INSTALLED ? VLCIcons.del : VLCIcons.add
+                        busy: model.state === ServicesDiscoveryModel.STATE_INSTALLING || model.state === ServicesDiscoveryModel.STATE_UNINSTALLING
                         text: {
                             switch(model.state) {
-                            case ServicesDiscoveryModel.INSTALLED:
+                            case ServicesDiscoveryModel.STATE_INSTALLED:
                                 return qsTr("Remove")
-                            case ServicesDiscoveryModel.NOTINSTALLED:
+                            case ServicesDiscoveryModel.STATE_NOTINSTALLED:
                                 return qsTr("Install")
-                            case ServicesDiscoveryModel.INSTALLING:
+                            case ServicesDiscoveryModel.STATE_INSTALLING:
                                 return qsTr("Installing")
-                            case ServicesDiscoveryModel.UNINSTALLING:
+                            case ServicesDiscoveryModel.STATE_UNINSTALLING:
                                 return qsTr("Uninstalling")
                             }
                         }
 
                         onClicked: {
-                            if (model.state === ServicesDiscoveryModel.NOTINSTALLED)
+                            if (model.state === ServicesDiscoveryModel.STATE_NOTINSTALLED)
                                 discoveryModel.installService(index)
-                            else if (model.state === ServicesDiscoveryModel.INSTALLED)
+                            else if (model.state === ServicesDiscoveryModel.STATE_INSTALLED)
                                 discoveryModel.removeService(index)
                         }
                     }

@@ -19,10 +19,6 @@
 #ifndef MLServicesDiscoveryModel_HPP
 #define MLServicesDiscoveryModel_HPP
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "util/base_model.hpp"
 #include "maininterface/mainctx.hpp"
 
@@ -34,13 +30,17 @@ class ServicesDiscoveryModel : public BaseModel
 public:
 
     Q_PROPERTY(MainCtx* ctx READ getCtx WRITE setCtx NOTIFY ctxChanged FINAL)
+    //filter list by to match addonTypeFilter, set to NONE to disable filtering
+    Q_PROPERTY(Type typeFilter READ getTypeFilter WRITE setTypeFilter NOTIFY typeFilterChanged FINAL)
+    Q_PROPERTY(State stateFilter READ getStateFilter WRITE setStateFilter NOTIFY stateFilterChanged FINAL)
 
-    enum State // equivalent to addon_state_t
+    enum class State // equivalent to addon_state_t
     {
-        NOTINSTALLED = 0,
-        INSTALLING,
-        INSTALLED,
-        UNINSTALLING
+        STATE_NOTINSTALLED = 0,
+        STATE_INSTALLING,
+        STATE_INSTALLED,
+        STATE_UNINSTALLING,
+        STATE_NONE //not defined in addon_state_t
     };
     Q_ENUM(State)
 
@@ -56,6 +56,22 @@ public:
     };
     Q_ENUM(Role)
 
+    enum class Type // equivalent as addon_type_t
+    {
+        TYPE_UNKNOWN = 0,
+        TYPE_EXTENSION,
+        TYPE_PLAYLIST_PARSER,
+        TYPE_SERVICE_DISCOVERY,
+        TYPE_SKIN2,
+        TYPE_PLUGIN,
+        TYPE_INTERFACE,
+        TYPE_META,
+        TYPE_OTHER,
+        TYPE_NONE //not defined in addon_type_t
+    };
+    Q_ENUM(Type)
+
+
     explicit ServicesDiscoveryModel(QObject* parent = nullptr);
 
 public: //QAbstractListModel override
@@ -70,8 +86,16 @@ public: // properties
     void setCtx(MainCtx* ctx);
     MainCtx* getCtx() const;
 
+    State getStateFilter() const;
+    void setStateFilter(State state);
+
+    Type getTypeFilter() const;
+    void setTypeFilter(Type type);
+
 signals:
     void ctxChanged();
+    void stateFilterChanged();
+    void typeFilterChanged();
 
 private:
     Q_DECLARE_PRIVATE(ServicesDiscoveryModel);
