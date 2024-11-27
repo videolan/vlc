@@ -35,7 +35,7 @@ FocusScope {
 
     property Component tableHeaderDelegate:  TableHeaderDelegate {
         Widgets.CaptionLabel {
-            horizontalAlignment: Text.AlignLeft
+            horizontalAlignment: colModel.hCenterText ? Text.AlignHCenter : Text.AlignLeft
             verticalAlignment: Text.AlignVCenter
 
             anchors.fill: parent

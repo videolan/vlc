@@ -74,6 +74,11 @@ T.Control {
                 id: text
 
                 anchors.verticalCenter: parent.verticalCenter
+
+                width: parent.width
+
+                horizontalAlignment: defaultDelId.colModel.hCenterText ? Text.AlignHCenter : Text.AlignLeft
+
                 text: defaultDelId.rowModel[defaultDelId.colModel.criteria] ?? ""
 
                 color: defaultDelId.selected
