@@ -42,6 +42,7 @@ class SDItem {
 public:
     SDItem( AddonPtr addon )
     {
+        vlc_mutex_locker locker{&addon->lock};
         name = qfu( addon->psz_name );
         summery = qfu( addon->psz_summary ).trimmed();
         description = qfu( addon->psz_description ).trimmed();
@@ -207,13 +208,25 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
         case Role::SERVICE_DESCRIPTION:
             return item->description;
         case Role::SERVICE_DOWNLOADS:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
             return QVariant::fromValue( item->entry->i_downloads );
+        }
         case Role::SERVICE_SCORE:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
             return item->entry->i_score / 100;
+        }
         case Role::SERVICE_STATE:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
             return item->entry->e_state;
+        }
         case Role::SERVICE_ARTWORK:
+        {
+            vlc_mutex_locker locker{&item->entry->lock};
             return item->artworkUrl;
+        }
         default:
             return {};
     }
