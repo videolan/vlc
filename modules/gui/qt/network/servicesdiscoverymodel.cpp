@@ -48,6 +48,7 @@ public:
         author = qfu( addon->psz_author );
         sourceUrl = QUrl( addon->psz_source_uri );
         entry = addon;
+        uuid = QByteArray( reinterpret_cast<const char*>(addon->uuid), sizeof( addon_uuid_t ));
 
         if ( addon->psz_image_data ) {
             char *cDir = config_GetUserDir( VLC_CACHE_DIR );
@@ -82,6 +83,7 @@ public:
     }
 
 public:
+    QByteArray  uuid;
     QString name;
     QString summery;
     QString description;
@@ -102,7 +104,7 @@ template<>
 bool ListCache<SDItemPtr>::compareItems(const SDItemPtr& a, const SDItemPtr& b)
 {
     //just compare the pointers here
-    return a == b;
+    return a->uuid == b->uuid;
 }
 
 // ServicesDiscoveryModelPrivate
@@ -240,7 +242,8 @@ void ServicesDiscoveryModel::installService(int idx)
         return;
 
     addon_uuid_t uuid;
-    memcpy( uuid, item->entry->uuid, sizeof( uuid ) );
+    assert(sizeof(uuid) == item->uuid.size());
+    memcpy( uuid, item->uuid.constData(), sizeof( uuid ) );
     addons_manager_Install( d->m_manager, uuid );
 }
 
@@ -253,7 +256,8 @@ void ServicesDiscoveryModel::removeService(int idx)
         return;
 
     addon_uuid_t uuid;
-    memcpy( uuid, item->entry->uuid, sizeof( uuid ) );
+    assert(sizeof(uuid) == item->uuid.size());
+    memcpy( uuid, item->uuid.constData(), sizeof( uuid ) );
     addons_manager_Remove( d->m_manager, uuid );
 }
 
