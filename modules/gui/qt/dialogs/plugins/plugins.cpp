@@ -354,46 +354,48 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     leftPane->layout()->addWidget( searchInput );
     leftPane->layout()->addItem( new QSpacerItem( 0, 10 ) );
 
-    QToolButton * button;
     signalMapper = new QSignalMapper();
-#define ADD_CATEGORY( label, ltooltip, numb ) \
-    button = new QToolButton( this );\
-    button->setIcon( iconFromCategory( numb ) ); \
-    button->setText( label );\
-    button->setToolTip( ltooltip );\
-    button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );\
-    button->setIconSize( QSize( 32, 32 ) );\
-    button->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Maximum) ;\
-    button->setMinimumSize( 32, 32 );\
-    button->setAutoRaise( true );\
-    button->setCheckable( true );\
-    if ( numb == -1 ) button->setChecked( true );\
-    button->setAutoExclusive( true );\
-    connect( button, &QToolButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map) );\
-    signalMapper->setMapping( button, numb );\
-    leftPane->layout()->addWidget( button );
 
-    ADD_CATEGORY( qtr("All"), qtr("Interface Settings"),
+    auto addCategory = [this, leftPane]( const QString& label, const QString& ltooltip, int numb) {
+        auto button = new QToolButton( this );
+        button->setIcon( iconFromCategory( numb ) );
+        button->setText( label );
+        button->setToolTip( ltooltip );
+        button->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+        button->setIconSize( QSize( 32, 32 ) );
+        button->setSizePolicy(QSizePolicy::MinimumExpanding,QSizePolicy::Maximum) ;
+        button->setMinimumSize( 32, 32 );
+        button->setAutoRaise( true );
+        button->setCheckable( true );
+        if ( numb == -1 )
+            button->setChecked( true );
+        button->setAutoExclusive( true );
+        connect( button, &QToolButton::clicked, signalMapper, QOverload<>::of(&QSignalMapper::map) );
+        signalMapper->setMapping( button, numb );
+        leftPane->layout()->addWidget( button );
+    };
+
+    addCategory( qtr("All"), qtr("Interface Settings"),
                   -1 );
-    ADD_CATEGORY( qtr("Skins"),
+    addCategory( qtr("Skins"),
                   qtr( "Skins customize player's appearance."
                        " You can activate them through preferences." ),
                   ADDON_SKIN2 );
-    ADD_CATEGORY( qtr("Playlist parsers"),
+    addCategory( qtr("Playlist parsers"),
                   qtr( "Playlist parsers add new capabilities to read"
                        " internet streams or extract meta data." ),
                   ADDON_PLAYLIST_PARSER );
-    ADD_CATEGORY( qtr("Service Discovery"),
+    addCategory( qtr("Service Discovery"),
                   qtr( "Service discoveries adds new sources to your playlist"
                        " such as web radios, video websites, ..." ),
                   ADDON_SERVICE_DISCOVERY );
-    ADD_CATEGORY( qtr("Interfaces"),
+    addCategory( qtr("Interfaces"),
                   "",
                   ADDON_INTERFACE );
-    ADD_CATEGORY( qtr("Art and meta fetchers"),
+    addCategory( qtr("Art and meta fetchers"),
                   qtr( "Retrieves extra info and art for playlist items" ),
                   ADDON_META );
-    ADD_CATEGORY( qtr("Extensions"),
+    addCategory( qtr("Extensions"),
                   qtr( "Extensions brings various enhancements."
                        " Check descriptions for more details" ),
                   ADDON_EXTENSION );
