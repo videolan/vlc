@@ -97,7 +97,7 @@ signals:
 public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-protected:
+public:
     void classBegin() override;
     void componentComplete() override;
 
