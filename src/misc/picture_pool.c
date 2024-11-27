@@ -38,7 +38,7 @@
 #include <vlc_list.h>
 #include "picture.h"
 
-#define POOL_MAX (CHAR_BIT * sizeof (unsigned long long))
+#define POOL_MAX 256
 
 struct picture_pool_t {
     vlc_mutex_t lock;
