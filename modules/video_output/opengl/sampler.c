@@ -740,7 +740,10 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
     const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(chroma);
     if (desc == NULL)
+    {
+        msg_Dbg(priv->gl, "opengl sampler: unknown chroma description %4.4s", (const char *)&chroma);
         return VLC_EGENERIC;
+    }
 
     unsigned tex_count = glfmt->tex_count;
 
@@ -755,10 +758,16 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
     {
         ret = sampler_yuv_base_init(sampler, desc, yuv_space);
         if (ret != VLC_SUCCESS)
+        {
+            msg_Dbg(priv->gl, "opengl sampler: could not initialize YUV shaders for %4.4s", (const char *)&chroma);
             return ret;
+        }
         ret = opengl_init_swizzle(sampler, swizzle_per_tex, desc);
         if (ret != VLC_SUCCESS)
+        {
+            msg_Dbg(priv->gl, "opengl sampler: could not determine swizzle for %4.4s", (const char *)&chroma);
             return ret;
+        }
     }
 
     const char *glsl_sampler, *lookup;
@@ -1092,6 +1101,7 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     priv->pl_opengl = pl_opengl_create(priv->pl_log, &gl_params);
     if (!priv->pl_opengl)
     {
+        msg_Dbg(gl, "opengl sampler: could not initialize libplacebo");
         vlc_gl_sampler_Delete(sampler);
         return NULL;
     }
@@ -1109,7 +1119,10 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     int ret = opengl_fragment_shader_init(sampler, expose_planes);
     if (ret != VLC_SUCCESS)
+    {
+        msg_Dbg(gl, "opengl sampler: could not initialize shaders");
         goto error;
+    }
 
     return sampler;
 
