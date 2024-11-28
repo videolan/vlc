@@ -50,7 +50,6 @@ class ExtensionListItem;
 class SearchLineEdit;
 class ExtensionCopy;
 class ExtensionsManager;
-class AddonsManager;
 class PixmapAnimator;
 class DelegateAnimationHelper;
 class ServicesDiscoveryModel;

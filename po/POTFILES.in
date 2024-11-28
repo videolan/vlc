@@ -709,8 +709,6 @@ modules/gui/qt/dialogs/open/openurl.cpp
 modules/gui/qt/dialogs/open/openurl.hpp
 modules/gui/qt/dialogs/playlists/playlists.cpp
 modules/gui/qt/dialogs/playlists/playlists.hpp
-modules/gui/qt/dialogs/plugins/addons_manager.cpp
-modules/gui/qt/dialogs/plugins/addons_manager.hpp
 modules/gui/qt/dialogs/plugins/plugins.cpp
 modules/gui/qt/dialogs/plugins/plugins.hpp
 modules/gui/qt/dialogs/podcast/podcast_configuration.cpp

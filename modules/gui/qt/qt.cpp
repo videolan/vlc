@@ -78,7 +78,6 @@ extern "C" char **environ;
 #endif
 #include "style/defaultthemeproviders.hpp"
 #include "dialogs/extensions/extensions_manager.hpp" /* Extensions manager */
-#include "dialogs/plugins/addons_manager.hpp" /* Addons manager */
 #include "dialogs/help/help.hpp"     /* Launch Update */
 #include "util/dismiss_popup_event_filter.hpp"
 #include "maininterface/compositor.hpp"
@@ -1124,7 +1123,6 @@ static void *ThreadCleanup( qt_intf_t *p_intf, CleanupReason cleanupReason )
 
     /* */
     ExtensionsManager::killInstance();
-    AddonsManager::killInstance();
 
     /* Destroy all remaining windows,
        because some are connected to some slots
