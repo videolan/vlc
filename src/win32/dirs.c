@@ -233,8 +233,10 @@ static char *config_GetAppDir (void)
         if (lastDir)
         {
             *lastDir = L'\0';
-            if (wcscat_s(path, ARRAY_SIZE(path), TEXT("\\portable")) == 0)
+            size_t pathlen = wcslen(path);
+            if ( pathlen + 1 + wcslen(L"\\portable" ) <= MAX_PATH )
             {
+                wcscpy( &path[pathlen], L"\\portable" );
                 DWORD attrib = GetFileAttributesW (path);
                 if (attrib != INVALID_FILE_ATTRIBUTES &&
                         (attrib & FILE_ATTRIBUTE_DIRECTORY))
