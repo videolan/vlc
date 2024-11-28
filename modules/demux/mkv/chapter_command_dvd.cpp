@@ -610,6 +610,7 @@ bool dvd_command_interpretor_c::HandleKeyEvent( NavivationKey key )
     case POPUP:
         return false;
     }
+    vlc_assert_unreachable();
 }
 
 void dvd_command_interpretor_c::HandleMousePressed( unsigned x, unsigned y )
