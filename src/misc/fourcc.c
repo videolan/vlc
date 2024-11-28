@@ -554,6 +554,10 @@ static const vlc_fourcc_t p_list_YUV[] = {
     0,
 };
 
+static const vlc_fourcc_t p_list_YUV_no_fallback[] = {
+    VLC_CODEC_V308,
+};
+
 /* */
 static const vlc_fourcc_t p_RGB32_fallback[] = {
     VLC_CODEC_XRGB,
@@ -662,6 +666,12 @@ bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
     for( unsigned i = 0; p_list_YUV[i]; i++ )
     {
         if( p_list_YUV[i] == fcc )
+            return true;
+    }
+
+    for (size_t i = 0; i < ARRAY_SIZE(p_list_YUV_no_fallback); i++)
+    {
+        if (p_list_YUV_no_fallback[i] == fcc)
             return true;
     }
     return false;
