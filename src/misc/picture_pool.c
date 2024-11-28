@@ -113,11 +113,9 @@ static void picture_pool_AppendPic(picture_pool_t *pool, picture_t *pic)
     priv->pool = pool;
 }
 
-picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
+static picture_pool_t *
+picture_pool_NewCommon(void)
 {
-    if (unlikely(count > POOL_MAX))
-        return NULL;
-
     picture_pool_t *pool = malloc(sizeof(*pool));
 
     if (unlikely(pool == NULL))
@@ -129,6 +127,18 @@ picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
     vlc_atomic_rc_init(&pool->refs);
+
+    return pool;
+}
+
+picture_pool_t *picture_pool_New(unsigned count, picture_t *const *tab)
+{
+    if (unlikely(count > POOL_MAX))
+        return NULL;
+
+    picture_pool_t *pool = picture_pool_NewCommon();
+    if (unlikely(pool == NULL))
+        return NULL;
 
     for (unsigned i = 0; i < count; ++i)
         picture_pool_AppendPic(pool, tab[i]);
