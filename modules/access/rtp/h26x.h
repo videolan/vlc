@@ -101,7 +101,7 @@ static void h26x_add_xps(void *priv, uint8_t *xps, size_t xpssz)
     *ppp_append = &((**ppp_append)->p_next);
 }
 
-static block_t * h26x_fillextradata (const char *psz)
+static inline block_t * h26x_fillextradata (const char *psz)
 {
     block_t *xps = NULL;
     block_t **pxps = &xps;
@@ -148,7 +148,7 @@ static void h26x_output(struct rtp_h26x_sys *sys,
     }
 }
 
-static void h26x_output_blocks(struct rtp_h26x_sys *sys, bool b_annexb)
+static inline void h26x_output_blocks(struct rtp_h26x_sys *sys, bool b_annexb)
 {
     if(!sys->p_packets)
         return;
