@@ -153,25 +153,22 @@ picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt,
     if (unlikely(count > POOL_MAX))
         return NULL;
 
-    picture_t *picture[POOL_MAX];
-    unsigned i;
+    picture_pool_t *pool = picture_pool_NewCommon();
+    if (unlikely(pool == NULL))
+        return NULL;
 
-    for (i = 0; i < count; i++) {
-        picture[i] = picture_NewFromFormat(fmt);
-        if (picture[i] == NULL)
-            goto error;
+    for (unsigned i = 0; i < count; ++i)
+    {
+        picture_t *pic = picture_NewFromFormat(fmt);
+        if (pic == NULL)
+        {
+            picture_pool_Release(pool);
+            return NULL;
+        }
+        picture_pool_AppendPic(pool, pic);
     }
 
-    picture_pool_t *pool = picture_pool_New(count, picture);
-    if (!pool)
-        goto error;
-
     return pool;
-
-error:
-    while (i > 0)
-        picture_Release(picture[--i]);
-    return NULL;
 }
 
 static picture_t *picture_pool_GetAvailableLocked(picture_pool_t *pool)
