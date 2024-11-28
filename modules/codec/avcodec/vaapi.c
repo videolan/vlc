@@ -263,6 +263,11 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
     {
         case AV_CODEC_ID_AV1:
         {
+            /* Tested with ffmpeg @2d077f9, and few AV1 samples, 10 extra
+             * pictures are needed to avoid deadlocks (cf. commit description)
+             * when playing and seeking. */
+            cfg->extra_pictures = 10;
+
             int ret = CheckCodecConfig(va, ctx, va_dpy, cfg->desc);
             if (ret != VLC_SUCCESS)
                 return ret;
