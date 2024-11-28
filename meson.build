@@ -528,7 +528,6 @@ if get_option('extra_checks')
     add_project_arguments(cpp.get_supported_arguments([
         '-Werror=missing-field-initializers',
         '-Werror=format',
-        '-Werror=return-mismatch'
     ]), language: ['cpp'])
 endif
 
