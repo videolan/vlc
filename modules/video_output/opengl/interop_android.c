@@ -238,8 +238,22 @@ Open(struct vlc_gl_interop *interop)
     interop->ops = &ops;
 
     interop->tex_target = GL_TEXTURE_EXTERNAL_OES;
-    interop->fmt_out.i_chroma = VLC_CODEC_RGBA;
-    interop->fmt_out.space = COLOR_SPACE_UNDEF;
+    if (vlc_gl_HasExtension(&extension_vt, "GL_EXT_YUV_target"))
+    {
+        msg_Warn(&interop->obj, "GL_EXT_YUV_target is available,"
+                " using it.");
+        /* We represent as Packed YUV 4:4:4 since there is a single
+         * texture target available. */
+        interop->fmt_out.i_chroma = VLC_CODEC_V308;
+        interop->fmt_out.space = interop->fmt_in.space;
+        interop->fmt_out.primaries = interop->fmt_in.primaries;
+        interop->fmt_out.transfer = interop->fmt_in.transfer;
+    }
+    else
+    {
+        interop->fmt_out.i_chroma = VLC_CODEC_RGBA;
+        interop->fmt_out.space = COLOR_SPACE_UNDEF;
+    }
 
     interop->tex_count = 1;
     interop->texs[0] = (struct vlc_gl_tex_cfg) {
