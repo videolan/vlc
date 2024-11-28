@@ -806,7 +806,10 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     struct vlc_gl_sampler *sampler =
         vlc_gl_sampler_New(filter->gl, filter->api, glfmt, false);
     if (!sampler)
+    {
+        msg_Dbg(&filter->obj, "Could not create sampler for renderer");
         return VLC_EGENERIC;
+    }
 
     struct vlc_gl_renderer *renderer = calloc(1, sizeof(*renderer));
     if (!renderer)
@@ -844,6 +847,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     int ret = opengl_link_program(filter);
     if (ret != VLC_SUCCESS)
     {
+        msg_Dbg(&filter->obj, "Could not link shaders");
         free(renderer);
         return ret;
     }
