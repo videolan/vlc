@@ -778,6 +778,7 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_P012,                  SEMIPLANAR(2, 2, 12) },
     { VLC_CODEC_P016,                  SEMIPLANAR(2, 2, 16) },
 
+    { VLC_CODEC_V308,                  PACKED_FMT(1, 24) },
     { VLC_CODEC_YUYV,                  PACKED_FMT(2, 16) },
     { VLC_CODEC_YVYU,                  PACKED_FMT(2, 16) },
     { VLC_CODEC_UYVY,                  PACKED_FMT(2, 16) },
