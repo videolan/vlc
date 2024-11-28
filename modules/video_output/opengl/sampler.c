@@ -525,6 +525,10 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                 swizzle_per_tex[0] = "r";
                 swizzle_per_tex[1] = "ag";
                 break;
+            case VLC_CODEC_V308:
+                swizzle_per_tex[0] = "rgb";
+                assert(sampler->glfmt.tex_count == 1);
+                break;
             default:
                 assert(!"missing chroma");
                 return VLC_EGENERIC;
@@ -543,10 +547,12 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
         (priv->gl->api_type == VLC_OPENGL && priv->glsl_version >= 130) ||
         (priv->gl->api_type == VLC_OPENGL_ES2 && priv->glsl_version >= 300);
 
+    const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
+
     switch (tex_target)
     {
         case GL_TEXTURE_EXTERNAL_OES:
-            *glsl_sampler = "samplerExternalOES";
+            *glsl_sampler = is_yuv ? "__samplerExternal2DY2YEXT" : "samplerExternalOES";
             *texture = has_texture_func ? "texture" : "texture2D";
             break;
         case GL_TEXTURE_2D:
@@ -566,14 +572,21 @@ static int
 InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
 {
     struct vlc_gl_sampler_priv *priv = PRIV(sampler);
+    const bool is_yuv = vlc_fourcc_IsYUV(sampler->glfmt.fmt.i_chroma);
 
     const char *image_external = priv->glsl_version >= 300
         ? "#extension GL_OES_EGL_image_external_essl3 : require\n"
         : "#extension GL_OES_EGL_image_external : require\n";
 
+    const char *ext_yuv_target =
+        "#extension GL_EXT_YUV_target : require\n";
+
     if (tex_target == GL_TEXTURE_EXTERNAL_OES)
     {
-        sampler->shader.extensions = strdup(image_external);
+        if (is_yuv)
+            sampler->shader.extensions = strdup(ext_yuv_target);
+        else
+            sampler->shader.extensions = strdup(image_external);
         if (!sampler->shader.extensions)
             return VLC_EGENERIC;
     }
