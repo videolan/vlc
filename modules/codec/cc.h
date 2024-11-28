@@ -37,6 +37,7 @@ enum cc_payload_type_e
     CC_PAYLOAD_DVD,
     CC_PAYLOAD_REPLAYTV,
     CC_PAYLOAD_SCTE20,
+    CC_PAYLOAD_CDP,
 };
 typedef struct
 {
@@ -336,7 +337,7 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         }
         c->b_reorder = false;
     }
-    else /* CC_PAYLOAD_SCTE20 */
+    else if( i_payload_type == CC_PAYLOAD_SCTE20 )
     {
         /* user_data(2)
          *          (u32 stripped earlier)
@@ -383,6 +384,68 @@ static inline void cc_Extract( cc_data_t *c, enum cc_payload_type_e i_payload_ty
         }
         c->b_reorder = true;
     }
+    else // CC_PAYLOAD_CDP
+    {
+#       define CDP_FLAG_TIME_CODE_PRESENT  (1<<7)
+#       define CDP_FLAG_CC_DATA_PRESENT    (1<<6)
+#       define CDP_FLAG_SVC_INFO_PRESENT   (1<<5)
+#       define CDP_FLAG_SVC_INFO_START     (1<<4)
+#       define CDP_FLAG_SVC_INFO_CHANGE    (1<<3)
+#       define CDP_FLAG_SVC_INFO_COMPLETE  (1<<2)
+#       define CDP_FLAG_CAPTION_SVC_ACTIVE (1<<1)
+
+        if(i_src < 7)
+            return;
+
+        /* ST334-2 5.2 cdp_header() */
+        uint8_t cdp_length = p_src[2];
+        if(cdp_length < 8 || cdp_length > i_src)
+            return;
+        uint8_t cdp_flags = p_src[4];
+
+        /* skip header */
+        p_src += 7; i_src -= 7;
+
+        /* 5.3 time_code_section() */
+        if( cdp_flags & CDP_FLAG_TIME_CODE_PRESENT )
+        {
+            if( i_src < 5 ) // Shall be 5 bytes
+                return;
+            p_src += 5; i_src += 5;
+        }
+        /* 5.4 ccdata_section */
+        if( cdp_flags & CDP_FLAG_CC_DATA_PRESENT )
+        {
+            /* ccdata_section()
+             *      u8 0x72
+             *      u3 marker bits(111)
+             *      u5 cc_count
+             *      for cc_count
+             *          u5 marker bits(1111 1)
+             *          u1 cc_valid
+             *          u2 cc_type
+             *          u8 cc_data_1
+             *          u8 cc_data_2
+             */
+            if( i_src < 2 || p_src[0] != 0x72 ) // marker
+                return;
+
+            const uint8_t *cc = &p_src[1];
+            const int i_count_cc = cc[0]&0x1f;
+
+            if( i_src - 2 < i_count_cc*3 )  // broken packet
+                return;
+            cc += 1;
+            for( int i = 0; i < i_count_cc; i++, cc += 3 )
+            {
+                if( c->i_data + 3 > CC_MAX_DATA_SIZE )
+                    break;
+                cc_AppendData( c, cc[0], &cc[1] );
+            }
+        }
+        /* remaining data */
+        c->b_reorder = false;
+    }
 }
 
 
@@ -428,6 +491,10 @@ static inline void cc_ProbeAndExtract( cc_data_t *c, bool b_top_field_first, con
         i_payload_type = CC_PAYLOAD_GA94;
         i_src -= 2;
         p_src += 2;
+    }
+    else if (p_src[0] == 0x96 && p_src[1] == 0x69) /* CDP */
+    {
+        i_payload_type = CC_PAYLOAD_CDP;
     }
     else
     {
