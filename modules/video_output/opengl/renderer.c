@@ -812,7 +812,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
     if (!renderer)
     {
         vlc_gl_sampler_Delete(sampler);
-        return VLC_EGENERIC;
+        return VLC_ENOMEM;
     }
 
     static const struct vlc_gl_filter_ops filter_ops = {
