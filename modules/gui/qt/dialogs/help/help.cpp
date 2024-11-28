@@ -425,6 +425,9 @@ void UpdateDialog::updateUI( )
             qtr( "Checking for updates..." ) );
         break;
     }
+    case UpdateModel::Unchecked:
+        // do nothing
+        break;
     }
 }
 
