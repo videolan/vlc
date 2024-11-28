@@ -1030,30 +1030,22 @@ bool AddonsSortFilterProxyModel::filterAcceptsRow( int source_row,
     return true;
 }
 
-/* Extension List Widget Item */
-ExtensionItemDelegate::ExtensionItemDelegate( QObject *parent )
-        : QStyledItemDelegate( parent )
-{
-    margins = QMargins( 4, 4, 4, 4 );
-}
-
-ExtensionItemDelegate::~ExtensionItemDelegate()
-{
-}
-
-void ExtensionItemDelegate::paint( QPainter *painter,
-                                   const QStyleOptionViewItem &option,
-                                   const QModelIndex &index ) const
+static void commonPaint(
+    QPainter *painter,
+    const QStyleOptionViewItem &option,
+    const QMargins& margins,
+    const QPixmap& icon,
+    const QString& name,
+    const QString& description
+    )
 {
     QStyleOptionViewItem opt = option;
-    initStyleOption( &opt, index );
 
     // Draw background
     if ( opt.state & QStyle::State_Selected )
         painter->fillRect( opt.rect, opt.palette.highlight() );
 
     // Icon
-    QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
     if( !icon.isNull() )
     {
         painter->drawPixmap( opt.rect.left() + margins.left(),
@@ -1079,16 +1071,48 @@ void ExtensionItemDelegate::paint( QPainter *painter,
                      - margins.right(),
                      - margins.bottom() - opt.fontMetrics.height() );
 
-    painter->drawText( textrect, Qt::AlignLeft,
-                       index.data( Qt::DisplayRole ).toString() );
+    painter->drawText( textrect, Qt::AlignLeft, name);
 
     font.setBold( false );
     painter->setFont( font );
     painter->drawText( textrect.translated( 0, option.fontMetrics.height() ),
                        Qt::AlignLeft,
-                       index.data( ExtensionListModel::SummaryRole ).toString() );
+                       description );
 
     painter->restore();
+}
+
+/* Extension List Widget Item */
+ExtensionItemDelegate::ExtensionItemDelegate( QObject *parent )
+        : QStyledItemDelegate( parent )
+{
+    margins = QMargins( 4, 4, 4, 4 );
+}
+
+ExtensionItemDelegate::~ExtensionItemDelegate()
+{
+}
+
+void ExtensionItemDelegate::paint( QPainter *painter,
+                                   const QStyleOptionViewItem &option,
+                                   const QModelIndex &index ) const
+{
+    QStyleOptionViewItem opt = option;
+    initStyleOption( &opt, index );
+
+    /* Draw common base  */
+    QString name = index.data( Qt::DisplayRole ).toString();
+    QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
+    QString description = index.data( ExtensionListModel::SummaryRole ).toString();
+
+    commonPaint(
+        painter,
+        option,
+        margins,
+        icon,
+        name,
+        description
+        );
 }
 
 QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
@@ -1113,9 +1137,8 @@ void ExtensionItemDelegate::initStyleOption( QStyleOptionViewItem *option,
 }
 
 AddonItemDelegate::AddonItemDelegate( QObject *parent )
-    : ExtensionItemDelegate( parent )
-    , animator( NULL )
-    , progressbar( NULL )
+    : QStyledItemDelegate( parent )
+    , margins( 4,4,4,4 )
 { }
 
 AddonItemDelegate::~AddonItemDelegate()
@@ -1148,9 +1171,21 @@ void AddonItemDelegate::paint( QPainter *painter,
     }
 
     /* Draw base info from parent */
-    ExtensionItemDelegate::paint( painter, newopt, index );
-
     initStyleOption( &newopt, index );
+
+    /* Draw common base  */
+    QString name = index.data( Qt::DisplayRole ).toString();
+    QPixmap icon = index.data( Qt::DecorationRole ).value<QPixmap>();
+    QString description = index.data( ExtensionListModel::SummaryRole ).toString();
+
+    commonPaint(
+        painter,
+        newopt,
+        margins,
+        icon,
+        name,
+        description
+        );
 
     painter->save();
     painter->setRenderHint( QPainter::TextAntialiasing );
@@ -1269,6 +1304,15 @@ QSize AddonItemDelegate::sizeHint( const QStyleOptionViewItem &option,
     }
     else
         return QSize();
+}
+
+void AddonItemDelegate::initStyleOption( QStyleOptionViewItem *option,
+                                            const QModelIndex &index ) const
+{
+    QStyledItemDelegate::initStyleOption( option, index );
+    option->decorationSize = QSize( option->rect.height(), option->rect.height() );
+    option->decorationSize -= QSize( margins.left() + margins.right(),
+                                    margins.top() + margins.bottom() );
 }
 
 QWidget *AddonItemDelegate::createEditor( QWidget *parent,

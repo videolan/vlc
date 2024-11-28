@@ -300,7 +300,7 @@ protected:
 };
 
 
-class AddonItemDelegate : public ExtensionItemDelegate
+class AddonItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 
@@ -313,6 +313,8 @@ public:
                 const QModelIndex &index ) const override;
     QSize sizeHint( const QStyleOptionViewItem &option,
                     const QModelIndex &index ) const override;
+    void initStyleOption( QStyleOptionViewItem *option,
+                         const QModelIndex &index ) const override;
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
@@ -327,8 +329,9 @@ signals:
     void showInfo();
 
 protected:
-    DelegateAnimationHelper *animator;
-    QWidget *progressbar;
+    QMargins margins;
+    DelegateAnimationHelper *animator = nullptr;
+    QWidget *progressbar = nullptr;
 };
 
 class ExtensionInfoDialog : public QVLCDialog
