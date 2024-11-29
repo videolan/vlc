@@ -193,8 +193,15 @@ vlc_vaapi_PicGetDisplay(picture_t *pic);
 static inline bool
 vlc_vaapi_IsChromaOpaque(int i_vlc_chroma)
 {
-    return i_vlc_chroma == VLC_CODEC_VAAPI_420
-        || i_vlc_chroma == VLC_CODEC_VAAPI_420_10BPP;
+    switch (i_vlc_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+        case VLC_CODEC_VAAPI_420_10BPP:
+        case VLC_CODEC_VAAPI_420_12BPP:
+            return true;
+        default:
+            return false;
+    }
 }
 
 void vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc);

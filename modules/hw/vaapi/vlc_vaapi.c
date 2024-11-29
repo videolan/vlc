@@ -55,6 +55,10 @@ vlc_chroma_to_vaapi(int i_vlc_chroma, unsigned *va_rt_format, int *va_fourcc)
             *va_rt_format = VA_RT_FORMAT_YUV420_10BPP;
             *va_fourcc = VA_FOURCC_P010;
             break;
+        case VLC_CODEC_VAAPI_420_12BPP:
+            *va_rt_format = VA_RT_FORMAT_YUV420_12;
+            *va_fourcc = VA_FOURCC_P012;
+            break;
         default:
             vlc_assert_unreachable();
     }
