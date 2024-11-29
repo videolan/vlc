@@ -155,33 +155,6 @@ vaegl_init_fourcc(struct priv *priv, unsigned va_fourcc)
             priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
             priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '3', '2');
             break;
-#if 0
-        /* TODO: the following fourcc are not handled for now */
-        case VA_FOURCC_RGBA:
-            priv->drm_fourccs[0] = VLC_FOURCC('G', 'R', '3', '2');
-            break;
-        case VA_FOURCC_BGRA:
-            priv->drm_fourccs[0] = VLC_FOURCC('G', 'R', '3', '2');
-            break;
-        case VA_FOURCC_YV12:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '8', ' ', ' ');
-            priv->drm_fourccs[1] = VLC_FOURCC('R', '8', ' ', ' ');
-            priv->drm_fourccs[2] = VLC_FOURCC('R', '8', ' ', ' ');
-            break;
-        case VA_FOURCC_422H:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '8', ' ', ' ');
-            priv->drm_fourccs[1] = VLC_FOURCC('R', '8', ' ', ' ');
-            priv->drm_fourccs[2] = VLC_FOURCC('R', '8', ' ', ' ');
-            break;
-        case VA_FOURCC_UYVY:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
-            break;
-        case VA_FOURCC_444P:
-            priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
-            priv->drm_fourccs[1] = VLC_FOURCC('R', '1', '6', ' ');
-            priv->drm_fourccs[2] = VLC_FOURCC('R', '1', '6', ' ');
-            break;
-#endif
         default: return VLC_EGENERIC;
     }
     priv->fourcc = va_fourcc;
