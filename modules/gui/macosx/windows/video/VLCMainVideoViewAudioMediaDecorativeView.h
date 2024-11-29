@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSImageView *foregroundCoverArtView;
 @property (readwrite, strong) IBOutlet NSImageView *backgroundCoverArtView;
 @property (readwrite, strong) IBOutlet NSVisualEffectView *backgroundVisualEffectView;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *foregroundViewTopConstraint;
 
 @end
 

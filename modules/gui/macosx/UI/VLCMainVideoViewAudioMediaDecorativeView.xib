@@ -50,6 +50,7 @@
                 <outlet property="backgroundCoverArtView" destination="cDv-dn-65H" id="bw2-8i-Xg6"/>
                 <outlet property="backgroundVisualEffectView" destination="D1e-fS-bwO" id="Jkh-ep-Wyn"/>
                 <outlet property="foregroundCoverArtView" destination="40P-sL-Mzq" id="nVl-ga-BoM"/>
+                <outlet property="foregroundViewTopConstraint" destination="TVt-Xt-aoo" id="OFh-5C-XZF"/>
             </connections>
             <point key="canvasLocation" x="66" y="-232"/>
         </customView>
