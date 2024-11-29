@@ -137,6 +137,11 @@
 {
     _audioDecorativeView = [VLCMainVideoViewAudioMediaDecorativeView fromNibWithOwner:self];
     _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    _bottomButtonStackViewConstraint =
+        [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor
+                                                     constant:VLCLibraryUIUnits.largeSpacing];
+
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playQueueController.playerController;
     [self updateDecorativeViewVisibilityOnControllerChange:controller];
