@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_tick.h>
 #include <vlc_player.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 typedef struct pip_controller_t pip_controller_t;
 
@@ -41,9 +42,10 @@ struct pip_controller_operations {
 struct pip_controller_media_callbacks {
     void (*play)(void* opaque);
     void (*pause)(void* opaque);
-    void (*seek_by)(vlc_tick_t time, void* opaque);
+    void (*seek_by)(vlc_tick_t time, dispatch_block_t completion, void *opaque);
     vlc_tick_t (*media_length)(void* opaque);
     vlc_tick_t (*media_time)(void* opaque);
+    bool (*is_media_seekable)(void* opaque);
     bool (*is_media_playing)(void* opaque);
 };
 

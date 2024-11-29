@@ -45,7 +45,8 @@
 
 /// Called by picture in picture to seek with time offset
 /// - Parameter offset: offset duration in milliseconds
-- (void)seekBy:(int64_t)offset;
+/// - Parameter completion: block to call as soon as seek is finished
+- (void)seekBy:(int64_t)offset completion:(dispatch_block_t)completion;
 
 /// Called by picture in picture to get the current media duration
 /// - Returns Must return media duration in milliseconds
@@ -54,6 +55,10 @@
 /// Called by picture in picture to get the current media duration
 /// - Returns Must return current media time in milliseconds
 - (int64_t)mediaTime;
+
+/// Called by picture in picture to figure out if media is seekable
+/// - Returns Must return YES if media is seekable, else return NO
+- (BOOL)isMediaSeekable;
 
 /// Called by picture in picture to get the media playback status
 /// - Returns Must return YES if media is playing, else return NO

@@ -87,6 +87,9 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
         [AVPictureInPictureController alloc]
             initWithContentSource:avPipSource
     ];
+    void *mediaController = (__bridge void*)_drawable.mediaController;
+    BOOL isMediaSeekable = (BOOL)_pipcontroller->media_cbs->is_media_seekable(mediaController);
+              avPipController.requiresLinearPlayback = !isMediaSeekable;
     avPipController.delegate = self;
 #if TARGET_OS_IOS
     // Not sure if it's mandatory, its usefulness isn't obvious and 
@@ -169,8 +172,7 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
     
     void *mediaController = (__bridge void*)_drawable.mediaController;
     int64_t offset = time_sec * 1e3;
-    _pipcontroller->media_cbs->seek_by(offset, mediaController);
-    completionHandler();
+    _pipcontroller->media_cbs->seek_by(offset, completionHandler, mediaController);
 }
 
 - (BOOL)pictureInPictureControllerIsPlaybackPaused:(AVPictureInPictureController *)pictureInPictureController {
@@ -266,10 +268,10 @@ static void PipControllerMediaPause(void *opaque) {
     [mediaController pause];
 }
 
-static void PipControllerMediaSeekBy(vlc_tick_t time, void *opaque) {
+static void PipControllerMediaSeekBy(vlc_tick_t time, dispatch_block_t completion, void *opaque) {
     id<VLCPictureInPictureMediaControlling> mediaController;
     mediaController = (__bridge id<VLCPictureInPictureMediaControlling>)opaque;
-    [mediaController seekBy:time];
+    [mediaController seekBy:time completion:completion];
 }
 
 static vlc_tick_t PipControllerMediaGetLength(void *opaque) {
@@ -282,6 +284,12 @@ static vlc_tick_t PipControllerMediaGetTime(void *opaque) {
     id<VLCPictureInPictureMediaControlling> mediaController;
     mediaController = (__bridge id<VLCPictureInPictureMediaControlling>)opaque;
     return [mediaController mediaTime];
+}
+
+static bool PipControllerMediaIsSeekable(void *opaque) {
+    id<VLCPictureInPictureMediaControlling> mediaController;
+    mediaController = (__bridge id<VLCPictureInPictureMediaControlling>)opaque;
+    return (bool)[mediaController isMediaSeekable];
 }
 
 static bool PipControllerMediaIsPlaying(void *opaque) {
@@ -320,6 +328,7 @@ static int OpenController( pip_controller_t *pipcontroller )
         PipControllerMediaSeekBy,
         PipControllerMediaGetLength,
         PipControllerMediaGetTime,
+        PipControllerMediaIsSeekable,
         PipControllerMediaIsPlaying
     };
     

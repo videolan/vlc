@@ -928,9 +928,10 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
  * @protocol VLCPictureInPictureMediaControlling <NSObject>
  * - (void)play;
  * - (void)pause;
- * - (void)seekBy:(int64_t)offset;
+ * - (void)seekBy:(int64_t)offset completion:(dispatch_block_t)completion;;
  * - (int64_t)mediaLength;
  * - (int64_t)mediaTime;
+ * - (BOOL)isMediaSeekable;
  * - (BOOL)isMediaPlaying;
  * @end
  * 
