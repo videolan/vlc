@@ -218,7 +218,7 @@ const char *vlc_fourcc_GetDescription(int cat, vlc_fourcc_t fourcc)
     VLC_CODEC_I420_16L, VLC_CODEC_I420_16B, VLC_CODEC_I420_12L, VLC_CODEC_I420_12B, VLC_CODEC_I420_10L, VLC_CODEC_I420_10B, VLC_CODEC_I420_9L, VLC_CODEC_I420_9B
 
 #define VLC_CODEC_YUV_SEMIPLANAR_420_16 \
-    VLC_CODEC_P010, VLC_CODEC_P016
+    VLC_CODEC_P010, VLC_CODEC_P012 ,VLC_CODEC_P016
 
 #define VLC_CODEC_YUV_SEMIPLANAR_422 \
     VLC_CODEC_NV16, VLC_CODEC_NV61
@@ -760,6 +760,7 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_YUVA_444_12L,          PLANAR_16(4, 1, 1, 12) },
     { VLC_CODEC_YUVA_444_12B,          PLANAR_16(4, 1, 1, 12) },
     { VLC_CODEC_P010,                  SEMIPLANAR(2, 2, 10) },
+    { VLC_CODEC_P012,                  SEMIPLANAR(2, 2, 12) },
     { VLC_CODEC_P016,                  SEMIPLANAR(2, 2, 16) },
 
     { VLC_CODEC_YUYV,                  PACKED_FMT(2, 16) },
