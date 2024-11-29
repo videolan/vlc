@@ -26,11 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoViewControlsBar : VLCControlsBarCommon
 
-@property (readwrite, strong) IBOutlet NSButton *bookmarksButton;
-@property (readwrite, strong) IBOutlet NSButton *subtitlesButton;
-@property (readwrite, strong) IBOutlet NSButton *audioButton;
-@property (readwrite, strong) IBOutlet NSButton *videoButton;
-@property (readwrite, strong) IBOutlet NSButton *floatOnTopButton;
+@property (readwrite, weak) IBOutlet NSButton *bookmarksButton;
+@property (readwrite, weak) IBOutlet NSButton *subtitlesButton;
+@property (readwrite, weak) IBOutlet NSButton *audioButton;
+@property (readwrite, weak) IBOutlet NSButton *videoButton;
+@property (readwrite, weak) IBOutlet NSButton *floatOnTopButton;
 
 - (IBAction)openBookmarks:(id)sender;
 - (IBAction)openSubtitlesMenu:(id)sender;
