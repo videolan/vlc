@@ -334,6 +334,7 @@
         </Feature>
 
         <UIRef Id="WixUI_Advanced" />
+        <UIRef Id="WixUI_ErrorProgressText" />
 
         <InstallExecuteSequence>
             <!-- <RemoveExistingProducts After="InstallValidate" /> -->
