@@ -399,9 +399,9 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_RGBA10LE,              PACKED_FMT(RGB, 4, 32, 10) },
     { VLC_CODEC_RGBA64,                PACKED_FMT(RGB, 8, 64, 16) },
     { VLC_CODEC_VUYA,                  PACKED_FMT(YUV444, 4, 32, 8) },
+    { VLC_CODEC_VUYX,                  PACKED_FMT(YUV444, 4, 32, 8) },
     { VLC_CODEC_Y210,                  PACKED_FMT(YUV422, 4, 32, 10) },
     { VLC_CODEC_Y410,                  PACKED_FMT(YUV444, 4, 32, 10) },
-
     { VLC_CODEC_Y211, VLC_CHROMA_SUBTYPE_YUV211,1, { {{1,4}, {1,1}} }, 4, 32, 8 },
     { VLC_CODEC_XYZ_12L,               PACKED_FMT(OTHER, 6, 48, 12) },
     { VLC_CODEC_XYZ_12B,               PACKED_FMT(OTHER, 6, 48, 12) },
