@@ -212,7 +212,7 @@
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-        [self applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint];
+        [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
     } else {
         [self setAutohideControls:YES];
         self.bottomButtonStackViewConstraint.active = NO;
@@ -223,14 +223,16 @@
     }
 }
 
-- (void)applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint
+- (void)applyAudioDecorativeViewForegroundCoverArtViewConstraints
 {
     if (![self.voutContainingView.subviews containsObject:self.audioDecorativeView]) {
         return;
     }
 
+    NSView * const foregroundCoverArtView = self.audioDecorativeView.foregroundCoverArtView;
     [NSLayoutConstraint activateConstraints:@[
-        [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:self.audioDecorativeView.foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing]
+        [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing],
+        [self.fakeTitleBar.bottomAnchor constraintLessThanOrEqualToAnchor:foregroundCoverArtView.topAnchor constant:-VLCLibraryUIUnits.largeSpacing]
     ]];
 }
 
@@ -449,8 +451,6 @@
     const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCLibraryUIUnits.largeSpacing;
 
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
-    self.audioDecorativeView.foregroundViewTopConstraint.constant =
-        self.fakeTitleBar.frame.size.height + VLCLibraryUIUnits.largeSpacing;
 
     _returnButtonTopConstraint.constant = buttonTopSpace;
     _playQueueButtonTopConstraint.constant = buttonTopSpace;
@@ -584,7 +584,7 @@
                relativeTo:self.mainControlsView];
     [self.voutContainingView applyConstraintsToFillSuperview];
     _voutViewController = nil;
-    [self applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint];
+    [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
 }
 
 - (void)pipActionPlay:(PIPViewController *)pip
