@@ -10,6 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="VLCMainVideoViewController">
             <connections>
                 <outlet property="bottomBarView" destination="1GA-GG-Sdx" id="0UY-5o-eVD"/>
+                <outlet property="centerButtonStackInViewConstraint" destination="l2Y-IR-aus" id="kLb-Ev-BuY"/>
                 <outlet property="centralControlsStackView" destination="CvV-yX-Nbh" id="zyI-Rb-bem"/>
                 <outlet property="controlsBar" destination="3" id="Mfq-2w-2uR"/>
                 <outlet property="fakeTitleBar" destination="jnw-gL-nrF" id="7lZ-al-c3d"/>
@@ -17,10 +18,13 @@
                 <outlet property="floatOnTopIndicatorImageView" destination="CrW-mq-gge" id="hqR-4Z-a18"/>
                 <outlet property="loadingIndicator" destination="xOQ-YR-iAc" id="CtX-Yo-UX2"/>
                 <outlet property="mainControlsView" destination="D4V-Zd-qvB" id="KwM-ya-ETn"/>
+                <outlet property="nextButtonSizeConstraint" destination="M5n-CD-fd3" id="WIM-QF-IMG"/>
                 <outlet property="overlayView" destination="FGS-tq-54S" id="RSC-7m-N0y"/>
+                <outlet property="playButtonSizeConstraint" destination="OHb-xJ-sqM" id="7Ve-Gd-rEz"/>
                 <outlet property="playQueueButton" destination="Drq-if-dw4" id="BZe-Cr-mzZ"/>
                 <outlet property="playQueueButtonTopConstraint" destination="VyM-t4-y6F" id="V94-GS-KcS"/>
                 <outlet property="playQueueButtonTrailingConstraint" destination="rWa-NJ-Aju" id="tzU-Iz-CXl"/>
+                <outlet property="prevButtonSizeConstraint" destination="XBm-GM-29d" id="8x6-WZ-ydw"/>
                 <outlet property="returnButton" destination="UoQ-34-Pox" id="nyY-OF-9zj"/>
                 <outlet property="returnButtonLeadingConstraint" destination="BkP-RA-uxn" id="CsI-gH-SYp"/>
                 <outlet property="returnButtonTopConstraint" destination="0l2-eC-67c" id="78K-sz-kmV"/>

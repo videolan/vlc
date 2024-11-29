@@ -31,6 +31,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMainVideoViewController : NSViewController
+
 @property (readwrite, strong) IBOutlet NSView *voutContainingView;
 
 @property (readwrite, strong) IBOutlet VLCVoutView *voutView;
@@ -49,6 +50,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, strong) IBOutlet NSLayoutConstraint *fakeTitleBarHeightConstraint;
 @property (readwrite, strong) IBOutlet NSProgressIndicator *loadingIndicator;
 @property (readwrite, strong) IBOutlet NSImageView *floatOnTopIndicatorImageView;
+
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *playButtonSizeConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *prevButtonSizeConstraint;
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *nextButtonSizeConstraint;
+
+@property (readwrite, weak) IBOutlet NSLayoutConstraint *centerButtonStackInViewConstraint;
 
 @property (readonly, strong) VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
 @property (readwrite, nonatomic) BOOL autohideControls;
