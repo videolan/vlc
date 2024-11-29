@@ -152,6 +152,7 @@ vaegl_init_fourcc(struct priv *priv, unsigned va_fourcc)
             priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '8', '8');
             break;
         case VA_FOURCC_P010:
+        case VA_FOURCC_P012:
             priv->drm_fourccs[0] = VLC_FOURCC('R', '1', '6', ' ');
             priv->drm_fourccs[1] = VLC_FOURCC('G', 'R', '3', '2');
             break;
@@ -423,6 +424,10 @@ GetChromaVaFourcc(vlc_fourcc_t opaque_chroma, int *va_fourcc,
             *va_fourcc = VA_FOURCC_P010;
             *sw_chroma = VLC_CODEC_P010;
             break;
+        case VLC_CODEC_VAAPI_420_12BPP:
+            *va_fourcc = VA_FOURCC_P012;
+            *sw_chroma = VLC_CODEC_P012;
+            break;
         default:
             vlc_assert_unreachable();
     }
@@ -477,6 +482,7 @@ Open(struct vlc_gl_interop *interop)
 
             break;
         case VLC_CODEC_VAAPI_420_10BPP: /* VLC_CODEC_P010 */
+        case VLC_CODEC_VAAPI_420_12BPP: /* VLC_CODEC_P012 */
             if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, GL_RG,
                                                 GL_RG16, GL_UNSIGNED_SHORT) != 16)
                 goto error;
