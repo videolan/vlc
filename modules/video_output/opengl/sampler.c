@@ -532,6 +532,13 @@ opengl_init_swizzle(struct vlc_gl_sampler *sampler,
                 swizzle_per_tex[0] = "rgb";
                 assert(sampler->glfmt.tex_count == 1);
                 break;
+            case VLC_CODEC_VUYX:
+                swizzle_per_tex[0] = "bgr";
+                break;
+            case VLC_CODEC_Y410:
+            case VLC_CODEC_Y412:
+                swizzle_per_tex[0] = "grb";
+                break;
             default:
                 assert(!"missing chroma");
                 return VLC_EGENERIC;
