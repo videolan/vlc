@@ -1260,6 +1260,15 @@ static const staticentry_t p_list_video[] = {
     B(VLC_CODEC_VAAPI_420_12BPP, "4:2:0 12bits VAAPI opaque"),
         A("VAO2"),
 
+    B(VLC_CODEC_VAAPI_444,       "4:4:4 8bits VAAPI opaque"),
+        A("VA4P"),
+
+    B(VLC_CODEC_VAAPI_444_10BPP, "4:4:4 10bits VAAPI opaque"),
+        A("VA40"),
+
+    B(VLC_CODEC_VAAPI_444_12BPP, "4:4:4 12bits VAAPI opaque"),
+        A("VA42"),
+
     B(VLC_CODEC_ANDROID_OPAQUE, "Android opaque"),
         A("ANOP"),
 

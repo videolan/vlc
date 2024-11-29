@@ -438,6 +438,9 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_VAAPI_420,             GPU_FMT(YUV420, 8) },
     { VLC_CODEC_VAAPI_420_10BPP,       GPU_FMT(YUV420, 10) },
     { VLC_CODEC_VAAPI_420_12BPP,       GPU_FMT(YUV420, 12) },
+    { VLC_CODEC_VAAPI_444,             GPU_FMT(YUV444, 8) },
+    { VLC_CODEC_VAAPI_444_10BPP,       GPU_FMT(YUV444, 10) },
+    { VLC_CODEC_VAAPI_444_12BPP,       GPU_FMT(YUV444, 12) },
 };
 
 #undef PACKED_FMT
