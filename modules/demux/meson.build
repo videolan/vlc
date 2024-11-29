@@ -37,12 +37,12 @@ if ogg_dep.found()
 endif
 
 if (get_option('tests').allowed())
-# Xiph test
-xiph_test = executable('xiph_test',
-    files('xiph_test.c'),
-    include_directories: [vlc_include_dirs])
+    # Xiph test
+    xiph_test = executable('xiph_test',
+        files('xiph_test.c'),
+        include_directories: [vlc_include_dirs])
 
-test('xiph_test', xiph_test, suite: 'demux')
+    test('xiph_test', xiph_test, suite: 'demux')
 endif
 
 # Demux dump

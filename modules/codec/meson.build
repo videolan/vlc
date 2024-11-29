@@ -410,20 +410,20 @@ if get_option('css_engine').require(flex.found() and bison.found(),
     ]
 
     if (get_option('tests').allowed())
-    # CSS parser test
-    css_parser_test = executable('css_parser_test',
-        files(
-            'webvtt/css_test.c',
-            'webvtt/css_parser.c'
-        ),
-        webvtt_lex_files, webvtt_bison_files,
-        link_with: [vlc_libcompat],
-        dependencies: [libvlccore_dep],
-        include_directories: [
-            vlc_include_dirs,
-            include_directories('webvtt')])
+        # CSS parser test
+        css_parser_test = executable('css_parser_test',
+            files(
+                'webvtt/css_test.c',
+                'webvtt/css_parser.c'
+            ),
+            webvtt_lex_files, webvtt_bison_files,
+            link_with: [vlc_libcompat],
+            dependencies: [libvlccore_dep],
+            include_directories: [
+                vlc_include_dirs,
+                include_directories('webvtt')])
 
-    test('css_parser', css_parser_test, suite: 'css_parser')
+        test('css_parser', css_parser_test, suite: 'css_parser')
     endif
 
 endif
