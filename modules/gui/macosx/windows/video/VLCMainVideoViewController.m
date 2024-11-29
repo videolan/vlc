@@ -584,6 +584,7 @@
                relativeTo:self.mainControlsView];
     [self.voutContainingView applyConstraintsToFillSuperview];
     _voutViewController = nil;
+    [self applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint];
 }
 
 - (void)pipActionPlay:(PIPViewController *)pip
@@ -604,7 +605,8 @@
     [controller pause];
 }
 
-- (void)pipActionPause:(PIPViewController *)pip {
+- (void)pipActionPause:(PIPViewController *)pip
+{
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playQueueController.playerController;
     [controller pause];
