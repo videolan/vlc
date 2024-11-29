@@ -188,7 +188,8 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
 
     if (desc->pixel_size == 2)
     {
-        if (desc->fcc != VLC_CODEC_P010 && desc->fcc != VLC_CODEC_P016) {
+        if (desc->fcc != VLC_CODEC_P010 && desc->fcc != VLC_CODEC_P012
+         && desc->fcc != VLC_CODEC_P016) {
             /* Do a bit shift if samples are stored on LSB. */
             float yuv_range_correction = (float)((1 << 16) - 1)
                                          / ((1 << desc->pixel_bits) - 1);
