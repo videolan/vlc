@@ -332,6 +332,8 @@
 #define VLC_CODEC_Y210            VLC_FOURCC('Y','2','1','0')
 /* Packed YUV 4:4:4 10-bit V10:U10:Y10:A2 */
 #define VLC_CODEC_Y410            VLC_FOURCC('Y','4','1','0')
+/* Packed YUV 4:4:4 12-bit V12:U12:Y12:A2 */
+#define VLC_CODEC_Y412            VLC_FOURCC('Y','4','1','2')
 /* Packed YUV 4:4:4 V:U:Y:A */
 #define VLC_CODEC_VUYA            VLC_FOURCC('V','U','Y','A')
 /* Packed YUV 4:4:4 V:U:Y:X, alpha channel undefined */
