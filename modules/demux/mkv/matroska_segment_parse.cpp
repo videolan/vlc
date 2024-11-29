@@ -1841,6 +1841,8 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
             vars.p_tk->b_pts_only = true;
 
             fill_extra_data( vars.p_tk, 0 );
+            if (vars.p_fmt->i_extra <= 4)
+                vars.p_fmt->b_packetized = false; // force full extradata by the packetizer
         }
         S_CASE("V_CAVS") {
             vars.p_fmt->i_codec = VLC_CODEC_CAVS;
