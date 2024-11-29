@@ -894,6 +894,7 @@ qml_modules += {
         'widgets/qml/PartialEffect.qml',
         'widgets/qml/ViewHeader.qml',
         'widgets/qml/ProgressIndicator.qml',
+        'widgets/qml/RectangularGlow.qml',
         qml_dynamicshadow_file,
         qml_blureffect_file,
         'widgets/qml/RoundImage.qml',
