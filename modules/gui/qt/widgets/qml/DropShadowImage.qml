@@ -35,8 +35,8 @@ ScaledImage {
 
     property real xOffset: 0
     property real yOffset: 0
-    property real xRadius: sourceItem?.radius ?? 0
-    property real yRadius: sourceItem?.radius ?? 0
+    property real xRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
+    property real yRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
 
     sourceSize: Qt.size(viewportWidth, viewportHeight)
 
