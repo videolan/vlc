@@ -342,14 +342,9 @@ void ServicesDiscoveryModelPrivate::addonFound( AddonPtr addon )
 
 void ServicesDiscoveryModelPrivate::addonChanged( AddonPtr addon )
 {
-    for ( size_t r = 0; r < m_items.size(); ++r )
-    {
-        if ( memcmp( m_items[r]->entry->uuid, addon->uuid, sizeof( addon->uuid ) ) )
-            continue;
+    SDItemPtr sdItem = std::make_shared<SDItem>(addon);
+    m_cache->updateItem(std::move(sdItem));
 
-        m_items[r] = std::make_shared<SDItem>(addon);
-        break;
-    }
     m_revision++;
     invalidateCache();
 }
