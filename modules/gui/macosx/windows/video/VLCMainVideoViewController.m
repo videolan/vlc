@@ -139,8 +139,7 @@
     _audioDecorativeView.translatesAutoresizingMaskIntoConstraints = NO;
 
     _bottomButtonStackViewConstraint =
-        [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor
-                                                     constant:VLCLibraryUIUnits.largeSpacing];
+        [self.bottomBarView.topAnchor constraintEqualToAnchor:self.centralControlsStackView.bottomAnchor];
 
     VLCPlayerController * const controller =
         VLCMain.sharedInstance.playQueueController.playerController;
