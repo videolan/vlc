@@ -441,6 +441,8 @@
     const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCLibraryUIUnits.largeSpacing;
 
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
+    self.audioDecorativeView.foregroundViewTopConstraint.constant =
+        self.fakeTitleBar.frame.size.height + VLCLibraryUIUnits.largeSpacing;
 
     _returnButtonTopConstraint.constant = buttonTopSpace;
     _playQueueButtonTopConstraint.constant = buttonTopSpace;
