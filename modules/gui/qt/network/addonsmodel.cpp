@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "servicesdiscoverymodel.hpp"
+#include "addonsmodel.hpp"
 
 #include "util/locallistbasemodel.hpp"
 
@@ -35,7 +35,7 @@
 #include <vlc_addons.h>
 
 #define CHECK_ADDON_TYPE_MATCH(type) \
-    static_assert(static_cast<addon_type_t>(ServicesDiscoveryModel::Type::TYPE_ ## type) == ADDON_##type)
+    static_assert(static_cast<addon_type_t>(AddonsModel::Type::TYPE_ ## type) == ADDON_##type)
 
 CHECK_ADDON_TYPE_MATCH(UNKNOWN);
 CHECK_ADDON_TYPE_MATCH(PLAYLIST_PARSER);
@@ -49,7 +49,7 @@ CHECK_ADDON_TYPE_MATCH(OTHER);
 #undef CHECK_ADDON_TYPE_MATCH
 
 #define CHECK_ADDON_STATE_MATCH(type) \
-    static_assert(static_cast<addon_state_t>(ServicesDiscoveryModel::State::STATE_ ## type) == ADDON_##type)
+    static_assert(static_cast<addon_state_t>(AddonsModel::State::STATE_ ## type) == ADDON_##type)
 
 CHECK_ADDON_STATE_MATCH(INSTALLING);
 CHECK_ADDON_STATE_MATCH(INSTALLED);
@@ -62,10 +62,10 @@ namespace {
 using AddonPtr = vlc_shared_data_ptr_type(addon_entry_t,
                                           addon_entry_Hold, addon_entry_Release);
 
-class SDItem {
+class AddonItem {
 public:
     //
-    SDItem( AddonPtr addon )
+    AddonItem( AddonPtr addon )
     {
         vlc_mutex_locker locker{&addon->lock};
         name = qfu( addon->psz_name );
@@ -121,43 +121,43 @@ public:
 
 } //namespace
 
-using SDItemPtr = std::shared_ptr<SDItem> ;
-using SDItemList = std::vector<SDItemPtr> ;
+using AddonItemPtr = std::shared_ptr<AddonItem> ;
+using AddonItemList = std::vector<AddonItemPtr> ;
 
 // ListCache specialisation
 
 template<>
-bool ListCache<SDItemPtr>::compareItems(const SDItemPtr& a, const SDItemPtr& b)
+bool ListCache<AddonItemPtr>::compareItems(const AddonItemPtr& a, const AddonItemPtr& b)
 {
     //just compare the pointers here
     return a->uuid == b->uuid;
 }
 
-// ServicesDiscoveryModelPrivate
+// AddonsModelPrivate
 
-class ServicesDiscoveryModelPrivate
-    : public LocalListBaseModelPrivate<SDItemPtr>
+class AddonsModelPrivate
+    : public LocalListBaseModelPrivate<AddonItemPtr>
 {
 
 public:
-    Q_DECLARE_PUBLIC(ServicesDiscoveryModel)
+    Q_DECLARE_PUBLIC(AddonsModel)
 
 public: //ctor/dtor
-    ServicesDiscoveryModelPrivate(ServicesDiscoveryModel* pub)
-        : LocalListBaseModelPrivate<SDItemPtr>(pub)
+    AddonsModelPrivate(AddonsModel* pub)
+        : LocalListBaseModelPrivate<AddonItemPtr>(pub)
     {
     }
 
-    ~ServicesDiscoveryModelPrivate()
+    ~AddonsModelPrivate()
     {
         if ( m_manager )
             addons_manager_Delete( m_manager );
     }
 
 public:
-    const SDItem* getItemForRow(int row) const
+    const AddonItem* getItemForRow(int row) const
     {
-        const SDItemPtr* ref = item(row);
+        const AddonItemPtr* ref = item(row);
         if (ref)
             return ref->get();
         return nullptr;
@@ -165,7 +165,7 @@ public:
 
     bool gatherRepository(const char* uri)
     {
-        Q_Q(ServicesDiscoveryModel);
+        Q_Q(AddonsModel);
         if (!m_manager)
             return false;
         m_loading = true;
@@ -177,14 +177,14 @@ public:
 public: //BaseModelPrivateT implementation
     bool initializeModel() override;
 
-    LocalListCacheLoader<SDItemPtr>::ItemCompare getSortFunction() const override
+    LocalListCacheLoader<AddonItemPtr>::ItemCompare getSortFunction() const override
     {
         if (m_sortOrder == Qt::SortOrder::DescendingOrder)
-            return [](const SDItemPtr& a, const SDItemPtr& b){
+            return [](const AddonItemPtr& a, const AddonItemPtr& b){
                 return QString::compare(a->name, b->name) > 0;
             };
         else
-            return [](const SDItemPtr& a, const SDItemPtr& b) {
+            return [](const AddonItemPtr& a, const AddonItemPtr& b) {
                 return QString::compare(a->name, b->name) < 0;
             };
     }
@@ -198,23 +198,23 @@ public: //discovery callbacks
 
 public: //LocalListCacheLoader implementation
     //return the data matching the pattern
-    SDItemList getModelData(const QString& pattern) const override
+    AddonItemList getModelData(const QString& pattern) const override
     {
         if (pattern.isEmpty()
-            && m_typeFilter == ServicesDiscoveryModel::Type::TYPE_NONE
-            && m_stateFilter == ServicesDiscoveryModel::State::STATE_NONE)
+            && m_typeFilter == AddonsModel::Type::TYPE_NONE
+            && m_stateFilter == AddonsModel::State::STATE_NONE)
             return m_items;
 
-        SDItemList items;
+        AddonItemList items;
         std::copy_if(
             m_items.cbegin(), m_items.cend(),
             std::back_inserter(items),
-            [&pattern, filter = m_typeFilter, state = m_stateFilter](const SDItemPtr& item) {
-                if (state != ServicesDiscoveryModel::State::STATE_NONE
-                    && static_cast<ServicesDiscoveryModel::State>(item->entry->e_state) != state)
+            [&pattern, filter = m_typeFilter, state = m_stateFilter](const AddonItemPtr& item) {
+                if (state != AddonsModel::State::STATE_NONE
+                    && static_cast<AddonsModel::State>(item->entry->e_state) != state)
                     return false;
-                if (filter != ServicesDiscoveryModel::Type::TYPE_NONE
-                    && static_cast<ServicesDiscoveryModel::Type>(item->entry->e_type) != filter)
+                if (filter != AddonsModel::Type::TYPE_NONE
+                    && static_cast<AddonsModel::Type>(item->entry->e_type) != filter)
                         return false;
                 return item->name.contains(pattern, Qt::CaseInsensitive);
             });
@@ -224,23 +224,23 @@ public: //LocalListCacheLoader implementation
 public: // data
     MainCtx* m_ctx = nullptr;
     addons_manager_t* m_manager = nullptr;
-    SDItemList m_items;
-    ServicesDiscoveryModel::Type m_typeFilter = ServicesDiscoveryModel::Type::TYPE_NONE;
-    ServicesDiscoveryModel::State m_stateFilter = ServicesDiscoveryModel::State::STATE_NONE;
+    AddonItemList m_items;
+    AddonsModel::Type m_typeFilter = AddonsModel::Type::TYPE_NONE;
+    AddonsModel::State m_stateFilter = AddonsModel::State::STATE_NONE;
 };
 
-ServicesDiscoveryModel::ServicesDiscoveryModel( QObject* parent )
-    : BaseModel( new ServicesDiscoveryModelPrivate(this), parent )
+AddonsModel::AddonsModel( QObject* parent )
+    : BaseModel( new AddonsModelPrivate(this), parent )
 {
 }
 
-QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) const
+QVariant AddonsModel::data( const QModelIndex& index, int role ) const
 {
-    Q_D(const ServicesDiscoveryModel);
+    Q_D(const AddonsModel);
     if (!d->m_ctx)
         return {};
 
-    const SDItem* item = d->getItemForRow(index.row());
+    const AddonItem* item = d->getItemForRow(index.row());
     if (!item)
         return {};
 
@@ -338,16 +338,16 @@ QVariant ServicesDiscoveryModel::data( const QModelIndex& index, int role ) cons
     }
 }
 
-bool ServicesDiscoveryModel::setData(const QModelIndex& index, const QVariant &value, int role)
+bool AddonsModel::setData(const QModelIndex& index, const QVariant &value, int role)
 {
     if ( role == Role::STATE )
     {
-        auto i_value = value.value<ServicesDiscoveryModel::State>();
-        if ( i_value == ServicesDiscoveryModel::State::STATE_INSTALLING )
+        auto i_value = value.value<AddonsModel::State>();
+        if ( i_value == AddonsModel::State::STATE_INSTALLING )
         {
             installService(index.row());
         }
-        else if ( i_value == ServicesDiscoveryModel::State::STATE_UNINSTALLING )
+        else if ( i_value == AddonsModel::State::STATE_UNINSTALLING )
         {
             removeService(index.row());
         }
@@ -355,12 +355,12 @@ bool ServicesDiscoveryModel::setData(const QModelIndex& index, const QVariant &v
     return true;
 }
 
-Qt::ItemFlags ServicesDiscoveryModel::flags( const QModelIndex &index ) const
+Qt::ItemFlags AddonsModel::flags( const QModelIndex &index ) const
 {
-    Q_D(const ServicesDiscoveryModel);
+    Q_D(const AddonsModel);
     Qt::ItemFlags qtFlags = BaseModel::flags(index);
 
-    const SDItem* item = d->getItemForRow(index.row());
+    const AddonItem* item = d->getItemForRow(index.row());
     if (!item)
         return qtFlags;
 
@@ -376,7 +376,7 @@ Qt::ItemFlags ServicesDiscoveryModel::flags( const QModelIndex &index ) const
     return qtFlags;
 }
 
-QHash<int, QByteArray> ServicesDiscoveryModel::roleNames() const
+QHash<int, QByteArray> AddonsModel::roleNames() const
 {
     return {
         { Role::NAME, "name" },
@@ -399,11 +399,11 @@ QHash<int, QByteArray> ServicesDiscoveryModel::roleNames() const
     };
 }
 
-void ServicesDiscoveryModel::installService(int idx)
+void AddonsModel::installService(int idx)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
 
-    const SDItem* item = d->getItemForRow(idx);
+    const AddonItem* item = d->getItemForRow(idx);
     if (!item)
         return;
 
@@ -413,11 +413,11 @@ void ServicesDiscoveryModel::installService(int idx)
     addons_manager_Install( d->m_manager, uuid );
 }
 
-void ServicesDiscoveryModel::removeService(int idx)
+void AddonsModel::removeService(int idx)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
 
-    const SDItem* item = d->getItemForRow(idx);
+    const AddonItem* item = d->getItemForRow(idx);
     if (!item)
         return;
 
@@ -427,21 +427,21 @@ void ServicesDiscoveryModel::removeService(int idx)
     addons_manager_Remove( d->m_manager, uuid );
 }
 
-void ServicesDiscoveryModel::loadFromDefaultRepository()
+void AddonsModel::loadFromDefaultRepository()
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
     d->gatherRepository("repo://");
 }
 
-void ServicesDiscoveryModel::loadFromExternalRepository(QUrl uri)
+void AddonsModel::loadFromExternalRepository(QUrl uri)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
     d->gatherRepository(uri.toEncoded().constData());
 }
 
-void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
+void AddonsModel::setCtx(MainCtx* ctx)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
 
     if (ctx == d->m_ctx)
         return;
@@ -452,21 +452,21 @@ void ServicesDiscoveryModel::setCtx(MainCtx* ctx)
     emit ctxChanged();
 }
 
-MainCtx* ServicesDiscoveryModel::getCtx() const
+MainCtx* AddonsModel::getCtx() const
 {
-    Q_D(const ServicesDiscoveryModel);
+    Q_D(const AddonsModel);
     return d->m_ctx;
 }
 
-ServicesDiscoveryModel::Type ServicesDiscoveryModel::getTypeFilter() const
+AddonsModel::Type AddonsModel::getTypeFilter() const
 {
-    Q_D(const ServicesDiscoveryModel);
+    Q_D(const AddonsModel);
     return d->m_typeFilter;
 }
 
-void ServicesDiscoveryModel::setTypeFilter(ServicesDiscoveryModel::Type type)
+void AddonsModel::setTypeFilter(AddonsModel::Type type)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
     if (type == d->m_typeFilter)
         return;
     d->m_typeFilter = type;
@@ -477,15 +477,15 @@ void ServicesDiscoveryModel::setTypeFilter(ServicesDiscoveryModel::Type type)
     emit typeFilterChanged();
 }
 
-ServicesDiscoveryModel::State ServicesDiscoveryModel::getStateFilter() const
+AddonsModel::State AddonsModel::getStateFilter() const
 {
-    Q_D(const ServicesDiscoveryModel);
+    Q_D(const AddonsModel);
     return d->m_stateFilter;
 }
 
-void ServicesDiscoveryModel::setStateFilter(ServicesDiscoveryModel::State state)
+void AddonsModel::setStateFilter(AddonsModel::State state)
 {
-    Q_D(ServicesDiscoveryModel);
+    Q_D(AddonsModel);
     if (state == d->m_stateFilter)
         return;
     d->m_stateFilter = state;
@@ -496,7 +496,7 @@ void ServicesDiscoveryModel::setStateFilter(ServicesDiscoveryModel::State state)
     emit stateFilterChanged();
 }
 
-QString ServicesDiscoveryModel::getLabelForType(ServicesDiscoveryModel::Type type)
+QString AddonsModel::getLabelForType(AddonsModel::Type type)
 {
     switch ( type )
     {
@@ -517,7 +517,7 @@ QString ServicesDiscoveryModel::getLabelForType(ServicesDiscoveryModel::Type typ
     }
 }
 
-QColor ServicesDiscoveryModel::getColorForType(ServicesDiscoveryModel::Type type)
+QColor AddonsModel::getColorForType(AddonsModel::Type type)
 {
     QColor color;
     switch( type )
@@ -549,21 +549,21 @@ QColor ServicesDiscoveryModel::getColorForType(ServicesDiscoveryModel::Type type
     return color;
 }
 
-QString ServicesDiscoveryModel::getIconForType(ServicesDiscoveryModel::Type type)
+QString AddonsModel::getIconForType(AddonsModel::Type type)
 {
     switch( type )
     {
-    case ServicesDiscoveryModel::Type::TYPE_EXTENSION:
+    case AddonsModel::Type::TYPE_EXTENSION:
         return QStringLiteral("qrc:///addons/addon_yellow.svg");
-    case ServicesDiscoveryModel::Type::TYPE_PLAYLIST_PARSER:
+    case AddonsModel::Type::TYPE_PLAYLIST_PARSER:
         return QStringLiteral("qrc:///addons/addon_green.svg");
-    case ServicesDiscoveryModel::Type::TYPE_SERVICE_DISCOVERY:
+    case AddonsModel::Type::TYPE_SERVICE_DISCOVERY:
         return QStringLiteral("qrc:///addons/addon_red.svg");
-    case ServicesDiscoveryModel::Type::TYPE_SKIN2:
+    case AddonsModel::Type::TYPE_SKIN2:
         return QStringLiteral("qrc:///addons/addon_cyan.svg");
-    case ServicesDiscoveryModel::Type::TYPE_INTERFACE:
+    case AddonsModel::Type::TYPE_INTERFACE:
         return QStringLiteral("qrc:///addons/addon_blue.svg");
-    case ServicesDiscoveryModel::Type::TYPE_META:
+    case AddonsModel::Type::TYPE_META:
         return QStringLiteral("qrc:///addons/addon_magenta.svg");
     default:
         return QStringLiteral("qrc:///addons/addon_default.svg");
@@ -571,14 +571,14 @@ QString ServicesDiscoveryModel::getIconForType(ServicesDiscoveryModel::Type type
     vlc_assert_unreachable();
 }
 
-int ServicesDiscoveryModel::getMaxScore()
+int AddonsModel::getMaxScore()
 {
     return ADDON_MAX_SCORE;
 }
 
 static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry )
 {
-    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    AddonsModelPrivate* d = (AddonsModelPrivate*) manager->owner.sys;
     QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
         {
             d->addonFound( std::move( entryPtr ) );
@@ -587,7 +587,7 @@ static void addonFoundCallback( addons_manager_t *manager, addon_entry_t *entry 
 
 static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
 {
-    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    AddonsModelPrivate* d = (AddonsModelPrivate*) manager->owner.sys;
     QMetaObject::invokeMethod( d->q_func(), [d]()
         {
             d->discoveryEnded();
@@ -596,16 +596,16 @@ static void addonsDiscoveryEndedCallback( addons_manager_t *manager )
 
 static void addonChangedCallback( addons_manager_t *manager, addon_entry_t *entry )
 {
-    ServicesDiscoveryModelPrivate* d = (ServicesDiscoveryModelPrivate*) manager->owner.sys;
+    AddonsModelPrivate* d = (AddonsModelPrivate*) manager->owner.sys;
     QMetaObject::invokeMethod( d->q_func(), [d, entryPtr = AddonPtr(entry)]()
         {
             d->addonChanged( std::move( entryPtr ) );
         }, Qt::QueuedConnection);
 }
 
-bool ServicesDiscoveryModelPrivate::initializeModel()
+bool AddonsModelPrivate::initializeModel()
 {
-    Q_Q(ServicesDiscoveryModel);
+    Q_Q(AddonsModel);
     if (m_qmlInitializing || !m_ctx)
         return false;
 
@@ -633,23 +633,23 @@ bool ServicesDiscoveryModelPrivate::initializeModel()
 }
 
 
-void ServicesDiscoveryModelPrivate::addonFound( AddonPtr addon )
+void AddonsModelPrivate::addonFound( AddonPtr addon )
 {
-    m_items.emplace_back(std::make_shared<SDItem>(addon));
+    m_items.emplace_back(std::make_shared<AddonItem>(addon));
 }
 
-void ServicesDiscoveryModelPrivate::addonChanged( AddonPtr addon )
+void AddonsModelPrivate::addonChanged( AddonPtr addon )
 {
-    SDItemPtr sdItem = std::make_shared<SDItem>(addon);
+    AddonItemPtr sdItem = std::make_shared<AddonItem>(addon);
     m_cache->updateItem(std::move(sdItem));
 
     m_revision++;
     invalidateCache();
 }
 
-void ServicesDiscoveryModelPrivate::discoveryEnded()
+void AddonsModelPrivate::discoveryEnded()
 {
-    Q_Q(ServicesDiscoveryModel);
+    Q_Q(AddonsModel);
     assert( m_loading );
     m_loading = false;
     emit q->loadingChanged();

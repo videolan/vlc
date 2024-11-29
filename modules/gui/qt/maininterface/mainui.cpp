@@ -54,7 +54,7 @@
 #include "network/networkmediamodel.hpp"
 #include "network/networkdevicemodel.hpp"
 #include "network/networksourcesmodel.hpp"
-#include "network/servicesdiscoverymodel.hpp"
+#include "network/addonsmodel.hpp"
 #include "network/standardpathmodel.hpp"
 
 #include "menus/qml_menu_wrapper.hpp"
@@ -289,7 +289,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkMediaModel>( uri, versionMajor, versionMinor, "NetworkMediaModel");
         qmlRegisterType<NetworkDeviceModel>( uri, versionMajor, versionMinor, "NetworkDeviceModel");
         qmlRegisterType<NetworkSourcesModel>( uri, versionMajor, versionMinor, "NetworkSourcesModel");
-        qmlRegisterType<ServicesDiscoveryModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
+        qmlRegisterType<AddonsModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
         qmlRegisterType<StandardPathModel>( uri, versionMajor, versionMinor, "StandardPathModel");
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
 
@@ -380,7 +380,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<NetworkMediaModel>( uri, versionMajor, versionMinor, "NetworkMediaModel");
         qmlRegisterType<NetworkDeviceModel>( uri, versionMajor, versionMinor, "NetworkDeviceModel");
         qmlRegisterType<NetworkSourcesModel>( uri, versionMajor, versionMinor, "NetworkSourcesModel");
-        qmlRegisterType<ServicesDiscoveryModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
+        qmlRegisterType<AddonsModel>( uri, versionMajor, versionMinor, "ServicesDiscoveryModel");
         qmlRegisterType<MLFoldersModel>( uri, versionMajor, versionMinor, "MLFolderModel");
         qmlRegisterType<MLRecentsModel>( uri, versionMajor, versionMinor, "MLRecentModel" );
 

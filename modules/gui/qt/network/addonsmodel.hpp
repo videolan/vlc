@@ -16,14 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef MLServicesDiscoveryModel_HPP
-#define MLServicesDiscoveryModel_HPP
+#ifndef ADDONS_MODEL_HPP
+#define ADDONS_MODEL_HPP
 
 #include "util/base_model.hpp"
 #include "maininterface/mainctx.hpp"
 
-class ServicesDiscoveryModelPrivate;
-class ServicesDiscoveryModel : public BaseModel
+class AddonsModelPrivate;
+class AddonsModel : public BaseModel
 {
     Q_OBJECT
 
@@ -83,7 +83,7 @@ public:
     Q_ENUM(Type)
 
 
-    explicit ServicesDiscoveryModel(QObject* parent = nullptr);
+    explicit AddonsModel(QObject* parent = nullptr);
 
 public: //QAbstractListModel override
     QVariant data(const QModelIndex& index, int role) const override;
@@ -120,7 +120,7 @@ signals:
     void typeFilterChanged();
 
 private:
-    Q_DECLARE_PRIVATE(ServicesDiscoveryModel);
+    Q_DECLARE_PRIVATE(AddonsModel);
 };
 
-#endif // MLServicesDiscoveryModel_HPP
+#endif // ADDONS_MODEL_HPP

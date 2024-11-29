@@ -250,6 +250,8 @@ libqt_plugin_la_SOURCES = \
 	menus/qml_menu_wrapper.cpp \
 	menus/qml_menu_wrapper.hpp \
 	menus/menus.cpp menus/menus.hpp \
+	network/addonsmodel.cpp \
+	network/addonsmodel.hpp \
 	network/mediatreelistener.cpp \
 	network/mediatreelistener.hpp \
 	network/devicesourceprovider.cpp \
@@ -262,8 +264,6 @@ libqt_plugin_la_SOURCES = \
 	network/networksourcesmodel.hpp \
 	network/networkmediamodel.cpp \
 	network/networkmediamodel.hpp \
-	network/servicesdiscoverymodel.cpp \
-	network/servicesdiscoverymodel.hpp \
 	network/standardpathmodel.cpp \
 	network/standardpathmodel.hpp \
 	network/vlcmediasourcewrapper.hpp \
@@ -452,12 +452,12 @@ nodist_libqt_plugin_la_SOURCES = \
 	menus/custom_menus.moc.cpp \
 	menus/qml_menu_wrapper.moc.cpp \
 	menus/menus.moc.cpp \
+	network/addonsmodel.moc.cpp \
 	network/devicesourceprovider.moc.cpp \
 	network/networkdevicemodel.moc.cpp \
 	network/networkbasemodel.moc.cpp \
 	network/networksourcesmodel.moc.cpp \
 	network/networkmediamodel.moc.cpp \
-	network/servicesdiscoverymodel.moc.cpp \
 	network/standardpathmodel.moc.cpp \
 	style/colorcontext.moc.cpp \
 	style/systempalette.moc.cpp \

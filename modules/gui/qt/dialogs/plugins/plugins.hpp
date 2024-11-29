@@ -52,7 +52,7 @@ class ExtensionCopy;
 class ExtensionsManager;
 class PixmapAnimator;
 class DelegateAnimationHelper;
-class ServicesDiscoveryModel;
+class AddonsModel;
 
 extern "C" {
     typedef struct extension_t extension_t;
@@ -151,7 +151,7 @@ private:
     PixmapAnimator *spinnerAnimation;
     bool b_localdone;
     QSignalMapper *signalMapper;
-    std::unique_ptr<ServicesDiscoveryModel> m_model;
+    std::unique_ptr<AddonsModel> m_model;
 };
 
 class PluginTreeItem : public QTreeWidgetItem
