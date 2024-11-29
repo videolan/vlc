@@ -369,7 +369,8 @@ tc_va_check_interop_blacklist(const struct vlc_gl_interop *interop, VADisplay *v
 }
 
 static int
-tc_va_check_derive_image(const struct vlc_gl_interop *interop)
+tc_va_check_derive_image(const struct vlc_gl_interop *interop,
+                         vlc_fourcc_t sw_chroma)
 {
     vlc_object_t *o = VLC_OBJECT(interop->gl);
     struct priv *priv = interop->priv;
@@ -389,7 +390,8 @@ tc_va_check_derive_image(const struct vlc_gl_interop *interop)
     assert(va_image.format.fourcc == priv->fourcc);
 
     const vlc_chroma_description_t *image_desc =
-        vlc_fourcc_GetChromaDescription(va_image.format.fourcc);
+        vlc_fourcc_GetChromaDescription(sw_chroma);
+    assert(image_desc != NULL);
     assert(image_desc->plane_count == va_image.num_planes);
 
     VABufferInfo va_buffer_info = (VABufferInfo) {
@@ -573,7 +575,7 @@ Open(struct vlc_gl_interop *interop)
     if (tc_va_check_interop_blacklist(interop, priv->vadpy))
         goto error;
 
-    if (tc_va_check_derive_image(interop))
+    if (tc_va_check_derive_image(interop, vlc_sw_chroma))
         goto error;
 
     /* The pictures are uploaded upside-down */
