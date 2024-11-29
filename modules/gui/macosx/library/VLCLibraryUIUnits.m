@@ -246,6 +246,21 @@
     return 400.;
 }
 
++ (const CGFloat)largePlaybackControlButtonSize
+{
+    return 64.;
+}
+
++ (const CGFloat)mediumPlaybackControlButtonSize
+{
+    return 48.;
+}
+
++ (const CGFloat)smallPlaybackControlButtonSize
+{
+    return 32.;
+}
+
 + (const CGFloat)sliderTickThickness
 {
     return 1.;
