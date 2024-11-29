@@ -37,8 +37,8 @@ ScaledImage {
 
     property real rectWidth: sourceItem ? Math.min(sourceItem.paintedWidth ?? Number.MAX_VALUE, sourceItem.width) : 0
     property real rectHeight: sourceItem ? Math.min(sourceItem.paintedHeight ?? Number.MAX_VALUE, sourceItem.height) : 0
-    property real xRadius: sourceItem?.radius ?? 0
-    property real yRadius: sourceItem?.radius ?? 0
+    property real xRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
+    property real yRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
 
     property color primaryColor: Qt.rgba(0, 0, 0, .18)
     property real primaryVerticalOffset: 0
