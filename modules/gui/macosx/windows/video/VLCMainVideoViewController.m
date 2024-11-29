@@ -212,10 +212,7 @@
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
-
-        [NSLayoutConstraint activateConstraints:@[
-            [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:self.audioDecorativeView.foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing]
-        ]];
+        [self applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint];
     } else {
         [self setAutohideControls:YES];
         self.bottomButtonStackViewConstraint.active = NO;
@@ -224,6 +221,17 @@
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.largePlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.mediumPlaybackControlButtonSize;
     }
+}
+
+- (void)applyBottomBarAudioDecorativeViewForegroundCoverArtViewConstraint
+{
+    if (![self.voutContainingView.subviews containsObject:self.audioDecorativeView]) {
+        return;
+    }
+
+    [NSLayoutConstraint activateConstraints:@[
+        [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:self.audioDecorativeView.foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing]
+    ]];
 }
 
 - (void)playerCurrentMediaItemChanged:(NSNotification *)notification
