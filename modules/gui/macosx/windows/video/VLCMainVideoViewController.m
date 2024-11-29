@@ -212,8 +212,8 @@
         self.bottomButtonStackViewConstraint.active = YES;
     } else {
         [self setAutohideControls:YES];
-        self.centerButtonStackInViewConstraint.active = YES;
         self.bottomButtonStackViewConstraint.active = NO;
+        self.centerButtonStackInViewConstraint.active = YES;
     }
 }
 
