@@ -545,6 +545,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                                 BOXDATA(p_av1C)->i_av1C );
                         p_track->fmt.i_extra = BOXDATA(p_av1C)->i_av1C;
                     }
+                    if (p_track->fmt.i_extra <= 4)
+                        p_track->fmt.b_packetized = false; // force full extradata by the packetizer
                 }
             }
             break;
