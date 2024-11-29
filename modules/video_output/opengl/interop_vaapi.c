@@ -434,6 +434,25 @@ done:
     return ret;
 }
 
+static void
+GetChromaVaFourcc(vlc_fourcc_t opaque_chroma, int *va_fourcc,
+                  vlc_fourcc_t *sw_chroma)
+{
+    switch (opaque_chroma)
+    {
+        case VLC_CODEC_VAAPI_420:
+            *va_fourcc = VA_FOURCC_NV12;
+            *sw_chroma = VLC_CODEC_NV12;
+            break;
+        case VLC_CODEC_VAAPI_420_10BPP:
+            *va_fourcc = VA_FOURCC_P010;
+            *sw_chroma = VLC_CODEC_P010;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 static int
 Open(struct vlc_gl_interop *interop)
 {
@@ -460,13 +479,11 @@ Open(struct vlc_gl_interop *interop)
     priv->fourcc = 0;
 
     int va_fourcc;
-    int vlc_sw_chroma;
+    vlc_fourcc_t vlc_sw_chroma;
+    GetChromaVaFourcc(interop->fmt_in.i_chroma, &va_fourcc, &vlc_sw_chroma);
     switch (interop->fmt_in.i_chroma)
     {
-        case VLC_CODEC_VAAPI_420:
-            va_fourcc = VA_FOURCC_NV12;
-            vlc_sw_chroma = VLC_CODEC_NV12;
-
+        case VLC_CODEC_VAAPI_420: /* VLC_CODEC_NV12 */
             interop->tex_count = 2;
             interop->texs[0] = (struct vlc_gl_tex_cfg) {
                 .w = {1, 1},
@@ -484,10 +501,7 @@ Open(struct vlc_gl_interop *interop)
             };
 
             break;
-        case VLC_CODEC_VAAPI_420_10BPP:
-            va_fourcc = VA_FOURCC_P010;
-            vlc_sw_chroma = VLC_CODEC_P010;
-
+        case VLC_CODEC_VAAPI_420_10BPP: /* VLC_CODEC_P010 */
             if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, GL_RG,
                                                 GL_RG16, GL_UNSIGNED_SHORT) != 16)
                 goto error;
