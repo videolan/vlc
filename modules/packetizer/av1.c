@@ -158,8 +158,9 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.i_extra = 0;
     }
 
-    if(!p_dec->fmt_in.i_extra && !p_dec->fmt_out.i_extra)
+    if(p_dec->fmt_out.i_extra <= 4)
     {
+        free(p_dec->fmt_out.p_extra);
         p_dec->fmt_out.i_extra =
                 AV1_create_DecoderConfigurationRecord((uint8_t **)&p_dec->fmt_out.p_extra,
                                                       p_sys->p_sequence_header,
