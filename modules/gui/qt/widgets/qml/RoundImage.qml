@@ -38,6 +38,7 @@ Item {
     // so it is not provided as an alias here
 
     property real radius
+    readonly property real effectiveRadius: (shaderEffect.readyForVisibility ?? shaderEffect.visible) ? radius : 0.0
 
     // NOTE: Note the distinction between ShaderEffect and
     //       ShaderEffectSource. ShaderEffect is no different
