@@ -409,6 +409,7 @@ if get_option('css_engine').require(flex.found() and bison.found(),
         webvtt_bison_files,
     ]
 
+    if (get_option('tests').allowed())
     # CSS parser test
     css_parser_test = executable('css_parser_test',
         files(
@@ -423,6 +424,7 @@ if get_option('css_engine').require(flex.found() and bison.found(),
             include_directories('webvtt')])
 
     test('css_parser', css_parser_test, suite: 'css_parser')
+    endif
 
 endif
 

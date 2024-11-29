@@ -25,6 +25,7 @@ vlc_http_lib = static_library('vlc_http',
     include_directories: [vlc_include_dirs],
 )
 
+if (get_option('tests').allowed())
 #
 # Tests
 #
@@ -84,7 +85,7 @@ test('http_h1chunked_test', h1chunked_test, suite: 'http')
 test('http_msg_test', http_msg_test, suite: 'http')
 test('http_file_test', http_file_test, suite: 'http')
 test('http_tunnel_test', http_tunnel_test, suite: 'http', timeout: 90)
-
+endif
 
 #
 # HTTP(S) module
