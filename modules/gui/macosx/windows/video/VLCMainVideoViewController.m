@@ -212,6 +212,10 @@
         self.prevButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.playButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
         self.nextButtonSizeConstraint.constant = VLCLibraryUIUnits.smallPlaybackControlButtonSize;
+
+        [NSLayoutConstraint activateConstraints:@[
+            [self.centralControlsStackView.topAnchor constraintGreaterThanOrEqualToAnchor:self.audioDecorativeView.foregroundCoverArtView.bottomAnchor constant:VLCLibraryUIUnits.largeSpacing]
+        ]];
     } else {
         [self setAutohideControls:YES];
         self.bottomButtonStackViewConstraint.active = NO;
