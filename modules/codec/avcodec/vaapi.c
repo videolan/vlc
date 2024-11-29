@@ -245,8 +245,9 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
 
     if (vlc_chroma == 0)
     {
-        msg_Warn(va, "ffmpeg chroma not compatible with vlc: hw: %d, sw: %d",
-                 hwframes_ctx->format, hwframes_ctx->sw_format);
+        msg_Warn(va, "ffmpeg chroma not compatible with vlc: hw: %s, sw: %s",
+                 av_get_pix_fmt_name(hwframes_ctx->format),
+                 av_get_pix_fmt_name(hwframes_ctx->sw_format));
         av_buffer_unref(&hwframes_ref);
         return VLC_EGENERIC;
     }
