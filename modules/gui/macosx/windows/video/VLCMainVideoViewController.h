@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *prevButtonSizeConstraint;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *nextButtonSizeConstraint;
 
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *centerButtonStackInViewConstraint;
+@property (readwrite, strong) IBOutlet NSLayoutConstraint *centerButtonStackInViewConstraint;
 @property (readonly) NSLayoutConstraint *bottomButtonStackViewConstraint;
 
 @property (readonly, strong) VLCMainVideoViewAudioMediaDecorativeView *audioDecorativeView;
