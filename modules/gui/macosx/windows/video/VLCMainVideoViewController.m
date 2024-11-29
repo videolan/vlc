@@ -208,8 +208,12 @@
 
     if (decorativeViewVisible) {
         [self setAutohideControls:NO];
+        self.centerButtonStackInViewConstraint.active = NO;
+        self.bottomButtonStackViewConstraint.active = YES;
     } else {
         [self setAutohideControls:YES];
+        self.centerButtonStackInViewConstraint.active = YES;
+        self.bottomButtonStackViewConstraint.active = NO;
     }
 }
 
