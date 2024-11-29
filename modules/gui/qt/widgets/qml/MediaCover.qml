@@ -27,7 +27,7 @@ import VLC.Style
 
 // NOTE: This rectangle is useful to discern the item against a similar background.
 // FIXME: Maybe we could refactor this to draw the background directly in the RoundImage.
-Rectangle {
+Item {
     id: root
 
     // Properties
@@ -39,6 +39,10 @@ Rectangle {
     readonly property real effectiveRadius: image.visible ? image.effectiveRadius
                                                           : (fallbackImage.visible ? fallbackImage.effectiveRadius
                                                                                    : 0.0)
+
+    property alias radius: image.radius
+
+    property alias color: background.color
 
     // Aliases
 
@@ -72,6 +76,12 @@ Rectangle {
 
     // Children
 
+    Rectangle {
+        id: background
+        anchors.fill: parent
+        radius: root.effectiveRadius
+    }
+
     //delay placeholder showing up
     Timer {
         id: timer
@@ -84,8 +94,6 @@ Rectangle {
         id: image
 
         anchors.fill: parent
-
-        radius: root.radius
 
         sourceSize.width: root.pictureWidth * Screen.devicePixelRatio
         sourceSize.height: root.pictureHeight * Screen.devicePixelRatio
