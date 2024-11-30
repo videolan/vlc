@@ -1257,10 +1257,9 @@ static NSString *genreArrayDisplayString(NSArray<VLCMediaLibraryGenre *> * const
     case VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK:
     {
         VLCMediaLibraryGenre * const genre = [VLCMediaLibraryGenre genreWithID:self.genreID];
-        if (genre == nil) {
-            return @"";
+        if (genre != nil) {
+            return genreArrayDisplayString(@[genre]);
         }
-        return genreArrayDisplayString(@[genre]);
     }
     default:
         return self.inputItem.date;
