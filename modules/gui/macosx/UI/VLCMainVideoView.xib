@@ -355,10 +355,28 @@
                                 </shadow>
                             </customView>
                             <stackView wantsLayer="YES" distribution="fill" orientation="horizontal" alignment="centerY" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CvV-yX-Nbh">
-                                <rect key="frame" x="260" y="208" width="200" height="64"/>
+                                <rect key="frame" x="208" y="208" width="304" height="64"/>
                                 <subviews>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="AXA-01-AU8" customClass="VLCImageButton">
+                                        <rect key="frame" x="0.0" y="13" width="32" height="40"/>
+                                        <shadow key="shadow" blurRadius="20">
+                                            <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </shadow>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="arrow.trianglehead.counterclockwise" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="BGU-Ew-pvq">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="Xh5-1i-dxH"/>
+                                            <constraint firstAttribute="width" secondItem="AXA-01-AU8" secondAttribute="height" multiplier="1:1" id="lgn-JT-8Qk"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="jumpBackward:" target="3" id="Kkq-12-jbm"/>
+                                        </connections>
+                                    </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="V9d-hX-iyg" customClass="VLCImageButton">
-                                        <rect key="frame" x="0.0" y="6.5" width="48.5" height="51"/>
+                                        <rect key="frame" x="52" y="6.5" width="48.5" height="51"/>
                                         <shadow key="shadow" blurRadius="20">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
@@ -376,7 +394,7 @@
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="PCC-8a-sVF" customClass="VLCImageButton">
-                                        <rect key="frame" x="68" y="-1.5" width="64.5" height="68"/>
+                                        <rect key="frame" x="120" y="-1.5" width="64.5" height="68"/>
                                         <shadow key="shadow" blurRadius="30">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
@@ -397,7 +415,7 @@
                                         </connections>
                                     </button>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="sF5-Z0-bef" customClass="VLCImageButton">
-                                        <rect key="frame" x="152" y="6.5" width="48.5" height="51"/>
+                                        <rect key="frame" x="204" y="6.5" width="48.5" height="51"/>
                                         <shadow key="shadow" blurRadius="20">
                                             <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </shadow>
@@ -414,13 +432,39 @@
                                             <action selector="fwd:" target="3" id="uPX-Xa-CwO"/>
                                         </connections>
                                     </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="aAq-uE-mLW" customClass="VLCImageButton">
+                                        <rect key="frame" x="272" y="13" width="32" height="40"/>
+                                        <shadow key="shadow" blurRadius="20">
+                                            <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </shadow>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="arrow.trianglehead.clockwise" catalog="system" imagePosition="only" alignment="center" continuous="YES" imageScaling="proportionallyUpOrDown" inset="2" id="V5z-Pf-hj2">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="32" id="OBA-WG-jaz"/>
+                                            <constraint firstAttribute="width" secondItem="aAq-uE-mLW" secondAttribute="height" multiplier="1:1" id="g5c-kh-jsZ"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="jumpForward:" target="3" id="5yg-na-tAR"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
+                                <constraints>
+                                    <constraint firstItem="aAq-uE-mLW" firstAttribute="width" secondItem="aAq-uE-mLW" secondAttribute="height" multiplier="1:1" id="eMl-LK-UdE"/>
+                                    <constraint firstItem="AXA-01-AU8" firstAttribute="width" secondItem="AXA-01-AU8" secondAttribute="height" multiplier="1:1" id="tkp-uc-bfs"/>
+                                </constraints>
                                 <visibilityPriorities>
+                                    <integer value="1000"/>
+                                    <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
                                 </visibilityPriorities>
                                 <customSpacing>
+                                    <real value="3.4028234663852886e+38"/>
+                                    <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
                                     <real value="3.4028234663852886e+38"/>
@@ -524,6 +568,8 @@
         <image name="NSLeftFacingTriangleTemplate" width="12" height="17"/>
         <image name="NSListViewTemplate" width="21" height="15"/>
         <image name="VLCPauseTemplate" width="128" height="128"/>
+        <image name="arrow.trianglehead.clockwise" catalog="system" width="15" height="17"/>
+        <image name="arrow.trianglehead.counterclockwise" catalog="system" width="15" height="17"/>
         <image name="arrow.up.left.and.arrow.down.right" catalog="system" width="16" height="15"/>
         <image name="backward.fill" catalog="system" width="20" height="12"/>
         <image name="bookmark.circle" catalog="system" width="15" height="15"/>
