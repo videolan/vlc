@@ -123,6 +123,14 @@
     self.forwardButton.accessibilityLabel = _NS("Seek forward");
     self.forwardButton.accessibilityTitle = self.forwardButton.toolTip;
 
+    self.jumpBackwardButton.toolTip = _NS("Jump backwards");
+    self.jumpBackwardButton.accessibilityLabel = _NS("Jump backwards in current item");
+    self.jumpBackwardButton.accessibilityTitle = self.jumpBackwardButton.toolTip;
+
+    self.jumpForwardButton.toolTip = _NS("Jump forwards");
+    self.jumpForwardButton.accessibilityLabel = _NS("Jump forwards in current item");
+    self.jumpForwardButton.accessibilityTitle = self.jumpForwardButton.toolTip;
+
     [self.timeSlider setToolTip: _NS("Position")];
     self.timeSlider.accessibilityLabel = _NS("Playback position");
     self.timeSlider.accessibilityTitle = self.timeSlider.toolTip;
