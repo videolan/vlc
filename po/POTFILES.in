@@ -1387,7 +1387,7 @@ share/lua/http/mobile.html
 share/lua/http/mobile_browse.html
 share/lua/http/mobile_equalizer.html
 share/lua/http/mobile_view.html
-share/vlc.appdata.xml.in.in
+share/org.videolan.vlc.appdata.xml.in.in
 
 
 # qt .ui files

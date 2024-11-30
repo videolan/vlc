@@ -1,4 +1,4 @@
 vlc.desktop
 vlc-*.desktop
-vlc.appdata.xml
-vlc.appdata.xml.in
+org.videolan.vlc.appdata.xml
+org.videolan.vlc.appdata.xml.in
