@@ -157,6 +157,31 @@
                                       accessibilityDescription:_NS("Muted")];
         _unmutedVolumeImage = [NSImage imageWithSystemSymbolName:@"speaker.wave.3.fill"
                                         accessibilityDescription:_NS("Unmuted")];
+
+        const int64_t shortJumpSize = var_InheritInteger(getIntf(), "short-jump-size");
+        NSString * const shortJumpSizeString = [NSString stringWithFormat:@"%lli", shortJumpSize];
+        switch (shortJumpSize) {
+            case 90:
+            case 75:
+            case 60:
+            case 45:
+            case 30:
+            case 15:
+            case 10:
+            case 5:
+            {
+                NSString * const jumpForwardSymbolName =
+                    [NSString stringWithFormat:@"%@.arrow.trianglehead.clockwise",shortJumpSizeString];
+                NSString * const jumpBackwardSymbolName =
+                    [NSString stringWithFormat:@"%@.arrow.trianglehead.counterclockwise", shortJumpSizeString];
+                self.jumpForwardButton.image =
+                    [NSImage imageWithSystemSymbolName:jumpForwardSymbolName
+                              accessibilityDescription:_NS("Jump forward")];
+                self.jumpBackwardButton.image =
+                    [NSImage imageWithSystemSymbolName:jumpBackwardSymbolName
+                              accessibilityDescription:_NS("Jump backward")];
+            }
+        }
     } else {
         _playImage = imageFromRes(@"VLCPlayTemplate");
         _pressedPlayImage = imageFromRes(@"VLCPlayTemplate");
