@@ -54,10 +54,23 @@
                                                 </textFieldCell>
                                             </textField>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="Vae-cT-EEI" userLabel="Play controls group">
-                                                <rect key="frame" x="202" y="10" width="96" height="32"/>
+                                                <rect key="frame" x="185" y="10" width="131" height="32"/>
                                                 <subviews>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="gAM-N6-20z" userLabel="Jump Back Button">
+                                                        <rect key="frame" x="0.0" y="3" width="20.5" height="28"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="arrow.trianglehead.counterclockwise" catalog="system" imagePosition="only" alignment="center" alternateImage="backward.fill" controlSize="large" continuous="YES" imageScaling="proportionallyUpOrDown" id="ZMf-Wu-LAx">
+                                                            <behavior key="behavior" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="gAM-N6-20z" secondAttribute="height" multiplier="1:1" id="xMw-di-Drm"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <action selector="jumpBackward:" target="3" id="WYX-uq-hwV"/>
+                                                        </connections>
+                                                    </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                                                        <rect key="frame" x="0.0" y="-1" width="32" height="35"/>
+                                                        <rect key="frame" x="20" y="-1.5" width="32.5" height="35"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="backward.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="backward.fill" controlSize="large" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="14">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -70,7 +83,7 @@
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="10">
-                                                        <rect key="frame" x="32" y="-3" width="32" height="38"/>
+                                                        <rect key="frame" x="52" y="-3" width="32" height="38"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="play.circle.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="play.circle.fill" controlSize="large" imageScaling="proportionallyUpOrDown" id="15">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -83,7 +96,7 @@
                                                         </connections>
                                                     </button>
                                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="12">
-                                                        <rect key="frame" x="64" y="-1" width="32" height="35"/>
+                                                        <rect key="frame" x="84" y="-1.5" width="32.5" height="35"/>
                                                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="forward.fill" catalog="system" imagePosition="only" alignment="center" alternateImage="forward.fill" controlSize="large" continuous="YES" enabled="NO" imageScaling="proportionallyUpOrDown" id="13">
                                                             <behavior key="behavior" lightByContents="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -95,19 +108,38 @@
                                                             <action selector="fwd:" target="3" id="51"/>
                                                         </connections>
                                                     </button>
+                                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="gzL-f3-Atd" userLabel="Jump Forwards Buttoin">
+                                                        <rect key="frame" x="116" y="6" width="15" height="23"/>
+                                                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="arrow.trianglehead.clockwise" catalog="system" imagePosition="only" alignment="center" alternateImage="arrow.trianglehead.clockwise" controlSize="large" continuous="YES" imageScaling="proportionallyUpOrDown" id="81E-pP-1hO">
+                                                            <behavior key="behavior" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="gzL-f3-Atd" secondAttribute="height" multiplier="1:1" id="sv0-Qp-GHf"/>
+                                                        </constraints>
+                                                        <connections>
+                                                            <action selector="jumpForward:" target="3" id="m6y-ed-Fwc"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                                 <constraints>
                                                     <constraint firstItem="11" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="11i-jS-o5W"/>
+                                                    <constraint firstItem="gzL-f3-Atd" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="3NJ-z2-sVu"/>
                                                     <constraint firstItem="10" firstAttribute="left" secondItem="11" secondAttribute="right" id="496-Ip-nTd"/>
                                                     <constraint firstItem="10" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="9Kr-xx-Ssf"/>
-                                                    <constraint firstAttribute="right" secondItem="12" secondAttribute="right" id="KOc-oW-4iH"/>
+                                                    <constraint firstItem="gzL-f3-Atd" firstAttribute="width" secondItem="gzL-f3-Atd" secondAttribute="height" multiplier="1:1" id="Hl0-jN-lyU"/>
+                                                    <constraint firstAttribute="trailing" secondItem="gzL-f3-Atd" secondAttribute="trailing" id="IQ0-ae-v5p"/>
+                                                    <constraint firstItem="gzL-f3-Atd" firstAttribute="left" secondItem="12" secondAttribute="right" id="KOc-oW-4iH"/>
+                                                    <constraint firstItem="gAM-N6-20z" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="QiN-nb-d8b"/>
+                                                    <constraint firstItem="gAM-N6-20z" firstAttribute="width" secondItem="gAM-N6-20z" secondAttribute="height" multiplier="1:1" id="Zi6-SL-IgL"/>
                                                     <constraint firstAttribute="height" constant="32" id="bN7-k9-7Iy"/>
                                                     <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" id="fFe-7J-ver"/>
                                                     <constraint firstItem="12" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="gwB-yN-SK0"/>
                                                     <constraint firstAttribute="bottom" secondItem="12" secondAttribute="bottom" id="l2h-EI-MAG"/>
                                                     <constraint firstItem="12" firstAttribute="left" secondItem="10" secondAttribute="right" id="mOu-KM-Uo8"/>
-                                                    <constraint firstItem="11" firstAttribute="left" secondItem="Vae-cT-EEI" secondAttribute="left" id="rI6-bN-oCM"/>
+                                                    <constraint firstItem="11" firstAttribute="left" secondItem="gAM-N6-20z" secondAttribute="right" id="rI6-bN-oCM"/>
                                                     <constraint firstAttribute="bottom" secondItem="10" secondAttribute="bottom" id="yGM-Jx-9fD"/>
+                                                    <constraint firstItem="gAM-N6-20z" firstAttribute="leading" secondItem="Vae-cT-EEI" secondAttribute="leading" id="yhq-h9-lgm"/>
                                                 </constraints>
                                             </customView>
                                             <slider hidden="YES" horizontalHuggingPriority="200" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="20" customClass="VLCPlaybackProgressSlider">
@@ -224,6 +256,8 @@
                 <outlet property="detailLabel" destination="hHQ-ue-m9C" id="YOa-QZ-nmx"/>
                 <outlet property="dropView" destination="65" id="9kL-XQ-Akn"/>
                 <outlet property="forwardButton" destination="12" id="f7L-YR-p1H"/>
+                <outlet property="jumpBackwardButton" destination="gAM-N6-20z" id="pjA-Rp-szy"/>
+                <outlet property="jumpForwardButton" destination="gzL-f3-Atd" id="g5i-TP-TrD"/>
                 <outlet property="playButton" destination="10" id="Gsq-tx-qf3"/>
                 <outlet property="playingItemDisplayField" destination="zpq-en-EAi" id="9js-uK-Dgf"/>
                 <outlet property="timeField" destination="9" id="uzI-2c-bs3"/>
@@ -232,6 +266,8 @@
         </customObject>
     </objects>
     <resources>
+        <image name="arrow.trianglehead.clockwise" catalog="system" width="15" height="17"/>
+        <image name="arrow.trianglehead.counterclockwise" catalog="system" width="15" height="17"/>
         <image name="backward.fill" catalog="system" width="20" height="12"/>
         <image name="forward.fill" catalog="system" width="20" height="12"/>
         <image name="play.circle.fill" catalog="system" width="15" height="15"/>
