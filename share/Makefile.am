@@ -7,8 +7,7 @@ if !HAVE_WIN32
 if !HAVE_DARWIN
 desktop_DATA = vlc.desktop
 appdatadir = $(datarootdir)/metainfo
-appdata_DATA = $(appdata_in_files:.xml.in=.xml)
-appdata_in_files = vlc.appdata.xml.in
+appdata_DATA = org.videolan.vlc.appdata.xml
 endif
 endif
 
@@ -23,7 +22,7 @@ vlc.desktop: vlc.desktop.in $(top_builddir)/config.status
 	$(AM_V_at)$(DESKTOP_FILE_VALIDATE) tmp-$@
 	$(AM_V_at)mv -f tmp-$@ $@
 
-vlc.appdata.xml: vlc.appdata.xml.in
+org.videolan.vlc.appdata.xml: org.videolan.vlc.appdata.xml.in
 	$(AM_V_GEN)$(MSGFMT) --xml --template $< -d $(top_srcdir)/po -o $@ || cp $< $@
 
 iconsdatadir = $(datadir)/icons/hicolor

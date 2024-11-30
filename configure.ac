@@ -4447,7 +4447,7 @@ AC_CONFIG_FILES([
   bin/Makefile
   test/Makefile
   modules/hw/mmal/Makefile
-  share/vlc.appdata.xml.in
+  share/org.videolan.vlc.appdata.xml.in
 ])
 
 AM_COND_IF([HAVE_WIN32], [

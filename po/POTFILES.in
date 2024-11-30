@@ -1265,7 +1265,7 @@ modules/visualization/projectm.cpp
 modules/visualization/visual/visual.c
 modules/visualization/visual/window_presets.h
 modules/visualization/vsxu.cpp
-share/vlc.appdata.xml.in.in
+share/org.videolan.vlc.appdata.xml.in.in
 share/lua/http/dialogs/batch_window.html
 share/lua/http/dialogs/browse_window.html
 share/lua/http/dialogs/create_stream.html

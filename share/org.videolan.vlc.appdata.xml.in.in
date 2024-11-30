@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2016-2017 Jean-Baptiste Kempf CC-0 -->
 
-<component type="desktop">
+<component type="desktop-application">
     <id>org.videolan.vlc</id>
     <launchable type="desktop-id">vlc.desktop</launchable>
     <metadata_license>CC0-1.0</metadata_license>
@@ -31,11 +31,12 @@
         <screenshot type="default">
             <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-poney.jpg</image>
         </screenshot>
-        <screenshot type="default">
+        <screenshot>
             <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-open.jpg</image>
         </screenshot>
-        <screenshot type="default">
+        <screenshot>
             <image>http://images.videolan.org/vlc/screenshots/2.0.0/vlc-2.0-gnome3-debian.jpg</image>
         </screenshot>
     </screenshots>
+    <content_rating type="oars-1.1" />
 </component>
