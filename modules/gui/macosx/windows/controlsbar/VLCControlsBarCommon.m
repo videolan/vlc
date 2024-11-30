@@ -312,6 +312,16 @@
     }
 }
 
+- (IBAction)jumpBackward:(id)sender
+{
+    [_playerController jumpBackwardShort];
+}
+
+- (IBAction)jumpForward:(id)sender
+{
+    [_playerController jumpForwardShort];
+}
+
 - (IBAction)timeSliderAction:(id)sender
 {
     float newPosition;

@@ -72,6 +72,8 @@
 - (IBAction)play:(id)sender;
 - (IBAction)bwd:(id)sender;
 - (IBAction)fwd:(id)sender;
+- (IBAction)jumpBackward:(id)sender;
+- (IBAction)jumpForward:(id)sender;
 
 - (IBAction)timeSliderAction:(id)sender;
 - (IBAction)volumeAction:(id)sender;
