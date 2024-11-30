@@ -45,6 +45,8 @@
                 <outlet property="forwardButton" destination="sF5-Z0-bef" id="H6w-Le-NAK"/>
                 <outlet property="fullscreenButton" destination="dYZ-ri-Kra" id="Cw2-BS-QG9"/>
                 <outlet property="fullscreenButtonWidthConstraint" destination="quS-fD-Od7" id="6hT-nR-yQI"/>
+                <outlet property="jumpBackwardButton" destination="AXA-01-AU8" id="gfa-Yt-ezI"/>
+                <outlet property="jumpForwardButton" destination="aAq-uE-mLW" id="M7n-mW-tNe"/>
                 <outlet property="muteVolumeButton" destination="afi-4d-rQk" id="y6R-6o-2OM"/>
                 <outlet property="pipButton" destination="yEi-SZ-SIS" id="vFi-Ln-9lT"/>
                 <outlet property="pipButtonWidthConstraint" destination="dxa-Jx-T4p" id="a5S-ec-2xD"/>
