@@ -1,5 +1,8 @@
 voutdir = $(pluginsdir)/video_output
 vout_LTLIBRARIES =
+# Install the pkglib/pkglibexec first before relinking the modules.
+# This ensures libtool re-linking is not racy.
+install-voutLTLIBRARIES: install-pkglibLTLIBRARIES
 
 EXTRA_DIST += video_output/README
 
