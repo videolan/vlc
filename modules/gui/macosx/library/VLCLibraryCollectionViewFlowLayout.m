@@ -153,6 +153,21 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     return _prevProvidedAnimationStep;
 }
 
+- (CGFloat)finalExpandedHeight
+{
+    switch(_animationType) {
+        case VLCExpandAnimationTypeHorizontalMedium:
+            return VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewWidth;
+        case VLCExpandAnimationTypeHorizontalLarge:
+            return VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewWidth;
+        case VLCExpandAnimationTypeVerticalLarge:
+            return VLCLibraryUIUnits.largeDetailSupplementaryViewCollectionViewHeight;
+        case VLCExpandAnimationTypeVerticalMedium:
+        default:
+            return VLCLibraryUIUnits.mediumDetailSupplementaryViewCollectionViewHeight;
+    }
+}
+
 #pragma mark - Public methods
 - (void)expandDetailSectionAtIndex:(NSIndexPath *)indexPath
 {
