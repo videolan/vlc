@@ -188,11 +188,9 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
     if (!newItemOnSameRow) {
         [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
 
-        if (indexPath != nil && self.collectionView != nil) {
-            NSRect frame = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath].frame;
-            frame.size.height += [self finalExpandedHeight];
-            [self.collectionView.animator scrollRectToVisible:frame];
-        }
+        NSRect frame = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath].frame;
+        frame.size.height += [self finalExpandedHeight];
+        [self.collectionView.animator scrollRectToVisible:frame];
     } else {
         _animationIsCollapse = NO;
     }
