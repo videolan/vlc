@@ -1,5 +1,8 @@
 aoutdir = $(pluginsdir)/audio_output
 aout_LTLIBRARIES =
+# Install the pkglib/pkglibexec first before relinking the modules.
+# This ensures libtool re-linking is not racy.
+install-aoutLTLIBRARIES: install-pkglibLTLIBRARIES
 
 libopensles_android_plugin_la_SOURCES = audio_output/opensles_android.c
 libopensles_android_plugin_la_LIBADD = $(LIBDL) $(LIBM)
