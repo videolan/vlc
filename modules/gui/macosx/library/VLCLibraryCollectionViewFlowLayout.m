@@ -189,7 +189,7 @@ static CVReturn detailViewAnimationCallback(CVDisplayLinkRef displayLink,
         [self animateDetailViewWithAnimation:VLCDetailViewAnimationTypeExpand];
 
         NSRect frame = [self.collectionView layoutAttributesForItemAtIndexPath:indexPath].frame;
-        frame.size.height += [self finalExpandedHeight];
+        frame.size.height += [self finalExpandedHeight] + VLCLibraryUIUnits.largeSpacing;
         [self.collectionView.animator scrollRectToVisible:frame];
     } else {
         _animationIsCollapse = NO;
