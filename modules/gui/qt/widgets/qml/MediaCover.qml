@@ -40,11 +40,11 @@ Item {
                                                           : (fallbackImage.visible ? fallbackImage.effectiveRadius
                                                                                    : 0.0)
 
+    // Aliases
+
     property alias radius: image.radius
 
     property alias color: background.color
-
-    // Aliases
 
     property alias source: image.source
 
@@ -62,6 +62,9 @@ Item {
     required property int pictureWidth
     required property int pictureHeight
 
+    readonly property real paintedWidth: fallbackImage.visible ? fallbackImage.paintedWidth : image.paintedWidth
+    readonly property real paintedHeight: fallbackImage.visible ? fallbackImage.paintedHeight : image.paintedHeight
+
     // Signals
 
     signal playIconClicked(var point)
@@ -78,7 +81,13 @@ Item {
 
     Rectangle {
         id: background
-        anchors.fill: parent
+
+        anchors.centerIn: parent
+        anchors.alignWhenCentered: true
+
+        width: root.paintedWidth
+        height: root.paintedHeight
+
         radius: root.effectiveRadius
     }
 
