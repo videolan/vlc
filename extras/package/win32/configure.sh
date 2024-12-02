@@ -1,7 +1,6 @@
 #!/bin/sh
 
 OPTIONS="
-      --enable-update-check
       --enable-lua
       --enable-flac
       --enable-theora

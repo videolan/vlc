@@ -446,7 +446,7 @@ fi
 cd ../..
 
 # configuration matching configure.sh (goom is called goom2, theora is theoradec+theoraenc)
-MCONFIGFLAGS="-Dupdate-check=enabled -Dlua=enabled -Dflac=enabled -Dtheoradec=enabled -Dtheoraenc=enabled \
+MCONFIGFLAGS="-Dlua=enabled -Dflac=enabled -Dtheoradec=enabled -Dtheoraenc=enabled \
     -Davcodec=enabled -Dmerge-ffmpeg=true \
     -Dlibass=enabled -Dschroedinger=enabled -Dshout=enabled -Dgoom2=enabled \
     -Dsse=enabled -Dlibcddb=enabled -Dzvbi=enabled -Dtelx=disabled $MCONFIGFLAGS"
@@ -480,8 +480,8 @@ if [ -n "$DISABLEGUI" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --disable-qt --disable-skins2"
     MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=disabled -Dskins2=disabled"
 else
-    CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2"
-    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=enabled -Dskins2=enabled"
+    CONFIGFLAGS="$CONFIGFLAGS --enable-qt --enable-skins2 --enable-update-check"
+    MCONFIGFLAGS="$MCONFIGFLAGS -Dqt=enabled -Dskins2=enabled -Dupdate-check=enabled"
 fi
 if [ -n "$WINSTORE" ]; then
     CONFIGFLAGS="$CONFIGFLAGS --enable-winstore-app"
