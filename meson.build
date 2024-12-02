@@ -173,7 +173,7 @@ iconv_dep = dependency('iconv', required: false)
 if not iconv_dep.found()
     # check in contribs
     if cc.has_function('iconv_open', prefix: vlc_conf_prefix + '#include <iconv.h>',
-                       dependencies: [contrib_dep, cc.find_library('iconv', dirs: contrib_libdir)])
+                       dependencies: [contrib_dep, cc.find_library('iconv', dirs: contrib_libdir, required: false)])
         iconv_dep = declare_dependency(
             dependencies: [contrib_dep, cc.find_library('iconv', dirs: contrib_libdir)])
     endif
