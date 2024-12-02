@@ -18,7 +18,7 @@ VPATH := $(TARBALLS)
 
 # Default Qt version
 QTBASE_VERSION_MAJOR := 6.8
-QTBASE_VERSION := $(QTBASE_VERSION_MAJOR).0
+QTBASE_VERSION := $(QTBASE_VERSION_MAJOR).3
 
 # Common download locations
 GNU ?= http://ftp.gnu.org/gnu

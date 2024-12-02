@@ -34,8 +34,6 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
-	$(APPLY) $(SRC)/qtdeclarative/0001-Add-missing-disconnect-and-null-check-in-QQuickPopup.patch
-	$(APPLY) $(SRC)/qtdeclarative/0001-Add-missing-null-pointer-check-in-QQuickPopup.patch
 	$(APPLY) $(SRC)/qtdeclarative/0001-QtQml-do-not-care-about-patch-version-when-checking-.patch
 	# disable unused CLI tools: qml, qmleasing, qmldom, qmlformat, qmltc
 	sed -i.orig -e 's,add_subdirectory(qml),#add_subdirectory(qml),' $(UNPACK_DIR)/tools/CMakeLists.txt
