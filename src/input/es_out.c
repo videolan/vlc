@@ -326,6 +326,34 @@ default_val:
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
         vlc_list_foreach( pos, (!fetes_i ? &p_sys->es : &p_sys->es_slaves), node )
 
+static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
+{
+    es_out_id_t *id = userdata;
+    struct vlc_input_es_out *out = id->out;
+    es_out_sys_t *p_sys = PRIV(&out->out);
+
+    if(!p_sys->p_input)
+        return;
+
+    if(!newmouse)
+    {
+        vlc_mouse_Init(&id->oldmouse);
+        return;
+    }
+
+    struct vlc_input_event_mouse event = {
+        .oldmouse = id->oldmouse,
+        .newmouse = *newmouse
+    };
+
+    input_SendEvent(p_sys->p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_MOUSE,
+        .mouse_data = event,
+    });
+
+    id->oldmouse = *newmouse;
+}
+
 static void
 decoder_on_vout_started(vlc_input_decoder_t *decoder, vout_thread_t *vout,
                       enum vlc_vout_order order, void *userdata)
@@ -2192,8 +2220,8 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     vlc_vector_init(&es->sub_es_vec);
     es->p_master = p_master;
     vlc_mouse_Init(&es->oldmouse);
-    es->mouse_event_cb = NULL;
-    es->mouse_event_userdata = NULL;
+    es->mouse_event_cb = MouseEventCb;
+    es->mouse_event_userdata = es;
     es->i_pts_level = VLC_TICK_INVALID;
     es->delay = VLC_TICK_MAX;
 
@@ -3607,9 +3635,14 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         p_es->mouse_event_cb = va_arg( args, vlc_mouse_event );
         p_es->mouse_event_userdata = va_arg( args, void * );
 
-        if( p_es->p_dec )
+        if( p_es->p_dec && p_es->mouse_event_cb )
             vlc_input_decoder_SetVoutMouseEvent( p_es->p_dec,
                 p_es->mouse_event_cb, p_es->mouse_event_userdata );
+        else /* fallback to player event */
+        {
+            p_es->mouse_event_cb = MouseEventCb;
+            p_es->mouse_event_userdata = p_es;
+        }
 
         return VLC_SUCCESS;
     }
