@@ -87,3 +87,4 @@ process() {
 process bin/ "*" text_only
 process lib/ "*.la"
 process lib/pkgconfig/ "*.pc" check
+process share/meson/cross/ "*.ini"
