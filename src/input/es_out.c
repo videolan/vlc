@@ -157,6 +157,7 @@ struct es_out_id_t
 
     vlc_mouse_event mouse_event_cb;
     void* mouse_event_userdata;
+    vlc_mouse_t oldmouse;
 };
 
 typedef struct
@@ -2190,6 +2191,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
     es->master = false;
     vlc_vector_init(&es->sub_es_vec);
     es->p_master = p_master;
+    vlc_mouse_Init(&es->oldmouse);
     es->mouse_event_cb = NULL;
     es->mouse_event_userdata = NULL;
     es->i_pts_level = VLC_TICK_INVALID;
