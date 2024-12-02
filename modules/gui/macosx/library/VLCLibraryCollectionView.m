@@ -24,4 +24,13 @@
 
 @implementation VLCLibraryCollectionView
 
+- (void)layout
+{
+    // Manually invalidate the collection view layout when we are going to layout the view; this
+    // fixes issues with the collection view item size calculations not always being updated when
+    // they should be
+    [self.collectionViewLayout invalidateLayout];
+    [super layout];
+}
+
 @end
