@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Templates as T
 import QtQml.Models
 
@@ -471,7 +472,7 @@ Item {
                 height: coverSize
                 radius: bg.radius
                 source: modelData.artwork ?? ""
-                sourceSize: dragItem.imageSourceSize ?? Qt.size(width, height)
+                sourceSize: dragItem.imageSourceSize ?? Qt.size(width * Screen.devicePixelRatio, height * Screen.devicePixelRatio)
 
                 onStatusChanged: {
                     if (status === Image.Ready)
