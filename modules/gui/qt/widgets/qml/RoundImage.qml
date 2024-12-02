@@ -32,6 +32,7 @@ Item {
     property alias asynchronous: image.asynchronous
     property alias source: image.source
     property alias sourceSize: image.sourceSize
+    property alias sourceClipRect: image.sourceClipRect
     property alias status: image.status
     property alias cache: image.cache
 
