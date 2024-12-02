@@ -34,8 +34,41 @@ Item {
     property alias sourceSize: image.sourceSize
     property alias status: image.status
     property alias cache: image.cache
-    // fillMode is not reflected in the texture,
-    // so it is not provided as an alias here
+
+    readonly property real paintedWidth: (shaderEffect.readyForVisibility) ? shaderEffect.width
+                                                                           : (image.clip ? image.width : image.paintedWidth)
+    readonly property real paintedHeight: (shaderEffect.readyForVisibility) ? shaderEffect.height
+                                                                            : (image.clip ? image.height : image.paintedHeight)
+
+    // NOTE: Fill mode is not guaranteed to be supported,
+    //       it is supported to the extent QQuickImage
+    //       provides properly filled texture, paintedWidth/Height,
+    //       and applies attributes such as tiling (QSGTexture::Repeat)
+    //       to the texture itself WHILE being invisible.
+    //       Invisible items usually are not requested to
+    //       update their paint node, so it is not clear if QQuickImage
+    //       would synchronize QSGTexture attributes with its
+    //       node when it is invisible (rounding is active).
+    // NOTE: Experiments show that preserve aspect ratio can
+    //       be supported, because QQuickImage provides
+    //       appropriate painted size when it is invisible,
+    //       and the generated texture is pre-filled. In
+    //       the future, Qt Quick may prefer doing this
+    //       within its shader, but for now, we should be
+    //       able to use it.
+    // NOTE: If you need a more guaranteed way to preserve
+    //       the aspect ratio, you can use `sourceSize` with
+    //       only one dimension set. Currently `fillMode` is
+    //       preferred instead of `sourceSize` because we need
+    //       to have control over both width and height.
+    property alias fillMode: image.fillMode
+
+    // We prefer preserve aspect fit by default, like in
+    // playlist delegate, because preserve aspect ratio
+    // crop needs `clip: true` to work properly, and it
+    // it breaks batching and should not be used in a
+    // delegate.
+    fillMode: Image.PreserveAspectFit
 
     property real radius
     readonly property real effectiveRadius: (shaderEffect.readyForVisibility ?? shaderEffect.visible) ? radius : 0.0
@@ -49,7 +82,14 @@ Item {
     ShaderEffect {
         id: shaderEffect
 
-        anchors.fill: parent
+        anchors.alignWhenCentered: true
+        anchors.centerIn: parent
+
+        implicitWidth: image.implicitWidth
+        implicitHeight: image.implicitHeight
+
+        width: image.paintedWidth
+        height: image.paintedHeight
 
         visible: readyForVisibility
 
@@ -93,7 +133,5 @@ Item {
         // item case). In that case, shader effect would report invisible although it
         // would appear in the grabbed image.
         visible: !shaderEffect.readyForVisibility
-
-        fillMode: Image.PreserveAspectCrop
     }
 }
