@@ -105,6 +105,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.m \
 	gui/macosx/library/VLCLibraryCarouselViewItemView.h \
 	gui/macosx/library/VLCLibraryCarouselViewItemView.m \
+	gui/macosx/library/VLCLibraryCollectionView.h \
+	gui/macosx/library/VLCLibraryCollectionView.m \
 	gui/macosx/library/VLCLibraryCollectionViewDataSource.h \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.h \
 	gui/macosx/library/VLCLibraryCollectionViewDelegate.m \
