@@ -17,6 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 
 
@@ -82,8 +83,8 @@ Rectangle {
 
         radius: root.radius
 
-        sourceSize.width: root.pictureWidth
-        sourceSize.height: root.pictureHeight
+        sourceSize.width: root.pictureWidth * Screen.devicePixelRatio
+        sourceSize.height: root.pictureHeight * Screen.devicePixelRatio
 
         onStatusChanged: {
             if (status === Image.Loading) {
@@ -112,8 +113,8 @@ Rectangle {
         // try to release the resources otherwise
         source: visible ? root.fallbackImageSource : ""
 
-        sourceSize.width: root.pictureWidth
-        sourceSize.height: root.pictureHeight
+        sourceSize.width: root.pictureWidth * Screen.devicePixelRatio
+        sourceSize.height: root.pictureHeight * Screen.devicePixelRatio
 
         cache: true
     }
