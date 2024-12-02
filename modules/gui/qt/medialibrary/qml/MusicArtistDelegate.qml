@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Window
 import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
@@ -166,8 +167,8 @@ T.ItemDelegate {
 
             source: (model.cover) ? model.cover
                                   : VLCStyle.noArtArtistSmall
-            sourceSize.width: width
-            sourceSize.height: height
+            sourceSize.width: width * Screen.devicePixelRatio
+            sourceSize.height: height * Screen.devicePixelRatio
 
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
