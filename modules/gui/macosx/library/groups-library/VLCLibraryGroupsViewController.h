@@ -26,6 +26,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryCollectionView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryGroupsDataSource;
 @class VLCLibraryMasterDetailViewTableViewDelegate;
@@ -36,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryGroupsViewController : VLCLibraryAbstractSegmentViewController<NSSplitViewDelegate>
 
 @property (readonly) NSScrollView *collectionViewScrollView;
-@property (readonly) NSCollectionView *collectionView;
+@property (readonly) VLCLibraryCollectionView *collectionView;
 @property (readonly) NSSplitView *listViewSplitView;
 @property (readonly) NSScrollView *groupsTableViewScrollView;
 @property (readonly) VLCLibraryTableView *groupsTableView;

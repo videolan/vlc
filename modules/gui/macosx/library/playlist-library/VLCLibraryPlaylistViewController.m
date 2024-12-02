@@ -24,6 +24,7 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryController.h"
@@ -106,7 +107,7 @@
     _collectionViewScrollView = 
         [[NSScrollView alloc] initWithFrame:self.libraryWindow.libraryTargetView.frame];
     _collectionViewDelegate = [[VLCLibraryCollectionViewDelegate alloc] init];
-    _collectionView = [[NSCollectionView alloc] init];
+    _collectionView = [[VLCLibraryCollectionView alloc] init];
 
     _collectionViewScrollView.documentView = _collectionView;
     _collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;

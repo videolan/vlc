@@ -24,6 +24,7 @@
 
 #import "extensions/NSView+VLCAdditions.h"
 
+#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -82,7 +83,7 @@
     _collectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     _collectionViewLayout.headerReferenceSize = VLCLibraryCollectionViewSupplementaryElementView.defaultHeaderSize;
 
-    _collectionView = [[NSCollectionView alloc] initWithFrame:NSZeroRect];
+    _collectionView = [[VLCLibraryCollectionView alloc] initWithFrame:NSZeroRect];
     _collectionView.postsFrameChangedNotifications = YES;
     _collectionView.collectionViewLayout = _collectionViewLayout;
     _collectionView.selectable = YES;

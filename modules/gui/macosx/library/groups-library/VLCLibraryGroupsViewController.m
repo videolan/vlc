@@ -24,6 +24,7 @@
 
 #import "extensions/NSString+Helpers.h"
 
+#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
@@ -71,7 +72,7 @@
 - (void)setupGridViewModeViews
 {
     _collectionViewScrollView = [[NSScrollView alloc] init];
-    _collectionView = [[NSCollectionView alloc] init];
+    _collectionView = [[VLCLibraryCollectionView alloc] init];
 
     self.collectionViewScrollView.translatesAutoresizingMaskIntoConstraints = NO;
     self.collectionView.translatesAutoresizingMaskIntoConstraints = NO;

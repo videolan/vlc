@@ -28,6 +28,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryCollectionView;
 @class VLCLibraryCollectionViewDelegate;
 @class VLCLibraryMasterDetailViewTableViewDelegate;
 @class VLCLibraryPlaylistDataSource;
@@ -42,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSScrollView *detailTableViewScrollView;
 @property (readonly) VLCLibraryTableView *detailTableView;
 @property (readonly) NSScrollView *collectionViewScrollView;
-@property (readonly) NSCollectionView *collectionView;
+@property (readonly) VLCLibraryCollectionView *collectionView;
 
 @property (readonly) VLCLibraryPlaylistDataSource *dataSource;
 @property (readonly) VLCLibraryCollectionViewDelegate *collectionViewDelegate;
