@@ -6,6 +6,8 @@
 # respectively.
 
 PKGS += meson-machinefile
+# regenerate the meson contrib file to use local pathes with the tools
+PKGS_TOOLS += meson-machinefile
 
 ifdef HAVE_CROSS_COMPILE
 CROSS_OR_NATIVE := cross
