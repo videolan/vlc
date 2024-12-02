@@ -40,7 +40,7 @@ typedef struct
     vlc_media_source_t public_data;
 
     services_discovery_t *sd;
-    vlc_atomic_rc_t rc;
+    size_t rc;
     vlc_media_source_provider_t *owner;
     struct vlc_list node;
     char name[];
@@ -111,7 +111,7 @@ vlc_media_source_New(vlc_media_source_provider_t *provider, const char *name)
     if (unlikely(!priv))
         return NULL;
 
-    vlc_atomic_rc_init(&priv->rc);
+    priv->rc = 1;
 
     vlc_media_source_t *ms = &priv->public_data;
 
@@ -147,20 +147,12 @@ vlc_media_source_New(vlc_media_source_provider_t *provider, const char *name)
     return ms;
 }
 
-static void
-vlc_media_source_provider_Remove(vlc_media_source_provider_t *provider,
-                                 vlc_media_source_t *ms)
-{
-    vlc_mutex_lock(&provider->lock);
-    vlc_list_remove(&ms_priv(ms)->node);
-    vlc_mutex_unlock(&provider->lock);
-}
 
 static void
 vlc_media_source_Delete(vlc_media_source_t *ms)
 {
     media_source_private_t *priv = ms_priv(ms);
-    vlc_media_source_provider_Remove(priv->owner, ms);
+
     vlc_sd_Destroy(priv->sd);
     vlc_media_tree_Release(ms->tree);
     free(priv);
@@ -170,15 +162,31 @@ void
 vlc_media_source_Hold(vlc_media_source_t *ms)
 {
     media_source_private_t *priv = ms_priv(ms);
-    vlc_atomic_rc_inc(&priv->rc);
+    vlc_media_source_provider_t *provider = priv->owner;
+    vlc_mutex_lock(&provider->lock);
+    vlc_assert(priv->rc != 0);
+    priv->rc++;
+    vlc_mutex_unlock(&provider->lock);
 }
 
 void
 vlc_media_source_Release(vlc_media_source_t *ms)
 {
     media_source_private_t *priv = ms_priv(ms);
-    if (vlc_atomic_rc_dec(&priv->rc))
-        vlc_media_source_Delete(ms);
+    vlc_media_source_provider_t *provider = priv->owner;
+
+    vlc_mutex_lock(&provider->lock);
+    vlc_assert(priv->rc != 0);
+    priv->rc--;
+    if (priv->rc != 0)
+    {
+        vlc_mutex_unlock(&provider->lock);
+        return;
+    }
+    vlc_list_remove(&priv->node);
+    vlc_mutex_unlock(&provider->lock);
+
+    vlc_media_source_Delete(ms);
 }
 
 static vlc_media_source_t *
@@ -262,7 +270,11 @@ vlc_media_source_provider_GetMediaSource(vlc_media_source_provider_t *provider,
     vlc_mutex_lock(&provider->lock);
     vlc_media_source_t *ms = vlc_media_source_provider_Find(provider, name);
     if (ms)
-        vlc_media_source_Hold(ms);
+    {
+        media_source_private_t *priv = ms_priv(ms);
+        vlc_assert(priv->rc != 0);
+        priv->rc++;
+    }
     else
         ms = vlc_media_source_provider_Add(provider, name);
     vlc_mutex_unlock(&provider->lock);
