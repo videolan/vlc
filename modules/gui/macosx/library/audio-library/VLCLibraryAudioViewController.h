@@ -27,6 +27,7 @@
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
+@class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
 
 @protocol VLCMediaLibraryItemProtocol;
@@ -44,12 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSScrollView *audioSongTableViewScrollView;
 @property (readonly, weak) NSTableView *audioSongTableView;
 @property (readonly, weak) NSScrollView *audioCollectionViewScrollView;
-@property (readonly, weak) NSCollectionView *audioLibraryCollectionView;
+@property (readonly, weak) VLCLibraryCollectionView *audioLibraryCollectionView;
 @property (readonly, weak) NSSplitView *audioLibraryGridModeSplitView;
 @property (readonly, weak) NSScrollView *audioLibraryGridModeSplitViewListTableViewScrollView;
 @property (readonly, weak) NSTableView *audioLibraryGridModeSplitViewListTableView;
 @property (readonly, weak) NSScrollView *audioLibraryGridModeSplitViewListSelectionCollectionViewScrollView;
-@property (readonly, weak) NSCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
+@property (readonly, weak) VLCLibraryCollectionView *audioLibraryGridModeSplitViewListSelectionCollectionView;
 
 @property (readonly) VLCLibraryAudioDataSource *audioDataSource;
 @property (readonly) VLCLibraryAudioGroupDataSource *audioGroupDataSource;
