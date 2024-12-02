@@ -1119,6 +1119,10 @@ static const char* const ppsz_restore_playback_desc[] = {
 #define STATS_LONGTEXT N_( \
      "Collect miscellaneous local statistics about the playing media.")
 
+#define STATSFREQ_TEXT N_("Statistics collection frequency")
+#define STATSFREQ_LONGTEXT N_( \
+     "Collection frequency of the statistics in ms.")
+
 #define ONEINSTANCE_TEXT N_("Allow only one running instance")
 #define ONEINSTANCE_LONGTEXT N_( \
     "Allowing only one running instance of VLC can sometimes be useful, " \
@@ -2227,6 +2231,9 @@ vlc_module_begin ()
               INTERACTION_LONGTEXT )
 
     add_bool ( "stats", true, STATS_TEXT, STATS_LONGTEXT )
+    add_integer( "stats-min-report-interval", 250,
+                        STATSFREQ_TEXT, STATSFREQ_LONGTEXT );
+        change_integer_range( 0, INT32_MAX )
 
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     add_module_cat("intf", SUBCAT_INTERFACE_MAIN, NULL,

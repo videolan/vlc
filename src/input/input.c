@@ -625,6 +625,8 @@ static void MainLoopStatistics( input_thread_t *p_input )
 static void MainLoop( input_thread_t *p_input, bool b_interactive )
 {
     vlc_tick_t i_intf_update = 0;
+    vlc_tick_t i_inf_update_delay =
+        VLC_TICK_FROM_MS(var_InheritInteger( p_input, "stats-min-report-interval" ));
     vlc_tick_t i_last_seek_mdate = 0;
 
     if( b_interactive && var_InheritBool( p_input, "start-paused" ) )
@@ -697,7 +699,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( now >= i_intf_update )
             {
                 MainLoopStatistics( p_input );
-                i_intf_update = now + VLC_TICK_FROM_MS(250);
+                i_intf_update = now + i_inf_update_delay;
             }
         }
 
