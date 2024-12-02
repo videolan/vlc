@@ -452,7 +452,7 @@ Item {
             Rectangle {
                 id: bg
 
-                radius: coverRepeater.count > 1 ? dragItem.coverSize : VLCStyle.dp(2, VLCStyle.scale)
+                radius: coverRepeater.count > 1 ? dragItem.coverSize : 0.0
                 anchors.fill: parent
                 color: theme.bg.primary
 
