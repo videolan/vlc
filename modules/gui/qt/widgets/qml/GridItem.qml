@@ -300,12 +300,13 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: parent.width + viewportHorizontalOffset
-                height: parent.height + viewportVerticalOffset
+                width: picture.paintedWidth + viewportHorizontalOffset
+                height: picture.paintedHeight + viewportVerticalOffset
 
                 rectWidth: sourceSize.width
                 rectHeight: sourceSize.height
 
+                // TODO: Apply painted size's aspect ratio (constant) in source size
                 sourceSize: Qt.size(128, 128)
             }
 
@@ -319,12 +320,13 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: parent.width + viewportHorizontalOffset
-                height: parent.height + viewportVerticalOffset
+                width: picture.paintedWidth + viewportHorizontalOffset
+                height: picture.paintedHeight + viewportVerticalOffset
 
                 rectWidth: sourceSize.width
                 rectHeight: sourceSize.height
 
+                // TODO: Apply painted size's aspect ratio (constant) in source size
                 sourceSize: Qt.size(128, 128)
 
                 primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
