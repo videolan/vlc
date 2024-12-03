@@ -962,11 +962,6 @@ if qt6_dep.found()
         include_directories: qt_include_dir,
         dependencies: qt6_dep)
 
-    qt6pre_files = qt6.preprocess(ui_files: ui_sources,
-        moc_headers: moc_headers,
-        include_directories: qt_include_dir,
-        dependencies: qt6_dep)
-
     qt_sources = files('qt.cpp')
 
     subdir('shaders')
@@ -1083,6 +1078,12 @@ if qt6_dep.found()
             'dependencies' : [xcb_dep, xcb_render_dep, xcb_xfixes_dep]
         }
     endif
+
+    qt6pre_files = qt6.preprocess(ui_files: ui_sources,
+        moc_headers: moc_headers,
+        moc_extra_arguments: qt_extra_flags,
+        include_directories: qt_include_dir,
+        dependencies: qt6_dep)
 
     # TODO support qmlcachegen
 
