@@ -50,7 +50,9 @@ Item {
 
         anchors.fill: parent
 
-        visible: (root.radius > 0.0) && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+        visible: readyForVisibility
+
+        readonly property bool readyForVisibility: (root.radius > 0.0) && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
         supportsAtlasTextures: true
 
@@ -84,7 +86,12 @@ Item {
 
         anchors.fill: parent
 
-        visible: !shaderEffect.visible
+        // Image should not be visible when there is rounding and RHI shader is supported.
+        // This is simply when the shader effect is invisible. However, Do not use `!shaderEffect.visible`,
+        // because the root item may be invisible (`grabToImage()` call on an invisible
+        // item case). In that case, shader effect would report invisible although it
+        // would appear in the grabbed image.
+        visible: !shaderEffect.readyForVisibility
 
         fillMode: Image.PreserveAspectCrop
     }
