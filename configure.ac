@@ -4012,6 +4012,9 @@ have_qt65="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
+  dnl use any qmake that is available, including from contrib tools
+  AC_PATH_PROGS(QMAKE6, [qmake6], qmake6, ["$PATH:${CONTRIB_DIR}/../bin"])
+
   AC_ARG_WITH([qtconf],
     AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
   )
@@ -4025,7 +4028,6 @@ AS_IF([test "${enable_qt}" != "no"], [
     ])
   ])
 
-  AC_PATH_PROGS(QMAKE6, [qmake6], qmake6)
   AS_IF([test -z "${QMAKE6}"], [
     have_qt="no"
   ],[
