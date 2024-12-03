@@ -1339,7 +1339,7 @@ libqt_plugin_la_ALL_QML = \
 libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/FadingEdgeX.vert \
                           shaders/FadingEdgeY.vert \
-                          shaders/FrostedGlass.frag \
+                          shaders/Noise.frag \
                           shaders/RectFilter.frag \
                           shaders/SubTexture.vert \
                           shaders/PlayerBlurredBackground.frag \

@@ -247,8 +247,6 @@ FocusScope {
                                 colorSet: ColorContext.Window
                             }
 
-                            blending: stackViewParentLayerEffect.blending
-
                             tint: frostedTheme.bg.secondary
                         }
                     }

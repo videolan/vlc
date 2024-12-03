@@ -10,7 +10,7 @@ shader_sources = [
     'FadingEdge.frag',
     'FadingEdgeX.vert',
     'FadingEdgeY.vert',
-    'FrostedGlass.frag',
+    'Noise.frag',
     'RectFilter.frag',
     'SubTexture.vert',
     'PlayerBlurredBackground.frag',

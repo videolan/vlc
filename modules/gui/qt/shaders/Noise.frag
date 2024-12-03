@@ -19,34 +19,21 @@
  *****************************************************************************/
 
 layout(location = 0) in vec2 qt_TexCoord0;
+
 layout(location = 0) out vec4 fragColor;
+
 layout(std140, binding = 0) uniform buf {
   mat4 qt_Matrix;
   float qt_Opacity;
-  vec4 tint;
-  float exclusionStrength;
-  float noiseStrength;
-  float tintStrength;
+  float strength;
 };
-layout(binding = 1) uniform sampler2D source;
 
 float rand(vec2 co){
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-vec4 exclude(vec4 src, vec4 dst)
-{
-    return src + dst - 2.0 * src * dst;
-}
-
 void main() {
    float r = rand(qt_TexCoord0) - 0.5;
-   vec4 noise = vec4(r,r,r,1.0) * noiseStrength;
-   vec4 blurred  = texture(source, qt_TexCoord0);
-
-   vec4 exclColor = vec4(exclusionStrength, exclusionStrength, exclusionStrength, 0.0);
-
-   blurred = exclude(blurred, exclColor);
-
-   fragColor = (mix(blurred, tint, tintStrength) + noise) * qt_Opacity;
+   vec4 noise = vec4(r,r,r,1.0) * strength;
+   fragColor = noise * qt_Opacity;
 }
