@@ -71,6 +71,20 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     return nodeChildren[indexPath.item];
 }
 
+- (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths forCollectionView:(NSCollectionView *)collectionView
+{
+    NSMutableArray<VLCInputItem *> * const inputItems =
+        [NSMutableArray arrayWithCapacity:indexPaths.count];
+
+    for (NSIndexPath * const indexPath in indexPaths) {
+        VLCInputNode * const inputNode = [self inputNodeForIndexPath:indexPath];
+        VLCInputItem * const inputItem = inputNode.inputItem;
+        [inputItems addObject:inputItem];
+    }
+
+    return inputItems.copy;
+}
+
 #pragma mark - collection view data source and delegation
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView

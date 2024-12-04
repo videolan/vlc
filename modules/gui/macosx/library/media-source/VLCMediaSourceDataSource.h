@@ -44,7 +44,8 @@ extern NSString * const VLCMediaSourceDataSourceNodeChanged;
 @property (readwrite, weak) VLCInputNodePathControl *pathControl;
 
 - (void)setupViews;
-- (VLCInputItem*)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
+- (VLCInputItem *)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;
+- (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths forCollectionView:(NSCollectionView *)collectionView;
 
 @end
 
