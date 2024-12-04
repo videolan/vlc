@@ -4194,12 +4194,8 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-core],[
         echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-core
         AC_MSG_RESULT([yes])
-        QT_CORE_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_libs)
         QT_CORE_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
-        QT_CORE_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
-        AC_SUBST([QT_CORE_PRIVATE_LIBS])
         AC_SUBST([QT_CORE_PRIVATE_CFLAGS])
-        AC_SUBST([QT_CORE_PRIVATE_LDFLAGS])
         have_qt_core_private="yes"
       ],[
         AC_MSG_RESULT([no])
@@ -4213,12 +4209,8 @@ AS_IF([test "${enable_qt}" != "no"], [
         echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
 
         AC_MSG_RESULT([yes])
-        QT_GUI_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_libs)
         QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
-        QT_GUI_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_ldflags)
-        AC_SUBST([QT_GUI_PRIVATE_LIBS])
         AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
-        AC_SUBST([QT_GUI_PRIVATE_LDFLAGS])
         have_qt_gui_private="yes"
       ],[
         AC_MSG_RESULT([no])
@@ -4231,12 +4223,8 @@ AS_IF([test "${enable_qt}" != "no"], [
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-quick],[
         echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
         AC_MSG_RESULT([yes])
-        QT_QUICK_PRIVATE_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_libs)
         QT_QUICK_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_cflags)
-        QT_QUICK_PRIVATE_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_ldflags)
-        AC_SUBST([QT_QUICK_PRIVATE_LIBS])
         AC_SUBST([QT_QUICK_PRIVATE_CFLAGS])
-        AC_SUBST([QT_QUICK_PRIVATE_LDFLAGS])
         have_qt_declarative_private="yes"
       ],[
         AC_MSG_RESULT([no])
