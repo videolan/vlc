@@ -128,6 +128,7 @@ class MainCtx : public QObject
     Q_PROPERTY(int maxVolume READ maxVolume NOTIFY maxVolumeChanged FINAL)
     Q_PROPERTY(float safeArea READ safeArea NOTIFY safeAreaChanged FINAL)
     Q_PROPERTY(VideoSurfaceProvider* videoSurfaceProvider READ getVideoSurfaceProvider WRITE setVideoSurfaceProvider NOTIFY hasEmbededVideoChanged FINAL)
+    Q_PROPERTY(int mouseHideTimeout READ mouseHideTimeout NOTIFY mouseHideTimeoutChanged FINAL)
 
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
 
@@ -255,6 +256,8 @@ public:
     VideoSurfaceProvider* getVideoSurfaceProvider() const;
     void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);
 
+    int mouseHideTimeout() const { return m_mouseHideTimeout; }
+
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); }
 
@@ -381,6 +384,8 @@ protected:
 
     float m_safeArea = 0.0;
 
+    int m_mouseHideTimeout = 1000;
+
     OsType m_osName;
     int m_osVersion;
 
@@ -489,6 +494,8 @@ signals:
     void maxVolumeChanged();
 
     void safeAreaChanged();
+
+    void mouseHideTimeoutChanged();
 
     void navBoxToggled();
 

@@ -425,6 +425,8 @@ void MainCtx::loadPrefs(const bool callSignals)
     loadFromVLCOption(m_pinOpacity, "qt-fs-opacity", &MainCtx::pinOpacityChanged);
 
     loadFromVLCOption(m_safeArea, "qt-safe-area", &MainCtx::safeAreaChanged);
+
+    loadFromVLCOption(m_mouseHideTimeout, "mouse-hide-timeout", &MainCtx::mouseHideTimeoutChanged);
 }
 
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
