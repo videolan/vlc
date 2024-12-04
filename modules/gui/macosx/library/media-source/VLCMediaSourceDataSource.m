@@ -71,7 +71,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     return nodeChildren[indexPath.item];
 }
 
-- (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths forCollectionView:(NSCollectionView *)collectionView
+- (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
 {
     NSMutableArray<VLCInputItem *> * const inputItems =
         [NSMutableArray arrayWithCapacity:indexPaths.count];

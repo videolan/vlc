@@ -192,7 +192,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     NSParameterAssert(dataSource != nil);
     NSSet<NSIndexPath *> * const indexPaths = collectionView.selectionIndexPaths;
     NSArray<VLCInputItem *> * const selectedInputItems =
-        [dataSource mediaSourceInputItemsAtIndexPaths:indexPaths forCollectionView:collectionView];
+        [dataSource mediaSourceInputItemsAtIndexPaths:indexPaths];
     const NSInteger mediaSourceItemIndex = [selectedInputItems indexOfObjectPassingTest:^BOOL(
         VLCInputItem * const inputItem, const NSUInteger idx, BOOL * const stop
     ) {
