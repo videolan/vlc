@@ -95,8 +95,10 @@
 
 - (void)setupCollectionView
 {
+    self.collectionView.allowsMultipleSelection = YES;
+
     VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
-    _collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
+    self.collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
     mediaSourceCollectionViewLayout.itemSize = VLCLibraryCollectionViewItem.defaultSize;
 }
 
