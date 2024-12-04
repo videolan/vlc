@@ -31,6 +31,8 @@
 #import "library/VLCLibraryMenuController.h"
 #import "library/VLCLibraryImageCache.h"
 
+#import "library/media-source/VLCMediaSourceDataSource.h"
+
 #import "main/VLCMain.h"
 
 #import "playqueue/VLCPlayQueueController.h"
@@ -178,30 +180,49 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     [VLCMain.sharedInstance.playQueueController addInputItem:_representedInputItem.vlcInputItem atPosition:-1 startPlayback:NO];
 }
 
--(void)mouseDown:(NSEvent *)theEvent
-{
-    if (theEvent.modifierFlags & NSControlKeyMask) {
-        if (!_menuController) {
-            _menuController = [[VLCLibraryMenuController alloc] init];
-        }
-
-        [_menuController setRepresentedInputItems:@[_representedInputItem]];
-        [_menuController popupMenuWithEvent:theEvent forView:self.view];
-    }
-
-    [super mouseDown:theEvent];
-}
-
-- (void)rightMouseDown:(NSEvent *)theEvent
+- (void)openContextMenu:(NSEvent *)event
 {
     if (!_menuController) {
         _menuController = [[VLCLibraryMenuController alloc] init];
     }
 
-    [_menuController setRepresentedInputItems:@[_representedInputItem]];
-    [_menuController popupMenuWithEvent:theEvent forView:self.view];
+    NSCollectionView * const collectionView = self.collectionView;
+    VLCMediaSourceDataSource * const dataSource =
+        (VLCMediaSourceDataSource *)collectionView.dataSource;
+    NSParameterAssert(dataSource != nil);
+    NSSet<NSIndexPath *> * const indexPaths = collectionView.selectionIndexPaths;
+    NSArray<VLCInputItem *> * const selectedInputItems =
+        [dataSource mediaSourceInputItemsAtIndexPaths:indexPaths forCollectionView:collectionView];
+    const NSInteger mediaSourceItemIndex = [selectedInputItems indexOfObjectPassingTest:^BOOL(
+        VLCInputItem * const inputItem, const NSUInteger idx, BOOL * const stop
+    ) {
+        return [inputItem.MRL isEqualToString:_representedInputItem.MRL];
+    }];
+    NSArray<VLCInputItem *> *items = nil;
 
-    [super rightMouseDown:theEvent];
+    if (mediaSourceItemIndex == NSNotFound) {
+        items = @[_representedInputItem];
+    } else {
+        items = selectedInputItems;
+    }
+
+    _menuController.representedInputItems = items;
+    [_menuController popupMenuWithEvent:event forView:self.view];
+}
+
+-(void)mouseDown:(NSEvent *)event
+{
+    if (event.modifierFlags & NSControlKeyMask) {
+        [self openContextMenu:event];
+    }
+
+    [super mouseDown:event];
+}
+
+- (void)rightMouseDown:(NSEvent *)event
+{
+    [self openContextMenu:event];
+    [super rightMouseDown:event];
 }
 
 @end
