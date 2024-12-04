@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QTemporaryFile>
 #include <QAbstractItemModel>
+#include <QLockFile>
 
 #include <cstdio>
 
@@ -39,6 +40,7 @@ class ModelRecoveryAgent
     QString m_recoveryFileName;
     QTimer m_timer;
     bool m_conditionDismissInitialDirtiness = false;
+    std::unique_ptr<QLockFile> m_lockFile;
 
 public:
     // NOTE: settings and model must outlive the instance of this class.
@@ -56,6 +58,12 @@ public:
             if (!recoveryFileName.isEmpty())
             {
                 m_recoveryFileName = std::move(recoveryFileName);
+                {
+                    m_lockFile = std::make_unique<QLockFile>(m_recoveryFileName + QStringLiteral(".lock"));
+                    m_lockFile->setStaleLockTime(0); // if the process crashed, QLockFile considers the lock stale regardless of the lock time
+                    if (!m_lockFile->tryLock()) // if the older instance is still alive, it would have the lock
+                        throw std::exception(); // Older instance is managing the recovery, don't take over. We don't support recovering multiple models at the moment.
+                }
                 const QFileInfo fileInfo(m_recoveryFileName);
                 if (fileInfo.size() > 0)
                 {
@@ -81,6 +89,14 @@ public:
             if (!temporaryFile.open())
                 throw std::exception();
             m_recoveryFileName = temporaryFile.fileName();
+            {
+                assert(!m_lockFile);
+                m_lockFile = std::make_unique<QLockFile>(m_recoveryFileName + QStringLiteral(".lock"));
+                m_lockFile->setStaleLockTime(0); // if the process crashed, QLockFile considers the lock stale regardless of the lock time
+                assert(!m_lockFile->isLocked()); // the file name is new here, it can not be locked before
+                if (!m_lockFile->tryLock())
+                    throw std::exception();
+            }
             settings->setValue(m_key, m_recoveryFileName);
             settings->sync();
         }
