@@ -610,6 +610,9 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     { V4L2_PIX_FMT_XBGR32,   VLC_CODEC_BGRX, 4 },
     { V4L2_PIX_FMT_XRGB32,   VLC_CODEC_XRGB, 4 },
 
+    { V4L2_PIX_FMT_BGR32,    VLC_CODEC_BGRA, 4 },
+    { V4L2_PIX_FMT_RGB32,    VLC_CODEC_ARGB, 4 },
+
     { V4L2_PIX_FMT_RGB24,   VLC_CODEC_RGB24, 3 },
     { V4L2_PIX_FMT_BGR24,   VLC_CODEC_BGR24, 3 },
 
