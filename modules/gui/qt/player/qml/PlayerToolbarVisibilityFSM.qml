@@ -59,7 +59,7 @@ FSM {
     property alias isVisible: fsmVisible.active
 
     property int lockCount: 0 // Track the number of locks
-    property int timeoutDuration: 3000
+    property int timeoutDuration: MainCtx.mouseHideTimeout
 
     initialState: ((Player.isInteractive && MainCtx.hasEmbededVideo))
                   ? fsmHidden : fsmVisible
@@ -130,14 +130,14 @@ FSM {
                     mouseMove: {
                         guard: () => !Player.isInteractive,
                         action: () => { 
-                            fsm.timeoutDuration = 3000;
+                            fsm.timeoutDuration = MainCtx.mouseHideTimeout;
                         },
                         target: fsmVideoMode
                     },
                     keyboardMove: {
                         guard: () => !Player.isInteractive,
                         action: () => { 
-                            fsm.timeoutDuration = 5000
+                            fsm.timeoutDuration = MainCtx.mouseHideTimeout * 2
                         },
                         target: fsmVideoMode
                     }
@@ -177,14 +177,14 @@ FSM {
             mouseMove: {
                 guard: () => !Player.isInteractive,
                 action: () => {
-                    fsm.timeoutDuration = 3000
+                    fsm.timeoutDuration = MainCtx.mouseHideTimeout
                 },
                 target: fsmVisible
             },
             keyboardMove: {
                 guard: () => !Player.isInteractive,
                 action: () => {
-                    fsm.timeoutDuration = 5000
+                    fsm.timeoutDuration = MainCtx.mouseHideTimeout * 2
                 },
                 target: fsmVisible
             },
