@@ -64,6 +64,13 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     [self.tableView setTarget:self];
 }
 
+- (VLCInputNode *)inputNodeForIndexPath:(NSIndexPath *)indexPath
+{
+    VLCInputNode * const rootNode = self.nodeToDisplay;
+    NSArray * const nodeChildren = rootNode.children;
+    return nodeChildren[indexPath.item];
+}
+
 #pragma mark - collection view data source and delegation
 
 - (NSInteger)numberOfSectionsInCollectionView:(NSCollectionView *)collectionView
@@ -98,14 +105,11 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
-    NSIndexPath *indexPath = indexPaths.anyObject;
+    NSIndexPath * const indexPath = indexPaths.anyObject;
     if (!indexPath) {
         return;
     }
-    VLCInputNode *rootNode = self.nodeToDisplay;
-    NSArray *nodeChildren = rootNode.children;
-    VLCInputNode *childNode = nodeChildren[indexPath.item];
-
+    VLCInputNode * const childNode = [self inputNodeForIndexPath:indexPath];
     [self performActionForNode:childNode allowPlayback:YES];
 }
 
