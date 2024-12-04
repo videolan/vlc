@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="addToPlayQueueButton" destination="Ubz-8I-W2F" id="ywN-PH-QZt"/>
                 <outlet property="annotationTextField" destination="kHQ-HZ-YIi" id="XX9-Sc-oam"/>
+                <outlet property="highlightBox" destination="5Hg-64-CCp" id="Gc2-5h-Gj9"/>
                 <outlet property="mediaImageView" destination="2aB-sB-hfY" id="Sv0-G1-KNm"/>
                 <outlet property="mediaTitleTextField" destination="OBS-Eh-1mT" id="h1n-PU-IAx"/>
                 <outlet property="playInstantlyButton" destination="S3I-5Z-qgS" id="VV4-Lu-IMq"/>
@@ -51,7 +52,15 @@
                         <constraint firstItem="kHQ-HZ-YIi" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" constant="7" id="s9g-G1-oCF"/>
                     </constraints>
                 </customView>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
+                <box boxType="custom" borderType="line" borderWidth="5" cornerRadius="4" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="5Hg-64-CCp">
+                    <rect key="frame" x="0.0" y="32" width="207" height="207"/>
+                    <view key="contentView" id="POR-eM-ISr">
+                        <rect key="frame" x="5" y="5" width="197" height="197"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </view>
+                    <color key="borderColor" red="1" green="0.38123786450000002" blue="0.039215686270000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                </box>
+                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="OBS-Eh-1mT">
                     <rect key="frame" x="-2" y="4" width="37" height="24"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="24" id="wMC-00-Vuv"/>
@@ -80,9 +89,13 @@
             <constraints>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="3Ah-0T-rA9"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="OBS-Eh-1mT" secondAttribute="trailing" id="457-oy-EbD"/>
+                <constraint firstItem="5Hg-64-CCp" firstAttribute="leading" secondItem="2aB-sB-hfY" secondAttribute="leading" id="5Ac-bl-b4l"/>
                 <constraint firstItem="Ubz-8I-W2F" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" constant="7" id="8Qf-Un-Gdl"/>
                 <constraint firstAttribute="trailing" secondItem="Ubz-8I-W2F" secondAttribute="trailing" constant="14" id="ZVz-SL-rxZ"/>
                 <constraint firstAttribute="bottom" secondItem="OBS-Eh-1mT" secondAttribute="bottom" constant="4" id="d6E-7J-S2d"/>
+                <constraint firstItem="5Hg-64-CCp" firstAttribute="bottom" secondItem="2aB-sB-hfY" secondAttribute="bottom" id="eRq-Jx-FiY"/>
+                <constraint firstItem="5Hg-64-CCp" firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="ffy-WV-Vlh"/>
+                <constraint firstItem="5Hg-64-CCp" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="top" id="kUZ-iy-kzW"/>
                 <constraint firstAttribute="trailing" secondItem="2aB-sB-hfY" secondAttribute="trailing" id="oZw-Ab-83p"/>
                 <constraint firstItem="2aB-sB-hfY" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="t9g-tX-AQX"/>
                 <constraint firstItem="OBS-Eh-1mT" firstAttribute="top" secondItem="2aB-sB-hfY" secondAttribute="bottom" constant="4" id="vJy-Kf-4Jh"/>

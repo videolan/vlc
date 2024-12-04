@@ -36,6 +36,7 @@ extern NSString *VLCMediaSourceCellIdentifier;
 @property (readwrite, weak) IBOutlet VLCImageView *mediaImageView;
 @property (readwrite, weak) IBOutlet NSButton *playInstantlyButton;
 @property (readwrite, weak) IBOutlet NSButton *addToPlayQueueButton;
+@property (readwrite, weak) IBOutlet NSBox *highlightBox;
 
 @property (readwrite, strong, nonatomic) VLCInputItem *representedInputItem;
 
