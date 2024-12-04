@@ -119,6 +119,10 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
 {
+    if (indexPaths.count != 1) {
+        return;
+    }
+
     NSIndexPath * const indexPath = indexPaths.anyObject;
     if (!indexPath) {
         return;
