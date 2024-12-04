@@ -862,6 +862,7 @@ qml_modules += {
         'widgets/qml/MenuCaption.qml',
         'widgets/qml/MenuLabel.qml',
         'widgets/qml/MLDragItem.qml',
+        'widgets/qml/MLTableColumns.qml',
         'widgets/qml/NavigableCol.qml',
         'widgets/qml/NavigableRow.qml',
         'widgets/qml/PlayCover.qml',
