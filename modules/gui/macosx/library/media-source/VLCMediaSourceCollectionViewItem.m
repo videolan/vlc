@@ -64,6 +64,7 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     self.annotationTextField.font = [NSFont systemFontOfSize:NSFont.systemFontSize weight:NSFontWeightBold];
     self.annotationTextField.textColor = NSColor.VLClibraryAnnotationColor;
     self.annotationTextField.backgroundColor = NSColor.VLClibraryAnnotationBackgroundColor;
+    self.highlightBox.borderColor = NSColor.VLCAccentColor;
 
     if (@available(macOS 10.14, *)) {
         [NSApplication.sharedApplication addObserver:self
@@ -110,12 +111,19 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     _annotationTextField.hidden = YES;
     _mediaImageView.image = nil;
     _addToPlayQueueButton.hidden = NO;
+    _highlightBox.hidden = YES;
 }
 
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
     _representedInputItem = representedInputItem;
     [self updateRepresentation];
+}
+
+- (void)setSelected:(BOOL)selected
+{
+    super.selected = selected;
+    _highlightBox.hidden = !selected;
 }
 
 - (void)updateRepresentation
