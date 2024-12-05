@@ -217,7 +217,7 @@ T.Control {
 
                 Layout.fillWidth: true
 
-                text: model.artist || qsTr("Unknown Artist")
+                text: model.artist
                 color: theme.fg.primary
             }
         }
