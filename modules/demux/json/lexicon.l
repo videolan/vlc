@@ -41,6 +41,13 @@
     result = (len > 0) ? len : YY_NULL; \
 }
 
+/** Forcing the size of the lexer's read buffer to speedup the json parsing */
+#define YY_READ_BUF_SIZE (1 << 18)
+#ifdef YY_BUF_SIZE
+#  undef YY_BUF_SIZE
+#endif
+#define YY_BUF_SIZE (YY_READ_BUF_SIZE * 2)
+
 %}
 
 %%
