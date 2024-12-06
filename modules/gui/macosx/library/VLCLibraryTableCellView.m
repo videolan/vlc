@@ -72,6 +72,8 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)setRepresentedItem:(VLCLibraryRepresentedItem *)representedItem
 {
     _representedItem = representedItem;
+    _representedInputItem = nil; // Reset and ensure the change is obvious
+
     id<VLCMediaLibraryItemProtocol> const actualItem = representedItem.item;
     NSAssert(actualItem != nil, @"Should not update nil represented item!");
 
@@ -100,6 +102,7 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
 - (void)setRepresentedInputItem:(VLCInputItem *)representedInputItem
 {
     _representedInputItem = representedInputItem;
+    _representedItem = nil; // Reset and ensure the change is obvious
 
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
