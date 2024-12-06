@@ -316,6 +316,10 @@ void vout_FilterMouse(vout_thread_t *vout, vlc_mouse_t *mouse)
         if (!filter_chain_MouseFilter(sys->filter.chain_static,
                                       &tmp[1], m))
             m = &tmp[1];
+
+        bool has_mouse_filter = filter_chain_HasMouseFilter(sys->filter.chain_interactive) ||
+                                filter_chain_HasMouseFilter(sys->filter.chain_static);
+        vlc_mouse_SetMouseFilter(m, has_mouse_filter);
     }
     vlc_mutex_unlock(&sys->filter.lock);
 
