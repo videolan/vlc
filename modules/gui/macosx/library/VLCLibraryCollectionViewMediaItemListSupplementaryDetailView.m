@@ -148,6 +148,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:item withCompletion:^(NSImage * const thumbnail) {
+        if (self.representedItem.item != item) {
+            return;
+        }
         self.artworkImageView.image = thumbnail;
     }];
 
