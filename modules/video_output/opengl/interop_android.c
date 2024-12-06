@@ -180,7 +180,10 @@ Close(struct vlc_gl_interop *interop)
     struct priv *priv = interop->priv;
 
     if (priv->previous_texture)
+    {
         SurfaceTexture_detachFromGLContext(priv->previous_texture);
+        SurfaceTexture_releaseTexImage(priv->previous_texture);
+    }
 
     if (priv->current_picture)
         picture_Release(priv->current_picture);
