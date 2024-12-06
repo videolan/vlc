@@ -301,7 +301,8 @@ _##field##TextField.delegate = self
     }
 
     NSParameterAssert(inputItems.count > 0);
-    _representedInputItems = inputItems.copy;
+    NSArray<VLCInputItem *> * const nonMutableInputItems = inputItems.copy;
+    _representedInputItems = nonMutableInputItems;
 
     NSMutableSet * const artworkMrlSet = NSMutableSet.set;
 
@@ -326,6 +327,10 @@ _##field##TextField.delegate = self
                     dispatch_group_enter(group);
                     [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
                                                    withCompletion:^(NSImage * const image) {
+                        if (nonMutableInputItems != self.representedInputItems) {
+                            dispatch_group_leave(group);
+                            return;
+                        }
                         if (image) {
                             [artworkImages addObject:image];
                         }
@@ -378,6 +383,10 @@ _##field##TextField.delegate = self
                 dispatch_group_enter(group);
                 [VLCLibraryImageCache thumbnailForInputItem:item
                                              withCompletion:^(NSImage * const image) {
+                    if (representedInputItems != self.representedInputItems) {
+                        dispatch_group_leave(group);
+                        return;
+                    }
                     if (image) {
                         [artworkImages addObject:image];
                     }
