@@ -115,6 +115,9 @@
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
+        if (self.representedItem.item != actualItem) {
+            return;
+        }
         self.imageView.image = thumbnail;
     }];
 
