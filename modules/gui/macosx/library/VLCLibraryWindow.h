@@ -62,10 +62,8 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 
 @property (nonatomic, weak) IBOutlet VLCMainWindowControlsBar *controlsBar;
 @property (readwrite, weak) IBOutlet NSLayoutConstraint *controlsBarHeightConstraint;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
 @property (readwrite, weak) IBOutlet NSSegmentedControl *gridVsListSegmentedControl;
 @property (readwrite, weak) IBOutlet NSSplitView *mainSplitView;
-@property (readwrite, weak) IBOutlet NSOutlineView *navSidebarOutlineView;
 @property (readwrite, weak) IBOutlet NSView *homeLibraryView;
 @property (readwrite, weak) IBOutlet NSScrollView *homeLibraryStackViewScrollView;
 @property (readwrite, weak) IBOutlet NSStackView *homeLibraryStackView;
@@ -100,7 +98,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceTableViewScrollView;
 @property (readwrite, weak) IBOutlet NSTableView *mediaSourceTableView;
 @property (readwrite, weak) IBOutlet NSScrollView *mediaSourceCollectionViewScrollView;
-@property (readwrite, weak) IBOutlet NSView *mediaOptionBar;
 @property (readwrite, weak) IBOutlet NSToolbar *mediaToolBar;
 @property (readwrite, weak) IBOutlet NSButton *librarySortButton;
 @property (readwrite, weak) IBOutlet NSSearchField *librarySearchField;
