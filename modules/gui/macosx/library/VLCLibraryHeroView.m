@@ -66,6 +66,9 @@
     self.titleTextField.stringValue = actualItem.displayString;
     self.detailTextField.stringValue = actualItem.primaryDetailString;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const image) {
+        if (self.representedItem.item != actualItem) {
+            return;
+        }
         self.largeImageView.image = image;
     }];
 }
