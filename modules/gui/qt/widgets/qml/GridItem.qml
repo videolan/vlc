@@ -76,6 +76,9 @@ T.ItemDelegate {
     implicitWidth: layout.implicitWidth
     implicitHeight: layout.implicitHeight
 
+    width: Math.round(implicitWidth)
+    height: Math.round(implicitHeight)
+
     highlighted: (hovered || visualFocus)
 
     Accessible.role: Accessible.Cell
