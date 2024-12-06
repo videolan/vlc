@@ -75,6 +75,8 @@ T.Control {
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
                              implicitContentHeight + topPadding + bottomPadding)
 
+    height: Math.round(implicitHeight)
+
     ListView.delayRemove: dragHandler.active
 
     T.ToolTip.visible: ( visible && (visualFocus || hovered) &&
