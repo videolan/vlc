@@ -65,7 +65,6 @@
 #include <QInputDialog>
 
 #include <QQmlProperty>
-#include <QQmlContext>
 
 #include <QWindow>
 #include <QScreen>
