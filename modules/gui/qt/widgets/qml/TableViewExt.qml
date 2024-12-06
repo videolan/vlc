@@ -390,7 +390,7 @@ FocusScope {
             required property var model
 
             width: view.width
-            height: root.rowHeight
+            height: Math.round(root.rowHeight)
 
             fixedColumnWidth: root.baseColumnWidth
             weightedColumnWidth: root._weightedColumnsSize
