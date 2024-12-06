@@ -562,22 +562,18 @@
                 <outlet property="mainSplitView" destination="u8g-jy-S4e" id="lI5-wR-kef"/>
                 <outlet property="mediaSourceCollectionView" destination="r7v-GI-W1U" id="3JJ-GU-o5o"/>
                 <outlet property="mediaSourceCollectionViewScrollView" destination="cFG-c9-cI9" id="QQq-Ql-uQ7"/>
-                <outlet property="mediaSourceCollectionViewScrollViewTopConstraint" destination="1h2-ln-GVY" id="orE-bG-zt4"/>
                 <outlet property="mediaSourceHomeButton" destination="jfA-Vr-sQc" id="oLM-NF-rqe"/>
                 <outlet property="mediaSourcePathControl" destination="Rjk-Q6-FYy" id="G63-NM-Ekn"/>
                 <outlet property="mediaSourcePathControlVisualEffectView" destination="LIN-LZ-lhm" id="gZZ-ov-qfP"/>
                 <outlet property="mediaSourceTableView" destination="vpJ-Oz-Ebz" id="Hbo-Qw-JQd"/>
                 <outlet property="mediaSourceTableViewScrollView" destination="7WD-fy-WtJ" id="8As-1W-Af8"/>
-                <outlet property="mediaSourceTableViewScrollViewTopConstraint" destination="y4h-EN-rn0" id="8f7-8Y-Zeb"/>
                 <outlet property="mediaSourceView" destination="eHd-Q9-F8D" id="gfU-Jp-eFr"/>
                 <outlet property="mediaToolBar" destination="pr3-TD-J2z" id="Chi-03-Fgd"/>
                 <outlet property="placeholderGoToBrowseButton" destination="V2G-WY-Ewc" id="oeg-Uf-wwE"/>
                 <outlet property="placeholderImageView" destination="fgK-fZ-95P" id="WwE-eN-rSA"/>
                 <outlet property="placeholderLabel" destination="adK-Pc-tnU" id="6Zw-IF-czx"/>
                 <outlet property="playQueueToggle" destination="IaO-se-D0g" id="tqY-YM-KQC"/>
-                <outlet property="renderersButton" destination="ffS-QP-Om3" id="rOM-No-rd0"/>
                 <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
-                <outlet property="splitViewBottomConstraintToSuperView" destination="DQQ-ji-YSy" id="b0t-C0-5uP"/>
                 <outlet property="splitViewController" destination="Kkr-kI-gpb" id="9aZ-xw-zrl"/>
                 <outlet property="toolbarDelegate" destination="xXj-E8-b8X" id="VsJ-ky-NJg"/>
                 <outlet property="videoLibraryCollectionView" destination="neh-e5-MUa" id="bmc-HF-k9s"/>
