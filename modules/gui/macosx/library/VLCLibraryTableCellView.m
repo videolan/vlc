@@ -80,6 +80,9 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.playInstantlyButton.target = self;
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
+        if (self.representedItem.item != actualItem) {
+            return;
+        }
         self.representedImageView.image = thumbnail;
     }];
 
@@ -102,6 +105,9 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
 
     [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem withCompletion:^(NSImage * const thumbnail) {
+        if (representedInputItem != self->_representedInputItem) {
+            return;
+        }
         self->_representedImageView.image = thumbnail;
     }];
 
