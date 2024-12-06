@@ -79,6 +79,9 @@
 - (void)setRepresentedPlayQueueItem:(VLCPlayQueueItem *)item
 {
     [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
+        if (item != self.representedPlayQueueItem) {
+            return;
+        }
         self.audioArtworkImageView.image = thumbnail;
         self.mediaImageView.image = thumbnail;
     }];
