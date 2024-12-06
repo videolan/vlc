@@ -328,6 +328,9 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
     }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
+        if (self.representedItem.item != album) {
+            return;
+        }
         self.representedImageView.image = thumbnail;
     }];
 
