@@ -533,6 +533,7 @@
                 </connections>
             </toolbar>
             <connections>
+                <outlet property="artworkButton" destination="f5c-zt-tHy" id="ugl-0g-F9f"/>
                 <outlet property="audioCollectionSelectionTableView" destination="LNt-ot-2wU" id="aim-ER-CpD"/>
                 <outlet property="audioCollectionSelectionTableViewScrollView" destination="HrP-Dz-Uh0" id="Sh0-oP-3Ad"/>
                 <outlet property="audioCollectionViewScrollView" destination="AYf-gS-P66" id="Jmt-vH-Vgq"/>
