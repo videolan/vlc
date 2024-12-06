@@ -1,10 +1,6 @@
 [workspace]
 members = [
-    "vlcrs-core",
-    "vlcrs-macros",
-    "vlcrs-messages",
-    "vlcrs-plugin",
-    "vlcrs-sys-generator"
+    "src/rust/vlcrs-*",
 ]
 resolver = "2"
 
