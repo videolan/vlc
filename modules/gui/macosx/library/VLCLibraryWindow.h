@@ -106,7 +106,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite, weak) IBOutlet NSButton *forwardsNavigationButton;
 @property (readwrite, weak) IBOutlet NSButton *artworkButton;
 @property (readwrite, weak) IBOutlet VLCLibraryWindowToolbarDelegate *toolbarDelegate;
-@property (readwrite, weak) IBOutlet NSLayoutConstraint *splitViewBottomConstraintToBottomBar;
 
 @property (nonatomic, readwrite, strong) IBOutlet NSView *emptyLibraryView;
 @property (nonatomic, readwrite, strong) IBOutlet NSImageView *placeholderImageView;

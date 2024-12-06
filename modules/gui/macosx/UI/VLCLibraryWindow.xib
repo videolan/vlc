@@ -573,7 +573,6 @@
                 <outlet property="placeholderImageView" destination="fgK-fZ-95P" id="WwE-eN-rSA"/>
                 <outlet property="placeholderLabel" destination="adK-Pc-tnU" id="6Zw-IF-czx"/>
                 <outlet property="playQueueToggle" destination="IaO-se-D0g" id="tqY-YM-KQC"/>
-                <outlet property="splitViewBottomConstraintToBottomBar" destination="QH8-mU-6ZP" id="b0t-C0-N5t"/>
                 <outlet property="splitViewController" destination="Kkr-kI-gpb" id="9aZ-xw-zrl"/>
                 <outlet property="toolbarDelegate" destination="xXj-E8-b8X" id="VsJ-ky-NJg"/>
                 <outlet property="videoLibraryCollectionView" destination="neh-e5-MUa" id="bmc-HF-k9s"/>
