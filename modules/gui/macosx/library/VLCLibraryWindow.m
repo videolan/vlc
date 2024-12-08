@@ -810,7 +810,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showLoadingOverlay
 {
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView] ||
+        [self.libraryTargetView.subviews containsObject:self.videoViewController.view]) {
         return;
     }
 
