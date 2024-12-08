@@ -131,7 +131,6 @@
                         <constraint firstItem="qv6-Mn-ifA" firstAttribute="centerY" secondItem="grx-kk-1X1" secondAttribute="centerY" id="AO4-Hd-L52"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="DKc-9E-HYo"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="width" secondItem="qv6-Mn-ifA" secondAttribute="width" multiplier="1.2" id="Jkb-0O-auX"/>
-                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="210" id="UHR-0G-iJA"/>
                         <constraint firstItem="ghp-DI-YmZ" firstAttribute="top" secondItem="aUB-Ld-N2o" secondAttribute="bottom" constant="10" id="XFC-9r-Q8L"/>
                         <constraint firstItem="aUB-Ld-N2o" firstAttribute="height" secondItem="qv6-Mn-ifA" secondAttribute="height" multiplier="1.2" id="eJ2-wz-BJL"/>
                         <constraint firstItem="ghp-DI-YmZ" firstAttribute="centerX" secondItem="qv6-Mn-ifA" secondAttribute="centerX" id="gL5-uR-Smy"/>
@@ -220,7 +219,6 @@
                 <constraint firstItem="ik5-L4-VLw" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="CW2-KK-Z5t"/>
                 <constraint firstItem="EIb-Is-vco" firstAttribute="top" secondItem="ik5-L4-VLw" secondAttribute="bottom" id="Cyw-MK-W8n"/>
                 <constraint firstAttribute="trailing" secondItem="ew3-Pn-diG" secondAttribute="trailing" constant="20" id="Hwc-K8-2WQ"/>
-                <constraint firstAttribute="bottom" secondItem="ew3-Pn-diG" secondAttribute="bottom" constant="54" id="OnX-TC-nMG"/>
                 <constraint firstAttribute="trailing" secondItem="EIb-Is-vco" secondAttribute="trailing" id="UAJ-gH-fWy"/>
                 <constraint firstItem="hc5-GJ-yJe" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="Ums-3j-iWc"/>
                 <constraint firstAttribute="bottom" secondItem="hc5-GJ-yJe" secondAttribute="bottom" constant="16" id="XfY-Lh-mBE"/>
@@ -231,7 +229,7 @@
                 <constraint firstItem="EIb-Is-vco" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="kEZ-5n-pxq"/>
                 <constraint firstItem="grx-kk-1X1" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" id="mCw-UE-mS0"/>
                 <constraint firstItem="ew3-Pn-diG" firstAttribute="leading" secondItem="NJR-gf-yTs" secondAttribute="leading" constant="20" id="qow-FG-3aN"/>
-                <constraint firstItem="EIb-Is-vco" firstAttribute="baseline" secondItem="ew3-Pn-diG" secondAttribute="firstBaseline" id="y82-Wx-neg"/>
+                <constraint firstItem="EIb-Is-vco" firstAttribute="bottom" secondItem="ew3-Pn-diG" secondAttribute="top" id="y82-Wx-neg"/>
             </constraints>
             <point key="canvasLocation" x="-148" y="45"/>
         </customView>
