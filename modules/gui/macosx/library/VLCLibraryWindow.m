@@ -144,6 +144,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     imageView.shadow = buttonShadow;
 }
 
+@interface VLCLibraryWindow ()
+
+@property BOOL presentLoadingOverlayOnVideoPlaybackHide;
+
+@end
+
 @implementation VLCLibraryWindow
 
 - (void)awakeFromNib
@@ -806,12 +812,18 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self showControlsBarImmediately];
     [self updateArtworkButtonEnabledState];
     self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = NO;
+
+    if (self.presentLoadingOverlayOnVideoPlaybackHide) {
+        [self showLoadingOverlay];
+    }
 }
 
 - (void)showLoadingOverlay
 {
-    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView] ||
-        [self.libraryTargetView.subviews containsObject:self.videoViewController.view]) {
+    if ([self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
+        return;
+    } else if ([self.libraryTargetView.subviews containsObject:self.videoViewController.view]) {
+        self.presentLoadingOverlayOnVideoPlaybackHide = YES;
         return;
     }
 
@@ -832,6 +844,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)hideLoadingOverlay
 {
+    self.presentLoadingOverlayOnVideoPlaybackHide = NO;
+
     if (![self.libraryTargetView.subviews containsObject:self.loadingOverlayView]) {
         return;
     }
