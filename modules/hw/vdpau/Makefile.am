@@ -1,7 +1,8 @@
 vdpaudir = $(pluginsdir)/vdpau
 # Install the pkglib/pkglibexec first before relinking the modules.
 # This ensures libtool re-linking is not racy.
-install-vpdauLTLIBRARIES: install-pkglibLTLIBRARIES
+installvpdauLTLIBRARIES = install-vdpauLTLIBRARIES
+$(installvpdauLTLIBRARIES): install-pkglibLTLIBRARIES
 
 
 libvlc_vdpau_la_SOURCES = hw/vdpau/vlc_vdpau.c hw/vdpau/vlc_vdpau.h hw/vdpau/instance.c
