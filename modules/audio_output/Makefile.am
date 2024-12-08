@@ -2,7 +2,8 @@ aoutdir = $(pluginsdir)/audio_output
 aout_LTLIBRARIES =
 # Install the pkglib/pkglibexec first before relinking the modules.
 # This ensures libtool re-linking is not racy.
-install-aoutLTLIBRARIES: install-pkglibLTLIBRARIES
+installaoutLTLIBRARIES = install-aoutLTLIBRARIES
+$(installaoutLTLIBRARIES): install-pkglibLTLIBRARIES
 
 libvlc_android_audioformat_jni_la_SOURCES = \
 	audio_output/android/audioformat_jni.c \
