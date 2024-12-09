@@ -20,12 +20,11 @@ import QtQuick
 Item {
     id: root
 
-    readonly property real implicitWidth: image.implicitHeight
-    readonly property real implicitHeight: image.implicitHeight
-
-    // Might need this as we have overridden implicit sizes as readonly
-    height: root.implicitHeight
-    width: root.implicitWidth
+    // Implicit size used to be overridden as readonly, but that needed
+    // binding width/height to the new properties which in turn caused
+    // problems with layouts.
+    implicitWidth: image.implicitWidth
+    implicitHeight: image.implicitHeight
 
     asynchronous: true
 
