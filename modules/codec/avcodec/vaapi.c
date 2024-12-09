@@ -169,13 +169,13 @@ static const struct vlc_video_context_operations vaapi_ctx_ops =
     .destroy = vaapi_ctx_destroy,
 };
 
-static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
-                  const AVPixFmtDescriptor *desc,
-                  const es_format_t *fmt_in, vlc_decoder_device *dec_device,
-                  video_format_t *fmt_out, vlc_video_context **vtcx_out)
+static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
 {
-    VLC_UNUSED(desc);
-    VLC_UNUSED(fmt_in);
+    AVCodecContext *ctx = cfg->avctx;
+    enum AVPixelFormat hwfmt = cfg->hwfmt;
+    vlc_decoder_device *dec_device = cfg->dec_device;
+    video_format_t *fmt_out = cfg->video_fmt_out;
+
     if ( hwfmt != AV_PIX_FMT_VAAPI || dec_device == NULL ||
         dec_device->type != VLC_DECODER_DEVICE_VAAPI)
         return VLC_EGENERIC;
@@ -282,7 +282,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt,
 
     va->ops = &ops;
     va->sys = vctx;
-    *vtcx_out = vctx;
+    cfg->vctx_out = vctx;
     return VLC_SUCCESS;
 }
 

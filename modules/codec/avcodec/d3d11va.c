@@ -64,8 +64,7 @@ struct d3d11va_pic_context
 
 #include "directx_va.h"
 
-static int Open(vlc_va_t *, AVCodecContext *, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
-                const es_format_t *, vlc_decoder_device *, video_format_t *, vlc_video_context **);
+static int Open(vlc_va_t *va, struct vlc_va_cfg *cfg);
 
 vlc_module_begin()
     set_description(N_("Direct3D11 Video Acceleration"))
@@ -232,10 +231,15 @@ static const struct vlc_va_operations ops =
     .close = Close,
 };
 
-static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *desc,
-                const es_format_t *fmt_in, vlc_decoder_device *dec_device,
-                video_format_t *fmt_out, vlc_video_context **vtcx_out)
+static int Open(vlc_va_t *va, struct vlc_va_cfg *cfg)
 {
+    AVCodecContext *ctx = cfg->avctx;
+    enum AVPixelFormat hwfmt = cfg->hwfmt;
+    const AVPixFmtDescriptor *desc = cfg->desc;
+    const es_format_t *fmt_in = cfg->fmt_in;
+    vlc_decoder_device *dec_device = cfg->dec_device;
+    video_format_t *fmt_out = cfg->video_fmt_out;
+
     int err = VLC_EGENERIC;
 
     ctx->hwaccel_context = NULL;
@@ -309,7 +313,7 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum AVPixelFormat hwfmt, con
 
     va->ops = &ops;
     *fmt_out = final_fmt;
-    *vtcx_out = sys->vctx;
+    cfg->vctx_out = sys->vctx;
     return VLC_SUCCESS;
 
 error:

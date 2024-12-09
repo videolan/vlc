@@ -738,10 +738,16 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
         vlc_mutex_unlock(open_lock);
 
     p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
-    vlc_video_context *vctx_out;
-    vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), p_context, hwfmt, src_desc,
-                                p_dec->fmt_in, init_device,
-                                &p_dec->fmt_out.video, &vctx_out);
+    struct vlc_va_cfg cfg = {
+        .avctx = p_context,
+        .hwfmt = hwfmt,
+        .desc = src_desc,
+        .fmt_in = p_dec->fmt_in,
+        .dec_device = init_device,
+        .video_fmt_out = &p_dec->fmt_out.video,
+        .vctx_out = NULL,
+    };
+    vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), &cfg);
     if (init_device)
         vlc_decoder_device_Release(init_device);
     if (open_lock)
@@ -749,17 +755,17 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     if (va == NULL)
         return VLC_EGENERIC; /* Unsupported codec profile or such */
     assert(p_dec->fmt_out.video.i_chroma != 0);
-    assert(vctx_out != NULL);
+    assert(cfg.vctx_out != NULL);
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
-    if (decoder_UpdateVideoOutput(p_dec, vctx_out))
+    if (decoder_UpdateVideoOutput(p_dec, cfg.vctx_out))
     {
         vlc_va_Delete(va, p_context);
         return VLC_EGENERIC; /* Unsupported codec profile or such */
     }
 
     p_sys->p_va = va;
-    p_sys->vctx_out = vlc_video_context_Hold( vctx_out );
+    p_sys->vctx_out = vlc_video_context_Hold( cfg.vctx_out );
     p_sys->pix_fmt = hwfmt;
     return VLC_SUCCESS;
 }

@@ -44,10 +44,7 @@ bool vlc_va_MightDecode(enum AVPixelFormat hwfmt)
     }
 }
 
-vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
-                     enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *src_desc,
-                     const es_format_t *fmt_in, vlc_decoder_device *device,
-                     video_format_t *fmt_out, vlc_video_context **vtcx_out)
+vlc_va_t *vlc_va_New(vlc_object_t *obj, struct vlc_va_cfg *cfg)
 {
     struct vlc_va_t *va = vlc_object_create(obj, sizeof (*va));
     if (unlikely(va == NULL))
@@ -59,8 +56,8 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
     for (ssize_t i = 0; i < total; i++) {
         vlc_va_open open = vlc_module_map(obj->logger, mods[i]);
 
-        if (open != NULL && open(va, avctx, hwfmt, src_desc, fmt_in, device,
-                                 fmt_out, vtcx_out) == VLC_SUCCESS) {
+        if (open != NULL && open(va, cfg) == VLC_SUCCESS)
+        {
             free(mods);
             return va;
         }

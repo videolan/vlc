@@ -30,6 +30,44 @@ typedef struct vlc_va_t vlc_va_t;
 typedef struct vlc_decoder_device vlc_decoder_device;
 typedef struct vlc_video_context vlc_video_context;
 
+struct vlc_va_cfg
+{
+    /**
+     * AVContext to set the hwaccel_context on.
+     *
+     * The VA can assume fields codec_id, coded_width, coded_height,
+     * active_thread_type, thread_count, framerate, profile, refs (H264) and
+     * hw_pix_fmt are set correctly */
+    AVCodecContext *avctx;
+
+    /** avcodec hardare PIX_FMT */
+    enum AVPixelFormat hwfmt;
+
+    /**  Description of the hardware fornat */
+    const AVPixFmtDescriptor *desc;
+
+    /** VLC format of the content to decode */
+    const es_format_t *fmt_in;
+
+    /** Decoder device that will be used to create the video context */
+    vlc_decoder_device *dec_device;
+
+    /**
+     * Resulting Video format
+     *
+     * Valid, can be changed by the module to change the size or chroma.
+     */
+    video_format_t *video_fmt_out;
+
+    /**
+     * Pointer to the used video context
+     *
+     * The video context must be allocated from the dec_device, filled and set
+     * to this pointer.
+     */
+    vlc_video_context *vctx_out;
+};
+
 struct vlc_va_operations {
     int (*get)(vlc_va_t *, picture_t *pic, AVCodecContext *ctx, AVFrame *frame);
     void (*close)(vlc_va_t *, AVCodecContext* ctx);
@@ -42,10 +80,7 @@ struct vlc_va_t {
     const struct vlc_va_operations *ops;
 };
 
-typedef int (*vlc_va_open)(vlc_va_t *, AVCodecContext *,
-                           enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
-                           const es_format_t *, vlc_decoder_device *,
-                           video_format_t *, vlc_video_context **);
+typedef int (*vlc_va_open)(vlc_va_t *, struct vlc_va_cfg *cfg);
 
 #define set_va_callback(activate, priority) \
     { \
@@ -66,16 +101,10 @@ bool vlc_va_MightDecode(enum AVPixelFormat hwfmt);
 /**
  * Creates an accelerated video decoding back-end for libavcodec.
  * @param obj parent VLC object
- * @param avctx AVContext to set the hwaccel_context on. The VA can assume fields
- *   codec_id, coded_width, coded_height, active_thread_type, thread_count,
- *   framerate, profile, refs (H264) and hw_pix_fmt are set correctly.
- * @param fmt VLC format of the content to decode
+ * @param cfg pointer to a configuration struct
  * @return a new VLC object on success, NULL on error.
  */
-vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext * avctx,
-                     enum AVPixelFormat hwfmt, const AVPixFmtDescriptor *,
-                     const es_format_t *fmt, vlc_decoder_device *device,
-                     video_format_t *, vlc_video_context **vtcx_out);
+vlc_va_t *vlc_va_New(vlc_object_t *obj, struct vlc_va_cfg *cfg);
 
 /**
  * Get a hardware video surface for a libavcodec frame.
