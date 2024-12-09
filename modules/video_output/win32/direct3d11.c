@@ -1686,7 +1686,7 @@ static int Direct3D11Open(vout_display_t *vd, bool external_device)
     }
 
     video_format_Clean(&vd->fmt);
-    vd->fmt = sys->pool_fmt;
+    video_format_Copy(&vd->fmt, &sys->pool_fmt);
 
     sys->log_level = var_InheritInteger(vd, "verbose");
 
