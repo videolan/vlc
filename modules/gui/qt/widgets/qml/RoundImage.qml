@@ -55,7 +55,9 @@ Item {
     //       and the generated texture is pre-filled. In
     //       the future, Qt Quick may prefer doing this
     //       within its shader, but for now, we should be
-    //       able to use it.
+    //       able to use it. Currently, as of Qt 6.8,
+    //       PreserveAspectCrop, PreserveAspectFit, and
+    //       Stretch can be considered supported.
     // NOTE: If you need a more guaranteed way to preserve
     //       the aspect ratio, you can use `sourceSize` with
     //       only one dimension set. Currently `fillMode` is
@@ -63,11 +65,14 @@ Item {
     //       to have control over both width and height.
     property alias fillMode: image.fillMode
 
-    // We prefer preserve aspect fit by default, like in
-    // playlist delegate, because preserve aspect ratio
-    // crop needs `clip: true` to work properly, and it
-    // it breaks batching and should not be used in a
-    // delegate.
+    // Unlike QQuickImage where it needs `clip: true` (clip node)
+    // for `PreserveAspectCrop`, with the custom shader we do not
+    // need that. This makes it feasible to use `PreserveAspectCrop`
+    // in delegate, where we want to have effective batching. Note
+    // that such option is still not free, because the fragment
+    // shader has to do additional calculations that way. Also note
+    // that a clip node is still necessary if radius is 0, as in
+    // that case the default image is used directly.
     fillMode: Image.PreserveAspectFit
 
     property real radius
@@ -88,8 +93,8 @@ Item {
         implicitWidth: image.implicitWidth
         implicitHeight: image.implicitHeight
 
-        width: image.paintedWidth
-        height: image.paintedHeight
+        width: (image.fillMode === Image.PreserveAspectCrop) ? root.width : image.paintedWidth
+        height: (image.fillMode === Image.PreserveAspectCrop) ? root.height : image.paintedHeight
 
         visible: readyForVisibility
 
@@ -114,12 +119,32 @@ Item {
         readonly property double softEdgeMin: -0.01
         readonly property double softEdgeMax:  0.01
 
+        readonly property size cropRate: {
+            let ret = Qt.size(0.0, 0.0)
+
+            // No need to calculate if PreserveAspectCrop is not used
+            if (root.fillMode !== Image.PreserveAspectCrop)
+                return ret
+
+            const implicitScale = implicitWidth / implicitHeight
+            const scale = width / height
+
+            if (scale > implicitScale)
+                ret.height = (implicitHeight - implicitWidth) / 2 / implicitHeight
+            else if (scale < implicitScale)
+                ret.width = (implicitWidth - implicitHeight) / 2 / implicitWidth
+
+            return ret
+        }
+
         // QQuickImage as texture provider, no need for ShaderEffectSource.
         // In this case, we simply ask the Image to provide its texture,
         // so that we can make use of our custom shader.
         readonly property Image source: image
 
-        fragmentShader: "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
+        fragmentShader: (cropRate.width > 0.0 || cropRate.height > 0.0) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport.frag.qsb"
+                                                                        : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
+
     }
 
     Image {

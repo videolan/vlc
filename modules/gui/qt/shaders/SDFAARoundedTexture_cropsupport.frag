@@ -1,5 +1,17 @@
 #version 440
 
+// TODO: Build system support for preprocessor defines, like CMake's `qt6_add_shaders()`.
+// NOTE: Currently the build system does not support defines for the shaders,
+//       So, the following is imported manually from SDFAARoundedTexture.frag.
+// FIXME: Remove this file when build system starts supporting defines for the
+//        shaders.
+
+#define CROP_SUPPORT
+
+// WARNING: The contents of this file must be in sync with SDFAARoundedTexture.frag
+//          for maintenance purposes. IF YOU EDIT THIS FILE, MAKE SURE TO DO THE
+//          SAME IN SDFAARoundedTexture.frag.
+
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
