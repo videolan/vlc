@@ -53,12 +53,15 @@ T.ItemDelegate {
     property alias cacheImage: picture.cacheImage
     property alias fallbackImage: picture.fallbackImageSource
 
+    property alias fillMode: picture.fillMode
+
     property alias title: titleLabel.text
     property alias subtitle: subtitleTxt.text
     property alias subtitleVisible: subtitleTxt.visible
     property alias playCoverShowPlay: picture.playCoverShowPlay
     property alias playIconSize: picture.playIconSize
     property alias pictureRadius: picture.radius
+    property alias effectiveRadius: picture.effectiveRadius
     property alias pictureOverlay: picture.imageOverlay
 
     property alias selectedShadow: selectedShadow

@@ -65,6 +65,8 @@ Item {
     readonly property real paintedWidth: fallbackImage.visible ? fallbackImage.paintedWidth : image.paintedWidth
     readonly property real paintedHeight: fallbackImage.visible ? fallbackImage.paintedHeight : image.paintedHeight
 
+    property alias fillMode: image.fillMode
+
     // Signals
 
     signal playIconClicked(var point)
@@ -125,6 +127,8 @@ Item {
         anchors.fill: parent
 
         radius: root.radius
+
+        fillMode: root.fillMode
 
         visible: image.source.toString() === "" //RoundImage.source is a QUrl
                  || image.status === Image.Error

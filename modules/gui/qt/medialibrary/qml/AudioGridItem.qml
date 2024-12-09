@@ -30,6 +30,13 @@ Widgets.GridItem {
     image: model.cover || ""
     fallbackImage: VLCStyle.noArtAlbumCover
 
+    // NOTE: If radius is 0.0, `QQuickImage` is used, and it
+    //       requires a clip node (`clip: true`) to display
+    //       `PreserveAspectCrop` where we can not have in a
+    //       delegate. So instead, use `PreserveAspectFit` in
+    //       that case.
+    fillMode: ((effectiveRadius > 0.0) ? Image.PreserveAspectCrop : Image.PreserveAspectFit
+
     title: model.title || qsTr("Unknown title")
     subtitle: model.main_artist || qsTr("Unknown artist")
     pictureWidth: VLCStyle.gridCover_music_width
