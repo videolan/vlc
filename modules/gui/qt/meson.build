@@ -909,6 +909,19 @@ qml_tests = {
 qmllibs = []
 
 if qt6_dep.found()
+    qt_rcc_extra_arguments = []
+    qt_zstd_check = '''
+    #include <qconfig.h>
+    #if QT_FEATURE_zstd != 1
+    #error "Qt can not decompress zstd. Resources are going to be compressed using zlib."
+    #endif
+    '''
+    if cpp.compiles(qt_zstd_check, dependencies: qt6_dep, name: 'Qt supports decompressing zstd')
+        qt_rcc_extra_arguments += '-compress-algo=zstd'
+    else
+        qt_rcc_extra_arguments += '-compress-algo=zlib'
+    endif
+
     prog_python = find_program('python3')
     modules_qrc = []
     foreach module : qml_modules
@@ -946,7 +959,8 @@ if qt6_dep.found()
                 meson.current_build_dir() / module['outdir'] / 'qmldir.qrc',
             ),
             include_directories: qt_include_dir,
-            dependencies: qt6_dep
+            dependencies: qt6_dep,
+            rcc_extra_arguments: qt_rcc_extra_arguments
         )
 
         #FIXME copy every files to the outdir module so they can be used by qt tooling
@@ -960,7 +974,8 @@ if qt6_dep.found()
     qt6pre_qrc = qt6.preprocess(
         qresources: qrc_files,
         include_directories: qt_include_dir,
-        dependencies: qt6_dep)
+        dependencies: qt6_dep,
+        rcc_extra_arguments: qt_rcc_extra_arguments)
 
     qt_sources = files('qt.cpp')
 
@@ -1083,7 +1098,8 @@ if qt6_dep.found()
         moc_headers: moc_headers,
         moc_extra_arguments: qt_extra_flags,
         include_directories: qt_include_dir,
-        dependencies: qt6_dep)
+        dependencies: qt6_dep,
+        rcc_extra_arguments: qt_rcc_extra_arguments)
 
     # TODO support qmlcachegen
 

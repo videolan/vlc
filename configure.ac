@@ -4009,6 +4009,7 @@ have_qt_declarative_private="no"
 have_qt_gui_private="no"
 have_qt_core_private="no"
 have_qt65="no"
+have_qt_zstd="no"
 have_fxc="no"
 AS_IF([test "${enable_qt}" != "no"], [
   have_qt="yes"
@@ -4136,6 +4137,22 @@ AS_IF([test "${enable_qt}" != "no"], [
         AC_MSG_WARN([qt runtime dependencies are missing, disabling qt interface])
         have_qt="no"
       ])
+
+      AC_MSG_CHECKING([if Qt can decompress zstd])
+      VLC_SAVE_FLAGS
+      CPPFLAGS="${CPPFLAGS} ${QT_CFLAGS}"
+      AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <qconfig.h>]],[[
+        #if QT_FEATURE_zstd != 1
+        #error "Qt can not decompress zstd. Resources are going to be compressed using zlib."
+        #endif
+        ]])], [
+         have_qt_zstd="yes"
+         AC_MSG_RESULT([yes])
+        ],[
+         AC_MSG_RESULT([no])
+        ])
+      VLC_RESTORE_FLAGS
 
       AC_MSG_CHECKING([for Qt QTest])
       (${QMAKE} ${srcdir}/modules/gui/qt/qtest.pro -o ${ac_pwd}/modules/gui/qt/qmake-qtest) 2>/dev/null
@@ -4276,6 +4293,7 @@ AM_CONDITIONAL([HAVE_QT_CORE_PRIVATE], [test "${have_qt_core_private}" = "yes"])
 AM_CONDITIONAL([HAVE_FXC], [test "${have_fxc}" = "yes"])
 AM_CONDITIONAL([HAVE_QT67], [test "${QT_VERSION_MAJ:-0}" -gt "6" || (test "${QT_VERSION_MAJ:-0}" = "6" && test "${QT_VERSION_MIN:-0}" -ge "7")])
 AM_CONDITIONAL([HAVE_QT65], [test "${have_qt65}" = "yes"])
+AM_CONDITIONAL([HAVE_QT_ZSTD], [test "${have_qt_zstd}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).

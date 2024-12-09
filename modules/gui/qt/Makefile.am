@@ -18,6 +18,13 @@ SUFFIXES += .ui .h .hpp .moc.cpp .qml .js .mjs .moc
 TEST_EXTENSIONS = .qml
 EXTRA_DIST = qt6.pro private-core.pro private-gui.pro private-quick.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
+RCC_EXTRA_PARAMS =
+
+if HAVE_QT_ZSTD
+RCC_EXTRA_PARAMS += -compress-algo=zstd
+else
+RCC_EXTRA_PARAMS += -compress-algo=zlib
+endif
 
 vlc_qt_check_SOURCES = vlc-qt-check.cpp plugins.hpp
 vlc_qt_check_CXXFLAGS = $(AM_CXXFLAGS) $(QT_CFLAGS) -fPIC $(CXXFLAGS_qt)
@@ -1402,7 +1409,7 @@ QSB_PARAMS_VERBOSE__0 = $(QSB_PARAMS_VERBOSE_0)
 
 shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.frag=.frag.qsb) $(libqt_plugin_la_SHADER:.vert=.vert.qsb)
 	$(AM_V_GEN) cp -f $(filter %.qrc, $^) $(builddir)/shaders/shaders.qrc || true
-	$(AM_V_GEN) $(RCC) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
+	$(AM_V_GEN) $(RCC) $(RCC_EXTRA_PARAMS) --name shaders -o $@ $(builddir)/shaders/$(notdir $(filter %.qrc, $^))
 
 libqt_plugin_la_SOURCES += shaders/shaders.qrc $(libqt_plugin_la_SHADER)
 BUILT_SOURCES += shaders/shaders.qrc
@@ -1414,7 +1421,7 @@ lib_qt_plugin_la_QRC += windows.qrc
 
 windows.cpp: $(libqt_plugin_la_RES)
 windows.cpp: windows.qrc
-	$(AM_V_GEN)$(RCC) --name windows -o $@ $<
+	$(AM_V_GEN)$(RCC) $(RCC_EXTRA_PARAMS) --name windows -o $@ $<
 
 nodist_libqt_plugin_la_SOURCES += windows.cpp
 endif
@@ -1505,7 +1512,7 @@ endif
 
 #package qmldir files
 %_qmlassets.cpp: $(builddir)/%/qmldir.qrc
-	$(AM_V_GEN)$(RCC) --name $*_assets -o $@ $<
+	$(AM_V_GEN)$(RCC) $(RCC_EXTRA_PARAMS) --name $*_assets -o $@ $<
 
 
 CLEANFILES += \
@@ -1523,7 +1530,7 @@ libqt_plugin_la_QML_MODULES_QMLDIR = $(libqt_plugin_la_QML_MODULES:%=$(builddir)
 libqt_plugin_la_QML_MODULES_QMLDIR_QRC = $(libqt_plugin_la_QML_MODULES:%=$(builddir)/%/qmldir.qrc)
 
 %_qmlassets.cpp: $(builddir)/%/qmldir.qrc $(builddir)/%/res.qrc $(libqt_plugin_la_ALL_QML)
-	$(AM_V_GEN)$(RCC) --name $*_assets -o $@ $(builddir)/$*/qmldir.qrc $(builddir)/$*/res.qrc
+	$(AM_V_GEN)$(RCC) $(RCC_EXTRA_PARAMS) --name $*_assets -o $@ $(builddir)/$*/qmldir.qrc $(builddir)/$*/res.qrc
 
 nodist_libqt_plugin_la_SOURCES += $(libqt_plugin_la_QML_MODULES:%=%_qmlassets.cpp)
 
@@ -1537,7 +1544,7 @@ EXTRA_DIST += $(libqt_plugin_la_QML)
 
 assets.cpp: $(libqt_plugin_la_RES)
 assets.cpp: assets.qrc
-	$(AM_V_GEN)$(RCC) --name assets -o $@ $<
+	$(AM_V_GEN)$(RCC) $(RCC_EXTRA_PARAMS) --name assets -o $@ $<
 
 
 if HAVE_QT_GTK
