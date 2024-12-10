@@ -249,9 +249,6 @@
         <property name="displayFormat">
          <string>HH'H':mm'm':ss's'.zzz</string>
         </property>
-        <property name="timeSpec">
-         <enum>Qt::LocalTime</enum>
-        </property>
        </widget>
       </item>
       <item row="1" column="4" colspan="2">
@@ -267,9 +264,6 @@
         </property>
         <property name="displayFormat">
          <string>HH'H':mm'm':ss's'.zzz</string>
-        </property>
-        <property name="timeSpec">
-         <enum>Qt::LocalTime</enum>
         </property>
        </widget>
       </item>
