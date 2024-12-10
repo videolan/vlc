@@ -142,7 +142,7 @@ void TimeTooltip::show()
 void TimeTooltip::paintEvent( QPaintEvent * )
 {
     QPainter p( this );
-    p.setRenderHints( QPainter::HighQualityAntialiasing | QPainter::TextAntialiasing );
+    p.setRenderHints( QPainter::TextAntialiasing );
 
     p.setPen( Qt::black );
     p.setBrush( qApp->palette().base() );
