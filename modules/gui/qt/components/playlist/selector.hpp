@@ -58,7 +58,7 @@ enum {
     LONGNAME_ROLE,       //QString
     PL_ITEM_ROLE,        //playlist_item_t*
     PL_ITEM_ID_ROLE,     //playlist_item_t->i_id
-    IN_ITEM_ROLE,        //input_item_t->i_id
+    IN_ITEM_ROLE,        //input_item_t*
     SPECIAL_ROLE,        //SpecialData
     CAP_SEARCH_ROLE,
     SD_CATEGORY_ROLE,
