@@ -337,13 +337,20 @@ void CompositorDirectComposition::destroyMainInterface()
         msg_Err(m_intf, "video surface still active while destroying main interface");
 
     commonIntfDestroy();
+    m_quickView.reset();
 }
 
 void CompositorDirectComposition::unloadGUI()
 {
     m_acrylicSurface.reset();
     m_interfaceWindowHandler.reset();
-    m_quickView.reset();
+
+    //at this point we need to unload the QML content but the window still need to
+    //be valid as it may still be used by the vout window.
+    //we cant' just delete the qmlEngine as the QmlView as the root item is parented to the QmlView
+    //setSource() to nothing will effectively destroy the root item
+    m_quickView->setSource(QUrl());
+
     commonGUIDestroy();
 }
 
