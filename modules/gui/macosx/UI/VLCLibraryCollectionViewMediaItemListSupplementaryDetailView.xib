@@ -22,7 +22,7 @@
                                 <imageView translatesAutoresizingMaskIntoConstraints="NO" id="xZd-Hk-h2M" customClass="VLCImageView">
                                     <rect key="frame" x="0.0" y="35" width="237" height="237"/>
                                     <constraints>
-                                        <constraint firstAttribute="width" secondItem="xZd-Hk-h2M" secondAttribute="height" multiplier="1:1" id="TIK-Ez-QbE"/>
+                                        <constraint firstAttribute="width" secondItem="xZd-Hk-h2M" secondAttribute="height" multiplier="1:1" priority="750" id="TIK-Ez-QbE"/>
                                     </constraints>
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="no-art" id="6X6-Og-u8A"/>
                                 </imageView>
@@ -175,6 +175,9 @@
                                         </subviews>
                                         <nil key="backgroundColor"/>
                                     </clipView>
+                                    <constraints>
+                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="200" id="Hpe-5w-QJh"/>
+                                    </constraints>
                                     <edgeInsets key="contentInsets" left="0.0" right="0.0" top="0.0" bottom="10"/>
                                     <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="ZBY-pE-E7T">
                                         <rect key="frame" x="-100" y="-100" width="701" height="15"/>
