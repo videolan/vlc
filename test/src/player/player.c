@@ -3006,9 +3006,9 @@ test_clock_discontinuities(struct ctx *ctx)
         vlc_player_CondWait(player, &ctx->wait);
 
     assert(vec->data[0] == VLC_TICK_0); /* Initial PTS */
-    assert(vec->data[1] == 2); /* 1st discontinuity */
-    assert(vec->data[2] == 2500000); /* 2nd discontinuity */
-    assert(vec->data[3] == 10000000); /* 3rd discontinuity */
+    assert(vec->data[1] == VLC_TICK_0 + 2); /* 1st discontinuity */
+    assert(vec->data[2] == VLC_TICK_0 + 2500000); /* 2nd discontinuity */
+    assert(vec->data[3] == VLC_TICK_0 + 10000000); /* 3rd discontinuity */
 
     test_end(ctx);
 }

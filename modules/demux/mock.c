@@ -546,7 +546,7 @@ Control(demux_t *demux, int query, va_list args)
             }
             return VLC_EGENERIC;
         case DEMUX_GET_POSITION:
-            *va_arg(args, double *) = sys->pts / (double) sys->length;
+            *va_arg(args, double *) = (sys->pts - VLC_TICK_0)/ (double) sys->length;
             return VLC_SUCCESS;
         case DEMUX_SET_POSITION:
             if (!sys->can_seek)
@@ -558,12 +558,12 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, vlc_tick_t *) = sys->length;
             return VLC_SUCCESS;
         case DEMUX_GET_TIME:
-            *va_arg(args, vlc_tick_t *) = sys->pts;
+            *va_arg(args, vlc_tick_t *) = sys->pts - VLC_TICK_0;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->pts = sys->video_pts = sys->audio_pts = va_arg(args, vlc_tick_t);
+            sys->pts = sys->video_pts = sys->audio_pts = VLC_TICK_0 + va_arg(args, vlc_tick_t);
             return VLC_SUCCESS;
         case DEMUX_GET_TITLE_INFO:
             if (sys->title_count > 0)
@@ -809,7 +809,7 @@ CheckAndCreateTracksEs(demux_t *demux, vlc_tick_t pts, bool *created)
     {
         if (track->id ||
            (track->video.add_track_at != VLC_TICK_INVALID &&
-            pts < track->video.add_track_at))
+            (pts - VLC_TICK_0) < track->video.add_track_at))
             continue;
         track->id = es_out_Add(demux->out, & track->fmt);
         if (!track->id)
@@ -1231,12 +1231,12 @@ Demux(demux_t *demux)
     else if (sys->video_track_count > 0 || sys->sub_track_count > 0)
         sys->pts = sys->video_pts;
 
-    if (sys->pts > sys->length)
-        sys->pts = sys->length;
+    if (sys->pts > VLC_TICK_0 + sys->length)
+        sys->pts = VLC_TICK_0 + sys->length;
 
     if (sys->chapter_gap > 0)
     {
-        int chapter_index = sys->pts / sys->chapter_gap;
+        int chapter_index = (sys->pts - VLC_TICK_0) / sys->chapter_gap;
         if (chapter_index != sys->current_chapter)
         {
             sys->updates |= INPUT_UPDATE_SEEKPOINT;
@@ -1268,8 +1268,8 @@ Demux(demux_t *demux)
     if (sys->audio_track_count > 0)
     {
         ret = DemuxAudio(demux, audio_step_length,
-                         __MIN(step_length + sys->audio_pts, sys->length));
-        if (sys->audio_pts + audio_step_length < sys->length)
+                         __MIN(step_length + sys->audio_pts - VLC_TICK_0, sys->length));
+        if (sys->audio_pts - VLC_TICK_0 + audio_step_length <= sys->length)
             eof = false;
     }
 
@@ -1277,8 +1277,8 @@ Demux(demux_t *demux)
      && (sys->video_track_count > 0 || sys->sub_track_count > 0))
     {
         ret = DemuxVideo(demux, video_step_length,
-                         __MIN(step_length + sys->video_pts, sys->length));
-        if (sys->video_pts + video_step_length < sys->length)
+                         __MIN(step_length + sys->video_pts - VLC_TICK_0, sys->length));
+        if (sys->video_pts - VLC_TICK_0 + video_step_length < sys->length)
             eof = false;
     }
 
@@ -1286,7 +1286,7 @@ Demux(demux_t *demux)
     if (step_length == 0)
     {
         sys->pts += sys->input_sample_length;
-        if (sys->pts + sys->input_sample_length < sys->length)
+        if (sys->pts - VLC_TICK_0 + sys->input_sample_length < sys->length)
             eof = false;
     }
 
@@ -1535,8 +1535,8 @@ ParseDiscontinuities(demux_t *demux)
 
         assert(index < pcr_count);
         struct pcr_point *point = &sys->pcr_points.data[index++];
-        point->oldpcr = oldpcrval;
-        point->newpcr = newpcrval;
+        point->oldpcr = VLC_TICK_0 + oldpcrval;
+        point->newpcr = VLC_TICK_0 + newpcrval;
     }
 
     return VLC_SUCCESS;
