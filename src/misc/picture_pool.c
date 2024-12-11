@@ -45,6 +45,7 @@ struct picture_pool_t {
     vlc_cond_t  wait;
 
     vlc_atomic_rc_t    refs;
+    bool released;
     struct vlc_list inuse_list;
     struct vlc_list available_list;
 };
@@ -55,19 +56,31 @@ static void picture_pool_Destroy(picture_pool_t *pool)
         return;
 
     assert(vlc_list_is_empty(&pool->inuse_list));
+    assert(vlc_list_is_empty(&pool->available_list));
 
     free(pool);
 }
 
 void picture_pool_Release(picture_pool_t *pool)
 {
-    picture_priv_t *priv;
-    vlc_list_foreach(priv, &pool->available_list, pool_node)
+    vlc_mutex_lock(&pool->lock);
+
+    /* Release pictures from both available and in-use lists */
+    for (size_t i = 0; i < 2; ++i)
     {
-        assert(priv->pool == pool);
-        priv->pool = NULL;
-        picture_Release(&priv->picture);
+        struct vlc_list *list = i == 0 ? &pool->available_list : &pool->inuse_list;
+
+        picture_priv_t *priv;
+        vlc_list_foreach(priv, list, pool_node)
+        {
+            assert(priv->pool == pool);
+            vlc_list_remove(&priv->pool_node);
+            picture_Release(&priv->picture);
+        }
     }
+    /* Prevent in-use cloned pictures to be added back to lists */
+    pool->released = true;
+    vlc_mutex_unlock(&pool->lock);
     picture_pool_Destroy(pool);
 }
 
@@ -84,10 +97,13 @@ static void picture_pool_ReleaseClone(picture_t *clone)
 
     vlc_mutex_lock(&pool->lock);
 
-    vlc_list_remove(&original_priv->pool_node);
-    vlc_list_append(&original_priv->pool_node, &pool->available_list);
+    if (!pool->released)
+    {
+        vlc_list_remove(&original_priv->pool_node);
+        vlc_list_append(&original_priv->pool_node, &pool->available_list);
+        vlc_cond_signal(&pool->wait);
+    }
 
-    vlc_cond_signal(&pool->wait);
     vlc_mutex_unlock(&pool->lock);
 
     picture_Release(original);
@@ -129,6 +145,7 @@ picture_pool_NewCommon(void)
     vlc_mutex_init(&pool->lock);
     vlc_cond_init(&pool->wait);
     vlc_atomic_rc_init(&pool->refs);
+    pool->released = false;
 
     return pool;
 }
