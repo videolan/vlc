@@ -123,7 +123,7 @@ typedef struct
     bool palette_sent;
 
     /* VA API */
-    vlc_va_t *p_va; /* Protected by lock */
+    vlc_va_t *p_va;
     enum AVPixelFormat pix_fmt;
     int profile;
     int level;
@@ -134,7 +134,8 @@ typedef struct
     unsigned decoder_height;
 
     /* Protect dec->fmt_out, decoder_Update*() and decoder_NewPicture()
-     * functions */
+     * functions from lavc_GetFrame(). ffmpeg_GetFormat() doesn't need locking
+     * as ffmpeg is taking care of the synchronisation. */
     vlc_mutex_t lock;
 } decoder_sys_t;
 
@@ -714,8 +715,7 @@ static int InitVideoDecCommon( decoder_t *p_dec )
 
 static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
                          enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt,
-                         const AVPixFmtDescriptor *src_desc,
-                         vlc_mutex_t *open_lock)
+                         const AVPixFmtDescriptor *src_desc)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -734,8 +734,6 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
     if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
         return VLC_EGENERIC; /* Unsupported brand of hardware acceleration */
-    if (open_lock)
-        vlc_mutex_unlock(open_lock);
 
     p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
     struct vlc_va_cfg cfg = {
@@ -750,8 +748,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), &cfg);
     if (init_device)
         vlc_decoder_device_Release(init_device);
-    if (open_lock)
-        vlc_mutex_lock(open_lock);
+
     if (va == NULL)
         return VLC_EGENERIC; /* Unsupported codec profile or such */
     assert(p_dec->fmt_out.video.i_chroma != 0);
@@ -877,7 +874,7 @@ int InitVideoHwDec( vlc_object_t *obj )
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
     {
-        if (ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], p_context->sw_pix_fmt, src_desc, NULL) == VLC_SUCCESS)
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], p_context->sw_pix_fmt, src_desc) == VLC_SUCCESS)
             // we have a matching hardware decoder
             return VLC_SUCCESS;
     }
@@ -1922,15 +1919,12 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     FrameSetPicture( frame, NULL );
 
-    vlc_mutex_lock(&sys->lock);
     if (sys->p_va == NULL)
     {
         if (!sys->b_direct_rendering)
-        {
-            vlc_mutex_unlock(&sys->lock);
             return avcodec_default_get_buffer2(ctx, frame, flags);
-        }
 
+        vlc_mutex_lock(&sys->lock);
         /* Most unaccelerated decoders do not call get_format(), so we need to
          * update the output video format here. The MT semaphore must be held
          * to protect p_dec->fmt_out. */
@@ -1940,19 +1934,18 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
             vlc_mutex_unlock(&sys->lock);
             return -1;
         }
+        vlc_mutex_unlock(&sys->lock);
     }
 
     if (sys->p_va != NULL)
     {
         int ret = lavc_va_GetFrame(ctx, frame, flags);
-        vlc_mutex_unlock(&sys->lock);
         return ret;
     }
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
     int ret = lavc_dr_GetFrame(ctx, frame, flags);
-    vlc_mutex_unlock(&sys->lock);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
     return ret;
@@ -2061,9 +2054,6 @@ no_reuse:
     if (!can_hwaccel)
         return swfmt;
 
-
-    vlc_mutex_lock(&p_sys->lock);
-
     const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
@@ -2073,14 +2063,12 @@ no_reuse:
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];
 
-        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, swfmt, src_desc, &p_sys->lock) != VLC_SUCCESS)
+        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, swfmt, src_desc) != VLC_SUCCESS)
             continue;
 
-        vlc_mutex_unlock(&p_sys->lock);
         return hwfmt;
     }
 
-    vlc_mutex_unlock(&p_sys->lock);
     /* Fallback to default behaviour */
     p_sys->pix_fmt = swfmt;
     return swfmt;
