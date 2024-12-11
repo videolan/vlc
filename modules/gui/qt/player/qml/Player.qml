@@ -548,6 +548,7 @@ FocusScope {
 
         showCSD: MainCtx.clientSideDecoration && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
         showToolbar: MainCtx.hasToolbarMenu && (MainCtx.intfMainWindow.visibility !== Window.FullScreen)
+        playlistVisible: playlistVisibility.isPlaylistVisible
 
         Navigation.parentItem: rootPlayer
         Navigation.downItem: {

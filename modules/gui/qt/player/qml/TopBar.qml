@@ -64,6 +64,8 @@ FocusScope{
 
     property alias resumeVisible: resumeDialog.visible
 
+    property alias playlistVisible: playlistButton.checked
+
     // Signals
 
     signal togglePlaylistVisibility()
@@ -469,8 +471,6 @@ FocusScope{
             text: VLCIcons.playlist
             description: qsTr("Playlist")
             focus: root.showToolbar
-
-            checked: MainCtx.playlistVisible
 
             width: VLCStyle.bannerButton_width
             height: VLCStyle.bannerButton_height
