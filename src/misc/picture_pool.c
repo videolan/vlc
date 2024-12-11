@@ -90,6 +90,8 @@ static void picture_pool_ReleaseClone(picture_t *clone)
     vlc_cond_signal(&pool->wait);
     vlc_mutex_unlock(&pool->lock);
 
+    picture_Release(original);
+
     picture_pool_Destroy(pool);
 }
 
