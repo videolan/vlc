@@ -283,6 +283,7 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
     va->ops = &ops;
     va->sys = vctx;
     cfg->vctx_out = vctx;
+    cfg->use_hwframes = true;
     return VLC_SUCCESS;
 }
 
