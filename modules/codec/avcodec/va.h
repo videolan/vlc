@@ -66,6 +66,13 @@ struct vlc_va_cfg
      * to this pointer.
      */
     vlc_video_context *vctx_out;
+
+    /**
+     * Indicate if the module is using the new AVHWFramesContext API
+     *
+     * False, by default, set to true if the module is using this API
+     */
+    bool use_hwframes;
 };
 
 struct vlc_va_operations {

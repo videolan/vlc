@@ -128,6 +128,7 @@ typedef struct
     int profile;
     int level;
     vlc_video_context *vctx_out;
+    bool use_hwframes;
 
     // decoder output seen by lavc, regardless of texture padding
     unsigned decoder_width;
@@ -743,6 +744,7 @@ static void ffmpeg_CloseVa(decoder_t *p_dec, AVCodecContext *context)
     p_sys->p_va = NULL;
     vlc_video_context_Release(p_sys->vctx_out);
     p_sys->vctx_out = NULL;
+    p_sys->use_hwframes = false;
 
     if (context != NULL)
         context->hwaccel_context = NULL;
@@ -764,6 +766,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
         .dec_device = dec_device,
         .video_fmt_out = &p_dec->fmt_out.video,
         .vctx_out = NULL,
+        .use_hwframes = false,
     };
     vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), &cfg);
 
@@ -782,7 +785,28 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_va = va;
     p_sys->vctx_out = vlc_video_context_Hold( cfg.vctx_out );
     p_sys->pix_fmt = hwfmt;
+    p_sys->use_hwframes = cfg.use_hwframes;
     return VLC_SUCCESS;
+}
+
+static int ffmpeg_RecreateVa(decoder_t *p_dec, AVCodecContext *p_context,
+                             enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_sys->vctx_out != NULL);
+
+    vlc_decoder_device *dec_device =
+        vlc_video_context_HoldDevice(p_sys->vctx_out);
+
+    ffmpeg_CloseVa(p_dec, p_context);
+
+    const AVPixFmtDescriptor *src_desc = av_pix_fmt_desc_get(swfmt);
+
+    int ret = ffmpeg_OpenVa(p_dec, p_context, p_sys->pix_fmt,
+                            src_desc, dec_device);
+    if (dec_device != NULL)
+        vlc_decoder_device_Release(dec_device);
+    return ret;
 }
 
 static const enum AVPixelFormat hwfmts[] =
@@ -1985,6 +2009,7 @@ static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
     /* Enumerate available formats */
     enum AVPixelFormat defaultfmt = avcodec_default_get_format(p_context, pi_fmt);
     enum AVPixelFormat swfmt = AV_PIX_FMT_NONE;
+    enum AVPixelFormat skipfmt = AV_PIX_FMT_NONE;
     bool can_hwaccel = false;
 
     for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
@@ -2053,7 +2078,25 @@ static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
      for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
         if (pi_fmt[i] == p_sys->pix_fmt)
         {
-            msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
+            if (p_sys->use_hwframes)
+            {
+                /* When using hwframes API, ffmpeg is reseting the hardware
+                 * context of the AVCodecContext before calling the
+                 * `get_format` callback. Therefore, the va context need to be
+                 * closed and opened again. */
+                msg_Dbg(p_dec, "recreating decoder output format %d", pi_fmt[i]);
+                int ret = ffmpeg_RecreateVa(p_dec, p_context, p_sys->pix_fmt,
+                                            swfmt);
+                if (ret != VLC_SUCCESS)
+                {
+                    msg_Err(p_dec, "error restarting va module");
+                    skipfmt = p_sys->pix_fmt; /* Don't retry this fmt */
+                    p_sys->pix_fmt = AV_PIX_FMT_NONE;
+                    goto no_reuse;
+                }
+            }
+            else
+                msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
             return p_sys->pix_fmt;
         }
 
@@ -2082,6 +2125,9 @@ no_reuse:
         for( size_t j = 0; hwfmt == AV_PIX_FMT_NONE && pi_fmt[j] != AV_PIX_FMT_NONE; j++ )
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];
+
+        if (hwfmt == skipfmt)
+            continue;
 
         vlc_decoder_device *dec_device;
         int ret = lavc_UpdateHWVideoFormat(p_dec, p_context, hwfmt, swfmt,
