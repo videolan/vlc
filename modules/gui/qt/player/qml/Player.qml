@@ -210,9 +210,9 @@ FocusScope {
                     }
 
                     Binding on cursorShape {
-                        when: topBar.state === "hidden"
-                              && controlBar.state === "hidden"
-                              && !interactiveAutoHideTimer.running
+                        when: playerToolbarVisibilityFSM.started
+                            && !playerToolbarVisibilityFSM.isVisible
+                            && !interactiveAutoHideTimer.running
                         value: Qt.BlankCursor
                     }
                 }
