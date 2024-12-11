@@ -733,6 +733,21 @@ static int lavc_UpdateHWVideoFormat(decoder_t *p_dec, AVCodecContext *p_context,
     return VLC_SUCCESS;
 }
 
+static void ffmpeg_CloseVa(decoder_t *p_dec, AVCodecContext *context)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    assert(p_sys->p_va != NULL);
+    assert(p_sys->vctx_out != NULL);
+
+    vlc_va_Delete(p_sys->p_va, NULL);
+    p_sys->p_va = NULL;
+    vlc_video_context_Release(p_sys->vctx_out);
+    p_sys->vctx_out = NULL;
+
+    if (context != NULL)
+        context->hwaccel_context = NULL;
+}
+
 static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
                          enum AVPixelFormat hwfmt,
                          const AVPixFmtDescriptor *src_desc,
@@ -1707,11 +1722,7 @@ void EndVideoDec( vlc_object_t *obj )
     avcodec_free_context( &ctx );
 
     if( p_sys->p_va )
-    {
-        vlc_va_Delete( p_sys->p_va, NULL );
-        vlc_video_context_Release( p_sys->vctx_out );
-        p_sys->vctx_out = NULL;
-    }
+        ffmpeg_CloseVa(p_dec, NULL);
 
     free( p_sys );
 }
@@ -2054,11 +2065,7 @@ no_reuse:
         // switching to a software decoder will not silently decode nothing
         // (get_format will fail to use AV_PIX_FMT_NONE)
         assert(!p_sys->b_hardware_only);
-        vlc_va_Delete(p_sys->p_va, NULL);
-        p_sys->p_va = NULL;
-        vlc_video_context_Release( p_sys->vctx_out );
-        p_sys->vctx_out = NULL;
-        p_context->hwaccel_context = NULL;
+        ffmpeg_CloseVa(p_dec, p_context);
     }
 
     p_sys->profile = p_context->profile;
