@@ -376,7 +376,6 @@ void d3d11_quad_t::UpdateViewport(const vout_display_place_t *place, const d3d_f
     }
 }
 
-#ifdef HAVE_D3D11_4_H
 HRESULT D3D11_InitFence(d3d11_device_t & d3d_dev, d3d11_gpu_fence & fence)
 {
     HRESULT hr;
@@ -430,4 +429,3 @@ int D3D11_WaitFence(d3d11_gpu_fence & fence)
     }
     return VLC_ENOTSUP;
 }
-#endif // HAVE_D3D11_4_H

@@ -107,9 +107,6 @@
 /* Define if the compiler supports typeof. */
 #mesondefine HAVE_CXX_TYPEOF
 
-/* Define to 1 if you have the <d3d11_4.h> header file. */
-#mesondefine HAVE_D3D11_4_H
-
 /* Define to 1 if you have the <dcomp.h> header file. */
 #mesondefine HAVE_DCOMP_H
 

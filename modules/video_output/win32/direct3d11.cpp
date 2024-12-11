@@ -129,9 +129,7 @@ typedef struct vout_display_sys_t
     d3d_shader_compiler_t    *shaders = nullptr;
     d3d11_quad_t             picQuad = {};
 
-#ifdef HAVE_D3D11_4_H
     d3d11_gpu_fence          fence = {};
-#endif
 
     bool                     use_staging_texture = false;
     picture_sys_d3d11_t      stagingSys = {};
@@ -909,7 +907,6 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
         }
     }
 
-#ifdef HAVE_D3D11_4_H
     if (sys->log_level >= 4)
     {
         vlc_tick_t render_start = vlc_tick_now();
@@ -920,7 +917,6 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture,
     {
         D3D11_WaitFence(sys->fence);
     }
-#endif
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -1466,13 +1462,11 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
     HRESULT hr;
 
-#ifdef HAVE_D3D11_4_H
     hr = D3D11_InitFence(*sys->d3d_dev, sys->fence);
     if (SUCCEEDED(hr))
     {
         msg_Dbg(vd, "using GPU render fence");
     }
-#endif
 
     ComPtr<ID3D11BlendState> pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { };
@@ -1589,9 +1583,7 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->flatVShader);
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
-#ifdef HAVE_D3D11_4_H
     D3D11_ReleaseFence(sys->fence);
-#endif
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");
 }

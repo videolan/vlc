@@ -268,7 +268,6 @@ check_c_headers = [
     ['zlib.h', { 'args' : [contrib_inc_args] }],
     ['wordexp.h'],
     ['dxgidebug.h'],
-    ['d3d11_4.h'],
     ['GL/wglew.h',
         { 'prefix' : ['#include <windows.h>', '#include <GL/glew.h>'],
           'args' : [contrib_inc_args] }],
