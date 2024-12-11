@@ -767,6 +767,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
         .video_fmt_out = &p_dec->fmt_out.video,
         .vctx_out = NULL,
         .use_hwframes = false,
+        .extra_pictures = 0,
     };
     vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), &cfg);
 
@@ -775,6 +776,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     assert(p_dec->fmt_out.video.i_chroma != 0);
     assert(cfg.vctx_out != NULL);
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
+    p_dec->i_extra_picture_buffers += cfg.extra_pictures;
 
     if (decoder_UpdateVideoOutput(p_dec, cfg.vctx_out))
     {

@@ -73,6 +73,13 @@ struct vlc_va_cfg
      * False, by default, set to true if the module is using this API
      */
     bool use_hwframes;
+
+    /**
+     * Request more pictures
+     *
+     * 0 by default, set if from the module
+     */
+    unsigned extra_pictures;
 };
 
 struct vlc_va_operations {
