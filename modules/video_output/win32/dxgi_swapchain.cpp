@@ -30,9 +30,7 @@
 #include <vlc_es.h>
 
 #include <windows.h>
-#if defined(HAVE_DCOMP_H)
-# include <dcomp.h>
-#endif
+#include <dcomp.h>
 
 #include <initguid.h>
 #include "dxgi_swapchain.h"
@@ -77,12 +75,10 @@ struct dxgi_swapchain
     swapchain_surface_type  swapchainSurfaceType;
     union {
         HWND                hwnd;
-#if defined(HAVE_DCOMP_H)
         struct {
             IDCompositionDevice  *device;
             IDCompositionVisual  *visual;
         } dcomp;
-#endif // HAVE_DCOMP_H
     } swapchainSurface;
 
     ComPtr<IDXGISwapChain1> dxgiswapChain;   /* DXGI 1.2 swap chain */
@@ -308,7 +304,6 @@ static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
     }
 }
 
-#if defined(HAVE_DCOMP_H)
 static void DXGI_CreateSwapchainDComp(dxgi_swapchain *display,
                                IDXGIAdapter *dxgiadapter, IUnknown *pFactoryDevice,
                                UINT width, UINT height)
@@ -349,7 +344,6 @@ static void DXGI_CreateSwapchainDComp(dxgi_swapchain *display,
         msg_Err(display->obj, "Could not create the SwapChain. (hr=0x%lX)", hr);
     }
 }
-#endif /* HAVE_DCOMP_H */
 
 void DXGI_LocalSwapchainSwap( dxgi_swapchain *display )
 {
@@ -405,7 +399,6 @@ dxgi_swapchain *DXGI_CreateLocalSwapchainHandleHwnd(vlc_object_t *o, HWND hwnd)
     return display;
 }
 
-#if defined(HAVE_DCOMP_H)
 dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcompDevice, void* dcompVisual)
 {
     dxgi_swapchain *display = new (std::nothrow) dxgi_swapchain();
@@ -419,7 +412,6 @@ dxgi_swapchain *DXGI_CreateLocalSwapchainHandleDComp(vlc_object_t *o, void* dcom
 
     return display;
 }
-#endif
 
 void DXGI_LocalSwapchainCleanupDevice( dxgi_swapchain *display )
 {
@@ -456,12 +448,10 @@ bool DXGI_UpdateSwapChain( dxgi_swapchain *display, IDXGIAdapter *dxgiadapter,
     {
         display->pixelFormat = newPixelFormat;
 
-#if defined(HAVE_DCOMP_H)
         if (display->swapchainSurfaceType == SWAPCHAIN_SURFACE_DCOMP)
             DXGI_CreateSwapchainDComp(display, dxgiadapter, pFactoryDevice,
                                       width, height);
         else // SWAPCHAIN_TARGET_HWND
-#endif // HAVE_DCOMP_H
             DXGI_CreateSwapchainHwnd(display, dxgiadapter, pFactoryDevice,
                                      width, height);
 

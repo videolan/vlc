@@ -273,11 +273,7 @@ check_c_headers = [
           'args' : [contrib_inc_args] }],
 ]
 
-check_cpp_headers = [
-    ['dcomp.h',
-        { 'prefix' : ['#include <windows.h>'],
-          'args' : [contrib_inc_args]}],
-]
+check_cpp_headers = []
 
 foreach header : check_c_headers
     header_kwargs = header.get(1, {})

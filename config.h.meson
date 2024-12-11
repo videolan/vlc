@@ -107,9 +107,6 @@
 /* Define if the compiler supports typeof. */
 #mesondefine HAVE_CXX_TYPEOF
 
-/* Define to 1 if you have the <dcomp.h> header file. */
-#mesondefine HAVE_DCOMP_H
-
 /* Define to 1 if you have the `dirfd' function. */
 #mesondefine HAVE_DIRFD
 

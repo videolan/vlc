@@ -2794,19 +2794,6 @@ __x_ABI_CWindows_CStorage_CIApplicationData2 *toto;
 AM_CONDITIONAL([HAVE_WINDOWS_STORAGE], [test "${have_iapplication_data2}" = "yes"])
 
 dnl
-dnl DirectComposition
-dnl
-AC_LANG_PUSH([C++])
-AC_CHECK_HEADERS([dcomp.h], [
-    have_dcomp="yes"
-], [], [
-  #include <windows.h>
-])
-AC_LANG_POP([C++])
-AM_CONDITIONAL([HAVE_DCOMP], [test "${have_dcomp}" = "yes"])
-
-
-dnl
 dnl  avformat demuxer/muxer plugin
 dnl
 

@@ -158,13 +158,9 @@ if host_system == 'windows'
     moc_headers += files(
         'maininterface/mainctx_win32.hpp',
         'maininterface/compositor_win7.hpp',
+        'maininterface/compositor_dcomp.hpp',
+        'maininterface/compositor_dcomp_acrylicsurface.hpp',
     )
-    if cdata.has('HAVE_DCOMP_H')
-        moc_headers += files(
-            'maininterface/compositor_dcomp.hpp',
-            'maininterface/compositor_dcomp_acrylicsurface.hpp',
-        )
-    endif
 endif
 
 if (x11_dep.found() and
@@ -511,14 +507,9 @@ if host_system == 'windows'
         'style/windowsthemeprovider.cpp',
         'util/csdmenu_win32.c',
         'util/csdmenu_win32.h',
+        'maininterface/compositor_dcomp.cpp',
+        'maininterface/compositor_dcomp_acrylicsurface.cpp',
     )
-
-    if cdata.has('HAVE_DCOMP_H')
-        some_sources += files(
-            'maininterface/compositor_dcomp.cpp',
-            'maininterface/compositor_dcomp_acrylicsurface.cpp',
-        )
-    endif
 endif
 
 if (x11_dep.found() and

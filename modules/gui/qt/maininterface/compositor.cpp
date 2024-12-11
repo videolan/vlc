@@ -26,10 +26,8 @@
 
 #ifdef _WIN32
 #include "mainctx_win32.hpp"
-#ifdef HAVE_DCOMP_H
-#  include "compositor_dcomp.hpp"
-#endif
-#  include "compositor_win7.hpp"
+#include "compositor_dcomp.hpp"
+#include "compositor_win7.hpp"
 #endif
 
 #ifdef QT_HAS_WAYLAND_COMPOSITOR
@@ -59,7 +57,7 @@ struct {
     const char* name;
     Compositor* (*instantiate)(qt_intf_t *p_intf);
 } static compositorList[] = {
-#if defined(_WIN32) && defined(HAVE_DCOMP_H)
+#if defined(_WIN32)
     {"dcomp", &instanciateCompositor<CompositorDirectComposition> },
 #endif
 #if defined(_WIN32) || defined(__APPLE__)

@@ -548,7 +548,6 @@ libqt_plugin_la_SOURCES += \
 nodist_libqt_plugin_la_SOURCES += maininterface/mainctx_win32.moc.cpp \
 	maininterface/compositor_win7.moc.cpp
 
-if HAVE_DCOMP
 libqt_plugin_la_SOURCES += \
 	maininterface/compositor_dcomp.cpp \
 	maininterface/compositor_dcomp.hpp \
@@ -560,7 +559,6 @@ nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_dcomp_acrylicsurface.moc.cpp \
 	maininterface/compositor_dcomp.moc.cpp
 
-endif
 endif
 
 # X11 compositor

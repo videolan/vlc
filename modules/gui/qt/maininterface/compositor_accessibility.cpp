@@ -32,7 +32,7 @@
 #ifdef QT_HAS_X11_COMPOSITOR
 #  include "compositor_x11_renderwindow.hpp"
 #endif
-#ifdef HAVE_DCOMP_H
+#ifdef _WIN32
 #  include "compositor_dcomp.hpp"
 #endif
 

@@ -288,9 +288,7 @@ static const char *const psz_raise_list_text[] =
 static const char *const compositor_vlc[] = {
     "auto",
 #ifdef _WIN32
-#ifdef HAVE_DCOMP_H
     "dcomp",
-#endif
     "platform",
     "win7",
 #endif
@@ -305,9 +303,7 @@ static const char *const compositor_vlc[] = {
 static const char *const compositor_user[] = {
     N_("Automatic"),
 #ifdef _WIN32
-#ifdef HAVE_DCOMP_H
     "Direct Composition",
-#endif
     "Platform Composition",
     "Windows 7",
 #endif
