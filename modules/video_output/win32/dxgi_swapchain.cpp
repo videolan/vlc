@@ -37,9 +37,7 @@
 #include <initguid.h>
 #include "dxgi_swapchain.h"
 
-#ifdef HAVE_DXGI1_6_H
-# include <dxgi1_6.h>
-#endif
+#include <dxgi1_6.h>
 
 #include "../../video_chroma/dxgi_fmt.h"
 
@@ -134,7 +132,6 @@ static const dxgi_color_space color_spaces[] = {
 #undef DXGIMAP
 };
 
-#ifdef HAVE_DXGI1_6_H
 static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_space *dst)
 {
     if (src == dst)
@@ -145,7 +142,6 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
         return true; /* we can handle anything to 709 */
     return false; /* let Windows do the rest */
 }
-#endif
 
 void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_render_cfg_t *cfg, bool match_display)
 {
@@ -198,7 +194,6 @@ void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_
 
     display->dxgiswapChain.As(&display->dxgiswapChain4);
 
-#ifdef HAVE_DXGI1_6_H
     if (match_display)
     if (SUCCEEDED(display->dxgiswapChain->GetContainingOutput(&dxgiOutput)))
     {
@@ -229,7 +224,6 @@ void DXGI_SelectSwapchainColorspace(dxgi_swapchain *display, const libvlc_video_
             }
         }
     }
-#endif
 
     hr = dxgiswapChain3->SetColorSpace1(color_spaces[best].dxgi);
     if (SUCCEEDED(hr))

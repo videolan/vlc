@@ -37,8 +37,6 @@
 #include <QtGui/qpa/qplatformnativeinterface.h>
 #include <QtCore/private/qsystemlibrary_p.h>
 
-#if __has_include(<dxgi1_6.h>)
-
 #if __has_include(<d3d11_1.h>)
 #define QRhiD3D11_ACTIVE
 #include <QtGui/private/qrhid3d11_p.h>
@@ -49,8 +47,6 @@
 #if (QT_VERSION < QT_VERSION_CHECK(6, 7, 0)) || defined(QRHI_D3D12_AVAILABLE)
 #define QRhiD3D12_ACTIVE
 #endif
-#endif
-
 #endif
 
 #if !defined(QRhiD3D11_ACTIVE) && !defined(QRhiD3D12_ACTIVE)

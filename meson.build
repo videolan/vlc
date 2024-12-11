@@ -267,7 +267,6 @@ check_c_headers = [
     ['xlocale.h'],
     ['zlib.h', { 'args' : [contrib_inc_args] }],
     ['wordexp.h'],
-    ['dxgi1_6.h'],
     ['dxgidebug.h'],
     ['d3d11_4.h'],
     ['GL/wglew.h',

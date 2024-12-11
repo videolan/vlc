@@ -53,9 +53,7 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-#ifdef HAVE_DXGI1_6_H
-# include <dxgi1_6.h>
-#endif
+#include <dxgi1_6.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -452,7 +450,6 @@ static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_i
     if (sys->hdrMode != hdr_Fake)
         return;
 
-#ifdef HAVE_DXGI1_6_H
     { // check the main display is in HDR mode
     HRESULT hr;
 
@@ -485,7 +482,6 @@ static void InitTonemapProcessor(vout_display_t *vd, const video_format_t *fmt_i
         goto error;
     }
     }
-#endif
 
     sys->tonemapProc = D3D11_TonemapperCreate(VLC_OBJECT(vd), sys->d3d_dev, fmt_in);
     if (sys->tonemapProc != NULL)
