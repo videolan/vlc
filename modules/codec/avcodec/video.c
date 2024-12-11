@@ -713,12 +713,10 @@ static int InitVideoDecCommon( decoder_t *p_dec )
     return VLC_SUCCESS;
 }
 
-static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
-                         enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt,
-                         const AVPixFmtDescriptor *src_desc)
+static int lavc_UpdateHWVideoFormat(decoder_t *p_dec, AVCodecContext *p_context,
+                                    enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt,
+                                    vlc_decoder_device **pp_dec_device)
 {
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
     if( hwfmt == AV_PIX_FMT_NONE )
         return VLC_EGENERIC;
 
@@ -735,19 +733,28 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
     if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
         return VLC_EGENERIC; /* Unsupported brand of hardware acceleration */
 
+    *pp_dec_device = init_device;
+    return VLC_SUCCESS;
+}
+
+static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
+                         enum AVPixelFormat hwfmt,
+                         const AVPixFmtDescriptor *src_desc,
+                         vlc_decoder_device *dec_device)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
     p_dec->fmt_out.video.i_chroma = 0; // make sure the va sets its output chroma
     struct vlc_va_cfg cfg = {
         .avctx = p_context,
         .hwfmt = hwfmt,
         .desc = src_desc,
         .fmt_in = p_dec->fmt_in,
-        .dec_device = init_device,
+        .dec_device = dec_device,
         .video_fmt_out = &p_dec->fmt_out.video,
         .vctx_out = NULL,
     };
     vlc_va_t *va = vlc_va_New(VLC_OBJECT(p_dec), &cfg);
-    if (init_device)
-        vlc_decoder_device_Release(init_device);
 
     if (va == NULL)
         return VLC_EGENERIC; /* Unsupported codec profile or such */
@@ -874,7 +881,17 @@ int InitVideoHwDec( vlc_object_t *obj )
 
     for( size_t i = 0; hwfmts[i] != AV_PIX_FMT_NONE; i++ )
     {
-        if (ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], p_context->sw_pix_fmt, src_desc) == VLC_SUCCESS)
+        vlc_decoder_device *dec_device;
+        int ret = lavc_UpdateHWVideoFormat(p_dec, p_context, hwfmts[i],
+                                           p_context->sw_pix_fmt, &dec_device);
+        if (ret != VLC_SUCCESS)
+            continue;
+
+        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmts[i], src_desc, dec_device);
+        if (dec_device != NULL)
+            vlc_decoder_device_Release(dec_device);
+
+        if (ret == VLC_SUCCESS)
             // we have a matching hardware decoder
             return VLC_SUCCESS;
     }
@@ -2063,7 +2080,17 @@ no_reuse:
             if( hwfmts[i] == pi_fmt[j] )
                 hwfmt = hwfmts[i];
 
-        if (ffmpeg_OpenVa(p_dec, p_context, hwfmt, swfmt, src_desc) != VLC_SUCCESS)
+        vlc_decoder_device *dec_device;
+        int ret = lavc_UpdateHWVideoFormat(p_dec, p_context, hwfmt, swfmt,
+                                           &dec_device);
+        if (ret != VLC_SUCCESS)
+            continue;
+
+        ret = ffmpeg_OpenVa(p_dec, p_context, hwfmt, src_desc, dec_device);
+        if (dec_device != NULL)
+            vlc_decoder_device_Release(dec_device);
+
+        if (ret != VLC_SUCCESS)
             continue;
 
         return hwfmt;
