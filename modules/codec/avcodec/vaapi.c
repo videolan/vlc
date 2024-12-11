@@ -169,6 +169,83 @@ static const struct vlc_video_context_operations vaapi_ctx_ops =
     .destroy = vaapi_ctx_destroy,
 };
 
+static int CheckCodecConfig(vlc_va_t *va, AVCodecContext *ctx, VADisplay va_dpy,
+                            const AVPixFmtDescriptor *sw_desc)
+{
+    assert(ctx->codec_id == AV_CODEC_ID_AV1);
+
+    if (sw_desc->nb_components < 2)
+        return VLC_EGENERIC;
+
+    int va_rt_format, vc_fourcc;
+    switch (sw_desc->comp[0].depth)
+    {
+        case 8:
+            va_rt_format = VA_RT_FORMAT_YUV420;
+            vc_fourcc = VA_FOURCC_NV12;
+            break;
+        case 10:
+            va_rt_format = VA_RT_FORMAT_YUV420_10BPP;
+            vc_fourcc = VA_FOURCC_P010;
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    VAProfile profile;
+    switch (ctx->profile)
+    {
+        case FF_PROFILE_AV1_MAIN:
+            profile = VAProfileAV1Profile0;
+            break;
+        case FF_PROFILE_AV1_HIGH:
+            profile = VAProfileAV1Profile1;
+            break;
+        default:
+            return VLC_EGENERIC;
+    }
+
+    VAConfigID config_id = VA_INVALID_ID;
+    VASurfaceID render_target = VA_INVALID_ID;
+    VAContextID context_id = VA_INVALID_ID;
+
+    config_id = vlc_vaapi_CreateConfigChecked(VLC_OBJECT(va), va_dpy, profile,
+                                              VAEntrypointVLD, 0);
+    if (config_id == VA_INVALID_ID)
+        goto error;
+
+    VASurfaceAttrib fourcc_attribs[1] = {
+        {
+            .type = VASurfaceAttribPixelFormat,
+            .flags = VA_SURFACE_ATTRIB_SETTABLE,
+            .value.type    = VAGenericValueTypeInteger,
+            .value.value.i = vc_fourcc,
+        }
+    };
+
+    VA_CALL(VLC_OBJECT(va), vaCreateSurfaces, va_dpy, va_rt_format,
+            ctx->coded_width, ctx->coded_height, &render_target, 1,
+            fourcc_attribs, 1);
+
+    context_id = vlc_vaapi_CreateContext(VLC_OBJECT(va), va_dpy, config_id,
+                                         ctx->coded_width, ctx->coded_height,
+                                         VA_PROGRESSIVE, &render_target, 1);
+
+error:
+    if (render_target != VA_INVALID_ID)
+        VA_CALL(VLC_OBJECT(va), vaDestroySurfaces, va_dpy, &render_target, 1);
+
+    if (config_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyConfig(VLC_OBJECT(va), va_dpy, config_id);
+
+    if (context_id != VA_INVALID_ID)
+    {
+        vlc_vaapi_DestroyContext(VLC_OBJECT(va), va_dpy, context_id);
+        return VLC_SUCCESS;
+    }
+    return VLC_EGENERIC;
+}
+
 static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
 {
     AVCodecContext *ctx = cfg->avctx;
@@ -181,6 +258,19 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
         return VLC_EGENERIC;
 
     VADisplay va_dpy = dec_device->opaque;
+
+    switch (ctx->codec_id)
+    {
+        case AV_CODEC_ID_AV1:
+        {
+            int ret = CheckCodecConfig(va, ctx, va_dpy, cfg->desc);
+            if (ret != VLC_SUCCESS)
+                return ret;
+            break;
+        }
+        default:
+            break;
+    }
 
     AVBufferRef *hwdev_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
     if (hwdev_ref == NULL)
