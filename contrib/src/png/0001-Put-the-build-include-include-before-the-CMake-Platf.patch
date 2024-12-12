@@ -6,13 +6,13 @@ Subject: [PATCH] Put the build include include before the CMake/Platform flags
 If the CMake flags have some include directory with an old
 pnglibconf.h it will use that one instead of ours
 ---
- scripts/genout.cmake.in | 2 +-
+ scripts/cmake/genout.cmake.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/genout.cmake.in b/scripts/genout.cmake.in
+diff --git a/scripts/cmake/genout.cmake.in b/scripts/cmake/genout.cmake.in
 index ec685d900..f6d478723 100644
---- a/scripts/genout.cmake.in
-+++ b/scripts/genout.cmake.in
+--- a/scripts/cmake/genout.cmake.in
++++ b/scripts/cmake/genout.cmake.in
 @@ -59,11 +59,11 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
    endif()
  
