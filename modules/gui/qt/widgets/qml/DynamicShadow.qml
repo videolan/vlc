@@ -29,6 +29,8 @@ MultiEffect {
 
     paddingRect: Qt.rect(xOffset, yOffset, 0, 0)
 
+    visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+
     property alias sourceItem: effect.source
 
     property alias xOffset: effect.shadowHorizontalOffset
