@@ -49,7 +49,7 @@ Widgets.BlurEffect {
         color: Qt.alpha(root.tint, root.tintStrength)
     }
 
-    ShaderEffect {
+    Widgets.NoiseRectangle {
         id: noise
 
         // Overlay for the blur effect:
@@ -58,8 +58,6 @@ Widgets.BlurEffect {
 
         visible: root.noiseStrength > 0.0
 
-        readonly property real strength: root.noiseStrength
-
-        fragmentShader: "qrc:///shaders/Noise.frag.qsb"
+        strength: root.noiseStrength
     }
 }
