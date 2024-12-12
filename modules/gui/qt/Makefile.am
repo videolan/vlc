@@ -1338,6 +1338,7 @@ libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/FadingEdgeX.vert \
                           shaders/FadingEdgeY.vert \
                           shaders/Noise.frag \
+                          shaders/Noise.vert \
                           shaders/RectFilter.frag \
                           shaders/SubTexture.vert \
                           shaders/PlayerBlurredBackground.frag \
