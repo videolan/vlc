@@ -341,6 +341,8 @@ libqt_plugin_la_SOURCES = \
 	util/model_recovery_agent.hpp \
 	util/vlcqtmessagehandler.cpp \
 	util/vlcqtmessagehandler.hpp \
+	util/qsgrectangularnoisenode.cpp \
+	util/qsgrectangularnoisenode.hpp \
 	widgets/native/animators.cpp \
 	widgets/native/animators.hpp \
 	widgets/native/customwidgets.cpp widgets/native/customwidgets.hpp \

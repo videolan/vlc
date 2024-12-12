@@ -474,6 +474,8 @@ some_sources = files(
     'util/model_recovery_agent.hpp',
     'util/vlcqtmessagehandler.cpp',
     'util/vlcqtmessagehandler.hpp',
+    'util/qsgrectangularnoisenode.cpp',
+    'util/qsgrectangularnoisenode.hpp',
     'widgets/native/animators.cpp',
     'widgets/native/animators.hpp',
     'widgets/native/customwidgets.cpp',
