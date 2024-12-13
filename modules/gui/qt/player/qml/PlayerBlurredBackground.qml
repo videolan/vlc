@@ -25,38 +25,15 @@ import VLC.Widgets as Widgets
 Item {
     id: rootItem
 
-    property alias source: blurSource.sourceItem
+    property alias source: blur.source
     property alias screenColor: shaderItem.screenColor
     property alias overlayColor: shaderItem.overlayColor
 
-    function scheduleUpdate() {
-        blurSource.scheduleUpdate()
-    }
-
-    onSourceChanged: blurSource.scheduleUpdate()
-
-    ShaderEffectSource {
-        id: blurSource
-
-        width: 512
-        height: 512
-        textureSize: Qt.size(512,512)
-
-        visible: false
-
-        live: false
-        hideSource: false
-        smooth: false
-        mipmap: false
-    }
 
     Widgets.BlurEffect {
         id: blur
 
-        source: blurSource
-
-        width: 512
-        height: 512
+        anchors.fill: parent
 
         radius: 50
         visible: false

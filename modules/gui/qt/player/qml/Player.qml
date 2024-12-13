@@ -370,11 +370,6 @@ FocusScope {
 
                                 Accessible.role: Accessible.Graphic
                                 Accessible.name: qsTr("Cover")
-
-                                onStatusChanged: {
-                                    if (status === Image.Ready)
-                                        backgroundImage.scheduleUpdate()
-                                }
                             }
                         }
 
