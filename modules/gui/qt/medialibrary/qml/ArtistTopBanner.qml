@@ -102,6 +102,7 @@ FocusScope {
             implicitWidth: VLCStyle.cover_normal
 
             Widgets.RoundImage {
+                id: roundImage
                 source: artist.cover || VLCStyle.noArtArtist
                 sourceSize.width: width * Screen.devicePixelRatio
                 sourceSize.height: height * Screen.devicePixelRatio
@@ -111,7 +112,7 @@ FocusScope {
 
             Rectangle {
                 anchors.fill: parent
-                radius: VLCStyle.cover_normal
+                radius: roundImage.effectiveRadius
                 color: "transparent"
                 border.width: VLCStyle.dp(1, VLCStyle.scale)
                 border.color: theme.border
