@@ -872,6 +872,11 @@ static int rtp_packetize_mpa( sout_stream_id_sys_t *id, block_t *in )
     {
         int           i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( 16 + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0, in->i_pts );
