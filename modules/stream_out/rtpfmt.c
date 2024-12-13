@@ -1049,6 +1049,11 @@ static int rtp_packetize_eac3(sout_stream_id_sys_t *id, block_t *in)
         bool last = i == (frag_count - 1);
         size_t len = last ? in->i_buffer : mtu;
         block_t *out = block_Alloc(14 + len);
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
         rtp_packetize_common(id, out, false, in->i_pts);
         out->p_buffer[12] = frame_type;
