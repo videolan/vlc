@@ -159,6 +159,8 @@ T.ItemDelegate {
         spacing: VLCStyle.margin_xsmall
 
         Widgets.RoundImage {
+            id: roundImage
+
             Layout.preferredHeight: VLCStyle.play_cover_small
             Layout.fillHeight: true
             Layout.preferredWidth: height
@@ -178,7 +180,7 @@ T.ItemDelegate {
                 anchors.margins: -border.width
                 z: -1
 
-                radius: VLCStyle.play_cover_small
+                radius: roundImage.effectiveRadius
 
                 color: "transparent"
 
