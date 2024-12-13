@@ -239,31 +239,23 @@ Filter(filter_t * filter, picture_t * src,
     if (pf_prepare_render_surface)
         pf_prepare_render_surface(filter_sys->p_data);
 
-    VAProcPipelineParameterBuffer *     pipeline_params;
+    VAProcPipelineParameterBuffer pipeline_params = {
+        .surface = vlc_vaapi_PicGetSurface(src),
+        .filters = &filter_sys->va.buf,
+        .num_filters = 1,
+    };
+
+    if (filter_sys->b_pipeline_fast)
+        pipeline_params.pipeline_flags = VA_PROC_PIPELINE_FAST;
+    if (pf_update_pipeline_params)
+        pf_update_pipeline_params(filter_sys->p_data, &pipeline_params);
 
     pipeline_buf =
         vlc_vaapi_CreateBuffer(VLC_OBJECT(filter),
                                filter_sys->va.dpy, filter_sys->va.ctx,
                                VAProcPipelineParameterBufferType,
-                               sizeof(*pipeline_params), 1, NULL);
+                               sizeof(pipeline_params), 1, &pipeline_params);
     if (pipeline_buf == VA_INVALID_ID)
-        goto error;
-
-    if (vlc_vaapi_MapBuffer(VLC_OBJECT(filter), filter_sys->va.dpy,
-                            pipeline_buf, (void **)&pipeline_params))
-        goto error;
-
-    *pipeline_params = (typeof(*pipeline_params)){0};
-    pipeline_params->surface = vlc_vaapi_PicGetSurface(src);
-    pipeline_params->filters = &filter_sys->va.buf;
-    pipeline_params->num_filters = 1;
-    if (filter_sys->b_pipeline_fast)
-        pipeline_params->pipeline_flags = VA_PROC_PIPELINE_FAST;
-    if (pf_update_pipeline_params)
-        pf_update_pipeline_params(filter_sys->p_data, pipeline_params);
-
-    if (vlc_vaapi_UnmapBuffer(VLC_OBJECT(filter),
-                              filter_sys->va.dpy, pipeline_buf))
         goto error;
 
     if (vlc_vaapi_RenderPicture(VLC_OBJECT(filter),
