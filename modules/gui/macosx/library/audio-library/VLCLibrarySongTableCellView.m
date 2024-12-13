@@ -34,9 +34,13 @@
 
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCInputItem.h"
 #import "library/VLCLibraryItemInternalMediaItemsDataSource.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryRepresentedItem.h"
+
+#import "playqueue/VLCPlayerController.h"
+#import "playqueue/VLCPlayQueueController.h"
 
 NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifier";
 
@@ -67,7 +71,26 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
         self.playInstantlyButton.contentTintColor = NSColor.VLCAccentColor;
     }
 
+    NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
+    [notificationCenter addObserver:self
+                           selector:@selector(playStateOrItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playStateOrItemChanged:)
+                               name:VLCPlayerStateChanged
+                             object:nil];
+
     [self prepareForReuse];
+}
+
+- (void)playStateOrItemChanged:(NSNotification *)notification
+{
+    const BOOL isCurrentItemAndIsPlaying =
+        [self.representedItem.item.firstMediaItem.inputItem.MRL isEqualToString:VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem.MRL];
+    self.songNameTextField.font = isCurrentItemAndIsPlaying
+        ? [NSFont boldSystemFontOfSize:NSFont.systemFontSize]
+        : [NSFont systemFontOfSize:NSFont.systemFontSize];
 }
 
 - (void)prepareForReuse
