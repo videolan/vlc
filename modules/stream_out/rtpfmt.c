@@ -1202,6 +1202,11 @@ static int rtp_packetize_mp4a_latm( sout_stream_id_sys_t *id, block_t *in )
         if( i != 0 )
             latmhdrsize = 0;
         out = block_Alloc( 12 + latmhdrsize + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1) ? 1 : 0),
