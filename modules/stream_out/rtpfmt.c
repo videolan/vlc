@@ -811,6 +811,11 @@ static int rtp_packetize_xiph( sout_stream_id_sys_t *id, block_t *in )
     {
         int           i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( 18 + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
         unsigned fragtype, numpkts;
         if (i_count == 1)
