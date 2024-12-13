@@ -1316,6 +1316,11 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
     {
         int      i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( RTP_H263_PAYLOAD_START + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
         b_p_bit = (i == 0) ? 1 : 0;
         h = ( b_p_bit << 10 )|
             ( b_v_bit << 9  )|
