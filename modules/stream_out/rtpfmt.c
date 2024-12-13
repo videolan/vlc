@@ -955,6 +955,12 @@ static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
     {
         int           i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( 16 + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
+
         /* MBZ:5 T:1 TR:10 AN:1 N:1 S:1 B:1 E:1 P:3 FBV:1 BFC:3 FFV:1 FFC:3 */
         uint32_t      h = ( i_temporal_ref << 16 )|
                           ( b_sequence_start << 13 )|
