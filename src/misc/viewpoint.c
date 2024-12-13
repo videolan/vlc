@@ -79,27 +79,21 @@ void vlc_viewpoint_from_orientation(vlc_viewpoint_t *vp,
         default:
         case ORIENT_NORMAL:
         case ORIENT_HFLIPPED:
-            *vp = (vlc_viewpoint_t) { .fov = vp->fov };
+            vlc_viewpoint_from_euler(vp, 0.f, 0.f, 0.f);
             break;
 
         case ORIENT_ROTATED_90:
         case ORIENT_ANTI_TRANSPOSED:
-            *vp = (vlc_viewpoint_t) {
-                .roll = -90.f, .fov = vp->fov
-            };
+            vlc_viewpoint_from_euler(vp, 0.f, 0.f, -90.f);
             break;
 
         case ORIENT_ROTATED_180:
         case ORIENT_VFLIPPED:
-            *vp = (vlc_viewpoint_t) {
-                .roll = -180.f, .fov = vp->fov
-            };
+            vlc_viewpoint_from_euler(vp, 0.f, 0.f, -180.f);
             break;
         case ORIENT_ROTATED_270:
         case ORIENT_TRANSPOSED:
-            *vp = (vlc_viewpoint_t) {
-                .roll = -270.f, .fov = vp->fov
-            };
+            vlc_viewpoint_from_euler(vp, 0.f, 0.f, -270.f);
             break;
     }
 }
