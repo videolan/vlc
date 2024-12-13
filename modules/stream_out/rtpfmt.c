@@ -1461,6 +1461,10 @@ rtp_packetize_h265_nal( sout_stream_id_sys_t *id,
     {
         /* Single NAL unit packet */
         block_t *out = block_Alloc( 12 + i_data );
+        if (unlikely(out == NULL))
+        {
+            return VLC_ENOMEM;
+        }
         out->i_dts    = i_dts;
         out->i_length = i_length;
 
@@ -1486,6 +1490,10 @@ rtp_packetize_h265_nal( sout_stream_id_sys_t *id,
         {
             const size_t i_payload = __MIN( i_data, i_max-3 );
             block_t *out = block_Alloc( 12 + 3 + i_payload );
+            if (unlikely(out == NULL))
+            {
+                return VLC_ENOMEM;
+            }
             out->i_dts    = i_dts + i * i_length / i_count;
             out->i_length = i_length / i_count;
 
@@ -1517,9 +1525,13 @@ static int rtp_packetize_h265( sout_stream_id_sys_t *id, block_t *in )
     size_t i_nal;
     while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
     {
-        rtp_packetize_h265_nal( id, p_nal, i_nal,
+        if (rtp_packetize_h265_nal( id, p_nal, i_nal,
                 (in->i_pts != VLC_TICK_INVALID ? in->i_pts : in->i_dts), in->i_dts,
-                it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer );
+                it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer ))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
     }
 
     block_Release(in);
