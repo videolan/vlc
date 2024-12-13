@@ -276,8 +276,10 @@ FocusScope {
                         colorSet: ColorContext.View
                     }
 
-                    PlayerBlurredBackground {
-                        id: backgroundImage
+                    Widgets.BlurEffect {
+                        id: blurredBackground
+
+                        radius: 64
 
                         //destination aspect ratio
                         readonly property real dar: parent.width / parent.height
@@ -288,8 +290,17 @@ FocusScope {
 
                         source: cover
 
-                        screenColor: bgtheme.bg.primary.alpha(.55)
-                        overlayColor: Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary).alpha(0.4)
+                        layer.enabled: true
+                        layer.samplerName: "backgroundSource"
+                        layer.effect: ShaderEffect {
+                            readonly property color screenColor: bgtheme.bg.primary.alpha(.55)
+                            readonly property color overlayColor: Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary).alpha(0.4)
+
+                            blending: false
+                            cullMode: ShaderEffect.BackFaceCulling
+
+                            fragmentShader: "qrc:///shaders/PlayerBlurredBackground.frag.qsb"
+                        }
                     }
                 }
 
