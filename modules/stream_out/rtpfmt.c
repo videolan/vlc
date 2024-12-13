@@ -1370,6 +1370,10 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
     {
         /* Single NAL unit packet */
         block_t *out = block_Alloc( 12 + i_data );
+        if (unlikely(out == NULL))
+        {
+            return VLC_ENOMEM;
+        }
         out->i_dts    = i_dts;
         out->i_length = i_length;
 
@@ -1393,6 +1397,10 @@ rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
         {
             const int i_payload = __MIN( i_data, i_max-2 );
             block_t *out = block_Alloc( 12 + 2 + i_payload );
+            if (unlikely(out == NULL))
+            {
+                return VLC_ENOMEM;
+            }
             out->i_dts    = i_dts + i * i_length / i_count;
             out->i_length = i_length / i_count;
 
@@ -1424,9 +1432,13 @@ static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
     while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
     {
         /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
-        rtp_packetize_h264_nal( id, p_nal, i_nal,
+        if (rtp_packetize_h264_nal( id, p_nal, i_nal,
                 (in->i_pts != VLC_TICK_INVALID ? in->i_pts : in->i_dts), in->i_dts,
-                it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer );
+                it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer ))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
     }
 
     block_Release(in);
