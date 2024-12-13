@@ -158,5 +158,11 @@ Item {
         // item case). In that case, shader effect would report invisible although it
         // would appear in the grabbed image.
         visible: !shaderEffect.readyForVisibility
+
+        // Clipping is not a big concern for rendering performance
+        // with the software or openvg scene graph adaptations.
+        // We can use clipping as QQuickImage suggests with
+        // PreserveAspectCrop in that case:
+        clip: (GraphicsInfo.shaderType !== GraphicsInfo.RhiShader) && (fillMode === Image.PreserveAspectCrop)
     }
 }
