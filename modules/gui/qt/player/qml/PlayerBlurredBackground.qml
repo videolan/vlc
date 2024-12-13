@@ -22,42 +22,20 @@ import QtQuick
 import VLC.Util
 import VLC.Widgets as Widgets
 
-Item {
+Widgets.BlurEffect {
     id: rootItem
 
-    property alias source: blur.source
-    property alias screenColor: shaderItem.screenColor
-    property alias overlayColor: shaderItem.overlayColor
+    required property color screenColor
+    required property color overlayColor
 
+    radius: 64
 
-    Widgets.BlurEffect {
-        id: blur
+    layer.enabled: true
+    layer.samplerName: "backgroundSource"
+    layer.effect: ShaderEffect {
+        readonly property color screenColor: rootItem.screenColor
+        readonly property color overlayColor: rootItem.overlayColor
 
-        anchors.fill: parent
-
-        radius: 64
-        visible: false
-    }
-
-    ShaderEffectSource {
-        id: proxySource
-        live: true
-        hideSource: false
-        sourceItem: blur
-        smooth: false
-        visible: false
-        mipmap: false
-    }
-
-    ShaderEffect {
-        id: shaderItem
-
-        property var backgroundSource: proxySource
-        property color screenColor
-        property color overlayColor
-
-        anchors.fill: parent
-        visible: true
         blending: false
         cullMode: ShaderEffect.BackFaceCulling
 
