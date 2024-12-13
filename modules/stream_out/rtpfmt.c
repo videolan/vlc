@@ -1667,6 +1667,11 @@ static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
       Allow for 12 extra bytes of RTP header.
     */
     p_out = block_Alloc( 12 + i_payload_size );
+    if (unlikely(p_out == NULL))
+    {
+        block_Release(in);
+        return VLC_ENOMEM;
+    }
 
     if ( i_payload_padding )
     {
