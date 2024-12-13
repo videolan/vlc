@@ -725,8 +725,8 @@ int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
     size_t len = end - start;
 
     char *b64 = malloc(len + 1);
-    if(!b64)
-        return VLC_EGENERIC;
+    if (unlikely(b64 == NULL))
+        return VLC_ENOMEM;
 
     memcpy(b64, start, len);
     b64[len] = '\0';
