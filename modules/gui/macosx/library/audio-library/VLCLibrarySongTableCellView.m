@@ -88,9 +88,12 @@ NSString *VLCAudioLibrarySongCellIdentifier = @"VLCAudioLibrarySongCellIdentifie
 {
     const BOOL isCurrentItemAndIsPlaying =
         [self.representedItem.item.firstMediaItem.inputItem.MRL isEqualToString:VLCMain.sharedInstance.playQueueController.currentlyPlayingInputItem.MRL];
-    self.songNameTextField.font = isCurrentItemAndIsPlaying
+    NSFont * const fontToUse = isCurrentItemAndIsPlaying
         ? [NSFont boldSystemFontOfSize:NSFont.systemFontSize]
         : [NSFont systemFontOfSize:NSFont.systemFontSize];
+    self.songNameTextField.font = fontToUse;
+    self.durationTextField.font = fontToUse;
+    self.trackNumberTextField.font = fontToUse;
 }
 
 - (void)prepareForReuse
