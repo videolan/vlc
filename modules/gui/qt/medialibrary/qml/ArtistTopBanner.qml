@@ -74,13 +74,13 @@ FocusScope {
         fillMode: artist.cover ? ((visible || (MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 5, 0))) ? Image.PreserveAspectCrop : Image.Stretch)
                                 : Image.Tile
 
-        visible: layer.enabled
+        visible: !blurEffect.visible
         cache: (source === VLCStyle.noArtArtist)
 
-        // Single pass linear filtering, in case the effect is not available:
-        layer.enabled: (GraphicsInfo.shaderType === GraphicsInfo.UnknownShadingLanguage)
-        layer.smooth: true
-        layer.textureSize: Qt.size(width * .75, height * .75)
+        // In fact, since layering is not used blur effect
+        // would not care about the opacity here. Still,
+        // to show intention we can have a simple binding:
+        opacity: blurEffect.visible ? 1.0 : 0.5
     }
 
     Item {
@@ -94,7 +94,7 @@ FocusScope {
         // the blur effect is applied to the whole texture and shown as whole:
         clip: !blurEffect.sourceNeedsLayering
 
-        visible: !background.visible && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+        visible: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
         // This blur effect does not create an implicit layer that is updated
         // each time the size changes. The source texture is static, so the blur
