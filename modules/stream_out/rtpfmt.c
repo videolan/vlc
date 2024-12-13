@@ -1728,6 +1728,11 @@ static int rtp_packetize_g726( sout_stream_id_sys_t *id, block_t *in, int i_pad 
     {
         int           i_payload = __MIN( i_max, i_data );
         block_t *out = block_Alloc( 12 + i_payload );
+        if (unlikely(out == NULL))
+        {
+            block_Release(in);
+            return VLC_ENOMEM;
+        }
 
         /* rtp common header */
         rtp_packetize_common( id, out, 0,
