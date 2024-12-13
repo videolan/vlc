@@ -35,7 +35,7 @@ Item {
 
         anchors.fill: parent
 
-        radius: 50
+        radius: 64
         visible: false
     }
 
