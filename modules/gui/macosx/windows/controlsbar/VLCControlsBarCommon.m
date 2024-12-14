@@ -420,7 +420,7 @@
 
 - (void)updateTimeSlider:(NSNotification *)aNotification;
 {
-    VLCInputItem *inputItem = _playerController.currentMedia;
+    VLCInputItem * const inputItem = _playerController.currentMedia;
 
     if (!inputItem) {
         // Nothing playing
@@ -437,8 +437,8 @@
     [self.timeSlider setKnobHidden:NO];
     [self.timeSlider setFloatValue:_playerController.position];
 
-    vlc_tick_t duration = inputItem.duration;
-    bool buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
+    const vlc_tick_t duration = inputItem.duration;
+    const BOOL buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
     if (duration == -1) {
         // No duration, disable slider
         [self.timeSlider setEnabled:NO];
@@ -449,12 +449,10 @@
         [self.timeSlider setEnabled:_playerController.seekable];
     }
 
-    NSString *timeString = [NSString stringWithDuration:duration
-                                            currentTime:_playerController.time
-                                               negative:NO];
-    NSString *remainingTime = [NSString stringWithDuration:duration
-                                               currentTime:_playerController.time
-                                                  negative:YES];
+    NSString * const timeString =
+        [NSString stringWithDuration:duration currentTime:_playerController.time negative:NO];
+    NSString * const remainingTime =
+        [NSString stringWithDuration:duration currentTime:_playerController.time negative:YES];
     [self.timeField setTime:timeString withRemainingTime:remainingTime];
     [self.timeField setNeedsDisplay:YES];
     [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];
