@@ -453,16 +453,15 @@
 
 - (void)updateMuteVolumeButtonImage
 {
-    _muteVolumeButton.image = _playerController.mute ?
-        _mutedVolumeImage : _unmutedVolumeImage;
+    _muteVolumeButton.image = _playerController.mute ? _mutedVolumeImage : _unmutedVolumeImage;
 }
 
 - (void)playerStateUpdated:(NSNotification *)aNotification
 {
     if (_playerController.playerState == VLC_PLAYER_STATE_PLAYING) {
-        [self setPause];
+        [self updatePlayButtonWithPauseState];
     } else {
-        [self setPlay];
+        [self updatePlayButtonWithPlayState];
     }
 }
 
@@ -500,19 +499,19 @@
     }
 }
 
-- (void)setPause
+- (void)updatePlayButtonWithPauseState
 {
-    [self.playButton setImage: _pauseImage];
-    [self.playButton setAlternateImage: _pressedPauseImage];
-    [self.playButton setToolTip: _NS("Pause")];
+    self.playButton.image = _pauseImage;
+    self.playButton.alternateImage = _pressedPauseImage;
+    self.playButton.toolTip = _NS("Pause");
     self.playButton.accessibilityLabel = self.playButton.toolTip;
 }
 
-- (void)setPlay
+- (void)updatePlayButtonWithPlayState
 {
-    [self.playButton setImage: _playImage];
-    [self.playButton setAlternateImage: _pressedPlayImage];
-    [self.playButton setToolTip: _NS("Play")];
+    self.playButton.image = _playImage;
+    self.playButton.alternateImage = _pressedPlayImage;
+    self.playButton.toolTip = _NS("Play");
     self.playButton.accessibilityLabel = self.playButton.toolTip;
 }
 
