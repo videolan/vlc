@@ -468,16 +468,16 @@
     }
 }
 
-- (void)updatePlaybackControls:(NSNotification *)aNotification
+- (void)updatePlaybackControls:(NSNotification *)notification
 {
-    bool b_seekable = _playerController.seekable;
-    bool b_chapters = [_playerController numberOfChaptersForCurrentTitle] > 0;
+    const BOOL seekable = _playerController.seekable;
+    const BOOL chapters = _playerController.numberOfChaptersForCurrentTitle > 0;
 
-    [self.timeSlider setEnabled: b_seekable];
+    self.timeSlider.enabled = seekable;
+    self.forwardButton.enabled = seekable || _playQueueController.hasNextPlayQueueItem || chapters;
+    self.backwardButton.enabled = seekable || _playQueueController.hasPreviousPlayQueueItem || chapters;
 
-    [self.forwardButton setEnabled: (b_seekable || _playQueueController.hasNextPlayQueueItem || b_chapters)];
-    [self.backwardButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlayQueueItem || b_chapters)];
-    [self updateCurrentItemDisplayControls:aNotification];
+    [self updateCurrentItemDisplayControls:notification];
 }
 
 - (void)updateCurrentItemDisplayControls:(NSNotification *)notification
