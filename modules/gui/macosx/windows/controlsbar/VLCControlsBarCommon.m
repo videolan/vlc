@@ -484,32 +484,25 @@
     [self updateCurrentItemDisplayControls:aNotification];
 }
 
-- (void)updateCurrentItemDisplayControls:(NSNotification *)aNotification
+- (void)updateCurrentItemDisplayControls:(NSNotification *)notification
 {
     VLCInputItem * const inputItem = _playerController.currentMedia;
-    if (!inputItem) {
-        return;
-    }
-
-    _playingItemDisplayField.stringValue = inputItem.name;
-
     VLCMediaLibraryMediaItem * const mediaItem =
         [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
-    if (!mediaItem) {
-        self.detailLabel.hidden = YES;
-    } else {
-        _detailLabel.hidden = 
-            [mediaItem.primaryDetailString isEqualToString:@""] ||
-            [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
-        _detailLabel.stringValue = mediaItem.primaryDetailString;
-    }
+
+    self.playingItemDisplayField.stringValue = inputItem ? inputItem.name : _NS("No current item");
+    self.detailLabel.hidden =
+        mediaItem == nil ||
+        [mediaItem.primaryDetailString isEqualToString:@""] ||
+        [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
+    self.detailLabel.stringValue = mediaItem.primaryDetailString;
 
     NSURL * const artworkURL = inputItem.artworkURL;
-
+    NSImage * const placeholderImage = [NSImage imageNamed:@"noart"];
     if (artworkURL) {
-        [_artworkImageView setImageURL:inputItem.artworkURL placeholderImage:[NSImage imageNamed:@"noart"]];
+        [self.artworkImageView setImageURL:inputItem.artworkURL placeholderImage:placeholderImage];
     } else {
-        _artworkImageView.image = [NSImage imageNamed:@"noart"];
+        self.artworkImageView.image = placeholderImage;
     }
 }
 
