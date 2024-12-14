@@ -95,7 +95,8 @@
         // to reselect. If the selection has been maintained then we need to reload the detail table
         // view.
         if (rowIndex == selectedMasterRow && self.masterTableView.selectedRow != selectedMasterRow) {
-            [self.masterTableView selectRow:selectedMasterRow byExtendingSelection:NO];
+            [self.masterTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:selectedMasterRow]
+                              byExtendingSelection:NO];
         } else {
             [self.detailTableView reloadData];
         }
