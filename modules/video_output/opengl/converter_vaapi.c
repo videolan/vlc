@@ -196,38 +196,40 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     if (pic == priv->last.pic)
     {
 #if VA_CHECK_VERSION(1, 1, 0)
-        va_surface_descriptor = priv->last.va_surface_descriptor;
+        for (unsigned i = 0; i < priv->last.va_surface_descriptor.num_layers; ++i)
 #else
-        va_image = priv->last.va_image;
+        for (unsigned i = 0; i < priv->last.va_image.num_planes; ++i)
 #endif
-        for (unsigned i = 0; i < priv->last.num_planes; ++i)
-            egl_images[i] = priv->last.egl_images[i];
+        {
+            tc->vt->BindTexture(tc->tex_target, textures[i]);
+            priv->glEGLImageTargetTexture2DOES(tc->tex_target, egl_images[i]);
+        }
+        return VLC_SUCCESS;
     }
-    else
-    {
+
+
 #if VA_CHECK_VERSION(1, 1, 0)
-        if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
-                                          VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
-                                          &va_surface_descriptor))
-            goto error;
-        release_image = true;
+    if (vlc_vaapi_ExportSurfaceHandle(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
+                                        VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME_2, 0,
+                                        &va_surface_descriptor))
+        goto error;
+    release_image = true;
 #else
-        if (vlc_vaapi_DeriveImage(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
-                                  &va_image))
-            goto error;
-        release_image = true;
+    if (vlc_vaapi_DeriveImage(o, priv->vadpy, vlc_vaapi_PicGetSurface(pic),
+                                &va_image))
+        goto error;
+    release_image = true;
 
-        assert(va_image.format.fourcc == priv->fourcc);
+    assert(va_image.format.fourcc == priv->fourcc);
 
-        va_buffer_info = (VABufferInfo) {
-            .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
-        };
-        if (vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
-                                          &va_buffer_info))
-            goto error;
+    va_buffer_info = (VABufferInfo) {
+        .mem_type = VA_SURFACE_ATTRIB_MEM_TYPE_DRM_PRIME
+    };
+    if (vlc_vaapi_AcquireBufferHandle(o, priv->vadpy, va_image.buf,
+                                        &va_buffer_info))
+        goto error;
 #endif
-        release_buffer_info = true;
-    }
+    release_buffer_info = true;
 
 #if VA_CHECK_VERSION(1, 1, 0)
     num_planes = va_surface_descriptor.num_layers;
@@ -273,22 +275,20 @@ tc_vaegl_update(const opengl_tex_converter_t *tc, GLuint *textures,
     }
 #endif
 
-    if (pic != priv->last.pic)
-    {
-        if (priv->last.pic != NULL)
-            vaegl_release_last_pic(tc, priv);
-        priv->last.pic = picture_Hold(pic);
+    if (priv->last.pic != NULL)
+        vaegl_release_last_pic(tc, priv);
+    priv->last.pic = picture_Hold(pic);
 #if VA_CHECK_VERSION(1, 1, 0)
-        priv->last.va_surface_descriptor = va_surface_descriptor;
+    priv->last.va_surface_descriptor = va_surface_descriptor;
 #else
-        priv->last.va_image = va_image;
-        priv->last.va_buffer_info = va_buffer_info;
+    priv->last.va_image = va_image;
+    priv->last.va_buffer_info = va_buffer_info;
 #endif
-        priv->last.num_planes = num_planes;
+    priv->last.num_planes = num_planes;
 
-        for (unsigned i = 0; i < num_planes; ++i)
-            priv->last.egl_images[i] = egl_images[i];
-    }
+    for (unsigned i = 0; i < num_planes; ++i)
+        priv->last.egl_images[i] = egl_images[i];
+
 
     return VLC_SUCCESS;
 
