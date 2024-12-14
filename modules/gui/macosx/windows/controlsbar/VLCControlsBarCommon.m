@@ -353,6 +353,9 @@
 
 - (IBAction)timeSliderAction:(id)sender
 {
+    if (![sender respondsToSelector:@selector(floatValue)]) {
+        return;
+    }
 
     switch (NSApp.currentEvent.type) {
         case NSEventTypeLeftMouseUp:
