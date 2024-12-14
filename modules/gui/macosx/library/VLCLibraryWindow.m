@@ -806,7 +806,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     // restore alpha value to 1 for the case that macosx-opaqueness is set to < 1
     self.alphaValue = 1.0;
-    self.videoViewController.view.hidden = YES;
     [self setViewForSelectedSegment];
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
