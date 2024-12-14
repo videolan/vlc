@@ -310,7 +310,7 @@ Item {
         Loader {
             active: {
                 const windowVisibility = MainCtx.intfMainWindow.visibility
-                return MainCtx.clientSideDecoration
+                return MainCtx.clientSideDecoration && !MainCtx.platformHandlesResizeWithCSD()
                         && (windowVisibility !== Window.Maximized)
                         && (windowVisibility !== Window.FullScreen)
 

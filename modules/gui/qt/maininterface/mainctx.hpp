@@ -328,6 +328,8 @@ public:
         return 0.0;
     }
 
+    Q_INVOKABLE virtual bool platformHandlesResizeWithCSD() const { return false; };
+
     /**
      * @brief ask for the application to terminate
      */
