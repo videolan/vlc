@@ -298,15 +298,13 @@
         [self performSelector:@selector(resetPreviousButton)
                    withObject: NULL
                    afterDelay:0.40];
-    } else {
-        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
-            // we just skipped 4 "continuous" events, otherwise we are too fast
-            [_playerController jumpBackwardExtraShort];
-            last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
-            [self performSelector:@selector(resetBackwardSkip)
-                       withObject: NULL
-                       afterDelay:0.40];
-        }
+    } else if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
+        // we just skipped 4 "continuous" events, otherwise we are too fast
+        [_playerController jumpBackwardExtraShort];
+        last_bwd_event = [NSDate timeIntervalSinceReferenceDate];
+        [self performSelector:@selector(resetBackwardSkip)
+                   withObject: NULL
+                   afterDelay:0.40];
     }
 }
 
@@ -333,15 +331,13 @@
         [self performSelector:@selector(resetNextButton)
                    withObject: NULL
                    afterDelay:0.40];
-    } else {
-        if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
-            // we just skipped 4 "continuous" events, otherwise we are too fast
-            [_playerController jumpForwardExtraShort];
-            last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
-            [self performSelector:@selector(resetForwardSkip)
-                       withObject: NULL
-                       afterDelay:0.40];
-        }
+    } else if (([NSDate timeIntervalSinceReferenceDate] - last_fwd_event) > 0.16) {
+        // we just skipped 4 "continuous" events, otherwise we are too fast
+        [_playerController jumpForwardExtraShort];
+        last_fwd_event = [NSDate timeIntervalSinceReferenceDate];
+        [self performSelector:@selector(resetForwardSkip)
+                   withObject: NULL
+                   afterDelay:0.40];
     }
 }
 
