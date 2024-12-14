@@ -422,34 +422,23 @@
 {
     VLCInputItem * const inputItem = _playerController.currentMedia;
 
-    if (!inputItem) {
-        // Nothing playing
-        [self.timeSlider setKnobHidden:YES];
-        [self.timeSlider setFloatValue: 0.0];
-        [self.timeField setStringValue: @"00:00"];
-        [self.timeSlider setIndefinite:NO];
-        [self.timeSlider setEnabled:NO];
-        [self.timeSlider setHidden:YES];
-        return;
-    }
-
-    [self.timeSlider setHidden:NO];
-    [self.timeSlider setKnobHidden:NO];
-    [self.timeSlider setFloatValue:_playerController.position];
-
-    const vlc_tick_t duration = inputItem.duration;
-    const BOOL buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
-    self.timeSlider.enabled = duration >= 0 && !buffering && _playerController.seekable;
-    self.timeSlider.indefinite = buffering;
-
+    const BOOL validInputItem = inputItem != nil;
+    const vlc_tick_t duration = validInputItem ? inputItem.duration : -1;
     NSString * const timeString =
         [NSString stringWithDuration:duration currentTime:_playerController.time negative:NO];
     NSString * const remainingTime =
         [NSString stringWithDuration:duration currentTime:_playerController.time negative:YES];
+    const BOOL buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
+
+    self.timeSlider.hidden = !validInputItem;
+    self.timeSlider.enabled = duration >= 0 && !buffering && _playerController.seekable;
+    self.timeSlider.indefinite = buffering;
+    self.timeSlider.floatValue = validInputItem ? _playerController.position : 0.;
+
     [self.timeField setTime:timeString withRemainingTime:remainingTime];
-    [self.timeField setNeedsDisplay:YES];
     [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];
-    [self.trailingTimeField setNeedsDisplay:YES];
+    self.timeField.needsDisplay = YES;
+    self.trailingTimeField.needsDisplay = YES;
 }
 
 - (void)updateVolumeSlider:(NSNotification *)aNotification
