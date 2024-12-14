@@ -110,16 +110,16 @@
 
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
-    [self.dropView setDrawBorder: NO];
+    self.dropView.drawBorder = NO;
 
-    [self.playButton setToolTip: _NS("Play")];
+    self.playButton.toolTip = _NS("Play");
     self.playButton.accessibilityLabel = self.playButton.toolTip;
 
-    [self.backwardButton setToolTip: _NS("Backward")];
+    self.backwardButton.toolTip = _NS("Backward");
     self.backwardButton.accessibilityLabel = _NS("Seek backward");
     self.backwardButton.accessibilityTitle = self.backwardButton.toolTip;
 
-    [self.forwardButton setToolTip: _NS("Forward")];
+    self.forwardButton.toolTip = _NS("Forward");
     self.forwardButton.accessibilityLabel = _NS("Seek forward");
     self.forwardButton.accessibilityTitle = self.forwardButton.toolTip;
 
@@ -131,11 +131,11 @@
     self.jumpForwardButton.accessibilityLabel = _NS("Jump forwards in current item");
     self.jumpForwardButton.accessibilityTitle = self.jumpForwardButton.toolTip;
 
-    [self.timeSlider setToolTip: _NS("Position")];
+    self.timeSlider.toolTip = _NS("Position");
     self.timeSlider.accessibilityLabel = _NS("Playback position");
     self.timeSlider.accessibilityTitle = self.timeSlider.toolTip;
 
-    [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
+    self.fullscreenButton.toolTip = _NS("Enter fullscreen");
     self.fullscreenButton.accessibilityLabel = self.fullscreenButton.toolTip;
 
     if (@available(macOS 11.0, *)) {
@@ -194,35 +194,34 @@
         _unmutedVolumeImage = imageFromRes(@"VLCVolumeOnTemplate");
     }
 
-    [self.backwardButton setImage: _backwardImage];
-    [self.backwardButton setAlternateImage: _backwardImage];
-    [self.forwardButton setImage: _forwardImage];
-    [self.forwardButton setAlternateImage: _forwardImage];
+    self.backwardButton.image = _backwardImage;
+    self.backwardButton.alternateImage = _backwardImage;
+    self.forwardButton.image = _forwardImage;
+    self.forwardButton.alternateImage = _forwardImage;
 
-    [self.fullscreenButton setImage: _fullscreenImage];
-    [self.fullscreenButton setAlternateImage: _fullscreenImage];
-    [self.playButton setImage: _playImage];
-    [self.playButton setAlternateImage: _pressedPlayImage];
+    self.fullscreenButton.image = _fullscreenImage;
+    self.fullscreenButton.alternateImage = _fullscreenImage;
+    self.playButton.image = _playImage;
+    self.playButton.alternateImage = _pressedPlayImage;
 
-    [self.timeSlider setHidden:NO];
+    self.timeSlider.hidden = NO;
 
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
-    [self.volumeSlider setToolTip: volumeTooltip];
+    self.volumeSlider.toolTip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
     self.volumeSlider.accessibilityLabel = _NS("Volume");
 
-    [self.volumeSlider setMaxValue: VLCVolumeMaximum];
-    [self.volumeSlider setDefaultValue: VLCVolumeDefault];
+    self.volumeSlider.maxValue = VLCVolumeMaximum;
+    self.volumeSlider.defaultValue = VLCVolumeDefault;
 
-    [self.muteVolumeButton setToolTip: _NS("Mute")];
+    self.muteVolumeButton.toolTip = _NS("Mute");
     self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
 
-    [self.timeField setNeedsDisplay:YES];
+    self.timeField.needsDisplay = YES;
     [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
     self.trailingTimeField.isTimeRemaining = NO;
     self.timeField.accessibilityLabel = _NS("Playback time");
 
     self.trailingTimeField.isTimeRemaining = !self.timeField.isTimeRemaining;
-    [self.trailingTimeField setNeedsDisplay:YES];
+    self.trailingTimeField.needsDisplay = YES;
     [self.trailingTimeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
     self.trailingTimeField.isTimeRemaining = YES;
     self.trailingTimeField.accessibilityLabel = _NS("Playback time");
@@ -244,10 +243,10 @@
 
     [self playerStateUpdated:nil];
 
-    [_artworkImageView setCropsImagesToRoundedCorners:YES];
-    [_artworkImageView setImage:[NSImage imageNamed:@"noart"]];
-    [_artworkImageView setContentGravity:VLCImageViewContentGravityResize];
-    
+    self.artworkImageView.cropsImagesToRoundedCorners = YES;
+    self.artworkImageView.image = [NSImage imageNamed:@"noart"];
+    self.artworkImageView.contentGravity = VLCImageViewContentGravityResize;
+
     if (!NSClassFromString(@"PIPViewController")) {
         self.pipButtonWidthConstraint.constant = 0;
         self.pipButton.hidden = YES;
@@ -264,7 +263,7 @@
 
 - (CGFloat)height
 {
-    return [self.bottomBarView frame].size.height;
+    return self.bottomBarView.frame.size.height;
 }
 
 #pragma mark -
