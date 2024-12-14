@@ -353,12 +353,9 @@
 
 - (IBAction)timeSliderAction:(id)sender
 {
-    float newPosition;
-    NSEvent *theEvent = [NSApp currentEvent];
-    NSEventType theEventType = [theEvent type];
 
-    switch (theEventType) {
-        case NSLeftMouseUp:
+    switch (NSApp.currentEvent.type) {
+        case NSEventTypeLeftMouseUp:
             /* Ignore mouse up, as this is a continuous slider and
              * when the user does a single click to a position on the slider,
              * the action is called twice, once for the mouse down and once
@@ -367,20 +364,18 @@
              * audio quirks.
              */
             return;
-        case NSLeftMouseDown:
-        case NSLeftMouseDragged:
-            newPosition = [sender floatValue];
+        case NSEventTypeLeftMouseDown:
+        case NSEventTypeLeftMouseDragged:
+        case NSEventTypeScrollWheel:
+        {
+            const float newPosition = [sender floatValue];
+            [_playerController setPositionFast:newPosition];
+            self.timeSlider.floatValue = newPosition;
             break;
-        case NSScrollWheel:
-            newPosition = [sender floatValue];
-            break;
-
+        }
         default:
             return;
     }
-
-    [_playerController setPositionFast:newPosition];
-    [self.timeSlider setFloatValue:newPosition];
 }
 
 - (IBAction)volumeAction:(id)sender
