@@ -439,15 +439,8 @@
 
     const vlc_tick_t duration = inputItem.duration;
     const BOOL buffering = _playerController.playerState == VLC_PLAYER_STATE_STARTED;
-    if (duration == -1) {
-        // No duration, disable slider
-        [self.timeSlider setEnabled:NO];
-    } else if (buffering) {
-        [self.timeSlider setEnabled:NO];
-        [self.timeSlider setIndefinite:buffering];
-    } else {
-        [self.timeSlider setEnabled:_playerController.seekable];
-    }
+    self.timeSlider.enabled = duration >= 0 && !buffering && _playerController.seekable;
+    self.timeSlider.indefinite = buffering;
 
     NSString * const timeString =
         [NSString stringWithDuration:duration currentTime:_playerController.time negative:NO];
