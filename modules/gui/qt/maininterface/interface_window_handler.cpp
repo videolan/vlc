@@ -52,6 +52,9 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     assert(m_window);
     assert(m_mainCtx);
 
+    if (m_mainCtx->useClientSideDecoration())
+        m_window->setFlag(Qt::FramelessWindowHint);
+
     /* */
     m_pauseOnMinimize = var_InheritBool( p_intf, "qt-pause-minimized" );
 

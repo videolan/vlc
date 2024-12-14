@@ -343,14 +343,11 @@ void X11DamageObserver::onEvent()
 
 //// CompositorX11RenderWindow
 
-CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWindow* parent)
+CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, QWindow* parent)
     : DummyRenderWindow(parent)
     , m_intf(p_intf)
     , m_conn(conn)
 {
-    if (useCSD)
-        setFlag(Qt::FramelessWindowHint);
-
     winId();
     setVisible(true);
 

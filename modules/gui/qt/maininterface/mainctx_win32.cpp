@@ -125,7 +125,14 @@ public:
         , m_useClientSideDecoration {mainctx->useClientSideDecoration()}
         , m_window {window}
         , m_buttonmodel {mainctx->csdButtonModel()}
+        , m_mainCtx(mainctx)
+        , m_platformHandlesResize(m_mainCtx->platformHandlesResizeWithCSD())
     {
+        assert(m_mainCtx);
+
+        // CSDWin32EventHandler does not support Qt::FramelessWindowHint:
+        m_window->setFlag(Qt::FramelessWindowHint, false);
+
         QApplication::instance()->installNativeEventFilter(this);
         updateCSDSettings();
     }
@@ -204,6 +211,24 @@ public:
                 clientRect->right -= rbw;
                 nonClientAreaExists = true;
             }
+            else if (m_platformHandlesResize && !IsZoomed(msg->hwnd))
+            {
+                // Resize outside client area:
+
+                // Before entering to fullscreen, Windows sends a WM_NCCALCSIZE message to determine
+                // the window geometry for fullscreen. In this case, we should not make an adjustment
+                // so that the window gets placed appropriately. At the same time, when getting
+                // restored from full screen, we should make this adjustment (state is still fullscreen):
+                if (m_window->property("__windowFullScreen").toInt() == 0) // not about to enter full screen OR about to restore from full screen OR stateless window
+                {
+                    // Do not adjust top, top is resized within the caption area. This is the behavior of SSD as well.
+                    const int resizeWidth = resizeBorderWidth(m_window);
+                    clientRect->left += resizeWidth;
+                    clientRect->right -= resizeWidth;
+                    clientRect->bottom -= resizeBorderHeight(m_window);
+                    nonClientAreaExists = true;
+                }
+            }
 
             *result = nonClientAreaExists ? 0 : WVR_REDRAW;
             return true;
@@ -232,19 +257,57 @@ public:
             // Map the point to client coordinates.
             ::MapWindowPoints(nullptr, msg->hwnd, &point, 1);
 
-            // exclude resize handle area
-            if ((m_window->windowState() != Qt::WindowFullScreen)
-                && (point.y < resizeBorderHeight(m_window)
-                    || point.x > (m_window->width() * m_window->devicePixelRatio() - resizeBorderWidth(m_window))))
-                return false;
-
             const double scaleFactor = m_window->devicePixelRatio();
 
             //divide by scale factor as buttons coordinates will be in dpr
             const QPoint qtPoint {static_cast<int>(point.x / scaleFactor), static_cast<int>(point.y / scaleFactor)};
             auto button = overlappingButton(qtPoint);
             if (!button)
+            {
+                if (!m_platformHandlesResize)
+                    return false;
+
+                if (!IsZoomed(msg->hwnd) && (m_window->windowState() != Qt::WindowFullScreen))
+                {
+                    // Top is resized within the caption area (even though it is client area), but still
+                    // handled by the platform. This is also the behavior with SSD and we can not have
+                    // the resize handle outside the window frame for the top side, because the top side
+                    // does not have transparent area but rather system caption is shown instead:
+
+                    int resizeHandleSize;
+                    const double intfScaleFactor = m_mainCtx->getIntfScaleFactor();
+                    const int unscaledResizeHandleSize = resizeBorderHeight(m_window);
+                    if (intfScaleFactor < 1.0)
+                    {
+                        // Make the top resize handle smaller if necessary, but not bigger (as the other edge
+                        // handles can't be made bigger), if the interface scale factor is small so that the
+                        // buttons in the caption area can be clicked more comfortably. This does not apply
+                        // to the minimize/maximize/close buttons, in that case resize handle should be the
+                        // minimal size regardless of the interface scale:
+                        resizeHandleSize = std::max<int>(2, unscaledResizeHandleSize * m_mainCtx->getIntfScaleFactor());
+                    }
+                    else
+                        resizeHandleSize = unscaledResizeHandleSize;
+
+                    if (point.y >= 0 && point.y <= resizeHandleSize)
+                    {
+                        const auto windowWidth = m_window->width() * m_window->devicePixelRatio();
+                        if (point.x >= -unscaledResizeHandleSize && point.x <= resizeHandleSize)
+                            *result = HTTOPLEFT;
+                        else if ((point.x >= windowWidth - resizeHandleSize) && (point.x <= windowWidth + unscaledResizeHandleSize))
+                            *result = HTTOPRIGHT;
+                        else if ((point.x > resizeHandleSize) && (point.x < windowWidth - resizeHandleSize))
+                            *result = HTTOP;
+                        else
+                            return false;
+
+                        // The rest (left, right, bottom) is handled by the system outside the client area
+                        // Only top resize should be within the client area, as that area corresponds to the caption.
+                        return true;
+                    }
+                }
                 return false;
+            }
 
             switch (button->type())
             {
@@ -329,7 +392,7 @@ public:
                 break;
             default:
                 resetPressedState();
-                break;
+                return false;
             }
 
 
@@ -363,6 +426,12 @@ public:
 private:
     void updateClientFrame()
     {
+        // DwmExtendFrameIntoClientArea() is not necessary when WS_POPUP is not
+        // used and platform handles resize (outside), where there is non-client
+        // area
+        if (m_platformHandlesResize)
+            return;
+
         auto hwnd = (HWND)m_window->winId();
 
         MARGINS margin {};
@@ -400,7 +469,9 @@ private:
     {
         for (auto button : m_buttonmodel->windowCSDButtons())
         {
-            if (button->rect().contains(point))
+            QRect rect = button->rect();
+            rect.setY(rect.y() + 2); // leave a small gap for top resize which is always within the caption area
+            if (rect.contains(point))
                 return button;
         }
         return nullptr;
@@ -450,6 +521,8 @@ private:
     QWindow *m_window;
     CSDButtonModel *m_buttonmodel;
     bool m_trackingMouse = false;
+    MainCtx *m_mainCtx = nullptr;
+    const bool m_platformHandlesResize;
 };
 
 }

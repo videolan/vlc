@@ -103,8 +103,6 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     m_mainCtx = mainCtx;
 
     m_qmlView = std::make_unique<QQuickView>();
-    if (m_mainCtx->useClientSideDecoration())
-        m_qmlView->setFlag(Qt::FramelessWindowHint);
     m_qmlView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_qmlView->setColor(QColor(Qt::transparent));
 

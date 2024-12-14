@@ -1074,12 +1074,12 @@ bool WindowStateHolder::holdFullscreen(QWindow *window, Source source, bool hold
     else
         newflags = oldflags & ~Qt::WindowFullScreen;
 
+    window->setProperty("__windowFullScreen", QVariant::fromValue(fullscreenCounter));
+
     if( newflags != oldflags )
     {
         window->setWindowStates( newflags );
     }
-
-    window->setProperty("__windowFullScreen", QVariant::fromValue(fullscreenCounter));
 
     return fullscreenCounter != 0;
 }

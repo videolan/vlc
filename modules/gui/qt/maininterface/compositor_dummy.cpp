@@ -21,6 +21,10 @@
 #include "maininterface/mainui.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
+#ifdef _WIN32
+#include "maininterface/mainctx_win32.hpp"
+#endif
+
 namespace vlc {
 
 CompositorDummy::CompositorDummy(qt_intf_t *p_intf, QObject* parent)
@@ -45,11 +49,15 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
     QQuickWindow::setDefaultAlphaBuffer(false);
 
     m_qmlWidget = std::make_unique<QQuickView>();
-    if (m_mainCtx->useClientSideDecoration())
-        m_qmlWidget->setFlag(Qt::FramelessWindowHint);
     m_qmlWidget->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get(), nullptr);
+    m_qmlWidget->create();
+
+#ifdef _WIN32
+    m_intfWindowHandler = std::make_unique<InterfaceWindowHandlerWin32>(m_intf, m_mainCtx, m_qmlWidget.get());
+#else
+    m_intfWindowHandler = std::make_unique<InterfaceWindowHandler>(m_intf, m_mainCtx, m_qmlWidget.get());
+#endif
 
     MainUI* ui = new MainUI(m_intf, m_mainCtx, m_qmlWidget.get(), m_qmlWidget.get());
     if (!ui->setup(m_qmlWidget->engine()))

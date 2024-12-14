@@ -155,7 +155,7 @@ class CompositorX11RenderWindow : public DummyRenderWindow, public AccessibleRen
 
     Q_OBJECT
 public:
-    explicit CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, bool useCSD, QWindow* parent = nullptr);
+    explicit CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_connection_t* conn, QWindow* parent = nullptr);
     ~CompositorX11RenderWindow();
 
     bool init();

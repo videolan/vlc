@@ -170,9 +170,7 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 {
     m_mainCtx = mainCtx;
 
-
-    bool useCSD = m_mainCtx->useClientSideDecoration();
-    m_renderWindow = std::make_unique<vlc::CompositorX11RenderWindow>(m_intf, m_conn, useCSD);
+    m_renderWindow = std::make_unique<vlc::CompositorX11RenderWindow>(m_intf, m_conn);
     if (!m_renderWindow->init())
         return false;
 
