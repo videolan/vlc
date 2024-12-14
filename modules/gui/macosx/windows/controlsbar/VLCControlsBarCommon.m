@@ -443,17 +443,13 @@
 
 - (void)updateVolumeSlider:(NSNotification *)aNotification
 {
-    float f_volume = _playerController.volume;
-    BOOL b_muted = _playerController.mute;
+    const BOOL muted = _playerController.mute;
+    const float volume = muted ? 0. : _playerController.volume;
 
-    if (b_muted)
-        f_volume = 0.f;
-
-    [self.volumeSlider setFloatValue: f_volume];
-    NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), (int)(f_volume * 100.0f)];
-    [self.volumeSlider setToolTip:volumeTooltip];
-
-    [self.volumeSlider setEnabled: !b_muted];
+    self.volumeSlider.enabled = !muted;
+    self.volumeSlider.floatValue = volume;
+    self.volumeSlider.toolTip =
+        [NSString stringWithFormat:_NS("Volume: %i %%"), (int)(volume * 100.)];
 }
 
 - (void)updateMuteVolumeButton:(NSNotification*)aNotification
