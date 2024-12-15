@@ -768,6 +768,9 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
     /* Daala packet to block */
     p_block = block_Alloc( dpacket.bytes );
+    if( unlikely(p_block == NULL) )
+        return NULL;
+
     memcpy( p_block->p_buffer, dpacket.packet, dpacket.bytes );
     p_block->i_dts = p_block->i_pts = p_pict->date;
 
