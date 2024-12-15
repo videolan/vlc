@@ -939,6 +939,12 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         {
             int i_block_size;
             p_block = block_Alloc( oggpacket.bytes );
+            if( unlikely(p_block == NULL) ) {
+                block_ChainRelease( p_chain );
+                p_chain = NULL;
+                break;
+            }
+
             memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
 
             i_block_size = vorbis_packet_blocksize( &p_sys->vi, &oggpacket );
