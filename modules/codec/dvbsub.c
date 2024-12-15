@@ -1992,6 +1992,9 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
     msg_Dbg( p_enc, "encoding subpicture" );
 #endif
     p_block = block_Alloc( 64000 );
+    if( unlikely(p_block == NULL) )
+        return NULL;
+
     bs_init( s, p_block->p_buffer, p_block->i_buffer );
 
     bs_write( s, 8, 0x20 ); /* Data identifier */
@@ -2020,6 +2023,12 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
 
         /* Send another (empty) subtitle to signal the end of display */
         p_block_stop = block_Alloc( 64000 );
+        if( unlikely(p_block_stop == NULL) )
+        {
+            block_Release(p_block);
+            return NULL;
+        }
+
         bs_init( s, p_block_stop->p_buffer, p_block_stop->i_buffer );
         bs_write( s, 8, 0x20 ); /* Data identifier */
         bs_write( s, 8, 0x0 );  /* Subtitle stream id */
