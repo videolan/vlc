@@ -739,23 +739,10 @@ static int BossCallback(vlc_object_t *p_this,
 
 #pragma mark - player callback delegations
 
-- (VLCInputItem *)currentMedia
-{
-    VLCInputItem *inputItem;
-    input_item_t *p_input;
-    vlc_player_Lock(_p_player);
-    p_input = vlc_player_GetCurrentMedia(_p_player);
-    if (p_input) {
-        inputItem = [[VLCInputItem alloc] initWithInputItem:p_input];
-    }
-    vlc_player_Unlock(_p_player);
-    return inputItem;
-}
-
 - (void)currentMediaItemChanged:(input_item_t *)newMediaItem
 {
-    [_defaultNotificationCenter postNotificationName:VLCPlayerCurrentMediaItemChanged
-                                              object:self];
+    _currentMedia = [[VLCInputItem alloc] initWithInputItem:newMediaItem];
+    [_defaultNotificationCenter postNotificationName:VLCPlayerCurrentMediaItemChanged object:self];
 }
 
 - (vlc_tick_t)durationOfCurrentMediaItem
