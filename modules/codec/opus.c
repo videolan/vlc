@@ -689,6 +689,11 @@ static block_t *Encode(encoder_t *enc, block_t *buf)
     while (sys->i_nb_samples + buf->i_nb_samples >= OPUS_FRAME_SIZE)
     {
         block_t *out_block = block_Alloc(OPUS_MAX_ENCODED_BYTES);
+        if (unlikely(out_block == NULL))
+        {
+            block_ChainRelease(result);
+            return NULL;
+        }
 
         /* add padding to beginning */
         if (sys->padding)
