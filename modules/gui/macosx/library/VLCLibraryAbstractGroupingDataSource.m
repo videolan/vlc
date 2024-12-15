@@ -72,7 +72,10 @@
     }
 
     const NSInteger selectedMasterRow = self.masterTableView.selectedRow;
-    if (tableView == self.detailTableView && self.backingArray.count > 0 && selectedMasterRow > -1) {
+    const NSInteger backingItemsCount = self.backingArray.count;
+    const BOOL selectedRowIsValid = selectedMasterRow > -1 && selectedMasterRow < backingItemsCount;
+
+    if (tableView == self.detailTableView && backingItemsCount > 0 && selectedRowIsValid) {
         return self.backingArray[selectedMasterRow].mediaItems.count;
     }
 
