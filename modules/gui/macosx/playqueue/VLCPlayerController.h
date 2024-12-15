@@ -317,12 +317,6 @@ extern const CGFloat VLCVolumeDefault;
  * @note it is the receiver's obligation to release the input item
  */
 @property (readonly, nullable) VLCInputItem * currentMedia;
-/**
- * set the current media item
- * @note this is typically done by the associated playlist so you should not need to do it
- * @return VLC_SUCCESS on success, another VLC error on failure
- */
-- (int)setCurrentMedia:(VLCInputItem *)currentMedia;
 
 /**
  * returns the duration of the current media in vlc ticks

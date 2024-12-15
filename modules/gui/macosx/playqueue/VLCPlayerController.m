@@ -752,17 +752,6 @@ static int BossCallback(vlc_object_t *p_this,
     return inputItem;
 }
 
-- (int)setCurrentMedia:(VLCInputItem *)currentMedia
-{
-    if (currentMedia == NULL) {
-        return VLC_ENOENT;
-    }
-    vlc_player_Lock(_p_player);
-    int ret = vlc_player_SetCurrentMedia(_p_player, currentMedia.vlcInputItem);
-    vlc_player_Unlock(_p_player);
-    return ret;
-}
-
 - (void)currentMediaItemChanged:(input_item_t *)newMediaItem
 {
     [_defaultNotificationCenter postNotificationName:VLCPlayerCurrentMediaItemChanged
