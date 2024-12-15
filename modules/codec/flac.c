@@ -764,6 +764,11 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
     }
 
     p_block = block_Alloc( bytes );
+    /* FLAC__STREAM_ENCODER_MEMORY_ALLOCATION_ERROR would be more appropriate
+       but it's not the right type of enum */
+    if( unlikely(p_block == NULL) )
+        return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR;
+
     memcpy( p_block->p_buffer, buffer, bytes );
 
     p_block->i_dts = p_block->i_pts = p_sys->i_pts;
