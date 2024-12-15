@@ -619,6 +619,9 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 / 8;
 
             p_new_block = block_Alloc( i_bytes_in_speex_frame );
+            if( unlikely(p_new_block == NULL) )
+                return NULL;
+
             memset( p_new_block->p_buffer, 0xff, i_bytes_in_speex_frame );
 
             /*
@@ -648,9 +651,13 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
                 speex_bits_write( &p_sys->bits,
                     (char*)p_block->p_buffer,
                     p_block->i_buffer - i_bytes_in_speex_frame );
+
                 p_block = block_Realloc( p_block,
                     0,
                     p_block->i_buffer-i_bytes_in_speex_frame );
+                if( unlikely(p_block == NULL) )
+                    return NULL;
+
                 *pp_block = p_block;
             }
             else
@@ -1167,6 +1174,9 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         speex_bits_reset( &p_sys->bits );
 
         p_block = block_Alloc( i_out );
+        if( unlikely(p_block == NULL) )
+            break;
+
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
         p_block->i_length = (vlc_tick_t)1000000 *
