@@ -846,20 +846,20 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu,
     action = addMIMStaticEntry( p_intf, menu, qtr( "Pre&vious" ),
             ":/toolbar/previous_b.svg", SLOT( prev() ), true );
     action->setEnabled( !bPlaylistEmpty );
-    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
 
     action = addMIMStaticEntry( p_intf, menu, qtr( "Ne&xt" ),
             ":/toolbar/next_b.svg", SLOT( next() ), true );
     action->setEnabled( !bPlaylistEmpty );
-    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
     CONNECT( THEMIM, playlistNotEmpty(bool), action, setEnabled(bool) );
 
     action = menu->addAction( qtr( "Record" ), THEAM, SLOT( record() ) );
     action->setIcon( QIcon( ":/toolbar/record.svg" ) );
     if( !p_input )
         action->setEnabled( false );
-    action->setData( ACTION_NO_CLEANUP + ACTION_DELETE_ON_REBUILD );
+    action->setData( static_cast<int>(ACTION_NO_CLEANUP | ACTION_DELETE_ON_REBUILD) );
     menu->addSeparator();
 }
 
