@@ -202,7 +202,7 @@ T.ToolBar {
                         rightMargin: VLCStyle.applicationHorizontalMargin
                     }
                     height: VLCStyle.globalToolbar_height
-                    active: root._showCSD
+                    active: root._showCSD && !MainCtx.platformHandlesTitleBarButtonsWithCSD()
                     source: VLCStyle.palette.hasCSDImage
                               ? "qrc:///qt/qml/VLC/Widgets/CSDThemeButtonSet.qml"
                               : "qrc:///qt/qml/VLC/Widgets/CSDWindowButtonSet.qml"

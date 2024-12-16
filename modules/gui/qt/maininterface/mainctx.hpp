@@ -329,6 +329,7 @@ public:
     }
 
     Q_INVOKABLE virtual bool platformHandlesResizeWithCSD() const { return false; };
+    Q_INVOKABLE virtual bool platformHandlesTitleBarButtonsWithCSD() const { return false; };
 
     /**
      * @brief ask for the application to terminate
