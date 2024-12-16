@@ -165,7 +165,7 @@ vlc_smb2_op_reset(struct vlc_smb2_op *op, struct smb2_context **smb2p)
 }
 
 static int
-smb2_check_status(struct vlc_smb2_op *op, const char *psz_func, int status)
+vlc_smb2_check_status(struct vlc_smb2_op *op, const char *psz_func, int status)
 {
     if (status < 0)
     {
@@ -183,12 +183,12 @@ smb2_check_status(struct vlc_smb2_op *op, const char *psz_func, int status)
 }
 
 static void
-smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
+vlc_smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
 {
     if (op->log && err != -EINTR)
         vlc_error(op->log, "%s failed: %d, %s", psz_func, err, smb2_get_error(op->smb2));
 
-    /* Don't override if set via smb2_check_status */
+    /* Don't override if set via vlc_smb2_check_status */
     if (op->error_status == 0)
         op->error_status = err;
 
@@ -198,10 +198,10 @@ smb2_set_error(struct vlc_smb2_op *op, const char *psz_func, int err)
 }
 
 #define VLC_SMB2_CHECK_STATUS(op, status) \
-    smb2_check_status(op, __func__, status)
+    vlc_smb2_check_status(op, __func__, status)
 
 #define VLC_SMB2_SET_ERROR(op, func, err) \
-    smb2_set_error(op, func, err)
+    vlc_smb2_set_error(op, func, err)
 
 #define VLC_SMB2_STATUS_DENIED(x) (x == -ECONNREFUSED || x == -EACCES)
 
