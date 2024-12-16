@@ -7,6 +7,10 @@ ifeq ($(call need_pkg,"libnfs >= 1.10"),)
 PKGS_FOUND += nfs
 endif
 
+ifneq ($(findstring gnutls,$(PKGS)),)
+DEPS_nfs = gnutls $(DEPS_gnutls)
+endif
+
 $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
 	$(call download_pkg,$(NFS_URL),nfs)
 
