@@ -146,7 +146,7 @@ void BookmarksDialog::update()
         QStringList row;
         row << QString( qfu( pp_bookmarks[i]->psz_name ) );
         row << qfu("-");
-        row << QString().sprintf( "%02u:%02u:%06.3f", hours, minutes, seconds );
+        row << QString( "%1:%2:%3" ).arg( hours, 2, 10, QChar('0')).arg( minutes, 2, 10, QChar('0')).arg(seconds, 10, 'f', 3, QChar('0'));
 
         QTreeWidgetItem *item = new QTreeWidgetItem( bookmarksList, row );
         item->setFlags( Qt::ItemIsSelectable | Qt::ItemIsEditable |
