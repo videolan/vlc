@@ -231,11 +231,6 @@ Filter(filter_t * filter, picture_t * src,
                               filter_sys->va.dpy, filter_sys->va.buf))
         goto error;
 
-    if (vlc_vaapi_BeginPicture(VLC_OBJECT(filter),
-                               filter_sys->va.dpy, filter_sys->va.ctx,
-                               vlc_vaapi_PicGetSurface(dest)))
-        goto error;
-
     if (pf_prepare_render_surface)
         pf_prepare_render_surface(filter_sys->p_data);
 
@@ -256,6 +251,11 @@ Filter(filter_t * filter, picture_t * src,
                                VAProcPipelineParameterBufferType,
                                sizeof(pipeline_params), 1, &pipeline_params);
     if (pipeline_buf == VA_INVALID_ID)
+        goto error;
+
+    if (vlc_vaapi_BeginPicture(VLC_OBJECT(filter),
+                               filter_sys->va.dpy, filter_sys->va.ctx,
+                               vlc_vaapi_PicGetSurface(dest)))
         goto error;
 
     if (vlc_vaapi_RenderPicture(VLC_OBJECT(filter),
