@@ -87,6 +87,8 @@ public:
 public:
     bool getDisableVolumeKeys() const;
 
+    Q_INVOKABLE bool platformHandlesShadowsWithCSD() const override { return true; };
+
 public slots:
     void reloadPrefs() override;
 

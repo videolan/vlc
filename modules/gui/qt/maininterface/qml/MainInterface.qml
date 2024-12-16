@@ -332,7 +332,7 @@ Item {
         z: -1
         hollow: Window.window && (Window.window.color.a < 1.0) // the interface may be translucent if the window has backdrop blur
         blending: false // stacked below everything, no need for blending even though it is not opaque
-        visible: _extendedFrameVisible
+        visible: _extendedFrameVisible && !MainCtx.platformHandlesShadowsWithCSD()
         anchors.fill: g_mainInterface
         spread: 0.0
         color: "black"
