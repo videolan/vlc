@@ -189,7 +189,8 @@ nfs_read_cb(int i_status, struct nfs_context *p_nfs, void *p_data,
     else
     {
         p_sys->res.read.i_len = i_status;
-        memcpy(p_sys->res.read.p_buf, p_data, i_status);
+        if (p_sys->res.read.p_buf != NULL && p_data != NULL)
+            memcpy(p_sys->res.read.p_buf, p_data, i_status);
     }
 }
 
@@ -209,9 +210,15 @@ FileRead(stream_t *p_access, void *p_buf, size_t i_len)
         return 0;
 
     p_sys->res.read.i_len = 0;
+#ifdef LIBNFS_API_V2
+    p_sys->res.read.p_buf = NULL;
+    if (nfs_read_async(p_sys->p_nfs, p_sys->p_nfsfh, p_buf, i_len, nfs_read_cb,
+                       p_access) < 0)
+#else
     p_sys->res.read.p_buf = p_buf;
     if (nfs_read_async(p_sys->p_nfs, p_sys->p_nfsfh, i_len, nfs_read_cb,
                        p_access) < 0)
+#endif
     {
         msg_Err(p_access, "nfs_read_async failed");
         return 0;
