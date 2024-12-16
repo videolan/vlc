@@ -487,7 +487,7 @@
         mediaItem == nil ||
         [mediaItem.primaryDetailString isEqualToString:@""] ||
         [mediaItem.primaryDetailString isEqualToString:mediaItem.durationString];
-    self.detailLabel.stringValue = mediaItem.primaryDetailString;
+    self.detailLabel.stringValue = mediaItem.primaryDetailString ?: @"";
 
     NSURL * const artworkURL = inputItem.artworkURL;
     NSImage * const placeholderImage = [NSImage imageNamed:@"noart"];
