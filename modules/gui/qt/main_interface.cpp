@@ -821,7 +821,7 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
          */
         if (b_autoresize)
         {
-            QRect screen = QApplication::desktop()->availableGeometry();
+            QRect screen = QGuiApplication::primaryScreen()->availableGeometry();
 #if HAS_QT56
             float factor = videoWidget->devicePixelRatioF();
 #else
