@@ -363,8 +363,7 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
 
 static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
                                   enum AVPixelFormat fmt,
-                                  enum AVPixelFormat swfmt,
-                                  vlc_decoder_device **pp_dec_device)
+                                  enum AVPixelFormat swfmt)
 {
     video_format_t fmt_out;
     int val;
@@ -408,11 +407,6 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     p_sys->decoder_width  = dec->fmt_out.video.i_width;
     p_sys->decoder_height = dec->fmt_out.video.i_height;
 
-    if (pp_dec_device)
-    {
-        *pp_dec_device = decoder_GetDecoderDevice(dec);
-        return *pp_dec_device == NULL;
-    }
     return 0;
 }
 
@@ -728,12 +722,14 @@ static int lavc_UpdateHWVideoFormat(decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_EGENERIC;
     }
     const AVPixFmtDescriptor *dsc = av_pix_fmt_desc_get(hwfmt);
-    vlc_decoder_device *init_device = NULL;
     msg_Dbg(p_dec, "trying format %s", dsc ? dsc->name : "unknown");
-    if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt, &init_device))
+    if (lavc_UpdateVideoFormat(p_dec, p_context, hwfmt, swfmt))
         return VLC_EGENERIC; /* Unsupported brand of hardware acceleration */
 
-    *pp_dec_device = init_device;
+    *pp_dec_device = decoder_GetDecoderDevice(p_dec);
+    if (*pp_dec_device == NULL)
+        return VLC_EGENERIC;
+
     return VLC_SUCCESS;
 }
 
@@ -1579,7 +1575,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
              * then picture buffer can be allocated. */
             if (p_sys->p_va == NULL
              && lavc_UpdateVideoFormat(p_dec, p_context, p_context->pix_fmt,
-                                       p_context->pix_fmt, NULL) == 0
+                                       p_context->pix_fmt) == 0
              && decoder_UpdateVideoOutput(p_dec, NULL) == 0)
                 p_pic = decoder_NewPicture(p_dec);
 
@@ -1945,7 +1941,7 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
         /* Most unaccelerated decoders do not call get_format(), so we need to
          * update the output video format here. The MT semaphore must be held
          * to protect p_dec->fmt_out. */
-        if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt, NULL) ||
+        if (lavc_UpdateVideoFormat(dec, ctx, ctx->pix_fmt, ctx->pix_fmt) ||
             decoder_UpdateVideoOutput(dec, NULL))
         {
             vlc_mutex_unlock(&sys->lock);
