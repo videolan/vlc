@@ -20,6 +20,7 @@ nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(APPLY) $(SRC)/nfs/0003-win32-define-struct-timezone-for-non-mingw-w32.patch
 	$(APPLY) $(SRC)/nfs/0004-win32-fix-build-with-MSVC.patch
 	$(APPLY) $(SRC)/nfs/0005-win32-don-t-use-pthread-on-Windows.patch
+	$(APPLY) $(SRC)/nfs/0001-cmake-export-the-necessary-library-in-the-pkg-config.patch
 	$(MOVE)
 
 .nfs: nfs toolchain.cmake
