@@ -35,7 +35,7 @@
 #include <vlc_modules.h>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 7, 0)
-#if defined(Q_OS_UNIX))
+#if defined(Q_OS_UNIX)
 #define QT_FEATURE_wayland 1
 #else
 #define QT_FEATURE_wayland -1
