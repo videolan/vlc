@@ -488,16 +488,21 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
     vlc_readdir_helper_init(&rdh, access, p_node);
 
     struct srvsvc_netsharectr *ctr = sys->share_enum->ctr;
+    size_t ctr_count = ctr->ctr1.count;
+
     for (uint32_t iinfo = 0;
-         iinfo < ctr->ctr1.count && ret == VLC_SUCCESS; ++iinfo)
+         iinfo < ctr_count && ret == VLC_SUCCESS; ++iinfo)
     {
        struct srvsvc_netshareinfo1 *info = &ctr->ctr1.array[iinfo];
-       if (info->type & SHARE_TYPE_HIDDEN)
+       const char *name = info->name;
+       uint32_t type = info->type;
+
+       if (type & SHARE_TYPE_HIDDEN)
            continue;
-       switch (info->type & 0x3)
+       switch (type & 0x3)
        {
            case SHARE_TYPE_DISKTREE:
-               ret = AddItem(access, &rdh, info->name, ITEM_TYPE_DIRECTORY, NULL);
+               ret = AddItem(access, &rdh, name, ITEM_TYPE_DIRECTORY, NULL);
                break;
        }
     }
