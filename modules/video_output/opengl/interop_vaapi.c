@@ -126,8 +126,6 @@ vaegl_image_destroy(const struct vlc_gl_interop *interop, EGLImageKHR image)
 static void
 vaegl_release_last_pic(const struct vlc_gl_interop *interop, struct priv *priv)
 {
-    vlc_object_t *o = VLC_OBJECT(interop->gl);
-
     for (unsigned i = 0; i < priv->last.num_planes; ++i)
         vaegl_image_destroy(interop, priv->last.egl_images[i]);
 
