@@ -260,6 +260,10 @@ public:
             emit q->nameChanged();
         });
 
+        for (auto conn : m_sourceUpdateConnections)
+            QObject::disconnect(conn);
+        m_sourceUpdateConnections.clear();
+
         //itemsUpdated is called only once after init.
         QObject::connect(m_sourcesProvider.get(), &DeviceSourceProvider::itemsUpdated, q,
                 [this]()
@@ -270,16 +274,20 @@ public:
                 for (const SharedInputItem& media : source->getMedias())
                     onMediaAdded(source, media);
 
-                QObject::connect(
+                auto conn = QObject::connect(
                     source.get(), &MediaSourceModel::mediaAdded,
                     q_ptr, [this, source](SharedInputItem media) {
                         onMediaAdded(source, media);
-                    }, Qt::UniqueConnection);
-                QObject::connect(
+                    });
+                m_sourceUpdateConnections.push_back(conn);
+
+                conn = QObject::connect(
                     source.get(), &MediaSourceModel::mediaRemoved,
                     q_ptr, [this, source](SharedInputItem media) {
                         onMediaRemoved(source, media);
-                    }, Qt::UniqueConnection);
+                    });
+
+                m_sourceUpdateConnections.push_back(conn);
             }
 
             m_revision += 1;
@@ -374,6 +382,8 @@ public:
     NetworkDeviceModel::SDCatType m_sdSource = NetworkDeviceModel::CAT_UNDEFINED;
     QString m_sourceName; // '*' -> all sources
     QString m_name; // source long name
+
+    std::vector<QMetaObject::Connection> m_sourceUpdateConnections;
 };
 
 NetworkDeviceModel::NetworkDeviceModel( QObject* parent )
