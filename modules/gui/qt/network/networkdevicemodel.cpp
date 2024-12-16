@@ -274,17 +274,27 @@ public:
                 for (const SharedInputItem& media : source->getMedias())
                     onMediaAdded(source, media);
 
+                //don't store a strong reference in the lambda or this may leak the source
+                //as the connection is destroyed when the source is destroyed but the
+                //connection holds a reference
+                QWeakPointer<MediaSourceModel> weakSource{source};
+
                 auto conn = QObject::connect(
                     source.get(), &MediaSourceModel::mediaAdded,
-                    q_ptr, [this, source](SharedInputItem media) {
-                        onMediaAdded(source, media);
+                    q_ptr, [this, weakSource](SharedInputItem media) {
+                        //source is the signal emitter, it should always exist
+                        auto strongSource  = weakSource.toStrongRef();
+                        assert(strongSource);
+                        onMediaAdded(strongSource, media);
                     });
                 m_sourceUpdateConnections.push_back(conn);
 
                 conn = QObject::connect(
                     source.get(), &MediaSourceModel::mediaRemoved,
-                    q_ptr, [this, source](SharedInputItem media) {
-                        onMediaRemoved(source, media);
+                    q_ptr, [this, weakSource](SharedInputItem media) {
+                        auto strongSource  = weakSource.toStrongRef();
+                        assert(strongSource);
+                        onMediaRemoved(strongSource, media);
                     });
 
                 m_sourceUpdateConnections.push_back(conn);
