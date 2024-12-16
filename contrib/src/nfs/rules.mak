@@ -12,9 +12,9 @@ $(TARBALLS)/libnfs-$(NFS_VERSION).tar.gz:
 
 .sum-nfs: libnfs-$(NFS_VERSION).tar.gz
 
+nfs: UNPACK_DIR=libnfs-libnfs-$(NFS_VERSION)
 nfs: libnfs-$(NFS_VERSION).tar.gz .sum-nfs
 	$(UNPACK)
-	mv libnfs-libnfs-$(NFS_VERSION) libnfs-$(NFS_VERSION)
 	$(MOVE)
 
 .nfs: nfs toolchain.cmake
