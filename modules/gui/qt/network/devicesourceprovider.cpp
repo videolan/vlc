@@ -105,6 +105,8 @@ MediaSourceModel::~MediaSourceModel()
 
 void MediaSourceModel::init()
 {
+    assert(m_mediaSource);
+
     if (m_listenner)
         return;
 
@@ -196,6 +198,9 @@ SharedMediaSourceModel MediaSourceCache::getMediaSourceModel(vlc_media_source_pr
         vlc_media_source_provider_GetMediaSource(provider, name),
         false );
 
+    if (!mediaSource)
+        return nullptr;
+
     SharedMediaSourceModel item = SharedMediaSourceModel::create(mediaSource);
     m_cache[key] = item;
     return item;
@@ -257,12 +262,12 @@ void DeviceSourceProvider::init()
                 ctx.name += ctx.name.isEmpty() ? qfu( meta->longname ) : ", " + qfu( meta->longname );
 
                 SharedMediaSourceModel mediaSource = MediaSourceCache::getInstance()->getMediaSourceModel(provider, meta->name);
-                //ensure this QObject don't live in the worker thread
-                mediaSource->moveToThread(thread);
 
                 if (!mediaSource)
                     continue;
 
+                //ensure this QObject don't live in the worker thread
+                mediaSource->moveToThread(thread);
                 ctx.sources.push_back(mediaSource);
             }
         },
