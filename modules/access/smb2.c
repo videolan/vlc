@@ -119,7 +119,11 @@ struct access_sys
     struct smb2_context *   smb2;
     struct smb2fh *         smb2fh;
     struct smb2dir *        smb2dir;
+#ifdef LIBSMB2_SHARE_ENUM_V2
+    struct srvsvc_NetrShareEnum_rep *share_enum;
+#else
     struct srvsvc_netshareenumall_rep *share_enum;
+#endif
     uint64_t                smb2_size;
     vlc_url_t               encoded_url;
     bool                    eof;
@@ -487,15 +491,26 @@ ShareEnum(stream_t *access, input_item_node_t *p_node)
     struct vlc_readdir_helper rdh;
     vlc_readdir_helper_init(&rdh, access, p_node);
 
+#ifdef LIBSMB2_SHARE_ENUM_V2
+    struct srvsvc_SHARE_INFO_1_CONTAINER *ctr = &sys->share_enum->ses.ShareInfo.Level1;
+    size_t ctr_count = ctr->EntriesRead;
+#else
     struct srvsvc_netsharectr *ctr = sys->share_enum->ctr;
     size_t ctr_count = ctr->ctr1.count;
+#endif
 
     for (uint32_t iinfo = 0;
          iinfo < ctr_count && ret == VLC_SUCCESS; ++iinfo)
     {
+#ifdef LIBSMB2_SHARE_ENUM_V2
+       struct srvsvc_SHARE_INFO_1 *info = &ctr->Buffer->share_info_1[iinfo];
+       const char *name = info->netname.utf8;
+       uint32_t type = info->type;
+#else
        struct srvsvc_netshareinfo1 *info = &ctr->ctr1.array[iinfo];
        const char *name = info->name;
        uint32_t type = info->type;
+#endif
 
        if (type & SHARE_TYPE_HIDDEN)
            continue;
@@ -594,7 +609,13 @@ vlc_smb2_open_share(stream_t *access, struct smb2_context **smb2p,
 
     int ret;
     if (do_enum)
+    {
+#ifdef LIBSMB2_SHARE_ENUM_V2
+        ret = smb2_share_enum_async(op.smb2, SHARE_INFO_1, smb2_open_cb, &op);
+#else
         ret = smb2_share_enum_async(op.smb2, smb2_open_cb, &op);
+#endif
+    }
     else
     {
         ret = smb2_stat_async(op.smb2, smb2_url->path, &smb2_stat,
