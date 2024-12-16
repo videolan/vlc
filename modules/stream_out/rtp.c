@@ -1224,8 +1224,13 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
             if (!strcmp(id->rtp_fmt.ptname, "vorbis") ||
                 !strcmp(id->rtp_fmt.ptname, "theora"))
             {
-                if (rtp_packetize_xiph_config(id, id->rtp_fmt.fmtp, p_buffer->i_pts))
-                    break;
+                int ret = rtp_packetize_xiph_config(id, id->rtp_fmt.fmtp, p_buffer->i_pts);
+                if (ret)
+                {
+                    /* Since we're returning early, this module owns the remaining blocks */
+                    block_ChainRelease(p_buffer);
+                    return ret;
+                }
             }
         }
 
