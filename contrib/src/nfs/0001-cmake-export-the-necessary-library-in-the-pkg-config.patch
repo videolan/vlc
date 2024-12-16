@@ -1,24 +1,29 @@
-From 49de343b66783e172a0a3f294d2946b62f06101a Mon Sep 17 00:00:00 2001
+From c6b70a429e7022fb5da88d3344ae8da55a761b41 Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Mon, 16 Dec 2024 11:46:16 +0100
 Subject: [PATCH] cmake: export the necessary library in the pkg-config file
 
 That includes gnutls on Linux if it's used.
 ---
- CMakeLists.txt        | 3 +++
+ CMakeLists.txt        | 8 ++++++++
  cmake/libnfs.pc.cmake | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1b94d2e..f2cf51d 100644
+index 1b94d2e..86e0845 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -155,6 +155,9 @@ install(FILES cmake/FindNFS.cmake
+@@ -155,6 +155,14 @@ install(FILES cmake/FindNFS.cmake
          DESTINATION ${INSTALL_CMAKE_DIR})
  
  # handle pc-config files
++set(PKG_LIBLIST "")
 +foreach(LIB ${SYSTEM_LIBRARIES})
-+  list(APPEND PKG_LIBLIST "-l${LIB}")
++  if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++    list(APPEND PKG_LIBLIST "${LIB}")
++  else()
++    list(APPEND PKG_LIBLIST "-l${LIB}")
++  endif()
 +endforeach()
  configure_file(cmake/libnfs.pc.cmake
                 ${CMAKE_CURRENT_BINARY_DIR}/libnfs.pc @ONLY)
