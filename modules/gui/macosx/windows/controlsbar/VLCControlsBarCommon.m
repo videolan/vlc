@@ -482,7 +482,7 @@
     VLCMediaLibraryMediaItem * const mediaItem =
         [VLCMediaLibraryMediaItem mediaItemForURL:_playerController.URLOfCurrentMediaItem];
 
-    self.playingItemDisplayField.stringValue = inputItem ? inputItem.name : _NS("No current item");
+    self.playingItemDisplayField.stringValue = inputItem.name ?: _NS("No current item");
     self.detailLabel.hidden =
         mediaItem == nil ||
         [mediaItem.primaryDetailString isEqualToString:@""] ||
