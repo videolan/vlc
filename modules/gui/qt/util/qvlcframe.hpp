@@ -38,13 +38,13 @@
 
 #ifdef _WIN32
     #include <QLibrary>
-    #include <QSysInfo>
     #include <dwmapi.h>
 
     inline bool setImmersiveDarkModeAttribute(HWND hwnd, bool enable) {
         typedef HRESULT(WINAPI *DwmSetWindowAttributeFunc)(HWND, DWORD, LPCVOID, DWORD);
         static const auto dwmSetWindowAttributeFunc = []() -> DwmSetWindowAttributeFunc {
-            if (QSysInfo::windowsVersion() < QSysInfo::WinVersion::WV_WINDOWS10)
+            HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+            if (GetProcAddress(hKernel32, "GetSystemCpuSetInformation") == NULL)
                 return nullptr;
 
             QLibrary dwmapidll("dwmapi");
