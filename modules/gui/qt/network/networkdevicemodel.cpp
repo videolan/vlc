@@ -278,7 +278,7 @@ public:
                 QObject::connect(
                     source.get(), &MediaSourceModel::mediaRemoved,
                     q_ptr, [this, source](SharedInputItem media) {
-                        onMediaAdded(source, media);
+                        onMediaRemoved(source, media);
                     }, Qt::UniqueConnection);
             }
 
