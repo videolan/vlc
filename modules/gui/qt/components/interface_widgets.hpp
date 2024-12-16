@@ -43,6 +43,7 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPropertyAnimation>
+#include <QAbstractNativeEventFilter>
 
 class QMenu;
 class QSlider;
@@ -51,7 +52,7 @@ class SpeedControlWidget;
 struct vout_window_t;
 
 /******************** Video Widget ****************/
-class VideoWidget : public QFrame
+class VideoWidget : public QFrame, public QAbstractNativeEventFilter
 {
     Q_OBJECT
 public:
@@ -68,7 +69,11 @@ protected:
         return NULL;
     }
 
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    bool nativeEventFilter(const QByteArray &eventType, void *message, qintptr *result) override;
+#else
+    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+#endif
     virtual void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
     void mousePressEvent(QMouseEvent *) Q_DECL_OVERRIDE;
     void mouseMoveEvent(QMouseEvent *) Q_DECL_OVERRIDE;

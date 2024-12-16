@@ -91,6 +91,7 @@ MainInterfaceWin32::MainInterfaceWin32( intf_thread_t *_p_intf )
     taskbar_wmsg = RegisterWindowMessage(TEXT("TaskbarButtonCreated"));
     if (taskbar_wmsg == 0)
         msg_Warn( p_intf, "Failed to register TaskbarButtonCreated message" );
+    qApp->installNativeEventFilter(this);
 }
 
 MainInterfaceWin32::~MainInterfaceWin32()
@@ -215,7 +216,11 @@ void MainInterfaceWin32::createTaskBarButtons()
         changeThumbbarButtons( THEMIM->getIM()->playingStatus() );
 }
 
-bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, qintptr *result)
+#else
+bool MainInterfaceWin32::nativeEventFilter(const QByteArray &, void *message, long *result)
+#endif
 {
     MSG * msg = static_cast<MSG*>( message );
 

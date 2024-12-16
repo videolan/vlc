@@ -90,6 +90,7 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, QWidget* p_parent )
     layout->setContentsMargins( 0, 0, 0, 0 );
     stable = NULL;
     p_window = NULL;
+    qApp->installNativeEventFilter(this);
     show();
 }
 
@@ -269,7 +270,11 @@ void VideoWidget::setSize( unsigned int w, unsigned int h )
     sync();
 }
 
-bool VideoWidget::nativeEvent( const QByteArray& eventType, void* message, long* )
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+bool VideoWidget::nativeEventFilter(const QByteArray &eventType, void *message, qintptr *)
+#else
+bool VideoWidget::nativeEventFilter(const QByteArray &eventType, void *message, long *)
+#endif
 {
 #if defined(QT5_HAS_X11)
 # if defined(QT5_HAS_XCB)
