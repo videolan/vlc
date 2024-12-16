@@ -90,7 +90,7 @@ static enum AudioOutput get_audio_output_from_device(void)
 
     int len = 0;
     char value[PROP_VALUE_MAX];
-    for (int i = 0; i < ARRAY_SIZE(audio_output_by_soc); i++)
+    for (size_t i = 0; i < ARRAY_SIZE(audio_output_by_soc); i++)
     {
         /* On return, len will equal (int)strlen(model_id) */
         len = __system_property_get(audio_output_by_soc[i].property, value);
