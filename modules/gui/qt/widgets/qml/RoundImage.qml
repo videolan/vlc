@@ -76,7 +76,7 @@ Item {
     fillMode: Image.PreserveAspectFit
 
     property real radius
-    readonly property real effectiveRadius: (shaderEffect.readyForVisibility ?? shaderEffect.visible) ? radius : 0.0
+    readonly property real effectiveRadius: shaderEffect.readyForVisibility ? radius : 0.0
 
     // NOTE: Note the distinction between ShaderEffect and
     //       ShaderEffectSource. ShaderEffect is no different
