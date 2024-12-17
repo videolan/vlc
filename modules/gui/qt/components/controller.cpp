@@ -52,6 +52,9 @@
 #include <QApplication>
 #include <QWindow>
 #include <QScreen>
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
+#include <QDesktopWidget>
+#endif
 
 //#define DEBUG_LAYOUT 1
 
@@ -1027,7 +1030,22 @@ void FullscreenControllerWidget::setTargetScreen(int screennumber)
 int FullscreenControllerWidget::targetScreen()
 {
     if( i_screennumber < 0 || i_screennumber >= QGuiApplication::screens().length() )
+    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+        auto *screen = QGuiApplication::screenAt( p_intf->p_sys->p_mi->pos() );
+        if (screen != nullptr)
+        {
+            for (qsizetype i = 0; i < QGuiApplication::screens().length(); i++)
+            {
+                if (screen == QGuiApplication::screens()[i])
+                    return i;
+            }
+        }
+        return -1;
+#else
         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+#endif
+    }
     return i_screennumber;
 }
 

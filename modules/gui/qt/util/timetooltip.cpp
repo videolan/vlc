@@ -25,7 +25,11 @@
 #include <QPainter>
 #include <QBitmap>
 #include <QFontMetrics>
+#if QT_VERSION < QT_VERSION_CHECK(5, 10, 0)
 #include <QDesktopWidget>
+#else
+#include <QScreen>
+#endif
 
 #define TIP_HEIGHT 5
 
@@ -76,7 +80,14 @@ void TimeTooltip::adjustPosition()
 #endif
 
     // Keep the tooltip on the same screen if possible
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    QRect screen{};
+    auto *screenAt = QGuiApplication::screenAt( mTarget );
+    if (screenAt != nullptr)
+        screen = screenAt->geometry();
+#else
     QRect screen = QApplication::desktop()->screenGeometry( mTarget );
+#endif
     position.setX( qMax( screen.left(), qMin( position.x(),
         screen.left() + screen.width() - size.width() ) ) );
     position.setY( qMax( screen.top(), qMin( position.y(),
