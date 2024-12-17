@@ -281,7 +281,7 @@ void SeekSlider::processReleasedButton()
 
 void SeekSlider::mouseReleaseEvent( QMouseEvent *event )
 {
-    if ( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+    if ( event->button() != Qt::LeftButton && event->button() != Qt::MiddleButton )
     {
         QSlider::mouseReleaseEvent( event );
         return;
@@ -294,7 +294,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 {
     /* Right-click */
     if ( !isEnabled() ||
-         ( event->button() != Qt::LeftButton && event->button() != Qt::MidButton )
+         ( event->button() != Qt::LeftButton && event->button() != Qt::MiddleButton )
        )
     {
         QSlider::mousePressEvent( event );
@@ -348,7 +348,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
 
 void SeekSlider::mouseMoveEvent( QMouseEvent *event )
 {
-    if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MidButton ) ) )
+    if ( ! ( event->buttons() & ( Qt::LeftButton | Qt::MiddleButton ) ) )
     {
         /* Handle button release when mouserelease has been hijacked by popup */
         processReleasedButton();
