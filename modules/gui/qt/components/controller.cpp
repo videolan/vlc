@@ -896,7 +896,7 @@ void FullscreenControllerWidget::restoreFSC()
         if ( targetScreen() < 0 )
             return;
 
-        QRect currentRes = QApplication::desktop()->screenGeometry( targetScreen() );
+        QRect currentRes = QGuiApplication::screens()[ targetScreen() ]->geometry();
         QWindow *wh = windowHandle();
         if ( wh != Q_NULLPTR )
         {
@@ -932,7 +932,7 @@ void FullscreenControllerWidget::restoreFSC()
 
 void FullscreenControllerWidget::centerFSC( int number )
 {
-    QRect currentRes = QApplication::desktop()->screenGeometry( number );
+    QRect currentRes = QGuiApplication::screens()[ number ]->geometry();
 
     /* screen has changed, calculate new position */
     QPoint pos = QPoint( currentRes.x() + (currentRes.width() / 2) - (width() / 2),
@@ -1006,7 +1006,7 @@ void FullscreenControllerWidget::slowHideFSC()
 
 void FullscreenControllerWidget::updateFullwidthGeometry( int number )
 {
-    QRect screenGeometry = QApplication::desktop()->screenGeometry( number );
+    QRect screenGeometry = QGuiApplication::screens()[ number ]->geometry();
     setMinimumWidth( screenGeometry.width() );
     setGeometry( screenGeometry.x(), screenGeometry.y() + screenGeometry.height() - height(), screenGeometry.width(), height() );
     adjustSize();
@@ -1138,7 +1138,7 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
         int i_moveX = pos.x() - i_mouse_last_x;
         int i_moveY = pos.y() - i_mouse_last_y;
 
-        const QRect screenRect = QApplication::desktop()->screenGeometry( targetScreen() );
+        const QRect screenRect = QGuiApplication::screens()[ targetScreen() ]->geometry();
 
         const int i_x = qBound( screenRect.left(), x() + i_moveX, screenRect.right() - width() );
         const int i_y = qBound( screenRect.top(),  y() + i_moveY, screenRect.bottom() - height() );

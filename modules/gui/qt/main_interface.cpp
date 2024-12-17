@@ -880,7 +880,7 @@ void MainInterface::setVideoFullScreen( bool fs )
             if( fullscreenControls )
                 fullscreenControls->setTargetScreen( numscreen );
 
-            QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+            QRect screenres = QGuiApplication::screens()[ numscreen ]->geometry();
             lastWinScreen = windowHandle()->screen();
 #ifdef QT5_HAS_WAYLAND
             if( !b_hasWayland )
