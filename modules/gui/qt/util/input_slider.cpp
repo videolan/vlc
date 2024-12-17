@@ -386,7 +386,12 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
             }
         }
 
-        QPoint target( event->globalX() - ( event->x() - posX ),
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const auto pos = event->globalPosition();
+#else
+        const auto pos = event->globalPos();
+#endif
+        QPoint target( pos.x() - ( event->x() - posX ),
                 QWidget::mapToGlobal( QPoint( 0, 0 ) ).y() );
         if( likely( size().width() > handleLength() ) ) {
             secstotimestr( psz_length, getValuePercentageFromXPos( event->x() ) * inputLength );

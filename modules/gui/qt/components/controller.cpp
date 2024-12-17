@@ -1112,8 +1112,13 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
         if( i_mouse_last_x == -1 || i_mouse_last_y == -1 )
             return;
 
-        int i_moveX = event->globalX() - i_mouse_last_x;
-        int i_moveY = event->globalY() - i_mouse_last_y;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        const auto pos = event->globalPosition();
+#else
+        const auto pos = event->globalPos();
+#endif
+        int i_moveX = pos.x() - i_mouse_last_x;
+        int i_moveY = pos.y() - i_mouse_last_y;
 
         const QRect screenRect = QApplication::desktop()->screenGeometry( targetScreen() );
 
@@ -1122,8 +1127,8 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
 
         move( i_x, i_y );
 
-        i_mouse_last_x = event->globalX();
-        i_mouse_last_y = event->globalY();
+        i_mouse_last_x = pos.x();
+        i_mouse_last_y = pos.y();
     }
 }
 
@@ -1134,8 +1139,13 @@ void FullscreenControllerWidget::mouseMoveEvent( QMouseEvent *event )
 void FullscreenControllerWidget::mousePressEvent( QMouseEvent *event )
 {
     if( isWideFSC ) return;
-    i_mouse_last_x = event->globalX();
-    i_mouse_last_y = event->globalY();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto pos = event->globalPosition();
+#else
+    auto pos = event->globalPos();
+#endif
+    i_mouse_last_x = pos.x();
+    i_mouse_last_y = pos.y();
     event->accept();
 }
 
