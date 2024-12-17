@@ -39,6 +39,7 @@ Audio output:
 
 Demuxer:
  * Support for HEIF image and grid image formats
+ * Support for Farbfeld images
  * Support for DASH WebM
  * Support for DVBSUB in mkv
  * Support for DAV video files
