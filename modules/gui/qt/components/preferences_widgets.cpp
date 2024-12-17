@@ -1230,7 +1230,7 @@ void KeySelectorControl::finish()
             treeItem->setText( HOTKEY_COL, keys );
             treeItem->setToolTip( HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
             treeItem->setToolTip( GLOBAL_HOTKEY_COL, qtr("Double click to change.\nDelete key to remove.") );
-            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( p_config_item->value.psz ) );
+            treeItem->setData( HOTKEY_COL, Qt::UserRole, QVariant( qfu( p_config_item->value.psz ) ) );
             table->addTopLevelItem( treeItem );
             continue;
         }
