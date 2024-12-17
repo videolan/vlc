@@ -452,6 +452,10 @@ static CVReturn detailViewAnimationCallback(
                                             CVOptionFlags *flagsOut,
                                             void *displayLinkContext)
 {
+    if (displayLinkContext == nil) {
+        return kCVReturnError;
+    }
+
     VLCLibraryCollectionViewFlowLayout *bridgedSelf = (__bridge VLCLibraryCollectionViewFlowLayout *)displayLinkContext;
     BOOL animationFinished = NO;
 
