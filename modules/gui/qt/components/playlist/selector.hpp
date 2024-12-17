@@ -99,7 +99,11 @@ signals:
     void action( PLSelItem* );
 
 private:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    inline void enterEvent( QEnterEvent* ){ showAction(); }
+#else
     inline void enterEvent( QEvent* ){ showAction(); }
+#endif
     inline void leaveEvent( QEvent* ){ hideAction(); }
 
     QTreeWidgetItem*     qitem;

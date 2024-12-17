@@ -417,7 +417,11 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     event->accept();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void SeekSlider::enterEvent( QEnterEvent * )
+#else
 void SeekSlider::enterEvent( QEvent * )
+#endif
 {
     /* Cancel the fade-out timer */
     hideHandleTimer->stop();

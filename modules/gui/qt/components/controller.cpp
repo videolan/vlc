@@ -1163,7 +1163,11 @@ void FullscreenControllerWidget::mouseReleaseEvent( QMouseEvent *event )
 /**
  * On mouse go above FSC
  */
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void FullscreenControllerWidget::enterEvent( QEnterEvent *event )
+#else
 void FullscreenControllerWidget::enterEvent( QEvent *event )
+#endif
 {
     b_mouse_over = true;
 

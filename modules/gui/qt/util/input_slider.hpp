@@ -65,7 +65,11 @@ protected:
     void mousePressEvent( QMouseEvent* event ) Q_DECL_OVERRIDE;
     void mouseReleaseEvent( QMouseEvent *event ) Q_DECL_OVERRIDE;
     void wheelEvent( QWheelEvent *event ) Q_DECL_OVERRIDE;
-    void enterEvent( QEvent * ) Q_DECL_OVERRIDE;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent( QEnterEvent *event ) Q_DECL_OVERRIDE;
+#else
+    void enterEvent( QEvent *event ) Q_DECL_OVERRIDE;
+#endif
     void leaveEvent( QEvent * ) Q_DECL_OVERRIDE;
     void hideEvent( QHideEvent * ) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *ev) Q_DECL_OVERRIDE;
