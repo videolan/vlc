@@ -640,8 +640,8 @@ int PLSelector::getCurrentItemCategory()
 void PLSelector::wheelEvent( QWheelEvent *e )
 {
     if( verticalScrollBar()->isVisible() && (
-        (verticalScrollBar()->value() != verticalScrollBar()->minimum() && e->delta() >= 0 ) ||
-        (verticalScrollBar()->value() != verticalScrollBar()->maximum() && e->delta() < 0 )
+        (verticalScrollBar()->value() != verticalScrollBar()->minimum() && e->angleDelta().y() >= 0 ) ||
+        (verticalScrollBar()->value() != verticalScrollBar()->maximum() && e->angleDelta().y() < 0 )
         ) )
         QApplication::sendEvent(verticalScrollBar(), e);
 

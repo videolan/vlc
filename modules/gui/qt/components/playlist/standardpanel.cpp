@@ -538,7 +538,7 @@ void StandardPLPanel::browseInto()
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
 {
     if( e->modifiers() & Qt::ControlModifier ) {
-        int numSteps = e->delta() / 8 / 15;
+        int numSteps = e->angleDelta().y() / 8 / 15;
         if( numSteps > 0)
             increaseZoom();
         else if( numSteps < 0)

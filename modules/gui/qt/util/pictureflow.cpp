@@ -869,7 +869,7 @@ void PictureFlow::wheelEvent(QWheelEvent * event)
     }
     else
     {
-        int numSteps = -((event->delta() / 8) / 15);
+        int numSteps = -((event->angleDelta().y() / 8) / 15);
 
         if (numSteps > 0)
         {

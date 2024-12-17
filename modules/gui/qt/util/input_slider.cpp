@@ -403,7 +403,7 @@ void SeekSlider::wheelEvent( QWheelEvent *event )
     {
         vlc_tick_t i_size = var_InheritInteger( p_intf->obj.libvlc, "short-jump-size" );
         int i_mode = var_InheritInteger( p_intf->obj.libvlc, "hotkeys-x-wheel-mode" );
-        if ( ( event->delta() < 0 && i_mode != 3 ) || ( event->delta() > 0 && i_mode == 3 ) )
+        if ( ( event->angleDelta().x() < 0 && i_mode != 3 ) || ( event->angleDelta().x() > 0 && i_mode == 3 ) )
             i_size = - i_size;
         float posOffset = static_cast<float>( i_size ) / static_cast<float>( inputLength );
         setValue( value() + posOffset * maximum() );
@@ -674,7 +674,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
 {
-    int newvalue = value() + event->delta() / ( 8 * 15 ) * f_step;
+    int newvalue = value() + event->angleDelta().y() / ( 8 * 15 ) * f_step;
     setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
 
     emit sliderReleased();
