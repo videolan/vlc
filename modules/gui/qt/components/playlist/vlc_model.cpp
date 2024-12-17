@@ -83,7 +83,7 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
 
     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
 
-    if( !QPixmapCache::find( key, artPix ))
+    if( !QPixmapCache::find( key, &artPix ))
     {
         if( artUrl.isEmpty() == false )
         {
@@ -97,7 +97,7 @@ QPixmap VLCModel::getArtPixmap( const QModelIndex & index, const QSize & size )
             }
         }
         key = QString("noart%1%2").arg(size.width()).arg(size.height());
-        if( !QPixmapCache::find( key, artPix ) )
+        if( !QPixmapCache::find( key, &artPix ) )
         {
             artPix = QPixmap( ":/noart" ).scaled( size,
                                           Qt::KeepAspectRatio,
