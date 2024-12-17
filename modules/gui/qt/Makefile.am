@@ -10,6 +10,7 @@
 #   - Add it to DEPS_res
 
 SUFFIXES += .ui .h .hpp .moc.cpp
+EXTRA_DIST += qt6.pro private-gui.pro
 
 libqt_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-DQT_USE_QSTRINGBUILDER \
@@ -39,6 +40,10 @@ libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid
 endif
 if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
+endif
+
+if HAVE_QT_GUI_PRIVATE
+libqt_plugin_la_CPPFLAGS += -DQT_GUI_PRIVATE $(QT_GUI_PRIVATE_CFLAGS)
 endif
 
 libqt_plugin_la_SOURCES = \

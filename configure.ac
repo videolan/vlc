@@ -3865,12 +3865,106 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
     ], [
-      AS_IF([test -n "${enable_qt}"],[
-        AC_MSG_ERROR([${QT_PKG_ERRORS}.])
-      ],[
-        AC_MSG_WARN([${QT_PKG_ERRORS}.])
+      dnl use any qmake that is available, including from contrib tools
+      AC_PATH_PROGS(QMAKE6, [qmake6 qmake], qmake6, ["${CONTRIB_DIR}/../bin:$PATH"])
+
+      AC_ARG_WITH([qtconf],
+        AS_HELP_STRING([--with-qtconf=PATH], [location of Qt6 qt.conf file (auto)])
+      )
+      AS_IF([test -z "${with_qtconf}"], [
+        AC_MSG_CHECKING([if contribs provide target_qt.conf])
+        AS_IF([test -e "${CONTRIB_DIR}/bin/target_qt.conf"], [
+          with_qtconf=${CONTRIB_DIR}/bin/target_qt.conf
+          AC_MSG_RESULT([yes])
+        ],[
+          AC_MSG_RESULT([no])
+        ])
       ])
-      enable_qt="no"
+
+      QT_PATHS=${QMAKE6}
+      AS_IF([test -n "${QMAKE6}"], [
+        AS_IF([test -n "${with_qtconf}"], [
+          QT_BIN_DIRECTORY="$(${QMAKE6} -qtconf ${with_qtconf} -query QT_HOST_BINS 2>/dev/null)"
+          AC_MSG_CHECKING([if qmake6 is found with qtconf])
+          AS_IF([test -n "${QT_BIN_DIRECTORY}" -a -x "${QT_BIN_DIRECTORY}/qmake6"], [
+            QMAKE6="${QT_BIN_DIRECTORY}/qmake6"
+            AC_MSG_RESULT([yes])
+          ],[
+            AC_MSG_RESULT([no])
+            AC_MSG_CHECKING([if qmake is found with qtconf])
+            AS_IF([test -n "${QT_BIN_DIRECTORY}" -a -x "${QT_BIN_DIRECTORY}/qmake"], [
+                QMAKE6="${QT_BIN_DIRECTORY}/qmake"
+                AC_MSG_RESULT([yes])
+            ],[
+                AC_MSG_RESULT([no])
+            ])
+          ])
+          QT_PATHS="${QMAKE6} -qtconf ${with_qtconf}"
+        ])
+      ])
+
+      QMAKE="${QT_PATHS}"
+      AC_MSG_NOTICE([using ${QMAKE}])
+
+      AC_MSG_CHECKING([for Qt libraries])
+      mkdir -p ${ac_pwd}/modules/gui/qt
+      touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
+      QT_PKG_ERRORS=$(${QT_PATHS} ${srcdir}/modules/gui/qt/qt6.pro -o ${ac_pwd}/modules/gui/qt/qmake-qt 2>&1)
+      ac_status=$?
+      AS_IF([test $ac_status = 0 && test -f "${ac_pwd}/modules/gui/qt/qmake-qt"], [
+        echo "get_cflags:"                    > ${ac_pwd}/modules/gui/qt/qmake-common.mk
+        echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+        echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+        dnl transform /foo/bar/libbaz.so arguments to -L/foo/bar -lbaz
+        dnl RS: each arguments (space separated) are treated as a new line
+        dnl FS: split fields using /[^/]* to extract the file basepath ($1)
+        dnl  /lib.*\.so/ lines (arguments) will add -Lxxx if this is not the current path (p), then transform into a -lxxx argument
+        dnl other arguments are kept as-is
+        echo '	echo $(LIBS) | awk '\''BEGIN{FS="/[[^/]]*$$";RS=" ";ORS=" "}{if($$0 ~ /\/lib.*\.so/){ if(p != $$1){ print "-L" $$1; p=$$1}; sub(/.*\/lib/, "-l"); sub(/\.so.*/, "")}; print $$0}'\' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+        echo 'get_ldflags:'                   >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+        echo '	echo $(LFLAGS)'             >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
+
+        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
+
+        AC_MSG_RESULT([yes])
+        QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
+        QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
+        QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_ldflags)
+        AC_SUBST([QT_LIBS])
+        AC_SUBST([QT_CFLAGS])
+        AC_SUBST([QT_LDFLAGS])
+
+        QT_PATH="$(${QT_PATHS}                   -query QT_INSTALL_BINS 2>/dev/null)"
+        QT_HOST_PATH="$(${QT_PATHS}              -query QT_HOST_BINS 2>/dev/null)"
+        QT_HOST_LIBEXEC_DIRECTORY="$(${QT_PATHS} -query QT_HOST_LIBEXECS 2>/dev/null)"
+        QT_LIBEXEC_DIRECTORY="$(${QT_PATHS}      -query QT_INSTALL_LIBEXECS 2>/dev/null)"
+        QT_VERSION="$(${QT_PATHS}                -query QT_VERSION 2>/dev/null)"
+        AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+        AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+        AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin" "${QT_HOST_LIBEXEC_DIRECTORY}" "${QT_LIBEXEC_DIRECTORY}"])
+
+        AC_MSG_CHECKING([for Qt GUI private])
+        (${QMAKE} ${srcdir}/modules/gui/qt/private-gui.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-gui) 2>/dev/null
+        ac_status=$?
+        AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-gui],[
+          echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
+
+          AC_MSG_RESULT([yes])
+          QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
+          AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
+          have_qt_gui_private="yes"
+        ],[
+          AC_MSG_RESULT([no])
+        ])
+        rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
+      ],[
+        AS_IF([test -n "${enable_qt}"],[
+          AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+        ],[
+          AC_MSG_WARN([${QT_PKG_ERRORS}.])
+        ])
+        enable_qt="no"
+      ])
     ])
 ])
 
@@ -3880,6 +3974,7 @@ AS_IF([test "${enable_qt}" != "no"], [
 AC_SUBST(QT_VERSION)
 AM_CONDITIONAL(ENABLE_QT, [test "$enable_qt" != "no"])
 AM_CONDITIONAL([HAVE_QT5_X11], [test "${have_qt5_x11}" = "yes"])
+AM_CONDITIONAL([HAVE_QT_GUI_PRIVATE], [test "${have_qt_gui_private}" = "yes"])
 
 dnl
 dnl detect kde4-config patch (used for kde solids).
