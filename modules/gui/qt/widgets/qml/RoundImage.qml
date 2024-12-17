@@ -116,8 +116,8 @@ Item {
 
         readonly property size size: Qt.size(width, height)
 
-        readonly property double softEdgeMin: -0.01
-        readonly property double softEdgeMax:  0.01
+        readonly property double softEdgeMin: -1. / Math.min(width, height)
+        readonly property double softEdgeMax: -softEdgeMin
 
         readonly property size cropRate: {
             let ret = Qt.size(0.0, 0.0)
