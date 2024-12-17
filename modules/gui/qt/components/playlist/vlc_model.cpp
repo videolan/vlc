@@ -206,7 +206,7 @@ void VLCModel::ensureArtRequested( const QModelIndex &index )
         QModelIndex child;
         for( int row = 0 ; row < nbnodes ; row++ )
         {
-            child = index.child( row, COLUMN_COVER );
+            child = index.model()->index( row, COLUMN_COVER );
             if ( child.isValid() && child.data().toString().isEmpty() )
                 THEMIM->getIM()->requestArtUpdate( getInputItem( child ), false );
         }
