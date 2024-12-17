@@ -161,7 +161,7 @@ class ClickableQLabel : public QLabel
 {
     Q_OBJECT
 public:
-    void mouseDoubleClickEvent( QMouseEvent *event ) Q_DECL_OVERRIDE
+    virtual void mouseDoubleClickEvent( QMouseEvent *event ) override
     {
         Q_UNUSED( event );
         emit doubleClicked();
