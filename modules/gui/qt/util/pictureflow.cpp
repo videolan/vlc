@@ -34,6 +34,7 @@
 #include <QApplication>
 #include <QImage>
 #include <QKeyEvent>
+#include <QtMath>  // for wheel deadzone calculation
 #include <QPainter>
 #include <QPixmap>
 #include <QTimer>
@@ -861,15 +862,32 @@ void PictureFlow::resizeEvent(QResizeEvent* event)
     QWidget::resizeEvent(event);
 }
 
+static Qt::Orientations getWheelOrientation(int x, int y)
+{
+    const qreal v_cos_deadzone = 0.45; // ~63 degrees
+    const qreal h_cos_deadzone = 0.95; // ~15 degrees
+
+    if (x == 0 && y == 0)
+        return Qt::Orientations{};
+
+    qreal cos = qFabs(x)/qSqrt(x*x + y*y);
+    if (cos < v_cos_deadzone)
+        return Qt::Vertical;
+    if (cos > h_cos_deadzone)
+        return Qt::Horizontal;
+    return Qt::Orientations{};
+}
+
 void PictureFlow::wheelEvent(QWheelEvent * event)
 {
-    if (event->orientation() == Qt::Horizontal)
+    QPoint p = event->angleDelta();
+    if (getWheelOrientation(p.x(), p.y()) == Qt::Horizontal)
     {
         event->ignore();
     }
     else
     {
-        int numSteps = -((event->angleDelta().y() / 8) / 15);
+        int numSteps = -((p.y() / 8) / 15);
 
         if (numSteps > 0)
         {
