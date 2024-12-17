@@ -54,7 +54,10 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QSignalMapper>
-#include <QStatusBar>
+
+#ifndef QT_NO_STATUSBAR
+# include <QStatusBar>
+#endif
 
 /*
   This file defines the main menus and the pop-up menu (right-click menu)
@@ -531,10 +534,12 @@ QMenu *VLCMenuBar::ViewMenu( intf_thread_t *p_intf, QMenu *current, MainInterfac
         action->setChecked( true );
     action->setEnabled(mi->isAdvancedWidgetAvailable());
 
+#ifndef QT_NO_STATUSBAR
     action = menu->addAction( qtr( "Status Bar" ) );
     action->setCheckable( true );
     action->setChecked( mi->statusBar()->isVisible() );
     CONNECT( action, triggered( bool ), mi, setStatusBarVisibility( bool) );
+#endif
 #if 0 /* For Visualisations. Not yet working */
     adv = menu->addAction( qtr( "Visualizations selector" ), mi,
                            SLOT( visual() ) );

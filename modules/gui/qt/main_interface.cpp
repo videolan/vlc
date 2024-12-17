@@ -57,12 +57,15 @@
 #include <QWindow>
 #include <QMenu>
 #include <QMenuBar>
-#include <QStatusBar>
 #include <QLabel>
 #include <QStackedWidget>
 #include <QScreen>
 #ifdef _WIN32
 #include <QFileInfo>
+#endif
+
+#ifndef QT_NO_STATUSBAR
+# include <QStatusBar>
 #endif
 
 #if ! HAS_QT510 && defined(QT5_HAS_X11)
@@ -168,11 +171,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     createMainWidget( settings );
 
+#ifndef QT_NO_STATUSBAR
     /**************
      * Status Bar *
      **************/
     createStatusBar();
     setStatusBarVisibility( getSettings()->value( "MainWindow/status-bar-visible", false ).toBool() );
+#endif
 
     /*********************************
      * Create the Systray Management *
@@ -550,6 +555,7 @@ inline void MainInterface::initSystray()
         createSystray();
 }
 
+#ifndef QT_NO_STATUSBAR
 inline void MainInterface::createStatusBar()
 {
     /****************
@@ -587,8 +593,10 @@ inline void MainInterface::createStatusBar()
          elapsed time.*/
     CONNECT( timeLabel, doubleClicked(), THEDP, gotoTimeDialog() );
 
+#ifndef QT_NO_STATUSBAR
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );
+#endif
 
     /* This shouldn't be necessary, but for somehow reason, the statusBarr
        starts at height of 20px and when a text is shown it needs more space.
@@ -598,6 +606,7 @@ inline void MainInterface::createStatusBar()
      */
     statusBarr->setFixedHeight( statusBarr->sizeHint().height() + 2 );
 }
+#endif
 
 /**********************************************************************
  * Handling of sizing of the components
@@ -828,8 +837,10 @@ void MainInterface::setVideoSize( unsigned int w, unsigned int h )
                         h -= menuBar()->height();
                     if( controls->isVisible() )
                         h -= controls->height();
+#ifndef QT_NO_STATUSBAR
                     if( statusBar()->isVisible() )
                         h -= statusBar()->height();
+#endif
                     if( inputC->isVisible() )
                         h -= inputC->height();
                 }
@@ -1116,7 +1127,9 @@ void MainInterface::displayNormalView()
 {
     menuBar()->setVisible( false );
     controls->setVisible( false );
+#ifndef QT_NO_STATUSBAR
     statusBar()->setVisible( false );
+#endif
     inputC->setVisible( false );
 }
 
@@ -1128,7 +1141,9 @@ void MainInterface::setMinimalView( bool b_minimal )
 {
     bool b_menuBarVisible = menuBar()->isVisible();
     bool b_controlsVisible = controls->isVisible();
+#ifndef QT_NO_STATUSBAR
     bool b_statusBarVisible = statusBar()->isVisible();
+#endif
     bool b_inputCVisible = inputC->isVisible();
 
     if( !isFullScreen() && !isMaximized() && b_minimal && !b_isWindowTiled )
@@ -1139,8 +1154,10 @@ void MainInterface::setMinimalView( bool b_minimal )
             i_heightChange += menuBar()->height();
         if( b_controlsVisible )
             i_heightChange += controls->height();
+#ifndef QT_NO_STATUSBAR
         if( b_statusBarVisible )
             i_heightChange += statusBar()->height();
+#endif
         if( b_inputCVisible )
             i_heightChange += inputC->height();
 
@@ -1150,7 +1167,9 @@ void MainInterface::setMinimalView( bool b_minimal )
 
     menuBar()->setVisible( !b_minimal );
     controls->setVisible( !b_minimal );
+#ifndef QT_NO_STATUSBAR
     statusBar()->setVisible( !b_minimal && b_statusbarVisible );
+#endif
     inputC->setVisible( !b_minimal );
 
     if( !isFullScreen() && !isMaximized() && !b_minimal && !b_isWindowTiled )
@@ -1161,8 +1180,10 @@ void MainInterface::setMinimalView( bool b_minimal )
             i_heightChange += menuBar()->height();
         if( !b_controlsVisible && controls->isVisible() )
             i_heightChange += controls->height();
+#ifndef QT_NO_STATUSBAR
         if( !b_statusBarVisible && statusBar()->isVisible() )
             i_heightChange += statusBar()->height();
+#endif
         if( !b_inputCVisible && inputC->isVisible() )
             i_heightChange += inputC->height();
 
@@ -1230,9 +1251,11 @@ StandardPLPanel *MainInterface::getPlaylistView()
 
 void MainInterface::setStatusBarVisibility( bool b_visible )
 {
+#ifndef QT_NO_STATUSBAR
     statusBar()->setVisible( b_visible );
     b_statusbarVisible = b_visible;
     if( controls ) controls->setGripVisible( !b_statusbarVisible );
+#endif
 }
 
 
@@ -1250,10 +1273,12 @@ void MainInterface::setPlaylistVisibility( bool b_visible )
 void MainInterface::setName( const QString& name )
 {
     input_name = name; /* store it for the QSystray use */
+#ifndef QT_NO_STATUSBAR
     /* Display it in the status bar, but also as a Tooltip in case it doesn't
        fit in the label */
     nameLabel->setText( name );
     nameLabel->setToolTip( name );
+#endif // QT_NO_STATUSBAR
 }
 
 /**
@@ -1274,16 +1299,20 @@ void MainInterface::setVLCWindowsTitle( const QString& aTitle )
 
 void MainInterface::showCryptedLabel( bool b_show )
 {
+#ifndef QT_NO_STATUSBAR
     if( cryptedLabel == NULL )
     {
         cryptedLabel = new QLabel;
         // The lock icon is not the right one for DRM protection/scrambled.
         //cryptedLabel->setPixmap( QPixmap( ":/lock.svg" ) );
         cryptedLabel->setText( "DRM" );
+#ifndef QT_NO_STATUSBAR
         statusBar()->addWidget( cryptedLabel );
+#endif
     }
 
     cryptedLabel->setVisible( b_show );
+#endif
 }
 
 /*****************************************************************************
