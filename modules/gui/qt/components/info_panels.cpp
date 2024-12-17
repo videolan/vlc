@@ -516,7 +516,7 @@ void InfoPanel::update( input_item_t *p_item)
 
             current_item->addChild(child_item);
         }
-        InfoTree->setItemExpanded( current_item, true);
+        current_item->setExpanded(true);
     }
 }
 
