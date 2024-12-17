@@ -42,6 +42,7 @@
 #include <QFont>
 #include <QAction>
 #include <QStack>
+#include <QBrush>
 
 /*************************************************************************
  * Playlist model implementation

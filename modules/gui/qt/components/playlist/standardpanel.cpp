@@ -70,6 +70,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFont>
+#include <QActionGroup>
 
 #include <assert.h>
 

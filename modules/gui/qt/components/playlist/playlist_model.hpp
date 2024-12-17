@@ -42,6 +42,7 @@
 #include <QVariant>
 #include <QModelIndex>
 #include <QAction>
+#include <QFont>
 
 class PLItem;
 class PlMimeData;
