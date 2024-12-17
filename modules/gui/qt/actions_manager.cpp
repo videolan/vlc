@@ -38,6 +38,8 @@
 #include "components/extended_panels.hpp"
 #include "menus.hpp"
 
+#include <QActionGroup>
+
 ActionsManager::ActionsManager( intf_thread_t * _p_i )
     : p_intf( _p_i )
     , m_scanning( false )
