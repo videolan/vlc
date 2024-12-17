@@ -186,7 +186,7 @@ void BookmarksDialog::del()
         b_ignore_updates = true;
         /* Sort needed to make sure that selected elements are deleted in descending
            order, otherwise the indexes might change and wrong bookmarks are deleted. */
-        qSort( selected.begin(), selected.end() );
+        std::sort( selected.begin(), selected.end() );
         QModelIndexList::Iterator it = selected.end();
         for( --it; it != selected.begin(); it-- )
         {

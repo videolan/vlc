@@ -126,7 +126,7 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
             list.append(index);
     }
 
-    qSort(list.begin(), list.end(), modelIndexLessThen);
+    std::sort(list.begin(), list.end(), modelIndexLessThen);
 
     AbstractPLItem *item = NULL;
     foreach( const QModelIndex &index, list ) {
