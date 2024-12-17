@@ -1026,7 +1026,7 @@ void FullscreenControllerWidget::setTargetScreen(int screennumber)
 
 int FullscreenControllerWidget::targetScreen()
 {
-    if( i_screennumber < 0 || i_screennumber >= QApplication::desktop()->screenCount() )
+    if( i_screennumber < 0 || i_screennumber >= QGuiApplication::screens().length() )
         return QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
     return i_screennumber;
 }

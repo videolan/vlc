@@ -875,7 +875,7 @@ void MainInterface::setVideoFullScreen( bool fs )
     {
         int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
 
-        if ( numscreen >= 0 && numscreen < QApplication::desktop()->screenCount() )
+        if ( numscreen >= 0 && numscreen < QGuiApplication::screens().length() )
         {
             if( fullscreenControls )
                 fullscreenControls->setTargetScreen( numscreen );
