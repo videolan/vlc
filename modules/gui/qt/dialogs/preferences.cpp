@@ -126,7 +126,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     setLayout( main_layout );
 
     /* Margins */
-    simple_tree_panel->layout()->setMargin( 1 );
+    simple_tree_panel->layout()->setContentsMargins( 1, 1, 1, 1 );
     simple_panels_stack->layout()->setContentsMargins( 6, 0, 0, 3 );
 
     for( int i = 0; i < SPrefsMax ; i++ ) simple_panels[i] = NULL;

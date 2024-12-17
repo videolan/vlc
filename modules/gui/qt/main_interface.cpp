@@ -364,7 +364,7 @@ void MainInterface::createResumePanel( QWidget *w )
     resumePanel = new QWidget( w );
     resumePanel->hide();
     QHBoxLayout *resumePanelLayout = new QHBoxLayout( resumePanel );
-    resumePanelLayout->setSpacing( 0 ); resumePanelLayout->setMargin( 0 );
+    resumePanelLayout->setSpacing( 0 ); resumePanelLayout->setContentsMargins( 0, 0, 0, 0 );
 
     QLabel *continuePixmapLabel = new QLabel();
     continuePixmapLabel->setPixmap( ImageHelper::loadSvgToPixmap( ":/menu/help.svg" , fontMetrics().height(), fontMetrics().height()) );
@@ -458,7 +458,7 @@ void MainInterface::createMainWidget( QSettings *creationSettings )
     setCentralWidget( main );
     mainLayout = new QVBoxLayout( main );
     main->setContentsMargins( 0, 0, 0, 0 );
-    mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
+    mainLayout->setSpacing( 0 ); mainLayout->setContentsMargins( 0, 0, 0, 0 );
 
     createResumePanel( main );
     /* */

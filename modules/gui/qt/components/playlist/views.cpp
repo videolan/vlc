@@ -477,7 +477,7 @@ void PlTreeView::keyPressEvent( QKeyEvent *event )
 PicFlowView::PicFlowView( QAbstractItemModel *p_model, QWidget *parent ) : QAbstractItemView( parent )
 {
     QHBoxLayout *layout = new QHBoxLayout( this );
-    layout->setMargin( 0 );
+    layout->setContentsMargins( 0, 0, 0, 0 );
     picFlow = new PictureFlow( this, p_model );
     picFlow->setContextMenuPolicy( Qt::CustomContextMenu );
     connect( picFlow, SIGNAL(customContextMenuRequested( const QPoint & )),

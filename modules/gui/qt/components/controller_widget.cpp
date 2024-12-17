@@ -49,7 +49,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 {
     /* We need a layout for this widget */
     QHBoxLayout *layout = new QHBoxLayout( this );
-    layout->setSpacing( 0 ); layout->setMargin( 0 );
+    layout->setSpacing( 0 ); layout->setContentsMargins( 0, 0, 0, 0 );
 
     /* We need a Label for the pix */
     volMuteLabel = new QLabel;

@@ -497,7 +497,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 QWidget *discFrame = new QWidget( this );
                 //discFrame->setLineWidth( 1 );
                 QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
-                discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
+                discLayout->setSpacing( 0 ); discLayout->setContentsMargins( 0, 0, 0, 0 );
 
                 QToolButton *prevSectionButton = new QToolButton( discFrame );
                 prevSectionButton->setIcon( QIcon( ":/toolbar/dvd_prev.svg" ) );
@@ -522,7 +522,7 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
             {
                 QWidget *telexFrame = new QWidget( this );
                 QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
-                telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
+                telexLayout->setSpacing( 0 ); telexLayout->setContentsMargins( 0, 0, 0, 0 );
 
                 QToolButton *telexOn = new QToolButton( telexFrame );
                 telexOn->setIcon( QIcon( ":/toolbar/tv.svg" ) );
@@ -638,7 +638,7 @@ DroppingController::DroppingController( intf_thread_t *_p_intf,
     setAcceptDrops( true );
     controlLayout = new QHBoxLayout( this );
     controlLayout->setSpacing( 5 );
-    controlLayout->setMargin( 0 );
+    controlLayout->setContentsMargins( 0, 0, 0, 0 );
     setFrameShape( QFrame::StyledPanel );
     setFrameShadow( QFrame::Raised );
     setMinimumHeight( 20 );

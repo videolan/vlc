@@ -89,7 +89,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                   p_selector( _p_selector )
 {
     viewStack = new QStackedLayout( this );
-    viewStack->setSpacing( 0 ); viewStack->setMargin( 0 );
+    viewStack->setSpacing( 0 ); viewStack->setContentsMargins( 0, 0, 0, 0 );
     setMinimumWidth( 300 );
 
     iconView    = NULL;

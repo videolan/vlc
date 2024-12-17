@@ -53,7 +53,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     setContentsMargins( 0, 3, 0, 3 );
 
     QGridLayout *layout = new QGridLayout( this );
-    layout->setMargin( 0 ); layout->setSpacing( 0 );
+    layout->setContentsMargins( 0, 0, 0, 0 ); layout->setSpacing( 0 );
 
     /*******************
      * Left            *

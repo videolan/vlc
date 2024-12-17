@@ -536,12 +536,12 @@ QFrame *AbstractController::discFrame()
     QFrame *discFrame = new QFrame( this );
 
     QHBoxLayout *discLayout = new QHBoxLayout( discFrame );
-    discLayout->setSpacing( 0 ); discLayout->setMargin( 0 );
+    discLayout->setSpacing( 0 ); discLayout->setContentsMargins( 0, 0, 0, 0 );
 
 
     QFrame *chapFrame = new QFrame( discFrame );
     QHBoxLayout *chapLayout = new QHBoxLayout( chapFrame );
-    chapLayout->setSpacing( 0 ); chapLayout->setMargin( 0 );
+    chapLayout->setSpacing( 0 ); chapLayout->setContentsMargins( 0, 0, 0, 0 );
 
     QToolButton *prevSectionButton = new QToolButton( chapFrame );
     setupButton( prevSectionButton );
@@ -560,7 +560,7 @@ QFrame *AbstractController::discFrame()
 
     QFrame *menuFrame = new QFrame( discFrame );
     QHBoxLayout *menuLayout = new QHBoxLayout( menuFrame );
-    menuLayout->setSpacing( 0 ); menuLayout->setMargin( 0 );
+    menuLayout->setSpacing( 0 ); menuLayout->setContentsMargins( 0, 0, 0, 0 );
 
     QToolButton *menuButton = new QToolButton( menuFrame );
     setupButton( menuButton );
@@ -594,7 +594,7 @@ QFrame *AbstractController::telexFrame()
      **/
     QFrame *telexFrame = new QFrame( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
-    telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
+    telexLayout->setSpacing( 0 ); telexLayout->setContentsMargins( 0, 0, 0, 0 );
     CONNECT( THEMIM->getIM(), teletextPossible( bool ),
              telexFrame, setVisible( bool ) );
 
@@ -720,14 +720,14 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
     controlLayout->setContentsMargins( 3, 1, 0, 1 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
-    controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
+    controlLayout1->setSpacing( 0 ); controlLayout1->setContentsMargins( 0, 0, 0, 0 );
 
     QString line1 = getSettings()->value( "MainWindow/MainToolbar1", MAIN_TB1_DEFAULT )
                                         .toString();
     parseAndCreate( line1, controlLayout1 );
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
-    controlLayout2->setSpacing( 0 ); controlLayout2->setMargin( 0 );
+    controlLayout2->setSpacing( 0 ); controlLayout2->setContentsMargins( 0, 0, 0, 0 );
     QString line2 = getSettings()->value( "MainWindow/MainToolbar2", MAIN_TB2_DEFAULT )
                                         .toString();
     parseAndCreate( line2, controlLayout2 );
@@ -760,7 +760,7 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
 {
     RTL_UNAFFECTED_WIDGET
     controlLayout = new QHBoxLayout( this );
-    controlLayout->setMargin( 0 );
+    controlLayout->setContentsMargins( 0, 0, 0, 0 );
     controlLayout->setSpacing( 0 );
 #ifdef DEBUG_LAYOUT
     setStyleSheet( "background: orange ");
@@ -777,7 +777,7 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
 {
     RTL_UNAFFECTED_WIDGET
     controlLayout = new QHBoxLayout( this );
-    controlLayout->setMargin( 0 );
+    controlLayout->setContentsMargins( 0, 0, 0, 0 );
     controlLayout->setSpacing( 0 );
 #ifdef DEBUG_LAYOUT
     setStyleSheet( "background: green ");

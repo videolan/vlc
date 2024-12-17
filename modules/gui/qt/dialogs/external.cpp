@@ -190,7 +190,7 @@ void DialogHandler::displayLogin(vlc_dialog_id *p_id, const QString &title,
     dialog->setWindowTitle (title);
     dialog->setWindowRole ("vlc-login");
     dialog->setModal(true);
-    layout->setMargin (2);
+    layout->setContentsMargins( 2, 2, 2, 2 );
 
     /* Username and password fields */
     QWidget *panel = new QWidget (dialog);
