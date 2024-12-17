@@ -43,6 +43,14 @@
 #include <QPainter>
 #include <QTimer>
 #include <QUrl>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QRandomGenerator>
+
+static inline int qrand() {
+    auto * q = QRandomGenerator::system();
+    return q->generate();
+}
+#endif
 
 #if defined (QT5_HAS_X11)
 # include <X11/Xlib.h>
