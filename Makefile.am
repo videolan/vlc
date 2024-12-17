@@ -65,10 +65,9 @@ EXTRA_DIST += \
 	extras/tools/automake-clang.patch \
 	extras/tools/cmake-enable-ALPN-support-on-macOS-10.14.patch \
 	extras/tools/libtool-2.4.7-bitcode.patch \
-	extras/tools/libtool-2.4.7-clang-libs.patch \
-	extras/tools/libtool-2.4.7-response-files.patch \
+	extras/tools/libtool-2.5.4-clang-libs.patch \
 	extras/tools/libtool-2.4.7-lpthread.patch \
-	extras/tools/libtool-2.4.7-embed-bitcode.patch
+	extras/tools/libtool-2.5.4-embed-bitcode.patch
 
 ###############################################################################
 # Various utilities ( editor syntax files, D-Bus controller ... )
