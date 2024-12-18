@@ -1142,6 +1142,39 @@ if qt6_dep.found()
     qtest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['Test'], required: false)
     if qtest_qt6_dep.found()
         vlc_tests += {
+            'name': 'test_qt_ml_model',
+            'sources': files(
+                'tests/test_ml_model.cpp',
+                'tests/vlc_stub_modules.cpp',
+                'util/base_model.cpp',
+                'medialibrary/mlbasemodel.cpp',
+                'medialibrary/medialib.cpp',
+                'medialibrary/mlthreadpool.cpp',
+                'playlist/playlist_controller.cpp',
+                'playlist/playlist_item.cpp',
+            ),
+            'moc_sources': files(
+                'tests/test_ml_model.cpp'
+            ),
+            'moc_headers': files(
+                'tests/vlc_stub_modules.cpp',
+	            'util/base_model.hpp',
+	            'util/listcache.hpp',
+	            'util/locallistcacheloader.hpp',
+	            'medialibrary/mlqmltypes.hpp',
+	            'medialibrary/mlbasemodel.hpp',
+	            'medialibrary/medialib.hpp',
+	            'medialibrary/mlthreadpool.hpp',
+	            'playlist/playlist_controller.hpp',
+	            'playlist/playlist_item.hpp',
+            ),
+            'suite': ['qt'],
+            'include_directories' : qt_include_dir,
+            'link_with': [libvlccore, libvlc],
+            'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
+        }
+
+        vlc_tests += {
             'name': 'test_qt_renderer_manager',
             'sources': files(
                 'tests/vlc_stub_modules.cpp',

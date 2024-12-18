@@ -1596,6 +1596,43 @@ QT_QTEST_COMMON_cxxflags = $(AM_CXXFLAGS) $(QT_CFLAGS) $(QT_QTEST_CFLAGS) -fPIC 
 QT_QTEST_COMMON_ldadd = $(QT_LIBS) $(LIBS_qt) $(QT_QTEST_LIBS) $(LIBVLCCORE) $(LIBVLC)
 QT_QTEST_COMMON_ldflags = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
 
+
+# test_ml_model
+
+test_ml_model_SOURCES = \
+	tests/vlc_stub_modules.cpp \
+	tests/test_ml_model.cpp \
+	util/base_model.hpp util/base_model_p.hpp  util/base_model.cpp \
+	util/listcache.hpp \
+	util/locallistcacheloader.hpp \
+	medialibrary/mlqmltypes.hpp \
+	medialibrary/mlbasemodel.hpp medialibrary/mlbasemodel.cpp \
+	medialibrary/medialib.hpp medialibrary/medialib.cpp \
+	medialibrary/mlthreadpool.hpp medialibrary/mlthreadpool.cpp \
+	playlist/playlist_controller.hpp playlist/playlist_controller.cpp \
+	playlist/playlist_item.hpp playlist/playlist_item.cpp
+
+nodist_test_ml_model_SOURCES = \
+	tests/test_ml_model.moc \
+	util/base_model.moc.cpp \
+	util/listcache.moc.cpp \
+	util/locallistcacheloader.moc.cpp \
+	medialibrary/mlqmltypes.moc.cpp \
+	medialibrary/mlbasemodel.moc.cpp \
+	medialibrary/medialib.moc.cpp \
+	medialibrary/mlthreadpool.moc.cpp \
+	playlist/playlist_controller.moc.cpp \
+	playlist/playlist_item.moc.cpp
+
+BUILT_SOURCES += tests/test_ml_model.moc
+CLEANFILES += tests/test_ml_model.moc
+test_ml_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_ml_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_ml_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_ml_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_ml_model
+TESTS += test_ml_model
+
 # test_renderer_manager_model
 
 test_renderer_manager_model_SOURCES = \
