@@ -69,6 +69,8 @@ static void EsFormatMergeSize( es_format_t *p_dst,
 #define ALLOWED_CHROMAS_YUV10 \
     VLC_CODEC_I420_10L, \
     VLC_CODEC_I420_10B, \
+    VLC_CODEC_I420_12B, \
+    VLC_CODEC_I420_12L, \
     VLC_CODEC_I420_16L \
 
 static const vlc_fourcc_t pi_allowed_chromas_yuv[] = {
@@ -118,6 +120,8 @@ static const vlc_fourcc_t *get_allowed_chromas( filter_t *p_filter )
     {
         case VLC_CODEC_I420_10L:
         case VLC_CODEC_I420_10B:
+        case VLC_CODEC_I420_12L:
+        case VLC_CODEC_I420_12B:
         case VLC_CODEC_I420_16L:
         case VLC_CODEC_CVPX_P010:
         case VLC_CODEC_D3D9_OPAQUE_10B:
