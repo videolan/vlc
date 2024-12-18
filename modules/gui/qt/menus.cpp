@@ -1438,7 +1438,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             case VLC_VAR_FLOAT:
                 var_Get( p_object, psz_var, &val );
                 if( CURTEXT ) menutext = qfue( CURTEXT );
-                else menutext.sprintf( "%.2f", CURVAL.f_float );
+                else menutext.setNum(CURVAL.f_float, 'f', 2);
                 CreateAndConnect( submenu, psz_var, menutext, "", RADIO_OR_COMMAND,
                         p_object, CURVAL, i_type,
                         CURVAL.f_float == val.f_float );
