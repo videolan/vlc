@@ -716,7 +716,6 @@ static int parse_farbfeld_header(vlc_object_t *object, es_format_t *fmt)
 {
     demux_t *demux = (demux_t*)object;
 
-    fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGBA64;
     const uint8_t *p_peek;
     if (vlc_stream_Peek(demux->s, &p_peek, 16) < 16)
         return VLC_EGENERIC;
@@ -727,8 +726,11 @@ static int parse_farbfeld_header(vlc_object_t *object, es_format_t *fmt)
     if (width == 0 || height == 0)
         return VLC_EGENERIC;
 
+    /* Farbfeld is essentially just a header followed by pixels. */
     fmt->video.i_width = width;
     fmt->video.i_height = height;
+    fmt->video.i_chroma = fmt->i_codec = VLC_CODEC_RGBA64;
+
     vlc_stream_Read(demux->s, NULL, 16);
 
     return VLC_SUCCESS;
