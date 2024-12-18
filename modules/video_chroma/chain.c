@@ -127,6 +127,7 @@ static const vlc_fourcc_t *get_allowed_chromas( filter_t *p_filter )
         case VLC_CODEC_D3D9_OPAQUE_10B:
         case VLC_CODEC_D3D11_OPAQUE_10B:
         case VLC_CODEC_VAAPI_420_10BPP:
+        case VLC_CODEC_VAAPI_420_12BPP:
             return pi_allowed_chromas_yuv10;
         case VLC_CODEC_I444:
             return pi_allowed_chromas_yuv444;
