@@ -33,6 +33,7 @@
 #include <vlc_probe.h>
 #include <vlc_interface.h>
 #include <vlc_player.h>
+#include <vlc_media_library.h>
 
 #include "../../../../lib/libvlc_internal.h"
 
@@ -111,6 +112,38 @@ static void CloseIntf( vlc_object_t *p_this )
     testenv->intf = nullptr;
 }
 
+//Medialib module
+
+static void* MLGet( vlc_medialibrary_module_t* module, int query, va_list args )
+{
+    return nullptr;
+}
+
+static int MLList( vlc_medialibrary_module_t* module, int query,
+                const vlc_ml_query_params_t* params, va_list args )
+{
+    return VLC_EGENERIC;
+}
+
+static int MLControl( vlc_medialibrary_module_t* module, int query, va_list args )
+{
+    return VLC_EGENERIC;
+}
+
+static int MLOpen( vlc_object_t* obj )
+{
+    auto* p_ml = reinterpret_cast<vlc_medialibrary_module_t*>( obj );
+    p_ml->pf_control = MLControl;
+    p_ml->pf_get = MLGet;
+    p_ml->pf_list = MLList;
+    return VLC_SUCCESS;
+}
+
+static void MLClose( vlc_object_t* obj )
+{
+    VLC_UNUSED(obj);
+}
+
 //module declaration
 
 vlc_module_begin()
@@ -123,6 +156,9 @@ add_submodule()
 add_submodule()
     set_capability("renderer probe", 10000)
     set_callback(vlc_rd_probe_open)
+add_submodule()
+    set_capability("medialibrary", 10000)
+    set_callbacks(MLOpen, MLClose)
 vlc_module_end()
 
 extern "C" {
@@ -148,7 +184,7 @@ VLCTestingEnv::~VLCTestingEnv()
 }
 
 static const char * test_defaults_args[] = {
-    "-v", "--vout=vdummy", "--aout=adummy", "--text-renderer=tdummy",
+    "-v", "--vout=vdummy", "--aout=adummy", "--text-renderer=tdummy", "--media-library"
 };
 
 static const int test_defaults_nargs =
