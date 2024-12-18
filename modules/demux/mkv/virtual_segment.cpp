@@ -87,7 +87,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
             (((!p_chap->i_end_time ||
                (*p_chap->i_end_time - p_chap->i_start_time) < (tmp - usertime_offset) )) ? tmp :
              *p_chap->i_end_time - p_chap->i_start_time + usertime_offset )
-            :*p_chap->i_end_time;
+            : (p_chap->i_end_time ? *p_chap->i_end_time : -1);
 
     virtual_chapter_c * p_vchap = new (std::nothrow) virtual_chapter_c( *p_segment, p_chap, start, stop, sub_chapters );
     if( !p_vchap )
