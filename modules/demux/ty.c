@@ -460,7 +460,9 @@ static int Demux( demux_t *p_demux )
     switch( p_rec->rec_type )
     {
         case 0xe0: /* video */
-            DemuxRecVideo( p_demux, p_rec, p_block_in );
+            if( DemuxRecVideo( p_demux, p_rec, p_block_in ) )
+                return VLC_DEMUXER_EGENERIC;
+
             break;
 
         case 0xc0: /* audio */
@@ -787,6 +789,12 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             if( p_sys->p_cc[i] )
             {
                 block_t *p_cc = block_Alloc( p_sys->cc.i_data );
+                if( unlikely(p_cc == NULL) )
+                {
+                    block_Release(p_block_in);
+                    return -1;
+                }
+
                 p_cc->i_flags |= BLOCK_FLAG_TYPE_I;
                 p_cc->i_pts = p_block_in->i_pts;
                 memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
