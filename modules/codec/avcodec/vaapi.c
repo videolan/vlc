@@ -333,10 +333,12 @@ static int Create(vlc_va_t *va, struct vlc_va_cfg *cfg)
             case AV_PIX_FMT_YUV420P10LE:
                 vlc_chroma = VLC_CODEC_VAAPI_420_10BPP;
                 break;
+#if LIBAVUTIL_VERSION_CHECK( 57, 36, 100 )
             case AV_PIX_FMT_P012LE:
             case AV_PIX_FMT_P012BE:
                 vlc_chroma = VLC_CODEC_VAAPI_420_12BPP;
                 break;
+#endif
             default:
                 break;
         }
