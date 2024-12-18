@@ -156,6 +156,8 @@ vlc_gl_t *vlc_gl_CreateOffscreen(vlc_object_t *parent,
                                  vlc_gl_start, gl, width, height, gl_cfg);
     if (gl->module == NULL)
     {
+        if (gl->device)
+            vlc_decoder_device_Release(gl->device);
         vlc_object_delete(gl);
         return NULL;
     }
