@@ -26,6 +26,13 @@ Item {
     implicitWidth: image.implicitWidth
     implicitHeight: image.implicitHeight
 
+    // Override QQuickItem's antialiasing as readonly.
+    // FIXME: The shader can be generated without
+    //        the define that enables antialiasing.
+    //        It should be done when the build system
+    //        starts supporting shader defines.
+    readonly property bool antialiasing: true
+
     asynchronous: true
 
     property alias asynchronous: image.asynchronous
@@ -106,6 +113,8 @@ Item {
 
         blending: true
 
+        antialiasing: root.antialiasing
+
         // FIXME: Culling seems to cause issues, such as when the view is layered due to
         //        fading edge effec, this is most likely a Qt bug.
         // cullMode: ShaderEffect.BackFaceCulling
@@ -168,5 +177,7 @@ Item {
         // We can use clipping as QQuickImage suggests with
         // PreserveAspectCrop in that case:
         clip: (GraphicsInfo.shaderType !== GraphicsInfo.RhiShader) && (fillMode === Image.PreserveAspectCrop)
+
+        antialiasing: root.antialiasing
     }
 }

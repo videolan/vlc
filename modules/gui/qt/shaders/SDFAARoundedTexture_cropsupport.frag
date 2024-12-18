@@ -12,6 +12,8 @@
 //          for maintenance purposes. IF YOU EDIT THIS FILE, MAKE SURE TO DO THE
 //          SAME IN SDFAARoundedTexture.frag.
 
+#define ANTIALIASING
+
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -125,7 +127,12 @@ void main()
     // Soften the outline, as recommended by the Valve paper, using smoothstep:
     // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
     // NOTE: The whole texel is multiplied, because of premultiplied alpha.
-    texel *= 1.0 - smoothstep(softEdgeMin, softEdgeMax, dist);
+#ifdef ANTIALIASING
+    float factor = smoothstep(softEdgeMin, softEdgeMax, dist);
+#else
+    float factor = step(0.0, dist);
+#endif
+    texel *= 1.0 - factor;
 
     fragColor = texel * qt_Opacity;
 }
