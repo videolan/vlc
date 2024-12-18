@@ -318,6 +318,11 @@ if host_system == 'darwin'
         'posix/thread.c',
         'posix/wait.c',
     ]
+    if have_osx
+        libvlccore_sources += [
+            'posix/spawn.c',
+        ]
+    endif
     libvlccore_link_args += '-Wl,-U,_vlc_static_modules'
 elif host_system == 'windows'
     libvlccore_sources += [

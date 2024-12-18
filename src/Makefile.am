@@ -523,6 +523,10 @@ endif
 libvlccore_la_SOURCES += \
 	posix/thread.c
 libvlccore_la_LIBADD += $(LIBEXECINFO)
+if HAVE_OSX
+libvlccore_la_SOURCES += \
+	posix/spawn.c
+endif
 if !HAVE_DARWIN
 if !HAVE_EMSCRIPTEN
 libvlccore_la_SOURCES += posix/netconf.c
