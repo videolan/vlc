@@ -217,11 +217,8 @@ void MainInterfaceWin32::createTaskBarButtons()
 
 bool MainInterfaceWin32::nativeEvent(const QByteArray &, void *message, long *result)
 {
-    return winEvent( static_cast<MSG*>( message ), result );
-}
+    MSG * msg = static_cast<MSG*>( message );
 
-bool MainInterfaceWin32::winEvent ( MSG * msg, long * result )
-{
     if (msg->message == taskbar_wmsg)
     {
         //We received the taskbarbuttoncreated, now we can really create the buttons

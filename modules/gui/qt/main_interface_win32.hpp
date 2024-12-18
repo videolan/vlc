@@ -37,7 +37,6 @@ public:
 
 private:
     virtual bool nativeEvent(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
-    virtual bool winEvent( MSG *, long * );
     virtual void toggleUpdateSystrayMenuWhenVisible() Q_DECL_OVERRIDE;
 
 protected:
