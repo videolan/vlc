@@ -100,6 +100,8 @@ Item {
 
         readonly property bool readyForVisibility: (root.radius > 0.0) && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
 
+        smooth: root.smooth
+
         supportsAtlasTextures: true
 
         blending: true
@@ -151,6 +153,8 @@ Item {
         id: image
 
         anchors.fill: parent
+
+        smooth: root.smooth
 
         // Image should not be visible when there is rounding and RHI shader is supported.
         // This is simply when the shader effect is invisible. However, Do not use `!shaderEffect.visible`,
