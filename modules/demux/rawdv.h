@@ -139,6 +139,8 @@ static inline block_t *dv_extract_audio( block_t *p_frame_block )
     i_samples = dv_get_audio_sample_count( &p_buf[1], i_dsf );
 
     p_block = block_Alloc( 4 * i_samples );
+    if( unlikely( p_block == NULL ) )
+        return NULL;
 
     /* for each DIF segment */
     p_frame = p_frame_block->p_buffer;
