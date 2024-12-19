@@ -323,6 +323,8 @@ libqt_plugin_la_SOURCES = \
 	util/effects_image_provider.hpp \
 	util/qsgroundedrectangularimagenode.cpp \
 	util/qsgroundedrectangularimagenode.hpp \
+	util/qsgtextureview.cpp \
+	util/qsgtextureview.hpp \
 	util/dismiss_popup_event_filter.cpp \
 	util/dismiss_popup_event_filter.hpp \
 	util/list_selection_model.cpp \
@@ -484,6 +486,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/dismiss_popup_event_filter.moc.cpp \
 	util/list_selection_model.moc.cpp \
 	util/vlchotkeyconverter.moc.cpp \
+	util/qsgtextureview.moc.cpp \
 	widgets/native/animators.moc.cpp \
 	widgets/native/csdthemeimage.moc.cpp \
 	widgets/native/customwidgets.moc.cpp \
