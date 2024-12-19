@@ -77,6 +77,7 @@ static const struct
     { ".ogv",   "video/ogg" },
     { ".ogx",   "application/ogg" },
     { ".opus",  "audio/ogg; codecs=opus" },
+    { ".qoa",   "audio/qoa" },
     { ".spx",   "audio/ogg" },
     { ".wav",   "audio/wav" },
     { ".wma",   "audio/x-ms-wma" },
