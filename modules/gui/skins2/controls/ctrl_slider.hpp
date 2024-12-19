@@ -89,8 +89,6 @@ private:
     const UString m_tooltip;
     /// Initial size of the control
     int m_width, m_height;
-    /// Position of the cursor
-    int m_xPosition, m_yPosition;
     /// Callback objects
     DEFINE_CALLBACK( CtrlSliderCursor, OverDown )
     DEFINE_CALLBACK( CtrlSliderCursor, DownOver )
