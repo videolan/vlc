@@ -578,7 +578,8 @@ vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
     int request_type = cfg->types;
     assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|
                            VLC_PREPARSER_TYPE_PARSE|
-                           VLC_PREPARSER_TYPE_THUMBNAIL));
+                           VLC_PREPARSER_TYPE_THUMBNAIL|
+                           VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES));
 
     unsigned parser_threads = cfg->max_parser_threads == 0 ? 1 :
                               cfg->max_parser_threads;
