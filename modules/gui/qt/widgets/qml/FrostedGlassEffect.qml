@@ -41,7 +41,15 @@ Widgets.BlurEffect {
 
         // Underlay for the blur effect:
         parent: root.source?.sourceItem ?? root.source
-        anchors.fill: parent
+
+        // Since we don't use layering for the effect area anymore,
+        // we need to restrict the filter to correspond to the effect
+        // area instead of the whole source:
+        x: root.x
+        y: root.y
+        width: root.width
+        height: root.height
+
         z: 999
 
         visible: root.tintStrength > 0.0
