@@ -60,6 +60,7 @@
 
 #include "menus/qml_menu_wrapper.hpp"
 
+#include "widgets/native/textureprovideritem.hpp"
 #include "widgets/native/csdthemeimage.hpp"
 #include "widgets/native/navigation_attached.hpp"
 #include "widgets/native/viewblockingrectangle.hpp"
@@ -349,6 +350,7 @@ void MainUI::registerQMLTypes()
         // @uri VLC.Widgets
         qmlRegisterType<CSDThemeImage>(uri, versionMajor, versionMinor, "CSDThemeImage");
         qmlRegisterType<ViewBlockingRectangle>( uri, versionMajor, versionMinor, "ViewBlockingRectangle" );
+        qmlRegisterType<TextureProviderItem>( uri, versionMajor, versionMinor, "TextureProviderItem" );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
