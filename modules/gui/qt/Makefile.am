@@ -347,7 +347,8 @@ libqt_plugin_la_SOURCES = \
 	widgets/native/qvlcframe.hpp \
 	widgets/native/searchlineedit.cpp widgets/native/searchlineedit.hpp \
 	widgets/native/viewblockingrectangle.cpp widgets/native/viewblockingrectangle.hpp \
-	widgets/native/doubleclickignoringitem.hpp
+	widgets/native/doubleclickignoringitem.hpp \
+	widgets/native/textureprovideritem.cpp widgets/native/textureprovideritem.hpp
 
 # Meta-object compilation
 
@@ -494,7 +495,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	widgets/native/navigation_attached.moc.cpp \
 	widgets/native/mlfolderseditor.moc.cpp \
 	widgets/native/searchlineedit.moc.cpp \
-	widgets/native/viewblockingrectangle.moc.cpp
+	widgets/native/viewblockingrectangle.moc.cpp \
+	widgets/native/textureprovideritem.moc.cpp
 
 nodist_libqt_plugin_la_SOURCES += \
 	dialogs/extended/ui_equalizer.h \
