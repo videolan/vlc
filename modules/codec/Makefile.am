@@ -416,7 +416,7 @@ libvaapi_plugin_la_SOURCES = \
 	codec/avcodec/vaapi.c hw/vaapi/vlc_vaapi.c hw/vaapi/vlc_vaapi.h
 libvaapi_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libvaapi_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVCODEC_CFLAGS)
-libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS)
+libvaapi_plugin_la_LIBADD = $(LIBVA_LIBS) $(AVCODEC_LIBS)
 if HAVE_AVCODEC_VAAPI
 if HAVE_VAAPI_DRM
 codec_LTLIBRARIES += libvaapi_drm_plugin.la

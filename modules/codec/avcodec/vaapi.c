@@ -42,11 +42,24 @@
 # include <va/va_drm.h>
 #endif
 #include <libavcodec/avcodec.h>
+#if FF_API_STRUCT_VAAPI_CONTEXT
 #include <libavcodec/vaapi.h>
+#else
+#include <libavutil/hwcontext_vaapi.h>
+#endif
 
 #include "avcodec.h"
 #include "va.h"
 #include "../../hw/vaapi/vlc_vaapi.h"
+
+#if !FF_API_STRUCT_VAAPI_CONTEXT
+struct vaapi_context
+{
+    VADisplay display;
+    VAConfigID config_id;
+    VAContextID context_id;
+};
+#endif
 
 struct vlc_va_sys_t
 {
@@ -145,8 +158,10 @@ static void Delete(vlc_va_t *va, void **hwctx)
 
     (void) hwctx;
 
-    vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
-    vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
+    if (sys->hw_ctx.context_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyContext(o, sys->hw_ctx.display, sys->hw_ctx.context_id);
+    if (sys->hw_ctx.config_id != VA_INVALID_ID)
+        vlc_vaapi_DestroyConfig(o, sys->hw_ctx.display, sys->hw_ctx.config_id);
     vlc_vaapi_ReleaseInstance(sys->va_inst);
     free(sys);
 }
@@ -196,6 +211,7 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
     sys->hw_ctx.config_id = VA_INVALID_ID;
     sys->hw_ctx.context_id = VA_INVALID_ID;
 
+#if FF_API_STRUCT_VAAPI_CONTEXT
     sys->hw_ctx.config_id =
         vlc_vaapi_CreateConfigChecked(o, sys->hw_ctx.display, i_profile,
                                       VAEntrypointVLD, i_vlc_chroma);
@@ -211,6 +227,24 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, const AVPixFmtDescriptor *d
         goto error;
 
     ctx->hwaccel_context = &sys->hw_ctx;
+#else
+    AVBufferRef *hwdev_ref = av_hwdevice_ctx_alloc(AV_HWDEVICE_TYPE_VAAPI);
+    if (hwdev_ref == NULL)
+        goto error;
+
+    AVHWDeviceContext *hwdev_ctx = (void *) hwdev_ref->data;
+    AVVAAPIDeviceContext *vadev_ctx = hwdev_ctx->hwctx;
+    vadev_ctx->display = va_dpy;
+
+    if (av_hwdevice_ctx_init(hwdev_ref) < 0)
+    {
+        av_buffer_unref(&hwdev_ref);
+        goto error;
+    }
+
+    ctx->hw_device_ctx = hwdev_ref;
+#endif
+
     va->sys = sys;
     va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = Get;
