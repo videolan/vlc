@@ -284,7 +284,8 @@ PlaylistListModel::roleNames() const
         { IsCurrentRole, "isCurrent" },
         { ArtistRole , "artist" },
         { AlbumRole  , "album" },
-        { ArtworkRole, "artwork" }
+        { ArtworkRole, "artwork" },
+        { UrlRole, "url" }
     };
 }
 
