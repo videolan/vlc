@@ -19,6 +19,13 @@ vlc_tests += {
 }
 
 vlc_tests += {
+    'name' : 'test_src_misc_viewpoint',
+    'sources' : files('misc/viewpoint.c'),
+    'suite' : ['src', 'test_src'],
+    'link_with' : [libvlccore],
+}
+
+vlc_tests += {
     'name' : 'test_src_clock_clock',
     'sources' : files(
         'clock/clock.c',
