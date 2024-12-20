@@ -39,7 +39,17 @@ vlc_modules += {
         '../../codec/vt_utils.h'
     ),
     'objc_args' : ['-fobjc-arc'],
-    'dependencies' : [avfoundation_dep, foundation_dep, avkit_dep, uifwk_dep, coremedia_dep, quartz_dep, corevideo_dep, coregraphics_dep, videotoolbox_dep],
+    'dependencies' : [
+        frameworks['AVFoundation'],
+        frameworks['Foundation'],
+        frameworks['AVKit'],
+        uifwk_dep,
+        frameworks['CoreMedia'],
+        frameworks['QuartzCore'],
+        frameworks['CoreVideo'],
+        frameworks['CoreGraphics'],
+        frameworks['VideoToolbox'],
+    ],
 }
 
 if have_ios or have_tvos
