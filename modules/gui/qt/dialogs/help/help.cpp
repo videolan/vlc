@@ -181,10 +181,10 @@ void AboutDialog::showEvent( QShowEvent *event )
 
 #ifdef UPDATE_CHECK
 
-struct UpdateModelPrivate
+class UpdateModelPrivate
 {
-    Q_DECLARE_PUBLIC(UpdateModel)
 public:
+    Q_DECLARE_PUBLIC(UpdateModel)
     UpdateModelPrivate(UpdateModel * pub)
         : q_ptr(pub)
     {
