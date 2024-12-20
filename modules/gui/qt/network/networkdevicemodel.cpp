@@ -142,12 +142,6 @@ static inline bool operator == (const NetworkDeviceItemPtr& a, const NetworkDevi
            && QString::compare(a->protocol, b->protocol, Qt::CaseInsensitive) == 0;
 }
 
-static inline std::size_t qHash(const NetworkDeviceItemPtr& s, size_t seed = 0) noexcept
-{
-    VLC_UNUSED(seed);
-    return s->id;
-}
-
 bool itemMatchPattern(const NetworkDeviceItemPtr& a, const QString& pattern)
 {
     return a->name.contains(pattern, Qt::CaseInsensitive);
