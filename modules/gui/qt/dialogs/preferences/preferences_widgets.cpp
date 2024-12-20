@@ -751,7 +751,7 @@ void ModuleListConfigControl::checkbox_lists( QString label, QString help, const
     QCheckBox *cb = new QCheckBox( label );
     checkBoxListItem *cbl = new checkBoxListItem;
 
-    connect( cb, &QCheckBox::stateChanged, this, &ModuleListConfigControl::onUpdate );
+    connect( cb, &QtCheckboxChanged, this, &ModuleListConfigControl::onUpdate );
     if( !help.isEmpty() )
         cb->setToolTip( formatTooltip( help ) );
     cbl->checkBox = cb;

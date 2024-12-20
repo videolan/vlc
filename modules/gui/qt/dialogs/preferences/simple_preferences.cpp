@@ -570,7 +570,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
                 ui.lastfm_zone->setVisible( ui.lastfm->isChecked() );
 
                 connect( ui.lastfm, &QCheckBox::toggled, ui.lastfm_zone, &QWidget::setVisible );
-                connect( ui.lastfm, &QCheckBox::stateChanged, this, &SPrefsPanel::lastfm_Changed );
+                connect( ui.lastfm, &QtCheckboxChanged, this, &SPrefsPanel::lastfm_Changed );
             }
             else
             {
@@ -787,9 +787,9 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             configBool( "qt-minimal-view", ui.minimalviewBox );
 
             /*Update layout radio buttons based on the checkState of the following checkboxes*/
-            connect(ui.menuBarCheck, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
-            connect(ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
-            connect(ui.titleBarCheckBox, &QCheckBox::stateChanged, this, &SPrefsPanel::updateLayoutSelection);
+            connect(ui.menuBarCheck, &QtCheckboxChanged, this, &SPrefsPanel::updateLayoutSelection);
+            connect(ui.pinVideoControlsCheckbox, &QtCheckboxChanged, this, &SPrefsPanel::updateLayoutSelection);
+            connect(ui.titleBarCheckBox, &QtCheckboxChanged, this, &SPrefsPanel::updateLayoutSelection);
 
             /*Clicking on image will check the corresponding layout radio button*/
             layoutImages = new QButtonGroup( this );
@@ -830,7 +830,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
 
             configBool( "qt-pin-controls", ui.pinVideoControlsCheckbox );
             m_resetters.push_back(std::make_unique<PropertyResetter>(ui.pinVideoControlsCheckbox, "checked"));
-            QObject::connect( ui.pinVideoControlsCheckbox, &QCheckBox::stateChanged, p_intf->p_mi, &MainCtx::setPinVideoControls );
+            QObject::connect( ui.pinVideoControlsCheckbox, &QtCheckboxChanged, p_intf->p_mi, &MainCtx::setPinVideoControls );
 
             ui.colorSchemeComboBox->setModel( p_intf->p_mi->getColorScheme() );
             ui.colorSchemeComboBox->setCurrentText( p_intf->p_mi->getColorScheme()->currentText() );

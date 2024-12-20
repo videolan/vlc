@@ -127,6 +127,12 @@ public:
 /* For marking translatable static strings (like `_()`) */
 #define qtr( i ) qfut( i )
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+#define QtCheckboxChanged  QCheckBox::checkStateChanged
+#else
+#define QtCheckboxChanged  QCheckBox::stateChanged
+#endif
+
 #define BUTTONACT( b, a ) connect( b, &QAbstractButton::clicked, this, a )
 
 #define getSettings() p_intf->mainSettings

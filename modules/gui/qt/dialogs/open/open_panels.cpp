@@ -927,8 +927,8 @@ void CaptureOpenPanel::initialize()
 
     /* Jack CONNECTs */
     CuMRL( jackChannels, QOverload<int>::of(&QSpinBox::valueChanged) );
-    CuMRL( jackPace, &QCheckBox::stateChanged );
-    CuMRL( jackConnect, &QCheckBox::stateChanged );
+    CuMRL( jackPace, &QtCheckboxChanged );
+    CuMRL( jackConnect, &QtCheckboxChanged );
     CuMRL( jackPortsSelected, &QLineEdit::textChanged );
     configList << "jack-input-use-vlc-pace" << "jack-input-auto-connect";
     }

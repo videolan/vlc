@@ -401,7 +401,7 @@ AddonsTab::AddonsTab( qt_intf_t *p_intf_ ) : QVLCFrame( p_intf_ )
     QCheckBox *installedOnlyBox = new QCheckBox( qtr("Only installed") );
     installedOnlyBox->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     switchStack->insertWidget( WITHONLINEADDONS, installedOnlyBox );
-    connect( installedOnlyBox, &QCheckBox::stateChanged, this, &AddonsTab::installChecked );
+    connect( installedOnlyBox, &QtCheckboxChanged, this, &AddonsTab::installChecked );
 
     // Model
     m_model = std::make_unique<AddonsModel>( );

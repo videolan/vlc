@@ -258,7 +258,7 @@ void PrefsDialog::setAdvanced()
 
         connect( advanced_tree, &PrefsTree::currentItemChanged, this, &PrefsDialog::changeAdvPanel );
         connect( tree_filter, &SearchLineEdit::textChanged, this, &PrefsDialog::advancedTreeFilterChanged );
-        connect( current_filter, &QCheckBox::stateChanged, this, &PrefsDialog::onlyLoadedToggled );
+        connect( current_filter, &QtCheckboxChanged, this, &PrefsDialog::onlyLoadedToggled );
         connect( search, &QShortcut::activated, tree_filter, QOverload<>::of(&SearchLineEdit::setFocus) );
 
         /* Set initial selection */

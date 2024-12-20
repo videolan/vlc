@@ -248,7 +248,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             checkBox->setText( qfu( p_widget->psz_text ) );
             checkBox->setChecked( p_widget->b_checked );
             setWidgetMapping(checkBox, p_widget);
-            connect( checkBox, &QCheckBox::stateChanged,
+            connect( checkBox, &QtCheckboxChanged,
                      this, &ExtensionDialog::TriggerClick );
             p_widget->p_sys_intf = checkBox;
             return checkBox;

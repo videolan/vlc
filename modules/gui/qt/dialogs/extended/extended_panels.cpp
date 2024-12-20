@@ -159,7 +159,7 @@ ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
     SETUP_VFILTER_OPTION( brightnessSlider, &QSlider::valueChanged )
     SETUP_VFILTER_OPTION( saturationSlider, &QSlider::valueChanged )
     SETUP_VFILTER_OPTION( gammaSlider, &QSlider::valueChanged )
-    SETUP_VFILTER_OPTION( brightnessThresholdCheck, &QCheckBox::stateChanged )
+    SETUP_VFILTER_OPTION( brightnessThresholdCheck, &QtCheckboxChanged )
 
     SETUP_VFILTER_gb( extract )
     SETUP_VFILTER_OPTION( extractComponentText, &QLineEdit::textChanged )
@@ -178,8 +178,8 @@ ExtVideo::ExtVideo( qt_intf_t *_p_intf, QTabWidget *_parent ) :
 
     SETUP_VFILTER_gb( gradient )
     SETUP_VFILTER_OPTION( gradientModeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged) )
-    SETUP_VFILTER_OPTION( gradientColorCheck, &QCheckBox::stateChanged )
-    SETUP_VFILTER_OPTION( gradientCartoonCheck, &QCheckBox::stateChanged )
+    SETUP_VFILTER_OPTION( gradientColorCheck, &QtCheckboxChanged )
+    SETUP_VFILTER_OPTION( gradientCartoonCheck, &QtCheckboxChanged )
 
     SETUP_VFILTER_gb( motionblur )
     SETUP_VFILTER_OPTION( blurFactorSlider, &QSlider::valueChanged )

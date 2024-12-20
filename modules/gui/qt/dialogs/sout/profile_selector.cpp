@@ -448,11 +448,11 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
     BUTTONACT( cancelButton, &VLCProfileEditor::reject );
 
-    connect( ui.valueholder_video_copy, &QCheckBox::stateChanged,
+    connect( ui.valueholder_video_copy, &QtCheckboxChanged,
              this, &VLCProfileEditor::activatePanels );
-    connect( ui.valueholder_audio_copy, &QCheckBox::stateChanged,
+    connect( ui.valueholder_audio_copy, &QtCheckboxChanged,
              this, &VLCProfileEditor::activatePanels );
-    connect( ui.valueholder_subtitles_overlay, &QCheckBox::stateChanged,
+    connect( ui.valueholder_subtitles_overlay, &QtCheckboxChanged,
              this, &VLCProfileEditor::activatePanels );
     connect( ui.valueholder_vcodec_bitrate, &QSpinBox::editingFinished,
              this, &VLCProfileEditor::fixBirateState );
