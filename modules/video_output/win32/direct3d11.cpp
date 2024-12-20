@@ -532,6 +532,10 @@ static const auto ops = []{
 static int Open(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_HWND &&
+        vd->cfg->window->type != VLC_WINDOW_TYPE_DCOMP)
+        return VLC_ENOTSUP;
+
     vout_display_sys_t *sys = new (std::nothrow) vout_display_sys_t();
     if (!sys)
         return VLC_ENOMEM;
