@@ -357,7 +357,7 @@ public:
         std::size_t hash = qHash(media);
         auto it = std::find_if(
             m_items.begin(), m_items.end(),
-            [hash, &media](const NetworkDeviceItemPtr& item) {
+            [hash](const NetworkDeviceItemPtr& item) {
                 return item->id == hash;
             });
         if (it == m_items.end())
