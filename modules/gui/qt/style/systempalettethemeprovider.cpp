@@ -352,7 +352,6 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColorSetBg(obj, CS, VQTC_NAME_PRIMARY, QPalette::AlternateBase);
         setQtColorSetFg(obj, CS, VQTC_NAME_PRIMARY, QPalette::Text);
 
-        QColor textfieldBorder;
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_HOVERED, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_FOCUSED, inputBorderFocused);
@@ -378,7 +377,6 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColorSetBg(obj, CS, VQTC_NAME_PRIMARY, QPalette::AlternateBase);
         setQtColorSetFg(obj, CS, VQTC_NAME_PRIMARY, QPalette::Text);
 
-        QColor textfieldBorder;
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_HOVERED, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_FOCUSED, inputBorderFocused);
@@ -390,7 +388,6 @@ static int updatePalette(vlc_qt_theme_provider_t* obj)
         setQtColorSetBg(obj, CS, VQTC_NAME_PRIMARY, QPalette::AlternateBase);
         setQtColorSetFg(obj, CS, VQTC_NAME_PRIMARY, QPalette::Text);
 
-        QColor textfieldBorder;
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_NORMAL, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_HOVERED, inputBorderNormal);
         setQtColor(obj, CS, VQTC_SECTION_DECORATION, VQTC_NAME_BORDER, VQTC_STATE_FOCUSED, inputBorderFocused);
