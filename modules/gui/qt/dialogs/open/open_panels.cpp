@@ -572,7 +572,7 @@ void DiscOpenPanel::updateMRL()
     discPath = ui.deviceCombo->currentText();
 
     int tmp = ui.deviceCombo->findText( discPath );
-    if( tmp != -1 &&  ui.deviceCombo->itemData( tmp ) != QVariant::Invalid )
+    if( tmp != -1 &&  ui.deviceCombo->itemData( tmp ).isValid() )
         discPath = ui.deviceCombo->itemData( tmp ).toString();
 
     /* MRL scheme */
