@@ -22,7 +22,7 @@ import QtQuick.Templates as T
 import QtQuick.Layouts
 import QtQml.Models
 
-
+// import VLC.MainInterface // TODO: for vlcTick, not used for now due to Qt 6.2
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Playlist
@@ -47,6 +47,17 @@ T.Control {
     readonly property point dragPosition: mapFromItem(dropAreaLayout,
                                                       dropAreaLayout.dragPosition.x,
                                                       dropAreaLayout.dragPosition.y)
+
+    // Model roles:
+    required property int index
+    required property bool isCurrent
+    required property url artwork
+    required property url url
+    required property string artist
+    required property string album
+    required property string title
+    required property var duration // TODO: Qt 6.2 can not use value type vlcTick
+    required property bool preparsed
 
     // Optional
     property var contextMenu
@@ -122,7 +133,7 @@ T.Control {
             implicitHeight: parent.height * 3 / 4
 
             color: {
-                if (model.isCurrent)
+                if (delegate.isCurrent)
                     return theme.accent
 
                 // based on design, ColorContext can't handle this case
@@ -147,7 +158,7 @@ T.Control {
             Accessible.role: Accessible.Graphic
             Accessible.name: qsTr("Cover")
             Accessible.description: {
-                if (model.isCurrent) {
+                if (delegate.isCurrent) {
                     if (Player.playingState === Player.PLAYING_STATE_PLAYING)
                         return qsTr("Playing")
                     else if (Player.playingState === Player.PLAYING_STATE_PAUSED)
@@ -161,11 +172,11 @@ T.Control {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: model.preparsed ? targetSource : ""
+                source: delegate.preparsed ? targetSource : ""
                 visible: !statusIcon.visible
                 asynchronous: true
 
-                readonly property url targetSource: (model?.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
+                readonly property url targetSource: (delegate?.artwork.toString()) ? VLCAccessImage.uri(delegate.artwork) : VLCStyle.noArtAlbumCover
 
                 onStatusChanged: {
                     if (source !== VLCStyle.noArtAlbumCover && status === Image.Error)
@@ -194,7 +205,7 @@ T.Control {
                 id: statusIcon
 
                 anchors.centerIn: parent
-                visible: (model.isCurrent && text !== "")
+                visible: (delegate.isCurrent && text !== "")
                 color: theme.accent
                 text: {
                     if (Player.playingState === Player.PLAYING_STATE_PLAYING)
@@ -220,8 +231,8 @@ T.Control {
 
                 Layout.fillWidth: true
 
-                font.weight: model.isCurrent ? Font.Bold : Font.DemiBold
-                text: model.title || qsTr("Unknown Title")
+                font.weight: delegate.isCurrent ? Font.Bold : Font.DemiBold
+                text: delegate.title || qsTr("Unknown Title")
                 color: theme.fg.primary
             }
 
@@ -230,7 +241,7 @@ T.Control {
 
                 Layout.fillWidth: true
 
-                text: model.artist
+                text: delegate.artist
                 color: theme.fg.primary
             }
         }
@@ -238,7 +249,7 @@ T.Control {
         Widgets.ListLabel {
             id: textDuration
 
-            text: model.duration.formatHMS()
+            text: delegate.duration.formatHMS()
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             color: theme.fg.primary
