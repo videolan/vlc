@@ -44,6 +44,8 @@ public:
 
     Q_INVOKABLE bool isSubSecond() const;
 
+    Q_INVOKABLE bool isSubHour() const;
+
     /**
      * @brief formatHMS
      * @param formatFlags flags to specialize formatting, default is SubSecondFormattedAsMS for legacy reasons

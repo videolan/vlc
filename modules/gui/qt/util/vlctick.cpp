@@ -55,6 +55,11 @@ bool VLCTick::isSubSecond() const
     return (MS_FROM_VLC_TICK(m_ticks) < 1000);
 }
 
+bool VLCTick::isSubHour() const
+{
+    return (SEC_FROM_VLC_TICK(m_ticks) < 3600);
+}
+
 QString VLCTick::formatHMS(int formatFlags) const
 {
     if (m_ticks == VLC_TICK_INVALID)
