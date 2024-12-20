@@ -237,8 +237,6 @@ protected slots:
 
     void handleKeyPress( QKeyEvent * );
 
-    void showBuffering( float );
-
     void resizeStack( int w, int h )
     {
         if( !isFullScreen() && !isMaximized() && !b_isWindowTiled )

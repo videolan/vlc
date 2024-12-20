@@ -1286,12 +1286,6 @@ void MainInterface::showCryptedLabel( bool b_show )
     cryptedLabel->setVisible( b_show );
 }
 
-void MainInterface::showBuffering( float f_cache )
-{
-    QString amount = QString("Buffering: %1%").arg( (int)(100*f_cache) );
-    statusBar()->showMessage( amount, 1000 );
-}
-
 /*****************************************************************************
  * Systray Icon and Systray Menu
  *****************************************************************************/
