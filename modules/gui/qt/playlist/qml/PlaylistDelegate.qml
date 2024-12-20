@@ -241,7 +241,7 @@ T.Control {
 
                 Layout.fillWidth: true
 
-                text: delegate.artist
+                text: delegate.artist || (delegate.title.length === 0 ? delegate.url : "")
                 color: theme.fg.primary
             }
         }
