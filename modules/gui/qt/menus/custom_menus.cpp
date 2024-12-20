@@ -415,7 +415,7 @@ BookmarkMenu::BookmarkMenu(MediaLib * mediaLib, vlc_player_t * player, QWidget *
     : QMenu(parent)
 {
     // FIXME: Do we really need a translation call for the string shortcut ?
-    addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog, qtr("Ctrl+B"));
+    addAction(qtr("&Manage"), THEDP, &DialogsProvider::bookmarksDialog )->setShortcut(qtr("Ctrl+B"));
 
     addSeparator();
 

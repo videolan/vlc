@@ -82,14 +82,14 @@ OpenDialog::OpenDialog(qt_intf_t *_p_intf, QWindow* parent )
 
     /* Menu for the Play button */
     QMenu * openButtonMenu = new QMenu( "Open", playButton );
-    openButtonMenu->addAction( qtr( "&Enqueue" ), this, &OpenDialog::enqueue,
-                                    QKeySequence( "Alt+E" ) );
-    openButtonMenu->addAction( qtr( "&Play" ), this, &OpenDialog::play,
-                                    QKeySequence( "Alt+P" ) );
-    openButtonMenu->addAction( qtr( "&Stream" ), this, &OpenDialog::stream,
-                                    QKeySequence( "Alt+S" ) );
-    openButtonMenu->addAction( qtr( "C&onvert" ), this, &OpenDialog::transcode,
-                                    QKeySequence( "Alt+O" ) );
+    openButtonMenu->addAction( qtr( "&Enqueue" ), this, &OpenDialog::enqueue
+                                    )->setShortcut( QKeySequence( "Alt+E" ) );
+    openButtonMenu->addAction( qtr( "&Play" ), this, &OpenDialog::play
+                                    )->setShortcut( QKeySequence( "Alt+P" ) );
+    openButtonMenu->addAction( qtr( "&Stream" ), this, &OpenDialog::stream
+                                    )->setShortcut( QKeySequence( "Alt+S" ) );
+    openButtonMenu->addAction( qtr( "C&onvert" ), this, &OpenDialog::transcode
+                                    )->setShortcut( QKeySequence( "Alt+O" ) );
 
     playButton->setMenu( openButtonMenu );
 

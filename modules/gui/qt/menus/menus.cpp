@@ -87,20 +87,15 @@ QAction *addDPStaticEntry( QMenu *menu,
 #ifndef __APPLE__ /* We don't set icons in menus in MacOS X */
     if( !EMPTY_STR( icon ) )
     {
-        if( !EMPTY_STR( shortcut ) )
-            action = menu->addAction( QIcon( icon ), text, THEDP,
-                                      member, qfut( shortcut ) );
-        else
-            action = menu->addAction( QIcon( icon ), text, THEDP, member );
+        action = menu->addAction( QIcon( icon ), text, THEDP, member );
     }
     else
 #endif
     {
-        if( !EMPTY_STR( shortcut ) )
-            action = menu->addAction( text, THEDP, member, qfut( shortcut ) );
-        else
-            action = menu->addAction( text, THEDP, member );
+        action = menu->addAction( text, THEDP, member );
     }
+    if( !EMPTY_STR( shortcut ) )
+        action->setShortcut( qfut( shortcut ) );
 #ifdef __APPLE__
     action->setMenuRole( role );
 #else
@@ -343,7 +338,8 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> pl
 
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,
-            &MainCtx::toggleInterfaceFullScreen, QString( "F11" ) );
+            &MainCtx::toggleInterfaceFullScreen );
+    action->setShortcut( QString( "F11" ) );
     action->setCheckable( true );
     action->setChecked( mi->interfaceVisibility() == QWindow::FullScreen );
 
@@ -674,7 +670,8 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
     action->setIcon( QIcon( ":/menu/ic_fluent_skip_back_10.svg") );
 #endif
 
-    action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog, qtr( "Ctrl+T" ) );
+    action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog );
+    action->setShortcut( qtr( "Ctrl+T" ) );
 
     menu->addSeparator();
 }
