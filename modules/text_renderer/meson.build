@@ -68,8 +68,8 @@ vlc_modules += {
 vlc_modules += {
     'name' : 'svg',
     'sources' : files('svg.c'),
-    'dependencies' : [rsvg_dep],
-    'enabled' : rsvg_dep.found(),
+    'dependencies' : [rsvg_dep, cairo_dep],
+    'enabled' : rsvg_dep.found() and cairo_dep.found(),
 }
 
 # macOS text to speech
