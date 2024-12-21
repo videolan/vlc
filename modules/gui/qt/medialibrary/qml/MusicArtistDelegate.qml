@@ -26,6 +26,7 @@ import QtQml.Models
 
 import VLC.MediaLibrary
 
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Util
@@ -169,10 +170,12 @@ T.ItemDelegate {
 
             source: (model.cover) ? model.cover
                                   : VLCStyle.noArtArtistSmall
-            sourceSize.width: width * Screen.devicePixelRatio
-            sourceSize.height: height * Screen.devicePixelRatio
+            sourceSize.width: width * eDPR
+            sourceSize.height: height * eDPR
 
             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
+            readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
             Rectangle {
                 anchors.fill: parent
