@@ -649,6 +649,18 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     // rateChangeable
     [self setRateControlsEnabled:_playerController.rateChangable];
+    // seekable
+    _fwd.enabled = _playerController.seekable;
+    _jumpToTime.enabled = _playerController.seekable;
+    // rewindable
+    _bwd.enabled = _playerController.seekable || _playerController.rewindable;
+    // pausable
+    _play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
+        ? _playerController.pausable
+        : YES;
+    // recordable
+    _record.enabled = _playerController.recordable;
+    _voutMenuRecord.enabled = _playerController.recordable;
 }
 
 - (void)rebuildAoutMenu
