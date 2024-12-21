@@ -430,8 +430,6 @@
 
     [self.timeField setTime:timeString withRemainingTime:remainingTime];
     [self.trailingTimeField setTime:timeString withRemainingTime:remainingTime];
-    self.timeField.needsDisplay = YES;
-    self.trailingTimeField.needsDisplay = YES;
 }
 
 - (void)updateVolumeSlider:(NSNotification *)aNotification
