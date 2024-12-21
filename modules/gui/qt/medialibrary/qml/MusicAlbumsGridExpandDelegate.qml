@@ -126,8 +126,10 @@ FocusScope {
                 source: (root.model && root.model.cover && root.model.cover !== "")
                     ?  root.model.cover
                     : VLCStyle.noArtAlbumCover
-                sourceSize.width: width * Screen.devicePixelRatio
-                sourceSize.height: height * Screen.devicePixelRatio
+                sourceSize.width: width * eDPR
+                sourceSize.height: height * eDPR
+
+                readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
