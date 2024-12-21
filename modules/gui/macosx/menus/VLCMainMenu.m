@@ -225,7 +225,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                              object:nil];
     [notificationCenter addObserver:self
                            selector:@selector(voutListChanged:)
-                               name:VLCPlayerListOfVideoOutputThreadsChanged object:nil];
+                               name:VLCPlayerListOfVideoOutputThreadsChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(capabilitiesChanged:)
+                               name:VLCPlayerCapabilitiesChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -638,6 +643,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         self.windowMenu.autoenablesItems = NO;
         self.info.enabled = NO;
     }
+}
+
+- (void)capabilitiesChanged:(NSNotification *)notification
+{
+    // rateChangeable
+    [self setRateControlsEnabled:_playerController.rateChangable];
 }
 
 - (void)rebuildAoutMenu
