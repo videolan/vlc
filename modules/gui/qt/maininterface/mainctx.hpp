@@ -300,6 +300,34 @@ public:
         item->setFiltersChildMouseEvents(enable);
     }
 
+    Q_INVOKABLE qreal effectiveDevicePixelRatio(const QQuickWindow* window) {
+        if (window)
+            return window->effectiveDevicePixelRatio();
+        else
+        {
+            // This is useful when item no longer has window when getting removed from the scene,
+            // which happens when the view changes. We should return the same value so that the
+            // images are not loaded just before getting destroyed due to source size change.
+            // Different windows have the same device pixel ratio, so this should not be a
+            // problem. At the same time, don't use `QGuiApplication::devicePixelRatio()` as
+            // it is not valid on Wayland and we prefer to return 0.0 rather than an intermediate
+            // or invalid value here to intent not to load an image just to discard them afterwards.
+            const auto window = intfMainWindow();
+            const auto quickWindow = qobject_cast<QQuickWindow*>(window);
+            if (quickWindow)
+                return quickWindow->effectiveDevicePixelRatio();
+            else if (window)
+                return window->devicePixelRatio();
+        }
+
+        // Return 0.0 to indicate not to load the image, as we know that this is an intermediate
+        // situation and we don't want to load image just to discard them after there is a window.
+        // QQuickImage still loads image with (0, 0) source size, but at least we indicate our
+        // intention and this can be handled manually in the future if necessary. Currently,
+        // intfMainWindow() is always available, so in only rare cases this would return 0.0.
+        return 0.0;
+    }
+
     /**
      * @brief ask for the application to terminate
      */
