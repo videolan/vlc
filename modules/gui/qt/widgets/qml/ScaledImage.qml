@@ -25,10 +25,12 @@ import VLC.MainInterface
 
 Image {
     id: root
-    sourceSize: Qt.size(width * Screen.devicePixelRatio,
-                        height * Screen.devicePixelRatio)
+    sourceSize: Qt.size(width * eDPR,
+                        height * eDPR)
 
     property bool disableSmoothWhenIntegerUpscaling: false
+
+    readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
     Binding on smooth {
         when: root.disableSmoothWhenIntegerUpscaling &&
