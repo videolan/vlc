@@ -20,7 +20,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 
-
+import VLC.MainInterface
 import VLC.Widgets as Widgets
 import VLC.Style
 
@@ -39,6 +39,8 @@ Item {
     readonly property real effectiveRadius: image.visible ? image.effectiveRadius
                                                           : (fallbackImage.visible ? fallbackImage.effectiveRadius
                                                                                    : 0.0)
+
+    readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
     // Aliases
 
@@ -106,8 +108,8 @@ Item {
 
         anchors.fill: parent
 
-        sourceSize.width: root.pictureWidth * Screen.devicePixelRatio
-        sourceSize.height: root.pictureHeight * Screen.devicePixelRatio
+        sourceSize.width: root.pictureWidth * root.eDPR
+        sourceSize.height: root.pictureHeight * root.eDPR
 
         onStatusChanged: {
             if (status === Image.Loading) {
@@ -136,8 +138,8 @@ Item {
         // try to release the resources otherwise
         source: visible ? root.fallbackImageSource : ""
 
-        sourceSize.width: root.pictureWidth * Screen.devicePixelRatio
-        sourceSize.height: root.pictureHeight * Screen.devicePixelRatio
+        sourceSize.width: root.pictureWidth * root.eDPR
+        sourceSize.height: root.pictureHeight * root.eDPR
 
         cache: true
     }
