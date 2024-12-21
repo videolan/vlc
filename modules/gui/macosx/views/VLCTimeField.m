@@ -28,8 +28,8 @@
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
-NSString *VLCTimeFieldDisplayTimeAsElapsed = @"DisplayTimeAsTimeElapsed";
-NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
+NSString * const VLCTimeFieldDisplayTimeAsElapsed = @"DisplayTimeAsTimeElapsed";
+NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 @interface VLCTimeField ()
 {
