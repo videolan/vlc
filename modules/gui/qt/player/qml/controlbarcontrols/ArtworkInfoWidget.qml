@@ -162,7 +162,7 @@ AbstractButton {
                     return VLCStyle.noArtAlbumCover
             }
 
-            sourceSize.height: root.height * Screen.devicePixelRatio
+            sourceSize.height: root.height * MainCtx.effectiveDevicePixelRatio(Window.window)
 
             fillMode: Image.PreserveAspectFit
 
