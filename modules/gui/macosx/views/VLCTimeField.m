@@ -42,11 +42,8 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 + (void)initialize
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSDictionary *appDefaults = [NSDictionary dictionaryWithObjectsAndKeys:
-                                 @"NO", VLCTimeFieldDisplayTimeAsRemaining,
-                                 nil];
-
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    NSDictionary * const appDefaults = @{VLCTimeFieldDisplayTimeAsRemaining : @NO};
     [defaults registerDefaults:appDefaults];
 }
 
