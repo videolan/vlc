@@ -114,9 +114,11 @@ FocusScope {
 
                             anchors.fill: parent
                             source: model.thumbnail || VLCStyle.noArtVideoCover
-                            sourceSize.width: width * Screen.devicePixelRatio
-                            sourceSize.height: height * Screen.devicePixelRatio
+                            sourceSize.width: width * eDPR
+                            sourceSize.height: height * eDPR
                             radius: VLCStyle.gridCover_radius
+
+                            readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                             Widgets.DefaultShadow {
                                 anchors.centerIn: parent
