@@ -288,7 +288,28 @@ FocusScope {
                         width: (cover.sar < dar) ? parent.width :  parent.height * cover.sar
                         height: (cover.sar < dar) ? parent.width / cover.sar :  parent.height
 
-                        source: cover
+                        source: textureProviderItem
+
+                        Widgets.TextureProviderItem {
+                            // Texture indirection to fool Qt into not creating an implicit
+                            // ShaderEffectSource because source image does not have fill mode
+                            // stretch. "If needed, MultiEffect will internally generate a
+                            // ShaderEffectSource as the texture source.": Qt creates a layer
+                            // if source has children, source is image and does not have
+                            // fill mode stretch or source size is null. In this case,
+                            // we really don't need Qt to create an implicit layer.
+
+                            // Note that this item does not create a new texture, it simply
+                            // represents the source image provider.
+                            id: textureProviderItem
+
+                            // Do not set textureSubRect, because we don't want blur to be
+                            // updated everytime the viewport changes. It is better to have
+                            // the static source texture blurred once, and adjust the blur
+                            // than to blur each time the viewport changes.
+
+                            source: cover
+                        }
 
                         layer.enabled: true
                         layer.samplerName: "backgroundSource"
