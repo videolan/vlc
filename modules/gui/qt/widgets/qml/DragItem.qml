@@ -472,7 +472,9 @@ Item {
                 height: coverSize
                 radius: bg.radius
                 source: modelData.artwork ?? ""
-                sourceSize: dragItem.imageSourceSize ?? Qt.size(width * Screen.devicePixelRatio, height * Screen.devicePixelRatio)
+                sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
+
+                readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                 onStatusChanged: {
                     if (status === Image.Ready)
