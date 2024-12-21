@@ -47,9 +47,9 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
 }
 
 
-- (void)setRemainingIdentifier:(NSString *)identifier
+- (void)setIdentifier:(NSUserInterfaceItemIdentifier)identifier
 {
-    self.identifier = identifier;
+    [super setIdentifier:identifier];
     self.isTimeRemaining = [NSUserDefaults.standardUserDefaults boolForKey:self.identifier];
 }
 

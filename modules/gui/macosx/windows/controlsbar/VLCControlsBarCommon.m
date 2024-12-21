@@ -216,13 +216,13 @@
     self.muteVolumeButton.accessibilityLabel = self.muteVolumeButton.toolTip;
 
     self.timeField.needsDisplay = YES;
-    [self.timeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsElapsed];
+    self.timeField.identifier = VLCTimeFieldDisplayTimeAsElapsed;
     self.trailingTimeField.isTimeRemaining = NO;
     self.timeField.accessibilityLabel = _NS("Playback time");
 
     self.trailingTimeField.isTimeRemaining = !self.timeField.isTimeRemaining;
     self.trailingTimeField.needsDisplay = YES;
-    [self.trailingTimeField setRemainingIdentifier:VLCTimeFieldDisplayTimeAsRemaining];
+    self.timeField.identifier = VLCTimeFieldDisplayTimeAsRemaining;
     self.trailingTimeField.isTimeRemaining = YES;
     self.trailingTimeField.accessibilityLabel = _NS("Playback time");
 
