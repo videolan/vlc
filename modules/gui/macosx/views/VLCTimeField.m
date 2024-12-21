@@ -42,9 +42,8 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 + (void)initialize
 {
-    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     NSDictionary * const appDefaults = @{VLCTimeFieldDisplayTimeAsRemaining : @NO};
-    [defaults registerDefaults:appDefaults];
+    [NSUserDefaults.standardUserDefaults registerDefaults:appDefaults];
 }
 
 
@@ -65,7 +64,7 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
     [self updateTimeValue];
 }
 
-- (void)mouseDown: (NSEvent *)ourEvent
+- (void)mouseDown:(NSEvent *)ourEvent
 {
     if (ourEvent.clickCount > 1) {
         [VLCMain.sharedInstance.mainMenu goToSpecificTime:nil];
@@ -87,8 +86,9 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 - (void)updateTimeValue
 {
-    if (!_cachedTime || !_remainingTime)
+    if (!_cachedTime || !_remainingTime) {
         return;
+    }
 
     if (self.timeRemaining) {
         self.stringValue = _remainingTime;
