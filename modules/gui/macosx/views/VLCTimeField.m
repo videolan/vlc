@@ -59,7 +59,7 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
     _isTimeRemaining = isTimeRemaining;
 
     if (self.identifier) {
-        [NSUserDefaults.standardUserDefaults setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:self.identifier];
+        [NSUserDefaults.standardUserDefaults setBool:_isTimeRemaining forKey:self.identifier];
     }
 
     [self updateTimeValue];
