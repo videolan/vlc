@@ -33,7 +33,6 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 @interface VLCTimeField ()
 {
-    NSString *_identifier;
     NSString *_cachedTime;
     NSString *_remainingTime;
 }
@@ -54,16 +53,16 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 - (void)setRemainingIdentifier:(NSString *)identifier
 {
-    _identifier = identifier;
-    _isTimeRemaining = [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
+    self.identifier = identifier;
+    _isTimeRemaining = [NSUserDefaults.standardUserDefaults boolForKey:self.identifier];
 }
 
 - (void)setIsTimeRemaining:(BOOL)isTimeRemaining
 {
     _isTimeRemaining = isTimeRemaining;
 
-    if (_identifier) {
-        [[NSUserDefaults standardUserDefaults] setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:_identifier];
+    if (self.identifier) {
+        [NSUserDefaults.standardUserDefaults setObject:(_isTimeRemaining ? @"YES" : @"NO") forKey:self.identifier];
     }
 
     [self updateTimeValue];
@@ -72,7 +71,7 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 - (void)mouseDown: (NSEvent *)ourEvent
 {
     if ( [ourEvent clickCount] > 1 ) {
-        [VLCMain.sharedInstance.mainMenu goToSpecificTime: nil];
+        [VLCMain.sharedInstance.mainMenu goToSpecificTime:nil];
     } else {
         self.isTimeRemaining = !self.isTimeRemaining;
     }
@@ -111,10 +110,11 @@ NSString *VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaining";
 
 - (BOOL)timeRemaining
 {
-    if (_identifier)
-        return [[NSUserDefaults standardUserDefaults] boolForKey:_identifier];
-    else
+    if (self.identifier) {
+        return [NSUserDefaults.standardUserDefaults boolForKey:self.identifier];
+    } else {
         return _isTimeRemaining;
+    }
 }
 
 @end
