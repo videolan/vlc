@@ -1988,8 +1988,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                 mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
             }
             vout_Release(p_vout);
-            return YES;
         }
+        return p_vout != NULL;
     } else if (mi == self.openSubtitleFile || mi == self.voutMenuOpenSubtitleFile) {
         return YES;
     } else {
