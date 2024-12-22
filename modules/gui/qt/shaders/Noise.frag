@@ -36,4 +36,11 @@ void main() {
    float r = rand(qt_TexCoord0) - 0.5;
    vec4 noise = vec4(r,r,r,1.0) * strength;
    fragColor = noise * qt_Opacity;
+   // Noise should use additive blending (S + D) instead of the default source-over
+   // blending (S + D * (1 - S.a)). For that, set alpha to 0:
+   // Since it is premultiplied, alpha is already factored in the other channels
+   // and should be still respected. "If blending is enabled, source-over blending
+   // is used. However, additive blending can be achieved by outputting zero in the
+   // alpha channel."
+   fragColor.a = 0.0;
 }
