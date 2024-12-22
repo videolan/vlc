@@ -1941,11 +1941,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
 {
     NSMenuItem * const mi = (NSMenuItem *)item;
+
     if (mi == nil) {
         return YES;
-    }
-
-    if (mi == self.play) {
+    } else if (mi == self.play) {
         return _playerController.playerState == VLC_PLAYER_STATE_PLAYING
             ? _playerController.currentMedia != nil && _playerController.pausable
             : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
@@ -1973,16 +1972,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
         mi.state = _playerController.mute ? NSOnState : NSOffState;
         [self refreshAudioDeviceList];
-    } else if (mi == self.half_window           ||
-               mi == self.normal_window         ||
-               mi == self.double_window         ||
-               mi == self.fittoscreen           ||
-               mi == self.snapshot              ||
-               mi == self.voutMenusnapshot      ||
-               mi == self.fullscreenItem        ||
+    } else if (mi == self.fullscreenItem        ||
                mi == self.voutMenufullscreen    ||
                mi == self.floatontop) {
-
         vout_thread_t * const p_vout = _playerController.videoOutputThreadForKeyWindow;
         if (p_vout != NULL) {
             if (mi == self.floatontop) {
@@ -1993,8 +1985,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             vout_Release(p_vout);
         }
         return p_vout != NULL;
-    } else if (mi == self.openSubtitleFile || mi == self.voutMenuOpenSubtitleFile) {
-        return YES;
     } else if (mi == self.rate) {
         const BOOL enabled = _playerController.currentMedia && _playerController.rateChangable;
 
@@ -2034,6 +2024,30 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return enabled;
     } else if (mi == self.info) {
         return _playerController.currentMedia != nil;
+    } else if (mi == self.half_window               ||
+               mi == self.normal_window             ||
+               mi == self.double_window             ||
+               mi == self.fittoscreen               ||
+               mi == self.snapshot                  ||
+               mi == self.voutMenusnapshot          ||
+               mi == self.deinterlace               ||
+               mi == self.deinterlace_mode          ||
+               mi == self.screen                    ||
+               mi == self.aspect_ratio              ||
+               mi == self.crop                      ||
+               mi == self.postprocessing            ||
+               mi == self.openSubtitleFile          ||
+               mi == self.voutMenuOpenSubtitleFile  ||
+               mi == self.subtitle_bgcolor) {
+        return _playerController.currentMedia != nil && _playerController.activeVideoPlayback;
+    } else if (mi == self.subtitle_bgopacity) {
+        const BOOL enabled = _playerController.activeVideoPlayback;
+        self.subtitle_bgopacityLabel_gray.hidden = enabled;
+        self.subtitle_bgopacityLabel.hidden = !enabled;
+        self.subtitle_bgopacity_sld.enabled = enabled;
+        return enabled;
+    } else if (mi == self.teletext) {
+        return _playerController.currentMedia != nil && _playerController.teletextMenuAvailable;
     } else {
         NSMenuItem * const parent = mi.parentItem;
         if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
