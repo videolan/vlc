@@ -1967,7 +1967,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == self.next || mi == self.voutMenunext || mi == self.dockMenunext) {
         return _playQueueController.hasNextPlayQueueItem;
     } else if (mi == self.record || mi == self.voutMenuRecord) {
-        return _playerController.recordable;
+        return _playerController.currentMedia != nil && _playerController.recordable;
     } else if (mi == self.random) {
         const enum vlc_playlist_playback_order playbackOrder = _playQueueController.playbackOrder;
         mi.state = playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState;
@@ -1975,7 +1975,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         const BOOL state = _playQueueController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
         mi.state = state ? NSOnState : NSOffState;
     } else if (mi == self.fwd || mi == self.bwd || mi == self.jumpToTime) {
-        return _playerController.seekable;
+        return _playerController.currentMedia != nil && _playerController.seekable;
     } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
         mi.state = _playerController.mute ? NSOnState : NSOffState;
         [self refreshAudioDeviceList];
