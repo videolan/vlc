@@ -226,6 +226,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                            selector:@selector(voutListChanged:)
                                name:VLCPlayerListOfVideoOutputThreadsChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateRateControls:)
+                               name:VLCPlayerCapabilitiesChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -620,6 +624,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [self updateTrackHandlingMenus:notification];
     [self updateSubtitlesMenu:notification];
+    [self updateRateControls:notification];
 
     if (_playerController.currentMedia != nil) {
         [self rebuildAoutMenu];
@@ -741,6 +746,22 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     self.subtitle_bgopacityLabel_gray.hidden = enabled;
     self.subtitle_bgopacityLabel.hidden = !enabled;
     self.subtitle_bgopacity_sld.enabled = enabled;
+}
+
+- (void)updateRateControls:(NSNotification *)notification
+{
+    const BOOL enabled = [self validateUserInterfaceItem:self.rate];
+    self.rate_sld.enabled = enabled;
+
+    NSColor * const color = enabled
+        ? NSColor.controlTextColor
+        : NSColor.disabledControlTextColor;
+
+    self.rateLabel.textColor = color;
+    self.rate_slowerLabel.textColor = color;
+    self.rate_normalLabel.textColor = color;
+    self.rate_fasterLabel.textColor = color;
+    self.rateTextField.textColor = color;
 }
 
 #pragma mark - View
@@ -1914,23 +1935,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         }
         return p_vout != NULL;
     } else if (mi == self.rate) {
-        const BOOL enabled = _playerController.currentMedia && _playerController.rateChangable;
-
-        self.rate_sld.enabled = enabled;
-
-        NSColor * const color = enabled
-            ? NSColor.controlTextColor
-            : NSColor.disabledControlTextColor;
-
-        self.rateLabel.textColor = color;
-        self.rate_slowerLabel.textColor = color;
-        self.rate_normalLabel.textColor = color;
-        self.rate_fasterLabel.textColor = color;
-        self.rateTextField.textColor = color;
-
-        [self updatePlaybackRate];
-
-        return enabled;
+        return _playerController.currentMedia && _playerController.rateChangable;
     } else if (mi == self.info) {
         return _playerController.currentMedia != nil;
     } else if (mi == self.half_window               ||
