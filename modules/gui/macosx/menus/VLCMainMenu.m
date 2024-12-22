@@ -139,8 +139,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [_rateTextField setAlignment:NSLeftTextAlignment];
     }
 
-    [self setSubtitleSizeControlsEnabled:NO];
-
 #ifdef HAVE_SPARKLE
     [_checkForUpdate setAction:@selector(checkForUpdates:)];
     [_checkForUpdate setTarget:[SUUpdater sharedUpdater]];
@@ -641,16 +639,15 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     self.info.enabled = [self validateUserInterfaceItem:self.info];
     self.rate.enabled = [self validateUserInterfaceItem:self.rate];
+    self.subtitleSize.enabled = [self validateUserInterfaceItem:self.subtitleSize];
 
     if (_playerController.currentMedia != nil) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
-        [self setSubtitleSizeControlsEnabled:YES];
     } else {
         [_postprocessing setEnabled:NO];
         [self setAudioSubMenusEnabled:NO];
         [self setVideoMenuActiveVideo:NO];
-        [self setSubtitleSizeControlsEnabled:NO];
 
         self.windowMenu.autoenablesItems = NO;
     }
@@ -825,20 +822,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
     [_subtitle_bgopacity_sld setEnabled: b_enabled];
     [_teletext setEnabled:_playerController.teletextMenuAvailable];
-}
-
-- (void)setSubtitleSizeControlsEnabled:(BOOL)b_enabled
-{
-    [_subtitleSizeSlider setEnabled: b_enabled];
-    unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
-    [_subtitleSizeSlider setIntValue:scaleFactor];
-    [_subtitleSizeTextField setStringValue: [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.]];
-
-    NSColor *color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    [_subtitleSizeLabel setTextColor:color];
-    [_subtitleSizeSmallerLabel setTextColor:color];
-    [_subtitleSizeLargerLabel setTextColor:color];
-    [_subtitleSizeTextField setTextColor:color];
 }
 
 #pragma mark - View
