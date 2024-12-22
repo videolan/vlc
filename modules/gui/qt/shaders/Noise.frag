@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+layout(location = 0) in vec2 qt_TexCoord0;
+
 layout(location = 0) out vec4 fragColor;
 
 layout(std140, binding = 0) uniform buf {
@@ -31,7 +33,7 @@ float rand(vec2 co){
 }
 
 void main() {
-   float r = rand(gl_FragCoord.xy * gl_FragCoord.wz) - 0.5;
+   float r = rand(qt_TexCoord0) - 0.5;
    vec4 noise = vec4(r,r,r,1.0) * strength;
    fragColor = noise * qt_Opacity;
 }
