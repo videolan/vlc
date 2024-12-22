@@ -1922,23 +1922,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
         mi.state = _playerController.mute ? NSOnState : NSOffState;
         [self refreshAudioDeviceList];
-    } else if (mi == self.fullscreenItem        ||
-               mi == self.voutMenufullscreen    ||
-               mi == self.floatontop) {
-        vout_thread_t * const p_vout = _playerController.videoOutputThreadForKeyWindow;
-        if (p_vout != NULL) {
-            if (mi == self.floatontop) {
-                mi.state = var_GetBool(p_vout, "video-on-top") ? NSOnState : NSOffState;
-            } else if (mi == self.fullscreenItem || mi == self.voutMenufullscreen) {
-                mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
-            }
-            vout_Release(p_vout);
-        }
-        return p_vout != NULL;
-    } else if (mi == self.rate) {
-        return _playerController.currentMedia && _playerController.rateChangable;
-    } else if (mi == self.info) {
-        return _playerController.currentMedia != nil;
     } else if (mi == self.half_window               ||
                mi == self.normal_window             ||
                mi == self.double_window             ||
@@ -1951,7 +1934,26 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                mi == self.aspect_ratio              ||
                mi == self.crop                      ||
                mi == self.postprocessing            ||
-               mi == self.openSubtitleFile          ||
+               mi == self.fullscreenItem            ||
+               mi == self.voutMenufullscreen        ||
+               mi == self.floatontop) {
+        vout_thread_t * const p_vout = _playerController.videoOutputThreadForKeyWindow;
+        if (p_vout != NULL) {
+            if (mi == self.floatontop) {
+                mi.state = var_GetBool(p_vout, "video-on-top") ? NSOnState : NSOffState;
+            } else if (mi == self.fullscreenItem || mi == self.voutMenufullscreen) {
+                mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
+            }
+            vout_Release(p_vout);
+        }
+        return p_vout != NULL &&
+               _playerController.currentMedia != nil &&
+               _playerController.activeVideoPlayback;
+    } else if (mi == self.rate) {
+        return _playerController.currentMedia && _playerController.rateChangable;
+    } else if (mi == self.info) {
+        return _playerController.currentMedia != nil;
+    } else if (mi == self.openSubtitleFile          ||
                mi == self.voutMenuOpenSubtitleFile  ||
                mi == self.subtitleSize) {
         return _playerController.currentMedia != nil && _playerController.activeVideoPlayback;
