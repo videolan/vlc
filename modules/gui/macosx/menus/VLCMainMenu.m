@@ -1950,6 +1950,9 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
 {
     NSMenuItem * const mi = (NSMenuItem *)item;
+    if (mi == nil) {
+        return YES;
+    }
 
     if (mi == self.stop || mi == self.voutMenustop || mi == self.dockMenustop) {
         return _playQueueController.currentlyPlayingInputItem != nil;
