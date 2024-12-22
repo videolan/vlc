@@ -152,7 +152,6 @@ moc_headers = files(
     'widgets/native/mlfolderseditor.hpp',
     'widgets/native/searchlineedit.hpp',
     'widgets/native/viewblockingrectangle.hpp',
-    'widgets/native/noiserectangle.hpp',
 )
 
 if host_system == 'windows'
@@ -497,8 +496,6 @@ some_sources = files(
     'widgets/native/viewblockingrectangle.cpp',
     'widgets/native/viewblockingrectangle.hpp',
     'widgets/native/doubleclickignoringitem.hpp',
-    'widgets/native/noiserectangle.cpp',
-    'widgets/native/noiserectangle.hpp',
 )
 
 if host_system == 'windows'
