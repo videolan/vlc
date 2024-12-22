@@ -164,6 +164,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     [self mediaItemChanged:nil];
     [self capabilitiesChanged:nil];
+    [self playbackStateChanged:nil];
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
     [self updateLibraryPlayQueueMode];
