@@ -2049,6 +2049,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self updatePlaybackRate];
 
         return enabled;
+    } else if (mi == self.info) {
+        return _playerController.currentMedia != nil;
     } else {
         NSMenuItem * const parent = mi.parentItem;
         if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
