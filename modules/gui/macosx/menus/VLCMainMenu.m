@@ -226,22 +226,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                            selector:@selector(voutListChanged:)
                                name:VLCPlayerListOfVideoOutputThreadsChanged
                              object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(capabilitiesChanged:)
-                               name:VLCPlayerCapabilitiesChanged
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(playQueueChanged:)
-                               name:VLCPlayQueueItemsAdded
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(playQueueChanged:)
-                               name:VLCPlayQueueItemsRemoved
-                             object:nil];
-    [notificationCenter addObserver:self
-                           selector:@selector(playQueueChanged:)
-                               name:VLCPlayQueueCurrentItemIndexChanged
-                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
