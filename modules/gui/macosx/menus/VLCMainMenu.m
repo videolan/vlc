@@ -160,7 +160,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _sortPlayQueue.submenu = _playQueueSortingController.playQueueSortingMenu;
 
     [self mediaItemChanged:nil];
-    [self capabilitiesChanged:nil];
     [self playbackStateChanged:nil];
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
@@ -637,50 +636,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     [self updateTrackHandlingMenus:aNotification];
 
-    self.info.enabled = [self validateUserInterfaceItem:self.info];
-    self.rate.enabled = [self validateUserInterfaceItem:self.rate];
-    self.subtitleSize.enabled = [self validateUserInterfaceItem:self.subtitleSize];
-
     if (_playerController.currentMedia != nil) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
     } else {
-        [_postprocessing setEnabled:NO];
-        [self setAudioSubMenusEnabled:NO];
-        [self setVideoMenuActiveVideo:NO];
-
         self.windowMenu.autoenablesItems = NO;
     }
-}
-
-- (void)capabilitiesChanged:(NSNotification *)notification
-{
-    const BOOL validCurrentMedia = _playerController.currentMedia != nil;
-    // rateChangeable
-    self.rate.enabled = [self validateUserInterfaceItem:self.rate];
-    // seekable
-    self.fwd.enabled = validCurrentMedia && _playerController.seekable;
-    self.jumpToTime.enabled = validCurrentMedia && _playerController.seekable;
-    // rewindable
-    self.bwd.enabled =
-        validCurrentMedia &&
-        (_playerController.seekable || _playerController.rewindable);
-    // pausable
-    self.play.enabled = [self validateUserInterfaceItem:self.play];
-    // recordable
-    self.record.enabled = validCurrentMedia && _playerController.recordable;
-    self.voutMenuRecord.enabled = validCurrentMedia && _playerController.recordable;
-}
-
-- (void)playQueueChanged:(NSNotification *)notification
-{
-    self.play.enabled = [self validateUserInterfaceItem:self.play];
-    self.previous.enabled = _playQueueController.hasPreviousPlayQueueItem;
-    self.voutMenuprev.enabled = _playQueueController.hasPreviousPlayQueueItem;
-    self.dockMenuprevious.enabled = _playQueueController.hasPreviousPlayQueueItem;
-    self.next.enabled = _playQueueController.hasPreviousPlayQueueItem;
-    self.voutMenunext.enabled = _playQueueController.hasPreviousPlayQueueItem;
-    self.dockMenuprevious.enabled = _playQueueController.hasPreviousPlayQueueItem;
 }
 
 - (void)rebuildAoutMenu
@@ -701,7 +662,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                        var:"visual"
                   selector:@selector(toggleVar:)];
     aout_Release(p_aout);
-    [self setAudioSubMenusEnabled:YES];
 }
 
 - (void)voutListChanged:(NSNotification *)aNotification
@@ -745,9 +705,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     vout_Release(p_vout);
 
     [self refreshVoutDeviceMenu:nil];
-
-    const BOOL activeVideoPlayback = _playerController.activeVideoPlayback;
-    [self setVideoMenuActiveVideo:activeVideoPlayback];
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)notification
@@ -776,48 +733,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget: self];
     }
     [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSOnState];
-}
-
-- (void)setAudioSubMenusEnabled:(BOOL)enabled
-{
-    [_visual setEnabled: enabled];
-    [_channels setEnabled: enabled];
-}
-
-- (void)setVideoMenuActiveVideo:(BOOL)activeVideo
-{
-    if (_videoMenu.autoenablesItems) {
-        _videoMenu.autoenablesItems = NO;
-    }
-
-    _snapshot.enabled = activeVideo;
-    [self setVideoSubmenusEnabled:activeVideo];
-}
-
-- (void)setVideoSubmenusEnabled:(BOOL)enabled
-{
-    [_deinterlace setEnabled: enabled];
-    [_deinterlace_mode setEnabled: enabled];
-    [_screen setEnabled: enabled];
-    [_aspect_ratio setEnabled: enabled];
-    [_crop setEnabled: enabled];
-    [_postprocessing setEnabled: enabled];
-    [self setSubtitleMenuEnabled: enabled];
-}
-
-- (void)setSubtitleMenuEnabled:(BOOL)b_enabled
-{
-    [_openSubtitleFile setEnabled: b_enabled];
-    [_voutMenuOpenSubtitleFile setEnabled: b_enabled];
-    if (b_enabled) {
-        [_subtitle_bgopacityLabel_gray setHidden: YES];
-        [_subtitle_bgopacityLabel setHidden: NO];
-    } else {
-        [_subtitle_bgopacityLabel_gray setHidden: NO];
-        [_subtitle_bgopacityLabel setHidden: YES];
-    }
-    [_subtitle_bgopacity_sld setEnabled: b_enabled];
-    [_teletext setEnabled:_playerController.teletextMenuAvailable];
 }
 
 #pragma mark - View
@@ -1558,20 +1473,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
-    const enum vlc_player_state playerState = _playerController.playerState;
-
-    self.stop.enabled = playerState != VLC_PLAYER_STATE_STOPPED;
-
     switch (_playerController.playerState) {
         case VLC_PLAYER_STATE_PLAYING:
             [self setPause];
             break;
-
-        case VLC_PLAYER_STATE_STOPPED:
-            [self setVideoMenuActiveVideo:NO];
-            [self setAudioSubMenusEnabled:NO];
-            NS_FALLTHROUGH;
-
         default:
             [self setPlay];
             break;
