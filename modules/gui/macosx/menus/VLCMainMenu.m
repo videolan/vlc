@@ -1949,76 +1949,63 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
 {
-    BOOL enabled = YES;
     NSMenuItem * const mi = (NSMenuItem *)item;
-    VLCInputItem *inputItem = _playQueueController.currentlyPlayingInputItem;
 
-    if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
-        if (!inputItem)
-            enabled = NO;
-    } else if (mi == _previous          ||
-               mi == _voutMenuprev      ||
-               mi == _dockMenuprevious) {
-        enabled = _playQueueController.hasPreviousPlayQueueItem;
-    } else if (
-               mi == _next              ||
-               mi == _voutMenunext      ||
-               mi == _dockMenunext) {
-        enabled = _playQueueController.hasNextPlayQueueItem;
-    } else if (mi == _record || mi == _voutMenuRecord) {
-        enabled = _playerController.recordable;
-    } else if (mi == _random) {
-        enum vlc_playlist_playback_order playbackOrder = [_playQueueController playbackOrder];
-        [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
-    } else if (mi == _quitAfterPB) {
-        BOOL state = _playQueueController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
-        [mi setState: state ? NSOnState : NSOffState];
-    } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
-        enabled = _playerController.seekable;
-    } else if (mi == _mute || mi == _dockMenumute || mi == _voutMenumute) {
-        [mi setState: _playerController.mute ? NSOnState : NSOffState];
+    if (mi == self.stop || mi == self.voutMenustop || mi == self.dockMenustop) {
+        return _playQueueController.currentlyPlayingInputItem != nil;
+    } else if (mi == self.previous || mi == self.voutMenuprev || mi == self.dockMenuprevious) {
+        return _playQueueController.hasPreviousPlayQueueItem;
+    } else if (mi == self.next || mi == self.voutMenunext || mi == self.dockMenunext) {
+        return _playQueueController.hasNextPlayQueueItem;
+    } else if (mi == self.record || mi == self.voutMenuRecord) {
+        return _playerController.recordable;
+    } else if (mi == self.random) {
+        const enum vlc_playlist_playback_order playbackOrder = _playQueueController.playbackOrder;
+        mi.state = playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState;
+    } else if (mi == self.quitAfterPB) {
+        const BOOL state = _playQueueController.actionAfterStop == VLC_PLAYLIST_MEDIA_STOPPED_EXIT;
+        mi.state = state ? NSOnState : NSOffState;
+    } else if (mi == self.fwd || mi == self.bwd || mi == self.jumpToTime) {
+        return _playerController.seekable;
+    } else if (mi == self.mute || mi == self.dockMenumute || mi == self.voutMenumute) {
+        mi.state = _playerController.mute ? NSOnState : NSOffState;
         [self refreshAudioDeviceList];
-    } else if (mi == _half_window           ||
-               mi == _normal_window         ||
-               mi == _double_window         ||
-               mi == _fittoscreen           ||
-               mi == _snapshot              ||
-               mi == _voutMenusnapshot      ||
-               mi == _fullscreenItem        ||
-               mi == _voutMenufullscreen    ||
-               mi == _floatontop
-               ) {
+    } else if (mi == self.half_window           ||
+               mi == self.normal_window         ||
+               mi == self.double_window         ||
+               mi == self.fittoscreen           ||
+               mi == self.snapshot              ||
+               mi == self.voutMenusnapshot      ||
+               mi == self.fullscreenItem        ||
+               mi == self.voutMenufullscreen    ||
+               mi == self.floatontop) {
 
-        vout_thread_t *p_vout = [_playerController videoOutputThreadForKeyWindow];
+        vout_thread_t * const p_vout = _playerController.videoOutputThreadForKeyWindow;
         if (p_vout != NULL) {
-            if (mi == _floatontop)
-                [mi setState: var_GetBool(p_vout, "video-on-top")];
-
-            if (mi == _fullscreenItem || mi == _voutMenufullscreen)
-                [mi setState: _playerController.fullscreen];
-
-            enabled = YES;
+            if (mi == self.floatontop) {
+                mi.state = var_GetBool(p_vout, "video-on-top") ? NSOnState : NSOffState;
+            } else if (mi == self.fullscreenItem || mi == self.voutMenufullscreen) {
+                mi.state = _playerController.fullscreen ? NSOnState : NSOffState;
+            }
             vout_Release(p_vout);
+            return YES;
         }
-
-    } else if (mi == _openSubtitleFile || mi == _voutMenuOpenSubtitleFile) {
-        enabled = YES;
+    } else if (mi == self.openSubtitleFile || mi == self.voutMenuOpenSubtitleFile) {
+        return YES;
     } else {
-        NSMenuItem *_parent = [mi parentItem];
-        if (_parent == _subtitle_textcolor || mi == _subtitle_textcolor ||
-            _parent == _subtitle_bgcolor || mi == _subtitle_bgcolor     ||
-            _parent == _subtitle_bgopacity || mi == _subtitle_bgopacity ||
-            _parent == _subtitle_outlinethickness || mi == _subtitle_outlinethickness
-            ) {
-            enabled = _openSubtitleFile.isEnabled;
-        } else if (_parent == _teletext || mi == _teletext) {
-            enabled = _playerController.teletextMenuAvailable;
+        NSMenuItem * const parent = mi.parentItem;
+        if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
+            parent == self.subtitle_bgcolor || mi == self.subtitle_bgcolor     ||
+            parent == self.subtitle_bgopacity || mi == self.subtitle_bgopacity ||
+            parent == self.subtitle_outlinethickness || mi == self.subtitle_outlinethickness) {
+
+            return self.openSubtitleFile.isEnabled;
+        } else if (parent == self.teletext || mi == self.teletext) {
+            return _playerController.teletextMenuAvailable;
         }
     }
 
-    inputItem = nil;
-
-    return enabled;
+    return YES;
 }
 
 @end
