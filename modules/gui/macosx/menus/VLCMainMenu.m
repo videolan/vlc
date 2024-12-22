@@ -666,9 +666,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         validCurrentMedia &&
         (_playerController.seekable || _playerController.rewindable);
     // pausable
-    self.play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
-        ? validCurrentMedia && _playerController.pausable
-        : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+    self.play.enabled = [self validateUserInterfaceItem:self.play];
     // recordable
     self.record.enabled = validCurrentMedia && _playerController.recordable;
     self.voutMenuRecord.enabled = validCurrentMedia && _playerController.recordable;
@@ -676,9 +674,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playQueueChanged:(NSNotification *)notification
 {
-    self.play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
-        ? _playerController.pausable
-        : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+    self.play.enabled = [self validateUserInterfaceItem:self.play];
     self.previous.enabled = _playQueueController.hasPreviousPlayQueueItem;
     self.voutMenuprev.enabled = _playQueueController.hasPreviousPlayQueueItem;
     self.dockMenuprevious.enabled = _playQueueController.hasPreviousPlayQueueItem;
