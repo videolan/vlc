@@ -1949,8 +1949,13 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return _playerController.playerState == VLC_PLAYER_STATE_PLAYING
             ? _playerController.currentMedia != nil && _playerController.pausable
             : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
-    } else if (mi == self.stop || mi == self.voutMenustop || mi == self.dockMenustop) {
-        return _playerController.playerState != VLC_PLAYER_STATE_STOPPED;
+    } else if (mi == self.stop ||
+               mi == self.voutMenustop ||
+               mi == self.dockMenustop ||
+               mi == self.visual ||
+               mi == self.channels) {
+        return _playerController.currentMedia &&
+               _playerController.playerState != VLC_PLAYER_STATE_STOPPED;
     } else if (mi == self.previous || mi == self.voutMenuprev || mi == self.dockMenuprevious) {
         return _playQueueController.hasPreviousPlayQueueItem;
     } else if (mi == self.next || mi == self.voutMenunext || mi == self.dockMenunext) {
