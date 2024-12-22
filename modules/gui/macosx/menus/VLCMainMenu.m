@@ -2029,6 +2029,25 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self updatePlaybackRate];
 
         return enabled;
+    } else if (mi == self.subtitleSize) {
+        const BOOL enabled = _playerController.currentMedia;
+
+        self.subtitleSizeSlider.enabled = enabled;
+
+        const unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
+        self.subtitleSizeSlider.intValue = scaleFactor;
+        self.subtitleSizeTextField.stringValue =
+            [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.];
+
+        NSColor * const color = enabled
+            ? NSColor.controlTextColor
+            : NSColor.disabledControlTextColor;
+        self.subtitleSizeLabel.textColor = color;
+        self.subtitleSizeSmallerLabel.textColor = color;
+        self.subtitleSizeLargerLabel.textColor = color;
+        self.subtitleSizeTextField.textColor = color;
+
+        return enabled;
     } else if (mi == self.info) {
         return _playerController.currentMedia != nil;
     } else {
