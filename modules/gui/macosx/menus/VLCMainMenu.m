@@ -139,7 +139,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [_rateTextField setAlignment:NSLeftTextAlignment];
     }
 
-    [self setRateControlsEnabled:NO];
     [self setSubtitleSizeControlsEnabled:NO];
 
 #ifdef HAVE_SPARKLE
@@ -642,17 +641,16 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
     VLCInputItem * const inputItem = _playerController.currentMedia;
     self.info.enabled = inputItem != nil;
+    self.rate.enabled = [self validateUserInterfaceItem:self.rate];
 
     if (inputItem != nil) {
         [self rebuildAoutMenu];
         [self rebuildVoutMenu];
-        [self setRateControlsEnabled:_playerController.rateChangable];
         [self setSubtitleSizeControlsEnabled:YES];
     } else {
         [_postprocessing setEnabled:NO];
         [self setAudioSubMenusEnabled:NO];
         [self setVideoMenuActiveVideo:NO];
-        [self setRateControlsEnabled:NO];
         [self setSubtitleSizeControlsEnabled:NO];
 
         self.windowMenu.autoenablesItems = NO;
@@ -663,7 +661,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 {
     const BOOL validCurrentMedia = _playerController.currentMedia != nil;
     // rateChangeable
-    [self setRateControlsEnabled:validCurrentMedia && _playerController.rateChangable];
+    self.rate.enabled = [self validateUserInterfaceItem:self.rate];
     // seekable
     self.fwd.enabled = validCurrentMedia && _playerController.seekable;
     self.jumpToTime.enabled = validCurrentMedia && _playerController.seekable;
@@ -828,19 +826,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
     [_subtitle_bgopacity_sld setEnabled: b_enabled];
     [_teletext setEnabled:_playerController.teletextMenuAvailable];
-}
-
-- (void)setRateControlsEnabled:(BOOL)b_enabled
-{
-    [_rate_sld setEnabled: b_enabled];
-    [self updatePlaybackRate];
-
-    NSColor *color = b_enabled ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
-    [_rateLabel setTextColor:color];
-    [_rate_slowerLabel setTextColor:color];
-    [_rate_normalLabel setTextColor:color];
-    [_rate_fasterLabel setTextColor:color];
-    [_rateTextField setTextColor:color];
 }
 
 - (void)setSubtitleSizeControlsEnabled:(BOOL)b_enabled
