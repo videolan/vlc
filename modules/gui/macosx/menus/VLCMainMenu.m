@@ -657,7 +657,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     // pausable
     _play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
         ? _playerController.pausable
-        : YES;
+        : _playerController.currentMedia != nil;
     // recordable
     _record.enabled = _playerController.recordable;
     _voutMenuRecord.enabled = _playerController.recordable;
