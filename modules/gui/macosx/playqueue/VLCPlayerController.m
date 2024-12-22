@@ -835,6 +835,7 @@ static int BossCallback(vlc_object_t *p_this,
 
     [self resumeOtherAudioPlaybackApps];
     _playbackHasTruelyEndedTimer = nil;
+    _currentMedia = nil;
 }
 
 - (void)stopOtherAudioPlaybackApps
