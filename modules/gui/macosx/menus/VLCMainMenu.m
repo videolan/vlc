@@ -2031,6 +2031,24 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return p_vout != NULL;
     } else if (mi == self.openSubtitleFile || mi == self.voutMenuOpenSubtitleFile) {
         return YES;
+    } else if (mi == self.rate) {
+        const BOOL enabled = _playerController.currentMedia && _playerController.rateChangable;
+
+        self.rate_sld.enabled = enabled;
+
+        NSColor * const color = enabled
+            ? NSColor.controlTextColor
+            : NSColor.disabledControlTextColor;
+
+        self.rateLabel.textColor = color;
+        self.rate_slowerLabel.textColor = color;
+        self.rate_normalLabel.textColor = color;
+        self.rate_fasterLabel.textColor = color;
+        self.rateTextField.textColor = color;
+
+        [self updatePlaybackRate];
+
+        return enabled;
     } else {
         NSMenuItem * const parent = mi.parentItem;
         if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
