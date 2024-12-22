@@ -1944,11 +1944,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 @end
 
-@implementation VLCMainMenu (NSMenuValidation)
+@implementation VLCMainMenu (NSUserInterfaceValidations)
 
-- (BOOL)validateMenuItem:(NSMenuItem *)mi
+- (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
 {
     BOOL enabled = YES;
+    NSMenuItem * const mi = (NSMenuItem *)item;
     VLCInputItem *inputItem = _playQueueController.currentlyPlayingInputItem;
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
