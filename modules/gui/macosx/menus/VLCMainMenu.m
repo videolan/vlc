@@ -1953,6 +1953,12 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         return enabled;
     } else if (mi == self.teletext) {
         return _playerController.currentMedia != nil && _playerController.teletextMenuAvailable;
+    } else if (mi == self.voutMenuAudiotrack) {
+        return _playerController.audioTracks.count > 0;
+    } else if (mi == self.voutMenuVideotrack) {
+        return _playerController.videoTracks.count > 0;
+    } else if (mi == self.voutMenuSubtitlestrack) {
+        return _playerController.subtitleTracks.count > 0;
     } else {
         NSMenuItem * const parent = mi.parentItem;
         if (parent == self.subtitle_textcolor || mi == self.subtitle_textcolor ||
