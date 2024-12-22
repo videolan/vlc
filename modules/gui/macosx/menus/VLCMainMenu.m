@@ -162,6 +162,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     _sortPlayQueue.submenu = _playQueueSortingController.playQueueSortingMenu;
 
     [self mediaItemChanged:nil];
+    [self capabilitiesChanged:nil];
     [self updateTitleAndChapterMenus:nil];
     [self updateProgramMenu:nil];
     [self updateLibraryPlayQueueMode];
