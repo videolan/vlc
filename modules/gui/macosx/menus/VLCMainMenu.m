@@ -632,9 +632,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 #pragma mark - Interface update
 
-- (void)mediaItemChanged:(NSNotification *)aNotification
+- (void)mediaItemChanged:(NSNotification *)notification
 {
-    [self updateTrackHandlingMenus:aNotification];
+    [self updateTrackHandlingMenus:notification];
+    [self updateSubtitlesMenu:notification];
 
     if (_playerController.currentMedia != nil) {
         [self rebuildAoutMenu];
@@ -733,6 +734,29 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [menuItem setTarget: self];
     }
     [[submenu itemWithTag: var_InheritInteger(getIntf(), "macosx-vdev")] setState: NSOnState];
+}
+
+- (void)updateSubtitlesMenu:(NSNotification *)notification
+{
+    const BOOL enabled = [self validateUserInterfaceItem:self.openSubtitleFile];
+    self.subtitleSizeSlider.enabled = enabled;
+
+    const unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
+    self.subtitleSizeSlider.intValue = scaleFactor;
+    self.subtitleSizeTextField.stringValue =
+        [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.];
+
+    NSColor * const color = enabled
+        ? NSColor.controlTextColor
+        : NSColor.disabledControlTextColor;
+    self.subtitleSizeLabel.textColor = color;
+    self.subtitleSizeSmallerLabel.textColor = color;
+    self.subtitleSizeLargerLabel.textColor = color;
+    self.subtitleSizeTextField.textColor = color;
+
+    self.subtitle_bgopacityLabel_gray.hidden = enabled;
+    self.subtitle_bgopacityLabel.hidden = !enabled;
+    self.subtitle_bgopacity_sld.enabled = enabled;
 }
 
 #pragma mark - View
@@ -1923,25 +1947,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
         [self updatePlaybackRate];
 
         return enabled;
-    } else if (mi == self.subtitleSize) {
-        const BOOL enabled = _playerController.currentMedia;
-
-        self.subtitleSizeSlider.enabled = enabled;
-
-        const unsigned int scaleFactor = _playerController.subtitleTextScalingFactor;
-        self.subtitleSizeSlider.intValue = scaleFactor;
-        self.subtitleSizeTextField.stringValue =
-            [NSString stringWithFormat:@"%.2fx", scaleFactor / 100.];
-
-        NSColor * const color = enabled
-            ? NSColor.controlTextColor
-            : NSColor.disabledControlTextColor;
-        self.subtitleSizeLabel.textColor = color;
-        self.subtitleSizeSmallerLabel.textColor = color;
-        self.subtitleSizeLargerLabel.textColor = color;
-        self.subtitleSizeTextField.textColor = color;
-
-        return enabled;
     } else if (mi == self.info) {
         return _playerController.currentMedia != nil;
     } else if (mi == self.half_window               ||
@@ -1958,14 +1963,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                mi == self.postprocessing            ||
                mi == self.openSubtitleFile          ||
                mi == self.voutMenuOpenSubtitleFile  ||
-               mi == self.subtitle_bgcolor) {
+               mi == self.subtitleSize) {
         return _playerController.currentMedia != nil && _playerController.activeVideoPlayback;
-    } else if (mi == self.subtitle_bgopacity) {
-        const BOOL enabled = _playerController.activeVideoPlayback;
-        self.subtitle_bgopacityLabel_gray.hidden = enabled;
-        self.subtitle_bgopacityLabel.hidden = !enabled;
-        self.subtitle_bgopacity_sld.enabled = enabled;
-        return enabled;
     } else if (mi == self.teletext) {
         return _playerController.currentMedia != nil && _playerController.teletextMenuAvailable;
     } else if (mi == self.voutMenuAudiotrack) {
@@ -1981,7 +1980,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
             parent == self.subtitle_bgopacity || mi == self.subtitle_bgopacity ||
             parent == self.subtitle_outlinethickness || mi == self.subtitle_outlinethickness) {
 
-            return self.openSubtitleFile.isEnabled;
+            return [self validateUserInterfaceItem:self.openSubtitleFile];
         } else if (parent == self.teletext || mi == self.teletext) {
             return _playerController.teletextMenuAvailable;
         }
