@@ -11,7 +11,6 @@ shader_sources = [
     'FadingEdgeX.vert',
     'FadingEdgeY.vert',
     'Noise.frag',
-    'Noise.vert',
     'RectFilter.frag',
     'SubTexture.vert',
     'PlayerBlurredBackground.frag',
