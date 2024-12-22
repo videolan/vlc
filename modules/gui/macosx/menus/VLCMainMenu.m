@@ -234,6 +234,18 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                            selector:@selector(capabilitiesChanged:)
                                name:VLCPlayerCapabilitiesChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playQueueChanged:)
+                               name:VLCPlayQueueItemsAdded
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playQueueChanged:)
+                               name:VLCPlayQueueItemsRemoved
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playQueueChanged:)
+                               name:VLCPlayQueueCurrentItemIndexChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf
                     target:VLC_OBJECT(getIntf())
@@ -666,6 +678,19 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     // recordable
     self.record.enabled = validCurrentMedia && _playerController.recordable;
     self.voutMenuRecord.enabled = validCurrentMedia && _playerController.recordable;
+}
+
+- (void)playQueueChanged:(NSNotification *)notification
+{
+    self.play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
+        ? _playerController.pausable
+        : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
+    self.previous.enabled = _playQueueController.hasPreviousPlayQueueItem;
+    self.voutMenuprev.enabled = _playQueueController.hasPreviousPlayQueueItem;
+    self.dockMenuprevious.enabled = _playQueueController.hasPreviousPlayQueueItem;
+    self.next.enabled = _playQueueController.hasPreviousPlayQueueItem;
+    self.voutMenunext.enabled = _playQueueController.hasPreviousPlayQueueItem;
+    self.dockMenuprevious.enabled = _playQueueController.hasPreviousPlayQueueItem;
 }
 
 - (void)rebuildAoutMenu
