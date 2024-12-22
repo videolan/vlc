@@ -45,6 +45,7 @@
 #import "panels/VLCTimeSelectionPanelController.h"
 
 #import "playqueue/VLCPlayQueueController.h"
+#import "playqueue/VLCPlayQueueModel.h"
 #import "playqueue/VLCPlayerController.h"
 #import "playqueue/VLCPlayQueueSortingMenuController.h"
 #import "preferences/VLCSimplePrefsController.h"
@@ -657,7 +658,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     // pausable
     self.play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
         ? _playerController.pausable
-        : _playerController.currentMedia != nil;
+        : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
     // recordable
     self.record.enabled = _playerController.recordable;
     self.voutMenuRecord.enabled = _playerController.recordable;
