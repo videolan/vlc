@@ -1975,10 +1975,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     }
 }
 
-@end
-
-@implementation VLCMainMenu (NSUserInterfaceValidations)
-
 - (BOOL)validateUserInterfaceItem:(id<NSValidatedUserInterfaceItem>)item
 {
     NSMenuItem * const mi = (NSMenuItem *)item;

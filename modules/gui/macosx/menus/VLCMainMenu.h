@@ -27,7 +27,7 @@
 
 @class VLCRendererMenuController;
 
-@interface VLCMainMenu : NSObject
+@interface VLCMainMenu : NSObject<NSUserInterfaceValidations>
 
 /* main menu */
 @property (readwrite, weak) IBOutlet NSMenuItem *about;
