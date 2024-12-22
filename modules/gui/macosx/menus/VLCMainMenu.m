@@ -648,20 +648,23 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)capabilitiesChanged:(NSNotification *)notification
 {
+    const BOOL validCurrentMedia = _playerController.currentMedia != nil;
     // rateChangeable
-    [self setRateControlsEnabled:_playerController.rateChangable];
+    [self setRateControlsEnabled:validCurrentMedia && _playerController.rateChangable];
     // seekable
-    self.fwd.enabled = _playerController.seekable;
-    self.jumpToTime.enabled = _playerController.seekable;
+    self.fwd.enabled = validCurrentMedia && _playerController.seekable;
+    self.jumpToTime.enabled = validCurrentMedia && _playerController.seekable;
     // rewindable
-    self.bwd.enabled = _playerController.seekable || _playerController.rewindable;
+    self.bwd.enabled =
+        validCurrentMedia &&
+        (_playerController.seekable || _playerController.rewindable);
     // pausable
     self.play.enabled = _playerController.playerState == VLC_PLAYER_STATE_PLAYING
-        ? _playerController.pausable
+        ? validCurrentMedia && _playerController.pausable
         : _playQueueController.playQueueModel.numberOfPlayQueueItems > 0;
     // recordable
-    self.record.enabled = _playerController.recordable;
-    self.voutMenuRecord.enabled = _playerController.recordable;
+    self.record.enabled = validCurrentMedia && _playerController.recordable;
+    self.voutMenuRecord.enabled = validCurrentMedia && _playerController.recordable;
 }
 
 - (void)rebuildAoutMenu
