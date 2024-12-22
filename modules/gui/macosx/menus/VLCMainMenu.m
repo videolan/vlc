@@ -1569,6 +1569,10 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)playbackStateChanged:(NSNotification *)aNotification
 {
+    const enum vlc_player_state playerState = _playerController.playerState;
+
+    self.stop.enabled = playerState != VLC_PLAYER_STATE_STOPPED;
+
     switch (_playerController.playerState) {
         case VLC_PLAYER_STATE_PLAYING:
             [self setPause];
