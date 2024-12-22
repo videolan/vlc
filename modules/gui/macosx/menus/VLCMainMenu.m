@@ -895,23 +895,38 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 #pragma mark - track handling
 - (void)updateTrackHandlingMenus:(NSNotification *)aNotification
 {
-    NSArray *tracks = _playerController.audioTracks;
-    NSUInteger numberOfTracks = tracks.count;
-    [self rebuildTracksMenu:_audiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
-    [self rebuildTracksMenu:_voutMenuAudiotrackMenu withMetadata:tracks count:numberOfTracks category:AUDIO_ES];
-    _voutMenuAudiotrack.enabled = _audiotrack.enabled = numberOfTracks > 0 ? YES : NO;
+    NSArray * const audioTracks = _playerController.audioTracks;
+    const NSUInteger numberOfAudioTracks = audioTracks.count;
+    [self rebuildTracksMenu:self.audiotrackMenu
+               withMetadata:audioTracks
+                      count:numberOfAudioTracks
+                   category:AUDIO_ES];
+    [self rebuildTracksMenu:self.voutMenuAudiotrackMenu
+               withMetadata:audioTracks
+                      count:numberOfAudioTracks
+                   category:AUDIO_ES];
 
-    tracks = _playerController.videoTracks;
-    numberOfTracks = tracks.count;
-    [self rebuildTracksMenu:_videotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
-    [self rebuildTracksMenu:_voutMenuVideotrackMenu withMetadata:tracks count:numberOfTracks category:VIDEO_ES];
-    _voutMenuVideotrack.enabled = _videotrack.enabled = numberOfTracks > 0 ? YES : NO;
+    NSArray * const videoTracks = _playerController.videoTracks;
+    const NSUInteger numberOfVideoTracks = videoTracks.count;
+    [self rebuildTracksMenu:self.videotrackMenu
+               withMetadata:videoTracks
+                      count:numberOfVideoTracks
+                   category:VIDEO_ES];
+    [self rebuildTracksMenu:self.voutMenuVideotrackMenu
+               withMetadata:videoTracks
+                      count:numberOfVideoTracks
+                   category:VIDEO_ES];
 
-    tracks = _playerController.subtitleTracks;
-    numberOfTracks = tracks.count;
-    [self rebuildTracksMenu:_subtitle_tracksMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
-    [self rebuildTracksMenu:_voutMenuSubtitlestrackMenu withMetadata:tracks count:numberOfTracks category:SPU_ES];
-    _voutMenuSubtitlestrack.enabled = _subtitle_track.enabled = numberOfTracks > 0 ? YES : NO;
+    NSArray * const subtitleTracks = _playerController.subtitleTracks;
+    const NSUInteger numberOfSubtitleTracks = subtitleTracks.count;
+    [self rebuildTracksMenu:self.subtitle_tracksMenu
+               withMetadata:subtitleTracks
+                      count:numberOfSubtitleTracks
+                   category:SPU_ES];
+    [self rebuildTracksMenu:self.voutMenuSubtitlestrackMenu
+               withMetadata:subtitleTracks
+                      count:numberOfSubtitleTracks
+                   category:SPU_ES];
 }
 
 - (void)rebuildTracksMenu:(NSMenu *)menu
