@@ -623,7 +623,6 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 - (void)mediaItemChanged:(NSNotification *)notification
 {
     [self updateTrackHandlingMenus:notification];
-    [self updateSubtitlesMenu:notification];
     [self updateRateControls:notification];
 
     if (_playerController.currentMedia != nil) {
@@ -922,7 +921,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 }
 
 #pragma mark - track handling
-- (void)updateTrackHandlingMenus:(NSNotification *)aNotification
+- (void)updateTrackHandlingMenus:(NSNotification *)notification
 {
     NSArray * const audioTracks = _playerController.audioTracks;
     const NSUInteger numberOfAudioTracks = audioTracks.count;
@@ -956,6 +955,8 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
                withMetadata:subtitleTracks
                       count:numberOfSubtitleTracks
                    category:SPU_ES];
+
+    [self updateSubtitlesMenu:notification];
 }
 
 - (void)rebuildTracksMenu:(NSMenu *)menu
