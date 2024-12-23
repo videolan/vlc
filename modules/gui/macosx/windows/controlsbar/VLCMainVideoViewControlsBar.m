@@ -66,6 +66,9 @@
     self.videoButton.toolTip = _NS("Video settings");
     self.videoButton.accessibilityLabel = self.videoButton.toolTip;
 
+    self.playbackRateButton.toolTip = _NS("Playback rate");
+    self.playbackRateButton.accessibilityLabel = self.playbackRateButton.toolTip;
+
     _playQueueController = VLCMain.sharedInstance.playQueueController;
     _playerController = _playQueueController.playerController;
 
