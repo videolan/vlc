@@ -168,6 +168,9 @@
                                                             <constraint firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="AFi-Xg-yDe"/>
                                                             <constraint firstAttribute="width" constant="32" id="Nvo-dk-KyW"/>
                                                         </constraints>
+                                                        <connections>
+                                                            <action selector="openPlaybackRate:" target="3" id="tLQ-DO-783"/>
+                                                        </connections>
                                                     </button>
                                                     <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="95O-Oc-zrQ" customClass="VLCImageButton">
                                                         <rect key="frame" x="37" y="-1" width="32" height="33"/>

@@ -121,6 +121,14 @@
     }
 }
 
+- (IBAction)openPlaybackRate:(id)sender
+{
+    NSMenu * const playbackMenu = VLCMain.sharedInstance.mainMenu.controlsMenu;
+    [playbackMenu popUpMenuPositioningItem:nil
+                                atLocation:self.playbackRateButton.frame.origin
+                                    inView:((NSView *)sender).superview];
+}
+
 - (IBAction)openBookmarks:(id)sender
 {
     [VLCMain.sharedInstance.bookmarks toggleWindow:sender];

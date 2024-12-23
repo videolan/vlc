@@ -33,6 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSButton *floatOnTopButton;
 @property (readwrite, weak) IBOutlet NSButton *playbackRateButton;
 
+- (IBAction)openPlaybackRate:(id)sender;
 - (IBAction)openBookmarks:(id)sender;
 - (IBAction)openSubtitlesMenu:(id)sender;
 - (IBAction)openAudioMenu:(id)sender;
