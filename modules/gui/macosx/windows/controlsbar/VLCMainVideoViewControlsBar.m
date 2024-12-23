@@ -78,6 +78,10 @@
                            selector:@selector(playbackRateChanged:)
                                name:VLCPlayerRateChanged
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playbackRateChanged:)
+                               name:VLCPlayerCapabilitiesChanged
+                             object:nil];
 
     [self update];
 }
