@@ -144,10 +144,19 @@
 
 - (IBAction)openPlaybackRate:(id)sender
 {
-    NSMenu * const playbackMenu = VLCMain.sharedInstance.mainMenu.controlsMenu;
-    [playbackMenu popUpMenuPositioningItem:nil
-                                atLocation:self.playbackRateButton.frame.origin
-                                    inView:((NSView *)sender).superview];
+    // Present a slider for changing playback rate, rely on button to display rate
+    NSSlider * const playbackRateSlider = [[NSSlider alloc] init];
+    playbackRateSlider.frame = NSMakeRect(0, 0, 272, 17);
+
+    NSMenuItem * const menuItem = [[NSMenuItem alloc] init];
+    menuItem.title = _NS("Playback rate");
+    menuItem.view = playbackRateSlider;
+
+    NSMenu * const menu = [[NSMenu alloc] initWithTitle:_NS("Playback rate")];
+    [menu addItem:menuItem];
+    [menu popUpMenuPositioningItem:nil
+                        atLocation:self.playbackRateButton.frame.origin
+                            inView:((NSView *)sender).superview];
 }
 
 - (IBAction)openBookmarks:(id)sender
