@@ -137,8 +137,8 @@
 
 - (void)updatePlaybackRateButton
 {
-    self.playbackRateButton.stringValue =
-        [NSString stringWithFormat:@"%.2fx", _playerController.playbackRate];
+    self.playbackRateButton.title =
+        [NSString stringWithFormat:@"%.1fx", _playerController.playbackRate];
     self.playbackRateButton.enabled = _playerController.rateChangable;
 }
 
