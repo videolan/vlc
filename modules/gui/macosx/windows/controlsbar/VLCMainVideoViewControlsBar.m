@@ -144,9 +144,12 @@
 
 - (IBAction)openPlaybackRate:(id)sender
 {
-    // Present a slider for changing playback rate, rely on button to display rate
     NSSlider * const playbackRateSlider = [[NSSlider alloc] init];
     playbackRateSlider.frame = NSMakeRect(0, 0, 272, 17);
+    playbackRateSlider.target = self;
+    playbackRateSlider.action = @selector(rateSliderAction:);
+    playbackRateSlider.minValue = -34.;
+    playbackRateSlider.maxValue = 34.;
 
     NSMenuItem * const menuItem = [[NSMenuItem alloc] init];
     menuItem.title = _NS("Playback rate");
@@ -157,6 +160,12 @@
     [menu popUpMenuPositioningItem:nil
                         atLocation:self.playbackRateButton.frame.origin
                             inView:((NSView *)sender).superview];
+}
+
+- (IBAction)rateSliderAction:(id)sender
+{
+    NSSlider * const slider = (NSSlider *)sender;
+    _playerController.playbackRate = pow(2, (double)slider.intValue / 17);
 }
 
 - (IBAction)openBookmarks:(id)sender
