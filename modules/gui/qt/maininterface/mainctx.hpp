@@ -482,7 +482,7 @@ signals:
     void pinVideoControlsChanged();
     void pinOpacityChanged();
 
-    void hasAcrylicSurfaceChanged();
+    void hasAcrylicSurfaceChanged(bool);
 
     void minimalViewChanged();
 

@@ -420,6 +420,7 @@ bool CompositorX11RenderWindow::startRendering()
     connect(this, &CompositorX11RenderWindow::registerVideoWindow, m_renderTask, &RenderTask::onRegisterVideoWindow);
     connect(this, &CompositorX11RenderWindow::videoSurfaceChanged, m_renderTask, &RenderTask::onVideoSurfaceChanged, Qt::BlockingQueuedConnection);
     connect(this, &CompositorX11RenderWindow::hasExtendedFrameChanged, m_renderTask, &RenderTask::onExtendedFrameChanged, Qt::BlockingQueuedConnection);
+    connect(this, &CompositorX11RenderWindow::acrylicChanged, m_renderTask, &RenderTask::onAcrylicChanged);
     //pass initial values
     m_renderTask->onInterfaceSurfaceChanged(m_interfaceClient.get());
     m_renderTask->onVideoSurfaceChanged(m_videoClient.get());
@@ -525,6 +526,16 @@ void CompositorX11RenderWindow::setVideoSize(const QSize& size)
         m_videoPosition.setSize(size * devicePixelRatio());
         emit videoPositionChanged(m_videoPosition);
     }
+}
+
+void CompositorX11RenderWindow::setAcrylic(bool value)
+{
+    if (m_hasAcrylic == value)
+        return;
+
+    m_hasAcrylic = value;
+
+    emit acrylicChanged(value);
 }
 
 void CompositorX11RenderWindow::setVideoWindow( QWindow* window)

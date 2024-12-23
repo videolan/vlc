@@ -541,7 +541,7 @@ void MainCtx::setHasAcrylicSurface(const bool v)
         return;
 
     m_hasAcrylicSurface = v;
-    emit hasAcrylicSurfaceChanged();
+    emit hasAcrylicSurfaceChanged(v);
 }
 
 void MainCtx::incrementIntfUserScaleFactor(bool increment)

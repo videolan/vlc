@@ -167,6 +167,7 @@ public:
     void setVideoSize(const QSize& size);
 
     inline bool hasAcrylic() const { return m_hasAcrylic; }
+    void setAcrylic(bool value);
     inline bool supportExtendedFrame() const { return m_supportExtendedFrame; }
 
     void setVideoWindow(QWindow* window);
@@ -185,6 +186,7 @@ signals:
     void visiblityChanged(bool visible);
     void registerVideoWindow(unsigned int xid);
     bool hasExtendedFrameChanged(bool hasExtendedFrame);
+    void acrylicChanged(bool value);
 
 protected:
     //override from QWindow

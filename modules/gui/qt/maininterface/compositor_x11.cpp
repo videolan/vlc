@@ -196,6 +196,8 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     setTransparentForMouseEvent(connection, m_videoWidget->winId());
     m_videoWidget->show();
 
+    connect(m_mainCtx, &MainCtx::hasAcrylicSurfaceChanged, m_renderWindow.get(), &CompositorX11RenderWindow::setAcrylic);
+
     m_qmlView = std::make_unique<CompositorX11UISurface>(m_renderWindow.get());
 
     m_qmlView->setFlag(Qt::WindowType::WindowTransparentForInput);
