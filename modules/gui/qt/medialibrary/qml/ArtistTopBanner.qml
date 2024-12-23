@@ -62,7 +62,18 @@ FocusScope {
         sourceSize: artist.cover ? Qt.size(Helpers.alignUp(Screen.desktopAvailableWidth, 32), 0)
                                  : undefined
         mipmap: !!artist.cover
-        fillMode: artist.cover ? Image.PreserveAspectCrop : Image.Tile
+        // Fill mode is stretch when blur effect is used, otherwise an implicit layer is created.
+        // Having the fill mode stretch does not have a side effect here, because source size
+        // is still calculated as to preserve the aspect ratio as height is left empty (0) and the
+        // image is not shown stretched because it is invisible when blur effect is used:
+        // "If only one dimension of the size is set to greater than 0, the other dimension is
+        //  set in proportion to preserve the source image's aspect ratio. (The fillMode is
+        //  independent of this.)". Unfortunately with old Qt versions we can not do this
+        // because it does not seem to create a layer when fill mode (tiling is wanted)
+        // is changed at a later point.
+        fillMode: artist.cover ? ((visible || (MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 5, 0))) ? Image.PreserveAspectCrop : Image.Stretch)
+                                : Image.Tile
+
         visible: layer.enabled
         cache: (source === VLCStyle.noArtArtist)
 
@@ -72,10 +83,42 @@ FocusScope {
         layer.textureSize: Qt.size(width * .75, height * .75)
     }
 
-    Widgets.BlurEffect {
+    Item {
         anchors.fill: background
-        source: background
-        radius: VLCStyle.dp(4, VLCStyle.scale)
+
+        // The texture is big, and the blur item should only draw the portion of it.
+        // If the blur effect creates an implicit layer, it properly adjusts the
+        // area that it needs to cover. However, as we don't want an additional
+        // layer that keeps getting updated every time the size changes, we feed
+        // the whole static texture. For that reason, we need clipping because
+        // the blur effect is applied to the whole texture and shown as whole:
+        clip: !blurEffect.sourceNeedsLayering
+
+        visible: !background.visible && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+
+        // This blur effect does not create an implicit layer that is updated
+        // each time the size changes. The source texture is static, so the blur
+        // is applied only once and we adjust the viewport through the parent item
+        // with clipping.
+        Widgets.BlurEffect {
+            id: blurEffect
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            // If source image is tiled, layering is necessary:
+            readonly property bool sourceNeedsLayering: (background.fillMode !== Image.Stretch) ||
+                                                        (MainCtx.qtVersion() < MainCtx.qtVersionCheck(6, 5, 0))
+
+            readonly property real aspectRatio: (background.implicitHeight / background.implicitWidth)
+
+            height: sourceNeedsLayering ? background.height : (aspectRatio * width)
+
+            source: background
+
+            radius: VLCStyle.dp(4, VLCStyle.scale)
+        }
     }
 
     Rectangle {
