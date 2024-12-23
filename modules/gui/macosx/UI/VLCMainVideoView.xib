@@ -164,9 +164,7 @@
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <constraints>
-                                                            <constraint firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="3jo-kY-LjO"/>
-                                                            <constraint firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="AFi-Xg-yDe"/>
-                                                            <constraint firstAttribute="width" constant="32" id="Nvo-dk-KyW"/>
+                                                            <constraint firstAttribute="width" constant="40" id="Nvo-dk-KyW"/>
                                                         </constraints>
                                                         <connections>
                                                             <action selector="openPlaybackRate:" target="3" id="tLQ-DO-783"/>
@@ -274,10 +272,6 @@
                                                         </connections>
                                                     </button>
                                                 </subviews>
-                                                <constraints>
-                                                    <constraint firstItem="GHq-pt-nIe" firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="ePT-93-ZIN"/>
-                                                    <constraint firstItem="GHq-pt-nIe" firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="kDm-GO-RV5"/>
-                                                </constraints>
                                                 <visibilityPriorities>
                                                     <integer value="1000"/>
                                                     <integer value="1000"/>
