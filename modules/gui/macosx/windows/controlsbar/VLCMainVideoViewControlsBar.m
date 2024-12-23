@@ -74,6 +74,10 @@
                            selector:@selector(floatOnTopChanged:)
                                name:VLCWindowFloatOnTopChangedNotificationName
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(playbackRateChanged:)
+                               name:VLCPlayerRateChanged
+                             object:nil];
 
     [self update];
 }
@@ -120,6 +124,11 @@
         self.floatOnTopButton.contentTintColor =
             floatOnTopEnabled ? NSColor.controlAccentColor : nil;
     }
+}
+
+- (void)playbackRateChanged:(NSNotification *)notification
+{
+    [self updatePlaybackRateButton];
 }
 
 - (void)updatePlaybackRateButton
