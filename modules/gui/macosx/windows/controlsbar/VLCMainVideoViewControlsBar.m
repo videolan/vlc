@@ -133,9 +133,9 @@
 
 - (void)updatePlaybackRateButton
 {
-    const double playbackRate =
-        VLCMain.sharedInstance.playQueueController.playerController.playbackRate;
-    self.playbackRateButton.stringValue = [NSString stringWithFormat:@"%.2fx", playbackRate];
+    self.playbackRateButton.stringValue =
+        [NSString stringWithFormat:@"%.2fx", _playerController.playbackRate];
+    self.playbackRateButton.enabled = _playerController.rateChangable;
 }
 
 - (IBAction)openPlaybackRate:(id)sender
