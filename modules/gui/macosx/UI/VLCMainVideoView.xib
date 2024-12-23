@@ -51,6 +51,7 @@
                 <outlet property="pipButton" destination="yEi-SZ-SIS" id="vFi-Ln-9lT"/>
                 <outlet property="pipButtonWidthConstraint" destination="dxa-Jx-T4p" id="a5S-ec-2xD"/>
                 <outlet property="playButton" destination="PCC-8a-sVF" id="ddT-ZM-Jhz"/>
+                <outlet property="playbackRateButton" destination="GHq-pt-nIe" id="k0k-fd-Vz5"/>
                 <outlet property="playingItemDisplayField" destination="lEW-MN-FFU" id="hKa-df-8UB"/>
                 <outlet property="subtitlesButton" destination="YTl-LZ-WDe" id="893-XB-eDY"/>
                 <outlet property="timeField" destination="3ri-8b-8mw" id="f0i-Gh-R8V"/>
@@ -156,8 +157,20 @@
                                             <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8F-hr-iaW">
                                                 <rect key="frame" x="0.0" y="0.0" width="254" height="32"/>
                                                 <subviews>
-                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="95O-Oc-zrQ" customClass="VLCImageButton">
+                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="GHq-pt-nIe" customClass="VLCImageButton">
                                                         <rect key="frame" x="0.0" y="-1" width="32" height="33"/>
+                                                        <buttonCell key="cell" type="recessed" title="1.0x" bezelStyle="recessed" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="pUr-pW-j5a">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <constraints>
+                                                            <constraint firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="3jo-kY-LjO"/>
+                                                            <constraint firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="AFi-Xg-yDe"/>
+                                                            <constraint firstAttribute="width" constant="32" id="Nvo-dk-KyW"/>
+                                                        </constraints>
+                                                    </button>
+                                                    <button wantsLayer="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="95O-Oc-zrQ" customClass="VLCImageButton">
+                                                        <rect key="frame" x="37" y="-1" width="32" height="33"/>
                                                         <buttonCell key="cell" type="recessed" bezelStyle="recessed" image="photo.tv" catalog="system" imagePosition="only" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyUpOrDown" inset="2" id="dnH-S4-sBc">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                             <font key="font" metaFont="system"/>
@@ -258,7 +271,12 @@
                                                         </connections>
                                                     </button>
                                                 </subviews>
+                                                <constraints>
+                                                    <constraint firstItem="GHq-pt-nIe" firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="ePT-93-ZIN"/>
+                                                    <constraint firstItem="GHq-pt-nIe" firstAttribute="width" secondItem="GHq-pt-nIe" secondAttribute="height" multiplier="1:1" id="kDm-GO-RV5"/>
+                                                </constraints>
                                                 <visibilityPriorities>
+                                                    <integer value="1000"/>
                                                     <integer value="1000"/>
                                                     <integer value="1000"/>
                                                     <integer value="1000"/>
@@ -268,6 +286,7 @@
                                                     <integer value="1000"/>
                                                 </visibilityPriorities>
                                                 <customSpacing>
+                                                    <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
                                                     <real value="3.4028234663852886e+38"/>
@@ -372,6 +391,7 @@
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="Xh5-1i-dxH"/>
                                             <constraint firstAttribute="width" secondItem="AXA-01-AU8" secondAttribute="height" multiplier="1:1" id="lgn-JT-8Qk"/>
+                                            <constraint firstAttribute="width" secondItem="AXA-01-AU8" secondAttribute="height" multiplier="1:1" id="tkp-uc-bfs"/>
                                         </constraints>
                                         <connections>
                                             <action selector="jumpBackward:" target="3" id="Kkq-12-jbm"/>
@@ -446,6 +466,7 @@
                                         <color key="contentTintColor" red="0.99999600649999998" green="1" blue="1" alpha="0.85338267140000001" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="OBA-WG-jaz"/>
+                                            <constraint firstAttribute="width" secondItem="aAq-uE-mLW" secondAttribute="height" multiplier="1:1" id="eMl-LK-UdE"/>
                                             <constraint firstAttribute="width" secondItem="aAq-uE-mLW" secondAttribute="height" multiplier="1:1" id="g5c-kh-jsZ"/>
                                         </constraints>
                                         <connections>
@@ -453,10 +474,6 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <constraints>
-                                    <constraint firstItem="aAq-uE-mLW" firstAttribute="width" secondItem="aAq-uE-mLW" secondAttribute="height" multiplier="1:1" id="eMl-LK-UdE"/>
-                                    <constraint firstItem="AXA-01-AU8" firstAttribute="width" secondItem="AXA-01-AU8" secondAttribute="height" multiplier="1:1" id="tkp-uc-bfs"/>
-                                </constraints>
                                 <visibilityPriorities>
                                     <integer value="1000"/>
                                     <integer value="1000"/>
