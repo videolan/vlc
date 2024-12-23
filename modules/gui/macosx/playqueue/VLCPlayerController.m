@@ -611,6 +611,8 @@ static int BossCallback(vlc_object_t *p_this,
         _aLoopPosition = -1;
         _bLoopPosition = -1;
 
+        _playbackRate = 1.0;
+
         libvlc_int_t *libvlc = vlc_object_instance(getIntf());
         var_AddCallback(libvlc, "intf-boss", BossCallback, (__bridge void *)self);
     }
