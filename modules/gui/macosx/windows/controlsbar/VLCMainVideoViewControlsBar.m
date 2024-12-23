@@ -150,6 +150,9 @@
     playbackRateSlider.action = @selector(rateSliderAction:);
     playbackRateSlider.minValue = -34.;
     playbackRateSlider.maxValue = 34.;
+    playbackRateSlider.sliderType = NSSliderTypeLinear;
+    playbackRateSlider.numberOfTickMarks = 17;
+    playbackRateSlider.controlSize = NSControlSizeSmall;
 
     NSMenuItem * const menuItem = [[NSMenuItem alloc] init];
     menuItem.title = _NS("Playback rate");
