@@ -275,27 +275,27 @@ static inline unsigned int stdc_first_leading_one_uc(unsigned char value)
 
 static inline unsigned int stdc_first_leading_zero_ull(unsigned long long value)
 {
-    return stdc_first_leading_one_ull(~value);
+    return stdc_leading_ones_ull(~value);
 }
 
 static inline unsigned int stdc_first_leading_zero_ul(unsigned long value)
 {
-    return stdc_first_leading_one_ul(~value);
+    return stdc_leading_ones_ul(~value);
 }
 
 static inline unsigned int stdc_first_leading_zero_ui(unsigned int value)
 {
-    return stdc_first_leading_one_ui(~value);
+    return stdc_leading_ones_ui(~value);
 }
 
 static inline unsigned int stdc_first_leading_zero_us(unsigned short value)
 {
-    return stdc_first_leading_one_us(~value);
+    return stdc_leading_ones_us(~value);
 }
 
 static inline unsigned int stdc_first_leading_zero_uc(unsigned char value)
 {
-    return stdc_first_leading_one_uc(~value);
+    return stdc_leading_ones_uc(~value);
 }
 
 #define stdc_first_leading_zero(value) \
