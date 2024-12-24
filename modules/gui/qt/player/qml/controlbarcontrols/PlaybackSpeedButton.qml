@@ -103,6 +103,8 @@ PopupIconToolButton {
 
             enabled: root.popup.contentItem && root.popup.contentItem.slider
 
+            gesturePolicy: TapHandler.ReleaseWithinBounds
+
             onTapped: (eventPoint, button) => {
                 root.popup.contentItem.slider.value = 0
             }
