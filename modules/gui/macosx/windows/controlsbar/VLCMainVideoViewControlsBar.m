@@ -157,6 +157,10 @@
     playbackRateSlider.numberOfTickMarks = 17;
     playbackRateSlider.controlSize = NSControlSizeSmall;
 
+    const double value = 17.0 * log(_playerController.playbackRate) / log(2.);
+    const int sliderIntValue = (int)((value > 0) ? value + 0.5 : value - 0.5);
+    playbackRateSlider.intValue = sliderIntValue;
+
     NSMenuItem * const menuItem = [[NSMenuItem alloc] init];
     menuItem.title = _NS("Playback rate");
     menuItem.view = playbackRateSlider;
