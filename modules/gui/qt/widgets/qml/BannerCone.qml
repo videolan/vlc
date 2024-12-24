@@ -30,8 +30,7 @@ Image {
     required property color color
     property alias csdMenuVisible: csdMenu.menuVisible
 
-    sourceSize.width: VLCStyle.icon_normal
-    sourceSize.height: VLCStyle.icon_normal
+    sourceSize: Qt.size(VLCStyle.icon_normal, VLCStyle.icon_normal)
 
     mipmap: MainCtx.useXmasCone()
     source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone for designs?
