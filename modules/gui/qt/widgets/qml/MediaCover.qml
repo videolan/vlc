@@ -108,8 +108,8 @@ Item {
 
         anchors.fill: parent
 
-        sourceSize.width: root.pictureWidth * root.eDPR
-        sourceSize.height: root.pictureHeight * root.eDPR
+        sourceSize: Qt.size(root.pictureWidth * root.eDPR,
+                            root.pictureHeight * root.eDPR)
 
         onStatusChanged: {
             if (status === Image.Loading) {
@@ -138,8 +138,8 @@ Item {
         // try to release the resources otherwise
         source: visible ? root.fallbackImageSource : ""
 
-        sourceSize.width: root.pictureWidth * root.eDPR
-        sourceSize.height: root.pictureHeight * root.eDPR
+        sourceSize: Qt.size(root.pictureWidth * root.eDPR,
+                            root.pictureHeight * root.eDPR)
 
         cache: true
     }
