@@ -28,8 +28,7 @@ Widgets.ImageToolButton {
 
     text: qsTr("A to B")
 
-    sourceSize.width: VLCStyle.icon_toolbar
-    sourceSize.height: VLCStyle.icon_toolbar
+    sourceSize: Qt.size(VLCStyle.icon_toolbar, VLCStyle.icon_toolbar)
 
     checked: Player.ABloopState !== Player.ABLOOP_STATE_NONE
     onClicked: Player.toggleABloopState()
