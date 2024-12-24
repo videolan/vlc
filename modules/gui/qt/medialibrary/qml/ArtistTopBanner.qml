@@ -104,8 +104,7 @@ FocusScope {
             Widgets.RoundImage {
                 id: roundImage
                 source: artist.cover || VLCStyle.noArtArtist
-                sourceSize.width: width * eDPR
-                sourceSize.height: height * eDPR
+                sourceSize: Qt.size(width * eDPR, height * eDPR)
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
