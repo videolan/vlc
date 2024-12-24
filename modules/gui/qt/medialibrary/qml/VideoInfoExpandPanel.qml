@@ -114,8 +114,7 @@ FocusScope {
 
                             anchors.fill: parent
                             source: model.thumbnail || VLCStyle.noArtVideoCover
-                            sourceSize.width: width * eDPR
-                            sourceSize.height: height * eDPR
+                            sourceSize: Qt.size(width * eDPR, height * eDPR)
                             radius: VLCStyle.gridCover_radius
 
                             readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
