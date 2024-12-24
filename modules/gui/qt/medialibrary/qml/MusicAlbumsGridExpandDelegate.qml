@@ -126,8 +126,7 @@ FocusScope {
                 source: (root.model && root.model.cover && root.model.cover !== "")
                     ?  root.model.cover
                     : VLCStyle.noArtAlbumCover
-                sourceSize.width: width * eDPR
-                sourceSize.height: height * eDPR
+                sourceSize: Qt.size(width * eDPR, height * eDPR)
 
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
