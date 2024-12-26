@@ -172,6 +172,15 @@ T.Control {
                         source = VLCStyle.noArtAlbumCover
                 }
 
+                Timer {
+                    running: (artwork.status === Image.Null)
+                    interval: VLCStyle.duration_long
+                    onTriggered: {
+                        // Remove the preparse guard, enough time has passed:
+                        artwork.source = Qt.binding(() => { return artwork.targetSource; })
+                    }
+                }
+
                 Widgets.DefaultShadow {
                     anchors.centerIn: parent
 
