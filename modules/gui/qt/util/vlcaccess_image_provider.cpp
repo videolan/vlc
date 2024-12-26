@@ -188,8 +188,14 @@ VLCAccessImage::VLCAccessImage(QObject* parent)
     : QObject(parent)
 {}
 
-QString VLCAccessImage::uri(QString path)
+QString VLCAccessImage::uri(const QString& path, const bool excludeLocalFileOrUnknownScheme)
 {
+    if (excludeLocalFileOrUnknownScheme)
+    {
+        const QUrl url(path);
+        if (url.scheme().isEmpty() || url.scheme() == QLatin1String("qrc") || url.scheme() == QLatin1String("file"))
+            return path;
+    }
     return VLCAccessImageProvider::wrapUri(path);
 }
 

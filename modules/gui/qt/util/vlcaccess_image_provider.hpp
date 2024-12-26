@@ -97,7 +97,7 @@ public:
      * @code
      *
      */
-    Q_INVOKABLE QString uri(QString path);
+    Q_INVOKABLE QString uri(const QString& path, bool excludeLocalFileOrUnknownScheme = true);
 
 };
 
