@@ -60,6 +60,8 @@ public:
 
     operator bool() const;
 
+    bool preparsed() const;
+
     vlc_playlist_item_t *raw() const {
         return d ? d->item.get() : nullptr;
     }

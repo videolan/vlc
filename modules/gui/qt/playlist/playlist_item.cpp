@@ -95,6 +95,12 @@ PlaylistItem::operator bool() const
     return d && d->item.get();
 }
 
+bool PlaylistItem::preparsed() const {
+    if (const auto item = inputItem())
+        return input_item_IsPreparsed(item);
+    return false;
+}
+
 
 //}
 //}
