@@ -278,6 +278,7 @@ QHash<int, QByteArray>
 PlaylistListModel::roleNames() const
 {
     return {
+        { PreparsedRole, "preparsed" },
         { TitleRole, "title" },
         { DurationRole, "duration" },
         { IsCurrentRole, "isCurrent" },
@@ -492,6 +493,8 @@ PlaylistListModel::data(const QModelIndex &index, int role) const
         return d->m_items[row].getArtwork();
     case UrlRole:
         return d->m_items[row].getUrl();
+    case PlaylistListModel::PreparsedRole:
+        return d->m_items[row].preparsed();
     default:
         return {};
     }
