@@ -161,9 +161,11 @@ T.Control {
 
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source: (model?.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
+                source: model.preparsed ? targetSource : ""
                 visible: !statusIcon.visible
                 asynchronous: true
+
+                readonly property url targetSource: (model?.artwork.toString()) ? VLCAccessImage.uri(model.artwork) : VLCStyle.noArtAlbumCover
 
                 onStatusChanged: {
                     if (source !== VLCStyle.noArtAlbumCover && status === Image.Error)
