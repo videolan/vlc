@@ -132,18 +132,22 @@ public:
 
     static int resizeBorderWidth(QWindow *window)
     {
+        // NOTE: When possible, Qt makes the application DPI aware, so `GetSystemMetrics()` would
+        //       already take the screen DPI into account.
         const int result = GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
         if (result > 0)
-            return qRound(static_cast<qreal>(result) / window->devicePixelRatio());
+            return qRound(static_cast<qreal>(result) * (window->devicePixelRatio() / window->screen()->devicePixelRatio()));
         else
             return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
     }
 
     static int resizeBorderHeight(QWindow *window)
     {
+        // NOTE: Qt makes the application DPI aware, so `GetSystemMetrics()` would already take
+        //       already take the screen DPI into account.
         const int result = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
         if (result > 0)
-            return qRound(static_cast<qreal>(result) / window->devicePixelRatio());
+            return qRound(static_cast<qreal>(result) * (window->devicePixelRatio() / window->screen()->devicePixelRatio()));
         else
             return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
     }
