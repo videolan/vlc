@@ -253,7 +253,37 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
             &CompositorDirectComposition::setup,
             Qt::SingleShotConnection);
 
-    m_quickView->create();
+    {
+        // Express the desire to use WS_EX_NOREDIRECTIONBITMAP, it has the following advantages:
+        // - Increased performance due to not having to copy buffers (within GPU, or inter GPU-CPU unlike WS_EX_LAYERED).
+        // - Win32 window background brush is invalidated, so window does not flash white when opened.
+        // - No more resize artifact until the opaque scene covers the new area when the window is resized.
+        // - Make it possible to use the Windows 11 22H2 native acrylic backdrop effect, because the white background does not remain as an artifact.
+        //   When the window has a frame (currently it is the case for both SSD and CSD), clear color does not clear that background, which means
+        //   that the window should not be exposed (transparent UI). Currently there is either the acrylic simulation visual in the background which is
+        //   completely opaque or the video visual or the UI visual does not get transparent, so we don't suffer from this issue. With `WS_EX_NOREDIRECTIONBITMAP`,
+        //   the background does not paint a rectangle with `WNDCLASSEX::hbrBackground`, even if `WS_EX_LAYERED` is not used, so we are fine. The scene graph
+        //   does not have anything in the window to clear, so clear color can be transparent which means that the UI can be transparent and expose the window
+        //   for the window to provide the (native) backdrop acrylic effect.
+
+        // WS_EX_NOREDIRECTIONBITMAP is only compatible with the flip swapchain model and D3D backend.
+        // In CompositorDirectComposition::init(), we already ensure that D3D is used (no OpenGL or Vulkan).
+        // Flip model is supported since Windows 8 and Qt does not use it only if the following environment
+        // variable is set. Since it targets Windows 10+, it does *not* check if flip model is supported and
+        // use the legacy swapchain model. For D3D12, flip model is always used.
+        const bool legacySwapchainModelIsExplicitlyWanted = qEnvironmentVariableIntValue("QT_D3D_NO_FLIP");
+
+        const char* const envDisableRedirectionSurface = "QT_QPA_DISABLE_REDIRECTION_SURFACE";
+        const bool redirectionSurfaceIsExplicitlyWanted = !qEnvironmentVariableIsEmpty(envDisableRedirectionSurface) && !qEnvironmentVariableIntValue(envDisableRedirectionSurface);
+
+        if (!legacySwapchainModelIsExplicitlyWanted && !redirectionSurfaceIsExplicitlyWanted)
+            qputenv(envDisableRedirectionSurface, "1"); // TODO: Other QQuickWindow (toolbar editor, independent popups)
+
+        m_quickView->create();
+
+        if (!legacySwapchainModelIsExplicitlyWanted && !redirectionSurfaceIsExplicitlyWanted)
+            qunsetenv(envDisableRedirectionSurface); // NOTE: We need to disable it, otherwise regular QWidget windows would have issues
+    }
 
     const bool ret = commonGUICreate(quickViewPtr, quickViewPtr, CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC);
 
