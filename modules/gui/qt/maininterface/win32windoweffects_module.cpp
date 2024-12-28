@@ -24,6 +24,7 @@
 #include <cassert>
 
 #include <dwmapi.h>
+#include <winuser.h>
 
 static bool isEffectAvailable(const QWindow* window, const WindowEffectsModule::Effect effect)
 {
@@ -50,8 +51,13 @@ static bool isEffectAvailable(const QWindow* window, const WindowEffectsModule::
         //       the custom solution has more chance to cause issues.
         if (!window->flags().testFlag(Qt::FramelessWindowHint))
         {
-            qDebug("Target window is not frameless, window can not be translucent for the Windows 11 22H2 native acrylic backdrop effect.");
-            return false;
+            const auto extendedStyle = GetWindowLong((HWND)window->winId(), GWL_EXSTYLE);
+            if (!(extendedStyle & 0x00200000L /* WS_EX_NOREDIRECTIONBITMAP */))
+            {
+                qDebug("Target window is not frameless and does not use WS_EX_NOREDIRECTIONBITMAP, " \
+                       "window can not be translucent for the Windows 11 22H2 native acrylic backdrop effect.");
+                return false;
+            }
         }
         return true;
     default:
