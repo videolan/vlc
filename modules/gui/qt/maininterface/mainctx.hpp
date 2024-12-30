@@ -270,6 +270,8 @@ public:
             return false; // Wayland is too buggy (tested with KWin 6.2), and there is no sign it'll improve by Qt 6.8.2 (QTBUG-131899).
         return true;
     }
+    
+    Q_INVOKABLE bool backdropBlurRequested() const { return var_InheritBool(p_intf, "qt-backdrop-blur"); }
 
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); }

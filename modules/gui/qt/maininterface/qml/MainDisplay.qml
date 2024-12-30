@@ -226,7 +226,8 @@ FocusScope {
 
                 color: theme.bg.primary
 
-                layer.enabled: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
+                layer.enabled: MainCtx.backdropBlurRequested() &&
+                               (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
                                (miniPlayer.visible || (loaderProgress.active && loaderProgress.item.visible))
 
                 layer.effect: Widgets.PartialEffect {
