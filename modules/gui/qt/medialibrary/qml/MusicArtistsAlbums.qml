@@ -154,9 +154,57 @@ FocusScope {
                 z: -1
 
                 anchors.fill: parent
-                anchors.bottomMargin: -artistList.displayMarginEnd
+
+                anchors.bottomMargin: usingAcrylic ? 0 : -artistList.displayMarginEnd
 
                 tintColor: artistList.colorContext.bg.secondary
+
+                Rectangle {
+                    // For the frosted glass effect to work properly, the content
+                    // (source) should be opaque. If there is inter-window backdrop
+                    // blur, this is not the case.
+
+                    // Note that beneath there is already (`stackViewParent`) a
+                    // background rectangle, but since `ViewBlockingRectangle` does
+                    // not use blending to block anything beneath in the scene graph
+                    // being rendered, the layered source essentially has transparent
+                    // area. Qt 5 (barely) allowed having layered items to have RGB
+                    // texture, but Qt 6 RHI mandates RGBA format
+                    // (`ShaderEffectSource.RGBA`).
+
+                    // For that reason, we need to restrict the extents of inter-window
+                    // backdrop blur (`AcrylicBackground`) to the beginning boundaries
+                    // of the area that is going to be blurred by `FrostedGlassEffect`.
+
+                    // This rectangle would not be necessary if there was a guarantee
+                    // that `stackViewParent`'s color is the same as
+                    // `artistListBackground.alternativeColor` as the `AcrylicBackground`
+                    // area is restricted, but since there is no such mandate this
+                    // rectangle can act as the opaque background provider with the
+                    // desired color.
+
+                    // Ideally the `FrostedGlassEffect` itself should have a base
+                    // rectangle that it places beneath the source, similar to
+                    // how it has a `filter` that it places on top of the source,
+                    // but this is not possible because `AcrylicBackground`/
+                    // `ViewBlockingRectangle` prevents anything beneath in the
+                    // scene graph to be rendered as it acts as a "pass through"
+                    // (for video visual PIP player case, or the window itself
+                    // for the inter-window backdrop blur case).
+
+                    // Background should be opaque, though here if it is translucent,
+                    // there is also another background provider `stackViewParent`
+                    // but its color may be different:
+                    color: Qt.alpha(artistListBackground.alternativeColor, 1.0)
+
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.bottom
+
+                    height: artistList.displayMarginEnd
+
+                    visible: (height > 0.0) && artistListBackground.usingAcrylic
+                }
             }
 
             // To get blur effect while scrolling in mainview
