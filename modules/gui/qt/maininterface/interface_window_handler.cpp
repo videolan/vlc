@@ -138,10 +138,10 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 InterfaceWindowHandler::~InterfaceWindowHandler()
 {
     m_window->removeEventFilter(this);
-    WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, false );
-    WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
     /* Save this size */
     QVLCTools::saveWindowPosition(getSettings(), m_window);
+    WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, false );
+    WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
 }
 
 void InterfaceWindowHandler::updateCSDWindowSettings()
