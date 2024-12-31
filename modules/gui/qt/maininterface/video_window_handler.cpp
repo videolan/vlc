@@ -62,7 +62,9 @@ void VideoWindowHandler::disable()
 
 void VideoWindowHandler::requestResizeVideo( unsigned i_width, unsigned i_height )
 {
-    emit askVideoToResize( i_width, i_height );
+    if (!m_window)
+        return;
+    emit askVideoToResize( i_width, i_height, m_window->windowStates() );
 }
 
 void VideoWindowHandler::requestVideoWindowed( )
@@ -81,11 +83,24 @@ void VideoWindowHandler::requestVideoState(  unsigned i_arg )
     emit askVideoOnTop( on_top );
 }
 
-void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h)
+void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h, Qt::WindowStates currentStates)
 {
     if (!m_window)
         return;
     Qt::WindowStates states = m_window->windowStates();
+
+    // This slot is queued, so by the time it is called
+    // the window states reflect the final states.
+    // `qt-video-autoresize` should not apply during state
+    // transition, that was also the behavior in VLC 3.
+    // Otherwise, when getting disengaged from fullscreen
+    // the interface/video would forget its old (overridden)
+    // size.
+
+    // Do not resize when transitioning between states:
+    if (currentStates != states)
+        return;
+
     if ((states & (Qt::WindowFullScreen | Qt::WindowMaximized)) == 0)
     {
         /* Resize video widget to video size, or keep it at the same

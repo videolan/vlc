@@ -48,13 +48,13 @@ public:
     void requestVideoFullScreen( const char * );
 
 signals:
-    void askVideoToResize( unsigned int, unsigned int );
+    void askVideoToResize( unsigned int, unsigned int, Qt::WindowStates );
     void askVideoSetFullScreen( bool );
     void askVideoOnTop( bool );
 
 protected slots:
     /* Manage the Video Functions from the vout threads */
-    void setVideoSize(unsigned int w, unsigned int h);
+    void setVideoSize(unsigned int w, unsigned int h, Qt::WindowStates states );
     virtual void setVideoFullScreen( bool );
     void setVideoOnTop( bool );
 
