@@ -140,8 +140,13 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
     m_window->removeEventFilter(this);
     /* Save this size */
     QVLCTools::saveWindowPosition(getSettings(), m_window);
-    WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, false );
-    WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
+    assert(qApp);
+    if (!qApp->property("isDying").toBool())
+    {
+        // If application is dying, we don't need to adjust the state
+        WindowStateHolder::holdOnTop( m_window,  WindowStateHolder::INTERFACE, false );
+        WindowStateHolder::holdFullscreen( m_window,  WindowStateHolder::INTERFACE, false );
+    }
 }
 
 void InterfaceWindowHandler::updateCSDWindowSettings()

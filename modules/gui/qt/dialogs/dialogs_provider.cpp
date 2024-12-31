@@ -127,6 +127,8 @@ QVariant DialogsProvider::getTextDialog(QWidget *parent,
 void DialogsProvider::quit()
 {
     b_isDying = true;
+    assert(qApp);
+    qApp->setProperty("isDying", true);
     libvlc_Quit( vlc_object_instance(p_intf) );
 }
 
