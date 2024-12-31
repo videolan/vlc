@@ -194,7 +194,7 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
 
     xcb_change_window_attributes(connection, m_videoWidget->winId(), mask, &values);
     setTransparentForMouseEvent(connection, m_videoWidget->winId());
-    m_videoWidget->show();
+    m_videoWidget->setVisible(true);
 
     connect(m_mainCtx, &MainCtx::hasAcrylicSurfaceChanged, m_renderWindow.get(), &CompositorX11RenderWindow::setAcrylic);
 
@@ -209,7 +209,7 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
     if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
         return false;
 
-    m_qmlView->show();
+    m_qmlView->setVisible(true);
 
     if (m_mainCtx->hasAcrylicSurface())
         m_renderWindow->m_hasAcrylic = true;

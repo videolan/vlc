@@ -97,9 +97,9 @@ bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx)
 
     m_rootWindow->installEventFilter(this);
 
-    m_rootWindow->show();
-    m_videoWindow->show();
-    m_quickWindow->show();
+    m_rootWindow->setVisible(true);
+    m_videoWindow->setVisible(true);
+    m_quickWindow->setVisible(true);
 
     m_quickWindow->raise(); // Make sure quick window is above the video window.
 

@@ -140,7 +140,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(), flags);
 
     if (ret)
-        m_qmlView->show();
+        m_qmlView->setVisible(true);
 
     return ret;
 }

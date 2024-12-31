@@ -1110,7 +1110,7 @@ bool WindowStateHolder::holdOnTop(QWindow *window, Source source, bool hold)
     {
 
         window->setFlags( newflags );
-        window->show(); /* necessary to apply window flags */
+        window->setVisible(true); /* necessary to apply window flags */
         //workaround: removing onTop state might drop fullscreen state
         window->setWindowStates(oldStates);
     }

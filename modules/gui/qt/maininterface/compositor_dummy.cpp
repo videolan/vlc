@@ -60,7 +60,7 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
     if (m_qmlWidget->status() != QQuickView::Ready)
         return false;
 
-    m_qmlWidget->show();
+    m_qmlWidget->setVisible(true);
 
     return true;
 }

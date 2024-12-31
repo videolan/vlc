@@ -352,7 +352,7 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
         setFlag(Qt::FramelessWindowHint);
 
     winId();
-    show();
+    setVisible(true);
 
     m_wid = winId();
 }

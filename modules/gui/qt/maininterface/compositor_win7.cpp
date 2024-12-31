@@ -84,7 +84,7 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
     m_stable->setAttribute( Qt::WA_ShowWithoutActivating );
     m_stable->setVisible(true);
 
-    m_videoWidget->show();
+    m_videoWidget->setVisible(true);
     m_videoWindowHWND = (HWND)m_videoWidget->winId();
 
     BOOL excluseFromPeek = TRUE;
@@ -106,7 +106,7 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
     const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
 
     if (ret)
-        m_qmlView->show();
+        m_qmlView->setVisible(true);
 
     return ret;
 }
@@ -178,7 +178,7 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
             m_videoWidget->hide();
         else
         {
-            m_videoWidget->show();
+            m_videoWidget->setVisible(true);
             m_videoWidget->setGeometry(m_qmlView->geometry());
             resetVideoZOrder();
         }
@@ -188,7 +188,7 @@ bool CompositorWin7::eventFilter(QObject*, QEvent* ev)
         resetVideoZOrder();
         break;
     case QEvent::Show:
-        m_videoWidget->show();
+        m_videoWidget->setVisible(true);
         resetVideoZOrder();
         break;
     case QEvent::Hide:
