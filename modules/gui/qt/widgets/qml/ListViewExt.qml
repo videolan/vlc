@@ -299,9 +299,33 @@ ListView {
             duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
+
+        onRunningChanged: {
+            if (!running) {
+                // This intends to clear the artifact (QTBUG-110969).
+                // Note that this does not help if items are not
+                // positioned correctly, for that x/y animation should
+                // not be used for add transitions.
+                const epsilon = 0.001
+                if (root.orientation === ListView.Vertical) {
+                    root.contentY -= epsilon
+                    root.contentY += epsilon
+                } else if (root.orientation === ListView.Horizontal) {
+                    root.contentX -= epsilon
+                    root.contentX += epsilon
+                }
+            }
+        }
     }
 
-    displaced: Transition {
+    // WARNING: Add displaced transition is disabled, because it is
+    //          often not executed properly, and causes items to have
+    //          incorrect positions. It is currently not possible to
+    //          recover from that situation. Fortunately move and
+    //          remove displaced seemingly are not affected from that
+    //          issue. See QTBUG-131106, QTBUG-89158, ...
+
+    moveDisplaced: Transition {
         NumberAnimation {
             // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
             property: "y"
@@ -309,6 +333,8 @@ ListView {
             easing.type: Easing.OutSine
         }
     }
+
+    removeDisplaced: moveDisplaced
 
     // Events
 
