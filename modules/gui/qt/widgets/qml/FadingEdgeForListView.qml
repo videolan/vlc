@@ -40,6 +40,9 @@ FadingEdge {
 
     readonly property bool transitionsRunning: (listView.add?.running ||
                                                 listView.addDisplaced?.running ||
+                                                listView.displaced?.running ||
+                                                listView.move?.running ||
+                                                listView.moveDisplaced?.running ||
                                                 listView.populate?.running ||
                                                 listView.remove?.running ||
                                                 listView.removeDisplaced?.running) ?? false
