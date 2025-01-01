@@ -328,7 +328,7 @@ ListView {
     moveDisplaced: Transition {
         NumberAnimation {
             // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
-            property: "y"
+            property: (root.orientation === ListView.Vertical) ? "y" : "x"
             duration: VLCStyle.duration_long
             easing.type: Easing.OutSine
         }
