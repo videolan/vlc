@@ -1,0 +1,33 @@
+From 4c1fb51e53f0df69684ea811080d7b9ab222cff1 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Wed, 1 Jan 2025 17:16:13 +0200
+Subject: [PATCH] Add missing null pointer check in QQuickPopup
+
+Otherwise in certain circumstances this causes
+null pointer dereference induced crash.
+
+This is only relevant when the new Qt 6.8 feature
+`popupType: Popup.Window` is used where it makes
+it possible for Quick Popups to have their own
+independent windows.
+---
+ src/quicktemplates/qquickpopup.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/quicktemplates/qquickpopup.cpp b/src/quicktemplates/qquickpopup.cpp
+index 85062f44fd..f85bcdd296 100644
+--- a/src/quicktemplates/qquickpopup.cpp
++++ b/src/quicktemplates/qquickpopup.cpp
+@@ -1104,7 +1104,8 @@ void QQuickPopupPrivate::adjustPopupItemParentAndWindow()
+             popupItem->setParentItem(popupWindow->contentItem());
+             popupItem->forceActiveFocus(Qt::PopupFocusReason);
+         }
+-        popupWindow->setVisible(visible);
++        if (popupWindow)
++            popupWindow->setVisible(visible);
+     } else {
+         if (visible) {
+             popupItem->setParentItem(overlay);
+-- 
+2.47.1
+
