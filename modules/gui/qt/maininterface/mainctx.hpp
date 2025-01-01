@@ -258,6 +258,19 @@ public:
 
     int mouseHideTimeout() const { return m_mouseHideTimeout; }
 
+    Q_INVOKABLE static inline bool useTopLevelWindowForToolTip() {
+        assert(qGuiApp);
+        if (QT_VERSION < QT_VERSION_CHECK(6, 8, 0))
+            return false; // Feature is not available
+#ifndef QT_STATIC // We have patched contrib Qt to fix both of the spotted Qt bugs
+        if (QT_VERSION < QT_VERSION_CHECK(6, 8, 2))
+            return false; // This feature was not tested properly upstream, and often causes crashes (QTBUG-131898, #28919).
+#endif
+        if (qGuiApp->platformName().startsWith(QLatin1String("wayland")))
+            return false; // Wayland is too buggy (tested with KWin 6.2), and there is no sign it'll improve by Qt 6.8.2 (QTBUG-131899).
+        return true;
+    }
+
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
     Q_INVOKABLE static inline void restoreCursor(void) { QApplication::restoreOverrideCursor(); }
 

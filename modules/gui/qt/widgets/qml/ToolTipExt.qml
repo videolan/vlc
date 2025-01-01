@@ -19,6 +19,7 @@
 import QtQuick
 import QtQuick.Templates as T
 
+import VLC.MainInterface
 import VLC.Style
 
 T.ToolTip {
@@ -40,9 +41,10 @@ T.ToolTip {
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutsideParent | T.Popup.CloseOnReleaseOutsideParent
 
     Component.onCompleted: {
-        if (typeof control.popupType === "number")
-            if (Qt.platform.pluginName !== "wayland") // FIXME: Qt 6.8.0 Wayland is not reliable
-                control.popupType = 1 // Popup.Window
+        if (MainCtx.useTopLevelWindowForToolTip()) {
+            console.assert(typeof control.popupType === "number")
+            control.popupType = 1 // Popup.Window
+        }
     }
 
     // NOTE: The tool tip often moves around, particularly noticable
