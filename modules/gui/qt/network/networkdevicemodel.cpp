@@ -209,6 +209,17 @@ public:
         : LocalListBaseModelPrivate<NetworkDeviceItemPtr>(pub)
     {}
 
+    ~NetworkDeviceModelPrivate()
+    {
+        //Explicilty disconnect signals here:
+        // - destructor will release m_sourcesProvider
+        // - its shared MediaSourceModel will be released
+        // - they will notify `mediaRemoved`, but the slot expects the shared MediaSourceModel to be valid
+        // at this point we don't care about model updates
+        for (auto& conn : m_sourceUpdateConnections)
+            QObject::disconnect(conn);
+    }
+
     NetworkDeviceModelLoader::ItemCompare getSortFunction() const override
     {
         if (m_sortCriteria == "mrl")
