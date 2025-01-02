@@ -25,7 +25,7 @@
 #include <vlc_plugin.h>
 #include <wayland-client.h>
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
 #include "viewporter-client-protocol.h"
 #endif
 
@@ -38,7 +38,7 @@ typedef struct
     struct wl_compositor* compositor;
     struct wl_subcompositor* subcompositor;
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     struct wp_viewport* viewport;
     struct wp_viewporter* viewporter;
 #endif
@@ -66,7 +66,7 @@ static void registry_global_cb(void* data, struct wl_registry* registry,
         sys->compositor_interface_version = version;
         sys->compositor = (struct wl_compositor*)wl_registry_bind(registry, id, &wl_compositor_interface, version);
     }
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     if (!strcmp(iface, "wp_viewporter"))
         sys->viewporter = (struct wp_viewporter*)wl_registry_bind(registry, id, &wp_viewporter_interface, version);
 #endif
@@ -106,7 +106,7 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
     if (!sys->video_surface)
         return VLC_EGENERIC;
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     if (sys->viewporter)
         sys->viewport = wp_viewporter_get_viewport(sys->viewporter, sys->video_surface);
     else
@@ -115,8 +115,8 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
         // The buffer scale must remain 1 when fractional scaling is used
         if (sys->buffer_scale != 1)
         {
-            msg_Dbg(obj, "Viewporter protocol is not available, and scale is not 1." \
-                         "Only integer scaling may be possible.");
+            msg_Dbg(obj, "Viewporter protocol is not available or Qt version is less than " \
+                         "6.5.0, and scale is not 1. Only integer scaling may be possible.");
 
             if (sys->compositor_interface_version >= 3)
             {
@@ -155,7 +155,7 @@ static void TeardownVoutWindow(struct qtwayland_t* obj)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     if (sys->viewport)
     {
         wp_viewport_destroy(sys->viewport);
@@ -205,7 +205,7 @@ static void Move(struct qtwayland_t* obj, int x, int y)
 
 static void Resize(struct qtwayland_t* obj, size_t width, size_t height)
 {
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
     assert(sys);
     if (!sys->video_surface)
@@ -228,7 +228,7 @@ static void Close(qtwayland_t* obj)
     qtwayland_priv_t* sys = (qtwayland_priv_t*)(obj->p_sys);
     wl_display_flush(sys->display);
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     if (sys->viewporter)
         wp_viewporter_destroy(sys->viewporter);
 #endif
@@ -254,7 +254,7 @@ static bool Init(qtwayland_t* obj, void* qpni_display)
     void* wrapper = wl_proxy_create_wrapper(display);
     wl_proxy_set_queue((struct wl_proxy*)wrapper, sys->queue);
 
-#ifdef QT_HAS_WAYLAND_PROTOCOLS
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     sys->viewporter = NULL;
     sys->viewport = NULL;
 #endif

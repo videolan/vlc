@@ -645,12 +645,14 @@ libqt_wayland_plugin_la_SOURCES += \
 	util/csdmenu_module.h
 
 nodist_libqt_wayland_plugin_la_SOURCES = \
-	maininterface/viewporter-client-protocol.h \
-	maininterface/viewporter-protocol.c \
 	maininterface/xdg-shell-client-protocol.h \
 	maininterface/xdg-shell-protocol.c
 
-BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
+if HAVE_QT65
+libqt_wayland_plugin_la_CFLAGS += -DQT_HAS_WAYLAND_FRACTIONAL_SCALING
+nodist_libqt_wayland_plugin_la_SOURCES += \
+	maininterface/viewporter-client-protocol.h \
+	maininterface/viewporter-protocol.c
 
 maininterface/viewporter-client-protocol.h: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml
@@ -660,6 +662,9 @@ maininterface/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml \
 		maininterface/viewporter-client-protocol.h
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
+endif
+
+BUILT_SOURCES += $(nodist_libqt_wayland_plugin_la_SOURCES)
 
 maininterface/xdg-shell-client-protocol.h: $(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
