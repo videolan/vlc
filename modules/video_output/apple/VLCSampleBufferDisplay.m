@@ -763,6 +763,7 @@ shouldInheritContentsScale:(CGFloat)newScale
         [sys.spuView removeFromSuperview];
     });
     DeletePipController(_pipcontroller);
+    _pipcontroller = NULL;
 }
 
 #pragma mark - VLCDisplayPictureInPictureControlling
