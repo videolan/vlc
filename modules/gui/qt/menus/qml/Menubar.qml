@@ -38,16 +38,16 @@ Item {
         colorSet: ColorContext.MenuBar
     }
 
-    Action{ id: mediaMenu;    text: qsTr("&Media")    ; onTriggered: (source) => menubar.popupMediaMenu(source);   }
-    Action{ id: playbackMenu; text: qsTr("&Playback") ; onTriggered: (source) => menubar.popupPlaybackMenu(source);}
-    Action{ id: videoMenu;    text: qsTr("&Video")    ; onTriggered: (source) => menubar.popupVideoMenu(source);   }
-    Action{ id: audioMenu;    text: qsTr("&Audio")    ; onTriggered: (source) => menubar.popupAudioMenu(source);   }
-    Action{ id: subtitleMenu; text: qsTr("&Subtitle") ; onTriggered: (source) => menubar.popupSubtitleMenu(source);}
-    Action{ id: toolMenu;     text: qsTr("&Tools")    ; onTriggered: (source) => menubar.popupToolsMenu(source);   }
-    Action{ id: viewMenu;     text: qsTr("V&iew")     ; onTriggered: (source) => menubar.popupViewMenu(source);    }
-    Action{ id: helpMenu;     text: qsTr("&Help")     ; onTriggered: (source) => menubar.popupHelpMenu(source);    }
+    Action{ id: mediaMenu;    text: menubar.menuEntryTitle(QmlMenuBar.MEDIA)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.MEDIA);   }
+    Action{ id: playbackMenu; text: menubar.menuEntryTitle(QmlMenuBar.PLAYBACK) ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.PLAYBACK);}
+    Action{ id: videoMenu;    text: menubar.menuEntryTitle(QmlMenuBar.VIDEO)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.VIDEO);   }
+    Action{ id: audioMenu;    text: menubar.menuEntryTitle(QmlMenuBar.AUDIO)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.AUDIO);   }
+    Action{ id: subtitleMenu; text: menubar.menuEntryTitle(QmlMenuBar.SUBTITLE) ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.SUBTITLE);}
+    Action{ id: toolMenu;     text: menubar.menuEntryTitle(QmlMenuBar.TOOL)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.TOOL);    }
+    Action{ id: viewMenu;     text: menubar.menuEntryTitle(QmlMenuBar.VIEW)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.VIEW);    }
+    Action{ id: helpMenu;     text: menubar.menuEntryTitle(QmlMenuBar.HELP)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.HELP);    }
 
-    property var toolbarModel: [
+    readonly property var toolbarModel: [
         mediaMenu,
         playbackMenu,
         videoMenu,

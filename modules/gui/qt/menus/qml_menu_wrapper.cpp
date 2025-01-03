@@ -297,6 +297,31 @@ QmlMenuBar::QmlMenuBar(QObject *parent)
 {
 }
 
+ QString QmlMenuBar::menuEntryTitle(MenuEntry entry)
+{
+    switch (entry)
+    {
+    case MEDIA:
+        return qtr("&Media");
+    case PLAYBACK:
+        return qtr("&Playback");
+    case VIDEO:
+        return qtr("&Video");
+    case AUDIO:
+        return qtr("&Audio");
+    case SUBTITLE:
+        return qtr("&Subtitle");
+    case TOOL:
+        return qtr("&Tools");
+    case VIEW:
+        return qtr("V&iew");
+    case HELP:
+        return qtr("&Help");
+    }
+    vlc_assert_unreachable();
+    return "";
+}
+
 void QmlMenuBar::popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)> createMenuFunc)
 {
     if (!m_ctx || !m_menubar || !button)
@@ -313,6 +338,47 @@ void QmlMenuBar::popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)
     connect(m_menu.get(), &QMenu::aboutToHide, this, &QmlMenuBar::onMenuClosed);
     QPointF position = button->mapToGlobal(QPoint(0, button->height()));
     m_menu->popup(position.toPoint());
+}
+
+
+void QmlMenuBar::setupMenuEntry(QMenu* menu, MenuEntry entry)
+{
+    qt_intf_t* p_intf = m_ctx->getIntf();
+    switch (entry) {
+    case MEDIA:
+        FileMenu(p_intf, menu);
+        break;
+    case PLAYBACK:
+        NavigMenu(p_intf, menu);
+        break;
+    case VIDEO:
+        VideoMenu(p_intf, menu);
+        break;
+    case AUDIO:
+        AudioMenu(p_intf, menu);
+        break;
+    case SUBTITLE:
+        SubtitleMenu(p_intf, menu);
+        break;
+    case TOOL:
+        ToolsMenu(p_intf, menu);
+        break;
+    case VIEW:
+        ViewMenu( p_intf, menu, m_playerViewVisible );
+        break;
+    case HELP:
+        HelpMenu( menu );
+        break;
+    default:
+        vlc_assert_unreachable();
+    };
+}
+
+void QmlMenuBar::popupMenuEntry(QQuickItem* button, MenuEntry entry)
+{
+    popupMenuCommon(button, [this, entry](QMenu* menu) {
+        setupMenuEntry(menu, entry);
+    });
 }
 
 void QmlMenuBar::popupMediaMenu( QQuickItem* button )

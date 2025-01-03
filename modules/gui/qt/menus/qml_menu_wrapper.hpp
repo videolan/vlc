@@ -151,7 +151,23 @@ class QmlMenuBar : public VLCMenuBar
     SIMPLE_MENU_PROPERTY(bool, playerViewVisible, false)
 
 public:
+    enum MenuEntry {
+        MEDIA,
+        PLAYBACK,
+        VIDEO,
+        AUDIO,
+        SUBTITLE,
+        TOOL,
+        VIEW,
+        HELP
+    };
+    Q_ENUM(MenuEntry);
+
+public:
     explicit QmlMenuBar(QObject *parent = nullptr);
+
+
+    Q_INVOKABLE static QString menuEntryTitle(MenuEntry entry);
 
 signals:
     //navigate to the left(-1)/right(1) menu
@@ -160,6 +176,8 @@ signals:
     void menuClosed();
 
 public slots:
+    void popupMenuEntry(QQuickItem* button, MenuEntry entry);
+
     void popupMediaMenu( QQuickItem* button);
     void popupPlaybackMenu( QQuickItem* button);
     void popupAudioMenu( QQuickItem* button );
@@ -175,6 +193,7 @@ private slots:
 private:
     typedef QMenu* (*CreateMenuFunc)();
     void popupMenuCommon( QQuickItem* button, std::function<void(QMenu*)> createMenuFunc);
+    void setupMenuEntry(QMenu* menu, MenuEntry entry);
     std::unique_ptr<QMenu> m_menu;
     QQuickItem* m_button = nullptr;
     friend class QmlMenuBarMenu;
