@@ -440,6 +440,16 @@ void QmlMenuBar::popupHelpMenu( QQuickItem* button )
     });
 }
 
+void QmlMenuBar::popupExtraActionsMenu( QQuickItem* button, const QList<MenuEntry>& extraActions )
+{
+    popupMenuCommon(button, [this, extraActions](QMenu* menu) {
+        for (auto action: extraActions) {
+            QMenu* subMenu = menu->addMenu(menuEntryTitle(action));
+            setupMenuEntry(subMenu, action);
+        }
+    });
+}
+
 void QmlMenuBar::onMenuClosed()
 {
     if (!m_openMenuOnHover)
