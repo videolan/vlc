@@ -110,7 +110,8 @@ void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h)
                 h = qRound( (float)h / factor );
                 msg_Dbg( m_intf, "Logical video size: %ux%u", w, h );
             }
-            m_window->resize(w, h);
+            m_window->resize(std::clamp<int>(w, m_window->minimumWidth(), m_window->maximumWidth()),
+                             std::clamp<int>(h, m_window->minimumHeight(), m_window->maximumHeight()));
         }
     }
 }
