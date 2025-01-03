@@ -84,7 +84,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     {
         int margin = m_mainCtx->windowExtendedMargin() * 2;
         int width = 320 + margin;
-        int height = 300 + margin;
+        int height = 360 + margin;
 
         double intfScaleFactor = m_mainCtx->getIntfScaleFactor();
         int scaledWidth = std::ceil( intfScaleFactor * width );
