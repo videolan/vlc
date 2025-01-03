@@ -258,6 +258,14 @@ void WheelToVLCConverter::wheelEvent( const QWheelEvent* e )
     }
 
     QPoint p = e->angleDelta();
+    if (e->inverted())
+    {
+        const Qt::Orientations preliminaryOrientation = getWheelOrientation(p.x(), p.y());
+        if (preliminaryOrientation == Qt::Vertical)
+            p.setY(-p.y());
+        else if (preliminaryOrientation == Qt::Horizontal)
+            p.setX(-p.x());
+    }
     p += m_scrollAmount;
 
     if (p.isNull())
