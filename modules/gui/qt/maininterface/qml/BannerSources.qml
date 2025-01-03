@@ -119,7 +119,7 @@ T.ToolBar {
 
                     Menus.Menubar {
                         id: menubar
-                        width: parent.width
+                        width: root._showCSD ? (parent.width - globalToolbarRight.width) : parent.width
                         height: implicitHeight
                         visible: MainCtx.hasToolbarMenu
                         enabled: visible
