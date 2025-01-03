@@ -217,8 +217,8 @@ FocusScope{
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.leftMargin: root.sideMargin
+        anchors.right: root.showCSD ? csdDecorations.left : parent.right
 
-        width: implicitWidth
 
         visible: root.showToolbar
         enabled: root.showToolbar
