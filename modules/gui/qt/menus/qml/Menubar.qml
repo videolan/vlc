@@ -23,7 +23,9 @@ import QtQuick.Layouts
 
 import VLC.MainInterface
 import VLC.Style
+import VLC.Widgets as Widgets
 import VLC.Menus
+
 
 Item {
     id: root
@@ -38,45 +40,76 @@ Item {
         colorSet: ColorContext.MenuBar
     }
 
-    Action{ id: mediaMenu;    text: menubar.menuEntryTitle(QmlMenuBar.MEDIA)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.MEDIA);   }
-    Action{ id: playbackMenu; text: menubar.menuEntryTitle(QmlMenuBar.PLAYBACK) ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.PLAYBACK);}
-    Action{ id: videoMenu;    text: menubar.menuEntryTitle(QmlMenuBar.VIDEO)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.VIDEO);   }
-    Action{ id: audioMenu;    text: menubar.menuEntryTitle(QmlMenuBar.AUDIO)    ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.AUDIO);   }
-    Action{ id: subtitleMenu; text: menubar.menuEntryTitle(QmlMenuBar.SUBTITLE) ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.SUBTITLE);}
-    Action{ id: toolMenu;     text: menubar.menuEntryTitle(QmlMenuBar.TOOL)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.TOOL);    }
-    Action{ id: viewMenu;     text: menubar.menuEntryTitle(QmlMenuBar.VIEW)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.VIEW);    }
-    Action{ id: helpMenu;     text: menubar.menuEntryTitle(QmlMenuBar.HELP)     ; onTriggered: (source) => menubar.popupMenuEntry(source, QmlMenuBar.HELP);    }
-
     readonly property var toolbarModel: [
-        mediaMenu,
-        playbackMenu,
-        videoMenu,
-        audioMenu,
-        subtitleMenu,
-        toolMenu,
-        viewMenu,
-        helpMenu,
+        QmlMenuBar.MEDIA,
+        QmlMenuBar.PLAYBACK,
+        QmlMenuBar.VIDEO,
+        QmlMenuBar.AUDIO,
+        QmlMenuBar.SUBTITLE,
+        QmlMenuBar.TOOL,
+        QmlMenuBar.VIEW,
+        QmlMenuBar.HELP
     ]
 
     property int _menuIndex: -1
     property int _countHovered: 0
 
+    //will contain the visible action (after _updateContentModel)
+    property var _visibleActionsModel: []
+    //will contain the actions acessible through the '>' menu (after _updateContentModel)
+    property var _extraActionsModel: []
+
+
+    signal _requestMenuPopup(int menuId)
 
     // Accessible
     Accessible.role: Accessible.MenuBar
 
-    function openMenu(obj, cb, index) {
-        cb.trigger(obj)
+    onWidthChanged: _updateContentModel()
+
+    function _openMenu(item, index) {
+        menubar.popupMenuEntry(item, toolbarModel[index])
         root._menuIndex = index
     }
 
-    function updateHover(obj, cb, index, hovered ) {
+    function _updateHover(item, index, hovered ) {
         root._countHovered += hovered ? 1 : -1
 
         if (hovered && menubar.openMenuOnHover) {
-            cb.trigger(obj)
-            root._menuIndex = index
+            _openMenu(item, index)
         }
+    }
+
+    //set up the model to show as many as possible menu entries
+    //remaining menus are placed in the ">" menu
+    function _updateContentModel() {
+        const visibleActions = []
+        const extraActions = []
+        const extraPadding = VLCStyle.margin_xsmall * 2
+        //keep enough place for the > menu
+        let availableWidth = root.width - _buttonWidth(root._extraActionLabel)
+        let i = 0
+        for (; i < root.toolbarModel.length; ++i) {
+            const textWidth = _buttonWidth(toolbarModel[i])
+            if (textWidth < availableWidth) {
+                visibleActions.push(i)
+            } else {
+                break
+            }
+            availableWidth -= textWidth;
+        }
+        for (; i < toolbarModel.length; ++i) {
+            extraActions.push(i)
+        }
+
+        root._visibleActionsModel = visibleActions
+        root._extraActionsModel = extraActions
+    }
+
+    function _buttonWidth(buttonId) {
+        return fontMetrics.advanceWidth(
+                    menubar.menuEntryTitle(buttonId).replace("&", "") //beware of mnemonics
+                ) + (VLCStyle.margin_xsmall * 2)
     }
 
     QmlMenuBar {
@@ -88,51 +121,130 @@ Item {
         onMenuClosed: _menuIndex = -1
         onNavigateMenu: (direction) => {
             const i =  (root._menuIndex + root.toolbarModel.length + direction) % root.toolbarModel.length
-            root.openMenu(menubarLayout.visibleChildren[i], root.toolbarModel[i], i)
+            root._requestMenuPopup(i)
         }
     }
 
-    RowLayout {
+    FontMetrics {
+        id: fontMetrics
+        font.pixelSize: VLCStyle.fontSize_normal
+    }
+
+    Row {
         id: menubarLayout
         spacing: 0
+
         Repeater {
-            model: root.toolbarModel
+            model: root._visibleActionsModel
 
-            T.MenuItem {
-                id: control
+            MenubarButton {
+                id: visibleButton
 
-                text: modelData.text
-                onClicked: root.openMenu(this, modelData, index)
-                onHoveredChanged: root.updateHover(this, modelData, index, hovered)
-                font.pixelSize: VLCStyle.fontSize_normal
+                text: menubar.menuEntryTitle(toolbarModel[modelData])
+                focused: modelData === root._menuIndex
 
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                onClicked: root._openMenu(visibleButton, modelData)
+                onHoveredChanged: root._updateHover(visibleButton, modelData, hovered)
 
-                implicitWidth: contentItem.implicitWidth + VLCStyle.margin_xsmall * 2
-                implicitHeight: contentItem.implicitHeight + VLCStyle.margin_xxxsmall * 2
-
-                Accessible.onPressAction: control.clicked()
-
-                ColorContext {
-                    id: theme
-                    colorSet: root.colorContext.colorSet
-
-                    enabled: control.enabled
-                    focused: index === root._menuIndex
-                    hovered: control.hovered
-                }
-
-                contentItem: IconLabel {
-                    text: control.text
-                    font: control.font
-                    opacity: enabled ? 1.0 : 0.3
-                    color: theme.fg.primary
-                }
-
-                background: Rectangle {
-                    color: theme.bg.primary
+                Connections {
+                    target: root
+                    function on_RequestMenuPopup(menuId) {
+                        if (menuId === modelData) {
+                            root._openMenu(visibleButton, modelData)
+                        }
+                    }
                 }
             }
+        }
+
+        Repeater {
+            model: root._extraActionsModel
+
+            Item {
+                id: hiddenButton
+
+                width: _buttonWidth(toolbarModel[modelData])
+                height: 1 //item with 0 height are discarded
+                anchors.bottom: menubarLayout.bottom
+
+                T.MenuItem {
+                    text: menubar.menuEntryTitle(toolbarModel[modelData])
+
+                    width: 0
+                    height: 0
+
+                    onClicked: root._openMenu(hiddenButton, modelData)
+                    Accessible.onPressAction: root._openMenu(hiddenButton, modelData)
+
+                    contentItem: null
+                    background: null
+                }
+
+                Connections {
+                    target: root
+                    function on_RequestMenuPopup(menuId) {
+                        if (menuId === modelData) {
+                            root._openMenu(hiddenButton, modelData)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    MenubarButton {
+        id: extraActionButton
+
+        anchors.top:  parent.top
+        anchors.right: parent.right
+
+        text: ">"
+
+        Accessible.ignored: true
+
+        visible: _extraActionsModel.length > 0
+        enabled: visible
+
+        onClicked: menubar.popupExtraActionsMenu(extraActionButton, root._extraActionsModel)
+    }
+
+    component MenubarButton: T.MenuItem {
+        id: control
+
+        property bool focused: false
+        property bool textVisible: true
+
+        font.pixelSize: VLCStyle.fontSize_normal
+
+        padding: 0
+
+        implicitWidth: contentItem.implicitWidth + leftPadding + rightPadding
+        implicitHeight: contentItem.implicitHeight + VLCStyle.margin_xxxsmall * 2
+
+        leftPadding: VLCStyle.margin_xsmall
+        rightPadding: VLCStyle.margin_xsmall
+
+        Accessible.onPressAction: control.clicked()
+
+        ColorContext {
+            id: theme
+            colorSet: root.colorContext.colorSet
+
+            enabled: control.enabled
+            focused: control.focused
+            hovered: control.hovered
+        }
+
+        contentItem: IconLabel {
+            text: control.text
+            font: control.font
+            opacity: enabled ? 1.0 : 0.3
+            color: theme.fg.primary
+            visible: control.textVisible
+        }
+
+        background: Rectangle {
+            color: theme.bg.primary
         }
     }
 }
