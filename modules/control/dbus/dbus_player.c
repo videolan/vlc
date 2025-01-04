@@ -537,7 +537,7 @@ MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
     vlc_playlist_Unlock(playlist);
     if(plitem)
     {
-        result = GetInputMeta(id, plitem, container);
+        result = GetInputMeta(plitem, container);
         vlc_playlist_item_Release(plitem);
     }
     else

@@ -1092,7 +1092,11 @@ playlist_on_items_added(vlc_playlist_t *playlist, size_t index,
                         vlc_playlist_item_t *const items[], size_t count,
                         void *data)
 {
-    tracklist_append_event_t *append_event = tracklist_append_event_create(index, items, count);
+    vlc_playlist_item_t *previous_item = NULL;
+    if (index > 0)
+        previous_item = vlc_playlist_Get(playlist, index - 1);
+
+    tracklist_append_event_t *append_event = tracklist_append_event_create(previous_item, items, count);
     bool added = add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_APPEND,
                                 .items_appended = append_event });
@@ -1105,7 +1109,16 @@ static void
 playlist_on_items_removed(vlc_playlist_t *playlist,
                           size_t index, size_t count, void *data)
 {
-    tracklist_remove_event_t *remove_event = tracklist_remove_event_create(index, count);
+    if (count == 0)
+        return;
+
+    uint64_t item_ids[count];
+    for (size_t i = 0; i < count; ++i) {
+        vlc_playlist_item_t *item = vlc_playlist_Get(playlist, index);
+        item_ids[i] = vlc_playlist_item_GetId(item);
+    }
+
+    tracklist_remove_event_t *remove_event = tracklist_remove_event_create(item_ids, count);
     bool added = add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_DELETED,
                                 .items_removed = remove_event });
@@ -1389,7 +1402,7 @@ int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg )
         free( psz ); \
     }
 
-int GetInputMeta(size_t index, vlc_playlist_item_t *item, DBusMessageIter *args)
+int GetInputMeta(vlc_playlist_item_t *item, DBusMessageIter *args)
 {
     input_item_t *p_input = vlc_playlist_item_GetMedia(item);
     DBusMessageIter dict, dict_entry, variant, list;
@@ -1400,7 +1413,8 @@ int GetInputMeta(size_t index, vlc_playlist_item_t *item, DBusMessageIter *args)
     dbus_int64_t i_length = i_mtime / 1000;
     char *psz_trackid;
 
-    if (asprintf(&psz_trackid, MPRIS_TRACKID_FORMAT, index) == -1)
+    uint64_t id = vlc_playlist_item_GetId(item);
+    if (asprintf(&psz_trackid, MPRIS_TRACKID_FORMAT, id) == -1)
         return VLC_ENOMEM;
 
     const char* ppsz_meta_items[] =

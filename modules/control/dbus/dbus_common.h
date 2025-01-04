@@ -88,7 +88,7 @@
 #define ADD_INT64( i ) DBUS_ADD( DBUS_TYPE_INT64, i )
 #define ADD_BYTE( b ) DBUS_ADD( DBUS_TYPE_BYTE, b )
 
-#define MPRIS_TRACKID_FORMAT "/org/videolan/vlc/playlist/%lu"
+#define MPRIS_TRACKID_FORMAT "/org/videolan/vlc/playlist/%" PRIu64
 
 struct intf_sys_t
 {
@@ -145,7 +145,7 @@ enum
 };
 
 int DemarshalSetPropertyValue( DBusMessage *p_msg, void *p_arg );
-int GetInputMeta( size_t index, vlc_playlist_item_t *,
+int GetInputMeta( vlc_playlist_item_t *,
                   DBusMessageIter *args );
 int AddProperty ( intf_thread_t *p_intf,
                   DBusMessageIter *p_container,

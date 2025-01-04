@@ -38,18 +38,19 @@
 #define DBUS_MPRIS_APPEND    "/org/mpris/MediaPlayer2/TrackList/Append"
 
 struct tracklist_change_event {
-    size_t index;
     size_t count;
     struct tracklist_change_event *next;
 };
 
 struct tracklist_append_event {
     struct tracklist_change_event change_ev;
+    vlc_playlist_item_t *after_track;
     vlc_playlist_item_t *items[];
 };
 
 struct tracklist_remove_event {
     struct tracklist_change_event change_ev;
+    uint64_t removed_tracks[];
 };
 
 typedef struct tracklist_append_event tracklist_append_event_t;
@@ -59,7 +60,7 @@ typedef struct tracklist_remove_event tracklist_remove_event_t;
  * The event data will be used to generate TrackAdded DBus signals later on.
  */
 tracklist_append_event_t *
-tracklist_append_event_create( size_t index,
+tracklist_append_event_create( vlc_playlist_item_t *after_track,
                                vlc_playlist_item_t *const items[],
                                size_t count );
 
@@ -67,7 +68,7 @@ tracklist_append_event_create( size_t index,
  *  The event data will be used to generate TrackRemoved DBus signals later on.
  */
 tracklist_remove_event_t *
-tracklist_remove_event_create( size_t index, size_t count );
+tracklist_remove_event_create( uint64_t removed_track_ids[], size_t count );
 
 /* Releases any resources reserved for this event */
 void tracklist_append_event_destroy( tracklist_append_event_t *event );
