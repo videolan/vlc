@@ -30,6 +30,9 @@ VideoWindowHandler::VideoWindowHandler(qt_intf_t* intf, QObject *parent)
     /* Does the interface resize to video size or the opposite */
     m_autoresize = var_InheritBool( m_intf, "qt-video-autoresize" );
 
+    assert(qGuiApp);
+    m_hasWayland = qGuiApp->platformName().startsWith(QLatin1String("wayland"));
+
     connect( this, &VideoWindowHandler::askVideoToResize,
              this, &VideoWindowHandler::setVideoSize, Qt::QueuedConnection );
     connect( this, &VideoWindowHandler::askVideoSetFullScreen,
