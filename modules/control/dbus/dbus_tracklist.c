@@ -566,22 +566,13 @@ TrackAddedSignal( intf_thread_t    *p_intf,
     DBusConnection  *p_conn = p_intf->p_sys->p_conn;
     DBusMessageIter meta;
 
-    SIGNAL_INIT( "MediaPlayer2.TrackList",
+    SIGNAL_INIT( DBUS_MPRIS_TRACKLIST_INTERFACE,
                  DBUS_MPRIS_OBJECT_PATH,
                  "TrackAdded" );
 
     OUT_ARGUMENTS;
 
-    if( unlikely(!dbus_message_iter_open_container( &args,
-                                                    DBUS_TYPE_ARRAY, "a{sv}",
-                                                    &meta )) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
-
-    GetInputMeta(item, &meta);
-
-    if( unlikely(!dbus_message_iter_close_container( &args,
-                                                     &meta )) )
-        return DBUS_HANDLER_RESULT_NEED_MEMORY;
+    GetInputMeta(item, &args);
 
     uint64_t previous_id;
     bool valid = previous_item != NULL;
@@ -603,7 +594,7 @@ TrackRemovedSignal( intf_thread_t    *p_intf, uint64_t id )
 {
     DBusConnection  *p_conn = p_intf->p_sys->p_conn;
 
-    SIGNAL_INIT( "MediaPlayer2.TrackList",
+    SIGNAL_INIT( DBUS_MPRIS_TRACKLIST_INTERFACE,
                  DBUS_MPRIS_OBJECT_PATH,
                  "TrackRemoved" );
 
