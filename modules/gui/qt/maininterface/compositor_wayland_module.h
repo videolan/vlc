@@ -30,7 +30,7 @@ typedef struct qtwayland_t
 
     bool (*init)(struct qtwayland_t*, void* display);
 
-    int (*setupInterface)(struct qtwayland_t*, void* video_surface, int scale);
+    int (*setupInterface)(struct qtwayland_t*, void* video_surface, double scale);
 
     int (*setupVoutWindow)(struct qtwayland_t*, vlc_window_t* p_wnd);
     void (*teardownVoutWindow)(struct qtwayland_t*);
@@ -39,6 +39,7 @@ typedef struct qtwayland_t
     void (*disable)(struct qtwayland_t*);
     void (*move)(struct qtwayland_t*, int x, int y);
     void (*resize)(struct qtwayland_t*, size_t width, size_t height);
+    void (*rescale)(struct qtwayland_t*, double scale);
 
     void (*close)(struct qtwayland_t*);
 } qtwayland_t;

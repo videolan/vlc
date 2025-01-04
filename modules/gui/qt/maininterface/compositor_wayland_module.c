@@ -29,7 +29,9 @@
 #include "viewporter-client-protocol.h"
 #endif
 
+#include <math.h>
 #include <assert.h>
+#include <float.h>
 
 typedef struct
 {
@@ -49,6 +51,13 @@ typedef struct
     struct wl_subsurface* video_subsurface;
 
     int buffer_scale;
+    bool fractional_scale;
+
+    // Store the size, because we need them
+    // if the scale changes (if fractional)
+    // to update the viewport:
+    int width;
+    int height;
 
     uint32_t compositor_interface_version;
 } qtwayland_priv_t;
@@ -84,7 +93,127 @@ static const struct wl_registry_listener registry_cbs = {
     registry_global_remove_cb,
 };
 
-static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface, int scale)
+static void SetSize(struct qtwayland_t* obj, size_t width, size_t height)
+{
+    assert(obj);
+    qtwayland_priv_t* const sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+
+    sys->width = width;
+    sys->height = height;
+}
+
+static void CommitSize(struct qtwayland_t* obj)
+{
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
+    assert(obj);
+    const qtwayland_priv_t* const sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+    if (!sys->video_surface)
+        return;
+    if (sys->viewport)
+    {
+        // Non-positive size (except (-1, -1) pair) causes protocol error:
+        assert((sys->width > 0 && sys->height > 0) ||
+               (sys->height == -1 && sys->width == -1));
+
+        // width and height here represent the final size, after scaling
+        // is taken into account. The fractional scaling protocol is not
+        // necessary, because the (fractional) scale is retrieved from the
+        // Qt Quick window which uses the fractional scale protocol itself
+        // to determine the device pixel ratio.
+        wp_viewport_set_destination(sys->viewport, sys->width, sys->height);
+        wl_surface_commit(sys->video_surface);
+    }
+#endif
+}
+
+static void SetScale(struct qtwayland_t* obj, double scale)
+{
+    assert(obj);
+    qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+
+    // Determine if scale is fractional:
+    assert(scale > 0.0);
+    sys->buffer_scale = ceil(scale);
+
+    if ((sys->buffer_scale - scale) < DBL_EPSILON)
+        sys->fractional_scale = false;
+    else
+        sys->fractional_scale = true;
+}
+
+static void CommitScale(struct qtwayland_t* obj)
+{
+    assert(obj);
+    qtwayland_priv_t* const sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+
+    // Once the scale becomes fractional, viewport is used.
+    // If the scale becomes an integer number after that,
+    // viewport is still used.
+    if (sys->fractional_scale)
+    {
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
+        if (sys->viewporter)
+        {
+            if (!sys->viewport)
+            {
+                sys->viewport = wp_viewporter_get_viewport(sys->viewporter, sys->video_surface);
+
+                // The buffer scale must remain 1 when fractional scaling is used:
+                // If compositor has viewport support, it should be at least version 3:
+                if (likely(sys->compositor_interface_version >= 3))
+                {
+                    wl_surface_set_buffer_scale(sys->video_surface, 1);
+                    wl_surface_commit(sys->video_surface);
+                }
+
+                // Started using viewport, commit size so that viewport destination is set:
+                CommitSize(obj);
+            }
+        }
+        else
+#endif
+        {
+            msg_Dbg(obj, "Viewporter protocol is not available or Qt version is less than " \
+                         "6.5.0, and scale is fractional. Only integer scaling may be possible.");
+
+            if (sys->compositor_interface_version >= 3)
+            {
+                wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+                wl_surface_commit(sys->video_surface);
+            }
+            else
+            {
+                msg_Dbg(obj, "Compositor interface version is below 3, integer scaling " \
+                             "is not possible.");
+            }
+        }
+    }
+    else
+    {
+#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
+        // Scale is not fractional, but if viewport has been initialized before, keep using it:
+        if (!sys->viewport)
+#endif
+        {
+            if (sys->compositor_interface_version >= 3)
+            {
+                wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
+                wl_surface_commit(sys->video_surface);
+            }
+            else
+            {
+                msg_Dbg(obj, "Compositor interface version is below 3, integer scaling " \
+                             "is not possible.");
+            }
+        }
+    }
+}
+
+static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface, double scale)
 {
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
 
@@ -92,7 +221,8 @@ static int SetupInterface(qtwayland_t* obj, void* qpni_interface_surface, int sc
         return VLC_EGENERIC;
 
     sys->interface_surface = (struct wl_surface*)qpni_interface_surface;
-    sys->buffer_scale = scale;
+
+    SetScale(obj, scale);
 
     return VLC_SUCCESS;
 }
@@ -106,29 +236,7 @@ static int SetupVoutWindow(qtwayland_t* obj, vlc_window_t* wnd)
     if (!sys->video_surface)
         return VLC_EGENERIC;
 
-#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
-    if (sys->viewporter)
-        sys->viewport = wp_viewporter_get_viewport(sys->viewporter, sys->video_surface);
-    else
-#endif
-    {
-        // The buffer scale must remain 1 when fractional scaling is used
-        if (sys->buffer_scale != 1)
-        {
-            msg_Dbg(obj, "Viewporter protocol is not available or Qt version is less than " \
-                         "6.5.0, and scale is not 1. Only integer scaling may be possible.");
-
-            if (sys->compositor_interface_version >= 3)
-            {
-                wl_surface_set_buffer_scale(sys->video_surface, sys->buffer_scale);
-            }
-            else
-            {
-                msg_Dbg(obj, "Compositor interface version is below 3, integer scaling " \
-                             "is not possible.");
-            }
-        }
-    }
+    CommitScale(obj);
 
     struct wl_region* region = wl_compositor_create_region(sys->compositor);
     if (!region)
@@ -205,22 +313,52 @@ static void Move(struct qtwayland_t* obj, int x, int y)
 
 static void Resize(struct qtwayland_t* obj, size_t width, size_t height)
 {
-#ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
+    assert(obj);
     qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
     assert(sys);
-    if (!sys->video_surface)
-        return;
-    if (sys->viewport)
+
+    bool commitNecessary = false;
+
     {
-        // width and height here represent the final size, after scaling
-        // is taken into account. The fractional scaling protocol is not
-        // necessary, because the (fractional) scale is retrieved from the
-        // Qt Quick window which uses the fractional scale protocol itself
-        // to determine the device pixel ratio.
-        wp_viewport_set_destination(sys->viewport, width, height);
-        wl_surface_commit(sys->video_surface);
+        // Do not directly compare, because SetSize may not directly use size as is
+        const int oldWidth = sys->width;
+        const int oldHeight = sys->height;
+
+        SetSize(obj, width, height);
+
+        if (oldWidth != sys->width)
+            commitNecessary = true;
+        else if (oldHeight != sys->height)
+            commitNecessary = true;
     }
-#endif
+
+    if (commitNecessary)
+        CommitSize(obj);
+}
+
+
+static void Rescale(struct qtwayland_t* obj, double scale)
+{
+    assert(obj);
+    qtwayland_priv_t* sys = (qtwayland_priv_t*)obj->p_sys;
+    assert(sys);
+
+    bool commitNecessary = false;
+
+    {
+        const int oldBufferScale = sys->buffer_scale;
+        const bool oldFractionalScale = sys->fractional_scale;
+
+        SetScale(obj, scale);
+
+        if (oldBufferScale != sys->buffer_scale)
+            commitNecessary = true;
+        else if (oldFractionalScale != sys->fractional_scale)
+            commitNecessary = true;
+    }
+
+    if (commitNecessary)
+        CommitScale(obj);
 }
 
 static void Close(qtwayland_t* obj)
@@ -318,6 +456,7 @@ int OpenCompositor(vlc_object_t* p_this)
     obj->disable = Disable;
     obj->move = Move;
     obj->resize = Resize;
+    obj->rescale = Rescale;
 
     obj->p_sys = sys;
 

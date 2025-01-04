@@ -81,6 +81,7 @@ public:
 protected slots:
     void onSurfacePositionChanged(const QPointF&) override;
     void onSurfaceSizeChanged(const QSizeF&) override;
+    void onSurfaceScaleChanged(qreal) override;
 #ifdef QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
     void adjustQuickWindowMask();
 #endif

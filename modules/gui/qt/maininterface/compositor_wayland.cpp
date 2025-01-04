@@ -17,8 +17,6 @@
  *****************************************************************************/
 #include "compositor_wayland.hpp"
 
-#include <cmath>
-
 #include "maininterface/mainctx.hpp"
 #include "maininterface/interface_window_handler.hpp"
 
@@ -117,7 +115,7 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     if (!interfaceSurface)
         return false;
 
-    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, std::ceil(dprForWindow(m_qmlView.get())));
+    m_waylandImpl->setupInterface(m_waylandImpl, interfaceSurface, dprForWindow(m_qmlView.get()));
 
     CompositorVideo::Flags flags = CompositorVideo::CAN_SHOW_PIP | CompositorVideo::HAS_ACRYLIC;
 
@@ -236,6 +234,13 @@ void CompositorWayland::onSurfaceSizeChanged(const QSizeF& size)
     m_waylandImpl->resize(m_waylandImpl,
                         size.width() / nativeDpr,
                         size.height() / nativeDpr);
+}
+
+void CompositorWayland::onSurfaceScaleChanged(qreal dpr)
+{
+    assert(m_waylandImpl);
+
+    m_waylandImpl->rescale(m_waylandImpl, dpr);
 }
 
 #ifdef QT_WAYLAND_HAS_CUSTOM_MARGIN_SUPPORT
