@@ -103,7 +103,7 @@ void VideoWindowHandler::setVideoSize(unsigned int w, unsigned int h)
                 w = screen.width();
                 h = screen.height();
             }
-            else
+            else if (!m_hasWayland)
             {
                 // Convert the size in logical pixels
                 w = qRound( (float)w / factor );
