@@ -77,6 +77,7 @@ signals:
     bool hasVideoEmbedChanged(bool);
     void surfacePositionChanged(QPointF position);
     void surfaceSizeChanged(QSizeF size);
+    void surfaceScaleChanged(qreal);
 
 public slots:
     void onWindowClosed();
@@ -126,9 +127,12 @@ protected:
 
     void updatePolish() override;
 
+    void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
+
 signals:
     void surfaceSizeChanged(QSizeF);
     void surfacePositionChanged(QPointF);
+    void surfaceScaleChanged(qreal);
 
     void mousePressed( int vlcButton );
     void mouseReleased( int vlcButton );
@@ -141,7 +145,8 @@ signals:
 protected slots:
     void updateSurfacePosition();
     void updateSurfaceSize();
-    void updateSurfacePositionAndSize();
+    void updateSurfaceScale();
+    void updateSurface();
 
     void updateParentChanged();
 
@@ -156,6 +161,7 @@ private:
 
     bool m_sizeDirty = false;
     bool m_positionDirty = false;
+    bool m_scaleDirty = false;
 };
 
 #endif // VIDEOSURFACE_HPP

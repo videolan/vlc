@@ -206,6 +206,8 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
             this, &CompositorVideo::onSurfacePositionChanged, Qt::UniqueConnection);
     connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
             this, &CompositorVideo::onSurfaceSizeChanged, Qt::UniqueConnection);
+    connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
+            this, &CompositorVideo::onSurfaceScaleChanged, Qt::UniqueConnection);
 }
 
 void CompositorVideo::windowDestroy()
@@ -217,6 +219,8 @@ void CompositorVideo::windowDestroy()
                this, &CompositorVideo::onSurfacePositionChanged);
     disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
                this, &CompositorVideo::onSurfaceSizeChanged);
+    disconnect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
+               this, &CompositorVideo::onSurfaceScaleChanged);
 
     if (m_destroyCb)
         m_destroyCb(m_wnd);

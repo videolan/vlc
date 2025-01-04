@@ -327,7 +327,9 @@ void VideoSurface::updatePolish()
 {
     QQuickItem::updatePolish();
 
-    if (m_sizeDirty)
+    assert(window());
+
+    if (m_sizeDirty && !size().isEmpty())
     {
         emit surfaceSizeChanged(size() * window()->effectiveDevicePixelRatio());
         m_sizeDirty = false;
@@ -340,6 +342,22 @@ void VideoSurface::updatePolish()
         emit surfacePositionChanged(scenePosition * window()->effectiveDevicePixelRatio());
         m_positionDirty = false;
     }
+
+    if (m_scaleDirty)
+    {
+        emit surfaceScaleChanged(window()->effectiveDevicePixelRatio());
+        m_scaleDirty = false;
+    }
+}
+
+void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
+{
+    if (change == ItemDevicePixelRatioHasChanged || change == ItemSceneChange)
+    {
+        updateSurfaceScale();
+    }
+
+    QQuickItem::itemChange(change, value);
 }
 
 void VideoSurface::updateSurfacePosition()
@@ -354,10 +372,17 @@ void VideoSurface::updateSurfaceSize()
     polish();
 }
 
-void VideoSurface::updateSurfacePositionAndSize()
+void VideoSurface::updateSurfaceScale()
+{
+    m_scaleDirty = true;
+    polish();
+}
+
+void VideoSurface::updateSurface()
 {
     updateSurfacePosition();
     updateSurfaceSize();
+    updateSurfaceScale();
 }
 
 void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurfaceProvider)
@@ -381,12 +406,13 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
         connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
+        connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged);
 
         connect(m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
-        connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, &VideoSurface::updateSurfacePositionAndSize);
+        connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, &VideoSurface::updateSurface);
 
         setFlag(ItemHasContents, true);
-        updateSurfacePositionAndSize(); // Polish is queued anyway, updatePolish() should be called when the initial size is set.
+        updateSurface(); // Polish is queued anyway, updatePolish() should be called when the initial size is set.
     }
     else
     {

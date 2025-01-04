@@ -173,6 +173,7 @@ private slots:
 protected slots:
     virtual void onSurfacePositionChanged(const QPointF&) {}
     virtual void onSurfaceSizeChanged(const QSizeF&) {}
+    virtual void onSurfaceScaleChanged(qreal) {}
 
 protected:
     qt_intf_t *m_intf = nullptr;
