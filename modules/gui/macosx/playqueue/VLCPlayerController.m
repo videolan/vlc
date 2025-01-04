@@ -604,7 +604,8 @@ static int BossCallback(vlc_object_t *p_this,
                                                             &player_vout_callbacks,
                                                             (__bridge void *)self);
 
-        _volume = VLCVolumeDefault;
+        const float aoutVolume = vlc_player_aout_GetVolume(_p_player);
+        _volume = aoutVolume >= 0.f ? aoutVolume : VLCVolumeDefault;
 
         _aLoopTime = -1;
         _bLoopTime = -1;
