@@ -477,6 +477,11 @@ static void *cli_client_thread(void *data)
         libvlc_Quit(vlc_object_instance(intf));
         vlc_restorecancel(canc);
     }
+    else
+    {
+        // Force EOF
+        shutdown(fileno(cl->stream), SHUT_WR);
+    }
 
     atomic_store_explicit(&cl->zombie, true, memory_order_release);
     return NULL;
