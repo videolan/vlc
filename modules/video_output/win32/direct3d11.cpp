@@ -1339,7 +1339,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt, vlc_video_
     if (vctx)
     {
         d3d11_video_context_t *vtcx_sys = GetD3D11ContextPrivate(vctx);
-        if (sys->picQuad.generic.textureFormat->formatTexture != vtcx_sys->format)
+        if (vtcx_sys && sys->picQuad.generic.textureFormat->formatTexture != vtcx_sys->format)
         {
             HRESULT hr;
             // check the input format can be used as input of a VideoProcessor
