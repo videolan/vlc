@@ -42,10 +42,16 @@ tracklist_append_event_t *tracklist_append_event_create(vlc_playlist_item_t *aft
     if (!result)
         return result;
 
-    if (after_track)
-        vlc_playlist_item_Hold(after_track);
+    bool has_previous = after_track != NULL;
+    uint64_t after_id = 0;
+    if( has_previous )
+        after_id = vlc_playlist_item_GetId( after_track );
 
-    *result = (tracklist_append_event_t) { .change_ev = { .count = count }, .after_track = after_track };
+    *result = (tracklist_append_event_t) {
+        .change_ev = { .count = count },
+        .has_previous = has_previous,
+        .after_track = after_id
+    };
     for (size_t i = 0; i < count; ++i) {
         result->items[i] = items[i];
         vlc_playlist_item_Hold(items[i]);
@@ -53,22 +59,24 @@ tracklist_append_event_t *tracklist_append_event_create(vlc_playlist_item_t *aft
     return result;
 }
 
-tracklist_remove_event_t *tracklist_remove_event_create(uint64_t removed_track_ids[], size_t count) {
+tracklist_remove_event_t *tracklist_remove_event_create(vlc_playlist_t *playlist, size_t first_index, size_t count) {
     tracklist_remove_event_t* result = malloc(sizeof(tracklist_remove_event_t) + count * sizeof(uint64_t));
     if (!result)
         return result;
 
     *result = (tracklist_remove_event_t) { .change_ev = { .count = count } };
-    memcpy(result->removed_tracks, removed_track_ids, count * sizeof(uint64_t));
+
+    for (size_t i = 0; i < count; ++i) {
+        vlc_playlist_item_t *item = vlc_playlist_Get( playlist, first_index + i );
+        result->removed_tracks[i] = vlc_playlist_item_GetId( item );
+    }
+
     return result;
 }
 
 void tracklist_append_event_destroy(tracklist_append_event_t *event) {
     if (!event)
         return;
-
-    if (event->after_track)
-        vlc_playlist_item_Release(event->after_track);
 
     for (size_t i = 0; i < event->change_ev.count; ++i) {
         vlc_playlist_item_Release(event->items[i]);
@@ -312,7 +320,7 @@ invalid_track_id:
     return InvalidTrackId(p_conn, p_from, psz_id, p_this);
 }
 
-static int MarshalTrack( DBusMessageIter *iter, uint64_t id, bool id_valid )
+static int MarshalTrack( DBusMessageIter *iter, bool id_valid, uint64_t id )
 {
     char *psz_track_id = NULL;
     int ret = VLC_SUCCESS;
@@ -348,8 +356,8 @@ MarshalTracks( intf_thread_t *p_intf, DBusMessageIter *container )
     for (size_t i = 0; i < pl_size; i++)
     {
         vlc_playlist_item_t *item = vlc_playlist_Get( playlist, i );
-        uint64_t track_id = vlc_playlist_item_GetId(item);
-        err = MarshalTrack( &tracks, track_id, true );
+        uint64_t track_id = vlc_playlist_item_GetId( item );
+        err = MarshalTrack( &tracks, true, track_id );
         if (err !=  VLC_SUCCESS)
             break;
     }
@@ -560,11 +568,11 @@ PropertiesChangedSignal( intf_thread_t    *p_intf,
  */
 static DBusHandlerResult
 TrackAddedSignal( intf_thread_t    *p_intf,
-                  vlc_playlist_item_t *previous_item,
+                  bool has_previous,
+                  uint64_t previous_item_id,
                   vlc_playlist_item_t *item )
 {
     DBusConnection  *p_conn = p_intf->p_sys->p_conn;
-    DBusMessageIter meta;
 
     SIGNAL_INIT( DBUS_MPRIS_TRACKLIST_INTERFACE,
                  DBUS_MPRIS_OBJECT_PATH,
@@ -574,12 +582,7 @@ TrackAddedSignal( intf_thread_t    *p_intf,
 
     GetInputMeta(item, &args);
 
-    uint64_t previous_id;
-    bool valid = previous_item != NULL;
-    if( valid )
-        previous_id = vlc_playlist_item_GetId( previous_item );
-
-    if( MarshalTrack( &args, previous_id, valid ) !=  VLC_SUCCESS )
+    if( MarshalTrack( &args, has_previous, previous_item_id ) !=  VLC_SUCCESS )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     SIGNAL_SEND;
@@ -600,7 +603,7 @@ TrackRemovedSignal( intf_thread_t    *p_intf, uint64_t id )
 
     OUT_ARGUMENTS;
 
-    if ( MarshalTrack( &args, id, true ) !=  VLC_SUCCESS )
+    if ( MarshalTrack( &args, true, id ) !=  VLC_SUCCESS )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
     SIGNAL_SEND;
@@ -624,11 +627,14 @@ int TrackListPropertiesChangedEmit( intf_thread_t    * p_intf,
             vlc_dictionary_value_for_key( p_changed_properties, "TrackAdded" );
 
         while ( added_tracks ) {
-            vlc_playlist_item_t *previous_item = added_tracks->after_track;
+            bool has_previous = added_tracks->has_previous;
+            uint64_t previous_id = added_tracks->after_track;
             for (size_t i = 0; i < added_tracks->change_ev.count; ++i) {
                 vlc_playlist_item_t *item = added_tracks->items[i];
-                TrackAddedSignal( p_intf, previous_item, item );
-                previous_item = item;
+                TrackAddedSignal( p_intf, has_previous, previous_id, item );
+
+                has_previous = true;
+                previous_id = vlc_playlist_item_GetId( item );
             }
             tracklist_append_event_t *next = tracklist_append_event_next( added_tracks );
             added_tracks = next;

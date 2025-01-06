@@ -44,7 +44,8 @@ struct tracklist_change_event {
 
 struct tracklist_append_event {
     struct tracklist_change_event change_ev;
-    vlc_playlist_item_t *after_track;
+    bool has_previous;    // false when items are inserted at the start of the tracklist
+    uint64_t after_track; // track id, only valid when has_previous is true
     vlc_playlist_item_t *items[];
 };
 
@@ -65,10 +66,11 @@ tracklist_append_event_create( vlc_playlist_item_t *after_track,
                                size_t count );
 
 /* Creates an event holding what items have been removed from a tracklist.
- *  The event data will be used to generate TrackRemoved DBus signals later on.
+ * The event data will be used to generate TrackRemoved DBus signals later on.
+ * Assumes playlist is locked.
  */
 tracklist_remove_event_t *
-tracklist_remove_event_create( uint64_t removed_track_ids[], size_t count );
+tracklist_remove_event_create( vlc_playlist_t *playlist, size_t first_index, size_t count );
 
 /* Releases any resources reserved for this event */
 void tracklist_append_event_destroy( tracklist_append_event_t *event );

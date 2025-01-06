@@ -1112,19 +1112,13 @@ playlist_on_items_removed(vlc_playlist_t *playlist,
     if (count == 0)
         return;
 
-    uint64_t item_ids[count];
-    for (size_t i = 0; i < count; ++i) {
-        vlc_playlist_item_t *item = vlc_playlist_Get(playlist, index);
-        item_ids[i] = vlc_playlist_item_GetId(item);
-    }
+    tracklist_remove_event_t *remove_event = tracklist_remove_event_create( playlist, index, count );
 
-    tracklist_remove_event_t *remove_event = tracklist_remove_event_create(item_ids, count);
     bool added = add_event_signal(data,
             &(callback_info_t){ .signal = SIGNAL_PLAYLIST_ITEM_DELETED,
                                 .items_removed = remove_event });
     if (!added)
         tracklist_remove_event_destroy(remove_event);
-    (void) playlist;
 }
 
 static void
