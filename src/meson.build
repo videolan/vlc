@@ -231,6 +231,7 @@ libvlccore_sources_base = files(
     'text/iso-639_def.h',
     'misc/actions.c',
     'misc/ancillary.c',
+    'misc/chroma_probe.c',
     'misc/executor.c',
     'misc/md5.c',
     'misc/probe.c',

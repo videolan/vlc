@@ -31,6 +31,7 @@ install_headers(
     'vlc_block_helper.h',
     'vlc_boxes.h',
     'vlc_charset.h',
+    'vlc_chroma_probe.h',
     'vlc_codec.h',
     'vlc_codecs.h',
     'vlc_common.h',

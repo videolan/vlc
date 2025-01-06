@@ -43,6 +43,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_configuration.h \
 	../include/vlc_cpu.h \
 	../include/vlc_clock.h \
+	../include/vlc_chroma_probe.h \
 	../include/vlc_decoder.h \
 	../include/vlc_demux.h \
 	../include/vlc_dialog.h \
@@ -380,6 +381,7 @@ libvlccore_la_SOURCES = \
 	misc/actions.c \
 	misc/ancillary.h \
 	misc/ancillary.c \
+	misc/chroma_probe.c \
 	misc/executor.c \
 	misc/md5.c \
 	misc/probe.c \

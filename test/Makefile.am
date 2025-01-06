@@ -37,6 +37,7 @@ check_PROGRAMS = \
 	test_src_interface_dialog \
 	test_src_media_source \
 	test_src_misc_bits \
+	test_src_misc_chroma_probe \
 	test_src_misc_epg \
 	test_src_misc_keystore \
 	test_src_misc_image \
@@ -218,6 +219,9 @@ test_src_input_decoder_SOURCES = \
 	src/input/decoder/input_decoder.h \
 	src/input/decoder/input_decoder_scenarios.c
 test_src_input_decoder_LDADD = $(LIBVLCCORE) $(LIBVLC)
+
+test_src_misc_chroma_probe_SOURCES = src/misc/chroma_probe.c
+test_src_misc_chroma_probe_LDADD = $(LIBVLCCORE) $(LIBVLC)
 
 test_src_misc_image_SOURCES = src/misc/image.c
 test_src_misc_image_LDADD = $(LIBVLCCORE) $(LIBVLC)
