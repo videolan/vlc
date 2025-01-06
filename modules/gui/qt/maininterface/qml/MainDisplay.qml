@@ -199,13 +199,17 @@ FocusScope {
             }
 
             Navigation.parentItem: mainColumn
-            Navigation.downItem: stackView
+            Navigation.downItem: mainRow
         }
 
-        Item {
+        FocusScope {
+            id: mainRow
+
             Layout.fillWidth: true
             Layout.fillHeight: true
             z: 0
+
+            focus: true
 
             Rectangle {
                 id: stackViewParent
@@ -320,6 +324,12 @@ FocusScope {
                 state: ((status === Loader.Ready) && MainCtx.playlistVisible) ? "expanded" : ""
 
                 readonly property bool shown: (status === Loader.Ready) && item.visible
+
+                onVisibleChanged: {
+                    if (!visible) {
+                        stackView.focus = true
+                    }
+                }
 
                 Component.onCompleted: {
                     Qt.callLater(() => { playlistTransition.enabled = true; })
@@ -533,7 +543,7 @@ FocusScope {
         background.visible: !stackViewParent.layer.enabled
 
         Navigation.parentItem: mainColumn
-        Navigation.upItem: stackView
+        Navigation.upItem: mainRow
         Navigation.cancelItem:sourcesBanner
         onVisibleChanged: {
             if (!visible && miniPlayer.activeFocus)
