@@ -81,7 +81,7 @@ FocusScope {
          return count
       }
 
-    readonly property int _availableSpaceForWeightedColumns: (width - (leftMargin + rightMargin + _totalSpacerSize + _fixedColumnSize))
+    readonly property int _availableSpaceForWeightedColumns: (availableRowWidth - ( _totalSpacerSize + _fixedColumnSize))
     readonly property int _weightedColumnsSize: _availableSpaceForWeightedColumns / _totalColumnWeights
 
     readonly property int _totalSpacerSize: VLCStyle.column_spacing * sortModel.length
