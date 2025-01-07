@@ -244,19 +244,15 @@ T.Control {
         }
 
         Item {
-            width: VLCStyle.icon_normal
+            width: VLCStyle.contextButton_width
 
             height: parent.height
 
             Widgets.IconToolButton {
                 id: contextButton
 
-                anchors.right: parent.right
-
-                // NOTE: We want the contextButton to be contained inside the trailing
-                //       column_spacing.
-                anchors.rightMargin: delegate.leftPadding - VLCStyle.layout_left_margin + delegate.rightPadding - VLCStyle.layout_right_margin +
-                                     parent.width + contentItemRow.rightPadding
+                // place it at the end of the last column, we don't want spacing for this column
+                x: - contentItemRow.spacing + VLCStyle.contextButton_margin
 
                 anchors.verticalCenter: parent.verticalCenter
 

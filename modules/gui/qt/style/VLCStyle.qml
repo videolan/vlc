@@ -169,6 +169,9 @@ QtObject {
     readonly property int button_width_normal: MainCtx.dp(96, scale)
     readonly property int button_width_large: MainCtx.dp(128, scale)
 
+    readonly property int contextButton_width: icon_normal
+    readonly property int contextButton_margin: margin_xxsmall
+
     readonly property int checkButton_width: MainCtx.dp(56, scale)
     readonly property int checkButton_height: MainCtx.dp(32, scale)
 

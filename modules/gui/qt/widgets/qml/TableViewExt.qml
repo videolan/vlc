@@ -105,6 +105,8 @@ FocusScope {
     property real _availabeRowWidthLastUpdateTime: Date.now()
 
     readonly property real _currentAvailableRowWidth: width - leftMargin - rightMargin
+                                                      // contextButton is implemented as fixed column
+                                                      - VLCStyle.contextButton_width - (VLCStyle.contextButton_margin * 2)
 
     // Aliases
 
