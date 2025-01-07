@@ -4054,8 +4054,7 @@ AS_IF([test "${enable_qt}" != "no"], [
   ], [])
 
   QT_BIN_DIRECTORY="$(${QT_PATHS}         -query QT_HOST_BINS 2>/dev/null)"
-  QMAKE="${QT_PATHS}"
-  AC_MSG_NOTICE([using ${QMAKE}])
+  AC_MSG_NOTICE([using ${QT_PATHS}])
 
   AC_CHECK_PROGS(PYTHON3, [python3], [no])
   AS_IF([test "$PYTHON3" == "no"], [
@@ -4064,29 +4063,27 @@ AS_IF([test "${enable_qt}" != "no"], [
   ],[
 
   AC_MSG_CHECKING([for Qt libraries])
-  mkdir -p ${ac_pwd}/modules/gui/qt
-  touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
-  QT_PKG_ERRORS=$(${QMAKE} ${srcdir}/modules/gui/qt/qt6.pro -o ${ac_pwd}/modules/gui/qt/qmake-qt 2>&1)
+  srcdir_abs=`(cd ${srcdir} && pwd -P)`
+  QT_PKG_ERRORS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+    --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+    --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
+    --builddir ${ac_pwd}/modules/gui/qt \
+    --libs)
   ac_status=$?
-  AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-qt],[
-      echo "get_cflags:"                    > ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      echo '	$(info $(DEFINES) $(INCPATH))' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      echo "get_libs:"                      >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      dnl transform /foo/bar/libbaz.so arguments to -L/foo/bar -lbaz
-      dnl RS: each arguments (space separated) are treated as a new line
-      dnl FS: split fields using /[^/]* to extract the file basepath ($1)
-      dnl  /lib.*\.so/ lines (arguments) will add -Lxxx if this is not the current path (p), then transform into a -lxxx argument
-      dnl other arguments are kept as-is
-      echo '	echo $(LIBS) | awk '\''BEGIN{FS="/[[^/]]*$$";RS=" ";ORS=" "}{if($$0 ~ /\/lib.*\.so/){ if(p != $$1){ print "-L" $$1; p=$$1}; sub(/.*\/lib/, "-l"); sub(/\.so.*/, "")}; print $$0}'\' >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      echo 'get_ldflags:'                   >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-      echo '	echo $(LFLAGS)'             >> ${ac_pwd}/modules/gui/qt/qmake-common.mk
-
-      echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"  >> ${ac_pwd}/modules/gui/qt/qmake-qt
+  AS_IF([test $ac_status = 0],[
 
       AC_MSG_RESULT([yes])
-      QT_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_libs)
-      QT_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_cflags)
-      QT_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qt get_ldflags)
+      QT_LIBS=${QT_PKG_ERRORS}
+      QT_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+        --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+        --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
+        --builddir ${ac_pwd}/modules/gui/qt \
+        --cflags)
+      QT_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+        --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+        --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
+        --builddir ${ac_pwd}/modules/gui/qt \
+        --ldflags)
       AC_SUBST([QT_LIBS])
       AC_SUBST([QT_CFLAGS])
       AC_SUBST([QT_LDFLAGS])
@@ -4147,14 +4144,25 @@ AS_IF([test "${enable_qt}" != "no"], [
       VLC_RESTORE_FLAGS
 
       AC_MSG_CHECKING([for Qt QTest])
-      (${QMAKE} ${srcdir}/modules/gui/qt/qtest.pro -o ${ac_pwd}/modules/gui/qt/qmake-qtest) 2>/dev/null
+      _QT_QTEST_LIBS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --libs) 2>/dev/null
       ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-qtest],[
-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-qtest
+      AS_IF([test $ac_status = 0],[
         AC_MSG_RESULT([yes])
-        QT_QTEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_libs)
-        QT_QTEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_cflags)
-        QT_QTEST_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-qtest get_cflags)
+        QT_QTEST_LIBS=${_QT_QTEST_LIBS}
+        QT_QTEST_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --cflags)
+        QT_QTEST_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --ldflags)
         AC_SUBST([QT_QTEST_LIBS])
         AC_SUBST([QT_QTEST_CFLAGS])
         AC_SUBST([QT_QTEST_LDFLAGS])
@@ -4162,22 +4170,32 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[
         AC_MSG_RESULT([no])
       ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-qtest
 
       AC_MSG_CHECKING([for QuickTest])
-      (${QMAKE} ${srcdir}/modules/gui/qt/quicktest.pro -o ${ac_pwd}/modules/gui/qt/qmake-quicktest) 2>/dev/null
+      _QT_QUICK_TEST_LIBS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --libs) 2>/dev/null
       ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
+      AS_IF([test $ac_status = 0],[
         AS_IF([${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
         --qmake "${QMAKE6}" \
         --qtconf "${with_qtconf}" \
         --modules QtTest="" \
         >&AS_MESSAGE_FD ], [
-            echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-quicktest
             AC_MSG_RESULT([yes])
-            QT_QUICK_TEST_LIBS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_libs)
-            QT_QUICK_TEST_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_cflags)
-            QT_QUICK_TEST_LDFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-quicktest get_ldflags)
+            QT_QUICK_TEST_LIBS=${_QT_QUICK_TEST_LIBS}
+            QT_QUICK_TEST_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+                --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+                --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
+                --builddir ${ac_pwd}/modules/gui/qt \
+                --cflags)
+            QT_QUICK_TEST_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+                --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+                --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
+                --builddir ${ac_pwd}/modules/gui/qt \
+                --ldflags)
             AC_SUBST([QT_QUICK_TEST_LIBS])
             AC_SUBST([QT_QUICK_TEST_CFLAGS])
             AC_SUBST([QT_QUICK_TEST_LDFLAGS])
@@ -4188,7 +4206,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       ],[
         AC_MSG_RESULT([no])
       ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-quicktest
 
       AC_PATH_PROGS(FXC, [fxc], [no], [${CONTRIB_DIR}/bin])
       AS_IF([test "$FXC" != "no"],[
@@ -4198,47 +4215,52 @@ AS_IF([test "${enable_qt}" != "no"], [
       ])
 
       AC_MSG_CHECKING([for Qt Core private])
-      (${QMAKE} ${srcdir}/modules/gui/qt/private-core.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-core) 2>/dev/null
+      _QT_CORE_PRIVATE_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/private-core.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --cflags) 2>/dev/null
       ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-core],[
-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-core
+      AS_IF([test $ac_status = 0],[
         AC_MSG_RESULT([yes])
-        QT_CORE_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-core get_cflags)
+        QT_CORE_PRIVATE_CFLAGS=${_QT_CORE_PRIVATE_CFLAGS}
         AC_SUBST([QT_CORE_PRIVATE_CFLAGS])
         have_qt_core_private="yes"
       ],[
         AC_MSG_RESULT([no])
       ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-private-core
 
       AC_MSG_CHECKING([for Qt GUI private])
-      (${QMAKE} ${srcdir}/modules/gui/qt/private-gui.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-gui) 2>/dev/null
+      _QT_GUI_PRIVATE_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/private-gui.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --cflags) 2>/dev/null
       ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-gui],[
-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-gui
-
+      AS_IF([test $ac_status = 0],[
         AC_MSG_RESULT([yes])
-        QT_GUI_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-gui get_cflags)
+        QT_GUI_PRIVATE_CFLAGS=${_QT_GUI_PRIVATE_CFLAGS}
         AC_SUBST([QT_GUI_PRIVATE_CFLAGS])
         have_qt_gui_private="yes"
       ],[
         AC_MSG_RESULT([no])
       ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-private-gui
 
       AC_MSG_CHECKING([for Qt Quick private])
-      (${QMAKE} ${srcdir}/modules/gui/qt/private-quick.pro -o ${ac_pwd}/modules/gui/qt/qmake-private-quick) 2>/dev/null
+      _QT_QUICK_PRIVATE_CFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
+            --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
+            --pro ${srcdir_abs}/modules/gui/qt/private-quick.pro \
+            --builddir ${ac_pwd}/modules/gui/qt \
+            --cflags) 2>/dev/null
       ac_status=$?
-      AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-private-quick],[
-        echo "include ${ac_pwd}/modules/gui/qt/qmake-common.mk"        >> ${ac_pwd}/modules/gui/qt/qmake-private-quick
+      AS_IF([test $ac_status = 0],[
         AC_MSG_RESULT([yes])
-        QT_QUICK_PRIVATE_CFLAGS=$(cd ${ac_pwd}/modules/gui/qt && make -s -f qmake-private-quick get_cflags)
+        QT_QUICK_PRIVATE_CFLAGS=${_QT_QUICK_PRIVATE_CFLAGS}
         AC_SUBST([QT_QUICK_PRIVATE_CFLAGS])
         have_qt_declarative_private="yes"
       ],[
         AC_MSG_RESULT([no])
       ])
-      rm -f ${ac_pwd}/modules/gui/qt/qmake-private-quick
 
       dnl gtk theme provider
       PKG_CHECK_MODULES([GTK3], [gtk+-3.0 >= 3.20], [
@@ -4249,9 +4271,6 @@ AS_IF([test "${enable_qt}" != "no"], [
       have_qt="no"
     ])
   ])
-  rm -f ${ac_pwd}/modules/gui/qt/qmake-common.mk
-  rm -f ${ac_pwd}/modules/gui/qt/qmake-qt
-  rm -f ${ac_pwd}/modules/gui/qt/.qmake.stash
   ])
 
     AS_IF([test "${have_qt}" = "no"],[
