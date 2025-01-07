@@ -4057,6 +4057,12 @@ AS_IF([test "${enable_qt}" != "no"], [
   QMAKE="${QT_PATHS}"
   AC_MSG_NOTICE([using ${QMAKE}])
 
+  AC_CHECK_PROGS(PYTHON3, [python3], [no])
+  AS_IF([test "$PYTHON3" == "no"], [
+    AC_MSG_WARN([python is required to detect Qt libraries/flags])
+    have_qt="no"
+  ],[
+
   AC_MSG_CHECKING([for Qt libraries])
   mkdir -p ${ac_pwd}/modules/gui/qt
   touch    ${ac_pwd}/modules/gui/qt/.qmake.stash
@@ -4099,7 +4105,6 @@ AS_IF([test "${enable_qt}" != "no"], [
           AC_MSG_WARN([qmlcachegen not found])
       ])
 
-      AC_CHECK_PROGS(PYTHON3, [python3], [no])
       AC_MSG_CHECKING([if required Qt plugins are installed with ${QMAKE6} and conf ${with_qtconf}])
 
       AS_IF([test "${have_qt65}" = "yes"], [
@@ -4107,7 +4112,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       ], [
         qt_qml_effects_module="Qt5Compat.GraphicalEffects"
       ])
-      AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
+      AS_IF([${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
             --qmake "${QMAKE6}" \
             --qtconf "${with_qtconf}" \
             --modules \
@@ -4163,7 +4168,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       (${QMAKE} ${srcdir}/modules/gui/qt/quicktest.pro -o ${ac_pwd}/modules/gui/qt/qmake-quicktest) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0 && test -f ${ac_pwd}/modules/gui/qt/qmake-quicktest],[
-        AS_IF([test "$PYTHON3" != "no" && ${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
+        AS_IF([${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
         --qmake "${QMAKE6}" \
         --qtconf "${with_qtconf}" \
         --modules QtTest="" \
@@ -4247,6 +4252,8 @@ AS_IF([test "${enable_qt}" != "no"], [
   rm -f ${ac_pwd}/modules/gui/qt/qmake-common.mk
   rm -f ${ac_pwd}/modules/gui/qt/qmake-qt
   rm -f ${ac_pwd}/modules/gui/qt/.qmake.stash
+  ])
+
     AS_IF([test "${have_qt}" = "no"],[
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
