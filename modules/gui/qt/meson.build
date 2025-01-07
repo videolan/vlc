@@ -961,6 +961,50 @@ if qt6_dep.found()
             dependencies: qt6_dep)
     endforeach
 
+    qt_static_check = '''
+    #include <qconfig.h>
+    #ifndef QT_STATIC
+    # error Qt using shared libraries
+    #endif
+    '''
+
+    if cpp.compiles(qt_static_check, dependencies: qt6_dep, name: 'Qt6 compiled with static libraries')
+        qt_install_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir', configtool: '-query QT_INSTALL_BINS')
+        qmake6 = find_program(qt_install_bin_directory + '/qmake6', required: true)
+        if qmake6.found()
+            qtcflags = run_command(
+                prog_python,
+                meson.current_source_dir() / 'scripts/static_dirs.py',
+                '--qmake', qmake6.full_path(),
+                '--pro', meson.current_source_dir() / 'qt6.pro',
+                '--builddir', meson.current_build_dir(),
+                '--cflags',
+                check: false,
+            )
+            if qtcflags.returncode() == 0
+                qt_extra_flags += qtcflags.stdout().split()
+            else
+                warning('Failed to get static Qt compilation flags: ' + qtcflags.stderr())
+            endif
+            qtlflags = run_command(
+                prog_python,
+                meson.current_source_dir() / 'scripts/static_dirs.py',
+                '--qmake', qmake6.full_path(),
+                '--pro', meson.current_source_dir() / 'qt6.pro',
+                '--builddir', meson.current_build_dir(),
+                '--libs', '--ldflags',
+                check: false,
+            )
+            if qtlflags.returncode() == 0
+                qt_link_args += qtlflags.stdout().split()
+            else
+                warning('Failed to get static Qt link flags: ' + qtlflags.stderr())
+            endif
+        else
+            warning('Failed to find qmake6 to get static Qt variables')
+        endif
+    endif
+
     qt6pre_qrc = qt6.preprocess(
         qresources: qrc_files,
         include_directories: qt_include_dir,
