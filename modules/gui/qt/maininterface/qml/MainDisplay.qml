@@ -295,7 +295,7 @@ FocusScope {
                         }
 
                         // Capture WheelEvents before they reach stackView
-                        onWheel: {
+                        onWheel: (wheel) => {
                             wheel.accepted = true
                         }
                     }
