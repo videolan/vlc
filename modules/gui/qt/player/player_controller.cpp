@@ -1220,10 +1220,23 @@ void PlayerController::reverse()
 void PlayerController::setRate( float new_rate )
 {
     Q_D(PlayerController);
+
+    if (qFuzzyCompare(d->m_rate, new_rate))
+        return;
+
     msg_Dbg( d->p_intf, "setRate %f", new_rate);
     vlc_player_locker lock{ d->m_player };
     if ( vlc_player_CanChangeRate( d->m_player ) )
+    {
         vlc_player_ChangeRate( d->m_player, new_rate );
+
+        // Until the timer notifies the change, we need to still change
+        // the rate, because player timer update may take a long time.
+        // For position, it is supposed to be interpolated but for rate
+        // the new value can be taken as is:
+        d->m_rate = new_rate;
+        emit rateChanged(d->m_rate);
+    }
 }
 
 void PlayerController::slower()
