@@ -71,6 +71,10 @@
  */
 @protocol VLCPictureInPictureWindowControlling <NSObject>
 
+/// Property to set the event handler block that will notify when the picture
+/// in picture is started or stopped
+@property (nonatomic) void(^stateChangeEventHandler)(BOOL isStarted);
+
 /// Call to present the display in picture in picture mode
 - (void)startPictureInPicture;
 

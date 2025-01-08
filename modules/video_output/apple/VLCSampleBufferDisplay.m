@@ -639,14 +639,13 @@ shouldInheritContentsScale:(CGFloat)newScale
 
 #pragma mark -
 
-@interface VLCSampleBufferDisplay: NSObject <VLCPictureInPictureWindowControlling>
+@interface VLCSampleBufferDisplay: NSObject
 {
     @public
     vout_display_place_t place;
     filter_t *converter;
 }
     @property (nonatomic, readonly, weak) VLCView *window;
-    @property (nonatomic, readonly, weak) id drawable;
     @property (nonatomic, readonly) vout_display_t *vd;
     @property (nonatomic) VLCSampleBufferDisplayView *displayView;
     @property (nonatomic) AVSampleBufferDisplayLayer *displayLayer;
@@ -694,8 +693,6 @@ shouldInheritContentsScale:(CGFloat)newScale
 
     _window = window;
 
-    _drawable = (__bridge id)var_InheritAddress (vd, "drawable-nsobject");
-
     _pipcontroller = CreatePipController(vd, (__bridge void *)self);
 
     _vd = vd;
@@ -713,13 +710,6 @@ shouldInheritContentsScale:(CGFloat)newScale
             (__bridge void*)_displayView.displayLayer
         );
     }
-    
-    if ( ![_drawable conformsToProtocol:@protocol(VLCPictureInPictureDrawable)] )
-        return;
-    
-    id<VLCPictureInPictureDrawable> drawable = (id<VLCPictureInPictureDrawable>)_drawable;
-    
-    drawable.pictureInPictureReady(self);
 }
 
 - (void)prepareDisplay {
@@ -764,35 +754,6 @@ shouldInheritContentsScale:(CGFloat)newScale
     });
     DeletePipController(_pipcontroller);
     _pipcontroller = NULL;
-}
-
-#pragma mark - VLCDisplayPictureInPictureControlling
-
-- (void)startPictureInPicture {
-    if ( _pipcontroller
-            && _pipcontroller->ops->start_pip ) {
-        _pipcontroller->ops->start_pip(
-            _pipcontroller
-        );
-    }
-}
-
-- (void)stopPictureInPicture {
-    if ( _pipcontroller
-            && _pipcontroller->ops->stop_pip ) {
-        _pipcontroller->ops->stop_pip(
-            _pipcontroller
-        );
-    }
-}
-
-- (void)invalidatePlaybackState {
-    if ( _pipcontroller
-            && _pipcontroller->ops->invalidate_pip ) {
-        _pipcontroller->ops->invalidate_pip(
-            _pipcontroller
-        );
-    }
 }
 
 @end

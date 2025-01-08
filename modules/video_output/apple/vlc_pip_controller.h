@@ -33,9 +33,6 @@ typedef struct pip_controller_t pip_controller_t;
 
 struct pip_controller_operations {
     void (*set_display_layer)(pip_controller_t *, void *);
-    void (*start_pip)(pip_controller_t *);
-    void (*stop_pip)(pip_controller_t *);
-    void (*invalidate_pip)(pip_controller_t *);
     int (*close)(pip_controller_t *);
 };
 

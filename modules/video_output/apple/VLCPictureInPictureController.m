@@ -41,11 +41,13 @@
 API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
 @interface VLCPictureInPictureController: NSObject
     <AVPictureInPictureSampleBufferPlaybackDelegate, 
-     AVPictureInPictureControllerDelegate>
+     AVPictureInPictureControllerDelegate,
+     VLCPictureInPictureWindowControlling>
 
 @property (nonatomic, readonly) NSObject *avPipController;
 @property (nonatomic, readonly) pip_controller_t *pipcontroller;
 @property (nonatomic, readonly, weak) id<VLCPictureInPictureDrawable> drawable;
+@property (nonatomic) void(^stateChangeEventHandler)(BOOL isStarted);
 
 - (instancetype)initWithPipController:(pip_controller_t *)pipcontroller;
 - (void)invalidatePlaybackState;
@@ -89,7 +91,7 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
     ];
     void *mediaController = (__bridge void*)_drawable.mediaController;
     BOOL isMediaSeekable = (BOOL)_pipcontroller->media_cbs->is_media_seekable(mediaController);
-              avPipController.requiresLinearPlayback = !isMediaSeekable;
+    avPipController.requiresLinearPlayback = !isMediaSeekable;
     avPipController.delegate = self;
 #if TARGET_OS_IOS
     // Not sure if it's mandatory, its usefulness isn't obvious and 
@@ -103,24 +105,8 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
                        forKeyPath:@"isPictureInPicturePossible"
                           options:NSKeyValueObservingOptionInitial|NSKeyValueObservingOptionNew
                           context:NULL];
-}
 
-- (void)startPictureInPicture {
-    AVPictureInPictureController *avPipController =
-        (AVPictureInPictureController *)_avPipController;
-    [avPipController startPictureInPicture];
-}
-
-- (void)stopPictureInPicture {
-    AVPictureInPictureController *avPipController =
-        (AVPictureInPictureController *)_avPipController;
-    [avPipController stopPictureInPicture];
-}
-
-- (void)invalidatePlaybackState {
-    AVPictureInPictureController *avPipController =
-        (AVPictureInPictureController *)_avPipController;
-    [avPipController invalidatePlaybackState];
+    _drawable.pictureInPictureReady(self);
 }
 
 - (void)close {
@@ -215,6 +201,36 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
     [self invalidatePlaybackState];
 }
 
+- (void)pictureInPictureControllerDidStartPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
+    if (_stateChangeEventHandler)
+        _stateChangeEventHandler(YES);
+}
+
+- (void)pictureInPictureControllerDidStopPictureInPicture:(AVPictureInPictureController *)pictureInPictureController {
+    if(_stateChangeEventHandler)
+        _stateChangeEventHandler(NO);
+}
+
+#pragma mark - VLCDisplayPictureInPictureControlling
+
+- (void)startPictureInPicture {
+    AVPictureInPictureController *avPipController =
+        (AVPictureInPictureController *)_avPipController;
+    [avPipController startPictureInPicture];
+}
+
+- (void)stopPictureInPicture {
+    AVPictureInPictureController *avPipController =
+        (AVPictureInPictureController *)_avPipController;
+    [avPipController stopPictureInPicture];
+}
+
+- (void)invalidatePlaybackState {
+    AVPictureInPictureController *avPipController =
+        (AVPictureInPictureController *)_avPipController;
+    [avPipController invalidatePlaybackState];
+}
+
 @end
 
 static void SetDisplayLayer( pip_controller_t *pipcontroller, void *layer) {
@@ -226,33 +242,6 @@ static void SetDisplayLayer( pip_controller_t *pipcontroller, void *layer) {
             (__bridge AVSampleBufferDisplayLayer *)layer;
         
         [sys prepare:displayLayer];
-    }
-}
-
-static void StartPictureInPicture( pip_controller_t *pipcontroller) {
-    if (@available(macOS 12.0, iOS 15.0, tvos 15.0, *)) {
-        VLCPictureInPictureController *sys = 
-            (__bridge VLCPictureInPictureController*)pipcontroller->p_sys;
-        
-        [sys startPictureInPicture];
-    }
-}
-
-static void StopPictureInPicture( pip_controller_t *pipcontroller) {
-    if (@available(macOS 12.0, iOS 15.0, tvos 15.0, *)) {
-        VLCPictureInPictureController *sys = 
-            (__bridge VLCPictureInPictureController*)pipcontroller->p_sys;
-
-        [sys stopPictureInPicture];
-    }
-}
-
-static void InvalidatePictureInPicture( pip_controller_t *pipcontroller) {
-    if (@available(macOS 12.0, iOS 15.0, tvos 15.0, *)) {
-        VLCPictureInPictureController *sys = 
-            (__bridge VLCPictureInPictureController*)pipcontroller->p_sys;
-        
-        [sys invalidatePlaybackState];
     }
 }
 
@@ -314,9 +303,6 @@ static int OpenController( pip_controller_t *pipcontroller )
 {
     static const struct pip_controller_operations ops = {
         SetDisplayLayer, 
-        StartPictureInPicture, 
-        StopPictureInPicture, 
-        InvalidatePictureInPicture, 
         CloseController
     };
 
