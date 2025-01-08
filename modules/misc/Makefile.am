@@ -137,3 +137,5 @@ libmedialibrary_plugin_la_LIBADD = $(MEDIALIBRARY_LIBS)
 libmedialibrary_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(miscdir)'
 EXTRA_LTLIBRARIES += libmedialibrary_plugin.la
 misc_LTLIBRARIES += $(LTLIBmedialibrary)
+
+include misc/preparser_serializer/Makefile.am
