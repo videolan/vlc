@@ -150,3 +150,5 @@ endif
 	else \
 		echo "Cross-compilation: cache generation skipped!" ; \
 	fi
+
+include preparser/Makefile.am

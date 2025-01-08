@@ -59,4 +59,33 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         build_by_default: not meson.is_cross_build(),
     )
 
+    vlc_preparser_sources = [
+      'preparser/main.c',
+      'preparser/cmdline.c',
+      'preparser/cmdline.h',
+      '../src/config/getopt.c',
+      '../src/config/jaro_winkler.c',
+    ]
+
+    executable('vlc-preparser',
+        vlc_preparser_sources,
+        link_with: [libvlc, libvlccore, vlc_libcompat],
+        include_directories: [vlc_include_dirs],
+        dependencies: vlc_deps,
+        install: true,
+        install_dir: get_option('libexecdir'),
+        win_subsystem: 'windows'
+    )
+
+    vlc_preparser_static_dep = executable('vlc-preparser-static',
+        vlc_preparser_sources,
+        link_with: [libvlc, libvlccore, vlc_libcompat],
+        include_directories: [vlc_include_dirs],
+        dependencies: vlc_deps,
+        c_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
+        objc_args: [vlc_top_builddir_def, vlc_top_srcdir_def],
+        install_dir: get_option('libexecdir'),
+        win_subsystem: 'windows'
+    )
+
 endif
