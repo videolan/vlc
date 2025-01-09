@@ -823,7 +823,7 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
             goto interop_init;
     }
 
-    const vlc_fourcc_t *list = NULL;
+    vlc_fourcc_t *list = NULL;
     if (is_yup)
         list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
     else if (interop->fmt_in.i_chroma != VLC_CODEC_XYZ_12B)
@@ -833,20 +833,20 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         goto error;
 
     /* Check whether any fallback for the chroma is translatable to OpenGL. */
-    while (*list)
+    for (const vlc_fourcc_t *fcc = list; *fcc; fcc++)
     {
-        ret = opengl_interop_init(interop, *list, space);
+        ret = opengl_interop_init(interop, *fcc, space);
         if (ret == VLC_SUCCESS)
         {
-            i_chroma = *list;
+            i_chroma = *fcc;
             msg_Warn(interop->gl, "direct rendering failed for %4.4s, "
                      "fallback to %4.4s",
                      (const char *)&interop->fmt_in.i_chroma,
                      (const char *)&i_chroma);
             goto interop_init;
         }
-        list++;
     }
+    free(list);
 
     goto error;
 

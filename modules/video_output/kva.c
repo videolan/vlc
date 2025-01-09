@@ -446,7 +446,7 @@ static int Control( vout_display_t *vd, int query )
 static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
 {
     vout_display_sys_t * sys = vd->sys;
-    const vlc_fourcc_t *fallback;
+    vlc_fourcc_t *fallback;
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
     int i_chroma_shift = 0;
@@ -458,6 +458,8 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     {
         fallback = ( pass == 0 ) ? vlc_fourcc_GetYUVFallback( fmt->i_chroma ) :
                                    vlc_fourcc_GetRGBFallback( fmt->i_chroma );
+        if( fallback == NULL )
+            continue;
 
         for( int i = 0; fallback[ i ]; i++ )
         {
@@ -512,6 +514,7 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                 fmt->i_chroma = fallback[ i ];
                 break;
             }
+            free( fallback );
         }
     }
 

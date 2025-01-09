@@ -777,26 +777,26 @@ VLC_API const char * vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc
  * It returns a list (terminated with the value 0) of YUV fourccs in
  * decreasing priority order for the given chroma.
  *
- * It will always return a non NULL pointer that must not be freed.
+ * It can return a NULL pointer, it must be freed.
  */
-VLC_API const vlc_fourcc_t * vlc_fourcc_GetYUVFallback( vlc_fourcc_t );
+VLC_API vlc_fourcc_t * vlc_fourcc_GetYUVFallback( vlc_fourcc_t );
 
 /**
  * It returns a list (terminated with the value 0) of RGB fourccs in
  * decreasing priority order for the given chroma.
  *
- * It will always return a non NULL pointer that must not be freed.
+ * It can return a NULL pointer, it must be freed.
  */
-VLC_API const vlc_fourcc_t * vlc_fourcc_GetRGBFallback( vlc_fourcc_t );
+VLC_API vlc_fourcc_t * vlc_fourcc_GetRGBFallback( vlc_fourcc_t );
 
 /**
  * It returns a list (terminated with the value 0) of fourccs in decreasing
  * priority order for the given chroma. It will return either YUV or RGB
  * fallbacks depending on whether or not the fourcc given is YUV.
  *
- * It will always return a non NULL pointer that must not be freed.
+ * It can return a NULL pointer, it must be freed.
  */
-VLC_API const vlc_fourcc_t * vlc_fourcc_GetFallback( vlc_fourcc_t );
+VLC_API vlc_fourcc_t * vlc_fourcc_GetFallback( vlc_fourcc_t );
 
 /**
  * Chroma subtype

@@ -136,12 +136,16 @@ static int Open(vout_display_t *vd,
         fmt->i_chroma = vd->source->i_chroma;
     } else {
         fmt->i_chroma = 0;
-        const vlc_fourcc_t *fcc;
-        for (fcc = vlc_fourcc_GetFallback(vd->source->i_chroma); *fcc; fcc++) {
-            if (vlc_placebo_FormatSupported(gpu, *fcc)) {
-                fmt->i_chroma = *fcc;
-                break;
+        vlc_fourcc_t *list = vlc_fourcc_GetFallback(vd->source->i_chroma);
+        if (list != NULL)
+        {
+            for (const vlc_fourcc_t *fcc = list; *fcc; fcc++) {
+                if (vlc_placebo_FormatSupported(gpu, *fcc)) {
+                    fmt->i_chroma = *fcc;
+                    break;
+                }
             }
+            free(list);
         }
 
         if (fmt->i_chroma == 0) {

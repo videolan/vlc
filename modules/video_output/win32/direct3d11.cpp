@@ -1083,14 +1083,18 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp, vlc_video_co
 #endif
                 )
         {
-            const vlc_fourcc_t *list = vlc_fourcc_GetFallback(vd->source->i_chroma);
-            for (unsigned i = 0; list[i] != 0; i++) {
-                if (list[i] == vd->source->i_chroma)
-                    continue;
-                fmt.i_chroma = list[i];
-                err = SetupOutputFormat(vd, &fmt, nullptr, &sys->picQuad.quad_fmt);
-                if (err == VLC_SUCCESS)
-                    break;
+            vlc_fourcc_t *list = vlc_fourcc_GetFallback(vd->source->i_chroma);
+            if (list != NULL)
+            {
+                for (unsigned i = 0; list[i] != 0; i++) {
+                    if (list[i] == vd->source->i_chroma)
+                        continue;
+                    fmt.i_chroma = list[i];
+                    err = SetupOutputFormat(vd, &fmt, nullptr, &sys->picQuad.quad_fmt);
+                    if (err == VLC_SUCCESS)
+                        break;
+                }
+                free(list);
             }
         }
         if (err != VLC_SUCCESS)

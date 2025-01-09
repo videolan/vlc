@@ -243,14 +243,16 @@ uint_fast32_t vlc_drm_find_best_format(int fd, uint_fast32_t plane_id,
     if (nfmt > plane.count_format_types)
         nfmt = plane.count_format_types;
 
+    vlc_fourcc_t *list = NULL;
     /* Look for an exact match first */
     uint_fast32_t drm_fourcc = vlc_drm_find_format(chroma, nfmt, fmts);
     if (drm_fourcc != 0)
         goto out;
 
     /* Fallback to decreasingly optimal formats */
-    const vlc_fourcc_t *list = vlc_fourcc_GetFallback(chroma);
-    assert(list != NULL);
+    list = vlc_fourcc_GetFallback(chroma);
+    if (list == NULL)
+        goto out;
 
     for (size_t i = 0; list[i] != 0; i++) {
         drm_fourcc = vlc_drm_find_format(list[i], nfmt, fmts);
@@ -259,6 +261,7 @@ uint_fast32_t vlc_drm_find_best_format(int fd, uint_fast32_t plane_id,
     }
     errno = ENOTSUP;
 out:
+    free(list);
     free(fmts);
     return drm_fourcc;
 }

@@ -1351,7 +1351,8 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
         msg_Warn( vd, "Disabling hardware chroma conversion due to odd dimensions" );
 
     for (unsigned pass = 0; pass < 2; pass++) {
-        const vlc_fourcc_t *list;
+        const vlc_fourcc_t *list = NULL;
+        vlc_fourcc_t *fallback_list = NULL;
         const vlc_fourcc_t dxva_chroma[] = {fmt->i_chroma, 0};
         D3DFORMAT decoder_format = D3DFMT_UNKNOWN;
 
@@ -1364,10 +1365,11 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
             msg_Dbg(vd, "favor decoder format: %4.4s (%d)", (const char*)&decoder_format, decoder_format);
         }
         else if (pass == 0 && hardware_scale_ok && sys->allow_hw_yuv && vlc_fourcc_IsYUV(fmt->i_chroma))
-            list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
+            list = fallback_list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         else if (pass == 1)
-            list = vlc_fourcc_GetRGBFallback(fmt->i_chroma);
-        else
+            list = fallback_list = vlc_fourcc_GetRGBFallback(fmt->i_chroma);
+
+        if (list == NULL)
             continue;
 
         for (unsigned i = 0; list[i] != 0; i++) {
@@ -1381,9 +1383,13 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
 
                 msg_Dbg(vd, "trying surface pixel format: %s", format->name);
                 if (!Direct3D9CheckConversion(vd, format->format))
+                {
+                    free(fallback_list);
                     return format;
+                }
             }
         }
+        free(fallback_list);
     }
     return NULL;
 }
