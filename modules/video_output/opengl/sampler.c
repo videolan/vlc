@@ -993,7 +993,9 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     int glsl_version;
     if (api->is_gles) {
-        sampler->shader.precision = "precision highp float;\n";
+        sampler->shader.precision = "precision highp float;\n"
+            "precision highp sampler2D;\n"
+            "precision highp sampler3D;\n";
         if (api->glsl_version >= 300) {
             sampler->shader.version = strdup("#version 300 es\n");
             glsl_version = 300;
