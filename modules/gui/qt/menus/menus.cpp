@@ -453,7 +453,7 @@ void VLCMenuBar::VideoMenu( qt_intf_t *p_intf, QMenu *current )
 {
     if( current->isEmpty() )
     {
-        current->addMenu(new CheckableListMenu(qtr( "Video &Track" ), THEMIM->getVideoTracks(), QActionGroup::ExclusionPolicy::ExclusiveOptional, current));
+        current->addMenu(new CheckableListMenu(qtr( "Video &Track" ), THEMIM->getVideoTracks(), QActionGroup::ExclusionPolicy::None, current));
 
         current->addSeparator();
         /* Surface modifiers */
