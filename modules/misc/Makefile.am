@@ -52,6 +52,12 @@ libsecuretransport_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(misc_RPATH) -Wl,-framewor
 misc_PLUGINS += libsecuretransport_plugin.la
 endif
 
+
+libemscripten_inhibit_plugin_la_SOURCES = misc/inhibit/emscripten.c
+if HAVE_EMSCRIPTEN
+misc_PLUGINS += libemscripten_inhibit_plugin.la
+endif
+
 if HAVE_OSX
 libiokit_inhibit_plugin_la_SOURCES = misc/inhibit/iokit-inhibit.c
 libiokit_inhibit_plugin_la_LDFLAGS = $(AM_LDFLAGS) -Wl,-framework,CoreFoundation,-framework,IOKit
