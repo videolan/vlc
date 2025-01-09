@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <vlc_cpu.h>
 
 #if defined (PLUGIN_ALTIVEC) && defined(HAVE_ALTIVEC_H)
@@ -46,13 +47,16 @@
 #if defined (PLUGIN_SSE2)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #    define VLC_TARGET VLC_SSE
+#    define COST 0.75
 #elif defined (PLUGIN_ALTIVEC)
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #    define VLC_TARGET VLC_ALTIVEC
+#    define COST 0.75
 #else
 #    define PLUGIN_PLAIN
 #    define DEST_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422,Y211"
 #    define VLC_TARGET
+#    define COST 1
 #endif
 
 /*****************************************************************************
@@ -63,6 +67,15 @@ static int  Activate ( filter_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add_in_outlist(vec, COST, VLC_CODEC_I420, VLC_CODEC_YUYV,
+        VLC_CODEC_YVYU, VLC_CODEC_UYVY);
+#ifdef PLUGIN_PLAIN
+    vlc_chroma_conv_add(vec, COST, VLC_CODEC_I420, VLC_CODEC_Y211, false);
+#endif
+}
+
 vlc_module_begin ()
 #if defined (PLUGIN_PLAIN)
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
@@ -77,6 +90,8 @@ vlc_module_begin ()
     set_callback_video_converter( Activate, 250 )
 # define vlc_CPU_capable() vlc_CPU_ALTIVEC()
 #endif
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 VIDEO_FILTER_WRAPPER( I420_YUY2 )

@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 
 /****************************************************************************
  * Local prototypes
@@ -41,9 +42,16 @@ static picture_t *Filter( filter_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 1, VLC_CODEC_BGR24, VLC_CODEC_RGBA, false);
+}
+
 vlc_module_begin ()
     set_description( N_("RV32 conversion filter") )
     set_callback_video_converter( OpenFilter, 1 )
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 static const struct vlc_filter_operations filter_ops = {

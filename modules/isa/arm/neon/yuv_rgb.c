@@ -27,14 +27,26 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <vlc_cpu.h>
 #include "chroma_neon.h"
 
 static int Open (filter_t *);
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_I420, VLC_CODEC_RGB565LE, false);
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_I420, VLC_CODEC_XBGR, false);
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_YV12, VLC_CODEC_XBGR, false);
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_NV21, VLC_CODEC_XBGR, false);
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_NV12, VLC_CODEC_XBGR, false);
+}
+
 vlc_module_begin ()
     set_description (N_("ARM NEON video chroma YUV->RGBA"))
     set_callback_video_converter(Open, 250)
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 /*

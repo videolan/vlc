@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <assert.h>
 #include "../video_filter/filter_picture.h"
 
@@ -43,9 +44,17 @@
  *****************************************************************************/
 static int  Open ( filter_t * );
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add_in_outlist(vec, 1, VLC_CODEC_YUVP, VLC_CODEC_RGBA,
+        VLC_CODEC_ARGB, VLC_CODEC_BGRA, VLC_CODEC_ABGR, VLC_CODEC_YUVA);
+}
+
 vlc_module_begin ()
     set_description( N_("YUVP converter") )
     set_callback_video_converter( Open, 10 )
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 /****************************************************************************

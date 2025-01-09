@@ -26,14 +26,35 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <vlc_cpu.h>
 #include "chroma_neon.h"
 
 static int Open (filter_t *);
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+#define PACKED_CHROMAS VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_YVYU, VLC_CODEC_VYUY
+
+    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_I420, PACKED_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_YV12, PACKED_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_I422, PACKED_CHROMAS);
+
+    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_NV12, VLC_CODEC_I420,
+        VLC_CODEC_YV12);
+    vlc_chroma_conv_add_in_outlist(vec, 0.75, VLC_CODEC_NV21, VLC_CODEC_I420,
+        VLC_CODEC_YV12);
+
+    vlc_chroma_conv_add(vec, 0.75, VLC_CODEC_NV24, VLC_CODEC_I444, false);
+
+    vlc_chroma_conv_add_out_inlist(vec, 0.75, VLC_CODEC_I422, VLC_CODEC_NV16,
+        PACKED_CHROMAS);
+}
 vlc_module_begin ()
     set_description (N_("ARM NEON video chroma conversions"))
     set_callback_video_converter(Open, 250)
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 #define DEFINE_PACK(pack, pict) \

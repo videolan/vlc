@@ -31,6 +31,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_picture_pool.h>
+#include <vlc_chroma_probe.h>
 #include "vlc_vdpau.h"
 
 /* Picture history as recommended by VDPAU documentation */
@@ -787,6 +788,16 @@ static const char *const algo_names[] = {
     N_("Bob"), N_("Temporal"), N_("Temporal-spatial"),
 };
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_VDPAU_VIDEO,
+        VLC_CODEC_VDPAU_OUTPUT, false);
+
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_VDPAU_VIDEO, VLC_CODEC_I420,
+        VLC_CODEC_YV12, VLC_CODEC_NV12, VLC_CODEC_I422, VLC_CODEC_NV16,
+        VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_I444, VLC_CODEC_NV24);
+}
+
 vlc_module_begin()
     set_shortname(N_("VDPAU"))
     set_description(N_("VDPAU surface conversions"))
@@ -809,4 +820,6 @@ vlc_module_begin()
 
     add_submodule()
     set_callback_video_converter(YCbCrOpen, 10)
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end()

@@ -29,6 +29,13 @@
 extern "C" {
 #endif
 
+#ifdef CAN_COMPILE_SSE2
+#define COPY_COST 0.75
+#else
+#define COPY_COST 1
+#endif
+
+
 typedef struct {
 # ifdef CAN_COMPILE_SSE2
     uint8_t *buffer;

@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 
 #define SRC_FOURCC "YUY2,YUNV,YVYU,UYVY,UYNV,Y422"
 #define DEST_FOURCC  "I422"
@@ -44,9 +45,19 @@ static int  Activate ( filter_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 1, VLC_CODEC_YUYV, VLC_CODEC_I422, false);
+    vlc_chroma_conv_add(vec, 1, VLC_CODEC_YVYU, VLC_CODEC_I422, false);
+    vlc_chroma_conv_add(vec, 1, VLC_CODEC_UYVY, VLC_CODEC_I422, false);
+}
+
 vlc_module_begin ()
     set_description( N_("Conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_callback_video_converter( Activate, 80 )
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 VIDEO_FILTER_WRAPPER( YUY2_I422 )

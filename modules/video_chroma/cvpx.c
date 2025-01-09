@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <vlc_modules.h>
 #include "../codec/vt_utils.h"
 #include "../video_chroma/copy.h"
@@ -64,6 +65,31 @@ typedef struct
     };
 } filter_sys_t;
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_BGRA, VLC_CODEC_CVPX_I420, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_BGRA, VLC_CODEC_CVPX_NV12, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_BGRA, VLC_CODEC_CVPX_P010, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_BGRA, VLC_CODEC_CVPX_UYVY, true);
+
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_I420, VLC_CODEC_CVPX_NV12, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_I420, VLC_CODEC_CVPX_P010, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_I420, VLC_CODEC_CVPX_UYVY, true);
+
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_P010, true);
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_NV12, VLC_CODEC_CVPX_UYVY, true);
+
+    vlc_chroma_conv_add(vec, 0.25, VLC_CODEC_CVPX_P010, VLC_CODEC_CVPX_UYVY, true);
+
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_NV12, VLC_CODEC_NV12, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_NV12, VLC_CODEC_I420, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_P010, VLC_CODEC_P010, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_P010, VLC_CODEC_I420_10L, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_UYVY, VLC_CODEC_UYVY, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_I420, VLC_CODEC_I420, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_CVPX_BGRA, VLC_CODEC_BGRA, true);
+}
+
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")
     set_callback_video_converter(Open, 10)
@@ -76,6 +102,8 @@ vlc_module_begin ()
     set_description("Fast CoreVideo resize+conversion")
     set_callback_video_converter(Open_chain_CVPX, 11)
 #endif
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 

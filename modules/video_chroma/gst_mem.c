@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 
 #include "../codec/gstreamer/gstcopypicture.h"
 #include "../codec/gstreamer/gst_mem.h"
@@ -110,9 +111,16 @@ static int Open(filter_t *p_filter)
     return VLC_SUCCESS;
 }
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_GST_MEM_OPAQUE, VLC_CODEC_NV12, false);
+}
+
 vlc_module_begin()
     set_shortname(N_("GST_MEM converter"))
     set_description(N_("GST_MEM Chroma Converter filter"))
     set_subcategory(SUBCAT_VIDEO_VFILTER)
     set_callback_video_converter(Open, 10)
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end()

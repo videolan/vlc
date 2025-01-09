@@ -30,6 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
+#include <vlc_chroma_probe.h>
 #include "filters.h"
 
 /********************************
@@ -1118,6 +1119,15 @@ error:
  * Module descriptor *
  *********************/
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_VAAPI_420, VLC_CODEC_I420, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_P010, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_VAAPI_420_10BPP, VLC_CODEC_I420_10L, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_VAAPI_420_12BPP, VLC_CODEC_P012, true);
+    vlc_chroma_conv_add(vec, 1.1, VLC_CODEC_VAAPI_420_12BPP, VLC_CODEC_I420_12L, true);
+}
+
 vlc_module_begin()
     set_shortname(N_("VAAPI filters"))
     set_description(N_("Video Accelerated API filters"))
@@ -1144,4 +1154,7 @@ vlc_module_begin()
 
     add_submodule()
     set_callback_video_converter(vlc_vaapi_OpenChroma, 10)
+
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end()

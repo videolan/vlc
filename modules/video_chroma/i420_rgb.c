@@ -34,6 +34,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_cpu.h>
+#include <vlc_chroma_probe.h>
 
 #include "i420_rgb.h"
 #include "../video_filter/filter_picture.h"
@@ -58,6 +59,28 @@ static void Set8bppPalette( filter_t *, uint8_t * );
 static int  Activate   ( filter_t * );
 static void Deactivate ( filter_t * );
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+#define OUT_CHROMAS_COMMON VLC_CODEC_RGB565, VLC_CODEC_RGB555, VLC_CODEC_XRGB, \
+    VLC_CODEC_RGBX, VLC_CODEC_BGRX, VLC_CODEC_XBGR
+
+#ifndef PLUGIN_PLAIN
+#define OUT_CHROMAS OUT_CHROMAS_COMMON
+#else
+#define OUT_CHROMAS OUT_CHROMAS_COMMON, VLC_CODEC_RGB233, VLC_CODEC_RGB332, \
+    VLC_CODEC_BGR233, VLC_CODEC_BGR565, VLC_CODEC_BGR555
+#endif
+
+#if defined (PLUGIN_SSE2)
+#define COST 0.75
+#else
+#define COST 1
+#endif
+
+    vlc_chroma_conv_add_in_outlist(vec, COST, VLC_CODEC_YV12, OUT_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, COST, VLC_CODEC_I420, OUT_CHROMAS);
+}
+
 vlc_module_begin ()
 #if defined (PLUGIN_SSE2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
@@ -70,6 +93,8 @@ vlc_module_begin ()
     set_callback_video_converter( Activate, 80 )
 # define vlc_CPU_capable() (true)
 #endif
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 #ifndef PLUGIN_PLAIN

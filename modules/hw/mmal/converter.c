@@ -32,6 +32,7 @@
 #include <vlc_codec.h>
 #include <vlc_filter.h>
 #include <vlc_plugin.h>
+#include <vlc_chroma_probe.h>
 
 #include <interface/mmal/mmal.h>
 #include <interface/mmal/util/mmal_util.h>
@@ -65,6 +66,20 @@ static const char * const  ppsz_converter_text[] = {
 
 static int OpenConverter(filter_t *);
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+#define OUT_CHROMAS \
+    VLC_CODEC_BGRX, VLC_CODEC_RGBX, VLC_CODEC_XBGR, \
+    VLC_CODEC_XRGB, VLC_CODEC_RGB565BE, VLC_CODEC_RGBA, \
+    VLC_CODEC_BGRA, VLC_CODEC_ARGB, VLC_CODEC_ABGR
+
+    vlc_chroma_conv_add_in_outlist(vec, 1, VLC_CODEC_I420_10L, OUT_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1, VLC_CODEC_I420, OUT_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_MMAL_OPAQUE, OUT_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_I420_10L, VLC_CODEC_MMAL_OPAQUE);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_I420, VLC_CODEC_MMAL_OPAQUE);
+}
+
 vlc_module_begin()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_shortname(N_("MMAL resizer"))
@@ -75,6 +90,8 @@ vlc_module_begin()
         change_integer_list( pi_converter_modes, ppsz_converter_text )
 #endif
     set_callback_video_converter(OpenConverter, 900)
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end()
 
 #define MMAL_SLICE_HEIGHT 16

@@ -34,6 +34,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_codec.h>
+#include <vlc_chroma_probe.h>
 
 #define COBJMACROS
 #include <initguid.h>
@@ -457,6 +458,20 @@ error:
     return VLC_EGENERIC;
 }
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+#define OUT_GPU_CHROMAS VLC_CODEC_D3D9_OPAQUE, VLC_CODEC_D3D9_OPAQUE_10B
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_D3D9_OPAQUE, VLC_CODEC_I420,
+        VLC_CODEC_YV12, VLC_CODEC_NV12);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_D3D9_OPAQUE_10B,
+        VLC_CODEC_I420_10L, VLC_CODEC_P010);
+
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_I420, OUT_GPU_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_YV12, OUT_GPU_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_I420_10L, OUT_GPU_CHROMAS);
+    vlc_chroma_conv_add_in_outlist(vec, 1.1, VLC_CODEC_P010, OUT_GPU_CHROMAS);
+}
+
 vlc_module_begin()
     set_description(N_("Direct3D9 adjust filter"))
     set_subcategory(SUBCAT_VIDEO_VFILTER)
@@ -493,4 +508,6 @@ vlc_module_begin()
     set_description(N_("Direct3D9"))
     set_callback_dec_device( D3D9OpenDecoderDevice, 10 )
     add_shortcut ("dxva2")
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end()

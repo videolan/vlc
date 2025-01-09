@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include "copy.h"
 
 typedef struct
@@ -227,7 +228,16 @@ static int Create( filter_t *p_filter )
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+    vlc_chroma_conv_add(vec, COPY_COST, VLC_CODEC_I420, VLC_CODEC_NV12, true);
+    vlc_chroma_conv_add(vec, COPY_COST, VLC_CODEC_YV12, VLC_CODEC_NV12, true);
+    vlc_chroma_conv_add(vec, COPY_COST, VLC_CODEC_I420_10L, VLC_CODEC_P010, true);
+}
+
 vlc_module_begin ()
     set_description( N_("YUV planar to semiplanar conversions") )
     set_callback_video_converter( Create, 160 )
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
