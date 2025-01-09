@@ -184,6 +184,9 @@ QQuickItem * CompositorWayland::activeFocusItem() const
 
 bool CompositorWayland::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)
 {
+    if (m_wnd)
+        return false;
+
     int ret = m_waylandImpl->setupVoutWindow(m_waylandImpl, p_wnd);
     if (ret != VLC_SUCCESS)
         return false;
