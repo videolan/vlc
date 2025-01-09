@@ -220,6 +220,9 @@ void CompositorVideo::windowDestroy()
 
     if (m_destroyCb)
         m_destroyCb(m_wnd);
+
+    m_wnd = nullptr;
+    m_destroyCb = nullptr;
 }
 
 void CompositorVideo::windowResize(unsigned width, unsigned height)
