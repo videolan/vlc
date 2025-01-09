@@ -121,6 +121,9 @@ void CompositorPlatform::unloadGUI()
 
 bool CompositorPlatform::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
+    if (m_wnd)
+        return false;
+
     commonSetupVoutWindow(p_wnd, destroyCb);
 
 #ifdef __WIN32
