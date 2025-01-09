@@ -341,7 +341,7 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     # avoid using gcc-ranlib with the clang toolchain, if both are installed
     VLC_RANLIB="$TRIPLET-ranlib"
     # force linking with the static C++ runtime of LLVM
-    VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a -static-libstdc++ --end-no-unused-arguments"
+    VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a -Wl,-l:libpthread.a -static-libstdc++ --end-no-unused-arguments"
     VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a --end-no-unused-arguments"
 fi
 
