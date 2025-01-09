@@ -770,6 +770,10 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         if (ret == VLC_SUCCESS)
         {
             i_chroma = *list;
+            msg_Warn(interop->gl, "direct rendering failed for %4.4s, "
+                     "fallback to %4.4s",
+                     (const char *)&interop->fmt_in.i_chroma,
+                     (const char *)&i_chroma);
             goto interop_init;
         }
         list++;
