@@ -16,7 +16,7 @@ guidir = $(pluginsdir)/gui
 gui_LTLIBRARIES =
 SUFFIXES += .ui .h .hpp .moc.cpp .qml .js .mjs .moc
 TEST_EXTENSIONS = .qml
-EXTRA_DIST = qt6.pro private-core.pro private-gui.pro private-quick.pro quicktest.pro scripts
+EXTRA_DIST = qt6.pro quicktest.pro scripts
 vlc_qt_libs = $(QT_LIBS)
 RCC_EXTRA_PARAMS =
 
@@ -76,18 +76,6 @@ libqt_plugin_la_CPPFLAGS += -DQT_QML_DEBUG
 endif
 if HAVE_QT_GTK
 libqt_plugin_la_CPPFLAGS += -DQT_HAS_GTK
-endif
-
-if HAVE_QT_CORE_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT_CORE_PRIVATE $(QT_CORE_PRIVATE_CFLAGS)
-endif
-
-if HAVE_QT_GUI_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT_GUI_PRIVATE $(QT_GUI_PRIVATE_CFLAGS)
-endif
-
-if HAVE_QT_DECLARATIVE_PRIVATE
-libqt_plugin_la_CPPFLAGS += -DQT_DECLARATIVE_PRIVATE $(QT_QUICK_PRIVATE_CFLAGS)
 endif
 
 libqt_plugin_la_SOURCES = \
