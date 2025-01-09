@@ -363,10 +363,12 @@ FocusScope {
 
                                 //source aspect ratio
                                 readonly property real sar: paintedWidth / paintedHeight
-                                readonly property int maximumWidth: Helpers.alignUp((Screen.desktopAvailableWidth / coverItem.sizeConstant), 32)
-                                readonly property int maximumHeight: Helpers.alignUp((Screen.desktopAvailableHeight / coverItem.sizeConstant), 32)
+                                readonly property int maximumWidth: Helpers.alignUp((Screen.desktopAvailableWidth * eDPR / coverItem.sizeConstant), 32)
+                                readonly property int maximumHeight: Helpers.alignUp((Screen.desktopAvailableHeight * eDPR / coverItem.sizeConstant), 32)
 
                                 readonly property int maximumSize: Math.min(maximumWidth, maximumHeight)
+
+                                readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
