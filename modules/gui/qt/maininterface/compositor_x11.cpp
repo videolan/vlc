@@ -248,6 +248,9 @@ void CompositorX11::onSurfaceSizeChanged(const QSizeF& size)
 
 bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)
 {
+    if (m_wnd)
+        return false;
+
     p_wnd->type = VLC_WINDOW_TYPE_XID;
     p_wnd->handle.xid = m_videoWidget->winId();
     commonSetupVoutWindow(p_wnd, destroyCb);
