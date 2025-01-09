@@ -349,6 +349,9 @@ void CompositorDirectComposition::unloadGUI()
 
 bool CompositorDirectComposition::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
+    if (m_wnd)
+        return false;
+
     {
         QMutexLocker lock(&m_setupStateLock);
         while (m_setupState == SetupState::Uninitialized)
