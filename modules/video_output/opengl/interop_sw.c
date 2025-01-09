@@ -655,7 +655,7 @@ opengl_interop_init(struct vlc_gl_interop *interop,
 {
     const vlc_chroma_description_t *desc =
         vlc_fourcc_GetChromaDescription(chroma);
-    if (!desc)
+    if (!desc || desc->plane_count == 0)
         return VLC_EGENERIC;
 
     assert(!interop->fmt_out.p_palette);
