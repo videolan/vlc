@@ -65,6 +65,6 @@ QtObject{
     // NOTE: Find the maximum picture size for nbItemPerRow == 1, so that we downscale in most of the cases
     //       formula for maxPictureWidth depended on nbItemPerRow would be:
     //       (basePictureWidth + _defaultHorizontalSpacing) * (1 + 1 / nbItemPerRow) - _defaultHorizontalSpacing
-    readonly property int maxPictureWidth: 2 * basePictureWidth + _defaultHorizontalSpacing
+    readonly property int maxPictureWidth: (basePictureWidth + _defaultHorizontalSpacing) * (1 + 1 / 3) - _defaultHorizontalSpacing
     readonly property int maxPictureHeight: (basePictureHeight / basePictureWidth) * maxPictureWidth
 }
