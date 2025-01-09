@@ -130,6 +130,9 @@ void CompositorWin7::unloadGUI()
 
 bool CompositorWin7::setupVoutWindow(vlc_window_t *p_wnd, VoutDestroyCb destroyCb)
 {
+    if (m_wnd)
+        return false;
+
     BOOL isCompositionEnabled;
     HRESULT hr = DwmIsCompositionEnabled(&isCompositionEnabled);
 
