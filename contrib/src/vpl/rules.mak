@@ -36,6 +36,7 @@ $(TARBALLS)/libvpl-$(VPL_VERSION).tar.gz:
 
 vpl: libvpl-$(VPL_VERSION).tar.gz .sum-vpl
 	$(UNPACK)
+	$(APPLY) $(SRC)/vpl/0001-CMake-depend-on-libc-when-compiling-with-Clang.patch
 	$(MOVE)
 
 .vpl: vpl toolchain.cmake
