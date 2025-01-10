@@ -512,7 +512,6 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryWindow * const libraryWindow = self.libraryWindow;
     libraryWindow.librarySegmentType = segmentType;
     [libraryWindow.splitViewController.navSidebarViewController selectSegment:segmentType];
-    [self updatePresentedView];
 }
 
 - (void)libraryModelUpdated:(NSNotification *)aNotification
