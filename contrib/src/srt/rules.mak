@@ -36,7 +36,7 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
 	$(call pkg_static,"scripts/srt.pc.in")
-	mv srt-$(SRT_VERSION) $@ && touch $@
+	$(MOVE)
 
 SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF -DENABLE_APPS=OFF
 
