@@ -1224,6 +1224,7 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/CheckedDelegate.qml \
 	widgets/qml/ComboBoxExt.qml \
 	widgets/qml/AcrylicBackground.qml \
+	widgets/qml/FloatingNotification.qml \
 	widgets/qml/AnimatedBackground.qml \
 	widgets/qml/CSDThemeButton.qml \
 	widgets/qml/CSDThemeButtonSet.qml \
