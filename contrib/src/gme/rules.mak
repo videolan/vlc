@@ -1,18 +1,18 @@
 # Game Music Emu
 
 GME_VERSION := 0.6.3
-GME_URL := https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-$(GME_VERSION).tar.xz
+GME_URL := $(GITHUB)/libgme/game-music-emu/archive/refs/tags/$(GME_VERSION).tar.gz
 
 PKGS += gme
 
-$(TARBALLS)/game-music-emu-$(GME_VERSION).tar.xz:
+$(TARBALLS)/game-music-emu-$(GME_VERSION).tar.gz:
 	$(call download_pkg,$(GME_URL),gme)
 
 DEPS_gme = zlib $(DEPS_zlib)
 
-.sum-gme: game-music-emu-$(GME_VERSION).tar.xz
+.sum-gme: game-music-emu-$(GME_VERSION).tar.gz
 
-game-music-emu: game-music-emu-$(GME_VERSION).tar.xz .sum-gme
+game-music-emu: game-music-emu-$(GME_VERSION).tar.gz .sum-gme
 	$(UNPACK)
 	$(APPLY) $(SRC)/gme/skip-underrun.patch
 	$(APPLY) $(SRC)/gme/0001-Export-the-proper-C-runtime-library.patch
