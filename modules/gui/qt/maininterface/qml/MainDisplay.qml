@@ -530,6 +530,17 @@ FocusScope {
         }
     }
 
+    Widgets.FloatingNotification {
+        id: notif
+
+        anchors {
+            bottom: miniPlayer.top
+            left: parent.left
+            right: parent.right
+            margins: VLCStyle.margin_large
+        }
+    }
+
     MiniPlayer {
         id: miniPlayer
 
