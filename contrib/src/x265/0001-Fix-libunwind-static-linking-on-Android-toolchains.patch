@@ -1,23 +1,28 @@
-From c5dd262ca6a31ec77a12fe0141fa4de875c6e7ba Mon Sep 17 00:00:00 2001
+From 6e5f1a13bf5abaa1a84a65d6bb4fa3c9eb5fb41a Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Wed, 16 Oct 2024 10:43:58 +0200
 Subject: [PATCH] Fix libunwind static linking on Android toolchains
 
 As well as llvm-mingw with -static-libgcc.
 ---
- source/CMakeLists.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ source/CMakeLists.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/source/CMakeLists.txt b/source/CMakeLists.txt
-index 8a3128bb7..8250f9ec7 100755
+index 33b6523f1..4d452e2c0 100644
 --- a/source/CMakeLists.txt
 +++ b/source/CMakeLists.txt
-@@ -882,6 +882,8 @@ if(X265_LATEST_TAG)
+@@ -649,6 +649,13 @@ if(X265_LATEST_TAG)
      foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
          if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
              list(APPEND PLIBLIST "${LIB}")
-+        elseif(${LIB} MATCHES "-l:libunwind.a") # android toolchain
-+            list(APPEND IMPLICITS_LIST "-lunwind")
++        elseif(${LIB} MATCHES "-l:lib.*.a")
++            string(LENGTH ${LIB} LIBLEN)
++            math(EXPR LIBLEN "${LIBLEN}-8")
++            string(SUBSTRING ${LIB} 6 ${LIBLEN} DIRECT_LIB)
++            list(APPEND PLIBLIST "-l${DIRECT_LIB}")
++        elseif(${LIB} MATCHES "-l.*")
++            list(APPEND PLIBLIST ${LIB})
          else()
              list(APPEND PLIBLIST "-l${LIB}")
          endif()
