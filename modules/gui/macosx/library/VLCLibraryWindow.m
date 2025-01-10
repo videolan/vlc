@@ -422,10 +422,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showAudioLibrary
 {
     [self.toolbarDelegate layoutForSegment:VLCLibraryMusicSegment];
-    VLCLibraryAudioViewController * const lvc =
-        [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
-    [lvc presentAudioView];
-    _librarySegmentViewController = lvc;
+    if (![self.librarySegmentViewController isKindOfClass:VLCLibraryAudioViewController.class]) {
+        _librarySegmentViewController =
+            [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
+    }
+    [(VLCLibraryAudioViewController *)self.librarySegmentViewController presentAudioView];
 }
 
 - (void)showPlaylistLibrary:(enum vlc_ml_playlist_type_t)playlistType
