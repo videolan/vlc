@@ -821,6 +821,17 @@ FocusScope {
         }
     }
 
+    Widgets.FloatingNotification {
+        id: notif
+
+        anchors {
+            bottom: controlBar.top
+            left: parent.left
+            right: parent.right
+            margins: VLCStyle.margin_large
+        }
+    }
+
     ControlBar {
         id: controlBar
 
