@@ -26,7 +26,7 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(APPLY) $(SRC)/srt/0001-core-remove-MSG_TRUNC-logging.patch
 	$(APPLY) $(SRC)/srt/0001-build-always-use-GNUInstallDirs.patch
 	$(call pkg_static,"scripts/srt.pc.in")
-	mv srt-$(SRT_VERSION) $@ && touch $@
+	$(MOVE)
 
 SRT_CONF := -DENABLE_SHARED=OFF -DUSE_ENCLIB=gnutls -DENABLE_CXX11=OFF
 
