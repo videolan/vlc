@@ -328,20 +328,19 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
     const struct vlc_gl_api *api = &vgl->api;
 
     assert(!fmt->p_palette);
-    video_format_t in_fmt = *fmt;
 
-    struct vlc_gl_interop *interop = vlc_gl_interop_New(gl, vctx, &in_fmt);
+    struct vlc_gl_interop *interop = vlc_gl_interop_New(gl, vctx, fmt);
     if (!interop)
     {
         msg_Err(gl, "Could not create interop");
         return VLC_EGENERIC;
     }
 
-    if ( !video_format_IsSameChroma( &in_fmt, fmt ) )
+    if ( !video_format_IsSameChroma( &interop->fmt_in, fmt ) )
     {
         msg_Warn(gl, "Could not update format, the interop changed the "
                      "requested chroma from %4.4s to %4.4s\n",
-                     (char *) &fmt->i_chroma, (char *) &in_fmt.i_chroma);
+                     (char *) &fmt->i_chroma, (char *) &interop->fmt_in.i_chroma);
         vlc_gl_interop_Delete(interop);
         return VLC_EGENERIC;
     }
