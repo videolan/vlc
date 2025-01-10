@@ -792,7 +792,6 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         || vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_integer"));
 
     video_color_space_t space;
-    const vlc_fourcc_t *list;
     const bool is_yup = vlc_fourcc_IsYUV(interop->fmt_in.i_chroma);
 
     if (is_yup)
@@ -802,19 +801,10 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         if (max_texture_units < 3)
             goto error;
 
-        list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
         space = interop->fmt_in.space;
     }
-    else if (interop->fmt_in.i_chroma == VLC_CODEC_XYZ_12B)
-    {
-        list = NULL;
-        space = COLOR_SPACE_UNDEF;
-    }
     else
-    {
-        list = vlc_fourcc_GetRGBFallback(interop->fmt_in.i_chroma);
         space = COLOR_SPACE_UNDEF;
-    }
 
     /* The pictures are uploaded upside-down */
     video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
@@ -832,6 +822,12 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         if (ret == VLC_SUCCESS)
             goto interop_init;
     }
+
+    const vlc_fourcc_t *list = NULL;
+    if (is_yup)
+        list = vlc_fourcc_GetYUVFallback(interop->fmt_in.i_chroma);
+    else if (interop->fmt_in.i_chroma != VLC_CODEC_XYZ_12B)
+        list = vlc_fourcc_GetRGBFallback(interop->fmt_in.i_chroma);
 
     if (list == NULL)
         goto error;
