@@ -1595,7 +1595,7 @@ QT_QTEST_COMMON_ldflags = $(AM_LDFLAGS) $(QT_LDFLAGS) $(QT_QTEST_LDFLAGS)
 # test_ml_model
 
 test_ml_model_SOURCES = \
-	tests/vlc_stub_modules.cpp \
+	tests/vlc_stub_modules.cpp tests/vlc_stub_modules.hpp \
 	tests/test_ml_model.cpp \
 	util/base_model.hpp util/base_model_p.hpp  util/base_model.cpp \
 	util/listcache.hpp \
@@ -1631,7 +1631,7 @@ TESTS += test_ml_model
 # test_renderer_manager_model
 
 test_renderer_manager_model_SOURCES = \
-	tests/vlc_stub_modules.cpp \
+	tests/vlc_stub_modules.cpp tests/vlc_stub_modules.hpp \
 	tests/test_renderer_manager_model.cpp \
     util/renderer_manager.hpp util/renderer_manager.cpp
 
@@ -1651,7 +1651,7 @@ TESTS += test_renderer_manager_model
 # test_vlc_dialog_model
 
 test_vlc_dialog_model_SOURCES = \
-	tests/vlc_stub_modules.cpp \
+	tests/vlc_stub_modules.cpp tests/vlc_stub_modules.hpp \
 	tests/test_vlc_dialog_model.cpp \
 	dialogs/dialogs/dialogmodel.cpp
 
