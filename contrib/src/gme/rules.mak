@@ -14,7 +14,7 @@ DEPS_gme = zlib $(DEPS_zlib)
 
 game-music-emu: game-music-emu-$(GME_VERSION).tar.gz .sum-gme
 	$(UNPACK)
-	$(APPLY) $(SRC)/gme/skip-underrun.patch
+	$(APPLY) $(SRC)/gme/0001-don-t-skip-negative-fixes-14088.patch
 	$(APPLY) $(SRC)/gme/0001-Export-the-proper-C-runtime-library.patch
 	$(APPLY) $(SRC)/gme/0002-link-with-libm-and-set-it-in-pkg-config-when-buildin.patch
 	$(APPLY) $(SRC)/gme/0003-fix-android-toolchain-broken-CMAKE_CXX_IMPLICIT_LINK.patch

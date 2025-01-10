@@ -1,0 +1,26 @@
+From f070646738428aa1f237f4c3ab3318db3ed77165 Mon Sep 17 00:00:00 2001
+From: Hannes Domani <ssbssa@yahoo.de>
+Date: Fri, 6 Mar 2015 14:43:45 +0100
+Subject: [PATCH] don't skip negative (fixes #14088)
+
+Signed-off-by: Jean-Baptiste Kempf <jb@videolan.org>
+---
+ gme/Fir_Resampler.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gme/Fir_Resampler.cpp b/gme/Fir_Resampler.cpp
+index d8dd683..ae5f2df 100644
+--- a/gme/Fir_Resampler.cpp
++++ b/gme/Fir_Resampler.cpp
+@@ -188,6 +188,8 @@ int Fir_Resampler_::skip_input( long count )
+ {
+ 	int remain = write_pos - buf.begin();
+ 	int max_count = remain - width_ * stereo;
++	if ( max_count < 0 )
++		return 0;
+ 	if ( count > max_count )
+ 		count = max_count;
+ 	
+-- 
+2.45.0.windows.1
+
