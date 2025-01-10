@@ -34,6 +34,7 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
+	$(APPLY) $(SRC)/srt/0001-build-fix-implicit-libraries-set-using-Wl-l-libname..patch
 	$(call pkg_static,"scripts/srt.pc.in")
 	$(MOVE)
 

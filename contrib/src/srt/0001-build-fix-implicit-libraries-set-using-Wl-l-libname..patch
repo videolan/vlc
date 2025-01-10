@@ -1,0 +1,33 @@
+From 64157b23fd0359fdbe706a17154be3733fc0deb2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 10 Jan 2025 13:04:59 +0100
+Subject: [PATCH] [build] fix implicit libraries set using -Wl,-l:libname.a
+
+We need to turn it to a more generic name in the pkg-config file.
+---
+ CMakeLists.txt | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1492306..49d4869 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1183,7 +1183,14 @@ endif()
+ # obtained by `pkg-config --libs`.
+ if(ENABLE_CXX_DEPS)
+ 	foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES})
+-		if((IS_ABSOLUTE ${LIB} AND EXISTS ${LIB}) OR (${LIB} MATCHES "^-l"))
++		if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
++			set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${LIB})
++		elseif(${LIB} MATCHES "-l:lib.*.a")
++			string(LENGTH ${LIB} LIBLEN)
++			math(EXPR LIBLEN "${LIBLEN}-8")
++			string(SUBSTRING ${LIB} 6 ${LIBLEN} DIRECT_LIB)
++			set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} "-l${DIRECT_LIB}")
++		elseif(${LIB} MATCHES "^-l")
+ 			set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ${LIB})
+ 		else()
+ 			set(SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} "-l${LIB}")
+-- 
+2.45.0.windows.1
+
