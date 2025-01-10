@@ -30,9 +30,9 @@ $(TARBALLS)/x265_$(X265_VERSION).tar.gz:
 
 x265: x265_$(X265_VERSION).tar.gz .sum-x265
 	$(UNPACK)
-	$(APPLY) $(SRC)/x265/x265-ldl-linking.patch
-	$(APPLY) $(SRC)/x265/x265-no-pdb-install.patch
-	$(APPLY) $(SRC)/x265/x265-enable-detect512.patch
+	$(APPLY) $(SRC)/x265/0001-fix-ldl-linking-error-of-x265.patch
+	$(APPLY) $(SRC)/x265/0002-do-not-copy-.pdb-files-that-don-t-exist.patch
+	$(APPLY) $(SRC)/x265/0003-add-patch-to-enable-detect512.patch
 	$(APPLY) $(SRC)/x265/0001-api-use-LoadLibraryExA-instead-of-LoadLibraryA.patch
 	$(APPLY) $(SRC)/x265/0001-threadpool-disable-group-affinity-in-UWP-builds.patch
 	$(APPLY) $(SRC)/x265/0001-Fix-libunwind-static-linking-on-Android-toolchains.patch
