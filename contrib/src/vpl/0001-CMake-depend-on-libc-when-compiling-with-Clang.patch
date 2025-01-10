@@ -1,0 +1,28 @@
+From bb93515761bc6c4a48ff5a9361bc84c36101c3d2 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 10 Jan 2025 08:10:21 +0100
+Subject: [PATCH] CMake: depend on libc++ when compiling with Clang
+
+libstdc++ is a GCC thing.
+---
+ libvpl/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libvpl/CMakeLists.txt b/libvpl/CMakeLists.txt
+index 46503e1..fadd1cc 100644
+--- a/libvpl/CMakeLists.txt
++++ b/libvpl/CMakeLists.txt
+@@ -190,7 +190,9 @@ if(INSTALL_DEV)
+     # WIN32 in general
+     set(MINGW_LIBS "-lole32 -lgdi32 -luuid")
+   endif()
+-  if(NOT MSVC)
++  if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
++    set(CXX_LIB "-lc++")
++  elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+     set(CXX_LIB "-lstdc++")
+   endif()
+   set(VPL_PKGCONFIG_DEPENDENT_LIBS
+-- 
+2.43.0
+
