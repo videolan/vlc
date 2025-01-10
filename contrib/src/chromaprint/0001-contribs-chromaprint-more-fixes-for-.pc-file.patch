@@ -1,0 +1,49 @@
+From e0ef879e98b2aabb2aaf9124b6260d4af5e820d4 Mon Sep 17 00:00:00 2001
+From: Pavlov Konstantin <thresh@videolan.org>
+Date: Fri, 8 Dec 2017 13:12:30 +0100
+Subject: [PATCH 1/2] contribs: chromaprint: more fixes for .pc file.
+
+- Moved AVFFT check: FFMPEG_LIBRARIES might be unset even if
+all needed FFmpeg libraries were found.
+- Added an ability to link with VDSP/Accelerate Framework on macOS.
+---
+ CMakeLists.txt          | 4 ++++
+ libchromaprint.pc.cmake | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fd6374e..c14e32b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -135,12 +135,16 @@ endif()
+ if(FFT_LIB STREQUAL "vdsp")
+ 	if(ACCELERATE_LIBRARIES)
+ 		set(USE_VDSP ON)
++		set(CHROMAPRINT_ADDITIONAL_LIBS "-F${ACCELERATE_LIBRARIES} -framework Accelerate")
+ 	else()
+ 		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+ 	endif()
+ elseif(FFT_LIB STREQUAL "avfft")
+ 	if(FFMPEG_LIBAVCODEC_FFT_FOUND)
+ 		set(USE_AVFFT ON)
++		find_package(PkgConfig)
++		pkg_check_modules(AVFFT REQUIRED libavcodec libavutil)
++		string(REPLACE ";" " " CHROMAPRINT_ADDITIONAL_LIBS "${AVFFT_LDFLAGS}")
+ 	else()
+ 		message(FATAL_ERROR "Selected ${FFT_LIB} for FFT calculations, but the library is not found")
+ 	endif()
+diff --git a/libchromaprint.pc.cmake b/libchromaprint.pc.cmake
+index 3799329..120e85d 100644
+--- a/libchromaprint.pc.cmake
++++ b/libchromaprint.pc.cmake
+@@ -7,6 +7,6 @@ Name: ${PROJECT_NAME}
+ Description: Audio fingerprint library
+ URL: http://acoustid.org/chromaprint
+ Version: ${PROJECT_VERSION}
+-Libs: -L${LIB_INSTALL_DIR} -lchromaprint
++Libs: -L${LIB_INSTALL_DIR} -lchromaprint @CHROMAPRINT_ADDITIONAL_LIBS@
+ Cflags: -I${INCLUDE_INSTALL_DIR}
+ 
+-- 
+2.45.0.windows.1
+
