@@ -395,10 +395,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 {
     // Only collection view mode
     [self.toolbarDelegate layoutForSegment:VLCLibraryHomeSegment];
-    VLCLibraryHomeViewController * const lvc =
-        [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
-    [lvc presentHomeView];
-    _librarySegmentViewController = lvc;
+    if (![self.librarySegmentViewController isKindOfClass:VLCLibraryHomeViewController.class]) {
+        _librarySegmentViewController =
+            [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
+    }
+    [(VLCLibraryHomeViewController *)self.librarySegmentViewController presentHomeView];
 }
 
 - (void)showVideoLibrary
