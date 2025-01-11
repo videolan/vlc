@@ -114,8 +114,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
 
     NSArray<NSString *> * const mediaItemLabels = self.representedItem.item.labels;
-    self.mediaItemLabelsStackView.hidden = mediaItemLabels.count == 0;
-    if (!self.mediaItemLabelsStackView.hidden) {
+    self.mediaItemLabelsTextField.hidden = mediaItemLabels.count == 0;
+    self.mediaItemLabelsTitleTextField.hidden = self.mediaItemLabelsTextField.hidden;
+    if (!self.mediaItemLabelsTextField.hidden) {
         self.mediaItemLabelsTextField.stringValue = [mediaItemLabels componentsJoinedByString:@", "];
     }
 
