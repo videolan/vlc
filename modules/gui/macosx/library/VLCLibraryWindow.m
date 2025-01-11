@@ -538,7 +538,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)presentGroupLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self showGroupsLibrary];
-    [(VLCLibraryAudioViewController *)self.librarySegmentViewController presentLibraryItem:libraryItem];
+    [(VLCLibraryGroupsViewController *)self.librarySegmentViewController presentGroup:libraryItem];
 }
 
 - (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
