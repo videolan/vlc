@@ -413,10 +413,11 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showShowLibrary
 {
     [self.toolbarDelegate layoutForSegment:VLCLibraryShowsVideoSubSegment];
-    VLCLibraryVideoViewController * const lvc =
-        [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
-    [lvc presentShowsView];
-    _librarySegmentViewController = lvc;
+    if (![self.librarySegmentViewController isKindOfClass:VLCLibraryVideoViewController.class]) {
+        _librarySegmentViewController =
+            [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
+    }
+    [(VLCLibraryVideoViewController *)self.librarySegmentViewController presentShowsView];
 }
 
 - (void)showAudioLibrary
