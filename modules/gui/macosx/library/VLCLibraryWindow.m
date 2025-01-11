@@ -438,10 +438,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     } else {
         [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsSegment];
     }
-    VLCLibraryPlaylistViewController * const lvc =
-        [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:self];
-    [lvc presentPlaylistsViewForPlaylistType:playlistType];
-    _librarySegmentViewController = lvc;
+
+    if (![self.librarySegmentViewController isKindOfClass:VLCLibraryPlaylistViewController.class]) {
+        _librarySegmentViewController =
+            [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:self];
+    }
+    [(VLCLibraryPlaylistViewController *)self.librarySegmentViewController presentPlaylistsViewForPlaylistType:playlistType];
 }
 
 - (void)showMediaSourceLibrary
