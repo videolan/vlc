@@ -1303,16 +1303,22 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (void)switchSubtitleOption:(id)sender
 {
-    NSInteger intValue = [sender tag];
-    NSString *representedObject = [sender representedObject];
+    NSMenuItem * const menuItem = (NSMenuItem *)sender;
+    if (menuItem == nil) {
+        return;
+    }
 
-    var_SetInteger(VLC_OBJECT(getIntf()), [representedObject UTF8String], intValue);
+    const NSInteger intValue = menuItem.tag;
+    NSString * const representedObject = menuItem.representedObject;
 
-    NSMenu *menu = [sender menu];
-    NSUInteger count = (NSUInteger) [menu numberOfItems];
-    for (NSUInteger x = 0; x < count; x++)
-        [[menu itemAtIndex:x] setState:NSOffState];
-    [[menu itemWithTag:intValue] setState:NSOnState];
+    var_SetInteger(VLC_OBJECT(getIntf()), representedObject.UTF8String, intValue);
+
+    NSMenu * const menu = menuItem.menu;
+    const NSUInteger count = (NSUInteger)menu.numberOfItems;
+    for (NSUInteger x = 0; x < count; x++) {
+        [menu itemAtIndex:x].state = NSOffState;
+    }
+    [menu itemWithTag:intValue].state = NSOnState;
 }
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
