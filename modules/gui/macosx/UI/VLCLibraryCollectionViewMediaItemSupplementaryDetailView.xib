@@ -193,17 +193,17 @@
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
                                             <rect key="frame" x="73" y="0.0" width="783" height="58"/>
                                             <subviews>
-                                                <textField focusRingType="none" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
-                                                    <rect key="frame" x="-2" y="42" width="787" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="Pzf-s3-rHC">
+                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HyO-9K-R7L">
+                                                    <rect key="frame" x="-2" y="42" width="808" height="16"/>
+                                                    <textFieldCell key="cell" title="Label" id="eIz-b2-2PE">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HyO-9K-R7L">
-                                                    <rect key="frame" x="-2" y="21" width="787" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="eIz-b2-2PE">
+                                                <textField focusRingType="none" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
+                                                    <rect key="frame" x="-2" y="21" width="808" height="16"/>
+                                                    <textFieldCell key="cell" title="Label" id="Pzf-s3-rHC">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
