@@ -1311,7 +1311,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
     const NSInteger intValue = menuItem.tag;
     NSString * const representedObject = menuItem.representedObject;
 
-    var_SetInteger(VLC_OBJECT(getIntf()), representedObject.UTF8String, intValue);
+    config_PutInt(representedObject.UTF8String, intValue);
 
     NSMenu * const menu = menuItem.menu;
     const NSUInteger count = (NSUInteger)menu.numberOfItems;
@@ -1323,7 +1323,7 @@ typedef NS_ENUM(NSInteger, VLCObjectType) {
 
 - (IBAction)switchSubtitleBackgroundOpacity:(id)sender
 {
-    var_SetInteger(VLC_OBJECT(getIntf()), "freetype-background-opacity", [sender intValue]);
+    config_PutInt("freetype-background-opacity", [sender intValue]);
 }
 
 - (IBAction)telxTransparent:(id)sender
