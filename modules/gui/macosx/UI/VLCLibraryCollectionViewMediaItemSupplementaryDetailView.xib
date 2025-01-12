@@ -338,6 +338,7 @@
                 <outlet property="contentViewTopConstraint" destination="Mr1-w0-CQK" id="T0p-C1-1nv"/>
                 <outlet property="mediaItemArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
                 <outlet property="mediaItemCopyrightTextField" destination="ebt-AQ-LWK" id="W6S-an-ehZ"/>
+                <outlet property="mediaItemCopyrightTitleTextField" destination="HYi-e3-j6K" id="D0s-mZ-NaH"/>
                 <outlet property="mediaItemFileNameTextField" destination="VxL-BW-3eh" id="fiL-3N-m3P"/>
                 <outlet property="mediaItemLabelsTextField" destination="HyO-9K-R7L" id="5V0-iU-KA0"/>
                 <outlet property="mediaItemLabelsTitleTextField" destination="uhm-9P-6qk" id="9bz-MW-v1p"/>
