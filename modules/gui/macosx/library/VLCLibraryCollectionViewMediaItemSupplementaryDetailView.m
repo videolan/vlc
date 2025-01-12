@@ -110,6 +110,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.mediaItemPrimaryDetailButton.contentTintColor = primaryDetailButtonColor;
         self.mediaItemSecondaryDetailButton.contentTintColor = secondaryDetailButtonColor;
     }
+    self.mediaItemFavoriteButton.state = actualItem.favorited ? NSOnState : NSOffState;
+
     self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
 
