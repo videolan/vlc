@@ -200,6 +200,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     const bool b_favorite = mediaItem.favorited;
     vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
     const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, !b_favorite);
+
+    if (result == VLC_SUCCESS) {
+        VLCMediaLibraryMediaItem * const updatedItem =
+            [VLCMediaLibraryMediaItem mediaItemForLibraryID:mediaItemId];
+        self.representedItem =
+            [[VLCLibraryRepresentedItem alloc] initWithItem:updatedItem
+                                                 parentType:self.representedItem.parentType];
+
+    } else {
+        NSLog(@"Unable to set favorite status of media item: %lli", mediaItemId);
+    }
 }
 
 @end
