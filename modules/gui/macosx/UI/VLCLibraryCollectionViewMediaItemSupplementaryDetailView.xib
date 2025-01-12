@@ -124,7 +124,7 @@
                                         <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="5Ul-IA-Mco">
                                             <rect key="frame" x="861" y="-2.5" width="16" height="21"/>
                                             <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="heart" catalog="system" imagePosition="only" alignment="center" alternateImage="heart.fill" imageScaling="proportionallyUpOrDown" inset="2" id="Gzu-E8-QAA">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
