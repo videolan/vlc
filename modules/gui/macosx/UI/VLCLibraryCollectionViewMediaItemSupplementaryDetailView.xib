@@ -90,10 +90,10 @@
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <stackView distribution="fill" orientation="horizontal" alignment="top" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JzZ-K9-xaP">
-                                    <rect key="frame" x="0.0" y="84" width="417" height="16"/>
+                                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JzZ-K9-xaP">
+                                    <rect key="frame" x="0.0" y="147" width="877" height="16"/>
                                     <subviews>
-                                        <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
+                                        <button horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
                                             <rect key="frame" x="0.0" y="0.0" width="196" height="16"/>
                                             <buttonCell key="cell" type="bevel" title="Media item primary detail string" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" imageScaling="proportionallyDown" inset="2" id="zkC-9p-xFn">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -108,7 +108,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="9CH-03-Iu3">
-                                            <rect key="frame" x="204" y="0.0" width="213" height="16"/>
+                                            <rect key="frame" x="201" y="0.0" width="655" height="16"/>
                                             <buttonCell key="cell" type="bevel" title="Media item secondary detail string" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" truncatesLastVisibleLine="YES" imageScaling="proportionallyDown" inset="2" id="wPH-tu-Uw1">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -121,15 +121,26 @@
                                                 <action selector="secondaryDetailAction:" target="HAc-or-XD8" id="IAX-VG-Kpd"/>
                                             </connections>
                                         </button>
+                                        <button horizontalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="5Ul-IA-Mco">
+                                            <rect key="frame" x="861" y="-2.5" width="16" height="21"/>
+                                            <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="heart" catalog="system" imagePosition="only" alignment="center" alternateImage="heart.fill" imageScaling="proportionallyUpOrDown" inset="2" id="Gzu-E8-QAA">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <color key="contentTintColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                        </button>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="5Ul-IA-Mco" firstAttribute="centerY" secondItem="JzZ-K9-xaP" secondAttribute="centerY" id="7R4-k6-KYR"/>
                                         <constraint firstAttribute="height" constant="16" id="Xhb-lh-AxX"/>
                                     </constraints>
                                     <visibilityPriorities>
                                         <integer value="1000"/>
                                         <integer value="1000"/>
+                                        <integer value="1000"/>
                                     </visibilityPriorities>
                                     <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
@@ -319,6 +330,7 @@
                             </subviews>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="fiJ-9f-ecF" secondAttribute="trailing" id="EBV-Hj-CYR"/>
+                                <constraint firstAttribute="trailing" secondItem="JzZ-K9-xaP" secondAttribute="trailing" id="sIb-Sq-XfX"/>
                             </constraints>
                             <visibilityPriorities>
                                 <integer value="1000"/>
@@ -384,6 +396,8 @@
         </view>
     </objects>
     <resources>
+        <image name="heart" catalog="system" width="16" height="14"/>
+        <image name="heart.fill" catalog="system" width="16" height="14"/>
         <image name="no-art" width="128" height="128"/>
         <image name="play.fill" catalog="system" width="12" height="13"/>
         <image name="plus" catalog="system" width="14" height="13"/>
