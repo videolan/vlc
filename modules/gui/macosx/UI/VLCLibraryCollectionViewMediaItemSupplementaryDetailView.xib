@@ -320,6 +320,7 @@
                 <outlet property="mediaItemLabelsTextField" destination="HyO-9K-R7L" id="5V0-iU-KA0"/>
                 <outlet property="mediaItemLabelsTitleTextField" destination="uhm-9P-6qk" id="9bz-MW-v1p"/>
                 <outlet property="mediaItemLastPlayedTextField" destination="2wD-n8-ITx" id="nFm-Ri-ghQ"/>
+                <outlet property="mediaItemLastPlayedTitleTextField" destination="F6B-1v-Bg2" id="Pla-nv-R8R"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
                 <outlet property="mediaItemPrimaryDetailButton" destination="S5i-gd-zkt" id="ssB-Jg-jcf"/>
                 <outlet property="mediaItemSecondaryDetailButton" destination="9CH-03-Iu3" id="J8O-hB-tHb"/>

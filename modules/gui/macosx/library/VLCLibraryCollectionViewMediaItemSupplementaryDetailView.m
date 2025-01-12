@@ -120,12 +120,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.mediaItemLabelsTextField.stringValue = [mediaItemLabels componentsJoinedByString:@", "];
     }
 
-    NSDate * const lastPlayedDate = [NSDate dateWithTimeIntervalSince1970:actualItem.lastPlayedDate];
-    NSDateFormatter * const formatter = [[NSDateFormatter alloc] init];
-    formatter.dateStyle = NSDateFormatterFullStyle;
-    formatter.timeStyle = NSDateFormatterFullStyle;
-    NSString * const lastPlayedString = [formatter stringFromDate:lastPlayedDate];
-    self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
+    self.mediaItemLastPlayedTextField.hidden = actualItem.lastPlayedDate == 0;
+    self.mediaItemLastPlayedTitleTextField.hidden = self.mediaItemLastPlayedTextField.hidden;
+    if (actualItem.lastPlayedDate > 0) {
+        NSDate * const lastPlayedDate =
+            [NSDate dateWithTimeIntervalSince1970:actualItem.lastPlayedDate];
+        NSDateFormatter * const formatter = [[NSDateFormatter alloc] init];
+        formatter.dateStyle = NSDateFormatterFullStyle;
+        formatter.timeStyle = NSDateFormatterFullStyle;
+        NSString * const lastPlayedString = [formatter stringFromDate:lastPlayedDate];
+        self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
+    }
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         if (self.representedItem.item != actualItem) {
