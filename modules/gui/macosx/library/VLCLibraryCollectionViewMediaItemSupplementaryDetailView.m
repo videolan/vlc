@@ -112,6 +112,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
     self.mediaItemFavoriteButton.state = actualItem.favorited ? NSOnState : NSOffState;
 
+    self.mediaItemPrimaryDetailButton.target = self;
+    self.mediaItemSecondaryDetailButton.target = self;
     self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
 
