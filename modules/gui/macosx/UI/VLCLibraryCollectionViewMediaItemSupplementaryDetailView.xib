@@ -169,6 +169,14 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="O20-fr-lHb">
+                                                    <rect key="frame" x="-2" y="42" width="83" height="16"/>
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Content:" id="LdZ-IF-3FI">
+                                                        <font key="font" metaFont="systemBold"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="NZk-WW-Uay">
                                                     <rect key="frame" x="-2" y="21" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="File name:" id="CyQ-Ao-mup">
@@ -187,6 +195,7 @@
                                                 </textField>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="O20-fr-lHb" secondAttribute="trailing" id="Avk-mZ-kvV"/>
                                                 <constraint firstAttribute="trailing" secondItem="HYi-e3-j6K" secondAttribute="trailing" id="B2m-08-6Of"/>
                                                 <constraint firstAttribute="trailing" secondItem="hEf-79-49a" secondAttribute="trailing" id="DCM-2G-n54"/>
                                                 <constraint firstAttribute="trailing" secondItem="uhm-9P-6qk" secondAttribute="trailing" id="qug-q4-wUc"/>
@@ -198,8 +207,10 @@
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
+                                                <integer value="1000"/>
                                             </visibilityPriorities>
                                             <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
@@ -221,6 +232,14 @@
                                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ebt-AQ-LWK">
                                                     <rect key="frame" x="-2" y="63" width="37" height="16"/>
                                                     <textFieldCell key="cell" title="Label" id="e2M-0W-dC5">
+                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YBs-Jb-5di">
+                                                    <rect key="frame" x="-2" y="63" width="37" height="16"/>
+                                                    <textFieldCell key="cell" title="Label" id="LfQ-cN-QlF">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -262,8 +281,10 @@
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
+                                                <integer value="1000"/>
                                             </visibilityPriorities>
                                             <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
@@ -337,12 +358,13 @@
                 <outlet property="contentViewRightConstraint" destination="cPm-6m-umY" id="T0p-C1-a7l"/>
                 <outlet property="contentViewTopConstraint" destination="Mr1-w0-CQK" id="T0p-C1-1nv"/>
                 <outlet property="mediaItemArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
+                <outlet property="mediaItemContentDescriptionTextField" destination="2wD-n8-ITx" id="TJC-Gc-enx"/>
                 <outlet property="mediaItemCopyrightTextField" destination="ebt-AQ-LWK" id="W6S-an-ehZ"/>
                 <outlet property="mediaItemCopyrightTitleTextField" destination="HYi-e3-j6K" id="D0s-mZ-NaH"/>
                 <outlet property="mediaItemFileNameTextField" destination="VxL-BW-3eh" id="fiL-3N-m3P"/>
                 <outlet property="mediaItemLabelsTextField" destination="HyO-9K-R7L" id="5V0-iU-KA0"/>
                 <outlet property="mediaItemLabelsTitleTextField" destination="uhm-9P-6qk" id="9bz-MW-v1p"/>
-                <outlet property="mediaItemLastPlayedTextField" destination="2wD-n8-ITx" id="nFm-Ri-ghQ"/>
+                <outlet property="mediaItemLastPlayedTextField" destination="YBs-Jb-5di" id="K2d-OZ-i3h"/>
                 <outlet property="mediaItemLastPlayedTitleTextField" destination="F6B-1v-Bg2" id="Pla-nv-R8R"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
                 <outlet property="mediaItemPrimaryDetailButton" destination="S5i-gd-zkt" id="ssB-Jg-jcf"/>
