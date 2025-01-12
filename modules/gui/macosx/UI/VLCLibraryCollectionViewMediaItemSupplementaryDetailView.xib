@@ -122,6 +122,9 @@
                                             </connections>
                                         </button>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="Xhb-lh-AxX"/>
+                                    </constraints>
                                     <visibilityPriorities>
                                         <integer value="1000"/>
                                         <integer value="1000"/>
@@ -132,7 +135,10 @@
                                     </customSpacing>
                                 </stackView>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
-                                    <rect key="frame" x="-2" y="63" width="94" height="16"/>
+                                    <rect key="frame" x="-2" y="126" width="94" height="16"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="16" id="8hg-2f-fip"/>
+                                    </constraints>
                                     <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
