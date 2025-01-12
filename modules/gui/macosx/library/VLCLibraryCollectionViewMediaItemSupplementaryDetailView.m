@@ -114,8 +114,11 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
 
     self.mediaItemPrimaryDetailButton.target = self;
     self.mediaItemSecondaryDetailButton.target = self;
+    self.mediaItemFavoriteButton.target = self;
+
     self.mediaItemPrimaryDetailButton.action = @selector(primaryDetailAction:);
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
+    self.mediaItemFavoriteButton.action = @selector(favoriteAction:);
 
     NSArray<NSString *> * const mediaItemLabels = self.representedItem.item.labels;
     self.mediaItemLabelsTextField.hidden = mediaItemLabels.count == 0;
@@ -188,6 +191,15 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     VLCLibraryWindow * const libraryWindow = VLCMain.sharedInstance.libraryWindow;
     const id<VLCMediaLibraryItemProtocol> libraryItem = actualItem.secondaryActionableDetailLibraryItem;
     [libraryWindow presentLibraryItem:libraryItem];
+}
+
+- (IBAction)favoriteAction:(id)sender
+{
+    VLCMediaLibraryMediaItem * const mediaItem = self.representedItem.item;
+    const int64_t mediaItemId = mediaItem.libraryID;
+    const bool b_favorite = mediaItem.favorited;
+    vlc_medialibrary_t * const p_ml = vlc_ml_instance_get(getIntf());
+    const int result = vlc_ml_media_set_favorite(p_ml, mediaItemId, !b_favorite);
 }
 
 @end

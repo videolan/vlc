@@ -128,6 +128,9 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <color key="contentTintColor" name="systemRedColor" catalog="System" colorSpace="catalog"/>
+                                            <connections>
+                                                <action selector="favoriteAction:" target="HAc-or-XD8" id="bPB-XU-9uc"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
