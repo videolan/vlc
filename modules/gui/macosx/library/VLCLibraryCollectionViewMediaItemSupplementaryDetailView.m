@@ -132,11 +132,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
     }
 
-    self.mediaItemCopyrightTextField.hidden = [actualItem.inputItem.copyright isEqualToString:@""];
-    self.mediaItemCopyrightTitleTextField.hidden = self.mediaItemCopyrightTextField.hidden;
-    self.mediaItemCopyrightTextField.stringValue = actualItem.inputItem.copyright;
+    VLCInputItem * const inputItem = actualItem.inputItem;
 
-    self.mediaItemContentDescriptionTextField.stringValue = actualItem.inputItem.contentDescription;
+    NSString * const copyright = inputItem.copyright;
+    self.mediaItemCopyrightTextField.hidden = [copyright isEqualToString:@""];
+    self.mediaItemCopyrightTitleTextField.hidden = self.mediaItemCopyrightTextField.hidden;
+    self.mediaItemCopyrightTextField.stringValue = copyright;
+
+    NSString * const contentDescription = inputItem.contentDescription;
+    self.mediaItemContentDescriptionTextField.hidden = [contentDescription isEqualToString:@""];
+    self.mediaItemContentDescriptionTitleTextField.hidden = self.mediaItemContentDescriptionTextField.hidden;
+    self.mediaItemContentDescriptionTextField.stringValue = contentDescription;
 
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         if (self.representedItem.item != actualItem) {
