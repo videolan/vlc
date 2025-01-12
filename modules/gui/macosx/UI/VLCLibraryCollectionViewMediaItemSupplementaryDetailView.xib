@@ -153,6 +153,14 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="HYi-e3-j6K">
+                                                    <rect key="frame" x="-2" y="63" width="83" height="16"/>
+                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Copyright:" id="FTb-8c-Kqq">
+                                                        <font key="font" metaFont="systemBold"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="F6B-1v-Bg2">
                                                     <rect key="frame" x="-2" y="42" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Last played:" id="LfQ-yR-UiL">
@@ -170,7 +178,7 @@
                                                     </textFieldCell>
                                                 </textField>
                                                 <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hEf-79-49a">
-                                                    <rect key="frame" x="-2" y="0.0" width="72" height="16"/>
+                                                    <rect key="frame" x="-2" y="0.0" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Path:" id="a9t-Zw-74U">
                                                         <font key="font" metaFont="systemBold"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -179,11 +187,13 @@
                                                 </textField>
                                             </subviews>
                                             <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="HYi-e3-j6K" secondAttribute="trailing" id="B2m-08-6Of"/>
                                                 <constraint firstAttribute="trailing" secondItem="hEf-79-49a" secondAttribute="trailing" id="DCM-2G-n54"/>
                                                 <constraint firstAttribute="trailing" secondItem="uhm-9P-6qk" secondAttribute="trailing" id="qug-q4-wUc"/>
                                                 <constraint firstAttribute="trailing" secondItem="NZk-WW-Uay" secondAttribute="trailing" id="r3e-pC-d3V"/>
                                             </constraints>
                                             <visibilityPriorities>
+                                                <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
@@ -194,14 +204,23 @@
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
                                             </customSpacing>
                                         </stackView>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
-                                            <rect key="frame" x="73" y="0.0" width="783" height="58"/>
+                                            <rect key="frame" x="84" y="0.0" width="793" height="100"/>
                                             <subviews>
                                                 <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HyO-9K-R7L">
                                                     <rect key="frame" x="-2" y="42" width="808" height="16"/>
                                                     <textFieldCell key="cell" title="Label" id="eIz-b2-2PE">
+                                                        <font key="font" usesAppearanceFont="YES"/>
+                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ebt-AQ-LWK">
+                                                    <rect key="frame" x="-2" y="63" width="37" height="16"/>
+                                                    <textFieldCell key="cell" title="Label" id="e2M-0W-dC5">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -242,8 +261,10 @@
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
                                                 <integer value="1000"/>
+                                                <integer value="1000"/>
                                             </visibilityPriorities>
                                             <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
                                                 <real value="3.4028234663852886e+38"/>
@@ -316,6 +337,7 @@
                 <outlet property="contentViewRightConstraint" destination="cPm-6m-umY" id="T0p-C1-a7l"/>
                 <outlet property="contentViewTopConstraint" destination="Mr1-w0-CQK" id="T0p-C1-1nv"/>
                 <outlet property="mediaItemArtworkImageView" destination="xZd-Hk-h2M" id="J8l-V9-P06"/>
+                <outlet property="mediaItemCopyrightTextField" destination="ebt-AQ-LWK" id="W6S-an-ehZ"/>
                 <outlet property="mediaItemFileNameTextField" destination="VxL-BW-3eh" id="fiL-3N-m3P"/>
                 <outlet property="mediaItemLabelsTextField" destination="HyO-9K-R7L" id="5V0-iU-KA0"/>
                 <outlet property="mediaItemLabelsTitleTextField" destination="uhm-9P-6qk" id="9bz-MW-v1p"/>

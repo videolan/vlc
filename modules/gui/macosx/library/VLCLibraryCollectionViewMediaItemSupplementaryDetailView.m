@@ -132,6 +132,8 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
     }
 
+    self.mediaItemCopyrightTextField.stringValue = actualItem.inputItem.copyright;
+
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         if (self.representedItem.item != actualItem) {
             return;
