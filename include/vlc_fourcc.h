@@ -804,10 +804,28 @@ VLC_API const vlc_fourcc_t * vlc_fourcc_GetFallback( vlc_fourcc_t );
 VLC_API bool vlc_fourcc_IsYUV( vlc_fourcc_t );
 
 /**
+ * Chroma subtype
+ */
+enum vlc_chroma_subtype
+{
+    VLC_CHROMA_SUBTYPE_OTHER,
+    VLC_CHROMA_SUBTYPE_YUV444,
+    VLC_CHROMA_SUBTYPE_YUV440,
+    VLC_CHROMA_SUBTYPE_YUV422,
+    VLC_CHROMA_SUBTYPE_YUV420,
+    VLC_CHROMA_SUBTYPE_YUV411,
+    VLC_CHROMA_SUBTYPE_YUV410,
+    VLC_CHROMA_SUBTYPE_YUV211,
+    VLC_CHROMA_SUBTYPE_RGB,
+    VLC_CHROMA_SUBTYPE_GREY,
+};
+
+/**
  * Chroma related information.
  */
 typedef struct {
     vlc_fourcc_t fcc;
+    enum vlc_chroma_subtype subtype;
     unsigned plane_count;
     struct {
         vlc_rational_t w;
