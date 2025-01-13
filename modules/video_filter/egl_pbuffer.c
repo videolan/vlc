@@ -227,7 +227,7 @@ context_created:
     return VLC_SUCCESS;
 error:
     eglTerminate(sys->display);
-    vlc_egl_display_Delete(sys->display);
+    vlc_egl_display_Delete(sys->vlc_display);
     return VLC_EGENERIC;
 }
 
