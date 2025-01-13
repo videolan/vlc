@@ -217,4 +217,16 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 }
 
+- (IBAction)ratingAction:(id)sender
+{
+    NSLevelIndicator * const control = (NSLevelIndicator *)sender;
+    if (control == nil) {
+        return;
+    }
+
+    const double proportion = 100 / control.maxValue;
+    const double rating = control.doubleValue * proportion;
+    ((VLCMediaLibraryMediaItem *)self.representedItem.item).rating = (int)rating;
+}
+
 @end
