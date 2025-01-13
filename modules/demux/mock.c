@@ -236,6 +236,7 @@ var_Read_float(const char *psz)
     X(error, bool, add_bool, Bool, false, NO_FREE) \
     X(pts_delay, vlc_tick_t, add_integer, Unsigned, DEFAULT_PTS_DELAY, NO_FREE) \
     X(pts_offset, vlc_tick_t, add_integer, Unsigned, 0, NO_FREE) \
+    X(time_offset, vlc_tick_t, add_integer, Ssize, 0, NO_FREE) \
     X(discontinuities, char *, add_string, String, NULL, FREE_CB) \
     X(config, char *, add_string, String, NULL, FREE_CB)
 
@@ -562,12 +563,12 @@ Control(demux_t *demux, int query, va_list args)
             *va_arg(args, vlc_tick_t *) = VLC_TICK_0 + sys->pts_offset;
             return VLC_SUCCESS;
         case DEMUX_GET_TIME:
-            *va_arg(args, vlc_tick_t *) = sys->clock - VLC_TICK_0 - sys->pts_offset;
+            *va_arg(args, vlc_tick_t *) = sys->time_offset + sys->clock - VLC_TICK_0 - sys->pts_offset;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
             if (!sys->can_seek)
                 return VLC_EGENERIC;
-            sys->clock = sys->video_pts = sys->audio_pts = va_arg(args, vlc_tick_t) + VLC_TICK_0;
+            sys->clock = sys->video_pts = sys->audio_pts = va_arg(args, vlc_tick_t) + VLC_TICK_0 + sys->time_offset;
             return VLC_SUCCESS;
         case DEMUX_GET_TITLE_INFO:
             if (sys->title_count > 0)
