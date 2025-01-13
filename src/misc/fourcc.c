@@ -669,7 +669,8 @@ const vlc_fourcc_t *vlc_fourcc_GetFallback( vlc_fourcc_t i_fourcc )
              {.w = {1,w_den}, .h = {1,h_den}}, \
              {.w = {1,    1}, .h = {1,    1}} }, \
       .pixel_size = ((bits + 7) / 8), \
-      .pixel_bits = bits
+      .pixel_bits = bits, \
+      .color_bits = bits
 
 #define PLANAR_8(subtype_, n, w_den, h_den) PLANAR(subtype_, n, w_den, h_den, 8)
 #define PLANAR_16(subtype_, n, w_den, h_den, bits) PLANAR(subtype_, n, w_den, h_den, bits)
@@ -680,22 +681,25 @@ const vlc_fourcc_t *vlc_fourcc_GetFallback( vlc_fourcc_t i_fourcc )
       .p = { {.w = {1,    1}, .h = {1,    1}}, \
              {.w = {2,w_den}, .h = {1,h_den}} }, \
       .pixel_size = ((bits + 7) / 8), \
-      .pixel_bits = bits
+      .pixel_bits = bits, \
+      .color_bits = bits
 
-#define PACKED_FMT(subtype_, size, bits) \
+#define PACKED_FMT(subtype_, size, bits, color_bits_) \
       .subtype = VLC_CHROMA_SUBTYPE_##subtype_, \
       .plane_count = 1, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
       .pixel_size = size, \
-      .pixel_bits = bits
+      .pixel_bits = bits, \
+      .color_bits = color_bits_
 
 /* Zero planes for hardware picture handles. Cannot be manipulated directly. */
-#define GPU_FMT(subtype_) \
+#define GPU_FMT(subtype_, color_bits_) \
       .subtype = VLC_CHROMA_SUBTYPE_##subtype_, \
       .plane_count = 0, \
       .p = { {.w = {1,1}, .h = {1,1}} }, \
       .pixel_size = 0, \
-      .pixel_bits = 0
+      .pixel_bits = 0, \
+      .color_bits = color_bits_
 
 static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_I411,                  PLANAR_8(YUV411, 3, 4, 1) },
@@ -766,84 +770,84 @@ static const vlc_chroma_description_t p_list_chroma_description[] = {
     { VLC_CODEC_P012,                  SEMIPLANAR(YUV420, 2, 2, 12) },
     { VLC_CODEC_P016,                  SEMIPLANAR(YUV420, 2, 2, 16) },
 
-    { VLC_CODEC_V308,                  PACKED_FMT(YUV444, 1, 24) },
-    { VLC_CODEC_YUYV,                  PACKED_FMT(YUV422, 2, 16) },
-    { VLC_CODEC_YVYU,                  PACKED_FMT(YUV422, 2, 16) },
-    { VLC_CODEC_UYVY,                  PACKED_FMT(YUV422, 2, 16) },
-    { VLC_CODEC_VYUY,                  PACKED_FMT(YUV422, 2, 16) },
-    { VLC_CODEC_YUV2,                  PACKED_FMT(YUV422, 2, 16) },
-    { VLC_CODEC_RGB233,                PACKED_FMT(RGB, 1, 8) },
-    { VLC_CODEC_BGR233,                PACKED_FMT(RGB, 1, 8) },
-    { VLC_CODEC_RGB332,                PACKED_FMT(RGB, 1, 8) },
-    { VLC_CODEC_YUVP,                  PACKED_FMT(OTHER, 1, 8) },
-    { VLC_CODEC_RGBP,                  PACKED_FMT(OTHER, 1, 8) },
-    { VLC_CODEC_GREY,                  PACKED_FMT(GREY, 1, 8) },
-    { VLC_CODEC_GREY_10L,              PACKED_FMT(GREY, 2, 10) },
-    { VLC_CODEC_GREY_10B,              PACKED_FMT(GREY, 2, 10) },
-    { VLC_CODEC_GREY_12L,              PACKED_FMT(GREY, 2, 12) },
-    { VLC_CODEC_GREY_12B,              PACKED_FMT(GREY, 2, 12) },
-    { VLC_CODEC_GREY_16L,              PACKED_FMT(GREY, 2, 16) },
-    { VLC_CODEC_GREY_16B,              PACKED_FMT(GREY, 2, 16) },
+    { VLC_CODEC_V308,                  PACKED_FMT(YUV444, 1, 24, 8) },
+    { VLC_CODEC_YUYV,                  PACKED_FMT(YUV422, 2, 16, 8) },
+    { VLC_CODEC_YVYU,                  PACKED_FMT(YUV422, 2, 16, 8) },
+    { VLC_CODEC_UYVY,                  PACKED_FMT(YUV422, 2, 16, 8) },
+    { VLC_CODEC_VYUY,                  PACKED_FMT(YUV422, 2, 16, 8) },
+    { VLC_CODEC_YUV2,                  PACKED_FMT(YUV422, 2, 16, 8) },
+    { VLC_CODEC_RGB233,                PACKED_FMT(RGB, 1, 8, 2.6) },
+    { VLC_CODEC_BGR233,                PACKED_FMT(RGB, 1, 8, 2.6) },
+    { VLC_CODEC_RGB332,                PACKED_FMT(RGB, 1, 8, 2.6) },
+    { VLC_CODEC_YUVP,                  PACKED_FMT(OTHER, 1, 8, 0) },
+    { VLC_CODEC_RGBP,                  PACKED_FMT(OTHER, 1, 8, 0) },
+    { VLC_CODEC_GREY,                  PACKED_FMT(GREY, 1, 8, 8) },
+    { VLC_CODEC_GREY_10L,              PACKED_FMT(GREY, 2, 10, 10) },
+    { VLC_CODEC_GREY_10B,              PACKED_FMT(GREY, 2, 10, 10) },
+    { VLC_CODEC_GREY_12L,              PACKED_FMT(GREY, 2, 12, 12) },
+    { VLC_CODEC_GREY_12B,              PACKED_FMT(GREY, 2, 12, 12) },
+    { VLC_CODEC_GREY_16L,              PACKED_FMT(GREY, 2, 16, 16) },
+    { VLC_CODEC_GREY_16B,              PACKED_FMT(GREY, 2, 16, 16) },
 
-    { VLC_CODEC_RGB555BE,              PACKED_FMT(RGB, 2, 15) },
-    { VLC_CODEC_RGB555LE,              PACKED_FMT(RGB, 2, 15) },
-    { VLC_CODEC_BGR555LE,              PACKED_FMT(RGB, 2, 15) },
-    { VLC_CODEC_BGR555BE,              PACKED_FMT(RGB, 2, 15) },
-    { VLC_CODEC_RGB565LE,              PACKED_FMT(RGB, 2, 16) },
-    { VLC_CODEC_RGB565BE,              PACKED_FMT(RGB, 2, 16) },
-    { VLC_CODEC_BGR565LE,              PACKED_FMT(RGB, 2, 16) },
-    { VLC_CODEC_BGR565BE,              PACKED_FMT(RGB, 2, 16) },
-    { VLC_CODEC_RGB24,                 PACKED_FMT(RGB, 3, 24) },
-    { VLC_CODEC_BGR24,                 PACKED_FMT(RGB, 3, 24) },
-    { VLC_CODEC_RGBX,                  PACKED_FMT(RGB, 4, 24) },
-    { VLC_CODEC_XRGB,                  PACKED_FMT(RGB, 4, 24) },
-    { VLC_CODEC_BGRX,                  PACKED_FMT(RGB, 4, 24) },
-    { VLC_CODEC_XBGR,                  PACKED_FMT(RGB, 4, 24) },
-    { VLC_CODEC_RGBA,                  PACKED_FMT(RGB, 4, 32) },
-    { VLC_CODEC_ARGB,                  PACKED_FMT(RGB, 4, 32) },
-    { VLC_CODEC_BGRA,                  PACKED_FMT(RGB, 4, 32) },
-    { VLC_CODEC_ABGR,                  PACKED_FMT(RGB, 4, 32) },
-    { VLC_CODEC_RGBA10LE,              PACKED_FMT(RGB, 4, 32) },
-    { VLC_CODEC_RGBA64,                PACKED_FMT(RGB, 8, 64) },
-    { VLC_CODEC_VUYA,                  PACKED_FMT(YUV444, 4, 32) },
-    { VLC_CODEC_Y210,                  PACKED_FMT(YUV422, 4, 32) },
-    { VLC_CODEC_Y410,                  PACKED_FMT(YUV444, 4, 32) },
+    { VLC_CODEC_RGB555BE,              PACKED_FMT(RGB, 2, 15, 5) },
+    { VLC_CODEC_RGB555LE,              PACKED_FMT(RGB, 2, 15, 5) },
+    { VLC_CODEC_BGR555LE,              PACKED_FMT(RGB, 2, 15, 5) },
+    { VLC_CODEC_BGR555BE,              PACKED_FMT(RGB, 2, 15, 5) },
+    { VLC_CODEC_RGB565LE,              PACKED_FMT(RGB, 2, 16, 5.3) },
+    { VLC_CODEC_RGB565BE,              PACKED_FMT(RGB, 2, 16, 5.3) },
+    { VLC_CODEC_BGR565LE,              PACKED_FMT(RGB, 2, 16, 5.3), },
+    { VLC_CODEC_BGR565BE,              PACKED_FMT(RGB, 2, 16, 5.3) },
+    { VLC_CODEC_RGB24,                 PACKED_FMT(RGB, 3, 24, 8) },
+    { VLC_CODEC_BGR24,                 PACKED_FMT(RGB, 3, 24, 8) },
+    { VLC_CODEC_RGBX,                  PACKED_FMT(RGB, 4, 24, 8) },
+    { VLC_CODEC_XRGB,                  PACKED_FMT(RGB, 4, 24, 8) },
+    { VLC_CODEC_BGRX,                  PACKED_FMT(RGB, 4, 24, 8) },
+    { VLC_CODEC_XBGR,                  PACKED_FMT(RGB, 4, 24, 8) },
+    { VLC_CODEC_RGBA,                  PACKED_FMT(RGB, 4, 32, 8) },
+    { VLC_CODEC_ARGB,                  PACKED_FMT(RGB, 4, 32, 8) },
+    { VLC_CODEC_BGRA,                  PACKED_FMT(RGB, 4, 32, 8) },
+    { VLC_CODEC_ABGR,                  PACKED_FMT(RGB, 4, 32, 8) },
+    { VLC_CODEC_RGBA10LE,              PACKED_FMT(RGB, 4, 32, 10) },
+    { VLC_CODEC_RGBA64,                PACKED_FMT(RGB, 8, 64, 16) },
+    { VLC_CODEC_VUYA,                  PACKED_FMT(YUV444, 4, 32, 8) },
+    { VLC_CODEC_Y210,                  PACKED_FMT(YUV422, 4, 32, 10) },
+    { VLC_CODEC_Y410,                  PACKED_FMT(YUV444, 4, 32, 10) },
 
-    { VLC_CODEC_Y211, VLC_CHROMA_SUBTYPE_YUV211,1, { {{1,4}, {1,1}} }, 4, 32 },
-    { VLC_CODEC_XYZ_12L,               PACKED_FMT(OTHER, 6, 48) },
-    { VLC_CODEC_XYZ_12B,               PACKED_FMT(OTHER, 6, 48) },
+    { VLC_CODEC_Y211, VLC_CHROMA_SUBTYPE_YUV211,1, { {{1,4}, {1,1}} }, 4, 32, 8 },
+    { VLC_CODEC_XYZ_12L,               PACKED_FMT(OTHER, 6, 48, 12) },
+    { VLC_CODEC_XYZ_12B,               PACKED_FMT(OTHER, 6, 48, 12) },
 
-    { VLC_CODEC_VDPAU_VIDEO,           GPU_FMT(YUV420) },
-    { VLC_CODEC_VDPAU_OUTPUT,          GPU_FMT(RGB) },
-    { VLC_CODEC_ANDROID_OPAQUE,        GPU_FMT(OTHER) },
-    { VLC_CODEC_MMAL_OPAQUE,           GPU_FMT(OTHER) },
-    { VLC_CODEC_D3D9_OPAQUE,           GPU_FMT(YUV420) },
-    { VLC_CODEC_D3D11_OPAQUE,          GPU_FMT(YUV420) },
-    { VLC_CODEC_D3D9_OPAQUE_10B,       GPU_FMT(YUV420) },
-    { VLC_CODEC_D3D11_OPAQUE_10B,      GPU_FMT(YUV420) },
-    { VLC_CODEC_D3D11_OPAQUE_RGBA,     GPU_FMT(RGB) },
-    { VLC_CODEC_D3D11_OPAQUE_BGRA,     GPU_FMT(RGB) },
-    { VLC_CODEC_D3D11_OPAQUE_ALPHA,    GPU_FMT(YUV420) },
+    { VLC_CODEC_VDPAU_VIDEO,           GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_VDPAU_OUTPUT,          GPU_FMT(RGB, 8) },
+    { VLC_CODEC_ANDROID_OPAQUE,        GPU_FMT(OTHER, 0) },
+    { VLC_CODEC_MMAL_OPAQUE,           GPU_FMT(OTHER, 0) },
+    { VLC_CODEC_D3D9_OPAQUE,           GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_D3D11_OPAQUE,          GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_D3D9_OPAQUE_10B,       GPU_FMT(YUV420, 10) },
+    { VLC_CODEC_D3D11_OPAQUE_10B,      GPU_FMT(YUV420, 10) },
+    { VLC_CODEC_D3D11_OPAQUE_RGBA,     GPU_FMT(RGB, 8) },
+    { VLC_CODEC_D3D11_OPAQUE_BGRA,     GPU_FMT(RGB, 8) },
+    { VLC_CODEC_D3D11_OPAQUE_ALPHA,    GPU_FMT(YUV420, 8) },
 
-    { VLC_CODEC_NVDEC_OPAQUE_16B,      GPU_FMT(YUV420) },
-    { VLC_CODEC_NVDEC_OPAQUE_10B,      GPU_FMT(YUV420) },
-    { VLC_CODEC_NVDEC_OPAQUE,          GPU_FMT(YUV420) },
+    { VLC_CODEC_NVDEC_OPAQUE_16B,      GPU_FMT(YUV420, 16) },
+    { VLC_CODEC_NVDEC_OPAQUE_10B,      GPU_FMT(YUV420, 10) },
+    { VLC_CODEC_NVDEC_OPAQUE,          GPU_FMT(YUV420, 8) },
 
-    { VLC_CODEC_NVDEC_OPAQUE_444,      GPU_FMT(YUV444) },
-    { VLC_CODEC_NVDEC_OPAQUE_444_16B,  GPU_FMT(YUV444) },
+    { VLC_CODEC_NVDEC_OPAQUE_444,      GPU_FMT(YUV444, 8) },
+    { VLC_CODEC_NVDEC_OPAQUE_444_16B,  GPU_FMT(YUV444, 16) },
 
-    { VLC_CODEC_CVPX_NV12,             GPU_FMT(YUV420) },
-    { VLC_CODEC_CVPX_UYVY,             GPU_FMT(YUV422) },
-    { VLC_CODEC_CVPX_I420,             GPU_FMT(YUV420) },
-    { VLC_CODEC_CVPX_BGRA,             GPU_FMT(RGB) },
+    { VLC_CODEC_CVPX_NV12,             GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_CVPX_UYVY,             GPU_FMT(YUV422, 8) },
+    { VLC_CODEC_CVPX_I420,             GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_CVPX_BGRA,             GPU_FMT(RGB, 8) },
 
-    { VLC_CODEC_CVPX_P010,             GPU_FMT(YUV420) },
+    { VLC_CODEC_CVPX_P010,             GPU_FMT(YUV420, 10) },
 
-    { VLC_CODEC_GST_MEM_OPAQUE,        GPU_FMT(OTHER) },
+    { VLC_CODEC_GST_MEM_OPAQUE,        GPU_FMT(OTHER, 0) },
 
-    { VLC_CODEC_VAAPI_420,             GPU_FMT(YUV420) },
-    { VLC_CODEC_VAAPI_420_10BPP,       GPU_FMT(YUV420) },
-    { VLC_CODEC_VAAPI_420_12BPP,       GPU_FMT(YUV420) },
+    { VLC_CODEC_VAAPI_420,             GPU_FMT(YUV420, 8) },
+    { VLC_CODEC_VAAPI_420_10BPP,       GPU_FMT(YUV420, 10) },
+    { VLC_CODEC_VAAPI_420_12BPP,       GPU_FMT(YUV420, 12) },
 };
 
 #undef PACKED_FMT
