@@ -6,6 +6,7 @@
  * Authors: David Fuhrmann <david dot fuhrmann at googlemail dot com>
  *          Felix Paul Kühne <fkuehne at videolan dot org>
  *          Pierre d'Herbemont <pdherbemont at videolan dot org>
+ *          Alexandre Janniaux <ajanni@videolabs.io>
  *
  * Some of the code is based on mpv's video_layer.swift by "der richter"
  *
@@ -109,6 +110,9 @@ typedef struct vout_display_sys_t {
     vout_display_place_t place;
     vout_display_cfg_t cfg;
 
+    bool change_projection;
+    video_projection_mode_t projection;
+    vlc_viewpoint_t viewpoint;
 } vout_display_sys_t;
 
 #pragma mark -
@@ -235,9 +239,18 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
     if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
         return VLC_EGENERIC;
 
+    sys->viewpoint = *vp;
     int ret = vout_display_opengl_SetViewpoint(sys->vgl, vp);
     vlc_gl_ReleaseCurrent(sys->gl);
     return ret;
+}
+
+static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t projection)
+{
+    vout_display_sys_t *sys = vd->sys;
+    sys->projection = projection;
+    sys->change_projection = true;
+    return VLC_SUCCESS;
 }
 
 /**
@@ -352,6 +365,15 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
 
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
+        if (sys->change_projection)
+        {
+            vout_display_opengl_ChangeProjection(sys->vgl, sys->projection);
+            vout_display_opengl_Viewport(sys->vgl, sys->place.x, sys->place.y,
+                                        sys->place.width, sys->place.height);
+            vout_display_opengl_SetOutputSize(sys->vgl, sys->cfg.display.width, sys->cfg.display.height);
+
+            sys->change_projection = false;
+        }
         vout_display_opengl_Prepare(sys->vgl, pic, subpicture);
         vlc_gl_ReleaseCurrent(sys->gl);
 
@@ -446,6 +468,8 @@ static int Open (vout_display_t *vd,
         vd->sys = sys = calloc(1, sizeof(*sys));
         if (sys == NULL)
             return VLC_ENOMEM;
+        sys->projection = vd->cfg->projection;
+        sys->change_projection = false;
 
         id container = (__bridge id)vd->cfg->window->handle.nsobject;
         if (!container) {
@@ -516,6 +540,7 @@ static int Open (vout_display_t *vd,
             return VLC_EGENERIC;
         }
 
+        sys->viewpoint = vd->cfg->viewpoint;
         sys->vgl = vout_display_opengl_New(fmt, &spu_chromas, sys->gl,
                                            &vd->cfg->viewpoint, context);
         vlc_gl_ReleaseCurrent(sys->gl);
@@ -534,6 +559,7 @@ static int Open (vout_display_t *vd,
             .display = PictureDisplay,
             .control = Control,
             .set_viewpoint = SetViewpoint,
+            .change_source_projection = ChangeSourceProjection,
         };
         vd->ops = &ops;
 
