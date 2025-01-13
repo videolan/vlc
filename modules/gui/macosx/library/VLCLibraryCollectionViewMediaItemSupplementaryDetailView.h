@@ -37,6 +37,7 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMe
 @property (readwrite, weak) IBOutlet NSButton *mediaItemSecondaryDetailButton;
 @property (readwrite, weak) IBOutlet NSButton *mediaItemFavoriteButton;
 @property (readwrite, weak) IBOutlet NSTextField *mediaItemYearAndDurationTextField;
+@property (readwrite, weak) IBOutlet NSLevelIndicator *mediaItemRatingIndicator;
 @property (readwrite, weak) IBOutlet NSTextField *mediaItemFileNameTextField;
 @property (readwrite, weak) IBOutlet NSTextField *mediaItemPathTextField;
 @property (readwrite, weak) IBOutlet NSTextField *mediaItemLabelsTitleTextField;

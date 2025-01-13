@@ -120,6 +120,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemSecondaryDetailButton.action = @selector(secondaryDetailAction:);
     self.mediaItemFavoriteButton.action = @selector(favoriteAction:);
 
+    const double ratingControlMax = self.mediaItemRatingIndicator.maxValue;
+    const double proportionOfMaxRating = 100 / ratingControlMax;
+    self.mediaItemRatingIndicator.doubleValue = (double)actualItem.rating / proportionOfMaxRating;
+
     NSArray<NSString *> * const mediaItemLabels = self.representedItem.item.labels;
     self.mediaItemLabelsTextField.hidden = mediaItemLabels.count == 0;
     self.mediaItemLabelsTitleTextField.hidden = self.mediaItemLabelsTextField.hidden;

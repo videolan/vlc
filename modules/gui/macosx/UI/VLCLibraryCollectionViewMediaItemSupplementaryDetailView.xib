@@ -418,6 +418,7 @@
                 <outlet property="mediaItemLastPlayedTitleTextField" destination="F6B-1v-Bg2" id="Pla-nv-R8R"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
                 <outlet property="mediaItemPrimaryDetailButton" destination="S5i-gd-zkt" id="ssB-Jg-jcf"/>
+                <outlet property="mediaItemRatingIndicator" destination="lYc-WP-hlc" id="PHd-Ka-eS7"/>
                 <outlet property="mediaItemSecondaryDetailButton" destination="9CH-03-Iu3" id="J8O-hB-tHb"/>
                 <outlet property="mediaItemTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
                 <outlet property="mediaItemYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
