@@ -312,7 +312,7 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
             m_mainCtx,
             &MainCtx::askToQuit);
 
-    m_quickView->show();
+    m_quickView->setVisible(true);
     return true;
 }
 
