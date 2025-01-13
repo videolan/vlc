@@ -663,18 +663,8 @@ const vlc_fourcc_t *vlc_fourcc_GetFallback( vlc_fourcc_t i_fourcc )
 
 bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 {
-    for( unsigned i = 0; p_list_YUV[i]; i++ )
-    {
-        if( p_list_YUV[i] == fcc )
-            return true;
-    }
-
-    for (size_t i = 0; i < ARRAY_SIZE(p_list_YUV_no_fallback); i++)
-    {
-        if (p_list_YUV_no_fallback[i] == fcc)
-            return true;
-    }
-    return false;
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(fcc);
+    return desc == NULL ? false : vlc_chroma_description_IsYUV(desc);
 }
 
 #define PLANAR(subtype_, n, w_den, h_den, bits) \
