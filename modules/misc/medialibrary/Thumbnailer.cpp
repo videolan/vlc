@@ -30,6 +30,7 @@
 #include <vlc_cxx_helpers.hpp>
 #include <vlc_preparser.h>
 
+#include <climits>
 #include <stdexcept>
 
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
@@ -57,14 +58,20 @@ void Thumbnailer::onThumbnailComplete( input_item_t *, int, picture_t* thumbnail
     if (thumbnail != nullptr)
         ctx->thumbnail = picture_Hold(thumbnail);
     ctx->thumbnailer->m_currentContext = nullptr;
-    ctx->thumbnailer->m_cond.signal();
+    ctx->thumbnailer->m_cond.broadcast();
 }
 
 bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
                             uint32_t desiredWidth, uint32_t desiredHeight,
                             float position, const std::string& dest )
 {
+#if INT_MAX < UINT32_MAX
+    assert(desiredWidth < (uint32_t)INT_MAX);
+    assert(desiredHeight < (uint32_t)INT_MAX);
+#endif
+
     ThumbnailerCtx ctx{};
+
     auto item = vlc::wrap_cptr( input_item_New( mrl.c_str(), nullptr ),
                                 &input_item_Release );
     if ( unlikely( item == nullptr ) )
@@ -72,6 +79,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
 
     ctx.done = false;
     ctx.thumbnailer = this;
+    ctx.thumbnail = NULL;
     {
         vlc::threads::mutex_locker lock( m_mutex );
         m_currentContext = &ctx;
@@ -120,10 +128,12 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
 
 void Thumbnailer::stop()
 {
+    vlc_preparser_Cancel(m_thumbnailer.get(), VLC_PREPARSER_REQ_ID_INVALID);
+
     vlc::threads::mutex_locker lock{ m_mutex };
     if ( m_currentContext != nullptr )
     {
-        m_currentContext->done = true;
-        m_cond.signal();
+        while (m_currentContext != nullptr && m_currentContext->done == false)
+            m_cond.wait( m_mutex );
     }
 }
