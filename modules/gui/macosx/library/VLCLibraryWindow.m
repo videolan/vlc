@@ -279,7 +279,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)setViewForSelectedSegment
 {
-    switch (_librarySegmentType) {
+    const VLCLibrarySegmentType segmentType = self.librarySegmentType;
+    [self.toolbarDelegate layoutForSegment:segmentType];
+
+    switch (segmentType) {
     case VLCLibraryHomeSegment:
         [self showHomeLibrary];
         break;
@@ -394,7 +397,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)showHomeLibrary
 {
     // Only collection view mode
-    [self.toolbarDelegate layoutForSegment:VLCLibraryHomeSegment];
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryHomeViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:self];
@@ -404,7 +406,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showVideoLibrary
 {
-    [self.toolbarDelegate layoutForSegment:VLCLibraryVideoSegment];
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryVideoViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
@@ -414,7 +415,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showShowLibrary
 {
-    [self.toolbarDelegate layoutForSegment:VLCLibraryShowsVideoSubSegment];
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryVideoViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:self];
@@ -424,7 +424,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showAudioLibrary
 {
-    [self.toolbarDelegate layoutForSegment:VLCLibraryMusicSegment];
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryAudioViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:self];
@@ -434,14 +433,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showPlaylistLibrary:(enum vlc_ml_playlist_type_t)playlistType
 {
-    if (playlistType == VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY) {
-        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment];
-    } else if (playlistType == VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY) {
-        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment];
-    } else {
-        [self.toolbarDelegate layoutForSegment:VLCLibraryPlaylistsSegment];
-    }
-
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryPlaylistViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:self];
@@ -454,8 +445,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self.navigationStack clear];
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
-    [self.toolbarDelegate layoutForSegment:segmentType];
-
     if (segmentType == VLCLibraryBrowseSegment) {
         [self.libraryMediaSourceViewController presentBrowseView];
     } else if (segmentType == VLCLibraryStreamsSegment) {
@@ -465,7 +454,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showGroupsLibrary
 {
-    [self.toolbarDelegate layoutForSegment:VLCLibraryGroupsSegment];
     if (![self.librarySegmentViewController isKindOfClass:VLCLibraryGroupsViewController.class]) {
         _librarySegmentViewController =
             [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:self];
