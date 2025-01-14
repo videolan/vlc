@@ -1269,7 +1269,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     dst->p_picture->format.i_y_offset       = region_fmt.i_y_offset;
     dst->p_picture->format.i_visible_width  = region_fmt.i_visible_width;
     dst->p_picture->format.i_visible_height = region_fmt.i_visible_height;
-    if (!apply_scale && scale_size.h != SCALE_UNIT)
+    if (!apply_scale && scale_size.w != SCALE_UNIT)
     {
         dst->place.x      = spu_scale_w(x_offset,                   scale_size);
         dst->place.width  = spu_scale_w(region_fmt.i_visible_width, scale_size);
@@ -1279,7 +1279,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
         dst->place.x      = x_offset;
         dst->place.width  = region_fmt.i_visible_width;
     }
-    if (!apply_scale && scale_size.w != SCALE_UNIT)
+    if (!apply_scale && scale_size.h != SCALE_UNIT)
     {
         dst->place.y      = spu_scale_h(y_offset,                    scale_size);
         dst->place.height = spu_scale_h(region_fmt.i_visible_height, scale_size);
