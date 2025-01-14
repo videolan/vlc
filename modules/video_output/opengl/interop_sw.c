@@ -545,7 +545,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
     if (desc->pixel_size == 2)
     {
         if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, format->fmt,
-                                            format->intfmt, GL_UNSIGNED_SHORT) != 16)
+                                            format->intfmt, format->type) != 16)
             return VLC_EGENERIC;
     }
 
