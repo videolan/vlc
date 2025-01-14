@@ -1543,9 +1543,8 @@ void EndVideoEnc( encoder_t *p_enc )
     av_frame_free( &p_sys->frame );
 
     vlc_avcodec_lock();
-    avcodec_close( p_sys->p_context );
-    vlc_avcodec_unlock();
     avcodec_free_context( &p_sys->p_context );
+    vlc_avcodec_unlock();
 
 
     av_free( p_sys->p_interleave_buf );
