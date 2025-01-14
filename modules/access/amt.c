@@ -1319,7 +1319,7 @@ static void amt_send_relay_request( stream_t *p_access, char *relay_ip )
  * Returns: the number of bytes written on success, else 0
  */
 
-static int serialize_ipv6_pkt(amt_ipv6_t *ip, uint8_t *buf, int buflen){
+static int serialize_ipv6_pkt(amt_ipv6_t *ip, char *buf, int buflen){
     if ( buflen < IPv6_HOP_BY_HOP_OPTION_LEN + IPv6_FIXED_HDR_LEN )
     {
         return 0;
@@ -1361,7 +1361,7 @@ static int serialize_ipv6_pkt(amt_ipv6_t *ip, uint8_t *buf, int buflen){
  * Returns: the number of bytes written on success, else 0
  */
 
-static int serialize_mld_report(amt_mldv2_listener_report_t *report, uint8_t *buf, int buflen, stream_t *p_access){
+static int serialize_mld_report(amt_mldv2_listener_report_t *report, char *buf, int buflen, stream_t *p_access){
     if ( buflen < MLD_REPORT_LEN )
     {
         return 0;
