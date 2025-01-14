@@ -37,7 +37,16 @@
 #include <vlc_filter.h>
 #include <vlc_picture_pool.h>
 
+#ifndef WORDS_BIGENDIAN
+#define WORDS_BIGENDIAN 0
+#define DEFINED_WORDS_BIGENDIAN
+#endif
+
 #include <goom/goom.h>
+
+#ifdef DEFINED_WORDS_BIGENDIAN
+#undef WORDS_BIGENDIAN
+#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -388,4 +397,3 @@ static void Close( filter_t *p_filter )
     video_format_Clean(&p_thread->fmt);
     free( p_thread );
 }
-
