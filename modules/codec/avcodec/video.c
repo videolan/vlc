@@ -1671,8 +1671,13 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Hack to force display of still pictures */
         p_pic->b_force = p_sys->b_first_frame;
         p_pic->i_nb_fields = 2 + frame->repeat_pict;
+#if LIBAVUTIL_VERSION_CHECK( 58, 7, 100 )
+        p_pic->b_progressive = !(frame->flags & AV_FRAME_FLAG_INTERLACED);
+        p_pic->b_top_field_first = !!(frame->flags & AV_FRAME_FLAG_TOP_FIELD_FIRST);
+#else
         p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
+#endif
         p_pic->b_still = p_frame_info && p_frame_info->b_eos;
 
         if (DecodeSidedata(p_dec, frame, p_pic))
