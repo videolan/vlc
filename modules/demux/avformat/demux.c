@@ -139,7 +139,7 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
     AVDictionaryEntry *rotation = av_dict_get(s->metadata, kRotateKey, NULL, 0);
     long angle = 0;
 
-    int32_t *matrix = (int32_t *)av_stream_get_side_data(s, AV_PKT_DATA_DISPLAYMATRIX, NULL);
+    int32_t *matrix = GetStreamSideData(s, AV_PKT_DATA_DISPLAYMATRIX);
     if( matrix ) {
         int64_t det = (int64_t)matrix[0] * matrix[4] - (int64_t)matrix[1] * matrix[3];
         if (det < 0) {
@@ -193,9 +193,8 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
 static void get_dovi_config(es_format_t *fmt, AVStream *s)
 {
 #if LIBAVUTIL_VERSION_CHECK( 57, 16, 100 )
-    AVDOVIDecoderConfigurationRecord *cfg =
-    (AVDOVIDecoderConfigurationRecord *)
-        av_stream_get_side_data(s, AV_PKT_DATA_DOVI_CONF, NULL);
+    const AVDOVIDecoderConfigurationRecord *cfg =
+        GetStreamSideData(s, AV_PKT_DATA_DOVI_CONF);
     if (!cfg)
         return;
 
