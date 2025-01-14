@@ -135,6 +135,9 @@ TRIPLET=$ARCH-w64-mingw32
 # Check if compiling with clang
 CC=${CC:-$TRIPLET-gcc}
 if ! printf "#ifdef __clang__\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
+    if ! printf "#if __clang_major__ >= 14\n#error CLANG\n#endif" | $CC -E - 1>/dev/null 2>/dev/null; then
+        COMPILING_WITH_CLANG14=1
+    fi
     COMPILING_WITH_CLANG=1
 else
     COMPILING_WITH_CLANG=0
@@ -256,7 +259,7 @@ if [ -n "$BUILD_UCRT" ]; then
             fi
         fi
 
-        if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
+        if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
             VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments"
             VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments"
             VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
@@ -266,7 +269,7 @@ if [ -n "$BUILD_UCRT" ]; then
         VLC_CFLAGS="$VLC_CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
         VLC_CPPFLAGS="$VLC_CPPFLAGS -DWINSTORECOMPAT"
-        if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
+        if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
             VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
             VLC_CFLAGS="$VLC_CFLAGS --end-no-unused-arguments"
             VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
@@ -317,12 +320,22 @@ echo $PATH
 mkdir -p contrib/contrib-$SHORTARCH && cd contrib/contrib-$SHORTARCH
 if [ -n "$WITH_PDB" ]; then
     CONTRIBFLAGS="$CONTRIBFLAGS --enable-pdb"
-    VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments -g -gcodeview --end-no-unused-arguments"
-    VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments -g -gcodeview --end-no-unused-arguments"
-    VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments -Wl,-pdb= --end-no-unused-arguments"
+    if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
+        VLC_CFLAGS="$VLC_CFLAGS --start-no-unused-arguments"
+        VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
+        VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments"
+    fi
+    VLC_CFLAGS="$VLC_CFLAGS -g -gcodeview"
+    VLC_CXXFLAGS="$VLC_CXXFLAGS -g -gcodeview"
+    VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-pdb="
     if [ -n "$PDB_MAP" ]; then
         VLC_CFLAGS="$VLC_CFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
         VLC_CXXFLAGS="$VLC_CXXFLAGS -fdebug-prefix-map='$VLC_ROOT_PATH'='$PDB_MAP'"
+    fi
+    if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
+        VLC_CFLAGS="$VLC_CFLAGS --end-no-unused-arguments"
+        VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
+        VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
     fi
 fi
 if [ -n "$BREAKPAD" ]; then
@@ -341,8 +354,16 @@ if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
     # avoid using gcc-ranlib with the clang toolchain, if both are installed
     VLC_RANLIB="$TRIPLET-ranlib"
     # force linking with the static C++ runtime of LLVM
-    VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a -Wl,-l:libpthread.a -static-libstdc++ --end-no-unused-arguments"
-    VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments -Wl,-l:libunwind.a --end-no-unused-arguments"
+    if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
+        VLC_CXXFLAGS="$VLC_CXXFLAGS --start-no-unused-arguments"
+        VLC_LDFLAGS="$VLC_LDFLAGS --start-no-unused-arguments"
+    fi
+    VLC_LDFLAGS="$VLC_LDFLAGS -Wl,-l:libunwind.a -Wl,-l:libpthread.a -static-libstdc++"
+    VLC_CXXFLAGS="$VLC_CXXFLAGS -Wl,-l:libunwind.a"
+    if [ "${COMPILING_WITH_CLANG14}" = "1" ]; then
+        VLC_CXXFLAGS="$VLC_CXXFLAGS --end-no-unused-arguments"
+        VLC_LDFLAGS="$VLC_LDFLAGS --end-no-unused-arguments"
+    fi
 fi
 
 if [ -z "$PKG_CONFIG" ]; then
