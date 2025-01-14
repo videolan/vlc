@@ -841,14 +841,15 @@ static int Demux( demux_t *p_demux )
 
     // handle extra data change, this can happen for FLV
 #if LIBAVUTIL_VERSION_MAJOR < 57
-    int side_data_size;
+# define EXTRA_SIZE_TYPE int
 #else
-    size_t side_data_size;
+# define EXTRA_SIZE_TYPE size_t
 #endif
+    EXTRA_SIZE_TYPE side_data_size;
     uint8_t *side_data = av_packet_get_side_data( &pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_data_size );
     if( side_data_size > 0 ) {
         // ignore new extradata which is the same as previous version
-        if( side_data_size != p_track->es_format.i_extra ||
+        if( side_data_size != (EXTRA_SIZE_TYPE)p_track->es_format.i_extra ||
             memcmp( side_data, p_track->es_format.p_extra, side_data_size ) != 0 )
         {
             msg_Warn( p_demux, "New extra data found, seek may not work as expected" );
