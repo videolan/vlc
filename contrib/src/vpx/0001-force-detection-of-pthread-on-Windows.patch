@@ -1,0 +1,27 @@
+From 31d0b0f8b637ad92b505ba0b696721afb9a16c1a Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Tue, 14 Jan 2025 15:12:48 +0100
+Subject: [PATCH] force detection of pthread on Windows
+
+---
+ configure | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/configure b/configure
+index 97e78996e..84a6fa093 100755
+--- a/configure
++++ b/configure
+@@ -598,10 +598,6 @@ process_detect() {
+ 
+             # Specialize windows and POSIX environments.
+             case $toolchain in
+-                *-win*-*)
+-                    # Don't check for any headers in Windows builds.
+-                    false
+-                ;;
+                 *)
+                     case $header in
+                         pthread.h) true;;
+-- 
+2.43.0
+

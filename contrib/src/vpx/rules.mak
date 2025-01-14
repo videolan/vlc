@@ -30,6 +30,8 @@ endif
 	# Disable automatic addition of -fembed-bitcode for iOS
 	# as it is enabled through --extra-cflags if necessary.
 	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
+	# make sure we can build when targetting Windows XP
+	$(APPLY) $(SRC)/vpx/0001-force-detection-of-pthread-on-Windows.patch
 	$(MOVE)
 
 DEPS_vpx =
