@@ -1529,9 +1529,9 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
  *****************************************************************************/
 
 /*****************************************************************************
- * UpdateSPU: update subpicture settings
+ * SetHighlights: update subpicture settings
  *****************************************************************************/
-static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
+static void SetHighlights(spu_t *spu, const vlc_spu_highlight_t *hl)
 {
     spu_private_t *sys = spu->p;
 
@@ -1977,7 +1977,7 @@ void spu_Attach(spu_t *spu, input_thread_t *input)
 {
     vlc_mutex_lock(&spu->p->lock);
     if (spu->p->input != input) {
-        UpdateSPU(spu, NULL);
+        SetHighlights(spu, NULL);
 
         spu->p->input = input;
 
@@ -2443,6 +2443,6 @@ void spu_ChangeChannelOrderMargin(spu_t *spu, enum vlc_vout_order order,
 void spu_SetHighlight(spu_t *spu, const vlc_spu_highlight_t *hl)
 {
     vlc_mutex_lock(&spu->p->lock);
-    UpdateSPU(spu, hl);
+    SetHighlights(spu, hl);
     vlc_mutex_unlock(&spu->p->lock);
 }
