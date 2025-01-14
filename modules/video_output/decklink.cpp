@@ -289,6 +289,7 @@ vlc_module_end ()
 
 /* Protects decklink_sys_t creation/deletion */
 static vlc::threads::mutex sys_lock;
+static vlc::threads::condition_variable cond_video;
 
 static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
 {
@@ -306,10 +307,8 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
         {
             while(sys->b_videomodule)
             {
-                sys_lock.unlock();
                 msg_Info(obj, "Waiting for previous vout module to exit");
-                vlc_tick_sleep(VLC_TICK_FROM_MS(100));
-                sys_lock.lock();
+                cond_video.wait(sys_lock);
             }
         }
     }
@@ -365,6 +364,7 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
     {
         sys->b_videomodule = false;
         sys->b_recycling = true;
+        cond_video.signal();
     }
 
     sys_lock.unlock();
