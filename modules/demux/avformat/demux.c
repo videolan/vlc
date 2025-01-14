@@ -208,6 +208,19 @@ static void get_dovi_config(es_format_t *fmt, const AVStream *s)
 #endif
 }
 
+static void get_palette(es_format_t *fmt, const AVStream *s)
+{
+    const uint8_t *pal = GetStreamSideData(s, AV_PKT_DATA_PALETTE);
+    if (pal) {
+        video_palette_t *p_palette = fmt->video.p_palette;
+        for (size_t i=0; i<ARRAY_SIZE(p_palette->palette); i++)
+        {
+            memcpy(p_palette->palette[i], pal, sizeof(p_palette->palette[0]));
+            pal += sizeof(p_palette->palette[0]);
+        }
+    }
+}
+
 static AVDictionary * BuildAVOptions( demux_t *p_demux )
 {
     char *psz_opts = var_InheritString( p_demux, "avformat-options" );
@@ -527,8 +540,8 @@ int avformat_OpenDemux( vlc_object_t *p_this )
 
             get_rotation(&es_fmt, s);
             get_dovi_config(&es_fmt, s);
+            get_palette(&es_fmt, s);
 
-# warning FIXME: implement palette transmission
             psz_type = "video";
 
             AVRational rate;
