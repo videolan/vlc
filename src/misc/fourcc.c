@@ -661,12 +661,6 @@ const vlc_fourcc_t *vlc_fourcc_GetFallback( vlc_fourcc_t i_fourcc )
             : vlc_fourcc_GetRGBFallback( i_fourcc );
 }
 
-bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
-{
-    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(fcc);
-    return desc == NULL ? false : vlc_chroma_description_IsYUV(desc);
-}
-
 #define PLANAR(subtype_, n, w_den, h_den, bits) \
       .subtype = VLC_CHROMA_SUBTYPE_##subtype_, \
       .plane_count = n, \

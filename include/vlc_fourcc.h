@@ -799,11 +799,6 @@ VLC_API const vlc_fourcc_t * vlc_fourcc_GetRGBFallback( vlc_fourcc_t );
 VLC_API const vlc_fourcc_t * vlc_fourcc_GetFallback( vlc_fourcc_t );
 
 /**
- * It returns true if the given fourcc is YUV and false otherwise.
- */
-VLC_API bool vlc_fourcc_IsYUV( vlc_fourcc_t );
-
-/**
  * Chroma subtype
  */
 enum vlc_chroma_subtype
@@ -860,6 +855,15 @@ vlc_chroma_description_IsYUV(const vlc_chroma_description_t *desc)
         default:
             return false;
     }
+}
+
+/**
+ * It returns true if the given fourcc is YUV and false otherwise.
+ */
+static inline bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
+{
+    const vlc_chroma_description_t *desc = vlc_fourcc_GetChromaDescription(fcc);
+    return desc == NULL ? false : vlc_chroma_description_IsYUV(desc);
 }
 
 /**
