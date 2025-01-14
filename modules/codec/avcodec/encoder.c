@@ -1227,8 +1227,19 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         frame->pict_type = 0;
 
         frame->repeat_pict = p_pict->i_nb_fields - 2;
+#if LIBAVUTIL_VERSION_CHECK( 58, 7, 100 )
+        if (p_pict->b_progressive)
+            frame->flags &= ~AV_FRAME_FLAG_INTERLACED;
+        else
+            frame->flags |= AV_FRAME_FLAG_INTERLACED;
+        if (p_pict->b_top_field_first)
+            frame->flags |= AV_FRAME_FLAG_TOP_FIELD_FIRST;
+        else
+            frame->flags &= ~AV_FRAME_FLAG_TOP_FIELD_FIRST;
+#else
         frame->interlaced_frame = !p_pict->b_progressive;
         frame->top_field_first = !!p_pict->b_top_field_first;
+#endif
 
         frame->format = p_sys->p_context->pix_fmt;
         frame->width = p_sys->p_context->width;
