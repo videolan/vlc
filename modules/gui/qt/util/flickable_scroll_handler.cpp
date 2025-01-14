@@ -114,11 +114,6 @@ bool FlickableScrollHandler::eventFilter(QObject *watched, QEvent *event)
     else
         return false;
 
-    if (wheel->inverted())
-    {
-        ev.delta = -ev.delta;
-    }
-
     const auto handler = [this, wheel, ev](Qt::Orientation orientation, bool fallback = false) {
         const auto vertical = (orientation == Qt::Vertical);
 
