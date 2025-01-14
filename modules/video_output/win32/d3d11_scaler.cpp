@@ -405,7 +405,8 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FROM_SRGB, 0);
             res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_SHARPNESS, 0.5);
             res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL, 1);
-            AMFColor black{0,0,0,255};
+            AMFColor black{};
+            black.a = 255;
             res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FILL_COLOR, black);
             // res = scaleProc->amf_scaler->SetProperty(AMF_HQ_SCALER_FRAME_RATE, oFrameRate);
             auto amf_fmt = DXGIToAMF(scaleProc->d3d_fmt->formatTexture);
