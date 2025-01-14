@@ -1159,7 +1159,7 @@ static int NetFillBuffer( stream_t *p_access )
 }
 
 static int  mms_ParseCommand( stream_t *p_access,
-                              uint8_t *p_data,
+                              const char *p_data,
                               size_t i_data,
                               size_t *pi_used )
 {
@@ -1239,7 +1239,7 @@ static int  mms_ParseCommand( stream_t *p_access,
 }
 
 static int  mms_ParsePacket( stream_t *p_access,
-                             const uint8_t *p_data, size_t i_data,
+                             const char *p_data, size_t i_data,
                              size_t *pi_used )
 {
     access_sys_t        *p_sys = p_access->p_sys;

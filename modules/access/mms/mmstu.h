@@ -50,10 +50,10 @@ typedef struct
     unsigned    i_timeout;
 
     /* */
-    uint8_t     buffer_tcp[MMS_BUFFER_SIZE];
+    char        buffer_tcp[MMS_BUFFER_SIZE];
     size_t      i_buffer_tcp;
 
-    uint8_t     buffer_udp[MMS_BUFFER_SIZE];
+    char        buffer_udp[MMS_BUFFER_SIZE];
     size_t      i_buffer_udp;
 
     /* data necessary to send data to server */
