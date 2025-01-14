@@ -95,7 +95,7 @@ struct spu_private_t {
     vlc_mutex_t textlock;
     filter_t *scale_yuvp;                     /**< scaling module for YUVP */
     filter_t *scale;                    /**< scaling module (all but YUVP) */
-    bool force_crop;                     /**< force cropping of subpicture */
+    bool crop_highlight;                     /**< force cropping of subpicture */
     struct {
         int x;
         int y;
@@ -968,12 +968,12 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     picture_t *region_picture;
 
     /* Force palette if requested
-     * FIXME b_force_palette and force_crop are applied to all subpictures using palette
+     * FIXME b_force_palette and crop_highlight are applied to all subpictures using palette
      * instead of only the right one (being the dvd spu).
      */
     const bool using_palette = region->p_picture->format.i_chroma == VLC_CODEC_YUVP;
     const bool force_palette = using_palette && sys->palette.i_entries > 0;
-    const bool crop_requested = (force_palette && sys->force_crop) ||
+    const bool crop_requested = (force_palette && sys->crop_highlight) ||
                                 region->i_max_width || region->i_max_height;
     bool changed_palette     = false;
 
@@ -1210,7 +1210,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     /* Force cropping if requested */
     if (crop_requested) {
         int crop_x, crop_y, crop_width, crop_height;
-        if(sys->force_crop){
+        if(sys->crop_highlight){
             crop_x     = apply_scale ? spu_scale_w(sys->crop.x, scale_size) : sys->crop.x;
             crop_y     = apply_scale ? spu_scale_h(sys->crop.y, scale_size) : sys->crop.y;
             crop_width = apply_scale ? spu_scale_w(sys->crop.width,  scale_size) : sys->crop.width;
@@ -1538,12 +1538,12 @@ static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
     vlc_mutex_assert(&sys->lock);
 
     sys->palette.i_entries = 0;
-    sys->force_crop = false;
+    sys->crop_highlight = false;
 
     if (hl == NULL)
         return;
 
-    sys->force_crop = true;
+    sys->crop_highlight = true;
     sys->crop.x      = hl->x_start;
     sys->crop.y      = hl->y_start;
     sys->crop.width  = hl->x_end - sys->crop.x;
