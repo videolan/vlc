@@ -392,8 +392,8 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
             *intfmt = GL_RG;
             *fmt = GL_RG;
             break;
-        case GL_R16UI:
-        case GL_RG16UI:
+        case GL_R16:
+        case GL_RG16:
             return false;
         default:
             vlc_assert_unreachable();
@@ -408,7 +408,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
         *intfmt = GL_LUMINANCE;
         *fmt = GL_LUMINANCE;
         break;
-    case GL_R16UI:
+    case GL_R16:
         if (interop->gl->api_type == VLC_OPENGL_ES2)
             return false;
 
@@ -419,7 +419,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
         *intfmt = GL_LUMINANCE_ALPHA;
         *fmt = GL_LUMINANCE_ALPHA;
         break;
-    case GL_RG16UI:
+    case GL_RG16:
         if (interop->gl->api_type == VLC_OPENGL_ES2)
             return false;
 
@@ -449,12 +449,12 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
             // 8 bits pixels
             { GL_R8, GL_RED, 0, 0, GL_UNSIGNED_BYTE, 0 },
             // 16 bits pixels
-            { GL_R16UI, GL_RED, 0, 0, GL_UNSIGNED_SHORT, 0 },
+            { GL_R16, GL_RED, 0, 0, GL_UNSIGNED_SHORT, 0 },
         // 2 planes
             // 8 bits pixels
             { GL_R8, GL_RED, GL_RG8, GL_RG, GL_UNSIGNED_BYTE, GL_UNSIGNED_BYTE },
             // 16 bits pixels
-            { GL_R16UI, GL_RED, GL_RG16UI, GL_RG_INTEGER, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
+            { GL_R16, GL_RED, GL_RG16, GL_RG, GL_UNSIGNED_SHORT, GL_UNSIGNED_SHORT },
         // 1 plane is a special case that will be handled explicitly
     };
 
