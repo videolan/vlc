@@ -205,8 +205,7 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
     else if (ctx->time_base.num > 0 && ctx->time_base.den > 0)
     {
         fmt->i_frame_rate = ctx->time_base.den;
-        fmt->i_frame_rate_base = ctx->time_base.num
-                                 * __MAX(ctx->ticks_per_frame, 1);
+        fmt->i_frame_rate_base = ctx->time_base.num;
     }
 
     /* FIXME we should only set the known values and let the core decide
@@ -328,12 +327,10 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
 
     /* always have date in fields/ticks units */
     if(dec->p_sys->pts.i_divider_num)
-        date_Change(&dec->p_sys->pts, fmt_out.i_frame_rate *
-                                      __MAX(ctx->ticks_per_frame, 1),
+        date_Change(&dec->p_sys->pts, fmt_out.i_frame_rate,
                                       fmt_out.i_frame_rate_base);
     else
-        date_Init(&dec->p_sys->pts, fmt_out.i_frame_rate *
-                                    __MAX(ctx->ticks_per_frame, 1),
+        date_Init(&dec->p_sys->pts, fmt_out.i_frame_rate,
                                     fmt_out.i_frame_rate_base);
 
     fmt_out.p_palette = dec->fmt_out.video.p_palette;
@@ -947,8 +944,6 @@ static vlc_tick_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
         return VLC_TICK_INVALID;
 
     int i_tick = p_context->ticks_per_frame;
-    if( i_tick <= 0 )
-        i_tick = 1;
 
     /* interpolate the next PTS */
     return date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
