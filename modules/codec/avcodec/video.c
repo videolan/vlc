@@ -792,7 +792,7 @@ static int ffmpeg_OpenVa(decoder_t *p_dec, AVCodecContext *p_context,
 }
 
 static int ffmpeg_RecreateVa(decoder_t *p_dec, AVCodecContext *p_context,
-                             enum AVPixelFormat hwfmt, enum AVPixelFormat swfmt)
+                             enum AVPixelFormat swfmt)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     assert(p_sys->vctx_out != NULL);
@@ -2092,8 +2092,7 @@ static enum AVPixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
                  * `get_format` callback. Therefore, the va context need to be
                  * closed and opened again. */
                 msg_Dbg(p_dec, "recreating decoder output format %d", pi_fmt[i]);
-                int ret = ffmpeg_RecreateVa(p_dec, p_context, p_sys->pix_fmt,
-                                            swfmt);
+                int ret = ffmpeg_RecreateVa(p_dec, p_context, swfmt);
                 if (ret != VLC_SUCCESS)
                 {
                     msg_Err(p_dec, "error restarting va module");
