@@ -569,7 +569,16 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
         GetFfmpegChroma( &p_context->pix_fmt, &p_enc->fmt_in.video );
 
-        if( p_codec->pix_fmts )
+        const enum AVPixelFormat *pix_fmts;
+#if LIBAVCODEC_VERSION_CHECK( 61, 13, 100 )
+        if (avcodec_get_supported_config(p_context, p_codec, AV_CODEC_CONFIG_PIX_FORMAT, 0,
+                                        (const void **)&pix_fmts, NULL) < 0)
+            pix_fmts = NULL;
+#else
+        pix_fmts = p_codec->pix_fmts;
+#endif
+
+        if( pix_fmts )
         {
             static const enum AVPixelFormat vlc_pix_fmts[] = {
                 AV_PIX_FMT_YUV420P,
@@ -577,8 +586,8 @@ int InitVideoEnc( vlc_object_t *p_this )
                 AV_PIX_FMT_RGB24,
             };
             bool found = false;
-            const enum PixelFormat *p = p_codec->pix_fmts;
-            for( ; !found && *p != -1; p++ )
+            const enum AVPixelFormat *p = pix_fmts;
+            for( ; !found && *p != AV_PIX_FMT_NONE; p++ )
             {
                 for( size_t i = 0; i < ARRAY_SIZE(vlc_pix_fmts); ++i )
                 {
@@ -590,7 +599,7 @@ int InitVideoEnc( vlc_object_t *p_this )
                     }
                 }
             }
-            if (!found) p_context->pix_fmt = p_codec->pix_fmts[0];
+            if (!found) p_context->pix_fmt = pix_fmts[0];
             GetVlcChroma( &p_enc->fmt_in.video, p_context->pix_fmt );
             p_enc->fmt_in.i_codec = p_enc->fmt_in.video.i_chroma;
         }
