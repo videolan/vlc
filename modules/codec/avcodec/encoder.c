@@ -258,19 +258,29 @@ static void probe_video_frame_rate( encoder_t *p_enc, AVCodecContext *p_context,
                                   ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4V ? 25 : CLOCK_FREQ );
 
     msg_Dbg( p_enc, "Time base for probing set to %d/%d", p_context->time_base.num, p_context->time_base.den );
-    if( p_codec->supported_framerates )
+
+    const AVRational *supported_framerates;
+#if LIBAVCODEC_VERSION_CHECK( 61, 13, 100 )
+    if (avcodec_get_supported_config(p_context, p_codec, AV_CODEC_CONFIG_FRAME_RATE, 0,
+                                     (const void **)&supported_framerates, NULL) < 0)
+        supported_framerates = NULL;
+#else
+    supported_framerates = p_codec->supported_framerates;
+#endif
+
+    if( supported_framerates )
     {
         /* We are finding fps values so 1/time_base */
         AVRational target = {
             .num = p_context->time_base.den,
             .den = p_context->time_base.num
         };
-        int idx = av_find_nearest_q_idx(target, p_codec->supported_framerates);
+        int idx = av_find_nearest_q_idx(target, supported_framerates);
 
-        p_context->time_base.num = p_codec->supported_framerates[idx].den ?
-                                    p_codec->supported_framerates[idx].den : 1;
-        p_context->time_base.den = p_codec->supported_framerates[idx].den ?
-                                    p_codec->supported_framerates[idx].num : CLOCK_FREQ;
+        p_context->time_base.num = supported_framerates[idx].den ?
+                                    supported_framerates[idx].den : 1;
+        p_context->time_base.den = supported_framerates[idx].den ?
+                                    supported_framerates[idx].num : CLOCK_FREQ;
 
         /* If we have something reasonable on supported framerates, use that*/
         if( p_context->time_base.den && p_context->time_base.den < CLOCK_FREQ )
