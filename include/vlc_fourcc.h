@@ -842,6 +842,27 @@ typedef struct {
 VLC_API const vlc_chroma_description_t * vlc_fourcc_GetChromaDescription( vlc_fourcc_t fourcc ) VLC_USED;
 
 /**
+ * Returns true if the chroma description is YUV
+ */
+static inline bool
+vlc_chroma_description_IsYUV(const vlc_chroma_description_t *desc)
+{
+    switch (desc->subtype)
+    {
+        case VLC_CHROMA_SUBTYPE_YUV444:
+        case VLC_CHROMA_SUBTYPE_YUV440:
+        case VLC_CHROMA_SUBTYPE_YUV422:
+        case VLC_CHROMA_SUBTYPE_YUV420:
+        case VLC_CHROMA_SUBTYPE_YUV410:
+        case VLC_CHROMA_SUBTYPE_YUV411:
+        case VLC_CHROMA_SUBTYPE_YUV211:
+            return true;
+        default:
+            return false;
+    }
+}
+
+/**
  * Get the average usable bits per pixel for a chroma.
  * \note it may return 0 for opaque or compressed vlc_fourcc_t
  */
