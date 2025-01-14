@@ -739,22 +739,29 @@ int InitVideoEnc( vlc_object_t *p_this )
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
+        const enum AVSampleFormat *sample_fmts;
+#if LIBAVCODEC_VERSION_CHECK( 61, 13, 100 )
+        if (avcodec_get_supported_config(p_context, p_codec, AV_CODEC_CONFIG_SAMPLE_FORMAT, 0,
+                                        (const void **)&sample_fmts, NULL) < 0)
+            sample_fmts = NULL;
+#else
+        sample_fmts = p_codec->sample_fmts;
+#endif
+
         p_context->codec_type  = AVMEDIA_TYPE_AUDIO;
-        p_context->sample_fmt  = p_codec->sample_fmts ?
-                                    p_codec->sample_fmts[0] :
-                                    AV_SAMPLE_FMT_S16;
+        p_context->sample_fmt  = sample_fmts ? sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
         /* Try to match avcodec input format to vlc format so we could avoid one
            format conversion */
         if( GetVlcAudioFormat( p_context->sample_fmt ) != p_enc->fmt_in.i_codec
-            && p_codec->sample_fmts )
+            && sample_fmts )
         {
             msg_Dbg( p_enc, "Trying to find more suitable sample format instead of %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
-            for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
+            for( unsigned int i=0; sample_fmts[i] != AV_SAMPLE_FMT_NONE; i++ )
             {
-                if( GetVlcAudioFormat( p_codec->sample_fmts[i] ) == p_enc->fmt_in.i_codec )
+                if( GetVlcAudioFormat( sample_fmts[i] ) == p_enc->fmt_in.i_codec )
                 {
-                    p_context->sample_fmt = p_codec->sample_fmts[i];
+                    p_context->sample_fmt = sample_fmts[i];
                     msg_Dbg( p_enc, "Using %s as new sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
                     break;
                 }
@@ -763,14 +770,14 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_sys->b_planar = av_sample_fmt_is_planar( p_context->sample_fmt );
         // Try if we can use interleaved format for codec input as VLC doesn't really do planar audio yet
         // FIXME: Remove when planar/interleaved audio in vlc is equally supported
-        if( p_sys->b_planar && p_codec->sample_fmts )
+        if( p_sys->b_planar && sample_fmts )
         {
             msg_Dbg( p_enc, "Trying to find packet sample format instead of planar %s", av_get_sample_fmt_name( p_context->sample_fmt ) );
-            for( unsigned int i=0; p_codec->sample_fmts[i] != -1; i++ )
+            for( unsigned int i=0; sample_fmts[i] != AV_SAMPLE_FMT_NONE; i++ )
             {
-                if( !av_sample_fmt_is_planar( p_codec->sample_fmts[i] ) )
+                if( !av_sample_fmt_is_planar( sample_fmts[i] ) )
                 {
-                    p_context->sample_fmt = p_codec->sample_fmts[i];
+                    p_context->sample_fmt = sample_fmts[i];
                     msg_Dbg( p_enc, "Changing to packet format %s as new sample format", av_get_sample_fmt_name( p_context->sample_fmt ) );
                     break;
                 }
