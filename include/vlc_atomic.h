@@ -51,7 +51,11 @@ typedef struct vlc_atomic_rc_t {
 /** Init the RC to 1 */
 static inline void vlc_atomic_rc_init(vlc_atomic_rc_t *rc)
 {
+#ifndef __cplusplus
     atomic_init(&rc->refs, (uintptr_t)1);
+#else
+    rc->refs = (uintptr_t)1;
+#endif
 }
 
 /** Increment the RC */
