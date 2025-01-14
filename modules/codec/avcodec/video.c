@@ -1049,7 +1049,11 @@ static vlc_tick_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
         date_Get( &p_sys->pts ) == VLC_TICK_INVALID )
         return VLC_TICK_INVALID;
 
+#if LIBAVCODEC_VERSION_CHECK( 60, 12, 100 )
+    int i_tick = p_context->codec_descriptor->props & AV_CODEC_PROP_FIELDS ? 2 : 1;
+#else
     int i_tick = p_context->ticks_per_frame;
+#endif
 
     /* interpolate the next PTS */
     return date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
