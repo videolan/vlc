@@ -151,7 +151,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     const uint8_t *p_peek;
     ssize_t i_peek = 0;
     ssize_t i_offset = 0;
-    uint64_t i_skip = 0;
+    int i_skip = 0;
     unsigned i_max_packets = PS_PACKET_PROBE;
     int format = MPEG_PS;
     int i_mux_rate = 0;
