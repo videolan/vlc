@@ -52,6 +52,7 @@
 #include "sdi.h"
 
 #include <atomic>
+#include <vector>
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
@@ -388,9 +389,9 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                     uint32_t *buf;
                     if (vanc->GetBufferForVerticalBlankingLine(i, (void**)&buf) != S_OK)
                         break;
-                    uint16_t dec[width * 2];
-                    v210_convert(&dec[0], buf, width, 1);
-                    block_t *cc = vanc_to_cc(demux_, dec, width * 2);
+                    std::vector<uint16_t> dec(width);
+                    v210_convert(&dec.front(), buf, width, 1);
+                    block_t *cc = vanc_to_cc(demux_, &dec.front(), width * 2);
                     if (!cc)
                         continue;
                     cc->i_pts = cc->i_dts = VLC_TICK_0 + stream_time;
