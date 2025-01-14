@@ -297,7 +297,7 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         case 0x90:
             fluid_synth_noteon (p_sys->synth, channel, p1, p2);
             break;
-#if (FLUIDSYNTH_VERSION_MAJOR >= 2)
+#if defined(FLUIDSYNTH_VERSION_MAJOR) && (FLUIDSYNTH_VERSION_MAJOR >= 2)
         case 0xA0:
             fluid_synth_key_pressure (p_sys->synth, channel, p1, p2);
             break;
