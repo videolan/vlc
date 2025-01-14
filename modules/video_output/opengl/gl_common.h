@@ -76,6 +76,9 @@
 #ifndef GL_R16UI
 # define GL_R16UI 0x8234
 #endif
+#ifndef GL_R16F
+# define GL_R16F 0x822D
+#endif
 #ifndef GL_BGRA
 # define GL_BGRA 0x80E1
 #endif
@@ -126,6 +129,9 @@
 #endif
 #ifndef GL_DYNAMIC_DRAW
 # define GL_DYNAMIC_DRAW 0x88E8
+#endif
+#ifndef GL_HALF_FLOAT
+# define GL_HALF_FLOAT 0x140B
 #endif
 
 #ifndef GL_READ_FRAMEBUFFER
