@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_chroma_probe.h>
 #include <vlc_cpu.h>
 
 #include <libswscale/swscale.h>
@@ -60,6 +61,57 @@ static const char *const ppsz_mode_descriptions[] =
   N_("Area"), N_("Luma bicubic / chroma bilinear"), N_("Gauss"),
   N_("SincR"), N_("Lanczos"), N_("Bicubic spline") };
 
+static void ProbeChroma(vlc_chroma_conv_vec *vec)
+{
+#define COST_FACTOR 1
+    size_t count;
+    const struct vlc_chroma_ffmpeg *table = GetVlcChromaFfmpegTable(&count);
+    assert(table != NULL && count > 0);
+
+    for (size_t i = 0; i < count; i++)
+    {
+        vlc_fourcc_t cur_chroma = table[i].i_chroma;
+        enum AVPixelFormat cur_avpf = table[i].i_chroma_id;
+        bool cur_supported_input = sws_isSupportedInput(cur_avpf);
+        bool cur_supported_output = sws_isSupportedOutput(cur_avpf);
+
+        if (!cur_supported_input && !cur_supported_output)
+            continue;
+
+        for (size_t j = i + 1; j < count; j++)
+        {
+            vlc_fourcc_t next_chroma = table[j].i_chroma;
+
+            if (next_chroma == cur_chroma)
+                continue;
+
+            enum AVPixelFormat next_avpf = table[j].i_chroma_id;
+            bool next_supported_input = sws_isSupportedInput(next_avpf);
+            bool next_supported_output = sws_isSupportedOutput(next_avpf);
+
+            if (!next_supported_input && !next_supported_output)
+                continue;
+
+            if (cur_supported_input && cur_supported_output
+             && next_supported_input && next_supported_output)
+            {
+                /* Likely case: add in <-> out two way conversion */
+                vlc_chroma_conv_add(vec, COST_FACTOR, cur_chroma, next_chroma,
+                                    true);
+            }
+            else
+            {
+                if (cur_supported_input && next_supported_output)
+                    vlc_chroma_conv_add(vec, COST_FACTOR, cur_chroma, next_chroma,
+                                        false);
+                else if (cur_supported_output && next_supported_input)
+                    vlc_chroma_conv_add(vec, COST_FACTOR, next_chroma, cur_chroma,
+                                        false);
+            }
+        }
+    }
+}
+
 vlc_module_begin ()
     set_description( N_("Video scaling filter") )
     set_shortname( N_("Swscale" ) )
@@ -67,6 +119,8 @@ vlc_module_begin ()
     set_callback_video_converter( OpenScaler, 150 )
     add_integer( "swscale-mode", 2, SCALEMODE_TEXT, SCALEMODE_LONGTEXT )
         change_integer_list( pi_mode_values, ppsz_mode_descriptions )
+    add_submodule()
+        set_callback_chroma_conv_probe(ProbeChroma)
 vlc_module_end ()
 
 /* Version checking */
