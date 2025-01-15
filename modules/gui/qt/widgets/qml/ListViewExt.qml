@@ -338,6 +338,25 @@ ListView {
 
     // Events
 
+    Component.onCompleted: {
+        // Flickable filters child mouse events for flicking (even when
+        // the delegate is grabbed). However, this is not a useful
+        // feature for non-touch cases, so disable it here and enable
+        // it if touch is detected through the hover handler:
+        MainCtx.setFiltersChildMouseEvents(root, false)
+    }
+
+    HoverHandler {
+        acceptedDevices: PointerDevice.TouchScreen
+
+        onHoveredChanged: {
+            if (hovered)
+                MainCtx.setFiltersChildMouseEvents(root, true)
+            else
+                MainCtx.setFiltersChildMouseEvents(root, false)
+        }
+    }
+
     // NOTE: We always want a valid 'currentIndex' by default.
     onCountChanged: if (count && currentIndex === -1) currentIndex = 0
 
