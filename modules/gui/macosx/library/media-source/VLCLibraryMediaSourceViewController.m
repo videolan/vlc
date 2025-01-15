@@ -95,6 +95,7 @@
 
     _navigationStack = [[VLCLibraryNavigationStack alloc] init];
     self.navigationStack.libraryWindow = self.libraryWindow;
+    self.navigationStack.mediaSourceBaseDataSource = self.baseDataSource;
 
     self.baseDataSource.navigationStack = self.navigationStack;
 }

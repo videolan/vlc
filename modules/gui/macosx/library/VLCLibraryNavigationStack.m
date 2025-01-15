@@ -148,10 +148,8 @@
         [_navigationStates removeObjectsInRange:rangeToRemove];
     }
 
-    VLCLibraryMediaSourceViewController * const lvc =
-        (VLCLibraryMediaSourceViewController *)self.libraryWindow.librarySegmentViewController;
     VLCLibraryNavigationState * const navigationState =
-        [[VLCLibraryNavigationState alloc] initFromMediaSourceDataSource:lvc.baseDataSource.childDataSource];
+        [[VLCLibraryNavigationState alloc] initFromMediaSourceDataSource:self.mediaSourceBaseDataSource.childDataSource];
     _currentPosition =
         [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:_navigationStates.count andState:navigationState];
     [_navigationStates addObject:navigationState];
@@ -191,10 +189,8 @@
         return;
     }
 
-    VLCLibraryMediaSourceViewController * const lvc =
-        (VLCLibraryMediaSourceViewController *)self.libraryWindow.librarySegmentViewController;
-    [lvc.baseDataSource setChildDataSource:state.currentMediaSource];
-    [lvc.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
+    [self.mediaSourceBaseDataSource setChildDataSource:state.currentMediaSource];
+    [self.mediaSourceBaseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
     [self updateDelegateNavigationButtons];
 }

@@ -25,10 +25,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
+@class VLCMediaSourceBaseDataSource;
 
 @interface VLCLibraryNavigationStack : NSObject
 
 @property (readwrite, nonatomic, weak) VLCLibraryWindow *libraryWindow;
+@property (readwrite, weak) VLCMediaSourceBaseDataSource *mediaSourceBaseDataSource;
 @property (readonly) BOOL forwardsAvailable;
 @property (readonly) BOOL backwardsAvailable;
 
