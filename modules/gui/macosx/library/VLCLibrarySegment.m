@@ -28,9 +28,21 @@
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
+#import "library/VLCLibraryWindow.h"
 
+#import "library/audio-library/VLCLibraryAudioViewController.h"
+
+#import "library/groups-library/VLCLibraryGroupsViewController.h"
+
+#import "library/home-library/VLCLibraryHomeViewController.h"
+
+#import "library/media-source/VLCLibraryMediaSourceViewController.h"
 #import "library/media-source/VLCMediaSource.h"
 #import "library/media-source/VLCMediaSourceProvider.h"
+
+#import "library/playlist-library/VLCLibraryPlaylistViewController.h"
+
+#import "library/video-library/VLCLibraryVideoViewController.h"
 
 #import "main/VLCMain.h"
 
@@ -358,6 +370,39 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         _displayString = [self displayStringForType:_segmentType];
     }
     _displayImage = [self iconForType:_segmentType];
+}
+
++ (nullable Class)libraryViewControllerClassForSegmentType:(VLCLibrarySegmentType)segmentType
+{
+    switch (segmentType) {
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
+        case VLCLibraryHeaderSegment:
+        case VLCLibraryExploreHeaderSegment:
+            return nil;
+        case VLCLibraryHomeSegment:
+            return VLCLibraryHomeViewController.class;
+        case VLCLibraryVideoSegment:
+        case VLCLibraryShowsVideoSubSegment:
+            return VLCLibraryVideoViewController.class;
+        case VLCLibraryMusicSegment:
+        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryAlbumsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegment:
+            return VLCLibraryAudioViewController.class;
+        case VLCLibraryPlaylistsSegment:
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+            return VLCLibraryPlaylistViewController.class;
+        case VLCLibraryGroupsSegment:
+        case VLCLibraryGroupsGroupSubSegment:
+            return VLCLibraryGroupsViewController.class;
+        case VLCLibraryBrowseSegment:
+        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+        case VLCLibraryStreamsSegment:
+            return VLCLibraryMediaSourceViewController.class;
+    }
 }
 
 @end
