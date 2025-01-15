@@ -115,10 +115,13 @@ ifndef BUILD_ENCODERS
 VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
 endif
 
+ifeq ($(ARCH),i386)
+VPX_CFLAGS += -mstackrealign
+endif
+
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 else
-VPX_CFLAGS += -mstackrealign
 ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for Windows armv7
 VPX_CONF += --disable-runtime-cpu-detect
