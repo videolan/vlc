@@ -38,13 +38,7 @@
 /*****************************************************************************
  * Chroma fourcc -> libavutil pixfmt mapping
  *****************************************************************************/
-static const struct
-{
-    vlc_fourcc_t  i_chroma;
-    enum AVPixelFormat i_chroma_id;
-    video_color_range_t range;
-
-} chroma_table[] =
+static const struct vlc_chroma_ffmpeg chroma_table[] =
 {
     /* Planar YUV formats */
     {VLC_CODEC_I444, AV_PIX_FMT_YUV444P,  COLOR_RANGE_UNDEF },
@@ -207,6 +201,13 @@ static const struct
     {VLC_CODEC_XYZ_12L, AV_PIX_FMT_XYZ12LE,  COLOR_RANGE_UNDEF },
     {VLC_CODEC_XYZ_12B, AV_PIX_FMT_XYZ12BE,  COLOR_RANGE_UNDEF },
 };
+
+
+const struct vlc_chroma_ffmpeg *GetVlcChromaFfmpegTable( size_t *count )
+{
+    *count = ARRAY_SIZE(chroma_table);
+    return chroma_table;
+}
 
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma )
 {

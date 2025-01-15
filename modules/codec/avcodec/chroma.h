@@ -27,6 +27,15 @@
 
 #include <libavutil/pixfmt.h>
 
+struct vlc_chroma_ffmpeg
+{
+    vlc_fourcc_t  i_chroma;
+    enum AVPixelFormat i_chroma_id;
+    video_color_range_t range;
+};
+
+const struct vlc_chroma_ffmpeg *GetVlcChromaFfmpegTable( size_t *count );
+
 enum AVPixelFormat FindFfmpegChroma( vlc_fourcc_t, bool *uv_flipped );
 
 int GetVlcChroma( video_format_t *fmt, enum AVPixelFormat i_ffmpeg_chroma );
