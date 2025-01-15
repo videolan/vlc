@@ -781,6 +781,25 @@ FocusScope {
             id: flickableScrollBar
         }
 
+        Component.onCompleted: {
+            // Flickable filters child mouse events for flicking (even when
+            // the delegate is grabbed). However, this is not a useful
+            // feature for non-touch cases, so disable it here and enable
+            // it if touch is detected through the hover handler:
+            MainCtx.setFiltersChildMouseEvents(this, false)
+        }
+
+        HoverHandler {
+            acceptedDevices: PointerDevice.TouchScreen
+
+            onHoveredChanged: {
+                if (hovered)
+                    MainCtx.setFiltersChildMouseEvents(flickable, true)
+                else
+                    MainCtx.setFiltersChildMouseEvents(flickable, false)
+            }
+        }
+
         TapHandler {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
 
