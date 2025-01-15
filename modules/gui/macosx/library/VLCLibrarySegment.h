@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class VLCLibraryAbstractSegmentViewController;
+
 extern NSString * const VLCLibraryBookmarkedLocationsKey;
 extern NSString * const VLCLibraryBookmarkedLocationsChanged;
 
@@ -59,6 +61,7 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
 @property (readonly) NSInteger childCount;
 
 + (nullable Class)libraryViewControllerClassForSegmentType:(VLCLibrarySegmentType)segmentType;
++ (nullable VLCLibraryAbstractSegmentViewController *)libraryViewControllerForSegmentType:(VLCLibrarySegmentType)segmentType;
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType;
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 

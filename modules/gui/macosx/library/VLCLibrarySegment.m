@@ -405,4 +405,37 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     }
 }
 
++ (VLCLibraryAbstractSegmentViewController *)libraryViewControllerForSegmentType:(VLCLibrarySegmentType)segmentType
+{
+    switch (segmentType) {
+        case VLCLibraryLowSentinelSegment:
+        case VLCLibraryHighSentinelSegment:
+        case VLCLibraryHeaderSegment:
+        case VLCLibraryExploreHeaderSegment:
+            return nil;
+        case VLCLibraryHomeSegment:
+            return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        case VLCLibraryVideoSegment:
+        case VLCLibraryShowsVideoSubSegment:
+            return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        case VLCLibraryMusicSegment:
+        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryAlbumsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegment:
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        case VLCLibraryPlaylistsSegment:
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+            return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        case VLCLibraryGroupsSegment:
+        case VLCLibraryGroupsGroupSubSegment:
+            return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        case VLCLibraryBrowseSegment:
+        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+        case VLCLibraryStreamsSegment:
+            return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+    }
+}
+
 @end
