@@ -4,6 +4,7 @@ members = [
     "src/rust/vlcrs-macros",
     "src/rust/vlcrs-messages",
     "src/rust/vlcrs-utils",
+    "modules/logger/telegraf-rs/"
 ]
 resolver = "2"
 
@@ -12,5 +13,5 @@ version = "4.0.0"
 license = "LGPL-2.1-or-later"
 
 [workspace.dependencies]
-vlcrs-core = { path = "./vlcrs-core" }
-vlcrs-macros = { path = "./vlcrs-macros" }
+vlcrs-core = { path = "src/rust/vlcrs-core" }
+vlcrs-macros = { path = "src/rust/vlcrs-macros" }

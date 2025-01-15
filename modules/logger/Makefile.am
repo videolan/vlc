@@ -30,3 +30,21 @@ libemscripten_logger_plugin_la_SOURCES = logger/emscripten.c
 if HAVE_EMSCRIPTEN
 logger_LTLIBRARIES += libemscripten_logger_plugin.la
 endif
+
+AM_V_LTCARGO = $(AM_V_LTCARGO_$(V))
+AM_V_LTCARGO_ = $(AM_V_LTCARGO_$(AM_DEFAULT_VERBOSITY))
+AM_V_LTCARGO__0 = $(AM_V_LTCARGO_0)
+AM_V_LTCARGO_0 = @echo "  CARGO  $(@)";
+
+libtelegraf_rs.la: $(libtelegraf_rs_plugin_la_SOURCES)
+	$(AM_V_LTCARGO)$(LIBTOOL_CARGO) $(abs_srcdir)/logger/telegraf-rs $@
+CLEANFILES += libtelegraf_rs.la
+
+libtelegraf_rs_plugin_la_SOURCES = \
+	logger/telegraf-rs/Cargo.toml \
+	logger/telegraf-rs/src/lib.rs
+libtelegraf_rs_plugin_la_LIBADD = libtelegraf_rs.la
+
+if HAVE_RUST
+logger_LTLIBRARIES += libtelegraf_rs_plugin.la
+endif

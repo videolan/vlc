@@ -1,0 +1,13 @@
+[package]
+name = "telegraf-rs"
+version.workspace = true
+edition = "2021"
+license = "LGPL-2.1-or-later"
+
+[dependencies]
+vlcrs-core.workspace = true
+vlcrs-macros.workspace = true
+telegraf = "=0.6.0"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(vlc_static_plugins)'] }
