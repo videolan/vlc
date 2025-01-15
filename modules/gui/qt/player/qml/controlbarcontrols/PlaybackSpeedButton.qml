@@ -78,39 +78,51 @@ PopupIconToolButton {
 
         z: -1
 
+        WheelToVLCConverter {
+            id: wheelToVLC
+
+            function handle(steps: int) {
+                let func
+                if (steps > 0)
+                    func = root.popup.contentItem.slider.increase
+                else
+                    func = root.popup.contentItem.slider.decrease
+
+                for (let i = 0; i < Math.abs(steps); ++i)
+                    func()
+            }
+
+            Component.onCompleted: {
+                wheelUpDown.connect(wheelToVLC.handle)
+                wheelLeftRight.connect(wheelToVLC.handle)
+            }
+        }
+
         WheelHandler {
-            onWheel: (event) => {
+            onWheel: (wheel) => {
                 if (!root.popup.contentItem || !root.popup.contentItem.slider) {
                     event.accepted = false
                     return
                 }
 
-                let delta = 0
+                // NOTE: Uncomment below to support (not only handle) high precision adjustment:
+                // if ((Math.abs(wheel.pixelDelta.x) % 120 > 0) || (Math.abs(wheel.pixelDelta.y) % 120 > 0)) {
+                //     let delta = 0
+                //     if (Math.abs(wheel.pixelDelta.x) > Math.abs(wheel.pixelDelta.y))
+                //         delta = wheel.pixelDelta.x
+                //     else
+                //         delta = wheel.pixelDelta.y
 
-                if (event.angleDelta.x)
-                    delta = event.angleDelta.x
-                else if (event.angleDelta.y)
-                    delta = event.angleDelta.y
-                else {
-                    event.accepted = false
-                    return
+                //     if (wheel.inverted)
+                //         delta = -delta
+
+                //     root.popup.contentItem.slider.value += 0.01 * delta
+                // } else
+                {
+                    wheelToVLC.qmlWheelEvent(wheel)
                 }
 
-                if (event.inverted)
-                    delta = -delta
-
-                event.accepted = true
-
-                delta = delta / 8 / 15
-
-                let func
-                if (delta > 0)
-                    func = root.popup.contentItem.slider.increase
-                else
-                    func = root.popup.contentItem.slider.decrease
-
-                for (let i = 0; i < Math.ceil(Math.abs(delta)); ++i)
-                    func()
+                wheel.accepted = true
             }
         }
 
