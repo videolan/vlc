@@ -109,6 +109,8 @@ endif
 endif
 endif
 
+VPX_CFLAGS=$(CFLAGS)
+
 ifndef BUILD_ENCODERS
 VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
 endif
@@ -116,14 +118,11 @@ endif
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 else
-VPX_CONF += --extra-cflags="-mstackrealign"
+VPX_CFLAGS += -mstackrealign
 ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for Windows armv7
 VPX_CONF += --disable-runtime-cpu-detect
 endif
-endif
-ifdef HAVE_MACOSX
-VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 endif
 ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
@@ -131,7 +130,6 @@ ifeq ($(ARCH),arm)
 VPX_CONF += --disable-runtime-cpu-detect
 endif
 VPX_CONF += --enable-vp8-decoder --disable-tools
-VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 ifeq ($(ARCH),aarch64)
 VPX_LDFLAGS += -arch arm64
@@ -147,7 +145,7 @@ VPX_CONF += --disable-optimizations
 endif
 
 ifdef HAVE_EMSCRIPTEN
-VPX_CONF += --extra-cflags="$(CFLAGS) -pthread"
+VPX_CFLAGS += -pthread
 endif
 
 # Always enable debug symbols, we strip in the final executables if needed
@@ -167,6 +165,8 @@ ifeq ($(ARCH),arm)
 VPX_CONF += --disable-neon_asm
 endif
 endif
+
+VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
