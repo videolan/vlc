@@ -47,7 +47,9 @@ struct priv
 {
     bool   has_gl_3;
     bool   has_texture_rg;
+    bool   has_texture_integer;
     bool   has_unpack_subimage;
+    bool   unsigned_sampler;
     void * texture_temp_buf;
     size_t texture_temp_buf_size;
     struct {
@@ -70,7 +72,8 @@ struct priv
         X(PFNGLBUFFERSUBDATAPROC,   BufferSubData) \
         X(PFNGLDELETEBUFFERSPROC,   DeleteBuffers) \
         X(PFNGLGENBUFFERSPROC,      GenBuffers) \
-        X(PFNGLPIXELSTOREIPROC,     PixelStorei)
+        X(PFNGLPIXELSTOREIPROC,     PixelStorei) \
+        X(PFNGLTEXPARAMETERIPROC,   TexParameteri)
     struct {
 #define DECLARE_SYMBOL(type, name) type name;
         OPENGL_VTABLE_F(DECLARE_SYMBOL)
@@ -246,6 +249,14 @@ tc_common_allocate_textures(const struct vlc_gl_interop *interop, uint32_t textu
         priv->gl.TexImage2D(interop->tex_target, 0, interop->texs[i].internal,
                                 tex_width[i], tex_height[i], 0, interop->texs[i].format,
                                 interop->texs[i].type, NULL);
+
+        /* Integer textures cannot be filtered using GL_LINEAR. They must use
+         * GL_NEAREST. */
+        if (priv->unsigned_sampler)
+        {
+            priv->gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            priv->gl.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
         GL_ASSERT_NOERROR(&priv->gl);
     }
     return VLC_SUCCESS;
@@ -393,7 +404,31 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
     }
     assert(gl3 || gl2 || gles3 || gles2);
 
-    if (gles2 && priv->has_texture_rg)
+    if (gles3)
+    {
+        switch (*intfmt) {
+        case GL_R8:
+        case GL_RG8:
+            break;
+        case GL_R16:
+            if (priv->has_texture_integer)
+            {
+                *intfmt = GL_R16UI;
+                *fmt = GL_RED_INTEGER;
+            }
+            break;
+        case GL_RG16:
+            if (priv->has_texture_integer)
+            {
+                *intfmt = GL_RG16UI;
+                *fmt = GL_RED_INTEGER;
+            }
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+    }
+    else if (gles2 && priv->has_texture_rg)
     {
         //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
         switch (*intfmt) {
@@ -444,10 +479,9 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
     }
     else
     {
-        //GLES 3.0, OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
+        //OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
         //don't need transformations
-        assert(gl3 || gles3 || (gl2 && priv->has_texture_rg));
-
+        assert(gl3 || (gl2 && priv->has_texture_rg));
     }
 
     if (pixel_size == 2
@@ -733,6 +767,10 @@ opengl_interop_generic_init(struct vlc_gl_interop *interop, bool allow_dr)
         || (interop->gl->api_type == VLC_OPENGL_ES2
             && vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_rg"));
 
+    priv->has_texture_integer = priv->has_gl_3 &&
+        (interop->gl->api_type == VLC_OPENGL
+        || vlc_gl_HasExtension(&extension_vt, "GL_EXT_texture_integer"));
+
     video_color_space_t space;
     const vlc_fourcc_t *list;
     const bool is_yup = vlc_fourcc_IsYUV(interop->fmt_in.i_chroma);
@@ -808,6 +846,17 @@ interop_init:
         .close = opengl_interop_generic_deinit,
     };
     interop->ops = &ops;
+
+    switch (interop->texs[0].format)
+    {
+        case GL_RED_INTEGER:
+        case GL_RG_INTEGER:
+            priv->unsigned_sampler = true;
+            break;
+        default:
+            priv->unsigned_sampler = false;
+            break;
+    }
 
     if (allow_dr && priv->has_unpack_subimage)
     {

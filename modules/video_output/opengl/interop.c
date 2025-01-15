@@ -123,6 +123,7 @@ static int GetTexFormatSize(struct vlc_gl_interop *interop, GLenum target,
             mul = 4;
             /* fall through */
         case GL_RED:
+        case GL_RED_INTEGER:
         case GL_RG:
             tex_param_size = GL_TEXTURE_RED_SIZE;
             break;

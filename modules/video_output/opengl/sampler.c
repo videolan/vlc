@@ -57,6 +57,7 @@ struct vlc_gl_sampler_priv {
     } uloc;
 
     bool yuv_color;
+    bool unsigned_sampler;
     GLfloat conv_matrix[4*4];
 
 #ifdef HAVE_LIBPLACEBO_GL
@@ -541,7 +542,7 @@ GetNames(struct vlc_gl_sampler *sampler, GLenum tex_target,
             *texture = has_texture_func ? "texture" : "texture2D";
             break;
         case GL_TEXTURE_2D:
-            *glsl_sampler = "sampler2D";
+            *glsl_sampler = priv->unsigned_sampler ? "usampler2D" : "sampler2D";
             *texture = has_texture_func ? "texture" : "texture2D";
             break;
         case GL_TEXTURE_RECTANGLE:
@@ -880,6 +881,21 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
 
     unsigned color_count;
     if (is_yuv) {
+
+        if (priv->unsigned_sampler)
+        {
+            /* One extra integer -> float step will be needed */
+            for (unsigned i = 0; i < tex_count; ++i)
+            {
+                if (tex_target == GL_TEXTURE_RECTANGLE)
+                    ADDF(" uvec4 t%u = %s(Textures[%u], TexSizes[%u] * tex_coords);\n",
+                         i, lookup, i, i);
+                else
+                    ADDF(" uvec4 t%u = %s(Textures[%u], tex_coords);\n",
+                         i, lookup, i);
+            }
+        }
+
         ADD(" vec4 pixel = vec4(\n");
         color_count = 0;
         for (unsigned i = 0; i < tex_count; ++i)
@@ -890,7 +906,13 @@ opengl_fragment_shader_init(struct vlc_gl_sampler *sampler, bool expose_planes)
             assert(color_count < PICTURE_PLANE_MAX);
             if (i > 0)
                 ADD("  ,");
-            if (tex_target == GL_TEXTURE_RECTANGLE)
+
+            if (priv->unsigned_sampler)
+            {
+                /* Integer -> float */
+                ADDF("  float(t%u.%s) / 65535.0\n", i, swizzle);
+            }
+            else if (tex_target == GL_TEXTURE_RECTANGLE)
             {
                 /* The coordinates are in texels values, not normalized */
                 ADDF("  %s(Textures[%u], TexSizes[%u] * tex_coords).%s\n", lookup, i, i, swizzle);
@@ -991,11 +1013,30 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
     sampler->shader.extensions = NULL;
     sampler->shader.body = NULL;
 
+    switch (sampler->glfmt.formats[0])
+    {
+        case GL_RED_INTEGER:
+        case GL_RG_INTEGER:
+            priv->unsigned_sampler = true;
+            break;
+        default:
+            priv->unsigned_sampler = false;
+            break;
+    }
+
     int glsl_version;
     if (api->is_gles) {
-        sampler->shader.precision = "precision highp float;\n"
-            "precision highp sampler2D;\n"
-            "precision highp sampler3D;\n";
+#define GLES_COMMON_PRECISION \
+            "precision highp float;\n" \
+            "precision highp sampler2D;\n" \
+            "precision highp sampler3D;\n"
+
+        if (priv->unsigned_sampler)
+            sampler->shader.precision = GLES_COMMON_PRECISION
+                "precision highp usampler2D;\n";
+        else
+            sampler->shader.precision = GLES_COMMON_PRECISION;
+
         if (api->glsl_version >= 300) {
             sampler->shader.version = strdup("#version 300 es\n");
             glsl_version = 300;
