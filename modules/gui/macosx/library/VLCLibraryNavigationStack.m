@@ -80,9 +80,9 @@
     return self;
 }
 
-- (void)setDelegate:(VLCLibraryWindow *)delegate
+- (void)setLibraryWindow:(VLCLibraryWindow *)delegate
 {
-    _delegate = delegate;
+    _libraryWindow = delegate;
     [self updateDelegateNavigationButtons];
 }
 
@@ -104,7 +104,7 @@
 
 - (void)forwards
 {
-    if (self.delegate == nil || !self.forwardsAvailable) {
+    if (self.libraryWindow == nil || !self.forwardsAvailable) {
         return;
     }
 
@@ -114,14 +114,14 @@
 
     VLCInputNode *node = _currentPosition.navigationState.currentNodeDisplayed;
     VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
-    [self.delegate.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
+    [self.libraryWindow.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
 
-    [self setDelegateToState:_currentPosition.navigationState];
+    [self setLibraryWindowToState:_currentPosition.navigationState];
 }
 
 - (void)backwards
 {
-    if (self.delegate == nil || !self.backwardsAvailable) {
+    if (self.libraryWindow == nil || !self.backwardsAvailable) {
         return;
     }
 
@@ -129,14 +129,14 @@
     _currentPosition =
         [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
-    [self.delegate.mediaSourcePathControl removeLastInputNodePathControlItem];
+    [self.libraryWindow.mediaSourcePathControl removeLastInputNodePathControlItem];
 
-    [self setDelegateToState:_currentPosition.navigationState];
+    [self setLibraryWindowToState:_currentPosition.navigationState];
 }
 
 - (void)appendCurrentLibraryState
 {
-    if (self.delegate == nil) {
+    if (self.libraryWindow == nil) {
         return;
     }
 
@@ -149,7 +149,7 @@
     }
 
     VLCLibraryMediaSourceViewController * const lvc =
-        (VLCLibraryMediaSourceViewController *)self.delegate.librarySegmentViewController;
+        (VLCLibraryMediaSourceViewController *)self.libraryWindow.librarySegmentViewController;
     VLCLibraryNavigationState * const navigationState =
         [[VLCLibraryNavigationState alloc] initFromMediaSourceDataSource:lvc.baseDataSource.childDataSource];
     _currentPosition =
@@ -177,22 +177,22 @@
 
 - (void)updateDelegateNavigationButtons
 {
-    if (self.delegate == nil) {
+    if (self.libraryWindow == nil) {
         return;
     }
 
-    self.delegate.forwardsNavigationButton.enabled = self.forwardsAvailable;
-    self.delegate.backwardsNavigationButton.enabled = self.backwardsAvailable;
+    self.libraryWindow.forwardsNavigationButton.enabled = self.forwardsAvailable;
+    self.libraryWindow.backwardsNavigationButton.enabled = self.backwardsAvailable;
 }
 
-- (void)setDelegateToState:(VLCLibraryNavigationState *)state
+- (void)setLibraryWindowToState:(VLCLibraryNavigationState *)state
 {
-    if (self.delegate == nil) {
+    if (self.libraryWindow == nil) {
         return;
     }
 
     VLCLibraryMediaSourceViewController * const lvc =
-        (VLCLibraryMediaSourceViewController *)self.delegate.librarySegmentViewController;
+        (VLCLibraryMediaSourceViewController *)self.libraryWindow.librarySegmentViewController;
     [lvc.baseDataSource setChildDataSource:state.currentMediaSource];
     [lvc.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 

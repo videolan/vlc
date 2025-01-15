@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryNavigationStack : NSObject
 
-@property (readwrite, nonatomic, weak) VLCLibraryWindow *delegate;
+@property (readwrite, nonatomic, weak) VLCLibraryWindow *libraryWindow;
 @property (readonly) BOOL forwardsAvailable;
 @property (readonly) BOOL backwardsAvailable;
 

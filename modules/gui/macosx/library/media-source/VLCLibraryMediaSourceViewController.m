@@ -94,7 +94,7 @@
     [_baseDataSource setupViews];
 
     _navigationStack = [[VLCLibraryNavigationStack alloc] init];
-    self.navigationStack.delegate = self.libraryWindow;
+    self.navigationStack.libraryWindow = self.libraryWindow;
 
     self.baseDataSource.navigationStack = self.navigationStack;
 }
