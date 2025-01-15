@@ -409,8 +409,8 @@ MainViewLoader {
             }
 
             listView.acceptDropFunc: function(index, drop) {
-                return new Promise(() => { root._dropAction(drop,
-                                                            listView.itemContainsDrag.index) } )
+                root._dropAction(drop, listView.itemContainsDrag.index)
+                return Promise.resolve()
             }
 
             listView.dropIndicator: null
