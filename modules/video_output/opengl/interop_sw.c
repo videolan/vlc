@@ -548,8 +548,8 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
 
     if (desc->pixel_size == 2)
     {
-        if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, format->fmt,
-                                            format->intfmt, format->type) != 16)
+        if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, plane1_fmt,
+                                            plane1_intfmt, plane1_type) != 16)
             return VLC_EGENERIC;
     }
 
@@ -570,8 +570,8 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
         interop->tex_count = 2;
 
         if (desc->pixel_size == 2 &&
-            vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, format->plane2_fmt,
-                format->plane2_intfmt, format->plane2_type) != 16)
+            vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, plane2_fmt,
+                plane2_intfmt, plane2_type) != 16)
         {
             return VLC_EGENERIC;
         }
