@@ -368,8 +368,10 @@ DivideRationalByTwo(vlc_rational_t *r) {
         r->den *= 2;
 }
 
-static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fmt)
+static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fmt,
+                        GLint *type)
 {
+    (void) type;
     struct priv *priv = interop->priv;
     if (*intfmt == 0)
         return true;
@@ -481,17 +483,18 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
          * #26712. */
         GLint intfmt = GL_RG8;
         GLint fmt = GL_RG;
-        if (!fixGLFormat(interop, &intfmt, &fmt))
+        GLint type = GL_UNSIGNED_BYTE;
+        if (!fixGLFormat(interop, &intfmt, &fmt, &type))
             return VLC_EGENERIC;
 
         interop->tex_count = 2;
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { 1, 1 }, { 1, 1 },
-            intfmt, fmt, GL_UNSIGNED_BYTE
+            intfmt, fmt, type
         };
         interop->texs[1] = (struct vlc_gl_tex_cfg) {
             { 1, 2 }, { 1, 1 },
-            GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE
+            GL_RGBA, GL_RGBA, type
         };
         return VLC_SUCCESS;
     }
@@ -527,20 +530,21 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
 
     GLint plane1_intfmt = format->intfmt;
     GLint plane1_fmt = format->fmt;
-    if (!fixGLFormat(interop, &plane1_intfmt, &plane1_fmt))
+    GLint plane1_type = format->type;
+    if (!fixGLFormat(interop, &plane1_intfmt, &plane1_fmt, &plane1_type))
         return VLC_EGENERIC;
 
     GLint plane2_intfmt = format->plane2_intfmt;
     GLint plane2_fmt = format->plane2_fmt;
-    if (!fixGLFormat(interop, &plane2_intfmt, &plane2_fmt))
+    GLint plane2_type = format->plane2_type;
+    if (!fixGLFormat(interop, &plane2_intfmt, &plane2_fmt, &plane2_type))
         return VLC_EGENERIC;
 
     msg_Dbg(interop, "Using format at index %u", format_index);
     msg_Dbg(interop, "Plane1: fmt=%#x intfmt=%#x type=%#x", plane1_fmt,
-            plane1_intfmt, format->type);
+            plane1_intfmt, plane1_type);
     msg_Dbg(interop, "Plane2: fmt=%#x intfmt=%#x type=%#x", plane2_fmt,
-            plane2_intfmt, format->plane2_type);
-
+            plane2_intfmt, plane2_type);
 
     if (desc->pixel_size == 2)
     {
@@ -557,7 +561,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
             interop->texs[i] = (struct vlc_gl_tex_cfg) {
                 { desc->p[i].w.num, desc->p[i].w.den },
                 { desc->p[i].h.num, desc->p[i].h.den },
-                plane1_intfmt, plane1_fmt, format->type
+                plane1_intfmt, plane1_fmt, plane1_type
             };
         }
     }
@@ -575,12 +579,12 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { desc->p[0].w.num, desc->p[0].w.den },
             { desc->p[0].h.num, desc->p[0].h.den },
-            plane1_intfmt, plane1_fmt, format->type
+            plane1_intfmt, plane1_fmt, plane1_type
         };
         interop->texs[1] = (struct vlc_gl_tex_cfg) {
             { desc->p[1].w.num, desc->p[1].w.den },
             { desc->p[1].h.num, desc->p[1].h.den },
-            plane2_intfmt, plane2_fmt, format->plane2_type
+            plane2_intfmt, plane2_fmt, plane2_type
         };
 
         /*
