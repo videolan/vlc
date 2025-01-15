@@ -132,7 +132,7 @@ ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for iOS arm7
 VPX_CONF += --disable-runtime-cpu-detect
 endif
-VPX_CONF += --enable-vp8-decoder --disable-tools
+VPX_CONF += --enable-vp8-decoder
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 ifeq ($(ARCH),aarch64)
 VPX_LDFLAGS += -arch arm64
