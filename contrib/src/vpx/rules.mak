@@ -139,7 +139,7 @@ VPX_CONF += --disable-runtime-cpu-detect
 endif
 endif
 ifdef HAVE_DARWIN_OS
-VPX_CONF += --enable-vp8-decoder --disable-tools
+VPX_CONF += --enable-vp8-decoder
 ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for iOS arm7
