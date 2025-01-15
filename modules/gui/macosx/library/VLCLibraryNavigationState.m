@@ -24,22 +24,18 @@
 
 #import "VLCLibraryWindow.h"
 
-#import "media-source/VLCLibraryMediaSourceViewController.h"
-#import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCMediaSourceDataSource.h"
 
 @implementation VLCLibraryNavigationState
 
-- (instancetype)initFromLibraryWindow:(VLCLibraryWindow *)libraryWindow
+- (instancetype)initFromMediaSourceDataSource:(VLCMediaSourceDataSource *)mediaSourceDataSource
 {
-    VLCLibraryNavigationState* navState = [super init];
-
-    if(navState) {
-        _currentMediaSource = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource;
-        _currentNodeDisplayed = libraryWindow.libraryMediaSourceViewController.baseDataSource.childDataSource.nodeToDisplay;
+    self = [super init];
+    if (self) {
+        _currentMediaSource = mediaSourceDataSource;
+        _currentNodeDisplayed = mediaSourceDataSource.nodeToDisplay;
     }
-
-    return navState;
+    return self;
 }
 
 @end

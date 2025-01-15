@@ -146,7 +146,7 @@
         [_navigationStates removeObjectsInRange:rangeToRemove];
     }
 
-    VLCLibraryNavigationState *navigationState = [[VLCLibraryNavigationState alloc] initFromLibraryWindow:_delegate];
+    VLCLibraryNavigationState * const navigationState = [[VLCLibraryNavigationState alloc] initFromMediaSourceDataSource:_delegate.libraryMediaSourceViewController.baseDataSource.childDataSource];
     _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:_navigationStates.count andState:navigationState];
     [_navigationStates addObject:navigationState];
 
