@@ -133,7 +133,7 @@ static inline void* GetStreamSideData(const AVStream *s, enum AVPacketSideDataTy
  * Open
  *****************************************************************************/
 
-static void get_rotation(es_format_t *fmt, AVStream *s)
+static void get_rotation(es_format_t *fmt, const AVStream *s)
 {
     char const *kRotateKey = "rotate";
     AVDictionaryEntry *rotation = av_dict_get(s->metadata, kRotateKey, NULL, 0);
@@ -190,7 +190,7 @@ static void get_rotation(es_format_t *fmt, AVStream *s)
     }
 }
 
-static void get_dovi_config(es_format_t *fmt, AVStream *s)
+static void get_dovi_config(es_format_t *fmt, const AVStream *s)
 {
 #if LIBAVUTIL_VERSION_CHECK( 57, 16, 100 )
     const AVDOVIDecoderConfigurationRecord *cfg =
