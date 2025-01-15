@@ -120,6 +120,8 @@ endif
 endif
 endif
 
+VPX_CFLAGS=$(CFLAGS)
+
 ifndef BUILD_ENCODERS
 VPX_CONF += --disable-vp8-encoder --disable-vp9-encoder
 endif
@@ -127,7 +129,7 @@ endif
 ifndef HAVE_WIN32
 VPX_CONF += --enable-pic
 else
-VPX_CONF += --extra-cflags="-mstackrealign"
+VPX_CFLAGS += -mstackrealign
 ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for Windows armv7
 VPX_CONF += --disable-runtime-cpu-detect
@@ -135,7 +137,6 @@ endif
 endif
 ifdef HAVE_DARWIN_OS
 VPX_CONF += --enable-vp8-decoder --disable-tools
-VPX_CONF += --extra-cflags="$(CFLAGS) $(EXTRA_CFLAGS)"
 ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
 # As of libvpx 1.14.0 we have to explicitly disable runtime CPU detection for iOS arm7
@@ -165,6 +166,8 @@ ifneq ($(shell $(VPX_CROSS)gcc -v >/dev/null 2>&1 || echo FAIL),)
 VPX_HOSTVARS = $(HOSTVARS)
 endif
 endif
+
+VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
