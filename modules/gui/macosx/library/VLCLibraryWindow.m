@@ -67,7 +67,7 @@
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
-#import "media-source/VLCLibraryNavigationStack.h"
+#import "media-source/VLCLibraryMediaSourceViewNavigationStack.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"

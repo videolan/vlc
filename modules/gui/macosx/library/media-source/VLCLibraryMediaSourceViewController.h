@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCInputNodePathControl;
 @class VLCLibraryCollectionView;
-@class VLCLibraryNavigationStack;
+@class VLCLibraryMediaSourceViewNavigationStack;
 @class VLCLibraryWindow;
 @class VLCMediaSourceBaseDataSource;
 
@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSLayoutConstraint *pathControlViewTopConstraintToSuperview;
 
 @property (readonly) VLCMediaSourceBaseDataSource *baseDataSource;
-@property (readonly) VLCLibraryNavigationStack *navigationStack;
+@property (readonly) VLCLibraryMediaSourceViewNavigationStack *navigationStack;
 
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 

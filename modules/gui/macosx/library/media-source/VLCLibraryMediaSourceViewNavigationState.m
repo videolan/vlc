@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryNavigationStack.m: MacOS X interface module
+ * VLCLibraryMediaSourceViewNavigationState.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,12 +20,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryNavigationState.h"
+#import "VLCLibraryMediaSourceViewNavigationState.h"
 
 #import "VLCMediaSourceDataSource.h"
 #import "library/VLCLibraryWindow.h"
 
-@implementation VLCLibraryNavigationState
+@implementation VLCLibraryMediaSourceViewNavigationState
 
 - (instancetype)initFromMediaSourceDataSource:(VLCMediaSourceDataSource *)mediaSourceDataSource
 {

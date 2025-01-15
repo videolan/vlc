@@ -1,9 +1,9 @@
 /*****************************************************************************
- * VLCLibraryNavigationStack.h: MacOS X interface module
+ * VLCLibraryMediaSourceViewNavigationStack.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
- * Authors: Claudio Cambra <developer@claudiocambra.com>
+ * Authors: Claudio Cambra <claudio.cambra@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,15 +24,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCMediaSourceDataSource;
-@class VLCInputNode;
+@class VLCLibraryWindow;
+@class VLCMediaSourceBaseDataSource;
 
-@interface VLCLibraryNavigationState : NSObject
+@interface VLCLibraryMediaSourceViewNavigationStack : NSObject
 
-@property (readonly) VLCMediaSourceDataSource *currentMediaSource;
-@property (readonly) VLCInputNode *currentNodeDisplayed;
+@property (readwrite, nonatomic, weak) VLCLibraryWindow *libraryWindow;
+@property (readwrite, weak) VLCMediaSourceBaseDataSource *baseDataSource;
+@property (readonly) BOOL forwardsAvailable;
+@property (readonly) BOOL backwardsAvailable;
 
-- (instancetype)initFromMediaSourceDataSource:(VLCMediaSourceDataSource *)mediaSourceDataSource;
+- (void)backwards;
+- (void)forwards;
+
+- (void)appendCurrentLibraryState;
+- (void)clear;
 
 @end
 

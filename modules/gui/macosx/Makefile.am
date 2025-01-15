@@ -255,10 +255,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCMediaSourceDataSource.m \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.h \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.m \
-	gui/macosx/library/media-source/VLCLibraryNavigationStack.h \
-	gui/macosx/library/media-source/VLCLibraryNavigationStack.m \
-	gui/macosx/library/media-source/VLCLibraryNavigationState.h \
-	gui/macosx/library/media-source/VLCLibraryNavigationState.m \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewNavigationStack.h \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewNavigationStack.m \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewNavigationState.h \
+	gui/macosx/library/media-source/VLCLibraryMediaSourceViewNavigationState.m \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.h \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistDataSource.h \

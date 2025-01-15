@@ -22,7 +22,7 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
-#import "VLCLibraryNavigationStack.h"
+#import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceProvider.h"
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceDeviceCollectionViewItem.h"

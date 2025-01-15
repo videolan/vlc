@@ -22,7 +22,7 @@
 
 #import "VLCLibraryMediaSourceViewController.h"
 
-#import "VLCLibraryNavigationStack.h"
+#import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceBaseDataSource.h"
 #import "VLCMediaSourceDataSource.h"
 
@@ -93,9 +93,9 @@
     _baseDataSource.tableViewScrollView = _tableViewScrollView;
     [_baseDataSource setupViews];
 
-    _navigationStack = [[VLCLibraryNavigationStack alloc] init];
+    _navigationStack = [[VLCLibraryMediaSourceViewNavigationStack alloc] init];
     self.navigationStack.libraryWindow = self.libraryWindow;
-    self.navigationStack.mediaSourceBaseDataSource = self.baseDataSource;
+    self.navigationStack.baseDataSource = self.baseDataSource;
 
     self.baseDataSource.navigationStack = self.navigationStack;
 }

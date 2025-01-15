@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryNavigationStack.m: MacOS X interface module
+ * VLCLibraryMediaSourceViewNavigationStack.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2022 VLC authors and VideoLAN
  *
@@ -20,7 +20,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCLibraryNavigationStack.h"
+#import "VLCLibraryMediaSourceViewNavigationStack.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
@@ -30,23 +30,23 @@
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
 #import "VLCLibraryMediaSourceViewController.h"
-#import "VLCLibraryNavigationState.h"
+#import "VLCLibraryMediaSourceViewNavigationState.h"
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceBaseDataSource.h"
 #import "VLCMediaSourceDataSource.h"
 
-@interface VLCLibraryNavigationCurrentStackPosition : NSObject
+@interface VLCLibraryMediaSourceViewNavigationCurrentStackPosition : NSObject
 
 @property (readonly) NSUInteger navigationStackIndex;
-@property (readonly) VLCLibraryNavigationState *navigationState;
+@property (readonly) VLCLibraryMediaSourceViewNavigationState *navigationState;
 
-- (instancetype)initWithStackIndex:(NSUInteger)index andState:(VLCLibraryNavigationState *)state;
+- (instancetype)initWithStackIndex:(NSUInteger)index andState:(VLCLibraryMediaSourceViewNavigationState *)state;
 
 @end
 
-@implementation VLCLibraryNavigationCurrentStackPosition
+@implementation VLCLibraryMediaSourceViewNavigationCurrentStackPosition
 
-- (instancetype)initWithStackIndex:(NSUInteger)index andState:(VLCLibraryNavigationState *)state
+- (instancetype)initWithStackIndex:(NSUInteger)index andState:(VLCLibraryMediaSourceViewNavigationState *)state
 {
     self = [super init];
 
@@ -61,15 +61,15 @@
 @end
 
 
-@interface VLCLibraryNavigationStack ()
+@interface VLCLibraryMediaSourceViewNavigationStack ()
 {
-    NSMutableArray<VLCLibraryNavigationState *> *_navigationStates;
-    VLCLibraryNavigationCurrentStackPosition *_currentPosition;
+    NSMutableArray<VLCLibraryMediaSourceViewNavigationState *> *_navigationStates;
+    VLCLibraryMediaSourceViewNavigationCurrentStackPosition *_currentPosition;
 }
 
 @end
 
-@implementation VLCLibraryNavigationStack
+@implementation VLCLibraryMediaSourceViewNavigationStack
 
 - (instancetype)init
 {
@@ -110,7 +110,7 @@
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex + 1;
     _currentPosition =
-        [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+        [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
     VLCInputNode *node = _currentPosition.navigationState.currentNodeDisplayed;
     VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
@@ -127,7 +127,7 @@
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex - 1;
     _currentPosition =
-        [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+        [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
     [self.libraryWindow.mediaSourcePathControl removeLastInputNodePathControlItem];
 
@@ -148,10 +148,10 @@
         [_navigationStates removeObjectsInRange:rangeToRemove];
     }
 
-    VLCLibraryNavigationState * const navigationState =
-        [[VLCLibraryNavigationState alloc] initFromMediaSourceDataSource:self.mediaSourceBaseDataSource.childDataSource];
+    VLCLibraryMediaSourceViewNavigationState * const navigationState =
+        [[VLCLibraryMediaSourceViewNavigationState alloc] initFromMediaSourceDataSource:self.baseDataSource.childDataSource];
     _currentPosition =
-        [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:_navigationStates.count andState:navigationState];
+        [[VLCLibraryMediaSourceViewNavigationCurrentStackPosition alloc] initWithStackIndex:_navigationStates.count andState:navigationState];
     [_navigationStates addObject:navigationState];
 
     [self updateDelegateNavigationButtons];
@@ -162,7 +162,7 @@
     NSAssert(range.location + range.length - 1 < _navigationStates.count, @"Invalid range for state removal and cleanup, out of bounds.");
     
     for (NSUInteger i = range.location; i < range.length; ++i) {
-        VLCLibraryNavigationState *state = [_navigationStates objectAtIndex:i];
+        VLCLibraryMediaSourceViewNavigationState *state = [_navigationStates objectAtIndex:i];
         VLCInputNode *stateNode = state.currentNodeDisplayed;
         
         if (stateNode) {
@@ -183,14 +183,14 @@
     self.libraryWindow.backwardsNavigationButton.enabled = self.backwardsAvailable;
 }
 
-- (void)setLibraryWindowToState:(VLCLibraryNavigationState *)state
+- (void)setLibraryWindowToState:(VLCLibraryMediaSourceViewNavigationState *)state
 {
     if (self.libraryWindow == nil) {
         return;
     }
 
-    [self.mediaSourceBaseDataSource setChildDataSource:state.currentMediaSource];
-    [self.mediaSourceBaseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
+    [self.baseDataSource setChildDataSource:state.currentMediaSource];
+    [self.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
     [self updateDelegateNavigationButtons];
 }
