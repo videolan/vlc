@@ -44,16 +44,32 @@ PopupIconToolButton {
         Navigation.rightItem: root
     }
 
-    contentItem: T.Label {
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
+    contentItem: Item {
+        implicitHeight: label.implicitHeight
+        implicitWidth: textMetrics.width
 
-        font.pixelSize: VLCStyle.fontSize_normal
+        TextMetrics {
+            id: textMetrics
+            font: label.font
+            // '-' is for additional space if certain digits have more width with certain fonts
+            text: "0.00x-"
+        }
 
-        text: !root.paintOnly ? qsTr("%1x").arg(+Player.rate.toFixed(2))
-                              : qsTr("1x")
+        Text {
+            id: label
 
-        color: root.color
+            anchors.fill: parent
+
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+
+            font.pixelSize: VLCStyle.fontSize_normal
+
+            text: !root.paintOnly ? qsTr("%1x").arg(+Player.rate.toFixed(2))
+                                  : qsTr("1x")
+
+            color: root.color
+        }
     }
 
     // TODO: Qt bug 6.2: QTBUG-103604
