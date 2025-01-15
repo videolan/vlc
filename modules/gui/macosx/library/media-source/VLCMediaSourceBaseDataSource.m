@@ -22,6 +22,7 @@
 
 #import "VLCMediaSourceBaseDataSource.h"
 
+#import "VLCLibraryNavigationStack.h"
 #import "VLCMediaSourceProvider.h"
 #import "VLCMediaSource.h"
 #import "VLCMediaSourceDeviceCollectionViewItem.h"
@@ -33,7 +34,6 @@
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
-#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryTableCellView.h"

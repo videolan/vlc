@@ -42,7 +42,6 @@
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
 #import "library/VLCLibraryModel.h"
-#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibrarySortingMenuController.h"
 #import "library/VLCLibraryUIUnits.h"
@@ -68,6 +67,7 @@
 
 #import "media-source/VLCMediaSourceBaseDataSource.h"
 #import "media-source/VLCLibraryMediaSourceViewController.h"
+#import "media-source/VLCLibraryNavigationStack.h"
 
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"

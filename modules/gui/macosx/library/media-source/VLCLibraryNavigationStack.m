@@ -22,18 +22,18 @@
 
 #import "VLCLibraryNavigationStack.h"
 
-#import "VLCInputItem.h"
-#import "VLCInputNodePathControl.h"
-#import "VLCInputNodePathControlItem.h"
-#import "VLCLibraryNavigationState.h"
-#import "VLCLibraryWindow.h"
+#import "library/VLCInputItem.h"
+#import "library/VLCInputNodePathControl.h"
+#import "library/VLCInputNodePathControlItem.h"
+#import "library/VLCLibraryWindow.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
-#import "media-source/VLCLibraryMediaSourceViewController.h"
-#import "media-source/VLCMediaSourceBaseDataSource.h"
-#import "media-source/VLCMediaSourceDataSource.h"
-#import "media-source/VLCMediaSource.h"
+#import "VLCLibraryMediaSourceViewController.h"
+#import "VLCLibraryNavigationState.h"
+#import "VLCMediaSource.h"
+#import "VLCMediaSourceBaseDataSource.h"
+#import "VLCMediaSourceDataSource.h"
 
 @interface VLCLibraryNavigationCurrentStackPosition : NSObject
 

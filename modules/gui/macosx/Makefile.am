@@ -142,10 +142,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryModel.m \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.h \
 	gui/macosx/library/VLCLibraryModelChangeDelegate.m \
-	gui/macosx/library/VLCLibraryNavigationStack.h \
-	gui/macosx/library/VLCLibraryNavigationStack.m \
-	gui/macosx/library/VLCLibraryNavigationState.h \
-	gui/macosx/library/VLCLibraryNavigationState.m \
 	gui/macosx/library/VLCLibraryRepresentedItem.h \
 	gui/macosx/library/VLCLibraryRepresentedItem.m \
 	gui/macosx/library/VLCLibrarySegment.h \
@@ -259,6 +255,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/media-source/VLCMediaSourceDataSource.m \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.h \
 	gui/macosx/library/media-source/VLCMediaSourceDeviceCollectionViewItem.m \
+	gui/macosx/library/media-source/VLCLibraryNavigationStack.h \
+	gui/macosx/library/media-source/VLCLibraryNavigationStack.m \
+	gui/macosx/library/media-source/VLCLibraryNavigationState.h \
+	gui/macosx/library/media-source/VLCLibraryNavigationState.m \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.h \
 	gui/macosx/library/media-source/VLCMediaSourceProvider.m \
 	gui/macosx/library/playlist-library/VLCLibraryPlaylistDataSource.h \

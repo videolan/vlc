@@ -22,9 +22,8 @@
 
 #import "VLCLibraryNavigationState.h"
 
-#import "VLCLibraryWindow.h"
-
-#import "media-source/VLCMediaSourceDataSource.h"
+#import "VLCMediaSourceDataSource.h"
+#import "library/VLCLibraryWindow.h"
 
 @implementation VLCLibraryNavigationState
 
