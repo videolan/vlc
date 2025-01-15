@@ -88,6 +88,11 @@ T.Control {
 
             grabPermissions: PointerHandler.CanTakeOverFromAnything
             cursorShape: Qt.ArrowCursor
+
+            Component.onCompleted: {
+                if (typeof blocking === 'boolean')
+                    blocking = true // Qt 6.3 feature
+            }
         }
     }
 
