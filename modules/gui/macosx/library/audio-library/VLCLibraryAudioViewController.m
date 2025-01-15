@@ -364,7 +364,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (VLCAudioLibrarySegment)currentLibrarySegmentToAudioLibrarySegment
 {
     switch (self.libraryWindow.librarySegmentType) {
-        case VLCLibraryMusicSegment:
+        case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegment:
             return VLCAudioLibraryArtistsSegment;
         case VLCLibraryAlbumsMusicSubSegment:
@@ -518,7 +518,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryModel * const model = VLCMain.sharedInstance.libraryController.libraryModel;
     const NSUInteger audioCount = model.numberOfAudioMedia;
 
-    if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegment ||
+    if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegmentType ||
          self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegment ||

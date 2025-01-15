@@ -62,6 +62,37 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 @end
 
 
+@interface VLCLibraryMusicSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryMusicSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryMusicSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Music");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"music.note"
+                                                  accessibilityDescription:@"Music icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalChildNodes = @[
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
+        ];
+    }
+    return self;
+}
+
+@end
+
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
@@ -70,7 +101,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryExploreHeaderSegment],
@@ -81,6 +112,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType
 {
+    if (segmentType == VLCLibraryMusicSegmentType) {
+        return [[VLCLibraryMusicSegment alloc] init];
+    }
     return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
 }
 
@@ -120,13 +154,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 {
     if (self.segmentType == VLCLibraryVideoSegment) {
         return @[[VLCLibrarySegment segmentWithSegmentType:VLCLibraryShowsVideoSubSegment]];
-    } else if (self.segmentType == VLCLibraryMusicSegment) {
-        return @[
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
-        ];
     } else if (self.segmentType == VLCLibraryPlaylistsSegment) {
         return @[
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment],
@@ -210,8 +237,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Library");
         case VLCLibraryHomeSegment:
             return _NS("Home");
-        case VLCLibraryMusicSegment:
-            return _NS("Music");
         case VLCLibraryArtistsMusicSubSegment:
             return _NS("Artists");
         case VLCLibraryAlbumsMusicSubSegment:
@@ -256,7 +281,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return nil;
         case VLCLibraryHomeSegment:
             return [NSImage imageNamed:@"bw-home"];
-        case VLCLibraryMusicSegment:
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
@@ -300,9 +324,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryHomeSegment:
             return [NSImage imageWithSystemSymbolName:@"house"
                              accessibilityDescription:@"Home icon"];
-        case VLCLibraryMusicSegment:
-            return [NSImage imageWithSystemSymbolName:@"music.note"
-                              accessibilityDescription:@"Music icon"];
         case VLCLibraryArtistsMusicSubSegment:
             return [NSImage imageWithSystemSymbolName:@"music.mic"
                              accessibilityDescription:@"Music artists icon"];
@@ -398,7 +419,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryVideoSegment:
         case VLCLibraryShowsVideoSubSegment:
             return VLCLibraryVideoViewController.class;
-        case VLCLibraryMusicSegment:
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
@@ -431,7 +451,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryVideoSegment:
         case VLCLibraryShowsVideoSubSegment:
             return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
-        case VLCLibraryMusicSegment:
+        case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:

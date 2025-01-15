@@ -227,8 +227,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
     self.libraryWindow.librarySegmentType = segment.segmentType;
 
-    if (segmentType == VLCLibraryMusicSegment) {
-        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
+    if (segmentType == VLCLibraryMusicSegmentType) {
+        [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
     }
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:segmentType];
@@ -271,8 +271,8 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
         if (segment.segmentType == VLCLibraryHeaderSegment || segment.segmentType == VLCLibraryExploreHeaderSegment) {
             return NSIndexSet.indexSet;
-        } else if (segment.segmentType == VLCLibraryMusicSegment) {
-            [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegment]];
+        } else if (segment.segmentType == VLCLibraryMusicSegmentType) {
+            [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
             NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegment];
             const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
             return [NSIndexSet indexSetWithIndex:artistsIndex];
