@@ -429,9 +429,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
     if (segmentType == VLCLibraryBrowseSegment) {
-        [self.libraryMediaSourceViewController presentBrowseView];
+        [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentBrowseView];
     } else if (segmentType == VLCLibraryStreamsSegment) {
-        [self.libraryMediaSourceViewController presentStreamsView];
+        [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentStreamsView];
     }
 }
 
@@ -538,7 +538,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 - (void)goToLocalFolderMrl:(NSString *)mrl
 {
     [self goToBrowseSection:self];
-    [self.libraryMediaSourceViewController presentLocalFolderMrl:mrl];
+    [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentLocalFolderMrl:mrl];
 }
 
 - (IBAction)sortLibrary:(id)sender
