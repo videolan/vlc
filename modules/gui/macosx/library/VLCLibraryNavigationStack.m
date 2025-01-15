@@ -104,41 +104,43 @@
 
 - (void)forwards
 {
-    if(_delegate == nil || !self.forwardsAvailable) {
+    if (self.delegate == nil || !self.forwardsAvailable) {
         return;
     }
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex + 1;
-    _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+    _currentPosition =
+        [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
     VLCInputNode *node = _currentPosition.navigationState.currentNodeDisplayed;
     VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
-    [_delegate.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
+    [self.delegate.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
 
     [self setDelegateToState:_currentPosition.navigationState];
 }
 
 - (void)backwards
 {
-    if(_delegate == nil || !self.backwardsAvailable) {
+    if (self.delegate == nil || !self.backwardsAvailable) {
         return;
     }
 
     NSUInteger newPositionIndex = _currentPosition.navigationStackIndex - 1;
-    _currentPosition = [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
+    _currentPosition =
+        [[VLCLibraryNavigationCurrentStackPosition alloc] initWithStackIndex:newPositionIndex andState:_navigationStates[newPositionIndex]];
 
-    [_delegate.mediaSourcePathControl removeLastInputNodePathControlItem];
+    [self.delegate.mediaSourcePathControl removeLastInputNodePathControlItem];
 
     [self setDelegateToState:_currentPosition.navigationState];
 }
 
 - (void)appendCurrentLibraryState
 {
-    if(_delegate == nil) {
+    if (self.delegate == nil) {
         return;
     }
 
-    if(self.forwardsAvailable) {
+    if (self.forwardsAvailable) {
         NSUInteger firstIndexToRemove = _currentPosition.navigationStackIndex + 1;
         // -1 to account for the array count
         NSRange rangeToRemove = NSMakeRange(firstIndexToRemove, (_navigationStates.count - 1) - _currentPosition.navigationStackIndex);
@@ -175,17 +177,17 @@
 
 - (void)updateDelegateNavigationButtons
 {
-    if(_delegate == nil) {
+    if (self.delegate == nil) {
         return;
     }
 
-    _delegate.forwardsNavigationButton.enabled = self.forwardsAvailable;
-    _delegate.backwardsNavigationButton.enabled = self.backwardsAvailable;
+    self.delegate.forwardsNavigationButton.enabled = self.forwardsAvailable;
+    self.delegate.backwardsNavigationButton.enabled = self.backwardsAvailable;
 }
 
 - (void)setDelegateToState:(VLCLibraryNavigationState *)state
 {
-    if(_delegate == nil) {
+    if (self.delegate == nil) {
         return;
     }
 
