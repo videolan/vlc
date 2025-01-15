@@ -174,9 +174,10 @@ VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) ./configure --target=$(VPX_TARGET) \
+	$(MAKEBUILDDIR)
+	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
-	cd $< && CONFIG_DEBUG=1 $(MAKE)
-	$(call pkg_static,"vpx.pc")
-	cd $< && CONFIG_DEBUG=1 $(MAKE) install
+	+CONFIG_DEBUG=1 $(MAKEBUILD)
+	$(call pkg_static,"_build/vpx.pc")
+	+CONFIG_DEBUG=1 $(MAKEBUILD) install
 	touch $@
