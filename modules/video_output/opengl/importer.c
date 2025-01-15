@@ -220,6 +220,7 @@ vlc_gl_importer_New(struct vlc_gl_interop *interop)
     glfmt->fmt = interop->fmt_out;
     glfmt->tex_target = interop->tex_target;
     glfmt->tex_count = interop->tex_count;
+    glfmt->half_float = interop->texs[0].type == GL_HALF_FLOAT;
 
     /* This matrix may be updated on new pictures */
     memcpy(&importer->mtx_coords_map, MATRIX2x3_IDENTITY,

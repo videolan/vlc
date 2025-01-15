@@ -382,7 +382,6 @@ DivideRationalByTwo(vlc_rational_t *r) {
 static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
                         GLint* intfmt, GLint* fmt, GLint *type)
 {
-    (void) type;
     struct priv *priv = interop->priv;
     if (*intfmt == 0)
         return true;
@@ -416,6 +415,18 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
                 *intfmt = GL_R16UI;
                 *fmt = GL_RED_INTEGER;
             }
+
+            /* Android is unlikely to support GL_R16UI or GL_R16: */
+            if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, *fmt,
+                                                *intfmt, *type) != 16)
+            {
+
+                /* XXX: Quality loss with 12 and 16bits since half float has
+                 * 10bits of mantissa */
+                *intfmt = GL_R16F;
+                *fmt = GL_RED;
+                *type = GL_HALF_FLOAT;
+            }
             break;
         case GL_RG16:
             if (priv->has_texture_integer)
@@ -423,6 +434,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
                 *intfmt = GL_RG16UI;
                 *fmt = GL_RED_INTEGER;
             }
+            /* XXX Is GL_RG16F possible with semi planar ? */
             break;
         default:
             vlc_assert_unreachable();

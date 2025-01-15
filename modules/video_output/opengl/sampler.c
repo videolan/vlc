@@ -187,6 +187,14 @@ sampler_yuv_base_init(struct vlc_gl_sampler *sampler,
     float *matrix = priv->conv_matrix;
     init_conv_matrix(matrix, yuv_space, range);
 
+    /* If using half_float, we multiply the conversion matrix by 255.  Reason:
+     * half-float YUV planes store values in [0..1]. Multiplying by 255
+     * compensates for that.
+     */
+    if (sampler->glfmt.half_float)
+        for (int i = 0; i < 4*3; ++i)
+            matrix[i] *= 255;
+
     if (desc->pixel_size == 2)
     {
         if (desc->fcc != VLC_CODEC_P010 && desc->fcc != VLC_CODEC_P012

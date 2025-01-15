@@ -42,6 +42,7 @@ struct vlc_gl_format {
     GLsizei tex_heights[PICTURE_PLANE_MAX];
 
     uint32_t formats[PICTURE_PLANE_MAX];
+    bool half_float;
 };
 
 /**
