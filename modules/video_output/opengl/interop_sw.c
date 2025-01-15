@@ -368,8 +368,8 @@ DivideRationalByTwo(vlc_rational_t *r) {
         r->den *= 2;
 }
 
-static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fmt,
-                        GLint *type)
+static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
+                        GLint* intfmt, GLint* fmt, GLint *type)
 {
     (void) type;
     struct priv *priv = interop->priv;
@@ -380,7 +380,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
     //don't need transformations
     if (priv->has_gl_3
         || (priv->has_texture_rg && interop->gl->api_type == VLC_OPENGL))
-        return true;
+        goto check_tex_alloc;
 
     //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
     if (priv->has_texture_rg)
@@ -401,7 +401,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
             vlc_assert_unreachable();
         }
 
-        return true;
+        goto check_tex_alloc;
     }
 
     //fallback to GL_LUMINANCE / GL_LUMINANCE_ALPHA
@@ -431,6 +431,12 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, GLint* intfmt, GLint* fm
     default:
         vlc_assert_unreachable();
     }
+
+check_tex_alloc:
+    if (pixel_size == 2
+     && vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, *fmt,
+                                        *intfmt, *type) != 16)
+        return false;
     return true;
 }
 
@@ -484,7 +490,7 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
         GLint intfmt = GL_RG8;
         GLint fmt = GL_RG;
         GLint type = GL_UNSIGNED_BYTE;
-        if (!fixGLFormat(interop, &intfmt, &fmt, &type))
+        if (!fixGLFormat(interop, desc->pixel_size, &intfmt, &fmt, &type))
             return VLC_EGENERIC;
 
         interop->tex_count = 2;
@@ -531,13 +537,15 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
     GLint plane1_intfmt = format->intfmt;
     GLint plane1_fmt = format->fmt;
     GLint plane1_type = format->type;
-    if (!fixGLFormat(interop, &plane1_intfmt, &plane1_fmt, &plane1_type))
+    if (!fixGLFormat(interop, desc->pixel_size, &plane1_intfmt, &plane1_fmt,
+                     &plane1_type))
         return VLC_EGENERIC;
 
     GLint plane2_intfmt = format->plane2_intfmt;
     GLint plane2_fmt = format->plane2_fmt;
     GLint plane2_type = format->plane2_type;
-    if (!fixGLFormat(interop, &plane2_intfmt, &plane2_fmt, &plane2_type))
+    if (!fixGLFormat(interop, desc->pixel_size, &plane2_intfmt, &plane2_fmt,
+                     &plane2_type))
         return VLC_EGENERIC;
 
     msg_Dbg(interop, "Using format at index %u", format_index);
@@ -545,13 +553,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
             plane1_intfmt, plane1_type);
     msg_Dbg(interop, "Plane2: fmt=%#x intfmt=%#x type=%#x", plane2_fmt,
             plane2_intfmt, plane2_type);
-
-    if (desc->pixel_size == 2)
-    {
-        if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, plane1_fmt,
-                                            plane1_intfmt, plane1_type) != 16)
-            return VLC_EGENERIC;
-    }
 
     if (desc->plane_count >= 3)
     {
@@ -568,13 +569,6 @@ interop_yuv_base_init(struct vlc_gl_interop *interop,
     else if (desc->plane_count == 2)
     {
         interop->tex_count = 2;
-
-        if (desc->pixel_size == 2 &&
-            vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, plane2_fmt,
-                plane2_intfmt, plane2_type) != 16)
-        {
-            return VLC_EGENERIC;
-        }
 
         interop->texs[0] = (struct vlc_gl_tex_cfg) {
             { desc->p[0].w.num, desc->p[0].w.den },
