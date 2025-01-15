@@ -135,8 +135,8 @@ static void get_rotation(es_format_t *fmt, const AVStream *s)
 
     int32_t *matrix = GetStreamSideData(s, AV_PKT_DATA_DISPLAYMATRIX);
     if( matrix ) {
-        int64_t det = (int64_t)matrix[0] * matrix[4] - (int64_t)matrix[1] * matrix[3];
-        if (det < 0) {
+        bool flipped = (int64_t)matrix[0] * matrix[4] < (int64_t)matrix[1] * matrix[3];
+        if (flipped) {
             /* Flip the matrix to decouple flip and rotation operations.
              * Always assume an horizontal flip for simplicity,
              * it can be changed later if rotation is 180º. */
@@ -148,7 +148,7 @@ static void get_rotation(es_format_t *fmt, const AVStream *s)
             fmt->video.orientation = ORIENT_ROTATED_270;
 
         else if (angle > 135 || angle < -135) {
-            if (det < 0)
+            if (flipped)
                 fmt->video.orientation = ORIENT_VFLIPPED;
             else
                 fmt->video.orientation = ORIENT_ROTATED_180;
@@ -160,7 +160,7 @@ static void get_rotation(es_format_t *fmt, const AVStream *s)
             fmt->video.orientation = ORIENT_NORMAL;
 
         /* Flip is already applied to the 180º case. */
-        if (det < 0 && !(angle > 135 || angle < -135)) {
+        if (flipped && !(angle > 135 || angle < -135)) {
             video_transform_t transform = (video_transform_t)fmt->video.orientation;
             /* Flip first then rotate */
             fmt->video.orientation = ORIENT_HFLIPPED;
