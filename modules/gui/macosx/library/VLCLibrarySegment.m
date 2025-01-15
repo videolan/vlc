@@ -49,6 +49,19 @@
 NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLocationsChanged";
 
+
+@interface VLCLibrarySegment ()
+
+@property NSString *internalDisplayString;
+@property NSImage *internalDisplayImage;
+@property (nullable) Class internalLibraryViewControllerClass;
+@property (nullable) NSArray<NSTreeNode *> *internalChildNodes;
+
+- (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
+
+@end
+
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
@@ -164,7 +177,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         return groupNodes.copy;
     }
 
-    return nil;
+    return self.internalChildNodes;
 }
 
 - (NSArray<NSString *> *)defaultBookmarkedLocations
@@ -362,14 +375,14 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     if ([self.representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
         VLCLibrarySegmentBookmarkedLocation * const descriptor =
             (VLCLibrarySegmentBookmarkedLocation *)self.representedObject;
-        _displayString = descriptor.name;
+        self.internalDisplayString = descriptor.name;
     } else if ([self.representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
         VLCMediaLibraryGroup * const group = (VLCMediaLibraryGroup *)self.representedObject;
-        _displayString = group.displayString;
+        self.internalDisplayString = group.displayString;
     } else {
-        _displayString = [self displayStringForType:_segmentType];
+        self.internalDisplayString = [self displayStringForType:_segmentType];
     }
-    _displayImage = [self iconForType:_segmentType];
+    self.internalDisplayImage = [self iconForType:_segmentType];
 }
 
 + (nullable Class)libraryViewControllerClassForSegmentType:(VLCLibrarySegmentType)segmentType
@@ -436,6 +449,21 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryStreamsSegment:
             return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     }
+}
+
+- (NSString *)displayString
+{
+    return self.internalDisplayString;
+}
+
+- (NSImage *)displayImage
+{
+    return self.internalDisplayImage;
+}
+
+- (nullable Class)libraryViewControllerClass
+{
+    return self.internalLibraryViewControllerClass;
 }
 
 @end
