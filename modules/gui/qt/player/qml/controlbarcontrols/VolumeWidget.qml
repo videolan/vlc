@@ -322,11 +322,16 @@ T.Pane {
                 WheelToVLCConverter {
                     id: wheelToVLC
 
-                    onWheelUpDown: (steps, modifiers) => {
+                    function handle(steps: int) {
                         if (steps > 0)
                             Player.setVolumeUp(steps)
                         else
                             Player.setVolumeDown(-steps)
+                    }
+
+                    Component.onCompleted: {
+                        wheelUpDown.connect(wheelToVLC.handle)
+                        wheelLeftRight.connect(wheelToVLC.handle)
                     }
                 }
             }
