@@ -117,6 +117,18 @@ static vlc_fourcc_t CodecTagToFourcc( uint32_t codec_tag )
 #endif
 }
 
+static inline void* GetStreamSideData(const AVStream *s, enum AVPacketSideDataType type)
+{
+#if LIBAVCODEC_VERSION_CHECK( 60, 29, 100 )
+    const AVCodecParameters *cp = s->codecpar;
+    const AVPacketSideData *psd =
+        av_packet_side_data_get(cp->coded_side_data, cp->nb_coded_side_data, type);
+    return psd ? psd->data : NULL;
+#else
+    return av_stream_get_side_data(s, type, NULL);
+#endif
+}
+
 /*****************************************************************************
  * Open
  *****************************************************************************/
