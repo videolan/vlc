@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCInputItem;
 @class VLCInputNode;
 @class VLCInputNodePathControl;
+@class VLCLibraryNavigationStack;
 @class VLCMediaSource;
 
 extern NSString * const VLCMediaSourceDataSourceNodeChanged;
@@ -42,6 +43,7 @@ extern NSString * const VLCMediaSourceDataSourceNodeChanged;
 @property (readwrite, weak) NSCollectionView *collectionView;
 @property (readwrite, weak) NSTableView *tableView;
 @property (readwrite, weak) VLCInputNodePathControl *pathControl;
+@property (readwrite, weak) VLCLibraryNavigationStack *navigationStack;
 
 - (void)setupViews;
 - (VLCInputItem *)mediaSourceInputItemAtRow:(NSInteger)tableViewRow;

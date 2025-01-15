@@ -419,9 +419,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
     newChildDataSource.collectionView = self.collectionView;
     newChildDataSource.pathControl = self.pathControl;
     newChildDataSource.tableView = self.tableView;
-    
+    newChildDataSource.navigationStack = self.navigationStack;
+
     [self setChildDataSource:newChildDataSource];
-    [VLCMain.sharedInstance.libraryWindow.navigationStack appendCurrentLibraryState];
+    [self.navigationStack appendCurrentLibraryState];
 
     [self togglePathControlVisibility:YES];
 }
@@ -488,6 +489,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
     _childDataSource = nil;
     [self.pathControl clearInputNodePathControlItems];
+    [self.navigationStack clear];
 
     [self reloadData];
 
@@ -497,8 +499,6 @@ referenceSizeForHeaderInSection:(NSInteger)section
 - (void)homeButtonAction:(id)sender
 {
     [self returnHome];
-    VLCLibraryNavigationStack * const mainNavStack = VLCMain.sharedInstance.libraryWindow.navigationStack;
-    [mainNavStack clear];
 }
 
 - (void)pathControlAction:(id)sender

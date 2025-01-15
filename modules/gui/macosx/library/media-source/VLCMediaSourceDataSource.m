@@ -226,7 +226,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         [self.displayedMediaSource preparseInputNodeWithinTree:node];
         self.nodeToDisplay = node;
 
-        [VLCMain.sharedInstance.libraryWindow.navigationStack appendCurrentLibraryState];
+        [self.navigationStack appendCurrentLibraryState];
     } else if (childRootInput.inputType == ITEM_TYPE_FILE && allowPlayback) {
         [VLCMain.sharedInstance.playQueueController addInputItem:childRootInput.vlcInputItem atPosition:-1 startPlayback:YES];
     }

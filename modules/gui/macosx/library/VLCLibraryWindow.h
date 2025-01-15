@@ -33,7 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryAbstractSegmentViewController;
 @class VLCLibraryCollectionView;
 @class VLCLibraryMediaSourceViewController;
-@class VLCLibraryNavigationStack;
 @class VLCLibrarySortingMenuController;
 @class VLCMediaLibraryGroup;
 @class VLCPlayQueueController;
@@ -120,7 +119,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
 @property (readwrite) BOOL nonembedded;
 
 @property (readwrite, weak) IBOutlet VLCLibraryWindowSplitViewController *splitViewController;
-@property (readwrite) VLCLibraryNavigationStack *navigationStack;
 @property (readonly) VLCLibraryMediaSourceViewController *libraryMediaSourceViewController;
 @property (readonly) VLCLibraryAbstractSegmentViewController *librarySegmentViewController;
 @property (readonly) VLCLibrarySortingMenuController *librarySortingMenuController;

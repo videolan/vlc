@@ -171,9 +171,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     _libraryTargetView = [[NSView alloc] init];
 
-    self.navigationStack = [[VLCLibraryNavigationStack alloc] init];
-    self.navigationStack.delegate = self;
-
     self.videoViewController.view.frame = self.mainSplitView.frame;
     self.videoViewController.view.hidden = YES;
     self.videoViewController.displayLibraryControls = YES;
@@ -196,8 +193,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                            selector:@selector(playerTrackSelectionChanged:)
                                name:VLCPlayerTrackSelectionChanged
                              object:nil];
-
-    _libraryMediaSourceViewController = [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:self];
 
     [self setViewForSelectedSegment];
     [self setupLoadingOverlayView];
@@ -425,7 +420,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (void)showMediaSourceLibrary
 {
-    [self.navigationStack clear];
+    [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack clear];
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
     if (segmentType == VLCLibraryBrowseSegment) {
@@ -613,12 +608,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)backwardsNavigationAction:(id)sender
 {
-    self.videoViewController.view.hidden ? [_navigationStack backwards] : [self disableVideoPlaybackAppearance];
+    self.videoViewController.view.hidden
+        ? [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack backwards]
+        : [self disableVideoPlaybackAppearance];
 }
 
 - (IBAction)forwardsNavigationAction:(id)sender
 {
-    [_navigationStack forwards];
+    [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack forwards];
 }
 
 #pragma mark - video output controlling

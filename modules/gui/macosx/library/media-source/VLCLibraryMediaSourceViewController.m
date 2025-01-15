@@ -33,6 +33,7 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryController.h"
+#import "library/VLCLibraryNavigationStack.h"
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -91,6 +92,11 @@
     _baseDataSource.tableView = _tableView;
     _baseDataSource.tableViewScrollView = _tableViewScrollView;
     [_baseDataSource setupViews];
+
+    _navigationStack = [[VLCLibraryNavigationStack alloc] init];
+    self.navigationStack.delegate = self.libraryWindow;
+
+    self.baseDataSource.navigationStack = self.navigationStack;
 }
 
 - (void)setupCollectionView

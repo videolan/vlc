@@ -30,6 +30,7 @@ typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
 };
 
 @class VLCInputNodePathControl;
+@class VLCLibraryNavigationStack;
 @class VLCMediaSourceDataSource;
 
 extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
@@ -49,6 +50,8 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 @property (readwrite, weak) NSVisualEffectView *pathControlVisualEffectView;
 @property (readwrite, nonatomic) VLCMediaSourceMode mediaSourceMode;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
+
+@property (readwrite, weak) VLCLibraryNavigationStack *navigationStack;
 
 - (void)setupViews;
 - (void)reloadViews;
