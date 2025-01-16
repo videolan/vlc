@@ -223,8 +223,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         return;
     }
 
-    VLCLibrarySegment * const segment = [VLCLibrarySegment segmentWithSegmentType:segmentType];
-    self.libraryWindow.librarySegmentType = segment.segmentType;
+    self.libraryWindow.librarySegmentType = segmentType;
 
     if (segmentType == VLCLibraryMusicSegmentType) {
         [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
