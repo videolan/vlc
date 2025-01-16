@@ -188,7 +188,7 @@
     NSArray<NSView *> * const targetViewSubViews = self.libraryTargetView.subviews;
     const BOOL emptyLibraryViewPresent = [targetViewSubViews containsObject:self.emptyLibraryView];
     const BOOL homeLibraryViewPresent = [targetViewSubViews containsObject:self.homeLibraryView];
-    if (self.libraryWindow.librarySegmentType == VLCLibraryHomeSegment &&
+    if (self.libraryWindow.librarySegmentType == VLCLibraryHomeSegmentType &&
         ((videoCount == 0 && !emptyLibraryViewPresent) ||
          (videoCount > 0 && !homeLibraryViewPresent) ||
          (audioCount == 0 && !emptyLibraryViewPresent) ||

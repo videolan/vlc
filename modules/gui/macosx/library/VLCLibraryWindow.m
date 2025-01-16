@@ -225,7 +225,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (_librarySegmentType) {
-    case VLCLibraryHomeSegment:
+    case VLCLibraryHomeSegmentType:
         _currentSelectedViewModeSegment = preferences.homeLibraryViewMode;
     case VLCLibraryVideoSegment:
         _currentSelectedViewModeSegment = preferences.videoLibraryViewMode;
@@ -282,7 +282,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     switch (segmentType) {
-    case VLCLibraryHomeSegment:
+    case VLCLibraryHomeSegmentType:
         [self showHomeLibrary];
         break;
     case VLCLibraryVideoSegment:
@@ -344,7 +344,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (_librarySegmentType) {
-    case VLCLibraryHomeSegment:
+    case VLCLibraryHomeSegmentType:
         preferences.homeLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryVideoSegment:

@@ -62,6 +62,31 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 @end
 
 
+@interface VLCLibraryHomeSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryHomeSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryHomeSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Home");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"house"
+                                                  accessibilityDescription:@"Home icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"bw-home"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryHomeViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryMusicSegment : VLCLibrarySegment
 @end
 
@@ -98,7 +123,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 + (NSArray<VLCLibrarySegment *> *)librarySegments
 {
     return @[
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegmentType],
@@ -112,7 +137,9 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType
 {
-    if (segmentType == VLCLibraryMusicSegmentType) {
+    if (segmentType == VLCLibraryHomeSegmentType) {
+        return [[VLCLibraryHomeSegment alloc] init];
+    } else if (segmentType == VLCLibraryMusicSegmentType) {
         return [[VLCLibraryMusicSegment alloc] init];
     }
     return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
@@ -235,8 +262,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     switch (segmentType) {
         case VLCLibraryHeaderSegment:
             return _NS("Library");
-        case VLCLibraryHomeSegment:
-            return _NS("Home");
         case VLCLibraryArtistsMusicSubSegment:
             return _NS("Artists");
         case VLCLibraryAlbumsMusicSubSegment:
@@ -279,8 +304,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
     switch (segmentType) {
         case VLCLibraryHeaderSegment:
             return nil;
-        case VLCLibraryHomeSegment:
-            return [NSImage imageNamed:@"bw-home"];
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
@@ -321,9 +344,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"books.vertical.fill"
                              accessibilityDescription:@"Library icon"];
-        case VLCLibraryHomeSegment:
-            return [NSImage imageWithSystemSymbolName:@"house"
-                             accessibilityDescription:@"Home icon"];
         case VLCLibraryArtistsMusicSubSegment:
             return [NSImage imageWithSystemSymbolName:@"music.mic"
                              accessibilityDescription:@"Music artists icon"];
@@ -414,7 +434,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryHeaderSegment:
         case VLCLibraryExploreHeaderSegment:
             return nil;
-        case VLCLibraryHomeSegment:
+        case VLCLibraryHomeSegmentType:
             return VLCLibraryHomeViewController.class;
         case VLCLibraryVideoSegment:
         case VLCLibraryShowsVideoSubSegment:
@@ -446,7 +466,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryHeaderSegment:
         case VLCLibraryExploreHeaderSegment:
             return nil;
-        case VLCLibraryHomeSegment:
+        case VLCLibraryHomeSegmentType:
             return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryVideoSegment:
         case VLCLibraryShowsVideoSubSegment:
