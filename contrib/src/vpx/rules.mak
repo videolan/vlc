@@ -183,8 +183,7 @@ VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
 	$(MAKEBUILDDIR)
-	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure --target=$(VPX_TARGET) \
-		$(VPX_CONF) --prefix=$(PREFIX)
+	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure $(VPX_CONF)
 	+CONFIG_DEBUG=1 $(MAKEBUILD)
 	$(call pkg_static,"$(BUILD_DIRUNPACK)/vpx.pc")
 	+CONFIG_DEBUG=1 $(MAKEBUILD) install
