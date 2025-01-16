@@ -771,4 +771,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     return self.internalLibraryViewControllerCreator();
 }
 
+- (void)presentLibraryViewUsingController:(VLCLibraryAbstractSegmentViewController *)controller
+{
+    self.internalLibraryViewPresenter(controller);
+}
+
 @end

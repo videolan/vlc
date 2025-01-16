@@ -62,6 +62,7 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType;
 - (nullable VLCLibraryAbstractSegmentViewController *)newLibraryViewController;
+- (void)presentLibraryViewUsingController:(VLCLibraryAbstractSegmentViewController *)controller;
 
 @end
 
