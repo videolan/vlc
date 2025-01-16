@@ -255,7 +255,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
         _currentSelectedViewModeSegment = preferences.videoOnlyPlaylistLibraryViewMode;
         break;
-    case VLCLibraryBrowseSegment:
+    case VLCLibraryBrowseSegmentType:
         _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
         break;
     case VLCLibraryStreamsSegment:
@@ -307,7 +307,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
         [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY];
         break;
-    case VLCLibraryBrowseSegment:
+    case VLCLibraryBrowseSegmentType:
     case VLCLibraryBrowseBookmarkedLocationSubSegment:
     case VLCLibraryStreamsSegment:
         [self showMediaSourceLibrary];
@@ -375,7 +375,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
         preferences.videoOnlyPlaylistLibraryViewMode = _currentSelectedViewModeSegment;
         break;
-    case VLCLibraryBrowseSegment:
+    case VLCLibraryBrowseSegmentType:
     case VLCLibraryBrowseBookmarkedLocationSubSegment:
         preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
         break;
@@ -423,7 +423,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack clear];
 
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
-    if (segmentType == VLCLibraryBrowseSegment) {
+    if (segmentType == VLCLibraryBrowseSegmentType) {
         [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentBrowseView];
     } else if (segmentType == VLCLibraryStreamsSegment) {
         [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentStreamsView];
@@ -603,7 +603,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (IBAction)goToBrowseSection:(id)sender
 {
-    [self.splitViewController.navSidebarViewController selectSegment:VLCLibraryBrowseSegment];
+    [self.splitViewController.navSidebarViewController selectSegment:VLCLibraryBrowseSegmentType];
 }
 
 - (IBAction)backwardsNavigationAction:(id)sender

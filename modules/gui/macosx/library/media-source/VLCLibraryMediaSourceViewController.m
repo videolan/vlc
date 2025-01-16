@@ -168,7 +168,7 @@
 
 - (void)presentBrowseView
 {
-    [self presentMediaSourceView:VLCLibraryBrowseSegment];
+    [self presentMediaSourceView:VLCLibraryBrowseSegmentType];
 }
 
 - (void)presentStreamsView
@@ -179,7 +179,7 @@
 - (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
 {
     [self.libraryWindow displayLibraryView:self.mediaSourceView];
-    _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegment ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
+    _baseDataSource.mediaSourceMode = viewSegment == VLCLibraryBrowseSegmentType ? VLCMediaSourceModeLAN : VLCMediaSourceModeInternet;
     [_baseDataSource reloadViews];
 }
 
