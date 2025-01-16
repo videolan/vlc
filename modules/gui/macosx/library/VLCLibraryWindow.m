@@ -249,7 +249,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsSegmentType:
         _currentSelectedViewModeSegment = preferences.playlistLibraryViewMode;
         break;
-    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
         _currentSelectedViewModeSegment = preferences.musicOnlyPlaylistLibraryViewMode;
         break;
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
@@ -301,7 +301,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsSegmentType:
         [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_ALL];
         break;
-    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
         [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY];
         break;
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
@@ -369,7 +369,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryPlaylistsSegmentType:
         preferences.playlistLibraryViewMode = _currentSelectedViewModeSegment;
         break;
-    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
+    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
         preferences.musicOnlyPlaylistLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
