@@ -322,7 +322,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 - (void)presentAudioGridModeView
 {
     const VLCLibrarySegmentType selectedSegment = self.libraryWindow.librarySegmentType;
-    if (selectedSegment == VLCLibrarySongsMusicSubSegment ||
+    if (selectedSegment == VLCLibrarySongsMusicSubSegmentType ||
         selectedSegment == VLCLibraryAlbumsMusicSubSegment) {
 
         [_audioLibraryCollectionView deselectAll:self];
@@ -336,7 +336,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
 - (void)presentAudioTableView
 {
-    if (self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegment) {
+    if (self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegmentType) {
         _audioSongTableViewScrollView.hidden = NO;
     } else {
         _audioLibrarySplitView.hidden = NO;
@@ -352,7 +352,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
             return libraryWindowPrefs.artistLibraryViewMode;
         case VLCLibraryGenresMusicSubSegmentType:
             return libraryWindowPrefs.genreLibraryViewMode;
-        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegmentType:
             return libraryWindowPrefs.songsLibraryViewMode;
         case VLCLibraryAlbumsMusicSubSegment:
             return libraryWindowPrefs.albumLibraryViewMode;
@@ -369,7 +369,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
             return VLCAudioLibraryArtistsSegment;
         case VLCLibraryAlbumsMusicSubSegment:
             return VLCAudioLibraryAlbumsSegment;
-        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegmentType:
             return VLCAudioLibrarySongsSegment;
         case VLCLibraryGenresMusicSubSegmentType:
             return VLCAudioLibraryGenresSegment;
@@ -500,7 +500,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class]) {
         segmentType = VLCLibraryGenresMusicSubSegmentType;
     } else {
-        segmentType = VLCLibrarySongsMusicSubSegment;
+        segmentType = VLCLibrarySongsMusicSubSegmentType;
     }
 
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -519,7 +519,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     const NSUInteger audioCount = model.numberOfAudioMedia;
 
     if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegmentType ||
          self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegmentType) &&

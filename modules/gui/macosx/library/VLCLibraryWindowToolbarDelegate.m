@@ -167,7 +167,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
         case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
-        case VLCLibrarySongsMusicSubSegment:
+        case VLCLibrarySongsMusicSubSegmentType:
         case VLCLibraryGenresMusicSubSegmentType:
         case VLCLibraryGroupsSegmentType:
         case VLCLibraryGroupsGroupSubSegmentType:
