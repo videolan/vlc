@@ -348,7 +348,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
 
     switch (self.libraryWindow.librarySegmentType) {
-        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryArtistsMusicSubSegmentType:
             return libraryWindowPrefs.artistLibraryViewMode;
         case VLCLibraryGenresMusicSubSegmentType:
             return libraryWindowPrefs.genreLibraryViewMode;
@@ -365,7 +365,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 {
     switch (self.libraryWindow.librarySegmentType) {
         case VLCLibraryMusicSegmentType:
-        case VLCLibraryArtistsMusicSubSegment:
+        case VLCLibraryArtistsMusicSubSegmentType:
             return VLCAudioLibraryArtistsSegment;
         case VLCLibraryAlbumsMusicSubSegmentType:
             return VLCAudioLibraryAlbumsSegment;
@@ -496,7 +496,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     if ([libraryItem isKindOfClass:VLCMediaLibraryAlbum.class]) {
         segmentType = VLCLibraryAlbumsMusicSubSegmentType;
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryArtist.class]) {
-        segmentType = VLCLibraryArtistsMusicSubSegment;
+        segmentType = VLCLibraryArtistsMusicSubSegmentType;
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class]) {
         segmentType = VLCLibraryGenresMusicSubSegmentType;
     } else {
@@ -520,7 +520,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
 
     if ((self.libraryWindow.librarySegmentType == VLCLibraryMusicSegmentType ||
          self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegmentType ||
-         self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegment ||
+         self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegmentType ||
          self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegmentType ||
          self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegmentType) &&
         ((audioCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||

@@ -272,7 +272,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
             return NSIndexSet.indexSet;
         } else if (segment.segmentType == VLCLibraryMusicSegmentType) {
             [self.outlineView expandItem:[self nodeForSegmentType:VLCLibraryMusicSegmentType]];
-            NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegment];
+            NSTreeNode * const artistsNode = [self nodeForSegmentType:VLCLibraryArtistsMusicSubSegmentType];
             const NSInteger artistsIndex = [self.outlineView rowForItem:artistsNode];
             return [NSIndexSet indexSetWithIndex:artistsIndex];
         }
