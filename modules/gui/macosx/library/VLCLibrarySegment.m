@@ -555,13 +555,16 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 - (void)updateSegmentTypeRepresentation
 {
-    if ([self.representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
-        VLCMediaLibraryGroup * const group = (VLCMediaLibraryGroup *)self.representedObject;
-        self.internalDisplayString = group.displayString;
-    } else {
-        self.internalDisplayString = [self displayStringForType:_segmentType];
+    NSString * const displayString = [self displayStringForType:_segmentType];
+    NSImage * const displayImage = [self iconForType:_segmentType];
+
+    if (displayString) {
+        self.internalDisplayString = displayString;
     }
-    self.internalDisplayImage = [self iconForType:_segmentType];
+
+    if (displayImage) {
+        self.internalDisplayImage = displayImage;
+    }
 }
 
 + (nullable Class)libraryViewControllerClassForSegmentType:(VLCLibrarySegmentType)segmentType
