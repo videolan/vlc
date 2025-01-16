@@ -163,6 +163,8 @@ Item {
             // cullMode: ShaderEffect.BackFaceCulling // Does not work sometimes. Qt bug?
 
             vertexShader: "qrc:///shaders/FadingEdge%1.vert.qsb".arg(vertical ? "Y" : "X")
+
+            // TODO: Dithering is not necessary if background color is not dark.
             fragmentShader: "qrc:///shaders/FadingEdge.frag.qsb"
         }
     }

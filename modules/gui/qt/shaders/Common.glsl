@@ -58,15 +58,18 @@
 
 //blending formulas are taken from Qt's Blend.qml implementation
 
+#define DITHERING_CUTOFF 0.01
+#define DITHERING_STRENGTH 0.01
+
 vec4 fromPremult(vec4 color) {
-    lowp vec4 result = vec4(0.0);
+    vec4 result = vec4(0.0);
     result.rgb = color.rgb / max(1.0/256.0, color.a);
     result.a = color.a;
     return result;
 }
 
 vec4 toPremult(vec4 color) {
-    lowp vec4 result = vec4(0.0);
+    vec4 result = vec4(0.0);
     result.rbg = color.rbg * color.a;
     result.a = color.a;
     return result;
