@@ -564,15 +564,15 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 + (NSArray<VLCLibrarySegment *> *)librarySegments
 {
     return @[
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegmentType],
+        [[VLCLibraryHomeSegment alloc] init],
         [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegmentType],
+        [[VLCLibraryVideoSegment alloc] init],
+        [[VLCLibraryMusicSegment alloc] init],
+        [[VLCLibraryPlaylistSegment alloc] init],
+        [[VLCLibraryGroupSegment alloc] init],
         [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Explore")],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegmentType],
+        [[VLCLibraryBrowseSegment alloc] init],
+        [[VLCLibraryStreamsSegment alloc] init],
     ];
 }
 
