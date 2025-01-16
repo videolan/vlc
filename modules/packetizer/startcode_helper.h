@@ -133,7 +133,8 @@ static inline const uint8_t * startcode_FindAnnexB_Bits( const uint8_t *p, const
     }
 
     for (end -= 3; p < end; p += 4) {
-        uint32_t x = *(const uint32_t*)p;
+        uint32_t x;
+        memcpy(&x, p, sizeof(x));
         if ((x - 0x01010101) & (~x) & 0x80808080)
         {
             /* matching DW isn't faster */
