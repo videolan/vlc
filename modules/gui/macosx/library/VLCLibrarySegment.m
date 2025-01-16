@@ -106,6 +106,31 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryVideoShowsSubSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryVideoShowsSubSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryShowsVideoSubSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Shows");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"tv"
+                                                  accessibilityDescription:@"Shows icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryVideoSegment : VLCLibrarySegment
 @end
 
@@ -124,8 +149,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
-        self.internalChildNodes =
-            @[[VLCLibrarySegment segmentWithSegmentType:VLCLibraryShowsVideoSubSegment]];
+        self.internalChildNodes = @[[[VLCLibraryVideoShowsSubSegment alloc] init]];
     }
     return self;
 }
@@ -600,8 +624,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     switch (segmentType) {
         case VLCLibraryHeaderSegment:
             return _NS("Library");
-        case VLCLibraryShowsVideoSubSegment:
-            return _NS("Shows");
         case VLCLibraryExploreHeaderSegment:
             return _NS("Explore");
         case VLCLibraryLowSentinelSegment:
@@ -616,8 +638,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     switch (segmentType) {
         case VLCLibraryHeaderSegment:
             return nil;
-        case VLCLibraryShowsVideoSubSegment:
-            return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryExploreHeaderSegment:
             return nil;
         case VLCLibraryLowSentinelSegment:
@@ -636,9 +656,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"books.vertical.fill"
                              accessibilityDescription:@"Library icon"];
-        case VLCLibraryShowsVideoSubSegment:
-            return [NSImage imageWithSystemSymbolName:@"tv"
-                             accessibilityDescription:@"Shows icon"];
         case VLCLibraryExploreHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
                              accessibilityDescription:@"Explore icon"];
@@ -689,7 +706,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryHomeSegmentType:
             return VLCLibraryHomeViewController.class;
         case VLCLibraryVideoSegmentType:
-        case VLCLibraryShowsVideoSubSegment:
+        case VLCLibraryShowsVideoSubSegmentType:
             return VLCLibraryVideoViewController.class;
         case VLCLibraryArtistsMusicSubSegmentType:
         case VLCLibraryAlbumsMusicSubSegmentType:
@@ -721,7 +738,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryHomeSegmentType:
             return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryVideoSegmentType:
-        case VLCLibraryShowsVideoSubSegment:
+        case VLCLibraryShowsVideoSubSegmentType:
             return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegmentType:

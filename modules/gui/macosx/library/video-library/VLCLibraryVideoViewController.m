@@ -254,7 +254,7 @@
     const NSInteger librarySegmentType = self.libraryWindow.librarySegmentType;
     if (librarySegmentType == VLCLibraryVideoSegmentType) {
         return self.libraryVideoDataSource;
-    } else if (librarySegmentType == VLCLibraryShowsVideoSubSegment) {
+    } else if (librarySegmentType == VLCLibraryShowsVideoSubSegmentType) {
         return self.libraryShowsDataSource;
     } else {
         return nil;
@@ -359,7 +359,7 @@
         self.libraryWindow.videoViewController.view.hidden) {
 
         [self updatePresentedVideoLibraryView];
-    } else if (self.libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegment &&
+    } else if (self.libraryWindow.librarySegmentType == VLCLibraryShowsVideoSubSegmentType &&
          ((showsCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
           (showsCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
          self.libraryWindow.videoViewController.view.hidden) {
