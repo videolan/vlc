@@ -79,6 +79,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @property (nullable) VLCLibraryAbstractSegmentViewController *(^internalLibraryViewControllerCreator)(void);
 @property (nullable) void (^internalLibraryViewPresenter)(VLCLibraryAbstractSegmentViewController *);
 @property (nullable) void (^internalSaveViewModePreference)(NSInteger);
+@property (nullable) NSInteger (^internalGetViewModePreference)(void);
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
@@ -131,6 +132,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.homeLibraryViewMode;
+        };
     }
     return self;
 }
@@ -165,6 +169,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.showsLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.showsLibraryViewMode;
+        };
     }
     return self;
 }
@@ -198,6 +205,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
         };
         self.internalChildNodes = @[[[VLCLibraryVideoShowsSubSegment alloc] init]];
     }
@@ -234,6 +244,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.artistLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.artistLibraryViewMode;
+        };
     }
     return self;
 }
@@ -267,6 +280,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.albumLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.albumLibraryViewMode;
         };
     }
     return self;
@@ -302,6 +318,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.songsLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.songsLibraryViewMode;
+        };
     }
     return self;
 }
@@ -335,6 +354,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.genreLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.genreLibraryViewMode;
         };
     }
     return self;
@@ -407,6 +429,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.musicOnlyPlaylistLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.musicOnlyPlaylistLibraryViewMode;
+        };
     }
     return self;
 }
@@ -441,6 +466,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.videoOnlyPlaylistLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.videoOnlyPlaylistLibraryViewMode;
+        };
     }
     return self;
 }
@@ -474,6 +502,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.playlistLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.playlistLibraryViewMode;
         };
         self.internalChildNodes = @[
             [[VLCLibraryPlaylistMusicPlaylistSubSegment alloc] init],
@@ -516,6 +547,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
+        };
     }
     return self;
 }
@@ -549,6 +583,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
         };
 
         VLCLibraryModel * const libraryModel =
@@ -604,6 +641,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode = viewMode;
         };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode;
+        };
     }
     return self;
 }
@@ -637,6 +677,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode;
         };
 
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
@@ -696,6 +739,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         };
         self.internalSaveViewModePreference = ^(const NSInteger viewMode) {
             VLCLibraryWindowPersistentPreferences.sharedInstance.streamLibraryViewMode = viewMode;
+        };
+        self.internalGetViewModePreference = ^{
+            return VLCLibraryWindowPersistentPreferences.sharedInstance.streamLibraryViewMode;
         };
     }
     return self;
@@ -823,7 +869,12 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     self.internalLibraryViewPresenter(controller);
 }
 
-- (void)saveViewMode:(NSInteger)viewMode
+- (NSInteger)viewMode
+{
+    return self.internalGetViewModePreference();
+}
+
+- (void)setViewMode:(NSInteger)viewMode
 {
     self.internalSaveViewModePreference(viewMode);
 }

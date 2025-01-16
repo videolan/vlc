@@ -302,7 +302,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
-    [[VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType] saveViewMode:_currentSelectedViewModeSegment];
+    [VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType].viewMode = _currentSelectedViewModeSegment;
     [self setViewForSelectedSegment];
 }
 
