@@ -246,9 +246,11 @@ if [ ! -z "$BUILD_UCRT" ]; then
             fi
         fi
 
-        LDFLAGS="$LDFLAGS -lwindowsapp"
-        CFLAGS="$CFLAGS -Wl,-lwindowsapp"
-        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp"
+        # WinstoreCompat: hopefully can go away someday
+        LDFLAGS="$LDFLAGS -lwindowsapp -lwindowsappcompat"
+        CFLAGS="$CFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
+        CXXFLAGS="$CXXFLAGS -Wl,-lwindowsapp,-lwindowsappcompat"
+        CPPFLAGS="$CPPFLAGS -DWINSTORECOMPAT"
         if [ "$COMPILING_WITH_CLANG" -gt 0 ]; then
             CFLAGS="$CFLAGS -Wno-unused-command-line-argument"
             CXXFLAGS="$CXXFLAGS -Wno-unused-command-line-argument"
