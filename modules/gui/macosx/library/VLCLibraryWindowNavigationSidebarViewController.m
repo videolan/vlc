@@ -60,24 +60,18 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 - (void)viewDidLoad
 {
     _treeController = [[NSTreeController alloc] init];
-    _treeController.objectClass = VLCLibrarySegment.class;
-    _treeController.countKeyPath = @"childCount";
-    _treeController.childrenKeyPath = @"childNodes";
-    _treeController.leafKeyPath = @"leaf";
-    [_treeController bind:@"contentArray" toObject:self withKeyPath:@"segments" options:nil];
+    self.treeController.objectClass = VLCLibrarySegment.class;
+    self.treeController.countKeyPath = @"childCount";
+    self.treeController.childrenKeyPath = @"childNodes";
+    self.treeController.leafKeyPath = @"leaf";
 
-    _outlineView.rowSizeStyle = NSTableViewRowSizeStyleMedium;
-    _outlineView.allowsMultipleSelection = NO;
-    _outlineView.allowsEmptySelection = NO;
-    _outlineView.allowsColumnSelection = NO;
-    _outlineView.allowsColumnReordering = NO;
+    self.outlineView.rowSizeStyle = NSTableViewRowSizeStyleMedium;
+    self.outlineView.allowsMultipleSelection = NO;
+    self.outlineView.allowsEmptySelection = NO;
+    self.outlineView.allowsColumnSelection = NO;
+    self.outlineView.allowsColumnReordering = NO;
 
-    [_outlineView bind:@"content"
-              toObject:_treeController
-           withKeyPath:@"arrangedObjects"
-               options:nil];
-
-    [_outlineView reloadData];
+    [self internalNodesChanged:nil];
 
     const NSEdgeInsets scrollViewInsets = self.outlineViewScrollView.contentInsets;
     _scrollViewInsets =
@@ -124,8 +118,13 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     const VLCLibrarySegmentType currentSegmentType = self.libraryWindow.librarySegmentType;
 
     self.ignoreSegmentSelectionChanges = YES;
-    
-    [self.treeController rearrangeObjects];
+
+    _segments = VLCLibrarySegment.librarySegments;
+    [self.treeController bind:@"contentArray" toObject:self withKeyPath:@"segments" options:nil];
+    [self.outlineView bind:@"content"
+                  toObject:self.treeController
+               withKeyPath:@"arrangedObjects"
+                   options:nil];
     [self.outlineView reloadData];
 
     NSTreeNode * const targetNode = [self nodeForSegmentType:currentSegmentType];
