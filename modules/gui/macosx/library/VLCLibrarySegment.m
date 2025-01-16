@@ -688,7 +688,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     self = [super initWithRepresentedObject:modelObject];
     if (self) {
         _segmentType = segmentValue;
-        [self updateSegmentTypeRepresentation];
     }
     return self;
 }
@@ -701,68 +700,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 - (NSInteger)childCount
 {
     return [self childNodes].count;
-}
-
-- (NSString *)displayStringForType:(VLCLibrarySegmentType)segmentType
-{
-    switch (segmentType) {
-        case VLCLibraryLowSentinelSegment:
-        case VLCLibraryHighSentinelSegment:
-            NSAssert(NO, @"Invalid segment value");
-    }
-    return nil;
-}
-
-- (NSImage *)oldIconImageForType:(VLCLibrarySegmentType)segmentType
-{
-    switch (segmentType) {
-        case VLCLibraryLowSentinelSegment:
-        case VLCLibraryHighSentinelSegment:
-            NSAssert(NO, @"Invalid segment value");
-            return nil;
-    }
-
-    return nil;
-}
-
-- (NSImage *)newIconImageForType:(VLCLibrarySegmentType)segmentType
-{
-    if (@available(macOS 11.0, *)) {
-        switch (segmentType) {
-        case VLCLibraryLowSentinelSegment:
-        case VLCLibraryHighSentinelSegment:
-            NSAssert(NO, @"Invalid segment value");
-            return nil;
-        }
-    }
-    return nil;
-}
-
-- (NSImage *)iconForType:(VLCLibrarySegmentType)segmentType
-{
-    NSImage *iconImage;
-    if (@available(macOS 11.0, *)) {
-        iconImage = [self newIconImageForType:segmentType];
-    } else {
-        iconImage = [self oldIconImageForType:segmentType];
-        iconImage.template = YES;
-    }
-
-    return iconImage;
-}
-
-- (void)updateSegmentTypeRepresentation
-{
-    NSString * const displayString = [self displayStringForType:_segmentType];
-    NSImage * const displayImage = [self iconForType:_segmentType];
-
-    if (displayString) {
-        self.internalDisplayString = displayString;
-    }
-
-    if (displayImage) {
-        self.internalDisplayImage = displayImage;
-    }
 }
 
 + (nullable Class)libraryViewControllerClassForSegmentType:(VLCLibrarySegmentType)segmentType
