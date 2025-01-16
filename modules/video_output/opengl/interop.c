@@ -127,6 +127,7 @@ static int GetTexFormatSize(struct vlc_gl_interop *interop, GLenum target,
             tex_param_size = GL_TEXTURE_RED_SIZE;
             break;
         case GL_LUMINANCE:
+        case GL_LUMINANCE_ALPHA:
             tex_param_size = GL_TEXTURE_LUMINANCE_SIZE;
             break;
         default:
