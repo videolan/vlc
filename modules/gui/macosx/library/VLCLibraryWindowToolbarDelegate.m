@@ -162,7 +162,7 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
             [self setLibrarySearchToolbarItemVisible:NO];
             [self setViewModeToolbarItemVisible:NO];
             break;
-        case VLCLibraryVideoSegment:
+        case VLCLibraryVideoSegmentType:
         case VLCLibraryShowsVideoSubSegment:
         case VLCLibraryMusicSegmentType:
         case VLCLibraryArtistsMusicSubSegment:

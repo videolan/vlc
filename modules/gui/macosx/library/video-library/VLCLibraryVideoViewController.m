@@ -252,7 +252,7 @@
 - (id<VLCLibraryDataSource>)currentDataSource
 {
     const NSInteger librarySegmentType = self.libraryWindow.librarySegmentType;
-    if (librarySegmentType == VLCLibraryVideoSegment) {
+    if (librarySegmentType == VLCLibraryVideoSegmentType) {
         return self.libraryVideoDataSource;
     } else if (librarySegmentType == VLCLibraryShowsVideoSubSegment) {
         return self.libraryShowsDataSource;
@@ -353,7 +353,7 @@
     const NSUInteger videoCount = model.numberOfVideoMedia;
     const NSUInteger showsCount = model.numberOfShows;
 
-    if (self.libraryWindow.librarySegmentType == VLCLibraryVideoSegment &&
+    if (self.libraryWindow.librarySegmentType == VLCLibraryVideoSegmentType &&
         ((videoCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
          (videoCount > 0 && ![self.libraryTargetView.subviews containsObject:_videoLibraryView])) &&
         self.libraryWindow.videoViewController.view.hidden) {
