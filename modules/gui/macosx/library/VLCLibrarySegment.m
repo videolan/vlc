@@ -75,6 +75,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @property NSImage *internalDisplayImage;
 @property (nullable) Class internalLibraryViewControllerClass;
 @property (nullable) NSArray<NSTreeNode *> *internalChildNodes;
+@property (nullable) VLCLibraryAbstractSegmentViewController *(^internalLibraryViewControllerCreator)(void);
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
@@ -118,6 +119,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryHomeViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -143,6 +147,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -168,6 +175,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryVideoViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryVideoViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
         self.internalChildNodes = @[[[VLCLibraryVideoShowsSubSegment alloc] init]];
     }
     return self;
@@ -194,6 +204,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -219,6 +232,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -244,6 +260,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -269,6 +288,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -294,6 +316,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
         self.internalChildNodes = @[
             [[VLCLibraryMusicArtistSubSegment alloc] init],
             [[VLCLibraryMusicAlbumSubSegment alloc] init],
@@ -325,6 +350,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -350,6 +378,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -375,6 +406,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
         self.internalChildNodes = @[
             [[VLCLibraryPlaylistMusicPlaylistSubSegment alloc] init],
             [[VLCLibraryPlaylistVideoPlaylistSubSegment alloc] init]
@@ -407,6 +441,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -432,6 +469,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
 
         VLCLibraryModel * const libraryModel =
             VLCMain.sharedInstance.libraryController.libraryModel;
@@ -477,6 +517,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
@@ -502,6 +545,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryMediaSourceViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
 
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
         NSArray<NSString *> *bookmarkedLocations =
@@ -552,6 +598,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             self.internalDisplayImage.template = YES;
         }
         self.internalLibraryViewControllerClass = VLCLibraryMediaSourceViewController.class;
+        self.internalLibraryViewControllerCreator = ^{
+            return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
+        };
     }
     return self;
 }
