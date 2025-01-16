@@ -780,4 +780,9 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     return self.internalLibraryViewControllerClass;
 }
 
+- (nullable VLCLibraryAbstractSegmentViewController *)newLibraryViewController
+{
+    return self.internalLibraryViewControllerCreator();
+}
+
 @end
