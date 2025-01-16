@@ -160,7 +160,7 @@ public:
         assert(m_settings);
 
         m_settings->sync();
-        assert(m_settings->contains(m_key));
+
         if (m_settings->value(m_key) == m_recoveryFileName)
         {
             m_settings->remove(m_key);
