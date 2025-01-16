@@ -252,8 +252,6 @@ export ACLOCAL_PATH=${VLC_ACLOCAL_PATH}
 # Tools #
 #########
 
-need_pkg = $(shell $(PKG_CONFIG) $(1) || echo 1)
-
 ifdef HAVE_CROSS_COMPILE
 # Use pkg-config cross-tool if it actually works
 ifeq ($(shell unset PKG_CONFIG_LIBDIR; $(HOST)-pkg-config --version 1>/dev/null 2>/dev/null || echo FAIL),)
@@ -262,12 +260,14 @@ else
 # Use the regular pkg-config and set some PKG_CONFIG_LIBDIR ourselves
 PKG_CONFIG_LIBDIR ?= /usr/$(HOST)/lib/pkgconfig:/usr/lib/$(HOST)/pkgconfig:/usr/share/pkgconfig
 export PKG_CONFIG_LIBDIR
-need_pkg = $(shell PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
+need_pkg = $(shell PKG_CONFIG_PATH=$(SYSTEM_PKG_CONFIG_PATH) PKG_CONFIG_LIBDIR=$(PKG_CONFIG_LIBDIR) $(PKG_CONFIG) $(1) || echo 1)
 endif
 endif # HAVE_CROSS_COMPILE
 
+need_pkg ?= $(shell PKG_CONFIG_PATH=$(SYSTEM_PKG_CONFIG_PATH) $(PKG_CONFIG) $(1) || echo 1)
 PKG_CONFIG ?= pkg-config
 
+SYSTEM_PKG_CONFIG_PATH := $(PKG_CONFIG_PATH)
 PKG_CONFIG_PATH := $(PREFIX)/lib/pkgconfig:$(PREFIX)/share/pkgconfig:$(PKG_CONFIG_PATH)
 export PKG_CONFIG_PATH
 
