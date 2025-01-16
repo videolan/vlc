@@ -138,10 +138,6 @@ VPX_CONF += --enable-vp8-decoder
 VPX_LDFLAGS := -L$(IOS_SDK)/usr/lib -isysroot $(IOS_SDK) $(LDFLAGS)
 ifeq ($(ARCH),aarch64)
 VPX_LDFLAGS += -arch arm64
-else
-ifndef HAVE_IOS
-VPX_LDFLAGS += -arch $(ARCH)
-endif
 endif
 endif
 
