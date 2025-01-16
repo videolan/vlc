@@ -81,6 +81,25 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryHeaderSegment : VLCLibrarySegment
+
+- (instancetype)initWithDisplayString:(NSString *)displayString;
+
+@end
+
+@implementation VLCLibraryHeaderSegment
+
+- (instancetype)initWithDisplayString:(NSString *)displayString{
+    self = [super initWithSegmentType:VLCLibraryHeaderSegmentType];
+    if (self) {
+        self.internalDisplayString = displayString;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryHomeSegment : VLCLibrarySegment
 @end
 
@@ -546,12 +565,12 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 {
     return @[
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHomeSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
+        [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Library")],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryExploreHeaderSegment],
+        [[VLCLibraryHeaderSegment alloc] initWithDisplayString:_NS("Explore")],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegmentType],
     ];
@@ -622,10 +641,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 - (NSString *)displayStringForType:(VLCLibrarySegmentType)segmentType
 {
     switch (segmentType) {
-        case VLCLibraryHeaderSegment:
-            return _NS("Library");
-        case VLCLibraryExploreHeaderSegment:
-            return _NS("Explore");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -636,10 +651,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 - (NSImage *)oldIconImageForType:(VLCLibrarySegmentType)segmentType
 {
     switch (segmentType) {
-        case VLCLibraryHeaderSegment:
-            return nil;
-        case VLCLibraryExploreHeaderSegment:
-            return nil;
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -653,12 +664,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 {
     if (@available(macOS 11.0, *)) {
         switch (segmentType) {
-        case VLCLibraryHeaderSegment:
-            return [NSImage imageWithSystemSymbolName:@"books.vertical.fill"
-                             accessibilityDescription:@"Library icon"];
-        case VLCLibraryExploreHeaderSegment:
-            return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
-                             accessibilityDescription:@"Explore icon"];
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -700,8 +705,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     switch (segmentType) {
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
-        case VLCLibraryHeaderSegment:
-        case VLCLibraryExploreHeaderSegment:
+        case VLCLibraryHeaderSegmentType:
             return nil;
         case VLCLibraryHomeSegmentType:
             return VLCLibraryHomeViewController.class;
@@ -732,8 +736,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
     switch (segmentType) {
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
-        case VLCLibraryHeaderSegment:
-        case VLCLibraryExploreHeaderSegment:
+        case VLCLibraryHeaderSegmentType:
             return nil;
         case VLCLibraryHomeSegmentType:
             return [[VLCLibraryHomeViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];

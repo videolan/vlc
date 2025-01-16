@@ -32,7 +32,7 @@ extern NSString * const VLCLibraryBookmarkedLocationsChanged;
 typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
     VLCLibraryLowSentinelSegment = -1,
     VLCLibraryHomeSegmentType,
-    VLCLibraryHeaderSegment,
+    VLCLibraryHeaderSegmentType,
     VLCLibraryVideoSegmentType,
     VLCLibraryShowsVideoSubSegmentType,
     VLCLibraryMusicSegmentType,
@@ -45,7 +45,6 @@ typedef NS_ENUM(NSInteger, VLCLibrarySegmentType) {
     VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType,
     VLCLibraryGroupsSegmentType,
     VLCLibraryGroupsGroupSubSegmentType,
-    VLCLibraryExploreHeaderSegment,
     VLCLibraryBrowseSegmentType,
     VLCLibraryBrowseBookmarkedLocationSubSegmentType,
     VLCLibraryStreamsSegmentType,
