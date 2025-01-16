@@ -578,22 +578,38 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 + (instancetype)segmentWithSegmentType:(VLCLibrarySegmentType)segmentType
 {
-    if (segmentType == VLCLibraryHomeSegmentType) {
-        return [[VLCLibraryHomeSegment alloc] init];
-    } else if (segmentType == VLCLibraryVideoSegmentType) {
-        return [[VLCLibraryVideoSegment alloc] init];
-    } else if (segmentType == VLCLibraryMusicSegmentType) {
-        return [[VLCLibraryMusicSegment alloc] init];
-    } else if (segmentType == VLCLibraryPlaylistsSegmentType) {
-        return [[VLCLibraryPlaylistSegment alloc] init];
-    } else if (segmentType == VLCLibraryGroupsSegmentType) {
-        return [[VLCLibraryGroupSegment alloc] init];
-    } else if (segmentType == VLCLibraryBrowseSegmentType) {
-        return [[VLCLibraryBrowseSegment alloc] init];
-    } else if (segmentType == VLCLibraryStreamsSegmentType) {
-        return [[VLCLibraryStreamsSegment alloc] init];
+    switch (segmentType) {
+        case VLCLibraryHomeSegmentType:
+            return [[VLCLibraryHomeSegment alloc] init];
+        case VLCLibraryVideoSegmentType:
+            return [[VLCLibraryVideoSegment alloc] init];
+        case VLCLibraryVideoShowsSubSegment:
+            return [[VLCLibraryVideoShowsSubSegment alloc] init];
+        case VLCLibraryMusicSegmentType:
+            return [[VLCLibraryMusicSegment alloc] init];
+        case VLCLibraryArtistsMusicSubSegmentType:
+            return [[VLCLibraryMusicArtistSubSegment alloc] init];
+        case VLCLibraryAlbumsMusicSubSegmentType:
+            return [[VLCLibraryMusicAlbumSubSegment alloc] init];
+        case VLCLibrarySongsMusicSubSegmentType:
+            return [[VLCLibraryMusicSongSubSegment alloc] init];
+        case VLCLibraryGenresMusicSubSegmentType:
+            return [[VLCLibraryMusicGenreSubSegment alloc] init];
+        case VLCLibraryPlaylistsSegmentType:
+            return [[VLCLibraryPlaylistSegment alloc] init];
+        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
+            return [[VLCLibraryPlaylistMusicPlaylistSubSegment alloc] init];
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
+            return [[VLCLibraryPlaylistVideoPlaylistSubSegment alloc] init];
+        case VLCLibraryGroupsSegmentType:
+            return [[VLCLibraryGroupSegment alloc] init];
+        case VLCLibraryBrowseSegmentType:
+            return [[VLCLibraryBrowseSegment alloc] init];
+        case VLCLibraryStreamsSegmentType:
+            return [[VLCLibraryStreamsSegment alloc] init];
+        default:
+            return nil;
     }
-    return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
 }
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType
