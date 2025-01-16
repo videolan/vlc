@@ -412,6 +412,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         case GL_R16:
             if (priv->has_texture_integer)
             {
+                msg_Dbg(interop->gl, "fallback to GL_R16UI");
                 *intfmt = GL_R16UI;
                 *fmt = GL_RED_INTEGER;
             }
@@ -420,9 +421,9 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
             if (vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, *fmt,
                                                 *intfmt, *type) != 16)
             {
-
                 /* XXX: Quality loss with 12 and 16bits since half float has
                  * 10bits of mantissa */
+                msg_Dbg(interop->gl, "fallback to GL_R16F");
                 *intfmt = GL_R16F;
                 *fmt = GL_RED;
                 *type = GL_HALF_FLOAT;
@@ -431,6 +432,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         case GL_RG16:
             if (priv->has_texture_integer)
             {
+                msg_Dbg(interop->gl, "fallback to GL_R1G6UI ?");
                 *intfmt = GL_RG16UI;
                 *fmt = GL_RED_INTEGER;
             }
@@ -445,10 +447,12 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
         switch (*intfmt) {
         case GL_R8:
+            msg_Dbg(interop->gl, "fallback to GL_GED");
             *intfmt = GL_RED;
             *fmt = GL_RED;
             break;
         case GL_RG8:
+            msg_Dbg(interop->gl, "fallback to GL_RG8");
             *intfmt = GL_RG;
             *fmt = GL_RG;
             break;
@@ -464,6 +468,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         //fallback to GL_LUMINANCE / GL_LUMINANCE_ALPHA
         switch (*intfmt) {
         case GL_R8:
+            msg_Dbg(interop->gl, "fallback to GL_LUMINANCE");
             *intfmt = GL_LUMINANCE;
             *fmt = GL_LUMINANCE;
             break;
@@ -471,10 +476,12 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
             if (gles2)
                 return false;
 
+            msg_Dbg(interop->gl, "fallback to GL_LUMINANCE16");
             *intfmt = GL_LUMINANCE16;
             *fmt = GL_LUMINANCE;
             break;
         case GL_RG8:
+            msg_Dbg(interop->gl, "fallback to GL_LUMINANCE_ALPHA");
             *intfmt = GL_LUMINANCE_ALPHA;
             *fmt = GL_LUMINANCE_ALPHA;
             break;
@@ -482,6 +489,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
             if (gles2)
                 return false;
 
+            msg_Dbg(interop->gl, "fallback to GL_LUMINANCE16_ALPHA16");
             *intfmt = GL_LUMINANCE16_ALPHA16;
             *fmt = GL_LUMINANCE_ALPHA;
             break;
