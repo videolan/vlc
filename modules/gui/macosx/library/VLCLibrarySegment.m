@@ -193,6 +193,34 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryGroupSubSegment : VLCLibrarySegment
+
+- (instancetype)initWithGroup:(VLCMediaLibraryGroup *)group;
+
+@end
+
+@implementation VLCLibraryGroupSubSegment
+
+- (instancetype)initWithGroup:(VLCMediaLibraryGroup *)group
+{
+    self = [super initWithRepresentedObject:group];
+    if (self) {
+        self.internalDisplayString = group.displayString;
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"play.rectangle"
+                                                  accessibilityDescription:@"Group icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"NSTouchBarTagIcon"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryGroupSegment : VLCLibrarySegment
 @end
 
@@ -222,7 +250,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
                 [NSMutableArray arrayWithCapacity:groupCount];
 
             for (VLCMediaLibraryGroup * const group in groups) {
-                [groupNodes addObject:[VLCLibrarySegment treeNodeWithRepresentedObject:group]];
+                [groupNodes addObject:[[VLCLibraryGroupSubSegment alloc] initWithGroup:group]];
             }
 
             self.internalChildNodes = groupNodes.copy;
@@ -392,7 +420,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             (VLCLibrarySegmentBookmarkedLocation *)modelObject;
         segmentValue = descriptor.segmentType;
     } else if ([modelObject isKindOfClass:VLCMediaLibraryGroup.class]) {
-        segmentValue = VLCLibraryGroupsGroupSubSegment;
+        segmentValue = VLCLibraryGroupsGroupSubSegmentType;
     }
 
     NSAssert(segmentValue > VLCLibraryLowSentinelSegment &&
@@ -436,8 +464,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return _NS("Music playlists");
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return _NS("Video playlists");
-        case VLCLibraryGroupsGroupSubSegment:
-            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryExploreHeaderSegment:
             return _NS("Explore");
         case VLCLibraryLowSentinelSegment:
@@ -463,8 +489,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
-        case VLCLibraryGroupsGroupSubSegment:
-            return [NSImage imageNamed:@"NSTouchBarTagIcon"];
         case VLCLibraryExploreHeaderSegment:
             return nil;
         case VLCLibraryLowSentinelSegment:
@@ -504,9 +528,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [NSImage imageWithSystemSymbolName:@"list.and.film"
                              accessibilityDescription:@"Video playlists icon"];
-        case VLCLibraryGroupsGroupSubSegment:
-            return [NSImage imageWithSystemSymbolName:@"play.rectangle"
-                             accessibilityDescription:@"Group icon"];
         case VLCLibraryExploreHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
                              accessibilityDescription:@"Explore icon"];
@@ -566,7 +587,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return VLCLibraryPlaylistViewController.class;
         case VLCLibraryGroupsSegmentType:
-        case VLCLibraryGroupsGroupSubSegment:
+        case VLCLibraryGroupsGroupSubSegmentType:
             return VLCLibraryGroupsViewController.class;
         case VLCLibraryBrowseSegmentType:
         case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
@@ -599,7 +620,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryGroupsSegmentType:
-        case VLCLibraryGroupsGroupSubSegment:
+        case VLCLibraryGroupsGroupSubSegmentType:
             return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryBrowseSegmentType:
         case VLCLibraryBrowseBookmarkedLocationSubSegmentType:

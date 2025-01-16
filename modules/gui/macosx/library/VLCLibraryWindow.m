@@ -262,7 +262,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         _currentSelectedViewModeSegment = preferences.streamLibraryViewMode;
         break;
     case VLCLibraryGroupsSegmentType:
-    case VLCLibraryGroupsGroupSubSegment:
+    case VLCLibraryGroupsGroupSubSegmentType:
         _currentSelectedViewModeSegment = preferences.groupsLibraryViewMode;
         break;
     default:
@@ -313,7 +313,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showMediaSourceLibrary];
         break;
     case VLCLibraryGroupsSegmentType:
-    case VLCLibraryGroupsGroupSubSegment:
+    case VLCLibraryGroupsGroupSubSegmentType:
         [self showGroupsLibrary];
     default:
         break;
@@ -383,7 +383,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryGroupsSegmentType:
-    case VLCLibraryGroupsGroupSubSegment:
+    case VLCLibraryGroupsGroupSubSegmentType:
         preferences.groupsLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     default:
