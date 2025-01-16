@@ -554,7 +554,8 @@ endif
 
 libshine_plugin_la_SOURCES = codec/shine.c
 libshine_plugin_la_CFLAGS = $(AM_CFLAGS) $(SHINE_CFLAGS)
-libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)' $(SHINE_LIBS)
+libshine_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
+libshine_plugin_la_LIBADD = $(SHINE_LIBS)
 EXTRA_LTLIBRARIES += libshine_plugin.la
 if ENABLE_SOUT
 codec_LTLIBRARIES += $(LTLIBshine)
