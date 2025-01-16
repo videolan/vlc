@@ -393,14 +393,9 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
     }
     assert(gl3 || gl2 || gles3 || gles2);
 
-    //GLES 3.0, OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
-    //don't need transformations
-    if (gl3 || gles3 || (gl2 && priv->has_texture_rg))
-        goto check_tex_alloc;
-
-    //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
-    if (priv->has_texture_rg)
+    if (gles2 && priv->has_texture_rg)
     {
+        //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
         switch (*intfmt) {
         case GL_R8:
             *intfmt = GL_RED;
@@ -416,39 +411,45 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         default:
             vlc_assert_unreachable();
         }
+    }
+    else if (gles2 || (gl2 && !priv->has_texture_rg))
+    {
+        //fallback to GL_LUMINANCE / GL_LUMINANCE_ALPHA
+        switch (*intfmt) {
+        case GL_R8:
+            *intfmt = GL_LUMINANCE;
+            *fmt = GL_LUMINANCE;
+            break;
+        case GL_R16:
+            if (gles2)
+                return false;
 
-        goto check_tex_alloc;
+            *intfmt = GL_LUMINANCE16;
+            *fmt = GL_LUMINANCE;
+            break;
+        case GL_RG8:
+            *intfmt = GL_LUMINANCE_ALPHA;
+            *fmt = GL_LUMINANCE_ALPHA;
+            break;
+        case GL_RG16:
+            if (gles2)
+                return false;
+
+            *intfmt = GL_LUMINANCE16_ALPHA16;
+            *fmt = GL_LUMINANCE_ALPHA;
+            break;
+        default:
+            vlc_assert_unreachable();
+        }
+    }
+    else
+    {
+        //GLES 3.0, OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
+        //don't need transformations
+        assert(gl3 || gles3 || (gl2 && priv->has_texture_rg));
+
     }
 
-    //fallback to GL_LUMINANCE / GL_LUMINANCE_ALPHA
-    switch (*intfmt) {
-    case GL_R8:
-        *intfmt = GL_LUMINANCE;
-        *fmt = GL_LUMINANCE;
-        break;
-    case GL_R16:
-        if (gles2)
-            return false;
-
-        *intfmt = GL_LUMINANCE16;
-        *fmt = GL_LUMINANCE;
-        break;
-    case GL_RG8:
-        *intfmt = GL_LUMINANCE_ALPHA;
-        *fmt = GL_LUMINANCE_ALPHA;
-        break;
-    case GL_RG16:
-        if (gles2)
-            return false;
-
-        *intfmt = GL_LUMINANCE16_ALPHA16;
-        *fmt = GL_LUMINANCE_ALPHA;
-        break;
-    default:
-        vlc_assert_unreachable();
-    }
-
-check_tex_alloc:
     if (pixel_size == 2
      && vlc_gl_interop_GetTexFormatSize(interop, GL_TEXTURE_2D, *fmt,
                                         *intfmt, *type) != 16)
