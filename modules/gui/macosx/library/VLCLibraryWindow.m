@@ -280,45 +280,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (![self.librarySegmentViewController isKindOfClass:segment.libraryViewControllerClass]) {
         _librarySegmentViewController = [segment newLibraryViewController];
     }
-
-    switch (segmentType) {
-    case VLCLibraryHomeSegmentType:
-        [self showHomeLibrary];
-        break;
-    case VLCLibraryVideoSegmentType:
-        [self showVideoLibrary];
-        break;
-    case VLCLibraryShowsVideoSubSegmentType:
-        [self showShowLibrary];
-        break;
-    case VLCLibraryMusicSegmentType:
-    case VLCLibraryArtistsMusicSubSegmentType:
-    case VLCLibraryAlbumsMusicSubSegmentType:
-    case VLCLibrarySongsMusicSubSegmentType:
-    case VLCLibraryGenresMusicSubSegmentType:
-        [self showAudioLibrary];
-        break;
-    case VLCLibraryPlaylistsSegmentType:
-        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_ALL];
-        break;
-    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
-        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_AUDIO_ONLY];
-        break;
-    case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
-        [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY];
-        break;
-    case VLCLibraryBrowseSegmentType:
-    case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
-    case VLCLibraryStreamsSegmentType:
-        [self showMediaSourceLibrary];
-        break;
-    case VLCLibraryGroupsSegmentType:
-    case VLCLibraryGroupsGroupSubSegmentType:
-        [self showGroupsLibrary];
-    default:
-        break;
-    }
-
+    [segment presentLibraryViewUsingController:self.librarySegmentViewController];
     [self invalidateRestorableState];
 }
 
@@ -391,48 +353,6 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     [self setViewForSelectedSegment];
-}
-
-- (void)showHomeLibrary
-{
-    [(VLCLibraryHomeViewController *)self.librarySegmentViewController presentHomeView];
-}
-
-- (void)showVideoLibrary
-{
-    [(VLCLibraryVideoViewController *)self.librarySegmentViewController presentVideoView];
-}
-
-- (void)showShowLibrary
-{
-    [(VLCLibraryVideoViewController *)self.librarySegmentViewController presentShowsView];
-}
-
-- (void)showAudioLibrary
-{
-    [(VLCLibraryAudioViewController *)self.librarySegmentViewController presentAudioView];
-}
-
-- (void)showPlaylistLibrary:(enum vlc_ml_playlist_type_t)playlistType
-{
-    [(VLCLibraryPlaylistViewController *)self.librarySegmentViewController presentPlaylistsViewForPlaylistType:playlistType];
-}
-
-- (void)showMediaSourceLibrary
-{
-    [((VLCLibraryMediaSourceViewController *)self.librarySegmentViewController).navigationStack clear];
-
-    const VLCLibrarySegmentType segmentType = self.librarySegmentType;
-    if (segmentType == VLCLibraryBrowseSegmentType) {
-        [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentBrowseView];
-    } else if (segmentType == VLCLibraryStreamsSegmentType) {
-        [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentStreamsView];
-    }
-}
-
-- (void)showGroupsLibrary
-{
-    [(VLCLibraryGroupsViewController *)self.librarySegmentViewController presentGroupsView];
 }
 
 - (void)displayLibraryView:(NSView *)view
