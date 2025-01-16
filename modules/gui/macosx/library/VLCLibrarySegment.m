@@ -632,7 +632,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [[VLCLibraryHomeSegment alloc] init];
         case VLCLibraryVideoSegmentType:
             return [[VLCLibraryVideoSegment alloc] init];
-        case VLCLibraryVideoShowsSubSegment:
+        case VLCLibraryShowsVideoSubSegmentType:
             return [[VLCLibraryVideoShowsSubSegment alloc] init];
         case VLCLibraryMusicSegmentType:
             return [[VLCLibraryMusicSegment alloc] init];
