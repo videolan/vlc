@@ -108,7 +108,9 @@ VPX_CONF := \
 	--disable-install-docs \
 	--disable-dependency-tracking \
 	--enable-vp9-highbitdepth \
-	--disable-tools
+	--disable-tools \
+	--target=$(VPX_TARGET) \
+	--prefix=$(PREFIX)
 
 ifneq ($(filter arm aarch64, $(ARCH)),)
 # Only enable runtime cpu detect on architectures other than arm/aarch64
@@ -175,8 +177,7 @@ VPX_CONF += --extra-cflags="$(VPX_CFLAGS)"
 .vpx: libvpx
 	rm -rf $(PREFIX)/include/vpx
 	$(MAKEBUILDDIR)
-	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure --target=$(VPX_TARGET) \
-		$(VPX_CONF) --prefix=$(PREFIX)
+	cd $(BUILD_DIR) && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) $(VPX_HOSTVARS) $(BUILD_SRC)/configure $(VPX_CONF)
 	+CONFIG_DEBUG=1 $(MAKEBUILD)
 	$(call pkg_static,"_build/vpx.pc")
 	+CONFIG_DEBUG=1 $(MAKEBUILD) install
