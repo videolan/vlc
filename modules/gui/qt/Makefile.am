@@ -1397,10 +1397,12 @@ QSB_PARAMS_VERBOSE_ = $(QSB_PARAMS_VERBOSE__$(AM_DEFAULT_VERBOSITY))
 QSB_PARAMS_VERBOSE_0 = -s
 QSB_PARAMS_VERBOSE__0 = $(QSB_PARAMS_VERBOSE_0)
 
-%.frag.qsb: %.frag
+EXTRA_DIST += shaders/Common.glsl
+
+%.frag.qsb: %.frag shaders/Common.glsl
 	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
 
-%.vert.qsb: %.vert
+%.vert.qsb: %.vert shaders/Common.glsl
 	$(qsb_verbose)PATH="$(QSB_EXTRA_PATH)$$PATH" $(QSB) $(QSB_PARAMS) $(QSB_PARAMS_VERBOSE) -o $@ $<
 
 shaders/shaders.cpp: $(srcdir)/shaders/shaders.qrc $(libqt_plugin_la_SHADER:.frag=.frag.qsb) $(libqt_plugin_la_SHADER:.vert=.vert.qsb)

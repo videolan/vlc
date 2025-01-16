@@ -18,6 +18,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#extension GL_GOOGLE_include_directive : enable
+
+#include "Common.glsl"
+
 layout(location = 0) in vec2 qt_TexCoord0;
 
 layout(location = 0) out vec4 fragColor;
@@ -27,10 +31,6 @@ layout(std140, binding = 0) uniform buf {
   float qt_Opacity;
   float strength;
 };
-
-float rand(vec2 co){
-    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
-}
 
 void main() {
    float r = rand(qt_TexCoord0) - 0.5;

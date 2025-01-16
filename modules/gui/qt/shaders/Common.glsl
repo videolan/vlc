@@ -1,4 +1,3 @@
-#version 440
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
  *
@@ -57,29 +56,50 @@
 **
 ****************************************************************************/
 
-#extension GL_GOOGLE_include_directive : enable
+//blending formulas are taken from Qt's Blend.qml implementation
 
-#include "Common.glsl"
-
-layout(location = 0) in vec2 qt_TexCoord0;
-layout(location = 0) out vec4 fragColor;
-layout(std140, binding = 0) uniform buf {
-    mat4 qt_Matrix;
-    float qt_Opacity;
-    vec4 screenColor;
-    vec4 overlayColor;
-};
-layout(binding = 1) uniform sampler2D backgroundSource;
-
-void main() {
+vec4 fromPremult(vec4 color) {
     lowp vec4 result = vec4(0.0);
-    lowp vec4 colorP = fromPremult(texture(backgroundSource, qt_TexCoord0));
-    lowp vec4 screenColorP = fromPremult(screenColor);
-    lowp vec4 overlayColorP = fromPremult(overlayColor);
+    result.rgb = color.rgb / max(1.0/256.0, color.a);
+    result.a = color.a;
+    return result;
+}
 
-    result = screen(colorP, screenColorP);
-    result = multiply(result, screenColorP);
-    result = normal(result, overlayColorP);
+vec4 toPremult(vec4 color) {
+    lowp vec4 result = vec4(0.0);
+    result.rbg = color.rbg * color.a;
+    result.a = color.a;
+    return result;
+}
 
-    fragColor = vec4(result.rgb, 1.0) * qt_Opacity;
+vec4 screen(vec4 color1, vec4 color2) {
+    vec4 result = vec4(0.0);
+    float a = max(color1.a, color1.a * color2.a);
+
+    result.rgb = 1.0 - (vec3(1.0) - color1.rgb) * (vec3(1.0) - color2.rgb);
+
+    result.rgb = mix(color1.rgb, result.rgb, color2.a);
+    result.a = max(color1.a, color1.a * color2.a);
+    return result;
+}
+
+vec4 multiply(vec4 color1, vec4 color2) {
+    vec4 result = vec4(0.0);
+
+    result.rgb = color1.rgb * color2.rgb;
+
+    result.rgb = mix(color1.rgb, result.rgb, color2.a);
+    result.a = max(color1.a, color1.a * color2.a);
+    return result;
+}
+
+vec4 normal(vec4 color1, vec4 color2) {
+    vec4 result = vec4(0.0);
+    result.rgb = mix(color1.rgb, color2.rgb, color2.a);
+    result.a = max(color1.a, color2.a);
+    return result;
+}
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
