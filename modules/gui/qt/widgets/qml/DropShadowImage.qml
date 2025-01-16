@@ -20,7 +20,9 @@ import QtQuick
 
 import VLC.Util
 
-ScaledImage {
+Item {
+    implicitWidth: image.implicitWidth
+    implicitHeight: image.implicitHeight
 
     property Item sourceItem: null
 
@@ -38,33 +40,71 @@ ScaledImage {
     property real xRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
     property real yRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
 
+    property alias sourceSize: image.sourceSize
+    property alias cache: image.cache
+    property alias asynchronous: image.asynchronous
+    property alias fillMode: image.fillMode
+
     sourceSize: Qt.size(viewportWidth, viewportHeight)
 
-    cache: true
-    asynchronous: true
+    Image {
+        id: image
 
-    fillMode: Image.Stretch
+        cache: true
+        asynchronous: true
 
-    onSourceSizeChanged: {
-        // Do not load the image when size is not valid:
-        if (sourceSize.width > 0 && sourceSize.height > 0)
-            source = Qt.binding(function() {
-                return Effects.url((xRadius > 0 || yRadius > 0) ? Effects.RoundedRectDropShadow
-                                                                : Effects.RectDropShadow,
-                                   {
-                                    "viewportWidth" : viewportWidth,
-                                    "viewportHeight" :viewportHeight,
+        visible: !visualDelegate.readyForVisibility
 
-                                    "blurRadius": blurRadius,
-                                    "color": color,
-                                    "rectWidth": rectWidth,
-                                    "rectHeight": rectHeight,
-                                    "xOffset": xOffset,
-                                    "yOffset": yOffset,
-                                    "xRadius": xRadius,
-                                    "yRadius": yRadius})
-            })
-        else
-            source = ""
+        fillMode: Image.Stretch
+
+        onSourceSizeChanged: {
+            // Do not load the image when size is not valid:
+            if (sourceSize.width > 0 && sourceSize.height > 0)
+                source = Qt.binding(function() {
+                    return Effects.url((xRadius > 0 || yRadius > 0) ? Effects.RoundedRectDropShadow
+                                                                    : Effects.RectDropShadow,
+                                       {
+                                        "viewportWidth" : viewportWidth,
+                                        "viewportHeight" :viewportHeight,
+
+                                        "blurRadius": blurRadius,
+                                        "color": color,
+                                        "rectWidth": rectWidth,
+                                        "rectHeight": rectHeight,
+                                        "xOffset": xOffset,
+                                        "yOffset": yOffset,
+                                        "xRadius": xRadius,
+                                        "yRadius": yRadius
+                                       })
+                })
+            else
+                source = ""
+        }
+    }
+
+    ShaderEffect {
+        id: visualDelegate
+
+        anchors.centerIn: parent
+        anchors.alignWhenCentered: true
+
+        implicitWidth: image.implicitWidth
+        implicitHeight: image.implicitHeight
+
+        width: image.paintedWidth
+        height: image.paintedHeight
+
+        visible: readyForVisibility
+
+        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+
+        supportsAtlasTextures: true
+        blending: true
+        // cullMode: ShaderEffect.BackFaceCulling
+
+        readonly property Image source: image
+
+        // TODO: Dithered texture is not necessary if theme is not dark.
+        fragmentShader: "qrc:///shaders/DitheredTexture.frag.qsb"
     }
 }
