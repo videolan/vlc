@@ -350,7 +350,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     switch (self.libraryWindow.librarySegmentType) {
         case VLCLibraryArtistsMusicSubSegment:
             return libraryWindowPrefs.artistLibraryViewMode;
-        case VLCLibraryGenresMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegmentType:
             return libraryWindowPrefs.genreLibraryViewMode;
         case VLCLibrarySongsMusicSubSegment:
             return libraryWindowPrefs.songsLibraryViewMode;
@@ -371,7 +371,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
             return VLCAudioLibraryAlbumsSegment;
         case VLCLibrarySongsMusicSubSegment:
             return VLCAudioLibrarySongsSegment;
-        case VLCLibraryGenresMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegmentType:
             return VLCAudioLibraryGenresSegment;
         default:
             NSAssert(false, @"Non-audio or unknown library subsegment received");
@@ -498,7 +498,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryArtist.class]) {
         segmentType = VLCLibraryArtistsMusicSubSegment;
     } else if ([libraryItem isKindOfClass:VLCMediaLibraryGenre.class]) {
-        segmentType = VLCLibraryGenresMusicSubSegment;
+        segmentType = VLCLibraryGenresMusicSubSegmentType;
     } else {
         segmentType = VLCLibrarySongsMusicSubSegment;
     }
@@ -522,7 +522,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
          self.libraryWindow.librarySegmentType == VLCLibrarySongsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryArtistsMusicSubSegment ||
          self.libraryWindow.librarySegmentType == VLCLibraryAlbumsMusicSubSegment ||
-         self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegment) &&
+         self.libraryWindow.librarySegmentType == VLCLibraryGenresMusicSubSegmentType) &&
         ((audioCount == 0 && ![self.libraryTargetView.subviews containsObject:self.emptyLibraryView]) ||
          (audioCount > 0 && ![self.libraryTargetView.subviews containsObject:_audioLibraryView])) &&
         self.libraryWindow.videoViewController.view.hidden) {

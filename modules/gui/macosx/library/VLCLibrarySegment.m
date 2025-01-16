@@ -133,6 +133,31 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryMusicGenreSubSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryMusicGenreSubSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryGenresMusicSubSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Genres");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"guitars"
+                                                  accessibilityDescription:@"Music genres icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"sidebar-music"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryAudioViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryMusicSegment : VLCLibrarySegment
 @end
 
@@ -155,7 +180,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryArtistsMusicSubSegment],
             [VLCLibrarySegment segmentWithSegmentType:VLCLibraryAlbumsMusicSubSegment],
             [VLCLibrarySegment segmentWithSegmentType:VLCLibrarySongsMusicSubSegment],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGenresMusicSubSegment],
+            [[VLCLibraryMusicGenreSubSegment alloc] init],
         ];
     }
     return self;
@@ -506,8 +531,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return _NS("Albums");
         case VLCLibrarySongsMusicSubSegment:
             return _NS("Songs");
-        case VLCLibraryGenresMusicSubSegment:
-            return _NS("Genres");
         case VLCLibraryShowsVideoSubSegment:
             return _NS("Shows");
         case VLCLibraryExploreHeaderSegment:
@@ -527,7 +550,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
-        case VLCLibraryGenresMusicSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
@@ -558,9 +580,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibrarySongsMusicSubSegment:
             return [NSImage imageWithSystemSymbolName:@"music.note"
                              accessibilityDescription:@"Music songs icon"];
-        case VLCLibraryGenresMusicSubSegment:
-                return [NSImage imageWithSystemSymbolName:@"guitars"
-                                 accessibilityDescription:@"Music genres icon"];
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageWithSystemSymbolName:@"tv"
                              accessibilityDescription:@"Shows icon"];
@@ -619,7 +638,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
-        case VLCLibraryGenresMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegmentType:
             return VLCLibraryAudioViewController.class;
         case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
@@ -652,7 +671,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryArtistsMusicSubSegment:
         case VLCLibraryAlbumsMusicSubSegment:
         case VLCLibrarySongsMusicSubSegment:
-        case VLCLibraryGenresMusicSubSegment:
+        case VLCLibraryGenresMusicSubSegmentType:
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
