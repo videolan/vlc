@@ -302,56 +302,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     }
 
     _currentSelectedViewModeSegment = _gridVsListSegmentedControl.selectedSegment;
-
-    VLCLibraryWindowPersistentPreferences * const preferences = VLCLibraryWindowPersistentPreferences.sharedInstance;
-
-    switch (_librarySegmentType) {
-    case VLCLibraryHomeSegmentType:
-        preferences.homeLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryVideoSegmentType:
-        preferences.videoLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryShowsVideoSubSegmentType:
-        preferences.showsLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryMusicSegmentType:
-    case VLCLibraryArtistsMusicSubSegmentType:
-        preferences.artistLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryGenresMusicSubSegmentType:
-        preferences.genreLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryAlbumsMusicSubSegmentType:
-        preferences.albumLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibrarySongsMusicSubSegmentType:
-        preferences.songsLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryPlaylistsSegmentType:
-        preferences.playlistLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
-        preferences.musicOnlyPlaylistLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
-        preferences.videoOnlyPlaylistLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryBrowseSegmentType:
-    case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
-        preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryStreamsSegmentType:
-        preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    case VLCLibraryGroupsSegmentType:
-    case VLCLibraryGroupsGroupSubSegmentType:
-        preferences.groupsLibraryViewMode = _currentSelectedViewModeSegment;
-        break;
-    default:
-        break;
-    }
-
+    [[VLCLibrarySegment segmentWithSegmentType:self.librarySegmentType] saveViewMode:_currentSelectedViewModeSegment];
     [self setViewForSelectedSegment];
 }
 
