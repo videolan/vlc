@@ -1,0 +1,32 @@
+From ca8306ea5c292f41057e124ab23760551753ef85 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Thu, 16 Jan 2025 13:11:54 +0100
+Subject: [PATCH] vp9 rc: fix sizeof of member in static function
+
+It generates a compilation in AppleClang 15.0.0.15000309:
+
+```
+../vp9/ratectrl_rtc.cc:29:67: error: invalid use of member 'cpi_' in static member function
+  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*cpi_)));
+                                                                  ^~~~
+```
+---
+ vp9/ratectrl_rtc.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/vp9/ratectrl_rtc.cc b/vp9/ratectrl_rtc.cc
+index b29e1ec23..43948fb7e 100644
+--- a/vp9/ratectrl_rtc.cc
++++ b/vp9/ratectrl_rtc.cc
+@@ -26,7 +26,7 @@ std::unique_ptr<VP9RateControlRTC> VP9RateControlRTC::Create(
+   std::unique_ptr<VP9RateControlRTC> rc_api(new (std::nothrow)
+                                                 VP9RateControlRTC());
+   if (!rc_api) return nullptr;
+-  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*cpi_)));
++  rc_api->cpi_ = static_cast<VP9_COMP *>(vpx_memalign(32, sizeof(*rc_api->cpi_)));
+   if (!rc_api->cpi_) return nullptr;
+   vp9_zero(*rc_api->cpi_);
+ 
+-- 
+2.45.0.windows.1
+

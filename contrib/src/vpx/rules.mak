@@ -31,6 +31,7 @@ endif
 	# Disable automatic addition of -fembed-bitcode for iOS
 	# as it is enabled through --extra-cflags if necessary.
 	$(APPLY) $(SRC)/vpx/libvpx-remove-bitcode.patch
+	$(APPLY) $(SRC)/vpx/0001-vp9-rc-fix-sizeof-of-member-in-static-function.patch
 	$(MOVE)
 
 DEPS_vpx =
