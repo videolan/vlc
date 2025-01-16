@@ -376,10 +376,26 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
     if (*intfmt == 0)
         return true;
 
+    bool gles2, gles3, gl2, gl3;
+    if (priv->has_gl_3)
+    {
+        gl3 = interop->gl->api_type == VLC_OPENGL;
+        gl2 = false;
+        gles3 = interop->gl->api_type == VLC_OPENGL_ES2;
+        gles2 = false;
+    }
+    else
+    {
+        gl3 = false;
+        gl2 = interop->gl->api_type == VLC_OPENGL;
+        gles3 = false;
+        gles2 = interop->gl->api_type == VLC_OPENGL_ES2;
+    }
+    assert(gl3 || gl2 || gles3 || gles2);
+
     //GLES 3.0, OpenGL 3.0 and OpenGL with GL_ARB_texture_rg
     //don't need transformations
-    if (priv->has_gl_3
-        || (priv->has_texture_rg && interop->gl->api_type == VLC_OPENGL))
+    if (gl3 || gles3 || (gl2 && priv->has_texture_rg))
         goto check_tex_alloc;
 
     //for GLES2 GL_EXT_texture_rg we need to use GL_RED/GL_RG as internal format
@@ -411,7 +427,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         *fmt = GL_LUMINANCE;
         break;
     case GL_R16:
-        if (interop->gl->api_type == VLC_OPENGL_ES2)
+        if (gles2)
             return false;
 
         *intfmt = GL_LUMINANCE16;
@@ -422,7 +438,7 @@ static bool fixGLFormat(struct vlc_gl_interop *interop, unsigned pixel_size,
         *fmt = GL_LUMINANCE_ALPHA;
         break;
     case GL_RG16:
-        if (interop->gl->api_type == VLC_OPENGL_ES2)
+        if (gles2)
             return false;
 
         *intfmt = GL_LUMINANCE16_ALPHA16;
