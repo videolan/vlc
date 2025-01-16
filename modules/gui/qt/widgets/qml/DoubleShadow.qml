@@ -24,8 +24,9 @@ import VLC.Util
 
 // A convenience file to encapsulate two drop shadow images stacked on top
 // of each other
-ScaledImage {
-    id: root
+Item {
+    implicitWidth: image.implicitWidth
+    implicitHeight: image.implicitHeight
 
     property Item sourceItem: null
 
@@ -50,45 +51,84 @@ ScaledImage {
     property real secondaryHorizontalOffset: 0
     property real secondaryBlurRadius: 0
 
-    //by default we request
-    sourceSize: Qt.size(viewportWidth, viewportHeight)
-
-    cache: true
-    asynchronous: true
-
-    fillMode: Image.Stretch
-
-    visible: (width > 0 && height > 0)
+    property alias sourceSize: image.sourceSize
+    property alias cache: image.cache
+    property alias asynchronous: image.asynchronous
+    property alias fillMode: image.fillMode
 
     z: -1
 
-    onSourceSizeChanged: {
-        // Do not load the image when size is not valid:
-        if (sourceSize.width > 0 && sourceSize.height > 0)
-            source = Qt.binding(() => {
-                return Effects.url(
-                    Effects.DoubleRoundedRectDropShadow,
-                    {
-                        "viewportWidth" : viewportWidth,
-                        "viewportHeight" :viewportHeight,
+    visible: (width > 0 && height > 0)
 
-                        "rectWidth": rectWidth,
-                        "rectHeight": rectHeight,
-                        "xRadius": xRadius,
-                        "yRadius": yRadius,
+    //by default we request
+    sourceSize: Qt.size(viewportWidth, viewportHeight)
 
-                        "primaryColor": primaryColor,
-                        "primaryBlurRadius": primaryBlurRadius,
-                        "primaryXOffset": primaryHorizontalOffset,
-                        "primaryYOffset": primaryVerticalOffset,
+    ScaledImage {
+        id: image
 
-                        "secondaryColor": secondaryColor,
-                        "secondaryBlurRadius": secondaryBlurRadius,
-                        "secondaryXOffset": secondaryHorizontalOffset,
-                        "secondaryYOffset": secondaryVerticalOffset,
-                    })
-            })
-        else
-            source = ""
+        anchors.fill: parent
+
+        cache: true
+        asynchronous: true
+
+        visible: !visualDelegate.readyForVisibility
+
+        fillMode: Image.Stretch
+
+        onSourceSizeChanged: {
+            // Do not load the image when size is not valid:
+            if (sourceSize.width > 0 && sourceSize.height > 0)
+                source = Qt.binding(() => {
+                    return Effects.url(
+                        Effects.DoubleRoundedRectDropShadow,
+                        {
+                            "viewportWidth" : viewportWidth,
+                            "viewportHeight" :viewportHeight,
+
+                            "rectWidth": rectWidth,
+                            "rectHeight": rectHeight,
+                            "xRadius": xRadius,
+                            "yRadius": yRadius,
+
+                            "primaryColor": primaryColor,
+                            "primaryBlurRadius": primaryBlurRadius,
+                            "primaryXOffset": primaryHorizontalOffset,
+                            "primaryYOffset": primaryVerticalOffset,
+
+                            "secondaryColor": secondaryColor,
+                            "secondaryBlurRadius": secondaryBlurRadius,
+                            "secondaryXOffset": secondaryHorizontalOffset,
+                            "secondaryYOffset": secondaryVerticalOffset,
+                        })
+                })
+            else
+                source = ""
+        }
+    }
+
+    ShaderEffect {
+        id: visualDelegate
+
+        anchors.centerIn: parent
+        anchors.alignWhenCentered: true
+
+        implicitWidth: image.implicitWidth
+        implicitHeight: image.implicitHeight
+
+        width: image.paintedWidth
+        height: image.paintedHeight
+
+        visible: readyForVisibility
+
+        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+
+        supportsAtlasTextures: true
+        blending: true
+        // cullMode: ShaderEffect.BackFaceCulling
+
+        readonly property Image source: image
+
+        // TODO: Dithered texture is not necessary if theme is not dark.
+        fragmentShader: "qrc:///shaders/DitheredTexture.frag.qsb"
     }
 }
