@@ -189,6 +189,31 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryPlaylistVideoPlaylistSubSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryPlaylistVideoPlaylistSubSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Video playlists");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"list.and.film"
+                                                  accessibilityDescription:@"Video playlists icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"sidebar-movie"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryPlaylistSegment : VLCLibrarySegment
 @end
 
@@ -209,7 +234,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
         self.internalChildNodes = @[
             [[VLCLibraryPlaylistMusicPlaylistSubSegment alloc] init],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment]
+            [[VLCLibraryPlaylistVideoPlaylistSubSegment alloc] init]
         ];
     }
     return self;
@@ -485,8 +510,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return _NS("Genres");
         case VLCLibraryShowsVideoSubSegment:
             return _NS("Shows");
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
-            return _NS("Video playlists");
         case VLCLibraryExploreHeaderSegment:
             return _NS("Explore");
         case VLCLibraryLowSentinelSegment:
@@ -507,8 +530,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryGenresMusicSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryShowsVideoSubSegment:
-            return [NSImage imageNamed:@"sidebar-movie"];
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
         case VLCLibraryExploreHeaderSegment:
             return nil;
@@ -543,9 +564,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageWithSystemSymbolName:@"tv"
                              accessibilityDescription:@"Shows icon"];
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
-            return [NSImage imageWithSystemSymbolName:@"list.and.film"
-                             accessibilityDescription:@"Video playlists icon"];
         case VLCLibraryExploreHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
                              accessibilityDescription:@"Explore icon"];
@@ -605,7 +623,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return VLCLibraryAudioViewController.class;
         case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
             return VLCLibraryPlaylistViewController.class;
         case VLCLibraryGroupsSegmentType:
         case VLCLibraryGroupsGroupSubSegmentType:
@@ -638,7 +656,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
+        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryGroupsSegmentType:
         case VLCLibraryGroupsGroupSubSegmentType:
