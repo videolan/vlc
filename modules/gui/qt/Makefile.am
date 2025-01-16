@@ -1343,7 +1343,8 @@ libqt_plugin_la_SHADER := shaders/FadingEdge.frag \
                           shaders/HollowRectangularGlow.frag \
                           shaders/RectangularGlow.frag \
                           shaders/SDFAARoundedTexture.frag \
-                          shaders/SDFAARoundedTexture_cropsupport.frag
+                          shaders/SDFAARoundedTexture_cropsupport.frag \
+                          shaders/DitheredTexture.frag
 if ENABLE_QT
 
 libqt_plugin_la_LIBADD += libqml_module_dialogs.a \

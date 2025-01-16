@@ -17,7 +17,8 @@ shader_sources = [
     'HollowRectangularGlow.frag',
     'RectangularGlow.frag',
     'SDFAARoundedTexture.frag',
-    'SDFAARoundedTexture_cropsupport.frag'
+    'SDFAARoundedTexture_cropsupport.frag',
+    'DitheredTexture.frag'
 ]
 
 shader_files = files(shader_sources)
