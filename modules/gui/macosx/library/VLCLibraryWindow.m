@@ -308,7 +308,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [self showPlaylistLibrary:VLC_ML_PLAYLIST_TYPE_VIDEO_ONLY];
         break;
     case VLCLibraryBrowseSegmentType:
-    case VLCLibraryBrowseBookmarkedLocationSubSegment:
+    case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
     case VLCLibraryStreamsSegmentType:
         [self showMediaSourceLibrary];
         break;
@@ -376,7 +376,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         preferences.videoOnlyPlaylistLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryBrowseSegmentType:
-    case VLCLibraryBrowseBookmarkedLocationSubSegment:
+    case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
         preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryStreamsSegmentType:

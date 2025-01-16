@@ -234,6 +234,35 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryBrowseBookmarkedLocationSubSegment : VLCLibrarySegment
+
+- (instancetype)initWithBookmarkedLocation:(VLCLibrarySegmentBookmarkedLocation *)descriptor;
+
+@end
+
+@implementation VLCLibraryBrowseBookmarkedLocationSubSegment
+
+- (instancetype)initWithBookmarkedLocation:(VLCLibrarySegmentBookmarkedLocation *)descriptor
+{
+    self = [super initWithRepresentedObject:descriptor];
+    if (self) {
+        self.internalDisplayString = descriptor.name;
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage =
+                [NSImage imageWithSystemSymbolName:@"folder"
+                          accessibilityDescription:@"Bookmarked location icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"NSFolder"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryGroupsViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @interface VLCLibraryBrowseSegment : VLCLibrarySegment
 @end
 
@@ -261,7 +290,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             [defaults setObject:bookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
         }
 
-        const VLCLibrarySegmentType segmentType = VLCLibraryBrowseBookmarkedLocationSubSegment;
+        const VLCLibrarySegmentType segmentType = VLCLibraryBrowseBookmarkedLocationSubSegmentType;
         NSMutableArray<NSTreeNode *> * const bookmarkedLocationNodes = NSMutableArray.array;
 
         for (NSString * const locationMrl in bookmarkedLocations) {
@@ -270,8 +299,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
                 [[VLCLibrarySegmentBookmarkedLocation alloc] initWithSegmentType:segmentType
                                                                             name:locationName
                                                                              mrl:locationMrl];
-            VLCLibrarySegment * const node =
-                [VLCLibrarySegment treeNodeWithRepresentedObject:descriptor];
+            VLCLibraryBrowseBookmarkedLocationSubSegment * const node =
+                [[VLCLibraryBrowseBookmarkedLocationSubSegment alloc] initWithBookmarkedLocation:descriptor];
             [bookmarkedLocationNodes addObject:node];
         }
 
@@ -411,8 +440,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryExploreHeaderSegment:
             return _NS("Explore");
-        case VLCLibraryBrowseBookmarkedLocationSubSegment:
-            NSAssert(NO, @"displayStringForType should not be called for this segment type");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -440,8 +467,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [NSImage imageNamed:@"NSTouchBarTagIcon"];
         case VLCLibraryExploreHeaderSegment:
             return nil;
-        case VLCLibraryBrowseBookmarkedLocationSubSegment:
-            return [NSImage imageNamed:@"NSFolder"];
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -485,9 +510,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryExploreHeaderSegment:
             return [NSImage imageWithSystemSymbolName:@"sailboat.fill"
                              accessibilityDescription:@"Explore icon"];
-        case VLCLibraryBrowseBookmarkedLocationSubSegment:
-            return [NSImage imageWithSystemSymbolName:@"folder"
-                             accessibilityDescription:@"Bookmarked location icon"];
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -512,11 +534,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 - (void)updateSegmentTypeRepresentation
 {
-    if ([self.representedObject isKindOfClass:VLCLibrarySegmentBookmarkedLocation.class]) {
-        VLCLibrarySegmentBookmarkedLocation * const descriptor =
-            (VLCLibrarySegmentBookmarkedLocation *)self.representedObject;
-        self.internalDisplayString = descriptor.name;
-    } else if ([self.representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
+    if ([self.representedObject isKindOfClass:VLCMediaLibraryGroup.class]) {
         VLCMediaLibraryGroup * const group = (VLCMediaLibraryGroup *)self.representedObject;
         self.internalDisplayString = group.displayString;
     } else {
@@ -551,7 +569,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryGroupsGroupSubSegment:
             return VLCLibraryGroupsViewController.class;
         case VLCLibraryBrowseSegmentType:
-        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+        case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
         case VLCLibraryStreamsSegmentType:
             return VLCLibraryMediaSourceViewController.class;
     }
@@ -584,7 +602,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryGroupsGroupSubSegment:
             return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryBrowseSegmentType:
-        case VLCLibraryBrowseBookmarkedLocationSubSegment:
+        case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
         case VLCLibraryStreamsSegmentType:
             return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     }
