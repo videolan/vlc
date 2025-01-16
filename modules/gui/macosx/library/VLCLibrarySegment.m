@@ -283,6 +283,32 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+@interface VLCLibraryStreamsSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryStreamsSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryStreamsSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Streams");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage =
+                [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
+                          accessibilityDescription:@"Streams icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"NSActionTemplate"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryMediaSourceViewController.class;
+    }
+    return self;
+}
+
+@end
+
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
@@ -296,7 +322,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryExploreHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryStreamsSegmentType],
     ];
 }
 
@@ -314,6 +340,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         return [[VLCLibraryGroupSegment alloc] init];
     } else if (segmentType == VLCLibraryBrowseSegmentType) {
         return [[VLCLibraryBrowseSegment alloc] init];
+    } else if (segmentType == VLCLibraryStreamsSegmentType) {
+        return [[VLCLibraryStreamsSegment alloc] init];
     }
     return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
 }
@@ -385,8 +413,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return _NS("Explore");
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             NSAssert(NO, @"displayStringForType should not be called for this segment type");
-        case VLCLibraryStreamsSegment:
-            return _NS("Streams");
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -416,8 +442,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return nil;
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageNamed:@"NSFolder"];
-        case VLCLibraryStreamsSegment:
-            return [NSImage imageNamed:@"NSActionTemplate"]; 
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -464,9 +488,6 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
             return [NSImage imageWithSystemSymbolName:@"folder"
                              accessibilityDescription:@"Bookmarked location icon"];
-        case VLCLibraryStreamsSegment:
-            return [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right"
-                             accessibilityDescription:@"Streams icon"];
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHighSentinelSegment:
             NSAssert(NO, @"Invalid segment value");
@@ -531,7 +552,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return VLCLibraryGroupsViewController.class;
         case VLCLibraryBrowseSegmentType:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
-        case VLCLibraryStreamsSegment:
+        case VLCLibraryStreamsSegmentType:
             return VLCLibraryMediaSourceViewController.class;
     }
 }
@@ -564,7 +585,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
             return [[VLCLibraryGroupsViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
         case VLCLibraryBrowseSegmentType:
         case VLCLibraryBrowseBookmarkedLocationSubSegment:
-        case VLCLibraryStreamsSegment:
+        case VLCLibraryStreamsSegmentType:
             return [[VLCLibraryMediaSourceViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
     }
 }

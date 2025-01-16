@@ -258,7 +258,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryBrowseSegmentType:
         _currentSelectedViewModeSegment = preferences.browseLibraryViewMode;
         break;
-    case VLCLibraryStreamsSegment:
+    case VLCLibraryStreamsSegmentType:
         _currentSelectedViewModeSegment = preferences.streamLibraryViewMode;
         break;
     case VLCLibraryGroupsSegmentType:
@@ -309,7 +309,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         break;
     case VLCLibraryBrowseSegmentType:
     case VLCLibraryBrowseBookmarkedLocationSubSegment:
-    case VLCLibraryStreamsSegment:
+    case VLCLibraryStreamsSegmentType:
         [self showMediaSourceLibrary];
         break;
     case VLCLibraryGroupsSegmentType:
@@ -379,7 +379,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     case VLCLibraryBrowseBookmarkedLocationSubSegment:
         preferences.browseLibraryViewMode = _currentSelectedViewModeSegment;
         break;
-    case VLCLibraryStreamsSegment:
+    case VLCLibraryStreamsSegmentType:
         preferences.streamLibraryViewMode = _currentSelectedViewModeSegment;
         break;
     case VLCLibraryGroupsSegmentType:
@@ -425,7 +425,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     const VLCLibrarySegmentType segmentType = self.librarySegmentType;
     if (segmentType == VLCLibraryBrowseSegmentType) {
         [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentBrowseView];
-    } else if (segmentType == VLCLibraryStreamsSegment) {
+    } else if (segmentType == VLCLibraryStreamsSegmentType) {
         [(VLCLibraryMediaSourceViewController *)self.librarySegmentViewController presentStreamsView];
     }
 }

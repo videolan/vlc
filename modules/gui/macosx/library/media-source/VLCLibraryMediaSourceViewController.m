@@ -173,7 +173,7 @@
 
 - (void)presentStreamsView
 {
-    [self presentMediaSourceView:VLCLibraryStreamsSegment];
+    [self presentMediaSourceView:VLCLibraryStreamsSegmentType];
 }
 
 - (void)presentMediaSourceView:(VLCLibrarySegmentType)viewSegment
