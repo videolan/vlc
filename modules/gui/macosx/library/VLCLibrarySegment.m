@@ -145,6 +145,35 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 @end
 
 
+@interface VLCLibraryPlaylistSegment : VLCLibrarySegment
+@end
+
+@implementation VLCLibraryPlaylistSegment
+
+- (instancetype)init
+{
+    self = [super initWithSegmentType:VLCLibraryPlaylistsSegmentType];
+    if (self) {
+        self.internalDisplayString = _NS("Playlists");
+        if (@available(macOS 11.0, *)) {
+            self.internalDisplayImage = [NSImage imageWithSystemSymbolName:@"list.triangle"
+                                                  accessibilityDescription:@"Playlists icon"];
+        } else {
+            self.internalDisplayImage = [NSImage imageNamed:@"NSListViewTemplate"];
+            self.internalDisplayImage.template = YES;
+        }
+        self.internalLibraryViewControllerClass = VLCLibraryPlaylistViewController.class;
+        self.internalChildNodes = @[
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment],
+            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment]
+        ];
+    }
+    return self;
+}
+
+@end
+
+
 @implementation VLCLibrarySegment
 
 + (NSArray<VLCLibrarySegment *> *)librarySegments
@@ -154,7 +183,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryVideoSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryMusicSegmentType],
-        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegment],
+        [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsSegmentType],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryGroupsSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryExploreHeaderSegment],
         [VLCLibrarySegment segmentWithSegmentType:VLCLibraryBrowseSegment],
@@ -170,6 +199,8 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         return [[VLCLibraryVideoSegment alloc] init];
     } else if (segmentType == VLCLibraryMusicSegmentType) {
         return [[VLCLibraryMusicSegment alloc] init];
+    } else if (segmentType == VLCLibraryPlaylistsSegmentType) {
+        return [[VLCLibraryPlaylistSegment alloc] init];
     }
     return [[VLCLibrarySegment alloc] initWithSegmentType:segmentType];
 }
@@ -208,12 +239,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
 
 - (NSArray<NSTreeNode *> *)childNodes
 {
-    if (self.segmentType == VLCLibraryPlaylistsSegment) {
-        return @[
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment],
-            [VLCLibrarySegment segmentWithSegmentType:VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment]
-        ];
-    } else if (self.segmentType == VLCLibraryBrowseSegment) {
+    if (self.segmentType == VLCLibraryBrowseSegment) {
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
         NSArray<NSString *> *bookmarkedLocations =
             [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
@@ -299,8 +325,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return _NS("Genres");
         case VLCLibraryShowsVideoSubSegment:
             return _NS("Shows");
-        case VLCLibraryPlaylistsSegment:
-            return _NS("Playlists");
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
             return _NS("Music playlists");
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
@@ -336,8 +360,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageNamed:@"sidebar-movie"];
-        case VLCLibraryPlaylistsSegment:
-            return [NSImage imageNamed:@"NSListViewTemplate"];
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
             return [NSImage imageNamed:@"sidebar-music"];
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
@@ -383,9 +405,6 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibraryShowsVideoSubSegment:
             return [NSImage imageWithSystemSymbolName:@"tv"
                              accessibilityDescription:@"Shows icon"];
-        case VLCLibraryPlaylistsSegment:
-            return [NSImage imageWithSystemSymbolName:@"list.triangle"
-                             accessibilityDescription:@"Playlists icon"];
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
             return [NSImage imageWithSystemSymbolName:@"music.note.list"
                              accessibilityDescription:@"Music playlists icon"];
@@ -465,7 +484,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibrarySongsMusicSubSegment:
         case VLCLibraryGenresMusicSubSegment:
             return VLCLibraryAudioViewController.class;
-        case VLCLibraryPlaylistsSegment:
+        case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return VLCLibraryPlaylistViewController.class;
@@ -498,7 +517,7 @@ NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLo
         case VLCLibrarySongsMusicSubSegment:
         case VLCLibraryGenresMusicSubSegment:
             return [[VLCLibraryAudioViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];
-        case VLCLibraryPlaylistsSegment:
+        case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegment:
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegment:
             return [[VLCLibraryPlaylistViewController alloc] initWithLibraryWindow:VLCMain.sharedInstance.libraryWindow];

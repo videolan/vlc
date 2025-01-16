@@ -300,7 +300,7 @@
     const vlc_ml_playlist_type_t playlistType = self.dataSource.playlistType;
     const size_t numberOfPlaylists = [model numberOfPlaylistsOfType:playlistType];
 
-    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegment &&
+    if (self.libraryWindow.librarySegmentType == VLCLibraryPlaylistsSegmentType &&
         ((numberOfPlaylists == 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:self.libraryWindow.emptyLibraryView]) ||
          (numberOfPlaylists > 0 && ![self.libraryWindow.libraryTargetView.subviews containsObject:_collectionViewScrollView])) &&
         self.libraryWindow.videoViewController.view.hidden) {
