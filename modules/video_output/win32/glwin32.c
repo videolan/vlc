@@ -85,7 +85,18 @@ static int SetViewpoint(vout_display_t *vd, const vlc_viewpoint_t *vp)
 static int Control(vout_display_t *vd, int query)
 {
     vout_display_sys_t *sys = vd->sys;
-    CommonControl(vd, &sys->area, query);
+    switch (query) {
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
+        CommonDisplaySizeChanged(&sys->area);
+        break;
+    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
+        sys->area.place_changed = true;
+        // fallthrough
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        CommonPlacePicture(vd, &sys->area);
+        break;
+    }
     return VLC_SUCCESS;
 }
 
