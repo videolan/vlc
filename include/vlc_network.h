@@ -292,6 +292,16 @@ static inline int vlc_setsockopt(int s, int level, int name,
 # endif
 #endif
 
+/* union of the various sockaddr structures often used together */
+typedef union {
+    struct sockaddr         sa;
+    struct sockaddr_storage ss;
+    struct sockaddr_in      sin;
+#ifdef AF_INET6
+    struct sockaddr_in6     sin6;
+#endif
+} vlc_sockaddr;
+
 VLC_API int vlc_getnameinfo( const struct sockaddr *, int, char *, int, int *, int );
 
 /**
