@@ -122,23 +122,23 @@ static int server_socket(unsigned *port)
     if (fd == -1)
         return -1;
 
-    struct sockaddr_in6 addr = {
-        .sin6_family = AF_INET6,
+    vlc_sockaddr addr = {
+        .sin6.sin6_family = AF_INET6,
 #ifdef HAVE_SA_LEN
-        .sin6_len = sizeof (addr),
+        .sin6.sin6_len = sizeof (addr),
 #endif
-        .sin6_addr = in6addr_loopback,
+        .sin6.sin6_addr = in6addr_loopback,
     };
-    socklen_t addrlen = sizeof (addr);
+    socklen_t addrlen = sizeof (addr.sin6);
 
-    if (bind(fd, (struct sockaddr *)&addr, addrlen)
-     || getsockname(fd, (struct sockaddr *)&addr, &addrlen))
+    if (bind(fd, &addr.sa, addrlen)
+     || getsockname(fd, &addr.sa, &addrlen))
     {
         vlc_close(fd);
         return -1;
     }
 
-    *port = ntohs(addr.sin6_port);
+    *port = ntohs(addr.sin6.sin6_port);
     return fd;
 }
 
