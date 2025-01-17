@@ -30,6 +30,7 @@
 #import "library/VLCLibrarySegmentBookmarkedLocation.h"
 #import "library/VLCLibraryWindow.h"
 #import "library/VLCLibraryWindowPersistentPreferences.h"
+#import "library/VLCLibraryWindowToolbarDelegate.h"
 
 #import "library/audio-library/VLCLibraryAudioViewController.h"
 
@@ -50,6 +51,14 @@
 NSString * const VLCLibraryBookmarkedLocationsKey = @"VLCLibraryBookmarkedLocations";
 NSString * const VLCLibraryBookmarkedLocationsChanged = @"VLCLibraryBookmarkedLocationsChanged";
 
+static const VLCLibraryWindowToolbarDisplayFlags standardLibraryViewToolbarDisplayFlags =
+    VLCLibraryWindowToolbarDisplayFlagSortOrderButton |
+    VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar |
+    VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton;
+
+static const VLCLibraryWindowToolbarDisplayFlags mediaSourceViewToolbarDisplayFlags =
+    VLCLibraryWindowToolbarDisplayFlagNavigationButtons |
+    VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton;
 
 NSArray<NSString *> *defaultBookmarkedLocations()
 {
@@ -80,6 +89,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @property (nullable) void (^internalLibraryViewPresenter)(VLCLibraryAbstractSegmentViewController *);
 @property (nullable) void (^internalSaveViewModePreference)(NSInteger);
 @property (nullable) NSInteger (^internalGetViewModePreference)(void);
+@property VLCLibraryWindowToolbarDisplayFlags internalToolbarDisplayFlags;
 
 - (instancetype)initWithSegmentType:(VLCLibrarySegmentType)segmentType;
 
@@ -172,6 +182,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.showsLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -209,6 +220,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.videoLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
         self.internalChildNodes = @[[[VLCLibraryVideoShowsSubSegment alloc] init]];
     }
     return self;
@@ -247,6 +259,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.artistLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -284,6 +297,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.albumLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -321,6 +335,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.songsLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -358,6 +373,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.genreLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -389,6 +405,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalLibraryViewPresenter = ^(VLCLibraryAbstractSegmentViewController * const controller) {
             [(VLCLibraryAudioViewController *)controller presentAudioView];
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
         self.internalChildNodes = @[
             [[VLCLibraryMusicArtistSubSegment alloc] init],
             [[VLCLibraryMusicAlbumSubSegment alloc] init],
@@ -432,6 +449,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.musicOnlyPlaylistLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -469,6 +487,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.videoOnlyPlaylistLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -506,6 +525,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.playlistLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
         self.internalChildNodes = @[
             [[VLCLibraryPlaylistMusicPlaylistSubSegment alloc] init],
             [[VLCLibraryPlaylistVideoPlaylistSubSegment alloc] init]
@@ -550,6 +570,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -587,6 +608,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = standardLibraryViewToolbarDisplayFlags;
 
         VLCLibraryModel * const libraryModel =
             VLCMain.sharedInstance.libraryController.libraryModel;
@@ -644,6 +666,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = mediaSourceViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -681,6 +704,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.browseLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = mediaSourceViewToolbarDisplayFlags;
 
         NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
         NSArray<NSString *> *bookmarkedLocations =
@@ -743,6 +767,7 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         self.internalGetViewModePreference = ^{
             return VLCLibraryWindowPersistentPreferences.sharedInstance.streamLibraryViewMode;
         };
+        self.internalToolbarDisplayFlags = mediaSourceViewToolbarDisplayFlags;
     }
     return self;
 }
@@ -877,6 +902,11 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 - (void)setViewMode:(NSInteger)viewMode
 {
     self.internalSaveViewModePreference(viewMode);
+}
+
+- (NSUInteger)toolbarDisplayFlags
+{
+    return self.internalToolbarDisplayFlags;
 }
 
 @end
