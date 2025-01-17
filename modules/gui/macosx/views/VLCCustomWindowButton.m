@@ -265,7 +265,7 @@
 
 @implementation VLCCustomEmptyLibraryBrowseButton
 
--(void)awakeFromNib
+- (void)awakeFromNib
 {
     self.wantsLayer = YES;
     self.layer.backgroundColor = NSColor.VLCAccentColor.CGColor;
@@ -273,19 +273,6 @@
     
     self.bezelStyle = NSBezelStyleRecessed;
     self.bordered = NO;
-    
-    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedTitle];
-    NSRange const titleRange = NSMakeRange(0, [title length]);
-    
-    // Normal
-    [title addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
-    [self setAttributedTitle:title];
-    
-    // Highlighted
-    [title removeAttribute:NSForegroundColorAttributeName range:titleRange];
-    [title addAttribute:NSForegroundColorAttributeName value:NSColor.VLClibraryLightTitleColor range:titleRange];
-    
-    [self setAttributedAlternateTitle:title];
         
     if ([self.cell isKindOfClass:[NSButtonCell class]]) {
         NSButtonCell *cell = (NSButtonCell *)self.cell;
@@ -299,6 +286,19 @@
         self.image.template = YES;
         self.imageHugsTitle = YES;
         self.contentTintColor = NSColor.whiteColor;
+    } else {
+        NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithAttributedString:self.attributedTitle];
+        NSRange const titleRange = NSMakeRange(0, [title length]);
+
+        // Normal
+        [title addAttribute:NSForegroundColorAttributeName value:[NSColor whiteColor] range:titleRange];
+        [self setAttributedTitle:title];
+
+        // Highlighted
+        [title removeAttribute:NSForegroundColorAttributeName range:titleRange];
+        [title addAttribute:NSForegroundColorAttributeName value:NSColor.VLClibraryLightTitleColor range:titleRange];
+
+        [self setAttributedAlternateTitle:title];
     }
 }
 
