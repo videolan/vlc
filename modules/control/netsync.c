@@ -202,11 +202,10 @@ static void *Master(void *handle)
             continue;
 
         /* We received something */
-        struct sockaddr_storage from;
-        socklen_t fromlen = sizeof (from);
+        vlc_sockaddr from;
+        socklen_t fromlen = sizeof (from.ss);
 
-        if (recvfrom(sys->fd, data, 8, 0,
-                     (struct sockaddr *)&from, &fromlen) < 8)
+        if (recvfrom(sys->fd, data, 8, 0, &from.sa, &fromlen) < 8)
             continue;
 
         vlc_tick_t master_system = GetPcrSystem(sys->input);
@@ -217,8 +216,7 @@ static void *Master(void *handle)
         data[1] = hton64(master_system);
 
         /* Reply to the sender */
-        sendto(sys->fd, data, 16, 0,
-               (struct sockaddr *)&from, fromlen);
+        sendto(sys->fd, data, 16, 0, &from.sa, fromlen);
 #if 0
         /* not sure we need the client information to sync,
            since we are the master anyway */
