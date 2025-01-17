@@ -118,21 +118,16 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
 
     if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
     {
-        union
-        {
-            struct sockaddr a;
-            struct sockaddr_in in;
-            struct sockaddr_in6 in6;
-        } dumb = {
+        vlc_sockaddr dumb = {
             { .sa_family = ptr->ai_addr->sa_family, },
         };
 
         static_assert (offsetof (struct sockaddr_in, sin_port) ==
                        offsetof (struct sockaddr_in6, sin6_port), "Mismatch");
         assert(ptr->ai_addrlen <= sizeof (dumb));
-        memcpy(&dumb.in6.sin6_port, ((unsigned char *)ptr->ai_addr)
+        memcpy(&dumb.sin6.sin6_port, ((unsigned char *)ptr->ai_addr)
                                + offsetof (struct sockaddr_in, sin_port), 2);
-        bind(fd, &dumb.a, ptr->ai_addrlen);
+        bind(fd, &dumb.sa, ptr->ai_addrlen);
     }
     else
 #endif
