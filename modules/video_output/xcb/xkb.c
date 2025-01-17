@@ -35,10 +35,14 @@
 
 static int keysymcmp (const void *pa, const void *pb)
 {
-    int a = *(const uint32_t *)pa;
-    int b = *(const uint32_t *)pb;
+    const uint32_t *a = pa;
+    const uint32_t *b = pb;
 
-    return a - b;
+    if (*a == *b)
+        return 0;
+    if (*a > *b)
+        return 1;
+    return -1;
 }
 
 static uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
