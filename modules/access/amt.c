@@ -293,19 +293,10 @@ typedef struct _access_sys_t
     vlc_timer_t updateTimer;
 
     /* Mulicast group and source, differentiate between address family based on the sa_family which is the first field (sin_family or sin6_family) in both structs */
-    union {
-        struct sockaddr_in ipv4;
-        struct sockaddr_in6 ipv6;
-    } mcastGroupAddr;
-    union {
-        struct sockaddr_in ipv4;
-        struct sockaddr_in6 ipv6;
-    } mcastSrcAddr;
+    vlc_sockaddr mcastGroupAddr;
+    vlc_sockaddr mcastSrcAddr;
     /* AMT relay imformation */
-    union {
-        struct sockaddr_in ipv4;
-        struct sockaddr_in6 ipv6;
-    } relayDiscoAddr;
+    vlc_sockaddr relayDiscoAddr;
 
     /* AMT Relay Membership Query data (RFC7450) */
     struct relay_mem_query_msg_t {
@@ -477,12 +468,12 @@ static int Open( vlc_object_t *p_this )
     /* Store the binary socket representation of multicast group address */
     if ( serverinfo->ai_family == AF_INET )
     {
-        sys->mcastGroupAddr.ipv4 = *(struct sockaddr_in*)serverinfo->ai_addr;
+        sys->mcastGroupAddr.sin = *(struct sockaddr_in*)serverinfo->ai_addr;
         hints.ai_family = AF_INET; /* now that we know family of the group we can improve the hints for resolving the source */
     }
     else
     {
-        sys->mcastGroupAddr.ipv6 = *(struct sockaddr_in6*)serverinfo->ai_addr;
+        sys->mcastGroupAddr.sin6 = *(struct sockaddr_in6*)serverinfo->ai_addr;
         hints.ai_family = AF_INET6;
     }
     /* Release the allocated memory */
@@ -546,9 +537,9 @@ static int Open( vlc_object_t *p_this )
         /* Store the binary socket representation of multicast source address */
         if ( serverinfo->ai_family == AF_INET )
         {
-            sys->mcastSrcAddr.ipv4 = *(struct sockaddr_in*)serverinfo->ai_addr;
+            sys->mcastSrcAddr.sin = *(struct sockaddr_in*)serverinfo->ai_addr;
         } else {
-            sys->mcastSrcAddr.ipv6 = *(struct sockaddr_in6*)serverinfo->ai_addr;
+            sys->mcastSrcAddr.sin6 = *(struct sockaddr_in6*)serverinfo->ai_addr;
         }
         msg_Dbg( p_access, "Setting multicast source address to %s", mcastSrc);
     }
@@ -665,7 +656,7 @@ static block_t *BlockAMT(stream_t *p_access, bool *restrict eof)
 {
     access_sys_t *sys = p_access->p_sys;
     ssize_t len = 0, shift = 0;
-    int tunnel = UDP_HDR_LEN + AMT_HDR_LEN + (sys->mcastGroupAddr.ipv4.sin_family == AF_INET ? IP_HDR_LEN : IPv6_FIXED_HDR_LEN );
+    int tunnel = UDP_HDR_LEN + AMT_HDR_LEN + (sys->mcastGroupAddr.sin.sin_family == AF_INET ? IP_HDR_LEN : IPv6_FIXED_HDR_LEN );
 
     /* Allocate anticipated MTU buffer for holding the UDP packet suitable for native or AMT tunneled multicast */
     block_t *pkt = block_Alloc( sys->mtu + tunnel );
@@ -894,9 +885,9 @@ static bool open_amt_tunnel( stream_t *p_access )
         /* Store the binary representation */
         if ( server->ai_family == AF_INET )
         {
-            sys->relayDiscoAddr.ipv4 = *(struct sockaddr_in*)server_addr;
+            sys->relayDiscoAddr.sin = *(struct sockaddr_in*)server_addr;
         } else {
-            sys->relayDiscoAddr.ipv6 = *(struct sockaddr_in6*)server_addr;
+            sys->relayDiscoAddr.sin6 = *(struct sockaddr_in6*)server_addr;
         }
 
         if( amt_sockets_init( p_access ) != 0 )
@@ -942,8 +933,8 @@ static bool open_amt_tunnel( stream_t *p_access )
 
             /* Arm IGMP timer once we've confirmed we are getting packets */
             vlc_timer_schedule( sys->updateTimer, false,
-                        VLC_TICK_FROM_SEC( sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic), 0 );
-            msg_Err(p_access, "Arming timer. qqic is %d",sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic);
+                        VLC_TICK_FROM_SEC( sys->relayDiscoAddr.sin.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic), 0 );
+            msg_Err(p_access, "Arming timer. qqic is %d",sys->relayDiscoAddr.sin.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic);
 
             break;   /* found an active server sending UDP packets, so exit loop */
         }
@@ -1132,16 +1123,12 @@ static void make_ipv6( amt_ipv6_t *p, uint16_t length, struct in6_addr *dst )
  */
 static int amt_sockets_init( stream_t *p_access )
 {
-    struct sockaddr *rcvAddr;
-    struct sockaddr_in rcvAddr4;
-    struct sockaddr_in6 rcvAddr6;
+    vlc_sockaddr rcvAddr = {0};
     access_sys_t *sys = p_access->p_sys;
-    memset( &rcvAddr4, 0, sizeof(struct sockaddr_in) );
-    memset( &rcvAddr6, 0, sizeof(struct sockaddr_in6) );
     int enable = 0, res = 0;
 
     /* create UDP socket */
-    sys->sAMT = vlc_socket( sys->relayDiscoAddr.ipv4.sin_family, SOCK_DGRAM, IPPROTO_UDP, true );
+    sys->sAMT = vlc_socket( sys->relayDiscoAddr.sin.sin_family, SOCK_DGRAM, IPPROTO_UDP, true );
     if( sys->sAMT == -1 )
     {
         msg_Err( p_access, "Failed to create UDP socket" );
@@ -1155,23 +1142,29 @@ static int amt_sockets_init( stream_t *p_access )
         goto error;
     }
 
-    rcvAddr4.sin_family      = AF_INET;
-    rcvAddr4.sin_port        = htons( 0 );
-    rcvAddr4.sin_addr.s_addr = INADDR_ANY;
+    socklen_t rcvNamelen;
+    if (sys->relayDiscoAddr.sin.sin_family == AF_INET)
+    {
+        rcvNamelen                  = sizeof(rcvAddr.sin);
+        rcvAddr.sin.sin_family      = AF_INET;
+        rcvAddr.sin.sin_port        = htons( 0 );
+        rcvAddr.sin.sin_addr.s_addr = INADDR_ANY;
+    }
+    else
+    {
+        rcvNamelen                  = sizeof(rcvAddr.sin6);
+        rcvAddr.sin6.sin6_family    = AF_INET6;
+        rcvAddr.sin6.sin6_port      = htons( 0 );
+        rcvAddr.sin6.sin6_addr      = (struct in6_addr) IN6ADDR_ANY_INIT;
+    }
 
-    rcvAddr6.sin6_family      = AF_INET6;
-    rcvAddr6.sin6_port        = htons( 0 );
-    rcvAddr6.sin6_addr = (struct in6_addr) IN6ADDR_ANY_INIT;
-
-    rcvAddr = sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? (struct sockaddr*) &rcvAddr4 : (struct sockaddr*) &rcvAddr6;
-
-    if( bind(sys->sAMT, rcvAddr, sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sizeof(rcvAddr4) : sizeof(rcvAddr6) ) != 0 )
+    if( bind(sys->sAMT, &rcvAddr.sa, rcvNamelen ) != 0 )
     {
         msg_Err( p_access, "Failed to bind UDP socket error: %s", vlc_strerror(errno) );
         goto error;
     }
 
-    sys->sQuery = vlc_socket( sys->relayDiscoAddr.ipv4.sin_family, SOCK_DGRAM, IPPROTO_UDP, true );
+    sys->sQuery = vlc_socket( sys->relayDiscoAddr.sin.sin_family, SOCK_DGRAM, IPPROTO_UDP, true );
     if( sys->sQuery == -1 )
     {
         msg_Err( p_access, "Failed to create query socket" );
@@ -1179,22 +1172,24 @@ static int amt_sockets_init( stream_t *p_access )
     }
 
     /* bind socket to local address */
-    struct sockaddr_in stLocalAddr4 =
+    vlc_sockaddr stLocalAddr = {0};
+    socklen_t stLocalNamelen;
+    if (sys->relayDiscoAddr.sin.sin_family == AF_INET)
     {
-        .sin_family      = AF_INET,
-        .sin_port        = htons( 0 ),
-        .sin_addr.s_addr = INADDR_ANY,
-    };
+        stLocalNamelen                  = sizeof(stLocalAddr.sin);
+        stLocalAddr.sin.sin_family      = AF_INET;
+        stLocalAddr.sin.sin_port        = htons( 0 );
+        stLocalAddr.sin.sin_addr.s_addr = INADDR_ANY;
+    }
+    else
+    {
+        stLocalNamelen               = sizeof(stLocalAddr.sin6);
+        stLocalAddr.sin6.sin6_family = AF_INET6;
+        stLocalAddr.sin6.sin6_port   = htons( 0 );
+        stLocalAddr.sin6.sin6_addr   = (struct in6_addr) IN6ADDR_ANY_INIT;
+    }
 
-    struct sockaddr_in6 stLocalAddr6;
-    memset( &rcvAddr6, 0, sizeof(struct sockaddr_in6) );
-    stLocalAddr6.sin6_family = AF_INET6;
-    stLocalAddr6.sin6_port = htons( 0 );
-    stLocalAddr6.sin6_addr = (struct in6_addr) IN6ADDR_ANY_INIT;
-
-    struct sockaddr *stLocalAddr = sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? (struct sockaddr*) &stLocalAddr4 : (struct sockaddr*) &stLocalAddr6;
-
-    if( bind(sys->sQuery, stLocalAddr, sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sizeof(stLocalAddr4) : sizeof(stLocalAddr6) ) != 0 )
+    if( bind(sys->sQuery, &stLocalAddr.sa, stLocalNamelen ) != 0 )
     {
         msg_Err( p_access, "Failed to bind query socket" );
         goto error;
@@ -1250,7 +1245,7 @@ static void amt_send_relay_discovery_msg( stream_t *p_access, char *relay_ip )
     sys->glob_ulNonce = ulNonce;
 
     /* send it */
-    nRet = sendto( sys->sAMT, chaSendBuffer, sizeof(chaSendBuffer), 0, (struct sockaddr*) &sys->relayDiscoAddr, sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6));
+    nRet = sendto( sys->sAMT, chaSendBuffer, sizeof(chaSendBuffer), 0, &sys->relayDiscoAddr.sa, sys->relayDiscoAddr.sin.sin_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6));
 
     if( nRet < 0)
     {
@@ -1296,7 +1291,7 @@ static void amt_send_relay_request( stream_t *p_access, char *relay_ip )
      */
 
     chaSendBuffer[0] = AMT_REQUEST;
-    chaSendBuffer[1] = sys->mcastGroupAddr.ipv4.sin_family == AF_INET6;
+    chaSendBuffer[1] = sys->mcastGroupAddr.sin.sin_family == AF_INET6;
     chaSendBuffer[2] = 0;
     chaSendBuffer[3] = 0;
 
@@ -1421,7 +1416,7 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
     ulNonce = sys->glob_ulNonce;
     memcpy( &pSendBuffer[8], &ulNonce, NONCE_LEN );
 
-    if ( sys->mcastGroupAddr.ipv4.sin_family == AF_INET )
+    if ( sys->mcastGroupAddr.sin.sin_family == AF_INET )
     {
         /* make IP header for IGMP packet */
         amt_ip_alert_t p_ipHead;
@@ -1440,13 +1435,13 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
 
         amt_igmpv3_groupRecord_t groupRcd;
         groupRcd.auxDatalen = 0;
-        groupRcd.ssm = sys->mcastGroupAddr.ipv4.sin_addr.s_addr;
+        groupRcd.ssm = sys->mcastGroupAddr.sin.sin_addr.s_addr;
 
-        if( sys->mcastSrcAddr.ipv4.sin_addr.s_addr )
+        if( sys->mcastSrcAddr.sin.sin_addr.s_addr )
         {
             groupRcd.type = leave ? AMT_IGMP_BLOCK:AMT_IGMP_INCLUDE;
             groupRcd.nSrc = htons(1);
-            groupRcd.srcIP[0] = sys->mcastSrcAddr.ipv4.sin_addr.s_addr;
+            groupRcd.srcIP[0] = sys->mcastSrcAddr.sin.sin_addr.s_addr;
 
         }
         else
@@ -1487,7 +1482,7 @@ static int amt_send_mem_update( stream_t *p_access, bool leave)
 
         make_ipv6(&ip, IPv6_HOP_BY_HOP_OPTION_LEN + MLD_REPORT_LEN, &tmp);
 
-        if( make_mld_report(p_access,leave,&report,&sys->mcastGroupAddr.ipv6.sin6_addr,&sys->mcastSrcAddr.ipv6.sin6_addr) )
+        if( make_mld_report(p_access,leave,&report,&sys->mcastGroupAddr.sin6.sin6_addr,&sys->mcastSrcAddr.sin6.sin6_addr) )
         {
             goto oom;
         }
@@ -1581,18 +1576,27 @@ static bool amt_rcv_relay_adv( stream_t *p_access )
         return false;
     }
 
-    struct sockaddr_in relayAddr4;
-    relayAddr4.sin_port = htons( AMT_PORT );
-    relayAddr4.sin_family = AF_INET;
+    vlc_sockaddr relayAddr = {0};
+    socklen_t relayNamelen;
+    void *bin_address_start;
+    if (sys->relayDiscoAddr.sin.sin_family == AF_INET)
+    {
+        relayNamelen               = sizeof(relayAddr.sin);
+        bin_address_start          = &relayAddr.sin.sin_addr;
+        relayAddr.sin.sin_port     = htons( AMT_PORT );
+        relayAddr.sin.sin_family   = AF_INET;
+    }
+    else
+    {
+        relayNamelen               = sizeof(relayAddr.sin6);
+        bin_address_start          = &relayAddr.sin6.sin6_addr;
+        relayAddr.sin6.sin6_port   = htons( AMT_PORT );
+        relayAddr.sin6.sin6_family = AF_INET6;
+    }
 
-    struct sockaddr_in6 relayAddr6;
-    relayAddr6.sin6_port = htons( AMT_PORT );
-    relayAddr6.sin6_family = AF_INET6;
+    memcpy( bin_address_start , &pkt[8], sys->relayDiscoAddr.sin.sin_family == AF_INET ? 4 : 16);
 
-    void *bin_address_start = (sys->relayDiscoAddr.ipv4.sin_family == AF_INET) ? (void*) &relayAddr4.sin_addr : (void*) &relayAddr6.sin6_addr;
-    memcpy( bin_address_start , &pkt[8], sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? 4 : 16);
-
-    int nRet = connect( sys->sAMT, sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? (struct sockaddr*)&relayAddr4 : (struct sockaddr*)&relayAddr6, sys->relayDiscoAddr.ipv4.sin_family == AF_INET ? sizeof(relayAddr4) : sizeof(relayAddr6) );
+    int nRet = connect( sys->sAMT, &relayAddr.sa, relayNamelen );
     if( nRet < 0 )
     {
         msg_Err( p_access, "Error connecting AMT UDP socket: %s", vlc_strerror(errno) );
@@ -1649,7 +1653,7 @@ static bool amt_rcv_relay_mem_query( stream_t *p_access )
 
     ssize_t len = recv( sys->sAMT, pkt, i_buf_len, 0 );
 
-    if ( len <= 0 || (sys->mcastGroupAddr.ipv4.sin_family == AF_INET && len != (RELAY_QUERY_MSG_LEN - 40)) || (sys->mcastGroupAddr.ipv4.sin_family == AF_INET6 && len < RELAY_QUERY_MSG_LEN) ) /* subtract 40 for ipv4 case */
+    if ( len <= 0 || (sys->mcastGroupAddr.sin.sin_family == AF_INET && len != (RELAY_QUERY_MSG_LEN - 40)) || (sys->mcastGroupAddr.sin.sin_family == AF_INET6 && len < RELAY_QUERY_MSG_LEN) ) /* subtract 40 for ipv4 case */
     {
         msg_Err(p_access, "length of relay query message invalid!");
         return false;
@@ -1665,7 +1669,7 @@ static bool amt_rcv_relay_mem_query( stream_t *p_access )
         return false;
     }
 
-    if ( sys->mcastGroupAddr.ipv4.sin_family == AF_INET )
+    if ( sys->mcastGroupAddr.sin.sin_family == AF_INET )
     {
         size_t shift = AMT_HDR_LEN + MAC_LEN + NONCE_LEN + IP_HDR_IGMP_LEN;
         sys->relay_query.igmp.type = pkt[shift];
@@ -1754,5 +1758,5 @@ static void amt_update_timer_cb( void *data )
     /* Arms the timer again for a single shot from this callback. That way, the
      * time spent in amt_send_mem_update() is taken into consideration. */
     vlc_timer_schedule( sys->updateTimer, false,
-                        VLC_TICK_FROM_SEC( sys->mcastGroupAddr.ipv4.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic), 0 );
+                        VLC_TICK_FROM_SEC( sys->mcastGroupAddr.sin.sin_family == AF_INET ? sys->relay_query.igmp.qqic : sys->relay_query.mld.qqic), 0 );
 }
