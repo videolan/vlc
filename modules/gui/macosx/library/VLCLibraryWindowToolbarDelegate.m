@@ -310,4 +310,12 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
                               self.vlcIconToolbarItem]];
 }
 
+- (void)applyVisiblityFlags:(VLCLibraryWindowToolbarDisplayFlags)flags
+{
+    [self setForwardsBackwardsToolbarItemsVisible:flags & VLCLibraryWindowToolbarDisplayFlagNavigationButtons];
+    [self setSortOrderToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagSortOrderButton];
+    [self setLibrarySearchToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar];
+    [self setViewModeToolbarItemVisible:flags & VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
+}
+
 @end

@@ -26,9 +26,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class VLCLibraryWindow;
+typedef NS_OPTIONS(NSUInteger, VLCLibraryWindowToolbarDisplayFlags) {
+    VLCLibraryWindowToolbarDisplayFlagNavigationButtons = 1 << 0,
+    VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton = 1 << 1,
+    VLCLibraryWindowToolbarDisplayFlagSortOrderButton = 1 << 2,
+    VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar = 1 << 3
+};
 
 extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
+
+@class VLCLibraryWindow;
 
 @interface VLCLibraryWindowToolbarDelegate : NSObject<NSToolbarDelegate>
 
@@ -51,6 +58,7 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 - (IBAction)rendererControlAction:(id)sender;
 
 - (void)layoutForSegment:(VLCLibrarySegmentType)segment;
+- (void)applyVisiblityFlags:(VLCLibraryWindowToolbarDisplayFlags)flags;
 
 @end
 
