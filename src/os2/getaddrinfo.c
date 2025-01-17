@@ -160,18 +160,17 @@ makeaddrinfo (int af, int type, int proto,
 static struct addrinfo *
 makeipv4info (int type, int proto, u_long ip, u_short port, const char *name)
 {
-    struct sockaddr_in addr;
+    vlc_sockaddr addr = {0};
 
-    memset (&addr, 0, sizeof (addr));
-    addr.sin_family = AF_INET;
+    addr.sin.sin_family = AF_INET;
 # ifdef HAVE_SA_LEN
-    addr.sin_len = sizeof (addr);
+    addr.sin.sin_len = sizeof (addr.sin);
 # endif
-    addr.sin_port = port;
-    addr.sin_addr.s_addr = ip;
+    addr.sin.sin_port = port;
+    addr.sin.sin_addr.s_addr = ip;
 
     return makeaddrinfo (AF_INET, type, proto,
-                         (struct sockaddr*)&addr, sizeof (addr), name);
+                         &addr.sa, sizeof (addr.sin), name);
 }
 
 /*
