@@ -295,7 +295,7 @@
     }
 
     if (@available(macOS 11.0, *)) {
-        self.image = [NSImage imageWithSystemSymbolName:@"wifi" accessibilityDescription:nil];
+        self.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
     }
 }
 
