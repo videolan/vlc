@@ -82,6 +82,12 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
 
     const auto updateMinimumSize = [this]()
     {
+        if (m_mainCtx->isMinimalView())
+        {
+            m_window->setMinimumSize({128, 16});
+            return;
+        }
+
         int margin = m_mainCtx->windowExtendedMargin() * 2;
         int width = 320 + margin;
         int height = 360 + margin;
@@ -94,6 +100,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     };
     connect( m_mainCtx, &MainCtx::intfScaleFactorChanged, this, updateMinimumSize );
     connect( m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, updateMinimumSize );
+    connect( m_mainCtx, &MainCtx::minimalViewChanged, this, updateMinimumSize );
     m_mainCtx->updateIntfScaleFactor();
 
     m_mainCtx->onWindowVisibilityChanged(m_window->visibility());
