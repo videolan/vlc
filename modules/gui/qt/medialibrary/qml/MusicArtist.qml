@@ -30,7 +30,7 @@ import VLC.Style
 FocusScope {
     id: root
 
-    property var artist: ({})
+    required property var artistId
 
     readonly property int _extraMargin: VLCStyle.dynamicAppMargins(width)
     readonly property int _contentLeftMargin: VLCStyle.layout_left_margin + _extraMargin
@@ -60,6 +60,8 @@ FocusScope {
     property alias rightPadding: view.rightPadding
 
     property alias _currentView: view.currentItem
+
+    property var _artist: ({})
 
     function navigationShowHeader(y, height) {
         const newContentY = Helpers.flickablePositionContaining(_currentView, y, height, 0, 0)
@@ -98,7 +100,7 @@ FocusScope {
 
                 rightPadding: root.rightPadding
 
-                artist: root.artist
+                artist: root._artist
 
                 onActiveFocusChanged: {
                     // make sure content is visible with activeFocus
@@ -251,6 +253,8 @@ FocusScope {
 
     onInitialIndexChanged: resetFocus()
 
+    onArtistIdChanged: fetchArtistData()
+
     function setCurrentItemFocus(reason) {
         if (view.currentItem === null) {
             Qt.callLater(setCurrentItemFocus, reason)
@@ -296,16 +300,40 @@ FocusScope {
             tableView_id.currentIndex = 0;
     }
 
+    function fetchArtistData() {
+        if (!artistId)
+            return
+
+        if (artistModel.loading)
+            return
+
+        artistModel.getDataById(artistId)
+            .then((artistData) => {
+                root._artist = artistData
+            })
+    }
+
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
+    }
+
+
+    MLArtistModel {
+        id: artistModel
+        ml: MediaLib
+
+        onLoadingChanged: {
+            if (!loading)
+                fetchArtistData()
+        }
     }
 
     MLAlbumModel {
         id: albumModel
 
         ml: MediaLib
-        parentId: artist.id
+        parentId: artistId
 
         onCountChanged: {
             if (albumModel.count > 0 && !albumSelectionModel.hasSelection) {

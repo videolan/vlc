@@ -42,6 +42,7 @@ FocusScope {
 
     property int initialIndex: 0
     property int initialAlbumIndex: 0
+    property var artistId: undefined
 
     //behave like a page
     property var pagePrefix: []
@@ -59,12 +60,11 @@ FocusScope {
     property alias currentIndex: artistList.currentIndex
     property alias currentAlbumIndex: albumSubView.currentIndex
 
-    property alias currentArtist: albumSubView.artist
     property bool isScreenSmall: VLCStyle.isScreenSmall
 
     onInitialAlbumIndexChanged: resetFocus()
     onInitialIndexChanged: resetFocus()
-    onCurrentIndexChanged: currentArtist = model.getDataAt(currentIndex)
+
     onIsScreenSmallChanged: {
         if (VLCStyle.isScreenSmall)
             resetFocus()
@@ -108,9 +108,18 @@ FocusScope {
             root.resetFocus()
         }
 
-        onDataChanged: {
-            if (topLeft.row <= currentIndex && bottomRight.row >= currentIndex)
-                currentArtist = artistModel.getDataAt(currentIndex)
+        //set the list on the requested artist id
+        onLoadingChanged: {
+            if (loading)
+                return
+            artistModel.getIndexFromId(root.artistId)
+                .then((row) => {
+                    artistList.currentIndex = row
+                    artistList._sidebarInitialyPositioned = true
+                })
+                .catch(() => {
+                    artistList._sidebarInitialyPositioned = true
+                })
         }
     }
 
@@ -131,6 +140,10 @@ FocusScope {
         Widgets.ListViewExt {
             id: artistList
 
+            property bool _sidebarInitialyPositioned: false
+
+            signal showArtist(var artistid)
+
             model: artistModel
             selectionModel: root.selectionModel
             currentIndex: -1
@@ -147,6 +160,18 @@ FocusScope {
 
             fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
                                                                           : artistListBackground.alternativeColor
+
+
+            onCurrentIndexChanged: {
+                if (!artistList._sidebarInitialyPositioned)
+                    return
+                root.artistId = model.getDataAt(currentIndex).id
+            }
+
+            onShowArtist: (artistId) => {
+                root.artistId = artistId
+            }
+
 
             Widgets.AcrylicBackground {
                 id: artistListBackground
@@ -308,6 +333,8 @@ FocusScope {
 
         MusicArtist {
             id: albumSubView
+
+            artistId: root.artistId
 
             Layout.fillHeight: true
             Layout.fillWidth: true

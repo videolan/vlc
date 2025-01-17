@@ -42,7 +42,7 @@ MainViewLoader {
     property alias sortOrder: artistModel.sortOrder
     property alias sortCriteria: artistModel.sortCriteria
 
-    signal requestArtistAlbumView(int reason)
+    signal requestArtistAlbumView(var id, int reason)
 
     isSearchable: true
 
@@ -98,7 +98,9 @@ MainViewLoader {
                     artistModel.addAndPlay( selectionModel.selectedIndexes )
                 } else {
                     currentIndex = index
-                    requestArtistAlbumView(Qt.TabFocusReason)
+                    const sel = selectionModel.selectedIndexes[0]
+                    const model = genreModel.getDataAt(sel)
+                    requestArtistAlbumView(model.id, Qt.TabFocusReason)
                 }
             }
 
@@ -124,7 +126,7 @@ MainViewLoader {
 
                 onItemClicked: (modifier) => { artistGrid.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
+                onItemDoubleClicked: root.requestArtistAlbumView(model.id, Qt.MouseFocusReason)
 
                 onContextMenuButtonClicked: (_, globalMousePos) => {
                     artistGrid.rightClickOnItem(index)

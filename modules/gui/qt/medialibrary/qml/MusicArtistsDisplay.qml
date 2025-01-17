@@ -59,8 +59,8 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
-            onRequestArtistAlbumView: (reason) => {
-                History.push([...root.pagePrefix, "albums"], { initialIndex: currentIndex }, reason)
+            onRequestArtistAlbumView: (id, reason) => {
+                History.push([...root.pagePrefix, "albums"], { artistId: id  }, reason)
             }
         }
     }
@@ -73,7 +73,7 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
-            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+            onArtistIdChanged: History.viewProp.artistId = artistId
             onCurrentAlbumIndexChanged: History.viewProp.initialAlbumIndex = currentAlbumIndex
         }
     }
