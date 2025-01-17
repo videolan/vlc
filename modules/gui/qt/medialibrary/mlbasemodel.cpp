@@ -110,6 +110,33 @@ public:
         auto jsEngine = qjsEngine(q);
         return jsEngine->toScriptValue(dataDict);
     }
+
+    //FIXME: building Promise from C++ should be available to other classes
+    std::tuple<QJSValue, QJSValue, QJSValue> makeJSPromise() const
+    {
+        Q_Q(const MLBaseModel);
+        auto jsEngine = qjsEngine(q);
+        QJSValue promiseRet = jsEngine->evaluate(
+            //no newline at beginning of string, () surrounding is mandatory
+            R"raw((function() {
+    let resolve;
+    let reject;
+    let p = new Promise((_resolve, _reject) => {
+        resolve = _resolve;
+        reject = _reject;
+    });
+    return [p, resolve, reject];
+}())
+)raw");
+        assert(promiseRet.isArray());
+        assert(promiseRet.property(QStringLiteral("length")).toInt() == 3);
+        QJSValue p = promiseRet.property(0);
+        QJSValue resolve = promiseRet.property(1);
+        assert(resolve.isCallable());
+        QJSValue reject = promiseRet.property(2);
+        assert(reject.isCallable());
+        return {p, resolve, reject};
+    }
 };
 
 // MLBaseModel
