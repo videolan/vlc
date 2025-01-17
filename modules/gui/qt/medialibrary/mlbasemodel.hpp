@@ -75,6 +75,17 @@ public:
      * @return a JS Promise with the content of the item
      */
     Q_INVOKABLE QJSValue getDataById(MLItemId id);
+
+
+    /**
+     * @brief getIndexFromId allow getting the row of an item from its id,
+     *        if the item is not in cache, data will be retreived until it is
+     *        satisfied
+     * @param id of the item
+     * @return a JS Promise with the row index
+     */
+    Q_INVOKABLE QJSValue getIndexFromId(MLItemId id);
+
 public:
     // properties functions
 

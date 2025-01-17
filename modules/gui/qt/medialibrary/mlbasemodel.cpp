@@ -97,6 +97,36 @@ public:
         return true;
     }
 
+    //this will load data until id is in the cache, then returns its position
+    void getIndexFromIdImpl(MLItemId id, QJSValue resolve, QJSValue reject) const
+    {
+        Q_Q(const MLBaseModel);
+
+        auto jsEngine = qjsEngine(q);
+        int index;
+        MLItem* item = q->findInCache(id, &index);
+        if (item) {
+            resolve.call({index});
+        }
+        else
+        {
+            int count = q->getCount();
+            int limit = q->getLimit();
+            //item doesn't exists
+            if ((limit != 0 && count >= limit) || count == getMaximumCount())
+                reject.call(); //not present
+            else
+            {
+                //load data until we have our item in cache
+                QObject::connect(q, &MLBaseModel::countChanged, q, [this, id, resolve = resolve, reject = reject](){
+                    getIndexFromIdImpl(id, resolve, reject);
+                }, Qt::SingleShotConnection);
+                if (m_cache)
+                    m_cache->fetchMore();
+            }
+        }
+    }
+
     QJSValue itemToJSValue(const MLItem* item) const {
         Q_Q(const MLBaseModel);
         if (!item)
@@ -262,6 +292,16 @@ Q_INVOKABLE QJSValue MLBaseModel::getDataById(MLItemId id)
             }
         );
     }
+    return p;
+}
+
+
+Q_INVOKABLE QJSValue MLBaseModel::getIndexFromId(MLItemId id)
+{
+    Q_D(const MLBaseModel);
+
+    auto [p, resolve, reject] = d->makeJSPromise();
+    d->getIndexFromIdImpl(id, resolve, reject);
     return p;
 }
 
