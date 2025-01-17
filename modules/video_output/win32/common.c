@@ -117,24 +117,3 @@ void CommonDisplaySizeChanged(display_win32_area_t *area)
     }
 }
 #endif /* WINAPI_PARTITION_DESKTOP */
-
-void CommonControl(vout_display_t *vd, display_win32_area_t *area, int query)
-{
-    switch (query) {
-    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-        CommonDisplaySizeChanged(area);
-#endif /* WINAPI_PARTITION_DESKTOP */
-        break;
-    case VOUT_DISPLAY_CHANGE_SOURCE_PLACE:
-        area->place_changed = true;
-        // fallthrough
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        CommonPlacePicture(vd, area);
-        break;
-
-    default:
-        vlc_assert_unreachable();
-    }
-}

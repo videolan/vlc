@@ -57,7 +57,6 @@ void CommonWindowClean(display_win32_area_t *);
 HWND CommonVideoHWND(const display_win32_area_t *);
 void CommonDisplaySizeChanged(display_win32_area_t *);
 #endif /* WINAPI_PARTITION_DESKTOP */
-void CommonControl(vout_display_t *, display_win32_area_t *, int );
 
 void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
 
