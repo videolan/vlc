@@ -551,25 +551,25 @@ vlc_smb2_print_addr(stream_t *access)
 {
     struct access_sys *sys = access->p_sys;
 
-    struct sockaddr_storage addr;
-    if (getsockname(smb2_get_fd(sys->smb2), (struct sockaddr *)&addr,
-                    &(socklen_t){ sizeof(addr) }) != 0)
+    vlc_sockaddr addr;
+    if (getsockname(smb2_get_fd(sys->smb2), &addr.sa,
+                    &(socklen_t){ sizeof(addr.ss) }) != 0)
         return;
 
-    void *sin_addr;
-    switch (addr.ss_family)
+    const void *sin_addr;
+    switch (addr.ss.ss_family)
     {
         case AF_INET6:
-            sin_addr = &((struct sockaddr_in6 *)&addr)->sin6_addr;
+            sin_addr = &addr.sin6.sin6_addr;
             break;
         case AF_INET:
-            sin_addr = &((struct sockaddr_in *)&addr)->sin_addr;
+            sin_addr = &addr.sin.sin_addr;
             break;
         default:
             return;
     }
     char ip[INET6_ADDRSTRLEN];
-    if (inet_ntop(addr.ss_family, sin_addr, ip, sizeof(ip)) == NULL)
+    if (inet_ntop(addr.ss.ss_family, sin_addr, ip, sizeof(ip)) == NULL)
         return;
 
     if (strcmp(ip, sys->encoded_url.psz_host) == 0)
