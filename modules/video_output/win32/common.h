@@ -58,8 +58,6 @@ HWND CommonVideoHWND(const display_win32_area_t *);
 void CommonDisplaySizeChanged(display_win32_area_t *);
 #endif /* WINAPI_PARTITION_DESKTOP */
 
-void CommonPlacePicture (vout_display_t *, display_win32_area_t *);
-
 void CommonInit(display_win32_area_t *, const video_format_t *);
 # ifdef __cplusplus
 }

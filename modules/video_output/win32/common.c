@@ -70,38 +70,7 @@ HWND CommonVideoHWND(const display_win32_area_t *area)
 {
     return EventThreadVideoHWND(area->event);
 }
-#endif /* WINAPI_PARTITION_DESKTOP */
 
-/*****************************************************************************
-* UpdateRects: update clipping rectangles
-*****************************************************************************
-* This function is called when the window position or size are changed, and
-* its job is to update the source and destination RECTs used to display the
-* picture.
-*****************************************************************************/
-void CommonPlacePicture(vout_display_t *vd, display_win32_area_t *area)
-{
-    /* Update the window position and size */
-    vout_display_place_t before_place = area->place;
-    vout_display_PlacePicture(&area->place, area->src_fmt, &vd->cfg->display);
-
-    /* Signal the change in size/position */
-    if (!vout_display_PlaceEquals(&before_place, &area->place))
-    {
-        area->place_changed |= true;
-
-#ifndef NDEBUG
-        msg_Dbg(vd, "UpdateRects source offset: %i,%i visible: %ix%i decoded: %ix%i",
-            area->src_fmt->i_x_offset, area->src_fmt->i_y_offset,
-            area->src_fmt->i_visible_width, area->src_fmt->i_visible_height,
-            area->src_fmt->i_width, area->src_fmt->i_height);
-        msg_Dbg(vd, "UpdateRects image_dst coords: %i,%i %ix%i",
-            area->place.x, area->place.y, area->place.width, area->place.height);
-#endif
-    }
-}
-
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 /* */
 void CommonWindowClean(display_win32_area_t *sys)
 {
