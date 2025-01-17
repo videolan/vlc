@@ -486,6 +486,9 @@ MLItem *MLBaseModel::itemCache(int signedidx) const
 MLItem *MLBaseModel::findInCache(const MLItemId& id, int *index) const
 {
     Q_D(const MLBaseModel);
+    if (!d->m_cache)
+        return nullptr;
+
     const auto item = d->m_cache->find([id](const auto &item)
     {
         return item->getId() == id;
