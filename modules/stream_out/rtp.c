@@ -733,7 +733,7 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     struct vlc_memstream sdp;
-    struct sockaddr_storage dst;
+    vlc_sockaddr dst;
     char *psz_sdp = NULL;
     socklen_t dstlen;
     int i;
@@ -763,13 +763,11 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
         inclport = true;
 
         /* Oh boy, this is really ugly! */
-        dstlen = sizeof( dst );
+        dstlen = sizeof( dst.ss );
         if( p_sys->es[0]->listen.fd != NULL )
-            getsockname( p_sys->es[0]->listen.fd[0],
-                         (struct sockaddr *)&dst, &dstlen );
+            getsockname( p_sys->es[0]->listen.fd[0], &dst.sa, &dstlen );
         else
-            getpeername( p_sys->es[0]->sinkv[0].rtp_fd,
-                         (struct sockaddr *)&dst, &dstlen );
+            getpeername( p_sys->es[0]->sinkv[0].rtp_fd, &dst.sa, &dstlen );
     }
     else
     {
@@ -783,14 +781,14 @@ char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url )
         dstlen = ipv6 ? sizeof( struct sockaddr_in6 )
                       : sizeof( struct sockaddr_in );
         memset (&dst, 0, dstlen);
-        dst.ss_family = ipv6 ? AF_INET6 : AF_INET;
+        dst.ss.ss_family = ipv6 ? AF_INET6 : AF_INET;
 #ifdef HAVE_SA_LEN
-        dst.ss_len = dstlen;
+        dst.ss.ss_len = dstlen;
 #endif
     }
 
     if( vlc_sdp_Start( &sdp, VLC_OBJECT( p_stream ), SOUT_CFG_PREFIX,
-                       NULL, 0, (struct sockaddr *)&dst, dstlen ) )
+                       NULL, 0, &dst.sa, dstlen ) )
         goto out;
 
     /* TODO: a=source-filter */
