@@ -351,6 +351,7 @@ static filter_t *filter_chain_AppendInner( filter_chain_t *chain,
     msg_Dbg( chain->obj, "Filter '%s' (%p) appended to chain (%p)",
              (name != NULL) ? name : module_GetShortName(filter->p_module),
              (void *)filter, (void *)chain );
+    free(name_chained);
     return filter;
 
 error:
@@ -358,6 +359,7 @@ error:
         msg_Err( chain->obj, "Failed to create %s '%s'", capability, name );
     else
         msg_Err( chain->obj, "Failed to create %s", capability );
+    free(name_chained);
     vlc_objres_clear(&filter->obj);
     es_format_Clean( &filter->fmt_out );
     es_format_Clean( &filter->fmt_in );
