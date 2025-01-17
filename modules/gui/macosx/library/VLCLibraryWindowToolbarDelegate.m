@@ -147,43 +147,6 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
             : NSControlStateValueOn;
 }
 
-#pragma mark - convenience method for configuration of toolbar items layout
-
-- (void)layoutForSegment:(VLCLibrarySegmentType)segment
-{
-    switch(segment) {
-        case VLCLibraryLowSentinelSegment:
-        case VLCLibraryHeaderSegmentType:
-        case VLCLibraryHighSentinelSegment:
-            vlc_assert_unreachable();
-        case VLCLibraryHomeSegmentType:
-            [self applyVisiblityFlags:0];
-            break;
-        case VLCLibraryVideoSegmentType:
-        case VLCLibraryShowsVideoSubSegmentType:
-        case VLCLibraryMusicSegmentType:
-        case VLCLibraryArtistsMusicSubSegmentType:
-        case VLCLibraryAlbumsMusicSubSegmentType:
-        case VLCLibrarySongsMusicSubSegmentType:
-        case VLCLibraryGenresMusicSubSegmentType:
-        case VLCLibraryGroupsSegmentType:
-        case VLCLibraryGroupsGroupSubSegmentType:
-        case VLCLibraryPlaylistsSegmentType:
-        case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
-        case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
-            [self applyVisiblityFlags:VLCLibraryWindowToolbarDisplayFlagSortOrderButton |
-             VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar |
-             VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
-            break;
-        case VLCLibraryBrowseSegmentType:
-        case VLCLibraryStreamsSegmentType:
-        case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
-            [self applyVisiblityFlags:VLCLibraryWindowToolbarDisplayFlagNavigationButtons |
-             VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
-            break;
-    }
-}
-
 #pragma mark - item visibility handling
 
 - (void)hideToolbarItem:(NSToolbarItem *)toolbarItem

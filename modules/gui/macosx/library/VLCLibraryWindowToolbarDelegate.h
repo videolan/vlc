@@ -56,8 +56,6 @@ extern NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier;
 @property (readwrite, weak) IBOutlet NSToolbarItem *renderersToolbarItem;
 
 - (IBAction)rendererControlAction:(id)sender;
-
-- (void)layoutForSegment:(VLCLibrarySegmentType)segment;
 - (void)applyVisiblityFlags:(VLCLibraryWindowToolbarDisplayFlags)flags;
 
 @end
