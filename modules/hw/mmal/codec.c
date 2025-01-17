@@ -208,7 +208,7 @@ static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     MMAL_STATUS_T status;
 
     if (buffer->cmd == MMAL_EVENT_ERROR) {
-        status = *(uint32_t *)buffer->data;
+        memcpy(&status, buffer->data, sizeof(status));
         decoder_sys_t * const sys = dec->p_sys;
         sys->err_stream = status;
         msg_Err(dec, "MMAL error %"PRIx32" \"%s\"", status,

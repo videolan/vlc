@@ -225,7 +225,7 @@ static void isp_control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     MMAL_STATUS_T status;
 
     if (buffer->cmd == MMAL_EVENT_ERROR) {
-        status = *(uint32_t *)buffer->data;
+        memcpy(&status, buffer->data, sizeof(status));
         msg_Err(vd, "MMAL error %"PRIx32" \"%s\"", status, mmal_status_to_string(status));
     }
 
@@ -755,7 +755,7 @@ static void vd_control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
     MMAL_STATUS_T status;
 
     if (buffer->cmd == MMAL_EVENT_ERROR) {
-        status = *(uint32_t *)buffer->data;
+        memcpy(&status, buffer->data, sizeof(status));
         msg_Err(vd, "MMAL error %"PRIx32" \"%s\"", status, mmal_status_to_string(status));
     }
 

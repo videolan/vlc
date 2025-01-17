@@ -250,7 +250,8 @@ static void conv_control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer
     filter_t * const p_filter = (filter_t *)port->userdata;
 
     if (buffer->cmd == MMAL_EVENT_ERROR) {
-        MMAL_STATUS_T status = *(uint32_t *)buffer->data;
+        MMAL_STATUS_T status;
+        memcpy(&status, buffer->data, sizeof(status));
 
         converter_sys_t * sys = p_filter->p_sys;
         sys->err_stream = status;
@@ -985,4 +986,3 @@ fail:
 
     return ret;
 }
-
