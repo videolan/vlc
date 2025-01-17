@@ -138,9 +138,7 @@ void system_Configure( libvlc_int_t *p_this, int i_argc, const char *const ppsz_
                 for( i_opt = 0; i_opt < i_argc; i_opt++ )
                 {
                     size_t i_len = strlen( ppsz_argv[ i_opt ] ) + 1;
-                    /* Windows will never switch to an architecture
-                     * with stronger alignment requirements, right. */
-                    *((size_t *)(p_data->data + i_data)) = i_len;
+                    memcpy( &p_data->data[i_data], &i_len, sizeof (size_t) );
                     i_data += sizeof (size_t);
                     memcpy( &p_data->data[i_data], ppsz_argv[ i_opt ], i_len );
                     i_data += i_len;
