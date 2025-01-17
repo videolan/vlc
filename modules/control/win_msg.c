@@ -91,13 +91,15 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
             char **ppsz_argv;
             vlc_ipc_data_t *p_data = (vlc_ipc_data_t *)pwm_data->lpData;
             size_t i_data = 0;
+            size_t i_len;
             int i_argc = p_data->argc, i_opt, i_options;
 
             ppsz_argv = vlc_alloc( i_argc, sizeof(char *) );
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
             {
-                ppsz_argv[i_opt] = p_data->data + i_data + sizeof(size_t);
-                i_data += sizeof(size_t) + *((size_t *)(p_data->data + i_data));
+                memcpy( &i_len, &p_data->data[i_data], sizeof(size_t) );
+                ppsz_argv[i_opt] = &p_data->data[i_data] + sizeof(size_t);
+                i_data += sizeof(size_t) + i_len;
             }
 
             for( i_opt = 0; i_opt < i_argc; i_opt++ )
