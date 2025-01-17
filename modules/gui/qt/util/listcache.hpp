@@ -235,6 +235,11 @@ public:
      */
     void refer(size_t index);
 
+    /**
+     * Request to fetch more data
+     */
+    void fetchMore();
+
     /*
      * reload
      */

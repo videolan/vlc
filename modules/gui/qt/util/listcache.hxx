@@ -375,6 +375,26 @@ void ListCache<T>::refer(size_t index)
 }
 
 template<typename T>
+void  ListCache<T>::fetchMore()
+{
+    const CacheData* cache = m_cachedData.get();
+    if (!cache)
+        cache = m_oldData.get();
+    if (!cache)
+        return; //nothing loaded yet
+
+    if (cache->loadedCount >= cache->queryCount)
+        return;
+
+    if (m_maxReferedIndex >= cache->loadedCount + m_chunkSize)
+        return;
+
+    m_maxReferedIndex = std::min(cache->loadedCount + m_chunkSize, cache->queryCount);
+    if (!m_appendTask)
+        asyncFetchMore();
+}
+
+template<typename T>
 void ListCache<T>::invalidate()
 {
     if (m_cachedData)
