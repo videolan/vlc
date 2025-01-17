@@ -231,6 +231,40 @@ void MLBaseModel::getDataFlat(const QVector<int> &indexes, QJSValue callback)
     *requestId = loadItems(indexes, cb);
 }
 
+
+Q_INVOKABLE QJSValue MLBaseModel::getDataById(MLItemId id)
+{
+    Q_D(const MLBaseModel);
+
+    auto [p, resolve, reject] = d->makeJSPromise();
+
+    MLItem* item = findInCache(id, nullptr);
+    if (item)
+    {
+        resolve.call({d->itemToJSValue(item)});
+    }
+    else
+    {
+        if (!m_itemLoader)
+            m_itemLoader = createMLLoader();
+
+        m_itemLoader->loadItemByIdTask(
+            id,
+            [this, resolve=std::move(resolve), reject=std::move(reject)](size_t taksId, MLListCache::ItemType&& item)
+            {
+                if (!item)
+                {
+                    reject.call();
+                    return;
+                }
+
+                resolve.call({d_func()->itemToJSValue(item.get())});
+            }
+        );
+    }
+    return p;
+}
+
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const
 {
     Q_D(const MLBaseModel);

@@ -69,6 +69,12 @@ public:
     Q_INVOKABLE void getDataFlat(const QVector<int> &indexList, QJSValue callback);
     QVariant data(const QModelIndex &index, int role) const override final;
 
+    /**
+     * @brief getDataById allows getting the informations of an mlitem from its Id
+     * @param id of the item
+     * @return a JS Promise with the content of the item
+     */
+    Q_INVOKABLE QJSValue getDataById(MLItemId id);
 public:
     // properties functions
 
