@@ -41,11 +41,10 @@
 #include "common.h"
 #include "../../video_chroma/copy.h"
 
-void CommonInit(display_win32_area_t *area, const video_format_t *src_fmt)
+void CommonInit(display_win32_area_t *area)
 {
     ZeroMemory(&area->place, sizeof(area->place));
     area->place_changed = false;
-    area->src_fmt = src_fmt;
 }
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)

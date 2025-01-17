@@ -182,7 +182,7 @@ static int Open(vout_display_t *vd,
     if (!sys)
         return VLC_ENOMEM;
 
-    CommonInit(&sys->area, NULL);
+    CommonInit(&sys->area);
     if (CommonWindowInit(vd, &sys->area, false))
         goto error;
 

@@ -40,8 +40,6 @@ typedef struct display_win32_area_t
     vout_display_place_t  place;
     bool                  place_changed;
     struct event_thread_t *event; // only use if sys.event is not NULL
-
-    const video_format_t  *src_fmt;
 } display_win32_area_t;
 
 #define RECTWidth(r)   (LONG)((r).right - (r).left)
@@ -58,7 +56,7 @@ HWND CommonVideoHWND(const display_win32_area_t *);
 void CommonDisplaySizeChanged(display_win32_area_t *);
 #endif /* WINAPI_PARTITION_DESKTOP */
 
-void CommonInit(display_win32_area_t *, const video_format_t *);
+void CommonInit(display_win32_area_t *);
 # ifdef __cplusplus
 }
 # endif

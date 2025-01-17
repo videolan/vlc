@@ -536,7 +536,7 @@ static int Open(vout_display_t *vd,
     if (ret != VLC_SUCCESS)
         goto error;
 
-    CommonInit(&sys->area, nullptr);
+    CommonInit(&sys->area);
 
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = (libvlc_video_update_output_cb)var_InheritAddress( vd, "vout-cb-update-output" );
