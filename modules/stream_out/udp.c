@@ -83,31 +83,27 @@ static void Flush(sout_stream_t *stream, void *id)
 
 static session_descriptor_t *CreateSDP(vlc_object_t *obj, int fd)
 {
-    union {
-        struct sockaddr addr;
-        struct sockaddr_in in;
-        struct sockaddr_in6 in6;
-    } src, dst;
+    vlc_sockaddr src, dst;
     socklen_t srclen = sizeof (srclen), dstlen = sizeof (dst);
     char dhost[INET6_ADDRSTRLEN];
     unsigned short dport;
 
-    if (getsockname(fd, &src.addr, &srclen)
-     || getpeername(fd, &dst.addr, &dstlen)) {
+    if (getsockname(fd, &src.sa, &srclen)
+     || getpeername(fd, &dst.sa, &dstlen)) {
         int val = errno;
 
         msg_Err(obj, "cannot format SDP: %s", vlc_strerror_c(val));
         return NULL;
     }
 
-    switch (dst.addr.sa_family) {
+    switch (dst.sa.sa_family) {
         case AF_INET:
-            inet_ntop(AF_INET, &dst.in.sin_addr, dhost, sizeof (dhost));
-            dport = dst.in.sin_port;
+            inet_ntop(AF_INET, &dst.sin.sin_addr, dhost, sizeof (dhost));
+            dport = dst.sin.sin_port;
             break;
         case AF_INET6:
-            inet_ntop(AF_INET6, &dst.in6.sin6_addr, dhost, sizeof (dhost));
-            dport = dst.in6.sin6_port;
+            inet_ntop(AF_INET6, &dst.sin6.sin6_addr, dhost, sizeof (dhost));
+            dport = dst.sin6.sin6_port;
             break;
         default:
             return NULL;
@@ -116,7 +112,7 @@ static session_descriptor_t *CreateSDP(vlc_object_t *obj, int fd)
     struct vlc_memstream sdp;
 
     if (vlc_sdp_Start(&sdp, obj, SOUT_CFG_PREFIX,
-                      &src.addr, srclen, &dst.addr, dstlen))
+                      &src.sa, srclen, &dst.sa, dstlen))
         return NULL;
 
     vlc_memstream_printf(&sdp, "m=video %d udp mpeg\r\n", ntohs(dport));
