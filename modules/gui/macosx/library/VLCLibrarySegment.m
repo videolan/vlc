@@ -79,6 +79,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 }
 
 
+// MARK: - Properties used by public VLCLibrarySegment methods internally and set by subclasses
+
 @interface VLCLibrarySegment ()
 
 @property NSString *internalDisplayString;
@@ -95,6 +97,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - VLCLibraryHeaderSegment
 
 @interface VLCLibraryHeaderSegment : VLCLibrarySegment
 
@@ -114,6 +118,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - VLCLibraryHomeSegment
 
 @interface VLCLibraryHomeSegment : VLCLibrarySegment
 @end
@@ -151,6 +157,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - Video library view segments
 
 @interface VLCLibraryVideoShowsSubSegment : VLCLibrarySegment
 @end
@@ -228,6 +236,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - Audio library view segments
 
 @interface VLCLibraryMusicArtistSubSegment : VLCLibrarySegment
 @end
@@ -419,6 +429,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+// MARK: - Playlist library view segments
+
 @interface VLCLibraryPlaylistMusicPlaylistSubSegment : VLCLibrarySegment
 @end
 
@@ -537,6 +549,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 @end
 
 
+// MARK: - Group library view segments
+
 @interface VLCLibraryGroupSubSegment : VLCLibrarySegment
 
 - (instancetype)initWithGroup:(VLCMediaLibraryGroup *)group;
@@ -631,6 +645,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - Media source-based library view segments
 
 @interface VLCLibraryBrowseBookmarkedLocationSubSegment : VLCLibrarySegment
 
@@ -774,6 +790,8 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
 @end
 
+
+// MARK: - VLCLibrarySegment
 
 @implementation VLCLibrarySegment
 
