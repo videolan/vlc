@@ -1078,8 +1078,6 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     i = 0;
     while( !IMediaObject_GetInputType( p_dmo, 0, i++, &dmo_type ) )
     {
-        p_vih = (VIDEOINFOHEADER *)dmo_type.pbFormat;
-
         msg_Dbg( p_enc, "available input chroma: %4.4s",
                  (char *)&dmo_type.subtype.Data1 );
         if( !memcmp( &dmo_type.subtype, &MEDIASUBTYPE_RGB565, 16 ) )
