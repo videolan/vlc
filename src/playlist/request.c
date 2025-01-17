@@ -192,11 +192,11 @@ vlc_playlist_MoveBySlices(vlc_playlist_t *playlist, size_t indices[],
 static int
 cmp_size(const void *lhs, const void *rhs)
 {
-    size_t a = *(size_t *) lhs;
-    size_t b = *(size_t *) rhs;
-    if (a < b)
+    const size_t *a = lhs;
+    const size_t *b = rhs;
+    if (*a < *b)
         return -1;
-    if (a == b)
+    if (*a == *b)
         return 0;
     return 1;
 }
