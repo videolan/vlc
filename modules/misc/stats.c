@@ -52,19 +52,21 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( !p_pic )
         goto error;
 
+    vlc_tick_t tick;
     if( p_block->i_buffer == kBufferSize )
     {
+        memcpy(&tick, p_block->p_buffer, sizeof(vlc_tick_t));
         msg_Dbg( p_dec, "got %"PRIu64" ms",
-                 MS_FROM_VLC_TICK(*(vlc_tick_t *)p_block->p_buffer) );
+                 MS_FROM_VLC_TICK(tick) );
         msg_Dbg( p_dec, "got %"PRIu64" ms offset",
-                 MS_FROM_VLC_TICK(vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) );
-        *(vlc_tick_t *)(p_pic->p->p_pixels) = *(vlc_tick_t *)p_block->p_buffer;
+                 MS_FROM_VLC_TICK(vlc_tick_now() - tick) );
     }
     else
     {
         msg_Dbg( p_dec, "got a packet not from stats demuxer" );
-        *(vlc_tick_t *)(p_pic->p->p_pixels) = vlc_tick_now();
+        tick = vlc_tick_now();
     }
+    memcpy(p_pic->p->p_pixels, &tick, sizeof(vlc_tick_t));
 
     p_pic->date = p_block->i_pts != VLC_TICK_INVALID ?
             p_block->i_pts : p_block->i_dts;
@@ -101,13 +103,14 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     (void)p_pict;
     block_t * p_block = block_Alloc( kBufferSize );
 
-    *(vlc_tick_t*)p_block->p_buffer = vlc_tick_now();
+    vlc_tick_t now = vlc_tick_now();
+    memcpy(p_block->p_buffer, &now, sizeof(vlc_tick_t));
     p_block->i_buffer = kBufferSize;
     p_block->i_length = kBufferSize;
     p_block->i_dts = p_pict->date;
 
     msg_Dbg( p_enc, "putting %"PRIu64"ms",
-             MS_FROM_VLC_TICK(*(vlc_tick_t*)p_block->p_buffer) );
+             MS_FROM_VLC_TICK(now) );
     return p_block;
 }
 
@@ -164,8 +167,10 @@ static int Demux( demux_t *p_demux )
 
     p_block->i_dts = p_block->i_pts = date_Increment( &p_sys->pts, kBufferSize );
 
+    vlc_tick_t tick;
+    memcpy(&tick, p_block->p_buffer, sizeof(vlc_tick_t));
     msg_Dbg( p_demux, "demux got %"PRId64" ms offset",
-             MS_FROM_VLC_TICK(vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) );
+             MS_FROM_VLC_TICK(vlc_tick_now() - tick) );
 
     //es_out_SetPCR( p_demux->out, p_block->i_pts );
 
