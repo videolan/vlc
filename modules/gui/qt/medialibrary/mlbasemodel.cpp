@@ -97,6 +97,19 @@ public:
         return true;
     }
 
+    QJSValue itemToJSValue(const MLItem* item) const {
+        Q_Q(const MLBaseModel);
+        if (!item)
+            return QJSValue::NullValue;
+
+        QMap<QString, QVariant> dataDict;
+        const QHash<int, QByteArray> roles = q->roleNames();
+        if (item) // item may fail to load
+            for (int role: roles.keys())
+                dataDict[roles[role]] = q->itemRoleData(item, role);
+        auto jsEngine = qjsEngine(q);
+        return jsEngine->toScriptValue(dataDict);
+    }
 };
 
 // MLBaseModel
@@ -174,13 +187,15 @@ void MLBaseModel::getDataFlat(const QVector<int> &indexes, QJSValue callback)
         for (int i = 0; i < indxSize; ++i)
         {
             const auto &item = items[i];
-            QMap<QString, QVariant> dataDict;
 
+            QJSValue jsitem;
             if (item) // item may fail to load
-                for (int role: roles.keys())
-                    dataDict[roles[role]] = itemRoleData(item.get(), role);
+                jsitem = d_func()->itemToJSValue(item.get());
+            else
+                jsitem = jsEngine->newObject();
 
-            jsArray.setProperty(i, jsEngine->toScriptValue(dataDict));
+
+            jsArray.setProperty(i, jsitem);
         }
 
         callback.call({jsArray});
