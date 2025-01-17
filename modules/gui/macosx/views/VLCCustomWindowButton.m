@@ -296,6 +296,9 @@
 
     if (@available(macOS 11.0, *)) {
         self.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
+        self.image.template = YES;
+        self.imageHugsTitle = YES;
+        self.contentTintColor = NSColor.whiteColor;
     }
 }
 
