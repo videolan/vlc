@@ -293,13 +293,10 @@
         cell.highlightsBy = NSContentsCellMask;
         cell.imagePosition = NSImageLeft;
     }
-    
-#if 0
-    // FIXME: Add the @"wifi" system symbol for macOS 11
+
     if (@available(macOS 11.0, *)) {
-        [NSImage imageWithSystemSymbolName:@"wifi" accessibilityDescription:nil];
+        self.image = [NSImage imageWithSystemSymbolName:@"wifi" accessibilityDescription:nil];
     }
-#endif
 }
 
 @end
