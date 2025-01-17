@@ -84,12 +84,12 @@ public: // QAbstractItemModel reimplementation
                         int role = Qt::DisplayRole) const override;
 
 protected: // MLBaseModel implementation
-    QVariant itemRoleData(MLItem* item, int role = Qt::DisplayRole) const override;
+    QVariant itemRoleData(const MLItem* item, int role = Qt::DisplayRole) const override;
 
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
 private: // Functions
-    QString getCover(MLPlaylist * playlist) const;
+    QString getCover(const MLPlaylist* playlist) const;
 
     void endTransaction();
 

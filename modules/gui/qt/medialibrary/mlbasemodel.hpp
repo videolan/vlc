@@ -59,7 +59,7 @@ public:
 
     virtual ~MLBaseModel();
 
-    virtual QVariant itemRoleData(MLItem *item, int role) const = 0;
+    virtual QVariant itemRoleData(const MLItem *item, int role) const = 0;
 
     Q_INVOKABLE void sortByColumn(QByteArray criteria, Qt::SortOrder order);
 

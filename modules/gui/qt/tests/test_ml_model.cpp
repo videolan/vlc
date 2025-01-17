@@ -36,7 +36,7 @@ class MLTestModel : public MLBaseModel
     Q_OBJECT
 
 public:
-    virtual QVariant itemRoleData(MLItem *item, int role) const override
+    virtual QVariant itemRoleData(const MLItem *item, int role) const override
     {
         VLC_UNUSED(role);
         if (!item)

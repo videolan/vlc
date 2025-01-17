@@ -62,12 +62,12 @@ QHash<int, QByteArray> MLVideoFoldersModel::roleNames() const /* override */
 
 // Protected MLVideoModel implementation
 
-QVariant MLVideoFoldersModel::itemRoleData(MLItem * item, const int role) const /* override */
+QVariant MLVideoFoldersModel::itemRoleData(const MLItem * item, const int role) const /* override */
 {
     if (item == nullptr)
         return QVariant();
 
-    MLFolder * folder = static_cast<MLFolder *> (item);
+    const MLFolder * folder = static_cast<const MLFolder *> (item);
 
     switch (role)
     {

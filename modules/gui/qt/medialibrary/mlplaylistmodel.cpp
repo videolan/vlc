@@ -311,9 +311,9 @@ QHash<int, QByteArray> MLPlaylistModel::roleNames() const /* override */
     };
 }
 
-QVariant MLPlaylistModel::itemRoleData(MLItem *item, int role) const /* override */
+QVariant MLPlaylistModel::itemRoleData(const MLItem *item, int role) const /* override */
 {
-    MLPlaylistMedia * media = static_cast<MLPlaylistMedia *>(item);
+    auto media = static_cast<const MLPlaylistMedia *>(item);
     if (media == nullptr)
         return QVariant();
 

@@ -47,7 +47,7 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
 protected:
-    QVariant itemRoleData(MLItem *item, int role) const override;
+    QVariant itemRoleData(const MLItem *item, int role) const override;
 
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 

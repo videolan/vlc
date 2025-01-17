@@ -25,9 +25,9 @@ MLAlbumTrackModel::MLAlbumTrackModel(QObject *parent)
 {
 }
 
-QVariant MLAlbumTrackModel::itemRoleData(MLItem *item, const int role) const
+QVariant MLAlbumTrackModel::itemRoleData(const MLItem *item, const int role) const
 {
-    const MLAlbumTrack* ml_track = static_cast<MLAlbumTrack *>(item);
+    const MLAlbumTrack* ml_track = static_cast<const MLAlbumTrack *>(item);
     assert( ml_track );
 
     switch (role)

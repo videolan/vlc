@@ -66,7 +66,7 @@ signals:
     void transactionPendingChanged();
 
 protected: // MLBaseModel implementation
-    QVariant itemRoleData(MLItem *item, int role = Qt::DisplayRole) const override;
+    QVariant itemRoleData(const MLItem *item, int role = Qt::DisplayRole) const override;
 
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 

@@ -26,9 +26,9 @@ MLUrlModel::MLUrlModel(QObject *parent)
 {
 }
 
-QVariant MLUrlModel::itemRoleData(MLItem *item, int role) const
+QVariant MLUrlModel::itemRoleData(const MLItem *item, int role) const
 {
-    const MLUrl* ml_url = static_cast<MLUrl *>(item);
+    const MLUrl* ml_url = static_cast<const MLUrl *>(item);
     if ( !ml_url )
         return QVariant();
 

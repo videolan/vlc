@@ -76,7 +76,7 @@ public: // Interface
     Q_INVOKABLE void setItemFavorite(const QModelIndex & index, bool played);
 
 protected:
-    QVariant itemRoleData(MLItem *item, int role) const override;
+    QVariant itemRoleData(const MLItem *item, int role) const override;
 
     void thumbnailUpdated(const QModelIndex& , MLItem* , const QString& , vlc_ml_thumbnail_status_t ) override;
 

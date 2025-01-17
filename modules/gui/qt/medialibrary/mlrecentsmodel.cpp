@@ -43,9 +43,9 @@ MLRecentsModel::MLRecentsModel( QObject* parent )
 {
 }
 
-QVariant MLRecentsModel::itemRoleData(MLItem *item , int role ) const
+QVariant MLRecentsModel::itemRoleData(const MLItem *item , int role ) const
 {
-    const MLRecentMedia* media = static_cast<MLRecentMedia *>(item);
+    const MLRecentMedia* media = static_cast<const MLRecentMedia *>(item);
     if ( !media )
         return QVariant();
 

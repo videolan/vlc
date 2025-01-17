@@ -23,9 +23,9 @@ MLArtistModel::MLArtistModel(QObject *parent)
 {
 }
 
-QVariant MLArtistModel::itemRoleData(MLItem *item, const int role) const
+QVariant MLArtistModel::itemRoleData(const MLItem *item, const int role) const
 {
-    const MLArtist* ml_artist = static_cast<MLArtist *>(item);
+    const MLArtist* ml_artist = static_cast<const MLArtist *>(item);
     assert( ml_artist );
 
     switch (role)

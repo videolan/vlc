@@ -73,14 +73,14 @@ QHash<int, QByteArray> MLVideoGroupsModel::roleNames() const /* override */
 
 // Protected MLVideoModel implementation
 
-QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /* override */
+QVariant MLVideoGroupsModel::itemRoleData(const MLItem * item, const int role) const /* override */
 {
     if (item == nullptr)
         return QVariant();
 
     if (item->getId().type == VLC_ML_PARENT_GROUP)
     {
-        MLGroup * group = static_cast<MLGroup *> (item);
+        auto group = static_cast<const MLGroup *> (item);
 
         switch (role)
         {
@@ -116,7 +116,7 @@ QVariant MLVideoGroupsModel::itemRoleData(MLItem * item, const int role) const /
     }
     else
     {
-        MLVideo * video = static_cast<MLVideo *> (item);
+        auto video = static_cast<const MLVideo *> (item);
 
         switch (role)
         {

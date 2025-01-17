@@ -92,9 +92,9 @@ void MLAlbumModel::onVlcMlEvent(const MLEvent &event)
     MLBaseModel::onVlcMlEvent( event );
 }
 
-QVariant MLAlbumModel::itemRoleData(MLItem *item, const int role) const
+QVariant MLAlbumModel::itemRoleData(const MLItem *item, const int role) const
 {
-    auto ml_item = static_cast<MLAlbum *>(item);
+    auto ml_item = static_cast<const MLAlbum *>(item);
     assert(ml_item);
 
     switch (role)

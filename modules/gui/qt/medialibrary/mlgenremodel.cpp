@@ -44,9 +44,9 @@ MLGenreModel::MLGenreModel(QObject *parent)
 {
 }
 
-QVariant MLGenreModel::itemRoleData(MLItem *item, const int role) const
+QVariant MLGenreModel::itemRoleData(const MLItem *item, const int role) const
 {
-    MLGenre* ml_genre = static_cast<MLGenre *>(item);
+    auto ml_genre = static_cast<const MLGenre *>(item);
     if (!ml_genre)
         return QVariant();
 
@@ -124,7 +124,7 @@ vlc_ml_sorting_criteria_t MLGenreModel::nameToCriteria(QByteArray name) const
     }.value(name, VLC_ML_SORTING_DEFAULT);
 }
 
-QString MLGenreModel::getCover(MLGenre * genre) const
+QString MLGenreModel::getCover(const MLGenre * genre) const
 {
     return MLCustomCover::url(genre->getId()
                             , QSize(MLGENREMODEL_COVER_WIDTH, MLGENREMODEL_COVER_HEIGHT)

@@ -86,9 +86,9 @@ MLVideoModel::MLVideoModel(QObject* parent)
     emit dataChanged(index, index, { VIDEO_IS_FAVORITE });
 }
 
-QVariant MLVideoModel::itemRoleData(MLItem *item, int role) const
+QVariant MLVideoModel::itemRoleData(const MLItem *item, int role) const
 {
-    const auto video = static_cast<MLVideo *>(item);
+    const auto video = static_cast<const MLVideo *>(item);
     if ( video == nullptr )
         return {};
 

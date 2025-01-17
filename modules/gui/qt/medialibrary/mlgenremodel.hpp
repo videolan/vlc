@@ -59,7 +59,7 @@ signals:
     void coverDefaultChanged() const;
 
 protected:
-    QVariant itemRoleData(MLItem *item, int role) const override;
+    QVariant itemRoleData(const MLItem *item, int role) const override;
 
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
 
@@ -67,7 +67,7 @@ private:
     void onVlcMlEvent(const MLEvent &event) override;
     vlc_ml_sorting_criteria_t nameToCriteria(QByteArray name) const override;
 
-    QString getCover(MLGenre * genre) const;
+    QString getCover(const MLGenre* genre) const;
 
     QString m_coverDefault;
 

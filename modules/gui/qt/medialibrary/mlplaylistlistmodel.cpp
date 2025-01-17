@@ -276,9 +276,9 @@ QHash<int, QByteArray> MLPlaylistListModel::roleNames() const /* override */
     };
 }
 
-QVariant MLPlaylistListModel::itemRoleData(MLItem *item, int role) const /* override */
+QVariant MLPlaylistListModel::itemRoleData(const MLItem *item, int role) const /* override */
 {
-    MLPlaylist * playlist = static_cast<MLPlaylist *>(item);
+    auto playlist = static_cast<const MLPlaylist *>(item);
     if (playlist == nullptr)
         return QVariant();
 
@@ -356,7 +356,7 @@ void MLPlaylistListModel::setTransactionPending(const bool value)
     emit transactionPendingChanged(value);
 }
 
-QString MLPlaylistListModel::getCover(MLPlaylist * playlist) const
+QString MLPlaylistListModel::getCover(const MLPlaylist * playlist) const
 {
     return MLCustomCover::url(playlist->getId()
                             , m_coverSize
