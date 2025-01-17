@@ -154,12 +154,10 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
     switch(segment) {
         case VLCLibraryLowSentinelSegment:
         case VLCLibraryHeaderSegmentType:
+        case VLCLibraryHighSentinelSegment:
             vlc_assert_unreachable();
         case VLCLibraryHomeSegmentType:
-            [self setForwardsBackwardsToolbarItemsVisible:NO];
-            [self setSortOrderToolbarItemVisible:NO];
-            [self setLibrarySearchToolbarItemVisible:NO];
-            [self setViewModeToolbarItemVisible:NO];
+            [self applyVisiblityFlags:0];
             break;
         case VLCLibraryVideoSegmentType:
         case VLCLibraryShowsVideoSubSegmentType:
@@ -173,21 +171,16 @@ NSString * const VLCLibraryWindowTrackingSeparatorToolbarItemIdentifier =
         case VLCLibraryPlaylistsSegmentType:
         case VLCLibraryPlaylistsMusicOnlyPlaylistsSubSegmentType:
         case VLCLibraryPlaylistsVideoOnlyPlaylistsSubSegmentType:
-            [self setForwardsBackwardsToolbarItemsVisible:NO];
-            [self setSortOrderToolbarItemVisible:YES];
-            [self setLibrarySearchToolbarItemVisible:YES];
-            [self setViewModeToolbarItemVisible:YES];
+            [self applyVisiblityFlags:VLCLibraryWindowToolbarDisplayFlagSortOrderButton |
+             VLCLibraryWindowToolbarDisplayFlagLibrarySearchBar |
+             VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
             break;
         case VLCLibraryBrowseSegmentType:
         case VLCLibraryStreamsSegmentType:
         case VLCLibraryBrowseBookmarkedLocationSubSegmentType:
-            [self setForwardsBackwardsToolbarItemsVisible:YES];
-            [self setSortOrderToolbarItemVisible:NO];
-            [self setLibrarySearchToolbarItemVisible:NO];
-            [self setViewModeToolbarItemVisible:YES];
+            [self applyVisiblityFlags:VLCLibraryWindowToolbarDisplayFlagNavigationButtons |
+             VLCLibraryWindowToolbarDisplayFlagToggleViewModeSegmentButton];
             break;
-        case VLCLibraryHighSentinelSegment:
-            vlc_assert_unreachable();
     }
 }
 
