@@ -353,22 +353,22 @@ net_SockAddrIsMulticast (const struct sockaddr *addr, socklen_t len)
 
 static inline int net_GetSockAddress( int fd, char *address, int *port )
 {
-    struct sockaddr_storage addr;
-    socklen_t addrlen = sizeof( addr );
+    vlc_sockaddr addr;
+    socklen_t addrlen = sizeof( addr.ss );
 
-    return getsockname( fd, (struct sockaddr *)&addr, &addrlen )
-        || vlc_getnameinfo( (struct sockaddr *)&addr, addrlen, address,
+    return getsockname( fd, &addr.sa, &addrlen )
+        || vlc_getnameinfo( &addr.sa, addrlen, address,
                             NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
         ? VLC_EGENERIC : 0;
 }
 
 static inline int net_GetPeerAddress( int fd, char *address, int *port )
 {
-    struct sockaddr_storage addr;
-    socklen_t addrlen = sizeof( addr );
+    vlc_sockaddr addr;
+    socklen_t addrlen = sizeof( addr.ss );
 
-    return getpeername( fd, (struct sockaddr *)&addr, &addrlen )
-        || vlc_getnameinfo( (struct sockaddr *)&addr, addrlen, address,
+    return getpeername( fd, &addr.sa, &addrlen )
+        || vlc_getnameinfo( &addr.sa, addrlen, address,
                             NI_MAXNUMERICHOST, port, NI_NUMERICHOST )
         ? VLC_EGENERIC : 0;
 }
