@@ -1157,8 +1157,8 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
     }
 
     IMediaObject_GetOutputType( p_dmo, 0, i_selected, &dmo_type );
-    ((VIDEOINFOHEADER *)dmo_type.pbFormat)->dwBitRate =
-        p_enc->fmt_out.i_bitrate;
+    memcpy( dmo_type.pbFormat + offsetof(VIDEOINFOHEADER, dwBitRate),
+            &(DWORD){ p_enc->fmt_out.i_bitrate }, sizeof(DWORD) );
 
     /* Get the private data for the codec */
     while( 1 )
