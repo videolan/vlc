@@ -63,11 +63,7 @@ typedef struct sap_address_t
     vlc_cond_t              wait;
 
     char                    group[NI_MAXNUMERICHOST];
-    union {
-        struct sockaddr     a;
-        struct sockaddr_in  in;
-        struct sockaddr_in6 in6;
-    } orig;
+    vlc_sockaddr            orig;
     socklen_t               origlen;
     int                     fd;
     unsigned                interval;
@@ -101,7 +97,7 @@ static sap_address_t *AddressCreate (vlc_object_t *obj, const char *group)
     strlcpy (addr->group, group, sizeof (addr->group));
     addr->fd = fd;
     addr->origlen = sizeof (addr->orig);
-    getsockname(fd, &addr->orig.a, &addr->origlen);
+    getsockname(fd, &addr->orig.sa, &addr->origlen);
 
     addr->interval = var_CreateGetInteger (obj, "sap-interval");
     vlc_cond_init (&addr->wait);
@@ -165,12 +161,7 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
 {
     int i;
     char psz_addr[NI_MAXNUMERICHOST];
-    union
-    {
-        struct sockaddr     a;
-        struct sockaddr_in  in;
-        struct sockaddr_in6 in6;
-    } addr;
+    vlc_sockaddr addr;
     socklen_t addrlen = 0;
     struct addrinfo *res;
 
@@ -191,13 +182,13 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
     }
 
     /* Determine SAP multicast address automatically */
-    switch (addr.a.sa_family)
+    switch (addr.sa.sa_family)
     {
 #if defined (HAVE_INET_PTON) || defined (_WIN32)
         case AF_INET6:
         {
             /* See RFC3513 for list of valid IPv6 scopes */
-            struct in6_addr *a6 = &addr.in6.sin6_addr;
+            struct in6_addr *a6 = &addr.sin6.sin6_addr;
 
             memcpy( a6->s6_addr + 2, "\x00\x00\x00\x00\x00\x00"
                    "\x00\x00\x00\x00\x00\x02\x7f\xfe", 14 );
@@ -214,7 +205,7 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
         case AF_INET:
         {
             /* See RFC2365 for IPv4 scopes */
-            uint32_t ipv4 = addr.in.sin_addr.s_addr;
+            uint32_t ipv4 = addr.sin.sin_addr.s_addr;
 
             /* 224.0.0.0/24 => 224.0.0.255 */
             if ((ipv4 & htonl (0xffffff00)) == htonl (0xe0000000))
@@ -241,17 +232,17 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
                 return NULL;
             }
 
-            addr.in.sin_addr.s_addr = ipv4;
+            addr.sin.sin_addr.s_addr = ipv4;
             break;
         }
 
         default:
             msg_Err (obj, "Address family %u not supported by SAP",
-                     (unsigned)addr.a.sa_family);
+                     (unsigned)addr.sa.sa_family);
             return NULL;
     }
 
-    i = vlc_getnameinfo( &addr.a, addrlen,
+    i = vlc_getnameinfo( &addr.sa, addrlen,
                          psz_addr, sizeof( psz_addr ), NULL, NI_NUMERICHOST );
 
     if( i )
@@ -289,26 +280,26 @@ matched:
     /* SAPv1, not encrypted, not compressed */
     uint8_t flags = 0x20;
 #ifdef AF_INET6
-    if (sap_addr->orig.a.sa_family == AF_INET6)
+    if (sap_addr->orig.sa.sa_family == AF_INET6)
         flags |= 0x10;
 #endif
     vlc_memstream_putc(&stream, flags);
     vlc_memstream_putc(&stream, 0x00); /* No authentication length */
     vlc_memstream_write(&stream, &(uint16_t){ vlc_tick_now() }, 2); /* ID hash */
 
-    switch (sap_addr->orig.a.sa_family)
+    switch (sap_addr->orig.sa.sa_family)
     {
 #ifdef AF_INET6
         case AF_INET6:
         {
-            const struct in6_addr *a6 = &sap_addr->orig.in6.sin6_addr;
+            const struct in6_addr *a6 = &sap_addr->orig.sin6.sin6_addr;
             vlc_memstream_write(&stream, a6, 16);
             break;
         }
 #endif
         case AF_INET:
         {
-            const struct in_addr *a4 = &sap_addr->orig.in.sin_addr;
+            const struct in_addr *a4 = &sap_addr->orig.sin.sin_addr;
             vlc_memstream_write(&stream, a4, 4);
             break;
         }
