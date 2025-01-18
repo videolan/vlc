@@ -133,13 +133,6 @@ static NSMenu *o_keys_menu = nil;
 
 @end
 
-@interface KeyConfigControl : VLCConfigControl
-
-- (id)initWithItem:(module_config_t *)_p_item
-          withView:(NSView *)o_parent_view;
-
-@end
-
 @interface ModuleListConfigControl : VLCConfigControl
 
 - (id)initWithItem:(module_config_t *)_p_item

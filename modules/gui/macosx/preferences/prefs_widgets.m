@@ -819,14 +819,13 @@ my_width, tooltip, init_value)                                              \
             else
                 control = [[FloatConfigControl alloc] initWithItem: _p_item withView: parentView];
             break;
-            /* don't display keys in the advanced settings, since the current controls
-             are broken by design. The user is required to change hotkeys in the sprefs
-             and can only change really advanced stuff here..
-             case CONFIG_ITEM_KEY:
-             control = [[KeyConfigControl alloc]
-             initWithItem: _p_item
-             withView: parentView];
-             break; */
+        /* don't display keys in the advanced settings, since the current controls
+         are broken by design. The user is required to change hotkeys in the sprefs
+         and can only change really advanced stuff here..
+
+        case CONFIG_ITEM_KEY:
+            break;
+         */
         case CONFIG_ITEM_MODULE_LIST:
         case CONFIG_ITEM_MODULE_LIST_CAT:
             control = [[ModuleListConfigControl alloc] initWithItem: _p_item withView: parentView];
@@ -1869,87 +1868,6 @@ my_width, tooltip, init_value)                                              \
 - (void)resetValues
 {
     [o_checkbox setState: config_GetInt(self.p_item->psz_name)];
-    [super resetValues];
-}
-@end
-
-@interface KeyConfigControl()
-{
-    NSPopUpButton   *o_popup;
-}
-@end
-
-@implementation KeyConfigControl
-- (id)initWithItem:(module_config_t *)p_item
-          withView:(NSView *)parentView
-{
-    const NSUInteger leftMargin = VLCLibraryUIUnits.largeSpacing;
-    const NSUInteger rightMargin = VLCLibraryUIUnits.largeSpacing;
-
-    NSRect mainFrame = [parentView frame];
-    NSString *labelString, *toolTip;
-    mainFrame.size.height = 22;
-    mainFrame.size.width = mainFrame.size.width - leftMargin - rightMargin + 1;
-    mainFrame.origin.x = leftMargin;
-    mainFrame.origin.y = 0;
-
-    if (self = [super initWithFrame:mainFrame item:p_item]) {
-        self.viewType = CONFIG_ITEM_KEY;
-
-        toolTip = [NSTR(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
-
-        /* add the label */
-        labelString = NSTR(p_item->psz_text);
-        ADD_LABEL(self.label, mainFrame, 0, -1, labelString, toolTip)
-        [self.label setAutoresizingMask:NSViewNotSizable ];
-        [self addSubview: self.label];
-
-        /* build the popup */
-        ADD_POPUP(o_popup, mainFrame, [self.label frame].origin.x +
-                  [self.label frame].size.width + 3,
-                  -2, 0, toolTip)
-        [o_popup setAutoresizingMask:NSViewWidthSizable ];
-
-        if (o_keys_menu == nil) {
-            o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
-#warning This does not work anymore. FIXME.
-#if 0
-            for (unsigned int i = 0; i < sizeof(vlc_key) / sizeof(key_descriptor_t); i++)
-                if (vlc_key[i].psz_key_string)
-                    POPULATE_A_KEY(o_keys_menu,toNSStr(vlc_key[i].psz_key_string),
-                                   vlc_key[i].i_key_code)
-#endif
-                    }
-        [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
-        [o_popup selectItem:[[o_popup menu] itemWithTag:p_item->value.i]];
-        [self addSubview: o_popup];
-
-    }
-    return self;
-}
-
-- (void) alignWithXPosition:(int)i_xPos
-{
-    NSRect frame;
-    NSRect superFrame = [self frame];
-    frame = [self.label frame];
-    frame.origin.x = i_xPos - frame.size.width - 3;
-    [self.label setFrame:frame];
-
-    frame = [o_popup frame];
-    frame.origin.x = i_xPos - 1;
-    frame.size.width = superFrame.size.width - frame.origin.x + 2;
-    [o_popup setFrame:frame];
-}
-
-- (int)intValue
-{
-    return (int)[o_popup selectedTag];
-}
-
-- (void)resetValues
-{
-    [o_popup selectItem:[[o_popup menu] itemWithTag:config_GetInt(self.p_item->psz_name)]];
     [super resetValues];
 }
 @end
