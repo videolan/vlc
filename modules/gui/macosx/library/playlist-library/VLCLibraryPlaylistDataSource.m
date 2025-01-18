@@ -77,6 +77,11 @@ typedef NS_ENUM(NSInteger, VLCLibraryDataSourceCacheAction) {
                              object:nil];
 }
 
+- (void)disconnect
+{
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
 - (void)playlistsReset:(NSNotification *)notification
 {
     NSParameterAssert(notification);
