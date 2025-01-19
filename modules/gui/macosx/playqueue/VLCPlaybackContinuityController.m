@@ -155,6 +155,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     if (!inputItem)
         return;
 
+    /* allow the user to over-write the start/stop/run-time */
     NSArray<NSString *> * const options = inputItem.options;
     const NSUInteger runtimeOption = [options indexOfObjectPassingTest:^BOOL(NSString * const obj, NSUInteger, BOOL *){
         return [obj hasPrefix:@"start-time"] || [obj hasPrefix:@"stop-time"];
@@ -163,16 +164,6 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     if (runtimeOption != NSNotFound) {
         return;
     }
-
-    /* allow the user to over-write the start/stop/run-time */
-    // FIXME: reimplement using new playlist
-#if 0
-    if (var_GetFloat(p_input_thread, "run-time") > 0 ||
-        var_GetFloat(p_input_thread, "start-time") > 0 ||
-        var_GetFloat(p_input_thread, "stop-time") != 0) {
-        return;
-    }
-#endif
 
     /* check for file existence before resuming */
     if (![self isValidResumeItem:inputItem])
