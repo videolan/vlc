@@ -173,7 +173,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     if (!url)
         return;
 
-    VLCMediaLibraryMediaItem *libraryMediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:url];
+    VLCMediaLibraryMediaItem * const libraryMediaItem = [VLCMediaLibraryMediaItem mediaItemForURL:url];
     if (!libraryMediaItem) {
         // input item isn't part of the library
         [self resumeLegacyPlaybackPositionForInputItem:inputItem
@@ -196,9 +196,9 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
         return;
     }
 
-    float lastPlaybackPosition = libraryMediaItem.progress;
-    int64_t duration = libraryMediaItem.duration;
-    BOOL isAlbumTrack = libraryMediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
+    const float lastPlaybackPosition = libraryMediaItem.progress;
+    const int64_t duration = libraryMediaItem.duration;
+    const BOOL isAlbumTrack = libraryMediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
 
     if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration || isAlbumTrack) {
 
