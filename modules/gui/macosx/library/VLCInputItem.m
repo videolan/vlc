@@ -635,6 +635,18 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[pathUrl]];
 }
 
+- (NSArray<NSString *> *)options
+{
+    NSMutableArray * const options = NSMutableArray.array;
+    const int i_options = _vlcInputItem->i_options;
+    for (NSUInteger i = 0; i < i_options; ++i) {
+        const char *psz_option = _vlcInputItem->ppsz_options[i];
+        NSString * const option = NSTR(psz_option);
+        [options addObject:option];
+    }
+    return options.copy;
+}
+
 @end
 
 
