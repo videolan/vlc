@@ -193,7 +193,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     NSParameterAssert(libraryMediaItem != nil);
 
     const float lastPlaybackPosition = libraryMediaItem.progress;
-    const int64_t duration = libraryMediaItem.duration;
+    const int64_t duration = playerController.durationOfCurrentMediaItem;
     const BOOL isAlbumTrack = libraryMediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
 
     if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration || isAlbumTrack) {
