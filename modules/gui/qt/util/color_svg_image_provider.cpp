@@ -28,29 +28,60 @@
 #include <QQmlFile>
 #include <QDebug>
 
-#define PATH_KEY "_res_PATH"
-#define BACKGROUND_KEY "_res_BG"
-#define COLOR1_KEY "_res_C1"
-#define COLOR2_KEY "_res_C2"
-#define COLOR_ACCENT_KEY "_res_ACCENT"
-
-namespace {
-
 static const QMap<QString, QString> predefinedSubst = {
     {COLOR1_KEY, "#FF00FF"},
     {COLOR2_KEY, "#00FFFF"},
     {COLOR_ACCENT_KEY, "#FF8800"},
 };
 
+QPair<QByteArray, std::optional<QColor>> colorizeSvg(const QString &filename, const QList<QPair<QString, QString> > &replacements)
+{
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        qWarning() << "SVGColorizer: can not open file " << filename << " for read.";
+        return {};
+    }
+
+    QByteArray data = file.readAll();
+    //we pass by QString because we want to perform case incensite replacements
+    QString dataStr = QString::fromUtf8(data);
+
+    std::optional<QColor> backgroundColor;
+
+    for (const auto& replacePair: replacements)
+    {
+        if (replacePair.first == PATH_KEY)
+            continue;
+        else if (replacePair.first == BACKGROUND_KEY)
+        {
+            backgroundColor = QColor(replacePair.second);
+        }
+        else if (predefinedSubst.contains(replacePair.first))
+        {
+            dataStr = dataStr.replace(predefinedSubst[replacePair.first],
+                                      replacePair.second, Qt::CaseInsensitive);
+        }
+        else
+        {
+            dataStr = dataStr.replace(replacePair.first, replacePair.second, Qt::CaseInsensitive);
+        }
+    }
+
+    return {dataStr.toUtf8(), backgroundColor};
+}
+
+namespace {
+
 class SVGColorImageReader: public AsyncTask<QImage>
 {
 public:
     SVGColorImageReader(const QString& filename, const QList<QPair<QString, QString>>& replacements, QSize requestedSize)
         : AsyncTask<QImage>()
+        , m_fileName(filename)
         , m_requestedSize(requestedSize)
         , m_replacements(replacements)
     {
-        m_file = new QFile(filename, this);
         if (!m_requestedSize.isValid())
             m_requestedSize = QSize{256, 256};
     }
@@ -63,7 +94,9 @@ public:
             return {};
         }
 
-        if (!m_file->open(QIODevice::ReadOnly))
+        const auto data = colorizeSvg(m_fileName, m_replacements);
+
+        if (data.first.isEmpty())
         {
             m_error = "file can't be opened";
             return {};
@@ -71,29 +104,10 @@ public:
 
         QColor backgroundColor{Qt::transparent};
 
-        QByteArray data = m_file->readAll();
-        //we pass by QString because we want to perform case incensite replacements
-        QString dataStr = QString::fromUtf8(data);
-        for (const auto& replacePair: m_replacements)
-        {
-            if (replacePair.first == PATH_KEY)
-                continue;
-            else if (replacePair.first == BACKGROUND_KEY)
-            {
-                backgroundColor = QColor(replacePair.second);
-            }
-            else if (predefinedSubst.contains(replacePair.first))
-            {
-                dataStr = dataStr.replace(predefinedSubst[replacePair.first],
-                                          replacePair.second, Qt::CaseInsensitive);
-            }
-            else
-            {
-                dataStr = dataStr.replace(replacePair.first, replacePair.second, Qt::CaseInsensitive);
-            }
-        }
+        if (data.second.has_value())
+            backgroundColor = *data.second;
 
-        QSvgRenderer renderer(dataStr.toUtf8());
+        QSvgRenderer renderer(data.first);
         if (!renderer.isValid())
         {
             m_error = "can't parse SVG content";
@@ -139,7 +153,7 @@ public:
     }
 
 private:
-    QFile* m_file = nullptr;
+    QString m_fileName;
     QString m_error;
     QSize m_requestedSize;
     QList<QPair<QString, QString>> m_replacements;

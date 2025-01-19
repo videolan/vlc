@@ -24,6 +24,14 @@
 #include <QString>
 #include <QUrlQuery>
 
+#define PATH_KEY "_res_PATH"
+#define BACKGROUND_KEY "_res_BG"
+#define COLOR1_KEY "_res_C1"
+#define COLOR2_KEY "_res_C2"
+#define COLOR_ACCENT_KEY "_res_ACCENT"
+
+QPair<QByteArray, std::optional<QColor>> colorizeSvg(const QString& filename, const QList<QPair<QString, QString>>& replacements);
+
 class SVGColorImageImageProvider: public QQuickAsyncImageProvider
 {
 public:
