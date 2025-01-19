@@ -190,9 +190,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
                                               ask:(BOOL)ask
                                            player:(VLCPlayerController *)playerController
 {
-    if(libraryMediaItem == nil) {
-        return;
-    }
+    NSParameterAssert(libraryMediaItem != nil);
 
     const float lastPlaybackPosition = libraryMediaItem.progress;
     const int64_t duration = libraryMediaItem.duration;
