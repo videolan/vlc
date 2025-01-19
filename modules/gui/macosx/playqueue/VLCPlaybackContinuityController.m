@@ -182,13 +182,11 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     }
 
     [self resumePlaybackPositionForLibraryMediaItem:libraryMediaItem
-                                          inputItem:inputItem
                                                 ask:(settingValue == 0)
                                              player:playerController];
 }
 
 - (void)resumePlaybackPositionForLibraryMediaItem:(VLCMediaLibraryMediaItem *)libraryMediaItem
-                                        inputItem:(VLCInputItem *)inputItem
                                               ask:(BOOL)ask
                                            player:(VLCPlayerController *)playerController
 {
@@ -201,7 +199,6 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
     const BOOL isAlbumTrack = libraryMediaItem.mediaSubType == VLC_ML_MEDIA_SUBTYPE_ALBUMTRACK;
 
     if (lastPlaybackPosition < MinimumStorePercent || duration < MinimumDuration || isAlbumTrack) {
-
         return;
     }
 
@@ -222,7 +219,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
         _resumeDialogController = [[VLCResumeDialogController alloc] init];
     }
 
-    [_resumeDialogController showWindowWithItem:inputItem
+    [_resumeDialogController showWindowWithItem:libraryMediaItem.inputItem
                                withLastPosition:(lastPlaybackPosition * duration) / 1000
                                 completionBlock:completionBlock];
 }
