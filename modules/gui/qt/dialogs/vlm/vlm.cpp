@@ -31,6 +31,7 @@
 #include "dialogs/open/open.hpp"
 #include "dialogs/sout/sout.hpp"
 #include "util/qt_dirs.hpp"
+#include "util/colorizedsvgicon.hpp"
 
 #include <QString>
 #include <QVBoxLayout>
@@ -461,7 +462,7 @@ VLMAWidget::VLMAWidget( VLMWrapper *_vlm, const QString& _name,
     objLayout->addWidget( time, 1, 3, 1, 2 );*/
 
     QToolButton *modifyButton = new QToolButton;
-    modifyButton->setIcon( QIcon( ":/menu/ic_fluent_options.svg" ) );
+    modifyButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( QStringLiteral(":/menu/ic_fluent_options.svg"), modifyButton ) );
     modifyButton->setToolTip( qtr("Change") );
     objLayout->addWidget( modifyButton, 0, 5 );
 
@@ -507,13 +508,13 @@ VLMBroadcast::VLMBroadcast( VLMWrapper *vlm, const QString& _name,
     b_looped = _looped;
 
     playButton = new QToolButton;
-    playButton->setIcon( QIcon( ":/menu/ic_fluent_play_filled.svg" ) );
+    playButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( QStringLiteral(":/menu/ic_fluent_play_filled.svg"), playButton ) );
     playButton->setToolTip( qtr("Play") );
     objLayout->addWidget( playButton, 1, 0 );
     b_playing = true;
 
     QToolButton *stopButton = new QToolButton;
-    stopButton->setIcon( QIcon( ":/menu/ic_fluent_stop.svg" ) );
+    stopButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_stop.svg", stopButton ) );
     stopButton->setToolTip( qtr("Stop") );
     objLayout->addWidget( stopButton, 1, 1 );
 
@@ -532,9 +533,9 @@ void VLMBroadcast::update()
 {
     vlm->EditBroadcast( name, input, inputOptions, output, b_enabled, b_looped );
     if( b_looped )
-        loopButton->setIcon( QIcon( ":/menu/ic_fluent_arrow_repeat_all.svg" ) );
+        loopButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_arrow_repeat_all.svg", loopButton ) );
     else
-        loopButton->setIcon( QIcon( ":/menu/repeat_off.svg" ) );
+        loopButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/repeat_off.svg", loopButton ) );
 }
 
 void VLMBroadcast::togglePlayPause()
@@ -542,12 +543,12 @@ void VLMBroadcast::togglePlayPause()
     if( b_playing )
     {
         vlm->ControlBroadcast( name, ControlBroadcastPause );
-        playButton->setIcon( QIcon( ":/menu/ic_pause_filled.svg" ) );
+        playButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_pause_filled.svg", playButton ) );
     }
     else
     {
         vlm->ControlBroadcast( name, ControlBroadcastPlay );
-        playButton->setIcon( QIcon( ":/menu/ic_fluent_play_filled.svg" ) );
+        playButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( QStringLiteral(":/menu/ic_fluent_play_filled.svg"), playButton ) );
     }
     b_playing = !b_playing;
 }
@@ -561,7 +562,7 @@ void VLMBroadcast::toggleLoop()
 void VLMBroadcast::stop()
 {
     vlm->ControlBroadcast( name, ControlBroadcastStop );
-    playButton->setIcon( QIcon( ":/menu/ic_fluent_play_filled.svg" ) );
+    playButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( QStringLiteral(":/menu/ic_fluent_play_filled.svg"), playButton ) );
 }
 
 /****************

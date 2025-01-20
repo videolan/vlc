@@ -46,6 +46,7 @@
 #include "dialogs/systray/systray.hpp"
 #include "util/varchoicemodel.hpp"
 #include "util/color_scheme_model.hpp"
+#include "util/colorizedsvgicon.hpp"
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlrecentsmodel.hpp"
 #include "medialibrary/mlbookmarkmodel.hpp"
@@ -87,7 +88,7 @@ QAction *addDPStaticEntry( QMenu *menu,
 #ifndef __APPLE__ /* We don't set icons in menus in MacOS X */
     if( !EMPTY_STR( icon ) )
     {
-        action = menu->addAction( QIcon( icon ), text, THEDP, member );
+        action = menu->addAction( ColorizedSvgIcon::colorizedIconForWidget( icon, menu ), text, THEDP, member );
     }
     else
 #endif
@@ -119,7 +120,7 @@ static QAction* addMIMStaticEntry( qt_intf_t *p_intf,
     if( !EMPTY_STR( icon ) )
     {
         action = menu->addAction( text, THEMIM,  member );
-        action->setIcon( QIcon( icon ) );
+        action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( icon, menu ) );
     }
     else
 #endif
@@ -141,7 +142,7 @@ static QAction* addMPLStaticEntry( qt_intf_t *p_intf,
     if( !EMPTY_STR( icon ) )
     {
         action = menu->addAction( text, THEMPL,  member );
-        action->setIcon( QIcon( icon ) );
+        action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( icon, menu ) );
     }
     else
 #endif
@@ -313,7 +314,7 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> pl
 
     action = menu->addAction(
 #ifndef __APPLE__
-            QIcon( ":/menu/ic_playlist.svg" ),
+            ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_playlist.svg", menu ),
 #endif
             qtr( "Play&list" ));
     action->setShortcut(QString( "Ctrl+L" ));
@@ -586,7 +587,7 @@ void VLCMenuBar::PopupMenuPlaylistEntries( QMenu *menu, qt_intf_t *p_intf )
                 THEMPL->togglePlayPause();
         });
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/ic_fluent_play_filled.svg" ) );
+        action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( QStringLiteral(":/menu/ic_fluent_play_filled.svg"), menu ) );
 #endif
     }
     else
@@ -633,17 +634,17 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
         action = rateMenu->addAction( qtr( "&Faster" ), THEMIM,
                                   &PlayerController::faster );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/ic_fluent_fast_forward.svg") );
+        action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_fast_forward.svg", rateMenu ) );
 #endif
     }
 
-    action = rateMenu->addAction( QIcon( ":/menu/ic_fluent_fast_forward.svg" ), qtr( "Faster (fine)" ), THEMIM,
+    action = rateMenu->addAction( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_fast_forward.svg", rateMenu ), qtr( "Faster (fine)" ), THEMIM,
                               &PlayerController::littlefaster );
 
     action = rateMenu->addAction( qtr( "N&ormal Speed" ), THEMIM,
                               &PlayerController::normalRate );
 
-    action = rateMenu->addAction( QIcon( ":/menu/ic_fluent_rewind.svg" ), qtr( "Slower (fine)" ), THEMIM,
+    action = rateMenu->addAction( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_rewind.svg", rateMenu ), qtr( "Slower (fine)" ), THEMIM,
                               &PlayerController::littleslower );
 
     if( b_normal )
@@ -651,7 +652,7 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
         action = rateMenu->addAction( qtr( "Slo&wer" ), THEMIM,
                                   &PlayerController::slower );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-        action->setIcon( QIcon( ":/menu/ic_fluent_rewind.svg") );
+        action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_rewind.svg", rateMenu ) );
 #endif
     }
 
@@ -664,13 +665,13 @@ void VLCMenuBar::PopupMenuControlEntries( QMenu *menu, qt_intf_t *p_intf,
     action = menu->addAction( qtr( "&Jump Forward" ), THEMIM,
              &PlayerController::jumpFwd );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/menu/ic_fluent_skip_forward_10.svg") );
+    action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_skip_forward_10.svg", menu ) );
 #endif
 
     action = menu->addAction( qtr( "Jump Bac&kward" ), THEMIM,
              &PlayerController::jumpBwd );
 #ifndef __APPLE__ /* No icons in menus in Mac */
-    action->setIcon( QIcon( ":/menu/ic_fluent_skip_back_10.svg") );
+    action->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_skip_back_10.svg", menu ) );
 #endif
 
     action = menu->addAction( qfut( I_MENU_GOTOTIME ), THEDP, &DialogsProvider::gotoTimeDialog );

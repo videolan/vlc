@@ -27,6 +27,7 @@
 #include "playlist/playlist_controller.hpp"
 #include "playlist/playlist_model.hpp"
 #include "dialogs/dialogs_provider.hpp"
+#include "util/colorizedsvgicon.hpp"
 
 // Qt includes
 #include <QPainter>
@@ -708,7 +709,7 @@ void QmlSubtitleMenu::beforePopup(QMenu * menu) /* override */
         emit triggered(Synchronize);
     });
 
-    menu->addAction(QIcon(":/menu/download.svg"), qtr("Search online"), this, [this]()
+    menu->addAction(ColorizedSvgIcon::colorizedIconForWidget(":/menu/download.svg", menu), qtr("Search online"), this, [this]()
     {
         emit triggered(Download);
     });
@@ -1051,19 +1052,20 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
     }
 
     action = m_menu->addAction( qtr("Add File...") );
-    action->setIcon(QIcon(":/menu/add.svg"));
+
+    action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/add.svg", m_menu.get()));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->simpleOpenDialog(false);
     });
 
     action = m_menu->addAction( qtr("Add Directory...") );
-    action->setIcon(QIcon(":/menu/add.svg"));
+    action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/add.svg", m_menu.get()));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDir();
     });
 
     action = m_menu->addAction( qtr("Advanced Open...") );
-    action->setIcon(QIcon(":/menu/add.svg"));
+    action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/add.svg", m_menu.get()));
     connect(action, &QAction::triggered, []( ) {
         DialogsProvider::getInstance()->PLAppendDialog();
     });
@@ -1127,7 +1129,7 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
         }
 
         action = m_menu->addAction( qtr("Shuffle the playlist") );
-        action->setIcon(QIcon(":/menu/ic_fluent_arrow_shuffle_on.svg"));
+        action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/ic_fluent_arrow_shuffle_on.svg", m_menu.get()));
         connect(action, &QAction::triggered, this, [this]( ) {
             m_controler->shuffle();
         });
