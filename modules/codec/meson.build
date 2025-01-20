@@ -669,7 +669,6 @@ if host_system == 'windows'
                     'avcodec/dxva_blocklist.c',
                 ),
             'c_args' : ['-DHAVE_LIBAVCODEC_D3D11VA_H=1'],
-            'cpp_args' : libcom_cppflags,
             'link_with' : [ d3d11_common_lib ],
             'dependencies' : [avcodec_compile_dep],
             'include_directories' : [
