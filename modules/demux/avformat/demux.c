@@ -633,7 +633,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         {
             const bool    b_ogg = !strcmp( p_sys->fmt->name, "ogg" );
             const uint8_t *p_extra = cp->extradata;
-            unsigned      i_extra  = cp->extradata_size;
+            size_t i_extra = cp->extradata_size;
 
             if( cp->codec_id == AV_CODEC_ID_THEORA && b_ogg )
             {
@@ -845,11 +845,12 @@ static int Demux( demux_t *p_demux )
 #else
 # define EXTRA_SIZE_TYPE size_t
 #endif
-    EXTRA_SIZE_TYPE side_data_size;
-    uint8_t *side_data = av_packet_get_side_data( &pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_data_size );
-    if( side_data_size > 0 ) {
+    EXTRA_SIZE_TYPE side_data_size_query;
+    uint8_t *side_data = av_packet_get_side_data( &pkt, AV_PKT_DATA_NEW_EXTRADATA, &side_data_size_query );
+    if( side_data_size_query > 0 ) {
         // ignore new extradata which is the same as previous version
-        if( side_data_size != (EXTRA_SIZE_TYPE)p_track->es_format.i_extra ||
+        size_t side_data_size = (size_t)side_data_size_query;
+        if( side_data_size != (size_t)p_track->es_format.i_extra ||
             memcmp( side_data, p_track->es_format.p_extra, side_data_size ) != 0 )
         {
             msg_Warn( p_demux, "New extra data found, seek may not work as expected" );
