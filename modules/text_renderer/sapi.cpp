@@ -61,8 +61,6 @@ static subpicture_region_t *RenderText(filter_t *,
                       const vlc_fourcc_t *);
 }
 
-static int RenderTextMTA(filter_t *, subpicture_region_t *);
-
 vlc_module_begin ()
  set_description(N_("Speech synthesis for Windows"))
 
