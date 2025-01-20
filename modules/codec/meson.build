@@ -692,13 +692,12 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
-            'c_args' : [ contrib_inc_args ],
             'link_with' : [ d3d9_common_lib ],
             'include_directories' : [
                 vlc_include_dirs,
                 include_directories('avcodec')
             ],
-            'dependencies' : [cc.find_library('dxva2')],
+            'dependencies' : [avcodec_compile_dep, cc.find_library('dxva2')],
         }
     endif
 
