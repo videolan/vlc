@@ -658,7 +658,6 @@ if host_system == 'windows'
     if (get_option('d3d11va').
         enable_auto_if(cc.check_header('libavcodec/d3d11va.h', args: [contrib_inc_args]))
         .allowed())
-        cdata.set('HAVE_LIBAVCODEC_D3D11VA_H', 1)
         vlc_modules += {
             'name' : 'd3d11va',
             'sources' : files(
@@ -669,6 +668,7 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
+            'c_args' : ['-DHAVE_LIBAVCODEC_D3D11VA_H=1'],
             'cpp_args' : libcom_cppflags,
             'link_with' : [ d3d11_common_lib ],
             'dependencies' : [avcodec_compile_dep],

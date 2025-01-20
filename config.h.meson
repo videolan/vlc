@@ -214,11 +214,6 @@
  * Library check macros
  */
 
-
-
-/* Define to 1 if you have the <libavcodec/d3d11va.h> header file. */
-#mesondefine HAVE_LIBAVCODEC_D3D11VA_H
-
 /* Define to 1 if you have the <libavcodec/dxva2.h> header file. */
 #mesondefine HAVE_LIBAVCODEC_DXVA2_H
 
