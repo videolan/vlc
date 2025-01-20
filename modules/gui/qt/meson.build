@@ -1064,33 +1064,31 @@ if qt6_dep.found()
         qt_cppargs += libcom_cppflags
     endif
 
-    if not (host_system in ['windows', 'darwin'])
-        #Qt GTK theme module
-        gtk_dep = dependency(
-            'gtk+-3.0',
-            version: '>=3.20',
-            required: get_option('qt_gtk')
-        )
+    #Qt GTK theme module
+    gtk_dep = dependency(
+        'gtk+-3.0',
+        version: '>=3.20',
+        required: get_option('qt_gtk').disable_auto_if(host_system in ['windows', 'darwin'])
+    )
 
-        vlc_modules += {
-            'name' : 'qt_gtktheme',
-            'sources' : files(
-                'style/gtkthemeprovider/gtk_compat.cpp',
-                'style/gtkthemeprovider/gtk_compat.h',
-                'style/gtkthemeprovider/gtkthemeprovider.cpp',
-                'style/gtkthemeprovider/gtk_util.cpp',
-                'style/gtkthemeprovider/gtk_util.h',
-                'style/gtkthemeprovider/nav_button_provider_gtk.cpp',
-                'style/gtkthemeprovider/nav_button_provider_gtk.h',
-                'style/gtkthemeprovider/scoped_gobject.h'
-            ),
-            'dependencies' : [gtk_dep],
-            'enabled' : gtk_dep.found()
-        }
+    vlc_modules += {
+        'name' : 'qt_gtktheme',
+        'sources' : files(
+            'style/gtkthemeprovider/gtk_compat.cpp',
+            'style/gtkthemeprovider/gtk_compat.h',
+            'style/gtkthemeprovider/gtkthemeprovider.cpp',
+            'style/gtkthemeprovider/gtk_util.cpp',
+            'style/gtkthemeprovider/gtk_util.h',
+            'style/gtkthemeprovider/nav_button_provider_gtk.cpp',
+            'style/gtkthemeprovider/nav_button_provider_gtk.h',
+            'style/gtkthemeprovider/scoped_gobject.h'
+        ),
+        'dependencies' : [gtk_dep],
+        'enabled' : gtk_dep.found()
+    }
 
-        if gtk_dep.found()
-            qt_extra_flags += '-DQT_HAS_GTK'
-        endif
+    if gtk_dep.found()
+        qt_extra_flags += '-DQT_HAS_GTK'
     endif
 
     if host_system == 'windows'
