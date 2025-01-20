@@ -328,14 +328,6 @@ else
     have_osx = false
 endif
 
-if have_osx
-    add_project_arguments('-mmacosx-version-min=10.11',
-        language: ['c', 'cpp', 'objc'])
-    add_project_link_arguments('-mmacosx-version-min=10.11',
-        language: ['c', 'cpp', 'objc'])
-endif
-
-
 #
 # Windows and MinGW checks
 #
