@@ -11,20 +11,17 @@
 # here that are used by multiple modules in the same subdirectory)
 
 # Check for X C bindings (XCB)
-if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').enabled()
-    xcb_dep = dependency('xcb', version: '>= 1.6', required: get_option('xcb'))
-    xcb_composite_dep = dependency('xcb-composite', required: get_option('xcb'))
-    xcb_randr_dep = dependency('xcb-randr', version: '>= 1.3', required: get_option('xcb'))
-    xcb_render_dep = dependency('xcb-render', required: get_option('xcb'))
-    xcb_shm_dep = dependency('xcb-shm', version: '>= 1.9.2', required: get_option('xcb'))
-    xcb_xkb_dep = dependency('xcb-xkb', required: get_option('xcb'))
-    xcb_keysyms_dep = dependency('xcb-keysyms', version: '>= 0.3.4', required: get_option('xcb'))
-    xproto_dep = dependency('xproto', required: get_option('xcb'))
-    xcb_damage_dep = dependency('xcb-damage', required: get_option('xcb'))
-    xcb_xfixes_dep = dependency('xcb-xfixes', required: get_option('xcb'))
-else
-    xcb_dep = dependency('', required: false)
-endif
+xcb_auto_option = get_option('xcb').disable_auto_if(host_system == 'darwin' or host_system == 'windows')
+xcb_dep = dependency('xcb', version: '>= 1.6', required: xcb_auto_option)
+xcb_composite_dep = dependency('xcb-composite', required: xcb_auto_option)
+xcb_randr_dep = dependency('xcb-randr', version: '>= 1.3', required: xcb_auto_option)
+xcb_render_dep = dependency('xcb-render', required: xcb_auto_option)
+xcb_shm_dep = dependency('xcb-shm', version: '>= 1.9.2', required: xcb_auto_option)
+xcb_xkb_dep = dependency('xcb-xkb', required: xcb_auto_option)
+xcb_keysyms_dep = dependency('xcb-keysyms', version: '>= 0.3.4', required: xcb_auto_option)
+xproto_dep = dependency('xproto', required: xcb_auto_option)
+xcb_damage_dep = dependency('xcb-damage', required: xcb_auto_option)
+xcb_xfixes_dep = dependency('xcb-xfixes', required: xcb_auto_option)
 
 # Check for Wayland
 if (host_system != 'darwin' and host_system != 'windows') or get_option('xcb').enabled()
