@@ -294,9 +294,9 @@ static  void on_player_current_media_changed(vlc_player_t *, input_item_t *new_m
     SharedInputItem newMediaPtr = SharedInputItem( new_media );
     that->callAsync([that,newMediaPtr] () {
         PlayerController* q = that->q_func();
-        that->UpdateName( newMediaPtr.get() );
         that->UpdateArt( newMediaPtr.get() );
         that->UpdateMeta( newMediaPtr.get() );
+        that->UpdateName( newMediaPtr.get() );
         that->m_url = vlc::wrap_cptr( input_item_GetURI( newMediaPtr.get() ) ).get();
 
         {
