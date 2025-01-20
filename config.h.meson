@@ -214,9 +214,6 @@
  * Library check macros
  */
 
-/* Define to 1 if you have the <libavcodec/dxva2.h> header file. */
-#mesondefine HAVE_LIBAVCODEC_DXVA2_H
-
 /* TODO: Properly check for the avformat header
  */
 #define HAVE_LIBAVFORMAT_AVFORMAT_H 1

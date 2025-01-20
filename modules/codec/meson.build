@@ -681,7 +681,6 @@ if host_system == 'windows'
     if (get_option('dxva2').
         enable_auto_if(cc.check_header('libavcodec/dxva2.h', args: [contrib_inc_args]))
         .allowed() and have_win_desktop)
-        cdata.set('HAVE_LIBAVCODEC_DXVA2_H', 1)
         vlc_modules += {
             'name' : 'dxva2',
             'sources' : files(
@@ -692,6 +691,7 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
+            'c_args' : [ '-DHAVE_LIBAVCODEC_DXVA2_H=1' ],
             'link_with' : [ d3d9_common_lib ],
             'include_directories' : [
                 vlc_include_dirs,
