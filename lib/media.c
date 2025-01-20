@@ -764,8 +764,8 @@ int libvlc_media_parse_request(libvlc_instance_t *inst, libvlc_media_t *media,
         do_parse = true;
     else
     {
-        if (input_net && (parse_flag & libvlc_media_parse_network) == 0)
-            do_parse = false;
+        if (input_net)
+            do_parse = parse_flag & libvlc_media_parse_network;
         else if (parse_flag & libvlc_media_parse_local)
         {
             switch (input_type)
