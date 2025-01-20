@@ -1149,7 +1149,7 @@ if qt6_dep.found()
         'name' : 'qt',
         'sources' : [qt6pre_files, qt6pre_qrc, shader_targets, shaders_processed, qt_sources, some_sources],
         'extra_files' : [shader_files],
-        'dependencies' : [qt_extra_deps, qt6_dep],
+        'dependencies' : [qt_extra_deps, qt6_dep, corefoundation_dep],
         'include_directories' : qt_include_dir,
         'c_args' : qt_extra_flags,
         'cpp_args' : [qt_extra_flags, qt_cppargs],
