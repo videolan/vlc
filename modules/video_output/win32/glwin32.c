@@ -171,7 +171,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     /* */
-    sys->place_changed = false;
+    sys->place_changed = true;
     if (CommonWindowInit(vd, &sys->video_wnd,
                    vd->source->projection_mode != PROJECTION_MODE_RECTANGULAR))
         goto error;
