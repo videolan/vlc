@@ -617,7 +617,7 @@ nodist_libqt_plugin_la_SOURCES += \
 	maininterface/compositor_wayland.moc.cpp
 
 libqt_wayland_plugin_la_CFLAGS = $(AM_CFLAGS) $(WAYLAND_CLIENT_CFLAGS)
-libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS)
+libqt_wayland_plugin_la_LIBADD =  $(WAYLAND_CLIENT_LIBS) $(LIBM)
 libqt_wayland_plugin_la_SOURCES = \
 	maininterface/qt_wayland_plugin.c \
 	maininterface/compositor_wayland_module.c \
