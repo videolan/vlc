@@ -272,13 +272,11 @@ vlc_modules += {
 
 # aribsub
 aribb24_dep = dependency('aribb24', version: '>= 1.0.1', required: get_option('aribsub'))
-if aribb24_dep.found()
-    cdata.set('HAVE_ARIBB24', 1)
-endif
 vlc_modules += {
     'name' : 'aribsub',
     'sources' : files('arib/aribsub.c'),
     'dependencies' : [aribb24_dep],
+    'cpp_args' : ['-DHAVE_ARIBB24'],
     'enabled' : aribb24_dep.found()
 }
 

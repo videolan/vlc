@@ -70,9 +70,6 @@
 /* AMD HQScaler supported */
 #mesondefine HAVE_AMF_SCALER
 
-/* Define if libaribb24 is available. */
-#mesondefine HAVE_ARIBB24
-
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #mesondefine HAVE_ARPA_INET_H
 
