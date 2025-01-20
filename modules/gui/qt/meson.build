@@ -481,6 +481,8 @@ some_sources = files(
     'util/model_recovery_agent.hpp',
     'util/vlcqtmessagehandler.cpp',
     'util/vlcqtmessagehandler.hpp',
+    'util/colorizedsvgicon.cpp',
+    'util/colorizedsvgicon.hpp',
     'widgets/native/animators.cpp',
     'widgets/native/animators.hpp',
     'widgets/native/customwidgets.cpp',
