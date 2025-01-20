@@ -1157,26 +1157,6 @@ if qt6_dep.found()
         'link_with' : qmllibs,
     }
 
-    quicktest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
-    if quicktest_qt6_dep.found()
-        qml_test_moc = qt6.compile_moc(
-            headers : files('tests/qml_test.hpp'),
-            dependencies : [quicktest_qt6_dep, qt6_dep]
-        )
-        qml_test = executable(
-          'qml_test',
-          [files('tests/qml_test.cpp', 'tests/qml_test.hpp'), qml_test_moc],
-          qt6pre_qrc,
-          build_by_default: false,
-          dependencies: [quicktest_qt6_dep, qt6_dep],
-          link_with: qmllibs,
-          cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
-        )
-        foreach test_name, test_file : qml_tests
-              test(test_name, qml_test, args: ['-input', test_file], suite:'qt')
-        endforeach
-    endif
-
     vlc_tests += {
         'name': 'base_model_test',
         'sources': files(
@@ -1267,6 +1247,26 @@ if qt6_dep.found()
             'link_with': [libvlccore, libvlc],
             'dependencies': [qt6_dep, qt_extra_deps, qtest_qt6_dep],
         }
-
     endif
+
+    quicktest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
+    if quicktest_qt6_dep.found()
+        qml_test_moc = qt6.compile_moc(
+            headers : files('tests/qml_test.hpp'),
+            dependencies : [quicktest_qt6_dep, qt6_dep]
+        )
+        qml_test = executable(
+          'qml_test',
+          [files('tests/qml_test.cpp', 'tests/qml_test.hpp'), qml_test_moc],
+          qt6pre_qrc,
+          build_by_default: false,
+          dependencies: [quicktest_qt6_dep, qt6_dep],
+          link_with: qmllibs,
+          cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
+        )
+        foreach test_name, test_file : qml_tests
+              test(test_name, qml_test, args: ['-input', test_file], suite:'qt')
+        endforeach
+    endif
+
 endif
