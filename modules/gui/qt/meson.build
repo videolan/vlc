@@ -1250,7 +1250,7 @@ if qt6_dep.found()
     endif
 
     quicktest_qt6_dep = dependency('qt6', version: '=' + qt6_dep.version(), modules: ['QuickTest'], required: false)
-    if quicktest_qt6_dep.found()
+    if quicktest_qt6_dep.found() and  qtest_qt6_dep.found()
         qml_test_moc = qt6.compile_moc(
             headers : files('tests/qml_test.hpp'),
             dependencies : [quicktest_qt6_dep, qt6_dep]
@@ -1260,7 +1260,7 @@ if qt6_dep.found()
           [files('tests/qml_test.cpp', 'tests/qml_test.hpp'), qml_test_moc],
           qt6pre_qrc,
           build_by_default: false,
-          dependencies: [quicktest_qt6_dep, qt6_dep],
+          dependencies: [quicktest_qt6_dep, qt6_dep, qtest_qt6_dep],
           link_with: qmllibs,
           cpp_args: ['-DQUICK_TEST_SOURCE_DIR="' + meson.current_source_dir() + '/tests"']
         )
