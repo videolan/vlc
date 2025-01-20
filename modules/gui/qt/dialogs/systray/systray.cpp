@@ -17,9 +17,11 @@
  *****************************************************************************/
 
 #include "systray.hpp"
+
+#include <QImageReader>
+
 #include "maininterface/mainctx.hpp"
 #include "menus/menus.hpp"
-#include <QSystemTrayIcon>
 #include "playlist/playlist_controller.hpp"
 #include "player/player_controller.hpp"
 #include "dialogs/dialogs_provider.hpp"
@@ -125,8 +127,34 @@ void VLCSystray::updateTooltipName( const QString& name )
         if( ( m_notificationSetting == NOTIFICATION_ALWAYS ) ||
             ( m_notificationSetting == NOTIFICATION_MINIMIZED && (windowVisiblity == QWindow::Hidden || windowVisiblity == QWindow::Minimized)))
         {
-            showMessage( qtr( "VLC media player" ), name,
-                                 QSystemTrayIcon::NoIcon, 3000 );
+            const auto showMessageTemplate = [this, &name](const auto &icon) {
+                showMessage( qtr( "VLC media player" ), name, icon, 3000 );
+            };
+
+            assert(m_intf);
+            assert(m_intf->p_mainPlayerController);
+            const QUrl& art = m_intf->p_mainPlayerController->getArtwork();
+            if (art.isValid())
+            {
+                // If there is artwork, use it but only when it is (almost) square:
+                const QString& fileName = art.toLocalFile();
+                const QImageReader imageReader(fileName);
+                if (Q_LIKELY(imageReader.canRead()))
+                {
+                    const QSize& size = imageReader.size(); // this does not read the whole image
+                    if (Q_LIKELY(!size.isEmpty()))
+                    {
+                        const double ratio = static_cast<double>(size.width()) / size.height();
+                        if (Q_LIKELY(std::abs(ratio - 1.0) < 0.2))
+                        {
+                            showMessageTemplate(QIcon(fileName));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            showMessageTemplate( QSystemTrayIcon::NoIcon );
         }
     }
     update();
