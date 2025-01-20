@@ -582,8 +582,8 @@ static void SpuAreaFixOverlap(spu_area_t *dst,
 }
 
 
-static void SpuAreaFitInside(spu_area_t *area, const unsigned boundary_width,
-                                               const unsigned boundary_height)
+static void SpuAreaMoveInside(spu_area_t *area, const unsigned boundary_width,
+                                                const unsigned boundary_height)
 {
     spu_area_t a = spu_area_scaled(*area);
     bool modified = false;
@@ -962,6 +962,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                             subpicture_region_t *region,
                             const spu_scale_t scale_size, bool apply_scale,
                             const vlc_fourcc_t *chroma_list,
+                            const unsigned output_x, const unsigned output_y,
                             const unsigned output_width, const unsigned output_height,
                             const spu_area_t *subtitle_area, size_t subtitle_area_count,
                             vlc_tick_t render_date)
@@ -1046,7 +1047,9 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if (subpic->b_subtitle)
         restrained.y -= y_margin;
 
-    SpuAreaFitInside(&restrained, output_width, output_height);
+    SpuAreaMoveInside(&restrained,
+                      apply_scale ? (output_x + output_width ) : spu_invscale_w(output_x + output_width, scale_size),
+                      apply_scale ? (output_y + output_height) : spu_invscale_h(output_y + output_height, scale_size));
 
     /* Fix the position for the current scale_size */
     x_offset = spu_scale_w(restrained.x, restrained.scale);
@@ -1415,10 +1418,15 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
         const bool subpic_in_video = IsSubpicInVideo(subpic, spu_in_full_window);
 
         unsigned output_width, output_height;
+        unsigned output_x, output_y;
         if (subpic_in_video) {
+            output_x      = video_position->x;
+            output_y      = video_position->y;
             output_width  = video_position->width;
             output_height = video_position->height;
         } else {
+            output_x      = fmt_dst->i_x_offset;
+            output_y      = fmt_dst->i_y_offset;
             output_width  = fmt_dst->i_visible_width;
             output_height = fmt_dst->i_visible_height;
         }
@@ -1492,7 +1500,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             output_last_ptr = SpuRenderRegion(spu, &area,
                             &forced_subpic, entry->channel_order,
                             region, scale, !external_scale,
-                            chroma_list, output_width, output_height,
+                            chroma_list,
+                            output_x, output_y, output_width, output_height,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : system_now);
             if (unlikely(output_last_ptr == NULL))
