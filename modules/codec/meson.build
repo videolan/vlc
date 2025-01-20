@@ -567,6 +567,7 @@ if host_system == 'darwin'
 endif
 
 # FFmpeg common helper library
+libavcodec_common = disabler()
 if avcodec_dep.found()
     libavcodec_common = static_library('avcodec_common',
         files('avcodec/fourcc.c', 'avcodec/chroma.c'),
