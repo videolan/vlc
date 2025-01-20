@@ -178,7 +178,7 @@ if (x11_dep.found() and
     )
 endif
 
-some_sources = files(
+qt_plugin_sources = files(
     'qt.cpp',
     'qt.hpp',
     'plugins.hpp',
@@ -507,7 +507,7 @@ some_sources = files(
 )
 
 if host_system == 'windows'
-    some_sources += files(
+    qt_plugin_sources += files(
         'maininterface/mainctx_win32.cpp',
         'maininterface/mainctx_win32.hpp',
         'maininterface/compositor_win7.cpp',
@@ -524,7 +524,7 @@ if (x11_dep.found() and
     xcb_dep.found() and
     xcb_damage_dep.found() and
     xcb_xfixes_dep.found())
-    some_sources += files(
+    qt_plugin_sources += files(
         'maininterface/compositor_x11.cpp',
         'maininterface/compositor_x11_renderclient.cpp',
         'maininterface/compositor_x11_renderwindow.cpp',
@@ -1092,7 +1092,7 @@ if qt6_dep.found()
     endif
 
     if host_system == 'windows'
-        some_sources += files('maininterface/win32windoweffects_module.cpp',
+        qt_plugin_sources += files('maininterface/win32windoweffects_module.cpp',
                               'maininterface/win32windoweffects_module.hpp')
     else
         kf6WindowSystem_dep = dependency('KF6WindowSystem',
@@ -1142,7 +1142,7 @@ if qt6_dep.found()
 
     vlc_modules += {
         'name' : 'qt',
-        'sources' : [qt6pre_files, qt6pre_qrc, shader_targets, shaders_processed, qt_sources, some_sources],
+        'sources' : [qt6pre_files, qt6pre_qrc, shader_targets, shaders_processed, qt_sources, qt_plugin_sources],
         'extra_files' : [shader_files],
         'dependencies' : [qt_extra_deps, qt6_dep, corefoundation_dep],
         'include_directories' : qt_include_dir,
