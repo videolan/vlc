@@ -497,20 +497,14 @@ static int net_Subscribe(vlc_object_t *obj, int fd,
 
 static int net_SetDSCP( int fd, uint8_t dscp )
 {
-    union {
-        struct sockaddr a;
-        struct sockaddr_in in;
-#ifdef IPV6_TCLASS
-        struct sockaddr_in in6;
-#endif
-    } addr;
+    vlc_sockaddr addr;
 
-    if (getsockname(fd, &addr.a, &(socklen_t){ sizeof (addr) }))
+    if (getsockname(fd, &addr.sa, &(socklen_t){ sizeof (addr) }))
         return -1;
 
     int level, cmd;
 
-    switch (addr.a.sa_family)
+    switch (addr.sa.sa_family)
     {
 #ifdef IPV6_TCLASS
         case AF_INET6:
