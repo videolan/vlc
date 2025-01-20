@@ -1072,22 +1072,23 @@ if qt6_dep.found()
             required: get_option('qt_gtk')
         )
 
-        if gtk_dep.found()
-            vlc_modules += {
-                'name' : 'qt_gtktheme',
-                'sources' : files(
-                    'style/gtkthemeprovider/gtk_compat.cpp',
-                    'style/gtkthemeprovider/gtk_compat.h',
-                    'style/gtkthemeprovider/gtkthemeprovider.cpp',
-                    'style/gtkthemeprovider/gtk_util.cpp',
-                    'style/gtkthemeprovider/gtk_util.h',
-                    'style/gtkthemeprovider/nav_button_provider_gtk.cpp',
-                    'style/gtkthemeprovider/nav_button_provider_gtk.h',
-                    'style/gtkthemeprovider/scoped_gobject.h'
-                ),
-                'dependencies' : [gtk_dep]
-            }
+        vlc_modules += {
+            'name' : 'qt_gtktheme',
+            'sources' : files(
+                'style/gtkthemeprovider/gtk_compat.cpp',
+                'style/gtkthemeprovider/gtk_compat.h',
+                'style/gtkthemeprovider/gtkthemeprovider.cpp',
+                'style/gtkthemeprovider/gtk_util.cpp',
+                'style/gtkthemeprovider/gtk_util.h',
+                'style/gtkthemeprovider/nav_button_provider_gtk.cpp',
+                'style/gtkthemeprovider/nav_button_provider_gtk.h',
+                'style/gtkthemeprovider/scoped_gobject.h'
+            ),
+            'dependencies' : [gtk_dep],
+            'enabled' : gtk_dep.found()
+        }
 
+        if gtk_dep.found()
             qt_extra_flags += '-DQT_HAS_GTK'
         endif
     endif
