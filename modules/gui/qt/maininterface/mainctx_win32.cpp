@@ -798,8 +798,14 @@ bool MainCtxWin32::getDisableVolumeKeys() const
 
 InterfaceWindowHandlerWin32::InterfaceWindowHandlerWin32(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
     : InterfaceWindowHandler(_p_intf, mainCtx, window, parent)
-    , m_CSDWindowEventHandler(new CSDWin32EventHandler(mainCtx, window, window))
 {
+    assert(mainCtx);
+    if (mainCtx->platformHandlesResizeWithCSD() || mainCtx->platformHandlesShadowsWithCSD())
+    {
+        assert(mainCtx->platformHandlesResizeWithCSD() && mainCtx->platformHandlesShadowsWithCSD());
+        m_CSDWindowEventHandler = new CSDWin32EventHandler(mainCtx, window, window);
+    }
+
     auto mainCtxWin32 = qobject_cast<MainCtxWin32*>(mainCtx);
     assert(mainCtxWin32);
     m_disableVolumeKeys = mainCtxWin32->getDisableVolumeKeys();
@@ -987,5 +993,8 @@ bool InterfaceWindowHandlerWin32::eventFilter(QObject* obj, QEvent* ev)
 
 void InterfaceWindowHandlerWin32::updateCSDWindowSettings()
 {
-    static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainCtx->useClientSideDecoration());
+    if (m_CSDWindowEventHandler)
+        static_cast<CSDWin32EventHandler *>(m_CSDWindowEventHandler)->setUseClientSideDecoration(m_mainCtx->useClientSideDecoration());
+    else
+        InterfaceWindowHandler::updateCSDWindowSettings();
 }

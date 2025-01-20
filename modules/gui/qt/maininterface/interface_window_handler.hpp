@@ -64,6 +64,7 @@ signals:
 private:
     bool applyKeyEvent(QKeyEvent * event) const;
 
+protected:
     virtual void updateCSDWindowSettings();
 
 protected:

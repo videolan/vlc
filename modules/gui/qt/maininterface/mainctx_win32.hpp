@@ -28,6 +28,7 @@
 #include "player/player_controller.hpp"
 #include "interface_window_handler.hpp"
 #include <QAbstractNativeEventFilter>
+#include <QOperatingSystemVersion>
 #include <wrl/client.h>
 
 #include <objbase.h>
@@ -87,8 +88,8 @@ public:
 public:
     bool getDisableVolumeKeys() const;
 
-    Q_INVOKABLE bool platformHandlesShadowsWithCSD() const override { return true; };
-    Q_INVOKABLE bool platformHandlesResizeWithCSD() const override { return true; };
+    Q_INVOKABLE bool platformHandlesShadowsWithCSD() const override { return (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8); };
+    Q_INVOKABLE bool platformHandlesResizeWithCSD() const override { return (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows8); };
 
 public slots:
     void reloadPrefs() override;
