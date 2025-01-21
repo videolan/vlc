@@ -80,6 +80,9 @@ MainViewLoader {
         resetFocus()
     }
 
+    Component.onCompleted: {
+        root.Keys.deletePressed.connect(root.deleteSelectedPlaylists)
+    }
 
     //---------------------------------------------------------------------------------------------
     // Private
