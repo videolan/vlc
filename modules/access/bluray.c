@@ -51,7 +51,7 @@
 #include <vlc_url.h>                        /* vlc_path2uri */
 #include <vlc_iso_lang.h>
 #include <vlc_fs.h>
-#include <vlc_subpicture.h> // vlc_spu_highlight_t
+#include <vlc_subpicture.h>
 
 #include "../demux/mpeg/timestamps.h"
 #include "../demux/timestamps_filter.h"
