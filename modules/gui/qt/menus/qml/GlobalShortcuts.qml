@@ -28,7 +28,7 @@ Item {
     ShortcutExt{ sequence:"Ctrl+D"; onActivated: DialogsProvider.openDiscDialog(); }
     ShortcutExt{ sequence:"Ctrl+N"; onActivated: DialogsProvider.openNetDialog(); }
     ShortcutExt{ sequence:"Ctrl+C"; onActivated: DialogsProvider.openCaptureDialog(); }
-    ShortcutExt{ sequence: StandardKey.Paste; onActivated: MainCtx.pasteFromClipboard(); }
+    ShortcutExt{ sequences: [StandardKey.Paste]; onActivated: MainCtx.pasteFromClipboard(); }
     ShortcutExt{ context: Qt.WindowShortcut; sequence:"Ctrl+Y"; onActivated: DialogsProvider.savePlayingToPlaylist(); }
     ShortcutExt{ sequence:"Ctrl+R"; onActivated: DialogsProvider.openAndTranscodingDialogs(); }
     ShortcutExt{ sequence:"Ctrl+S"; onActivated: DialogsProvider.openAndStreamingDialogs(); }
@@ -49,8 +49,8 @@ Item {
     ShortcutExt{ sequence:"F11"; onActivated: MainCtx.toggleInterfaceFullScreen() }
     ShortcutExt{ sequence:"Ctrl+H"; onActivated: MainCtx.minimalView = !MainCtx.minimalView; }
 
-    ShortcutExt{ sequence: StandardKey.ZoomIn; onActivated: MainCtx.incrementIntfUserScaleFactor(true) }
-    ShortcutExt{ sequence: StandardKey.ZoomOut; onActivated: MainCtx.incrementIntfUserScaleFactor(false) }
+    ShortcutExt{ sequences: [StandardKey.ZoomIn]; onActivated: MainCtx.incrementIntfUserScaleFactor(true) }
+    ShortcutExt{ sequences: [StandardKey.ZoomOut]; onActivated: MainCtx.incrementIntfUserScaleFactor(false) }
 
     Loader {
         active: MainCtx.mediaLibraryAvailable
