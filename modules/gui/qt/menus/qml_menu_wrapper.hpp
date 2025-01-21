@@ -391,6 +391,9 @@ public:
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
+
+signals:
+    void requestDeleteSelectedPlaylists();
 };
 
 class QmlAudioContextMenu : public VLCMenuBar

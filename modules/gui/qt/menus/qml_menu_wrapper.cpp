@@ -839,9 +839,7 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
 
     action = menu->addAction(qtr("Delete"));
 
-    connect(action, &QAction::triggered, [this, ids]() {
-        m_model->deletePlaylists(ids);
-    });
+    connect(action, &QAction::triggered, this, &PlaylistListContextMenu::requestDeleteSelectedPlaylists);
 
     menu->popup(pos);
 }

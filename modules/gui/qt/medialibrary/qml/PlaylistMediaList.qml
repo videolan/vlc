@@ -183,6 +183,23 @@ MainViewLoader {
         return Promise.resolve()
     }
 
+    function deleteSelectedPlaylists() {
+        console.assert(root.model)
+        console.assert(root.selectionModel)
+        if (root.selectionModel.hasSelection) {
+            const items = []
+            for (const i of root.selectionModel.selectedIndexes) {
+                items.push(root.model.data(i, MLPlaylistListModel.PLAYLIST_ID))
+            }
+            console.assert(items.length > 0)
+            if (DialogsProvider.questionDialog(qsTr("Do you really want to delete the selected playlist(s)?"),
+                                               qsTr("Delete playlist(s)")))
+                root.model.deletePlaylists(items)
+        } else {
+            console.warn(root, ": Nothing to delete")
+        }
+    }
+
     //---------------------------------------------------------------------------------------------
     // Childs
     //---------------------------------------------------------------------------------------------
@@ -247,6 +264,10 @@ MainViewLoader {
 
         function tableView_popup(index, selectedIndexes, globalPos) {
             popup(selectedIndexes, globalPos)
+        }
+
+        Component.onCompleted: {
+            contextMenu.requestDeleteSelectedPlaylists.connect(root.deleteSelectedPlaylists)
         }
     }
 
