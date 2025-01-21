@@ -180,22 +180,36 @@ error:
     return NULL;
 }
 
-int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
-                                         video_projection_mode_t projection)
+struct renderer_config
 {
-    const config_chain_t chain = {
+    video_projection_mode_t projection;
+    vlc_stereoscopic_mode_t stereo_mode;
+};
+
+static int RestartRenderer(vout_display_opengl_t *vgl,
+                           const struct renderer_config *config)
+{
+    config_chain_t chain_projection = {
         .psz_name = strdup("projection-mode"),
-        .psz_value = strdup(projection == PROJECTION_MODE_RECTANGULAR ? "0" : "-1"),
+        .psz_value = strdup(config->projection == PROJECTION_MODE_RECTANGULAR ? "0" : "-1"),
     };
 
+    if (chain_projection.psz_name == NULL ||
+        chain_projection.psz_value == NULL)
+    {
+        free(chain_projection.psz_name);
+        free(chain_projection.psz_value);
+        return VLC_ENOMEM;
+    }
+
     struct vlc_gl_filter *new_renderer =
-        vlc_gl_filters_Replace(vgl->filters, vgl->renderer_filter, "renderer", &chain);
-    free(chain.psz_name);
-    free(chain.psz_value);
+        vlc_gl_filters_Replace(vgl->filters, vgl->renderer_filter, "renderer", &chain_projection);
+    free(chain_projection.psz_name);
+    free(chain_projection.psz_value);
     if (new_renderer == NULL)
     {
-        msg_Err(vgl->gl, "Could not re-create renderer filter for projection mode %d",
-                (int)projection);
+        msg_Err(vgl->gl, "Could not re-create renderer filter for projection=%d",
+                (int)config->projection);
         return VLC_EGENERIC;
     }
 
@@ -210,7 +224,20 @@ int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
     vgl->renderer = new_renderer->sys;
 
     vlc_gl_renderer_SetViewpoint(vgl->renderer, &vgl->viewpoint);
+    return VLC_SUCCESS;
+}
 
+int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
+                                         video_projection_mode_t projection)
+{
+    struct renderer_config config = {
+        .projection = projection,
+    };
+    int ret = RestartRenderer(vgl, &config);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    vgl->projection = projection;
     msg_Dbg(vgl->gl, "Changed to projection mode %d", projection);
     return VLC_SUCCESS;
 }
