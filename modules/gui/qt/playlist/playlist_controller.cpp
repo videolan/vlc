@@ -70,9 +70,9 @@ QVector<Media> toMediaList(const QVariantList &sources)
     QVector<Media> mediaList;
     std::transform(sources.begin(), sources.end(),
                    std::back_inserter(mediaList), [](const QVariant& value) {
-        if (value.canConvert<QUrl>() || value.canConvert<QString>())
+        if ((value.typeId() == QMetaType::QUrl) || (value.typeId() == QMetaType::QString))
         {
-            QUrl mrl = value.canConvert<QString>()
+            QUrl mrl = (value.typeId() == QMetaType::QString)
                     ? QUrl::fromUserInput(value.value<QString>())
                     : value.value<QUrl>();
 
