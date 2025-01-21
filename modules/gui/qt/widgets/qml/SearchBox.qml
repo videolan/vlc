@@ -78,6 +78,7 @@ FocusScope {
                 PropertyChanges {
                     target: textField
                     text: ""
+                    width: 0.0
                 }
 
                 PropertyChanges {
