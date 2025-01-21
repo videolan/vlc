@@ -98,6 +98,9 @@ QVector<Media> toMediaList(const QVariantList &sources)
         return Media{};
     });
 
+    // Clear invalid media:
+    mediaList.removeAll(Media());
+
     return mediaList;
 }
 
@@ -427,6 +430,9 @@ PlaylistController::append(const QVector<Media> &media, bool startPlaying)
 {
     Q_D(PlaylistController);
 
+    if (Q_UNLIKELY(media.isEmpty()))
+        return;
+
     vlc_playlist_locker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
@@ -451,6 +457,10 @@ void
 PlaylistController::insert(size_t index, const QVector<Media> &media, bool startPlaying)
 {
     Q_D(PlaylistController);
+
+    if (Q_UNLIKELY(media.isEmpty()))
+        return;
+
     vlc_playlist_locker locker(d->m_playlist);
 
     auto rawMedia = toRaw<input_item_t *>(media);
