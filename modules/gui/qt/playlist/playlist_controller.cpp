@@ -76,6 +76,12 @@ QVector<Media> toMediaList(const QVariantList &sources)
                     ? QUrl::fromUserInput(value.value<QString>())
                     : value.value<QUrl>();
 
+            if (!mrl.isValid())
+                return Media();
+
+            if (mrl.scheme().isEmpty()) // akin to `UrlValidator::validate()`
+                return Media();
+
             if (mrl.isLocalFile())
                 mrl = resolveWinSymlinks(mrl);
 
