@@ -320,6 +320,14 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
      && vout_display_opengl_SetViewpoint(vgl, viewpoint) != VLC_SUCCESS)
         msg_Err(gl, "Could not set viewpoint");
 
+    int projection_mode = var_InheritInteger(gl, "projection-mode");
+    if (projection_mode == PROJECTION_MODE_RECTANGULAR ||
+        projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
+        projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+        vgl->projection = projection_mode;
+    else
+        vgl->projection = fmt->projection_mode;
+
     /* Forward to the core the changes to the input format requested by the
      * interop */
     video_format_Clean(fmt);
