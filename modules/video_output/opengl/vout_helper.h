@@ -90,4 +90,7 @@ int vout_display_opengl_UpdateFormat(vout_display_opengl_t *vgl,
 int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
                                          video_projection_mode_t projection);
 
+int vout_display_opengl_ChangeStereoMode(vout_display_opengl_t *vgl,
+                                         vlc_stereoscopic_mode_t projection);
+
 #endif

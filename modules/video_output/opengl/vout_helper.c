@@ -65,6 +65,7 @@ struct vout_display_opengl_t {
 
     vlc_viewpoint_t viewpoint;
     video_projection_mode_t projection;
+    vlc_stereoscopic_mode_t stereo_mode;
 };
 
 static const vlc_fourcc_t gl_subpicture_chromas[] = {
@@ -194,22 +195,32 @@ static int RestartRenderer(vout_display_opengl_t *vgl,
         .psz_value = strdup(config->projection == PROJECTION_MODE_RECTANGULAR ? "0" : "-1"),
     };
 
+    config_chain_t chain_stereo = {
+        .psz_name = strdup("video-stereo-mode"),
+        .p_next = &chain_projection,
+    };
     if (chain_projection.psz_name == NULL ||
-        chain_projection.psz_value == NULL)
+        chain_projection.psz_value == NULL ||
+        chain_stereo.psz_name == NULL ||
+        asprintf(&chain_stereo.psz_value, "%d", (int)config->stereo_mode) == -1)
     {
         free(chain_projection.psz_name);
         free(chain_projection.psz_value);
+        free(chain_stereo.psz_name);
+        free(chain_stereo.psz_value);
         return VLC_ENOMEM;
     }
 
     struct vlc_gl_filter *new_renderer =
-        vlc_gl_filters_Replace(vgl->filters, vgl->renderer_filter, "renderer", &chain_projection);
+        vlc_gl_filters_Replace(vgl->filters, vgl->renderer_filter, "renderer", &chain_stereo);
     free(chain_projection.psz_name);
     free(chain_projection.psz_value);
+    free(chain_stereo.psz_name);
+    free(chain_stereo.psz_value);
     if (new_renderer == NULL)
     {
-        msg_Err(vgl->gl, "Could not re-create renderer filter for projection=%d",
-                (int)config->projection);
+        msg_Err(vgl->gl, "Could not re-create renderer filter for projection=%d stereo_mode=%d",
+                (int)config->projection, (int)config->stereo_mode);
         return VLC_EGENERIC;
     }
 
@@ -232,6 +243,7 @@ int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
 {
     struct renderer_config config = {
         .projection = projection,
+        .stereo_mode = vgl->stereo_mode,
     };
     int ret = RestartRenderer(vgl, &config);
     if (ret != VLC_SUCCESS)
@@ -239,6 +251,22 @@ int vout_display_opengl_ChangeProjection(vout_display_opengl_t *vgl,
 
     vgl->projection = projection;
     msg_Dbg(vgl->gl, "Changed to projection mode %d", projection);
+    return VLC_SUCCESS;
+}
+
+int vout_display_opengl_ChangeStereoMode(vout_display_opengl_t *vgl,
+                                         vlc_stereoscopic_mode_t stereo_mode)
+{
+    struct renderer_config config = {
+        .projection = vgl->projection,
+        .stereo_mode = stereo_mode,
+    };
+    int ret = RestartRenderer(vgl, &config);
+    if (ret != VLC_SUCCESS)
+        return ret;
+
+    vgl->stereo_mode = stereo_mode;
+    msg_Dbg(vgl->gl, "Changed to stereo mode %d", stereo_mode);
     return VLC_SUCCESS;
 }
 
@@ -327,6 +355,12 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         vgl->projection = projection_mode;
     else
         vgl->projection = fmt->projection_mode;
+
+    int stereo_mode = var_InheritInteger(gl, "video-stereo-mode");
+    if (stereo_mode > 0 && stereo_mode <= VIDEO_STEREO_OUTPUT_MAX)
+        vgl->stereo_mode = stereo_mode;
+    else
+        vgl->stereo_mode = VIDEO_STEREO_OUTPUT_AUTO;
 
     /* Forward to the core the changes to the input format requested by the
      * interop */
