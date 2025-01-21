@@ -48,9 +48,16 @@
 #import <vlc_picture_pool.h>
 
 #import "codec/vt_utils.h"
-#import "video_output/opengl/vout_helper.h"
 
 #define BUFFER_COUNT 3
+
+#ifndef GL_TEXTURE_RECTANGLE
+# define GL_TEXTURE_RECTANGLE 0x84F5
+#endif
+
+#ifndef GL_BGRA
+# define GL_BGRA 0x80E1
+#endif
 
 struct vlc_cvbuffer {
     CVPixelBufferRef cvpx;
