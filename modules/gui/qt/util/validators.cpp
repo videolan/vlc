@@ -28,7 +28,7 @@
 
 QValidator::State UrlValidator::validate( QString& str, int& ) const
 {
-    if( str.startsWith( ' ' ) )
+    if( str.startsWith( ' ' ) || str.endsWith( ' ' ) )
         return QValidator::Invalid;
 
     if ( str.isEmpty() )
@@ -43,8 +43,7 @@ QValidator::State UrlValidator::validate( QString& str, int& ) const
 
 void UrlValidator::fixup( QString & input ) const
 {
-    while( input.startsWith( ' ' ) )
-        input.chop( 1 );
+    input = input.trimmed();
     QUrl fixed( input, QUrl::TolerantMode );
     input = fixed.toString();
 }
