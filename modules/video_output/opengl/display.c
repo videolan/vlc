@@ -81,6 +81,11 @@ typedef struct vout_display_sys_t
     bool restart_renderer;
 
     struct {
+        vlc_stereoscopic_mode_t mode;
+        bool changed;
+    } stereo;
+
+    struct {
         PFNGLFLUSHPROC Flush;
     } vt;
     vlc_viewpoint_t viewpoint;
@@ -174,6 +179,15 @@ static int ChangeSourceProjection(vout_display_t *vd, video_projection_mode_t pr
     return VLC_SUCCESS;
 }
 
+static int SetStereoMode(vout_display_t *vd, vlc_stereoscopic_mode_t mode)
+{
+    vout_display_sys_t *sys = vd->sys;
+    UpdateConfig(vd);
+    sys->stereo.mode = mode;
+    sys->stereo.changed = true;
+    return VLC_SUCCESS;
+}
+
 static const struct vlc_display_operations ops = {
     .close = Close,
     .prepare = PictureRender,
@@ -182,6 +196,7 @@ static const struct vlc_display_operations ops = {
     .set_viewpoint = SetViewpoint,
     .update_format = UpdateFormat,
     .change_source_projection = ChangeSourceProjection,
+    .set_stereo = SetStereoMode,
 };
 
 /**
@@ -237,6 +252,7 @@ static int Open(vout_display_t *vd,
     struct vout_display_placement dp = vd->cfg->display;
     PlacePicture(vd, &sys->place, dp);
     sys->place_changed = true;
+    sys->stereo.changed = false;
     vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
 
     /* Initialize video display */
@@ -298,6 +314,12 @@ static void PictureRender (vout_display_t *vd, picture_t *pic,
 
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
+        if (sys->stereo.changed)
+        {
+            vout_display_opengl_ChangeStereoMode(sys->vgl, sys->stereo.mode);
+            sys->stereo.changed = false;
+        }
+
         if (sys->restart_renderer)
         {
             vout_display_opengl_ChangeProjection(sys->vgl, vd->cfg->projection);
