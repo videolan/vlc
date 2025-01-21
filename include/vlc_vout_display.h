@@ -318,16 +318,6 @@ struct vlc_display_operations
     void       (*set_icc_profile)(vout_display_t *, const vlc_icc_profile_t *prof);
 
     /**
-     * Notifies the new Stereoscopic 3D mode in \ref vout_display_cfg_t changed.
-     *
-     * May be NULL.
-     *
-     * \retval VLC_SUCCESS if the display handled the change
-     * \retval VLC_EGENERIC if the display handled the change was not handled
-     */
-    int        (*set_stereo)(vout_display_t *, vlc_stereoscopic_mode_t);
-
-    /**
      * Notifies a change in the input format.
      *
      * The format size is not expected to change.
@@ -350,6 +340,16 @@ struct vlc_display_operations
      */
     int (*change_source_projection)(vout_display_t *display,
                                     video_projection_mode_t projection);
+
+    /**
+     * Notifies the new Stereoscopic 3D mode in \ref vout_display_cfg_t changed.
+     *
+     * May be NULL.
+     *
+     * \retval VLC_SUCCESS if the display handled the change
+     * \retval VLC_EGENERIC if the display handled the change was not handled
+     */
+    int        (*set_stereo)(vout_display_t *, vlc_stereoscopic_mode_t);
 };
 
 /**
