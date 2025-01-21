@@ -39,6 +39,7 @@ public:
         PLAYLIST_DURATION,
         PLAYLIST_COUNT
     };
+    Q_ENUM(Roles)
 
     enum PlaylistType {
         PLAYLIST_TYPE_ALL,
