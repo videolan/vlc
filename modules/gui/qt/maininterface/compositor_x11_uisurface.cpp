@@ -185,6 +185,9 @@ void CompositorX11UISurface::createFbo()
 
     f->glGenFramebuffers(1, &m_fboId);
 
+    m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
+    m_context->functions()->glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
+
     emit sizeChanged(fboSize);
 }
 
@@ -229,7 +232,6 @@ void CompositorX11UISurface::render()
         const QSize fboSize = size() * devicePixelRatio();
 
         m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
-        m_context->functions()->glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureId, 0);
         //qt may mess with scissor/viewport
         m_context->functions()->glScissor(0,0, fboSize.width(), fboSize.height());
         m_context->extraFunctions()->glViewport(0,0, fboSize.width(), fboSize.height());
