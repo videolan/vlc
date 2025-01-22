@@ -808,7 +808,7 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
     const video_format_t *p_fmt_dst = cfg->video_dst;
     plane_t *p_plane;
     /* time in seconds from the start of the stream */
-    kate_float t = (p_spusys->i_start + cfg->pts - p_subpic->i_start ) / 1000000.0f;
+    kate_float t = secf_from_vlc_tick( p_spusys->i_start + cfg->pts - p_subpic->i_start );
 
     bool new_regions = false;
     if( !video_format_IsSimilar(cfg->prev_src, p_fmt_src) ||
