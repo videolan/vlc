@@ -38,15 +38,12 @@ typedef struct {
 } osd_spu_updater_sys_t;
 
 static void OSDTextUpdate(subpicture_t *subpic,
-                          const video_format_t *prev_src, const video_format_t *fmt_src,
-                          const video_format_t *prev_dst, const video_format_t *fmt_dst,
-                          vlc_tick_t ts)
+                          const struct vlc_spu_updater_configuration *cfg)
 {
     osd_spu_updater_sys_t *sys = subpic->updater.sys;
-    VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
-    VLC_UNUSED(prev_src);
+    const video_format_t *fmt_dst = cfg->video_dst;
 
-    if (video_format_IsSimilar(prev_dst, fmt_dst))
+    if (video_format_IsSimilar(cfg->prev_dst, fmt_dst))
         return;
 
     vlc_spu_regions_Clear( &subpic->regions );

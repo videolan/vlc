@@ -107,16 +107,16 @@ static void CopyImageToRegion(picture_t *dst_pic, const aribcc_image_t *image)
 }
 
 static void SubpictureUpdate(subpicture_t *p_subpic,
-                             const video_format_t *prev_src, const video_format_t *p_src_format,
-                             const video_format_t *prev_dst, const video_format_t *p_dst_format,
-                             vlc_tick_t i_ts)
+                             const struct vlc_spu_updater_configuration *cfg)
 {
     libaribcaption_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
+    const video_format_t *p_src_format = cfg->video_src;
+    const video_format_t *p_dst_format = cfg->video_dst;
 
-    bool b_src_changed = p_src_format->i_visible_width  != prev_src->i_visible_width ||
-                         p_src_format->i_visible_height != prev_src->i_visible_height;
-    bool b_dst_changed = !video_format_IsSimilar(prev_dst, p_dst_format);
+    bool b_src_changed = p_src_format->i_visible_width  != cfg->prev_src->i_visible_width ||
+                         p_src_format->i_visible_height != cfg->prev_src->i_visible_height;
+    bool b_dst_changed = !video_format_IsSimilar(cfg->prev_dst, p_dst_format);
 
     unsigned i_render_area_width  = p_dst_format->i_visible_width;
     unsigned i_render_area_height = p_src_format->i_visible_height * p_dst_format->i_visible_width /
@@ -127,7 +127,7 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
                                                           i_render_area_height);
     }
 
-    const vlc_tick_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
+    const vlc_tick_t i_stream_date = p_spusys->i_pts + (cfg->pts - p_subpic->i_start);
 
     /* Retrieve the expected render status for detecting whether the subtitle image changed */
     aribcc_render_status_t status = aribcc_renderer_try_render(p_sys->p_renderer,

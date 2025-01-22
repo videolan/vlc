@@ -183,10 +183,14 @@ void subpicture_Update( subpicture_t *p_subpicture,
     if (p_upd->ops == NULL)
         return;
 
-    p_upd->ops->update(p_subpicture,
-                       &p_private->src, p_fmt_src,
-                       &p_private->dst, p_fmt_dst,
-                       i_ts);
+    struct vlc_spu_updater_configuration cfg = {
+        .prev_src  = &p_private->src,
+        .prev_dst  = &p_private->dst,
+        .video_src = p_fmt_src,
+        .video_dst = p_fmt_dst,
+        .pts       = i_ts,
+    };
+    p_upd->ops->update( p_subpicture, &cfg );
 
     video_format_Clean( &p_private->src );
     video_format_Clean( &p_private->dst );

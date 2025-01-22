@@ -97,15 +97,15 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
 }
 
 static void SubpictureTextUpdate(subpicture_t *subpic,
-                                 const video_format_t *prev_src, const video_format_t *fmt_src,
-                                 const video_format_t *prev_dst, const video_format_t *fmt_dst,
-                                 vlc_tick_t ts)
+                                 const struct vlc_spu_updater_configuration *cfg)
 {
     subtext_updater_sys_t *sys = subpic->updater.sys;
+    const video_format_t *fmt_src = cfg->video_src;
+    const video_format_t *fmt_dst = cfg->video_dst;
 
-    if (fmt_src->i_visible_height == prev_src->i_visible_height &&
-        video_format_IsSimilar(prev_dst, fmt_dst) &&
-        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > ts))
+    if (fmt_src->i_visible_height == cfg->prev_src->i_visible_height &&
+        video_format_IsSimilar(cfg->prev_dst, fmt_dst) &&
+        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > cfg->pts))
         return;
 
     substext_updater_region_t *p_updtregion = &sys->region;
@@ -266,9 +266,9 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
 
     if( b_schedule_blink_update &&
-        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update < ts) )
+        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update < cfg->pts) )
     {
-        sys->i_next_update = ts + VLC_TICK_FROM_SEC(1);
+        sys->i_next_update = cfg->pts + VLC_TICK_FROM_SEC(1);
         sys->b_blink_even = !sys->b_blink_even;
     }
 }

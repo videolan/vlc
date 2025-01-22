@@ -170,6 +170,21 @@ VLC_API void subpicture_region_Delete( subpicture_region_t *p_region );
  */
 VLC_API void vlc_spu_regions_Clear( vlc_spu_regions * );
 
+struct vlc_spu_updater_configuration
+{
+    // source video format of the video under the SPU
+    const video_format_t *video_src;
+    // scaled video format of the video under the SPU
+    const video_format_t *video_dst;
+    // source video format of the previous vlc_spu_updater_ops.update call
+    const video_format_t *prev_src;
+    // scaled video format of the previous vlc_spu_updater_ops.update call
+    const video_format_t *prev_dst;
+    // timestamp when the SPU will be displayed, between i_start and i_stop
+    // for subtitles
+    vlc_tick_t           pts;
+};
+
 /**
  * Subpicture updater operation virtual table.
  *
@@ -181,9 +196,7 @@ struct vlc_spu_updater_ops
       * the main job of creating the subpicture regions for the
       * current video_format */
     void (*update)(subpicture_t *,
-                   const video_format_t *prev_src, const video_format_t *p_fmt_src,
-                   const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
-                   vlc_tick_t);
+                   const struct vlc_spu_updater_configuration *);
 
     /** Optional callback for subpicture private data cleanup */
     void (*destroy)(subpicture_t *);

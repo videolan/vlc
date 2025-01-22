@@ -800,19 +800,19 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
    Looks good with white though since it's all luma. Hopefully that will be the
    common case. */
 static void TigerUpdateSubpicture( subpicture_t *p_subpic,
-                                   const video_format_t *prev_src, const video_format_t *p_fmt_src,
-                                   const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
-                                   vlc_tick_t ts )
+                                   const struct vlc_spu_updater_configuration *cfg )
 {
     kate_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
+    const video_format_t *p_fmt_src = cfg->video_src;
+    const video_format_t *p_fmt_dst = cfg->video_dst;
     plane_t *p_plane;
     /* time in seconds from the start of the stream */
-    kate_float t = (p_spusys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
+    kate_float t = (p_spusys->i_start + cfg->pts - p_subpic->i_start ) / 1000000.0f;
 
     bool new_regions = false;
-    if( !video_format_IsSimilar(prev_src, p_fmt_src) ||
-        !video_format_IsSimilar(prev_dst, p_fmt_dst) )
+    if( !video_format_IsSimilar(cfg->prev_src, p_fmt_src) ||
+        !video_format_IsSimilar(cfg->prev_dst, p_fmt_dst) )
         new_regions = true;
 
     if (!new_regions)

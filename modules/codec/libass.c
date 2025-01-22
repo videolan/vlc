@@ -94,10 +94,7 @@ static void DecSysRelease( decoder_sys_t *p_sys );
 static void DecSysHold( decoder_sys_t *p_sys );
 
 /* */
-static void SubpictureUpdate( subpicture_t *,
-                              const video_format_t *, const video_format_t *,
-                              const video_format_t *, const video_format_t *,
-                              vlc_tick_t );
+static void SubpictureUpdate( subpicture_t *, const struct vlc_spu_updater_configuration * );
 static void SubpictureDestroy( subpicture_t * );
 
 typedef struct
@@ -416,16 +413,16 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
  *
  ****************************************************************************/
 static void SubpictureUpdate( subpicture_t *p_subpic,
-                              const video_format_t *prev_src, const video_format_t *p_fmt_src,
-                              const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
-                              vlc_tick_t i_ts )
+                              const struct vlc_spu_updater_configuration *cfg )
 {
     libass_spu_updater_sys_t *p_spusys = p_subpic->updater.sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;
+    const video_format_t *p_fmt_src = cfg->video_src;
+    const video_format_t *p_fmt_dst = cfg->video_dst;
 
-    bool b_fmt_src = p_fmt_src->i_visible_width  != prev_src->i_visible_width ||
-                     p_fmt_src->i_visible_height != prev_src->i_visible_height;
-    bool b_fmt_dst = !video_format_IsSimilar(prev_dst, p_fmt_dst);
+    bool b_fmt_src = p_fmt_src->i_visible_width  != cfg->prev_src->i_visible_width ||
+                     p_fmt_src->i_visible_height != cfg->prev_src->i_visible_height;
+    bool b_fmt_dst = !video_format_IsSimilar(cfg->prev_dst, p_fmt_dst);
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -445,7 +442,7 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
     }
 
     /* */
-    const vlc_tick_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
+    const vlc_tick_t i_stream_date = p_spusys->i_pts + (cfg->pts - p_subpic->i_start);
     int i_changed;
     ASS_Image *p_img = ass_render_frame( p_sys->p_renderer, p_sys->p_track,
                                          MS_FROM_VLC_TICK( i_stream_date ), &i_changed );

@@ -1585,13 +1585,9 @@ static void updater_unlock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
 }
 
 static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
-                                    const video_format_t *prev_src, const video_format_t *p_fmt_src,
-                                    const video_format_t *prev_dst, const video_format_t *p_fmt_dst,
-                                    vlc_tick_t i_ts)
+                                    const struct vlc_spu_updater_configuration *cfg)
 {
-    VLC_UNUSED(prev_src); VLC_UNUSED(p_fmt_src);
-    VLC_UNUSED(prev_dst); VLC_UNUSED(p_fmt_dst);
-    VLC_UNUSED(i_ts);
+    VLC_UNUSED(cfg);
 
     bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.sys;
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
