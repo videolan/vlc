@@ -319,5 +319,6 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         free(sys);
     }
     sys->region.b_absolute = true;
+    sys->i_next_update = VLC_TICK_INVALID;
     return subpic;
 }
