@@ -1132,8 +1132,6 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
 
         /* Scale if needed into cache */
         if (!region->p_private) {
-            filter_t *scale = sys->scale;
-
             picture_t *picture = region->p_picture;
             picture_Hold(picture);
 
@@ -1165,6 +1163,7 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
                  picture->format.i_visible_height != dst_height ||
                  (convert_chroma && !using_palette)))
             {
+                filter_t *scale = sys->scale;
                 scale->fmt_in.video  = picture->format;
                 scale->fmt_out.video = picture->format;
                 if (using_palette)
