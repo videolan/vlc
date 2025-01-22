@@ -184,6 +184,13 @@ static void ParsePXCTLI( decoder_t *p_dec, const subpicture_data_t *p_spu_data,
     }
 }
 
+static void UpdateDvdSpu(subpicture_t * p_spu,
+                         const struct vlc_spu_updater_configuration * cfg)
+{
+    p_spu->i_original_picture_width  = cfg->video_src->i_visible_width;
+    p_spu->i_original_picture_height = cfg->video_src->i_visible_height;
+}
+
 /*****************************************************************************
  * OutputPicture:
  *****************************************************************************
@@ -198,7 +205,15 @@ static void OutputPicture( decoder_t *p_dec,
     uint16_t *p_pixeldata;
 
     /* Allocate the subpicture internal data. */
-    p_spu = decoder_NewSubpicture( p_dec, NULL );
+    static const struct vlc_spu_updater_ops spu_ops =
+    {
+        .update = UpdateDvdSpu,
+    };
+
+    static const subpicture_updater_t updater = {
+        .ops = &spu_ops,
+    };
+    p_spu = decoder_NewSubpicture( p_dec, &updater );
     if( !p_spu ) return;
 
     p_spu->i_original_picture_width =
