@@ -82,6 +82,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->b_packetizer = b_packetizer;
     p_sys->b_disabletrans = var_InheritBool( p_dec, "dvdsub-transparency" );
     p_sys->i_spu_size = 0;
+    p_sys->buffer     = NULL;
+    p_sys->buffer_size = 0;
     p_sys->i_spu      = 0;
     p_sys->p_block    = NULL;
 
@@ -123,6 +125,7 @@ static void Close( vlc_object_t *p_this )
         block_ChainRelease( p_sys->p_block );
     }
 
+    free( p_sys->buffer );
     free( p_sys );
 }
 
@@ -143,8 +146,19 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    /* FIXME: what the, we shouldn’t need to allocate 64k of buffer --sam. */
-    p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, sizeof(p_sys->buffer) );
+    size_t block_size;
+    vlc_frame_ChainProperties( p_spu_block, NULL, &block_size, NULL );
+    if ( p_sys->buffer_size < block_size )
+    {
+        void *bigger = realloc( p_sys->buffer, block_size );
+        if ( unlikely(bigger == NULL) )
+        {
+            return VLCDEC_ECRITICAL;
+        }
+        p_sys->buffer = bigger;
+        p_sys->buffer_size = block_size;
+    }
+    p_sys->i_spu = block_ChainExtract( p_spu_block, p_sys->buffer, block_size );
     p_sys->i_pts = p_spu_block->i_pts;
     block_ChainRelease( p_spu_block );
 
