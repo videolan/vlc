@@ -35,8 +35,8 @@ struct decoder_sys_t
 
     block_t *p_block;
 
-    /* We will never overflow */
-    uint8_t buffer[65536];
+    uint8_t *buffer;
+    size_t  buffer_size;
 };
 
 /*****************************************************************************
