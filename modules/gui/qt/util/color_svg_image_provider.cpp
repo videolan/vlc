@@ -19,14 +19,16 @@
 #include "color_svg_image_provider.hpp"
 #include "qt.hpp"
 #include "util/asynctask.hpp"
+#include "util/imagehelper.hpp"
 
-#include <QSvgRenderer>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QPainter>
 #include <QFile>
 #include <QQmlFile>
 #include <QDebug>
+#include <QBuffer>
+#include <QImageIOHandler>
 
 static const QMap<QString, QString> predefinedSubst = {
     {COLOR1_KEY, "#FF00FF"},
@@ -88,7 +90,7 @@ public:
 
     QImage execute() override
     {
-        if (m_requestedSize.width() == 0 || m_requestedSize.height() == 0)
+        if (m_requestedSize.width() < 0 || m_requestedSize.height() < 0)
         {
             m_error = "invalid size requested";
             return {};
@@ -102,47 +104,70 @@ public:
             return {};
         }
 
-        QColor backgroundColor{Qt::transparent};
-
-        if (data.second.has_value())
-            backgroundColor = *data.second;
-
-        QSvgRenderer renderer(data.first);
-        if (!renderer.isValid())
-        {
-            m_error = "can't parse SVG content";
-            return {};
-        }
-
-        //FIXME QT < 5.15 doesn't support QSvgRenderer::setAspectRatioMode
-        //scale to fit manually
-        QRect bounds;
-        QSize bbox = renderer.defaultSize();
-        float sourceAR = bbox.width() / (float)bbox.height();
-        float destAR = m_requestedSize.width() / (float)m_requestedSize.height();
-        if (qFuzzyCompare(sourceAR, destAR))
-            bounds = QRect({0,0}, m_requestedSize);
-        else if (sourceAR < destAR) {
-            float scaledWidth = m_requestedSize.height() * sourceAR;
-            bounds = QRect((m_requestedSize.width() - scaledWidth) / 2, 0,
-                           scaledWidth, m_requestedSize.height());
-        } else {
-            float scaledHeight = m_requestedSize.width() / sourceAR;
-            bounds = QRect(0, (m_requestedSize.height() - scaledHeight) / 2,
-                           m_requestedSize.width(), scaledHeight);
-        }
+        const auto svgHandler = QScopedPointer<QImageIOHandler>(ImageHelper::createSvgImageIOHandler());
 
         QImage image;
-        if (backgroundColor.alpha() == 255)
-            image = QImage(m_requestedSize, QImage::Format_RGB32);
-        else
-            image = QImage(m_requestedSize, QImage::Format_ARGB32_Premultiplied);
-        image.fill(backgroundColor);
 
-        QPainter painter;
-        painter.begin(&image);
-        renderer.render(&painter, bounds);
-        painter.end();
+        if (svgHandler)
+        {
+            QBuffer buffer;
+            buffer.setData(data.first);
+
+            if (Q_LIKELY(buffer.open(QFile::ReadOnly)))
+            {
+                svgHandler->setDevice(&buffer);
+
+                if (Q_LIKELY(svgHandler->canRead()))
+                {
+                    QSize scaledSize;
+
+                    if ((m_requestedSize.width() == 0 || m_requestedSize.height() == 0))
+                    {
+                        // QImageReader standard behavior, if width or height is 0,
+                        // it is calculated to preserve the aspect ratio:
+
+                        const QSize naturalSize = svgHandler->option(QImageIOHandler::Size).toSize();
+
+                        if (m_requestedSize.width() == 0)
+                            scaledSize.setWidth(m_requestedSize.height() * ((qreal)naturalSize.width() / naturalSize.height()));
+                        else if (m_requestedSize.height() == 0)
+                            scaledSize.setHeight(m_requestedSize.width() * ((qreal)naturalSize.height() / naturalSize.width()));
+                    }
+                    else
+                    {
+                        scaledSize = m_requestedSize;
+                    }
+
+                    if (!scaledSize.isEmpty())
+                        svgHandler->setOption(QImageIOHandler::ScaledSize, scaledSize);
+
+                    if (data.second.has_value())
+                        svgHandler->setOption(QImageIOHandler::BackgroundColor, *data.second);
+
+                    svgHandler->read(&image);
+                }
+                else
+                {
+                    m_error = QStringLiteral("Svg Image Provider: svg image handler can not read the svg contents, is the file svg specification compliant?");
+                }
+            }
+            else
+            {
+                m_error = QStringLiteral("Svg Image Provider: can not open colorized svg buffer for read.");
+            }
+        }
+        else
+        {
+            m_error = QStringLiteral("Svg Image Provider: can not found QSvgPlugin, is it installed?");
+        }
+
+        if (Q_UNLIKELY(image.isNull()))
+        {
+            if (m_error.isEmpty())
+                m_error = QStringLiteral("Svg Image Provider: unspecified error.");
+            image = QImage(m_requestedSize, QImage::Format_RGB32);
+            image.fill(QColor("purple"));
+        }
 
         return image;
     }

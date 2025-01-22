@@ -53,7 +53,7 @@ Item {
 
         visible: !artwork.visible
 
-        sourceSize: Qt.size(width, height)
+        sourceSize: Qt.size(0, height) // preserve aspect ratio
 
         fillMode: root.fillMode
         horizontalAlignment: root.horizontalAlignment
