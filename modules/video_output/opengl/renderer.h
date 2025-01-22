@@ -104,6 +104,8 @@ struct vlc_gl_renderer
 
     /* Projection mode for the input data */
     video_projection_mode_t projection_mode;
+    vlc_stereoscopic_mode_t stereo_mode;
+    video_multiview_mode_t multiview_mode;
 };
 
 vlc_gl_filter_open_fn vlc_gl_renderer_Open;

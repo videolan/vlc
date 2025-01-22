@@ -80,8 +80,9 @@ static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]
 static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
                                  video_projection_mode_t projection_mode)
 {
-    if (projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
+    if ((projection_mode == PROJECTION_MODE_EQUIRECTANGULAR
         || projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD)
+        && renderer->multiview_mode == renderer->sampler->glfmt.fmt.multiview_mode)
     {
         getProjectionMatrix(renderer->f_sar, renderer->f_fovy,
                             renderer->var.ProjectionMatrix);
@@ -104,6 +105,7 @@ static void getViewpointMatrixes(struct vlc_gl_renderer *renderer,
 
 static void
 InitStereoMatrix(GLfloat matrix_out[static 3*3],
+                 vlc_stereoscopic_mode_t stereo_mode,
                  video_multiview_mode_t multiview_mode)
 {
     /*
@@ -112,16 +114,17 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
      *
      * This 2D transformation is affine, so the matrix is 3x3 and applies to 3D
      * vectors in the form (x, y, 1).
-     *
-     * Note that since for now, we always crop the left eye, in practice the
-     * offset is always 0, so the transform is actually linear (a 2x2 matrix
-     * would be sufficient).
      */
 
     memcpy(matrix_out, MATRIX3_IDENTITY, sizeof(MATRIX3_IDENTITY));
 
 #define COL(x) (x*3)
 #define ROW(x) (x)
+
+    if (stereo_mode == VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE)
+        return;
+    assert(stereo_mode == VIDEO_STEREO_OUTPUT_LEFT_ONLY ||
+           stereo_mode == VIDEO_STEREO_OUTPUT_RIGHT_ONLY);
 
     switch (multiview_mode)
     {
@@ -142,6 +145,8 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
              *            \ 0    0    1 /
              */
             matrix_out[COL(0) + ROW(0)] = 0.5;
+            if (stereo_mode == VIDEO_STEREO_OUTPUT_RIGHT_ONLY)
+                matrix_out[COL(2) + ROW(0)] = 0.5;
             break;
         case MULTIVIEW_STEREO_TB:
             /*
@@ -165,6 +170,8 @@ InitStereoMatrix(GLfloat matrix_out[static 3*3],
              *            \ 0    0    1 /
              */
             matrix_out[COL(1) + ROW(1)] = 0.5;
+            if (stereo_mode == VIDEO_STEREO_OUTPUT_RIGHT_ONLY)
+                matrix_out[COL(2) + ROW(1)] = 0.5;
             break;
         default:
             break;
@@ -673,8 +680,12 @@ static int SetupCoords(struct vlc_gl_renderer *renderer,
     GLushort *indices;
     unsigned nbVertices, nbIndices;
 
+    video_projection_mode_t projection_mode = renderer->projection_mode;
+    if (renderer->multiview_mode != renderer->sampler->glfmt.fmt.multiview_mode)
+        projection_mode = PROJECTION_MODE_RECTANGULAR;
+
     int i_ret;
-    switch (renderer->projection_mode)
+    switch (projection_mode)
     {
     case PROJECTION_MODE_RECTANGULAR:
         i_ret = BuildRectangle(&vertexCoord, &textureCoord, &nbVertices,
@@ -798,7 +809,7 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
 {
     (void) size_out;
 
-    const char * const options[] = { "projection-mode", NULL };
+    const char * const options[] = { "projection-mode", "video-stereo-mode", NULL };
     config_ChainParse(filter, "", options, config);
 
     const opengl_vtable_t *vt = &filter->api->vt;
@@ -844,6 +855,33 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
             break;
     }
 
+    int stereo_mode = var_InheritInteger(filter, "video-stereo-mode");
+    if (stereo_mode > VIDEO_STEREO_OUTPUT_AUTO && stereo_mode <= VIDEO_STEREO_OUTPUT_MAX)
+        renderer->stereo_mode = stereo_mode;
+
+    if (sampler->glfmt.fmt.multiview_mode == MULTIVIEW_2D)
+    {
+        renderer->stereo_mode = VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE;
+        renderer->multiview_mode = MULTIVIEW_2D;
+    }
+    else switch (stereo_mode)
+    {
+        case VIDEO_STEREO_OUTPUT_LEFT_ONLY:
+        case VIDEO_STEREO_OUTPUT_RIGHT_ONLY:
+        case VIDEO_STEREO_OUTPUT_AUTO:
+            /* multiview_mode != MULTIVIEW_2D */
+            renderer->multiview_mode = sampler->glfmt.fmt.multiview_mode;
+            if (stereo_mode == VIDEO_STEREO_OUTPUT_AUTO)
+                renderer->stereo_mode = VIDEO_STEREO_OUTPUT_LEFT_ONLY;
+            break;
+        case VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE:
+        case VIDEO_STEREO_OUTPUT_STEREO: /* stereo mode is not supported yet */
+        default:
+            renderer->multiview_mode = MULTIVIEW_2D; /* Enforce the planar view */
+            renderer->stereo_mode = VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE;
+            break;
+    }
+
     int ret = opengl_link_program(filter);
     if (ret != VLC_SUCCESS)
     {
@@ -852,10 +890,9 @@ vlc_gl_renderer_Open(struct vlc_gl_filter *filter,
         return ret;
     }
 
-    const video_format_t *fmt = &sampler->glfmt.fmt;
-    InitStereoMatrix(renderer->var.StereoMatrix, fmt->multiview_mode);
+    InitStereoMatrix(renderer->var.StereoMatrix, renderer->stereo_mode, renderer->multiview_mode);
 
-    getViewpointMatrixes(renderer, fmt->projection_mode);
+    getViewpointMatrixes(renderer, renderer->projection_mode);
 
     vt->GenBuffers(1, &renderer->vertex_buffer_object);
     vt->GenBuffers(1, &renderer->index_buffer_object);
