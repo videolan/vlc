@@ -1319,23 +1319,6 @@ LIBVLC_API int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
                                                  double f_pos, bool b_fast );
 
 /**
- * Enable A to B loop for the current media
- *
- * This function need to be called 2 times with libvlc_abloop_a and
- * libvlc_abloop_b to setup an A to B loop. It uses and stores the
- * current time/position when called. The B time must be higher than the
- * A time.
- *
- * \param p_mi the Media Player
- * \param abloop select which A/B cursor to set
- * \return 0 on success, -1 on error
- * \version LibVLC 4.0.0 and later.
- */
-LIBVLC_API int
-libvlc_media_player_set_abloop( libvlc_media_player_t *p_mi,
-                                libvlc_abloop_t abloop );
-
-/**
  * Enable A to B loop for the current media by setting the start time and end
  * time
  *

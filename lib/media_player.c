@@ -1403,19 +1403,6 @@ double libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
 }
 
 int
-libvlc_media_player_set_abloop( libvlc_media_player_t *p_mi,
-                                libvlc_abloop_t abloop )
-{
-    vlc_player_t *player = p_mi->player;
-    vlc_player_Lock(player);
-
-    int ret = vlc_player_SetAtoBLoop(player, (int) abloop);
-
-    vlc_player_Unlock(player);
-    return ret;
-}
-
-int
 libvlc_media_player_set_abloop_time( libvlc_media_player_t *p_mi,
                                      libvlc_time_t a_time, libvlc_time_t b_time )
 {
