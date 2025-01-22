@@ -43,7 +43,6 @@
 #include <vlc_mouse.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>
-#include <vlc_subpicture.h> // vlc_spu_highlight_t
 #include "input_internal.h"
 #ifdef _WIN32
 #  include <vlc_charset.h> // FromWide
@@ -707,7 +706,7 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
     case ES_OUT_SPU_SET_HIGHLIGHT:
     {
         es_out_id_t *p_es = va_arg( args, es_out_id_t * );
-        const vlc_spu_highlight_t *p_hl = va_arg( args, const vlc_spu_highlight_t * );
+        const struct vlc_spu_highlight_t *p_hl = va_arg( args, const struct vlc_spu_highlight_t * );
         return es_out_in_Control( p_sys->p_out, in, ES_OUT_SPU_SET_HIGHLIGHT,
                                   p_es->p_es, p_hl );
     }
