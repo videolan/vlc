@@ -94,6 +94,7 @@ typedef enum vlc_stereoscopic_mode_t
     VIDEO_STEREO_OUTPUT_LEFT_ONLY,
     VIDEO_STEREO_OUTPUT_RIGHT_ONLY,
     VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE,
+#define VIDEO_STEREO_OUTPUT_MAX VIDEO_STEREO_OUTPUT_SIDE_BY_SIDE
 } vlc_stereoscopic_mode_t;
 
 /*****************************************************************************
