@@ -28,29 +28,49 @@
 #include <QApplication>
 #include <QPainter>
 #include <QScreen>
-#include <QSvgRenderer>
 #include <QImageIOHandler>
 #include <QPluginLoader>
+#include <QFile>
 #include "imagehelper.hpp"
 
 
 QPixmap ImageHelper::loadSvgToPixmap( const QString &path, qint32 i_width, qint32 i_height )
 {
     qreal ratio = QApplication::primaryScreen()->devicePixelRatio();
-    QPixmap pixmap( QSize( i_width, i_height ) * ratio );
 
+    const auto svgHandler = QScopedPointer<QImageIOHandler>(createSvgImageIOHandler());
 
-    pixmap.fill( Qt::transparent );
+    QImage image;
+    const auto size = QSize( i_width, i_height ) * ratio;
 
-    QSvgRenderer renderer( path );
-    QPainter painter;
+    if (svgHandler)
+    {
+        QFile file(path);
 
-    painter.begin( &pixmap );
-    renderer.render( &painter );
-    painter.end();
+        if (file.open(QFile::ReadOnly))
+        {
+            svgHandler->setDevice(&file);
+            svgHandler->setOption(QImageIOHandler::ScaledSize, size);
 
-    pixmap.setDevicePixelRatio( ratio );
-    return pixmap;
+            if (svgHandler->canRead())
+                svgHandler->read(&image);
+            else
+                qWarning() << "ImageHelper: svg image handler can not read file " << path << ".";
+        }
+        else
+        {
+            qWarning() << "ImageHelper: can not open file " << path << ".";
+        }
+    }
+
+    if (Q_UNLIKELY(image.isNull()))
+    {
+        image = QImage(size, QImage::Format_RGB32);
+        image.fill(QColor("purple"));
+    }
+
+    image.setDevicePixelRatio(ratio);
+    return QPixmap::fromImage(image);
 }
 
 QImageIOHandler *ImageHelper::createSvgImageIOHandler()
