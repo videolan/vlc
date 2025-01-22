@@ -41,7 +41,6 @@
 #include <vlc_configuration.h>
 
 #include "gl_util.h"
-#include "vout_helper.h"
 #include "sampler.h"
 #include "picture.h"
 
