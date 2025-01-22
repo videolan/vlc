@@ -155,14 +155,15 @@ MainViewLoader {
     function _dropAction(drop, index) {
         const item = drop.source
         if (Helpers.isValidInstanceOf(item, Widgets.DragItem)) {
-            item.getSelectedInputItem().then(inputItems => {
+            drop.accepted = true
+            return item.getSelectedInputItem().then(inputItems => {
                 if (index === undefined)
                     DialogsProvider.playlistsDialog(inputItems)
                 else
                     root.model.append(root.model.getItemId(index), inputItems)
             })
-            drop.accepted = true
         } else if (drop.hasUrls) {
+            drop.accepted = true
             const urlList = []
             for (let url in drop.urls)
                 urlList.push(drop.urls[url])
@@ -170,10 +171,10 @@ MainViewLoader {
                 DialogsProvider.playlistsDialog(inputItems)
             else
                 root.model.append(root.model.getItemId(index), urlList)
-            drop.accepted = true
         } else {
             drop.accepted = false
         }
+        return Promise.resolve()
     }
 
     //---------------------------------------------------------------------------------------------
@@ -314,8 +315,18 @@ MainViewLoader {
                     }
 
                     onDropped: function(drop) {
-                        root._dropAction(drop, index)
+                        MainCtx.setCursor(gridView, Qt.BusyCursor)
+                        root._dropAction(drop, index).then(() => {
+                            if (gridView)
+                                MainCtx.unsetCursor(gridView)
+                        })
                     }
+                }
+
+                Component.onCompleted: {
+                    // Qt Quick Button sets a cursor for itself, unset it so that if the view has
+                    // busy cursor, it is visible over the delegate:
+                    MainCtx.unsetCursor(this)
                 }
             }
 
@@ -409,8 +420,7 @@ MainViewLoader {
             }
 
             listView.acceptDropFunc: function(index, drop) {
-                root._dropAction(drop, listView.itemContainsDrag.index)
-                return Promise.resolve()
+                return root._dropAction(drop, listView.itemContainsDrag.index)
             }
 
             listView.dropIndicator: null
