@@ -18,7 +18,6 @@ QTPLUGIN += qwindowsvistastyle
 }
 
 linux {
-QT += opengl # compositor_x11 requires Qt OpenGL
 QTPLUGIN += qxcb-glx-integration qxcb-egl-integration qxcb qwayland-generic qwayland-egl qgtk3 qxdgdesktopportal xdg-shell
 }
 
