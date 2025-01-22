@@ -1415,6 +1415,52 @@ libvlc_media_player_set_abloop( libvlc_media_player_t *p_mi,
     return ret;
 }
 
+int
+libvlc_media_player_set_abloop_time( libvlc_media_player_t *p_mi,
+                                     libvlc_time_t a_time, libvlc_time_t b_time )
+{
+    vlc_tick_t a_tick = vlc_tick_from_libvlc_time(a_time);
+    if (a_tick >= 0)
+        a_tick += VLC_TICK_0;
+
+    vlc_tick_t b_tick = vlc_tick_from_libvlc_time(b_time);
+    if (b_tick >= 0)
+        b_tick += VLC_TICK_0;
+
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    int ret = vlc_player_SetAtoBLoopTime(player, a_tick, b_tick);
+
+    vlc_player_Unlock(player);
+    return ret == VLC_SUCCESS ? 0 : -1;
+}
+
+int
+libvlc_media_player_set_abloop_position( libvlc_media_player_t *p_mi,
+                                         double a_pos, double b_pos )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    int ret = vlc_player_SetAtoBLoopPosition(player, a_pos, b_pos);
+
+    vlc_player_Unlock(player);
+    return ret == VLC_SUCCESS ? 0 : -1;
+}
+
+int
+libvlc_media_player_reset_abloop( libvlc_media_player_t *p_mi )
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    int ret = vlc_player_ResetAtoBLoop(player);
+
+    vlc_player_Unlock(player);
+    return ret == VLC_SUCCESS ? 0 : -1;
+}
+
 libvlc_abloop_t
 libvlc_media_player_get_abloop( libvlc_media_player_t *p_mi,
                                 libvlc_time_t *a_time, double *a_pos,

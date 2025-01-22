@@ -1336,6 +1336,48 @@ libvlc_media_player_set_abloop( libvlc_media_player_t *p_mi,
                                 libvlc_abloop_t abloop );
 
 /**
+ * Enable A to B loop for the current media by setting the start time and end
+ * time
+ *
+ * The B time must be higher than the A time.
+ *
+ * \param p_mi the Media Player
+ * \param a_time start time for the loop (in ms)
+ * \param b_time end time for the loop (in ms)
+ * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 and later.
+ */
+LIBVLC_API int
+libvlc_media_player_set_abloop_time( libvlc_media_player_t *p_mi,
+                                     libvlc_time_t a_time, libvlc_time_t b_time );
+
+/**
+ * Enable A to B loop for the current media by setting the start position and
+ * end position
+ *
+ * The B position must be higher than the A position.
+ *
+ * \param p_mi the Media Player
+ * \param a_pos start position for the loop
+ * \param b_pos end position for the loop
+ * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 and later.
+ */
+LIBVLC_API int
+libvlc_media_player_set_abloop_position( libvlc_media_player_t *p_mi,
+                                         double a_pos, double b_pos );
+
+/**
+ * Reset/remove the A to B loop for the current media
+ *
+ * \param p_mi the Media Player
+ * \return 0 on success, -1 on error
+ * \version LibVLC 4.0.0 and later.
+ */
+LIBVLC_API int
+libvlc_media_player_reset_abloop( libvlc_media_player_t *p_mi );
+
+/**
  * Get the A to B loop status
  *
  * @note If the returned status is VLC_PLAYER_ABLOOP_A, then a_time and a_pos
