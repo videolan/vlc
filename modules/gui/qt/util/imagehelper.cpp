@@ -29,6 +29,8 @@
 #include <QPainter>
 #include <QScreen>
 #include <QSvgRenderer>
+#include <QImageIOHandler>
+#include <QPluginLoader>
 #include "imagehelper.hpp"
 
 
@@ -49,4 +51,33 @@ QPixmap ImageHelper::loadSvgToPixmap( const QString &path, qint32 i_width, qint3
 
     pixmap.setDevicePixelRatio( ratio );
     return pixmap;
+}
+
+QImageIOHandler *ImageHelper::createSvgImageIOHandler()
+{
+    static const auto plugin = []() -> QPointer<QImageIOPlugin> {
+#ifdef QT_STATIC
+        const auto& staticPlugins = QPluginLoader::staticInstances();
+        const auto it = std::find_if(staticPlugins.begin(), staticPlugins.end(), [](QObject *obj) -> bool {
+            return obj->inherits("QSvgPlugin");
+        });
+
+        if (it != staticPlugins.end())
+            return qobject_cast<QImageIOPlugin*>(*it);
+        else
+            return nullptr;
+#else
+        QPluginLoader loader(QStringLiteral("imageformats/qsvg")); // Official Qt plugin
+        // No need to check the metadata (or inherits `QSvgPlugin`), a plugin named "qsvg" should already support svg.
+        return qobject_cast<QImageIOPlugin*>(loader.instance());
+#endif
+    }();
+
+    if (!plugin)
+    {
+        qWarning() << "ImageHelper: svg image plugin is not found.";
+        return nullptr;
+    }
+
+    return plugin->create(nullptr);
 }

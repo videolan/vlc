@@ -31,6 +31,8 @@ class ImageHelper
 public:
     /* render a Svg to a pixmap with current device pixel ratio */
     static QPixmap loadSvgToPixmap(const QString& path, qint32 i_width, qint32 i_height);
+
+    static class QImageIOHandler* createSvgImageIOHandler();
 };
 
 #endif // IMAGEHELPER_HPP
