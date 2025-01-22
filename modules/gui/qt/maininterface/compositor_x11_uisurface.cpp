@@ -25,7 +25,6 @@
 #include <QApplication>
 #include <QQuickRenderTarget>
 #include <QQuickGraphicsDevice>
-#include <QOpenGLFramebufferObject>
 #include <QOpenGLExtraFunctions>
 #include <QThread>
 #include <QBackingStore>
@@ -226,15 +225,15 @@ void CompositorX11UISurface::render()
     if (m_context)
     {
         m_uiRenderControl->endFrame();
-        QOpenGLFramebufferObject::bindDefault();
         m_context->functions()->glFlush();
 
         const QSize fboSize = size() * devicePixelRatio();
 
-        m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
         //qt may mess with scissor/viewport
         m_context->functions()->glScissor(0,0, fboSize.width(), fboSize.height());
         m_context->extraFunctions()->glViewport(0,0, fboSize.width(), fboSize.height());
+        m_context->functions()->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_fboId);
+        m_context->functions()->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_context->defaultFramebufferObject());
         m_context->extraFunctions()->glBlitFramebuffer(0, 0, fboSize.width(), fboSize.height(), 0, 0, fboSize.width(), fboSize.height(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
         m_context->swapBuffers(this);
     }
