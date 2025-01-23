@@ -3660,14 +3660,16 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         p_es->mouse_event_cb = va_arg( args, vlc_mouse_event );
         p_es->mouse_event_userdata = va_arg( args, void * );
 
-        if( p_es->p_dec && p_es->mouse_event_cb )
-            vlc_input_decoder_SetVoutMouseEvent( p_es->p_dec,
-                p_es->mouse_event_cb, p_es->mouse_event_userdata );
-        else /* fallback to player event */
+        if ( !p_es->mouse_event_cb )
         {
+            /* fallback to player event */
             p_es->mouse_event_cb = MouseEventCb;
             p_es->mouse_event_userdata = p_es;
         }
+
+        if( p_es->p_dec )
+            vlc_input_decoder_SetVoutMouseEvent( p_es->p_dec,
+                p_es->mouse_event_cb, p_es->mouse_event_userdata );
 
         return VLC_SUCCESS;
     }
