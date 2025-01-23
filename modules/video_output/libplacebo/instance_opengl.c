@@ -37,6 +37,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg);
 static void CloseInstance(vlc_placebo_t *pl);
 static int MakeCurrent(vlc_placebo_t *pl);
 static void ReleaseCurrent(vlc_placebo_t *pl);
+static void SwapBuffers(void *);
 
 #define GL_TEXT N_("OpenGL extension")
 #define GLES2_TEXT N_("OpenGL ES 2 extension")
@@ -127,7 +128,7 @@ static int InitInstance(vlc_placebo_t *pl, const vout_display_cfg_t *cfg)
 
     // Create swapchain for this surface
     struct pl_opengl_swapchain_params swap_params = {
-        .swap_buffers = (void (*)(void *)) vlc_gl_Swap,
+        .swap_buffers = SwapBuffers,
         .max_swapchain_depth = var_InheritInteger(pl, "gl-swap-depth"),
         .priv = sys->gl,
     };
@@ -178,4 +179,9 @@ static void ReleaseCurrent(vlc_placebo_t *pl)
 {
     vlc_placebo_system_t *sys = pl->sys;
     vlc_gl_ReleaseCurrent(sys->gl);
+}
+
+static void SwapBuffers(void *opaque)
+{
+    vlc_gl_Swap(opaque);
 }
