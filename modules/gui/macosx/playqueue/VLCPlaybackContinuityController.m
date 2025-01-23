@@ -179,6 +179,7 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
         [self resumeLegacyPlaybackPositionForInputItem:inputItem
                                                    ask:(settingValue == 0)
                                                 player:playerController];
+        return;
     }
 
     [self resumePlaybackPositionForLibraryMediaItem:libraryMediaItem
