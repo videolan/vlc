@@ -150,8 +150,9 @@ static char *EITConvertToUTF8( demux_t *p_demux,
     }\
     } while(0)\
 
-static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
+static void SDTCallBack( void *opaque, dvbpsi_sdt_t *p_sdt )
 {
+    demux_t              *p_demux = opaque;
     demux_sys_t          *p_sys = p_demux->p_sys;
     ts_pid_t             *sdt = GetPID(p_sys, TS_SI_SDT_PID);
     ts_pat_t             *p_pat = ts_pid_Get(&p_sys->pids, 0)->u.p_pat;
@@ -383,8 +384,9 @@ static int EITConvertDuration( uint32_t i_duration )
 }
 #undef CVT_FROM_BCD
 
-static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
+static void TDTCallBack( void *opaque, dvbpsi_tot_t *p_tdt )
 {
+    demux_t            *p_demux = opaque;
     demux_sys_t        *p_sys = p_demux->p_sys;
 
 
@@ -490,8 +492,9 @@ static void EITExtractDrDescItems( demux_t *p_demux, const dvbpsi_extended_event
     }
 }
 
-static void EITCallBack( demux_t *p_demux, dvbpsi_eit_t *p_eit )
+static void EITCallBack( void *opaque, dvbpsi_eit_t *p_eit )
 {
+    demux_t            *p_demux = opaque;
     demux_sys_t        *p_sys = p_demux->p_sys;
     const dvbpsi_eit_event_t *p_evt;
     uint64_t i_runevt = 0;
@@ -783,7 +786,7 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
 #endif
     if( p_pid->i_pid == TS_SI_SDT_PID && i_table_id == 0x42 )
     {
-        if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_demux ) )
+        if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, SDTCallBack, p_demux ) )
             msg_Err( p_demux, "SINewTableCallback: failed attaching SDTCallback" );
     }
     else if( p_pid->i_pid == TS_SI_EIT_PID &&
@@ -791,13 +794,13 @@ static void SINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id,
                (i_table_id >= 0x50 && i_table_id <= 0x5f) ) ) /* Schedule */
     {
         if( !dvbpsi_eit_attach( h, i_table_id, i_extension,
-                                (dvbpsi_eit_callback)EITCallBack, p_demux ) )
+                                EITCallBack, p_demux ) )
             msg_Err( p_demux, "SINewTableCallback: failed attaching EITCallback" );
     }
     else if( p_pid->i_pid == TS_SI_TDT_PID &&
             (i_table_id == TS_SI_TDT_TABLE_ID || i_table_id == TS_SI_TOT_TABLE_ID) )
     {
-        if( !dvbpsi_tot_attach( h, i_table_id, i_extension, (dvbpsi_tot_callback)TDTCallBack, p_demux ) )
+        if( !dvbpsi_tot_attach( h, i_table_id, i_extension, TDTCallBack, p_demux ) )
             msg_Err( p_demux, "SINewTableCallback: failed attaching TDTCallback" );
     }
     else if( p_pid->i_pid == TS_ARIB_CDT_PID && i_table_id == TS_ARIB_CDT_TABLE_ID )
