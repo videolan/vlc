@@ -177,9 +177,12 @@ T.ItemDelegate {
             readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
             Rectangle {
-                anchors.fill: parent
+                anchors.centerIn: parent
+                anchors.alignWhenCentered: false
 
-                anchors.margins: -border.width
+                implicitWidth: roundImage.paintedWidth + border.width
+                implicitHeight: roundImage.paintedHeight + border.width
+
                 z: -1
 
                 radius: roundImage.effectiveRadius
