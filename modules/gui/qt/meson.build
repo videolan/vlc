@@ -1225,6 +1225,25 @@ if qt6_dep.found()
         }
 
         vlc_tests += {
+            'name': 'test_qt_thread_runner',
+            'sources': files(
+                'tests/test_thread_runner.cpp',
+                'medialibrary/mlthreadpool.cpp',
+                'medialibrary/mlthreadpool.hpp'
+            ),
+            'moc_sources': files(
+                'tests/test_thread_runner.cpp'
+            ),
+            'moc_headers': files(
+                'medialibrary/mlthreadpool.hpp'
+            ),
+            'suite': ['qt'],
+            'include_directories' : qt_include_dir,
+            'dependencies': [qt6_dep, qtest_qt6_dep]
+        }
+
+
+        vlc_tests += {
             'name': 'test_qt_dialog_model',
             'sources': files(
                 'tests/vlc_stub_modules.cpp',

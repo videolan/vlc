@@ -1658,6 +1658,25 @@ test_renderer_manager_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_renderer_manager_model
 TESTS += test_renderer_manager_model
 
+# test_thread_runner
+
+test_thread_runner_SOURCES = \
+	tests/test_thread_runner.cpp \
+    medialibrary/mlthreadpool.cpp medialibrary/mlthreadpool.hpp
+
+nodist_test_thread_runner_SOURCES = \
+	tests/test_thread_runner.moc \
+    medialibrary/mlthreadpool.moc.cpp
+
+BUILT_SOURCES += tests/test_thread_runner.moc
+CLEANFILES += tests/test_thread_runner.moc
+test_thread_runner_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_thread_runner_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_thread_runner_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_thread_runner_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_thread_runner
+TESTS += test_thread_runner
+
 # test_vlc_dialog_model
 
 test_vlc_dialog_model_SOURCES = \
