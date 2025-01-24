@@ -3,7 +3,9 @@
 DVBCSA_VERSION := 1.1.0
 DVBCSA_URL := $(VIDEOLAN)/libdvbcsa/$(DVBCSA_VERSION)/libdvbcsa-$(DVBCSA_VERSION).tar.gz
 
+ifdef GPL
 PKGS += dvbcsa
+endif
 ifeq ($(call need_pkg,"libdvbcsa >= 1.1.0"),)
 PKGS_FOUND += dvbcsa
 endif
@@ -20,6 +22,7 @@ libdvbcsa: libdvbcsa-$(DVBCSA_VERSION).tar.gz .sum-dvbcsa
 	$(MOVE)
 
 .dvbcsa: libdvbcsa
+	$(REQUIRE_GPL)
 	$(RECONF)
 	$(MAKEBUILDDIR)
 	$(MAKECONFIGURE)
