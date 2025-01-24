@@ -29,9 +29,7 @@ PNG_CONF += -DCMAKE_ASM_FLAGS="$(CFLAGS)"
 endif
 endif
 
-ifdef HAVE_WIN32
 PNG_CONF += -DPNG_DEBUG_POSTFIX:STRING=
-endif
 
 ifeq ($(ARCH),arm)
 ifdef HAVE_IOS
