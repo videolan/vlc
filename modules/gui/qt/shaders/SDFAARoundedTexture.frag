@@ -129,6 +129,8 @@ void main()
     float softEdgeMax = fwidth(dist) * 0.75;
     float softEdgeMin = -softEdgeMax;
 #endif
+    // Breathing room (shrink):
+    dist += softEdgeMax;
 
     // Soften the outline, as recommended by the Valve paper, using smoothstep:
     // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
