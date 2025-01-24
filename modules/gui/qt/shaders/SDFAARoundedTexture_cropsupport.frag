@@ -13,6 +13,7 @@
 //          SAME IN SDFAARoundedTexture.frag.
 
 #define ANTIALIASING
+#define BACKGROUND_SUPPORT
 
 /*****************************************************************************
  * Copyright (C) 2024 VLC authors and VideoLAN
@@ -56,6 +57,9 @@ layout(std140, binding = 0) uniform buf {
     vec2 size;
 #ifdef CROP_SUPPORT
     vec2 cropRate;
+#endif
+#ifdef BACKGROUND_SUPPORT
+    vec4 backgroundColor;
 #endif
     float radiusTopRight;
     float radiusBottomRight;
@@ -124,6 +128,12 @@ void main()
     vec4 texel = texture(source, qt_TexCoord0);
 #endif
 
+#ifdef BACKGROUND_SUPPORT
+    // Source over blending (S + D * (1 - S.a)):
+    texel = texel + backgroundColor * (1.0 - texel.a);
+#endif
+
+#ifdef ANTIALIASING
     // Soften the outline, as recommended by the Valve paper, using smoothstep:
     // "Improved Alpha-Tested Magnification for Vector Textures and Special Effects"
     // NOTE: The whole texel is multiplied, because of premultiplied alpha.
