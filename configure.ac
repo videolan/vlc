@@ -1198,6 +1198,15 @@ AS_IF([test "${enable_extra_checks}" = "yes"], [
     AC_LANG_POP(C++)
 ])
 
+# Casting incompatible functions is notoriously bug prone with emscripten:
+# https://emscripten.org/docs/porting/guidelines/function_pointer_issues.html
+AS_IF([test "${enable_extra_checks}" = "yes" && test "${SYS}" = "emscripten"], [
+    AX_APPEND_COMPILE_FLAGS([-Werror=cast-function-type-strict], [CFLAGS])
+    AC_LANG_PUSH(C++)
+    AX_APPEND_COMPILE_FLAGS([-Werror=cast-function-type-strict], [CXXFLAGS])
+    AC_LANG_POP(C++)
+])
+
 dnl UWP forbidden checks
 AS_IF([test "${SYS}" = "mingw32"], [
   AC_MSG_CHECKING(for if_nametoindex availability)
