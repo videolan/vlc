@@ -42,6 +42,14 @@ Item {
     property alias status: image.status
     property alias cache: image.cache
 
+    // Padding represents how much the content is shrunk. For now this is a readonly property.
+    // Currently it only takes the `softEdgeMax` into calculation, as that's what the shader
+    // uses to shrink to prevent "hard edges". Note that padding can only be calculated properly
+    // when the shader has custom softedge support (`CUSTOM_SOFTEDGE`), currently it is used
+    // at all times.
+    readonly property real padding: (shaderEffect.readyForVisibility && antialiasing) ? (Math.max(shaderEffect.width, shaderEffect.height) / 4 * shaderEffect.softEdgeMax)
+                                                                                      : Qt.size(0.0, 0.0)
+
     readonly property real paintedWidth: (shaderEffect.readyForVisibility) ? shaderEffect.width
                                                                            : (image.clip ? image.width : image.paintedWidth)
     readonly property real paintedHeight: (shaderEffect.readyForVisibility) ? shaderEffect.height
