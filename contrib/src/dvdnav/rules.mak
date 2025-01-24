@@ -20,6 +20,9 @@ $(TARBALLS)/libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2:
 dvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.bz2 .sum-dvdnav
 	$(UNPACK)
 	$(APPLY) $(SRC)/dvdnav/0001-configure-don-t-use-ms-style-packing.patch
+	# turn asserts/exit into silent discard
+	$(APPLY) $(SRC)/dvdnav/0001-play-avoid-assert-and-exit-and-bogus-PG-link.patch
+	$(APPLY) $(SRC)/dvdnav/0002-play-avoid-assert-and-exit-and-bogus-Cell-link.patch
 	$(call pkg_static,"misc/dvdnav.pc.in")
 	$(MOVE)
 
