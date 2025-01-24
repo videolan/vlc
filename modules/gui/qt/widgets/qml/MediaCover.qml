@@ -25,8 +25,6 @@ import VLC.Widgets as Widgets
 import VLC.Style
 
 
-// NOTE: This rectangle is useful to discern the item against a similar background.
-// FIXME: Maybe we could refactor this to draw the background directly in the RoundImage.
 Item {
     id: root
 
@@ -93,6 +91,8 @@ Item {
         height: root.paintedHeight
 
         radius: root.effectiveRadius
+
+        visible: !Qt.colorEqual(image.effectiveBackgroundColor, color)
     }
 
     //delay placeholder showing up
@@ -111,6 +111,8 @@ Item {
         sourceSize: Qt.size(root.pictureWidth * root.eDPR,
                             root.pictureHeight * root.eDPR)
 
+        backgroundColor: root.color
+
         onStatusChanged: {
             if (status === Image.Loading) {
                 root._loadTimeout = false
@@ -127,6 +129,8 @@ Item {
         anchors.fill: parent
 
         radius: root.radius
+
+        backgroundColor: root.color
 
         fillMode: root.fillMode
 

@@ -83,7 +83,9 @@ Item {
     fillMode: Image.PreserveAspectFit
 
     property real radius
+    property alias backgroundColor: shaderEffect.backgroundColor
     readonly property real effectiveRadius: shaderEffect.readyForVisibility ? radius : 0.0
+    readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
     // NOTE: Note the distinction between ShaderEffect and
     //       ShaderEffectSource. ShaderEffect is no different
@@ -124,6 +126,8 @@ Item {
         readonly property real radiusBottomRight: radius
         readonly property real radiusTopLeft: radius
         readonly property real radiusBottomLeft: radius
+
+        property color backgroundColor: "transparent"
 
         readonly property size size: Qt.size(width, height)
 
