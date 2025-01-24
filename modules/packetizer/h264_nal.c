@@ -533,7 +533,7 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
             bs_read_ue( p_bs ); /* log2 max mv h */
             bs_read_ue( p_bs ); /* log2 max mv v */
             p_sps->vui.i_max_num_reorder_frames = bs_read_ue( p_bs );
-            bs_read_ue( p_bs ); /* max dec frame buffering */
+            p_sps->vui.i_max_dec_frame_buffering = bs_read_ue( p_bs );
         }
     }
 
@@ -816,14 +816,11 @@ static uint8_t h264_get_max_dpb_frames( const h264_sequence_parameter_set_t *p_s
 }
 
 bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
-                          uint8_t *pi_depth, unsigned *pi_delay )
+                          uint8_t *pi_max_num_reorder, uint8_t *pi_max_dec_buffering )
 {
     uint8_t i_max_num_reorder_frames = p_sps->vui.i_max_num_reorder_frames;
-    if( p_sps->i_pic_order_cnt_type == 2 ) /* 8.2.1.3 */
-    {
-        i_max_num_reorder_frames = 0;
-    }
-    else if( !p_sps->vui.b_bitstream_restriction_flag )
+    uint8_t i_max_dec_frame_buffering = p_sps->vui.i_max_dec_frame_buffering;
+    if( !p_sps->vui.b_bitstream_restriction_flag )
     {
         switch( p_sps->i_profile ) /* E-2.1 */
         {
@@ -838,18 +835,23 @@ bool h264_get_dpb_values( const h264_sequence_parameter_set_t *p_sps,
             case PROFILE_H264_HIGH_444_PREDICTIVE:
                 if( p_sps->i_constraint_set_flags & H264_CONSTRAINT_SET_FLAG(3) )
                 {
-                    i_max_num_reorder_frames = 0; /* all IDR */
+                    i_max_num_reorder_frames =
+                    i_max_dec_frame_buffering = 0; /* all IDR */
                     break;
                 }
                 /* fallthrough */
             default:
-                i_max_num_reorder_frames = h264_get_max_dpb_frames( p_sps );
+                i_max_num_reorder_frames =
+                i_max_dec_frame_buffering = h264_get_max_dpb_frames( p_sps );
                 break;
         }
     }
 
-    *pi_depth = i_max_num_reorder_frames;
-    *pi_delay = 0;
+    if( i_max_num_reorder_frames > i_max_dec_frame_buffering )
+        i_max_num_reorder_frames = i_max_dec_frame_buffering;
+
+    *pi_max_num_reorder = i_max_num_reorder_frames;
+    *pi_max_dec_buffering = i_max_dec_frame_buffering;
 
     return true;
 }

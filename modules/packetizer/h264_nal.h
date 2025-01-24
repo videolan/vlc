@@ -154,6 +154,7 @@ struct h264_sequence_parameter_set_t
         /* restrictions */
         uint8_t b_bitstream_restriction_flag;
         uint8_t i_max_num_reorder_frames;
+        uint8_t i_max_dec_frame_buffering;
     } vui;
 };
 
@@ -209,7 +210,7 @@ uint8_t * h264_avcC_to_AnnexB_NAL( const uint8_t *p_buf, size_t i_buf,
                                    size_t *pi_result, uint8_t *pi_nal_length_size );
 
 bool h264_get_dpb_values( const h264_sequence_parameter_set_t *,
-                          uint8_t *pi_depth, unsigned *pi_delay );
+                          uint8_t *pi_max_num_reorder, uint8_t *pi_max_dec_buffering );
 
 unsigned h264_get_max_frame_num( const h264_sequence_parameter_set_t * );
 bool h264_is_frames_only( const h264_sequence_parameter_set_t * );

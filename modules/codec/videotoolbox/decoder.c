@@ -284,7 +284,7 @@ static bool FillReorderInfoH264(decoder_t *p_dec, const block_t *p_block,
 
                 p_info->i_num_ts = h264_get_num_ts(p_sps, slice, sei.i_pic_struct,
                                                    p_info->i_foc, bFOC);
-                unsigned dummy;
+                uint8_t dummy;
                 h264_get_dpb_values(p_sps, &p_info->i_max_pics_buffering, &dummy);
 
                 if (!p_info->b_progressive)
