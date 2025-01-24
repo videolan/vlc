@@ -26,60 +26,6 @@
 #include <QThreadPool>
 #include <QMutex>
 
-class MLThreadPool;
-
-//internal task MLThreadPool
-class MLThreadPoolSerialTask : public QObject, public QRunnable
-{
-    Q_OBJECT
-public:
-    MLThreadPoolSerialTask(MLThreadPool* parent, const QString& queueName);
-
-    void run() override;
-
-private:
-    MLThreadPool* m_parent = nullptr;
-    QString m_queueName;
-};
-
-/**
- * @brief The MLThreadPool act like a QThreadPool, with the difference that it allows tasks
- * to be run sequentially by specifying a queue name when starting the task.
- */
-class MLThreadPool
-{
-public:
-    explicit MLThreadPool();
-    ~MLThreadPool();
-
-
-    void setMaxThreadCount(size_t threadCount);
-
-    /**
-     * @brief start enqueue a QRunnable to be executed on the threadpool
-     * @param task is the task to enqueue
-     * @param queue, the name of the queue, all task with the same queue name will be
-     * ran sequentially, if queue is null, task will be run without additional specific
-     * constraint (like on QThreadPool)
-     */
-    void start(QRunnable* task, const char* queue = nullptr);
-
-    /**
-     * @brief tryTake atempt to the specified task from the queue if the task has not started
-     * @return true if the task has been removed from the queue and was not started yet
-     */
-    bool tryTake(QRunnable* task);
-
-private:
-    friend class MLThreadPoolSerialTask;
-
-    QRunnable* getNextTaskFromQueue(const QString& queueName);
-
-    QMutex m_lock;
-    QThreadPool m_threadpool;
-    QMap<QString, QQueue<QRunnable*>> m_serialTasks;
-};
-
 class RunOnThreadBaseRunner;
 
 class ThreadRunner : public QObject
@@ -95,6 +41,8 @@ public:
     ThreadRunner();
     ~ThreadRunner();
 
+    void setMaxThreadCount(size_t threadCount);
+
     void destroy();
     void cancelTask(const QObject* object, quint64 taskId);
 
@@ -108,8 +56,32 @@ private slots:
     void runOnThreadDone(RunOnThreadBaseRunner* runner, quint64 target, const QObject* object, int status);
     void runOnThreadTargetDestroyed(QObject * object);
 
+
 private:
-    MLThreadPool m_threadPool;
+    /**
+     * @brief start enqueue a QRunnable to be executed on the threadpool
+     * @param task is the task to enqueue
+     * @param queue, the name of the queue, all task with the same queue name will be
+     * ran sequentially, if queue is null, task will be run without additional specific
+     * constraint (like on QThreadPool)
+     */
+    void start(QRunnable* task, const char* queue = nullptr);
+
+    /**
+     * @brief tryTake atempt to the specified task from the queue if the task has not started
+     * @return true if the task has been removed from the queue and was not started yet
+     */
+    bool tryTake(QRunnable* task);
+
+    QRunnable* getNextTaskFromQueue(const QString& queueName);
+    void processQueueLocked(const QString& queueName);
+
+private:
+    QThreadPool m_threadPool;
+
+    friend class MLThreadPoolSerialTask;
+    QMutex m_serialTaskLock;
+    QMap<QString, QQueue<QRunnable*>> m_serialTasks;
 
     bool m_shuttingDown = false;
     quint64 m_taskId = 1;
@@ -194,7 +166,7 @@ quint64 ThreadRunner::runOnThread(const QObject* obj,
     connect(obj, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed, Qt::DirectConnection);
     m_runningTasks.insert(taskId, runnable);
     m_objectTasks.insert(obj, taskId);
-    m_threadPool.start(runnable, queue);
+    start(runnable, queue);
     return taskId;
 }
 
