@@ -1,0 +1,30 @@
+From 43d76f9a0136fb244662e59876d87c7256df27c4 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 24 Jan 2025 13:39:11 +0100
+Subject: [PATCH 2/2] play: avoid assert and exit and bogus Cell link
+
+Just return LinkNoLink.
+---
+ src/vm/play.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/vm/play.c b/src/vm/play.c
+index e5d0e72..a9d99fa 100644
+--- a/src/vm/play.c
++++ b/src/vm/play.c
+@@ -203,7 +203,11 @@ link_t play_Cell(vm_t *vm) {
+     Log3(vm, "(vm->state).cellN (%i) > pgc->nr_of_cells (%i)",
+             (vm->state).cellN, (vm->state).pgc->nr_of_cells );
+ #endif
+-    assert((vm->state).cellN == (vm->state).pgc->nr_of_cells + 1);
++    if((vm->state).cellN == (vm->state).pgc->nr_of_cells + 1) {
++      /* bogus link, ignore it */
++      link_t link_values = { LinkNoLink, 0, 0, 0 };
++      return link_values;
++    }
+     return play_PGC_post(vm);
+   }
+ 
+-- 
+2.45.0.windows.1
+

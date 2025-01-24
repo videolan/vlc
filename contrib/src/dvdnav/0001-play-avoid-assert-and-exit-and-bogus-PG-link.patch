@@ -1,0 +1,30 @@
+From ff8676289c227d03293f63152d327b2a16775eea Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Fri, 24 Jan 2025 13:34:52 +0100
+Subject: [PATCH 1/2] play: avoid assert and exit and bogus PG link
+
+Just return LinkNoLink.
+---
+ src/vm/play.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/vm/play.c b/src/vm/play.c
+index 8830883..e5d0e72 100644
+--- a/src/vm/play.c
++++ b/src/vm/play.c
+@@ -177,7 +177,11 @@ link_t play_PG(vm_t *vm) {
+     Log3(vm, "play_PG: (vm->state).pgN (%i) > pgc->nr_of_programs (%i)",
+             (vm->state).pgN, (vm->state).pgc->nr_of_programs );
+ #endif
+-    assert((vm->state).pgN == (vm->state).pgc->nr_of_programs + 1);
++    if((vm->state).pgN > (vm->state).pgc->nr_of_programs + 1) {
++      /* bogus link, ignore it */
++      link_t link_values = { LinkNoLink, 0, 0, 0 };
++      return link_values;
++    }
+     return play_PGC_post(vm);
+   }
+ 
+-- 
+2.45.0.windows.1
+
