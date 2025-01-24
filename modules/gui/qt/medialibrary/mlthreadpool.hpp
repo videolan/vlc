@@ -115,6 +115,7 @@ private:
     quint64 m_taskId = 1;
     QMap<quint64, RunOnThreadBaseRunner*> m_runningTasks;
     QMultiMap<const QObject*, quint64> m_objectTasks;
+    QMutex m_lock;
 };
 
 class RunOnThreadBaseRunner : public QObject, public QRunnable
@@ -182,13 +183,15 @@ quint64 ThreadRunner::runOnThread(const QObject* obj,
                                       std::function<void (quint64 taskId, Ctx&)> uiFun,
                                       const char* queue)
 {
+    QMutexLocker locker{&m_lock};
+
     if (m_shuttingDown)
         return 0;
 
     auto taskId = m_taskId++;
     auto runnable = new RunOnThreadRunner<Ctx>(taskId, obj, mlFun, uiFun);
     connect(runnable, &RunOnThreadBaseRunner::done, this, &ThreadRunner::runOnThreadDone);
-    connect(obj, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+    connect(obj, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed, Qt::DirectConnection);
     m_runningTasks.insert(taskId, runnable);
     m_objectTasks.insert(obj, taskId);
     m_threadPool.start(runnable, queue);

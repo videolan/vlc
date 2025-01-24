@@ -133,6 +133,7 @@ ThreadRunner::~ThreadRunner()
 
 void ThreadRunner::destroy()
 {
+    QMutexLocker locker{&m_lock};
     m_shuttingDown = true;
     //try to cancel as many tasks as possible
     for (auto taskIt = m_objectTasks.begin(); taskIt != m_objectTasks.end(); /**/)
@@ -161,6 +162,7 @@ void ThreadRunner::destroy()
 void ThreadRunner::cancelTask(const QObject* object, quint64 taskId)
 {
     assert(taskId != 0);
+    QMutexLocker locker{&m_lock};
 
     auto task = m_runningTasks.value(taskId, nullptr);
     if (!task)
@@ -177,32 +179,51 @@ void ThreadRunner::cancelTask(const QObject* object, quint64 taskId)
 
 void ThreadRunner::runOnThreadDone(RunOnThreadBaseRunner* runner, quint64 target, const QObject* object, int status)
 {
+    QMutexLocker locker{&m_lock};
+    if (!m_runningTasks.contains(target))
+    {
+        runner->deleteLater();
+        return;
+    }
+
+    m_runningTasks.remove(target);
+    m_objectTasks.remove(object, target);
+    if (m_objectTasks.count(object) == 0)
+        disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+
     if (m_shuttingDown)
     {
-        if (m_runningTasks.contains(target))
-        {
-            m_runningTasks.remove(target);
-            m_objectTasks.remove(object, target);
-            if (m_objectTasks.count(object) == 0)
-                disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
-        }
         if (m_runningTasks.empty())
             deleteLater();
+        runner->deleteLater();
+        return;
     }
-    else if (m_runningTasks.contains(target))
+
+    if (status == ML_TASK_STATUS_SUCCEED)
     {
-        if (status == ML_TASK_STATUS_SUCCEED)
+        if (object->thread() == this->thread())
+        {
+            locker.unlock();
             runner->runUICallback();
-        m_runningTasks.remove(target);
-        m_objectTasks.remove(object, target);
-        if (m_objectTasks.count(object) == 0)
-            disconnect(object, &QObject::destroyed, this, &ThreadRunner::runOnThreadTargetDestroyed);
+            runner->deleteLater();
+        }
+        else
+        {
+            //run the callback in the object thread
+            QMetaObject::invokeMethod(
+                const_cast<QObject*>(object),
+                [runner](){
+                    runner->runUICallback();
+                    runner->deleteLater();
+                }
+            );
+        }
     }
-    runner->deleteLater();
 }
 
 void ThreadRunner::runOnThreadTargetDestroyed(QObject * object)
 {
+    QMutexLocker locker{&m_lock};
     if (m_objectTasks.contains(object))
     {
         for (auto taskId : m_objectTasks.values(object))
