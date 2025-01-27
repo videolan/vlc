@@ -1119,30 +1119,30 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     if ((apply_scale && (scale_size.w != SCALE_UNIT || scale_size.h != SCALE_UNIT)) || convert_chroma)
     {
         /* Destroy the cache if unusable */
-        if (region->p_private) {
-            subpicture_region_private_t *private = region->p_private;
+        if (!subpicture_region_cache_IsValid(region)) {
+            const video_format_t *cachefmt = subpicture_region_cache_GetFormat(region);
             bool is_changed = false;
 
             /* Check resize changes */
-            if (dst_width  != private->fmt.i_visible_width ||
-                dst_height != private->fmt.i_visible_height)
+            if (dst_width  != cachefmt->i_visible_width ||
+                dst_height != cachefmt->i_visible_height)
                 is_changed = true;
 
             /* Check forced palette changes */
             if (changed_palette)
                 is_changed = true;
 
-            if (convert_chroma && private->fmt.i_chroma != chroma_list[0])
+            if (convert_chroma && cachefmt->i_chroma != chroma_list[0])
                 is_changed = true;
 
             if (is_changed) {
-                subpicture_region_private_Delete(private);
-                region->p_private = NULL;
+                subpicture_region_cache_Invalidate(region);
             }
         }
 
         /* Scale if needed into cache */
-        if (!region->p_private) {
+        if (!subpicture_region_cache_IsValid(region)) {
+
             picture_t *picture = region->p_picture;
             picture_Hold(picture);
 
@@ -1201,19 +1201,15 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
 
             /* */
             if (picture) {
-                region->p_private = subpicture_region_private_New(&picture->format);
-                if (region->p_private) {
-                    region->p_private->p_picture = picture;
-                } else {
+                if(subpicture_region_cache_Assign(region, picture) != VLC_SUCCESS)
                     picture_Release(picture);
-                }
             }
         }
 
         /* And use the scaled picture */
-        if (region->p_private) {
-            region_fmt     = region->p_private->fmt;
-            region_picture = region->p_private->p_picture;
+        if (subpicture_region_cache_IsValid(region)) {
+            region_fmt     = *subpicture_region_cache_GetFormat(region);
+            region_picture = subpicture_region_cache_GetPicture(region);
         }
     }
 
@@ -2130,7 +2126,7 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
     /* p_private is for spu only and cannot be non NULL here */
     subpicture_region_t *r;
     vlc_spu_regions_foreach(r, &subpic->regions)
-        assert(r->p_private == NULL);
+        assert(!subpicture_region_cache_IsValid(r));
 
     /* */
     vlc_mutex_lock(&sys->lock);

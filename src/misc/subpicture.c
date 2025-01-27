@@ -199,43 +199,62 @@ void subpicture_Update( subpicture_t *p_subpicture,
     video_format_Copy( &p_private->dst, p_fmt_dst );
 }
 
-
-subpicture_region_private_t *subpicture_region_private_New( video_format_t *p_fmt )
+typedef struct subpicture_region_private_t
 {
-    subpicture_region_private_t *p_private = malloc( sizeof(*p_private) );
+    subpicture_region_t region;
+    video_format_t fmt;
+    picture_t *p_picture;
+} subpicture_region_private_t;
 
-    if( !p_private )
-        return NULL;
-
-    if ( video_format_Copy( &p_private->fmt, p_fmt ) != VLC_SUCCESS )
-    {
-        free( p_private );
-        return NULL;
-    }
-
-    p_private->p_picture = NULL;
-    return p_private;
+const video_format_t * subpicture_region_cache_GetFormat( const subpicture_region_t *p_region )
+{
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+    return &p_priv->fmt;
 }
 
-void subpicture_region_private_Delete( subpicture_region_private_t *p_private )
+picture_t * subpicture_region_cache_GetPicture( subpicture_region_t *p_region )
 {
-    if( p_private->p_picture )
-        picture_Release( p_private->p_picture );
-    video_format_Clean( &p_private->fmt );
-    free( p_private );
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+    return p_priv->p_picture;
+}
+
+bool subpicture_region_cache_IsValid(const subpicture_region_t *p_region)
+{
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+    return p_priv->fmt.i_chroma;
+}
+void subpicture_region_cache_Invalidate( subpicture_region_t *p_region )
+{
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+    if( p_priv->p_picture )
+    {
+        picture_Release( p_priv->p_picture );
+        p_priv->p_picture = NULL;
+    }
+    video_format_Clean( &p_priv->fmt );
+    video_format_Init( &p_priv->fmt, 0 );
+}
+
+int subpicture_region_cache_Assign( subpicture_region_t *p_region, picture_t *p_picture )
+{
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+    if ( video_format_Copy( &p_priv->fmt, &p_picture->format ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+    p_priv->p_picture = p_picture;
+    return VLC_SUCCESS;
 }
 
 static subpicture_region_t * subpicture_region_NewInternal( void )
 {
-    subpicture_region_t *p_region = calloc( 1, sizeof(*p_region ) );
+    subpicture_region_private_t *p_region = calloc( 1, sizeof(subpicture_region_private_t) );
     if( unlikely(p_region == NULL) )
         return NULL;
 
-    p_region->i_alpha = 0xff;
-    p_region->i_x = INT_MAX;
-    p_region->i_y = INT_MAX;
+    p_region->region.i_alpha = 0xff;
+    p_region->region.i_x = INT_MAX;
+    p_region->region.i_y = INT_MAX;
 
-    return p_region;
+    return &p_region->region;
 }
 
 subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
@@ -333,15 +352,16 @@ void subpicture_region_Delete( subpicture_region_t *p_region )
     if( !p_region )
         return;
 
-    if( p_region->p_private )
-        subpicture_region_private_Delete( p_region->p_private );
+    subpicture_region_private_t *p_priv = container_of(p_region, subpicture_region_private_t, region);
+
+    subpicture_region_cache_Invalidate( p_region );
 
     if( p_region->p_picture )
         picture_Release( p_region->p_picture );
 
     text_segment_ChainDelete( p_region->p_text );
     video_format_Clean( &p_region->fmt );
-    free( p_region );
+    free( p_priv );
 }
 
 void vlc_spu_regions_Clear( vlc_spu_regions *regions )

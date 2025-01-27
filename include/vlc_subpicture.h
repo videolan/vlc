@@ -47,7 +47,6 @@
 /**
  * Video subtitle region spu core private
  */
-typedef struct subpicture_region_private_t subpicture_region_private_t;
 typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 typedef struct filter_t vlc_blender_t;
 
@@ -85,7 +84,6 @@ struct subpicture_region_t
     int             i_max_height;    /** vertical rendering/cropping target/limit */
 
     struct vlc_list node;             /**< for inclusion in a vlc_spu_regions */
-    subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
 
 typedef struct vlc_list vlc_spu_regions;
