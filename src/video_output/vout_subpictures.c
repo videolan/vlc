@@ -81,6 +81,18 @@ struct subtitle_position_cache
     const subpicture_region_t *region;
     int x, y;
     bool is_active;
+    struct {
+        unsigned original_width;
+        unsigned original_height;
+        unsigned visible_width;
+        unsigned visible_height;
+        bool b_in_window;
+        int i_x;
+        int i_y;
+        int i_align;
+        int i_max_width;
+        int i_max_height;
+    } key;
 };
 typedef struct VLC_VECTOR(struct subtitle_position_cache) subtitles_positions_vector;
 
@@ -636,14 +648,32 @@ static void subtitles_positions_FinishUpdate(subtitles_positions_vector *subs)
     }
 }
 
+static bool subtitle_position_cache_Matches(const struct subtitle_position_cache *pos,
+                                            const subpicture_t *subpic,
+                                            const subpicture_region_t *region)
+{
+    return pos->region == region &&
+           pos->key.original_width == subpic->i_original_picture_width &&
+           pos->key.original_height == subpic->i_original_picture_height &&
+           pos->key.visible_width == region->fmt.i_visible_width &&
+           pos->key.visible_height == region->fmt.i_visible_height &&
+           pos->key.b_in_window == region->b_in_window &&
+           pos->key.i_x == region->i_x &&
+           pos->key.i_y == region->i_y &&
+           pos->key.i_align == region->i_align &&
+           pos->key.i_max_width == region->i_max_width &&
+           pos->key.i_max_height == region->i_max_height;
+}
+
 static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
     const subtitles_positions_vector *subs,
+    const subpicture_t *subpic,
     const subpicture_region_t *region)
 {
     struct subtitle_position_cache *pos;
     vlc_vector_foreach_ref(pos, subs)
     {
-        if (pos->region == region)
+        if (subtitle_position_cache_Matches(pos, subpic, region))
         {
             return pos;
         }
@@ -652,6 +682,7 @@ static struct subtitle_position_cache *subtitles_positions_FindRelativeRegion(
 }
 
 static void subtitles_positions_AddRelativeRegion(subtitles_positions_vector *subs,
+                                          const subpicture_t *subpic,
                                           const subpicture_region_t *region,
                                           const spu_area_t *area,
                                           struct subtitle_position_cache *write)
@@ -673,6 +704,17 @@ static void subtitles_positions_AddRelativeRegion(subtitles_positions_vector *su
     write->is_active = true;
     write->x         = area->x;
     write->y         = area->y;
+    // Set cache invalidation key values
+    write->key.original_width = subpic->i_original_picture_width;
+    write->key.original_height = subpic->i_original_picture_height;
+    write->key.visible_width = region->fmt.i_visible_width;
+    write->key.visible_height = region->fmt.i_visible_height;
+    write->key.b_in_window = region->b_in_window;
+    write->key.i_x = region->i_x;
+    write->key.i_y = region->i_y;
+    write->key.i_align = region->i_align;
+    write->key.i_max_width = region->i_max_width;
+    write->key.i_max_height = region->i_max_height;
 }
 
 /**
@@ -1464,7 +1506,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (subpic->b_subtitle && !region->b_absolute)
             {
                 cache_pos =
-                    subtitles_positions_FindRelativeRegion(&sys->subs_pos, region);
+                    subtitles_positions_FindRelativeRegion(&sys->subs_pos, subpic, region);
                 if (cache_pos != NULL)
                 {
                     region->i_x = cache_pos->x;
@@ -1512,7 +1554,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 {
                     if (!external_scale)
                         area = spu_area_unscaled(area, scale);
-                    subtitles_positions_AddRelativeRegion(&sys->subs_pos, region, &area, cache_pos);
+                    subtitles_positions_AddRelativeRegion(&sys->subs_pos, subpic, region, &area, cache_pos);
                 }
             }
         }
