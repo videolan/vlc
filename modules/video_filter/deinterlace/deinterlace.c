@@ -135,29 +135,6 @@ static int Open( filter_t *p_filter );
  */
 static void Flush( filter_t *p_filter );
 
-/**
- * Mouse callback for the deinterlace filter.
- *
- * Open() sets this up as the mouse callback method (pf_video_mouse)
- * in the filter structure.
- *
- * Currently, this handles the scaling of the y coordinate for algorithms
- * that halve the output height.
- *
- * @param p_filter The filter instance.
- * @param[out] p_mouse Updated mouse position data.
- * @param[in] p_old Previous mouse position data. Unused in this filter.
- * @param[in] p_new Latest mouse position data.
- * @return VLC error code; currently always VLC_SUCCESS.
- * @retval VLC_SUCCESS All ok.
- * @see Open()
- * @see filter_t
- * @see vlc_mouse_t
- */
-static int Mouse( filter_t *p_filter,
-                  vlc_mouse_t *p_mouse,
-                  const vlc_mouse_t *p_old );
-
 /*****************************************************************************
  * Extra documentation
  *****************************************************************************/
@@ -456,21 +433,6 @@ void Flush( filter_t *p_filter )
 }
 
 /*****************************************************************************
- * Mouse event callback
- *****************************************************************************/
-
-int Mouse( filter_t *p_filter,
-           vlc_mouse_t *p_mouse,
-           const vlc_mouse_t *p_old )
-{
-    VLC_UNUSED(p_old);
-    filter_sys_t *p_sys = p_filter->p_sys;
-    if( p_sys->context.settings.b_half_height )
-        p_mouse->i_y *= 2;
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
  * Close: clean up the filter
  *****************************************************************************/
 /**
@@ -486,7 +448,6 @@ static void Close( filter_t *p_filter )
 static const struct vlc_filter_operations filter_ops = {
     .filter_video = Deinterlace,
     .flush = Flush,
-    .video_mouse = Mouse,
     .close = Close,
 };
 
