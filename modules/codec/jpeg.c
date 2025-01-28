@@ -35,21 +35,6 @@
 #include <setjmp.h>
 #include <stdckdint.h>
 
-/* JPEG_SYS_COMMON_MEMBERS:
- * members common to encoder and decoder descriptors
- */
-#define JPEG_SYS_COMMON_MEMBERS                             \
-/**@{*/                                                     \
-    /* libjpeg error handler manager */                     \
-    struct jpeg_error_mgr err;                              \
-                                                            \
-    /* setjmp buffer for internal libjpeg error handling */ \
-    jmp_buf setjmp_buffer;                                  \
-                                                            \
-    vlc_object_t *p_obj;                                    \
-                                                            \
-/**@}*/                                                     \
-
 #define ENC_CFG_PREFIX "sout-jpeg-"
 #define ENC_QUALITY_TEXT N_("Quality level")
 #define ENC_QUALITY_LONGTEXT N_("Quality level " \
@@ -61,17 +46,21 @@
  */
 struct jpeg_sys_t
 {
-    JPEG_SYS_COMMON_MEMBERS
-};
+    /* libjpeg error handler manager */
+    struct jpeg_error_mgr err;
 
-typedef struct jpeg_sys_t jpeg_sys_t;
+    /* setjmp buffer for internal libjpeg error handling */
+    jmp_buf setjmp_buffer;
+
+    vlc_object_t *p_obj;
+};
 
 /*
  * jpeg decoder descriptor
  */
 typedef struct
 {
-    JPEG_SYS_COMMON_MEMBERS
+    struct jpeg_sys_t common;
 
     JSAMPARRAY p_row_pointers;
     struct jpeg_decompress_struct p_jpeg;
@@ -87,7 +76,7 @@ static int DecodeBlock(decoder_t *, block_t *);
  */
 typedef struct
 {
-    JPEG_SYS_COMMON_MEMBERS
+    struct jpeg_sys_t common;
 
     struct jpeg_compress_struct p_jpeg;
 
@@ -142,7 +131,7 @@ vlc_module_end()
  */
 static void user_error_exit(j_common_ptr p_jpeg)
 {
-    jpeg_sys_t *p_sys = (jpeg_sys_t *)p_jpeg->err;
+    struct jpeg_sys_t *p_sys = p_jpeg->client_data;
     p_jpeg->err->output_message(p_jpeg);
     longjmp(p_sys->setjmp_buffer, 1);
 }
@@ -154,7 +143,7 @@ static void user_error_message(j_common_ptr p_jpeg)
 {
     char error_msg[JMSG_LENGTH_MAX];
 
-    jpeg_sys_t *p_sys = (jpeg_sys_t *)p_jpeg->err;
+    struct jpeg_sys_t *p_sys = p_jpeg->client_data;
     p_jpeg->err->format_message(p_jpeg, error_msg);
     msg_Err(p_sys->p_obj, "%s", error_msg);
 }
@@ -180,11 +169,12 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     p_dec->p_sys = p_sys;
 
-    p_sys->p_obj = p_this;
+    p_sys->p_jpeg.client_data = &p_sys->common;
+    p_sys->common.p_obj = p_this;
 
-    p_sys->p_jpeg.err = jpeg_std_error(&p_sys->err);
-    p_sys->err.error_exit = user_error_exit;
-    p_sys->err.output_message = user_error_message;
+    p_sys->p_jpeg.err = jpeg_std_error(&p_sys->common.err);
+    p_sys->common.err.error_exit = user_error_exit;
+    p_sys->common.err.output_message = user_error_message;
 
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;
@@ -489,7 +479,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     }
 
     /* libjpeg longjmp's there in case of error */
-    if (setjmp(p_sys->setjmp_buffer))
+    if (setjmp(p_sys->common.setjmp_buffer))
     {
         goto error;
     }
@@ -624,11 +614,12 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     p_enc->p_sys = p_sys;
 
-    p_sys->p_obj = p_this;
+    p_sys->p_jpeg.client_data = &p_sys->common;
+    p_sys->common.p_obj = p_this;
 
-    p_sys->p_jpeg.err = jpeg_std_error(&p_sys->err);
-    p_sys->err.error_exit = user_error_exit;
-    p_sys->err.output_message = user_error_message;
+    p_sys->p_jpeg.err = jpeg_std_error(&p_sys->common.err);
+    p_sys->common.err.error_exit = user_error_exit;
+    p_sys->common.err.output_message = user_error_message;
 
     p_sys->i_quality = var_GetInteger(p_enc, ENC_CFG_PREFIX "quality");
 
@@ -673,7 +664,7 @@ static block_t *EncodeBlock(encoder_t *p_enc, picture_t *p_pic)
     unsigned long size = p_block->i_buffer;
 
     /* libjpeg longjmp's there in case of error */
-    if (setjmp(p_sys->setjmp_buffer))
+    if (setjmp(p_sys->common.setjmp_buffer))
     {
         goto error;
     }
