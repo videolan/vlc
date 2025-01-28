@@ -276,6 +276,12 @@ static inline void BufferChainAppend( sout_buffer_chain_t *c, block_t *b )
     block_ChainLastAppend( &c->pp_last, b );
 }
 
+static void BufferChainAppendCallback( void *opaque, block_t *b )
+{
+    sout_buffer_chain_t *c = opaque;
+    BufferChainAppend(c, b);
+}
+
 static inline block_t *BufferChainGet( sout_buffer_chain_t *c )
 {
     block_t *b = c->p_first;
@@ -1885,7 +1891,7 @@ void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     sout_mux_sys_t       *p_sys = p_mux->p_sys;
 
     BuildPAT( p_sys->p_dvbpsi,
-              c, (PEStoTSCallback)BufferChainAppend,
+              c, BufferChainAppendCallback,
               p_sys->i_tsid, p_sys->i_pat_version_number,
               &p_sys->pat,
               p_sys->i_num_pmt, p_sys->pmt, p_sys->i_pmt_program_number );
@@ -1913,7 +1919,7 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
     }
 
     BuildPMT( p_sys->p_dvbpsi, VLC_OBJECT(p_mux), p_sys->standard,
-              c, (PEStoTSCallback)BufferChainAppend,
+              c, BufferChainAppendCallback,
               p_sys->i_tsid, p_sys->i_pmt_version_number,
               ((sout_input_sys_t *)p_sys->p_pcr_input->p_sys)->ts.i_pid,
               &p_sys->sdt,
