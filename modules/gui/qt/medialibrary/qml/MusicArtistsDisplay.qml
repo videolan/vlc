@@ -59,7 +59,7 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
-            onRequestArtistAlbumView: (id, reason) => {
+            onArtistAlbumViewRequested: (id, reason) => {
                 History.push([...root.pagePrefix, "albums"], { artistId: id  }, reason)
             }
         }

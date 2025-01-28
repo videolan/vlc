@@ -42,7 +42,22 @@ MainViewLoader {
     property alias sortOrder: artistModel.sortOrder
     property alias sortCriteria: artistModel.sortCriteria
 
-    signal requestArtistAlbumView(var id, int reason)
+    signal artistAlbumViewRequested(var id, int reason)
+
+    function requestArtistAlbumView(reason: int, id = null) {
+        if (id !== null) {
+            console.assert(id !== undefined)
+            artistAlbumViewRequested(id, reason)
+        } else {
+            // Do not call this function if there is no current item,
+            // and you are not providing an explicit id:
+            console.assert(currentIndex >= 0)
+            // Do not call this function if there is no model:
+            console.assert(root.model)
+            const data = root.model.getDataAt(currentIndex)
+            artistAlbumViewRequested(data.id, reason)
+        }
+    }
 
     isSearchable: true
 
@@ -98,9 +113,7 @@ MainViewLoader {
                     artistModel.addAndPlay( selectionModel.selectedIndexes )
                 } else {
                     currentIndex = index
-                    const sel = selectionModel.selectedIndexes[0]
-                    const model = genreModel.getDataAt(sel)
-                    requestArtistAlbumView(model.id, Qt.TabFocusReason)
+                    root.requestArtistAlbumView(Qt.TabFocusReason)
                 }
             }
 
@@ -126,7 +139,7 @@ MainViewLoader {
 
                 onItemClicked: (modifier) => { artistGrid.leftClickOnItem(modifier, index) }
 
-                onItemDoubleClicked: root.requestArtistAlbumView(model.id, Qt.MouseFocusReason)
+                onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)
 
                 onContextMenuButtonClicked: (_, globalMousePos) => {
                     artistGrid.rightClickOnItem(index)
@@ -204,7 +217,9 @@ MainViewLoader {
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            onItemDoubleClicked: root.requestArtistAlbumView(Qt.MouseFocusReason)
+            onItemDoubleClicked: function(index, model) {
+                root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)
+            }
 
             onContextMenuButtonClicked: (_,_, globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
