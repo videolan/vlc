@@ -182,6 +182,7 @@ GLConvAllocateTextures(const struct vlc_gl_interop *interop, uint32_t textures[]
 static void
 GLConvDeallocateTextures(const struct vlc_gl_interop *interop, uint32_t textures[])
 {
+    (void)textures;
     struct glpriv *priv = interop->priv;
 
     if (priv->gl_handle_d3d && priv->gl_render)
