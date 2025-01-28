@@ -329,7 +329,7 @@ static void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev, I
 struct dxgi_debug_handle_t
 {
     HINSTANCE                 dxgidebug_dll;
-    HRESULT (WINAPI * pf_DXGIGetDebugInterface)(const GUID *riid, void **ppDebug);
+    HRESULT (WINAPI * pf_DXGIGetDebugInterface)(REFIID, void **ppDebug);
 
     void Init()
     {
@@ -362,7 +362,7 @@ struct dxgi_debug_handle_t
         if (pf_DXGIGetDebugInterface)
         {
             IDXGIDebug *pDXGIDebug;
-            if (SUCCEEDED(pf_DXGIGetDebugInterface(&IID_GRAPHICS_PPV_ARGS(&pDXGIDebug))))
+            if (SUCCEEDED(pf_DXGIGetDebugInterface(IID_GRAPHICS_PPV_ARGS(&pDXGIDebug))))
             {
                 pDXGIDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
                 pDXGIDebug->Release();
