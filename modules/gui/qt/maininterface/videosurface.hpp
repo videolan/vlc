@@ -23,6 +23,7 @@
 #include <QRunnable>
 #include <QPointer>
 #include "qt.hpp"
+#include "util/vlchotkeyconverter.hpp"
 
 #include <vlc_threads.h>
 
@@ -33,7 +34,6 @@ extern "C" {
 Q_MOC_INCLUDE( "maininterface/mainctx.hpp")
 
 class MainCtx;
-class WheelToVLCConverter;
 
 class WindowResizer :
     public QRunnable
@@ -153,7 +153,7 @@ protected slots:
 private:
     QPointF m_oldHoverPos;
 
-    WheelToVLCConverter* m_wheelEventConverter = nullptr;
+    WheelToVLCConverter m_wheelEventConverter;
 
     QPointer<VideoSurfaceProvider> m_provider;
 

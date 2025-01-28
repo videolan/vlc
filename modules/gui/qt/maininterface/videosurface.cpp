@@ -17,7 +17,6 @@
  *****************************************************************************/
 #include "videosurface.hpp"
 #include "maininterface/mainctx.hpp"
-#include "util/vlchotkeyconverter.hpp"
 #include <QSGRectangleNode>
 #include <QThreadPool>
 #include <vlc_window.h>
@@ -209,8 +208,6 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
 
-    m_wheelEventConverter = new WheelToVLCConverter(this);
-
     {
         connect(this, &QQuickItem::widthChanged, this, &VideoSurface::updateSurfaceSize);
         connect(this, &QQuickItem::heightChanged, this, &VideoSurface::updateSurfaceSize);
@@ -308,7 +305,7 @@ void VideoSurface::keyPressEvent(QKeyEvent* event)
 #if QT_CONFIG(wheelevent)
 void VideoSurface::wheelEvent(QWheelEvent *event)
 {
-    m_wheelEventConverter->wheelEvent(event);
+    m_wheelEventConverter.wheelEvent(event);
     event->accept();
 }
 #endif
@@ -392,6 +389,8 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
 
     if (m_provider)
     {
+        disconnect(this, nullptr, m_provider, nullptr);
+        disconnect(&m_wheelEventConverter, nullptr, m_provider, nullptr);
         disconnect(m_provider, nullptr, this, nullptr);
     }
 
@@ -408,7 +407,7 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
         connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged);
 
-        connect(m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
+        connect(&m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
         connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, &VideoSurface::updateSurface);
 
         setFlag(ItemHasContents, true);
