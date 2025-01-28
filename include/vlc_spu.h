@@ -41,7 +41,6 @@ struct vout_display_place_t;
  * \file
  */
 
-typedef struct spu_private_t spu_private_t;
 struct vlc_render_subpicture;
 
 /**
@@ -50,8 +49,6 @@ struct vlc_render_subpicture;
 struct spu_t
 {
     struct vlc_object_t obj;
-
-    spu_private_t *p;
 };
 
 VLC_API spu_t * spu_Create( vlc_object_t *, vout_thread_t * );
