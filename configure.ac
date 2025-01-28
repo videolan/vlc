@@ -455,7 +455,7 @@ esac
 dnl WinRT
 AC_ARG_ENABLE([winstore_app],
      AS_HELP_STRING([--enable-winstore-app],
-                    [Build targetted for Windows Store apps (default disabled)]))
+                    [Build targeted for Windows Store apps (default disabled)]))
 
 vlc_winstore_app=0
 AS_IF([test "${SYS}" = "mingw32"],[
@@ -691,7 +691,7 @@ AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #endif
     ])], [
 
-dnl Check for broken versions of mingw-runtime compatability library
+dnl Check for broken versions of mingw-runtime compatibility library
     AC_MSG_CHECKING(for broken mingw-runtime)
     AC_PREPROC_IFELSE([AC_LANG_SOURCE([
 #include <_mingw.h>
@@ -742,7 +742,7 @@ dnl Check for broken versions of mingw-runtime compatability library
 
 
 dnl
-dnl Buggy glibc prevention. Purposedly not cached.
+dnl Buggy glibc prevention. Purposely not cached.
 dnl See sourceware.org bugs 5058 and 5443.
 dnl Ubuntu alone has 20 bug numbers for this...
 dnl
@@ -939,7 +939,7 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([_Thread_local int foo = 0;
 ],[ AC_MSG_RESULT([no])])
 
 dnl __STDC_NO_THREADS__ can't be trusted on some platforms.
-dnl check for its availability explicitely
+dnl check for its availability explicitly
 AC_CHECK_HEADERS([threads.h])
 
 AC_CHECK_LIB([anl],[getaddrinfo_a],[])
@@ -1454,7 +1454,7 @@ fi
 
 WIN32_PATH_CMD=
 AS_IF([test "${SYS}" = "mingw32"], [
-    AC_MSG_CHECKING([how to transform windows pathes])
+    AC_MSG_CHECKING([how to transform windows paths])
     win32_path_cmd=no
     for win_path in "cygpath" "wslpath" "wine winepath"
     do
@@ -3142,7 +3142,7 @@ dnl
 dnl Teletext Modules
 dnl vbi decoder plugin (using libzbvi)
 dnl telx module
-dnl uncompatible
+dnl incompatible
 dnl
 AC_ARG_ENABLE([zvbi],
   AS_HELP_STRING([--enable-zvbi],[VBI (inc. Teletext) decoding support with
