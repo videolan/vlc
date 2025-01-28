@@ -696,10 +696,23 @@ static vlc_tick_t EsOutGetWakeup(es_out_sys_t *p_sys)
 }
 
 
+static bool EsOutIsEmpty(es_out_sys_t *p_sys)
+{
+    assert( !p_sys->b_buffering );
+
+    es_out_id_t *es;
+    foreach_es_then_es_slaves(es)
+    {
+        if( es->p_dec && !vlc_input_decoder_IsEmpty( es->p_dec ) )
+            return false;
+        if( es->p_dec_record && !vlc_input_decoder_IsEmpty( es->p_dec_record ) )
+            return false;
+    }
+    return true;
+}
+
 static bool EsOutDrain(es_out_sys_t *p_sys)
 {
-    es_out_id_t *es;
-
     if( p_sys->p_pgrm == NULL ) /* Nothing to drain, assume es_out is empty */
         return true;
 
@@ -710,14 +723,7 @@ static bool EsOutDrain(es_out_sys_t *p_sys)
             return true;
     }
 
-    foreach_es_then_es_slaves(es)
-    {
-        if( es->p_dec && !vlc_input_decoder_IsEmpty( es->p_dec ) )
-            return false;
-        if( es->p_dec_record && !vlc_input_decoder_IsEmpty( es->p_dec_record ) )
-            return false;
-    }
-    return true;
+    return EsOutIsEmpty(p_sys);
 }
 
 static void EsOutUpdateDelayJitter(es_out_sys_t *p_sys)
