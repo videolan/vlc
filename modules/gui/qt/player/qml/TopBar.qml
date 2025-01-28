@@ -95,6 +95,7 @@ FocusScope{
 
     // Functions
 
+    // FIXME: Imperative layouting in QML is stupid, this needs to be gone.
     function _layoutLine(c1, c2, offset)
     {
         let c1Height = c1?.implicitHeight ?? 0
@@ -120,6 +121,7 @@ FocusScope{
         return lineHeight
     }
 
+    // FIXME: Imperative layouting in QML is stupid, this needs to be gone.
     //FIXME: if CSD will be weirdly placed if application safe-area are used,
     //nota that if you need a safe area (kiosk mode), you probably don't need CSD
     function _layout() {
@@ -225,6 +227,7 @@ FocusScope{
 
         onHoveredChanged: menu => root.requestLockUnlockAutoHide(hovered)
         onMenuOpenedChanged: menu => root.requestLockUnlockAutoHide(menuOpened)
+        onImplicitHeightChanged: root._layout()
     }
 
     Item {
