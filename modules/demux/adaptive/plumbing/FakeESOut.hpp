@@ -91,7 +91,6 @@ namespace adaptive
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool hasSelectedEs(const AbstractFakeESOutID *) const;
-            bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
             vlc_tick_t fixTimestamp(vlc_tick_t);

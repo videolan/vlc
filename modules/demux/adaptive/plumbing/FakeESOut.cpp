@@ -462,13 +462,6 @@ bool FakeESOut::hasSelectedEs(const AbstractFakeESOutID *id) const
     return false;
 }
 
-bool FakeESOut::decodersDrained()
-{
-    bool b_empty = true;
-    es_out_Control( real_es_out, ES_OUT_GET_EMPTY, &b_empty );
-    return b_empty;
-}
-
 bool FakeESOut::restarting() const
 {
     bool b = !recycle_candidates.empty();

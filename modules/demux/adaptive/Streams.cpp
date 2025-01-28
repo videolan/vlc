@@ -342,11 +342,6 @@ void AbstractStream::setLivePause(bool b)
     }
 }
 
-bool AbstractStream::decodersDrained()
-{
-    return fakeEsOut()->decodersDrained();
-}
-
 vlc_tick_t AbstractStream::getDemuxedAmount(Times from) const
 {
     vlc_tick_t i_demuxed = fakeEsOut()->commandsQueue()->getDemuxedAmount(from).continuous;
