@@ -271,7 +271,7 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
     m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
     const bool backendIsOpenVg = QQuickWindow::sceneGraphBackend() == QLatin1String("openvg");
-    if (!backendIsOpenVg && (flags & CompositorVideo::CAN_SHOW_PIP))
+    if (!backendIsOpenVg && (flags & CompositorVideo::CAN_SHOW_PIP) && var_InheritBool(m_intf, "qt-pip-mode"))
     {
         m_mainCtx->setCanShowVideoPIP(true);
     }
