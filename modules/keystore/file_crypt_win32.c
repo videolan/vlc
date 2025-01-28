@@ -28,8 +28,17 @@
 #include <windows.h>
 #include <dpapi.h>
 
-typedef BOOL (WINAPI *ProcessFunc)(DATA_BLOB*, LPCWSTR, DATA_BLOB*, PVOID,
-                                   CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
+typedef BOOL (*ProcessFunc)(DATA_BLOB*, DATA_BLOB*);
+
+static BOOL FuncProtect(DATA_BLOB *input_blob, DATA_BLOB *output_blob)
+{
+    return CryptProtectData( input_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, output_blob);
+}
+
+static BOOL FuncUnprotect(DATA_BLOB *input_blob, DATA_BLOB *output_blob)
+{
+    return CryptUnprotectData( input_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, output_blob);
+}
 
 static size_t Process(const uint8_t *p_src, size_t i_src_len, uint8_t **pp_dst, ProcessFunc pf_process)
 {
@@ -40,7 +49,7 @@ static size_t Process(const uint8_t *p_src, size_t i_src_len, uint8_t **pp_dst, 
     };
     DATA_BLOB output_blob;
 
-    if (pf_process( &input_blob, NULL, NULL, NULL, NULL, CRYPTPROTECT_UI_FORBIDDEN, &output_blob) == FALSE)
+    if (pf_process( &input_blob, &output_blob) == FALSE)
         return 0;
     *pp_dst = malloc(output_blob.cbData);
     if( unlikely( *pp_dst == NULL ) )
@@ -58,10 +67,7 @@ static size_t Decrypt( vlc_keystore *p_keystore, void *p_ctx, const uint8_t *p_s
 {
     VLC_UNUSED( p_keystore );
     VLC_UNUSED( p_ctx );
-    // Cast the function pointer to avoid an invalid parameter warning, regarding the "description"
-    // parameter. It's LPCWSTR in the case of CryptProtectData, and LPWSTR* in the case of CryptUnprotect
-    // Since we pass NULL anyway, we don't care
-    return Process( p_src, i_src_len, pp_dst, (ProcessFunc)&CryptUnprotectData );
+    return Process( p_src, i_src_len, pp_dst, FuncUnprotect );
 }
 
 static size_t Encrypt( vlc_keystore *p_keystore, void *p_ctx, const uint8_t *p_src,
@@ -69,7 +75,7 @@ static size_t Encrypt( vlc_keystore *p_keystore, void *p_ctx, const uint8_t *p_s
 {
     VLC_UNUSED( p_keystore );
     VLC_UNUSED( p_ctx );
-    return Process( p_src, i_src_len, pp_dst, CryptProtectData );
+    return Process( p_src, i_src_len, pp_dst, FuncProtect );
 }
 
 int CryptInit(vlc_keystore *p_keystore, struct crypt *p_crypt)
