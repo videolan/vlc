@@ -78,8 +78,6 @@ FocusScope {
 
         if (model.count === 0 || initialIndex === -1) return
 
-        selectionModel.select(model.index(initialIndex, 0), ItemSelectionModel.ClearAndSelect)
-
         artistList.positionViewAtIndex(initialIndex, ItemView.Contain)
 
         artistList.setCurrentItem(initialIndex)
