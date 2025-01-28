@@ -99,7 +99,7 @@ T.ItemDelegate {
 
                 if (!(root.selected && button === Qt.RightButton)) {
                     view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
-                    view.showArtist(model.id)
+                    view.currentIndex = root.index
                 }
             }
 
@@ -126,7 +126,7 @@ T.ItemDelegate {
                     if (active) {
                         if (!selected) {
                             view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
-                            view.showArtist(model.id)
+                            view.currentIndex = root.index
                         }
 
                         target.Drag.active = true
