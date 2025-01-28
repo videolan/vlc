@@ -991,8 +991,9 @@ static void ParsePAT( vlc_object_t *p_obj, scan_t *p_scan,
 }
 
 /* FIXME handle properly string (convert to utf8) */
-static void PATCallBack( scan_session_t *p_session, dvbpsi_pat_t *p_pat )
+static void PATCallBack( void *opaque, dvbpsi_pat_t *p_pat )
 {
+    scan_session_t *p_session = opaque;
     vlc_object_t *p_obj = p_session->p_obj;
 
     /* */
@@ -1082,8 +1083,9 @@ static void ParseSDT( vlc_object_t *p_obj, scan_t *p_scan, const dvbpsi_sdt_t *p
     }
 }
 
-static void SDTCallBack( scan_session_t *p_session, dvbpsi_sdt_t *p_sdt )
+static void SDTCallBack( void *opaque, dvbpsi_sdt_t *p_sdt )
 {
+    scan_session_t *p_session = opaque;
     vlc_object_t *p_obj = p_session->p_obj;
     dvbpsi_sdt_t **pp_stored_sdt = NULL;
     if( p_sdt->i_table_id == SDT_OTHER_TS_TABLE_ID )
@@ -1435,8 +1437,9 @@ static void ParseNIT( vlc_object_t *p_obj, scan_t *p_scan,
     }
 }
 
-static void NITCallBack( scan_session_t *p_session, dvbpsi_nit_t *p_nit )
+static void NITCallBack( void * opaque, dvbpsi_nit_t *p_nit )
 {
+    scan_session_t *p_session = opaque;
     vlc_object_t *p_obj = p_session->p_obj;
     dvbpsi_nit_t **pp_stored_nit = NULL;
 
@@ -1520,12 +1523,12 @@ static void PSINewTableCallBack( dvbpsi_t *h, uint8_t i_table_id, uint16_t i_ext
 
     if( i_table_id == SDT_CURRENT_TS_TABLE_ID || i_table_id == SDT_OTHER_TS_TABLE_ID )
     {
-        if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, (dvbpsi_sdt_callback)SDTCallBack, p_session ) )
+        if( !dvbpsi_sdt_attach( h, i_table_id, i_extension, SDTCallBack, p_session ) )
             msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching SDTCallback" );
     }
     else if( i_table_id == NIT_CURRENT_NETWORK_TABLE_ID || i_table_id == NIT_OTHER_NETWORK_TABLE_ID )
     {
-        if( !dvbpsi_nit_attach( h, i_table_id, i_extension, (dvbpsi_nit_callback)NITCallBack, p_session ) )
+        if( !dvbpsi_nit_attach( h, i_table_id, i_extension, NITCallBack, p_session ) )
             msg_Err( p_session->p_obj, "PSINewTableCallback: failed attaching NITCallback" );
     }
 }
@@ -1805,7 +1808,7 @@ static bool scan_session_Push( scan_session_t *p_scan, const uint8_t *p_packet )
                 return false;
 
             p_scan->p_pathandle->p_sys = (void *) p_scan->p_obj;
-            if( !dvbpsi_pat_attach( p_scan->p_pathandle, (dvbpsi_pat_callback)PATCallBack, p_scan ) )
+            if( !dvbpsi_pat_attach( p_scan->p_pathandle, PATCallBack, p_scan ) )
             {
                 dvbpsi_delete( p_scan->p_pathandle );
                 p_scan->p_pathandle = NULL;
