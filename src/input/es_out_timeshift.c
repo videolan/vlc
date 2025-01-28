@@ -507,6 +507,22 @@ ControlLockedDrain(struct es_out_timeshift *p_sys,
 }
 
 static int
+ControlLockedIsEmpty(struct es_out_timeshift *p_sys, input_source_t *in,
+                     bool *pb_empty)
+{
+    if( p_sys->b_delayed && TsHasCmd( p_sys->p_ts ) )
+        *pb_empty = false;
+    else
+    {
+        int ret = es_out_in_Control( p_sys->p_out, in, ES_OUT_IS_EMPTY,
+                                     pb_empty );
+        assert( !ret );
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int
 ControlLockedGetWakeup(struct es_out_timeshift *p_sys,
                        input_source_t *in,
                        vlc_tick_t *pi_wakeup)
@@ -715,6 +731,11 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
     {
         bool *pb_empty = va_arg( args, bool* );
         return ControlLockedDrain(p_sys, in, pb_empty);
+    }
+    case ES_OUT_IS_EMPTY:
+    {
+        bool *pb_empty = va_arg( args, bool* );
+        return ControlLockedIsEmpty(p_sys, in, pb_empty);
     }
 
     case ES_OUT_POST_SUBNODE:

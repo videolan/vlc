@@ -698,7 +698,8 @@ static vlc_tick_t EsOutGetWakeup(es_out_sys_t *p_sys)
 
 static bool EsOutIsEmpty(es_out_sys_t *p_sys)
 {
-    assert( !p_sys->b_buffering );
+    if( p_sys->b_buffering )
+        return true;
 
     es_out_id_t *es;
     foreach_es_then_es_slaves(es)
@@ -3620,6 +3621,13 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     {
         bool *pb = va_arg( args, bool* );
         *pb = EsOutDrain(p_sys);
+        return VLC_SUCCESS;
+    }
+
+    case ES_OUT_IS_EMPTY:
+    {
+        bool *pb = va_arg( args, bool* );
+        *pb = EsOutIsEmpty( p_sys );
         return VLC_SUCCESS;
     }
 

@@ -93,6 +93,9 @@ enum es_out_query_e
      * XXX You SHALL call ES_OUT_RESET_PCR before any other es_out_Control/Send calls. */
     ES_OUT_DRAIN,  /* arg1=bool*   res=cannot fail */
 
+    /* Ask if es_out has no more data to play */
+    ES_OUT_IS_EMPTY, /* arg1=bool*               res=cannot fail */
+
     /* Set global meta data (The vlc_meta_t is not modified nor released) */
     ES_OUT_SET_META, /* arg1=const vlc_meta_t * */
 
