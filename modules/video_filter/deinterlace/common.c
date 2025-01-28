@@ -35,6 +35,7 @@
 void InitDeinterlacingContext( struct deinterlace_ctx *p_context )
 {
     p_context->settings.b_double_rate = false;
+    p_context->settings.b_half_height = false;
     p_context->settings.b_use_frame_history = false;
     p_context->settings.b_custom_pts = false;
 
@@ -106,6 +107,14 @@ void GetDeinterlacingOutput( const struct deinterlace_ctx *p_context,
                              video_format_t *p_dst, const video_format_t *p_src )
 {
     *p_dst = *p_src;
+
+    if( p_context->settings.b_half_height )
+    {
+        p_dst->i_height /= 2;
+        p_dst->i_visible_height /= 2;
+        p_dst->i_y_offset /= 2;
+        p_dst->i_sar_den *= 2;
+    }
 
     if( p_context->settings.b_double_rate )
     {

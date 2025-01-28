@@ -58,6 +58,7 @@ typedef struct  {
     bool b_double_rate;       /**< Shall we double the framerate? */
     bool b_use_frame_history; /**< Use the input frame history buffer? */
     bool b_custom_pts;        /**< for inverse telecine */
+    bool b_half_height;       /**< Shall be divide the height by 2 */
 } deinterlace_algo;
 
 struct deinterlace_ctx
