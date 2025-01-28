@@ -2769,8 +2769,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
         streamFlush(p_sys);
 
         /* stop buffering */
-        bool b_empty;
-        es_out_Control( p_demux->out, ES_OUT_DRAIN, &b_empty );
+        es_out_Control( p_demux->out, ES_OUT_DRAIN );
     }
 
     /* avoid busy loops (read returns no data) */
@@ -3030,8 +3029,12 @@ static int blurayDemux(demux_t *p_demux)
 
     if(p_sys->b_draining)
     {
-        bool b_empty = false;
-        if(es_out_Control(p_sys->p_out, ES_OUT_DRAIN, &b_empty) != VLC_SUCCESS || b_empty)
+        int ret = es_out_Control(p_sys->p_out, ES_OUT_DRAIN);
+
+        bool b_empty = true;
+        if (ret == VLC_SUCCESS)
+            es_out_Control(p_sys->p_out, ES_OUT_IS_EMPTY, &b_empty);
+        if (b_empty)
         {
             es_out_Control(p_sys->p_out, ES_OUT_RESET_PCR);
             p_sys->b_draining = false;

@@ -709,8 +709,10 @@ static int DemuxHEIF( demux_t *p_demux )
     /* Displaying a picture */
     if( p_sys->i_end_display_time > 0 )
     {
-        bool b_empty;
-        es_out_Control( p_demux->out, ES_OUT_DRAIN, &b_empty );
+        bool b_empty = true;
+        int ret = es_out_Control( p_demux->out, ES_OUT_DRAIN );
+        if( ret == VLC_SUCCESS )
+            es_out_Control( p_demux->out, ES_OUT_IS_EMPTY, &b_empty );
         if( !b_empty || vlc_tick_now() <= p_sys->i_end_display_time )
         {
             vlc_tick_sleep( VLC_TICK_FROM_MS(40) );

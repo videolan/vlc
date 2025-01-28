@@ -491,22 +491,6 @@ static inline int es_out_in_PrivControl(struct vlc_input_es_out *p_out,
 }
 
 static int
-ControlLockedDrain(struct es_out_timeshift *p_sys,
-                      input_source_t *in,
-                      bool *pb_empty )
-{
-    if( p_sys->b_delayed && TsHasCmd( p_sys->p_ts ) )
-        *pb_empty = false;
-    else
-    {
-        int ret = es_out_in_Control( p_sys->p_out, in, ES_OUT_DRAIN, pb_empty );
-        assert( ret == VLC_SUCCESS );
-    }
-
-    return VLC_SUCCESS;
-}
-
-static int
 ControlLockedIsEmpty(struct es_out_timeshift *p_sys, input_source_t *in,
                      bool *pb_empty)
 {
@@ -670,6 +654,7 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
     case ES_OUT_SET_ES_STATE:
     case ES_OUT_SET_ES_CAT_POLICY:
     case ES_OUT_SET_ES_FMT:
+    case ES_OUT_DRAIN:
     {
         ts_cmd_control_t cmd;
         if( CmdInitControl( &cmd, in, i_query, args, p_sys->b_delayed ) )
@@ -727,11 +712,6 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
                                   p_es->p_es, p_hl );
     }
     /* Special internal input control */
-    case ES_OUT_DRAIN:
-    {
-        bool *pb_empty = va_arg( args, bool* );
-        return ControlLockedDrain(p_sys, in, pb_empty);
-    }
     case ES_OUT_IS_EMPTY:
     {
         bool *pb_empty = va_arg( args, bool* );
@@ -1636,6 +1616,7 @@ static int CmdInitControl( ts_cmd_control_t *p_cmd, input_source_t *in,
         p_cmd->u.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
+    case ES_OUT_DRAIN:
     case ES_OUT_RESET_PCR:           /* no arg */
         break;
 
@@ -1767,6 +1748,7 @@ CmdExecuteControl(struct es_out_timeshift *p_sys,
         return es_out_in_Control( p_sys->p_out, in, i_query, p_cmd->u.int_i64.i_int,
                                   p_cmd->u.int_i64.i_i64 );
 
+    case ES_OUT_DRAIN:
     case ES_OUT_RESET_PCR:           /* no arg */
         return es_out_in_Control( p_sys->p_out, in, i_query );
 

@@ -712,19 +712,19 @@ static bool EsOutIsEmpty(es_out_sys_t *p_sys)
     return true;
 }
 
-static bool EsOutDrain(es_out_sys_t *p_sys)
+static int EsOutDrain(es_out_sys_t *p_sys)
 {
     if( p_sys->p_pgrm == NULL ) /* Nothing to drain, assume es_out is empty */
-        return true;
+        return VLC_SUCCESS;
 
     if( p_sys->b_buffering )
     {
         EsOutDecodersStopBuffering(p_sys, true);
         if( p_sys->b_buffering )
-            return true;
+            return VLC_EGENERIC;
     }
 
-    return EsOutIsEmpty(p_sys);
+    return VLC_SUCCESS;
 }
 
 static void EsOutUpdateDelayJitter(es_out_sys_t *p_sys)
@@ -3618,11 +3618,7 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     }
 
     case ES_OUT_DRAIN:
-    {
-        bool *pb = va_arg( args, bool* );
-        *pb = EsOutDrain(p_sys);
-        return VLC_SUCCESS;
-    }
+        return EsOutDrain(p_sys);
 
     case ES_OUT_IS_EMPTY:
     {

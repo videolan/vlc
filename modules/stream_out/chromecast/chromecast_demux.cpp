@@ -272,8 +272,10 @@ struct demux_cc
         {
             /* Signal EOF to the sout when the es_out is empty (so when the
              * DecoderThread fifo are empty) */
-            bool b_empty;
-            es_out_Control( p_demux->s->out, ES_OUT_DRAIN, &b_empty );
+            bool b_empty = true;
+            int ret = es_out_Control( p_demux->s->out, ES_OUT_DRAIN );
+            if( ret == VLC_SUCCESS )
+                es_out_Control( p_demux->s->out, ES_OUT_IS_EMPTY, &b_empty );
             if( b_empty )
                 p_renderer->pf_send_input_event( p_renderer->p_opaque,
                                                  CC_INPUT_EVENT_EOF,
