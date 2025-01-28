@@ -667,7 +667,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
                 b_paused_at_eof = false;
             }
-            else if( !es_out_Drain( input_priv(p_input)->p_es_out ) )
+            else if( !es_out_IsEmpty( input_priv(p_input)->p_es_out ) )
             {
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
                 i_wakeup = vlc_tick_now() + INPUT_IDLE_SLEEP;

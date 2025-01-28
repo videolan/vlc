@@ -212,10 +212,10 @@ es_out_GetBuffering(struct vlc_input_es_out *out)
 }
 
 static inline bool
-es_out_Drain(struct vlc_input_es_out *out)
+es_out_IsEmpty(struct vlc_input_es_out *out)
 {
     bool b;
-    int i_ret = es_out_Control(&out->out, ES_OUT_DRAIN, &b);
+    int i_ret = es_out_Control(&out->out, ES_OUT_IS_EMPTY, &b);
 
     assert( !i_ret );
     return b;
