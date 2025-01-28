@@ -491,7 +491,7 @@ static inline int es_out_in_PrivControl(struct vlc_input_es_out *p_out,
 }
 
 static int
-ControlLockedGetEmpty(struct es_out_timeshift *p_sys,
+ControlLockedDrain(struct es_out_timeshift *p_sys,
                       input_source_t *in,
                       bool *pb_empty )
 {
@@ -499,7 +499,7 @@ ControlLockedGetEmpty(struct es_out_timeshift *p_sys,
         *pb_empty = false;
     else
     {
-        int ret = es_out_in_Control( p_sys->p_out, in, ES_OUT_GET_EMPTY, pb_empty );
+        int ret = es_out_in_Control( p_sys->p_out, in, ES_OUT_DRAIN, pb_empty );
         assert( ret == VLC_SUCCESS );
     }
 
@@ -711,10 +711,10 @@ static int ControlLocked( es_out_t *p_out, input_source_t *in, int i_query,
                                   p_es->p_es, p_hl );
     }
     /* Special internal input control */
-    case ES_OUT_GET_EMPTY:
+    case ES_OUT_DRAIN:
     {
         bool *pb_empty = va_arg( args, bool* );
-        return ControlLockedGetEmpty(p_sys, in, pb_empty);
+        return ControlLockedDrain(p_sys, in, pb_empty);
     }
 
     case ES_OUT_POST_SUBNODE:

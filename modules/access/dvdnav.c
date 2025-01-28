@@ -1211,7 +1211,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "DVDNAV_WAIT" );
 
         bool b_empty;
-        es_out_Control( p_sys->p_tf_out, ES_OUT_GET_EMPTY, &b_empty );
+        es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN, &b_empty );
         if( !b_empty )
         {
             vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
@@ -1571,7 +1571,7 @@ static void DemuxForceStill( demux_t *p_demux )
     DemuxBlock( p_demux, buffer, sizeof(buffer) );
 
     bool b_empty;
-    es_out_Control( p_sys->p_tf_out, ES_OUT_GET_EMPTY, &b_empty );
+    es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN, &b_empty );
 }
 
 /*****************************************************************************

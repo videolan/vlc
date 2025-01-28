@@ -695,7 +695,8 @@ static vlc_tick_t EsOutGetWakeup(es_out_sys_t *p_sys)
     return input_clock_GetWakeup( p_sys->p_pgrm->p_input_clock );
 }
 
-static bool EsOutDecodersIsEmpty(es_out_sys_t *p_sys)
+
+static bool EsOutDrain(es_out_sys_t *p_sys)
 {
     es_out_id_t *es;
 
@@ -3606,10 +3607,10 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         return VLC_SUCCESS;
     }
 
-    case ES_OUT_GET_EMPTY:
+    case ES_OUT_DRAIN:
     {
         bool *pb = va_arg( args, bool* );
-        *pb = EsOutDecodersIsEmpty(p_sys);
+        *pb = EsOutDrain(p_sys);
         return VLC_SUCCESS;
     }
 

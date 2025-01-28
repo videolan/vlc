@@ -186,7 +186,7 @@ static int EsOutControl(es_out_t *out, input_source_t* in, int query, va_list ar
         case ES_OUT_DEL_GROUP:
         case ES_OUT_SET_ES_SCRAMBLED_STATE:
             break;
-        case ES_OUT_GET_EMPTY:
+        case ES_OUT_DRAIN:
             *va_arg(args, bool *) = true;
             break;
         case ES_OUT_SET_META:
