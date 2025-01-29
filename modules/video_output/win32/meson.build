@@ -46,7 +46,8 @@ if have_win_desktop
             'sources' : files('direct3d9.c', 'common.c', 'events.c', 'sensors.cpp', 'win32touch.c'),
             'link_with' : [ d3d9_common_lib, chroma_copy_lib ],
             'dependencies' : [
-                cc.find_library('user32')
+                cc.find_library('user32'),
+                cc.find_library('dxva2'),
             ]
         }
     endif

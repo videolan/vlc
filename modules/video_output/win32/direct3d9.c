@@ -159,7 +159,6 @@ typedef struct vout_display_sys_t
 
     /* range converter */
     struct {
-        HMODULE                 dll;
         IDXVAHD_VideoProcessor *proc;
     } processor;
 } vout_display_sys_t;
@@ -1270,7 +1269,6 @@ static void Direct3D9Destroy(vout_display_sys_t *sys)
     if (sys->processor.proc)
     {
         IDXVAHD_VideoProcessor_Release(sys->processor.proc);
-        FreeLibrary(sys->processor.dll);
     }
     if (sys->dec_device)
         vlc_decoder_device_Release(sys->dec_device);
@@ -1448,27 +1446,9 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
 
     HRESULT hr;
 
-    sys->processor.dll = LoadLibrary(TEXT("DXVA2.DLL"));
-    if (unlikely(!sys->processor.dll))
-    {
-        msg_Err(vd, "Failed to load DXVA2.DLL");
-        return VLC_EGENERIC;
-    }
-
     D3DFORMAT *formatsList = NULL;
     DXVAHD_VPCAPS *capsList = NULL;
     IDXVAHD_Device *hd_device = NULL;
-
-#ifdef __MINGW64_VERSION_MAJOR
-    typedef HRESULT (WINAPI* PDXVAHD_CreateDevice)(IDirect3DDevice9Ex *,const DXVAHD_CONTENT_DESC *,DXVAHD_DEVICE_USAGE,PDXVAHDSW_Plugin,IDXVAHD_Device **);
-#endif
-    PDXVAHD_CreateDevice CreateDevice;
-    CreateDevice = (PDXVAHD_CreateDevice)GetProcAddress(sys->processor.dll, "DXVAHD_CreateDevice");
-    if (CreateDevice == NULL)
-    {
-        msg_Err(vd, "Can't create HD device (not Windows 7+)");
-        goto error;
-    }
 
     DXVAHD_CONTENT_DESC desc;
     desc.InputFrameFormat = DXVAHD_FRAME_FORMAT_PROGRESSIVE;
@@ -1479,7 +1459,7 @@ static int InitRangeProcessor(vout_display_t *vd, const d3d9_format_t *d3dfmt,
     desc.OutputWidth      = vd->source->i_visible_width;
     desc.OutputHeight     = vd->source->i_visible_height;
 
-    hr = CreateDevice(sys->d3d9_device->d3ddev.devex, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, NULL, &hd_device);
+    hr = DXVAHD_CreateDevice(sys->d3d9_device->d3ddev.devex, &desc, DXVAHD_DEVICE_USAGE_PLAYBACK_NORMAL, NULL, &hd_device);
     if (FAILED(hr))
     {
         msg_Dbg(vd, "Failed to create the device (error 0x%lX)", hr);
@@ -1580,7 +1560,6 @@ error:
     free(formatsList);
     if (hd_device)
         IDXVAHD_Device_Release(hd_device);
-    FreeLibrary(sys->processor.dll);
     return VLC_EGENERIC;
 }
 
