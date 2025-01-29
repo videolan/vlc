@@ -37,6 +37,10 @@
 #include <private/qquickwindow_p.h>
 #endif
 
+#ifndef X_DISPLAY_MISSING
+#include <X11/Xlib.h>
+#endif
+
 using namespace vlc;
 
 int CompositorX11::windowEnable(const vlc_window_cfg_t *)
@@ -251,6 +255,14 @@ bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb
 
     p_wnd->type = VLC_WINDOW_TYPE_XID;
     p_wnd->handle.xid = m_videoWidget->winId();
+#ifndef X_DISPLAY_MISSING
+    assert(qGuiApp);
+    const auto x11App = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+    assert(x11App); // already checked in `init()`
+    assert(x11App->display());
+    p_wnd->display.x11 = XDisplayString(x11App->display());
+#endif
+
     commonSetupVoutWindow(p_wnd, destroyCb);
     return true;
 }
