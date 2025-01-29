@@ -88,5 +88,5 @@ int vlc_dlclose(void *handle)
 
 void *vlc_dlsym(void *handle, const char *psz_function)
 {
-    return (void *)GetProcAddress(handle, psz_function);
+    return GetProcAddress(handle, psz_function);
 }

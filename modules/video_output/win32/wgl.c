@@ -271,11 +271,11 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
     vout_display_sys_t *sys = gl->sys;
 
     /* See https://www.khronos.org/opengl/wiki/Load_OpenGL_Functions */
-    void *f= (void *)wglGetProcAddress(name);
+    PROC f= wglGetProcAddress(name);
     if(f == 0 || (f == (void*)0x1) || (f == (void*)0x2) ||
       (f == (void*)0x3) || (f == (void*)-1) )
     {
-        f = (void *)GetProcAddress(sys->hOpengl, name);
+        f = GetProcAddress(sys->hOpengl, name);
     }
     return f;
 }

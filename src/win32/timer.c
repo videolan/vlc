@@ -57,7 +57,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
     if (unlikely(!vlc_once_begin(&TIMER_INIT_FUNC))) {
         HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
-        SystemTimeAsFileTime_ = (void*)GetProcAddress(h, "GetSystemTimePreciseAsFileTime");
+        SystemTimeAsFileTime_ = GetProcAddress(h, "GetSystemTimePreciseAsFileTime");
         if (unlikely(SystemTimeAsFileTime_ == NULL)) // win7
             SystemTimeAsFileTime_ = GetSystemTimeAsFileTime;
         vlc_once_complete(&TIMER_INIT_FUNC);
