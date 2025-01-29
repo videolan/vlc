@@ -77,7 +77,7 @@ if have_win_desktop
             'name' : 'glinterop_dxva2',
             'sources' : files('interop_dxva2.c'),
             'c_args' : [ contrib_inc_args ],
-            'dependencies' : [ opengl32_lib ],
+            'dependencies' : [ opengl32_lib, cc.find_library('dxva2') ],
             'link_with' : [ d3d9_common_lib ]
         }
     endif
