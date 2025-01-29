@@ -34,6 +34,8 @@
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
+NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollectionViewItemAdjustmentKey";
+
 @implementation VLCLibraryUIUnits
 
 + (const CGFloat)largeSpacing
@@ -147,6 +149,16 @@
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
+    }
+
+    const NSInteger adjustment =
+        [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
+    if (adjustment > 0) {
+        numItemsInRow += adjustment;
+        [self itemSizeForCollectionView:collectionView
+                             withLayout:collectionViewLayout
+                   withItemsAspectRatio:itemsAspectRatio
+                 withNumberOfItemsInRow:numItemsInRow];
     }
 
     return itemSize;

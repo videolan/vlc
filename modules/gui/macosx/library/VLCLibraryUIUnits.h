@@ -29,6 +29,8 @@ typedef NS_ENUM(NSUInteger, VLCLibraryCollectionViewItemAspectRatio) {
     VLCLibraryCollectionViewItemAspectRatioVideoItem,
 };
 
+extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCLibraryUIUnits : NSObject
