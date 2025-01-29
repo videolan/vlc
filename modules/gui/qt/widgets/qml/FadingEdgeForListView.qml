@@ -94,6 +94,7 @@ FadingEdge {
                                                                              : listView.width) > (fadeSize * 2 + VLCStyle.dp(25))
 
     enableBeginningFade: _fadeRectEnoughSize &&
+                         !beginningHoverHandler.hovered &&
                          (orientation === Qt.Vertical ? !listView.atYBeginning
                                                       : !listView.atXBeginning) &&
                          (!firstVisibleItem ||
@@ -101,6 +102,7 @@ FadingEdge {
                           !(firstVisibleItem?.hovered ?? true)))
 
     enableEndFade: _fadeRectEnoughSize &&
+                   !endHoverHandler.hovered &&
                    (orientation === Qt.Vertical ? !listView.atYEnd
                                                 : !listView.atXEnd) &&
                    (!lastVisibleItem ||
@@ -115,5 +117,59 @@ FadingEdge {
     Binding on enableEndFade {
         when: !!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)
         value: false
+    }
+
+    Item {
+        id: beginningArea
+
+        z: 99
+        parent: root.listView
+
+        anchors {
+            top: parent.top
+            left: parent.left
+
+            topMargin: (orientation === Qt.Vertical) ? beginningMargin : undefined
+            leftMargin: (orientation === Qt.Horizontal) ? beginningMargin : undefined
+
+            bottom: (orientation === Qt.Horizontal) ? parent.bottom : undefined
+            right: (orientation === Qt.Vertical) ? parent.right : undefined
+        }
+
+        implicitWidth: fadeSize
+        implicitHeight: fadeSize
+
+        HoverHandler {
+            id: beginningHoverHandler
+
+            grabPermissions: PointerHandler.ApprovesTakeOverByAnything
+        }
+    }
+
+    Item {
+        id: endArea
+
+        z: 99
+        parent: root.listView
+
+        anchors {
+            bottom: parent.bottom
+            right: parent.right
+
+            bottomMargin: (orientation === Qt.Vertical) ? beginningMargin : undefined
+            rightMargin: (orientation === Qt.Horizontal) ? beginningMargin : undefined
+
+            top: (orientation === Qt.Horizontal) ? parent.top : undefined
+            left: (orientation === Qt.Vertical) ? parent.left : undefined
+        }
+
+        implicitWidth: fadeSize
+        implicitHeight: fadeSize
+
+        HoverHandler {
+            id: endHoverHandler
+
+            grabPermissions: PointerHandler.ApprovesTakeOverByAnything
+        }
     }
 }
