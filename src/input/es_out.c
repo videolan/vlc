@@ -136,6 +136,7 @@ struct es_out_id_t
     char        *psz_language_code;
     char        *psz_title;
     bool        b_terminated;
+    bool        forced;
 
     vlc_input_decoder_t   *p_dec;
     vlc_input_decoder_t   *p_dec_record;
@@ -2188,6 +2189,7 @@ static es_out_id_t *EsOutAddLocked(es_out_sys_t *p_sys,
 
     es->b_scrambled = false;
     es->b_terminated = false;
+    es->forced = false;
 
     switch( es->fmt.i_cat )
     {
@@ -2539,6 +2541,7 @@ static void EsOutUnselectEs(es_out_sys_t *p_sys, es_out_id_t *es, bool b_update)
         EsOutStopNextFrame(p_sys);
 
     EsOutDestroyDecoder(p_sys, es);
+    es->forced = false;
 
     if( !b_update )
         return;
@@ -2551,7 +2554,10 @@ static bool EsOutSelectMatchPrioritized( const es_out_es_props_t *p_esprops,
                                          const es_out_id_t *es )
 {
     if( p_esprops->p_main_es != NULL )
-        return es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority;
+    {
+        return !p_esprops->p_main_es->forced &&
+               es->fmt.i_priority > p_esprops->p_main_es->fmt.i_priority;
+    }
 
     return es->fmt.i_priority > ES_PRIORITY_NOT_DEFAULTABLE;
 }
@@ -2732,6 +2738,9 @@ static void EsOutSelect(es_out_sys_t *p_sys, es_out_id_t *es, bool b_force)
             EsOutSelectEs(p_sys, es, b_force, VLC_VOUT_ORDER_PRIMARY);
         }
     }
+
+    if( b_force )
+        es->forced = true;
 
     /* FIXME TODO handle priority here */
     if( p_esprops && p_sys->i_mode == ES_OUT_MODE_AUTO && EsIsSelected( es ) )
