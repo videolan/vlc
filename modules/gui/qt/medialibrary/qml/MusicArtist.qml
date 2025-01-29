@@ -192,6 +192,8 @@ FocusScope {
                         delegate: Widgets.GridItem {
                             id: gridItem
 
+                            required property var model
+
                             y: selectedBorderWidth
 
                             width: gridHelper.cellWidth
