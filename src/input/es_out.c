@@ -694,8 +694,6 @@ static vlc_tick_t EsOutGetWakeup(es_out_sys_t *p_sys)
     return input_clock_GetWakeup( p_sys->p_pgrm->p_input_clock );
 }
 
-static es_out_id_t es_cat[DATA_ES];
-
 static bool EsOutDecodersIsEmpty(es_out_sys_t *p_sys)
 {
     es_out_id_t *es;
@@ -3234,28 +3232,21 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
     {
-#define IGNORE_ES DATA_ES
         es_out_id_t *es = va_arg( args, es_out_id_t * ), *other;
 
         enum es_format_category_e i_cat;
         if( es == NULL )
             i_cat = UNKNOWN_ES;
-        else if( es == es_cat + AUDIO_ES )
-            i_cat = AUDIO_ES;
-        else if( es == es_cat + VIDEO_ES )
-            i_cat = VIDEO_ES;
-        else if( es == es_cat + SPU_ES )
-            i_cat = SPU_ES;
         else
         {
             if (es->b_terminated)
                 return VLC_EGENERIC;
-            i_cat = IGNORE_ES;
+            i_cat = es->fmt.i_cat;
         }
 
         foreach_es_then_es_slaves(other)
         {
-            if (i_cat == IGNORE_ES && es == other)
+            if (es == other)
             {
                 if (i_query == ES_OUT_RESTART_ES && es->p_dec != NULL)
                 {
@@ -3318,18 +3309,6 @@ static int EsOutVaControlLocked(es_out_sys_t *p_sys, input_source_t *source,
         {
             /*p_sys->i_default_video_id = -1;*/
             /*p_sys->i_default_audio_id = -1;*/
-            p_sys->sub.i_demux_id = -1;
-        }
-        else if( es == es_cat + AUDIO_ES )
-        {
-            /*p_sys->i_default_video_id = -1;*/
-        }
-        else if( es == es_cat + VIDEO_ES )
-        {
-            /*p_sys->i_default_audio_id = -1;*/
-        }
-        else if( es == es_cat + SPU_ES )
-        {
             p_sys->sub.i_demux_id = -1;
         }
         else
