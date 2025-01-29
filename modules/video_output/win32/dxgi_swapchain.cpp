@@ -245,25 +245,33 @@ static void FillSwapChainDesc(dxgi_swapchain *display, UINT width, UINT height, 
     out->Format = display->pixelFormat->formatTexture;
     //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
 
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN10)
     bool isWin10OrGreater = false;
     HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
     if (likely(hKernel32 != NULL))
         isWin10OrGreater = GetProcAddress(hKernel32, "GetSystemCpuSetInformation") != NULL;
     if (isWin10OrGreater)
+#endif // !_WIN32_WINNT_WIN10
         out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN10)
     else
     {
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
         bool isWin8OrGreater = false;
         if (likely(hKernel32 != NULL))
             isWin8OrGreater = GetProcAddress(hKernel32, "GetCurrentThreadStackLimits") != NULL;
         if (isWin8OrGreater)
+#endif // !_WIN32_WINNT_WIN8
             out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
         else
         {
             out->SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
             out->BufferCount = 1;
         }
+#endif // !_WIN32_WINNT_WIN8
     }
+#endif // !_WIN32_WINNT_WIN10
 }
 
 static void DXGI_CreateSwapchainHwnd(dxgi_swapchain *display,
