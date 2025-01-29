@@ -1578,13 +1578,6 @@ static void DemuxForceStill( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    static const uint8_t buffer[] = {
-        0x00, 0x00, 0x01, 0xe0, 0x00, 0x07,
-        0x80, 0x00, 0x00,
-        0x00, 0x00, 0x01, 0xB7,
-    };
-    DemuxBlock( p_demux, buffer, sizeof(buffer) );
-
     int ret = es_out_Control( p_sys->p_tf_out, ES_OUT_DRAIN );
     if (ret == VLC_SUCCESS)
         p_sys->b_wait_empty = true;
