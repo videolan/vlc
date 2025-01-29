@@ -240,7 +240,7 @@ void CompositorX11::unloadGUI()
 
 void CompositorX11::onSurfacePositionChanged(const QPointF& position)
 {
-    m_renderWindow->setVideoPosition(position.toPoint());
+    m_renderWindow->setVideoPosition({static_cast<int>(position.x()), static_cast<int>(position.y())});
 }
 
 void CompositorX11::onSurfaceSizeChanged(const QSizeF& size)

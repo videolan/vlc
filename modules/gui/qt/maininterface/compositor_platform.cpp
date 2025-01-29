@@ -194,7 +194,8 @@ void CompositorPlatform::windowDisable()
 
 void CompositorPlatform::onSurfacePositionChanged(const QPointF &position)
 {
-    m_videoWindow->setPosition((position / m_videoWindow->devicePixelRatio()).toPoint());
+    const QPointF point = position / m_videoWindow->devicePixelRatio();
+    m_videoWindow->setPosition({static_cast<int>(point.x()), static_cast<int>(point.y())});
 }
 
 void CompositorPlatform::onSurfaceSizeChanged(const QSizeF &size)

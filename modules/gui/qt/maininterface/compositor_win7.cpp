@@ -225,7 +225,8 @@ void CompositorWin7::resetVideoZOrder()
 
 void CompositorWin7::onSurfacePositionChanged(const QPointF& position)
 {
-    m_stable->move((position / m_stable->window()->devicePixelRatioF()).toPoint());
+    const QPointF point = position / m_stable->window()->devicePixelRatioF();
+    m_stable->move({static_cast<int>(point.x()), static_cast<int>(point.y())});
 }
 
 void CompositorWin7::onSurfaceSizeChanged(const QSizeF& size)
