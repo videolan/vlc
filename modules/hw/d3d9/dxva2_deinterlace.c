@@ -42,7 +42,6 @@
 
 typedef struct
 {
-    HINSTANCE                      hdecoder_dll;
     IDirectXVideoProcessor         *processor;
     IDirect3DSurface9              *hw_surface;
 
@@ -329,7 +328,6 @@ static void D3D9CloseDeinterlace(filter_t *filter)
     Flush(filter);
     IDirect3DSurface9_Release( sys->hw_surface );
     IDirectXVideoProcessor_Release( sys->processor );
-    FreeLibrary( sys->hdecoder_dll );
     vlc_video_context_Release(filter->vctx_out);
 
     free(sys);
@@ -342,7 +340,6 @@ static const struct vlc_filter_operations filter_ops = {
 int D3D9OpenDeinterlace(filter_t *filter)
 {
     filter_sys_t *sys;
-    HINSTANCE hdecoder_dll = NULL;
     HRESULT hr;
     GUID *processorGUIDs = NULL;
     GUID *processorGUID = NULL;
@@ -361,22 +358,11 @@ int D3D9OpenDeinterlace(filter_t *filter)
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
-    hdecoder_dll = LoadLibrary(TEXT("DXVA2.DLL"));
-    if (!hdecoder_dll)
-        goto error;
-
     d3d9_video_context_t *vtcx_sys = GetD3D9ContextPrivate( filter->vctx_in );
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext( filter->vctx_in );
 
-    HRESULT (WINAPI *CreateVideoService)(IDirect3DDevice9 *,
-                                         REFIID riid,
-                                         void **ppService);
-    CreateVideoService =
-      (void *)GetProcAddress(hdecoder_dll, "DXVA2CreateVideoService");
-    if (CreateVideoService == NULL)
-        goto error;
-    hr = CreateVideoService( d3d9_decoder->d3ddev.dev,
+    hr = DXVA2CreateVideoService( d3d9_decoder->d3ddev.dev,
                              &IID_IDirectXVideoProcessorService, &pv );
     if (FAILED(hr))
         goto error;
@@ -493,7 +479,6 @@ int D3D9OpenDeinterlace(filter_t *filter)
         goto error;
     sys->Saturation = Range.DefaultValue.Value;
 
-    sys->hdecoder_dll = hdecoder_dll;
     sys->decoder_caps = best_caps;
 
     InitDeinterlacingContext( &sys->context );
@@ -532,8 +517,6 @@ error:
         IDirectXVideoProcessor_Release( sys->processor );
     if (processor)
         IDirectXVideoProcessorService_Release(processor);
-    if (hdecoder_dll)
-        FreeLibrary(hdecoder_dll);
     free(sys);
 
     return VLC_EGENERIC;
