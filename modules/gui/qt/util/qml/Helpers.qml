@@ -115,4 +115,13 @@ QtObject {
         return (obj?.length !== undefined) ?? false
     }
 
+    // Similar to Item::contains(), but accepts area (rectangle):
+    function itemIntersects(item: Item, area: rect) : bool {
+        if (!item)
+            return false
+        if (area.width <= 0.0 || area.height <= 0.0)
+            return false
+        return !(((item.x < (area.x + area.width)) && ((item.x + item.width) > area.x)) &&
+                 ((item.y < (area.y + area.height)) && ((item.y + item.height) > area.y)))
+    }
 }
