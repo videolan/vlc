@@ -253,10 +253,10 @@ static void FillSwapChainDesc(dxgi_swapchain *display, UINT width, UINT height, 
         out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     else
     {
-        bool isWin80OrGreater = false;
+        bool isWin8OrGreater = false;
         if (likely(hKernel32 != NULL))
-            isWin80OrGreater = GetProcAddress(hKernel32, "CheckTokenCapability") != NULL;
-        if (isWin80OrGreater)
+            isWin8OrGreater = GetProcAddress(hKernel32, "GetCurrentThreadStackLimits") != NULL;
+        if (isWin8OrGreater)
             out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         else
         {
