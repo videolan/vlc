@@ -696,7 +696,7 @@ if host_system == 'windows'
                 vlc_include_dirs,
                 include_directories('avcodec')
             ],
-            'dependencies' : [avcodec_dep, avutil_dep],
+            'dependencies' : [avcodec_dep, avutil_dep, cc.find_library('dxva2')],
         }
     endif
 

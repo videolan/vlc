@@ -41,7 +41,6 @@ struct dxva2_pic_context
 {
     struct d3d9_pic_context ctx;
     struct vlc_va_surface_t *va_surface;
-    HINSTANCE               dxva2_dll;
 };
 
 #define DXVA2_PICCONTEXT_FROM_PICCTX(pic_ctx)  \
@@ -63,9 +62,6 @@ typedef struct
 {
     /* Direct3D */
     vlc_video_context      *vctx;
-
-    /* DLL */
-    HINSTANCE              dxva2_dll;
 
     /* Device manager */
     IDirect3DDeviceManager9  *devmng;
@@ -113,12 +109,10 @@ static void dxva2_pic_context_destroy(picture_context_t *ctx)
 {
     struct dxva2_pic_context *pic_ctx = DXVA2_PICCONTEXT_FROM_PICCTX(ctx);
     struct vlc_va_surface_t *va_surface = pic_ctx->va_surface;
-    HINSTANCE dxva2_dll = pic_ctx->dxva2_dll;
     static_assert(offsetof(struct dxva2_pic_context, ctx.s) == 0,
         "Cast assumption failure");
     d3d9_pic_context_destroy(ctx);
     va_surface_Release(va_surface);
-    FreeLibrary(dxva2_dll);
 }
 
 static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
@@ -128,7 +122,6 @@ static picture_context_t *dxva2_pic_context_copy(picture_context_t *ctx)
     if (unlikely(pic_ctx==NULL))
         return NULL;
     *pic_ctx = *src_ctx;
-    pic_ctx->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     vlc_video_context_Hold(pic_ctx->ctx.s.vctx);
     va_surface_AddRef(pic_ctx->va_surface);
     AcquireD3D9PictureSys(&pic_ctx->ctx.picsys);
@@ -156,7 +149,6 @@ static picture_context_t* NewSurfacePicContext(vlc_va_t *va, vlc_va_surface_t *v
     if (unlikely(pic_ctx==NULL))
         return NULL;
     pic_ctx->va_surface = va_surface;
-    pic_ctx->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
     return &pic_ctx->ctx.s;
 }
 
@@ -245,15 +237,6 @@ static int Open(vlc_va_t *va, struct vlc_va_cfg *cfg)
     va->sys = sys;
 
     /* Load dll*/
-    sys->dxva2_dll = LoadLibrary(TEXT("DXVA2.DLL"));
-    if (!sys->dxva2_dll) {
-        msg_Warn(va, "cannot load DXVA2 decoder DLL");
-        if (sys->vctx)
-            vlc_video_context_Release(sys->vctx);
-        free( sys );
-        return VLC_EGENERIC;
-    }
-
     struct va_pool_cfg pool_cfg = {
         D3dCreateDevice,
         DxDestroyVideoDecoder,
@@ -318,20 +301,8 @@ static int D3dCreateDevice(vlc_va_t *va)
 
     d3d9_decoder_device_t *d3d9_decoder = GetD3D9OpaqueContext(sys->vctx);
 
-    HRESULT (WINAPI *CreateDeviceManager9)(UINT *pResetToken,
-                                           IDirect3DDeviceManager9 **);
-    CreateDeviceManager9 =
-      (void *)GetProcAddress(sys->dxva2_dll,
-                             "DXVA2CreateDirect3DDeviceManager9");
-
-    if (!CreateDeviceManager9) {
-        msg_Err(va, "cannot load function");
-        return VLC_EGENERIC;
-    }
-    msg_Dbg(va, "got CreateDeviceManager9");
-
     UINT token;
-    if (FAILED(CreateDeviceManager9(&token, &sys->devmng))) {
+    if (FAILED(DXVA2CreateDirect3DDeviceManager9(&token, &sys->devmng))) {
         msg_Err(va, " OurDirect3DCreateDeviceManager9 failed");
         return VLC_EGENERIC;
     }
@@ -623,8 +594,6 @@ static void DxDestroyVideoDecoder(void *opaque)
     IDirect3DDeviceManager9_CloseDeviceHandle(sys->devmng, sys->device);
     IDirectXVideoDecoderService_Release(sys->d3ddec);
     IDirect3DDeviceManager9_Release(sys->devmng);
-    if (sys->dxva2_dll)
-        FreeLibrary(sys->dxva2_dll);
 
     free(sys);
 }
