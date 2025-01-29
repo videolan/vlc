@@ -27,8 +27,8 @@ import VLC.Util
 
 T.Control {
     id: root
-    width: VLCStyle.dp(320, VLCStyle.scale)
-    height: VLCStyle.dp(180, VLCStyle.scale)
+    width: Math.round(VLCStyle.dp(320, VLCStyle.scale))
+    height: Math.round(VLCStyle.dp(180, VLCStyle.scale))
 
     //VideoSurface x,y won't update
     onXChanged: videoSurface.updateSurfacePosition()
