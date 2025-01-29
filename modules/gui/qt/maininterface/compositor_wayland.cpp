@@ -230,8 +230,8 @@ void CompositorWayland::onSurfaceSizeChanged(const QSizeF& size)
     qreal nativeDpr = dprForWindow(m_qmlView.get());
 
     m_waylandImpl->resize(m_waylandImpl,
-                        size.width() / nativeDpr,
-                        size.height() / nativeDpr);
+                        std::ceil(size.width() / nativeDpr),
+                        std::ceil(size.height() / nativeDpr));
 }
 
 void CompositorWayland::onSurfaceScaleChanged(qreal dpr)

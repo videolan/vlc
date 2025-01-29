@@ -199,5 +199,6 @@ void CompositorPlatform::onSurfacePositionChanged(const QPointF &position)
 
 void CompositorPlatform::onSurfaceSizeChanged(const QSizeF &size)
 {
-    m_videoWindow->resize((size / m_videoWindow->devicePixelRatio()).toSize());
+    const QSizeF area = (size / m_videoWindow->devicePixelRatio());
+    m_videoWindow->resize({static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))});
 }

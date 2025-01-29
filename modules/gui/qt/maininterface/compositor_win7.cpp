@@ -230,7 +230,8 @@ void CompositorWin7::onSurfacePositionChanged(const QPointF& position)
 
 void CompositorWin7::onSurfaceSizeChanged(const QSizeF& size)
 {
-    m_stable->resize((size / m_stable->window()->devicePixelRatioF()).toSize());
+    const QSizeF area = (size / m_stable->window()->devicePixelRatioF());
+    m_stable->resize({static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))});
 }
 
 

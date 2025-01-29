@@ -245,7 +245,8 @@ void CompositorX11::onSurfacePositionChanged(const QPointF& position)
 
 void CompositorX11::onSurfaceSizeChanged(const QSizeF& size)
 {
-    m_renderWindow->setVideoSize((size / m_videoWidget->window()->devicePixelRatioF()).toSize());
+    const QSizeF area = (size / m_videoWidget->window()->devicePixelRatioF());
+    m_renderWindow->setVideoSize({static_cast<int>(std::ceil(area.width())), static_cast<int>(std::ceil(area.height()))});
 }
 
 bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb)

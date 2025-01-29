@@ -195,9 +195,9 @@ void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
     emit surfaceSizeChanged(size);
     QMutexLocker lock(&m_voutlock);
     if (m_resizer)
-        m_resizer->reportSize(size.width(), size.height());
+        m_resizer->reportSize(std::ceil(size.width()), std::ceil(size.height()));
     else if (m_voutWindow)
-        vlc_window_ReportSize(m_voutWindow, size.width(), size.height());
+        vlc_window_ReportSize(m_voutWindow, std::ceil(size.width()), std::ceil(size.height()));
 }
 
 
