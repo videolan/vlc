@@ -19,10 +19,10 @@ get_buildsystem_arch() {
     fi
 }
 
-HOST_ARCH=`uname -m | cut -d. -f1`
-HOST_ARCH=`get_buildsystem_arch $HOST_ARCH`
-BUILD_ARCH=`uname -m | cut -d. -f1`
-BUILD_ARCH=`get_buildsystem_arch $BUILD_ARCH`
+ACTUAL_HOST_ARCH=`uname -m | cut -d. -f1`
+HOST_ARCH=`get_buildsystem_arch $ACTUAL_HOST_ARCH`
+ACTUAL_BUILD_ARCH=`uname -m | cut -d. -f1`
+BUILD_ARCH=`get_buildsystem_arch $ACTUAL_BUILD_ARCH`
 
 vlcGetOSXKernelVersion() {
     local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)
