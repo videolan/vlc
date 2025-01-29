@@ -1165,7 +1165,9 @@ static int Demux( demux_t *p_demux )
             if( unlikely(!p_dsi) )
                 break;
             const dsi_gi_t *p_dsi_gi = &p_dsi->dsi_gi;
-            if( p_dsi_gi->vobu_3rdref_ea != 0 )
+            if( p_dsi_gi->vobu_ea != 0 )
+                p_sys->i_vobu_flush = p_dsi_gi->vobu_ea;
+            else if( p_dsi_gi->vobu_3rdref_ea != 0 )
                 p_sys->i_vobu_flush = p_dsi_gi->vobu_3rdref_ea;
             else if( p_dsi_gi->vobu_2ndref_ea != 0 )
                 p_sys->i_vobu_flush = p_dsi_gi->vobu_2ndref_ea;
