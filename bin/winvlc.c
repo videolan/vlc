@@ -59,26 +59,6 @@ static char *FromWide (const wchar_t *wide)
     return out;
 }
 
-#if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-static BOOL SetDefaultDllDirectories_(DWORD flags)
-{
-    HMODULE h = GetModuleHandle(TEXT("kernel32.dll"));
-    if (h == NULL)
-        return FALSE;
-
-    BOOL (WINAPI * SetDefaultDllDirectoriesReal)(DWORD);
-
-    SetDefaultDllDirectoriesReal = (BOOL (WINAPI *)(DWORD))
-                                    GetProcAddress(h, "SetDefaultDllDirectories");
-    if (SetDefaultDllDirectoriesReal == NULL)
-        return FALSE;
-
-    return SetDefaultDllDirectoriesReal(flags);
-}
-# define SetDefaultDllDirectories SetDefaultDllDirectories_
-
-#endif
-
 static void PrioritizeSystem32(void)
 {
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
