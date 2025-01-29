@@ -230,6 +230,7 @@ typedef struct
     vlc_tick_t  i_buffering_extra_initial;
     vlc_tick_t  i_buffering_extra_stream;
     vlc_tick_t  i_buffering_extra_system;
+    bool        b_draining;
 
     /* Record */
     sout_stream_t *p_sout_record;
@@ -262,6 +263,7 @@ static void EsOutChangePosition(es_out_sys_t *out, bool b_flush, es_out_id_t *p_
 static void EsOutProgramChangePause(es_out_sys_t *out, bool b_paused, vlc_tick_t i_date);
 static void EsOutProgramsChangeRate(es_out_sys_t *out);
 static void EsOutDecodersStopBuffering(es_out_sys_t *out, bool b_forced);
+static void EsOutDrainDecoder(es_out_sys_t *p_sys, es_out_id_t *es, bool wait);
 static void EsOutGlobalMeta(es_out_sys_t *p_out, const vlc_meta_t *p_meta);
 static void EsOutMeta(es_out_sys_t *p_out, const vlc_meta_t *p_meta, const vlc_meta_t *p_progmeta);
 static int EsOutEsUpdateFmt(es_out_id_t *es, const es_format_t *fmt);
@@ -724,6 +726,15 @@ static int EsOutDrain(es_out_sys_t *p_sys)
             return VLC_EGENERIC;
     }
 
+    if( !p_sys->b_draining )
+    {
+        es_out_id_t *id;
+        foreach_es_then_es_slaves(id)
+            if (id->p_dec != NULL)
+                EsOutDrainDecoder(p_sys, id, false);
+        p_sys->b_draining = true;
+    }
+
     return VLC_SUCCESS;
 }
 
@@ -955,6 +966,7 @@ static void EsOutChangePosition(es_out_sys_t *p_sys, bool b_flush,
     p_sys->i_buffering_extra_initial = 0;
     p_sys->i_buffering_extra_stream = 0;
     p_sys->i_buffering_extra_system = 0;
+    p_sys->b_draining = false;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
 }
@@ -2936,6 +2948,7 @@ static int EsOutSend(es_out_t *out, es_out_id_t *es, block_t *p_block )
     }
 
     vlc_mutex_lock( &p_sys->lock );
+    assert( !p_sys->b_draining );
 
     /* Shift all slaves timestamps with the main source normal time. This will
      * allow to synchronize 2 demuxers with different time bases. Remove the
@@ -3978,9 +3991,12 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     {
         EsOutDrain(p_sys);
         es_out_id_t *id;
+        if( p_sys->b_draining )
+            return VLC_SUCCESS;
         foreach_es_then_es_slaves(id)
             if (id->p_dec != NULL)
                 EsOutDrainDecoder(p_sys, id, false);
+        p_sys->b_draining = true;
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_VBI_PAGE:
@@ -4112,6 +4128,7 @@ input_EsOutNew(input_thread_t *p_input, input_source_t *main_source, float rate,
     p_sys->rate = rate;
 
     p_sys->b_buffering = true;
+    p_sys->b_draining = false;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
 
