@@ -433,7 +433,7 @@ libdxva2_plugin_la_SOURCES = \
 	packetizer/hevc_nal.c packetizer/hevc_nal.h \
 	packetizer/h26x_nal_common.h \
 	codec/avcodec/dxva_blocklist.c
-libdxva2_plugin_la_LIBADD = libd3d9_common.la $(LIBCOM) -luuid -ldxva2
+libdxva2_plugin_la_LIBADD = libd3d9_common.la -ld3d9 $(LIBCOM) -luuid -ldxva2
 if !HAVE_WINSTORE
 if HAVE_AVCODEC_DXVA2
 codec_LTLIBRARIES += libdxva2_plugin.la

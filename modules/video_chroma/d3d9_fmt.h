@@ -47,7 +47,6 @@ struct d3d9_pic_context
 
 typedef struct
 {
-    HINSTANCE               hdll;       /* handle of the opened d3d9 dll */
     union {
         IDirect3D9          *obj;
         IDirect3D9Ex        *objex;

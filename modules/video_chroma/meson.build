@@ -134,6 +134,7 @@ if host_system == 'windows'
             'dxgi_fmt.c',
             ),
         include_directories: [vlc_include_dirs],
+        dependencies: [ cc.find_library('d3d9') ],
         pic: true,
         install: false,
     )
