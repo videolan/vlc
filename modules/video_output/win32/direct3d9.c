@@ -667,7 +667,7 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    HRESULT (WINAPI * OurD3DXCompileShader)(
+    typedef HRESULT (WINAPI * OurD3DXCompileShader_ptr)(
             LPCSTR pSrcData,
             UINT srcDataLen,
             const D3DXMACRO *pDefines,
@@ -679,7 +679,8 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
             LPD3DXBUFFER *ppErrorMsgs,
             LPD3DXCONSTANTTABLE *ppConstantTable);
 
-    OurD3DXCompileShader = GetProcAddress(sys->hxdll, "D3DXCompileShader");
+    OurD3DXCompileShader_ptr OurD3DXCompileShader;
+    OurD3DXCompileShader = (OurD3DXCompileShader_ptr)GetProcAddress(sys->hxdll, "D3DXCompileShader");
     if (!OurD3DXCompileShader) {
         msg_Warn(vd, "Cannot locate reference to D3DXCompileShader; pixel shading will be disabled");
         return VLC_EGENERIC;

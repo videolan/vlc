@@ -174,13 +174,17 @@ retry:
 }
 
 /*** Futeces^WAddress waits ***/
-static HRESULT (WINAPI *SetThreadDescription_)(HANDLE, PCWSTR);
+typedef HRESULT (WINAPI *SetThreadDescription_ptr)(HANDLE, PCWSTR);
+static SetThreadDescription_ptr SetThreadDescription_;
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-static BOOL (WINAPI *WaitOnAddress_)(VOID volatile *, PVOID, SIZE_T, DWORD);
+typedef BOOL (WINAPI *WaitOnAddress_ptr)(VOID volatile *, PVOID, SIZE_T, DWORD);
+static WaitOnAddress_ptr WaitOnAddress_;
 #define WaitOnAddress (*WaitOnAddress_)
-static VOID (WINAPI *WakeByAddressAll_)(PVOID);
+typedef VOID (WINAPI *WakeByAddressAll_ptr)(PVOID);
+static WakeByAddressAll_ptr WakeByAddressAll_;
 #define WakeByAddressAll (*WakeByAddressAll_)
-static VOID (WINAPI *WakeByAddressSingle_)(PVOID);
+typedef VOID (WINAPI *WakeByAddressSingle_ptr)(PVOID);
+static WakeByAddressSingle_ptr WakeByAddressSingle_;
 #define WakeByAddressSingle (*WakeByAddressSingle_)
 
 static struct wait_addr_bucket
@@ -704,7 +708,7 @@ void vlc_threads_setup(libvlc_int_t *vlc)
 #endif
 }
 
-#define LOOKUP(s) (((s##_) = GetProcAddress(h, #s)) != NULL)
+#define LOOKUP(s) (((s##_) = (s##_ptr)GetProcAddress(h, #s)) != NULL)
 
 int __stdcall DllMain (void *hinstDll, unsigned long fdwReason, void *lpvReserved)
 {
