@@ -136,12 +136,14 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                  withItemsAspectRatio:itemsAspectRatio
                                withNumberOfItemsInRow:numItemsInRow];
 
+    BOOL changed = NO;
     while (itemSize.width > VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
+        changed = YES;
     }
     while (itemSize.width < VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth && numItemsInRow > minItemsInRow) {
         --numItemsInRow;
@@ -149,11 +151,12 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
+        changed = YES;
     }
 
     const NSInteger adjustment =
         [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
-    if (adjustment > 0) {
+    if (adjustment > 0 && changed) {
         numItemsInRow += adjustment;
         [self itemSizeForCollectionView:collectionView
                              withLayout:collectionViewLayout
