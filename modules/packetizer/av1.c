@@ -156,6 +156,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
     {
         free(p_dec->fmt_out.p_extra);
         p_dec->fmt_out.i_extra = 0;
+        p_dec->fmt_out.p_extra = NULL;
     }
 
     if(p_dec->fmt_out.i_extra <= 4)
