@@ -30,12 +30,7 @@
 #warning "QRhiD3D11 and QRhi headers are required for DirectComposition compositor."
 #endif
 
-#ifndef QT_CORE_PRIVATE
-#warning "QSystemLibrary private header is required for DirectComposition compositor."
-#endif
-
 #include <QtGui/qpa/qplatformnativeinterface.h>
-#include <QtCore/private/qsystemlibrary_p.h>
 
 #if __has_include(<d3d11_1.h>)
 #define QRhiD3D11_ACTIVE
@@ -55,6 +50,9 @@
 
 #include "compositor_dcomp_acrylicsurface.hpp"
 #include "maininterface/interface_window_handler.hpp"
+
+#include <memory>
+#include <type_traits>
 
 namespace vlc {
 
@@ -120,14 +118,19 @@ bool CompositorDirectComposition::init()
             return false;
     }
 
-    QSystemLibrary dcomplib(QLatin1String("dcomp"));
+    std::unique_ptr<std::remove_pointer_t<HMODULE>, BOOL WINAPI (*)(HMODULE)>
+        dcomplib(::LoadLibraryEx(TEXT("dcomp.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32), ::FreeLibrary);
 
     typedef HRESULT (__stdcall *DCompositionCreateDeviceFuncPtr)(
         _In_opt_ IDXGIDevice *dxgiDevice,
         _In_ REFIID iid,
         _Outptr_ void **dcompositionDevice);
-    DCompositionCreateDeviceFuncPtr func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
-        dcomplib.resolve("DCompositionCreateDevice"));
+    DCompositionCreateDeviceFuncPtr func = nullptr;
+    if (dcomplib)
+    {
+        func = reinterpret_cast<DCompositionCreateDeviceFuncPtr>(
+            GetProcAddress(dcomplib.get(), "DCompositionCreateDevice"));
+    }
 
     Microsoft::WRL::ComPtr<IDCompositionDevice> device;
     if (!func || FAILED(func(nullptr, IID_PPV_ARGS(&device))))
