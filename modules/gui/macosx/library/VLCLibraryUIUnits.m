@@ -128,35 +128,32 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
 {
-    static uint numItemsInRow = 5;
-    static uint minItemsInRow = 2;
+    uint numItemsInRow = 5;
+    static const uint kMinItemsInCollectionViewRow = 1;
 
     NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                            withLayout:collectionViewLayout
                                  withItemsAspectRatio:itemsAspectRatio
                                withNumberOfItemsInRow:numItemsInRow];
 
-    BOOL changed = NO;
     while (itemSize.width > VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth) {
         ++numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
-        changed = YES;
     }
-    while (itemSize.width < VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth && numItemsInRow > minItemsInRow) {
+    while (itemSize.width < VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth && numItemsInRow > kMinItemsInCollectionViewRow) {
         --numItemsInRow;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
                               withItemsAspectRatio:itemsAspectRatio
                             withNumberOfItemsInRow:numItemsInRow];
-        changed = YES;
     }
 
     const NSInteger adjustment =
         [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
-    if (adjustment > 0 && changed) {
+    if (adjustment != 0 && numItemsInRow + adjustment > kMinItemsInCollectionViewRow) {
         numItemsInRow += adjustment;
         itemSize = [self itemSizeForCollectionView:collectionView
                                         withLayout:collectionViewLayout
