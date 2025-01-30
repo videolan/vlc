@@ -158,10 +158,10 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
         [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
     if (adjustment > 0 && changed) {
         numItemsInRow += adjustment;
-        [self itemSizeForCollectionView:collectionView
-                             withLayout:collectionViewLayout
-                   withItemsAspectRatio:itemsAspectRatio
-                 withNumberOfItemsInRow:numItemsInRow];
+        itemSize = [self itemSizeForCollectionView:collectionView
+                                        withLayout:collectionViewLayout
+                              withItemsAspectRatio:itemsAspectRatio
+                            withNumberOfItemsInRow:numItemsInRow];
     }
 
     return itemSize;
