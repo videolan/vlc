@@ -185,7 +185,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                      (interItemSpacing * (numItemsInRow - 1)) +
                                      1);
 
-    const CGFloat itemWidth = rowOfItemsWidth / numItemsInRow;
+    const CGFloat itemWidth = MAX(rowOfItemsWidth / numItemsInRow, 1);
     const CGFloat itemHeight = itemsAspectRatio == VLCLibraryCollectionViewItemAspectRatioDefaultItem ?
         itemWidth + VLCLibraryCollectionViewItem.bottomTextViewsHeight :
         (itemWidth * [VLCLibraryCollectionViewItem videoHeightAspectRatioMultiplier]) + VLCLibraryCollectionViewItem.bottomTextViewsHeight;
