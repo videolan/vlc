@@ -515,7 +515,7 @@ static vlc_tick_t vlc_clock_master_update(vlc_clock_t *clock,
     if (clock->delay > 0 && main_clock->delay < 0 && ts > -main_clock->delay)
         ts += main_clock->delay;
 
-    vlc_tick_t drift = VLC_TICK_INVALID;
+    vlc_tick_t drift = 0;
     vlc_clock_on_update(clock, system_now, ts, drift,
                         rate, frame_rate, frame_rate_base);
     return drift;
