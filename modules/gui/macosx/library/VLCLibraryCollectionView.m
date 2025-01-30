@@ -22,6 +22,9 @@
 
 #import "VLCLibraryCollectionView.h"
 
+#import "library/VLCLibraryCollectionViewFlowLayout.h"
+#import "library/VLCLibraryUIUnits.h"
+
 @implementation VLCLibraryCollectionView
 
 - (void)layout
@@ -31,6 +34,30 @@
     // they should be
     [self.collectionViewLayout invalidateLayout];
     [super layout];
+}
+
+- (void)keyDown:(NSEvent *)event
+{
+    if (![self.collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class] ||
+        !(event.modifierFlags & NSCommandKeyMask)) {
+        return;
+    }
+
+    const unichar key = [event.charactersIgnoringModifiers.lowercaseString characterAtIndex:0];
+    if (key != '+' && key != '-') {
+        return;
+    }
+
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
+    NSInteger collectionViewAdjustment =
+        [defaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
+    if (key == '+') {
+        collectionViewAdjustment--;
+    } else if (key == '-') {
+        collectionViewAdjustment++;
+    }
+    [defaults setInteger:collectionViewAdjustment forKey:VLCLibraryCollectionViewItemAdjustmentKey];
+    [self.collectionViewLayout invalidateLayout];
 }
 
 @end
