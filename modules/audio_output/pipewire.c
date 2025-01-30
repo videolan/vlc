@@ -374,8 +374,9 @@ static void vlc_pw_stream_flush(struct vlc_pw_stream *s)
 static void vlc_pw_stream_drain(struct vlc_pw_stream *s)
 {
     vlc_pw_lock(s->context);
+    bool empty = s->start == VLC_TICK_INVALID;
     s->first_pts = s->start = VLC_TICK_INVALID;
-    if (vlc_pw_stream_get_state(s) == PW_STREAM_STATE_ERROR)
+    if (vlc_pw_stream_get_state(s) == PW_STREAM_STATE_ERROR || empty)
         stream_drained(s); /* Don't wait on a failed stream */
     else if (s->queue.head == NULL)
         pw_stream_flush(s->stream, true); /* Drain now */
