@@ -2501,7 +2501,7 @@ bool vlc_input_decoder_IsEmpty( vlc_input_decoder_t * p_owner )
     else if( p_owner->fmt.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         b_empty = vout_IsEmpty( p_owner->p_vout );
     else if( p_owner->fmt.i_cat == AUDIO_ES && p_owner->p_astream != NULL )
-        b_empty = !p_owner->b_draining || vlc_aout_stream_IsDrained( p_owner->p_astream );
+        b_empty = vlc_aout_stream_IsDrained( p_owner->p_astream );
     else
         b_empty = true; /* TODO subtitles support */
     vlc_fifo_Unlock( p_owner->p_fifo );
