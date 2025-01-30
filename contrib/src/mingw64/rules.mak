@@ -13,17 +13,24 @@ ifdef HAVE_WINSTORE
 PKGS += alloweduwp
 endif
 PKGS += dxva dxvahd mingw11-fixes mingw12-fixes mft10
+ifeq ($(ARCH),i386)
+PKGS += dxva_x86
+endif
+
 ifeq ($(call mingw_at_least, 10), true)
 PKGS_FOUND += dxva mft10
 endif # MINGW 10
 ifeq ($(call mingw_at_least, 11), true)
-PKGS_FOUND += dxvahd
+PKGS_FOUND +=
 endif # MINGW 11
 ifeq ($(call mingw_at_least, 12), true)
 PKGS_FOUND += mingw11-fixes
 endif # MINGW 12
 ifeq ($(call mingw_at_least, 13), true)
-PKGS_FOUND += mingw12-fixes
+PKGS_FOUND += mingw12-fixes dxvahd
+ifeq ($(ARCH),i386)
+PKGS_FOUND += dxva_x86
+endif
 endif # MINGW 13
 endif # !HAVE_VISUALSTUDIO
 
@@ -34,7 +41,7 @@ endif
 
 endif # HAVE_WIN32
 
-PKGS_ALL += winpthreads dxva dxvahd mingw11-fixes mingw12-fixes alloweduwp mft10
+PKGS_ALL += winpthreads dxva dxvahd dxva_x86 mingw11-fixes mingw12-fixes alloweduwp mft10
 
 # $(TARBALLS)/mingw-w64-$(MINGW64_HASH).tar.xz:
 # 	$(call download_git,$(MINGW64_GITURL),,$(MINGW64_HASH))
@@ -51,6 +58,8 @@ mingw64: mingw-w64-v$(MINGW64_VERSION).tar.bz2 .sum-mingw64
 # mingw64: mingw-w64-$(MINGW64_HASH).tar.xz .sum-mingw64
 	$(UNPACK)
 	$(APPLY) $(SRC)/mingw64/0001-headers-disable-more-strmif-interfaces-in-UWP.patch
+	$(APPLY) $(SRC)/mingw64/0001-crt-add-missing-DXVAHD_CreateDevice-for-x86.patch
+	$(APPLY) $(SRC)/mingw64/0001-headers-dxvahd-Add-missing-WINAPI-on-DXVAHD_CreateDe.patch
 	$(MOVE)
 
 .mingw64: mingw64
@@ -143,4 +152,21 @@ endif
 	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
 	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a DATA= HEADERS=
 	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libwindowsapp.a install-$(MINGW64_BUILDDIR)LIBRARIES
+	touch $@
+
+.sum-dxva_x86: .sum-mingw64
+	touch $@
+
+.dxva_x86: BUILD_DIR=$</vlc_build_dxva_x86
+.dxva_x86: mingw64
+ifeq ($(ARCH),i386)
+	install -d "$(PREFIX)/include"
+
+	# Trick mingw-w64 into just building libdxva2.a
+	$(MAKEBUILDDIR)
+	$(MAKECONFIGURE) $(MINGW64_MINIMALCRT_CONF)
+	mkdir -p $(BUILD_DIR)/mingw-w64-crt/$(MINGW64_BUILDDIR)
+	+$(MAKEBUILD) -C mingw-w64-crt LIBRARIES=$(MINGW64_BUILDDIR)/libdxva2.a DATA= HEADERS=
+	+$(MAKEBUILD) -C mingw-w64-crt $(MINGW64_BUILDDIR)_LIBRARIES=$(MINGW64_BUILDDIR)/libdxva2.a install-$(MINGW64_BUILDDIR)LIBRARIES
+endif
 	touch $@
