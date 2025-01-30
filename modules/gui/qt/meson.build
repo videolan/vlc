@@ -1060,10 +1060,6 @@ if qt6_dep.found()
         qt_extra_flags += '-DQT_GUI_PRIVATE'
     endif
 
-    if cpp.has_header('private/qobject_p.h', dependencies: qt6_dep)
-        qt_extra_flags += '-DQT_CORE_PRIVATE'
-    endif
-
     if host_system == 'windows'
         qt_cppargs += libcom_cppflags
     endif

@@ -34,11 +34,6 @@ QT += gui-private
 DEFINES += QT_GUI_PRIVATE
 }
 
-qtHaveModule(core-private) {
-QT += core-private
-DEFINES += QT_CORE_PRIVATE
-}
-
 qtHaveModule(quick-private) {
 QT += quick-private
 DEFINES += QT_DECLARATIVE_PRIVATE
