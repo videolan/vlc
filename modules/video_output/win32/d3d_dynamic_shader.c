@@ -37,8 +37,6 @@
 
 struct d3d_shader_compiler_t
 {
-    HINSTANCE                 compiler_dll; /* handle of the opened d3dcompiler dll */
-    pD3DCompile               OurD3DCompile;
 };
 
 static const char globPixelShaderDefault[] = "\
@@ -335,7 +333,6 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
 #if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     VLC_UNUSED(compiler);
 #else
-# define D3DCompile(a,b,c,d,e,f,g,h,i,j,k)    compiler->OurD3DCompile(a,b,c,d,e,f,g,h,i,j,k)
 # if !defined(NDEBUG)
     if (IsDebuggerPresent())
         compileFlags += D3DCOMPILE_DEBUG;
@@ -675,35 +672,11 @@ int D3D_CreateShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t **compiler
     *compiler = calloc(1, sizeof(d3d_shader_compiler_t));
     if (unlikely(*compiler == NULL))
         return VLC_ENOMEM;
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    /* d3dcompiler_47 is the latest on windows 10 */
-    for (int i = 47; i > 41; --i)
-    {
-        WCHAR filename[19];
-        _snwprintf(filename, ARRAY_SIZE(filename), TEXT("D3DCOMPILER_%d.dll"), i);
-        (*compiler)->compiler_dll = LoadLibrary(filename);
-        if ((*compiler)->compiler_dll) break;
-    }
-    if ((*compiler)->compiler_dll)
-        (*compiler)->OurD3DCompile = (pD3DCompile)((void*)GetProcAddress((*compiler)->compiler_dll, "D3DCompile"));
-
-    if (!(*compiler)->OurD3DCompile) {
-        msg_Err(obj, "Cannot locate reference to D3DCompile in d3dcompiler DLL");
-        FreeLibrary((*compiler)->compiler_dll);
-        free(*compiler);
-        return VLC_EGENERIC;
-    }
-#endif // WINAPI_PARTITION_DESKTOP
 
     return VLC_SUCCESS;
 }
 
 void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *compiler)
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    if (compiler->compiler_dll)
-        FreeLibrary(compiler->compiler_dll);
-#endif // WINAPI_PARTITION_DESKTOP
     free(compiler);
 }
-
