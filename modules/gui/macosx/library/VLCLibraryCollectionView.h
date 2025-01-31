@@ -24,6 +24,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCLibraryCollectionViewItemAdjustmentBigger;
+extern NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller;
+
 @interface VLCLibraryCollectionView : NSCollectionView
 
 @end

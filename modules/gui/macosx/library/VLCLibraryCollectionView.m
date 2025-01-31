@@ -25,6 +25,9 @@
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryUIUnits.h"
 
+NSString * const VLCLibraryCollectionViewItemAdjustmentBigger = @"VLCLibraryCollectionViewItemAdjustmentBigger";
+NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCollectionViewItemAdjustmentSmaller";
+
 @implementation VLCLibraryCollectionView
 
 - (void)layout
@@ -51,12 +54,20 @@
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     NSInteger collectionViewAdjustment =
         [defaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
+    NSNotification *notification;
     if (key == '+') {
         collectionViewAdjustment--;
+        notification =
+            [NSNotification notificationWithName:VLCLibraryCollectionViewItemAdjustmentBigger
+                                          object:self];
     } else if (key == '-') {
         collectionViewAdjustment++;
+        notification =
+            [NSNotification notificationWithName:VLCLibraryCollectionViewItemAdjustmentSmaller
+                                          object:self];
     }
     [defaults setInteger:collectionViewAdjustment forKey:VLCLibraryCollectionViewItemAdjustmentKey];
+    [NSNotificationCenter.defaultCenter postNotification:notification];
     [self.collectionViewLayout invalidateLayout];
 }
 
