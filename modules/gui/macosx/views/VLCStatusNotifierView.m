@@ -23,6 +23,7 @@
 #import "VLCStatusNotifierView.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "library/VLCLibraryCollectionView.h"
 #import "library/VLCLibraryModel.h"
 
 NSString * const VLCStatusNotifierViewActivated = @"VLCStatusNotifierViewActivated";
@@ -144,6 +145,10 @@ NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeact
             [self presentTransientMessage:self.libraryItemsLoadedMessage];
             [self removeMessage:self.loadingLibraryItemsMessage];
         }
+    } else if ([notificationName isEqualToString:VLCLibraryCollectionViewItemAdjustmentBigger]) {
+        [self presentTransientMessage:_NS("Increased grid view item size")];
+    } else if ([notificationName isEqualToString:VLCLibraryCollectionViewItemAdjustmentSmaller]) {
+        [self presentTransientMessage:_NS("Decreased grid view item size")];
     }
 }
 
