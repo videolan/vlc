@@ -50,7 +50,7 @@ vlc_mf_d3d::~vlc_mf_d3d()
 void vlc_mf_d3d::Init()
 {
 #if _WIN32_WINNT < _WIN32_WINNT_WIN8
-    HINSTANCE mfplat_dll = LoadLibraryA("mfplat.dll");
+    HINSTANCE mfplat_dll = LoadLibraryExA("mfplat.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (mfplat_dll)
     {
         fptr_MFCreateDXGIDeviceManager = reinterpret_cast<decltype(fptr_MFCreateDXGIDeviceManager)>(
