@@ -17,7 +17,7 @@ int vlc_AMFCreateContext(struct vlc_amf_context *c)
 {
 #ifdef _WIN32
 # if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    HMODULE hLib = LoadLibraryA(AMF_DLL_NAMEA);
+    HMODULE hLib = LoadLibraryExA(AMF_DLL_NAMEA, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (hLib == NULL)
         return VLC_ENOTSUP;
 
