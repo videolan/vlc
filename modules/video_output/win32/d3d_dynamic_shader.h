@@ -29,12 +29,7 @@
 extern "C" {
 #endif// __cplusplus
 
-typedef struct d3d_shader_compiler_t d3d_shader_compiler_t;
-
-int D3D_CreateShaderCompiler(vlc_object_t *, d3d_shader_compiler_t **);
-void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *);
-
-HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
+HRESULT D3D_CompilePixelShader(vlc_object_t *,
                                D3D_FEATURE_LEVEL,
                                const display_info_t *,
                                video_transfer_func_t,
@@ -43,7 +38,7 @@ HRESULT D3D_CompilePixelShader(vlc_object_t *, const d3d_shader_compiler_t *,
                                d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET],
                                size_t shader_views[DXGI_MAX_RENDER_TARGET]);
 
-HRESULT D3D_CompileVertexShader(vlc_object_t *, const d3d_shader_compiler_t *,
+HRESULT D3D_CompileVertexShader(vlc_object_t *,
                                 D3D_FEATURE_LEVEL, bool flat,
                                 d3d_shader_blob *);
 

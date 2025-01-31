@@ -130,7 +130,6 @@ typedef struct vout_display_sys_t
 
     d3d11_device_t           *d3d_dev = NULL;
     d3d11_decoder_device_t   *local_d3d_dev = NULL; // when opened without a video context
-    d3d_shader_compiler_t    *shaders = nullptr;
     d3d11_quad_t             picQuad = {};
 
     d3d11_gpu_fence          fence = {};
@@ -544,10 +543,6 @@ static int Open(vout_display_t *vd,
 
     d3d11_decoder_device_t *dev_sys = NULL;
 
-    int ret = D3D_CreateShaderCompiler(VLC_OBJECT(vd), &sys->shaders);
-    if (ret != VLC_SUCCESS)
-        goto error;
-
     sys->outside_opaque = var_InheritAddress( vd, "vout-cb-opaque" );
     sys->updateOutputCb      = (libvlc_video_update_output_cb)var_InheritAddress( vd, "vout-cb-update-output" );
     sys->swapCb              = (libvlc_video_swap_cb)var_InheritAddress( vd, "vout-cb-swap" );
@@ -643,7 +638,6 @@ error:
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = static_cast<vout_display_sys_t *>(vd->sys);
-    D3D_ReleaseShaderCompiler(sys->shaders);
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
     CommonWindowClean(sys->video_wnd);
 #endif
@@ -1455,7 +1449,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->use_staging_texture = false;
 
     d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
-    hr = D3D11_CompilePixelShaderBlob(vd, sys->shaders, sys->d3d_dev,
+    hr = D3D11_CompilePixelShaderBlob(vd, sys->d3d_dev,
                                   &sys->display, fmt->transfer,
                                   fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad, pPSBlob);
@@ -1551,7 +1545,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (sys->regionQuad.generic.textureFormat != NULL)
     {
         d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET] = { };
-        hr = D3D11_CompilePixelShaderBlob(vd, sys->shaders, sys->d3d_dev,
+        hr = D3D11_CompilePixelShaderBlob(vd, sys->d3d_dev,
                                       &sys->display, TRANSFER_FUNC_SRGB, true,
                                       &sys->regionQuad, pPSBlob);
         if (FAILED(hr))
@@ -1569,7 +1563,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     }
 
     d3d_shader_blob VSBlob = { };
-    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), sys->shaders, sys->d3d_dev, true, &VSBlob);
+    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), sys->d3d_dev, true, &VSBlob);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to compile the flat vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
@@ -1581,7 +1575,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     }
 
 
-    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), sys->shaders, sys->d3d_dev, false, &VSBlob);
+    hr = D3D11_CompileVertexShaderBlob(VLC_OBJECT(vd), sys->d3d_dev, false, &VSBlob);
     if(FAILED(hr)) {
       msg_Err(vd, "Failed to compile the 360 vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;

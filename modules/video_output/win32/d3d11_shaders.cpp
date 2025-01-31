@@ -33,7 +33,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
+HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o,
                                    d3d11_device_t *d3d_dev,
                                    const display_info_t *display,
                                    video_transfer_func_t transfer,
@@ -41,7 +41,7 @@ HRESULT (D3D11_CompilePixelShaderBlob)(vlc_object_t *o, const d3d_shader_compile
                                    const d3d11_quad_t *quad, d3d_shader_blob pPSBlob[DXGI_MAX_RENDER_TARGET])
 {
     size_t shader_views[DXGI_MAX_RENDER_TARGET];
-    return D3D_CompilePixelShader(o, compiler, d3d_dev->feature_level,
+    return D3D_CompilePixelShader(o, d3d_dev->feature_level,
                                   display, transfer,
                                   src_full_range, quad->generic.textureFormat, pPSBlob, shader_views);
 }
@@ -168,8 +168,8 @@ void D3D11_ReleaseVertexShader(d3d11_vertex_shader_t *shader)
     shader->shader.Reset();
 }
 
-HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
+HRESULT D3D11_CompileVertexShaderBlob(vlc_object_t *obj,
                                       d3d11_device_t *d3d_dev, bool flat, d3d_shader_blob *pVSBlob)
 {
-    return D3D_CompileVertexShader(obj, compiler, d3d_dev->feature_level, flat, pVSBlob);
+    return D3D_CompileVertexShader(obj, d3d_dev->feature_level, flat, pVSBlob);
 }

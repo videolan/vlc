@@ -35,10 +35,6 @@
 #include "d3d_shaders.h"
 #include "d3d_dynamic_shader.h"
 
-struct d3d_shader_compiler_t
-{
-};
-
 static const char globPixelShaderDefault[] = "\
 #pragma warning( disable: 3571 )\n\
 cbuffer PS_CONSTANT_BUFFER : register(b0)\n\
@@ -321,7 +317,7 @@ static void ID3D10BlobtoBlob(ID3D10Blob *d3dblob, d3d_shader_blob *blob)
 }
 
 
-static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
+static HRESULT CompileShader(vlc_object_t *obj,
                              D3D_FEATURE_LEVEL feature_level,
                              const char *psz_shader, bool pixelShader,
                              const D3D_SHADER_MACRO *defines,
@@ -330,9 +326,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
     ID3D10Blob* pShaderBlob = NULL, *pErrBlob = NULL;
 
     UINT compileFlags = 0;
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    VLC_UNUSED(compiler);
-#else
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 # if !defined(NDEBUG)
     if (IsDebuggerPresent())
         compileFlags += D3DCOMPILE_DEBUG;
@@ -386,7 +380,7 @@ static HRESULT CompileShader(vlc_object_t *obj, const d3d_shader_compiler_t *com
     return S_OK;
 }
 
-static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
+static HRESULT CompilePixelShaderBlob(vlc_object_t *o,
                                    D3D_FEATURE_LEVEL feature_level,
                                    const char *psz_sampler,
                                    const char *psz_shader_resource_views,
@@ -415,11 +409,11 @@ static HRESULT CompilePixelShaderBlob(vlc_object_t *o, const d3d_shader_compiler
     }
 #endif
 
-    return CompileShader(o, compiler, feature_level, globPixelShaderDefault, true,
+    return CompileShader(o, feature_level, globPixelShaderDefault, true,
                          defines, pPSBlob);
 }
 
-HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *compiler,
+HRESULT (D3D_CompilePixelShader)(vlc_object_t *o,
                                  D3D_FEATURE_LEVEL feature_level,
                                  const display_info_t *display,
                                  video_transfer_func_t transfer,
@@ -634,7 +628,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     }
 
     HRESULT hr;
-    hr = CompilePixelShaderBlob(o, compiler, feature_level,
+    hr = CompilePixelShaderBlob(o, feature_level,
                                 psz_sampler[0], psz_shader_resource_views[0],
                                 psz_src_to_linear,
                                 psz_linear_to_display,
@@ -642,7 +636,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
                                 &pPSBlob[0]);
     if (SUCCEEDED(hr) && psz_sampler[1])
     {
-        hr = CompilePixelShaderBlob(o, compiler, feature_level,
+        hr = CompilePixelShaderBlob(o, feature_level,
                                     psz_sampler[1],  psz_shader_resource_views[1],
                                     psz_src_to_linear,
                                     psz_linear_to_display,
@@ -655,7 +649,7 @@ HRESULT (D3D_CompilePixelShader)(vlc_object_t *o, const d3d_shader_compiler_t *c
     return hr;
 }
 
-HRESULT D3D_CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *compiler,
+HRESULT D3D_CompileVertexShader(vlc_object_t *obj,
                                 D3D_FEATURE_LEVEL feature_level, bool flat,
                                 d3d_shader_blob *blob)
 {
@@ -663,20 +657,5 @@ HRESULT D3D_CompileVertexShader(vlc_object_t *obj, const d3d_shader_compiler_t *
          { "HAS_PROJECTION", flat ? "0" : "1" },
          { NULL, NULL },
     };
-    return CompileShader(obj, compiler, feature_level, globVertexShader, false, defines, blob);
-}
-
-
-int D3D_CreateShaderCompiler(vlc_object_t *obj, d3d_shader_compiler_t **compiler)
-{
-    *compiler = calloc(1, sizeof(d3d_shader_compiler_t));
-    if (unlikely(*compiler == NULL))
-        return VLC_ENOMEM;
-
-    return VLC_SUCCESS;
-}
-
-void D3D_ReleaseShaderCompiler(d3d_shader_compiler_t *compiler)
-{
-    free(compiler);
+    return CompileShader(obj, feature_level, globVertexShader, false, defines, blob);
 }
