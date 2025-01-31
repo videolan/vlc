@@ -175,10 +175,15 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
 
     sys->hvideownd = wnd->handle.hwnd;
     sys->hGLDC = GetDC(sys->hvideownd);
-    sys->hOpengl = LoadLibraryExA("opengl32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
     if (sys->hGLDC == NULL)
     {
         msg_Err(gl, "Could not get the device context");
+        goto error;
+    }
+    sys->hOpengl = LoadLibraryExA("opengl32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    if (sys->hOpengl == NULL)
+    {
+        msg_Err(gl, "Could not get the opengl32 DLL");
         goto error;
     }
 
