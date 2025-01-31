@@ -610,14 +610,13 @@ static int CropBorderCallback(vlc_object_t *object, char const *cmd,
     return VLC_SUCCESS;
 }
 
-bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den)
+bool GetAspectRatio(const char *ar_str, vlc_rational_t *ar)
 {
-    if (sscanf(ar_str, "%u:%u", num, den) == 2 &&
-        (*num != 0) == (*den != 0))
+    if (sscanf(ar_str, "%u:%u", &ar->num, &ar->den) == 2 &&
+        (ar->num != 0) == (ar->den != 0))
         return true;
     else if (*ar_str == '\0') {
-        *num = VLC_DAR_FROM_SOURCE.num;
-        *den = VLC_DAR_FROM_SOURCE.den;
+        *ar = VLC_DAR_FROM_SOURCE;
         return true;
     }
     return false;
@@ -628,10 +627,10 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
 {
     vout_thread_t *vout = (vout_thread_t *)object;
     VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
-    unsigned num, den;
+    vlc_rational_t ar;
 
-    if (GetAspectRatio(newval.psz_string, &num, &den))
-        vout_ChangeDisplayAspectRatio(vout, num, den);
+    if (GetAspectRatio(newval.psz_string, &ar))
+        vout_ChangeDisplayAspectRatio(vout, ar.num, ar.den);
     return VLC_SUCCESS;
 }
 

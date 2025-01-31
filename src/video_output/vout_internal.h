@@ -142,7 +142,7 @@ static inline bool vout_CropEqual(const struct vout_crop *a,
 }
 
 bool vout_ParseCrop(struct vout_crop *, const char *crop_str);
-bool GetAspectRatio(const char *ar_str, unsigned *num, unsigned *den);
+bool GetAspectRatio(const char *ar_str, vlc_rational_t *ar);
 
 /* TODO to move them to vlc_vout.h */
 void vout_ChangeFullscreen(vout_thread_t *, const char *id);
