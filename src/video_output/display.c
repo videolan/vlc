@@ -573,7 +573,7 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     int err1 = VLC_SUCCESS, err2;
 
-    if (osys->dar.den == VLC_DAR_FROM_SOURCE.den && osys->dar.num == VLC_DAR_FROM_SOURCE.num) {
+    if (VLC_DAR_IS_FROM_SOURCE(osys->dar)) {
         video_format_t fixed_src = *source;
         VoutFixFormatAR( &fixed_src );
         err2 = vout_SetSourceAspect(vd, fixed_src.i_sar_num, fixed_src.i_sar_den);
@@ -669,7 +669,7 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     osys->dar = (vlc_rational_t){dar_num, dar_den};
 
-    if (dar_num == VLC_DAR_FROM_SOURCE.num && dar_den == VLC_DAR_FROM_SOURCE.den)
+    if (VLC_DAR_IS_FROM_SOURCE(osys->dar))
         // use the source aspect ratio that we don't have yet
         // see vout_UpdateDisplaySourceProperties()
         return;
