@@ -337,7 +337,7 @@ struct dxgi_debug_handle_t
         pf_DXGIGetDebugInterface = nullptr;
         if (IsDebuggerPresent())
         {
-            dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+            dxgidebug_dll = LoadLibraryExA("DXGIDEBUG.DLL", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
             if (dxgidebug_dll)
             {
                 pf_DXGIGetDebugInterface =
