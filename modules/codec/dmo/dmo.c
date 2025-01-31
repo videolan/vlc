@@ -609,11 +609,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
     DMO_PARTIAL_MEDIATYPE dmo_partial_type;
     int i_err;
 
-    long (STDCALL *OurDMOEnum)( const GUID *, DWORD, DWORD,
-                               const DMO_PARTIAL_MEDIATYPE *,
-                               DWORD, const DMO_PARTIAL_MEDIATYPE *,
-                               IEnumDMO ** );
-
     IEnumDMO *p_enum_dmo = NULL;
     WCHAR *psz_dmo_name;
     GUID clsid_dmo;
@@ -645,34 +640,18 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
                                         p_fmt->i_original_fourcc : p_fmt->i_codec;
     }
 
-    /* Load msdmo DLL */
-    *p_hmsdmo_dll = LoadLibrary( TEXT( "msdmo.dll" ) );
-    if( *p_hmsdmo_dll == NULL )
-    {
-        msg_Dbg( p_this, "failed loading msdmo.dll" );
-        return VLC_EGENERIC;
-    }
-    OurDMOEnum = (void *)GetProcAddress( *p_hmsdmo_dll, "DMOEnum" );
-    if( OurDMOEnum == NULL )
-    {
-        msg_Dbg( p_this, "GetProcAddress failed to find DMOEnum()" );
-        FreeLibrary( *p_hmsdmo_dll );
-        return VLC_EGENERIC;
-    }
-
     if( !b_out )
     {
-        i_err = OurDMOEnum( &GUID_NULL, 1 /*DMO_ENUMF_INCLUDE_KEYED*/,
+        i_err = DMOEnum( &GUID_NULL, 1 /*DMO_ENUMF_INCLUDE_KEYED*/,
                             1, &dmo_partial_type, 0, NULL, &p_enum_dmo );
     }
     else
     {
-        i_err = OurDMOEnum( &GUID_NULL, 1 /*DMO_ENUMF_INCLUDE_KEYED*/,
+        i_err = DMOEnum( &GUID_NULL, 1 /*DMO_ENUMF_INCLUDE_KEYED*/,
                             0, NULL, 1, &dmo_partial_type, &p_enum_dmo );
     }
     if( i_err )
     {
-        FreeLibrary( *p_hmsdmo_dll );
         /* return VLC_EGENERIC; */
         /* Try loading the dll directly */
         goto loader;
@@ -703,7 +682,6 @@ static int LoadDMO( vlc_object_t *p_this, HINSTANCE *p_hmsdmo_dll,
 
     if( !*pp_dmo )
     {
-        FreeLibrary( *p_hmsdmo_dll );
         /* return VLC_EGENERIC; */
         /* Try loading the dll directly */
         goto loader;

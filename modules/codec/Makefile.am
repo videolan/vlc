@@ -629,7 +629,7 @@ codec_LTLIBRARIES += $(LTLIBqsv)
 libdmo_plugin_la_SOURCES = codec/dmo/dmo.c codec/dmo/dmo.h codec/dmo/buffer.c
 libdmo_plugin_la_LIBADD = $(LIBM)
 if HAVE_WIN32
-libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid
+libdmo_plugin_la_LIBADD += $(LIBCOM) -luuid -lmsdmo
 if !HAVE_WINSTORE
 codec_LTLIBRARIES += libdmo_plugin.la
 endif

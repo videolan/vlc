@@ -708,6 +708,7 @@ if host_system == 'windows'
             ),
         'dependencies': [
             cc.find_library('uuid'),
+            cc.find_library('msdmo'),
         ],
         'enabled' : have_win_desktop,
     }
