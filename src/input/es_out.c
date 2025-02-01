@@ -3990,13 +3990,6 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     case ES_OUT_PRIV_SET_EOS:
     {
         EsOutDrain(p_sys);
-        es_out_id_t *id;
-        if( p_sys->b_draining )
-            return VLC_SUCCESS;
-        foreach_es_then_es_slaves(id)
-            if (id->p_dec != NULL)
-                EsOutDrainDecoder(p_sys, id, false);
-        p_sys->b_draining = true;
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_VBI_PAGE:
