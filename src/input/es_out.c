@@ -3980,6 +3980,7 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     }
     case ES_OUT_PRIV_SET_EOS:
     {
+        EsOutDrain(p_sys);
         es_out_id_t *id;
         foreach_es_then_es_slaves(id)
             if (id->p_dec != NULL)
