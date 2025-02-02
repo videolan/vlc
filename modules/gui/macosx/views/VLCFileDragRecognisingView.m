@@ -51,6 +51,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    [self unregisterDraggedTypes];
+}
+
 - (void)awakeFromNib
 {
     [self setupDragRecognition];
