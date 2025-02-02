@@ -36,9 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface VLCDragDropView : NSView
+@interface VLCDragDropView : VLCFileDragRecognisingView
 
-@property (nonatomic, assign) id<VLCDragDropTarget> dropTarget;
 @property (nonatomic, assign) BOOL drawBorder;
 
 - (void)enablePlayQueueItems;

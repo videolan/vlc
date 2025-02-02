@@ -47,7 +47,7 @@
 
 - (void)enablePlayQueueItems
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObjects:NSFilenamesPboardType, nil]];
+    [self setupDragRecognition];
 }
 
 - (BOOL)mouseDownCanMoveWindow
@@ -55,14 +55,9 @@
     return YES;
 }
 
-- (void)dealloc
-{
-    [self unregisterDraggedTypes];
-}
-
 - (void)awakeFromNib
 {
-    [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+    [super awakeFromNib];
     self.wantsLayer = YES;
     self.layer.cornerRadius = 5.;
     [self updateBorderColor];
@@ -75,14 +70,11 @@
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric) {
-        if (self.drawBorder) {
-            self.layer.borderWidth = 5.;
-        }
-        return NSDragOperationCopy;
+    const NSDragOperation operation = [super draggingEntered:sender];
+    if (operation != NSDragOperationNone && self.drawBorder) {
+        self.layer.borderWidth = 5.;
     }
-
-    return NSDragOperationNone;
+    return operation;
 }
 
 - (void)draggingEnded:(id <NSDraggingInfo>)sender
@@ -93,27 +85,6 @@
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
     self.layer.borderWidth = 0.;
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-    return YES;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-    BOOL returnValue = NO;
-    NSPasteboard *pasteBoard = [sender draggingPasteboard];
-    if (!pasteBoard) {
-        return NO;
-    }
-
-    if (_dropTarget) {
-        returnValue = [_dropTarget handlePasteBoardFromDragSession:pasteBoard];
-    }
-
-    [self setNeedsDisplay:YES];
-    return returnValue;
 }
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
