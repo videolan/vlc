@@ -405,30 +405,28 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
 - (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)paste
 {
-    id propertyList = [paste propertyListForType:NSFilenamesPboardType];
+    const id propertyList = [paste propertyListForType:NSFilenamesPboardType];
     if (propertyList == nil) {
         return NO;
     }
 
-    NSArray *values = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-    NSUInteger valueCount = [values count];
+    NSArray * const values = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    const NSUInteger valueCount = values.count;
     if (valueCount > 0) {
-        NSMutableArray *metadataArray = [NSMutableArray arrayWithCapacity:valueCount];
+        NSMutableArray * const metadataArray = [NSMutableArray arrayWithCapacity:valueCount];
 
-        for (NSString *filepath in values) {
-            VLCOpenInputMetadata *inputMetadata;
-
-            inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
-            if (!inputMetadata)
+        for (NSString * const filepath in values) {
+            VLCOpenInputMetadata * const inputMetadata =
+                [VLCOpenInputMetadata inputMetaWithPath:filepath];
+            if (!inputMetadata) {
                 continue;
-
+            }
             [metadataArray addObject:inputMetadata];
         }
-        [_playQueueController addPlayQueueItems:metadataArray];
 
+        [_playQueueController addPlayQueueItems:metadataArray];
         return YES;
     }
-
     return NO;
 }
 
