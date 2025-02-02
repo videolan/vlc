@@ -35,7 +35,7 @@
 /*****************************************************************************
  * VLCVoutView interface
  *****************************************************************************/
-@interface VLCVoutView : NSView
+@interface VLCVoutView : VLCFileDragRecognisingView
 
 @property (readwrite, assign) vout_thread_t * voutThread;
 @property (readwrite, assign) vlc_window_t *voutWindow;
