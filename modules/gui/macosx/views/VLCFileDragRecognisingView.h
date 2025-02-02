@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCFileDragRecognisingView : NSView
 
+- (void)setupDragRecognition;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -24,4 +24,9 @@
 
 @implementation VLCFileDragRecognisingView
 
+- (void)setupDragRecognition
+{
+    [self registerForDraggedTypes:@[NSFilenamesPboardType]];
+}
+
 @end
