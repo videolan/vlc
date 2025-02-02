@@ -99,7 +99,7 @@
 
 - (void)setup
 {
-    [self registerForDraggedTypes:@[NSFilenamesPboardType]];
+    self.dropTarget = self;
     i_lastScrollWheelDirection = 0;
     f_cumulated_magnification = 0.0;
 
@@ -109,7 +109,8 @@
     vlc_mutex_init(&_mutex);
 }
 
-- (void)layout {
+- (void)layout
+{
     NSRect bounds = [self convertRectToBacking:self.bounds];
     // dispatch the event async to prevent potential deadlock 
     // with video output's RenderPicture's display lock
@@ -396,6 +397,11 @@
 - (void)beginGestureWithEvent:(NSEvent *)event
 {
     f_cumulated_magnification = 0.0;
+}
+
+- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)pasteboard
+{
+    return [VLCFileDragRecognisingView handlePasteboardFromDragSessionAsPlayQueueItems:pasteboard];
 }
 
 @end
