@@ -35,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) id<VLCDragDropTarget> dropTarget;
 
++ (BOOL)handlePasteboardFromDragSessionAsPlayQueueItems:(NSPasteboard *)pasteboard;
 - (void)setupDragRecognition;
 
 @end

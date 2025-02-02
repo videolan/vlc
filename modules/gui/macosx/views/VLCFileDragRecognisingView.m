@@ -22,7 +22,37 @@
 
 #import "VLCFileDragRecognisingView.h"
 
+#import "main/VLCMain.h"
+#import "playqueue/VLCPlayQueueController.h"
+#import "windows/VLCOpenInputMetadata.h"
+
 @implementation VLCFileDragRecognisingView
+
++ (BOOL)handlePasteboardFromDragSessionAsPlayQueueItems:(NSPasteboard *)pasteboard
+{
+    const id propertyList = [pasteboard propertyListForType:NSFilenamesPboardType];
+    if (propertyList == nil) {
+        return NO;
+    }
+
+    NSArray * const values = [propertyList sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
+    const NSUInteger valueCount = values.count;
+    if (valueCount <= 0) {
+        return NO;
+    }
+
+    NSMutableArray * const metadataArray = [NSMutableArray arrayWithCapacity:valueCount];
+
+    for (NSString * const filepath in values) {
+        VLCOpenInputMetadata * const inputMetadata = [VLCOpenInputMetadata inputMetaWithPath:filepath];
+        if (inputMetadata != nil) {
+            [metadataArray addObject:inputMetadata];
+        }
+    }
+
+    [VLCMain.sharedInstance.playQueueController addPlayQueueItems:metadataArray];
+    return YES;
+}
 
 - (instancetype)init
 {
