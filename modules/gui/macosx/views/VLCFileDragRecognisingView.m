@@ -66,4 +66,12 @@
     [self registerForDraggedTypes:@[NSFilenamesPboardType]];
 }
 
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
+{
+    if ((NSDragOperationGeneric & [sender draggingSourceOperationMask]) == NSDragOperationGeneric) {
+        return NSDragOperationCopy;
+    }
+    return NSDragOperationNone;
+}
+
 @end
