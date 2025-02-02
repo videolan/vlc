@@ -24,6 +24,33 @@
 
 @implementation VLCFileDragRecognisingView
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [self setupDragRecognition];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [self setupDragRecognition];
+    }
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect
+{
+    self = [super initWithFrame:frameRect];
+    if (self) {
+        [self setupDragRecognition];
+    }
+    return self;
+}
+
 - (void)setupDragRecognition
 {
     [self registerForDraggedTypes:@[NSFilenamesPboardType]];
