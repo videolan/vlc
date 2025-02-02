@@ -24,7 +24,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol VLCDragDropTarget
+
+@required
+- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)pasteboard;
+
+@end
+
 @interface VLCFileDragRecognisingView : NSView
+
+@property (nonatomic, assign) id<VLCDragDropTarget> dropTarget;
 
 - (void)setupDragRecognition;
 

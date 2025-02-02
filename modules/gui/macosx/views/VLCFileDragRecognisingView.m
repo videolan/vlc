@@ -74,4 +74,18 @@
     return NSDragOperationNone;
 }
 
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
+{
+    NSPasteboard * const pasteboard = [sender draggingPasteboard];
+    if (pasteboard == nil) {
+        return NO;
+    }
+
+    [self setNeedsDisplay:YES];
+    if (self.dropTarget) {
+        return [self.dropTarget handlePasteBoardFromDragSession:pasteboard];
+    }
+    return NO;
+}
+
 @end

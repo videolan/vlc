@@ -24,6 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "views/VLCFileDragRecognisingView.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /*****************************************************************************
@@ -32,11 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
  *****************************************************************************/
 @interface VLCDropDisabledImageView : NSImageView
 
-@end
-
-@protocol VLCDragDropTarget
-@required
-- (BOOL)handlePasteBoardFromDragSession:(NSPasteboard *)aPasteboard;
 @end
 
 @interface VLCDragDropView : NSView

@@ -30,6 +30,8 @@
 #import <vlc_vout.h>
 #import <vlc_window.h>
 
+#import "views/VLCFileDragRecognisingView.h"
+
 /*****************************************************************************
  * VLCVoutView interface
  *****************************************************************************/
