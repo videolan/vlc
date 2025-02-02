@@ -51,6 +51,11 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+    [self setupDragRecognition];
+}
+
 - (void)setupDragRecognition
 {
     [self registerForDraggedTypes:@[NSFilenamesPboardType]];
