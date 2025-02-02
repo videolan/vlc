@@ -74,6 +74,11 @@
     return NSDragOperationNone;
 }
 
+- (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender
+{
+    return YES;
+}
+
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
 {
     NSPasteboard * const pasteboard = [sender draggingPasteboard];
