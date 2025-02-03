@@ -667,13 +667,13 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
+            'c_args' : [ contrib_inc_args ],
             'cpp_args' : libcom_cppflags,
             'link_with' : [ d3d11_common_lib ],
             'include_directories' : [
                 vlc_include_dirs,
                 include_directories('avcodec')
             ],
-            'dependencies' : [avcodec_dep, avutil_dep],
         }
     endif
 
@@ -691,12 +691,13 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
+            'c_args' : [ contrib_inc_args ],
             'link_with' : [ d3d9_common_lib ],
             'include_directories' : [
                 vlc_include_dirs,
                 include_directories('avcodec')
             ],
-            'dependencies' : [avcodec_dep, avutil_dep, cc.find_library('dxva2')],
+            'dependencies' : [cc.find_library('dxva2')],
         }
     endif
 
