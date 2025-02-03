@@ -57,21 +57,43 @@ class PlaylistListModel;
     type m_##name = defaultValue;
 
 
-class StringListMenu : public QObject
+class BasicMenuContainer : public QObject
 {
     Q_OBJECT
 
     SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
+    Q_PROPERTY(bool visible READ visible NOTIFY visibleChanged FINAL)
 
 public:
     using QObject::QObject;
+
+    bool visible() const { return m_visible; }
+
+signals:
+    void visibleChanged();
+
+protected:
+    QMenu *newMenu();
+
+private:
+    void setVisible(bool visible);
+
+    bool m_visible = false;
+    QPointer<QMenu> m_prevMenu;
+};
+
+class StringListMenu : public BasicMenuContainer
+{
+    Q_OBJECT
+
+public:
+    using BasicMenuContainer::BasicMenuContainer;
 
     Q_INVOKABLE void popup(const QPoint &point, const QVariantList &stringList);
 
 signals:
     void selected(int index, const QString &str);
 };
-
 
 class SortMenu : public QObject
 {
@@ -360,18 +382,15 @@ protected: // QmlTrackMenu implementation
     void beforePopup(QMenu * menu) override;
 };
 
-class PlaylistListContextMenu : public QObject {
+class PlaylistListContextMenu : public BasicMenuContainer {
     Q_OBJECT
 
-    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
     SIMPLE_MENU_PROPERTY(MLPlaylistListModel *, model, nullptr)
 public:
     PlaylistListContextMenu(QObject * parent = nullptr);
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
-private:
-    std::unique_ptr<QMenu> m_menu;
 };
 
 class QmlAudioContextMenu : public VLCMenuBar
@@ -389,44 +408,45 @@ private:
     std::unique_ptr<QMenu> m_menu;
 };
 
-class PlaylistMediaContextMenu : public QObject {
+class PlaylistMediaContextMenu : public BasicMenuContainer {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(MLPlaylistModel *, model, nullptr)
-    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
 public:
-    PlaylistMediaContextMenu(QObject * parent = nullptr);
+    using BasicMenuContainer::BasicMenuContainer;
 
 public slots:
     void popup(const QModelIndexList & selected, QPoint pos, QVariantMap options = {});
 signals:
     void showMediaInformation(int index);
-private:
-    std::unique_ptr<QMenu> m_menu;
 };
 
-class NetworkMediaContextMenu : public QObject {
+class NetworkMediaContextMenu : public BasicMenuContainer {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(NetworkMediaModel*, model, nullptr)
-    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
 public:
-    NetworkMediaContextMenu(QObject* parent = nullptr);
+        using BasicMenuContainer::BasicMenuContainer;
 
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
-private:
-    std::unique_ptr<QMenu> m_menu;
+    void tableView_popup(int /*current*/, const QModelIndexList &selected, QPoint pos)
+    {
+        popup(selected, pos);
+    }
 };
 
-class NetworkDeviceContextMenu : public QObject {
+class NetworkDeviceContextMenu : public BasicMenuContainer {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(NetworkDeviceModel*, model, nullptr)
-    SIMPLE_MENU_PROPERTY(MainCtx *, ctx, nullptr)
 public:
-    NetworkDeviceContextMenu(QObject* parent = nullptr);
+    using BasicMenuContainer::BasicMenuContainer;
+
 public slots:
     void popup(const QModelIndexList& selected, QPoint pos );
-private:
-    std::unique_ptr<QMenu> m_menu;
+    void tableView_popup(int /*current*/, const QModelIndexList &selected, QPoint pos)
+    {
+        popup(selected, pos);
+    }
+
 };
 
 class PlaylistContextMenu : public QObject {

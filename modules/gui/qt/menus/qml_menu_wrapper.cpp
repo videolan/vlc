@@ -71,8 +71,7 @@ namespace
 void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
 {
     assert(m_ctx);
-    QMenu *m = new VLCMenu(m_ctx->getIntf());
-    m->setAttribute(Qt::WA_DeleteOnClose);
+    QMenu *m = newMenu();
 
     for (int i = 0; i != stringList.size(); ++i)
     {
@@ -84,6 +83,30 @@ void StringListMenu::popup(const QPoint &point, const QVariantList &stringList)
     }
 
     m->popup(point);
+}
+
+QMenu *BasicMenuContainer::newMenu()
+{
+    QMenu *m = new VLCMenu(m_ctx->getIntf());
+    m->setAttribute(Qt::WA_DeleteOnClose);
+    if (m_prevMenu)
+    {
+        setVisible(false);
+        m_prevMenu->disconnect(this);
+    }
+
+    m_prevMenu = m;
+    connect(m, &QMenu::aboutToShow, this, [this](){ setVisible(true);});
+    connect(m, &QMenu::aboutToHide, this, [this](){ setVisible(false);});
+    return m;
+}
+
+void BasicMenuContainer::setVisible(bool visible)
+{
+    if (m_visible == visible) return;
+
+    m_visible = visible;
+    emit visibleChanged();
 }
 
 // SortMenu
@@ -771,7 +794,7 @@ void QmlAudioContextMenu::popup(const QPoint & position)
 //=================================================================================================
 
 PlaylistListContextMenu::PlaylistListContextMenu(QObject * parent)
-    : QObject(parent)
+    : BasicMenuContainer(parent)
 {}
 
 
@@ -787,17 +810,17 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
     for (const QModelIndex & modelIndex : selected)
         ids.push_back(m_model->data(modelIndex, MLPlaylistListModel::PLAYLIST_ID));
 
-    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
+    auto menu = newMenu();
 
     MediaLib * ml = m_model->ml();
 
-    QAction * action = m_menu->addAction(qtr("Add and play"));
+    QAction * action = menu->addAction(qtr("Add and play"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids);
     });
 
-    action = m_menu->addAction(qtr("Enqueue"));
+    action = menu->addAction(qtr("Enqueue"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addToPlaylist(ids);
@@ -805,7 +828,7 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
 
     if (ids.count() == 1)
     {
-        action = m_menu->addAction(qtr("Rename"));
+        action = menu->addAction(qtr("Rename"));
 
         QModelIndex index = selected.first();
 
@@ -814,20 +837,19 @@ void PlaylistListContextMenu::popup(const QModelIndexList & selected, QPoint pos
         });
     }
 
-    action = m_menu->addAction(qtr("Delete"));
+    action = menu->addAction(qtr("Delete"));
 
     connect(action, &QAction::triggered, [this, ids]() {
         m_model->deletePlaylists(ids);
     });
 
-    m_menu->popup(pos);
+    menu->popup(pos);
 }
 
 //=================================================================================================
 // PlaylistMediaContextMenu
 //=================================================================================================
 
-PlaylistMediaContextMenu::PlaylistMediaContextMenu(QObject * parent) : QObject(parent) {}
 
 void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint pos,
                                      QVariantMap options)
@@ -842,38 +864,38 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
     for (const QModelIndex& modelIndex : selected)
         ids.push_back(m_model->data(modelIndex, MLPlaylistModel::MEDIA_ID));
 
-    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
+    auto menu =newMenu();
 
     MediaLib * ml = m_model->ml();
 
-    QAction * action = m_menu->addAction(qtr("Add and play"));
+    QAction * action = menu->addAction(qtr("Add and play"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids);
     });
 
-    action = m_menu->addAction(qtr("Enqueue"));
+    action = menu->addAction(qtr("Enqueue"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addToPlaylist(ids);
     });
 
-    action = m_menu->addAction(qtr("Add to playlist"));
+    action = menu->addAction(qtr("Add to playlist"));
 
     connect(action, &QAction::triggered, [ids]() {
         DialogsProvider::getInstance()->playlistsDialog(ids);
     });
 
-    action = m_menu->addAction(qtr("Play as audio"));
+    action = menu->addAction(qtr("Play as audio"));
 
     connect(action, &QAction::triggered, [ml, ids]() {
         ml->addAndPlay(ids, {":no-video"});
     });
 
     if (options.contains("information") && options["information"].typeId() == QMetaType::Int) {
-        action = m_menu->addAction(qtr("Information"));
+        action = menu->addAction(qtr("Information"));
 
-        QSignalMapper * mapper = new QSignalMapper(m_menu.get());
+        QSignalMapper * mapper = new QSignalMapper(menu);
 
         connect(action, &QAction::triggered, mapper, QOverload<>::of(&QSignalMapper::map));
 
@@ -882,9 +904,9 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
                 this, &PlaylistMediaContextMenu::showMediaInformation);
     }
 
-    m_menu->addSeparator();
+    menu->addSeparator();
 
-    action = m_menu->addAction(qtr("Remove Selected"));
+    action = menu->addAction(qtr("Remove Selected"));
 
     action->setIcon(QIcon(":/menu/remove.svg"));
 
@@ -892,14 +914,10 @@ void PlaylistMediaContextMenu::popup(const QModelIndexList & selected, QPoint po
         m_model->remove(selected);
     });
 
-    m_menu->popup(pos);
+    menu->popup(pos);
 }
 
 //=================================================================================================
-
-NetworkMediaContextMenu::NetworkMediaContextMenu(QObject* parent)
-    : QObject(parent)
-{}
 
 void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
@@ -908,15 +926,15 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     if (!m_model)
         return;
 
-    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
+    auto menu = newMenu();
     QAction* action;
 
-    action = m_menu->addAction( qtr("Add and play") );
+    action = menu->addAction( qtr("Add and play") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = m_menu->addAction( qtr("Enqueue") );
+    action = menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
@@ -940,7 +958,7 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
     if (canBeIndexed)
     {
         bool removeFromML = countIndexed > 0;
-        action = m_menu->addAction(removeFromML
+        action = menu->addAction(removeFromML
             ? qtr("Remove from Media Library")
             : qtr("Add to Media Library"));
 
@@ -951,12 +969,8 @@ void NetworkMediaContextMenu::popup(const QModelIndexList& selected, QPoint pos)
         });
     }
 
-    m_menu->popup(pos);
+    menu->popup(pos);
 }
-
-NetworkDeviceContextMenu::NetworkDeviceContextMenu(QObject* parent)
-    : QObject(parent)
-{}
 
 void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos)
 {
@@ -965,20 +979,20 @@ void NetworkDeviceContextMenu::popup(const QModelIndexList& selected, QPoint pos
     if (!m_model)
         return;
 
-    m_menu = std::make_unique<VLCMenu>(m_ctx->getIntf());
+    auto menu = newMenu();
     QAction* action;
 
-    action = m_menu->addAction( qtr("Add and play") );
+    action = menu->addAction( qtr("Add and play") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addAndPlay(selected);
     });
 
-    action = m_menu->addAction( qtr("Enqueue") );
+    action = menu->addAction( qtr("Enqueue") );
     connect(action, &QAction::triggered, [this, selected]( ) {
         m_model->addToPlaylist(selected);
     });
 
-    m_menu->popup(pos);
+    menu->popup(pos);
 }
 
 PlaylistContextMenu::PlaylistContextMenu(QObject* parent)
