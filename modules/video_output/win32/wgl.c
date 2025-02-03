@@ -180,8 +180,8 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
         msg_Err(gl, "Could not get the device context");
         goto error;
     }
-    sys->hOpengl = LoadLibraryExA("opengl32.dll", NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
-    if (sys->hOpengl == NULL)
+    sys->hOpengl = GetModuleHandleA("opengl32.dll");
+    if (unlikely(sys->hOpengl == NULL))
     {
         msg_Err(gl, "Could not get the opengl32 DLL");
         goto error;
@@ -257,8 +257,6 @@ static void Close(vlc_gl_t *gl)
         wglDeleteContext(sys->hGLRC);
     if (sys->hGLDC)
         ReleaseDC(sys->hvideownd, sys->hGLDC);
-    if (sys->hOpengl)
-        FreeLibrary(sys->hOpengl);
 
     DestroyGPUAffinityDC(gl);
 
