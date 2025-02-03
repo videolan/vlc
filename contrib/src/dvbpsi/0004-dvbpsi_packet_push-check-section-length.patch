@@ -1,0 +1,35 @@
+From 029b69147ea866b6ff5b938ef32cdfd8a8603303 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Mon, 18 Nov 2024 17:35:52 +0700
+Subject: [PATCH 4/4] dvbpsi_packet_push: check section length
+
+---
+ src/dvbpsi.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/dvbpsi.c b/src/dvbpsi.c
+index 6b5641a..89444c5 100644
+--- a/src/dvbpsi.c
++++ b/src/dvbpsi.c
+@@ -377,12 +377,14 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
+ 
+             if (!p_decoder->b_complete_header)
+             {
+-                /* Header is complete */
+-                p_decoder->b_complete_header = true;
+                 /* Compute p_section->i_length and update p_decoder->i_need */
+-                p_decoder->i_need = p_section->i_length
+-                                  = ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
++                p_section->i_length = ((uint16_t)(p_section->p_data[1] & 0xf)) << 8
+                                        | p_section->p_data[2];
++                if(p_section->i_length > 4093)
++                    return false;
++                p_decoder->i_need = p_section->i_length;
++                /* Header is complete */
++                p_decoder->b_complete_header = true;
+                 /* Check that the section isn't too long */
+                 if (p_decoder->i_need > p_decoder->i_section_max_size - 3)
+                 {
+-- 
+2.48.1
+
