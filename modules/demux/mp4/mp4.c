@@ -933,10 +933,10 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
     if( p_block == NULL )
         return;
 
-    if ( p_track->b_chans_reorder )
+    if ( p_track->i_chans_to_reorder )
     {
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                             p_track->fmt.audio.i_channels,
+                             p_track->i_chans_to_reorder,
                              p_track->rgi_chans_reordering,
                              p_track->fmt.i_codec );
     }
@@ -3158,7 +3158,7 @@ static void TrackConfigApply( const track_config_t *p_cfg,
      p_track->p_asf = p_cfg->p_asf;
      memcpy( p_track->rgi_chans_reordering, p_cfg->rgi_chans_reordering,
              AOUT_CHAN_MAX * sizeof(p_cfg->rgi_chans_reordering[0]) );
-     p_track->b_chans_reorder = p_cfg->b_chans_reorder;
+     p_track->i_chans_to_reorder = p_cfg->i_chans_to_reorder;
      p_track->b_forced_spu = p_cfg->b_forced_spu;
      p_track->i_block_flags = p_cfg->i_block_flags;
      p_track->b_ignore_implicit_pts = p_cfg->b_ignore_implicit_pts;

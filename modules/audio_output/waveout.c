@@ -364,7 +364,7 @@ static void Play( audio_output_t *p_aout, block_t *block, vlc_tick_t date )
     if( block && sys->chans_to_reorder )
     {
         aout_ChannelReorder( block->p_buffer, block->i_buffer,
-                             sys->waveformat.Format.nChannels,
+                             sys->chans_to_reorder,
                              sys->chan_table, sys->format );
     }
     while( PlayWaveOut( p_aout, sys->h_waveout, p_waveheader, block,

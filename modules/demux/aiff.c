@@ -78,7 +78,7 @@ typedef struct
 
     vlc_tick_t  i_time;
 
-    bool        b_reorder;
+    uint8_t     i_chans_to_reorder;
     uint8_t     pi_chan_table[AOUT_CHAN_MAX];
     vlc_meta_t  *p_meta;
     vlc_fourcc_t audio_fourcc;
@@ -187,7 +187,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
-    p_sys->b_reorder = false;
+    p_sys->i_chans_to_reorder = 0;
     es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
 
     const uint32_t *pi_channels_in = NULL;
@@ -273,7 +273,7 @@ static int Open( vlc_object_t *p_this )
 
     if( pi_channels_in != NULL )
     {
-        p_sys->b_reorder =
+        p_sys->i_chans_to_reorder =
             aout_CheckChannelReorder( pi_channels_in, NULL,
                                       p_sys->fmt.audio.i_physical_channels,
                                       p_sys->pi_chan_table ) > 0;
@@ -281,7 +281,7 @@ static int Open( vlc_object_t *p_this )
             vlc_fourcc_GetCodecAudio( p_sys->fmt.i_codec,
                                       p_sys->fmt.audio.i_bitspersample );
         if( p_sys->audio_fourcc == 0 )
-            p_sys->b_reorder = false;
+            p_sys->i_chans_to_reorder = 0;
     }
 
     p_sys->i_ssnd_start = p_sys->i_ssnd_pos + 16 + p_sys->i_ssnd_offset;
@@ -359,9 +359,9 @@ static int Demux( demux_t *p_demux )
                                            p_sys->i_ssnd_fsize) /
                      p_sys->fmt.audio.i_rate;
 
-    if( p_sys->b_reorder )
+    if( p_sys->i_chans_to_reorder )
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                             p_sys->fmt.audio.i_channels, p_sys->pi_chan_table,
+                             p_sys->i_chans_to_reorder, p_sys->pi_chan_table,
                              p_sys->audio_fourcc );
     /* */
     es_out_Send( p_demux->out, p_sys->es, p_block );

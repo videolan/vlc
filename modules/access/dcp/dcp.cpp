@@ -738,7 +738,7 @@ static int Demux( demux_t *p_demux )
 
         if( p_sys->i_chans_to_reorder )
             aout_ChannelReorder( p_audio_frame->p_buffer, p_audio_frame->i_buffer,
-                    p_sys->i_channels,
+                    p_sys->i_chans_to_reorder,
                     p_sys->pi_chan_table, VLC_CODEC_S24L );
 
         p_audio_frame->i_buffer = AudioFrameBuff.Size();

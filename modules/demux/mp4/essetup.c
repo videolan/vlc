@@ -1261,10 +1261,11 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
         {
             const unsigned i_bps = aout_BitsPerSample( p_fmt->i_codec );
             /* Uncompressed audio */
-            if( i_bps && aout_CheckChannelReorder( p_rg_chans_order, NULL,
-                                                   i_vlc_mapping,
-                                                   p_cfg->rgi_chans_reordering ) )
-                p_cfg->b_chans_reorder = true;
+            if( i_bps )
+                 p_cfg->i_chans_to_reorder =
+                    aout_CheckChannelReorder( p_rg_chans_order, NULL,
+                                              i_vlc_mapping,
+                                              p_cfg->rgi_chans_reordering );
 
             /* we can only set bitmap for VLC mapping or [re]mapped pcm audio
              * as vlc can't enumerate channels for compressed content */
