@@ -92,7 +92,7 @@ typedef struct
     uint32_t    i_block_flags;
     uint32_t    i_next_block_flags;
     uint8_t     rgi_chans_reordering[AOUT_CHAN_MAX];
-    bool        b_chans_reorder;
+    uint8_t     i_chans_to_reorder;
     es_out_id_t *p_es;
 
     /* display size only ! */

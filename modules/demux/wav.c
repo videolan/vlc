@@ -481,7 +481,7 @@ static int Demux( demux_t *p_demux )
     /* Do the channel reordering */
     if( p_sys->i_chans_to_reorder )
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                             p_sys->fmt.audio.i_channels,
+                             p_sys->i_chans_to_reorder,
                              p_sys->pi_chan_table, p_sys->fmt.i_codec );
 
     es_out_Send( p_demux->out, p_sys->p_es, p_block );

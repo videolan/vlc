@@ -356,7 +356,7 @@ static void Play( audio_output_t *p_aout, block_t *block )
     if( block && p_aout->sys->chans_to_reorder )
     {
         aout_ChannelReorder( block->p_buffer, block->i_buffer,
-                             p_aout->sys->waveformat.Format.nChannels,
+                             p_aout->sys->chans_to_reorder,
                              p_aout->sys->chan_table, p_aout->sys->format );
     }
     while( PlayWaveOut( p_aout, p_aout->sys->h_waveout, p_waveheader, block,

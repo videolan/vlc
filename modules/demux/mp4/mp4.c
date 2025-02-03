@@ -706,10 +706,10 @@ static void MP4_Block_Send( demux_t *p_demux, mp4_track_t *p_track, block_t *p_b
     if( p_block == NULL )
         return;
 
-    if ( p_track->b_chans_reorder )
+    if ( p_track->i_chans_to_reorder )
     {
         aout_ChannelReorder( p_block->p_buffer, p_block->i_buffer,
-                             p_track->fmt.audio.i_channels,
+                             p_track->i_chans_to_reorder,
                              p_track->rgi_chans_reordering,
                              p_track->fmt.i_codec );
     }
