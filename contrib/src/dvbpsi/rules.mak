@@ -20,6 +20,10 @@ libdvbpsi: libdvbpsi-$(DVBPSI_VERSION).tar.bz2 .sum-dvbpsi
 	$(APPLY) $(SRC)/dvbpsi/dvbpsi-sys-types.patch
 	$(APPLY) $(SRC)/dvbpsi/0001-really-identify-duplicates.patch
 	$(APPLY) $(SRC)/dvbpsi/0002-really-reset-packet-counter.patch
+	$(APPLY) $(SRC)/dvbpsi/0001-dvbpsi_packet_push-compute-sizes-using-pointer-to-en.patch
+	$(APPLY) $(SRC)/dvbpsi/0002-dvbpsi_packet_push-check-adaptation-field-length.patch
+	$(APPLY) $(SRC)/dvbpsi/0003-dvbpsi_packet_push-check-section-pointers-field.patch
+	$(APPLY) $(SRC)/dvbpsi/0004-dvbpsi_packet_push-check-section-length.patch
 	$(MOVE)
 
 .dvbpsi: libdvbpsi

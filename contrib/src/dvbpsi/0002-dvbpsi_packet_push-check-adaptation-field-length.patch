@@ -1,0 +1,28 @@
+From f3f354fa18aaf9ebbe37b74d6fe91409a3dd8a75 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Mon, 18 Nov 2024 13:20:15 +0700
+Subject: [PATCH 2/4] dvbpsi_packet_push: check adaptation field length
+
+---
+ src/dvbpsi.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/dvbpsi.c b/src/dvbpsi.c
+index a11d70a..0c8c440 100644
+--- a/src/dvbpsi.c
++++ b/src/dvbpsi.c
+@@ -315,7 +315,11 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, uint8_t* p_data)
+ 
+     /* Skip the adaptation_field if present */
+     if (p_data[3] & 0x20)
++    {
+         p_payload_pos = p_data + 5 + p_data[4];
++	if(p_payload_pos >= p_data_end)
++	    return false;
++    }
+     else
+         p_payload_pos = p_data + 4;
+ 
+-- 
+2.48.1
+
