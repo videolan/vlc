@@ -909,45 +909,6 @@ static void *Thread( void *obj )
     QApplication app( argc, argv );
     app.setProperty("initialStyle", app.style()->objectName());
 
-#if defined(_WIN32)
-    // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
-    //       We have to manually pick a graphics api here, since the default graphics
-    //       api (Direct3D 11.2) may not be supported.
-
-    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
-        qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
-        (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
-    {
-        // If OS version is lower than Windows 8.1, and Qt version is lower than
-        // 6.6.0, do not take risk and use OpenGL (since probing is not available).
-        // If OS version is greater than or equal to Windows 8.1, and Qt version is
-        // lower than 6.6.0, take risk and do not use the fallback procedure.
-        // Qt in the contribs is already version 6.7.0, so this should not be a
-        // concern.
-        if ((QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows8_1) ||
-            (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)))
-        {
-            // TODO: Probe D3D12 when it becomes the default.
-            // If probing is not available, use OpenGL as a compromise:
-            QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
-            QRhiD3D11InitParams params;
-            if (QRhi::probe(QRhi::D3D11, &params))
-                graphicsApi = QSGRendererInterface::Direct3D11;
-            else
-            {
-                QRhiGles2InitParams params1;
-                params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
-                if (!QRhi::probe(QRhi::OpenGLES2, &params1))
-                    graphicsApi = QSGRendererInterface::Software;
-                delete params1.fallbackSurface;
-            }
-#endif
-            QQuickWindow::setGraphicsApi(graphicsApi);
-        }
-    }
-#endif
-
     {
         // Install custom translator:
         const auto translator = new Translator(&app);
@@ -983,6 +944,68 @@ static void *Thread( void *obj )
             QSettings::NativeFormat,
 #endif
             QSettings::UserScope, "vlc", "vlc-qt-interface" );
+
+#if defined(_WIN32)
+    // NOTE: Qt Quick does not have a cross-API RHI fallback procedure (as of Qt 6.7.1).
+    //       We have to manually pick a graphics api here, since the default graphics
+    //       api (Direct3D 11.2) may not be supported.
+    static const auto probeRhi = []() -> QSGRendererInterface::GraphicsApi {
+        QSGRendererInterface::GraphicsApi graphicsApi = QSGRendererInterface::OpenGL;
+        // TODO: Probe D3D12 when it becomes the default.
+        QRhiD3D11InitParams params;
+        if (QRhi::probe(QRhi::D3D11, &params))
+            graphicsApi = QSGRendererInterface::Direct3D11;
+        else
+        {
+            QRhiGles2InitParams params1;
+            params1.fallbackSurface = QRhiGles2InitParams::newFallbackSurface();
+            if (!QRhi::probe(QRhi::OpenGLES2, &params1))
+                graphicsApi = QSGRendererInterface::Software;
+            delete params1.fallbackSurface;
+        }
+        return graphicsApi;
+    };
+
+    if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
+        qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
+        (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
+    {
+        static const char* const graphicsApiKey = "graphics-api";
+        const QVariant graphicsApiValue = p_intf->mainSettings->value(graphicsApiKey);
+        // settings value can be string (ini file), do not use `typeId()`:
+        if (graphicsApiValue.isValid() && Q_LIKELY(graphicsApiValue.canConvert<int>()))
+        {
+            // A cached (by then) valid graphics api is found, use it:
+            QQuickWindow::setGraphicsApi(static_cast<QSGRendererInterface::GraphicsApi>(graphicsApiValue.value<int>()));
+            // Asynchronous re-probe to see if the cached graphics api is still applicable.
+            // If not, QQuickWindow is going to emit scene graph error, and the application is
+            // likely going to terminate. However, when the user starts the application again
+            // there will not be an error thanks to this. We can not prevent the error, as
+            // it is decided to not make compositor initializaation wait to not reduce the startup
+            // speed. Startup time is defined as the time it takes to start playing the initial
+            // item. Currently the player waits for the interface, and QQuickWindow initialization
+            // is therefore not enforced to be synchronous (`QWindow::setVisible(true)` which
+            // initializes the scene graph thus rhi is asynchronous).
+            QMetaObject::invokeMethod(&app, [settings = QPointer(p_intf->mainSettings)]() {
+                // We can not use `QQuickWindow::setGraphicsApi()` here, as QQuickWindow
+                // may have already tried to initialize the scene graph hence rhi. If the
+                // cached graphics api is not optimal or not available anymore, the next
+                // startup will use the refreshed value. That's the best we can do here
+                // without forcing QQuickWindow to wait (hence delaying startup).
+                assert(settings);
+                settings->setValue(graphicsApiKey, static_cast<int>(probeRhi()));
+                settings->sync();
+            }, Qt::QueuedConnection); // Asynchronous, so probing here does not cause start-up slowdown.
+        }
+        else
+        {
+            const QSGRendererInterface::GraphicsApi graphicsApi = probeRhi();
+            QQuickWindow::setGraphicsApi(graphicsApi);
+            p_intf->mainSettings->setValue(graphicsApiKey, static_cast<int>(graphicsApi));
+            p_intf->mainSettings->sync();
+        }
+    }
+#endif
 
     app.setApplicationDisplayName( qtr("VLC media player") );
 
