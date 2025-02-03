@@ -612,13 +612,13 @@ static int CropBorderCallback(vlc_object_t *object, char const *cmd,
 
 bool GetAspectRatio(const char *ar_str, vlc_rational_t *ar)
 {
-    if (sscanf(ar_str, "%u:%u", &ar->num, &ar->den) == 2 &&
-        (ar->num != 0) == (ar->den != 0))
-        return true;
-    else if (*ar_str == '\0') {
+    if (*ar_str == '\0') {
         *ar = VLC_DAR_FROM_SOURCE;
         return true;
     }
+    if (sscanf(ar_str, "%u:%u", &ar->num, &ar->den) == 2 &&
+        (ar->num != 0) == (ar->den != 0))
+        return true;
     return false;
 }
 
