@@ -40,6 +40,12 @@ NativeMenu {
 
     signal showMediaInformation(int index)
 
+
+    // required by TableViewExt
+    property var tableView_popup: function (index/* reserved for future */, selectedIndexes, globalPos) {
+        return popup(selectedIndexes, globalPos)
+    }
+
     // Settings
 
     actions: [{

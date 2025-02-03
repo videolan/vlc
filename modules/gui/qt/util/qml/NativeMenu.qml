@@ -43,6 +43,10 @@ QtObject {
 
     property var actions: []
 
+    property alias visible: menu.visible
+
+    readonly property int currentRequest: _currentRequest
+
     signal requestData(var requestID, var indexes)
 
 
@@ -58,7 +62,9 @@ QtObject {
 
     property point _popupPoint
 
-
+    // requests data for '_indexes' and shows popup menu
+    // with 'NativeMenu::actions' based on '_options'
+    // returns unique request id
     function popup(_indexes, point, _options) {
         root._options = _options
         root._indexes = _indexes
@@ -67,6 +73,7 @@ QtObject {
 
         const requestID = ++_currentRequest
         requestData(requestID, _indexes)
+        return requestID
     }
 
     function setData(id, data) {
