@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1C1C62011F8260A90052DD4F /* VLCWrappableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C1C62001F8260A90052DD4F /* VLCWrappableTextField.m */; };
 		1C31138E1E508C6900D4DD76 /* VLCAboutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */; };
 		1C3113901E508C6900D4DD76 /* VLCHelpWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1C67C8A41D58C0980079E1C1 /* VLCHelpWindowController.m */; };
 		1C3113921E508C6900D4DD76 /* VLCAddonListItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF0435F1972E26A0022B534 /* VLCAddonListItem.m */; };
@@ -264,8 +263,6 @@
 		1058C7ADFEA557BF11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		1C06F2A21F08F1250068846F /* osx_notifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = osx_notifications.m; path = ../../../modules/notify/osx_notifications.m; sourceTree = "<group>"; };
 		1C18BE461F2926700053D329 /* keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = keychain.m; path = ../../../modules/keystore/keychain.m; sourceTree = "<group>"; };
-		1C1C61FF1F8260A90052DD4F /* VLCWrappableTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCWrappableTextField.h; sourceTree = "<group>"; };
-		1C1C62001F8260A90052DD4F /* VLCWrappableTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCWrappableTextField.m; sourceTree = "<group>"; };
 		1C1ED51D2205AC6B00811EC0 /* VLCControlsBarCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCControlsBarCommon.h; sourceTree = "<group>"; };
 		1C1ED5262205B14700811EC0 /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		1C1ED5272205B14700811EC0 /* Spotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spotify.h; sourceTree = "<group>"; };
@@ -1160,8 +1157,6 @@
 				6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */,
 				6B2EFC611F281A0900F3C0EA /* VLCVolumeSliderCell.h */,
 				6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */,
-				1C1C61FF1F8260A90052DD4F /* VLCWrappableTextField.h */,
-				1C1C62001F8260A90052DD4F /* VLCWrappableTextField.m */,
 			);
 			path = views;
 			sourceTree = "<group>";
@@ -2355,7 +2350,6 @@
 				7D713D322201AE350042BEB7 /* VLCLibraryWindow.m in Sources */,
 				7D22A8F422BC14F80063ECD2 /* VLCLibrarySortingMenuController.m in Sources */,
 				1C3113C91E508C6900D4DD76 /* VLCOutput.m in Sources */,
-				1C1C62011F8260A90052DD4F /* VLCWrappableTextField.m in Sources */,
 				535F1BC02B4892A200C78D98 /* VLCLibraryHomeViewAudioCarouselContainerView.m in Sources */,
 				7D445D842202524D00263D34 /* VLCPlayQueueItem.m in Sources */,
 				1C3113CF1E508C6900D4DD76 /* prefs_widgets.m in Sources */,

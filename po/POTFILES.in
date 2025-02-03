@@ -604,8 +604,6 @@ modules/gui/macosx/views/VLCVolumeSlider.h
 modules/gui/macosx/views/VLCVolumeSlider.m
 modules/gui/macosx/views/VLCVolumeSliderCell.h
 modules/gui/macosx/views/VLCVolumeSliderCell.m
-modules/gui/macosx/views/VLCWrappableTextField.h
-modules/gui/macosx/views/VLCWrappableTextField.m
 modules/gui/macosx/windows/VLCAboutWindowController.h
 modules/gui/macosx/windows/VLCAboutWindowController.m
 modules/gui/macosx/windows/VLCDetachedAudioWindow.h

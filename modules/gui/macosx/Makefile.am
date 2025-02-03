@@ -408,8 +408,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCVolumeSlider.m \
 	gui/macosx/views/VLCVolumeSliderCell.h \
 	gui/macosx/views/VLCVolumeSliderCell.m \
-	gui/macosx/views/VLCWrappableTextField.h \
-	gui/macosx/views/VLCWrappableTextField.m \
 	gui/macosx/windows/VLCAboutWindowController.h \
 	gui/macosx/windows/VLCAboutWindowController.m \
 	gui/macosx/windows/VLCDetachedAudioWindow.h \
