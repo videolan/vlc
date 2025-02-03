@@ -28,7 +28,6 @@
 #import "extensions/NSString+Helpers.h"
 #import "windows/video/VLCVideoOutputProvider.h"
 #import "library/VLCInputItem.h"
-#import "views/VLCWrappableTextField.h"
 
 #import <vlc_configuration.h>
 

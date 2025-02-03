@@ -38,7 +38,6 @@
 #import "views/VLCPlaybackProgressSlider.h"
 #import "views/VLCTimeField.h"
 #import "views/VLCVolumeSlider.h"
-#import "views/VLCWrappableTextField.h"
 
 /*****************************************************************************
  * VLCControlsBarCommon

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,11 +16,11 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="91" y="467" width="500" height="500"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1025"/>
             <value key="minSize" type="size" width="239" height="239"/>
             <view key="contentView" id="4" customClass="VLCTrackingView">
                 <rect key="frame" x="0.0" y="0.0" width="500" height="500"/>
-                <autoresizingMask key="autoresizingMask"/>
+                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="s7h-2z-AKB" customClass="VLCMainVideoViewOverlayView">
                         <rect key="frame" x="0.0" y="0.0" width="500" height="500"/>
@@ -31,7 +31,7 @@
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="65" customClass="VLCDragDropView">
                                         <rect key="frame" x="0.0" y="0.0" width="500" height="115"/>
                                         <subviews>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hHQ-ue-m9C" customClass="VLCWrappableTextField">
+                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hHQ-ue-m9C">
                                                 <rect key="frame" x="8" y="63" width="484" height="19"/>
                                                 <shadow key="shadow" blurRadius="5">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -42,7 +42,7 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-en-EAi" customClass="VLCWrappableTextField">
+                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-en-EAi">
                                                 <rect key="frame" x="8" y="82" width="484" height="28"/>
                                                 <shadow key="shadow" blurRadius="5">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -63,6 +63,7 @@
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <constraints>
+                                                            <constraint firstAttribute="width" secondItem="gAM-N6-20z" secondAttribute="height" multiplier="1:1" id="Zi6-SL-IgL"/>
                                                             <constraint firstAttribute="width" secondItem="gAM-N6-20z" secondAttribute="height" multiplier="1:1" id="xMw-di-Drm"/>
                                                         </constraints>
                                                         <connections>
@@ -115,6 +116,7 @@
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <constraints>
+                                                            <constraint firstAttribute="width" secondItem="gzL-f3-Atd" secondAttribute="height" multiplier="1:1" id="Hl0-jN-lyU"/>
                                                             <constraint firstAttribute="width" secondItem="gzL-f3-Atd" secondAttribute="height" multiplier="1:1" id="sv0-Qp-GHf"/>
                                                         </constraints>
                                                         <connections>
@@ -127,11 +129,9 @@
                                                     <constraint firstItem="gzL-f3-Atd" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="3NJ-z2-sVu"/>
                                                     <constraint firstItem="10" firstAttribute="left" secondItem="11" secondAttribute="right" id="496-Ip-nTd"/>
                                                     <constraint firstItem="10" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="9Kr-xx-Ssf"/>
-                                                    <constraint firstItem="gzL-f3-Atd" firstAttribute="width" secondItem="gzL-f3-Atd" secondAttribute="height" multiplier="1:1" id="Hl0-jN-lyU"/>
                                                     <constraint firstAttribute="trailing" secondItem="gzL-f3-Atd" secondAttribute="trailing" id="IQ0-ae-v5p"/>
                                                     <constraint firstItem="gzL-f3-Atd" firstAttribute="left" secondItem="12" secondAttribute="right" id="KOc-oW-4iH"/>
                                                     <constraint firstItem="gAM-N6-20z" firstAttribute="centerY" secondItem="Vae-cT-EEI" secondAttribute="centerY" id="QiN-nb-d8b"/>
-                                                    <constraint firstItem="gAM-N6-20z" firstAttribute="width" secondItem="gAM-N6-20z" secondAttribute="height" multiplier="1:1" id="Zi6-SL-IgL"/>
                                                     <constraint firstAttribute="height" constant="32" id="bN7-k9-7Iy"/>
                                                     <constraint firstAttribute="bottom" secondItem="11" secondAttribute="bottom" id="fFe-7J-ver"/>
                                                     <constraint firstItem="12" firstAttribute="top" secondItem="Vae-cT-EEI" secondAttribute="top" id="gwB-yN-SK0"/>

@@ -41,7 +41,6 @@
 #import "views/VLCTimeField.h"
 #import "views/VLCTrackingView.h"
 #import "views/VLCVolumeSlider.h"
-#import "views/VLCWrappableTextField.h"
 
 /*****************************************************************************
  * VLCMainWindowControlsBar
