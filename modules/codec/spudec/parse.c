@@ -857,6 +857,12 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
     const uint16_t *p_source = p_pixeldata;
     video_format_t fmt;
     video_palette_t palette;
+
+    if (p_spu_properties->i_width <= 0)
+        return VLC_SUCCESS;
+    if (p_spu_properties->i_height <= (p_spu_data->i_y_top_offset + p_spu_data->i_y_bottom_offset))
+        return VLC_SUCCESS;
+
     const int width = p_spu_properties->i_width;
     const int height = p_spu_properties->i_height -
         p_spu_data->i_y_top_offset - p_spu_data->i_y_bottom_offset;
