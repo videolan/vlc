@@ -238,6 +238,10 @@ MainViewLoader {
         model: root.model
 
         ctx: MainCtx
+
+        function tableView_popup(index, selectedIndexes, globalPos) {
+            popup(selectedIndexes, globalPos)
+        }
     }
 
     // TBD: Refactor this with MusicGenres ?
@@ -414,6 +418,8 @@ MainViewLoader {
 
             header: root.header
 
+            rowContextMenu: contextMenu
+
             listView.isDropAcceptableFunc: function(drag, index) {
                 root._adjustDragAccepted(drag)
                 return drag.accepted
@@ -433,10 +439,6 @@ MainViewLoader {
             onActionForSelection: _actionAtIndex()
 
             onItemDoubleClicked: (_, model) => showList(model, Qt.MouseFocusReason)
-
-            onContextMenuButtonClicked: (_, _, globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
-            }
 
             onRightClick: (_, _, globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedRows(), globalMousePos)

@@ -288,6 +288,8 @@ FocusScope {
 
             // Settings
 
+            rowContextMenu: null
+
             rowHeight: VLCStyle.tableCoverRow_height
 
             displayMarginEnd: root.displayMarginEnd

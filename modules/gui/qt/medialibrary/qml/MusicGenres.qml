@@ -266,12 +266,10 @@ MainViewLoader {
 
             header: root.header
 
+            rowContextMenu: contextMenu
+
             onItemDoubleClicked: (index, model) => {
                 root.showAlbumView(model.id, model.name, Qt.MouseFocusReason)
-            }
-
-            onContextMenuButtonClicked: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }
 
             onRightClick: (_,_,globalMousePos) => {

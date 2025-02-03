@@ -184,6 +184,8 @@ MainViewLoader {
 
             selectionModel: root.selectionModel
 
+            rowContextMenu: root.contextMenu
+
             dragItem: root.dragItem
 
             header: root.header
@@ -209,10 +211,6 @@ MainViewLoader {
             }
 
             onItemDoubleClicked: (index, model) => root.onDoubleClick(model)
-
-            onContextMenuButtonClicked: (_,_,globalMousePos) => {
-                root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
 
             onRightClick: (_,_,globalMousePos) => {
                 root.contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)

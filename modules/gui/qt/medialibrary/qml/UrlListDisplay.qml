@@ -83,11 +83,11 @@ Widgets.TableViewExt {
 
     rowHeight: VLCStyle.listAlbumCover_height + VLCStyle.margin_xxsmall * 2
 
+    rowContextMenu: contextMenu
+
     onActionForSelection: (selection) => model.addAndPlay( selection )
     onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
-    onContextMenuButtonClicked: (_,_,globalMousePos) => {
-        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-    }
+
     onRightClick: (_,_,globalMousePos) => {
         contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     }

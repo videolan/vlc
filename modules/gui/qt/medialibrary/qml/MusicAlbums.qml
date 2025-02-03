@@ -243,12 +243,11 @@ MainViewLoader {
             dragItem: albumDragItem
             rowHeight: VLCStyle.tableCoverRow_height
 
+            rowContextMenu: contextMenu
+
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
 
-            onContextMenuButtonClicked: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
             onRightClick: (_,_,globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }

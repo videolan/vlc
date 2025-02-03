@@ -184,6 +184,10 @@ FocusScope {
 
         model: root.model
         ctx: MainCtx
+
+        function tableView_popup(index, selectedIndexes, globalPos) {
+            popup(selectedIndexes, globalPos)
+        }
     }
 
     PlaylistMedia
@@ -199,6 +203,8 @@ FocusScope {
         model: root.model
 
         dragItem: root.dragItem
+
+        rowContextMenu: contextMenu
 
         isMusic: root.isMusic
 
@@ -221,10 +227,6 @@ FocusScope {
         }
 
         // Events
-
-        onContextMenuButtonClicked: (_,_,globalMousePos) => {
-            contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
-        }
 
         onRightClick: (_,_,globalMousePos) => {
             contextMenu.popup(selectionModel.selectedRows(), globalMousePos)

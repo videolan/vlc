@@ -180,11 +180,10 @@ Widgets.TableViewExt {
 
     onDragItemChanged: console.assert(root.dragItem === tableDragItem)
 
+    rowContextMenu: contextMenu
+
     onActionForSelection: (selection) => model.addAndPlay(selection)
     onItemDoubleClicked: (index, model) => MediaLib.addAndPlay(model.id)
-    onContextMenuButtonClicked: (_,_, globalMousePos) => {
-        contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-    }
     onRightClick: (_,_, globalMousePos) => {
         contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
     }

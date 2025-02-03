@@ -550,6 +550,8 @@ FocusScope {
 
             dragItem: tableDragItem
 
+            rowContextMenu: trackContextMenu
+
             Navigation.parentItem: root
 
             Navigation.upAction: function() {
@@ -559,7 +561,6 @@ FocusScope {
             Navigation.cancelAction: root._onNavigationCancel
 
             onItemDoubleClicked: MediaLib.addAndPlay(model.id)
-            onContextMenuButtonClicked: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
             onRightClick: trackContextMenu.popup(tableView_id.selectionModel.selectedIndexes, globalMousePos)
 
             onDragItemChanged: console.assert(tableView_id.dragItem === tableDragItem)

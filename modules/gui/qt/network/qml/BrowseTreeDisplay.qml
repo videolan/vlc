@@ -295,11 +295,11 @@ MainViewLoader {
                 }
             }
 
+            rowContextMenu: contextMenu
+
             onActionForSelection: (selection) => _actionAtIndex(selection[0].row)
             onItemDoubleClicked: (index, model) => _actionAtIndex(index)
-            onContextMenuButtonClicked: (_,_,globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
+
             onRightClick: (_,_,globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }

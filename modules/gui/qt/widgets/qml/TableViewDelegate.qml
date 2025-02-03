@@ -35,6 +35,8 @@ T.Control {
     required property bool selected
     required property Widgets.DragItem dragItem
 
+    required property var contextMenu
+
     readonly property bool topContainsDrag: dropAreaLayout.higherDropArea.containsDrag
     readonly property bool bottomContainsDrag: dropAreaLayout.lowerDropArea.containsDrag
     readonly property bool containsDrag: (topContainsDrag || bottomContainsDrag)
@@ -46,6 +48,8 @@ T.Control {
                                                       dropAreaLayout.dragPosition.x,
                                                       dropAreaLayout.dragPosition.y)
 
+    readonly property ItemSelectionModel selectionModel: delegate.ListView.view.selectionModel
+
     // Optional, used to show the drop indicator
     property alias isDropAcceptable: dropAreaLayout.isDropAcceptable
 
@@ -54,11 +58,22 @@ T.Control {
 
     property int _modifiersOnLastPress: Qt.NoModifier
 
-    signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
+    readonly property int _defaultContextMenuRequestID: index
+
+    property int _contextMenuRequestID: -1
+
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
     signal selectAndFocus(int modifiers, int focusReason)
+
+    Connections {
+        target: contextMenu
+
+        function onVisibleChanged() {
+            if (!contextMenu.visible) _contextMenuRequestID = -1
+        }
+    }
 
     property Component defaultDelegate: TableRowDelegate {
         id: defaultDelId
@@ -126,7 +141,7 @@ T.Control {
                 if (dragItem) {
                     if (active) {
                         if (!selected) {
-                            delegate.ListView.view.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
+                            delegate.selectionModel.select(index, ItemSelectionModel.ClearAndSelect)
                         }
 
                         dragItem.Drag.active = true
@@ -151,7 +166,7 @@ T.Control {
 
                 if (!(delegate.selected && button === Qt.RightButton)) {
                     const view = delegate.ListView.view
-                    view.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
+                    delegate.selectionModel.updateSelection(point.modifiers, view.currentIndex, index)
                     view.currentIndex = index
                 }
 
@@ -248,6 +263,8 @@ T.Control {
 
             height: parent.height
 
+            visible: !!delegate.contextMenu
+
             Widgets.IconToolButton {
                 id: contextButton
 
@@ -263,6 +280,9 @@ T.Control {
                 description: qsTr("Menu")
 
                 visible: delegate.hovered
+                         || ((delegate.contextMenu?.currentRequest ?? delegate._defaultContextMenuRequestID)
+                                    === delegate._contextMenuRequestID
+                                && delegate.contextMenu.visible)
 
                 // NOTE: QTBUG-100543
                 // Hover handling in controls is blocking in Qt 6.2, meaning if this
@@ -284,7 +304,11 @@ T.Control {
                         delegate.selectAndFocus(Qt.NoModifier, Qt.MouseFocusReason)
 
                     const pos = contextButton.mapToGlobal(VLCStyle.margin_xsmall, contextButton.height / 2 + VLCStyle.fontHeight_normal)
-                    delegate.contextMenuButtonClicked(this, delegate.rowModel, pos)
+                    const selectionIndexes = delegate.ListView.view.selectionModel.selectedIndexes
+
+                    delegate._contextMenuRequestID
+                            = delegate.contextMenu.tableView_popup(delegate.index, selectionIndexes, pos)
+                                ?? delegate._defaultContextMenuRequestID
                 }
 
                 activeFocusOnTab: false

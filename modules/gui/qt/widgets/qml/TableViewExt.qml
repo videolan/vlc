@@ -47,6 +47,30 @@ FocusScope {
         }
     }
 
+    /*
+        Expects an object with the following properties:
+
+        // Determines if the menu is visible (optional)
+        bool visible
+
+        // The request ID associated with the currently displayed context menu (optional)
+        int currentRequest
+
+        // Displays the popup menu at the specified position (required)
+        // incase the function doesn't return request id TableViewExt will
+        // try to mimic behavior but it may have some caveats
+        //
+        // Parameters:
+        //    current    - calling row index
+        //    selectedIndexes - current item selection (all)
+        //    globalPos  - the global position where the popup should appear
+        //
+        // Returns:
+        //    int - the generated request ID
+        function tableView_popup(current, selectedIndexes, globalPos) -> int (request ID)
+    */
+    required property var rowContextMenu
+
     // NOTE: We want edge to edge backgrounds in our delegate and header, so we implement our own
     //       margins implementation like in ExpandGridView. The default values should be the same
     //       than ExpandGridView to respect the grid parti pris.
@@ -157,7 +181,6 @@ FocusScope {
 
     //forwarded from subview
     signal actionForSelection( var selection )
-    signal contextMenuButtonClicked(Item menuParent, var menuModel, point globalMousePos)
     signal rightClick(Item menuParent, var menuModel, point globalMousePos)
     signal itemDoubleClicked(var index, var model)
 
@@ -235,7 +258,6 @@ FocusScope {
         id: view
 
         anchors.fill: parent
-
         focus: true
 
         headerPositioning: ListView.OverlayHeader
@@ -402,14 +424,13 @@ FocusScope {
 
             dragItem: root.dragItem
 
+            contextMenu: root.rowContextMenu
+
             rowModel: model
             sortModel: root.sortModel
 
             selected: selectionModel.selectedIndexesFlat.includes(index)
 
-            onContextMenuButtonClicked: (menuParent, menuModel, globalMousePos) => {
-                root.contextMenuButtonClicked(menuParent, menuModel, globalMousePos)
-            }
             onRightClick: (menuParent, menuModel, globalMousePos) => {
                 root.rightClick(menuParent, menuModel, globalMousePos)
             }

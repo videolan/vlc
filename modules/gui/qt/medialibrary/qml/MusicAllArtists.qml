@@ -203,6 +203,7 @@ MainViewLoader {
             model: artistModel
             focus: true
             dragItem: artistsDragItem
+            rowContextMenu: contextMenu
             rowHeight: VLCStyle.tableCoverRow_height
 
             header: root.header
@@ -221,9 +222,6 @@ MainViewLoader {
                 root.requestArtistAlbumView(Qt.MouseFocusReason, model.id)
             }
 
-            onContextMenuButtonClicked: (_,_, globalMousePos) => {
-                contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
-            }
             onRightClick: (_,_,globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
             }
