@@ -772,7 +772,6 @@ option('nfs',
 # TODO: Missing v4l2
 # TODO: Missing rpi-omxil
 # TODO: Missing gst-decode
-# TODO: Missing merge-ffmpeg
 # TODO: Missing libva
 # TODO: Missing tremor
 # TODO: Missing x26410b
