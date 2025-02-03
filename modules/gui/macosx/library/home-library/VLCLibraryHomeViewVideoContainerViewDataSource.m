@@ -296,9 +296,7 @@ NSString * const VLCLibraryVideoCollectionViewDataSourceDisplayedCollectionChang
 {
     VLCLibraryCollectionViewItem * const viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
     const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-    // TODO: Find a more elegant way to do this
-    VLCLibraryHomeViewVideoGridContainerView * const containerView = (VLCLibraryHomeViewVideoGridContainerView *)collectionView.superview.superview.superview;
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
+    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.groupDescriptor.group];
 
     viewItem.representedItem = representedItem;
     return viewItem;
@@ -320,9 +318,7 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const mediaItemSupplementaryDetailView = [collectionView makeSupplementaryViewOfKind:kind withIdentifier:VLCLibraryCollectionViewMediaItemSupplementaryDetailViewKind forIndexPath:indexPath];
 
         const id<VLCMediaLibraryItemProtocol> item = self.collectionArray[indexPath.item];
-        // TODO: Find a more elegant way to do this
-        VLCLibraryHomeViewVideoGridContainerView * const containerView = (VLCLibraryHomeViewVideoGridContainerView *)collectionView.superview.superview.superview;
-        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:containerView.videoGroup];
+        VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:item parentType:self.groupDescriptor.group];
 
         mediaItemSupplementaryDetailView.representedItem = representedItem;
         mediaItemSupplementaryDetailView.selectedItem = [collectionView itemAtIndexPath:indexPath];
@@ -373,13 +369,9 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
     for (NSIndexPath * const indexPath in indexPaths) {
         const id<VLCMediaLibraryItemProtocol> libraryItem = 
             [self libraryItemAtIndexPath:indexPath forCollectionView:collectionView];
-        // TODO: Find a more elegant way to do this
-        VLCLibraryHomeViewVideoGridContainerView * const containerView = 
-            (VLCLibraryHomeViewVideoGridContainerView *)collectionView.superview.superview.superview;
-        NSAssert(containerView != nil, @"The collection view's container view should not be nil!");
         VLCLibraryRepresentedItem * const representedItem = 
             [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem 
-                                                 parentType:containerView.videoGroup];
+                                                 parentType:self.groupDescriptor.group];
         [representedItems addObject:representedItem];
     }
 
@@ -409,12 +401,10 @@ viewForSupplementaryElementOfKind:(NSCollectionViewSupplementaryElementKind)kind
         carouselItemView.frame = itemFrame;
     }
 
-    // TODO: Find a more elegant way to do this
-    VLCLibraryHomeViewVideoCarouselContainerView * const containerView = (VLCLibraryHomeViewVideoCarouselContainerView *)carousel.superview;
-
     const id<VLCMediaLibraryItemProtocol> libraryItem = self.collectionArray[index];
-    VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
-                                                                                             parentType:containerView.videoGroup];
+    VLCLibraryRepresentedItem * const representedItem =
+        [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem
+                                             parentType:self.groupDescriptor.group];
     carouselItemView.representedItem = representedItem;
     return carouselItemView;
 }
