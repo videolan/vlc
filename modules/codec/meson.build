@@ -571,7 +571,9 @@ libavcodec_common = disabler()
 if avcodec_dep.found()
     libavcodec_common = static_library('avcodec_common',
         files('avcodec/fourcc.c', 'avcodec/chroma.c'),
-        dependencies: [avutil_dep, avcodec_dep],
+        dependencies: [
+            avcodec_dep.partial_dependency(includes:true, compile_args:true)
+        ],
         install: false,
         include_directories: [
             vlc_include_dirs,
