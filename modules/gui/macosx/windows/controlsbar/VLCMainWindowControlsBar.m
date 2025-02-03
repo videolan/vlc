@@ -195,15 +195,12 @@
     }
 }
 
-- (void)updatePlaybackControls:(NSNotification *)aNotification
+- (void)updatePlaybackControls:(NSNotification *)notification
 {
-    bool b_seekable = _playerController.seekable;
-    // FIXME: re-add chapter navigation as needed
-    bool b_chapters = false;
-
-    [self.prevButton setEnabled: (b_seekable || _playQueueController.hasPreviousPlayQueueItem || b_chapters)];
-    [self.nextButton setEnabled: (b_seekable || _playQueueController.hasNextPlayQueueItem || b_chapters)];
-    [self updateCurrentItemDisplayControls:aNotification];
+    const BOOL b_seekable = _playerController.seekable;
+    self.prevButton.enabled = b_seekable || _playQueueController.hasPreviousPlayQueueItem;
+    self.nextButton.enabled = b_seekable || _playQueueController.hasNextPlayQueueItem;
+    [self updateCurrentItemDisplayControls:notification];
 }
 
 @end
