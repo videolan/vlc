@@ -102,7 +102,6 @@ CompositorDirectComposition::~CompositorDirectComposition()
 {
     //m_acrylicSurface should be released before the RHI context is destroyed
     assert(!m_acrylicSurface);
-    destroyMainInterface();
 }
 
 bool CompositorDirectComposition::init()
@@ -352,7 +351,8 @@ void CompositorDirectComposition::unloadGUI()
     //be valid as it may still be used by the vout window.
     //we cant' just delete the qmlEngine as the QmlView as the root item is parented to the QmlView
     //setSource() to nothing will effectively destroy the root item
-    m_quickView->setSource(QUrl());
+    if (Q_LIKELY(m_quickView))
+        m_quickView->setSource(QUrl());
 
     commonGUIDestroy();
 }
