@@ -98,10 +98,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)initDisplayLink
 {
     const CVReturn ret = CVDisplayLinkCreateWithActiveCGDisplays(&_displayLink);
-    if (ret != kCVReturnSuccess) {
-        // TODO: Handle error
-        return;
-    }
+    NSAssert(ret == kCVReturnSuccess && _displayLink != NULL, @"Could not init displaylink");
     CVDisplayLinkSetOutputCallback(_displayLink, DisplayLinkCallback, (__bridge void*) self);
 }
 
@@ -270,9 +267,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
 - (void)beginAnimating
 {
     const CVReturn err = CVDisplayLinkStart(_displayLink);
-    if (err != kCVReturnSuccess) {
-        // TODO: Handle error
-    }
+    NSAssert(err == kCVReturnSuccess, @"Display link animation start should not return error!");
     _animationPosition = -(_animationWidth);
     self.enabled = NO;
 }
