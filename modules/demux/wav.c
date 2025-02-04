@@ -673,6 +673,12 @@ static int Open( vlc_object_t * p_this )
                 }
                 break;
             case wav_chunk_id_fmt:
+                if( p_sys->i_frame_samples != 0 )
+                {
+                    ChunkSkip( p_demux, i_size );
+                    msg_Warn( p_demux, "fmt chunk already parsed" );
+                    break;
+                }
                 if( ChunkParseFmt( p_demux, i_size ) != VLC_SUCCESS )
                     goto error;
                 break;
