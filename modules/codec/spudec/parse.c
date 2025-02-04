@@ -71,8 +71,8 @@ typedef struct
 static int  ParseControlSeq( decoder_t *, vlc_tick_t i_pts,
                              void(*pf_queue)(decoder_t *, subpicture_t *) );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
-                             const spu_properties_t *, uint16_t * );
-static int  Render         ( decoder_t *, subpicture_t *, const uint16_t *,
+                             const spu_properties_t *, uint16_t *, size_t * );
+static int  Render         ( decoder_t *, subpicture_t *, const uint16_t *, size_t,
                              const subpicture_data_t *, const spu_properties_t * );
 
 /*****************************************************************************
@@ -243,9 +243,11 @@ static void OutputPicture( decoder_t *p_dec,
      */
     p_pixeldata = vlc_alloc( p_sys->i_rle_size, sizeof(*p_pixeldata) * 2 * 2 );
 
+    size_t pixeldata_size = p_sys->i_rle_size * 2 * 2; // in 16-bit
+
     /* We try to display it */
     subpicture_data_t render_spu_data = *p_spu_data; /* Need a copy */
-    if( ParseRLE( p_dec, &render_spu_data, p_spu_properties, p_pixeldata ) )
+    if( ParseRLE( p_dec, &render_spu_data, p_spu_properties, p_pixeldata, &pixeldata_size ) )
     {
         /* There was a parse error, delete the subpicture */
         subpicture_Delete( p_spu );
@@ -259,7 +261,7 @@ static void OutputPicture( decoder_t *p_dec,
              render_spu_data.pi_offset[0], render_spu_data.pi_offset[1] );
 #endif
 
-    if( Render( p_dec, p_spu, p_pixeldata, &render_spu_data, p_spu_properties ) )
+    if( Render( p_dec, p_spu, p_pixeldata, pixeldata_size, &render_spu_data, p_spu_properties ) )
     {
         subpicture_Delete( p_spu );
         free( p_pixeldata );
@@ -615,7 +617,7 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
 static int ParseRLE( decoder_t *p_dec,
                      subpicture_data_t *p_spu_data,
                      const spu_properties_t *p_spu_properties,
-                     uint16_t *p_pixeldata )
+                     uint16_t *p_pixeldata, size_t * pixeldata_size )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -624,6 +626,14 @@ static int ParseRLE( decoder_t *p_dec,
     unsigned int i_x, i_y;
 
     uint16_t *p_dest = p_pixeldata;
+    size_t dest_left = *pixeldata_size;
+#define WRITE_CODE(x)         \
+    if (dest_left == 0)       \
+        break;                \
+    do {                      \
+        *p_dest++ = (x);      \
+        dest_left--;          \
+    } while(0)
 
     /* The subtitles are interlaced, we need two offsets */
     unsigned int  i_id = 0;                   /* Start on the even SPU layer */
@@ -642,12 +652,12 @@ static int ParseRLE( decoder_t *p_dec,
     pi_table[ 0 ] = p_spu_data->pi_offset[ 0 ] << 1;
     pi_table[ 1 ] = p_spu_data->pi_offset[ 1 ] << 1;
 
-    for( i_y = 0 ; i_y < i_height ; i_y++ )
+    for( i_y = 0 ; i_y < i_height && dest_left != 0 ; i_y++ )
     {
         unsigned int i_code;
         pi_offset = pi_table + i_id;
 
-        for( i_x = 0 ; i_x < i_width ; i_x += i_code >> 2 )
+        for( i_x = 0 ; i_x < i_width && dest_left != 0 ; i_x += i_code >> 2 )
         {
             i_code = 0;
             for( unsigned int i_min = 1; i_min <= 0x40 && i_code < i_min; i_min <<= 2 )
@@ -710,14 +720,14 @@ static int ParseRLE( decoder_t *p_dec,
                     {
                         /* We can't be sure the current lines will be skipped,
                          * so we store the code just in case. */
-                      *p_dest++ = i_code;
+                      WRITE_CODE( i_code );
                       i_skipped_bottom++;
                     }
                 }
                 else
                 {
                     /* We got a valid code, store it */
-                    *p_dest++ = i_code;
+                    WRITE_CODE( i_code );
 
                     /* Valid code means no blank line */
                     b_empty_top = false;
@@ -726,7 +736,7 @@ static int ParseRLE( decoder_t *p_dec,
             }
             else
             {
-                *p_dest++ = i_code;
+                WRITE_CODE( i_code );
             }
         }
 
@@ -757,7 +767,7 @@ static int ParseRLE( decoder_t *p_dec,
         /* Skip them just in case */
         while( i_y < i_height )
         {
-            *p_dest++ = i_width << 2;
+            WRITE_CODE( i_width << 2 );
             i_y++;
         }
 
@@ -844,17 +854,20 @@ static int ParseRLE( decoder_t *p_dec,
 #endif
     }
 
+    *pixeldata_size = *pixeldata_size - dest_left;
+
     return VLC_SUCCESS;
 }
 
 static int Render( decoder_t *p_dec, subpicture_t *p_spu,
-                    const uint16_t *p_pixeldata,
+                    const uint16_t *p_pixeldata, size_t pixeldata_size,
                     const subpicture_data_t *p_spu_data,
                     const spu_properties_t *p_spu_properties )
 {
     uint8_t *p_p;
     int i_x, i_y, i_len, i_color, i_pitch;
     const uint16_t *p_source = p_pixeldata;
+    size_t source_left = pixeldata_size;
     video_format_t fmt;
     video_palette_t palette;
 
@@ -891,7 +904,6 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
         msg_Err( p_dec, "cannot allocate SPU region" );
         return VLC_EGENERIC;
     }
-    vlc_spu_regions_push(&p_spu->regions, p_region);
 
     p_region->b_absolute = true; p_region->b_in_window = false;
     p_region->i_x = p_spu_properties->i_x;
@@ -905,12 +917,20 @@ static int Render( decoder_t *p_dec, subpicture_t *p_spu,
         /* Draw until we reach the end of the line */
         for( i_x = 0 ; i_x < width; i_x += i_len )
         {
+            if( source_left == 0 )
+            {
+                msg_Err( p_dec, "missing RLE data" );
+                subpicture_region_Delete( p_region );
+                return VLC_EGENERIC;
+            }
             /* Get the RLE part, then draw the line */
             i_color = *p_source & 0x3;
             i_len = *p_source++ >> 2;
+            source_left--;
             memset( p_p + i_x + i_y, i_color, i_len );
         }
     }
+    vlc_spu_regions_push(&p_spu->regions, p_region);
 
     return VLC_SUCCESS;
 }
