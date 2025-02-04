@@ -401,7 +401,6 @@
 
 - (void)updatePlayQueueToggleState
 {
-    // TODO: Rename playlist stuff
     VLCLibraryWindow * const libraryWindow = (VLCLibraryWindow*)self.view.window;
     if (libraryWindow != nil && _displayLibraryControls) {
         NSView * const sidebarView =
