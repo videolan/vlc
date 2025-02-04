@@ -103,6 +103,7 @@ const CGFloat VLCVolumeDefault = 1.;
     BOOL _spotifyPlaybackWasPaused;
 
     NSTimer *_playbackHasTruelyEndedTimer;
+    VLCInputItem *_currentMedia;
 }
 
 @property (readwrite, atomic) iTunesApplication *appleMusicApp;
@@ -678,6 +679,18 @@ static int BossCallback(vlc_object_t *p_this,
 - (void)dealloc
 {
     [_defaultNotificationCenter removeObserver:self];
+}
+
+- (VLCInputItem *)currentMedia {
+    if (_currentMedia)
+        return _currentMedia;
+    vlc_player_Lock(_p_player);
+    input_item_t *vlcInputItem = vlc_player_GetCurrentMedia(_p_player);
+    if (vlcInputItem) {
+        _currentMedia = [[VLCInputItem alloc] initWithInputItem:vlcInputItem];
+    }
+    vlc_player_Unlock(_p_player);
+    return _currentMedia;
 }
 
 #pragma mark - playback control methods
