@@ -475,28 +475,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [self.window setTitle: _NS("Preferences")];
 }
 
-/* TODO: move this part to core */
-#define config_GetLabel(a,b) __config_GetLabel(VLC_OBJECT(a),b)
-static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *psz_name)
-{
-    module_config_t *p_config = config_FindConfig(psz_name);
-
-    /* sanity checks */
-    if (!p_config) {
-        msg_Err(p_this, "option %s does not exist", psz_name);
-        return NULL;
-    }
-
-    if (p_config->psz_longtext)
-        return p_config->psz_longtext;
-    else if (p_config->psz_text)
-        return p_config->psz_text;
-    else
-        msg_Warn(p_this, "option %s does not include any help", psz_name);
-
-    return NULL;
-}
-
 #pragma mark -
 #pragma mark Setup controls
 
@@ -579,14 +557,14 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 - (void)setupButton: (NSButton *)object forBoolValue: (const char *)name
 {
     [object setState: config_GetInt(name)];
-    [object setToolTip: NSTR(config_GetLabel(p_intf, name))];
+    [object setToolTip: NSTR(config_GetLabel(name))];
 }
 
 - (void)setupField:(NSTextField *)object forOption:(const char *)psz_option
 {
     char *psz_tmp = config_GetPsz(psz_option);
     [object setStringValue: toNSStr(psz_tmp)];
-    [object setToolTip: NSTR(config_GetLabel(p_intf, psz_option))];
+    [object setToolTip: NSTR(config_GetLabel(psz_option))];
     free(psz_tmp);
 }
 
@@ -816,7 +794,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     i = config_GetInt("freetype-opacity") * 100.0 / 255.0 + 0.5;
     [_osd_opacityTextField setIntValue: i];
     [_osd_opacitySlider setIntValue: i];
-    [_osd_opacitySlider setToolTip: NSTR(config_GetLabel(p_intf, "freetype-opacity"))];
+    [_osd_opacitySlider setToolTip: NSTR(config_GetLabel("freetype-opacity"))];
     [_osd_opacityTextField setToolTip: [_osd_opacitySlider toolTip]];
     [self setupButton:_osd_forceboldCheckbox forBoolValue: "freetype-bold"];
     [self setupButton:_osd_outline_colorPopup forIntList: "freetype-outline-color"];
