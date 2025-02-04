@@ -1,0 +1,181 @@
+name: Linux
+
+'on':
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  ubuntu:
+    name: 'ubuntu'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y build-essential cmake meson ninja-build
+
+      - name: meson build
+        run: |
+          meson setup build \
+            -Dvlc=false \
+            -Dtests=disabled \
+            -Dnls=disabled \
+            -Doptimize_memory=false \
+            -Dstream_outputs=false \
+            -Dvideolan_manager=false \
+            -Daddon_manager=false \
+            -Drun_as_root=false \
+            -Dbranch_protection=disabled \
+            -Dssp=disabled \
+            -Dextra_checks=false \
+            -Dwinstore_app=false \
+            -Dupdate-check=disabled \
+            -Drust=disabled \
+            -Dvendored_rust_deps="no" \
+            -Dsse=disabled \
+            -Davx=disabled \
+            -Dvcd_module=false \
+            -Dcss_engine=disabled \
+            -Dchromecast=disabled \
+            -Dqt=disabled \
+            -Dqt_gtk=disabled \
+            -Dqt_qml_debug=false \
+            -Dskins2=disabled \
+            -Ddbus=disabled \
+            -Dwayland=disabled \
+            -Dx11=disabled \
+            -Dxcb=disabled \
+            -Davcodec=disabled \
+            -Dmerge-ffmpeg=false \
+            -Dlibva=disabled \
+            -Domxil=false \
+            -Davformat=disabled \
+            -Dalsa=disabled \
+            -Dpulse=disabled \
+            -Doss=disabled \
+            -Dogg=disabled \
+            -Dmpg123=disabled \
+            -Dschroedinger=disabled \
+            -Drsvg=disabled \
+            -Dcairo=disabled \
+            -Dfreetype=disabled \
+            -Dflac=disabled \
+            -Dopus=disabled \
+            -Dtheoraenc=disabled \
+            -Dtheoradec=disabled \
+            -Ddaaladec=disabled \
+            -Ddaalaenc=disabled \
+            -Dvorbis=disabled \
+            -Dvsxu=disabled \
+            -Dx265=disabled \
+            -Dx264=disabled \
+            -Dx262=disabled \
+            -Dfdk-aac=disabled \
+            -Dvpx=disabled \
+            -Dshine=disabled \
+            -Daom=disabled \
+            -Drav1e=disabled \
+            -Ddav1d=disabled \
+            -Dtwolame=disabled \
+            -Dvpl=disabled \
+            -Dspatialaudio=disabled \
+            -Dsamplerate=disabled \
+            -Dsoxr=disabled \
+            -Dspeex=disabled \
+            -Dspeexdsp=disabled \
+            -Dcaca=disabled \
+            -Ddrm=disabled \
+            -Dgoom2=disabled \
+            -Davahi=disabled \
+            -Dupnp=disabled \
+            -Dlibxml2=disabled \
+            -Dmedialibrary=disabled \
+            -Dfaad=disabled \
+            -Dfluidsynth=disabled \
+            -Dmicrodns=disabled \
+            -Dgnutls=disabled \
+            -Dlibsecret=disabled \
+            -Dmatroska=disabled \
+            -Dlibdvbpsi=disabled \
+            -Ddvbcsa=disabled \
+            -Daribb24=disabled \
+            -Dlibmodplug=disabled \
+            -Dtaglib=disabled \
+            -Dlibcddb=disabled \
+            -Dlibass=disabled \
+            -Dlibchromaprint=disabled \
+            -Dmad=enabled \
+            -Dpng=disabled \
+            -Djpeg=disabled \
+            -Dbpg=disabled \
+            -Daribsub=disabled \
+            -Dtelx=disabled \
+            -Dzvbi=disabled \
+            -Dkate=disabled \
+            -Dtiger=disabled \
+            -Dlibplacebo=disabled \
+            -Dgles2=disabled \
+            -Dlua=disabled \
+            -Dsrt=disabled \
+            -Dvulkan=disabled \
+            -Dscreen=disabled \
+            -Dfreerdp=disabled \
+            -Dvnc=disabled \
+            -Dswscale=disabled \
+            -Dpostproc=disabled \
+            -Debur128=disabled \
+            -Drnnoise=disabled \
+            -Dmtp=disabled \
+            -Dwasapi=disabled \
+            -Dmacosx_avfoundation=disabled \
+            -Ddc1394=disabled \
+            -Ddv1394=disabled \
+            -Dlinsys=disabled \
+            -Ddvdnav=disabled \
+            -Ddvdread=disabled \
+            -Dbluray=disabled \
+            -Dshout=disabled \
+            -Dncurses=disabled \
+            -Dminimal_macosx=disabled \
+            -Dudev=disabled \
+            -Ddsm=disabled \
+            -Dlive555=disabled \
+            -Drist=disabled \
+            -Dlibgcrypt=disabled \
+            -Dfontconfig=disabled \
+            -Dfribidi=disabled \
+            -Dharfbuzz=disabled \
+            -Dd3d11va=disabled \
+            -Ddxva2=disabled \
+            -Damf_scaler=disabled \
+            -Damf_frc=disabled \
+            -Damf_vqenhancer=disabled \
+            -Ddirectx=disabled \
+            -Dprojectm=disabled \
+            -Dlibssh2=disabled \
+            -Dsftp=disabled \
+            -Darchive=disabled \
+            -Daribb25=disabled \
+            -Daribcaption=disabled \
+            -Dgme=disabled \
+            -Dmpc=enabled \
+            -Dsid=disabled \
+            -Dnvdec=enabled \
+            -Ddecklink=enabled \
+            -Dnfs=disabled
+
+      - name: meson compile
+        run: |
+          cd build && meson compile
