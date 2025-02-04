@@ -338,6 +338,17 @@ static int ChunkParseDS64( demux_t *p_demux, uint32_t i_size )
     return ChunkSkip( p_demux, i_size );
 }
 
+static void InitFmt( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    p_sys->i_frame_size = 0;
+    p_sys->i_frame_samples = 0;
+    p_sys->i_chans_to_reorder = 0;
+    p_sys->i_channel_mask = 0;
+}
+
 static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -586,6 +597,8 @@ static int ChunkParseFmt( demux_t *p_demux, uint32_t i_size )
     return VLC_SUCCESS;
 
 error:
+    es_format_Clean( &p_sys->fmt );
+    InitFmt( p_demux );
     free( p_wf );
     return VLC_EGENERIC;
 }
@@ -616,12 +629,9 @@ static int Open( vlc_object_t * p_this )
     if( unlikely(!p_sys) )
         return VLC_ENOMEM;
 
-    es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
     p_sys->p_es           = NULL;
     p_sys->i_data_pos = p_sys->i_data_size = 0;
-    p_sys->i_frame_samples = 0;
-    p_sys->i_chans_to_reorder = 0;
-    p_sys->i_channel_mask = 0;
+    InitFmt( p_demux );
 
     /* skip riff header */
     if( vlc_stream_Read( p_demux->s, NULL, 12 ) != 12 )
