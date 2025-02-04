@@ -499,7 +499,7 @@
     return _voutViewController != nil;
 }
 
-- (void)pictureInPictureChanged:(VLCPlayerController *)playerController
+- (void)pictureInPictureChanged:(NSNotification *)notification
 {
     if (self.pipIsActive) {
         return;
@@ -511,8 +511,7 @@
 
     _voutViewController = [PIPVoutViewController new];
     _voutViewController.view = self.voutContainingView;
-    VLCPlayerController * const controller =
-        VLCMain.sharedInstance.playQueueController.playerController;
+    VLCPlayerController * const controller = notification.object;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
     
     VLCInputItem * const item = controller.currentMedia;
