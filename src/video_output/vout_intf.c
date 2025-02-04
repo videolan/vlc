@@ -241,8 +241,6 @@ void vout_CreateVars( vout_thread_t *p_vout )
                     vlc_gettext( p_3D_output_format_values[i].psz_label ) );
     }
 
-    var_AddCallback( p_vout, "video-stereo-mode", Stereo3DCallback, NULL );
-
     /* Crop offset vars */
     var_Create( p_vout, "crop-left", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     var_Create( p_vout, "crop-top", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
@@ -389,6 +387,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_AddCallback( p_vout, "override-projection", OverrideProjectionCallback, NULL );
     var_AddCallback( p_vout, "projection-mode", ChangeProjectionCallback, NULL );
+    var_AddCallback(p_vout, "video-stereo-mode", Stereo3DCallback, NULL);
 }
 
 void vout_IntfReinit( vout_thread_t *p_vout )
@@ -405,6 +404,7 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "secondary-sub-margin" );
 
     var_TriggerCallback( p_vout, "projection-mode" );
+    var_TriggerCallback(p_vout, "video-stereo-mode");
 }
 
 void vout_IntfDeinit(vlc_object_t *obj)
@@ -430,6 +430,7 @@ void vout_IntfDeinit(vlc_object_t *obj)
     var_DelCallback(obj, "autoscale", AutoScaleCallback, NULL);
     var_DelCallback(obj, "override-projection", OverrideProjectionCallback, NULL);
     var_DelCallback(obj, "projection-mode", ChangeProjectionCallback, NULL);
+    var_DelCallback(obj, "video-stereo-mode", Stereo3DCallback, NULL);
 }
 
 /*****************************************************************************
