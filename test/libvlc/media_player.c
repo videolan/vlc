@@ -659,6 +659,23 @@ static void test_media_player_multiple_instance(const char** argv, int argc)
     libvlc_media_player_release(player2);
 }
 
+static void test_media_player_video_controls(const char** argv, int argc)
+{
+    libvlc_instance_t *instance = libvlc_new(argc, argv);
+
+    /* ...with the media and the player being on different instances */
+    libvlc_media_t *media1 = libvlc_media_new_path("foo");
+    libvlc_media_player_t *player1 = libvlc_media_player_new(instance);
+    libvlc_media_player_set_media(player1, media1);
+
+    libvlc_video_set_video_stereo_mode(player1, libvlc_VideoStereoSideBySide);
+
+    libvlc_media_release(media1);
+    libvlc_media_player_release(player1);
+    libvlc_release(instance);
+}
+
+
 int main (void)
 {
     test_init();
@@ -669,6 +686,7 @@ int main (void)
     test_media_player_tracks (test_defaults_args, test_defaults_nargs);
     test_media_player_programs (test_defaults_args, test_defaults_nargs);
     test_media_player_multiple_instance (test_defaults_args, test_defaults_nargs);
+    test_media_player_video_controls(test_defaults_args, test_defaults_nargs);
 
     return 0;
 }
