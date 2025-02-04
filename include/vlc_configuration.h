@@ -252,6 +252,26 @@ VLC_API void config_ResetAll(void);
 VLC_API module_config_t *config_FindConfig(const char *name) VLC_USED;
 
 /**
+ * Gets the config label string for a configuration item, acquired by name.
+ * A valid configuration item name is required.
+ *
+ * \param name Configuration item name
+ */
+static inline const char *config_GetLabel(const char *const psz_name)
+{
+    module_config_t *const p_config = config_FindConfig(psz_name);
+
+    /* sanity checks */
+    if (p_config == NULL)
+        return NULL;
+    if (p_config->psz_longtext)
+        return p_config->psz_longtext;
+    if (p_config->psz_text)
+        return p_config->psz_text;
+    return NULL;
+}
+
+/**
  * System directory identifiers
  */
 typedef enum vlc_system_dir
