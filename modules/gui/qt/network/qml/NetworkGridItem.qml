@@ -44,6 +44,8 @@ Widgets.GridItem {
         return ""
     }
 
+    fillMode: Image.PreserveAspectCrop
+
     cacheImage: true // we may have network thumbnail
 
     fallbackImage: {
