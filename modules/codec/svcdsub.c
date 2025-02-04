@@ -546,7 +546,7 @@ static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
                 i_color = bs_read( &bs, 2 );
                 if( i_color == 0 && (i_count = bs_read( &bs, 2 )) )
                 {
-                    i_count = __MIN( i_count, p_sys->i_width - i_column );
+                    i_count = __MIN( i_count, p_sys->i_width - i_column - 1 );
                     memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
                                     i_column], 0, i_count + 1 );
                     i_column += i_count;
