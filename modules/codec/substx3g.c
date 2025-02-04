@@ -331,7 +331,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    for( uint16_t i=0; i < i_psz_bytelength; i++ )
+    for( size_t i=0; psz_subtitle[i] != '\0'; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
 
     tx3g_segment_t *p_segment3g = tx3g_segment_New( psz_subtitle );
