@@ -214,8 +214,6 @@ VideoSurface::VideoSurface(QQuickItem* parent)
 
         connect(this, &QQuickItem::xChanged, this, &VideoSurface::updateSurfacePosition);
         connect(this, &QQuickItem::yChanged, this, &VideoSurface::updateSurfacePosition);
-        connect(this, &QQuickItem::parentChanged, this, &VideoSurface::updateParentChanged);
-        updateParentChanged();
     }
 }
 
@@ -419,28 +417,4 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
     }
 
     emit videoSurfaceProviderChanged();
-}
-
-void VideoSurface::updateParentChanged()
-{
-    //we need to track the global position of the VideoSurface within the scene
-    //it depends on the position of the VideoSurface itself and all its parents
-
-    for (const QPointer<QQuickItem>& p : m_parentList)
-    {
-        if (!p)
-            continue;
-        disconnect(p, &QQuickItem::xChanged, this, &VideoSurface::updateSurfacePosition);
-        disconnect(p, &QQuickItem::yChanged, this, &VideoSurface::updateSurfacePosition);
-        disconnect(p, &QQuickItem::parentChanged, this, &VideoSurface::updateParentChanged);
-    }
-    m_parentList.clear();
-
-    for (QQuickItem* p = parentItem(); p != nullptr; p = p->parentItem())
-    {
-        connect(p, &QQuickItem::xChanged, this, &VideoSurface::updateSurfacePosition);
-        connect(p, &QQuickItem::yChanged, this, &VideoSurface::updateSurfacePosition);
-        connect(p, &QQuickItem::parentChanged, this, &VideoSurface::updateParentChanged);
-        m_parentList.push_back(p);
-    }
 }
