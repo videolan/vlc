@@ -250,11 +250,14 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                  * CORE...SUBSTREAM is regular extension.
                  * SUBSTREAM...CORE is sync issue.
                  */
-                p_dec->fmt_out.i_profile = PROFILE_DTS_EXPRESS;
-                p_sys->first.i_rate = xssheader.i_rate;
-                p_sys->first.i_frame_length = xssheader.i_frame_length;
-                p_sys->i_state = STATE_NEXT_SYNC;
-                break;
+                if (xssheader.i_rate != 0 && xssheader.i_frame_length != 0)
+                {
+                    p_dec->fmt_out.i_profile = PROFILE_DTS_EXPRESS;
+                    p_sys->first.i_rate = xssheader.i_rate;
+                    p_sys->first.i_frame_length = xssheader.i_frame_length;
+                    p_sys->i_state = STATE_NEXT_SYNC;
+                    break;
+                }
             }
 
             msg_Warn( p_dec, "substream without the paired core stream, skip it" );
