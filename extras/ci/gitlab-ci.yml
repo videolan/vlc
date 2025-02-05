@@ -19,6 +19,7 @@ variables:
     VLC_UWP_LLVM_IMAGE: registry.videolan.org/vlc-debian-llvm-uwp:20211020111246
     VLC_WIN_LLVM_UCRT_IMAGE: registry.videolan.org/vlc-debian-llvm-ucrt:20251223015425
     VLC_DEBIAN_IMAGE: registry.videolan.org/vlc-debian-unstable:20200229201904
+    VLC_DEBIAN_QT6_IMAGE: registry.videolan.org/vlc-debian-unstable:20260121072258
     VLC_ANDROID_IMAGE: registry.videolan.org/vlc-debian-android-3.0:20250626142950
     VLC_ANDROID4_IMAGE: registry.videolan.org/vlc-debian-android:20250626142950
     VLC_SNAP_IMAGE: registry.videolan.org/vlc-ubuntu-bionic:20250904134924
@@ -316,6 +317,25 @@ debian:
             export XZ_OPT="-T 0"
             make -j$NCPU distcheck
         fi
+    variables: *variables-debian
+
+debian-qt6:
+    extends: .docker-template
+    image:
+        name: $VLC_DEBIAN_QT6_IMAGE
+    script: |
+        export NCPU=$(getconf _NPROCESSORS_ONLN)
+
+        export CFLAGS="$CFLAGS -Werror=missing-field-initializers -Werror=format -Werror=incompatible-pointer-types -Werror=restrict -Werror=int-conversion -Werror=implicit-int -Werror=return-mismatch -Werror=declaration-missing-parameter-type"
+        export CXXFLAGS="$CXXFLAGS -Werror=missing-field-initializers -Werror=format"
+
+        # patch VLC to disable Qt5 detection
+        sed -i.orig 's/Qt5Svg/Qt5Svg Qt5DisableDetection/' configure.ac
+
+        # Build VLC
+        ./bootstrap
+        ./configure --disable-nls
+        make -j$NCPU -k
     variables: *variables-debian
 
 nightly-debian:
