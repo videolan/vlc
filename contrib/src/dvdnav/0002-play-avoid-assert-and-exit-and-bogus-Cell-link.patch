@@ -17,7 +17,7 @@ index e5d0e72..a9d99fa 100644
              (vm->state).cellN, (vm->state).pgc->nr_of_cells );
  #endif
 -    assert((vm->state).cellN == (vm->state).pgc->nr_of_cells + 1);
-+    if((vm->state).cellN == (vm->state).pgc->nr_of_cells + 1) {
++    if((vm->state).cellN > (vm->state).pgc->nr_of_cells + 1) {
 +      /* bogus link, ignore it */
 +      link_t link_values = { LinkNoLink, 0, 0, 0 };
 +      return link_values;
