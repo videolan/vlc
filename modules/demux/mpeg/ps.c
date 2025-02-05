@@ -299,11 +299,9 @@ static void Close( vlc_object_t *p_this )
     for( i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->b_configured )
-        {
-            es_format_Clean( &tk->fmt );
-            if( tk->es ) es_out_Del( p_demux->out, tk->es );
-        }
+        es_format_Clean( &tk->fmt );
+        if( tk->b_configured && tk->es != NULL )
+            es_out_Del( p_demux->out, tk->es );
     }
 
     ps_psm_destroy( &p_sys->psm );
