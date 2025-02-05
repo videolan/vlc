@@ -49,6 +49,9 @@
 #include "demux-run.h"
 #include "decoder.h"
 
+void vlc_object_InitInputConfig(vlc_object_t *obj,
+                                bool playback, bool do_inherit);
+
 struct test_es_out_t
 {
     struct es_out_t out;
@@ -222,6 +225,8 @@ static const struct es_out_callbacks es_out_cbs =
 
 static es_out_t *test_es_out_create(vlc_object_t *parent)
 {
+    vlc_object_InitInputConfig(parent, true, false);
+
     struct test_es_out_t *ctx = malloc(sizeof (*ctx));
     if (ctx == NULL)
     {

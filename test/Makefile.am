@@ -330,8 +330,8 @@ FORCE:
 .PHONY: FORCE
 
 libvlc_demux_run_la_SOURCES = src/input/demux-run.c src/input/demux-run.h \
-	src/input/common.c src/input/common.h
-libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS)
+	src/input/common.c src/input/common.h $(top_srcdir)/src/input/var.c
+libvlc_demux_run_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(top_srcdir)/src
 libvlc_demux_run_la_LDFLAGS = -no-install -static
 libvlc_demux_run_la_LIBADD = \
 	../lib/libvlc.la ../src/libvlccore.la ../compat/libcompat.la
