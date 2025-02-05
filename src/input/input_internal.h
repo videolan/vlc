@@ -700,7 +700,8 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *, const char *name );
 
 /* var.c */
 
-void input_ConfigVarInit ( input_thread_t * );
+void vlc_object_InitInputConfig(vlc_object_t *obj,
+                                bool playback, bool do_inherit);
 
 /* Subtitles */
 int subtitles_Detect( input_thread_t *, char *, const char *, input_item_slave_t ***, int * );
