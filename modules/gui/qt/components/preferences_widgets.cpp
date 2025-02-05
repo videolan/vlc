@@ -622,8 +622,6 @@ void ModuleListConfigControl::fillGrid( QGridLayout *l, int line )
 
 ModuleListConfigControl::~ModuleListConfigControl()
 {
-    foreach ( checkBoxListItem *it, modules )
-        free( it->psz_module );
     qDeleteAll( modules );
     modules.clear();
     delete groupBox;
@@ -653,10 +651,10 @@ void ModuleListConfigControl::checkbox_lists( QString label, QString help, const
         cb->setToolTip( formatTooltip( help ) );
     cbl->checkBox = cb;
 
-    cbl->psz_module = strdup( psz_module );
+    cbl->psz_module = qfu( psz_module );
     modules.append( cbl );
 
-    if( p_item->value.psz && strstr( p_item->value.psz, cbl->psz_module ) )
+    if( p_item->value.psz && strstr( p_item->value.psz, psz_module ) )
         cbl->checkBox->setChecked( true );
 }
 

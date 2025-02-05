@@ -407,7 +407,7 @@ private:
 
 struct checkBoxListItem {
     QCheckBox *checkBox;
-    char *psz_module;
+    QString   psz_module;
 };
 
 class ModuleListConfigControl : public VStringConfigControl
