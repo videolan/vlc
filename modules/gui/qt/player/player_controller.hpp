@@ -196,7 +196,7 @@ public:
     Q_PROPERTY(RendererManager* rendererManager READ getRendererManager CONSTANT FINAL)
 
     // High resolution time fed by SMPTE Timer
-    Q_PROPERTY(QString highResolutionTime READ highResolutionTime NOTIFY highResolutionTimeChanged FINAL)
+    Q_PROPERTY(QString highResolutionTime READ highResolutionTime FINAL)
 
     /* exposed actions */
 public slots:

@@ -29,6 +29,11 @@
 #include <QTimer>
 #include <QUrl>
 
+#ifndef QT_HAS_LIBATOMIC
+#warning "libatomic is not available. Read write lock is going to be used instead."
+#include <QReadWriteLock>
+#endif
+
 typedef struct vlc_preparser_t vlc_preparser_t;
 
 class PlayerControllerPrivate {
@@ -95,7 +100,14 @@ public:
     double       m_position = 0.f;
     VLCTick      m_length= 0;
 
-    QString m_highResolutionTime { "00:00:00:00" };
+#if QT_HAS_LIBATOMIC
+    std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime;
+#else
+    vlc_player_timer_smpte_timecode m_highResolutionTime;
+    mutable QReadWriteLock m_highResolutionTimeLock;
+#endif
+    mutable QPair<vlc_player_timer_smpte_timecode, QString> m_highResolutionTimeSample;
+
     unsigned m_smpteTimerRequestCount = 0;
 
     SharedInputItem    m_currentItem;

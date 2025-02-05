@@ -38,6 +38,10 @@
 #include <QDir>
 #include <QSignalMapper>
 #include <QThreadPool>
+#ifndef QT_HAS_LIBATOMIC
+#include <QReadLocker>
+#include <QWriteLocker>
+#endif
 
 #include <cassert>
 
@@ -1009,16 +1013,10 @@ static void on_player_timer_smpte_update(const struct vlc_player_timer_smpte_tim
                                          void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate *>(data);
-
-    that->callAsync([that, tc_copy = *tc](){
-        that->m_highResolutionTime = QString::asprintf("%02u:%02u:%02u%c%02u",
-                                                       tc_copy.hours,
-                                                       tc_copy.minutes,
-                                                       tc_copy.seconds,
-                                                       tc_copy.drop_frame ? '.' : ':',
-                                                       tc_copy.frames);
-        emit that->q_func()->highResolutionTimeChanged(that->m_highResolutionTime);
-    });
+#ifndef QT_HAS_LIBATOMIC
+    QWriteLocker lock(&that->m_highResolutionTimeLock);
+#endif
+    that->m_highResolutionTime = *tc;
 }
 
 
@@ -1953,6 +1951,39 @@ void PlayerController::snapshot()
     }
 }
 
+QString PlayerController::highResolutionTime() const
+{
+    Q_D(const PlayerController);
+
+    // Sample:
+    vlc_player_timer_smpte_timecode sample;
+    {
+#ifndef QT_HAS_LIBATOMIC
+        QReadLocker lock(&d->m_highResolutionTimeLock);
+#endif
+        sample = d->m_highResolutionTime;
+    }
+
+    const vlc_player_timer_smpte_timecode& lastSample = d->m_highResolutionTimeSample.first;
+
+    if (sample.frames == lastSample.frames &&
+        sample.frame_resolution == lastSample.frame_resolution &&
+        sample.seconds == lastSample.seconds &&
+        sample.minutes == lastSample.minutes &&
+        sample.hours == lastSample.hours &&
+        sample.drop_frame == lastSample.drop_frame)
+        return d->m_highResolutionTimeSample.second;
+
+    d->m_highResolutionTimeSample.second = QString::asprintf("%02u:%02u:%02u%c%02u",
+                                                             sample.hours,
+                                                             sample.minutes,
+                                                             sample.seconds,
+                                                             sample.drop_frame ? '.' : ':',
+                                                             sample.frames);
+    d->m_highResolutionTimeSample.first = std::move(sample);
+
+    return d->m_highResolutionTimeSample.second;
+}
 
 //OTHER
 
@@ -2136,8 +2167,5 @@ PRIMITIVETYPE_GETTER(QString, getArtist, m_artist)
 PRIMITIVETYPE_GETTER(QString, getAlbum, m_album)
 PRIMITIVETYPE_GETTER(QUrl, getArtwork, m_artwork)
 PRIMITIVETYPE_GETTER(QUrl, getUrl, m_url)
-
-// High resolution time fed by SMPTE timer
-PRIMITIVETYPE_GETTER(QString, highResolutionTime, m_highResolutionTime)
 
 #undef PRIMITIVETYPE_GETTER

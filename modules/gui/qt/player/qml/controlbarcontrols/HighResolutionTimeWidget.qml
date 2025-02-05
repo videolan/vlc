@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 import QtQuick
+import QtQuick.Window
 import QtQuick.Controls
 
 
@@ -37,7 +38,7 @@ Control {
     Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
 
     Accessible.role: Accessible.Indicator
-    Accessible.name:  paintOnly ? "00:00:00:00" : Player.highResolutionTime
+    Accessible.name: contentItem.text
 
     function _adjustSMPTETimer(add) {
         if (typeof toolbarEditor !== "undefined") // FIXME: Can't use paintOnly because it is set later
@@ -73,16 +74,46 @@ Control {
         implicitHeight: smpteTimecodeMetrics.height
         implicitWidth: smpteTimecodeMetrics.width
 
+        property alias text: label.text
+
         Widgets.MenuLabel {
             id: label
             anchors.fill: parent
 
-            text: paintOnly ? "00:00:00:00" : Player.highResolutionTime
+            text: paintOnly ? "00:00:00:00" : timeText
             color: theme.fg.primary
 
             horizontalAlignment: Text.AlignHCenter
 
             Accessible.ignored: true
+
+            property string timeText
+
+            Connections {
+                target: label.Window.window
+                enabled: label.visible
+
+                function onAfterAnimating() {
+                    // Sampling point
+                    // Emitted from the GUI thread
+
+                    // Constantly update the label, so that the window
+                    // prepares new frames as we don't know when the
+                    // timecode changes. This is similar to animations:
+                    label.update()
+
+                    if (label.timeText === Player.highResolutionTime)
+                        return
+
+                    label.timeText = Player.highResolutionTime
+
+                    // Text would like polishing after text change.
+                    // We need this because `afterAnimating()` is
+                    // signalled after the items are polished:
+                    if (label.ensurePolished)
+                        label.ensurePolished()
+                }
+            }
         }
 
         TextMetrics {
