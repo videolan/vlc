@@ -102,8 +102,8 @@ vlc_modules += {
 }
 
 # libmad codec
-if get_option('mad').allowed()
 mad_dep = disabler()
+if get_option('mad').allowed()
 # TODO add support for a custom folder for libmad
 if cc.check_header('mad.h')
     mad_dep = cc.find_library('mad')

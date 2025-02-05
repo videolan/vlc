@@ -1,5 +1,5 @@
-if get_option('nvdec').allowed()
 nvdec_dep = disabler()
+if get_option('nvdec').allowed()
 if cc.check_header('ffnvcodec/dynlink_loader.h')
     nvdec_dep = enabler()
 elif cc.check_header('ffnvcodec/dynlink_loader.h', dependencies: contrib_dep )

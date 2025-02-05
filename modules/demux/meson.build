@@ -405,8 +405,8 @@ vlc_modules += {
 }
 
 # mpc
-if get_option('mpc').allowed()
 mpc_dep = disabler()
+if get_option('mpc').allowed()
 if cc.check_header('mpc/mpcdec.h')
     mpc_dep = cc.find_library('mpcdec')
     cdata.set('HAVE_MPC_MPCDEC_H', 1)

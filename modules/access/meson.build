@@ -9,8 +9,8 @@ vlc_modules += {
 }
 
 decklink_dep = disabler()
-if get_option('decklink').allowed()
 decklink_cpp_args = []
+if get_option('decklink').allowed()
 if host_system == 'windows'
     decklink_cpp_args += libcom_cppflags
 endif
