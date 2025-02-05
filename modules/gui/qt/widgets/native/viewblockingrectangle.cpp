@@ -122,15 +122,23 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
 
     if (!oldNode)
     {
+        const auto observerNode = new MatrixChangeObserverNode([p = QPointer(this)]() {
+            if (Q_LIKELY(p))
+                emit p->scenePositionHasChanged();
+        });
+        observerNode->setFlag(QSGNode::OwnedByParent);
+
         if (softwareMode)
         {
             softwareRenderNode = new SoftwareRenderNode;
             softwareRenderNode->setWindow(window());
+            softwareRenderNode->appendChildNode(observerNode);
         }
         else
         {
             rectangleNode = window()->createRectangleNode();
             assert(rectangleNode);
+            rectangleNode->appendChildNode(observerNode);
 
             const auto material = rectangleNode->material();
             if (!material ||

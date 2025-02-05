@@ -21,6 +21,37 @@
 
 #include <QQuickItem>
 #include <QColor>
+#include <QMatrix4x4>
+#include <QSGRenderNode>
+
+// WARNING: Do not use QSGTransformNode here with preprocess, Qt does not
+//          necessarily call preprocess when the combined matrix changes!
+class MatrixChangeObserverNode : public QSGRenderNode
+{
+public:
+    explicit MatrixChangeObserverNode(const std::function<void()>& callback)
+        : m_callback(callback) { }
+
+    void render(const RenderState *) override
+    {
+        assert(matrix());
+        const QMatrix4x4 m = *matrix(); // matrix() is the combined matrix here
+        if (m_lastCombinedMatrix != m)
+        {
+            m_callback();
+            m_lastCombinedMatrix = m;
+        }
+    }
+
+    RenderingFlags flags() const override
+    {
+        // Enable all optimizations, as we are not actually rendering anything in this node:
+        return static_cast<RenderingFlags>(BoundedRectRendering | DepthAwareRendering | OpaqueRendering | NoExternalRendering);
+    }
+private:
+    std::function<void()> m_callback;
+    QMatrix4x4 m_lastCombinedMatrix;
+};
 
 class ViewBlockingRectangle : public QQuickItem
 {
@@ -29,7 +60,7 @@ class ViewBlockingRectangle : public QQuickItem
     Q_PROPERTY(QColor color MEMBER m_color NOTIFY colorChanged FINAL)
 
 public:
-    ViewBlockingRectangle(QQuickItem *parent = nullptr);
+    explicit ViewBlockingRectangle(QQuickItem *parent = nullptr);
 
 protected:
     QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
@@ -39,6 +70,9 @@ private:
     bool m_windowChanged = false;
 
 signals:
+    // NOTE: `scenePositionHasChanged()` signal is emitted from the render thread,
+    //       and NOT during synchronization (meaning, GUI thread is not blocked):
+    void scenePositionHasChanged();
     void colorChanged();
 };
 
