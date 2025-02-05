@@ -996,6 +996,13 @@ AS_IF([test "${SYS}" != "mingw32"], [
 ])
 AC_SUBST([LIBRT])
 
+dnl Check for libatomic
+have_libatomic="no"
+VLC_SAVE_FLAGS
+AC_SEARCH_LIBS([__atomic_load], [atomic], [have_libatomic="yes"])
+VLC_RESTORE_FLAGS
+AM_CONDITIONAL([HAVE_LIBATOMIC], [test "${have_libatomic}" = "yes"])
+
 dnl  Check for clock_* functions, needs to be done here,
 dnl  after the -lrt check
 AC_REPLACE_FUNCS([clock_gettime clock_nanosleep clock_getres])
