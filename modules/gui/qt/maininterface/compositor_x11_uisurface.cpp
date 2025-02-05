@@ -247,6 +247,7 @@ void CompositorX11UISurface::render()
         m_backingStore->flush(geometry());
     }
 
+    emit m_uiWindow->frameSwapped();
 
     emit updated();
 }
