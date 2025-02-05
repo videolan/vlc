@@ -42,9 +42,6 @@
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 #include <vlc_url.h>
-#ifdef _WIN32
-  #include <vlc_charset.h> /* FromWide for Win32 */
-#endif
 
 #include <QFileDialog>
 #include <QDialogButtonBox>
@@ -403,16 +400,14 @@ void DiscOpenPanel::onFocus()
                 wchar_t psz_name[512] = L"";
                 GetVolumeInformationW( drive, psz_name, 511, NULL, NULL, NULL, NULL, 0 );
 
-                char *psz_drive = FromWide( drive );
+                QString psz_drive = QString::fromWCharArray( drive );
                 QString displayName = psz_drive;
-                char *psz_title = FromWide( psz_name );
-                if( !EMPTY_STR(psz_title)) {
+                QString psz_title = QString::fromWCharArray( psz_name );
+                if( !psz_title.isEmpty()) {
                     displayName = displayName + " - "  + psz_title;
                 }
 
-                ui.deviceCombo->addItem( displayName, qfu(psz_drive) );
-                free( psz_drive );
-                free( psz_title );
+                ui.deviceCombo->addItem( displayName, psz_drive );
             }
 
             /* go to next drive */
