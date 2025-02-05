@@ -214,6 +214,9 @@ VideoSurface::VideoSurface(QQuickItem* parent)
 
         connect(this, &QQuickItem::xChanged, this, &VideoSurface::updateSurfacePosition);
         connect(this, &QQuickItem::yChanged, this, &VideoSurface::updateSurfacePosition);
+
+        // This is for the case when the item's parent-relative position stays the same, but ancestors change position:
+        connect(this, &ViewBlockingRectangle::scenePositionHasChanged, this, &VideoSurface::updateSurfacePosition, Qt::QueuedConnection);
     }
 }
 
