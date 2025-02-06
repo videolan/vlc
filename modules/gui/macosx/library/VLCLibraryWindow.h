@@ -24,6 +24,8 @@
 
 #import "views/VLCDragDropView.h"
 
+#import "library/VLCLibraryItemPresentingCapable.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCMainWindowControlsBar;
@@ -50,7 +52,7 @@ typedef NS_ENUM(NSInteger, VLCLibraryViewModeSegment) {
     VLCLibraryLargestSentinelViewModeSegment
 };
 
-@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification, VLCDragDropTarget>
+@interface VLCLibraryWindow : VLCFullVideoViewWindow<NSUserInterfaceItemIdentification, VLCDragDropTarget, VLCLibraryItemPresentingCapable>
 
 extern const CGFloat VLCLibraryWindowMinimalWidth;
 extern const CGFloat VLCLibraryWindowMinimalHeight;
@@ -137,7 +139,6 @@ extern const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier;
                               usingConstraints:(NSArray<NSLayoutConstraint *> *)constraints
                              displayingMessage:(NSString *)message;
 - (void)displayNoResultsMessage;
-- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 - (void)goToLocalFolderMrl:(NSString *)mrl;
 
 - (IBAction)goToBrowseSection:(id)sender;
