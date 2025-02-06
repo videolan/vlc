@@ -463,7 +463,7 @@ static void *Run(void *p_obj)
 static int Open(vlc_object_t *p_obj)
 {
     services_discovery_t *sd = (services_discovery_t *)p_obj;
-    struct discovery_sys *p_sys = vlc_alloc(1, sizeof(struct discovery_sys));
+    struct discovery_sys *p_sys = vlc_obj_calloc(p_obj, 1, sizeof(struct discovery_sys));
     struct device_info *info = NULL;
     if (!p_sys)
         return VLC_ENOMEM;
@@ -525,7 +525,6 @@ error:
         sd_bus_close(p_sys->bus);
     }
     sd_bus_error_free(&err);
-    free(p_sys);
     return VLC_EGENERIC;
 }
 
@@ -540,7 +539,6 @@ static void Close(vlc_object_t *p_obj)
     vlc_cancel(p_sys->thread);
     vlc_join(p_sys->thread, NULL);
     vlc_dictionary_clear(&p_sys->entries, FreeEntries, sd);
-    free(p_sys);
 }
 
 VLC_SD_PROBE_HELPER("udisks", N_("UDisks2"), SD_CAT_DEVICES)
