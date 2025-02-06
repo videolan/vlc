@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryAbstractSegmentViewController.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCMediaLibraryGroup;
 
-@interface VLCLibraryGroupsViewController : VLCLibraryAbstractSegmentViewController<NSSplitViewDelegate>
+@interface VLCLibraryGroupsViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate>
 
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) VLCLibraryCollectionView *collectionView;

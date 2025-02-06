@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryAbstractSegmentViewController.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
 #include <vlc_media_library.h>
 
@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryTableView;
 @class VLCLibraryWindow;
 
-@interface VLCLibraryPlaylistViewController : VLCLibraryAbstractSegmentViewController<NSSplitViewDelegate>
+@interface VLCLibraryPlaylistViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate>
 
 @property (readonly) NSSplitView *listViewSplitView;
 @property (readonly) NSScrollView *masterTableViewScrollView;

@@ -22,7 +22,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "library/VLCLibraryAbstractSegmentViewController.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
 @class VLCLibraryWindow;
 @class VLCLibraryHomeViewStackViewController;
@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the home library views
 
-@interface VLCLibraryHomeViewController : VLCLibraryAbstractSegmentViewController
+@interface VLCLibraryHomeViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
 
 @property (readonly, weak) NSView *homeLibraryView;
 @property (readonly, weak) NSScrollView *homeLibraryStackViewScrollView;

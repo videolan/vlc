@@ -23,7 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibrarySegment.h"
-#import "library/VLCLibraryAbstractSegmentViewController.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
@@ -34,7 +34,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioViewController : VLCLibraryAbstractSegmentViewController
+@interface VLCLibraryAudioViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
 
 @property (readonly, weak) NSView *audioLibraryView;
 @property (readonly, weak) NSSplitView *audioLibrarySplitView;
