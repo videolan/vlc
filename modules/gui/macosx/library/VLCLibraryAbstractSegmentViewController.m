@@ -22,7 +22,6 @@
 
 #import "VLCLibraryAbstractSegmentViewController.h"
 
-#import "library/VLCLibraryDataSource.h"
 #import "library/VLCLibraryWindow.h"
 
 @implementation VLCLibraryAbstractSegmentViewController
@@ -39,31 +38,6 @@
         _placeholderLabel = libraryWindow.placeholderLabel;
     }
     return self;
-}
-
-- (id<VLCLibraryDataSource>)currentDataSource
-{
-    [self doesNotRecognizeSelector:_cmd];
-    return nil;
-}
-
-// A note on the connected property.
-// This does not necessarily reflect the connection state of the data sources themselves.
-// We may disconnect the data sources via the view controllers when we detect that long loads are
-// taking place. However, keeping the connection state in the view controller allows us to
-// reconnect the data sources once the long loads are over (or not reconnect them, if the view
-// controller was originally disconnected, for example if the embedded video view is open)
-
-- (void)connect
-{
-    [self.currentDataSource connect];
-    _connected = YES;
-}
-
-- (void)disconnect
-{
-    [self.currentDataSource disconnect];
-    _connected = NO;
 }
 
 @end

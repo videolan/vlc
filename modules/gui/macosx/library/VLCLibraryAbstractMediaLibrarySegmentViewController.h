@@ -24,7 +24,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol VLCLibraryDataSource;
+
 @interface VLCLibraryAbstractMediaLibrarySegmentViewController : VLCLibraryAbstractSegmentViewController
+
+@property (readonly) BOOL connected; // Meaning to library model notifications
+
+// Implement getters for these properties in subclass
+@property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
+@property (readonly) id<VLCLibraryDataSource> currentDataSource;
+
+- (void)connect;
+- (void)disconnect;
 
 @end
 

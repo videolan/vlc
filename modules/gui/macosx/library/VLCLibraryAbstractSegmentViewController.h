@@ -25,7 +25,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
-@protocol VLCLibraryDataSource;
 
 @interface VLCLibraryAbstractSegmentViewController : NSObject
 
@@ -35,15 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, weak) NSImageView *placeholderImageView;
 @property (readonly, weak) NSTextField *placeholderLabel;
 
-// Implement getters for these properties in subclass
-@property (readonly) NSArray<NSLayoutConstraint *> *placeholderImageViewSizeConstraints;
-@property (readonly) id<VLCLibraryDataSource> currentDataSource;
-@property (readonly) BOOL connected; // Meaning to library model notifications
-
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
-
-- (void)connect;
-- (void)disconnect;
 
 @end
 
