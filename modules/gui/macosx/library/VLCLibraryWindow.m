@@ -38,6 +38,7 @@
 #import "playqueue/VLCPlayQueueController.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
 #import "library/VLCLibraryController.h"
 #import "library/VLCLibraryCollectionViewItem.h"
 #import "library/VLCLibraryCollectionViewSupplementaryElementView.h"
@@ -594,7 +595,9 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = YES;
 
-    [self.librarySegmentViewController disconnect];
+    if ([self.librarySegmentViewController isKindOfClass:VLCLibraryAbstractMediaLibrarySegmentViewController.class]) {
+        [(VLCLibraryAbstractMediaLibrarySegmentViewController *)self.librarySegmentViewController disconnect];
+    }
 }
 
 - (void)disableVideoPlaybackAppearance
