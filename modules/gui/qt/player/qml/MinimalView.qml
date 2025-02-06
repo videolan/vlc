@@ -156,6 +156,15 @@ FocusScope {
         }
     }
 
+    Widgets.FloatingNotification {
+        anchors {
+            bottom: parent.bottom
+            left: parent.left
+            right: parent.right
+            margins: VLCStyle.margin_large
+        }
+    }
+
     Keys.onPressed: (event) => {
         if (event.accepted)
             return
