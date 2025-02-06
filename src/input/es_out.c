@@ -700,7 +700,10 @@ static bool EsOutDrain(es_out_sys_t *p_sys)
 {
     es_out_id_t *es;
 
-    if( p_sys->b_buffering && p_sys->p_pgrm )
+    if( p_sys->p_pgrm == NULL ) /* Nothing to drain, assume es_out is empty */
+        return true;
+
+    if( p_sys->b_buffering )
     {
         EsOutDecodersStopBuffering(p_sys, true);
         if( p_sys->b_buffering )
