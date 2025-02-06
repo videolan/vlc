@@ -732,8 +732,13 @@ NSArray<NSString *> *defaultBookmarkedLocations()
 
         const VLCLibrarySegmentType segmentType = VLCLibraryBrowseBookmarkedLocationSubSegmentType;
         NSMutableArray<NSTreeNode *> * const bookmarkedLocationNodes = NSMutableArray.array;
+        NSMutableArray<NSString *> * const remainingBookmarkedLocations = bookmarkedLocations.mutableCopy;
 
         for (NSString * const locationMrl in bookmarkedLocations) {
+            if (![NSFileManager.defaultManager fileExistsAtPath:[NSURL URLWithString:locationMrl].path]) {
+                [remainingBookmarkedLocations removeObject:locationMrl];
+                continue;
+            }
             NSString * const locationName = locationMrl.lastPathComponent;
             VLCLibrarySegmentBookmarkedLocation * const descriptor =
                 [[VLCLibrarySegmentBookmarkedLocation alloc] initWithSegmentType:segmentType
@@ -745,6 +750,10 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         }
 
         self.internalChildNodes = bookmarkedLocationNodes.copy;
+
+        if (bookmarkedLocations.count != remainingBookmarkedLocations.count) {
+            [defaults setObject:remainingBookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
+        }
     }
     return self;
 }
