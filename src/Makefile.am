@@ -94,6 +94,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_poll.h \
 	../include/vlc_probe.h \
 	../include/vlc_preparser.h \
+	../include/vlc_process.h \
 	../include/vlc_queue.h \
 	../include/vlc_rand.h \
 	../include/vlc_renderer_discovery.h \
@@ -448,7 +449,8 @@ libvlccore_la_SOURCES += \
 	win32/plugin.c \
 	win32/rand.c \
 	win32/specific.c \
-	win32/thread.c
+	win32/thread.c \
+	win32/process.c
 if HAVE_WINSTORE
 libvlccore_la_SOURCES += posix/timer.c win32/dirs-uap.c
 else
@@ -540,7 +542,8 @@ libvlccore_la_SOURCES += \
 libvlccore_la_LIBADD += $(LIBEXECINFO)
 if HAVE_OSX
 libvlccore_la_SOURCES += \
-	posix/spawn.c
+	posix/spawn.c \
+	posix/process.c
 endif
 if !HAVE_DARWIN
 if !HAVE_EMSCRIPTEN
@@ -551,7 +554,8 @@ libvlccore_la_SOURCES += \
 	posix/error.c \
 	posix/picture.c \
 	posix/spawn.c \
-	posix/specific.c
+	posix/specific.c \
+	posix/process.c
 if HAVE_LIBANL
 libvlccore_la_SOURCES += \
 	linux/getaddrinfo.c

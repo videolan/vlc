@@ -330,6 +330,7 @@ if host_system == 'darwin'
     if have_osx
         libvlccore_sources += [
             'posix/spawn.c',
+            'posix/process.c',
         ]
     endif
 elif host_system == 'windows'
@@ -353,6 +354,7 @@ elif host_system == 'windows'
             'win32/timer.c',
             'win32/dirs.c',
             'win32/spawn.c',
+            'win32/process.c',
         ]
     endif
 else
@@ -372,6 +374,7 @@ else
             'posix/picture.c',
             'posix/specific.c',
             'posix/thread.c',
+            'posix/process.c',
         ]
     endif
 

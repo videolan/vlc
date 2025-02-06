@@ -1066,3 +1066,7 @@ vlc_preparser_req_GetItem
 vlc_preparser_req_Release
 vlc_preparser_Delete
 vlc_preparser_SetTimeout
+vlc_process_Spawn
+vlc_process_Terminate
+vlc_process_fd_Read
+vlc_process_fd_Write
