@@ -616,6 +616,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     if (self.presentLoadingOverlayOnVideoPlaybackHide) {
         [self showLoadingOverlay];
     }
+
+    if ([self.librarySegmentViewController isKindOfClass:VLCLibraryAbstractMediaLibrarySegmentViewController.class]) {
+        [(VLCLibraryAbstractMediaLibrarySegmentViewController *)self.librarySegmentViewController connect];
+    }
 }
 
 - (void)showLoadingOverlay
