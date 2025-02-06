@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryItemPresentingCapable.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryHeroView;
@@ -30,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryHomeViewVideoCarouselContainerView;
 @protocol VLCMediaLibraryItemProtocol;
 
-@interface VLCLibraryHomeViewStackViewController : NSObject
+@interface VLCLibraryHomeViewStackViewController : NSObject<VLCLibraryItemPresentingCapable>
 
 @property (readwrite, assign, nonatomic) NSSize collectionViewItemSize;
 @property (readwrite, assign, nonatomic) CGFloat collectionViewMinimumLineSpacing;
@@ -48,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reloadData;
 - (void)connectContainers;
 - (void)disconnectContainers;
-- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 

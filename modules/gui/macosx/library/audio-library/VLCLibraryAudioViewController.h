@@ -24,6 +24,7 @@
 
 #import "library/VLCLibrarySegment.h"
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/VLCLibraryItemPresentingCapable.h"
 
 @class VLCLibraryAudioDataSource;
 @class VLCLibraryAudioGroupDataSource;
@@ -34,7 +35,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryAudioViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+@interface VLCLibraryAudioViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable>
 
 @property (readonly, weak) NSView *audioLibraryView;
 @property (readonly, weak) NSSplitView *audioLibrarySplitView;
@@ -59,7 +60,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)presentAudioView;
 - (void)reloadData;
-- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem;
 
 @end
 

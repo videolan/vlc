@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/VLCLibraryItemPresentingCapable.h"
 
 @class VLCLibraryCollectionView;
 @class VLCLibraryWindow;
@@ -34,8 +35,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Controller for the video library views
-
-@interface VLCLibraryVideoViewController : VLCLibraryAbstractMediaLibrarySegmentViewController
+@interface VLCLibraryVideoViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<VLCLibraryItemPresentingCapable>
 
 @property (readonly, weak) NSView *videoLibraryView;
 @property (readonly, weak) NSSplitView *videoLibrarySplitView;
