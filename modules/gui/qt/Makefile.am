@@ -286,6 +286,7 @@ libqt_plugin_la_SOURCES = \
 	util/workerthreadset.hpp util/workerthreadset.cpp \
 	util/base_model.hpp util/base_model_p.hpp util/base_model.cpp \
 	util/color_scheme_model.cpp util/color_scheme_model.hpp \
+	util/ui_notifier.cpp util/ui_notifier.hpp \
 	util/color_svg_image_provider.cpp util/color_svg_image_provider.hpp \
 	util/vlcaccess_image_provider.cpp util/vlcaccess_image_provider.hpp \
 	util/covergenerator.cpp \
@@ -469,6 +470,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	util/workerthreadset.moc.cpp \
 	util/base_model.moc.cpp \
 	util/color_scheme_model.moc.cpp \
+	util/ui_notifier.moc.cpp \
 	util/color_svg_image_provider.moc.cpp \
 	util/vlcaccess_image_provider.moc.cpp \
 	util/imageluminanceextractor.moc.cpp \
