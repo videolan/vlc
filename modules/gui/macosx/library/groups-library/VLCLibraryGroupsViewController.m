@@ -254,19 +254,19 @@
     }
 }
 
-- (void)presentGroup:(VLCMediaLibraryGroup *)group
+- (void)presentLibraryItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
 {
     [self presentGroupsView];
     
     const VLCLibraryViewModeSegment viewModeSegment =
         VLCLibraryWindowPersistentPreferences.sharedInstance.groupsLibraryViewMode;
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
-        NSIndexPath * const groupIndexPath = [self.dataSource indexPathForLibraryItem:group];
+        NSIndexPath * const groupIndexPath = [self.dataSource indexPathForLibraryItem:libraryItem];
         NSSet<NSIndexPath *> * const groupIndexPathSet = [NSSet setWithObject:groupIndexPath];
         [self.collectionView scrollToItemsAtIndexPaths:groupIndexPathSet
                                         scrollPosition:NSCollectionViewScrollPositionTop];
     } else {
-        const NSInteger groupRow = [self.dataSource rowForLibraryItem:group];
+        const NSInteger groupRow = [self.dataSource rowForLibraryItem:libraryItem];
         [self.groupsTableView selectRowIndexes:[NSIndexSet indexSetWithIndex:groupRow]
                           byExtendingSelection:NO];
         [self.groupsTableView scrollRowToVisible:groupRow];

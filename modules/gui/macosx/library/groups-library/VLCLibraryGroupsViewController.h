@@ -23,6 +23,7 @@
 #import <Cocoa/Cocoa.h>
 
 #import "library/VLCLibraryAbstractMediaLibrarySegmentViewController.h"
+#import "library/VLCLibraryItemPresentingCapable.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCLibraryWindow;
 @class VLCMediaLibraryGroup;
 
-@interface VLCLibraryGroupsViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate>
+@interface VLCLibraryGroupsViewController : VLCLibraryAbstractMediaLibrarySegmentViewController<NSSplitViewDelegate, VLCLibraryItemPresentingCapable>
 
 @property (readonly) NSScrollView *collectionViewScrollView;
 @property (readonly) VLCLibraryCollectionView *collectionView;
@@ -51,7 +52,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithLibraryWindow:(VLCLibraryWindow *)libraryWindow;
 
 - (void)presentGroupsView;
-- (void)presentGroup:(VLCMediaLibraryGroup *)group;
 
 @end
 
