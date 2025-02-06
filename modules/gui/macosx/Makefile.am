@@ -101,6 +101,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCInputNodePathControlItem.m \
 	gui/macosx/library/VLCLibraryAbstractGroupingDataSource.h \
 	gui/macosx/library/VLCLibraryAbstractGroupingDataSource.m \
+	gui/macosx/library/VLCLibraryAbstractMediaLibrarySegmentViewController.h \
+	gui/macosx/library/VLCLibraryAbstractMediaLibrarySegmentViewController.m \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.h \
 	gui/macosx/library/VLCLibraryAbstractSegmentViewController.m \
 	gui/macosx/library/VLCLibraryCarouselViewItemView.h \
