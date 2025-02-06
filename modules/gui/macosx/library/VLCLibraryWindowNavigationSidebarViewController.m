@@ -41,6 +41,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 @property BOOL ignoreSegmentSelectionChanges;
 @property (readonly) NSEdgeInsets scrollViewInsets;
+@property (readonly) NSMutableDictionary<NSString *, dispatch_source_t> *observedPathDispatchSources;
 
 @end
 
@@ -53,6 +54,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
         _libraryWindow = libraryWindow;
         _segments = VLCLibrarySegment.librarySegments;
         _ignoreSegmentSelectionChanges = NO;
+        _observedPathDispatchSources = NSMutableDictionary.dictionary;
     }
     return self;
 }
@@ -134,6 +136,45 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
                   byExtendingSelection:NO];
 
     self.ignoreSegmentSelectionChanges = NO;
+
+    [self updateBookmarkObservation];
+}
+
+- (void)updateBookmarkObservation
+{
+    NSArray<NSString *> * const bookmarkedLocations =
+        [NSUserDefaults.standardUserDefaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
+    if (bookmarkedLocations.count == 0) {
+        return;
+    }
+
+    NSMutableArray<NSString *> * const deletedLocations = self.observedPathDispatchSources.allKeys.mutableCopy;
+    const __weak typeof(self) weakSelf = self;
+
+    for (NSString * const locationPath in bookmarkedLocations) {
+        [deletedLocations removeObject:locationPath];
+        if ([self.observedPathDispatchSources objectForKey:locationPath] != nil) {
+            continue;
+        }
+        const uintptr_t descriptor = open([NSURL URLWithString:locationPath].path.UTF8String, O_EVTONLY);
+        if (descriptor == -1) {
+            continue;
+        }
+        const dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        const dispatch_source_t fileDispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, descriptor, DISPATCH_VNODE_DELETE | DISPATCH_VNODE_RENAME, globalQueue);
+        dispatch_source_set_event_handler(fileDispatchSource, ^{
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                [weakSelf internalNodesChanged:nil];
+            });
+        });
+        dispatch_source_set_cancel_handler(fileDispatchSource, ^{
+            close(descriptor);
+        });
+        dispatch_resume(fileDispatchSource);
+        [self.observedPathDispatchSources setObject:fileDispatchSource forKey:locationPath];
+    }
+
+    [self.observedPathDispatchSources removeObjectsForKeys:deletedLocations];
 }
 
 - (void)statusViewActivated:(NSNotification *)notification
