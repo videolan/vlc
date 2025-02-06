@@ -1070,3 +1070,6 @@ vlc_process_Spawn
 vlc_process_Terminate
 vlc_process_fd_Read
 vlc_process_fd_Write
+vlc_preparser_msg_Init
+vlc_preparser_msg_Clean
+vlc_preparser_msg_serdes_Create

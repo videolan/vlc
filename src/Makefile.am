@@ -95,6 +95,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_probe.h \
 	../include/vlc_preparser.h \
 	../include/vlc_process.h \
+	../include/vlc_preparser_ipc.h \
 	../include/vlc_queue.h \
 	../include/vlc_rand.h \
 	../include/vlc_renderer_discovery.h \
@@ -273,6 +274,7 @@ libvlccore_la_SOURCES = \
 	preparser/art.h \
 	preparser/fetcher.c \
 	preparser/fetcher.h \
+	preparser/ipc.c \
 	preparser/preparser.c \
 	input/item.c \
 	input/access.c \
