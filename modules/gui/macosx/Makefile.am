@@ -135,6 +135,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryImageCache.m \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.h \
 	gui/macosx/library/VLCLibraryItemInternalMediaItemsDataSource.m \
+	gui/macosx/library/VLCLibraryItemPresentingCapable.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDataSource.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.h \
 	gui/macosx/library/VLCLibraryMasterDetailViewTableViewDelegate.m \
