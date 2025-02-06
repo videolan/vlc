@@ -34,6 +34,11 @@
 
 #import "views/VLCStatusNotifierView.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 // This needs to match whatever identifier has been set in the library window XIB
 static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCellIdentifier";
 
@@ -142,8 +147,9 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 
 - (void)updateBookmarkObservation
 {
+    NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;
     NSArray<NSString *> * const bookmarkedLocations =
-        [NSUserDefaults.standardUserDefaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
+        [defaults stringArrayForKey:VLCLibraryBookmarkedLocationsKey];
     if (bookmarkedLocations.count == 0) {
         return;
     }
@@ -151,19 +157,49 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     NSMutableArray<NSString *> * const deletedLocations = self.observedPathDispatchSources.allKeys.mutableCopy;
     const __weak typeof(self) weakSelf = self;
 
-    for (NSString * const locationPath in bookmarkedLocations) {
-        [deletedLocations removeObject:locationPath];
-        if ([self.observedPathDispatchSources objectForKey:locationPath] != nil) {
+    for (NSString * const locationMrl in bookmarkedLocations) {
+        [deletedLocations removeObject:locationMrl];
+        if ([self.observedPathDispatchSources objectForKey:locationMrl] != nil) {
             continue;
         }
-        const uintptr_t descriptor = open([NSURL URLWithString:locationPath].path.UTF8String, O_EVTONLY);
+        NSURL * const locationUrl = [NSURL URLWithString:locationMrl];
+        const uintptr_t descriptor = open(locationUrl.path.UTF8String, O_EVTONLY);
         if (descriptor == -1) {
             continue;
         }
+        struct stat fileStat;
+        const int statResult = fstat(descriptor, &fileStat);
+
         const dispatch_queue_t globalQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         const dispatch_source_t fileDispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, descriptor, DISPATCH_VNODE_DELETE | DISPATCH_VNODE_RENAME, globalQueue);
         dispatch_source_set_event_handler(fileDispatchSource, ^{
-            dispatch_async(dispatch_get_main_queue(), ^ {
+            const unsigned long eventFlags = dispatch_source_get_data(fileDispatchSource);
+            if (eventFlags & DISPATCH_VNODE_RENAME && statResult != -1) {
+                NSURL * const parentLocationUrl = locationUrl.URLByDeletingLastPathComponent;
+                NSString * const parentLocationPath = parentLocationUrl.path;
+                NSArray<NSString *> * const files = [NSFileManager.defaultManager contentsOfDirectoryAtPath:parentLocationPath error:nil];
+                NSString *newFileName = nil;
+
+                for (NSString * const file in files) {
+                    NSString * const fullChildPath = [parentLocationPath stringByAppendingPathComponent:file];
+                    struct stat currentFileStat;
+                    if (stat(fullChildPath.UTF8String, &currentFileStat) == -1) {
+                        continue;
+                    } else if (currentFileStat.st_ino == fileStat.st_ino) {
+                        newFileName = fullChildPath.lastPathComponent;
+                        break;
+                    }
+                }
+
+                if (newFileName != nil) {
+                    NSMutableArray<NSString *> * const mutableBookmarkedLocations = bookmarkedLocations.mutableCopy;
+                    const NSUInteger locationIndex = [mutableBookmarkedLocations indexOfObject:locationMrl];
+                    NSString * const newLocationMrl = [parentLocationUrl URLByAppendingPathComponent:newFileName].absoluteString;
+                    [mutableBookmarkedLocations replaceObjectAtIndex:locationIndex withObject:newLocationMrl];
+                    [defaults setObject:mutableBookmarkedLocations forKey:VLCLibraryBookmarkedLocationsKey];
+                }
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
                 [weakSelf internalNodesChanged:nil];
             });
         });
@@ -171,7 +207,7 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
             close(descriptor);
         });
         dispatch_resume(fileDispatchSource);
-        [self.observedPathDispatchSources setObject:fileDispatchSource forKey:locationPath];
+        [self.observedPathDispatchSources setObject:fileDispatchSource forKey:locationMrl];
     }
 
     [self.observedPathDispatchSources removeObjectsForKeys:deletedLocations];
