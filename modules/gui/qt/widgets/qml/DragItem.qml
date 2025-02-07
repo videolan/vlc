@@ -473,6 +473,7 @@ Item {
                 radius: bg.radius
                 source: modelData.artwork ?? ""
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
+                fillMode: Image.PreserveAspectCrop
 
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
