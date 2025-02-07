@@ -64,16 +64,16 @@ static inline void FLAC_ParseStreamInfo( const uint8_t *p_buf,
     stream_info->total_samples = GetQWBE(&p_buf[4+6]) & ((INT64_C(1)<<36)-1);
 }
 
-/* Will return INT64_MAX for an invalid utf-8 sequence */
-static inline int64_t read_utf8(const uint8_t *p_buf, unsigned i_buf, int *pi_read)
+/* Will return UINT64_MAX for an invalid utf-8 sequence */
+static inline uint64_t read_utf8(const uint8_t *p_buf, unsigned i_buf, int *pi_read)
 {
     /* Max coding bits is 56 - 8 */
     /* Value max precision is 36 bits */
-    int64_t i_result = 0;
+    uint64_t i_result = 0;
     unsigned i;
 
     if(i_buf < 1)
-        return INT64_MAX;
+        return UINT64_MAX;
 
     if (!(p_buf[0] & 0x80)) { /* 0xxxxxxx */
         i_result = p_buf[0];
@@ -97,15 +97,15 @@ static inline int64_t read_utf8(const uint8_t *p_buf, unsigned i_buf, int *pi_re
         i_result = 0;
         i = 6;
     } else {
-        return INT64_MAX;
+        return UINT64_MAX;
     }
 
     if(i_buf < i + 1)
-        return INT64_MAX;
+        return UINT64_MAX;
 
     for (unsigned j = 1; j <= i; j++) {
         if (!(p_buf[j] & 0x80) || (p_buf[j] & 0x40)) { /* 10xxxxxx */
-            return INT64_MAX;
+            return UINT64_MAX;
         }
         i_result <<= 6;
         i_result |= (p_buf[j] & 0x3F);
@@ -239,8 +239,10 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
 
     /* Check Sample/Frame number */
     int i_read;
-    int64_t i_fsnumber = read_utf8(&p_buf[i_header++], i_buf - 4, &i_read);
-    if ( i_fsnumber == INT64_MAX )
+    uint64_t i_fsnumber = read_utf8(&p_buf[i_header++], i_buf - 4, &i_read);
+
+    /* Invalid UTF-8 */
+    if (i_fsnumber == UINT64_MAX)
         return 0;
 
     i_header += i_read;
