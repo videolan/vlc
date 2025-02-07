@@ -1404,7 +1404,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     existingkeys = NULL;
 
     table = _table;
-    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : "" )
+    setWindowTitle( ( b_global ? qtr( "Global" ) + QString(" ") : QStringLiteral("") )
                     + qtr( "Hotkey change" ) );
     setWindowRole( "vlc-key-input" );
 
