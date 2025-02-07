@@ -28,6 +28,7 @@
 
 NSString * const VLCStatusNotifierViewActivated = @"VLCStatusNotifierViewActivated";
 NSString * const VLCStatusNotifierViewDeactivated = @"VLCStatusNotifierViewDeactivated";
+NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutTimerUserInfoMessageKey";
 
 NSString *incrementTrailingNumber(NSString *input)
 {
@@ -67,6 +68,7 @@ NSString *incrementTrailingNumber(NSString *input)
 @property BOOL permanentDiscoveryMessageActive;
 @property NSMutableSet<NSString *> *longNotifications;
 @property NSMutableArray<NSString *> *messages;
+@property NSMutableDictionary<NSString *, NSTimer *> *activeTimers;
 
 @property (readonly) NSString *loadingLibraryItemsMessage;
 @property (readonly) NSString *libraryItemsLoadedMessage;
@@ -89,6 +91,7 @@ NSString *incrementTrailingNumber(NSString *input)
     _libraryItemsLoadedMessage = _NS("Library items loaded");
     _discoveringMediaMessage = _NS("Discovering media");
     _discoveryCompletedMessage = _NS("Media discovery completed");
+    _activeTimers = NSMutableDictionary.dictionary;
 
     self.label.stringValue = _NS("Idle");
     self.progressIndicator.hidden = YES;
@@ -197,10 +200,31 @@ NSString *incrementTrailingNumber(NSString *input)
     }
 }
 
+- (void)messageTimeout:(NSTimer *)timer
+{
+    NSString * const message =
+        [timer.userInfo objectForKey:VLCMessageTimeoutTimerUserInfoMessageKey];
+    [self removeMessage:message];
+    [self.activeTimers removeObjectForKey:message];
+}
+
 - (void)presentTransientMessage:(NSString *)message
 {
     [self addMessage:message];
-    [self performSelector:@selector(removeMessage:) withObject:message afterDelay:2.0];
+
+    NSTimer * const existingTimer = [self.activeTimers objectForKey:message];
+    if (existingTimer != nil) {
+        [existingTimer invalidate];
+        [self.activeTimers removeObjectForKey:message];
+    }
+
+    NSTimer * const newTimer =
+        [NSTimer scheduledTimerWithTimeInterval:2.0
+                                         target:self
+                                       selector:@selector(messageTimeout:)
+                                       userInfo:@{VLCMessageTimeoutTimerUserInfoMessageKey: message}
+                                        repeats:NO];
+    [self.activeTimers setObject:newTimer forKey:message];
 }
 
 @end
