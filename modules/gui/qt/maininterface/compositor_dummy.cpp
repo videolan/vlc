@@ -42,7 +42,7 @@ bool CompositorDummy::init()
     return true;
 }
 
-bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
+bool CompositorDummy::makeMainInterface(MainCtx* mainCtx, std::function<void (QQuickWindow *)> aboutToShowQuickWindowCallback)
 {
     m_mainCtx = mainCtx;
 
@@ -67,6 +67,9 @@ bool CompositorDummy::makeMainInterface(MainCtx* mainCtx)
 
     if (m_qmlWidget->status() != QQuickView::Ready)
         return false;
+
+    if (aboutToShowQuickWindowCallback)
+        aboutToShowQuickWindowCallback(m_qmlWidget.get());
 
     m_qmlWidget->setVisible(true);
 

@@ -236,7 +236,7 @@ void CompositorDirectComposition::setup()
     }
 }
 
-bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
+bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback)
 {
     assert(mainCtx);
     m_mainCtx = mainCtx;
@@ -313,6 +313,9 @@ bool CompositorDirectComposition::makeMainInterface(MainCtx* mainCtx)
             &QQuickWindow::sceneGraphError,
             m_mainCtx,
             &MainCtx::askToQuit);
+
+    if (aboutToShowQuickWindowCallback)
+        aboutToShowQuickWindowCallback(quickViewPtr);
 
     m_quickView->setVisible(true);
     return true;

@@ -170,7 +170,7 @@ bool CompositorX11::init()
     return true;
 }
 
-bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
+bool CompositorX11::makeMainInterface(MainCtx* mainCtx, std::function<void (QQuickWindow *)> aboutToShowQuickWindowCallback)
 {
     m_mainCtx = mainCtx;
 
@@ -210,6 +210,9 @@ bool CompositorX11::makeMainInterface(MainCtx* mainCtx)
         flags |= CompositorVideo::HAS_EXTENDED_FRAME;
     if (!commonGUICreate(m_renderWindow.get(), m_qmlView.get(), flags))
         return false;
+
+    if (aboutToShowQuickWindowCallback)
+        aboutToShowQuickWindowCallback(m_qmlView->getOffscreenWindow());
 
     m_qmlView->setVisible(true);
 

@@ -38,7 +38,7 @@ public:
 
     bool init() override;
 
-    bool makeMainInterface(MainCtx *) override;
+    bool makeMainInterface(MainCtx *, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback = {}) override;
     void destroyMainInterface() override;
     void unloadGUI() override;
     bool setupVoutWindow(vlc_window_t*, VoutDestroyCb destroyCb) override;

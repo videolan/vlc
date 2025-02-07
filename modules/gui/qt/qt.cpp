@@ -966,6 +966,7 @@ static void *Thread( void *obj )
         return graphicsApi;
     };
 
+    static const char* const asyncRhiProbeCompletedProperty = "asyncRhiProbeCompleted";
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
         qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
         (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
@@ -986,7 +987,7 @@ static void *Thread( void *obj )
             // item. Currently the player waits for the interface, and QQuickWindow initialization
             // is therefore not enforced to be synchronous (`QWindow::setVisible(true)` which
             // initializes the scene graph thus rhi is asynchronous).
-            QMetaObject::invokeMethod(&app, [settings = QPointer(p_intf->mainSettings)]() {
+            QMetaObject::invokeMethod(&app, [&app, settings = QPointer(p_intf->mainSettings)]() {
                 // We can not use `QQuickWindow::setGraphicsApi()` here, as QQuickWindow
                 // may have already tried to initialize the scene graph hence rhi. If the
                 // cached graphics api is not optimal or not available anymore, the next
@@ -995,6 +996,7 @@ static void *Thread( void *obj )
                 assert(settings);
                 settings->setValue(graphicsApiKey, static_cast<int>(probeRhi()));
                 settings->sync();
+                app.setProperty(asyncRhiProbeCompletedProperty, true);
             }, Qt::QueuedConnection); // Asynchronous, so probing here does not cause start-up slowdown.
         }
         else
@@ -1042,12 +1044,38 @@ static void *Thread( void *obj )
 
     if( !p_intf->b_isDialogProvider )
     {
+        static const auto gracefulExitHandler = [&app, mainCtx = QPointer(p_intf->p_mi), settings = QPointer(p_intf->mainSettings)](QQuickWindow *window) {
+            // Graceful exit on error, as if this signal is not connected
+            // Qt uses `qFatal()`. With `MainCtx::askToQuit()`, the event loop
+            // would be cleared first:
+            assert(window);
+            QObject::connect(window,
+                             &QQuickWindow::sceneGraphError,
+                             &app,
+                             [&app, mainCtx, settings](QQuickWindow::SceneGraphError error, const QString &message) {
+                                 qWarning() << "Compositor: Scene Graph Error: " << error << ", Message: " << message;
+                                 assert(mainCtx);
+#ifdef _WIN32
+                                // This is not really important, as with graceful exit the events in the queue should
+                                // be cleared first. This means that in the worst case the application should wait
+                                // until asynchronous probing is completed before exiting.
+                                 if (!app.property(asyncRhiProbeCompletedProperty).toBool())
+                                 {
+                                     assert(settings);
+                                     settings->remove(asyncRhiProbeCompletedProperty);
+                                     settings->sync();
+                                 }
+#endif
+                                 mainCtx->askToQuit();
+                             });
+        };
+
         bool ret = false;
         do {
             p_intf->p_compositor.reset(compositorFactory.createCompositor());
             if (! p_intf->p_compositor)
                 break;
-            ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi);
+            ret = p_intf->p_compositor->makeMainInterface(p_intf->p_mi, gracefulExitHandler);
             if (!ret)
             {
                 p_intf->p_compositor->destroyMainInterface();

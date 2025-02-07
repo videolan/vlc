@@ -61,7 +61,7 @@ bool CompositorWin7::init()
     return true;
 }
 
-bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
+bool CompositorWin7::makeMainInterface(MainCtx* mainCtx, std::function<void (QQuickWindow *)> aboutToShowQuickWindowCallback)
 {
     m_mainCtx = mainCtx;
 
@@ -106,7 +106,11 @@ bool CompositorWin7::makeMainInterface(MainCtx* mainCtx)
     const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(), CompositorVideo::CAN_SHOW_PIP);
 
     if (ret)
+    {
+        if (aboutToShowQuickWindowCallback)
+            aboutToShowQuickWindowCallback(m_qmlView.get());
         m_qmlView->setVisible(true);
+    }
 
     return ret;
 }

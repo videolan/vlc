@@ -40,7 +40,7 @@ public:
 
     bool init() override;
 
-    bool makeMainInterface(MainCtx*) override;
+    bool makeMainInterface(MainCtx*, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback = {}) override;
 
     /**
      * @brief release all resources used by the compositor.

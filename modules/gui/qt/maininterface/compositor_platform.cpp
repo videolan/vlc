@@ -62,7 +62,7 @@ bool CompositorPlatform::init()
     return false;
 }
 
-bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx)
+bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx, std::function<void (QQuickWindow *)> aboutToShowQuickWindowCallback)
 {
     m_mainCtx = mainCtx;
 
@@ -96,6 +96,9 @@ bool CompositorPlatform::makeMainInterface(MainCtx *mainCtx)
     m_quickWindow->setOpacity(1.0);
 
     m_rootWindow->installEventFilter(this);
+
+    if (aboutToShowQuickWindowCallback)
+        aboutToShowQuickWindowCallback(m_quickWindow);
 
     m_rootWindow->setVisible(true);
     m_videoWindow->setVisible(true);

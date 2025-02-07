@@ -97,7 +97,7 @@ bool CompositorWayland::init()
     return m_waylandImpl->init(m_waylandImpl, qpni_display);
 }
 
-bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
+bool CompositorWayland::makeMainInterface(MainCtx* mainCtx, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback)
 {
     assert(mainCtx);
     m_mainCtx = mainCtx;
@@ -136,7 +136,11 @@ bool CompositorWayland::makeMainInterface(MainCtx* mainCtx)
     const bool ret = commonGUICreate(m_qmlView.get(), m_qmlView.get(), flags);
 
     if (ret)
+    {
+        if (aboutToShowQuickWindowCallback)
+            aboutToShowQuickWindowCallback(m_qmlView.get());
         m_qmlView->setVisible(true);
+    }
 
     return ret;
 }

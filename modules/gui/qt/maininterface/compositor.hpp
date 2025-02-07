@@ -71,7 +71,7 @@ public:
 
     [[nodiscard]] virtual bool init() = 0;
 
-    [[nodiscard]] virtual bool makeMainInterface(MainCtx* intf) = 0;
+    [[nodiscard]] virtual bool makeMainInterface(MainCtx* intf, std::function<void(QQuickWindow*)> aboutToShowQuickWindowCallback = {}) = 0;
 
     /**
      * @brief destroyMainInterface must released all resources, this is called before
