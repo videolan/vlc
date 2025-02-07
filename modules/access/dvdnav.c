@@ -656,7 +656,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->i_pgc_length > 0 )
             {
                 *va_arg( args, vlc_tick_t * ) =
-                        dvdnav_get_current_time( p_sys->dvdnav ) * 100 / 9;
+                        FROM_SCALE_NZ( dvdnav_get_current_time(p_sys->dvdnav) );
                 return VLC_SUCCESS;
             }
             break;
@@ -665,7 +665,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             vlc_tick_t i_time = va_arg( args, vlc_tick_t );
             if( dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
-                                               i_time * 9 / 100,
+                                               TO_SCALE_NZ(i_time),
                                                SEEK_SET ) == DVDNAV_STATUS_OK )
                 return VLC_SUCCESS;
             msg_Err( p_demux, "can't set time to %" PRId64, i_time );
