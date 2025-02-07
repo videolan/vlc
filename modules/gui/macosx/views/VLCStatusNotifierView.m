@@ -129,7 +129,12 @@ NSString *incrementTrailingNumber(NSString *input)
 
 - (void)removeMessage:(NSString *)message
 {
-    [self.messages removeObject:message];
+    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger, BOOL *){
+        return [string hasPrefix:message];
+    }];
+    if (matchingIndex != NSNotFound) {
+        [self.messages removeObjectAtIndex:matchingIndex];
+    }
     if (self.messages.count == 0) {
         [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewDeactivated object:self];
         return;
