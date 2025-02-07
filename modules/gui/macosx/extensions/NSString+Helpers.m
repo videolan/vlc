@@ -198,6 +198,38 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     return [NSString stringWithString:wrapped_string];
 }
 
+- (NSString *)stringWithIncrementedTrailingNumber
+{
+    // Regular expression pattern to match a number in parentheses at the end of the string.
+    //   \\(    - matches '('
+    //   (\\d+) - matches one or more digits
+    //   \\)    - matches ')'
+    //   $      - position at the end of the string
+    NSError *error = nil;
+    NSRegularExpression * const regex =
+        [NSRegularExpression regularExpressionWithPattern:@"\\((\\d+)\\)$" options:0 error:&error];
+    if (error) {
+        NSLog(@"Regex creation error: %@", error);
+        return self;
+    }
+
+    const NSRange fullRange = NSMakeRange(0, self.length);
+    NSTextCheckingResult * const match = [regex firstMatchInString:self options:0 range:fullRange];
+
+    if (match == nil) {
+        return [self stringByAppendingString:@" (2)"];
+    }
+    // Extract the captured digits.
+    const NSRange numberRange = [match rangeAtIndex:1];
+    NSString * const numberString = [self substringWithRange:numberRange];
+    const NSInteger number = numberString.integerValue + 1;
+
+    // Replace the old number with the incremented number.
+    NSMutableString * const result = self.mutableCopy;
+    [result replaceCharactersInRange:numberRange withString:[NSString stringWithFormat:@"%ld", number]];
+    return result.copy;
+}
+
 @end
 
 #pragma mark -

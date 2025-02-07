@@ -149,6 +149,14 @@ NSImage *imageFromRes(NSString *name);
  */
 - (NSString *)stringWrappedToWidth:(int)width;
 
+/**
+ Returns a new string with a trailing number in the format of  "ORIGINALSTRING (2)"
+
+ If there is no existing trailing number in the string, a starting value of " (2)" will be appended.
+ If there is an existing trailing number in the string, the number value will be incremented.
+ */
+- (NSString *)stringWithIncrementedTrailingNumber;
+
 @end
 
 /**
