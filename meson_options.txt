@@ -219,6 +219,11 @@ option('oss',
     value: 'auto',
     description: 'Enable/disable OSS support (default-enabled on BSD)')
 
+option('sndio',
+    type : 'feature',
+    value : 'auto',
+    description : 'Enable/disable sndio support')
+
 option('ogg',
     type : 'feature',
     value : 'auto',
@@ -778,7 +783,6 @@ option('nfs',
 # TODO: Missing vdpau
 # TODO: Missing kva
 # TODO: Missing mmal
-# TODO: Missing sndio
 # TODO: Missing jack
 # TODO: Missing opensles
 # TODO: Missing kai

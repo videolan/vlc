@@ -46,6 +46,16 @@ if jack_dep.found()
     }
 endif
 
+# sndio output
+sndio_dep = dependency('sndio', version: '>= 1.8.0', required: get_option('sndio'))
+
+vlc_modules += {
+    'name' : 'sndio',
+    'sources' : files('sndio.c'),
+    'dependencies' : [sndio_dep],
+    'enabled' : sndio_dep.found(),
+}
+
 # AUHAL output module (macOS only)
 if have_osx
     vlc_modules += {
