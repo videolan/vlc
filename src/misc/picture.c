@@ -175,10 +175,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
         const vlc_rational_t *h = &p_dsc->p[i].h;
         const vlc_rational_t *w = &p_dsc->p[i].w;
 
-        /* A plane cannot be over-sampled. This could lead to overflow. */
-        assert(h->den >= h->num);
-        assert(w->den >= w->num);
-
         unsigned mul_height;
         if (unlikely(ckd_mul(&mul_height, height, h->num)))
             return VLC_EGENERIC;
