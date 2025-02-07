@@ -123,7 +123,15 @@ NSString *incrementTrailingNumber(NSString *input)
     if (self.messages.count == 0) {
         [NSNotificationCenter.defaultCenter postNotificationName:VLCStatusNotifierViewActivated object:self];
     }
-    [self.messages addObject:message];
+    NSString *finalMessage = message;
+    const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger, BOOL *){
+        return [string hasPrefix:message];
+    }];
+    if (matchingIndex != NSNotFound) {
+        finalMessage = incrementTrailingNumber([self.messages objectAtIndex:matchingIndex]);
+        [self.messages removeObjectAtIndex:matchingIndex];
+    }
+    [self.messages addObject:finalMessage];
     self.label.stringValue = [self.messages componentsJoinedByString:@"\n"];
 }
 
