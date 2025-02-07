@@ -270,6 +270,12 @@ bool CompositorX11::setupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb
 
 QWindow* CompositorX11::interfaceMainWindow() const { return m_renderWindow.get(); }
 
+QQuickWindow *CompositorX11::quickWindow() const
+{
+    assert(m_qmlView);
+    return m_qmlView->getOffscreenWindow();
+}
+
 QQuickItem * CompositorX11::activeFocusItem() const /* override */
 {
     return m_qmlView->activeFocusItem();

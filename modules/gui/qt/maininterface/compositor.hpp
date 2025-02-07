@@ -96,6 +96,10 @@ public:
 
     virtual QWindow* interfaceMainWindow() const = 0;
 
+    // Override this to return the quick window if quick window
+    // is not the interface main window:
+    virtual QQuickWindow* quickWindow() const;
+
     virtual QQuickItem * activeFocusItem() const = 0;
 };
 

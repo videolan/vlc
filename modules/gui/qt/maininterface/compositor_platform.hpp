@@ -43,6 +43,7 @@ public:
     void unloadGUI() override;
     bool setupVoutWindow(vlc_window_t*, VoutDestroyCb destroyCb) override;
     QWindow* interfaceMainWindow() const override;
+    QQuickWindow* quickWindow() const override;
     Type type() const override;
     QQuickItem * activeFocusItem() const override;
 

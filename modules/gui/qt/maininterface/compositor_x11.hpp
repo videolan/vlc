@@ -51,6 +51,7 @@ public:
     inline Type type() const override { return X11Compositor; }
 
     QWindow* interfaceMainWindow() const override;
+    QQuickWindow* quickWindow() const override;
 
     QQuickItem * activeFocusItem() const override;
 

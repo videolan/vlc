@@ -148,6 +148,11 @@ QWindow *CompositorPlatform::interfaceMainWindow() const
     return m_rootWindow.get();
 }
 
+QQuickWindow *CompositorPlatform::quickWindow() const
+{
+    return m_quickWindow.get();
+}
+
 Compositor::Type CompositorPlatform::type() const
 {
     return Compositor::PlatformCompositor;

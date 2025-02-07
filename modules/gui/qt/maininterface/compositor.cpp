@@ -457,3 +457,8 @@ bool CompositorVideo::setBlurBehind(QWindow *window, const bool enable)
 
     return true;
 }
+
+QQuickWindow *Compositor::quickWindow() const
+{
+    return qobject_cast<QQuickWindow*>(interfaceMainWindow());
+}
