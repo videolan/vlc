@@ -153,7 +153,11 @@ Item {
     Loader {
         id: overlay
 
-        anchors.fill: parent
+        anchors.centerIn: parent
+        anchors.alignWhenCentered: true
+
+        width: root.paintedWidth
+        height: root.paintedHeight
     }
 
     Loader {
