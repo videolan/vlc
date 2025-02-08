@@ -48,8 +48,8 @@ Widgets.GridItem {
     pictureHeight: VLCStyle.gridCover_video_height
 
     pictureOverlay: Item {
-        width: root.pictureWidth
-        height: root.pictureHeight
+        implicitWidth: root.pictureWidth
+        implicitHeight: root.pictureHeight
 
         Widgets.ScaledImage {
             id: image
