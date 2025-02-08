@@ -62,6 +62,8 @@ Item {
     required property int pictureWidth
     required property int pictureHeight
 
+    readonly property real padding: fallbackImage.visible ? fallbackImage.padding : image.padding
+
     readonly property real paintedWidth: fallbackImage.visible ? fallbackImage.paintedWidth : image.paintedWidth
     readonly property real paintedHeight: fallbackImage.visible ? fallbackImage.paintedHeight : image.paintedHeight
 

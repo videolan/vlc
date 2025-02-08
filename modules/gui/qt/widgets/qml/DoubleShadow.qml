@@ -36,8 +36,8 @@ Item {
     property real viewportWidth: rectWidth + viewportHorizontalOffset
     property real viewportHeight: rectHeight + viewportVerticalOffset
 
-    property real rectWidth: sourceItem ? Math.min(sourceItem.paintedWidth ?? Number.MAX_VALUE, sourceItem.width) : 0
-    property real rectHeight: sourceItem ? Math.min(sourceItem.paintedHeight ?? Number.MAX_VALUE, sourceItem.height) : 0
+    property real rectWidth: sourceItem ? Math.min((sourceItem.paintedWidth ?? Number.MAX_VALUE) - Math.ceil(sourceItem.padding ?? 0) * 2, sourceItem.width) : 0
+    property real rectHeight: sourceItem ? Math.min((sourceItem.paintedHeight ?? Number.MAX_VALUE) - Math.ceil(sourceItem.padding ?? 0) * 2, sourceItem.height) : 0
     property real xRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
     property real yRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
 

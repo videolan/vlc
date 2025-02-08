@@ -303,8 +303,8 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: picture.paintedWidth + viewportHorizontalOffset
-                height: picture.paintedHeight + viewportVerticalOffset
+                width: picture.paintedWidth + viewportHorizontalOffset - Math.ceil(picture.padding) * 2
+                height: picture.paintedHeight + viewportVerticalOffset - Math.ceil(picture.padding) * 2
 
                 rectWidth: sourceSize.width
                 rectHeight: sourceSize.height
@@ -323,8 +323,8 @@ T.ItemDelegate {
 
                 sourceItem: parent
 
-                width: picture.paintedWidth + viewportHorizontalOffset
-                height: picture.paintedHeight + viewportVerticalOffset
+                width: picture.paintedWidth + viewportHorizontalOffset - Math.ceil(picture.padding) * 2
+                height: picture.paintedHeight + viewportVerticalOffset - Math.ceil(picture.padding) * 2
 
                 rectWidth: sourceSize.width
                 rectHeight: sourceSize.height
