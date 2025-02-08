@@ -36,6 +36,9 @@
 
 NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollectionViewItemAdjustmentKey";
 
+@implementation VLCCollectionViewItemSizing
+@end
+
 @implementation VLCLibraryUIUnits
 
 + (const CGFloat)largeSpacing

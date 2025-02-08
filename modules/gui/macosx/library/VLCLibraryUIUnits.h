@@ -33,6 +33,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
+@interface VLCCollectionViewItemSizing: NSObject
+
+@property (readwrite) NSUInteger rowItemCount;
+@property (readwrite) NSSize itemSize;
+
+@end
+
 @interface VLCLibraryUIUnits : NSObject
 
 // Note that these values are not necessarily linked to the layout defined in the .xib files.
