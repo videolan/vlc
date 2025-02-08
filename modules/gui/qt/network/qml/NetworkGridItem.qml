@@ -71,8 +71,8 @@ Widgets.GridItem {
     }
 
     pictureOverlay: Item {
-        width: root.pictureWidth
-        height: root.pictureHeight
+        implicitWidth: root.pictureWidth
+        implicitHeight: root.pictureHeight
 
         Widgets.VideoProgressBar {
             id: progressBar
