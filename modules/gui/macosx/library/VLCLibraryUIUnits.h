@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, VLCLibraryCollectionViewItemAspectRatio) {
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern const unsigned short kMinItemsInCollectionViewRow;
 extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
 @interface VLCCollectionViewItemSizing: NSObject
@@ -94,6 +95,10 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 + (const NSSize)adjustedCollectionViewItemSizeForCollectionView:(NSCollectionView *)collectionView
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio;
+
++ (VLCCollectionViewItemSizing *)adjustedItemSizingForCollectionView:(NSCollectionView *)collectionView
+                                                          withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                                                withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio;
 
 @end
 

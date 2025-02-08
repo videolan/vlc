@@ -34,6 +34,7 @@
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
+const unsigned short kMinItemsInCollectionViewRow = 2;
 NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollectionViewItemAdjustmentKey";
 
 @implementation VLCCollectionViewItemSizing
@@ -131,8 +132,16 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                                      withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                            withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
 {
+    return [self adjustedItemSizingForCollectionView:collectionView
+                                          withLayout:collectionViewLayout
+                                withItemsAspectRatio:itemsAspectRatio].itemSize;
+}
+
++ (VLCCollectionViewItemSizing *)adjustedItemSizingForCollectionView:(NSCollectionView *)collectionView
+                                                          withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
+                                                withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
+{
     uint numItemsInRow = 5;
-    static const uint kMinItemsInCollectionViewRow = 1;
 
     NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                            withLayout:collectionViewLayout
@@ -164,7 +173,10 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                             withNumberOfItemsInRow:numItemsInRow];
     }
 
-    return itemSize;
+    VLCCollectionViewItemSizing * const itemSizing = [[VLCCollectionViewItemSizing alloc] init];
+    itemSizing.itemSize = itemSize;
+    itemSizing.rowItemCount = numItemsInRow;
+    return itemSizing;
 }
 
 + (const NSSize)itemSizeForCollectionView:(NSCollectionView *)collectionView
