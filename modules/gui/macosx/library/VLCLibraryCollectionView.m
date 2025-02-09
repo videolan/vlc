@@ -77,7 +77,29 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCol
             [NSNotification notificationWithName:VLCLibraryCollectionViewItemAdjustmentBigger
                                           object:self];
     } else if (key == '-') {
-        collectionViewAdjustment++;
+        if (currentRowItemSizing.rowItemCount == kMinItemsInCollectionViewRow && currentRowItemSizing.unclampedRowItemCount <= kMinItemsInCollectionViewRow) {
+            // The adjustment works independently of the size of the collection view, which can lead
+            // to situations where the adjustment is very negative and is being clamped to ensure we
+            // do not go below the minimum items in row value. However, that means that when trying
+            // to make collection view items smaller via a larger adjustment value, the user could
+            // press CMD - multiple times before any change is visible to them (this can happen when
+            // the collection view size has shrunk, for instance).
+            //
+            // To work around this we make a big adjustment that immediately provides visual
+            // feedback. To do this we calculate what the adjustment must be to get the row item
+            // count to be the minimum row item count value + 1.
+            //
+            // The unclampedRowItemCount is the number of items in row post-adjustment, so we need
+            // to retrieve the original, unclamped, unadjusted row item count. We then work out the
+            // difference between the unclamped&unadjusted row item count and the minimum row item
+            // count:
+            //   <adjustment> = <min items in row> - (<unclamped row item count> - <old adjustment>)
+            //
+            // To finish, we add 1 to visually change the row item count and show more items.
+            collectionViewAdjustment = kMinItemsInCollectionViewRow - (currentRowItemSizing.unclampedRowItemCount + collectionViewAdjustment) + 1;
+        } else {
+            ++collectionViewAdjustment;
+        }
         notification =
             [NSNotification notificationWithName:VLCLibraryCollectionViewItemAdjustmentSmaller
                                           object:self];
