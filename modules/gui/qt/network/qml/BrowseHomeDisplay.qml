@@ -171,7 +171,7 @@ FocusScope {
         Widgets.NavigableCol {
             id: column
 
-            width: foldersSection.width
+            width: flickable.width
             height: implicitHeight
 
             spacing: (MainCtx.gridView ? VLCStyle.gridView_spacing : VLCStyle.tableView_spacing) -
@@ -275,7 +275,7 @@ FocusScope {
     }
 
     component HomeDeviceView: BrowseDeviceView {
-        width: root.width
+        width: flickable.width
         height: contentHeight
 
         maximumRows: root.maximumRows
