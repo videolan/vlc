@@ -16,6 +16,9 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store
         vlc_sources += ['winvlc.c']
     else
         vlc_sources += ['vlc.c', 'override.c']
+        if x11_dep.found()
+            vlc_deps += [x11_dep]
+        endif
     endif
 
     executable('vlc',
