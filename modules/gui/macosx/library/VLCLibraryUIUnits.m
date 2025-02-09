@@ -141,37 +141,26 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                                                           withLayout:(VLCLibraryCollectionViewFlowLayout *)collectionViewLayout
                                                 withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
 {
-    uint numItemsInRow = 5;
-
-    NSSize itemSize = [self itemSizeForCollectionView:collectionView
-                                           withLayout:collectionViewLayout
-                                 withItemsAspectRatio:itemsAspectRatio
-                               withNumberOfItemsInRow:numItemsInRow];
-
-    while (itemSize.width > VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth) {
-        ++numItemsInRow;
-        itemSize = [self itemSizeForCollectionView:collectionView
-                                        withLayout:collectionViewLayout
-                              withItemsAspectRatio:itemsAspectRatio
-                            withNumberOfItemsInRow:numItemsInRow];
-    }
-    while (itemSize.width < VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth && numItemsInRow > kMinItemsInCollectionViewRow) {
-        --numItemsInRow;
-        itemSize = [self itemSizeForCollectionView:collectionView
-                                        withLayout:collectionViewLayout
-                              withItemsAspectRatio:itemsAspectRatio
-                            withNumberOfItemsInRow:numItemsInRow];
-    }
+    const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
+    const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
+    const CGFloat availableWidth =
+        collectionViewLayout.collectionViewContentSize.width - (sectionInsets.left + sectionInsets.right);
+    const float maxPossibleNumItemsInRow =
+        floor(availableWidth / (VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth + interItemSpacing));
+    const float minPossibleNumItemsInRow =
+        MIN(ceil(availableWidth / (VLCLibraryUIUnits.dynamicCollectionViewItemMaximumWidth + interItemSpacing)), maxPossibleNumItemsInRow);
 
     const NSInteger adjustment =
         [NSUserDefaults.standardUserDefaults integerForKey:VLCLibraryCollectionViewItemAdjustmentKey];
-    if (adjustment != 0 && numItemsInRow + adjustment > kMinItemsInCollectionViewRow) {
-        numItemsInRow += adjustment;
-        itemSize = [self itemSizeForCollectionView:collectionView
-                                        withLayout:collectionViewLayout
-                              withItemsAspectRatio:itemsAspectRatio
-                            withNumberOfItemsInRow:numItemsInRow];
-    }
+    const uint midPossibleNumItemsInRow =
+        round((minPossibleNumItemsInRow + maxPossibleNumItemsInRow) / 2.0);
+    const uint numItemsInRow =
+        MAX(midPossibleNumItemsInRow + adjustment, kMinItemsInCollectionViewRow);
+
+    const NSSize itemSize = [self itemSizeForCollectionView:collectionView
+                                                 withLayout:collectionViewLayout
+                                       withItemsAspectRatio:itemsAspectRatio
+                                     withNumberOfItemsInRow:numItemsInRow];
 
     VLCCollectionViewItemSizing * const itemSizing = [[VLCCollectionViewItemSizing alloc] init];
     itemSizing.itemSize = itemSize;
@@ -184,14 +173,12 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
                      withItemsAspectRatio:(VLCLibraryCollectionViewItemAspectRatio)itemsAspectRatio
                    withNumberOfItemsInRow:(uint)numItemsInRow
 {
-    NSParameterAssert(numItemsInRow > 0);
-    NSParameterAssert(collectionView);
-    NSParameterAssert(collectionViewLayout);
+    NSParameterAssert(numItemsInRow > 0 && collectionView && collectionViewLayout);
 
     const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
     const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
 
-    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
+    const CGFloat rowOfItemsWidth = collectionViewLayout.collectionViewContentSize.width -
                                     (sectionInsets.left +
                                      sectionInsets.right +
                                      (interItemSpacing * (numItemsInRow - 1)) +
