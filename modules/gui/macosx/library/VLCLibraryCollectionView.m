@@ -63,6 +63,8 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCol
                                           withItemsAspectRatio:delegate.itemsAspectRatio];
     if (currentRowItemSizing.rowItemCount <= kMinItemsInCollectionViewRow && key == '+') {
         return;
+    } else if (currentRowItemSizing.itemSize.width <= VLCLibraryUIUnits.collectionViewItemMinimumWidth && key == '-') {
+        return;
     }
 
     NSUserDefaults * const defaults = NSUserDefaults.standardUserDefaults;

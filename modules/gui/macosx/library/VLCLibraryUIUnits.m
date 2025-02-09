@@ -117,6 +117,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 200;
 }
 
++ (const CGFloat)collectionViewItemMinimumWidth
+{
+    return 40;
+}
+
 + (const CGFloat)collectionViewItemSpacing
 {
     return [self largeSpacing];

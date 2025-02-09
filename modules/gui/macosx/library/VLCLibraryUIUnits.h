@@ -66,6 +66,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMinimumWidth;
 @property (class, readonly) const CGFloat dynamicCollectionViewItemMaximumWidth;
+@property (class, readonly) const CGFloat collectionViewItemMinimumWidth;
 
 @property (class, readonly) const CGFloat collectionViewItemSpacing;
 @property (class, readonly) const NSEdgeInsets collectionViewSectionInsets;
