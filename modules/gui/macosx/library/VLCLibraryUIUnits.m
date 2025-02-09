@@ -149,7 +149,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
     const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
     const CGFloat availableWidth =
-        collectionViewLayout.collectionViewContentSize.width - (sectionInsets.left + sectionInsets.right);
+        collectionView.bounds.size.width - (sectionInsets.left + sectionInsets.right);
     const float maxPossibleNumItemsInRow =
         floor(availableWidth / (VLCLibraryUIUnits.dynamicCollectionViewItemMinimumWidth + interItemSpacing));
     const float minPossibleNumItemsInRow =
@@ -183,7 +183,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     const NSEdgeInsets sectionInsets = collectionViewLayout.sectionInset;
     const CGFloat interItemSpacing = collectionViewLayout.minimumInteritemSpacing;
 
-    const CGFloat rowOfItemsWidth = collectionViewLayout.collectionViewContentSize.width -
+    const CGFloat rowOfItemsWidth = collectionView.bounds.size.width -
                                     (sectionInsets.left +
                                      sectionInsets.right +
                                      (interItemSpacing * (numItemsInRow - 1)) +
