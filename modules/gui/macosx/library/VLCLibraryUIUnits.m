@@ -34,7 +34,6 @@
 
 #import "windows/controlsbar/VLCControlsBarCommon.h"
 
-const unsigned short kMinItemsInCollectionViewRow = 2;
 NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollectionViewItemAdjustmentKey";
 
 @implementation VLCCollectionViewItemSizing
@@ -122,6 +121,11 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     return 40;
 }
 
++ (const unsigned short)collectionViewMinItemsInRow
+{
+    return 2;
+}
+
 + (const CGFloat)collectionViewItemSpacing
 {
     return [self largeSpacing];
@@ -161,7 +165,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
         round((minPossibleNumItemsInRow + maxPossibleNumItemsInRow) / 2.0);
 
     const uint unclampedNumItemsInRow = midPossibleNumItemsInRow + adjustment;
-    const uint numItemsInRow = MAX(unclampedNumItemsInRow, kMinItemsInCollectionViewRow);
+    const uint numItemsInRow = MAX(unclampedNumItemsInRow, VLCLibraryUIUnits.collectionViewMinItemsInRow);
     const NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                                  withLayout:collectionViewLayout
                                        withItemsAspectRatio:itemsAspectRatio
