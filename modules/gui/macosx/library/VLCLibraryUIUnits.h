@@ -36,6 +36,7 @@ extern NSString * const VLCLibraryCollectionViewItemAdjustmentKey;
 
 @interface VLCCollectionViewItemSizing: NSObject
 
+@property (readwrite) NSUInteger unclampedRowItemCount;
 @property (readwrite) NSUInteger rowItemCount;
 @property (readwrite) NSSize itemSize;
 
