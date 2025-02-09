@@ -22,6 +22,7 @@
 
 #import "VLCLibraryCollectionView.h"
 
+#import "library/VLCLibraryCollectionViewDelegate.h"
 #import "library/VLCLibraryCollectionViewFlowLayout.h"
 #import "library/VLCLibraryUIUnits.h"
 
@@ -42,12 +43,25 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCol
 - (void)keyDown:(NSEvent *)event
 {
     if (![self.collectionViewLayout isKindOfClass:VLCLibraryCollectionViewFlowLayout.class] ||
+        ![self.delegate isKindOfClass:VLCLibraryCollectionViewDelegate.class] ||
         !(event.modifierFlags & NSCommandKeyMask)) {
         return;
     }
 
     const unichar key = [event.charactersIgnoringModifiers.lowercaseString characterAtIndex:0];
     if (key != '+' && key != '-') {
+        return;
+    }
+
+    VLCLibraryCollectionViewFlowLayout * const layout =
+        (VLCLibraryCollectionViewFlowLayout *)self.collectionViewLayout;
+    VLCLibraryCollectionViewDelegate * const delegate =
+        (VLCLibraryCollectionViewDelegate *)self.delegate;
+    VLCCollectionViewItemSizing * const currentRowItemSizing =
+        [VLCLibraryUIUnits adjustedItemSizingForCollectionView:self
+                                                    withLayout:layout
+                                          withItemsAspectRatio:delegate.itemsAspectRatio];
+    if (currentRowItemSizing.rowItemCount <= kMinItemsInCollectionViewRow && key == '+') {
         return;
     }
 
