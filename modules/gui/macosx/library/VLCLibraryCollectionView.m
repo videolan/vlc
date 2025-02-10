@@ -96,7 +96,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentSmaller = @"VLCLibraryCol
             //   <adjustment> = <min items in row> - (<unclamped row item count> - <old adjustment>)
             //
             // To finish, we add 1 to visually change the row item count and show more items.
-            collectionViewAdjustment = VLCLibraryUIUnits.collectionViewMinItemsInRow - (currentRowItemSizing.unclampedRowItemCount + collectionViewAdjustment) + 1;
+            collectionViewAdjustment = VLCLibraryUIUnits.collectionViewMinItemsInRow - (currentRowItemSizing.unclampedRowItemCount - collectionViewAdjustment) + 1;
         } else {
             ++collectionViewAdjustment;
         }
