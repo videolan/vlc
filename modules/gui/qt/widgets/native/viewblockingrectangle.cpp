@@ -122,11 +122,18 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
 
     if (!oldNode)
     {
-        const auto observerNode = new MatrixChangeObserverNode([p = QPointer(this)]() {
+        const auto observerNode = new MatrixChangeObserverNode([p = QPointer(this)](const QMatrix4x4& matrix) {
             if (Q_LIKELY(p))
+            {
+                p->m_renderPosition = {matrix.row(0)[3], // Viewport/scene X
+                                       matrix.row(1)[3]}; // Viewport/scene y
                 emit p->scenePositionHasChanged();
+            }
         });
         observerNode->setFlag(QSGNode::OwnedByParent);
+
+        // Initial position:
+        m_renderPosition = mapToScene(QPointF(0,0));
 
         if (softwareMode)
         {
@@ -157,6 +164,8 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
 
     const auto rect = boundingRect();
 
+    m_renderSize = rect.size();
+
     if (softwareMode)
     {
         softwareRenderNode->setRect(rect);
@@ -184,4 +193,14 @@ QSGNode *ViewBlockingRectangle::updatePaintNode(QSGNode *oldNode, UpdatePaintNod
 
         return rectangleNode;
     }
+}
+
+QSizeF ViewBlockingRectangle::renderSize() const
+{
+    return m_renderSize;
+}
+
+QPointF ViewBlockingRectangle::renderPosition() const
+{
+    return m_renderPosition;
 }

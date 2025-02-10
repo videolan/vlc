@@ -69,6 +69,8 @@ public:
 
     bool eventFilter(QObject *watched, QEvent *event) override;
 
+    bool canDoThreadedSurfaceUpdates() const override { return true; };
+
 private slots:
     void onSurfacePositionChanged(const QPointF& position) override;
     void onSurfaceSizeChanged(const QSizeF& size) override;

@@ -137,6 +137,9 @@ public:
     virtual void windowUnsetFullscreen();
     virtual void windowSetFullscreen(const char *id);
 
+    // The following method should return true if surface updates can be threaded:
+    virtual bool canDoThreadedSurfaceUpdates() const { return false; };
+
 protected:
     void commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb destroyCb);
     void commonWindowEnable();

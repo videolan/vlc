@@ -78,6 +78,8 @@ public:
     int windowEnable(const vlc_window_cfg_t *) override;
     void windowDisable() override;
 
+    bool canDoThreadedSurfaceUpdates() const override { return true; };
+
 protected slots:
     void onSurfacePositionChanged(const QPointF&) override;
     void onSurfaceSizeChanged(const QSizeF&) override;

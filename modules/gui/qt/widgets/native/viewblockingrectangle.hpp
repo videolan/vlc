@@ -29,7 +29,7 @@
 class MatrixChangeObserverNode : public QSGRenderNode
 {
 public:
-    explicit MatrixChangeObserverNode(const std::function<void()>& callback)
+    explicit MatrixChangeObserverNode(const std::function<void(const QMatrix4x4&)>& callback)
         : m_callback(callback) { }
 
     // Use prepare(), because matrix() returns dangling pointer when render() is called from Qt 6.2 to 6.5 (QTBUG-97589):
@@ -41,7 +41,7 @@ public:
         const QMatrix4x4 m = *matrix(); // matrix() is the combined matrix here
         if (m_lastCombinedMatrix != m)
         {
-            m_callback();
+            m_callback(m);
             m_lastCombinedMatrix = m;
         }
     }
@@ -57,7 +57,7 @@ public:
         return static_cast<RenderingFlags>(BoundedRectRendering | DepthAwareRendering | OpaqueRendering | NoExternalRendering);
     }
 private:
-    std::function<void()> m_callback;
+    std::function<void(const QMatrix4x4& newMatrix)> m_callback;
     QMatrix4x4 m_lastCombinedMatrix;
 };
 
@@ -73,9 +73,19 @@ public:
 protected:
     QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
 
+    // For now these are protected, but can be made public if necessary:
+    // These methods should only be called from the rendering thread.
+    QSizeF renderSize() const;
+    QPointF renderPosition() const;
+
 private:
     QColor m_color;
     bool m_windowChanged = false;
+
+    // Although these members belong to the class instance's thread, they
+    // are updated in the rendering thread:
+    QSizeF m_renderSize;
+    QPointF m_renderPosition {-1., -1.};
 
 signals:
     // NOTE: `scenePositionHasChanged()` signal is emitted from the render thread,

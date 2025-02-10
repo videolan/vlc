@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #include "videosurface.hpp"
-#include "maininterface/mainctx.hpp"
+
 #include <QSGRectangleNode>
 #include <QThreadPool>
 #include <vlc_window.h>
@@ -25,6 +25,8 @@
 #ifdef QT_DECLARATIVE_PRIVATE
 #  include <QtGui/qpa/qplatformwindow.h>
 #endif
+
+#include "maininterface/mainctx.hpp"
 
 WindowResizer::WindowResizer(vlc_window_t* window):
     m_requestedWidth(0),
@@ -87,8 +89,9 @@ void WindowResizer::waitForCompletion()
         vlc_cond_wait(&m_cond, &m_lock);
 }
 
-VideoSurfaceProvider::VideoSurfaceProvider(QObject* parent)
+VideoSurfaceProvider::VideoSurfaceProvider(bool threadedSurfaceUpdates, QObject* parent)
     : QObject(parent)
+    , m_threadedSurfaceUpdates(threadedSurfaceUpdates)
 {
 }
 
@@ -207,17 +210,6 @@ VideoSurface::VideoSurface(QQuickItem* parent)
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlag(ItemAcceptsInputMethod, true);
-
-    {
-        connect(this, &QQuickItem::widthChanged, this, &VideoSurface::updateSurfaceSize);
-        connect(this, &QQuickItem::heightChanged, this, &VideoSurface::updateSurfaceSize);
-
-        connect(this, &QQuickItem::xChanged, this, &VideoSurface::updateSurfacePosition);
-        connect(this, &QQuickItem::yChanged, this, &VideoSurface::updateSurfacePosition);
-
-        // This is for the case when the item's parent-relative position stays the same, but ancestors change position:
-        connect(this, &ViewBlockingRectangle::scenePositionHasChanged, this, &VideoSurface::updateSurfacePosition, Qt::QueuedConnection);
-    }
 }
 
 int VideoSurface::qtMouseButton2VLC( Qt::MouseButton qtButton )
@@ -321,30 +313,50 @@ void VideoSurface::setCursorShape(Qt::CursorShape shape)
     setCursor(shape);
 }
 
-void VideoSurface::updatePolish()
+void VideoSurface::synchronize()
 {
-    QQuickItem::updatePolish();
+    // This may be called from the rendering thread, not necessarily
+    // during synchronization (GUI thread is not blocked). Try to
+    // be very careful.
 
-    assert(window());
+    QSizeF size;
+    QPointF position;
 
-    if (m_sizeDirty && !size().isEmpty())
+    if (QThread::currentThread() == thread())
     {
-        emit surfaceSizeChanged(size() * window()->effectiveDevicePixelRatio());
-        m_sizeDirty = false;
+        // Item's thread (GUI thread):
+        size = this->size();
+        position = this->mapToScene(QPointF(0,0));
+    }
+    else
+    {
+        // Render thread:
+        size = renderSize();
+        position = renderPosition();
     }
 
-    if (m_positionDirty)
+    if (m_oldRenderSize != size || m_dprDirty)
     {
-        QPointF scenePosition = this->mapToScene(QPointF(0,0));
-
-        emit surfacePositionChanged(scenePosition * window()->effectiveDevicePixelRatio());
-        m_positionDirty = false;
+        if (!size.isEmpty())
+        {
+            emit surfaceSizeChanged(size * m_dpr);
+            m_oldRenderSize = size;
+        }
     }
 
-    if (m_scaleDirty)
+    if (m_oldRenderPosition != position || m_dprDirty)
     {
-        emit surfaceScaleChanged(window()->effectiveDevicePixelRatio());
-        m_scaleDirty = false;
+        if (position.x() >= 0.0 && position.y() >= 0.0)
+        {
+            emit surfacePositionChanged(position * m_dpr); // render position is relative to scene/viewport
+            m_oldRenderPosition = position;
+        }
+    }
+
+    if (m_dprDirty)
+    {
+        emit surfaceScaleChanged(m_dpr);
+        m_dprDirty = false;
     }
 }
 
@@ -352,35 +364,12 @@ void VideoSurface::itemChange(ItemChange change, const ItemChangeData &value)
 {
     if (change == ItemDevicePixelRatioHasChanged || change == ItemSceneChange)
     {
-        updateSurfaceScale();
+        m_dprChanged = true;
+        // Request update, so that `updatePaintNode()` gets called which updates the DPR for `::synchronize()`:
+        update();
     }
 
     QQuickItem::itemChange(change, value);
-}
-
-void VideoSurface::updateSurfacePosition()
-{
-    m_positionDirty = true;
-    polish();
-}
-
-void VideoSurface::updateSurfaceSize()
-{
-    m_sizeDirty = true;
-    polish();
-}
-
-void VideoSurface::updateSurfaceScale()
-{
-    m_scaleDirty = true;
-    polish();
-}
-
-void VideoSurface::updateSurface()
-{
-    updateSurfacePosition();
-    updateSurfaceSize();
-    updateSurfaceScale();
 }
 
 void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurfaceProvider)
@@ -404,15 +393,13 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
         connect(this, &VideoSurface::mouseDblClicked, m_provider, &VideoSurfaceProvider::onMouseDoubleClick);
         connect(this, &VideoSurface::mouseReleased, m_provider, &VideoSurfaceProvider::onMouseReleased);
         connect(this, &VideoSurface::keyPressed, m_provider, &VideoSurfaceProvider::onKeyPressed);
-        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged);
-        connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged);
-        connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged);
+        connect(this, &VideoSurface::surfaceSizeChanged, m_provider, &VideoSurfaceProvider::onSurfaceSizeChanged, Qt::DirectConnection);
+        connect(this, &VideoSurface::surfacePositionChanged, m_provider, &VideoSurfaceProvider::surfacePositionChanged, Qt::DirectConnection);
+        connect(this, &VideoSurface::surfaceScaleChanged, m_provider, &VideoSurfaceProvider::surfaceScaleChanged, Qt::DirectConnection);
 
         connect(&m_wheelEventConverter, &WheelToVLCConverter::vlcWheelKey, m_provider, &VideoSurfaceProvider::onMouseWheeled);
-        connect(m_provider, &VideoSurfaceProvider::videoEnabledChanged, this, &VideoSurface::updateSurface);
 
         setFlag(ItemHasContents, true);
-        updateSurface(); // Polish is queued anyway, updatePolish() should be called when the initial size is set.
     }
     else
     {
@@ -420,4 +407,49 @@ void VideoSurface::setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurface
     }
 
     emit videoSurfaceProviderChanged();
+}
+
+QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
+{
+    // This is called from the render thread, but during synchronization.
+    // So the GUI thread is blocked here. This makes it safer to access the window
+    // to get the effective DPR, rather than doing it outside the synchronization
+    // stage.
+
+    const auto w = window();
+    assert (w);
+
+    if (Q_UNLIKELY(!m_provider))
+        return node;
+
+    if (w != m_oldWindow)
+    {
+        if (m_oldWindow)
+            disconnect(m_oldWindow, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize);
+
+        m_oldWindow = w;
+
+        if (w)
+        {
+            // This is constant:
+            if (m_provider->supportsThreadedSurfaceUpdates())
+            {
+                // Synchronize just before swapping the frame for better synchronization:
+                connect(w, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize, Qt::DirectConnection);
+            }
+            else
+            {
+                connect(w, &QQuickWindow::afterAnimating, this, &VideoSurface::synchronize);
+            }
+        }
+    }
+
+    if (m_dprChanged)
+    {
+        m_dpr = w->effectiveDevicePixelRatio();
+        m_dprDirty = true;
+        m_dprChanged = false;
+    }
+
+    return ViewBlockingRectangle::updatePaintNode(node, data);
 }

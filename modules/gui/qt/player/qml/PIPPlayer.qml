@@ -30,10 +30,6 @@ T.Control {
     width: Math.round(VLCStyle.dp(320, VLCStyle.scale))
     height: Math.round(VLCStyle.dp(180, VLCStyle.scale))
 
-    //VideoSurface x,y won't update
-    onXChanged: videoSurface.updateSurfacePosition()
-    onYChanged: videoSurface.updateSurfacePosition()
-
     objectName: "pip window"
 
     property real dragXMin: 0

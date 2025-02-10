@@ -202,12 +202,13 @@ void CompositorVideo::commonSetupVoutWindow(vlc_window_t* p_wnd, VoutDestroyCb d
     // These need to be connected here, since the compositor might not be ready when
     // these signals are emitted. VOut window might not be set, or worse, compositor's
     // internal preparations might not be completed yet:
+    constexpr auto connType = static_cast<Qt::ConnectionType>(Qt::UniqueConnection | Qt::DirectConnection);
     connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfacePositionChanged,
-            this, &CompositorVideo::onSurfacePositionChanged, Qt::UniqueConnection);
+            this, &CompositorVideo::onSurfacePositionChanged, connType);
     connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceSizeChanged,
-            this, &CompositorVideo::onSurfaceSizeChanged, Qt::UniqueConnection);
+            this, &CompositorVideo::onSurfaceSizeChanged, connType);
     connect(m_videoSurfaceProvider.get(), &VideoSurfaceProvider::surfaceScaleChanged,
-            this, &CompositorVideo::onSurfaceScaleChanged, Qt::UniqueConnection);
+            this, &CompositorVideo::onSurfaceScaleChanged, connType);
 }
 
 void CompositorVideo::windowDestroy()
@@ -268,7 +269,7 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     assert(m_mainCtx);
     assert(window);
 
-    m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>();
+    m_videoSurfaceProvider = std::make_unique<VideoSurfaceProvider>(canDoThreadedSurfaceUpdates());
     m_mainCtx->setVideoSurfaceProvider(m_videoSurfaceProvider.get());
     const bool backendIsOpenVg = QQuickWindow::sceneGraphBackend() == QLatin1String("openvg");
     if (!backendIsOpenVg && (flags & CompositorVideo::CAN_SHOW_PIP) && var_InheritBool(m_intf, "qt-pip-mode"))

@@ -61,7 +61,7 @@ class VideoSurfaceProvider : public QObject
 {
     Q_OBJECT
 public:
-    VideoSurfaceProvider(QObject* parent = nullptr);
+    VideoSurfaceProvider(bool threadedSurfaceUpdates = false, QObject* parent = nullptr);
     virtual ~VideoSurfaceProvider() {}
 
     void enable(vlc_window_t* voutWindow);
@@ -70,6 +70,8 @@ public:
 
     void setVideoEmbed(bool embed);
     bool hasVideoEmbed() const;
+
+    bool supportsThreadedSurfaceUpdates() const { return m_threadedSurfaceUpdates; };
 
 signals:
     void ctxChanged(MainCtx*);
@@ -94,6 +96,7 @@ protected:
     vlc_window_t* m_voutWindow = nullptr;
     WindowResizer * m_resizer = nullptr;
     bool m_videoEmbed = false;
+    bool m_threadedSurfaceUpdates = false;
 };
 
 
@@ -110,6 +113,8 @@ public:
     void setVideoSurfaceProvider(VideoSurfaceProvider *newVideoSurfaceProvider);
 
 protected:
+    QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *) override;
+
     int qtMouseButton2VLC( Qt::MouseButton qtButton );
 
     void mousePressEvent(QMouseEvent *event) override;
@@ -125,10 +130,7 @@ protected:
     Qt::CursorShape getCursorShape() const;
     void setCursorShape(Qt::CursorShape);
 
-    void updatePolish() override;
-
     void itemChange(QQuickItem::ItemChange change, const QQuickItem::ItemChangeData &value) override;
-
 signals:
     void surfaceSizeChanged(QSizeF);
     void surfacePositionChanged(QPointF);
@@ -143,10 +145,7 @@ signals:
     void videoSurfaceProviderChanged();
 
 protected slots:
-    void updateSurfacePosition();
-    void updateSurfaceSize();
-    void updateSurfaceScale();
-    void updateSurface();
+    void synchronize();
 
 private:
     QPointF m_oldHoverPos;
@@ -155,9 +154,22 @@ private:
 
     QPointer<VideoSurfaceProvider> m_provider;
 
-    bool m_sizeDirty = false;
-    bool m_positionDirty = false;
-    bool m_scaleDirty = false;
+    QPointer<QQuickWindow> m_oldWindow;
+
+    // This is updated and read from different threads, but during synchronization stage so explicit synchronization
+    // such as atomic boolean or locking is not necessary:
+    bool m_dprChanged = false; // itemChange() <-> updatePaintNode() (different threads, but GUI thread is blocked)
+
+    // These are updated and read from either the item/GUI thread or the render thread:
+    QSizeF m_oldRenderSize;
+    QPointF m_oldRenderPosition {-1., -1.};
+
+    // m_dpr and m_dprDirty are updated in render thread when the GUI thread is blocked (updatePaintNode()).
+    // m_dprDirty may be updated in GUI thread when threaded updates is not possible. Since m_dprDirty can
+    // not be updated both in render thread and GUI thread concurrently (as GUI thread is blocked during
+    // updatePaintNode() call), data synchronization should not be necessary:
+    qreal m_dpr = 1.0;
+    bool m_dprDirty = false;
 };
 
 #endif // VIDEOSURFACE_HPP
