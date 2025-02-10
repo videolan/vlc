@@ -420,6 +420,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     newChildDataSource.pathControl = self.pathControl;
     newChildDataSource.tableView = self.tableView;
     newChildDataSource.navigationStack = self.navigationStack;
+    newChildDataSource.parentBaseDataSource = self;
 
     [self setChildDataSource:newChildDataSource];
     [self.navigationStack appendCurrentLibraryState];

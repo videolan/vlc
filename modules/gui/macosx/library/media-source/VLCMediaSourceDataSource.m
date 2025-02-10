@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
+#import "VLCMediaSourceBaseDataSource.h"
 #import "VLCMediaSourceCollectionViewItem.h"
 #import "VLCMediaSource.h"
 
