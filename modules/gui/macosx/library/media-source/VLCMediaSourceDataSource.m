@@ -59,39 +59,48 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
 @implementation VLCMediaSourceDataSource
 
+- (dispatch_source_t)observeLocalUrl:(NSURL *)url
+                      forVnodeEvents:(dispatch_source_vnode_flags_t)eventsFlags
+                    withEventHandler:(dispatch_block_t)eventHandlerBlock
+{
+    const uintptr_t descriptor = open(url.path.UTF8String, O_EVTONLY);
+    if (descriptor == -1) {
+        return nil;
+    }
+    struct stat fileStat;
+    const int statResult = fstat(descriptor, &fileStat);
+
+    const dispatch_queue_t globalQueue =
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    const dispatch_source_t fileDispatchSource =
+        dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, descriptor, eventsFlags, globalQueue);
+    dispatch_source_set_event_handler(fileDispatchSource, eventHandlerBlock);
+    dispatch_source_set_cancel_handler(fileDispatchSource, ^{
+        close(descriptor);
+    });
+    dispatch_resume(fileDispatchSource);
+    return fileDispatchSource;
+}
+
 - (void)setNodeToDisplay:(nonnull VLCInputNode*)nodeToDisplay
 {
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     _nodeToDisplay = nodeToDisplay;
     [self reloadData];
 
-    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
-    const uintptr_t descriptor = open(nodeUrl.path.UTF8String, O_EVTONLY);
-    if (descriptor == -1) {
-        return;
-    }
-    struct stat fileStat;
-    const int statResult = fstat(descriptor, &fileStat);
     const __weak typeof(self) weakSelf = self;
 
-    const dispatch_queue_t globalQueue =
-        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-    const dispatch_source_t fileDispatchSource =
-        dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
-                               descriptor,
-                               DISPATCH_VNODE_WRITE,
-                               globalQueue);
-    dispatch_source_set_event_handler(fileDispatchSource, ^{
+    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+    self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
+                                             forVnodeEvents:DISPATCH_VNODE_WRITE
+                                           withEventHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay.vlcInputItemNode withUrl:nodeUrl];
+            input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
+            [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                                                                      withUrl:nodeUrl];
             [weakSelf reloadData];
         });
-    });
-    dispatch_source_set_cancel_handler(fileDispatchSource, ^{
-        close(descriptor);
-    });
-    dispatch_resume(fileDispatchSource);
-    self.observedPathDispatchSource = fileDispatchSource;
+    }];
 }
 
 - (void)setupViews
