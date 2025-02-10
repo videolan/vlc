@@ -210,7 +210,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     const char* psz_mrl = "mock://video_track_count=0;audio_track_count=1;"
                           /* force timeout: parsing will take the same time as length */
                           "can_control_pace=false;"
-                          "length=200";
+                          "length=20000000";
     input_item_t* p_item = input_item_New( psz_mrl, "mock item" );
     assert( p_item != NULL );
 
