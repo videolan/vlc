@@ -731,6 +731,9 @@ bool demux_sys_t::FreeUnused()
 
 bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date )
 {
+    if ( !new_vsegment.CurrentSegment() )
+        return false;
+
     if ( p_current_vsegment != &new_vsegment )
     {
         if ( p_current_vsegment->CurrentSegment() != NULL )
