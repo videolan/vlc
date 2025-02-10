@@ -417,6 +417,13 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
+    // Clear pre-existing child nodes
+    while (directoryNode->i_children > 0) {
+        input_item_node_t * const child = directoryNode->pp_children[0];
+        input_item_node_RemoveNode(directoryNode, child);
+        input_item_node_Delete(child);
+    }
+
     NSError *error;
     NSArray<NSURL *> *subDirectories = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:directoryUrl
                                                                      includingPropertiesForKeys:@[NSURLIsDirectoryKey]
