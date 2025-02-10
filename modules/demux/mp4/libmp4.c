@@ -4707,6 +4707,11 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
 
         p_data->p_items[i].p_extents = malloc( p_data->p_items[i].i_extent_count *
                                                sizeof(p_data->p_items[i].p_extents[0]) );
+        if(!p_data->p_items[i].p_extents)
+        {
+            p_data->i_item_count = i;
+            MP4_READBOX_EXIT( 0 );
+        }
         for( uint16_t j=0; j<p_data->p_items[i].i_extent_count; j++ )
         {
             if( i_version > 0 )
