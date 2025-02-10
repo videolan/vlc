@@ -164,7 +164,7 @@ NSString * const VLCLibraryCollectionViewItemAdjustmentKey = @"VLCLibraryCollect
     const uint midPossibleNumItemsInRow =
         round((minPossibleNumItemsInRow + maxPossibleNumItemsInRow) / 2.0);
 
-    const uint unclampedNumItemsInRow = midPossibleNumItemsInRow + adjustment;
+    const int unclampedNumItemsInRow = midPossibleNumItemsInRow + adjustment;
     const uint numItemsInRow = MAX(unclampedNumItemsInRow, VLCLibraryUIUnits.collectionViewMinItemsInRow);
     const NSSize itemSize = [self itemSizeForCollectionView:collectionView
                                                  withLayout:collectionViewLayout
