@@ -97,14 +97,20 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     const __weak typeof(self) weakSelf = self;
 
     self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
-                                             forVnodeEvents:DISPATCH_VNODE_WRITE
+                                             forVnodeEvents:DISPATCH_VNODE_WRITE | DISPATCH_VNODE_DELETE | DISPATCH_VNODE_RENAME
                                            withEventHandler:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
-            [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
-                                                                      withUrl:nodeUrl];
-            [weakSelf reloadData];
-        });
+        const uintptr_t eventFlags = dispatch_source_get_data(weakSelf.observedPathDispatchSource);
+        if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                                                                          withUrl:nodeUrl];
+                [weakSelf reloadData];
+            });
+        }
     }];
 }
 
