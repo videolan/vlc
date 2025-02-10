@@ -22,6 +22,11 @@
 
 #import "VLCMediaSourceDataSource.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 #import "VLCMediaSourceCollectionViewItem.h"
 #import "VLCMediaSource.h"
@@ -47,6 +52,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 {
     VLCInputItem *_childRootInput;
 }
+
+@property (readwrite) dispatch_source_t observedPathDispatchSource;
+
 @end
 
 @implementation VLCMediaSourceDataSource
@@ -56,6 +64,34 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     _nodeToDisplay = nodeToDisplay;
     [self reloadData];
+
+    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+    const uintptr_t descriptor = open(nodeUrl.path.UTF8String, O_EVTONLY);
+    if (descriptor == -1) {
+        return;
+    }
+    struct stat fileStat;
+    const int statResult = fstat(descriptor, &fileStat);
+    const __weak typeof(self) weakSelf = self;
+
+    const dispatch_queue_t globalQueue =
+        dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    const dispatch_source_t fileDispatchSource =
+        dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE,
+                               descriptor,
+                               DISPATCH_VNODE_WRITE,
+                               globalQueue);
+    dispatch_source_set_event_handler(fileDispatchSource, ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:nodeToDisplay.vlcInputItemNode withUrl:nodeUrl];
+            [weakSelf reloadData];
+        });
+    });
+    dispatch_source_set_cancel_handler(fileDispatchSource, ^{
+        close(descriptor);
+    });
+    dispatch_resume(fileDispatchSource);
+    self.observedPathDispatchSource = fileDispatchSource;
 }
 
 - (void)setupViews
