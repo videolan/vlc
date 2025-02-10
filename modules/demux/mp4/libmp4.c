@@ -4698,7 +4698,8 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
 
         uint64_t i_entrysize = (( i_version > 0 ) ? p_data->i_index_size : 0) +
                                p_data->i_offset_size + p_data->i_length_size;
-        if( i_read / i_entrysize < p_data->p_items[i].i_extent_count )
+        if( i_entrysize > 0 &&
+            i_read / i_entrysize < p_data->p_items[i].i_extent_count )
         {
             p_data->i_item_count = i;
             MP4_READBOX_EXIT( 0 );
