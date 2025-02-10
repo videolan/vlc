@@ -101,7 +101,10 @@ class CSDButtonModel : public QObject
 public:
     CSDButtonModel(MainCtx *mainCtx, QObject *parent = nullptr);
 
-    QList<CSDButton *> windowCSDButtons() const;
+    // QList may cause crash on destruction (QTBUG-132126),
+    // return by reference so that the QList rvalue is not
+    // destructed:
+    const QList<CSDButton *>& windowCSDButtons() const;
 
 private slots:
     void minimizeButtonClicked();

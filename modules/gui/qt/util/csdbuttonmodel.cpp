@@ -122,7 +122,7 @@ CSDButtonModel::CSDButtonModel(MainCtx *mainCtx, QObject *parent)
     newButton(CSDButton::Close, &CSDButtonModel::closeButtonClicked);
 }
 
-QList<CSDButton *> CSDButtonModel::windowCSDButtons() const
+const QList<CSDButton *> &CSDButtonModel::windowCSDButtons() const
 {
     return m_windowCSDButtons;
 }
