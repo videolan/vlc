@@ -86,11 +86,15 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 {
     NSAssert(nodeToDisplay, @"Nil node to display, will not set");
     _nodeToDisplay = nodeToDisplay;
+
+    input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
+    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+    [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
+
     [self reloadData];
 
     const __weak typeof(self) weakSelf = self;
 
-    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
     self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
                                              forVnodeEvents:DISPATCH_VNODE_WRITE
                                            withEventHandler:^{
