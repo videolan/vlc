@@ -28,67 +28,6 @@
 
 #include "maininterface/mainctx.hpp"
 
-WindowResizer::WindowResizer(vlc_window_t* window):
-    m_requestedWidth(0),
-    m_requestedHeight(0),
-    m_currentWidth(0),
-    m_currentHeight(0),
-    m_running(false),
-    m_voutWindow(window)
-{
-    vlc_mutex_init(&m_lock);
-    vlc_cond_init(&m_cond);
-    setAutoDelete(false);
-}
-
-WindowResizer::~WindowResizer()
-{
-}
-
-void WindowResizer::run()
-{
-    vlc_mutex_lock(&m_lock);
-    while (m_requestedWidth != m_currentWidth ||
-           m_requestedHeight != m_currentHeight)
-    {
-        unsigned width = m_requestedWidth;
-        unsigned height = m_requestedHeight;
-        vlc_mutex_unlock(&m_lock);
-
-        vlc_window_ReportSize(m_voutWindow, width, height);
-
-        vlc_mutex_lock(&m_lock);
-        m_currentWidth = width;
-        m_currentHeight = height;
-    }
-    m_running = false;
-    vlc_cond_signal(&m_cond);
-    vlc_mutex_unlock(&m_lock);
-}
-
-void WindowResizer::reportSize(float width, float height)
-{
-    if (width < 0 || height < 0)
-        return;
-
-    vlc_mutex_locker locker(&m_lock);
-    m_requestedWidth = static_cast<unsigned>(width);
-    m_requestedHeight = static_cast<unsigned>(height);
-    if (m_running == false)
-    {
-        m_running = true;
-        QThreadPool::globalInstance()->start(this);
-    }
-}
-
-/* Must called under m_voutlock before deletion */
-void WindowResizer::waitForCompletion()
-{
-    vlc_mutex_locker locker(&m_lock);
-    while (m_running)
-        vlc_cond_wait(&m_cond, &m_lock);
-}
-
 VideoSurfaceProvider::VideoSurfaceProvider(bool threadedSurfaceUpdates, QObject* parent)
     : QObject(parent)
     , m_threadedSurfaceUpdates(threadedSurfaceUpdates)
@@ -97,7 +36,6 @@ VideoSurfaceProvider::VideoSurfaceProvider(bool threadedSurfaceUpdates, QObject*
 
 bool VideoSurfaceProvider::isEnabled()
 {
-    QMutexLocker lock(&m_voutlock);
     return m_voutWindow != nullptr;
 }
 
@@ -109,27 +47,14 @@ bool VideoSurfaceProvider::hasVideoEmbed() const
 void VideoSurfaceProvider::enable(vlc_window_t* voutWindow)
 {
     assert(voutWindow);
-    {
-        QMutexLocker lock(&m_voutlock);
-        m_voutWindow = voutWindow;
-        m_resizer = new (std::nothrow) WindowResizer(voutWindow);
-    }
+    m_voutWindow = voutWindow;
     emit videoEnabledChanged(true);
 }
 
 void VideoSurfaceProvider::disable()
 {
     setVideoEmbed(false);
-    {
-        QMutexLocker lock(&m_voutlock);
-        if (m_resizer != nullptr)
-        {
-            m_resizer->waitForCompletion();
-            delete m_resizer;
-            m_resizer = nullptr;
-        }
-        m_voutWindow = nullptr;
-    }
+    m_voutWindow = nullptr;
     emit videoEnabledChanged(false);
 }
 
@@ -141,44 +66,36 @@ void VideoSurfaceProvider::setVideoEmbed(bool embed)
 
 void VideoSurfaceProvider::onWindowClosed()
 {
-    QMutexLocker lock(&m_voutlock);
-    if (m_resizer != nullptr)
-        m_resizer->waitForCompletion();
     if (m_voutWindow)
         vlc_window_ReportClose(m_voutWindow);
 }
 
 void VideoSurfaceProvider::onMousePressed(int vlcButton)
 {
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportMousePressed(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseReleased(int vlcButton)
 {
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportMouseReleased(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseDoubleClick(int vlcButton)
 {
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportMouseDoubleClick(m_voutWindow, vlcButton);
 }
 
 void VideoSurfaceProvider::onMouseMoved(float x, float y)
 {
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportMouseMoved(m_voutWindow, x, y);
 }
 
 void VideoSurfaceProvider::onMouseWheeled(int vlcButton)
 {
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportKeyPress(m_voutWindow, vlcButton);
 }
@@ -187,19 +104,14 @@ void VideoSurfaceProvider::onKeyPressed(int key, Qt::KeyboardModifiers modifiers
 {
     QKeyEvent event(QEvent::KeyPress, key, modifiers);
     int vlckey = qtEventToVLCKey(&event);
-    QMutexLocker lock(&m_voutlock);
     if (m_voutWindow)
         vlc_window_ReportKeyPress(m_voutWindow, vlckey);
-
 }
 
 void VideoSurfaceProvider::onSurfaceSizeChanged(QSizeF size)
 {
     emit surfaceSizeChanged(size);
-    QMutexLocker lock(&m_voutlock);
-    if (m_resizer)
-        m_resizer->reportSize(std::ceil(size.width()), std::ceil(size.height()));
-    else if (m_voutWindow)
+    if (m_voutWindow)
         vlc_window_ReportSize(m_voutWindow, std::ceil(size.width()), std::ceil(size.height()));
 }
 
