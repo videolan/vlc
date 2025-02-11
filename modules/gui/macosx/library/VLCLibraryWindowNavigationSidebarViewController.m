@@ -124,6 +124,14 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
 {
     const VLCLibrarySegmentType currentSegmentType = self.libraryWindow.librarySegmentType;
 
+    NSMutableSet<NSNumber *> * const expandedSegmentTypes = NSMutableSet.set;
+    for (VLCLibrarySegment * const segment in self.treeController.content) {
+        NSTreeNode * const node = [self nodeForSegmentType:segment.segmentType];
+        if ([self.outlineView isItemExpanded:node]) {
+            [expandedSegmentTypes addObject:@(segment.segmentType)];
+        }
+    }
+
     self.ignoreSegmentSelectionChanges = YES;
 
     _segments = VLCLibrarySegment.librarySegments;
@@ -143,6 +151,13 @@ static NSString * const VLCLibrarySegmentCellIdentifier = @"VLCLibrarySegmentCel
     self.ignoreSegmentSelectionChanges = NO;
 
     [self updateBookmarkObservation];
+
+    for (VLCLibrarySegment * const segment in self.treeController.content) {
+        if ([expandedSegmentTypes containsObject:@(segment.segmentType)]) {
+            NSTreeNode * const node = [self nodeForSegmentType:segment.segmentType];
+            [self.outlineView expandItem:node];
+        }
+    }
 }
 
 - (void)updateBookmarkObservation
