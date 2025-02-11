@@ -115,7 +115,7 @@ static void thumbnailer_callback( vlc_preparser_req *req, int status,
     vlc_preparser_req_Release( req );
 }
 
-static void test_thumbnails( libvlc_instance_t* p_vlc )
+static void test_thumbnails( libvlc_instance_t* p_vlc, bool external )
 {
     struct test_ctx ctx;
     vlc_cond_init( &ctx.cond );
@@ -131,7 +131,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         const struct vlc_preparser_cfg cfg = {
             .types = VLC_PREPARSER_TYPE_THUMBNAIL,
             .timeout = test_params[i].i_timeout,
-            .external_process = false,
+            .external_process = external,
         };
 
         vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
@@ -198,12 +198,12 @@ static void thumbnailer_callback_cancel( vlc_preparser_req *req, int status,
     vlc_preparser_req_Release(req);
 }
 
-static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
+static void test_cancel_thumbnail( libvlc_instance_t* p_vlc, bool external )
 {
     const struct vlc_preparser_cfg cfg = {
         .types = VLC_PREPARSER_TYPE_THUMBNAIL,
         .timeout = VLC_TICK_INVALID,
-        .external_process = false,
+        .external_process = external,
     };
     vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
                 VLC_OBJECT( p_vlc->p_libvlc_int ), &cfg );
@@ -245,8 +245,14 @@ int main( void )
     libvlc_instance_t *vlc = libvlc_new(ARRAY_SIZE(argv), argv);
     assert(vlc);
 
-    test_thumbnails( vlc );
-    test_cancel_thumbnail( vlc );
+    fprintf(stderr, "Run with internal preparser...\n");
+    test_thumbnails( vlc, false );
+    test_cancel_thumbnail( vlc, false );
+
+    fprintf(stderr, "Run with external preparser...\n");
+    test_thumbnails( vlc, true );
+    test_cancel_thumbnail( vlc, true );
+
 
     libvlc_release( vlc );
 }

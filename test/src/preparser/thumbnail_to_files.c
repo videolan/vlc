@@ -228,26 +228,12 @@ static int get_formats(enum vlc_thumbnailer_format *out_format,
     vlc_assert_unreachable();
 }
 
-int main(int argc, const char *argv[])
+static int run_test(libvlc_instance_t *vlc, bool external)
 {
-    test_init();
-    argc--;
-    argv++;
-
     size_t test_count = ARRAY_SIZE(test_entries);
     struct vlc_thumbnailer_output entries[test_count];
     int fd_array[test_count];
     char path_array[test_count][sizeof("/tmp/libvlc_XXXXXX")];
-
-    libvlc_instance_t *vlc = libvlc_new(argc, argv);
-    assert(vlc);
-
-    /* This test require swscale */
-    if (!module_exists("swscale"))
-    {
-        fprintf(stderr, "skip: no \"swscale\" module\n");
-        goto skip;
-    }
 
     enum vlc_thumbnailer_format format;
     const char *forced_demux, *ext;
@@ -299,7 +285,7 @@ int main(int argc, const char *argv[])
         .max_parser_threads = 1,
         .max_thumbnailer_threads = 1,
         .timeout = 0,
-        .external_process = false,
+        .external_process = external,
     };
     vlc_preparser_t *preparser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                    &cfg);
@@ -357,10 +343,42 @@ int main(int argc, const char *argv[])
     input_item_Release(item);
 
     vlc_preparser_Delete(preparser);
-    libvlc_release(vlc);
     return 0;
 
 skip:
-    libvlc_release(vlc);
     return 77;
+}
+
+int main(int argc, const char *argv[])
+{
+    test_init();
+    argc--;
+    argv++;
+
+    libvlc_instance_t *vlc = libvlc_new(argc, argv);
+    assert(vlc);
+
+    int ret = 0;
+
+    /* This test require swscale */
+    if (!module_exists("swscale"))
+    {
+        fprintf(stderr, "skip: no \"swscale\" module\n");
+        goto end;
+    }
+
+    fprintf(stderr, "Run with internal preparser...\n");
+    ret = run_test(vlc, false);
+    if (ret != 0) {
+        goto end;
+    }
+    fprintf(stderr, "Run with external preparser...\n");
+    ret = run_test(vlc, true);
+    if (ret != 0) {
+        goto end;
+    }
+
+end:
+    libvlc_release(vlc);
+    return ret;
 }
