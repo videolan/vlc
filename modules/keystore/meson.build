@@ -7,15 +7,21 @@ vlc_modules += {
 # File keystore
 file_keystore_extra_sources = []
 file_keystore_extra_deps = []
+file_keystore_extra_link = []
 if host_system == 'windows'
     file_keystore_extra_sources += files('file_crypt_win32.c')
     file_keystore_extra_deps += cc.find_library('crypt32', required: true)
 endif
-# TODO: Add Android-specific sources
+if host_system == 'android'
+    file_keystore_extra_sources += files('file_crypt_android.c')
+    file_keystore_extra_link += [libandroid_env]
+endif
+
 vlc_modules += {
     'name' : 'file_keystore',
-    'sources' : files('file.c', 'list_util.c', file_keystore_extra_sources),
-    'dependencies' : file_keystore_extra_deps
+    'sources' : files('file.c', 'list_util.c') + file_keystore_extra_sources,
+    'dependencies' : file_keystore_extra_deps,
+    'link_with' : file_keystore_extra_link,
 }
 
 # libsecret keystore
