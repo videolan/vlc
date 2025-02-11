@@ -260,7 +260,9 @@ check_c_headers = [
     ['sys/auxv.h'],
     ['sys/eventfd.h'],
     ['sys/mount.h', { 'prefix' : ['#include <sys/types.h>'] }],
-    ['sys/shm.h'],
+    # Android API < 26 doesn't have a correct sys/shm.h implementation
+    # Bionic >= 26 source code also says it's not useful because of SELinux.
+    ['sys/shm.h', { 'exclude_host': ['android'] }],
     ['sys/soundcard.h'],
     ['valgrind/valgrind.h'],
     ['X11/Xlib.h'],
@@ -277,6 +279,11 @@ check_cpp_headers = []
 
 foreach header : check_c_headers
     header_kwargs = header.get(1, {})
+
+    if host_system in header_kwargs.get('exclude_host', [])
+        continue
+    endif
+
     # TODO: Once we require meson 1.0, drop the array join here
     # See: https://github.com/mesonbuild/meson/pull/11099
     if cc.check_header(header[0],
