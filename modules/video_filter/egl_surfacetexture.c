@@ -67,8 +67,6 @@ struct surfacetexture_sys
 
     size_t current_flip;
 
-    struct vlc_gl_api api;
-
     EGLConfig cfgv;
 
     picture_t *current_picture;
@@ -402,14 +400,6 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height,
     int ret = vlc_gl_MakeCurrent(gl);
     if (ret != VLC_SUCCESS)
         goto error4;
-
-    ret = vlc_gl_api_Init(&sys->api, gl);
-    if (ret != VLC_SUCCESS)
-    {
-        msg_Err(gl, "Failed to initialize gl_api");
-        vlc_gl_ReleaseCurrent(gl);
-        goto error4;
-    }
 
     struct vlc_gl_extension_vt extension_vt;
     vlc_gl_LoadExtensionFunctions(gl, &extension_vt);
