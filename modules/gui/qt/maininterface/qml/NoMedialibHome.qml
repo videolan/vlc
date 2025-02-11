@@ -16,52 +16,151 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-
+import QtQuick.Window
 
 import VLC.MainInterface
-import VLC.Style
 import VLC.Widgets as Widgets
+import VLC.Util
+import VLC.Style
 import VLC.Dialogs
 
 FocusScope {
     id: root
 
-    Accessible.role: Accessible.Client
-    Accessible.name: qsTr("Home view")
+    property var pagePrefix: [] // behave like a Page
 
-    //behave like a Page
-    property var pagePrefix: []
-
-    ColorContext {
+    readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
     }
 
-    Column {
-        anchors.centerIn: parent
+    Accessible.role: Accessible.Client
+    Accessible.name: qsTr("Home View")
 
-        spacing: VLCStyle.margin_small
 
-        Widgets.IconLabel {
-            text: VLCIcons.dropzone
-            color: theme.fg.secondary
-            anchors.horizontalCenter: parent.horizontalCenter
-            font.pixelSize: VLCStyle.dp(100, VLCStyle.scale)
+    component ConeNButtons: FocusScope {
+        id: coneNButtons
+
+        property int orientation: Qt.Vertical
+
+        property real spacing: VLCStyle.margin_large
+
+        implicitWidth: orientation === Qt.Vertical ? Math.max(cone.implicitWidth, buttons.implicitWidth)
+                                                   : cone.implicitWidth + spacing + buttons.implicitWidth
+        implicitHeight: orientation === Qt.Vertical ? cone.implicitHeight + spacing + buttons.implicitHeight
+                                                    : cone.implicitHeight
+
+        states: [
+            State {
+                name: "vertical"
+                AnchorChanges {
+                    target: cone
+
+                    anchors.left: undefined
+                    anchors.horizontalCenter: coneNButtons.horizontalCenter
+                }
+                AnchorChanges {
+                    target: buttons
+
+                    anchors.left: undefined
+                    anchors.verticalCenter: undefined
+                    anchors.top: cone.bottom
+                    anchors.horizontalCenter: coneNButtons.horizontalCenter
+                }
+                PropertyChanges {
+                    target: buttons
+
+                    anchors.topMargin: coneNButtons.spacing
+                }
+            },
+            State {
+                name: "horizontal"
+                AnchorChanges {
+                    target: cone
+
+                    anchors.horizontalCenter: undefined
+                    anchors.left: coneNButtons.left
+                }
+                AnchorChanges {
+                    target: buttons
+
+                    anchors.top: undefined
+                    anchors.horizontalCenter: undefined
+                    anchors.left: cone.right
+                    anchors.verticalCenter: coneNButtons.verticalCenter
+                }
+                PropertyChanges {
+                    target: buttons
+
+                    anchors.leftMargin: coneNButtons.spacing
+                }
+            }
+        ]
+
+        state: orientation === Qt.Vertical ? "vertical" : "horizontal"
+
+
+        Image {
+            id: cone
+
+            property real _eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
+
+            sourceSize: Qt.size(0, orientation === Qt.Vertical ? VLCStyle.colWidth(1)
+                                                               : buttons.implicitHeight * 1.618 * _eDPR) // 1.618 = golden ratio approximation
+
+            source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone designs
+                                          : SVGColorImage.colorize("qrc:///misc/cone.svg").accent(theme.accent).uri()
         }
 
-        Widgets.MenuLabel {
-            anchors .horizontalCenter: parent.horizontalCenter
-            text: qsTr("Drop some content here")
-            color: theme.fg.secondary
-        }
+        Row {
+            id: buttons
 
-        Widgets.ActionButtonPrimary {
-            id: openFileButton
-            text: qsTr("Open File")
-            focus: true
-            anchors.horizontalCenter: parent.horizontalCenter
-            onClicked: DialogsProvider.simpleOpenDialog()
-            Navigation.parentItem: root
+            spacing: coneNButtons.spacing
+
+            Widgets.ActionButtonPrimary {
+                id: fileButton
+
+                focus: true
+
+                text: qsTr("Open File")
+
+                // NOTE: Use the same width for the buttons (give more width if necessary) to have bilateral symmetry:
+                width: Math.max(fileButton.implicitWidth, discButton.implicitWidth)
+
+                Navigation.parentItem: coneNButtons
+                Navigation.rightItem: discButton
+
+                // TODO: The full-fledged open dialog is advertised as "Open Multiple Files" in the menu.
+                //       In the future, we can have the "Open File" button as a combo box button that has these options,
+                //       with the default being a simple open dialog:
+                //       - Default: simple open dialog.
+                //       - Combo box option 1 (user clicks the down button, and the combo box reveals all buttons): open multiple files (Ctrl+Shift+O).
+                //       - Combo box option 2: open location from clipboard (Ctrl+V) / simple text edit dialog.
+                onClicked: DialogsProvider.simpleOpenDialog()
+            }
+
+            Widgets.ActionButtonPrimary {
+                id: discButton
+
+                text: qsTr("Open Disc")
+
+                // NOTE: Use the same width for the buttons (give more width if necessary) to have bilateral symmetry:
+                width: Math.max(fileButton.implicitWidth, discButton.implicitWidth)
+
+                Navigation.parentItem: coneNButtons
+                Navigation.leftItem: fileButton
+
+                onClicked: DialogsProvider.openDiscDialog()
+            }
         }
+    }
+
+
+    ConeNButtons {
+        focus: true
+
+        anchors.centerIn: root
+
+        Navigation.parentItem: root
     }
 }
