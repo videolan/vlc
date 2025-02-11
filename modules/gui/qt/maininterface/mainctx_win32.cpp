@@ -137,6 +137,11 @@ public:
         updateCSDSettings();
     }
 
+    ~CSDWin32EventHandler()
+    {
+        QApplication::instance()->removeNativeEventFilter(this);
+    }
+
     static int resizeBorderWidth(QWindow *window)
     {
         // NOTE: When possible, Qt makes the application DPI aware, so `GetSystemMetrics()` would
