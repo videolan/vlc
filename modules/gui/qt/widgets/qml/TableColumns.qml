@@ -35,6 +35,8 @@ Item {
     // NOTE: That's useful when we want to enforce a cover criteria for the titleDelegate.
     property string criteriaCover: "cover"
 
+    property int fillMode: Image.PreserveAspectFit
+
     property int titleCover_width: VLCStyle.trackListAlbumCover_width
     property int titleCover_height: VLCStyle.trackListAlbumCover_heigth
     property int titleCover_radius: VLCStyle.trackListAlbumCover_radius
@@ -107,6 +109,8 @@ Item {
                 source: titleDel.rowModel?.[root.criteriaCover] ?? ""
 
                 fallbackImageSource: titleDel.colModel.placeHolder || VLCStyle.noArtAlbumCover
+
+                fillMode: root.fillMode
 
                 playCoverVisible: (titleDel.currentlyFocused || titleDel.containsMouse)
                 playIconSize: VLCStyle.play_cover_small
