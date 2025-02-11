@@ -99,5 +99,6 @@ vlc_modules += {
     'sources' : files('avparser.c'),
     'dependencies' : [avutil_dep, avcodec_dep],
     'link_with' : [libavcodec_common],
+    'link_args' : symbolic_linkargs,
     'enabled' : avcodec_dep.found() and not get_option('merge-ffmpeg'),
 }
