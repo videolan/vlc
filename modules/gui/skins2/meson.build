@@ -152,5 +152,7 @@ vlc_modules += {
     'dependencies' : [ skins2_deps ],
     'c_args' : skins2_flags,
     'cpp_args' : [skins2_flags, '-O2', '-fno-rtti'],
-    'enabled' : get_option('skins2').allowed() and freetype_dep.found() and host_system != 'darwin'
+    'enabled' : get_option('skins2')
+      .disable_auto_if(host_system != 'windows' and not x11_dep.found()).allowed() and
+      freetype_dep.found() and host_system != 'darwin'
 }
