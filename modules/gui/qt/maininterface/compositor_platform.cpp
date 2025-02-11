@@ -115,7 +115,7 @@ void CompositorPlatform::unloadGUI()
 {
     m_rootWindow->removeEventFilter(this);
     m_interfaceWindowHandler.reset();
-    delete m_quickWindow;
+    m_quickWindow->setSource(QUrl());
     commonGUIDestroy();
 }
 
