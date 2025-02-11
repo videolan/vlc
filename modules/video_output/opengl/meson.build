@@ -21,7 +21,7 @@ opengl_vout_commonsources = files(
 )
 
 libvlc_opengl = []
-if opengl_dep.found() and not (have_ios or have_tvos)
+if opengl_dep.found() and not (have_ios or have_tvos or host_system == 'android')
     libvlc_opengl = static_library('vlc_opengl',
                                    dependencies: [
                                     gl_common_dep,
@@ -37,7 +37,7 @@ vlc_modules += {
         ],
     'link_with' : [libvlc_opengl],
     'dependencies' : [gl_common_dep, m_lib],
-    'enabled' : opengl_dep.found() and not (have_ios or have_tvos)
+    'enabled' : opengl_dep.found() and not (have_ios or have_tvos or host_system == 'android')
 }
 
 libvlc_opengles = []
@@ -58,7 +58,7 @@ if host_system in ['darwin', 'android'] or opengl_dep.found() or opengles2_dep.f
         interop_sw_libs += libvlc_opengles
     endif
 
-    if opengles2_dep.found()
+    if opengles2_dep.found() or host_system == 'android'
         interop_sw_cargs += '-DUSE_OPENGL_ES2'
     endif
 endif
