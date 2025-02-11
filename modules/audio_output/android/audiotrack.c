@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
-#include "../video_output/android/env.h"
+#include "../../video_output/android/env.h"
 #include "device.h"
 #include "audioformat_jni.h"
 #include "dynamicsprocessing_jni.h"
