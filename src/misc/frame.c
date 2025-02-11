@@ -110,7 +110,11 @@ vlc_frame_t *vlc_frame_Init(vlc_frame_t *restrict f, const struct vlc_frame_call
 #define VLC_FRAME_ALIGN        32
 
 /** Initial reserved header and footer size. */
-#define VLC_FRAME_PADDING      32
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+# define VLC_FRAME_PADDING      0 /* Don't hide buffer overflows */
+#else
+# define VLC_FRAME_PADDING      32 /* Avoid <= 32 bytes reallocs */
+#endif
 
 vlc_frame_t *vlc_frame_Alloc (size_t size)
 {
