@@ -36,7 +36,8 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
-    property bool fadingEdgeList: true
+    property bool listEnableBeginningFade: true // false, when as a row
+    property bool listEnableEndFade: true // false, when as a row
 
     // NOTE: Specify an optional header for the view.
     property Component header: null
@@ -45,7 +46,16 @@ MainViewLoader {
 
     property int headerPositioning: ListView.OverlayHeader
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool interactive: true // false, when as a row
+
+    property bool reuseItems: true
+
     readonly property int currentIndex: currentItem?.currentIndex ?? -1
+
+    readonly property int rowHeight: currentItem?.rowHeight ?? 0
 
     // 'role' used for tableview's section text
     required  property string sectionProperty
@@ -74,6 +84,10 @@ MainViewLoader {
         { text: qsTr("Duration"),   criteria: "duration" }
     ]
 
+
+    signal seeAllButtonClicked(int reason)
+
+
     // Functions
 
     function getLabel(model) {
@@ -83,6 +97,10 @@ MainViewLoader {
             model.resolution_name || "",
             model.channel || ""
         ].filter(function(a) { return a !== "" })
+    }
+
+    function getItemY(index) {
+        return currentItem?.getItemY(index) ?? 0
     }
 
     // reimplement function to show "Info Panel" in grid view for the model index data
@@ -102,21 +120,6 @@ MainViewLoader {
         MainCtx.requestShowPlayerView()
     }
 
-    // Private events
-
-    setCurrentItemFocus: function (reason) {
-        if (headerItem && headerItem.Navigation.navigable)
-            headerItem.setCurrentItemFocus(reason)
-        else
-            setCurrentItemFocusDefault(reason)
-    }
-
-    function _onNavigationUp() {
-        if (headerItem && headerItem.Navigation.navigable)
-            headerItem.setCurrentItemFocus(Qt.BacktabFocusReason)
-        else
-            Navigation.defaultNavigationUp()
-    }
 
     Widgets.MLDragItem {
         id: dragItem
@@ -152,11 +155,18 @@ MainViewLoader {
 
             labels: root.gridLabels
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            interactive: root.interactive
+
+            reuseItems: root.reuseItems
+
             // Navigation
 
             Navigation.parentItem: root
 
-            Navigation.upAction: _onNavigationUp
+            Navigation.upItem: headerItem
 
             // Functions
 
@@ -196,13 +206,21 @@ MainViewLoader {
 
             section.property: root.sectionProperty
 
-            fadingEdge.enableEndFade: root.fadingEdgeList
+            fadingEdge.enableBeginningFade: root.listEnableBeginningFade
+            fadingEdge.enableEndFade: root.listEnableEndFade
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            interactive: root.interactive
+
+            reuseItems: root.reuseItems
 
             // Navigation
 
             Navigation.parentItem: root
 
-            Navigation.upAction: _onNavigationUp
+            Navigation.upItem: headerItem
 
             // Events
 

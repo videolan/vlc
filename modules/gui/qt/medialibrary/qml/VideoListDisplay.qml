@@ -26,7 +26,7 @@ import VLC.Widgets as Widgets
 import VLC.MainInterface
 import VLC.Style
 
-MainTableView {
+Widgets.TableViewExt {
     id: listView_id
 
     //---------------------------------------------------------------------------------------------

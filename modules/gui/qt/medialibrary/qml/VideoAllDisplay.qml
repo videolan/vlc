@@ -67,6 +67,10 @@ Widgets.PageLoader {
             }
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+
+            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
+
+            displayMarginEnd: g_mainDisplay.displayMargin
         }
     }
 
@@ -81,6 +85,10 @@ Widgets.PageLoader {
             function isInfoExpandPanelAvailable(/* modelIndexData */) {
                 return true
             }
+
+            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
+
+            displayMarginEnd: g_mainDisplay.displayMargin
         }
     }
 
@@ -91,6 +99,10 @@ Widgets.PageLoader {
             function isInfoExpandPanelAvailable(/* modelIndexData */) {
                 return true
             }
+
+            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
+
+            displayMarginEnd: g_mainDisplay.displayMargin
         }
     }
 
