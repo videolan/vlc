@@ -375,6 +375,23 @@ elif host_system == 'linux'
     endif
 endif
 
+if host_system == 'android'
+    libvlccore_sources += [
+        'linux/cpu.c',
+        'linux/dirs.c',
+        'linux/thread.c',
+        'posix/filesystem.c',
+        'posix/plugin.c',
+        'posix/rand.c',
+        'posix/timer.c',
+
+
+        'android/error.c',
+        'android/specific.c',
+        'android/thread.c',
+    ]
+endif
+
 if get_option('update-check').allowed()
     if not gcrypt_dep.found()
         error('libgcrypt is required for update checking system')
