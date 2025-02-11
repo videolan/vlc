@@ -341,6 +341,7 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
     {
         text_style_Delete(sys->p_default_style);
         free(sys);
+        return NULL;
     }
     sys->region.b_absolute = true; sys->region.b_in_window = false;
     sys->i_next_update = VLC_TICK_INVALID;
