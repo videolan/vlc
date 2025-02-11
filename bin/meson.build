@@ -1,7 +1,7 @@
 # Do we build the main VLC binary?
 build_vlc = get_option('vlc')
 
-if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store
+if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store and host_system != 'android'
     vlc_sources = []
 
     vlc_deps = [m_lib, dl_lib, threads_dep]
