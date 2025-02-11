@@ -29,7 +29,7 @@
 #include <vlc_threads.h>
 #include <vlc_modules.h>
 #include <vlc_fourcc.h>
-#include "../video_output/android/env.h"
+#include "../../video_output/android/env.h"
 #include "audioformat_jni.h"
 
 #define THREAD_NAME "android_audio"
