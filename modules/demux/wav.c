@@ -392,15 +392,14 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if( p_sys->i_frame_size <= 0 || p_sys->i_frame_samples <= 0 )
+    if( p_sys->i_frame_size == 0 || p_sys->i_frame_samples == 0 )
     {
-        msg_Dbg( p_demux, "invalid frame size: %i %i", p_sys->i_frame_size,
-                                                       p_sys->i_frame_samples );
+        msg_Dbg( p_demux, "invalid frame size: 0 0" );
         goto error;
     }
     if( p_sys->fmt.audio.i_rate == 0 )
     {
-        msg_Dbg( p_demux, "invalid sample rate: %i", p_sys->fmt.audio.i_rate );
+        msg_Dbg( p_demux, "invalid sample rate: 0" );
         goto error;
     }
 
