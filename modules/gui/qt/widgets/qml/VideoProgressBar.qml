@@ -37,6 +37,7 @@ Item {
     }
 
     Rectangle {
+        id: rectangle
 
         anchors.left: parent.left
         anchors.right: parent.right
@@ -49,25 +50,10 @@ Item {
         color: "white"
         radius: progressBar.radius
 
-        //use clipping again to delimit the viewed part as we want the accent section to follow the given as well
-        Item {
-            clip: true
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            width: progressBar.value * parent.width
-
-            Rectangle {
-                width: progressBar.width
-
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-
-                color: theme.fg.primary
-                radius: progressBar.radius
-            }
+        gradient: Gradient {
+            orientation: Gradient.Horizontal
+            GradientStop { position: progressBar.value; color: theme.fg.primary }
+            GradientStop { position: progressBar.value + (1. / rectangle.width); color: rectangle.color }
         }
     }
 }
