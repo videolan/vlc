@@ -42,6 +42,8 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
 @interface VLCMediaLibraryFolderObserver ()
 
 @property (readonly) FSEventStreamRef stream;
+@property (readonly) CFStringRef urlPathRef;
+@property (readonly) CFArrayRef pathsToWatch;
 
 @end
 
@@ -52,24 +54,33 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
     self = [super init];
     if (self) {
         _url = url;
+        _urlPathRef = (__bridge_retained CFStringRef)url.path;
+        _pathsToWatch = CFArrayCreate(NULL, (const void **)&_urlPathRef, 1, NULL);
 
-        const CFStringRef urlPathRef = (__bridge CFStringRef)url.path;
-        const CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&urlPathRef, 1, NULL);
+        const FSEventStreamContext context = { 0, (__bridge void *)self, NULL, NULL, NULL };
         const FSEventStreamCreateFlags createFlags =
             kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagIgnoreSelf;
 
         _stream = FSEventStreamCreate(kCFAllocatorDefault,
                                       &fsEventCallback,
-                                      (__bridge void *)self,
-                                      pathsToWatch,
+                                      &context,
+                                      _pathsToWatch,
                                       kFSEventStreamEventIdSinceNow,
                                       3.0,
                                       createFlags);
 
         FSEventStreamSetDispatchQueue(_stream, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0));
-        FSEventStreamStart(self.stream);
+        NSAssert(FSEventStreamStart(_stream), @"FSEvent stream should be started for %@", url.path);
     }
     return self;
+}
+
+- (void)dealloc
+{
+    FSEventStreamStop(_stream);
+    FSEventStreamRelease(_stream);
+    CFRelease(_urlPathRef);
+    CFRelease(_pathsToWatch);
 }
 
 @end
