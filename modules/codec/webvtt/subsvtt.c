@@ -448,24 +448,7 @@ static void webvtt_domnode_Debug( webvtt_dom_node_t *p_node, int i_depth )
 #define webvtt_domnode_Debug(a,b) webvtt_domnode_Debug((webvtt_dom_node_t *)a,b)
 #endif
 
-static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node );
 static void webvtt_dom_cue_Delete( webvtt_dom_cue_t *p_cue );
-static void webvtt_region_Delete( webvtt_region_t *p_region );
-
-static void webvtt_dom_text_Delete( webvtt_dom_text_t *p_node )
-{
-    free( p_node->psz_text );
-    free( p_node );
-}
-
-static void webvtt_dom_tag_Delete( webvtt_dom_tag_t *p_node )
-{
-    text_style_Delete( p_node->p_cssstyle );
-    free( p_node->psz_attrs );
-    free( p_node->psz_tag );
-    webvtt_domnode_ChainDelete( p_node->p_child );
-    free( p_node );
-}
 
 static void webvtt_domnode_AppendLast( webvtt_dom_node_t **pp_append,
                                        webvtt_dom_node_t *p_node )
@@ -485,13 +468,37 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
         webvtt_dom_node_t *p_next = p_node->p_next;
 
         if( p_node->type == NODE_TAG )
-            webvtt_dom_tag_Delete( (webvtt_dom_tag_t *) p_node );
+        {
+            webvtt_dom_tag_t *p_tag_node = (webvtt_dom_tag_t *) p_node;
+            text_style_Delete( p_tag_node->p_cssstyle );
+            free( p_tag_node->psz_attrs );
+            free( p_tag_node->psz_tag );
+            webvtt_domnode_ChainDelete( p_tag_node->p_child );
+            free( p_tag_node );
+        }
         else if( p_node->type == NODE_TEXT )
-            webvtt_dom_text_Delete( (webvtt_dom_text_t *) p_node );
+        {
+            webvtt_dom_text_t *p_text_node = (webvtt_dom_text_t *)p_node;
+            free( p_text_node->psz_text );
+            free( p_text_node );
+        }
         else if( p_node->type == NODE_CUE )
-            webvtt_dom_cue_Delete( (webvtt_dom_cue_t *) p_node );
+        {
+            webvtt_dom_cue_t *p_cue_node = (webvtt_dom_cue_t *)p_node;
+            text_style_Delete( p_cue_node->p_cssstyle );
+            webvtt_cue_settings_Clean( &p_cue_node->settings );
+            free( p_cue_node->psz_id );
+            webvtt_domnode_ChainDelete( p_cue_node->p_child );
+            free( p_cue_node );
+        }
         else if( p_node->type == NODE_REGION )
-            webvtt_region_Delete( (webvtt_region_t *) p_node );
+        {
+            webvtt_region_t *p_region_node = (webvtt_region_t *)p_node;
+            text_style_Delete( p_region_node->p_cssstyle );
+            free( p_region_node->psz_id );
+            webvtt_domnode_ChainDelete( p_region_node->p_child );
+            free( p_region_node );
+        }
 
         p_node = p_next;
     }
