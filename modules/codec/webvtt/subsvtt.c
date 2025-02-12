@@ -1097,12 +1097,6 @@ static unsigned webvtt_region_CountLines( const webvtt_region_t *p_region )
     return i_lines;
 }
 
-static void webvtt_region_ClearCues( webvtt_region_t *p_region )
-{
-    webvtt_domnode_ChainDelete( p_region->p_child );
-    p_region->p_child = NULL;
-}
-
 static void ClearCuesByTime( webvtt_dom_node_t **pp_next, vlc_tick_t i_nztime )
 {
     while( *pp_next )
@@ -1178,7 +1172,8 @@ static void webvtt_region_AddCue( webvtt_region_t *p_region,
 static void webvtt_region_Delete( webvtt_region_t *p_region )
 {
     text_style_Delete( p_region->p_cssstyle );
-    webvtt_region_ClearCues( p_region );
+    webvtt_domnode_ChainDelete( p_region->p_child );
+    p_region->p_child = NULL;
     free( p_region->psz_id );
     free( p_region );
 }
