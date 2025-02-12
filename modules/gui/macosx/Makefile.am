@@ -190,6 +190,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/library/VLCLibraryWindowTitlesSidebarViewController.m \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.h \
 	gui/macosx/library/VLCLibraryWindowToolbarDelegate.m \
+	gui/macosx/library/VLCMediaLibraryFolderObserver.h \
+	gui/macosx/library/VLCMediaLibraryFolderObserver.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.h \
 	gui/macosx/library/groups-library/VLCLibraryGroupsDataSource.m \
 	gui/macosx/library/groups-library/VLCLibraryGroupsViewController.h \
