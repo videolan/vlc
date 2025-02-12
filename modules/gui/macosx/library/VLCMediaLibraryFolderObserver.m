@@ -68,7 +68,7 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
         _defaultsKey =
             [NSString stringWithFormat:@"%@%@", VLCMediaLibraryFolderFSLastEventIdPrefix, url.path];
 
-        const FSEventStreamContext context = { 0, (__bridge void *)self, NULL, NULL, NULL };
+        FSEventStreamContext context = { 0, (__bridge void *)self, NULL, NULL, NULL };
         const FSEventStreamCreateFlags createFlags =
             kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagIgnoreSelf;
 
