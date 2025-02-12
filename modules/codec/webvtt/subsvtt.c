@@ -1590,6 +1590,8 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, vlc_tick_t i_nz
             }
 
             *pp_append = p_new;
+            while( *pp_append )
+                pp_append = &((*pp_append)->p_next);
 
             if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT )
             {
