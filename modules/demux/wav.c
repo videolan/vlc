@@ -51,7 +51,7 @@ typedef struct
     uint64_t        i_data_size;
 
     unsigned int    i_frame_size;
-    int             i_frame_samples;
+    unsigned int    i_frame_samples;
 
     date_t          pts;
 
@@ -232,7 +232,7 @@ static int ChunkGetNext( demux_t *p_demux, enum wav_chunk_id *p_id,
     }
 }
 
-static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_PCM( unsigned int *pi_size, unsigned *pi_samples,
                           const es_format_t *p_fmt )
 {
     int i_bytes;
@@ -259,7 +259,7 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_MS_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -275,7 +275,7 @@ static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                 const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -291,7 +291,7 @@ static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                      const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -304,7 +304,7 @@ static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_MSGSM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_MSGSM( unsigned int *pi_size, unsigned *pi_samples,
                             const es_format_t *p_fmt )
 {
     if( p_fmt->i_bitrate <= 0 )
