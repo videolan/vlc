@@ -1623,6 +1623,8 @@ static void ChainCueSegments( const webvtt_dom_cue_t *p_cue, text_segment_t *p_n
         }
 
         *pp_append = p_new;
+        while( *pp_append )
+            pp_append = &((*pp_append)->p_next);
 
         if( p_cue->settings.vertical == WEBVTT_ALIGN_LEFT )
         {
