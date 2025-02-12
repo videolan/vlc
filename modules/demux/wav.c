@@ -592,6 +592,9 @@ static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
     if( p_fmt->audio.i_channels == 0 )
         return VLC_EGENERIC;
 
+    if( p_fmt->audio.i_blockalign < 7 * p_fmt->audio.i_channels )
+        return VLC_EGENERIC;
+
     *pi_samples = 2 + 2 * ( p_fmt->audio.i_blockalign -
         7 * p_fmt->audio.i_channels ) / p_fmt->audio.i_channels;
     *pi_size = p_fmt->audio.i_blockalign;
