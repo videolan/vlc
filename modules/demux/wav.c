@@ -71,7 +71,7 @@ struct demux_sys_t
     int64_t         i_data_size;
 
     unsigned int    i_frame_size;
-    int             i_frame_samples;
+    unsigned int    i_frame_samples;
 
     date_t          pts;
 
@@ -82,11 +82,11 @@ struct demux_sys_t
 
 static int ChunkFind( demux_t *, const char *, unsigned int * );
 
-static int FrameInfo_IMA_ADPCM( unsigned int *, int *, const es_format_t * );
-static int FrameInfo_MS_ADPCM ( unsigned int *, int *, const es_format_t * );
-static int FrameInfo_Creative_ADPCM( unsigned int *, int *, const es_format_t * );
-static int FrameInfo_PCM      ( unsigned int *, int *, const es_format_t * );
-static int FrameInfo_MSGSM    ( unsigned int *, int *, const es_format_t * );
+static int FrameInfo_IMA_ADPCM( unsigned int *, unsigned *, const es_format_t * );
+static int FrameInfo_MS_ADPCM ( unsigned int *, unsigned *, const es_format_t * );
+static int FrameInfo_Creative_ADPCM( unsigned int *, unsigned *, const es_format_t * );
+static int FrameInfo_PCM      ( unsigned int *, unsigned *, const es_format_t * );
+static int FrameInfo_MSGSM    ( unsigned int *, unsigned *, const es_format_t * );
 
 /*****************************************************************************
  * Open: check file and initializes structures
@@ -559,7 +559,7 @@ static int ChunkFind( demux_t *p_demux, const char *fcc, unsigned int *pi_size )
     }
 }
 
-static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_PCM( unsigned int *pi_size, unsigned *pi_samples,
                           const es_format_t *p_fmt )
 {
     int i_bytes;
@@ -586,7 +586,7 @@ static int FrameInfo_PCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_MS_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -602,7 +602,7 @@ static int FrameInfo_MS_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                 const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -618,7 +618,7 @@ static int FrameInfo_IMA_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, unsigned *pi_samples,
                                      const es_format_t *p_fmt )
 {
     if( p_fmt->audio.i_channels == 0 )
@@ -631,7 +631,7 @@ static int FrameInfo_Creative_ADPCM( unsigned int *pi_size, int *pi_samples,
     return VLC_SUCCESS;
 }
 
-static int FrameInfo_MSGSM( unsigned int *pi_size, int *pi_samples,
+static int FrameInfo_MSGSM( unsigned int *pi_size, unsigned *pi_samples,
                             const es_format_t *p_fmt )
 {
     if( p_fmt->i_bitrate <= 0 )
