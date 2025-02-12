@@ -1,10 +1,10 @@
 # AMF
 
-AMF_VERSION := 1.4.34
-AMF_URL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v$(AMF_VERSION)/AMF-headers.tar.gz
+AMF_VERSION := 1.4.36
+AMF_URL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF/releases/download/v$(AMF_VERSION)/AMF-headers-v$(AMF_VERSION).tar.gz
 AMF_GITURL := $(GITHUB)/GPUOpen-LibrariesAndSDKs/AMF.git
 AMF_BRANCH := v$(AMF_VERSION)
-AMF_GITVERSION := 6d7bec0469961e2891c6e1aaa5122b76ed82e1db
+AMF_GITVERSION := 8f5a645e89380549368eec68935b151b238aa17b
 
 ifeq ($(ARCH),x86_64)
 ifdef HAVE_WIN32
@@ -39,16 +39,11 @@ $(TARBALLS)/AMF-$(AMF_GITVERSION).tar.xz:
 # 	$(call check_githash,$(AMF_GITVERSION))
 # 	touch "$@"
 
+amf: UNPACK_DIR=amf-headers-v$(AMF_VERSION)
 amf: AMF-$(AMF_VERSION).tar.gz .sum-amf
 # amf: AMF-$(AMF_GITVERSION).tar.xz .sum-amf
 	$(RM) -Rf AMF
 	$(UNPACK)
-	# the tarball is extracted to AMF but it the filesystem is case insenstive
-	# we can't move AMF to amf
-	mv -f -- AMF AMF-$(AMF_VERSION)
-	$(APPLY) $(SRC)/amf/0001-Move-AMF_UNICODE-into-Platform.h.patch
-	$(APPLY) $(SRC)/amf/0002-Define-LPRI-d-ud-x-64-as-Unicode-wide-versions-of-AM.patch
-	$(APPLY) $(SRC)/amf/0003-Define-AMFPRI-d-ud-x-64-using-the-standard-C-format-.patch
 	$(MOVE)
 
 .amf: amf
