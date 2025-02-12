@@ -47,10 +47,9 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
     
     VLCMediaLibraryFolderObserver * const observer =
         (__bridge VLCMediaLibraryFolderObserver *)clientCallBackInfo;
+    NSNumber * const eventId = @(eventIds[0]);
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (eventIds != NULL) {
-            [NSUserDefaults.standardUserDefaults setObject:@(eventIds[0]) forKey:observer.defaultsKey];
-        }
+        [NSUserDefaults.standardUserDefaults setObject:eventId forKey:observer.defaultsKey];
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaLibraryFolderFSEvent
                                                           object:observer.url];
     });
