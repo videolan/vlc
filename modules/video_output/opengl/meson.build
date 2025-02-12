@@ -1,3 +1,8 @@
+opengl_headers_c_args = []
+if host_system == 'android'
+    opengl_headers_c_args += ['-DUSE_OPENGL_ES2']
+endif
+
 gl_common_dep = declare_dependency(
     link_with: [libplacebo_utils],
     sources: files(
@@ -10,6 +15,7 @@ gl_common_dep = declare_dependency(
         'picture.c',
         'sampler.c',
         ),
+    compile_args: opengl_headers_c_args,
     include_directories: [vlc_include_dirs],
     dependencies: [contrib_dep],
 )
