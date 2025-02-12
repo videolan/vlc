@@ -124,9 +124,7 @@ skins2_sources += files(
 )
 endif
 
-dep_x11 = cc.find_library('X11', required: get_option('x11'))
-
-if dep_x11.found()
+if x11_dep.found()
 skins2_flags += [ '-DX11_SKINS' ]
 skins2_sources += files(
     'x11/x11_display.cpp',
@@ -140,7 +138,7 @@ skins2_sources += files(
     'x11/x11_tooltip.cpp',
 )
 skins2_deps += [
-    dep_x11,
+    x11_dep,
     dependency('xpm', required: true),
     dependency('xinerama', required: true),
     dependency('xcursor', required: true),
