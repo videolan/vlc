@@ -1012,12 +1012,7 @@ AC_CHECK_HEADER([stdckdint.h],, [
 ])
 
 dnl  POSIX
-AC_CHECK_HEADERS([arpa/inet.h poll.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h wordexp.h])
-AC_CHECK_HEADERS([net/if.h], [], [],
-[
-#include <sys/types.h>
-#include <sys/socket.h>
-])
+AC_CHECK_HEADERS([arpa/inet.h net/if.h poll.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h wordexp.h])
 AC_CHECK_HEADER([syslog.h], [have_syslog="yes"], [have_syslog="no"])
 AM_CONDITIONAL([HAVE_SYSLOG], [test "$have_syslog" = "yes"])
 
