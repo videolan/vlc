@@ -30,6 +30,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryModel.h"
 #import "library/VLCLibraryDataTypes.h"
+#import "library/VLCMediaLibraryFolderObserver.h"
 
 #import <vlc_media_library.h>
 
@@ -60,6 +61,10 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
                                       selector:@selector(playbackStateChanged:)
                                           name:VLCPlayerStateChanged
                                         object:nil];
+        [defaultNotificationCenter addObserver:self
+                                      selector:@selector(monitoredFolderChanged:)
+                                          name:VLCMediaLibraryFolderFSEvent
+                                        object:nil];
     }
     return self;
 }
@@ -85,6 +90,12 @@ typedef int (*folder_action_f)(vlc_medialibrary_t*, const char*);
             vlc_ml_resume_background(self->_p_libraryInstance);
         });
     }
+}
+
+- (void)monitoredFolderChanged:(NSNotification *)notification
+{
+    NSURL * const folderURL = (NSURL *)notification.object;
+    [self reloadFolderWithFileURL:folderURL];
 }
 
 - (int)appendItemToPlayQueue:(VLCMediaLibraryMediaItem *)mediaItem playImmediately:(BOOL)playImmediately
