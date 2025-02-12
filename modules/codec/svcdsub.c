@@ -177,6 +177,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
     /* Parse and decode */
     subpicture_t *p_spu = DecodePacket( p_dec, p_block );
+    block_Release( p_block );
     if( p_spu != NULL )
         decoder_QueueSub( p_dec, p_spu );
     return VLCDEC_SUCCESS;
