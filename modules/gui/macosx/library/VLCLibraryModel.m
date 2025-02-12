@@ -22,6 +22,8 @@
 
 #import "VLCLibraryModel.h"
 
+#import "VLCMediaLibraryFolderObserver.h"
+
 #import "extensions/NSArray+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
 
@@ -93,6 +95,8 @@ NSString * const VLCLibraryModelDiscoveryFailed = @"VLCLibraryModelDiscoveryFail
     dispatch_queue_t _genreCacheModificationQueue;
     dispatch_queue_t _groupCacheModificationQueue;
 }
+
+@property (readwrite) NSArray<VLCMediaLibraryFolderObserver *> *folderObservers;
 
 @property (readwrite, atomic) NSArray *cachedAudioMedia;
 @property (readwrite, atomic) NSArray *cachedArtists;
@@ -305,6 +309,16 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             self->_initialRecentsCount = vlc_ml_count_video_history(self->_p_mediaLibrary, &queryParameters);
             self->_initialRecentAudioCount = vlc_ml_count_audio_history(self->_p_mediaLibrary, &queryParameters);
         });
+
+        NSMutableArray<VLCMediaLibraryFolderObserver *> * const observers = NSMutableArray.array;
+        NSArray<VLCMediaLibraryEntryPoint *> * const entryPoints = self.listOfMonitoredFolders;
+        for (VLCMediaLibraryEntryPoint * const entryPoint in entryPoints) {
+            NSURL * const url = [NSURL URLWithString:entryPoint.MRL];
+            VLCMediaLibraryFolderObserver * const observer =
+                [[VLCMediaLibraryFolderObserver alloc] initWithURL:url];
+            [observers addObject:observer];
+        }
+        self.folderObservers = observers.copy;
     }
     return self;
 }
