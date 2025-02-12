@@ -348,7 +348,7 @@ elif host_system == 'windows'
             'win32/spawn.c',
         ]
     endif
-elif host_system == 'linux'
+else
     libvlccore_sources += [
         'posix/dirs.c',
         'posix/error.c',
@@ -361,12 +361,31 @@ elif host_system == 'linux'
         'posix/plugin.c',
         'posix/rand.c',
         'posix/timer.c',
-        'posix/sort.c',
-        'linux/cpu.c',
-        'linux/dirs.c',
-        'linux/filesystem.c',
-        'linux/thread.c',
     ]
+
+    if cdata.get('HAVE_QSORT_R', 0) == 1 or cdata.get('HAVE_BROKEN_QSORT_R', 0) == 1
+        libvlccore_sources += 'posix/sort.c'
+    endif
+
+    if host_system not in ['linux', 'freebsd']
+        libvlccore_sources += 'posix/wait.c'
+    endif
+
+    if host_system == 'linux'
+        libvlccore_sources += [
+            'linux/cpu.c',
+            'linux/dirs.c',
+            'linux/filesystem.c',
+            'linux/thread.c',
+        ]
+    endif
+
+    if host_system == 'freebsd'
+        libvlccore_sources += [
+            'freebsd/cpu.c',
+            'freebsd/thread.c',
+        ]
+    endif
 
     if anl_lib.found()
         libvlccore_sources += 'linux/getaddrinfo.c'
