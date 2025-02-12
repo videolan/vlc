@@ -24,6 +24,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString * const VLCMediaLibraryFolderFSEvent;
+
 @interface VLCMediaLibraryFolderObserver : NSObject
 
 @property (readonly) NSURL *url;

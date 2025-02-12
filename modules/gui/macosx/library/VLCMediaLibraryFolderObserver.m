@@ -22,6 +22,8 @@
 
 #import "VLCMediaLibraryFolderObserver.h"
 
+NSString * const VLCMediaLibraryFolderFSEvent = @"VLCMediaLibraryFolderFSEvent";
+
 void fsEventCallback(ConstFSEventStreamRef streamRef,
                      void *clientCallBackInfo,
                      size_t numEvents,
@@ -31,6 +33,10 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
 {
     VLCMediaLibraryFolderObserver * const observer =
         (__bridge VLCMediaLibraryFolderObserver *)clientCallBackInfo;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaLibraryFolderFSEvent
+                                                          object:observer.url];
+    });
 }
 
 @interface VLCMediaLibraryFolderObserver ()
@@ -46,6 +52,7 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
     self = [super init];
     if (self) {
         _url = url;
+
         const CFStringRef urlPathRef = (__bridge CFStringRef)url.path;
         const CFArrayRef pathsToWatch = CFArrayCreate(NULL, (const void **)&urlPathRef, 1, NULL);
         const FSEventStreamCreateFlags createFlags =
