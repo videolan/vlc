@@ -468,13 +468,11 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             free( p_tag_node->psz_attrs );
             free( p_tag_node->psz_tag );
             webvtt_domnode_ChainDelete( p_tag_node->p_child );
-            free( p_tag_node );
         }
         else if( p_node->type == NODE_TEXT )
         {
             webvtt_dom_text_t *p_text_node = (webvtt_dom_text_t *)p_node;
             free( p_text_node->psz_text );
-            free( p_text_node );
         }
         else if( p_node->type == NODE_CUE )
         {
@@ -483,7 +481,6 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             webvtt_cue_settings_Clean( &p_cue_node->settings );
             free( p_cue_node->psz_id );
             webvtt_domnode_ChainDelete( p_cue_node->p_child );
-            free( p_cue_node );
         }
         else if( p_node->type == NODE_REGION )
         {
@@ -491,8 +488,8 @@ static void webvtt_domnode_ChainDelete( webvtt_dom_node_t *p_node )
             text_style_Delete( p_region_node->p_cssstyle );
             free( p_region_node->psz_id );
             webvtt_domnode_ChainDelete( p_region_node->p_child );
-            free( p_region_node );
         }
+        free( p_node );
 
         p_node = p_next;
     }
