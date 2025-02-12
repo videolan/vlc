@@ -477,7 +477,8 @@ static int MimeDemux( demux_t *p_demux )
     }
 
     i = 0;
-    i_size = strlen( p_sys->psz_separator ) + 2;
+    size_t sep_len = strlen(p_sys->psz_separator);
+    i_size = sep_len + 2;
     if( p_sys->i_data_peeked < i_size )
     {
         msg_Warn( p_demux, "data shortage" );
@@ -505,12 +506,10 @@ static int MimeDemux( demux_t *p_demux )
         }
 
         /* Handle old and new style of separators */
-        if (!strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2),
-                     strlen( p_sys->psz_separator ))
-         || ((strnlen(p_sys->psz_separator, 4+1) > 4)
+        if (!strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2), sep_len)
+         || (sep_len > 4
           && !strncmp(p_sys->psz_separator, "--", 2)
-          && !strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i),
-                      strlen( p_sys->psz_separator))))
+          && !strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i), sep_len)))
         {
             break;
         }
