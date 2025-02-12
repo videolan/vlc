@@ -1,6 +1,6 @@
 # chromaprint
 
-CHROMAPRINT_VERSION := 1.4.2
+CHROMAPRINT_VERSION := 1.5.1
 CHROMAPRINT_URL := $(GITHUB)/acoustid/chromaprint/releases/download/v$(CHROMAPRINT_VERSION)/chromaprint-$(CHROMAPRINT_VERSION).tar.gz
 
 PKGS += chromaprint
@@ -23,7 +23,7 @@ DEPS_chromaprint = ffmpeg $(DEPS_ffmpeg)
 
 .chromaprint: chromaprint toolchain.cmake
 	$(CMAKECLEAN)
-	$(HOSTVARS_CMAKE) $(CMAKE)
+	$(HOSTVARS_CMAKE) $(CMAKE) -DBUILD_TESTS=OFF
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
