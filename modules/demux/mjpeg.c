@@ -510,6 +510,17 @@ static int MimeDemux( demux_t *p_demux )
             }
         }
 
+        /* peek is located now at "--", check if we have enough data for the
+         * separator */
+        while (i + 2 + sep_len > (size_t)p_sys->i_data_peeked)
+        {
+            if (!Peek(p_demux, false))
+            {
+                msg_Warn( p_demux, "data shortage" );
+                return VLC_DEMUXER_EOF;
+            }
+        }
+
         /* Handle old and new style of separators */
         if (!strncmp(p_sys->psz_separator, (char *)(p_sys->p_peek + i + 2), sep_len)
          || (sep_len > 4
