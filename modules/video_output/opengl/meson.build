@@ -17,7 +17,7 @@ gl_common_dep = declare_dependency(
         ),
     compile_args: opengl_headers_c_args,
     include_directories: [vlc_include_dirs],
-    dependencies: [contrib_dep],
+    dependencies: [contrib_dep, opengl_dep],
 )
 
 opengl_vout_commonsources = files(

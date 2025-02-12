@@ -79,7 +79,7 @@ foreach vlc_test: vlc_tests
             include_directories: [vlc_test.get('include_directories', []),
                 vlc_include_dirs],
             dependencies: [vlc_test.get('dependencies', []),
-                libvlccore_deps],
+                libvlccore_deps, opengl_dep],
             c_args: [vlc_test.get('c_args', []), common_args],
             cpp_args: [vlc_test.get('cpp_args', []), common_args],
             objc_args: [vlc_test.get('objc_args', []), common_args]),
