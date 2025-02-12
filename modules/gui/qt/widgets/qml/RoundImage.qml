@@ -48,7 +48,7 @@ Item {
     // when the shader has custom softedge support (`CUSTOM_SOFTEDGE`), currently it is used
     // at all times.
     readonly property real padding: (shaderEffect.readyForVisibility && antialiasing) ? (Math.max(shaderEffect.width, shaderEffect.height) / 4 * shaderEffect.softEdgeMax)
-                                                                                      : Qt.size(0.0, 0.0)
+                                                                                      : 0.0
 
     readonly property real paintedWidth: (shaderEffect.readyForVisibility) ? shaderEffect.width
                                                                            : (image.clip ? image.width : image.paintedWidth)
