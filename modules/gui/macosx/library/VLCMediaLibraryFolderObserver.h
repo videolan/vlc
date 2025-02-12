@@ -26,6 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCMediaLibraryFolderObserver : NSObject
 
+@property (readonly) NSURL *url;
+
+- (instancetype)initWithURL:(NSURL *)url;
+
 @end
 
 NS_ASSUME_NONNULL_END
