@@ -23,13 +23,23 @@
 #import "VLCMediaLibraryFolderObserver.h"
 
 NSString * const VLCMediaLibraryFolderFSEvent = @"VLCMediaLibraryFolderFSEvent";
+NSString * const VLCMediaLibraryFolderFSLastEventIdPrefix = @"VLCMediaLibraryFolderFSLastEventId_";
+
+@interface VLCMediaLibraryFolderObserver ()
+
+@property (readonly) FSEventStreamRef stream;
+@property (readonly) CFStringRef urlPathRef;
+@property (readonly) CFArrayRef pathsToWatch;
+@property (readonly) NSString *defaultsKey;
+
+@end
 
 void fsEventCallback(ConstFSEventStreamRef streamRef,
                      void *clientCallBackInfo,
                      size_t numEvents,
                      void *eventPaths,
-                     const FSEventStreamEventFlags *eventFlags,
-                     const FSEventStreamEventId *eventIds)
+                     const FSEventStreamEventFlags eventFlags[],
+                     const FSEventStreamEventId eventIds[])
 {
     if (numEvents == 0) {
         return;
@@ -38,18 +48,13 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
     VLCMediaLibraryFolderObserver * const observer =
         (__bridge VLCMediaLibraryFolderObserver *)clientCallBackInfo;
     dispatch_async(dispatch_get_main_queue(), ^{
+        if (eventIds != NULL) {
+            [NSUserDefaults.standardUserDefaults setObject:@(eventIds[0]) forKey:observer.defaultsKey];
+        }
         [NSNotificationCenter.defaultCenter postNotificationName:VLCMediaLibraryFolderFSEvent
                                                           object:observer.url];
     });
 }
-
-@interface VLCMediaLibraryFolderObserver ()
-
-@property (readonly) FSEventStreamRef stream;
-@property (readonly) CFStringRef urlPathRef;
-@property (readonly) CFArrayRef pathsToWatch;
-
-@end
 
 @implementation VLCMediaLibraryFolderObserver
 
@@ -60,16 +65,24 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
         _url = url;
         _urlPathRef = (__bridge_retained CFStringRef)url.path;
         _pathsToWatch = CFArrayCreate(NULL, (const void **)&_urlPathRef, 1, NULL);
+        _defaultsKey =
+            [NSString stringWithFormat:@"%@%@", VLCMediaLibraryFolderFSLastEventIdPrefix, url.path];
 
         const FSEventStreamContext context = { 0, (__bridge void *)self, NULL, NULL, NULL };
         const FSEventStreamCreateFlags createFlags =
             kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagIgnoreSelf;
 
+        NSNumber * const lastEventIdDefaults =
+            (NSNumber *)[NSUserDefaults.standardUserDefaults objectForKey:self.defaultsKey];
+        const FSEventStreamEventId lastEventId = lastEventIdDefaults == nil
+            ? kFSEventStreamEventIdSinceNow
+            : lastEventIdDefaults.unsignedLongLongValue;
+
         _stream = FSEventStreamCreate(kCFAllocatorDefault,
                                       &fsEventCallback,
                                       &context,
                                       _pathsToWatch,
-                                      kFSEventStreamEventIdSinceNow,
+                                      lastEventId,
                                       3.0,
                                       createFlags);
 
