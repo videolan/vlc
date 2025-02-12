@@ -1542,12 +1542,15 @@ static text_segment_t *ConvertRubyNodeToSegment( const webvtt_dom_node_t *p_node
         {
             const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
             if( !strcmp(p_tag->psz_tag, "rt") && p_tag->p_child &&
-                p_tag->p_child->type == NODE_TEXT )
+                p_tag->p_child->type == NODE_TEXT && psz_base )
             {
                 const webvtt_dom_text_t *p_rttext = (const webvtt_dom_text_t *)p_tag->p_child;
-                *pp_rt_append = text_segment_ruby_New( psz_base, p_rttext->psz_text );
-                if( *pp_rt_append )
-                    pp_rt_append = &(*pp_rt_append)->p_next;
+                if ( p_rttext->psz_text )
+                {
+                    *pp_rt_append = text_segment_ruby_New( psz_base, p_rttext->psz_text );
+                    if( *pp_rt_append )
+                        pp_rt_append = &(*pp_rt_append)->p_next;
+                }
             }
             psz_base = NULL;
         }
