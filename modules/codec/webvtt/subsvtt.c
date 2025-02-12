@@ -1126,13 +1126,13 @@ static void ClearCuesByTime( webvtt_dom_node_t **pp_next, vlc_tick_t i_nztime )
 }
 
 /* Remove top most line/cue for bottom insert */
-static void webvtt_region_Reduce( webvtt_region_t *p_region )
+static bool webvtt_region_Reduce( webvtt_region_t *p_region )
 {
     if( p_region->p_child )
     {
         assert( p_region->p_child->type == NODE_CUE );
         if( p_region->p_child->type != NODE_CUE )
-            return;
+            return false;
         webvtt_dom_cue_t *p_cue = (webvtt_dom_cue_t *)p_region->p_child;
         if( p_cue->i_lines == 1 ||
             webvtt_dom_cue_Reduced( p_cue ) < 1 )
@@ -1140,8 +1140,10 @@ static void webvtt_region_Reduce( webvtt_region_t *p_region )
             p_region->p_child = p_cue->p_next;
             p_cue->p_next = NULL;
             webvtt_dom_cue_Delete( p_cue );
+            return true;
         }
     }
+    return false;
 }
 
 static void webvtt_region_AddCue( webvtt_region_t *p_region,
@@ -1160,8 +1162,8 @@ static void webvtt_region_AddCue( webvtt_region_t *p_region,
             ( i_lines > WEBVTT_REGION_LINES_COUNT ||
              (p_region->b_scroll_up && i_lines > p_region->i_lines_max_scroll)) )
         {
-            webvtt_region_Reduce( p_region ); /* scrolls up */
-            assert( webvtt_region_CountLines( p_region ) < i_lines );
+            if (!webvtt_region_Reduce( p_region )) /* scrolls up */
+                break;
         }
         else break;
     }
