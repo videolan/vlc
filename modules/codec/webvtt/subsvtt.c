@@ -48,6 +48,11 @@
 
 //#define SUBSVTT_DEBUG
 
+// maximum recursions in GetTimedTags()
+#define MAX_TIMED_TAGS_RECURSION           50
+// maximum recursions in ConvertNodesToSegments()
+#define MAX_TIMED_NODE_SEGMENTS_RECURSION  50
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -1516,8 +1521,12 @@ struct render_variables_s
 static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
                                                struct render_variables_s *p_vars,
                                                const webvtt_dom_cue_t *p_cue,
-                                               const webvtt_dom_node_t *p_node )
+                                               const webvtt_dom_node_t *p_node,
+                                               size_t depth )
 {
+    if (depth > MAX_TIMED_NODE_SEGMENTS_RECURSION)
+        return NULL;
+
     text_segment_t *p_head = NULL;
     text_segment_t **pp_append = &p_head;
     for( ; p_node ; p_node = p_node->p_next )
@@ -1543,7 +1552,7 @@ static text_segment_t *ConvertNodesToSegments( decoder_t *p_dec,
         {
             const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *)p_node;
             *pp_append = ConvertNodesToSegments( p_dec, p_vars, p_cue,
-                                                 p_tag->p_child );
+                                                 p_tag->p_child, depth+1 );
         }
     }
     return p_head;
@@ -1553,7 +1562,7 @@ static text_segment_t *ConvertCueToSegments( decoder_t *p_dec,
                                              struct render_variables_s *p_vars,
                                              const webvtt_dom_cue_t *p_cue )
 {
-    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child );
+    return ConvertNodesToSegments( p_dec, p_vars, p_cue, p_cue->p_child, 0 );
 }
 
 static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_nzstop,
@@ -1608,8 +1617,12 @@ static text_segment_t * ConvertCuesToSegments( decoder_t *p_dec, vlc_tick_t i_nz
 }
 
 static void GetTimedTags( const webvtt_dom_node_t *p_node,
-                           vlc_tick_t i_nzstart, vlc_tick_t i_nzstop, vlc_array_t *p_times )
+                          vlc_tick_t i_nzstart, vlc_tick_t i_nzstop, vlc_array_t *p_times,
+                          size_t depth )
 {
+    if (depth > MAX_TIMED_TAGS_RECURSION)
+        return;
+
     for( ; p_node; p_node = p_node->p_next )
     {
         switch( p_node->type )
@@ -1619,12 +1632,12 @@ static void GetTimedTags( const webvtt_dom_node_t *p_node,
                 const webvtt_dom_tag_t *p_tag = (const webvtt_dom_tag_t *) p_node;
                 if( p_tag->i_nzstart > -1 && p_tag->i_nzstart >= i_nzstart && p_tag->i_nzstart < i_nzstop )
                     (void) vlc_array_append( p_times, (void *) p_tag );
-                GetTimedTags( p_tag->p_child, i_nzstart, i_nzstop, p_times );
+                GetTimedTags( p_tag->p_child, i_nzstart, i_nzstop, p_times, depth+1 );
             } break;
             case NODE_REGION:
             case NODE_CUE:
                 GetTimedTags( webvtt_domnode_getFirstChild( p_node ),
-                              i_nzstart, i_nzstop, p_times );
+                              i_nzstart, i_nzstop, p_times, depth+1 );
                 break;
             default:
                 break;
@@ -1840,7 +1853,7 @@ static void Render( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_nzstop 
     vlc_array_t timedtags;
     vlc_array_init( &timedtags );
 
-    GetTimedTags( p_sys->p_root->p_child, i_nzstart, i_nzstop, &timedtags );
+    GetTimedTags( p_sys->p_root->p_child, i_nzstart, i_nzstop, &timedtags, 0 );
     if( timedtags.i_count )
         qsort( timedtags.pp_elems, timedtags.i_count, sizeof(*timedtags.pp_elems), timedtagsArrayCmp );
 
