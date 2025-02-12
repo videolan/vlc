@@ -31,6 +31,10 @@ void fsEventCallback(ConstFSEventStreamRef streamRef,
                      const FSEventStreamEventFlags *eventFlags,
                      const FSEventStreamEventId *eventIds)
 {
+    if (numEvents == 0) {
+        return;
+    }
+    
     VLCMediaLibraryFolderObserver * const observer =
         (__bridge VLCMediaLibraryFolderObserver *)clientCallBackInfo;
     dispatch_async(dispatch_get_main_queue(), ^{
