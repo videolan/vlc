@@ -108,6 +108,10 @@ NSString * const VLCMessageTimeoutTimerUserInfoMessageKey = @"VLCMessageTimeoutT
 
 - (void)removeMessage:(NSString *)message
 {
+    if (message == nil) {
+        return;
+    }
+
     const NSInteger matchingIndex = [self.messages indexOfObjectPassingTest:^BOOL(NSString * const string, NSUInteger, BOOL *){
         return [string hasPrefix:message];
     }];
