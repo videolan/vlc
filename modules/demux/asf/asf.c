@@ -1232,9 +1232,6 @@ static int DemuxInit( demux_t *p_demux )
         es_format_Clean( &fmt );
     }
 
-    free( fmt_priorities_ex.pi_stream_numbers );
-    free( fmt_priorities_bitrate_ex.pi_stream_numbers );
-
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
     if( p_sys->p_root->p_data->i_object_size > 50 ) /* see libasf ASF_OBJECT_DATA <= 50 handling */
     { /* local file */
@@ -1367,6 +1364,8 @@ static int DemuxInit( demux_t *p_demux )
         }
     }
 #endif
+    free( fmt_priorities_ex.pi_stream_numbers );
+    free( fmt_priorities_bitrate_ex.pi_stream_numbers );
 
     p_sys->packet_sys.pi_preroll = &p_sys->p_fp->i_preroll;
     p_sys->packet_sys.pi_preroll_start = &p_sys->i_preroll_start;
@@ -1375,6 +1374,8 @@ static int DemuxInit( demux_t *p_demux )
     return VLC_SUCCESS;
 
 error:
+    free( fmt_priorities_ex.pi_stream_numbers );
+    free( fmt_priorities_bitrate_ex.pi_stream_numbers );
     DemuxEnd( p_demux );
     return VLC_EGENERIC;
 }
