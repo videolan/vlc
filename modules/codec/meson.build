@@ -566,7 +566,9 @@ endif
 
 # FFmpeg common helper library
 libavcodec_common = disabler()
+avcodec_compile_dep = disabler()
 if avcodec_dep.found()
+    avcodec_compile_dep = avcodec_dep.partial_dependency(includes:true, compile_args:true)
     libavcodec_common = static_library('avcodec_common',
         files('avcodec/fourcc.c', 'avcodec/chroma.c'),
         dependencies: [
@@ -667,9 +669,9 @@ if host_system == 'windows'
                     '../packetizer/hevc_nal.c',
                     'avcodec/dxva_blocklist.c',
                 ),
-            'c_args' : [ contrib_inc_args ],
             'cpp_args' : libcom_cppflags,
             'link_with' : [ d3d11_common_lib ],
+            'dependencies' : [avcodec_compile_dep],
             'include_directories' : [
                 vlc_include_dirs,
                 include_directories('avcodec')
