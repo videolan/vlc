@@ -1,6 +1,6 @@
 # srt
 
-SRT_VERSION := 1.5.3
+SRT_VERSION := 1.5.4
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 # gnutls (nettle/gmp) can't be used with the LGPLv2 license
