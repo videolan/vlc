@@ -31,6 +31,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -1942,20 +1943,37 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Function to convert pts to chunk or byte
  *****************************************************************************/
 
-static int64_t AVI_Rescale( int64_t i_value, uint32_t i_timescale, uint32_t i_newscale )
+static bool AVI_Rescale( vlc_tick_t *out, vlc_tick_t i_value,
+                         uint32_t i_timescale, uint32_t i_newscale )
 {
     /* TODO: replace (and mp4) with better global helper (recursive checks) */
     if( i_timescale == i_newscale )
-        return i_value;
+    {
+        *out = i_value;
+        return false;
+    }
 
-    if( (i_value >= 0 && i_value <= INT64_MAX / i_newscale) ||
-        (i_value < 0  && i_value >= INT64_MIN / i_newscale) )
-        return i_value * i_newscale / i_timescale;
+    int64_t res;
+    if( !ckd_mul( &res, i_value, i_newscale ) )
+    {
+        *out = res / i_timescale;
+        return false;
+    }
 
-    /* overflow */
+    /* overflow, try: q * i_newscale + r * i_newscale / i_timescale */
     int64_t q = i_value / i_timescale;
     int64_t r = i_value % i_timescale;
-    return q * i_newscale + r * i_newscale / i_timescale;
+
+    int64_t scaled_q, scaled_r;
+    if( ckd_mul( &scaled_q, q, i_newscale ) )
+        return true;
+    if( ckd_mul( &scaled_r, r, i_newscale ) )
+        return true;
+    if( ckd_add( &res, scaled_q, scaled_r / i_timescale ) )
+        return true;
+
+    *out = res;
+    return false;
 }
 
 static int64_t AVI_PTSToChunk( avi_track_t *tk, vlc_tick_t i_pts )
@@ -1963,8 +1981,10 @@ static int64_t AVI_PTSToChunk( avi_track_t *tk, vlc_tick_t i_pts )
     if( !tk->i_scale || !tk->i_rate )
         return -1;
 
-    i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
-    return i_pts / CLOCK_FREQ;
+    vlc_tick_t res;
+    if( AVI_Rescale( &res, i_pts, tk->i_scale, tk->i_rate ) )
+        return -1;
+    return res / CLOCK_FREQ;
 }
 
 static int64_t AVI_PTSToByte( avi_track_t *tk, vlc_tick_t i_pts )
@@ -1972,8 +1992,10 @@ static int64_t AVI_PTSToByte( avi_track_t *tk, vlc_tick_t i_pts )
     if( !tk->i_scale || !tk->i_samplesize || !tk->i_rate )
         return -1;
 
-    i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
-    return i_pts / CLOCK_FREQ * tk->i_samplesize;
+    vlc_tick_t res;
+    if( AVI_Rescale( &res, i_pts, tk->i_scale, tk->i_rate ) )
+        return -1;
+    return res / CLOCK_FREQ * tk->i_samplesize;
 }
 
 static vlc_tick_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
@@ -1983,8 +2005,11 @@ static vlc_tick_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
     if( !tk->i_rate )
         return i_dpts;
 
-    if( tk->i_scale )
-        i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
+    if( !tk->i_scale )
+        return 0;
+
+    if( AVI_Rescale( &i_dpts, CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale ) )
+        return 0;
 
     if( tk->i_samplesize )
     {
