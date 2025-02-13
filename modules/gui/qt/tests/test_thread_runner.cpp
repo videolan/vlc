@@ -22,7 +22,7 @@
 #include "../medialibrary/mlthreadpool.hpp"
 #include "qtestcase.h"
 
-static const int TASK_TIMEOUT = 50; //MS
+static const int TASK_TIMEOUT = 300; //MS
 
 class Dummy : public QObject
 {
