@@ -2192,7 +2192,10 @@ static int AVI_TrackSeek( demux_t *p_demux,
     }
     else
     {
-        if( AVI_StreamBytesSet( p_demux, tk, AVI_PTSToByte( tk, i_date ) ) )
+        int64_t toread = AVI_PTSToByte( tk, i_date );
+        if ( toread < 0)
+            return VLC_EGENERIC;
+        if( AVI_StreamBytesSet( p_demux, tk, toread ) )
         {
             return VLC_EGENERIC;
         }
