@@ -169,9 +169,9 @@ static void stream_read_cb(pa_stream *s, size_t length, void *userdata)
         return;
     }
     if (negative)
-        pts += latency;
+        pts += VLC_TICK_FROM_US(latency);
     else
-        pts -= latency;
+        pts -= VLC_TICK_FROM_US(latency);
 
     es_out_SetPCR(demux->out, pts);
     if (unlikely(sys->es == NULL))
@@ -206,7 +206,7 @@ static int Control(demux_t *demux, int query, va_list ap)
 
             if (pa_stream_get_time(sys->stream, &us) < 0)
                 return VLC_EGENERIC;
-            *(va_arg(ap, vlc_tick_t *)) = us * 10000000LL / CLOCK_FREQ;
+            *(va_arg(ap, vlc_tick_t *)) = VLC_TICK_FROM_US(us);
             break;
         }
 
