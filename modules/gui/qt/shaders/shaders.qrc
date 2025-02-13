@@ -11,7 +11,7 @@
         <file alias="HollowRectangularGlow.frag.qsb">HollowRectangularGlow.frag.qsb</file>
         <file alias="RectangularGlow.frag.qsb">RectangularGlow.frag.qsb</file>
         <file alias="SDFAARoundedTexture.frag.qsb">SDFAARoundedTexture.frag.qsb</file>
-        <file alias="SDFAARoundedTexture_cropsupport.frag.qsb">SDFAARoundedTexture_cropsupport.frag.qsb</file>
+        <file alias="SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb">SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb</file>
         <file alias="DitheredTexture.frag.qsb">DitheredTexture.frag.qsb</file>
     </qresource>
 </RCC>

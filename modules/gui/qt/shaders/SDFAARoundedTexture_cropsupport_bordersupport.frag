@@ -7,6 +7,7 @@
 //        shaders.
 
 #define CROP_SUPPORT
+#define BORDER_SUPPORT
 
 // WARNING: The contents of this file must be in sync with SDFAARoundedTexture.frag
 //          for maintenance purposes. IF YOU EDIT THIS FILE, MAKE SURE TO DO THE
@@ -61,6 +62,10 @@ layout(std140, binding = 0) uniform buf {
 #endif
 #ifdef BACKGROUND_SUPPORT
     vec4 backgroundColor;
+#endif
+#ifdef BORDER_SUPPORT
+    vec4 borderColor;
+    float borderRange;
 #endif
     float radiusTopRight;
     float radiusBottomRight;
@@ -134,6 +139,22 @@ void main()
 #ifdef BACKGROUND_SUPPORT
     // Source over blending (S + D * (1 - S.a)):
     texel = texel + backgroundColor * (1.0 - texel.a);
+#endif
+
+#ifdef BORDER_SUPPORT
+    if (borderRange > 0.0)
+    {
+        // Solid border:
+        float borderStep = step(-borderRange, dist);
+        vec4 border = borderStep * borderColor;
+#ifdef ANTIALIASING
+        // Inner AA (Outer AA is handled below, regardless of the border):
+        // This is additive, solid and AA part do not intersect:
+        border += (smoothstep(-borderRange - fwidth(dist) * 1.5, -borderRange, dist)) * (1.0 - borderStep) * borderColor;
+#endif
+        // Source over blending (S + D * (1 - S.a)):
+        texel = border + texel * (1.0 - border.a);
+    }
 #endif
 
 #ifdef ANTIALIASING

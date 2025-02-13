@@ -17,7 +17,7 @@ shader_sources = [
     'HollowRectangularGlow.frag',
     'RectangularGlow.frag',
     'SDFAARoundedTexture.frag',
-    'SDFAARoundedTexture_cropsupport.frag',
+    'SDFAARoundedTexture_cropsupport_bordersupport.frag',
     'DitheredTexture.frag'
 ]
 

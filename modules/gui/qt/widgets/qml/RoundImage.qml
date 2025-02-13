@@ -117,7 +117,8 @@ Item {
 
         visible: readyForVisibility
 
-        readonly property bool readyForVisibility: (root.radius > 0.0) && (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
+        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) &&
+                                                   (root.radius > 0.0 || root.borderWidth > 0)
 
         smooth: root.smooth
 
@@ -167,8 +168,8 @@ Item {
         // so that we can make use of our custom shader.
         readonly property Image source: image
 
-        fragmentShader: (cropRate.width > 0.0 || cropRate.height > 0.0) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport.frag.qsb"
-                                                                        : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
+        fragmentShader: (cropRate.width > 0.0 || cropRate.height > 0.0) || (root.borderWidth > 0) ? "qrc:///shaders/SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb"
+                                                                                                  : "qrc:///shaders/SDFAARoundedTexture.frag.qsb"
 
     }
 
