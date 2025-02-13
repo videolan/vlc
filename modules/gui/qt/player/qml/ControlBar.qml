@@ -38,9 +38,9 @@ T.Pane {
     }
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            contentWidth + leftPadding + rightPadding)
+                            implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + bottomInset,
-                             contentHeight + topPadding + bottomPadding)
+                             implicitContentHeight + topPadding + bottomPadding)
 
     topInset: sliderY
 
