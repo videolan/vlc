@@ -82,8 +82,8 @@ typedef struct
  *****************************************************************************/
 static int cue_Compare( const void *a_, const void *b_ )
 {
-    webvtt_cue_t *a = (webvtt_cue_t *)a_;
-    webvtt_cue_t *b = (webvtt_cue_t *)b_;
+    const webvtt_cue_t *a = a_;
+    const webvtt_cue_t *b = b_;
     if( a->i_start == b->i_start )
     {
         if( a->i_stop > b->i_stop )
