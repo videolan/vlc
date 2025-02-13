@@ -229,6 +229,12 @@ FocusScope {
                                 }
                             }
 
+                            onContextMenuButtonClicked: (_, globalMousePos) => {
+                                albumSelectionModel.updateSelection( Qt.NoModifier , albumsList.currentIndex, index )
+                                contextMenu.popup(albumSelectionModel.selectedIndexes
+                                                  , globalMousePos)
+                            }
+
                             function play() {
                                 if ( model.id !== undefined ) {
                                     MediaLib.addAndPlay( model.id )
