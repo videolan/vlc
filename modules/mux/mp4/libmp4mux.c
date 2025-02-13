@@ -1858,7 +1858,7 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
     if( i_duration == 0 && (h->options & FRAGMENTED) == 0 )
     {
         for (unsigned int i = 0; i < vlc_array_count(&h->tracks); i++) {
-            mp4mux_trackinfo_t *p_stream = vlc_array_item_at_index(&h->tracks, 0);
+            mp4mux_trackinfo_t *p_stream = vlc_array_item_at_index(&h->tracks, i);
             i_duration = __MAX(i_duration, p_stream->i_read_duration);
         }
         if(p_obj)
