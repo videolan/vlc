@@ -176,24 +176,10 @@ T.ItemDelegate {
 
             readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
-            Rectangle {
-                anchors.centerIn: parent
-                anchors.alignWhenCentered: false
+            borderColor: (isCurrent || _isHover) ? theme.accent
+                                                 : theme.border
 
-                implicitWidth: roundImage.paintedWidth + border.width
-                implicitHeight: roundImage.paintedHeight + border.width
-
-                z: -1
-
-                radius: roundImage.effectiveRadius
-
-                color: "transparent"
-
-                border.width: VLCStyle.dp(1, VLCStyle.scale)
-
-                border.color: (isCurrent || _isHover) ? theme.accent
-                                                      : theme.border
-            }
+            borderWidth: VLCStyle.dp(1, VLCStyle.scale)
         }
 
         Widgets.TextAutoScroller {
