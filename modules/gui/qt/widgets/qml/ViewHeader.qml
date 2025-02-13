@@ -53,9 +53,9 @@ T.Pane {
 
     width: view.width
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                                contentWidth + leftPadding + rightPadding)
+                            implicitContentWidth + leftPadding + rightPadding)
     implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             contentHeight + topPadding + bottomPadding)
+                             implicitContentHeight + topPadding + bottomPadding)
 
 
     Navigation.navigable: button.visible
