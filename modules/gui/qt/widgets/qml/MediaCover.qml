@@ -44,7 +44,7 @@ Item {
 
     property alias radius: image.radius
 
-    property alias color: background.color
+    property alias color: image.backgroundColor
 
     property alias source: image.source
 
@@ -83,20 +83,6 @@ Item {
 
     // Children
 
-    Rectangle {
-        id: background
-
-        anchors.centerIn: parent
-        anchors.alignWhenCentered: true
-
-        width: root.paintedWidth
-        height: root.paintedHeight
-
-        radius: root.effectiveRadius
-
-        visible: !Qt.colorEqual(image.effectiveBackgroundColor, color)
-    }
-
     //delay placeholder showing up
     Timer {
         id: timer
@@ -112,8 +98,6 @@ Item {
 
         sourceSize: Qt.size(root.pictureWidth * root.eDPR,
                             root.pictureHeight * root.eDPR)
-
-        backgroundColor: root.color
 
         onStatusChanged: {
             if (status === Image.Loading) {
