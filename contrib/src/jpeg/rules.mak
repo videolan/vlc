@@ -1,6 +1,6 @@
 # jpeg
 
-JPEG_VERSION := 3.0.3
+JPEG_VERSION := 3.1.0
 JPEG_URL := $(GITHUB)/libjpeg-turbo/libjpeg-turbo/archive/refs/tags/$(JPEG_VERSION).tar.gz
 
 $(TARBALLS)/libjpeg-turbo-$(JPEG_VERSION).tar.gz:
