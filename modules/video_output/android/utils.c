@@ -103,6 +103,7 @@ struct vlc_android_jfields
           jmethodID init_iz;
           jmethodID init_z;
           jmethodID updateTexImage;
+          jmethodID release;
           jmethodID releaseTexImage;
           jmethodID getTransformMatrix;
           jmethodID detachFromGLContext;
@@ -374,6 +375,9 @@ static void NDKSurfaceTexture_destroy(
     if (!p_env)
         return;
 
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             handle->awh->jfields.SurfaceTexture.release);
+
     if (handle->surface.window)
         handle->awh->pf_winRelease(handle->surface.window);
 
@@ -496,6 +500,9 @@ static void JNISurfaceTexture_destroy(
     JNIEnv *p_env = android_getEnvCommon(NULL, handle->awh->p_jvm, "SurfaceTexture");
     if (!p_env)
         return;
+
+    (*p_env)->CallVoidMethod(p_env, handle->jtexture,
+                             handle->awh->jfields.SurfaceTexture.release);
 
     if (handle->surface.window)
         handle->awh->pf_winRelease(handle->surface.window);
@@ -676,6 +683,9 @@ InitJNIFields(JNIEnv *env, vlc_object_t *p_obj, jobject *jobj, AWindowHandler *a
 
     GET_METHOD(SurfaceTexture, getTransformMatrix,
                "getTransformMatrix", "([F)V", true);
+
+    GET_METHOD(SurfaceTexture, release,
+               "release", "()V", true);
 
     GET_METHOD(SurfaceTexture, releaseTexImage,
                "releaseTexImage", "()V", false);
