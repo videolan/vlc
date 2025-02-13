@@ -45,7 +45,8 @@ Item {
             }
 
         }
-        gesturePolicy: TapHandler.DragThreshold
+
+        gesturePolicy: TapHandler.ReleaseWithinBounds
     }
 
     HoverHandler {
