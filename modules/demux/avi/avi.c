@@ -2136,7 +2136,10 @@ static int AVI_TrackSeek( demux_t *p_demux,
 
     if( !tk->i_samplesize )
     {
-        if( AVI_StreamChunkSet( p_demux, tk, AVI_PTSToChunk( tk, i_date ) ) )
+        int64_t idxpos = AVI_PTSToChunk( tk, i_date );
+        if ( unlikely( idxpos < 0 || idxpos > UINT_MAX ) )
+            return VLC_EGENERIC;
+        if( AVI_StreamChunkSet( p_demux, tk, idxpos ) )
         {
             return VLC_EGENERIC;
         }
