@@ -1956,7 +1956,7 @@ static int64_t AVI_Rescale( int64_t i_value, uint32_t i_timescale, uint32_t i_ne
 static int64_t AVI_PTSToChunk( avi_track_t *tk, vlc_tick_t i_pts )
 {
     if( !tk->i_scale || !tk->i_rate )
-        return 0;
+        return -1;
 
     i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
     return i_pts / CLOCK_FREQ;
@@ -1965,7 +1965,7 @@ static int64_t AVI_PTSToChunk( avi_track_t *tk, vlc_tick_t i_pts )
 static int64_t AVI_PTSToByte( avi_track_t *tk, vlc_tick_t i_pts )
 {
     if( !tk->i_scale || !tk->i_samplesize || !tk->i_rate )
-        return 0;
+        return -1;
 
     i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
     return i_pts / CLOCK_FREQ * tk->i_samplesize;
