@@ -97,6 +97,17 @@ Item {
     readonly property real effectiveRadius: shaderEffect.readyForVisibility ? radius : 0.0
     readonly property color effectiveBackgroundColor: shaderEffect.readyForVisibility ? backgroundColor : "transparent"
 
+    // Border:
+    // NOTE: The border is an overlay for the texture (the
+    //       texture does not shrink).
+    // NOTE: Border uses source-over blending. Therefore if
+    //       it is translucent, the image would get exposed.
+    // NOTE: The unit of width is not specified. It is
+    //       recommended to do only relative adjustments.
+    property color borderColor: "black"
+    property int borderWidth: 0
+    readonly property int effectiveBorderWidth: shaderEffect.readyForVisibility ? borderWidth : 0
+
     // NOTE: Note the distinction between ShaderEffect and
     //       ShaderEffectSource. ShaderEffect is no different
     //       than any other item, including Image. ShaderEffectSource
@@ -162,6 +173,10 @@ Item {
 
             return ret
         }
+
+        // (2 / width) seems to be a good coefficient to make it similar to `Rectangle.border`:
+        readonly property double borderRange: (root.borderWidth / width * 2.)
+        readonly property color borderColor: root.borderColor
 
         // QQuickImage as texture provider, no need for ShaderEffectSource.
         // In this case, we simply ask the Image to provide its texture,
