@@ -1258,7 +1258,7 @@ static int Demux_Seekable( demux_t *p_demux )
         else if ( i_dpts > -2 * CLOCK_FREQ ) /* don't send a too early dts (low fps video) */
         {
             int64_t i_chunks_count = AVI_PTSToChunk( tk, i_dpts );
-            if( i_dpts > 0 && AVI_GetDPTS( tk, i_chunks_count ) < i_dpts )
+            if( i_chunks_count > 0 && AVI_GetDPTS( tk, i_chunks_count ) < i_dpts )
             {
                 /* AVI code is crap. toread is either bytes, or here, chunk count.
                  * That does not even work when reading amount < scale / rate */
