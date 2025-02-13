@@ -193,6 +193,7 @@ FocusScope {
                             id: gridItem
 
                             required property var model
+                            required property int index
 
                             y: selectedBorderWidth
 
