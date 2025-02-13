@@ -239,6 +239,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     if( p_sys->i_state == SUBTITLE_BLOCK_EMPTY && p_block->i_pts <= VLC_TICK_INVALID )
     {
         msg_Warn( p_dec, "first packet expected but no PTS present");
+        block_Release( p_block );
         return NULL;
     }
 
