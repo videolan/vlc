@@ -150,15 +150,9 @@ FocusScope {
                 sourceSize: Qt.size(width * eDPR, height * eDPR)
                 anchors.fill: parent
                 radius: VLCStyle.cover_normal
+                borderColor: theme.border
+                borderWidth: VLCStyle.dp(1, VLCStyle.scale)
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                radius: roundImage.effectiveRadius
-                color: "transparent"
-                border.width: VLCStyle.dp(1, VLCStyle.scale)
-                border.color: theme.border
             }
         }
 
