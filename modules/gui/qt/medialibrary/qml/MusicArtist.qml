@@ -212,6 +212,11 @@ FocusScope {
                             textAlignHCenter: true
                             dragItem: albumDragItem
 
+                            // updates to selection is manually handled for optimization purpose
+                            Component.onCompleted: _updateSelected()
+
+                            onIndexChanged: _updateSelected()
+
                             onPlayClicked: play()
                             onItemDoubleClicked: play()
 
@@ -224,8 +229,15 @@ FocusScope {
                             Connections {
                                 target: albumsList.selectionModel
 
-                                function onSelectionChanged() {
-                                    gridItem.selected = albumsList.selectionModel.isSelected(index)
+                                function onSelectionChanged(selected, deselected) {
+                                    const idx = albumModel.index(gridItem.index, 0)
+                                    const findInSelection = s => s.find(range => range.contains(idx)) !== undefined
+
+                                    // NOTE: we only get diff of the selection
+                                    if (findInSelection(selected))
+                                        gridItem.selected = true
+                                    else if (findInSelection(deselected))
+                                        gridItem.selected = false
                                 }
                             }
 
@@ -239,6 +251,10 @@ FocusScope {
                                 if ( model.id !== undefined ) {
                                     MediaLib.addAndPlay( model.id )
                                 }
+                            }
+
+                            function _updateSelected() {
+                                selected = albumSelectionModel.isRowSelected(gridItem.index)
                             }
                         }
 
