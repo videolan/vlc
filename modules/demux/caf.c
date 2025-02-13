@@ -716,7 +716,7 @@ static int ReadKukiChunk( demux_t *p_demux, uint64_t i_size )
         int error = ProcessAACCookie( p_demux, p_peek, i_size );
         if( error ) return error;
     }
-    else
+    else if( p_sys->fmt.i_codec != 0 )
     {
         p_sys->fmt.i_extra = i_size;
         p_sys->fmt.p_extra = malloc( i_size );
