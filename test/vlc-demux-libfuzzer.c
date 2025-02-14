@@ -41,9 +41,18 @@ static libvlc_instance_t *vlc;
 
 int LLVMFuzzerInitialize(int *argc, char ***argv)
 {
-    (void) argc; (void) argv;
-
+    (void) argc;
     vlc_run_args_init(&args);
+
+    if (args.name == NULL)
+    {
+        char *name = *argv[0];
+        static const char suffix[] = "-libfuzzer";
+        static const size_t suffix_len = sizeof(suffix) - 1;
+        char *target_start = strstr(name, suffix);
+        if (target_start != NULL && target_start[suffix_len] == '-')
+            args.name = &target_start[suffix_len + 1];
+    }
     vlc = libvlc_create(&args);
 
     return vlc ? 0 : -1;
