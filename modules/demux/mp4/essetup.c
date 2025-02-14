@@ -693,7 +693,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case ATOM_H264:
         case VLC_FOURCC('W','V','C','1'):
         {
-            MP4_Box_t *p_strf = MP4_BoxGet(  p_sample, "strf", 0 );
+            MP4_Box_t *p_strf = MP4_BoxGet(  p_sample, "strf" );
             if ( p_strf && BOXDATA(p_strf) )
             {
                 p_track->fmt.video.i_width = BOXDATA(p_strf)->bmiHeader.biWidth;
@@ -931,7 +931,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
         case ATOM_fLaC:
         {
-            const MP4_Box_t *p_dfLa = MP4_BoxGet(  p_sample, "dfLa", 0 );
+            const MP4_Box_t *p_dfLa = MP4_BoxGet(  p_sample, "dfLa" );
             if( p_dfLa && p_dfLa->data.p_binary->i_blob > 4 &&
                 GetDWBE(p_dfLa->data.p_binary->p_blob) == 0 ) /* fullbox header, avoids creating dedicated parser */
             {
@@ -956,7 +956,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.audio.i_channels = 0;
             p_track->fmt.audio.i_bitspersample = 0;
 
-            const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3", 0 );
+            const MP4_Box_t *p_dec3 = MP4_BoxGet(  p_sample, "dec3" );
             if( p_dec3 && BOXDATA(p_dec3) )
             {
                 p_track->fmt.i_bitrate = BOXDATA(p_dec3)->i_data_rate * 1000;
@@ -972,7 +972,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             p_track->fmt.audio.i_channels = 0;
             p_track->fmt.audio.i_bitspersample = 0;
 
-            MP4_Box_t *p_dac3 = MP4_BoxGet(  p_sample, "dac3", 0 );
+            MP4_Box_t *p_dac3 = MP4_BoxGet(  p_sample, "dac3" );
             if( p_dac3 && BOXDATA(p_dac3) )
             {
                 static const int pi_bitrate[] = {

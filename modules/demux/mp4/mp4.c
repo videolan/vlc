@@ -1017,7 +1017,7 @@ static int Open( vlc_object_t * p_this )
         if( p_tkhd && BOXDATA(p_tkhd) && (BOXDATA(p_tkhd)->i_flags&MP4_TRACK_ENABLED) )
             b_enabled_es = true;
 
-        MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap", i );
+        MP4_Box_t *p_chap = MP4_BoxGet( p_trak, "tref/chap" );
         if( p_chap && p_chap->data.p_tref_generic &&
             p_chap->data.p_tref_generic->i_entry_count > 0 && !p_sys->p_tref_chap )
             p_sys->p_tref_chap = p_chap;
