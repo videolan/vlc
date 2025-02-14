@@ -3231,7 +3231,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
     }
 
-    const MP4_Box_t *p_sample = MP4_BoxGetVa( p_track->p_stsd, "[%d]",
+    const MP4_Box_t *p_sample = MP4_BoxGetVa( p_track->p_stsd, "[%u]",
                                             i_sample_description_index - 1 );
     if( !p_sample ||
         ( !p_sample->data.p_payload && p_track->fmt.i_cat != SPU_ES ) )
