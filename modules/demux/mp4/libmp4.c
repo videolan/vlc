@@ -37,6 +37,7 @@
 #include <math.h>
 #include <assert.h>
 #include <limits.h>
+#include <stdckdint.h>
 
 /* Some assumptions:
  * The input method HAS to be seekable
@@ -53,14 +54,17 @@ static double conv_fx( int32_t fx ) {
 #ifdef MP4_VERBOSE
 static char * MP4_Time2Str( stime_t i_duration, uint32_t i_scale )
 {
-    uint64_t i_time = (i_scale > 0) ? i_duration / i_scale : 0;
+    uint64_t i_time = (i_scale) ? i_duration / i_scale : 0;
     unsigned h = ( i_time /( 60*60 ) ) % 60;
     unsigned m = ( i_time / 60 ) % 60;
     unsigned s = i_time % 60;
-    unsigned ms = (i_scale) ? (1000*i_duration / i_scale) % 1000 : 0;
+    uint64_t ms;
+    if ( i_scale == 0 || ckd_mul( &ms, 1000, i_duration ) )
+        ms = 0;
+    ms = (ms / i_scale) % 1000;
 
     char *out;
-    if( asprintf( &out, "%u:%.2u:%.2u:%.3u", h, m, s, ms ) < 0 )
+    if( asprintf( &out, "%u:%.2u:%.2u:%.3" PRIu64, h, m, s, ms ) < 0 )
         return NULL;
     return out;
 }
