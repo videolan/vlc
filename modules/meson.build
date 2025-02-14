@@ -388,6 +388,10 @@ foreach module : vlc_modules
         endif
     endforeach
 
+    vlc_plugins_manifest += {
+        module['name']: module
+    }
+
     if not module.get('enabled', true)
         continue
     endif
@@ -423,9 +427,6 @@ foreach module : vlc_modules
     )
     vlc_plugins_targets += {
         module['name']: vlc_plugin
-    }
-    vlc_plugins_manifest += {
-        module['name']: module
     }
 endforeach
 
