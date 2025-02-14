@@ -1936,7 +1936,7 @@ void MP4_BoxDumpStructure( stream_t *p_input, const MP4_Box_t *p_box );
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
-MP4_Box_t *MP4_BoxGetVa( const MP4_Box_t *p_box, const char *psz_fmt, ... );
+MP4_Box_t *MP4_BoxGetVa( const MP4_Box_t *p_box, const char *psz_fmt, ... ) VLC_FORMAT(2, 3);
 
 /*****************************************************************************
  * MP4_BoxGet: find a box given a path relative to p_box
@@ -1957,7 +1957,7 @@ MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt) ;
  * ex: /moov/trak
  *     ../mdia
  *****************************************************************************/
-unsigned MP4_BoxCountVa( const MP4_Box_t *p_box, const char *psz_fmt, ... );
+unsigned MP4_BoxCountVa( const MP4_Box_t *p_box, const char *psz_fmt, ... ) VLC_FORMAT(2, 3);
 
 /*****************************************************************************
  * MP4_BoxCount: find number of box given a path relative to p_box
