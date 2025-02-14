@@ -42,18 +42,22 @@ foreach vlc_test: vlc_tests
     disabled_dependencies = []
     test_modules_deps = []
     foreach module_name : vlc_test.get('module_depends', [])
-        if module_name not in vlc_plugins_targets.keys()
+        if module_name not in vlc_plugins_manifest.keys()
             error('Test entry \'@0@\' cannot depend on non-existant VLC plugin \'@1@\''
                   .format(vlc_test['name'], module_name))
         endif
-        test_modules_deps += vlc_plugins_targets[module_name]
+
         if not vlc_plugins_manifest[module_name].get('enabled', true)
             disabled_dependencies += module_name
+        else
+            test_modules_deps += vlc_plugins_targets[module_name]
         endif
     endforeach
 
     if disabled_dependencies != []
         # TODO: mark as skipped
+        warning('Test \'@0@\' will be disabled, missing plugins: @1@'.format(
+                vlc_test['name'], ', '.join(disabled_dependencies)))
         continue
     endif
 
