@@ -323,7 +323,10 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     p_fp->i_data_packets_count = GetQWLE( p_peek + 56 );
     p_fp->i_play_duration = GetQWLE( p_peek + 64 );
     p_fp->i_send_duration = GetQWLE( p_peek + 72 );
-    p_fp->i_preroll = VLC_TICK_FROM_MS(GetQWLE( p_peek + 80 ));
+    uint64_t preroll = GetQWLE( p_peek + 80 );
+    if (unlikely(preroll > INT32_MAX)) // sanity check on "appropriate" value
+        return VLC_EBADVAR;
+    p_fp->i_preroll = VLC_TICK_FROM_MS(preroll);
     p_fp->i_flags = GetDWLE( p_peek + 88 );
     p_fp->i_min_data_packet_size = __MAX( GetDWLE( p_peek + 92 ), (uint32_t) 1 );
     p_fp->i_max_data_packet_size = __MAX( GetDWLE( p_peek + 96 ), (uint32_t) 1 );
@@ -333,13 +336,13 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
     msg_Dbg( s,
             "read \"file properties object\" file_id:" GUID_FMT
             " file_size:%"PRId64" creation_date:%"PRId64" data_packets_count:"
-            "%"PRId64" play_duration:%"PRId64" send_duration:%"PRId64" preroll:%"PRId64
+            "%"PRId64" play_duration:%"PRId64" send_duration:%"PRId64" preroll:%"PRIu64
             " flags:%d min_data_packet_size:%d "
             " max_data_packet_size:%d max_bitrate:%d",
             GUID_PRINT( p_fp->i_file_id ), p_fp->i_file_size,
             p_fp->i_creation_date, p_fp->i_data_packets_count,
             p_fp->i_play_duration, p_fp->i_send_duration,
-            MS_FROM_VLC_TICK(p_fp->i_preroll), p_fp->i_flags,
+            preroll, p_fp->i_flags,
             p_fp->i_min_data_packet_size, p_fp->i_max_data_packet_size,
             p_fp->i_max_bitrate );
 #endif
@@ -1455,7 +1458,7 @@ static const struct ASF_Object_Function_entry
       ASF_ReadObject_metadata, ASF_FreeObject_metadata},
     { &asf_object_codec_list_guid, ASF_OBJECT_CODEC_LIST,
       ASF_ReadObject_codec_list, ASF_FreeObject_codec_list },
-    { &asf_object_marker_guid, ASF_OBJECT_MARKER, 
+    { &asf_object_marker_guid, ASF_OBJECT_MARKER,
       ASF_ReadObject_marker, ASF_FreeObject_marker },
     { &asf_object_padding, ASF_OBJECT_PADDING, NULL, NULL },
     { &asf_object_compatibility_guid, ASF_OBJECT_OTHER, NULL, NULL },
