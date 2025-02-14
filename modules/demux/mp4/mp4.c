@@ -715,7 +715,7 @@ static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
     for( unsigned i=0; i<i_tracks; i++ )
     {
         MP4_TrackInit( &p_sys->track[i],
-                       MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%d]", i ) );
+                       MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%u]", i ) );
     }
 
     return VLC_SUCCESS;
@@ -1267,7 +1267,7 @@ static int Open( vlc_object_t * p_this )
     b_enabled_es = false;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        MP4_Box_t *p_trak = MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%d]", i );
+        MP4_Box_t *p_trak = MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%u]", i );
 
         /* Enabled check as explained above */
         MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
