@@ -459,6 +459,11 @@ static int Open( vlc_object_t * p_this )
                   "found %d stream but %d are declared",
                   i_track, p_avih->i_streams );
     }
+    if( i_track > AVIF_MAX_STREAMS )
+    {
+        msg_Err( p_demux, "Invalid number of streams %u", i_track );
+        goto error;
+    }
     if( i_track == 0 )
     {
         msg_Err( p_demux, "no stream defined!" );
@@ -2313,7 +2318,7 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
 
     if( c1 < '0' || c1 > '9' || c2 < '0' || c2 > '9' )
     {
-        *pi_number =  100; /* > max stream number */
+        *pi_number = AVIF_MAX_STREAMS; /* > max stream number */
         *pi_type = UNKNOWN_ES;
     }
     else
@@ -2722,7 +2727,6 @@ static void AVI_IndexLoad( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* Load indexes */
-    assert( p_sys->i_track <= 100 );
     avi_index_t p_idx_indx[p_sys->i_track];
     avi_index_t p_idx_idx1[p_sys->i_track];
     for( unsigned i = 0; i < p_sys->i_track; i++ )
