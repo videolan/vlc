@@ -115,6 +115,12 @@ FocusScope {
         property bool selected: false
     }
 
+    // extra margin taken in account for positionViewAtIndex
+    //
+    // this is required since delegates selection rect may occupy area outside of
+    // delegates, to make scrolling with selection better we add extra margins here
+    property real extraMarginForPositionView: verticalSpacing / 2
+
     property var _idChildrenList: []
     property var _unusedItemList: []
     property var _currentRange: [0,0]
@@ -508,7 +514,8 @@ FocusScope {
         const newContentY = Helpers.flickablePositionContaining(flickable,
                                                                 getItemPos(index)[1]
                                                                 , rowHeight
-                                                                , topMargin, bottomMargin)
+                                                                , topMargin + extraMarginForPositionView
+                                                                , bottomMargin + extraMarginForPositionView)
 
         if (newContentY !== flickable.contentY)
             animateFlickableContentY(newContentY)
