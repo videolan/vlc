@@ -1355,10 +1355,10 @@ static void EsOutProgramHandleClockSource(es_out_sys_t *p_sys, es_out_pgrm_t *p_
             /* Fall-through */
         case VLC_CLOCK_MASTER_INPUT:
         {
-            vlc_clock_main_Lock(p_sys->p_pgrm->clocks.main);
+            vlc_clock_main_Lock(p_pgrm->clocks.main);
             p_pgrm->clocks.input =
                 vlc_clock_main_CreateInputMaster(p_pgrm->clocks.main);
-            vlc_clock_main_Unlock(p_sys->p_pgrm->clocks.main);
+            vlc_clock_main_Unlock(p_pgrm->clocks.main);
 
             if (p_pgrm->clocks.input == NULL)
                 break;
