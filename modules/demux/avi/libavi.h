@@ -20,6 +20,9 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#define AVIF_MAX_STREAMS 100 /* chunk storage index is twocc + 2 digits */
+                             /* and is a de-facto limit of 100 tracks */
+
 /* biCompression / Others are FourCC */
 #define BI_RGB              0x0000
 #define BI_RLE8             0x0001
