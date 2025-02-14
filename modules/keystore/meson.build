@@ -8,7 +8,7 @@ vlc_modules += {
 file_keystore_extra_sources = []
 file_keystore_extra_deps = []
 if host_system == 'windows'
-    file_keystore_extra_sources += 'file_crypt_win32.c'
+    file_keystore_extra_sources += files('file_crypt_win32.c')
     file_keystore_extra_deps += cc.find_library('crypt32', required: true)
 endif
 # TODO: Add Android-specific sources
