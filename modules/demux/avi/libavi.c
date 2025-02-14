@@ -516,7 +516,7 @@ static int AVI_ChunkRead_strf( stream_t *s, avi_chunk_t *p_chk )
                 if ( !p_bih->biClrUsed )
                 {
                     if( p_bih->biBitCount < 32 )
-                        p_bih->biClrUsed = (1 << p_bih->biBitCount);
+                        p_bih->biClrUsed = (UINT32_C(1) << p_bih->biBitCount);
                     else
                         p_bih->biBitCount = UINT16_MAX;
                 }
