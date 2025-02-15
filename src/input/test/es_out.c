@@ -339,7 +339,7 @@ struct vlc_logger {
     const struct vlc_logger_operations *ops;
 };
 
-int main(void)
+void test_playback(void)
 {
     vlc_list_init(&opened_decoders);
     struct vlc_logger logger = { .ops = &test_logger_operations };
@@ -447,5 +447,96 @@ int main(void)
     vlc_object_delete(&input->obj);
     vlc_object_delete(root);
 
-    return VLC_SUCCESS;
+}
+
+void test_multiple_programs(void)
+{
+    vlc_list_init(&opened_decoders);
+    struct vlc_logger logger = { .ops = &test_logger_operations };
+    libvlc_priv_t *libvlc = (vlc_object_create)(NULL, sizeof(*libvlc));
+    vlc_object_t *root = &libvlc->public_data.obj;
+    root->logger = &logger;
+
+    var_Create(root, "clock-master", VLC_VAR_STRING);
+    var_SetString(root, "clock-master", "auto");
+
+    var_Create(root, "captions", VLC_VAR_INTEGER);
+    var_SetInteger(root, "captions", 608);
+
+    input_item_t *item = input_item_NewStream("mock://", "mock", 0);
+
+    input_thread_private_t *priv = vlc_object_create(root, sizeof(*priv));
+    assert(priv != NULL);
+    priv->p_item = item;
+
+    input_thread_t *input = &priv->input;
+    var_Create(input, "video", VLC_VAR_BOOL);
+    var_SetBool(input, "video", true);
+    var_Create(input, "audio", VLC_VAR_BOOL);
+    var_SetBool(input, "audio", true);
+
+    input_source_t *source = InputSourceNew();
+
+    struct vlc_input_es_out *out =
+        input_EsOutNew(input, source, 1.f, INPUT_TYPE_PLAYBACK);
+    assert(out != NULL);
+
+    es_out_SetMode(out, ES_OUT_MODE_AUTO);
+
+    vlc_tick_t pts_delay = VLC_TICK_FROM_MS(300);
+    es_out_SetJitter(out, pts_delay, 0, 40 * pts_delay / DEFAULT_PTS_DELAY);
+
+    es_format_t video_fmt;
+    es_format_Init(&video_fmt, VIDEO_ES, VLC_CODEC_RGBA);
+    video_fmt.i_id = 1;
+    video_fmt.i_group = 1;
+    video_format_Init(&video_fmt.video, VLC_CODEC_RGBA);
+    video_fmt.video.i_width = video_fmt.video.i_visible_width = 64;
+    video_fmt.video.i_height = video_fmt.video.i_visible_height = 64;
+    es_out_id_t *video_track = es_out_Add(&out->out, &video_fmt);
+    assert(video_track != NULL);
+    es_format_Clean(&video_fmt);
+
+    es_format_t audio_fmt;
+    es_format_Init(&audio_fmt, AUDIO_ES, VLC_CODEC_F32L);
+    audio_fmt.i_id = 2;
+    video_fmt.i_group = 2;
+    audio_fmt.audio.i_format = VLC_CODEC_F32L;
+    audio_fmt.audio.i_rate = 44100;
+    audio_fmt.audio.i_physical_channels = 2;
+    audio_fmt.audio.i_channels = 2;
+    es_out_id_t *audio_track = es_out_Add(&out->out, &audio_fmt);
+    assert(audio_track != NULL);
+    es_format_Clean(&audio_fmt);
+
+    block_t *block = block_Alloc(10);
+    assert(block);
+    es_out_Send(&out->out, video_track, block);
+
+    block = block_Alloc(10);
+    assert(block);
+    es_out_Send(&out->out, audio_track, block);
+
+    es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 1, VLC_TICK_0);
+    es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 1, VLC_TICK_0 + VLC_TICK_FROM_MS(100));
+    es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 2, VLC_TICK_0 + VLC_TICK_FROM_MS(200));
+    es_out_Control(&out->out, ES_OUT_SET_GROUP_PCR, 2, VLC_TICK_0 + VLC_TICK_FROM_MS(300) - 1);
+
+    es_out_Del(&out->out, audio_track);
+    es_out_Del(&out->out, video_track);
+
+    es_out_SetMode(out, ES_OUT_MODE_END);
+    es_out_Delete(&out->out);
+
+    input_source_Release(source);
+    input_item_Release(item);
+    vlc_object_delete(&input->obj);
+    vlc_object_delete(root);
+}
+
+int main(void)
+{
+    test_playback();
+    test_multiple_programs();
+    return 0;
 }
