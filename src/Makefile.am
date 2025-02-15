@@ -519,7 +519,7 @@ if !HAVE_LINUX
 libvlccore_la_SOURCES += posix/wait.c
 endif
 if !HAVE_ANDROID
-if !HAVE_EMSCRIPTEN
+if HAVE_QSORT_R
 libvlccore_la_SOURCES += posix/sort.c
 endif
 libvlccore_la_SOURCES += \
