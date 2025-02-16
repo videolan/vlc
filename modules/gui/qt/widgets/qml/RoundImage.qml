@@ -26,12 +26,14 @@ Item {
     implicitWidth: image.implicitWidth
     implicitHeight: image.implicitHeight
 
-    // Override QQuickItem's antialiasing as readonly.
+    // WARNING: We can not override QQuickItem's antialiasing
+    //          property as readonly because Qt 6.6 marks it
+    //          as `FINAL`...
     // FIXME: The shader can be generated without
     //        the define that enables antialiasing.
     //        It should be done when the build system
     //        starts supporting shader defines.
-    readonly property bool antialiasing: true
+    antialiasing: true
 
     asynchronous: true
 
