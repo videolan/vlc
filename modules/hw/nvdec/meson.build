@@ -1,11 +1,6 @@
-nvdec_dep = disabler()
-if get_option('nvdec').allowed()
-if cc.check_header('ffnvcodec/dynlink_loader.h')
-    nvdec_dep = enabler()
-elif cc.check_header('ffnvcodec/dynlink_loader.h', dependencies: contrib_dep )
-    nvdec_dep = contrib_dep
-endif
-endif
+# nvdec
+nvdec_dep = dependency('ffnvcodec', required: get_option('nvdec'))
+
 vlc_modules += {
     'name' : 'nvdec',
     'sources' : files('nvdec.c', 'hw_pool.c'),
