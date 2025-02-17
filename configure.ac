@@ -2237,8 +2237,10 @@ AC_ARG_ENABLE([nvdec], AS_HELP_STRING([--disable-nvdec],
   [disable NVDEC decoder (default auto)]))
 have_nvdec="no"
 AS_IF([test "$enable_nvdec" != "no"], [
-  AC_CHECK_HEADERS([ffnvcodec/dynlink_loader.h], [
+  PKG_CHECK_MODULES([FFNVCODEC], [ffnvcodec], [
     have_nvdec="yes"
+  ], [
+    AC_MSG_WARN([${FFNVCODEC_PKG_ERRORS}: nvdec will not be available.])
   ])
 ])
 AM_CONDITIONAL([HAVE_NVDEC], [test "${have_nvdec}" != "no"])
