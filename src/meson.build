@@ -414,3 +414,26 @@ libvlccore = library(
 )
 
 libvlccore_dep = declare_dependency(link_with: libvlccore, sources: vlc_about)
+
+vlc_tests += {
+    'name' : 'input_es_out',
+    'sources' : files(
+        'input/test/es_out.c',
+        'input/es_out.c',
+        'input/es_out.h',
+        'input/source.c',
+        'input/source.h',
+        'input/item.c',
+        'input/item.h',
+        'clock/clock.c',
+        'clock/clock.h',
+        'text/strings.c',
+        'clock/clock_internal.c',
+        'clock/clock_internal.h',
+        'clock/input_clock.c',
+        'clock/input_clock.h',
+  ),
+  'suite' : ['src'],
+  'link_with' : [libvlccore],
+  'include_directories' : [include_directories('.')],
+}
