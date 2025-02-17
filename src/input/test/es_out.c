@@ -339,7 +339,7 @@ struct vlc_logger {
     const struct vlc_logger_operations *ops;
 };
 
-void test_playback(void)
+static void test_playback(void)
 {
     vlc_list_init(&opened_decoders);
     struct vlc_logger logger = { .ops = &test_logger_operations };
@@ -449,7 +449,7 @@ void test_playback(void)
 
 }
 
-void test_multiple_programs(void)
+static void test_multiple_programs(void)
 {
     vlc_list_init(&opened_decoders);
     struct vlc_logger logger = { .ops = &test_logger_operations };
