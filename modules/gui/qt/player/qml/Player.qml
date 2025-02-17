@@ -141,6 +141,8 @@ FocusScope {
 
     PlayerPlaylistVisibilityFSM {
         id: playlistVisibility
+
+        onIsPlaylistVisibleChanged: lockUnlockAutoHide(isPlaylistVisible)
     }
 
     Connections {
