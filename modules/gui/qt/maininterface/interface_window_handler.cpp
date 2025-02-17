@@ -246,14 +246,15 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
     }
     case QEvent::Close:
     {
+        setInterfaceHiden();
+
         if (var_InheritBool(p_intf, "qt-close-to-system-tray"))
         {
             if (const QSystemTrayIcon* const sysTrayIcon = m_mainCtx->getSysTray())
             {
                 if (sysTrayIcon->isSystemTrayAvailable() && sysTrayIcon->isVisible())
                 {
-                    setInterfaceHiden();
-                    event->accept();
+                    event->ignore();
                     return true;
                 }
             }
