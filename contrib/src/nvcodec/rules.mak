@@ -5,7 +5,9 @@ NVCODEC_VERSION := 12.0.16.0
 NVCODEC_URL := $(GITHUB)/FFmpeg/nv-codec-headers/releases/download/n$(NVCODEC_VERSION)/nv-codec-headers-$(NVCODEC_VERSION).tar.gz
 
 ifndef HAVE_DARWIN_OS
+ifndef HAVE_WINSTORE # no LoadLibrary
 PKGS += nvcodec
+endif
 endif
 
 # $(TARBALLS)/nvcodec-$(NVCODEC_HASH).tar.xz:
