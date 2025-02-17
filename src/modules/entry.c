@@ -37,7 +37,7 @@
 
 #include "modules/modules.h"
 #include "config/configuration.h"
-#include "libvlc.h"
+#include "../libvlc.h"
 
 module_t *vlc_module_create(vlc_plugin_t *plugin)
 {

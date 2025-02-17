@@ -35,7 +35,7 @@
 #include <vlc_window.h>
 #include <vlc_modules.h>
 #include "inhibit.h"
-#include <libvlc.h>
+#include "../libvlc.h"
 
 typedef struct
 {

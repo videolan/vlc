@@ -33,7 +33,7 @@
 #include <vlc_memstream.h>
 #include <vlc_http.h>
 
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "input/resource.h"
 #include "audio_output/aout_internal.h"
 

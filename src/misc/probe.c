@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_probe.h>
 #include <vlc_modules.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #undef vlc_probe
 void *vlc_probe (vlc_object_t *obj,

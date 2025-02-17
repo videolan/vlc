@@ -33,7 +33,7 @@
 #include <vlc_modules.h>
 #include <vlc_atomic.h>
 
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "aout_internal.h"
 
 typedef struct aout_dev

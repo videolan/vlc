@@ -34,7 +34,7 @@
 #include <vlc_executor.h>
 
 #include "art.h"
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "fetcher.h"
 #include "input/input_interface.h"
 #include "misc/interrupt.h"

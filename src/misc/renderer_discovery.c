@@ -30,7 +30,7 @@
 #include <vlc_renderer_discovery.h>
 #include <vlc_probe.h>
 #include <vlc_modules.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 
 struct vlc_renderer_item_t
 {

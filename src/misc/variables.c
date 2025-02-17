@@ -38,7 +38,7 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_charset.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "variables.h"
 #include "config/configuration.h"
 

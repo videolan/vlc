@@ -30,7 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_threads.h>
 #include <vlc_atomic.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "threads.h"
 
 /* <stdatomic.h> types cannot be used in the C++ view of <vlc_threads.h> */

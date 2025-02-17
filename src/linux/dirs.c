@@ -28,7 +28,7 @@
 #include <linux/limits.h>
 
 #include <vlc_common.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "config/configuration.h"
 
 static char *config_GetLibDirRaw(void)

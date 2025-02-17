@@ -38,7 +38,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_codec.h>
 
-#include <libvlc.h>
+#include "../libvlc.h"
 
 #include "display.h"
 #include "vout_internal.h"

@@ -32,7 +32,7 @@
 #include <vlc_modules.h>
 #include <vlc_url.h>
 #include <vlc_memstream.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include <assert.h>
 
 #include "stream.h"

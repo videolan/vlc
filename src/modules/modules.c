@@ -37,7 +37,7 @@
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "config/configuration.h"
 #include "vlc_arrays.h"
 #include "modules/modules.h"

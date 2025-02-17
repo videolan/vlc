@@ -28,7 +28,7 @@
 #include <math.h>
 
 #include <vlc_common.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_aout_volume.h>

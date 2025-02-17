@@ -27,7 +27,7 @@
 #include <vlc_modules.h>
 #include <vlc_list.h>
 #include <vlc_threads.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 
 #include <assert.h>
 

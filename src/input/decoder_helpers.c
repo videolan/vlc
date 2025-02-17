@@ -32,7 +32,7 @@
 #include <vlc_meta.h>
 #include <vlc_modules.h>
 #include <vlc_picture.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 void decoder_Init( decoder_t *p_dec, es_format_t *restrict fmt_in, const es_format_t *restrict p_fmt )
 {

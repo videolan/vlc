@@ -37,7 +37,7 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include "aout_internal.h"
 #include "../video_output/vout_internal.h" /* for vout_Request */
 

@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_fingerprinter.h>
 #include <vlc_modules.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 fingerprinter_thread_t *fingerprinter_Create( vlc_object_t *p_this )
 {

@@ -45,7 +45,7 @@
 #include <vlc_stream.h>
 #include <vlc_fs.h>
 #include <vlc_sout.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include <vlc_modules.h>
 
 struct decoder_owner

@@ -24,7 +24,7 @@
 #define LIBVLC_INPUT_INTERFACE_H 1
 
 #include <vlc_input.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 
 /**********************************************************************
  * Item metadata

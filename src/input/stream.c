@@ -40,7 +40,7 @@
 #include <vlc_charset.h>
 #include <vlc_stream_extractor.h>
 
-#include <libvlc.h>
+#include "../libvlc.h"
 #include "stream.h"
 #include "mrl_helpers.h"
 

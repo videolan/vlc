@@ -35,7 +35,7 @@
 #include <vlc_cpu.h>
 #include <vlc_memstream.h>
 #include <vlc_modules.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #include <assert.h>
 

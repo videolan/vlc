@@ -27,7 +27,7 @@
 #include <vlc_atomic.h>
 #include <vlc_list.h>
 #include <vlc_threads.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 /**
  * An executor can spawn several threads.

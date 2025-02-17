@@ -51,7 +51,7 @@
 #include <vlc_charset.h>
 #include <vlc_arrays.h>
 #include <vlc_player.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include <errno.h>
 
 static const struct xml_entity_s

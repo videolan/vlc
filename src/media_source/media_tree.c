@@ -31,7 +31,7 @@
 #include <vlc_input_item.h>
 #include <vlc_threads.h>
 #include <vlc_preparser.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 struct vlc_media_tree_listener_id
 {

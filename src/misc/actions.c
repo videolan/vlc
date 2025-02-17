@@ -40,7 +40,7 @@
 #include <vlc_common.h>
 #include <vlc_actions.h>
 #include <vlc_charset.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 static const struct key_descriptor
 {

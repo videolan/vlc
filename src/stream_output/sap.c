@@ -37,7 +37,7 @@
 #include <vlc_memstream.h>
 
 #include "stream_output.h"
-#include "libvlc.h"
+#include "../libvlc.h"
 
 /* SAP is always on that port */
 #define IPPORT_SAP 9875

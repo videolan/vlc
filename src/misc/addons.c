@@ -28,7 +28,7 @@
 #include <vlc_modules.h>
 #include <vlc_arrays.h>
 #include <vlc_interrupt.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #include <vlc_addons.h>
 

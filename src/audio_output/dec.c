@@ -37,7 +37,7 @@
 
 #include "aout_internal.h"
 #include "clock/clock.h"
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #define BLOCK_FLAG_CORE_PRIVATE_FILTERED (1 << BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 

@@ -30,7 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_block.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 /**
  * Internal state for block queues

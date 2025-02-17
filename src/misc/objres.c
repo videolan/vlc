@@ -31,7 +31,7 @@
 
 #include <vlc_common.h>
 
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "variables.h"
 
 struct vlc_res

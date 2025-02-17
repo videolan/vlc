@@ -47,7 +47,7 @@
 #include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_network.h>
-#include "libvlc.h" /* vlc_mkdir */
+#include "../libvlc.h" /* vlc_mkdir */
 
 int vlc_open (const char *filename, int flags, ...)
 {

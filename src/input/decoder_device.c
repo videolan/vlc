@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_codec.h>
 #include <vlc_modules.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 struct vlc_decoder_device_priv
 {

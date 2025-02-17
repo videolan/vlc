@@ -30,7 +30,7 @@
 #include <vlc_opengl.h>
 #include <vlc_codec.h>
 #include <vlc_vout_display.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include <vlc_modules.h>
 
 static const struct vlc_gl_cfg gl_cfg_default = {

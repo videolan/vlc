@@ -42,7 +42,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include "libvlc.h" /* vlc_mkdir */
+#include "../libvlc.h" /* vlc_mkdir */
 
 #ifndef NTDDI_WIN10_RS3
 #define NTDDI_WIN10_RS3  0x0A000004

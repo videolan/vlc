@@ -40,7 +40,7 @@
 #   include <xlocale.h>
 #endif
 
-#include "libvlc.h"
+#include "../libvlc.h"
 #include <vlc_charset.h>
 
 double vlc_strtod_c(const char *restrict str, char **restrict end)

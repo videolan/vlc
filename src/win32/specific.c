@@ -29,7 +29,7 @@
 # define UNICODE
 #endif
 #include <vlc_common.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 #include "../lib/libvlc_internal.h"
 
 #include <winsock2.h>

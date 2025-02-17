@@ -30,7 +30,7 @@
 #include <vlc_modules.h>
 #include <vlc_mouse.h>
 #include <vlc_spu.h>
-#include <libvlc.h>
+#include "../libvlc.h"
 #include <assert.h>
 
 module_t *vlc_filter_LoadModule(filter_t *p_filter, const char *capability,

@@ -36,7 +36,7 @@
 #include <vlc_rand.h>
 #include <vlc_strings.h>
 
-#include "libvlc.h"
+#include "../libvlc.h"
 
 
 /*****************************************************************************

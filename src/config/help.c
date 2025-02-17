@@ -38,7 +38,7 @@
 #include "ansi_term.h"
 #include "modules/modules.h"
 #include "config/configuration.h"
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #if defined( _WIN32 )
 # define wcwidth(cp) ((void)(cp), 1) /* LOL */

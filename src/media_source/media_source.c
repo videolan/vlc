@@ -29,7 +29,7 @@
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
 #include <vlc_vector.h>
-#include "libvlc.h"
+#include "../libvlc.h"
 
 #ifdef TEST_MEDIA_SOURCE
 #define vlc_module_name "test"
