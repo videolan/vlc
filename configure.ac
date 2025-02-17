@@ -870,9 +870,13 @@ dnl
 dnl Check for headers
 dnl
 
-AC_CHECK_HEADER([stdckdint.h],, [
+have_stdckdint="no"
+AC_CHECK_HEADER([stdckdint.h], [
+  have_stdckdint="yes"
+], [
   CPPFLAGS="${CPPFLAGS} -I\$(top_srcdir)/compat/stdckdint"
 ])
+AM_CONDITIONAL([HAVE_STDCKDINT], [test "${have_stdckdint}" = "yes"])
 
 dnl  POSIX
 AC_CHECK_HEADERS([arpa/inet.h pthread.h search.h sys/shm.h sys/socket.h sys/uio.h])
