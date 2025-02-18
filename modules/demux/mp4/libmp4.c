@@ -5176,7 +5176,7 @@ void MP4_BoxDumpStructure( stream_t *s, const MP4_Box_t *p_box )
  **
  *****************************************************************************
  *****************************************************************************/
-static bool get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
+static bool get_token( const char **ppsz_path, char **ppsz_token, int *pi_number )
 {
     size_t i_len ;
     if( !*ppsz_path[0] )
@@ -5224,11 +5224,9 @@ static bool get_token( char **ppsz_path, char **ppsz_token, int *pi_number )
     return true;
 }
 
-static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
-                                 const char *psz_fmt, va_list args)
+static void MP4_BoxGet_Path( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
+                             const char *psz_path)
 {
-    char *psz_dup;
-    char *psz_path;
     char *psz_token = NULL;
 
     if( !p_box )
@@ -5237,18 +5235,9 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
         return;
     }
 
-    if( vasprintf( &psz_path, psz_fmt, args ) == -1 )
-        psz_path = NULL;
-
-    if( !psz_path || !psz_path[0] )
-    {
-        free( psz_path );
-        *pp_result = NULL;
-        return;
-    }
+    assert( psz_path && psz_path[0] );
 
 //    fprintf( stderr, "path:'%s'\n", psz_path );
-    psz_dup = psz_path; /* keep this pointer, as it need to be unallocated */
     for( ; ; )
     {
         int i_number;
@@ -5259,7 +5248,6 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
 //                 psz_path,psz_token,i_number );
         if( !psz_token )
         {
-            free( psz_dup );
             *pp_result = p_box;
             return;
         }
@@ -5345,9 +5333,34 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
 
 error_box:
     free( psz_token );
-    free( psz_dup );
     *pp_result = NULL;
     return;
+}
+
+static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p_box,
+                                 const char *psz_fmt, va_list args)
+{
+    char *psz_path;
+
+    if( !p_box )
+    {
+        *pp_result = NULL;
+        return;
+    }
+
+    if( vasprintf( &psz_path, psz_fmt, args ) == -1 )
+        psz_path = NULL;
+
+    if( !psz_path || !psz_path[0] )
+    {
+        free( psz_path );
+        *pp_result = NULL;
+        return;
+    }
+
+    MP4_BoxGet_Path( pp_result, p_box, psz_path );
+
+    free( psz_path );
 }
 
 /*****************************************************************************
