@@ -129,7 +129,7 @@ case $OS in
   androideabi)
     case $ARCH in
       arm|armv7|thumbv7neon)
-        return_triplet $TRIPLET
+        return_triplet "arm-linux-androideabi"
         ;;
     esac
     ;;
