@@ -357,7 +357,7 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
             if( !BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index )
                 continue;
 
-            const MP4_Box_t *p_prop = MP4_BoxGet( p_sys->p_root, "meta/iprp/ipco/[%u]",
+            const MP4_Box_t *p_prop = MP4_BoxGetVa( p_sys->p_root, "meta/iprp/ipco/[%u]",
                 BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index - 1 );
             if( !p_prop )
                 continue;
