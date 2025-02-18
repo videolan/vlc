@@ -110,6 +110,7 @@ vlc_modules += {
 }
 
 d3d11_common_lib = []
+d3d9_common_lib = []
 if host_system == 'windows'
     d3d11_common_lib = static_library('d3d11_common',
         files(
