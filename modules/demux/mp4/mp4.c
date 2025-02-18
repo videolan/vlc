@@ -903,7 +903,7 @@ static int Open( vlc_object_t * p_this )
 
         for( i = 0; i < i_count; i++ )
         {
-            MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
+            MP4_Box_t *p_rdrf = MP4_BoxGetVa( p_rmra, "rmda[%d]/rdrf", i );
             char      *psz_ref;
             uint32_t  i_ref_type;
 
@@ -1010,7 +1010,7 @@ static int Open( vlc_object_t * p_this )
     b_enabled_es = false;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%d]", i );
+        MP4_Box_t *p_trak = MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%d]", i );
 
 
         MP4_Box_t *p_tkhd = MP4_BoxGet( p_trak, "tkhd" );
@@ -1030,7 +1030,7 @@ static int Open( vlc_object_t * p_this )
     /* now process each track and extract all useful information */
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
-        MP4_Box_t *p_trak = MP4_BoxGet( p_sys->p_root, "/moov/trak[%u]", i );
+        MP4_Box_t *p_trak = MP4_BoxGetVa( p_sys->p_root, "/moov/trak[%u]", i );
         MP4_TrackSetup( p_demux, &p_sys->track[i], p_trak, true, !b_enabled_es );
 
         if( p_sys->track[i].b_ok && !p_sys->track[i].b_chapters_source )
@@ -2933,7 +2933,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         return VLC_EGENERIC;
     }
 
-    MP4_Box_t *p_sample = MP4_BoxGet(  p_track->p_stsd, "[%d]",
+    MP4_Box_t *p_sample = MP4_BoxGetVa(  p_track->p_stsd, "[%d]",
                             i_sample_description_index - 1 );
 
     if( !p_sample ||

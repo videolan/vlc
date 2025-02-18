@@ -5373,7 +5373,7 @@ static void MP4_BoxGet_Internal( const MP4_Box_t **pp_result, const MP4_Box_t *p
  *     ../mdia
  *****************************************************************************/
 VLC_FORMAT(2, 3)
-MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
+MP4_Box_t *MP4_BoxGetVa( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
     const MP4_Box_t *p_result;
@@ -5381,6 +5381,15 @@ MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
     va_start( args, psz_fmt );
     MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );
     va_end( args );
+
+    return( (MP4_Box_t *) p_result );
+}
+
+MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt )
+{
+    const MP4_Box_t *p_result;
+
+    MP4_BoxGet_Path( &p_result, p_box, psz_fmt );
 
     return( (MP4_Box_t *) p_result );
 }
@@ -5395,7 +5404,7 @@ MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
  *     ../mdia
  *****************************************************************************/
 VLC_FORMAT(2, 3)
-unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... )
+unsigned MP4_BoxCountVa( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
     unsigned i_count;
@@ -5404,6 +5413,28 @@ unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... )
     va_start( args, psz_fmt );
     MP4_BoxGet_Internal( &p_result, p_box, psz_fmt, args );
     va_end( args );
+    if( !p_result )
+    {
+        return( 0 );
+    }
+
+    i_count = 1;
+    for( p_next = p_result->p_next; p_next != NULL; p_next = p_next->p_next)
+    {
+        if( p_next->i_type == p_result->i_type)
+        {
+            i_count++;
+        }
+    }
+    return( i_count );
+}
+
+unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt )
+{
+    unsigned i_count;
+    const MP4_Box_t *p_result, *p_next;
+
+    MP4_BoxGet_Path( &p_result, p_box, psz_fmt );
     if( !p_result )
     {
         return( 0 );
