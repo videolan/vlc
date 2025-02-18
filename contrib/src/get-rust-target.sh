@@ -121,7 +121,7 @@ case $OS in
   android)
     case $ARCH in
       aarch64|i686|x86_64)
-        return_triplet $TRIPLET
+        return_triplet "$ARCH-linux-android"
         ;;
     esac
     ;;
