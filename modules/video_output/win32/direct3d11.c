@@ -1300,6 +1300,29 @@ static bool canHandleConversion(const dxgi_color_space *src, const dxgi_color_sp
 }
 #endif
 
+static IDXGIOutput *GetDXGIOutput(IDXGISwapChain1 *dxgiswapChain, d3d11_device_t *d3d_dev)
+{
+    IDXGIOutput *dxgiOutput = NULL;
+    if (FAILED(IDXGISwapChain_GetContainingOutput( dxgiswapChain, &dxgiOutput )))
+    {
+        // GetContainingOutput fails in UWP
+        IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
+        if (likely(dxgiadapter!=NULL)) {
+            // Get the first usable output (monitor)
+            for (UINT adapter=0;;adapter++)
+            {
+                HRESULT hr = IDXGIAdapter_EnumOutputs(dxgiadapter, adapter, &dxgiOutput);
+                if (SUCCEEDED(hr))
+                    break;
+                if (hr == DXGI_ERROR_NOT_FOUND) // no more adapters
+                    break;
+            }
+            IDXGIAdapter_Release(dxgiadapter);
+        }
+    }
+    return dxgiOutput;
+}
+
 static void D3D11SetColorSpace(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1371,7 +1394,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
 
 #ifdef HAVE_DXGI1_6_H
     if (sys->hdrMode == hdr_Auto || sys->hdrMode == hdr_Fake) // match the screen
-    if (SUCCEEDED(IDXGISwapChain_GetContainingOutput( sys->dxgiswapChain, &dxgiOutput )))
+    if ((dxgiOutput = GetDXGIOutput( sys->dxgiswapChain, &sys->d3d_dev )) != NULL)
     {
         IDXGIOutput6 *dxgiOutput6 = NULL;
         if (SUCCEEDED(IDXGIOutput_QueryInterface( dxgiOutput, &IID_IDXGIOutput6, (void **)&dxgiOutput6 )))
