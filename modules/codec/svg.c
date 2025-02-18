@@ -37,7 +37,7 @@
 #include <glib-object.h>                                  /* g_object_unref( ) */
 
 #include <librsvg/rsvg.h>
-#include <cairo/cairo.h>
+#include <cairo.h>
 
 /*****************************************************************************
  * Local prototypes
