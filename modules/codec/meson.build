@@ -499,8 +499,8 @@ speex_dep = dependency('speex', version: '>= 1.0.5', required: get_option('speex
 vlc_modules += {
     'name' : 'speex',
     'sources' : files('speex.c'),
-    'dependencies' : [speex_dep],
-    'enabled' : speex_dep.found(),
+    'dependencies' : [speex_dep, ogg_dep],
+    'enabled' : speex_dep.found() and ogg_dep.found(),
 }
 
 # Vorbis codec
