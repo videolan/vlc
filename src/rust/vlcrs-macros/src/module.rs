@@ -1168,6 +1168,7 @@ pub fn module(input: TokenStream) -> TokenStream {
         #cfg_not_static
         #entry_copyright
 
+        #cfg_not_static
         #module_name
 
         #cfg_not_static
