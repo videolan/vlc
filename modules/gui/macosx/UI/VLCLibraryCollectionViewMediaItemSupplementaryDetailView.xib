@@ -173,7 +173,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="uhm-9P-6qk">
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="uhm-9P-6qk">
                                                     <rect key="frame" x="-2" y="105" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Labels:" id="FCe-hT-5o4">
                                                         <font key="font" metaFont="systemBold"/>
@@ -181,7 +181,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="HYi-e3-j6K">
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="HYi-e3-j6K">
                                                     <rect key="frame" x="-2" y="84" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Copyright:" id="FTb-8c-Kqq">
                                                         <font key="font" metaFont="systemBold"/>
@@ -189,7 +189,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="F6B-1v-Bg2">
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="F6B-1v-Bg2">
                                                     <rect key="frame" x="-2" y="63" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Last played:" id="LfQ-yR-UiL">
                                                         <font key="font" metaFont="systemBold"/>
@@ -197,7 +197,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="O20-fr-lHb">
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="O20-fr-lHb">
                                                     <rect key="frame" x="-2" y="42" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Content:" id="LdZ-IF-3FI">
                                                         <font key="font" metaFont="systemBold"/>
@@ -205,7 +205,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="1000" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="NZk-WW-Uay">
+                                                <textField focusRingType="none" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="NZk-WW-Uay">
                                                     <rect key="frame" x="-2" y="21" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="File name:" id="CyQ-Ao-mup">
                                                         <font key="font" metaFont="systemBold"/>
@@ -213,7 +213,7 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hEf-79-49a">
+                                                <textField focusRingType="none" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hEf-79-49a">
                                                     <rect key="frame" x="-2" y="0.0" width="83" height="16"/>
                                                     <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Path:" id="a9t-Zw-74U">
                                                         <font key="font" metaFont="systemBold"/>
@@ -253,7 +253,7 @@
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="B2d-Zo-xAO">
                                             <rect key="frame" x="84" y="0.0" width="786" height="142"/>
                                             <subviews>
-                                                <levelIndicator verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lYc-WP-hlc">
+                                                <levelIndicator verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="lYc-WP-hlc">
                                                     <rect key="frame" x="0.0" y="126" width="60" height="16"/>
                                                     <levelIndicatorCell key="cell" editable="YES" alignment="left" doubleValue="5" maxValue="5" levelIndicatorStyle="rating" id="bi9-yf-v6w"/>
                                                     <color key="fillColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
@@ -261,49 +261,49 @@
                                                         <action selector="ratingAction:" target="HAc-or-XD8" id="K0H-Ga-hji"/>
                                                     </connections>
                                                 </levelIndicator>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HyO-9K-R7L">
-                                                    <rect key="frame" x="-2" y="105" width="790" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="eIz-b2-2PE">
+                                                <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="HyO-9K-R7L">
+                                                    <rect key="frame" x="-2" y="105" width="181" height="16"/>
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="eIz-b2-2PE">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ebt-AQ-LWK">
+                                                <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="ebt-AQ-LWK">
                                                     <rect key="frame" x="-2" y="84" width="37" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="e2M-0W-dC5">
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="e2M-0W-dC5">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="YBs-Jb-5di">
+                                                <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="YBs-Jb-5di">
                                                     <rect key="frame" x="-2" y="63" width="37" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="LfQ-cN-QlF">
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="LfQ-cN-QlF">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2wD-n8-ITx">
+                                                <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="2wD-n8-ITx">
                                                     <rect key="frame" x="-2" y="42" width="37" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="d5Z-Y4-LbO">
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="d5Z-Y4-LbO">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
-                                                    <rect key="frame" x="-2" y="21" width="790" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="Pzf-s3-rHC">
+                                                <textField focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="VxL-BW-3eh">
+                                                    <rect key="frame" x="-2" y="21" width="181" height="16"/>
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="Pzf-s3-rHC">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" verticalHuggingPriority="750" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="7gY-3s-Kay">
-                                                    <rect key="frame" x="-2" y="0.0" width="790" height="16"/>
-                                                    <textFieldCell key="cell" title="Label" id="3XB-SJ-5ia">
+                                                <textField focusRingType="none" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7gY-3s-Kay">
+                                                    <rect key="frame" x="-2" y="0.0" width="181" height="16"/>
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="3XB-SJ-5ia">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
