@@ -168,6 +168,16 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemContentDescriptionTitleTextField.hidden = self.mediaItemContentDescriptionTextField.hidden;
     self.mediaItemContentDescriptionTextField.stringValue = contentDescription;
 
+    NSString * const director = inputItem.director;
+    self.mediaItemDirectorTextField.hidden = [inputItem.director isEqualToString:@""];
+    self.mediaItemDirectorTitleTextField.hidden = self.mediaItemDirectorTextField.hidden;
+    self.mediaItemDirectorTextField.stringValue = director;
+
+    NSString * const actors = inputItem.actors;
+    self.mediaItemActorsTextField.hidden = [inputItem.actors isEqualToString:@""];
+    self.mediaItemActorsTitleTextField.hidden = self.mediaItemActorsTextField.hidden;
+    self.mediaItemActorsTextField.stringValue = actors;
+
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
         if (self.representedItem.item != actualItem) {
             return;

@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+
 #import "VLCLibraryCollectionViewSupplementaryDetailView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -53,6 +54,10 @@ extern NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMe
 @property (readwrite, weak) IBOutlet NSBox *mediaItemSummarySeparator;
 @property (readwrite, weak) IBOutlet NSStackView *mediaItemSummaryStackView;
 @property (readwrite, weak) IBOutlet NSTextField *mediaItemSummaryTextField;
+@property (readwrite, weak) IBOutlet NSTextField *mediaItemDirectorTextField;
+@property (readwrite, weak) IBOutlet NSTextField *mediaItemDirectorTitleTextField;
+@property (readwrite, weak) IBOutlet NSTextField *mediaItemActorsTextField;
+@property (readwrite, weak) IBOutlet NSTextField *mediaItemActorsTitleTextField;
 
 - (IBAction)playAction:(id)sender;
 - (IBAction)enqueueAction:(id)sender;
