@@ -336,7 +336,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     if( p_packetsys->pf_updatesendtime )
         p_packetsys->pf_updatesendtime( p_packetsys, pkt->send_time );
 
-    uint32_t i_subpayload_count = 0;
+    vlc_tick_t i_subpayload_delta = 0;
     while (i_payload_data_length && pkt->i_skip < pkt->left )
     {
         uint32_t i_sub_payload_data_length = i_payload_data_length;
@@ -355,7 +355,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         }
 
         vlc_tick_t i_payload_pts;
-        i_payload_pts = i_pkt_time + i_pkt_time_delta * i_subpayload_count;
+        i_payload_pts = i_pkt_time + i_subpayload_delta;
         if ( p_tkinfo->p_sp )
             i_payload_pts -= VLC_TICK_FROM_MSFTIME(p_tkinfo->p_sp->i_time_offset);
 
@@ -391,7 +391,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         else
             i_payload_data_length = 0;
 
-        i_subpayload_count++;
+        i_subpayload_delta += i_pkt_time_delta;
     }
 
     return 0;
