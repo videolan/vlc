@@ -683,7 +683,7 @@ SoundSlider::SoundSlider( QWidget *_parent, float _i_step,
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
 {
-    int newvalue = value() + event->angleDelta().y() / ( 8 * 15 ) * f_step;
+    int newvalue = value() + event->angleDelta().y() / QWheelEvent::DefaultDeltasPerStep * f_step;
     setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
 
     emit sliderReleased();

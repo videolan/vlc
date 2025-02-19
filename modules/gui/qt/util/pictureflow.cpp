@@ -887,7 +887,7 @@ void PictureFlow::wheelEvent(QWheelEvent * event)
     }
     else
     {
-        int numSteps = -((p.y() / 8) / 15);
+        int numSteps = -(p.y() / QWheelEvent::DefaultDeltasPerStep);
 
         if (numSteps > 0)
         {
