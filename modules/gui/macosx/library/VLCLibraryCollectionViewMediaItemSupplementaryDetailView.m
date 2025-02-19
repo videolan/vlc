@@ -84,9 +84,10 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         }
     }
 
-    [strings addObjectsFromArray:@[
-        actualItem.durationString, actualItem.readableMediaType, actualItem.readableMediaSubType
-    ]];
+    if (![actualItem.primaryDetailString isEqualToString:actualItem.durationString]) {
+        [strings addObject:actualItem.durationString];
+    }
+    [strings addObjectsFromArray:@[actualItem.readableMediaType, actualItem.readableMediaSubType]];
     return [strings componentsJoinedByString:@" · "];
 }
 
