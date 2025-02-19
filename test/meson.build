@@ -85,3 +85,43 @@ foreach vlc_test: vlc_tests
         suite: [vlc_test.get('suite', []), 'test'],
         depends: [test_modules_deps])
 endforeach
+
+libvlc_demux_defines = []
+libvlc_demux_deps = []
+# TODO support !HAVE_DYNAMIC_PLUGINS
+# libvlc_demux_defines=['-DHAVE_STATIC_MODULES']
+# if libdvbpsi_dep.found()
+#     libvlc_demux_defines += '-DHAVE_DVBPSI'
+#     libvlc_demux_deps += [libdvbpsi_dep, aribb24_dep, libdvbcsa_dep]
+# endif
+# if libebml_dep.found() and libmatroska_dep.found()
+#     libvlc_demux_defines += '-DHAVE_MATROSKA'
+#     libvlc_demux_deps += [libebml_dep, libmatroska_dep, z_dep]
+# endif
+
+libvlc_demux_run = static_library ('libvlc_demux_run',
+    files('src/input/demux-run.c', 'src/input/common.c', '../src/input/var.c'),
+    c_args: libvlc_demux_defines,
+    dependencies: libvlc_demux_deps,
+    include_directories: [vlc_include_dirs],
+    link_with: [libvlc, libvlccore, vlc_libcompat])
+
+libvlc_demux_dec_defines = [libvlc_demux_defines, '-DHAVE_DECODERS']
+libvlc_demux_dec_run = static_library ('libvlc_demux_dec_run',
+    files('src/input/demux-run.c', 'src/input/common.c', '../src/input/var.c', 'src/input/decoder.c'),
+    c_args: libvlc_demux_dec_defines,
+    dependencies: libvlc_demux_deps,
+    include_directories: [vlc_include_dirs],
+    link_with: [libvlc, libvlccore, vlc_libcompat])
+
+executable('vlc-demux-run', 'vlc-demux-run.c',
+    include_directories: [vlc_include_dirs],
+    link_with: [libvlc_demux_run, libvlc, libvlccore, vlc_libcompat],
+    install: false,
+    win_subsystem: 'console')
+
+executable('vlc-demux-dec-run', 'vlc-demux-run.c',
+    include_directories: [vlc_include_dirs],
+    link_with: [libvlc_demux_dec_run, libvlc, libvlccore, vlc_libcompat],
+    install: false,
+    win_subsystem: 'console')
