@@ -105,22 +105,26 @@ public:
         auto jsEngine = qjsEngine(q);
         int index;
         MLItem* item = q->findInCache(id, &index);
+
         if (item) {
             resolve.call({index});
         }
         else
         {
+            unsigned int loaded = q->getLoadedCount();
             int count = q->getCount();
             int limit = q->getLimit();
             //item doesn't exists
-            if ((limit != 0 && count >= limit) || count == getMaximumCount())
+            if ((limit != 0 && count >= limit) || loaded == getMaximumCount()) {
                 reject.call(); //not present
+            }
             else
             {
                 //load data until we have our item in cache
-                QObject::connect(q, &MLBaseModel::countChanged, q, [this, id, resolve = resolve, reject = reject](){
+                QObject::connect(q, &MLBaseModel::dataChanged, q, [this, id, resolve = resolve, reject = reject](){
                     getIndexFromIdImpl(id, resolve, reject);
                 }, Qt::SingleShotConnection);
+
                 if (m_cache)
                     m_cache->fetchMore();
             }
