@@ -260,4 +260,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     ((VLCMediaLibraryMediaItem *)self.representedItem.item).rating = (int)rating;
 }
 
+- (IBAction)openPathAction:(id)sender
+{
+    [self.representedItem revealInFinder];
+}
+
 @end

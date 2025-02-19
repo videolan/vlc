@@ -229,25 +229,28 @@
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
                                                 </textField>
-                                                <textField focusRingType="none" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="hEf-79-49a">
-                                                    <rect key="frame" x="-2" y="0.0" width="83" height="16"/>
-                                                    <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Path:" id="a9t-Zw-74U">
+                                                <button imageHugsTitle="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="DPs-b2-1We">
+                                                    <rect key="frame" x="23" y="0.0" width="56" height="16"/>
+                                                    <buttonCell key="cell" type="inline" title="Path:" bezelStyle="inline" image="arrow.up.right.circle.fill" catalog="system" imagePosition="leading" alignment="right" state="on" imageScaling="proportionallyDown" inset="2" id="L32-8T-032">
+                                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                         <font key="font" metaFont="systemBold"/>
-                                                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                    </textFieldCell>
-                                                </textField>
+                                                    </buttonCell>
+                                                    <color key="contentTintColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                    <connections>
+                                                        <action selector="openPathAction:" target="HAc-or-XD8" id="4qa-Cp-3z6"/>
+                                                    </connections>
+                                                </button>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstAttribute="trailing" secondItem="oO9-wF-WH8" secondAttribute="trailing" id="4lG-eg-Jph"/>
                                                 <constraint firstAttribute="trailing" secondItem="O20-fr-lHb" secondAttribute="trailing" id="Avk-mZ-kvV"/>
                                                 <constraint firstAttribute="trailing" secondItem="HYi-e3-j6K" secondAttribute="trailing" id="B2m-08-6Of"/>
                                                 <constraint firstAttribute="trailing" secondItem="jeT-l1-TZw" secondAttribute="trailing" id="Bn3-s2-Uym"/>
-                                                <constraint firstAttribute="trailing" secondItem="hEf-79-49a" secondAttribute="trailing" id="DCM-2G-n54"/>
                                                 <constraint firstAttribute="trailing" secondItem="F6B-1v-Bg2" secondAttribute="trailing" id="HeU-cb-dP6"/>
                                                 <constraint firstAttribute="trailing" secondItem="kQq-KE-Eg7" secondAttribute="trailing" id="Qck-Zs-gY3"/>
                                                 <constraint firstAttribute="trailing" secondItem="uhm-9P-6qk" secondAttribute="trailing" id="qug-q4-wUc"/>
                                                 <constraint firstAttribute="trailing" secondItem="NZk-WW-Uay" secondAttribute="trailing" id="r3e-pC-d3V"/>
+                                                <constraint firstAttribute="trailing" secondItem="DPs-b2-1We" secondAttribute="trailing" id="sne-CC-z6F"/>
                                             </constraints>
                                             <visibilityPriorities>
                                                 <integer value="1000"/>
@@ -423,7 +426,6 @@
                                         <constraint firstItem="uhm-9P-6qk" firstAttribute="bottom" secondItem="HyO-9K-R7L" secondAttribute="bottom" id="0vs-gO-P5e"/>
                                         <constraint firstItem="nte-55-oZ5" firstAttribute="top" secondItem="fiJ-9f-ecF" secondAttribute="top" id="2qN-VG-JuO"/>
                                         <constraint firstItem="uhm-9P-6qk" firstAttribute="top" secondItem="HyO-9K-R7L" secondAttribute="top" id="3dP-TU-v2E"/>
-                                        <constraint firstItem="hEf-79-49a" firstAttribute="bottom" secondItem="7gY-3s-Kay" secondAttribute="bottom" id="Bvn-kU-xuu"/>
                                         <constraint firstItem="jeT-l1-TZw" firstAttribute="top" secondItem="lYc-WP-hlc" secondAttribute="top" id="Ffu-Mn-19g"/>
                                         <constraint firstItem="O20-fr-lHb" firstAttribute="bottom" secondItem="2wD-n8-ITx" secondAttribute="bottom" id="G7j-y4-CwL"/>
                                         <constraint firstItem="obm-oY-7sg" firstAttribute="bottom" secondItem="kQq-KE-Eg7" secondAttribute="bottom" id="NHr-q0-RPl"/>
@@ -436,11 +438,11 @@
                                         <constraint firstItem="F6B-1v-Bg2" firstAttribute="bottom" secondItem="YBs-Jb-5di" secondAttribute="bottom" id="hJz-J5-u8P"/>
                                         <constraint firstItem="aRP-nR-Yap" firstAttribute="bottom" secondItem="oO9-wF-WH8" secondAttribute="bottom" id="hW1-4U-bjt"/>
                                         <constraint firstItem="gGl-6E-i7b" firstAttribute="width" secondItem="fiJ-9f-ecF" secondAttribute="width" multiplier="0.5" id="p7F-3O-kNE"/>
-                                        <constraint firstItem="hEf-79-49a" firstAttribute="top" secondItem="7gY-3s-Kay" secondAttribute="top" id="sdd-55-2C8"/>
                                         <constraint firstAttribute="bottom" secondItem="nte-55-oZ5" secondAttribute="bottom" id="tRf-Wy-VCr"/>
                                         <constraint firstItem="NZk-WW-Uay" firstAttribute="bottom" secondItem="VxL-BW-3eh" secondAttribute="bottom" id="uLS-za-6mQ"/>
                                         <constraint firstItem="jeT-l1-TZw" firstAttribute="bottom" secondItem="lYc-WP-hlc" secondAttribute="bottom" id="wPe-Gj-Utf"/>
                                         <constraint firstItem="gGl-6E-i7b" firstAttribute="top" secondItem="fiJ-9f-ecF" secondAttribute="top" id="ws3-XE-Ula"/>
+                                        <constraint firstItem="DPs-b2-1We" firstAttribute="top" secondItem="7gY-3s-Kay" secondAttribute="top" id="yYq-Ae-K3M"/>
                                         <constraint firstItem="O20-fr-lHb" firstAttribute="top" secondItem="2wD-n8-ITx" secondAttribute="top" id="ysc-b4-DWV"/>
                                     </constraints>
                                     <visibilityPriorities>
@@ -520,6 +522,7 @@
                 <outlet property="mediaItemLastPlayedTextField" destination="YBs-Jb-5di" id="K2d-OZ-i3h"/>
                 <outlet property="mediaItemLastPlayedTitleTextField" destination="F6B-1v-Bg2" id="Pla-nv-R8R"/>
                 <outlet property="mediaItemPathTextField" destination="7gY-3s-Kay" id="P4t-h1-m3P"/>
+                <outlet property="mediaItemPathTitleButton" destination="DPs-b2-1We" id="Hg4-9T-B4B"/>
                 <outlet property="mediaItemPrimaryDetailButton" destination="S5i-gd-zkt" id="ssB-Jg-jcf"/>
                 <outlet property="mediaItemRatingIndicator" destination="lYc-WP-hlc" id="PHd-Ka-eS7"/>
                 <outlet property="mediaItemSecondaryDetailButton" destination="9CH-03-Iu3" id="J8O-hB-tHb"/>
@@ -534,6 +537,7 @@
         </view>
     </objects>
     <resources>
+        <image name="arrow.up.right.circle.fill" catalog="system" width="15" height="15"/>
         <image name="heart" catalog="system" width="16" height="14"/>
         <image name="heart.fill" catalog="system" width="16" height="14"/>
         <image name="no-art" width="128" height="128"/>
