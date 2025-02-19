@@ -61,7 +61,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 }
 
-- (NSString *)formattedYearAndDurationString
+- (NSString *)formattedYearAndDurationAndTypeString
 {
     if (self.representedItem == nil) {
         return @"";
@@ -84,7 +84,9 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         }
     }
 
-    [strings addObjectsFromArray:@[actualItem.durationString]];
+    [strings addObjectsFromArray:@[
+        actualItem.durationString, actualItem.readableMediaType, actualItem.readableMediaSubType
+    ]];
     return [strings componentsJoinedByString:@" · "];
 }
 
@@ -97,7 +99,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     _mediaItemTitleTextField.stringValue = actualItem.displayString;
     _mediaItemPrimaryDetailButton.title = actualItem.primaryDetailString;
     _mediaItemSecondaryDetailButton.title = actualItem.secondaryDetailString;
-    _mediaItemYearAndDurationTextField.stringValue = [self formattedYearAndDurationString];
+    _mediaItemYearAndDurationAndTypeTextField.stringValue = [self formattedYearAndDurationAndTypeString];
     _mediaItemFileNameTextField.stringValue = actualItem.inputItem.name;
     _mediaItemPathTextField.stringValue = actualItem.inputItem.decodedMRL;
 

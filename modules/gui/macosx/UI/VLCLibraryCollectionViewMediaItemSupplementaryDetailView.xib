@@ -153,7 +153,7 @@
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="8hg-2f-fip"/>
                                     </constraints>
-                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration" id="JBg-wo-ZeE">
+                                    <textFieldCell key="cell" lineBreakMode="clipping" title="Year · Duration · Type · Subtype" id="JBg-wo-ZeE">
                                         <font key="font" metaFont="system"/>
                                         <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -424,7 +424,7 @@
                 <outlet property="mediaItemRatingIndicator" destination="lYc-WP-hlc" id="PHd-Ka-eS7"/>
                 <outlet property="mediaItemSecondaryDetailButton" destination="9CH-03-Iu3" id="J8O-hB-tHb"/>
                 <outlet property="mediaItemTitleTextField" destination="nCe-dY-YMM" id="h3l-p0-w3e"/>
-                <outlet property="mediaItemYearAndDurationTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
+                <outlet property="mediaItemYearAndDurationAndTypeTextField" destination="QuO-3G-BMT" id="y34-rD-uR"/>
                 <outlet property="playMediaItemButton" destination="ntd-VT-2KS" id="LJV-KL-cK4"/>
             </connections>
             <point key="canvasLocation" x="-237.5" y="-284"/>
