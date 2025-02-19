@@ -87,7 +87,15 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     if (![actualItem.primaryDetailString isEqualToString:actualItem.durationString]) {
         [strings addObject:actualItem.durationString];
     }
+
     [strings addObjectsFromArray:@[actualItem.readableMediaType, actualItem.readableMediaSubType]];
+
+    VLCInputItem * const inputItem = actualItem.inputItem;
+    NSString * const discNumber = inputItem.discNumber;
+    if (![discNumber isEqualToString:@""]) {
+        [strings addObject:[NSString stringWithFormat:@"%@ %@", _NS("Disc"), discNumber]];
+    }
+
     return [strings componentsJoinedByString:@" · "];
 }
 
