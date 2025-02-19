@@ -24,6 +24,7 @@ foreach vlc_test: vlc_tests
         'cpp_args',
         'objc_args',
         'include_directories',
+        'env',
     ]
 
     foreach key : vlc_test.keys()
@@ -82,6 +83,7 @@ foreach vlc_test: vlc_tests
             c_args: [vlc_test.get('c_args', []), common_args],
             cpp_args: [vlc_test.get('cpp_args', []), common_args],
             objc_args: [vlc_test.get('objc_args', []), common_args]),
+            env: vlc_test.get('env', []),
         suite: [vlc_test.get('suite', []), 'test'],
         depends: [test_modules_deps])
 endforeach
