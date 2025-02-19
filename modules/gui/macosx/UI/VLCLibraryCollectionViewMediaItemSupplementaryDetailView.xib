@@ -14,10 +14,10 @@
             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="20" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FWp-yd-2Pm">
-                    <rect key="frame" x="10" y="0.0" width="780" height="225"/>
+                    <rect key="frame" x="10" y="10" width="780" height="215"/>
                     <subviews>
                         <stackView distribution="equalCentering" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TOx-1e-6D9">
-                            <rect key="frame" x="0.0" y="10" width="180" height="215"/>
+                            <rect key="frame" x="0.0" y="0.0" width="180" height="215"/>
                             <subviews>
                                 <imageView horizontalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="xZd-Hk-h2M" customClass="VLCImageView">
                                     <rect key="frame" x="0.0" y="35" width="180" height="180"/>
@@ -80,10 +80,10 @@
                             </customSpacing>
                         </stackView>
                         <stackView distribution="fillEqually" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" horizontalCompressionResistancePriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="bw7-QB-Ssc">
-                            <rect key="frame" x="200" y="0.0" width="580" height="225"/>
+                            <rect key="frame" x="200" y="0.0" width="580" height="215"/>
                             <subviews>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nCe-dY-YMM">
-                                    <rect key="frame" x="-2" y="199" width="167" height="26"/>
+                                    <rect key="frame" x="-2" y="189" width="167" height="26"/>
                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" title="Media item name" id="6RM-x8-Y4y">
                                         <font key="font" textStyle="title1" name=".SFNS-Regular"/>
                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -91,7 +91,7 @@
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JzZ-K9-xaP">
-                                    <rect key="frame" x="0.0" y="178" width="580" height="16"/>
+                                    <rect key="frame" x="0.0" y="168" width="580" height="16"/>
                                     <subviews>
                                         <button horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="S5i-gd-zkt">
                                             <rect key="frame" x="0.0" y="0.0" width="196" height="16"/>
@@ -149,7 +149,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QuO-3G-BMT">
-                                    <rect key="frame" x="-2" y="157" width="196" height="16"/>
+                                    <rect key="frame" x="-2" y="147" width="196" height="16"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="16" id="8hg-2f-fip"/>
                                     </constraints>
@@ -160,10 +160,10 @@
                                     </textFieldCell>
                                 </textField>
                                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fiJ-9f-ecF">
-                                    <rect key="frame" x="0.0" y="0.0" width="580" height="152"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="580" height="142"/>
                                     <subviews>
                                         <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fRH-zv-BlF">
-                                            <rect key="frame" x="0.0" y="10" width="79" height="142"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="79" height="142"/>
                                             <subviews>
                                                 <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="jeT-l1-TZw">
                                                     <rect key="frame" x="-2" y="126" width="83" height="16"/>
@@ -379,7 +379,6 @@
                                         <constraint firstItem="uhm-9P-6qk" firstAttribute="bottom" secondItem="HyO-9K-R7L" secondAttribute="bottom" id="0vs-gO-P5e"/>
                                         <constraint firstItem="nte-55-oZ5" firstAttribute="top" secondItem="fiJ-9f-ecF" secondAttribute="top" id="2qN-VG-JuO"/>
                                         <constraint firstItem="uhm-9P-6qk" firstAttribute="top" secondItem="HyO-9K-R7L" secondAttribute="top" id="3dP-TU-v2E"/>
-                                        <constraint firstAttribute="bottom" secondItem="gGl-6E-i7b" secondAttribute="bottom" constant="10" id="9aS-TQ-TNF"/>
                                         <constraint firstItem="hEf-79-49a" firstAttribute="bottom" secondItem="7gY-3s-Kay" secondAttribute="bottom" id="Bvn-kU-xuu"/>
                                         <constraint firstItem="jeT-l1-TZw" firstAttribute="top" secondItem="lYc-WP-hlc" secondAttribute="top" id="Ffu-Mn-19g"/>
                                         <constraint firstItem="O20-fr-lHb" firstAttribute="bottom" secondItem="2wD-n8-ITx" secondAttribute="bottom" id="G7j-y4-CwL"/>
@@ -430,7 +429,7 @@
                     </subviews>
                     <constraints>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="top" secondItem="FWp-yd-2Pm" secondAttribute="top" id="7hM-jR-3N3"/>
-                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" constant="10" id="bdR-rj-nKk"/>
+                        <constraint firstAttribute="bottom" secondItem="TOx-1e-6D9" secondAttribute="bottom" id="bdR-rj-nKk"/>
                         <constraint firstAttribute="bottom" secondItem="bw7-QB-Ssc" secondAttribute="bottom" id="elF-5e-5LQ"/>
                         <constraint firstAttribute="trailing" secondItem="bw7-QB-Ssc" secondAttribute="trailing" id="uvg-NE-l4m"/>
                         <constraint firstItem="TOx-1e-6D9" firstAttribute="leading" secondItem="FWp-yd-2Pm" secondAttribute="leading" id="vAN-Ww-VKA"/>
@@ -449,7 +448,7 @@
             <constraints>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="leading" secondItem="HAc-or-XD8" secondAttribute="leading" constant="10" id="D62-3E-aDO"/>
                 <constraint firstItem="FWp-yd-2Pm" firstAttribute="top" secondItem="HAc-or-XD8" secondAttribute="top" constant="30" id="Mr1-w0-CQK"/>
-                <constraint firstAttribute="bottom" secondItem="FWp-yd-2Pm" secondAttribute="bottom" id="bUH-jE-TQQ"/>
+                <constraint firstAttribute="bottom" secondItem="FWp-yd-2Pm" secondAttribute="bottom" constant="10" id="bUH-jE-TQQ"/>
                 <constraint firstAttribute="trailing" secondItem="FWp-yd-2Pm" secondAttribute="trailing" constant="10" id="cPm-6m-umY"/>
             </constraints>
             <connections>
