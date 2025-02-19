@@ -223,6 +223,14 @@ public:
     ssize_t maximumCount() const;
 
     /**
+     * @return underlying list size
+     * COUNT_UNINITIALIZED is returned if the list isn't initialized
+     *
+     * This may be usefull to know loaded size
+     */
+    ssize_t loadedCount() const;
+
+    /**
      * Init the list size
      *
      * This method must be called at most once (the list size is not expected

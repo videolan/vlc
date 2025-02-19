@@ -635,4 +635,11 @@ void ListCache<T>::asyncFetchMore()
         });
 }
 
+
+template<typename T>
+inline ssize_t ListCache<T>::loadedCount() const
+{
+    return m_cachedData ? m_cachedData->loadedCount : COUNT_UNINITIALIZED;
+}
+
 #endif /* LISTCACHE_HXX */

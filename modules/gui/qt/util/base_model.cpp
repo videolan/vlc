@@ -196,6 +196,12 @@ unsigned int BaseModel::getCount() const
     return d->getCount();
 }
 
+unsigned int BaseModel::getLoadedCount() const
+{
+    Q_D(const BaseModel);
+    return d->getLoadedCount();
+}
+
 unsigned int BaseModel::getMaximumCount() const
 {
     Q_D(const BaseModel);

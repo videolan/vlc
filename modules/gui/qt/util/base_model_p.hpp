@@ -36,6 +36,8 @@ public:
     virtual void resetCache() = 0;
     virtual void invalidateCache() = 0;
     virtual bool loading() const = 0;
+
+    virtual unsigned int getLoadedCount() const = 0;
     virtual unsigned int getCount() const = 0;
     virtual unsigned int getMaximumCount() const = 0;
 
@@ -134,6 +136,7 @@ public:
     const T* item(int signedidx) const;
 
     unsigned int getCount() const override;
+    unsigned int getLoadedCount() const override;
     unsigned int getMaximumCount() const override;
 
     virtual std::unique_ptr<ListCacheLoader<T>> createLoader() const = 0;
@@ -154,6 +157,19 @@ unsigned BaseModelPrivateT<T>::getCount() const
         return 0;
 
     return static_cast<unsigned>(queryCount);
+}
+
+template<typename T>
+unsigned BaseModelPrivateT<T>::getLoadedCount() const
+{
+    if (!m_cache)
+        return 0;
+
+    ssize_t loadedCount = m_cache->loadedCount();
+    if (loadedCount == ListCache<T>::COUNT_UNINITIALIZED)
+        return 0;
+
+    return static_cast<unsigned>(loadedCount);
 }
 
 template<typename T>

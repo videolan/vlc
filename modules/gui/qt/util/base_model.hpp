@@ -76,6 +76,7 @@ public:
     void setOffset(unsigned int offset);
 
     unsigned int getCount() const;
+    unsigned int getLoadedCount() const;
     unsigned int getMaximumCount() const;
 
     virtual bool loading() const;
