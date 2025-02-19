@@ -148,6 +148,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
         self.mediaItemLastPlayedTextField.stringValue = lastPlayedString;
     }
 
+    NSString * const summary = actualItem.movie != nil
+        ? actualItem.movie.summary : actualItem.showEpisode != nil
+            ? actualItem.showEpisode.summary : @"";
+    self.mediaItemSummaryStackView.hidden = summary == nil || [summary isEqualToString:@""];
+    self.mediaItemSummarySeparator.hidden = self.mediaItemSummaryStackView.hidden;
+    self.mediaItemSummaryTextField.stringValue = summary;
+
     VLCInputItem * const inputItem = actualItem.inputItem;
 
     NSString * const copyright = inputItem.copyright;
