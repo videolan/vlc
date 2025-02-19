@@ -129,7 +129,7 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     const double proportionOfMaxRating = 100 / ratingControlMax;
     self.mediaItemRatingIndicator.doubleValue = (double)actualItem.rating / proportionOfMaxRating;
 
-    NSArray<NSString *> * const mediaItemLabels = self.representedItem.item.labels;
+    NSArray<NSString *> * const mediaItemLabels = actualItem.labels;
     self.mediaItemLabelsTextField.hidden = mediaItemLabels.count == 0;
     self.mediaItemLabelsTitleTextField.hidden = self.mediaItemLabelsTextField.hidden;
     if (!self.mediaItemLabelsTextField.hidden) {
