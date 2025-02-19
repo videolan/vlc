@@ -68,21 +68,24 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     }
 
     const VLCMediaLibraryMediaItem * const actualItem = self.representedItem.item;
+    NSMutableArray<NSString *> * const strings = NSMutableArray.array;
 
     if (actualItem.year > 0) {
-        return [NSString stringWithFormat:@"%u · %@", actualItem.year, actualItem.durationString];
+        [strings addObject:[NSString stringWithFormat:@"%u", actualItem.year]];
     } else if (actualItem.files.count > 0) {
         VLCMediaLibraryFile * const firstFile = actualItem.files.firstObject;
         const time_t fileLastModTime = firstFile.lastModificationDate;
 
         if (fileLastModTime > 0) {
             NSDate * const lastModDate = [NSDate dateWithTimeIntervalSince1970:fileLastModTime];
-            NSDateComponents * const components = [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:lastModDate];
-            return [NSString stringWithFormat:@"%ld · %@", components.year, actualItem.durationString];
+            NSDateComponents * const components =
+                [[NSCalendar currentCalendar] components:NSCalendarUnitYear fromDate:lastModDate];
+            [strings addObject:[NSString stringWithFormat:@"%ld", components.year]];
         }
     }
 
-    return actualItem.durationString;
+    [strings addObjectsFromArray:@[actualItem.durationString]];
+    return [strings componentsJoinedByString:@" · "];
 }
 
 - (void)updateRepresentation
