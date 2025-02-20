@@ -86,6 +86,8 @@ public:
      */
     Q_INVOKABLE QJSValue getIndexFromId(MLItemId id);
 
+    void getIndexFromId2(MLItemId id, std::function<void(std::optional<int> index)> cb);
+
 public:
     // properties functions
 

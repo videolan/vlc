@@ -98,16 +98,15 @@ public:
     }
 
     //this will load data until id is in the cache, then returns its position
-    void getIndexFromIdImpl(MLItemId id, QJSValue resolve, QJSValue reject) const
+    void getIndexFromIdImpl(MLItemId id, std::function<void (std::optional<int> index)> cb) const
     {
         Q_Q(const MLBaseModel);
 
-        auto jsEngine = qjsEngine(q);
         int index;
         MLItem* item = q->findInCache(id, &index);
 
         if (item) {
-            resolve.call({index});
+            cb(index);
         }
         else
         {
@@ -116,13 +115,13 @@ public:
             int limit = q->getLimit();
             //item doesn't exists
             if ((limit != 0 && count >= limit) || loaded == getMaximumCount()) {
-                reject.call(); //not present
+                cb(std::nullopt);
             }
             else
             {
                 //load data until we have our item in cache
-                QObject::connect(q, &MLBaseModel::dataChanged, q, [this, id, resolve = resolve, reject = reject](){
-                    getIndexFromIdImpl(id, resolve, reject);
+                QObject::connect(q, &MLBaseModel::dataChanged, q, [this, id, cb](){
+                    getIndexFromIdImpl(id, cb);
                 }, Qt::SingleShotConnection);
 
                 if (m_cache)
@@ -307,8 +306,23 @@ Q_INVOKABLE QJSValue MLBaseModel::getIndexFromId(MLItemId id)
     Q_D(const MLBaseModel);
 
     auto [p, resolve, reject] = d->makeJSPromise();
-    d->getIndexFromIdImpl(id, resolve, reject);
+    auto cb = [resolve = resolve, reject = reject](std::optional<int> index)
+    {
+        if (index.has_value())
+            resolve.call({*index});
+        else
+            reject.call(); //not present
+    };
+
+    getIndexFromId2(id, cb);
     return p;
+}
+
+void MLBaseModel::getIndexFromId2(MLItemId id, std::function<void (std::optional<int>)> cb)
+{
+    Q_D(const MLBaseModel);
+
+    d->getIndexFromIdImpl(id, cb);
 }
 
 QVariant MLBaseModel::data(const QModelIndex &index, int role) const
