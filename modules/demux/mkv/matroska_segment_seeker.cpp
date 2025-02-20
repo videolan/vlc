@@ -486,11 +486,16 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
     while( ms.cluster == NULL || (
           ms.cluster->IsFiniteSize() && ms.cluster->GetEndPosition() < fpos ) )
     {
-        if( !( ms.cluster = static_cast<KaxCluster*>( ms.ep.Get() ) ) )
+        EbmlElement *el = ms.ep.Get();
+        if( el == nullptr )
         {
             msg_Err( &ms.sys.demuxer, "unable to read KaxCluster during seek, giving up" );
             return;
         }
+        if (!MKV_IS_ID( el, KaxCluster ))
+        continue; // look for the next element
+
+        ms.cluster = static_cast<KaxCluster*>( el );
 
         i_cluster_pos = ms.cluster->GetElementPosition();
 
