@@ -581,17 +581,24 @@ InitShaderExtensions(struct vlc_gl_sampler *sampler, GLenum tex_target)
     const char *ext_yuv_target =
         "#extension GL_EXT_YUV_target : require\n";
 
+    const char *image_ext = "";
     if (tex_target == GL_TEXTURE_EXTERNAL_OES)
     {
         if (is_yuv)
-            sampler->shader.extensions = strdup(ext_yuv_target);
+            image_ext = ext_yuv_target;
         else
-            sampler->shader.extensions = strdup(image_external);
-        if (!sampler->shader.extensions)
-            return VLC_EGENERIC;
+            image_ext = image_external;
     }
-    else
-        sampler->shader.extensions = NULL;
+
+    int ret = asprintf(&sampler->shader.extensions,
+        "#extension GL_OES_texture_3D : enable\n"
+        "%s", image_ext);
+    if (ret <= 0)
+    {
+        if (ret == 0)
+            FREENULL(sampler->shader.extensions);
+        return VLC_EGENERIC;
+    }
 
     return VLC_SUCCESS;
 }
@@ -1056,16 +1063,14 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
 
     int glsl_version;
     if (api->is_gles) {
-#define GLES_COMMON_PRECISION \
-            "precision highp float;\n" \
-            "precision highp sampler2D;\n" \
-            "precision highp sampler3D;\n"
 
-        if (priv->unsigned_sampler)
-            sampler->shader.precision = GLES_COMMON_PRECISION
-                "precision highp usampler2D;\n";
-        else
-            sampler->shader.precision = GLES_COMMON_PRECISION;
+        if (asprintf(&sampler->shader.precision,
+            "precision highp float;\n"
+            "precision highp sampler2D;\n"
+            "%s%s",
+            api->supports_sampler3D ? "precision highp sampler3D;\n" : "",
+            priv->unsigned_sampler ? "precision highp usampler2D;\n" : "" ) <= 0 )
+            goto error;
 
         if (api->glsl_version >= 300) {
             sampler->shader.version = strdup("#version 300 es\n");
@@ -1074,8 +1079,12 @@ vlc_gl_sampler_New(struct vlc_gl_t *gl, const struct vlc_gl_api *api,
             sampler->shader.version = strdup("#version 100\n");
             glsl_version = 100;
         }
+        if (!sampler->shader.version)
+            goto error;
     } else {
-        sampler->shader.precision = "";
+        sampler->shader.precision = strdup("// no precision\n");
+        if (!sampler->shader.precision)
+            goto error;
         /* GLSL version 420+ breaks backwards compatibility with pre-GLSL 130
          * syntax, which we use in our vertex/fragment shaders. */
         glsl_version = __MIN(api->glsl_version, 410);
@@ -1160,6 +1169,7 @@ vlc_gl_sampler_Delete(struct vlc_gl_sampler *sampler)
     pl_log_destroy(&priv->pl_log);
 #endif
 
+    free(sampler->shader.precision);
     free(sampler->shader.extensions);
     free(sampler->shader.body);
     free(sampler->shader.version);

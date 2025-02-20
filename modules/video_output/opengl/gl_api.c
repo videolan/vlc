@@ -202,5 +202,15 @@ vlc_gl_api_Init(struct vlc_gl_api *api, vlc_gl_t *gl)
             api->glsl_version = 120;
     }
 
+    if (api->is_gles)
+    {
+        if (api->glsl_version < 300)
+            api->supports_sampler3D = vlc_gl_HasExtension(&extension_vt, "GL_OES_texture_3D");
+        else
+            api->supports_sampler3D = true;
+    }
+    else
+        api->supports_sampler3D = false;
+
     return VLC_SUCCESS;
 }

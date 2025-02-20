@@ -46,6 +46,9 @@ struct vlc_gl_api {
 
     /* Multisampling for anti-aliasing */
     bool supports_multisample;
+
+    /* sampler3D feature and syntax support */
+    bool supports_sampler3D;
 };
 
 int

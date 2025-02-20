@@ -97,7 +97,7 @@ struct vlc_gl_sampler {
         /**
          * Precision preamble that is appropriate for this shader.
          */
-        const char *precision;
+        char *precision;
 
         /**
          * Piece of fragment shader code declaration OpenGL extensions.
