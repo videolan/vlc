@@ -167,6 +167,47 @@ private slots:
         m_model->appendRange(1, 1000);
         QTRY_COMPARE_WITH_TIMEOUT(m_model->getCount(), 1000u, 100);
     }
+
+
+    void testGetIndexFromID()
+    {
+        const int low = 1;
+        const int high = 300;
+        m_model->appendRange(low, high);
+
+        const int timeout = 1000;
+
+        // let loading complete, getIndexFromID won't work for 'loading' model
+        QVERIFY(QTest::qWaitFor([this] () { return !m_model->loading(); }, timeout));
+
+        std::optional<int> row = -1;
+        auto cb = [&row](std::optional<int> index)
+        {
+            row = index;
+        };
+
+        // bug of MR6926, here model tries to get index for data outside the initial chunk size
+        m_model->getIndexFromId2(MLItemId{high, VLC_ML_PARENT_UNKNOWN}, cb);
+
+        // NOTE: CI fails with QTRY_COMPARE_WITH_TIMEOUT
+        QVERIFY(QTest::qWaitFor([&row]() { return row != -1; }, timeout));
+        QCOMPARE(row, high - 1);
+
+        // above we must have loaded all the data, following this we should not need to wait for results
+        m_model->getIndexFromId2(MLItemId{low - 1, VLC_ML_PARENT_UNKNOWN}, cb);
+        QCOMPARE(row, std::nullopt);
+
+        m_model->getIndexFromId2(MLItemId{low, VLC_ML_PARENT_UNKNOWN}, cb);
+        QCOMPARE(row, low - 1);
+
+        m_model->getIndexFromId2(MLItemId{high + 1, VLC_ML_PARENT_UNKNOWN}, cb);
+        QCOMPARE(row, std::nullopt);
+
+        const int mid = (low + high) / 2;
+        m_model->getIndexFromId2(MLItemId{mid, VLC_ML_PARENT_UNKNOWN}, cb);
+        QCOMPARE(row, mid - 1);
+    }
+
 private:
     std::unique_ptr<VLCTestingEnv> m_env;
     std::unique_ptr<MediaLib> m_medialib;
