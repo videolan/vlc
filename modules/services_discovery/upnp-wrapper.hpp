@@ -115,6 +115,8 @@ inline const char* xml_getChildElementValue( IXML_Element* p_parent,
 
 #ifdef _WIN32
 
+#include <iphlpapi.h> // IP_ADAPTER_ADDRESSES, IP_ADAPTER_MULTICAST_ADDRESS, etc
+
 inline IP_ADAPTER_MULTICAST_ADDRESS* getMulticastAddress(IP_ADAPTER_ADDRESSES* p_adapter)
 {
     const unsigned long i_broadcast_ip = inet_addr("239.255.255.250");
