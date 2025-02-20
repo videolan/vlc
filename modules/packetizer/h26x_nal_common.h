@@ -20,6 +20,7 @@
 #ifndef H26X_NAL_COMMON_H
 # define H26X_NAL_COMMON_H
 
+#include <assert.h>
 #include <vlc_common.h>
 #include "iso_color_tables.h"
 
@@ -54,6 +55,12 @@ bool h26x_get_picture_size( nal_u2_t chroma_format_idc,
     unsigned ox, oy, w, h, vw, vh;
     w = vw = pic_width_in_luma_samples;
     h = vh = pic_height_in_luma_samples;
+
+    if( chroma_format_idc > 3 )
+    {
+        assert( chroma_format_idc <= 3 );
+        return false;
+    }
 
     static const uint8_t SubWidthHeight[4][2] = { {1, 1}, {2, 2}, {2, 1}, {1, 1} };
 
