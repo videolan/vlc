@@ -1813,10 +1813,11 @@ static void * spu_PrerenderThread(void *priv)
 
         subpicture_t *p_subpic = sys->prerender.p_processed;
 
-        spu_UpdateOriginalSize(spu, p_subpic, &fmtsrc);
 
         subpicture_Update(p_subpic, &fmtsrc, &fmtdst,
                           p_subpic->b_subtitle ? p_subpic->i_start : vlc_tick_now());
+
+        spu_UpdateOriginalSize(spu, p_subpic, &fmtsrc);
 
         spu_PrerenderText(spu, p_subpic, chroma_list);
 
