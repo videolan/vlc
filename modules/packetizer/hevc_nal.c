@@ -771,6 +771,8 @@ static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     p_sps->chroma_format_idc = bs_read_ue( p_bs );
     if( p_sps->chroma_format_idc == 3 )
         p_sps->separate_colour_plane_flag = bs_read1( p_bs );
+    else if ( p_sps->chroma_format_idc > 3 )
+        return false;
     p_sps->pic_width_in_luma_samples = bs_read_ue( p_bs );
     p_sps->pic_height_in_luma_samples = bs_read_ue( p_bs );
     if( !p_sps->pic_width_in_luma_samples || !p_sps->pic_height_in_luma_samples )
