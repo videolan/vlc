@@ -63,7 +63,13 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
     /* verify we can read this Segment */
     try
     {
-        p_l0->Read( p_stream1->estream, EBML_CLASS_CONTEXT(EbmlHead), i_upper_lvl, p_l0, true);
+        EbmlElement *el = nullptr;
+        p_l0->Read( p_stream1->estream, EBML_CLASS_CONTEXT(EbmlHead), i_upper_lvl, el, true);
+        if (i_upper_lvl != 0)
+        {
+            assert(el != nullptr);
+            delete el;
+        }
     }
     catch(...)
     {
