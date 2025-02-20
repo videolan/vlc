@@ -83,6 +83,10 @@ protected:
         std::vector<std::unique_ptr<MLItem>> load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const override
         {
             VLC_UNUSED(ml);
+
+            if (m_mlTestModel.m_items.empty())
+                return {};
+
             uint32_t offset = queryParams->i_offset;
             uint32_t count = queryParams->i_nbResults;
             size_t maxIndex = std::min(
