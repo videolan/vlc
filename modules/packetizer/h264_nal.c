@@ -303,6 +303,8 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
     {
         /* chroma_format_idc */
         p_sps->i_chroma_idc = bs_read_ue( p_bs );
+        if( p_sps->i_chroma_idc > 3 )
+            return false;
         if( p_sps->i_chroma_idc == 3 )
             p_sps->b_separate_colour_planes_flag = bs_read1( p_bs );
         else
