@@ -329,7 +329,7 @@ selector:
     | selector_with_trailing_whitespace simple_selector
     {
         $$ = $1;
-        if ($$)
+        if ($$ && $2)
         {
             vlc_css_selector_AddSpecifier( $$, $2 );
             $2->combinator = RELATION_DESCENDENT;
@@ -338,7 +338,7 @@ selector:
     }
     | selector combinator simple_selector {
         $$ = $1;
-        if ($$)
+        if ($$ && $3)
         {
             vlc_css_selector_AddSpecifier( $$, $3 );
             $3->combinator = $2;
@@ -437,7 +437,7 @@ attrib:
     }
     | '[' maybe_space attr_name match maybe_space ident_or_string maybe_space ']' {
         $$ = vlc_css_selector_New( SPECIFIER_ATTRIB, $3 );
-        if( $$ )
+        if( $$ && $$ )
         {
             $$->match = $4;
             $$->p_matchsel = vlc_css_selector_New( SPECIFIER_ID, $6 );
