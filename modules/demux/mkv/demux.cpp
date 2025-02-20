@@ -74,6 +74,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
     catch(...)
     {
         msg_Err(p_demux, "EBML Header Read failed");
+        delete p_l0;
         return false;
     }
 
