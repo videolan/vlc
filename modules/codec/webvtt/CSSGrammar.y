@@ -577,11 +577,15 @@ decl_list:
 
 declaration:
     property ':' maybe_space expr prio {
-        $$ = vlc_css_declaration_New( $1 );
-        if( $$ )
-            $$->expr = $4;
-        else
-            vlc_css_expression_Delete( $4 );
+        if( $4 )
+        {
+            $$ = vlc_css_declaration_New( $1 );
+            if( $$ )
+                $$->expr = $4;
+            else
+                vlc_css_expression_Delete( $4 );
+        }
+        else $$ = NULL;
         free( $1 );
     }
     |
