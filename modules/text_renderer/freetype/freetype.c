@@ -1148,6 +1148,7 @@ static subpicture_region_t *Render( filter_t *p_filter,
         region->i_alpha = p_region_in->i_alpha;
         region->i_align = p_region_in->i_align;
         region->b_absolute = p_region_in->b_absolute;
+        region->b_in_window = p_region_in->b_in_window;
         break;
     }
 

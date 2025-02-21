@@ -178,7 +178,7 @@ static void SubpictureUpdate(subpicture_t *p_subpic,
         if (!region)
             break;
 
-        region->b_absolute = true;
+        region->b_absolute = true; region->b_in_window = false;
         region->i_x = image->dst_x;
         region->i_y = image->dst_y;
         region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;

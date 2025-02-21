@@ -738,7 +738,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     vlc_spu_regions_push( &p_spu->regions, p_region );
 
     /* Normal text subs, easy markup */
-    p_region->b_absolute = false;
+    p_region->b_absolute = false; p_region->b_in_window = false;
     p_region->i_align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
     p_region->i_x = p_sys->i_align ? 20 : 0;
     p_region->i_y = 10;

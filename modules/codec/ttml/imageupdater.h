@@ -95,7 +95,7 @@ static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
         if (unlikely(r == NULL))
             return;
 
-        r->b_absolute = true;
+        r->b_absolute = true; r->b_in_window = false;
         r->i_align = SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_TOP;
 
         if( p_updtregion->i_flags & ORIGIN_X_IS_RATIO )

@@ -1421,7 +1421,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             }
             region_FixFmt(region);
 
-            const bool subpic_in_video = !spu_in_full_window;
+            const bool subpic_in_video = !spu_in_full_window ||
+                                         !region->b_in_window;
             unsigned output_width, output_height;
             unsigned output_x, output_y;
             if (subpic_in_video) {
@@ -1479,7 +1480,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 cached_is_absolute = region->b_absolute;
                 cached_alignment = region->i_align;
                 region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
-                region->b_absolute = true;
+                region->b_absolute = true; region->b_in_window = false;
             }
 
             /* */

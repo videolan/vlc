@@ -1167,7 +1167,7 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
         /* broken legacy align var (can't handle center...). Will change only regions content. */
         if( p_dec_sys->i_align & SUBPICTURE_ALIGN_MASK )
             p_spu_sys->region.inner_align = p_dec_sys->i_align;
-        p_updtregion->b_absolute = true;
+        p_updtregion->b_absolute = true; p_updtregion->b_in_window = false;
 
         p_spu_sys->margin_ratio = 0.0;
 

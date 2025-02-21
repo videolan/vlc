@@ -479,7 +479,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             }
         }
 
-        p_spu_sys->region.b_absolute = false;
+        p_spu_sys->region.b_absolute = false; p_spu_sys->region.b_in_window = false;
         p_spu_sys->region.inner_align = i_align;
         p_spu_sys->region.flags = UPDT_REGION_IGNORE_BACKGROUND;
 
@@ -578,12 +578,12 @@ static subpicture_t *Subpicture( decoder_t *p_dec,
     if ( b_text )
     {
         p_spu->i_stop = i_pts + VLC_TICK_FROM_SEC(10);
-        p_region->b_absolute = false;
+        p_region->b_absolute = false; p_region->b_in_window = false;
     }
     else
     {
         p_spu->i_stop = VLC_TICK_INVALID;
-        p_region->b_absolute = true;
+        p_region->b_absolute = true; p_region->b_in_window = false;
         p_region->i_align = i_align;
         // bottom center based on "vbi-position"
         p_region->i_x = 0;

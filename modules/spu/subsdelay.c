@@ -138,6 +138,8 @@ struct subsdelay_heap_entry_t
 
     bool b_last_region_absolute;
 
+    bool b_last_region_in_window;
+
     bool b_last_region_saved;
 };
 
@@ -705,6 +707,7 @@ static subsdelay_heap_entry_t * SubsdelayEntryCreate( subpicture_t *p_source, fi
     p_entry->i_last_region_y = 0;
     p_entry->i_last_region_align = 0;
     p_entry->b_last_region_absolute = false;
+    p_entry->b_last_region_in_window = false;
 
     return p_entry;
 }
@@ -938,6 +941,7 @@ static void SubpicUpdateWrapper( subpicture_t *p_subpic,
         p_entry->i_last_region_y = p_region->i_y;
         p_entry->i_last_region_align = p_region->i_align;
         p_entry->b_last_region_absolute = p_region->b_absolute;
+        p_entry->b_last_region_in_window = p_region->b_in_window;
 
         p_entry->b_last_region_saved = true;
     }
@@ -1048,7 +1052,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
     {
         if( p_region )
         {
-            p_region->b_absolute = false;
+            p_region->b_absolute = false; p_region->b_in_window = false;
             p_region->i_x = 0;
             p_region->i_y = 10;
             p_region->i_align = ( p_region->i_align & ( ~SUBPICTURE_ALIGN_MASK ) )
@@ -1062,6 +1066,7 @@ static void SubpicLocalUpdate( subpicture_t* p_subpic, vlc_tick_t i_ts )
         if( p_region )
         {
             p_region->b_absolute = p_entry->b_last_region_absolute;
+            p_region->b_in_window = p_entry->b_last_region_in_window;
             p_region->i_x = p_entry->i_last_region_x;
             p_region->i_y = p_entry->i_last_region_y;
             p_region->i_align = p_entry->i_last_region_align;

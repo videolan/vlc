@@ -160,7 +160,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
         return NULL;
     }
 
-    p_region->b_absolute = true;
+    p_region->b_absolute = true; p_region->b_in_window = false;
     p_region->fmt.i_sar_num =
     p_region->fmt.i_sar_den = 0;
 
@@ -256,7 +256,7 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     p_region->region.i_alpha = 0xff;
     p_region->region.i_x = INT_MAX;
     p_region->region.i_y = INT_MAX;
-    p_region->region.b_absolute = false;
+    p_region->region.b_absolute = false; p_region->region.b_in_window = false;
 
     return &p_region->region;
 }

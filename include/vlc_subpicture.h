@@ -72,6 +72,7 @@ struct subpicture_region_t
     picture_t       *p_picture;          /**< picture comprising this region */
 
     bool            b_absolute;       /**< position is absolute in the movie */
+    bool            b_in_window;          /**< position the region in window */
     int             i_x;      /**< position of region, relative to alignment */
     int             i_y;      /**< position of region, relative to alignment */
     int             i_align;       /**< alignment flags SUBPICTURE_ALIGN_xxx */

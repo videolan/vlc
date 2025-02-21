@@ -344,6 +344,7 @@ static void FillSubpictureUpdater(stl_sg_t *p_group, subtext_updater_sys_t *p_sp
     }
 
     p_spu_sys->region.b_absolute = false;
+    p_spu_sys->region.b_in_window = false;
     p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
     if(p_group->i_justify == 0x01)
         p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_LEFT;

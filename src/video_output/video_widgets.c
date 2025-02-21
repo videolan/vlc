@@ -281,7 +281,7 @@ static void OSDWidgetUpdate(subpicture_t *subpic,
         p_region = OSDIcon(sys->type, &fmt);
     if (p_region)
     {
-        p_region->b_absolute = true;
+        p_region->b_absolute = true; p_region->b_in_window = false;
         vlc_spu_regions_push(&subpic->regions, p_region);
     }
 }

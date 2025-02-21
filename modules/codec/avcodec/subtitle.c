@@ -285,7 +285,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
     if (!region)
         return NULL;
 
-    region->b_absolute = true; /* We have offset and size for subtitle */
+    region->b_absolute = true; region->b_in_window = false; /* We have offset and size for subtitle */
     region->i_x = ffregion->x;
     region->i_y = ffregion->y;
     region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;

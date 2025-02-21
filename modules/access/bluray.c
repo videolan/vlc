@@ -1615,7 +1615,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
         if (p_dst == NULL)
             break;
 
-        p_dst->b_absolute = true;
+        p_dst->b_absolute = true; p_dst->b_in_window = false;
         p_dst->i_x      = p_src->i_x;
         p_dst->i_y      = p_src->i_y;
         // fields not modified on the source

@@ -656,7 +656,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
             return NULL;
         }
 
-        p_region->b_absolute = false;
+        p_region->b_absolute = false; p_region->b_in_window = false;
         if( p_es->i_x >= 0 && p_es->i_y >= 0 )
         {
             p_region->i_x = p_es->i_x;

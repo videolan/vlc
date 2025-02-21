@@ -248,7 +248,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
         subtext_updater_sys_t *p_spusys = p_sub->updater.sys;
         textst_FillRegions(p_dec, &p_block->p_buffer[13], p_block->i_buffer - 13,
                            &p_spusys->region);
-        p_spusys->region.b_absolute = false;
+        p_spusys->region.b_absolute = false; p_spusys->region.b_in_window = false;
 
         decoder_QueueSub(p_dec, p_sub);
     }

@@ -48,7 +48,8 @@ struct substext_updater_region_t
     /* store above percentile meanings as modifier flags */
     int flags; /* subpicture_updater_sys_region_flags_e */
     int align; /* alignment of the region itself */
-    bool b_absolute; /* position absolute to the video coordinates */
+    bool b_absolute;  /**< position is absolute in the movie */
+    bool b_in_window; /**< position the region in whole window */
     int inner_align; /* alignment of content inside the region */
     text_style_t *p_region_style;
     text_segment_t *p_segments;
@@ -78,7 +79,8 @@ static inline void SubpictureUpdaterSysRegionInit(substext_updater_region_t *p_u
     memset(p_updtregion, 0, sizeof(*p_updtregion));
     p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
     p_updtregion->b_absolute = false;
-    p_updtregion->inner_align = 0;
+    p_updtregion->b_in_window = false;
+    p_updtregion->inner_align = 0 ; // centered
 }
 
 static inline substext_updater_region_t *SubpictureUpdaterSysRegionNew( void )
@@ -168,6 +170,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
         r->p_text = text_segment_Copy( update_region->p_segments );
         r->b_absolute = update_region->b_absolute;
+        r->b_in_window = update_region->b_in_window;
         r->i_align = update_region->align;
         r->text_flags |= update_region->inner_align & SUBPICTURE_ALIGN_MASK;
         if (update_region->flags & UPDT_REGION_IGNORE_BACKGROUND)
@@ -319,7 +322,7 @@ static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
         text_style_Delete(sys->p_default_style);
         free(sys);
     }
-    sys->region.b_absolute = true;
+    sys->region.b_absolute = true; sys->region.b_in_window = false;
     sys->i_next_update = VLC_TICK_INVALID;
     return subpic;
 }

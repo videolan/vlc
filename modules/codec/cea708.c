@@ -1050,7 +1050,7 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
                              (CEA708_SCREEN_ROWS * CEA708_FONT_TO_LINE_HEIGHT_RATIO);
     }
     p_region->flags |= UPDT_REGION_ORIGIN_X_IS_RATIO|UPDT_REGION_ORIGIN_Y_IS_RATIO;
-    p_region->b_absolute = false;
+    p_region->b_absolute = false; p_region->b_in_window = false;
 
     if( p_w->i_firstrow <= p_w->i_lastrow )
     {

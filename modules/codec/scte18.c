@@ -195,7 +195,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 
             p_spu->b_ephemer  = true;
 
-            p_spu_sys->region.b_absolute = false;
+            p_spu_sys->region.b_absolute = false; p_spu_sys->region.b_in_window = false;
             p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_TOP;
             p_spu_sys->p_default_style->i_style_flags = STYLE_BOLD | STYLE_BACKGROUND;
             p_spu_sys->p_default_style->i_features |= STYLE_HAS_FLAGS;

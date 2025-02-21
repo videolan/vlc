@@ -1798,6 +1798,7 @@ static void RenderRegions( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_
             }
 
             p_updtregion->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
+            p_updtregion->b_in_window = false;
             p_updtregion->align = SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_LEFT;
             p_updtregion->inner_align = GetCueTextAlignment( (const webvtt_dom_cue_t *)p_vttregion->p_child );
             p_updtregion->origin.x = v.i_left;
@@ -1847,7 +1848,8 @@ static void RenderRegions( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_
                 continue;
             }
 
-            p_updtregion->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
+            /* can't be absolute as snap to lines can overlap ! */
+            p_updtregion->b_absolute = false; p_updtregion->b_in_window = false;
             if( p_cue->settings.line.b_auto )
             {
                 p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;

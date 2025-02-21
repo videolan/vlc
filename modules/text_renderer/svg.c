@@ -393,6 +393,8 @@ static subpicture_region_t *RenderText( filter_t *p_filter,
     p_region_out->i_y     = p_region_in->i_y;
     p_region_out->i_alpha = p_region_in->i_alpha;
     p_region_out->i_align = p_region_in->i_align;
+    p_region_out->b_absolute = p_region_in->b_absolute;
+    p_region_out->b_in_window= p_region_in->b_in_window;
 
     return p_region_out;
 }

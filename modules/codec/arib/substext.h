@@ -73,7 +73,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         r->fmt.i_sar_den = 1;
 
         r->p_text = text_segment_New( p_region->psz_text );
-        r->b_absolute = true;
+        r->b_absolute = true; r->b_in_window = false;
         r->i_align  = SUBPICTURE_ALIGN_LEFT | SUBPICTURE_ALIGN_TOP;
 
         if (p_region->i_planewidth > 0 && p_region->i_planeheight > 0)
