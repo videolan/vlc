@@ -784,6 +784,8 @@ static void ASF_fillup_es_bitrate_priorities_ex( demux_sys_t *p_sys, void *p_hdr
 static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    asf_es_priorities_t fmt_priorities_ex = { NULL, 0 };
+    asf_es_priorities_t fmt_priorities_bitrate_ex = { NULL, 0 };
 
     /* init context */
     p_sys->i_time   = VLC_TICK_INVALID;
@@ -855,8 +857,6 @@ static int DemuxInit( demux_t *p_demux )
                                               &asf_object_header_extension_guid, 0 );
 
     asf_object_language_list_t *p_languages = NULL;
-    asf_es_priorities_t fmt_priorities_ex = { NULL, 0 };
-    asf_es_priorities_t fmt_priorities_bitrate_ex = { NULL, 0 };
 
     if( p_hdr_ext )
     {
