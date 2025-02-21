@@ -284,8 +284,10 @@ Q_INVOKABLE QJSValue MLBaseModel::getDataById(MLItemId id)
 
         m_itemLoader->loadItemByIdTask(
             id,
-            [this, resolve=std::move(resolve), reject=std::move(reject)](size_t taksId, MLListCache::ItemType&& item)
+            [this, resolve=std::move(resolve), reject=std::move(reject)](size_t taskId, MLListCache::ItemType&& item)
             {
+                Q_UNUSED(taskId);
+
                 if (!item)
                 {
                     reject.call();
