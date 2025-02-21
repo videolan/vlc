@@ -606,7 +606,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     opaque,
                     ::std::ptr::null_mut(),
                     ::vlcrs_core::plugin::ModuleProperties::CONFIG_CREATE as _,
-                    ::vlcrs_core::plugin::ConfigModule::SUBCATEGORY as i64,
+                    ::vlcrs_core::plugin::ConfigModule::SUBCATEGORY as std::ffi::c_int,
                     &mut config as *mut *mut ::vlcrs_core::plugin::vlc_param,
                 )
             } != 0
@@ -618,7 +618,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                     opaque,
                     config as _,
                     ::vlcrs_core::plugin::ModuleProperties::CONFIG_VALUE as _,
-                    ::vlcrs_core::plugin::ConfigSubcategory::#category as i64,
+                    ::vlcrs_core::plugin::ConfigSubcategory::#category as std::ffi::c_int,
                 )
             } != 0
             {
@@ -665,7 +665,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                             opaque,
                             ::std::ptr::null_mut(),
                             ::vlcrs_core::plugin::ModuleProperties::CONFIG_CREATE as _,
-                            ::vlcrs_core::plugin::ConfigModule::SECTION as i64,
+                            ::vlcrs_core::plugin::ConfigModule::SECTION as std::ffi::c_int,
                             &mut config as *mut *mut ::vlcrs_core::plugin::vlc_param,
                         )
                     } != 0
@@ -763,7 +763,7 @@ fn generate_module_code(module_info: &ModuleInfo) -> TokenStream2 {
                         opaque,
                         ::std::ptr::null_mut(),
                         ::vlcrs_core::plugin::ModuleProperties::CONFIG_CREATE as _,
-                        #item_type as i64,
+                        #item_type as std::ffi::c_int,
                         &mut config as *mut *mut ::vlcrs_core::plugin::vlc_param,
                     )
                 } != 0
