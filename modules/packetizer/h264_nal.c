@@ -355,8 +355,9 @@ static bool h264_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
 
     /* Skip i_log2_max_frame_num */
     p_sps->i_log2_max_frame_num = bs_read_ue( p_bs );
-    if( p_sps->i_log2_max_frame_num > 12)
+    if( (uint_fast32_t) p_sps->i_log2_max_frame_num > 12)
         p_sps->i_log2_max_frame_num = 12;
+
     /* Read poc_type */
     p_sps->i_pic_order_cnt_type = bs_read_ue( p_bs );
     if( p_sps->i_pic_order_cnt_type == 0 )
