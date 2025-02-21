@@ -197,7 +197,7 @@ vlc_module_begin ()
     add_integer_with_range( CFG_PREFIX "width", 100, 0, UINT_MAX,
                  WIDTH_TEXT, WIDTH_LONGTEXT )
 
-    add_integer_with_range( CFG_PREFIX "align", 5, 0, 10,
+    add_integer_with_range( CFG_PREFIX "align", SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT, 0, 10,
                  ALIGN_TEXT, ALIGN_LONGTEXT)
         change_integer_list( pi_align_values, ppsz_align_descriptions )
 
@@ -326,8 +326,9 @@ static int CreateFilter( filter_t *p_filter )
     GET_VAR( position );
 #undef GET_VAR
 
-    if( p_sys->i_align == 3 || p_sys->i_align == 7 )
-        p_sys->i_align = 5;
+    if( p_sys->i_align == (SUBPICTURE_ALIGN_RIGHT|SUBPICTURE_ALIGN_LEFT) ||
+        p_sys->i_align == (SUBPICTURE_ALIGN_RIGHT|SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_TOP) )
+        p_sys->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
 
     i_command = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "delay" );
     p_sys->i_delay = VLC_TICK_FROM_MS( i_command );
@@ -772,8 +773,9 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
     {
         int i_old = 0, i_new = 0;
         vlc_mutex_lock( &p_sys->lock );
-        if( newval.i_int == 3 || newval.i_int == 7 )
-            newval.i_int = 5;
+        if( newval.i_int == (SUBPICTURE_ALIGN_RIGHT|SUBPICTURE_ALIGN_LEFT) ||
+            newval.i_int == (SUBPICTURE_ALIGN_RIGHT|SUBPICTURE_ALIGN_LEFT|SUBPICTURE_ALIGN_TOP) )
+            newval.i_int = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
         while( pi_align_values[i_old] != p_sys->i_align ) i_old++;
         while( pi_align_values[i_new] != newval.i_int ) i_new++;
         msg_Dbg( p_this, "changing alignment from %d (%s) to %d (%s)",
