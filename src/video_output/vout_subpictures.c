@@ -1330,27 +1330,6 @@ static void spu_UpdateOriginalSize(spu_t *spu, subpicture_t *subpic,
     }
 }
 
-static bool IsSubpicInVideo(const subpicture_t *subpic, bool spu_in_full_window)
-{
-    // no spu outside video allowed
-    if (!spu_in_full_window)
-        return true;
-
-    // only subtitle SPUs allowed outside video
-    if (!subpic->b_subtitle)
-        return true;
-
-    // absolute spu in video coordinates
-    const subpicture_region_t *p_region;
-    vlc_spu_regions_foreach_const(p_region, &subpic->regions)
-    {
-        if (p_region->b_absolute)
-            return true;
-    }
-
-    return false;
-}
-
 /**
  * This function renders all sub picture units in the list.
  */
@@ -1417,21 +1396,6 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
 
         const unsigned i_original_width = subpic->i_original_picture_width;
         const unsigned i_original_height = subpic->i_original_picture_height;
-        const bool subpic_in_video = IsSubpicInVideo(subpic, spu_in_full_window);
-
-        unsigned output_width, output_height;
-        unsigned output_x, output_y;
-        if (subpic_in_video) {
-            output_x      = video_position->x;
-            output_y      = video_position->y;
-            output_width  = video_position->width;
-            output_height = video_position->height;
-        } else {
-            output_x      = fmt_dst->i_x_offset;
-            output_y      = fmt_dst->i_y_offset;
-            output_width  = fmt_dst->i_visible_width;
-            output_height = fmt_dst->i_visible_height;
-        }
 
         /* Render all regions
          * We always transform non absolute subtitle into absolute one on the
@@ -1456,6 +1420,21 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 region = rendered_text;
             }
             region_FixFmt(region);
+
+            const bool subpic_in_video = !spu_in_full_window;
+            unsigned output_width, output_height;
+            unsigned output_x, output_y;
+            if (subpic_in_video) {
+                output_x      = video_position->x;
+                output_y      = video_position->y;
+                output_width  = video_position->width;
+                output_height = video_position->height;
+            } else {
+                output_x      = fmt_dst->i_x_offset;
+                output_y      = fmt_dst->i_y_offset;
+                output_width  = fmt_dst->i_visible_width;
+                output_height = fmt_dst->i_visible_height;
+            }
 
             /* Compute region scale AR */
             vlc_rational_t region_sar = (vlc_rational_t) {
@@ -1811,13 +1790,13 @@ static void * spu_PrerenderThread(void *priv)
         fmtsrc = sys->prerender.fmtsrc;
 
         unsigned display_width, display_height;
-        if (IsSubpicInVideo(sys->prerender.p_processed, sys->prerender.spu_in_full_window))
+        fmtdst.i_width  = fmtdst.i_visible_width  = sys->prerender.video_position.width;
+        fmtdst.i_height = fmtdst.i_visible_height = sys->prerender.video_position.height;
+        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        if (!sys->prerender.spu_in_full_window)
         {
             display_width  = sys->prerender.video_position.width;
             display_height = sys->prerender.video_position.height;
-            fmtdst.i_width  = fmtdst.i_visible_width  = display_width;
-            fmtdst.i_height = fmtdst.i_visible_height = display_height;
-            fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
         }
         else
         {
@@ -2331,13 +2310,13 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
 
         unsigned display_width, display_height;
         video_format_t fmtdst = *fmt_dst;
-        if (IsSubpicInVideo(subpic, spu_in_full_window))
+        fmtdst.i_width  = fmtdst.i_visible_width  = video_position->width;
+        fmtdst.i_height = fmtdst.i_visible_height = video_position->height;
+        fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        if (!spu_in_full_window)
         {
             display_width  = video_position->width;
             display_height = video_position->height;
-            fmtdst.i_width  = fmtdst.i_visible_width  = display_width;
-            fmtdst.i_height = fmtdst.i_visible_height = display_height;
-            fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
         }
         else
         {
