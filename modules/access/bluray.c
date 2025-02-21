@@ -1615,7 +1615,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
         if (p_dst == NULL)
             break;
 
-        p_dst->b_absolute = p_src->b_absolute;
+        p_dst->b_absolute = true;
         p_dst->i_x      = p_src->i_x;
         p_dst->i_y      = p_src->i_y;
         // fields not modified on the source
@@ -1872,7 +1872,6 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const eventov)
 
         p_reg = subpicture_region_New(&fmt);
         if (p_reg) {
-            p_reg->b_absolute = true;
             p_reg->i_x = eventov->x;
             p_reg->i_y = eventov->y;
             /* Append it to our list. */
@@ -1993,7 +1992,6 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
             vlc_mutex_unlock(&ov->lock);
             return;
         }
-        p_reg->b_absolute = true;
         p_reg->i_x = 0;
         p_reg->i_y = 0;
         vlc_spu_regions_push(&ov->regions, p_reg);
