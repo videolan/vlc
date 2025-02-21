@@ -65,6 +65,7 @@ enum
     ATTRIBUTE_X_PERCENT = (1 << 2),
     ATTRIBUTE_Y         = (1 << 3),
     ATTRIBUTE_Y_PERCENT = (1 << 4),
+    ATTRIBUTE_REL_WINDOW = (1 << 5),
 };
 
 typedef struct
@@ -325,8 +326,8 @@ static int ParsePositionAttributeList( char *psz_subtitle, int *i_align,
     char *psz_align    = GrabAttributeValue( "alignment", psz_subtitle );
     char *psz_margin_x = GrabAttributeValue( "horizontal-margin", psz_subtitle );
     char *psz_margin_y = GrabAttributeValue( "vertical-margin", psz_subtitle );
-    /* -- UNSUPPORTED
     char *psz_relative = GrabAttributeValue( "relative-to", psz_subtitle );
+    /* -- UNSUPPORTED
     char *psz_rotate_x = GrabAttributeValue( "rotate-x", psz_subtitle );
     char *psz_rotate_y = GrabAttributeValue( "rotate-y", psz_subtitle );
     char *psz_rotate_z = GrabAttributeValue( "rotate-z", psz_subtitle );
@@ -380,6 +381,13 @@ static int ParsePositionAttributeList( char *psz_subtitle, int *i_align,
 
         free( psz_margin_y );
     }
+    if( psz_relative )
+    {
+        if( !strcasecmp( "Window", psz_relative ) )
+            i_mask |= ATTRIBUTE_REL_WINDOW;
+
+        free( psz_relative );
+    }
     return i_mask;
 }
 
@@ -391,7 +399,11 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 
     i_mask = ParsePositionAttributeList( psz_subtitle, &i_align, &i_x, &i_y );
 
-    p_region->b_absolute = false; p_region->b_in_window = false;
+    p_region->b_absolute = false;
+    if( i_mask & ATTRIBUTE_REL_WINDOW )
+        p_region->b_in_window = true;
+    else
+        p_region->b_in_window = false;
     if( i_mask & ATTRIBUTE_ALIGNMENT )
         p_region->i_align = i_align;
 
