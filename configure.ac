@@ -494,6 +494,7 @@ AS_IF([test "${SYS}" = "mingw32"],[
 ])
 
 AM_CONDITIONAL([HAVE_FREEBSD], [test "${SYS}" = "freebsd"])
+AM_CONDITIONAL([HAVE_OPENBSD], [test "${SYS}" = "openbsd"])
 AM_CONDITIONAL([HAVE_LINUX],   [test "${SYS}" = "linux"])
 AM_CONDITIONAL([HAVE_ANDROID], [test "${VENDOR}" = "android"])
 AM_CONDITIONAL([HAVE_OS2],     [test "${SYS}" = "os2"])

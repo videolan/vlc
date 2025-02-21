@@ -492,6 +492,12 @@ libvlccore_la_SOURCES += \
 	freebsd/thread.c
 endif
 
+if HAVE_OPENBSD
+libvlccore_la_SOURCES += \
+        openbsd/cpu.c \
+        openbsd/thread.c
+endif
+
 if HAVE_LINUX
 libvlccore_la_SOURCES += \
 	linux/cpu.c \
