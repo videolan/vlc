@@ -269,7 +269,6 @@ typedef struct
     int                i_ancillary_id;
     vlc_tick_t         i_pts;
 
-    bool               b_absolute;
     int                i_spu_position;
     int                i_spu_x;
     int                i_spu_y;
@@ -368,12 +367,10 @@ static int Open( vlc_object_t *p_this )
     i_posy = var_CreateGetInteger( p_this, DVBSUB_CFG_PREFIX "y" );
 
     /* Check if subpicture position was overridden */
-    p_sys->b_absolute = true;
     p_sys->i_spu_x = p_sys->i_spu_y = 0;
 
     if( ( i_posx >= 0 ) && ( i_posy >= 0 ) )
     {
-        p_sys->b_absolute = true;
         p_sys->i_spu_x = i_posx;
         p_sys->i_spu_y = i_posy;
     }
@@ -1614,7 +1611,7 @@ static subpicture_t *render( decoder_t *p_dec )
             msg_Err( p_dec, "cannot allocate SPU region" );
             continue;
         }
-        p_spu_region->b_absolute = p_sys->b_absolute;
+        p_spu_region->b_absolute = true;
         p_spu_region->i_x = i_base_x + p_regiondef->i_x;
         p_spu_region->i_y = i_base_y + p_regiondef->i_y;
         p_spu_region->i_align = p_sys->i_spu_position;
@@ -1655,7 +1652,7 @@ static subpicture_t *render( decoder_t *p_dec )
             p_spu_region->fmt.i_height = p_spu_region->fmt.i_visible_height = p_region->i_height;
 
             p_spu_region->p_text = text_segment_New( p_object_def->psz_text );
-            p_spu_region->b_absolute = p_sys->b_absolute;
+            p_spu_region->b_absolute = true;
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
             p_spu_region->i_y = i_base_y + p_regiondef->i_y + p_object_def->i_y;
             p_spu_region->i_align = p_sys->i_spu_position;
