@@ -1001,9 +1001,11 @@ static struct subpicture_region_rendered *SpuRenderRegion(spu_t *spu,
     /* Place the picture
      * We compute the position in the rendered size */
 
-    int i_align = region->i_align;
-    if (channel_order == VLC_VOUT_ORDER_SECONDARY)
-        i_align = sys->secondary_alignment >= 0 ? sys->secondary_alignment : i_align;
+    int i_align;
+    if (channel_order == VLC_VOUT_ORDER_SECONDARY && sys->secondary_alignment >= 0)
+        i_align = sys->secondary_alignment;
+    else
+        i_align = region->i_align;
 
     SpuRegionPlace(&x_offset, &y_offset,
                    subpic, region, i_align);
