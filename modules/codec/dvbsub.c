@@ -1485,6 +1485,11 @@ static subpicture_t *render( decoder_t *p_dec )
     int i_base_x;
     int i_base_y;
 
+    if ( p_sys->p_page == NULL)
+    {
+        return NULL;
+    }
+
     /* Allocate the subpicture internal data. */
     p_spu = decoder_NewSubpicture( p_dec, NULL );
     if( !p_spu )
@@ -1517,11 +1522,6 @@ static subpicture_t *render( decoder_t *p_dec )
         /* see notes on DDS at the top of the file */
         i_base_x += p_sys->display.i_x;
         i_base_y += p_sys->display.i_y;
-    }
-
-    if ( p_sys->p_page == NULL)
-    {
-        return p_spu;
     }
 
     /* Loop on region definitions */
