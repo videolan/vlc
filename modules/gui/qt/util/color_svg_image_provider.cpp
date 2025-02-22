@@ -129,9 +129,15 @@ public:
                         const QSize naturalSize = svgHandler->option(QImageIOHandler::Size).toSize();
 
                         if (m_requestedSize.width() == 0)
+                        {
                             scaledSize.setWidth(m_requestedSize.height() * ((qreal)naturalSize.width() / naturalSize.height()));
+                            scaledSize.setHeight(m_requestedSize.height());
+                        }
                         else if (m_requestedSize.height() == 0)
+                        {
                             scaledSize.setHeight(m_requestedSize.width() * ((qreal)naturalSize.height() / naturalSize.width()));
+                            scaledSize.setWidth(m_requestedSize.width());
+                        }
                     }
                     else
                     {
