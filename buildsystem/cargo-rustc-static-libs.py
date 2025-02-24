@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: LGPL-2.1-or-later
 # Copyright (C) 2022 Loïc Branstett <loic@videolabs.io>
+# Copyright (C) 2025 Alexandre Janniaux <ajanni@videolabs.io>
 #
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU Lesser General Public License as published by
@@ -30,12 +31,15 @@ import os, sys, json, subprocess, tempfile, argparse
 NATIVE_STATIC_LIBS="native-static-libs"
 
 parser = argparse.ArgumentParser()
+parser.add_argument("--target")
 parser.add_argument("cargo_cmds", nargs=argparse.REMAINDER)
 
 args = parser.parse_args()
 
 cargo_argv = args.cargo_cmds
 cargo_argv.append("rustc")
+if args.target is not None:
+    cargo_argv.append(f"--target={args.target}")
 cargo_argv.append("--message-format=json")
 cargo_argv.append("--crate-type=staticlib")
 cargo_argv.append("--quiet")
