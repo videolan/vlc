@@ -36,6 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
 #include <vlc_vout_display.h>
+#include <vlc_subpicture.h>
 #include "libvlc.h"
 #include "modules/modules.h"
 
@@ -403,7 +404,17 @@ static const char *const video_stereo_formats_text[] = {
     N_("Side-by-Side"),
 };
 
-static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static const int pi_pos_values[] = {
+    0,
+    SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_TOP,
+    SUBPICTURE_ALIGN_BOTTOM,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_RIGHT,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_LEFT,
+    SUBPICTURE_ALIGN_BOTTOM | SUBPICTURE_ALIGN_RIGHT,
+};
 static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
   N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
@@ -1698,7 +1709,7 @@ vlc_module_begin ()
     add_integer( "video-title-timeout", 5000, VIDEO_TITLE_TIMEOUT_TEXT,
                  VIDEO_TITLE_TIMEOUT_LONGTEXT )
         change_safe()
-    add_integer( "video-title-position", 8, VIDEO_TITLE_POSITION_TEXT,
+    add_integer( "video-title-position", SUBPICTURE_ALIGN_BOTTOM, VIDEO_TITLE_POSITION_TEXT,
                  VIDEO_TITLE_POSITION_LONGTEXT )
         change_safe()
         change_integer_list( pi_pos_values, ppsz_pos_descriptions )
