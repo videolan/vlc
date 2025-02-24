@@ -44,6 +44,8 @@ FocusScope {
     property int initialAlbumIndex: 0
     property var artistId: undefined
 
+    property var _requestedArtistId: undefined
+
     //behave like a page
     property var pagePrefix: []
 
@@ -110,12 +112,32 @@ FocusScope {
         onLoadingChanged: {
             if (loading)
                 return
-            artistModel.getIndexFromId(root.artistId)
+
+            const defined = v => typeof v !== "undefined"
+
+            if ((root._requestedArtistId === root.artistId)
+                    && defined(root._requestedArtistId))
+                return
+
+            root._requestedArtistId = root.artistId
+            if (!defined(root._requestedArtistId))
+                return
+
+            const thisRequestID = root._requestedArtistId
+            artistModel.getIndexFromId(root._requestedArtistId)
                 .then((row) => {
+                    if ((root._requestedArtistId !== thisRequestID)
+                        || (root._requestedArtistId !== root.artistId))
+                        return
+
                     artistList.currentIndex = row
                     artistList._sidebarInitialyPositioned = true
                 })
                 .catch(() => {
+                    if ((root._requestedArtistId !== thisRequestID)
+                       || (root._requestedArtistId !== root.artistId))
+                    return
+
                     artistList._sidebarInitialyPositioned = true
                 })
         }
