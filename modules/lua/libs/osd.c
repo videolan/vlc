@@ -96,9 +96,8 @@ static int vlc_osd_position_from_string( const char *psz_name )
           { SUBPICTURE_ALIGN_TOP   |SUBPICTURE_ALIGN_RIGHT, "top-right"    },
           { SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_LEFT,  "bottom-left"  },
           { SUBPICTURE_ALIGN_BOTTOM|SUBPICTURE_ALIGN_RIGHT, "bottom-right" },
-          { 0, NULL } };
-    int i;
-    for( i = 0; pp_icons[i].psz_name; i++ )
+        };
+    for( size_t i = 0; i < ARRAY_SIZE(pp_icons); i++ )
     {
         if( !strcmp( psz_name, pp_icons[i].psz_name ) )
             return pp_icons[i].i_position;
