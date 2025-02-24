@@ -390,7 +390,8 @@ void  ListCache<T>::fetchMore()
         return;
 
     m_maxReferedIndex = std::min(cache->loadedCount + m_chunkSize, cache->queryCount);
-    if (!m_appendTask)
+    if (!m_appendTask
+            && cache != m_oldData.get()) // data will be loaded after completing pending updates
         asyncFetchMore();
 }
 
