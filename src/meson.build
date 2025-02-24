@@ -514,3 +514,6 @@ vlc_tests += {
     'link_with' : [libvlccore],
 }
 
+if get_option('rust').enabled()
+subdir('rust')
+endif
