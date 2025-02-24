@@ -63,8 +63,8 @@ path = "lib.rs"
     with open("lib.rs", "w", encoding="utf-8") as lib_rs:
         lib_rs.write("#![allow(dead_code)] fn main(){}")
 
-    # Execute the cargo build and redirect stdout (and not stderr)
-    cargo_r = subprocess.run(cargo_argv, stdout=subprocess.PIPE)
+    # Execute the cargo build and redirect stdout/stderr
+    cargo_r = subprocess.run(cargo_argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # We don't use `check=True in run because it raise an execption
     # and outputing a python traceback isn't useful at all.
@@ -72,8 +72,10 @@ path = "lib.rs"
     # We also exit here so that the output o tmp dir is not cleared when
     # there is an error.
     if cargo_r.returncode != 0:
-        print("command: {cargo_argv}", file=sys.stderr)
-        print("cwd: {tmpdir}", file=sys.stderr)
+        print(f"command: {' '.join(cargo_argv)}", file=sys.stderr)
+        print(f"cwd: {tmpdir}", file=sys.stderr)
+        print(cargo_r.stderr, file=sys.stderr)
+        print(cargo_r.stdout, file=sys.stderr)
         sys.exit(cargo_r.returncode)
 
 # Get the jsons output
