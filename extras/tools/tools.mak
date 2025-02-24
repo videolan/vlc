@@ -394,6 +394,7 @@ ninja-$(NINJA_VERSION).tar.gz:
 ninja: UNPACK_DIR=ninja-$(NINJA_BUILD_NAME)
 ninja: ninja-$(NINJA_VERSION).tar.gz
 	$(UNPACK)
+	$(APPLY) $(TOOLS)/ninja-1.11.1-replace-pipes-quote-with-shlex-quote.patch
 	$(MOVE)
 
 .buildninja: ninja
