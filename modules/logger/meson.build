@@ -30,3 +30,9 @@ vlc_modules += {
     'name' : 'json_tracer',
     'sources' : files('json.c')
 }
+
+vlc_rust_modules += {
+    'name' : 'telegraf_rs',
+    'sources' : files('telegraf-rs/src/lib.rs'),
+    'cargo_toml' : files('telegraf-rs/Cargo.toml'),
+}
