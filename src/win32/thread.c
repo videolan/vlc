@@ -349,7 +349,7 @@ void vlc_atomic_notify_all(void *addr)
 /*** Threads ***/
 static
 unsigned
-__stdcall vlc_entry (void *p)
+__stdcall ThreadEntry (void *p)
 {
     struct vlc_thread *th = p;
 
@@ -379,7 +379,7 @@ int vlc_clone (vlc_thread_t *p_handle, void *(*entry) (void *),
      * function instead of CreateThread, otherwise you'll end up with
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
-    h = (HANDLE)(uintptr_t) _beginthreadex (NULL, 0, vlc_entry, th, 0, NULL);
+    h = (HANDLE)(uintptr_t) _beginthreadex (NULL, 0, ThreadEntry, th, 0, NULL);
     if (h == 0)
     {
         int err = errno;
