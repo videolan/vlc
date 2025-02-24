@@ -54,6 +54,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 [package]
 name = "native-static-libs"
 version = "0.0.0"
+edition = "2024"
 
 [lib]
 path = "lib.rs"
