@@ -40,10 +40,6 @@
 
 #include <QWindow>
 
-#ifndef QT_GUI_PRIVATE
-#warning "qplatformnativeinterface.h header is required for MainCtxWin32"
-#endif
-#include <QtGui/qpa/qplatformnativeinterface.h>
 #include <dwmapi.h>
 
 #define WM_APPCOMMAND 0x0319
@@ -108,13 +104,10 @@ using namespace vlc::playlist;
 
 namespace  {
 
-HWND WinId( QWindow *windowHandle )
+HWND WinId( const QWindow *window )
 {
-    if( windowHandle && windowHandle->handle() )
-        return static_cast<HWND>(QGuiApplication::platformNativeInterface()->
-            nativeResourceForWindow("handle", windowHandle));
-    else
-        return 0;
+    assert(window);
+    return reinterpret_cast<HWND>(window->winId());
 }
 
 class CSDWin32EventHandler : public QObject, public QAbstractNativeEventFilter
@@ -142,26 +135,44 @@ public:
         QApplication::instance()->removeNativeEventFilter(this);
     }
 
+    static int getSystemMetricsForDpi(int nIndex, UINT dpi)
+    {
+        typedef int (WINAPI *GetSystemMetricsForDpiFunc)(int, UINT);
+        static GetSystemMetricsForDpiFunc getSystemMetricsForDpi = []() {
+            const auto user32dll = LoadLibraryEx(TEXT("user32.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+            return reinterpret_cast<GetSystemMetricsForDpiFunc>(GetProcAddress(user32dll, "GetSystemMetricsForDpi"));
+        }();
+
+        if (getSystemMetricsForDpi)
+            return getSystemMetricsForDpi(nIndex, dpi);
+
+        return GetSystemMetrics(nIndex);
+    }
+
+    static int getSystemMetricsForWindow(int nIndex, const QWindow* window)
+    {
+        assert(window);
+
+        typedef UINT (WINAPI *GetDpiForWindowFunc)(HWND);
+        static GetDpiForWindowFunc getDpiForWindow = []() {
+            const auto user32dll = LoadLibraryEx(TEXT("user32.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+            return reinterpret_cast<GetDpiForWindowFunc>(GetProcAddress(user32dll, "GetDpiForWindow"));
+        }();
+
+        if (getDpiForWindow)
+            return getSystemMetricsForDpi(nIndex, getDpiForWindow(WinId(window)));
+
+        return GetSystemMetrics(nIndex);
+    }
+
     static int resizeBorderWidth(QWindow *window)
     {
-        // NOTE: When possible, Qt makes the application DPI aware, so `GetSystemMetrics()` would
-        //       already take the screen DPI into account.
-        const int result = GetSystemMetrics(SM_CXSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
-        if (result > 0)
-            return qRound(static_cast<qreal>(result) * (window->devicePixelRatio() / window->screen()->devicePixelRatio()));
-        else
-            return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
+        return getSystemMetricsForWindow(SM_CXSIZEFRAME, window) + getSystemMetricsForWindow(SM_CXPADDEDBORDER, window);
     }
 
     static int resizeBorderHeight(QWindow *window)
     {
-        // NOTE: Qt makes the application DPI aware, so `GetSystemMetrics()` would already take
-        //       already take the screen DPI into account.
-        const int result = GetSystemMetrics(SM_CYSIZEFRAME) + GetSystemMetrics(SM_CXPADDEDBORDER);
-        if (result > 0)
-            return qRound(static_cast<qreal>(result) * (window->devicePixelRatio() / window->screen()->devicePixelRatio()));
-        else
-            return qRound(static_cast<qreal>(8) * window->devicePixelRatio());
+        return getSystemMetricsForWindow(SM_CYSIZEFRAME, window) + getSystemMetricsForWindow(SM_CXPADDEDBORDER, window);
     }
 
     bool nativeEventFilter(const QByteArray &, void *message, qintptr *result) override
