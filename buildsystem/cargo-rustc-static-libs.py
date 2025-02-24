@@ -49,7 +49,7 @@ cargo_argv.append("--print=native-static-libs")
 with tempfile.TemporaryDirectory() as tmpdir:
     os.chdir(tmpdir)
 
-    with open("Cargo.toml", "w") as cargo_toml:
+    with open("Cargo.toml", "w", encoding="utf-8") as cargo_toml:
         cargo_toml.write("""
 [package]
 name = "native-static-libs"
@@ -60,7 +60,7 @@ edition = "2024"
 path = "lib.rs"
 """)
     
-    with open("lib.rs", "w") as lib_rs:
+    with open("lib.rs", "w", encoding="utf-8") as lib_rs:
         lib_rs.write("#![allow(dead_code)] fn main(){}")
 
     # Execute the cargo build and redirect stdout (and not stderr)
