@@ -599,10 +599,10 @@ void ListCache<T>::asyncCountAndLoad()
 template<typename T>
 void ListCache<T>::asyncFetchMore()
 {
+    assert(m_cachedData);
     if (m_maxReferedIndex <= m_cachedData->loadedCount)
         return;
 
-    assert(m_cachedData);
     if (m_appendTask)
         m_loader->cancelTask(m_appendTask);
 
