@@ -17,6 +17,15 @@
  *****************************************************************************/
 import QtQuick
 
+// NOTE: ImageExt behaves exactly like Image, except when at least one of these features are used:
+//       - `PreserveAspectCrop` fill mode without requiring a clip node.
+//       - Rounded rectangular shaping.
+//       - Background coloring.
+//       - Outlining (border).
+//       - TODO: Custom padding.
+// NOTE: Extra features are only available with the RHI graphics backend,
+//       particularly when shaders are supported.
+// NOTE: Do not use this type if none of the extra features are used.
 Item {
     id: root
 

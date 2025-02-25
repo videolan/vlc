@@ -116,7 +116,7 @@ FocusScope {
         Component {
             id: cover
 
-            Widgets.RoundImage {
+            Widgets.ImageExt {
                 id: expand_cover_id
 
                 property int cover_height: parent.cover_height

@@ -144,7 +144,7 @@ FocusScope {
             implicitHeight: VLCStyle.cover_normal
             implicitWidth: VLCStyle.cover_normal
 
-            Widgets.RoundImage {
+            Widgets.ImageExt {
                 id: roundImage
                 source: artist.cover || VLCStyle.noArtArtist
                 sourceSize: Qt.size(width * eDPR, height * eDPR)

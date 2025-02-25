@@ -464,7 +464,7 @@ Item {
                 }
             }
 
-            Widgets.RoundImage {
+            Widgets.ImageExt {
                 id: artworkCover
 
                 anchors.centerIn: parent

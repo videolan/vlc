@@ -159,7 +159,7 @@ T.ItemDelegate {
     contentItem: RowLayout {
         spacing: VLCStyle.margin_xsmall
 
-        Widgets.RoundImage {
+        Widgets.ImageExt {
             id: roundImage
 
             Layout.preferredHeight: VLCStyle.play_cover_small

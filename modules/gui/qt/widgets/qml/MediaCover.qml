@@ -91,7 +91,7 @@ Item {
         onTriggered: root._loadTimeout = true
     }
 
-    Widgets.RoundImage {
+    Widgets.ImageExt {
         id: image
 
         anchors.fill: parent
@@ -109,7 +109,7 @@ Item {
         }
     }
 
-    Widgets.RoundImage {
+    Widgets.ImageExt {
         id: fallbackImage
 
         anchors.fill: parent

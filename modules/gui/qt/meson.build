@@ -899,7 +899,7 @@ qml_modules += {
         'widgets/qml/RectangularGlow.qml',
         qml_dynamicshadow_file,
         qml_blureffect_file,
-        'widgets/qml/RoundImage.qml',
+        'widgets/qml/ImageExt.qml',
     ),
 }
 

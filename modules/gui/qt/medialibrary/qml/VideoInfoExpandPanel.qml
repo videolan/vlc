@@ -109,7 +109,7 @@ FocusScope {
                         width: VLCStyle.gridCover_video_width
 
                         /* A bigger cover for the album */
-                        Widgets.RoundImage {
+                        Widgets.ImageExt {
                             id: expand_cover_id
 
                             anchors.fill: parent
