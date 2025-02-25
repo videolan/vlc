@@ -60,6 +60,7 @@ FocusScope {
     property int horizontalSpacing: VLCStyle.column_spacing
     property int verticalSpacing: VLCStyle.column_spacing
 
+    property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
 
     required property int nbItemPerRow
@@ -136,6 +137,7 @@ FocusScope {
     property alias contentWidth: flickable.contentWidth
     property alias contentX: flickable.contentX
     property alias gridScrollBar: flickableScrollBar
+    property alias interactive: flickable.interactive
 
     property alias expandDelegate: expandItemLoader.sourceComponent
     readonly property Item expandItem: expandItemLoader.item
