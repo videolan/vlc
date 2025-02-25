@@ -39,7 +39,7 @@ VideoAll {
 
     // Children
 
-    model: MLRecentsVideoModel {
+    model: MLRecentVideoModel {
         id: recentModel
         ml: MediaLib
     }

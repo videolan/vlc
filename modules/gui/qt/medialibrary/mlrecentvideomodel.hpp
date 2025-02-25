@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef ML_RECENTS_VIDEO_MODEL_H
-#define ML_RECENTS_VIDEO_MODEL_H
+#ifndef ML_RECENT_VIDEO_MODEL_H
+#define ML_RECENT_VIDEO_MODEL_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,14 +25,14 @@
 
 #include "mlvideomodel.hpp"
 
-class MLRecentsVideoModel : public MLVideoModel
+class MLRecentVideoModel : public MLVideoModel
 {
     Q_OBJECT
 
 public:
-    explicit MLRecentsVideoModel(QObject * parent = nullptr);
+    explicit MLRecentVideoModel(QObject * parent = nullptr);
 
-    virtual ~MLRecentsVideoModel() = default;
+    virtual ~MLRecentVideoModel() = default;
 
 protected: // MLBaseModel implementation
     std::unique_ptr<MLListCacheLoader> createMLLoader() const override;
@@ -53,4 +53,4 @@ private:
     };
 };
 
-#endif // ML_RECENTS_VIDEO_MODEL_H
+#endif // ML_RECENT_VIDEO_MODEL_H

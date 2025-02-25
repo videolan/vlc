@@ -62,7 +62,7 @@ FocusScope {
 
     // Childs
 
-    MLRecentsVideoModel {
+    MLRecentVideoModel {
         id: recentModel
 
         ml: MediaLib

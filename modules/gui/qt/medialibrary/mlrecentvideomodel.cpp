@@ -16,25 +16,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "mlrecentsvideomodel.hpp"
+#include "mlrecentvideomodel.hpp"
 #include "mlhelper.hpp"
 
 // Ctor / dtor
 
-MLRecentsVideoModel::MLRecentsVideoModel(QObject * parent) : MLVideoModel(parent) {}
+MLRecentVideoModel::MLRecentVideoModel(QObject * parent) : MLVideoModel(parent) {}
 
 // Protected MLBaseModel implementation
 
 std::unique_ptr<MLListCacheLoader>
-MLRecentsVideoModel::createMLLoader() const
+MLRecentVideoModel::createMLLoader() const
 /* override */
 {
-    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentsVideoModel::Loader>(*this));
+    return std::make_unique<MLListCacheLoader>(m_mediaLib, std::make_shared<MLRecentVideoModel::Loader>(*this));
 }
 
 // Private MLVideoModel reimplementation
 
-void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
+void MLRecentVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
 {
     switch (event.i_type)
     {
@@ -50,13 +50,13 @@ void MLRecentsVideoModel::onVlcMlEvent(const MLEvent & event) /* override */
 
 // Loader
 
-size_t MLRecentsVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
+size_t MLRecentVideoModel::Loader::count(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
     return vlc_ml_count_video_history(ml, queryParams);
 }
 
 std::vector<std::unique_ptr<MLItem>>
-MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
+MLRecentVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_params_t* queryParams) const /* override */
 {
     ml_unique_ptr<vlc_ml_media_list_t> media_list {
         vlc_ml_list_video_history(ml, queryParams)
@@ -76,7 +76,7 @@ MLRecentsVideoModel::Loader::load(vlc_medialibrary_t* ml, const vlc_ml_query_par
 }
 
 std::unique_ptr<MLItem>
-MLRecentsVideoModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
+MLRecentVideoModel::Loader::loadItemById(vlc_medialibrary_t* ml, MLItemId itemId) const
 {
     assert(itemId.type == VLC_ML_PARENT_UNKNOWN);
     ml_unique_ptr<vlc_ml_media_t> media(vlc_ml_get_media(ml, itemId.id));
