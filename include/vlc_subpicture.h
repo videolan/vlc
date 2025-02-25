@@ -174,10 +174,14 @@ struct vlc_spu_updater_configuration
     const video_format_t *video_src;
     // scaled video format of the video under the SPU
     const video_format_t *video_dst;
+    unsigned  display_width;
+    unsigned  display_height;
+
     // source video format of the previous vlc_spu_updater_ops.update call
     const video_format_t *prev_src;
     // scaled video format of the previous vlc_spu_updater_ops.update call
     const video_format_t *prev_dst;
+
     // timestamp when the SPU will be displayed, between i_start and i_stop
     // for subtitles
     vlc_tick_t           pts;
@@ -311,7 +315,8 @@ VLC_API subpicture_t * subpicture_NewFromPicture( vlc_object_t *, picture_t *, v
  * This function will update the content of a subpicture created with
  * a non NULL subpicture_updater_t.
  */
-VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *, vlc_tick_t );
+VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *,
+    unsigned display_width, unsigned display_height, vlc_tick_t );
 
 /**
  * This function will blend a given subpicture onto a picture.

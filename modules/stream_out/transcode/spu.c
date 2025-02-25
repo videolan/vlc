@@ -232,7 +232,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
             fmt.video.i_visible_height =
             fmt.video.i_height = h;
 
-            subpicture_Update( p_subpic, &fmt.video, &fmt.video, p_subpic->i_start );
+            subpicture_Update( p_subpic, &fmt.video, &fmt.video, w, h, p_subpic->i_start );
             es_format_Clean( &fmt );
 
             p_block = transcode_encoder_encode( id->encoder, p_subpic );

@@ -1810,11 +1810,19 @@ static void * spu_PrerenderThread(void *priv)
         fmtdst = sys->prerender.fmtdst;
         fmtsrc = sys->prerender.fmtsrc;
 
+        unsigned display_width, display_height;
         if (IsSubpicInVideo(sys->prerender.p_processed, sys->prerender.spu_in_full_window))
         {
-            fmtdst.i_width  = fmtdst.i_visible_width  = sys->prerender.video_position.width;
-            fmtdst.i_height = fmtdst.i_visible_height = sys->prerender.video_position.height;
+            display_width  = sys->prerender.video_position.width;
+            display_height = sys->prerender.video_position.height;
+            fmtdst.i_width  = fmtdst.i_visible_width  = display_width;
+            fmtdst.i_height = fmtdst.i_visible_height = display_height;
             fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        }
+        else
+        {
+            display_width  = sys->prerender.fmtdst.i_visible_width;
+            display_height = sys->prerender.fmtdst.i_visible_height;
         }
 
         vlc_mutex_unlock(&sys->prerender.lock);
@@ -1823,6 +1831,7 @@ static void * spu_PrerenderThread(void *priv)
 
 
         subpicture_Update(p_subpic, &fmtsrc, &fmtdst,
+                          display_width, display_height,
                           p_subpic->b_subtitle ? p_subpic->i_start : vlc_tick_now());
 
         spu_UpdateOriginalSize(spu, p_subpic, &fmtsrc);
@@ -2320,16 +2329,24 @@ vlc_render_subpicture *spu_Render(spu_t *spu,
         subpic->i_start = entry->start;
         subpic->i_stop = entry->stop;
 
+        unsigned display_width, display_height;
         video_format_t fmtdst = *fmt_dst;
         if (IsSubpicInVideo(subpic, spu_in_full_window))
         {
-            fmtdst.i_width  = fmtdst.i_visible_width  = video_position->width;
-            fmtdst.i_height = fmtdst.i_visible_height = video_position->height;
+            display_width  = video_position->width;
+            display_height = video_position->height;
+            fmtdst.i_width  = fmtdst.i_visible_width  = display_width;
+            fmtdst.i_height = fmtdst.i_visible_height = display_height;
             fmtdst.i_sar_num = fmtdst.i_sar_den = 1;
+        }
+        else
+        {
+            display_width  = fmt_dst->i_visible_width;
+            display_height = fmt_dst->i_visible_height;
         }
 
         subpicture_Update(subpic,
-                          fmt_src, &fmtdst,
+                          fmt_src, &fmtdst, display_width, display_height,
                           subpic->b_subtitle ? render_subtitle_date : system_now);
     }
 

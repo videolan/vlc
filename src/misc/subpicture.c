@@ -175,6 +175,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
 void subpicture_Update( subpicture_t *p_subpicture,
                         const video_format_t *p_fmt_src,
                         const video_format_t *p_fmt_dst,
+                        unsigned display_width, unsigned display_height,
                         vlc_tick_t i_ts )
 {
     subpicture_updater_t *p_upd = &p_subpicture->updater;
@@ -186,6 +187,8 @@ void subpicture_Update( subpicture_t *p_subpicture,
     struct vlc_spu_updater_configuration cfg = {
         .prev_src  = &p_private->src,
         .prev_dst  = &p_private->dst,
+        .display_width  = display_width,
+        .display_height = display_height,
         .video_src = p_fmt_src,
         .video_dst = p_fmt_dst,
         .pts       = i_ts,
