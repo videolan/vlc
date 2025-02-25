@@ -30,15 +30,8 @@ Widgets.GridItem {
     image: model.cover || ""
     fallbackImage: VLCStyle.noArtAlbumCover
 
-    // NOTE: If radius is 0.0, `QQuickImage` is used, and it
-    //       requires a clip node (`clip: true`) to display
-    //       `PreserveAspectCrop` where we can not have in a
-    //       delegate. So instead, use `PreserveAspectFit` in
-    //       that case. If non-RHI scene graph adaptation is
-    //       used, a clip node is not a concern, so in that
-    //       case `PreserveAspectCrop` can be used as well.
-    fillMode: ((GraphicsInfo.shaderType !== GraphicsInfo.RhiShader) || (effectiveRadius > 0.0)) ? Image.PreserveAspectCrop
-                                                                                                : Image.PreserveAspectFit
+    fillMode: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader) ? Image.PreserveAspectCrop
+                                                                   : Image.PreserveAspectFit
 
     title: model.title || qsTr("Unknown title")
     subtitle: model.main_artist || qsTr("Unknown artist")
