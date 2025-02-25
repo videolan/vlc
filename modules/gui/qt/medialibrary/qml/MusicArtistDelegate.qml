@@ -180,6 +180,20 @@ T.ItemDelegate {
                                                  : theme.border
 
             borderWidth: VLCStyle.dp(1, VLCStyle.scale)
+
+            // FIXME: Qt bug (observed 6.2 and 6.8): Without an alpha node beneath the image, the image does not get rendered.
+            Rectangle {
+                z: -1
+
+                anchors.centerIn: parent
+
+                width: 1
+                height: 1
+
+                opacity: 0.01
+
+                color: "black"
+            }
         }
 
         Widgets.TextAutoScroller {
