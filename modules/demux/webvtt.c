@@ -324,6 +324,9 @@ static void BuildIndex( demux_t *p_demux )
         return;
     assert( p_sys->index.p_array != NULL );
 
+    if( p_sys->index.p_array == NULL )
+        return;
+
     /* Order time entries ascending, start time before end time */
     qsort( p_sys->index.p_array, p_sys->index.i_count,
            sizeof(struct index_entry_s), index_Compare );
