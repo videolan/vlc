@@ -1489,6 +1489,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             assert(scale.w != 0 && scale.h != 0);
 
             bool cached_is_absolute;
+            int cached_alignment;
             subpicture_t forced_subpic = *subpic;
             struct subtitle_position_cache *cache_pos =
                 subtitles_positions_FindRegion(&sys->subs_pos, subpic, region);
@@ -1497,6 +1498,8 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
                 region->i_x = cache_pos->x;
                 region->i_y = cache_pos->y;
                 cached_is_absolute = region->b_absolute;
+                cached_alignment = region->i_align;
+                region->i_align = SUBPICTURE_ALIGN_TOP | SUBPICTURE_ALIGN_LEFT;
                 region->b_absolute = true;
             }
 
@@ -1520,6 +1523,7 @@ static vlc_render_subpicture *SpuRenderSubpictures(spu_t *spu,
             if (cache_pos != NULL)
             {
                 region->b_absolute = cached_is_absolute;
+                region->i_align = cached_alignment;
                 assert(output_last_ptr->place.x == cache_pos->x);
                 assert(output_last_ptr->place.y == cache_pos->y);
             }
