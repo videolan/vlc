@@ -145,6 +145,20 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     {
         sar.num = 4;
         sar.den = 3;
+    }
+    else
+    {
+        sar.num = 1;
+        sar.den = 1;
+    }
+
+    if ( p_updtregion->b_in_window )
+    {
+        subpic->i_original_picture_width  = cfg->display_width;
+        subpic->i_original_picture_height = cfg->display_height;
+    }
+    else if( sys->region.flags & UPDT_REGION_USES_GRID_COORDINATES )
+    {
         subpic->i_original_picture_width  = fmt_dst->i_visible_height * sar.num / sar.den;
         subpic->i_original_picture_height = fmt_dst->i_visible_height;
     }
@@ -152,11 +166,17 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     {
         subpic->i_original_picture_width  = fmt_dst->i_width * fmt_dst->i_sar_num / fmt_dst->i_sar_den;
         subpic->i_original_picture_height = fmt_dst->i_height;
-        sar.num = 1;
-        sar.den = 1;
     }
 
     bool b_schedule_blink_update = false;
+
+    video_format_t render_fmt = *fmt_dst;
+    if (p_updtregion->b_in_window)
+    {
+        render_fmt.i_x_offset = render_fmt.i_y_offset = 0;
+        render_fmt.i_width  = render_fmt.i_visible_width  = cfg->display_width;
+        render_fmt.i_height = render_fmt.i_visible_height = cfg->display_height;
+    }
 
     for( substext_updater_region_t *update_region = &sys->region;
                                     update_region; update_region = update_region->p_next )
@@ -183,25 +203,25 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
         {
             const float margin_ratio = sys->margin_ratio;
             const int   margin_h     = margin_ratio * ( b_gridmode ? subpic->i_original_picture_width
-                                                                   : fmt_dst->i_visible_width );
-            const int   margin_v     = margin_ratio * fmt_dst->i_visible_height;
+                                                                   : render_fmt.i_visible_width );
+            const int   margin_v     = margin_ratio * render_fmt.i_visible_height;
 
             /* subpic invisible margins sizes */
-            const int outerright_h = fmt_dst->i_width - (fmt_dst->i_visible_width + fmt_dst->i_x_offset);
-            const int outerbottom_v = fmt_dst->i_height - (fmt_dst->i_visible_height + fmt_dst->i_y_offset);
+            const int outerright_h = render_fmt.i_width - (render_fmt.i_visible_width + render_fmt.i_x_offset);
+            const int outerbottom_v = render_fmt.i_height - (render_fmt.i_visible_height + render_fmt.i_y_offset);
             /* regions usable */
-            const int inner_w = fmt_dst->i_visible_width - margin_h * 2;
-            const int inner_h = fmt_dst->i_visible_height - margin_v * 2;
+            const int inner_w = render_fmt.i_visible_width - margin_h * 2;
+            const int inner_h = render_fmt.i_visible_height - margin_v * 2;
 
             if (r->i_align & SUBPICTURE_ALIGN_LEFT)
-                r->i_x = margin_h + fmt_dst->i_x_offset;
+                r->i_x = margin_h + render_fmt.i_x_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_RIGHT)
                 r->i_x = margin_h + outerright_h;
             else
                 r->i_x = 0;
 
             if (r->i_align & SUBPICTURE_ALIGN_TOP )
-                r->i_y = margin_v + fmt_dst->i_y_offset;
+                r->i_y = margin_v + render_fmt.i_y_offset;
             else if (r->i_align & SUBPICTURE_ALIGN_BOTTOM )
                 r->i_y = margin_v + outerbottom_v;
             else
@@ -229,8 +249,8 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 
         } else {
             /* FIXME it doesn't adapt on crop settings changes */
-            r->i_x = update_region->origin.x * fmt_dst->i_width  / update_region->extent.x;
-            r->i_y = update_region->origin.y * fmt_dst->i_height / update_region->extent.y;
+            r->i_x = update_region->origin.x * render_fmt.i_width  / update_region->extent.x;
+            r->i_y = update_region->origin.y * render_fmt.i_height / update_region->extent.y;
         }
 
         /* Add missing default style, if any, to all segments */
