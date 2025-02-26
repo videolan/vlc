@@ -74,7 +74,7 @@ struct subpicture_region_t
     bool            b_absolute;       /**< position is absolute in the movie */
     int             i_x;      /**< position of region, relative to alignment */
     int             i_y;      /**< position of region, relative to alignment */
-    int             i_align;                  /**< alignment flags of region */
+    int             i_align;       /**< alignment flags SUBPICTURE_ALIGN_xxx */
     int             i_alpha;                               /**< transparency */
 
     /* Parameters for text regions (p_picture to be rendered) */
