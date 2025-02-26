@@ -239,6 +239,32 @@ deinterlacecommon_lib = static_library(
 vlc_modules = []
 vlc_rust_modules = []
 
+libandroid_env = []
+libandroid_utils = []
+
+if host_system == 'android'
+libandroid_env = static_library(
+    'libvlc_android_env',
+    include_directories: [vlc_include_dirs],
+    install: false,
+    pic: true,
+    sources: [
+        'video_output/android/env.c',
+        'video_output/android/env.h',
+    ],
+)
+libandroid_utils = static_library(
+    'libvlc_android_utils',
+    include_directories: [vlc_include_dirs],
+    install: false,
+    pic: true,
+    sources: [
+        'video_output/android/utils.c',
+        'video_output/android/utils.h',
+    ],
+)
+endif
+
 # video chroma modules
 subdir('video_chroma')
 
