@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_memstream.h>
+#include <vlc_vout_osd.h>
 #include "player.h"
 #include "input/resource.h"
 

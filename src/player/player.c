@@ -32,6 +32,7 @@
 #include <vlc_decoder.h>
 #include <vlc_memstream.h>
 #include <vlc_http.h>
+#include <vlc_vout_osd.h>
 
 #include "../libvlc.h"
 #include "input/resource.h"

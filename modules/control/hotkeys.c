@@ -40,6 +40,7 @@
 #include <vlc_actions.h>
 #include <vlc_spu.h>
 #include <vlc_executor.h>
+#include <vlc_vout_osd.h>
 #include "math.h"
 
 struct intf_sys_t
