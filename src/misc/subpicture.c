@@ -253,6 +253,7 @@ static subpicture_region_t * subpicture_region_NewInternal( void )
     p_region->region.i_alpha = 0xff;
     p_region->region.i_x = INT_MAX;
     p_region->region.i_y = INT_MAX;
+    p_region->region.b_absolute = false;
 
     return &p_region->region;
 }
