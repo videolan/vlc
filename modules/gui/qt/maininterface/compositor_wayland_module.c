@@ -103,19 +103,19 @@ static void SetSize(struct qtwayland_t* obj, size_t width, size_t height)
     sys->height = height;
 }
 
-static void CommitSize(struct qtwayland_t* obj)
+static bool CommitSize(struct qtwayland_t* obj)
 {
 #ifdef QT_HAS_WAYLAND_FRACTIONAL_SCALING
     assert(obj);
     const qtwayland_priv_t* const sys = (qtwayland_priv_t*)obj->p_sys;
     assert(sys);
     if (!sys->video_surface)
-        return;
+        return false;
     if (sys->viewport)
     {
         // Non-positive size (except (-1, -1) pair) causes protocol error:
-        assert((sys->width > 0 && sys->height > 0) ||
-               (sys->height == -1 && sys->width == -1));
+        if (unlikely(!((sys->width > 0 && sys->height > 0) || (sys->height == -1 && sys->width == -1))))
+            return false;
 
         // width and height here represent the final size, after scaling
         // is taken into account. The fractional scaling protocol is not
@@ -124,8 +124,11 @@ static void CommitSize(struct qtwayland_t* obj)
         // to determine the device pixel ratio.
         wp_viewport_set_destination(sys->viewport, sys->width, sys->height);
         wl_surface_commit(sys->video_surface);
+        return true;
     }
 #endif
+
+    return false;
 }
 
 static void SetScale(struct qtwayland_t* obj, double scale)
