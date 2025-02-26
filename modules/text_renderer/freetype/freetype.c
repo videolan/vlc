@@ -1147,6 +1147,7 @@ static subpicture_region_t *Render( filter_t *p_filter,
 //      }
         region->i_alpha = p_region_in->i_alpha;
         region->i_align = p_region_in->i_align;
+        region->b_absolute = p_region_in->b_absolute;
         break;
     }
 
@@ -1298,4 +1299,3 @@ static void Destroy( filter_t *p_filter )
 
     free( p_sys );
 }
-
