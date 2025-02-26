@@ -52,38 +52,43 @@ static QVector<RAW> toRaw(const QVector<WRAPPER> &items)
     return vec;
 }
 
-static QUrl resolveWinSymlinks(const QUrl &mrl)
-{
-#ifdef _WIN32
-    QFileInfo info (mrl.toLocalFile());
-    if ( info.isSymLink() )
-    {
-        QString target = info.symLinkTarget();
-        return QFile::exists(target) ? QUrl::fromLocalFile(target) : mrl;
-    }
-#endif
-    return mrl;
-}
-
 QVector<Media> toMediaList(const QVariantList &sources)
 {
     QVector<Media> mediaList;
     std::transform(sources.begin(), sources.end(),
                    std::back_inserter(mediaList), [](const QVariant& value) {
-        if ((value.typeId() == QMetaType::QUrl) || (value.typeId() == QMetaType::QString))
+        const auto typeId = value.typeId();
+        if ((typeId == QMetaType::QUrl) || (typeId == QMetaType::QString))
         {
-            QUrl mrl = (value.typeId() == QMetaType::QString)
-                    ? QUrl::fromUserInput(value.value<QString>())
-                    : value.value<QUrl>();
+            std::optional<QString> input;
+            QUrl mrl;
+            if (typeId == QMetaType::QString)
+            {
+                input = value.value<QString>().trimmed(); // akin to `UrlValidator::fixup()`
+                mrl = *input; // plain text to QUrl, tolerant mode
+            }
+            else if (typeId == QMetaType::QUrl)
+            {
+                mrl = value.value<QUrl>(); // use the provided QUrl as is
+            }
+            else
+                Q_UNREACHABLE();
 
             if (!mrl.isValid())
-                return Media();
+                return Media(); // the input is broken (beyond repair of tolerant mode if plain text)
+
+            if ((typeId == QMetaType::QString) && mrl.scheme().isEmpty())
+            {
+                // Assume input is a path (only if the input is plain text):
+                assert(input);
+                mrl = QString::fromUtf8(vlc::wrap_cptr(vlc_path2uri(input->toUtf8().cbegin(), nullptr)).get()); // tolerant mode
+
+                if (!mrl.isValid())
+                    return Media();
+            }
 
             if (mrl.scheme().isEmpty()) // akin to `UrlValidator::validate()`
                 return Media();
-
-            if (mrl.isLocalFile())
-                mrl = resolveWinSymlinks(mrl);
 
             return Media(mrl.toString(QUrl::FullyEncoded), mrl.fileName());
         }
