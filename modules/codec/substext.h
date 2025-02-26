@@ -77,6 +77,7 @@ static inline void SubpictureUpdaterSysRegionInit(substext_updater_region_t *p_u
 {
     memset(p_updtregion, 0, sizeof(*p_updtregion));
     p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
+    p_updtregion->b_absolute = false;
     p_updtregion->inner_align = 0;
 }
 
