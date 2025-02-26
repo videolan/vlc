@@ -461,7 +461,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     int i_inline_align = -1;
     p_spu_sys->region.p_segments = ParseSubtitles( &i_inline_align, psz_subtitle );
     free( psz_subtitle );
-    p_spu_sys->region.b_absolute = false; p_spu_sys->region.b_in_window = false;
+    p_spu_sys->region.b_absolute = false;
+    p_spu_sys->region.b_in_window = true;
     if( p_sys->i_align >= 0 ) /* bottom ; left, right or centered */
     {
         p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
