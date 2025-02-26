@@ -246,7 +246,18 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
     }
     case QEvent::Close:
     {
+#if QT_VERSION < QT_VERSION_CHECK(6, 9, 0)
+        // Before Qt 6.9.0, `QWindow`'s `wl_surface` gets deleted when `QWindow::hide()` is called.
+        static bool platformIsWayland = []() {
+            assert(qGuiApp);
+            return qGuiApp->platformName().startsWith(QLatin1String("wayland"));
+        }();
+
+        if (!platformIsWayland)
+            setInterfaceHiden();
+#else
         setInterfaceHiden();
+#endif
 
         if (var_InheritBool(p_intf, "qt-close-to-system-tray"))
         {
@@ -254,6 +265,10 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
             {
                 if (sysTrayIcon->isSystemTrayAvailable() && sysTrayIcon->isVisible())
                 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 9, 0)
+                    if (platformIsWayland)
+                        setInterfaceHiden();
+#endif
                     event->ignore();
                     return true;
                 }
