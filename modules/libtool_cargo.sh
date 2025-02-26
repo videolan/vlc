@@ -52,7 +52,11 @@ LT_CONVENIENCE=$2
 $CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" -- ${CFGS}
 
 # "Build" the project a second time and fetch the native-static-libs to link with
-NATIVE_STATIC_LIBS=$($CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" --quiet -- ${CFGS} --print native-static-libs 2>&1 | grep "native-static-libs" | sed "s/note: native-static-libs://" | sed "s/-lvlccore//")
+NATIVE_STATIC_LIBS=$($CARGO_RUSTC_CMD --manifest-path="$MODULE_PROJECT_DIR/Cargo.toml" --quiet -- ${CFGS} --print native-static-libs 2>&1 \
+    | grep "native-static-libs" \
+    | sed "s/note: native-static-libs://" \
+    | sed "s/-lvlccore//" \
+    | sed 's/-framework [^ ]*//g')
 
 STATIC_LIB_NAME=$(echo $LT_CONVENIENCE | sed "s/\.la/\.a/")
 STATIC_LIB_DEP=$(echo $LT_CONVENIENCE | sed "s/\.la/\.d/")
