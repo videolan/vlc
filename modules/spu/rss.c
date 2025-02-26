@@ -343,7 +343,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
-    subpicture_region_t *p_region;
 
     int i_item;
     rss_feed_t *p_feed;
@@ -501,12 +500,8 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         /* Display the feed's image */
         picture_t *p_pic = p_feed->p_pic;
 
-        p_region = subpicture_region_ForPicture( NULL, p_pic );
-        if( !p_region )
-        {
-            msg_Err( p_filter, "cannot allocate SPU region" );
-        }
-        else
+        subpicture_region_t *p_region = subpicture_region_ForPicture( NULL, p_pic );
+        if( likely(p_region) )
         {
             p_region->i_x = region->i_x;
             p_region->i_y = region->i_y;
