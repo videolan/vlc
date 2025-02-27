@@ -376,6 +376,32 @@ void InterfaceWindowHandler::setBoss()
 
 void InterfaceWindowHandler::setInterfaceHiden()
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 9, 0)
+    // `CompositorWayland` depends on the promise that the window resources are not deleted.
+    // Window's `wl_surface` gets deleted when the window gets hidden before Qt 6.9.0. So,
+    // here we should inhibit hiding the window. Note that intercepting `QEvent::hide` does
+    // not make it possible to inhibit hiding the window.
+    assert(p_intf);
+    assert(p_intf->p_compositor);
+    static bool inhibitHide = [intf = p_intf]() {
+        assert(qGuiApp);
+        // type() == WaylandCompositor is not used because any video embedding methodology may
+        // depend on window resources:
+        const bool ret = qGuiApp->platformName().startsWith(QLatin1String("wayland")) &&
+                         dynamic_cast<vlc::CompositorVideo*>(intf->p_compositor.get());
+        if (ret)
+            msg_Warn(intf, "In this configuration, the interface window can not get hidden.");
+        return ret;
+    }();
+
+    if (inhibitHide)
+    {
+        // Instead of doing nothing, minimize the window:
+        setInterfaceMinimized();
+        return;
+    }
+#endif
+
     m_window->hide();
 }
 
