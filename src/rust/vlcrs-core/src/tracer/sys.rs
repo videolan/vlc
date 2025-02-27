@@ -37,6 +37,7 @@ pub enum vlc_tracer_value_type {
     Integer = 0,
     Double = 1,
     String = 2,
+    Unsigned = 3,
 }
 
 #[repr(C)]
@@ -45,6 +46,7 @@ pub union vlc_tracer_value {
     pub integer: i64,
     pub double: c_double,
     pub string: *const c_char,
+    pub unsigned: u64,
 }
 
 #[repr(C)]
