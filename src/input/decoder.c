@@ -2474,6 +2474,20 @@ void vlc_input_decoder_DecodeWithStatus(vlc_input_decoder_t *p_owner, vlc_frame_
     vlc_fifo_QueueUnlocked( p_owner->p_fifo, frame );
     if (status != NULL)
         GetStatusLocked(p_owner, status);
+
+    struct vlc_tracer *tracer = vlc_object_get_tracer(&p_owner->dec.obj);
+    if (tracer != NULL)
+    {
+        size_t fifo_size = vlc_fifo_GetBytes(p_owner->p_fifo);
+        size_t fifo_count = vlc_fifo_GetCount(p_owner->p_fifo);
+        vlc_tracer_Trace(tracer,
+                         VLC_TRACE("id", p_owner->psz_id),
+                         VLC_TRACE("fifo_size", (uint64_t)fifo_size),
+                         VLC_TRACE("fifo_count", (uint64_t)fifo_count),
+                         VLC_TRACE_END);
+    }
+
+
     vlc_fifo_Unlock( p_owner->p_fifo );
 }
 
