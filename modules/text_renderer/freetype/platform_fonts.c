@@ -554,7 +554,11 @@ int ConvertToLiveSize( filter_t *p_filter, const text_style_t *p_style )
     }
     else if ( p_style->f_font_relsize )
     {
-        i_font_size = (int) p_filter->fmt_out.video.i_height * p_style->f_font_relsize / 100;
+        unsigned area_height = p_filter->fmt_out.video.i_height;
+        if (p_filter->fmt_out.video.i_height > p_filter->fmt_out.video.i_width )
+            // portrait mode leads to very large text
+            area_height = p_filter->fmt_out.video.i_width;
+        i_font_size = (int) area_height * p_style->f_font_relsize / 100;
     }
 
     if( p_sys->i_scale != 100 )
