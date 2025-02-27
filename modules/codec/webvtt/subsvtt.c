@@ -713,8 +713,9 @@ static bool webvtt_domnode_Match_Attribute( const webvtt_dom_node_t *p_node,
     {
         const webvtt_dom_tag_t *p_tagnode = (webvtt_dom_tag_t *) p_node;
 
-        if( ( !strcmp( p_tagnode->psz_tag, "v" ) && !strcmp( psz, "voice" ) ) || /* v = only voice */
-            ( !strcmp( p_tagnode->psz_tag, "lang" ) && !strcmp( psz, "lang" ) ) )
+        if( p_tagnode->psz_attrs != NULL &&
+          ( ( !strcmp( p_tagnode->psz_tag, "v" ) && !strcmp( psz, "voice" ) ) || /* v = only voice */
+            ( !strcmp( p_tagnode->psz_tag, "lang" ) && !strcmp( psz, "lang" ) ) ) )
         {
             const char *psz_start = NULL;
             /* skip classes decl */
