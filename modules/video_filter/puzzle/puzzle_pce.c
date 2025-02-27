@@ -125,7 +125,7 @@ int puzzle_bake_pieces_shapes( filter_t *p_filter)
             return VLC_EGENERIC;
         }
 
-        int i_ret;
+        int i_ret = VLC_SUCCESS;
         for (uint8_t i_plane = 0; i_plane < p_sys->s_allocated.i_planes; i_plane++) {
             i_ret = puzzle_generate_sect_bezier( p_filter, &p_sys->ps_pieces_shapes[i_currect_shape][i_plane],   7, ps_scale_pts_V, i_plane, puzzle_SHAPE_LEFT);
             if (i_ret != VLC_SUCCESS) break;
