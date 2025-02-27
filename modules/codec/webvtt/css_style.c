@@ -31,6 +31,9 @@ static void Color( vlc_css_term_t term,
                    uint32_t *color, uint8_t *alpha,
                    uint16_t *feat, int cflag, int aflag )
 {
+    if( unlikely( term.psz == NULL ) )
+        return;
+
     if( term.type == TYPE_FUNCTION )
     {
         if( term.function ) /* func( expr ) */
