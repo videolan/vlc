@@ -1259,8 +1259,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
                 return;
             }
 
+            filepos_t read = ksblock.ReadData( vars.obj->es.I_O() );
+            if (read == 0 && ksblock.GetSize() != 0) {
+                msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&ksblock) );
+                return;
+            }
             vars.simpleblock = &ksblock;
-            vars.simpleblock->ReadData( vars.obj->es.I_O() );
             vars.simpleblock->SetParent( *vars.obj->cluster );
 
             if( ksblock.IsKeyframe() )
@@ -1279,8 +1283,12 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
 
         E_CASE( KaxBlock, kblock )
         {
+            filepos_t read = kblock.ReadData( vars.obj->es.I_O() );
+            if (unlikely(read == 0) && kblock.GetSize() != 0) {
+                msg_Err( vars.p_demuxer,"Error while reading %s",  EBML_NAME(&kblock) );
+                return;
+            }
             vars.block = &kblock;
-            vars.block->ReadData( vars.obj->es.I_O() );
             vars.block->SetParent( *vars.obj->cluster );
 
             const mkv_track_t *p_track = vars.obj->FindTrackByBlock( &kblock, NULL );
