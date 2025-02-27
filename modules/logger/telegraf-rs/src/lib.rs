@@ -32,6 +32,9 @@ impl IntoFieldData for TraceField {
             vlc_tracer_value_type::Integer => unsafe {
                 telegraf::FieldData::Number(self.0.value().integer)
             },
+            vlc_tracer_value_type::Unsigned => unsafe {
+                telegraf::FieldData::UNumber(self.0.value().unsigned)
+            },
             vlc_tracer_value_type::Double => unsafe {
                 telegraf::FieldData::Float(self.0.value().double)
             },
