@@ -351,25 +351,42 @@ elif host_system == 'windows'
     endif
 else
     libvlccore_sources += [
-        'posix/dirs.c',
-        'posix/error.c',
-        'posix/netconf.c',
-        'posix/spawn.c',
-        'posix/picture.c',
-        'posix/specific.c',
-        'posix/thread.c',
         'posix/filesystem.c',
         'posix/plugin.c',
         'posix/rand.c',
         'posix/timer.c',
     ]
 
+    if host_system != 'android'
+        libvlccore_sources += [
+            'posix/dirs.c',
+            'posix/error.c',
+            'posix/netconf.c',
+            'posix/spawn.c',
+            'posix/picture.c',
+            'posix/specific.c',
+            'posix/thread.c',
+        ]
+    endif
+
     if cdata.get('HAVE_QSORT_R', 0) == 1
         libvlccore_sources += 'posix/sort.c'
     endif
 
-    if host_system not in ['linux', 'freebsd']
+    if host_system not in ['android', 'linux', 'freebsd']
         libvlccore_sources += 'posix/wait.c'
+    endif
+
+    if host_system == 'android'
+        libvlccore_sources += [
+            'android/error.c',
+            'android/specific.c',
+            'android/thread.c',
+
+            'linux/cpu.c',
+            'linux/dirs.c',
+            'linux/thread.c',
+        ]
     endif
 
     if host_system == 'linux'
@@ -388,28 +405,20 @@ else
         ]
     endif
 
-    if anl_lib.found()
-        libvlccore_sources += 'linux/getaddrinfo.c'
-    else
-        libvlccore_sources += 'posix/getaddrinfo.c'
+    if host_system == 'openbsd'
+        libvlccore_sources += [
+            'openbsd/cpu.c',
+            'openbsd/thread.c',
+        ]
     endif
-endif
 
-if host_system == 'android'
-    libvlccore_sources += [
-        'linux/cpu.c',
-        'linux/dirs.c',
-        'linux/thread.c',
-        'posix/filesystem.c',
-        'posix/plugin.c',
-        'posix/rand.c',
-        'posix/timer.c',
-
-
-        'android/error.c',
-        'android/specific.c',
-        'android/thread.c',
-    ]
+    if host_system != 'android'
+        if anl_lib.found()
+            libvlccore_sources += 'linux/getaddrinfo.c'
+        else
+            libvlccore_sources += 'posix/getaddrinfo.c'
+        endif
+    endif
 endif
 
 if get_option('update-check').allowed()
