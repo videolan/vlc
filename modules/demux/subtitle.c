@@ -1093,6 +1093,8 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
         i_len = s ? strlen( s ) : 0;
         if( i_len <= 0 )
         {
+            if (psz_text)
+                psz_text[i_old] = '\0';
             p_subtitle->psz_text = psz_text;
             return VLC_SUCCESS;
         }
@@ -1103,7 +1105,6 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
-        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
 
         /* replace [br] by \n */
@@ -1534,6 +1535,8 @@ static int ParseDVDSubtitle(vlc_object_t *p_obj, subs_properties_t *p_props,
         i_len = strlen( s );
         if( i_len == 1 && s[0] == '}')
         {
+            if (psz_text)
+                psz_text[i_old] = '\0';
             p_subtitle->psz_text = psz_text;
             return VLC_SUCCESS;
         }
@@ -1544,7 +1547,6 @@ static int ParseDVDSubtitle(vlc_object_t *p_obj, subs_properties_t *p_props,
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
-        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
     }
 }
@@ -1653,12 +1655,13 @@ static int ParseAQT(vlc_object_t *p_obj, subs_properties_t *p_props, text_t *txt
 
             memcpy( &psz_text[i_old], s, i_len );
             psz_text[i_old + i_len + 0] = '\n';
-            psz_text[i_old + i_len + 1] = '\0';
             i_old += i_len + 1;
             if( txt->i_line == txt->i_line_count )
                 break;
         }
     }
+    if (psz_text)
+        psz_text[i_old] = '\0';
     p_subtitle->psz_text = psz_text;
     return VLC_SUCCESS;
 }
@@ -1798,10 +1801,11 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
-        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
     }
 
+    if (psz_text)
+        psz_text[i_old] = '\0';
     p_subtitle->psz_text = psz_text;
     return VLC_SUCCESS;
 }
@@ -2188,10 +2192,10 @@ static int ParseRealText( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
-        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
     }
 
+    psz_text[i_old] = '\0';
     /* Remove the starting ">" that remained after the sscanf */
     memmove( &psz_text[0], &psz_text[1], strlen( psz_text ) );
 
@@ -2347,6 +2351,8 @@ static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
         i_len = s ? strlen( s ) : 0;
         if( i_len <= 0 )
         {
+            if (psz_text)
+                psz_text[i_old] = '\0';
             p_subtitle->psz_text = psz_text;
             return VLC_SUCCESS;
         }
@@ -2357,7 +2363,6 @@ static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         memcpy( &psz_text[i_old], s, i_len );
         psz_text[i_old + i_len + 0] = '\n';
-        psz_text[i_old + i_len + 1] = '\0';
         i_old += i_len + 1;
     }
 }
