@@ -1194,16 +1194,15 @@ static int subtitle_ParseSubViewerTiming( subtitle_t *p_subtitle,
     int h1, m1, s1, d1, h2, m2, s2, d2;
 
     if( sscanf( s, "%d:%d:%d.%d,%d:%d:%d.%d",
-                &h1, &m1, &s1, &d1, &h2, &m2, &s2, &d2) == 8 )
-    {
-        p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
-                              VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+                &h1, &m1, &s1, &d1, &h2, &m2, &s2, &d2) != 8 )
+        return VLC_EGENERIC;
 
-        p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
-                              VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
+    p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
+                          VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
+
+    p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
+                          VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
+    return VLC_SUCCESS;
 }
 
 /* ParseSubViewer
