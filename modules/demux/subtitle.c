@@ -39,6 +39,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <assert.h>
+#include <stdckdint.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>
@@ -1197,10 +1198,23 @@ static int subtitle_ParseSubViewerTiming( subtitle_t *p_subtitle,
                 &h1, &m1, &s1, &d1, &h2, &m2, &s2, &d2) != 8 )
         return VLC_EGENERIC;
 
-    p_subtitle->i_start = vlc_tick_from_sec( h1 * 3600 + m1 * 60 + s1) +
+    int64_t sec, ms, total;
+    if (ckd_mul(&sec, h1, 3600) ||
+        ckd_mul(&ms,  m1, 60) ||
+        ckd_add(&total, sec, ms) ||
+        ckd_add(&total, total, s1))
+        return VLC_EINVAL;
+
+    p_subtitle->i_start = vlc_tick_from_sec( total ) +
                           VLC_TICK_FROM_MS( d1 ) + VLC_TICK_0;
 
-    p_subtitle->i_stop  = vlc_tick_from_sec( h2 * 3600 + m2 * 60 + s2 ) +
+    if (ckd_mul(&sec, h2, 3600) ||
+        ckd_mul(&ms,  m2, 60) ||
+        ckd_add(&total, sec, ms) ||
+        ckd_add(&total, total, s2))
+        return VLC_EINVAL;
+
+    p_subtitle->i_stop  = vlc_tick_from_sec( total ) +
                           VLC_TICK_FROM_MS( d2 ) + VLC_TICK_0;
     return VLC_SUCCESS;
 }
