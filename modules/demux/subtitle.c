@@ -1709,9 +1709,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     for( ;; )
     {
-        char p_dummy;
-        char *psz_temp;
-
         const char *s = TextGetLine( txt );
         if( !s )
         {
@@ -1737,30 +1734,32 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( !strncmp( s, "FORMAT=", strlen("FORMAT=") ) )
         {
             const char *psz_format = s + strlen( "FORMAT=" );
-            if( sscanf (psz_format, "TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
+            if( !strncmp( psz_format, "TIME", strlen("TIME") ) && (psz_format[4] == '\0' || psz_format[4] == ' ') )
             {
+                // FORMAT=TIME may be followed by a comment
                 p_props->mpsub.i_factor = 100;
-                break;
             }
-
-            psz_temp = malloc( strlen(psz_format) + 1 );
-            if( !psz_temp )
+            else
             {
-                return VLC_ENOMEM;
-            }
+                char *psz_temp = malloc( strlen(psz_format) + 1 );
+                if( !psz_temp )
+                {
+                    return VLC_ENOMEM;
+                }
 
-            if( sscanf( psz_format, "%[^\r\n]", psz_temp ) )
-            {
+                if( sscanf( psz_format, "%[^\r\n]", psz_temp ) )
+                {
                 float f_fps = us_strtof( psz_temp, NULL );
 
                 if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
                     var_SetFloat( p_obj, "sub-fps", f_fps );
 
-                p_props->mpsub.i_factor = 1;
+                    p_props->mpsub.i_factor = 1;
+                    free( psz_temp );
+                    break;
+                }
                 free( psz_temp );
-                break;
             }
-            free( psz_temp );
         }
     }
 
