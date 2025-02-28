@@ -139,7 +139,6 @@ private:
                                            size_t result_count, void *data);
 
 private:
-    vlc_medialibrary_module_t* m_ml;
     vlc::threads::mutex m_mutex;
     vlc::threads::condition_variable m_cond;
     ThumbnailerCtx* m_currentContext;

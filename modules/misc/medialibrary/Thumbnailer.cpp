@@ -32,11 +32,9 @@
 
 #include <climits>
 #include <stdexcept>
-#include <climits>
 
 Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
-    : m_ml( ml )
-    , m_currentContext( nullptr )
+    : m_currentContext( nullptr )
     , m_thumbnailer( nullptr, &vlc_preparser_Delete )
 {
     const struct vlc_preparser_cfg cfg = []{
@@ -113,7 +111,7 @@ bool Thumbnailer::generate( const medialibrary::IMedia&, const std::string& mrl,
         };
 
         vlc_preparser_req_id requestId;
-        requestId = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(), 
+        requestId = vlc_preparser_GenerateThumbnailToFiles(m_thumbnailer.get(),
                                                            item.get(),
                                                            &thumb_arg,
                                                            &thumb_out, 1,
