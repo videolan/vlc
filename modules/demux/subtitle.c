@@ -1734,21 +1734,22 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             break;
         }
 
-        if( strstr( s, "FORMAT" ) )
+        if( !strncmp( s, "FORMAT=", strlen("FORMAT=") ) )
         {
-            if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
+            const char *psz_format = s + strlen( "FORMAT=" );
+            if( sscanf (psz_format, "TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
             {
                 p_props->mpsub.i_factor = 100;
                 break;
             }
 
-            psz_temp = malloc( strlen(s) );
+            psz_temp = malloc( strlen(psz_format) + 1 );
             if( !psz_temp )
             {
                 return VLC_ENOMEM;
             }
 
-            if( sscanf( s, "FORMAT=%[^\r\n]", psz_temp ) )
+            if( sscanf( psz_format, "%[^\r\n]", psz_temp ) )
             {
                 float f_fps = us_strtof( psz_temp, NULL );
 
