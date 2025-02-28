@@ -24,6 +24,7 @@ cddb: libcddb-$(CDDB_VERSION).tar.bz2 .sum-cddb
 	$(APPLY) $(SRC)/cddb/cddb-no-alarm.patch
 	$(APPLY) $(SRC)/cddb/fix-header-guards.patch
 	$(APPLY) $(SRC)/cddb/no-gettext.patch
+	$(APPLY) $(SRC)/cddb/cddb-gcc14-getsockoptfix.patch
 	# Avoid relying on iconv.m4 from gettext, when reconfiguring.
 	# This is only used by the frontend which we disable.
 	sed -i.orig 's/^[[:blank:]]*AM_ICONV/#&/' $(UNPACK_DIR)/configure.ac
