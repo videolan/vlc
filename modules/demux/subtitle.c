@@ -1741,22 +1741,14 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             }
             else
             {
-                char *psz_temp = malloc( strlen(psz_format) + 1 );
-                if( !psz_temp )
+                float f_fps;
+                if( sscanf( psz_format, "%f", &f_fps ) == 1 )
                 {
-                    return VLC_ENOMEM;
-                }
-
-                if( sscanf( psz_format, "%[^\r\n]", psz_temp ) )
-                {
-                float f_fps = us_strtof( psz_temp, NULL );
-
-                if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
-                    var_SetFloat( p_obj, "sub-fps", f_fps );
+                    if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
+                        var_SetFloat( p_obj, "sub-fps", f_fps );
 
                     p_props->mpsub.i_factor = 1;
                 }
-                free( psz_temp );
             }
         }
     }
