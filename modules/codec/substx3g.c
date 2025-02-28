@@ -339,7 +339,10 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         psz_subtitle = strndup( (const char*) p_pszstart, i_psz_bytelength );
 
     if ( !psz_subtitle )
+    {
+        block_Release( p_block );
         return VLCDEC_SUCCESS;
+    }
 
     p_buf += i_psz_bytelength + sizeof(uint16_t);
 
@@ -354,6 +357,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     {
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
+        block_Release( p_block );
         return VLCDEC_SUCCESS;
     }
 
@@ -363,6 +367,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     {
         text_segment_Delete( p_segment3g->s );
         free( p_segment3g );
+        block_Release( p_block );
         return VLCDEC_SUCCESS;
     }
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
