@@ -516,16 +516,22 @@ void MainCtx::sendVLCHotkey(int vlcHotkey)
 
 void MainCtx::updateIntfScaleFactor()
 {
-    m_intfScaleFactor = m_intfUserScaleFactor;
+    auto newValue = m_intfUserScaleFactor;
     if (QWindow* window = p_intf->p_compositor ? p_intf->p_compositor->interfaceMainWindow() : nullptr)
     {
         QScreen* screen = window->screen();
         if (screen)
         {
             qreal dpi = screen->logicalDotsPerInch();
-            m_intfScaleFactor = m_intfUserScaleFactor * dpi / VLC_REFERENCE_SCALE_FACTOR;
+            newValue = m_intfUserScaleFactor * dpi / VLC_REFERENCE_SCALE_FACTOR;
         }
     }
+
+    const int FACTOR_RESOLUTION = 100;
+    if ( static_cast<int>(m_intfScaleFactor * FACTOR_RESOLUTION)
+         == static_cast<int>(newValue * FACTOR_RESOLUTION) ) return;
+
+    m_intfScaleFactor = newValue;
     emit intfScaleFactorChanged();
 }
 
