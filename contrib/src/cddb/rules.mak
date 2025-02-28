@@ -23,6 +23,7 @@ cddb: libcddb-$(CDDB_VERSION).tar.bz2 .sum-cddb
 	$(APPLY) $(SRC)/cddb/cddb-no-alarm.patch
 	$(APPLY) $(SRC)/cddb/fix-header-guards.patch
 	$(APPLY) $(SRC)/cddb/no-gettext.patch
+	$(APPLY) $(SRC)/cddb/cddb-gcc14-getsockoptfix.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/cddb/win32-pkg.patch
 endif
