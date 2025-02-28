@@ -1101,6 +1101,25 @@ static void DeletePipController( pip_controller_t * pip_controller )
     vlc_object_delete(pip_controller);
 }
 
+static int UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
+                        vlc_video_context *vctx)
+{
+    VLCSampleBufferDisplay *sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
+    msg_Dbg(vd, "Update format! from %4.4s to %4.4s", &vd->fmt->i_chroma, &fmt->i_chroma);
+
+    // Display will only work with CVPX video context
+    filter_t *converter = NULL;
+    if (!vlc_video_context_GetPrivate(vctx, VLC_VIDEO_CONTEXT_CVPX)) {
+        converter = CreateCVPXConverter(vd, fmt);
+        if (!converter)
+            return VLC_EGENERIC;
+    }
+
+    DeleteCVPXConverter(sys->converter);
+    sys->converter = converter;
+    return VLC_SUCCESS;
+}
+
 static int Open (vout_display_t *vd,
                  video_format_t *fmt, vlc_video_context *context)
 {
@@ -1139,6 +1158,7 @@ static int Open (vout_display_t *vd,
             .prepare = Prepare,
             .display = Display,
             .control = Control,
+            .update_format = UpdateFormat,
         };
         
         vd->ops = &ops;
