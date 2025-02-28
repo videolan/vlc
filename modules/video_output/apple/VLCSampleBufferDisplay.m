@@ -418,7 +418,7 @@ static vlc_decoder_device * CVPXHoldDecoderDevice(vlc_object_t *o, void *sys)
 }
 
 static filter_t *
-CreateCVPXConverter(vout_display_t *vd)
+CreateCVPXConverter(vout_display_t *vd, const video_format_t *fmt)
 {
     filter_t *converter = vlc_object_create(vd, sizeof(filter_t));
     if (!converter)
@@ -432,8 +432,8 @@ CreateCVPXConverter(vout_display_t *vd)
     converter->owner.video = &cbs;
     converter->owner.sys = vd;
 
-    es_format_InitFromVideo( &converter->fmt_in,  vd->fmt );
-    es_format_InitFromVideo( &converter->fmt_out,  vd->fmt );
+    es_format_InitFromVideo(&converter->fmt_in, fmt);
+    es_format_InitFromVideo(&converter->fmt_out, fmt);
 
     converter->fmt_out.video.i_chroma =
     converter->fmt_out.i_codec = VLC_CODEC_CVPX_BGRA;
@@ -1116,7 +1116,7 @@ static int Open (vout_display_t *vd,
     // Display will only work with CVPX video context
     filter_t *converter = NULL;
     if (!vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_CVPX)) {
-        converter = CreateCVPXConverter(vd);
+        converter = CreateCVPXConverter(vd, fmt);
         if (!converter)
             return VLC_EGENERIC;
     }
