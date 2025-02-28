@@ -321,17 +321,12 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
     if ( i_psz_bytelength > 2 &&
          ( !memcmp( p_pszstart, "\xFE\xFF", 2 ) || !memcmp( p_pszstart, "\xFF\xFE", 2 ) )
        )
-    {
         psz_subtitle = FromCharset( "UTF-16", p_pszstart, i_psz_bytelength );
-        if ( !psz_subtitle )
-            return VLCDEC_SUCCESS;
-    }
     else
-    {
         psz_subtitle = strndup( (const char*) p_pszstart, i_psz_bytelength );
-        if ( !psz_subtitle )
-            return VLCDEC_SUCCESS;
-    }
+
+    if ( !psz_subtitle )
+        return VLCDEC_SUCCESS;
 
     for( uint16_t i=0; i < i_psz_bytelength; i++ )
      if ( psz_subtitle[i] == '\r' ) psz_subtitle[i] = '\n';
