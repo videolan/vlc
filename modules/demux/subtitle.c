@@ -1708,8 +1708,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
 {
     VLC_UNUSED( i_idx );
 
-    char *psz_text = strdup( "" );
-
     if( !p_props->mpsub.b_inited )
     {
         p_props->mpsub.f_total = 0.0;
@@ -1726,7 +1724,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         const char *s = TextGetLine( txt );
         if( !s )
         {
-            free( psz_text );
             return VLC_EGENERIC;
         }
 
@@ -1741,7 +1738,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             psz_temp = malloc( strlen(s) );
             if( !psz_temp )
             {
-                free( psz_text );
                 return VLC_ENOMEM;
             }
 
@@ -1772,6 +1768,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         }
     }
 
+    char *psz_text = strdup( "" );
     for( ;; )
     {
         const char *s = TextGetLine( txt );
