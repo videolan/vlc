@@ -838,7 +838,7 @@ SPrefsPanel::SPrefsPanel( qt_intf_t *_p_intf, QWidget *_parent,
             QObject::connect( ui.colorSchemeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged)
                               , p_intf->p_mi->getColorScheme(), &ColorSchemeModel::setCurrentIndex );
 
-            const float intfScaleFloatFactor = 100.f;
+            const double intfScaleFloatFactor = 100;
             const auto updateIntfUserScaleFactorFromControls =
                     [this, slider = ui.intfScaleFactorSlider, spinBox = ui.intfScaleFactorSpinBox, intfScaleFloatFactor](const int value)
             {
