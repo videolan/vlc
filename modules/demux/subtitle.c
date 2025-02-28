@@ -245,6 +245,9 @@ static char * get_language_from_filename( const char * );
 
 static block_t *ToTextBlock( const subtitle_t *p_subtitle )
 {
+    if ( p_subtitle->psz_text == NULL )
+        return NULL;
+
     block_t *p_block;
     size_t i_len = strlen( p_subtitle->psz_text ) + 1;
 
@@ -258,6 +261,9 @@ static block_t *ToTextBlock( const subtitle_t *p_subtitle )
 
 static block_t *ToEIA608Block( const subtitle_t *p_subtitle )
 {
+    if ( p_subtitle->psz_text == NULL )
+        return NULL;
+
     block_t *p_block;
     const size_t i_len = strlen( p_subtitle->psz_text );
     const size_t i_block = (1 + i_len / 5) * 3;
@@ -1078,10 +1084,7 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
 
     /* Now read text until an empty line */
     size_t i_old = 0;
-    psz_text = strdup("");
-    if( !psz_text )
-        return VLC_ENOMEM;
-
+    psz_text = NULL;
     for( ;; )
     {
         const char *s = TextGetLine( txt );
@@ -1516,9 +1519,7 @@ static int ParseDVDSubtitle(vlc_object_t *p_obj, subs_properties_t *p_props,
 
     /* Now read text until a line containing "}" */
     size_t i_old = 0;
-    psz_text = strdup("");
-    if( !psz_text )
-        return VLC_ENOMEM;
+    psz_text = NULL;
     for( ;; )
     {
         const char *s = TextGetLine( txt );
@@ -1609,7 +1610,7 @@ static int ParseAQT(vlc_object_t *p_obj, subs_properties_t *p_props, text_t *txt
     VLC_UNUSED(p_props);
     VLC_UNUSED( i_idx );
 
-    char *psz_text = strdup( "" );
+    char *psz_text = NULL;
     size_t i_old = 0;
     size_t i_len;
     int i_firstline = 1;
@@ -1775,7 +1776,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         }
     }
 
-    char *psz_text = strdup( "" );
+    char *psz_text = NULL;
     size_t i_old = 0;
     for( ;; )
     {
@@ -2337,10 +2338,7 @@ static int ParseCommonSBV( vlc_object_t *p_obj, subs_properties_t *p_props,
 
     /* Now read text until an empty line */
     size_t i_old = 0;
-    psz_text = strdup("");
-    if( !psz_text )
-        return VLC_ENOMEM;
-
+    psz_text = NULL;
     for( ;; )
     {
         const char *s = TextGetLine( txt );
