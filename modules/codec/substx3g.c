@@ -1,5 +1,5 @@
 /*****************************************************************************
- * substx3gsub.c : MP4 tx3g subtitles decoder
+ * substx3g.c : MP4 tx3g subtitles decoder
  *****************************************************************************
  * Copyright (C) 2014 VLC authors and VideoLAN
  *
