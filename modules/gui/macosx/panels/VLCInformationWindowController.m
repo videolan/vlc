@@ -343,8 +343,10 @@ _##field##TextField.delegate = self
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
         if (artworkImages.count == 0) {
-            _artwork = [NSImage imageNamed:@"noart.png"];
-            [self updateRepresentation];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _artwork = [NSImage imageNamed:@"noart.png"];
+                [self updateRepresentation];
+            });
             return;
         }
 
@@ -356,11 +358,14 @@ _##field##TextField.delegate = self
             [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
                                                             size:artworkSize
                                                    gridItemCount:artworkImages.count];
-        _artwork = [NSImage compositeImageWithImages:artworkImages
-                                              frames:frames
-                                                size:artworkSize];
 
-        [self updateRepresentation];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _artwork = [NSImage compositeImageWithImages:artworkImages
+                                                frames:frames
+                                                    size:artworkSize];
+
+            [self updateRepresentation];
+        });
     });
 }
 
@@ -398,8 +403,10 @@ _##field##TextField.delegate = self
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
         if (artworkImages.count == 0) {
-            _artwork = [NSImage imageNamed:@"noart.png"];
-            [self updateRepresentation];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                _artwork = [NSImage imageNamed:@"noart.png"];
+                [self updateRepresentation];
+            });
             return;
         }
 
@@ -411,11 +418,13 @@ _##field##TextField.delegate = self
             [NSImage framesForCompositeImageSquareGridWithImages:artworkImages
                                                             size:artworkSize
                                                    gridItemCount:artworkImages.count];
-        _artwork = [NSImage compositeImageWithImages:artworkImages
-                                              frames:frames
-                                                size:artworkSize];
 
-        [self updateRepresentation];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            _artwork = [NSImage compositeImageWithImages:artworkImages
+                                                frames:frames
+                                                    size:artworkSize];
+            [self updateRepresentation];
+        });
     });
 }
 
@@ -478,9 +487,7 @@ _##field##TextField.originalStateString = inputItem.field == nil ? @"" : inputIt
     _artworkImageButton.image = _artwork;
 
     if (!_mainMenuInstance) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.window.title = inputItem.title;
-        });
+        self.window.title = inputItem.title;
     }
 }
 
