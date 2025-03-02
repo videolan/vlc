@@ -588,7 +588,6 @@ static int Open(vlc_object_t *obj)
     {
         vlc_pw_unlock(s->context);
         free(s);
-        pw_properties_free(props);
         vlc_pw_disconnect(sys->context);
         free(sys);
         return VLC_EGENERIC;
