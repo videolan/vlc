@@ -590,8 +590,10 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
 
     /* Create the stream */
     struct vlc_pw_stream *s = malloc(sizeof (*s));
-    if (unlikely(s == NULL))
+    if (unlikely(s == NULL)) {
+        pw_properties_free(props);
         return NULL;
+    }
 
     enum pw_stream_flags flags =
         PW_STREAM_FLAG_AUTOCONNECT |
