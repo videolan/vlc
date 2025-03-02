@@ -198,6 +198,10 @@ class RTSPClientVlc;
 #define CAP_SUBSESSION_PAUSE    (1 << 3)
 #define CAPS_DEFAULT            CAP_RATE_CONTROL
 
+#if LIVEMEDIA_LIBRARY_VERSION_INT < 1732752000 // 2024.11.28
+typedef char EventLoopWatchVariable;
+#endif
+
 struct demux_sys_t
 {
     char            *p_sdp;    /* XXX mallocated */
@@ -236,8 +240,8 @@ struct demux_sys_t
     bool             b_no_data;     /* if we never received any data */
     int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
 
-    char             event_rtsp;
-    char             event_data;
+    EventLoopWatchVariable event_rtsp;
+    EventLoopWatchVariable event_data;
 
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
     bool             b_paused;      /* Are we paused? */
