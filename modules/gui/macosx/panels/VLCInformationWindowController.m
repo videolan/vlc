@@ -431,8 +431,6 @@ _##field##TextField.delegate = self
         VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentPlayingItem = playerController.currentMedia;
     VLCInputItem * const firstItem = self.representedInputItems.firstObject;
-    NSAssert([currentPlayingItem.MRL isEqualToString:firstItem.MRL],
-             @"Should not update statistics when items are different!");
     NSAssert(_statisticsEnabled, @"Statistics should not be updated when they are disabled!");
     VLCInputStats * const inputStats = aNotification.userInfo[VLCPlayerInputStats];
     NSAssert(inputStats != nil, @"inputStats received for statistics update should not be nil!");
