@@ -107,6 +107,8 @@ namespace  {
 HWND WinId( const QWindow *window )
 {
     assert(window);
+    if (!window->handle())
+        return NULL;
     return reinterpret_cast<HWND>(window->winId());
 }
 
