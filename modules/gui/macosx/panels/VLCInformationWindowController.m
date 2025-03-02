@@ -468,15 +468,8 @@ _##field##TextField.delegate = self
         [inputItem parseInputItem];
     }
 
-#define FILL_FIELD_FROM_INPUTITEM(field)                            \
-    {                                                               \
-    NSString * const inputItemString = inputItem.field;             \
-    if (inputItemString != nil) {                                   \
-        _##field##TextField.originalStateString = inputItemString;  \
-    } else {                                                        \
-        _##field##TextField.originalStateString = @"";              \
-    }                                                               \
-}
+#define FILL_FIELD_FROM_INPUTITEM(field)                                                    \
+_##field##TextField.originalStateString = inputItem.field == nil ? @"" : inputItem.field;
 
     PERFORM_ACTION_ALL_TEXTFIELDS(FILL_FIELD_FROM_INPUTITEM);
 
