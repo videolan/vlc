@@ -440,6 +440,11 @@ _##field##TextField.delegate = self
         VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentPlayingItem = playerController.currentMedia;
     VLCInputItem * const firstItem = self.representedInputItems.firstObject;
+    
+    if (self.mainMenuInstance && ![currentPlayingItem.MRL isEqualToString:firstItem.MRL]) {
+        self.representedInputItems = @[currentPlayingItem];
+    }
+
     NSAssert(_statisticsEnabled, @"Statistics should not be updated when they are disabled!");
     VLCInputStats * const inputStats = aNotification.userInfo[VLCPlayerInputStats];
     NSAssert(inputStats != nil, @"inputStats received for statistics update should not be nil!");
