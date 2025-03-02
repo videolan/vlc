@@ -578,14 +578,14 @@ static struct vlc_pw_stream *vlc_pw_stream_create(audio_output_t *aout,
     props = pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio",
                               PW_KEY_MEDIA_CATEGORY, "Playback",
                               NULL);
+    if (unlikely(props == NULL))
+        return NULL;
 
-    if (likely(props != NULL)) {
-        char *role = var_InheritString(aout, "role");
-        if (role != NULL) { /* Capitalise the first character */
-            pw_properties_setf(props, PW_KEY_MEDIA_ROLE, "%c%s",
-                               toupper((unsigned char)role[0]), role + 1);
-            free(role);
-        }
+    char *role = var_InheritString(aout, "role");
+    if (role != NULL) { /* Capitalise the first character */
+        pw_properties_setf(props, PW_KEY_MEDIA_ROLE, "%c%s",
+                           toupper((unsigned char)role[0]), role + 1);
+        free(role);
     }
 
     /* Create the stream */
