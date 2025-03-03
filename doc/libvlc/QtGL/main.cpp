@@ -1,5 +1,5 @@
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QSurfaceFormat>
 #include <QMainWindow>
 
@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
     mainWindow.setCentralWidget(glWidget);
 
     mainWindow.resize(mainWindow.sizeHint());
-    int desktopArea = QApplication::desktop()->width() *
-                     QApplication::desktop()->height();
+    QSize size = QGuiApplication::primaryScreen()->size();
+    int desktopArea = size.width() * size.height();
     int widgetArea = mainWindow.width() * mainWindow.height();
     if (((float)widgetArea / (float)desktopArea) < 0.75f)
         mainWindow.show();
