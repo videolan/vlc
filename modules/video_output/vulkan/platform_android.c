@@ -44,22 +44,22 @@ static int InitPlatform(vlc_vk_platform_t *vk)
         return VLC_EGENERIC;
 
     vk->platform_ext = VK_KHR_ANDROID_SURFACE_EXTENSION_NAME;
-    vk->platform_ops = &platform_ops;
+    vk->ops = &platform_ops;
     return VLC_SUCCESS;
 }
 
 static void ClosePlatform(vlc_vk_platform_t *vk)
 {
-    AWindowHandler_releaseANativeWindow(vk->window->handle.anativewindow,
-                                        AWindow_Video);
+    AWindowHandler_releaseANativeWindow(vk->window->display.anativewindow,
+                                        vk->window->handle.android_id);
 }
 
 static int CreateSurface(vlc_vk_platform_t *vk, const vlc_vk_instance_t *inst,
                          VkSurfaceKHR *surface_out)
 {
     ANativeWindow *anw =
-        AWindowHandler_getANativeWindow(vk->window->handle.anativewindow,
-                                        AWindow_Video);
+        AWindowHandler_getANativeWindow(vk->window->display.anativewindow,
+                                        vk->window->handle.android_id);
     PFN_vkCreateAndroidSurfaceKHR CreateAndroidSurfaceKHR = (PFN_vkCreateAndroidSurfaceKHR)
         inst->get_proc_address(inst->instance, "vkCreateAndroidSurfaceKHR");
 
