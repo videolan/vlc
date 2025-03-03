@@ -105,7 +105,7 @@ void Mwindow::initUI() {
 
     /* Put all in layouts */
     QHBoxLayout *layout = new QHBoxLayout;
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(playBut);
     layout->addWidget(stopBut);
     layout->addWidget(muteBut);
@@ -113,7 +113,7 @@ void Mwindow::initUI() {
     layout->addWidget(volumeSlider);
 
     QVBoxLayout *layout2 = new QVBoxLayout;
-    layout2->setMargin(0);
+    layout2->setContentsMargins(0, 0, 0, 0);
     layout2->addWidget(videoWidget);
     layout2->addWidget(slider);
     layout2->addLayout(layout);
