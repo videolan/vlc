@@ -923,9 +923,9 @@ if qt6_dep.found()
         qt_rcc_extra_arguments += '-compress-algo=zlib'
     endif
 
-    libatomic = cc.find_library('atomic', required: false)
-    if libatomic.found()
-        qt_extra_deps += cc.find_library('atomic', required: false)
+    atomic_lib = cc.find_library('atomic', required: false)
+    if atomic_lib.found()
+        qt_extra_deps += atomic_lib
         qt_extra_flags += '-DQT_HAS_LIBATOMIC'
     endif
 
