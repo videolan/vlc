@@ -32,8 +32,8 @@ Item {
     // Implicit size used to be overridden as readonly, but that needed
     // binding width/height to the new properties which in turn caused
     // problems with layouts.
-    implicitWidth: image.implicitWidth
-    implicitHeight: image.implicitHeight
+    implicitWidth: shaderEffect.readyForVisibility ? shaderEffect.implicitWidth : image.implicitWidth
+    implicitHeight: shaderEffect.readyForVisibility ? shaderEffect.implicitHeight : image.implicitHeight
 
     // WARNING: We can not override QQuickItem's antialiasing
     //          property as readonly because Qt 6.6 marks it
@@ -129,11 +129,11 @@ Item {
         anchors.alignWhenCentered: true
         anchors.centerIn: parent
 
-        implicitWidth: image.implicitWidth
-        implicitHeight: image.implicitHeight
+        implicitWidth: (image.status === Image.Ready) ? image.implicitWidth : 64
+        implicitHeight: (image.status === Image.Ready) ? image.implicitHeight : 64
 
-        width: (image.fillMode === Image.PreserveAspectCrop) ? root.width : image.paintedWidth
-        height: (image.fillMode === Image.PreserveAspectCrop) ? root.height : image.paintedHeight
+        width: ((image.status !== Image.Ready) || (image.fillMode === Image.PreserveAspectCrop)) ? root.width : image.paintedWidth
+        height: ((image.status !== Image.Ready) || (image.fillMode === Image.PreserveAspectCrop)) ? root.height : image.paintedHeight
 
         visible: readyForVisibility
 
@@ -172,6 +172,10 @@ Item {
             if (root.fillMode !== Image.PreserveAspectCrop)
                 return ret
 
+            // No need to calculate if image is not ready
+            if (image.status !== Image.Ready)
+                return ret
+
             const implicitScale = implicitWidth / implicitHeight
             const scale = width / height
 
@@ -184,7 +188,7 @@ Item {
         }
 
         // (2 / width) seems to be a good coefficient to make it similar to `Rectangle.border`:
-        readonly property double borderRange: (root.borderWidth / width * 2.)
+        readonly property double borderRange: (image.status === Image.Ready) ? (root.borderWidth / width * 2.) : 0.0 // no need for outlining if there is no image (nothing to outline)
         readonly property color borderColor: root.borderColor
 
         // QQuickImage as texture provider, no need for ShaderEffectSource.
