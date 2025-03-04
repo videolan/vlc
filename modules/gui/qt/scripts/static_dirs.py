@@ -12,10 +12,12 @@ import re
 import subprocess
 import sys
 
-def call_qmake(qmake:str, qtconf, builddir, pro) -> str:
+def call_qmake(qmake:str, qtconf, builddir, pro, debug:bool) -> str:
     if builddir and builddir != '' and not os.path.exists(builddir):
         os.makedirs(builddir)
     qmake_cmd = [ qmake ]
+    if debug:
+        qmake_cmd += ['CONFIG+=debug']
     if qtconf and qtconf != '':
         qmake_cmd += [ '-qtconf', qtconf ]
     qmake_cmd += [pro, '-o', '-' ]
@@ -55,12 +57,15 @@ if __name__ == "__main__":
     parser.add_argument("--ldflags",
                         required=False, action='store_true',
                         help="get the list of linker flags")
+    parser.add_argument("--debug",
+                        required=False, action='store_true',
+                        help="debug mode")
     args = parser.parse_args()
 
     result = ''
     sources = [ os.path.join(args.builddir, '.qmake.stash') ]
     in_sources = False
-    makefile = call_qmake(args.qmake, args.qtconf, args.builddir, args.pro)
+    makefile = call_qmake(args.qmake, args.qtconf, args.builddir, args.pro, args.debug)
     for line in makefile.splitlines():
         if in_sources:
             l = line.strip()

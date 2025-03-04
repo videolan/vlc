@@ -4083,12 +4083,17 @@ AS_IF([test "${enable_qt}" != "no"], [
   ],[
 
   AC_MSG_CHECKING([for Qt libraries])
+  qmake_additional_params=""
+  AS_IF([test "${enable_debug}" != "no"], [
+    qmake_additional_params="$qmake_additional_params --debug"
+  ])
   srcdir_abs=`(cd ${srcdir} && pwd -P)`
   QT_PKG_ERRORS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
     --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
     --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
     --builddir ${ac_pwd}/modules/gui/qt \
-    --libs)
+    --libs \
+    ${qmake_additional_params})
   ac_status=$?
   AS_IF([test $ac_status = 0],[
 
@@ -4098,12 +4103,14 @@ AS_IF([test "${enable_qt}" != "no"], [
         --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
         --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
         --builddir ${ac_pwd}/modules/gui/qt \
-        --cflags)
+        --cflags \
+        ${qmake_additional_params})
       QT_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
         --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
         --pro ${srcdir_abs}/modules/gui/qt/qt6.pro \
         --builddir ${ac_pwd}/modules/gui/qt \
-        --ldflags)
+        --ldflags \
+        ${qmake_additional_params})
       AC_SUBST([QT_LIBS])
       AC_SUBST([QT_CFLAGS])
       AC_SUBST([QT_LDFLAGS])
@@ -4168,7 +4175,8 @@ AS_IF([test "${enable_qt}" != "no"], [
             --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
             --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
             --builddir ${ac_pwd}/modules/gui/qt \
-            --libs) 2>/dev/null
+            --libs \
+            ${qmake_additional_params}) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0],[
         AC_MSG_RESULT([yes])
@@ -4177,12 +4185,14 @@ AS_IF([test "${enable_qt}" != "no"], [
             --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
             --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
             --builddir ${ac_pwd}/modules/gui/qt \
-            --cflags)
+            --cflags \
+            ${qmake_additional_params})
         QT_QTEST_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
             --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
             --pro ${srcdir_abs}/modules/gui/qt/qtest.pro \
             --builddir ${ac_pwd}/modules/gui/qt \
-            --ldflags)
+            --ldflags \
+            ${qmake_additional_params})
         AC_SUBST([QT_QTEST_LIBS])
         AC_SUBST([QT_QTEST_CFLAGS])
         AC_SUBST([QT_QTEST_LDFLAGS])
@@ -4196,7 +4206,8 @@ AS_IF([test "${enable_qt}" != "no"], [
             --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
             --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
             --builddir ${ac_pwd}/modules/gui/qt \
-            --libs) 2>/dev/null
+            --libs \
+            ${qmake_additional_params}) 2>/dev/null
       ac_status=$?
       AS_IF([test $ac_status = 0],[
         AS_IF([${PYTHON3} ${srcdir}/buildsystem/check_qml_module.py \
@@ -4210,12 +4221,14 @@ AS_IF([test "${enable_qt}" != "no"], [
                 --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
                 --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
                 --builddir ${ac_pwd}/modules/gui/qt \
-                --cflags)
+                --cflags \
+                ${qmake_additional_params})
             QT_QUICK_TEST_LDFLAGS=$(${PYTHON3} ${srcdir}/modules/gui/qt/scripts/static_dirs.py \
                 --qmake "${QMAKE6}" --qtconf "${with_qtconf}" \
                 --pro ${srcdir_abs}/modules/gui/qt/quicktest.pro \
                 --builddir ${ac_pwd}/modules/gui/qt \
-                --ldflags)
+                --ldflags \
+                ${qmake_additional_params})
             AC_SUBST([QT_QUICK_TEST_LIBS])
             AC_SUBST([QT_QUICK_TEST_CFLAGS])
             AC_SUBST([QT_QUICK_TEST_LDFLAGS])

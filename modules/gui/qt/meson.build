@@ -989,6 +989,10 @@ if qt6_dep.found()
         qt_install_bin_directory = qt6_dep.get_variable(pkgconfig: 'bindir', configtool: '-query QT_INSTALL_BINS')
         qmake6 = find_program(qt_install_bin_directory + '/qmake6', required: true)
         if qmake6.found()
+            qmake_additional_params = []
+            if get_option('buildtype') == 'debug'
+                qmake_additional_params += '--debug'
+            endif
             qtcflags = run_command(
                 prog_python,
                 meson.current_source_dir() / 'scripts/static_dirs.py',
@@ -996,6 +1000,7 @@ if qt6_dep.found()
                 '--pro', meson.current_source_dir() / 'qt6.pro',
                 '--builddir', meson.current_build_dir(),
                 '--cflags',
+                qmake_additional_params,
                 check: false,
             )
             if qtcflags.returncode() == 0
@@ -1010,6 +1015,7 @@ if qt6_dep.found()
                 '--pro', meson.current_source_dir() / 'qt6.pro',
                 '--builddir', meson.current_build_dir(),
                 '--libs', '--ldflags',
+                qmake_additional_params,
                 check: false,
             )
             if qtlflags.returncode() == 0
