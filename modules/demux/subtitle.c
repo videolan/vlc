@@ -1755,8 +1755,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
                     var_SetFloat( p_obj, "sub-fps", f_fps );
 
                     p_props->mpsub.i_factor = 1;
-                    free( psz_temp );
-                    break;
                 }
                 free( psz_temp );
             }
