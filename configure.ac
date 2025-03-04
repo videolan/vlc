@@ -3260,12 +3260,26 @@ have_libplacebo_gl="no"
 AS_IF([test "$enable_libplacebo" != "no"], [
   PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 4.192], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
-    AC_CHECK_HEADER([libplacebo/vulkan.h], [VLC_ADD_PLUGIN([placebo_vk])])
-    AC_CHECK_HEADER([libplacebo/opengl.h], [
+
+    AC_MSG_CHECKING([libplacebo is compiled with vulkan support])
+    PLACEBO_HAS_VULKAN="$(${PKG_CONFIG} libplacebo --variable pl_has_vulkan)"
+    AS_IF([test "${PLACEBO_HAS_VULKAN}" = "1"], [
+      AC_MSG_RESULT([yes])
+      VLC_ADD_PLUGIN([placebo_vk])
+    ],[
+      AC_MSG_RESULT([no])
+    ])
+
+    AC_MSG_CHECKING([libplacebo is compiled with OpenGL support])
+    PLACEBO_HAS_OPENGL="$(${PKG_CONFIG} libplacebo --variable pl_has_opengl)"
+    AS_IF([test "${PLACEBO_HAS_OPENGL}" = "1"], [
+        AC_MSG_RESULT([yes])
         AC_DEFINE([HAVE_LIBPLACEBO_GL], [1], [Define to 1 if <libplacebo/opengl.h> is available.])
         VLC_ADD_PLUGIN([placebo_gl])
         VLC_ADD_PLUGIN([placebo_gles2])
         have_libplacebo_gl="yes"
+    ],[
+        AC_MSG_RESULT([no])
     ])
   ], [
     AS_IF([test -n "${enable_libplacebo}"], [
