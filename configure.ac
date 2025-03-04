@@ -3250,6 +3250,13 @@ dnl
 EXTEND_HELP_STRING([Video plugins:])
 
 dnl
+dnl Vulkan
+dnl
+AC_ARG_ENABLE(vulkan,
+  [AS_HELP_STRING([--disable-vulkan],
+      [disable Vulkan support (default auto)])])
+
+dnl
 dnl  libplacebo support
 dnl
 AC_ARG_ENABLE([libplacebo],
@@ -3261,13 +3268,15 @@ AS_IF([test "$enable_libplacebo" != "no"], [
   PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 4.192], [
     AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
 
-    AC_MSG_CHECKING([libplacebo is compiled with vulkan support])
-    PLACEBO_HAS_VULKAN="$(${PKG_CONFIG} libplacebo --variable pl_has_vulkan)"
-    AS_IF([test "${PLACEBO_HAS_VULKAN}" = "1"], [
-      AC_MSG_RESULT([yes])
-      VLC_ADD_PLUGIN([placebo_vk])
-    ],[
-      AC_MSG_RESULT([no])
+    AS_IF([test "$enable_vulkan" != "no"], [
+      AC_MSG_CHECKING([libplacebo is compiled with vulkan support])
+      PLACEBO_HAS_VULKAN="$(${PKG_CONFIG} libplacebo --variable pl_has_vulkan)"
+      AS_IF([test "${PLACEBO_HAS_VULKAN}" = "1"], [
+        AC_MSG_RESULT([yes])
+        VLC_ADD_PLUGIN([placebo_vk])
+      ],[
+        AC_MSG_RESULT([no])
+      ])
     ])
 
     AC_MSG_CHECKING([libplacebo is compiled with OpenGL support])
@@ -3338,10 +3347,6 @@ PKG_HAVE_WITH_MODULES([GLES2], [glesv2], [enable GLES2 support (default auto)])
 dnl
 dnl Vulkan
 dnl
-AC_ARG_ENABLE(vulkan,
-  [AS_HELP_STRING([--disable-vulkan],
-      [disable Vulkan support (default auto)])])
-
 AS_IF([test "$enable_vulkan" != "no"], [
   PKG_CHECK_MODULES([VULKAN], [vulkan >= 1.0.26], [
   ], [
