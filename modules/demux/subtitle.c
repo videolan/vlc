@@ -1738,6 +1738,19 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
         }
 
+        /* Data Lines */
+        float wait, duration;
+        if( sscanf( s, "%f %f", &wait, &duration ) == 2 )
+        {
+            float f1 = wait;
+            float f2 = duration;
+            p_props->mpsub.f_total += f1 * p_props->mpsub.i_factor;
+            p_subtitle->i_start = VLC_TICK_0 + llroundf(10000.f * p_props->mpsub.f_total);
+            p_props->mpsub.f_total += f2 * p_props->mpsub.i_factor;
+            p_subtitle->i_stop = VLC_TICK_0 + llroundf(10000.f * p_props->mpsub.f_total);
+            break;
+        }
+
         if( strstr( s, "FORMAT" ) )
         {
             if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
@@ -1764,18 +1777,6 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
                 break;
             }
             free( psz_temp );
-        }
-
-        /* Data Lines */
-        float f1 = vlc_strtof_c( s, &psz_temp );
-        if( *psz_temp )
-        {
-            float f2 = vlc_strtof_c( psz_temp, NULL );
-            p_props->mpsub.f_total += f1 * p_props->mpsub.i_factor;
-            p_subtitle->i_start = VLC_TICK_0 + llroundf(10000.f * p_props->mpsub.f_total);
-            p_props->mpsub.f_total += f2 * p_props->mpsub.i_factor;
-            p_subtitle->i_stop = VLC_TICK_0 + llroundf(10000.f * p_props->mpsub.f_total);
-            break;
         }
     }
 
