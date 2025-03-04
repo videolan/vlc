@@ -1738,6 +1738,9 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             return VLC_EGENERIC;
         }
 
+        if ( *s =='#' || *s == '\0' )
+            continue;
+
         /* Data Lines */
         float wait, duration;
         if( sscanf( s, "%f %f", &wait, &duration ) == 2 )
