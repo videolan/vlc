@@ -70,7 +70,7 @@ FocusScope {
             id: mouseAutoHide
             running: true
             repeat: false
-            interval: 3000
+            interval: MainCtx.mouseHideTimeout
 
             onTriggered: {
                 // Cursor hides when toggleControlBarButton is not visible
