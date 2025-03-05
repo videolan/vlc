@@ -408,7 +408,7 @@ FocusScope {
             color: root.colorContext.accent
         }
 
-        delegate: TableViewDelegate {
+        delegate: Widgets.TableViewDelegateExt {
             id: tableDelegate
 
             required property var model

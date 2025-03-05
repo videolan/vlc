@@ -1255,7 +1255,7 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ImageToolButton.qml \
 	widgets/qml/ListViewExt.qml \
 	widgets/qml/TableViewExt.qml \
-	widgets/qml/TableViewDelegate.qml \
+	widgets/qml/TableViewDelegateExt.qml \
 	widgets/qml/TableRowDelegate.qml \
 	widgets/qml/TableHeaderDelegate.qml \
 	widgets/qml/DefaultShadow.qml \
