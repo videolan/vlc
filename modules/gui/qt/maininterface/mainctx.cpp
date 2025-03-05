@@ -712,6 +712,9 @@ void MainCtx::setGrouping(Grouping grouping)
 
 void MainCtx::setInterfaceAlwaysOnTop( bool on_top )
 {
+    if (b_interfaceOnTop == on_top)
+        return;
+
     b_interfaceOnTop = on_top;
     emit interfaceAlwaysOnTopChanged(on_top);
 }
