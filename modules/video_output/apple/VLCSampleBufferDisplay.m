@@ -1105,7 +1105,6 @@ static int UpdateFormat(vout_display_t *vd, const video_format_t *fmt,
                         vlc_video_context *vctx)
 {
     VLCSampleBufferDisplay *sys = (__bridge VLCSampleBufferDisplay*)vd->sys;
-    msg_Dbg(vd, "Update format! from %4.4s to %4.4s", &vd->fmt->i_chroma, &fmt->i_chroma);
 
     // Display will only work with CVPX video context
     filter_t *converter = NULL;
