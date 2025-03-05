@@ -69,6 +69,7 @@ struct filter_sys_t
     struct filter_level Hue;
     struct filter_level Saturation;
 
+    d3d11_handle_t                 hd3d;
     d3d11_device_t                 d3d_dev;
     ID3D11VideoDevice              *d3dviddev;
     ID3D11VideoContext             *d3dvidctx;
@@ -360,11 +361,19 @@ static int D3D11OpenAdjust(vlc_object_t *obj)
         return VLC_ENOMEM;
     memset(sys, 0, sizeof (*sys));
 
+    if ( unlikely(D3D11_Create(filter, &sys->hd3d, false) != VLC_SUCCESS ))
+    {
+       msg_Err(filter, "Could not access the d3d11.");
+       free(sys);
+       return VLC_EGENERIC;
+    }
+
     D3D11_TEXTURE2D_DESC dstDesc;
     D3D11_FilterHoldInstance(filter, &sys->d3d_dev, &dstDesc);
     if (unlikely(sys->d3d_dev.d3dcontext==NULL))
     {
         msg_Dbg(filter, "Filter without a context");
+        D3D11_Destroy(&sys->hd3d);
         free(sys);
         return VLC_ENOOBJ;
     }
@@ -596,6 +605,7 @@ error:
     if (sys->d3d_dev.d3dcontext)
         D3D11_FilterReleaseInstance(&sys->d3d_dev);
     d3d11_device_unlock(&sys->d3d_dev);
+    D3D11_Destroy(&sys->hd3d);
     free(sys);
 
     return VLC_EGENERIC;
@@ -629,6 +639,7 @@ static void D3D11CloseAdjust(vlc_object_t *obj)
     ID3D11VideoDevice_Release(sys->d3dviddev);
 
     D3D11_FilterReleaseInstance(&sys->d3d_dev);
+    D3D11_Destroy(&sys->hd3d);
 
     free(sys);
 }
