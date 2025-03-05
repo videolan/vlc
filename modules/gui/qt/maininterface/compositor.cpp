@@ -278,13 +278,16 @@ bool CompositorVideo::commonGUICreateImpl(QWindow* window, CompositorVideo::Flag
     m_mainCtx->setWindowSuportExtendedFrame(flags & CompositorVideo::HAS_EXTENDED_FRAME);
     if (!backendIsOpenVg && (flags & CompositorVideo::HAS_ACRYLIC))
     {
-        if (Q_LIKELY(!window->isActive()))
+#ifndef _WIN32
+        assert(qGuiApp);
+        if (qGuiApp->platformName().startsWith(QLatin1String("wayland")) && Q_LIKELY(!window->isActive()))
         {
             connect(window, &QWindow::activeChanged, this, [this, window = QPointer(window)]() {
                setBlurBehind(window, true);
             }, Qt::SingleShotConnection);
         }
         else
+#endif
         {
             setBlurBehind(window, true);
         }
