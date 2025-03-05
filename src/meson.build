@@ -363,7 +363,7 @@ else
         'posix/timer.c',
     ]
 
-    if cdata.get('HAVE_QSORT_R', 0) == 1 or cdata.get('HAVE_BROKEN_QSORT_R', 0) == 1
+    if cdata.get('HAVE_QSORT_R', 0) == 1
         libvlccore_sources += 'posix/sort.c'
     endif
 
