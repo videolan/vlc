@@ -24,10 +24,6 @@
 #include <string>
 #include <sstream>
 
-#ifdef _MSC_VER
-typedef int ssize_t;
-#endif
-
 #include <vlc/vlc.h>
 
 #define INITIAL_WIDTH  1500
