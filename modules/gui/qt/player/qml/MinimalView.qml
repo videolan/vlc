@@ -32,6 +32,16 @@ FocusScope {
                             && (!MainCtx.hasEmbededVideo || _csdOnVideo)
     property bool _csdOnVideo: true
 
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+
+        palette: (MainCtx.hasEmbededVideo && MainCtx.pinVideoControls === false)
+                 ? VLCStyle.darkPalette
+                 : VLCStyle.palette
+
+        colorSet: ColorContext.Window
+    }
+
     VideoSurface {
         id: videoSurface
 
@@ -72,22 +82,12 @@ FocusScope {
     }
 
     Rectangle {
-        color: "#000000"
+        color: theme.bg.primary
 
         anchors.fill: parent
 
         visible: !MainCtx.hasEmbededVideo
         focus: visible
-
-        ColorContext {
-            id: theme
-
-            palette: (MainCtx.hasEmbededVideo && MainCtx.pinVideoControls === false)
-                     ? VLCStyle.darkPalette
-                     : VLCStyle.palette
-
-            colorSet: ColorContext.Window
-        }
 
         Image {
             id: logo
