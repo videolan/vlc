@@ -549,7 +549,7 @@ MESONCLEAN = rm -rf $(BUILD_DIR)/meson-private
 MESONBUILD = meson compile -C $(BUILD_DIR) $(MESON_BUILD) && meson install -C $(BUILD_DIR)
 
 # shared Qt config
-ifeq ($(call system_tool_version, qmake6 -query QT_VERSION 2>/dev/null, cat),$(QTBASE_VERSION))
+ifeq ($(call system_tool_majmin, qmake6 -query QT_VERSION 2>/dev/null),$(QTBASE_VERSION_MAJOR))
 
 ifdef HAVE_CROSS_COMPILE
 QT_LIBEXECS := $(shell qmake6 -query QT_HOST_LIBEXECS)
@@ -559,9 +559,9 @@ QT_LIBEXECS := $(shell qmake6 -query QT_INSTALL_LIBEXECS):$(shell qmake6 -query 
 QT_BINS := $(shell qmake6 -query QT_INSTALL_BINS):$(shell qmake6 -query QT_HOST_BINS)
 endif
 
-ifeq ($(call system_tool_version, PATH="${QT_LIBEXECS}" moc --version, cat),$(QTBASE_VERSION))
-ifeq ($(call system_tool_version, PATH="${QT_BINS}" qsb --version, cat),$(QTBASE_VERSION))
-ifeq ($(call system_tool_version, PATH="${QT_LIBEXECS}" qmlcachegen --version, cat),$(QTBASE_VERSION))
+ifeq ($(call system_tool_majmin, PATH="${QT_LIBEXECS}" moc --version),$(QTBASE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, PATH="${QT_BINS}" qsb --version),$(QTBASE_VERSION_MAJOR))
+ifeq ($(call system_tool_majmin, PATH="${QT_LIBEXECS}" qmlcachegen --version),$(QTBASE_VERSION_MAJOR))
 QT_USES_SYSTEM_TOOLS = 1
 endif
 endif
