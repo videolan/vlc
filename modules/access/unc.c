@@ -45,8 +45,8 @@
 
 typedef struct
 {
-    int i_smb;
-    uint64_t size;
+    HANDLE h;
+    LARGE_INTEGER size;
     vlc_url_t url;
 } access_sys_t;
 
@@ -120,15 +120,16 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
     access_sys_t *p_sys = p_access->p_sys;
     int64_t      i_ret;
 
-    if( i_pos >= INT64_MAX )
+    if( i_pos >= LONG_LONG_MAX )
         return VLC_EGENERIC;
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
-    i_ret = lseek( p_sys->i_smb, i_pos, SEEK_SET );
-    if( i_ret == -1 )
+    LARGE_INTEGER pos;
+    pos.QuadPart = i_pos;
+    if( !SetFilePointerEx( p_sys->h, pos, NULL, FILE_BEGIN) )
     {
-        msg_Err( p_access, "seek failed (%s)", vlc_strerror_c(errno) );
+        msg_Err( p_access, "seek failed (%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -138,13 +139,12 @@ static int Seek( stream_t *p_access, uint64_t i_pos )
 static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    int i_read;
+    DWORD i_read;
 
-    i_read = read( p_sys->i_smb, p_buffer, i_len );
-    if( i_read < 0 )
+    if( !ReadFile(p_sys->h, p_buffer, i_len, &i_read, NULL) )
     {
-        msg_Err( p_access, "read failed (%s)", vlc_strerror_c(errno) );
-        i_read = 0;
+        msg_Err( p_access, "read failed (%lu)", GetLastError() );
+        return -1;
     }
 
     return i_read;
@@ -246,7 +246,9 @@ static int Control( stream_t *p_access, int i_query, va_list args )
     case STREAM_GET_SIZE:
         if( p_access->pf_readdir != NULL )
             return VLC_EGENERIC;
-        *va_arg( args, uint64_t * ) = sys->size;
+        if( sys->size.QuadPart == LONG_LONG_MIN )
+            return VLC_EGENERIC;
+        *va_arg( args, uint64_t * ) = sys->size.QuadPart;
         break;
 
     case STREAM_GET_PTS_DELAY:
@@ -270,9 +272,9 @@ static int Open(vlc_object_t *obj)
     stream_t *access = (stream_t *)obj;
     vlc_url_t url;
     vlc_credential credential;
-    char *psz_decoded_path = NULL, *psz_uri = NULL, *psz_var_domain = NULL;
-    int fd;
-    uint64_t size;
+    char *psz_decoded_path = NULL, *psz_var_domain = NULL;
+    HANDLE h;
+    wchar_t *w_uri;
     bool is_dir;
 
     if (vlc_UrlParseFixup(&url, access->psz_url) != 0)
@@ -305,7 +307,7 @@ static int Open(vlc_object_t *obj)
 
     for (;;)
     {
-        struct stat st;
+        char *psz_uri;
 
         if (smb_get_uri(access, &psz_uri,
                         credential.psz_username, credential.psz_password,
@@ -318,19 +320,20 @@ static int Open(vlc_object_t *obj)
             return VLC_ENOMEM;
         }
 
-        if (stat(psz_uri, &st) == 0)
+        w_uri = ToWide( psz_uri );
+        free( psz_uri );
+        if( unlikely(w_uri == NULL) )
+            break;
+
+        DWORD f = GetFileAttributesW( w_uri );
+        if (f == INVALID_FILE_ATTRIBUTES)
         {
-            is_dir = S_ISDIR(st.st_mode) != 0;
-            size = st.st_size;
+            free( w_uri );
+            w_uri = NULL;
             break;
         }
 
-        /* stat() fails with servers or shares. Assume directory. */
-        is_dir = true;
-        size = 0;
-
-        if (errno != EACCES)
-            break;
+        is_dir = (f & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 
         errno = 0;
         if (vlc_credential_get(&credential, access, "smb-user",
@@ -344,11 +347,17 @@ static int Open(vlc_object_t *obj)
     free(psz_var_domain);
     free(psz_decoded_path);
 
+    if ( w_uri == NULL)
+    {
+        vlc_UrlClean(&url);
+        return VLC_EGENERIC;
+    }
+
     /* Init access */
     access_sys_t *sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
     {
-        free(psz_uri);
+        free(w_uri);
         vlc_UrlClean(&url);
         return VLC_ENOMEM;
     }
@@ -360,20 +369,31 @@ static int Open(vlc_object_t *obj)
         sys->url = url;
         access->pf_readdir = DirRead;
         access->pf_control = access_vaDirectoryControlHelper;
-        fd = -1;
+        h = INVALID_HANDLE_VALUE;
     }
     else
     {
+        vlc_UrlClean(&url);
+        h = CreateFileW(w_uri, GENERIC_READ,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING,
+            FILE_FLAG_RANDOM_ACCESS, NULL);
+        if (h == INVALID_HANDLE_VALUE)
+        {
+            free(w_uri);
+            return VLC_EACCES;
+        }
+
         access->pf_read = Read;
         access->pf_control = Control;
         access->pf_seek = Seek;
-        fd = open(psz_uri, O_RDONLY, 0);
-        vlc_UrlClean(&url);
-    }
-    free(psz_uri);
 
-    sys->size = size;
-    sys->i_smb = fd;
+        if (!GetFileSizeEx(h, &sys->size))
+            sys->size.QuadPart = LONG_LONG_MIN;
+    }
+    free(w_uri);
+
+    sys->h = h;
 
     return VLC_SUCCESS;
 }
@@ -384,7 +404,7 @@ static void Close(vlc_object_t *obj)
     access_sys_t *sys = access->p_sys;
 
     vlc_UrlClean(&sys->url);
-    close(sys->i_smb);
+    CloseHandle(sys->h);
 }
 
 vlc_module_begin()
