@@ -1,0 +1,27 @@
+From 4d163818668fb71745bea44c6c3e01a4a9b3f3e4 Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Wed, 5 Mar 2025 19:29:58 +0200
+Subject: [PATCH] QtQml: do not care about patch version when checking QML
+ cache
+
+This allows using `qmlcachegen` that has different patch version.
+---
+ src/qml/common/qv4compileddata.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/qml/common/qv4compileddata.cpp b/src/qml/common/qv4compileddata.cpp
+index 9dee91f713..0ea3e2912b 100644
+--- a/src/qml/common/qv4compileddata.cpp
++++ b/src/qml/common/qv4compileddata.cpp
+@@ -49,7 +49,7 @@ bool Unit::verifyHeader(QDateTime expectedSourceTimeStamp, QString *errorString)
+         return false;
+     }
+ 
+-    if (qtVersion != quint32(QT_VERSION)) {
++    if ((qtVersion >> 8) != (quint32(QT_VERSION) >> 8)) {
+         *errorString = QString::fromUtf8("Qt version mismatch. Found %1 expected %2")
+                                .arg(qtVersion, 0, 16).arg(QT_VERSION, 0, 16);
+         return false;
+-- 
+2.48.1
+
