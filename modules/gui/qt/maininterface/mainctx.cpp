@@ -1106,21 +1106,30 @@ bool WindowStateHolder::holdOnTop(QWindow *window, Source source, bool hold)
     else
         onTopCounter &= ~source;
 
-    Qt::WindowStates oldStates = window->windowStates();
-    Qt::WindowFlags oldflags = window->flags();
-    Qt::WindowFlags newflags;
+#ifdef _WIN32
+    if (!window->handle()) // do not call hold on top if there is no platform window
+        return false;
+#endif
 
     if( onTopCounter != 0 )
-        newflags = oldflags | Qt::WindowStaysOnTopHint;
-    else
-        newflags = oldflags & ~Qt::WindowStaysOnTopHint;
-    if( newflags != oldflags )
     {
-
-        window->setFlags( newflags );
-        window->setVisible(true); /* necessary to apply window flags */
-        //workaround: removing onTop state might drop fullscreen state
-        window->setWindowStates(oldStates);
+#ifdef _WIN32
+        // Qt::WindowStaysOnTopHint is broken on Windows: QTBUG-133034, QTBUG-132522.
+        // Reported to be fixed by Qt 6.9, but needs additional checking if the solution does not interfere with `CSDWin32EventHandler`.
+        SetWindowPos(reinterpret_cast<HWND>(window->winId()), HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+#else
+        window->setFlag(Qt::WindowStaysOnTopHint, true);
+#endif
+    }
+    else
+    {
+#ifdef _WIN32
+        // Qt::WindowStaysOnTopHint is broken on Windows: QTBUG-133034, QTBUG-132522.
+        // Reported to be fixed by Qt 6.9, but needs additional checking if the solution does not interfere with `CSDWin32EventHandler`.
+        SetWindowPos(reinterpret_cast<HWND>(window->winId()), HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+#else
+        window->setFlag(Qt::WindowStaysOnTopHint, false);
+#endif
     }
 
     window->setProperty("__windowOnTop", QVariant::fromValue(onTopCounter));
