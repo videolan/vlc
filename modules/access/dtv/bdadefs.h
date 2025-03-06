@@ -20,7 +20,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <tuner.h>
 #include <mpeg2structs.h>
 
 #ifndef __ISampleGrabberCB_FWD_DEFINED__

@@ -36,6 +36,7 @@
 #endif
 
 #include <dshow.h>
+#include <tuner.h>
 
 #include <comcat.h>
 #include "bdadefs.h"
