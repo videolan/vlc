@@ -1004,6 +1004,7 @@ vlc_playlist_Pause
 vlc_playlist_Resume
 vlc_playlist_Export
 vlc_playlist_SetMediaStoppedAction
+vlc_replay_gain_CopyFromMeta
 vlc_intf_GetMainPlaylist
 vlc_media_source_Hold
 vlc_media_source_Release

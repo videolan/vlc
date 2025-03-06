@@ -97,6 +97,7 @@ pluginsinclude_HEADERS.h = \
 	../include/vlc_queue.h \
 	../include/vlc_rand.h \
 	../include/vlc_renderer_discovery.h \
+	../include/vlc_replay_gain.h \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sort.h \
 	../include/vlc_sout.h \
@@ -290,6 +291,7 @@ libvlccore_la_SOURCES = \
 	input/meta.c \
 	input/attachment.c \
 	input/parse.c \
+	input/replay_gain.c \
 	player/player.c \
 	player/player.h \
 	player/input.c \

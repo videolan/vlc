@@ -44,6 +44,7 @@
 #include <vlc_decoder.h>
 #include <vlc_memstream.h>
 #include <vlc_tracer.h>
+#include <vlc_replay_gain.h>
 
 #include "input_internal.h"
 #include "./source.h"
@@ -2037,22 +2038,10 @@ static void EsOutFillEsFmt(es_out_sys_t *p_sys, es_format_t *fmt)
         audio_replay_gain_t rg;
         memset( &rg, 0, sizeof(rg) );
         vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-        vlc_audio_replay_gain_MergeFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
+        vlc_replay_gain_CopyFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
         vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+        replay_gain_Merge( &fmt->audio_replay_gain, &rg );
 
-        for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
-        {
-            if( !fmt->audio_replay_gain.pb_peak[i] )
-            {
-                fmt->audio_replay_gain.pb_peak[i] = rg.pb_peak[i];
-                fmt->audio_replay_gain.pf_peak[i] = rg.pf_peak[i];
-            }
-            if( !fmt->audio_replay_gain.pb_gain[i] )
-            {
-                fmt->audio_replay_gain.pb_gain[i] = rg.pb_gain[i];
-                fmt->audio_replay_gain.pf_gain[i] = rg.pf_gain[i];
-            }
-        }
         break;
     }
 

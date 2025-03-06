@@ -299,12 +299,6 @@ sout_stream_t *sout_NewInstance(vlc_object_t *p_parent, const char *psz_dest)
     return NULL;
 }
 
-void vlc_audio_replay_gain_MergeFromMeta(audio_replay_gain_t *p_dst,
-                                         const struct vlc_meta_t *p_meta)
-{
-    (void)p_dst; (void)p_meta;
-}
-
 static input_source_t *InputSourceNew(void)
 {
     input_source_t *in = calloc(1, sizeof(*in));

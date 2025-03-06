@@ -32,6 +32,7 @@
 #include <vlc_modules.h>
 #include <vlc_aout.h>
 #include <vlc_aout_volume.h>
+#include <vlc_replay_gain.h>
 #include "aout_internal.h"
 
 struct aout_volume
@@ -134,63 +135,12 @@ int aout_volume_Amplify(aout_volume_t *vol, block_t *block)
     return 0;
 }
 
-/*** Replay gain ***/
-static float aout_ReplayGainSelect(vlc_object_t *obj, const char *str,
-                                   const audio_replay_gain_t *replay_gain)
-{
-    unsigned mode = AUDIO_REPLAY_GAIN_MAX;
-
-    if (likely(str != NULL))
-    {   /* Find selectrf mode */
-        if (!strcmp (str, "track"))
-            mode = AUDIO_REPLAY_GAIN_TRACK;
-        else
-        if (!strcmp (str, "album"))
-            mode = AUDIO_REPLAY_GAIN_ALBUM;
-    }
-
-    /* */
-    float multiplier;
-
-    if (mode == AUDIO_REPLAY_GAIN_MAX)
-    {
-        multiplier = 1.f;
-    }
-    else
-    {
-        float gain;
-
-        /* If the selectrf mode is not available, prefer the other one */
-        if (!replay_gain->pb_gain[mode] && replay_gain->pb_gain[!mode])
-            mode = !mode;
-
-        if (replay_gain->pb_gain[mode])
-            gain = replay_gain->pf_gain[mode]
-                 + var_InheritFloat (obj, "audio-replay-gain-preamp");
-        else
-            gain = var_InheritFloat (obj, "audio-replay-gain-default");
-
-        multiplier = powf (10.f, gain / 20.f);
-
-        if (var_InheritBool (obj, "audio-replay-gain-peak-protection"))
-            multiplier = fminf (multiplier, replay_gain->pb_peak[mode]
-                                            ? 1.f / replay_gain->pf_peak[mode]
-                                            : 1.f);
-    }
-
-    /* Command line / configuration gain */
-    multiplier *= var_InheritFloat (obj, "gain");
-
-    return multiplier;
-}
-
 static int ReplayGainCallback (vlc_object_t *obj, char const *var,
                                vlc_value_t oldval, vlc_value_t val, void *data)
 {
     aout_volume_t *vol = data;
-    float multiplier = aout_ReplayGainSelect(obj, val.psz_string,
-                                             &vol->replay_gain);
+    float multiplier = replay_gain_CalcMultiplier(obj, &vol->replay_gain);
     atomic_store_explicit(&vol->gain_factor, multiplier, memory_order_relaxed);
-    VLC_UNUSED(var); VLC_UNUSED(oldval);
+    VLC_UNUSED(var); VLC_UNUSED(oldval); VLC_UNUSED(val);
     return VLC_SUCCESS;
 }

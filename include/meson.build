@@ -92,6 +92,7 @@ install_headers(
     'vlc_probe.h',
     'vlc_rand.h',
     'vlc_renderer_discovery.h',
+    'vlc_replay_gain.h',
     'vlc_services_discovery.h',
     'vlc_sort.h',
     'vlc_sout.h',

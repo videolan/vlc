@@ -26,6 +26,7 @@
 #include <vlc_common.h>
 #include <vlc_fourcc.h>
 #include <vlc_viewpoint.h>
+#include <vlc_replay_gain.h>
 
 /**
  * \file
@@ -45,26 +46,6 @@ struct video_palette_t
     int i_entries;                         /**< number of in-use palette entries */
     uint8_t palette[VIDEO_PALETTE_COLORS_MAX][4];  /**< 4-byte RGBA/YUVA palette */
 };
-
-/**
- * audio replay gain description
- */
-#define AUDIO_REPLAY_GAIN_MAX (2)
-#define AUDIO_REPLAY_GAIN_TRACK (0)
-#define AUDIO_REPLAY_GAIN_ALBUM (1)
-typedef struct
-{
-    /* true if we have the peak value */
-    bool pb_peak[AUDIO_REPLAY_GAIN_MAX];
-    /* peak value where 1.0 means full sample value */
-    float      pf_peak[AUDIO_REPLAY_GAIN_MAX];
-
-    /* true if we have the gain value */
-    bool pb_gain[AUDIO_REPLAY_GAIN_MAX];
-    /* gain value in dB */
-    float      pf_gain[AUDIO_REPLAY_GAIN_MAX];
-} audio_replay_gain_t;
-
 
 /**
  * Audio channel type

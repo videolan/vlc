@@ -45,6 +45,7 @@
 #include <vlc_picture_pool.h>
 #include <vlc_tracer.h>
 #include <vlc_list.h>
+#include <vlc_replay_gain.h>
 
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
@@ -495,20 +496,6 @@ static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
 /*****************************************************************************
  * Buffers allocation callbacks for the decoders
  *****************************************************************************/
-static bool aout_replaygain_changed( const audio_replay_gain_t *a,
-                                     const audio_replay_gain_t *b )
-{
-    for( size_t i=0; i<AUDIO_REPLAY_GAIN_MAX; i++ )
-    {
-        if( a->pb_gain[i] != b->pb_gain[i] ||
-            a->pb_peak[i] != b->pb_peak[i] ||
-            (a->pb_gain[i] && a->pf_gain[i] != b->pf_gain[i]) ||
-            (a->pb_peak[i] && a->pf_peak[i] != b->pf_peak[i]) )
-            return true;
-    }
-    return false;
-}
-
 static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
 {
     vlc_input_decoder_t *p_owner = dec_get_owner( p_dec );
@@ -532,8 +519,8 @@ static int ModuleThread_UpdateAudioFormat( decoder_t *p_dec )
     }
 
     /* Check if only replay gain has changed */
-    if( aout_replaygain_changed( &p_dec->fmt_in->audio_replay_gain,
-                                 &p_owner->fmt.audio_replay_gain ) )
+    if( replay_gain_Compare( &p_dec->fmt_in->audio_replay_gain,
+                             &p_owner->fmt.audio_replay_gain ) )
     {
         p_dec->fmt_out.audio_replay_gain = p_dec->fmt_in->audio_replay_gain;
         if( p_owner->p_aout )
@@ -2065,19 +2052,7 @@ CreateDecoder( vlc_object_t *p_parent, const struct vlc_input_decoder_cfg *cfg )
     /* Copy ourself the input replay gain */
     if( fmt->i_cat == AUDIO_ES )
     {
-        for( unsigned i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
-        {
-            if( !p_dec->fmt_out.audio_replay_gain.pb_peak[i] )
-            {
-                p_dec->fmt_out.audio_replay_gain.pb_peak[i] = fmt->audio_replay_gain.pb_peak[i];
-                p_dec->fmt_out.audio_replay_gain.pf_peak[i] = fmt->audio_replay_gain.pf_peak[i];
-            }
-            if( !p_dec->fmt_out.audio_replay_gain.pb_gain[i] )
-            {
-                p_dec->fmt_out.audio_replay_gain.pb_gain[i] = fmt->audio_replay_gain.pb_gain[i];
-                p_dec->fmt_out.audio_replay_gain.pf_gain[i] = fmt->audio_replay_gain.pf_gain[i];
-            }
-        }
+        replay_gain_Merge( &p_dec->fmt_out.audio_replay_gain, &fmt->audio_replay_gain );
     }
 
     /* */

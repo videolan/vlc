@@ -168,6 +168,7 @@ libvlccore_sources_base = files(
     'input/input_interface.h',
     'input/vlm_internal.h',
     'input/vlm_event.h',
+    'input/replay_gain.c',
     'input/resource.h',
     'input/resource.c',
     'input/services_discovery.c',
