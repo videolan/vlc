@@ -36,8 +36,10 @@
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
 #include <vlc_url.h>
+#include <vlc_replay_gain.h>
 #include <assert.h>
 #include <limits.h>
+#include <math.h>
 #include "meta.h"
 #include "attachments.h"
 #include "heif.h"
@@ -1048,6 +1050,8 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->context.i_lastseqnumber = UINT32_MAX;
     p_sys->i_attachments = -1;
+    p_sys->qt.f_replay_gain_norm = NAN;
+    p_sys->qt.f_replay_gain_peak = NAN;
 
     p_demux->p_sys = p_sys;
 
@@ -3258,37 +3262,36 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     (float)p_fmt->video.i_frame_rate_base;
             break;
         case AUDIO_ES:
+        {
+            int i_ret = VLC_EGENERIC;
             if( p_sys->p_meta )
             {
-                audio_replay_gain_t *p_arg = &p_fmt->audio_replay_gain;
-                const char *psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_gain" );
-                if( psz_meta )
-                {
-                    double f_gain = vlc_atof_c( psz_meta );
-                    p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
-                    p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = f_gain != 0;
-                }
-                psz_meta = vlc_meta_GetExtra( p_sys->p_meta, "replaygain_track_peak" );
-                if( psz_meta )
-                {
-                    double f_gain = vlc_atof_c( psz_meta );
-                    p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain;
-                    p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = f_gain > 0;
-                }
+                i_ret = vlc_replay_gain_CopyFromMeta( &p_fmt->audio_replay_gain, p_sys->p_meta );
             }
 
-            if( p_sys->qt.f_replay_gain_peak > 0 )
+            /* use replay gain if available; otherwise use sound check */
+            if( i_ret != VLC_SUCCESS )
             {
                 audio_replay_gain_t *p_arg = &p_fmt->audio_replay_gain;
-                if( !p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] )
+                replay_gain_Reset( p_arg );
+
+                if( isfinite(p_sys->qt.f_replay_gain_norm) )
                 {
-                    p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_norm;
                     p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
+                    p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_norm;
                 }
-                if( !p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] )
+
+                if( isfinite(p_sys->qt.f_replay_gain_peak) )
                 {
-                    p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_peak;
                     p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
+                    p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = p_sys->qt.f_replay_gain_peak;
+                }
+
+                if( p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] )
+                {
+                    /* sound check uses -16 LUFS as the reference level */
+                    p_arg->pb_reference_loudness = true;
+                    p_arg->pf_reference_loudness = -16.f;
                 }
             }
 
@@ -3358,6 +3361,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
                     break;
             }
             break;
+        }
         default:
             break;
     }

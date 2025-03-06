@@ -420,6 +420,13 @@ static void iTUNTripletCallback( const char *psz_key,
         }
         ctx->ituncb( &data, ctx->priv );
     }
+    else if( !strncasecmp(psz_key, "REPLAYGAIN_", 11) )
+    {
+        char *psz_val = StringConvert( p_data );
+        if( psz_val )
+            vlc_meta_SetExtra( ctx->p_meta, psz_key, psz_val );
+        free( psz_val );
+    }
 }
 
 static void SetupmdirMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_box, void *priv )
