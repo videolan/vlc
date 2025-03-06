@@ -120,6 +120,7 @@ actionCallback(encodedBy);
 
     self.outlineView.dataSource = self;
     self.outlineView.delegate = self;
+    self.outlineView.tableColumns.lastObject.resizingMask = NSTableColumnAutoresizingMask;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     if (_mainMenuInstance && _statisticsEnabled) {
@@ -606,6 +607,7 @@ _##field##TextField.originalStateString = @"";
 
     [self.outlineView reloadData];
     [self.outlineView expandItem:nil expandChildren:YES];
+    [self.outlineView sizeLastColumnToFit];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification
