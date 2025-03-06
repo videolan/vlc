@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_plugin.h>
@@ -37,6 +39,7 @@
 #include <vlc_codec.h>
 #include <vlc_codecs.h>
 #include <vlc_input.h>
+#include <vlc_replay_gain.h>
 
 #include "../../packetizer/a52.h"
 #include "../../packetizer/dts_header.h"
@@ -362,8 +365,7 @@ typedef struct
     struct mpga_frameheader_s mpgah;
     struct xing_info_s xing;
 
-    float rgf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
-    float rgf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
+    audio_replay_gain_t audio_replay_gain;
 
     sync_table_t mllt;
     struct
@@ -435,6 +437,9 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
     p_sys->p_packetized_data = NULL;
     p_sys->chapters.i_current = 0;
+    p_sys->xing.f_peak_signal = NAN;
+    p_sys->xing.f_radio_replay_gain = NAN;
+    p_sys->xing.f_audiophile_replay_gain = NAN;
     TAB_INIT(p_sys->chapters.i_count, p_sys->chapters.p_entry);
 
     if( vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
@@ -468,19 +473,7 @@ static int OpenCommon( demux_t *p_demux,
     }
 
     es_format_t *p_fmt = &p_sys->p_packetizer->fmt_out;
-    for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
-    {
-        if ( p_sys->rgf_replay_gain[i] != 0.0 )
-        {
-            p_fmt->audio_replay_gain.pb_gain[i] = true;
-            p_fmt->audio_replay_gain.pf_gain[i] = p_sys->rgf_replay_gain[i];
-        }
-        if ( p_sys->rgf_replay_peak[i] != 0.0 )
-        {
-            p_fmt->audio_replay_gain.pb_peak[i] = true;
-            p_fmt->audio_replay_gain.pf_peak[i] = p_sys->rgf_replay_peak[i];
-        }
-    }
+    replay_gain_Merge( &p_fmt->audio_replay_gain, &p_sys->audio_replay_gain );
 
     for( ;; )
     {
@@ -1270,30 +1263,7 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
             bool b_updated;
             if( ID3HandleTag( p_payload, i_payload, i_tag, p_meta, &b_updated ) )
             {
-                char ** ppsz_keys = vlc_meta_CopyExtraNames( p_meta );
-                if( ppsz_keys )
-                {
-                    for( size_t i = 0; ppsz_keys[i]; ++i )
-                    {
-                        float *pf = NULL;
-                        if(     !strcasecmp( ppsz_keys[i], "REPLAYGAIN_TRACK_GAIN" ) )
-                            pf = &p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK];
-                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_TRACK_PEAK" ) )
-                            pf = &p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK];
-                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_ALBUM_GAIN" ) )
-                            pf = &p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM];
-                        else if( !strcasecmp( ppsz_keys[i], "REPLAYGAIN_ALBUM_PEAK" ) )
-                            pf = &p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_ALBUM];
-                        if( pf )
-                        {
-                            const char *psz_val = vlc_meta_GetExtra( p_meta, ppsz_keys[i] );
-                            if( psz_val )
-                                *pf = vlc_atof_c( psz_val );
-                        }
-                        free( ppsz_keys[i] );
-                    }
-                    free( ppsz_keys );
-                }
+                vlc_replay_gain_CopyFromMeta( &p_sys->audio_replay_gain, p_meta );
             }
             vlc_meta_Delete( p_meta );
         }
@@ -1421,9 +1391,23 @@ static int MpgaInit( demux_t *p_demux )
             p_sys->b_estimate_bitrate = false;
         }
 
-        p_sys->rgf_replay_peak[AUDIO_REPLAY_GAIN_TRACK] = xing->f_peak_signal;
-        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_TRACK] = xing->f_radio_replay_gain;
-        p_sys->rgf_replay_gain[AUDIO_REPLAY_GAIN_ALBUM] = xing->f_audiophile_replay_gain;
+        if( isfinite(xing->f_radio_replay_gain) )
+        {
+            p_sys->audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
+            p_sys->audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_TRACK] = xing->f_radio_replay_gain;
+        }
+
+        if( isfinite(xing->f_peak_signal) )
+        {
+            p_sys->audio_replay_gain.pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
+            p_sys->audio_replay_gain.pf_peak[AUDIO_REPLAY_GAIN_TRACK] = xing->f_peak_signal;
+        }
+
+        if( isfinite(xing->f_audiophile_replay_gain) )
+        {
+            p_sys->audio_replay_gain.pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
+            p_sys->audio_replay_gain.pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = xing->f_audiophile_replay_gain;
+        }
 
         msg_Dbg( p_demux, "Using '%4.4s' infotag"
                           "(%"PRIu32" bytes, %"PRIu32" frames, %u samples/frame)",
