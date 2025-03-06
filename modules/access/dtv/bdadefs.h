@@ -279,9 +279,3 @@ static FORCEINLINE HRESULT ISampleGrabber_SetCallback(ISampleGrabber* This,ISamp
 
 
 #endif  /* __ISampleGrabber_INTERFACE_DEFINED__ */
-
-
-extern "C" {
-extern const CLSID CLSID_SampleGrabber; // found in strmiids
-
-};
