@@ -42,7 +42,8 @@
 #if defined(__MINGW64_VERSION_MAJOR)
 #include <qedit.h>
 #else
-#include "bdadefs.h"
+// qedit.h is not part of the Windows 7 SDK anymore, use a local version
+#include "qedit.h"
 #endif
 #include <stdexcept>
 

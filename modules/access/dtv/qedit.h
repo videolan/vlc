@@ -1,5 +1,5 @@
 /*****************************************************************************
- * bdadefs.h : DirectShow BDA headers for vlc
+ * qedit.h : DirectShow BDA headers for vlc
  *****************************************************************************
  * Copyright (C) 2007 the VideoLAN team
  *
