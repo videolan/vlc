@@ -278,6 +278,13 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
         event->ignore();
         return true;
     }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+    case QEvent::DevicePixelRatioChange:
+    {
+        m_mainCtx->intfDevicePixelRatioChanged();
+    }
+#endif
+
     default:
         break;
     }

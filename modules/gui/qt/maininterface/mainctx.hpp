@@ -534,6 +534,7 @@ signals:
     void requestInterfaceMinimized();
 
     void intfScaleFactorChanged();
+    void intfDevicePixelRatioChanged();
 
     void pinVideoControlsChanged();
     void pinOpacityChanged();
