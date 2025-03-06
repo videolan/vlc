@@ -110,6 +110,19 @@ FocusScope {
 
             source: MainCtx.useXmasCone() ? "qrc:///logo/vlc48-xmas.png" // TODO: new xmas cone designs
                                           : SVGColorImage.colorize("qrc:///misc/cone.svg").accent(theme.accent).uri()
+
+            Connections {
+                target: MainCtx
+
+                function onIntfDevicePixelRatioChanged() {
+                    // Update the DPR:
+                    // Normally, this is not done, as we display the images at the size we
+                    // want, and we don't want to re-load all images on DPR change. But
+                    // in this case we depend on the implicit size, so we should re-load
+                    // the image with the updated DPR:
+                    cone._eDPR = MainCtx.effectiveDevicePixelRatio(cone.Window.window)
+                }
+            }
         }
 
         Row {
