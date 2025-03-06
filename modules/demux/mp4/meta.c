@@ -395,9 +395,10 @@ static void iTUNTripletCallback( const char *psz_key,
                               "%*"PRIX32" %*"PRIX32" %"PRIX32" %"PRIX32,
                               &values[0], &values[1], &values[2], &values[3] ) == 4 )
         {
-            values[0] = __MIN(values[0], values[1]); /* left / right volume */
+            values[0] = __MAX(values[0], values[1]); /* left / right volume */
             if( values[0] )
-                data.NORM.volume_adjust =  -10.0 * log10( values[0] / 10000.0 );
+                data.NORM.volume_adjust = -10.0 * log10( values[0] / 1000.0 );
+
             values[2] = __MAX(values[2], values[3]); /* left / right peak */
             if( values[2] )
                 data.NORM.peak = values[2] / 32768.0;
@@ -625,4 +626,3 @@ void SetupMeta( vlc_meta_t *p_meta, const MP4_Box_t *p_udta,
         }
     }
 }
-
