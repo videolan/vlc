@@ -715,20 +715,20 @@ SET_INPUTITEM_PROP(field, field)                \
 - (NSInteger)outlineView:(NSOutlineView *)outlineView
   numberOfChildrenOfItem:(id)item
 {
-    return (item == nil) ? [_rootCodecInformationItem children].count : [item children].count;
+    return (item == nil) ? _rootCodecInformationItem.children.count : [item children].count;
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView
    isItemExpandable:(id)item
 {
-    return ([item children].count > 0);
+    return [item children].count > 0;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView
             child:(NSInteger)index
            ofItem:(id)item
 {
-    return (item == nil) ? [_rootCodecInformationItem children][index] : [item children][index];
+    return (item == nil) ? _rootCodecInformationItem.children[index] : [item children][index];
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView
