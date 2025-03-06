@@ -88,7 +88,7 @@ actionCallback(encodedBy);
 
 #pragma mark - window controller
 
-@interface VLCInformationWindowController () <NSOutlineViewDataSource>
+@interface VLCInformationWindowController () <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
     VLCCodecInformationTreeItem *_rootCodecInformationItem;
     NSImage *_artwork;
@@ -119,6 +119,7 @@ actionCallback(encodedBy);
     [self.window setInitialFirstResponder: _decodedMRLLabel];
 
     self.outlineView.dataSource = self;
+    self.outlineView.delegate = self;
 
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
     if (_mainMenuInstance && _statisticsEnabled) {
@@ -603,8 +604,8 @@ _##field##TextField.originalStateString = @"";
         [self updateStreamsForInputItems:_representedInputItems];
     }
 
-    [_outlineView reloadData];
-    [_outlineView expandItem:nil expandChildren:YES];
+    [self.outlineView reloadData];
+    [self.outlineView expandItem:nil expandChildren:YES];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification
@@ -709,7 +710,7 @@ SET_INPUTITEM_PROP(field, field)                \
 
 @end
 
-@implementation VLCInformationWindowController (NSTableDataSource)
+@implementation VLCInformationWindowController (NSOutlineViewDataSource)
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView
   numberOfChildrenOfItem:(id)item
@@ -742,6 +743,23 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
     } else {
         return [item propertyValue];
     }
+}
+
+@end
+
+@implementation VLCInformationWindowController (NSOutlineViewDelegate)
+
+- (NSView *)outlineView:(NSTableView *)outlineView
+     viewForTableColumn:(nullable NSTableColumn *)tableColumn
+                   item:(nonnull id)item
+{
+    NSTextField * const cellView = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    cellView.objectValue =
+        [self outlineView:self.outlineView objectValueForTableColumn:tableColumn byItem:item];
+    cellView.editable = NO;
+    cellView.bordered = NO;
+    cellView.drawsBackground = NO;
+    return cellView;
 }
 
 @end
