@@ -1617,6 +1617,8 @@ vlc_module_begin ()
                  VOLUME_STEP_LONGTEXT )
         change_float_range( 1., AOUT_VOLUME_DEFAULT )
     add_bool( "volume-save", true, VOLUME_SAVE_TEXT, NULL )
+    add_bool( "audio-time-stretch", true, AUDIO_TIME_STRETCH_TEXT,
+                AUDIO_TIME_STRETCH_LONGTEXT )
 #if defined(__ANDROID__) || defined(__APPLE__) || defined(_WIN32)
     add_bool( "spdif", false, SPDIF_TEXT, SPDIF_LONGTEXT )
 #else
@@ -1633,7 +1635,7 @@ vlc_module_begin ()
                  DESYNC_LONGTEXT )
         change_safe ()
 
-    /* FIXME TODO create a subcat replay gain ? */
+    set_section( N_("Replay gain") , NULL )
     add_string( "audio-replay-gain-mode", ppsz_replay_gain_mode[0], AUDIO_REPLAY_GAIN_MODE_TEXT,
                 AUDIO_REPLAY_GAIN_MODE_LONGTEXT )
         change_string_list( ppsz_replay_gain_mode, ppsz_replay_gain_mode_text )
@@ -1643,9 +1645,6 @@ vlc_module_begin ()
                AUDIO_REPLAY_GAIN_DEFAULT_TEXT, AUDIO_REPLAY_GAIN_DEFAULT_LONGTEXT )
     add_bool( "audio-replay-gain-peak-protection", true,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT )
-
-    add_bool( "audio-time-stretch", true,
-              AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_module("aout", "audio output", "any", AOUT_TEXT, AOUT_LONGTEXT)
