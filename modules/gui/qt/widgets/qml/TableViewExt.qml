@@ -179,11 +179,14 @@ FocusScope {
 
     property alias listView: view
 
+    property alias displayMarginBeginning: view.displayMarginBeginning
     property alias displayMarginEnd: view.displayMarginEnd
 
     property alias count: view.count
 
     property alias colorContext: view.colorContext
+
+    property alias reuseItems: view.reuseItems
 
     // Signals
 
