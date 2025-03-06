@@ -38,6 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_input_item.h>
 #include <vlc_sout.h>
+#include <vlc_replay_gain.h>
 #include "../demux/xiph.h"
 
 #include <ogg/ogg.h>
@@ -405,6 +406,36 @@ static int ProcessHeaders( decoder_t *p_dec )
     }
     ParseVorbisComments( p_dec );
 
+    int i_ret = vlc_replay_gain_CopyFromMeta( &p_dec->fmt_out.audio_replay_gain, p_dec->p_description );
+
+    /* use replay gain if available; otherwise see vorbisgain(1) */
+    if( i_ret != VLC_SUCCESS && p_dec->p_description != NULL )
+    {
+        audio_replay_gain_t *p_arg = &p_dec->fmt_out.audio_replay_gain;
+        replay_gain_Reset( p_arg );
+
+        const char *track_gain = vlc_meta_GetExtra( p_dec->p_description, "RG_RADIO" );
+        if( track_gain )
+        {
+            p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
+            p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = vlc_strtof_c( track_gain, NULL );
+        }
+
+        const char *track_peak = vlc_meta_GetExtra( p_dec->p_description, "RG_PEAK" );
+        if( track_peak )
+        {
+            p_arg->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
+            p_arg->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = vlc_strtof_c( track_peak, NULL );
+        }
+
+        const char *album_gain = vlc_meta_GetExtra( p_dec->p_description, "RG_AUDIOPHILE" );
+        if( album_gain )
+        {
+            p_arg->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
+            p_arg->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = vlc_strtof_c( album_gain, NULL );
+        }
+    }
+
     /* The next packet in order is the codebooks header
      * We need to watch out that this packet is not missing as a
      * missing or corrupted header is fatal. */
@@ -620,38 +651,7 @@ static void ParseVorbisComments( decoder_t *p_dec )
             *psz_value = '\0';
             psz_value++;
 
-            if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_GAIN" ) ||
-                !strcasecmp( psz_name, "RG_RADIO" ) )
-            {
-                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
-
-                r->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
-                r->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
-            }
-            else if( !strcasecmp( psz_name, "REPLAYGAIN_TRACK_PEAK" ) ||
-                     !strcasecmp( psz_name, "RG_PEAK" ) )
-            {
-                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
-
-                r->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
-                r->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = vlc_atof_c( psz_value );
-            }
-            else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_GAIN" ) ||
-                     !strcasecmp( psz_name, "RG_AUDIOPHILE" ) )
-            {
-                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
-
-                r->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
-                r->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
-            }
-            else if( !strcasecmp( psz_name, "REPLAYGAIN_ALBUM_PEAK" ) )
-            {
-                audio_replay_gain_t *r = &p_dec->fmt_out.audio_replay_gain;
-
-                r->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
-                r->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = vlc_atof_c( psz_value );
-            }
-            else if( !strcasecmp( psz_name, "METADATA_BLOCK_PICTURE" ) )
+            if( !strcasecmp( psz_name, "METADATA_BLOCK_PICTURE" ) )
             { /* Do nothing, for now */ }
             else
             {

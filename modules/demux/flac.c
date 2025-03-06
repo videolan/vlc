@@ -36,6 +36,7 @@
 #include <vlc_input.h>                /* vlc_input_attachment, vlc_seekpoint */
 #include <vlc_codec.h>                /* decoder_t */
 #include <vlc_charset.h>              /* EnsureUTF8 */
+#include <vlc_replay_gain.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -744,6 +745,8 @@ static int  ParseHeaders( demux_t *p_demux, es_format_t *p_fmt )
             i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 4+i_len );
             if( i_peek == 4+i_len )
                 ParseComment( p_demux, p_peek, i_peek );
+
+            vlc_replay_gain_CopyFromMeta( &p_fmt->audio_replay_gain, p_sys->p_meta );
         }
         else if( i_type == META_PICTURE )
         {
@@ -818,7 +821,7 @@ static void ParseComment( demux_t *p_demux, const uint8_t *p_data, size_t i_data
     vorbis_ParseComment( NULL, &p_sys->p_meta, &p_data[4], i_data - 4,
         &p_sys->i_attachments, &p_sys->attachments,
         &p_sys->i_cover_score, &p_sys->i_cover_idx,
-        &p_sys->i_title_seekpoints, &p_sys->pp_title_seekpoints, NULL, NULL );
+        &p_sys->i_title_seekpoints, &p_sys->pp_title_seekpoints );
 }
 
 static void ParsePicture( demux_t *p_demux, const uint8_t *p_data, size_t i_data )

@@ -39,6 +39,7 @@
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 #include <vlc_input.h>
+#include <vlc_replay_gain.h>
 
 #include <ogg/ogg.h>
 
@@ -2569,18 +2570,12 @@ static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
     demux_sys_t *p_ogg = p_demux->p_sys;
     int i_cover_score = 0;
     int i_cover_idx = 0;
-    float pf_replay_gain[AUDIO_REPLAY_GAIN_MAX];
-    float pf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
-    for(int i=0; i< AUDIO_REPLAY_GAIN_MAX; i++ )
-    {
-        pf_replay_gain[i] = 0;
-        pf_replay_peak[i] = 0;
-    }
+
     vorbis_ParseComment( p_fmt, &p_ogg->p_meta, p_headers, i_headers,
                          &p_ogg->i_attachments, &p_ogg->attachments,
                          &i_cover_score, &i_cover_idx,
-                         &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints,
-                         &pf_replay_gain, &pf_replay_peak );
+                         &p_ogg->i_seekpoints, &p_ogg->pp_seekpoints );
+
     if( p_ogg->p_meta != NULL && i_cover_idx < p_ogg->i_attachments )
     {
         char psz_url[128];
@@ -2589,19 +2584,33 @@ static void Ogg_ExtractComments( demux_t *p_demux, es_format_t *p_fmt,
         vlc_meta_Set( p_ogg->p_meta, vlc_meta_ArtworkURL, psz_url );
     }
 
-    for ( int i=0; i<AUDIO_REPLAY_GAIN_MAX;i++ )
+    int i_ret = vlc_replay_gain_CopyFromMeta( &p_fmt->audio_replay_gain, p_ogg->p_meta );
+
+    /* use replay gain if available; otherwise use IETF RFC7845 §5.2.1 */
+    if( i_ret != VLC_SUCCESS && p_ogg->p_meta != NULL )
     {
-        if ( pf_replay_gain[i] != 0 )
+        audio_replay_gain_t *p_arg = &p_fmt->audio_replay_gain;
+        replay_gain_Reset( p_arg );
+
+        const char *track_gain = vlc_meta_GetExtra( p_ogg->p_meta, "R128_TRACK_GAIN" );
+        if( track_gain )
         {
-            p_fmt->audio_replay_gain.pb_gain[i] = true;
-            p_fmt->audio_replay_gain.pf_gain[i] = pf_replay_gain[i];
-            msg_Dbg( p_demux, "setting replay gain %d to %f", i, pf_replay_gain[i] );
+            p_arg->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
+            p_arg->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = vlc_strtof_c( track_gain, NULL ) / 256.f;
         }
-        if ( pf_replay_peak[i] != 0 )
+
+        const char *album_gain = vlc_meta_GetExtra( p_ogg->p_meta, "R128_ALBUM_GAIN" );
+        if( album_gain )
         {
-            p_fmt->audio_replay_gain.pb_peak[i] = true;
-            p_fmt->audio_replay_gain.pf_peak[i] = pf_replay_peak[i];
-            msg_Dbg( p_demux, "setting replay peak %d to %f", i, pf_replay_gain[i] );
+            p_arg->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
+            p_arg->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = vlc_strtof_c( album_gain, NULL ) / 256.f;
+        }
+
+        if( track_gain || album_gain )
+        {
+            /* EBU R128 uses -23 LUFS as the reference level */
+            p_arg->pb_reference_loudness = true;
+            p_arg->pf_reference_loudness = -23.f;
         }
     }
 
