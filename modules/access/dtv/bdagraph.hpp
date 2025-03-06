@@ -39,7 +39,11 @@
 #include <tuner.h>
 
 #include <comcat.h>
+#if defined(__MINGW64_VERSION_MAJOR)
+#include <qedit.h>
+#else
 #include "bdadefs.h"
+#endif
 #include <stdexcept>
 
 #include <vlc_threads.h>
