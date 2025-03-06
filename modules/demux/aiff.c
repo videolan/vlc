@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
 #include <vlc_aout.h>
+#include <vlc_meta.h>
 #include <limits.h>
 
 #include "mp4/coreaudio.h"
@@ -44,12 +45,13 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
+static void Close   ( vlc_object_t * );
 
 vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("AIFF demuxer" ) )
     set_capability( "demux", 10 )
-    set_callback( Open )
+    set_callbacks( Open, Close )
     add_shortcut( "aiff" )
     add_file_extension("aiff")
 vlc_module_end ()
@@ -78,6 +80,7 @@ typedef struct
 
     bool        b_reorder;
     uint8_t     pi_chan_table[AOUT_CHAN_MAX];
+    vlc_meta_t  *p_meta;
     vlc_fourcc_t audio_fourcc;
 } demux_sys_t;
 
@@ -104,11 +107,65 @@ static unsigned int GetF80BE( const uint8_t p[10] )
 }
 
 /*****************************************************************************
+ * ReadTextChunk: reads aiff text chunks - name, author, copyright, annotation
+ *****************************************************************************/
+static int ReadTextChunk( demux_t *p_demux,  uint64_t i_chunk_size, uint32_t i_data_size )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    const uint8_t *p_peek;
+
+    ssize_t ret = vlc_stream_Peek( p_demux->s, &p_peek, i_chunk_size );
+    if( ret == -1 || (size_t) ret != i_chunk_size )
+        return VLC_EGENERIC;
+
+    static const struct {
+        const char  psz_name[4];
+        int         i_meta;
+    } p_dsc[4] = {
+        { "NAME", vlc_meta_Title },
+        { "AUTH", vlc_meta_Artist },
+        { "(c) ", vlc_meta_Copyright },
+        { "ANNO", vlc_meta_Description }
+    };
+
+    for( size_t i = 0; i < ARRAY_SIZE( p_dsc ); i++ )
+    {
+        if( memcmp(p_peek, p_dsc[i].psz_name, 4) )
+            continue;
+
+        char *psz_value = malloc( i_data_size + 1 );
+
+        if( unlikely(psz_value == NULL) )
+            return VLC_ENOMEM;
+
+        if( !p_sys->p_meta )
+        {
+            p_sys->p_meta = vlc_meta_New();
+            if( unlikely(p_sys->p_meta == NULL) )
+            {
+                free( psz_value );
+                return VLC_ENOMEM;
+            }
+        }
+
+        memcpy( psz_value, (char*)&p_peek[8], i_data_size );
+        psz_value[i_data_size] = '\0';
+        vlc_meta_Set( p_sys->p_meta, p_dsc[i].i_meta, psz_value );
+        free( psz_value );
+
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
+}
+
+/*****************************************************************************
  * Open
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys;
 
     const uint8_t *p_peek;
 
@@ -121,19 +178,24 @@ static int Open( vlc_object_t *p_this )
     if( vlc_stream_Read( p_demux->s, NULL, 12 ) != 12 )
         return VLC_EGENERIC;
 
-    /* Fill p_demux field */
-    demux_sys_t *p_sys = vlc_obj_calloc( p_this, 1, sizeof (*p_sys) );
-    es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
+    p_sys = vlc_obj_calloc( p_this, 1, sizeof( *p_sys ) );
+
+    if( unlikely(p_sys == NULL) )
+        return VLC_ENOMEM;
+
+    p_demux->p_sys = p_sys;
+
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
     p_sys->b_reorder = false;
+    es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
 
     const uint32_t *pi_channels_in = NULL;
 
     for( ;; )
     {
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
-            return VLC_EGENERIC;
+            break;
 
         uint32_t i_data_size = GetDWBE( &p_peek[4] );
         uint64_t i_chunk_size = UINT64_C( 8 ) + i_data_size + ( i_data_size & 1 );
@@ -184,13 +246,13 @@ static int Open( vlc_object_t *p_this )
                                           &p_sys->fmt.audio.i_channels,
                                           &pi_channels_in ) != VLC_SUCCESS )
                 msg_Warn( p_demux, "discarding chan mapping" );
-
         }
-
-        if( p_sys->i_ssnd_pos >= 12 && p_sys->fmt.audio.i_channels != 0 )
+        else
         {
-            /* We have found the 2 needed chunks */
-            break;
+            int i_ret = ReadTextChunk( p_demux, i_chunk_size, i_data_size );
+
+            if( unlikely(i_ret == VLC_ENOMEM) )
+                return VLC_ENOMEM;
         }
 
         /* consume chunk data */
@@ -228,7 +290,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_ssnd_fsize = p_sys->fmt.audio.i_channels *
                           ((p_sys->fmt.audio.i_bitspersample + 7) / 8);
 
-    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 )
+    if( p_sys->i_ssnd_fsize <= 0 || p_sys->fmt.audio.i_rate == 0 || p_sys->i_ssnd_pos < 12 )
     {
         msg_Err( p_demux, "invalid audio parameters" );
         return VLC_EGENERIC;
@@ -255,7 +317,6 @@ static int Open( vlc_object_t *p_this )
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys;
 
     return VLC_SUCCESS;
 }
@@ -305,6 +366,18 @@ static int Demux( demux_t *p_demux )
     /* */
     es_out_Send( p_demux->out, p_sys->es, p_block );
     return VLC_DEMUXER_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    demux_t     *p_demux = (demux_t*)p_this;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    if( p_sys->p_meta )
+        vlc_meta_Delete( p_sys->p_meta );
 }
 
 /*****************************************************************************
@@ -374,6 +447,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             return VLC_EGENERIC;
         }
+        case DEMUX_GET_META:
+        {
+            vlc_meta_t *p_meta = va_arg( args, vlc_meta_t * );
+            if( !p_sys->p_meta )
+                return VLC_EGENERIC;
+            vlc_meta_Merge( p_meta, p_sys->p_meta );
+            return VLC_SUCCESS;
+        }
+
         case DEMUX_SET_TIME:
         case DEMUX_GET_FPS:
             return VLC_EGENERIC;
