@@ -344,7 +344,7 @@
                                                 </textField>
                                                 <textField focusRingType="none" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7gY-3s-Kay">
                                                     <rect key="frame" x="-2" y="0.0" width="177" height="16"/>
-                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" title="Label" id="3XB-SJ-5ia">
+                                                    <textFieldCell key="cell" truncatesLastVisibleLine="YES" selectable="YES" title="Label" id="3XB-SJ-5ia">
                                                         <font key="font" usesAppearanceFont="YES"/>
                                                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
