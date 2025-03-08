@@ -38,30 +38,30 @@
                         </connections>
                     </webView>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2256">
-                        <rect key="frame" x="20" y="8" width="27" height="25"/>
-                        <buttonCell key="cell" type="roundTextured" title="⌂" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="2275">
+                        <rect key="frame" x="19" y="8" width="31" height="23"/>
+                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="house" catalog="system" imagePosition="overlaps" alignment="center" borderStyle="border" inset="2" id="2275">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="systemBold" size="20"/>
+                            <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
                             <action selector="helpGoHome:" target="-2" id="2338"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2257">
-                        <rect key="frame" x="55" y="8" width="30" height="25"/>
-                        <buttonCell key="cell" type="roundTextured" title="←" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="2276">
+                        <rect key="frame" x="56" y="8" width="22" height="23"/>
+                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="chevron.left" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="2276">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="systemBold" size="18"/>
+                            <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
                             <action selector="goBack:" target="2241" id="2267"/>
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2258">
-                        <rect key="frame" x="93" y="8" width="30" height="25"/>
-                        <buttonCell key="cell" type="roundTextured" title="→" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="2277">
+                        <rect key="frame" x="84" y="8" width="22" height="23"/>
+                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="chevron.right" catalog="system" imagePosition="only" alignment="center" borderStyle="border" inset="2" id="2277">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="systemBold" size="18"/>
+                            <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
                             <action selector="goForward:" target="2241" id="2266"/>
@@ -83,4 +83,9 @@
             </view>
         </window>
     </objects>
+    <resources>
+        <image name="chevron.left" catalog="system" width="10" height="14"/>
+        <image name="chevron.right" catalog="system" width="10" height="14"/>
+        <image name="house" catalog="system" width="19" height="16"/>
+    </resources>
 </document>
