@@ -62,40 +62,35 @@ impl TracerCapability for TelegrafTracer {
     }
 
     fn trace(&self, _tick: vlcrs_core::tracer::Tick, trace: &'_ vlcrs_core::tracer::Trace) {
-        if !trace
-            .entries()
-            .any(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
-        {
+        let (tags, records) = trace.entries().fold(
+            (Vec::new(), Vec::new()),
+            |(mut tags, mut records), entry| {
+                if entry.kind() == vlcrs_core::tracer::sys::vlc_tracer_value_type::String {
+                    let value = unsafe { CStr::from_ptr(entry.value().string) };
+                    tags.push((
+                        String::from(entry.key()),
+                        String::from(value.to_str().unwrap()),
+                    ));
+                } else {
+                    records.push((
+                        String::from(entry.key()),
+                        Box::new(TraceField(entry)) as Box<dyn IntoFieldData>,
+                    ));
+                }
+
+                (tags, records)
+            },
+        );
+
+        if records.is_empty() {
             /* We cannot support events for now. */
             return;
         }
-        let tags: Vec<(String, String)> = trace
-            .entries()
-            .filter(|e| e.kind() == vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
-            .map(|entry| unsafe {
-                let value = CStr::from_ptr(entry.value().string);
-                (
-                    String::from(entry.key()),
-                    String::from(value.to_str().unwrap()),
-                )
-            })
-            .collect();
-
-        let record: Vec<(String, Box<dyn IntoFieldData + 'static>)> = trace
-            .entries()
-            .filter(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
-            .map(|entry| {
-                (
-                    String::from(entry.key()),
-                    Box::new(TraceField(entry)) as Box<dyn IntoFieldData>,
-                )
-            })
-            .collect();
 
         let p = Point::new(
             String::from("measurement"),
             tags,
-            record,
+            records,
             None, //Some(tick.0 as u64),
         );
 
