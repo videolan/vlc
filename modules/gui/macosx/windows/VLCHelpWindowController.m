@@ -37,7 +37,7 @@
 {
     self = [super initWithWindowNibName:@"Help"];
     if (self) {
-        [self setWindowFrameAutosaveName:@"help"];
+        self.windowFrameAutosaveName = @"help";
     }
 
     return self;
@@ -48,10 +48,10 @@
     if (@available(macOS 10.12, *)) {
         self.window.tabbingMode = NSWindowTabbingModeDisallowed;
     }
-    [self.window setTitle:_NS("VLC media player Help")];
-    [self.forwardButton setToolTip:_NS("Next")];
-    [self.backButton setToolTip:_NS("Previous")];
-    [self.homeButton setToolTip:_NS("Index")];
+    self.window.title = _NS("VLC media player Help");
+    self.forwardButton.toolTip = _NS("Next");
+    self.backButton.toolTip = _NS("Previous");
+    self.homeButton.toolTip = _NS("Index");
 }
 
 - (void)showHelp
@@ -62,19 +62,17 @@
 
 - (IBAction)helpGoHome:(id)sender
 {
-    NSString *htmlWithStyle = [NSString
-                               stringWithFormat:@"<style>body { font-family: -apple-system, Helvetica Neue; }</style>%@",
-                               NSTR(I_LONGHELP)];
-
-    [[self.helpWebView mainFrame] loadHTMLString:htmlWithStyle
-                                         baseURL:[NSURL URLWithString:@"https://videolan.org"]];
+    NSString * const style = @"<style>body { font-family: -apple-system, Helvetica Neue; }</style>";
+    NSString * const htmlWithStyle = [style stringByAppendingString:NSTR(I_LONGHELP)];
+    NSURL * const baseURL = [NSURL URLWithString:@"https://videolan.org"];
+    [self.helpWebView.mainFrame loadHTMLString:htmlWithStyle baseURL:baseURL];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     /* Update back/forward button states whenever a new page is loaded */
-    [self.forwardButton setEnabled:[self.helpWebView canGoForward]];
-    [self.backButton setEnabled:[self.helpWebView canGoBack]];
+    self.forwardButton.enabled = self.helpWebView.canGoForward;
+    self.backButton.enabled = self.helpWebView.canGoBack;
 }
 
 @end
