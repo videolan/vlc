@@ -22,21 +22,76 @@
 # include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/sysctl.h>
+#include <sys/auxv.h>
+#ifdef __powerpc__
+#include <machine/cpu.h>
+#endif
 
 #include <vlc_common.h>
 #include <vlc_cpu.h>
 
-#if defined (__powerpc__) /* both 32- and 64-bit */
+#if defined (__aarch64__)
 unsigned vlc_CPU_raw(void)
 {
     unsigned int flags = 0;
-    int opt;
-    size_t optlen = sizeof (opt);
+    unsigned long hwcap = 0;
+    //unsigned long hwcap2 = 0; // TODO: SVE2
 
-    if (sysctlbyname("hw.altivec", &opt, &optlen, NULL, 0) == 0 && opt != 0)
+    elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap));
+    // elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap2)); // TODO: SVE2
+
+    /* HWCAP_FP (HAVE_FPU) is statically assumed. */
+    if (hwcap & HWCAP_ASIMD)
+        flags |= VLC_CPU_ARM_NEON;
+    if (hwcap & HWCAP_SVE)
+        flags |= VLC_CPU_ARM_SVE;
+
+    return flags;
+}
+
+#elif defined (__arm__)
+unsigned vlc_CPU_raw(void)
+{
+    unsigned int flags = 0;
+    unsigned long hwcap = 0;
+
+    elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap));
+
+    /* TLS implies ARMv6, Thumb-EE and VFP imply ARMv7 */
+    if (hwcap & (HWCAP_TLS|HWCAP_THUMBEE|HWCAP_VFP))
+        flags |= VLC_CPU_ARMv6; /* SIMD */
+    if (hwcap & HWCAP_NEON)
+        flags |= VLC_CPU_ARM_NEON; /* Advanced SIMD */
+
+    return flags;
+}
+
+#elif defined (__powerpc__) /* both 32- and 64-bit */
+unsigned vlc_CPU_raw(void)
+{
+    unsigned int flags = 0;
+    unsigned long hwcap = 0;
+
+    elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap));
+
+    if (hwcap & PPC_FEATURE_HAS_ALTIVEC)
         flags |= VLC_CPU_ALTIVEC;
+
+    return flags;
+}
+
+#elif defined (__riscv)
+# define HWCAP_RV(letter) (1LU << ((letter) - 'A'))
+
+unsigned vlc_CPU_raw(void)
+{
+    unsigned int flags = 0;
+    unsigned long hwcap = 0;
+
+    elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap));
+
+    if (hwcap & HWCAP_RV('V'))
+        flags |= VLC_CPU_RV_V;
 
     return flags;
 }
