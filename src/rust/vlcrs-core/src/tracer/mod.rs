@@ -101,7 +101,7 @@ extern "C" fn tracer_trace(
     {
         let tracer: &dyn TracerCapability =
             unsafe { &**(opaque as *const Box<dyn TracerCapability>) };
-        let trace = Trace { entries };
+        let trace = Trace(entries);
         tracer.trace(Tick(tick), &trace);
     }
 }
@@ -209,7 +209,7 @@ impl Tracer {
 
             // SAFETY: the pointer `tracer` is guaranteed to be non-null and
             //         nobody else has reference to it.
-            sys::vlc_tracer_TraceWithTs(tracer, tick.0, entries.entries);
+            sys::vlc_tracer_TraceWithTs(tracer, tick.0, entries.0);
         }
     }
 }
@@ -221,9 +221,7 @@ macro_rules! trace {
 
 #[derive(PartialEq, Copy, Clone)]
 #[repr(transparent)]
-pub struct Trace {
-    pub entries: NonNull<sys::vlc_tracer_trace>,
-}
+pub struct Trace(NonNull<sys::vlc_tracer_trace>);
 
 #[derive(PartialEq, Copy, Clone, Debug)]
 #[repr(transparent)]
@@ -257,7 +255,7 @@ impl IntoIterator for Trace {
     type IntoIter = TraceIterator;
     fn into_iter(self) -> Self::IntoIter {
         TraceIterator {
-            current_field: unsafe { self.entries.read().entries },
+            current_field: unsafe { self.0.read().entries },
         }
     }
 }
@@ -315,9 +313,7 @@ mod test {
             entries: NonNull::from(&entries[0]),
         };
 
-        let trace = Trace {
-            entries: NonNull::from(&trace),
-        };
+        let trace = Trace(NonNull::from(&trace));
 
         let mut iterator = trace.into_iter();
 
