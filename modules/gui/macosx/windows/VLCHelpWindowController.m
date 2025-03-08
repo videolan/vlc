@@ -73,6 +73,14 @@
     /* Update back/forward button states whenever a new page is loaded */
     self.forwardButton.enabled = self.helpWebView.canGoForward;
     self.backButton.enabled = self.helpWebView.canGoBack;
+    self.progressIndicator.hidden = YES;
+    [self.progressIndicator stopAnimation:nil];
+}
+
+- (void)webView:(WebView *)sender didStartProvisionalLoadForFrame:(WebFrame *)frame
+{
+    self.progressIndicator.hidden = NO;
+    [self.progressIndicator startAnimation:nil];
 }
 
 @end

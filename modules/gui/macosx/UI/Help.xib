@@ -13,6 +13,7 @@
                 <outlet property="forwardButton" destination="2258" id="iEY-oD-cv3"/>
                 <outlet property="helpWebView" destination="2241" id="cMX-Wb-U2g"/>
                 <outlet property="homeButton" destination="2256" id="sWB-6l-roa"/>
+                <outlet property="progressIndicator" destination="d97-0g-MPE" id="abc-ol-def"/>
                 <outlet property="window" destination="2239" id="2342"/>
             </connections>
         </customObject>
@@ -67,9 +68,14 @@
                             <action selector="goForward:" target="2241" id="2266"/>
                         </connections>
                     </button>
+                    <progressIndicator maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="d97-0g-MPE">
+                        <rect key="frame" x="444" y="10" width="16" height="20"/>
+                    </progressIndicator>
                 </subviews>
                 <constraints>
+                    <constraint firstAttribute="bottom" secondItem="d97-0g-MPE" secondAttribute="bottom" constant="10" id="651-46-r5T"/>
                     <constraint firstItem="2257" firstAttribute="leading" secondItem="2256" secondAttribute="trailing" constant="8" id="6Va-Ur-0gs"/>
+                    <constraint firstAttribute="trailing" secondItem="d97-0g-MPE" secondAttribute="trailing" constant="20" id="70o-I7-qoK"/>
                     <constraint firstItem="2241" firstAttribute="top" secondItem="2240" secondAttribute="top" id="7J6-p5-r45"/>
                     <constraint firstAttribute="trailing" secondItem="2241" secondAttribute="trailing" id="CYF-2C-pXI"/>
                     <constraint firstItem="2258" firstAttribute="leading" secondItem="2257" secondAttribute="trailing" constant="8" id="JGE-np-3B3"/>
@@ -77,6 +83,7 @@
                     <constraint firstItem="2256" firstAttribute="leading" secondItem="2240" secondAttribute="leading" constant="20" id="YuN-8j-3ks"/>
                     <constraint firstAttribute="bottom" secondItem="2256" secondAttribute="bottom" constant="10" id="ZKn-0H-1ii"/>
                     <constraint firstAttribute="bottom" secondItem="2241" secondAttribute="bottom" constant="40" id="qEX-nC-QiS"/>
+                    <constraint firstItem="d97-0g-MPE" firstAttribute="top" secondItem="2241" secondAttribute="bottom" constant="10" id="vRu-Oz-TLk"/>
                     <constraint firstItem="2256" firstAttribute="centerY" secondItem="2257" secondAttribute="centerY" id="vba-6f-BZO"/>
                     <constraint firstItem="2257" firstAttribute="centerY" secondItem="2258" secondAttribute="centerY" id="xIG-Tk-diy"/>
                 </constraints>
