@@ -53,7 +53,7 @@ pub struct Tick(pub i64);
 ///         Some(Self{ last_trace_tick: Cell::from(Tick(0)) })
 ///     }
 ///
-///     fn trace(&self, tick: Tick, entries: &Trace) {
+///     fn trace(&self, tick: Tick, trace: &Trace) {
 ///         let mut state = self.last_trace_tick.get_mut();
 ///         *state = tick;
 ///     }
@@ -83,7 +83,7 @@ pub trait TracerCapability: Sync {
     where
         Self: Sized;
 
-    fn trace(&self, tick: Tick, entries: &Trace);
+    fn trace(&self, tick: Tick, trace: &Trace);
 }
 
 #[allow(non_camel_case_types)]
@@ -96,12 +96,12 @@ pub type TracerCapabilityActivate =
 extern "C" fn tracer_trace(
     opaque: *const c_void,
     tick: sys::vlc_tick,
-    entries: NonNull<sys::vlc_tracer_trace>,
+    trace: NonNull<sys::vlc_tracer_trace>,
 ) {
     {
         let tracer: &dyn TracerCapability =
             unsafe { &**(opaque as *const Box<dyn TracerCapability>) };
-        let trace = Trace(entries);
+        let trace = Trace(trace);
         tracer.trace(Tick(tick), &trace);
     }
 }
@@ -149,7 +149,7 @@ extern "C" fn activate_tracer<T: TracerCapability>(
 ///     fn open(obj: &mut Object) -> Option<impl TracerCapability> {
 ///         Some(Self{})
 ///     }
-///     fn trace(&self, _tick: Tick, _entries: &Trace) {}
+///     fn trace(&self, _tick: Tick, _trace: &Trace) {}
 /// }
 ///
 /// module!{
@@ -202,14 +202,14 @@ impl Tracer {
     ///
     /// Register the new point at time [tick] with the metadata [entries].
     ///
-    pub fn trace(&self, tick: Tick, entries: Trace) {
+    pub fn trace(&self, tick: Tick, trace: Trace) {
         unsafe {
             // SAFETY: TODO
             let tracer = *self.tracer.get();
 
             // SAFETY: the pointer `tracer` is guaranteed to be non-null and
             //         nobody else has reference to it.
-            sys::vlc_tracer_TraceWithTs(tracer, tick.0, entries.0);
+            sys::vlc_tracer_TraceWithTs(tracer, tick.0, trace.0);
         }
     }
 }

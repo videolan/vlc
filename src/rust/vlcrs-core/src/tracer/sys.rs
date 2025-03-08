@@ -72,8 +72,7 @@ pub struct vlc_tracer {
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub struct vlc_tracer_operations {
-    pub trace:
-        extern "C" fn(opaque: *const c_void, ts: vlc_tick, entries: NonNull<vlc_tracer_trace>),
+    pub trace: extern "C" fn(opaque: *const c_void, ts: vlc_tick, trace: NonNull<vlc_tracer_trace>),
     pub destroy: extern "C" fn(*mut c_void),
 }
 
@@ -82,6 +81,6 @@ extern "C" {
     pub fn vlc_tracer_TraceWithTs(
         tracer: NonNull<vlc_tracer>,
         tick: vlc_tick,
-        entries: NonNull<vlc_tracer_trace>,
+        trace: NonNull<vlc_tracer_trace>,
     );
 }

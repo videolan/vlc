@@ -61,15 +61,15 @@ impl TracerCapability for TelegrafTracer {
         Some(Self { endpoint })
     }
 
-    fn trace(&self, _tick: vlcrs_core::tracer::Tick, entries: &'_ vlcrs_core::tracer::Trace) {
-        if !entries
+    fn trace(&self, _tick: vlcrs_core::tracer::Tick, trace: &'_ vlcrs_core::tracer::Trace) {
+        if !trace
             .into_iter()
             .any(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
         {
             /* We cannot support events for now. */
             return;
         }
-        let tags: Vec<(String, String)> = entries
+        let tags: Vec<(String, String)> = trace
             .into_iter()
             .filter(|e| e.kind() == vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
             .map(|entry| unsafe {
@@ -81,7 +81,7 @@ impl TracerCapability for TelegrafTracer {
             })
             .collect();
 
-        let record: Vec<(String, Box<dyn IntoFieldData + 'static>)> = entries
+        let record: Vec<(String, Box<dyn IntoFieldData + 'static>)> = trace
             .into_iter()
             .filter(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
             .map(|entry| {
