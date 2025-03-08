@@ -48,10 +48,10 @@
     if (@available(macOS 10.12, *)) {
         self.window.tabbingMode = NSWindowTabbingModeDisallowed;
     }
-    [[self window] setTitle:_NS("VLC media player Help")];
-    [forwardButton setToolTip:_NS("Next")];
-    [backButton setToolTip:_NS("Previous")];
-    [homeButton setToolTip:_NS("Index")];
+    [self.window setTitle:_NS("VLC media player Help")];
+    [self.forwardButton setToolTip:_NS("Next")];
+    [self.backButton setToolTip:_NS("Previous")];
+    [self.homeButton setToolTip:_NS("Index")];
 }
 
 - (void)showHelp
@@ -66,15 +66,15 @@
                                stringWithFormat:@"<style>body { font-family: -apple-system, Helvetica Neue; }</style>%@",
                                NSTR(I_LONGHELP)];
 
-    [[helpWebView mainFrame] loadHTMLString:htmlWithStyle
-                                    baseURL:[NSURL URLWithString:@"https://videolan.org"]];
+    [[self.helpWebView mainFrame] loadHTMLString:htmlWithStyle
+                                         baseURL:[NSURL URLWithString:@"https://videolan.org"]];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
     /* Update back/forward button states whenever a new page is loaded */
-    [forwardButton setEnabled:[helpWebView canGoForward]];
-    [backButton setEnabled:[helpWebView canGoBack]];
+    [self.forwardButton setEnabled:[self.helpWebView canGoForward]];
+    [self.backButton setEnabled:[self.helpWebView canGoBack]];
 }
 
 @end

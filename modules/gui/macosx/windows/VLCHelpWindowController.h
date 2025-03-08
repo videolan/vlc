@@ -24,12 +24,11 @@
 #import <WebKit/WebKit.h>
 
 @interface VLCHelpWindowController : NSWindowController
-{
-    IBOutlet WebView *helpWebView;
-    IBOutlet id backButton;
-    IBOutlet id forwardButton;
-    IBOutlet id homeButton;
-}
+
+@property (readwrite, weak) IBOutlet WebView *helpWebView;
+@property (readwrite, weak) IBOutlet NSButton *backButton;
+@property (readwrite, weak) IBOutlet NSButton *forwardButton;
+@property (readwrite, weak) IBOutlet NSButton *homeButton;
 
 - (IBAction)helpGoHome:(id)sender;
 - (void)showHelp;
