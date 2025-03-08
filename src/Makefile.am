@@ -494,6 +494,11 @@ libvlccore_la_SOURCES += \
 	freebsd/thread.c
 endif
 
+if HAVE_NETBSD
+libvlccore_la_SOURCES += \
+        netbsd/thread.c
+endif
+
 if HAVE_OPENBSD
 libvlccore_la_SOURCES += \
         openbsd/cpu.c \

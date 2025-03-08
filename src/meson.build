@@ -405,6 +405,12 @@ else
         ]
     endif
 
+    if host_system == 'netbsd'
+        libvlccore_sources += [
+            'netbsd/thread.c',
+        ]
+    endif
+
     if host_system == 'openbsd'
         libvlccore_sources += [
             'openbsd/cpu.c',
