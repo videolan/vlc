@@ -45,6 +45,9 @@
 
 - (void)windowDidLoad
 {
+    if (@available(macOS 10.12, *)) {
+        self.window.tabbingMode = NSWindowTabbingModeDisallowed;
+    }
     [[self window] setTitle:_NS("VLC media player Help")];
     [forwardButton setToolTip:_NS("Next")];
     [backButton setToolTip:_NS("Previous")];
