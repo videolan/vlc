@@ -52,6 +52,10 @@
     if (self) {
         /* we don't want this window to be restored on relaunch */
         [self setRestorable:NO];
+
+        if (@available(macOS 10.12, *)) {
+            self.tabbingMode = NSWindowTabbingModeDisallowed;
+        }
     }
     return self;
 }
