@@ -22,7 +22,7 @@ use std::{
     ptr::NonNull,
 };
 
-use crate::{object::Object, plugin::ModuleProtocol};
+use crate::{convert::AssumeValid, object::Object, plugin::ModuleProtocol};
 
 pub mod sys;
 
@@ -245,57 +245,71 @@ impl Trace {
     }
 }
 
-impl IntoIterator for Trace {
-    type Item = TraceField;
-    type IntoIter = TraceIterator;
+impl<'a> IntoIterator for &'a Trace {
+    type Item = TraceEntry<'a>;
+    type IntoIter = TraceIterator<'a>;
     fn into_iter(self) -> Self::IntoIter {
         TraceIterator {
             current_field: unsafe { self.0.read().entries },
+            _plt: std::marker::PhantomData,
         }
     }
 }
 
-#[derive(PartialEq, Copy, Clone, Debug)]
-#[repr(transparent)]
-pub struct TraceField {
-    pub entry: NonNull<sys::vlc_tracer_entry>,
-}
-
-impl TraceField {
-    pub fn key(&self) -> &str {
-        unsafe {
-            let key = CStr::from_ptr(self.entry.read().key);
-            key.to_str().unwrap()
-        }
-    }
-
-    pub fn kind(&self) -> sys::vlc_tracer_value_type {
-        unsafe { self.entry.read().kind }
-    }
-
-    pub fn value(&self) -> sys::vlc_tracer_value {
-        unsafe { self.entry.read().value }
-    }
-}
-
-pub struct TraceIterator {
+/// Iterate over trace record entries.
+pub struct TraceIterator<'a> {
     current_field: NonNull<sys::vlc_tracer_entry>,
+    _plt: std::marker::PhantomData<&'a sys::vlc_tracer_entry>,
 }
 
-impl Iterator for TraceIterator {
-    type Item = TraceField;
+impl<'a> Iterator for TraceIterator<'a> {
+    type Item = TraceEntry<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         unsafe {
             if self.current_field.read().key.is_null() {
                 return None;
             }
-            let output = Some(TraceField {
-                entry: self.current_field,
-            });
+            let output = Some(TraceEntry::from(self.current_field.read()));
             self.current_field = self.current_field.add(1);
             output
         }
+    }
+}
+
+/// A key-value pair recorded in a trace event.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct TraceEntry<'a> {
+    pub key: &'a str,
+    pub value: TraceValue<'a>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum TraceValue<'a> {
+    Integer(i64),
+    Double(f64),
+    String(&'a str),
+    Unsigned(u64),
+}
+
+impl<'a> From<sys::vlc_tracer_entry> for TraceEntry<'a> {
+    fn from(entry: sys::vlc_tracer_entry) -> Self {
+        // SAFETY: Key is guaranteed to be non-null by the iterator.
+        let key = unsafe { CStr::from_ptr(entry.key).assume_valid() };
+
+        // SAFETY: Union accesses are only made with the associated entry tag.
+        let value = unsafe {
+            match entry.kind {
+                sys::vlc_tracer_value_type::Integer => TraceValue::Integer(entry.value.integer),
+                sys::vlc_tracer_value_type::Double => TraceValue::Double(entry.value.double),
+                sys::vlc_tracer_value_type::String => {
+                    TraceValue::String(CStr::from_ptr(entry.value.string).assume_valid())
+                }
+                sys::vlc_tracer_value_type::Unsigned => TraceValue::Unsigned(entry.value.unsigned),
+            }
+        };
+
+        Self { key, value }
     }
 }
 
@@ -320,16 +334,9 @@ mod test {
             },
         ];
 
-        let trace_field = TraceField {
-            entry: NonNull::from(&entries[0]),
-        };
-        assert_eq!(trace_field.kind(), vlc_tracer_value_type::String);
-        assert_eq!(trace_field.key(), "test1");
-
-        let trace_field = TraceField {
-            entry: NonNull::from(&entries[1]),
-        };
-        assert_eq!(trace_field.kind(), vlc_tracer_value_type::Integer);
+        let trace_field = TraceEntry::from(entries[0]);
+        assert_eq!(trace_field.key, "test1");
+        assert_eq!(trace_field.value, TraceValue::String("value1"));
 
         let trace = vlc_tracer_trace {
             entries: NonNull::from(&entries[0]),
@@ -340,13 +347,9 @@ mod test {
         let mut iterator = trace.entries();
 
         let first = iterator.next().expect("First field must be valid");
-        assert_eq!(first.kind(), vlc_tracer_value_type::String);
-        assert_eq!(first.key(), "test1");
-        unsafe {
-            assert_eq!(CStr::from_ptr(first.value().string), c"value1");
-        }
+        assert_eq!(first.value, TraceValue::String("value1"));
+        assert_eq!(first.key, "test1");
 
-        let second = iterator.next();
-        assert_eq!(second, None);
+        assert_eq!(iterator.next(), None);
     }
 }

@@ -15,30 +15,20 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 
-use std::{cell::UnsafeCell, ffi::CStr, sync::Mutex};
-use telegraf::{Client, IntoFieldData, Point};
-use vlcrs_core::tracer::{sys::vlc_tracer_value_type, TracerCapability, TracerModuleLoader};
+use std::{cell::UnsafeCell, sync::Mutex};
+use telegraf::{Client, IntoFieldData};
+use vlcrs_core::tracer::{TraceValue, TracerCapability, TracerModuleLoader};
 use vlcrs_macros::module;
 
-struct TraceField(vlcrs_core::tracer::TraceField);
+struct TraceValueWrapper<'a>(TraceValue<'a>);
 
-impl IntoFieldData for TraceField {
+impl<'a> IntoFieldData for TraceValueWrapper<'a> {
     fn field_data(&self) -> telegraf::FieldData {
-        match self.0.kind() {
-            vlc_tracer_value_type::String => unsafe {
-                let value = CStr::from_ptr(self.0.value().string);
-                telegraf::FieldData::Str(value.to_str().unwrap().to_string())
-            },
-            vlc_tracer_value_type::Integer => unsafe {
-                telegraf::FieldData::Number(self.0.value().integer)
-            },
-            vlc_tracer_value_type::Unsigned => unsafe {
-                telegraf::FieldData::UNumber(self.0.value().unsigned)
-            },
-            vlc_tracer_value_type::Double => unsafe {
-                telegraf::FieldData::Float(self.0.value().double)
-            },
-            _ => unreachable!(),
+        match self.0 {
+            TraceValue::String(value) => telegraf::FieldData::Str(String::from(value)),
+            TraceValue::Integer(value) => telegraf::FieldData::Number(value),
+            TraceValue::Unsigned(value) => telegraf::FieldData::UNumber(value),
+            TraceValue::Double(value) => telegraf::FieldData::Float(value),
         }
     }
 }
@@ -61,21 +51,17 @@ impl TracerCapability for TelegrafTracer {
         Some(Self { endpoint })
     }
 
-    fn trace(&self, _tick: vlcrs_core::tracer::Tick, trace: &'_ vlcrs_core::tracer::Trace) {
+    fn trace(&self, _tick: vlcrs_core::tracer::Tick, trace: &vlcrs_core::tracer::Trace) {
         let (tags, records) = trace.entries().fold(
             (Vec::new(), Vec::new()),
             |(mut tags, mut records), entry| {
-                if entry.kind() == vlcrs_core::tracer::sys::vlc_tracer_value_type::String {
-                    let value = unsafe { CStr::from_ptr(entry.value().string) };
-                    tags.push((
-                        String::from(entry.key()),
-                        String::from(value.to_str().unwrap()),
-                    ));
+                let name = String::from(entry.key);
+                if let TraceValue::String(value) = entry.value {
+                    let value = String::from(value);
+                    tags.push(telegraf::protocol::Tag { name, value });
                 } else {
-                    records.push((
-                        String::from(entry.key()),
-                        Box::new(TraceField(entry)) as Box<dyn IntoFieldData>,
-                    ));
+                    let value = TraceValueWrapper(entry.value).field_data();
+                    records.push(telegraf::protocol::Field { name, value });
                 }
 
                 (tags, records)
@@ -87,12 +73,12 @@ impl TracerCapability for TelegrafTracer {
             return;
         }
 
-        let p = Point::new(
-            String::from("measurement"),
+        let p = telegraf::Point {
+            measurement: String::from("measurement"),
             tags,
-            records,
-            None, //Some(tick.0 as u64),
-        );
+            fields: records,
+            timestamp: None, //Some(tick.0 as u64),
+        };
 
         let mut endpoint = self.endpoint.lock().unwrap();
         if let Err(err) = endpoint.get_mut().write_point(&p) {
