@@ -24,7 +24,7 @@ use std::{
 
 use crate::{convert::AssumeValid, object::Object, plugin::ModuleProtocol};
 
-pub mod sys;
+mod sys;
 
 pub struct Tick(pub i64);
 
