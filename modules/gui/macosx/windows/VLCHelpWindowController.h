@@ -30,6 +30,7 @@
 @property (readwrite, weak) IBOutlet NSButton *forwardButton;
 @property (readwrite, weak) IBOutlet NSButton *homeButton;
 @property (readwrite, weak) IBOutlet NSProgressIndicator *progressIndicator;
+@property (readwrite, weak) IBOutlet NSVisualEffectView *visualEffectView;
 
 - (IBAction)helpGoHome:(id)sender;
 - (void)showHelp;
