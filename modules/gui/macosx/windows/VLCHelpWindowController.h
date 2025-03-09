@@ -23,9 +23,9 @@
 
 #import <WebKit/WebKit.h>
 
-@interface VLCHelpWindowController : NSWindowController
+@interface VLCHelpWindowController : NSWindowController<WKNavigationDelegate>
 
-@property (readwrite, weak) IBOutlet WebView *helpWebView;
+@property (readonly) WKWebView *helpWebView;
 @property (readwrite, weak) IBOutlet NSButton *backButton;
 @property (readwrite, weak) IBOutlet NSButton *forwardButton;
 @property (readwrite, weak) IBOutlet NSButton *homeButton;
@@ -33,6 +33,8 @@
 @property (readwrite, weak) IBOutlet NSVisualEffectView *visualEffectView;
 
 - (IBAction)helpGoHome:(id)sender;
+- (IBAction)helpGoBack:(id)sender;
+- (IBAction)helpGoForward:(id)sender;
 - (void)showHelp;
 
 @end

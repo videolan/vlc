@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="14113"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,7 +10,6 @@
             <connections>
                 <outlet property="backButton" destination="2257" id="c2X-ol-C9I"/>
                 <outlet property="forwardButton" destination="2258" id="iEY-oD-cv3"/>
-                <outlet property="helpWebView" destination="2241" id="cMX-Wb-U2g"/>
                 <outlet property="homeButton" destination="2256" id="sWB-6l-roa"/>
                 <outlet property="progressIndicator" destination="d97-0g-MPE" id="abc-ol-def"/>
                 <outlet property="visualEffectView" destination="FtB-z3-gSh" id="1234"/>
@@ -30,15 +28,6 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="400"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <webView translatesAutoresizingMaskIntoConstraints="NO" id="2241">
-                        <rect key="frame" x="0.0" y="40" width="480" height="360"/>
-                        <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" plugInsEnabled="NO" javaEnabled="NO" javaScriptEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO" loadsImagesAutomatically="NO" allowsAnimatedImages="NO" allowsAnimatedImageLooping="NO">
-                            <nil key="identifier"/>
-                        </webPreferences>
-                        <connections>
-                            <outlet property="frameLoadDelegate" destination="-2" id="2340"/>
-                        </connections>
-                    </webView>
                     <visualEffectView blendingMode="behindWindow" material="titlebar" state="followsWindowActiveState" translatesAutoresizingMaskIntoConstraints="NO" id="FtB-z3-gSh">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="40"/>
                         <subviews>
@@ -59,7 +48,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="goBack:" target="2241" id="2267"/>
+                                    <action selector="helpGoBack:" target="-2" id="Jpt-6K-wje"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2258">
@@ -69,7 +58,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="goForward:" target="2241" id="2266"/>
+                                    <action selector="helpGoForward:" target="-2" id="olV-gO-PNO"/>
                                 </connections>
                             </button>
                             <progressIndicator wantsLayer="YES" maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="d97-0g-MPE">
@@ -96,11 +85,7 @@
                 <constraints>
                     <constraint firstItem="FtB-z3-gSh" firstAttribute="leading" secondItem="2240" secondAttribute="leading" id="2QX-pH-XaP"/>
                     <constraint firstAttribute="trailing" secondItem="FtB-z3-gSh" secondAttribute="trailing" id="6pc-cs-Zwy"/>
-                    <constraint firstItem="2241" firstAttribute="top" secondItem="2240" secondAttribute="top" id="7J6-p5-r45"/>
-                    <constraint firstAttribute="trailing" secondItem="2241" secondAttribute="trailing" id="CYF-2C-pXI"/>
                     <constraint firstAttribute="bottom" secondItem="FtB-z3-gSh" secondAttribute="bottom" id="XNK-O0-XXZ"/>
-                    <constraint firstItem="2241" firstAttribute="leading" secondItem="2240" secondAttribute="leading" id="XlN-01-Yyk"/>
-                    <constraint firstAttribute="bottom" secondItem="2241" secondAttribute="bottom" id="qEX-nC-QiS"/>
                 </constraints>
             </view>
         </window>

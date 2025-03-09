@@ -39,16 +39,26 @@
     if (self) {
         self.windowFrameAutosaveName = @"help";
     }
-
     return self;
 }
 
 - (void)windowDidLoad
 {
+    self.window.title = _NS("VLC media player Help");
     if (@available(macOS 10.12, *)) {
         self.window.tabbingMode = NSWindowTabbingModeDisallowed;
     }
-    self.window.title = _NS("VLC media player Help");
+    
+    _helpWebView = [[WKWebView alloc] initWithFrame:self.window.contentView.bounds];
+    self.helpWebView.navigationDelegate = self;
+    self.helpWebView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.window.contentView addSubview:self.helpWebView positioned:NSWindowBelow relativeTo:self.visualEffectView];
+
+    [self.helpWebView.topAnchor constraintEqualToAnchor:self.window.contentView.topAnchor].active = YES;
+    [self.helpWebView.bottomAnchor constraintEqualToAnchor:self.visualEffectView.topAnchor].active = YES;
+    [self.helpWebView.leadingAnchor constraintEqualToAnchor:self.window.contentView.leadingAnchor].active = YES;
+    [self.helpWebView.trailingAnchor constraintEqualToAnchor:self.window.contentView.trailingAnchor].active = YES;
+
     self.forwardButton.toolTip = _NS("Next");
     self.backButton.toolTip = _NS("Previous");
     self.homeButton.toolTip = _NS("Index");
@@ -65,19 +75,29 @@
     NSString * const style = @"<style>body { font-family: -apple-system, Helvetica Neue; }</style>";
     NSString * const htmlWithStyle = [style stringByAppendingString:NSTR(I_LONGHELP)];
     NSURL * const baseURL = [NSURL URLWithString:@"https://videolan.org"];
-    [self.helpWebView.mainFrame loadHTMLString:htmlWithStyle baseURL:baseURL];
+    [self.helpWebView loadHTMLString:htmlWithStyle baseURL:baseURL];
 }
 
-- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
+- (IBAction)helpGoBack:(id)sender
+{
+    [self.helpWebView goBack];
+}
+
+- (IBAction)helpGoForward:(id)sender
+{
+    [self.helpWebView goForward];
+}
+
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation
 {
     /* Update back/forward button states whenever a new page is loaded */
-    self.forwardButton.enabled = self.helpWebView.canGoForward;
-    self.backButton.enabled = self.helpWebView.canGoBack;
+    self.forwardButton.enabled = webView.canGoForward;
+    self.backButton.enabled = webView.canGoBack;
     self.progressIndicator.hidden = YES;
     [self.progressIndicator stopAnimation:nil];
 }
 
-- (void)webView:(WebView *)sender didStartProvisionalLoadForFrame:(WebFrame *)frame
+- (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
 {
     self.progressIndicator.hidden = NO;
     [self.progressIndicator startAnimation:nil];
