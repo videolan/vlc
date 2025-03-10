@@ -26,8 +26,6 @@
 #include "../test.hpp"
 
 #include <limits>
-#define vlc_tick_from_sec(a) (CLOCK_FREQ * (a))
-#define VLC_TICK_FROM_MS(a) (1000 * (a))
 
 int Conversions_test()
 {

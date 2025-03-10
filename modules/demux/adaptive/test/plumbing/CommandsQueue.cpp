@@ -37,8 +37,6 @@ using namespace adaptive;
 
 using OutputVal = std::pair<const AbstractFakeESOutID *, block_t *>;
 
-#define vlc_tick_from_sec(a) (CLOCK_FREQ * (a))
-
 class TestEsOut : public AbstractFakeEsOut
 {
     public:

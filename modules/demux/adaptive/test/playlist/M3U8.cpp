@@ -45,9 +45,6 @@ using namespace adaptive;
 using namespace adaptive::playlist;
 using namespace hls::playlist;
 
-#define vlc_tick_from_sec(a) (CLOCK_FREQ * (a))
-#define SEC_FROM_VLC_TICK(a) ((a)/CLOCK_FREQ)
-
 static M3U8 * ParseM3U8(vlc_object_t *obj, const char *psz, size_t isz)
 {
     M3U8Parser parser(nullptr);
