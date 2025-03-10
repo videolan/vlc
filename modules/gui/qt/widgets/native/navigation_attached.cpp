@@ -53,6 +53,7 @@ void NavigationAttached::defaultNavigationGeneric(QJSValue& jsCallback, QQuickIt
             && (!nextItem || nextItem->getnavigable()))
         {
             directionItem->forceActiveFocus(reason);
+            directionItem->setProperty("focusReason", reason); // Control's focus reason sometimes is not adjusted with `forceActiveFocus()`, Qt bug?
         }
         else if (nextItem)
         {

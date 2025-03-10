@@ -38,6 +38,9 @@ QtObject {
         item.focus = false;
 
         item.forceActiveFocus(reason);
+
+        if (item.focusReason !== undefined)
+            item.focusReason = reason // Control's focus reason sometimes is not adjusted with `forceActiveFocus()`, Qt bug?
     }
 
     function pointInRadius(x, y, radius) {
