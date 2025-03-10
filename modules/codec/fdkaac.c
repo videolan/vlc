@@ -318,7 +318,7 @@ static int OpenEncoder(vlc_object_t *p_this)
 
 #ifndef NDEBUG
     // TODO: Add more debug info to this config printout
-    msg_Dbg(p_enc, "fmt_out.p_extra = %i", p_enc->fmt_out.i_extra);
+    msg_Dbg(p_enc, "fmt_out.p_extra = %zu", p_enc->fmt_out.i_extra);
 #endif
 
     return VLC_SUCCESS;
