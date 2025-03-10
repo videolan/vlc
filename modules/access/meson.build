@@ -218,7 +218,7 @@ vlc_modules += {
 subdir('screen')
 
 # RDP/Remote Client Desktop capture
-freerdp_dep = dependency('freerdp', required: get_option('freerdp'))
+freerdp_dep = dependency('freerdp2', required: get_option('freerdp'))
 if freerdp_dep.found()
     vlc_modules += {
     'name' : 'rdp',
