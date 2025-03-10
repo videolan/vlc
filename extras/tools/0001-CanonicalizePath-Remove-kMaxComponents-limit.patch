@@ -1,0 +1,424 @@
+From 9941df614f2c08093eb76f5cfa402afbd7475a39 Mon Sep 17 00:00:00 2001
+From: David 'Digit' Turner <digit@google.com>
+Date: Mon, 4 Dec 2023 22:47:37 +0100
+Subject: [PATCH 1/2] CanonicalizePath: Remove kMaxComponents limit
+
+This patch refactors the CanonicalizePath() to fix
+two issues and improve performance. This is achieved
+through the following:
+
+- Remove the kMaxPathComponents limit entirely,
+  which fixes ninja-build#1732, by dropping the
+  `components` array entirely, in favor of
+  back-tracking the destination pointer.
+
+- Properly handle '/' and '\' which were incorrectly
+  converted into an empty string. This fixes
+  ninja-build#2008.
+
+- Skip initial '../' components in relative paths,
+  as these are common when referencing source files
+  in build plans, and doing so make the loop after
+  this step run faster in practice since most
+  source files do not need adjustments.
+
+- Simplify the inner loop logic by handling the
+  last component (which is not followed by a
+  trailing directory separator) separately.
+
+  This noticeably improves performance because
+  the inner loop becomes smaller with less branch
+  mis-predictions in the general case.
+
+- Never access or copy the caharacter after the
+  end of the input string.
+
+- Use memchr() to find the next '/' on Posix, which
+  allows the use of SIMD implementations provided by
+  the C runtime (e.g. through IFUNC functions on Linux),
+  resulting in very noticeable speedup. This is also
+  why a statically Ninja executable will be slower
+  than one that links to the C library dynamically :-/
+
+- Avoid performing any writes when the input path
+  doesn't need any adjustment, which is also quite
+  common.
+
+Note that this patch does _not_ remove the 64-bit
+limit for the `slash_bits`  value, which is only
+used on Win32.
+
+Benchmarking was done in several ways:
+
+- On Linux, running `hyperfine canon-perftest` to run the
+  canonicalization benchmark program and measure its total
+  running time. Three compilers were used to generate
+  dynamically-linked executables.
+
+  ```
+               BEFORE (ms)  AFTER (ms)
+
+  GCC 13.2.0      651         369
+  Clang 14.0      591         402
+  Clang 18,0      653         400
+  ```
+
+- On Windows, running `canon-perftest` 5 times and keeping
+  the best reported average result. The number are slower
+  since they only measure the benched function.
+
+  ```
+                   BEFORE (ms)  AFTER (ms)
+
+  Mingw64 GCC 12      246         195
+  ```
+
+- On Linux, run `hyperfine ninja -C out/default -n --quiet`
+  on a large Fuchsia build plan, once with 70000+ pending
+  commands, and once after the build (i.e. `ninja: no work to do`).
+
+  ````
+               BEFORE (s)  AFTER (s)
+
+  pre_build       8.789    8.647
+  post_build      6.703    6.590
+  ```
+---
+ src/util.cc      | 149 +++++++++++++++++++++++++++++++++++------------
+ src/util_test.cc | 101 ++++++++++++++++++++++++++++++--
+ 2 files changed, 208 insertions(+), 42 deletions(-)
+
+diff --git a/src/util.cc b/src/util.cc
+index ef5f103..dcb6abc 100644
+--- a/src/util.cc
++++ b/src/util.cc
+@@ -143,20 +143,19 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
+     return;
+   }
+ 
+-  const int kMaxPathComponents = 60;
+-  char* components[kMaxPathComponents];
+-  int component_count = 0;
+-
+   char* start = path;
+   char* dst = start;
++  char* dst_start = dst;
+   const char* src = start;
+   const char* end = start + *len;
++  const char* src_next;
+ 
++  // For absolute paths, skip the leading directory separator
++  // as this one should never be removed from the result.
+   if (IsPathSeparator(*src)) {
+ #ifdef _WIN32
+-
+-    // network path starts with //
+-    if (*len > 1 && IsPathSeparator(*(src + 1))) {
++    // Windows network path starts with //
++    if (src + 2 <= end && IsPathSeparator(src[1])) {
+       src += 2;
+       dst += 2;
+     } else {
+@@ -167,50 +166,126 @@ void CanonicalizePath(char* path, size_t* len, uint64_t* slash_bits) {
+     ++src;
+     ++dst;
+ #endif
++    dst_start = dst;
++  } else {
++    // For relative paths, skip any leading ../ as these are quite common
++    // to reference source files in build plans, and doing this here makes
++    // the loop work below faster in general.
++    while (src + 3 <= end && src[0] == '.' && src[1] == '.' &&
++           IsPathSeparator(src[2])) {
++      src += 3;
++      dst += 3;
++    }
+   }
+ 
+-  while (src < end) {
+-    if (*src == '.') {
+-      if (src + 1 == end || IsPathSeparator(src[1])) {
+-        // '.' component; eliminate.
+-        src += 2;
+-        continue;
+-      } else if (src[1] == '.' && (src + 2 == end || IsPathSeparator(src[2]))) {
+-        // '..' component.  Back up if possible.
++  // Loop over all components of the paths _except_ the last one, in
++  // order to simplify the loop's code and make it faster.
++  int component_count = 0;
++  char* dst0 = dst;
++  for (; src < end; src = src_next) {
++#ifndef _WIN32
++    // Use memchr() for faster lookups thanks to optimized C library
++    // implementation. `hyperfine canon_perftest` shows a significant
++    // difference (e,g, 484ms vs 437ms).
++    const char* next_sep =
++        static_cast<const char*>(::memchr(src, '/', end - src));
++    if (!next_sep) {
++      // This is the last component, will be handled out of the loop.
++      break;
++    }
++#else
++    // Need to check for both '/' and '\\' so do not use memchr().
++    // Cannot use strpbrk() because end[0] can be \0 or something else!
++    const char* next_sep = src;
++    while (next_sep != end && !IsPathSeparator(*next_sep))
++      ++next_sep;
++    if (next_sep == end) {
++      // This is the last component, will be handled out of the loop.
++      break;
++    }
++#endif
++    // Position for next loop iteration.
++    src_next = next_sep + 1;
++    // Length of the component, excluding trailing directory.
++    size_t component_len = next_sep - src;
++
++    if (component_len <= 2) {
++      if (component_len == 0) {
++        continue;  // Ignore empty component, e.g. 'foo//bar' -> 'foo/bar'.
++      }
++      if (src[0] == '.') {
++        if (component_len == 1) {
++          continue;  // Ignore '.' component, e.g. './foo' -> 'foo'.
++        } else if (src[1] == '.') {
++          // Process the '..' component if found. Back up if possible.
++          if (component_count > 0) {
++            // Move back to start of previous component.
++            --component_count;
++            while (--dst > dst0 && !IsPathSeparator(dst[-1])) {
++              // nothing to do here, decrement happens before condition check.
++            }
++          } else {
++            dst[0] = '.';
++            dst[1] = '.';
++            dst[2] = src[2];
++            dst += 3;
++          }
++          continue;
++        }
++      }
++    }
++    ++component_count;
++
++    // Copy or skip component, including trailing directory separator.
++    if (dst != src) {
++      ::memmove(dst, src, src_next - src);
++    }
++    dst += src_next - src;
++  }
++
++  // Handling the last component that does not have a trailing separator.
++  // The logic here is _slightly_ different since there is no trailing
++  // directory separator.
++  size_t component_len = end - src;
++  do {
++    if (component_len == 0)
++      break;  // Ignore empty component (e.g. 'foo//' -> 'foo/')
++    if (src[0] == '.') {
++      if (component_len == 1)
++        break;  // Ignore trailing '.' (e.g. 'foo/.' -> 'foo/')
++      if (src[1] == '.') {
++        // Handle '..'. Back up if possible.
+         if (component_count > 0) {
+-          dst = components[component_count - 1];
+-          src += 3;
+-          --component_count;
++          while (--dst > dst0 && !IsPathSeparator(dst[-1])) {
++            // nothing to do here, decrement happens before condition check.
++          }
+         } else {
+-          *dst++ = *src++;
+-          *dst++ = *src++;
+-          *dst++ = *src++;
++          dst[0] = '.';
++          dst[1] = '.';
++          dst += 2;
++          // No separator to add here.
+         }
+-        continue;
++        break;
+       }
+     }
+-
+-    if (IsPathSeparator(*src)) {
+-      src++;
+-      continue;
++    // Skip or copy last component, no trailing separator.
++    if (dst != src) {
++      ::memmove(dst, src, component_len);
+     }
++    dst += component_len;
++  } while (0);
+ 
+-    if (component_count == kMaxPathComponents)
+-      Fatal("path has too many components : %s", path);
+-    components[component_count] = dst;
+-    ++component_count;
+-
+-    while (src != end && !IsPathSeparator(*src))
+-      *dst++ = *src++;
+-    *dst++ = *src++;  // Copy '/' or final \0 character as well.
+-  }
++  // Remove trailing path separator if any, but keep the initial
++  // path separator(s) if there was one (or two on Windows).
++  if (dst > dst_start && IsPathSeparator(dst[-1]))
++    dst--;
+ 
+   if (dst == start) {
++    // Handle special cases like "aa/.." -> "."
+     *dst++ = '.';
+-    *dst++ = '\0';
+   }
+ 
+-  *len = dst - start - 1;
++  *len = dst - start;  // dst points after the trailing char here.
+ #ifdef _WIN32
+   uint64_t bits = 0;
+   uint64_t bits_mask = 1;
+diff --git a/src/util_test.cc b/src/util_test.cc
+index d58b170..8467e2a 100644
+--- a/src/util_test.cc
++++ b/src/util_test.cc
+@@ -89,13 +89,57 @@ TEST(CanonicalizePath, PathSamples) {
+   EXPECT_EQ("/foo", path);
+ #endif
+ 
++  path = "..";
++  CanonicalizePath(&path);
++  EXPECT_EQ("..", path);
++
++  path = "../";
++  CanonicalizePath(&path);
++  EXPECT_EQ("..", path);
++
++  path = "../foo";
++  CanonicalizePath(&path);
++  EXPECT_EQ("../foo", path);
++
++  path = "../foo/";
++  CanonicalizePath(&path);
++  EXPECT_EQ("../foo", path);
++
++  path = "../..";
++  CanonicalizePath(&path);
++  EXPECT_EQ("../..", path);
++
++  path = "../../";
++  CanonicalizePath(&path);
++  EXPECT_EQ("../..", path);
++
++  path = "./../";
++  CanonicalizePath(&path);
++  EXPECT_EQ("..", path);
++
++  path = "/..";
++  CanonicalizePath(&path);
++  EXPECT_EQ("/..", path);
++
++  path = "/../";
++  CanonicalizePath(&path);
++  EXPECT_EQ("/..", path);
++
++  path = "/../..";
++  CanonicalizePath(&path);
++  EXPECT_EQ("/../..", path);
++
++  path = "/../../";
++  CanonicalizePath(&path);
++  EXPECT_EQ("/../..", path);
++
+   path = "/";
+   CanonicalizePath(&path);
+-  EXPECT_EQ("", path);
++  EXPECT_EQ("/", path);
+ 
+   path = "/foo/..";
+   CanonicalizePath(&path);
+-  EXPECT_EQ("", path);
++  EXPECT_EQ("/", path);
+ 
+   path = ".";
+   CanonicalizePath(&path);
+@@ -171,7 +215,7 @@ TEST(CanonicalizePath, PathSamplesWindows) {
+ 
+   path = "\\";
+   CanonicalizePath(&path);
+-  EXPECT_EQ("", path);
++  EXPECT_EQ("/", path);
+ }
+ 
+ TEST(CanonicalizePath, SlashTracking) {
+@@ -321,8 +365,53 @@ TEST(CanonicalizePath, TooManyComponents) {
+   EXPECT_EQ(58, std::count(path.begin(), path.end(), '\\'));
+   CanonicalizePath(&path, &slash_bits);
+   EXPECT_EQ(slash_bits, 0x3ffffffffffffff);
++
++  // More than 60 components is now completely ok too.
++  path =
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\a\\"
++      "a\\a\\a\\a\\a\\a\\a\\a\\a\\x\\y.h";
++  EXPECT_EQ(218, std::count(path.begin(), path.end(), '\\'));
++  CanonicalizePath(&path, &slash_bits);
++  EXPECT_EQ(slash_bits, 0xffffffffffffffff);
+ }
+-#endif
++#else   // !_WIN32
++TEST(CanonicalizePath, TooManyComponents) {
++  string path;
++  uint64_t slash_bits;
++
++  // More than 60 components is now completely ok.
++  path =
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/a/"
++      "a/a/a/a/a/a/a/a/a/x/y.h";
++  EXPECT_EQ(218, std::count(path.begin(), path.end(), '/'));
++  CanonicalizePath(&path, &slash_bits);
++  EXPECT_EQ(slash_bits, 0x0);
++}
++#endif  // !_WIN32
+ 
+ TEST(CanonicalizePath, UpDir) {
+   string path, err;
+@@ -353,11 +442,13 @@ TEST(CanonicalizePath, NotNullTerminated) {
+   EXPECT_EQ(strlen("foo"), len);
+   EXPECT_EQ("foo/. bar/.", string(path));
+ 
++  // Verify that foo/..file gets canonicalized to 'file' without
++  // touching the rest of the string.
+   path = "foo/../file bar/.";
+   len = strlen("foo/../file");
+   CanonicalizePath(&path[0], &len, &unused);
+   EXPECT_EQ(strlen("file"), len);
+-  EXPECT_EQ("file ./file bar/.", string(path));
++  EXPECT_EQ("file../file bar/.", string(path));
+ }
+ 
+ TEST(PathEscaping, TortureTest) {
+-- 
+2.45.0.windows.1
+
