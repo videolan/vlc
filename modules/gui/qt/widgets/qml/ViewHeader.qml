@@ -94,6 +94,11 @@ T.Pane {
 
             focus: true
 
+            Binding on focusReason {
+                // NOTE: This is an explicit binding so that it does not get overridden:
+                value: root.focusReason
+            }
+
             text: qsTr("See All")
 
             font.pixelSize: VLCStyle.fontSize_large
