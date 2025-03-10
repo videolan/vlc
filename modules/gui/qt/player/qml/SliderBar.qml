@@ -394,11 +394,35 @@ T.ProgressBar {
             property int bufferAnimPosition: 0
             property int bufferFrames: 1000
             property alias animateLoading: loadingAnim.running
+            property bool display: false
+            property bool buffering: Player.buffering > 0 && Player.buffering < 1
 
             height: control.barHeight
             opacity: 0.4
             color: theme.fg.neutral //FIXME buffer color ?
             radius: control.barHeight
+
+            Timer {
+                id: bufferingTimer
+                interval: VLCStyle.humanMoment
+                repeat: false
+                running: false
+                onTriggered: {
+                    bufferRect.display = true
+                }
+            }
+
+            onBufferingChanged: {
+                if(buffering)
+                {
+                    bufferingTimer.start()
+                }
+                else
+                {
+                    bufferingTimer.stop()
+                    bufferRect.display = false
+                }
+            }
 
             states: [
                 State {
@@ -425,7 +449,7 @@ T.ProgressBar {
                 },
                 State {
                     name: "time to start playing known"
-                    when: control.visible && Player.buffering < 1
+                    when: control.visible && bufferRect.display
                     PropertyChanges {
                         target: bufferRect
                         width: Player.buffering * parent.width
@@ -436,7 +460,7 @@ T.ProgressBar {
                 },
                 State {
                     name: "playing from buffer"
-                    when: control.visible && Player.buffering === 1
+                    when: control.visible && !bufferRect.display
                     PropertyChanges {
                         target: bufferRect
                         width: Player.buffering * parent.width
