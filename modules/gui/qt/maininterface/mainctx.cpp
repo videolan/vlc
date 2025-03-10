@@ -766,6 +766,16 @@ QJSValue MainCtx::urlListToMimeData(const QJSValue &array) {
         else if (element.isString())
             // If the element is string, we assume it is already encoded
             decodedUrl = element.toString();
+        else if (element.isVariant())
+        {
+            const QVariant variant = element.toVariant();
+            if (variant.typeId() == QMetaType::QUrl)
+                decodedUrl = variant.toUrl().toString(QUrl::FullyEncoded);
+            else if (variant.typeId() == QMetaType::QString)
+                decodedUrl = variant.toString();
+            else
+                Q_UNREACHABLE();
+        }
         else
             Q_UNREACHABLE(); // Assertion failure in debug builds
         string += decodedUrl + QStringLiteral("\r\n");
