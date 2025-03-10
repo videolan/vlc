@@ -412,6 +412,8 @@ ninja: UNPACK_DIR=ninja-$(NINJA_BUILD_NAME)
 ninja: ninja-$(NINJA_VERSION).tar.gz
 	$(UNPACK)
 	$(APPLY) $(TOOLS)/ninja-1.11.1-replace-pipes-quote-with-shlex-quote.patch
+	$(APPLY) $(TOOLS)/0001-CanonicalizePath-Remove-kMaxComponents-limit.patch
+	$(APPLY) $(TOOLS)/0002-CanonicalizePath-fix-a-b-._foo-a-replacement.patch
 	$(MOVE)
 
 .buildninja: ninja
