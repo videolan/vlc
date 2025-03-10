@@ -50,13 +50,13 @@ T.Button {
 
     // Settings
 
-    width: implicitWidth
-    height: implicitHeight
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
 
-    implicitWidth: contentItem.implicitWidth
-    implicitHeight: contentItem.implicitHeight
-
-    padding: 0
+    padding: VLCStyle.margin_xsmall
+    spacing: VLCStyle.margin_xsmall
 
     font.pixelSize: VLCStyle.fontSize_normal
 
@@ -100,17 +100,15 @@ T.Button {
         implicitWidth: tabRow.implicitWidth
         implicitHeight: tabRow.implicitHeight
 
-        Row {
+        RowLayout {
             id: tabRow
 
             anchors.fill: parent
 
-            padding: VLCStyle.margin_xsmall
-            spacing: VLCStyle.margin_xsmall
+            spacing: control.spacing
 
             Item {
-                width: implicitWidth
-                height: implicitHeight
+                Layout.fillHeight: true
 
                 implicitWidth: VLCStyle.fontHeight_normal
                 implicitHeight: VLCStyle.fontHeight_normal
@@ -147,6 +145,12 @@ T.Button {
             }
 
             Widgets.ListLabel {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
                 text: control.text
 
                 //button text is already exposed
