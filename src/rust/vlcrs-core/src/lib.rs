@@ -34,3 +34,5 @@ pub mod plugin;
 pub mod object;
 
 pub mod tracer;
+
+pub(crate) mod convert;
