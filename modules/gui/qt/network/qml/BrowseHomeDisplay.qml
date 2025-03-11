@@ -274,6 +274,9 @@ FocusScope {
 
         interactive: false
 
+        enableBeginningFade: false
+        enableEndFade: false
+
         onBrowse: (tree, reason) => root.browse(tree, reason)
         onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
