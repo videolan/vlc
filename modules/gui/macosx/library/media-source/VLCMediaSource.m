@@ -429,7 +429,7 @@ static const char *const myFoldersDescription = "My Folders";
     const NSDirectoryEnumerationOptions options =
         NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants;
     NSArray<NSURLResourceKey> * const keys = @[NSURLIsDirectoryKey];
-    NSArray<NSURL *> * const children =
+    NSArray<NSURL *> *children =
         [NSFileManager.defaultManager contentsOfDirectoryAtURL:directoryUrl
                                     includingPropertiesForKeys:keys
                                                        options:options
@@ -439,6 +439,11 @@ static const char *const myFoldersDescription = "My Folders";
         NSLog(@"Failed to get directories: %@.", error);
         return;
     }
+
+    children = [children sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        return [url1.lastPathComponent compare:url2.lastPathComponent
+                                       options:NSCaseInsensitiveSearch];
+    }];
 
     for (NSURL * const url in children) {
         NSNumber *isDirectory;
