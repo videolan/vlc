@@ -25,6 +25,13 @@
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCInputItem.h"
+#import "library/VLCLibraryWindow.h"
+
+#import "main/VLCMain.h"
+
+#import "VLCLibraryMediaSourceViewController.h"
+#import "VLCLibraryMediaSourceViewNavigationStack.h"
+#import "VLCLibraryMediaSourceViewNavigationState.h"
 
 @interface VLCMediaSource ()
 {
@@ -417,11 +424,32 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
-    // Clear pre-existing child nodes
+    NSMutableDictionary<NSURL *, VLCLibraryMediaSourceViewNavigationState *> * const affectedPathControlStates = NSMutableDictionary.dictionary;
+    VLCLibraryMediaSourceViewController * const msvc = (VLCLibraryMediaSourceViewController *)VLCMain.sharedInstance.libraryWindow.librarySegmentViewController;
+
+    // Do depth first traversal first in order to find any nodes contained in a nav stack state
+    input_item_node_t * stack[1024];
+    size_t stackCount = 0;
+    stack[stackCount++] = directoryNode;
+
+    while (stackCount > 0) {
+        input_item_node_t * const current = stack[--stackCount];
+        VLCLibraryMediaSourceViewNavigationState * const state = [msvc.navigationStack stateForNode:current];
+        if (state != nil) {
+            [affectedPathControlStates setObject:state forKey:[NSURL URLWithString:state.currentNodeDisplayed.inputItem.MRL]];
+        }
+
+        for (int i = 0; i < current->i_children; i++) {
+            stack[stackCount++] = current->pp_children[i];
+        }
+    }
+
+    // Clear pre-existing child nodes. We will need to re-create them, if applicable, later when
+    // generating new nodes
     while (directoryNode->i_children > 0) {
-        input_item_node_t * const child = directoryNode->pp_children[0];
-        input_item_node_RemoveNode(directoryNode, child);
-        input_item_node_Delete(child);
+        input_item_node_t * const childNode = directoryNode->pp_children[0];
+        input_item_node_RemoveNode(directoryNode, childNode);
+        input_item_node_Delete(childNode);
     }
 
     NSError *error;
