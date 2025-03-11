@@ -517,6 +517,22 @@ static const char *const myFoldersDescription = "My Folders";
             urlInputItem = NULL;
         }
     }
+
+    // Give orphan input nodes for remaining affected path control nodes
+    for (VLCLibraryMediaSourceViewNavigationState * const state in affectedPathControlStates.allValues) {
+        input_item_t * const urlInputItem = input_item_NewExt(state.currentNodeDisplayed.inputItem.MRL.UTF8String,
+                                                              state.currentNodeDisplayed.inputItem.name.UTF8String,
+                                                              0,
+                                                              ITEM_TYPE_DIRECTORY,
+                                                              ITEM_LOCAL);
+        if (urlInputItem != NULL) {
+            input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
+            if (urlNode) {
+                state.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:urlNode];
+            }
+            input_item_Release(urlInputItem);
+        }
+    }
 }
 
 - (NSString *)mediaSourceDescription
