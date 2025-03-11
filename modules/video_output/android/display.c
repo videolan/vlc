@@ -62,6 +62,7 @@ struct subpicture
 struct sys
 {
     AWindowHandler *awh;
+    bool can_set_video_layout;
     android_video_context_t *avctx;
     struct subpicture sub;
 };
@@ -380,6 +381,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
 static void SetVideoLayout(vout_display_t *vd)
 {
     struct sys *sys = vd->sys;
+    if (!sys->can_set_video_layout)
+        return;
 
     video_format_t rot_fmt;
     video_format_ApplyRotation(&rot_fmt, vd->source);
@@ -428,7 +431,8 @@ static void Close(vout_display_t *vd)
 {
     struct sys *sys = vd->sys;
 
-    AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
+    if (sys->can_set_video_layout)
+        AWindowHandler_setVideoLayout(sys->awh, 0, 0, 0, 0, 0, 0);
 
     if (sys->sub.window != NULL)
         subpicture_CloseDisplay(vd);
@@ -444,11 +448,14 @@ static int Open(vout_display_t *vd,
 
     if (embed->type != VLC_WINDOW_TYPE_ANDROID_NATIVE
      || fmtp->i_chroma != VLC_CODEC_ANDROID_OPAQUE
-     || context == NULL
-     || !AWindowHandler_canSetVideoLayout(awh))
+     || context == NULL)
         return VLC_EGENERIC;
 
-    if (!vd->obj.force && fmtp->projection_mode != PROJECTION_MODE_RECTANGULAR)
+    bool can_set_video_layout = AWindowHandler_canSetVideoLayout(awh);
+
+    if (!vd->obj.force
+     && (fmtp->projection_mode != PROJECTION_MODE_RECTANGULAR
+      || !can_set_video_layout))
     {
         /* Let the gles2 vout handle projection */
         return VLC_EGENERIC;
@@ -460,6 +467,7 @@ static int Open(vout_display_t *vd,
         return VLC_ENOMEM;
 
     sys->awh = awh;
+    sys->can_set_video_layout = can_set_video_layout;
     sys->avctx = vlc_video_context_GetPrivate(context, VLC_VIDEO_CONTEXT_AWINDOW);
     assert(sys->avctx);
     if (sys->avctx->texture != NULL)
