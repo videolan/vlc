@@ -36,7 +36,7 @@ void UINotifier::setupNotifications()
                               , qtr("Scale: %1%").arg(scale));
     });
 
-    connect(m_ctx, &MainCtx::minimalViewChanged, this, [this]()
+    connect(m_ctx, &MainCtx::mainInterfaceModesChanged, this, [this]()
     {
         if (m_ctx->isMinimalView())
             emit showNotification(MinimalView

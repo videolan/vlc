@@ -187,6 +187,20 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     loadPrefs(false);
     loadFromSettingsImpl(false);
 
+    connect(this, &MainCtx::requestShowMainView, this, [this](){
+        if (!m_mainViewModes.testFlag(MainViewMode::MAININTERFACE_MODE_PLAYER))
+            return;
+        m_mainViewModes.setFlag(MAININTERFACE_MODE_PLAYER, false);
+        emit mainViewModesChanged(m_mainViewModes);
+    });
+
+    connect(this, &MainCtx::requestShowPlayerView, this, [this](){
+        if (m_mainViewModes.testFlag(MainViewMode::MAININTERFACE_MODE_PLAYER))
+            return;
+        m_mainViewModes.setFlag(MAININTERFACE_MODE_PLAYER, true);
+        emit mainViewModesChanged(m_mainViewModes);
+    });
+
     /* Get the available interfaces */
     m_extraInterfaces = new VLCVarChoiceModel(VLC_OBJECT(p_intf->intf), "intf-add", this);
 
@@ -414,8 +428,10 @@ void MainCtx::loadPrefs(const bool callSignals)
             signal(this);
     };
 
+    bool minimalMode = false;
     /* Are we in the enhanced always-video mode or not ? */
-    loadFromVLCOption(m_minimalView, "qt-minimal-view", &MainCtx::minimalViewChanged);
+    loadFromVLCOption(minimalMode, "qt-minimal-view", nullptr);
+    setMinimalView(minimalMode);
 
     loadFromVLCOption(m_bgCone, "qt-bgcone", &MainCtx::bgConeToggled);
 
@@ -696,13 +712,13 @@ void MainCtx::setbgCone(bool bgCone)
     emit bgConeToggled();
 }
 
-void MainCtx::setMinimalView(bool minimalView)
+void MainCtx::setMinimalView(bool enable)
 {
-    if (m_minimalView == minimalView)
+    if (m_mainInterfaceModes.testFlag(MAININTERFACE_MODE_MINIMAL) == enable)
         return;
 
-    m_minimalView = minimalView;
-    emit minimalViewChanged();
+    m_mainInterfaceModes.setFlag(MAININTERFACE_MODE_MINIMAL, enable);
+    emit mainInterfaceModesChanged(m_mainInterfaceModes);
 }
 
 void MainCtx::setShowRemainingTime( bool show )
@@ -1077,6 +1093,18 @@ void MainCtx::setAttachedToolTip(QObject *toolTip)
         qmlWarning(obj) << "Could not set self as custom ToolTip!";
     obj->deleteLater();
 #endif
+}
+
+MainCtx::MainInterfaceMode MainCtx::getEffectiveMainInterfaceMode() const {
+    //priority applies across modes
+    if (m_mainInterfaceModes & MainCtx::MAININTERFACE_MODE_MINIMAL)
+        return MAININTERFACE_MODE_MINIMAL;
+    else if (m_mainInterfaceModes & MAININTERFACE_MODE_PLAYER)
+        return MAININTERFACE_MODE_PLAYER;
+    else if (m_mainInterfaceModes & MAININTERFACE_MODE_MAINDISPLAY)
+        return MAININTERFACE_MODE_MAINDISPLAY;
+    else
+        return MAININTERFACE_MODE_INVALID;
 }
 
 double MainCtx::dp(const double px, const double scale)

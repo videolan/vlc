@@ -111,7 +111,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     };
     connect( m_mainCtx, &MainCtx::intfScaleFactorChanged, this, updateMinimumSize );
     connect( m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, updateMinimumSize );
-    connect( m_mainCtx, &MainCtx::minimalViewChanged, this, updateMinimumSize );
+    connect( m_mainCtx, &MainCtx::mainInterfaceModesChanged, this, updateMinimumSize );
     m_mainCtx->updateIntfScaleFactor();
     updateMinimumSize();
 

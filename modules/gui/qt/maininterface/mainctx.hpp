@@ -131,15 +131,16 @@ class MainCtx : public QObject
     Q_PROPERTY(VideoSurfaceProvider* videoSurfaceProvider READ getVideoSurfaceProvider WRITE setVideoSurfaceProvider NOTIFY hasEmbededVideoChanged FINAL)
     Q_PROPERTY(int mouseHideTimeout READ mouseHideTimeout NOTIFY mouseHideTimeoutChanged FINAL)
     Q_PROPERTY(bool albumSections READ albumSections WRITE setAlbumSections NOTIFY albumSectionsChanged FINAL)
-
     Q_PROPERTY(CSDButtonModel *csdButtonModel READ csdButtonModel CONSTANT FINAL)
+    Q_PROPERTY(MainInterfaceModes mainInterfaceModes READ getMainInterfaceModes NOTIFY mainInterfaceModesChanged FINAL)
+    Q_PROPERTY(MainInterfaceMode effectiveMainInterfaceMode READ getEffectiveMainInterfaceMode NOTIFY mainInterfaceModesChanged FINAL)
 
     //Property to get Operating System info
     Q_PROPERTY(OsType osName READ getOSName CONSTANT)
     Q_PROPERTY(int osVersion READ getOSVersion CONSTANT)
 
     // Expose Property Minimal View for Player View
-    Q_PROPERTY(bool minimalView READ isMinimalView WRITE setMinimalView NOTIFY minimalViewChanged FINAL)
+    Q_PROPERTY(bool minimalView READ isMinimalView WRITE setMinimalView NOTIFY mainInterfaceModesChanged FINAL)
 
     // This Property only works if hasAcrylicSurface is set
     Q_PROPERTY(bool acrylicActive READ acrylicActive WRITE setAcrylicActive NOTIFY acrylicActiveChanged FINAL)
@@ -204,6 +205,18 @@ public:
     };
     Q_ENUM(OsType)
 
+    //what should the main view display
+    //multiple modes may be enabled, priority applies across modes
+    //minimal > player > medialib
+    enum MainInterfaceMode {
+        MAININTERFACE_MODE_INVALID = 0,
+        MAININTERFACE_MODE_MAINDISPLAY = 1,
+        MAININTERFACE_MODE_PLAYER = 2,
+        MAININTERFACE_MODE_MINIMAL = 4
+    };
+    Q_FLAG(MainInterfaceMode);
+    Q_DECLARE_FLAGS(MainInterfaceModes, MainInterfaceMode)
+
     inline QWindow::Visibility interfaceVisibility() const { return m_windowVisibility; }
     bool isPlaylistDocked() { return b_playlistDocked; }
     bool isPlaylistVisible() { return m_playlistVisible; }
@@ -248,7 +261,7 @@ public:
     inline int getOSVersion() const {return m_osVersion;}
 
     inline bool isbgCone() const {return m_bgCone; }
-    inline bool isMinimalView() const {return m_minimalView; }
+    inline bool isMinimalView() const {return m_mainInterfaceModes & MAININTERFACE_MODE_MINIMAL; }
 
     inline bool windowSuportExtendedFrame() const { return m_windowSuportExtendedFrame; }
     inline unsigned windowExtendedMargin() const { return m_windowExtendedMargin; }
@@ -260,7 +273,7 @@ public:
     void setVideoSurfaceProvider(VideoSurfaceProvider* videoSurfaceProvider);
 
     int mouseHideTimeout() const { return m_mouseHideTimeout; }
-    
+
     Q_INVOKABLE bool backdropBlurRequested() const { return var_InheritBool(p_intf, "qt-backdrop-blur"); }
 
     Q_INVOKABLE static inline void setCursor(Qt::CursorShape cursor) { QApplication::setOverrideCursor(QCursor(cursor)); }
@@ -366,6 +379,9 @@ public:
 
     CSDButtonModel *csdButtonModel() { return m_csdButtonModel.get(); }
 
+    inline MainInterfaceModes getMainInterfaceModes() const { return m_mainInterfaceModes; };
+    MainInterfaceMode getEffectiveMainInterfaceMode() const;
+
     Q_INVOKABLE static double dp(const double px, const double scale);
     Q_INVOKABLE double dp(const double px) const;
 
@@ -432,7 +448,7 @@ protected:
     bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
     double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
-    bool                 m_minimalView = false;
+    MainInterfaceModes   m_mainInterfaceModes = { MAININTERFACE_MODE_MAINDISPLAY };
 
     double               m_artistAlbumsWidthFactor = 4.;
 
@@ -556,8 +572,6 @@ signals:
 
     void hasAcrylicSurfaceChanged(bool);
 
-    void minimalViewChanged();
-
     void acrylicActiveChanged();
 
     void smoothScrollChanged();
@@ -583,9 +597,13 @@ signals:
 
     void artistAlbumsWidthFactorChanged( double );
 
+    void mainInterfaceModesChanged(MainInterfaceModes);
+
 private:
     void loadPrefs(bool callSignals);
     void loadFromSettingsImpl(bool callSignals);
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(MainCtx::MainInterfaceModes)
 
 #endif
