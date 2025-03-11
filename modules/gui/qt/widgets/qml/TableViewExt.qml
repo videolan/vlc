@@ -112,7 +112,7 @@ FocusScope {
 
     property Component header: null
     property Item headerItem: view.headerItem?.loadedHeader ?? null
-    property color headerColor: colorContext.bg.primary
+    property color headerColor: "transparent"
     property int headerTopPadding: 0
 
 
