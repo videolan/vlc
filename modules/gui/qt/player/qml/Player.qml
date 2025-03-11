@@ -655,7 +655,7 @@ FocusScope {
             value: playlistVisibility.isPlaylistVisible ? "visible" : "hidden"
         }
 
-        component: PlaylistListView {
+        component: PlaylistPane {
             id: playlistView
 
             width: Helpers.clamp(rootPlayer.width / resizeHandle.widthFactor

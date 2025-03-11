@@ -42,7 +42,7 @@ T.ToolBar {
 
     // For now, used for d&d functionality
     // Not strictly necessary to set
-    property PlaylistListView plListView: null
+    property PlaylistPane playlistPane: null
 
     property bool _showCSD: MainCtx.clientSideDecoration && !(MainCtx.intfMainWindow.visibility === Window.FullScreen)
 
@@ -428,10 +428,10 @@ T.ToolBar {
                                     }
 
                                     onEntered: (drag) => {
-                                        if (plListView) {
-                                            console.assert(plListView.isDropAcceptableFunc)
-                                            console.assert(plListView.model)
-                                            if (plListView.isDropAcceptableFunc(drag, plListView.model.count)) {
+                                        if (root.playlistPane) {
+                                            console.assert(root.playlistPane.isDropAcceptableFunc)
+                                            console.assert(root.playlistPane.model)
+                                            if (root.playlistPane.isDropAcceptableFunc(drag, root.playlistPane.model.count)) {
                                                 drag.accept()
                                             } else {
                                                 drag.accepted = false
@@ -442,9 +442,9 @@ T.ToolBar {
                                     }
 
                                     onDropped: (drop) => {
-                                        if (plListView) {
-                                            console.assert(plListView.acceptDropFunc)
-                                            plListView.acceptDropFunc(plListView.model.count, drop)
+                                        if (root.playlistPane) {
+                                            console.assert(root.playlistPane.acceptDropFunc)
+                                            root.playlistPane.acceptDropFunc(root.playlistPane.model.count, drop)
                                         }
                                     }
 

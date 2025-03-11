@@ -51,7 +51,7 @@ Window {
         MainCtx.playlistVisible = false
     }
 
-    PlaylistListView {
+    PlaylistPane {
         id: playlistView
 
         useAcrylic: false

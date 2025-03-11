@@ -182,9 +182,9 @@ FocusScope {
 
             model: g_mainDisplay.tabModel
 
-            plListView: playlistLoader.active ? playlistLoader.item
-                                              : (playlistWindowLoader.status === Loader.Ready ? playlistWindowLoader.item.playlistView
-                                                                                              : null)
+            playlistPane: playlistLoader.active ? playlistLoader.item
+                                                : (playlistWindowLoader.status === Loader.Ready ? playlistWindowLoader.item.playlistView
+                                                                                                : null)
 
             onItemClicked: (index) => {
                 const name = g_mainDisplay.tabModel.get(index).name
@@ -364,7 +364,7 @@ FocusScope {
                     }
                 }
 
-                sourceComponent: PlaylistListView {
+                sourceComponent: PlaylistPane {
                     id: playlist
 
                     implicitWidth: Math.round(VLCStyle.isScreenSmall
