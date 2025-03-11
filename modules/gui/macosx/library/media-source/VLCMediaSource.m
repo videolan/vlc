@@ -411,9 +411,10 @@ static const char *const myFoldersDescription = "My Folders";
     });
 }
 
-- (void)generateChildNodesForDirectoryNode:(input_item_node_t*)directoryNode withUrl:(NSURL*)directoryUrl
+- (void)generateChildNodesForDirectoryNode:(input_item_node_t *)directoryNode
+                                   withUrl:(NSURL *)directoryUrl
 {
-    if(directoryNode == NULL || directoryUrl == nil) {
+    if (directoryNode == NULL || directoryUrl == nil) {
         return;
     }
 
@@ -425,16 +426,21 @@ static const char *const myFoldersDescription = "My Folders";
     }
 
     NSError *error;
-    NSArray<NSURL *> *subDirectories = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:directoryUrl
-                                                                     includingPropertiesForKeys:@[NSURLIsDirectoryKey]
-                                                                                        options:NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants
-                                                                                          error:&error];
-    if (subDirectories == nil || subDirectories.count == 0 || error) {
+    const NSDirectoryEnumerationOptions options =
+        NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants;
+    NSArray<NSURLResourceKey> * const keys = @[NSURLIsDirectoryKey];
+    NSArray<NSURL *> * const children =
+        [NSFileManager.defaultManager contentsOfDirectoryAtURL:directoryUrl
+                                    includingPropertiesForKeys:keys
+                                                       options:options
+                                                         error:&error];
+
+    if (children == nil || children.count == 0 || error) {
         NSLog(@"Failed to get directories: %@.", error);
         return;
     }
 
-    for (NSURL * const url in subDirectories) {
+    for (NSURL * const url in children) {
         NSNumber *isDirectory;
         NSNumber *isVolume;
         NSNumber *isEjectable;
