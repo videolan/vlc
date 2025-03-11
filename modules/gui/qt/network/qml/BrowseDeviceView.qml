@@ -65,7 +65,7 @@ FocusScope {
         Navigation.parentItem: root
 
         Navigation.downAction: function() {
-            view.setCurrentItemFocus(Qt.TabFocusReason)
+            loader.setCurrentItemFocus(Qt.TabFocusReason)
         }
 
         onSeeAllButtonClicked: reason => root.seeAll(reason)
@@ -75,12 +75,12 @@ FocusScope {
 
     // Aliases
 
-    property alias leftPadding: view.leftPadding
-    property alias rightPadding: view.rightPadding
+    property alias leftPadding: loader.anchors.leftMargin
+    property alias rightPadding: loader.anchors.rightMargin
 
     // Private
 
-    property alias _currentView: view.currentItem
+    property alias _currentView: loader.item
 
     // Signals
 
@@ -98,15 +98,6 @@ FocusScope {
     }
 
     // Connections
-
-    Connections {
-        target: MainCtx
-
-        function onGridViewChanged() {
-            if (MainCtx.gridView) view.replace(grid)
-            else                  view.replace(list)
-        }
-    }
 
     // Functions
 
@@ -171,14 +162,14 @@ FocusScope {
         model: root.model
     }
 
-    Widgets.StackViewExt {
-        id: view
+    Loader {
+        id: loader
 
         anchors.fill: parent
 
         focus: (model.count !== 0)
 
-        initialItem: (MainCtx.gridView) ? grid : list
+        sourceComponent: (MainCtx.gridView) ? grid : list
     }
 
     Component {
