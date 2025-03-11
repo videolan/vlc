@@ -277,6 +277,9 @@ FocusScope {
         enableBeginningFade: false
         enableEndFade: false
 
+        // FIXME: ExpandGridView makes this page completely unusable when `reuseItems` is set (#29084):
+        reuseItems: !MainCtx.gridView
+
         onBrowse: (tree, reason) => root.browse(tree, reason)
         onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
