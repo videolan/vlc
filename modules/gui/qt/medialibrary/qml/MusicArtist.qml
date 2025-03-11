@@ -57,9 +57,9 @@ FocusScope {
            return headerItem.albumsListView.currentIndex
     }
 
-    property alias rightPadding: view.rightPadding
+    property real rightPadding
 
-    property alias _currentView: view.currentItem
+    property alias _currentView: loader.item
 
     property var _artist: ({})
 
@@ -281,11 +281,11 @@ FocusScope {
     onArtistIdChanged: fetchArtistData()
 
     function setCurrentItemFocus(reason) {
-        if (view.currentItem === null) {
+        if (loader.item === null) {
             Qt.callLater(setCurrentItemFocus, reason)
             return
         }
-        view.currentItem.setCurrentItemFocus(reason);
+        loader.item.setCurrentItemFocus(reason);
     }
 
     function resetFocus() {
@@ -608,22 +608,13 @@ FocusScope {
         }
     }
 
-    Widgets.StackViewExt {
-        id: view
+    Loader {
+        id: loader
 
         anchors.fill: parent
+        anchors.rightMargin: root.rightPadding
 
         focus: albumModel.count !== 0
-        initialItem: MainCtx.gridView ? gridComponent : tableComponent
-
-        Connections {
-            target: MainCtx
-            function onGridViewChanged() {
-                if (MainCtx.gridView)
-                    view.replace(gridComponent)
-                else
-                    view.replace(tableComponent)
-            }
-        }
+        sourceComponent: MainCtx.gridView ? gridComponent : tableComponent
     }
 }
