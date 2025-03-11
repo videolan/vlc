@@ -88,6 +88,8 @@ FadingEdge {
         z: 99
         parent: root.listView
 
+        visible: root.enableBeginningFade
+
         anchors {
             top: parent.top
             left: parent.left
@@ -114,6 +116,8 @@ FadingEdge {
 
         z: 99
         parent: root.listView
+
+        visible: root.enableEndFade
 
         anchors {
             bottom: parent.bottom
