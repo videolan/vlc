@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCLibraryMediaSourceViewNavigationState : NSObject
 
 @property (readonly) VLCMediaSourceDataSource *currentMediaSource;
-@property (readonly) VLCInputNode *currentNodeDisplayed;
+@property (readwrite) VLCInputNode *currentNodeDisplayed;
 
 - (instancetype)initFromMediaSourceDataSource:(VLCMediaSourceDataSource *)mediaSourceDataSource;
 
