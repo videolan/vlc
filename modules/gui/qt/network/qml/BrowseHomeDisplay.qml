@@ -273,6 +273,8 @@ FocusScope {
 
         visible: (model.count !== 0)
 
+        interactive: false
+
         onBrowse: (tree, reason) => root.browse(tree, reason)
         onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
