@@ -1001,6 +1001,11 @@ FocusScope {
         }
     }
 
+    TapHandler {
+        acceptedButtons: Qt.BackButton
+        onTapped: MainCtx.playerView = false
+    }
+
     //filter key events to keep toolbar
     //visible when user navigates within the control bar
     KeyEventFilter {

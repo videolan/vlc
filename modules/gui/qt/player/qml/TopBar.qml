@@ -455,7 +455,7 @@ FocusScope{
                 id: contextMenu
 
                 ctx: MainCtx
-                playerViewVisible: History.match(History.viewPath, ["player"])
+                playerViewVisible: MainCtx.mainViewModes & MainCtx.MAININTERFACE_MODE_PLAYER
 
                 onAboutToShow: root.requestLockUnlockAutoHide(true)
                 onAboutToHide: root.requestLockUnlockAutoHide(false)

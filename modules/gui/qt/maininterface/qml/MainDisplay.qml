@@ -81,9 +81,23 @@ FocusScope {
             _showMiniPlayer = true
     }
 
+    function loadCurrentHistoryView(focusReason) {
+        loadView(History.viewPath, History.viewProp, focusReason)
+        contextSaver.restore(History.viewPath)
+    }
+
     Component.onCompleted: {
-        if (MainCtx.canShowVideoPIP)
+        if (MainCtx.canShowVideoPIP) {
             pipPlayerComponent.createObject(this)
+        } else {
+            if (MainCtx.hasEmbededVideo)
+                MainPlaylistController.stop()
+        }
+
+        if (History.previousEmpty) {
+            History.update(["home"])
+        }
+        loadCurrentHistoryView(Qt.OtherFocusReason)
     }
 
     Navigation.cancelAction: function() {
@@ -156,6 +170,29 @@ FocusScope {
         }
     }
 
+    ModelSortSettingHandler {
+        id: contextSaver
+    }
+
+    Connections {
+        target: MainCtx.sort
+
+        function onCriteriaChanged(criteria) {
+            contextSaver.save(History.viewPath)
+        }
+
+        function onOrderChanged(order) {
+            contextSaver.save(History.viewPath)
+        }
+    }
+
+    Connections {
+        target: History
+        function onNavigate(focusReason) {
+            loadCurrentHistoryView(focusReason)
+        }
+    }
+
     ColorContext {
         id: theme
         palette: VLCStyle.palette
@@ -207,13 +244,12 @@ FocusScope {
             onItemClicked: (index) => {
                 const name = g_mainDisplay.tabModel.get(index).name
 
-                //don't add the ["mc"] prefix as we are only testing subviers from MainDisplay
                 if (stackView.isDefaulLoadedForPath([name])) {
                     return
                 }
 
                 selectedIndex = index
-                History.push(["mc", name])
+                History.push([name])
             }
 
             Navigation.parentItem: mainColumn
@@ -680,5 +716,13 @@ FocusScope {
                 _showMiniPlayer = false;
             }
         }
+    }
+
+    MouseArea {
+        /// handles mouse navigation buttons
+        anchors.fill: parent
+        acceptedButtons: Qt.BackButton
+        cursorShape: undefined
+        onClicked: History.previous()
     }
 }
