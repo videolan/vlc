@@ -77,6 +77,8 @@ FocusScope {
 
     property string title
 
+    property bool interactive: true
+
     // Aliases
 
     property alias leftPadding: loader.anchors.leftMargin
@@ -197,6 +199,8 @@ FocusScope {
 
             selectionModel: modelSelect
 
+            interactive: root.interactive
+
             Navigation.parentItem: root
 
             Navigation.upItem: headerItem
@@ -300,6 +304,8 @@ FocusScope {
             header: root.header
 
             selectionModel: modelSelect
+
+            interactive: root.interactive
 
             Navigation.parentItem: root
 
