@@ -327,6 +327,9 @@ static int subpicture_OpenDisplay(vout_display_t *vd)
     if (sub->renderer == NULL)
         goto delete_interop;
 
+    vlc_gl_sub_renderer_SetOutputSize(sub->renderer, vd->cfg->display.width,
+                                      vd->cfg->display.height);
+
     vlc_gl_ReleaseCurrent(sub->gl);
 
     static const vlc_fourcc_t gl_subpicture_chromas[] = {
