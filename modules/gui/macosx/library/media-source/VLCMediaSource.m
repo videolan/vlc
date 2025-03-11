@@ -311,7 +311,6 @@ static const char *const myFoldersDescription = "My Folders";
         input_item_node_t *vlcInputNode = inputNode.vlcInputItemNode;
         NSURL *dirUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
 
-        [self clearChildNodesForNode:vlcInputNode]; // Clear existing nodes, refresh
         [self generateChildNodesForDirectoryNode:vlcInputNode withUrl:dirUrl];
         return;
     }
