@@ -60,7 +60,7 @@ T.Control {
         TapHandler {
             gesturePolicy: TapHandler.WithinBounds
 
-            onDoubleTapped: MainCtx.requestShowPlayerView()
+            onDoubleTapped: MainCtx.playerView = true
             onTapped: MainPlaylistController.togglePlayPause()
         }
 
@@ -176,7 +176,7 @@ T.Control {
 
             textStyle: root.textStyle
 
-            onClicked: MainCtx.requestShowPlayerView()
+            onClicked: MainCtx.playerView = true
         }
     }
 }

@@ -278,7 +278,7 @@ void VLCMenuBar::ToolsMenu( qt_intf_t *p_intf, QMenu *menu )
  * Interface modification, load other interfaces, activate Extensions
  * \param current, set to NULL for menu creation, else for menu update
  **/
-void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> playerViewVisible)
+void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
 {
     QAction *action;
 
@@ -295,21 +295,6 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> pl
         if( a->parent() == menu ) delete a;
         else menu->removeAction( a );
         if( m && m->parent() == menu ) delete m;
-    }
-
-    if (playerViewVisible.has_value())
-    {
-        QString title;
-
-        if (*playerViewVisible)
-            title = qtr("Show &main view");
-        else
-            title = qtr("Show &player view");
-
-        action = menu->addAction(title);
-
-        connect( action, &QAction::triggered, mi, *playerViewVisible ? &MainCtx::requestShowMainView
-                                                                     : &MainCtx::requestShowPlayerView );
     }
 
     action = menu->addAction(
@@ -336,6 +321,14 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu, std::optional<bool> pl
     connect( action, &QAction::triggered, mi, &MainCtx::setInterfaceAlwaysOnTop );
 
     menu->addSeparator();
+
+    {
+        bool isPlayerVisible = mi->getMainInterfaceModes() & MainCtx::MAININTERFACE_MODE_PLAYER;
+        action = menu->addAction(qtr("&Big Player View"));
+        action->setCheckable( true );
+        action->setChecked( isPlayerVisible );
+        connect( action, &QAction::triggered, mi, &MainCtx::setPlayerView);
+    }
 
     /* FullScreen View */
     action = menu->addAction( qtr( "&Fullscreen Interface" ), mi,

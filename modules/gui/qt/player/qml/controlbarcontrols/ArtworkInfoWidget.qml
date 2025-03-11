@@ -86,11 +86,7 @@ AbstractButton {
     // Events
 
     onClicked: {
-        if (MainCtx.mainViewModes & MainCtx.MAININTERFACE_MODE_PLAYER) {
-            MainCtx.requestShowMainView()
-        } else {
-            MainCtx.requestShowPlayerView()
-        }
+        MainCtx.playerView = !MainCtx.playerView
     }
 
     // Children

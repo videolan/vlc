@@ -481,7 +481,6 @@ T.ToolBar {
                             Menus.QmlGlobalMenu {
                                 id: contextMenu
                                 ctx: MainCtx
-                                playerViewVisible: MainCtx.mainViewModes & MainCtx.MAININTERFACE_MODE_PLAYER
                             }
                         }
 

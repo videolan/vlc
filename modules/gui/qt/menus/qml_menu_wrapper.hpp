@@ -150,7 +150,6 @@ class QmlGlobalMenu : public VLCMenuBar
 {
     Q_OBJECT
     SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
-    SIMPLE_MENU_PROPERTY(bool, playerViewVisible, false)
 
     Q_PROPERTY(bool shown READ isShown NOTIFY shownChanged FINAL)
 
@@ -180,7 +179,6 @@ class QmlMenuBar : public VLCMenuBar
     SIMPLE_MENU_PROPERTY(MainCtx*, ctx, nullptr)
     SIMPLE_MENU_PROPERTY(QQuickItem*, menubar, nullptr)
     SIMPLE_MENU_PROPERTY(bool, openMenuOnHover, false)
-    SIMPLE_MENU_PROPERTY(bool, playerViewVisible, false)
 
 public:
     enum MenuEntry {
