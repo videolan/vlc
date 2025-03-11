@@ -77,6 +77,8 @@ FocusScope {
     }
 
     Rectangle {
+        id: background
+
         anchors.fill: parent
         color: theme.bg.secondary
 
@@ -418,10 +420,7 @@ FocusScope {
                 }
             }]
 
-
-            headerColor: theme.bg.secondary
-
-            fadingEdge.backgroundColor: headerColor
+            fadingEdge.backgroundColor: background.color
 
             header: Loader {
                 sourceComponent: VLCStyle.isScreenSmall
