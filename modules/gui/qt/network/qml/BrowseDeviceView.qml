@@ -79,6 +79,8 @@ FocusScope {
 
     property bool interactive: true
 
+    property bool reuseItems: true
+
     // Aliases
 
     property alias leftPadding: loader.anchors.leftMargin
@@ -201,6 +203,8 @@ FocusScope {
 
             interactive: root.interactive
 
+            reuseItems: root.reuseItems
+
             Navigation.parentItem: root
 
             Navigation.upItem: headerItem
@@ -306,6 +310,8 @@ FocusScope {
             selectionModel: modelSelect
 
             interactive: root.interactive
+
+            reuseItems: root.reuseItems
 
             Navigation.parentItem: root
 
