@@ -508,6 +508,11 @@ static const char *const myFoldersDescription = "My Folders";
             if (urlNode) {
                 input_item_node_AppendNode(directoryNode, urlNode);
             }
+            VLCLibraryMediaSourceViewNavigationState * const affectedState = [affectedPathControlStates objectForKey:url];
+            if (affectedState != nil) {
+                affectedState.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:urlNode];
+                [affectedPathControlStates removeObjectForKey:url];
+            }
             input_item_Release(urlInputItem);
             urlInputItem = NULL;
         }
