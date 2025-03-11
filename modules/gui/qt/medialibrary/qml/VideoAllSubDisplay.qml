@@ -263,9 +263,6 @@ VideoAll {
     header: VideoRecentVideos {
         width: root.width
 
-        leftPadding: root.leftPadding
-        rightPadding: root.rightPadding
-
         nbItemPerRow: root.currentItem?.nbItemPerRow ?? 0
 
         allVideosContentLeftMargin: root.currentItem?.contentLeftMargin ?? 0

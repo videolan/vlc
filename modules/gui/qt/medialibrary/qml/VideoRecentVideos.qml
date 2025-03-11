@@ -117,11 +117,14 @@ FocusScope {
 
             visible: recentModel.count > 0
 
-            width: root.width
-            height: currentItem?.contentHeight ?? 0
+            anchors {
+                left: parent.left
+                right: parent.right
+                leftMargin: root.leftPadding
+                rightMargin: root.rightPadding
+            }
 
-            leftPadding: root.leftPadding
-            rightPadding: root.rightPadding
+            height: currentItem?.contentHeight ?? 0
 
             focus: true
 

@@ -23,11 +23,10 @@ import QtQml.Models
 
 
 import VLC.MainInterface
-import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
 
-Widgets.StackViewExt {
+Loader {
     id: root
 
     /*
@@ -111,6 +110,10 @@ Widgets.StackViewExt {
     //       gets called multiple times even when the currentComponent stays the same.
     property Component currentComponent: MainCtx.gridView ? grid : list
 
+    // ### StackView compat:
+    property alias initialItem: root.sourceComponent
+    property alias currentItem: root.item
+
     // Navigation
 
     // handle cancelAction, if currentIndex is set reset it to 0
@@ -191,7 +194,7 @@ Widgets.StackViewExt {
     }
 
     function _loadView(reason) {
-        replace(null, currentComponent)
+        sourceComponent = currentComponent
 
         if (typeof reason !== "undefined")
             setCurrentItemFocus(reason)
