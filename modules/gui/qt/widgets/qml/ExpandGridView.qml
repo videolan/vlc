@@ -166,7 +166,8 @@ FocusScope {
     }
 
     contentHeight: {
-        const size = getItemPos(_count - 1)[1] + rowHeight + _expandItemVerticalSpace
+        // the trailing row spacing should not be accounted when calculating the content height:
+        const size = getItemPos(_count - 1)[1] + rowHeight + _expandItemVerticalSpace - verticalSpacing
 
         // NOTE: topMargin and headerHeight are included in root.getItemPos.
         if (footerItem)
