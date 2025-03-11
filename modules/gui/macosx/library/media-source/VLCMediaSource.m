@@ -441,6 +441,17 @@ static const char *const myFoldersDescription = "My Folders";
     }
 
     children = [children sortedArrayUsingComparator:^NSComparisonResult(NSURL *url1, NSURL *url2) {
+        NSNumber *isDirectory1 = nil;
+        NSNumber *isDirectory2 = nil;
+        [url1 getResourceValue:&isDirectory1 forKey:NSURLIsDirectoryKey error:NULL];
+        [url2 getResourceValue:&isDirectory2 forKey:NSURLIsDirectoryKey error:NULL];
+
+        if (isDirectory1.boolValue && !isDirectory2.boolValue) {
+            return NSOrderedAscending;
+        } else if (!isDirectory1.boolValue && isDirectory2.boolValue) {
+            return NSOrderedDescending;
+        }
+
         return [url1.lastPathComponent compare:url2.lastPathComponent
                                        options:NSCaseInsensitiveSearch];
     }];
