@@ -165,8 +165,7 @@ FocusScope {
             width: flickable.width
             height: implicitHeight
 
-            spacing: (MainCtx.gridView ? VLCStyle.gridView_spacing : VLCStyle.tableView_spacing) -
-                     VLCStyle.layoutTitle_top_padding
+            spacing: 0 // relied on the generous padding of ViewHeader instead
 
             Navigation.parentItem: root
 
