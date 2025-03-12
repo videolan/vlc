@@ -22,6 +22,8 @@
 
 #import "VLCLibraryMediaSourceViewNavigationStack.h"
 
+#import "extensions/NSString+Helpers.h"
+
 #import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
@@ -102,8 +104,7 @@
     mediaSource.didFinishGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
         for (size_t i = 0; i < node->i_children; i++) {
             input_item_node_t * const childNode = node->pp_children[i];
-            VLCInputNode * const childInputNode = [[VLCInputNode alloc] initWithInputNode:childNode];
-            NSURL * const url = [NSURL URLWithString:childInputNode.inputItem.MRL];
+            NSURL * const url = [NSURL URLWithString:toNSStr(childNode->p_item->psz_uri)];
             VLCLibraryMediaSourceViewNavigationState * const affectedState = [self.affectedPathControlStates objectForKey:url];
             if (affectedState != nil) {
                 affectedState.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:childNode];
