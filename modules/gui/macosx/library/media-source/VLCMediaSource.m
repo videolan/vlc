@@ -443,6 +443,10 @@ static const char *const myFoldersDescription = "My Folders";
             stack[stackCount++] = current->pp_children[i];
         }
     }
+    
+    if (self.willStartGeneratingChildNodesForNodeHandler) {
+        self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
+    }
 
     // Clear pre-existing child nodes. We will need to re-create them, if applicable, later when
     // generating new nodes
@@ -532,6 +536,10 @@ static const char *const myFoldersDescription = "My Folders";
             }
             input_item_Release(urlInputItem);
         }
+    }
+    
+    if (self.didFinishGeneratingChildNodesForNodeHandler) {
+        self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
     }
 }
 

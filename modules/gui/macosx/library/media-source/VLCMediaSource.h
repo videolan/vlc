@@ -53,6 +53,8 @@ extern NSString *VLCMediaSourcePreparsingEnded;
 @property (nonatomic, readonly) NSString *mediaSourceDescription;
 @property (nonatomic, readonly) VLCInputNode *rootNode;
 @property (nonatomic, readonly) enum services_discovery_category_e category;
+@property (readwrite) void (^willStartGeneratingChildNodesForNodeHandler)(input_item_node_t *);
+@property (readwrite) void (^didFinishGeneratingChildNodesForNodeHandler)(input_item_node_t *);
 
 @end
 
