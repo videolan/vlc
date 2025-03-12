@@ -23,15 +23,7 @@
 #import "VLCMediaSource.h"
 
 #import "extensions/NSString+Helpers.h"
-
 #import "library/VLCInputItem.h"
-#import "library/VLCLibraryWindow.h"
-
-#import "main/VLCMain.h"
-
-#import "VLCLibraryMediaSourceViewController.h"
-#import "VLCLibraryMediaSourceViewNavigationStack.h"
-#import "VLCLibraryMediaSourceViewNavigationState.h"
 
 @interface VLCMediaSource ()
 {
@@ -424,32 +416,11 @@ static const char *const myFoldersDescription = "My Folders";
         return;
     }
 
-    NSMutableDictionary<NSURL *, VLCLibraryMediaSourceViewNavigationState *> * const affectedPathControlStates = NSMutableDictionary.dictionary;
-    VLCLibraryMediaSourceViewController * const msvc = (VLCLibraryMediaSourceViewController *)VLCMain.sharedInstance.libraryWindow.librarySegmentViewController;
-
-    // Do depth first traversal first in order to find any nodes contained in a nav stack state
-    input_item_node_t * stack[1024];
-    size_t stackCount = 0;
-    stack[stackCount++] = directoryNode;
-
-    while (stackCount > 0) {
-        input_item_node_t * const current = stack[--stackCount];
-        VLCLibraryMediaSourceViewNavigationState * const state = [msvc.navigationStack stateForNode:current];
-        if (state != nil) {
-            [affectedPathControlStates setObject:state forKey:[NSURL URLWithString:state.currentNodeDisplayed.inputItem.MRL]];
-        }
-
-        for (int i = 0; i < current->i_children; i++) {
-            stack[stackCount++] = current->pp_children[i];
-        }
-    }
-    
     if (self.willStartGeneratingChildNodesForNodeHandler) {
         self.willStartGeneratingChildNodesForNodeHandler(directoryNode);
     }
 
-    // Clear pre-existing child nodes. We will need to re-create them, if applicable, later when
-    // generating new nodes
+    // Clear pre-existing child nodes
     while (directoryNode->i_children > 0) {
         input_item_node_t * const childNode = directoryNode->pp_children[0];
         input_item_node_RemoveNode(directoryNode, childNode);
@@ -512,32 +483,11 @@ static const char *const myFoldersDescription = "My Folders";
             if (urlNode) {
                 input_item_node_AppendNode(directoryNode, urlNode);
             }
-            VLCLibraryMediaSourceViewNavigationState * const affectedState = [affectedPathControlStates objectForKey:url];
-            if (affectedState != nil) {
-                affectedState.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:urlNode];
-                [affectedPathControlStates removeObjectForKey:url];
-            }
             input_item_Release(urlInputItem);
             urlInputItem = NULL;
         }
     }
 
-    // Give orphan input nodes for remaining affected path control nodes
-    for (VLCLibraryMediaSourceViewNavigationState * const state in affectedPathControlStates.allValues) {
-        input_item_t * const urlInputItem = input_item_NewExt(state.currentNodeDisplayed.inputItem.MRL.UTF8String,
-                                                              state.currentNodeDisplayed.inputItem.name.UTF8String,
-                                                              0,
-                                                              ITEM_TYPE_DIRECTORY,
-                                                              ITEM_LOCAL);
-        if (urlInputItem != NULL) {
-            input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
-            if (urlNode) {
-                state.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:urlNode];
-            }
-            input_item_Release(urlInputItem);
-        }
-    }
-    
     if (self.didFinishGeneratingChildNodesForNodeHandler) {
         self.didFinishGeneratingChildNodesForNodeHandler(directoryNode);
     }
