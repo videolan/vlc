@@ -720,10 +720,12 @@ CreateVideoContext(decoder_t *p_dec)
      * to modify its layout. */
 
     p_sys->video.surfacetexture = NULL;
+    int awh_caps = AWindowHandler_getCapabilities(awh);
+    bool can_set_video_layout = awh_caps & AWH_CAPS_SET_VIDEO_LAYOUT;
     bool use_surfacetexture =
         p_dec->fmt_out.video.projection_mode != PROJECTION_MODE_RECTANGULAR
      || (!p_sys->api.b_support_rotation && p_dec->fmt_out.video.orientation != ORIENT_NORMAL)
-     || !AWindowHandler_canSetVideoLayout(awh);
+     || !can_set_video_layout;
 
     if (!use_surfacetexture)
     {

@@ -451,8 +451,8 @@ static int Open(vout_display_t *vd,
      || context == NULL)
         return VLC_EGENERIC;
 
-    bool can_set_video_layout = AWindowHandler_canSetVideoLayout(awh);
-
+    bool can_set_video_layout = AWindowHandler_getCapabilities(awh)
+                                & AWH_CAPS_SET_VIDEO_LAYOUT;
     if (!vd->obj.force
      && (fmtp->projection_mode != PROJECTION_MODE_RECTANGULAR
       || !can_set_video_layout))

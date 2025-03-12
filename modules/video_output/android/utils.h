@@ -33,6 +33,9 @@
 #include <vlc_vout_display.h>
 #include <vlc_common.h>
 
+/* AWH using a VideoLAN AWindow helpers */
+#define AWH_CAPS_SET_VIDEO_LAYOUT 0x1
+
 typedef struct AWindowHandler AWindowHandler;
 typedef struct ASurfaceTexture ASurfaceTexture;
 
@@ -156,15 +159,12 @@ ANativeWindow *AWindowHandler_getANativeWindow(AWindowHandler *p_awh,
 void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
                                          enum AWindow_ID id);
 
-/**
- * Returns true if the video layout can be changed
- */
-bool AWindowHandler_canSetVideoLayout(AWindowHandler *p_awh);
+int AWindowHandler_getCapabilities(AWindowHandler *p_awh);
 
 /**
  * Set the video layout
  *
- * Should be called only if AWindowHandler_canSetVideoLayout() returned true
+ * Should be called only if AWindowHandler_getCapabilities() has AWH_CAPS_SET_VIDEO_LAYOUT
  */
 int AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
                                   int i_width, int i_height,

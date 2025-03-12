@@ -139,7 +139,7 @@ struct AWindowHandler
     struct {
         awh_events_t cb;
     } event;
-    bool b_has_video_layout_listener;
+    int capabilities;
 
     struct {
         jfloatArray jtransform_mtx_array;
@@ -822,10 +822,12 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
     }
     LoadNativeWindowAPI(p_awh);
 
-    p_awh->b_has_video_layout_listener =
-        wnd && flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER;
+    p_awh->capabilities = 0;
 
-    if (p_awh->b_has_video_layout_listener && p_events != NULL)
+    if (wnd && flags & AWINDOW_REGISTER_FLAGS_HAS_VIDEO_LAYOUT_LISTENER)
+        p_awh->capabilities |= AWH_CAPS_SET_VIDEO_LAYOUT;
+
+    if (p_awh->capabilities & AWH_CAPS_SET_VIDEO_LAYOUT && p_events != NULL)
     {
         /* XXX: HACK: force mediacodec to setup an OpenGL surface when the vout
          * is forced to gles2. Indeed, setting b_has_video_layout_listener to
@@ -835,7 +837,7 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
         if (vout_modules
          && (strncmp(vout_modules, "gles2", sizeof("gles2") - 1) == 0
           || strncmp(vout_modules, "opengles2", sizeof("opengles2") - 1) == 0))
-            p_awh->b_has_video_layout_listener = false;
+            p_awh->capabilities &= ~AWH_CAPS_SET_VIDEO_LAYOUT;
         free(vout_modules);
     }
 
@@ -1223,10 +1225,10 @@ AndroidNativeWindow_onWindowSize(JNIEnv* env, jobject clazz, jlong handle,
         p_awh->event.cb.on_new_window_size(p_awh->wnd, width, height);
 }
 
-bool
-AWindowHandler_canSetVideoLayout(AWindowHandler *p_awh)
+int
+AWindowHandler_getCapabilities(AWindowHandler *p_awh)
 {
-    return p_awh->b_has_video_layout_listener && p_awh->wnd != NULL;
+    return p_awh->capabilities;
 }
 
 int
@@ -1235,7 +1237,7 @@ AWindowHandler_setVideoLayout(AWindowHandler *p_awh,
                               int i_visible_width, int i_visible_height,
                               int i_sar_num, int i_sar_den)
 {
-    assert(p_awh->b_has_video_layout_listener);
+    assert(p_awh->capabilities & AWH_CAPS_SET_VIDEO_LAYOUT);
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return VLC_EGENERIC;
