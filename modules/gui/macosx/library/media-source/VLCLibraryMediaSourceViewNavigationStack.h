@@ -45,7 +45,6 @@ typedef struct input_item_node_t input_item_node_t;
 - (void)clear;
 
 - (void)installHandlersOnMediaSource:(VLCMediaSource *)mediaSource;
-- (nullable VLCLibraryMediaSourceViewNavigationState *)stateForNode:(input_item_node_t *)node;
 
 @end
 

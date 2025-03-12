@@ -250,12 +250,4 @@
     [self updateDelegateNavigationButtons];
 }
 
-- (nullable VLCLibraryMediaSourceViewNavigationState *)stateForNode:(input_item_node_t *)node
-{
-    const NSUInteger index = [_navigationStates indexOfObjectPassingTest:^BOOL(VLCLibraryMediaSourceViewNavigationState * const _Nonnull obj, const NSUInteger idx, BOOL * const _Nonnull stop) {
-        return obj.currentNodeDisplayed.vlcInputItemNode == node;
-    }];
-    return index == NSNotFound ? nil : _navigationStates[index];
-}
-
 @end
