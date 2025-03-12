@@ -171,7 +171,7 @@
     VLCInputNodePathControlItem *nodePathItem = [[VLCInputNodePathControlItem alloc] initWithInputNode:node];
     [self.libraryWindow.mediaSourcePathControl appendInputNodePathControlItem:nodePathItem];
 
-    [self setLibraryWindowToState:_currentPosition.navigationState];
+    [self setMediaSourceViewToState:_currentPosition.navigationState];
 }
 
 - (void)backwards
@@ -186,7 +186,7 @@
 
     [self.libraryWindow.mediaSourcePathControl removeLastInputNodePathControlItem];
 
-    [self setLibraryWindowToState:_currentPosition.navigationState];
+    [self setMediaSourceViewToState:_currentPosition.navigationState];
 }
 
 - (void)appendCurrentLibraryState
@@ -238,12 +238,8 @@
     self.libraryWindow.backwardsNavigationButton.enabled = self.backwardsAvailable;
 }
 
-- (void)setLibraryWindowToState:(VLCLibraryMediaSourceViewNavigationState *)state
+- (void)setMediaSourceViewToState:(VLCLibraryMediaSourceViewNavigationState *)state
 {
-    if (self.libraryWindow == nil) {
-        return;
-    }
-
     [self.baseDataSource setChildDataSource:state.currentMediaSource];
     [self.baseDataSource.childDataSource setNodeToDisplay:state.currentNodeDisplayed];
 
