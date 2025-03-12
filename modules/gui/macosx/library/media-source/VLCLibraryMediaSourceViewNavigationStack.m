@@ -86,23 +86,19 @@
 - (void)installHandlersOnMediaSource:(VLCMediaSource *)mediaSource
 {
     mediaSource.willStartGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
-        // Do depth first traversal first in order to find any nodes contained in a nav stack state
-        input_item_node_t * stack[1024];
-        size_t stackCount = 0;
-        stack[stackCount++] = node;
+        const NSInteger rootMostAffectedState = [_navigationStates indexOfObjectPassingTest:^BOOL(VLCLibraryMediaSourceViewNavigationState * const _Nonnull obj, const NSUInteger idx, BOOL * const _Nonnull stop) {
+            return obj.currentNodeDisplayed.vlcInputItemNode == node;
+        }];
 
-        while (stackCount > 0) {
-            input_item_node_t * const current = stack[--stackCount];
-            VLCLibraryMediaSourceViewNavigationState * const state = [self stateForNode:current];
-            if (state != nil) {
-                [self.affectedPathControlStates setObject:state forKey:[NSURL URLWithString:state.currentNodeDisplayed.inputItem.MRL]];
-            }
-
-            for (int i = 0; i < current->i_children; i++) {
-                stack[stackCount++] = current->pp_children[i];
+        if (rootMostAffectedState != NSNotFound) {
+            for (NSUInteger i = rootMostAffectedState + 1; i < _navigationStates.count; i++) {
+                VLCLibraryMediaSourceViewNavigationState * const state = _navigationStates[i];
+                NSURL * const url = [NSURL URLWithString:state.currentNodeDisplayed.inputItem.MRL];
+                [self.affectedPathControlStates setObject:state forKey:url];
             }
         }
     };
+
     mediaSource.didFinishGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
         for (size_t i = 0; i < node->i_children; i++) {
             input_item_node_t * const childNode = node->pp_children[i];
