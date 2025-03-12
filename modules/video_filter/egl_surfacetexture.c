@@ -129,6 +129,8 @@ static picture_context_t *CreatePictureContext(vlc_gl_t *gl)
     struct video_ctx *vctx = GetVCtx(gl);
 
     ctx->texture = vlc_asurfacetexture_New(gl->device->opaque, false);
+    if (ctx->texture == NULL)
+        goto error;
 
     struct ANativeWindow *window = ctx->texture->window;
     native_window_api_t *api =
