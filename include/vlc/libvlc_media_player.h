@@ -933,6 +933,22 @@ bool libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         void* opaque );
 
 /**
+ * Helper to setup output_callbacks for \ref libvlc_video_engine_anw
+ */
+static inline bool
+libvlc_video_set_anw_callbacks( libvlc_media_player_t *mp,
+                                libvlc_video_output_setup_cb setup_cb,
+                                libvlc_video_output_cleanup_cb cleanup_cb,
+                                libvlc_video_update_output_cb update_output_cb,
+                                void *opaque )
+{
+    return libvlc_video_set_output_callbacks( mp, libvlc_video_engine_anw,
+                                              setup_cb, cleanup_cb, NULL,
+                                              update_output_cb, NULL, NULL,
+                                              NULL, NULL, NULL, opaque );
+}
+
+/**
  * Set the handler where the media player should display its video output.
  *
  * The drawable is an `NSObject` that require responding to two selectors
