@@ -105,6 +105,7 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     connect( m_mainCtx, &MainCtx::windowExtendedMarginChanged, this, updateMinimumSize );
     connect( m_mainCtx, &MainCtx::minimalViewChanged, this, updateMinimumSize );
     m_mainCtx->updateIntfScaleFactor();
+    updateMinimumSize();
 
     m_mainCtx->onWindowVisibilityChanged(m_window->visibility());
     connect( m_window, &QWindow::visibilityChanged,
