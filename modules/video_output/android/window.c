@@ -33,6 +33,9 @@
 #include <vlc_window.h>
 #include <vlc_codec.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_media_player.h>
+
 #include <dlfcn.h>
 #include <jni.h>
 
@@ -43,6 +46,12 @@ typedef struct
 {
     vlc_wasync_resize_compressor_t compressor;
 } vout_window_sys_t;
+
+struct vout_window_sys_cb
+{
+    void *opaque;
+    libvlc_video_output_cleanup_cb cleanup_cb;
+};
 
 static void OnNewWindowSize(vlc_window_t *wnd,
                             unsigned i_width, unsigned i_height)
@@ -108,6 +117,76 @@ static int Open(vlc_window_t *wnd)
     return VLC_SUCCESS;
 }
 
+static void DestroyCallback(vlc_window_t *wnd)
+{
+    struct vout_window_sys_cb *sys = wnd->sys;
+    if (sys->cleanup_cb != NULL)
+        sys->cleanup_cb(sys->opaque);
+}
+
+static int OpenCallback(vlc_window_t *wnd)
+{
+    static const struct vlc_window_operations ops = {
+        .destroy = DestroyCallback,
+    };
+
+    libvlc_video_engine_t engine = var_InheritInteger(wnd, "vout-cb-type");
+    if (engine != libvlc_video_engine_anw)
+        return VLC_EGENERIC;
+
+    struct vout_window_sys_cb *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
+    if (sys == NULL)
+        return VLC_ENOMEM;
+
+    sys->opaque = var_InheritAddress(wnd, "vout-cb-opaque");
+    libvlc_video_output_setup_cb setup_cb = var_InheritAddress(wnd, "vout-cb-setup");
+    libvlc_video_update_output_cb update_cb = var_InheritAddress(wnd, "vout-cb-update-output");
+    sys->cleanup_cb = var_InheritAddress(wnd, "vout-cb-cleanup");
+
+    if (update_cb == NULL)
+        return VLC_EGENERIC;
+
+    if (setup_cb != NULL)
+    {
+        const libvlc_video_setup_device_cfg_t cfg = {
+            .hardware_decoding = true,
+        };
+        libvlc_video_setup_device_info_t out;
+        bool success = setup_cb(&sys->opaque, &cfg, &out);
+        if (!success)
+            return VLC_EGENERIC;
+        (void) out; /* Ignored on Android */
+    }
+
+    /* Default values, parameters are overridden by the producer */
+    const libvlc_video_render_cfg_t render_cfg = {
+        .width = 1,
+        .height = 1,
+    };
+    libvlc_video_output_cfg_t out = { .anw = { NULL, NULL } };
+    bool success = update_cb(sys->opaque, &render_cfg, &out);
+    if (!success)
+        goto error;
+    assert(out.anw.video != NULL);
+
+    AWindowHandler *awh =
+        AWindowHandler_newFromANWs(VLC_OBJECT(wnd), out.anw.video, out.anw.subtitle);
+    if (awh == NULL)
+        goto error;
+
+    wnd->sys = sys;
+    wnd->type = VLC_WINDOW_TYPE_ANDROID_NATIVE;
+    wnd->display.anativewindow = awh;
+    wnd->handle.android_id = AWindow_Video;
+    wnd->ops = &ops;
+
+    return VLC_SUCCESS;
+error:
+    if (sys->cleanup_cb != NULL)
+        sys->cleanup_cb(sys->opaque);
+    return VLC_EGENERIC;
+}
+
 static int
 OpenDecDevice(vlc_decoder_device *device, vlc_window_t *window)
 {
@@ -140,6 +219,9 @@ vlc_module_begin()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
     set_callback(Open)
+    add_submodule ()
+        set_capability("vout window", 11)
+        set_callback(OpenCallback)
     add_submodule ()
         set_callback_dec_device(OpenDecDevice, 1)
         add_shortcut("android")
