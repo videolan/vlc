@@ -67,6 +67,8 @@
     VLCLibraryMediaSourceViewNavigationCurrentStackPosition *_currentPosition;
 }
 
+@property (readwrite) NSMutableDictionary<NSURL *, VLCLibraryMediaSourceViewNavigationState *> *affectedPathControlStates;
+
 @end
 
 @implementation VLCLibraryMediaSourceViewNavigationStack
@@ -76,8 +78,61 @@
     self = [super init];
     if (self) {
         _navigationStates = [[NSMutableArray alloc] init];
+        _affectedPathControlStates = NSMutableDictionary.dictionary;
     }
     return self;
+}
+
+- (void)installHandlersOnMediaSource:(VLCMediaSource *)mediaSource
+{
+    mediaSource.willStartGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
+        // Do depth first traversal first in order to find any nodes contained in a nav stack state
+        input_item_node_t * stack[1024];
+        size_t stackCount = 0;
+        stack[stackCount++] = node;
+
+        while (stackCount > 0) {
+            input_item_node_t * const current = stack[--stackCount];
+            VLCLibraryMediaSourceViewNavigationState * const state = [self stateForNode:current];
+            if (state != nil) {
+                [self.affectedPathControlStates setObject:state forKey:[NSURL URLWithString:state.currentNodeDisplayed.inputItem.MRL]];
+            }
+
+            for (int i = 0; i < current->i_children; i++) {
+                stack[stackCount++] = current->pp_children[i];
+            }
+        }
+    };
+    mediaSource.didFinishGeneratingChildNodesForNodeHandler = ^(input_item_node_t * const node) {
+        for (size_t i = 0; i < node->i_children; i++) {
+            input_item_node_t * const childNode = node->pp_children[i];
+            VLCInputNode * const childInputNode = [[VLCInputNode alloc] initWithInputNode:childNode];
+            NSURL * const url = [NSURL URLWithString:childInputNode.inputItem.MRL];
+            VLCLibraryMediaSourceViewNavigationState * const affectedState = [self.affectedPathControlStates objectForKey:url];
+            if (affectedState != nil) {
+                affectedState.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:childNode];
+                [self.affectedPathControlStates removeObjectForKey:url];
+            }
+        }
+
+        // Give orphan input nodes for remaining affected path control nodes
+        for (VLCLibraryMediaSourceViewNavigationState * const state in self.affectedPathControlStates.allValues) {
+            input_item_t * const urlInputItem = input_item_NewExt(state.currentNodeDisplayed.inputItem.MRL.UTF8String,
+                                                                state.currentNodeDisplayed.inputItem.name.UTF8String,
+                                                                0,
+                                                                ITEM_TYPE_DIRECTORY,
+                                                                ITEM_LOCAL);
+            if (urlInputItem != NULL) {
+                input_item_node_t * const urlNode = input_item_node_Create(urlInputItem);
+                if (urlNode) {
+                    state.currentNodeDisplayed = [[VLCInputNode alloc] initWithInputNode:urlNode];
+                }
+                input_item_Release(urlInputItem);
+            }
+        }
+
+        [self.affectedPathControlStates removeAllObjects];
+    };
 }
 
 - (void)setLibraryWindow:(VLCLibraryWindow *)delegate

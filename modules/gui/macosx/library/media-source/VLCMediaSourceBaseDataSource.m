@@ -160,6 +160,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     for (VLCMediaSource * const mediaSource in mediaSources) {
         VLCInputNode * const rootNode = [mediaSource rootNode];
         [mediaSource preparseInputNodeWithinTree:rootNode];
+        [self.navigationStack installHandlersOnMediaSource:mediaSource];
     }
 
     _mediaSources = mediaSources;

@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class VLCLibraryWindow;
+@class VLCMediaSource;
 @class VLCMediaSourceBaseDataSource;
 @class VLCLibraryMediaSourceViewNavigationState;
 
@@ -42,6 +43,8 @@ typedef struct input_item_node_t input_item_node_t;
 
 - (void)appendCurrentLibraryState;
 - (void)clear;
+
+- (void)installHandlersOnMediaSource:(VLCMediaSource *)mediaSource;
 - (nullable VLCLibraryMediaSourceViewNavigationState *)stateForNode:(input_item_node_t *)node;
 
 @end
