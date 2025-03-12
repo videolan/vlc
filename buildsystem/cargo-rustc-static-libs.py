@@ -61,7 +61,7 @@ path = "lib.rs"
 """)
     
     with open("lib.rs", "w", encoding="utf-8") as lib_rs:
-        lib_rs.write("#![allow(dead_code)] fn main(){}")
+        lib_rs.write("#![allow(dead_code)] fn foo(){}")
 
     # Execute the cargo build and redirect stdout/stderr
     cargo_r = subprocess.run(cargo_argv, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
