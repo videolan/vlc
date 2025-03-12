@@ -144,6 +144,7 @@ static picture_context_t *CreatePictureContext(vlc_gl_t *gl)
     if (ctx->surface == EGL_NO_SURFACE)
     {
         msg_Err(gl, "cannot create EGL window surface");
+        vlc_asurfacetexture_Delete(ctx->texture);
         goto error;
     }
 
