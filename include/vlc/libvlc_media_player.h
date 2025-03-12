@@ -626,6 +626,14 @@ typedef struct libvlc_video_output_cfg_t
         int opengl_format;
         /** currently unused */
         void *p_surface;
+        struct {
+            /** Pointer to an ANativeWindow, used for video rendering */
+            void *video;
+            /** Pointer to an ANativeWindow, used for subtitles rendering, if
+             * blending subtitles into the video surface is not possible (when
+             * using MediaCodec with direct hw rendering) */
+            void *subtitle;
+        } anw;
     };
     /** Video is full range or studio/limited range. */
     bool full_range;
@@ -652,9 +660,9 @@ typedef struct libvlc_video_output_cfg_t
  *       uses to render. The host must set a Render target and call Present()
  *       when it needs the drawing from VLC to be done. This object is not valid
  *       anymore after Cleanup is called.
- *
- * Tone mapping, range and color conversion will be done depending on the values
- * set in the output structure.
+ * Tone mapping, range and color conversion will be done depending on the
+ * values set in the output structure. It can be ignored in the \ref
+ * libvlc_video_engine_anw case.
  */
 typedef bool (*libvlc_video_update_output_cb)(void* opaque, const libvlc_video_render_cfg_t *cfg,
                                               libvlc_video_output_cfg_t *output );
@@ -747,6 +755,23 @@ typedef enum libvlc_video_engine_t {
     libvlc_video_engine_d3d11,
     /** Direct3D9 rendering engine */
     libvlc_video_engine_d3d9,
+
+    /**
+     * Android ANativeWindow. It can be set in \ref libvlc_video_output_cfg_t
+     * from the \ref libvlc_video_update_output_cb callback. The ANativeWindow
+     * can be created via:
+     *  - 'ANativeWindow_fromSurface': from a JAVA SurfaceView
+     *  - 'AImageReader_getWindow()': from an 'AImageReader' created with the
+     *  following arguments: \verbatim
+     AImageReader_newWithUsage(1, 1 AIMAGE_FORMAT_PRIVATE,
+                               AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE,
+                               maxImages, &reader);
+     \endverbatim
+     * The width and height from \ref libvlc_video_render_cfg_t should be
+     * ignored as the video size is overridden by the producer (MediaCodec or
+     * EGL vout).
+     */
+    libvlc_video_engine_anw,
 } libvlc_video_engine_t;
 
 
@@ -876,9 +901,12 @@ typedef bool( *libvlc_video_output_select_plane_cb )( void *opaque, size_t plane
  * \param cleanup_cb callback called to clean up user data
  * \param window_cb callback called to setup the window
  * \param update_output_cb callback to get the rendering format of the host (cannot be NULL)
- * \param swap_cb callback called after rendering a video frame (cannot be NULL)
- * \param makeCurrent_cb callback called to enter/leave the rendering context (cannot be NULL)
- * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
+ * \param swap_cb callback called after rendering a video frame (can only be
+ * NULL when using \ref libvlc_video_engine_anw)
+ * \param makeCurrent_cb callback called to enter/leave the rendering context
+ * (can only be NULL when using \ref libvlc_video_engine_anw)
+ * \param getProcAddress_cb opengl function loading callback (cannot be NULL 
+ * for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param metadata_cb callback to provide frame metadata (D3D11 only)
  * \param select_plane_cb callback to select different D3D11 rendering targets
  * \param opaque private pointer passed to callbacks
