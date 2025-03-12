@@ -744,6 +744,8 @@ error:
 static JNIEnv*
 AWindowHandler_getEnv(AWindowHandler *p_awh)
 {
+    if (p_awh->p_jvm == NULL)
+        return NULL;
     return android_getEnvCommon(NULL, p_awh->p_jvm, "AWindowHandler");
 }
 
@@ -852,7 +854,7 @@ AWindowHandler_releaseANativeWindowEnv(AWindowHandler *p_awh, JNIEnv *p_env,
         p_awh->views[id].p_anw = NULL;
     }
 
-    if (p_awh->views[id].jsurface)
+    if (p_env != NULL && p_awh->views[id].jsurface)
     {
         (*p_env)->DeleteGlobalRef(p_env, p_awh->views[id].jsurface);
         p_awh->views[id].jsurface = NULL;
@@ -874,16 +876,20 @@ AWindowHandler_destroy(AWindowHandler *p_awh)
 
         if (p_awh->jobj)
             JNI_ANWCALL(CallVoidMethod, unregisterNative);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
+    }
+
+    AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Video);
+    AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, AWindow_Subtitles);
+
+    if (p_env != NULL)
+    {
         if (p_awh->jobj)
             (*p_env)->DeleteGlobalRef(p_env, p_awh->jobj);
+        (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
     }
 
     if (p_awh->p_anw_dl)
         dlclose(p_awh->p_anw_dl);
-
-    (*p_env)->DeleteGlobalRef(p_env, p_awh->stex.jtransform_mtx_array);
     free(p_awh);
 }
 
@@ -1108,6 +1114,8 @@ error:
 struct vlc_asurfacetexture *
 vlc_asurfacetexture_New(AWindowHandler *p_awh, bool single_buffer)
 {
+    if (p_awh->p_jvm == NULL)
+        return NULL;
     JNIEnv *p_env = android_getEnvCommon(NULL, p_awh->p_jvm, "SurfaceTexture");
     struct vlc_asurfacetexture_priv *surfacetexture =
         CreateSurfaceTexture(p_awh, p_env, single_buffer);
@@ -1150,12 +1158,10 @@ AWindowHandler_getANativeWindow(AWindowHandler *p_awh, enum AWindow_ID id)
 {
     assert(id < AWindow_Max);
 
-    JNIEnv *p_env;
-
     if (p_awh->views[id].p_anw)
         return p_awh->views[id].p_anw;
 
-    p_env = AWindowHandler_getEnv(p_awh);
+    JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
     if (!p_env)
         return NULL;
 
@@ -1187,8 +1193,7 @@ void AWindowHandler_releaseANativeWindow(AWindowHandler *p_awh,
                                          enum AWindow_ID id)
 {
     JNIEnv *p_env = AWindowHandler_getEnv(p_awh);
-    if (p_env)
-        AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id);
+    AWindowHandler_releaseANativeWindowEnv(p_awh, p_env, id);
 }
 
 static inline AWindowHandler *jlong_AWindowHandler(jlong handle)
