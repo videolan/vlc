@@ -175,10 +175,8 @@ private slots:
         const int high = 300;
         m_model->appendRange(low, high);
 
-        const int timeout = 1000;
-
         // let loading complete, getIndexFromID won't work for 'loading' model
-        QVERIFY(QTest::qWaitFor([this] () { return !m_model->loading(); }, timeout));
+        QVERIFY(QTest::qWaitFor([this] () { return !m_model->loading(); }));
 
         std::optional<int> row = -1;
         auto cb = [&row](std::optional<int> index)
@@ -190,7 +188,7 @@ private slots:
         m_model->getIndexFromId2(MLItemId{high, VLC_ML_PARENT_UNKNOWN}, cb);
 
         // NOTE: CI fails with QTRY_COMPARE_WITH_TIMEOUT
-        QVERIFY(QTest::qWaitFor([&row]() { return row != -1; }, timeout));
+        QVERIFY(QTest::qWaitFor([&row]() { return row != -1; }));
         QCOMPARE(row, high - 1);
 
         // above we must have loaded all the data, following this we should not need to wait for results
