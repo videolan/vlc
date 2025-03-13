@@ -637,6 +637,10 @@ static const struct input_item_parser_cbs_t parserCallbacks =
 
 - (NSArray<NSString *> *)options
 {
+    if (_vlcInputItem == NULL) {
+        return @[];
+    }
+
     const int i_options = _vlcInputItem->i_options;
     NSMutableArray * const options = [NSMutableArray arrayWithCapacity:i_options];
     for (NSUInteger i = 0; i < i_options; ++i) {
@@ -748,7 +752,7 @@ NSString * const value_##prop =                                                 
 - (NSString *)description
 {
     NSString *inputItemName;
-    if (_vlcInputItemNode->p_item)
+    if (_vlcInputItemNode && _vlcInputItemNode->p_item)
         inputItemName = toNSStr(_vlcInputItemNode->p_item->psz_name);
     else
         inputItemName = @"p_item == nil";
@@ -757,11 +761,14 @@ NSString * const value_##prop =                                                 
 
 - (int)numberOfChildren
 {
-    return _vlcInputItemNode->i_children;
+    return _vlcInputItemNode ? _vlcInputItemNode->i_children : 0;
 }
 
 - (NSArray<VLCInputNode *> *)children
 {
+    if (_vlcInputItemNode == NULL) {
+        return @[];
+    }
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:_vlcInputItemNode->i_children];
     for (int i = 0; i < _vlcInputItemNode->i_children; i++) {
         VLCInputNode *inputNode = [[VLCInputNode alloc] initWithInputNode:_vlcInputItemNode->pp_children[i]];
