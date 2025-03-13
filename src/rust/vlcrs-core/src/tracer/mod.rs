@@ -219,9 +219,41 @@ macro_rules! trace {
     ($tracer: ident, $ts: expr, $($key:ident = $value:expr)*) => {};
 }
 
+/// A trace record obtained from VLC.
+///
+/// Trace records are a set of `entries`, a list of key-values describing the traced event.
+///
+/// # Examples
+///
+/// ```
+/// impl TracerCapability for T {
+///     fn trace(&self, trace: &Trace) {
+///         for entry in trace.entries() {
+///             println!("{}", entry.key);
+///         }
+///     }
+/// }
+/// ```
 #[derive(PartialEq, Copy, Clone)]
 #[repr(transparent)]
 pub struct Trace(NonNull<sys::vlc_tracer_trace>);
+
+impl Trace {
+    /// Get an iterator over the trace entries.
+    pub fn entries(&self) -> TraceIterator {
+        self.into_iter()
+    }
+}
+
+impl IntoIterator for Trace {
+    type Item = TraceField;
+    type IntoIter = TraceIterator;
+    fn into_iter(self) -> Self::IntoIter {
+        TraceIterator {
+            current_field: unsafe { self.0.read().entries },
+        }
+    }
+}
 
 #[derive(PartialEq, Copy, Clone, Debug)]
 #[repr(transparent)]
@@ -248,16 +280,6 @@ impl TraceField {
 
 pub struct TraceIterator {
     current_field: NonNull<sys::vlc_tracer_entry>,
-}
-
-impl IntoIterator for Trace {
-    type Item = TraceField;
-    type IntoIter = TraceIterator;
-    fn into_iter(self) -> Self::IntoIter {
-        TraceIterator {
-            current_field: unsafe { self.0.read().entries },
-        }
-    }
 }
 
 impl Iterator for TraceIterator {
@@ -315,7 +337,7 @@ mod test {
 
         let trace = Trace(NonNull::from(&trace));
 
-        let mut iterator = trace.into_iter();
+        let mut iterator = trace.entries();
 
         let first = iterator.next().expect("First field must be valid");
         assert_eq!(first.kind(), vlc_tracer_value_type::String);

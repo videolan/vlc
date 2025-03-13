@@ -63,14 +63,14 @@ impl TracerCapability for TelegrafTracer {
 
     fn trace(&self, _tick: vlcrs_core::tracer::Tick, trace: &'_ vlcrs_core::tracer::Trace) {
         if !trace
-            .into_iter()
+            .entries()
             .any(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
         {
             /* We cannot support events for now. */
             return;
         }
         let tags: Vec<(String, String)> = trace
-            .into_iter()
+            .entries()
             .filter(|e| e.kind() == vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
             .map(|entry| unsafe {
                 let value = CStr::from_ptr(entry.value().string);
@@ -82,7 +82,7 @@ impl TracerCapability for TelegrafTracer {
             .collect();
 
         let record: Vec<(String, Box<dyn IntoFieldData + 'static>)> = trace
-            .into_iter()
+            .entries()
             .filter(|e| e.kind() != vlcrs_core::tracer::sys::vlc_tracer_value_type::String)
             .map(|entry| {
                 (
