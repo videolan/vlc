@@ -46,6 +46,9 @@ NSString *VLCLibrarySupplementaryElementViewIdentifier = @"VLCLibrarySupplementa
         self.usesSingleLineMode = NO;
         self.drawsBackground = YES;
         self.backgroundColor = [NSColor clearColor];
+        self.allowsDefaultTighteningForTruncation = YES;
+        self.maximumNumberOfLines = 1;
+        self.lineBreakMode = NSLineBreakByTruncatingTail;
     }
     return self;
 }
