@@ -38,6 +38,7 @@
 #include "dialogs/dialogs_provider.hpp" /* Open Subtitle file */
 #include "util/qt_dirs.hpp"
 #include "util/validators.hpp"
+#include "util/colorizedsvgicon.hpp"
 #include <vlc_intf_strings.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
@@ -94,6 +95,8 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
     /* Subtitles */
     /* Deactivate the subtitles control by default. */
     ui.subGroupBox->setEnabled( false );
+
+    ui.fileBrowseButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/add.svg", ui.fileBrowseButton ) );
 
     /* Connects  */
     BUTTONACT( ui.fileBrowseButton, &FileOpenPanel::browseFile );
