@@ -635,10 +635,10 @@ static const struct input_item_parser_cbs_t parserCallbacks =
     [NSWorkspace.sharedWorkspace activateFileViewerSelectingURLs:@[pathUrl]];
 }
 
-- (NSArray<NSString *> *)options
+- (nullable NSArray<NSString *> *)options
 {
     if (_vlcInputItem == NULL) {
-        return @[];
+        return nil;
     }
 
     const int i_options = _vlcInputItem->i_options;

@@ -75,7 +75,7 @@ extern NSString * const VLCInputItemCommonDataDifferingFlagString;
 @property (readwrite) NSURL *artworkURL;
 @property (readonly) BOOL preparsed;
 @property (readonly) BOOL isStream;
-@property (readonly) NSArray<NSString *> *options;
+@property (readonly, nullable) NSArray<NSString *> *options;
 
 - (void)parseInputItem;
 - (void)cancelParsing;

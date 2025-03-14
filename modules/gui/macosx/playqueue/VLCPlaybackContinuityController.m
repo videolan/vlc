@@ -157,6 +157,10 @@ static NSString *VLCRecentlyPlayedMediaListKey = @"recentlyPlayedMediaList";
 
     /* allow the user to over-write the start/stop/run-time */
     NSArray<NSString *> * const options = inputItem.options;
+    if (options == nil) {
+        return;
+    }
+
     const NSUInteger runtimeOption = [options indexOfObjectPassingTest:^BOOL(NSString * const obj, NSUInteger, BOOL *){
         return [obj hasPrefix:@"start-time"] || [obj hasPrefix:@"stop-time"];
     }];
