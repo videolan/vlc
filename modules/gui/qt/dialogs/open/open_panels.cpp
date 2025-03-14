@@ -359,6 +359,8 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, qt_intf_t *_p_intf ) :
         ui.deviceCombo->setCurrentIndex( temp );
 #endif
 
+    ui.ejectButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/ic_fluent_arrow_eject.svg", ui.ejectButton ) );
+
     /* CONNECTs */
     BUTTONACT( ui.dvdRadioButton,     &DiscOpenPanel::updateButtons );
     BUTTONACT( ui.bdRadioButton,      &DiscOpenPanel::updateButtons );
