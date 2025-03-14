@@ -1143,7 +1143,7 @@ void PlaylistContextMenu::popup(int selectedIndex, QPoint pos )
         }
 
         action = m_menu->addAction( qtr("Shuffle the playlist") );
-        action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/ic_fluent_arrow_shuffle_on.svg", m_menu.get()));
+        action->setIcon(ColorizedSvgIcon::colorizedIconForWidget(":/menu/ic_fluent_arrow_shuffle.svg", m_menu.get()));
         connect(action, &QAction::triggered, this, [this]( ) {
             m_controler->shuffle();
         });
