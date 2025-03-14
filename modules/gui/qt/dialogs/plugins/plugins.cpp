@@ -32,6 +32,7 @@
 #include "network/addonsmodel.hpp"
 #include "widgets/native/animators.hpp"
 #include "util/imagehelper.hpp"
+#include "util/colorizedsvgicon.hpp"
 
 #include <cassert>
 
@@ -1048,8 +1049,10 @@ QWidget *AddonItemDelegate::createEditor( QWidget *parent,
             installButton = new QPushButton( QIcon( ":/menu/remove.svg" ),
                                              qtr("&Uninstall"), parent );
         else
-            installButton = new QPushButton( QIcon( ":/menu/add.svg" ),
-                                             qtr("&Install"), parent );
+        {
+            installButton = new QPushButton( qtr("&Install"), parent );
+            installButton->setIcon( ColorizedSvgIcon::colorizedIconForWidget( ":/menu/add.svg", installButton ) );
+        }
         connect( installButton, &QPushButton::clicked, this, &AddonItemDelegate::editButtonClicked );
         editorWidget->layout()->addWidget( installButton );
     }
