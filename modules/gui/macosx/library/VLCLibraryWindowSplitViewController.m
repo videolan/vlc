@@ -89,6 +89,9 @@
 
 - (IBAction)toggleNavigationSidebar:(id)sender
 {
+    if (self.mainVideoModeEnabled) {
+        return;
+    }
     const BOOL navigationSidebarCollapsed = self.navSidebarItem.isCollapsed;
     self.navSidebarItem.animator.collapsed = !navigationSidebarCollapsed;
 }
@@ -109,6 +112,11 @@
     _mainVideoModeEnabled = mainVideoModeEnabled;
     self.navSidebarItem.collapsed = mainVideoModeEnabled;
     self.multifunctionSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
+{
+    return subview != self.navSidebarViewController.view || !self.mainVideoModeEnabled;
 }
 
 @end
