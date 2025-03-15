@@ -46,6 +46,8 @@ typedef NS_ENUM(NSUInteger, VLCLibraryWindowSplitViewDividerIndex) {
 @property (readonly) NSSplitViewItem *libraryTargetViewItem;
 @property (readonly) NSSplitViewItem *multifunctionSidebarItem;
 
+@property (readwrite, nonatomic) BOOL mainVideoModeEnabled;
+
 - (IBAction)toggleNavigationSidebar:(id)sender;
 - (IBAction)toggleMultifunctionSidebar:(id)sender;
 

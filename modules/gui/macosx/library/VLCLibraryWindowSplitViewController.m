@@ -104,4 +104,11 @@
     self.libraryWindow.videoViewController.playQueueButton.state = controlState;
 }
 
+- (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
+{
+    _mainVideoModeEnabled = mainVideoModeEnabled;
+    self.navSidebarItem.collapsed = mainVideoModeEnabled;
+    self.multifunctionSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
+}
+
 @end

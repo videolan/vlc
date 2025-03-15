@@ -537,7 +537,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self hideControlsBarImmediately];
     [self.videoViewController showControls];
 
-    self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = YES;
+    self.splitViewController.mainVideoModeEnabled = YES;
 
     if ([self.librarySegmentViewController isKindOfClass:VLCLibraryAbstractMediaLibrarySegmentViewController.class]) {
         [(VLCLibraryAbstractMediaLibrarySegmentViewController *)self.librarySegmentViewController disconnect];
@@ -555,7 +555,8 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
     [self updateArtworkButtonEnabledState];
-    self.splitViewController.multifunctionSidebarViewController.mainVideoModeEnabled = NO;
+
+    self.splitViewController.mainVideoModeEnabled = NO;
 
     if (self.presentLoadingOverlayOnVideoPlaybackHide) {
         [self showLoadingOverlay];
