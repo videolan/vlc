@@ -31,6 +31,12 @@
 
 #import "windows/video/VLCMainVideoViewController.h"
 
+@interface VLCLibraryWindowSplitViewController ()
+
+@property (readwrite) BOOL priorNavSidebarCollapsedState;
+
+@end
+
 @implementation VLCLibraryWindowSplitViewController
 
 - (void)viewDidLoad
@@ -109,8 +115,16 @@
 
 - (void)setMainVideoModeEnabled:(BOOL)mainVideoModeEnabled
 {
+    if (self.mainVideoModeEnabled == mainVideoModeEnabled) {
+        return;
+    } else if (mainVideoModeEnabled) {
+        self.priorNavSidebarCollapsedState = self.navSidebarItem.isCollapsed;
+        self.navSidebarItem.collapsed = YES;
+    } else {
+        self.navSidebarItem.collapsed = self.priorNavSidebarCollapsedState;
+    }
+
     _mainVideoModeEnabled = mainVideoModeEnabled;
-    self.navSidebarItem.collapsed = mainVideoModeEnabled;
     self.multifunctionSidebarViewController.mainVideoModeEnabled = mainVideoModeEnabled;
 }
 
