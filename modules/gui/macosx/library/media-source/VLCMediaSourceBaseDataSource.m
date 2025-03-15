@@ -211,6 +211,10 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
         VLCInputNode * const rootNode = mediaSource.rootNode;
         NSArray * const nodeChildren = rootNode.children;
+        if (nodeChildren == nil) {
+            NSLog(@"No children found for media source root node: %@ cannot provide viewItem correctly", rootNode);
+            return viewItem;
+        }
         VLCInputNode * const childNode = nodeChildren[indexPath.item];
         VLCInputItem * const childRootInput = childNode.inputItem;
         viewItem.titleTextField.stringValue = childRootInput.name;
@@ -274,6 +278,10 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
         mediaSource = _mediaSources[indexPath.section];
         VLCInputNode * const rootNode = mediaSource.rootNode;
         NSArray * const nodeChildren = rootNode.children;
+        if (nodeChildren == nil) {
+            NSLog(@"No children found for media source root node: %@ cannot access item correctly", rootNode);
+            return;
+        }
         childNode = nodeChildren[indexPath.item];
     } else {
         mediaSource = _mediaSources[indexPath.item];

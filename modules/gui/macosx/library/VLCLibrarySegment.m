@@ -71,8 +71,10 @@ NSArray<NSString *> *defaultBookmarkedLocations()
         VLCInputNode * const rootNode = mediaSource.rootNode;
         [mediaSource preparseInputNodeWithinTree:rootNode];
 
-        for (VLCInputNode * const node in rootNode.children) {
-            [locationMrls addObject:node.inputItem.MRL];
+        if (rootNode.children != nil) {
+            for (VLCInputNode * const node in rootNode.children) {
+                [locationMrls addObject:node.inputItem.MRL];
+            }
         }
     }
 

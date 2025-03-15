@@ -764,10 +764,10 @@ NSString * const value_##prop =                                                 
     return _vlcInputItemNode ? _vlcInputItemNode->i_children : 0;
 }
 
-- (NSArray<VLCInputNode *> *)children
+- (nullable NSArray<VLCInputNode *> *)children
 {
     if (_vlcInputItemNode == NULL) {
-        return @[];
+        return nil;
     }
     NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithCapacity:_vlcInputItemNode->i_children];
     for (int i = 0; i < _vlcInputItemNode->i_children; i++) {

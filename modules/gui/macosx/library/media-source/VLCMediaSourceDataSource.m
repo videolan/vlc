@@ -120,11 +120,11 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     [self.tableView setTarget:self];
 }
 
-- (VLCInputNode *)inputNodeForIndexPath:(NSIndexPath *)indexPath
+- (nullable VLCInputNode *)inputNodeForIndexPath:(NSIndexPath *)indexPath
 {
     VLCInputNode * const rootNode = self.nodeToDisplay;
     NSArray * const nodeChildren = rootNode.children;
-    return nodeChildren[indexPath.item];
+    return nodeChildren ? nodeChildren[indexPath.item] : nil;
 }
 
 - (NSArray<VLCInputItem *> *)mediaSourceInputItemsAtIndexPaths:(NSSet<NSIndexPath *> *const)indexPaths
@@ -134,6 +134,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
     for (NSIndexPath * const indexPath in indexPaths) {
         VLCInputNode * const inputNode = [self inputNodeForIndexPath:indexPath];
+        if (!inputNode) {
+            continue;
+        }
         VLCInputItem * const inputItem = inputNode.inputItem;
         [inputItems addObject:inputItem];
     }
@@ -165,6 +168,10 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
     VLCInputNode *rootNode = _nodeToDisplay;
     NSArray *nodeChildren = rootNode.children;
+    if (nodeChildren == nil) {
+        NSLog(@"No children for node %@, cannot provide correctly setup viewItem", rootNode);
+        return viewItem;
+    }
     VLCInputNode *childNode = nodeChildren[indexPath.item];
     VLCInputItem *childRootInput = childNode.inputItem;
 
@@ -184,7 +191,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         return;
     }
     VLCInputNode * const childNode = [self inputNodeForIndexPath:indexPath];
-    [self performActionForNode:childNode allowPlayback:YES];
+    if (childNode) {
+        [self performActionForNode:childNode allowPlayback:YES];
+    }
 }
 
 - (NSSize)collectionView:(NSCollectionView *)collectionView
@@ -224,7 +233,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     }
 
     VLCInputNode *childNode = [self mediaSourceInputNodeAtRow:selectedIndex];
-    [self performActionForNode:childNode allowPlayback:NO];
+    if (childNode) {
+        [self performActionForNode:childNode allowPlayback:NO];
+    }
 }
 
 - (void)tableViewAction:(id)sender
@@ -235,10 +246,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     }
 
     VLCInputNode *childNode = [self mediaSourceInputNodeAtRow:selectedIndex];
-    [self performActionForNode:childNode allowPlayback:YES];
+    if (childNode) {
+        [self performActionForNode:childNode allowPlayback:YES];
+    }
 }
 
-- (VLCInputNode*)mediaSourceInputNodeAtRow:(NSInteger)tableViewRow
+- (nullable VLCInputNode *)mediaSourceInputNodeAtRow:(NSInteger)tableViewRow
 {
     if (_nodeToDisplay == nil) {
         return nil;

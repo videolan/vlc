@@ -96,7 +96,7 @@ NSDictionary<NSString *, id> * const commonInputItemData(NSArray<VLCInputItem*> 
 @property (readonly) struct input_item_node_t *vlcInputItemNode;
 @property (readonly, nullable) VLCInputItem *inputItem;
 @property (readonly) int numberOfChildren;
-@property (readonly) NSArray <VLCInputNode *> *children;
+@property (readonly, nullable) NSArray <VLCInputNode *> *children;
 
 @end
 
