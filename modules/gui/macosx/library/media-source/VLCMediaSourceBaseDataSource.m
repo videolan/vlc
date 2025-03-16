@@ -78,6 +78,8 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
                                selector:@selector(mediaSourcePreparingEnded:)
                                    name:VLCMediaSourcePreparsingEnded
                                  object:nil];
+        [self loadMediaSources];
+        [self returnHome];
     }
     return self;
 }
@@ -169,9 +171,12 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
 - (void)setMediaSourceMode:(VLCMediaSourceMode)mediaSourceMode
 {
+    if (mediaSourceMode == self.mediaSourceMode) {
+        return;
+    }
     _mediaSourceMode = mediaSourceMode;
     [self loadMediaSources];
-    [self homeButtonAction:self];
+    [self returnHome];
 }
 
 #pragma mark - collection view data source
