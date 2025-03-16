@@ -112,7 +112,15 @@ FocusScope {
 
     property Component header: null
     property Item headerItem: view.headerItem?.loadedHeader ?? null
-    property color headerColor: "transparent"
+    // NOTE: Clipping is not used, so if header is not inline, it should have background to not expose the content.
+    // TODO: Investigate using clipping here, which makes more sense in general for views. Not using clipping
+    //       makes this view not suitable for using it in auxiliary places (non-main, which is not naturally
+    //       clipped by the window). In order to make use of clipping, the header should be placed outside of
+    //       the view (similar to play queue). This is already a requirement to prevent events reaching to
+    //       the delegate (such as, hovering over the header). As `clip: true` adjusts both the scene graph
+    //       viewport, and qt quick event delivery agent. Having a control as header and blocking the events
+    //       events reaching beneath is not a good behavior, as currently done here.
+    property color headerColor: (interactive && (headerPositioning !== ListView.InlineHeader)) ? colorContext.bg.primary : "transparent"
     property int headerTopPadding: 0
 
 
