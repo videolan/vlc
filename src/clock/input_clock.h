@@ -99,7 +99,6 @@ void input_clock_Delete(input_clock_t *);
  * It will also tell if the clock point is late regarding our buffering.
  *
  * \param clock the input clock object to update with the new point
- * \param p_log the logger object to use
  * \param b_can_pace_control whether the input can control the speed of playback
  * \param b_buffering whether the input is buffering
  * \param b_extra_buffering_allowed tells if we are allowed to bufferize more
@@ -109,7 +108,7 @@ void input_clock_Delete(input_clock_t *);
  *
  * \return clock update delay
  */
-vlc_tick_t input_clock_Update( input_clock_t *clock, vlc_object_t *p_log,
+vlc_tick_t input_clock_Update(input_clock_t *clock,
                             bool b_can_pace_control, bool b_buffering,
                             bool b_extra_buffering_allowed,
                             vlc_tick_t i_clock, vlc_tick_t i_system );

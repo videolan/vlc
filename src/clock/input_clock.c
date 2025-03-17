@@ -222,7 +222,7 @@ void input_clock_AttachListener(input_clock_t *cl,
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
+vlc_tick_t input_clock_Update( input_clock_t *cl,
                          bool b_can_pace_control, bool b_buffering,
                          bool b_extra_buffering_allowed,
                          vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
@@ -257,12 +257,12 @@ vlc_tick_t input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
              * stream ?). */
-            msg_Warn(p_log, "clock gap, unexpected stream discontinuity: "
+            vlc_warning(cl->logger, "clock gap, unexpected stream discontinuity: "
                      "system_diff: %"PRId64" stream_diff: %"PRId64,
                      system_diff, stream_diff);
 
             /* */
-            msg_Warn(p_log, "feeding synchro with a new reference point trying"
+            vlc_warning(cl->logger, "feeding synchro with a new reference point trying"
                      " to recover from clock gap");
             b_reset_reference= true;
             discontinuity = true;
