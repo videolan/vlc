@@ -1555,7 +1555,7 @@ static es_out_pgrm_t *EsOutProgramAdd(es_out_sys_t *p_sys, input_source_t *sourc
         return NULL;
     }
 
-    p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
+    p_pgrm->p_input_clock = input_clock_New(vlc_object_logger(p_input), p_sys->rate);
     if( !p_pgrm->p_input_clock )
     {
         vlc_clock_main_Delete(p_pgrm->clocks.main);

@@ -72,7 +72,7 @@ struct vlc_input_clock_cbs {
  *
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( float rate );
+input_clock_t *input_clock_New(struct vlc_logger *logger, float rate);
 
 /**
  * This function attach a clock listener to the input clock

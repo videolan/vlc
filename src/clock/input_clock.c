@@ -104,6 +104,7 @@
 /* */
 struct input_clock_t
 {
+    struct vlc_logger *logger;
     struct {
         const struct vlc_input_clock_cbs *cbs;
         void *opaque;
@@ -163,11 +164,12 @@ static void UpdateListener( input_clock_t *cl, bool discontinuity )
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( float rate )
+input_clock_t *input_clock_New(struct vlc_logger *logger, float rate)
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
         return NULL;
+    cl->logger = logger;
     cl->listener.cbs = NULL;
     cl->listener.opaque = NULL;
 
