@@ -186,6 +186,9 @@
                                                             <constraint firstAttribute="width" constant="80" id="Z0g-An-VZe"/>
                                                         </constraints>
                                                         <sliderCell key="cell" controlSize="mini" continuous="YES" state="on" alignment="left" maxValue="512" doubleValue="50" tickMarkPosition="above" sliderType="linear" id="KnE-u5-aI1" customClass="VLCVolumeSliderCell"/>
+                                                        <connections>
+                                                            <action selector="volumeAction:" target="3" id="5IU-vg-f8h"/>
+                                                        </connections>
                                                     </slider>
                                                 </subviews>
                                                 <visibilityPriorities>
@@ -262,6 +265,7 @@
                 <outlet property="playingItemDisplayField" destination="zpq-en-EAi" id="9js-uK-Dgf"/>
                 <outlet property="timeField" destination="9" id="uzI-2c-bs3"/>
                 <outlet property="timeSlider" destination="20" id="AFS-sq-vuw"/>
+                <outlet property="volumeSlider" destination="z4Z-7V-IQk" id="njj-Ji-PGF"/>
             </connections>
         </customObject>
     </objects>
