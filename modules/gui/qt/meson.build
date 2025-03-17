@@ -901,6 +901,7 @@ qml_modules += {
         qml_blureffect_file,
         'widgets/qml/ImageExt.qml',
         'widgets/qml/ScrollBarExt.qml',
+        'widgets/qml/FastBlend.qml',
     ),
 }
 
