@@ -121,7 +121,9 @@ VLC_API const char *vlc_strerror_c(int);
  * @{
  */
 
-struct vlc_logger;
+struct vlc_logger {
+    const struct vlc_logger_operations *ops;
+};
 
 VLC_API void vlc_Log(struct vlc_logger *const *logger, int prio,
                      const char *type, const char *module,

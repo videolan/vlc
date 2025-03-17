@@ -329,10 +329,6 @@ static const struct vlc_logger_operations test_logger_operations = {
     .log = LogText,
 };
 
-struct vlc_logger {
-    const struct vlc_logger_operations *ops;
-};
-
 static void test_playback(void)
 {
     vlc_list_init(&opened_decoders);
