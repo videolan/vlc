@@ -311,16 +311,13 @@ FocusScope {
                             source: cover
                         }
 
-                        layer.enabled: true
-                        layer.samplerName: "backgroundSource"
-                        layer.effect: ShaderEffect {
-                            readonly property color screenColor: bgtheme.bg.primary.alpha(.55)
-                            readonly property color overlayColor: Qt.tint(bgtheme.fg.primary, bgtheme.bg.primary).alpha(0.4)
+                        Widgets.FastBlend {
+                            anchors.fill: parent
 
-                            blending: false
-                            cullMode: ShaderEffect.BackFaceCulling
+                            color: Qt.rgba(0.5, 0.5, 0.5, 1.0)
 
-                            fragmentShader: "qrc:///shaders/PlayerBlurredBackground.frag.qsb"
+                            mode: bgtheme.palette.isDark ? Widgets.FastBlend.Mode.Multiply // multiply makes darker
+                                                         : Widgets.FastBlend.Mode.Screen // screen (inverse multiply) makes lighter
                         }
                     }
                 }
