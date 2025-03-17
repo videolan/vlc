@@ -404,7 +404,7 @@ T.ProgressBar {
 
             Timer {
                 id: bufferingTimer
-                interval: VLCStyle.humanMoment
+                interval: VLCStyle.duration_humanMoment
                 repeat: false
                 running: false
                 onTriggered: {
