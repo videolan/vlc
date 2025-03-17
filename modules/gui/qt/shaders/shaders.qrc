@@ -13,5 +13,9 @@
         <file alias="SDFAARoundedTexture.frag.qsb">SDFAARoundedTexture.frag.qsb</file>
         <file alias="SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb">SDFAARoundedTexture_cropsupport_bordersupport.frag.qsb</file>
         <file alias="DitheredTexture.frag.qsb">DitheredTexture.frag.qsb</file>
+        <file alias="FastBlend.frag.qsb">FastBlend.frag.qsb</file>
+        <file alias="FastBlend_additive.frag.qsb">FastBlend_additive.frag.qsb</file>
+        <file alias="FastBlend_multiply.frag.qsb">FastBlend_multiply.frag.qsb</file>
+        <file alias="FastBlend_screen.frag.qsb">FastBlend_screen.frag.qsb</file>
     </qresource>
 </RCC>
