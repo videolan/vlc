@@ -13,7 +13,6 @@ shader_sources = [
     'Noise.frag',
     'RectFilter.frag',
     'SubTexture.vert',
-    'PlayerBlurredBackground.frag',
     'HollowRectangularGlow.frag',
     'RectangularGlow.frag',
     'SDFAARoundedTexture.frag',

@@ -7,7 +7,6 @@
         <file alias="Noise.frag.qsb">Noise.frag.qsb</file>
         <file alias="RectFilter.frag.qsb">RectFilter.frag.qsb</file>
         <file alias="SubTexture.vert.qsb">SubTexture.vert.qsb</file>
-        <file alias="PlayerBlurredBackground.frag.qsb">PlayerBlurredBackground.frag.qsb</file>
         <file alias="HollowRectangularGlow.frag.qsb">HollowRectangularGlow.frag.qsb</file>
         <file alias="RectangularGlow.frag.qsb">RectangularGlow.frag.qsb</file>
         <file alias="SDFAARoundedTexture.frag.qsb">SDFAARoundedTexture.frag.qsb</file>
