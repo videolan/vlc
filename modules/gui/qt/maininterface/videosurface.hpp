@@ -131,6 +131,7 @@ private:
     QPointer<VideoSurfaceProvider> m_provider;
 
     QPointer<QQuickWindow> m_oldWindow;
+    QMetaObject::Connection m_synchConnection;
 
     // This is updated and read from different threads, but during synchronization stage so explicit synchronization
     // such as atomic boolean or locking is not necessary:

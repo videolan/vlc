@@ -337,7 +337,7 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
     if (w != m_oldWindow)
     {
         if (m_oldWindow)
-            disconnect(m_oldWindow, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize);
+            disconnect(m_synchConnection);
 
         m_oldWindow = w;
 
@@ -347,11 +347,11 @@ QSGNode *VideoSurface::updatePaintNode(QSGNode *node, UpdatePaintNodeData *data)
             if (m_provider->supportsThreadedSurfaceUpdates())
             {
                 // Synchronize just before swapping the frame for better synchronization:
-                connect(w, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize, Qt::DirectConnection);
+                m_synchConnection = connect(w, &QQuickWindow::afterRendering, this, &VideoSurface::synchronize, Qt::DirectConnection);
             }
             else
             {
-                connect(w, &QQuickWindow::afterAnimating, this, &VideoSurface::synchronize);
+                m_synchConnection = connect(w, &QQuickWindow::afterAnimating, this, &VideoSurface::synchronize);
             }
         }
     }
