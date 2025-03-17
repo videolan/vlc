@@ -31,7 +31,7 @@
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="65" customClass="VLCDragDropView">
                                         <rect key="frame" x="0.0" y="0.0" width="500" height="115"/>
                                         <subviews>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hHQ-ue-m9C">
+                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="hHQ-ue-m9C">
                                                 <rect key="frame" x="8" y="63" width="484" height="19"/>
                                                 <shadow key="shadow" blurRadius="5">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -42,7 +42,7 @@
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                 </textFieldCell>
                                             </textField>
-                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-en-EAi">
+                                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-en-EAi">
                                                 <rect key="frame" x="8" y="82" width="484" height="28"/>
                                                 <shadow key="shadow" blurRadius="5">
                                                     <color key="color" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
