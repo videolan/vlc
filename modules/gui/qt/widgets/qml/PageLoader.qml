@@ -107,6 +107,7 @@ StackViewExt {
                         pageProp[key] = properties[key]
                     }
 
+                    History.update([...pagePrefix, head])
                     root.replace(null, component, pageProp)
                     found = true
                     break;
