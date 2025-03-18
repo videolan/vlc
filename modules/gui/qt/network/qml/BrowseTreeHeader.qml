@@ -72,6 +72,8 @@ T.Pane {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            background: null
+
             path: root.path
 
             onHomeButtonClicked: reason => root.homeButtonClicked(reason)

@@ -194,7 +194,7 @@ T.Control {
 
     FontMetrics {
         id: fontMetrics
-        font.pixelSize: VLCStyle.fontSize_large
+        font.pixelSize: VLCStyle.fontSize_xxxlarge
     }
 
     FontMetrics {

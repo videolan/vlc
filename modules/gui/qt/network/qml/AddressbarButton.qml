@@ -107,16 +107,12 @@ T.AbstractButton {
     Component {
         id: textContent
 
-        T.Label {
+        Widgets.SubtitleLabel {
             verticalAlignment: Text.AlignVCenter
 
             text: button.text
 
-            elide: Text.ElideRight
-
             color: button.foregroundColor
-
-            font.pixelSize: button.font.pixelSize
 
             font.weight: (highlighted) ? Font.DemiBold : Font.Normal
         }
