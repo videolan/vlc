@@ -27,28 +27,18 @@ import VLC.Widgets as Widgets
 FocusScope {
     id: root
 
-    implicitWidth: content.implicitWidth
-    implicitHeight: content.implicitHeight
+    implicitWidth: iconButton.implicitWidth
+    implicitHeight: iconButton.implicitHeight
 
     property real maxSearchFieldWidth: Number.MAX_VALUE
     property alias buttonWidth: iconButton.implicitWidth
     property alias searchPattern: textField.text
-
-    property bool _widthOverridden: false
 
     // public functions
 
     function expandAndFocus() {
         expandedState.state = "expanded"
         textField.forceActiveFocus(Qt.ShortcutFocusReason)
-    }
-
-    onWidthChanged: {
-        // Proper way of this would be checking if width is bound to implicitWidth
-        if (width === implicitWidth)
-            _widthOverridden = false
-        else
-            _widthOverridden = true
     }
 
     StateGroup {
@@ -62,9 +52,7 @@ FocusScope {
 
                 PropertyChanges {
                     target: textField
-                    // Take care if SearchBox was set a specific width:
-                    width: Math.min(root.maxSearchFieldWidth,
-                                    (root._widthOverridden ? (content.width - iconButton.width) : textField.implicitWidth))
+                    height:  textField.implicitHeight
                 }
 
                 PropertyChanges {
@@ -78,7 +66,7 @@ FocusScope {
                 PropertyChanges {
                     target: textField
                     text: ""
-                    width: 0.0
+                    height: 0.0
                 }
 
                 PropertyChanges {
@@ -93,7 +81,7 @@ FocusScope {
             from: ""; to: "expanded"
             reversible: true
 
-            NumberAnimation { property: "width"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
+            NumberAnimation { property: "height"; easing.type: Easing.InOutSine; duration: VLCStyle.duration_long; }
         }
     }
 
@@ -101,127 +89,120 @@ FocusScope {
         id: theme
     }
 
-    Row {
-        id: content
+    Widgets.IconToolButton {
+        id: iconButton
+
         anchors.fill: parent
 
-        layoutDirection: Qt.RightToLeft // anchor iconButton to right
+        font.pixelSize: VLCStyle.icon_banner
 
-        Widgets.IconToolButton {
-            id: iconButton
+        text: VLCIcons.search
+        description: qsTr("Filter")
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+        focus: true
 
-            font.pixelSize: VLCStyle.icon_banner
+        Navigation.parentItem: root
+        Navigation.downItem: textField
 
-            text: VLCIcons.search
-            description: qsTr("Filter")
-
-            focus: true
-
-            Navigation.parentItem: root
-            Navigation.leftItem: textField
-
-            onClicked: {
-                if (expandedState.state == "")
-                    expandAndFocus()
-                else
-                    expandedState.state = ""
-            }
-        }
-
-        TextFieldExt {
-            id: textField
-
-            property bool _keyPressed: false
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-
-            implicitWidth: VLCStyle.widthSearchInput
-            width: 0
-
-            visible: (width > 0)
-
-            padding: VLCStyle.dp(6)
-            leftPadding: padding + VLCStyle.dp(4)
-            rightPadding: (textField.width - clearButton.x)
-
-            radius: clearButton.radius
-
-            selectByMouse: true
-
-            placeholderText: qsTr("filter")
-
-            Navigation.parentItem: root
-            Navigation.rightItem: clearButton.visible ? clearButton : iconButton
-            Navigation.cancelAction: function() {
+        onClicked: {
+            if (expandedState.state == "")
+                expandAndFocus()
+            else
                 expandedState.state = ""
-                iconButton.focusReason = Qt.ShortcutFocusReason
-            }
-
-            Accessible.searchEdit: true
-
-            //ideally we should use Keys.onShortcutOverride but it doesn't
-            //work with TextField before 5.13 see QTBUG-68711
-            onActiveFocusChanged: {
-                if (activeFocus)
-                    MainCtx.useGlobalShortcuts = false
-                else
-                    MainCtx.useGlobalShortcuts = true
-            }
-
-            Keys.priority: Keys.AfterItem
-
-            Keys.onPressed: (event) => {
-                _keyPressed = true
-
-                //we don't want Navigation.cancelAction to match Backspace
-                if (event.matches(StandardKey.Backspace))
-                    event.accepted = true
-
-                Navigation.defaultKeyAction(event)
-            }
-
-            Keys.onReleased: (event) => {
-                if (_keyPressed === false)
-                    return
-
-                _keyPressed = false
-
-                //we don't want Navigation.cancelAction to match Backspace
-                if (event.matches(StandardKey.Backspace))
-                    event.accepted = true
-
-                Navigation.defaultKeyReleaseAction(event)
-            }
-
-            Widgets.IconToolButton {
-                id: clearButton
-
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: VLCStyle.margin_xxsmall
-
-                font.pixelSize: VLCStyle.icon_normal
-                text: VLCIcons.close
-
-                description: qsTr("Clear")
-
-                visible: (textField.text.length > 0)
-
-                onVisibleChanged: {
-                    if (!visible && parent.visible) {
-                        parent.focus = true
-                    }
-                }
-                onClicked: textField.clear()
-
-                Navigation.parentItem: textField
-                Navigation.leftItem: textField
-                Navigation.rightItem: iconButton
-            }
         }
     }
+
+    TextFieldExt {
+        id: textField
+
+        property bool _keyPressed: false
+
+        anchors.top: iconButton.bottom
+        anchors.right: iconButton.right
+
+        implicitWidth: VLCStyle.widthSearchInput
+        height: 0
+
+        visible: (height > 0)
+
+        padding: VLCStyle.dp(6)
+        leftPadding: padding + VLCStyle.dp(4)
+        rightPadding: (textField.width - clearButton.x)
+
+        radius: clearButton.radius
+
+        selectByMouse: true
+
+        placeholderText: qsTr("filter")
+
+        Navigation.parentItem: root
+        Navigation.upItem: iconButton
+        Navigation.rightItem: clearButton.visible ? clearButton : null
+        Navigation.cancelAction: function() {
+            expandedState.state = ""
+            iconButton.focusReason = Qt.ShortcutFocusReason
+        }
+
+        Accessible.searchEdit: true
+
+        //ideally we should use Keys.onShortcutOverride but it doesn't
+        //work with TextField before 5.13 see QTBUG-68711
+        onActiveFocusChanged: {
+            if (activeFocus)
+                MainCtx.useGlobalShortcuts = false
+            else
+                MainCtx.useGlobalShortcuts = true
+        }
+
+        Keys.priority: Keys.AfterItem
+
+        Keys.onPressed: (event) => {
+            _keyPressed = true
+
+            //we don't want Navigation.cancelAction to match Backspace
+            if (event.matches(StandardKey.Backspace))
+                event.accepted = true
+
+            Navigation.defaultKeyAction(event)
+        }
+
+        Keys.onReleased: (event) => {
+            if (_keyPressed === false)
+                return
+
+            _keyPressed = false
+
+            //we don't want Navigation.cancelAction to match Backspace
+            if (event.matches(StandardKey.Backspace))
+                event.accepted = true
+
+            Navigation.defaultKeyReleaseAction(event)
+        }
+
+        Widgets.IconToolButton {
+            id: clearButton
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: VLCStyle.margin_xxsmall
+
+            font.pixelSize: VLCStyle.icon_banner
+            text: VLCIcons.close
+
+            description: qsTr("Clear")
+
+            visible: (textField.text.length > 0)
+
+            onVisibleChanged: {
+                if (!visible && parent.visible) {
+                    parent.focus = true
+                }
+            }
+            onClicked: textField.clear()
+
+            Navigation.parentItem: textField
+            Navigation.leftItem: textField
+        }
+    }
+
 }
