@@ -635,6 +635,8 @@ qml_modules += {
         'maininterface/qml/MainDisplay.qml',
         'maininterface/qml/NoMedialibHome.qml',
         qml_maininterface_extra_files,
+        'maininterface/qml/SideNavigationPane.qml',
+        'maininterface/qml/SideNavigationDelegate.qml',
     ),
 }
 qml_modules += {

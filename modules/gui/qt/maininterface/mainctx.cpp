@@ -189,6 +189,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
     m_sort = new SortCtx(this);
     m_search = new SearchCtx(this);
     m_playqueuePanel = new PlayqueuePanelCtx(this);
+    m_navigationPanel = new PlayqueuePanelCtx(this);
 
     // getOSInfo();
     QOperatingSystemVersion currentOS = QOperatingSystemVersion::current();

@@ -750,6 +750,7 @@ modules/gui/qt/maininterface/qml/MainDisplay.qml
 modules/gui/qt/maininterface/qml/MainInterface.qml
 modules/gui/qt/maininterface/qml/NoMedialibHome.qml
 modules/gui/qt/maininterface/qml/UpdatePane.qml
+modules/gui/qt/maininterface/qml/SideNavigationPane.qml
 modules/gui/qt/widgets/qml/EmptyLabelButton.qml
 modules/gui/qt/widgets/qml/EmptyLabel.qml
 modules/gui/qt/medialibrary/mlbookmarkmodel.cpp
