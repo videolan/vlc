@@ -145,7 +145,7 @@ signals:
     void widthFactorChanged(double);
 
 private:
-    bool m_visible = false;
+    bool m_visible = true;
     bool m_docked = false;
     ///< playlist size: root.width / playlistScaleFactor
     double  m_widthFactor = 4.;
