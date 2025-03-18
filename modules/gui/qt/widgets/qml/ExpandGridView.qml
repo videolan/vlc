@@ -136,6 +136,10 @@ FocusScope {
     property alias contentHeight: flickable.contentHeight
     property alias contentWidth: flickable.contentWidth
     property alias contentX: flickable.contentX
+    property alias originX: flickable.originX
+    property alias contentY: flickable.contentY
+    property alias originY: flickable.originY
+
     property alias gridScrollBar: flickableScrollBar
     property alias interactive: flickable.interactive
 
