@@ -3790,6 +3790,15 @@ static int EsOutVaPrivControlLocked(es_out_sys_t *p_sys, input_source_t *source,
     {
         vlc_tick_t *pi_wakeup = va_arg( args, vlc_tick_t* );
         *pi_wakeup = EsOutGetWakeup(p_sys);
+
+        struct vlc_tracer *tracer = vlc_object_get_tracer( &p_sys->p_input->obj );
+        if (tracer != NULL)
+        {
+            vlc_tracer_Trace(tracer,
+                             VLC_TRACE("id", "es_out"),
+                             VLC_TRACE_TICK_NS("wakeup_delay", *pi_wakeup == 0 ? 0 : *pi_wakeup - vlc_tick_now()),
+                             VLC_TRACE_END);
+        }
         return VLC_SUCCESS;
     }
     case ES_OUT_PRIV_SET_ES_LIST:
