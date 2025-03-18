@@ -916,6 +916,7 @@ modules/gui/qt/widgets/native/qvlcframe.hpp
 modules/gui/qt/widgets/native/searchlineedit.cpp
 modules/gui/qt/widgets/native/searchlineedit.hpp
 modules/gui/qt/widgets/qml/DragItem.qml
+modules/gui/qt/widgets/qml/GridSortFilterControls.qml
 modules/gui/qt/widgets/qml/SearchBox.qml
 modules/gui/qt/widgets/qml/SortControl.qml
 modules/gui/qt/widgets/qml/TableColumns.qml

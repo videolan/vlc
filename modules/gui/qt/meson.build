@@ -883,6 +883,7 @@ qml_modules += {
         'widgets/qml/EmptyLabelButton.qml',
         'widgets/qml/EmptyLabelHint.qml',
         'widgets/qml/GridItem.qml',
+        'widgets/qml/GridSortFilterControls.qml',
         'widgets/qml/HorizontalResizeHandle.qml',
         'widgets/qml/IconLabel.qml',
         'widgets/qml/IconButton.qml',
