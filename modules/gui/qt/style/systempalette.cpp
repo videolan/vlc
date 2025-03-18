@@ -516,7 +516,7 @@ void SystemPalette::makeLightPalette()
     //window banner & miniplayer
     {
         C::ColorSet CS = C::Window;
-        setColor(CS, C::Bg, C::Primary, C::Normal, Qt::white); //looks not white in figma more like #FDFDFD
+        setColor(CS, C::Bg, C::Primary, C::Normal, lightGrey400); //looks not white in figma more like #FDFDFD
         setColor(CS, C::Bg, C::Secondary, C::Normal, lightGrey400);
         setColor(CS, C::Decoration, C::Border, C::Normal, QColor{"#E0E0E0"}); //FIXME not a predef
     }
