@@ -25,7 +25,7 @@ import VLC.Style
 
 
 Window {
-    visible: MainCtx.playlistVisible
+    visible: MainCtx.playqueuePanel.visible
 
     transientParent: MainCtx.intfMainWindow
 
@@ -48,7 +48,7 @@ Window {
     }
 
     onClosing: {
-        MainCtx.playlistVisible = false
+        MainCtx.playqueuePanel.visible = false
     }
 
     PlaylistPane {

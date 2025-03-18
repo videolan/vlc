@@ -104,4 +104,53 @@ private:
     bool m_available = false;
 };
 
+class PlayqueuePanelCtx: public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged FINAL)
+    Q_PROPERTY(bool docked READ isDocked WRITE setDocked NOTIFY dockedChanged FINAL)
+    Q_PROPERTY(double widthFactor READ widthFactor WRITE setWidthFactor NOTIFY widthFactorChanged FINAL)
+
+public:
+    inline PlayqueuePanelCtx(QObject* parent = nullptr): QObject(parent) {}
+
+    inline bool isDocked() const { return m_docked; }
+    inline bool isVisible() const { return m_visible; }
+    inline double widthFactor() const { return m_widthFactor; }
+
+    inline void setDocked(bool value) {
+        if (value == m_docked)
+            return;
+        m_docked = value;
+        emit dockedChanged(value);
+    }
+
+    inline void setVisible(bool value) {
+        if (value == m_visible)
+            return;
+        m_visible = value;
+        emit visibleChanged(value);
+    }
+
+    inline void setWidthFactor(double value) {
+        if (value == m_widthFactor)
+            return;
+        m_widthFactor = value;
+        emit widthFactorChanged(value);
+    }
+
+signals:
+    void visibleChanged(bool visible);
+    void dockedChanged(bool);
+    void widthFactorChanged(double);
+
+private:
+    bool m_visible = false;
+    bool m_docked = false;
+    ///< playlist size: root.width / playlistScaleFactor
+    double  m_widthFactor = 4.;
+
+    friend class MainCtx;
+};
+
 #endif // MAINCTX_SUBMODELS_HPP

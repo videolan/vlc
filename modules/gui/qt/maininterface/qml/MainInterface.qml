@@ -220,7 +220,7 @@ Item {
         Loader {
             id: playlistWindowLoader
             asynchronous: true
-            active: !MainCtx.playlistDocked
+            active: !MainCtx.playqueuePanel.docked
             source: "qrc:///qt/qml/VLC/Playlist/PlaylistDetachedWindow.qml"
         }
 

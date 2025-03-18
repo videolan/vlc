@@ -152,12 +152,6 @@ FocusScope {
         target: MainCtx
 
         //playlist
-        function onPlaylistDockedChanged() {
-            playlistVisibility.updatePlaylistDocked()
-        }
-        function onPlaylistVisibleChanged() {
-            playlistVisibility.updatePlaylistVisible()
-        }
         function onHasEmbededVideoChanged() {
             playlistVisibility.updateVideoEmbed()
             playerToolbarVisibilityFSM.updateVideoEmbed()
@@ -166,6 +160,20 @@ FocusScope {
             playerToolbarVisibilityFSM.askShow()
         }
     }
+
+
+    Connections {
+        target: MainCtx.playqueuePanel
+
+        //playlist
+        function onDockedChanged() {
+            playlistVisibility.updatePlaylistDocked()
+        }
+        function onVisibleChanged() {
+            playlistVisibility.updatePlaylistVisible()
+        }
+    }
+
 
     Loader {
         id: playerSpecializationLoader
@@ -1072,24 +1080,24 @@ FocusScope {
 
                 onWidthFactorChanged: {
                     if (!_inhibitMainCtxUpdate)
-                        MainCtx.playerPlaylistWidthFactor = widthFactor
+                        MainCtx.playqueuePanel.widthFactor = widthFactor
                 }
 
                 Component.onCompleted:  _updateFromMainCtx()
 
                 function _updateFromMainCtx() {
-                    if (widthFactor == MainCtx.playerPlaylistWidthFactor)
+                    if (widthFactor === MainCtx.playqueuePanel.widthFactor)
                         return
 
                     _inhibitMainCtxUpdate = true
-                    widthFactor = MainCtx.playerPlaylistWidthFactor
+                    widthFactor = MainCtx.playqueuePanel.widthFactor
                     _inhibitMainCtxUpdate = false
                 }
 
                 Connections {
-                    target: MainCtx
+                    target: MainCtx.playqueuePanel
 
-                    function onPlaylistWidthFactorChanged() {
+                    function onWidthFactorChanged() {
                         resizeHandle._updateFromMainCtx()
                     }
                 }

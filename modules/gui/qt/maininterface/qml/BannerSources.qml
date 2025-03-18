@@ -407,7 +407,7 @@ T.ToolBar {
                         Widgets.IconToolButton {
                             id: playlist_btn
 
-                            checked: MainCtx.playlistVisible
+                            checked: MainCtx.playqueuePanel.visible
 
                             font.pixelSize: VLCStyle.icon_banner
                             text: VLCIcons.playlist
@@ -419,9 +419,9 @@ T.ToolBar {
 
                             width: VLCStyle.bannerButton_width
                             height: VLCStyle.bannerButton_height
-                            highlighted: MainCtx.playlistVisible
+                            highlighted: MainCtx.playqueuePanel.visible
 
-                            onClicked:  MainCtx.playlistVisible = !MainCtx.playlistVisible
+                            onClicked:  MainCtx.playqueuePanel.visible = !MainCtx.playqueuePanel.visible
 
                             DropArea {
                                 anchors.fill: parent
@@ -459,7 +459,7 @@ T.ToolBar {
                                     interval: VLCStyle.duration_humanMoment
 
                                     onTriggered: {
-                                        MainCtx.playlistVisible = true
+                                        MainCtx.playqueuePanel.visible = true
                                     }
                                 }
                             }

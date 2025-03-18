@@ -38,6 +38,7 @@
 #include "menus.hpp"
 
 #include "maininterface/mainctx.hpp"                     /* View modifications */
+#include "maininterface/mainctx_submodels.hpp"
 #include "dialogs/dialogs_provider.hpp"                   /* Dialogs display */
 #include "dialogs/help/help.hpp"
 #include "player/player_controller.hpp"                      /* Input Management */
@@ -305,14 +306,14 @@ void VLCMenuBar::ViewMenu(qt_intf_t *p_intf, QMenu *menu)
             qtr( "Play&list" ));
     action->setShortcut(QString( "Ctrl+L" ));
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi, &MainCtx::setPlaylistVisible );
-    action->setChecked( mi->isPlaylistVisible() );
+    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &PlayqueuePanelCtx::setVisible );
+    action->setChecked( mi->getPlayqueuePanel()->isVisible() );
 
     /* Docked Playlist */
     action = menu->addAction( qtr( "Docked Playlist" ) );
     action->setCheckable( true );
-    connect( action, &QAction::triggered, mi, &MainCtx::setPlaylistDocked );
-    action->setChecked( mi->isPlaylistDocked() );
+    connect( action, &QAction::triggered, mi->getPlayqueuePanel(), &PlayqueuePanelCtx::setDocked );
+    action->setChecked( mi->getPlayqueuePanel()->isDocked() );
 
     menu->addSeparator();
 

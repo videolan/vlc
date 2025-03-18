@@ -53,61 +53,61 @@ FSM {
 
     //exposed internal states
     property alias isPlaylistVisible: fsmVisible.active
- 
-    initialState: MainCtx.playlistDocked ? fsmDocked : fsmFloating
-    
+
+    initialState: MainCtx.playqueuePanel.docked ? fsmDocked : fsmFloating
+
     signalMap: ({
         togglePlaylistVisibility: fsm.togglePlaylistVisibility,
         updatePlaylistVisible: fsm.updatePlaylistVisible,
         updatePlaylistDocked: fsm.updatePlaylistDocked,
         updateVideoEmbed: fsm.updateVideoEmbed,
     })
- 
+
     FSMState {
         id: fsmFloating
- 
+
         transitions: ({
             togglePlaylistVisibility: {
-                action: () => { MainCtx.playlistVisible = !MainCtx.playlistVisible }
+                action: () => { MainCtx.playqueuePanel.visible = !MainCtx.playqueuePanel.visible }
             },
             updatePlaylistDocked: {
-                guard: () => MainCtx.playlistDocked,
+                guard: () => MainCtx.playqueuePanel.docked,
                 target: fsmDocked
             }
         })
     }
- 
+
     FSMState {
         id: fsmDocked
  
-        initialState: (MainCtx.hasEmbededVideo || !MainCtx.playlistVisible ||
+        initialState: (MainCtx.hasEmbededVideo || !MainCtx.playqueuePanel.visible ||
                        // Playlist animation is only enabled if the previous effective mode is main display
                        // mode. We currently don't care about animations when going to main display mode and back
                        // to player mode if the initial mode is not main display mode:
                        (MainCtx.initialEffectiveMainInterfaceMode !== MainCtx.MAININTERFACE_MODE_MAINDISPLAY))
                       ? fsmHidden : fsmVisible
- 
+
         transitions: ({
             updatePlaylistDocked: {
-                guard: () => !MainCtx.playlistDocked,
+                guard: () => !MainCtx.playqueuePanel.docked,
                 target: fsmFloating
             },
         })
- 
+
         FSMState {
             id: fsmVisible
 
             function enter() {
-                MainCtx.playlistVisible = true
+                MainCtx.playqueuePanel.visible = true
             }
- 
+
             transitions: ({
                 updateVideoEmbed: {
                     guard: () => MainCtx.hasEmbededVideo,
                     target: fsmHidden
                 },
                 updatePlaylistVisible: {
-                    guard: () => !MainCtx.playlistVisible,
+                    guard: () => !MainCtx.playqueuePanel.visible,
                     target: fsmFollowVisible
                 },
                 togglePlaylistVisibility: {
@@ -125,7 +125,7 @@ FSM {
                 id: fsmFollowVisible
 
                 function enter() {
-                    MainCtx.playlistVisible = false
+                    MainCtx.playqueuePanel.visible = false
                 }
 
                 transitions: ({
@@ -134,7 +134,7 @@ FSM {
                         target: fsmEmbed
                     },
                     updatePlaylistVisible: {
-                        guard: () => MainCtx.playlistVisible,
+                        guard: () => MainCtx.playqueuePanel.visible,
                         target: fsmVisible
                     },
                     togglePlaylistVisibility: {
@@ -148,17 +148,17 @@ FSM {
 
                 transitions: ({
                     updateVideoEmbed: [{ //guards tested in order{
-                        guard: () => !MainCtx.hasEmbededVideo && !MainCtx.playlistVisible,
+                        guard: () => !MainCtx.hasEmbededVideo && !MainCtx.playqueuePanel.visible,
                         target: fsmFollowVisible
                     }, {
-                        guard: () => !MainCtx.hasEmbededVideo && MainCtx.playlistVisible,
+                        guard: () => !MainCtx.hasEmbededVideo && MainCtx.playqueuePanel.visible,
                         target: fsmVisible
                     }],
                     togglePlaylistVisibility: {
                         target: fsmVisible
                     },
                     updatePlaylistVisible: {
-                        guard: () => MainCtx.playlistVisible,
+                        guard: () => MainCtx.playqueuePanel.visible,
                         target: fsmVisible
                     },
                 })

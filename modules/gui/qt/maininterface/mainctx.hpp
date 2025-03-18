@@ -67,6 +67,7 @@ class VLCSystray;
 class MediaLib;
 class ColorSchemeModel;
 class VLCVarChoiceModel;
+class PlayqueuePanelCtx;
 #ifdef UPDATE_CHECK
 class UpdateModel;
 #endif
@@ -97,10 +98,8 @@ class MainCtx : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(bool playlistDocked READ isPlaylistDocked WRITE setPlaylistDocked NOTIFY playlistDockedChanged FINAL)
-    Q_PROPERTY(bool playlistVisible READ isPlaylistVisible WRITE setPlaylistVisible NOTIFY playlistVisibleChanged FINAL)
-    Q_PROPERTY(double playlistWidthFactor READ getPlaylistWidthFactor WRITE setPlaylistWidthFactor NOTIFY playlistWidthFactorChanged FINAL)
     Q_PROPERTY(double playerPlaylistWidthFactor READ getPlayerPlaylistWidthFactor WRITE setPlayerPlaylistWidthFactor NOTIFY playerPlaylistFactorChanged FINAL)
+    Q_PROPERTY(PlayqueuePanelCtx* playqueuePanel READ getPlayqueuePanel CONSTANT FINAL)
     Q_PROPERTY(double artistAlbumsWidthFactor READ artistAlbumsWidthFactor WRITE setArtistAlbumsWidthFactor NOTIFY artistAlbumsWidthFactorChanged FINAL)
     Q_PROPERTY(bool interfaceAlwaysOnTop READ isInterfaceAlwaysOnTop WRITE setInterfaceAlwaysOnTop NOTIFY interfaceAlwaysOnTopChanged FINAL)
     Q_PROPERTY(bool hasEmbededVideo READ hasEmbededVideo NOTIFY hasEmbededVideoChanged FINAL)
@@ -222,9 +221,7 @@ public:
     Q_DECLARE_FLAGS(MainInterfaceModes, MainInterfaceMode)
 
     inline QWindow::Visibility interfaceVisibility() const { return m_windowVisibility; }
-    bool isPlaylistDocked() { return b_playlistDocked; }
-    bool isPlaylistVisible() { return m_playlistVisible; }
-    inline double getPlaylistWidthFactor() const { return m_playlistWidthFactor; }
+    inline PlayqueuePanelCtx* getPlayqueuePanel() const { return m_playqueuePanel; }
     inline double getPlayerPlaylistWidthFactor() const { return m_playerPlaylistWidthFactor; }
     bool isInterfaceAlwaysOnTop() { return b_interfaceOnTop; }
     inline bool isHideAfterCreation() const { return b_hideAfterCreation; }
@@ -441,7 +438,7 @@ protected:
     double               m_intfScaleFactor = 1.;
     int                  i_notificationSetting = 0; /// Systray Notifications
     bool                 b_hideAfterCreation = false; /// --qt-start-minimized
-    bool                 b_playlistDocked = false;
+    PlayqueuePanelCtx*   m_playqueuePanel = nullptr;
     QWindow::Visibility  m_windowVisibility = QWindow::Windowed;
     bool                 b_interfaceOnTop = false;      ///keep UI on top
     bool                 b_hasWayland = false;
@@ -464,8 +461,6 @@ protected:
     QUrl                 m_dialogFilepath; /* Last path used in dialogs */
 
     /* States */
-    bool                 m_playlistVisible = false;       ///< Is the playlist visible ?
-    double               m_playlistWidthFactor = 4.;   ///< playlist size: root.width / playlistScaleFactor
     double               m_playerPlaylistWidthFactor = 4.;
     MainInterfaceModes   m_mainInterfaceModes = { MAININTERFACE_MODE_MAINDISPLAY };
     MainInterfaceMode    m_initialEffectiveMainInterfaceMode = MAININTERFACE_MODE_MAINDISPLAY;
@@ -517,9 +512,6 @@ protected:
 public slots:
     void toggleToolbarMenu();
     void toggleInterfaceFullScreen();
-    void setPlaylistDocked( bool );
-    void setPlaylistVisible( bool );
-    void setPlaylistWidthFactor( double );
     void setPlayerPlaylistWidthFactor( double factor );
     void setInterfaceAlwaysOnTop( bool );
     void setShowRemainingTime( bool );
@@ -568,9 +560,6 @@ signals:
     void askRaise();
     void kc_pressed(); /* easter eggs */
 
-    void playlistDockedChanged(bool);
-    void playlistVisibleChanged(bool);
-    void playlistWidthFactorChanged(double);
     void playerPlaylistFactorChanged(double);
     void interfaceAlwaysOnTopChanged(bool);
     void hasEmbededVideoChanged(bool);

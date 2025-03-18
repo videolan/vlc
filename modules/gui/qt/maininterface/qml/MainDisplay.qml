@@ -508,7 +508,7 @@ FocusScope {
                         anchors.fill: parent
                         hoverEnabled: true
                         onClicked: {
-                            MainCtx.playlistVisible = false
+                            MainCtx.playqueuePanel.visible = false
                         }
 
                         // Capture WheelEvents before they reach stackView
@@ -532,9 +532,9 @@ FocusScope {
 
                 visible: false
 
-                active: MainCtx.playlistDocked
+                active: MainCtx.playqueuePanel.docked
 
-                state: ((status === Loader.Ready) && MainCtx.playlistVisible) ? "expanded" : ""
+                state: ((status === Loader.Ready) && MainCtx.playqueuePanel.visible) ? "expanded" : ""
 
                 readonly property bool shown: !!item?.visible
 
@@ -602,7 +602,7 @@ FocusScope {
                     }
 
                     Navigation.cancelAction: function() {
-                        MainCtx.playlistVisible = false
+                        MainCtx.playqueuePanel.visible = false
                         stackView.forceActiveFocus()
                     }
 
@@ -644,24 +644,24 @@ FocusScope {
 
                         onWidthFactorChanged: {
                             if (!_inhibitMainInterfaceUpdate && visible)
-                                MainCtx.setPlaylistWidthFactor(widthFactor)
+                                MainCtx.playqueuePanel.widthFactor = widthFactor
                         }
 
                         Component.onCompleted:  _updateFromMainInterface()
 
                         function _updateFromMainInterface() {
-                            if (widthFactor == MainCtx.playlistWidthFactor)
+                            if (widthFactor === MainCtx.playqueuePanel.widthFactor)
                                 return
 
                             _inhibitMainInterfaceUpdate = true
-                            widthFactor = MainCtx.playlistWidthFactor
+                            widthFactor = MainCtx.playqueuePanel.widthFactor
                             _inhibitMainInterfaceUpdate = false
                         }
 
                         Connections {
-                            target: MainCtx
+                            target: MainCtx.playqueuePanel
 
-                            function onPlaylistWidthFactorChanged() {
+                            function onWidthFactorChanged() {
                                 resizeHandle._updateFromMainInterface()
                             }
                         }
