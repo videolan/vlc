@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "maininterface/navigationmodel.hpp"
+
 #include "medialibrary/medialib.hpp"
 #include "medialibrary/mlqmltypes.hpp"
 #include "medialibrary/mlcustomcover.hpp"
@@ -243,6 +245,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterSingletonInstance<UpdateModel>( uri, versionMajor, versionMinor, "UpdateModel", m_mainCtx->getUpdateModel() );
 #endif
 
+        qmlRegisterTypesAndRevisions<NavigationModel>( uri, versionMajor);
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);
     }

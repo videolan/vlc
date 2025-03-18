@@ -183,6 +183,7 @@ libqt_plugin_la_SOURCES = \
 	maininterface/mainctx_submodels.hpp \
 	maininterface/mainui.cpp \
 	maininterface/mainui.hpp \
+	maininterface/navigationmodel.cpp maininterface/navigationmodel.hpp \
 	maininterface/videosurface.cpp \
 	maininterface/videosurface.hpp \
 	maininterface/video_window_handler.cpp \
@@ -448,6 +449,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	maininterface/mainctx.moc.cpp \
 	maininterface/mainctx_submodels.moc.cpp \
 	maininterface/mainui.moc.cpp \
+	maininterface/navigationmodel.moc.cpp \
 	maininterface/videosurface.moc.cpp \
 	maininterface/video_window_handler.moc.cpp \
 	medialibrary/medialib.moc.cpp \
@@ -1843,6 +1845,27 @@ test_vlc_dialog_model_LDADD = $(QT_QTEST_COMMON_ldadd)
 test_vlc_dialog_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
 check_PROGRAMS += test_vlc_dialog_model
 TESTS += test_vlc_dialog_model
+
+
+test_qt_navigation_model_SOURCES = \
+	tests/vlc_stub_modules.cpp \
+	tests/test_navigation_model.cpp \
+	maininterface/navigationmodel.hpp \
+	maininterface/navigationmodel.cpp
+
+nodist_test_qt_navigation_model_SOURCES = \
+	tests/test_navigation_model.moc \
+	maininterface/navigationmodel.moc.cpp
+
+BUILT_SOURCES += tests/test_navigation_model.moc
+CLEANFILES += tests/test_navigation_model.moc
+test_qt_navigation_model_CPPFLAGS = $(QT_QTEST_COMMON_cppflags)
+test_qt_navigation_model_CXXFLAGS = $(QT_QTEST_COMMON_cxxflags)
+test_qt_navigation_model_LDADD = $(QT_QTEST_COMMON_ldadd)
+test_qt_navigation_model_LDFLAGS = $(QT_QTEST_COMMON_ldflags)
+check_PROGRAMS += test_qt_navigation_model
+TESTS += test_qt_navigation_model
+
 
 endif
 
