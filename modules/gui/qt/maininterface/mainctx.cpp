@@ -455,7 +455,7 @@ void MainCtx::loadPrefs(const bool callSignals)
 void MainCtx::loadFromSettingsImpl(const bool callSignals)
 {
     const auto loadFromSettings = [this, callSignals](auto &variable, const char *name
-            , const auto defaultValue, auto signal)
+            , const auto defaultValue, auto obj,  auto signal)
     {
         using variableType = std::remove_reference_t<decltype(variable)>;
 
@@ -464,30 +464,30 @@ void MainCtx::loadFromSettingsImpl(const bool callSignals)
             return;
 
         variable = value;
-        if (callSignals && signal)
-            (this->*signal)(variable);
+        if (obj && callSignals && signal)
+            (obj->*signal)(variable);
     };
 
-    loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, &MainCtx::playlistDockedChanged);
+    loadFromSettings(b_playlistDocked, "MainWindow/pl-dock-status", true, this, &MainCtx::playlistDockedChanged);
 
-    loadFromSettings(m_playlistVisible, "MainWindow/playlist-visible", false, &MainCtx::playlistVisibleChanged);
+    loadFromSettings(m_playlistVisible, "MainWindow/playlist-visible", false, this, &MainCtx::playlistVisibleChanged);
 
-    loadFromSettings(m_playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0 , &MainCtx::playlistWidthFactorChanged);
+    loadFromSettings(m_playlistWidthFactor, "MainWindow/playlist-width-factor", 4.0, this, &MainCtx::playlistWidthFactorChanged);
 
-    loadFromSettings(m_playerPlaylistWidthFactor, "MainWindow/player-playlist-width-factor", 4.0 , &MainCtx::playerPlaylistFactorChanged);
+    loadFromSettings(m_playerPlaylistWidthFactor, "MainWindow/player-playlist-width-factor", 4.0, this, &MainCtx::playerPlaylistFactorChanged);
 
     loadFromSettings(m_artistAlbumsWidthFactor, "MainWindow/artist-albums-width-factor"
-                     , 4.0 , &MainCtx::artistAlbumsWidthFactorChanged);
+        , 4.0, this,  &MainCtx::artistAlbumsWidthFactorChanged);
 
-    loadFromSettings(m_gridView, "MainWindow/grid-view", true, &MainCtx::gridViewChanged);
+    loadFromSettings(m_gridView, "MainWindow/grid-view", true, this, &MainCtx::gridViewChanged);
 
-    loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, &MainCtx::groupingChanged);
+    loadFromSettings(m_grouping, "MainWindow/grouping", GROUPING_NONE, this, &MainCtx::groupingChanged);
 
-    loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, &MainCtx::showRemainingTimeChanged);
+    loadFromSettings(m_showRemainingTime, "MainWindow/ShowRemainingTime", false, this, &MainCtx::showRemainingTimeChanged);
 
     loadFromSettings(m_albumSections, "MainWindow/album-sections", true, &MainCtx::albumSectionsChanged);
 
-    loadFromSettings(m_lyricsMode, "MainWindow/lyrics-mode", true, &MainCtx::lyricsModeChanged);
+    loadFromSettings(m_lyricsMode, "MainWindow/lyrics-mode", true, this, &MainCtx::lyricsModeChanged);
 
     const auto colorSchemeIndex = getSettings()->value( "MainWindow/color-scheme-index", 0 ).toInt();
     m_colorScheme->setCurrentIndex(colorSchemeIndex);
