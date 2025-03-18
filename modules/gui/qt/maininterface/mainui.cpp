@@ -39,6 +39,7 @@
 #include "util/imageluminanceextractor.hpp"
 #include "util/keyhelper.hpp"
 #include "style/systempalette.hpp"
+#include "style/vlcicons.hpp"
 #include "util/navigation_history.hpp"
 #include "util/flickable_scroll_handler.hpp"
 #include "util/kirigamiwheelhandler.hpp"
@@ -376,6 +377,7 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ColorContext>(uri, versionMajor, versionMinor, "ColorContext");
         qmlRegisterUncreatableType<ColorProperty>(uri, versionMajor, versionMinor, "colorProperty", "");
         qmlRegisterType<SystemPalette>(uri, versionMajor, versionMinor, "SystemPalette");
+        qmlRegisterTypesAndRevisions<VLCIcons>( uri, versionMajor );
 
         qmlRegisterModule(uri, versionMajor, versionMinor);
         qmlProtectModule(uri, versionMajor);

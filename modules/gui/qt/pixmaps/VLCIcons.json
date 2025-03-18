@@ -1,6 +1,7 @@
 {
-    "qml_name": "VLCIcons.qml",
-    "qml_file_prefix": "qrc:///",
+    "hpp_name": "../style/vlcicons.hpp",
+    "cpp_name": "../style/vlcicons.cpp",
+    "qml_prefix": "qrc:///",
     "font_file": "VLCIcons.ttf",
     "font_name": "VLCIcons",
     "glyphs" : [
