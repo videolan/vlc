@@ -26,48 +26,63 @@ import VLC.MediaLibrary
 import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
+import VLC.Menus
 
-VideoAll {
+Widgets.PageExt {
+
     id: root
 
-    // Properties
-
-    // Aliases
+    property alias currentIndex: videoAll.currentIndex
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: modelVideo.parentId
 
-    // NOTE: The title of the group.
-    property string title: ""
+    title: qsTr("Videos")
 
-    sectionProperty: {
-        switch (model.sortCriteria) {
-        case "title":
-            return "title_first_symbol"
-        default:
-            return ""
+    sortMenu: SortMenuVideo {
+        ctx: MainCtx
+
+        onGrouping: (grouping) => { MainCtx.grouping = grouping }
+    }
+
+    VideoAll {
+        id: videoAll
+
+        // Aliases
+
+        anchors.fill: parent
+
+        displayMarginBeginning: root.displayMarginBeginning
+        displayMarginEnd: root.displayMarginEnd
+        enableBeginningFade: root.enableBeginningFade
+        enableEndFade: root.enableEndFade
+
+        sectionProperty: {
+            switch (model.sortCriteria) {
+            case "title":
+                return "title_first_symbol"
+            default:
+                return ""
+            }
         }
-    }
 
-    // Children
+        function isInfoExpandPanelAvailable(/* modelIndexData */) {
+            return true
+        }
 
-    model: MLVideoModel {
-        id: modelVideo
+        // Children
 
-        searchPattern: MainCtx.search.pattern
-        sortOrder: MainCtx.sort.order
-        sortCriteria: MainCtx.sort.criteria
+        model: MLVideoModel {
+            id: modelVideo
 
-        ml: MediaLib
-    }
+            searchPattern: MainCtx.search.pattern
+            sortOrder: MainCtx.sort.order
+            sortCriteria: MainCtx.sort.criteria
 
-    contextMenu: MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
+            ml: MediaLib
+        }
 
-    header: Widgets.ViewHeader {
-        view: root
+        contextMenu: MLContextMenu { model: modelVideo; showPlayAsAudioAction: true }
 
-        visible: view.count > 0
-
-        text: view.title
     }
 }

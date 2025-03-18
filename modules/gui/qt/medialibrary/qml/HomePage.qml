@@ -29,7 +29,7 @@ import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
 
-T.Page {
+Widgets.PageExt {
     id: root
 
     property var pagePrefix: [] // behave like a Page
@@ -39,9 +39,11 @@ T.Page {
         { text: qsTr("Duration"), criteria: "duration" }
     ]
 
-    readonly property bool hasGridListMode: true
+    title: qsTr("Home")
 
-    readonly property bool isSearchable: true
+    hasGridListMode: true
+
+    isSearchable: true
 
     property real listCoverHeight: VLCStyle.listAlbumCover_height
     property real listCoverWidth: VLCStyle.listAlbumCover_width
@@ -51,18 +53,6 @@ T.Page {
         id: theme
         colorSet: ColorContext.View
     }
-
-    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
-                            implicitContentWidth + leftPadding + rightPadding,
-                            implicitHeaderWidth,
-                            implicitFooterWidth)
-    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
-                             implicitContentHeight + topPadding + bottomPadding
-                             + (implicitHeaderHeight > 0 ? implicitHeaderHeight + spacing : 0)
-                             + (implicitFooterHeight > 0 ? implicitFooterHeight + spacing : 0))
-
-    title: qsTr("Home")
-
 
     signal seeAllButtonClicked(string name, int reason)
 
@@ -82,11 +72,11 @@ T.Page {
     contentItem: Flickable {
         id: flickable
 
-        implicitWidth: Math.max(header.implicitWidth, coneNButtons.implicitWidth, mediaRows.implicitWidth)
-        implicitHeight: header.implicitHeight + coneNButtons.implicitHeight + (_hasMedias ? mediaRows.implicitHeight : 0)
+        implicitWidth: Math.max(coneNButtons.implicitWidth, mediaRows.implicitWidth)
+        implicitHeight: coneNButtons.implicitHeight + (_hasMedias ? mediaRows.implicitHeight : 0)
 
         contentWidth: width
-        contentHeight: _hasMedias ? header.implicitHeight + coneNButtons.implicitHeight + mediaRows.implicitHeight
+        contentHeight: _hasMedias ? coneNButtons.implicitHeight + mediaRows.implicitHeight
                                   : height - topMargin - bottomMargin
 
         flickableDirection: Flickable.AutoFlickIfNeeded
@@ -154,27 +144,6 @@ T.Page {
             // jumps when it is enabled again later on.
         }
 
-        // FIXME: Do not use `ViewHeader` for page titles.
-        // FIXME: Use `header` property for `Page` header.
-        //        `header` dosen't respect paddings of `contentItem`,
-        //        and allows the `contentItem` to be scrolled through it.
-        Widgets.ViewHeader {
-            id: header
-
-            visible: flickable._hasMedias
-
-            view: newMediaRow
-
-            text: root.title
-
-            topPadding: 0
-
-            Binding on implicitHeight {
-                when: !flickable._hasMedias
-                value: 0.0
-            }
-        }
-
         NoMedialibHome.ConeNButtons {
             id: coneNButtons
 
@@ -183,7 +152,7 @@ T.Page {
             orientation: flickable._hasMedias ? Qt.Horizontal : Qt.Vertical
 
             anchors.centerIn: flickable._hasMedias ? undefined : parent
-            anchors.top: flickable._hasMedias ? header.bottom : undefined
+            anchors.top: flickable._hasMedias ? parent.top : undefined
             anchors.left: flickable._hasMedias ? parent.left : undefined
             anchors.leftMargin: flickable._hasMedias ? newMediaRow.contentLeftMargin : 0
 

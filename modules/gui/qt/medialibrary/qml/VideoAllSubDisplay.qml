@@ -28,19 +28,19 @@ import VLC.Util
 import VLC.Style
 import VLC.Menus
 
-VideoAll {
+Widgets.PageExt {
     id: root
 
-    // Properties
+    signal showList(var model, int reason)
+
+    property alias currentIndex: videoAll.currentIndex
 
     // NOTE: We are exposing a custom SortMenu with grouping options.
-    property SortMenuVideo sortMenu: SortMenuVideo {
+    sortMenu: SortMenuVideo {
         ctx: MainCtx
 
         onGrouping: (grouping) => { MainCtx.grouping = grouping }
     }
-
-    // Private
 
     readonly property QtObject _meta: {
         const grouping = MainCtx.grouping;
@@ -66,208 +66,209 @@ VideoAll {
         gc() // `QJSEngine::GarbageCollectionExtension` is installed by default
     }
 
-    // Signals
-
-    signal showList(var model, int reason)
-
-    // Settings
-
-    model: _meta?.model ?? null
-
-    contextMenu: MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
-
-    gridLabels: _meta?.gridLabels ?? root.getLabel
-
-    listLabels: _meta?.listLabels ?? root.getLabel
-
-    sectionProperty: _meta?.sectionProperty ?? ""
-
-    showGroupCountColumn: _meta?.showGroupCountColumn ?? false
-
-    header: Widgets.ViewHeader {
-        view: root
-
-        visible: view.count > 0
-
-        text: qsTr("All")
-    }
-
     // Functions
 
-    function getLabelGroup(model, string) {
-        if (!model) return ""
+    title: qsTr("Videos")
 
-        const count = model.count
+    VideoAll {
+        id: videoAll
 
-        if (count === 1) {
-            return getLabel(model)
-        } else {
-            if (count < 100)
-                return [ string.arg(count) ]
-            else
-                return [ string.arg("99+") ]
+        anchors.fill: parent
+
+        model: _meta?.model ?? null
+
+        contextMenu: MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }
+
+        gridLabels: _meta?.gridLabels ?? videoAll.getLabel
+
+        listLabels: _meta?.listLabels ?? videoAll.getLabel
+
+        showGroupCountColumn: _meta?.showGroupCountColumn ?? false
+
+        sectionProperty: _meta?.sectionProperty ?? ""
+
+        displayMarginBeginning: root.displayMarginBeginning
+        displayMarginEnd: root.displayMarginEnd
+        enableBeginningFade: root.enableBeginningFade
+        enableEndFade: root.enableEndFade
+
+
+        // VideoAll events reimplementation
+
+        function getLabelGroup(model, string) {
+            if (!model) return ""
+
+            const count = model.count
+
+            if (count === 1) {
+                return getLabel(model)
+            } else {
+                if (count < 100)
+                    return [ string.arg(count) ]
+                else
+                    return [ string.arg("99+") ]
+            }
         }
-    }
 
-    // VideoAll events reimplementation
 
-    function onAction(indexes) { _meta.onAction(indexes) }
+        function onAction(indexes) { _meta.onAction(indexes) }
 
-    function onDoubleClick(object) { _meta.onDoubleClick(object) }
+        function onDoubleClick(object) { _meta.onDoubleClick(object) }
 
-    function isInfoExpandPanelAvailable(modelIndexData) {
-        return _meta.isInfoExpandPanelAvailable(modelIndexData)
-    }
-
-    // Children
-
-    Component {
-        id: videoComponent
-
-        QtObject {
-            id: metaVideo
-
-            property var model: MLVideoModel {
-                ml: MediaLib
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
-            }
-
-            property var gridLabels: root.getLabel
-
-            property var listLabels: root.getLabel
-
-            property string sectionProperty: {
-                switch (model.sortCriteria) {
-                case "title":
-                    return "title_first_symbol"
-                default:
-                    return ""
-                }
-            }
-
-            function onAction(indexes) {
-                model.addAndPlay( indexes )
-                MainCtx.playerView = true
-            }
-
-            function onDoubleClick(object) {
-                MediaLib.addAndPlay(object.id)
-                MainCtx.playerView = true
-            }
-
-            function isInfoExpandPanelAvailable(modelIndexData) { return true }
+        function isInfoExpandPanelAvailable(modelIndexData) {
+            return _meta.isInfoExpandPanelAvailable(modelIndexData)
         }
-    }
 
-    Component {
-        id: groupComponent
+        // Children
 
-        QtObject {
-            id: metaGroup
+        Component {
+            id: videoComponent
 
-            property var model: MLVideoGroupsModel {
-                ml: MediaLib
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
-            }
+            QtObject {
+                id: metaVideo
 
-            property string sectionProperty: {
-                switch (model.sortCriteria) {
-                case "title":
-                    return "group_title_first_symbol"
-                default:
-                    return ""
+                property var model: MLVideoModel {
+                    ml: MediaLib
+                    searchPattern: MainCtx.search.pattern
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
                 }
-            }
 
-            property var gridLabels: function (model) {
-                return root.getLabelGroup(model, qsTr("%1 Videos"))
-            }
+                property var gridLabels: videoAll.getLabel
 
-            property var listLabels: function (model) {
-                return root.getLabel(model)
-            }
+                property var listLabels: videoAll.getLabel
 
-            property bool showGroupCountColumn: true
+                property string sectionProperty: {
+                    switch (model.sortCriteria) {
+                    case "title":
+                        return "title_first_symbol"
+                    default:
+                        return ""
+                    }
+                }
 
-            function onAction(indexes) {
-                const index = indexes[0]
-
-                const object = model.getDataAt(index);
-
-                if (object.isVideo) {
+                function onAction(indexes) {
                     model.addAndPlay( indexes )
                     MainCtx.playerView = true
-
-                    return
                 }
 
-                root.showList(object, Qt.TabFocusReason)
-            }
-
-            function onDoubleClick(object) {
-                if (object.isVideo) {
+                function onDoubleClick(object) {
                     MediaLib.addAndPlay(object.id)
                     MainCtx.playerView = true
-                    return
                 }
 
-                root.showList(object, Qt.MouseFocusReason)
-            }
-
-            function isInfoExpandPanelAvailable(modelIndexData) {
-                return modelIndexData.isVideo
+                function isInfoExpandPanelAvailable(modelIndexData) { return true }
             }
         }
-    }
 
-    Component {
-        id: folderComponent
+        Component {
+            id: groupComponent
 
-        QtObject {
-            id: metaFolder
+            QtObject {
+                id: metaGroup
 
-            property var model: MLVideoFoldersModel {
-                ml: MediaLib
-                searchPattern: MainCtx.search.pattern
-                sortOrder: MainCtx.sort.order
-                sortCriteria: MainCtx.sort.criteria
-            }
+                property var model: MLVideoGroupsModel {
+                    ml: MediaLib
+                    searchPattern: MainCtx.search.pattern
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                }
 
-            property string sectionProperty: {
-                switch (model.sortCriteria) {
-                case "title":
-                    return "title_first_symbol"
-                default:
-                    return ""
+                property string sectionProperty: {
+                    switch (model.sortCriteria) {
+                    case "title":
+                        return "group_title_first_symbol"
+                    default:
+                        return ""
+                    }
+                }
+
+                property var gridLabels: function (model) {
+                    return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
+                }
+
+                property var listLabels: function (model) {
+                    return videoAll.getLabel(model)
+                }
+
+                property bool showGroupCountColumn: true
+
+                function onAction(indexes) {
+                    const index = indexes[0]
+
+                    const object = model.getDataAt(index);
+
+                    if (object.isVideo) {
+                        model.addAndPlay( indexes )
+                        MainCtx.playerView = true
+
+                        return
+                    }
+
+                    root.showList(object, Qt.TabFocusReason)
+                }
+
+                function onDoubleClick(object) {
+                    if (object.isVideo) {
+                        MediaLib.addAndPlay(object.id)
+                        MainCtx.playerView = true
+                        return
+                    }
+
+                    root.showList(object, Qt.MouseFocusReason)
+                }
+
+                function isInfoExpandPanelAvailable(modelIndexData) {
+                    return modelIndexData.isVideo
                 }
             }
+        }
 
-            property var gridLabels: function (model) {
-                return root.getLabelGroup(model, qsTr("%1 Videos"))
-            }
+        Component {
+            id: folderComponent
 
-            property var listLabels: function (model) {
-                return root.getLabel(model)
-            }
+            QtObject {
+                id: metaFolder
 
-            property bool showGroupCountColumn: true
+                property var model: MLVideoFoldersModel {
+                    ml: MediaLib
+                    searchPattern: MainCtx.search.pattern
+                    sortOrder: MainCtx.sort.order
+                    sortCriteria: MainCtx.sort.criteria
+                }
 
-            function onAction(indexes) {
-                const index = indexes[0]
+                property string sectionProperty: {
+                    switch (model.sortCriteria) {
+                    case "title":
+                        return "title_first_symbol"
+                    default:
+                        return ""
+                    }
+                }
 
-                root.showList(model.getDataAt(index), Qt.TabFocusReason)
-            }
+                property var gridLabels: function (model) {
+                    return videoAll.getLabelGroup(model, qsTr("%1 Videos"))
+                }
 
-            function onDoubleClick(object) {
-                root.showList(object, Qt.MouseFocusReason)
-            }
+                property var listLabels: function (model) {
+                    return videoAll.getLabel(model)
+                }
 
-            function isInfoExpandPanelAvailable(modelIndexData) {
-                return false
+                property bool showGroupCountColumn: true
+
+                function onAction(indexes) {
+                    const index = indexes[0]
+
+                    root.showList(model.getDataAt(index), Qt.TabFocusReason)
+                }
+
+                function onDoubleClick(object) {
+                    root.showList(object, Qt.MouseFocusReason)
+                }
+
+                function isInfoExpandPanelAvailable(modelIndexData) {
+                    return false
+                }
             }
         }
     }

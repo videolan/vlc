@@ -33,38 +33,12 @@ Widgets.PageLoader {
     //---------------------------------------------------------------------------------------------
     // Properties
     //---------------------------------------------------------------------------------------------
-    property var sortMenu
-
-    property ListModel tabModel: ListModel {
-        Component.onCompleted: {
-            pageModel.forEach(function(e) {
-                append({
-                    name       : e.name,
-                    displayText: e.displayText
-                })
-            })
-        }
-    }
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
 
     property bool enableBeginningFade: true
     property bool enableEndFade: true
-
-    localMenuDelegate: Widgets.LocalTabBar {
-        currentView: root.pageName
-
-        model: tabModel
-
-        onClicked: (index) => {
-            const pageName = root.pageModel[index].name
-            if (root.isDefaulLoadedForPath([pageName]))
-                return
-            History.push([...root.pagePrefix, pageName])
-        }
-    }
-
     //---------------------------------------------------------------------------------------------
     // Settings
     //---------------------------------------------------------------------------------------------
@@ -85,9 +59,6 @@ Widgets.PageLoader {
     Accessible.name: qsTr("Video view")
 
     onCurrentItemChanged: {
-        // NOTE: We need bindings because the VideoAll model can change over time.
-        sortMenu     = Qt.binding(function () { return currentItem.sortMenu; })
-
         if (currentItem) {
             if (currentItem.displayMarginBeginning !== undefined)
                 currentItem.displayMarginBeginning = Qt.binding(() => { return root.displayMarginBeginning })

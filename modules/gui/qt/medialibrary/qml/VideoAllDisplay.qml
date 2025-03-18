@@ -32,8 +32,6 @@ Widgets.PageLoader {
 
     // Properties
 
-    property var sortMenu
-
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
 
@@ -51,11 +49,6 @@ Widgets.PageLoader {
         component: componentGroup
     }]
 
-    // Events
-
-    onCurrentItemChanged: {
-        sortMenu  = currentItem.sortMenu
-    }
 
     // Children
 
@@ -83,8 +76,6 @@ Widgets.PageLoader {
         id: componentGroup
 
         VideoGroupDisplay {
-            id: group
-
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             function isInfoExpandPanelAvailable(/* modelIndexData */) {

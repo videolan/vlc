@@ -32,7 +32,6 @@ Widgets.PageLoader {
 
     property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
-
     property bool enableBeginningFade: true
     property bool enableEndFade: true
 
@@ -56,35 +55,35 @@ Widgets.PageLoader {
     Component {
         id: componentAll
 
-        PlaylistMediaList {
-            id: playlistView
+        Widgets.PageExt {
 
-            header: Widgets.ViewHeader {
-                view: playlistView
+            title: qsTr("Playlists")
 
-                visible: view.count > 0
+            PlaylistMediaList {
+                id: playlistView
 
-                text: qsTr("Playlists")
-            }
+                anchors.fill: parent
 
-            isMusic: false
+                isMusic: false
 
-            searchPattern: MainCtx.search.pattern
-            sortOrder: MainCtx.sort.order
-            sortCriteria: MainCtx.sort.criteria
+                searchPattern: MainCtx.search.pattern
+                sortOrder: MainCtx.sort.order
+                sortCriteria: MainCtx.sort.criteria
 
-            displayMarginBeginning: root.displayMarginBeginning
-            displayMarginEnd: root.displayMarginEnd
+                displayMarginBeginning: root.displayMarginBeginning
+                displayMarginEnd: root.displayMarginEnd
 
-            enableBeginningFade: root.enableBeginningFade
-            enableEndFade: root.enableEndFade
+                enableBeginningFade: root.enableBeginningFade
+                enableEndFade: root.enableEndFade
 
-            onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
+                onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
-            onShowList: (model, reason) => {
-                History.push([...root.pagePrefix, "list"], { parentId: model.id, name: model.name }, reason)
+                onShowList: (model, reason) => {
+                    History.push([...root.pagePrefix, "list"], { parentId: model.id, title: model.name }, reason)
+                }
             }
         }
+
     }
 
     Component {

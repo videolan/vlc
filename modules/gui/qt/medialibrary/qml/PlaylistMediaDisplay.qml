@@ -30,37 +30,10 @@ import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
 
-FocusScope {
+Widgets.PageExt {
     id: root
 
-    // Properties
-
-    //behave like a Page
-    property var pagePrefix: []
-
-    readonly property bool hasGridListMode: false
-    readonly property bool isSearchable: true
-
-    property int leftPadding: 0
-    property int rightPadding: 0
-
-    property alias playlistView: view
-
-    readonly property int currentIndex: view.currentIndex
-    property string name: ""
-
-    property int initialIndex: 0
-
-    property alias header: view.header
-    property Item headerItem: view.headerItem
-
     property bool isMusic: true
-    property string _placeHolder: isMusic ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
-
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
-
-    // Aliases
 
     // NOTE: This is used to determine which media(s) shall be displayed.
     property alias parentId: model.parentId
@@ -68,12 +41,15 @@ FocusScope {
     property alias sortOrder: model.sortOrder
     property alias sortCriteria: model.sortCriteria
 
+    property int initialIndex: 0
+    readonly property int currentIndex: view.currentIndex
     property alias model: model
-
     property alias dragItem: dragItem
 
-    property alias displayMarginBeginning: view.displayMarginBeginning
-    property alias displayMarginEnd: view.displayMarginEnd
+    property string _placeHolder: root.isMusic ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
+
+    hasGridListMode: false
+    isSearchable: true
 
     // Events
 
@@ -81,7 +57,6 @@ FocusScope {
 
     onInitialIndexChanged: resetFocus()
 
-    // Functions
 
     function setCurrentItemFocus(reason) { view.setCurrentItemFocus(reason); }
 
@@ -104,8 +79,6 @@ FocusScope {
         view.setCurrentItem(index)
     }
 
-    // Events
-
     function onDelete()
     {
         const indexes = view.selectionModel.selectedIndexes;
@@ -116,32 +89,36 @@ FocusScope {
         model.remove(indexes);
     }
 
-    // Childs
 
-    MLPlaylistModel {
-        id: model
+    FocusScope {
 
-        ml: MediaLib
+        anchors.fill:  parent
 
-        onCountChanged: {
-            // NOTE: We need to cancel the Drag item manually when resetting. Should this be called
-            //       from 'onModelReset' only ?
-            dragItem.Drag.cancel();
+        MLPlaylistModel {
+            id: model
 
-            if (count === 0 || view.selectionModel.hasSelection)
-                return;
+            ml: MediaLib
 
-            resetFocus();
-        }
+            onCountChanged: {
+                // NOTE: We need to cancel the Drag item manually when resetting. Should this be called
+                //       from 'onModelReset' only ?
+                dragItem.Drag.cancel();
 
-        function onBusynessChanged() {
-            if (transactionPending || loading) {
-                MainCtx.setCursor(root, Qt.BusyCursor)
-                visibilityTimer.start()
-            } else {
-                visibilityTimer.stop()
-                progressIndicator.visible = false
-                MainCtx.unsetCursor(root)
+                if (count === 0 || view.selectionModel.hasSelection)
+                    return;
+
+                resetFocus();
+            }
+
+            function onBusynessChanged() {
+                if (transactionPending || loading) {
+                    MainCtx.setCursor(root, Qt.BusyCursor)
+                    visibilityTimer.start()
+                } else {
+                    visibilityTimer.stop()
+                    progressIndicator.visible = false
+                    MainCtx.unsetCursor(root)
+                }
             }
         }
 
@@ -150,120 +127,110 @@ FocusScope {
             model.loadingChanged.connect(model.onBusynessChanged)
             model.onBusynessChanged()
         }
-    }
 
-    Widgets.ProgressIndicator {
-        id: progressIndicator
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.margins: VLCStyle.margin_small
+        Widgets.ProgressIndicator {
+            id: progressIndicator
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            anchors.margins: VLCStyle.margin_small
 
-        visible: false
+            visible: false
 
-        z: 99
+            z: 99
 
-        text: root.model?.transactionPending ? qsTr("Processing...") : ""
+            text: root.model?.transactionPending ? qsTr("Processing...") : ""
 
-        Timer {
-            id: visibilityTimer
+            Timer {
+                id: visibilityTimer
 
-            interval: VLCStyle.duration_humanMoment
-
-            onTriggered: {
-                progressIndicator.visible = true
-            }
-        }
-    }
-
-    MLDragItem {
-        id: dragItem
-
-        view: view
-
-        indexes: indexesFlat ? view.selectionModel.selectedIndexesFlat
-                             : view.selectionModel.selectedIndexes
-        indexesFlat: !!view.selectionModel.selectedIndexesFlat
-
-        coverRole: "thumbnail"
-
-        defaultCover: root._placeHolder
-    }
-
-
-    PlaylistMediaContextMenu {
-        id: contextMenu
-
-        model: root.model
-        ctx: MainCtx
-
-        function tableView_popup(index, selectedIndexes, globalPos) {
-            popup(selectedIndexes, globalPos)
-        }
-    }
-
-    PlaylistMedia
-    {
-        id: view
-
-        // Settings
-
-        anchors.fill: parent
-
-        focus: (model.count !== 0)
-
-        model: root.model
-
-        dragItem: root.dragItem
-
-        rowContextMenu: contextMenu
-
-        isMusic: root.isMusic
-
-        preferredHeader: Widgets.ViewHeader {
-            view: root.playlistView
-
-            visible: view.count > 0
-
-            text: root.name
-        }
-
-        fadingEdge.enableBeginningFade: root.enableBeginningFade
-        fadingEdge.enableEndFade: root.enableEndFade
-
-        Navigation.parentItem: root
-
-        Navigation.cancelAction: function () {
-            if (view.currentIndex <= 0) {
-                root.Navigation.defaultNavigationCancel()
-            } else {
-                positionViewAtIndex(0, ItemView.Contain)
-
-                setCurrentItem(0)
+                interval: VLCStyle.duration_humanMoment
             }
         }
 
-        // Events
+        MLDragItem {
+            id: dragItem
 
-        onRightClick: (_,_,globalMousePos) => {
-            contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            view: view
+
+            indexes: indexesFlat ? view.selectionModel.selectedIndexesFlat
+                                 : view.selectionModel.selectedIndexes
+            indexesFlat: !!view.selectionModel.selectedIndexesFlat
+
+            coverRole: "thumbnail"
+
+            defaultCover: root._placeHolder
         }
 
-        // Keys
 
-        Keys.onDeletePressed: onDelete()
-    }
+        PlaylistMediaContextMenu {
+            id: contextMenu
 
-    Widgets.EmptyLabelButton {
-        anchors.centerIn: parent
+            model: root.model
+            ctx: MainCtx
 
-        visible: !model.loading && (model.count <= 0)
+           function tableView_popup(index, selectedIndexes, globalPos) {
+               popup(selectedIndexes, globalPos)
+           }
+        }
 
-        focus: visible
+        PlaylistMedia
+        {
+            id: view
 
-        text: qsTr("No media found")
+            // Settings
 
-        cover: root._placeHolder
+            anchors.fill: parent
 
-        Navigation.parentItem: root
+            focus: (model.count !== 0)
+
+            model: root.model
+
+            dragItem: root.dragItem
+
+            rowContextMenu: contextMenu
+
+            isMusic: root.isMusic
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
+
+            Navigation.parentItem: root
+
+            Navigation.cancelAction: function () {
+                if (view.currentIndex <= 0) {
+                    root.Navigation.defaultNavigationCancel()
+                } else {
+                    positionViewAtIndex(0, ItemView.Contain)
+
+                    setCurrentItem(0)
+                }
+            }
+
+            // Events
+
+            onRightClick: (_,_,globalMousePos) => {
+                contextMenu.popup(selectionModel.selectedRows(), globalMousePos)
+            }
+
+            // Keys
+
+            Keys.onDeletePressed: onDelete()
+        }
+
+        Widgets.EmptyLabelButton {
+            anchors.centerIn: parent
+
+            visible: !model.loading && (model.count <= 0)
+
+            focus: visible
+
+            text: qsTr("No media found")
+
+            cover: root._placeHolder
+
+            Navigation.parentItem: root
+        }
     }
 }

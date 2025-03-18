@@ -28,48 +28,15 @@ import VLC.Widgets as Widgets
 import VLC.Style
 import VLC.Menus
 
-FocusScope {
+Widgets.PageExt {
     id: root
 
     // Properties
-
-    property int leftPadding: 0
-    property int rightPadding: 0
-
-    property var sortModel: MainCtx.gridView ? [
-        { text: qsTr("Title"), criteria: "title" },
-        { text: qsTr("Release Year"), criteria: "release_year" },
-    ] : [
-        { text: qsTr("Title"), criteria: "title" },
-        { text: qsTr("Release Year"), criteria: "release_year" },
-        { text: qsTr("Album Title"), criteria: "album_title" },
-        { text: qsTr("Duration"), criteria: "duration" }
-    ]
-
-    property SortMenuAlbums sortMenu: SortMenuAlbums {
-        ctx: MainCtx
-
-        sectionsVisible: !MainCtx.gridView
-    }
-
     property int initialIndex: 0
     property int initialAlbumIndex: 0
     property var artistId: undefined
 
     property var _requestedArtistId: undefined
-
-    //behave like a page
-    property var pagePrefix: []
-
-    property alias displayMarginBeginning: artistList.displayMarginBeginning
-    property alias displayMarginEnd: artistList.displayMarginEnd
-
-    // Currently only respected by the list view:
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
-
-    readonly property bool hasGridListMode: true
-    readonly property bool isSearchable: true
 
     property alias model: artistModel
     property alias selectionModel: selectionModel
@@ -82,6 +49,32 @@ FocusScope {
     property alias currentAlbumIndex: albumSubView.currentIndex
 
     property bool isScreenSmall: VLCStyle.isScreenSmall
+
+    //padding is handled internally
+    leftPadding: 0
+    rightPadding: 0
+
+    hasGridListMode: true
+    isSearchable: true
+
+    //we provide our own header
+    header: null
+
+    sortModel: MainCtx.gridView ? [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+    ] : [
+        { text: qsTr("Title"), criteria: "title" },
+        { text: qsTr("Release Year"), criteria: "release_year" },
+        { text: qsTr("Album Title"), criteria: "album_title" },
+        { text: qsTr("Duration"), criteria: "duration" }
+    ]
+
+    sortMenu: SortMenuAlbums {
+        ctx: MainCtx
+
+        sectionsVisible: !MainCtx.gridView
+    }
 
     onInitialAlbumIndexChanged: resetFocus()
     onInitialIndexChanged: resetFocus()
@@ -195,14 +188,14 @@ FocusScope {
             visible: !VLCStyle.isScreenSmall && (artistModel.count > 0)
             focus: !VLCStyle.isScreenSmall && (artistModel.count > 0)
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
             fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
                                                                           : artistListBackground.alternativeColor
 
             fadingEdge.enableBeginningFade: root.enableBeginningFade
             fadingEdge.enableEndFade: root.enableEndFade
-
-            displayMarginBeginning: root.displayMarginBeginning
-            displayMarginEnd: root.displayMarginEnd
 
             onCurrentIndexChanged: {
                 if (!artistList._sidebarInitialyPositioned)
@@ -293,7 +286,6 @@ FocusScope {
                 visible: view.count > 0
 
                 leftPadding: VLCStyle.margin_normal
-                topPadding: VLCStyle.margin_xlarge
                 bottomPadding: VLCStyle.margin_small
 
                 text: qsTr("Artists")

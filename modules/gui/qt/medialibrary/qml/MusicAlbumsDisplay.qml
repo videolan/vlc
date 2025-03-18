@@ -17,26 +17,33 @@
  *****************************************************************************/
 
 import QtQuick
-
+import QtQuick.Layouts
+import QtQuick.Templates as T
 
 import VLC.MainInterface
 import VLC.Style
 import VLC.Widgets as Widgets
 
-MusicAlbums {
+Widgets.PageExt {
     id: root
 
-    header: Widgets.ViewHeader {
-        view: root
+    title: qsTr("Albums")
 
-        visible: view.count > 0
+    MusicAlbums {
+        anchors.fill: parent
 
-        text: qsTr("Albums")
+        searchPattern: MainCtx.search.pattern
+        sortCriteria: MainCtx.sort.criteria
+        sortOrder: MainCtx.sort.order
+
+
+        displayMarginBeginning: root.displayMarginBeginning
+        displayMarginEnd: root.displayMarginEnd
+
+        enableBeginningFade: root.enableBeginningFade
+        enableEndFade: root.enableEndFade
+
+        onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
     }
 
-    searchPattern: MainCtx.search.pattern
-    sortCriteria: MainCtx.sort.criteria
-    sortOrder: MainCtx.sort.order
-
-    onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 }
