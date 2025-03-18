@@ -78,7 +78,6 @@ T.Page {
     on_FirstChildChanged: {
         if (!_firstChild)
             return
-        _firstChild.focus = true
         _firstChild.Navigation.parentItem = root
         _firstChild.Navigation.upItem = root.header
     }

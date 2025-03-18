@@ -64,6 +64,8 @@ Widgets.PageLoader {
 
                 anchors.fill: parent
 
+                focus: true
+
                 isMusic: false
 
                 searchPattern: MainCtx.search.pattern

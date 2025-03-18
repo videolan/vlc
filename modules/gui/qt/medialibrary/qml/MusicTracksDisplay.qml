@@ -50,6 +50,9 @@ Widgets.PageExt {
     FocusScope {
 
         anchors.fill: parent
+
+        focus: true
+
         // Aliases
 
         property alias leftPadding: tracklistdisplay_id.leftPadding

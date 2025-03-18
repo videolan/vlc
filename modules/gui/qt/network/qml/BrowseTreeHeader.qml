@@ -31,8 +31,12 @@ import VLC.MainInterface
 T.Pane {
     id: root
 
+    signal browse(var tree, int reason)
+    signal homeButtonClicked(int reason)
+
     // Network* model
     required property BaseModel providerModel
+    property var path: providerModel?.path ?? []
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
@@ -43,6 +47,11 @@ T.Pane {
     topPadding: VLCStyle.layoutTitle_top_padding
     bottomPadding: VLCStyle.layoutTitle_bottom_padding
 
+    // FIXME: `GridItem`'s background extends beyond its
+    //        bounding rect, violating the hypothetical
+    //        clip test (see 7e6b23db).
+    bottomInset: MainCtx.gridView ? VLCStyle.gridItemSelectedBorder : undefined
+
     height: implicitHeight
     implicitHeight: layout.implicitHeight + topPadding + bottomPadding
     implicitWidth: layout.implicitWidth + leftPadding + rightPadding
@@ -50,39 +59,51 @@ T.Pane {
     focus: medialibraryBtn.visible
     Navigation.navigable: medialibraryBtn.visible
 
+    background: Rectangle {
+        color: theme.bg.primary
+    }
+
     RowLayout {
         id: layout
 
         anchors.fill: parent
 
-        Widgets.SubtitleLabel {
-            text: providerModel.name
-            color: colorContext.fg.primary
-
+        NetworkAddressbar {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            path: root.path
+
+            onHomeButtonClicked: reason => root.homeButtonClicked(reason)
+
+            onBrowse:  (tree, reason) => root.browse(tree, reason)
         }
 
         Widgets.ButtonExt {
             id: medialibraryBtn
 
-            readonly property NetworkMediaModel networkModel: providerModel as NetworkMediaModel
-
             focus: true
 
-            iconTxt: networkModel?.indexed ? VLCIcons.remove : VLCIcons.add
+            iconTxt: root.providerModel.indexed ? VLCIcons.remove : VLCIcons.add
 
-            text: networkModel?.indexed
+            text: root.providerModel.indexed
                   ? qsTr("Remove from medialibrary")
                   : qsTr("Add to medialibrary")
 
-            visible: providerModel?.canBeIndexed ?? false
+            visible: root.providerModel.canBeIndexed ?? false
 
-            onClicked: networkModel.indexed = !networkModel.indexed
+            onClicked: root.providerModel.indexed = !root.providerModel.indexed
 
             Layout.preferredWidth: implicitWidth
 
             Navigation.parentItem: root
+            Navigation.rightItem: gridSortFilter
+        }
+
+        Widgets.GridSortFilterControls {
+            id: gridSortFilter
+
+            Navigation.leftItem: medialibraryBtn
         }
     }
 }

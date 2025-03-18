@@ -36,7 +36,7 @@ Widgets.PageLoader {
         component: serviceSourceComponent
     }, {
         name: "services_manage",
-        url: "qrc:///qt/qml/VLC/Network/ServicesManage.qml"
+        component: serviceManageComponent
     }, {
         name: "source_root",
         component: sourceRootComponent
@@ -53,7 +53,7 @@ Widgets.PageLoader {
     property bool enableEndFade: true
 
     function _showServiceHome(reason) {
-        History.push([...root.pagePrefix, "services"], reason)
+        History.push([...root.pagePrefix, "all"], reason)
     }
 
     function _showServiceManage(reason) {
@@ -93,12 +93,35 @@ Widgets.PageLoader {
     Component {
         id: serviceSourceComponent
 
-        ServicesSources {
-            onBrowseServiceManage:  (reason) => root._showServiceManage(reason)
-            onBrowseSourceRoot: (name, reason) => root. _showServiceRoot(name, reason)
+        Widgets.PageExt {
+
+            title: qsTr("Services")
+
+            ServicesSources {
+                id: serviceSource
+
+                anchors.fill: parent
+
+                onBrowseServiceManage:  (reason) => root._showServiceManage(reason)
+                onBrowseSourceRoot: (name, reason) => root. _showServiceRoot(name, reason)
+            }
         }
     }
 
+    Component {
+        id: serviceManageComponent
+
+        Widgets.PageExt {
+
+            title: qsTr("Install services")
+
+            ServicesManage {
+                id: serviceSource
+
+                anchors.fill: parent
+            }
+        }
+    }
 
     Component {
         id: sourceRootComponent
@@ -106,15 +129,11 @@ Widgets.PageLoader {
         BrowseTreeDisplay {
             property alias source_name: deviceModel.source_name
 
-            property Component localMenuDelegate: NetworkAddressbar {
-                path: [{display: deviceModel.name, tree: {}}]
-
-                onHomeButtonClicked: _showServiceHome(reason)
-            }
-
             model: deviceModel
             contextMenu: contextMenu
+            headerPath: [{display: deviceModel.name, tree: {}}]
 
+            onHomeButtonClicked: reason => _showServiceHome(reason)
             onBrowse: (tree, reason) => {
                 root._showServiceNode(tree, deviceModel.source_name, reason)
             }
@@ -148,25 +167,13 @@ Widgets.PageLoader {
             property alias tree: mediaModel.tree
             property string source_name
 
-            property Component localMenuDelegate: NetworkAddressbar {
-                path: {
-                    const _path = mediaModel.path
-                    _path.unshift({display: root_name, tree: {"source_name": source_name, "isRoot": true}})
-                    return _path
-                }
-
-                onHomeButtonClicked: root._showServiceHome(reason)
-
-                onBrowse: (tree, reason) => {
-                    if (tree.isRoot)
-                        root._showServiceRoot(source_name, reason)
-                    else
-                        root._showServiceNode(tree, source_name, reason)
-                }
+            onBrowse: (tree, reason) => {
+                if (tree.isRoot)
+                    root._showServiceRoot(source_name, reason)
+                else
+                    root._showServiceNode(tree, source_name, reason)
             }
-
-            onBrowse: (tree, reason) => root._showServiceNode(tree, source_name, reason)
-
+            onHomeButtonClicked: (tree, reason) => root._showServiceHome(reason)
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             model: NetworkMediaModel {
@@ -176,6 +183,13 @@ Widgets.PageLoader {
                 searchPattern: MainCtx.search.pattern
                 sortOrder: MainCtx.sort.order
                 sortCriteria: MainCtx.sort.criteria
+            }
+
+            headerPath:  {
+                let _path =  [{display: mediaModel.name, tree: {"source_name": source_name, "isRoot": true}}]
+                _path.concat(mediaModel.path)
+
+                return _path
             }
 
             contextMenu: NetworkMediaContextMenu {

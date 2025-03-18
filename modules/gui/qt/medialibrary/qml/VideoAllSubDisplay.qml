@@ -75,6 +75,8 @@ Widgets.PageExt {
 
         anchors.fill: parent
 
+        focus: true
+
         model: _meta?.model ?? null
 
         contextMenu: MLContextMenu { model: _meta ? _meta.model : null; showPlayAsAudioAction: true }

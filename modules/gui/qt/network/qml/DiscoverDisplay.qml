@@ -48,8 +48,6 @@ Widgets.PageLoader {
     property bool enableBeginningFade: true
     property bool enableEndFade: true
 
-    localMenuDelegate: menuDelegate
-
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Discover view")
 
@@ -74,27 +72,5 @@ Widgets.PageLoader {
         if (root.isDefaulLoadedForPath([pageName]))
             return
         History.push([...root.pagePrefix, pageName])
-    }
-
-    property ListModel tabModel: ListModel {
-        Component.onCompleted: {
-            pageModel.forEach(function(e) {
-                append({
-                           displayText: e.displayText,
-                           name: e.name,
-                       })
-            })
-        }
-    }
-
-    Component {
-        id: menuDelegate
-
-        Widgets.LocalTabBar {
-            currentView: root.pageName
-            model: tabModel
-
-            onClicked: (index) => root.loadIndex(index)
-        }
     }
 }

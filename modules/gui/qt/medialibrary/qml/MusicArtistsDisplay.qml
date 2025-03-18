@@ -58,6 +58,8 @@ Widgets.PageLoader {
 
                 anchors.fill: parent
 
+                focus: true
+
                 searchPattern: MainCtx.search.pattern
                 sortOrder: MainCtx.sort.order
                 sortCriteria: MainCtx.sort.criteria

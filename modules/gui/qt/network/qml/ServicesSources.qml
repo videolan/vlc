@@ -31,17 +31,14 @@ import VLC.Menus
 Widgets.ExpandGridItemView {
     id: root
 
-    //properties
+    signal browseServiceManage(int reason)
+    signal browseSourceRoot(string sourceName, int reason)
+
 
     readonly property bool hasGridListMode: false
     readonly property bool isSearchable: true
 
-    property var pagePrefix: []
-
-    //signals
-
-    signal browseServiceManage(int reason)
-    signal browseSourceRoot(string sourceName, int reason)
+    focus: true
 
     //settings
 
@@ -50,12 +47,6 @@ Widgets.ExpandGridItemView {
     subtitleHeight: 0
 
     model: sourcesModel
-
-    headerDelegate: Widgets.ViewHeader {
-        view: root
-
-        text: qsTr("Services")
-    }
 
     delegate: Widgets.GridItem {
 

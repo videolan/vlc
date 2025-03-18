@@ -55,6 +55,8 @@ Widgets.PageLoader {
 
                 anchors.fill: parent
 
+                focus: true
+
                 displayMarginBeginning: root.displayMarginBeginning
                 displayMarginEnd: root.displayMarginEnd
 
@@ -86,6 +88,8 @@ Widgets.PageLoader {
                 id: albumsView
 
                 anchors.fill: parent
+
+                focus: true
 
                 searchPattern: MainCtx.search.pattern
                 sortOrder: MainCtx.sort.order

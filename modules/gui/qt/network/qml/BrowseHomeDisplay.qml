@@ -29,16 +29,13 @@ import VLC.Util
 import VLC.Style
 import VLC.Network
 
-FocusScope {
+Widgets.PageExt {
     id: root
 
     // Properties
 
     property bool _initialized: false
     property bool _resetFocusPendingAfterInitialization: false
-
-    property int leftPadding: 0
-    property int rightPadding: 0
 
     property int maximumRows: {
         if (model.searchPattern !== "")
@@ -60,6 +57,7 @@ FocusScope {
     //behave like a Page
     property var pagePrefix: []
 
+
     // Aliases
 
     property alias model: foldersSection.model
@@ -70,6 +68,8 @@ FocusScope {
     signal seeAllFolders(var title, int reason)
 
     signal browse(var tree, int reason)
+
+    title: qsTr("Browse")
 
     focus: true
 
@@ -279,7 +279,7 @@ FocusScope {
 
         for (let i = 0; i < column.count; ++i) {
             const widget = column.itemAt(i)
-            if (widget.activeFocus && widget.visible)
+            if (widget && widget.activeFocus && widget.visible)
                 return
         }
 

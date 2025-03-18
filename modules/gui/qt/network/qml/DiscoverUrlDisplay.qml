@@ -27,26 +27,15 @@ import VLC.Style
 import VLC.Playlist
 import VLC.Network
 
-FocusScope {
+Widgets.PageExt {
     id: root
 
-    // Properties
+    title: qsTr("URL")
 
-    //behave like a Page
-    property var pagePrefix: []
-
-    readonly property bool hasGridListMode: false
-    readonly property bool isSearchable: urlListDisplay.active
+    hasGridListMode: false
+    isSearchable: urlListDisplay.active
                                     && urlListDisplay.item.isSearchable !== undefined
                                     && urlListDisplay.item.isSearchable
-
-    property int leftPadding: 0
-    property int rightPadding: 0
-
-    property int displayMarginEnd: 0
-
-    property bool enableBeginningFade: true
-    property bool enableEndFade: true
 
     //---------------------------------------------------------------------------------------------
     // Functions
@@ -56,81 +45,82 @@ FocusScope {
         searchField.forceActiveFocus(reason);
     }
 
-    //---------------------------------------------------------------------------------------------
-    // Childs
-    //---------------------------------------------------------------------------------------------
-
-    Column {
+    FocusScope {
         anchors.fill: parent
+        focus: true
 
-        FocusScope {
-            id: searchFieldContainer
+        Column {
+            anchors.fill: parent
 
-            width: root.width
-            height: searchField.height + VLCStyle.margin_normal * 2
-            focus: true
+            FocusScope {
+                id: searchFieldContainer
 
-            Navigation.parentItem:  root
-            Navigation.downItem: urlListDisplay.item ?? null
-
-            Widgets.TextFieldExt {
-                id: searchField
-
+                width: parent.width
+                height: searchField.height + VLCStyle.margin_normal * 2
                 focus: true
-                anchors.centerIn: parent
-                height: VLCStyle.dp(32, VLCStyle.scale)
-                width: root.width * .6
-                placeholderText: qsTr("Paste or write the URL here")
-                selectByMouse: true
 
-                onAccepted: {
-                    if (urlListDisplay.status == Loader.Ready)
-                        urlListDisplay.item.model.addAndPlay(text)
-                    else
-                        MainPlaylistController.append([text], true)
-                }
+                Navigation.parentItem:  root
+                Navigation.downItem: urlListDisplay.item ?? null
 
-                Keys.priority: Keys.AfterItem
-                Keys.onPressed: (event) => searchFieldContainer.Navigation.defaultKeyAction(event)
+                Widgets.TextFieldExt {
+                    id: searchField
 
-                //ideally we should use Keys.onShortcutOverride but it doesn't
-                //work with TextField before 5.13 see QTBUG-68711
-                onActiveFocusChanged: {
-                    if (activeFocus)
-                        MainCtx.useGlobalShortcuts = false
-                    else
-                        MainCtx.useGlobalShortcuts = true
+                    focus: true
+                    anchors.centerIn: parent
+                    height: VLCStyle.dp(32, VLCStyle.scale)
+                    width: parent.width * .6
+                    placeholderText: qsTr("Paste or write the URL here")
+                    selectByMouse: true
+
+                    onAccepted: {
+                        if (urlListDisplay.status == Loader.Ready)
+                            urlListDisplay.item.model.addAndPlay(text)
+                        else
+                            MainPlaylistController.append([text], true)
+                    }
+
+                    Keys.priority: Keys.AfterItem
+                    Keys.onPressed: (event) => searchFieldContainer.Navigation.defaultKeyAction(event)
+
+                    //ideally we should use Keys.onShortcutOverride but it doesn't
+                    //work with TextField before 5.13 see QTBUG-68711
+                    onActiveFocusChanged: {
+                        if (activeFocus)
+                            MainCtx.useGlobalShortcuts = false
+                        else
+                            MainCtx.useGlobalShortcuts = true
+                    }
                 }
             }
-        }
 
-        Loader {
-            id: urlListDisplay
+            Loader {
+                id: urlListDisplay
 
-            width: parent.width
-            height: parent.height - searchFieldContainer.height
+                width: parent.width
+                height: parent.height - searchFieldContainer.height
 
-            active: MainCtx.mediaLibraryAvailable
-            source: "qrc:///qt/qml/VLC/MediaLibrary/UrlListDisplay.qml"
+                active: MainCtx.mediaLibraryAvailable
+                source: "qrc:///qt/qml/VLC/MediaLibrary/UrlListDisplay.qml"
 
-            onLoaded: {
-                item.leftPadding = Qt.binding(function() {
-                    return root.leftPadding
-                })
+                onLoaded: {
+                    item.leftPadding = Qt.binding(function() {
+                        return root.leftPadding
+                    })
 
-                item.rightPadding = Qt.binding(function() {
-                    return root.rightPadding
-                })
+                    item.rightPadding = Qt.binding(function() {
+                        return root.rightPadding
+                    })
 
-                item.displayMarginEnd = Qt.binding(() => { return root.displayMarginEnd })
+                    item.displayMarginEnd = Qt.binding(() => { return root.displayMarginEnd })
 
-                item.fadingEdge.enableBeginningFade = Qt.binding(() => { return root.enableBeginningFade })
-                item.fadingEdge.enableEndFade = Qt.binding(() => { return root.enableEndFade })
+                    item.fadingEdge.enableBeginningFade = Qt.binding(() => { return root.enableBeginningFade })
+                    item.fadingEdge.enableEndFade = Qt.binding(() => { return root.enableEndFade })
 
-                item.Navigation.upItem = searchField
-                item.Navigation.parentItem =  root
+                    item.Navigation.upItem = searchField
+                    item.Navigation.parentItem =  root
 
-                item.searchPattern = Qt.binding(() => MainCtx.search.pattern)
+                    item.searchPattern = Qt.binding(() => MainCtx.search.pattern)
+                }
             }
         }
     }

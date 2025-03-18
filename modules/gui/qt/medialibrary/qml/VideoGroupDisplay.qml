@@ -52,6 +52,8 @@ Widgets.PageExt {
 
         anchors.fill: parent
 
+        focus: true
+
         displayMarginBeginning: root.displayMarginBeginning
         displayMarginEnd: root.displayMarginEnd
         enableBeginningFade: root.enableBeginningFade
