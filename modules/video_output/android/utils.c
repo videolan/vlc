@@ -40,6 +40,7 @@
 
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurface)(JNIEnv*, jobject);
 typedef ANativeWindow* (*ptr_ANativeWindow_fromSurfaceTexture)(JNIEnv*, jobject);
+typedef void (*ptr_ANativeWindow_acquire)(ANativeWindow*);
 typedef void (*ptr_ANativeWindow_release)(ANativeWindow*);
 
 typedef void (*ptr_ASurfaceTexture_getTransformMatrix)
@@ -130,6 +131,7 @@ struct AWindowHandler
 
     void *p_anw_dl;
     ptr_ANativeWindow_fromSurface pf_winFromSurface;
+    ptr_ANativeWindow_acquire pf_winAcquire;
     ptr_ANativeWindow_release pf_winRelease;
     native_window_api_t anw_api;
 
@@ -321,6 +323,7 @@ static void
 LoadNativeSurfaceAPI(AWindowHandler *p_awh)
 {
     p_awh->pf_winFromSurface = NativeSurface_fromSurface;
+    p_awh->pf_winAcquire = NULL;
     p_awh->pf_winRelease = NativeSurface_release;
     p_awh->anw_api.winLock = NativeSurface_lock;
     p_awh->anw_api.unlockAndPost = NativeSurface_unlockAndPost;
@@ -574,12 +577,13 @@ LoadNativeWindowAPI(AWindowHandler *p_awh)
     }
 
     p_awh->pf_winFromSurface = dlsym(p_library, "ANativeWindow_fromSurface");
+    p_awh->pf_winAcquire = dlsym(p_library, "ANativeWindow_acquire");
     p_awh->pf_winRelease = dlsym(p_library, "ANativeWindow_release");
     p_awh->anw_api.winLock = dlsym(p_library, "ANativeWindow_lock");
     p_awh->anw_api.unlockAndPost = dlsym(p_library, "ANativeWindow_unlockAndPost");
     p_awh->anw_api.setBuffersGeometry = dlsym(p_library, "ANativeWindow_setBuffersGeometry");
 
-    if (p_awh->pf_winFromSurface && p_awh->pf_winRelease
+    if (p_awh->pf_winFromSurface && p_awh->pf_winAcquire && p_awh->pf_winRelease
      && p_awh->anw_api.winLock && p_awh->anw_api.unlockAndPost
      && p_awh->anw_api.setBuffersGeometry)
     {
@@ -844,6 +848,38 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
     p_awh->capabilities |= AWH_CAPS_SURFACE_VIEW;
 
     return p_awh;
+}
+
+AWindowHandler *
+AWindowHandler_newFromANWs(vlc_object_t *obj, ANativeWindow *video,
+                           ANativeWindow *subtitle)
+{
+    (void) obj;
+    AWindowHandler *awh = calloc(1, sizeof(AWindowHandler));
+    if (!awh)
+        return NULL;
+
+    awh->p_jvm = NULL;
+    awh->jobj = NULL;
+    awh->jfields = (struct vlc_android_jfields) { .AWindow.clazz = NULL };
+    awh->wnd = NULL;
+
+    LoadNativeWindowAPI(awh);
+    if (awh->pf_winAcquire == NULL)
+    {
+        free(awh);
+        return NULL;
+    }
+
+    awh->views[AWindow_Video].p_anw = video;
+    awh->pf_winAcquire(video);
+    awh->capabilities = 0;
+
+    awh->views[AWindow_Subtitles].p_anw = subtitle;
+    if (subtitle != NULL)
+        awh->pf_winAcquire(subtitle);
+
+    return awh;
 }
 
 static void

@@ -130,6 +130,10 @@ struct vlc_asurfacetexture_operations
 AWindowHandler *AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events);
 void AWindowHandler_destroy(AWindowHandler *p_awh);
 
+AWindowHandler *
+AWindowHandler_newFromANWs(vlc_object_t *obj, ANativeWindow *video,
+                           ANativeWindow *subtitle);
+
 /**
  * Get the public native window API
  *
