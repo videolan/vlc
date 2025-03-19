@@ -521,9 +521,11 @@ static EGLSurface CreateSurface(vlc_gl_t *gl, EGLDisplay dpy, EGLConfig config,
         AWindowHandler_getANativeWindow(gl->surface->display.anativewindow,
                                         gl->surface->handle.android_id);
 
+    if (anw == NULL)
+        return EGL_NO_SURFACE;
+
     (void) width; (void) height;
-    return (anw != NULL) ? eglCreateWindowSurface(dpy, config, anw, NULL)
-                         : EGL_NO_SURFACE;
+    return eglCreateWindowSurface(dpy, config, anw, NULL);
 }
 
 static void ReleaseDisplay(vlc_gl_t *gl)
