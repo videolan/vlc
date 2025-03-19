@@ -60,8 +60,6 @@ FocusScope {
 
     // Settings
 
-    layer.enabled: (StackView.status === StackView.Deactivating || StackView.status === StackView.Activating)
-
     Accessible.role: Accessible.Client
     Accessible.name: qsTr("Player")
 
