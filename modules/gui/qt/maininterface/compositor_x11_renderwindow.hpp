@@ -222,6 +222,8 @@ private:
 
     CompositorX11UISurface* m_interfaceWindow = nullptr;
     std::unique_ptr<CompositorX11RenderClient> m_interfaceClient;
+
+    QWindow::Visibility m_lastVisibility;
 };
 
 }

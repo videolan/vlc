@@ -352,6 +352,27 @@ CompositorX11RenderWindow::CompositorX11RenderWindow(qt_intf_t* p_intf, xcb_conn
     setVisible(true);
 
     m_wid = winId();
+
+    m_lastVisibility = visibility();
+
+    connect(this, &QWindow::visibilityChanged, this, [this](QWindow::Visibility visibility) {
+        if (visibility == QWindow::Visibility::Minimized)
+        {
+            // Hidden is handled in `QWindow::hideEvent()`.
+            emit visiblityChanged(false);
+        }
+        else if (m_lastVisibility == QWindow::Visibility::Minimized && visibility != QWindow::Visibility::Hidden)
+        {
+            // Show is handled in `QWindow::showEvent()`.
+            // Expose is handled in `QWindow::exposeEvent()`. However, KWin X11 does not send expose event when
+            // a window is restored from minimized state.
+            resetClientPixmaps();
+            emit visiblityChanged(true);
+            emit requestUIRefresh();
+        }
+
+        m_lastVisibility = visibility;
+    });
 }
 
 CompositorX11RenderWindow::~CompositorX11RenderWindow()
