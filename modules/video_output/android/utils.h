@@ -35,6 +35,8 @@
 
 /* AWH using a VideoLAN AWindow helpers */
 #define AWH_CAPS_SET_VIDEO_LAYOUT 0x1
+/* AWH backed by a Android SurfaceView */
+#define AWH_CAPS_SURFACE_VIEW 0x2
 
 typedef struct AWindowHandler AWindowHandler;
 typedef struct ASurfaceTexture ASurfaceTexture;

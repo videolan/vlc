@@ -841,6 +841,8 @@ AWindowHandler_new(vlc_object_t *obj, vlc_window_t *wnd, awh_events_t *p_events)
         free(vout_modules);
     }
 
+    p_awh->capabilities |= AWH_CAPS_SURFACE_VIEW;
+
     return p_awh;
 }
 
