@@ -204,15 +204,16 @@ void CompositorX11UISurface::destroyFbo()
     }
 }
 
-void CompositorX11UISurface::render()
+bool CompositorX11UISurface::render()
 {
     if (!isExposed())
-        return;
+        return false;
 
     if (m_context)
     {
         const bool current = m_context->makeCurrent(this);
-        assert(current);
+        if (!current)
+            return false;
         m_uiRenderControl->beginFrame();
     }
 
@@ -250,6 +251,8 @@ void CompositorX11UISurface::render()
     emit m_uiWindow->frameSwapped();
 
     emit updated();
+
+    return true;
 }
 
 void CompositorX11UISurface::updateSizes()
@@ -411,18 +414,21 @@ bool CompositorX11UISurface::eventFilter(QObject*, QEvent *event)
     return false;
 }
 
-void CompositorX11UISurface::resizeFbo()
+bool CompositorX11UISurface::resizeFbo()
 {
     if (m_rootItem)
     {
         const bool current = m_context->makeCurrent(this);
-        assert(current);
+        if (!current)
+            return false;
         destroyFbo();
         createFbo();
         m_context->doneCurrent();
         updateSizes();
         render();
+        return true;
     }
+    return false;
 }
 
 void CompositorX11UISurface::applyNvidiaWorkaround(QSurfaceFormat &format)

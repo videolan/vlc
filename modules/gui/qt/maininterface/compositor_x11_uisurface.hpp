@@ -57,7 +57,7 @@ public:
     explicit CompositorX11UISurface(QWindow* window, QScreen *screen = nullptr);
     ~CompositorX11UISurface();
 
-    virtual void render();
+    virtual bool render();
 
     bool handleWindowEvent(QEvent *event);
 
@@ -91,7 +91,7 @@ protected:
 
     void createFbo();
     void destroyFbo();
-    void resizeFbo();
+    bool resizeFbo();
 
 private:
     static void applyNvidiaWorkaround(QSurfaceFormat& format);
