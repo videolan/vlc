@@ -100,7 +100,7 @@
         songDetailString = item.artistName;
     }
 
-    if (songDetailString) {
+    if (songDetailString && ![songDetailString isEqualToString:@""]) {
         self.mediaTitleTextField.hidden = YES;
         self.secondaryMediaTitleTextField.hidden = NO;
         self.artistTextField.hidden = NO;
