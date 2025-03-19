@@ -42,7 +42,29 @@ VideoAll {
 
     // Private
 
-    property var _meta: null
+    readonly property QtObject _meta: {
+        const grouping = MainCtx.grouping;
+
+        if (grouping === MainCtx.GROUPING_NAME)
+            return groupComponent.createObject()
+        else if (grouping === MainCtx.GROUPING_FOLDER)
+            return folderComponent.createObject()
+        else
+            return videoComponent.createObject()
+    }
+
+    on_MetaChanged: {
+        // Purge the objects that are pending deletion, to have the model
+        // preservation behavior aligned with 460cd3d4. If we don't do
+        // this, the QML/JS engine would pick an arbitrary time to collect
+        // garbage, potentially leading having all models alive at the
+        // same time:
+        // > having the three models always present, means that the data (at
+        // > least the first chuck) is loaded 3 times, and will be reloaded
+        // > 3 times every time a database event triggers a refresh of the
+        // > model.
+        gc() // `QJSEngine::GarbageCollectionExtension` is installed by default
+    }
 
     // Signals
 
@@ -63,19 +85,6 @@ VideoAll {
     headerPositioning: headerItem.model.count > 0 ? ListView.InlineHeader : ListView.OverlayHeader
 
     // Functions
-
-    function _updateMetaModel(groupping) {
-        if (root._meta)
-            root._meta.destroy()
-
-        if (groupping === MainCtx.GROUPING_NAME) {
-            root._meta = groupComponent.createObject(root)
-        } else if (groupping === MainCtx.GROUPING_FOLDER) {
-            root._meta = folderComponent.createObject(root)
-        } else {
-            root._meta = videoComponent.createObject(root)
-        }
-    }
 
     function getLabelGroup(model, string) {
         if (!model) return ""
@@ -103,15 +112,6 @@ VideoAll {
     }
 
     // Children
-
-    Connections {
-        target: MainCtx
-        function onGroupingChanged() {
-            root._updateMetaModel(MainCtx.grouping)
-        }
-    }
-
-    Component.onCompleted: root._updateMetaModel(MainCtx.grouping)
 
     Component {
         id: videoComponent
