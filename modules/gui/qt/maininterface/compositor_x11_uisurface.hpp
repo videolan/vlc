@@ -89,8 +89,11 @@ protected:
 
     void updateSizes();
 
+    // WARNING: The OpenGL context must be made current against this window before calling these methods:
     void createFbo();
     void destroyFbo();
+
+    // NOTE: This method attempts to make the OpenGL context current against this window:
     bool resizeFbo();
 
 private:

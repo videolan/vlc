@@ -89,8 +89,21 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
 
     if (m_context)
     {
-        connect(m_uiWindow, &QQuickWindow::sceneGraphInitialized, this, &CompositorX11UISurface::createFbo);
-        connect(m_uiWindow, &QQuickWindow::sceneGraphInvalidated, this, &CompositorX11UISurface::destroyFbo);
+        connect(m_uiWindow, &QQuickWindow::sceneGraphInitialized, this, [this]() {
+            assert(m_context);
+            const bool ret = m_context->makeCurrent(this);
+            assert(ret); // initial fbo creation must succeed
+            createFbo();
+            m_context->doneCurrent();
+        });
+        connect(m_uiWindow, &QQuickWindow::sceneGraphInvalidated, this, [this]() {
+            assert(m_context);
+            if (Q_LIKELY(m_context->makeCurrent(this)))
+            {
+                destroyFbo();
+                m_context->doneCurrent();
+            }
+        });
     }
 
     connect(m_uiWindow, &QQuickWindow::beforeRendering, this, &CompositorX11UISurface::beforeRendering);
