@@ -186,11 +186,13 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
     self.mediaItemActorsTitleTextField.hidden = self.mediaItemActorsTextField.hidden;
     self.mediaItemActorsTextField.stringValue = actors;
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
-        if (self.representedItem.item != actualItem) {
+        if (!weakSelf || weakSelf.representedItem.item != actualItem) {
             return;
         }
-        self->_mediaItemArtworkImageView.image = thumbnail;
+        VLCLibraryCollectionViewMediaItemSupplementaryDetailView * const strongSelf = weakSelf;
+        strongSelf->_mediaItemArtworkImageView.image = thumbnail;
     }];
 }
 

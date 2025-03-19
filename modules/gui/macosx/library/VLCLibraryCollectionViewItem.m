@@ -219,12 +219,13 @@ const CGFloat VLCLibraryCollectionViewItemMaximumDisplayedProgress = 0.95;
     self.mediaTitleTextField.stringValue = actualItem.displayString;
     self.secondaryInfoTextField.stringValue = actualItem.primaryDetailString;
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem
                                    withCompletion:^(NSImage * const thumbnail) {
-        if (self.representedItem.item != actualItem) {
+        if (!weakSelf || weakSelf.representedItem.item != actualItem) {
             return;
         }
-        self.mediaImageView.image = thumbnail;
+        weakSelf.mediaImageView.image = thumbnail;
     }];
 
     if ([actualItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {

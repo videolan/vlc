@@ -147,19 +147,17 @@ NSCollectionViewSupplementaryElementKind const VLCLibraryCollectionViewMediaItem
             secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
+    __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [VLCLibraryImageCache thumbnailForLibraryItem:item withCompletion:^(NSImage * const thumbnail) {
-        if (self.representedItem.item != item) {
+        if (!weakSelf || weakSelf.representedItem.item != item) {
             return;
         }
-        self.artworkImageView.image = thumbnail;
+        weakSelf.artworkImageView.image = thumbnail;
     }];
 
-    __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [_tracksDataSource setRepresentedItem:item withCompletion:^{
-        __strong typeof(self) strongSelf = weakSelf;
-
-        if (strongSelf) {
-            [strongSelf.tableView reloadData];
+        if (weakSelf) {
+            [weakSelf.tableView reloadData];
         }
     }];
 }

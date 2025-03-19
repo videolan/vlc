@@ -327,14 +327,14 @@ const CGFloat VLCLibraryAlbumTableCellViewDefaultHeight = 168.;
         self.genreNameTextButton.contentTintColor = secondaryActionableDetail ? NSColor.secondaryLabelColor : NSColor.tertiaryLabelColor;
     }
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:album withCompletion:^(NSImage * const thumbnail) {
-        if (self.representedItem.item != album) {
+        if (!weakSelf || weakSelf.representedItem.item != album) {
             return;
         }
-        self.representedImageView.image = thumbnail;
+        weakSelf.representedImageView.image = thumbnail;
     }];
 
-    __weak typeof(self) weakSelf = self; // Prevent retain cycle
     [_tracksDataSource setRepresentedItem:album withCompletion:^{
         __strong typeof(self) strongSelf = weakSelf;
 

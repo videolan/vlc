@@ -138,12 +138,14 @@ NSString *VLCMediaSourceCellIdentifier = @"VLCLibraryCellIdentifier";
     VLCInputItem * const inputItem = _representedInputItem;
     _mediaTitleTextField.stringValue = inputItem.name;
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForInputItem:inputItem
                                  withCompletion:^(NSImage * const thumbnail) {
-        if (self->_representedInputItem != inputItem) {
+        VLCMediaSourceCollectionViewItem * const strongSelf = weakSelf;
+        if (!strongSelf || strongSelf->_representedInputItem != inputItem) {
             return;
         }
-        self->_mediaImageView.image = thumbnail;
+        strongSelf->_mediaImageView.image = thumbnail;
     }];
 
 

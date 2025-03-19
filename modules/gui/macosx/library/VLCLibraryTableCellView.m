@@ -81,11 +81,12 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.playInstantlyButton.action = @selector(playMediaItemInstantly:);
     self.playInstantlyButton.target = self;
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const thumbnail) {
-        if (self.representedItem.item != actualItem) {
+        if (!weakSelf || weakSelf.representedItem.item != actualItem) {
             return;
         }
-        self.representedImageView.image = thumbnail;
+        weakSelf.representedImageView.image = thumbnail;
     }];
 
     if(actualItem.primaryDetailString.length > 0) {
@@ -107,11 +108,13 @@ NSString * const VLCLibraryTableCellViewIdentifier = @"VLCLibraryTableCellViewId
     self.singlePrimaryTitleTextField.hidden = NO;
     self.singlePrimaryTitleTextField.stringValue = _representedInputItem.name;
 
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForInputItem:self->_representedInputItem withCompletion:^(NSImage * const thumbnail) {
-        if (representedInputItem != self->_representedInputItem) {
+        VLCLibraryTableCellView * const strongSelf = weakSelf;
+        if (!strongSelf || representedInputItem != strongSelf->_representedInputItem) {
             return;
         }
-        self->_representedImageView.image = thumbnail;
+        strongSelf->_representedImageView.image = thumbnail;
     }];
 
     self.trackingView.viewToHide = self.playInstantlyButton;

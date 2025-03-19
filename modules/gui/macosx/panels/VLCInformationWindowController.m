@@ -308,6 +308,7 @@ _##field##TextField.delegate = self
 
     NSMutableSet * const artworkMrlSet = NSMutableSet.set;
 
+    __weak typeof(self) weakSelf = self;
     const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_libraryitemimg_queue", 0);
     dispatch_async(queue, ^{
         NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
@@ -329,7 +330,7 @@ _##field##TextField.delegate = self
                     dispatch_group_enter(group);
                     [VLCLibraryImageCache thumbnailForLibraryItem:mediaItem
                                                    withCompletion:^(NSImage * const image) {
-                        if (nonMutableInputItems != self.representedInputItems) {
+                        if (!weakSelf || nonMutableInputItems != weakSelf.representedInputItems) {
                             dispatch_group_leave(group);
                             return;
                         }
@@ -380,6 +381,7 @@ _##field##TextField.delegate = self
     NSParameterAssert(representedInputItems.count > 0);
     _representedInputItems = representedInputItems;
 
+    __weak typeof(self) weakSelf = self;
     const dispatch_queue_t queue = dispatch_queue_create("vlc_infowindow_inputitemimg_queue", 0);
     dispatch_async(queue, ^{
         NSMutableArray<NSImage *> * const artworkImages = NSMutableArray.array;
@@ -390,7 +392,7 @@ _##field##TextField.delegate = self
                 dispatch_group_enter(group);
                 [VLCLibraryImageCache thumbnailForInputItem:item
                                              withCompletion:^(NSImage * const image) {
-                    if (representedInputItems != self.representedInputItems) {
+                    if (!weakSelf || representedInputItems != weakSelf.representedInputItems) {
                         dispatch_group_leave(group);
                         return;
                     }

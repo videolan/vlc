@@ -78,12 +78,13 @@
 
 - (void)setRepresentedPlayQueueItem:(VLCPlayQueueItem *)item
 {
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
-        if (item != self.representedPlayQueueItem) {
+        if (!weakSelf || item != weakSelf.representedPlayQueueItem) {
             return;
         }
-        self.audioArtworkImageView.image = thumbnail;
-        self.mediaImageView.image = thumbnail;
+        weakSelf.audioArtworkImageView.image = thumbnail;
+        weakSelf.mediaImageView.image = thumbnail;
     }];
 
     const BOOL validArtistString = item.artistName && item.artistName.length > 0;

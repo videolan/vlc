@@ -62,12 +62,13 @@
         VLCMain.sharedInstance.playQueueController.playerController;
     VLCInputItem * const currentInputItem = controller.currentMedia;
     if (controller.currentMedia) {
+        __weak typeof(self) weakSelf = self;
         [VLCLibraryImageCache thumbnailForInputItem:currentInputItem
                                      withCompletion:^(NSImage * const thumbnail) {
             if (currentInputItem != controller.currentMedia) {
                 return;
             }
-            [self setCoverArt:thumbnail];
+            [weakSelf setCoverArt:thumbnail];
         }];
     }
 }

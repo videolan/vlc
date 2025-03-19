@@ -65,11 +65,13 @@
     const id<VLCMediaLibraryItemProtocol> actualItem = self.representedItem.item;
     self.titleTextField.stringValue = actualItem.displayString;
     self.detailTextField.stringValue = actualItem.primaryDetailString;
+
+    __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForLibraryItem:actualItem withCompletion:^(NSImage * const image) {
-        if (self.representedItem.item != actualItem) {
+        if (!weakSelf || weakSelf.representedItem.item != actualItem) {
             return;
         }
-        self.largeImageView.image = image;
+        weakSelf.largeImageView.image = image;
     }];
 }
 
