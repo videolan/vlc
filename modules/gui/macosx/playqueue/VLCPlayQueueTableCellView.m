@@ -78,6 +78,8 @@
 
 - (void)setRepresentedPlayQueueItem:(VLCPlayQueueItem *)item
 {
+    _representedPlayQueueItem = item;
+
     __weak typeof(self) weakSelf = self;
     [VLCLibraryImageCache thumbnailForPlayQueueItem:item withCompletion:^(NSImage * const thumbnail) {
         if (!weakSelf || item != weakSelf.representedPlayQueueItem) {
@@ -120,8 +122,6 @@
     }
 
     self.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
-
-    _representedPlayQueueItem = item;
 }
 
 @end
