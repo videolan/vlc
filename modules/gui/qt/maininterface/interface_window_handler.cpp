@@ -162,9 +162,7 @@ InterfaceWindowHandler::~InterfaceWindowHandler()
 
 void InterfaceWindowHandler::updateCSDWindowSettings()
 {
-    m_window->hide(); // some window managers don't like to change frame window hint on visible window
     m_window->setFlag(Qt::FramelessWindowHint, m_mainCtx->useClientSideDecoration());
-    m_window->setVisible(true);
 }
 
 bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
