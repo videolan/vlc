@@ -191,12 +191,27 @@ bool QSGTextureView::isAtlasTexture() const
 
 QSGTexture *QSGTextureView::removedFromAtlas(QRhiResourceUpdateBatch *batch) const
 {
-    Q_UNUSED(batch);
+    assert(m_texture); // it is absurd to call removedFromAtlas() when there is no target
 
-    // QSGTextureView does not remove the source texture from the atlas. Removing
-    // from atlas means copying the texture, and this is not necessary. Shaders
-    // support atlas texture by having `qt_SubRect_X` uniform, or, in the case
-    // of `ShaderEffect`, `supportsAtlasTextures` is set.
+    // We can "remove" the target texture from the atlas, and re-attach the view to the detached texture.
+    // It should be noted that this method does not mutate the target texture, which can be guessed by
+    // the method signature (being a const method), but rather creates a new texture which is an independent
+    // texture that has its content copied from the atlas texture (still owned by the atlas texture).
+    // This would not cause a leak, because:
+    // 1) we are not owning the atlas texture (current view target) here.
+    // 2) the returned (detached) texture is owned by the atlas texture (current view target).
+    QSGTexture *const detachedTexture = m_texture->removedFromAtlas(batch);
+    if (Q_LIKELY(detachedTexture))
+    {
+        // This virtual method is const, which is fine for QSGTexture (removing
+        // from atlas means returning a new image which is a copy from the relevant
+        // part of the atlas), but not for QSGTextureView, because the texture view
+        // needs to mutate to point to the detached texture. There is not much to
+        // do besides 1) creating a new QSGTextureView and returning it, and leaking
+        // this instance 2) using const cast.
+        const_cast<QSGTextureView*>(this)->setTexture(detachedTexture);
+        return const_cast<QSGTextureView*>(this);
+    }
 
     return nullptr;
 }
