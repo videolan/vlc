@@ -31,15 +31,4 @@ MultiEffect {
     autoPaddingEnabled: false
 
     property alias radius: effect.blurMax
-
-    onChildrenChanged: {
-        for (let i in children) {
-            if (children[i] instanceof ShaderEffect) {
-                // Qt creates multiple ShaderEffect, depending
-                // on parameters. They support atlas/sub textures
-                // but Qt does not set `supportsAtlasTextures`:
-                children[i].supportsAtlasTextures = true
-            }
-        }
-    }
 }
