@@ -241,12 +241,7 @@ Item {
                 if (drop.hasUrls) {
 
                     for (let i = 0; i < drop.urls.length; i++)
-                    {
-                        /* First decode the URL since we'll re-encode it
-                           afterwards, while fixing the non-encoded spaces. */
-                        let url = decodeURIComponent(drop.urls[i]);
-                        urls.push(url);
-                    }
+                        urls.push(drop.urls[i])
 
                 } else if (drop.hasText) {
                     /* Browsers give content as text if you dnd the addressbar,
