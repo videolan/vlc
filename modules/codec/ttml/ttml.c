@@ -129,7 +129,7 @@ const char * tt_namespaces_GetPrefix( const tt_namespaces_t *nss,
 void tt_namespaces_Register( tt_namespaces_t *nss, const char *psz_prefix,
                              const char *psz_uri )
 {
-    if( tt_namespaces_GetPrefix( nss, psz_uri ) )
+    if( !psz_uri || tt_namespaces_GetPrefix( nss, psz_uri ) )
         return;
     struct tt_namespace_s *ns = malloc(sizeof(*ns));
     if( ns )

@@ -174,7 +174,7 @@ static int ReadTTML( demux_t* p_demux )
                 break;
 
             case XML_READER_STARTELEM:
-                if( strcmp( psz_node_namespace, TT_NS ) ||
+                if( (psz_node_namespace && strcmp( psz_node_namespace, TT_NS )) ||
                     strcmp( tt_LocalName( psz_node_name ), "tt" ) ||
                     p_sys->p_rootnode != NULL )
                     return VLC_EGENERIC;
