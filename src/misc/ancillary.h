@@ -23,33 +23,25 @@
 
 #include <vlc_ancillary.h>
 
-/*
- * A NULL terminated array of struct vlc_ancillary *. We don't use a
- * vlc_vector here in orer to gain few bytes (2 * size_t) for each
- * ancillary users (each vlc_frame_t/picture_t). Users will likely have one
- * or zero ancillary so the optimisations of the vlc_vector are not
- * important here.
- */
-
 static inline void
-vlc_ancillary_array_Init(struct vlc_ancillary ***array)
+vlc_ancillary_array_Init(vlc_ancillary_array *array)
 {
-    *array = NULL;
+    vlc_vector_init(array);
 }
 
 void
-vlc_ancillary_array_Clear(struct vlc_ancillary ***array);
+vlc_ancillary_array_Clear(vlc_ancillary_array *array);
 
 int
-vlc_ancillary_array_Dup(struct vlc_ancillary ***dst_array,
-                        struct vlc_ancillary ** const*src_array);
+vlc_ancillary_array_Dup(vlc_ancillary_array *dst_array,
+                        const vlc_ancillary_array *src_array);
 
 int
-vlc_ancillary_array_Insert(struct vlc_ancillary ***array,
+vlc_ancillary_array_Insert(vlc_ancillary_array *array,
                            struct vlc_ancillary *ancillary);
 
 struct vlc_ancillary *
-vlc_ancillary_array_Get(struct vlc_ancillary ** const*array,
+vlc_ancillary_array_Get(const vlc_ancillary_array *array,
                         vlc_ancillary_id id);
 
 #endif /* VLC_ANCILLARY_INTERNAL_H */

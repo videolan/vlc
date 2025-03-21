@@ -23,7 +23,7 @@
 
 #include <vlc_picture.h>
 #include <vlc_list.h>
-struct vlc_ancillary;
+#include <vlc_ancillary.h>
 
 typedef struct
 {
@@ -37,9 +37,7 @@ typedef struct
     void *pool; /* Only used by picture_pool.c */
     struct vlc_list pool_node; /* Only used by picture_pool.c */
 
-    /** Private ancillary struct. Don't use it directly, but use it via
-     * picture_AttachAncillary() and picture_GetAncillary(). */
-    struct vlc_ancillary **ancillaries;
+    vlc_ancillary_array ancillaries;
 } picture_priv_t;
 
 void *picture_Allocate(int *, size_t);

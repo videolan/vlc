@@ -24,9 +24,8 @@
 #define VLC_FRAME_H 1
 
 #include <vlc_tick.h>
+#include <vlc_ancillary.h>
 
-struct vlc_ancillary;
-typedef uint32_t vlc_ancillary_id;
 
 /**
  * \defgroup frame Frames
@@ -134,9 +133,7 @@ struct vlc_frame_t
     vlc_tick_t  i_dts;
     vlc_tick_t  i_length;
 
-    /** Private ancillary struct. Don't use it directly, but use it via
-     * vlc_frame_AttachAncillary() and vlc_frame_GetAncillary(). */
-    struct vlc_ancillary **priv_ancillaries;
+    vlc_ancillary_array ancillaries;
 
     const struct vlc_frame_callbacks *cbs;
 };

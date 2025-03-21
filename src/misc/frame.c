@@ -65,8 +65,8 @@ static void vlc_frame_Check (vlc_frame_t *frame)
 
 void vlc_frame_CopyProperties(vlc_frame_t *restrict dst, const vlc_frame_t *src)
 {
-    vlc_ancillary_array_Dup(&dst->priv_ancillaries,
-                            &src->priv_ancillaries);
+    vlc_ancillary_array_Dup(&dst->ancillaries,
+                            &src->ancillaries);
 
     dst->i_flags   = src->i_flags;
     dst->i_nb_samples = src->i_nb_samples;
@@ -99,7 +99,7 @@ vlc_frame_t *vlc_frame_Init(vlc_frame_t *restrict f, const struct vlc_frame_call
     f->i_pts =
     f->i_dts = VLC_TICK_INVALID;
     f->i_length = 0;
-    vlc_ancillary_array_Init(&f->priv_ancillaries);
+    vlc_ancillary_array_Init(&f->ancillaries);
     f->cbs = cbs;
     return f;
 }
@@ -161,7 +161,7 @@ void vlc_frame_Release(vlc_frame_t *frame)
     frame->p_next = NULL;
     vlc_frame_Check (frame);
 #endif
-    vlc_ancillary_array_Clear(&frame->priv_ancillaries);
+    vlc_ancillary_array_Clear(&frame->ancillaries);
 
     frame->cbs->free(frame);
 }
@@ -562,11 +562,11 @@ vlc_frame_t *vlc_frame_FilePath(const char *path, bool write)
 int
 vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary)
 {
-    return vlc_ancillary_array_Insert(&frame->priv_ancillaries, ancillary);
+    return vlc_ancillary_array_Insert(&frame->ancillaries, ancillary);
 }
 
 struct vlc_ancillary *
 vlc_frame_GetAncillary(vlc_frame_t *frame, vlc_ancillary_id id)
 {
-    return vlc_ancillary_array_Get(&frame->priv_ancillaries, id);
+    return vlc_ancillary_array_Get(&frame->ancillaries, id);
 }

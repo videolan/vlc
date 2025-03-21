@@ -21,6 +21,7 @@
 #ifndef VLC_ANCILLARY_H
 #define VLC_ANCILLARY_H 1
 
+#include <vlc_vector.h>
 #include <stdint.h>
 
 /**
@@ -59,6 +60,8 @@
  * callback.
  */
 struct vlc_ancillary;
+
+typedef struct VLC_VECTOR(struct vlc_ancillary *) vlc_ancillary_array;
 
 /**
  * ID of an ancillary. Each ancillary user can create its own unique ID via

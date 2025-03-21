@@ -79,123 +79,63 @@ vlc_ancillary_GetData(const struct vlc_ancillary *ancillary)
 }
 
 void
-vlc_ancillary_array_Clear(struct vlc_ancillary ***array)
+vlc_ancillary_array_Clear(vlc_ancillary_array *array)
 {
-    if (*array != NULL)
-    {
-        for (struct vlc_ancillary **ancillary = *array;
-             *ancillary != NULL; ancillary++)
-        {
-            vlc_ancillary_Release(*ancillary);
-        }
-
-        free(*array);
-        *array = NULL;
-    }
-}
-
-static size_t
-vlc_ancillary_array_Count(struct vlc_ancillary **array)
-{
-    size_t count = 0;
-    for (struct vlc_ancillary **ancillary = array;
-         *ancillary != NULL; ancillary++)
-    {
-        count++;
-    }
-
-    return count;
+    struct vlc_ancillary *ancillary;
+    vlc_vector_foreach(ancillary, array)
+        vlc_ancillary_Release(ancillary);
+    vlc_vector_clear(array);
 }
 
 int
-vlc_ancillary_array_Dup(struct vlc_ancillary ***dst_arrayp,
-                        struct vlc_ancillary ** const*src_arrayp)
+vlc_ancillary_array_Dup(vlc_ancillary_array *dst_array,
+                        const vlc_ancillary_array *src_array)
 {
-    if (unlikely(*dst_arrayp != NULL))
-        vlc_ancillary_array_Clear(dst_arrayp);
-
-    if (*src_arrayp == NULL)
+    vlc_ancillary_array_Clear(dst_array);
+    if (src_array->size == 0)
         return VLC_SUCCESS;
 
-    struct vlc_ancillary **src_array = *src_arrayp;
-    size_t count = vlc_ancillary_array_Count(src_array);
-
-    struct vlc_ancillary **dst_array =
-        vlc_alloc(count + 1, sizeof(struct vlc_ancillary *));
-    if (dst_array == NULL)
-        return VLC_ENOMEM;
-
-    for (size_t i = 0; i < count; ++i)
-    {
-        dst_array[i] = vlc_ancillary_Hold(src_array[i]);
-        assert(dst_array[i] != NULL);
-    }
-    dst_array[count] = NULL;
-    *dst_arrayp = dst_array;
+    int ret = VLC_SUCCESS;
+    for (size_t i = 0; i < src_array->size && ret == VLC_SUCCESS; ++i)
+        ret = vlc_ancillary_array_Insert(dst_array, src_array->data[i]);
 
     return VLC_SUCCESS;
 }
 
 int
-vlc_ancillary_array_Insert(struct vlc_ancillary ***arrayp,
+vlc_ancillary_array_Insert(vlc_ancillary_array *array,
                            struct vlc_ancillary *ancillary)
 {
-    /* First case: the array is empty */
-    if (*arrayp == NULL)
+    assert(ancillary != NULL);
+
+    for (size_t i = 0; i < array->size; ++i)
     {
-        struct vlc_ancillary **array = vlc_alloc(2, sizeof(struct vlc_ancillary *));
-        if (array == NULL)
-            return VLC_ENOMEM;
-
-        array[0] = vlc_ancillary_Hold(ancillary);
-        array[1] = NULL;
-
-        *arrayp = array;
-
-        return VLC_SUCCESS;
-    }
-
-    struct vlc_ancillary **array = *arrayp;
-    size_t count = vlc_ancillary_array_Count(array);
-
-    /* Second case: the array has already an ancillary of the same id (very
-     * unlikely) */
-    for (size_t i = 0; i < count; ++i)
-    {
-        if (array[i]->id == ancillary->id)
+        struct vlc_ancillary *ancillary_it = array->data[i];
+        if (ancillary_it->id == ancillary->id)
         {
-            vlc_ancillary_Release(array[i]);
-            array[i] = vlc_ancillary_Hold(ancillary);
+            vlc_ancillary_Release(ancillary_it);
+            array->data[i] = vlc_ancillary_Hold(ancillary);
             return VLC_SUCCESS;
         }
     }
 
-    /* Third case: realloc the array to add the new ancillary */
-    array = vlc_reallocarray(array, count + 2, sizeof(struct vlc_ancillary *));
-    if (array == NULL)
+    bool success = vlc_vector_push(array, ancillary);
+    if (!success)
         return VLC_ENOMEM;
-
-    array[count] = vlc_ancillary_Hold(ancillary);
-    array[count + 1] = NULL;
-
-    *arrayp = array;
+    vlc_ancillary_Hold(ancillary);
 
     return VLC_SUCCESS;
 }
 
 struct vlc_ancillary *
-vlc_ancillary_array_Get(struct vlc_ancillary ** const*arrayp,
+vlc_ancillary_array_Get(const vlc_ancillary_array *array,
                         vlc_ancillary_id id)
 {
-    if (*arrayp == NULL)
-        return NULL;
-
-    struct vlc_ancillary **array = *arrayp;
-    for (struct vlc_ancillary **ancillary = array;
-         *ancillary != NULL; ancillary++)
+    struct vlc_ancillary *ancillary_it;
+    vlc_vector_foreach(ancillary_it, array)
     {
-        if ((*ancillary)->id == id)
-            return *ancillary;
+        if (ancillary_it->id == id)
+            return ancillary_it;
     }
     return NULL;
 }
