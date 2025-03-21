@@ -656,17 +656,17 @@ void WinTaskbarWidget::createTaskBarButtons()
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_DISABLED;
 
     thbButtons[1].dwMask = dwMask;
     thbButtons[1].iId = 1;
     thbButtons[1].iBitmap = 2;
-    thbButtons[1].dwFlags = THEMPL->count() > 0 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[1].dwFlags = THEMPL->count() > 0 ? THBF_ENABLED : THBF_DISABLED;
 
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_DISABLED;
 
     hr = p_taskbl->ThumbBarSetImageList( winId, himl );
     if( FAILED(hr) )
@@ -751,7 +751,7 @@ void WinTaskbarWidget::changeThumbbarButtons( )
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_DISABLED;
 
     //play/pause
     thbButtons[1].dwMask = dwMask;
@@ -762,7 +762,7 @@ void WinTaskbarWidget::changeThumbbarButtons( )
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_DISABLED;
 
     switch( THEMIM->getPlayingState() )
     {
