@@ -558,15 +558,3 @@ vlc_frame_t *vlc_frame_FilePath(const char *path, bool write)
     vlc_close (fd);
     return frame;
 }
-
-int
-vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary)
-{
-    return vlc_ancillary_array_Insert(&frame->ancillaries, ancillary);
-}
-
-struct vlc_ancillary *
-vlc_frame_GetAncillary(vlc_frame_t *frame, vlc_ancillary_id id)
-{
-    return vlc_ancillary_array_Get(&frame->ancillaries, id);
-}

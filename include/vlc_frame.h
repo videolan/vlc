@@ -242,8 +242,11 @@ VLC_API void vlc_frame_Release(vlc_frame_t *frame);
  * @param ancillary ancillary that will be held by the frame, can't be NULL
  * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
  */
-VLC_API int
-vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary);
+static inline int
+vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary)
+{
+    return vlc_ancillary_array_Insert(&frame->ancillaries, ancillary);
+}
 
 /**
  * Return the ancillary identified by an ID
@@ -253,8 +256,11 @@ vlc_frame_AttachAncillary(vlc_frame_t *frame, struct vlc_ancillary *ancillary);
  * @return the ancillary or NULL if the ancillary for that particular id is
  * not present
  */
-VLC_API struct vlc_ancillary *
-vlc_frame_GetAncillary(vlc_frame_t *frame, vlc_ancillary_id id);
+static inline struct vlc_ancillary *
+vlc_frame_GetAncillary(vlc_frame_t *frame, vlc_ancillary_id id)
+{
+    return vlc_ancillary_array_Get(&frame->ancillaries, id);
+}
 
 /**
  * Copy frame properties from src to dst
