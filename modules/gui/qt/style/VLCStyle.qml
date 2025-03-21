@@ -20,6 +20,7 @@ import QtQuick
 import QtQuick.Controls
 import VLC.MainInterface
 import VLC.Style
+import VLC.Widgets as Widgets
 
 QtObject {
     id: vlc_style
@@ -57,7 +58,7 @@ QtObject {
     readonly property double margin_xlarge: MainCtx.dp(32, scale);
     readonly property double margin_xxlarge: MainCtx.dp(36, scale);
 
-    property Component _scrollBarComponent: ScrollBar { }
+    property Component _scrollBarComponent: Widgets.ScrollBarExt { }
     property real resizeHandleWidth
 
     // Borders

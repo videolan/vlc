@@ -784,7 +784,7 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds
 
-        ScrollBar.vertical: ScrollBar {
+        ScrollBar.vertical: ScrollBarExt {
             id: flickableScrollBar
         }
 

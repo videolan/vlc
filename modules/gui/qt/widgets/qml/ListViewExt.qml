@@ -81,8 +81,8 @@ ListView {
     keyNavigationEnabled: false
     keyNavigationWraps: false
 
-    ScrollBar.vertical: ScrollBar { }
-    ScrollBar.horizontal: ScrollBar { }
+    ScrollBar.vertical: ScrollBarExt { }
+    ScrollBar.horizontal: ScrollBarExt { }
 
     flickableDirection: Flickable.AutoFlickIfNeeded
 

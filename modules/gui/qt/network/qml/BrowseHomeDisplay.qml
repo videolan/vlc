@@ -135,7 +135,7 @@ FocusScope {
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
 
-        ScrollBar.vertical: ScrollBar { }
+        ScrollBar.vertical: Widgets.ScrollBarExt { }
 
         flickableDirection: Flickable.AutoFlickIfNeeded
         boundsBehavior: Flickable.StopAtBounds

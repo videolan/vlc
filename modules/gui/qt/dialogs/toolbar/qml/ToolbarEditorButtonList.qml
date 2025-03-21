@@ -31,7 +31,7 @@ GridView {
 
     clip: true
 
-    ScrollBar.vertical: ScrollBar { }
+    ScrollBar.vertical: Widgets.ScrollBarExt { }
     model: PlayerControlbarControls.controlList.length
 
     currentIndex: -1

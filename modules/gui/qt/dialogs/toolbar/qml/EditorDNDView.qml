@@ -22,6 +22,7 @@ import QtQml.Models
 
 import VLC.Style
 import VLC.Util
+import VLC.Widgets as Widgets
 
 ListView {
     id: playerBtnDND
@@ -40,7 +41,7 @@ ListView {
 
     property bool extraWidthAvailable: true
 
-    ScrollBar.horizontal: ScrollBar {
+    ScrollBar.horizontal: Widgets.ScrollBarExt {
         id: scrollBar
     }
 

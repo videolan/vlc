@@ -348,7 +348,7 @@ T.ToolBar {
                             contentWidth: localMenuGroup.width
                             contentHeight: VLCStyle.localToolbar_height // don't allow vertical flickering
 
-                            ScrollBar.horizontal: ScrollBar {
+                            ScrollBar.horizontal: Widgets.ScrollBarExt {
                                 y: localMenuView.height - height
                                 width: localMenuView.availableWidth
                                 policy: ScrollBar.AsNeeded

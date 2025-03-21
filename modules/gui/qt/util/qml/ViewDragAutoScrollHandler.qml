@@ -17,6 +17,7 @@
  *****************************************************************************/
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Templates as T
 
 import VLC.Style
 
@@ -66,7 +67,7 @@ QtObject {
             interval: 100
         }
 
-        readonly property ScrollBar _scrollBar: (root.view) ? ((root.orientation === Qt.Vertical) ? root.view.ScrollBar.vertical
+        readonly property T.ScrollBar _scrollBar: (root.view) ? ((root.orientation === Qt.Vertical) ? root.view.ScrollBar.vertical
                                                                                                   : root.view.ScrollBar.horizontal)
                                                             : null
 
