@@ -46,7 +46,7 @@ private:
     void createTaskBarButtons();
 
 private slots:
-    void changeThumbbarButtons(PlayerController::PlayingState );
+    void changeThumbbarButtons();
     void playlistItemCountChanged( size_t itemId );
     virtual void onVideoFullscreenChanged( bool fs );
 

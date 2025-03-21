@@ -656,7 +656,7 @@ void WinTaskbarWidget::createTaskBarButtons()
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_HIDDEN;
 
     thbButtons[1].dwMask = dwMask;
     thbButtons[1].iId = 1;
@@ -666,7 +666,7 @@ void WinTaskbarWidget::createTaskBarButtons()
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_HIDDEN;
 
     hr = p_taskbl->ThumbBarSetImageList( winId, himl );
     if( FAILED(hr) )
@@ -683,8 +683,12 @@ void WinTaskbarWidget::createTaskBarButtons()
              this, &WinTaskbarWidget::changeThumbbarButtons);
     connect( THEMPL, &vlc::playlist::PlaylistController::countChanged,
             this, &WinTaskbarWidget::playlistItemCountChanged );
+    connect( THEMPL, &vlc::playlist::PlaylistController::hasPrevChanged,
+            this, &WinTaskbarWidget::changeThumbbarButtons );
+    connect( THEMPL, &vlc::playlist::PlaylistController::hasNextChanged,
+            this, &WinTaskbarWidget::changeThumbbarButtons );
     if( THEMIM->getPlayingState() == PlayerController::PLAYING_STATE_PLAYING )
-        changeThumbbarButtons( THEMIM->getPlayingState() );
+        changeThumbbarButtons( );
 }
 
 bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, qintptr* /* result */)
@@ -724,16 +728,16 @@ bool WinTaskbarWidget::nativeEventFilter(const QByteArray &, void *message, qint
 
 void WinTaskbarWidget::playlistItemCountChanged( size_t  )
 {
-    changeThumbbarButtons( THEMIM->getPlayingState() );
+    changeThumbbarButtons( );
 }
 
 void WinTaskbarWidget::onVideoFullscreenChanged( bool fs )
 {
     if( !fs )
-        changeThumbbarButtons( THEMIM->getPlayingState() );
+        changeThumbbarButtons( );
 }
 
-void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_status )
+void WinTaskbarWidget::changeThumbbarButtons( )
 {
     if( p_taskbl == NULL )
         return;
@@ -747,7 +751,7 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
     thbButtons[0].dwMask = dwMask;
     thbButtons[0].iId = 0;
     thbButtons[0].iBitmap = 0;
-    thbButtons[0].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[0].dwFlags = THEMPL->hasPrev() ? THBF_ENABLED : THBF_HIDDEN;
 
     //play/pause
     thbButtons[1].dwMask = dwMask;
@@ -758,9 +762,9 @@ void WinTaskbarWidget::changeThumbbarButtons( PlayerController::PlayingState i_s
     thbButtons[2].dwMask = dwMask;
     thbButtons[2].iId = 2;
     thbButtons[2].iBitmap = 3;
-    thbButtons[2].dwFlags = THEMPL->count() > 1 ? THBF_ENABLED : THBF_HIDDEN;
+    thbButtons[2].dwFlags = THEMPL->hasNext() ? THBF_ENABLED : THBF_HIDDEN;
 
-    switch( i_status )
+    switch( THEMIM->getPlayingState() )
     {
         case PlayerController::PLAYING_STATE_PLAYING:
             {
