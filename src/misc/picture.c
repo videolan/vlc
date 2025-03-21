@@ -485,6 +485,20 @@ picture_t *picture_Clone(picture_t *picture)
 }
 
 int
+picture_MergeAncillaries(picture_t *pic, const vlc_ancillary_array *src_array)
+{
+    picture_priv_t *priv = container_of(pic, picture_priv_t, picture);
+    return vlc_ancillary_array_Merge(&priv->ancillaries, src_array);
+}
+
+int
+picture_MergeAndClearAncillaries(picture_t *pic, vlc_ancillary_array *src_array)
+{
+    picture_priv_t *priv = container_of(pic, picture_priv_t, picture);
+    return vlc_ancillary_array_MergeAndClear(&priv->ancillaries, src_array);
+}
+
+int
 picture_AttachAncillary(picture_t *pic, struct vlc_ancillary *ancillary)
 {
     picture_priv_t *priv = container_of(pic, picture_priv_t, picture);

@@ -318,6 +318,8 @@ net_Read
 net_SetCSCov
 net_Write
 picture_AttachAncillary
+picture_MergeAncillaries
+picture_MergeAndClearAncillaries
 picture_AttachNewAncillary
 picture_BlendSubpicture
 picture_Clone

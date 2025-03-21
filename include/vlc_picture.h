@@ -28,13 +28,11 @@
 #include <assert.h>
 #include <vlc_atomic.h>
 #include <vlc_es.h>
+#include <vlc_ancillary.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-struct vlc_ancillary;
-typedef uint32_t vlc_ancillary_id;
 
 /**
  * \defgroup picture Generic picture API
@@ -416,6 +414,27 @@ VLC_API void picture_Copy( picture_t *p_dst, const picture_t *p_src );
  * \return A clone picture on success, NULL on error.
  */
 VLC_API picture_t *picture_Clone(picture_t *pic);
+
+/**
+ * Merge two ancillary arrays
+ *
+ * @param picture the picture that hold the destination ancillary array
+ * @param src_array pointer to an ancillary array
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+picture_MergeAncillaries(picture_t *pic, const vlc_ancillary_array *src_array);
+
+/**
+ * Merge and clear two ancillary arrays
+ *
+ * @param picture the picture that hold the destination ancillary array
+ * @param src_array pointer to the source ancillary array, will point to empty
+ * data after this call.
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+picture_MergeAndClearAncillaries(picture_t *pic, vlc_ancillary_array *src_array);
 
 /**
  * Attach an ancillary to the picture
