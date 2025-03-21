@@ -900,6 +900,7 @@ qml_modules += {
         qml_dynamicshadow_file,
         qml_blureffect_file,
         'widgets/qml/ImageExt.qml',
+        'widgets/qml/ScrollBarExt.qml',
     ),
 }
 

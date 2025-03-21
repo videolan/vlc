@@ -1300,7 +1300,8 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ViewHeader.qml \
 	widgets/qml/ProgressIndicator.qml \
 	widgets/qml/RectangularGlow.qml \
-	widgets/qml/ImageExt.qml
+	widgets/qml/ImageExt.qml \
+	widgets/qml/ScrollBarExt.qml
 if HAVE_QT65
 libqml_module_widgets_a_QML += \
 	widgets/qml/DynamicShadow.qml \

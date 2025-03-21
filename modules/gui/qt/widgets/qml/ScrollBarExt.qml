@@ -1,0 +1,103 @@
+/*****************************************************************************
+ * Copyright (C) 2025 VLC authors and VideoLAN
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * ( at your option ) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
+
+import QtQuick
+import QtQuick.Templates as T
+
+import VLC.Style
+
+T.ScrollBar {
+    id: control
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
+    padding: VLCStyle.dp(2, VLCStyle.scale)
+    visible: policy !== T.ScrollBar.AlwaysOff
+    minimumSize: horizontal ? (height / width) : (width / height)
+
+    // We don't want to show anything is scrolling is not possible (content size less than
+    // or equal to flickable size), unless `ScrollBar.AlwaysOn` is used (not by default):
+    readonly property bool _shown: (policy === T.ScrollBar.AlwaysOn) || (control.size < 1.0)
+
+    // active is not used here, because it is set when the attached Flickable is moving.
+    // interacting is only set when the scroll bar itself is interacted.
+    readonly property bool interacting: (interactive && (control.hovered || control.pressed))
+
+    readonly property ColorContext colorContext: ColorContext {
+        id: theme
+        colorSet: ColorContext.Item
+
+        // focused: control.activeFocus // irrelevant
+        enabled: control.enabled
+
+        // Do not change the colors when pressed or hovered, similar to WinUI3:
+        pressed: false
+        hovered: true
+    }
+
+    component DefaultBehavior : Behavior {
+        // WARNING: Qt bug: OpacityAnimator is bugged
+        NumberAnimation {
+            easing.type: Easing.OutSine
+            duration: VLCStyle.duration_veryShort
+        }
+    }
+
+    background: Rectangle {
+        color: theme.bg.primary
+        radius: width / 2
+
+        opacity: (control._shown && control.interacting) ? 1.0 : 0.0
+
+        visible: (opacity > 0.0)
+
+        DefaultBehavior on opacity { }
+    }
+
+    contentItem: Rectangle {
+        implicitWidth: VLCStyle.dp(control.interacting ? 5 : 2, VLCStyle.scale)
+        implicitHeight: VLCStyle.dp(control.interacting ? 5 : 2, VLCStyle.scale)
+
+        radius: width / 2
+        color: theme.fg.secondary
+
+        visible: (opacity > 0.0)
+
+        opacity: control._shown ? 1.0 : 0.0
+
+        DefaultBehavior on opacity { }
+
+        component SizeBehavior : Behavior {
+            NumberAnimation {
+                easing.type: Easing.OutSine
+                duration: VLCStyle.duration_veryShort
+            }
+        }
+
+        SizeBehavior on implicitWidth {
+            enabled: control.vertical
+        }
+
+        SizeBehavior on implicitHeight {
+            enabled: control.horizontal
+        }
+    }
+}
