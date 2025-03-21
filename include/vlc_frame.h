@@ -230,6 +230,35 @@ vlc_frame_Realloc(vlc_frame_t *frame, ssize_t pre, size_t body) VLC_USED;
 VLC_API void vlc_frame_Release(vlc_frame_t *frame);
 
 /**
+ * Merge two ancillary arrays
+ *
+ * @param frame the frame that hold the destination ancillary array
+ * @param src_array pointer to an ancillary array
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+static inline int
+vlc_frame_MergeAncillaries(vlc_frame_t *frame,
+                           const vlc_ancillary_array *src_array)
+{
+    return vlc_ancillary_array_Merge(&frame->ancillaries, src_array);
+}
+
+/**
+ * Merge and clear two ancillary arrays
+ *
+ * @param frame the frame that hold the destination ancillary array
+ * @param src_array pointer to the source ancillary array, will point to empty
+ * data after this call.
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+static inline int
+vlc_frame_MergeAndClearAncillaries(vlc_frame_t *frame,
+                                   vlc_ancillary_array *src_array)
+{
+    return vlc_ancillary_array_MergeAndClear(&frame->ancillaries, src_array);
+}
+
+/**
  * Attach an ancillary to the frame
  *
  * @warning the ancillary will be released only if the frame is allocated from
