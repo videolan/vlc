@@ -129,6 +129,72 @@ vlc_ancillary_GetData(const struct vlc_ancillary *ancillary);
 
 /**
  * @}
+ * \defgroup ancillary_array Ancillary array API
+ * @{
+ */
+
+/**
+ * Init an ancillary array
+ *
+ * @param array pointer to the ancillary array to initialize
+ */
+static inline void
+vlc_ancillary_array_Init(vlc_ancillary_array *array)
+{
+    vlc_vector_init(array);
+}
+
+/**
+ * Clear an ancillary array
+ *
+ * This will release the refcount on all ancillaries and free the vector data
+ *
+ * @param array pointer to the ancillary array to clear
+ */
+VLC_API void
+vlc_ancillary_array_Clear(vlc_ancillary_array *array);
+
+/**
+ * Duplicate an ancillary array
+ *
+ * The dst array will be duplicated, but all ancillaries will be ref counted.
+ *
+ * @param dst_array pointer to an initialized ancillary array, if not empty,
+ * previous ancillaries will be preserved.
+ * @param src_array pointer to the source ancillary array
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+vlc_ancillary_array_Dup(vlc_ancillary_array *dst_array,
+                        const vlc_ancillary_array *src_array);
+
+/**
+ * Insert a new ancillary in the array
+ *
+ * @note Several ancillaries can be attached to an array, but if two ancillaries
+ * are identified by the same ID, only the last one take precedence.
+ *
+ * @param array pointer to the ancillary array
+ * @param ancillary pointer to the ancillary to add
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+vlc_ancillary_array_Insert(vlc_ancillary_array *array,
+                           struct vlc_ancillary *ancillary);
+
+/**
+ * Get a specific ancillary from the array
+ *
+ * @param array pointer to the ancillary array
+ * @param id id of the ancillary
+ * @return a valid ancillary or NULL if not found, no need to release it.
+ */
+VLC_API struct vlc_ancillary *
+vlc_ancillary_array_Get(const vlc_ancillary_array *array,
+                        vlc_ancillary_id id);
+
+/**
+ * @}
  * \defgroup ancillary_data Ancillary IDs and data
  * @{
  */

@@ -25,7 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 
-#include "ancillary.h"
+#include <vlc_ancillary.h>
 
 struct vlc_ancillary
 {

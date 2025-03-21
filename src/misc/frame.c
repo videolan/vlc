@@ -39,7 +39,7 @@
 #include <vlc_frame.h>
 #include <vlc_fs.h>
 
-#include "ancillary.h"
+#include <vlc_ancillary.h>
 
 #ifndef NDEBUG
 static void vlc_frame_Check (vlc_frame_t *frame)

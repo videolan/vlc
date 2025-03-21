@@ -381,7 +381,6 @@ libvlccore_la_SOURCES = \
 	text/iso_lang.c \
 	text/iso-639_def.h \
 	misc/actions.c \
-	misc/ancillary.h \
 	misc/ancillary.c \
 	misc/chroma_probe.c \
 	misc/executor.c \

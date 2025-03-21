@@ -39,7 +39,7 @@
 #include <vlc_image.h>
 #include <vlc_block.h>
 
-#include "ancillary.h"
+#include <vlc_ancillary.h>
 
 static void PictureDestroyContext( picture_t *p_picture )
 {
