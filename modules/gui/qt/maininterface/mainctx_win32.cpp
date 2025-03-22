@@ -502,6 +502,9 @@ private:
 
     void hoverExclusive(CSDButton::ButtonType type)
     {
+        if (Q_UNLIKELY(!qApp) || qApp->property("isDying").toBool())
+            return;
+
         const auto& buttons = m_buttonmodel->windowCSDButtons();
         std::for_each(buttons.begin(), buttons.end(), [type](const auto& button)
         {
@@ -511,6 +514,9 @@ private:
 
     void handleButtonActionExclusive(CSDButton::ButtonType type, bool pressed)
     {
+        if (Q_UNLIKELY(!qApp) || qApp->property("isDying").toBool())
+            return;
+
         const auto& buttons = m_buttonmodel->windowCSDButtons();
         std::for_each(buttons.begin(), buttons.end(), [type, pressed](const auto& button)
         {
@@ -531,6 +537,9 @@ private:
 
     void resetPressedState()
     {
+        if (Q_UNLIKELY(!qApp) || qApp->property("isDying").toBool())
+            return;
+
         const auto& buttons = m_buttonmodel->windowCSDButtons();
         std::for_each(buttons.begin(), buttons.end(), [](const auto& button)
         {
@@ -540,6 +549,9 @@ private:
 
     void setAllUnhovered()
     {
+        if (Q_UNLIKELY(!qApp) || qApp->property("isDying").toBool())
+            return;
+
         const auto& buttons = m_buttonmodel->windowCSDButtons();
         std::for_each(buttons.begin(), buttons.end(), [](const auto& button)
         {
