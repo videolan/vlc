@@ -116,6 +116,12 @@ vlc_ancillary_Release(struct vlc_ancillary *ancillary);
 VLC_API struct vlc_ancillary *
 vlc_ancillary_Hold(struct vlc_ancillary *ancillary);
 
+/**
+ * Get the data of the ancillary
+ *
+ * @param ancillary ancillary to get data from
+ * @return data used when created the ancillary, same lifetime than the ancillary
+ */
 VLC_API void *
 vlc_ancillary_GetData(const struct vlc_ancillary *ancillary);
 
