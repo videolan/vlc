@@ -426,12 +426,15 @@ Item {
     Repeater {
         id: coverRepeater
 
-        model: dragItem._covers
+        readonly property var _model: dragItem._covers
 
-        property int notReadyCount: count
+        property int notReadyCount
 
-        onModelChanged: {
-            notReadyCount = count
+        on_ModelChanged: {
+            // Repeater signals model and count change after it reloads the items.
+            // So we need to adjust the ready count before that:
+            notReadyCount = _model.length
+            model = _model
         }
 
         onNotReadyCountChanged: {
