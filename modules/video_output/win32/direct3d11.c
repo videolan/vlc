@@ -1009,6 +1009,36 @@ static void CallUpdateRects(vout_display_t *vd)
     }
 }
 
+static int CreateStaging(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
+    video_format_t surface_fmt = sys->pool_fmt;
+    surface_fmt.i_width  = sys->picQuad.i_width;
+    surface_fmt.i_height = sys->picQuad.i_height;
+
+    if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &surface_fmt,
+                         false, false, 1, textures))
+    {
+        msg_Err(vd, "Failed to allocate the staging texture");
+        return VLC_EGENERIC;
+    }
+
+    sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
+    if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.formatInfo,
+                                 textures, 0, sys->stagingSys.resourceView))
+    {
+        msg_Err(vd, "Failed to allocate the staging shader view");
+        return VLC_EGENERIC;
+    }
+
+    for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
+        sys->stagingSys.texture[plane] = textures[plane];
+
+
+    return VLC_SUCCESS;
+}
+
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1915,27 +1945,9 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
-        video_format_t surface_fmt = sys->pool_fmt;
-        surface_fmt.i_width  = sys->picQuad.i_width;
-        surface_fmt.i_height = sys->picQuad.i_height;
-
-        if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &surface_fmt, false, false, 1, textures))
-        {
-            msg_Err(vd, "Failed to allocate the staging texture");
-            return VLC_EGENERIC;
-        }
-
-        sys->picQuad.resourceCount = DxgiResourceCount(sys->picQuad.formatInfo);
-        if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.formatInfo,
-                                     textures, 0, sys->stagingSys.resourceView))
-        {
-            msg_Err(vd, "Failed to allocate the staging shader view");
-            return VLC_EGENERIC;
-        }
-
-        for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
-            sys->stagingSys.texture[plane] = textures[plane];
+        int ret = CreateStaging(vd);
+        if (ret != VLC_SUCCESS)
+            return ret;
     }
 #endif
 
