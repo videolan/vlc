@@ -64,6 +64,7 @@
 struct vlc_ancillary;
 
 typedef struct VLC_VECTOR(struct vlc_ancillary *) vlc_ancillary_array;
+#define VLC_ANCILLARY_ARRAY_INITIALIZER VLC_VECTOR_INITIALIZER
 
 /**
  * ID of an ancillary. Each ancillary user can create its own unique ID via
