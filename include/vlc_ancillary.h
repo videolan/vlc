@@ -172,6 +172,23 @@ vlc_ancillary_array_Merge(vlc_ancillary_array *dst_array,
                           const vlc_ancillary_array *src_array);
 
 /**
+ * Merge and clear two ancillary arrays
+ *
+ * The src array will be moved to the dst array if the dst array is empty (fast
+ * path). Otherwise, both arrays will be merged into dst_array and the
+ * src_array will be cleared afterward.
+ *
+ * @param dst_array pointer to a valid ancillary array, if not empty, previous
+ * ancillaries will be preserved.
+ * @param src_array pointer to the source ancillary array, will point to empty
+ * data after this call.
+ * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
+ */
+VLC_API int
+vlc_ancillary_array_MergeAndClear(vlc_ancillary_array *dst_array,
+                                  vlc_ancillary_array *src_array);
+
+/**
  * Insert a new ancillary in the array
  *
  * @note Several ancillaries can be attached to an array, but if two ancillaries

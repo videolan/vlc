@@ -102,6 +102,23 @@ vlc_ancillary_array_Merge(vlc_ancillary_array *dst_array,
 }
 
 int
+vlc_ancillary_array_MergeAndClear(vlc_ancillary_array *dst_array,
+                                  vlc_ancillary_array *src_array)
+{
+    if (dst_array->size == 0)
+    {
+        *dst_array = *src_array;
+        vlc_ancillary_array_Init(src_array);
+        return VLC_SUCCESS;
+    }
+
+    int ret = vlc_ancillary_array_Merge(dst_array, src_array);
+    if (ret == VLC_SUCCESS)
+        vlc_ancillary_array_Clear(src_array);
+    return ret;
+}
+
+int
 vlc_ancillary_array_Insert(vlc_ancillary_array *array,
                            struct vlc_ancillary *ancillary)
 {
