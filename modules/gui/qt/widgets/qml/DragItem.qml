@@ -453,29 +453,18 @@ Item {
             width: dragItem.coverSize
             height: dragItem.coverSize
 
-            Rectangle {
-                id: bg
-
-                radius: coverRepeater.count > 1 ? dragItem.coverSize : 0.0
-                anchors.fill: parent
-                color: theme.bg.primary
-
-                DefaultShadow {
-                    anchors.centerIn: parent
-
-                    sourceItem: bg
-                }
-            }
-
             Widgets.ImageExt {
                 id: artworkCover
 
                 anchors.centerIn: parent
                 width: coverSize
                 height: coverSize
-                radius: bg.radius
+                radius: coverRepeater.count > 1 ? dragItem.coverSize : 0.0
                 source: modelData.artwork ?? ""
                 sourceSize: dragItem.imageSourceSize ?? Qt.size(width * eDPR, height * eDPR)
+                backgroundColor: theme.bg.primary
+                borderWidth: VLCStyle.dp(1, VLCStyle.scale)
+                borderColor: theme.border
                 fillMode: Image.PreserveAspectCrop
 
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
@@ -516,15 +505,12 @@ Item {
                         _triggerReadiness = true // Only in this case the image is loaded and shown.
                     }
                 }
-            }
 
-            Rectangle {
-                // for cover border
-                color: "transparent"
-                border.width: VLCStyle.dp(1, VLCStyle.scale)
-                border.color: theme.border
-                anchors.fill: parent
-                radius: bg.radius
+                DefaultShadow {
+                    anchors.centerIn: parent
+
+                    sourceItem: parent
+                }
             }
         }
     }
