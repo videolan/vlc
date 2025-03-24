@@ -39,7 +39,7 @@
 
 #define COBJMACROS
 #include <initguid.h>
-#include <d3d11.h>
+#include <d3d11_1.h>
 #ifdef HAVE_DXGI1_6_H
 # include <dxgi1_6.h>
 #else
@@ -155,6 +155,7 @@ struct vout_display_sys_t
 #endif
 
     picture_sys_t            stagingSys;
+    HANDLE                   sharedHandle;
 
     ID3D11RenderTargetView   *d3drenderTargetView;
     ID3D11DepthStencilView   *d3ddepthStencilView;
@@ -360,6 +361,7 @@ static int Open(vlc_object_t *object)
     }
     else
         vd->info.subpicture_chromas = NULL;
+    sys->sharedHandle = INVALID_HANDLE_VALUE;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
@@ -1009,7 +1011,7 @@ static void CallUpdateRects(vout_display_t *vd)
     }
 }
 
-static int CreateStaging(vout_display_t *vd)
+static int CreateStaging(vout_display_t *vd, ID3D11DeviceContext *shared_context)
 {
     vout_display_sys_t *sys = vd->sys;
     ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
@@ -1018,7 +1020,7 @@ static int CreateStaging(vout_display_t *vd)
     surface_fmt.i_height = sys->picQuad.i_height;
 
     if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.formatInfo, &surface_fmt,
-                         false, false, 1, textures))
+                         false, shared_context != NULL, 1, textures))
     {
         msg_Err(vd, "Failed to allocate the staging texture");
         return VLC_EGENERIC;
@@ -1035,6 +1037,21 @@ static int CreateStaging(vout_display_t *vd)
     for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
         sys->stagingSys.texture[plane] = textures[plane];
 
+
+    if (shared_context)
+    {
+        assert(sys->sharedHandle == INVALID_HANDLE_VALUE);
+        HRESULT hr;
+        IDXGIResource1* sharedResource = NULL;
+        ID3D11Resource_QueryInterface(sys->stagingSys.resource[0], &IID_IDXGIResource1, (void**)&sharedResource);
+        hr = IDXGIResource1_CreateSharedHandle(sharedResource, NULL, DXGI_SHARED_RESOURCE_READ|DXGI_SHARED_RESOURCE_WRITE, NULL, &sys->sharedHandle);
+        IDXGIResource1_Release(sharedResource);
+        if (FAILED(hr))
+        {
+            msg_Err(vd, "Failed to get the shared handle");
+            return VLC_EGENERIC;
+        }
+    }
 
     return VLC_SUCCESS;
 }
@@ -1103,6 +1120,45 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         D3D11_TEXTURE2D_DESC srcDesc;
         ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &srcDesc);
 
+        ID3D11DeviceContext* copyContext = sys->d3d_dev.d3dcontext;
+        ID3D11Resource* copyResource = p_sys->resource[KNOWN_DXGI_INDEX];
+
+        if (is_d3d11_opaque(picture->format.i_chroma) && sys->d3d_dev.d3dcontext != p_sys->context)
+        {
+            if (sys->stagingSys.texture[0] == NULL)
+            {
+                sys->legacy_shader = true; // force using staging
+                int ret = CreateStaging(vd, p_sys->context);
+                if (unlikely(ret != VLC_SUCCESS))
+                {
+                    if (is_d3d11_opaque(picture->format.i_chroma))
+                        d3d11_device_unlock( &sys->d3d_dev );
+                    return;
+                }
+            }
+
+            HRESULT hr;
+
+            ID3D11Device *psysDev;
+            ID3D11Device1 *d3d11VLC1;
+            ID3D11DeviceContext_GetDevice(p_sys->context, &psysDev);
+            hr = ID3D11Device_QueryInterface(psysDev, &IID_ID3D11Device1, (void**)&d3d11VLC1);
+            if (SUCCEEDED(hr))
+            {
+                hr = ID3D11Device1_OpenSharedResource1(d3d11VLC1, sys->sharedHandle, &IID_ID3D11Resource, (void**)&copyResource);
+                ID3D11Device1_Release(d3d11VLC1);
+            }
+            ID3D11Device_Release(psysDev);
+            if (FAILED(hr))
+            {
+                if (is_d3d11_opaque(picture->format.i_chroma))
+                    d3d11_device_unlock( &sys->d3d_dev );
+                return;
+            }
+
+            copyContext = p_sys->context;
+        }
+
         if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader) {
             D3D11_TEXTURE2D_DESC texDesc;
             if (!is_d3d11_opaque(picture->format.i_chroma))
@@ -1115,8 +1171,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 .right = __MIN(srcDesc.Width, texDesc.Width),
                 .back = 1,
             };
-            ID3D11DeviceContext_CopySubresourceRegion(sys->d3d_dev.d3dcontext,
-                                                      sys->stagingSys.resource[KNOWN_DXGI_INDEX],
+            ID3D11DeviceContext_CopySubresourceRegion(copyContext,
+                                                      copyResource,
                                                       0, 0, 0, 0,
                                                       p_sys->resource[KNOWN_DXGI_INDEX],
                                                       p_sys->slice_index, &box);
@@ -1143,6 +1199,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 UpdateSize(vd);
             }
         }
+
+        if (copyResource != p_sys->resource[KNOWN_DXGI_INDEX])
+            // shared resource
+            ID3D11Resource_Release(copyResource);
     }
 
     if (subpicture) {
@@ -1945,7 +2005,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
     {
         /* we need a staging texture */
-        int ret = CreateStaging(vd);
+        int ret = CreateStaging(vd, NULL);
         if (ret != VLC_SUCCESS)
             return ret;
     }
@@ -2144,6 +2204,8 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     sys->d3dregion_count = 0;
 
     ReleasePictureSys(&sys->stagingSys);
+    CloseHandle(sys->sharedHandle);
+    sys->sharedHandle = INVALID_HANDLE_VALUE;
 
     if (sys->tonemapProc != NULL)
     {
