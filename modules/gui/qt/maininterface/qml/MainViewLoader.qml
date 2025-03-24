@@ -51,12 +51,17 @@ Widgets.StackViewExt {
     // behave like a Page
     property var pagePrefix: []
 
-    // optional, loaded when isLoading is true
-    // only loaded on initial load, when count is less then 1
-    property Component loadingComponent: null
+    // default `loadingComponent` which is instantiated as `_loadingItem`
+    // only once, i.e., when the model is loading for the first time
+    property Component loadingComponent: Component {
+        Widgets.ProgressIndicator {
+            text: ""
+        }
+    }
 
-    // NOTE: Sometimes the model has no 'loading' property.
-    readonly property bool isLoading: model.loading ?? false
+    property Item _loadingItem: null
+
+    readonly property bool isLoading: model.loading
 
     onIsLoadingChanged: {
         // Adjust the cursor. Unless the loaded item (view) sets a cursor
@@ -68,6 +73,14 @@ Widgets.StackViewExt {
         } else {
             MainCtx.unsetCursor(root)
         }
+
+        if (isLoading && !_loadingItem && loadingComponent)
+            _loadingItem = loadingComponent.createObject(this, {
+                "anchors.centerIn": root,
+                "visible": false,
+                "z": 1
+            })
+        else if (!isLoading && _loadingItem) _loadingItem.visible = false
     }
 
     readonly property int count: model.count
@@ -96,19 +109,7 @@ Widgets.StackViewExt {
 
     // NOTE: We have to use a Component here. When using a var the onCurrentComponentChanged event
     //       gets called multiple times even when the currentComponent stays the same.
-    property Component currentComponent: {
-        if (isLoading && count < 1) {
-            if (loadingComponent)
-                return loadingComponent
-            // fall through to load 'grid' or 'list' view
-        } else if (count === 0)
-            return emptyLabel
-
-        if (MainCtx.gridView)
-            return grid
-        else
-            return list
-    }
+    property Component currentComponent: MainCtx.gridView ? grid : list
 
     // Navigation
 
@@ -194,5 +195,25 @@ Widgets.StackViewExt {
 
         if (typeof reason !== "undefined")
             setCurrentItemFocus(reason)
+    }
+
+    Timer {
+        running: isLoading && _loadingItem
+
+        interval: VLCStyle.duration_humanMoment
+
+        onTriggered: {
+            _loadingItem.visible = true
+        }
+    }
+
+    Loader {
+        anchors.centerIn: parent
+
+        z: 1
+
+        active: !count && emptyLabel && !(_loadingItem && _loadingItem.visible)
+
+        sourceComponent: emptyLabel
     }
 }
