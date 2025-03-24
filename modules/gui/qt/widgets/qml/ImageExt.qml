@@ -51,6 +51,7 @@ Item {
     property alias sourceSize: image.sourceSize
     property alias sourceClipRect: image.sourceClipRect
     property alias status: image.status
+    property alias shaderStatus: shaderEffect.status
     property alias cache: image.cache
 
     // Padding represents how much the content is shrunk. For now this is a readonly property.
