@@ -599,7 +599,8 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
 
 #undef AllocateTextures
 int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
-                      const d3d_format_t *cfg, const video_format_t *fmt, bool for_decoder,
+                      const d3d_format_t *cfg, const video_format_t *fmt,
+                      bool for_decoder, bool shared,
                       unsigned pool_size, ID3D11Texture2D *textures[] )
 {
     plane_t planes[PICTURE_PLANE_MAX];
@@ -622,6 +623,8 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
         texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     }
     texDesc.ArraySize = pool_size;
+    if (shared)
+        texDesc.MiscFlags |= D3D11_RESOURCE_MISC_SHARED | D3D11_RESOURCE_MISC_SHARED_NTHANDLE;
 
     const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( fmt->i_chroma );
     if( !p_chroma_desc )

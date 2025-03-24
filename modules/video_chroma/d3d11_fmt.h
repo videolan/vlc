@@ -159,8 +159,9 @@ static inline const d3d_format_t *D3D11_RenderFormat(DXGI_FORMAT opaque, bool gp
 }
 
 int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
-                     const video_format_t *, bool, unsigned pool_size, ID3D11Texture2D *textures[]);
-#define AllocateTextures(a,b,c,d,e,f,g)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f,g)
+                     const video_format_t *, bool decoder, bool shared,
+                     unsigned pool_size, ID3D11Texture2D *textures[]);
+#define AllocateTextures(a,b,c,d,e,f,g,h)  AllocateTextures(VLC_OBJECT(a),b,c,d,e,f,g,h)
 
 #ifndef NDEBUG
 void D3D11_LogProcessorSupport(vlc_object_t*, ID3D11VideoProcessorEnumerator*);
