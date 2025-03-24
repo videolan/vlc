@@ -479,16 +479,41 @@ Item {
                 fillMode: Image.PreserveAspectCrop
 
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
+                property bool _triggerReadiness: false
 
-                onStatusChanged: {
-                    if (status === Image.Ready)
+                on_TriggerReadinessChanged: {
+                    // If it was already true (readiness already signalled), do not decrease the counter.
+                    // This handler is only called when the property changes.
+                    if (_triggerReadiness) {
                         coverRepeater.notReadyCount -= 1
-                    else if (status === Image.Error) {
+                    }
+                }
+
+                readonly property var _combinedStatus: [status, shaderStatus]
+
+                on_CombinedStatusChanged: {
+                    // Qt `ShaderEffect` documentation states:
+                    // > When runtime compilation is not in use and the shader properties
+                    // > refer to files with bytecode, the status is always Compiled.
+                    // However this is not correct, the status is reported to be "uncompiled" initially.
+                    // And sometimes the status remains "uncompiled" even when the shader is in use, for
+                    // that reason I only care about `ShaderEffect.Error` here and not `Compiled`.
+
+                    if (shaderStatus === ShaderEffect.Error) {
+                        _triggerReadiness = true // Not much to do in this case, shader could not be loaded.
+                        return
+                    }
+
+                    if (status === Image.Error) {
                         const fallbackSource = modelData.fallback ?? defaultCover
-                        if (source === fallbackSource)
-                            coverRepeater.notReadyCount -= 1
-                        else
+                        if (source === fallbackSource) {
+                            _triggerReadiness = true // Not much to do in this case either, fallback image could not be loaded.
+                        } else {
                             source = fallbackSource
+                        }
+                    } else if (status === Image.Ready /* && shaderStatus === ShaderEffect.Compiled */) {
+                        // FIXME: When Qt starts to report `ShaderEffect.Compiled` properly, start using it.
+                        _triggerReadiness = true // Only in this case the image is loaded and shown.
                     }
                 }
             }
