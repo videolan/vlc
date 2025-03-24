@@ -467,6 +467,9 @@ Item {
                 borderColor: theme.border
                 fillMode: Image.PreserveAspectCrop
 
+                // FIXME: Qt bug, asynchronous + texture provider + custom shader does not work properly with `grabToImage()`:
+                asynchronous: false
+
                 readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
                 property bool _triggerReadiness: false
 
