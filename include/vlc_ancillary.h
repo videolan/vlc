@@ -53,6 +53,8 @@
  * @{
  * \file
  * Ancillary definition and functions
+ * \defgroup ancillary_api Ancillary API
+ * @{
  */
 
 /**
@@ -124,6 +126,12 @@ vlc_ancillary_Hold(struct vlc_ancillary *ancillary);
  */
 VLC_API void *
 vlc_ancillary_GetData(const struct vlc_ancillary *ancillary);
+
+/**
+ * @}
+ * \defgroup ancillary_data Ancillary IDs and data
+ * @{
+ */
 
 /**
  * Dolby Vision metadata description
@@ -238,5 +246,8 @@ typedef struct vlc_vpx_alpha_t
     uint8_t *data;
 } vlc_vpx_alpha_t;
 
-/** @} */
+/**
+ * @}
+ * @}
+ */
 #endif /* VLC_ANCILLARY_H */
