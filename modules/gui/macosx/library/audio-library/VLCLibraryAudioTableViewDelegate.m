@@ -101,7 +101,14 @@
             cellText = [@(mediaItem.playCount) stringValue];
         } else if ([columnIdentifier isEqualToString:VLCLibrarySongsTableViewYearColumnIdentifier]) {
             cellIdentifier = @"VLCLibrarySongsTableViewYearTableCellViewIdentifier";
-            cellText = [@(mediaItem.year) stringValue];
+            if (mediaItem.year == 0) {
+                cellText = @"";
+            } else {
+                NSDate * const yearDate = [NSDate dateWithTimeIntervalSince1970:mediaItem.year];
+                NSDateComponents * const components =
+                    [NSCalendar.currentCalendar components:NSCalendarUnitYear fromDate:yearDate];
+                cellText = @(components.year).stringValue;
+            }
         } else {
             NSAssert(true, @"Received unknown column identifier %@", columnIdentifier);
         }
