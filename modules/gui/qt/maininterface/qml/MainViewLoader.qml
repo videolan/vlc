@@ -58,6 +58,18 @@ Widgets.StackViewExt {
     // NOTE: Sometimes the model has no 'loading' property.
     readonly property bool isLoading: model.loading ?? false
 
+    onIsLoadingChanged: {
+        // Adjust the cursor. Unless the loaded item (view) sets a cursor
+        // globally or for itself, this is going to be respected. It should
+        // be noted that cursor adjustment is conventionally not delayed,
+        // unlike indicators:
+        if (isLoading) {
+            MainCtx.setCursor(root, Qt.BusyCursor)
+        } else {
+            MainCtx.unsetCursor(root)
+        }
+    }
+
     readonly property int count: model.count
 
     readonly property bool hasGridListMode: !!grid && !!list
