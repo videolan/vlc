@@ -46,11 +46,11 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
     [NSUserDefaults.standardUserDefaults registerDefaults:appDefaults];
 }
 
-
-- (void)setIdentifier:(NSUserInterfaceItemIdentifier)identifier
+- (void)setPreferencesIdentifier:(NSString *)preferencesIdentifier
 {
-    [super setIdentifier:identifier];
-    self.isTimeRemaining = [NSUserDefaults.standardUserDefaults boolForKey:self.identifier];
+    _preferencesIdentifier = preferencesIdentifier;
+    self.isTimeRemaining = [NSUserDefaults.standardUserDefaults
+                            boolForKey:self.preferencesIdentifier];
 }
 
 - (void)setIsTimeRemaining:(BOOL)isTimeRemaining
@@ -58,7 +58,8 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
     _isTimeRemaining = isTimeRemaining;
 
     if (self.identifier) {
-        [NSUserDefaults.standardUserDefaults setBool:_isTimeRemaining forKey:self.identifier];
+        [NSUserDefaults.standardUserDefaults setBool:_isTimeRemaining
+                                              forKey:self.preferencesIdentifier];
     }
 
     [self updateTimeValue];
@@ -107,8 +108,8 @@ NSString * const VLCTimeFieldDisplayTimeAsRemaining = @"DisplayTimeAsTimeRemaini
 
 - (BOOL)timeRemaining
 {
-    if (self.identifier) {
-        return [NSUserDefaults.standardUserDefaults boolForKey:self.identifier];
+    if (self.preferencesIdentifier) {
+        return [NSUserDefaults.standardUserDefaults boolForKey:self.preferencesIdentifier];
     } else {
         return _isTimeRemaining;
     }

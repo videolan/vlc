@@ -35,6 +35,7 @@ extern NSString * const VLCTimeFieldDisplayTimeAsRemaining;
 
 @interface VLCTimeField : NSTextField
 
+@property (readwrite, assign, nonatomic) NSString *preferencesIdentifier;
 @property (readwrite, assign, nonatomic) BOOL isTimeRemaining;
 
 - (void)setTime:(NSString *)time withRemainingTime:(NSString *)remainingTime;
