@@ -60,25 +60,27 @@ FadingEdge {
                                                                                   listView.currentItem.height)
                                                                         : Qt.rect(-1, -1, -1, -1)
 
-    enableBeginningFade: _fadeRectEnoughSize &&
-                         !beginningHoverHandler.hovered &&
-                         (orientation === Qt.Vertical ? !listView.atYBeginning
-                                                      : !listView.atXBeginning) &&
-                         Helpers.itemIntersects(beginningArea, _currentItemMappedRect)
+    readonly property bool _disableBeginningFade: (!!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)) ||
+                                                  !_fadeRectEnoughSize ||
+                                                  (orientation === Qt.Vertical ? listView.atYBeginning
+                                                                               : listView.atXBeginning) ||
+                                                  !Helpers.itemIntersects(beginningArea, _currentItemMappedRect)
 
-    enableEndFade: _fadeRectEnoughSize &&
-                   !endHoverHandler.hovered &&
-                   (orientation === Qt.Vertical ? !listView.atYEnd
-                                                : !listView.atXEnd) &&
-                   Helpers.itemIntersects(endArea, _currentItemMappedRect)
+    readonly property bool _disableEndFade: (!!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)) ||
+                                            !_fadeRectEnoughSize ||
+                                            (orientation === Qt.Vertical ? listView.atYEnd
+                                                                         : listView.atXEnd) ||
+                                            !Helpers.itemIntersects(endArea, _currentItemMappedRect)
 
     Binding on enableBeginningFade {
-        when: !!listView.headerItem && (listView.headerPositioning !== ListView.InlineHeader)
+        // This explicit binding is to override `enableBeginningFade` when it is not feasible to have fading edge.
+        when: root._disableBeginningFade || beginningHoverHandler.hovered
         value: false
     }
 
     Binding on enableEndFade {
-        when: !!listView.footerItem && (listView.footerPositioning !== ListView.InlineFooter)
+        // This explicit binding is to override `enableEndFade` when it is not feasible to have fading edge.
+        when: root._disableEndFade || endHoverHandler.hovered
         value: false
     }
 
@@ -88,7 +90,7 @@ FadingEdge {
         z: 99
         parent: root.listView
 
-        visible: root.enableBeginningFade
+        visible: !root._disableBeginningFade
 
         anchors {
             top: parent.top
@@ -117,7 +119,7 @@ FadingEdge {
         z: 99
         parent: root.listView
 
-        visible: root.enableEndFade
+        visible: !root._disableEndFade
 
         anchors {
             bottom: parent.bottom
