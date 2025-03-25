@@ -429,8 +429,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     const NSInteger rowForLibraryItem = [self.audioDataSource rowForLibraryItem:libraryItem];
     if (rowForLibraryItem != NSNotFound) {
         NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:rowForLibraryItem];
-        [targetMainTableView selectRowIndexes:indexSet byExtendingSelection:NO];
-        [targetMainTableView scrollRowToVisible:rowForLibraryItem];
+        [self.audioDataSource tableView:targetMainTableView selectRowIndices:indexSet];
     }
 }
 
