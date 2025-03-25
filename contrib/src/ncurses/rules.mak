@@ -1,6 +1,6 @@
 # ncurses
 
-NCURSES_VERSION := 6.3
+NCURSES_VERSION := 6.5
 NCURSES_URL := $(GNU)/ncurses/ncurses-$(NCURSES_VERSION).tar.gz
 
 ifdef HAVE_MACOSX
@@ -30,6 +30,9 @@ NCURSES_CONF+= --without-debug
 endif
 ifdef HAVE_WIN32
 NCURSES_CONF+= --disable-sigwinch
+endif
+ifdef HAVE_MACOSX
+NCURSES_CONF += cf_cv_func_clock_gettime=no
 endif
 
 .ncurses: ncurses
