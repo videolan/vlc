@@ -701,11 +701,12 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
         return;
     }
 
+    const NSInteger selectedRow = indices.firstIndex;
     if (tableView.selectedRowIndexes != indices) {
         [tableView selectRowIndexes:indices byExtendingSelection:NO];
+        [tableView scrollRowToVisible:selectedRow];
     }
 
-    const NSInteger selectedRow = indices.firstIndex;
     if (selectedRow >= self.displayedCollection.count) {
         return;
     }
