@@ -242,18 +242,16 @@ FocusScope {
                                         width,
                                         height - stackView.height)
 
-                    effect: frostedGlassEffect
+                    effectLayer.effect: Component {
+                        Widgets.FrostedGlassEffect {
+                            ColorContext {
+                                id: frostedTheme
+                                palette: VLCStyle.palette
+                                colorSet: ColorContext.Window
+                            }
 
-                    Widgets.FrostedGlassEffect {
-                        id: frostedGlassEffect
-
-                        ColorContext {
-                            id: frostedTheme
-                            palette: VLCStyle.palette
-                            colorSet: ColorContext.Window
+                            tint: frostedTheme.bg.secondary
                         }
-
-                        tint: frostedTheme.bg.secondary
                     }
                 }
 

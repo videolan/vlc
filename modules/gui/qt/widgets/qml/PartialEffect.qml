@@ -17,10 +17,6 @@
  *****************************************************************************/
 
 import QtQuick
-import QtQuick.Window
-
-import VLC.MainInterface
-import VLC.Widgets as Widgets
 
 // This item can be used as a layer effect.
 // The purpose of this item is to apply an effect to a partial
@@ -36,13 +32,14 @@ Item {
     // a texture provider without creating an extra layer.
     // Make sure that the sampler name is set to "source" (default) if
     // this is used as a layer effect.
-    property alias source: textureProviderItem.source
+    property Item source
+
+    // Default layer properties are used except that `enabled` is set by default.
+    // The geometry of the effect will be adjusted to `effectRect` automatically.
+    property alias effectLayer: effectProxy.layer
 
     // Rectangular area where the effect should be applied:
-    property alias effectRect: textureProviderItem.effectRect
-
-    property Item effect
-    property string samplerName: "source"
+    property alias effectRect: effectProxy.effectRect
 
     // Enable blending if background of source is not opaque.
     // This comes with a performance penalty.
@@ -61,10 +58,10 @@ Item {
 
         readonly property rect discardRect: {
             if (blending)
-                return Qt.rect(textureProviderItem.x / root.width,
-                               textureProviderItem.y / root.height,
-                               (textureProviderItem.x + textureProviderItem.width) / root.width,
-                               (textureProviderItem.y + textureProviderItem.height) / root.height)
+                return Qt.rect(effectProxy.x / root.width,
+                               effectProxy.y / root.height,
+                               (effectProxy.x + effectProxy.width) / root.width,
+                               (effectProxy.y + effectProxy.height) / root.height)
             else // If blending is not enabled, no need to make the normalization calculations
                 return Qt.rect(0, 0, 0, 0)
         }
@@ -79,77 +76,37 @@ Item {
         fragmentShader: blending ? "qrc:///shaders/RectFilter.frag.qsb" : ""
     }
 
-    // We use texture provider that uses QSGTextureView.
-    // QSGTextureView is able to denote a viewport that
-    // covers a certain area in the source texture.
-    // This way, we don't need to have another layer just
-    // to clip the source texture.
-    Widgets.TextureProviderItem {
-        id: textureProviderItem
+    // This item represents the region where the effect is applied.
+    // `effectLayer` only has access to the area denoted with
+    // the property `effectRect`
+    ShaderEffect {
+        id: effectProxy
 
         x: effectRect.x
         y: effectRect.y
         width: effectRect.width
         height: effectRect.height
 
-        readonly property Item sourceItem: source?.sourceItem ?? source
+        blending: root.blending
+
+        // This item is used to show effect
+        // so it is pointless to show if
+        // there is no effect to show.
+        visible: layer.enabled
+
+        // cullMode: ShaderEffect.BackFaceCulling
 
         property rect effectRect
 
-        property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
+        property alias source: root.source
 
-        Binding on textureSubRect {
-            delayed: true
-            value: Qt.rect(effectRect.x * textureProviderItem.eDPR,
-                           effectRect.y * textureProviderItem.eDPR,
-                           effectRect.width * textureProviderItem.eDPR,
-                           effectRect.height * textureProviderItem.eDPR)
-        }
+        readonly property rect normalRect: Qt.rect(effectRect.x / root.width,
+                                                   effectRect.y / root.height,
+                                                   effectRect.width / root.width,
+                                                   effectRect.height / root.height)
 
-        onDprChanged: {
-            eDPR = MainCtx.effectiveDevicePixelRatio(Window.window)
-        }
+        vertexShader: "qrc:///shaders/SubTexture.vert.qsb"
 
-        onChildrenChanged: {
-            // Do not add visual(QQuickItem) children to this item,
-            // because Qt thinks that it needs to use implicit layering.
-            // "If needed, MultiEffect will internally generate a
-            // ShaderEffectSource as the texture source."
-            // Adding children to a texture provider item is not going
-            // make them rendered in the texture. Instead, simply add
-            // to the source. If source is layered, the source would
-            // be a `ShaderEffectSource`, in that case `sourceItem`
-            // can be used to reach to the real source.
-            console.assert(textureProviderItem.children.length === 0)
-        }
-
-        // Effect's source is sub-texture through the texture provider:
-        Binding {
-            target: root.effect
-            property: root.samplerName
-            value: textureProviderItem
-        }
-
-        // Adjust the blending. Currently MultiEffect/FastBlur does not
-        // support adjusting it:
-        Binding {
-            target: root.effect
-            when: root.effect && (typeof root.effect.blending === "boolean")
-            property: "blending"
-            value: root.blending
-        }
-
-        // Positioning:
-        Binding {
-            target: root.effect
-            property: "parent"
-            value: root
-        }
-
-        Binding {
-            target: root.effect
-            property: "anchors.fill"
-            value: textureProviderItem
-        }
+        layer.enabled: layer.effect
     }
 }
