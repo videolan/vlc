@@ -58,7 +58,9 @@
 
 using Microsoft::WRL::ComPtr;
 
-static int  Open(vout_display_t *,
+static int  OpenDisplay(vout_display_t *,
+                 video_format_t *, vlc_video_context *);
+static int  OpenDrawable(vout_display_t *,
                  video_format_t *, vlc_video_context *);
 static void Close(vout_display_t *);
 
@@ -98,7 +100,12 @@ vlc_module_begin ()
         change_string_list(ppsz_hdr_mode, ppsz_hdr_mode_text)
 
     add_shortcut("direct3d11")
-    set_callback_display(Open, 300)
+    set_callback_display(OpenDisplay, 300)
+
+    add_submodule()
+        set_callback_display(OpenDrawable, 0)
+        add_shortcut("d3d11drawable")
+
 vlc_module_end ()
 
 enum d3d11_upscale
@@ -529,13 +536,9 @@ static const auto ops = []{
     return ops;
 }();
 
-static int Open(vout_display_t *vd,
+static int OpenGeneric(vout_display_t *vd,
                 video_format_t *fmtp, vlc_video_context *context)
 {
-    if (vd->cfg->window->type != VLC_WINDOW_TYPE_HWND &&
-        vd->cfg->window->type != VLC_WINDOW_TYPE_DCOMP)
-        return VLC_ENOTSUP;
-
     vout_display_sys_t *sys = new (std::nothrow) vout_display_sys_t();
     if (!sys)
         return VLC_ENOMEM;
@@ -637,6 +640,27 @@ static int Open(vout_display_t *vd,
 error:
     Close(vd);
     return VLC_EGENERIC;
+}
+
+static int OpenDisplay(vout_display_t *vd,
+                       video_format_t *fmtp, vlc_video_context *context)
+{
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_HWND &&
+        vd->cfg->window->type != VLC_WINDOW_TYPE_DCOMP)
+        return VLC_ENOTSUP;
+
+    return OpenGeneric(vd, fmtp, context);
+}
+
+static int OpenDrawable(vout_display_t *vd,
+                        video_format_t *fmtp, vlc_video_context *context)
+{
+    if (vd->cfg->window->type != VLC_WINDOW_TYPE_DUMMY)
+        return VLC_ENOTSUP;
+
+    /* TODO: other checks for callback validity should be there. */
+
+    return OpenGeneric(vd, fmtp, context);
 }
 
 static void Close(vout_display_t *vd)
