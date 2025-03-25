@@ -63,8 +63,6 @@ MainViewLoader {
     grid: gridComponent
     list: tableComponent
 
-    loadingComponent: busyIndicatorComponent
-
     emptyLabel: emptyLabelComponent
 
     Navigation.cancelAction: function() {
@@ -318,116 +316,26 @@ MainViewLoader {
     Component {
         id: emptyLabelComponent
 
-        StandardView {
-            view: Widgets.EmptyLabelButton {
-                id: emptyLabel
+        Widgets.EmptyLabelButton {
+            id: emptyLabel
 
-                visible: !root.isLoading
+            // FIXME: find better cover
+            cover: VLCStyle.noArtVideoCover
+            coverWidth : VLCStyle.dp(182, VLCStyle.scale)
+            coverHeight: VLCStyle.dp(114, VLCStyle.scale)
 
-                // FIXME: find better cover
-                cover: VLCStyle.noArtVideoCover
-                coverWidth : VLCStyle.dp(182, VLCStyle.scale)
-                coverHeight: VLCStyle.dp(114, VLCStyle.scale)
+            text: qsTr("Nothing to see here, go back.")
 
-                text: qsTr("Nothing to see here, go back.")
+            button.iconTxt: VLCIcons.back
+            button.text: qsTr("Back")
+            button.enabled: !History.previousEmpty
+            button.width: button.implicitWidth
 
-                button.iconTxt: VLCIcons.back
-                button.text: qsTr("Back")
-                button.enabled: !History.previousEmpty
-                button.width: button.implicitWidth
-
-                function onNavigate(reason) {
-                    History.previous(reason)
-                }
-
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-
-                Navigation.parentItem: root
+            function onNavigate(reason) {
+                History.previous(reason)
             }
-        }
-    }
 
-    Component {
-        id: busyIndicatorComponent
-
-        StandardView {
-            view: Item {
-                Navigation.navigable: false
-
-                visible: root.isLoading
-
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-
-                Widgets.BusyIndicatorExt {
-                    id: busyIndicator
-
-                    runningDelayed: root.isLoading
-                    anchors.centerIn: parent
-                    z: 1
-                }
-            }
-        }
-    }
-
-    // Helper view i.e a ColumnLayout with BrowseHeader
-    component StandardView : FocusScope {
-        required property Item view
-
-        // NOTE: This is required to pass the focusReason when the current view changes in
-        //       MainViewLoader.
-        property int focusReason: (header.activeFocus) ? header.focusReason
-                                                       : view?.focusReason ?? Qt.NoFocusReason
-
-        // used by MainDisplay to transfer focus
-        function setCurrentItemFocus(reason) {
-            if (!Navigation.navigable)
-                return
-
-            if (header.Navigation.navigable)
-                Helpers.enforceFocus(header, reason)
-            else
-                Helpers.enforceFocus(view, reason)
-        }
-
-        onViewChanged: {
-            if (layout.children.length === 2)
-                layout.children.pop()
-
-            layout.children.push(view)
-            view.Navigation.upAction = function () {
-                // FIXME: for some reason default navigation flow doesn't work
-                // i.e setting Navigtaion.upItem doesn't fallthrough to parent's
-                // action if it's navigable is false
-
-                if (header.Navigation.navigable)
-                    header.forceActiveFocus(Qt.BacktabFocusReason)
-                else
-                    return false // fallthrough default action
-            }
-        }
-
-        ColumnLayout {
-            id: layout
-
-            anchors.fill: parent
-
-            BrowseTreeHeader {
-                id: header
-
-                focus: true
-
-                leftPadding: root.headerLeftPadding
-                rightPadding: root.headerRightPadding
-
-                providerModel: root.model
-
-                Layout.fillWidth: true
-
-                Navigation.parentItem: root
-                Navigation.downItem: (view.Navigation.navigable) ? view : null
-            }
+            Navigation.parentItem: root
         }
     }
 }
