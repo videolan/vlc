@@ -225,8 +225,9 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
             });
             break;
         case VLC_ML_EVENT_DISCOVERY_PROGRESS:
+        {
+            NSString * const entryPoint = toNSStr(p_event->discovery_progress.psz_entry_point);
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSString * const entryPoint = toNSStr(p_event->discovery_progress.psz_entry_point);
                 NSDictionary<NSString *, NSString *> * const info = entryPoint == nil
                     ? nil
                     : @{@"entryPoint": entryPoint};
@@ -236,6 +237,7 @@ static void libraryCallback(void *p_data, const vlc_ml_event_t *p_event)
                                            userInfo:info];
             });
             break;
+        }
         case VLC_ML_EVENT_DISCOVERY_COMPLETED:
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSNotificationCenter * const defaultCenter = NSNotificationCenter.defaultCenter;
