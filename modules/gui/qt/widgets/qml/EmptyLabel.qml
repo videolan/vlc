@@ -31,20 +31,28 @@ T.Control {
     readonly property int contentLeftMargin: extraMargin + VLCStyle.layout_left_margin
     readonly property int contentRightMargin: extraMargin + VLCStyle.layout_right_margin
 
+    leftPadding: contentLeftMargin
+    rightPadding: contentRightMargin
+
+    implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                            implicitContentWidth + leftPadding + rightPadding)
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     // Aliases
 
     default property alias contents: column.data
 
     property alias cover: cover.source
 
-    property alias coverWidth: coverContainer.width
-    property alias coverHeight: coverContainer.height
+    property alias coverWidth: cover.width
+    property alias coverHeight: cover.height
 
     property alias text: label.text
 
     property alias column: column
 
-    spacing: VLCStyle.margin_small
+    spacing: VLCStyle.margin_normal
 
     enabled: visible
 
@@ -58,65 +66,40 @@ T.Control {
         colorSet: ColorContext.View
     }
 
-    Column {
+    contentItem: Column {
         id: column
-
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        width: root.width - root.contentLeftMargin - root.contentRightMargin
 
         spacing: root.spacing
 
-        Item {
-            width: parent.width
-            height: label.y + label.height
+        ScaledImage {
+            id: cover
 
-            Item {
-                id: coverContainer
+            anchors.horizontalCenter: parent.horizontalCenter
 
-                anchors.horizontalCenter: parent.horizontalCenter
+            width: VLCStyle.colWidth(1)
+            height: VLCStyle.colWidth(1)
 
-                width: VLCStyle.colWidth(1)
-                height: VLCStyle.colWidth(1)
+            fillMode: Image.PreserveAspectFit
 
-                ScaledImage {
-                    id: cover
+            Widgets.DefaultShadow {
+                anchors.centerIn: parent
 
-                    anchors.fill: parent
-
-                    asynchronous: true
-
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                Widgets.DefaultShadow {
-                    anchors.centerIn: cover
-                    sourceItem: parent
-                }
+                sourceItem: parent
             }
+        }
 
-            T.Label {
-                id: label
+        T.Label {
+            id: label
 
-                anchors.top: coverContainer.bottom
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
 
-                anchors.topMargin: VLCStyle.margin_large
+            focus: false
 
-                width: parent.width
+            color: theme.fg.primary
 
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-
-                focus: false
-
-                wrapMode: Text.WordWrap
-
-                color: theme.fg.primary
-
-                font.pixelSize: VLCStyle.fontSize_xxlarge
-                font.weight: Font.DemiBold
-            }
+            font.pixelSize: VLCStyle.fontSize_xxlarge
+            font.weight: Font.DemiBold
         }
     }
 }
