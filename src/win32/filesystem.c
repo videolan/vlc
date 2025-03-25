@@ -452,16 +452,53 @@ int vlc_dup2(int oldfd, int newfd)
 
 int vlc_pipe (int fds[2])
 {
-#if (defined(__MINGW64_VERSION_MAJOR) && __MINGW64_VERSION_MAJOR < 8)
-    // old mingw doesn't know about _CRT_USE_WINAPI_FAMILY_DESKTOP_APP
+    /* Create the named pipe with FILE_FLAG_OVERLAPPED to enable asynchronous
+     * I/O. This is necessary because vlc_poll on Windows, only work with
+     * sockets.
+     * Using FILE_FLAG_OVERLAPPED allows us to perform non-blocking I/O,
+     * which is the correct approach for async operations in Windows. */
 # if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-    return _pipe (fds, 32768, O_NOINHERIT | O_BINARY);
-# else
-    _set_errno(EPERM);
-    return -1;
-# endif
-#elif defined(_CRT_USE_WINAPI_FAMILY_DESKTOP_APP)
-    return _pipe (fds, 32768, O_NOINHERIT | O_BINARY);
+    static atomic_uint_least64_t count = 0;
+
+    uint_least64_t c = atomic_fetch_add(&count, 1);
+
+    TCHAR pipeName[MAX_PATH] = {0};
+    if (wsprintf(pipeName, TEXT("\\\\.\\pipe\\AnonPipe_%lu"), c) < 0) {
+        return -1;
+    }
+
+    HANDLE hRead = CreateNamedPipe(pipeName,
+                            PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED,
+                            PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
+                            1, 4096 * 8, 4096 * 8, 0, NULL);
+    if (hRead == INVALID_HANDLE_VALUE) {
+        return -1;
+    }
+
+    HANDLE hWrite = CreateFile(pipeName, GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+                               FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED,
+                               NULL);
+    if (hWrite == INVALID_HANDLE_VALUE) {
+        CloseHandle(hRead);
+        return -1;
+    }
+
+
+    int fdReadPipe = _open_osfhandle((intptr_t)hRead, _O_RDONLY);
+    if (fdReadPipe == -1) {
+        CloseHandle(hRead);
+        CloseHandle(hWrite);
+        return -1;
+    }
+    int fdWritePipe = _open_osfhandle((intptr_t)hWrite, _O_WRONLY);
+    if (fdWritePipe == -1) {
+        _close(fdReadPipe);
+        CloseHandle(hWrite);
+        return -1;
+    }
+    fds[0] = fdReadPipe;
+    fds[1] = fdWritePipe;
+    return 0;
 #else
     _set_errno(EPERM);
     return -1;
