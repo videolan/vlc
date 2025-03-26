@@ -319,6 +319,14 @@ MainViewLoader {
         Widgets.EmptyLabelButton {
             id: emptyLabel
 
+            background: Rectangle {
+                // NOTE: This is necessary because MainViewLoader may position this indicator over the shown header when height is small.
+                border.color: emptyLabel.colorContext.border
+                radius: VLCStyle.dp(6, VLCStyle.scale)
+                color: emptyLabel.colorContext.bg.primary
+                opacity: 0.8
+            }
+
             // FIXME: find better cover
             cover: VLCStyle.noArtVideoCover
             coverWidth : VLCStyle.dp(182, VLCStyle.scale)
