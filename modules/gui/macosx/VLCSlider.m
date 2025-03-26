@@ -37,6 +37,13 @@
         _isScrollable = YES;
         if (@available(macOS 10.14, *)) {
             [self viewDidChangeEffectiveAppearance];
+
+#if (__MAC_OS_X_VERSION_MAX_ALLOWED >= 140000)
+            // While this is available back to 10.9, it defaulted to
+            // true in macOS 13 and earlier so setting it starting
+            // in macOS 10.14+ is fine.
+            [self setClipsToBounds:YES];
+#endif
         } else {
             [self setSliderStyleLight];
         }
