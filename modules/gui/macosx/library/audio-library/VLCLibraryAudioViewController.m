@@ -459,7 +459,7 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     }
 }
 
-- (void)presentLibraryItemWaitForDataSourceFinished:(NSNotification *)aNotification
+- (void)presentLibraryItemWaitForDataSourceFinished:(nullable NSNotification *)aNotification
 {
     if (self.audioDataSource.displayedCollectionCount < self.audioDataSource.collectionToDisplayCount) {
         return;
@@ -502,12 +502,17 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
         segmentType = VLCLibrarySongsMusicSubSegmentType;
     }
 
+    VLCLibraryWindow * const libraryWindow = self.libraryWindow;
+    if (segmentType == libraryWindow.librarySegmentType) {
+        [self presentLibraryItemWaitForDataSourceFinished:nil];
+        return;
+    }
+
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(presentLibraryItemWaitForDataSourceFinished:)
                                                name:VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
                                              object:self.audioDataSource];
 
-    VLCLibraryWindow * const libraryWindow = self.libraryWindow;
     libraryWindow.librarySegmentType = segmentType;
     [libraryWindow.splitViewController.navSidebarViewController selectSegment:segmentType];
 }
