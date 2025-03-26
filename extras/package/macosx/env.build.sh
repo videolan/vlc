@@ -2,7 +2,7 @@
 
 HOST_ARCH="x86_64"
 BUILD_ARCH=`uname -m | cut -d. -f1`
-MINIMAL_OSX_VERSION="10.11"
+MINIMAL_OSX_VERSION="10.7"
 
 get_actual_arch() {
     if [ "$1" = "aarch64" ]; then
@@ -109,11 +109,26 @@ vlcSetSymbolEnvironment() {
     # here. This allows compilation also with newer macOS SDKs.
     # List assumes macOS 10.10 / iOS 8 at minimum.
 
+    # - libnetwork does not exist yet on 10.7 (used by libcddb)
+    # - Added symbols in macOS 10.9 / iOS 7
+    # - Added symbols between 10.7 and 10.11
     # - Added symbols in macOS 10.12 / iOS 10 / watchOS 3
     # - Added symbols in macOS 10.13 / iOS 11 / watchOS 4 / tvOS 11
     # - Added symbol in macOS 10.14 / iOS 12 / tvOS 9
     # - Added symbols in macOS 10.15 / iOS 13 / tvOS 13
     "${cmd}" "$@" \
+    ac_cv_lib_network_connect=no \
+    \
+    ac_cv_func_memset_s=no \
+    \
+    ac_cv_func_ffsll=no \
+    ac_cv_func_flsll=no \
+    ac_cv_func_fdopendir=no \
+    ac_cv_func_openat=no \
+    ac_cv_func_fstatat=no \
+    ac_cv_func_readlinkat=no \
+    ac_cv_func_linkat=no \
+    ac_cv_func_unlinkat=no \
     \
     ac_cv_func_basename_r=no \
     ac_cv_func_clock_getres=no \
