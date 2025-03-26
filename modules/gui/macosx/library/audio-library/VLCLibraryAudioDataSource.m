@@ -769,7 +769,7 @@ NSString * const VLCLibraryAudioDataSourceDisplayedCollectionChangedNotification
     NSParameterAssert(tableView != nil);
 
     const NSInteger clickedRow = tableView.clickedRow;
-    const id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[clickedRow - 1];
+    const id<VLCMediaLibraryItemProtocol> libraryItem = self.displayedCollection[clickedRow];
     VLCLibraryRepresentedItem * const representedItem = [[VLCLibraryRepresentedItem alloc] initWithItem:libraryItem parentType:self.currentParentType];
 
     [representedItem play];
