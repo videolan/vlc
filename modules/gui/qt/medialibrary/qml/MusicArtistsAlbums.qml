@@ -362,9 +362,7 @@ FocusScope {
     }
 
     Widgets.EmptyLabelButton {
-        anchors.fill: parent
-        anchors.leftMargin: root.leftPadding
-        anchors.rightMargin: root.rightPadding
+        anchors.centerIn: parent
 
         visible: !artistModel.loading && (artistModel.count <= 0)
         focus: visible

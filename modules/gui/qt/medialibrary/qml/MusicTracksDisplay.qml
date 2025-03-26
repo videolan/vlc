@@ -85,7 +85,7 @@ FocusScope {
     }
 
     Widgets.EmptyLabelButton {
-        anchors.fill: parent
+        anchors.centerIn: parent
         visible: !tracklistdisplay_id.model.loading && (tracklistdisplay_id.model.count <= 0)
         focus: visible
         text: qsTr("No tracks found\nPlease try adding sources")
