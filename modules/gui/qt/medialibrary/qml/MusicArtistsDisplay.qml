@@ -50,6 +50,8 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: artistsView
 
+                visible: view.count > 0
+
                 text: qsTr("Artists")
             }
 

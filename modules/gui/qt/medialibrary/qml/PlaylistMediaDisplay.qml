@@ -211,6 +211,8 @@ FocusScope {
         header: Widgets.ViewHeader {
             view: root.playlistView
 
+            visible: view.count > 0
+
             text: root.name
         }
 

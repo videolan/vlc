@@ -56,6 +56,8 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: playlistView
 
+                visible: view.count > 0
+
                 text: qsTr("Playlists")
             }
 

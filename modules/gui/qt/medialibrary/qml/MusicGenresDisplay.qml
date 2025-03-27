@@ -46,6 +46,8 @@ Widgets.PageLoader {
             header: Widgets.ViewHeader {
                 view: genresView
 
+                visible: view.count > 0
+
                 text: qsTr("Genres")
             }
 
@@ -71,6 +73,8 @@ Widgets.PageLoader {
 
             header: Widgets.ViewHeader {
                 view: albumsView
+
+                visible: view.count > 0
 
                 text: qsTr("Genres - %1").arg(genreName)
             }

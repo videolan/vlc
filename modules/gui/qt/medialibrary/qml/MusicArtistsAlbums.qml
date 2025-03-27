@@ -269,6 +269,8 @@ FocusScope {
             header: Widgets.ViewHeader {
                 view: artistList
 
+                visible: view.count > 0
+
                 leftPadding: VLCStyle.margin_normal
                 topPadding: VLCStyle.margin_xlarge
                 bottomPadding: VLCStyle.margin_small

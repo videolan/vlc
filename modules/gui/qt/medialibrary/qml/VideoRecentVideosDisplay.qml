@@ -49,6 +49,8 @@ VideoAll {
     header: Widgets.ViewHeader {
         view: root
 
+        visible: view.count > 0
+
         text: qsTr("Continue Watching")
     }
 }

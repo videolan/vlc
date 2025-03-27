@@ -66,6 +66,8 @@ VideoAll {
     header: Widgets.ViewHeader {
         view: root
 
+        visible: view.count > 0
+
         text: view.title
     }
 }

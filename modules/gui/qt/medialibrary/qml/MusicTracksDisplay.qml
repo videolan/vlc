@@ -65,6 +65,8 @@ FocusScope {
         header: Widgets.ViewHeader {
             view: tracklistdisplay_id
 
+            visible: view.count > 0
+
             text: qsTr("Tracks")
         }
 
