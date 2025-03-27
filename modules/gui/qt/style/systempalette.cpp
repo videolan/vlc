@@ -889,6 +889,10 @@ void SystemPalette::makeSystemPalette()
         else
             makeLightPalette();
     }
+    else
+    {
+        m_isDark = palette->isThemeDark();
+    }
 
     m_palettePriv = std::move(palette);
 }
