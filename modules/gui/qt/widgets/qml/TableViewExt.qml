@@ -308,6 +308,7 @@ FocusScope {
                 visible: view.headerPositioning === ListView.OverlayHeader
                          && text !== ""
                          && view.contentY > (row.height - col.height - row.topPadding)
+                         && row.visible
             }
 
             Column {
@@ -335,6 +336,9 @@ FocusScope {
                     bottomPadding: VLCStyle.margin_xsmall
 
                     spacing: VLCStyle.column_spacing
+
+                    // If there is a specific header, obey to its visibility otherwise hide the header if model is empty:
+                    visible: headerLoader.item ? headerLoader.item.visible : (view.count > 0)
 
                     Repeater {
                         model: sortModel
