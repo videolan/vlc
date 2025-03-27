@@ -138,14 +138,14 @@ FocusScope {
     property alias gridScrollBar: flickableScrollBar
 
     property alias expandDelegate: expandItemLoader.sourceComponent
-    property alias expandItem: expandItemLoader.item
+    readonly property Item expandItem: expandItemLoader.item
 
     property alias headerDelegate: headerItemLoader.sourceComponent
     property alias headerHeight: headerItemLoader.implicitHeight
-    property alias headerItem: headerItemLoader.item
+    readonly property Item headerItem: headerItemLoader.item
 
     property alias footerDelegate: footerItemLoader.sourceComponent
-    property alias footerItem: footerItemLoader.item
+    readonly property Item footerItem: footerItemLoader.item
 
     // Signals
 
