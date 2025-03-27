@@ -368,7 +368,7 @@ FocusScope {
 
         visible: !artistModel.loading && (artistModel.count <= 0)
         focus: visible
-        text: qsTr("No artists found\nPlease try adding sources, by going to the Browse tab")
+        text: qsTr("No artists found\nPlease try adding sources")
         Navigation.parentItem: root
     }
 }

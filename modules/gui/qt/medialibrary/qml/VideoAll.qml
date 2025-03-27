@@ -229,7 +229,7 @@ MainViewLoader {
 
             focus: true
 
-            text: qsTr("No video found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No video found\nPlease try adding sources")
 
             cover: VLCStyle.noArtVideoCover
 

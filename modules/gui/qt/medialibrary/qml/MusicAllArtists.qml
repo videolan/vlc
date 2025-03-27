@@ -238,7 +238,7 @@ MainViewLoader {
         id: emptyLabelComponent
 
         Widgets.EmptyLabelButton {
-            text: qsTr("No artists found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No artists found\nPlease try adding sources")
             Navigation.parentItem: root
             cover: VLCStyle.noArtArtistCover
         }

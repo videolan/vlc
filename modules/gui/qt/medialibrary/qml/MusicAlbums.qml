@@ -279,7 +279,7 @@ MainViewLoader {
         id: emptyLabelComponent
 
         Widgets.EmptyLabelButton {
-            text: qsTr("No albums found\nPlease try adding sources, by going to the Browse tab")
+            text: qsTr("No albums found\nPlease try adding sources")
             Navigation.parentItem: root
             cover: VLCStyle.noArtAlbumCover
         }
