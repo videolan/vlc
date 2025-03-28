@@ -44,6 +44,10 @@ ListView {
     property var isDropAcceptableFunc
     property var acceptDropFunc
 
+    property Component defaultScrollBar: Component {
+        ScrollBarExt { }
+    }
+
     // Private
 
     property bool _keyPressed: false
@@ -81,8 +85,18 @@ ListView {
     keyNavigationEnabled: false
     keyNavigationWraps: false
 
-    ScrollBar.vertical: ScrollBarExt { }
-    ScrollBar.horizontal: ScrollBarExt { }
+    ScrollBar.vertical: {
+        // By default vertical scroll bar is only used when the orientation is vertical.
+        if (root.defaultScrollBar && (root.orientation === ListView.Vertical))
+            return root.defaultScrollBar.createObject() // rely on JS/QML engine's garbage collection
+        return null
+    }
+    ScrollBar.horizontal: {
+        // By default horizontal scroll bar is only used when the orientation is horizontal.
+        if (root.defaultScrollBar && (root.orientation === ListView.Horizontal))
+            return root.defaultScrollBar.createObject() // rely on JS/QML engine's garbage collection
+        return null
+    }
 
     flickableDirection: Flickable.AutoFlickIfNeeded
 
