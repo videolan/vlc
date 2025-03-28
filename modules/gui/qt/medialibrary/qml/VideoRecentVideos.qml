@@ -147,8 +147,6 @@ FocusScope {
         Widgets.ViewHeader {
             id: subtitleLabel
 
-            visible: text !== ""
-
             view: root
 
             leftPadding: allVideosContentLeftMargin

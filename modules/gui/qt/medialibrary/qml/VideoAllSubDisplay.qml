@@ -271,7 +271,9 @@ VideoAll {
         allVideosContentLeftMargin: root.currentItem?.contentLeftMargin ?? 0
         allVideosContentRightMargin: root.currentItem?.contentRightMargin ?? 0
 
-        subtitleText: (root.model && root.model.count > 0) ? qsTr("Videos") : ""
+        subtitleText: qsTr("Videos")
+
+        visible: (root.model?.count ?? 0) > 0
 
         Navigation.parentItem: root
 
