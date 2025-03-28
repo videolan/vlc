@@ -74,8 +74,6 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
         m_backingStorePainter->setCompositionMode(QPainter::CompositionMode_Source);
     }
 
-    m_renderWindow->installEventFilter(this);
-
     m_uiRenderControl = new CompositorX11RenderControl(window);
 
     m_uiWindow = new CompositorOffscreenWindow(m_uiRenderControl);
@@ -86,6 +84,8 @@ CompositorX11UISurface::CompositorX11UISurface(QWindow* window, QScreen* screen)
     m_qmlEngine = new QQmlEngine();
     if (!m_qmlEngine->incubationController())
         m_qmlEngine->setIncubationController(m_uiWindow->incubationController());
+
+    m_renderWindow->installEventFilter(this);
 
     if (m_context)
     {
