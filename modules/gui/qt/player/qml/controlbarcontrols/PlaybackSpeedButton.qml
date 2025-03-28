@@ -101,6 +101,8 @@ PopupIconToolButton {
         WheelHandler {
             orientation: Qt.Vertical | Qt.Horizontal
 
+            acceptedDevices: PointerDevice.AllDevices
+
             onWheel: (wheel) => {
                 if (!root.popup.contentItem || !root.popup.contentItem.slider) {
                     event.accepted = false
