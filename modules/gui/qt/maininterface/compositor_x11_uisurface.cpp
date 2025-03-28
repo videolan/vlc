@@ -151,11 +151,12 @@ CompositorX11UISurface::~CompositorX11UISurface()
 
 void CompositorX11UISurface::setContent(QQmlComponent*,  QQuickItem* rootItem)
 {
+    assert(rootItem);
     m_rootItem = rootItem;
 
     m_rootItem->setParentItem(m_uiWindow->contentItem());
 
-    updateSizes();
+    m_rootItem->setSize(size());
 
     m_rootItem->forceActiveFocus();
 
