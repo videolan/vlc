@@ -270,6 +270,8 @@ bool CompositorX11UISurface::render()
 
 void CompositorX11UISurface::updateSizes()
 {
+    assert(m_uiWindow);
+
     qreal dpr = devicePixelRatio();
     QSize windowSize = size();
 
@@ -279,7 +281,8 @@ void CompositorX11UISurface::updateSizes()
         m_backingStore->resize(m_onscreenSize);
 
     // Behave like SizeRootObjectToView.
-    m_rootItem->setSize(windowSize);
+    if (m_rootItem)
+        m_rootItem->setSize(windowSize);
     m_uiWindow->resize(windowSize);
 }
 
