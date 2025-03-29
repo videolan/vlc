@@ -30,10 +30,10 @@ T.ScrollBar {
                              implicitContentHeight + topPadding + bottomPadding)
 
     padding: VLCStyle.dp(2, VLCStyle.scale)
-    visible: policy !== T.ScrollBar.AlwaysOff
+    visible: policy !== T.ScrollBar.AlwaysOff && ((background && background.opacity > 0.0) || (contentItem && contentItem.opacity > 0.0))
     minimumSize: horizontal ? (height / width) : (width / height)
 
-    // We don't want to show anything is scrolling is not possible (content size less than
+    // We don't want to show anything if scrolling is not possible (content size less than
     // or equal to flickable size), unless `ScrollBar.AlwaysOn` is used (not by default):
     readonly property bool _shown: (policy === T.ScrollBar.AlwaysOn) || (control.size < 1.0)
 
