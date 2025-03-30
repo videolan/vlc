@@ -29,7 +29,7 @@ template<class T>
 T QSGRoundedRectangularImageNode::material_cast(QSGMaterial* const material)
 {
 #ifdef NDEBUG
-    return static_cast<T>(object);
+    return static_cast<T>(material);
 #else
     const auto ret = dynamic_cast<T>(material);
     assert(ret); // incompatible material type
