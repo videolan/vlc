@@ -61,6 +61,8 @@ ColumnLayout {
     Layout.fillWidth: true
     Layout.fillHeight: true
 
+    spacing: VLCStyle.margin_normal
+
     // Events
 
     Component.onCompleted: _updateValue(Player.rate)
@@ -150,7 +152,6 @@ ColumnLayout {
         id: rowA
 
         Layout.fillWidth: true
-        Layout.topMargin: VLCStyle.margin_xsmall
 
         Layout.alignment: Qt.AlignTop
 
@@ -184,7 +185,7 @@ ColumnLayout {
         id: slider
 
         Layout.fillWidth: true
-        Layout.topMargin: VLCStyle.margin_xsmall
+
         topPadding: 0
 
         // NOTE: These values come from the VLC 3.x implementation.
@@ -244,7 +245,6 @@ ColumnLayout {
     GridLayout {
         Layout.fillWidth: true
         Layout.fillHeight: true
-        Layout.topMargin: VLCStyle.margin_xsmall
 
         rows: radioButtonRepeater.count / 2 // two columns
         flow: GridLayout.TopToBottom
