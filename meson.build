@@ -136,7 +136,7 @@ cargo_bin = find_program('cargo', required: get_option('rust'))
 #
 # General feature defines
 #
-vlc_conf_prefix = ''
+vlc_conf_prefix = []
 
 feature_defines = [
     ['_GNU_SOURCE', 1], # Enable GNU extensions on systems that have them
@@ -144,7 +144,7 @@ feature_defines = [
 
 foreach d : feature_defines
     cdata.set(d.get(0), d.get(1))
-    vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
+    vlc_conf_prefix += '#define @0@ @1@'.format(d.get(0), d.get(1))
 endforeach
 
 vlc_tests = []
@@ -395,7 +395,7 @@ windows_version_test = '''
 
     foreach d : windows_defines
         cdata.set(d.get(0), d.get(1))
-        vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
+        vlc_conf_prefix += '#define @0@ @1@'.format(d.get(0), d.get(1))
     endforeach
 
     mingw_check = '''
@@ -451,7 +451,7 @@ ucrt_version_test = '''
 
         foreach d : mingw_defines
             cdata.set(d.get(0), d.get(1))
-            vlc_conf_prefix = vlc_conf_prefix + '#define @0@ @1@\n'.format(d.get(0), d.get(1))
+            vlc_conf_prefix += '#define @0@ @1@'.format(d.get(0), d.get(1))
         endforeach
 
         # fno-strict-aliasing is necessary for WRL and IID_PPV_ARGS to work safely
@@ -958,7 +958,7 @@ elif host_system == 'windows'
     pollfd_prefix += '#include <winsock2.h>'
 endif
 
-if cc.has_type('struct pollfd', prefix: [vlc_conf_prefix] + pollfd_prefix)
+if cc.has_type('struct pollfd', prefix: vlc_conf_prefix + pollfd_prefix)
     cdata.set('HAVE_STRUCT_POLLFD', 1)
 endif
 
