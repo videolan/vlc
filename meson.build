@@ -951,16 +951,14 @@ if not cc.has_type('ssize_t', prefix: '#include <sys/types.h>')
 endif
 
 # Check for struct pollfd type
-# TODO: Refactor once updating to meson 1.0.0
-# which supports prefix arrays.
-pollfd_prefix = '#include <sys/types.h>\n'
+pollfd_prefix = ['#include <sys/types.h>']
 if cdata.get('HAVE_POLL', 0) == 1
     pollfd_prefix += '#include <poll.h>'
 elif host_system == 'windows'
     pollfd_prefix += '#include <winsock2.h>'
 endif
 
-if cc.has_type('struct pollfd', prefix: [vlc_conf_prefix, pollfd_prefix])
+if cc.has_type('struct pollfd', prefix: [vlc_conf_prefix] + pollfd_prefix)
     cdata.set('HAVE_STRUCT_POLLFD', 1)
 endif
 
