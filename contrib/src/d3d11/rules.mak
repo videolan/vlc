@@ -26,6 +26,9 @@ DXGI_H_URL := http://sourceforge.net/p/mingw-w64/mingw-w64/ci/$(DXGITYPE_COMMIT_
 ifdef HAVE_WIN32
 PKGS += d3d11
 endif
+ifeq ($(call mingw_at_least, 8), true)
+PKGS_FOUND += d3d11
+endif # MINGW 8
 
 $(TARBALLS)/d3d11.h:
 	$(call download,$(D3D11_H_URL))
