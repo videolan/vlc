@@ -18,6 +18,7 @@
 
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Templates as T
 import QtQuick.Layouts
 
 
@@ -32,16 +33,9 @@ ColumnLayout {
 
     property alias slider: slider
 
-    // Private
+    signal radioButtonClicked(T.AbstractButton button)
 
-    property var _model: [{ "value": 0.25 },
-                          { "value": 0.5 },
-                          { "value": 0.75 },
-                          { "value": 1, "title": qsTr("Normal") },
-                          { "value": 1.25 },
-                          { "value": 1.5 },
-                          { "value": 1.75 },
-                          { "value": 2 }]
+    // Private
 
     // NOTE: 0.96 and 1.04 are useful for video enthusiasts.
     property var _values: [ 0.25, 0.5, 0.75, 0.96, 1.0, 1.04, 1.25, 1.5, 1.75, 2 ]
@@ -73,32 +67,10 @@ ColumnLayout {
 
     // Function
 
-    function _updateComboBox(value) {
-        // NOTE: We want a rounded 1.xx value.
-        value = Math.round(value * 100) / 100
-
-        for (let i = 0; i < _model.length; i++) {
-            if (Helpers.compareFloat(_model[i].value, value) === false)
-                continue
-
-            comboBox.currentIndex = i
-
-            _value = value
-
-            return;
-        }
-
-        comboBox.currentIndex = -1
-
-        _value = value
-    }
-
     function _updateValue(value) {
         _update = false
 
         _applySlider(value)
-
-        _updateComboBox(value)
 
         _update = true
     }
@@ -137,8 +109,6 @@ ColumnLayout {
         _update = false
 
         Player.rate = value
-
-        _updateComboBox(value)
 
         _update = true
     }
@@ -232,7 +202,6 @@ ColumnLayout {
         toolTipFollowsMouse: true
 
         Navigation.parentItem: root
-        Navigation.downItem: comboBox
 
         Keys.priority: Keys.AfterItem
         Keys.onPressed: (event) => Navigation.defaultKeyAction(event)
@@ -266,56 +235,49 @@ ColumnLayout {
         }
     }
 
-    RowLayout {
-        id: rowB
-
+    Widgets.ListLabel {
+        text: qsTr("Presets:")
+        color: colorContext.fg.primary
         Layout.fillWidth: true
+    }
+
+    GridLayout {
+        Layout.fillWidth: true
+        Layout.fillHeight: true
         Layout.topMargin: VLCStyle.margin_xsmall
 
-        Navigation.parentItem: root
-        Navigation.upItem: slider
+        rows: radioButtonRepeater.count / 2 // two columns
+        flow: GridLayout.TopToBottom
 
-        Widgets.ListLabel {
-            text: qsTr("Presets")
-            color: colorContext.fg.primary
-            Layout.fillWidth: true
+        rowSpacing: VLCStyle.margin_small
+        columnSpacing: VLCStyle.margin_small
+
+        ButtonGroup {
+            id: buttonGroup
+
+            onClicked: function(button /* : AbstractButton */) {
+                Player.rate = button.modelData
+                root.radioButtonClicked(button)
+            }
         }
 
-        Widgets.ComboBoxExt {
-            id: comboBox
+        Repeater {
+            id: radioButtonRepeater
 
-            Layout.preferredWidth: VLCStyle.combobox_width_normal
-            Layout.preferredHeight: VLCStyle.combobox_height_normal
+            model: root._values
 
-            model: ListModel {}
+            delegate: Widgets.RadioButtonExt {
+                required property double modelData
 
-            // NOTE: We display the 'Normal' string when the Slider is centered.
-            displayText: (currentIndex === 3) ? currentText
-                                              : root._value
+                Layout.fillWidth: true
 
-            Navigation.parentItem: rowB
+                text: modelData
 
-            // NOTE: This makes the navigation possible since 'up' is changing the comboBox value.
-            Navigation.leftItem: slider
+                checked: Math.abs(Player.rate - modelData) < 0.01 // need some generous epsilon here
 
-            Component.onCompleted: {
-                for (let i = 0; i < _model.length; i++) {
-                    const item = _model[i]
+                padding: 0 // we use spacing instead of paddings here
 
-                    const title = item.title
-
-                    if (title)
-                        model.append({ "title": title })
-                    else
-                        model.append({ "title": String(item.value) })
-                }
-            }
-
-            onCurrentIndexChanged: {
-                if (root._update === false || currentIndex === -1)
-                    return
-
-                root._applySlider(_model[currentIndex].value)
+                ButtonGroup.group: buttonGroup
             }
         }
     }
