@@ -303,10 +303,8 @@ foreach header : check_c_headers
         continue
     endif
 
-    # TODO: Once we require meson 1.0, drop the array join here
-    # See: https://github.com/mesonbuild/meson/pull/11099
     if cc.check_header(header[0],
-                       prefix: '\n'.join(header_kwargs.get('prefix', [])),
+                       prefix: header_kwargs.get('prefix', []),
                        args: header_kwargs.get('args', []))
         cdata.set('HAVE_' + header[0].underscorify().to_upper(), 1)
     endif
@@ -314,10 +312,8 @@ endforeach
 
 foreach header : check_cpp_headers
     header_kwargs = header.get(1, {})
-    # TODO: Once we require meson 1.0, drop the array join here
-    # See: https://github.com/mesonbuild/meson/pull/11099
     if cpp.check_header(header[0],
-                       prefix: '\n'.join(header_kwargs.get('prefix', [])),
+                       prefix: header_kwargs.get('prefix', []),
                        args: header_kwargs.get('args', []))
         cdata.set('HAVE_' + header[0].underscorify().to_upper(), 1)
     endif
@@ -964,7 +960,7 @@ elif host_system == 'windows'
     pollfd_prefix += '#include <winsock2.h>'
 endif
 
-if cc.has_type('struct pollfd', prefix: '\n'.join([vlc_conf_prefix, pollfd_prefix]))
+if cc.has_type('struct pollfd', prefix: [vlc_conf_prefix, pollfd_prefix])
     cdata.set('HAVE_STRUCT_POLLFD', 1)
 endif
 

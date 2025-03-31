@@ -83,11 +83,11 @@ vlc_modules += {
 
 # Windows SAPI text to speech
 if host_system == 'windows'
-    have_sapi = cpp.has_type('ISpObjectToken', prefix: '\n'.join([
+    have_sapi = cpp.has_type('ISpObjectToken', prefix: [
         '#include <windows.h>',
         '#include <sapi.h>',
         '#include <sphelper.h>'
-    ]))
+    ])
 else
     have_sapi = false
 endif
