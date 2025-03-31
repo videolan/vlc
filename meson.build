@@ -1101,11 +1101,11 @@ subdir('src')
 # LibVLC
 subdir('lib')
 
-# VLC binaries
-subdir('bin')
-
 # VLC plugins
 subdir('modules')
+
+# VLC binaries
+subdir('bin')
 
 # Generate config.h
 configure_file(input: 'config.h.meson',
