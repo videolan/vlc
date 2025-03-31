@@ -188,64 +188,13 @@ static void spu_channel_Clean(spu_private_t *sys, struct spu_channel *channel)
 {
     spu_render_entry_t *entry;
     vlc_vector_foreach_ref(entry, &channel->entries)
-        spu_Channel_CleanEntry(sys, entry);
+    {
+        assert(entry->subpic);
+
+        spu_PrerenderCancel(sys, entry->subpic);
+        subpicture_Delete(entry->subpic);
+    }
     vlc_vector_clear(&channel->entries);
-}
-
-static bool spu_HasAlreadyExpired(vlc_tick_t start, vlc_tick_t stop,
-                                  vlc_tick_t system_now)
-{
-    bool b_stop_is_valid = (stop >= start);
-    /* we can't include ephemere SPU without end date
-           as the joining gap would be dropped due to the
-           asynchronous update between the drop and the displayed SPU */
-    if(b_stop_is_valid && stop < system_now)
-        return true;
-    return false;
-}
-
-static void spu_channel_EarlyRemoveLate(spu_private_t *sys,
-                                        struct spu_channel *channel,
-                                        vlc_tick_t system_now)
-{
-    if(channel->entries.size == 0)
-        return;
-    /* Find first display time that will expire ephemer SPU and store it's enqueue
-     * order. Ephemer really expires on next SPU activation, or if it has a valid
-     * stop time */
-    const spu_render_entry_t *last = &channel->entries.data[channel->entries.size-1];
-    vlc_tick_t minactivespu = last->start;
-    int64_t minactivespuorder = last->subpic->i_order;
-    for (size_t i = 0; i < channel->entries.size - 1; i++)
-    {
-        const spu_render_entry_t *entry = &channel->entries.data[i];
-        if(!entry->subpic->b_ephemer &&
-           spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
-            continue;
-        if(minactivespu >= entry->start)
-        {
-            minactivespu = entry->start;
-            if(minactivespuorder > entry->subpic->i_order)
-                minactivespuorder = entry->subpic->i_order;
-        }
-    }
-
-    for (size_t i = 0; i < channel->entries.size;)
-    {
-        const spu_render_entry_t *entry = &channel->entries.data[i];
-        /* !warn: do not simplify using order only. There can be multiple SPU
-         * lines active at a same time, while ephemer ones are always expired
-         * by next activated SPU in enqueue order */
-        if((entry->subpic->b_ephemer &&
-            entry->subpic->i_order < minactivespuorder) ||
-            spu_HasAlreadyExpired(entry->start, entry->stop, system_now))
-        {
-            spu_Channel_CleanEntry(sys, &channel->entries.data[i]);
-            vlc_vector_remove(&channel->entries, i);
-            continue;
-        }
-        i++;
-    }
 }
 
 static struct spu_channel *spu_GetChannel(spu_t *spu, size_t channel_id, size_t *index)
@@ -2163,16 +2112,6 @@ void spu_PutSubpicture(spu_t *spu, subpicture_t *subpic)
         }
 
         vlc_clock_Unlock(channel->clock);
-
-        spu_channel_EarlyRemoveLate(sys, channel, system_now);
-
-        /* Maybe the new one is also already expired */
-        if(spu_HasAlreadyExpired(subpic->i_start, subpic->i_stop, system_now))
-        {
-            vlc_mutex_unlock(&sys->lock);
-            subpicture_Delete(subpic);
-            return;
-        }
     }
 
     /* An ephemer with stop time can be ephemer,
