@@ -902,6 +902,7 @@ qml_modules += {
         'widgets/qml/ImageExt.qml',
         'widgets/qml/ScrollBarExt.qml',
         'widgets/qml/FastBlend.qml',
+        'widgets/qml/RadioButtonExt.qml',
     ),
 }
 
