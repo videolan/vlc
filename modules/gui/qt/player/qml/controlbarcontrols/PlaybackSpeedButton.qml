@@ -42,6 +42,10 @@ PopupIconToolButton {
 
         // NOTE: Mapping the right direction because the down action triggers the ComboBox.
         Navigation.rightItem: root
+
+        onRadioButtonClicked: {
+            root.popup.close()
+        }
     }
 
     contentItem: Item {
