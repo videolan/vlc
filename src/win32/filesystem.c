@@ -65,24 +65,46 @@ static wchar_t *widen_path (const char *path)
 
 int vlc_open (const char *filename, int flags, ...)
 {
-    int mode = 0;
-    va_list ap;
+    DWORD dwDesiredAccess, dwCreationDisposition, dwFlagsAndAttributes;
 
     flags |= O_NOINHERIT; /* O_CLOEXEC */
     /* Defaults to binary mode */
     if ((flags & O_TEXT) == 0)
         flags |= O_BINARY;
 
-    va_start (ap, flags);
+    if (flags & O_WRONLY)
+    {
+        dwDesiredAccess = GENERIC_WRITE;
+    }
+    else if (flags & O_RDWR)
+    {
+        dwDesiredAccess = GENERIC_READ | GENERIC_WRITE;
+    }
+    else // if (flags & O_RDONLY)
+    {
+        dwDesiredAccess = GENERIC_READ;
+    }
+
     if (flags & O_CREAT)
     {
-        int unixmode = va_arg(ap, int);
-        if (unixmode & 0444)
-            mode |= _S_IREAD;
-        if (unixmode & 0222)
-            mode |= _S_IWRITE;
+        if (flags & O_EXCL)
+            dwCreationDisposition = CREATE_NEW;
+        else
+            dwCreationDisposition = CREATE_ALWAYS;
     }
-    va_end (ap);
+    else if (flags & O_TRUNC)
+    {
+        dwCreationDisposition = TRUNCATE_EXISTING;
+    }
+    else
+    {
+        dwCreationDisposition = OPEN_EXISTING;
+    }
+
+    dwFlagsAndAttributes = FILE_FLAG_RANDOM_ACCESS | SECURITY_SQOS_PRESENT | SECURITY_IDENTIFICATION;
+
+    // if (flags & O_NONBLOCK)
+    //     dwFlagsAndAttributes |= FILE_FLAG_OVERLAPPED;
 
     /*
      * open() cannot open files with non-“ANSI” characters on Windows.
@@ -92,8 +114,31 @@ int vlc_open (const char *filename, int flags, ...)
     if (wpath == NULL)
         return -1;
 
-    int fd = _wopen (wpath, flags, mode);
+    HANDLE h;
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
+    h = CreateFileW(wpath, dwDesiredAccess,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL, dwCreationDisposition,
+        dwFlagsAndAttributes, NULL);
+#else
+    CREATEFILE2_EXTENDED_PARAMETERS params = { 0 };
+    params.dwSize = sizeof(params);
+    params.dwFileAttributes = dwFlagsAndAttributes & 0xFFFF;
+    params.dwFileFlags = dwFlagsAndAttributes & ~(0xFFFF | SECURITY_VALID_SQOS_FLAGS);
+    params.dwSecurityQosFlags = dwFlagsAndAttributes & SECURITY_VALID_SQOS_FLAGS;
+    h = CreateFile2(wpath, dwDesiredAccess,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        dwCreationDisposition,
+        &params);
+#endif
     free (wpath);
+    if (h == INVALID_HANDLE_VALUE)
+        return -1;
+    int fd = _open_osfhandle((intptr_t)h, flags);
+    if (unlikely(fd == -1))
+    {
+        CloseHandle(h);
+    }
     return fd;
 }
 
