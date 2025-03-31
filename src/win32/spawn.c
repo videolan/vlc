@@ -116,7 +116,7 @@ static int vlc_spawn_inner(pid_t *restrict pid, const char *path,
     char *cmdline = NULL;
 
     if (fdv[0] == -1 || fdv[1] == -1) {
-        nulfd = vlc_open("\\\\.\\NUL", O_RDWR);
+        nulfd = _open("\\\\.\\NUL", O_RDWR);
         if (unlikely(nulfd == -1))
             goto error;
 
