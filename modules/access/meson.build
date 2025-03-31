@@ -9,16 +9,21 @@ vlc_modules += {
 }
 
 decklink_dep = disabler()
+decklink_dependencies = []
 decklink_cpp_args = []
 if get_option('decklink').allowed()
 if host_system == 'windows'
     decklink_cpp_args += libcom_cppflags
 endif
+if have_osx
+    decklink_dependencies += corefoundation_dep
+endif
 # TODO allow providing a custom location for the DeckLink SDK
 if contrib_dir != ''
     decklink_dep = declare_dependency(
         link_args: '-L' + contrib_libdir,
-        compile_args: [f'-I@contrib_incdir@/decklink'])
+        compile_args: [f'-I@contrib_incdir@/decklink'],
+        dependencies: decklink_dependencies)
     if not cpp.check_header('DeckLinkAPI.h', dependencies: [ decklink_dep ])
         decklink_dep = disabler()
     endif
