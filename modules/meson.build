@@ -378,6 +378,7 @@ endif
 # entry with the needed build definition for a VLC plugin.
 #
 vlc_plugins_targets = {}
+vlc_plugins_targets_array = []
 vlc_plugins_manifest = {}
 foreach module : vlc_modules
     if not module.has_key('name')
@@ -451,6 +452,7 @@ foreach module : vlc_modules
     vlc_plugins_targets += {
         module['name']: vlc_plugin
     }
+    vlc_plugins_targets_array += vlc_plugin
 endforeach
 
 # Rust/cargo common handling code
