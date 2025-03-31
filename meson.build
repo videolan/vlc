@@ -930,7 +930,7 @@ endif
 
 # Check for struct sockaddr_storage type
 # Define it to `sockaddr` if missing
-sockaddr_prefix = '#include <sys/types.h>\n'
+sockaddr_prefix = ['#include <sys/types.h>']
 if host_system == 'windows'
     sockaddr_prefix += '#include <winsock2.h>'
 else
