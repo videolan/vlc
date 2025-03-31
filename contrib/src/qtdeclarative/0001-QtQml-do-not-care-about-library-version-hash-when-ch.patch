@@ -1,0 +1,40 @@
+From 516124593ac452a9c894ea642a67854a6ee1a2fd Mon Sep 17 00:00:00 2001
+From: Fatih Uzunoglu <fuzun54@outlook.com>
+Date: Mon, 31 Mar 2025 23:14:59 +0300
+Subject: [PATCH] QtQml: do not care about library version hash when checking
+ QML cache
+
+This allows using `qmlcachegen` that has different library version
+hash.
+---
+ src/qml/common/qv4compileddata.cpp | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/src/qml/common/qv4compileddata.cpp b/src/qml/common/qv4compileddata.cpp
+index 803739e27c..1af7319517 100644
+--- a/src/qml/common/qv4compileddata.cpp
++++ b/src/qml/common/qv4compileddata.cpp
+@@ -68,20 +68,6 @@ bool Unit::verifyHeader(QDateTime expectedSourceTimeStamp, QString *errorString)
+         }
+     }
+ 
+-#if defined(QML_COMPILE_HASH) && defined(QML_COMPILE_HASH_LENGTH) && QML_COMPILE_HASH_LENGTH > 0
+-    if (qstrncmp(qml_compile_hash, libraryVersionHash, QML_COMPILE_HASH_LENGTH) != 0) {
+-        *errorString = QStringLiteral("QML compile hashes don't match. Found %1 expected %2")
+-                               .arg(QString::fromLatin1(
+-                                            QByteArray(libraryVersionHash, QML_COMPILE_HASH_LENGTH)
+-                                                    .toPercentEncoding()),
+-                                    QString::fromLatin1(
+-                                            QByteArray(qml_compile_hash, QML_COMPILE_HASH_LENGTH)
+-                                                    .toPercentEncoding()));
+-        return false;
+-    }
+-#else
+-#error "QML_COMPILE_HASH must be defined for the build of QtDeclarative to ensure version checking for cache files"
+-#endif
+     return true;
+ }
+ 
+-- 
+2.48.1
+
