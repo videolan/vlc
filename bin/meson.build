@@ -55,6 +55,7 @@ if build_vlc and (host_system != 'darwin' or have_osx) and not have_win_store an
         command: [vlc_cache_gen_dep, meson.global_build_root() / 'modules'],
         # ninja command will be `ninja bin/plugins.dat`
         output: 'plugins.dat',
+        depends: vlc_plugins_targets_array,
         build_by_default: not meson.is_cross_build(),
     )
 
