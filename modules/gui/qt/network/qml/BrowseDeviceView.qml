@@ -53,6 +53,8 @@ FocusScope {
 
     property bool isSearchable: true
 
+    readonly property bool hasGridListMode: true
+
     property Component header: Widgets.ViewHeader {
         view: root
 
