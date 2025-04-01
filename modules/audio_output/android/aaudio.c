@@ -501,14 +501,18 @@ CloseAAudioStream(aout_stream_t *stream)
 {
     struct sys *sys = stream->sys;
 
-    RequestStop(stream);
+    if (!sys->error)
+    {
+        RequestStop(stream);
 
-    if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) != VLC_SUCCESS)
-        msg_Warn(stream, "Error waiting for stopped state");
+        if (WaitState(stream, AAUDIO_STREAM_STATE_STOPPED) != VLC_SUCCESS)
+            msg_Warn(stream, "Error waiting for stopped state");
+    }
 
     vt.AAudioStream_close(sys->as);
 
     sys->as = NULL;
+    sys->error = false;
 }
 
 static aaudio_channel_mask_t
@@ -749,8 +753,9 @@ Flush(aout_stream_t *stream)
     struct sys *sys = stream->sys;
     aaudio_stream_state_t state = GetState(stream);
 
-    if (state == AAUDIO_STREAM_STATE_UNINITIALIZED
-     || state == AAUDIO_STREAM_STATE_OPEN)
+    if (state == AAUDIO_STREAM_STATE_UNINITIALIZED)
+        goto error;
+    if (state == AAUDIO_STREAM_STATE_OPEN)
         return;
 
     /* Flush must be requested while PAUSED */
@@ -758,19 +763,20 @@ Flush(aout_stream_t *stream)
     if (state != AAUDIO_STREAM_STATE_PAUSING
      && state != AAUDIO_STREAM_STATE_PAUSED
      && RequestPause(stream) != VLC_SUCCESS)
-        return;
+        goto error;
 
     state = GetState(stream);
     if (state == AAUDIO_STREAM_STATE_PAUSING
      && WaitState(stream, AAUDIO_STREAM_STATE_PAUSED) != VLC_SUCCESS)
-        return;
+        goto error;
 
     if (RequestFlush(stream) != VLC_SUCCESS)
-        return;
+        goto error;
 
     if (WaitState(stream, AAUDIO_STREAM_STATE_FLUSHED) != VLC_SUCCESS)
-        return;
+        goto error;
 
+error:
     CloseAAudioStream(stream);
 
     vlc_frame_ChainRelease(sys->frame_chain);
