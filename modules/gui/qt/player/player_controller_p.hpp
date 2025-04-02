@@ -103,7 +103,7 @@ public:
 #if QT_HAS_LIBATOMIC
     std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime;
 #else
-    vlc_player_timer_smpte_timecode m_highResolutionTime;
+    vlc_player_timer_smpte_timecode m_highResolutionTime {};
     mutable QReadWriteLock m_highResolutionTimeLock;
 #endif
     mutable QPair<vlc_player_timer_smpte_timecode, QString> m_highResolutionTimeSample;
