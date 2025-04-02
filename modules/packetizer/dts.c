@@ -305,8 +305,9 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                          vlc_dts_header_IsSync( p_header, VLC_DTS_HEADER_SIZE ) )
                     {
                         p_sys->i_input_size = p_sys->i_next_offset = p_sys->first.i_frame_size - 1;
-                        /* reenter */
-                        break;
+                        assert(p_sys->i_input_size);
+                        if(p_sys->i_input_size >= VLC_DTS_HEADER_SIZE)
+                            break; /* reenter */
                     }
                     msg_Dbg( p_dec, "emulated sync word "
                              "(no sync on following frame)" );
