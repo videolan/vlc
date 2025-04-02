@@ -73,8 +73,8 @@ T.ScrollBar {
     }
 
     contentItem: Rectangle {
-        implicitWidth: VLCStyle.dp(control.interacting ? 5 : 2, VLCStyle.scale)
-        implicitHeight: VLCStyle.dp(control.interacting ? 5 : 2, VLCStyle.scale)
+        implicitWidth: control.interacting ? VLCStyle.scrollBarInteractingSize : VLCStyle.scrollBarNonInteractingSize
+        implicitHeight: control.interacting ? VLCStyle.scrollBarInteractingSize : VLCStyle.scrollBarNonInteractingSize
 
         radius: width / 2
         color: theme.fg.secondary

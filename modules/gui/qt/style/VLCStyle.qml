@@ -17,10 +17,9 @@
  *****************************************************************************/
 pragma Singleton
 import QtQuick
-import QtQuick.Controls
+
 import VLC.MainInterface
 import VLC.Style
-import VLC.Widgets as Widgets
 
 QtObject {
     id: vlc_style
@@ -58,8 +57,7 @@ QtObject {
     readonly property double margin_xlarge: MainCtx.dp(32, scale);
     readonly property double margin_xxlarge: MainCtx.dp(36, scale);
 
-    property Component _scrollBarComponent: Widgets.ScrollBarExt { }
-    property real resizeHandleWidth
+    readonly property real resizeHandleWidth: (scrollBarInteractingSize / 2)
 
     // Borders
     readonly property int border: MainCtx.dp(1, scale)
@@ -320,6 +318,10 @@ QtObject {
     readonly property int controlLayoutHeight: MainCtx.dp(64, scale)
     readonly property int controlLayoutHeightPinned: MainCtx.dp(32, scale)
 
+    // Scroll bar (size means width or height, depending on the orientation):
+    readonly property real scrollBarInteractingSize: MainCtx.dp(5, scale)
+    readonly property real scrollBarNonInteractingSize: MainCtx.dp(2, scale)
+
     function dp(size, scale) {
         if (scale === undefined)
             return MainCtx.dp(size, MainCtx.intfScaleFactor)
@@ -328,19 +330,6 @@ QtObject {
 
     function colWidth(nb) {
       return nb * VLCStyle.column_width + ( nb - 1 ) * VLCStyle.column_spacing;
-    }
-
-    Component.onCompleted: {
-        {
-            // Resize handle width setting:
-            const scrollBarObject = _scrollBarComponent.createObject()
-            console.assert(scrollBarObject)
-            const scrollBarWidth = scrollBarObject.width
-            scrollBarObject.destroy()
-
-            _scrollBarComponent = null
-            resizeHandleWidth = (scrollBarWidth / 2)
-        }
     }
 
     //dynamic margins based on screen width
