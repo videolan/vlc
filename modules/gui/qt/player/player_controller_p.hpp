@@ -100,7 +100,7 @@ public:
     double       m_position = 0.f;
     VLCTick      m_length= 0;
 
-#if QT_HAS_LIBATOMIC
+#ifdef QT_HAS_LIBATOMIC
     std::atomic<vlc_player_timer_smpte_timecode> m_highResolutionTime;
 #else
     vlc_player_timer_smpte_timecode m_highResolutionTime {};
