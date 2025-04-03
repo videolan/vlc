@@ -1337,7 +1337,6 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/TableHeaderDelegate.qml \
 	widgets/qml/DefaultShadow.qml \
 	widgets/qml/ListLabel.qml \
-	widgets/qml/LocalTabBar.qml \
 	widgets/qml/MediaCover.qml \
 	widgets/qml/SubtitleLabel.qml \
 	widgets/qml/MenuCaption.qml \

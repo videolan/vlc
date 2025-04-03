@@ -897,7 +897,6 @@ qml_modules += {
         'widgets/qml/TableHeaderDelegate.qml',
         'widgets/qml/DefaultShadow.qml',
         'widgets/qml/ListLabel.qml',
-        'widgets/qml/LocalTabBar.qml',
         'widgets/qml/MediaCover.qml',
         'widgets/qml/SubtitleLabel.qml',
         'widgets/qml/MenuCaption.qml',
