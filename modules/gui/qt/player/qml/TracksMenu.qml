@@ -40,10 +40,6 @@ T.Popup {
 
     height: VLCStyle.dp(296, VLCStyle.scale)
 
-    // Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15
-    closePolicy: Popup.CloseOnPressOutside | Popup.CloseOnEscape
-    modal: true
-
     // Animations
 
     Behavior on width {
@@ -59,8 +55,6 @@ T.Popup {
         id: popupTheme
         colorSet: ColorContext.Window
     }
-
-    T.Overlay.modal: null
 
     background: Rectangle {
         // NOTE: The opacity should be stronger on a light background for readability.
