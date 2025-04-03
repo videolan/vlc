@@ -25,14 +25,16 @@
 #include "player/control_list_model.hpp"
 #include "player/player_controlbar_model.hpp"
 
-#define SETTINGS_KEY_SELECTEDPROFILE "SelectedProfile"
-#define SETTINGS_ARRAYNAME_PROFILES "Profiles"
-#define SETTINGS_KEY_NAME "Name"
-#define SETTINGS_KEY_MODEL "Model"
+// NOTE: QSettings started to accept QAnyStringView with Qt 6.4,
+//       so instead of a QString(Literal), use QLatin1String(View):
+constexpr QLatin1String SETTINGS_KEY_SELECTEDPROFILE {"SelectedProfile"};
+constexpr QLatin1String SETTINGS_ARRAYNAME_PROFILES {"Profiles"};
+constexpr QLatin1String SETTINGS_KEY_NAME {"Name"};
+constexpr QLatin1String SETTINGS_KEY_MODEL {"Model"};
 
-#define SETTINGS_CONTROL_SEPARATOR QChar(',')
-#define SETTINGS_CONFIGURATION_SEPARATOR QChar('|')
-#define SETTINGS_PROFILE_SEPARATOR QChar('$')
+constexpr QChar SETTINGS_CONTROL_SEPARATOR {','};
+constexpr QChar SETTINGS_CONFIGURATION_SEPARATOR {'|'};
+constexpr QChar SETTINGS_PROFILE_SEPARATOR {'$'};
 
 decltype (ControlbarProfileModel::m_defaults)
     ControlbarProfileModel::m_defaults =
