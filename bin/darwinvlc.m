@@ -204,9 +204,8 @@ int main(int i_argc, const char *ppsz_argv[])
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_source_t sigIntSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGINT, 0, queue);
     dispatch_source_t sigTermSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGTERM, 0, queue);
-    dispatch_source_t sigChldSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_SIGNAL, SIGCHLD, 0, queue);
 
-    if (!sigIntSource || !sigTermSource || !sigChldSource)
+    if (!sigIntSource || !sigTermSource)
         abort();
 
     dispatch_source_set_event_handler(sigIntSource, ^{
@@ -216,16 +215,8 @@ int main(int i_argc, const char *ppsz_argv[])
         vlc_terminate(nil);
     });
 
-    dispatch_source_set_event_handler(sigChldSource, ^{
-        int status;
-        while(waitpid(-1, &status, WNOHANG) > 0)
-            ;
-    });
-
     dispatch_resume(sigIntSource);
     dispatch_resume(sigTermSource);
-    dispatch_resume(sigChldSource);
-
 
     /* Handle parameters */
     const char **argv = calloc(i_argc + 2, sizeof (argv[0]));
@@ -320,7 +311,6 @@ out:
 
     dispatch_release(sigIntSource);
     dispatch_release(sigTermSource);
-    dispatch_release(sigChldSource);
 
     if (vlc)
         libvlc_release(vlc);
