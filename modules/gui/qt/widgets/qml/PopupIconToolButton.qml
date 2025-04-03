@@ -77,13 +77,6 @@ Widgets.IconToolButton {
         // Setting margins to >=0 makes it sure that this is satisfied.
         margins: MainCtx.windowExtendedMargin
 
-        modal: true
-
-        // NOTE: Popup.CloseOnPressOutside doesn't work with non-model Popup on Qt < 5.15.
-        closePolicy: (Popup.CloseOnPressOutside | Popup.CloseOnEscape)
-
-        Overlay.modal: null
-
         // Events
 
         onOpened: {
