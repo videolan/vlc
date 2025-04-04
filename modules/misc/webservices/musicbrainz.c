@@ -162,7 +162,7 @@ static bool musicbrainz_fill_release(const struct json_object *release,
                                      musicbrainz_release_t *r)
 {
     const struct json_array *media_array = json_get_array(release, "media");
-    if (media_array == NULL && media_array->size == 0)
+    if (media_array == NULL || media_array->size == 0)
         return false;
     /* we always use first media */
     const struct json_value *media = &media_array->entries[0];
@@ -170,7 +170,7 @@ static bool musicbrainz_fill_release(const struct json_object *release,
         return false;
 
     const struct json_array *tracks = json_get_array(&media->object, "tracks");
-    if (tracks == NULL && tracks->size == 0)
+    if (tracks == NULL || tracks->size == 0)
         return false;
 
     r->p_tracks = calloc(tracks->size, sizeof(*r->p_tracks));
