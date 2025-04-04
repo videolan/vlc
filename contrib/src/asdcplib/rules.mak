@@ -2,7 +2,7 @@
 
 ASDCPLIB_VERSION := 2.7.19
 
-ASDCPLIB_URL := http://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSION).tar.gz
+ASDCPLIB_URL := https://download.cinecert.com/asdcplib/asdcplib-$(ASDCPLIB_VERSION).tar.gz
 
 # nettle/gmp can't be used with the LGPLv2 license
 ifdef GPL

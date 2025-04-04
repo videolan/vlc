@@ -1,7 +1,7 @@
 # librist
 
 LIBRIST_VERSION := v0.2.7
-LIBRIST_URL := http://code.videolan.org/rist/librist/-/archive/$(LIBRIST_VERSION)/librist-$(LIBRIST_VERSION).tar.gz
+LIBRIST_URL := https://code.videolan.org/rist/librist/-/archive/$(LIBRIST_VERSION)/librist-$(LIBRIST_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
 PKGS += librist

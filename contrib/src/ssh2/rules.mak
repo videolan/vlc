@@ -1,7 +1,7 @@
 # ssh2
 
 LIBSSH2_VERSION := 1.11.0
-LIBSSH2_URL := http://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.gz
+LIBSSH2_URL := https://www.libssh2.org/download/libssh2-$(LIBSSH2_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
 PKGS += ssh2

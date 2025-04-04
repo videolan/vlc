@@ -2,7 +2,7 @@
 
 LUA_SHORTVERSION := 5.4
 LUA_VERSION := $(LUA_SHORTVERSION).4
-LUA_URL := http://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
+LUA_URL := https://www.lua.org/ftp/lua-$(LUA_VERSION).tar.gz
 
 # Reverse priority order
 LUA_TARGET := generic

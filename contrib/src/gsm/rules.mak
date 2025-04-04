@@ -1,7 +1,7 @@
 # GSM
 GSM_MAJVERSION := 1.0
 GSM_MINVERSION := 22
-GSM_URL := http://www.quut.com/gsm/gsm-$(GSM_MAJVERSION).$(GSM_MINVERSION).tar.gz
+GSM_URL := https://www.quut.com/gsm/gsm-$(GSM_MAJVERSION).$(GSM_MINVERSION).tar.gz
 
 $(TARBALLS)/gsm-$(GSM_MAJVERSION)-pl$(GSM_MINVERSION).tar.gz:
 	$(call download_pkg,$(GSM_URL),gsm)

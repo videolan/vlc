@@ -1,6 +1,6 @@
 # basu
 BASU_VERSION := 0.2.1
-BASU_URL := http://git.sr.ht/~emersion/basu/refs/download/v$(BASU_VERSION)/basu-$(BASU_VERSION).tar.gz
+BASU_URL := https://git.sr.ht/~emersion/basu/refs/download/v$(BASU_VERSION)/basu-$(BASU_VERSION).tar.gz
 
 ifneq ($(call need_pkg,"libelogind"),)
 ifneq ($(call need_pkg,"libsystemd"),)

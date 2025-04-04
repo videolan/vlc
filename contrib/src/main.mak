@@ -21,10 +21,10 @@ QTBASE_VERSION_MAJOR := 6.8
 QTBASE_VERSION := $(QTBASE_VERSION_MAJOR).3
 
 # Common download locations
-GNU ?= http://ftp.gnu.org/gnu
+GNU ?= https://ftp.gnu.org/gnu
 SF := https://downloads.sourceforge.net/project
-VIDEOLAN := http://downloads.videolan.org/pub/videolan
-CONTRIB_VIDEOLAN := http://downloads.videolan.org/pub/contrib
+VIDEOLAN := https://downloads.videolan.org/pub/videolan
+CONTRIB_VIDEOLAN := https://downloads.videolan.org/pub/contrib
 VIDEOLAN_GIT := https://git.videolan.org/git
 GITHUB := https://github.com
 GOOGLE_CODE := https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com
@@ -657,7 +657,7 @@ distclean: clean
 	$(RM) config.mak
 	unlink Makefile
 
-PREBUILT_URL=http://download.videolan.org/pub/videolan/contrib/$(HOST)/vlc-contrib-$(HOST)-latest.tar.bz2
+PREBUILT_URL=https://download.videolan.org/pub/videolan/contrib/$(HOST)/vlc-contrib-$(HOST)-latest.tar.bz2
 
 vlc-contrib-$(HOST)-latest.tar.bz2:
 	$(call download,$(PREBUILT_URL))
