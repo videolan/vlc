@@ -399,9 +399,6 @@ static vlc_tls_t *gnutls_ClientSessionOpen(vlc_tls_creds_t *crd,
 
     gnutls_session_t session = priv->session;
 
-    /* minimum DH prime bits */
-    gnutls_dh_set_prime_bits (session, 1024);
-
     if (likely(hostname != NULL))
         /* fill Server Name Indication */
         gnutls_server_name_set (session, GNUTLS_NAME_DNS,
