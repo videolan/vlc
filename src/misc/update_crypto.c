@@ -932,7 +932,7 @@ public_key_t *download_key( vlc_object_t *p_this,
                     const uint8_t *p_longid, const uint8_t *p_signature_issuer )
 {
     char *psz_url;
-    if( asprintf( &psz_url, "http://download.videolan.org/pub/keys/%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X.asc",
+    if( asprintf( &psz_url, "https://download.videolan.org/pub/keys/%.2X%.2X%.2X%.2X%.2X%.2X%.2X%.2X.asc",
                     p_longid[0], p_longid[1], p_longid[2], p_longid[3],
                     p_longid[4], p_longid[5], p_longid[6], p_longid[7] ) == -1 )
         return NULL;

@@ -74,9 +74,9 @@
  */
 
 #ifndef NDEBUG
-# define UPDATE_VLC_STATUS_URL "http://update-test.videolan.org/vlc/status"
+# define UPDATE_VLC_STATUS_URL "https://update-test.videolan.org/vlc/status"
 #else
-# define UPDATE_VLC_STATUS_URL "http://update.videolan.org/vlc/status"
+# define UPDATE_VLC_STATUS_URL "https://update.videolan.org/vlc/status"
 #endif
 
 #define dialog_FatalWait( p_obj, psz_title, psz_fmt, ... ) \
