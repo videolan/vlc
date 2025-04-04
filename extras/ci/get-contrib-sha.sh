@@ -36,7 +36,7 @@ case $1 in
         VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/apple" )
         ;;
     macos*)
-        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/macos" )
+        VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/macosx" )
         ;;
     raspbian*)
         VLC_CONTRIB_REBUILD_PATHS+=( "extras/package/raspberry" )
