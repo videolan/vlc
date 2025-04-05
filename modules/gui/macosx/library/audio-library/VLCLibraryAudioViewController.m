@@ -420,6 +420,8 @@ NSString *VLCLibraryPlaceholderAudioViewIdentifier = @"VLCLibraryPlaceholderAudi
     NSTableView *targetMainTableView;
     if ([libraryItem isKindOfClass:VLCMediaLibraryMediaItem.class]) {
         targetMainTableView = self.audioSongTableView;
+    } else if ([self viewModeSegmentForCurrentLibrarySegment] == VLCLibraryGridViewModeSegment) {
+        targetMainTableView = self.audioLibraryGridModeSplitViewListTableView;
     } else {
         targetMainTableView = self.audioCollectionSelectionTableView;
     }
