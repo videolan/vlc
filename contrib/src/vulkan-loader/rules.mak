@@ -51,12 +51,12 @@ endif
 	$(MOVE)
 
 # Needed for the loader's cmake script to find the registry files
-VULKAN_LOADER_ENV_CONF = \
-	VULKAN_HEADERS_INSTALL_DIR="$(PREFIX)"
+VULKAN_LOADER_CONF += \
+	-DVULKAN_HEADERS_INSTALL_DIR:STRING=$(PREFIX)
 
 .vulkan-loader: vulkan-loader toolchain.cmake
 	$(CMAKECLEAN)
-	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS_CMAKE) $(CMAKE) $(VULKAN_LOADER_CONF)
+	$(HOSTVARS_CMAKE) $(CMAKE) $(VULKAN_LOADER_CONF)
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
