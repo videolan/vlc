@@ -43,7 +43,6 @@ vulkan-loader: Vulkan-Loader-$(VULKAN_LOADER_VERSION).tar.gz .sum-vulkan-loader
 	$(UNPACK)
 # Patches are from msys2 package system
 # https://github.com/msys2/MINGW-packages/tree/master/mingw-w64-vulkan-loader
-	$(APPLY) $(SRC)/vulkan-loader/002-proper-def-files-for-32bit.patch
 	$(APPLY) $(SRC)/vulkan-loader/0003-fix-libunwind-usage-when-static-linking.patch
 ifeq ($(HOST),i686-w64-mingw32)
 	cp -v $(SRC)/vulkan-loader/libvulkan-32.def $(UNPACK_DIR)/loader/vulkan-1.def
@@ -58,14 +57,6 @@ VULKAN_LOADER_ENV_CONF = \
 .vulkan-loader: vulkan-loader toolchain.cmake
 	$(CMAKECLEAN)
 	$(VULKAN_LOADER_ENV_CONF) $(HOSTVARS_CMAKE) $(CMAKE) $(VULKAN_LOADER_CONF)
-	+$(CMAKEBUILD)
-
-ifdef HAVE_WIN32
-# CMake will generate a .pc file with -lvulkan even if the static library
-# generated is libvulkan.dll.a.
-	sed -i.orig -e "s,-lvulkan-1.dll,-lvulkan.dll," $(BUILD_DIR)/loader/vulkan.pc
-endif
-
 	+$(CMAKEBUILD)
 	$(CMAKEINSTALL)
 	touch $@
