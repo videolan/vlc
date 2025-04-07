@@ -40,7 +40,6 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(APPLY) $(SRC)/libplacebo/0001-vulkan-meson-add-the-clang-gcc-C-runtime.patch
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-overriding-python3-path.patch
 	$(APPLY) $(SRC)/libplacebo/0001-meson-allow-forcing-the-path-to-look-for-libraries.patch
-	$(APPLY) $(SRC)/libplacebo/0004-vulkan-utils_gen-try-to-locate-the-vulkan-registry-i.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson .python-venv
