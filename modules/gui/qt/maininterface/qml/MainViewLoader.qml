@@ -23,6 +23,7 @@ import QtQml.Models
 
 
 import VLC.MainInterface
+import VLC.Widgets as Widgets
 import VLC.Util
 import VLC.Style
 
