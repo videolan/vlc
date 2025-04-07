@@ -1,67 +1,29 @@
-From 56ce783d2cad375cb29f19be43b5dda7061ded3c Mon Sep 17 00:00:00 2001
+From 51146078613bf27b7427b1558220ae99204a9692 Mon Sep 17 00:00:00 2001
 From: Alexey Pavlov <alexpux@gmail.com>
 Date: Fri, 8 Nov 2019 07:40:41 +0100
-Subject: [PATCH 1/3] proper def files for 32bit
+Subject: [PATCH 1/2] proper def files for 32bit
 
 ---
- loader/CMakeLists.txt       | 15 +++++++++++++--
- loader/vk_loader_platform.h |  8 +++++++-
- loader/vulkan-1.def         |  2 +-
- 3 files changed, 21 insertions(+), 4 deletions(-)
+ loader/CMakeLists.txt | 8 ++++++++
+ loader/vulkan-1.def   | 2 +-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
-index d1606f549..0552c5bdd 100644
+index 622937b2a..b4f91db9b 100644
 --- a/loader/CMakeLists.txt
 +++ b/loader/CMakeLists.txt
-@@ -127,7 +127,7 @@ set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG}Note that this may be unsafe, as the C co
- set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} the stack frame for certain calls. If the compiler does not do this, then unknown device")
- set(ASM_FAILURE_MSG "${ASM_FAILURE_MSG} extensions will suffer from a corrupted stack.")
- if(WIN32)
--    if(MINGW)
-+    if(NOT MINGW)
-         find_program(JWASM_FOUND jwasm)
-         if (JWASM_FOUND)
-             set(CMAKE_ASM_MASM_COMPILER ${JWASM_FOUND})
-@@ -145,7 +145,7 @@ if(WIN32)
-     if (USE_MASM)
-       enable_language(ASM_MASM)
-     endif ()
--    if(CMAKE_ASM_MASM_COMPILER_WORKS OR JWASM_FOUND)
-+    if(MSVC AND CMAKE_ASM_MASM_COMPILER_WORKS OR JWASM_FOUND)
-         if(MINGW)
-             set(CMAKE_ASM_MASM_FLAGS ${CMAKE_ASM_MASM_FLAGS} ${JWASM_FLAGS})
-         elseif(NOT CMAKE_CL_64 AND NOT JWASM_FOUND)
-@@ -161,12 +161,14 @@ if(WIN32)
-         target_link_libraries(loader-unknown-chain Vulkan::Headers)
-         target_include_directories(loader-unknown-chain PUBLIC $<TARGET_PROPERTY:loader_asm_gen_files,BINARY_DIR>)
-         add_dependencies(loader-unknown-chain loader_asm_gen_files)
-+        set_target_properties(loader-unknown-chain PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
-     else()
-         message(WARNING "Could not find working MASM assebler\n${ASM_FAILURE_MSG}")
-         add_custom_target(loader_asm_gen_files)
-         add_library(loader-unknown-chain OBJECT unknown_ext_chain.c)
-         target_link_libraries(loader-unknown-chain loader_specific_options)
-         set_target_properties(loader-unknown-chain PROPERTIES CMAKE_C_FLAGS_DEBUG "${MODIFIED_C_FLAGS_DEBUG}")
-+        set_target_properties(loader-unknown-chain PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
-     endif()
- elseif(APPLE)
-     # For MacOS, use the C code and force the compiler's tail-call optimization instead of using assembly code.
-@@ -217,6 +219,7 @@ endif()
- 
- if(WIN32)
-     add_library(loader-opt STATIC ${OPT_LOADER_SRCS})
-+    set_target_properties(loader-opt PROPERTIES DEFINE_SYMBOL "VK_BUILDING_DLL")
-     target_link_libraries(loader-opt PUBLIC loader_specific_options)
-     add_dependencies(loader-opt loader_asm_gen_files)
-     set_target_properties(loader-opt PROPERTIES CMAKE_C_FLAGS_DEBUG "${MODIFIED_C_FLAGS_DEBUG}")
-@@ -237,9 +240,17 @@ if(WIN32)
+@@ -337,6 +337,7 @@ if(WIN32)
      # when adding the suffix the import and runtime library names must be consistent
-     # mingw: libvulkan-1.dll.a / libvulkan-1.dll
+     # mingw: libvulkan-1.dll.a / vulkan-1.dll
      # msvc: vulkan-1.lib / vulkan-1.dll
 +    if(MSVC)
      set_target_properties(vulkan
                            PROPERTIES
-                           OUTPUT_NAME vulkan-1)
+                           OUTPUT_NAME ${API_TYPE}-1)
+@@ -346,6 +347,13 @@ if(WIN32)
+                               PROPERTIES
+                               PREFIX "")
+     endif()
 +    else()
 +    set_target_properties(vulkan
 +                          PROPERTIES
@@ -71,26 +33,7 @@ index d1606f549..0552c5bdd 100644
 +    endif()
  
      if(MSVC AND ENABLE_WIN10_ONECORE)
-         target_link_libraries(vulkan OneCoreUAP.lib LIBCMT.LIB LIBCMTD.LIB LIBVCRUNTIME.LIB LIBUCRT.LIB)
-diff --git a/loader/vk_loader_platform.h b/loader/vk_loader_platform.h
-index 594a24986..6bbe6798b 100644
---- a/loader/vk_loader_platform.h
-+++ b/loader/vk_loader_platform.h
-@@ -77,7 +77,13 @@
- #include "vk_layer_dispatch_table.h"
- #include "vk_loader_extensions.h"
- 
--#if defined(__GNUC__) && __GNUC__ >= 4
-+#if defined(_WIN32)
-+#  if defined (VK_BUILDING_DLL)
-+#    define LOADER_EXPORT __declspec(dllexport)
-+#  else
-+#    define LOADER_EXPORT
-+#  endif
-+#elif defined(__GNUC__) && __GNUC__ >= 4
- #define LOADER_EXPORT __attribute__((visibility("default")))
- #elif defined(__SUNPRO_C) && (__SUNPRO_C >= 0x590)
- #define LOADER_EXPORT __attribute__((visibility("default")))
+         target_link_libraries(vulkan PRIVATE OneCoreUAP.lib LIBCMT.LIB LIBCMTD.LIB LIBVCRUNTIME.LIB LIBUCRT.LIB)
 diff --git a/loader/vulkan-1.def b/loader/vulkan-1.def
 index f1aab7880..0b8a68ff8 100644
 --- a/loader/vulkan-1.def

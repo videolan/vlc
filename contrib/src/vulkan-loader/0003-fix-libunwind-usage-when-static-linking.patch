@@ -1,24 +1,25 @@
-From c2b51b82c5dc3e62dc6bc9778261555a2ebdd67d Mon Sep 17 00:00:00 2001
+From ab6edca6a93be813f52108489a4a690e44bb8dab Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@ycbcr.xyz>
 Date: Thu, 17 Oct 2024 11:56:18 +0200
-Subject: [PATCH 3/3] fix libunwind usage when static linking
+Subject: [PATCH 2/2] fix libunwind usage when static linking
 
 It ends up with
 - set(CMAKE_C_IMPLICIT_LINK_LIBRARIES "atomic;m;-l:libunwind.a;dl;c;-l:libunwind.a;dl")
 - set(CMAKE_CXX_IMPLICIT_LINK_LIBRARIES "windowsapp;windowsapp;ucrt;windowsapp;ucrtapp;c++;mingw32;-l:libunwind.a;moldname;mingwex;mingw32;-l:libunwind.a;moldname;mingwex")
 ---
- loader/CMakeLists.txt | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ loader/CMakeLists.txt | 14 ++++++++++++++
+ loader/vulkan.pc.in   |  1 +
+ 2 files changed, 15 insertions(+)
 
 diff --git a/loader/CMakeLists.txt b/loader/CMakeLists.txt
-index b29c81a8d..cd5a6a441 100644
+index 3d8aa6c62..14ddcf326 100644
 --- a/loader/CMakeLists.txt
 +++ b/loader/CMakeLists.txt
-@@ -335,7 +335,18 @@ include(FindPkgConfig QUIET)
- if(PKG_CONFIG_FOUND)
-     set(VK_API_VERSION "${LOADER_GENERATED_HEADER_VERSION}")
-     foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
--        set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
+@@ -498,6 +498,20 @@ install(FILES "${version_config}" DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Vulk
+ # https://gitlab.kitware.com/cmake/cmake/-/issues/22621
+ find_package(PkgConfig)
+ if (PKG_CONFIG_FOUND)
++    foreach(LIB ${CMAKE_CXX_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
 +        if(IS_ABSOLUTE ${LIB} AND EXISTS ${LIB})
 +            set(PRIVATE_LIBS "${PRIVATE_LIBS} ${LIB}")
 +        elseif(${LIB} MATCHES "-l:lib.*.a")
@@ -31,9 +32,20 @@ index b29c81a8d..cd5a6a441 100644
 +        else()
 +            set(PRIVATE_LIBS "${PRIVATE_LIBS} -l${LIB}")
 +        endif()
-     endforeach()
-     if(MSVC)
-         set(VULKAN_LIB_SUFFIX "-1")
++    endforeach()
+     if(WIN32)
+         if(MINGW)
+             set(VULKAN_LIB_SUFFIX "-1.dll")
+diff --git a/loader/vulkan.pc.in b/loader/vulkan.pc.in
+index 6a285f267..ab35414ba 100644
+--- a/loader/vulkan.pc.in
++++ b/loader/vulkan.pc.in
+@@ -7,4 +7,5 @@ Name: Vulkan-Loader
+ Description: Vulkan Loader
+ Version: @VULKAN_LOADER_VERSION@
+ Libs: -L${libdir} -lvulkan@VULKAN_LIB_SUFFIX@
++Libs.private: @PRIVATE_LIBS@
+ Cflags: -I${includedir}
 -- 
 2.45.0.windows.1
 
