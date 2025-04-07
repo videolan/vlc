@@ -22,8 +22,10 @@ define VULKAN_HEADERS_CHECK :=
 endef
 
 PKGS += vulkan-headers
+ifndef HAVE_ANDROID # in NDK27 vk.xml is not available anymore, we need to install our own
 ifneq ($(call cppcheck, VULKAN_HEADERS_OK, $(VULKAN_HEADERS_CHECK)),)
 PKGS_FOUND += vulkan-headers
+endif
 endif
 
 $(TARBALLS)/Vulkan-Headers-$(VULKAN_HEADERS_VERSION).tar.gz:
