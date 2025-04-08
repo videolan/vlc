@@ -758,6 +758,7 @@ static int ExtractAV1Profile(AVCodecContext *p_context, const es_format_t *fmt_i
 
 int InitVideoHwDec( vlc_object_t *obj )
 {
+#ifdef _WIN32
     decoder_t *p_dec = container_of(obj, decoder_t, obj);
 
     if (p_dec->fmt_in.i_codec != VLC_CODEC_AV1)
@@ -802,6 +803,7 @@ int InitVideoHwDec( vlc_object_t *obj )
 failed:
     avcodec_free_context( &p_context );
     free(p_sys);
+#endif
     return VLC_EGENERIC;
 }
 
