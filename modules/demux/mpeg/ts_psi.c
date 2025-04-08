@@ -1849,9 +1849,8 @@ void SendCAPMTUpdate( demux_t *p_demux, const ts_pmt_t *p_pmt )
     demux_sys_t  *p_sys = p_demux->p_sys;
     if( !p_pmt->p_ctx->p_capmt )
         return;
-    if( vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
-                            (void *)p_pmt->p_ctx->p_capmt ) != VLC_SUCCESS )
-        msg_Warn( p_demux, "Impos");
+    (void) vlc_stream_Control( p_sys->stream, STREAM_SET_PRIVATE_ID_CA,
+                               (void *)p_pmt->p_ctx->p_capmt );
 }
 
 static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
