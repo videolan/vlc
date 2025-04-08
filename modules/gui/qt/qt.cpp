@@ -967,11 +967,12 @@ static void *Thread( void *obj )
     };
 
     static const char* const asyncRhiProbeCompletedProperty = "asyncRhiProbeCompleted";
+    // NOTE: `QSettings` accepts `QAnyStringView` starting from Qt 6.4, use `QLatin1String(View)`:
+    static constexpr QLatin1String graphicsApiKey {"graphics-api"};
     if (qEnvironmentVariableIsEmpty("QSG_RHI_BACKEND") &&
         qEnvironmentVariableIsEmpty("QT_QUICK_BACKEND") &&
         (QT_VERSION < QT_VERSION_CHECK(6, 4, 0) || !uint(qEnvironmentVariableIntValue("QSG_RHI_PREFER_SOFTWARE_RENDERER"))))
     {
-        static const char* const graphicsApiKey = "graphics-api";
         const QVariant graphicsApiValue = p_intf->mainSettings->value(graphicsApiKey);
         // settings value can be string (ini file), do not use `typeId()`:
         if (graphicsApiValue.isValid() && Q_LIKELY(graphicsApiValue.canConvert<int>()))
@@ -1062,7 +1063,7 @@ static void *Thread( void *obj )
                                  if (!app.property(asyncRhiProbeCompletedProperty).toBool())
                                  {
                                      assert(settings);
-                                     settings->remove(asyncRhiProbeCompletedProperty);
+                                     settings->remove(graphicsApiKey);
                                      settings->sync();
                                  }
 #endif
