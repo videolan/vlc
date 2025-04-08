@@ -287,7 +287,7 @@ void DialogsProvider::messagesDialog(int page)
 
 void DialogsProvider::gotoTimeDialog()
 {
-    toggleDialogVisible(m_vlmDialog);
+    toggleDialogVisible(m_gotoTimeDialog);
 }
 
 #ifdef ENABLE_VLM
