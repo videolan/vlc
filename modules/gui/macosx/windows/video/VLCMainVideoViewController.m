@@ -520,7 +520,7 @@
     self.retainedWindow = window;
 
     _voutViewController = [PIPVoutViewController new];
-    _voutViewController.view = self.voutContainingView;
+    _voutViewController.view = [self acquireVideoView];
     VLCPlayerController * const controller = notification.object;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
     
@@ -604,13 +604,8 @@
 
 - (void)pipDidClose:(PIPViewController *)pip
 {
-    [self.voutContainingView removeFromSuperview];
-    [self.view addSubview:self.voutContainingView
-               positioned:NSWindowBelow
-               relativeTo:self.mainControlsView];
-    [self.voutContainingView applyConstraintsToFillSuperview];
+    [self returnVideoView:_voutViewController.view];
     _voutViewController = nil;
-    [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
 }
 
 - (void)pipActionPlay:(PIPViewController *)pip
