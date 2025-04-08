@@ -66,6 +66,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)showControls;
 - (void)hideControls;
+- (nullable NSView *)acquireVideoView;
+- (void)returnVideoView:(NSView *)videoView;
 
 - (IBAction)togglePlayQueue:(id)sender;
 - (IBAction)returnToLibrary:(id)sender;

@@ -565,6 +565,24 @@
         [libraryWindow disableVideoPlaybackAppearance];
     }
 }
+
+- (nullable NSView *)acquireVideoView
+{
+    [self.voutContainingView removeFromSuperview];
+    return self.voutContainingView;
+}
+
+- (void)returnVideoView:(NSView *)videoView
+{
+    NSParameterAssert(videoView != nil);
+    [videoView removeFromSuperview];
+    [self.view addSubview:videoView
+               positioned:NSWindowBelow
+               relativeTo:self.mainControlsView];
+    [videoView applyConstraintsToFillSuperview];
+    [self applyAudioDecorativeViewForegroundCoverArtViewConstraints];
+}
+
 #pragma mark - PIPViewControllerDelegate
 
 - (BOOL)pipShouldClose:(PIPViewController *)pip
