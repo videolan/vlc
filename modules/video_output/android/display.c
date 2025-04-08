@@ -430,8 +430,7 @@ static int AndroidWindow_UpdateCrop(vout_display_sys_t *sys,
 }
 
 static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
-                                   android_window *p_window,
-                                   bool b_java_configured)
+                                   android_window *p_window)
 {
     unsigned int i_max_buffer_count = 0;
 
@@ -444,8 +443,7 @@ static int AndroidWindow_SetupANWP(vout_display_sys_t *sys,
     if (sys->anwp.setUsage(p_window->p_surface_priv, false, 0) != 0)
         goto error;
 
-    if (!b_java_configured
-        && sys->anwp.setBuffersGeometry(p_window->p_surface_priv,
+    if (sys->anwp.setBuffersGeometry(p_window->p_surface_priv,
                                         p_window->fmt.i_width,
                                         p_window->fmt.i_height,
                                         p_window->i_android_hal) != 0)
@@ -483,39 +481,13 @@ error:
     return -1;
 }
 
-static int AndroidWindow_ConfigureJavaSurface(vout_display_sys_t *sys,
-                                              android_window *p_window,
-                                              bool *p_java_configured)
-{
-    /* setBuffersGeometry is broken before ics. Use
-     * AJavaWindow_setBuffersGeometry to configure the surface on the java side
-     * synchronously.  AJavaWindow_setBuffersGeometry return en error when you
-     * don't need to call it (ie, after ics). if this call succeed, you need to
-     * get a new surface handle. That's why AndroidWindow_DisconnectSurface is
-     * called here. */
-    if (AWindowHandler_setBuffersGeometry(sys->p_awh, p_window->id,
-                                          p_window->fmt.i_width,
-                                          p_window->fmt.i_height,
-                                          p_window->i_android_hal) == VLC_SUCCESS)
-    {
-        *p_java_configured = true;
-        AndroidWindow_DisconnectSurface(sys, p_window);
-        if (AndroidWindow_ConnectSurface(sys, p_window) != 0)
-            return -1;
-    } else
-        *p_java_configured = false;
-
-    return 0;
-}
-
 static int AndroidWindow_SetupANW(vout_display_sys_t *sys,
-                                  android_window *p_window,
-                                  bool b_java_configured)
+                                  android_window *p_window)
 {
     p_window->i_pic_count = 1;
     p_window->i_min_undequeued = 0;
 
-    if (!b_java_configured && sys->anw->setBuffersGeometry)
+    if (sys->anw->setBuffersGeometry)
         return sys->anw->setBuffersGeometry(p_window->p_surface,
                                             p_window->fmt.i_width,
                                             p_window->fmt.i_height,
@@ -528,8 +500,6 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
                                android_window *p_window,
                                unsigned int i_pic_count)
 {
-    bool b_java_configured = false;
-
     if (i_pic_count != 0)
         p_window->i_pic_count = i_pic_count;
 
@@ -543,13 +513,9 @@ static int AndroidWindow_Setup(vout_display_sys_t *sys,
         p_window->fmt.i_width = (p_pic->format.i_width + align_pixels) & ~align_pixels;
         picture_Release(p_pic);
 
-        if (AndroidWindow_ConfigureJavaSurface(sys, p_window,
-                                               &b_java_configured) != 0)
-            return -1;
-
         if (!p_window->b_use_priv
-            || AndroidWindow_SetupANWP(sys, p_window, b_java_configured) != 0) {
-            if (AndroidWindow_SetupANW(sys, p_window, b_java_configured) != 0)
+            || AndroidWindow_SetupANWP(sys, p_window) != 0) {
+            if (AndroidWindow_SetupANW(sys, p_window) != 0)
                 return -1;
         }
     } else {
