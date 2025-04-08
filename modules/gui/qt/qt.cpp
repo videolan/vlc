@@ -1054,7 +1054,7 @@ static void *Thread( void *obj )
                              &QQuickWindow::sceneGraphError,
                              &app,
                              [&app, mainCtx, settings](QQuickWindow::SceneGraphError error, const QString &message) {
-                                 qWarning() << "Compositor: Scene Graph Error: " << error << ", Message: " << message;
+                                 qCritical() << "Compositor: Scene Graph Error: " << error << ", Message: " << message;
                                  assert(mainCtx);
 #ifdef _WIN32
                                 // This is not really important, as with graceful exit the events in the queue should
