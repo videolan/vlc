@@ -309,6 +309,8 @@ FocusScope {
                     right: parent.right
                 }
 
+                z: 1
+
                 sourceWidth: root.width
                 targetWidth: artistList.width
 
