@@ -826,6 +826,8 @@ static void Close(vlc_object_t *p_this)
     {
         if (sys->b_displayed)
             ClearSurface(vd);
+        if (!sys->p_window->b_opaque && !sys->p_window->b_use_priv)
+            sys->anw->setBuffersGeometry(sys->p_window->p_surface, 0, 0, 0);
         AndroidWindow_Destroy(vd, sys->p_window);
     }
 
