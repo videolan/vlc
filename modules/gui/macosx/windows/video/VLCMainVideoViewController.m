@@ -521,6 +521,7 @@
 
     _voutViewController = [PIPVoutViewController new];
     _voutViewController.view = [self acquireVideoView];
+    NSAssert(_voutViewController.view != nil, @"Vout view should not be nil");
     VLCPlayerController * const controller = notification.object;
     _pipViewController.playing = controller.playerState == VLC_PLAYER_STATE_PLAYING;
     

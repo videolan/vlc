@@ -563,10 +563,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self updateArtworkButtonEnabledState];
 
     _acquiredVideoView = [self.videoViewController acquireVideoView];
-    [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
-                                       positioned:NSWindowBelow
-                                       relativeTo:self.artworkButton];
-    [_acquiredVideoView applyConstraintsToFillSuperview];
+    if (_acquiredVideoView) {
+        [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
+                                        positioned:NSWindowBelow
+                                        relativeTo:self.artworkButton];
+        [_acquiredVideoView applyConstraintsToFillSuperview];
+    }
 
     self.splitViewController.mainVideoModeEnabled = NO;
 
