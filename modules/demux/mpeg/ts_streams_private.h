@@ -58,11 +58,11 @@ struct ts_pmt_t
 
     struct
     {
-        ts_90khz_t i_current;
-        ts_90khz_t i_first; // seen <> != TS_TICK_UNKNOWN
+        vlc_tick_t i_current;
+        vlc_tick_t i_first; // seen <> != TS_TICK_UNKNOWN
         /* broken PCR handling */
-        ts_90khz_t i_first_dts;
-        ts_90khz_t i_pcroffset;
+        vlc_tick_t i_first_dts;
+        vlc_tick_t i_pcroffset;
         bool    b_disable; /* ignore PCR field, use dts */
         bool    b_fix_done;
     } pcr;
@@ -73,7 +73,7 @@ struct ts_pmt_t
         time_t i_event_length;
     } eit;
 
-    ts_90khz_t i_last_dts;
+    vlc_tick_t i_last_dts;
     uint64_t i_last_dts_byte;
 
     /* ARIB specific */
@@ -140,7 +140,7 @@ struct ts_stream_t
         block_t **pp_last;
     } prepcr;
 
-    ts_90khz_t i_last_dts;
+    vlc_tick_t i_last_dts;
 };
 
 typedef struct ts_si_context_t ts_si_context_t;

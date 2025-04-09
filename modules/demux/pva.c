@@ -394,8 +394,8 @@ static void ParsePES( demux_t *p_demux )
     uint8_t     hdr[30];
 
     unsigned    i_skip;
-    ts_90khz_t  i_dts = -1;
-    ts_90khz_t  i_pts = -1;
+    ts_90khz_t  i_dts = TS_90KHZ_INVALID;
+    ts_90khz_t  i_pts = TS_90KHZ_INVALID;
 
     p_sys->p_pes = NULL;
 
@@ -445,10 +445,10 @@ static void ParsePES( demux_t *p_demux )
     p_pes->i_buffer -= i_skip;
     p_pes->p_buffer += i_skip;
 
-    if( i_dts >= 0 )
-        p_pes->i_dts = VLC_TICK_0 + i_dts * 100 / 9;
-    if( i_pts >= 0 )
-        p_pes->i_pts = VLC_TICK_0 + i_pts * 100 / 9;
+    if( i_dts != TS_90KHZ_INVALID )
+        p_pes->i_dts = FROM_SCALE(i_dts);
+    if( i_pts != TS_90KHZ_INVALID )
+        p_pes->i_pts = FROM_SCALE(i_pts);
 
     /* Set PCR */
     if( p_pes->i_pts > 0 )
