@@ -73,6 +73,7 @@
 #import "views/VLCBottomBarView.h"
 #import "views/VLCCustomWindowButton.h"
 #import "views/VLCDragDropView.h"
+#import "views/VLCImageView.h"
 #import "views/VLCLoadingOverlayView.h"
 #import "views/VLCNoResultsLabel.h"
 #import "views/VLCRoundedCornerTextField.h"
@@ -101,6 +102,7 @@ const NSUserInterfaceItemIdentifier VLCLibraryWindowIdentifier = @"VLCLibraryWin
 {
     NSInteger _currentSelectedViewModeSegment;
     VLCVideoWindowCommon *_temporaryAudioDecorativeWindow;
+    NSView *_acquiredVideoView;
 }
 
 @property NSTimer *searchInputTimer;
@@ -532,6 +534,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         return;
     }
 
+    if (_acquiredVideoView) {
+        [self.videoViewController returnVideoView:_acquiredVideoView];
+    }
+
     [self presentVideoView];
     [self enableVideoTitleBarMode];
     [self hideControlsBarImmediately];
@@ -555,6 +561,12 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self disableVideoTitleBarMode];
     [self showControlsBarImmediately];
     [self updateArtworkButtonEnabledState];
+
+    _acquiredVideoView = [self.videoViewController acquireVideoView];
+    [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
+                                       positioned:NSWindowBelow
+                                       relativeTo:self.artworkButton];
+    [_acquiredVideoView applyConstraintsToFillSuperview];
 
     self.splitViewController.mainVideoModeEnabled = NO;
 
