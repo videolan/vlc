@@ -91,7 +91,6 @@ int
 vlc_ancillary_array_Dup(vlc_ancillary_array *dst_array,
                         const vlc_ancillary_array *src_array)
 {
-    vlc_ancillary_array_Clear(dst_array);
     if (src_array->size == 0)
         return VLC_SUCCESS;
 
