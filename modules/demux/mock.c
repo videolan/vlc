@@ -1273,7 +1273,7 @@ Demux(demux_t *demux)
     if (sys->audio_track_count > 0)
     {
         ret = DemuxAudio(demux, audio_step_length,
-                         __MIN(step_length + sys->audio_pts - VLC_TICK_0, sys->length));
+                         __MIN(step_length + sys->clock - VLC_TICK_0, sys->length));
         if (sys->audio_pts - VLC_TICK_0 + audio_step_length <= sys->length)
             eof = false;
     }
@@ -1282,7 +1282,7 @@ Demux(demux_t *demux)
      && (sys->video_track_count > 0 || sys->sub_track_count > 0))
     {
         ret = DemuxVideo(demux, video_step_length,
-                         __MIN(step_length + sys->video_pts - VLC_TICK_0 - sys->pts_offset, sys->length));
+                         __MIN(step_length + sys->clock - VLC_TICK_0 - sys->pts_offset, sys->length));
         if (sys->video_pts - VLC_TICK_0 - sys->pts_offset + video_step_length < sys->length)
             eof = false;
     }
