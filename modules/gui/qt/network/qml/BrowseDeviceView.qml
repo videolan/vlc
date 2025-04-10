@@ -55,6 +55,10 @@ FocusScope {
 
     readonly property bool hasGridListMode: true
 
+    // NOTE: Currently only respected by the table view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     property Component header: Widgets.ViewHeader {
         view: root
 
@@ -286,6 +290,9 @@ FocusScope {
             rowHeight: VLCStyle.tableCoverRow_height
 
             displayMarginEnd: root.displayMarginEnd
+
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             model: root.model
 
