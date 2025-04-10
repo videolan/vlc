@@ -1,6 +1,6 @@
 # libvpx
 
-VPX_VERSION := 1.15.0
+VPX_VERSION := 1.15.1
 VPX_URL := $(GITHUB)/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 ifneq ($(filter arm aarch64 i386 loongarch64 mipsel mips64el ppc64le x86_64, $(ARCH)),)
