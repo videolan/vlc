@@ -103,6 +103,8 @@ Widgets.PageLoader {
 
             displayMarginEnd: g_mainDisplay.displayMargin
 
+            enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+
             model: StandardPathModel {
                 sortCriteria: MainCtx.sort.criteria
                 sortOrder: MainCtx.sort.order
@@ -130,6 +132,8 @@ Widgets.PageLoader {
             ]
 
             displayMarginEnd: g_mainDisplay.displayMargin
+
+            enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
 
             model: NetworkDeviceModel {
                 ctx: MainCtx
