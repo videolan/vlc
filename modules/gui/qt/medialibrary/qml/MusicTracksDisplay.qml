@@ -84,6 +84,8 @@ FocusScope {
 
         // To get blur effect while scrolling in mainview
         displayMarginEnd: g_mainDisplay.displayMargin
+
+        fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
     }
 
     Widgets.EmptyLabelButton {
