@@ -69,6 +69,8 @@ Widgets.ListViewExt {
     // To get blur effect while scrolling in mainview
     displayMarginEnd: g_mainDisplay.displayMargin
 
+    fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+
     delegate: Rectangle {
         width: servicesView.width - VLCStyle.margin_large * 2
         height: row.implicitHeight + VLCStyle.margin_small * 2
