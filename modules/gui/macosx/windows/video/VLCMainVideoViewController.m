@@ -433,9 +433,13 @@
     return buttonBox;
 }
 
+- (void)updateLibraryControls:(NSNotification *)notification
+{
+    [self updateLibraryControls];
+}
+
 - (void)updateLibraryControls
 {
-
     const NSWindow * const viewWindow = self.view.window;
     const CGFloat windowTitlebarHeight = viewWindow.titlebarHeight;
 
@@ -451,6 +455,11 @@
     if (!self.displayLibraryControls) {
         return;
     }
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                             selector:@selector(updateLibraryControls:)
+                                                 name:VLCVideoWindowDidEnterFullscreen
+                                               object:nil];
 
     _returnButtonTopConstraint.constant = buttonTopSpace;
     _playQueueButtonTopConstraint.constant = buttonTopSpace;
