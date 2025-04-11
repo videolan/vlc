@@ -49,7 +49,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 @interface VLCMediaSourceBaseDataSource () <NSCollectionViewDataSource, NSCollectionViewDelegate, NSTableViewDelegate, NSTableViewDataSource>
 {
     NSArray<VLCMediaSource *> *_mediaSources;
-    NSArray *_discoveredLANdevices;
+    NSArray<VLCInputNode *> *_discoveredLANdevices;
     BOOL _gridViewMode;
 }
 @end
@@ -346,7 +346,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
          * so the problem is well hidden and does not need this work-around */
         _discoveredLANdevices = nil;
 
-        NSMutableArray *currentDevices;
+        NSMutableArray<VLCInputNode *> *currentDevices;
         @synchronized (_mediaSources) {
             const NSInteger mediaSourceCount = _mediaSources.count;
             currentDevices = [[NSMutableArray alloc] initWithCapacity:mediaSourceCount];
@@ -401,14 +401,22 @@ referenceSizeForHeaderInSection:(NSInteger)section
         return;
     }
 
-    VLCMediaSource * const mediaSource = _mediaSources[selectedRow];
-
-    VLCInputNode *childNode;
+    VLCMediaSource *mediaSource = nil;
+    VLCInputNode *childNode = nil;
     if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+        NSUInteger currentIter = 0;
+        NSInteger remainingRow = selectedRow;
+        while (currentIter < _mediaSources.count && remainingRow >= _mediaSources[currentIter].rootNode.numberOfChildren) {
+            remainingRow -= _mediaSources[currentIter].rootNode.numberOfChildren;
+            currentIter++;
+        }
+        mediaSource = _mediaSources[currentIter];
         childNode = _discoveredLANdevices[selectedRow];
     } else {
+        mediaSource = _mediaSources[selectedRow];
         childNode = mediaSource.rootNode;
     }
+    NSAssert(mediaSource != nil, @"Media source should not be nil");
     NSAssert(childNode != nil, @"Child node should not be nil");
 
     [self configureChildDataSourceWithNode:childNode andMediaSource:mediaSource];
