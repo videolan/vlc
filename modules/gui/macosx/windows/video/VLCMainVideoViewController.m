@@ -435,9 +435,6 @@
 
 - (void)updateLibraryControls
 {
-    if (!_displayLibraryControls) {
-        return;
-    }
 
     const NSWindow * const viewWindow = self.view.window;
     const CGFloat windowTitlebarHeight = viewWindow.titlebarHeight;
@@ -450,6 +447,10 @@
     const CGFloat buttonTopSpace = placeInFakeToolbar ? 0 : VLCLibraryUIUnits.largeSpacing;
 
     _fakeTitleBarHeightConstraint.constant = windowFullscreen ? 0 : windowTitlebarHeight;
+
+    if (!self.displayLibraryControls) {
+        return;
+    }
 
     _returnButtonTopConstraint.constant = buttonTopSpace;
     _playQueueButtonTopConstraint.constant = buttonTopSpace;
