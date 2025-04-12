@@ -252,6 +252,14 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         textField.selectable = NO;
         textField.lineBreakMode = NSLineBreakByTruncatingTail;
         return textField;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
+        NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+        textField.stringValue = [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
+        textField.editable = NO;
+        textField.bordered = NO;
+        textField.drawsBackground = NO;
+        textField.selectable = NO;
+        return textField;
     }
     return nil;
 }
