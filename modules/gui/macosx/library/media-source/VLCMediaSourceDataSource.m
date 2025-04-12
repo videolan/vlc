@@ -93,6 +93,15 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
     [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
 
+    for (VLCInputNode * const childNode in nodeToDisplay.children) {
+        if (childNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
+            continue;
+        }
+        NSURL * const childNodeUrl = [NSURL URLWithString:childNode.inputItem.MRL];
+        [self.displayedMediaSource generateChildNodesForDirectoryNode:childNode.vlcInputItemNode
+                                                                withUrl:childNodeUrl];
+    }
+
     [self reloadData];
 
     const __weak typeof(self) weakSelf = self;
