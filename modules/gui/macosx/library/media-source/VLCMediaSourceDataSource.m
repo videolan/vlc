@@ -90,38 +90,43 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     _nodeToDisplay = nodeToDisplay;
 
     input_item_node_t * const inputNode = nodeToDisplay.vlcInputItemNode;
-    NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
-    [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
 
-    for (VLCInputNode * const childNode in nodeToDisplay.children) {
-        if (childNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
-            continue;
+    if (self.parentBaseDataSource.mediaSourceMode == VLCMediaSourceModeLAN) {
+        NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
+        [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
+
+        for (VLCInputNode * const childNode in nodeToDisplay.children) {
+            if (childNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
+                continue;
+            }
+            NSURL * const childNodeUrl = [NSURL URLWithString:childNode.inputItem.MRL];
+            [self.displayedMediaSource generateChildNodesForDirectoryNode:childNode.vlcInputItemNode
+                                                                    withUrl:childNodeUrl];
         }
-        NSURL * const childNodeUrl = [NSURL URLWithString:childNode.inputItem.MRL];
-        [self.displayedMediaSource generateChildNodesForDirectoryNode:childNode.vlcInputItemNode
-                                                                withUrl:childNodeUrl];
+        const __weak typeof(self) weakSelf = self;
+
+        self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
+                                                forVnodeEvents:DISPATCH_VNODE_WRITE | 
+                                                               DISPATCH_VNODE_DELETE |
+                                                               DISPATCH_VNODE_RENAME
+                                            withEventHandler:^{
+            const uintptr_t eventFlags =
+                dispatch_source_get_data(weakSelf.observedPathDispatchSource);
+            if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
+                });
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
+                                                                              withUrl:nodeUrl];
+                    [weakSelf reloadData];
+                });
+            }
+        }];
     }
 
     [self reloadData];
-
-    const __weak typeof(self) weakSelf = self;
-
-    self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
-                                             forVnodeEvents:DISPATCH_VNODE_WRITE | DISPATCH_VNODE_DELETE | DISPATCH_VNODE_RENAME
-                                           withEventHandler:^{
-        const uintptr_t eventFlags = dispatch_source_get_data(weakSelf.observedPathDispatchSource);
-        if (eventFlags & DISPATCH_VNODE_DELETE || eventFlags & DISPATCH_VNODE_RENAME) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.parentBaseDataSource homeButtonAction:weakSelf];
-            });
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf.displayedMediaSource generateChildNodesForDirectoryNode:inputNode
-                                                                          withUrl:nodeUrl];
-                [weakSelf reloadData];
-            });
-        }
-    }];
 }
 
 - (void)setupViews
