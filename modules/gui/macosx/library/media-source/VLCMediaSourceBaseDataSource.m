@@ -61,6 +61,8 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     self = [super init];
     if (self) {
         _mediaSources = @[];
+        _discoveredLANdevices = @[];
+        _mediaSourceMode = VLCMediaSourceModeLAN;
         NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
         [notificationCenter addObserver:self
                                selector:@selector(mediaSourceChildrenReset:)
