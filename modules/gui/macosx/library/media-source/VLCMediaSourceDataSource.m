@@ -37,6 +37,7 @@
 #import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
 #import "library/VLCInputNodePathControlItem.h"
+#import "library/VLCLibraryImageCache.h"
 #import "library/VLCLibraryTableCellView.h"
 #import "library/VLCLibraryUIUnits.h"
 #import "library/VLCLibraryWindow.h"
@@ -220,9 +221,25 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    VLCLibraryTableCellView * const cellView = [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
-    cellView.representedInputItem = [self mediaSourceInputItemAtRow:row];
-    return cellView;
+    VLCInputNode * const inputNode = [self mediaSourceInputNodeAtRow:row];
+    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableIconColumn"]) {
+        VLCImageView * const imageView = [[VLCImageView alloc] initWithFrame:NSZeroRect];
+        [VLCLibraryImageCache thumbnailForInputItem:inputNode.inputItem
+                                     withCompletion:^(NSImage * _Nullable image) {
+            imageView.image = image;
+        }];
+        return imageView;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+        NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+        textField.stringValue = inputNode.inputItem.name;
+        textField.editable = NO;
+        textField.bordered = NO;
+        textField.drawsBackground = NO;
+        textField.selectable = NO;
+        textField.lineBreakMode = NSLineBreakByTruncatingTail;
+        return textField;
+    }
+    return nil;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
