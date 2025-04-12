@@ -33,6 +33,7 @@
 #import "VLCMediaSource.h"
 
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
@@ -244,22 +245,11 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         }];
         return imageView;
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
-        NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
-        textField.stringValue = inputNode.inputItem.name;
-        textField.editable = NO;
-        textField.bordered = NO;
-        textField.drawsBackground = NO;
-        textField.selectable = NO;
-        textField.lineBreakMode = NSLineBreakByTruncatingTail;
-        return textField;
+        return [NSTextField defaultLabelWithString:inputNode.inputItem.name];
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
-        NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
-        textField.stringValue = [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
-        textField.editable = NO;
-        textField.bordered = NO;
-        textField.drawsBackground = NO;
-        textField.selectable = NO;
-        return textField;
+        NSString * const countString =
+            [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
+        return [NSTextField defaultLabelWithString:countString];
     }
     return nil;
 }
