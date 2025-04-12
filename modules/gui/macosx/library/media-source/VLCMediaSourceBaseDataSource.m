@@ -50,7 +50,6 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 {
     NSArray<VLCMediaSource *> *_mediaSources;
     NSArray<VLCInputNode *> *_discoveredLANdevices;
-    BOOL _gridViewMode;
 }
 @end
 
@@ -574,7 +573,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)reloadDataForNotification:(NSNotification *)aNotification
 {
-    if (_gridViewMode) {
+    if (self.viewMode == VLCLibraryGridViewModeSegment) {
         if (self.collectionView.dataSource == self) {
             const NSInteger index = [_mediaSources indexOfObject:aNotification.object];
             if (self.collectionView.numberOfSections > index) {
@@ -595,7 +594,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
 
 - (void)reloadData
 {
-    if (_gridViewMode) {
+    if (self.viewMode == VLCLibraryGridViewModeSegment) {
         [self.collectionView reloadData];
     } else {
         [self.tableView reloadData];
