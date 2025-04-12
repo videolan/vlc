@@ -93,6 +93,21 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
 #pragma mark - view and model state management
 
+- (VLCLibraryViewModeSegment)viewMode
+{
+    VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs =
+        VLCLibraryWindowPersistentPreferences.sharedInstance;
+
+    switch (_mediaSourceMode) {
+        case VLCMediaSourceModeLAN:
+            return libraryWindowPrefs.browseLibraryViewMode;
+        case VLCMediaSourceModeInternet:
+            return libraryWindowPrefs.streamLibraryViewMode;
+        default:
+            return VLCLibraryGridViewModeSegment;
+    }
+}
+
 - (void)setupViews
 {
     self.collectionView.dataSource = self;
@@ -122,20 +137,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
 
 - (void)reloadViews
 {
-    VLCLibraryViewModeSegment viewModeSegment = VLCLibraryGridViewModeSegment;
-    VLCLibraryWindowPersistentPreferences * const libraryWindowPrefs = VLCLibraryWindowPersistentPreferences.sharedInstance;
-
-    switch (_mediaSourceMode) {
-        case VLCMediaSourceModeLAN:
-            viewModeSegment = libraryWindowPrefs.browseLibraryViewMode;
-            break;
-        case VLCMediaSourceModeInternet:
-            viewModeSegment = libraryWindowPrefs.streamLibraryViewMode;
-            break;
-        default:
-            break;
-    }
-
+    const VLCLibraryViewModeSegment viewModeSegment = self.viewMode;
     if (viewModeSegment == VLCLibraryGridViewModeSegment) {
         self.collectionViewScrollView.hidden = NO;
         self.tableViewScrollView.hidden = YES;

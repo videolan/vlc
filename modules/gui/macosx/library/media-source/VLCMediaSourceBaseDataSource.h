@@ -22,6 +22,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+#import "library/VLCLibraryWindow.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSInteger, VLCMediaSourceMode) {
@@ -52,6 +54,8 @@ extern NSString * const VLCMediaSourceBaseDataSourceNodeChanged;
 @property (readwrite, nonatomic) VLCMediaSourceDataSource *childDataSource;
 
 @property (readwrite, weak) VLCLibraryMediaSourceViewNavigationStack *navigationStack;
+
+@property (readonly) VLCLibraryViewModeSegment viewMode;
 
 - (void)setupViews;
 - (void)reloadViews;
