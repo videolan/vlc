@@ -119,10 +119,6 @@
     _collectionViewScrollView.automaticallyAdjustsContentInsets = NO;
     _collectionViewScrollView.contentInsets = defaultInsets;
     _collectionViewScrollView.scrollerInsets = scrollerInsets;
-
-    _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _tableViewScrollView.contentInsets = defaultInsets;
-    _tableViewScrollView.scrollerInsets = scrollerInsets;
 }
 
 - (void)setupPlaceholderLabel

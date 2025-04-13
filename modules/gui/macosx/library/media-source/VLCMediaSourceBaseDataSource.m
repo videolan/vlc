@@ -148,6 +148,7 @@ NSString * const VLCMediaSourceBaseDataSourceNodeChanged = @"VLCMediaSourceBaseD
     } else {
         NSAssert(false, @"View mode must be grid or list mode");
     }
+    [self togglePathControlVisibility:!_pathControlVisualEffectView.hidden];
 }
 
 - (void)loadMediaSources
@@ -502,8 +503,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
     _collectionViewScrollView.scrollerInsets = scrollerInsets;
 
     _tableViewScrollView.automaticallyAdjustsContentInsets = NO;
-    _tableViewScrollView.contentInsets = scrollViewInsets;
-    _tableViewScrollView.scrollerInsets = scrollerInsets;
+    _tableViewScrollView.contentInsets =
+        NSEdgeInsetsMake(scrollViewsTopSpace + _tableViewScrollView.window.titlebarHeight, 0, 0, 0);
 }
 
 - (void)returnHome
