@@ -96,16 +96,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         NSURL * const nodeUrl = [NSURL URLWithString:nodeToDisplay.inputItem.MRL];
         [self.displayedMediaSource generateChildNodesForDirectoryNode:inputNode withUrl:nodeUrl];
 
-        for (VLCInputNode * const childNode in nodeToDisplay.children) {
-            if (childNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
-                continue;
-            }
-            NSURL * const childNodeUrl = [NSURL URLWithString:childNode.inputItem.MRL];
-            [self.displayedMediaSource generateChildNodesForDirectoryNode:childNode.vlcInputItemNode
-                                                                    withUrl:childNodeUrl];
-        }
         const __weak typeof(self) weakSelf = self;
-
         self.observedPathDispatchSource = [self observeLocalUrl:nodeUrl
                                                 forVnodeEvents:DISPATCH_VNODE_WRITE | 
                                                                DISPATCH_VNODE_DELETE |
@@ -247,6 +238,23 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
         return [NSTextField defaultLabelWithString:inputNode.inputItem.name];
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
+        if (inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
+            return [NSTextField defaultLabelWithString:NSTR("File")];
+        } else if (inputNode.numberOfChildren == 0) {
+            NSTextField * const textField = [NSTextField defaultLabelWithString:NSTR("Loading…")];
+            dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+                NSURL * const inputNodeUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
+                input_item_node_t * const p_inputNode = inputNode.vlcInputItemNode;
+                [self.displayedMediaSource generateChildNodesForDirectoryNode:p_inputNode
+                                                                      withUrl:inputNodeUrl];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    textField.stringValue =
+                        [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
+                });
+            });
+            return textField;
+        }
+
         NSString * const countString =
             [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
         return [NSTextField defaultLabelWithString:countString];
