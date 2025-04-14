@@ -65,8 +65,8 @@ static void vlc_frame_Check (vlc_frame_t *frame)
 
 void vlc_frame_CopyProperties(vlc_frame_t *restrict dst, const vlc_frame_t *src)
 {
-    vlc_ancillary_array_Dup(&dst->ancillaries,
-                            &src->ancillaries);
+    vlc_ancillary_array_Merge(&dst->ancillaries,
+                              &src->ancillaries);
 
     dst->i_flags   = src->i_flags;
     dst->i_nb_samples = src->i_nb_samples;

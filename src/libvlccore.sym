@@ -34,7 +34,7 @@ vlc_ancillary_Release
 vlc_ancillary_Hold
 vlc_ancillary_GetData
 vlc_ancillary_array_Clear
-vlc_ancillary_array_Dup
+vlc_ancillary_array_Merge
 vlc_ancillary_array_Insert
 vlc_ancillary_array_Get
 vlc_audio_meter_Init

@@ -156,9 +156,11 @@ VLC_API void
 vlc_ancillary_array_Clear(vlc_ancillary_array *array);
 
 /**
- * Duplicate an ancillary array
+ * Merge two ancillary arrays
  *
- * The dst array will be duplicated, but all ancillaries will be ref counted.
+ * Copy all ancillaries from src_array to dst_array, preserving all previous
+ * ancillaries. In case of ancillary id conflict, the one from src_array will
+ * have precedence.
  *
  * @param dst_array pointer to an initialized ancillary array, if not empty,
  * previous ancillaries will be preserved.
@@ -166,8 +168,8 @@ vlc_ancillary_array_Clear(vlc_ancillary_array *array);
  * @return VLC_SUCCESS in case of success, VLC_ENOMEM in case of alloc error
  */
 VLC_API int
-vlc_ancillary_array_Dup(vlc_ancillary_array *dst_array,
-                        const vlc_ancillary_array *src_array);
+vlc_ancillary_array_Merge(vlc_ancillary_array *dst_array,
+                          const vlc_ancillary_array *src_array);
 
 /**
  * Insert a new ancillary in the array
