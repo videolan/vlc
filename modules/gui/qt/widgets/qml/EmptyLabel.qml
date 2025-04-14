@@ -88,6 +88,8 @@ T.Control {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
 
+            anchors.horizontalCenter: parent.horizontalCenter
+
             focus: false
 
             color: theme.fg.primary

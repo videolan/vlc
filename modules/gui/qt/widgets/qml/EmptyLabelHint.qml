@@ -40,7 +40,7 @@ EmptyLabel {
     Widgets.CaptionLabel {
         id: labelHint
 
-        width: parent.width
+        anchors.horizontalCenter: parent.horizontalCenter
 
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
