@@ -26,13 +26,7 @@ T.Control {
     id: root
 
     // Properties
-    readonly property int extraMargin: VLCStyle.dynamicAppMargins(width)
-
-    readonly property int contentLeftMargin: extraMargin + VLCStyle.layout_left_margin
-    readonly property int contentRightMargin: extraMargin + VLCStyle.layout_right_margin
-
-    leftPadding: contentLeftMargin
-    rightPadding: contentRightMargin
+    padding: VLCStyle.margin_normal
 
     implicitWidth: Math.max(implicitBackgroundWidth + leftInset + rightInset,
                             implicitContentWidth + leftPadding + rightPadding)
