@@ -22,6 +22,7 @@ shader_sources = [
     'FastBlend_screen.frag',
     'RoundedRectangleShadow.frag',
     'RoundedRectangleShadow_hollow.frag',
+    'VoronoiSnow.frag',
 ]
 
 shader_files = files(shader_sources)
