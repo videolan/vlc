@@ -267,8 +267,26 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 typeName = NSTR("Unknown");
                 break;
             case ITEM_TYPE_FILE:
-                typeName = NSTR("File");
+            {
+                NSString * const filePath = inputNode.inputItem.MRL;
+                NSString * const extension = filePath.pathExtension.lowercaseString;
+                if (extension.length > 0) {
+                    typeName = [NSString stringWithFormat:@"%@ File", extension.capitalizedString];
+
+                    const CFStringRef extCF = (__bridge CFStringRef)extension;
+                    const CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extCF, NULL);
+                    if (uti) {
+                        CFStringRef descriptionCF = UTTypeCopyDescription(uti);
+                        if (descriptionCF) {
+                            typeName = CFBridgingRelease(descriptionCF);
+                        }
+                        CFRelease(uti);
+                    }
+                } else {
+                    typeName = NSTR("File");
+                }
                 break;
+            }
             case ITEM_TYPE_DIRECTORY:
                 typeName = NSTR("Directory");
                 break;
