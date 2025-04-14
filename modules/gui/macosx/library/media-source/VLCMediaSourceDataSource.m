@@ -225,7 +225,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
     return 0;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView
+   viewForTableColumn:(NSTableColumn *)tableColumn
+                  row:(NSInteger)row
 {
     VLCInputNode * const inputNode = [self mediaSourceInputNodeAtRow:row];
     if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableIconColumn"]) {
@@ -239,7 +241,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         return [NSTextField defaultLabelWithString:inputNode.inputItem.name];
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
         if (inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
-            return [NSTextField defaultLabelWithString:NSTR("File")];
+            return nil;
         } else if (inputNode.numberOfChildren == 0) {
             NSTextField * const textField = [NSTextField defaultLabelWithString:NSTR("Loading…")];
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
@@ -253,11 +255,43 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 });
             });
             return textField;
+        } else {
+            NSString * const countString =
+                [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
+            return [NSTextField defaultLabelWithString:countString];
         }
-
-        NSString * const countString =
-            [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
-        return [NSTextField defaultLabelWithString:countString];
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
+        NSString *typeName = NSTR("Unknown");
+        switch (inputNode.inputItem.inputType) {
+            case ITEM_TYPE_UNKNOWN:
+                typeName = NSTR("Unknown");
+                break;
+            case ITEM_TYPE_FILE:
+                typeName = NSTR("File");
+                break;
+            case ITEM_TYPE_DIRECTORY:
+                typeName = NSTR("Directory");
+                break;
+            case ITEM_TYPE_DISC:
+                typeName = NSTR("Disc");
+                break;
+            case ITEM_TYPE_CARD:
+                typeName = NSTR("Card");
+                break;
+            case ITEM_TYPE_STREAM:
+                typeName = NSTR("Stream");
+                break;
+            case ITEM_TYPE_PLAYLIST:
+                typeName = NSTR("Playlist");
+                break;
+            case ITEM_TYPE_NODE:
+                typeName = NSTR("Node");
+                break;
+            case ITEM_TYPE_NUMBER:
+                typeName = NSTR("Undefined");
+                break;
+        }
+        return [NSTextField defaultLabelWithString:typeName];
     }
     return nil;
 }
