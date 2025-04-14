@@ -485,7 +485,7 @@ MainViewLoader {
             focus: true
 
             text: qsTr("No playlists found")
-            hint: qsTr("Right click on a media to add it to a playlist")
+            hint: qsTr("Right click on a media\nto add it to a playlist")
 
             cover: VLCStyle.noArtAlbumCover
         }
