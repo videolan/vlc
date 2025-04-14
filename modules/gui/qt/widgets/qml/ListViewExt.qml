@@ -307,6 +307,11 @@ ListView {
     Accessible.role: Accessible.List
 
     add: Transition {
+        // Transition is relevant when drag and drop is feasible.
+        // Component approach can not be used here because `Transition`
+        // does not have a "target" property, and wants a valid parent.
+        enabled: !!root.acceptDropFunc
+
         OpacityAnimator {
             from: 0.0 // QTBUG-66475
             to: 1.0
@@ -340,6 +345,11 @@ ListView {
     //          issue. See QTBUG-131106, QTBUG-89158, ...
 
     moveDisplaced: Transition {
+        // Transition is relevant when drag and drop is feasible.
+        // Component approach can not be used here because `Transition`
+        // does not have a "target" property, and wants a valid parent.
+        enabled: !!root.acceptDropFunc
+
         NumberAnimation {
             // TODO: Use YAnimator >= Qt 6.0 (QTBUG-66475)
             property: (root.orientation === ListView.Vertical) ? "y" : "x"
