@@ -319,7 +319,7 @@ QtObject {
     readonly property int controlLayoutHeightPinned: MainCtx.dp(32, scale)
 
     // Scroll bar (size means width or height, depending on the orientation):
-    readonly property real scrollBarInteractingSize: MainCtx.dp(5, scale)
+    readonly property real scrollBarInteractingSize: MainCtx.dp(8, scale)
     readonly property real scrollBarNonInteractingSize: MainCtx.dp(2, scale)
 
     function dp(size, scale) {
