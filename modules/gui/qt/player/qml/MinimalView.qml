@@ -81,8 +81,11 @@ FocusScope {
         }
     }
 
-    Rectangle {
-        color: theme.bg.primary
+    // TODO: `ViewBlockingRectangle` (`AcrylicBackground`) is not necessary
+    //       here, this should ideally be a translucent rectangle. It is
+    //       is only used to provide the tint color and animations.
+    Widgets.AcrylicBackground {
+        tintColor: theme.bg.primary
 
         anchors.fill: parent
 
