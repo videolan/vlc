@@ -216,7 +216,9 @@ Loader {
 
         z: 1
 
-        active: !count && emptyLabel && !(_loadingItem && _loadingItem.visible)
+        // We can not depend on the existence of loading indicator here, unless we want this to be a delayed binding.
+        // Instead, use the condition where loading indicator is created (either shown, or pending to be shown):
+        active: (root.count === 0) && root.emptyLabel && (!root.isLoading || !root.loadingComponent)
 
         sourceComponent: emptyLabel
     }
