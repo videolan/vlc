@@ -397,6 +397,27 @@ referenceSizeForHeaderInSection:(NSInteger)section
         return [NSTextField defaultLabelWithString:name];
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
         return nil;
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
+        if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+            VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
+            if (currentNodeInput.inputType == ITEM_TYPE_DIRECTORY) {
+                return [NSTextField defaultLabelWithString:_NS("Directory")];
+            }
+        } else {
+            VLCMediaSource * const mediaSource = _mediaSources[row];
+            switch(mediaSource.category) {
+                case SD_CAT_DEVICES:
+                    return [NSTextField defaultLabelWithString:_NS("Devices")];
+                case SD_CAT_LAN:
+                    return [NSTextField defaultLabelWithString:_NS("LAN")];
+                case SD_CAT_INTERNET:
+                    return [NSTextField defaultLabelWithString:_NS("Internet")];
+                case SD_CAT_MYCOMPUTER:
+                    return [NSTextField defaultLabelWithString:_NS("My Computer")];
+            }
+        }
+    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableSizeColumn"]) {
+        return nil;
     }
     return nil;
 }
