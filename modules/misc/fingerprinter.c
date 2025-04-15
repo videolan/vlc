@@ -46,6 +46,7 @@ struct fingerprinter_sys_t
     vlc_thread_t thread;
     vlc_player_t *player;
     vlc_player_listener_id *listener_id;
+    chromaprint_fingerprint_t chroma_fingerprint;
 
     atomic_bool abort;
 
@@ -184,13 +185,11 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
     }
     input_item_SetURI( p_item, psz_uri ) ;
 
-    chromaprint_fingerprint_t chroma_fingerprint;
-
-    chroma_fingerprint.psz_fingerprint = NULL;
-    chroma_fingerprint.i_duration = fp->i_duration;
+    p_fingerprinter->p_sys->chroma_fingerprint.psz_fingerprint = NULL;
+    p_fingerprinter->p_sys->chroma_fingerprint.i_duration = fp->i_duration;
 
     var_Create( p_fingerprinter, "fingerprint-data", VLC_VAR_ADDRESS );
-    var_SetAddress( p_fingerprinter, "fingerprint-data", &chroma_fingerprint );
+    var_SetAddress( p_fingerprinter, "fingerprint-data", &p_fingerprinter->p_sys->chroma_fingerprint );
 
     vlc_player_t *player = p_fingerprinter->p_sys->player;
     vlc_player_Lock(player);
@@ -208,9 +207,13 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
             vlc_player_CondWait(player,
                                 &p_fingerprinter->p_sys->processing.cond);
 
-        fp->psz_fingerprint = chroma_fingerprint.psz_fingerprint;
-        if( !fp->i_duration ) /* had not given hint */
-            fp->i_duration = chroma_fingerprint.i_duration;
+        if( !p_fingerprinter->p_sys->abort )
+        {
+            fp->psz_fingerprint = p_fingerprinter->p_sys->chroma_fingerprint.psz_fingerprint;
+            p_fingerprinter->p_sys->chroma_fingerprint.psz_fingerprint = NULL;
+            if( !fp->i_duration ) /* had not given hint */
+                fp->i_duration = p_fingerprinter->p_sys->chroma_fingerprint.i_duration;
+        }
     }
 
     vlc_player_Unlock(player);
