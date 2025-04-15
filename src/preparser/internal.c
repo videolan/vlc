@@ -1,7 +1,7 @@
 /*****************************************************************************
- * preparser.c
+ * internal.c
  *****************************************************************************
- * Copyright © 2017-2017 VLC authors and VideoLAN
+ * Copyright © 2017-2025 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

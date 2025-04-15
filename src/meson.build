@@ -131,7 +131,7 @@ libvlccore_sources_base = files(
     'preparser/fetcher.c',
     'preparser/fetcher.h',
     'preparser/ipc.c',
-    'preparser/preparser.c',
+    'preparser/internal.c',
     'input/item.c',
     'input/access.c',
     'clock/clock_internal.c',
