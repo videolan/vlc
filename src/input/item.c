@@ -1057,11 +1057,35 @@ input_item_t *input_item_Copy( input_item_t *p_input )
         }
     }
 
+    struct input_item_es item_es;
+    struct input_item_es cpy_item_es;
+    vlc_vector_foreach(item_es, &p_input->es_vec) {
+        cpy_item_es.id_stable = item_es.id_stable;
+        cpy_item_es.id = strdup(item_es.id);
+        if (cpy_item_es.id == NULL) {
+            goto error;
+        }
+        es_format_Init(&cpy_item_es.es, UNKNOWN_ES, 0);
+        if (es_format_Copy(&cpy_item_es.es, &item_es.es) != VLC_SUCCESS) {
+            /* es_format_Copy didn't stop if an allocation fail so we need to
+             * clear all memory allocated */
+            es_format_Clean(&cpy_item_es.es);
+            free(cpy_item_es.id);
+            goto error;
+        }
+        vlc_vector_push(&item->es_vec, cpy_item_es);
+    }
+
     vlc_mutex_unlock( &p_input->lock );
 
     /* No need to lock; no other thread has seen this new item yet. */
     input_item_CopyOptions( item, p_input );
     return item;
+
+error:
+    vlc_mutex_unlock(&p_input->lock);
+    input_item_Release(item);
+    return NULL;
 }
 
 struct item_type_entry
