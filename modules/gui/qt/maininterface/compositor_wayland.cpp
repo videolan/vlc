@@ -250,11 +250,24 @@ void CompositorWayland::adjustQuickWindowMask()
 {
     assert(m_intf);
     assert(m_intf->p_mi);
-    unsigned maskMargin = 0;
-    if (Q_LIKELY(static_cast<unsigned>(m_intf->p_mi->CSDBorderSize()) < m_intf->p_mi->windowExtendedMargin()))
-        maskMargin = m_intf->p_mi->windowExtendedMargin() - m_intf->p_mi->CSDBorderSize();
-    const QMargins maskMargins(maskMargin, maskMargin, maskMargin, maskMargin);
-    m_qmlView->setMask(m_qmlView->geometry().marginsRemoved(maskMargins));
+    // Assuming no overflow:
+    const auto maskMargin = static_cast<int>(m_intf->p_mi->windowExtendedMargin()) - m_intf->p_mi->CSDBorderSize();
+    if (maskMargin > 0)
+    {
+        // WARNING: Be careful here, if Qt platform plugin applies decoration (CSD handled by the Qt platform plugin),
+        //          it might be necessary to care about `QWaylandWindow::clientSideMargins()` when setting the mask.
+        //          Since this branch is only taken when FramelessWindowHint (CSD handled by the application) is used,
+        //          we do not need to care about that here.
+        const QMargins maskMargins(maskMargin, maskMargin, maskMargin, maskMargin);
+        m_qmlView->setMask(QRect(QPoint(0, 0), m_qmlView->size()).marginsRemoved(maskMargins));
+    }
+    else
+    {
+        // WARNING: As per the warning above, if you want to set a mask in this case (FramelessWindowHint is off),
+        //          you might need to care about `QWaylandWindow::clientSideMargins()`, unless the mask is disabled
+        //          altogether, as done here:
+        m_qmlView->setMask(QRegion()); // null/empty region, disable mask
+    }
 }
 #endif
 
