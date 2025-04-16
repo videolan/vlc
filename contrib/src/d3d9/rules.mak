@@ -14,6 +14,9 @@ ifdef HAVE_WIN32
 ifndef HAVE_VISUALSTUDIO
 PKGS += d3d9
 endif
+ifeq ($(call mingw_at_least, 8), true)
+PKGS_FOUND += d3d9
+endif # MINGW 8
 endif
 
 $(TARBALLS)/d3d9caps.h:
