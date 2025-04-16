@@ -445,6 +445,8 @@ vlc_chroma_conv_Probe(vlc_fourcc_t from, vlc_fourcc_t to,
                 if (next->cost < cur->cost)
                     cur->cost = next->cost;
                 vlc_vector_remove(&result_vec, j);
+                /* update pointer after possible realloc */
+                cur = &result_vec.data[i];
             }
             else
                 j++;
