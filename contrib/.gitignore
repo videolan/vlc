@@ -12,4 +12,5 @@ plugins
 python-venv
 vlc-contrib-*.tar.xz
 vlc-contrib-*.tar.bz2
+qml
 /*-*-*/
