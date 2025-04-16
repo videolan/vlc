@@ -908,7 +908,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCMediaSourceTableCountColumn" width="42" minWidth="10" maxWidth="3.4028234663852886e+38" id="edO-i5-VZb">
+                                    <tableColumn identifier="VLCMediaSourceTableCountColumn" width="80" minWidth="32" maxWidth="3.4028234663852886e+38" id="edO-i5-VZb">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Count">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -940,7 +940,7 @@
                                             </tableCellView>
                                         </prototypeCellViews>
                                     </tableColumn>
-                                    <tableColumn identifier="VLCMediaSourceTableKindColumn" width="40" minWidth="40" maxWidth="3.4028234663852886e+38" id="K6u-4u-7Na">
+                                    <tableColumn identifier="VLCMediaSourceTableKindColumn" width="200" minWidth="50" maxWidth="3.4028234663852886e+38" id="K6u-4u-7Na">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" title="Kind">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

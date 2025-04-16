@@ -49,6 +49,7 @@
         [self setupPropertiesFromLibraryWindow:libraryWindow];
         [self setupBaseDataSource];
         [self setupCollectionView];
+        [self setupTableView];
         [self setupMediaSourceLibraryViews];
         [self setupPlaceholderLabel];
         [self setupPathControlView];
@@ -107,6 +108,34 @@
     VLCLibraryCollectionViewFlowLayout * const mediaSourceCollectionViewLayout = VLCLibraryCollectionViewFlowLayout.standardLayout;
     self.collectionView.collectionViewLayout = mediaSourceCollectionViewLayout;
     mediaSourceCollectionViewLayout.itemSize = VLCLibraryCollectionViewItem.defaultSize;
+}
+
+- (void)setupTableView
+{
+    NSArray<NSTableColumn *> * const columns = self.tableView.tableColumns;
+    const NSUInteger columnCount = columns.count;
+    if (columnCount == 0)
+        return;
+
+    const NSInteger nameColumnIndex = [columns indexOfObjectPassingTest:^BOOL(NSTableColumn * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return [obj.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"];
+    }];
+    NSAssert(nameColumnIndex != NSNotFound, @"Name column not found");
+    NSTableColumn * const expandableColumn = columns[nameColumnIndex];
+
+    // Compute total width of all columns except the expandable one
+    CGFloat fixedColumnsWidth = 200; // Account for last column which we don't want too large
+    for (NSTableColumn * const column in columns) {
+        if (column != expandableColumn && column != columns.lastObject)
+            fixedColumnsWidth += column.width;
+    }
+
+    const CGFloat spacing = self.tableView.intercellSpacing.width;
+    const CGFloat totalSpacing = spacing * (columnCount - 1);
+    const CGFloat tableWidth = self.libraryTargetView.bounds.size.width;
+    const CGFloat remainingWidth = tableWidth - fixedColumnsWidth - totalSpacing;
+
+    expandableColumn.width = MAX(remainingWidth, 400);
 }
 
 - (void)setupMediaSourceLibraryViews
