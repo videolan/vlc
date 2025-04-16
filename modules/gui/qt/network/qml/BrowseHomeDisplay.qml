@@ -100,34 +100,6 @@ FocusScope {
             lanSection.setCurrentItemFocus(reason);
     }
 
-    function _centerFlickableOnItem(item) {
-        if (item.activeFocus === false)
-            return
-
-        let minY
-        let maxY
-
-        const index = item.currentIndex
-
-        // NOTE: We want to include the header when we're on the first row.
-        if ((MainCtx.gridView && index < item.nbItemPerRow) || index < 1) {
-            minY = item.y
-
-            maxY = minY + item.getItemY(index) + item.rowHeight
-        } else {
-            minY = item.y + item.getItemY(index)
-
-            maxY = minY + item.rowHeight
-        }
-
-        // TODO: We could implement a scrolling animation like in ExpandGridView.
-        if (maxY > flickable.contentY + flickable.height) {
-            flickable.contentY = maxY - flickable.height
-        } else if (minY < flickable.contentY) {
-            flickable.contentY = minY
-        }
-    }
-
     readonly property ColorContext colorContext: ColorContext {
         id: theme
         colorSet: ColorContext.View
@@ -304,7 +276,19 @@ FocusScope {
         onBrowse: (tree, reason) => root.browse(tree, reason)
         onSeeAll: (reason) => root.seeAllDevices(title, model.sd_source, reason)
 
-        onActiveFocusChanged: _centerFlickableOnItem(this)
-        onCurrentIndexChanged: _centerFlickableOnItem(this)
+        onActiveFocusChanged: {
+            if (activeFocus) {
+                const item = _currentView?.currentItem ?? _currentView?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                Helpers.positionFlickableToContainItem(flickable, item ?? this)
+            }
+        }
+
+        onCurrentIndexChanged: {
+            if (activeFocus) {
+                const item = _currentView?.currentItem ?? _currentView?._getItem(currentIndex) // FIXME: `ExpandGridView` does not have `currentItem`.
+                if (item)
+                    Helpers.positionFlickableToContainItem(flickable, item)
+            }
+        }
     }
 }
