@@ -375,22 +375,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
    viewForTableColumn:(NSTableColumn *)tableColumn
                   row:(NSInteger)row
 {
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableIconColumn"]) {
-        VLCImageView * const imageView = [[VLCImageView alloc] initWithFrame:NSZeroRect];
-        if (_mediaSourceMode == VLCMediaSourceModeLAN) {
-            VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
-            NSURL * const artworkURL = currentNodeInput.artworkURL;
-            NSImage * const placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
-            if (artworkURL) {
-                [imageView setImageURL:artworkURL placeholderImage:placeholder];
-            } else {
-                imageView.image = placeholder;
-            }
-        } else {
-            imageView.image = [NSImage imageNamed:@"NXFollow"];
-        }
-        return imageView;
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
         NSString * const name = _mediaSourceMode == VLCMediaSourceModeLAN
             ? _discoveredLANdevices[row].inputItem.name
             : _mediaSources[row].mediaSourceDescription;

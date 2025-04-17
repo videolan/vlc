@@ -230,14 +230,7 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                   row:(NSInteger)row
 {
     VLCInputNode * const inputNode = [self mediaSourceInputNodeAtRow:row];
-    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableIconColumn"]) {
-        VLCImageView * const imageView = [[VLCImageView alloc] initWithFrame:NSZeroRect];
-        [VLCLibraryImageCache thumbnailForInputItem:inputNode.inputItem
-                                     withCompletion:^(NSImage * _Nullable image) {
-            imageView.image = image;
-        }];
-        return imageView;
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
         return [NSTextField defaultLabelWithString:inputNode.inputItem.name];
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
         if (inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
