@@ -30,7 +30,7 @@
 #import "VLCMediaSourceDataSource.h"
 
 #import "extensions/NSString+Helpers.h"
-#import "extensions/NSTextField+VLCAdditions.h"
+#import "extensions/NSTableCellView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryWindow.h"
@@ -376,33 +376,64 @@ referenceSizeForHeaderInSection:(NSInteger)section
                   row:(NSInteger)row
 {
     if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
+        VLCLibraryTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
+
+        if (_mediaSourceMode == VLCMediaSourceModeLAN) {
+            VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
+            NSURL * const artworkURL = currentNodeInput.artworkURL;
+            NSImage * const placeholder = [NSImage imageNamed:@"NXdefaultappicon"];
+            if (artworkURL) {
+                [cellView.representedImageView setImageURL:artworkURL placeholderImage:placeholder];
+            } else {
+                cellView.representedImageView.image = placeholder;
+            }
+        } else {
+            cellView.representedImageView.image = [NSImage imageNamed:@"NXFollow"];
+        }
+
         NSString * const name = _mediaSourceMode == VLCMediaSourceModeLAN
             ? _discoveredLANdevices[row].inputItem.name
             : _mediaSources[row].mediaSourceDescription;
-        return [NSTextField defaultLabelWithString:name];
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
-        return nil;
+
+        cellView.primaryTitleTextField.hidden = YES;
+        cellView.secondaryTitleTextField.hidden = YES;
+        cellView.singlePrimaryTitleTextField.hidden = NO;
+        cellView.singlePrimaryTitleTextField.stringValue = name;
+        return cellView;
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
+        static NSString * const basicCellViewIdentifier = @"BasicTableCellViewIdentifier";
+        NSTableCellView *cellView =
+            [tableView makeViewWithIdentifier:basicCellViewIdentifier owner:self];
+        if (cellView == nil) {
+            cellView = [NSTableCellView tableCellViewWithIdentifier:basicCellViewIdentifier
+                                                      showingString:@""];
+        }
+        NSAssert(cellView, @"Cell view should not be nil");
+
         if (_mediaSourceMode == VLCMediaSourceModeLAN) {
             VLCInputItem * const currentNodeInput = _discoveredLANdevices[row].inputItem;
             if (currentNodeInput.inputType == ITEM_TYPE_DIRECTORY) {
-                return [NSTextField defaultLabelWithString:_NS("Directory")];
+                cellView.textField.stringValue = _NS("Directory");
             }
         } else {
             VLCMediaSource * const mediaSource = _mediaSources[row];
             switch(mediaSource.category) {
                 case SD_CAT_DEVICES:
-                    return [NSTextField defaultLabelWithString:_NS("Devices")];
+                    cellView.textField.stringValue = _NS("Devices");
+                    break;
                 case SD_CAT_LAN:
-                    return [NSTextField defaultLabelWithString:_NS("LAN")];
+                    cellView.textField.stringValue = _NS("LAN");
+                    break;
                 case SD_CAT_INTERNET:
-                    return [NSTextField defaultLabelWithString:_NS("Internet")];
+                    cellView.textField.stringValue = _NS("Internet");
+                    break;
                 case SD_CAT_MYCOMPUTER:
-                    return [NSTextField defaultLabelWithString:_NS("My Computer")];
+                    cellView.textField.stringValue = _NS("My Computer");
+                    break;
             }
         }
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableSizeColumn"]) {
-        return nil;
+        return cellView;
     }
     return nil;
 }
