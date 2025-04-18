@@ -33,7 +33,7 @@
 #import "VLCMediaSource.h"
 
 #import "extensions/NSString+Helpers.h"
-#import "extensions/NSTextField+VLCAdditions.h"
+#import "extensions/NSTableCellView+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCInputNodePathControl.h"
@@ -251,20 +251,12 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
         return nil;
     }
 
+    static NSString * const basicCellViewIdentifier = @"BasicTableCellViewIdentifier";
     NSTableCellView *cellView =
-        [tableView makeViewWithIdentifier:@"NSTableCellViewIdentifier" owner:self];
+        [tableView makeViewWithIdentifier:basicCellViewIdentifier owner:self];
     if (cellView == nil) {
-        cellView = [[NSTableCellView alloc] initWithFrame:NSZeroRect];
-        cellView.identifier = @"NSTableCellViewIdentifier";
-
-        NSTextField * const textField = [NSTextField defaultLabelWithString:@""];
-        textField.translatesAutoresizingMaskIntoConstraints = NO;
-
-        cellView.textField = textField;
-        [cellView addSubview:textField];
-        [cellView.centerYAnchor constraintEqualToAnchor:textField.centerYAnchor].active = YES;
-        [cellView.leadingAnchor constraintEqualToAnchor:textField.leadingAnchor].active = YES;
-        [cellView.trailingAnchor constraintEqualToAnchor:textField.trailingAnchor].active = YES;
+        cellView =
+            [NSTableCellView tableCellViewWithIdentifier:basicCellViewIdentifier showingString:@""];
     }
     NSAssert(cellView, @"Cell view should not be nil");
 
