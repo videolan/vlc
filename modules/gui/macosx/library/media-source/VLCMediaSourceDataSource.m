@@ -230,28 +230,60 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                   row:(NSInteger)row
 {
     VLCInputNode * const inputNode = [self mediaSourceInputNodeAtRow:row];
+
     if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableNameColumn"]) {
-        return [NSTextField defaultLabelWithString:inputNode.inputItem.name];
-    } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
-        if (inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
-            return nil;
-        } else if (inputNode.numberOfChildren == 0) {
-            NSTextField * const textField = [NSTextField defaultLabelWithString:NSTR("Loading…")];
+        VLCLibraryTableCellView * const cellView =
+            [tableView makeViewWithIdentifier:VLCLibraryTableCellViewIdentifier owner:self];
+        [VLCLibraryImageCache thumbnailForInputItem:inputNode.inputItem
+                                     withCompletion:^(NSImage * _Nullable image) {
+            cellView.representedImageView.image = image;
+        }];
+        cellView.primaryTitleTextField.hidden = YES;
+        cellView.secondaryTitleTextField.hidden = YES;
+        cellView.singlePrimaryTitleTextField.hidden = NO;
+        cellView.singlePrimaryTitleTextField.stringValue = inputNode.inputItem.name;
+        return cellView;
+    }
+
+     // Only present count view for folders
+    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"] &&
+        inputNode.inputItem.inputType != ITEM_TYPE_DIRECTORY) {
+        return nil;
+    }
+
+    NSTableCellView *cellView =
+        [tableView makeViewWithIdentifier:@"NSTableCellViewIdentifier" owner:self];
+    if (cellView == nil) {
+        cellView = [[NSTableCellView alloc] initWithFrame:NSZeroRect];
+        cellView.identifier = @"NSTableCellViewIdentifier";
+
+        NSTextField * const textField = [NSTextField defaultLabelWithString:@""];
+        textField.translatesAutoresizingMaskIntoConstraints = NO;
+
+        cellView.textField = textField;
+        [cellView addSubview:textField];
+        [cellView.centerYAnchor constraintEqualToAnchor:textField.centerYAnchor].active = YES;
+        [cellView.leadingAnchor constraintEqualToAnchor:textField.leadingAnchor].active = YES;
+        [cellView.trailingAnchor constraintEqualToAnchor:textField.trailingAnchor].active = YES;
+    }
+    NSAssert(cellView, @"Cell view should not be nil");
+
+    if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableCountColumn"]) {
+        if (inputNode.numberOfChildren == 0) {
+            cellView.textField.stringValue = NSTR("Loading…");
             dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
                 NSURL * const inputNodeUrl = [NSURL URLWithString:inputNode.inputItem.MRL];
                 input_item_node_t * const p_inputNode = inputNode.vlcInputItemNode;
                 [self.displayedMediaSource generateChildNodesForDirectoryNode:p_inputNode
                                                                       withUrl:inputNodeUrl];
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    textField.stringValue =
+                    cellView.textField.stringValue =
                         [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
                 });
             });
-            return textField;
         } else {
-            NSString * const countString =
+            cellView.textField.stringValue =
                 [NSString stringWithFormat:@"%i items", inputNode.numberOfChildren];
-            return [NSTextField defaultLabelWithString:countString];
         }
     } else if ([tableColumn.identifier isEqualToString:@"VLCMediaSourceTableKindColumn"]) {
         NSString *typeName = NSTR("Unknown");
@@ -302,9 +334,9 @@ NSString * const VLCMediaSourceDataSourceNodeChanged = @"VLCMediaSourceDataSourc
                 typeName = NSTR("Undefined");
                 break;
         }
-        return [NSTextField defaultLabelWithString:typeName];
+        cellView.textField.stringValue = typeName;
     }
-    return nil;
+    return cellView;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
