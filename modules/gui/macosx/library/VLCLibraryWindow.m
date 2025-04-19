@@ -562,12 +562,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self showControlsBarImmediately];
     [self updateArtworkButtonEnabledState];
 
-    _acquiredVideoView = [self.videoViewController acquireVideoView];
-    if (_acquiredVideoView) {
-        [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
-                                        positioned:NSWindowBelow
-                                        relativeTo:self.artworkButton];
-        [_acquiredVideoView applyConstraintsToFillSuperview];
+    if (!self.playQueueController.playerController.currentMediaIsAudioOnly) {
+        _acquiredVideoView = [self.videoViewController acquireVideoView];
+        if (_acquiredVideoView) {
+            [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
+                                            positioned:NSWindowBelow
+                                            relativeTo:self.artworkButton];
+            [_acquiredVideoView applyConstraintsToFillSuperview];
+        }
     }
 
     self.splitViewController.mainVideoModeEnabled = NO;
