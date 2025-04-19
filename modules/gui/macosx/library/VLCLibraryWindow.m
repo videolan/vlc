@@ -453,6 +453,17 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     self.controlsBar.thumbnailTrackingView.viewToHide.hidden = artworkButtonDisabled;
 }
 
+- (void)configureArtworkButtonLiveVideoView
+{
+    _acquiredVideoView = [self.videoViewController acquireVideoView];
+    if (_acquiredVideoView) {
+        [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
+                                           positioned:NSWindowBelow
+                                           relativeTo:self.artworkButton];
+        [_acquiredVideoView applyConstraintsToFillSuperview];
+    }
+}
+
 - (void)hideControlsBarImmediately
 {
     self.controlsBarHeightConstraint.constant = 0;
@@ -563,13 +574,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
     [self updateArtworkButtonEnabledState];
 
     if (!self.playQueueController.playerController.currentMediaIsAudioOnly) {
-        _acquiredVideoView = [self.videoViewController acquireVideoView];
-        if (_acquiredVideoView) {
-            [self.controlsBar.artworkImageView addSubview:_acquiredVideoView
-                                            positioned:NSWindowBelow
-                                            relativeTo:self.artworkButton];
-            [_acquiredVideoView applyConstraintsToFillSuperview];
-        }
+        [self configureArtworkButtonLiveVideoView];
     }
 
     self.splitViewController.mainVideoModeEnabled = NO;
