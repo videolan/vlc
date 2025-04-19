@@ -225,7 +225,8 @@
 
 - (void)applyAudioDecorativeViewForegroundCoverArtViewConstraints
 {
-    if (![self.voutContainingView.subviews containsObject:self.audioDecorativeView]) {
+    if (![self.view.subviews containsObject:self.voutContainingView] ||
+        ![self.voutContainingView.subviews containsObject:self.audioDecorativeView]) {
         return;
     }
 
