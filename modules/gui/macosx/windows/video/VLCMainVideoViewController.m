@@ -190,17 +190,7 @@
 
 - (void)updateDecorativeViewVisibilityOnControllerChange:(VLCPlayerController *)controller
 {
-    VLCMediaLibraryMediaItem * const mediaItem = 
-        [VLCMediaLibraryMediaItem mediaItemForURL:controller.URLOfCurrentMediaItem];
-
-    BOOL decorativeViewVisible = NO;
-    if (mediaItem != nil) {
-        decorativeViewVisible = mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
-    } else {
-        VLCInputItem * const inputItem = controller.currentMedia;
-        decorativeViewVisible = inputItem != nil && controller.videoTracks.count == 0;
-    }
-
+    const BOOL decorativeViewVisible = controller.currentMediaIsAudioOnly;
     NSView * const targetView = decorativeViewVisible ? self.audioDecorativeView : self.voutView;
     self.voutContainingView.subviews = @[targetView];
     [targetView applyConstraintsToFillSuperview];

@@ -800,6 +800,22 @@ static int BossCallback(vlc_object_t *p_this,
     return name;
 }
 
+- (BOOL)currentMediaIsAudioOnly
+{
+    NSURL * const currentItemUrl = self.URLOfCurrentMediaItem;
+    if (currentItemUrl == nil) {
+        return NO;
+    }
+
+    VLCMediaLibraryMediaItem * const mediaItem =
+        [VLCMediaLibraryMediaItem mediaItemForURL:currentItemUrl];
+    if (mediaItem != nil) {
+        return mediaItem.mediaType == VLC_ML_MEDIA_TYPE_AUDIO;
+    }
+
+    return self.videoTracks.count == 0 && self.audioTracks.count > 0;
+}
+
 - (void)stateChanged:(enum vlc_player_state)state
 {
     /* instead of using vlc_player_GetState, we cache the state and provide it through a synthesized getter
