@@ -94,9 +94,15 @@ API_AVAILABLE(ios(15.0), tvos(15.0), macosx(12.0))
     avPipController.requiresLinearPlayback = !isMediaSeekable;
     avPipController.delegate = self;
 #if TARGET_OS_IOS
-    // Not sure if it's mandatory, its usefulness isn't obvious and 
-    // documentation doesn't particularily helps
-    avPipController.canStartPictureInPictureAutomaticallyFromInline = YES;
+    // Check if the drawable implements the new method to Controls whether PiP 
+    // can start automatically when video enters inline mode
+    if ([_drawable respondsToSelector:@selector(canStartPictureInPictureAutomaticallyFromInline)]) {
+        avPipController.canStartPictureInPictureAutomaticallyFromInline = 
+            [_drawable canStartPictureInPictureAutomaticallyFromInline];
+    } else {
+        // Use default value if method not implemented
+        avPipController.canStartPictureInPictureAutomaticallyFromInline = YES;
+    }
 #endif
     _avPipController = avPipController;
 
