@@ -129,6 +129,20 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
+- (void)handleAlbumUpdateInRow:(NSInteger)row
+{
+    NSParameterAssert(row >= 0 && row < self.representedListOfAlbums.count);
+    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
+    NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndex:0];
+    NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
+
+    [self performActionOnTableViews:^(NSTableView * const tableView){
+        [tableView reloadDataForRowIndexes:indexSet columnIndexes:columnIndexSet];
+    } onCollectionViews:^(NSCollectionView * const collectionView){
+        [collectionView reloadItemsAtIndexPaths:indexPaths];
+    }];
+}
+
 - (void)performActionOnTableViews:(void (^)(NSTableView *))tableViewAction
                 onCollectionViews:(void (^)(NSCollectionView *))collectionViewAction
 {
@@ -158,15 +172,7 @@
         return;
     }
 
-    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
-    NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndex:0];
-    NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
-
-    [self performActionOnTableViews:^(NSTableView * const tableView){
-        [tableView reloadDataForRowIndexes:indexSet columnIndexes:columnIndexSet];
-    } onCollectionViews:^(NSCollectionView * const collectionView){
-        [collectionView reloadItemsAtIndexPaths:indexPaths];
-    }];
+    [self handleAlbumUpdateInRow:row];
 }
 
 - (void)libraryModelAlbumDeleted:(NSNotification *)notification
