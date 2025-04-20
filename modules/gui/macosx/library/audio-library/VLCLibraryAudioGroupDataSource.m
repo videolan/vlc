@@ -112,6 +112,10 @@
                            selector:@selector(libraryModelAlbumsReset:)
                                name:VLCLibraryModelAlbumListReset
                              object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumDeleted:)
+                               name:VLCLibraryModelAlbumDeleted
+                             object:nil];
 
     [self reloadData];
 }
@@ -140,6 +144,24 @@
 - (void)libraryModelAlbumsReset:(NSNotification *)notification
 {
     [self updateRepresentedListOfAlbums];
+}
+
+- (void)libraryModelAlbumDeleted:(NSNotification *)notification
+{
+    const NSInteger row = [self rowForLibraryItem:notification.object];
+    if (row == NSNotFound) {
+        NSLog(@"VLCLibraryAudioGroupDataSource: Unable to find row for library item, can't delete");
+        return;
+    }
+
+    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
+    NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
+
+    [self performActionOnTableViews:^(NSTableView * const tableView){
+        [tableView removeRowsAtIndexes:indexSet withAnimation:NSTableViewAnimationSlideUp];
+    } onCollectionViews:^(NSCollectionView * const collectionView){
+        [collectionView deleteItemsAtIndexPaths:indexPaths];
+    }];
 }
 
 - (void)reloadTableViews
