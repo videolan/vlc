@@ -113,6 +113,10 @@
                                name:VLCLibraryModelAlbumListReset
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumUpdated:)
+                               name:VLCLibraryModelAlbumUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(libraryModelAlbumDeleted:)
                                name:VLCLibraryModelAlbumDeleted
                              object:nil];
@@ -144,6 +148,25 @@
 - (void)libraryModelAlbumsReset:(NSNotification *)notification
 {
     [self updateRepresentedListOfAlbums];
+}
+
+- (void)libraryModelAlbumUpdated:(NSNotification *)notification
+{
+    const NSInteger row = [self rowForLibraryItem:notification.object];
+    if (row == NSNotFound) {
+        NSLog(@"VLCLibraryAudioGroupDataSource: Unable to find row for library item, can't update");
+        return;
+    }
+
+    NSIndexSet * const indexSet = [NSIndexSet indexSetWithIndex:row];
+    NSIndexSet * const columnIndexSet = [NSIndexSet indexSetWithIndex:0];
+    NSSet * const indexPaths = [NSSet setWithObject:[NSIndexPath indexPathForItem:row inSection:0]];
+
+    [self performActionOnTableViews:^(NSTableView * const tableView){
+        [tableView reloadDataForRowIndexes:indexSet columnIndexes:columnIndexSet];
+    } onCollectionViews:^(NSCollectionView * const collectionView){
+        [collectionView reloadItemsAtIndexPaths:indexPaths];
+    }];
 }
 
 - (void)libraryModelAlbumDeleted:(NSNotification *)notification
