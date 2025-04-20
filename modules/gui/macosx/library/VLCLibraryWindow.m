@@ -189,6 +189,10 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
                                name:VLCPlayerCurrentMediaItemChanged
                              object:nil];
     [notificationCenter addObserver:self
+                           selector:@selector(playerCurrentMediaItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
                            selector:@selector(playerStateChanged:)
                                name:VLCPlayerStateChanged
                              object:nil];
@@ -425,6 +429,26 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (self.videoViewController.view.isHidden) {
         [self showControlsBar];
+    }
+}
+
+- (void)playerCurrentMediaItemChanged:(NSNotification *)notification
+{
+    NSParameterAssert(notification);
+    VLCPlayerController * const controller = notification.object;
+    NSAssert(controller != nil,
+             @"Player current media item changed notification should have valid player controller");
+
+    // Live video playback in controls bar artwork button handling
+    if (self.splitViewController.mainVideoModeEnabled) {
+        return;
+    }
+
+    if (controller.currentMediaIsAudioOnly && _acquiredVideoView) {
+        [self.videoViewController returnVideoView:_acquiredVideoView];
+        _acquiredVideoView = nil;
+    } else if (!controller.currentMediaIsAudioOnly && _acquiredVideoView == nil) {
+        [self configureArtworkButtonLiveVideoView];
     }
 }
 
