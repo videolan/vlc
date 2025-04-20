@@ -571,6 +571,7 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
 
     if (_acquiredVideoView) {
         [self.videoViewController returnVideoView:_acquiredVideoView];
+        _acquiredVideoView = nil;
     }
 
     [self presentVideoView];
