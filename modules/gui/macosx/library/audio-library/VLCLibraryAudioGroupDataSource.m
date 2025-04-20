@@ -93,11 +93,6 @@
     }
 }
 
-- (void)libraryModelAudioMediaItemsReset:(NSNotification *)notification
-{
-    [self updateRepresentedListOfAlbums];
-}
-
 - (void)connect
 {
     NSNotificationCenter * const notificationCenter = NSNotificationCenter.defaultCenter;
@@ -106,7 +101,14 @@
                            selector:@selector(libraryModelAudioMediaItemsReset:)
                                name:VLCLibraryModelAudioMediaListReset
                              object:nil];
-    // TODO: Handle item deletion, update
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemUpdated:)
+                               name:VLCLibraryModelAudioMediaItemUpdated
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAudioMediaItemDeleted:)
+                               name:VLCLibraryModelAudioMediaItemDeleted
+                             object:nil];
 
     [notificationCenter addObserver:self
                            selector:@selector(libraryModelAlbumsReset:)
@@ -129,6 +131,15 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
+- (NSInteger)rowContainingMediaItem:(id<VLCMediaLibraryItemProtocol>)libraryItem
+{
+    return [self.representedAudioGroup.albums indexOfObjectPassingTest:^BOOL(VLCMediaLibraryAlbum *album, NSUInteger idx, BOOL *stop) {
+        return [album.mediaItems indexOfObjectPassingTest:^BOOL(VLCMediaLibraryMediaItem *item, NSUInteger idx, BOOL *stop) {
+            return item.libraryID == libraryItem.libraryID;
+        }] != NSNotFound;
+    }];
+}
+
 - (void)handleAlbumUpdateInRow:(NSInteger)row
 {
     NSParameterAssert(row >= 0 && row < self.representedListOfAlbums.count);
@@ -141,6 +152,17 @@
     } onCollectionViews:^(NSCollectionView * const collectionView){
         [collectionView reloadItemsAtIndexPaths:indexPaths];
     }];
+}
+
+- (void)handleLibraryItemChange:(id<VLCMediaLibraryItemProtocol>)item
+{
+    NSParameterAssert(item != nil);
+    const NSInteger row = [self rowContainingMediaItem:item];
+    if (row == NSNotFound) {
+        NSLog(@"VLCLibraryAudioGroupDataSource: Unable to find row for library item, can't change");
+        return;
+    }
+    [self handleAlbumUpdateInRow:row];
 }
 
 - (void)performActionOnTableViews:(void (^)(NSTableView *))tableViewAction
@@ -157,6 +179,22 @@
     for (NSCollectionView * const collectionView in collectionViews) {
         collectionViewAction(collectionView);
     }
+}
+
+- (void)libraryModelAudioMediaItemsReset:(NSNotification *)notification
+{
+    [self updateRepresentedListOfAlbums];
+}
+
+
+- (void)libraryModelAudioMediaItemUpdated:(NSNotification *)notification
+{
+    [self handleLibraryItemChange:notification.object];
+}
+
+- (void)libraryModelAudioMediaItemDeleted:(NSNotification *)notification
+{
+    [self handleLibraryItemChange:notification.object];
 }
 
 - (void)libraryModelAlbumsReset:(NSNotification *)notification
