@@ -116,4 +116,9 @@
 /// - Returns Must return the block where picture in picture activation
 /// controller is passed
 - (void (^)(id<VLCPictureInPictureWindowControlling>)) pictureInPictureReady;
+
+/// Controls whether PiP can start automatically when video enters inline mode
+/// - Returns YES to allow automatic PiP activation, NO to disable it
+/// The default implementation will return YES if not implemented
+- (BOOL)canStartPictureInPictureAutomaticallyFromInline;
 @end
