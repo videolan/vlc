@@ -121,6 +121,22 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
+- (void)performActionOnTableViews:(void (^)(NSTableView *))tableViewAction
+                onCollectionViews:(void (^)(NSCollectionView *))collectionViewAction
+{
+    NSParameterAssert(tableViewAction != nil && collectionViewAction != nil);
+
+    NSArray<NSTableView *> * const tableViews = self.tableViews;
+    for (NSTableView * const tableView in tableViews) {
+        tableViewAction(tableView);
+    }
+
+    NSArray<NSCollectionView *> * const collectionViews = self.collectionViews;
+    for (NSCollectionView * const collectionView in collectionViews) {
+        collectionViewAction(collectionView);
+    }
+}
+
 - (void)libraryModelAlbumsReset:(NSNotification *)notification
 {
     [self updateRepresentedListOfAlbums];
