@@ -108,12 +108,22 @@
                              object:nil];
     // TODO: Handle item deletion, update
 
+    [notificationCenter addObserver:self
+                           selector:@selector(libraryModelAlbumsReset:)
+                               name:VLCLibraryModelAlbumListReset
+                             object:nil];
+
     [self reloadData];
 }
 
 - (void)disconnect
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)libraryModelAlbumsReset:(NSNotification *)notification
+{
+    [self updateRepresentedListOfAlbums];
 }
 
 - (void)reloadTableViews
