@@ -45,13 +45,12 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
+PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, QWindow *parent)
+    : QVLCDialog(parent, _p_intf)
 {
     MainCtx * mainCtx = p_intf->p_mi;
 
     assert(mainCtx->hasMediaLibrary());
-
-    setWindowFlags(Qt::Tool);
 
     setWindowRole("vlc-playlists");
 
@@ -107,8 +106,8 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
 
     m_button->setEnabled(false);
 
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &PlaylistsDialog::onAccepted);
-    connect(buttonBox, &QDialogButtonBox::rejected, this, &PlaylistsDialog::close);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &PlaylistsDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, this, &PlaylistsDialog::reject);
 
     m_label = new QLabel(this);
 
@@ -126,14 +125,14 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf) : QVLCFrame(_p_intf)
     layout->addLayout(layoutButtons);
 
     // FIXME: Is this the right default size ?
-    restoreWidgetPosition("Playlists", QSize(320, 320));
+    QVLCTools::restoreWidgetPosition(p_intf, "Playlists", this, QSize(320, 320));
 
     updateGeometry();
 }
 
-PlaylistsDialog::~PlaylistsDialog() /* override */
+PlaylistsDialog::~PlaylistsDialog()
 {
-    saveWidgetPosition("Playlists");
+    QVLCTools::saveWidgetPosition(p_intf, "Playlists", this);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -157,23 +156,6 @@ void PlaylistsDialog::hideEvent(QHideEvent *) /* override */
     m_lineEdit->clear();
 }
 
-void PlaylistsDialog::keyPressEvent(QKeyEvent * event) /* override */
-{
-    int key = event->key();
-
-    // FIXME: For some reason we have to do this manually on here. Shouldn't QDialogButtonBox do
-    //        this automatically ?
-    if (key == Qt::Key_Return || key == Qt::Key_Enter)
-    {
-        if (m_button->isEnabled())
-            onAccepted();
-
-        return;
-    }
-
-    QVLCFrame::keyPressEvent(event);
-}
-
 //-------------------------------------------------------------------------------------------------
 // Private slots
 //-------------------------------------------------------------------------------------------------
@@ -191,7 +173,7 @@ void PlaylistsDialog::onDoubleClicked()
     if (m_button->isEnabled() == false)
         return;
 
-    onAccepted();
+    accept();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -207,7 +189,7 @@ void PlaylistsDialog::onTextEdited()
         m_button->setEnabled(true);
 }
 
-void PlaylistsDialog::onAccepted()
+void PlaylistsDialog::accept()
 {
 
     QString text = m_lineEdit->text();
@@ -222,5 +204,5 @@ void PlaylistsDialog::onAccepted()
         m_model->create(text, m_ids);
     }
 
-    close();
+    QVLCDialog::accept();
 }
