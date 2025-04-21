@@ -37,6 +37,13 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     readonly property int extraMargin: VLCStyle.dynamicAppMargins(width)
 
     readonly property int headerLeftPadding: (contentLeftMargin > 0)
@@ -138,6 +145,9 @@ MainViewLoader {
 
             selectionModel: root.selectionModel
             model: root.model
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
             headerDelegate: BrowseTreeHeader {
                 providerModel: root.model
@@ -277,6 +287,12 @@ MainViewLoader {
             Navigation.upItem: tableView.headerItem
 
             rowHeight: VLCStyle.tableCoverRow_height
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             header: BrowseTreeHeader {
                 providerModel: root.model
