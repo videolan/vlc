@@ -41,6 +41,9 @@ FocusScope {
         { text: qsTr("Disc"),     criteria: "disc_number" }
     ]
 
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     // Aliases
 
     property alias leftPadding: tracklistdisplay_id.leftPadding
@@ -49,6 +52,9 @@ FocusScope {
     property alias isSearchable: tracklistdisplay_id.isSearchable
     property alias model: tracklistdisplay_id.model
     property alias selectionModel: tracklistdisplay_id.selectionModel
+
+    property alias displayMarginBeginning: tracklistdisplay_id.displayMarginBeginning
+    property alias displayMarginEnd: tracklistdisplay_id.displayMarginEnd
 
     function setCurrentItemFocus(reason) {
         tracklistdisplay_id.setCurrentItemFocus(reason);
@@ -73,6 +79,9 @@ FocusScope {
         searchPattern: MainCtx.search.pattern
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
+
+        fadingEdge.enableBeginningFade: root.enableBeginningFade
+        fadingEdge.enableEndFade: root.enableEndFade
 
         Navigation.parentItem: root
         Navigation.cancelAction: function() {
