@@ -36,6 +36,13 @@ FocusScope {
     readonly property int _contentLeftMargin: VLCStyle.layout_left_margin + _extraMargin
     readonly property int _contentRightMargin: VLCStyle.layout_right_margin + _extraMargin
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     //the index to "go to" when the view is loaded
     property int initialIndex: 0
 
@@ -421,6 +428,9 @@ FocusScope {
             selectionModel: albumSelectionModel
             model: albumModel
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
             Connections {
                 target: albumModel
                 // selectionModel updates but doesn't trigger any signal, this forces selection update in view
@@ -523,6 +533,12 @@ FocusScope {
             header: root.header
             headerPositioning: ListView.InlineHeader
             rowHeight: VLCStyle.tableCoverRow_height
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             property var _modelSmall: [{
                 weight: 1,
