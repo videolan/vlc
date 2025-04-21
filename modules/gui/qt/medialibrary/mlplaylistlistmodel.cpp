@@ -92,6 +92,8 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
         MLItemId createdPlaylistId;
     };
 
+    setTransactionPending(true);
+
     m_mediaLib->runOnMLThread<Ctx>(this,
     //ML thread
     [name](vlc_medialibrary_t* ml, Ctx& ctx)
@@ -104,6 +106,8 @@ void appendMediaIntoPlaylist(vlc_medialibrary_t* ml, int64_t playlistId, const s
         }
     },
     [this, initialItems](quint64, const Ctx& ctx) {
+        endTransaction(); // this is intentionally called here and not after `append()`
+
         if (ctx.createdPlaylistId.id)
         {
             append(ctx.createdPlaylistId, initialItems);
