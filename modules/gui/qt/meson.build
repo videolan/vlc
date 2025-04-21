@@ -598,7 +598,6 @@ qml_modules += {
         'maininterface/qml/MainInterface.qml',
         'maininterface/qml/MainViewLoader.qml',
         'maininterface/qml/MainDisplay.qml',
-        'maininterface/qml/MainTableView.qml',
         'maininterface/qml/NoMedialibHome.qml'
     ),
 }

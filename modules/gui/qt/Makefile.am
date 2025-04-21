@@ -997,7 +997,6 @@ libqml_module_maininterface_a_QML = \
 	maininterface/qml/MainInterface.qml \
 	maininterface/qml/MainViewLoader.qml \
 	maininterface/qml/MainDisplay.qml \
-	maininterface/qml/MainTableView.qml \
 	maininterface/qml/NoMedialibHome.qml
 nodist_libqml_module_maininterface_a_SOURCES = maininterface_qmlassets.cpp
 $(libqml_module_maininterface_a_QML:.qml=.cpp) : $(builddir)/maininterface/res.qrc
