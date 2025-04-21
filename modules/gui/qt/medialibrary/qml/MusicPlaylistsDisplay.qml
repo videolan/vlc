@@ -30,6 +30,12 @@ import VLC.Style
 Widgets.PageLoader {
     id: root
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     //---------------------------------------------------------------------------------------------
     // Settings
     //---------------------------------------------------------------------------------------------
@@ -67,6 +73,12 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             onShowList: (model, reason) => {
@@ -86,6 +98,12 @@ Widgets.PageLoader {
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
         }
