@@ -37,6 +37,12 @@ Widgets.PageLoader {
         component: albumGenreComponent
     }]
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     Component {
         id: genresComponent
         /* List View */
@@ -50,6 +56,12 @@ Widgets.PageLoader {
 
                 text: qsTr("Genres")
             }
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
@@ -78,6 +90,12 @@ Widgets.PageLoader {
 
                 text: qsTr("Genres - %1").arg(genreName)
             }
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
