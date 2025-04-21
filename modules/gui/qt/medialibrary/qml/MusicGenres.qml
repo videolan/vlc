@@ -38,6 +38,13 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     property alias searchPattern: genreModel.searchPattern
     property alias sortOrder: genreModel.sortOrder
     property alias sortCriteria: genreModel.sortCriteria
@@ -128,6 +135,9 @@ MainViewLoader {
             model: genreModel
 
             headerDelegate: root.header
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
             delegate: Widgets.GridItem {
                 id: genreGridDelegate
@@ -263,6 +273,12 @@ MainViewLoader {
             Navigation.parentItem: root
             dragItem: genreDragItem
             rowHeight: VLCStyle.tableCoverRow_height
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             header: root.header
 
