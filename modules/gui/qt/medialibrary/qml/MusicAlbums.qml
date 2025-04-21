@@ -37,6 +37,13 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     property alias parentId: albumModelId.parentId
     property alias searchPattern: albumModelId.searchPattern
     property alias sortOrder: albumModelId.sortOrder
@@ -103,6 +110,9 @@ MainViewLoader {
 
             selectionModel: root.selectionModel
             model: albumModelId
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
             delegate: AudioGridItem {
                 id: audioGridItem
@@ -247,6 +257,12 @@ MainViewLoader {
 
             sortModel: (availableRowWidth < VLCStyle.colWidth(4)) ? _modelSmall
                                                                   : _modelMedium
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             onRightClick: (_,_,globalMousePos) => {
                 contextMenu.popup(selectionModel.selectedIndexes, globalMousePos)
