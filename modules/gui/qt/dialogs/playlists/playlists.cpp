@@ -45,7 +45,7 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media, QWindow *parent)
+PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media, MLPlaylistListModel::PlaylistType type, QWindow *parent)
     : QVLCDialog(parent, _p_intf)
 {
     MainCtx * mainCtx = p_intf->p_mi;
@@ -69,6 +69,7 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media,
     connect(m_playlists, &QTreeView::doubleClicked, this, &PlaylistsDialog::onDoubleClicked);
 
     m_model = new MLPlaylistListModel(m_playlists);
+    m_model->setPlaylistType(type);
 
     m_model->setMl(mainCtx->getMediaLibrary());
 

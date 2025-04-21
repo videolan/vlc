@@ -24,10 +24,10 @@
 #define QVLC_PLAYLISTS_H_ 1
 
 // VLC includes
+#include "medialibrary/mlplaylistlistmodel.hpp"
 #include <widgets/native/qvlcframe.hpp>
 
 // Forward declarations
-class MLPlaylistListModel;
 class QTreeView;
 class QLineEdit;
 class QLabel;
@@ -38,7 +38,10 @@ class PlaylistsDialog : public QVLCDialog
     Q_OBJECT
 
 public: // Ctor / dtor
-    explicit PlaylistsDialog(qt_intf_t *_p_intf, const QVariantList & media, QWindow *parent = nullptr);
+    explicit PlaylistsDialog(qt_intf_t *_p_intf,
+                             const QVariantList & media,
+                             MLPlaylistListModel::PlaylistType type = MLPlaylistListModel::PLAYLIST_TYPE_ALL,
+                             QWindow *parent = nullptr);
 
     ~PlaylistsDialog();
 

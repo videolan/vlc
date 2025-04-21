@@ -124,7 +124,14 @@ NativeMenu {
     }
 
     function addToAPlaylist(dataList, options, indexes) {
-        DialogsProvider.playlistsDialog(_mlIDList(dataList))
+        let type
+        // if (dataList.length === 1)
+            type = root.showPlayAsAudioAction ? MLPlaylistListModel.PLAYLIST_TYPE_VIDEO
+                                              : MLPlaylistListModel.PLAYLIST_TYPE_AUDIO
+        // else
+        //    type = MLPlaylistListModel.PLAYLIST_TYPE_ALL // iterate through items?
+
+        DialogsProvider.playlistsDialog(_mlIDList(dataList), type)
     }
 
     function addFavorite(dataList, options, indexes) {

@@ -411,9 +411,9 @@ void DialogsProvider::mediaCodecDialog()
         m_mediaInfoDialog->hide();
 }
 
-void DialogsProvider::playlistsDialog( const QVariantList & medias )
+void DialogsProvider::playlistsDialog( const QVariantList & medias, MLPlaylistListModel::PlaylistType type )
 {
-    const auto dialog = new PlaylistsDialog(p_intf, medias);
+    const auto dialog = new PlaylistsDialog(p_intf, medias, type);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
 }
