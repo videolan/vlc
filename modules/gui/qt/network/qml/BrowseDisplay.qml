@@ -30,6 +30,12 @@ import VLC.Network
 Widgets.PageLoader {
     id: root
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     // Settings
 
     pageModel: [{
@@ -101,9 +107,11 @@ Widgets.PageLoader {
                 { text: qsTr("Url"),        criteria: "mrl"  }
             ]
 
-            displayMarginEnd: g_mainDisplay.displayMargin
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
-            enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             model: StandardPathModel {
                 sortCriteria: MainCtx.sort.criteria
@@ -131,9 +139,11 @@ Widgets.PageLoader {
                 { text: qsTr("Url"),        criteria: "mrl"  }
             ]
 
-            displayMarginEnd: g_mainDisplay.displayMargin
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
-            enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             model: NetworkDeviceModel {
                 ctx: MainCtx
@@ -160,6 +170,12 @@ Widgets.PageLoader {
         BrowseTreeDisplay {
 
             property alias tree: mediaModel.tree
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             model: NetworkMediaModel {
                 id: mediaModel
