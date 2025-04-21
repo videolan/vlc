@@ -148,7 +148,6 @@ private:
     std::unique_ptr<HelpDialog> m_helpDialog;
     std::unique_ptr<AboutDialog> m_aboutDialog;
     std::unique_ptr<MediaInfoDialog> m_mediaInfoDialog;
-    std::unique_ptr<PlaylistsDialog> m_playlistDialog;
     std::unique_ptr<BookmarksDialog> m_bookmarkDialog;
     std::unique_ptr<PodcastConfigDialog> m_podcastDialog;
     std::unique_ptr<PluginDialog> m_pluginDialog;
@@ -170,7 +169,6 @@ private:
     void toggleDialogVisible(std::unique_ptr<T>& dialog);
 
 public slots:
-    void playlistsDialog();
     void playlistsDialog( const QVariantList & listMedia );
     void bookmarksDialog();
     void mediaInfoDialog( void );

@@ -157,8 +157,8 @@ void DialogsProvider::customEvent( QEvent *event )
             //FIXME
             //playlistDialog(); break;
             break;
-        case INTF_DIALOG_PLAYLISTS:
-            playlistsDialog(); break;
+        // case INTF_DIALOG_PLAYLISTS:
+        // FIXME: `intf_dialog_args_t` is not supported by `PlaylistsDialog`.
         case INTF_DIALOG_MESSAGES:
             messagesDialog(); break;
         case INTF_DIALOG_FILEINFO:
@@ -411,21 +411,11 @@ void DialogsProvider::mediaCodecDialog()
         m_mediaInfoDialog->hide();
 }
 
-void DialogsProvider::playlistsDialog()
-{
-    toggleDialogVisible(m_playlistDialog);
-}
-
 void DialogsProvider::playlistsDialog( const QVariantList & medias )
 {
-    ensureDialog(m_playlistDialog);
-
-    m_playlistDialog->setMedias(medias);
-
-    m_playlistDialog->show();
-
-    // FIXME: We shouldn't have to call this on here.
-    m_playlistDialog->activateWindow();
+    const auto dialog = new PlaylistsDialog(p_intf, medias);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->open();
 }
 
 void DialogsProvider::bookmarksDialog()

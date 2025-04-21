@@ -38,15 +38,9 @@ class PlaylistsDialog : public QVLCDialog
     Q_OBJECT
 
 public: // Ctor / dtor
-    explicit PlaylistsDialog(qt_intf_t *_p_intf, QWindow *parent = nullptr);
+    explicit PlaylistsDialog(qt_intf_t *_p_intf, const QVariantList & media, QWindow *parent = nullptr);
 
     ~PlaylistsDialog();
-
-public: // Interface
-    Q_INVOKABLE void setMedias(const QVariantList & medias);
-
-protected: // Events
-    void hideEvent(QHideEvent * event) override;
 
 public slots:
     void accept() override;

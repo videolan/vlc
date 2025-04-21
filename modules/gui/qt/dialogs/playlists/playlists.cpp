@@ -45,7 +45,7 @@
 // Ctor / dtor
 //-------------------------------------------------------------------------------------------------
 
-PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, QWindow *parent)
+PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, const QVariantList &media, QWindow *parent)
     : QVLCDialog(parent, _p_intf)
 {
     MainCtx * mainCtx = p_intf->p_mi;
@@ -128,32 +128,17 @@ PlaylistsDialog::PlaylistsDialog(qt_intf_t * _p_intf, QWindow *parent)
     QVLCTools::restoreWidgetPosition(p_intf, "Playlists", this, QSize(320, 320));
 
     updateGeometry();
+
+    {
+        assert(!media.isEmpty());
+        m_ids = media;
+        m_label->setText(qtr("%1 Media").arg(m_ids.count()));
+    }
 }
 
 PlaylistsDialog::~PlaylistsDialog()
 {
     QVLCTools::saveWidgetPosition(p_intf, "Playlists", this);
-}
-
-//-------------------------------------------------------------------------------------------------
-// Interface
-//-------------------------------------------------------------------------------------------------
-
-/* Q_INVOKABLE */ void PlaylistsDialog::setMedias(const QVariantList & medias)
-{
-    m_ids = medias;
-
-    m_label->setText(qtr("%1 Media(s)").arg(m_ids.count()));
-}
-
-//-------------------------------------------------------------------------------------------------
-// Events
-//-------------------------------------------------------------------------------------------------
-
-void PlaylistsDialog::hideEvent(QHideEvent *) /* override */
-{
-    // NOTE: We clear the lineEdit when hiding the dialog.
-    m_lineEdit->clear();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -204,5 +189,18 @@ void PlaylistsDialog::accept()
         m_model->create(text, m_ids);
     }
 
-    QVLCDialog::accept();
+    // Model is asynchronous, we need to wait for the model to complete processing...
+    if (Q_LIKELY(m_model->transactionPending())) // Same thread, TOCTOU is not relevant.
+    {
+        hide();
+
+        connect(m_model, &MLPlaylistListModel::transactionPendingChanged, this, [this](bool done) {
+            if (!done)
+                QVLCDialog::accept();
+            }, Qt::SingleShotConnection);
+    }
+    else
+    {
+        QVLCDialog::accept();
+    }
 }
