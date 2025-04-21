@@ -46,6 +46,12 @@ Widgets.PageLoader {
         }
     }
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     localMenuDelegate: Widgets.LocalTabBar {
         currentView: root.pageName
 
@@ -81,5 +87,19 @@ Widgets.PageLoader {
     onCurrentItemChanged: {
         // NOTE: We need bindings because the VideoAll model can change over time.
         sortMenu     = Qt.binding(function () { return currentItem.sortMenu; })
+
+        if (currentItem) {
+            if (currentItem.displayMarginBeginning !== undefined)
+                currentItem.displayMarginBeginning = Qt.binding(() => { return root.displayMarginBeginning })
+
+            if (currentItem.displayMarginEnd !== undefined)
+                currentItem.displayMarginEnd = Qt.binding(() => { return root.displayMarginEnd })
+
+            if (currentItem.enableBeginningFade !== undefined)
+                currentItem.enableBeginningFade = Qt.binding(() => { return root.enableBeginningFade })
+
+            if (currentItem.enableEndFade !== undefined)
+                currentItem.enableEndFade = Qt.binding(() => { return root.enableEndFade })
+        }
     }
 }
