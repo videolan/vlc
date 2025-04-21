@@ -46,6 +46,11 @@ Widgets.PageLoader {
         guard: function (prop) { return !!prop.tree }
     }]
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     function _showServiceHome(reason) {
         History.push([...root.pagePrefix, "services"], reason)
@@ -67,6 +72,22 @@ Widgets.PageLoader {
                 source_name: source_name
             },
             reason)
+    }
+
+    onCurrentItemChanged: {
+        if (currentItem) {
+            if (currentItem.displayMarginBeginning !== undefined)
+                currentItem.displayMarginBeginning = Qt.binding(() => { return root.displayMarginBeginning })
+
+            if (currentItem.displayMarginEnd !== undefined)
+                currentItem.displayMarginEnd = Qt.binding(() => { return root.displayMarginEnd })
+
+            if (currentItem.enableBeginningFade !== undefined)
+                currentItem.enableBeginningFade = Qt.binding(() => { return root.enableBeginningFade })
+
+            if (currentItem.enableEndFade !== undefined)
+                currentItem.enableEndFade = Qt.binding(() => { return root.enableEndFade })
+        }
     }
 
     Component {
