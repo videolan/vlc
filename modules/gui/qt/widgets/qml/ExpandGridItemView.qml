@@ -49,8 +49,6 @@ Widgets.ExpandGridView {
 
     // Settings
 
-    displayMarginEnd: g_mainDisplay.displayMargin
-
     nbItemPerRow: gridHelper.nbItemPerRow
 
     // responsive cell sizing based on available area

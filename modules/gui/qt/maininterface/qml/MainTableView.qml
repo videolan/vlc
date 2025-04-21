@@ -23,8 +23,4 @@ import VLC.Style
 
 Widgets.TableViewExt {
     id: root
-
-    displayMarginEnd: g_mainDisplay.displayMargin
-
-    fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
 }

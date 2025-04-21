@@ -43,10 +43,10 @@ FocusScope {
     property int leftPadding: 0
     property int rightPadding: 0
 
-    property int displayMarginEnd: g_mainDisplay.displayMargin
+    property int displayMarginEnd: 0
 
     property bool enableBeginningFade: true
-    property bool enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
+    property bool enableEndFade: true
 
     //---------------------------------------------------------------------------------------------
     // Functions

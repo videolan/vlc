@@ -90,11 +90,6 @@ FocusScope {
             else
                 tracklistdisplay_id.currentIndex = 0;
         }
-
-        // To get blur effect while scrolling in mainview
-        displayMarginEnd: g_mainDisplay.displayMargin
-
-        fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
     }
 
     Widgets.EmptyLabelButton {
