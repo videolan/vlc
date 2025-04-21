@@ -220,19 +220,6 @@ void QVLCFrame::keyPressEvent(QKeyEvent *keyEvent)
     }
 }
 
-void QVLCDialog::keyPressEvent(QKeyEvent *keyEvent)
-{
-    if (keyEvent->key() == Qt::Key_Escape)
-    {
-        this->cancel();
-    }
-    else if (keyEvent->key() == Qt::Key_Return ||
-             keyEvent->key() == Qt::Key_Enter)
-    {
-        this->close();
-    }
-}
-
 void QVLCDialog::setWindowTransientParent(QWidget* widget, QWindow* parent, qt_intf_t* p_intf)
 {
     assert(widget);

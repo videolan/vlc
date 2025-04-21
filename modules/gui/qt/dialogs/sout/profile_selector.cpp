@@ -443,10 +443,10 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     QPushButton *saveButton = new QPushButton(
                 ( qs_name.isEmpty() ) ? qtr( "Create" ) : qtr( "Save" ) );
     ui.buttonBox->addButton( saveButton, QDialogButtonBox::AcceptRole );
-    BUTTONACT( saveButton, &VLCProfileEditor::close );
+    connect( ui.buttonBox, &QDialogButtonBox::accepted, this, &VLCProfileEditor::accept );
     QPushButton *cancelButton = new QPushButton( qtr( "Cancel" ) );
     ui.buttonBox->addButton( cancelButton, QDialogButtonBox::RejectRole );
-    BUTTONACT( cancelButton, &VLCProfileEditor::reject );
+    connect( ui.buttonBox, &QDialogButtonBox::rejected, this, &VLCProfileEditor::reject );
 
     connect( ui.valueholder_video_copy, &QtCheckboxChanged,
              this, &VLCProfileEditor::activatePanels );
@@ -776,7 +776,7 @@ void VLCProfileEditor::fillProfileOldFormat( const QString& qs )
     ui.valueholder_subtitles_overlay->setChecked( options[15].toInt() );
 }
 
-void VLCProfileEditor::close()
+void VLCProfileEditor::accept()
 {
     if( ui.profileLine->text().isEmpty() )
     {
@@ -787,7 +787,7 @@ void VLCProfileEditor::close()
     }
     name = ui.profileLine->text();
 
-    accept();
+    QVLCDialog::accept();
 }
 
 #define currentData( box ) box->itemData( box->currentIndex() )

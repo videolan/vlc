@@ -36,9 +36,11 @@ public:
 
     void toggleVisible();
 
+public slots:
+    void accept() override;
+    void reject() override;
+
 private slots:
-    void close() override;
-    void cancel() override;
     void reset();
 
 private:

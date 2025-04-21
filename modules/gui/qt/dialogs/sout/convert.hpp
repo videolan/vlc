@@ -55,9 +55,10 @@ private:
     QUrl outgoingMRL;
     QStringList mrls;
 
+public slots:
+    void accept() override;
+
 private slots:
-    void close() override;
-    void cancel() override;
     void fileBrowse();
     void setDestinationFileExtension();
     void validate();

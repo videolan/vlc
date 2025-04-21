@@ -143,8 +143,8 @@ ConvertDialog::ConvertDialog( QWindow *parent, qt_intf_t *_p_intf,
 
     mainLayout->addWidget( buttonBox, 5, 3 );
 
-    BUTTONACT( okButton, &ConvertDialog::close );
-    BUTTONACT( cancelButton, &ConvertDialog::cancel );
+    connect( buttonBox, &QDialogButtonBox::accepted, this, &ConvertDialog::accept );
+    connect( buttonBox, &QDialogButtonBox::rejected, this, &ConvertDialog::reject );
 
     connect( convertRadio, &QRadioButton::toggled, convertPanel, &QWidget::setEnabled );
     connect( profile, &VLCProfileSelector::optionsChanged, this, &ConvertDialog::setDestinationFileExtension );
@@ -166,12 +166,7 @@ void ConvertDialog::fileBrowse()
     setDestinationFileExtension();
 }
 
-void ConvertDialog::cancel()
-{
-    reject();
-}
-
-void ConvertDialog::close()
+void ConvertDialog::accept()
 {
     hide();
 
@@ -250,7 +245,8 @@ void ConvertDialog::close()
         msg_Dbg( p_intf, "Transcode chain: %s", qtu( mrl.to_string() ) );
         mrls.append(mrl.to_string());
     }
-    accept();
+
+    QVLCDialog::accept();
 }
 
 void ConvertDialog::setDestinationFileExtension()

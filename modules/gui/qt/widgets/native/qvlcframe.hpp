@@ -121,16 +121,6 @@ public:
 
 protected:
     qt_intf_t *p_intf;
-
-    virtual void cancel()
-    {
-        hide();
-    }
-    virtual void close()
-    {
-        hide();
-    }
-    void keyPressEvent( QKeyEvent *keyEvent ) override;
 };
 
 #endif

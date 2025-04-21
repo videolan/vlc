@@ -84,8 +84,8 @@ private:
     QHash<QString, resultset> caps;
     void loadCapabilities();
     void reset();
-protected slots:
-    void close() override;
+public slots:
+    void accept() override;
 private slots:
     void muxSelected();
     void codecSelected();
