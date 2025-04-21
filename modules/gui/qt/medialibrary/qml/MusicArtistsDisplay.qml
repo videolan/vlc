@@ -40,6 +40,11 @@ Widgets.PageLoader {
         component: artistAlbumsComponent
     }]
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     Component {
         id: allArtistsComponent
@@ -59,6 +64,12 @@ Widgets.PageLoader {
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
 
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
+
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
             onArtistAlbumViewRequested: (id, reason) => {
@@ -74,6 +85,12 @@ Widgets.PageLoader {
             searchPattern: MainCtx.search.pattern
             sortOrder: MainCtx.sort.order
             sortCriteria: MainCtx.sort.criteria
+
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
+
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
 
             onArtistIdChanged: History.viewProp.artistId = artistId
             onCurrentAlbumIndexChanged: History.viewProp.initialAlbumIndex = currentAlbumIndex
