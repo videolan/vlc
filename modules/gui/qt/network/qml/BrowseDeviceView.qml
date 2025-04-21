@@ -41,6 +41,7 @@ FocusScope {
     readonly property int contentLeftMargin: _currentView?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: _currentView?.contentRightMargin ?? 0
 
+    property int displayMarginBeginning: 0
     property int displayMarginEnd: 0
 
     readonly property int currentIndex: _currentView?.currentIndex ?? -1
@@ -193,6 +194,7 @@ FocusScope {
                                                 ? -1
                                                 : root.maximumRows * nbItemPerRow
 
+            displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
             model: root.model
@@ -295,6 +297,7 @@ FocusScope {
 
             rowHeight: VLCStyle.tableCoverRow_height
 
+            displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd
 
             fadingEdge.enableBeginningFade: root.enableBeginningFade
