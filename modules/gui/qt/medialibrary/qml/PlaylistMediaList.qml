@@ -392,7 +392,7 @@ MainViewLoader {
     Component {
         id: table
 
-        MainTableView {
+        Widgets.TableViewExt {
             id: tableView
 
             //-------------------------------------------------------------------------------------

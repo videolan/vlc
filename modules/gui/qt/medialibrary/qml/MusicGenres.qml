@@ -221,7 +221,7 @@ MainViewLoader {
     Component {
         id: tableComponent
         /* Table View */
-        MainTableView {
+        Widgets.TableViewExt {
             id: tableView_id
 
             property var _modelSmall: [{

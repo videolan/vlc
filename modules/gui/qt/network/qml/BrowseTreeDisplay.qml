@@ -204,7 +204,7 @@ MainViewLoader {
     Component{
         id: tableComponent
 
-        MainTableView {
+        Widgets.TableViewExt {
             id: tableView
 
             property Component thumbnailColumn: NetworkThumbnailItem {

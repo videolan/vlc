@@ -521,7 +521,7 @@ FocusScope {
     Component {
         id: tableComponent
 
-        MainTableView {
+        Widgets.TableViewExt {
             id: tableView_id
 
             model: trackModel

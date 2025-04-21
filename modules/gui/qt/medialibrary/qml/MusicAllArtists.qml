@@ -166,7 +166,7 @@ MainViewLoader {
     Component {
         id: tableComponent
 
-        MainTableView {
+        Widgets.TableViewExt {
             id: artistTable
 
             property var _modelSmall: [{

@@ -27,7 +27,7 @@ import VLC.MainInterface
 import VLC.Util
 import VLC.Style
 
-MainTableView {
+Widgets.TableViewExt {
     id: root
 
     //---------------------------------------------------------------------------------------------
