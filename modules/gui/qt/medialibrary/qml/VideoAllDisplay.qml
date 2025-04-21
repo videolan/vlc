@@ -34,6 +34,12 @@ Widgets.PageLoader {
 
     property var sortMenu
 
+    property int displayMarginBeginning: 0
+    property int displayMarginEnd: 0
+
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     // Settings
 
     pageModel: [{
@@ -65,9 +71,11 @@ Widgets.PageLoader {
 
             onCurrentIndexChanged: History.viewProp.initialIndex = currentIndex
 
-            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
-            displayMarginEnd: g_mainDisplay.displayMargin
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
         }
     }
 
@@ -83,9 +91,11 @@ Widgets.PageLoader {
                 return true
             }
 
-            listEnableEndFade: g_mainDisplay.hasMiniPlayer === false
+            displayMarginBeginning: root.displayMarginBeginning
+            displayMarginEnd: root.displayMarginEnd
 
-            displayMarginEnd: g_mainDisplay.displayMargin
+            enableBeginningFade: root.enableBeginningFade
+            enableEndFade: root.enableEndFade
         }
     }
 }
