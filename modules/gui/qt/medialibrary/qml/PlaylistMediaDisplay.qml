@@ -57,6 +57,8 @@ FocusScope {
     property bool isMusic: true
     property string _placeHolder: isMusic ? VLCStyle.noArtAlbumCover : VLCStyle.noArtVideoCover
 
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     // Aliases
 
@@ -69,6 +71,9 @@ FocusScope {
     property alias model: model
 
     property alias dragItem: dragItem
+
+    property alias displayMarginBeginning: view.displayMarginBeginning
+    property alias displayMarginEnd: view.displayMarginEnd
 
     // Events
 
@@ -221,6 +226,9 @@ FocusScope {
 
             text: root.name
         }
+
+        fadingEdge.enableBeginningFade: root.enableBeginningFade
+        fadingEdge.enableEndFade: root.enableEndFade
 
         Navigation.parentItem: root
 
