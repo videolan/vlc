@@ -49,6 +49,13 @@ FocusScope {
     //behave like a page
     property var pagePrefix: []
 
+    property alias displayMarginBeginning: artistList.displayMarginBeginning
+    property alias displayMarginEnd: artistList.displayMarginEnd
+
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
+
     readonly property bool hasGridListMode: true
     readonly property bool isSearchable: true
 
@@ -179,6 +186,8 @@ FocusScope {
             fadingEdge.backgroundColor: artistListBackground.usingAcrylic ? "transparent"
                                                                           : artistListBackground.alternativeColor
 
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             onCurrentIndexChanged: {
                 if (!artistList._sidebarInitialyPositioned)
@@ -244,11 +253,6 @@ FocusScope {
                     visible: (height > 0.0) && artistListBackground.usingAcrylic
                 }
             }
-
-            // To get blur effect while scrolling in mainview
-            displayMarginEnd: g_mainDisplay.displayMargin
-
-            fadingEdge.enableEndFade: (g_mainDisplay.hasMiniPlayer === false)
 
             Navigation.parentItem: root
 
