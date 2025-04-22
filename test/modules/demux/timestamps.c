@@ -82,5 +82,16 @@ int main(void)
     ts2 = TimeStampWrapAround(VLC_TICK_0 + TS_33BITS_ROLL_NZ, ts1);
     ASSERT(ts2 == ts1 + TS_33BITS_ROLL_NZ);
 
+    /* Should wrap multiple times */
+    ts1 = VLC_TICK_0;
+    ts2 = TimeStampWrapAround(VLC_TICK_0 + TS_33BITS_ROLL_NZ * 2, ts1);
+    ASSERT(ts2 > ts1);
+    ASSERT(ts2 == ts1 + TS_33BITS_ROLL_NZ * 2);
+
+    ts1 = VLC_TICK_0 + TS_33BITS_HALF_ROLL_NZ;
+    ts2 = TimeStampWrapAround(VLC_TICK_0 + TS_33BITS_ROLL_NZ * 5, ts1);
+    ASSERT(ts2 > ts1);
+    ASSERT(ts2 == ts1 + TS_33BITS_ROLL_NZ * 5);
+
     return 0;
 }

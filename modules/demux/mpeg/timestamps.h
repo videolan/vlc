@@ -33,11 +33,17 @@ typedef int64_t ts_90khz_t;
 
 static inline vlc_tick_t TimeStampWrapAround( vlc_tick_t i_past_pcr, vlc_tick_t i_time )
 {
-    vlc_tick_t i_adjust = 0;
-    if( i_past_pcr > TS_33BITS_HALF_ROLL_NZ && i_time < TS_33BITS_HALF_ROLL_NZ )
-        i_adjust = TS_33BITS_ROLL_NZ;
+    if( i_past_pcr == VLC_TICK_INVALID || i_time >= i_past_pcr )
+        return i_time;
 
-    return i_time + i_adjust;
+    vlc_tick_t delta = i_past_pcr - i_time;
+    if( delta >= TS_33BITS_HALF_ROLL_NZ )
+    {
+        vlc_tick_t rolls = (delta + TS_33BITS_ROLL_NZ - 1) / TS_33BITS_ROLL_NZ;
+        i_time += rolls * TS_33BITS_ROLL_NZ;
+    }
+
+    return i_time;
 }
 
 #endif
