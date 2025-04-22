@@ -871,7 +871,7 @@ qml_modules += {
         'widgets/qml/NavigableCol.qml',
         'widgets/qml/NavigableRow.qml',
         'widgets/qml/PlayCover.qml',
-        'widgets/qml/RoundButton.qml',
+        'widgets/qml/RoundButtonExt.qml',
         'widgets/qml/ScaledImage.qml',
         'widgets/qml/ScanProgressBar.qml',
         'widgets/qml/TextAutoScroller.qml',

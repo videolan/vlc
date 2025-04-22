@@ -693,7 +693,7 @@ ListView {
     // FIXME: We probably need to upgrade these RoundButton(s) eventually. And we probably need
     //        to have some kind of animation when switching pages.
 
-    RoundButton {
+    RoundButtonExt {
         id: buttonLeft
 
         anchors.left: parent.left
@@ -710,7 +710,7 @@ ListView {
         activeFocusOnTab: false
     }
 
-    RoundButton {
+    RoundButtonExt {
         id: buttonRight
 
         anchors.right: parent.right

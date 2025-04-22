@@ -96,12 +96,11 @@ Item {
             ml: MediaLib
         }
 
-        Widgets.RoundButton {
+        Widgets.RoundButtonExt {
             id: bookmarkButton
 
-            size: control.barHeight
-
-            backgroundColor: bookmarkButton.colorContext.fg.primary
+            height: control.barHeight
+            width: height
 
             x: control.width * model.position - width/2
             focusPolicy: Qt.NoFocus

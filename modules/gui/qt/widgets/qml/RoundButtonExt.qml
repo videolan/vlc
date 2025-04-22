@@ -1,5 +1,6 @@
 /*****************************************************************************
- * Copyright (C) 2019 VLC authors and VideoLAN
+ * Copyright (C) 2025 VLC authors and VideoLAN
+ * Copyright (C) 2017 The Qt Company Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +17,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Templates as T
 
 import VLC.Widgets as Widgets
 import VLC.Style
 
-Button{
+T.RoundButton {
     id: control
+
+    implicitWidth: text.length !== 1 ? Math.max(implicitBackgroundWidth + leftInset + rightInset,
+                                                implicitContentWidth + leftPadding + rightPadding)
+                                     : implicitHeight // special case for single letter/icon to make it perfectly round. This should be safe due to `Text.HorizontalFit`
+    implicitHeight: Math.max(implicitBackgroundHeight + topInset + bottomInset,
+                             implicitContentHeight + topPadding + bottomPadding)
+
     hoverEnabled: true
-    property real size: VLCStyle.icon_normal
-    property color backgroundColor: theme.bg.primary
+
+    padding: VLCStyle.dp(6, VLCStyle.scale)
+    spacing: VLCStyle.dp(6, VLCStyle.scale)
+
+    font.pixelSize: VLCStyle.icon_small
 
     //Accessible
     Accessible.onPressAction: control.clicked()
 
     readonly property ColorContext colorContext: ColorContext {
         id: theme
-        colorSet: ColorContext.View
+        colorSet: ColorContext.ToolButton // ###
 
         enabled: control.enabled
         focused: control.visualFocus
         hovered: control.hovered
+        pressed: control.down
     }
 
     contentItem: Text {
@@ -46,14 +58,15 @@ Button{
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
 
+        fontSizeMode: (text.length !== 1) ? Text.FixedSize : Text.HorizontalFit
         Accessible.ignored: true
     }
 
-    background: Rectangle {
-        width: control.size
-        height: control.size
-        opacity: control.hovered ? 1 : 0.5
-        color: control.backgroundColor
-        radius: control.size/2
+    background: Widgets.AnimatedBackground {
+        radius: control.radius
+        enabled: control.enabled
+        visible: !control.flat || control.down || control.checked || control.highlighted
+        color: theme.bg.secondary // ###
+        border.color: theme.border
     }
 }
