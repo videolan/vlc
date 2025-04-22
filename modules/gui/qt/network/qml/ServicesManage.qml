@@ -43,8 +43,21 @@ Widgets.ListViewExt {
         sortOrder: MainCtx.sort.order
         sortCriteria: MainCtx.sort.criteria
 
+        onLoadingChanged: {
+            // Adjust the cursor. Unless the loaded item (view) sets a cursor
+            // globally or for itself, this is going to be respected. It should
+            // be noted that cursor adjustment is conventionally not delayed,
+            // unlike indicators:
+            if (loading) {
+                MainCtx.setCursor(servicesView, Qt.BusyCursor)
+            } else {
+                MainCtx.unsetCursor(servicesView)
+            }
+        }
+
         Component.onCompleted: {
             discoveryModel.loadFromDefaultRepository()
+            loadingChanged() // make sure the handler is called
         }
     }
 
