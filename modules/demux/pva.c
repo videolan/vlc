@@ -148,7 +148,7 @@ static int Demux( demux_t *p_demux )
     const uint8_t *p_peek;
     int         i_size;
     block_t     *p_frame;
-    int64_t     i_pts;
+    ts_90khz_t  i_pts;
     int         i_skip;
 
     if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
@@ -190,7 +190,7 @@ static int Demux( demux_t *p_demux )
             p_sys->i_vc = p_peek[3];
 
             /* read the PTS and potential extra bytes TODO: make it a bit more optimised */
-            i_pts = -1;
+            i_pts = TS_90KHZ_INVALID;
             i_skip = 8;
             if( p_peek[5]&0x10 )
             {
@@ -233,7 +233,7 @@ static int Demux( demux_t *p_demux )
             {
                 p_frame->p_buffer += i_skip;
                 p_frame->i_buffer -= i_skip;
-                if( i_pts >= 0 )
+                if( i_pts != TS_90KHZ_INVALID )
                     p_frame->i_pts = FROM_SCALE(i_pts);
                 block_ChainAppend( &p_sys->p_es, p_frame );
             }
