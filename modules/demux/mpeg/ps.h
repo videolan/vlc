@@ -495,8 +495,8 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
     unsigned int i_skip  = 0;
-    ts_90khz_t i_pts = -1;
-    ts_90khz_t i_dts = -1;
+    ts_90khz_t i_pts = TS_90KHZ_INVALID;
+    ts_90khz_t i_dts = TS_90KHZ_INVALID;
     uint8_t i_stream_id = 0;
     bool b_pes_scrambling = false;
 
@@ -522,12 +522,12 @@ static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int 
     p_pes->i_buffer -= i_skip;
 
     /* ISO/IEC 13818-1 2.7.5: if no pts and no dts, then dts == pts */
-    if( i_pts >= 0 && i_dts < 0 )
+    if( i_pts != TS_90KHZ_INVALID && i_dts == TS_90KHZ_INVALID )
         i_dts = i_pts;
 
-    if( i_dts >= 0 )
+    if( i_dts != TS_90KHZ_INVALID )
         p_pes->i_dts = FROM_SCALE( i_dts );
-    if( i_pts >= 0 )
+    if( i_pts != TS_90KHZ_INVALID )
         p_pes->i_pts = FROM_SCALE( i_pts );
 
     return VLC_SUCCESS;

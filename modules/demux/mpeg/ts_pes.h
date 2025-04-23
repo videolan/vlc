@@ -20,6 +20,8 @@
 #ifndef VLC_TS_PES_H
 #define VLC_TS_PES_H
 
+#include "timestamps.h"
+
 typedef struct
 {
     vlc_object_t *p_obj;
