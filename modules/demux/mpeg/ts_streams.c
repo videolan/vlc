@@ -270,14 +270,14 @@ ts_stream_t *ts_stream_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->gather.pp_last = &pes->gather.p_data;
     pes->gather.i_saved = 0;
     pes->gather.i_block_flags = 0;
-    pes->gather.i_append_pcr = VLC_TICK_INVALID;
+    pes->gather.i_append_pcr = TS_90KHZ_INVALID;
     pes->b_broken_PUSI_conformance = false;
     pes->b_always_receive = false;
     pes->p_sections_proc = NULL;
     pes->p_proc = NULL;
     pes->prepcr.p_head = NULL;
     pes->prepcr.pp_last = &pes->prepcr.p_head;
-    pes->i_last_dts = -1;
+    pes->i_last_dts = TS_90KHZ_INVALID;
 
     return pes;
 }

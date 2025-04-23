@@ -2229,7 +2229,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     /* Probe Boundaries */
     if( p_sys->b_canfastseek && p_pmt->i_last_dts == TS_TICK_UNKNOWN )
     {
-        p_pmt->i_last_dts = 0;
+        p_pmt->i_last_dts = TS_90KHZ_INVALID;
         ProbeStart( p_demux, p_pmt->i_number );
         ProbeEnd( p_demux, p_pmt->i_number );
     }

@@ -26,6 +26,7 @@
 #define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TICK_0)
 
 typedef int64_t ts_90khz_t;
+#define TS_90KHZ_INVALID -1
 
 static inline ts_90khz_t TimeStampWrapAround( ts_90khz_t i_first_pcr, ts_90khz_t i_time )
 {

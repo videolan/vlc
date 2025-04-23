@@ -82,7 +82,7 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         return;
 
     size_t i_pesextoffset = 8;
-    ts_90khz_t i_dts = -1;
+    ts_90khz_t i_dts = TS_90KHZ_INVALID;
     if( p_pes[7] & 0x80 ) // PTS
     {
         i_pesextoffset += 5;
@@ -197,12 +197,12 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
 
 codecprobingend:
     /* Track timestamps and flag missing PAT */
-    if( !p_sys->patfix.i_timesourcepid && i_dts > -1 )
+    if( !p_sys->patfix.i_timesourcepid && i_dts != TS_90KHZ_INVALID )
     {
         p_sys->patfix.i_first_dts = i_dts;
         p_sys->patfix.i_timesourcepid = pid->i_pid;
     }
-    else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts > -1 &&
+    else if( p_sys->patfix.i_timesourcepid == pid->i_pid && i_dts != TS_90KHZ_INVALID &&
              p_sys->patfix.status == PAT_WAITING )
     {
         if( i_dts - p_sys->patfix.i_first_dts > TO_SCALE(MIN_PAT_INTERVAL) )
