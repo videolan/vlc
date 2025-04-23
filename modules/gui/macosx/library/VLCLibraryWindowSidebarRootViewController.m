@@ -24,6 +24,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
@@ -92,12 +93,8 @@
 
 - (void)setupPlayQueueTitle
 {
-    _playQueueHeaderLabel = [[NSTextField alloc] init];
-    self.playQueueHeaderLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    _playQueueHeaderLabel = [NSTextField defaultLabelWithString:@""];
     self.playQueueHeaderLabel.font = NSFont.VLCLibrarySubsectionHeaderFont;
-    self.playQueueHeaderLabel.editable = NO;
-    self.playQueueHeaderLabel.bezeled = NO;
-    self.playQueueHeaderLabel.drawsBackground = NO;
     self.playQueueHeaderLabel.textColor = NSColor.headerTextColor;
 
     [self.view addSubview:self.playQueueHeaderLabel];
