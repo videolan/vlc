@@ -35,8 +35,6 @@ _Static_assert (VLC_TICK_INVALID + 1 == VLC_TICK_0,
                 "can't define TS_UNKNOWN reference");
 #define TS_TICK_UNKNOWN (VLC_TICK_INVALID - 1)
 
-#define SETANDVALID(a) (a != TS_TICK_UNKNOWN && a != VLC_TICK_INVALID)
-
 typedef enum ts_standards_e
 {
     TS_STANDARD_AUTO = 0,
