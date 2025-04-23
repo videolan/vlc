@@ -28,6 +28,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
 #import "library/VLCLibraryCollectionView.h"
@@ -123,19 +124,11 @@
 
 - (void)setupPlaceholderLabel
 {
-    if (@available(macOS 10.12, *)) {
-        _browsePlaceholderLabel = [NSTextField labelWithString:_NS("No files")];
-    } else {
-        _browsePlaceholderLabel = [[NSTextField alloc] init];
-        self.browsePlaceholderLabel.stringValue = _NS("No files");
-        self.browsePlaceholderLabel.editable = NO;
-    }
+    _browsePlaceholderLabel = [NSTextField defaultLabelWithString:_NS("No files")];
     self.browsePlaceholderLabel.font = NSFont.VLClibrarySectionHeaderFont;
     self.browsePlaceholderLabel.textColor = NSColor.secondaryLabelColor;
     self.browsePlaceholderLabel.alignment = NSTextAlignmentCenter;
     self.browsePlaceholderLabel.backgroundColor = NSColor.clearColor;
-    self.browsePlaceholderLabel.bezeled = NO;
-    self.browsePlaceholderLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.mediaSourceView addSubview:self.browsePlaceholderLabel];
     [self.mediaSourceView addConstraints:@[
         [self.browsePlaceholderLabel.centerXAnchor constraintEqualToAnchor:self.mediaSourceView.centerXAnchor],
