@@ -37,10 +37,11 @@
 #include <vlc_plugin.h>
 #include <vlc_actions.h>
 
-#include "library/VLCLibraryUIUnits.h"
-#include "main/VLCMain.h"
-#include "extensions/NSString+Helpers.h"
-#include "preferences/prefs_widgets.h"
+#import "library/VLCLibraryUIUnits.h"
+#import "main/VLCMain.h"
+#import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
+#import "preferences/prefs_widgets.h"
 
 NSString * const VLCPrefsWidgetModuleDragType = @"VLC media player module";
 
@@ -63,12 +64,9 @@ NSString * const VLCPrefsWidgetModuleDragType = @"VLC media player module";
     s_rc.size.height = 17;                                                  \
     s_rc.origin.x = x_offset - 3;                                           \
     s_rc.origin.y = superFrame.size.height - 17 + my_y_offset;              \
-    o_label = [[NSTextField alloc] initWithFrame: s_rc];                    \
-    [o_label setDrawsBackground: NO];                                       \
-    [o_label setBordered: NO];                                              \
-    [o_label setEditable: NO];                                              \
+    o_label = [NSTextField defaultLabelWithString:label];                   \
+    o_label.frame = s_rc;                                                   \
     [o_label setSelectable: NO];                                            \
-    [o_label setStringValue: label];                                        \
     [o_label setToolTip: tooltip];                                          \
     [o_label setFont:[NSFont systemFontOfSize:0]];                          \
     [o_label sizeToFit];                                                    \
