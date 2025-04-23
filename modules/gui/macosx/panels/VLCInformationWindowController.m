@@ -25,6 +25,7 @@
 
 #import "extensions/NSImage+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
 
 #import "library/VLCInputItem.h"
 #import "library/VLCLibraryController.h"
@@ -757,12 +758,9 @@ objectValueForTableColumn:(NSTableColumn *)tableColumn
      viewForTableColumn:(nullable NSTableColumn *)tableColumn
                    item:(nonnull id)item
 {
-    NSTextField * const cellView = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    NSTextField * const cellView = [NSTextField defaultLabelWithString:@""];
     cellView.objectValue =
         [self outlineView:self.outlineView objectValueForTableColumn:tableColumn byItem:item];
-    cellView.editable = NO;
-    cellView.bordered = NO;
-    cellView.drawsBackground = NO;
     return cellView;
 }
 
