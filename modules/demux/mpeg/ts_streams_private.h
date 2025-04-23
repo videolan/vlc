@@ -76,6 +76,7 @@ struct ts_pmt_t
 
     ts_90khz_t i_last_dts;
     uint64_t i_last_dts_byte;
+    bool b_last_dts_probed;
 
     /* CA */
     //en50221_capmt_info_t *capmt;

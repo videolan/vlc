@@ -31,10 +31,6 @@ typedef struct csa_t csa_t;
 
 #define TS_PSI_PAT_PID 0x00
 
-_Static_assert (VLC_TICK_INVALID + 1 == VLC_TICK_0,
-                "can't define TS_UNKNOWN reference");
-#define TS_TICK_UNKNOWN (VLC_TICK_INVALID - 1)
-
 typedef enum ts_standards_e
 {
     TS_STANDARD_AUTO = 0,

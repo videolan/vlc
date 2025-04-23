@@ -949,9 +949,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( !p_sys->b_ignore_time_for_positions &&
              p_pmt &&
-             p_pmt->pcr.i_first > TS_90KHZ_INVALID &&
-             p_pmt->i_last_dts > TS_90KHZ_INVALID &&
-             p_pmt->pcr.i_current > TS_90KHZ_INVALID )
+             p_pmt->pcr.i_first != TS_90KHZ_INVALID &&
+             p_pmt->i_last_dts != TS_90KHZ_INVALID &&
+             p_pmt->pcr.i_current != TS_90KHZ_INVALID )
         {
             double i_length = TimeStampWrapAround( p_pmt->pcr.i_first,
                                                    p_pmt->i_last_dts ) - p_pmt->pcr.i_first;
@@ -995,9 +995,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         if( !p_sys->b_ignore_time_for_positions && b_bool && p_pmt &&
-             p_pmt->pcr.i_first > TS_90KHZ_INVALID &&
-             p_pmt->i_last_dts > TS_90KHZ_INVALID &&
-             p_pmt->pcr.i_current > TS_90KHZ_INVALID )
+             p_pmt->pcr.i_first != TS_90KHZ_INVALID &&
+             p_pmt->i_last_dts != TS_90KHZ_INVALID &&
+             p_pmt->pcr.i_current != TS_90KHZ_INVALID )
         {
             ts_90khz_t i_length = TimeStampWrapAround( p_pmt->pcr.i_first,
                                                        p_pmt->i_last_dts ) - p_pmt->pcr.i_first;
@@ -1026,7 +1026,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     {
         vlc_tick_t i_time = va_arg( args, vlc_tick_t );
 
-        if( p_sys->b_canseek && p_pmt && p_pmt->pcr.i_first > TS_90KHZ_INVALID &&
+        if( p_sys->b_canseek && p_pmt && p_pmt->pcr.i_first != TS_90KHZ_INVALID &&
            !SeekToTime( p_demux, p_pmt, p_pmt->pcr.i_first + TO_SCALE(i_time) ) )
         {
             ReadyQueuesPostSeek( p_demux );
@@ -1048,7 +1048,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
         }
 
-        if( p_pmt && p_pmt->pcr.i_current > TS_90KHZ_INVALID && p_pmt->pcr.i_first > TS_90KHZ_INVALID )
+        if( p_pmt && p_pmt->pcr.i_current != TS_90KHZ_INVALID && p_pmt->pcr.i_first != TS_90KHZ_INVALID )
         {
             ts_90khz_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
             *va_arg( args, vlc_tick_t * ) = FROM_SCALE(i_pcr - p_pmt->pcr.i_first);
@@ -1077,8 +1077,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( !p_sys->b_ignore_time_for_positions &&
             p_pmt &&
-           ( p_pmt->pcr.i_first > TS_90KHZ_INVALID || p_pmt->pcr.i_first_dts != TS_90KHZ_INVALID ) &&
-             p_pmt->i_last_dts > TS_90KHZ_INVALID )
+           ( p_pmt->pcr.i_first != TS_90KHZ_INVALID || p_pmt->pcr.i_first_dts != TS_90KHZ_INVALID ) &&
+             p_pmt->i_last_dts != TS_90KHZ_INVALID )
         {
             ts_90khz_t i_start = (p_pmt->pcr.i_first != TS_90KHZ_INVALID) ? p_pmt->pcr.i_first :
                                   p_pmt->pcr.i_first_dts;
@@ -1388,7 +1388,7 @@ static vlc_tick_t GetTimeForUntimed( const ts_pmt_t *p_pmt )
         if( (p_pid->i_flags & FLAG_FILTERED) && SEEN(p_pid) &&
              p_pid->type == TYPE_STREAM &&
              p_pid->u.p_stream->p_es &&
-             p_pid->u.p_stream->i_last_dts > TS_90KHZ_INVALID )
+             p_pid->u.p_stream->i_last_dts != TS_90KHZ_INVALID )
         {
             const ts_es_t *p_es = p_pid->u.p_stream->p_es;
             if( p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES )
@@ -1427,7 +1427,7 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
     {
         const ts_pmt_t *p_pmt = p_es->p_program;
         if( p_block->i_pts != VLC_TICK_INVALID &&
-            p_pmt->pcr.i_current > TS_90KHZ_INVALID )
+            p_pmt->pcr.i_current != TS_90KHZ_INVALID )
         {
             /* Teletext can have totally offset timestamps... RAI1, German */
             vlc_tick_t i_pcr = FROM_SCALE(TimeStampWrapAround( p_pmt->pcr.i_first,
@@ -1440,7 +1440,7 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
             /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
              * In this case use the last PCR + 40ms */
             ts_90khz_t i_ts = GetTimeForUntimed( p_es->p_program );
-            if( i_ts > TS_90KHZ_INVALID )
+            if( i_ts != TS_90KHZ_INVALID )
             {
                 i_ts = TimeStampWrapAround( p_pmt->pcr.i_first, i_ts );
                 p_block->i_dts = p_block->i_pts = FROM_SCALE(i_ts) + VLC_TICK_FROM_MS(40);
@@ -1702,7 +1702,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
             if( !p_pmt->pcr.b_fix_done ) /* Not seen yet */
                 PCRFixHandle( p_demux, p_pmt, p_block );
 
-            if( p_es->id && (p_pmt->pcr.i_current > TS_90KHZ_INVALID || p_pmt->pcr.b_disable) )
+            if( p_es->id && (p_pmt->pcr.i_current != TS_90KHZ_INVALID || p_pmt->pcr.b_disable) )
             {
                 if( pid->u.p_stream->prepcr.p_head )
                 {
@@ -1727,9 +1727,9 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
                 }
 
                 /* Compute PCR/DTS offset if any */
-                ts_90khz_t i_pcrref = (i_append_pcr > TS_90KHZ_INVALID) ? i_append_pcr : p_pmt->pcr.i_first;
+                ts_90khz_t i_pcrref = (i_append_pcr != TS_90KHZ_INVALID) ? i_append_pcr : p_pmt->pcr.i_first;
                 if( p_pmt->pcr.i_pcroffset == -1 && p_block->i_dts != VLC_TICK_INVALID &&
-                    i_pcrref > TS_90KHZ_INVALID &&
+                    i_pcrref != TS_90KHZ_INVALID &&
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     ts_90khz_t i_dts27 = TO_SCALE(p_block->i_dts);
@@ -1785,7 +1785,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
                     block_ChainLastAppend( &pid->u.p_stream->prepcr.pp_last, p_block );
 
                 /* PCR Seen and no es->id, cleanup current and prepcr blocks */
-                if( p_pmt->pcr.i_current > TS_90KHZ_INVALID )
+                if( p_pmt->pcr.i_current != TS_90KHZ_INVALID )
                 {
                     block_ChainRelease( pid->u.p_stream->prepcr.p_head );
                     pid->u.p_stream->prepcr.p_head = NULL;
@@ -2527,13 +2527,13 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
         return;
     }
     /* Record the first data packet timestamp in case there won't be any PCR */
-    else if( p_pmt->pcr.i_first_dts == TS_TICK_UNKNOWN )
+    else if( p_pmt->pcr.i_first_dts == TS_90KHZ_INVALID )
     {
         p_pmt->pcr.i_first_dts = TO_SCALE(p_block->i_dts);
     }
     else if( p_block->i_dts - FROM_SCALE(p_pmt->pcr.i_first_dts) > VLC_TICK_FROM_MS(500) ) /* "PCR repeat rate shall not exceed 100ms" */
     {
-        if( p_pmt->pcr.i_current <= TS_90KHZ_INVALID &&
+        if( p_pmt->pcr.i_current == TS_90KHZ_INVALID &&
             GetPID( p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
         {
             int i_cand = FindPCRCandidate( p_pmt );
@@ -2704,7 +2704,7 @@ static bool GatherPESData( demux_t *p_demux, ts_pid_t *p_pid, block_t *p_pkt, si
 
     const ts_es_t *p_es = p_pid->u.p_stream->p_es;
     ts_90khz_t i_append_pcr = ( p_es && p_es->p_program )
-                         ? p_es->p_program->pcr.i_current : TS_TICK_UNKNOWN;
+                         ? p_es->p_program->pcr.i_current : TS_90KHZ_INVALID;
 
     return ts_pes_Gather( &cb, p_pid->u.p_stream,
                           p_pkt, b_unit_start,

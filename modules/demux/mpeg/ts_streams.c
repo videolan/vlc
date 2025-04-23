@@ -104,16 +104,17 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->od.i_version = -1;
     ARRAY_INIT( pmt->od.objects );
 
-    pmt->i_last_dts = TS_TICK_UNKNOWN;
+    pmt->i_last_dts = TS_90KHZ_INVALID;
     pmt->i_last_dts_byte = 0;
+    pmt->b_last_dts_probed = false;
 
     pmt->p_atsc_si_basepid      = NULL;
     pmt->p_si_sdt_pid = NULL;
 
-    pmt->pcr.i_current = TS_TICK_UNKNOWN;
-    pmt->pcr.i_first  = TS_TICK_UNKNOWN;
+    pmt->pcr.i_current = TS_90KHZ_INVALID;
+    pmt->pcr.i_first  = TS_90KHZ_INVALID;
     pmt->pcr.b_disable = false;
-    pmt->pcr.i_first_dts = TS_TICK_UNKNOWN;
+    pmt->pcr.i_first_dts = TS_90KHZ_INVALID;
     pmt->pcr.i_pcroffset = -1;
 
     pmt->pcr.b_fix_done = false;
