@@ -399,8 +399,8 @@ static void ParsePES( demux_t *p_demux )
     uint8_t     hdr[30];
 
     unsigned    i_skip;
-    stime_t     i_dts = -1;
-    stime_t     i_pts = -1;
+    ts_90khz_t  i_dts = -1;
+    ts_90khz_t  i_pts = -1;
 
     p_sys->p_pes = NULL;
 

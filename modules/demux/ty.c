@@ -565,7 +565,7 @@ static void Close( vlc_object_t *p_this )
  * Assume buf points to beginning of PTS */
 static vlc_tick_t get_pts( const uint8_t *buf )
 {
-    stime_t i_pts = GetPESTimestamp( buf );
+    ts_90khz_t i_pts = GetPESTimestamp( buf );
     return FROM_SCALE_NZ(i_pts); /* convert PTS (90Khz clock) to microseconds */
 }
 

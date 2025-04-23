@@ -456,7 +456,7 @@ static inline int ps_pkt_parse_pack( const uint8_t *p_pkt, size_t i_pkt,
     }
     else if( i_pkt >= 12 && (p[4] >> 4) == 0x02 ) /* MPEG-1 Pack SCR, same bits as PES/PTS */
     {
-        stime_t i_scr;
+        ts_90khz_t i_scr;
         if(!ExtractPESTimestamp( &p[4], 0x02, &i_scr ))
             return VLC_EGENERIC;
         *pi_scr = FROM_SCALE( i_scr );
@@ -511,8 +511,8 @@ static inline int ps_pkt_parse_system( const uint8_t *p_pkt, size_t i_pkt,
 static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
     unsigned int i_skip  = 0;
-    stime_t i_pts = -1;
-    stime_t i_dts = -1;
+    ts_90khz_t i_pts = -1;
+    ts_90khz_t i_dts = -1;
     uint8_t i_stream_id = 0;
     bool b_pes_scrambling = false;
 

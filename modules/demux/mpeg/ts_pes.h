@@ -29,7 +29,7 @@ typedef struct
 {
     vlc_object_t *p_obj;
     void *priv;
-    void(*pf_parse)(vlc_object_t *, void *, block_t *, uint32_t, stime_t );
+    void(*pf_parse)(vlc_object_t *, void *, block_t *, uint32_t, ts_90khz_t );
 } ts_pes_parse_callback;
 
 bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes );
@@ -37,7 +37,7 @@ bool ts_pes_Drain( ts_pes_parse_callback *cb, ts_stream_t *p_pes );
 bool ts_pes_Gather( ts_pes_parse_callback *cb,
                     ts_stream_t *p_pes, block_t *p_pkt,
                     bool b_unit_start, bool b_valid_scrambling,
-                    stime_t i_append_pcr );
+                    ts_90khz_t i_append_pcr );
 
 
 #endif

@@ -32,7 +32,7 @@
 #include "../../libvlc/test.h"
 
 static void Parse(vlc_object_t *obj, void *priv, block_t *data,
-                  uint32_t i_flags, stime_t t)
+                  uint32_t i_flags, ts_90khz_t t)
 {
     VLC_UNUSED(obj);
     VLC_UNUSED(t);
