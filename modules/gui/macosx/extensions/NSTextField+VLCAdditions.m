@@ -26,9 +26,13 @@
 
 + (instancetype)defaultLabelWithString:(NSString *)stringValue
 {
-    if (@available(macOS 10.12, *))
-        return [NSTextField wrappingLabelWithString:stringValue];
+    if (@available(macOS 10.12, *)) {
+        NSTextField * const textField = [NSTextField wrappingLabelWithString:stringValue];
+        textField.translatesAutoresizingMaskIntoConstraints = NO;
+        return textField;
+    }
     NSTextField * const textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+    textField.translatesAutoresizingMaskIntoConstraints = NO;
     textField.stringValue = stringValue;
     textField.editable = NO;
     textField.bordered = NO;
