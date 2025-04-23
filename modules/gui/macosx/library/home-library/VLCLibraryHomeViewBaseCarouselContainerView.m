@@ -24,6 +24,7 @@
 
 #import "extensions/NSFont+VLCAdditions.h"
 #import "extensions/NSString+Helpers.h"
+#import "extensions/NSTextField+VLCAdditions.h"
 
 #import "library/VLCLibraryDataTypes.h"
 #import "library/VLCLibraryCarouselViewItemView.h"
@@ -84,14 +85,10 @@
 
 - (void)setupView
 {
-    _titleView = [[NSTextField alloc] init];
+    _titleView = [NSTextField defaultLabelWithString:@""];
     self.titleView.font = NSFont.VLClibrarySectionHeaderFont;
     self.titleView.textColor = NSColor.headerTextColor;
-    self.titleView.selectable = NO;
-    self.titleView.bordered = NO;
-    self.titleView.drawsBackground = NO;
     [self addSubview:self.titleView];
-    self.titleView.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
         [self.leadingAnchor constraintEqualToAnchor:self.titleView.leadingAnchor],
         [self.trailingAnchor constraintEqualToAnchor:self.titleView.trailingAnchor],
