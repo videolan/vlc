@@ -76,6 +76,12 @@ vlc_tests += {
 endif
 
 vlc_tests += {
+    'name' : 'test_modules_demux_timestamps',
+    'sources' : files('demux/timestamps.c'),
+    'suite' : ['modules', 'test_modules']
+}
+
+vlc_tests += {
     'name' : 'test_modules_demux_timestamps_filter',
     'sources' : files('demux/timestamps_filter.c'),
     'suite' : ['modules', 'test_modules'],

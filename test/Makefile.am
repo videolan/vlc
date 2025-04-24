@@ -54,6 +54,7 @@ check_PROGRAMS = \
 	test_modules_packetizer_mpegvideo \
 	test_modules_codec_hxxx_helper \
 	test_modules_keystore \
+	test_modules_demux_timestamps \
 	test_modules_demux_timestamps_filter \
 	test_modules_demux_ts_pes \
 	test_modules_playlist_m3u \
@@ -254,6 +255,7 @@ test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_tls_SOURCES = modules/misc/tls.c
 test_modules_tls_LDADD = $(LIBVLCCORE) $(LIBVLC)
+test_modules_demux_timestamps_SOURCES = modules/demux/timestamps.c
 test_modules_demux_timestamps_filter_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_demux_timestamps_filter_SOURCES = modules/demux/timestamps_filter.c
 test_modules_demux_ts_pes_LDADD = $(LIBVLCCORE) $(LIBVLC)
