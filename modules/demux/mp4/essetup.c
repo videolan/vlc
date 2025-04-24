@@ -971,6 +971,35 @@ int SetupAudioES( demux_t *p_demux, const mp4_track_t *p_track,
             }
             break;
         }
+        case ATOM_Opus:
+        {
+            const MP4_Box_t *p_dOps = MP4_BoxGet(  p_sample, "dOps" );
+            if( p_dOps && p_dOps->data.p_binary->i_blob > 10 )
+            {
+                size_t i_src = p_dOps->data.p_binary->i_blob;
+                const uint8_t *p_src = p_dOps->data.p_binary->p_blob;
+                if(p_src[0] != 0x00 || (SIZE_MAX - p_dOps->data.p_binary->i_blob < 26))
+                    break;
+                size_t i_dst = 2 + 8 + p_dOps->data.p_binary->i_blob + 8 + 8;
+                uint8_t *p_dst = malloc(i_dst);
+                if( likely( p_dst ) )
+                {
+                    p_dst[0] = 0x01;
+                    p_dst[1] = 8 + i_src;
+                    memcpy(&p_dst[2], "OpusHead", 8);
+                    memcpy(&p_dst[10], p_src, i_src);
+                    p_dst[10] = 0x01; // set version != ISOBMFF mapping
+                    SetWLE(&p_dst[12], GetWBE(&p_dst[12])); // swap endianness for PreSkip
+                    SetDWLE(&p_dst[14], GetDWBE(&p_dst[14])); // swap endianness for InputSampleRate
+                    SetWLE(&p_dst[18], GetWBE(&p_dst[18])); // swap endianness for OutputGain
+                    memcpy(&p_dst[10 + i_src], "OpusTags\x00\x00\x00\x00\x00\x00\x00", 16);
+                    p_fmt->i_extra = i_dst;
+                    p_fmt->p_extra = p_dst;
+                    p_fmt->i_codec = VLC_CODEC_OPUS;
+                }
+            }
+            break;
+        }
         case( ATOM_eac3 ):
         {
             p_fmt->i_codec = VLC_CODEC_EAC3;
