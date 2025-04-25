@@ -1307,7 +1307,8 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/ImageExt.qml \
 	widgets/qml/ScrollBarExt.qml \
 	widgets/qml/FastBlend.qml \
-	widgets/qml/RadioButtonExt.qml
+	widgets/qml/RadioButtonExt.qml \
+	widgets/qml/RoundedRectangleShadow.qml
 if HAVE_QT65
 libqml_module_widgets_a_QML += \
 	widgets/qml/DynamicShadow.qml \
