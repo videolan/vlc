@@ -1311,11 +1311,9 @@ libqml_module_widgets_a_QML = \
 	widgets/qml/RoundedRectangleShadow.qml
 if HAVE_QT65
 libqml_module_widgets_a_QML += \
-	widgets/qml/DynamicShadow.qml \
 	widgets/qml/BlurEffect.qml
 else
 libqml_module_widgets_a_QML += \
-	widgets/qml/compat/DynamicShadow.qml \
 	widgets/qml/compat/BlurEffect.qml
 endif
 nodist_libqml_module_widgets_a_SOURCES = widgets_qmlassets.cpp
