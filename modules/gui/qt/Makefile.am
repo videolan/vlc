@@ -845,7 +845,7 @@ libqt_plugin_la_RES = \
 	pixmaps/icons/profile_new.svg \
 	pixmaps/icons/record.svg \
 	pixmaps/icons/remove.svg \
-	pixmaps/icons/renderer.svg \
+	pixmaps/icons/ic_fluent_cast.svg \
 	pixmaps/icons/ic_fluent_arrow_repeat_all.svg \
 	pixmaps/icons/ic_fluent_arrow_repeat_1.svg \
 	pixmaps/icons/ic_fluent_rewind.svg \

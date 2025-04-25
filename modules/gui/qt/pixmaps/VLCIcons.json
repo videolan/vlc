@@ -55,7 +55,7 @@
         {"key":"profile_new", "path": "./icons/profile_new.svg"},
         {"key":"record", "path": "./icons/record.svg"},
         {"key":"remove", "path": "./icons/remove.svg"},
-        {"key":"renderer", "path": "./icons/renderer.svg"},
+        {"key":"renderer", "path": "./icons/ic_fluent_cast.svg"},
         {"key":"repeat_all", "path": "./icons/ic_fluent_arrow_repeat_all.svg"},
         {"key":"repeat_one", "path": "./icons/ic_fluent_arrow_repeat_1.svg"},
         {"key":"search", "path": "./icons/ic_fluent_search.svg"},
