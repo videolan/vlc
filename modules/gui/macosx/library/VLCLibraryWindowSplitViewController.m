@@ -130,7 +130,9 @@
 
 - (BOOL)splitView:(NSSplitView *)splitView canCollapseSubview:(NSView *)subview
 {
-    return subview != self.navSidebarViewController.view || !self.mainVideoModeEnabled;
+    return subview != self.navSidebarViewController.view
+           || !self.mainVideoModeEnabled
+           || [super splitView:splitView canCollapseSubview:subview];
 }
 
 @end
