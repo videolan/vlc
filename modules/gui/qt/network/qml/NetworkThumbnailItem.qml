@@ -80,14 +80,6 @@ Widgets.TableRowDelegate {
             width: artwork.width
             height: artwork.height
 
-            Widgets.DefaultShadow {
-                anchors.centerIn: artwork
-
-                // clip shadows to only the painted area of cover
-                rectWidth: artwork.paintedWidth
-                rectHeight: artwork.paintedHeight
-            }
-
             //FIXME: implement fillMode in RoundImage and use MediaCover here instead
             //or directly TableCollumns.titleHeaderDelegate in place of NetworkThumbnailItem
             NetworkCustomCover {
@@ -107,6 +99,10 @@ Widgets.TableRowDelegate {
                 bgColor: root.colorContext.bg.secondary
                 color1: root.colorContext.fg.primary
                 accent: root.colorContext.accent
+
+                Widgets.DefaultShadow {
+
+                }
 
                 Widgets.PlayCover {
                     x: Math.round((artwork.width - width) / 2)

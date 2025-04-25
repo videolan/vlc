@@ -184,9 +184,6 @@ AbstractButton {
             }
 
             Widgets.DefaultShadow {
-                anchors.centerIn: coverImage
-
-                sourceItem: coverImage
 
             }
         }

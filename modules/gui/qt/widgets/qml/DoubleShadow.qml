@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Copyright (C) 2022 VLC authors and VideoLAN
+ * Copyright (C) 2025 VLC authors and VideoLAN
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,117 +18,44 @@
 
 import QtQuick
 
-
-import VLC.Style
-import VLC.Util
-
-// A convenience file to encapsulate two drop shadow images stacked on top
-// of each other
+// A convenience file to encapsulate two drop shadow rectangles stacked
 Item {
-    implicitWidth: image.implicitWidth
-    implicitHeight: image.implicitHeight
+    id: root
 
-    property Item sourceItem: null
+    property alias radius: primaryShadow.radius
 
-    readonly property real viewportHorizontalOffset: (Math.max(Math.abs(primaryHorizontalOffset) + primaryBlurRadius, Math.abs(secondaryHorizontalOffset) + secondaryBlurRadius)) * 2
-    readonly property real viewportVerticalOffset: (Math.max(Math.abs(primaryVerticalOffset) + primaryBlurRadius, Math.abs(secondaryVerticalOffset) + secondaryBlurRadius)) * 2
+    property alias primaryColor: primaryShadow.color
+    property alias primaryVerticalOffset: primaryShadow.yOffset
+    property alias primaryHorizontalOffset: primaryShadow.xOffset
+    property alias primaryBlurRadius: primaryShadow.blurRadius
 
-    property real viewportWidth: rectWidth + viewportHorizontalOffset
-    property real viewportHeight: rectHeight + viewportVerticalOffset
+    property alias secondaryColor: secondaryShadow.color
+    property alias secondaryVerticalOffset: secondaryShadow.yOffset
+    property alias secondaryHorizontalOffset: secondaryShadow.xOffset
+    property alias secondaryBlurRadius: secondaryShadow.blurRadius
 
-    property real rectWidth: sourceItem ? Math.min((sourceItem.paintedWidth ?? Number.MAX_VALUE) - Math.ceil(sourceItem.padding ?? 0) * 2, sourceItem.width) : 0
-    property real rectHeight: sourceItem ? Math.min((sourceItem.paintedHeight ?? Number.MAX_VALUE) - Math.ceil(sourceItem.padding ?? 0) * 2, sourceItem.height) : 0
-    property real xRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
-    property real yRadius: (sourceItem ? (sourceItem.effectiveRadius ?? sourceItem.radius) : 0) ?? 0
+    primaryColor: Qt.rgba(0, 0, 0, .18)
+    secondaryColor: Qt.rgba(0, 0, 0, .22)
 
-    property color primaryColor: Qt.rgba(0, 0, 0, .18)
-    property real primaryVerticalOffset: 0
-    property real primaryHorizontalOffset: 0
-    property real primaryBlurRadius: 0
+    RoundedRectangleShadow {
+        id: primaryShadow
 
-    property color secondaryColor: Qt.rgba(0, 0, 0, .22)
-    property real secondaryVerticalOffset: 0
-    property real secondaryHorizontalOffset: 0
-    property real secondaryBlurRadius: 0
+        parent: root.parent // similar to how Repeater behaves
 
-    property alias sourceSize: image.sourceSize
-    property alias cache: image.cache
-    property alias asynchronous: image.asynchronous
-    property alias fillMode: image.fillMode
-
-    z: -1
-
-    visible: (width > 0 && height > 0)
-
-    //by default we request
-    sourceSize: Qt.size(viewportWidth, viewportHeight)
-
-    ScaledImage {
-        id: image
-
-        anchors.fill: parent
-
-        cache: true
-        asynchronous: true
-
-        visible: !visualDelegate.readyForVisibility
-
-        fillMode: Image.Stretch
-
-        onSourceSizeChanged: {
-            // Do not load the image when size is not valid:
-            if (sourceSize.width > 0 && sourceSize.height > 0)
-                source = Qt.binding(() => {
-                    return Effects.url(
-                        Effects.DoubleRoundedRectDropShadow,
-                        {
-                            "viewportWidth" : viewportWidth,
-                            "viewportHeight" :viewportHeight,
-
-                            "rectWidth": rectWidth,
-                            "rectHeight": rectHeight,
-                            "xRadius": xRadius,
-                            "yRadius": yRadius,
-
-                            "primaryColor": primaryColor,
-                            "primaryBlurRadius": primaryBlurRadius,
-                            "primaryXOffset": primaryHorizontalOffset,
-                            "primaryYOffset": primaryVerticalOffset,
-
-                            "secondaryColor": secondaryColor,
-                            "secondaryBlurRadius": secondaryBlurRadius,
-                            "secondaryXOffset": secondaryHorizontalOffset,
-                            "secondaryYOffset": secondaryVerticalOffset,
-                        })
-                })
-            else
-                source = ""
-        }
+        opacity: root.opacity
+        visible: root.visible
+        enabled: root.enabled
     }
 
-    ShaderEffect {
-        id: visualDelegate
+    RoundedRectangleShadow {
+        id: secondaryShadow
 
-        anchors.centerIn: parent
-        anchors.alignWhenCentered: true
+        parent: root.parent // similar to how Repeater behaves
 
-        implicitWidth: image.implicitWidth
-        implicitHeight: image.implicitHeight
+        opacity: root.opacity
+        visible: root.visible
+        enabled: root.enabled
 
-        width: image.paintedWidth
-        height: image.paintedHeight
-
-        visible: readyForVisibility
-
-        readonly property bool readyForVisibility: (GraphicsInfo.shaderType === GraphicsInfo.RhiShader)
-
-        supportsAtlasTextures: true
-        blending: true
-        // cullMode: ShaderEffect.BackFaceCulling
-
-        readonly property Image source: image
-
-        // TODO: Dithered texture is not necessary if theme is not dark.
-        fragmentShader: "qrc:///shaders/DitheredTexture.frag.qsb"
+        radius: root.radius
     }
 }

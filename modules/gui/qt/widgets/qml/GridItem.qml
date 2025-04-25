@@ -297,40 +297,14 @@ T.ItemDelegate {
             DefaultShadow {
                 id: unselectedShadow
 
-                anchors.centerIn: parent
-
                 visible: opacity > 0
-
-                sourceItem: parent
-
-                width: picture.paintedWidth + viewportHorizontalOffset - Math.ceil(picture.padding) * 2
-                height: picture.paintedHeight + viewportVerticalOffset - Math.ceil(picture.padding) * 2
-
-                rectWidth: sourceSize.width
-                rectHeight: sourceSize.height
-
-                // TODO: Apply painted size's aspect ratio (constant) in source size
-                sourceSize: Qt.size(128, 128)
             }
 
             DoubleShadow {
                 id: selectedShadow
 
-                anchors.centerIn: parent
-
                 visible: opacity > 0
                 opacity: 0
-
-                sourceItem: parent
-
-                width: picture.paintedWidth + viewportHorizontalOffset - Math.ceil(picture.padding) * 2
-                height: picture.paintedHeight + viewportVerticalOffset - Math.ceil(picture.padding) * 2
-
-                rectWidth: sourceSize.width
-                rectHeight: sourceSize.height
-
-                // TODO: Apply painted size's aspect ratio (constant) in source size
-                sourceSize: Qt.size(128, 128)
 
                 primaryVerticalOffset: VLCStyle.dp(6, VLCStyle.scale)
                 primaryBlurRadius: VLCStyle.dp(18, VLCStyle.scale)

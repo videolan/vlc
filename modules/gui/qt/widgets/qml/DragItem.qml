@@ -510,9 +510,7 @@ Item {
                 }
 
                 DefaultShadow {
-                    anchors.centerIn: parent
 
-                    sourceItem: parent
                 }
             }
         }
@@ -544,9 +542,7 @@ Item {
         }
 
         DefaultShadow {
-            anchors.centerIn: parent
 
-            sourceItem: extraCovers
         }
     }
 

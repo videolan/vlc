@@ -193,10 +193,6 @@ T.Control {
                 }
 
                 Widgets.DefaultShadow {
-                    anchors.centerIn: parent
-
-                    sourceItem: parent
-
                     visible: (artwork.status === Image.Ready)
                 }
             }

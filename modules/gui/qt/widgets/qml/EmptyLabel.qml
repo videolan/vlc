@@ -76,9 +76,7 @@ T.Control {
             fillMode: Image.PreserveAspectFit
 
             Widgets.DefaultShadow {
-                anchors.centerIn: parent
 
-                sourceItem: parent
             }
         }
 

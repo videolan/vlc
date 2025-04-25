@@ -120,10 +120,6 @@ FocusScope {
                             readonly property real eDPR: MainCtx.effectiveDevicePixelRatio(Window.window)
 
                             Widgets.DefaultShadow {
-                                anchors.centerIn: parent
-
-                                sourceItem: parent
-
                                 visible: (parent.status === Image.Ready)
                             }
                         }

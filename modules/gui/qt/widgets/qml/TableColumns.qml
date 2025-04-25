@@ -135,9 +135,7 @@ Item {
                 }
 
                 DefaultShadow {
-                    anchors.centerIn: parent
 
-                    sourceItem: parent
                 }
 
                 onPlayIconClicked: root.playClicked(titleDel.rowModel)

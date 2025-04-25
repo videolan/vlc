@@ -156,9 +156,7 @@ Column {
             }
 
             DefaultShadow {
-                anchors.centerIn: parent
 
-                sourceItem: parent
             }
 
             SubtitleLabel {
