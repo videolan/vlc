@@ -29,8 +29,6 @@
 
 #include <cassert>
 #include <algorithm>
-#include <vlc_common.h>
-#include <vlc_xml.h>
 
 using namespace adaptive::xml;
 
