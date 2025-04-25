@@ -235,18 +235,13 @@ T.Control {
         implicitWidth: height
         implicitHeight: VLCStyle.icon_medium
 
-        Widgets.DropShadowImage {
+        Widgets.RoundedRectangleShadow {
             id: hoverShadow
-
-            anchors.centerIn: parent
 
             visible: opacity > 0
             opacity: 0
 
-            rectWidth: parent.width
-            rectHeight: parent.height
-            xRadius: parent.width
-            yRadius: xRadius
+            radius: parent.width
 
             blurRadius: VLCStyle.dp(9)
             yOffset: VLCStyle.dp(4)
