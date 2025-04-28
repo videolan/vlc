@@ -55,7 +55,7 @@ ssize_t vlc_https_chunked_write(struct vlc_tls *tls, const void *base,
 
     if (eos)
     {
-        if (vlc_tls_Write(tls, "0\r\n", 3) < 3)
+        if (vlc_tls_Write(tls, "0\r\n\r\n", 5) < 5)
             return -1;
     }
 
