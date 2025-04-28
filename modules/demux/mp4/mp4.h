@@ -91,6 +91,7 @@ typedef struct
     bool        b_chans_reorder;
 
     bool b_forced_spu; /* forced track selection (never done by default/priority) */
+    bool b_ignore_implicit_pts;
 
     uint32_t    i_block_flags;
 } track_config_t;
@@ -109,6 +110,7 @@ typedef struct
     uint32_t i_switch_group;
 
     bool b_mac_encoding;
+    bool b_ignore_implicit_pts;
 
     es_format_t fmt;
     uint32_t    i_block_flags;

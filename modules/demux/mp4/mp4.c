@@ -603,7 +603,7 @@ static vlc_tick_t MP4_TrackGetDTSPTS( demux_t *p_demux, const mp4_track_t *p_tra
         {
             *pi_nzpts = i_dts + MP4_rescale_mtime( delta, p_track->i_timescale );
         }
-        else if( p_track->fmt.i_cat == VIDEO_ES )
+        else if( p_track->b_ignore_implicit_pts )
         {
             *pi_nzpts = INVALID_PTS;
         }
@@ -3162,6 +3162,7 @@ static void TrackConfigApply( const track_config_t *p_cfg,
      p_track->b_chans_reorder = p_cfg->b_chans_reorder;
      p_track->b_forced_spu = p_cfg->b_forced_spu;
      p_track->i_block_flags = p_cfg->i_block_flags;
+     p_track->b_ignore_implicit_pts = p_cfg->b_ignore_implicit_pts;
 }
 
 static int TrackFillConfig( demux_t *p_demux, const mp4_track_t *p_track,

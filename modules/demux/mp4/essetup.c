@@ -784,6 +784,9 @@ int SetupVideoES( demux_t *p_demux, const mp4_track_t *p_track, const MP4_Box_t 
                                BOXDATA(p_strf)->i_extra,
                                p_fmt );
             }
+            /* Mostly bogus muxs with old codecs
+             * see 71c4cc66456facb59cd0eef1626be1be1befeb39 */
+            p_cfg->b_ignore_implicit_pts = true;
             break;
         }
 
