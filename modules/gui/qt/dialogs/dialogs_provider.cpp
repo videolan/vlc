@@ -67,6 +67,7 @@
 #include <QUrl>
 #include <QInputDialog>
 #include <QPointer>
+#include <QMessageBox>
 
 #define I_OP_DIR_WINTITLE I_DIR_OR_FOLDER( N_("Open Directory"), \
                                            N_("Open Folder") )
@@ -399,6 +400,16 @@ void DialogsProvider::mediaInfoDialog( const MLItemId& itemId )
                                    inputItem, &cfg ),
                                    &input_item_parser_id_Release );
     }
+}
+
+bool DialogsProvider::getMessageDialog(const QString& message) const
+{
+    QMessageBox messageBox;
+    messageBox.setText(message);
+    messageBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+
+    int result = messageBox.exec();
+    return result == QMessageBox::Ok;
 }
 
 void DialogsProvider::mediaCodecDialog()

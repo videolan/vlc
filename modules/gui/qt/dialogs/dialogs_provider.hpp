@@ -177,6 +177,7 @@ public slots:
     void mediaInfoDialog( const PlaylistItem& pItem );
     void mediaInfoDialog( const MLItemId& itemId );
     void mediaCodecDialog();
+    bool getMessageDialog(const QString& message) const;
     void prefsDialog();
     void firstRunDialog();
     void extendedDialog();
