@@ -89,7 +89,11 @@ NativeMenu {
             "text": qsTr("Information"),
             "action": _signalShowInformation,
             "visible": showInformationAvailable
-        }, {
+        },{
+            "text": qsTr("Delete File From System"),
+            "action": deleteFileFromSource,
+            "visible": _deleteFileFromSource
+        },{
             "text": qsTr("Media Information"),
             "action": function(dataList, options, indexes) {
                 DialogsProvider.mediaInfoDialog(dataList[0][idDataRole])
@@ -160,6 +164,15 @@ NativeMenu {
         model.deleteStream(dataList[0][idDataRole])
     }
 
+    function deleteFileFromSource(dataList, options, indexes) {
+        let confirm = DialogsProvider.getMessageDialog("Are you sure you want to delete this file?");
+        
+        if (confirm) {
+            model.deleteFileFromSource(indexes[0]);
+            console.log("File Deleted !!");
+        }
+    }
+
     function showInformationAvailable(dataList, options, indexes) {
         return indexes.length === 1
                 && Helpers.isInteger(options?.["information"] ?? null)
@@ -199,6 +212,10 @@ NativeMenu {
 
     function _deleteStream(dataList,options, indexes) {
         return _checkRole(dataList, "isDeletable", true)
+    }
+
+    function _deleteFileFromSource(dataList, options, indexes) {
+        return  _checkRole(dataList, "isDeletableFile", true)
     }
 
     function _signalShowInformation(dataList, options) {
