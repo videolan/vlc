@@ -26,7 +26,6 @@ typedef struct {
     struct wl_event_queue* queue;
     struct xdg_wm_base *wm_base;
     struct xdg_toplevel *toplevel;
-    bool supportWindowMenu;
 } csd_menu_priv_t;
 
 static void csd_registry_global_cb(void* data, struct wl_registry* registry,
@@ -57,7 +56,7 @@ static bool CSDMenuPopup(qt_csd_menu_t* p_this, qt_csd_menu_event* event)
     csd_menu_priv_t* sys = (csd_menu_priv_t*)p_this->p_sys;
     assert (event->platform == QT_CSD_PLATFORM_WAYLAND);
 
-    if (!sys->supportWindowMenu)
+    if (unlikely(!sys->toplevel))
         return false;
 
     xdg_toplevel_show_window_menu(sys->toplevel, event->data.wayland.seat, event->data.wayland.serial, event->x, event->y);
