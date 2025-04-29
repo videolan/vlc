@@ -21,6 +21,7 @@
 
 #include "mlmediamodel.hpp"
 #include "mlhelper.hpp"
+#include <QFile>
 
 MLMediaModel::MLMediaModel(QObject *par)
     : MLBaseModel(par)
@@ -45,12 +46,64 @@ void MLMediaModel::setMediaIsFavorite(const QModelIndex &index, bool isFavorite)
     emit dataChanged(index, index, { MEDIA_IS_FAVORITE });
 }
 
-QUrl MLMediaModel::getParentURL(const QModelIndex &index)
-{
+QUrl MLMediaModel::getParentURL(const QModelIndex &index) {
     const auto media = static_cast<MLMedia *>(item(index.row()));
     assert(media != nullptr);
+    return getParentURL(media);
+}
 
+QUrl MLMediaModel::getParentURL(const MLMedia *media) const{
+    assert(media != nullptr);
     return getParentURLFromURL(media->mrl());
+}
+
+bool MLMediaModel::getPermissions(const MLMedia* media) const
+{
+    QString mrl = media->mrl();
+
+    QUrl fileUrl(mrl);
+    QString localPath = fileUrl.toLocalFile();
+
+    if (localPath.isEmpty())
+        return false;
+
+    QFileDevice::Permissions filePermissions = QFile::permissions(localPath);
+
+    if (!(filePermissions & QFileDevice::WriteUser))
+        return false;
+
+    QUrl parentUrl = getParentURL(media);
+    QString parentPath = parentUrl.toLocalFile();
+
+    if (parentPath.isEmpty())
+        return false;
+
+    QFileDevice::Permissions folderPermissions = QFile::permissions(parentPath);
+
+    return folderPermissions & QFileDevice::WriteUser;
+}
+
+void MLMediaModel::deleteFileFromSource(const QModelIndex &index)
+{
+    const auto media = static_cast<MLMedia *>(item(index.row()));
+    QString mrl = media->mrl();
+
+    QUrl fileUrl(mrl);
+    QString localPath = fileUrl.toLocalFile();
+
+    QFile file(localPath);
+    bool removed = file.remove();
+    if (!removed)
+        return;
+
+    QUrl parentUrl = getParentURL(index);
+    QString parentUrlString = parentUrl.toString();
+
+    m_mediaLib->runOnMLThread(this,
+                              [parentUrlString](vlc_medialibrary_t *ml)
+                              {
+                                  vlc_ml_reload_folder(ml, qtu(parentUrlString));
+                              });
 }
 
 vlc_ml_sorting_criteria_t MLMediaModel::nameToCriteria(QByteArray name) const
@@ -78,6 +131,7 @@ QHash<int, QByteArray> MLMediaModel::roleNames() const
         {MEDIA_PROGRESS, "progress"},
         {MEDIA_PLAYCOUNT, "playcount"},
         {MEDIA_LAST_PLAYED_DATE, "last_played_date"},
+        {MEDIA_IS_DELETABLE_FILE, "isDeletableFile"},
     };
 }
 
@@ -128,6 +182,8 @@ QVariant MLMediaModel::itemRoleData(const MLItem *item, int role) const
         return QVariant::fromValue(media->playCount());
     case MEDIA_LAST_PLAYED_DATE:
         return QVariant::fromValue( media->lastPlayedDate().toString( QLocale::system().dateFormat( QLocale::ShortFormat ) ) );
+    case MEDIA_IS_DELETABLE_FILE:
+        return QVariant::fromValue(getPermissions(media));
     }
     return {};
 }

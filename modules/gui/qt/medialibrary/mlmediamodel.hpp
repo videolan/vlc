@@ -47,6 +47,7 @@ public:
         MEDIA_PROGRESS,
         MEDIA_PLAYCOUNT,
         MEDIA_LAST_PLAYED_DATE,
+        MEDIA_IS_DELETABLE_FILE,
         MEDIA_ROLES_COUNT,
     };
 
@@ -55,6 +56,9 @@ public:
 
     Q_INVOKABLE void setMediaIsFavorite(const QModelIndex &index, bool isFavorite);
     Q_INVOKABLE QUrl getParentURL(const QModelIndex &index);
+    Q_INVOKABLE QUrl getParentURL(const MLMedia *media) const;
+    Q_INVOKABLE bool getPermissions(const MLMedia* media) const;
+    Q_INVOKABLE void deleteFileFromSource(const QModelIndex &index);
 
 protected:
     QHash<int, QByteArray> roleNames() const override;
