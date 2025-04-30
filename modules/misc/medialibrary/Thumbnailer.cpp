@@ -40,7 +40,7 @@ Thumbnailer::Thumbnailer( vlc_medialibrary_module_t* ml )
         .max_parser_threads = 0,
         .max_thumbnailer_threads = 1,
         .timeout = VLC_TICK_FROM_SEC( 3 ),
-        .external_process = false,
+        .external_process = true,
     })
 {
 }
