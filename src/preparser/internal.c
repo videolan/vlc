@@ -572,87 +572,6 @@ PreparserRequestRetain(struct vlc_preparser_req *req)
     return req;
 }
 
-vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
-                                    const struct vlc_preparser_cfg *cfg )
-{
-    assert(cfg != NULL);
-
-    assert(cfg->timeout >= 0);
-
-    int request_type = cfg->types;
-    assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|
-                           VLC_PREPARSER_TYPE_PARSE|
-                           VLC_PREPARSER_TYPE_THUMBNAIL|
-                           VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES));
-
-    unsigned parser_threads = cfg->max_parser_threads == 0 ? 1 :
-                              cfg->max_parser_threads;
-    unsigned thumbnailer_threads = cfg->max_thumbnailer_threads == 0 ? 1 :
-                                   cfg->max_thumbnailer_threads;
-
-    vlc_preparser_t* preparser = malloc( sizeof *preparser );
-    if (!preparser)
-        return NULL;
-
-    preparser->timeout = cfg->timeout;
-    preparser->owner = parent;
-
-    if (request_type & VLC_PREPARSER_TYPE_PARSE)
-    {
-        preparser->parser = vlc_executor_New(parser_threads);
-        if (!preparser->parser)
-            goto error_parser;
-    }
-    else
-        preparser->parser = NULL;
-
-    if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
-    {
-        preparser->fetcher = input_fetcher_New(parent, request_type);
-        if (unlikely(preparser->fetcher == NULL))
-            goto error_fetcher;
-    }
-    else
-        preparser->fetcher = NULL;
-
-    if (request_type & (VLC_PREPARSER_TYPE_THUMBNAIL |
-                        VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES))
-    {
-        preparser->thumbnailer = vlc_executor_New(thumbnailer_threads);
-        if (!preparser->thumbnailer)
-            goto error_thumbnail;
-    }
-    else
-        preparser->thumbnailer = NULL;
-
-    if (request_type & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES)
-    {
-        preparser->thumbnailer_to_files = vlc_executor_New(1);
-        if (preparser->thumbnailer_to_files == NULL)
-            goto error_thumbnail_to_files;
-    }
-    else
-        preparser->thumbnailer_to_files = NULL;
-
-    vlc_mutex_init(&preparser->lock);
-    vlc_list_init(&preparser->submitted_tasks);
-
-    return preparser;
-
-error_thumbnail_to_files:
-    if (preparser->thumbnailer != NULL)
-        vlc_executor_Delete(preparser->thumbnailer);
-error_thumbnail:
-    if (preparser->fetcher != NULL)
-        input_fetcher_Delete(preparser->fetcher);
-error_fetcher:
-    if (preparser->parser != NULL)
-        vlc_executor_Delete(preparser->parser);
-error_parser:
-    free(preparser);
-    return NULL;
-}
-
 vlc_preparser_req *
 vlc_preparser_Push( vlc_preparser_t *preparser, input_item_t *item,
                     int type_options,
@@ -975,4 +894,85 @@ void vlc_preparser_Delete( vlc_preparser_t *preparser )
         vlc_executor_Delete(preparser->thumbnailer_to_files);
 
     free( preparser );
+}
+
+vlc_preparser_t* vlc_preparser_New( vlc_object_t *parent,
+                                    const struct vlc_preparser_cfg *cfg )
+{
+    assert(cfg != NULL);
+
+    assert(cfg->timeout >= 0);
+
+    int request_type = cfg->types;
+    assert(request_type & (VLC_PREPARSER_TYPE_FETCHMETA_ALL|
+                           VLC_PREPARSER_TYPE_PARSE|
+                           VLC_PREPARSER_TYPE_THUMBNAIL|
+                           VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES));
+
+    unsigned parser_threads = cfg->max_parser_threads == 0 ? 1 :
+                              cfg->max_parser_threads;
+    unsigned thumbnailer_threads = cfg->max_thumbnailer_threads == 0 ? 1 :
+                                   cfg->max_thumbnailer_threads;
+
+    vlc_preparser_t* preparser = malloc( sizeof *preparser );
+    if (!preparser)
+        return NULL;
+
+    preparser->timeout = cfg->timeout;
+    preparser->owner = parent;
+
+    if (request_type & VLC_PREPARSER_TYPE_PARSE)
+    {
+        preparser->parser = vlc_executor_New(parser_threads);
+        if (!preparser->parser)
+            goto error_parser;
+    }
+    else
+        preparser->parser = NULL;
+
+    if (request_type & VLC_PREPARSER_TYPE_FETCHMETA_ALL)
+    {
+        preparser->fetcher = input_fetcher_New(parent, request_type);
+        if (unlikely(preparser->fetcher == NULL))
+            goto error_fetcher;
+    }
+    else
+        preparser->fetcher = NULL;
+
+    if (request_type & (VLC_PREPARSER_TYPE_THUMBNAIL |
+                        VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES))
+    {
+        preparser->thumbnailer = vlc_executor_New(thumbnailer_threads);
+        if (!preparser->thumbnailer)
+            goto error_thumbnail;
+    }
+    else
+        preparser->thumbnailer = NULL;
+
+    if (request_type & VLC_PREPARSER_TYPE_THUMBNAIL_TO_FILES)
+    {
+        preparser->thumbnailer_to_files = vlc_executor_New(1);
+        if (preparser->thumbnailer_to_files == NULL)
+            goto error_thumbnail_to_files;
+    }
+    else
+        preparser->thumbnailer_to_files = NULL;
+
+    vlc_mutex_init(&preparser->lock);
+    vlc_list_init(&preparser->submitted_tasks);
+
+    return preparser;
+
+error_thumbnail_to_files:
+    if (preparser->thumbnailer != NULL)
+        vlc_executor_Delete(preparser->thumbnailer);
+error_thumbnail:
+    if (preparser->fetcher != NULL)
+        input_fetcher_Delete(preparser->fetcher);
+error_fetcher:
+    if (preparser->parser != NULL)
+        vlc_executor_Delete(preparser->parser);
+error_parser:
+    free(preparser);
+    return NULL;
 }
