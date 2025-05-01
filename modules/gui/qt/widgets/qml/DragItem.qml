@@ -512,6 +512,20 @@ Item {
                 DefaultShadow {
 
                 }
+
+                // FIXME: Qt bug (observed 6.2 and 6.8): The image does not get rendered without this.
+                Rectangle {
+                    z: -1
+
+                    anchors.centerIn: parent
+
+                    width: 1
+                    height: 1
+
+                    opacity: 0.01
+
+                    color: "black"
+                }
             }
         }
     }
