@@ -346,7 +346,7 @@ static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
         return;
     }
 
-    if (vlc_mouse_HasPressed(&id->oldmouse, newmouse, MOUSE_BUTTON_LEFT)) {
+    if (vlc_mouse_HasReleased(&id->oldmouse, newmouse, MOUSE_BUTTON_LEFT)) {
         input_SendEvent(p_sys->p_input, &(struct vlc_input_event) {
             .type = INPUT_EVENT_MOUSE_LEFT
         });
