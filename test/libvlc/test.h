@@ -66,7 +66,7 @@ static const char test_default_sample[] = "mock://";
 static inline void test_setup(void)
 {
     setenv("VLC_PLUGIN_PATH", TOP_BUILDDIR"/modules", 1);
-    setenv("VLC_LIB_PATH", TOP_BUILDDIR, 1);
+    setenv("VLC_LIB_PATH", TOP_BUILDDIR"/modules", 1);
 }
 
 static inline void test_init (void)
