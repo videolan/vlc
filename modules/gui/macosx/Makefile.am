@@ -22,7 +22,7 @@ endif
 
 EXTRA_DIST += $(ASSET_CATALOG_DEPS)
 
-SUFFIXES += .xib .nib
+SUFFIXES += .xib .nib .air .metal
 
 xib_verbose = $(xib_verbose_$(V))
 xib_verbose_ = $(xib_verbose__$(AM_DEFAULT_VERBOSITY))
@@ -36,6 +36,10 @@ xib_verbose__0 = $(xib_verbose_0)
 	  --minimum-deployment-target 10.11 --output-format human-readable-text \
 	  --compile $@ $<
 
+# Rule to compile .metal to .air
+.air: .metal
+	@mkdir -p $(builddir)/$(@D)
+	xcrun metal -c $< -o $(builddir)/$@
 
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -I$(srcdir)/gui/macosx
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
