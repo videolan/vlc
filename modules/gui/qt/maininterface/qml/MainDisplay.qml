@@ -162,6 +162,25 @@ FocusScope {
         colorSet: ColorContext.View
     }
 
+    Loader {
+        id: voronoiSnowLoader
+
+        z: 1.5
+        source: "qrc:///qt/qml/VLC/Widgets/VoronoiSnow.qml"
+        anchors.fill: parent
+        active: false
+
+        function toggleActive() {
+            voronoiSnowLoader.active = !voronoiSnowLoader.active
+        }
+
+        Component.onCompleted: {
+            if (MainCtx.useXmasCone()) {
+                MainCtx.kc_pressed.connect(voronoiSnowLoader.toggleActive)
+            }
+        }
+    }
+
     ColumnLayout {
         id: mainColumn
         anchors.fill: parent
