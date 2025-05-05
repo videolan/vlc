@@ -36,8 +36,9 @@ MainViewLoader {
     readonly property int contentLeftMargin: currentItem?.contentLeftMargin ?? 0
     readonly property int contentRightMargin: currentItem?.contentRightMargin ?? 0
 
-    property bool listEnableBeginningFade: true // false, when as a row
-    property bool listEnableEndFade: true // false, when as a row
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     // NOTE: Specify an optional header for the view.
     property Component header: null
@@ -206,8 +207,8 @@ MainViewLoader {
 
             section.property: root.sectionProperty
 
-            fadingEdge.enableBeginningFade: root.listEnableBeginningFade
-            fadingEdge.enableEndFade: root.listEnableEndFade
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             displayMarginBeginning: root.displayMarginBeginning
             displayMarginEnd: root.displayMarginEnd

@@ -187,8 +187,8 @@ T.Page {
                 visible: model.count !== 0
 
                 headerPositioning: ListView.InlineHeader
-                listEnableBeginningFade: false
-                listEnableEndFade: false
+                enableBeginningFade: false
+                enableEndFade: false
                 sectionProperty: ""
 
                 interactive: false
@@ -273,8 +273,8 @@ T.Page {
                 visible: model.count !== 0
 
                 listHeaderPositioning: ListView.InlineHeader
-                listEnableBeginningFade: false
-                listEnableEndFade: false
+                enableBeginningFade: false
+                enableEndFade: false
                 listSectionProperty: ""
 
                 interactive: false
@@ -345,8 +345,8 @@ T.Page {
                 visible: model.count !== 0
 
                 listHeaderPositioning: ListView.InlineHeader
-                listEnableBeginningFade: false
-                listEnableEndFade: false
+                enableBeginningFade: false
+                enableEndFade: false
                 listSectionProperty: ""
 
                 interactive: false

@@ -36,8 +36,9 @@ MainViewLoader {
 
     property int listHeaderPositioning: ListView.OverlayHeader // ListView.InlineHeader, when as a row
 
-    property bool listEnableBeginningFade: true // false, when as a row
-    property bool listEnableEndFade: true // false, when as a row
+    // Currently only respected by the list view:
+    property bool enableBeginningFade: true
+    property bool enableEndFade: true
 
     property string listSectionProperty: model.sortCriteria === "title" ? "title_first_symbol" : "" // "", when as a row
 
@@ -289,8 +290,8 @@ MainViewLoader {
 
             section.property: root.listSectionProperty
 
-            fadingEdge.enableBeginningFade: root.listEnableBeginningFade
-            fadingEdge.enableEndFade: root.listEnableEndFade
+            fadingEdge.enableBeginningFade: root.enableBeginningFade
+            fadingEdge.enableEndFade: root.enableEndFade
 
             dragItem: dragItemId
 
