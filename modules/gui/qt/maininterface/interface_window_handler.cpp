@@ -42,6 +42,13 @@ void setWindowState(QWindow *window, Qt::WindowState state)
 
 }
 
+const Qt::Key InterfaceWindowHandler::kc[10] =
+{
+        Qt::Key_Up, Qt::Key_Up,
+        Qt::Key_Down, Qt::Key_Down,
+        Qt::Key_Left, Qt::Key_Right, Qt::Key_Left, Qt::Key_Right,
+        Qt::Key_B, Qt::Key_A
+};
 
 InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* mainCtx, QWindow* window, QObject *parent)
     : QObject(parent)
@@ -143,6 +150,9 @@ InterfaceWindowHandler::InterfaceWindowHandler(qt_intf_t *_p_intf, MainCtx* main
     connect(m_mainCtx, &MainCtx::requestInterfaceMinimized,
             this, &InterfaceWindowHandler::setInterfaceMinimized);
 
+    connect(this, &InterfaceWindowHandler::kc_pressed,
+            m_mainCtx, &MainCtx::kc_pressed);
+
     m_window->installEventFilter(this);
 }
 
@@ -220,6 +230,18 @@ bool InterfaceWindowHandler::eventFilter(QObject*, QEvent* event)
     case QEvent::KeyPress:
     {
         QKeyEvent * keyEvent = static_cast<QKeyEvent *> (event);
+
+        /* easter eggs sequence handling */
+        if ( keyEvent->key() == kc[ i_kc_offset ] )
+            i_kc_offset++;
+        else
+            i_kc_offset = 0;
+
+        if ( i_kc_offset == (sizeof( kc ) / sizeof( Qt::Key )) )
+        {
+            i_kc_offset = 0;
+            emit kc_pressed();
+        }
 
         if (applyKeyEvent(keyEvent) == false)
             return false;

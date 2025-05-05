@@ -60,6 +60,7 @@ signals:
     void interfaceAlwaysOnTopChanged(bool);
     void interfaceFullScreenChanged(bool);
     void incrementIntfUserScaleFactor(bool increment);
+    void kc_pressed();
 
 private:
     bool applyKeyEvent(QKeyEvent * event) const;
@@ -84,6 +85,9 @@ protected:
     bool m_hasResizeCursor = false;
 
     QRect m_interfaceGeometry;
+
+    static const Qt::Key kc[10]; /* easter eggs */
+    int i_kc_offset = 0;
 };
 
 #endif // INTERFACEWINDOWHANDLER_H
