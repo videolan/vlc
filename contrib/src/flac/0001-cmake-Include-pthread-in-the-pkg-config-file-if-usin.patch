@@ -1,0 +1,37 @@
+From 8e74f100fa822852dd567cd0dbaf7245b26c412f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Mon, 5 May 2025 13:42:15 +0300
+Subject: [PATCH] cmake: Include "-pthread" in the pkg-config file if using
+ pthreads
+
+This makes sure that users of the library pass the right linker
+flags if linking libflac statically, with a mingw toolchain that
+doesn't automatically link in pthreads.
+---
+ CMakeLists.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9396130d..c8f4e7ff 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -157,7 +157,7 @@ if(MINGW AND (WITH_FORTIFY_SOURCE OR WITH_STACK_PROTECTOR))
+     link_libraries("ssp.a")
+     # static libraries don't carry over other static libraries in mingw
+     # we need to export it in the pkg-config
+-    set(FLAC_STATIC_LIBS "-lssp")
++    set(FLAC_STATIC_LIBS "${FLAC_STATIC_LIBS} -lssp")
+   endif()
+ elseif(NOT MSVC)
+   set(HAVE_LIBSSP 1)
+@@ -212,6 +212,7 @@ if(ENABLE_MULTITHREADING)
+     find_package(Threads)
+     if(CMAKE_USE_PTHREADS_INIT)
+         set(HAVE_PTHREAD 1)
++        set(FLAC_STATIC_LIBS "${FLAC_STATIC_LIBS} -pthread")
+     endif()
+ endif()
+ 
+-- 
+2.43.0
+

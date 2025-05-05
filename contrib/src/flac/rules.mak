@@ -15,6 +15,7 @@ $(TARBALLS)/flac-$(FLAC_VERSION).tar.xz:
 
 flac: flac-$(FLAC_VERSION).tar.xz .sum-flac
 	$(UNPACK)
+	$(APPLY) $(SRC)/flac/0001-cmake-Include-pthread-in-the-pkg-config-file-if-usin.patch
 	$(call pkg_static,"src/libFLAC/flac.pc.in")
 	$(MOVE)
 
