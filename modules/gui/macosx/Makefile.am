@@ -411,6 +411,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/views/VLCScrollingClipView.m \
 	gui/macosx/views/VLCSettingTextField.h \
 	gui/macosx/views/VLCSettingTextField.m \
+	gui/macosx/views/VLCSnowEffectView.h \
+	gui/macosx/views/VLCSnowEffectView.m \
 	gui/macosx/views/VLCStatusNotifierView.h \
 	gui/macosx/views/VLCStatusNotifierView.m \
 	gui/macosx/views/VLCSubScrollView.h \
