@@ -256,6 +256,7 @@ MainCtx::MainCtx(qt_intf_t *_p_intf)
         cfg.types = VLC_PREPARSER_TYPE_PARSE;
         cfg.max_parser_threads = 1;
         cfg.timeout = 0;
+        cfg.external_process = false;
         return cfg;
     }();
     m_network_preparser = vlc_preparser_New(VLC_OBJECT(libvlc), &cfg);

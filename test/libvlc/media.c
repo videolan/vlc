@@ -257,6 +257,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
         .types = options,
         .max_parser_threads = 1,
         .timeout = VLC_TICK_FROM_MS(timeout),
+        .external_process = false,
     };
     vlc_preparser_t *parser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                 &cfg);

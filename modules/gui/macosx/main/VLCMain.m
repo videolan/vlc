@@ -168,6 +168,7 @@ int OpenIntf (vlc_object_t *p_this)
                 .types = VLC_PREPARSER_TYPE_PARSE,
                 .max_parser_threads = 1,
                 .timeout = 0,
+                .external_process = false,
             };
             p_network_preparser = vlc_preparser_New(p_this, &cfg);
             if (p_network_preparser == nil)

@@ -94,6 +94,7 @@ MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
         .max_parser_threads = 1,
         .max_thumbnailer_threads = 0,
         .timeout = VLC_TICK_FROM_SEC(5),
+        .external_process = false,
     })
 {
 }

@@ -131,6 +131,7 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
         const struct vlc_preparser_cfg cfg = {
             .types = VLC_PREPARSER_TYPE_THUMBNAIL,
             .timeout = test_params[i].i_timeout,
+            .external_process = false,
         };
 
         vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
@@ -202,6 +203,7 @@ static void test_cancel_thumbnail( libvlc_instance_t* p_vlc )
     const struct vlc_preparser_cfg cfg = {
         .types = VLC_PREPARSER_TYPE_THUMBNAIL,
         .timeout = VLC_TICK_INVALID,
+        .external_process = false,
     };
     vlc_preparser_t* p_thumbnailer = vlc_preparser_New(
                 VLC_OBJECT( p_vlc->p_libvlc_int ), &cfg );

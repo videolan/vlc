@@ -299,6 +299,11 @@ struct vlc_preparser_cfg
      * Timeout of the preparser and/or thumbnailer, 0 for no limits.
      */
     vlc_tick_t timeout;
+
+    /**
+     * Indicate if the preparser will use external process or not.
+     */
+    bool external_process;
 };
 
 /**

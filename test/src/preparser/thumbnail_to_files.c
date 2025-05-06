@@ -299,6 +299,7 @@ int main(int argc, const char *argv[])
         .max_parser_threads = 1,
         .max_thumbnailer_threads = 1,
         .timeout = 0,
+        .external_process = false,
     };
     vlc_preparser_t *preparser = vlc_preparser_New(VLC_OBJECT(vlc->p_libvlc_int),
                                                    &cfg);

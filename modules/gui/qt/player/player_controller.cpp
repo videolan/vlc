@@ -2006,6 +2006,7 @@ void PlayerController::requestArtUpdate( input_item_t *p_item )
             cfg.types = VLC_PREPARSER_TYPE_FETCHMETA_ALL;
             cfg.max_parser_threads = 1;
             cfg.timeout = default_timeout;
+            cfg.external_process = false;
             return cfg;
         }();
         d->m_preparser = vlc_preparser_New(VLC_OBJECT(d->p_intf), &cfg);

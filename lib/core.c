@@ -269,6 +269,7 @@ vlc_preparser_t *libvlc_get_preparser(libvlc_instance_t *instance)
             .types = VLC_PREPARSER_TYPE_PARSE | VLC_PREPARSER_TYPE_FETCHMETA_ALL,
             .max_parser_threads = max_threads,
             .timeout = default_timeout,
+            .external_process = false,
         };
 
         parser = instance->parser =
@@ -289,6 +290,7 @@ vlc_preparser_t *libvlc_get_thumbnailer(libvlc_instance_t *instance)
         const struct vlc_preparser_cfg cfg = {
             .types = VLC_PREPARSER_TYPE_THUMBNAIL,
             .timeout = 0,
+            .external_process = false,
         };
 
         thumb = instance->thumbnailer =
