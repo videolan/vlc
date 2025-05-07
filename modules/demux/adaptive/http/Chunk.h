@@ -55,7 +55,7 @@ namespace adaptive
         {
             public:
                 virtual ~ChunkInterface() = default;
-                virtual std::string getContentType  () const = 0;
+                virtual const std::string & getContentType  () const = 0;
                 virtual RequestStatus getRequestStatus() const = 0;
 
                 virtual block_t *   readBlock       () = 0;
@@ -74,7 +74,7 @@ namespace adaptive
                 const BytesRange &  getBytesRange   () const;
                 ChunkType           getChunkType    () const;
                 const StorageID &   getStorageID    () const;
-                virtual std::string getContentType  () const override;
+                virtual const std::string & getContentType  () const override;
                 virtual RequestStatus getRequestStatus() const override;
                 virtual void        recycle() = 0;
 
@@ -93,7 +93,7 @@ namespace adaptive
             public:
                 virtual ~AbstractChunk();
 
-                virtual std::string   getContentType        () const override;
+                virtual const std::string & getContentType  () const override;
                 virtual RequestStatus getRequestStatus      () const override;
                 virtual size_t        getBytesRead          () const override;
                 virtual bool          hasMoreData           () const override;
@@ -124,7 +124,7 @@ namespace adaptive
                 virtual block_t *   read            (size_t)  override;
                 virtual bool        hasMoreData     () const  override;
                 virtual size_t      getBytesRead    () const  override;
-                virtual std::string getContentType  () const  override;
+                virtual const std::string & getContentType() const override;
                 virtual void        recycle() override;
 
                 static const size_t CHUNK_SIZE = 32768;
@@ -203,7 +203,7 @@ namespace adaptive
                 ProbeableChunk(ChunkInterface *);
                 virtual ~ProbeableChunk();
 
-                virtual std::string getContentType  () const override;
+                virtual const std::string & getContentType  () const override;
                 virtual RequestStatus getRequestStatus() const override;
 
                 virtual block_t *   readBlock       () override;

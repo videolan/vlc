@@ -37,6 +37,8 @@
 
 using namespace adaptive::http;
 
+static std::string EmptyStr = "";
+
 AbstractChunkSource::AbstractChunkSource(ChunkType t, const BytesRange &range)
 {
     type = t;
@@ -57,9 +59,9 @@ const BytesRange & AbstractChunkSource::getBytesRange() const
     return bytesRange;
 }
 
-std::string AbstractChunkSource::getContentType() const
+const std::string & AbstractChunkSource::getContentType() const
 {
-    return std::string();
+    return EmptyStr;
 }
 
 RequestStatus AbstractChunkSource::getRequestStatus() const
@@ -88,7 +90,7 @@ AbstractChunk::~AbstractChunk()
     source->recycle();
 }
 
-std::string AbstractChunk::getContentType() const
+const std::string & AbstractChunk::getContentType() const
 {
     return source->getContentType();
 }
@@ -264,13 +266,13 @@ StorageID HTTPChunkSource::makeStorageID(const std::string &s, const BytesRange 
     return std::to_string(r.getStartByte())+ std::to_string(r.getEndByte()) + '@' + s;
 }
 
-std::string HTTPChunkSource::getContentType() const
+const std::string & HTTPChunkSource::getContentType() const
 {
     vlc_mutex_locker locker(&lock);
     if(connection)
         return connection->getContentType();
     else
-        return std::string();
+        return EmptyStr;
 }
 
 void HTTPChunkSource::setIdentifier(const std::string &s, const BytesRange &r)
@@ -570,7 +572,7 @@ ProbeableChunk::~ProbeableChunk()
     delete source;
 }
 
-std::string ProbeableChunk::getContentType() const
+const std::string & ProbeableChunk::getContentType() const
 {
     return source->getContentType();
 }

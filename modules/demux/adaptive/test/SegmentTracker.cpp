@@ -73,7 +73,7 @@ class DummyChunkSource : public AbstractChunkSource
             : AbstractChunkSource(t, range), data(v), offset(0), contentType(content) {}
         virtual ~DummyChunkSource() = default;
         virtual void recycle() override { delete this; }
-        virtual std::string getContentType  () const override
+        virtual const std::string & getContentType  () const override
         {
             return contentType;
         }
