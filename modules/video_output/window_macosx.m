@@ -750,9 +750,13 @@ int Open(vlc_window_t *wnd)
         sys.delegate = moduleDelegate;
 
         __block VLCVideoStandaloneWindowController *windowController;
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        if (CFRunLoopGetCurrent() != CFRunLoopGetMain())
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                windowController = [[VLCVideoStandaloneWindowController alloc] initWithModuleDelegate:moduleDelegate];
+            });
+        else
             windowController = [[VLCVideoStandaloneWindowController alloc] initWithModuleDelegate:moduleDelegate];
-        });
+
         if (unlikely(windowController == nil))
             return VLC_ENOMEM;
         sys.windowController = windowController;
