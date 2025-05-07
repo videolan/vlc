@@ -102,7 +102,7 @@ ListView {
         colorSet: ColorContext.View
     }
 
-    DefaultFlickableScrollHandler {
+    VLCFlickableScrollHandler {
         fallbackScroll: true
         enabled: true
     }

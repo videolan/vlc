@@ -20,11 +20,12 @@ import QtQml
 
 import VLC.MainInterface
 import VLC.Util
+import VLC.Style
 
 FlickableScrollHandler {
     id: handler
 
     scaleFactor: MainCtx.intfScaleFactor
-
-    enabled: !MainCtx.smoothScroll
+    smoothScroll: MainCtx.smoothScroll
+    duration: VLCStyle.duration_long
 }

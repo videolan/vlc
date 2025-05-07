@@ -254,7 +254,11 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_COMPOSITOR_LONGTEXT N_("Select Qt video integration backend. Use with care, the interface may not start if an incompatible compositor is selected")
 
 #define SMOOTH_SCROLLING_TEXT N_( "Use smooth scrolling in Flickable based views" )
-#define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue)" )
+#define SMOOTH_SCROLLING_LONGTEXT N_( "Deactivating this option will disable smooth scrolling in Flickable based views (such as the Playqueue). " \
+                                      "This option is only respected with a scroll handler, see option `qt-use-scroll-handler`." )
+
+#define SCROLL_HANDLER_TEXT N_( "Use Kirigami scroll handler for Flickable based views" )
+#define SCROLL_HANDLER_LONGTEXT N_( "Using Kirigami scroll handler may improve scrolling behavior." )
 
 #define SAFE_AREA_TEXT N_( "Safe area for the user interface" )
 #define SAFE_AREA_LONGTEXT N_( "Sets the safe area percentage between 0.0 and 100 when you want " \
@@ -441,6 +445,8 @@ vlc_module_begin ()
             change_integer_list( i_raise_list, psz_raise_list_text )
 
     add_bool( "qt-smooth-scrolling", true, SMOOTH_SCROLLING_TEXT, SMOOTH_SCROLLING_LONGTEXT )
+
+    add_bool( "qt-use-scroll-handler", true, SCROLL_HANDLER_TEXT, SCROLL_HANDLER_LONGTEXT )
 
     add_bool( "qt-verbose", false, VERBOSE_TEXT, VERBOSE_LONGTEXT )
 

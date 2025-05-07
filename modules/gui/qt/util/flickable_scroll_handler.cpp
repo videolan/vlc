@@ -26,7 +26,7 @@
 #define PAGE_SCROLL_SHIFT_OR_CTRL true
 
 FlickableScrollHandler::FlickableScrollHandler(QObject *parent)
-    : QObject(parent)
+    : DummyFlickableScrollHandler(parent)
 {
     connect(this, &FlickableScrollHandler::scaleFactorChanged, this, [this]() {
         m_effectiveScaleFactor = QApplication::styleHints()->wheelScrollLines() * 20 * m_scaleFactor;
@@ -236,19 +236,6 @@ void FlickableScrollHandler::adjustScrollBar(ScrollBar& scrollBar)
         scrollBar.decreaseMethod = item->metaObject()->method(item->metaObject()->indexOfMethod("decrease()"));
         scrollBar.increaseMethod = item->metaObject()->method(item->metaObject()->indexOfMethod("increase()"));
     }
-}
-
-qreal FlickableScrollHandler::scaleFactor() const
-{
-    return m_scaleFactor;
-}
-
-void FlickableScrollHandler::setScaleFactor(qreal newScaleFactor)
-{
-    if (qFuzzyCompare(m_scaleFactor, newScaleFactor))
-        return;
-    m_scaleFactor = newScaleFactor;
-    emit scaleFactorChanged();
 }
 
 bool FlickableScrollHandler::enabled() const

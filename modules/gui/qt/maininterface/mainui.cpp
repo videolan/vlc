@@ -41,6 +41,7 @@
 #include "style/systempalette.hpp"
 #include "util/navigation_history.hpp"
 #include "util/flickable_scroll_handler.hpp"
+#include "util/kirigamiwheelhandler.hpp"
 #include "util/color_svg_image_provider.hpp"
 #include "util/effects_image_provider.hpp"
 #include "util/vlcaccess_image_provider.hpp"
@@ -362,7 +363,18 @@ void MainUI::registerQMLTypes()
         qmlRegisterType<ImageLuminanceExtractor>( uri, versionMajor, versionMinor, "ImageLuminanceExtractor");
 
         qmlRegisterType<ItemKeyEventFilter>( uri, versionMajor, versionMinor, "KeyEventFilter" );
-        qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
+
+        // WARNING: This type is deprecated, do not use it.
+        qmlRegisterType<FlickableScrollHandler>( uri, versionMajor, versionMinor, "VLCFlickableScrollHandler" );
+
+        {
+            auto funcRegisterScrollHandler = qmlRegisterType<DummyFlickableScrollHandler>;
+            if (var_InheritBool(m_intf, "qt-use-scroll-handler"))
+                funcRegisterScrollHandler = qmlRegisterType<Kirigami::WheelHandler>;
+
+            funcRegisterScrollHandler( uri, versionMajor, versionMinor, "FlickableScrollHandler" );
+        }
+
         qmlRegisterType<ListSelectionModel>( uri, versionMajor, versionMinor, "ListSelectionModel" );
         qmlRegisterType<DoubleClickIgnoringItem>( uri, versionMajor, versionMinor, "DoubleClickIgnoringItem" );
         qmlRegisterType<TextureProviderObserver>( uri, versionMajor, versionMinor, "TextureProviderObserver" );
