@@ -57,7 +57,7 @@ namespace adaptive
         {
             public:
                 virtual ~ChunkInterface() {}
-                virtual std::string getContentType  () const = 0;
+                virtual const std::string & getContentType  () const = 0;
                 virtual RequestStatus getRequestStatus() const = 0;
 
                 virtual block_t *   readBlock       () = 0;
@@ -76,7 +76,7 @@ namespace adaptive
                 const BytesRange &  getBytesRange   () const;
                 ChunkType           getChunkType    () const;
                 const StorageID &   getStorageID    () const;
-                std::string getContentType  () const override;
+                const std::string & getContentType  () const override;
                 RequestStatus getRequestStatus() const override;
                 virtual void        recycle() = 0;
 
@@ -95,7 +95,7 @@ namespace adaptive
             public:
                 virtual ~AbstractChunk();
 
-                std::string   getContentType        () const override;
+                const std::string & getContentType  () const override;
                 RequestStatus getRequestStatus      () const override;
                 size_t        getBytesRead          () const override;
                 bool          hasMoreData           () const override;
@@ -126,7 +126,7 @@ namespace adaptive
                 block_t *   read            (size_t)  override;
                 bool        hasMoreData     () const  override;
                 size_t      getBytesRead    () const  override;
-                std::string getContentType  () const  override;
+                const std::string & getContentType() const override;
                 void        recycle() override;
 
                 static const size_t CHUNK_SIZE = 32768;
@@ -205,7 +205,7 @@ namespace adaptive
                 ProbeableChunk(ChunkInterface *);
                 virtual ~ProbeableChunk();
 
-                std::string getContentType  () const override;
+                const std::string & getContentType  () const override;
                 RequestStatus getRequestStatus() const override;
 
                 block_t *   readBlock       () override;
