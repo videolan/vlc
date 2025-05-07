@@ -24,6 +24,29 @@
 #include <QQuickItem>
 #include <QQmlParserStatus>
 
+class DummyFlickableScrollHandler : public QObject
+{
+    Q_OBJECT
+
+    // These properties may be overridden if necessary, they are not marked as final.
+    Q_PROPERTY(qreal scaleFactor MEMBER m_scaleFactor NOTIFY scaleFactorChanged)
+    Q_PROPERTY(bool smoothScroll MEMBER m_smoothScroll NOTIFY smoothScrollChanged)
+    Q_PROPERTY(int duration MEMBER m_duration NOTIFY durationChanged)
+
+public:
+    explicit DummyFlickableScrollHandler(QObject *parent = nullptr) : QObject(parent) { }
+
+signals:
+    void scaleFactorChanged();
+    void smoothScrollChanged();
+    void durationChanged();
+
+protected:
+    qreal m_scaleFactor = 1.;
+    int m_duration = 200;
+    bool m_smoothScroll = true;
+};
+
 class FlickableScrollHandler : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
