@@ -46,6 +46,8 @@
 #include <vlc_window.h>
 #include <vlc_fs.h>
 
+#define BO_DATA_PREALLOCATED_COUNT 4
+
 static const char *clientExts;
 
 static PFNGLFINISHPROC Finish;
@@ -54,6 +56,14 @@ static PFNGLFINISHPROC Finish;
 static PFNEGLGETPLATFORMDISPLAYEXTPROC GetPlatformDisplayEXT;
 static PFNEGLCREATEPLATFORMWINDOWSURFACEEXTPROC CreatePlatformWindowSurfaceEXT;
 #endif
+
+typedef struct bo_data_s
+{
+    struct wl_buffer *wl_buffer;
+    size_t plane_count;
+    int fd[4];
+    bool used;
+} bo_data_t;
 
 typedef struct vlc_gl_sys_t
 {
@@ -77,6 +87,7 @@ typedef struct vlc_gl_sys_t
         struct gbm_surface* surface;
         struct gbm_bo* bo_prev;
         struct gbm_bo* bo_next;
+        bo_data_t bo_data[BO_DATA_PREALLOCATED_COUNT];
         uint32_t format;
     } gbm;
 
@@ -182,8 +193,20 @@ static void Resize(vlc_gl_t* gl, unsigned width, unsigned height)
 static void ReleaseBoPrivateData(struct gbm_bo*  bo, void* data)
 {
     VLC_UNUSED(bo);
-    struct wl_buffer* buffer = (struct wl_buffer*) data;
-    wl_buffer_destroy(buffer);
+    bo_data_t* const bo_data = data;
+    assert(bo_data);
+    if (likely(bo_data->wl_buffer))
+        wl_buffer_destroy(bo_data->wl_buffer);
+    for (size_t i = 0; i < bo_data->plane_count; ++i)
+        close(bo_data->fd[i]);
+    assert(bo_data->used);
+    bo_data->used = false;
+}
+
+static void ReleaseAndFreeBoPrivateData(struct gbm_bo* bo, void *data)
+{
+    ReleaseBoPrivateData(bo, data);
+    free(data);
 }
 
 static void LockNext(vlc_gl_t* gl)
@@ -208,17 +231,43 @@ static void BindBuffer(vlc_gl_t* gl)
     uint32_t height = gbm_bo_get_height(bo);
     uint32_t width = gbm_bo_get_width(bo);
 
-    struct wl_buffer* buffer = (struct wl_buffer*)gbm_bo_get_user_data(bo);
+    bo_data_t *bo_data = gbm_bo_get_user_data(bo);
 
-    if (!buffer)
+    if (!bo_data)
     {
+        void (*bo_data_release_func)(struct gbm_bo *, void *);
+
+        for (size_t i = 0; i < ARRAY_SIZE(sys->gbm.bo_data); ++i)
+        {
+            if (!sys->gbm.bo_data[i].used)
+            {
+                bo_data = &sys->gbm.bo_data[i];
+                bo_data_release_func = ReleaseBoPrivateData;
+                break;
+            }
+        }
+
+        if (!bo_data)
+        {
+            if (ARRAY_SIZE(sys->gbm.bo_data) > 0)
+                msg_Dbg(gl, "no available preallocated private bo data, allocating a new one");
+            bo_data = malloc(sizeof(bo_data_t));
+            if (unlikely(!bo_data))
+                return;
+            bo_data_release_func = ReleaseAndFreeBoPrivateData;
+        }
+
         uint64_t modifier = gbm_bo_get_modifier(bo);
         uint32_t format = gbm_bo_get_format(bo);
 
         struct zwp_linux_buffer_params_v1* params = zwp_linux_dmabuf_v1_create_params(sys->wayland.dmabuf);
-        for (int i = 0; i < gbm_bo_get_plane_count(bo); ++i)
+        const size_t plane_count = gbm_bo_get_plane_count(bo);
+        assert(plane_count <= ARRAY_SIZE(bo_data->fd));
+        bo_data->plane_count = plane_count;
+        for (size_t i = 0; i < plane_count; ++i)
         {
             int fd = gbm_bo_get_fd_for_plane(bo, i);
+            bo_data->fd[i] = fd;
             uint32_t stride = gbm_bo_get_stride_for_plane(bo, i);
             uint32_t offset = gbm_bo_get_offset(bo, i);
 
@@ -233,15 +282,22 @@ static void BindBuffer(vlc_gl_t* gl)
                                            modifier >> 32,
                                            modifier & 0xffffffff);
         }
-        buffer = zwp_linux_buffer_params_v1_create_immed(params, width, height, format, 0);
+        bo_data->wl_buffer = zwp_linux_buffer_params_v1_create_immed(params, width, height, format, 0);
 
         zwp_linux_buffer_params_v1_destroy(params);
 
-        if (buffer)
-            gbm_bo_set_user_data(bo, buffer, ReleaseBoPrivateData);
+        bo_data->used = true;
+
+        if (unlikely(!bo_data->wl_buffer))
+        {
+            bo_data_release_func(bo, bo_data);
+            return;
+        }
+
+        gbm_bo_set_user_data(bo, bo_data, bo_data_release_func);
     }
 
-    wl_surface_attach(gl->surface->handle.wl, buffer, 0, 0);
+    wl_surface_attach(gl->surface->handle.wl, bo_data->wl_buffer, 0, 0);
     wl_surface_damage(gl->surface->handle.wl, 0, 0, width, height);
     wl_surface_commit(gl->surface->handle.wl);
 
