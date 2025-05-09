@@ -413,6 +413,7 @@
 		537040DE2DD848440030ABF5 /* VLCPlaybackEndViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaybackEndViewController.m; sourceTree = "<group>"; };
 		53741A582DCA7B4B00E112CD /* VLCSnowEffectView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCSnowEffectView.h; sourceTree = "<group>"; };
 		53741A592DCA7B4B00E112CD /* VLCSnowEffectView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCSnowEffectView.m; sourceTree = "<group>"; };
+		53741A5B2DCD141D00E112CD /* VLCShaderTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCShaderTypes.h; sourceTree = "<group>"; };
 		5377B15B2BD12EEE00D660B8 /* QuickLookThumbnailing.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLookThumbnailing.framework; path = System/Library/PrivateFrameworks/QuickLookThumbnailing.framework; sourceTree = SDKROOT; };
 		5377B15D2BD12F2900D660B8 /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		537976B82A4319330036827E /* VLCSettingTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCSettingTextField.m; sourceTree = "<group>"; };
@@ -1051,6 +1052,7 @@
 				1C1ED5142205A96600811EC0 /* playqueue */,
 				1C1ED5102204B06700811EC0 /* preferences */,
 				6CEA55632C6BA14300CCC2E7 /* private */,
+				5318F9312DBBB3B10008D9C8 /* shaders */,
 				1C1ED5062204AB7C00811EC0 /* views */,
 				1C1ED5072204AC5900811EC0 /* windows */,
 			);
@@ -1603,6 +1605,14 @@
 				5310AFB42B53EC4E00E75F9A /* iCarousel.h */,
 			);
 			path = iCarousel;
+			sourceTree = "<group>";
+		};
+		5318F9312DBBB3B10008D9C8 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				53741A5B2DCD141D00E112CD /* VLCShaderTypes.h */,
+			);
+			path = shaders;
 			sourceTree = "<group>";
 		};
 		5325C5742930026600B2B63A /* audio-library */ = {
