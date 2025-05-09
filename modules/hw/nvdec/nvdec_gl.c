@@ -198,6 +198,8 @@ static int Open(struct vlc_gl_interop *interop)
         result = CALL_CUDA(cuCtxCreate, &p_sys->cuConverterCtx, 0, cuConverterDevice);
         if (result != VLC_SUCCESS)
         {
+            vlc_decoder_device_Release(device);
+            return result;
         }
     }
 
