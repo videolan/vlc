@@ -219,7 +219,7 @@ static int Open(vout_display_t *vd,
     vlc_window_t *surface = vd->cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
 
-    /* VDPAU GL interop works only with GLX. Override the "gl" option to force
+    /* VDPAU/NVDEC GL interop works only with GLX. Override the "gl" option to force
      * it. */
 #ifndef USE_OPENGL_ES2
     if (surface->type == VLC_WINDOW_TYPE_XID)
@@ -227,6 +227,11 @@ static int Open(vout_display_t *vd,
         switch (vd->source->i_chroma)
         {
             case VLC_CODEC_VDPAU_VIDEO:
+            case VLC_CODEC_NVDEC_OPAQUE:
+            case VLC_CODEC_NVDEC_OPAQUE_10B:
+            case VLC_CODEC_NVDEC_OPAQUE_16B:
+            case VLC_CODEC_NVDEC_OPAQUE_444:
+            case VLC_CODEC_NVDEC_OPAQUE_444_16B:
             {
                 /* Force the option only if it was not previously set */
                 if (gl_name == NULL || gl_name[0] == 0
