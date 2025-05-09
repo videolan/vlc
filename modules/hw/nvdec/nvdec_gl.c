@@ -203,6 +203,9 @@ static int Open(struct vlc_gl_interop *interop)
         }
     }
 
+    /* The pictures are uploaded upside-down */
+    video_format_TransformBy(&interop->fmt_out, TRANSFORM_VFLIP);
+
     vlc_fourcc_t render_chroma = NVDECToVlcChroma(interop->fmt_in.i_chroma);
     switch (render_chroma)
     {
