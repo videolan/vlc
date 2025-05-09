@@ -267,6 +267,7 @@ static int Open(struct vlc_gl_interop *interop)
             break;
     }
 
+    interop->tex_target = GL_TEXTURE_2D;
     interop->fmt_out.i_chroma = render_chroma;
     interop->fmt_out.space = interop->fmt_in.space;
 
