@@ -547,11 +547,19 @@ vlc_player_GetTimerPoint(vlc_player_t *player, bool seeking,
     if (player->timer.best_source.point.system_date == VLC_TICK_INVALID)
         goto end;
 
-    if (system_now != VLC_TICK_INVALID)
+    if (system_now != VLC_TICK_INVALID && !player->timer.paused)
         ret = vlc_player_timer_point_Interpolate(&player->timer.best_source.point,
                                                  system_now, out_ts, out_pos);
     else
+    {
+        const struct vlc_player_timer_point *point =
+            &player->timer.best_source.point;
+        if (out_ts)
+            *out_ts = point->ts;
+        if (out_pos)
+            *out_pos = point->position;
         ret = VLC_SUCCESS;
+    }
 
 end:
     vlc_mutex_unlock(&player->timer.lock);
