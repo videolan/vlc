@@ -47,6 +47,7 @@ libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,AVFoundation \
 	-Wl,-framework,Cocoa \
 	-Wl,-framework,CoreAudio \
+	-Wl,-framework,CoreGraphics \
 	-Wl,-framework,CoreVideo \
 	-Wl,-framework,IOKit \
 	-Wl,-framework,QuartzCore \
@@ -54,6 +55,8 @@ libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,WebKit \
 	-Wl,-framework,QuickLook \
 	-Wl,-framework,QuickLookThumbnailing \
+	-Wl,-framework,Metal \
+	-Wl,-framework,MetalKit \
 	-Wl,-weak_framework,MediaPlayer
 
 if HAVE_SPARKLE
