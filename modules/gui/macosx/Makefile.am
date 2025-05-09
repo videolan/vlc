@@ -547,6 +547,14 @@ BUILT_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES:.xib=.nib)
 endif
 
 
+libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
+libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
+libmacosx_plugin_la_METAL_LIBRARY = Shaders.metallib
+
+$(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
+	@mkdir -p $(builddir)/$(@D)
+	xcrun metallib $(addprefix $(builddir)/,$(libmacosx_plugin_la_METAL_AIR_FILES)) -o $(builddir)/$@
+
 libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/App-Icons/VLC-Xmas.icns \
 	gui/macosx/Resources/App-Icons/VLC.icns \
