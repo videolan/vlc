@@ -28,6 +28,7 @@
 #endif
 
 #import <Cocoa/Cocoa.h>
+#import <MetalKit/MetalKit.h>
 
 #import <vlc_common.h>
 #import <vlc_interface.h>
@@ -91,5 +92,7 @@ extern NSString * const kVLCPreferencesVersion;
 @property (readonly) VLCVideoEffectsWindowController *videoEffectsPanel;
 @property (readonly) VLCVideoOutputProvider *voutProvider;
 @property (readonly) VLCDetachedAudioWindow *detachedAudioWindow;
+@property (readonly) id<MTLDevice> metalDevice;
+@property (readonly) id<MTLLibrary> metalLibrary;
 
 @end

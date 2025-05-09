@@ -44,6 +44,8 @@
 #include <vlc_variables.h>
 #include <vlc_preparser.h>
 
+#include <Metal/Metal.h>
+
 #import "extensions/NSString+Helpers.h"
 
 #import "library/VLCLibraryController.h"
@@ -286,6 +288,18 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+    _metalDevice = MTLCreateSystemDefaultDevice();
+    NSString * const libraryPath =
+        [NSBundle.mainBundle pathForResource:@"Shaders" ofType:@"metallib"];
+    if (!libraryPath) {
+        NSLog(@"Error: Could not find Shaders.metallib in the bundle.");
+    }
+    NSError *error = nil;
+    _metalLibrary = [_metalDevice newLibraryWithFile:libraryPath error:&error];
+    if (!_metalLibrary) {
+        NSLog(@"Error creating Metal library: %@", error);
+    }
+
     _clickerManager = [[VLCClickerManager alloc] init];
 
     [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:_mainmenu topLevelObjects:nil];
