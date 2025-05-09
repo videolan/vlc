@@ -118,23 +118,6 @@ vlc_media_tree_FindNodeByMedia(input_item_node_t *parent,
     return false;
 }
 
-static input_item_node_t *
-vlc_media_tree_AddChild(input_item_node_t *parent, input_item_t *media);
-
-static void
-vlc_media_tree_AddSubtree(input_item_node_t *to, input_item_node_t *from)
-{
-    for (int i = 0; i < from->i_children; ++i)
-    {
-        input_item_node_t *child = from->pp_children[i];
-        input_item_node_t *node = vlc_media_tree_AddChild(to, child->p_item);
-        if (unlikely(!node))
-            break; /* what could we do? */
-
-        vlc_media_tree_AddSubtree(node, child);
-    }
-}
-
 static void
 vlc_media_tree_ClearChildren(input_item_node_t *root)
 {
@@ -164,10 +147,15 @@ media_subtree_changed(input_item_t *media, input_item_node_t *node,
     }
 
     vlc_media_tree_ClearChildren(subtree_root);
-    vlc_media_tree_AddSubtree(subtree_root, node);
+    /* The nodes can be directly used, as the subtree callback is given
+     * ownership of the input item node. */
+    subtree_root->pp_children = node->pp_children;
+    subtree_root->i_children = node->i_children;
+    node->pp_children = NULL;
+    node->i_children = 0;
+    input_item_node_Delete(node);
     vlc_media_tree_Notify(tree, on_children_reset, subtree_root);
     vlc_media_tree_Unlock(tree);
-    input_item_node_Delete(node);
 }
 
 static void
