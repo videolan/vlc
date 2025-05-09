@@ -147,6 +147,7 @@ static void onParserSubtreeAdded( input_item_t *, input_item_node_t *subtree,
         input_item_t* media = child->p_item;
         req->children->emplace_back( media );
     }
+    input_item_node_Delete(subtree);
 }
 
 } /* extern C */

@@ -188,6 +188,7 @@ void MetadataExtractor::onParserSubtreeAdded( input_item_t *,
 {
     auto* ctx = static_cast<ParseContext*>( data );
     ctx->mde->addSubtree( *ctx, subtree );
+    input_item_node_Delete(subtree);
 }
 
 void MetadataExtractor::onAttachmentsAdded( input_item_t *,

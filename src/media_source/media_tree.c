@@ -167,6 +167,7 @@ media_subtree_changed(input_item_t *media, input_item_node_t *node,
     vlc_media_tree_AddSubtree(subtree_root, node);
     vlc_media_tree_Notify(tree, on_children_reset, subtree_root);
     vlc_media_tree_Unlock(tree);
+    input_item_node_Delete(node);
 }
 
 static void

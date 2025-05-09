@@ -63,6 +63,7 @@ static void cb_subtree_added(input_item_t *p_item, input_item_node_t *p_node, vo
         VLCInputItem *inputItem = (__bridge VLCInputItem *)p_data;
         [inputItem subTreeAdded:p_node];
     });
+    input_item_node_Delete(p_node);
 }
 
 static const struct input_item_parser_cbs_t parserCallbacks =

@@ -1025,6 +1025,7 @@ input_thread_Events(input_thread_t *input_thread,
         case INPUT_EVENT_SUBITEMS:
             vlc_player_SendEvent(player, on_media_subitems_changed,
                                  input_GetItem(input->thread), event->subitems);
+            input_item_node_Delete(event->subitems);
             break;
         case INPUT_EVENT_DEAD:
             if (input->started) /* Can happen with early input_thread fails */

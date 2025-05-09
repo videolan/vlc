@@ -85,6 +85,7 @@ on_subtree_added(input_item_t *media, input_item_node_t *subtree,
     vlc_playlist_Lock(playlist);
     vlc_playlist_ExpandItemFromNode(playlist, subtree);
     vlc_playlist_Unlock(playlist);
+    input_item_node_Delete(subtree);
 }
 
 static void

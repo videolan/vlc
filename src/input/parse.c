@@ -75,6 +75,8 @@ input_item_parser_InputEvent(input_thread_t *input,
             if (parser->cbs->on_subtree_added)
                 parser->cbs->on_subtree_added(input_GetItem(input),
                                               event->subitems, parser->userdata);
+            else
+                input_item_node_Delete(event->subitems);
             break;
         case INPUT_EVENT_ATTACHMENTS:
             if (parser->cbs->on_attachments_added != NULL)

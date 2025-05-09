@@ -446,7 +446,7 @@ typedef struct input_item_parser_cbs_t
      * @note This callback is optional.
      *
      * @param item the parsed item
-     * @param subtree sub items of the current item
+     * @param subtree sub items of the current item (the listener gets the ownership)
      * @param userdata user data set by input_item_Parse()
      */
     void (*on_subtree_added)(input_item_t *item, input_item_node_t *subtree, void *userdata);

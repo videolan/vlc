@@ -225,6 +225,7 @@ static void input_item_subtree_added(input_item_t *item,
     VLC_UNUSED(item);
     libvlc_media_t * p_md = user_data;
     libvlc_media_add_subtree(p_md, node);
+    input_item_node_Delete(node);
 }
 
 void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *node)
