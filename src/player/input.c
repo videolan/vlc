@@ -870,7 +870,7 @@ vlc_player_input_MouseFallback(struct vlc_player_input *input)
     vlc_player_TogglePause(player);
 }
 
-static void
+static bool
 input_thread_Events(input_thread_t *input_thread,
                     const struct vlc_input_event *event, void *user_data)
 {
@@ -904,8 +904,10 @@ input_thread_Events(input_thread_t *input_thread,
                                         VLC_PLAYER_TIMER_EVENT_DISCONTINUITY,
                                         VLC_TICK_INVALID);
         }
-        return;
+        return true;
     }
+
+    bool handled = true;
 
     vlc_mutex_lock(&player->lock);
 
@@ -1053,10 +1055,12 @@ input_thread_Events(input_thread_t *input_thread,
             vlc_player_input_MouseFallback(input);
             break;
         default:
+            handled = false;
             break;
     }
 
     vlc_mutex_unlock(&player->lock);
+    return handled;
 }
 
 void

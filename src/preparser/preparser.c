@@ -329,7 +329,7 @@ end:
     TaskDelete(task);
 }
 
-static void
+static bool
 on_thumbnailer_input_event( input_thread_t *input,
                             const struct vlc_input_event *event, void *userdata )
 {
@@ -337,7 +337,7 @@ on_thumbnailer_input_event( input_thread_t *input,
     if ( event->type != INPUT_EVENT_THUMBNAIL_READY &&
          ( event->type != INPUT_EVENT_STATE || ( event->state.value != ERROR_S &&
                                                  event->state.value != END_S ) ) )
-         return;
+         return false;
 
     struct task *task = userdata;
 
@@ -347,6 +347,7 @@ on_thumbnailer_input_event( input_thread_t *input,
         task->preparse_status = VLC_SUCCESS;
     }
     vlc_sem_post(&task->preparse_ended);
+    return true;
 }
 
 static int

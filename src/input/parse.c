@@ -47,12 +47,13 @@ struct input_item_parser_id_t
     void *userdata;
 };
 
-static void
+static bool
 input_item_parser_InputEvent(input_thread_t *input,
                              const struct vlc_input_event *event, void *parser_)
 {
     input_item_parser_id_t *parser = parser_;
 
+    bool handled = true;
     switch (event->type)
     {
         case INPUT_EVENT_TIMES:
@@ -83,8 +84,10 @@ input_item_parser_InputEvent(input_thread_t *input,
                                                   parser->userdata);
             break;
         default:
+            handled = false;
             break;
     }
+    return handled;
 }
 
 input_item_parser_id_t *

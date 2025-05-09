@@ -333,7 +333,7 @@ struct vlc_input_event
 
 struct vlc_input_thread_callbacks
 {
-    void (*on_event)(input_thread_t *input, const struct vlc_input_event *event,
+    bool (*on_event)(input_thread_t *input, const struct vlc_input_event *event,
                      void *userdata);
 };
 
