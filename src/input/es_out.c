@@ -4553,9 +4553,6 @@ static void EsOutUpdateInfo(es_out_sys_t *p_sys,
            const char *psz_loc_name = NULL;
            switch (fmt->video.projection_mode)
            {
-           case PROJECTION_MODE_RECTANGULAR:
-               psz_loc_name = N_("Rectangular");
-               break;
            case PROJECTION_MODE_EQUIRECTANGULAR:
                psz_loc_name = N_("Equirectangular");
                break;
