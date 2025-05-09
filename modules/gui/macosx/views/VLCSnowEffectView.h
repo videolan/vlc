@@ -21,10 +21,13 @@
  *****************************************************************************/
 
 #import <Cocoa/Cocoa.h>
+#import <MetalKit/MetalKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCSnowEffectView : NSView
+@interface VLCSnowEffectView : NSView<MTKViewDelegate>
+
+@property MTKView *mtkView;
 
 @end
 
