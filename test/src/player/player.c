@@ -591,7 +591,7 @@ player_on_media_epg_changed(vlc_player_t *player, input_item_t *media,
 
 static void
 player_on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
-                           input_item_node_t *subitems, void *data)
+                           const input_item_node_t *subitems, void *data)
 {
     (void) media;
     struct ctx *ctx = get_ctx(player, data);

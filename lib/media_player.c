@@ -462,7 +462,7 @@ on_media_meta_changed(vlc_player_t *player, input_item_t *media, void *data)
 
 static void
 on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
-                          input_item_node_t *new_subitems, void *data)
+                          const input_item_node_t *new_subitems, void *data)
 {
     (void) player;
 

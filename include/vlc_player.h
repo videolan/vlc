@@ -3191,7 +3191,7 @@ struct vlc_player_cbs
      * @param data opaque pointer set by vlc_player_AddListener()
      */
     void (*on_media_subitems_changed)(vlc_player_t *player,
-        input_item_t *media, input_item_node_t *new_subitems, void *data);
+        input_item_t *media, const input_item_node_t *new_subitems, void *data);
 
     /**
      * Called when new attachments are added to the media

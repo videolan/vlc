@@ -34,7 +34,7 @@ typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
 static void
 vlc_playlist_CollectChildren(vlc_playlist_t *playlist,
                              media_vector_t *dest,
-                             input_item_node_t *node)
+                             const input_item_node_t *node)
 {
     vlc_playlist_AssertLocked(playlist);
     for (int i = 0; i < node->i_children; ++i)
@@ -48,7 +48,7 @@ vlc_playlist_CollectChildren(vlc_playlist_t *playlist,
 
 int
 vlc_playlist_ExpandItem(vlc_playlist_t *playlist, size_t index,
-                        input_item_node_t *node)
+                        const input_item_node_t *node)
 {
     vlc_playlist_AssertLocked(playlist);
 
@@ -63,7 +63,7 @@ vlc_playlist_ExpandItem(vlc_playlist_t *playlist, size_t index,
 
 int
 vlc_playlist_ExpandItemFromNode(vlc_playlist_t *playlist,
-                                input_item_node_t *subitems)
+                                const input_item_node_t *subitems)
 {
     vlc_playlist_AssertLocked(playlist);
     input_item_t *media = subitems->p_item;

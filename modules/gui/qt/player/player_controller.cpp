@@ -784,7 +784,7 @@ static void on_player_media_epg_changed(vlc_player_t *, input_item_t *, void *da
     });
 }
 
-static void on_player_subitems_changed(vlc_player_t *, input_item_t *, input_item_node_t *, void *data)
+static void on_player_subitems_changed(vlc_player_t *, input_item_t *, const input_item_node_t *, void *data)
 {
     PlayerControllerPrivate* that = static_cast<PlayerControllerPrivate*>(data);
     msg_Dbg( that->p_intf, "on_player_subitems_changed");

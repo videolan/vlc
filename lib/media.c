@@ -130,12 +130,12 @@ static libvlc_media_t *input_item_add_subitem( libvlc_media_t *p_md,
 struct vlc_item_list
 {
     struct vlc_list node;
-    input_item_node_t *item;
+    const input_item_node_t *item;
     libvlc_media_t *media;
 };
 
 static struct vlc_item_list *
-wrap_item_in_list( libvlc_media_t *media, input_item_node_t *item )
+wrap_item_in_list( libvlc_media_t *media, const input_item_node_t *item )
 {
     struct vlc_item_list *node = malloc( sizeof *node );
     if( node == NULL )
@@ -146,7 +146,7 @@ wrap_item_in_list( libvlc_media_t *media, input_item_node_t *item )
 }
 
 static void input_item_add_subnode( libvlc_media_t *md,
-                                    input_item_node_t *root )
+                                    const input_item_node_t *root )
 {
     struct vlc_list list;
     vlc_list_init( &list );
@@ -227,7 +227,7 @@ static void input_item_subtree_added(input_item_t *item,
     libvlc_media_add_subtree(p_md, node);
 }
 
-void libvlc_media_add_subtree(libvlc_media_t *p_md, input_item_node_t *node)
+void libvlc_media_add_subtree(libvlc_media_t *p_md, const input_item_node_t *node)
 {
     input_item_add_subnode( p_md, node );
 

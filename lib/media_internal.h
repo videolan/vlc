@@ -55,7 +55,7 @@ struct libvlc_media_t
 /* Media Descriptor */
 libvlc_media_t * libvlc_media_new_from_input_item( input_item_t * );
 
-void libvlc_media_add_subtree(libvlc_media_t *, input_item_node_t *);
+void libvlc_media_add_subtree(libvlc_media_t *, const input_item_node_t *);
 
 static inline enum es_format_category_e
 libvlc_track_type_to_escat( libvlc_track_type_t i_type )

@@ -121,7 +121,8 @@ on_player_media_length_changed(vlc_player_t *player, vlc_tick_t new_length,
 
 static void
 on_player_media_subitems_changed(vlc_player_t *player, input_item_t *media,
-                                 input_item_node_t *subitems, void *userdata)
+                                 const input_item_node_t *subitems,
+                                 void *userdata)
 {
     VLC_UNUSED(player);
     VLC_UNUSED(media);
