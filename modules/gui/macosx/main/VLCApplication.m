@@ -58,6 +58,18 @@
          * it ends-up after being relocated or rename */
         _appLocationURL = [[[NSBundle mainBundle] bundleURL] fileReferenceURL];
 
+        if (config_GetInt("macosx-icon-change")) {
+            NSCalendar *const gregorian =
+                [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+            const NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay
+                                                              inUnit:NSCalendarUnitYear
+                                                             forDate:[NSDate date]];
+
+            if (dayOfYear >= 354) {
+                _winterHolidaysTheming = YES;
+            }
+        }
+
     }
     return self;
 }
@@ -75,16 +87,12 @@
     if (_vlcAppIconImage != nil)
         return _vlcAppIconImage;
 
-    if (config_GetInt("macosx-icon-change")) {
+    if (self.winterHolidaysTheming) {
         /* After day 354 of the year, the usual VLC cone is replaced by another cone
          * wearing a Father Xmas hat.
          * Note: this icon doesn't represent an endorsement of The Coca-Cola Company.
          */
-        NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-        NSUInteger dayOfYear = [gregorian ordinalityOfUnit:NSCalendarUnitDay inUnit:NSCalendarUnitYear forDate:[NSDate date]];
-
-        if (dayOfYear >= 354)
-            _vlcAppIconImage = [NSImage imageNamed:@"VLC-Xmas"];
+        _vlcAppIconImage = [NSImage imageNamed:@"VLC-Xmas"];
     }
 
     if (_vlcAppIconImage == nil)

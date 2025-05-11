@@ -43,5 +43,6 @@
  * Must be called from the main thread only.
  */
 @property(strong, readonly) NSImage *vlcAppIconImage;
+@property(assign, readonly) BOOL winterHolidaysTheming;
 
 @end
