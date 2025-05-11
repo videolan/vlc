@@ -75,6 +75,9 @@
 
 - (void)setup
 {
+    self.wantsLayer = YES;
+    self.layer.backgroundColor = NSColor.clearColor.CGColor;
+
     VLCMain * const main = VLCMain.sharedInstance;
     const id<MTLDevice> metalDevice = main.metalDevice;
     NSParameterAssert(metalDevice != nil);
@@ -83,6 +86,10 @@
     _mtkView = [[MTKView alloc] initWithFrame:self.bounds device:metalDevice];
     self.mtkView.delegate = self;
     self.mtkView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+    self.mtkView.colorPixelFormat = MTLPixelFormatBGRA8Unorm;
+    self.mtkView.clearColor = MTLClearColorMake(0, 0, 0, 0);
+    ((CAMetalLayer *)self.mtkView.layer).opaque = NO;
+    self.mtkView.layer.backgroundColor = NSColor.clearColor.CGColor;
     [self addSubview:self.mtkView];
 
     _commandQueue = [metalDevice newCommandQueue];
@@ -159,6 +166,11 @@
     self.mtkView.paused = NO;
     self.mtkView.enableSetNeedsDisplay = NO;
     _startTime = CACurrentMediaTime();
+}
+
+- (BOOL)isOpaque
+{
+    return NO;
 }
 
 // MARK: - MTKViewDelegate
