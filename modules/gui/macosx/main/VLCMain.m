@@ -291,13 +291,14 @@ static VLCMain *sharedInstance = nil;
     _metalDevice = MTLCreateSystemDefaultDevice();
     NSString * const libraryPath =
         [NSBundle.mainBundle pathForResource:@"Shaders" ofType:@"metallib"];
-    if (!libraryPath) {
+    if (libraryPath) {
+        NSError *error = nil;
+        _metalLibrary = [_metalDevice newLibraryWithFile:libraryPath error:&error];
+        if (!_metalLibrary) {
+            NSLog(@"Error creating Metal library: %@", error);
+        }
+    } else {
         NSLog(@"Error: Could not find Shaders.metallib in the bundle.");
-    }
-    NSError *error = nil;
-    _metalLibrary = [_metalDevice newLibraryWithFile:libraryPath error:&error];
-    if (!_metalLibrary) {
-        NSLog(@"Error creating Metal library: %@", error);
     }
 
     _clickerManager = [[VLCClickerManager alloc] init];
