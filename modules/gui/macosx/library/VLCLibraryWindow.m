@@ -31,6 +31,7 @@
 #import "extensions/NSView+VLCAdditions.h"
 #import "extensions/NSWindow+VLCAdditions.h"
 
+#import "main/VLCApplication.h"
 #import "main/VLCMain.h"
 #import "menus/VLCMainMenu.h"
 
@@ -78,6 +79,7 @@
 #import "views/VLCNoResultsLabel.h"
 #import "views/VLCPlaybackEndViewController.h"
 #import "views/VLCRoundedCornerTextField.h"
+#import "views/VLCSnowEffectView.h"
 #import "views/VLCTrackingView.h"
 
 #import "windows/controlsbar/VLCMainWindowControlsBar.h"
@@ -289,6 +291,14 @@ static void addShadow(NSImageView *__unsafe_unretained imageView)
         [view.leftAnchor constraintEqualToAnchor:self.libraryTargetView.leftAnchor],
         [view.rightAnchor constraintEqualToAnchor:self.libraryTargetView.rightAnchor]
     ]];
+
+    if (VLCMain.sharedInstance.metalLibrary && ((VLCApplication *)NSApplication.sharedApplication).winterHolidaysTheming) {
+        VLCSnowEffectView * const snowView =
+            [[VLCSnowEffectView alloc] initWithFrame:self.contentView.bounds];
+        [self.libraryTargetView addSubview:snowView];
+        snowView.translatesAutoresizingMaskIntoConstraints = NO;
+        [snowView applyConstraintsToFillSuperview];
+    }
 }
 
 - (void)displayLibraryPlaceholderViewWithImage:(NSImage *)image
