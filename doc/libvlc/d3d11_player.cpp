@@ -716,7 +716,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.lpszClassName = "WindowClass";
+    wc.lpszClassName = TEXT("WindowClass");
 
     RegisterClassEx(&wc);
 
@@ -727,8 +727,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     Context.client_area.height = wr.bottom - wr.top;
 
     Context.hWnd = CreateWindowEx(0,
-                          "WindowClass",
-                          "libvlc Demo app",
+                          TEXT("WindowClass"),
+                          TEXT("libvlc Demo app"),
                           WS_OVERLAPPEDWINDOW,
                           CW_USEDEFAULT, CW_USEDEFAULT,
                           Context.client_area.width,
