@@ -32,6 +32,7 @@
 #include <vlc_charset.h>                           /* EnsureUTF8 */
 #include <vlc_input.h>
 #include <vlc_aout.h>
+#include <vlc_memory.h> // realloc_or_free
 #include <vlc_plugin.h>
 #include <vlc_dialog.h>
 #include <assert.h>
@@ -4653,7 +4654,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             continue;
 
         const MP4_Box_t *p_tfhd = MP4_BoxGet( p_traf, "tfhd" );
-        const uint32_t i_trun_count = MP4_BoxCount( p_traf, "trun" );
+        uint32_t i_trun_count = MP4_BoxCount( p_traf, "trun" );
         if ( !p_tfhd || !i_trun_count )
             continue;
 
@@ -4661,9 +4662,12 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
         if( !p_track )
             continue;
 
-        p_track->context.runs.p_array = calloc(i_trun_count, sizeof(mp4_run_t));
+        p_track->context.runs.p_array = realloc_or_free(p_track->context.runs.p_array,
+            (i_trun_count + p_track->context.runs.i_count) * sizeof(mp4_run_t));
         if(!p_track->context.runs.p_array)
             continue;
+        memset(&p_track->context.runs.p_array[i_trun_count], 0, p_track->context.runs.i_count * sizeof(mp4_run_t));
+        i_trun_count += p_track->context.runs.i_count;
 
         /* Get defaults for this/these RUN */
         uint32_t i_track_defaultsamplesize = 0;
@@ -4817,6 +4821,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
                      MP4_rescale_mtime( i_trun_dts, p_track->i_timescale ), i_trun_data_offset );
 #endif
             //************
+            assert(p_track->context.runs.i_count < i_trun_count);
             mp4_run_t *p_run = &p_track->context.runs.p_array[p_track->context.runs.i_count++];
             p_run->i_first_dts = i_trun_dts;
             p_run->i_offset = i_trun_data_offset;
