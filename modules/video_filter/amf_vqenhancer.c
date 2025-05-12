@@ -180,7 +180,9 @@ int D3D11CreateAMFVQE(vlc_object_t *p_this)
     if (dev_sys->d3d_dev.adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
     {
         msg_Err(filter, "AMF filter only supported with AMD GPUs");
-        goto error;
+        D3D11_FilterReleaseInstance(&sys->d3d_dev);
+        D3D11_Destroy(&sys->hd3d);
+        return VLC_EGENERIC;
     }
 
     DXGI_FORMAT input_format = dstDesc.Format;
