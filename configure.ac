@@ -4417,6 +4417,44 @@ then
   ])
 
   dnl
+  dnl If possible, use xcrun to find the right metal tool
+  dnl
+
+  AS_IF([test ! "${XCRUN}" = "no"], [
+    AC_MSG_CHECKING([for metal (using xcrun)])
+    METAL="$(eval $XCRUN -f metal 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${METAL}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "${METAL}" = "no"], [
+    AC_PATH_PROG(METAL, [metal], [no])
+    AS_IF([test "${METAL}" = "no"], [
+      AC_MSG_ERROR([metal was not found, but is required for --enable-macosx])
+    ])
+  ])
+
+  dnl
+  dnl If possible, use xcrun to find the right metallib tool
+  dnl
+
+  AS_IF([test ! "${XCRUN}" = "no"], [
+    AC_MSG_CHECKING([for metallib (using xcrun)])
+    METALLIB="$(eval $XCRUN -f metallib 2>/dev/null || echo no)"
+    AC_MSG_RESULT([${METALLIB}])
+  ], [
+    AC_MSG_WARN([Looking for tools without using xcrun])
+  ])
+
+  AS_IF([test "${METALLIB}" = "no"], [
+    AC_PATH_PROG(METALLIB, [metallib], [no])
+    AS_IF([test "${METALLIB}" = "no"], [
+      AC_MSG_ERROR([metallib was not found, but is required for --enable-macosx])
+    ])
+  ])
+
+  dnl
   dnl If possible, use xcrun to find the right actool
   dnl
 

@@ -36,10 +36,15 @@ xib_verbose__0 = $(xib_verbose_0)
 	  --minimum-deployment-target 10.11 --output-format human-readable-text \
 	  --compile $@ $<
 
+metal_verbose = $(metal_verbose_$(V))
+metal_verbose_ = $(metal_verbose__$(AM_DEFAULT_VERBOSITY))
+metal_verbose_0 = @echo "  METAL     " $@;
+metal_verbose__0 = $(metal_verbose_0)
+
 # Rule to compile .metal to .air
 .air: .metal
 	@mkdir -p $(builddir)/$(@D)
-	xcrun metal -c $< -o $(builddir)/$@
+	$(metal_verbose)$(METAL) -c $< -o $(builddir)/$@
 
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc -I$(srcdir)/gui/macosx
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
@@ -544,8 +549,11 @@ libmacosx_plugin_la_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES)
 if ENABLE_MACOSX_UI
 gui_LTLIBRARIES += libmacosx_plugin.la
 BUILT_SOURCES += $(libmacosx_plugin_la_XIB_SOURCES:.xib=.nib)
-endif
 
+metallib_verbose = $(metallib_verbose_$(V))
+metallib_verbose_ = $(metallib_verbose__$(AM_DEFAULT_VERBOSITY))
+metallib_verbose_0 = @echo "  METALLIB     " $@;
+metallib_verbose__0 = $(metallib_verbose_0)
 
 libmacosx_plugin_la_METAL_SOURCES = gui/macosx/shaders/VLCSnowShader.metal
 libmacosx_plugin_la_METAL_AIR_FILES = $(libmacosx_plugin_la_METAL_SOURCES:.metal=.air)
@@ -553,7 +561,9 @@ libmacosx_plugin_la_METAL_LIBRARY = Shaders.metallib
 
 $(libmacosx_plugin_la_METAL_LIBRARY): $(libmacosx_plugin_la_METAL_AIR_FILES)
 	@mkdir -p $(builddir)/$(@D)
-	xcrun metallib $(addprefix $(builddir)/,$(libmacosx_plugin_la_METAL_AIR_FILES)) -o $(builddir)/$@
+	$(metallib_verbose)$(METALLIB) $(addprefix $(builddir)/,$(libmacosx_plugin_la_METAL_AIR_FILES)) -o $(builddir)/$@
+
+endif
 
 libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/App-Icons/VLC-Xmas.icns \
