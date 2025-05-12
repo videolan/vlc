@@ -444,10 +444,18 @@ int D3D11_UpscalerUpdate(vlc_object_t *vd, d3d11_scaler *scaleProc, d3d11_device
             scaleProc->picsys.processorOutput->Release();
             scaleProc->picsys.processorOutput = NULL;
         }
+        if (scaleProc->picsys.context)
+        {
+            scaleProc->picsys.context->Release();
+            scaleProc->picsys.context = nullptr;
+        }
+
         scaleProc->picsys.texture[0] = upscaled.Get();
         for (size_t i=0; i<ARRAY_SIZE(scaleProc->picsys.resourceView); i++)
             scaleProc->picsys.resourceView[i] = scaleProc->SRVs[i];
         scaleProc->picsys.formatTexture = texDesc.Format;
+        scaleProc->picsys.context = d3d_dev->d3dcontext;
+        scaleProc->picsys.context->AddRef();
     }
 
 #ifdef HAVE_AMF_SCALER
@@ -732,8 +740,15 @@ int D3D11_UpscalerScale(vlc_object_t *vd, d3d11_scaler *scaleProc, picture_sys_t
             scaleProc->picsys.processorOutput->Release();
             scaleProc->picsys.processorOutput = NULL;
         }
+        if (scaleProc->picsys.context)
+        {
+            scaleProc->picsys.context->Release();
+            scaleProc->picsys.context = nullptr;
+        }
         scaleProc->picsys.texture[0] = out;
         scaleProc->picsys.formatTexture = inputDesc.Format;
+        scaleProc->picsys.context = scaleProc->d3d_dev->d3dcontext;
+        scaleProc->picsys.context->AddRef();
 
         amfOutput->Release();
 
