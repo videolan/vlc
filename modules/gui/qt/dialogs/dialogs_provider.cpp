@@ -415,7 +415,7 @@ void DialogsProvider::playlistsDialog( const QVariantList & medias, MLPlaylistLi
 {
     const auto dialog = new PlaylistsDialog(p_intf, medias, type);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->open();
+    dialog->show(); // "Modeless dialogs are displayed using show()"
 }
 
 void DialogsProvider::bookmarksDialog()
