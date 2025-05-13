@@ -31,7 +31,7 @@
 
 #include "../../libvlc/test.h"
 
-static void Parse(vlc_object_t *obj, void *priv, block_t *data, stime_t append_pcr)
+static void Parse(vlc_object_t *obj, void *priv, block_t *data, ts_90khz_t append_pcr)
 {
     VLC_UNUSED(obj);
     VLC_UNUSED(append_pcr);

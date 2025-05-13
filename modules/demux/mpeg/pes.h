@@ -22,7 +22,7 @@
 
 #include "timestamps.h"
 
-static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, stime_t *ret )
+static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, ts_90khz_t *ret )
 {
     /* !warn broken muxers set incorrect flags. see #17773 and #19140 */
     /* check marker bits, and i_flags = b 0010, 0011 or 0001 */
@@ -34,29 +34,29 @@ static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, 
         return false;
 
 
-    *ret =  ((stime_t)(p_data[ 0]&0x0e ) << 29)|
-             (stime_t)(p_data[1] << 22)|
-            ((stime_t)(p_data[2]&0xfe) << 14)|
-             (stime_t)(p_data[3] << 7)|
-             (stime_t)(p_data[4] >> 1);
+    *ret =  ((ts_90khz_t)(p_data[ 0]&0x0e ) << 29)|
+             (ts_90khz_t)(p_data[1] << 22)|
+            ((ts_90khz_t)(p_data[2]&0xfe) << 14)|
+             (ts_90khz_t)(p_data[3] << 7)|
+             (ts_90khz_t)(p_data[4] >> 1);
     return true;
 }
 
 /* PS SCR timestamp as defined in H222 2.5.3.2 */
-static inline stime_t ExtractPackHeaderTimestamp( const uint8_t *p_data )
+static inline ts_90khz_t ExtractPackHeaderTimestamp( const uint8_t *p_data )
 {
-    return ((stime_t)(p_data[ 0]&0x38 ) << 27)|
-            ((stime_t)(p_data[0]&0x03 ) << 28)|
-             (stime_t)(p_data[1] << 20)|
-            ((stime_t)(p_data[2]&0xf8 ) << 12)|
-            ((stime_t)(p_data[2]&0x03 ) << 13)|
-             (stime_t)(p_data[3] << 5) |
-             (stime_t)(p_data[4] >> 3);
+    return  ((ts_90khz_t)(p_data[0]&0x38 ) << 27)|
+            ((ts_90khz_t)(p_data[0]&0x03 ) << 28)|
+             (ts_90khz_t)(p_data[1] << 20)|
+            ((ts_90khz_t)(p_data[2]&0xf8 ) << 12)|
+            ((ts_90khz_t)(p_data[2]&0x03 ) << 13)|
+             (ts_90khz_t)(p_data[3] << 5) |
+             (ts_90khz_t)(p_data[4] >> 3);
 }
 
 inline
 static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size_t i_header,
-                           unsigned *pi_skip, stime_t *pi_dts, stime_t *pi_pts,
+                           unsigned *pi_skip, ts_90khz_t *pi_dts, ts_90khz_t *pi_pts,
                            uint8_t *pi_stream_id, bool *pb_pes_scambling )
 {
     unsigned i_skip;
