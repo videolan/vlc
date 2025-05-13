@@ -1054,7 +1054,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              p_pmt->i_last_dts > 0 )
         {
             int64_t i_start = (p_pmt->pcr.i_first > -1) ? p_pmt->pcr.i_first :
-                              TO_SCALE(p_pmt->pcr.i_first_dts);
+                              p_pmt->pcr.i_first_dts;
             int64_t i_last = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->i_last_dts );
             i_last += p_pmt->pcr.i_pcroffset;
             *pi64 = FROM_SCALE(i_last - i_start);
@@ -2087,9 +2087,9 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
                         {
                             p_pmt->pcr.i_first = *pi_pcr;
                         }
-                        else if( p_pmt->pcr.i_first_dts < VLC_TICK_0 )
+                        else if( p_pmt->pcr.i_first_dts == -1 )
                         {
-                            p_pmt->pcr.i_first_dts = FROM_SCALE(*pi_pcr);
+                            p_pmt->pcr.i_first_dts = *pi_pcr;
                         }
 
                         if( i_program == 0 || i_program == p_pmt->i_number )
@@ -2407,11 +2407,11 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
         return;
     }
     /* Record the first data packet timestamp in case there won't be any PCR */
-    else if( !p_pmt->pcr.i_first_dts )
+    else if( p_pmt->pcr.i_first_dts == -1 )
     {
-        p_pmt->pcr.i_first_dts = p_block->i_dts;
+        p_pmt->pcr.i_first_dts = TO_SCALE(p_block->i_dts);
     }
-    else if( p_block->i_dts - p_pmt->pcr.i_first_dts > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
+    else if( p_block->i_dts - FROM_SCALE(p_pmt->pcr.i_first_dts) > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
     {
         if( p_pmt->pcr.i_current < 0 &&
             GetPID( p_demux->p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )
