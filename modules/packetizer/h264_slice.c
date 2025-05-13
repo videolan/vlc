@@ -189,8 +189,14 @@ h264_slice_t * h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
         if( bs_read1( &s ) ) /* num_ref_idx_active_override_flag */
         {
             num_ref_idx_l01_active_minus1[0] = bs_read_ue( &s );
+            if (num_ref_idx_l01_active_minus1[0] > 31)
+                num_ref_idx_l01_active_minus1[0] = p_pps->num_ref_idx_l01_default_active_minus1[0];
             if( i_slice_type == 1 || i_slice_type == 6 ) /* B slices */
+            {
                 num_ref_idx_l01_active_minus1[1] = bs_read_ue( &s );
+                if (num_ref_idx_l01_active_minus1[1] > 31)
+                    num_ref_idx_l01_active_minus1[1] = p_pps->num_ref_idx_l01_default_active_minus1[1];
+            }
         }
     }
 
