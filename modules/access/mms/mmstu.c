@@ -1177,17 +1177,6 @@ static int  mms_ParseCommand( stream_t *p_access,
     p_sys->i_cmd = 0;
     p_sys->i_command = 0;
     *pi_used = 0;
-    if( (p_sys->p_cmd = malloc( i_data )) )
-    {
-        p_sys->i_cmd = i_data;
-        memcpy( p_sys->p_cmd, p_data, i_data );
-        *pi_used = i_data; /* by default */
-    }
-    else
-    {
-        return -1;
-    }
-
     if( i_data < MMS_CMD_HEADERSIZE )
     {
         msg_Warn( p_access, "truncated command (header incomplete)" );
@@ -1203,6 +1192,17 @@ static int  mms_ParseCommand( stream_t *p_access,
         return -1;
     }
 
+    if( (p_sys->p_cmd = malloc( i_data )) )
+    {
+        p_sys->i_cmd = i_data;
+        memcpy( p_sys->p_cmd, p_data, i_data );
+        *pi_used = i_data; /* by default */
+    }
+    else
+    {
+        return -1;
+    }
+
     if( i_length > p_sys->i_cmd )
     {
         msg_Warn( p_access,
@@ -1210,11 +1210,8 @@ static int  mms_ParseCommand( stream_t *p_access,
                    (size_t)i_length - i_data  );
         return -1;
     }
-    else if( i_length < p_sys->i_cmd )
-    {
-        p_sys->i_cmd = i_length;
-        *pi_used = i_length;
-    }
+    p_sys->i_cmd = i_length;
+    *pi_used = i_length;
 
     msg_Dbg( p_access,
              "recv command start_sequence:0x%8.8x command_id:0x%8.8x length:%d len8:%d sequence 0x%8.8x len8_II:%d dir_comm:0x%8.8x",
