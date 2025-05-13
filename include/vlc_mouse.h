@@ -141,6 +141,12 @@ static inline bool vlc_mouse_HasMoved( const vlc_mouse_t *p_old,
 {
     return p_old->i_x != p_new->i_x || p_old->i_y != p_new->i_y;
 }
+static inline bool vlc_mouse_HasDragged( const vlc_mouse_t *p_old,
+                                       const vlc_mouse_t *p_new )
+{
+    return vlc_mouse_IsLeftPressed( p_new ) &&
+           vlc_mouse_HasMoved( p_old, p_new );
+}
 static inline bool vlc_mouse_HasButton( const vlc_mouse_t *p_old,
                                         const vlc_mouse_t *p_new )
 {
