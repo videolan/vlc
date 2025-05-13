@@ -160,6 +160,7 @@ struct es_out_id_t
     vlc_mouse_event mouse_event_cb;
     void* mouse_event_userdata;
     vlc_mouse_t oldmouse;
+    bool mouse_being_dragged;
 };
 
 typedef struct
@@ -343,13 +344,26 @@ static void MouseEventCb(const vlc_mouse_t *newmouse, void *userdata)
     if(!newmouse || vlc_mouse_HasMouseFilter(newmouse))
     {
         vlc_mouse_Init(&id->oldmouse);
+        id->mouse_being_dragged = false;
         return;
     }
 
+    const es_format_t *fmt = id->fmt_out.i_cat != UNKNOWN_ES ? &id->fmt_out : &id->fmt;
+
+    if (fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR) {
+        if (vlc_mouse_HasDragged( &id->oldmouse, newmouse )) {
+            id->mouse_being_dragged = true;
+        }
+    };
+
     if (vlc_mouse_HasReleased(&id->oldmouse, newmouse, MOUSE_BUTTON_LEFT)) {
-        input_SendEvent(p_sys->p_input, &(struct vlc_input_event) {
-            .type = INPUT_EVENT_MOUSE_LEFT
-        });
+        if (!id->mouse_being_dragged) {
+            input_SendEvent(p_sys->p_input, &(struct vlc_input_event) {
+                .type = INPUT_EVENT_MOUSE_LEFT
+            });
+        }
+
+        id->mouse_being_dragged = false;
     }
 
     id->oldmouse = *newmouse;
