@@ -22,6 +22,7 @@
 #define VLC_PLAYLIST_ITEM_H
 
 #include <vlc_atomic.h>
+#include <vlc_preparser.h>
 
 typedef struct vlc_playlist_item vlc_playlist_item_t;
 typedef struct input_item_t input_item_t;
@@ -30,6 +31,7 @@ struct vlc_playlist_item
 {
     input_item_t *media;
     uint64_t id;
+    vlc_preparser_req_id preparser_id;
     vlc_atomic_rc_t rc;
 };
 
