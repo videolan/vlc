@@ -614,7 +614,11 @@ static stream_t* PreparseStream( stream_t *p_demux )
          else
          {
             //strip xml prologue to avoid double conversion
-            char *tmp = strstr( psz_source, "?>" ) + 2;
+            char *tmp = strstr( psz_source, "?>" );
+            if ( tmp )
+                tmp += 2;
+            else
+                tmp = psz_source;
             tmp = FromCharset( encoding, tmp, strlen( tmp ) );
             free( psz_source );
             free( encoding );
