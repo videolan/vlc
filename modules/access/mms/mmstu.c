@@ -1173,6 +1173,10 @@ static int  mms_ParseCommand( stream_t *p_access,
     uint32_t    i_id;
 
     free( p_sys->p_cmd );
+    p_sys->p_cmd = NULL;
+    p_sys->i_cmd = 0;
+    p_sys->i_command = 0;
+    *pi_used = 0;
     if( (p_sys->p_cmd = malloc( i_data )) )
     {
         p_sys->i_cmd = i_data;
@@ -1181,15 +1185,12 @@ static int  mms_ParseCommand( stream_t *p_access,
     }
     else
     {
-        *pi_used = p_sys->i_cmd = 0;
-        p_sys->i_command = 0;
         return -1;
     }
 
     if( i_data < MMS_CMD_HEADERSIZE )
     {
         msg_Warn( p_access, "truncated command (header incomplete)" );
-        p_sys->i_command = 0;
         return -1;
     }
     i_id =  GetDWLE( p_data + 4 );
@@ -1199,7 +1200,6 @@ static int  mms_ParseCommand( stream_t *p_access,
     {
         msg_Err( p_access,
                  "incorrect command header (0x%"PRIx32")", i_id );
-        p_sys->i_command = 0;
         return -1;
     }
 
@@ -1208,7 +1208,6 @@ static int  mms_ParseCommand( stream_t *p_access,
         msg_Warn( p_access,
                   "truncated command (missing %zu bytes)",
                    (size_t)i_length - i_data  );
-        p_sys->i_command = 0;
         return -1;
     }
     else if( i_length < p_sys->i_cmd )
