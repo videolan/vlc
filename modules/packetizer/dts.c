@@ -91,6 +91,8 @@ static void PacketizeFlush( decoder_t *p_dec )
 static block_t *GetOutBuffer( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
+    if (p_sys->i_input_size == 0)
+        return NULL;
 
     if( !p_sys->b_date_set
      || p_dec->fmt_out.audio.i_rate != p_sys->first.i_rate )
